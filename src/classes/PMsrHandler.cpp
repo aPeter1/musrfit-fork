@@ -1,0 +1,1780 @@
+/***************************************************************************
+
+  PMsrHandler.cpp
+
+  Author: Andreas Suter
+  e-mail: andreas.suter@psi.ch
+
+  $Id$
+
+***************************************************************************/
+
+/***************************************************************************
+ *   Copyright (C) 2007 by Andreas Suter                                   *
+ *   andreas.suter@psi.c                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
+#include <math.h>
+
+#include <string>
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+#include <TString.h>
+#include <TObjArray.h>
+#include <TObjString.h>
+#include <TDatime.h>
+
+#include "PMusr.h"
+#include "PMsrHandler.h"
+
+//--------------------------------------------------------------------------
+// Constructor
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param fileName
+ */
+PMsrHandler::PMsrHandler(char *fileName)
+{
+  // init variables
+  fFileName = fileName;
+  fMsrBlockCounter = 0;
+
+  fTitle = "";
+
+  fStatistic.fChisq = true;
+  fStatistic.fMin   = -1.0;
+  fStatistic.fNdf   = 0;
+
+  fFuncHandler = 0;
+}
+
+//--------------------------------------------------------------------------
+// Destructor
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ */
+PMsrHandler::~PMsrHandler()
+{
+  fParam.clear();
+  fTheory.clear();
+  fFunctions.clear();
+  fRuns.clear();
+  fCommands.clear();
+  fPlots.clear();
+  fStatistic.fStatLines.clear();
+}
+
+//--------------------------------------------------------------------------
+// ReadMsrFile (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * <p><b>return:</b>
+ * - PMUSR_SUCCESS if everything is OK
+ * - line number if an error in the MSR file was encountered which cannot be handled.
+ *
+ */
+int PMsrHandler::ReadMsrFile()
+{
+  ifstream f;
+  char str[256];
+  TString line;
+  int line_no = 0;
+  int error = PMUSR_SUCCESS;
+
+  PMsrLineStructure current;
+
+  PMsrLines fit_parameter;
+  PMsrLines theory;
+  PMsrLines functions;
+  PMsrLines run;
+  PMsrLines commands;
+  PMsrLines plot;
+  PMsrLines statistic;
+
+  // open msr-file
+  f.open(fFileName.Data(), iostream::in);
+  if (!f.is_open()) {
+    return PMUSR_MSR_FILE_NOT_FOUND;
+  }
+
+  fMsrBlockCounter = -1; // no msr block
+
+  // read msr-file
+  while (!f.eof()) {
+
+    // read a line
+    f.getline(str, sizeof(str));
+    line = str;
+    line_no++;
+
+    current.fLineNo = line_no;
+    current.fLine   = line;
+
+    // if the line is not a comment line nor an empty line do something
+    if (!line.IsWhitespace() && !line.BeginsWith("#")) {
+
+      // check for a msr block
+      if (line_no == 1) { // title
+        fTitle = line;
+      } else if (line.Contains("FITPARAMETER")) { // FITPARAMETER block tag
+        fMsrBlockCounter = MSR_TAG_FITPARAMETER;
+      } else if (line.Contains("THEORY")) {       // THEORY block tag
+        fMsrBlockCounter = MSR_TAG_THEORY;
+        theory.push_back(current);
+      } else if (line.Contains("FUNCTIONS")) {    // FUNCTIONS block tag
+        fMsrBlockCounter = MSR_TAG_FUNCTIONS;
+        functions.push_back(current);
+      } else if (line.Contains("RUN")) {          // RUN block tag
+        fMsrBlockCounter = MSR_TAG_RUN;
+        run.push_back(current);
+      } else if (line.Contains("COMMANDS")) {     // COMMANDS block tag
+        fMsrBlockCounter = MSR_TAG_COMMANDS;
+        commands.push_back(current);
+      } else if (line.Contains("PLOT")) {         // PLOT block tag
+        fMsrBlockCounter = MSR_TAG_PLOT;
+        plot.push_back(current);
+      } else if (line.Contains("STATISTIC")) {    // STATISTIC block tag
+        fMsrBlockCounter = MSR_TAG_STATISTIC;
+        statistic.push_back(current);
+      } else { // the read line is some real stuff
+
+        switch (fMsrBlockCounter) {
+          case MSR_TAG_FITPARAMETER: // FITPARAMETER block
+            fit_parameter.push_back(current);
+            break;
+          case MSR_TAG_THEORY:       // THEORY block
+            theory.push_back(current);
+            break;
+          case MSR_TAG_FUNCTIONS:    // FUNCTIONS block
+            functions.push_back(current);
+            break;
+          case MSR_TAG_RUN:          // RUN block
+            run.push_back(current);
+            break;
+          case MSR_TAG_COMMANDS:     // COMMANDS block
+            commands.push_back(current);
+            break;
+          case MSR_TAG_PLOT:         // PLOT block
+            plot.push_back(current);
+            break;
+          case MSR_TAG_STATISTIC:    // STATISTIC block
+            statistic.push_back(current);
+            break;
+          default:
+            break;
+        }
+      }
+    }
+  }
+
+  // close msr-file
+  f.close();
+
+  // execute handler of the various blocks
+  if (!HandleFitParameterEntry(fit_parameter))
+    error = PMUSR_MSR_SYNTAX_ERROR;
+  if (!HandleTheoryEntry(theory))
+    error = PMUSR_MSR_SYNTAX_ERROR;
+  if (!HandleFunctionsEntry(functions))
+    error = PMUSR_MSR_SYNTAX_ERROR;
+  if (!HandleRunEntry(run))
+    error = PMUSR_MSR_SYNTAX_ERROR;
+  if (!HandleCommandsEntry(commands))
+    error = PMUSR_MSR_SYNTAX_ERROR;
+  if (!HandlePlotEntry(plot))
+    error = PMUSR_MSR_SYNTAX_ERROR;
+  if (!HandleStatisticEntry(statistic))
+    error = PMUSR_MSR_SYNTAX_ERROR;
+
+  // clean up
+  fit_parameter.clear();
+  theory.clear();
+  functions.clear();
+  run.clear();
+  commands.clear();
+  plot.clear();
+  statistic.clear();
+
+  return error;
+}
+
+//--------------------------------------------------------------------------
+// WriteMsrLogFile (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ */
+int PMsrHandler::WriteMsrLogFile()
+{
+  const unsigned int prec = 6; // output precision for float/doubles
+
+  TObjArray *tokens;
+  TObjString *ostr;
+  TString str;
+
+  // construct log file name
+  tokens = fFileName.Tokenize(".");
+  if (!tokens)
+    return PMUSR_TOKENIZE_ERROR;
+  ostr = dynamic_cast<TObjString*>(tokens->At(0));
+  str = ostr->GetString();
+  str += ".mlog";
+
+  // clean up
+  if (tokens) {
+    delete tokens;
+    tokens = 0;
+  }
+
+//cout << endl << "log file name = " << str.Data() << endl << endl;
+
+  ofstream f;
+
+  // open mlog-file
+  f.open(str.Data(), iostream::out);
+  if (!f.is_open()) {
+    return PMUSR_MSR_LOG_FILE_WRITE_ERROR;
+  }
+
+  // write mlog-file
+
+  // write title
+  f << fTitle.Data();
+  f << endl << "###############################################################";
+
+  // write fit parameter block
+  f << endl << "FITPARAMETER";
+  f << endl << "#      No Name        Value     Step        Pos_Error   Boundaries";
+  f << endl;
+  PMsrParamList::iterator param_iter;
+  for (param_iter = fParam.begin(); param_iter != fParam.end(); ++param_iter) {
+    // parameter no
+    f.width(9);
+    f << right << param_iter->fNo;
+    f << " ";
+    // parameter name
+    f.width(11);
+    f << left << param_iter->fName.Data();
+    f << " ";
+    // value of the parameter
+    f.width(10);
+    f.precision(prec);
+    f << left << param_iter->fValue;
+    // value of step/error/neg.error
+    f.width(12);
+    f.precision(prec);
+    f << left << param_iter->fStep;
+    f.width(12);
+    f.precision(prec);
+    if ((param_iter->fNoOfParams == 5) || (param_iter->fNoOfParams == 7)) // pos. error given
+      if (param_iter->fPosErrorPresent) // pos error is a number
+        f << left << param_iter->fPosError;
+      else // pos error is a none
+        f << left << "none";
+    else // no pos. error
+      f << left << "none";
+    // boundaries
+    if (param_iter->fNoOfParams > 5) {
+      f.width(8);
+      f.precision(prec);
+      f << left << param_iter->fLowerBoundary;
+      f.width(8);
+      f.precision(prec);
+      f << left << param_iter->fUpperBoundary;
+    }
+    // terminate line
+    f << endl;
+  }
+  f << endl << "###############################################################";
+
+  // write theory block
+  PMsrLines::iterator theo_iter;
+  for (theo_iter = fTheory.begin(); theo_iter != fTheory.end(); ++theo_iter) {
+    f << endl << theo_iter->fLine.Data();
+  }
+  f << endl;
+  f << endl << "###############################################################";
+
+  // write functions block
+  f << endl << "FUNCTIONS";
+  for (int i=0; i<GetNoOfFuncs(); i++) {
+    str = *fFuncHandler->GetFuncString(i);
+    str.ToLower();
+    f << endl << str.Data();
+  }
+  f << endl;
+  f << endl << "###############################################################";
+
+  // write run block
+  PMsrRunList::iterator run_iter;
+  for (run_iter = fRuns.begin(); run_iter != fRuns.end(); ++run_iter) {
+    // run header
+    f << endl << "RUN " << run_iter->fRunName.Data() << " ";
+    str = run_iter->fBeamline;
+    str.ToUpper();
+    f << str.Data() << " ";
+    str = run_iter->fInstitute;
+    str.ToUpper();
+    f << str.Data() << " ";
+    str = run_iter->fFileFormat;
+    str.ToUpper();
+    f << str.Data() << "   (name beamline institute data-file-format)";
+    // fittype
+    f.width(16);
+    switch (run_iter->fFitType) {
+      case MSR_FITTYPE_SINGLE_HISTO:
+        f << endl << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)";
+        break;
+      case MSR_FITTYPE_ASYM:
+        f << endl << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)";
+        break;
+      case MSR_FITTYPE_ASYM_RRF:
+        f << endl << left << "fittype" << MSR_FITTYPE_ASYM_RRF << "         (RRF asymmetry fit)";
+        break;
+      case MSR_FITTYPE_NO_MUSR:
+        f << endl << left << "fittype" << MSR_FITTYPE_NO_MUSR << "         (non muSR fit)";
+        break;
+      default:
+        break;
+    }
+    // rrffrequency
+    if (run_iter->fRRFFreq != -1.0) {
+      f.width(16);
+      f << endl << left << "rrffrequency";
+      f.precision(prec);
+      f << run_iter->fRRFFreq;
+    }
+    // rrfpacking
+    if (run_iter->fRRFPacking != -1) {
+      f.width(16);
+      f << endl << left << "rrfpacking";
+      f.precision(prec);
+      f << run_iter->fRRFPacking;
+    }
+    // alpha
+    if (run_iter->fAlphaParamNo != -1) {
+      f.width(16);
+      f << endl << left << "alpha";
+      f << run_iter->fAlphaParamNo;
+    }
+    // beta
+    if (run_iter->fBetaParamNo != -1) {
+      f.width(16);
+      f << endl << left << "beta";
+      f << run_iter->fBetaParamNo;
+    }
+    // alpha2
+    if (run_iter->fAlpha2ParamNo != -1) {
+      f.width(16);
+      f << endl << left << "alpha2";
+      f << run_iter->fAlpha2ParamNo;
+    }
+    // beta2
+    if (run_iter->fBeta2ParamNo != -1) {
+      f.width(16);
+      f << endl << left << "beta2";
+      f << run_iter->fBeta2ParamNo;
+    }
+    // norm
+    if (run_iter->fNormParamNo != -1) {
+      f.width(16);
+      f << endl << left << "norm";
+      // check if norm is give as a function
+      if (run_iter->fNormParamNo >= MSR_PARAM_FUN_OFFSET)
+        f << "fun" << run_iter->fNormParamNo-MSR_PARAM_FUN_OFFSET;
+      else
+        f << run_iter->fNormParamNo;
+    }
+    // backgr.fit
+    if (run_iter->fBkgFitParamNo != -1) {
+      f.width(16);
+      f << endl << left << "backgr.fit";
+      f << run_iter->fBkgFitParamNo;
+    }
+    // rphase
+    if (run_iter->fPhaseParamNo != -1) {
+      f.width(16);
+      f << endl << left << "rphase";
+      f << run_iter->fPhaseParamNo;
+    }
+    // lifetime
+    if (run_iter->fLifetimeParamNo != -1) {
+      f.width(16);
+      f << endl << left << "lifetime";
+      f << run_iter->fLifetimeParamNo;
+    }
+    // lifetimecorrection
+    if ((run_iter->fLifetimeCorrection) && (run_iter->fFitType == MSR_FITTYPE_SINGLE_HISTO)) {
+      f << endl << "lifetimecorrection";
+    }
+    // map
+    PIntVector::iterator map_iter;
+    f << endl << "map         ";
+    for (map_iter = run_iter->fMap.begin(); map_iter != run_iter->fMap.end(); ++map_iter) {
+      f.width(5);
+      f << right << *map_iter;
+    }
+    // if there are less maps then 10 fill with zeros
+    if (run_iter->fMap.size() < 10) {
+      for (int i=run_iter->fMap.size(); i<10; i++)
+        f << "    0";
+    }
+    // forward
+    if (run_iter->fForwardHistoNo != -1) {
+      f.width(16);
+      f << endl << left << "forward";
+      f << run_iter->fForwardHistoNo;
+    }
+    // backward
+    if (run_iter->fBackwardHistoNo != -1) {
+      f.width(16);
+      f << endl << left << "backward";
+      f << run_iter->fBackwardHistoNo;
+    }
+    // right
+    if (run_iter->fRightHistoNo != -1) {
+      f.width(16);
+      f << endl << left << "right";
+      f << run_iter->fRightHistoNo;
+    }
+    // left
+    if (run_iter->fLeftHistoNo != -1) {
+      f.width(16);
+      f << endl << left << "left";
+      f << run_iter->fLeftHistoNo;
+    }
+    // backgr.fix
+    if (!isnan(run_iter->fBkgFix[0])) {
+      f.width(15);
+      f << endl << left << "backgr.fix";
+      for (int i=0; i<2; i++) {
+        f.precision(prec);
+        f.width(12);
+        f << left << run_iter->fBkgFix[i];
+      }
+    }
+    // background
+    if (run_iter->fBkgRange[0] != -1) {
+      f.width(16);
+      f << endl << "background";
+      for (int i=0; i<4; i++) {
+        if (run_iter->fBkgRange[i] == -1)
+          break;
+        f.width(8);
+        f << left << run_iter->fBkgRange[i];
+      }
+    }
+    // data
+    if (run_iter->fDataRange[0] != -1) {
+      f.width(16);
+      f << endl << "data";
+      for (int i=0; i<4; i++) {
+        if (run_iter->fDataRange[i] == -1)
+          break;
+        f.width(8);
+        f << left << run_iter->fDataRange[i];
+      }
+    }
+    // t0
+    if (run_iter->fT0[0] != -1) {
+      f.width(16);
+      f << endl << "t0";
+      for (int i=0; i<2; i++) {
+        if (run_iter->fT0[i] == -1)
+          break;
+        f.width(8);
+        f << left << run_iter->fT0[i];
+      }
+    }
+    // fit
+    if (run_iter->fFitRange[0] != -1) {
+      f.width(16);
+      f << endl << "fit";
+      for (int i=0; i<2; i++) {
+        if (run_iter->fFitRange[i] == -1)
+          break;
+        f.width(8);
+        f.precision(2);
+        f << left << fixed << run_iter->fFitRange[i];
+      }
+    }
+    // packing
+    f.width(16);
+    f << endl << left << "packing";
+    f << run_iter->fPacking;
+    // run block done
+    f << endl;
+  }
+  f << endl << "###############################################################";
+
+  // write command block
+  f << endl << "COMMANDS";
+  PMsrLines::iterator cmd_iter;
+  for (cmd_iter = fCommands.begin(); cmd_iter != fCommands.end(); ++cmd_iter) {
+    f << endl << cmd_iter->fLine.Data();
+  }
+  f << endl;
+  f << endl << "###############################################################";
+
+  // write plot block
+  PMsrPlotList::iterator plot_iter;
+  for (plot_iter = fPlots.begin(); plot_iter != fPlots.end(); ++plot_iter) {
+    // plot header
+    switch (plot_iter->fPlotType) {
+      case MSR_PLOT_SINGLE_HISTO:
+        f << endl << "PLOT " << plot_iter->fPlotType << "   (single histo plot)";
+        break;
+      case MSR_PLOT_ASYM:
+        f << endl << "PLOT " << plot_iter->fPlotType << "   (asymmetry plot)";
+        break;
+      case MSR_PLOT_ASYM_RRF:
+        f << endl << "PLOT " << plot_iter->fPlotType << "   (rotating reference frame plot)";
+        break;
+      case MSR_PLOT_NO_MUSR:
+        f << endl << "PLOT " << plot_iter->fPlotType << "   (non muSR plot)";
+        break;
+      default:
+        break;
+    }
+    // runs
+    f << endl << "runs     ";
+    f.precision(0);
+    PComplexVector::iterator r_it;
+    for (r_it = plot_iter->fRuns.begin(); r_it != plot_iter->fRuns.end(); ++r_it) {
+      if (plot_iter->fPlotType != MSR_PLOT_ASYM_RRF) { // all but MSR_PLOT_ASYM_RRF
+        f.width(4);
+        f << r_it->Re();
+      } else { // MSR_PLOT_ASYM_RRF
+        f << r_it->Re() << "," << r_it->Im() << "    ";
+      }
+    }
+    // range
+    f << endl << "range    ";
+    f.precision(2);
+    f << plot_iter->fTmin << "   " << plot_iter->fTmax;
+    if (plot_iter->fYmin != -999.0) {
+      f << "   " << plot_iter->fYmin << "   " << plot_iter->fYmax;
+    }
+    f << endl;
+  }
+  f << endl << "###############################################################";
+
+  // write statistic block
+  TDatime dt;
+  f << endl << "STATISTIC --- " << dt.AsSQLString();
+  // if fMin and fNdf are given, make new statistic block
+  if ((fStatistic.fMin != -1.0) && (fStatistic.fNdf != 0)) {
+    // throw away the old statistics block
+    fStatistic.fStatLines.clear();
+    // create the new statistics block
+    PMsrLineStructure line;
+    if (fStatistic.fChisq) { // chi^2
+      line.fLine  = "  chi2 = ";
+      line.fLine += fStatistic.fMin;
+      line.fLine += ", NDF = ";
+      line.fLine += fStatistic.fNdf;
+      line.fLine += ", chi2r = chi2/NDF = ";
+      line.fLine += fStatistic.fMin / fStatistic.fNdf;
+    } else {
+      line.fLine  = "  maxLH = ";
+      line.fLine += fStatistic.fMin;
+      line.fLine += ", NDF = ";
+      line.fLine += fStatistic.fNdf;
+      line.fLine += ", maxLHr = maxLH/NDF = ";
+      line.fLine += fStatistic.fMin / fStatistic.fNdf;
+    }
+    fStatistic.fStatLines.push_back(line);
+  }
+  // write the statistics block
+  PMsrLines::iterator stat_iter;
+  for (stat_iter = fStatistic.fStatLines.begin(); stat_iter != fStatistic.fStatLines.end(); ++stat_iter) {
+    f << endl << stat_iter->fLine.Data();
+  }
+  f << endl;
+  f << endl << "###############################################################";
+
+
+  // close mlog-file
+  f.close();
+
+  return PMUSR_SUCCESS;
+}
+
+//--------------------------------------------------------------------------
+// SetMsrParamValue (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param i
+ * \param value
+ */
+bool PMsrHandler::SetMsrParamValue(unsigned int i, double value)
+{
+  if (i > fParam.size()) {
+    cout << endl << "PMsrHandler::SetMsrParamValue(): i = " << i << " is larger than the number of parameters " << fParam.size();
+    cout << endl;
+    return false;
+  }
+
+  fParam[i].fValue = value;
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// SetMsrParamStep (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param i
+ * \param value
+ */
+bool PMsrHandler::SetMsrParamStep(unsigned int i, double value)
+{
+  if (i > fParam.size()) {
+    cout << endl << "PMsrHandler::SetMsrParamValue(): i = " << i << " is larger than the number of parameters " << fParam.size();
+    cout << endl;
+    return false;
+  }
+
+  fParam[i].fStep = value;
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// SetMsrParamPosError (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param i
+ * \param value
+ */
+bool PMsrHandler::SetMsrParamPosError(unsigned int i, double value)
+{
+  if (i > fParam.size()) {
+    cout << endl << "PMsrHandler::SetMsrParamPosError(): i = " << i << " is larger than the number of parameters " << fParam.size();
+    cout << endl;
+    return false;
+  }
+
+  fParam[i].fPosErrorPresent = true;
+  fParam[i].fPosError = value;
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// HandleFitParameterEntry (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>The routine analyze a parameter line and, if the possible parameter list
+ * is OK (what this means see below), it adds the parameter to the parameter list.
+ *
+ * <p>Possible cases:
+ * \code
+ * No Name Value Step/Neg_Error Pos_Error Boundary_Low Boundary_High
+ * x  x    x     x              x         x            x              -> 7 Parameters, e.g. after a MINOS fit
+ * x  x    x     x                        x            x              -> 6 Parameters, e.g. after a MIGRAD fit
+ * x  x    x     x              x                                     -> 5 Parameters, e.g. after a MINOS fit
+ *                                                                                     without boundaries
+ * x  x    x     x                                                    -> 4 Parameters, e.g. after MIGRAD fit
+ *                                                                                     without bounderies, or
+ *                                                                                     when starting
+ * \endcode
+ *
+ * \param lines is a list of lines containing the fitparameter block
+ */
+bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
+{
+  PMsrParamStructure param;
+  bool    error = false;
+
+  PMsrLines::iterator iter;
+
+  TObjArray *tokens;
+  TObjString *ostr;
+  TString str;
+
+  // init param structure
+  param.fNoOfParams      = -1;
+  param.fNo              = -1;
+  param.fName            = TString("");
+  param.fValue           = nan("NAN");
+  param.fStep            = nan("NAN");
+  param.fPosErrorPresent = nan("NAN");
+  param.fPosError        = nan("NAN");
+  param.fLowerBoundary   = nan("NAN");
+  param.fUpperBoundary   = nan("NAN");
+
+  // fill param structure
+  iter = lines.begin();
+  while ((iter != lines.end()) && !error) {
+
+    tokens = iter->fLine.Tokenize(" ");
+    if (!tokens) {
+      cout << endl << "SEVERE ERROR: Couldn't tokenize Parameters in line " << iter->fLineNo;
+      cout << endl << endl;
+      return false;
+    }
+
+    // handle various input possiblities
+    if ((tokens->GetEntries() < 4) || (tokens->GetEntries() > 7)) {
+      error = true;
+    } else { // handle the first 4 parameter since they are always the same
+      // parameter number
+      ostr = dynamic_cast<TObjString*>(tokens->At(0));
+      str = ostr->GetString();
+      if (str.IsDigit())
+        param.fNo = str.Atoi();
+      else
+        error = true;
+
+      // parameter name
+      ostr = dynamic_cast<TObjString*>(tokens->At(1));
+      str = ostr->GetString();
+      param.fName = str;
+
+      // parameter value
+      ostr = dynamic_cast<TObjString*>(tokens->At(2));
+      str = ostr->GetString();
+      if (str.IsFloat())
+        param.fValue = (double)str.Atof();
+      else
+        error = true;
+
+      // parameter value
+      ostr = dynamic_cast<TObjString*>(tokens->At(3));
+      str = ostr->GetString();
+      if (str.IsFloat())
+        param.fStep = (double)str.Atof();
+      else
+        error = true;
+
+      // 4 values, i.e. No Name Value Step
+      if (tokens->GetEntries() == 4) {
+        param.fNoOfParams = 4;
+      }
+
+      // 5 values, i.e. No Name Value Neg_Error Pos_Error
+      if (tokens->GetEntries() == 5) {
+        param.fNoOfParams = 5;
+
+        // positive error
+        ostr = dynamic_cast<TObjString*>(tokens->At(4));
+        str = ostr->GetString();
+        if (str.IsFloat()) {
+          param.fPosErrorPresent = true;
+          param.fPosError = (double)str.Atof();
+        } else {
+          str.ToLower();
+          if (!str.CompareTo("none"))
+            param.fPosErrorPresent = false;
+          else
+            error = true;
+        }
+      }
+
+      // 6 values, i.e. No Name Value Error Lower_Bounderay Upper_Boundary
+      if (tokens->GetEntries() == 6) {
+        param.fNoOfParams = 6;
+
+        // lower boundary
+        ostr = dynamic_cast<TObjString*>(tokens->At(4));
+        str = ostr->GetString();
+        if (str.IsFloat())
+          param.fLowerBoundary = (double)str.Atof();
+        else
+          error = true;
+
+        // upper boundary
+        ostr = dynamic_cast<TObjString*>(tokens->At(5));
+        str = ostr->GetString();
+        if (str.IsFloat())
+          param.fUpperBoundary = (double)str.Atof();
+        else
+          error = true;
+      }
+
+      // 7 values, i.e. No Name Value Neg_Error Pos_Error Lower_Bounderay Upper_Boundary
+      if (tokens->GetEntries() == 7) {
+        param.fNoOfParams = 7;
+
+        // positive error
+        ostr = dynamic_cast<TObjString*>(tokens->At(4));
+        str = ostr->GetString();
+        if (str.IsFloat()) {
+          param.fPosErrorPresent = true;
+          param.fPosError = (double)str.Atof();
+        } else {
+          str.ToLower();
+          if (!str.CompareTo("none"))
+            param.fPosErrorPresent = false;
+          else
+            error = true;
+        }
+
+        // lower boundary
+        ostr = dynamic_cast<TObjString*>(tokens->At(5));
+        str = ostr->GetString();
+        if (str.IsFloat())
+          param.fLowerBoundary = (double)str.Atof();
+        else
+          error = true;
+
+        // upper boundary
+        ostr = dynamic_cast<TObjString*>(tokens->At(6));
+        str = ostr->GetString();
+        if (str.IsFloat())
+          param.fUpperBoundary = (double)str.Atof();
+        else
+          error = true;
+      }
+    }
+
+    // check if enough elements found
+    if (error) {
+      cout << endl << "ERROR in line " << iter->fLineNo << ":";
+      cout << endl << iter->fLine.Data();
+      cout << endl << "A Fit Parameter line needs to have the following form: ";
+      cout << endl;
+      cout << endl << "No Name Value Step/Error [Lower_Boundary Upper_Boundary]";
+      cout << endl;
+      cout << endl << "or";
+      cout << endl;
+      cout << endl << "No Name Value Step/Neg_Error Pos_Error [Lower_Boundary Upper_Boundary]";
+      cout << endl;
+      cout << endl << "No:             the parameter number (an int)";
+      cout << endl << "Name:           the name of the parameter (less than 256 character)";
+      cout << endl << "Value:          the starting value of the parameter (a double)";
+      cout << endl << "Step/Error,";
+      cout << endl << "Step/Neg_Error: the starting step value in a fit  (a double), or";
+      cout << endl << "                the symmetric error (MIGRAD, SIMPLEX), or";
+      cout << endl << "                the negative error (MINOS)";
+      cout << endl << "Pos_Error:      the positive error (MINOS),  (a double)";
+      cout << endl << "Lower_Boundary: the lower boundary allowed for the fit parameter  (a double)";
+      cout << endl << "Upper_Boundary: the upper boundary allowed for the fit parameter  (a double)";
+      cout << endl;
+    } else { // everything is OK, therefore add the parameter to the parameter list
+      fParam.push_back(param);
+    }
+
+    // clean up
+    if (tokens) {
+      delete tokens;
+      tokens = 0;
+    }
+
+    iter++;
+  }
+
+  return !error;
+}
+
+//--------------------------------------------------------------------------
+// HandleTheoryEntry (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param lines is a list of lines containing the fitparameter block
+ */
+bool PMsrHandler::HandleTheoryEntry(PMsrLines &lines)
+{
+  // store the theory lines
+  fTheory = lines;
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// HandleFunctionsEntry (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param lines is a list of lines containing the fitparameter block
+ */
+bool PMsrHandler::HandleFunctionsEntry(PMsrLines &lines)
+{
+  // store the functions lines
+  fFunctions = lines;
+
+  // create function handler
+  fFuncHandler = new PFunctionHandler(fFunctions);
+  if (fFuncHandler == 0) {
+    cout << endl << "**ERROR**: PMsrHandler::HandleFunctionsEntry: Couldn't invoke PFunctionHandler";
+    return false;
+  }
+
+  // do the parsing
+  if (!fFuncHandler->DoParse()) {
+    return false;
+  }
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// HandleRunEntry (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param lines is a list of lines containing the fitparameter block
+ */
+bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
+{
+  PMsrLines::iterator iter;
+  PMsrRunStructure param;
+  bool first = true; // first run line tag
+  bool error = false;
+
+  TString str;
+  TObjString *ostr;
+  TObjArray *tokens;
+
+  iter = lines.begin();
+  while ((iter != lines.end()) && !error) {
+    // everything to lower case first
+    iter->fLine.ToLower();
+
+    // tokenize line
+    tokens = iter->fLine.Tokenize(" ");
+    if (!tokens) {
+      cout << endl << "SEVERE ERROR: Couldn't tokenize Parameters in line " << iter->fLineNo;
+      cout << endl << endl;
+      return false;
+    }
+
+    // RUN line ----------------------------------------------
+    if (iter->fLine.BeginsWith("run")) {
+
+      if (!first) // not the first run in the list
+        fRuns.push_back(param);
+      else
+        first = false;
+
+      InitRunParameterStructure(param);
+
+      // get run name, beamline, institute, and file-format
+      if (tokens->GetEntries() < 5) {
+        error = true;
+      } else {
+        // run name
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        param.fRunName = ostr->GetString();
+        // beamline
+        ostr = dynamic_cast<TObjString*>(tokens->At(2));
+        param.fBeamline = ostr->GetString();
+        // institute
+        ostr = dynamic_cast<TObjString*>(tokens->At(3));
+        param.fInstitute = ostr->GetString();
+        // data file format
+        ostr = dynamic_cast<TObjString*>(tokens->At(4));
+        param.fFileFormat = ostr->GetString();
+      }
+    }
+
+    // fittype -------------------------------------------------
+    if (iter->fLine.BeginsWith("fittype")) {
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit()) {
+          int fittype = str.Atoi();
+          if ((fittype == MSR_FITTYPE_SINGLE_HISTO) ||
+              (fittype == MSR_FITTYPE_ASYM) ||
+              (fittype == MSR_FITTYPE_ASYM_RRF) ||
+              (fittype == MSR_FITTYPE_NO_MUSR)) {
+            param.fFitType = fittype;
+          } else {
+            error = true;
+          }
+        } else {
+          error = true;
+        }
+      }
+    }
+
+    // alpha -------------------------------------------------
+    if (iter->fLine.BeginsWith("alpha")) {
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit())
+          param.fAlphaParamNo = str.Atoi();
+        else
+          error = true;
+      }
+    }
+
+    // beta -------------------------------------------------
+    if (iter->fLine.BeginsWith("beta")) {
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit())
+          param.fBetaParamNo = str.Atoi();
+        else
+          error = true;
+      }
+    }
+
+    // norm -------------------------------------------------
+    if (iter->fLine.BeginsWith("norm")) {
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit()) {
+          param.fNormParamNo = str.Atoi();
+        } else if (str.Contains("fun")) {
+          int no;
+          if (FilterFunMapNumber(str, "fun", no))
+            param.fNormParamNo = no;
+          else
+            error = true;
+        } else {
+          error = true;
+        }
+      }
+    }
+
+    // backgr.fit --------------------------------------------
+    if (iter->fLine.BeginsWith("backgr.fit")) {
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit())
+          param.fBkgFitParamNo = str.Atoi();
+        else
+          error = true;
+      }
+    }
+
+    // rphase ------------------------------------------------
+    if (iter->fLine.BeginsWith("rphase")) {
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit())
+          param.fPhaseParamNo = str.Atoi();
+        else
+          error = true;
+      }
+    }
+
+    // lifetime ------------------------------------------------
+    if (iter->fLine.BeginsWith("lifetime ")) {
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit())
+          param.fLifetimeParamNo = str.Atoi();
+        else
+          error = true;
+      }
+    }
+
+    // lifetimecorrection ---------------------------------------
+    if (iter->fLine.BeginsWith("lifetimecorrection")) {
+      param.fLifetimeCorrection = true;
+    }
+
+    // map ------------------------------------------------------
+    if (iter->fLine.BeginsWith("map")) {
+      for (int i=1; i<tokens->GetEntries(); i++) {
+        ostr = dynamic_cast<TObjString*>(tokens->At(i));
+        str = ostr->GetString();
+        if (str.IsDigit())
+          // only fill map vector until a first zero is encountered
+          if (str.Atoi() != 0)
+            param.fMap.push_back(str.Atoi());
+          else
+            break;
+        else
+          error = true;
+      }
+      // check map entries, i.e. if the map values are within parameter bounds
+      for (unsigned int i=0; i<param.fMap.size(); i++) {
+        if ((param.fMap[i] <= 0) || (param.fMap[i] > (int) fParam.size())) {
+          cout << endl << "**SEVERE ERROR** in PMsrHandler::HandleRunEntry: map value " << param.fMap[i] << " in line " << iter->fLineNo << " is out of range!";
+          error = true;
+          break;
+        }
+      }
+    }
+
+    // forward ------------------------------------------------
+    if (iter->fLine.BeginsWith("forward")) {
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit())
+          param.fForwardHistoNo = str.Atoi();
+        else
+          error = true;
+      }
+    }
+
+    // backward -----------------------------------------------
+    if (iter->fLine.BeginsWith("backward")) {
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit())
+          param.fBackwardHistoNo = str.Atoi();
+        else
+          error = true;
+      }
+    }
+
+    // backgr.fix ----------------------------------------------
+    if (iter->fLine.BeginsWith("backgr.fix")) {
+      if (tokens->GetEntries() != 3) {
+        error = true;
+      } else {
+        for (int i=1; i<3; i++) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(i));
+          str = ostr->GetString();
+          if (str.IsFloat())
+            param.fBkgFix[i-1] = str.Atof();
+          else
+            error = true;
+        }
+      }
+    }
+
+    // background ---------------------------------------------
+    if (iter->fLine.BeginsWith("background")) {
+      if ((tokens->GetEntries() != 3) && (tokens->GetEntries() != 5)) {
+        error = true;
+      } else {
+        for (int i=1; i<tokens->GetEntries(); i++) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(i));
+          str = ostr->GetString();
+          if (str.IsDigit())
+            param.fBkgRange[i-1] = str.Atoi();
+          else
+            error = true;
+        }
+      }
+    }
+
+    // data --------------------------------------------------
+    if (iter->fLine.BeginsWith("data")) {
+      if ((tokens->GetEntries() != 3) && (tokens->GetEntries() != 5)) {
+        error = true;
+      } else {
+        for (int i=1; i<tokens->GetEntries(); i++) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(i));
+          str = ostr->GetString();
+          if (str.IsDigit())
+            param.fDataRange[i-1] = str.Atoi();
+          else
+            error = true;
+        }
+      }
+    }
+
+    // t0 -----------------------------------------------------
+    if (iter->fLine.BeginsWith("t0")) {
+      if ((tokens->GetEntries() != 2) && (tokens->GetEntries() != 3)) {
+        error = true;
+      } else {
+        for (int i=1; i<tokens->GetEntries(); i++) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(i));
+          str = ostr->GetString();
+          if (str.IsDigit())
+            param.fT0[i-1] = str.Atoi();
+          else
+            error = true;
+        }
+      }
+    }
+
+    // fit -----------------------------------------------------
+    if (iter->fLine.BeginsWith("fit ")) {
+      if (tokens->GetEntries() < 3) {
+        error = true;
+      } else {
+        for (int i=1; i<3; i++) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(i));
+          str = ostr->GetString();
+          if (str.IsFloat())
+            param.fFitRange[i-1] = str.Atof();
+          else
+            error = true;
+        }
+      }
+    }
+
+    // packing --------------------------------------------------
+    if (iter->fLine.BeginsWith("packing")) {
+      if (tokens->GetEntries() != 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit())
+          param.fPacking = str.Atoi();
+        else
+          error = true;
+      }
+    }
+
+    // rrffrequency --------------------------------------------------
+    if (iter->fLine.BeginsWith("rrffrequency")) {
+      if (tokens->GetEntries() != 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsFloat())
+          param.fRRFFreq = str.Atof();
+        else
+          error = true;
+      }
+    }
+
+    // rrfpacking --------------------------------------------------
+    if (iter->fLine.BeginsWith("rrfpacking")) {
+      if (tokens->GetEntries() != 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit())
+          param.fRRFPacking = str.Atoi();
+        else
+          error = true;
+      }
+    }
+
+    // alpha2 --------------------------------------------------
+    if (iter->fLine.BeginsWith("alpha2")) {
+      if (tokens->GetEntries() != 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit())
+          param.fAlpha2ParamNo = str.Atoi();
+        else
+          error = true;
+      }
+    }
+
+    // beta2 --------------------------------------------------
+    if (iter->fLine.BeginsWith("beta2")) {
+      if (tokens->GetEntries() != 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit())
+          param.fBeta2ParamNo = str.Atoi();
+        else
+          error = true;
+      }
+    }
+
+    // right --------------------------------------------------
+    if (iter->fLine.BeginsWith("right")) {
+      if (tokens->GetEntries() != 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit())
+          param.fRightHistoNo = str.Atoi();
+        else
+          error = true;
+      }
+    }
+
+    // left --------------------------------------------------
+    if (iter->fLine.BeginsWith("left")) {
+      if (tokens->GetEntries() != 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit())
+          param.fLeftHistoNo = str.Atoi();
+        else
+          error = true;
+      }
+    }
+
+    // clean up
+    if (tokens) {
+      delete tokens;
+      tokens = 0;
+    }
+
+    ++iter;
+  }
+
+  if (error) {
+    --iter;
+    cout << endl << "ERROR in line " << iter->fLineNo << ":";
+    cout << endl << iter->fLine.Data();
+    cout << endl << "RUN block syntax is too complex to print it here. Please check the manual.";
+  } else { // save last run found
+    fRuns.push_back(param);
+  }
+
+  return !error;
+}
+
+//--------------------------------------------------------------------------
+// InitRunParameterStructure (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param param
+ */
+void PMsrHandler::InitRunParameterStructure(PMsrRunStructure &param)
+{
+  param.fRunName         = "";
+  param.fBeamline        = "";
+  param.fInstitute       = "";
+  param.fFileFormat      = "";
+  param.fFitType         = -1;
+  param.fAlphaParamNo    = -1;
+  param.fBetaParamNo     = -1;
+  param.fNormParamNo     = -1;
+  param.fBkgFitParamNo   = -1;
+  param.fPhaseParamNo    = -1;
+  param.fLifetimeParamNo = -1;
+  param.fLifetimeCorrection = true;
+  param.fMap.clear(); // empty list
+  param.fForwardHistoNo  = -1;
+  param.fBackwardHistoNo = -1;
+  for (int i=0; i<2; i++)
+    param.fBkgFix[i] = nan("NAN");
+  for (int i=0; i<4; i++)
+    param.fBkgRange[i] = -1;
+  for (int i=0; i<4; i++)
+    param.fDataRange[i] = -1;
+  for (int i=0; i<2; i++)
+    param.fT0[i] = -1;
+  for (int i=0; i<4; i++)
+    param.fFitRange[i] = -1;
+  param.fPacking = 1;
+  param.fRRFFreq       = -1.0;
+  param.fRRFPacking    = -1;
+  param.fAlpha2ParamNo = -1;
+  param.fBeta2ParamNo  = -1;
+  param.fRightHistoNo  = -1;
+  param.fLeftHistoNo   = -1;
+}
+
+//--------------------------------------------------------------------------
+// FilterFunMapNumber (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Used to filter numbers from a string of the structure strX, where
+ * X is a number. The filter string is used to define the offset to X.
+ * It is used to filter strings like: map1 or fun4. At the moment only
+ * the filter strings 'map' and 'fun' are supported.
+ *
+ * \param str  input string
+ * \param filter filter string
+ * \param no filtered number
+ */
+bool PMsrHandler::FilterFunMapNumber(TString str, const char *filter, int &no)
+{
+  int  found, no_found=-1;
+
+  // copy str to an ordinary c-like string
+  char *cstr;
+  cstr = new char[str.Sizeof()];
+  strncpy(cstr, str.Data(), str.Sizeof());
+
+  // get number if present
+  if (!strcmp(filter, "fun")) {
+    found = sscanf(cstr, "fun%d", &no_found);
+    if (found == 1)
+      if (no_found < 1000)
+        no = no_found + MSR_PARAM_FUN_OFFSET;
+  } else if (!strcmp(filter, "map")) {
+    found = sscanf(cstr, "map%d", &no_found);
+    if (found == 1)
+      if (no_found < 1000)
+        no = no_found + MSR_PARAM_MAP_OFFSET;
+  }
+
+  // clean up
+  if (cstr) {
+    delete [] cstr;
+    cstr = 0;
+  }
+
+  if ((no_found < 0) || (no_found > 1000))
+    return false;
+  else
+    return true;
+}
+
+//--------------------------------------------------------------------------
+// HandleCommandsEntry (private)
+//--------------------------------------------------------------------------
+/**
+ * <p> In the command block there shall be a new command which can be used
+ * to switch between chi2 and maximum_likelyhood!!
+ *
+ * \param lines is a list of lines containing the fitparameter block
+ */
+bool PMsrHandler::HandleCommandsEntry(PMsrLines &lines)
+{
+  PMsrLines::iterator iter;
+
+  if (lines.empty()) {
+    cout << endl << "WARNING: There is no COMMANDS block! Do you really want this?";
+    cout << endl;
+  }
+
+  for (iter = lines.begin(); iter != lines.end(); ++iter) {
+    if (!iter->fLine.BeginsWith("COMMANDS"))
+      fCommands.push_back(*iter);
+  }
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// HandlePlotEntry (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param lines is a list of lines containing the fitparameter block
+ */
+bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
+{
+  bool error = false;
+
+  PMsrPlotStructure param;
+
+  PMsrLines::iterator iter1;
+  PMsrLines::iterator iter2;
+  TObjArray *tokens;
+  TObjArray *tokens2;
+  TObjString *ostr;
+  TString str;
+  TString str2;
+
+  if (lines.empty()) {
+    cout << endl << "WARNING: There is no PLOT block! Do you really want this?";
+    cout << endl;
+  }
+
+  iter1 = lines.begin();
+  while ((iter1 != lines.end()) && !error) {
+
+    // initialize param structure
+    param.fPlotType = -1;
+    param.fTmin = -999.0;
+    param.fTmax = -999.0;
+    param.fYmin = -999.0;
+    param.fYmax = -999.0;
+
+    // find next plot if any is present
+    iter2 = iter1;
+    ++iter2;
+    for ( ; iter2 != lines.end(); ++iter2) {
+      if (iter2->fLine.Contains("PLOT"))
+        break;
+    }
+
+    // handle a single PLOT block
+    while ((iter1 != iter2) && !error) {
+
+      if (iter1->fLine.Contains("PLOT")) { // handle plot header
+        tokens = iter1->fLine.Tokenize(" ");
+        if (!tokens) {
+          cout << endl << "SEVERE ERROR: Couldn't tokenize PLOT in line " << iter1->fLineNo;
+          cout << endl << endl;
+          return false;
+        }
+        if (tokens->GetEntries() < 2) { // plot type missing
+          error = true;
+        } else {
+          ostr = dynamic_cast<TObjString*>(tokens->At(1));
+          str = ostr->GetString();
+          if (str.IsDigit())
+            param.fPlotType = str.Atoi();
+          else
+            error = true;
+        }
+        // clean up
+        if (tokens) {
+          delete tokens;
+          tokens = 0;
+        }
+      }
+
+      if (iter1->fLine.Contains("runs")) { // handle plot runs
+        TComplex run;
+        switch (param.fPlotType) {
+          case -1:
+            error = true;
+            break;
+          case MSR_PLOT_SINGLE_HISTO: // like: runs 1 5 13
+          case MSR_PLOT_ASYM:
+          case MSR_PLOT_NO_MUSR:
+            tokens = iter1->fLine.Tokenize(" ");
+            if (!tokens) {
+              cout << endl << "SEVERE ERROR: Couldn't tokenize PLOT in line " << iter1->fLineNo;
+              cout << endl << endl;
+              return false;
+            }
+            if (tokens->GetEntries() < 2) { // runs missing
+              error = true;
+            } else {
+              for (int i=1; i<tokens->GetEntries(); i++) {
+                ostr = dynamic_cast<TObjString*>(tokens->At(i));
+                str = ostr->GetString();
+                if (str.IsDigit()) {
+                  run = TComplex(str.Atoi(),-1.0);
+                  param.fRuns.push_back(run);
+                } else {
+                  error = true;
+                }
+              }
+            }
+            // clean up
+            if (tokens) {
+              delete tokens;
+              tokens = 0;
+            }
+            break;
+          case MSR_PLOT_ASYM_RRF: // like: runs 1,1 1,2
+            tokens = iter1->fLine.Tokenize(" ");
+            if (!tokens) {
+              cout << endl << "SEVERE ERROR: Couldn't tokenize PLOT in line " << iter1->fLineNo;
+              cout << endl << endl;
+              return false;
+            }
+            if (tokens->GetEntries() < 2) { // runs missing
+              error = true;
+            } else {
+              for (int i=1; i<tokens->GetEntries(); i++) {
+                ostr = dynamic_cast<TObjString*>(tokens->At(i)); // something like 1,2
+                str = ostr->GetString();
+                tokens2 = str.Tokenize(",");
+                if (!tokens2) {
+                  error = true;
+                } else {
+                  ostr = dynamic_cast<TObjString*>(tokens2->At(0)); // real part
+                  str = ostr->GetString();
+                  ostr = dynamic_cast<TObjString*>(tokens2->At(1)); // imag part
+                  str2 = ostr->GetString();
+                  if (str.IsDigit() && str2.IsDigit()) {
+                    run = TComplex(str.Atoi(),str2.Atoi());
+                    param.fRuns.push_back(run);
+                  } else {
+                    error = true;
+                  }
+                }
+                if (tokens2) {
+                  delete tokens2;
+                  tokens2 = 0;
+                }
+              }
+            }
+            // clean up
+            if (tokens) {
+              delete tokens;
+              tokens = 0;
+            }
+            break;
+          default:
+            error = true;
+            break;
+        }
+      }
+
+      if (iter1->fLine.Contains("range")) { // handle plot range
+        tokens = iter1->fLine.Tokenize(" ");
+        if (!tokens) {
+          cout << endl << "SEVERE ERROR: Couldn't tokenize PLOT in line " << iter1->fLineNo;
+          cout << endl << endl;
+          return false;
+        }
+        if ((tokens->GetEntries() != 3) && (tokens->GetEntries() != 5)) {
+          error = true;
+        } else {
+
+          // handle t_min
+          ostr = dynamic_cast<TObjString*>(tokens->At(1));
+          str = ostr->GetString();
+          if (str.IsFloat())
+            param.fTmin =  (double)str.Atof();
+          else
+            error = true;
+
+          // handle t_max
+          ostr = dynamic_cast<TObjString*>(tokens->At(2));
+          str = ostr->GetString();
+          if (str.IsFloat())
+            param.fTmax =  (double)str.Atof();
+          else
+            error = true;
+
+          if (tokens->GetEntries() == 5) { // y-axis interval given as well
+
+            // handle y_min
+            ostr = dynamic_cast<TObjString*>(tokens->At(3));
+            str = ostr->GetString();
+            if (str.IsFloat())
+              param.fYmin =  (double)str.Atof();
+            else
+              error = true;
+
+            // handle y_max
+            ostr = dynamic_cast<TObjString*>(tokens->At(4));
+            str = ostr->GetString();
+            if (str.IsFloat())
+              param.fYmax =  (double)str.Atof();
+            else
+              error = true;
+          }
+        }
+        // clean up
+        if (tokens) {
+          delete tokens;
+          tokens = 0;
+        }
+      }
+
+      ++iter1;
+
+    }
+
+    // analyze if the plot block is valid
+    if (!error) {
+      if (param.fRuns.empty()) { // there was no run tag
+        error = true;
+      } else { // everything ok
+        if ((param.fTmin != -999.0) || (param.fTmax != -999.0)) { // if range is given, check that it is ordered properly
+          if (param.fTmin > param.fTmax) {
+            double keep = param.fTmin;
+            param.fTmin = param.fTmax;
+            param.fTmax = keep;
+          }
+        }
+
+        if ((param.fYmin != -999.0) || (param.fYmax != -999.0)) { // if range is given, check that it is ordered properly
+          if (param.fYmin > param.fYmax) {
+            double keep = param.fYmin;
+            param.fYmin = param.fYmax;
+            param.fYmax = keep;
+          }
+        }
+
+        fPlots.push_back(param);
+      }
+    }
+
+    if (error) { // print error message
+      --iter1;
+      cout << endl << "ERROR in line " << iter1->fLineNo << ": " << iter1->fLine.Data();
+      cout << endl << "A PLOT block needs to have the following structure:";
+      cout << endl;
+      cout << endl << "PLOT <plot_type>";
+      cout << endl << "runs <run_list>";
+      cout << endl << "[range tmin tmax [ymin ymax]]";
+      cout << endl;
+      cout << endl << "where <plot_type> is: 0=single histo asym,";
+      cout << endl << "                      2=forward-backward asym,"; 
+      cout << endl << "                      4=RRF asym (not implemented yet),";
+      cout << endl << "                      8=non muSR.";
+      cout << endl << "<run_list> is the list of runs";
+      cout << endl << "   for <plot_type> 0,2,8 it is a list of run numbers, e.g. runs 1 3";
+      cout << endl << "   for <plot_type> 4     it is a list of 'complex' numbers, where";
+      cout << endl << "                         the real part is the run number, and the";
+      cout << endl << "                         imaginary one is 1=real part or 2=imag part, e.g.";
+      cout << endl << "                         runs 1,1 1,2";
+      cout << endl << "range is optional";
+    }
+
+    param.fRuns.clear();
+
+  }
+
+  return !error;
+}
+
+//--------------------------------------------------------------------------
+// HandleStatisticEntry (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param lines is a list of lines containing the fitparameter block
+ */
+bool PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
+{
+  PMsrLines::iterator iter;
+
+  if (lines.empty()) {
+    cout << endl << "WARNING: There is no STATISTIC block! Do you really want this?";
+    cout << endl;
+  }
+
+  for (iter = lines.begin(); iter != lines.end(); ++iter) {
+    if (!iter->fLine.BeginsWith("STATISTIC"))
+      fStatistic.fStatLines.push_back(*iter);
+  }
+
+  return true;
+}
+
+// end ---------------------------------------------------------------------

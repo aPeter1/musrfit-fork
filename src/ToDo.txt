@@ -1,0 +1,66 @@
+2007/11/28
+
+---------------------
+short term:
+---------------------
+
+* dump data and theory after fit (ascii/root): **DONE** for now
+    done for ascii/root asymmetry && single histo: all the rest is missing
+* migrate all typedef's and defines -> PMusr.h **DONE**
+
+* Since rootcint cannot handle the spirit include files I will try to remove all the
+  root dictionary related stuff since almost for sure, nobody will use the classes
+  from the cint interpreter level 2007/12/27 **DONE**
+
+* begin with the implementation of the FUNCTIONS block
+  using the spirit parser framework **DONE**
+
+* 2007/12/30: implement functions in PTheory **DONE** 08-01-02
+
+* 2008/01/02: nice function block output needed. **DONE** 08-01-02
+
+* write a little standalone program which is converting the old msr-files to the new ones. **DONE** 08-01-04
+
+* implement max.likelihood fits
+
+* implement table based theory functions (LF stuff)
+
+---------------------
+intermediate term:
+---------------------
+
+* start writing docu, i.e. transfering WKM doc from German -> English and
+  describe new features with examples!
+* implement RRF stuff
+* implement NonMuSR stuff
+* implement access to user-function, i.e. functions not
+  defined within musrfit, using the ROOT dictionary feature
+  to look for them and use them.
+* think about if it is worth to modifiy wkm in order to read
+  the new msr-files, so that wkmview can be used for an intermediate
+  time.
+
+---------------------
+long term:
+---------------------
+
+* implement ROOT based wkmview, i.e. all the graphical stuff needed
+  including event handler, etc.
+* implement FFT with msr-interface
+* switch from qmake to cmake
+
+---------------------
+problems:
+---------------------
+* rootcint cannot handle spirit framework includes, hence FUNCTIONS related stuff cannot be included
+  into a root dictionary.
+
+---------------------
+fixes:
+---------------------
+* Needed to change some part of the Minuit2 source code, otherwise I got a strange linker error message.
+  In MnMinos.h the constructors (3 overloaded versions) are defined implicitly. When linking against libPMusr.so
+  which is using libMinuit2Base.so, I got the error message from the linker that is cannot find the reference
+  to the second constructor. When transfering the implicit definition from the header file to the cxx, the
+  problem was gone. Since to fiddle in the Minuit2 source code directly is ugly, I should look for a way to
+  build libPMusr.so which doesn't have this problem.

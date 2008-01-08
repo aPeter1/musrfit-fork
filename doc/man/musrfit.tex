@@ -1,0 +1,351 @@
+\documentclass[twoside]{article}
+
+\usepackage[english]{babel}
+\usepackage{a4}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{xspace}
+\usepackage{rotating}
+
+\setlength{\topmargin}{10mm}
+\setlength{\topmargin}{-13mm}
+% \setlength{\oddsidemargin}{0.5cm}
+% \setlength{\evensidemargin}{0cm}
+\setlength{\oddsidemargin}{0.7cm}
+\setlength{\evensidemargin}{0.7cm}
+\setlength{\textwidth}{14.5cm}
+\setlength{\textheight}{23.8cm}
+
+\pagestyle{fancyplain}
+\addtolength{\headwidth}{0.6cm}
+\fancyhead{}%
+\fancyhead[RE,LO]{musrfit}%
+\fancyhead[LE,RO]{\thepage}
+%\cfoot{--- Andreas Suter -- \today ---}
+\cfoot{LE-$\mu$SR -- \includegraphics[width=2cm]{logo_n.eps}~~~~ -- \today}
+
+\DeclareMathAlphabet{\bi}{OML}{cmm}{b}{it}
+
+\newcommand{\musr}{$\mu$SR\xspace}
+
+\begin{document}
+
+\tableofcontents
+
+\section{Introduction}\label{sec:introduction}%
+
+\section{Available Executables}\label{sec:available-executables}%
+
+\subsection{musrfit}\label{subsec:musrfit}%
+\subsection{musrview}\label{subsec:musrview}%
+\fbox{q} \textbf{Quit}: is terminating \texttt{musrview}.
+
+\subsection{musrt0}\label{subsec:musrt0}%
+\subsection{musrpara}\label{subsec:musrpara}%
+
+\section{Users Guide}\label{sec:user-guide}%
+
+\section{Description of the msr-File Format}\label{sec:msr-file}%
+
+The programs are using an input file to control their action. This input file has the extension \texttt{.msr} (msr-file). the msr-file is built up from different blocks. Each block starts with a keyword, and is terminated by an empty line\footnote{The title is an exception from this rule.}. Comments are starting with the character `\#'. The various input blocks will be described now.
+
+\subsection{The Title}\label{subsec:msr-file-title}%
+
+The first line of the msr-file is the title line. Different than all the other input blocks, it doesn't start with a block keyword. It is just an simple text line, in which any information can be placed. The title text will be used in the graphical representation of the data as a headline.
+
+\subsection{The \texttt{FITPARAMETER}-Block}\label{subsec:msr-file-fitparameter-block}%
+
+The \texttt{FITPARAMETER}-block is used to define the fitparameters in a \textsc{Minuit} typical style.
+There are various possible parameter definitions possible which are listed here:
+
+\begin{enumerate}
+ \item \verb!<no> <name> <value> <step>!
+ \item \verb!<no> <name> <value> <step> <lower boundary> <upper boundary>!
+ \item \verb!<no> <name> <value> <step> <pos.error> <lower boundary> <upper boundary>!
+\end{enumerate}
+
+\noindent where \verb!<no>! is the parameter number, \verb!<name>! is the parameter name\footnote{The parameter name is limited to 10 characters, and furthermore no spaces are allowed!}, \verb!<value>! is the initial guess of the parameter, \verb!<step>! the inital step width, \verb!<lower/upper boundary>! is the lower/upper boundary for the parameter\footnote{According to the \textsc{Minuit} manual this should be avoided whenever possible.}.
+
+In the output \texttt{mlog}-file, \verb!<value>! will be the \textsc{Minuit} fit value, \verb!<step>! will contain the error estimate (or the negative error estimate if \textsc{Minos} was successfully used), \verb!<pos.error>! will have the value \texttt{none} if no \textsc{Minos} was used, otherwise it will show the positive error estimate. A typical example will look like this:
+
+\begin{verbatim}
+FITPARAMETER
+#      Nr. Name        Value     Step      Pos_Error  Bounderies
+         1 alpha       1         0.02      none       0         1.8
+         2 asy         0.1042    0.004713  none       0         0.33
+         3 phase       15        1.0       none
+         4 freq        0.9       0.0379    none
+         5 rate        0.03      0.00579   none
+\end{verbatim}
+
+
+\subsection{The \texttt{THEORY}-Block}\label{subsec:msr-file-theory-block}%
+
+The \texttt{THEORY}-block is used to define the fit function. There is a set of predefined functions available (see table \ref{tab:predefined-theory-functions}). It is also possible to use externally defined functions. How to use them will be explained afterwards, first the predefined functions will be described.
+
+\begin{table}[h]
+ \centering
+ \begin{tabular}{|l|l|l|l|l|}
+   \hline
+   % title -------------------------------------------------------------------
+   \rule[-3mm]{0mm}{8mm}
+   \textbf{name} & \textbf{abbriviation} & \textbf{parameters} & 
+        \textbf{mathematical expression} & \textbf{refs.} \\ \hline\hline
+   % asymmetry ---------------------------------------------------------------
+   \rule[-3mm]{0mm}{8mm}
+   \texttt{asymmetry} & \texttt{a} & $A$ (1) & $A$ & \\ \hline
+   % simple exponential ------------------------------------------------------
+   \rule[-3mm]{0mm}{8mm}
+   \texttt{simplExpo} & \texttt{se} & $\lambda$ ($\mu\mathrm{s}^{-1}$) & $\exp(-\lambda t)$ & \\ \hline
+   % general exponential -----------------------------------------------------
+   \rule[-3mm]{0mm}{8mm}
+   \texttt{generExpo} & \texttt{ge} & $\lambda$ ($\mu\mathrm{s}^{-1}$), $\beta$ (1)
+        & $\exp\left[-\left(\lambda t\right)^\beta \right]$ & \\ \hline
+   % simple gauss ------------------------------------------------------------
+   \rule[-3mm]{0mm}{8mm}
+   \texttt{simpleGss} & \texttt{sg} & $\sigma$ ($\mu\mathrm{s}^{-1}$)
+        & $\exp\left[-\frac{1}{2}\left(\sigma t\right)^2\right]$ & \\ \hline
+   % static Kubo-Toyabe ZF ---------------------------------------------------
+   \rule[-3mm]{0mm}{8mm}
+   \texttt{statGssKT} & \texttt{stg} & $\sigma$ ($\mu\mathrm{s}^{-1}$)
+        & $\frac{1}{3} + \frac{2}{3} [1-(\sigma t)^2]
+          \exp\left[-\frac{1}{2}\left(\sigma t\right)^2\right] $ & ?? \\ \hline
+   % static Kubo-Toyabe LF ---------------------------------------------------
+   \rule[-3mm]{0mm}{8mm}
+   \texttt{statKTTab} & \texttt{sktt} & $\nu$ (MHz), $\sigma$ ($\mu\mathrm{s}^{-1}$) 
+        & static Kubo-Toyabe (ZF and LF, tabulated) & ?? \\
+                      &               & table & & \\ \hline
+   % dynamic Kubo-Toyabe LF --------------------------------------------------
+   \rule[-3mm]{0mm}{8mm}
+   \texttt{dynmKTTab} & \texttt{dktt} & $\nu$ (MHz), $\sigma$ ($\mu\mathrm{s}^{-1}$) 
+        & dynamic Kubo-Toyabe (ZF and LF, tabulated) & ?? \\
+                      &               & $\gamma$ ($\mu\mathrm{s}^{-1}$), table & & \\ \hline
+   % combined Lorentz-Gauss-Kubo-Toyabe --------------------------------------
+   \rule[-3mm]{0mm}{8mm}
+   \texttt{combiLGKT} & \texttt{lgkt} & $\lambda_{\rm L}$ ($\mu\mathrm{s}^{-1}$),
+        $\lambda_{\rm G}$ ($\mu\mathrm{s}^{-1}$) &
+        $\frac{1}{3}+\frac{2}{3}\left[1-(\lambda_{\rm G}t)^2-\lambda_{\rm L}t
+            \right]\exp\left[-\frac{1}{2}(\lambda_{\rm G}t)^2-\lambda_{\rm L}t\right]$ 
+        & ?? \\ \hline
+   % abragam -----------------------------------------------------------------
+   \rule[-3mm]{0mm}{8mm}
+   \texttt{abragam} & \texttt{ab} & $\sigma$ ($\mu\mathrm{s}^{-1}$),
+        $\gamma$ ($\mu\mathrm{s}^{-1}$) & 
+        $\exp\left[-\left(\frac{\displaystyle\sigma}{\displaystyle\gamma}\right)^2 
+             (e^{-\gamma t}-1-\gamma t)\right]$ & ?? \\ \hline
+   % spin glass --------------------------------------------------------------
+   \rule[-3mm]{0mm}{8mm}
+   \texttt{spinGlas} & \texttt{sg} & $\lambda$ ($\mu\mathrm{s}^{-1}$), 
+        $\gamma$ ($\mu\mathrm{s}^{-1}$) & $\alpha := \frac{4\lambda^2 (1-q)}{\gamma}$,
+        \qquad $\beta := \sqrt{q} \lambda$ & ?? \\
+   \rule[-3mm]{0mm}{8mm}
+        & & & $\frac{1}{3} e^{-\sqrt{\alpha t}} + \frac{2}{3} \left( 1 -
+              \frac{(\beta t)^2}{\sqrt{\alpha t + (\beta t)^2}} \right)
+              e^{-\sqrt{\alpha t + (\beta t)^2}} $ & \\ \hline
+   % TF cos ------------------------------------------------------------------
+   \rule[-3mm]{0mm}{8mm}
+   \texttt{TFieldCos} & \texttt{tf} & $\varphi$ ($^\circ$), $\nu$ (MHz) 
+        & $\cos(2\pi\nu t + \frac{\displaystyle \pi}{180} \varphi) $ & ?? \\ \hline
+   % bessel ------------------------------------------------------------------
+   \rule[-3mm]{0mm}{8mm}
+   \texttt{bessel} & \texttt{be} & $\varphi$ ($^\circ$), $\nu$ (MHz)
+        & $J_0(2\pi\nu t + \frac{\displaystyle \pi}{180} \varphi)$ & ?? \\ \hline
+   % internal bessel ---------------------------------------------------------
+   \rule[-3mm]{0mm}{8mm}
+   \texttt{internBsl} & \texttt{ib} & $\varphi$ ($^\circ$), $\nu$ (MHz) 
+      & $\frac{2}{3} J_0(2\pi\nu t + \frac{\displaystyle \pi}{180} \varphi) 
+         e^{-\lambda_{\rm T} t} + \frac{1}{3} e^{-\lambda_{\rm L} t}$ & ?? \\
+      & & $\lambda_{\rm T}$ ($\mu\mathrm{s}^{-1}$), $\lambda_{\rm L}$ ($\mu\mathrm{s}^{-1}$) & & \\  \hline
+   % random anisotropy hyperfine field ---------------------------------------
+   \rule[-3mm]{0mm}{8mm}
+   \texttt{rdAnisoHf} & \texttt{rahf} & $\nu$ (MHz), $\lambda$ ($\mu\mathrm{s}^{-1}$) 
+      & $\frac{1}{6} \left( 1 - \frac{\nu t}{2} \right) e^{-\frac{\nu t}{2}} +
+         \frac{1}{3} \left( 1 - \frac{\nu t}{4} \right) e^{-\frac{\nu t + 2.44949 \lambda t}{4}}$ & ?? \\ \hline
+   % internal field ----------------------------------------------------------
+   \rule[-3mm]{0mm}{8mm}
+   \texttt{internFld} & \texttt{if} & $\varphi$ ($^\circ$), $\nu$ (MHz) 
+      & $\frac{2}{3} \cos(2\pi\nu t + \frac{\displaystyle \pi}{180} \varphi) 
+         e^{-\lambda_{\rm T} t} + \frac{1}{3} e^{-\lambda_{\rm L} t}$ & ?? \\
+      & & $\lambda_{\rm T}$ ($\mu\mathrm{s}^{-1}$), $\lambda_{\rm L}$ ($\mu\mathrm{s}^{-1}$) & & \\ \hline
+ \end{tabular}
+ \caption{\textsl{List of the predefined theory functions.}}\label{tab:predefined-theory-functions}
+\end{table}
+
+Every theory function has to be written on a single line. It starts with the theory function name or its abbriviation followed by the parameters. Consecutive lines of theory functions will be multiplied. If theory functions need to be added, a line with a `$+$' has to separte them. The parameters are given as the number assigned to them in the \texttt{FITPARAMETER}-block. The order of the parameters is given in table \ref{tab:predefined-theory-functions}. As an example
+
+\begin{verbatim}
+simplExpo 4
+\end{verbatim}
+
+\noindent defines an exponential function with a depolarization rate $\lambda$ given by the parameter 4 of the \texttt{FITPARAMETER}-block. A full fetched \texttt{THEORY}-block could be
+
+\begin{verbatim}
+THEORY
+asymmetry   2
+simplExpo   3
+TFieldCos   4    5
++
+asymmetry   6
+simplExpo   7
+\end{verbatim}
+
+\noindent which means
+
+\begin{math}
+ A(t) = P_2 \cdot e^{-t\cdot P_3} \cdot \cos(2\pi P_5 t + \frac{\displaystyle\pi}{180} P_4) +
+        P_6 \cdot e^{-t\cdot P_7}
+\end{math}
+
+\noindent where $P_\alpha$ is the parameter $\alpha$.
+
+\subsubsection{Maps}\label{subsubsec:maps}%
+
+In case different runs are fitted simultaniously, it is very often necessary that for a given theory function, some parameters are run dependend. An example would be a temperature scan, where the parameters (asymmetry, depolarization rates, etc.\xspace) will depend on the temperature. In order to handle such situations, the mapping of parameters in the \texttt{THEORY}-block is possible. Instead of a parameter number, the mapping of the parameter is given. The definition of the mapping block is part of the \texttt{RUN}-block (see Sec.\ref{subsec:msr-file-run-block}) and will be described there. For example
+
+\begin{verbatim}
+THEORY
+asymmetry   2
+simplExpo   3
+TFieldCos   4    5
++
+asymmetry   map1
+simplExpo   map2
+\end{verbatim}
+
+\noindent means that the first part of this theory function is run independ, as for instance the background, and the second part is changing from run to run, i.e.\xspace \texttt{map1/2} will point to different parameters depending on the run.
+
+\subsubsection{Functions}\label{subsubsec:functions}%
+
+Yet another useful feature is the possibilty to define functions (see Sec.\ref{subsec:msr-file-functions-block}). Within the \texttt{THEORY}-block functions can be address as \texttt{fun$\alpha$}, where $\alpha$ is the function number, e.g.\xspace \texttt{fun2}.
+
+\subsubsection{User Functions}\label{subsubsec:user-functions}%
+
+\subsection{The \texttt{FUNCTIONS}-Block}\label{subsec:msr-file-functions-block}%
+
+\subsection{The \texttt{RUN}-Block}\label{subsec:msr-file-run-block}%
+
+The \texttt{RUN}-Block is used to collect the data needed for a particular run to be fitted. This is including run name, fit type, data format, etc.\xspace The \texttt{RUN}-Block is slightly different organized than the other blocks. The information are collected via labels followed by the information.
+Each run to be fitted has its own \texttt{RUN}-Block. A \texttt{RUN}-Block starts with run-file line which has the structure
+
+\begin{verbatim}
+RUN <run-file-name> <beamline> <institute> <file-format>
+\end{verbatim}
+
+\noindent The tokens following the \texttt{RUN} statement are used to identifiy the run, the potential location where the run might be found, and the file format in which the run was saved. In order to understand the meaning of all the above tokens, a short digression is needed. Where is \texttt{musrfit} looking for data files? There is a specifc order how this is done:
+
+\begin{enumerate}
+ \item Check if the file is found in the current directory
+ \item Check if there is a system variable \texttt{WKMFULLDATAPATH}. This system variable can
+       contain multiple search paths separated by columns, e.g.\xspace \\ 
+       \texttt{export WKMFULLDATAPATH=/mnt/home/nemu/analysis:/afs/psi.ch/.../analysis}.
+ \item Check if the path (or multiple paths) was (were) given in the XML startup file.
+ \item Construct the search path from the \texttt{RUN}-block information the following way: \\
+       \texttt{??? NEEDS TO BE CHECKED ???}
+\end{enumerate}
+
+\noindent Here some valid examples:
+
+\begin{verbatim}
+RUN 2007/lem07_his_2018 MUE4 PSI ROOT-PPC
+\end{verbatim}
+
+\begin{verbatim}
+RUN 2007/lem07_2018_rb1_npp MUE4 PSI NEMU
+\end{verbatim}
+
+\begin{verbatim}
+RUN 2007/???? PIE3 PSI PSI-BIN
+\end{verbatim}
+
+\noindent After this short digression back to the \texttt{RUN}-block description. 
+
+\begin{table}[h]
+ \centering
+ \begin{tabular}{|l|l|} \hline
+   \textbf{\texttt{RUN}-block tag} & \textbf{comment} \\ \hline\hline
+   \texttt{<run-file-name>} & sub path and filename without extension \\ \hline
+   \texttt{<beamline>}      & \begin{minipage}{12cm}
+                              name of the beamline where the data where taken, 
+                              e.g.\xspace \texttt{MUE4}. Used to generate a
+                              default path.
+                              \end{minipage} \\ \hline
+   \texttt{<institute>}     & \begin{minipage}{12cm}
+                              name of the institute where the data where taken, 
+                              e.g.\xspace \texttt{PSI}. Used to generate a
+                              default path.
+                              \end{minipage} \\ \hline
+   \texttt{<file-format>}   & file format, e.g.\xspace \texttt{NEXUS} (for details 
+                              see Sec.\ref{subsec:supported-data-formats})\\ \hline
+ \end{tabular}
+ \caption{}\label{tab:run-block}
+\end{table}
+
+\noindent In order to describe the operations needed for fitting and ploting, quite a few information are needed. These information are following the \texttt{RUN}-statement and will be listed below. Depending on the fit-type these information will vary and hence it will be indicated for which fit/plot-type the information is applicable.
+
+\begin{description}
+ \item[\texttt{fittype}] \textsl{(required)}, this tag is used to indicate which type of fit 
+         is whished. The supported fit-types are:
+         \begin{description}
+           \item[0] Single Histogram Fit
+           \item[2] Asymmetry Fit
+           \item[4] Asymmetry Fit in a Rotating Reference Frame
+           \item[8] Non-\musr Fit
+         \end{description}
+         The description of these fit-types can be found in Sec.\ref{sec:fit-types}
+  \item[\texttt{alpha, beta}] \textsl{(fit-type 2, 4)}
+\end{description}
+
+
+\subsection{The \texttt{FOURIER}-Block}\label{subsec:msr-file-fourier-block}%
+
+\subsection{The \texttt{COMMANDS}-Block}\label{subsec:msr-file-commands-block}%
+
+\subsection{The \texttt{PLOT}-Block}\label{subsec:msr-file-plot-block}%
+
+\subsection{The \texttt{STATISTICS}-Block}\label{subsec:msr-file-statistics-block}%
+
+\subsection{Supported Data Formats}\label{subsec:supported-data-formats}%
+\subsubsection{\texttt{NEMU} File Format}\label{subsubsec:nemu-format}%
+\subsubsection{\texttt{ROOT} File Format}\label{subsubsec:root-format}%
+\subsubsection{\texttt{NEXUS} File Format}\label{subsubsec:nexus-format}%
+\subsubsection{\texttt{PSI-BIN} File Format}\label{subsubsec:psibin-format}%
+\subsubsection{\texttt{MUD} File Format}\label{subsubsec:mud-format}%
+\subsubsection{\texttt{NON-MUSR} File Format}\label{subsubsec:non-musr-format}%
+
+\section{Fit Types}\label{sec:fit-types}%
+
+\subsection{Single Histogram Fit}\label{subsec:single-histogram-fit}%
+\subsection{Asymmetry Fit}\label{subsec:asymmetry-fit}%
+\subsection{Rotating Reference Fit}\label{subsec:rrf}%
+\subsection{Non-Musr Fit}\label{subsec:non-musr-fit}%
+
+\section{Data Preparation for Fitting and Plotting}\label{sec:data-preparation}%
+
+\subsection{Single Histogram Fit / Plot (\texttt{fittype/plottype 0})}\label{subsec:single-histo-fit-plot}%
+\subsubsection{\texttt{fittype 0}}\label{subsubsec:single-histo-fit}%
+\subsubsection{\texttt{plottype 0}}\label{subsubsec:single-histo-plot}%
+
+\subsection{Asymmetry Fit / Plot (\texttt{fittype/plottype 2})}\label{subsec:asymmetry-fit-plot}%
+\subsubsection{\texttt{fittype 2}}\label{subsubsec:asymmetry-fit}%
+\subsubsection{\texttt{plottype 2}}\label{subsubsec:asymmetry-plot}%
+
+\subsection{Rotating Reference Fit / Plot (\texttt{fittype/plottype 4})}\label{subsec:rrf-fit-plot}%
+\subsubsection{\texttt{fittype 2}}\label{subsubsec:rrf-fit}%
+\subsubsection{\texttt{plottype 2}}\label{subsubsec:rrf-plot}%
+
+\subsection{Non-Musr Fit / Plot (\texttt{fittype/plottype 8})}\label{subsec:non-musr-fit-plot}%
+\subsubsection{\texttt{fittype 2}}\label{subsubsec:non-musr-fit}%
+\subsubsection{\texttt{plottype 2}}\label{subsubsec:non-musr-plot}%
+
+\appendix
+
+\section{Installation}\label{sec:installation}%
+
+\begin{thebibliography}{99}
+\end{thebibliography}
+
+\end{document}

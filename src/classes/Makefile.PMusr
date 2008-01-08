@@ -1,0 +1,138 @@
+#---------------------------------------------------
+# Makefile.PMusr
+#
+# Author: Andreas Suter
+# e-mail: andreas.suter@psi.ch
+#
+# $Id$
+#
+# Comment: If it doesn't work, try 
+#          make --warning-undefined-variables -f Makefile.PMusr
+#          it might be that OSTYPE is not set properly, i.e.
+#          OSTYPE being a variable (set), instead of a enviornment
+#          variable (printenv). If so, try 
+#          export OSTYPE=linux-gnu
+#          are whatever makes sense on your system.
+#---------------------------------------------------
+
+#---------------------------------------------------
+# get compilation and library flags from root-config
+
+ROOTCFLAGS    = $(shell $(ROOTSYS)/bin/root-config --cflags)
+ROOTLIBS      = $(shell $(ROOTSYS)/bin/root-config --libs)
+ROOTGLIBS     = $(shell $(ROOTSYS)/bin/root-config --glibs)
+
+#---------------------------------------------------
+# depending on the architecture, choose the compiler,
+# linker, and the flags to use
+#
+
+ifeq ($(OSTYPE),linux)
+OS = LINUX
+endif
+ifeq ($(OSTYPE),linux-gnu)
+OS = LINUX
+endif
+ifeq ($(OSTYPE),darwin)
+OS = DARWIN
+endif
+
+# -- Linux
+ifeq ($(OS),LINUX)
+CXX           = g++
+CXXFLAGS      = -g -Wall -fPIC
+PMUSRPATH     = ../include
+MNPATH        = /usr/local/include
+INCLUDES      = -I $(PMUSRPATH) -I $(MNPATH)
+LD            = g++
+LDFLAGS       = -g
+SOFLAGS       = -O -shared
+endif
+
+# -- Darwin
+ifeq ($(OS),DARWIN)
+CXX           = g++
+CXXFLAGS      = -g -Wall -fPIC
+INCLUDES      = -I../include
+LD            = g++
+LDFLAGS       = -g
+SOFLAGS       = -dynamic
+endif
+
+# the output from the root-config script:
+CXXFLAGS      += $(ROOTCFLAGS)
+LDFLAGS       +=
+
+# the ROOT libraries (G = graphic)
+LIBS          = $(ROOTLIBS) -lXMLParser
+GLIBS         = $(ROOTGLIBS) -lXMLParser
+
+# PSI libs
+PSILIBS       = -lTLemRunHeader
+# Minuit2 lib
+MNLIB         = -L/usr/local/lib -lMinuit2Base
+
+
+# some definitions: headers, sources, objects,...
+HEADERS =
+HEADERS += PStartupHandler.h
+HEADERS += PMsrHandler.h
+HEADERS += PRunDataHandler.h
+HEADERS += PFunctionHandler.h
+HEADERS += PFunctionGrammar.h
+HEADERS += PFunction.h
+HEADERS += PRunBase.h
+HEADERS += PRunSingleHisto.h
+HEADERS += PRunAsymmetry.h
+HEADERS += PRunRRF.h
+HEADERS += PRunNonMusr.h
+HEADERS += PRunListCollection.h
+HEADERS += PTheory.h
+HEADERS += PFitterFcn.h
+HEADERS += PFitter.h
+
+OBJS =
+OBJS += PStartupHandler.o
+OBJS += PMsrHandler.o
+OBJS += PRunDataHandler.o
+OBJS += PFunctionHandler.o
+OBJS += PFunction.o
+OBJS += PRunBase.o
+OBJS += PRunSingleHisto.o
+OBJS += PRunAsymmetry.o
+OBJS += PRunRRF.o
+OBJS += PRunNonMusr.o
+OBJS += PRunListCollection.o
+OBJS += PTheory.o
+OBJS += PFitterFcn.o
+OBJS += PFitter.o
+
+SHLIB = libPMusr.so
+
+# make the shared lib:
+#
+all:  $(SHLIB)
+
+$(SHLIB): $(OBJS)
+	@echo "---> Building shared library $(SHLIB) ..."
+	/bin/rm -f $(SHLIB)
+	$(LD) $(OBJS) $(SOFLAGS) -o $(SHLIB) $(GLIBS) $(PSILIBS) $(MNLIB)
+	@echo "done"
+
+# clean up: remove all object file (and core files)
+# semicolon needed to tell make there is no source
+# for this target!
+#
+clean:; 	@rm -f $(OBJS) *Dict* core*
+	@echo "---> removing $(OBJS)"
+
+#
+$(OBJS): %.o: %.cpp
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
+
+install: all
+	@echo "Installing shared lib: libPMusr.so ( you must be root ;-) )"
+ifeq ($(OS),LINUX)
+	cp -pv $(SHLIB) $(ROOTSYS)/lib
+	cp -pv $(PMUSRPATH)/*.h $(ROOTSYS)/include
+endif
