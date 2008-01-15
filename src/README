@@ -36,8 +36,11 @@ musrfit is the first program in a series to be written which will be a full repl
 Build Instructions:
 -------------------
 
+In order to get musrfit compiled, you need first to build the shared library libPMusr.so. In order to do so, please follow the instruction given in the file classes/BUILD.
+
 make -f Makefile.musrfit
 make -f Makefile.musrfit install
+
 
 #---------------------------------------------------------------------
 # this is the end ...
