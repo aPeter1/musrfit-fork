@@ -166,7 +166,7 @@ class PTheory
     virtual double Func(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
 
   private:
-    virtual unsigned int SearchDataBase(TString name);
+    virtual int SearchDataBase(TString name);
     virtual void MakeCleanAndTidyTheoryBlock(PMsrLines* fullTheoryBlock);
 
     virtual double Asymmetry(const vector<double>& paramValues, const vector<double>& funcValues) const;

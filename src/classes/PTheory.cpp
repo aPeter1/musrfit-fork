@@ -526,9 +526,9 @@ double PTheory::Func(register double t, const vector<double>& paramValues, const
  *
  * \param name
  */
-unsigned int PTheory::SearchDataBase(TString name)
+int PTheory::SearchDataBase(TString name)
 {
-  unsigned int idx = THEORY_UNDEFINED;
+  int idx = THEORY_UNDEFINED;
 
   for (unsigned int i=0; i<THEORY_MAX; i++) {
     if (!name.CompareTo(fgTheoDataBase[i].fName, TString::kIgnoreCase) ||
@@ -557,7 +557,7 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
   char substr[256];
   TObjArray *tokens = 0;
   TObjString *ostr;
-  unsigned int idx = THEORY_UNDEFINED;
+  int idx = THEORY_UNDEFINED;
 
   for (unsigned int i=1; i<fullTheoryBlock->size(); i++) {
     // get the line to be prettyfied
@@ -580,7 +580,7 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
       }
     }
     // check if theory is indeed defined. This should not be necessay at this point but ...
-    if (idx == (unsigned int)THEORY_UNDEFINED)
+    if (idx == THEORY_UNDEFINED)
       continue;
     // check that there enough tokens. This should not be necessay at this point but ...
     if ((unsigned int)tokens->GetEntries() < fgTheoDataBase[idx].fNoOfParam + 1)

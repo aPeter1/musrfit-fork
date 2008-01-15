@@ -77,7 +77,7 @@ class PRunBase
   protected:
     bool fValid;
 
-    unsigned int fRunNo;        ///< number of the run within the msr file
+    int fRunNo;                 ///< number of the run within the msr file
     PMsrHandler      *fMsrInfo; ///< msr-file handler
     PMsrRunStructure *fRunInfo; ///< run info used to filter out needed infos for the run
     PRunDataHandler  *fRawData; ///< holds the raw run data
