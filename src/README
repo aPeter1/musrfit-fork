@@ -1,0 +1,44 @@
+#---------------------------------------------------------------------
+# README
+# Andreas Suter, 2008/01/15
+# $Id$
+#---------------------------------------------------------------------
+
+The following programs are available:
+
+1) msr2msr
+2) musrfit
+
+which will be described below (including build instructions).
+
+*************
+1) msr2msr
+*************
+
+The original msr-files used in WKM (wkmfit, wkmview, ...) do have some shortcomings, hence it was necessary to slightly change the file format of these msr-files and hence sacrify the backwards compatibility. In order to be able to use old wkm-files, msr2msr was written. This program takes an old msr-file and converts it to a new one. If a new msr-file is fed to msr2msr, the output will be just a mere copy of the file, and hence it doesn't harm. This means, whenever you are not sure if the given msr-file is a new or and old one, just execute msr2msr.
+
+usage: msr2msr <msr-file-in> <msr-file-out> | [--help]
+  <msr-file-in> : input msr-file
+  <msr-file-out>: converted msr-output-file
+
+Build Instructions:
+-------------------
+
+make -f Makefile.msr2msr
+make -f Makefile.msr2msr install
+
+*************
+1) musrfit
+*************
+
+musrfit is the first program in a series to be written which will be a full replacement for the corresponding WKM programs, e.g. wkmfit -> musrfit, etc.
+
+Build Instructions:
+-------------------
+
+make -f Makefile.musrfit
+make -f Makefile.musrfit install
+
+#---------------------------------------------------------------------
+# this is the end ...
+#---------------------------------------------------------------------
