@@ -42,7 +42,7 @@ ifeq ($(OS),LINUX)
 CXX           = g++
 CXXFLAGS      = -g -Wall -fPIC
 PMUSRPATH     = ../include
-MNPATH        = /usr/local/include
+MNPATH        = $(ROOTSYS)/include
 INCLUDES      = -I $(PMUSRPATH) -I $(MNPATH)
 LD            = g++
 LDFLAGS       = -g
@@ -70,7 +70,7 @@ GLIBS         = $(ROOTGLIBS) -lXMLParser
 # PSI libs
 PSILIBS       = -lTLemRunHeader
 # Minuit2 lib
-MNLIB         = -L/usr/local/lib -lMinuit2Base
+MNLIB         = -L$(ROOTSYS)/lib -lMinuit2
 
 
 # some definitions: headers, sources, objects,...
