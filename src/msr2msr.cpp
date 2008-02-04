@@ -76,7 +76,7 @@ bool msr2msr_run(char *str)
   run.ToUpper();
 
   // tokenize run
-  tokens = line.Tokenize(" ");
+  tokens = line.Tokenize(" \t");
   if (tokens->GetEntries() < 4) {
     cout << endl << "**ERROR**: Something is wrong with the RUN block header:";
     cout << endl << "  >> " << str;
@@ -132,7 +132,7 @@ void msr2msr_param(char *str, int &tag)
   char sstr[256];
   char spaces[256];
 
-  tokens = line.Tokenize(" ");
+  tokens = line.Tokenize(" \t");
   unsigned int noTokens = tokens->GetEntries();
   if (noTokens == 4) {
     strcat(str, "    none");
@@ -149,21 +149,33 @@ void msr2msr_param(char *str, int &tag)
     strcat(sstr, spaces);
     // value
     strcat(sstr, ostr[2]->GetString().Data());
-    memset(spaces, 0, sizeof(spaces));
-    memset(spaces, ' ', 10-strlen(ostr[2]->GetString().Data()));
-    strcat(sstr, spaces);
+    if (strlen(ostr[2]->GetString().Data()) < 10) {
+      memset(spaces, 0, sizeof(spaces));
+      memset(spaces, ' ', 10-strlen(ostr[2]->GetString().Data()));
+      strcat(sstr, spaces);
+    } else {
+      strcat(sstr, " ");
+    }
     // step
     strcat(sstr, ostr[3]->GetString().Data());
-    memset(spaces, 0, sizeof(spaces));
-    memset(spaces, ' ', 12-strlen(ostr[3]->GetString().Data()));
-    strcat(sstr, spaces);
+    if (strlen(ostr[3]->GetString().Data()) < 12) {
+      memset(spaces, 0, sizeof(spaces));
+      memset(spaces, ' ', 12-strlen(ostr[3]->GetString().Data()));
+      strcat(sstr, spaces);
+    } else {
+      strcat(sstr, " ");
+    }
     // pos. error
     strcat(sstr, "none        ");
     // lower boundary
     strcat(sstr, ostr[4]->GetString().Data());
-    memset(spaces, 0, sizeof(spaces));
-    memset(spaces, ' ', 8-strlen(ostr[4]->GetString().Data()));
-    strcat(sstr, spaces);
+    if (strlen(ostr[4]->GetString().Data()) < 8) {
+      memset(spaces, 0, sizeof(spaces));
+      memset(spaces, ' ', 8-strlen(ostr[4]->GetString().Data()));
+      strcat(sstr, spaces);
+    } else {
+      strcat(sstr, " ");
+    }
     // upper boundary
     strcat(sstr, ostr[5]->GetString().Data());
     strcpy(str, sstr);
