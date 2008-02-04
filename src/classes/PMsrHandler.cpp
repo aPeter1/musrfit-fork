@@ -736,7 +736,7 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
   iter = lines.begin();
   while ((iter != lines.end()) && !error) {
 
-    tokens = iter->fLine.Tokenize(" ");
+    tokens = iter->fLine.Tokenize(" \t");
     if (!tokens) {
       cout << endl << "SEVERE ERROR: Couldn't tokenize Parameters in line " << iter->fLineNo;
       cout << endl << endl;
@@ -965,7 +965,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     iter->fLine.ToLower();
 
     // tokenize line
-    tokens = iter->fLine.Tokenize(" ");
+    tokens = iter->fLine.Tokenize(" \t");
     if (!tokens) {
       cout << endl << "SEVERE ERROR: Couldn't tokenize Parameters in line " << iter->fLineNo;
       cout << endl << endl;
@@ -1537,7 +1537,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
     while ((iter1 != iter2) && !error) {
 
       if (iter1->fLine.Contains("PLOT")) { // handle plot header
-        tokens = iter1->fLine.Tokenize(" ");
+        tokens = iter1->fLine.Tokenize(" \t");
         if (!tokens) {
           cout << endl << "SEVERE ERROR: Couldn't tokenize PLOT in line " << iter1->fLineNo;
           cout << endl << endl;
@@ -1569,7 +1569,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           case MSR_PLOT_SINGLE_HISTO: // like: runs 1 5 13
           case MSR_PLOT_ASYM:
           case MSR_PLOT_NO_MUSR:
-            tokens = iter1->fLine.Tokenize(" ");
+            tokens = iter1->fLine.Tokenize(" \t");
             if (!tokens) {
               cout << endl << "SEVERE ERROR: Couldn't tokenize PLOT in line " << iter1->fLineNo;
               cout << endl << endl;
@@ -1596,7 +1596,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
             }
             break;
           case MSR_PLOT_ASYM_RRF: // like: runs 1,1 1,2
-            tokens = iter1->fLine.Tokenize(" ");
+            tokens = iter1->fLine.Tokenize(" \t");
             if (!tokens) {
               cout << endl << "SEVERE ERROR: Couldn't tokenize PLOT in line " << iter1->fLineNo;
               cout << endl << endl;
@@ -1642,7 +1642,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
       }
 
       if (iter1->fLine.Contains("range")) { // handle plot range
-        tokens = iter1->fLine.Tokenize(" ");
+        tokens = iter1->fLine.Tokenize(" \t");
         if (!tokens) {
           cout << endl << "SEVERE ERROR: Couldn't tokenize PLOT in line " << iter1->fLineNo;
           cout << endl << endl;

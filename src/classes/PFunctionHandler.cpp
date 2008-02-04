@@ -92,7 +92,7 @@ cout << endl << "fLines[" << i << "] = '" << fLines[i].fLine.Data() << "'";
     tree_parse_info<> info = ast_parse(line.Data(), function, space_p);
 
     if (info.full) {
-      cout << endl << "parse successfull ..." << endl;
+      cout << endl << "parse successful ..." << endl;
       PFunction func(info);
       fFuncs.push_back(func);
     } else {

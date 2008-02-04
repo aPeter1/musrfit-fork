@@ -443,7 +443,7 @@ bool PRunDataHandler::ReadNemuFile()
 
   // read header
   bool    headerInfo = true;
-  char    instr[128];
+  char    instr[512];
   TString line;
   double  dval;
   int     ival;
@@ -551,9 +551,11 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
       histoData.push_back(val[i]);
   }
 
-  // save the last histo
-  runData.fDataBin.push_back(histoData);
-  histoData.clear();
+  // save the last histo if not empty
+  if (histoData.size() > 0) {
+    runData.fDataBin.push_back(histoData);
+    histoData.clear();
+  }
 
   // close file
   f.close();
