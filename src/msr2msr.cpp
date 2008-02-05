@@ -135,7 +135,36 @@ void msr2msr_param(char *str, int &tag)
   tokens = line.Tokenize(" \t");
   unsigned int noTokens = tokens->GetEntries();
   if (noTokens == 4) {
-    strcat(str, "    none");
+    for (unsigned int i=0; i<4; i++)
+      ostr[i] = dynamic_cast<TObjString*>(tokens->At(i));
+    // number
+    sprintf(sstr, "%10s", ostr[0]->GetString().Data());
+    // name
+    strcat(sstr, " ");
+    strcat(sstr, ostr[1]->GetString().Data());
+    memset(spaces, 0, sizeof(spaces));
+    memset(spaces, ' ', 12-strlen(ostr[1]->GetString().Data()));
+    strcat(sstr, spaces);
+    // value
+    strcat(sstr, ostr[2]->GetString().Data());
+    if (strlen(ostr[2]->GetString().Data()) < 10) {  
+      memset(spaces, 0, sizeof(spaces));
+      memset(spaces, ' ', 10-strlen(ostr[2]->GetString().Data()));
+      strcat(sstr, spaces);
+    } else {
+      strcat(sstr, " ");
+    }
+    // step
+    strcat(sstr, ostr[3]->GetString().Data());
+    if (strlen(ostr[3]->GetString().Data()) < 12) {
+      memset(spaces, 0, sizeof(spaces));
+      memset(spaces, ' ', 12-strlen(ostr[3]->GetString().Data()));
+      strcat(sstr, spaces);
+    } else {
+      strcat(sstr, " ");
+    }
+    strcat(sstr, "none");
+    strcpy(str, sstr);
   } else if (noTokens == 6) {
     for (unsigned int i=0; i<6; i++)
       ostr[i] = dynamic_cast<TObjString*>(tokens->At(i));
@@ -149,7 +178,7 @@ void msr2msr_param(char *str, int &tag)
     strcat(sstr, spaces);
     // value
     strcat(sstr, ostr[2]->GetString().Data());
-    if (strlen(ostr[2]->GetString().Data()) < 10) {
+    if (strlen(ostr[2]->GetString().Data()) < 10) {  
       memset(spaces, 0, sizeof(spaces));
       memset(spaces, ' ', 10-strlen(ostr[2]->GetString().Data()));
       strcat(sstr, spaces);
