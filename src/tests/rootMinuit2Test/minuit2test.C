@@ -79,7 +79,7 @@ void minuit2test()
   gFitFcn->SetParNames("N0", "asym", "lambda", "B", "phase", "Bkg");
   gFitFcn->SetParameter(0, 30.0);   // N0
 //  gFitFcn->SetParLimits(0, 0.0, 1.0e6);
-  gFitFcn->SetParameter(1, 0.11);    // asym
+  gFitFcn->SetParameter(1, 0.26);    // asym
 //  gFitFcn->SetParLimits(1, 0.0, 0.33);
   gFitFcn->SetParameter(2, 0.3);     // lambda
 //  gFitFcn->SetParLimits(2, 0.0, 100.0);
@@ -100,6 +100,9 @@ void minuit2test()
 
   histo->Draw();
 
+  gFitFcn->SetParameter(0, 150.0);   // N0
+  gFitFcn->SetParameter(5, 23.0);    // Bkg
+  
   TVirtualFitter::SetDefaultFitter("Minuit2");
-  histo->Fit("gFitFcn", "LE"); // L->likleyhood, E->minos 
+  histo->Fit("gFitFcn", "L"); // L->likleyhood, E->minos 
 }

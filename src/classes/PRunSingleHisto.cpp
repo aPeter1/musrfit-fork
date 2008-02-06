@@ -166,9 +166,54 @@ double PRunSingleHisto::CalcChiSquare(const std::vector<double>& par)
  */
 double PRunSingleHisto::CalcMaxLikelihood(const std::vector<double>& par)
 {
-  cout << endl << "PRunSingleHisto::CalcMaxLikelihood(): not implemented yet ..." << endl;
+  double mllh      = 0.0; // maximum log likelihood assuming poisson distribution for the single bin
 
-  return 1.0;
+  double N0;
+
+  // check if norm is a parameter or a function
+  if (fRunInfo->fNormParamNo < MSR_PARAM_FUN_OFFSET) { // norm is a parameter
+    N0 = par[fRunInfo->fNormParamNo-1];
+  } else { // norm is a function
+    // get function number
+    unsigned int funNo = fRunInfo->fNormParamNo-MSR_PARAM_FUN_OFFSET;
+    // evaluate function
+    N0 = fMsrInfo->EvalFunc(funNo,fRunInfo->fMap,par);
+  }
+
+  // get tau
+  double tau;
+  if (fRunInfo->fLifetimeParamNo != -1)
+    tau = par[fRunInfo->fLifetimeParamNo-1];
+  else
+    tau = PMUON_LIFETIME;
+
+  // get background
+  double bkg = par[fRunInfo->fBkgFitParamNo-1];
+
+  // calculate functions
+  for (int i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
+    int funcNo = fMsrInfo->GetFuncNo(i);
+    fFuncValues[i] = fMsrInfo->EvalFunc(funcNo, fRunInfo->fMap, par);
+  }
+
+  // calculate maximum log likelihood
+  double theo;
+  double data;
+  for (unsigned int i=0; i<fData.fValue.size(); i++) {
+    if ((fData.fTime[i]>=fFitStartTime) && (fData.fTime[i]<=fFitStopTime)) {     
+      // calculate theory for the given parameter set
+      theo = N0*TMath::Exp(-fData.fTime[i]/tau)*(1+fTheory->Func(fData.fTime[i], par, fFuncValues))+bkg;
+      // check if data value is not too small
+      if (fData.fValue[i] > 1.0e-9)
+        data = fData.fValue[i];
+      else
+        data = 1.0e-9;
+      // add maximum log likelihood contribution of bin i
+      mllh -= data*TMath::Log(theo) - theo - TMath::LnGamma(data+1);
+    }
+  }
+
+  return mllh;
 }
 
 //--------------------------------------------------------------------------

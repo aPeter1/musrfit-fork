@@ -178,7 +178,7 @@ bool PFitter::CheckCommands()
       continue;
     } else if (it->fLine.Contains("CHI_SQUARE")) {
       fUseChi2 = true;
-    } else if (it->fLine.Contains("MAX_LIKELYHOOD")) {
+    } else if (it->fLine.Contains("MAX_LIKELIHOOD")) {
       fUseChi2 = false;
     } else if (it->fLine.Contains("INTERACTIVE")) {
       fCmdList.push_back(PMN_INTERACTIVE);
@@ -325,7 +325,7 @@ bool PFitter::ExecuteMinimize()
   ROOT::Minuit2::MnMinimize minimize((*fFitterFcn), fMnUserParams);
 
   // minimize
-  ROOT::Minuit2::FunctionMinimum min = minimize();
+  ROOT::Minuit2::FunctionMinimum min = minimize(); 
   if (!min.IsValid()) {
     cout << endl << "**WARNING**: PFitter::ExecuteMinimize(): Fit did not converge, sorry ...";
     return false;

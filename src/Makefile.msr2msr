@@ -60,9 +60,9 @@ LIBS          = $(ROOTLIBS) -lXMLParser
 GLIBS         = $(ROOTGLIBS) -lXMLParser
 
 # PSI libs
-PSILIBS       = -lTLemRunHeader -lPMusr
+#PSILIBS       = -lTLemRunHeader -lPMusr
 # Minuit2 lib
-MNLIB         = -L$(ROOTSYS)/lib -lMinuit2
+#MNLIB         = -L$(ROOTSYS)/lib -lMinuit2
 
 # Executable
 EXEC = msr2msr
@@ -78,7 +78,7 @@ all:  $(EXEC)
 $(EXEC): $(OBJS)
 	@echo "---> Building $(EXEC) ..."
 	/bin/rm -f $(SHLIB)
-	$(LD) $(OBJS) -o $(EXEC) $(GLIBS) $(PSILIBS) $(MNLIB)
+	$(LD) $(OBJS) -o $(EXEC) $(GLIBS)
 	@echo "done"
 
 # clean up: remove all object file (and core files)

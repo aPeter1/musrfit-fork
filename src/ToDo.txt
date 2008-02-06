@@ -25,7 +25,7 @@ short term:
 
 * write a little standalone program which is converting the old msr-files to the new ones. **DONE** 08-01-04
 
-* implement max.likelihood fits
+* implement max.likelihood fits **DONE** 08-02-06 (for Single Histo only. For the others not clear how to do it)
 
 * implement table based theory functions (LF stuff)
 
@@ -33,14 +33,15 @@ short term:
 intermediate term:
 ---------------------
 
-* start writing docu, i.e. transfering WKM doc from German -> English and
+* start writing docu, i.e. transferring WKM doc from German -> English and
   describe new features with examples!
+* introduce error numbers with corresponding docu/explanation in the latex-docu.  
 * implement RRF stuff
 * implement NonMuSR stuff
 * implement access to user-function, i.e. functions not
   defined within musrfit, using the ROOT dictionary feature
   to look for them and use them.
-* think about if it is worth to modifiy wkm in order to read
+* think about if it is worth to modify wkm in order to read
   the new msr-files, so that wkmview can be used for an intermediate
   time.
 
@@ -65,6 +66,8 @@ fixes:
 * Needed to change some part of the Minuit2 source code, otherwise I got a strange linker error message.
   In MnMinos.h the constructors (3 overloaded versions) are defined implicitly. When linking against libPMusr.so
   which is using libMinuit2Base.so, I got the error message from the linker that is cannot find the reference
-  to the second constructor. When transfering the implicit definition from the header file to the cxx, the
+  to the second constructor. When transferring the implicit definition from the header file to the cxx, the
   problem was gone. Since to fiddle in the Minuit2 source code directly is ugly, I should look for a way to
   build libPMusr.so which doesn't have this problem.
+  
+  -> This problem has been resolved cleanly by using minuit2 delivered with root!

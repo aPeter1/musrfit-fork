@@ -1467,7 +1467,7 @@ bool PMsrHandler::FilterFunMapNumber(TString str, const char *filter, int &no)
 //--------------------------------------------------------------------------
 /**
  * <p> In the command block there shall be a new command which can be used
- * to switch between chi2 and maximum_likelyhood!!
+ * to switch between chi2 and maximum_likelihood!!
  *
  * \param lines is a list of lines containing the fitparameter block
  */

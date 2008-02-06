@@ -99,9 +99,6 @@ bool PRunListCollection::Add(int runNo)
 
   int fitType = (*fMsrInfo->GetMsrRunList())[runNo].fFitType;
 
-PRunAsymmetry* asym;
-bool status;
-
   switch (fitType) {
     case PRUN_SINGLE_HISTO:
       fRunSingleHistoList.push_back(new PRunSingleHisto(fMsrInfo, fData, runNo));
@@ -110,8 +107,6 @@ bool status;
       break;
     case PRUN_ASYMMETRY:
       fRunAsymmetryList.push_back(new PRunAsymmetry(fMsrInfo, fData, runNo));
-      asym = fRunAsymmetryList[fRunAsymmetryList.size()-1];
-      status = asym->IsValid();
       if (!fRunAsymmetryList[fRunAsymmetryList.size()-1]->IsValid())
         success = false;
       break;
@@ -217,14 +212,15 @@ double PRunListCollection::GetSingleHistoMaximumLikelihood(const std::vector<dou
 // GetAsymmetryMaximumLikelihood
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> Since it is not clear yet how to handle asymmetry fits with max likelihood
+ * the chi square will be used!
  */
 double PRunListCollection::GetAsymmetryMaximumLikelihood(const std::vector<double>& par)
 {
   double mlh = 0.0;
 
   for (unsigned int i=0; i<fRunAsymmetryList.size(); i++)
-    mlh += fRunAsymmetryList[i]->CalcMaxLikelihood(par);
+    mlh += fRunAsymmetryList[i]->CalcChiSquare(par);
 
   return mlh;
 }
@@ -233,14 +229,15 @@ double PRunListCollection::GetAsymmetryMaximumLikelihood(const std::vector<doubl
 // GetRRFMaximumLikelihood
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> Since it is not clear yet how to handle RRF fits with max likelihood
+ * the chi square will be used!
  */
 double PRunListCollection::GetRRFMaximumLikelihood(const std::vector<double>& par)
 {
   double mlh = 0.0;
 
   for (unsigned int i=0; i<fRunRRFList.size(); i++)
-    mlh += fRunRRFList[i]->CalcMaxLikelihood(par);
+    mlh += fRunRRFList[i]->CalcChiSquare(par);
 
   return mlh;
 }
@@ -249,14 +246,15 @@ double PRunListCollection::GetRRFMaximumLikelihood(const std::vector<double>& pa
 // GetNonMusrMaximumLikelihood
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> Since it is not clear yet how to handle non musr fits with max likelihood
+ * the chi square will be used!
  */
 double PRunListCollection::GetNonMusrMaximumLikelihood(const std::vector<double>& par)
 {
   double mlh = 0.0;
 
   for (unsigned int i=0; i<fRunNonMusrList.size(); i++)
-    mlh += fRunNonMusrList[i]->CalcMaxLikelihood(par);
+    mlh += fRunNonMusrList[i]->CalcChiSquare(par);
 
   return mlh;
 }
