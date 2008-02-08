@@ -52,14 +52,15 @@ typedef parse_tree_match_t::tree_iterator iter_t;
 struct PFunctionGrammar : public grammar<PFunctionGrammar>
 {
     static const int realID       = 1;
-    static const int funLabelID   = 2;
-    static const int parameterID  = 3;
-    static const int mapID        = 4;
-    static const int functionID   = 5;
-    static const int factorID     = 6;
-    static const int termID       = 7;
-    static const int expressionID = 8;
-    static const int assignmentID = 9;
+    static const int constPiID    = 2;
+    static const int funLabelID   = 3;
+    static const int parameterID  = 4;
+    static const int mapID        = 5;
+    static const int functionID   = 6;
+    static const int factorID     = 7;
+    static const int termID       = 8;
+    static const int expressionID = 9;
+    static const int assignmentID = 10;
 
     template <typename ScannerT>
     struct definition
@@ -68,6 +69,8 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
         {
             //  Start grammar definition
             real        =   leaf_node_d[ real_p ];
+
+            const_pi    =   leaf_node_d[ str_p("PI") ];
 
             fun_label   =   leaf_node_d[ ( lexeme_d[ "FUN" >> +digit_p ] ) ];
 
@@ -93,6 +96,7 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
                         ;
 
             factor      =   real
+                        |   const_pi
                         |   parameter
                         |   map
                         |   function
@@ -114,6 +118,7 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
 
             // turn on the debugging info.
             BOOST_SPIRIT_DEBUG_RULE(real);
+            BOOST_SPIRIT_DEBUG_RULE(const_pi);
             BOOST_SPIRIT_DEBUG_RULE(fun_label);
             BOOST_SPIRIT_DEBUG_RULE(parameter);
             BOOST_SPIRIT_DEBUG_RULE(map);
@@ -132,6 +137,7 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
         rule<ScannerT, parser_context<>, parser_tag<mapID> >          map;
         rule<ScannerT, parser_context<>, parser_tag<parameterID> >    parameter;
         rule<ScannerT, parser_context<>, parser_tag<funLabelID> >     fun_label;
+        rule<ScannerT, parser_context<>, parser_tag<constPiID> >      const_pi;
         rule<ScannerT, parser_context<>, parser_tag<realID> >         real;
 
         rule<ScannerT, parser_context<>, parser_tag<assignmentID> > const&

@@ -161,6 +161,9 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     node.fID = PFunctionGrammar::realID; // keep the ID
     node.fDvalue = dvalue; // keep the value
 // cout << endl << ">> realID: value = " << dvalue;
+  } else if (i->value.id() == PFunctionGrammar::constPiID) { // handle constant pi
+    node.fID = PFunctionGrammar::constPiID; // keep the ID
+    node.fDvalue = 3.14159265358979323846; // keep the value
   } else if (i->value.id() == PFunctionGrammar::parameterID) { // handle parameter number
     str = string(i->value.begin(), i->value.end()); // get string
     status = sscanf(str.c_str(), "PAR%d", &ivalue); // convert string to parameter number
@@ -301,6 +304,8 @@ bool PFunction::FindAndCheckMapAndParamRange(PFuncTreeNode &node, unsigned int m
 {
   if (node.fID == PFunctionGrammar::realID) {
     return true;
+  } else if (node.fID == PFunctionGrammar::constPiID) {
+    return true;
   } else if (node.fID == PFunctionGrammar::parameterID) {
     if (node.fIvalue <= (int) paramSize)
       return true;
@@ -357,6 +362,8 @@ double PFunction::Eval(vector<double> param)
 double PFunction::EvalNode(PFuncTreeNode &node)
 {
   if (node.fID == PFunctionGrammar::realID) {
+    return node.fDvalue;
+  } else if (node.fID == PFunctionGrammar::constPiID) {
     return node.fDvalue;
   } else if (node.fID == PFunctionGrammar::parameterID) {
     return fParam[node.fIvalue-1];
@@ -487,6 +494,8 @@ void PFunction::EvalTreeForStringExpression(iter_t const& i)
     fFuncString += string(i->value.begin(), i->value.end()).c_str();
     if (*i->value.begin() == '-')
       fFuncString += ")";
+  } else if (i->value.id() == PFunctionGrammar::constPiID) {
+    fFuncString += "Pi";
   } else if (i->value.id() == PFunctionGrammar::funLabelID) {
     assert(i->children.size() == 0);
     //SetFuncNo(i);
@@ -502,53 +511,46 @@ void PFunction::EvalTreeForStringExpression(iter_t const& i)
     iter_t it = i->children.begin();
     // funcName, '(', expression, ')'
     fFuncString += string(it->value.begin(), it->value.end()).c_str();
-    if (termOp == 0)
-      fFuncString += "(";
+    fFuncString += "(";
     EvalTreeForStringExpression(i->children.begin()+2); // the real stuff
-    if (termOp == 0)
-      fFuncString += ")";
+    fFuncString += ")";
   } else if (i->value.id() == PFunctionGrammar::factorID) {
     EvalTreeForStringExpression(i->children.begin());
   } else if (i->value.id() == PFunctionGrammar::termID) {
+    termOp++;
     if (*i->value.begin() == '*') {
+cout << endl << ">> i->children.size() = " << i->children.size() << endl;
       assert(i->children.size() == 2);
-      termOp++;
       EvalTreeForStringExpression(i->children.begin());
       fFuncString += " * ";
       EvalTreeForStringExpression(i->children.begin()+1);
-      termOp--;
     } else if (*i->value.begin() == '/') {
       assert(i->children.size() == 2);
-      termOp++;
       EvalTreeForStringExpression(i->children.begin());
       fFuncString += " / ";
       EvalTreeForStringExpression(i->children.begin()+1);
-      termOp--;
     } else {
       assert(0);
     }
+    termOp--;
   } else if (i->value.id() == PFunctionGrammar::expressionID) {
+    if (termOp > 0)
+      fFuncString += "(";
     if (*i->value.begin() == '+') {
       assert(i->children.size() == 2);
-      if (termOp > 0)
-        fFuncString += "(";
       EvalTreeForStringExpression(i->children.begin());
       fFuncString += " + ";
       EvalTreeForStringExpression(i->children.begin()+1);
-      if (termOp > 0)
-        fFuncString += ")";
     } else if (*i->value.begin() == '-') {
       assert(i->children.size() == 2);
-      if (termOp > 0)
-        fFuncString += "(";
       EvalTreeForStringExpression(i->children.begin());
       fFuncString += " - ";
       EvalTreeForStringExpression(i->children.begin()+1);
-      if (termOp > 0)
-        fFuncString += ")";
     } else {
       assert(0);
     }
+    if (termOp > 0)
+      fFuncString += ")";
   } else if (i->value.id() == PFunctionGrammar::assignmentID) {
     assert(i->children.size() == 3);
     EvalTreeForStringExpression(i->children.begin());
