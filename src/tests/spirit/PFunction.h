@@ -75,7 +75,7 @@ typedef struct func_tree_node {
 //----------------------------------------------------------------------------
 class PFunction {
   public:
-    PFunction(tree_parse_info<> info, vector<double> param, vector<int> map);
+    PFunction(tree_parse_info<> info, vector<double> param, vector<int> map, bool debug);
     virtual ~PFunction();
 
     virtual bool IsValid() { return fValid; }
@@ -96,12 +96,16 @@ class PFunction {
     virtual long EvaluateTree(tree_parse_info<> info);
     virtual long EvalTreeExpression(iter_t const& i);
 
+    virtual long PrintTree(tree_parse_info<> info);
+    virtual long PrintTreeExpression(iter_t const& i);
+
   private:
     tree_parse_info<> fInfo;
     vector<double> fParam;
     vector<int> fMap;
     PFuncTreeNode fFunc;
 
+    bool fDebug;
     bool fValid;  ///< flag showing if the function is valid
     int  fFuncNo; ///< function number, i.e. FUNx with x the function number
 

@@ -109,7 +109,7 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
                               | (root_node_d[ch_p('-')] >> term)
                             );
 
-            assignment  =   (fun_label >> ch_p('=') >> expression);
+            assignment  =   fun_label >> ch_p('=') >> expression;
             //  End grammar definition
 
             // turn on the debugging info.

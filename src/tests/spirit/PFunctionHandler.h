@@ -44,7 +44,7 @@ using namespace std;
 class PFunctionHandler
 {
   public:
-    PFunctionHandler(char *fln);
+    PFunctionHandler(char *fln, bool debug);
     PFunctionHandler(vector<QString> lines);
     virtual ~PFunctionHandler();
 
@@ -55,6 +55,7 @@ class PFunctionHandler
     virtual unsigned int GetNoOfFuncs() { return fFuncs.size(); }
 
   private:
+    bool fDebug;
     bool fValid;
 
     QString fFileName;

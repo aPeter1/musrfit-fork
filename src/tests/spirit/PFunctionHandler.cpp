@@ -46,7 +46,7 @@
  *
  * \param fln
  */
-PFunctionHandler::PFunctionHandler(char *fln)
+PFunctionHandler::PFunctionHandler(char *fln, bool debug) : fDebug(debug)
 {
   fValid = true;
   fFileName = QString(fln);
@@ -186,7 +186,7 @@ cout << endl << "fLines[" << i << "] = '" << fLines[i].latin1() << "'";
 
     if (info.full) {
       cout << endl << "parse successfull ..." << endl;
-      PFunction func(info, fParam, fMap);
+      PFunction func(info, fParam, fMap, fDebug);
       fFuncs.push_back(func);
     } else {
       cout << endl << "parse failed ... (" << i << ")" << endl;

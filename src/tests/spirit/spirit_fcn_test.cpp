@@ -6,10 +6,11 @@ using namespace std;
 //-----------------------------------------------------
 void syntax()
 {
-  cout << endl << "spirit_fcn_test [--file <filename>] | [--help]";
+  cout << endl << "spirit_fcn_test [--file <filename> [--debug]] | [--help]";
   cout << endl << "  without arguments: interactive mode";
   cout << endl << "  --file <filename>: function block etc. from file";
-  cout << endl << "  --help: this help";
+  cout << endl << "  --help:  this help";
+  cout << endl << "  --debug: will print the ast tree only (no evaluatio)";
   cout << endl << endl;
 }
 
@@ -47,26 +48,35 @@ void handle_input(vector<QString> &lines)
 int main(int argc, char *argv[])
 {
   bool inputFile = false;
+  bool debug     = false;
 
-  if (argc > 3) {
+  if (argc > 4) {
     syntax();
     return 0;
   } else if (argc == 2) {
     syntax();
     return 0;
-  } else if (argc == 3) {
+  } else if (argc >= 3) {
     if (strcmp(argv[1], "--file")) {
       syntax();
       return 0;
     } else {
       inputFile = true;
     }
+    if (argc == 4) {
+      if (strcmp(argv[3], "--debug")) {
+        syntax();
+        return 0;
+      } else {
+        debug = true;
+      }
+    }
   }
 
   PFunctionHandler *fcnHandler = 0;
 
   if (inputFile) {
-    fcnHandler = new PFunctionHandler(argv[2]);
+    fcnHandler = new PFunctionHandler(argv[2], debug);
   } else {
     vector<QString> lines;
     handle_input(lines);
@@ -84,9 +94,11 @@ cout << endl << "lines.size() = " << lines.size();
   if (go_on) {
     cout << endl << "will do the parsing ...";
     if (fcnHandler->DoParse()) {
-       cout << endl << "will do the evaluation ...";
-       for (unsigned int i=0; i<fcnHandler->GetNoOfFuncs(); i++)
-         cout << endl << "FUN" << fcnHandler->GetFuncNo(i) << " = " << fcnHandler->Eval(fcnHandler->GetFuncNo(i));
+       if (!debug) {
+         cout << endl << "will do the evaluation ...";
+         for (unsigned int i=0; i<fcnHandler->GetNoOfFuncs(); i++)
+           cout << endl << "FUN" << fcnHandler->GetFuncNo(i) << " = " << fcnHandler->Eval(fcnHandler->GetFuncNo(i));
+       }
     }
   }
 

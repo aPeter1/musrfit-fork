@@ -59,7 +59,8 @@ using namespace std;
  * \param param the parameter vector
  * \param map the map vector
  */
-PFunction::PFunction(tree_parse_info<> info, vector<double> param, vector<int> map)
+PFunction::PFunction(tree_parse_info<> info, vector<double> param, vector<int> map, bool debug) :
+    fDebug(debug)
 {
   cout << endl << "in PFunction ...";
 
@@ -70,6 +71,12 @@ PFunction::PFunction(tree_parse_info<> info, vector<double> param, vector<int> m
   // init class variables
   fValid  = true;
   fFuncNo = -1;
+
+  // print out ast tree
+  if (fDebug) {
+    PrintTree(info);
+    return;
+  }
 
   // check parameter and map range
   if (!CheckParameterAndMapRange()) {
@@ -154,7 +161,6 @@ bool PFunction::CheckParameterAndMapInTree(iter_t const& i)
       fValid = false;
     }
   } else if (i->value.id() == PFunctionGrammar::functionID) {
-cout << endl << "children = " << i->children.size() << endl;
     assert(i->children.size() == 4);
     // i: 'funcName', '(', 'expression', ')'
     success = CheckParameterAndMapInTree(i->children.begin()+2); // thats the real stuff
@@ -163,12 +169,12 @@ cout << endl << "children = " << i->children.size() << endl;
     assert(i->children.size() == 1);
     success = CheckParameterAndMapInTree(i->children.begin());
   } else if (i->value.id() == PFunctionGrammar::termID) {
-    // '*'/'/' i: lhs, rhs
+    // '*' or '/' i: lhs, rhs
     assert(i->children.size() == 2);
     success = CheckParameterAndMapInTree(i->children.begin());
     success = CheckParameterAndMapInTree(i->children.begin()+1);
   } else if (i->value.id() == PFunctionGrammar::expressionID) {
-    // '+'/'-' i: lhs, rhs
+    // '+' or '-' i: lhs, rhs
     assert(i->children.size() == 2);
     success = CheckParameterAndMapInTree(i->children.begin());
     success = CheckParameterAndMapInTree(i->children.begin()+1);
@@ -616,5 +622,155 @@ long PFunction::EvalTreeExpression(iter_t const& i)
     assert(0);
   }
 
+  return 0;
+}
+
+//-------------------------------------------------------------
+// PrintTree (protected)
+//-------------------------------------------------------------
+long PFunction::PrintTree(tree_parse_info<> info)
+{
+  cout << endl << "********************************************";
+  cout << endl << ">> PrintTree";
+  cout << endl << "********************************************";
+  long value = PrintTreeExpression(info.trees.begin());
+  cout << endl << "********************************************";
+  cout << endl;
+  return value;
+}
+
+//-------------------------------------------------------------
+// PrintTreeExpression (protected)
+//-------------------------------------------------------------
+long PFunction::PrintTreeExpression(iter_t const& i)
+{
+  string str;
+  iter_t j;
+
+  if (i->value.id() == PFunctionGrammar::realID) {
+    if (i->children.size() == 0) {
+      str = string(i->value.begin(), i->value.end());
+      cout << endl << ">> " << str;
+    } else {
+      for (unsigned int k=0; k<i->children.size(); k++) {
+        j = i->children.begin()+k;
+        str = string(j->value.begin(), j->value.end());
+        cout << endl << "!> " << str;
+      }
+    }
+  } else if (i->value.id() == PFunctionGrammar::funLabelID) {
+    if (i->children.size() == 0) {
+      j = i->children.begin();
+      str = string(j->value.begin(), j->value.end());
+      cout << endl << ">> " << str;
+    } else {
+      for (unsigned int k=0; k<i->children.size(); k++) {
+        j = i->children.begin()+k;
+        str = string(j->value.begin(), j->value.end());
+        cout << endl << "!> " << str;
+      }
+    }
+  } else if (i->value.id() == PFunctionGrammar::parameterID) {
+    if (i->children.size() == 0) {
+      str = string(i->value.begin(), i->value.end());
+      cout << endl << ">> " << str;
+    } else {
+      for (unsigned int k=0; k<i->children.size(); k++) {
+        j = i->children.begin()+k;
+        str = string(j->value.begin(), j->value.end());
+        cout << endl << "!> " << str;
+      }
+    }
+  } else if (i->value.id() == PFunctionGrammar::mapID) {
+    if (i->children.size() == 0) {
+      str = string(i->value.begin(), i->value.end());
+      cout << endl << ">> " << str;
+    } else {
+      for (unsigned int k=0; k<i->children.size(); k++) {
+        j = i->children.begin()+k;
+        str = string(j->value.begin(), j->value.end());
+        cout << endl << "!> " << str;
+      }
+    }
+  } else if (i->value.id() == PFunctionGrammar::functionID) {
+    // i: 'funcName', '(', 'expression', ')'
+    if (i->children.size() == 4) {
+      j = i->children.begin();
+      str = string(j->value.begin(), j->value.end());
+      cout << endl << ">> " << str;
+      j = i->children.begin()+1;
+      str = string(j->value.begin(), j->value.end());
+      cout << endl << ">> " << str;
+      PrintTreeExpression(i->children.begin()+2);
+      j = i->children.begin()+3;
+      str = string(j->value.begin(), j->value.end());
+      cout << endl << ">> " << str;
+    } else {
+      for (unsigned int k=0; k<i->children.size(); k++) {
+        j = i->children.begin()+k;
+        str = string(j->value.begin(), j->value.end());
+        cout << endl << "!> " << str;
+      }
+    }
+  } else if (i->value.id() == PFunctionGrammar::factorID) {
+    // i: real | parameter | map | function | expression
+    if (i->children.size() == 1) {
+      PrintTreeExpression(i->children.begin());
+    } else {
+      for (unsigned int k=0; k<i->children.size(); k++) {
+        j = i->children.begin()+k;
+        str = string(j->value.begin(), j->value.end());
+        cout << endl << "!> " << str;
+      }
+    }
+  } else if (i->value.id() == PFunctionGrammar::termID) {
+    // '*' or '/' i: lhs, rhs
+    str = string(i->value.begin(), i->value.end());
+    cout << endl << ">> " << str;
+    if (i->children.size() == 2) {
+      PrintTreeExpression(i->children.begin());
+      PrintTreeExpression(i->children.begin()+1);
+    } else {
+      for (unsigned int k=0; k<i->children.size(); k++) {
+        j = i->children.begin()+k;
+        str = string(j->value.begin(), j->value.end());
+        cout << endl << "!> " << str;
+      }
+    }
+  } else if (i->value.id() == PFunctionGrammar::expressionID) {
+    // '+' or '-' i: lhs, rhs
+    str = string(i->value.begin(), i->value.end());
+    cout << endl << ">> " << str;
+    if (i->children.size() == 2) {
+      PrintTreeExpression(i->children.begin());
+      PrintTreeExpression(i->children.begin()+1);
+    } else {
+      for (unsigned int k=0; k<i->children.size(); k++) {
+        j = i->children.begin()+k;
+        str = string(j->value.begin(), j->value.end());
+        cout << endl << "!> " << str;
+      }
+    }
+  } else if (i->value.id() == PFunctionGrammar::assignmentID) {
+    // i: 'funx', '=', 'expression'
+    if (i->children.size() == 3) {
+      j = i->children.begin();
+      str = string(j->value.begin(), j->value.end());
+      cout << endl << ">> " << str;
+      j = i->children.begin()+1;
+      str = string(j->value.begin(), j->value.end());
+      cout << endl << ">> " << str;
+      PrintTreeExpression(i->children.begin()+2);
+    } else {
+      for (unsigned int k=0; k<i->children.size(); k++) {
+        j = i->children.begin()+k;
+        str = string(j->value.begin(), j->value.end());
+        cout << endl << "!> " << str;
+      }
+    }
+  } else {
+    cout << endl << "this point should never have been reached :-(" << endl;
+    assert(0);
+  }
   return 0;
 }
