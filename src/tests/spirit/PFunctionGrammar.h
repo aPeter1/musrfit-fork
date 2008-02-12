@@ -35,7 +35,7 @@
 #include <iostream>
 using namespace std;
 
-//#define BOOST_SPIRIT_DEBUG
+#define BOOST_SPIRIT_DEBUG
 
 #include <boost/spirit/core.hpp>
 #include <boost/spirit/tree/ast.hpp>

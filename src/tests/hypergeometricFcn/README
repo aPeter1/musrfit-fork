@@ -1,0 +1,15 @@
+hypergeometricFcn is a test to verify that Mathematica and the GSL lib
+produce the same output for the confluent hypergeometric function 1F1(m,n,z).
+The file erfi.dat is a file generate by Mathematica with the following commands
+
+f = Erfi[z]
+tt = Table[{z, f}, {z, 0, 3, 0.01}]
+Export["erfi.dat", tt]
+
+and Erfi[z] can be written in terms of 1F1(m,n,z) as
+
+Erfi[z] = 2 z / Sqrt[Pi] Hypergeometric1F1[1/2, 3/2, z^2]
+
+The only thing hypergeometricFcn does is to read erfi.dat, calculate Erfi[z]
+according to the above equation and save both data sets in a file called
+erfi_gsl.dat.
