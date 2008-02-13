@@ -5,13 +5,16 @@ $Id$
 
 Generate fake data:
 
-fakeData.pro
-fakeData.cpp
+fakeData.pro   : qmake input file to generate the Makefile
+fakeData.cpp   : main
+
+paramInput.dat : example input file for setting t0, asym, N0, bkg, 
+                 time resolution, no of channels
 
 fakeData is producing fake data root files which can be used in analysis
 software like maxent and wkm (wkm only after converting to nemu files).
 
 -------------------------------------------------------------------------
 
-skewedGaussian.C is a simple root macro which is generating a skewed
+skewedGaussian.C : is a simple root macro which is generating a skewed
 Gaussian input file for fakeData
