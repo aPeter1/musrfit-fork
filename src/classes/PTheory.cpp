@@ -117,7 +117,7 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
   TObjArray *tokens;
   TObjString *ostr;
 
-  tokens = str.Tokenize(" ");
+  tokens = str.Tokenize(" \t");
   if (!tokens) {
     cout << endl << "**SEVERE ERROR**: PTheory(): Couldn't tokenize theory block line " << line->fLineNo << ".";
     cout << endl << "  line content: " << line->fLine.Data();
@@ -288,6 +288,7 @@ bool PTheory::IsValid()
  */
 double PTheory::Func(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
 {
+
   if (fMul) {
     if (fAdd) { // fMul != 0 && fAdd != 0
       switch (fType) {
@@ -351,6 +352,10 @@ double PTheory::Func(register double t, const vector<double>& paramValues, const
           return InternalBessel(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
           break;
+        case THEORY_SKEWED_GAUSS:
+          return SkewedGauss(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
+                 fAdd->Func(t, paramValues, funcValues);
+          break;
         default:
           cout << endl << "**PANIC ERROR**: PTheory::Func: You never should have reached this line?!?! (" << fType << ")";
           cout << endl;
@@ -402,6 +407,9 @@ double PTheory::Func(register double t, const vector<double>& paramValues, const
           break;
         case THEORY_INTERNAL_BESSEL:
           return InternalBessel(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
+          break;
+        case THEORY_SKEWED_GAUSS:
+          return SkewedGauss(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
         default:
           cout << endl << "**PANIC ERROR**: PTheory::Func: You never should have reached this line?!?! (" << fType << ")";
@@ -457,6 +465,9 @@ double PTheory::Func(register double t, const vector<double>& paramValues, const
         case THEORY_INTERNAL_BESSEL:
           return InternalBessel(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
+        case THEORY_SKEWED_GAUSS:
+          return SkewedGauss(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
+          break;
         default:
           cout << endl << "**PANIC ERROR**: PTheory::Func: You never should have reached this line?!?! (" << fType << ")";
           cout << endl;
@@ -508,6 +519,9 @@ double PTheory::Func(register double t, const vector<double>& paramValues, const
           break;
         case THEORY_INTERNAL_BESSEL:
           return InternalBessel(t, paramValues, funcValues);
+          break;
+        case THEORY_SKEWED_GAUSS:
+          return SkewedGauss(t, paramValues, funcValues);
           break;
         default:
           cout << endl << "**PANIC ERROR**: PTheory::Func: You never should have reached this line?!?! (" << fType << ")";
@@ -565,7 +579,7 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
     // copy line content to str in order to remove comments
     str = line->fLine.Copy();
     // tokenize line
-    tokens = str.Tokenize(" ");
+    tokens = str.Tokenize(" \t");
     // make a handable string out of the asymmetry token
     ostr = dynamic_cast<TObjString*>(tokens->At(0));
     str = ostr->GetString();
@@ -968,3 +982,43 @@ double PTheory::InternalBessel(register double t, const vector<double>& paramVal
          0.333333333333333*TMath::Exp(-val[3]*t);
 }
 
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$
+ * \param paramValues
+ */
+double PTheory::SkewedGauss(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+{
+  double val[4];
+  double skg;
+
+  // check if FUNCTIONS are used
+  for (unsigned int i=0; i<4; i++) {
+    if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
+      val[i] = paramValues[fParamNo[i]];
+    } else { // function
+      val[i] = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
+    }
+  }
+
+
+  // val[2] = sigma-, val[3] = sigma+
+  double z1 = val[3]*t/TMath::Sqrt(2.0); // sigma+
+  double z2 = val[2]*t/TMath::Sqrt(2.0); // sigma-
+  double g1 = TMath::Exp(-0.5*TMath::Power(t*val[3], 2.0)); // gauss sigma+
+  double g2 = TMath::Exp(-0.5*TMath::Power(t*val[2], 2.0)); // gauss sigma-
+
+  if ((z1 >= 25.0) || (z2 >= 25.0)) // needed to prevent crash of 1F1
+    skg = 2.0e300;
+  else
+    skg = 0.5*TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t) * ( g1 + g2 ) -
+          0.5*TMath::Sin(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t) *
+          (
+          g1*2.0*z1/TMath::Sqrt(TMath::Pi())*gsl_sf_hyperg_1F1(0.5,1.5,z1*z1) -
+          g2*2.0*z2/TMath::Sqrt(TMath::Pi())*gsl_sf_hyperg_1F1(0.5,1.5,z2*z2)
+          );
+
+  return skg;
+}

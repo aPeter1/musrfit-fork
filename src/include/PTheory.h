@@ -38,6 +38,12 @@
 
 #include "PMsrHandler.h"
 
+#include <gsl_sf_hyperg.h>
+
+extern "C" {
+  double gsl_sf_hyperg_1F1(double a, double b, double x);
+}
+
 // --------------------------------------------------------
 // function handling tags
 // --------------------------------------------------------
@@ -59,7 +65,8 @@
 #define THEORY_TF_COS                      12
 #define THEORY_BESSEL                      13
 #define THEORY_INTERNAL_BESSEL             14
-#define THEORY_USER                        15
+#define THEORY_SKEWED_GAUSS                15
+#define THEORY_USER                        16
 
 // function parameter tags, i.e. how many parameters has a specific function
 #define THEORY_PARAM_ASYMMETRY                    1 // asymetry
@@ -77,9 +84,10 @@
 #define THEORY_PARAM_TF_COS                       2 // phase, frequency
 #define THEORY_PARAM_BESSEL                       2 // phase, frequency
 #define THEORY_PARAM_INTERNAL_BESSEL              5 // fraction, phase, frequency, TF damping, damping
+#define THEORY_PARAM_SKEWED_GAUSS                 4 // phase, frequency, rate minus, rate plus
 
 // number of available user functions
-#define THEORY_MAX 15
+#define THEORY_MAX 16
 
 // deg -> rad factor
 #define DEG_TO_RAD 0.0174532925199432955
@@ -150,7 +158,10 @@ static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
          "bessel", "b", "(phase frequency)"},
 
         {THEORY_INTERNAL_BESSEL, THEORY_PARAM_INTERNAL_BESSEL, false,
-         "internBsl", "ib", "(phase frequency Trate Lrate)"}};
+         "internBsl", "ib", "(phase frequency Trate Lrate)"},
+
+        {THEORY_SKEWED_GAUSS, THEORY_PARAM_SKEWED_GAUSS, false,
+         "skewedGss", "skg", "(phase frequency rate_minus rate_plus)"}};
 
 //--------------------------------------------------------------------------------------
 /**
@@ -184,6 +195,7 @@ class PTheory
     virtual double TFCos(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
     virtual double Bessel(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
     virtual double InternalBessel(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
+    virtual double SkewedGauss(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
 
     // variables
     bool fValid;
