@@ -29,11 +29,11 @@ void skewedGaussian()
   FILE *fp;
   char fln[256];
 
-  strcpy(fln, "skewedGauss.dat");
-
   const Double_t B0 = 100.0; // (G)
-  const Double_t sm = 2.0;   // (G)
-  const Double_t sp = 10.0;  // (G)
+  const Double_t sm = 4.0;   // (G)
+  const Double_t sp = 5.0;  // (G)
+
+  sprintf(fln, "skewedGauss-B%0.2lf-sm%0.2lf-sp%0.2lf.dat", B0, sm, sp);
 
   const Int_t noOfPoints = 1000;
 
