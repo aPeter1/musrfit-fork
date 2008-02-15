@@ -23,11 +23,17 @@ short term:
 
 * 2008/01/02: nice function block output needed. **DONE** 08-01-02
 
-* write a little standalone program which is converting the old msr-files to the new ones. **DONE** 08-01-04
+* write a little standalone program which is converting the old msr-files to 
+  the new ones. **DONE** 08-01-04
 
-* implement max.likelihood fits **DONE** 08-02-06 (for Single Histo only. For the others not clear how to do it)
+* implement max.likelihood fits **DONE** 08-02-06 (for Single Histo only.
+  For the others not clear how to do it.)
 
 * implement table based theory functions (LF stuff)
+
+* if a parameter is not used at all, minuit is still varying it!! This is stupid.
+  Check the minuit manual, there must be a function to "remove" these parameters,
+  i.e. forcing minuit to ignore them.
 
 ---------------------
 intermediate term:

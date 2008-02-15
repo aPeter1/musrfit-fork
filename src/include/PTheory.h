@@ -161,7 +161,7 @@ static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
          "internBsl", "ib", "(phase frequency Trate Lrate)"},
 
         {THEORY_SKEWED_GAUSS, THEORY_PARAM_SKEWED_GAUSS, false,
-         "skewedGss", "skg", "(phase frequency rate_minus rate_plus)"}};
+         "skewedGss", "skg", "(phase frequency rate_m rate_p)"}};
 
 //--------------------------------------------------------------------------------------
 /**
