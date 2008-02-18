@@ -31,6 +31,8 @@ short term:
 
 * fix problems in FUNCTIONS of the form (sin(par1)) **DONE** 08-02-18
 
+* fix output problems of the mlog files
+
 * implement table based theory functions (LF stuff)
 
 * if a parameter is not used at all, minuit is still varying it!! This is stupid.

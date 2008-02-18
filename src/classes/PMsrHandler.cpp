@@ -279,14 +279,16 @@ int PMsrHandler::WriteMsrLogFile()
     f << left << param_iter->fName.Data();
     f << " ";
     // value of the parameter
-    f.width(10);
+    f.width(9);
     f.precision(prec);
     f << left << param_iter->fValue;
+    f << " ";
     // value of step/error/neg.error
-    f.width(12);
+    f.width(11);
     f.precision(prec);
     f << left << param_iter->fStep;
-    f.width(12);
+    f << " ";
+    f.width(11);
     f.precision(prec);
     if ((param_iter->fNoOfParams == 5) || (param_iter->fNoOfParams == 7)) // pos. error given
       if (param_iter->fPosErrorPresent) // pos error is a number
@@ -295,14 +297,17 @@ int PMsrHandler::WriteMsrLogFile()
         f << left << "none";
     else // no pos. error
       f << left << "none";
+    f << " ";
     // boundaries
     if (param_iter->fNoOfParams > 5) {
-      f.width(8);
+      f.width(7);
       f.precision(prec);
       f << left << param_iter->fLowerBoundary;
-      f.width(8);
+      f << " ";
+      f.width(7);
       f.precision(prec);
       f << left << param_iter->fUpperBoundary;
+      f << " ";
     }
     // terminate line
     f << endl;
