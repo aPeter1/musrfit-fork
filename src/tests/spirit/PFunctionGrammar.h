@@ -35,7 +35,7 @@
 #include <iostream>
 using namespace std;
 
-#define BOOST_SPIRIT_DEBUG
+//#define BOOST_SPIRIT_DEBUG
 
 #include <boost/spirit/core.hpp>
 #include <boost/spirit/tree/ast.hpp>
@@ -75,21 +75,21 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
 
             map         =   leaf_node_d[ ( lexeme_d[ "MAP" >> +digit_p ] ) ];
 
-            function    =   str_p("COS")   >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("SIN")   >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("TAN")   >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("COSH")  >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("SINH")  >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("TANH")  >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("ACOS")  >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("ASIN")  >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("ATAN")  >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("ACOSH") >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("ASINH") >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("ATANH") >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("LOG")   >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("LN")    >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("EXP")   >> ch_p('(') >> expression >> ch_p(')')
+            function    =   lexeme_d[ root_node_d[ str_p("COS")   ] >> ch_p('(') ] >> expression >> ch_p(')')
+                        |   lexeme_d[ root_node_d[ str_p("SIN")   ] >> ch_p('(') ] >> expression >> ch_p(')')
+                        |   lexeme_d[ root_node_d[ str_p("TAN")   ] >> ch_p('(') ] >> expression >> ch_p(')')
+                        |   lexeme_d[ root_node_d[ str_p("COSH")  ] >> ch_p('(') ] >> expression >> ch_p(')')
+                        |   lexeme_d[ root_node_d[ str_p("SINH")  ] >> ch_p('(') ] >> expression >> ch_p(')')
+                        |   lexeme_d[ root_node_d[ str_p("TANH")  ] >> ch_p('(') ] >> expression >> ch_p(')')
+                        |   lexeme_d[ root_node_d[ str_p("ACOS")  ] >> ch_p('(') ] >> expression >> ch_p(')')
+                        |   lexeme_d[ root_node_d[ str_p("ASIN")  ] >> ch_p('(') ] >> expression >> ch_p(')')
+                        |   lexeme_d[ root_node_d[ str_p("ATAN")  ] >> ch_p('(') ] >> expression >> ch_p(')')
+                        |   lexeme_d[ root_node_d[ str_p("ACOSH") ] >> ch_p('(') ] >> expression >> ch_p(')')
+                        |   lexeme_d[ root_node_d[ str_p("ASINH") ] >> ch_p('(') ] >> expression >> ch_p(')')
+                        |   lexeme_d[ root_node_d[ str_p("ATANH") ] >> ch_p('(') ] >> expression >> ch_p(')')
+                        |   lexeme_d[ root_node_d[ str_p("LOG")   ] >> ch_p('(') ] >> expression >> ch_p(')')
+                        |   lexeme_d[ root_node_d[ str_p("LN")    ] >> ch_p('(') ] >> expression >> ch_p(')')
+                        |   lexeme_d[ root_node_d[ str_p("EXP")   ] >> ch_p('(') ] >> expression >> ch_p(')')
                         ;
 
             factor      =   real

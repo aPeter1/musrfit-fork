@@ -161,9 +161,9 @@ bool PFunction::CheckParameterAndMapInTree(iter_t const& i)
       fValid = false;
     }
   } else if (i->value.id() == PFunctionGrammar::functionID) {
-    assert(i->children.size() == 4);
-    // i: 'funcName', '(', 'expression', ')'
-    success = CheckParameterAndMapInTree(i->children.begin()+2); // thats the real stuff
+    assert(i->children.size() == 3);
+    // i: '(', 'expression', ')'
+    success = CheckParameterAndMapInTree(i->children.begin()+1); // thats the real stuff
   } else if (i->value.id() == PFunctionGrammar::factorID) {
     // i: real | parameter | map | function | expression
     assert(i->children.size() == 1);
@@ -268,9 +268,8 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     // keep the id
     node.fID = PFunctionGrammar::functionID;
     // keep function tag
-    // i: 'funcName', '(', 'expression', ')'
-    iter_t it = i->children.begin();
-    str =  string(it->value.begin(), it->value.end()); // get string
+    // i: '(', 'expression', ')'
+    str =  string(i->value.begin(), i->value.end()); // get string
 // cout << endl << ">> functionID: value = " << str;
     if (!strcmp(str.c_str(), "COS"))
       node.fFunctionTag = FUN_COS;
@@ -308,8 +307,8 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     }
     // add node
     node.children.push_back(child);
-    // i: 'funcName', '(', 'expression', ')'
-    FillFuncEvalTree(i->children.begin()+2, node.children[0]);
+    // i: '(', 'expression', ')'
+    FillFuncEvalTree(i->children.begin()+1, node.children[0]);
   } else if (i->value.id() == PFunctionGrammar::factorID) {
 // cout << endl << ">> factorID";
     // keep the id
@@ -534,19 +533,16 @@ long PFunction::EvalTreeExpression(iter_t const& i)
     cout << endl << "-----";
     fFuncString += string(i->value.begin(), i->value.end());
   } else if (i->value.id() == PFunctionGrammar::functionID) {
-    assert(i->children.size() == 4);
+    assert(i->children.size() == 3);
     cout << endl << "functionID: children = " << i->children.size();
-    iter_t it = i->children.begin();
-    cout << endl << "functionID: value = " << string(it->value.begin(), it->value.end());
+    cout << endl << "functionID: value = " << string(i->value.begin(), i->value.end());
     cout << endl << "-----";
-    // funcName, '(', expression, ')'
+    // '(', expression, ')'
     counter++;
-    fFuncString += string(it->value.begin(), it->value.end());
-    if (termOp == 0)
-      fFuncString += "(";
-    EvalTreeExpression(i->children.begin()+2); // the real stuff
-    if (termOp == 0)
-      fFuncString += ")";
+    fFuncString += string(i->value.begin(), i->value.end());
+    fFuncString += "(";
+    EvalTreeExpression(i->children.begin()+1); // the real stuff
+    fFuncString += ")";
     counter--;
   } else if (i->value.id() == PFunctionGrammar::factorID) {
     cout << endl << "factorID: children = " << i->children.size();
@@ -555,58 +551,50 @@ long PFunction::EvalTreeExpression(iter_t const& i)
     counter--;
   } else if (i->value.id() == PFunctionGrammar::termID) {
     cout << endl << "termID: children = " << i->children.size();
+    counter++;
+    termOp++;
     if (*i->value.begin() == '*') {
       cout << endl << "termID: '*'";
       assert(i->children.size() == 2);
-      counter++;
-      termOp++;
       EvalTreeExpression(i->children.begin());
       fFuncString += " * ";
       EvalTreeExpression(i->children.begin()+1);
-      termOp--;
-      counter--;
     } else if (*i->value.begin() == '/') {
       cout << endl << "termID: '/'";
       assert(i->children.size() == 2);
-      counter++;
-      termOp++;
       EvalTreeExpression(i->children.begin());
       fFuncString += " / ";
       EvalTreeExpression(i->children.begin()+1);
-      termOp--;
-      counter--;
     } else {
       assert(0);
     }
+    termOp--;
+    counter--;
   } else if (i->value.id() == PFunctionGrammar::expressionID) {
     cout << endl << "expressionID: children = " << i->children.size();
+    if (termOp > 0)
+      fFuncString += "(";
     if (*i->value.begin() == '+') {
       cout << endl << "expressionID: '+'";
       assert(i->children.size() == 2);
       counter++;
-      if (termOp > 0)
-        fFuncString += "(";
       EvalTreeExpression(i->children.begin());
       fFuncString += " + ";
       EvalTreeExpression(i->children.begin()+1);
-      if (termOp > 0)
-        fFuncString += ")";
       counter--;
     } else if (*i->value.begin() == '-') {
       cout << endl << "expressionID: '-'";
       assert(i->children.size() == 2);
       counter++;
-      if (termOp > 0)
-        fFuncString += "(";
       EvalTreeExpression(i->children.begin());
       fFuncString += " - ";
       EvalTreeExpression(i->children.begin()+1);
-      if (termOp > 0)
-        fFuncString += ")";
       counter--;
     } else {
       assert(0);
     }
+    if (termOp > 0)
+      fFuncString += ")";
   } else if (i->value.id() == PFunctionGrammar::assignmentID) {
     cout << endl << "assignmentID: children = " << i->children.size();
     assert(i->children.size() == 3);
@@ -693,16 +681,15 @@ long PFunction::PrintTreeExpression(iter_t const& i)
       }
     }
   } else if (i->value.id() == PFunctionGrammar::functionID) {
-    // i: 'funcName', '(', 'expression', ')'
-    if (i->children.size() == 4) {
+    // i: '(', 'expression', ')'
+    str = string(i->value.begin(), i->value.end());
+    cout << endl << ">> " << str;
+    if (i->children.size() == 3) {
       j = i->children.begin();
       str = string(j->value.begin(), j->value.end());
       cout << endl << ">> " << str;
-      j = i->children.begin()+1;
-      str = string(j->value.begin(), j->value.end());
-      cout << endl << ">> " << str;
-      PrintTreeExpression(i->children.begin()+2);
-      j = i->children.begin()+3;
+      PrintTreeExpression(i->children.begin()+1);
+      j = i->children.begin()+2;
       str = string(j->value.begin(), j->value.end());
       cout << endl << ">> " << str;
     } else {

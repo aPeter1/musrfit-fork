@@ -164,6 +164,9 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
   } else if (i->value.id() == PFunctionGrammar::constPiID) { // handle constant pi
     node.fID = PFunctionGrammar::constPiID; // keep the ID
     node.fDvalue = 3.14159265358979323846; // keep the value
+  } else if (i->value.id() == PFunctionGrammar::constGammaMuID) { // handle constant gamma_mu
+    node.fID = PFunctionGrammar::constGammaMuID; // keep the ID
+    node.fDvalue = 0.01355; // keep the value
   } else if (i->value.id() == PFunctionGrammar::parameterID) { // handle parameter number
     str = string(i->value.begin(), i->value.end()); // get string
     status = sscanf(str.c_str(), "PAR%d", &ivalue); // convert string to parameter number
@@ -180,9 +183,7 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     // keep the id
     node.fID = PFunctionGrammar::functionID;
     // keep function tag
-    // i: 'funcName', '(', 'expression', ')'
-    iter_t it = i->children.begin();
-    str =  string(it->value.begin(), it->value.end()); // get string
+    str =  string(i->value.begin(), i->value.end()); // get string
 // cout << endl << ">> functionID: value = " << str;
     if (!strcmp(str.c_str(), "COS"))
       node.fFunctionTag = FUN_COS;
@@ -220,8 +221,8 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     }
     // add node
     node.children.push_back(child);
-    // i: 'funcName', '(', 'expression', ')'
-    FillFuncEvalTree(i->children.begin()+2, node.children[0]);
+    // i: '(', 'expression', ')'
+    FillFuncEvalTree(i->children.begin()+1, node.children[0]);
   } else if (i->value.id() == PFunctionGrammar::factorID) {
 // cout << endl << ">> factorID";
     // keep the id
@@ -306,6 +307,8 @@ bool PFunction::FindAndCheckMapAndParamRange(PFuncTreeNode &node, unsigned int m
     return true;
   } else if (node.fID == PFunctionGrammar::constPiID) {
     return true;
+  } else if (node.fID == PFunctionGrammar::constGammaMuID) {
+    return true;
   } else if (node.fID == PFunctionGrammar::parameterID) {
     if (node.fIvalue <= (int) paramSize)
       return true;
@@ -364,6 +367,8 @@ double PFunction::EvalNode(PFuncTreeNode &node)
   if (node.fID == PFunctionGrammar::realID) {
     return node.fDvalue;
   } else if (node.fID == PFunctionGrammar::constPiID) {
+    return node.fDvalue;
+  } else if (node.fID == PFunctionGrammar::constGammaMuID) {
     return node.fDvalue;
   } else if (node.fID == PFunctionGrammar::parameterID) {
     return fParam[node.fIvalue-1];
@@ -496,6 +501,8 @@ void PFunction::EvalTreeForStringExpression(iter_t const& i)
       fFuncString += ")";
   } else if (i->value.id() == PFunctionGrammar::constPiID) {
     fFuncString += "Pi";
+  } else if (i->value.id() == PFunctionGrammar::constGammaMuID) {
+    fFuncString += "gamma_mu";
   } else if (i->value.id() == PFunctionGrammar::funLabelID) {
     assert(i->children.size() == 0);
     //SetFuncNo(i);
@@ -507,12 +514,11 @@ void PFunction::EvalTreeForStringExpression(iter_t const& i)
     assert(i->children.size() == 0);
     fFuncString += string(i->value.begin(), i->value.end()).c_str();
   } else if (i->value.id() == PFunctionGrammar::functionID) {
-    assert(i->children.size() == 4);
-    iter_t it = i->children.begin();
-    // funcName, '(', expression, ')'
-    fFuncString += string(it->value.begin(), it->value.end()).c_str();
+    assert(i->children.size() == 3);
+    fFuncString += string(i->value.begin(), i->value.end()).c_str(); // keep function name
     fFuncString += "(";
-    EvalTreeForStringExpression(i->children.begin()+2); // the real stuff
+    // '(', expression, ')'
+    EvalTreeForStringExpression(i->children.begin()+1); // the real stuff
     fFuncString += ")";
   } else if (i->value.id() == PFunctionGrammar::factorID) {
     EvalTreeForStringExpression(i->children.begin());

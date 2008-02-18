@@ -29,6 +29,8 @@ short term:
 * implement max.likelihood fits **DONE** 08-02-06 (for Single Histo only.
   For the others not clear how to do it.)
 
+* fix problems in FUNCTIONS of the form (sin(par1)) **DONE** 08-02-18
+
 * implement table based theory functions (LF stuff)
 
 * if a parameter is not used at all, minuit is still varying it!! This is stupid.

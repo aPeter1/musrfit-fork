@@ -51,16 +51,17 @@ typedef parse_tree_match_t::tree_iterator iter_t;
  */
 struct PFunctionGrammar : public grammar<PFunctionGrammar>
 {
-    static const int realID       = 1;
-    static const int constPiID    = 2;
-    static const int funLabelID   = 3;
-    static const int parameterID  = 4;
-    static const int mapID        = 5;
-    static const int functionID   = 6;
-    static const int factorID     = 7;
-    static const int termID       = 8;
-    static const int expressionID = 9;
-    static const int assignmentID = 10;
+    static const int realID         = 1;
+    static const int constPiID      = 2;
+    static const int constGammaMuID = 3;
+    static const int funLabelID     = 4;
+    static const int parameterID    = 5;
+    static const int mapID          = 6;
+    static const int functionID     = 7;
+    static const int factorID       = 8;
+    static const int termID         = 9;
+    static const int expressionID   = 10;
+    static const int assignmentID   = 11;
 
     template <typename ScannerT>
     struct definition
@@ -68,57 +69,61 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
         definition(PFunctionGrammar const& /*self*/)
         {
             //  Start grammar definition
-            real        =   leaf_node_d[ real_p ];
+            real           =   leaf_node_d[ real_p ];
 
-            const_pi    =   leaf_node_d[ str_p("PI") ];
+            const_pi       =   leaf_node_d[ str_p("PI") ];
 
-            fun_label   =   leaf_node_d[ ( lexeme_d[ "FUN" >> +digit_p ] ) ];
+            const_gamma_mu =   leaf_node_d[ str_p("GAMMA_MU") ];
 
-            parameter   =   leaf_node_d[ ( lexeme_d[ "PAR" >> +digit_p ] ) ];
+            fun_label      =   leaf_node_d[ ( lexeme_d[ "FUN" >> +digit_p ] ) ];
 
-            map         =   leaf_node_d[ ( lexeme_d[ "MAP" >> +digit_p ] ) ];
+            parameter      =   leaf_node_d[ ( lexeme_d[ "PAR" >> +digit_p ] ) ];
 
-            function    =   str_p("COS")   >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("SIN")   >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("TAN")   >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("COSH")  >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("SINH")  >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("TANH")  >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("ACOS")  >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("ASIN")  >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("ATAN")  >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("ACOSH") >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("ASINH") >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("ATANH") >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("LOG")   >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("LN")    >> ch_p('(') >> expression >> ch_p(')')
-                        |   str_p("EXP")   >> ch_p('(') >> expression >> ch_p(')')
-                        ;
+            map            =   leaf_node_d[ ( lexeme_d[ "MAP" >> +digit_p ] ) ];
 
-            factor      =   real
-                        |   const_pi
-                        |   parameter
-                        |   map
-                        |   function
-                        |   inner_node_d[ch_p('(') >> expression >> ch_p(')')]
-                        ;
+            function       =   lexeme_d[ root_node_d[ str_p("COS")   ] >> ch_p('(') ] >> expression >> ch_p(')')
+                           |   lexeme_d[ root_node_d[ str_p("SIN")   ] >> ch_p('(') ] >> expression >> ch_p(')')
+                           |   lexeme_d[ root_node_d[ str_p("TAN")   ] >> ch_p('(') ] >> expression >> ch_p(')')
+                           |   lexeme_d[ root_node_d[ str_p("COSH")  ] >> ch_p('(') ] >> expression >> ch_p(')')
+                           |   lexeme_d[ root_node_d[ str_p("SINH")  ] >> ch_p('(') ] >> expression >> ch_p(')')
+                           |   lexeme_d[ root_node_d[ str_p("TANH")  ] >> ch_p('(') ] >> expression >> ch_p(')')
+                           |   lexeme_d[ root_node_d[ str_p("ACOS")  ] >> ch_p('(') ] >> expression >> ch_p(')')
+                           |   lexeme_d[ root_node_d[ str_p("ASIN")  ] >> ch_p('(') ] >> expression >> ch_p(')')
+                           |   lexeme_d[ root_node_d[ str_p("ATAN")  ] >> ch_p('(') ] >> expression >> ch_p(')')
+                           |   lexeme_d[ root_node_d[ str_p("ACOSH") ] >> ch_p('(') ] >> expression >> ch_p(')')
+                           |   lexeme_d[ root_node_d[ str_p("ASINH") ] >> ch_p('(') ] >> expression >> ch_p(')')
+                           |   lexeme_d[ root_node_d[ str_p("ATANH") ] >> ch_p('(') ] >> expression >> ch_p(')')
+                           |   lexeme_d[ root_node_d[ str_p("LOG")   ] >> ch_p('(') ] >> expression >> ch_p(')')
+                           |   lexeme_d[ root_node_d[ str_p("LN")    ] >> ch_p('(') ] >> expression >> ch_p(')')
+                           |   lexeme_d[ root_node_d[ str_p("EXP")   ] >> ch_p('(') ] >> expression >> ch_p(')')
+                           ;
 
-            term        =   factor >>
-                            *(  (root_node_d[ch_p('*')] >> factor)
-                              | (root_node_d[ch_p('/')] >> factor)
-                            );
+            factor         =   real
+                           |   const_pi
+                           |   const_gamma_mu
+                           |   parameter
+                           |   map
+                           |   function
+                           |   inner_node_d[ch_p('(') >> expression >> ch_p(')')]
+                           ;
 
-            expression  =   term >>
-                            *(  (root_node_d[ch_p('+')] >> term)
-                              | (root_node_d[ch_p('-')] >> term)
-                            );
+            term           =   factor >>
+                               *(  (root_node_d[ch_p('*')] >> factor)
+                                 | (root_node_d[ch_p('/')] >> factor)
+                               );
 
-            assignment  =   (fun_label >> ch_p('=') >> expression);
+            expression     =   term >>
+                               *(  (root_node_d[ch_p('+')] >> term)
+                                 | (root_node_d[ch_p('-')] >> term)
+                               );
+
+            assignment     =   (fun_label >> ch_p('=') >> expression);
             //  End grammar definition
 
             // turn on the debugging info.
             BOOST_SPIRIT_DEBUG_RULE(real);
             BOOST_SPIRIT_DEBUG_RULE(const_pi);
+            BOOST_SPIRIT_DEBUG_RULE(const_gamma_mu);
             BOOST_SPIRIT_DEBUG_RULE(fun_label);
             BOOST_SPIRIT_DEBUG_RULE(parameter);
             BOOST_SPIRIT_DEBUG_RULE(map);
@@ -137,6 +142,7 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
         rule<ScannerT, parser_context<>, parser_tag<mapID> >          map;
         rule<ScannerT, parser_context<>, parser_tag<parameterID> >    parameter;
         rule<ScannerT, parser_context<>, parser_tag<funLabelID> >     fun_label;
+        rule<ScannerT, parser_context<>, parser_tag<constGammaMuID> > const_gamma_mu;
         rule<ScannerT, parser_context<>, parser_tag<constPiID> >      const_pi;
         rule<ScannerT, parser_context<>, parser_tag<realID> >         real;
 
