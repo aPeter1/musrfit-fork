@@ -75,6 +75,11 @@ bool msr2msr_run(char *str)
   // for filtering
   run.ToUpper();
 
+  // remove run comment, i.e. (name ...
+  Ssiz_t idx = line.Index("(");
+  if (idx > 0)
+    line.Remove(idx);
+
   // tokenize run
   tokens = line.Tokenize(" \t");
   if (tokens->GetEntries() < 4) {
@@ -85,6 +90,10 @@ bool msr2msr_run(char *str)
     return false;
   }
 
+  if (tokens->GetEntries() == 5) { // alread new msr file, do only add the proper run comment
+    sprintf(str, "%s (name beamline institute data-file-format)", line.Data());
+    return true;
+  }
 
   if (run.Contains("NEMU")) {
     ostr[0] = dynamic_cast<TObjString*>(tokens->At(1)); // file name
