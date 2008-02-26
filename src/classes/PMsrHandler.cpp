@@ -966,9 +966,6 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
 
   iter = lines.begin();
   while ((iter != lines.end()) && !error) {
-    // everything to lower case first
-    iter->fLine.ToLower();
-
     // tokenize line
     tokens = iter->fLine.Tokenize(" \t");
     if (!tokens) {
@@ -978,7 +975,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // RUN line ----------------------------------------------
-    if (iter->fLine.BeginsWith("run")) {
+    if (iter->fLine.BeginsWith("run", TString::kIgnoreCase)) {
 
       if (!first) // not the first run in the list
         fRuns.push_back(param);
@@ -1007,7 +1004,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // fittype -------------------------------------------------
-    if (iter->fLine.BeginsWith("fittype")) {
+    if (iter->fLine.BeginsWith("fittype", TString::kIgnoreCase)) {
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
@@ -1030,7 +1027,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // alpha -------------------------------------------------
-    if (iter->fLine.BeginsWith("alpha")) {
+    if (iter->fLine.BeginsWith("alpha", TString::kIgnoreCase)) {
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
@@ -1044,7 +1041,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // beta -------------------------------------------------
-    if (iter->fLine.BeginsWith("beta")) {
+    if (iter->fLine.BeginsWith("beta", TString::kIgnoreCase)) {
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
@@ -1058,7 +1055,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // norm -------------------------------------------------
-    if (iter->fLine.BeginsWith("norm")) {
+    if (iter->fLine.BeginsWith("norm", TString::kIgnoreCase)) {
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
@@ -1079,7 +1076,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // backgr.fit --------------------------------------------
-    if (iter->fLine.BeginsWith("backgr.fit")) {
+    if (iter->fLine.BeginsWith("backgr.fit", TString::kIgnoreCase)) {
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
@@ -1093,7 +1090,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // rphase ------------------------------------------------
-    if (iter->fLine.BeginsWith("rphase")) {
+    if (iter->fLine.BeginsWith("rphase", TString::kIgnoreCase)) {
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
@@ -1107,7 +1104,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // lifetime ------------------------------------------------
-    if (iter->fLine.BeginsWith("lifetime ")) {
+    if (iter->fLine.BeginsWith("lifetime ", TString::kIgnoreCase)) {
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
@@ -1121,12 +1118,12 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // lifetimecorrection ---------------------------------------
-    if (iter->fLine.BeginsWith("lifetimecorrection")) {
+    if (iter->fLine.BeginsWith("lifetimecorrection", TString::kIgnoreCase)) {
       param.fLifetimeCorrection = true;
     }
 
     // map ------------------------------------------------------
-    if (iter->fLine.BeginsWith("map")) {
+    if (iter->fLine.BeginsWith("map", TString::kIgnoreCase)) {
       for (int i=1; i<tokens->GetEntries(); i++) {
         ostr = dynamic_cast<TObjString*>(tokens->At(i));
         str = ostr->GetString();
@@ -1150,7 +1147,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // forward ------------------------------------------------
-    if (iter->fLine.BeginsWith("forward")) {
+    if (iter->fLine.BeginsWith("forward", TString::kIgnoreCase)) {
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
@@ -1164,7 +1161,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // backward -----------------------------------------------
-    if (iter->fLine.BeginsWith("backward")) {
+    if (iter->fLine.BeginsWith("backward", TString::kIgnoreCase)) {
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
@@ -1178,7 +1175,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // backgr.fix ----------------------------------------------
-    if (iter->fLine.BeginsWith("backgr.fix")) {
+    if (iter->fLine.BeginsWith("backgr.fix", TString::kIgnoreCase)) {
       if (tokens->GetEntries() != 3) {
         error = true;
       } else {
@@ -1194,7 +1191,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // background ---------------------------------------------
-    if (iter->fLine.BeginsWith("background")) {
+    if (iter->fLine.BeginsWith("background", TString::kIgnoreCase)) {
       if ((tokens->GetEntries() != 3) && (tokens->GetEntries() != 5)) {
         error = true;
       } else {
@@ -1210,7 +1207,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // data --------------------------------------------------
-    if (iter->fLine.BeginsWith("data")) {
+    if (iter->fLine.BeginsWith("data", TString::kIgnoreCase)) {
       if ((tokens->GetEntries() != 3) && (tokens->GetEntries() != 5)) {
         error = true;
       } else {
@@ -1226,7 +1223,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // t0 -----------------------------------------------------
-    if (iter->fLine.BeginsWith("t0")) {
+    if (iter->fLine.BeginsWith("t0", TString::kIgnoreCase)) {
       if ((tokens->GetEntries() != 2) && (tokens->GetEntries() != 3)) {
         error = true;
       } else {
@@ -1242,7 +1239,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // fit -----------------------------------------------------
-    if (iter->fLine.BeginsWith("fit ")) {
+    if (iter->fLine.BeginsWith("fit ", TString::kIgnoreCase)) {
       if (tokens->GetEntries() < 3) {
         error = true;
       } else {
@@ -1258,7 +1255,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // packing --------------------------------------------------
-    if (iter->fLine.BeginsWith("packing")) {
+    if (iter->fLine.BeginsWith("packing", TString::kIgnoreCase)) {
       if (tokens->GetEntries() != 2) {
         error = true;
       } else {
@@ -1272,7 +1269,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // rrffrequency --------------------------------------------------
-    if (iter->fLine.BeginsWith("rrffrequency")) {
+    if (iter->fLine.BeginsWith("rrffrequency", TString::kIgnoreCase)) {
       if (tokens->GetEntries() != 2) {
         error = true;
       } else {
@@ -1286,7 +1283,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // rrfpacking --------------------------------------------------
-    if (iter->fLine.BeginsWith("rrfpacking")) {
+    if (iter->fLine.BeginsWith("rrfpacking", TString::kIgnoreCase)) {
       if (tokens->GetEntries() != 2) {
         error = true;
       } else {
@@ -1300,7 +1297,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // alpha2 --------------------------------------------------
-    if (iter->fLine.BeginsWith("alpha2")) {
+    if (iter->fLine.BeginsWith("alpha2", TString::kIgnoreCase)) {
       if (tokens->GetEntries() != 2) {
         error = true;
       } else {
@@ -1314,7 +1311,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // beta2 --------------------------------------------------
-    if (iter->fLine.BeginsWith("beta2")) {
+    if (iter->fLine.BeginsWith("beta2", TString::kIgnoreCase)) {
       if (tokens->GetEntries() != 2) {
         error = true;
       } else {
@@ -1328,7 +1325,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // right --------------------------------------------------
-    if (iter->fLine.BeginsWith("right")) {
+    if (iter->fLine.BeginsWith("right", TString::kIgnoreCase)) {
       if (tokens->GetEntries() != 2) {
         error = true;
       } else {
@@ -1342,7 +1339,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // left --------------------------------------------------
-    if (iter->fLine.BeginsWith("left")) {
+    if (iter->fLine.BeginsWith("left", TString::kIgnoreCase)) {
       if (tokens->GetEntries() != 2) {
         error = true;
       } else {

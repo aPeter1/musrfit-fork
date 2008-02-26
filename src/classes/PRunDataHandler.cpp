@@ -190,7 +190,6 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo)
   TString str;
   TString ext;
 
-  runInfo.fRunName.ToLower();
   runInfo.fBeamline.ToLower();
   runInfo.fInstitute.ToLower();
   runInfo.fFileFormat.ToLower();
