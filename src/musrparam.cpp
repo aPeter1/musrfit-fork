@@ -43,15 +43,15 @@ void musrparam_syntax()
   cout << endl << "usage: musrparam <input-filename> <output-filename>";
   cout << endl << "  <input-filename>: file name of the control file to extract the parameters.";
   cout << endl << "  It has the following structure:";
-  cout << endl << "  msr-file-name-1, temp-1";
-  cout << endl << "  msr-file-name-2, temp-2";
+  cout << endl << "  msr-file-name-1, independent-var1-1, independent-var2-1";
+  cout << endl << "  msr-file-name-2, independent-var1-2, independent-var2-2";
   cout << endl << "  etc.";
   cout << endl << "  It is allowed to add comment lines which start with '%'";
   cout << endl;
   cout << endl << "  <output-filename>: file name of the generated output file";
   cout << endl << "  The output will have the structure:";
-  cout << endl << "  msr-file-name-1, temp-1, par1, err_par1, par2, err_par2, par3, err_par3, ... ";
-  cout << endl << "  msr-file-name-2, temp-2, par1, err_par1, par2, err_par2, par3, err_par3, ... ";
+  cout << endl << "  msr-file-name-1, independent-var1-1, ..., par1, err_par1, par2, err_par2, par3, err_par3, ... ";
+  cout << endl << "  msr-file-name-2, independent-var1-2, ..., par1, err_par1, par2, err_par2, par3, err_par3, ... ";
   cout << endl << "  etc.";
   cout << endl << "  If positive and negative errors are present, it will be par1, err_par1-, err_par1+, etc.";
   cout << endl << endl;
@@ -97,14 +97,6 @@ int main(int argc, char *argv[])
     // tokenize string
     tstr = TString(str);
     tokens = tstr.Tokenize(" ,;\t");
-
-    // check if there are two elements, namely msr-file-name, temp
-    if (tokens->GetEntries() != 2) {
-      cout << endl << "**ERROR** in line " << lineNo << ". Found " << tokens->GetEntries() << " tokens instead of 2, will quit.";
-      cout << endl << endl;
-      fin.close();
-      return -1;
-    }
 
     // keep msr-file name and temperature
     paramStr = TString(str) + TString(", ");
