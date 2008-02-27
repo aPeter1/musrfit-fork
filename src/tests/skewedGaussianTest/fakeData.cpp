@@ -298,18 +298,17 @@ int main(int argc, char *argv[])
   cout << endl << ">> calculate all the histo_i(t) ..." << endl;
 
   // calculate the histograms
-  PIntVector idata;
-  vector<PIntVector> histo;
+  vector<PDoubleVector> histo;
   for (UInt_t i=0; i<asym.size(); i++) {    // loop over all histos
     for (Int_t j=0; j<noOfChannels; j++) { // loop over time
       if (j < t0[i])
         dval = bkg[i];
       else
         dval = N0[i]*TMath::Exp(-timeResolution*(j-t0[i])/tau_mu)*(1.0+asymmetry[i][j])+bkg[i];
-      idata.push_back((int)dval);
+      ddata.push_back(dval);
     }
-    histo.push_back(idata);
-    idata.clear();
+    histo.push_back(ddata);
+    ddata.clear();
     cout << endl << ">> histo " << i+1 << "/" << asym.size() << " done ...";
   }
 
@@ -340,6 +339,33 @@ int main(int argc, char *argv[])
     TH1F    *hh;
     TString name, title;
     for (UInt_t i=0; i<asym.size(); i++) {
+      name   = "casym";
+      name  += i;
+      title  = "asym";
+      title += i;
+      chist = new TCanvas(name.Data(), title.Data(), 10, 10, 800, 600);
+      chist->Show();
+
+      name   = "hh";
+      name  += i;
+      title  = "asym";
+      title += i;
+      hh = new TH1F(name.Data(), title.Data(), noOfChannels, 
+                    -timeResolution/2.0, (noOfChannels+0.5)*timeResolution);
+      for (Int_t j=0; j<noOfChannels; j++) {
+        hh->SetBinContent(j, asymmetry[i][j]);
+      }
+      hh->Draw("*H HIST");
+
+      tf.WriteTObject(chist);
+
+      if (hh)
+        delete hh;
+      if (chist)
+        delete chist;
+    }
+
+    for (UInt_t i=0; i<histo.size(); i++) {
       name   = "chist";
       name  += i;
       title  = "histo";
@@ -354,7 +380,7 @@ int main(int argc, char *argv[])
       hh = new TH1F(name.Data(), title.Data(), noOfChannels, 
                     -timeResolution/2.0, (noOfChannels+0.5)*timeResolution);
       for (Int_t j=0; j<noOfChannels; j++) {
-        hh->SetBinContent(j, asymmetry[i][j]);
+        hh->SetBinContent(j, histo[i][j]);
       }
       hh->Draw("*H HIST");
 
