@@ -153,6 +153,7 @@ double PRunSingleHisto::CalcChiSquare(const std::vector<double>& par)
 // counter++;
 // if (counter == 4) exit(0);
 
+//cout << endl << ">> " << chisq*fRunInfo->fPacking;
   return chisq*fRunInfo->fPacking;
 }
 

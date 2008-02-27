@@ -40,6 +40,9 @@ using namespace std;
 #include "PMsrHandler.h"
 #include "PTheory.h"
 
+#define SQRT_TWO 1.41421356237
+#define SQRT_PI  1.77245385091
+
 //--------------------------------------------------------------------------
 // Constructor
 //--------------------------------------------------------------------------
@@ -1005,8 +1008,8 @@ double PTheory::SkewedGauss(register double t, const vector<double>& paramValues
 
 
   // val[2] = sigma-, val[3] = sigma+
-  double z1 = val[3]*t/TMath::Sqrt(2.0); // sigma+
-  double z2 = val[2]*t/TMath::Sqrt(2.0); // sigma-
+  double z1 = val[3]*t/SQRT_TWO; // sigma+
+  double z2 = val[2]*t/SQRT_TWO; // sigma-
   double g1 = TMath::Exp(-0.5*TMath::Power(t*val[3], 2.0)); // gauss sigma+
   double g2 = TMath::Exp(-0.5*TMath::Power(t*val[2], 2.0)); // gauss sigma-
 
@@ -1016,8 +1019,8 @@ double PTheory::SkewedGauss(register double t, const vector<double>& paramValues
     skg = 0.5*TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t) * ( g1 + g2 ) -
           0.5*TMath::Sin(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t) *
           (
-          g1*2.0*z1/TMath::Sqrt(TMath::Pi())*gsl_sf_hyperg_1F1(0.5,1.5,z1*z1) -
-          g2*2.0*z2/TMath::Sqrt(TMath::Pi())*gsl_sf_hyperg_1F1(0.5,1.5,z2*z2)
+          g1*2.0*z1/SQRT_PI*gsl_sf_hyperg_1F1(0.5,1.5,z1*z1) -
+          g2*2.0*z2/SQRT_PI*gsl_sf_hyperg_1F1(0.5,1.5,z2*z2)
           );
 
   return skg;
