@@ -103,10 +103,10 @@ int main(int argc, char *argv[])
   cout << endl << ">> read p(B) file ...";
 
   // read pB input file and fill B and pB
-  ifstream f;
+  ifstream fpB;
 
-  f.open(pBFileName.Data(), iostream::in);
-  if (!f.is_open()) {
+  fpB.open(pBFileName.Data(), iostream::in);
+  if (!fpB.is_open()) {
     cout << endl << "**ERROR**: Sorry, couldn't open input file (p(B) file): " << pBFileName.Data();
     cout << endl << "  Will quit";
     cout << endl;
@@ -116,9 +116,9 @@ int main(int argc, char *argv[])
   char str[256];
   Double_t bb, ppb;
   int status, lineNo=0;
-  while (!f.eof()) {
+  while (!fpB.eof()) {
     // read a line
-    f.getline(str, sizeof(str));
+    fpB.getline(str, sizeof(str));
 
     // ignore comments or empty lines
     if ((str[0] == '#') || (strlen(str)==0))
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
       cout << endl << "**ERROR**: Problems while reading the input file (line no " << lineNo << "), will quit.";
       cout << endl << "  status = " << status;
       cout << endl;
-      f.close();
+      fpB.close();
       return -1;
     }
 
@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
     lineNo++;
   }
 
-  f.close();
+  fpB.close();
 
   // normalize p(B)
   Double_t sum = 0.0;
@@ -163,9 +163,12 @@ int main(int argc, char *argv[])
 
   cout << endl << ">> read parameter input file ...";
 
+  // read parameter input file
+  ifstream fparam;
+  
   // open parameter input file and extract the parameters
-  f.open(paramInputFileName.Data(), iostream::in);
-  if (!f.is_open()) {
+  fparam.open(paramInputFileName.Data(), iostream::in);
+  if (!fparam.is_open()) {
     cout << endl << "**ERROR**: Sorry, couldn't open parameter input file: " << paramInputFileName.Data();
     cout << endl << "  Will quit";
     cout << endl;
@@ -179,9 +182,9 @@ int main(int argc, char *argv[])
   Int_t       ival;
 
   lineNo = 0;
-  while (!f.eof()) {
+  while (!fparam.eof()) {
     // read a line
-    f.getline(str, sizeof(str));
+    fparam.getline(str, sizeof(str));
     lineNo++;
 
     // ignore comments or empty lines
@@ -261,7 +264,7 @@ int main(int argc, char *argv[])
     }
   }
 
-  f.close();
+  fparam.close();
 
   cout << endl << ">> number of pB's     = " << pB.size();
   cout << endl << ">> number of channels = " << noOfChannels;
@@ -444,9 +447,9 @@ int main(int argc, char *argv[])
   runHeader->SetTimeResolution(fval);
   runHeader->SetNChannels(noOfChannels);
   runHeader->SetNHist(histoData.size());
-  Int_t *t0array = new Int_t[histoData.size()];
+  Double_t *t0array = new Double_t[histoData.size()];
   for (UInt_t i=0; i<histoData.size(); i++)
-    t0array[i] = t0[i];
+    t0array[i] = (Double_t)t0[i];
   runHeader->SetTimeZero(t0array);
   if (t0array)
     delete t0array;
