@@ -5,13 +5,19 @@ $Id$
 
 Generate fake data:
 
-fakeData.pro   : qmake input file to generate the Makefile
-fakeData.cpp   : main
+fakeData.pro     : qmake input file to generate the Makefile
+fakeData.cpp     : main -> generates root-file output
+
+fakeDataNemu.pro : qmake input file to generate the Makefile
+fakeDataNemu.cpp : main -> generates nemu-file output
 
 paramInput.dat : example input file for setting t0, asym, N0, bkg, 
                  time resolution, no of channels
 
 fakeData is producing fake data root files which can be used in analysis
+software like maxent and wkm (wkm only after converting to nemu files).
+
+fakeDataNemu is producing fake data nemu files which can be used in analysis
 software like maxent and wkm (wkm only after converting to nemu files).
 
 -------------------------------------------------------------------------
