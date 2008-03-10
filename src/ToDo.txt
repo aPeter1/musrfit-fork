@@ -31,13 +31,27 @@ short term:
 
 * fix problems in FUNCTIONS of the form (sin(par1)) **DONE** 08-02-18
 
-* fix output problems of the mlog files
-
-* implement table based theory functions (LF stuff)
+* fix output problems of the mlog files **DONE** 08-02-22
 
 * if a parameter is not used at all, minuit is still varying it!! This is stupid.
   Check the minuit manual, there must be a function to "remove" these parameters,
-  i.e. forcing minuit to ignore them.
+  i.e. forcing minuit to ignore them. checked the manual: use fix() (see p.31)
+  **DONE** 08-03-10
+
+* implement table based theory functions (LF stuff)
+
+* check midas keyboard routines for the usability
+
+  system.c
+  while (ss_kbhit()) {
+      ch = ss_getchar(0);
+      if (ch == -1)
+        ch = getchar();
+
+      if (ch == '!')
+        status = RPC_SHUTDOWN;
+  }
+
 
 ---------------------
 intermediate term:

@@ -84,6 +84,8 @@ class PMsrHandler
     virtual double EvalFunc(unsigned int i, vector<int> map, vector<double> param)
                        { return fFuncHandler->Eval(i,map,param); }
 
+    virtual int ParameterInUse(unsigned int paramNo);
+
   private:
     TString                fFileName;
     TString                fTitle;     ///< holds the title string of the msr-file
@@ -99,6 +101,8 @@ class PMsrHandler
 
     PFunctionHandler *fFuncHandler; ///< needed to parse functions
 
+    PIntVector fParamInUse; ///< array holding the information if a particular parameter is used at all, i.e. if the theory is using it (perhaps via maps or functions)
+
     virtual bool HandleFitParameterEntry(PMsrLines &line);
     virtual bool HandleTheoryEntry(PMsrLines &line);
     virtual bool HandleFunctionsEntry(PMsrLines &line);
@@ -106,6 +110,8 @@ class PMsrHandler
     virtual bool HandleCommandsEntry(PMsrLines &line);
     virtual bool HandlePlotEntry(PMsrLines &line);
     virtual bool HandleStatisticEntry(PMsrLines &line);
+
+    virtual void FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLines &run);
 
     virtual void InitRunParameterStructure(PMsrRunStructure &param);
     virtual bool FilterFunMapNumber(TString str, const char *filter, int &no);

@@ -1008,20 +1008,20 @@ double PTheory::SkewedGauss(register double t, const vector<double>& paramValues
 
 
   // val[2] = sigma-, val[3] = sigma+
-  double z1 = val[3]*t/SQRT_TWO; // sigma+
-  double z2 = val[2]*t/SQRT_TWO; // sigma-
-  double g1 = TMath::Exp(-0.5*TMath::Power(t*val[3], 2.0)); // gauss sigma+
-  double g2 = TMath::Exp(-0.5*TMath::Power(t*val[2], 2.0)); // gauss sigma-
+  double zp = val[3]*t/SQRT_TWO; // sigma+
+  double zm = val[2]*t/SQRT_TWO; // sigma-
+  double gp = TMath::Exp(-0.5*TMath::Power(t*val[3], 2.0)); // gauss sigma+
+  double gm = TMath::Exp(-0.5*TMath::Power(t*val[2], 2.0)); // gauss sigma-
+  double wp = val[3]/(val[2]+val[3]); // sigma+ / (sigma+ + sigma-)
 
-  if ((z1 >= 25.0) || (z2 >= 25.0)) // needed to prevent crash of 1F1
+  if ((zp >= 25.0) || (zm >= 25.0)) // needed to prevent crash of 1F1
     skg = 2.0e300;
   else
-    skg = 0.5*TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t) * ( g1 + g2 ) -
-          0.5*TMath::Sin(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t) *
-          (
-          g1*2.0*z1/SQRT_PI*gsl_sf_hyperg_1F1(0.5,1.5,z1*z1) -
-          g2*2.0*z2/SQRT_PI*gsl_sf_hyperg_1F1(0.5,1.5,z2*z2)
-          );
+    skg = (1.0-wp) * (gm * (TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t) +
+                            TMath::Sin(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t) * 2.0*zm/SQRT_PI*gsl_sf_hyperg_1F1(0.5,1.5,zm*zm)))
+          +
+          wp *       (gp * (TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t) -
+                            TMath::Sin(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t) * 2.0*zp/SQRT_PI*gsl_sf_hyperg_1F1(0.5,1.5,zp*zp)));
 
   return skg;
 }

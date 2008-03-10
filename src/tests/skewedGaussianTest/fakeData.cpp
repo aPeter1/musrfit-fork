@@ -51,12 +51,12 @@ typedef vector<int>    PIntVector;
 
 void fakeDataSyntax()
 {
-  cout << endl << "usage: fakeData <pB-File> <paramInputFile> <outputFile> [--dump <dumpFln>]";
+  cout << endl << "usage: fakeData <pB-File> <paramInputFile> <outputFile> [--nemu] [--dump <dumpFln>]";
   cout << endl << "  <pB-File>:        file holding p(B) in columns B, pB, separated by ','";
   cout << endl << "                    comment lines start with a '#'";
   cout << endl << "  <paramInputFile>: holding parameters needed to generate the histograms";
   cout << endl << "                    (see below)";
-  cout << endl << "  <rootOutputFile>: output file name of the fake data histo file";
+  cout << endl << "  <outputFile>    : output file name of the fake data histo file";
   cout << endl << "  --dump <dumpFln>: option to dump p(B) and A_i(t) in a separate root file";
   cout << endl;
   cout << endl << "<paramInputFile> structure:";

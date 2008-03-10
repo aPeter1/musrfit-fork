@@ -250,6 +250,14 @@ bool PFitter::SetParameters()
     }
   }
 
+  // check if there is an unused parameter, if so, fix it
+  for (unsigned int i=0; i<fParams.size(); i++) {
+    if (fRunInfo->ParameterInUse(i) == 0) { // parameter not used in the whole theory!!
+      fMnUserParams.Fix(i); // fix the unused parameter so that minuit will not vary it
+      cout << endl << "**WARNING** : Parameter No " << i+1 << " is not used at all, will fix it" << endl;
+    }
+  }
+
   return true;
 }
 
@@ -391,7 +399,9 @@ bool PFitter::ExecuteMinos()
 
   for (unsigned int i=0; i<fParams.size(); i++) {
     // only try to call minos if the parameter is not fixed!!
-    if (fMnUserParams.Error(i) != 0) {
+    // the 1st condition is from an user fixed variable,
+    // the 2nd condition is from an all together unused variable
+    if ((fMnUserParams.Error(i) != 0) && (fRunInfo->ParameterInUse(i) != 0)) {
       // 1-sigma MINOS errors
       std::pair<double, double> err = minos(i);
 

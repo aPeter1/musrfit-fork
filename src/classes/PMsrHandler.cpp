@@ -82,6 +82,7 @@ PMsrHandler::~PMsrHandler()
   fCommands.clear();
   fPlots.clear();
   fStatistic.fStatLines.clear();
+  fParamInUse.clear();
 }
 
 //--------------------------------------------------------------------------
@@ -207,6 +208,9 @@ int PMsrHandler::ReadMsrFile()
     error = PMUSR_MSR_SYNTAX_ERROR;
   if (!HandleStatisticEntry(statistic))
     error = PMUSR_MSR_SYNTAX_ERROR;
+
+  // fill parameter in use vector
+  FillParameterInUse(theory, functions, run);
 
   // clean up
   fit_parameter.clear();
@@ -692,6 +696,26 @@ bool PMsrHandler::SetMsrParamPosError(unsigned int i, double value)
   fParam[i].fPosError = value;
 
   return true;
+}
+
+//--------------------------------------------------------------------------
+// ParameterInUse (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Needed for the following purpose: if minuit is minimizing, it varies
+ * all the parameters of the parameter list (if not fixed), even if a particular
+ * parameter is <b>NOT</b> used at all. This is stupid! Hence one has to check
+ * if the parameter is used at all and if not, it has to be fixed.
+ *
+ * \param paramNo
+ */
+int PMsrHandler::ParameterInUse(unsigned int paramNo)
+{
+  // check that paramNo is within acceptable range
+  if ((paramNo < 0) || (paramNo > fParam.size()))
+    return -1;
+
+  return fParamInUse[paramNo];
 }
 
 //--------------------------------------------------------------------------
@@ -1777,6 +1801,306 @@ bool PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
   }
 
   return true;
+}
+
+//--------------------------------------------------------------------------
+// FillParameterInUse (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param theory
+ * \param funcs
+ * \param run
+ */
+void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLines &run)
+{
+  PIntVector map;
+  PIntVector fun;
+  PMsrLines::iterator iter;
+  TObjArray  *tokens = 0;
+  TObjString *ostr = 0;
+  TString    str;
+  int        ival;
+
+  // create and initialize fParamInUse vector
+  for (unsigned int i=0; i<fParam.size(); i++)
+    fParamInUse.push_back(0);
+
+  // go through all the theory lines ------------------------------------
+  for (iter = theory.begin(); iter != theory.end(); ++iter) {
+    // remove potential comments
+    str = iter->fLine;
+    if (str.First('#') != -1)
+      str.Resize(str.First('#'));
+
+    // everything to lower case
+    str.ToLower();
+
+    // tokenize string
+    tokens = str.Tokenize(" \t");
+    if (!tokens)
+      continue;
+
+    // filter param no, map no, and fun no
+    for (int i=0; i<tokens->GetEntries(); i++) {
+      ostr = dynamic_cast<TObjString*>(tokens->At(i));
+      str = ostr->GetString();
+      if (str.IsDigit()) { // parameter number
+        ival = str.Atoi();
+        if ((ival > 0) && (ival < (int)fParam.size())) {
+          fParamInUse[ival-1]++;
+//cout << endl << ">>>> theo: param no : " << ival;
+        }
+      } else if (str.Contains("map")) { // map
+        if (FilterFunMapNumber(str, "map", ival))
+          map.push_back(ival-MSR_PARAM_MAP_OFFSET);
+      } else if (str.Contains("fun")) { // fun
+        if (FilterFunMapNumber(str, "fun", ival))
+          fun.push_back(ival-MSR_PARAM_FUN_OFFSET);
+      }
+    }
+
+    // delete tokens
+    if (tokens) {
+      delete tokens;
+      tokens = 0;
+    }
+  }
+
+  // go through all the function lines: 1st time -----------------------------
+  for (iter = funcs.begin(); iter != funcs.end(); ++iter) {
+    // remove potential comments
+    str = iter->fLine;
+    if (str.First('#') != -1)
+      str.Resize(str.First('#'));
+
+    // everything to lower case
+    str.ToLower();
+
+    tokens = str.Tokenize(" /t");
+    if (!tokens)
+      continue;
+
+    // filter fun number
+    ostr = dynamic_cast<TObjString*>(tokens->At(0));
+    str = ostr->GetString();
+    if (!FilterFunMapNumber(str, "fun", ival))
+      continue;
+    ival -= MSR_PARAM_FUN_OFFSET;
+
+    // check if fun number is used, and if yes, filter parameter numbers and maps
+    TString sstr;
+    for (unsigned int i=0; i<fun.size(); i++) {
+      if (fun[i] == ival) { // function number found
+        // filter for parX
+        sstr = iter->fLine;
+        char sval[128];
+        while (sstr.Index("par") != -1) {
+          memset(sval, 0, sizeof(sval));
+          sstr = &sstr[sstr.Index("par")+3]; // trunc sstr
+          for (int j=0; j<sstr.Sizeof(); j++) {
+            if (!isdigit(sstr[j]))
+              break;
+            sval[j] = sstr[j];
+          }
+          sscanf(sval, "%d", &ival);
+//cout << endl << ">>>> parX from func 1st, X = " << ival;
+          fParamInUse[ival-1]++;
+        }
+
+        // filter for mapX
+        sstr = iter->fLine;
+        while (sstr.Index("map") != -1) {
+          memset(sval, 0, sizeof(sval));
+          sstr = &sstr[sstr.Index("map")+3]; // trunc sstr
+          for (int j=0; j<sstr.Sizeof(); j++) {
+            if (!isdigit(sstr[j]))
+              break;
+            sval[j] = sstr[j];
+          }
+          sscanf(sval, "%d", &ival);
+//cout << endl << ">>>> mapX from func 1st, X = " << ival;
+          // check if map value already in map, otherwise add it
+          if (ival > 0) {
+            unsigned int pos;
+            for (pos=0; pos<map.size(); pos++) {
+              if (ival == map[pos])
+                break;
+            }
+            if ((unsigned int)ival == map.size()) { // new map value
+              map.push_back(ival);
+            }
+          }
+        }
+      }
+    }
+
+    // delete tokens
+    if (tokens) {
+      delete tokens;
+      tokens = 0;
+    }
+  }
+
+  // go through all the run block lines -------------------------------------
+  for (iter = run.begin(); iter != run.end(); ++iter) {
+    // remove potential comments
+    str = iter->fLine;
+    if (str.First('#') != -1)
+      str.Resize(str.First('#'));
+
+    // everything to lower case
+    str.ToLower();
+
+    // handle everything but the maps
+    if (str.Contains("alpha") || str.Contains("beta") ||
+        str.Contains("alpha2") || str.Contains("beta2") ||
+        str.Contains("norm") || str.Contains("backgr.fit") ||
+        str.Contains("rphase") || str.Contains("lifetime ")) {
+      // tokenize string
+      tokens = str.Tokenize(" \t");
+      if (!tokens)
+        continue;
+      if (tokens->GetEntries()<2)
+        continue;
+
+      ostr = dynamic_cast<TObjString*>(tokens->At(1)); // parameter number or function
+      str = ostr->GetString();
+      // check if parameter number
+      if (str.IsDigit()) {
+        ival = str.Atoi();
+        fParamInUse[ival-1]++;
+//cout << endl << ">>>> run : parameter no : " << ival;
+      }
+      // check if fun
+      if (str.Contains("fun")) {
+        if (FilterFunMapNumber(str, "fun", ival)) {
+          fun.push_back(ival-MSR_PARAM_FUN_OFFSET);
+//cout << endl << ">>>> run : fun no : " << ival-MSR_PARAM_FUN_OFFSET;
+        }
+      }
+
+      // delete tokens
+      if (tokens) {
+        delete tokens;
+        tokens = 0;
+      }
+    }
+
+    // handle the maps
+    if (str.Contains("map")) {
+      // tokenize string
+      tokens = str.Tokenize(" \t");
+      if (!tokens)
+        continue;
+
+      // get the parameter number via map
+      for (unsigned int i=0; i<map.size(); i++) {
+        if (map[i] < tokens->GetEntries()) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(map[i]));
+          str = ostr->GetString();
+          if (str.IsDigit()) {
+            ival = str.Atoi();
+            fParamInUse[ival-1]++; // this is OK since map is ranging from 1 ..
+//cout << endl << ">>>> param no : " << ival << ", via map no : " << map[i];
+          }
+        }
+      }
+
+      // delete tokens
+      if (tokens) {
+        delete tokens;
+        tokens = 0;
+      }
+    }
+  }
+
+  // go through all the function lines: 2nd time -----------------------------
+  for (iter = funcs.begin(); iter != funcs.end(); ++iter) {
+    // remove potential comments
+    str = iter->fLine;
+    if (str.First('#') != -1)
+      str.Resize(str.First('#'));
+
+    // everything to lower case
+    str.ToLower();
+
+    tokens = str.Tokenize(" /t");
+    if (!tokens)
+      continue;
+
+    // filter fun number
+    ostr = dynamic_cast<TObjString*>(tokens->At(0));
+    str = ostr->GetString();
+    if (!FilterFunMapNumber(str, "fun", ival))
+      continue;
+    ival -= MSR_PARAM_FUN_OFFSET;
+
+    // check if fun number is used, and if yes, filter parameter numbers and maps
+    TString sstr;
+    for (unsigned int i=0; i<fun.size(); i++) {
+      if (fun[i] == ival) { // function number found
+        // filter for parX
+        sstr = iter->fLine;
+        char sval[128];
+        while (sstr.Index("par") != -1) {
+          memset(sval, 0, sizeof(sval));
+          sstr = &sstr[sstr.Index("par")+3]; // trunc sstr
+          for (int j=0; j<sstr.Sizeof(); j++) {
+            if (!isdigit(sstr[j]))
+              break;
+            sval[j] = sstr[j];
+          }
+          sscanf(sval, "%d", &ival);
+//cout << endl << ">>>> parX from func 2nd, X = " << ival;
+          fParamInUse[ival-1]++;
+        }
+
+        // filter for mapX
+        sstr = iter->fLine;
+        while (sstr.Index("map") != -1) {
+          memset(sval, 0, sizeof(sval));
+          sstr = &sstr[sstr.Index("map")+3]; // trunc sstr
+          for (int j=0; j<sstr.Sizeof(); j++) {
+            if (!isdigit(sstr[j]))
+              break;
+            sval[j] = sstr[j];
+          }
+          sscanf(sval, "%d", &ival);
+//cout << endl << ">>>> mapX from func 2nd, X = " << ival;
+          // check if map value already in map, otherwise add it
+          if (ival > 0) {
+            unsigned int pos;
+            for (pos=0; pos<map.size(); pos++) {
+              if (ival == map[pos])
+                break;
+            }
+            if ((unsigned int)ival == map.size()) { // new map value
+              map.push_back(ival);
+            }
+          }
+        }
+      }
+    }
+
+    // delete tokens
+    if (tokens) {
+      delete tokens;
+      tokens = 0;
+    }
+  }
+
+/*
+cout << endl << ">> fParamInUse: ";
+for (unsigned int i=0; i<fParamInUse.size(); i++)
+  cout << fParamInUse[i] << " ";
+cout << endl;
+*/
+
+  // clean up
+  map.clear();
+  fun.clear();
 }
 
 // end ---------------------------------------------------------------------
