@@ -32,7 +32,9 @@
 #include <iostream>
 using namespace std;
 
+#include <TObject.h>
 #include <TString.h>
+#include <TF1.h>
 #include <TObjString.h>
 #include <TObjArray.h>
 #include <TMath.h>
@@ -86,6 +88,7 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
   fValid = true;
   fAdd = 0;
   fMul = 0;
+  fStaticKTLFFunc = 0;
 
   static unsigned int lineNo = 1; // lineNo
   static unsigned int depth  = 0; // needed to handle '+' properly
@@ -139,6 +142,22 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
     cout << endl << "  in line no " << line->fLineNo << " is undefined!";
     fValid = false;
     return;
+  }
+
+  // for static KT LF some TF1 object needs to be invoked 
+  if (idx == (unsigned int) THEORY_STATIC_KT_LF) {
+    // check if it is necessary to create fStaticKTLFFunc
+    if (fStaticKTLFFunc == 0) {
+      fStaticKTLFFunc = new TF1("fStaticKTLFFunc",
+                                "exp(-0.5*pow([0]*x,2.0))*sin(2.0*pi*[1]*x)",
+                                0.0, 13.0);
+      if (!fStaticKTLFFunc) {
+        cout << endl << "**WARNING** in StaticKTLF: Couldn't invoke necessary function";
+        fValid = false;
+      } else {
+        fStaticKTLFFunc->SetNpx(1000);
+      }
+    }
   }
 
   // line is a valid function, hence analyze parameters
@@ -253,6 +272,11 @@ PTheory::~PTheory()
     delete fAdd;
     fAdd = 0;
   }
+
+  if (fStaticKTLFFunc) {
+    delete fStaticKTLFFunc;
+    fStaticKTLFFunc = 0;
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -315,12 +339,12 @@ double PTheory::Func(register double t, const vector<double>& paramValues, const
           return StaticGaussKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
           break;
-        case THEORY_STATIC_KT_TABLE:
-          return StaticKTTable(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
+        case THEORY_STATIC_KT_LF:
+          return StaticKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
           break;
-        case THEORY_DYNAMIC_KT_TABLE:
-          return DynamicKTTable(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
+        case THEORY_DYNAMIC_KT_LF:
+          return DynamicKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
           break;
         case THEORY_COMBI_LGKT:
@@ -381,11 +405,11 @@ double PTheory::Func(register double t, const vector<double>& paramValues, const
         case THEORY_STATIC_GAUSS_KT:
           return StaticGaussKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
-        case THEORY_STATIC_KT_TABLE:
-          return StaticKTTable(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
+        case THEORY_STATIC_KT_LF:
+          return StaticKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
-        case THEORY_DYNAMIC_KT_TABLE:
-          return DynamicKTTable(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
+        case THEORY_DYNAMIC_KT_LF:
+          return DynamicKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
         case THEORY_COMBI_LGKT:
           return CombiLGKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
@@ -438,11 +462,11 @@ double PTheory::Func(register double t, const vector<double>& paramValues, const
         case THEORY_STATIC_GAUSS_KT:
           return StaticGaussKT(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
-        case THEORY_STATIC_KT_TABLE:
-          return StaticKTTable(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
+        case THEORY_STATIC_KT_LF:
+          return StaticKTLF(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
-        case THEORY_DYNAMIC_KT_TABLE:
-          return DynamicKTTable(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
+        case THEORY_DYNAMIC_KT_LF:
+          return DynamicKTLF(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
         case THEORY_COMBI_LGKT:
           return CombiLGKT(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
@@ -493,11 +517,11 @@ double PTheory::Func(register double t, const vector<double>& paramValues, const
         case THEORY_STATIC_GAUSS_KT:
           return StaticGaussKT(t, paramValues, funcValues);
           break;
-        case THEORY_STATIC_KT_TABLE:
-          return StaticKTTable(t, paramValues, funcValues);
+        case THEORY_STATIC_KT_LF:
+          return StaticKTLF(t, paramValues, funcValues);
           break;
-        case THEORY_DYNAMIC_KT_TABLE:
-          return DynamicKTTable(t, paramValues, funcValues);
+        case THEORY_DYNAMIC_KT_LF:
+          return DynamicKTLF(t, paramValues, funcValues);
           break;
         case THEORY_COMBI_LGKT:
           return CombiLGKT(t, paramValues, funcValues);
@@ -757,9 +781,37 @@ double PTheory::StaticGaussKT(register double t, const vector<double>& paramValu
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::StaticKTTable(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::StaticKTLF(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
 {
-  return 0.0;
+  double val[2]; // frequency, damping
+
+  // check if FUNCTIONS are used
+  for (unsigned int i=0; i<2; i++) {
+    if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
+      val[i] = paramValues[fParamNo[i]];
+    } else { // function
+      val[i] = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
+    }
+  }
+
+  double result;
+  if (val[0] == 0.0) {
+    double sigma_t_2 = t*t*val[1]*val[1];
+
+    result = 0.333333333333333 * (1.0 + 2.0*(1.0 - sigma_t_2)*TMath::Exp(-0.5*sigma_t_2));
+  } else {
+    fStaticKTLFFunc->SetParameters(val[1], val[0]); // damping, frequency
+
+    double delta = val[1];
+    double w0    = 2.0*TMath::Pi()*val[0];
+
+    result = 1.0 - 2.0*TMath::Power(delta/w0,2.0)*(1.0 - 
+                TMath::Exp(-0.5*TMath::Power(delta*t, 2.0))*TMath::Cos(w0*t)) +
+                2.0*TMath::Power(delta, 4.0)/TMath::Power(w0, 3.0)*
+                fStaticKTLFFunc->Integral(0.0, t);
+  }
+
+  return result;
 }
 
 //--------------------------------------------------------------------------
@@ -769,7 +821,7 @@ double PTheory::StaticKTTable(register double t, const vector<double>& paramValu
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::DynamicKTTable(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::DynamicKTLF(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
 {
   return 0.0;
 }
