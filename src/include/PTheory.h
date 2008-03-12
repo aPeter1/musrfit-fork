@@ -35,6 +35,7 @@
 #include <vector>
 
 #include <TString.h>
+#include <TF1.h>
 
 #include "PMsrHandler.h"
 
@@ -55,8 +56,8 @@ extern "C" {
 #define THEORY_GENERAL_EXP                  2
 #define THEORY_SIMPLE_GAUSS                 3
 #define THEORY_STATIC_GAUSS_KT              4
-#define THEORY_STATIC_KT_TABLE              5
-#define THEORY_DYNAMIC_KT_TABLE             6
+#define THEORY_STATIC_KT_LF                 5
+#define THEORY_DYNAMIC_KT_LF                6
 #define THEORY_COMBI_LGKT                   7
 #define THEORY_SPIN_GLASS                   8
 #define THEORY_RANDOM_ANISOTROPIC_HYPERFINE 9
@@ -74,8 +75,8 @@ extern "C" {
 #define THEORY_PARAM_GENERAL_EXP                  2 // damping, exponents
 #define THEORY_PARAM_SIMPLE_GAUSS                 1 // damping
 #define THEORY_PARAM_STATIC_GAUSS_KT              1 // damping
-#define THEORY_PARAM_STATIC_KT_TABLE              2 // frequency, damping
-#define THEORY_PARAM_DYNAMIC_KT_TABLE             3 // frequency, damping, hop-rate
+#define THEORY_PARAM_STATIC_KT_LF                 2 // frequency, damping
+#define THEORY_PARAM_DYNAMIC_KT_LF                3 // frequency, damping, hop-rate
 #define THEORY_PARAM_COMBI_LGKT                   2 // Lorentz rate, Gauss rate
 #define THEORY_PARAM_SPIN_GLASS                   3 // rate, hop-rate, order parameter
 #define THEORY_PARAM_RANDOM_ANISOTROPIC_HYPERFINE 2 // frequency, rate
@@ -130,11 +131,11 @@ static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
         {THEORY_STATIC_GAUSS_KT, THEORY_PARAM_STATIC_GAUSS_KT, false,
          "statGssKt", "stg", "(rate)"},
 
-        {THEORY_STATIC_KT_TABLE, THEORY_PARAM_STATIC_KT_TABLE, true,
-         "statKTTab", "sktt", "(frequency damping table)"},
+        {THEORY_STATIC_KT_LF, THEORY_PARAM_STATIC_KT_LF, true,
+         "statKTTab", "sktt", "(frequency damping)"},
 
-        {THEORY_DYNAMIC_KT_TABLE, THEORY_PARAM_DYNAMIC_KT_TABLE, true,
-         "dynmKTTab", "dktt", "(frequency damping hopprate table)"},
+        {THEORY_DYNAMIC_KT_LF, THEORY_PARAM_DYNAMIC_KT_LF, true,
+         "dynmKTTab", "dktt", "(frequency damping hopprate)"},
 
         {THEORY_COMBI_LGKT, THEORY_PARAM_COMBI_LGKT, false,
          "combiLGKT", "lgkt", "(LorentzRate GaussRate)"},
@@ -185,8 +186,8 @@ class PTheory
     virtual double GeneralExp(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
     virtual double SimpleGauss(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
     virtual double StaticGaussKT(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
-    virtual double StaticKTTable(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
-    virtual double DynamicKTTable(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
+    virtual double StaticKTLF(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
+    virtual double DynamicKTLF(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
     virtual double CombiLGKT(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
     virtual double SpinGlass(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
     virtual double RandomAnisotropicHyperfine(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
@@ -207,6 +208,7 @@ class PTheory
 //    unsigned int fTotalNoOfMsrParam;
 //    TString fUserFun;
 //    TString fUserFunPreParsed;
+    TF1 *fStaticKTLFFunc;
 
     PMsrHandler *fMsrInfo;
 };
