@@ -507,13 +507,28 @@ bool PFitter::ExecuteSave()
       fout.width(12);
       fout << fParams[i].fPosError;
     } else {
-      fout << "---       ---";
+      fout.setf(ios::left, ios::adjustfield);
+      fout.width(12);
+      fout << "---";
+      fout.setf(ios::left, ios::adjustfield);
+      fout.width(12);
+      fout << "---";
     }
     // write limits
     if (!isnan(fParams[i].fLowerBoundary)) {
-      fout << fParams[i].fLowerBoundary << "   " << fParams[i].fUpperBoundary;
+      fout.setf(ios::left, ios::adjustfield);
+      fout.width(7);
+      fout << fParams[i].fLowerBoundary;
+      fout.setf(ios::left, ios::adjustfield);
+      fout.width(7);
+      fout << fParams[i].fUpperBoundary;
     } else {
-      fout << "---       ---";
+      fout.setf(ios::left, ios::adjustfield);
+      fout.width(7);
+      fout << "---";
+      fout.setf(ios::left, ios::adjustfield);
+      fout.width(7);
+      fout << "---";
     }
   }
   fout << endl;
@@ -524,6 +539,7 @@ bool PFitter::ExecuteSave()
   fout << endl << "-------------------------------------------------------------------------";
   if (mnState.HasCovariance()) {
     ROOT::Minuit2::MnUserCovariance cov = mnState.Covariance();
+    fout << endl << "from " << cov.Nrow() << " free parameters";
     for (unsigned int i=0; i<cov.Nrow(); i++) {
       fout << endl;
       for (unsigned int j=0; j<i; j++) {
@@ -547,55 +563,81 @@ bool PFitter::ExecuteSave()
   if (mnState.HasGlobalCC() && mnState.HasCovariance()) {
     ROOT::Minuit2::MnGlobalCorrelationCoeff corr = mnState.GlobalCC();
     ROOT::Minuit2::MnUserCovariance cov = mnState.Covariance();
+    PIntVector parNo;
     fout << endl << " No   Global      ";
     for (unsigned int i=0; i<fParams.size(); i++) {
       fout.setf(ios::left, ios::adjustfield);
       fout.width(9);
-      fout << i+1;
-    }
-    TString title("Minuit2 Output Correlation Matrix for ");
-    title += fRunInfo->GetFileName();
-    title += " - ";
-    title += dt.AsSQLString();
-    TCanvas *ccorr = new TCanvas("ccorr", "title", 500, 500);
-    TH2D *hcorr = new TH2D("hcorr", title, fParams.size(), 0.0, fParams.size(), fParams.size(), 0.0, fParams.size());
-    double dval;
-    for (unsigned int i=0; i<fParams.size(); i++) {
-      // line number
-      fout << endl << " ";
-      fout.setf(ios::left, ios::adjustfield);
-      fout.width(5);
-      fout << i+1;
-      // global correlation coefficient
-      fout.setf(ios::left, ios::adjustfield);
-      fout.width(12);
-      fout << corr.GlobalCC()[i];
-      // correlations matrix
-      for (unsigned int j=0; j<fParams.size(); j++) {
-        fout.setf(ios::left, ios::adjustfield);
-        fout.precision(4);
-        fout.width(9);
-        if (i==j) {
-          fout << "1.0";
-          hcorr->Fill((double)i,(double)i,1.0);
-        } else {
-          dval = cov(i,j)/(fMnUserParams.Error(i)*fMnUserParams.Error(j));
-          hcorr->Fill((double)i,(double)j,dval);
-          fout << dval;
-        }
+      // only free parameters, i.e. not fixed, and not unsed ones!
+      if ((fParams[i].fStep != 0) && fRunInfo->ParameterInUse(i) > 0) {
+        fout << i+1;
+        parNo.push_back(i);
       }
     }
-    // write correlation matrix into a root file
-    TFile ff("MINUIT2.root", "recreate");
-    ccorr->Draw();
-    hcorr->Draw("COLZTEXT");
-    ccorr->Write();
-    ff.Close();
-    // clean up
-    if (ccorr)
-      delete ccorr;
-    if (hcorr)
-      delete hcorr;
+    // check that there is a correspondens between minuit2 and musrfit book keeping
+    if (parNo.size() != cov.Nrow()) {
+      cout << endl << "**SEVERE ERROR** in PFitter::ExecuteSave(): minuit2 and musrfit book keeping to not correspond! Unable to write correlation matrix.";
+      cout << endl;
+    } else { // book keeping is OK
+      TString title("Minuit2 Output Correlation Matrix for ");
+      title += fRunInfo->GetFileName();
+      title += " - ";
+      title += dt.AsSQLString();
+      TCanvas *ccorr = new TCanvas("ccorr", "title", 500, 500);
+      TH2D *hcorr = new TH2D("hcorr", title, cov.Nrow(), 0.0, cov.Nrow(), cov.Nrow(), 0.0, cov.Nrow());
+      double dval;
+      for (unsigned int i=0; i<cov.Nrow(); i++) {
+        // parameter number
+        fout << endl << " ";
+        fout.setf(ios::left, ios::adjustfield);
+        fout.width(5);
+        fout << parNo[i]+1;
+        // global correlation coefficient
+        fout.setf(ios::left, ios::adjustfield);
+        fout.width(12);
+        fout << corr.GlobalCC()[i];
+        // correlations matrix
+        for (unsigned int j=0; j<cov.Nrow(); j++) {
+          fout.setf(ios::left, ios::adjustfield);
+          fout.precision(4);
+          fout.width(9);
+          if (i==j) {
+            fout << "1.0";
+            hcorr->Fill((double)i,(double)i,1.0);
+          } else {
+            // check that errors are none zero
+            if (fMnUserParams.Error(parNo[i]) == 0.0) {
+              cout << endl << "**SEVERE ERROR** in PFitter::ExecuteSave(): parameter no " << parNo[i]+1 << " has an error == 0. Cannot correctly handle the correlation matrix.";
+              cout << endl;
+              dval = 0.0;
+            } else if (fMnUserParams.Error(parNo[j]) == 0.0) {
+              cout << endl << "**SEVERE ERROR** in PFitter::ExecuteSave(): parameter no " << parNo[j]+1 << " has an error == 0. Cannot correctly handle the correlation matrix.";
+              cout << endl;
+              dval = 0.0;
+            } else {
+              dval = cov(i,j)/(fMnUserParams.Error(parNo[i])*fMnUserParams.Error(parNo[j]));
+            }
+            hcorr->Fill((double)i,(double)j,dval);
+            fout << dval;
+          }
+        }
+      }
+      // write correlation matrix into a root file
+      TFile ff("MINUIT2.root", "recreate");
+      ccorr->Draw();
+      if (cov.Nrow() <= 6)
+        hcorr->Draw("COLZTEXT");
+      else
+        hcorr->Draw("COLZ");
+      ccorr->Write();
+      ff.Close();
+      // clean up
+      if (ccorr)
+        delete ccorr;
+      if (hcorr)
+        delete hcorr;
+    }
+    parNo.clear(); // clean up
   } else {
     fout << endl << " no correlation coefficients available";
   }
