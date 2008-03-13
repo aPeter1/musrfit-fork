@@ -121,14 +121,24 @@ bool PFitter::DoFit()
   for (unsigned int i=0; i<fCmdList.size(); i++) {
     switch (fCmdList[i]) {
       case PMN_INTERACTIVE:
+        cout << endl << "**WARNING** from PFitter::DoFit() : the command INTERACTIVE is not yet implemented.";
+        cout << endl;
         break;
       case PMN_CONTOURS:
+        cout << endl << "**WARNING** from PFitter::DoFit() : the command CONTOURS is not yet implemented.";
+        cout << endl;
         break;
       case PMN_EIGEN:
+        cout << endl << "**WARNING** from PFitter::DoFit() : the command EIGEN is not yet implemented.";
+        cout << endl;
         break;
       case PMN_HESSE:
+        cout << endl << "**WARNING** from PFitter::DoFit() : the command HESSE is not yet implemented.";
+        cout << endl;
         break;
       case PMN_MACHINE_PRECISION:
+        cout << endl << "**WARNING** from PFitter::DoFit() : the command MACHINE_PRECISION is not yet implemented.";
+        cout << endl;
         break;
       case PMN_MIGRAD:
         status = ExecuteMigrad();
@@ -140,6 +150,8 @@ bool PFitter::DoFit()
         status = ExecuteMinos();
         break;
       case PMN_PLOT:
+        cout << endl << "**WARNING** from PFitter::DoFit() : the command PLOT is not yet implemented.";
+        cout << endl;
         break;
       case PMN_SAVE:
         status = ExecuteSave();
@@ -150,10 +162,16 @@ bool PFitter::DoFit()
         status = ExecuteSimplex();
         break;
       case PMN_USER_COVARIANCE:
+        cout << endl << "**WARNING** from PFitter::DoFit() : the command USER_COVARIANCE is not yet implemented.";
+        cout << endl;
         break;
       case PMN_USER_PARAM_STATE:
+        cout << endl << "**WARNING** from PFitter::DoFit() : the command USER_PARAM_STATE is not yet implemented.";
+        cout << endl;
         break;
       case PMN_PRINT:
+        cout << endl << "**WARNING** from PFitter::DoFit() : the command PRINT is not yet implemented.";
+        cout << endl;
         break;
       default:
         cout << endl << "**PANIC ERROR**: PFitter::DoFit(): You should never have reached this point" << endl;
