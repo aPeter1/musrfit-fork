@@ -68,6 +68,7 @@ class PMsrHandler
     virtual PMsrStatisticStructure* GetMsrStatistic() { return &fStatistic; }
 
     virtual unsigned int GetNoOfParams() { return fParam.size(); }
+    virtual const TString& GetFileName() const { return fFileName; }
 
     virtual bool SetMsrParamValue(unsigned int i, double value);
     virtual bool SetMsrParamStep(unsigned int i, double value);

@@ -39,6 +39,7 @@ short term:
   **DONE** 08-03-10
 
 * implement table based theory functions (LF stuff)
+  static GKT LF **DONE** 08-03-12
 
 * check midas keyboard routines for the usability
 

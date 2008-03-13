@@ -30,13 +30,22 @@
  ***************************************************************************/
 
 #include <iostream>
+#include <fstream>
 using namespace std;
+
+#include <math.h>
 
 #include "Minuit2/FunctionMinimum.h"
 #include "Minuit2/MnMinimize.h"
 #include "Minuit2/MnMigrad.h"
 #include "Minuit2/MnMinos.h"
 #include "Minuit2/MnSimplex.h"
+#include "Minuit2/MnUserParameterState.h"
+
+#include "TCanvas.h"
+#include "TH2.h"
+#include "TFile.h"
+#include "TDatime.h"
 
 #include "PFitter.h"
 
@@ -423,13 +432,176 @@ bool PFitter::ExecuteMinos()
  */
 bool PFitter::ExecuteSave()
 {
-  cout << "PFitter::ExecuteSave(): not yet implemented ..." << endl;
+  cout << "PFitter::ExecuteSave(): will write minuit2 output file ..." << endl;
 
   // if any minimization was done, otherwise get out immediately
   if (!fFcnMin) {
     cout << endl << "PFitter::ExecuteSave(): nothing to be saved ...";
     return false;
   }
+
+  ROOT::Minuit2::MnUserParameterState mnState = fFcnMin->UserState();
+
+  // check if the user parameter state is valid
+  if (!mnState.IsValid()) {
+    cout << endl << "**WARNING** Minuit2 User Parameter State is not valid, i.e. nothing to be saved";
+    cout << endl;
+    return false;
+  }
+
+  ofstream fout;
+
+  // open minuit2 output file
+  fout.open("MINUIT2.OUTPUT", iostream::out);
+  if (!fout.is_open()) {
+    cout << endl << "**ERROR** PFitter::ExecuteSave() couldn't open MINUIT2.OUTPUT file";
+    cout << endl;
+    return false;
+  }
+
+  // write header
+  TDatime dt;
+  fout << endl << "*************************************************************************";
+  fout << endl << " musrfit MINUIT2 output file from " << fRunInfo->GetFileName().Data() << " - " << dt.AsSQLString();
+  fout << endl << "*************************************************************************";
+  fout << endl;
+
+  // write global informations
+  fout << endl << " Fval() = " << mnState.Fval() << ", Edm() = " << mnState.Edm() << ", NFcn() = " << mnState.NFcn();
+  fout << endl;
+  fout << endl << "*************************************************************************";
+
+  // write parameters
+  fParams = *(fRunInfo->GetMsrParamList()); // get the update parameters back
+  fout << endl << " PARAMETERS";
+  fout << endl << "-------------------------------------------------------------------------";
+  fout << endl << "                         Parabolic           Minos";
+  fout << endl << " No   Name      Value      Error      Negative    Positive   Limits";
+  for (unsigned int i=0; i<fParams.size(); i++) {
+    // write no
+    fout.setf(ios::right, ios::adjustfield);
+    fout.width(3);
+    fout << endl << i+1 << "   ";
+    // write name
+    fout << fParams[i].fName.Data();
+    for (int j=0; j<10-fParams[i].fName.Length(); j++)
+      fout << " ";
+    // write value
+    fout.setf(ios::left, ios::adjustfield);
+    fout.precision(6);
+    fout.width(11);
+    fout << fParams[i].fValue;
+    // write parabolic error
+    fout.setf(ios::left, ios::adjustfield);
+    fout.precision(6);
+    fout.width(11);
+    fout << fMnUserParams.Error(i);
+    // write minos errors
+    if (fParams[i].fPosErrorPresent) {
+      fout.setf(ios::left, ios::adjustfield);
+      fout.precision(6);
+      fout.width(12);
+      fout << fParams[i].fStep; 
+      fout.setf(ios::left, ios::adjustfield);
+      fout.precision(6);
+      fout.width(12);
+      fout << fParams[i].fPosError;
+    } else {
+      fout << "---       ---";
+    }
+    // write limits
+    if (!isnan(fParams[i].fLowerBoundary)) {
+      fout << fParams[i].fLowerBoundary << "   " << fParams[i].fUpperBoundary;
+    } else {
+      fout << "---       ---";
+    }
+  }
+  fout << endl;
+  fout << endl << "*************************************************************************";
+
+  // write covariance matrix
+  fout << endl << " COVARIANCE MATRIX";
+  fout << endl << "-------------------------------------------------------------------------";
+  if (mnState.HasCovariance()) {
+    ROOT::Minuit2::MnUserCovariance cov = mnState.Covariance();
+    for (unsigned int i=0; i<cov.Nrow(); i++) {
+      fout << endl;
+      for (unsigned int j=0; j<i; j++) {
+        if (cov(i,j) > 0.0)
+          fout << " ";
+        fout.setf(ios::left, ios::adjustfield);
+        fout.precision(6);
+        fout.width(14);
+        fout << cov(i,j);
+      }
+    }
+  } else {
+    fout << endl << " no covariance matrix available";
+  }
+  fout << endl;
+  fout << endl << "*************************************************************************";
+
+  // write correlation matrix
+  fout << endl << " CORRELATION COEFFICIENTS";
+  fout << endl << "-------------------------------------------------------------------------";
+  if (mnState.HasGlobalCC() && mnState.HasCovariance()) {
+    ROOT::Minuit2::MnGlobalCorrelationCoeff corr = mnState.GlobalCC();
+    ROOT::Minuit2::MnUserCovariance cov = mnState.Covariance();
+    fout << endl << " No   Global      ";
+    for (unsigned int i=0; i<fParams.size(); i++) {
+      fout.setf(ios::left, ios::adjustfield);
+      fout.width(9);
+      fout << i+1;
+    }
+    TString title("Minuit2 Output Correlation Matrix for ");
+    title += fRunInfo->GetFileName();
+    title += " - ";
+    title += dt.AsSQLString();
+    TCanvas *ccorr = new TCanvas("ccorr", "title", 500, 500);
+    TH2D *hcorr = new TH2D("hcorr", title, fParams.size(), 0.0, fParams.size(), fParams.size(), 0.0, fParams.size());
+    double dval;
+    for (unsigned int i=0; i<fParams.size(); i++) {
+      // line number
+      fout << endl << " ";
+      fout.setf(ios::left, ios::adjustfield);
+      fout.width(5);
+      fout << i+1;
+      // global correlation coefficient
+      fout.setf(ios::left, ios::adjustfield);
+      fout.width(12);
+      fout << corr.GlobalCC()[i];
+      // correlations matrix
+      for (unsigned int j=0; j<fParams.size(); j++) {
+        fout.setf(ios::left, ios::adjustfield);
+        fout.precision(4);
+        fout.width(9);
+        if (i==j) {
+          fout << "1.0";
+          hcorr->Fill((double)i,(double)i,1.0);
+        } else {
+          dval = cov(i,j)/(fMnUserParams.Error(i)*fMnUserParams.Error(j));
+          hcorr->Fill((double)i,(double)j,dval);
+          fout << dval;
+        }
+      }
+    }
+    // write correlation matrix into a root file
+    TFile ff("MINUIT2.root", "recreate");
+    ccorr->Draw();
+    hcorr->Draw("COLZTEXT");
+    ccorr->Write();
+    ff.Close();
+    // clean up
+    if (ccorr)
+      delete ccorr;
+    if (hcorr)
+      delete hcorr;
+  } else {
+    fout << endl << " no correlation coefficients available";
+  }
+
+  // close MINUIT2.OUTPUT file
+  fout.close();
 
   return true;
 }
