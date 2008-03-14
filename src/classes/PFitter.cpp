@@ -279,7 +279,8 @@ bool PFitter::SetParameters()
 
   // check if there is an unused parameter, if so, fix it
   for (unsigned int i=0; i<fParams.size(); i++) {
-    if (fRunInfo->ParameterInUse(i) == 0) { // parameter not used in the whole theory!!
+    // parameter not used in the whole theory and not already fixed!!
+    if ((fRunInfo->ParameterInUse(i) == 0) && (fParams[i].fStep != 0.0)) {
       fMnUserParams.Fix(i); // fix the unused parameter so that minuit will not vary it
       cout << endl << "**WARNING** : Parameter No " << i+1 << " is not used at all, will fix it" << endl;
     }

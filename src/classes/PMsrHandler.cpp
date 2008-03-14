@@ -1848,7 +1848,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
       str = ostr->GetString();
       if (str.IsDigit()) { // parameter number
         ival = str.Atoi();
-        if ((ival > 0) && (ival < (int)fParam.size())) {
+        if ((ival > 0) && (ival < (int)fParam.size()+1)) {
           fParamInUse[ival-1]++;
 //cout << endl << ">>>> theo: param no : " << ival;
         }
@@ -1856,6 +1856,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
         if (FilterFunMapNumber(str, "map", ival))
           map.push_back(ival-MSR_PARAM_MAP_OFFSET);
       } else if (str.Contains("fun")) { // fun
+//cout << endl << "theo:fun: " << str.Data();
         if (FilterFunMapNumber(str, "fun", ival))
           fun.push_back(ival-MSR_PARAM_FUN_OFFSET);
       }
@@ -1878,6 +1879,8 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
     // everything to lower case
     str.ToLower();
 
+//cout << endl << ">> " << str.Data();
+
     tokens = str.Tokenize(" /t");
     if (!tokens)
       continue;
@@ -1892,6 +1895,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
     // check if fun number is used, and if yes, filter parameter numbers and maps
     TString sstr;
     for (unsigned int i=0; i<fun.size(); i++) {
+//cout << endl << ">> funNo: " << fun[i];
       if (fun[i] == ival) { // function number found
         // filter for parX
         sstr = iter->fLine;
@@ -1899,6 +1903,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
         while (sstr.Index("par") != -1) {
           memset(sval, 0, sizeof(sval));
           sstr = &sstr[sstr.Index("par")+3]; // trunc sstr
+//cout << endl << ">> par:sstr: " << sstr.Data();
           for (int j=0; j<sstr.Sizeof(); j++) {
             if (!isdigit(sstr[j]))
               break;
@@ -1914,6 +1919,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
         while (sstr.Index("map") != -1) {
           memset(sval, 0, sizeof(sval));
           sstr = &sstr[sstr.Index("map")+3]; // trunc sstr
+//cout << endl << ">> map:sstr: " << sstr.Data();
           for (int j=0; j<sstr.Sizeof(); j++) {
             if (!isdigit(sstr[j]))
               break;
@@ -1928,11 +1934,12 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
               if (ival == map[pos])
                 break;
             }
-            if ((unsigned int)ival == map.size()) { // new map value
+            if (pos == map.size()) { // new map value
               map.push_back(ival);
             }
           }
         }
+        break; // since function was found, break the loop
       }
     }
 
@@ -1990,12 +1997,14 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 
     // handle the maps
     if (str.Contains("map")) {
+//cout << endl << ">> " << str.Data();
       // tokenize string
       tokens = str.Tokenize(" \t");
       if (!tokens)
         continue;
 
       // get the parameter number via map
+//cout << endl << ">> map.size() = " << map.size();
       for (unsigned int i=0; i<map.size(); i++) {
         if (map[i] < tokens->GetEntries()) {
           ostr = dynamic_cast<TObjString*>(tokens->At(map[i]));
@@ -2094,7 +2103,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 /*
 cout << endl << ">> fParamInUse: ";
 for (unsigned int i=0; i<fParamInUse.size(); i++)
-  cout << fParamInUse[i] << " ";
+  cout << endl << i+1 << ", " << fParamInUse[i];
 cout << endl;
 */
 
