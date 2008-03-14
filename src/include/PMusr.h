@@ -132,7 +132,7 @@ typedef struct {
   double fField;                  ///< magnetic field value
   double fTemp;                   ///< temperature during the run
   double fTimeResolution;         ///< time resolution of the run
-  vector<unsigned int> fT0s;      ///< vector of t0's of a run
+  PDoubleVector fT0s;             ///< vector of t0's of a run
   vector<PDoubleVector> fDataBin; ///< vector of all histos of a run
 } PRawRunData;
 

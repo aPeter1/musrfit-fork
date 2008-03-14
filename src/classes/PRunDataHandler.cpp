@@ -332,7 +332,7 @@ bool PRunDataHandler::ReadRootFile()
   int noOfHistos = runHeader->GetNHist();
 
   // get t0's
-  Int_t *t0 = runHeader->GetTimeZero();
+  Double_t *t0 = runHeader->GetTimeZero();
   // check if t0's are there
   if (t0[0] != -1) { // ugly, but at the moment there is no other way
     // copy t0's so they are not lost
