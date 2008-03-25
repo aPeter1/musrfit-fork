@@ -1046,7 +1046,7 @@ double PTheory::InternalBessel(register double t, const vector<double>& paramVal
  */
 double PTheory::SkewedGauss(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
 {
-  double val[4];
+  double val[4]; // phase, freq, sigma-, sigma+
   double skg;
 
   // check if FUNCTIONS are used
@@ -1065,15 +1065,16 @@ double PTheory::SkewedGauss(register double t, const vector<double>& paramValues
   double gp = TMath::Exp(-0.5*TMath::Power(t*val[3], 2.0)); // gauss sigma+
   double gm = TMath::Exp(-0.5*TMath::Power(t*val[2], 2.0)); // gauss sigma-
   double wp = val[3]/(val[2]+val[3]); // sigma+ / (sigma+ + sigma-)
+  double wm = 1.0-wp;
+  double phase = DEG_TO_RAD*val[0];
+  double freq  = TWO_PI*val[1];
 
   if ((zp >= 25.0) || (zm >= 25.0)) // needed to prevent crash of 1F1
     skg = 2.0e300;
   else
-    skg = (1.0-wp) * (gm * (TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t) +
-                            TMath::Sin(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t) * 2.0*zm/SQRT_PI*gsl_sf_hyperg_1F1(0.5,1.5,zm*zm)))
-          +
-          wp *       (gp * (TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t) -
-                            TMath::Sin(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t) * 2.0*zp/SQRT_PI*gsl_sf_hyperg_1F1(0.5,1.5,zp*zp)));
+    skg = TMath::Cos(phase+freq*t) * (wm*gm + wp*gp) +
+          TMath::Sin(phase+freq*t) * (wm*gm*2.0*zm/SQRT_PI*gsl_sf_hyperg_1F1(0.5,1.5,zm*zm) -
+                                      wp*gp*2.0*zp/SQRT_PI*gsl_sf_hyperg_1F1(0.5,1.5,zp*zp));
 
   return skg;
 }
