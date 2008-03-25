@@ -1071,6 +1071,8 @@ double PTheory::SkewedGauss(register double t, const vector<double>& paramValues
 
   if ((zp >= 25.0) || (zm >= 25.0)) // needed to prevent crash of 1F1
     skg = 2.0e300;
+  else if (val[2] == val[3]) // sigma+ == sigma- -> Gaussian
+    skg = TMath::Cos(phase+freq*t) * gp;
   else
     skg = TMath::Cos(phase+freq*t) * (wm*gm + wp*gp) +
           TMath::Sin(phase+freq*t) * (wm*gm*2.0*zm/SQRT_PI*gsl_sf_hyperg_1F1(0.5,1.5,zm*zm) -
