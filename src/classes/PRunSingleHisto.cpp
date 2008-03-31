@@ -333,7 +333,7 @@ bool PRunSingleHisto::PrepareData()
   // first get start data, end data, and t0
   unsigned int start = fRunInfo->fDataRange[0];
   unsigned int end   = fRunInfo->fDataRange[1];
-  unsigned int t0    = fT0s[0];
+  double t0          = fT0s[0];
   // check if start, end, and t0 make any sense
   // 1st check if start and end are in proper order
   if (end < start) { // need to swap them

@@ -371,7 +371,7 @@ bool PRunAsymmetry::PrepareData()
   // first get start data, end data, and t0
   unsigned int start[2] = {fRunInfo->fDataRange[0], fRunInfo->fDataRange[2]};
   unsigned int end[2]   = {fRunInfo->fDataRange[1], fRunInfo->fDataRange[3]};
-  unsigned int t0[2]    = {fT0s[0], fT0s[1]};
+  double t0[2]          = {fT0s[0], fT0s[1]};
   // check if start, end, and t0 make any sense
   // 1st check if start and end are in proper order
   for (unsigned int i=0; i<2; i++) {
