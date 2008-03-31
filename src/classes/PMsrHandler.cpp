@@ -209,8 +209,16 @@ int PMsrHandler::ReadMsrFile()
   if (!HandleStatisticEntry(statistic))
     error = PMUSR_MSR_SYNTAX_ERROR;
 
-  // fill parameter in use vector
+  // fill parameter-in-use vector
   FillParameterInUse(theory, functions, run);
+
+  // check that parameter names are unique
+  unsigned int parX, parY;
+  if (!CheckUniquenessOfParamNames(parX, parY)) {
+    cout << endl << "PMsrHandler::ReadMsrFile: **SEVERE ERROR** parameter name " << fParam[parX].fName.Data() << " is identical for parameter no " << fParam[parX].fNo << " and " << fParam[parY].fNo << "!";
+    cout << endl << "Needs to be fixed first!";
+    error = PMUSR_MSR_SYNTAX_ERROR;
+  }
 
   // clean up
   fit_parameter.clear();
@@ -2100,16 +2108,41 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
     }
   }
 
-/*
-cout << endl << ">> fParamInUse: ";
-for (unsigned int i=0; i<fParamInUse.size(); i++)
-  cout << endl << i+1 << ", " << fParamInUse[i];
-cout << endl;
-*/
+// cout << endl << ">> fParamInUse: ";
+// for (unsigned int i=0; i<fParamInUse.size(); i++)
+//   cout << endl << i+1 << ", " << fParamInUse[i];
+// cout << endl;
 
   // clean up
   map.clear();
   fun.clear();
+}
+
+//--------------------------------------------------------------------------
+// CheckUniquenessOfParamNames (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param parX
+ * \param parY
+ */
+bool PMsrHandler::CheckUniquenessOfParamNames(unsigned int &parX, unsigned int &parY)
+{
+  bool unique = true;
+
+  for (unsigned int i=0; i<fParam.size()-1; i++) {
+    for (unsigned int j=i+1; j<fParam.size(); j++) {
+      if (fParam[i].fName.CompareTo(fParam[j].fName) == 0) { // equal
+        unique = false;
+        parX = i;
+        parY = j;
+        break;
+      }
+    }
+  }
+
+  return unique;
 }
 
 // end ---------------------------------------------------------------------

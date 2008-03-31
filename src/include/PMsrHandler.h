@@ -86,6 +86,7 @@ class PMsrHandler
                        { return fFuncHandler->Eval(i,map,param); }
 
     virtual int ParameterInUse(unsigned int paramNo);
+    virtual bool CheckUniquenessOfParamNames(unsigned int &parX, unsigned int &parY);
 
   private:
     TString                fFileName;
