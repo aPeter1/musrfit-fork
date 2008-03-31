@@ -54,9 +54,9 @@ void musrfit_syntax()
 {
   cout << endl << "usage: musrfit [<msr-file> [--debug] | [--dump <type>]] | --version | --help";
   cout << endl << "       <msr-file>: msr input file";
-  cout << endl << "       'msrfit <msf-file>' will execute msrfit";
-  cout << endl << "       'msrfit' or 'msrfit --help' will show this help";
-  cout << endl << "       'msrfit --version' will print the msrfit version";
+  cout << endl << "       'musrfit <msr-file>' will execute msrfit";
+  cout << endl << "       'musrfit' or 'musrfit --help' will show this help";
+  cout << endl << "       'musrfit --version' will print the msrfit version";
   cout << endl << "       --debug is used to print additional infos";
   cout << endl << "       --dump <type> is writing a data file with the fit data and the theory";
   cout << endl << "              <type> can be 'ascii', 'root'"; 
@@ -467,7 +467,7 @@ int main(int argc, char *argv[])
   // check syntax
   if (argc == 2) {
     if (!strcmp(argv[1], "--version")) {
-      cout << endl << "msrfit version: $Id$";
+      cout << endl << "musrfit version: $Id$";
       cout << endl << endl;
       return PMUSR_SUCCESS; 
     } else if (!strcmp(argv[1], "--help")) {
