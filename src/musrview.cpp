@@ -35,7 +35,12 @@ using namespace std;
 #include <TApplication.h>
 
 #include "PMusr.h"
+#include "PStartupHandler.h"
+#include "PMsrHandler.h"
+#include "PRunDataHandler.h"
+#include "PRunListCollection.h"
 #include "PMusrCanvas.h"
+
 
 //--------------------------------------------------------------------------
 /**
@@ -56,6 +61,7 @@ void musrview_syntax()
 int main(int argc, char *argv[])
 {
   bool show_syntax = false;
+  int  status;
 
   switch (argc) {
     case 1:
@@ -71,7 +77,7 @@ int main(int argc, char *argv[])
       } else {
         // check if filename has extension msr
         if (!strstr(argv[1], ".msr")) {
-          cout << endl << "ERROR: " << argv[1] << " is not a msr-file!" << endl;
+          cout << endl << "**ERROR** " << argv[1] << " is not a msr-file!" << endl;
           show_syntax = true;
         }
       }
@@ -85,23 +91,90 @@ int main(int argc, char *argv[])
     return PMUSR_WRONG_STARTUP_SYNTAX;
   }
 
-  TApplication app("App", &argc, argv);
+  // read startup file
+  PStartupHandler *startupHandler = new PStartupHandler();
 
-  PMusrCanvas *musrCanvas = new PMusrCanvas("musr canvas dummy", 10, 10, 800, 600);
-  if (!musrCanvas->IsValid()) {
-    cout << endl << "**SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
-    cout << endl;
-    return -1;
+  // read msr-file
+  PMsrHandler *msrHandler = new PMsrHandler(argv[1]);
+  status = msrHandler->ReadMsrFile();
+  if (status != PMUSR_SUCCESS) {
+    switch (status) {
+      case PMUSR_MSR_FILE_NOT_FOUND:
+        cout << endl << "**ERROR** couldn't find '" << argv[1] << "'" << endl << endl;
+        break;
+      case PMUSR_MSR_SYNTAX_ERROR:
+        cout << endl << "**SYNTAX ERROR** in file " << argv[1] << ", full stop here." << endl << endl;
+      default:
+        cout << endl << "**UNKNOWN ERROR** when trying to read the msr-file" << endl << endl;
+        break;
+    }
+    return status;
   }
 
-  musrCanvas->Connect("Done(Int_t)", "TApplication", &app, "Terminate(Int_t)");
+  // read all the necessary runs (raw data)
+  PRunDataHandler *dataHandler = new PRunDataHandler(msrHandler);
+  bool success = dataHandler->IsAllDataAvailable();
+  if (!success) {
+    cout << endl << "**ERROR** Couldn't read all data files, will quit ..." << endl;
+  }
 
-  app.Run();
+  // generate the necessary fit histogramms for the view
+  PRunListCollection *runListCollection = 0;
+  if (success) {
+    // feed all the necessary histogramms for the view
+    runListCollection = new PRunListCollection(msrHandler, dataHandler);
+    for (unsigned int i=0; i < msrHandler->GetMsrRunList()->size(); i++) {
+      success = runListCollection->Add(i);
+      if (!success) {
+        cout << endl << "**ERROR** Couldn't handle run no " << i << " ";
+        cout << (*msrHandler->GetMsrRunList())[i].fRunName.Data();
+        break;
+      }
+    }
+  }
+
+  if (success) {
+    // generate Root application needed for PMusrCanvas
+    TApplication app("App", &argc, argv);
+
+    PMusrCanvas *musrCanvas = new PMusrCanvas(msrHandler->GetMsrTitle()->Data(), 10, 10, 800, 600);
+    if (!musrCanvas->IsValid()) {
+      cout << endl << "**SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
+      cout << endl;
+      return -1;
+    }
+    musrCanvas->SetParameterList(*msrHandler->GetMsrParamList());
+    musrCanvas->SetTheoryList(*msrHandler->GetMsrTheory());
+    musrCanvas->SetFunctionList(*msrHandler->GetMsrFunctions());
+    musrCanvas->UpdateParamTheoryPad();
+
+    musrCanvas->Connect("Done(Int_t)", "TApplication", &app, "Terminate(Int_t)");
+
+    app.Run();
+
+    // clean up
+    if (musrCanvas) {
+      delete musrCanvas;
+      musrCanvas = 0;
+    }
+  }
 
   // clean up
-  if (musrCanvas) {
-    delete musrCanvas;
-    musrCanvas = 0;
+  if (startupHandler) {
+    delete startupHandler;
+    startupHandler = 0;
+  }
+  if (msrHandler) {
+    delete msrHandler;
+    msrHandler = 0;
+  }
+  if (dataHandler) {
+    delete dataHandler;
+    dataHandler = 0;
+  }
+  if (runListCollection) {
+    delete runListCollection;
+    runListCollection = 0;
   }
 
   return 0;

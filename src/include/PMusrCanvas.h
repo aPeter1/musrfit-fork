@@ -38,6 +38,8 @@
 #include <TPaveText.h>
 #include <TPad.h>
 
+#include "PMusr.h"
+
 #define YINFO  0.1
 #define YTITLE 0.95
 #define XTHEO  0.75
@@ -55,6 +57,12 @@ class PMusrCanvas : public TObject, public TQObject
 
     virtual Bool_t IsValid() { return fValid; }
 
+    virtual void SetParameterList(PMsrParamList &paramList);
+    virtual void SetTheoryList(PMsrLines &theoryList);
+    virtual void SetFunctionList(PMsrLines &functionList);
+
+    virtual void UpdateParamTheoryPad();
+
     virtual void Done(Int_t status=0); // *SIGNAL*
     virtual void HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected); // SLOT
 
@@ -68,6 +76,10 @@ class PMusrCanvas : public TObject, public TQObject
     TPaveText *fInfoPad;
 
     TPaveText *fKeyboardHandlerText;
+
+    PMsrParamList fParamList;
+    PMsrLines     fTheoryList;
+    PMsrLines     fFunctionList;
 
   ClassDef(PMusrCanvas, 1)
 };

@@ -92,12 +92,11 @@ cout << "fMainCanvas = " << fMainCanvas << endl;
   }
   fTitlePad->SetFillColor(TColor::GetColor(255,255,255));
   fTitlePad->SetTextAlign(12); // middle, left
-  fTitlePad->AddText("This is a title, this is a title, this is a title, this is a title, ...");
+  fTitlePad->AddText(title);
   fTitlePad->Draw();
 
   // data/theory pad
-  fDataTheoryPad = new TPad("dataTheoryPad", "dataTheoryPad", 0.0, YINFO, XTHEO-0.02, YTITLE);
- fDataTheoryPad = new TPad("dataTheoryPad", "dataTheoryPad", 0.0, YINFO, XTHEO, YTITLE);
+  fDataTheoryPad = new TPad("dataTheoryPad", "dataTheoryPad", 0.0, YINFO, XTHEO, YTITLE);
   if (fDataTheoryPad == 0) {
     cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fDataTheoryPad";
     cout << endl;
@@ -116,21 +115,6 @@ cout << "fMainCanvas = " << fMainCanvas << endl;
   fParameterTheoryPad->SetFillColor(TColor::GetColor(255,255,255));
   fParameterTheoryPad->SetTextAlign(13); // top, left
   fParameterTheoryPad->SetTextFont(102); // courier bold, scalable so that greek parameters will be plotted properly
-  fParameterTheoryPad->AddText("parameter/theory pad ...");
-  fParameterTheoryPad->AddText("1 alphaLR 0.9157  0.01075");
-  fParameterTheoryPad->AddText("2 alphaTB 0.8777  0.007409");
-  fParameterTheoryPad->AddText("3 asyS    0.1555  0.004631");
-  fParameterTheoryPad->AddText("4 lambdaS 0.06726 0.01466");
-  fParameterTheoryPad->AddText("5 field   7.444   0.1995");
-  fParameterTheoryPad->AddText("6 phaseLR 18.3    4.1");
-  fParameterTheoryPad->AddText("7 phaseTB -83.1   2.1");
-  fParameterTheoryPad->AddText(" ");
-  fParameterTheoryPad->AddText("asymmetry  3");
-  fParameterTheoryPad->AddText("simplExpo  4           (#lambda)");
-  fParameterTheoryPad->AddText("TFieldCos  map1 fun1   (#phi #nu)");
-  fParameterTheoryPad->AddText(" ");
-  fParameterTheoryPad->AddText("fun1 = par5 * 0.01355");
-  fParameterTheoryPad->Draw();
 
   // info pad
   fInfoPad = new TPaveText(0.0, 0.0, 1.0, YINFO, "NDC");
@@ -256,4 +240,129 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
     }
     fMainCanvas->Update();
   }
+}
+
+//--------------------------------------------------------------------------
+// SetParameterList
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param paramList
+ */
+void PMusrCanvas::SetParameterList(PMsrParamList &paramList)
+{
+  fParamList = paramList;
+}
+
+//--------------------------------------------------------------------------
+// SetTheoryList
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param theoryList
+ */
+void PMusrCanvas::SetTheoryList(PMsrLines &theoryList)
+{
+  fTheoryList = theoryList;
+}
+
+//--------------------------------------------------------------------------
+// SetFunctionList
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param functionList
+ */
+void PMusrCanvas::SetFunctionList(PMsrLines &functionList)
+{
+  fFunctionList = functionList;
+}
+
+//--------------------------------------------------------------------------
+// UpdateParamTheoryPad
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PMusrCanvas::UpdateParamTheoryPad()
+{
+  TString  str;
+  char     cnum[128];
+  int      maxLength = 0;
+  Double_t ypos;
+  int      idx;
+
+  // add parameters ------------------------------------------------------------
+  // get maximal parameter name string length
+  for (unsigned int i=0; i<fParamList.size(); i++) {
+    if (fParamList[i].fName.Length() > maxLength)
+      maxLength = fParamList[i].fName.Length();
+  }
+  maxLength += 2;
+  // add parameters to the pad
+  for (unsigned int i=0; i<fParamList.size(); i++) {
+    str = "";
+    // parameter no
+    str += fParamList[i].fNo;
+    if (fParamList[i].fNo<10)
+      str += "  ";
+    else
+      str += " ";
+    // parameter name
+    str += fParamList[i].fName;
+    for (int j=0; j<maxLength-fParamList[i].fName.Length(); j++) // fill spaces
+      str += " ";
+    // parameter value
+    if (round(fParamList[i].fValue)-fParamList[i].fValue==0)
+      sprintf(cnum, "%.1lf", fParamList[i].fValue);
+    else
+      sprintf(cnum, "%.6lf", fParamList[i].fValue);
+    str += cnum;
+    for (int j=0; j<9-(int)strlen(cnum); j++) // fill spaces
+      str += " ";
+    str += " "; // to make sure that at least 1 space is placed
+    // parameter error
+    if (fParamList[i].fPosErrorPresent) { // minos was used
+      if (round(fParamList[i].fStep)-fParamList[i].fStep==0)
+        sprintf(cnum, "%.1lf", fParamList[i].fStep);
+      else
+        sprintf(cnum, "%.6lf", fParamList[i].fStep);
+      str += cnum;
+      str += "/";
+      if (round(fParamList[i].fPosError)-fParamList[i].fPosError==0)
+        sprintf(cnum, "%.1lf", fParamList[i].fPosError);
+      else
+        sprintf(cnum, "%.6lf", fParamList[i].fPosError);
+      str += cnum;
+    } else { // minos was not used
+      if (round(fParamList[i].fStep)-fParamList[i].fStep==0)
+        sprintf(cnum, "%.1lf", fParamList[i].fStep);
+      else
+        sprintf(cnum, "%.6lf", fParamList[i].fStep);
+      str += cnum;
+    }
+    ypos = 0.925-i*0.025;
+    fParameterTheoryPad->AddText(0.03, ypos, str.Data());
+  }
+
+  // add theory ------------------------------------------------------------
+  ypos -= 0.025;
+  for (unsigned int i=1; i<fTheoryList.size(); i++) {
+    // remove comment if present
+    str = fTheoryList[i].fLine;
+    idx = str.Index("(");
+    if (idx > 0) { // comment present
+      str.Resize(idx-1);
+      str.Resize(str.Strip().Length());
+    }
+    ypos -= 0.025;
+    fParameterTheoryPad->AddText(0.03, ypos, str.Data());
+  }
+
+  fParameterTheoryPad->Draw();
+  fMainCanvas->cd();
+  fMainCanvas->Update();
 }
