@@ -62,6 +62,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void SetFunctionList(PMsrLines &functionList);
 
     virtual void UpdateParamTheoryPad();
+    virtual void UpdateInfoPad();
 
     virtual void Done(Int_t status=0); // *SIGNAL*
     virtual void HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected); // SLOT

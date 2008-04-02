@@ -373,3 +373,16 @@ void PMusrCanvas::UpdateParamTheoryPad()
   fMainCanvas->cd();
   fMainCanvas->Update();
 }
+
+//--------------------------------------------------------------------------
+// UpdateInfoPad
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PMusrCanvas::UpdateInfoPad()
+{
+  // get fit data
+  // get chisq if not a max likelihood fit
+  // get run plot info
+}

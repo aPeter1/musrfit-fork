@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<musrfit xmlns="http://nemu.web.psi.ch/musrfit">
+    <comment>
+        $Id$
+        Defines default settings for the musrfit package
+    </comment>
+    <data_path name="/mnt/data/nemu/his"/>
+    <data_path name="/mnt/data/nemu/wkm"/>
+    <root_settings>
+        <marker_list>
+            <!-- Root marker numbers -->
+            <marker>24</marker>
+            <marker>25</marker>
+            <marker>26</marker>
+            <marker>27</marker>
+            <marker>28</marker>
+            <marker>29</marker>
+            <marker>30</marker>
+            <marker>20</marker>
+            <marker>21</marker>
+            <marker>22</marker>
+            <marker>23</marker>
+            <marker>2</marker>
+            <marker>3</marker>
+            <marker>5</marker>
+        </marker_list>
+        <color_list>
+            <!-- Color as RGB coded string -->
+            <color>"0,0,0"</color>
+            <color>"1,0,0"</color>
+        </color_list>
+    </root_settings>
+</musrfit>

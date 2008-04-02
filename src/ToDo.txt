@@ -45,6 +45,8 @@ short term:
 
 * something is strange with the coordinate system in TPaveText! **CHECK**
 
+* setup startup handler with infos like: data path, symbol list, color list, ...
+
 ---------------------
 intermediate term:
 ---------------------
