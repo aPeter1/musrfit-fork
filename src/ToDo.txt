@@ -41,18 +41,9 @@ short term:
 * implement table based theory functions (LF stuff)
   static GKT LF **DONE** 08-03-12
 
-* check midas keyboard routines for the usability
+* do I need to cleanup AddText() objects from TPaveText etc myself? **CHECK**
 
-  system.c
-  while (ss_kbhit()) {
-      ch = ss_getchar(0);
-      if (ch == -1)
-        ch = getchar();
-
-      if (ch == '!')
-        status = RPC_SHUTDOWN;
-  }
-
+* something is strange with the coordinate system in TPaveText! **CHECK**
 
 ---------------------
 intermediate term:

@@ -362,6 +362,13 @@ void PMusrCanvas::UpdateParamTheoryPad()
     fParameterTheoryPad->AddText(0.03, ypos, str.Data());
   }
 
+  // add functions --------------------------------------------------------
+  ypos -= 0.025;
+  for (unsigned int i=1; i<fFunctionList.size(); i++) {
+    ypos -= 0.025;
+    fParameterTheoryPad->AddText(0.03, ypos, fFunctionList[i].fLine.Data());
+  }
+
   fParameterTheoryPad->Draw();
   fMainCanvas->cd();
   fMainCanvas->Update();
