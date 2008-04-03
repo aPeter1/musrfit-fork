@@ -26,8 +26,10 @@
         </marker_list>
         <color_list>
             <!-- Color as RGB coded string -->
-            <color>"0,0,0"</color>
-            <color>"1,0,0"</color>
+            <color>0,0,0</color>
+            <color>255,0,0</color>
+            <color>0,255,0</color>
+            <color>0,0,255</color>
         </color_list>
     </root_settings>
 </musrfit>

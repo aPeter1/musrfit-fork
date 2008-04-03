@@ -32,15 +32,54 @@
 #ifndef _PSTARTUPHANDLER_H_
 #define _PSTARTUPHANDLER_H_
 
-#include <TSAXParser.h>
+#include <TObject.h>
+#include <TQObject.h>
+#include <TList.h>
 #include <TString.h>
 
-class PStartupHandler : public TSAXParser
+#include "PMusr.h"
+
+class PStartupHandler : public TObject, public TQObject
 {
   public:
     PStartupHandler();
     virtual ~PStartupHandler();
+
+    virtual void OnStartDocument(); // SLOT
+    virtual void OnEndDocument(); // SLOT
+    virtual void OnStartElement(const char*, const TList*); // SLOT
+    virtual void OnEndElement(const char*); // SLOT
+    virtual void OnCharacters(const char*); // SLOT
+    virtual void OnComment(const char*); // SLOT
+    virtual void OnWarning(const char*); // SLOT
+    virtual void OnError(const char*); // SLOT
+    virtual void OnFatalError(const char*); // SLOT
+    virtual void OnCdataBlock(const char*, Int_t); // SLOT
+
+  private:
+    enum EKeyWords {eEmpty, eComment, eDataPath,
+                    eRootSettings, eMarkerList, eMarker, 
+                    eColorList, eColor};
+    EKeyWords       fKey;
+
+    vector<TString> fDataPathList;
+    PIntVector      fMarkerList;
+    PIntVector      fColorList;
+
+  ClassDef(PStartupHandler, 1)
 };
+
+// root dictionary stuff --------------------------------------------------
+#ifdef __CINT__
+
+#pragma link off all globals;
+#pragma link off all classes;
+#pragma link off all functions;
+
+#pragma link C++ class PStartupHandler+;
+
+#endif
+// root dictionary stuff --------------------------------------------------
 
 #endif // _PSTARTUPHANDLER_H_
 

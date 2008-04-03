@@ -77,26 +77,8 @@ GSLLIB        = -lgslcblas -lgsl
 
 
 # some definitions: headers (used to generate *Dict* stuff), sources, objects,...
-HEADERS =
-# HEADERS += PStartupHandler.h
-# HEADERS += PMsrHandler.h
-# HEADERS += PRunDataHandler.h
-# HEADERS += PFunctionHandler.h
-# HEADERS += PFunctionGrammar.h
-# HEADERS += PFunction.h
-# HEADERS += PRunBase.h
-# HEADERS += PRunSingleHisto.h
-# HEADERS += PRunAsymmetry.h
-# HEADERS += PRunRRF.h
-# HEADERS += PRunNonMusr.h
-# HEADERS += PRunListCollection.h
-# HEADERS += PTheory.h
-# HEADERS += PFitterFcn.h
-# HEADERS += PFitter.h
-HEADERS += ../include/PMusrCanvas.h
-
 OBJS =
-OBJS += PStartupHandler.o
+OBJS += PStartupHandler.o PStartupHandlerDict.o
 OBJS += PMsrHandler.o
 OBJS += PRunDataHandler.o
 OBJS += PFunctionHandler.o
@@ -111,9 +93,6 @@ OBJS += PTheory.o
 OBJS += PFitterFcn.o
 OBJS += PFitter.o
 OBJS += PMusrCanvas.o PMusrCanvasDict.o
-
-DICT =
-DICT += PMusrCanvasDict.cpp
 
 SHLIB = libPMusr.so
 
@@ -138,9 +117,13 @@ clean:; 	@rm -f $(OBJS) *Dict* core*
 $(OBJS): %.o: %.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
 
-$(DICT): $(HEADERS)
-	@echo "Generating dictionary files"
-	rootcint -f $@ -c $^
+PStartupHandlerDict.cpp: ../include/PStartupHandler.h
+	@echo "Generating dictionary $@..."
+	rootcint -f $@ -c -p $^
+
+PMusrCanvasDict.cpp: ../include/PMusrCanvas.h
+	@echo "Generating dictionary $@..."
+	rootcint -f $@ -c -p $^
 
 install: all
 	@echo "Installing shared lib: libPMusr.so ( you must be root ;-) )"

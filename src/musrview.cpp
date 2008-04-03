@@ -33,6 +33,7 @@
 using namespace std;
 
 #include <TApplication.h>
+#include <TSAXParser.h>
 
 #include "PMusr.h"
 #include "PStartupHandler.h"
@@ -62,6 +63,7 @@ int main(int argc, char *argv[])
 {
   bool show_syntax = false;
   int  status;
+  bool success = true;
 
   switch (argc) {
     case 1:
@@ -92,7 +94,25 @@ int main(int argc, char *argv[])
   }
 
   // read startup file
+  TSAXParser *saxParser = new TSAXParser();
   PStartupHandler *startupHandler = new PStartupHandler();
+  saxParser->ConnectToHandler("PStartupHandler", startupHandler);
+  status = saxParser->ParseFile("musrfit_startup.xml");
+  // check for parse errors
+  if (status) { // error
+    cout << endl << "**ERROR** reading/parsing musrfit_startup.xml. Fix it.";
+    cout << endl;
+    // clean up
+    if (saxParser) {
+      delete saxParser;
+      saxParser = 0;
+    }
+    if (startupHandler) {
+      delete startupHandler;
+      startupHandler = 0;
+    }
+    return PMUSR_WRONG_STARTUP_SYNTAX;
+  }
 
   // read msr-file
   PMsrHandler *msrHandler = new PMsrHandler(argv[1]);
@@ -113,7 +133,7 @@ int main(int argc, char *argv[])
 
   // read all the necessary runs (raw data)
   PRunDataHandler *dataHandler = new PRunDataHandler(msrHandler);
-  bool success = dataHandler->IsAllDataAvailable();
+  success = dataHandler->IsAllDataAvailable();
   if (!success) {
     cout << endl << "**ERROR** Couldn't read all data files, will quit ..." << endl;
   }
@@ -160,6 +180,10 @@ int main(int argc, char *argv[])
   }
 
   // clean up
+  if (saxParser) {
+    delete saxParser;
+    saxParser = 0;
+  }
   if (startupHandler) {
     delete startupHandler;
     startupHandler = 0;
