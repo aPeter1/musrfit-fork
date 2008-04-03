@@ -110,6 +110,12 @@ typedef vector<double> PDoubleVector;
  */
 typedef vector<TComplex> PComplexVector;
 
+//-------------------------------------------------------------
+/**
+ * <p> typedef to make to code more readable.
+ */
+typedef vector<TString> PStringVector;
+
 //------------------------------------------------------------------------------------------
 /**
  * <p>Predominantly used in PRunBase.

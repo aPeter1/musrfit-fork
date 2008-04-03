@@ -154,6 +154,7 @@ void PStartupHandler::OnCharacters(const char *str)
     case eDataPath:
       // check that str is a valid path
       // add str to the path list
+      fDataPathList.push_back(str);
       break;
     case eMarker:
       // check that str is a number

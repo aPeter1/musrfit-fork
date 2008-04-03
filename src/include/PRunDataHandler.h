@@ -43,14 +43,15 @@ using namespace std;
 class PRunDataHandler
 {
   public:
-    PRunDataHandler(PMsrHandler *msrInfo);
+    PRunDataHandler(PMsrHandler *msrInfo, const PStringVector dataPath);
     virtual ~PRunDataHandler();
 
     virtual bool IsAllDataAvailable() { return fAllDataAvailable; }
     virtual PRawRunData* GetRunData(TString runName);
 
   private:
-    PMsrHandler *fMsrInfo;
+    PMsrHandler   *fMsrInfo;
+    PStringVector fDataPath;
 
     bool fAllDataAvailable; ///< flag indicating if all data sets could be read
     TString fRunName;       ///< current run name

@@ -32,11 +32,6 @@
 #ifndef _PMSRHANDLER_H_
 #define _PMSRHANDLER_H_
 
-/*
-#include <vector>
-using namespace std;
-*/
-
 #include <TString.h>
 #include <TComplex.h>
 
@@ -72,6 +67,7 @@ class PMsrHandler
 
     virtual bool SetMsrParamValue(unsigned int i, double value);
     virtual bool SetMsrParamStep(unsigned int i, double value);
+    virtual bool SetMsrParamPosErrorPresent(unsigned int i, bool value);
     virtual bool SetMsrParamPosError(unsigned int i, double value);
 
     virtual void SetMsrStatisticMin(double min) { fStatistic.fMin = min; }

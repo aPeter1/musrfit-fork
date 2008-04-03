@@ -62,7 +62,9 @@ PMusrCanvas::PMusrCanvas()
 /**
  *
  */
-PMusrCanvas::PMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh)
+PMusrCanvas::PMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
+                         const PIntVector markerList, const PIntVector colorList) :
+                         fMarkerList(markerList), fColorList(colorList)
 {
   fValid = false;
 

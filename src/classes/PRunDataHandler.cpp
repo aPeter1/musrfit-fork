@@ -52,7 +52,7 @@ using namespace std;
  * <p>
  *
  */
-PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo)
+PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo, const PStringVector dataPath) : fDataPath(dataPath)
 {
 //  cout << endl << "in PRunDataHandler::PRunDataHandler()";
 
@@ -63,6 +63,10 @@ PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo)
     fAllDataAvailable = false;
   else
     fAllDataAvailable = true;
+
+/*for (unsigned int i=0; i<fDataPath.size(); i++)
+  cout << endl << i << ": " << fDataPath[i].Data();
+cout << endl;*/
 }
 
 //--------------------------------------------------------------------------
@@ -236,18 +240,26 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo)
   }
 
   // check if the file is found in the directory given in the startup file
-  // ** STILL MISSING **
+  if (pathName.CompareTo("???") == 0) { // not found in local directory search
+    for (unsigned int i=0; i<fDataPath.size(); i++) {
+      str = fDataPath[i] + TString("/") + runInfo.fRunName + TString(".") + ext;
+      if (gSystem->AccessPathName(str.Data())!=true) { // found
+        pathName = str;
+        break;
+      }
+    }
+  }
 
   // check if the file is found in the directories given by WKMFULLDATAPATH
   const char *wkmpath = gSystem->Getenv("WKMFULLDATAPATH");
-  if (pathName.CompareTo("???") == 0) { // not found in local directory search
+  if (pathName.CompareTo("???") == 0) { // not found in local directory and xml path
     str = TString(wkmpath);
     // WKMFULLDATAPATH has the structure: path_1:path_2:...:path_n
     TObjArray *tokens = str.Tokenize(":");
     TObjString *ostr;
     for (int i=0; i<tokens->GetEntries(); i++) {
       ostr = dynamic_cast<TObjString*>(tokens->At(i));
-      str = ostr->GetString() + "/" + runInfo.fRunName + TString(".") + ext;
+      str = ostr->GetString() + TString("/") + runInfo.fRunName + TString(".") + ext;
       if (gSystem->AccessPathName(str.Data())!=true) { // found
         pathName = str;
         break;
@@ -276,7 +288,7 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo)
 
   // no proper path name found
   if (pathName.CompareTo("???") == 0) {
-    cout << endl << "ERROR: Couldn't find '" << runInfo.fRunName << "' in any standard path.";
+    cout << endl << "**ERROR** Couldn't find '" << runInfo.fRunName << "' in any standard path.";
     cout << endl << "  standard search pathes are:";
     cout << endl << "  1. the local directory";
     cout << endl << "  2. the data directory given in the startup XML file";

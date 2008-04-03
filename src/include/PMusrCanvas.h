@@ -52,7 +52,8 @@ class PMusrCanvas : public TObject, public TQObject
 {
   public:
     PMusrCanvas();
-    PMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh);
+    PMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh, 
+                const PIntVector markerList, const PIntVector colorList);
     virtual ~PMusrCanvas();
 
     virtual Bool_t IsValid() { return fValid; }
@@ -81,6 +82,9 @@ class PMusrCanvas : public TObject, public TQObject
     PMsrParamList fParamList;
     PMsrLines     fTheoryList;
     PMsrLines     fFunctionList;
+
+    PIntVector    fMarkerList;
+    PIntVector    fColorList;
 
   ClassDef(PMusrCanvas, 1)
 };

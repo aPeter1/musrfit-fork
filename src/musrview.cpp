@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
   }
 
   // read all the necessary runs (raw data)
-  PRunDataHandler *dataHandler = new PRunDataHandler(msrHandler);
+  PRunDataHandler *dataHandler = new PRunDataHandler(msrHandler, startupHandler->GetDataPathList());
   success = dataHandler->IsAllDataAvailable();
   if (!success) {
     cout << endl << "**ERROR** Couldn't read all data files, will quit ..." << endl;
@@ -157,7 +157,8 @@ int main(int argc, char *argv[])
     // generate Root application needed for PMusrCanvas
     TApplication app("App", &argc, argv);
 
-    PMusrCanvas *musrCanvas = new PMusrCanvas(msrHandler->GetMsrTitle()->Data(), 10, 10, 800, 600);
+    PMusrCanvas *musrCanvas = new PMusrCanvas(msrHandler->GetMsrTitle()->Data(), 10, 10, 800, 600,
+                                  startupHandler->GetMarkerList(), startupHandler->GetColorList());
     if (!musrCanvas->IsValid()) {
       cout << endl << "**SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
       cout << endl;

@@ -684,6 +684,28 @@ bool PMsrHandler::SetMsrParamStep(unsigned int i, double value)
 }
 
 //--------------------------------------------------------------------------
+// SetMsrParamPosErrorPresent (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param i
+ * \param value
+ */
+bool PMsrHandler::SetMsrParamPosErrorPresent(unsigned int i, bool value)
+{
+  if (i > fParam.size()) {
+    cout << endl << "PMsrHandler::SetMsrParamPosErrorPresent(): i = " << i << " is larger than the number of parameters " << fParam.size();
+    cout << endl;
+    return false;
+  }
+
+  fParam[i].fPosErrorPresent = value;
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
 // SetMsrParamPosError (public)
 //--------------------------------------------------------------------------
 /**

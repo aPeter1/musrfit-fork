@@ -4,8 +4,8 @@
         $Id$
         Defines default settings for the musrfit package
     </comment>
-    <data_path name="/mnt/data/nemu/his"/>
-    <data_path name="/mnt/data/nemu/wkm"/>
+    <data_path>/mnt/data/nemu/his</data_path>
+    <data_path>/mnt/data/nemu/wkm</data_path>
     <root_settings>
         <marker_list>
             <!-- Root marker numbers -->

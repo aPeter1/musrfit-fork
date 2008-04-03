@@ -56,13 +56,17 @@ class PStartupHandler : public TObject, public TQObject
     virtual void OnFatalError(const char*); // SLOT
     virtual void OnCdataBlock(const char*, Int_t); // SLOT
 
+    virtual const PStringVector GetDataPathList() const { return fDataPathList; }
+    virtual const PIntVector    GetMarkerList() const { return fMarkerList; }
+    virtual const PIntVector    GetColorList() const { return fColorList; }
+
   private:
     enum EKeyWords {eEmpty, eComment, eDataPath,
                     eRootSettings, eMarkerList, eMarker, 
                     eColorList, eColor};
     EKeyWords       fKey;
 
-    vector<TString> fDataPathList;
+    PStringVector   fDataPathList;
     PIntVector      fMarkerList;
     PIntVector      fColorList;
 
