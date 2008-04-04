@@ -39,11 +39,11 @@
 
 #include "PMsrHandler.h"
 
-#include <gsl_sf_hyperg.h>
-
-extern "C" {
-  double gsl_sf_hyperg_1F1(double a, double b, double x);
-}
+// #include <gsl_sf_hyperg.h>
+// 
+// extern "C" {
+//   double gsl_sf_hyperg_1F1(double a, double b, double x);
+// }
 
 // --------------------------------------------------------
 // function handling tags

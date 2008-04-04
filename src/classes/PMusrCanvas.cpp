@@ -47,6 +47,7 @@ ClassImpQ(PMusrCanvas)
 PMusrCanvas::PMusrCanvas()
 {
   fValid = false;
+  fPlotNumber = -1;
 
   fMainCanvas          = 0;
   fTitlePad            = 0;
@@ -62,9 +63,10 @@ PMusrCanvas::PMusrCanvas()
 /**
  *
  */
-PMusrCanvas::PMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
+PMusrCanvas::PMusrCanvas(const int number, const char* title,
+                         Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
                          const PIntVector markerList, const PIntVector colorList) :
-                         fMarkerList(markerList), fColorList(colorList)
+                         fPlotNumber(number), fMarkerList(markerList), fColorList(colorList)
 {
   fValid = false;
 
@@ -76,10 +78,12 @@ PMusrCanvas::PMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, 
   fKeyboardHandlerText = 0;
 
   // invoke canvas
-  fMainCanvas = new TCanvas("fMainCanvas", title, wtopx, wtopy, ww, wh);
-cout << "fMainCanvas = " << fMainCanvas << endl;
+  TString canvasName = TString("fMainCanvas");
+  canvasName += fPlotNumber;
+  fMainCanvas = new TCanvas(canvasName.Data(), title, wtopx, wtopy, ww, wh);
+cout << canvasName.Data() << " = " << fMainCanvas << endl;
   if (fMainCanvas == 0) {
-    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fMainCanvas";
+    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke " << canvasName.Data();
     cout << endl;
     return;
   }
@@ -119,7 +123,7 @@ cout << "fMainCanvas = " << fMainCanvas << endl;
   fParameterTheoryPad->SetTextFont(102); // courier bold, scalable so that greek parameters will be plotted properly
 
   // info pad
-  fInfoPad = new TPaveText(0.0, 0.0, 1.0, YINFO, "NDC");
+  fInfoPad = new TLegend(0.0, 0.0, 1.0, YINFO, "NDC");
   if (fInfoPad == 0) {
     cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fInfoPad";
     cout << endl;
@@ -127,11 +131,6 @@ cout << "fMainCanvas = " << fMainCanvas << endl;
   }
   fInfoPad->SetFillColor(TColor::GetColor(255,255,255));
   fInfoPad->SetTextAlign(12); // middle, left
-  fInfoPad->AddText("musrfit info pad ...");
-  fInfoPad->AddText(" this is the 1st info line ...");
-  fInfoPad->AddText(" this is the 2nd info line ...");
-  fInfoPad->AddText(" this is the 2nd info line ...");
-  fInfoPad->Draw();
 
   // fKeyboardHandlerText Pad init
   fDataTheoryPad->cd();
@@ -152,13 +151,13 @@ cout << "fMainCanvas = " << fMainCanvas << endl;
   fMainCanvas->Connect("ProcessedEvent(Int_t,Int_t,Int_t,TObject*)", "PMusrCanvas", 
                        this, "HandleCmdKey(Int_t,Int_t,Int_t,TObject*)");
 
-cout << "this                 " << this << endl;
-cout << "fMainCanvas          " << fMainCanvas << endl;
-cout << "fTitlePad            " << fTitlePad << endl;
-cout << "fDataTheoryPad       " << fDataTheoryPad << endl;
-cout << "fParameterTheoryPad  " << fParameterTheoryPad << endl;
-cout << "fInfoPad             " << fInfoPad << endl;
-cout << "fKeyboardHandlerText " << fKeyboardHandlerText << endl;
+// cout << "this                 " << this << endl;
+// cout << "fMainCanvas          " << fMainCanvas << endl;
+// cout << "fTitlePad            " << fTitlePad << endl;
+// cout << "fDataTheoryPad       " << fDataTheoryPad << endl;
+// cout << "fParameterTheoryPad  " << fParameterTheoryPad << endl;
+// cout << "fInfoPad             " << fInfoPad << endl;
+// cout << "fKeyboardHandlerText " << fKeyboardHandlerText << endl;
 
 }
 
@@ -170,6 +169,7 @@ cout << "fKeyboardHandlerText " << fKeyboardHandlerText << endl;
  */
 PMusrCanvas::~PMusrCanvas()
 {
+cout << "~PMusrCanvas() called" << endl;
   // cleanup
   if (fKeyboardHandlerText) {
     delete fKeyboardHandlerText;
@@ -221,11 +221,11 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   if (event != kKeyPress)
      return;
 
-  cout << ">this          " << this << endl;
-  cout << ">fMainCanvas   " << fMainCanvas << endl;
-  cout << ">selected      " << selected << endl;
-
-  cout << "px: "  << (char)fMainCanvas->GetEventX() << endl;
+//   cout << ">this          " << this << endl;
+//   cout << ">fMainCanvas   " << fMainCanvas << endl;
+//   cout << ">selected      " << selected << endl;
+// 
+//   cout << "px: "  << (char)fMainCanvas->GetEventX() << endl;
 
   TString str((Char_t)x);
   if (x == 'q') {
@@ -245,45 +245,6 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
 }
 
 //--------------------------------------------------------------------------
-// SetParameterList
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param paramList
- */
-void PMusrCanvas::SetParameterList(PMsrParamList &paramList)
-{
-  fParamList = paramList;
-}
-
-//--------------------------------------------------------------------------
-// SetTheoryList
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param theoryList
- */
-void PMusrCanvas::SetTheoryList(PMsrLines &theoryList)
-{
-  fTheoryList = theoryList;
-}
-
-//--------------------------------------------------------------------------
-// SetFunctionList
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param functionList
- */
-void PMusrCanvas::SetFunctionList(PMsrLines &functionList)
-{
-  fFunctionList = functionList;
-}
-
-//--------------------------------------------------------------------------
 // UpdateParamTheoryPad
 //--------------------------------------------------------------------------
 /**
@@ -291,6 +252,9 @@ void PMusrCanvas::SetFunctionList(PMsrLines &functionList)
  */
 void PMusrCanvas::UpdateParamTheoryPad()
 {
+  if (!fValid)
+    return;
+
   TString  str;
   char     cnum[128];
   int      maxLength = 0;
@@ -298,52 +262,54 @@ void PMusrCanvas::UpdateParamTheoryPad()
   int      idx;
 
   // add parameters ------------------------------------------------------------
+  PMsrParamList param = *fMsrHandler->GetMsrParamList();
+
   // get maximal parameter name string length
-  for (unsigned int i=0; i<fParamList.size(); i++) {
-    if (fParamList[i].fName.Length() > maxLength)
-      maxLength = fParamList[i].fName.Length();
+  for (unsigned int i=0; i<param.size(); i++) {
+    if (param[i].fName.Length() > maxLength)
+      maxLength = param[i].fName.Length();
   }
   maxLength += 2;
   // add parameters to the pad
-  for (unsigned int i=0; i<fParamList.size(); i++) {
+  for (unsigned int i=0; i<param.size(); i++) {
     str = "";
     // parameter no
-    str += fParamList[i].fNo;
-    if (fParamList[i].fNo<10)
+    str += param[i].fNo;
+    if (param[i].fNo<10)
       str += "  ";
     else
       str += " ";
     // parameter name
-    str += fParamList[i].fName;
-    for (int j=0; j<maxLength-fParamList[i].fName.Length(); j++) // fill spaces
+    str += param[i].fName;
+    for (int j=0; j<maxLength-param[i].fName.Length(); j++) // fill spaces
       str += " ";
     // parameter value
-    if (round(fParamList[i].fValue)-fParamList[i].fValue==0)
-      sprintf(cnum, "%.1lf", fParamList[i].fValue);
+    if (round(param[i].fValue)-param[i].fValue==0)
+      sprintf(cnum, "%.1lf", param[i].fValue);
     else
-      sprintf(cnum, "%.6lf", fParamList[i].fValue);
+      sprintf(cnum, "%.6lf", param[i].fValue);
     str += cnum;
     for (int j=0; j<9-(int)strlen(cnum); j++) // fill spaces
       str += " ";
     str += " "; // to make sure that at least 1 space is placed
     // parameter error
-    if (fParamList[i].fPosErrorPresent) { // minos was used
-      if (round(fParamList[i].fStep)-fParamList[i].fStep==0)
-        sprintf(cnum, "%.1lf", fParamList[i].fStep);
+    if (param[i].fPosErrorPresent) { // minos was used
+      if (round(param[i].fStep)-param[i].fStep==0)
+        sprintf(cnum, "%.1lf", param[i].fStep);
       else
-        sprintf(cnum, "%.6lf", fParamList[i].fStep);
+        sprintf(cnum, "%.6lf", param[i].fStep);
       str += cnum;
       str += "/";
-      if (round(fParamList[i].fPosError)-fParamList[i].fPosError==0)
-        sprintf(cnum, "%.1lf", fParamList[i].fPosError);
+      if (round(param[i].fPosError)-param[i].fPosError==0)
+        sprintf(cnum, "%.1lf", param[i].fPosError);
       else
-        sprintf(cnum, "%.6lf", fParamList[i].fPosError);
+        sprintf(cnum, "%.6lf", param[i].fPosError);
       str += cnum;
     } else { // minos was not used
-      if (round(fParamList[i].fStep)-fParamList[i].fStep==0)
-        sprintf(cnum, "%.1lf", fParamList[i].fStep);
+      if (round(param[i].fStep)-param[i].fStep==0)
+        sprintf(cnum, "%.1lf", param[i].fStep);
       else
-        sprintf(cnum, "%.6lf", fParamList[i].fStep);
+        sprintf(cnum, "%.6lf", param[i].fStep);
       str += cnum;
     }
     ypos = 0.925-i*0.025;
@@ -352,9 +318,10 @@ void PMusrCanvas::UpdateParamTheoryPad()
 
   // add theory ------------------------------------------------------------
   ypos -= 0.025;
-  for (unsigned int i=1; i<fTheoryList.size(); i++) {
+  PMsrLines theory = *fMsrHandler->GetMsrTheory();
+  for (unsigned int i=1; i<theory.size(); i++) {
     // remove comment if present
-    str = fTheoryList[i].fLine;
+    str = theory[i].fLine;
     idx = str.Index("(");
     if (idx > 0) { // comment present
       str.Resize(idx-1);
@@ -366,14 +333,53 @@ void PMusrCanvas::UpdateParamTheoryPad()
 
   // add functions --------------------------------------------------------
   ypos -= 0.025;
-  for (unsigned int i=1; i<fFunctionList.size(); i++) {
+  PMsrLines functions = *fMsrHandler->GetMsrFunctions();
+  for (unsigned int i=1; i<functions.size(); i++) {
     ypos -= 0.025;
-    fParameterTheoryPad->AddText(0.03, ypos, fFunctionList[i].fLine.Data());
+    fParameterTheoryPad->AddText(0.03, ypos, functions[i].fLine.Data());
   }
 
   fParameterTheoryPad->Draw();
   fMainCanvas->cd();
   fMainCanvas->Update();
+}
+
+//--------------------------------------------------------------------------
+// UpdateDataTheoryPad
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PMusrCanvas::UpdateDataTheoryPad()
+{
+  // some checks first
+  unsigned int runNo;
+  PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
+  PMsrRunList runs = *fMsrHandler->GetMsrRunList();
+  for (unsigned int i=0; i<plotInfo.fRuns.size(); i++) {
+    // first check that plot number is smaller than the maximal number of runs
+    if ((int)plotInfo.fRuns[i].Re() > (int)runs.size()) {
+      fValid = false;
+      cout << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** run plot number " << (int)plotInfo.fRuns[i].Re() << " is larger than the number of runs " << runs.size();
+      cout << endl;
+      return;
+    }
+    // check that the plottype and the fittype do correspond
+    runNo = (unsigned int)plotInfo.fRuns[i].Re()-1;
+cout << endl << ">> runNo = " << runNo;
+cout << endl;
+    if (plotInfo.fPlotType != runs[runNo].fFitType) {
+      fValid = false;
+      cout << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** plottype = " << plotInfo.fPlotType << ", fittype = " << runs[runNo].fFitType << ", however they have to correspond!";
+      cout << endl;
+      return;
+    }
+  }
+
+  for (unsigned int i=0; i<plotInfo.fRuns.size(); i++) {
+    // get run data and create a histogram
+    // get theory object and calculate a theory histogram
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -384,7 +390,43 @@ void PMusrCanvas::UpdateParamTheoryPad()
  */
 void PMusrCanvas::UpdateInfoPad()
 {
-  // get fit data
+  if (!fValid)
+    return;
+
+  PMsrStatisticStructure statistic = *fMsrHandler->GetMsrStatistic();
+  TString tstr, tsubstr;
+
+  tstr = "musrfit: ";
+
+  // get fit date
+  tstr += statistic.fDate;
+  tstr += TString(", ");
+
   // get chisq if not a max likelihood fit
+  if (statistic.fChisq) { // chisq
+    tstr += TString("chisq = ");
+  } else { // max. likelihood
+    tstr += TString("maxLH = ");
+  }
+  tstr += statistic.fMin;
+  tstr += TString(" , NDF = ");
+  tstr += statistic.fNdf;
+  if (statistic.fChisq) { // chisq
+    tstr += TString(" , chisq/NDF = ");
+  } else { // max. likelihood
+    tstr += TString(" , maxLH/NDF = ");
+  }
+  if (statistic.fNdf != 0) {
+    tstr += statistic.fMin/statistic.fNdf;
+  } else {
+    tstr += TString("undefined");
+  }
+
+  fInfoPad->SetHeader(tstr);
+
   // get run plot info
+
+  fInfoPad->Draw();
+  fMainCanvas->cd();
+  fMainCanvas->Update();
 }

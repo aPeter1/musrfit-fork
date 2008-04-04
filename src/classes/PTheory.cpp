@@ -39,6 +39,8 @@ using namespace std;
 #include <TObjArray.h>
 #include <TMath.h>
 
+#include <Math/SpecFuncMathMore.h>
+
 #include "PMsrHandler.h"
 #include "PTheory.h"
 
@@ -1074,9 +1076,12 @@ double PTheory::SkewedGauss(register double t, const vector<double>& paramValues
   else if (val[2] == val[3]) // sigma+ == sigma- -> Gaussian
     skg = TMath::Cos(phase+freq*t) * gp;
   else
+//     skg = TMath::Cos(phase+freq*t) * (wm*gm + wp*gp) +
+//           TMath::Sin(phase+freq*t) * (wm*gm*2.0*zm/SQRT_PI*gsl_sf_hyperg_1F1(0.5,1.5,zm*zm) -
+//                                       wp*gp*2.0*zp/SQRT_PI*gsl_sf_hyperg_1F1(0.5,1.5,zp*zp));
     skg = TMath::Cos(phase+freq*t) * (wm*gm + wp*gp) +
-          TMath::Sin(phase+freq*t) * (wm*gm*2.0*zm/SQRT_PI*gsl_sf_hyperg_1F1(0.5,1.5,zm*zm) -
-                                      wp*gp*2.0*zp/SQRT_PI*gsl_sf_hyperg_1F1(0.5,1.5,zp*zp));
+          TMath::Sin(phase+freq*t) * (wm*gm*2.0*zm/SQRT_PI*ROOT::Math::conf_hyperg(0.5,1.5,zm*zm) -
+                                      wp*gp*2.0*zp/SQRT_PI*ROOT::Math::conf_hyperg(0.5,1.5,zp*zp));
 
   return skg;
 }

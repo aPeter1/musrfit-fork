@@ -36,9 +36,15 @@
 #include <TQObject.h>
 #include <TCanvas.h>
 #include <TPaveText.h>
+#include <TLegend.h>
 #include <TPad.h>
+#include <TH1F.h>
 
 #include "PMusr.h"
+#ifndef __MAKECINT__
+#include "PMsrHandler.h"
+#include "PRunListCollection.h"
+#endif
 
 #define YINFO  0.1
 #define YTITLE 0.95
@@ -46,23 +52,27 @@
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>The preprocessor tag __MAKECINT__ is used to hide away from rootcint
+ * the overly complex spirit header files. 
  */
 class PMusrCanvas : public TObject, public TQObject
 {
   public:
     PMusrCanvas();
-    PMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh, 
+    PMusrCanvas(const int number, const char* title, 
+                Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
                 const PIntVector markerList, const PIntVector colorList);
     virtual ~PMusrCanvas();
 
     virtual Bool_t IsValid() { return fValid; }
 
-    virtual void SetParameterList(PMsrParamList &paramList);
-    virtual void SetTheoryList(PMsrLines &theoryList);
-    virtual void SetFunctionList(PMsrLines &functionList);
+#ifndef __MAKECINT__
+    virtual void SetMsrHandler(PMsrHandler *msrHandler) { fMsrHandler = msrHandler; }
+    virtual void SetRunListCollection(PRunListCollection *runList) { fRunList = runList; }
+#endif
 
     virtual void UpdateParamTheoryPad();
+    virtual void UpdateDataTheoryPad();
     virtual void UpdateInfoPad();
 
     virtual void Done(Int_t status=0); // *SIGNAL*
@@ -70,21 +80,25 @@ class PMusrCanvas : public TObject, public TQObject
 
   private:
     Bool_t fValid;
+    Int_t  fPlotNumber;
 
     TCanvas   *fMainCanvas;
     TPaveText *fTitlePad;
     TPad      *fDataTheoryPad;
     TPaveText *fParameterTheoryPad;
-    TPaveText *fInfoPad;
+    TLegend   *fInfoPad;
 
     TPaveText *fKeyboardHandlerText;
 
-    PMsrParamList fParamList;
-    PMsrLines     fTheoryList;
-    PMsrLines     fFunctionList;
+#ifndef __MAKECINT__
+    PMsrHandler        *fMsrHandler;
+    PRunListCollection *fRunList;
+#endif
 
-    PIntVector    fMarkerList;
-    PIntVector    fColorList;
+    vector<TH1F*> fData;
+
+    PIntVector fMarkerList;
+    PIntVector fColorList;
 
   ClassDef(PMusrCanvas, 1)
 };

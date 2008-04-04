@@ -251,6 +251,7 @@ typedef vector<PMsrPlotStructure>  PMsrPlotList;
  */
 typedef struct {
   PMsrLines fStatLines;
+  TString fDate;     ///< string holding fitting date and time
   bool   fChisq;     ///< flag telling if min = chi2 or min = max.likelyhood
   double fMin;       ///< chi2 or max. likelyhood
   unsigned int fNdf; ///< number of degrees of freedom

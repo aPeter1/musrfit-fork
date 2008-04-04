@@ -37,8 +37,8 @@ CXX           = g++
 CXXFLAGS      = -g -Wall -fPIC
 PMUSRPATH     = ./include
 MNPATH        = $(ROOTSYS)/include
-GSLPATH       = /usr/include/gsl
-INCLUDES      = -I $(PMUSRPATH) -I $(MNPATH) -I $(GSLPATH)
+#GSLPATH       = /usr/include/gsl
+INCLUDES      = -I $(PMUSRPATH) -I $(MNPATH)
 LD            = g++
 LDFLAGS       = -g
 endif
@@ -64,8 +64,8 @@ GLIBS         = $(ROOTGLIBS) -lXMLParser
 PSILIBS       = -lTLemRunHeader -lPMusr
 # Minuit2 lib
 MNLIB         = -L$(ROOTSYS)/lib -lMinuit2
-# GSL lib
-GSLLIB        = -lgslcblas -lgsl
+# MathMore lib
+MMLIB         = -L$(ROOTSYS)/lib -lMathMore
 
 
 EXEC = musrview
@@ -81,7 +81,7 @@ all:  $(EXEC)
 $(EXEC): $(OBJS)
 	@echo "---> Building $(EXEC) ..."
 	/bin/rm -f $(SHLIB)
-	$(LD) $(OBJS) -o $(EXEC) $(GLIBS) $(PSILIBS) $(MNLIB) $(GSLLIB)
+	$(LD) $(OBJS) -o $(EXEC) $(GLIBS) $(PSILIBS) $(MNLIB) $(MMLIB)
 	@echo "done"
 
 # clean up: remove all object file (and core files)

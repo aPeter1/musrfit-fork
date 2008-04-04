@@ -608,18 +608,18 @@ int PMsrHandler::WriteMsrLogFile()
     // create the new statistics block
     PMsrLineStructure line;
     if (fStatistic.fChisq) { // chi^2
-      line.fLine  = "  chi2 = ";
+      line.fLine  = "  chisq = ";
       line.fLine += fStatistic.fMin;
       line.fLine += ", NDF = ";
       line.fLine += fStatistic.fNdf;
-      line.fLine += ", chi2r = chi2/NDF = ";
+      line.fLine += ", chisq/NDF = ";
       line.fLine += fStatistic.fMin / fStatistic.fNdf;
     } else {
       line.fLine  = "  maxLH = ";
       line.fLine += fStatistic.fMin;
       line.fLine += ", NDF = ";
       line.fLine += fStatistic.fNdf;
-      line.fLine += ", maxLHr = maxLH/NDF = ";
+      line.fLine += ", maxLH/NDF = ";
       line.fLine += fStatistic.fMin / fStatistic.fNdf;
     }
     fStatistic.fStatLines.push_back(line);
@@ -1818,17 +1818,75 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
  */
 bool PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
 {
-  PMsrLines::iterator iter;
-
   if (lines.empty()) {
     cout << endl << "WARNING: There is no STATISTIC block! Do you really want this?";
     cout << endl;
+    return false;
   }
 
-  for (iter = lines.begin(); iter != lines.end(); ++iter) {
-    if (!iter->fLine.BeginsWith("STATISTIC"))
-      fStatistic.fStatLines.push_back(*iter);
+  char str[128];
+  char date[128];
+  char time[128];
+  int  status;
+  double dval;
+  unsigned int ival;
+  for (unsigned int i=0; i<lines.size(); i++) {
+    // filter date and chisq etc from strings
+    // extract date and time
+    if (lines[i].fLine.Contains("STATISTIC")) {
+      status = sscanf(lines[i].fLine.Data(), "STATISTIC --- %s%s", date, time);
+      if (status == 2) {
+        fStatistic.fDate = TString(date)+TString(", ")+TString(time);
+      } else {
+        fStatistic.fDate = TString("????-??-??, ??:??:??");
+      }
+    }
+    // extract chisq
+    if (lines[i].fLine.Contains("chisq =")) {
+      fStatistic.fChisq = true;
+      strncpy(str, lines[i].fLine.Data(), sizeof(str));
+      status = sscanf(str+lines[i].fLine.Index("chisq = ")+8, "%lf", &dval);
+      if (status == 1) {
+        fStatistic.fMin = dval;
+      } else {
+        fStatistic.fMin = -1.0;
+      }
+    }
+    // extract maxLH
+    if (lines[i].fLine.Contains("maxLH =")) {
+      fStatistic.fChisq = true;
+      strncpy(str, lines[i].fLine.Data(), sizeof(str));
+      status = sscanf(str+lines[i].fLine.Index("maxLH = ")+8, "%lf", &dval);
+      if (status == 1) {
+        fStatistic.fMin = dval;
+      } else {
+        fStatistic.fMin = -1.0;
+      }
+    }
+    // extract NDF
+    if (lines[i].fLine.Contains(", NDF =")) {
+      fStatistic.fChisq = true;
+      strncpy(str, lines[i].fLine.Data(), sizeof(str));
+      status = sscanf(str+lines[i].fLine.Index(", NDF = ")+8, "%u", &ival);
+      if (status == 1) {
+        fStatistic.fNdf = ival;
+      } else {
+        fStatistic.fNdf = 0;
+      }
+    }
+    // keep string
+    fStatistic.fStatLines.push_back(lines[i]);
   }
+
+// cout << endl << "Statistic:";
+// cout << endl << " Date & Time: " << fStatistic.fDate.Data();
+// if (fStatistic.fChisq) { // chisq
+//   cout << endl << " chisq = " << fStatistic.fMin;
+//   cout << endl << " NDF   = " << fStatistic.fNdf;
+// } else { // maximum likelihood
+//   cout << endl << " maxLH = " << fStatistic.fMin;
+//   cout << endl << " NDF   = " << fStatistic.fNdf;
+// }
 
   return true;
 }

@@ -40,7 +40,7 @@
  * <p>
  *
  * \param msrInfo pointer to the msr info structure
- * \param runNo number of the run of the msr-file
+ * \param data
  */
 PRunListCollection::PRunListCollection(PMsrHandler *msrInfo, PRunDataHandler *data)
 {
@@ -292,16 +292,34 @@ unsigned int PRunListCollection::GetTotalNoOfBinsFitted()
  * <p>
  *
  * \param index
+ * \param tag kIndex -> data at index, kRunNo -> data of given run no
  */
-PRunData* PRunListCollection::GetSingleHisto(unsigned int index)
+PRunData* PRunListCollection::GetSingleHisto(unsigned int index, EDataSwitch tag)
 {
-  if ((index < 0) || (index > fRunSingleHistoList.size())) {
-    cout << endl << "PRunListCollection::GetSingleHisto: index = " << index << " out of bounds";
-    return 0;
-  }
+  PRunData *data = 0;
 
-  fRunSingleHistoList[index]->CalcTheory();
-  PRunData *data = fRunSingleHistoList[index]->GetData();
+  switch (tag) {
+    case kIndex:
+      if ((index < 0) || (index > fRunSingleHistoList.size())) {
+        cout << endl << "PRunListCollection::GetSingleHisto: index = " << index << " out of bounds";
+        return 0;
+      }
+
+      fRunSingleHistoList[index]->CalcTheory();
+      data = fRunSingleHistoList[index]->GetData();
+      break;
+    case kRunNo:
+      for (unsigned int i=0; i<fRunSingleHistoList.size(); i++) {
+        if (fRunSingleHistoList[i]->GetRunNo() == index) {
+          data = fRunSingleHistoList[i]->GetData();
+          break;
+        }
+      }
+      break;
+    default: // error
+      return 0;
+      break;
+  }
 
   return data;
 }
@@ -313,16 +331,34 @@ PRunData* PRunListCollection::GetSingleHisto(unsigned int index)
  * <p>
  *
  * \param index
+ * \param tag kIndex -> data at index, kRunNo -> data of given run no
  */
-PRunData* PRunListCollection::GetAsymmetry(unsigned int index)
+PRunData* PRunListCollection::GetAsymmetry(unsigned int index, EDataSwitch tag)
 {
-  if ((index < 0) || (index > fRunAsymmetryList.size())) {
-    cout << endl << "PRunListCollection::GetAsymmetry: index = " << index << " out of bounds";
-    return 0;
-  }
+  PRunData *data = 0;
 
-  fRunAsymmetryList[index]->CalcTheory();
-  PRunData *data = fRunAsymmetryList[index]->GetData();
+  switch (tag) {
+    case kIndex:
+      if ((index < 0) || (index > fRunAsymmetryList.size())) {
+        cout << endl << "PRunListCollection::GetAsymmetry: index = " << index << " out of bounds";
+        return 0;
+      }
+
+      fRunAsymmetryList[index]->CalcTheory();
+      data = fRunAsymmetryList[index]->GetData();
+      break;
+    case kRunNo:
+      for (unsigned int i=0; i<fRunAsymmetryList.size(); i++) {
+        if (fRunAsymmetryList[i]->GetRunNo() == index) {
+          data = fRunAsymmetryList[i]->GetData();
+          break;
+        }
+      }
+      break;
+    default: // error
+      return 0;
+      break;
+  }
 
   return data;
 }
@@ -334,12 +370,24 @@ PRunData* PRunListCollection::GetAsymmetry(unsigned int index)
  * <p>
  *
  * \param index
+ * \param tag kIndex -> data at index, kRunNo -> data of given run no
  */
-PRunData* PRunListCollection::GetRRF(unsigned int index)
+PRunData* PRunListCollection::GetRRF(unsigned int index, EDataSwitch tag)
 {
-  if ((index < 0) || (index > fRunRRFList.size())) {
-    cout << endl << "PRunListCollection::GetRRF: index = " << index << " out of bounds";
-    return 0;
+  PRunData *data = 0;
+
+  switch (tag) {
+    case kIndex:
+      if ((index < 0) || (index > fRunRRFList.size())) {
+        cout << endl << "PRunListCollection::GetRRF: index = " << index << " out of bounds";
+        return 0;
+      }
+      break;
+    case kRunNo:
+      break;
+    default: // error
+      return 0;
+      break;
   }
 
   return 0;
@@ -352,12 +400,24 @@ PRunData* PRunListCollection::GetRRF(unsigned int index)
  * <p>
  *
  * \param index
+ * \param tag kIndex -> data at index, kRunNo -> data of given run no
  */
-PRunData* PRunListCollection::GetNonMusr(unsigned int index)
+PRunData* PRunListCollection::GetNonMusr(unsigned int index, EDataSwitch tag)
 {
-  if ((index < 0) || (index > fRunNonMusrList.size())) {
-    cout << endl << "PRunListCollection::GetNonMusr: index = " << index << " out of bounds";
-    return 0;
+  PRunData *data = 0;
+
+  switch (tag) {
+    case kIndex:
+      if ((index < 0) || (index > fRunNonMusrList.size())) {
+        cout << endl << "PRunListCollection::GetNonMusr: index = " << index << " out of bounds";
+        return 0;
+      }
+      break;
+    case kRunNo:
+      break;
+    default: // error
+      return 0;
+      break;
   }
 
   return 0;

@@ -157,28 +157,60 @@ int main(int argc, char *argv[])
     // generate Root application needed for PMusrCanvas
     TApplication app("App", &argc, argv);
 
-    PMusrCanvas *musrCanvas = new PMusrCanvas(msrHandler->GetMsrTitle()->Data(), 10, 10, 800, 600,
-                                  startupHandler->GetMarkerList(), startupHandler->GetColorList());
-    if (!musrCanvas->IsValid()) {
-      cout << endl << "**SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
-      cout << endl;
-      return -1;
+    vector<PMusrCanvas*> canvasVector;
+    PMusrCanvas *musrCanvas;
+
+    bool ok = true;
+    for (unsigned int i=0; i<msrHandler->GetMsrPlotList()->size(); i++) {
+
+      musrCanvas = new PMusrCanvas(i, msrHandler->GetMsrTitle()->Data(), 
+                                   10+i*100, 10+i*100, 800, 600,
+                                   startupHandler->GetMarkerList(),
+                                   startupHandler->GetColorList());
+      if (!musrCanvas->IsValid()) {
+        cout << endl << "**SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
+        cout << endl;
+        ok = false;
+        break;
+      }
+      // ugly but rootcint cannot handle the spirit-parser framework
+//       musrCanvas->SetParamInfo(*msrHandler->GetMsrParamList());
+//       musrCanvas->SetTheoryInfo(*msrHandler->GetMsrTheory());
+//       musrCanvas->SetFunctionsInfo(*msrHandler->GetMsrFunctions());
+//       musrCanvas->SetRunsInfo(*msrHandler->GetMsrRunList());
+//       musrCanvas->SetPlotInfo(msrHandler->GetMsrPlotList()->at(i));
+//       musrCanvas->SetStatisticsInfo(*msrHandler->GetMsrStatistic());
+
+      musrCanvas->SetMsrHandler(msrHandler);
+      musrCanvas->SetRunListCollection(runListCollection);
+
+      musrCanvas->UpdateParamTheoryPad();
+      musrCanvas->UpdateDataTheoryPad();
+      musrCanvas->UpdateInfoPad();
+
+      if (!musrCanvas->IsValid()) { // something went wrong
+        ok = false;
+        break;
+      }
+
+      musrCanvas->Connect("Done(Int_t)", "TApplication", &app, "Terminate(Int_t)");
+
+      // keep musrCanvas objects
+      canvasVector.push_back(musrCanvas);
     }
-    musrCanvas->SetParameterList(*msrHandler->GetMsrParamList());
-    musrCanvas->SetTheoryList(*msrHandler->GetMsrTheory());
-    musrCanvas->SetFunctionList(*msrHandler->GetMsrFunctions());
-    musrCanvas->UpdateParamTheoryPad();
 
-    musrCanvas->Connect("Done(Int_t)", "TApplication", &app, "Terminate(Int_t)");
-
-    app.Run();
+    // check that everything is ok
+    if (ok)
+      app.Run(true); // true needed that Run will return after quit so that cleanup works
 
     // clean up
-    if (musrCanvas) {
-      delete musrCanvas;
-      musrCanvas = 0;
+cout << endl << "clean up canvas vector ...";
+    for (unsigned int i=0; i<canvasVector.size(); i++) {
+      canvasVector[i]->~PMusrCanvas();
     }
+    canvasVector.empty();
   }
+cout << endl;
 
   // clean up
   if (saxParser) {

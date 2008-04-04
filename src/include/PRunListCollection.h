@@ -49,6 +49,8 @@ class PRunListCollection
     PRunListCollection(PMsrHandler *msrInfo, PRunDataHandler *data);
     virtual ~PRunListCollection();
 
+    enum EDataSwitch { kIndex, kRunNo };
+
     virtual bool Add(int runNo);
 
     virtual double GetSingleHistoChisq(const std::vector<double>& par);
@@ -68,10 +70,10 @@ class PRunListCollection
     virtual unsigned int GetNoOfRRF()         { return fRunRRFList.size(); }
     virtual unsigned int GetNoOfNonMusr()     { return fRunNonMusrList.size(); }
 
-    virtual PRunData* GetSingleHisto(unsigned int index);
-    virtual PRunData* GetAsymmetry(unsigned int index);
-    virtual PRunData* GetRRF(unsigned int index);
-    virtual PRunData* GetNonMusr(unsigned int index);
+    virtual PRunData* GetSingleHisto(unsigned int index, EDataSwitch tag=kIndex);
+    virtual PRunData* GetAsymmetry(unsigned int index, EDataSwitch tag=kIndex);
+    virtual PRunData* GetRRF(unsigned int index, EDataSwitch tag=kIndex);
+    virtual PRunData* GetNonMusr(unsigned int index, EDataSwitch tag=kIndex);
 
   private:
     PMsrHandler *fMsrInfo;  ///< keeps all msr file info

@@ -41,7 +41,6 @@ using namespace std;
 #include "PMsrHandler.h"
 #include "PRunDataHandler.h"
 #include "PTheory.h"
-//#include "PFunctions.h"
 
 //------------------------------------------------------------------------------------------
 /**
@@ -70,6 +69,7 @@ class PRunBase
 
     virtual void CalcTheory() = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
 
+    virtual unsigned int GetRunNo() { return fRunNo; }
     virtual PRunData* GetData() { return &fData; }
     virtual void CleanUp();
     virtual bool IsValid() { return fValid; }
@@ -77,7 +77,7 @@ class PRunBase
   protected:
     bool fValid;
 
-    int fRunNo;                 ///< number of the run within the msr file
+    unsigned int fRunNo;        ///< number of the run within the msr file
     PMsrHandler      *fMsrInfo; ///< msr-file handler
     PMsrRunStructure *fRunInfo; ///< run info used to filter out needed infos for the run
     PRunDataHandler  *fRawData; ///< holds the raw run data
