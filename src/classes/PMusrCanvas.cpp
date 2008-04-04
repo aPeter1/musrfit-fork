@@ -376,9 +376,66 @@ cout << endl;
     }
   }
 
+  PRunData *data;
   for (unsigned int i=0; i<plotInfo.fRuns.size(); i++) {
     // get run data and create a histogram
+    data = 0;
+    // get data depending on the fittype
+    switch (runs[runNo].fFitType) {
+      case MSR_FITTYPE_SINGLE_HISTO:
+        data = fRunList->GetSingleHisto(runNo, PRunListCollection::kRunNo);
+        if (!data) { // something wrong
+          fValid = false;
+          // error message
+          cout << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** couldn't obtain run no " << runNo << " for a single histogram plot";
+          cout << endl;
+          return;
+        }
+        // handle data
+        break;
+      case MSR_FITTYPE_ASYM:
+        data = fRunList->GetAsymmetry(runNo, PRunListCollection::kRunNo);
+        if (!data) { // something wrong
+          fValid = false;
+          // error message
+          cout << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** couldn't obtain run no " << runNo << " for a asymmetry plot";
+          cout << endl;
+          return;
+        }
+        // handle data
+        break;
+      case MSR_FITTYPE_ASYM_RRF:
+        data = fRunList->GetRRF(runNo, PRunListCollection::kRunNo);
+        if (!data) { // something wrong
+          fValid = false;
+          // error message
+          cout << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** couldn't obtain run no " << runNo << " for a RRF plot";
+          cout << endl;
+          return;
+        }
+        // handle data
+        break;
+      case MSR_FITTYPE_NO_MUSR:
+        data = fRunList->GetNonMusr(runNo, PRunListCollection::kRunNo);
+        if (!data) { // something wrong
+          fValid = false;
+          // error message
+          cout << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** couldn't obtain run no " << runNo << " for a none musr data plot";
+          cout << endl;
+          return;
+        }
+        // handle data
+        break;
+      default:
+        fValid = false;
+        // error message
+        cout << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** wrong plottype tag?!";
+        cout << endl;
+        return;
+        break;
+    }
     // get theory object and calculate a theory histogram
+    // generate the histo plot
   }
 }
 
@@ -430,3 +487,155 @@ void PMusrCanvas::UpdateInfoPad()
   fMainCanvas->cd();
   fMainCanvas->Update();
 }
+
+//--------------------------------------------------------------------------
+// InitDataSet
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param dataSet
+ */
+void PMusrCanvas::InitDataSet(PMusrCanvasDataSet &dataSet)
+{
+  dataSet.data = 0;
+  dataSet.dataFourierRe = 0;
+  dataSet.dataFourierIm = 0;
+  dataSet.dataFourierPwr = 0;
+  dataSet.dataFourierPhase = 0;
+  dataSet.theory = 0;
+  dataSet.theoryFourierRe = 0;
+  dataSet.theoryFourierIm = 0;
+  dataSet.theoryFourierPwr = 0;
+  dataSet.theoryFourierPhase = 0;
+  dataSet.diff = 0;
+  dataSet.diffFourierRe = 0;
+  dataSet.diffFourierIm = 0;
+  dataSet.diffFourierPwr = 0;
+  dataSet.diffFourierPhase = 0;
+}
+
+//--------------------------------------------------------------------------
+// CleanupDataSet
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param dataSet
+ */
+void PMusrCanvas::CleanupDataSet(PMusrCanvasDataSet &dataSet)
+{
+  if (dataSet.data) {
+    delete dataSet.data;
+    dataSet.data = 0;
+  }
+  if (dataSet.dataFourierRe) {
+    delete dataSet.dataFourierRe;
+    dataSet.dataFourierRe = 0;
+  }
+  if (dataSet.dataFourierIm) {
+    delete dataSet.dataFourierIm;
+    dataSet.dataFourierIm = 0;
+  }
+  if (dataSet.dataFourierPwr) {
+    delete dataSet.dataFourierPwr;
+    dataSet.dataFourierPwr = 0;
+  }
+  if (dataSet.dataFourierPhase) {
+    delete dataSet.dataFourierPhase;
+    dataSet.dataFourierPhase = 0;
+  }
+  if (dataSet.theory) {
+    delete dataSet.theory;
+    dataSet.theory = 0;
+  }
+  if (dataSet.theoryFourierRe) {
+    delete dataSet.theoryFourierRe;
+    dataSet.theoryFourierRe = 0;
+  }
+  if (dataSet.theoryFourierIm) {
+    delete dataSet.theoryFourierIm;
+    dataSet.theoryFourierIm = 0;
+  }
+  if (dataSet.theoryFourierPwr) {
+    delete dataSet.theoryFourierPwr;
+    dataSet.theoryFourierPwr = 0;
+  }
+  if (dataSet.theoryFourierPhase) {
+    delete dataSet.theoryFourierPhase;
+    dataSet.theoryFourierPhase = 0;
+  }
+  if (dataSet.diff) {
+    delete dataSet.diff;
+    dataSet.diff = 0;
+  }
+  if (dataSet.diffFourierRe) {
+    delete dataSet.diffFourierRe;
+    dataSet.diffFourierRe = 0;
+  }
+  if (dataSet.diffFourierIm) {
+    delete dataSet.diffFourierIm;
+    dataSet.diffFourierIm = 0;
+  }
+  if (dataSet.diffFourierPwr) {
+    delete dataSet.diffFourierPwr;
+    dataSet.diffFourierPwr = 0;
+  }
+  if (dataSet.diffFourierPhase) {
+    delete dataSet.diffFourierPhase;
+    dataSet.diffFourierPhase = 0;
+  }
+}
+
+//--------------------------------------------------------------------------
+// HandleSingleHistoDataSet
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param runNo
+ * \param data
+ */
+void PMusrCanvas::HandleSingleHistoDataSet(unsigned int runNo, PRunData *data)
+{
+}
+
+//--------------------------------------------------------------------------
+// HandleAsymmetryDataSet
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param runNo
+ * \param data
+ */
+void PMusrCanvas::HandleAsymmetryDataSet(unsigned int runNo, PRunData *data)
+{
+}
+
+//--------------------------------------------------------------------------
+// HandleRRFDataSet
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param runNo
+ * \param data
+ */
+void PMusrCanvas::HandleRRFDataSet(unsigned int runNo, PRunData *data)
+{
+}
+
+//--------------------------------------------------------------------------
+// HandleNoneMusrDataSet
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param runNo
+ * \param data
+ */
+void PMusrCanvas::HandleNoneMusrDataSet(unsigned int runNo, PRunData *data)
+{
+}
+

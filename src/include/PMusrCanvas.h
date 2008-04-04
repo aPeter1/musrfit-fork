@@ -44,11 +44,39 @@
 #ifndef __MAKECINT__
 #include "PMsrHandler.h"
 #include "PRunListCollection.h"
-#endif
+#endif // __MAKECINT__
 
 #define YINFO  0.1
 #define YTITLE 0.95
 #define XTHEO  0.75
+
+//------------------------------------------------------------------------
+/**
+ * <p>
+ */
+typedef struct {
+  TH1F *data;
+  TH1F *dataFourierRe;
+  TH1F *dataFourierIm;
+  TH1F *dataFourierPwr;
+  TH1F *dataFourierPhase;
+  TH1F *theory;
+  TH1F *theoryFourierRe;
+  TH1F *theoryFourierIm;
+  TH1F *theoryFourierPwr;
+  TH1F *theoryFourierPhase;
+  TH1F *diff;
+  TH1F *diffFourierRe;
+  TH1F *diffFourierIm;
+  TH1F *diffFourierPwr;
+  TH1F *diffFourierPhase;
+} PMusrCanvasDataSet;
+
+//------------------------------------------------------------------------
+/**
+ * <p>
+ */
+typedef vector<PMusrCanvasDataSet> PMusrCanvasDataList;
 
 //--------------------------------------------------------------------------
 /**
@@ -69,7 +97,7 @@ class PMusrCanvas : public TObject, public TQObject
 #ifndef __MAKECINT__
     virtual void SetMsrHandler(PMsrHandler *msrHandler) { fMsrHandler = msrHandler; }
     virtual void SetRunListCollection(PRunListCollection *runList) { fRunList = runList; }
-#endif
+#endif // __MAKECINT__
 
     virtual void UpdateParamTheoryPad();
     virtual void UpdateDataTheoryPad();
@@ -93,12 +121,19 @@ class PMusrCanvas : public TObject, public TQObject
 #ifndef __MAKECINT__
     PMsrHandler        *fMsrHandler;
     PRunListCollection *fRunList;
-#endif
+#endif // __MAKECINT__
 
-    vector<TH1F*> fData;
+    PMusrCanvasDataList fData;
 
     PIntVector fMarkerList;
     PIntVector fColorList;
+
+    virtual void InitDataSet(PMusrCanvasDataSet &dataSet);
+    virtual void CleanupDataSet(PMusrCanvasDataSet &dataSet);
+    virtual void HandleSingleHistoDataSet(unsigned int runNo, PRunData *data);
+    virtual void HandleAsymmetryDataSet(unsigned int runNo, PRunData *data);
+    virtual void HandleRRFDataSet(unsigned int runNo, PRunData *data);
+    virtual void HandleNoneMusrDataSet(unsigned int runNo, PRunData *data);
 
   ClassDef(PMusrCanvas, 1)
 };
