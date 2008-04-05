@@ -112,7 +112,7 @@ PRunAsymmetry::PRunAsymmetry(PMsrHandler *msrInfo, PRunDataHandler *rawData, uns
 
 //cout << endl << ">> PRunAsymmetry::PRunAsymmetry(): fAlphaBetaTag = " << fAlphaBetaTag;
 
-  // calculate fData
+  // calculate fFitData
   if (!PrepareData())
     fValid = false;
 }
@@ -153,34 +153,34 @@ double PRunAsymmetry::CalcChiSquare(const std::vector<double>& par)
   }
 
   // calculate chisq
-  for (unsigned int i=0; i<fData.fValue.size(); i++) {
-    if ((fData.fTime[i]>=fFitStartTime) && (fData.fTime[i]<=fFitStopTime)) {
+  for (unsigned int i=0; i<fFitData.fValue.size(); i++) {
+    if ((fFitData.fTime[i]>=fFitStartTime) && (fFitData.fTime[i]<=fFitStopTime)) {
       switch (fAlphaBetaTag) {
         case 1: // alpha == 1, beta == 1
-          asymFcnValue = fTheory->Func(fData.fTime[i], par, fFuncValues);
+          asymFcnValue = fTheory->Func(fFitData.fTime[i], par, fFuncValues);
           break;
         case 2: // alpha != 1, beta == 1
           a = par[fRunInfo->fAlphaParamNo-1];
-          f = fTheory->Func(fData.fTime[i], par, fFuncValues);
+          f = fTheory->Func(fFitData.fTime[i], par, fFuncValues);
           asymFcnValue = (f*(a+1.0)-(a-1.0))/((a+1.0)-f*(a-1.0));
           break;
         case 3: // alpha == 1, beta != 1
           b = par[fRunInfo->fBetaParamNo-1];
-          f = fTheory->Func(fData.fTime[i], par, fFuncValues);
+          f = fTheory->Func(fFitData.fTime[i], par, fFuncValues);
           asymFcnValue = f*(b+1.0)/(2.0-f*(b-1.0));
           break;
         case 4: // alpha != 1, beta != 1
           a = par[fRunInfo->fAlphaParamNo-1];
           b = par[fRunInfo->fBetaParamNo-1];
-          f = fTheory->Func(fData.fTime[i], par, fFuncValues);
+          f = fTheory->Func(fFitData.fTime[i], par, fFuncValues);
           asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0));
           break;
         default:
           break;
       }
 //if (i==0) cout << endl << "A(0) = " << asymFcnValue;
-      diff = fData.fValue[i] - asymFcnValue;
-      chisq += diff*diff / (fData.fError[i]*fData.fError[i]);
+      diff = fFitData.fValue[i] - asymFcnValue;
+      chisq += diff*diff / (fFitData.fError[i]*fFitData.fError[i]);
     }
   }
 
@@ -227,32 +227,32 @@ void PRunAsymmetry::CalcTheory()
   // calculate asymmetry
   double asymFcnValue = 0.0;
   double a, b, f;
-  for (unsigned int i=0; i<fData.fTime.size(); i++) {
+  for (unsigned int i=0; i<fFitData.fTime.size(); i++) {
     switch (fAlphaBetaTag) {
       case 1: // alpha == 1, beta == 1
-        asymFcnValue = fTheory->Func(fData.fTime[i], par, fFuncValues);
+        asymFcnValue = fTheory->Func(fFitData.fTime[i], par, fFuncValues);
         break;
       case 2: // alpha != 1, beta == 1
         a = par[fRunInfo->fAlphaParamNo-1];
-        f = fTheory->Func(fData.fTime[i], par, fFuncValues);
+        f = fTheory->Func(fFitData.fTime[i], par, fFuncValues);
         asymFcnValue = (f*(a+1.0)-(a-1.0))/((a+1.0)-f*(a-1.0));
         break;
       case 3: // alpha == 1, beta != 1
         b = par[fRunInfo->fBetaParamNo-1];
-        f = fTheory->Func(fData.fTime[i], par, fFuncValues);
+        f = fTheory->Func(fFitData.fTime[i], par, fFuncValues);
         asymFcnValue = f*(b+1.0)/(2.0-f*(b-1.0));
         break;
       case 4: // alpha != 1, beta != 1
         a = par[fRunInfo->fAlphaParamNo-1];
         b = par[fRunInfo->fBetaParamNo-1];
-        f = fTheory->Func(fData.fTime[i], par, fFuncValues);
+        f = fTheory->Func(fFitData.fTime[i], par, fFuncValues);
         asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0));
         break;
       default:
         asymFcnValue = 0.0;
         break;
     }
-    fData.fTheory.push_back(asymFcnValue);
+    fFitData.fTheory.push_back(asymFcnValue);
   }
 
   // clean up
@@ -272,7 +272,7 @@ void PRunAsymmetry::CalcTheory()
  */
 bool PRunAsymmetry::PrepareData()
 {
-//cout << endl << "in PRunAsymmetry::PrepareData(): will feed fData";
+//cout << endl << "in PRunAsymmetry::PrepareData(): will feed fFitData";
 
   // get forward/backward histo from PRunDataHandler object ------------------------
   // get the correct run
@@ -459,7 +459,7 @@ bool PRunAsymmetry::PrepareData()
       cout << endl << "  forward/backward time are not equal! This cannot be handled";
       return false;
     }
-    fData.fTime.push_back(forwardPacked.fTime[i]);
+    fFitData.fTime.push_back(forwardPacked.fTime[i]);
     // to make the formulae more readable
     f  = forwardPacked.fValue[i];
     b  = backwardPacked.fValue[i];
@@ -470,19 +470,19 @@ bool PRunAsymmetry::PrepareData()
       asym = (f-b) / (f+b);
     else
       asym = 0.0;
-    fData.fValue.push_back(asym);
+    fFitData.fValue.push_back(asym);
     // calculate the error
     if (f+b != 0.0)
       error = 2.0/((f+b)*(f+b))*TMath::Sqrt(b*b*ef*ef+eb*eb*f*f);
     else
       error = 1.0;
-    fData.fError.push_back(error);
+    fFitData.fError.push_back(error);
   }
 
 /*
 FILE *fp = fopen("asym.dat", "w");
-for (unsigned int i=0; i<fData.fTime.size(); i++) {
-  fprintf(fp, "%lf, %lf, %lf\n", fData.fTime[i], fData.fValue[i], fData.fError[i]);
+for (unsigned int i=0; i<fFitData.fTime.size(); i++) {
+  fprintf(fp, "%lf, %lf, %lf\n", fFitData.fTime[i], fFitData.fValue[i], fFitData.fError[i]);
 }
 fclose(fp);
 return false;
@@ -490,8 +490,8 @@ return false;
 
   // count the number of bins to be fitted
   fNoOfFitBins=0;
-  for (unsigned int i=0; i<fData.fValue.size(); i++) {
-    if ((fData.fTime[i] >= fFitStartTime) && (fData.fTime[i] <= fFitStopTime))
+  for (unsigned int i=0; i<fFitData.fValue.size(); i++) {
+    if ((fFitData.fTime[i] >= fFitStartTime) && (fFitData.fTime[i] <= fFitStopTime))
       fNoOfFitBins++;
   }
 

@@ -127,11 +127,11 @@ double PRunSingleHisto::CalcChiSquare(const std::vector<double>& par)
   }
 
   // calculate chi square
-  for (unsigned int i=0; i<fData.fValue.size(); i++) {
-    if ((fData.fTime[i]>=fFitStartTime) && (fData.fTime[i]<=fFitStopTime)) {
-      diff = fData.fValue[i] -
-            (N0*TMath::Exp(-fData.fTime[i]/tau)*(1+fTheory->Func(fData.fTime[i], par, fFuncValues))+bkg);
-      chisq += diff*diff / (fData.fError[i]*fData.fError[i]);
+  for (unsigned int i=0; i<fFitData.fValue.size(); i++) {
+    if ((fFitData.fTime[i]>=fFitStartTime) && (fFitData.fTime[i]<=fFitStopTime)) {
+      diff = fFitData.fValue[i] -
+            (N0*TMath::Exp(-fFitData.fTime[i]/tau)*(1+fTheory->Func(fFitData.fTime[i], par, fFuncValues))+bkg);
+      chisq += diff*diff / (fFitData.fError[i]*fFitData.fError[i]);
     }
   }
 
@@ -139,15 +139,15 @@ double PRunSingleHisto::CalcChiSquare(const std::vector<double>& par)
 // static int counter = 0;
 // TString fln=fRunInfo->fRunName+"_"+(Long_t)fRunInfo->fForwardHistoNo+"_data.dat";
 // ofstream f(fln.Data(),ios_base::out);
-// for (unsigned int i=0; i<fData.fValue.size(); i++) {
-//   f << endl << fData.fTime[i] << " " << fData.fValue[i] << " " << fData.fError[i];
+// for (unsigned int i=0; i<fFitData.fValue.size(); i++) {
+//   f << endl << fFitData.fTime[i] << " " << fFitData.fValue[i] << " " << fFitData.fError[i];
 // }
 // f.close();
 // 
 // fln=fRunInfo->fRunName+"_"+(Long_t)fRunInfo->fForwardHistoNo+"_theo.dat";
 // ofstream ft(fln.Data(),ios_base::out);
-// for (unsigned int i=0; i<fData.fValue.size(); i++) {
-//   ft << endl << fData.fTime[i] << " " << N0*TMath::Exp(-fData.fTime[i]/tau)*(1+fTheory->Func(fData.fTime[i], par))+bkg;
+// for (unsigned int i=0; i<fFitData.fValue.size(); i++) {
+//   ft << endl << fFitData.fTime[i] << " " << N0*TMath::Exp(-fFitData.fTime[i]/tau)*(1+fTheory->Func(fFitData.fTime[i], par))+bkg;
 // }
 // ft.close();
 // counter++;
@@ -200,13 +200,13 @@ double PRunSingleHisto::CalcMaxLikelihood(const std::vector<double>& par)
   // calculate maximum log likelihood
   double theo;
   double data;
-  for (unsigned int i=0; i<fData.fValue.size(); i++) {
-    if ((fData.fTime[i]>=fFitStartTime) && (fData.fTime[i]<=fFitStopTime)) {     
+  for (unsigned int i=0; i<fFitData.fValue.size(); i++) {
+    if ((fFitData.fTime[i]>=fFitStartTime) && (fFitData.fTime[i]<=fFitStopTime)) {     
       // calculate theory for the given parameter set
-      theo = N0*TMath::Exp(-fData.fTime[i]/tau)*(1+fTheory->Func(fData.fTime[i], par, fFuncValues))+bkg;
+      theo = N0*TMath::Exp(-fFitData.fTime[i]/tau)*(1+fTheory->Func(fFitData.fTime[i], par, fFuncValues))+bkg;
       // check if data value is not too small
-      if (fData.fValue[i] > 1.0e-9)
-        data = fData.fValue[i];
+      if (fFitData.fValue[i] > 1.0e-9)
+        data = fFitData.fValue[i];
       else
         data = 1.0e-9;
       // add maximum log likelihood contribution of bin i
@@ -251,8 +251,8 @@ void PRunSingleHisto::CalcTheory()
   }
 
   // calculate theory
-  for (unsigned int i=0; i<fData.fTime.size(); i++) {
-    fData.fTheory.push_back(N0*TMath::Exp(-fData.fTime[i]/tau)*(1+fTheory->Func(fData.fTime[i], par, fFuncValues))+bkg);
+  for (unsigned int i=0; i<fFitData.fTime.size(); i++) {
+    fFitData.fTheory.push_back(N0*TMath::Exp(-fFitData.fTime[i]/tau)*(1+fTheory->Func(fFitData.fTime[i], par, fFuncValues))+bkg);
   }
 
   // clean up
@@ -268,7 +268,7 @@ void PRunSingleHisto::CalcTheory()
  */
 bool PRunSingleHisto::PrepareData()
 {
-//  cout << endl << "in PRunSingleHisto::PrepareData(): will feed fData";
+//  cout << endl << "in PRunSingleHisto::PrepareData(): will feed fFitData";
 
   // get the proper run
   PRawRunData* runData = fRawData->GetRunData(fRunInfo->fRunName);
@@ -333,7 +333,7 @@ bool PRunSingleHisto::PrepareData()
   // first get start data, end data, and t0
   unsigned int start = fRunInfo->fDataRange[0];
   unsigned int end   = fRunInfo->fDataRange[1];
-  double t0          = fT0s[0];
+  double       t0    = fT0s[0];
   // check if start, end, and t0 make any sense
   // 1st check if start and end are in proper order
   if (end < start) { // need to swap them
@@ -356,7 +356,8 @@ bool PRunSingleHisto::PrepareData()
     cout << endl << "PRunSingleHisto::PrepareData(): t0 data bin doesn't make any sense!";
     return false;
   }
-  // everything looks fine, hence fill data set
+
+  // everything looks fine, hence fill fit data set
   double value = 0.0;
   for (unsigned i=start; i<end; i++) {
     if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
@@ -364,12 +365,12 @@ bool PRunSingleHisto::PrepareData()
       // the value is normalize to per bin
       value /= fRunInfo->fPacking;
       // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-      fData.fTime.push_back(fTimeResolution*((double)i-(double)t0-(double)fRunInfo->fPacking));
-      fData.fValue.push_back(value);
+      fFitData.fTime.push_back(fTimeResolution*((double)i-(double)t0-(double)fRunInfo->fPacking));
+      fFitData.fValue.push_back(value);
       if (value == 0.0)
-        fData.fError.push_back(1.0);
+        fFitData.fError.push_back(1.0);
       else
-        fData.fError.push_back(TMath::Sqrt(value));
+        fFitData.fError.push_back(TMath::Sqrt(value));
       value = 0.0;
     }
     value += runData->fDataBin[histoNo][i];
@@ -377,10 +378,33 @@ bool PRunSingleHisto::PrepareData()
 
   // count the number of bins to be fitted
   fNoOfFitBins=0;
-  for (unsigned int i=0; i<fData.fValue.size(); i++) {
-    if ((fData.fTime[i] >= fFitStartTime) && (fData.fTime[i] <= fFitStopTime))
+  for (unsigned int i=0; i<fFitData.fValue.size(); i++) {
+    if ((fFitData.fTime[i] >= fFitStartTime) && (fFitData.fTime[i] <= fFitStopTime))
       fNoOfFitBins++;
   }
+
+  // fill the bin data set (used for plots and t0's search
+  start = (unsigned int)t0-fRunInfo->fPacking*((unsigned int)t0/fRunInfo->fPacking);
+  end   = (unsigned int)t0+fRunInfo->fPacking*((runData->fDataBin[histoNo].size()-1-(unsigned int)t0)/fRunInfo->fPacking);
+  value = 0.0;
+//cout << endl << ">> start = " << start << ", end = " << end << ", " << runData->fDataBin[histoNo].size();
+  for (unsigned i=start; i<end; i++) {
+    if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
+      // in order that after rebinning the fit does not need to be redone (important for plots)
+      // the value is normalize to per bin
+      value /= fRunInfo->fPacking;
+      // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
+      fBinData.fTime.push_back(fTimeResolution*((double)i-(double)t0-(double)fRunInfo->fPacking));
+      fBinData.fValue.push_back(value);
+      if (value == 0.0)
+        fBinData.fError.push_back(1.0);
+      else
+        fBinData.fError.push_back(TMath::Sqrt(value));
+      value = 0.0;
+    }
+    value += runData->fDataBin[histoNo][i];
+  }
+//cout << endl << "fBinData.fValue.size() = " << fBinData.fValue.size();
 
   return true;
 }

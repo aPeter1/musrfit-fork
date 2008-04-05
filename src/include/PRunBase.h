@@ -70,7 +70,7 @@ class PRunBase
     virtual void CalcTheory() = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
 
     virtual unsigned int GetRunNo() { return fRunNo; }
-    virtual PRunData* GetData() { return &fData; }
+    virtual PRunData* GetData() { return &fFitData; }
     virtual void CleanUp();
     virtual bool IsValid() { return fValid; }
 
@@ -82,16 +82,17 @@ class PRunBase
     PMsrRunStructure *fRunInfo; ///< run info used to filter out needed infos for the run
     PRunDataHandler  *fRawData; ///< holds the raw run data
 
-    vector<int> fParamNo;        ///< vector of parameter numbers for the specifc run
+    PIntVector fParamNo;        ///< vector of parameter numbers for the specifc run
 
-    PRunData fData;         ///< data to be fitted
-    double fTimeResolution; ///< time resolution
-    vector<double> fT0s;    ///< all t0's of a run! The derived classes will handle it
+    PRunData fFitData;          ///< data to be fitted, i.e. binned data on the fit time range
+    PRunData fBinData;          ///< binned data set, starting at raw data 0, i.e. at negative times used to plot and determine t0's
+    double fTimeResolution;     ///< time resolution
+    PDoubleVector fT0s;         ///< all t0's of a run! The derived classes will handle it
 
     virtual bool PrepareData() = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
 
-    vector<double> fFuncValues; ///< is keeping the values of the functions from the FUNCTIONS block
-    PTheory *fTheory;       ///< theory needed to calculate chi-square
+    PDoubleVector fFuncValues;  ///< is keeping the values of the functions from the FUNCTIONS block
+    PTheory *fTheory;           ///< theory needed to calculate chi-square
 };
 
 #endif // _PRUNBASE_H_

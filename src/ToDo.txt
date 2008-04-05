@@ -41,11 +41,20 @@ short term:
 * implement table based theory functions (LF stuff)
   static GKT LF **DONE** 08-03-12
 
+* setup startup handler with infos like: data path, symbol list, color list, ...
+  **DONE** 08-04-04
+
+* at the moment that startup handler is looked for in the directory where musrfit/musrview
+  is executed, this is stupid. Define a place where to look for it.
+
+* check concept to get bin data for musrview on single histo (fBinData in PRunBase). 
+  If it is ok, implement it for the others.
+
 * do I need to cleanup AddText() objects from TPaveText etc myself? **CHECK**
 
 * something is strange with the coordinate system in TPaveText! **CHECK**
 
-* setup startup handler with infos like: data path, symbol list, color list, ...
+* check problem with the mathmore implementation of 1F1(m;n;z)
 
 ---------------------
 intermediate term:

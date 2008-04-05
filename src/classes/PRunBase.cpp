@@ -122,10 +122,15 @@ PRunBase::~PRunBase()
 {
   fParamNo.clear();
 
-  fData.fTime.clear();
-  fData.fValue.clear();
-  fData.fError.clear();
-  fData.fTheory.clear();
+  fFitData.fTime.clear();
+  fFitData.fValue.clear();
+  fFitData.fError.clear();
+  fFitData.fTheory.clear();
+
+  fBinData.fTime.clear();
+  fBinData.fValue.clear();
+  fBinData.fError.clear();
+  fBinData.fTheory.clear();
 
   fT0s.clear();
 

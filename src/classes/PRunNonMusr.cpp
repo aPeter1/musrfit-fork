@@ -60,7 +60,7 @@ PRunNonMusr::PRunNonMusr(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigne
 {
   bool success;
 
-  // calculate fData
+  // calculate fFitData
   if (success) {
     success = PrepareData();
   }
@@ -130,12 +130,12 @@ bool PRunNonMusr::PrepareData()
 {
   bool success = true;
 
-  cout << endl << "in PRunNonMusr::PrepareData(): will feed fData";
+  cout << endl << "in PRunNonMusr::PrepareData(): will feed fFitData";
 
   // count the number of bins to be fitted
   fNoOfFitBins=0;
-  for (unsigned int i=0; i<fData.fValue.size(); i++) {
-    if ((fData.fTime[i] >= fFitStartTime) && (fData.fTime[i] <= fFitStopTime))
+  for (unsigned int i=0; i<fFitData.fValue.size(); i++) {
+    if ((fFitData.fTime[i] >= fFitStartTime) && (fFitData.fTime[i] <= fFitStopTime))
       fNoOfFitBins++;
   }
 
