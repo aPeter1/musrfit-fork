@@ -118,12 +118,23 @@ typedef vector<TString> PStringVector;
 
 //-------------------------------------------------------------
 /**
- * <p>Predominantly used in PRunBase.
+ * <p> data handling tag
+ */
+enum EPMusrHandleTag { kEmpty, kFit, kView };
+
+//-------------------------------------------------------------
+/**
+ * <p> Predominantly used in PRunBase.
  */
 typedef struct {
-  vector<double> fTime;
+  // data related info
+  double fDataTimeStart;
+  double fDataTimeStep;
   vector<double> fValue;
   vector<double> fError;
+  // theory related info
+  double fTheoryTimeStart;
+  double fTheoryTimeStep;
   vector<double> fTheory;
 } PRunData;
 

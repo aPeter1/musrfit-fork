@@ -58,6 +58,7 @@ PRunBase::PRunBase()
   fTimeResolution = -1.0;
 
   fValid = true;
+  fHandleTag = kEmpty;
 }
 
 //--------------------------------------------------------------------------
@@ -69,9 +70,10 @@ PRunBase::PRunBase()
  * \param msrInfo pointer to the msr info structure
  * \param runNo number of the run of the msr-file
  */
-PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo)
+PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo, EPMusrHandleTag tag)
 {
   fValid = true;
+  fHandleTag = tag;
 
   fRunNo = static_cast<int>(runNo);
   if ((runNo < 0) || (runNo > msrInfo->GetMsrRunList()->size())) {
@@ -122,15 +124,9 @@ PRunBase::~PRunBase()
 {
   fParamNo.clear();
 
-  fFitData.fTime.clear();
-  fFitData.fValue.clear();
-  fFitData.fError.clear();
-  fFitData.fTheory.clear();
-
-  fBinData.fTime.clear();
-  fBinData.fValue.clear();
-  fBinData.fError.clear();
-  fBinData.fTheory.clear();
+  fData.fValue.clear();
+  fData.fError.clear();
+  fData.fTheory.clear();
 
   fT0s.clear();
 

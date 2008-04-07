@@ -45,6 +45,8 @@ PRunRRF::PRunRRF() : PRunBase()
   fFitStartTime = 0.0;
   fFitStopTime  = 0.0;
   fNoOfFitBins  = 0;
+
+  fHandleTag = kEmpty;
 }
 
 //--------------------------------------------------------------------------
@@ -56,7 +58,7 @@ PRunRRF::PRunRRF() : PRunBase()
  * \param msrInfo pointer to the msr info structure
  * \param runNo number of the run of the msr-file
  */
-PRunRRF::PRunRRF(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo) : PRunBase(msrInfo, rawData, runNo)
+PRunRRF::PRunRRF(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
 {
   bool success;
 
@@ -130,14 +132,7 @@ bool PRunRRF::PrepareData()
 {
   bool success = true;
 
-  cout << endl << "in PRunRRF::PrepareData(): will feed fFitData";
-
-  // count the number of bins to be fitted
-  fNoOfFitBins=0;
-  for (unsigned int i=0; i<fFitData.fValue.size(); i++) {
-    if ((fFitData.fTime[i] >= fFitStartTime) && (fFitData.fTime[i] <= fFitStopTime))
-      fNoOfFitBins++;
-  }
+  cout << endl << "in PRunRRF::PrepareData(): will feed fData";
 
   return success;
 }

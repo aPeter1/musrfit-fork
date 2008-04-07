@@ -248,10 +248,12 @@ void musrfit_write_ascii(TString fln, PRunData *data, int runCounter)
   }
 
   // dump data
-  f << "% number of data values = " << data->fTime.size() << endl;
+  f << "% number of data values = " << data->fValue.size() << endl;
   f << "% time (us), value, error, theory" << endl;
-  for (unsigned int i=0; i<data->fTime.size(); i++) {
-    f << data->fTime[i] << ", " << data->fValue[i] << ", " << data->fError[i] << ", " << data->fTheory[i] << endl;
+  double time;
+  for (unsigned int i=0; i<data->fValue.size(); i++) {
+    time = data->fDataTimeStart + (double)i*data->fDataTimeStep;
+    f << time << ", " << data->fValue[i] << ", " << data->fError[i] << ", " << data->fTheory[i] << endl;
   }
 
   // close file
@@ -349,14 +351,14 @@ void musrfit_write_root(TFile &f, TString fln, PRunData *data, int runCounter)
   TCanvas *c = new TCanvas(name, title.Data(), 10, 10, 800, 600);
 
   // create histos
-  Double_t diff = data->fTime[1]-data->fTime[0];
+  Double_t diff = data->fDataTimeStep;
   Double_t start = -diff/2.0;
-  Double_t end = data->fTime[data->fTime.size()-1]+diff/2.0;
-  TH1F *hdata = new TH1F("hdata", "run data", data->fTime.size(), start, end);
-  TH1F *htheo = new TH1F("htheo", "run theory", data->fTime.size(), start, end);
+  Double_t end = data->fDataTimeStep*(data->fValue.size()-1)+diff/2.0;
+  TH1F *hdata = new TH1F("hdata", "run data", data->fValue.size(), start, end);
+  TH1F *htheo = new TH1F("htheo", "run theory", data->fValue.size(), start, end);
 
   // fill data
-  for (unsigned int i=0; i<data->fTime.size(); i++) {
+  for (unsigned int i=0; i<data->fValue.size(); i++) {
     hdata->SetBinContent(i, data->fValue[i]);
     hdata->SetBinError(i, data->fError[i]);
     htheo->SetBinContent(i, data->fTheory[i]);
@@ -555,7 +557,7 @@ int main(int argc, char *argv[])
     // feed all the necessary histogramms for the fit
     runListCollection = new PRunListCollection(msrHandler, dataHandler);
     for (unsigned int i=0; i < msrHandler->GetMsrRunList()->size(); i++) {
-      success = runListCollection->Add(i);
+      success = runListCollection->Add(i, kFit);
       if (!success) {
         cout << endl << "Couldn't handle run no " << i << " ";
         cout << (*msrHandler->GetMsrRunList())[i].fRunName.Data();

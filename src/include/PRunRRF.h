@@ -38,7 +38,7 @@ class PRunRRF : public PRunBase
 {
   public:
     PRunRRF();
-    PRunRRF(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo);
+    PRunRRF(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo, EPMusrHandleTag tag);
     virtual ~PRunRRF();
 
     virtual double CalcChiSquare(const std::vector<double>& par);

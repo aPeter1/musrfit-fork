@@ -38,7 +38,7 @@ class PRunAsymmetry : public PRunBase
 {
   public:
     PRunAsymmetry();
-    PRunAsymmetry(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo);
+    PRunAsymmetry(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo, EPMusrHandleTag tag);
     virtual ~PRunAsymmetry();
 
     virtual double CalcChiSquare(const std::vector<double>& par);
@@ -49,6 +49,8 @@ class PRunAsymmetry : public PRunBase
 
   protected:
     virtual bool PrepareData();
+    virtual bool PrepareFitData(PRawRunData* runData, unsigned int histoNo[2]);
+    virtual bool PrepareViewData(PRawRunData* runData, unsigned int histoNo[2]);
 
   private:
     unsigned int fAlphaBetaTag; ///< 1-> alpha = beta = 1; 2-> alpha != 1, beta = 1; 3-> alpha = 1, beta != 1; 4-> alpha != 1, beta != 1

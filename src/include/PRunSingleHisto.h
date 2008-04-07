@@ -38,7 +38,7 @@ class PRunSingleHisto : public PRunBase
 {
   public:
     PRunSingleHisto();
-    PRunSingleHisto(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo);
+    PRunSingleHisto(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo, EPMusrHandleTag tag);
     virtual ~PRunSingleHisto();
 
     virtual double CalcChiSquare(const std::vector<double>& par);
@@ -49,6 +49,8 @@ class PRunSingleHisto : public PRunBase
 
   protected:
     virtual bool PrepareData();
+    virtual bool PrepareFitData(unsigned int start, unsigned int end, double t0, PRawRunData* runData, unsigned int histoNo);
+    virtual bool PrepareViewData(unsigned int start, unsigned int end, double t0, PRawRunData* runData, unsigned int histoNo);
 
   private:
     double fFitStartTime;

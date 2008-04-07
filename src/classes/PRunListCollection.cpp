@@ -86,8 +86,9 @@ PRunListCollection::~PRunListCollection()
  * <p>
  *
  * \param runNo
+ * \param tag
  */
-bool PRunListCollection::Add(int runNo)
+bool PRunListCollection::Add(int runNo, EPMusrHandleTag tag)
 {
   bool success = true;
 
@@ -101,22 +102,22 @@ bool PRunListCollection::Add(int runNo)
 
   switch (fitType) {
     case PRUN_SINGLE_HISTO:
-      fRunSingleHistoList.push_back(new PRunSingleHisto(fMsrInfo, fData, runNo));
+      fRunSingleHistoList.push_back(new PRunSingleHisto(fMsrInfo, fData, runNo, tag));
       if (!fRunSingleHistoList[fRunSingleHistoList.size()-1]->IsValid())
         success = false;
       break;
     case PRUN_ASYMMETRY:
-      fRunAsymmetryList.push_back(new PRunAsymmetry(fMsrInfo, fData, runNo));
+      fRunAsymmetryList.push_back(new PRunAsymmetry(fMsrInfo, fData, runNo, tag));
       if (!fRunAsymmetryList[fRunAsymmetryList.size()-1]->IsValid())
         success = false;
       break;
     case PRUN_RRF:
-      fRunRRFList.push_back(new PRunRRF(fMsrInfo, fData, runNo));
+      fRunRRFList.push_back(new PRunRRF(fMsrInfo, fData, runNo, tag));
       if (!fRunRRFList[fRunRRFList.size()-1]->IsValid())
         success = false;
       break;
     case PRUN_NON_MUSR:
-      fRunNonMusrList.push_back(new PRunNonMusr(fMsrInfo, fData, runNo));
+      fRunNonMusrList.push_back(new PRunNonMusr(fMsrInfo, fData, runNo, tag));
       if (!fRunNonMusrList[fRunNonMusrList.size()-1]->IsValid())
         success = false;
       break;

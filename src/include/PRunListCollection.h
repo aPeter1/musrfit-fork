@@ -51,7 +51,7 @@ class PRunListCollection
 
     enum EDataSwitch { kIndex, kRunNo };
 
-    virtual bool Add(int runNo);
+    virtual bool Add(int runNo, EPMusrHandleTag tag);
 
     virtual double GetSingleHistoChisq(const std::vector<double>& par);
     virtual double GetAsymmetryChisq(const std::vector<double>& par);

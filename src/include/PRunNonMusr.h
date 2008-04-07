@@ -38,7 +38,7 @@ class PRunNonMusr : public PRunBase
 {
   public:
     PRunNonMusr();
-    PRunNonMusr(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo);
+    PRunNonMusr(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo, EPMusrHandleTag tag);
     virtual ~PRunNonMusr();
 
     virtual double CalcChiSquare(const std::vector<double>& par);

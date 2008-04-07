@@ -61,7 +61,7 @@ class PRunBase
 {
   public:
     PRunBase();
-    PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo);
+    PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo, EPMusrHandleTag tag);
     virtual ~PRunBase();
 
     virtual double CalcChiSquare(const vector<double>& par) = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
@@ -70,12 +70,14 @@ class PRunBase
     virtual void CalcTheory() = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
 
     virtual unsigned int GetRunNo() { return fRunNo; }
-    virtual PRunData* GetData() { return &fFitData; }
+    virtual PRunData* GetData() { return &fData; }
     virtual void CleanUp();
     virtual bool IsValid() { return fValid; }
 
   protected:
     bool fValid;
+
+    EPMusrHandleTag fHandleTag; ///< tag telling whether this is used for fit, view, ...
 
     unsigned int fRunNo;        ///< number of the run within the msr file
     PMsrHandler      *fMsrInfo; ///< msr-file handler
@@ -84,8 +86,7 @@ class PRunBase
 
     PIntVector fParamNo;        ///< vector of parameter numbers for the specifc run
 
-    PRunData fFitData;          ///< data to be fitted, i.e. binned data on the fit time range
-    PRunData fBinData;          ///< binned data set, starting at raw data 0, i.e. at negative times used to plot and determine t0's
+    PRunData fData;             ///< data to be fitted, viewed, i.e. binned data
     double fTimeResolution;     ///< time resolution
     PDoubleVector fT0s;         ///< all t0's of a run! The derived classes will handle it
 

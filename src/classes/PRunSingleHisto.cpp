@@ -58,7 +58,7 @@ PRunSingleHisto::PRunSingleHisto() : PRunBase()
  * \param msrInfo pointer to the msr info structure
  * \param runNo number of the run of the msr-file
  */
-PRunSingleHisto::PRunSingleHisto(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo) : PRunBase(msrInfo, rawData, runNo)
+PRunSingleHisto::PRunSingleHisto(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
 {
   if (!PrepareData()) {
     cout << endl << "**SEVERE ERROR**: PRunSingleHisto::PRunSingleHisto: Couldn't prepare data for fitting!";
@@ -127,11 +127,13 @@ double PRunSingleHisto::CalcChiSquare(const std::vector<double>& par)
   }
 
   // calculate chi square
-  for (unsigned int i=0; i<fFitData.fValue.size(); i++) {
-    if ((fFitData.fTime[i]>=fFitStartTime) && (fFitData.fTime[i]<=fFitStopTime)) {
-      diff = fFitData.fValue[i] -
-            (N0*TMath::Exp(-fFitData.fTime[i]/tau)*(1+fTheory->Func(fFitData.fTime[i], par, fFuncValues))+bkg);
-      chisq += diff*diff / (fFitData.fError[i]*fFitData.fError[i]);
+  double time;
+  for (unsigned int i=0; i<fData.fValue.size(); i++) {
+    time = fData.fDataTimeStart + (double)i*fData.fDataTimeStep;
+    if ((time>=fFitStartTime) && (time<=fFitStopTime)) {
+      diff = fData.fValue[i] -
+            (N0*TMath::Exp(-time/tau)*(1+fTheory->Func(time, par, fFuncValues))+bkg);
+      chisq += diff*diff / (fData.fError[i]*fData.fError[i]);
     }
   }
 
@@ -139,15 +141,17 @@ double PRunSingleHisto::CalcChiSquare(const std::vector<double>& par)
 // static int counter = 0;
 // TString fln=fRunInfo->fRunName+"_"+(Long_t)fRunInfo->fForwardHistoNo+"_data.dat";
 // ofstream f(fln.Data(),ios_base::out);
-// for (unsigned int i=0; i<fFitData.fValue.size(); i++) {
-//   f << endl << fFitData.fTime[i] << " " << fFitData.fValue[i] << " " << fFitData.fError[i];
+// for (unsigned int i=0; i<fData.fValue.size(); i++) {
+//   time = fData.fDataTimeStart + (double)i*fData.fDataTimeStep;
+//   f << endl << time << " " << fData.fValue[i] << " " << fData.fError[i];
 // }
 // f.close();
 // 
 // fln=fRunInfo->fRunName+"_"+(Long_t)fRunInfo->fForwardHistoNo+"_theo.dat";
 // ofstream ft(fln.Data(),ios_base::out);
-// for (unsigned int i=0; i<fFitData.fValue.size(); i++) {
-//   ft << endl << fFitData.fTime[i] << " " << N0*TMath::Exp(-fFitData.fTime[i]/tau)*(1+fTheory->Func(fFitData.fTime[i], par))+bkg;
+// for (unsigned int i=0; i<fData.fValue.size(); i++) {
+//   time = fData.fDataTimeStart + (double)i*fData.fDataTimeStep;
+//   ft << endl << time << " " << N0*TMath::Exp(-time/tau)*(1.0+fTheory->Func(time, par, fFuncValues))+bkg;
 // }
 // ft.close();
 // counter++;
@@ -200,13 +204,15 @@ double PRunSingleHisto::CalcMaxLikelihood(const std::vector<double>& par)
   // calculate maximum log likelihood
   double theo;
   double data;
-  for (unsigned int i=0; i<fFitData.fValue.size(); i++) {
-    if ((fFitData.fTime[i]>=fFitStartTime) && (fFitData.fTime[i]<=fFitStopTime)) {     
+  double time;
+  for (unsigned int i=0; i<fData.fValue.size(); i++) {
+    time = fData.fDataTimeStart + (double)i*fData.fDataTimeStep;
+    if ((time>=fFitStartTime) && (time<=fFitStopTime)) {
       // calculate theory for the given parameter set
-      theo = N0*TMath::Exp(-fFitData.fTime[i]/tau)*(1+fTheory->Func(fFitData.fTime[i], par, fFuncValues))+bkg;
+      theo = N0*TMath::Exp(-time/tau)*(1+fTheory->Func(time, par, fFuncValues))+bkg;
       // check if data value is not too small
-      if (fFitData.fValue[i] > 1.0e-9)
-        data = fFitData.fValue[i];
+      if (fData.fValue[i] > 1.0e-9)
+        data = fData.fValue[i];
       else
         data = 1.0e-9;
       // add maximum log likelihood contribution of bin i
@@ -251,8 +257,10 @@ void PRunSingleHisto::CalcTheory()
   }
 
   // calculate theory
-  for (unsigned int i=0; i<fFitData.fTime.size(); i++) {
-    fFitData.fTheory.push_back(N0*TMath::Exp(-fFitData.fTime[i]/tau)*(1+fTheory->Func(fFitData.fTime[i], par, fFuncValues))+bkg);
+  double time;
+  for (unsigned int i=0; i<fData.fValue.size(); i++) {
+    time = fData.fDataTimeStart + (double)i*fData.fDataTimeStep;
+    fData.fTheory.push_back(N0*TMath::Exp(-time/tau)*(1+fTheory->Func(time, par, fFuncValues))+bkg);
   }
 
   // clean up
@@ -268,7 +276,7 @@ void PRunSingleHisto::CalcTheory()
  */
 bool PRunSingleHisto::PrepareData()
 {
-//  cout << endl << "in PRunSingleHisto::PrepareData(): will feed fFitData";
+//  cout << endl << "in PRunSingleHisto::PrepareData(): will feed fData";
 
   // get the proper run
   PRawRunData* runData = fRawData->GetRunData(fRunInfo->fRunName);
@@ -357,20 +365,51 @@ bool PRunSingleHisto::PrepareData()
     return false;
   }
 
-  // everything looks fine, hence fill fit data set
+  // everything looks fine, hence fill data set
+  bool status;
+  switch(fHandleTag) {
+    case kFit:
+      status = PrepareFitData(start, end, t0, runData, histoNo);
+      break;
+    case kView:
+      status = PrepareViewData(start, end, t0, runData, histoNo);
+      break;
+    default:
+      status = false;
+      break;
+  }
+
+  return status;
+}
+
+//--------------------------------------------------------------------------
+// PrepareFitData
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param start
+ * \param end
+ * \param runData
+ * \param histoNo
+ */
+bool PRunSingleHisto::PrepareFitData(unsigned int start, unsigned int end, double t0,
+                                     PRawRunData* runData, unsigned int histoNo)
+{
   double value = 0.0;
+  // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
+  fData.fDataTimeStart = fTimeResolution*((double)fRunInfo->fPacking/2.0);
+  fData.fDataTimeStep  = fTimeResolution*fRunInfo->fPacking;
   for (unsigned i=start; i<end; i++) {
     if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
       // in order that after rebinning the fit does not need to be redone (important for plots)
       // the value is normalize to per bin
       value /= fRunInfo->fPacking;
-      // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-      fFitData.fTime.push_back(fTimeResolution*((double)i-(double)t0-(double)fRunInfo->fPacking));
-      fFitData.fValue.push_back(value);
+      fData.fValue.push_back(value);
       if (value == 0.0)
-        fFitData.fError.push_back(1.0);
+        fData.fError.push_back(1.0);
       else
-        fFitData.fError.push_back(TMath::Sqrt(value));
+        fData.fError.push_back(TMath::Sqrt(value));
       value = 0.0;
     }
     value += runData->fDataBin[histoNo][i];
@@ -378,35 +417,30 @@ bool PRunSingleHisto::PrepareData()
 
   // count the number of bins to be fitted
   fNoOfFitBins=0;
-  for (unsigned int i=0; i<fFitData.fValue.size(); i++) {
-    if ((fFitData.fTime[i] >= fFitStartTime) && (fFitData.fTime[i] <= fFitStopTime))
+  double time;
+  for (unsigned int i=0; i<fData.fValue.size(); i++) {
+    time = fData.fDataTimeStart + (double)i*fData.fDataTimeStep;
+    if ((time >= fFitStartTime) && (time <= fFitStopTime))
       fNoOfFitBins++;
   }
-
-  // fill the bin data set (used for plots and t0's search
-  start = (unsigned int)t0-fRunInfo->fPacking*((unsigned int)t0/fRunInfo->fPacking);
-  end   = (unsigned int)t0+fRunInfo->fPacking*((runData->fDataBin[histoNo].size()-1-(unsigned int)t0)/fRunInfo->fPacking);
-  value = 0.0;
-//cout << endl << ">> start = " << start << ", end = " << end << ", " << runData->fDataBin[histoNo].size();
-  for (unsigned i=start; i<end; i++) {
-    if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
-      // in order that after rebinning the fit does not need to be redone (important for plots)
-      // the value is normalize to per bin
-      value /= fRunInfo->fPacking;
-      // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-      fBinData.fTime.push_back(fTimeResolution*((double)i-(double)t0-(double)fRunInfo->fPacking));
-      fBinData.fValue.push_back(value);
-      if (value == 0.0)
-        fBinData.fError.push_back(1.0);
-      else
-        fBinData.fError.push_back(TMath::Sqrt(value));
-      value = 0.0;
-    }
-    value += runData->fDataBin[histoNo][i];
-  }
-//cout << endl << "fBinData.fValue.size() = " << fBinData.fValue.size();
 
   return true;
 }
 
-
+//--------------------------------------------------------------------------
+// PrepareViewData
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param start
+ * \param end
+ * \param runData
+ * \param histoNo
+ */
+bool PRunSingleHisto::PrepareViewData(unsigned int start, unsigned int end, double t0,
+                                      PRawRunData* runData, unsigned int histoNo)
+{
+  // to be implemented yet
+  return true;
+}
