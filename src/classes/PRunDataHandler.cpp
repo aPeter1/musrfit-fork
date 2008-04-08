@@ -478,9 +478,17 @@ bool PRunDataHandler::ReadNemuFile()
   bool    ok;
   int     groups = 0, channels = 0;
 
-  Ssiz_t idx;
+  // skip leading empty lines
   do {
     f.getline(instr, sizeof(instr));
+    line = TString(instr);
+    if (!line.IsWhitespace())
+      break;
+  } while (!f.eof());
+
+  // real header data should start here
+  Ssiz_t idx;
+  do {
     line = TString(instr);
     if (line.IsWhitespace()) { // end of header reached
       headerInfo = false;
@@ -532,7 +540,8 @@ bool PRunDataHandler::ReadNemuFile()
           runData.fTimeResolution = dval * 1000.0;
       }
     }
-  } while (headerInfo);
+    f.getline(instr, sizeof(instr));
+  } while (headerInfo && !f.eof());
 
   if ((groups == 0) || (channels == 0) || isnan(runData.fTimeResolution)) {
     cout << endl << "PRunDataHandler::ReadNemuFile(): essential header informations are missing!";
@@ -554,7 +563,6 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
   unsigned int group_counter = 0;
   int val[10];
   while (!f.eof()) {
-    f.getline(instr, sizeof(instr));
     // check if empty line, i.e. new group
     if (IsWhitespace(instr)) {
       runData.fDataBin.push_back(histoData);
@@ -577,6 +585,8 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
     // feed data
     for (int i=0; i<status; i++)
       histoData.push_back(val[i]);
+
+    f.getline(instr, sizeof(instr));
   }
 
   // save the last histo if not empty
