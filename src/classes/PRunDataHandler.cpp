@@ -52,11 +52,28 @@ using namespace std;
  * <p>
  *
  */
-PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo, const PStringVector dataPath) : fDataPath(dataPath)
+PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo) : fMsrInfo(msrInfo)
 {
 //  cout << endl << "in PRunDataHandler::PRunDataHandler()";
 
-  fMsrInfo = msrInfo;
+  // read files
+  if (!ReadFile()) // couldn't read file
+    fAllDataAvailable = false;
+  else
+    fAllDataAvailable = true;
+}
+
+//--------------------------------------------------------------------------
+// Constructor
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo, const PStringVector dataPath) : 
+      fMsrInfo(msrInfo), fDataPath(dataPath)
+{
+//  cout << endl << "in PRunDataHandler::PRunDataHandler()";
 
   // read files
   if (!ReadFile()) // couldn't read file

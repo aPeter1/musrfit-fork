@@ -64,9 +64,75 @@ PMusrCanvas::PMusrCanvas()
  *
  */
 PMusrCanvas::PMusrCanvas(const int number, const char* title,
+                         Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh) :
+                         fPlotNumber(number)
+{
+  InitMusrCanvas(title, wtopx, wtopy, ww, wh);
+}
+
+//--------------------------------------------------------------------------
+// Constructor
+//--------------------------------------------------------------------------
+/**
+ *
+ */
+PMusrCanvas::PMusrCanvas(const int number, const char* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
                          const PIntVector markerList, const PIntVector colorList) :
                          fPlotNumber(number), fMarkerList(markerList), fColorList(colorList)
+{
+  InitMusrCanvas(title, wtopx, wtopy, ww, wh);
+}
+
+//--------------------------------------------------------------------------
+// Destructor
+//--------------------------------------------------------------------------
+/**
+ *
+ */
+PMusrCanvas::~PMusrCanvas()
+{
+cout << "~PMusrCanvas() called" << endl;
+  // cleanup
+  if (fKeyboardHandlerText) {
+    delete fKeyboardHandlerText;
+    fKeyboardHandlerText = 0;
+  }
+  if (fTitlePad) {
+    delete fTitlePad;
+    fTitlePad = 0;
+  }
+  if (fDataTheoryPad) {
+    delete fDataTheoryPad;
+    fDataTheoryPad = 0;
+  }
+  if (fParameterTheoryPad) {
+    delete fParameterTheoryPad;
+    fParameterTheoryPad = 0;
+  }
+  if (fInfoPad) {
+    delete fInfoPad;
+    fInfoPad = 0;
+  }
+  if (fMainCanvas) {
+    delete fMainCanvas;
+    fMainCanvas = 0;
+  }
+}
+
+//--------------------------------------------------------------------------
+// InitMusrCanvas
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param title
+ * \param wtopx
+ * \param wtopy
+ * \param ww
+ * \param wh
+ */
+void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh)
 {
   fValid = false;
 
@@ -158,43 +224,6 @@ cout << canvasName.Data() << " = " << fMainCanvas << endl;
 // cout << "fParameterTheoryPad  " << fParameterTheoryPad << endl;
 // cout << "fInfoPad             " << fInfoPad << endl;
 // cout << "fKeyboardHandlerText " << fKeyboardHandlerText << endl;
-
-}
-
-//--------------------------------------------------------------------------
-// Destructor
-//--------------------------------------------------------------------------
-/**
- *
- */
-PMusrCanvas::~PMusrCanvas()
-{
-cout << "~PMusrCanvas() called" << endl;
-  // cleanup
-  if (fKeyboardHandlerText) {
-    delete fKeyboardHandlerText;
-    fKeyboardHandlerText = 0;
-  }
-  if (fTitlePad) {
-    delete fTitlePad;
-    fTitlePad = 0;
-  }
-  if (fDataTheoryPad) {
-    delete fDataTheoryPad;
-    fDataTheoryPad = 0;
-  }
-  if (fParameterTheoryPad) {
-    delete fParameterTheoryPad;
-    fParameterTheoryPad = 0;
-  }
-  if (fInfoPad) {
-    delete fInfoPad;
-    fInfoPad = 0;
-  }
-  if (fMainCanvas) {
-    delete fMainCanvas;
-    fMainCanvas = 0;
-  }
 }
 
 //--------------------------------------------------------------------------

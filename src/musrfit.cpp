@@ -527,7 +527,7 @@ int main(int argc, char *argv[])
   status = saxParser->ParseFile(startup_path_name);
   // check for parse errors
   if (status) { // error
-    cout << endl << "**ERROR** reading/parsing musrfit_startup.xml. Fix it.";
+    cout << endl << "**WARNING** reading/parsing musrfit_startup.xml.";
     cout << endl;
     // clean up
     if (saxParser) {
@@ -538,7 +538,6 @@ int main(int argc, char *argv[])
       delete startupHandler;
       startupHandler = 0;
     }
-    return PMUSR_WRONG_STARTUP_SYNTAX;
   }
 
   // read msr-file
@@ -547,12 +546,12 @@ int main(int argc, char *argv[])
   if (status != PMUSR_SUCCESS) {
     switch (status) {
       case PMUSR_MSR_FILE_NOT_FOUND:
-        cout << endl << "couldn't find " << argv[1] << endl << endl;
+        cout << endl << "**ERROR** couldn't find " << argv[1] << endl << endl;
         break;
       case PMUSR_MSR_SYNTAX_ERROR:
-        cout << endl << "syntax error in file " << argv[1] << ", full stop here." << endl << endl;
+        cout << endl << "**SYNTAX ERROR** in file " << argv[1] << ", full stop here." << endl << endl;
       default:
-        cout << endl << "unkown error when trying to read the msr-file" << endl << endl;
+        cout << endl << "**UNKOWN ERROR** when trying to read the msr-file" << endl << endl;
         break;
     }
     return status;
@@ -562,10 +561,15 @@ int main(int argc, char *argv[])
     musrfit_debug_info(msrHandler);
 
   // read all the necessary runs (raw data)
-  PRunDataHandler *dataHandler = new PRunDataHandler(msrHandler, startupHandler->GetDataPathList());
+  PRunDataHandler *dataHandler;
+  if (startupHandler)
+    dataHandler = new PRunDataHandler(msrHandler, startupHandler->GetDataPathList());
+  else
+    dataHandler = new PRunDataHandler(msrHandler);
+
   bool success = dataHandler->IsAllDataAvailable();
   if (!success) {
-    cout << endl << "Couldn't read all data files, will quit ..." << endl;
+    cout << endl << "**ERROR** Couldn't read all data files, will quit ..." << endl;
   }
 
   // generate the necessary fit histogramms for the fit
@@ -576,7 +580,7 @@ int main(int argc, char *argv[])
     for (unsigned int i=0; i < msrHandler->GetMsrRunList()->size(); i++) {
       success = runListCollection->Add(i, kFit);
       if (!success) {
-        cout << endl << "Couldn't handle run no " << i << " ";
+        cout << endl << "**ERROR** Couldn't handle run no " << i << " ";
         cout << (*msrHandler->GetMsrRunList())[i].fRunName.Data();
         break;
       }
@@ -598,13 +602,13 @@ int main(int argc, char *argv[])
     if (status != PMUSR_SUCCESS) {
       switch (status) {
         case PMUSR_MSR_LOG_FILE_WRITE_ERROR:
-          cout << endl << "couldn't write mlog-file" << endl << endl;
+          cout << endl << "**ERROR** couldn't write mlog-file" << endl << endl;
           break;
         case PMUSR_TOKENIZE_ERROR:
-          cout << endl << "couldn't generate mlog-file name" << endl << endl;
+          cout << endl << "**ERROR** couldn't generate mlog-file name" << endl << endl;
           break;
         default:
-          cout << endl << "unkown error when trying to write the mlog-file" << endl << endl;
+          cout << endl << "**UNKOWN ERROR** when trying to write the mlog-file" << endl << endl;
           break;
       }
     }

@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
   status = saxParser->ParseFile(startup_path_name);
   // check for parse errors
   if (status) { // error
-    cout << endl << "**ERROR** reading/parsing musrfit_startup.xml. Fix it.";
+    cout << endl << "**WARNING** reading/parsing musrfit_startup.xml.";
     cout << endl;
     // clean up
     if (saxParser) {
@@ -128,7 +128,6 @@ int main(int argc, char *argv[])
       delete startupHandler;
       startupHandler = 0;
     }
-    return PMUSR_WRONG_STARTUP_SYNTAX;
   }
 
   // read msr-file
@@ -149,7 +148,12 @@ int main(int argc, char *argv[])
   }
 
   // read all the necessary runs (raw data)
-  PRunDataHandler *dataHandler = new PRunDataHandler(msrHandler, startupHandler->GetDataPathList());
+  PRunDataHandler *dataHandler;
+  if (startupHandler)
+    dataHandler = new PRunDataHandler(msrHandler, startupHandler->GetDataPathList());
+  else
+    dataHandler = new PRunDataHandler(msrHandler);
+
   success = dataHandler->IsAllDataAvailable();
   if (!success) {
     cout << endl << "**ERROR** Couldn't read all data files, will quit ..." << endl;
@@ -180,10 +184,15 @@ int main(int argc, char *argv[])
     bool ok = true;
     for (unsigned int i=0; i<msrHandler->GetMsrPlotList()->size(); i++) {
 
-      musrCanvas = new PMusrCanvas(i, msrHandler->GetMsrTitle()->Data(), 
-                                   10+i*100, 10+i*100, 800, 600,
-                                   startupHandler->GetMarkerList(),
-                                   startupHandler->GetColorList());
+      if (startupHandler)
+        musrCanvas = new PMusrCanvas(i, msrHandler->GetMsrTitle()->Data(), 
+                                     10+i*100, 10+i*100, 800, 600,
+                                     startupHandler->GetMarkerList(),
+                                     startupHandler->GetColorList());
+      else
+        musrCanvas = new PMusrCanvas(i, msrHandler->GetMsrTitle()->Data(), 
+                                     10+i*100, 10+i*100, 800, 600);
+
       if (!musrCanvas->IsValid()) {
         cout << endl << "**SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
         cout << endl;

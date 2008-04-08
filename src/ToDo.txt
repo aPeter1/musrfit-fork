@@ -46,9 +46,7 @@ short term:
 
 * at the moment that startup handler is looked for in the directory where musrfit/musrview
   is executed, this is stupid. Define a place where to look for it.
-
-* check concept to get bin data for musrview on single histo (fBinData in PRunBase). 
-  If it is ok, implement it for the others.
+  **DONE** 08-04-08
 
 * do I need to cleanup AddText() objects from TPaveText etc myself? **CHECK**
 

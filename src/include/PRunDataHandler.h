@@ -43,6 +43,7 @@ using namespace std;
 class PRunDataHandler
 {
   public:
+    PRunDataHandler(PMsrHandler *msrInfo);
     PRunDataHandler(PMsrHandler *msrInfo, const PStringVector dataPath);
     virtual ~PRunDataHandler();
 

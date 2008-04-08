@@ -88,6 +88,8 @@ class PMusrCanvas : public TObject, public TQObject
   public:
     PMusrCanvas();
     PMusrCanvas(const int number, const char* title, 
+                Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh);
+    PMusrCanvas(const int number, const char* title, 
                 Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
                 const PIntVector markerList, const PIntVector colorList);
     virtual ~PMusrCanvas();
@@ -128,6 +130,7 @@ class PMusrCanvas : public TObject, public TQObject
     PIntVector fMarkerList;
     PIntVector fColorList;
 
+    virtual void InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh);
     virtual void InitDataSet(PMusrCanvasDataSet &dataSet);
     virtual void CleanupDataSet(PMusrCanvasDataSet &dataSet);
     virtual void HandleSingleHistoDataSet(unsigned int runNo, PRunData *data);
