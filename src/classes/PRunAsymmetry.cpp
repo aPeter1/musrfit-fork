@@ -609,7 +609,8 @@ bool PRunAsymmetry::PrepareFitData(PRawRunData* runData, unsigned int histoNo[2]
   double asym;
   double f, b, ef, eb;
   // fill data time start, and step
-  fData.fDataTimeStart = fTimeResolution*((double)fRunInfo->fPacking/2.0);
+  // data start at data_start-t0
+  fData.fDataTimeStart = fTimeResolution*(((double)start[0]-t0[0])+(double)fRunInfo->fPacking/2.0);
   fData.fDataTimeStep  = fTimeResolution*(double)fRunInfo->fPacking;
   for (unsigned int i=0; i<forwardPacked.fValue.size(); i++) {
     // to make the formulae more readable

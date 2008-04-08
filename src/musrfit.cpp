@@ -29,6 +29,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <iostream>
 #include <fstream>
 using namespace std;
@@ -503,11 +507,24 @@ int main(int argc, char *argv[])
     return PMUSR_WRONG_STARTUP_SYNTAX;
   }
 
+  // get default path (for the moment only linux like)
+  char *pmusrpath;
+  char musrpath[128];
+  pmusrpath = getenv("MUSRFITPATH");
+  if (pmusrpath == 0) { // not set, will try default one
+    strcpy(musrpath, "/home/nemu/analysis/bin");
+    cout << endl << "**WARNING** MUSRFITPATH environment variable not set will try " << musrpath << endl;
+  } else {
+    strncpy(musrpath, pmusrpath, sizeof(musrpath));
+  }
+
   // read startup file
+  char startup_path_name[128];
+  sprintf(startup_path_name, "%s/musrfit_startup.xml", musrpath);
   TSAXParser *saxParser = new TSAXParser();
   PStartupHandler *startupHandler = new PStartupHandler();
   saxParser->ConnectToHandler("PStartupHandler", startupHandler);
-  status = saxParser->ParseFile("musrfit_startup.xml");
+  status = saxParser->ParseFile(startup_path_name);
   // check for parse errors
   if (status) { // error
     cout << endl << "**ERROR** reading/parsing musrfit_startup.xml. Fix it.";

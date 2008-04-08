@@ -397,8 +397,9 @@ bool PRunSingleHisto::PrepareFitData(unsigned int start, unsigned int end, doubl
                                      PRawRunData* runData, unsigned int histoNo)
 {
   double value = 0.0;
+  // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.fDataTimeStart = fTimeResolution*((double)fRunInfo->fPacking/2.0);
+  fData.fDataTimeStart = fTimeResolution*(((double)start-t0)+(double)fRunInfo->fPacking/2.0);
   fData.fDataTimeStep  = fTimeResolution*fRunInfo->fPacking;
   for (unsigned i=start; i<end; i++) {
     if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
