@@ -339,9 +339,25 @@ bool PRunSingleHisto::PrepareData()
   // transform raw histo data. This is done the following way (for details see the manual):
   // for the single histo fit, just the rebinned raw data are copied
   // first get start data, end data, and t0
-  unsigned int start = fRunInfo->fDataRange[0];
-  unsigned int end   = fRunInfo->fDataRange[1];
+  unsigned int start;
+  unsigned int end;
   double       t0    = fT0s[0];
+  switch (fHandleTag) {
+    case kFit:
+      start = fRunInfo->fDataRange[0];
+      end   = fRunInfo->fDataRange[1];
+      break;
+    case kView:
+      // raw data, since PMusrCanvas is doing ranging etc.
+      // start = the first bin which is a multiple of packing backward from t0
+      start = (int)t0 - ((int)t0/fRunInfo->fPacking)*fRunInfo->fPacking;
+      // end = last bin starting from start which is a multipl of packing and still within the data 
+      end   = start + ((runData->fDataBin[histoNo].size()-start-1)/fRunInfo->fPacking)*fRunInfo->fPacking;
+      break;
+    default:
+      return false;
+      break;
+  }
   // check if start, end, and t0 make any sense
   // 1st check if start and end are in proper order
   if (end < start) { // need to swap them
@@ -366,36 +382,6 @@ bool PRunSingleHisto::PrepareData()
   }
 
   // everything looks fine, hence fill data set
-  bool status;
-  switch(fHandleTag) {
-    case kFit:
-      status = PrepareFitData(start, end, t0, runData, histoNo);
-      break;
-    case kView:
-      status = PrepareViewData(start, end, t0, runData, histoNo);
-      break;
-    default:
-      status = false;
-      break;
-  }
-
-  return status;
-}
-
-//--------------------------------------------------------------------------
-// PrepareFitData
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param start
- * \param end
- * \param runData
- * \param histoNo
- */
-bool PRunSingleHisto::PrepareFitData(unsigned int start, unsigned int end, double t0,
-                                     PRawRunData* runData, unsigned int histoNo)
-{
   double value = 0.0;
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
@@ -425,23 +411,5 @@ bool PRunSingleHisto::PrepareFitData(unsigned int start, unsigned int end, doubl
       fNoOfFitBins++;
   }
 
-  return true;
-}
-
-//--------------------------------------------------------------------------
-// PrepareViewData
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param start
- * \param end
- * \param runData
- * \param histoNo
- */
-bool PRunSingleHisto::PrepareViewData(unsigned int start, unsigned int end, double t0,
-                                      PRawRunData* runData, unsigned int histoNo)
-{
-  // to be implemented yet
   return true;
 }
