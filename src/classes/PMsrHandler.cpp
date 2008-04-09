@@ -75,6 +75,7 @@ PMsrHandler::PMsrHandler(char *fileName)
  */
 PMsrHandler::~PMsrHandler()
 {
+  fComments.clear();
   fParam.clear();
   fTheory.clear();
   fFunctions.clear();
@@ -133,8 +134,9 @@ int PMsrHandler::ReadMsrFile()
     current.fLineNo = line_no;
     current.fLine   = line;
 
-    // if the line is not a comment line nor an empty line do something
-    if (!line.IsWhitespace() && !line.BeginsWith("#")) {
+    if (line.BeginsWith("#")) { // if the line is not a comment line keep it
+      fComments.push_back(current);
+    } else if (!line.IsWhitespace()) { // if not an empty line, handle it
 
       // check for a msr block
       if (line_no == 1) { // title
@@ -229,6 +231,12 @@ int PMsrHandler::ReadMsrFile()
   plot.clear();
   statistic.clear();
 
+// cout << endl << "# Comments: ";
+// for (unsigned int i=0; i<fComments.size(); i++) {
+//   cout << endl << fComments[i].fLineNo << " " << fComments[i].fLine.Data();
+// }
+// cout << endl;
+
   return error;
 }
 
@@ -272,14 +280,19 @@ int PMsrHandler::WriteMsrLogFile()
 
   // write mlog-file
 
+  int lineNo = 1;
+
   // write title
   f << fTitle.Data();
-  f << endl << "###############################################################";
+  CheckAndWriteComment(f, ++lineNo);
+//  f << endl << "###############################################################";
 
   // write fit parameter block
   f << endl << "FITPARAMETER";
-  f << endl << "#      No Name        Value     Step        Pos_Error   Boundaries";
+  CheckAndWriteComment(f, ++lineNo);
+//  f << endl << "#      No Name        Value     Step        Pos_Error   Boundaries";
   f << endl;
+  CheckAndWriteComment(f, ++lineNo);
   PMsrParamList::iterator param_iter;
   for (param_iter = fParam.begin(); param_iter != fParam.end(); ++param_iter) {
     // parameter no
@@ -323,26 +336,32 @@ int PMsrHandler::WriteMsrLogFile()
     }
     // terminate line
     f << endl;
+    CheckAndWriteComment(f, ++lineNo);
   }
-  f << endl << "###############################################################";
+//  f << endl << "###############################################################";
 
   // write theory block
   PMsrLines::iterator theo_iter;
   for (theo_iter = fTheory.begin(); theo_iter != fTheory.end(); ++theo_iter) {
     f << endl << theo_iter->fLine.Data();
+    CheckAndWriteComment(f, ++lineNo);
   }
   f << endl;
-  f << endl << "###############################################################";
+  CheckAndWriteComment(f, ++lineNo);
+//  f << endl << "###############################################################";
 
   // write functions block
   f << endl << "FUNCTIONS";
+  CheckAndWriteComment(f, ++lineNo);
   for (int i=0; i<GetNoOfFuncs(); i++) {
     str = *fFuncHandler->GetFuncString(i);
     str.ToLower();
     f << endl << str.Data();
+    CheckAndWriteComment(f, ++lineNo);
   }
   f << endl;
-  f << endl << "###############################################################";
+  CheckAndWriteComment(f, ++lineNo);
+//  f << endl << "###############################################################";
 
   // write run block
   PMsrRunList::iterator run_iter;
@@ -358,6 +377,7 @@ int PMsrHandler::WriteMsrLogFile()
     str = run_iter->fFileFormat;
     str.ToUpper();
     f << str.Data() << "   (name beamline institute data-file-format)";
+    CheckAndWriteComment(f, ++lineNo);
     // fittype
     f.width(16);
     switch (run_iter->fFitType) {
@@ -376,12 +396,14 @@ int PMsrHandler::WriteMsrLogFile()
       default:
         break;
     }
+    CheckAndWriteComment(f, ++lineNo);
     // rrffrequency
     if (run_iter->fRRFFreq != -1.0) {
       f.width(16);
       f << endl << left << "rrffrequency";
       f.precision(prec);
       f << run_iter->fRRFFreq;
+      CheckAndWriteComment(f, ++lineNo);
     }
     // rrfpacking
     if (run_iter->fRRFPacking != -1) {
@@ -389,30 +411,35 @@ int PMsrHandler::WriteMsrLogFile()
       f << endl << left << "rrfpacking";
       f.precision(prec);
       f << run_iter->fRRFPacking;
+      CheckAndWriteComment(f, ++lineNo);
     }
     // alpha
     if (run_iter->fAlphaParamNo != -1) {
       f.width(16);
       f << endl << left << "alpha";
       f << run_iter->fAlphaParamNo;
+      CheckAndWriteComment(f, ++lineNo);
     }
     // beta
     if (run_iter->fBetaParamNo != -1) {
       f.width(16);
       f << endl << left << "beta";
       f << run_iter->fBetaParamNo;
+      CheckAndWriteComment(f, ++lineNo);
     }
     // alpha2
     if (run_iter->fAlpha2ParamNo != -1) {
       f.width(16);
       f << endl << left << "alpha2";
       f << run_iter->fAlpha2ParamNo;
+      CheckAndWriteComment(f, ++lineNo);
     }
     // beta2
     if (run_iter->fBeta2ParamNo != -1) {
       f.width(16);
       f << endl << left << "beta2";
       f << run_iter->fBeta2ParamNo;
+      CheckAndWriteComment(f, ++lineNo);
     }
     // norm
     if (run_iter->fNormParamNo != -1) {
@@ -423,28 +450,33 @@ int PMsrHandler::WriteMsrLogFile()
         f << "fun" << run_iter->fNormParamNo-MSR_PARAM_FUN_OFFSET;
       else
         f << run_iter->fNormParamNo;
+      CheckAndWriteComment(f, ++lineNo);
     }
     // backgr.fit
     if (run_iter->fBkgFitParamNo != -1) {
       f.width(16);
       f << endl << left << "backgr.fit";
       f << run_iter->fBkgFitParamNo;
+      CheckAndWriteComment(f, ++lineNo);
     }
     // rphase
     if (run_iter->fPhaseParamNo != -1) {
       f.width(16);
       f << endl << left << "rphase";
       f << run_iter->fPhaseParamNo;
+      CheckAndWriteComment(f, ++lineNo);
     }
     // lifetime
     if (run_iter->fLifetimeParamNo != -1) {
       f.width(16);
       f << endl << left << "lifetime";
       f << run_iter->fLifetimeParamNo;
+      CheckAndWriteComment(f, ++lineNo);
     }
     // lifetimecorrection
     if ((run_iter->fLifetimeCorrection) && (run_iter->fFitType == MSR_FITTYPE_SINGLE_HISTO)) {
       f << endl << "lifetimecorrection";
+      CheckAndWriteComment(f, ++lineNo);
     }
     // map
     PIntVector::iterator map_iter;
@@ -458,29 +490,34 @@ int PMsrHandler::WriteMsrLogFile()
       for (int i=run_iter->fMap.size(); i<10; i++)
         f << "    0";
     }
+    CheckAndWriteComment(f, ++lineNo);
     // forward
     if (run_iter->fForwardHistoNo != -1) {
       f.width(16);
       f << endl << left << "forward";
       f << run_iter->fForwardHistoNo;
+      CheckAndWriteComment(f, ++lineNo);
     }
     // backward
     if (run_iter->fBackwardHistoNo != -1) {
       f.width(16);
       f << endl << left << "backward";
       f << run_iter->fBackwardHistoNo;
+      CheckAndWriteComment(f, ++lineNo);
     }
     // right
     if (run_iter->fRightHistoNo != -1) {
       f.width(16);
       f << endl << left << "right";
       f << run_iter->fRightHistoNo;
+      CheckAndWriteComment(f, ++lineNo);
     }
     // left
     if (run_iter->fLeftHistoNo != -1) {
       f.width(16);
       f << endl << left << "left";
       f << run_iter->fLeftHistoNo;
+      CheckAndWriteComment(f, ++lineNo);
     }
     // backgr.fix
     if (!isnan(run_iter->fBkgFix[0])) {
@@ -491,6 +528,7 @@ int PMsrHandler::WriteMsrLogFile()
         f.width(12);
         f << left << run_iter->fBkgFix[i];
       }
+      CheckAndWriteComment(f, ++lineNo);
     }
     // background
     if (run_iter->fBkgRange[0] != -1) {
@@ -502,6 +540,7 @@ int PMsrHandler::WriteMsrLogFile()
         f.width(8);
         f << left << run_iter->fBkgRange[i];
       }
+      CheckAndWriteComment(f, ++lineNo);
     }
     // data
     if (run_iter->fDataRange[0] != -1) {
@@ -513,6 +552,7 @@ int PMsrHandler::WriteMsrLogFile()
         f.width(8);
         f << left << run_iter->fDataRange[i];
       }
+      CheckAndWriteComment(f, ++lineNo);
     }
     // t0
     if (run_iter->fT0[0] != -1) {
@@ -524,6 +564,7 @@ int PMsrHandler::WriteMsrLogFile()
         f.width(8);
         f << left << run_iter->fT0[i];
       }
+      CheckAndWriteComment(f, ++lineNo);
     }
     // fit
     if (run_iter->fFitRange[0] != -1) {
@@ -536,24 +577,30 @@ int PMsrHandler::WriteMsrLogFile()
         f.precision(2);
         f << left << fixed << run_iter->fFitRange[i];
       }
+      CheckAndWriteComment(f, ++lineNo);
     }
     // packing
     f.width(16);
     f << endl << left << "packing";
     f << run_iter->fPacking;
+    CheckAndWriteComment(f, ++lineNo);
     // run block done
     f << endl;
+    CheckAndWriteComment(f, ++lineNo);
   }
-  f << endl << "###############################################################";
+//  f << endl << "###############################################################";
 
   // write command block
   f << endl << "COMMANDS";
+  CheckAndWriteComment(f, ++lineNo);
   PMsrLines::iterator cmd_iter;
   for (cmd_iter = fCommands.begin(); cmd_iter != fCommands.end(); ++cmd_iter) {
     f << endl << cmd_iter->fLine.Data();
+    CheckAndWriteComment(f, ++lineNo);
   }
   f << endl;
-  f << endl << "###############################################################";
+  CheckAndWriteComment(f, ++lineNo);
+//  f << endl << "###############################################################";
 
   // write plot block
   PMsrPlotList::iterator plot_iter;
@@ -575,6 +622,7 @@ int PMsrHandler::WriteMsrLogFile()
       default:
         break;
     }
+    CheckAndWriteComment(f, ++lineNo);
     // runs
     f << endl << "runs     ";
     f.precision(0);
@@ -587,6 +635,7 @@ int PMsrHandler::WriteMsrLogFile()
         f << r_it->Re() << "," << r_it->Im() << "    ";
       }
     }
+    CheckAndWriteComment(f, ++lineNo);
     // range
     f << endl << "range    ";
     f.precision(2);
@@ -594,13 +643,16 @@ int PMsrHandler::WriteMsrLogFile()
     if (plot_iter->fYmin != -999.0) {
       f << "   " << plot_iter->fYmin << "   " << plot_iter->fYmax;
     }
+    CheckAndWriteComment(f, ++lineNo);
     f << endl;
+    CheckAndWriteComment(f, ++lineNo);
   }
-  f << endl << "###############################################################";
+//  f << endl << "###############################################################";
 
   // write statistic block
   TDatime dt;
   f << endl << "STATISTIC --- " << dt.AsSQLString();
+  CheckAndWriteComment(f, ++lineNo);
   // if fMin and fNdf are given, make new statistic block
   if ((fStatistic.fMin != -1.0) && (fStatistic.fNdf != 0)) {
     // throw away the old statistics block
@@ -628,9 +680,11 @@ int PMsrHandler::WriteMsrLogFile()
   PMsrLines::iterator stat_iter;
   for (stat_iter = fStatistic.fStatLines.begin(); stat_iter != fStatistic.fStatLines.end(); ++stat_iter) {
     f << endl << stat_iter->fLine.Data();
+    CheckAndWriteComment(f, ++lineNo);
   }
   f << endl;
-  f << endl << "###############################################################";
+    CheckAndWriteComment(f, ++lineNo);
+//  f << endl << "###############################################################";
 
 
   // close mlog-file
@@ -2223,6 +2277,31 @@ bool PMsrHandler::CheckUniquenessOfParamNames(unsigned int &parX, unsigned int &
   }
 
   return unique;
+}
+
+//--------------------------------------------------------------------------
+// CheckAndWriteComment
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param f
+ * \param lineNo
+ */
+void PMsrHandler::CheckAndWriteComment(ofstream &f, int &lineNo)
+{
+  unsigned int i;
+
+  // check if lineNo is present
+  for (i=0; i<fComments.size(); i++) {
+    if (fComments[i].fLineNo == lineNo)
+      break;
+  }
+
+  if (i<fComments.size()) {
+    f << endl << fComments[i].fLine.Data();
+    CheckAndWriteComment(f, ++lineNo);
+  }
 }
 
 // end ---------------------------------------------------------------------

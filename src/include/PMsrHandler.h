@@ -85,7 +85,8 @@ class PMsrHandler
     virtual bool CheckUniquenessOfParamNames(unsigned int &parX, unsigned int &parY);
 
   private:
-    TString                fFileName;
+    PMsrLines              fComments;  ///< holds the comments of the msr-file
+    TString                fFileName;  ///< file name of the msr-file
     TString                fTitle;     ///< holds the title string of the msr-file
     PMsrParamList          fParam;     ///< holds a list of the fit parameters
     PMsrLines              fTheory;    ///< holds the theory definition
@@ -108,6 +109,8 @@ class PMsrHandler
     virtual bool HandleCommandsEntry(PMsrLines &line);
     virtual bool HandlePlotEntry(PMsrLines &line);
     virtual bool HandleStatisticEntry(PMsrLines &line);
+
+    virtual void CheckAndWriteComment(ofstream &f, int &lineNo);
 
     virtual void FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLines &run);
 
