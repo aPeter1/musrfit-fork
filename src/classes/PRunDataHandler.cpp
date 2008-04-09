@@ -31,6 +31,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 using namespace std;
 
 #include <TROOT.h>
@@ -43,6 +44,7 @@ using namespace std;
 #include <TH1F.h>
 
 #include "TLemRunHeader.h"
+#include "MuSR_td_PSI_bin.h"
 #include "PRunDataHandler.h"
 
 //--------------------------------------------------------------------------
@@ -420,6 +422,11 @@ bool PRunDataHandler::ReadRootFile()
   // add run to the run list
   fData.push_back(runData);
 
+  // clean up
+  for (unsigned int i=0; i<runData.fDataBin.size(); i++)
+    runData.fDataBin[i].clear();
+  runData.fDataBin.clear();
+
   return true;
 }
 
@@ -628,6 +635,11 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
   // add run to the run list
   fData.push_back(runData);
 
+  // clean up
+  for (unsigned int i=0; i<runData.fDataBin.size(); i++)
+    runData.fDataBin[i].clear();
+  runData.fDataBin.clear();
+
   return true;
 }
 
@@ -640,8 +652,104 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
  */
 bool PRunDataHandler::ReadPsiBinFile()
 {
-  cout << endl << "PRunDataHandler::ReadPsiBinFile(): Sorry, not yet implemented ...";
-  return false;
+//  cout << endl << "PRunDataHandler::ReadPsiBinFile(): Sorry, not yet implemented ...";
+
+  MuSR_td_PSI_bin psiBin;
+  int status;
+  bool success;
+
+  // read psi bin file
+  status = psiBin.read(fRunPathName.Data());
+  switch (status) {
+    case 0: // everything perfect
+      success = true;
+      break;
+    case 1: // couldn't open file, or failed while reading the header
+      cout << endl << "**ERROR** couldn't open psibin file, or failed while reading the header";
+      cout << endl;
+      success = false;
+      break;
+    case 2: // unsupported version of the data
+      cout << endl << "**ERROR** psibin file: unsupported version of the data";
+      cout << endl;
+      success = false;
+      break;
+    case 3: // error when allocating data buffer
+      cout << endl << "**ERROR** psibin file: error when allocating data buffer";
+      cout << endl;
+      success = false;
+      break;
+    case 4: // number of histograms/record not equals 1
+      cout << endl << "**ERROR** psibin file: number of histograms/record not equals 1";
+      cout << endl;
+      success = false;
+      break;
+    default: // you never should have reached this point
+      success = false;
+      break;
+  }
+
+  // if any reading error happend, get out of here
+  if (!success)
+    return success;
+
+cout << endl << "> " << psiBin.get_numberHisto_int() << ": ";
+for (int i=0; i<psiBin.get_numberHisto_int(); i++)
+  cout << endl << "> " << psiBin.get_nameHisto(i);
+cout << endl;
+
+  // fill necessary header informations
+  PIntVector ivec;
+  PRawRunData runData;
+  double dval;
+  // keep run name
+  runData.fRunName = fRunName;
+  // get run title
+  runData.fRunTitle = TString(psiBin.get_comment().c_str()); // run title
+  // get setup
+  runData.fSetup = TString("");
+  // get field
+  status = sscanf(psiBin.get_field().c_str(), "%lfG", &dval);
+  if (status == 1)
+    runData.fField = dval;
+  // get temperature
+  status = sscanf(psiBin.get_temp().c_str(), "%lfK", &dval);
+  if (status == 1)
+    runData.fTemp = dval;
+  // get time resolution (ns)
+  runData.fTimeResolution = psiBin.get_binWidth_ns();
+  // get t0's
+  ivec = psiBin.get_t0_vector();
+  if (ivec.empty()) {
+    cout << endl << "**ERROR** psibin file: couldn't obtain any t0's";
+    cout << endl;
+    return false;
+  }
+  for (unsigned int i=0; i<ivec.size(); i++)
+    runData.fT0s.push_back((double)ivec[i]);
+
+  // fill raw data
+  PDoubleVector histoData;
+  int *histo;
+  for (int i=0; i<psiBin.get_numberHisto_int(); i++) {
+    histo = psiBin.get_histo_array_int(i);
+    for (int j=0; j<psiBin.get_histoLength_bin(); j++) {
+      histoData.push_back(histo[j]);
+    }
+    runData.fDataBin.push_back(histoData);
+    histoData.clear();
+  }
+
+  // add run to the run list
+  fData.push_back(runData);
+
+  // clean up
+  runData.fT0s.clear();
+  for (unsigned int i=0; i<runData.fDataBin.size(); i++)
+    runData.fDataBin[i].clear();
+  runData.fDataBin.clear();
+
+  return success;
 }
 
 //--------------------------------------------------------------------------

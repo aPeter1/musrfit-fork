@@ -42,9 +42,9 @@ void skewedGaussian()
   char fln[256];
 
   const Double_t w  = 1.0;   // weight of the skewed Gaussian
-  const Double_t B0 = 100.0; // skewed Gaussian B0 (G)
+  const Double_t B0 = 2500.0; // skewed Gaussian B0 (G)
   const Double_t sm = 4.5;   // skewed Gaussian sigma- (G)
-  const Double_t sp = 4.5;  // skewed Gaussian sigma+ (G)
+  const Double_t sp = 4.5;   // skewed Gaussian sigma+ (G)
 
   const Double_t B0ext = 110.0; // external field Gaussian B0 (G)
   const Double_t sext  = 1.2;   // external field Gaussian sigma (G)

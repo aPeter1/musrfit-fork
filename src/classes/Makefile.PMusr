@@ -44,7 +44,8 @@ CXXFLAGS      = -g -Wall -Wno-trigraphs -fPIC
 PMUSRPATH     = ../include
 MNPATH        = $(ROOTSYS)/include
 GSLPATH       = /usr/include/gsl
-INCLUDES      = -I $(PMUSRPATH) -I $(MNPATH) -I $(GSLPATH)
+PSIBINPATH    = ../external/MuSR_software/Class_MuSR_PSI
+INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(GSLPATH) -I$(PSIBINPATH)
 LD            = g++
 LDFLAGS       = -g
 SOFLAGS       = -O -shared
@@ -94,6 +95,9 @@ OBJS += PFitterFcn.o
 OBJS += PFitter.o
 OBJS += PMusrCanvas.o PMusrCanvasDict.o
 
+EXTOBJS  =
+EXTOBJS += MuSR_td_PSI_bin.o
+
 SHLIB = libPMusr.so
 
 # make the shared lib:
@@ -103,7 +107,7 @@ all:  $(SHLIB)
 $(SHLIB): $(OBJS)
 	@echo "---> Building shared library $(SHLIB) ..."
 	/bin/rm -f $(SHLIB)
-	$(LD) $(OBJS) $(SOFLAGS) -o $(SHLIB) $(GLIBS) $(PSILIBS) $(MNLIB) $(GSLLIB)
+	$(LD) $(OBJS) $(EXTOBJS) $(SOFLAGS) -o $(SHLIB) $(GLIBS) $(PSILIBS) $(MNLIB) $(GSLLIB)
 	@echo "done"
 
 # clean up: remove all object file (and core files)
@@ -116,6 +120,9 @@ clean:; 	@rm -f $(OBJS) *Dict* core*
 #
 $(OBJS): %.o: %.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
+
+MuSR_td_PSI_bin.o: ../external/MuSR_software/Class_MuSR_PSI/MuSR_td_PSI_bin.cpp
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -c ../external/MuSR_software/Class_MuSR_PSI/MuSR_td_PSI_bin.cpp
 
 PStartupHandlerDict.cpp: ../include/PStartupHandler.h
 	@echo "Generating dictionary $@..."
