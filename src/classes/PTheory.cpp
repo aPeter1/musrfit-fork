@@ -950,7 +950,7 @@ double PTheory::Abragam(register double t, const vector<double>& paramValues, co
  */
 double PTheory::InternalField(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
 {
-  double val[4];
+  double val[4]; // phase, freq, transversal rate, longitudinal rate
 
   // check if FUNCTIONS are used
   for (unsigned int i=0; i<4; i++) {
@@ -962,7 +962,7 @@ double PTheory::InternalField(register double t, const vector<double>& paramValu
   }
 
   return 0.666666666666667*
-                 TMath::Cos(DEG_TO_RAD*val[0])+TWO_PI*val[1]*
+                 TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1])*
                  TMath::Exp(-val[2]*t) +
          0.333333333333333*TMath::Exp(-val[3]*t);
 }
