@@ -33,6 +33,7 @@
 using namespace std;
 
 #include <TColor.h>
+#include <TRandom.h>
 
 #include "PMusrCanvas.h"
 
@@ -118,6 +119,11 @@ cout << "~PMusrCanvas() called" << endl;
     delete fMainCanvas;
     fMainCanvas = 0;
   }
+  if (fData.size() > 0) {
+    for (unsigned int i=0; i<fData.size(); i++)
+      CleanupDataSet(fData[i]);
+    fData.clear();
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -168,7 +174,7 @@ cout << canvasName.Data() << " = " << fMainCanvas << endl;
   fTitlePad->Draw();
 
   // data/theory pad
-  fDataTheoryPad = new TPad("dataTheoryPad", "dataTheoryPad", 0.0, YINFO, XTHEO, YTITLE);
+  fDataTheoryPad = new TPad("dataTheoryCanvas", "dataTheoryCanvas", 0.0, YINFO, XTHEO, YTITLE);
   if (fDataTheoryPad == 0) {
     cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fDataTheoryPad";
     cout << endl;
@@ -409,6 +415,7 @@ cout << endl;
   for (unsigned int i=0; i<plotInfo.fRuns.size(); i++) {
     // get run data and create a histogram
     data = 0;
+    runNo = (unsigned int)plotInfo.fRuns[i].Re()-1;
     // get data depending on the fittype
     switch (runs[runNo].fFitType) {
       case MSR_FITTYPE_SINGLE_HISTO:
@@ -421,6 +428,7 @@ cout << endl;
           return;
         }
         // handle data
+        HandleSingleHistoDataSet(runNo, data);
         break;
       case MSR_FITTYPE_ASYM:
         data = fRunList->GetAsymmetry(runNo, PRunListCollection::kRunNo);
@@ -432,6 +440,7 @@ cout << endl;
           return;
         }
         // handle data
+        HandleAsymmetryDataSet(runNo, data);
         break;
       case MSR_FITTYPE_ASYM_RRF:
         data = fRunList->GetRRF(runNo, PRunListCollection::kRunNo);
@@ -443,6 +452,7 @@ cout << endl;
           return;
         }
         // handle data
+        HandleRRFDataSet(runNo, data);
         break;
       case MSR_FITTYPE_NO_MUSR:
         data = fRunList->GetNonMusr(runNo, PRunListCollection::kRunNo);
@@ -454,6 +464,7 @@ cout << endl;
           return;
         }
         // handle data
+        HandleNoneMusrDataSet(runNo, data);
         break;
       default:
         fValid = false;
@@ -463,9 +474,27 @@ cout << endl;
         return;
         break;
     }
-    // get theory object and calculate a theory histogram
-    // generate the histo plot
   }
+
+  // generate the histo plot
+  fDataTheoryPad->cd();
+  if (fData.size() > 0) {
+    fData[0].data->Draw("pe1");
+    // set time range
+    Double_t xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin;
+    Double_t xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax;
+    fData[0].data->GetXaxis()->SetRangeUser(xmin, xmax);
+    // check if it is necessary to set the y-axis range
+    // plot all remaining data
+    for (unsigned int i=1; i<fData.size(); i++) {
+      fData[i].data->Draw("pe1same");
+    }
+    // plot all the theory
+    for (unsigned int i=0; i<fData.size(); i++) {
+      fData[i].theory->Draw("csame");
+    }
+  }
+  fMainCanvas->cd();
 }
 
 //--------------------------------------------------------------------------
@@ -627,6 +656,97 @@ void PMusrCanvas::CleanupDataSet(PMusrCanvasDataSet &dataSet)
  */
 void PMusrCanvas::HandleSingleHistoDataSet(unsigned int runNo, PRunData *data)
 {
+  PMusrCanvasDataSet dataSet;
+  TH1F *dataHisto;
+  TH1F *theoHisto;
+
+  TString name;
+  double start;
+  double end;
+
+   InitDataSet(dataSet);
+
+  // dataHisto -------------------------------------------------------------
+  // create histo specific infos
+  name  = fMsrHandler->GetMsrRunList()->at(runNo).fRunName + "_DataRunNo";
+  name += (int)runNo;
+  start = data->fDataTimeStart;
+  end   = data->fDataTimeStart + (data->fValue.size()-1)*data->fDataTimeStep;
+
+  // invoke histo
+  dataHisto = new TH1F(name, name, data->fValue.size(), start, end);
+
+  // check if lifetimecorrection is set
+  if (fMsrHandler->GetMsrRunList()->at(runNo).fLifetimeCorrection) {
+    // get background
+    // get lifetime
+    // fill histogram
+  } else { // no lifetimecorrection
+    // fill histogram
+    int pack = fMsrHandler->GetMsrRunList()->at(runNo).fPacking;
+    for (unsigned int i=0; i<data->fValue.size(); i++) {
+      dataHisto->SetBinContent(i, pack*data->fValue[i]);
+      dataHisto->SetBinError(i, TMath::Sqrt(pack)*data->fError[i]);
+    }
+  }
+
+  // set marker and line color
+  if (runNo < fColorList.size()) {
+    dataHisto->SetMarkerColor(fColorList[runNo]);
+    dataHisto->SetLineColor(fColorList[runNo]);
+  } else {
+    TRandom rand(runNo);
+    Int_t color = TColor::GetColor((Int_t)rand.Integer(255), (Int_t)rand.Integer(255), (Int_t)rand.Integer(255));
+    dataHisto->SetMarkerColor(color);
+    dataHisto->SetLineColor(color);
+  }
+  // set marker size
+  dataHisto->SetMarkerSize(1);
+  // set marker type
+  if (runNo < fMarkerList.size()) {
+    dataHisto->SetMarkerStyle(fMarkerList[runNo]);
+  } else {
+    TRandom rand(runNo);
+    dataHisto->SetMarkerStyle(20+(Int_t)rand.Integer(10));
+  }
+
+  // theoHisto -------------------------------------------------------------
+  // create histo specific infos
+  name  = fMsrHandler->GetMsrRunList()->at(runNo).fRunName + "_TheoRunNo";
+  name += (int)runNo;
+  start = data->fTheoryTimeStart;
+  end   = data->fTheoryTimeStart + (data->fTheory.size()-1)*data->fTheoryTimeStep;
+
+  // invoke histo
+  theoHisto = new TH1F(name, name, data->fTheory.size(), start, end);
+
+  // check if lifetimecorrection is set
+  if (fMsrHandler->GetMsrRunList()->at(runNo).fLifetimeCorrection) {
+    // get background
+    // get lifetime
+    // fill histogram
+  } else { // no lifetimecorrection
+    // fill histogram
+    int pack = fMsrHandler->GetMsrRunList()->at(runNo).fPacking;
+    for (unsigned int i=0; i<data->fValue.size(); i++) {
+      theoHisto->SetBinContent(i, pack*data->fTheory[i]);
+    }
+  }
+
+  // set the line color
+  if (runNo < fColorList.size()) {
+    theoHisto->SetLineColor(fColorList[runNo]);
+  } else {
+    TRandom rand(runNo);
+    Int_t color = TColor::GetColor((Int_t)rand.Integer(255), (Int_t)rand.Integer(255), (Int_t)rand.Integer(255));
+    theoHisto->SetLineColor(color);
+  }
+
+  // fill handler list -----------------------------------------------------
+  dataSet.data   = dataHisto;
+  dataSet.theory = theoHisto;
+
+  fData.push_back(dataSet);
 }
 
 //--------------------------------------------------------------------------

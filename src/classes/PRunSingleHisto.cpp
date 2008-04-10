@@ -411,5 +411,30 @@ bool PRunSingleHisto::PrepareData()
       fNoOfFitBins++;
   }
 
+  // fill theory vector for kView
+  if (kView) {
+    // feed the parameter vector
+    std::vector<double> par;
+    PMsrParamList *paramList = fMsrInfo->GetMsrParamList();
+    for (unsigned int i=0; i<paramList->size(); i++)
+      par.push_back((*paramList)[i].fValue);
+
+
+    fData.fTheoryTimeStart = -t0*fTimeResolution;
+    fData.fTheoryTimeStep  = fTimeResolution;
+    for (unsigned int i=0; i<runData->fDataBin[histoNo].size(); i++) {
+      if ((int)i-(int)t0 < 0) {
+        fData.fTheory.push_back(0.0);
+      } else {
+        time  = fData.fTheoryTimeStart + i*fTimeResolution;
+        value = fTheory->Func(time, par, fFuncValues);
+        fData.fTheory.push_back(value);
+      }
+    }
+
+    // clean up
+    par.clear();
+  }
+
   return true;
 }

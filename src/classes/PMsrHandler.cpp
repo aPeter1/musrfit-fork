@@ -136,8 +136,10 @@ int PMsrHandler::ReadMsrFile()
 
     if (line.BeginsWith("#")) { // if the line is not a comment line keep it
       fComments.push_back(current);
-    } else if (!line.IsWhitespace()) { // if not an empty line, handle it
+      continue;
+    }
 
+    if (!line.IsWhitespace()) { // if not an empty line, handle it
       // check for a msr block
       if (line_no == 1) { // title
         fTitle = line;
@@ -1502,7 +1504,7 @@ void PMsrHandler::InitRunParameterStructure(PMsrRunStructure &param)
   param.fBkgFitParamNo   = -1;
   param.fPhaseParamNo    = -1;
   param.fLifetimeParamNo = -1;
-  param.fLifetimeCorrection = true;
+  param.fLifetimeCorrection = false;
   param.fMap.clear(); // empty list
   param.fForwardHistoNo  = -1;
   param.fBackwardHistoNo = -1;
