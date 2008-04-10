@@ -962,7 +962,7 @@ double PTheory::InternalField(register double t, const vector<double>& paramValu
   }
 
   return 0.666666666666667*
-                 TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1])*
+                 TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t)*
                  TMath::Exp(-val[2]*t) +
          0.333333333333333*TMath::Exp(-val[3]*t);
 }
