@@ -289,56 +289,55 @@ int PMsrHandler::WriteMsrLogFile()
   f << endl << "FITPARAMETER";
   CheckAndWriteComment(f, ++lineNo);
   f << endl;
-  PMsrParamList::iterator param_iter;
-  for (param_iter = fParam.begin(); param_iter != fParam.end(); ++param_iter) {
+  for (unsigned int i=0; i<fParam.size(); i++) {
     // parameter no
     f.width(9);
-    f << right << param_iter->fNo;
+    f << right << fParam[i].fNo;
     f << " ";
     // parameter name
     f.width(11);
-    f << left << param_iter->fName.Data();
+    f << left << fParam[i].fName.Data();
     f << " ";
     // value of the parameter
     f.width(9);
     f.precision(prec);
-    f << left << param_iter->fValue;
+    f << left << fParam[i].fValue;
     f << " ";
     // value of step/error/neg.error
     f.width(11);
     f.precision(prec);
-    f << left << param_iter->fStep;
+    f << left << fParam[i].fStep;
     f << " ";
     f.width(11);
     f.precision(prec);
-    if ((param_iter->fNoOfParams == 5) || (param_iter->fNoOfParams == 7)) // pos. error given
-      if (param_iter->fPosErrorPresent) // pos error is a number
-        f << left << param_iter->fPosError;
+    if ((fParam[i].fNoOfParams == 5) || (fParam[i].fNoOfParams == 7)) // pos. error given
+      if (fParam[i].fPosErrorPresent) // pos error is a number
+        f << left << fParam[i].fPosError;
       else // pos error is a none
         f << left << "none";
     else // no pos. error
       f << left << "none";
     f << " ";
     // boundaries
-    if (param_iter->fNoOfParams > 5) {
+    if (fParam[i].fNoOfParams > 5) {
       f.width(7);
       f.precision(prec);
-      f << left << param_iter->fLowerBoundary;
+      f << left << fParam[i].fLowerBoundary;
       f << " ";
       f.width(7);
       f.precision(prec);
-      f << left << param_iter->fUpperBoundary;
+      f << left << fParam[i].fUpperBoundary;
       f << " ";
     }
-    // terminate parameter line
-    f << endl;
+    // terminate parameter line if not the last line
+    if (i != fParam.size()-1)
+      f << endl;
     CheckAndWriteComment(f, ++lineNo);
   }
 
   // write theory block
-  PMsrLines::iterator theo_iter;
-  for (theo_iter = fTheory.begin(); theo_iter != fTheory.end(); ++theo_iter) {
-    f << endl << theo_iter->fLine.Data();
+  for (unsigned int i=0; i<fTheory.size(); i++) {
+    f << endl << fTheory[i].fLine.Data();
     CheckAndWriteComment(f, ++lineNo);
   }
 
@@ -353,23 +352,22 @@ int PMsrHandler::WriteMsrLogFile()
   }
 
   // write run block
-  PMsrRunList::iterator run_iter;
-  for (run_iter = fRuns.begin(); run_iter != fRuns.end(); ++run_iter) {
+  for (unsigned int i=0; i<fRuns.size(); i++) {
     // run header
-    f << endl << "RUN " << run_iter->fRunName.Data() << " ";
-    str = run_iter->fBeamline;
+    f << endl << "RUN " << fRuns[i].fRunName.Data() << " ";
+    str = fRuns[i].fBeamline;
     str.ToUpper();
     f << str.Data() << " ";
-    str = run_iter->fInstitute;
+    str = fRuns[i].fInstitute;
     str.ToUpper();
     f << str.Data() << " ";
-    str = run_iter->fFileFormat;
+    str = fRuns[i].fFileFormat;
     str.ToUpper();
     f << str.Data() << "   (name beamline institute data-file-format)";
     CheckAndWriteComment(f, ++lineNo);
     // fittype
     f.width(16);
-    switch (run_iter->fFitType) {
+    switch (fRuns[i].fFitType) {
       case MSR_FITTYPE_SINGLE_HISTO:
         f << endl << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)";
         break;
@@ -387,219 +385,216 @@ int PMsrHandler::WriteMsrLogFile()
     }
     CheckAndWriteComment(f, ++lineNo);
     // rrffrequency
-    if (run_iter->fRRFFreq != -1.0) {
+    if (fRuns[i].fRRFFreq != -1.0) {
       f.width(16);
       f << endl << left << "rrffrequency";
       f.precision(prec);
-      f << run_iter->fRRFFreq;
+      f << fRuns[i].fRRFFreq;
       CheckAndWriteComment(f, ++lineNo);
     }
     // rrfpacking
-    if (run_iter->fRRFPacking != -1) {
+    if (fRuns[i].fRRFPacking != -1) {
       f.width(16);
       f << endl << left << "rrfpacking";
       f.precision(prec);
-      f << run_iter->fRRFPacking;
+      f << fRuns[i].fRRFPacking;
       CheckAndWriteComment(f, ++lineNo);
     }
     // alpha
-    if (run_iter->fAlphaParamNo != -1) {
+    if (fRuns[i].fAlphaParamNo != -1) {
       f.width(16);
       f << endl << left << "alpha";
-      f << run_iter->fAlphaParamNo;
+      f << fRuns[i].fAlphaParamNo;
       CheckAndWriteComment(f, ++lineNo);
     }
     // beta
-    if (run_iter->fBetaParamNo != -1) {
+    if (fRuns[i].fBetaParamNo != -1) {
       f.width(16);
       f << endl << left << "beta";
-      f << run_iter->fBetaParamNo;
+      f << fRuns[i].fBetaParamNo;
       CheckAndWriteComment(f, ++lineNo);
     }
     // alpha2
-    if (run_iter->fAlpha2ParamNo != -1) {
+    if (fRuns[i].fAlpha2ParamNo != -1) {
       f.width(16);
       f << endl << left << "alpha2";
-      f << run_iter->fAlpha2ParamNo;
+      f << fRuns[i].fAlpha2ParamNo;
       CheckAndWriteComment(f, ++lineNo);
     }
     // beta2
-    if (run_iter->fBeta2ParamNo != -1) {
+    if (fRuns[i].fBeta2ParamNo != -1) {
       f.width(16);
       f << endl << left << "beta2";
-      f << run_iter->fBeta2ParamNo;
+      f << fRuns[i].fBeta2ParamNo;
       CheckAndWriteComment(f, ++lineNo);
     }
     // norm
-    if (run_iter->fNormParamNo != -1) {
+    if (fRuns[i].fNormParamNo != -1) {
       f.width(16);
       f << endl << left << "norm";
       // check if norm is give as a function
-      if (run_iter->fNormParamNo >= MSR_PARAM_FUN_OFFSET)
-        f << "fun" << run_iter->fNormParamNo-MSR_PARAM_FUN_OFFSET;
+      if (fRuns[i].fNormParamNo >= MSR_PARAM_FUN_OFFSET)
+        f << "fun" << fRuns[i].fNormParamNo-MSR_PARAM_FUN_OFFSET;
       else
-        f << run_iter->fNormParamNo;
+        f << fRuns[i].fNormParamNo;
       CheckAndWriteComment(f, ++lineNo);
     }
     // backgr.fit
-    if (run_iter->fBkgFitParamNo != -1) {
+    if (fRuns[i].fBkgFitParamNo != -1) {
       f.width(16);
       f << endl << left << "backgr.fit";
-      f << run_iter->fBkgFitParamNo;
+      f << fRuns[i].fBkgFitParamNo;
       CheckAndWriteComment(f, ++lineNo);
     }
     // rphase
-    if (run_iter->fPhaseParamNo != -1) {
+    if (fRuns[i].fPhaseParamNo != -1) {
       f.width(16);
       f << endl << left << "rphase";
-      f << run_iter->fPhaseParamNo;
+      f << fRuns[i].fPhaseParamNo;
       CheckAndWriteComment(f, ++lineNo);
     }
     // lifetime
-    if (run_iter->fLifetimeParamNo != -1) {
+    if (fRuns[i].fLifetimeParamNo != -1) {
       f.width(16);
       f << endl << left << "lifetime";
-      f << run_iter->fLifetimeParamNo;
+      f << fRuns[i].fLifetimeParamNo;
       CheckAndWriteComment(f, ++lineNo);
     }
     // lifetimecorrection
-    if ((run_iter->fLifetimeCorrection) && (run_iter->fFitType == MSR_FITTYPE_SINGLE_HISTO)) {
+    if ((fRuns[i].fLifetimeCorrection) && (fRuns[i].fFitType == MSR_FITTYPE_SINGLE_HISTO)) {
       f << endl << "lifetimecorrection";
       CheckAndWriteComment(f, ++lineNo);
     }
     // map
-    PIntVector::iterator map_iter;
     f << endl << "map         ";
-    for (map_iter = run_iter->fMap.begin(); map_iter != run_iter->fMap.end(); ++map_iter) {
+    for (unsigned int j=0; j>fRuns[i].fMap.size(); j++) {
       f.width(5);
-      f << right << *map_iter;
+      f << right << fRuns[i].fMap[j];
     }
     // if there are less maps then 10 fill with zeros
-    if (run_iter->fMap.size() < 10) {
-      for (int i=run_iter->fMap.size(); i<10; i++)
+    if (fRuns[i].fMap.size() < 10) {
+      for (int j=fRuns[i].fMap.size(); j<10; j++)
         f << "    0";
     }
     CheckAndWriteComment(f, ++lineNo);
     // forward
-    if (run_iter->fForwardHistoNo != -1) {
+    if (fRuns[i].fForwardHistoNo != -1) {
       f.width(16);
       f << endl << left << "forward";
-      f << run_iter->fForwardHistoNo;
+      f << fRuns[i].fForwardHistoNo;
       CheckAndWriteComment(f, ++lineNo);
     }
     // backward
-    if (run_iter->fBackwardHistoNo != -1) {
+    if (fRuns[i].fBackwardHistoNo != -1) {
       f.width(16);
       f << endl << left << "backward";
-      f << run_iter->fBackwardHistoNo;
+      f << fRuns[i].fBackwardHistoNo;
       CheckAndWriteComment(f, ++lineNo);
     }
     // right
-    if (run_iter->fRightHistoNo != -1) {
+    if (fRuns[i].fRightHistoNo != -1) {
       f.width(16);
       f << endl << left << "right";
-      f << run_iter->fRightHistoNo;
+      f << fRuns[i].fRightHistoNo;
       CheckAndWriteComment(f, ++lineNo);
     }
     // left
-    if (run_iter->fLeftHistoNo != -1) {
+    if (fRuns[i].fLeftHistoNo != -1) {
       f.width(16);
       f << endl << left << "left";
-      f << run_iter->fLeftHistoNo;
+      f << fRuns[i].fLeftHistoNo;
       CheckAndWriteComment(f, ++lineNo);
     }
     // backgr.fix
-    if (!isnan(run_iter->fBkgFix[0])) {
+    if (!isnan(fRuns[i].fBkgFix[0])) {
       f.width(15);
       f << endl << left << "backgr.fix";
       for (int i=0; i<2; i++) {
         f.precision(prec);
         f.width(12);
-        f << left << run_iter->fBkgFix[i];
+        f << left << fRuns[i].fBkgFix[i];
       }
       CheckAndWriteComment(f, ++lineNo);
     }
     // background
-    if (run_iter->fBkgRange[0] != -1) {
+    if (fRuns[i].fBkgRange[0] != -1) {
       f.width(16);
       f << endl << "background";
       for (int i=0; i<4; i++) {
-        if (run_iter->fBkgRange[i] == -1)
+        if (fRuns[i].fBkgRange[i] == -1)
           break;
         f.width(8);
-        f << left << run_iter->fBkgRange[i];
+        f << left << fRuns[i].fBkgRange[i];
       }
       CheckAndWriteComment(f, ++lineNo);
     }
     // data
-    if (run_iter->fDataRange[0] != -1) {
+    if (fRuns[i].fDataRange[0] != -1) {
       f.width(16);
       f << endl << "data";
       for (int i=0; i<4; i++) {
-        if (run_iter->fDataRange[i] == -1)
+        if (fRuns[i].fDataRange[i] == -1)
           break;
         f.width(8);
-        f << left << run_iter->fDataRange[i];
+        f << left << fRuns[i].fDataRange[i];
       }
       CheckAndWriteComment(f, ++lineNo);
     }
     // t0
-    if (run_iter->fT0[0] != -1) {
+    if (fRuns[i].fT0[0] != -1) {
       f.width(16);
       f << endl << "t0";
       for (int i=0; i<2; i++) {
-        if (run_iter->fT0[i] == -1)
+        if (fRuns[i].fT0[i] == -1)
           break;
         f.width(8);
-        f << left << run_iter->fT0[i];
+        f << left << fRuns[i].fT0[i];
       }
       CheckAndWriteComment(f, ++lineNo);
     }
     // fit
-    if (run_iter->fFitRange[0] != -1) {
+    if (fRuns[i].fFitRange[0] != -1) {
       f.width(16);
       f << endl << "fit";
       for (int i=0; i<2; i++) {
-        if (run_iter->fFitRange[i] == -1)
+        if (fRuns[i].fFitRange[i] == -1)
           break;
         f.width(8);
         f.precision(2);
-        f << left << fixed << run_iter->fFitRange[i];
+        f << left << fixed << fRuns[i].fFitRange[i];
       }
       CheckAndWriteComment(f, ++lineNo);
     }
     // packing
     f.width(16);
     f << endl << left << "packing";
-    f << run_iter->fPacking;
+    f << fRuns[i].fPacking;
     CheckAndWriteComment(f, ++lineNo);
   }
 
   // write command block
   f << endl << "COMMANDS";
   CheckAndWriteComment(f, ++lineNo);
-  PMsrLines::iterator cmd_iter;
-  for (cmd_iter = fCommands.begin(); cmd_iter != fCommands.end(); ++cmd_iter) {
-    f << endl << cmd_iter->fLine.Data();
+  for (unsigned int i=0; i<fCommands.size(); i++) {
+    f << endl << fCommands[i].fLine.Data();
     CheckAndWriteComment(f, ++lineNo);
   }
 
   // write plot block
-  PMsrPlotList::iterator plot_iter;
-  for (plot_iter = fPlots.begin(); plot_iter != fPlots.end(); ++plot_iter) {
+  for (unsigned int i=0; i<fPlots.size(); i++) {
     // plot header
-    switch (plot_iter->fPlotType) {
+    switch (fPlots[i].fPlotType) {
       case MSR_PLOT_SINGLE_HISTO:
-        f << endl << "PLOT " << plot_iter->fPlotType << "   (single histo plot)";
+        f << endl << "PLOT " << fPlots[i].fPlotType << "   (single histo plot)";
         break;
       case MSR_PLOT_ASYM:
-        f << endl << "PLOT " << plot_iter->fPlotType << "   (asymmetry plot)";
+        f << endl << "PLOT " << fPlots[i].fPlotType << "   (asymmetry plot)";
         break;
       case MSR_PLOT_ASYM_RRF:
-        f << endl << "PLOT " << plot_iter->fPlotType << "   (rotating reference frame plot)";
+        f << endl << "PLOT " << fPlots[i].fPlotType << "   (rotating reference frame plot)";
         break;
       case MSR_PLOT_NO_MUSR:
-        f << endl << "PLOT " << plot_iter->fPlotType << "   (non muSR plot)";
+        f << endl << "PLOT " << fPlots[i].fPlotType << "   (non muSR plot)";
         break;
       default:
         break;
@@ -608,22 +603,21 @@ int PMsrHandler::WriteMsrLogFile()
     // runs
     f << endl << "runs     ";
     f.precision(0);
-    PComplexVector::iterator r_it;
-    for (r_it = plot_iter->fRuns.begin(); r_it != plot_iter->fRuns.end(); ++r_it) {
-      if (plot_iter->fPlotType != MSR_PLOT_ASYM_RRF) { // all but MSR_PLOT_ASYM_RRF
+    for (unsigned int j=0; j<fPlots[i].fRuns.size(); j++) {
+      if (fPlots[i].fPlotType != MSR_PLOT_ASYM_RRF) { // all but MSR_PLOT_ASYM_RRF
         f.width(4);
-        f << r_it->Re();
+        f << fPlots[i].fRuns[j].Re();
       } else { // MSR_PLOT_ASYM_RRF
-        f << r_it->Re() << "," << r_it->Im() << "    ";
+        f << fPlots[i].fRuns[j].Re() << "," << fPlots[i].fRuns[j].Im() << "    ";
       }
     }
     CheckAndWriteComment(f, ++lineNo);
     // range
     f << endl << "range    ";
     f.precision(2);
-    f << plot_iter->fTmin << "   " << plot_iter->fTmax;
-    if (plot_iter->fYmin != -999.0) {
-      f << "   " << plot_iter->fYmin << "   " << plot_iter->fYmax;
+    f << fPlots[i].fTmin << "   " << fPlots[i].fTmax;
+    if (fPlots[i].fYmin != -999.0) {
+      f << "   " << fPlots[i].fYmin << "   " << fPlots[i].fYmax;
     }
     CheckAndWriteComment(f, ++lineNo);
   }
@@ -656,9 +650,8 @@ int PMsrHandler::WriteMsrLogFile()
     fStatistic.fStatLines.push_back(line);
   }
   // write the statistics block
-  PMsrLines::iterator stat_iter;
-  for (stat_iter = fStatistic.fStatLines.begin(); stat_iter != fStatistic.fStatLines.end(); ++stat_iter) {
-    f << endl << stat_iter->fLine.Data();
+  for (unsigned int i=0; i<fStatistic.fStatLines.size(); i++) {
+    f << endl << fStatistic.fStatLines[i].fLine.Data();
     CheckAndWriteComment(f, ++lineNo);
   }
 
