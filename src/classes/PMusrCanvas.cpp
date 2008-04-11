@@ -685,8 +685,8 @@ void PMusrCanvas::HandleSingleHistoDataSet(unsigned int runNo, PRunData *data)
     // fill histogram
     int pack = fMsrHandler->GetMsrRunList()->at(runNo).fPacking;
     for (unsigned int i=0; i<data->fValue.size(); i++) {
-      dataHisto->SetBinContent(i, pack*data->fValue[i]);
-      dataHisto->SetBinError(i, TMath::Sqrt(pack)*data->fError[i]);
+      dataHisto->SetBinContent(i, data->fValue[i]);
+      dataHisto->SetBinError(i, data->fError[i]);
     }
   }
 
@@ -717,6 +717,8 @@ void PMusrCanvas::HandleSingleHistoDataSet(unsigned int runNo, PRunData *data)
   start = data->fTheoryTimeStart;
   end   = data->fTheoryTimeStart + (data->fTheory.size()-1)*data->fTheoryTimeStep;
 
+cout << endl << ">> start = " << start << ", end = " << end << endl;
+
   // invoke histo
   theoHisto = new TH1F(name, name, data->fTheory.size(), start, end);
 
@@ -728,8 +730,8 @@ void PMusrCanvas::HandleSingleHistoDataSet(unsigned int runNo, PRunData *data)
   } else { // no lifetimecorrection
     // fill histogram
     int pack = fMsrHandler->GetMsrRunList()->at(runNo).fPacking;
-    for (unsigned int i=0; i<data->fValue.size(); i++) {
-      theoHisto->SetBinContent(i, pack*data->fTheory[i]);
+    for (unsigned int i=0; i<data->fTheory.size(); i++) {
+      theoHisto->SetBinContent(i, data->fTheory[i]);
     }
   }
 

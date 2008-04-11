@@ -52,8 +52,7 @@ short term:
 
 * something is strange with the coordinate system in TPaveText! **CHECK**
 
-* check problem with the mathmore implementation of 1F1(m;n;z)
-  2008-04-07 cannot reproduce Bastians problem!?!?!
+* need a CLEAN concept for handling data/theory generation for kView!!
 
 ---------------------
 intermediate term:

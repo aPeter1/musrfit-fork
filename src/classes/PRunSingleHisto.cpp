@@ -257,9 +257,38 @@ void PRunSingleHisto::CalcTheory()
   }
 
   // calculate theory
+  unsigned int size;
+  double start;
+  double resolution;
   double time;
-  for (unsigned int i=0; i<fData.fValue.size(); i++) {
-    time = fData.fDataTimeStart + (double)i*fData.fDataTimeStep;
+  PRawRunData* runData; // only used for kView
+  unsigned int histoNo; // only used for kView
+  switch (fHandleTag) {
+    case kFit:
+      size       = fData.fValue.size();
+      start      = fData.fDataTimeStart;
+      resolution = fData.fDataTimeStep;
+      break;
+    case kView:
+      runData = fRawData->GetRunData(fRunInfo->fRunName);
+      if (fRunInfo->fFileFormat.Contains("ppc")) {
+        histoNo = runData->fDataBin.size()/2 + fRunInfo->fForwardHistoNo-1;
+      } else {
+        histoNo = fRunInfo->fForwardHistoNo-1;
+      }
+      size       = runData->fDataBin[histoNo].size();
+      start      = -fT0s[0]*fTimeResolution;
+      resolution = fTimeResolution;
+      fData.fTheoryTimeStart = start;
+      fData.fTheoryTimeStep  = resolution;
+      break;
+    case kEmpty:
+    default:
+      size = -1;
+      break;
+  }
+  for (unsigned int i=0; i<size; i++) {
+    time = start + (double)i*resolution;
     fData.fTheory.push_back(N0*TMath::Exp(-time/tau)*(1+fTheory->Func(time, par, fFuncValues))+bkg);
   }
 
@@ -382,7 +411,7 @@ bool PRunSingleHisto::PrepareData()
   }
 
   // everything looks fine, hence fill data set
-  double value = 0.0;
+  double value  = 0.0;
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
   fData.fDataTimeStart = fTimeResolution*(((double)start-t0)+(double)fRunInfo->fPacking/2.0);
@@ -412,28 +441,8 @@ bool PRunSingleHisto::PrepareData()
   }
 
   // fill theory vector for kView
-  if (kView) {
-    // feed the parameter vector
-    std::vector<double> par;
-    PMsrParamList *paramList = fMsrInfo->GetMsrParamList();
-    for (unsigned int i=0; i<paramList->size(); i++)
-      par.push_back((*paramList)[i].fValue);
-
-
-    fData.fTheoryTimeStart = -t0*fTimeResolution;
-    fData.fTheoryTimeStep  = fTimeResolution;
-    for (unsigned int i=0; i<runData->fDataBin[histoNo].size(); i++) {
-      if ((int)i-(int)t0 < 0) {
-        fData.fTheory.push_back(0.0);
-      } else {
-        time  = fData.fTheoryTimeStart + i*fTimeResolution;
-        value = fTheory->Func(time, par, fFuncValues);
-        fData.fTheory.push_back(value);
-      }
-    }
-
-    // clean up
-    par.clear();
+  if (fHandleTag == kView) {
+    CalcTheory();
   }
 
   return true;

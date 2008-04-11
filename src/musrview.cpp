@@ -55,7 +55,7 @@ using namespace std;
 void musrview_syntax()
 {
   cout << endl << "usage: musrview <msr-file> | --version | --help";
-  cout << endl << "       <msr-file>: msr input file";
+  cout << endl << "       <msr-file>: msr/mlog input file";
   cout << endl << "       'musrview <msr-file>' will execute msrfit";
   cout << endl << "       'musrview' or 'msrfit --help' will show this help";
   cout << endl << "       'musrview --version' will print the msrfit version";
@@ -81,9 +81,9 @@ int main(int argc, char *argv[])
       } else if (strstr(argv[1], "--help")) {
         show_syntax = true;
       } else {
-        // check if filename has extension msr
-        if (!strstr(argv[1], ".msr")) {
-          cout << endl << "**ERROR** " << argv[1] << " is not a msr-file!" << endl;
+        // check if filename has extension msr or mlog
+        if (!strstr(argv[1], ".msr") && !strstr(argv[1], ".mlog")) {
+          cout << endl << "**ERROR** " << argv[1] << " is not a msr/mlog-file!" << endl;
           show_syntax = true;
         }
       }

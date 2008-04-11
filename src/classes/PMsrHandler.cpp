@@ -134,7 +134,7 @@ int PMsrHandler::ReadMsrFile()
     current.fLineNo = line_no;
     current.fLine   = line;
 
-    if (line.BeginsWith("#")) { // if the line is not a comment line keep it
+    if (line.BeginsWith("#") || line.IsWhitespace()) { // if the line is a comment/empty line keep it
       fComments.push_back(current);
       continue;
     }
@@ -270,8 +270,6 @@ int PMsrHandler::WriteMsrLogFile()
     tokens = 0;
   }
 
-//cout << endl << "log file name = " << str.Data() << endl << endl;
-
   ofstream f;
 
   // open mlog-file
@@ -281,20 +279,16 @@ int PMsrHandler::WriteMsrLogFile()
   }
 
   // write mlog-file
-
   int lineNo = 1;
 
   // write title
   f << fTitle.Data();
   CheckAndWriteComment(f, ++lineNo);
-//  f << endl << "###############################################################";
 
   // write fit parameter block
   f << endl << "FITPARAMETER";
   CheckAndWriteComment(f, ++lineNo);
-//  f << endl << "#      No Name        Value     Step        Pos_Error   Boundaries";
   f << endl;
-  CheckAndWriteComment(f, ++lineNo);
   PMsrParamList::iterator param_iter;
   for (param_iter = fParam.begin(); param_iter != fParam.end(); ++param_iter) {
     // parameter no
@@ -336,11 +330,10 @@ int PMsrHandler::WriteMsrLogFile()
       f << left << param_iter->fUpperBoundary;
       f << " ";
     }
-    // terminate line
+    // terminate parameter line
     f << endl;
     CheckAndWriteComment(f, ++lineNo);
   }
-//  f << endl << "###############################################################";
 
   // write theory block
   PMsrLines::iterator theo_iter;
@@ -348,9 +341,6 @@ int PMsrHandler::WriteMsrLogFile()
     f << endl << theo_iter->fLine.Data();
     CheckAndWriteComment(f, ++lineNo);
   }
-  f << endl;
-  CheckAndWriteComment(f, ++lineNo);
-//  f << endl << "###############################################################";
 
   // write functions block
   f << endl << "FUNCTIONS";
@@ -361,9 +351,6 @@ int PMsrHandler::WriteMsrLogFile()
     f << endl << str.Data();
     CheckAndWriteComment(f, ++lineNo);
   }
-  f << endl;
-  CheckAndWriteComment(f, ++lineNo);
-//  f << endl << "###############################################################";
 
   // write run block
   PMsrRunList::iterator run_iter;
@@ -586,11 +573,7 @@ int PMsrHandler::WriteMsrLogFile()
     f << endl << left << "packing";
     f << run_iter->fPacking;
     CheckAndWriteComment(f, ++lineNo);
-    // run block done
-    f << endl;
-    CheckAndWriteComment(f, ++lineNo);
   }
-//  f << endl << "###############################################################";
 
   // write command block
   f << endl << "COMMANDS";
@@ -600,9 +583,6 @@ int PMsrHandler::WriteMsrLogFile()
     f << endl << cmd_iter->fLine.Data();
     CheckAndWriteComment(f, ++lineNo);
   }
-  f << endl;
-  CheckAndWriteComment(f, ++lineNo);
-//  f << endl << "###############################################################";
 
   // write plot block
   PMsrPlotList::iterator plot_iter;
@@ -646,10 +626,7 @@ int PMsrHandler::WriteMsrLogFile()
       f << "   " << plot_iter->fYmin << "   " << plot_iter->fYmax;
     }
     CheckAndWriteComment(f, ++lineNo);
-    f << endl;
-    CheckAndWriteComment(f, ++lineNo);
   }
-//  f << endl << "###############################################################";
 
   // write statistic block
   TDatime dt;
@@ -684,10 +661,6 @@ int PMsrHandler::WriteMsrLogFile()
     f << endl << stat_iter->fLine.Data();
     CheckAndWriteComment(f, ++lineNo);
   }
-  f << endl;
-    CheckAndWriteComment(f, ++lineNo);
-//  f << endl << "###############################################################";
-
 
   // close mlog-file
   f.close();
