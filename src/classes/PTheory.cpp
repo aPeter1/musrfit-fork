@@ -1022,7 +1022,7 @@ double PTheory::Bessel(register double t, const vector<double>& paramValues, con
  */
 double PTheory::InternalBessel(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
 {
-  double val[4];
+  double val[4]; // phase, frequency, Trate, Lrate
 
   // check if FUNCTIONS are used
   for (unsigned int i=0; i<4; i++) {

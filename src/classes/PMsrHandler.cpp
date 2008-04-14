@@ -467,13 +467,13 @@ int PMsrHandler::WriteMsrLogFile()
     }
     // map
     f << endl << "map         ";
-    for (unsigned int j=0; j>fRuns[i].fMap.size(); j++) {
+    for (unsigned int j=0; j<fRuns[i].fMap.size(); j++) {
       f.width(5);
       f << right << fRuns[i].fMap[j];
     }
     // if there are less maps then 10 fill with zeros
     if (fRuns[i].fMap.size() < 10) {
-      for (int j=fRuns[i].fMap.size(); j<10; j++)
+      for (unsigned int j=fRuns[i].fMap.size(); j<10; j++)
         f << "    0";
     }
     CheckAndWriteComment(f, ++lineNo);
@@ -509,10 +509,10 @@ int PMsrHandler::WriteMsrLogFile()
     if (!isnan(fRuns[i].fBkgFix[0])) {
       f.width(15);
       f << endl << left << "backgr.fix";
-      for (int i=0; i<2; i++) {
+      for (unsigned int j=0; j<2; j++) {
         f.precision(prec);
         f.width(12);
-        f << left << fRuns[i].fBkgFix[i];
+        f << left << fRuns[i].fBkgFix[j];
       }
       CheckAndWriteComment(f, ++lineNo);
     }
@@ -520,11 +520,11 @@ int PMsrHandler::WriteMsrLogFile()
     if (fRuns[i].fBkgRange[0] != -1) {
       f.width(16);
       f << endl << "background";
-      for (int i=0; i<4; i++) {
-        if (fRuns[i].fBkgRange[i] == -1)
+      for (unsigned int j=0; j<4; j++) {
+        if (fRuns[i].fBkgRange[j] == -1)
           break;
         f.width(8);
-        f << left << fRuns[i].fBkgRange[i];
+        f << left << fRuns[i].fBkgRange[j];
       }
       CheckAndWriteComment(f, ++lineNo);
     }
@@ -532,11 +532,11 @@ int PMsrHandler::WriteMsrLogFile()
     if (fRuns[i].fDataRange[0] != -1) {
       f.width(16);
       f << endl << "data";
-      for (int i=0; i<4; i++) {
-        if (fRuns[i].fDataRange[i] == -1)
+      for (unsigned int j=0; j<4; j++) {
+        if (fRuns[i].fDataRange[j] == -1)
           break;
         f.width(8);
-        f << left << fRuns[i].fDataRange[i];
+        f << left << fRuns[i].fDataRange[j];
       }
       CheckAndWriteComment(f, ++lineNo);
     }
@@ -544,11 +544,11 @@ int PMsrHandler::WriteMsrLogFile()
     if (fRuns[i].fT0[0] != -1) {
       f.width(16);
       f << endl << "t0";
-      for (int i=0; i<2; i++) {
-        if (fRuns[i].fT0[i] == -1)
+      for (unsigned int j=0; j<2; j++) {
+        if (fRuns[i].fT0[j] == -1)
           break;
         f.width(8);
-        f << left << fRuns[i].fT0[i];
+        f << left << fRuns[i].fT0[j];
       }
       CheckAndWriteComment(f, ++lineNo);
     }
@@ -556,12 +556,12 @@ int PMsrHandler::WriteMsrLogFile()
     if (fRuns[i].fFitRange[0] != -1) {
       f.width(16);
       f << endl << "fit";
-      for (int i=0; i<2; i++) {
-        if (fRuns[i].fFitRange[i] == -1)
+      for (unsigned int j=0; j<2; j++) {
+        if (fRuns[i].fFitRange[j] == -1)
           break;
         f.width(8);
         f.precision(2);
-        f << left << fixed << fRuns[i].fFitRange[i];
+        f << left << fixed << fRuns[i].fFitRange[j];
       }
       CheckAndWriteComment(f, ++lineNo);
     }

@@ -676,18 +676,10 @@ void PMusrCanvas::HandleSingleHistoDataSet(unsigned int runNo, PRunData *data)
   // invoke histo
   dataHisto = new TH1F(name, name, data->fValue.size(), start, end);
 
-  // check if lifetimecorrection is set
-  if (fMsrHandler->GetMsrRunList()->at(runNo).fLifetimeCorrection) {
-    // get background
-    // get lifetime
-    // fill histogram
-  } else { // no lifetimecorrection
-    // fill histogram
-    int pack = fMsrHandler->GetMsrRunList()->at(runNo).fPacking;
-    for (unsigned int i=0; i<data->fValue.size(); i++) {
-      dataHisto->SetBinContent(i, data->fValue[i]);
-      dataHisto->SetBinError(i, data->fError[i]);
-    }
+  // fill histogram
+  for (unsigned int i=0; i<data->fValue.size(); i++) {
+    dataHisto->SetBinContent(i, data->fValue[i]);
+    dataHisto->SetBinError(i, data->fError[i]);
   }
 
   // set marker and line color
@@ -722,17 +714,9 @@ cout << endl << ">> start = " << start << ", end = " << end << endl;
   // invoke histo
   theoHisto = new TH1F(name, name, data->fTheory.size(), start, end);
 
-  // check if lifetimecorrection is set
-  if (fMsrHandler->GetMsrRunList()->at(runNo).fLifetimeCorrection) {
-    // get background
-    // get lifetime
-    // fill histogram
-  } else { // no lifetimecorrection
-    // fill histogram
-    int pack = fMsrHandler->GetMsrRunList()->at(runNo).fPacking;
-    for (unsigned int i=0; i<data->fTheory.size(); i++) {
-      theoHisto->SetBinContent(i, data->fTheory[i]);
-    }
+  // fill histogram
+  for (unsigned int i=0; i<data->fTheory.size(); i++) {
+    theoHisto->SetBinContent(i, data->fTheory[i]);
   }
 
   // set the line color
