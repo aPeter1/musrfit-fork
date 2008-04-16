@@ -30,6 +30,12 @@
             <color>255,0,0</color>
             <color>0,255,0</color>
             <color>0,0,255</color>
+            <color>255,0,255</color>
+            <color>0,255,255</color>
+            <color>156,0,255</color>
+            <color>99,101,49</color>
+            <color>49,101,49</color>
+            <color>156,48,0</color>
         </color_list>
     </root_settings>
 </musrfit>

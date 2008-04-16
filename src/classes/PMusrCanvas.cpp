@@ -479,15 +479,20 @@ cout << endl;
   // generate the histo plot
   fDataTheoryPad->cd();
   if (fData.size() > 0) {
-    fData[0].data->Draw("pe1");
+    fData[0].data->Draw("pe");
     // set time range
     Double_t xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin;
     Double_t xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax;
     fData[0].data->GetXaxis()->SetRangeUser(xmin, xmax);
     // check if it is necessary to set the y-axis range
+    Double_t ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin;
+    Double_t ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax;
+    if ((ymin != -999.0) && (ymax != -999.0)) {
+      fData[0].data->GetYaxis()->SetRangeUser(ymin, ymax);
+    }
     // plot all remaining data
     for (unsigned int i=1; i<fData.size(); i++) {
-      fData[i].data->Draw("pe1same");
+      fData[i].data->Draw("pesame");
     }
     // plot all the theory
     for (unsigned int i=0; i<fData.size(); i++) {
@@ -539,7 +544,33 @@ void PMusrCanvas::UpdateInfoPad()
 
   fInfoPad->SetHeader(tstr);
 
-  // get run plot info
+  // get/set run plot info
+  unsigned int runNo;
+  PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
+  PMsrRunList runs = *fMsrHandler->GetMsrRunList();
+  for (unsigned int i=0; i<fData.size(); i++) {
+    // run label = run_name/histo/T=0K/B=0G/E=0keV/...
+    runNo = (unsigned int)plotInfo.fRuns[i].Re()-1;
+    tstr  = runs[runNo].fRunName + TString(","); // run_name
+    // histo info (depending on the fittype
+    if (runs[runNo].fFitType == MSR_FITTYPE_SINGLE_HISTO) {
+      tstr += TString("h:");
+      tstr += runs[runNo].fForwardHistoNo;
+      tstr += TString(",");
+    } else if (runs[runNo].fFitType == MSR_FITTYPE_ASYM) {
+      tstr += TString("h:");
+      tstr += runs[runNo].fForwardHistoNo;
+      tstr += TString("/");
+      tstr += runs[runNo].fBackwardHistoNo;
+      tstr += TString(",");
+    }
+    // temperature if present
+    // field if present
+    // energy if present
+    // more stuff if present
+    // add entry
+    fInfoPad->AddEntry(fData[i].data, tstr.Data(), "p");
+  }
 
   fInfoPad->Draw();
   fMainCanvas->cd();
@@ -709,7 +740,7 @@ void PMusrCanvas::HandleSingleHistoDataSet(unsigned int runNo, PRunData *data)
   start = data->fTheoryTimeStart;
   end   = data->fTheoryTimeStart + (data->fTheory.size()-1)*data->fTheoryTimeStep;
 
-cout << endl << ">> start = " << start << ", end = " << end << endl;
+//cout << endl << ">> start = " << start << ", end = " << end << endl;
 
   // invoke histo
   theoHisto = new TH1F(name, name, data->fTheory.size(), start, end);

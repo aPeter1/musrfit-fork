@@ -1846,6 +1846,13 @@ bool PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
     return false;
   }
 
+  // check if chisq or max.log likelihood
+  fStatistic.fChisq = true;
+  for (unsigned int i=0; i<fCommands.size(); i++) {
+    if (fCommands[i].fLine.Contains("MAX_LIKELIHOOD"))
+      fStatistic.fChisq = false; // max.log likelihood
+  }
+
   char str[128];
   char date[128];
   char time[128];
@@ -1865,7 +1872,6 @@ bool PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
     }
     // extract chisq
     if (lines[i].fLine.Contains("chisq =")) {
-      fStatistic.fChisq = true;
       strncpy(str, lines[i].fLine.Data(), sizeof(str));
       status = sscanf(str+lines[i].fLine.Index("chisq = ")+8, "%lf", &dval);
       if (status == 1) {
@@ -1876,7 +1882,6 @@ bool PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
     }
     // extract maxLH
     if (lines[i].fLine.Contains("maxLH =")) {
-      fStatistic.fChisq = true;
       strncpy(str, lines[i].fLine.Data(), sizeof(str));
       status = sscanf(str+lines[i].fLine.Index("maxLH = ")+8, "%lf", &dval);
       if (status == 1) {
@@ -1887,7 +1892,6 @@ bool PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
     }
     // extract NDF
     if (lines[i].fLine.Contains(", NDF =")) {
-      fStatistic.fChisq = true;
       strncpy(str, lines[i].fLine.Data(), sizeof(str));
       status = sscanf(str+lines[i].fLine.Index(", NDF = ")+8, "%u", &ival);
       if (status == 1) {

@@ -137,28 +137,7 @@ double PRunSingleHisto::CalcChiSquare(const std::vector<double>& par)
     }
   }
 
-
-// static int counter = 0;
-// TString fln=fRunInfo->fRunName+"_"+(Long_t)fRunInfo->fForwardHistoNo+"_data.dat";
-// ofstream f(fln.Data(),ios_base::out);
-// for (unsigned int i=0; i<fData.fValue.size(); i++) {
-//   time = fData.fDataTimeStart + (double)i*fData.fDataTimeStep;
-//   f << endl << time << " " << fData.fValue[i] << " " << fData.fError[i];
-// }
-// f.close();
-// 
-// fln=fRunInfo->fRunName+"_"+(Long_t)fRunInfo->fForwardHistoNo+"_theo.dat";
-// ofstream ft(fln.Data(),ios_base::out);
-// for (unsigned int i=0; i<fData.fValue.size(); i++) {
-//   time = fData.fDataTimeStart + (double)i*fData.fDataTimeStep;
-//   ft << endl << time << " " << N0*TMath::Exp(-time/tau)*(1.0+fTheory->Func(time, par, fFuncValues))+bkg;
-// }
-// ft.close();
-// counter++;
-// if (counter == 4) exit(0);
-
-//cout << endl << ">> " << chisq*fRunInfo->fPacking;
-  return chisq*fRunInfo->fPacking;
+  return chisq;
 }
 
 //--------------------------------------------------------------------------
@@ -407,7 +386,7 @@ bool PRunSingleHisto::PrepareFitData()
       if (value == 0.0)
         fData.fError.push_back(1.0);
       else
-        fData.fError.push_back(TMath::Sqrt(value));
+        fData.fError.push_back(TMath::Sqrt(value/fRunInfo->fPacking));
       value = 0.0;
     }
     value += runData->fDataBin[histoNo][i];
@@ -506,17 +485,17 @@ bool PRunSingleHisto::PrepareRawViewData()
   }
   // 2nd check if start is within proper bounds
   if ((start < 0) || (start > runData->fDataBin[histoNo].size())) {
-    cout << endl << "PRunSingleHisto::PrepareData(): **ERROR** start data bin doesn't make any sense!";
+    cout << endl << "PRunSingleHisto::PrepareRawViewData(): **ERROR** start data bin doesn't make any sense!";
     return false;
   }
   // 3rd check if end is within proper bounds
   if ((end < 0) || (end > runData->fDataBin[histoNo].size())) {
-    cout << endl << "PRunSingleHisto::PrepareData(): **ERROR** end data bin doesn't make any sense!";
+    cout << endl << "PRunSingleHisto::PrepareRawViewData(): **ERROR** end data bin doesn't make any sense!";
     return false;
   }
   // 4th check if t0 is within proper bounds
   if ((t0 < 0) || (t0 > runData->fDataBin[histoNo].size())) {
-    cout << endl << "PRunSingleHisto::PrepareData(): **ERROR** t0 data bin doesn't make any sense!";
+    cout << endl << "PRunSingleHisto::PrepareRawViewData(): **ERROR** t0 data bin doesn't make any sense!";
     return false;
   }
 
@@ -535,7 +514,7 @@ bool PRunSingleHisto::PrepareRawViewData()
       if (value == 0.0)
         fData.fError.push_back(1.0);
       else
-        fData.fError.push_back(TMath::Sqrt(value));
+        fData.fError.push_back(TMath::Sqrt(value/fRunInfo->fPacking));
       value = 0.0;
     }
     value += runData->fDataBin[histoNo][i];
@@ -595,10 +574,176 @@ bool PRunSingleHisto::PrepareRawViewData()
 // PrepareViewData
 //--------------------------------------------------------------------------
 /**
- * <p> Muon life time corrected data
- *
+ * <p> Muon life time corrected data: Starting from
+ * \f[ N(t) = N_0 e^{-t/\tau} [ 1 + A(t) ] + \mathrm{Bkg} \f]
+ * it follows that
+ * \f[ A(t) = (-1) + e^{+t/\tau}\, \frac{N(t)-\mathrm{Bkg}}{N_0}. \f]
+ * For the error estimate only the statistical error of \f$ N(t) \f$ is used, and hence
+ * \f[ \Delta A(t) = \frac{e^{t/\tau}}{N_0}\,\sqrt{\frac{N(t)}{p}} \f]
+ * where \f$ p \f$ is the packing, and \f$ N(t) \f$ are the packed data, i.e.
+ * \f[ N(t_i) = \frac{1}{p}\, \sum_{j=i}^{i+p} n_j \f]
+ * with \f$ n_j \f$ the raw histogram data bins.
  */
 bool PRunSingleHisto::PrepareViewData()
 {
+  // get the proper run
+  PRawRunData* runData = fRawData->GetRunData(fRunInfo->fRunName);
+  if (!runData) { // couldn't get run
+    cout << endl << "PRunSingleHisto::PrepareViewData(): **ERROR** Couldn't get run " << fRunInfo->fRunName.Data() << "!";
+    return false;
+  }
+
+  // keep the time resolution in (us)
+  fTimeResolution = runData->fTimeResolution/1.0e3;
+
+  // check if the t0's are given in the msr-file
+  if (fRunInfo->fT0[0] == -1) { // t0's are NOT in the msr-file
+    // check if the t0's are in the data file
+    if (runData->fT0s.size() != 0) { // t0's in the run data
+      // keep the proper t0's. For single histo runs, forward is holding the histo no
+      // fForwardHistoNo starts with 1 not with 0 ;-)
+      fT0s.push_back(runData->fT0s[fRunInfo->fForwardHistoNo-1]);
+    } else { // t0's are neither in the run data nor in the msr-file -> not acceptable!
+      cout << endl << "PRunSingleHisto::PrepareViewData(): **ERROR** NO t0's found, neither in the run data nor in the msr-file!";
+      return false;
+    }
+  } else { // t0's in the msr-file
+    // check if t0's are given in the data file
+    if (runData->fT0s.size() != 0) {
+      // compare t0's of the msr-file with the one in the data file
+      if (fabs(fRunInfo->fT0[0]-runData->fT0s[fRunInfo->fForwardHistoNo-1])>5.0) { // given in bins!!
+        cout << endl << "PRunSingleHisto::PrepareViewData(): **WARNING**:";
+        cout << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[0];
+        cout << endl << "  t0 from the data file is " << runData->fT0s[fRunInfo->fForwardHistoNo-1];
+        cout << endl << "  This is quite a deviation! Is this done intentionally??";
+        cout << endl;
+      }
+    }
+    fT0s.push_back(fRunInfo->fT0[0]);
+  }
+
+  // check if post pile up data shall be used
+  unsigned int histoNo;
+  if (fRunInfo->fFileFormat.Contains("ppc")) {
+    histoNo = runData->fDataBin.size()/2 + fRunInfo->fForwardHistoNo-1;
+  } else {
+    histoNo = fRunInfo->fForwardHistoNo-1;
+  }
+
+  if ((runData->fDataBin.size() < histoNo) || (histoNo < 0)) {
+    cout << endl << "PRunSingleHisto::PrepareViewData(): **PANIC ERROR**:";
+    cout << endl << "   histoNo found = " << histoNo << ", but there are only " << runData->fDataBin.size() << " runs!?!?";
+    cout << endl << "   Will quite :-(";
+    cout << endl;
+    return false;
+  }
+
+  // transform raw histo data. This is done the following way (for details see the manual):
+  // for the single histo fit, just the rebinned raw data are copied
+  // first get start data, end data, and t0
+  unsigned int start;
+  unsigned int end;
+  double       t0    = fT0s[0];
+  // raw data, since PMusrCanvas is doing ranging etc.
+  // start = the first bin which is a multiple of packing backward from t0
+  start = (int)t0 - ((int)t0/fRunInfo->fPacking)*fRunInfo->fPacking;
+  // end = last bin starting from start which is a multipl of packing and still within the data 
+  end   = start + ((runData->fDataBin[histoNo].size()-start-1)/fRunInfo->fPacking)*fRunInfo->fPacking;
+  // check if start, end, and t0 make any sense
+  // 1st check if start and end are in proper order
+  if (end < start) { // need to swap them
+    int keep = end;
+    end = start;
+    start = keep;
+  }
+  // 2nd check if start is within proper bounds
+  if ((start < 0) || (start > runData->fDataBin[histoNo].size())) {
+    cout << endl << "PRunSingleHisto::PrepareViewData(): **ERROR** start data bin doesn't make any sense!";
+    return false;
+  }
+  // 3rd check if end is within proper bounds
+  if ((end < 0) || (end > runData->fDataBin[histoNo].size())) {
+    cout << endl << "PRunSingleHisto::PrepareViewData(): **ERROR** end data bin doesn't make any sense!";
+    return false;
+  }
+  // 4th check if t0 is within proper bounds
+  if ((t0 < 0) || (t0 > runData->fDataBin[histoNo].size())) {
+    cout << endl << "PRunSingleHisto::PrepareViewData(): **ERROR** t0 data bin doesn't make any sense!";
+    return false;
+  }
+
+  // everything looks fine, hence fill data set
+
+  // feed the parameter vector
+  std::vector<double> par;
+  PMsrParamList *paramList = fMsrInfo->GetMsrParamList();
+  for (unsigned int i=0; i<paramList->size(); i++)
+    par.push_back((*paramList)[i].fValue);
+
+  // calculate asymmetry
+  double N0 = par[fRunInfo->fNormParamNo-1];
+//cout << endl << ">> N0 = " << N0;
+
+  // get tau
+  double tau;
+  if (fRunInfo->fLifetimeParamNo != -1)
+    tau = par[fRunInfo->fLifetimeParamNo-1];
+  else
+    tau = PMUON_LIFETIME;
+//cout << endl << ">> tau = " << tau;
+
+  // get background
+  double bkg = par[fRunInfo->fBkgFitParamNo-1];
+//cout << endl << ">> bkg = " << bkg;
+
+  double value  = 0.0;
+  double expval;
+  double time;
+  // data start at data_start-t0
+  // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
+  fData.fDataTimeStart = fTimeResolution*(((double)start-t0)+(double)fRunInfo->fPacking/2.0);
+  fData.fDataTimeStep  = fTimeResolution*fRunInfo->fPacking;
+//cout << endl << ">> start = " << fData.fDataTimeStart << ", step = " << fData.fDataTimeStep;
+  for (unsigned i=start; i<end; i++) {
+    if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
+      // in order that after rebinning the fit does not need to be redone (important for plots)
+      // the value is normalize to per bin
+      value /= fRunInfo->fPacking;
+      time = fData.fDataTimeStart+(double)i*fData.fDataTimeStep/fRunInfo->fPacking;
+      expval = TMath::Exp(+time/tau)/N0;
+      fData.fValue.push_back(-1.0+expval*(value-bkg));
+      fData.fError.push_back(expval*TMath::Sqrt(value/fRunInfo->fPacking));
+//cout << endl << ">> " << time << ", " << expval << ", " << -1.0+expval*(value-bkg) << ", " << expval*TMath::Sqrt(value/fRunInfo->fPacking);
+      value = 0.0;
+    }
+    value += runData->fDataBin[histoNo][i];
+  }
+
+  // count the number of bins to be fitted
+  fNoOfFitBins=0;
+  for (unsigned int i=0; i<fData.fValue.size(); i++) {
+    time = fData.fDataTimeStart + (double)i*fData.fDataTimeStep;
+    if ((time >= fFitStartTime) && (time <= fFitStopTime))
+      fNoOfFitBins++;
+  }
+
+  // calculate functions
+  for (int i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
+    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), fRunInfo->fMap, par);
+  }
+
+  // calculate theory
+  unsigned int size = runData->fDataBin[histoNo].size();
+  double startTime  = -fT0s[0]*fTimeResolution;
+  fData.fTheoryTimeStart = startTime;
+  fData.fTheoryTimeStep  = fTimeResolution;
+  for (unsigned int i=0; i<size; i++) {
+    time = startTime + (double)i*fTimeResolution;
+    fData.fTheory.push_back(fTheory->Func(time, par, fFuncValues));
+  }
+
+  // clean up
+  par.clear();
+
   return true;
 }
