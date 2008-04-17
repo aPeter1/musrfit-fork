@@ -34,6 +34,7 @@
 
 #include <TObject.h>
 #include <TQObject.h>
+#include <TStyle.h>
 #include <TCanvas.h>
 #include <TPaveText.h>
 #include <TLegend.h>
@@ -112,6 +113,8 @@ class PMusrCanvas : public TObject, public TQObject
     Bool_t fValid;
     Int_t  fPlotNumber;
 
+    TStyle    *fStyle;
+
     TCanvas   *fMainCanvas;
     TPaveText *fTitlePad;
     TPad      *fDataTheoryPad;
@@ -128,6 +131,7 @@ class PMusrCanvas : public TObject, public TQObject
     PIntVector fMarkerList;
     PIntVector fColorList;
 
+    virtual void CreateStyle();
     virtual void InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh);
     virtual void InitDataSet(PMusrCanvasDataSet &dataSet);
     virtual void CleanupDataSet(PMusrCanvasDataSet &dataSet);

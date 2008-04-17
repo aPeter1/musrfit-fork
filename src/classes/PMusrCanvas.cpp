@@ -50,6 +50,7 @@ PMusrCanvas::PMusrCanvas()
   fValid = false;
   fPlotNumber = -1;
 
+  fStyle               = 0;
   fMainCanvas          = 0;
   fTitlePad            = 0;
   fDataTheoryPad       = 0;
@@ -67,6 +68,7 @@ PMusrCanvas::PMusrCanvas(const int number, const char* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh) :
                          fPlotNumber(number)
 {
+  CreateStyle();
   InitMusrCanvas(title, wtopx, wtopy, ww, wh);
 }
 
@@ -81,6 +83,7 @@ PMusrCanvas::PMusrCanvas(const int number, const char* title,
                          const PIntVector markerList, const PIntVector colorList) :
                          fPlotNumber(number), fMarkerList(markerList), fColorList(colorList)
 {
+  CreateStyle();
   InitMusrCanvas(title, wtopx, wtopy, ww, wh);
 }
 
@@ -94,6 +97,10 @@ PMusrCanvas::~PMusrCanvas()
 {
 cout << "~PMusrCanvas() called" << endl;
   // cleanup
+  if (fStyle) {
+    delete fStyle;
+    fStyle = 0;
+  }
   if (fTitlePad) {
     fTitlePad->Clear();
     delete fTitlePad;
@@ -122,6 +129,20 @@ cout << "~PMusrCanvas() called" << endl;
       CleanupDataSet(fData[i]);
     fData.clear();
   }
+}
+
+//--------------------------------------------------------------------------
+// CreateStyle
+//--------------------------------------------------------------------------
+/**
+ * <p> Set styles for the canvas. Perhaps one could transfer them to the startup-file in the future.
+ */
+void PMusrCanvas::CreateStyle()
+{
+  fStyle = new TStyle("musrStyle", "musrStyle");
+  fStyle->SetOptStat(0);  // no statistics options
+  fStyle->SetOptTitle(0); // no title
+  fStyle->cd();
 }
 
 //--------------------------------------------------------------------------
