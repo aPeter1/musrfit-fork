@@ -189,8 +189,9 @@ bool PRunDataHandler::ReadFile()
 bool PRunDataHandler::FileAlreadyRead(PMsrRunStructure &runInfo)
 {
   for (unsigned int i=0; i<fData.size(); i++) {
-    if (!fData[i].fRunName.CompareTo(runInfo.fRunName)) // run alread read
+    if (!fData[i].fRunName.CompareTo(runInfo.fRunName)) { // run alread read
       return true;
+    }
   }
 
   return false;
@@ -582,31 +583,46 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
   int status;
   unsigned int group_counter = 0;
   int val[10];
-  while (!f.eof()) {
+  do {
     // check if empty line, i.e. new group
     if (IsWhitespace(instr)) {
       runData.fDataBin.push_back(histoData);
       histoData.clear();
       group_counter++;
+    } else {
+      // extract values
+      status = sscanf(instr, "%d %d %d %d %d %d %d %d %d %d", 
+                      &val[0], &val[1], &val[2], &val[3], &val[4],
+                      &val[5], &val[6], &val[7], &val[8], &val[9]);
+      // no values found: error
+      if (status == 0) {
+        cout << endl << "PRunDataHandler::ReadNemuFile(): **ERROR** while reading data ...";
+        // clean up
+        for (unsigned int i=0; i<group_counter; i++)
+          runData.fDataBin[i].clear();
+        runData.fDataBin.clear();
+        return false;
+      }
+      // feed data
+      for (int i=0; i<status; i++)
+        histoData.push_back(val[i]);
     }
+
+    f.getline(instr, sizeof(instr));
+
+  } while (!f.eof());
+
+  // handle last line if present
+  if (strlen(instr) != 0) {
     // extract values
     status = sscanf(instr, "%d %d %d %d %d %d %d %d %d %d", 
                     &val[0], &val[1], &val[2], &val[3], &val[4],
                     &val[5], &val[6], &val[7], &val[8], &val[9]);
-    // no values found: error
-    if (status == 0) {
-      cout << endl << "PRunDataHandler::ReadNemuFile(): **ERROR** while reading data ...";
-      // clean up
-      for (unsigned int i=0; i<group_counter; i++)
-        runData.fDataBin[i].clear();
-      runData.fDataBin.clear();
-      return false;
+    if (status > 0) {
+      // feed data
+      for (int i=0; i<status; i++)
+        histoData.push_back(val[i]);
     }
-    // feed data
-    for (int i=0; i<status; i++)
-      histoData.push_back(val[i]);
-
-    f.getline(instr, sizeof(instr));
   }
 
   // save the last histo if not empty
@@ -635,8 +651,8 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
       cout << endl << "PRunDataHandler::ReadNemuFile(): **ERROR**";
       cout << endl << "  expected " << channels << " bins in histo " << i << ", but found " << runData.fDataBin[i].size();
       // clean up
-      for (unsigned int i=0; i<runData.fDataBin.size(); i++)
-        runData.fDataBin[i].clear();
+      for (unsigned int j=0; j<runData.fDataBin.size(); j++)
+        runData.fDataBin[j].clear();
       runData.fDataBin.clear();
       return false;
     }
