@@ -153,7 +153,6 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
   TString canvasName = TString("fMainCanvas");
   canvasName += fPlotNumber;
   fMainCanvas = new TCanvas(canvasName.Data(), title, wtopx, wtopy, ww, wh);
-cout << canvasName.Data() << " = " << fMainCanvas << endl;
   if (fMainCanvas == 0) {
     cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke " << canvasName.Data();
     cout << endl;
@@ -545,6 +544,8 @@ void PMusrCanvas::UpdateInfoPad()
   fInfoPad->SetHeader(tstr);
 
   // get/set run plot info
+  double dval;
+  char   sval[128];
   unsigned int runNo;
   PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
   PMsrRunList runs = *fMsrHandler->GetMsrRunList();
@@ -565,9 +566,34 @@ void PMusrCanvas::UpdateInfoPad()
       tstr += TString(",");
     }
     // temperature if present
+    tstr += TString("T=");
+    dval = fRunList->GetTemp(runs[runNo].fRunName);
+    if (isnan(dval)) {
+      tstr += TString("??,");
+    } else {
+      sprintf(sval, "%0.2lf", dval);
+      tstr += TString(sval) + TString("(K),");
+    }
     // field if present
+    tstr += TString("B=");
+    dval = fRunList->GetField(runs[runNo].fRunName);
+    if (isnan(dval)) {
+      tstr += TString("??,");
+    } else {
+      sprintf(sval, "%0.2lf", dval);
+      tstr += TString(sval) + TString("(G),");
+    }
     // energy if present
-    // more stuff if present
+    tstr += TString("E=");
+    dval = fRunList->GetEnergy(runs[runNo].fRunName);
+    if (isnan(dval)) {
+      tstr += TString("??,");
+    } else {
+      sprintf(sval, "%0.2lf", dval);
+      tstr += TString(sval) + TString("(keV),");
+    }
+    // setup if present
+    tstr += fRunList->GetSetup(runs[runNo].fRunName);
     // add entry
     fInfoPad->AddEntry(fData[i].data, tstr.Data(), "p");
   }

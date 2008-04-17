@@ -75,6 +75,11 @@ class PRunListCollection
     virtual PRunData* GetRRF(unsigned int index, EDataSwitch tag=kIndex);
     virtual PRunData* GetNonMusr(unsigned int index, EDataSwitch tag=kIndex);
 
+    virtual double GetTemp(TString &runName);
+    virtual double GetField(TString &runName);
+    virtual double GetEnergy(TString &runName);
+    virtual const char* GetSetup(TString &runName);
+
   private:
     PMsrHandler *fMsrInfo;  ///< keeps all msr file info
     PRunDataHandler *fData; ///< handles all raw data

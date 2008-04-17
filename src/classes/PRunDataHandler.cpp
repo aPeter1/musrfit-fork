@@ -356,6 +356,18 @@ bool PRunDataHandler::ReadRootFile()
     return false;
   }
 
+  // get temperature
+  runData.fTemp = runHeader->GetSampleTemperature();
+
+  // get field
+  runData.fField = runHeader->GetSampleBField();
+
+  // get implantation energy
+  runData.fEnergy = runHeader->GetImpEnergy();
+
+  // get setup
+  runData.fSetup = runHeader->GetLemSetup().GetString();
+
   // get time resolution
   runData.fTimeResolution = runHeader->GetTimeResolution();
 
@@ -463,6 +475,7 @@ bool PRunDataHandler::ReadNemuFile()
   runData.fSetup          = TString("");
   runData.fField          = nan("NAN");
   runData.fTemp           = nan("NAN");
+  runData.fEnergy         = nan("NAN");
   runData.fTimeResolution = nan("NAN");
 
   // open file

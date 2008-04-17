@@ -148,6 +148,7 @@ typedef struct {
   TString fSetup;                 ///< description of the setup of this run
   double fField;                  ///< magnetic field value
   double fTemp;                   ///< temperature during the run
+  double fEnergy;                 ///< implantation energy of the muon
   double fTimeResolution;         ///< time resolution of the run
   PDoubleVector fT0s;             ///< vector of t0's of a run
   vector<PDoubleVector> fDataBin; ///< vector of all histos of a run

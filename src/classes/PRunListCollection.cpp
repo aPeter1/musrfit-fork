@@ -423,3 +423,56 @@ PRunData* PRunListCollection::GetNonMusr(unsigned int index, EDataSwitch tag)
 
   return 0;
 }
+
+//--------------------------------------------------------------------------
+// GetTemp
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param runName
+ */
+double PRunListCollection::GetTemp(TString &runName)
+{
+  return fData->GetRunData(runName)->fTemp;
+}
+
+//--------------------------------------------------------------------------
+// GetField
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param runName
+ */
+double PRunListCollection::GetField(TString &runName)
+{
+  return fData->GetRunData(runName)->fField;
+}
+
+//--------------------------------------------------------------------------
+// GetEnergy
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param runName
+ */
+double PRunListCollection::GetEnergy(TString &runName)
+{
+  return fData->GetRunData(runName)->fEnergy;
+}
+
+//--------------------------------------------------------------------------
+// GetSetup
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param runName
+ */
+const char* PRunListCollection::GetSetup(TString &runName)
+{
+  return fData->GetRunData(runName)->fSetup.Data();
+}
+
