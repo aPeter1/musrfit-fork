@@ -51,8 +51,8 @@ using namespace std;
 #define PRUN_RRF          4
 #define PRUN_NON_MUSR     8
 
-// muon life time in (us)
-#define PMUON_LIFETIME 2.19705
+// muon life time in (us), see PRL99, 032001 (2007)
+#define PMUON_LIFETIME 2.197019
 
 // accelerator cycles in (us), needed to determine proper background
 #define ACCEL_PERIOD_PSI     0.01975

@@ -225,6 +225,7 @@ int main(int argc, char *argv[])
     // clean up
 cout << endl << "clean up canvas vector ...";
     for (unsigned int i=0; i<canvasVector.size(); i++) {
+      // check if canvas is still there before calling the destructor **TO BE DONE**
       canvasVector[i]->~PMusrCanvas();
     }
     canvasVector.empty();

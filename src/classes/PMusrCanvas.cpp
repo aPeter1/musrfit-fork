@@ -55,7 +55,6 @@ PMusrCanvas::PMusrCanvas()
   fDataTheoryPad       = 0;
   fParameterTheoryPad  = 0;
   fInfoPad             = 0;
-  fKeyboardHandlerText = 0;
 }
 
 //--------------------------------------------------------------------------
@@ -95,11 +94,8 @@ PMusrCanvas::~PMusrCanvas()
 {
 cout << "~PMusrCanvas() called" << endl;
   // cleanup
-  if (fKeyboardHandlerText) {
-    delete fKeyboardHandlerText;
-    fKeyboardHandlerText = 0;
-  }
   if (fTitlePad) {
+    fTitlePad->Clear();
     delete fTitlePad;
     fTitlePad = 0;
   }
@@ -108,10 +104,12 @@ cout << "~PMusrCanvas() called" << endl;
     fDataTheoryPad = 0;
   }
   if (fParameterTheoryPad) {
+    fParameterTheoryPad->Clear();
     delete fParameterTheoryPad;
     fParameterTheoryPad = 0;
   }
   if (fInfoPad) {
+    fInfoPad->Clear();
     delete fInfoPad;
     fInfoPad = 0;
   }
@@ -147,7 +145,6 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
   fDataTheoryPad       = 0;
   fParameterTheoryPad  = 0;
   fInfoPad             = 0;
-  fKeyboardHandlerText = 0;
 
   // invoke canvas
   TString canvasName = TString("fMainCanvas");
@@ -203,18 +200,6 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
   fInfoPad->SetFillColor(TColor::GetColor(255,255,255));
   fInfoPad->SetTextAlign(12); // middle, left
 
-  // fKeyboardHandlerText Pad init
-  fDataTheoryPad->cd();
-  fKeyboardHandlerText = new TPaveText(0.1, 0.1, 0.3, 0.2, "rb");
-  if (fKeyboardHandlerText == 0) {
-    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fKeyboardHandlerText";
-    cout << endl;
-    return;
-  }
-  fKeyboardHandlerText->AddText("none");
-  fKeyboardHandlerText->Draw();
-  fDataTheoryPad->Modified();
-
   fValid = true;
 
   fMainCanvas->cd();
@@ -228,7 +213,6 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
 // cout << "fDataTheoryPad       " << fDataTheoryPad << endl;
 // cout << "fParameterTheoryPad  " << fParameterTheoryPad << endl;
 // cout << "fInfoPad             " << fInfoPad << endl;
-// cout << "fKeyboardHandlerText " << fKeyboardHandlerText << endl;
 }
 
 //--------------------------------------------------------------------------
@@ -265,15 +249,7 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   if (x == 'q') {
     Done(0);
   } else {
-    if (fKeyboardHandlerText) {
-      fDataTheoryPad->cd();
-      delete fKeyboardHandlerText;
-      fKeyboardHandlerText = 0;
-      fKeyboardHandlerText = new TPaveText(0.1, 0.1, 0.3, 0.2, "rb");
-      fKeyboardHandlerText->AddText(str.Data());
-      fKeyboardHandlerText->Draw();
-      fMainCanvas->cd();
-    }
+    // do all the necessary stuff **TO BE DONE**
     fMainCanvas->Update();
   }
 }
@@ -427,7 +403,7 @@ cout << endl;
           return;
         }
         // handle data
-        HandleSingleHistoDataSet(runNo, data);
+        HandleDataSet(runNo, data);
         break;
       case MSR_FITTYPE_ASYM:
         data = fRunList->GetAsymmetry(runNo, PRunListCollection::kRunNo);
@@ -439,7 +415,7 @@ cout << endl;
           return;
         }
         // handle data
-        HandleAsymmetryDataSet(runNo, data);
+        HandleDataSet(runNo, data);
         break;
       case MSR_FITTYPE_ASYM_RRF:
         data = fRunList->GetRRF(runNo, PRunListCollection::kRunNo);
@@ -451,7 +427,7 @@ cout << endl;
           return;
         }
         // handle data
-        HandleRRFDataSet(runNo, data);
+        HandleDataSet(runNo, data);
         break;
       case MSR_FITTYPE_NO_MUSR:
         data = fRunList->GetNonMusr(runNo, PRunListCollection::kRunNo);
@@ -463,7 +439,7 @@ cout << endl;
           return;
         }
         // handle data
-        HandleNoneMusrDataSet(runNo, data);
+        HandleDataSet(runNo, data);
         break;
       default:
         fValid = false;
@@ -703,7 +679,7 @@ void PMusrCanvas::CleanupDataSet(PMusrCanvasDataSet &dataSet)
 }
 
 //--------------------------------------------------------------------------
-// HandleSingleHistoDataSet
+// HandleDataSet
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -711,7 +687,7 @@ void PMusrCanvas::CleanupDataSet(PMusrCanvasDataSet &dataSet)
  * \param runNo
  * \param data
  */
-void PMusrCanvas::HandleSingleHistoDataSet(unsigned int runNo, PRunData *data)
+void PMusrCanvas::HandleDataSet(unsigned int runNo, PRunData *data)
 {
   PMusrCanvasDataSet dataSet;
   TH1F *dataHisto;
@@ -721,7 +697,7 @@ void PMusrCanvas::HandleSingleHistoDataSet(unsigned int runNo, PRunData *data)
   double start;
   double end;
 
-   InitDataSet(dataSet);
+  InitDataSet(dataSet);
 
   // dataHisto -------------------------------------------------------------
   // create histo specific infos
@@ -791,43 +767,3 @@ void PMusrCanvas::HandleSingleHistoDataSet(unsigned int runNo, PRunData *data)
 
   fData.push_back(dataSet);
 }
-
-//--------------------------------------------------------------------------
-// HandleAsymmetryDataSet
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param runNo
- * \param data
- */
-void PMusrCanvas::HandleAsymmetryDataSet(unsigned int runNo, PRunData *data)
-{
-}
-
-//--------------------------------------------------------------------------
-// HandleRRFDataSet
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param runNo
- * \param data
- */
-void PMusrCanvas::HandleRRFDataSet(unsigned int runNo, PRunData *data)
-{
-}
-
-//--------------------------------------------------------------------------
-// HandleNoneMusrDataSet
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param runNo
- * \param data
- */
-void PMusrCanvas::HandleNoneMusrDataSet(unsigned int runNo, PRunData *data)
-{
-}
-

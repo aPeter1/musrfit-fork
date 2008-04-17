@@ -118,8 +118,6 @@ class PMusrCanvas : public TObject, public TQObject
     TPaveText *fParameterTheoryPad;
     TLegend   *fInfoPad;
 
-    TPaveText *fKeyboardHandlerText;
-
 #ifndef __MAKECINT__
     PMsrHandler        *fMsrHandler;
     PRunListCollection *fRunList;
@@ -133,10 +131,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh);
     virtual void InitDataSet(PMusrCanvasDataSet &dataSet);
     virtual void CleanupDataSet(PMusrCanvasDataSet &dataSet);
-    virtual void HandleSingleHistoDataSet(unsigned int runNo, PRunData *data);
-    virtual void HandleAsymmetryDataSet(unsigned int runNo, PRunData *data);
-    virtual void HandleRRFDataSet(unsigned int runNo, PRunData *data);
-    virtual void HandleNoneMusrDataSet(unsigned int runNo, PRunData *data);
+    virtual void HandleDataSet(unsigned int runNo, PRunData *data);
 
   ClassDef(PMusrCanvas, 1)
 };
