@@ -152,6 +152,9 @@ typedef struct {
   double fTimeResolution;         ///< time resolution of the run
   PDoubleVector fT0s;             ///< vector of t0's of a run
   vector<PDoubleVector> fDataBin; ///< vector of all histos of a run
+  PDoubleVector fXData;           ///< vector of all x-data if noMuSR fit
+  PDoubleVector fYData;           ///< vector of all x-data if noMuSR fit
+  PDoubleVector fErrYData;        ///< vector of all x-data if noMuSR fit
 } PRawRunData;
 
 //-------------------------------------------------------------

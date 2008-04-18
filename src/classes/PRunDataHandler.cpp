@@ -841,15 +841,19 @@ bool PRunDataHandler::ReadAsciiFile()
     return false;
   }
 
+  PRawRunData runData;
+
+  int     lineNo = 0;
   char    instr[512];
   TString line, workStr;
   bool    headerTag = false;
   bool    dataTag = false;
+  double  x, y, ey;
 
   while (!f.eof()) {
     f.getline(instr, sizeof(instr));
-cout << endl << ">> " << instr;
     line = TString(instr);
+    lineNo++;
 
     // check if comment line
     if (line.BeginsWith("#") || line.BeginsWith("%"))
@@ -861,7 +865,6 @@ cout << endl << ">> " << instr;
     if (workStr.BeginsWith("header", TString::kIgnoreCase)) {
       headerTag = true;
       dataTag = false;
-cout << endl << "** HEADER TAG FOUND **";
       continue;
     }
 
@@ -869,7 +872,6 @@ cout << endl << "** HEADER TAG FOUND **";
     workStr = line;
     workStr.Remove(TString::kLeading, ' '); // remove spaces from the beining
     if (workStr.BeginsWith("data", TString::kIgnoreCase)) {
-cout << endl << "** DATA TAG FOUND **";
       headerTag = false;
       dataTag = true;
       continue;
@@ -881,16 +883,39 @@ cout << endl << "** DATA TAG FOUND **";
       workStr = line;
       workStr.Remove(TString::kLeading, ' '); // remove spaces from the beining
       if (workStr.BeginsWith("title:", TString::kIgnoreCase)) {
-        // keep title
+        runData.fRunTitle = TString(workStr.Data()+workStr.First(":")+2);
       } else if (workStr.BeginsWith("setup:", TString::kIgnoreCase)) {
-        // keep setup
+        runData.fSetup = TString(workStr.Data()+workStr.First(":")+2);
       } else if (workStr.BeginsWith("field:", TString::kIgnoreCase)) {
-        // keep field
+        workStr = TString(workStr.Data()+workStr.First(":")+2);
+        if (!workStr.IsFloat()) {
+          cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", field is not a number.";
+          cout << endl;
+          success = false;
+          break;
+        }
+        runData.fField = workStr.Atof();
       } else if (workStr.BeginsWith("temp:", TString::kIgnoreCase)) {
-        // keep temp
+        workStr = TString(workStr.Data()+workStr.First(":")+2);
+        if (!workStr.IsFloat()) {
+          cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", temperature is not a number.";
+          cout << endl;
+          success = false;
+          break;
+        }
+        runData.fTemp = workStr.Atof();
       } else if (workStr.BeginsWith("energy:", TString::kIgnoreCase)) {
-        // keep energy
+        workStr = TString(workStr.Data()+workStr.First(":")+2);
+        if (!workStr.IsFloat()) {
+          cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", energy is not a number.";
+          cout << endl;
+          success = false;
+          break;
+        }
+        runData.fEnergy = workStr.Atof();
       } else { // error
+        cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", illegal header line.";
+        cout << endl;
         success = false;
         break;
       }
@@ -901,26 +926,69 @@ cout << endl << "** DATA TAG FOUND **";
       TObjArray *tokens;
       // check if data have x, y [, error y] structure, and that x, y, and error y are numbers
       tokens = line.Tokenize(" ,/t");
-cout << endl << ">> data tokens = " << tokens->GetEntries();
       // check if the number of data line entries is 2 or 3
       if ((tokens->GetEntries() != 2) && (tokens->GetEntries() != 3)) {
-        cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** found data line with a structure different than \"x, y [, error y]\", cannot be handled";
+        cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** found data line with a structure different than \"x, y [, error y]\", cannot be handled (line no " << lineNo << ")";
         cout << endl;
         success = false;
         break;
       }
+
+      // get x
+      ostr = dynamic_cast<TObjString*>(tokens->At(0));
+      if (!ostr->GetString().IsFloat()) {
+        cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ": x = " << ostr->GetString().Data() << " is not a number, sorry.";
+        cout << endl;
+        success = false;
+        break;
+      }
+      x = ostr->GetString().Atof();
+
+      // get y
+      ostr = dynamic_cast<TObjString*>(tokens->At(1));
+      if (!ostr->GetString().IsFloat()) {
+        cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ": y = " << ostr->GetString().Data() << " is not a number, sorry.";
+        cout << endl;
+        success = false;
+        break;
+      }
+      y = ostr->GetString().Atof();
+
+      // get error y if present
+      if (tokens->GetEntries() == 3) {
+        ostr = dynamic_cast<TObjString*>(tokens->At(2));
+        if (!ostr->GetString().IsFloat()) {
+          cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ": error y = " << ostr->GetString().Data() << " is not a number, sorry.";
+          cout << endl;
+          success = false;
+          break;
+        }
+        ey = ostr->GetString().Atof();
+      } else {
+        ey = 1.0;
+      }
+
       // clean up tokens
       if (tokens) {
         delete tokens;
         tokens = 0;
       }
+
+      // keep values
+      runData.fXData.push_back(x);
+      runData.fYData.push_back(y);
+      runData.fErrYData.push_back(ey);
     } else {
+      cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << " neither header nor data line. No idea how to handle it!";
+      cout << endl;
       success = false;
       break;
     }
   }
 
   f.close();
+
+  fData.push_back(runData);
 
   return success;
 }
