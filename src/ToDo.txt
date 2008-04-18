@@ -48,11 +48,12 @@ short term:
   is executed, this is stupid. Define a place where to look for it.
   **DONE** 08-04-08
 
-* do I need to cleanup AddText() objects from TPaveText etc myself? **CHECK**
+* do I need to cleanup AddText() objects from TPaveText etc myself? -> YES **DONE** 08-04-17
+
+* need a CLEAN concept for handling data/theory generation for kView!! **DONE** 08-04-17
 
 * something is strange with the coordinate system in TPaveText! **CHECK**
 
-* need a CLEAN concept for handling data/theory generation for kView!!
 
 ---------------------
 intermediate term:

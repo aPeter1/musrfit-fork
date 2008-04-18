@@ -798,13 +798,131 @@ bool PRunDataHandler::ReadMudFile()
 // ReadAsciiFile
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Reads ascii files. Intended for the No-muSR data.
+ *
+ * The file format definition is:
+ * Comment lines start with a '#' or '%' character.
+ * The file can start with some header info. The header is optional, as all its tags, but 
+ * if present it has the following format:
+ *
+ * HEADER
+ * TITLE:  title
+ * SETUP:  setup
+ * FIELD:  field
+ * TEMP:   temperature
+ * ENERGY: energy
+ *
+ * field is assumed to be given in (G), the temperature in (K), the energy in (keV)
+ *
+ * The data are read column like and start with the data tag DATA, followed by the
+ * data columns, i.e.:
+ *
+ * DATA
+ * x, y [, error y]
+ *
+ * where spaces, column, are a tab are possible separations.
+ * If no error in y is present, the weighting in the fit will be equal.
  *
  */
 bool PRunDataHandler::ReadAsciiFile()
 {
+  bool success = true;
+
   cout << endl << "PRunDataHandler::ReadAsciiFile(): Sorry, not yet implemented ...";
-  return false;
+
+  // open file
+  ifstream f;
+
+  // open dump-file
+  f.open(fRunPathName.Data(), ifstream::in);
+  if (!f.is_open()) {
+    cout << endl << "Couldn't open data file (" << fRunPathName.Data() << ") for reading, sorry ...";
+    cout << endl;
+    return false;
+  }
+
+  char    instr[512];
+  TString line, workStr;
+  bool    headerTag = false;
+  bool    dataTag = false;
+
+  while (!f.eof()) {
+    f.getline(instr, sizeof(instr));
+cout << endl << ">> " << instr;
+    line = TString(instr);
+
+    // check if comment line
+    if (line.BeginsWith("#") || line.BeginsWith("%"))
+      continue;
+
+    // check if header tag
+    workStr = line;
+    workStr.Remove(TString::kLeading, ' '); // remove spaces from the beining
+    if (workStr.BeginsWith("header", TString::kIgnoreCase)) {
+      headerTag = true;
+      dataTag = false;
+cout << endl << "** HEADER TAG FOUND **";
+      continue;
+    }
+
+    // check if data tag
+    workStr = line;
+    workStr.Remove(TString::kLeading, ' '); // remove spaces from the beining
+    if (workStr.BeginsWith("data", TString::kIgnoreCase)) {
+cout << endl << "** DATA TAG FOUND **";
+      headerTag = false;
+      dataTag = true;
+      continue;
+    }
+
+    if (headerTag) {
+      if (line.IsWhitespace()) // ignore empty lines
+        continue;
+      workStr = line;
+      workStr.Remove(TString::kLeading, ' '); // remove spaces from the beining
+      if (workStr.BeginsWith("title:", TString::kIgnoreCase)) {
+        // keep title
+      } else if (workStr.BeginsWith("setup:", TString::kIgnoreCase)) {
+        // keep setup
+      } else if (workStr.BeginsWith("field:", TString::kIgnoreCase)) {
+        // keep field
+      } else if (workStr.BeginsWith("temp:", TString::kIgnoreCase)) {
+        // keep temp
+      } else if (workStr.BeginsWith("energy:", TString::kIgnoreCase)) {
+        // keep energy
+      } else { // error
+        success = false;
+        break;
+      }
+    } else if (dataTag) {
+      if (line.IsWhitespace()) // ignore empty lines
+        continue;
+      TObjString *ostr;
+      TObjArray *tokens;
+      // check if data have x, y [, error y] structure, and that x, y, and error y are numbers
+      tokens = line.Tokenize(" ,/t");
+cout << endl << ">> data tokens = " << tokens->GetEntries();
+      // check if the number of data line entries is 2 or 3
+      if ((tokens->GetEntries() != 2) && (tokens->GetEntries() != 3)) {
+        cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** found data line with a structure different than \"x, y [, error y]\", cannot be handled";
+        cout << endl;
+        success = false;
+        break;
+      }
+      // clean up tokens
+      if (tokens) {
+        delete tokens;
+        tokens = 0;
+      }
+    } else {
+      success = false;
+      break;
+    }
+  }
+
+  f.close();
+
+  return success;
 }
 
 //--------------------------------------------------------------------------
