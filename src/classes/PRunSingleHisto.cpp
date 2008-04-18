@@ -218,7 +218,16 @@ void PRunSingleHisto::CalcTheory()
     par.push_back((*paramList)[i].fValue);
 
   // calculate asymmetry
-  double N0 = par[fRunInfo->fNormParamNo-1];
+  double N0;
+  // check if norm is a parameter or a function
+  if (fRunInfo->fNormParamNo < MSR_PARAM_FUN_OFFSET) { // norm is a parameter
+    N0 = par[fRunInfo->fNormParamNo-1];
+  } else { // norm is a function
+    // get function number
+    unsigned int funNo = fRunInfo->fNormParamNo-MSR_PARAM_FUN_OFFSET;
+    // evaluate function
+    N0 = fMsrInfo->EvalFunc(funNo,fRunInfo->fMap,par);
+  }
 
   // get tau
   double tau;
@@ -537,7 +546,16 @@ bool PRunSingleHisto::PrepareRawViewData()
     par.push_back((*paramList)[i].fValue);
 
   // calculate asymmetry
-  double N0 = par[fRunInfo->fNormParamNo-1];
+  double N0;
+  // check if norm is a parameter or a function
+  if (fRunInfo->fNormParamNo < MSR_PARAM_FUN_OFFSET) { // norm is a parameter
+    N0 = par[fRunInfo->fNormParamNo-1];
+  } else { // norm is a function
+    // get function number
+    unsigned int funNo = fRunInfo->fNormParamNo-MSR_PARAM_FUN_OFFSET;
+    // evaluate function
+    N0 = fMsrInfo->EvalFunc(funNo,fRunInfo->fMap,par);
+  }
 
   // get tau
   double tau;
@@ -681,7 +699,16 @@ bool PRunSingleHisto::PrepareViewData()
     par.push_back((*paramList)[i].fValue);
 
   // calculate asymmetry
-  double N0 = par[fRunInfo->fNormParamNo-1];
+  double N0;
+  // check if norm is a parameter or a function
+  if (fRunInfo->fNormParamNo < MSR_PARAM_FUN_OFFSET) { // norm is a parameter
+    N0 = par[fRunInfo->fNormParamNo-1];
+  } else { // norm is a function
+    // get function number
+    unsigned int funNo = fRunInfo->fNormParamNo-MSR_PARAM_FUN_OFFSET;
+    // evaluate function
+    N0 = fMsrInfo->EvalFunc(funNo,fRunInfo->fMap,par);
+  }
 //cout << endl << ">> N0 = " << N0;
 
   // get tau
