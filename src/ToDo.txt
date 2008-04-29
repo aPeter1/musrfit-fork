@@ -81,6 +81,12 @@ long term:
 * switch from qmake to cmake
 
 ---------------------
+bugs:
+---------------------
+* when having multiple plots: closing some of the plots and finally pressing 'q' will lead to a crash
+  since root already eliminated the closed canvas plot.
+
+---------------------
 problems:
 ---------------------
 * rootcint cannot handle spirit framework includes, hence FUNCTIONS related stuff cannot be included

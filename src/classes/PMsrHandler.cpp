@@ -329,10 +329,10 @@ int PMsrHandler::WriteMsrLogFile()
       f << left << fParam[i].fUpperBoundary;
       f << " ";
     }
+    CheckAndWriteComment(f, ++lineNo);
     // terminate parameter line if not the last line
     if (i != fParam.size()-1)
       f << endl;
-    CheckAndWriteComment(f, ++lineNo);
   }
 
   // write theory block
@@ -2266,8 +2266,9 @@ void PMsrHandler::CheckAndWriteComment(ofstream &f, int &lineNo)
 
   // check if lineNo is present
   for (i=0; i<fComments.size(); i++) {
-    if (fComments[i].fLineNo == lineNo)
+    if (fComments[i].fLineNo == lineNo) {
       break;
+    }
   }
 
   if (i<fComments.size()) {

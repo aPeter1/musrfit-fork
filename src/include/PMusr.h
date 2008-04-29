@@ -130,12 +130,13 @@ typedef struct {
   // data related info
   double fDataTimeStart;
   double fDataTimeStep;
-  vector<double> fValue;
-  vector<double> fError;
+  PDoubleVector fX; // only used for non-muSR
+  PDoubleVector fValue;
+  PDoubleVector fError;
   // theory related info
   double fTheoryTimeStart;
   double fTheoryTimeStep;
-  vector<double> fTheory;
+  PDoubleVector fTheory;
 } PRunData;
 
 //-------------------------------------------------------------

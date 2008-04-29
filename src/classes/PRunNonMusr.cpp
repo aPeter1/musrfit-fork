@@ -134,6 +134,70 @@ bool PRunNonMusr::PrepareData()
 
   cout << endl << "in PRunNonMusr::PrepareData(): will feed fFitData";
 
+  if (fHandleTag == kFit)
+    success = PrepareFitData();
+  else if (fHandleTag == kView)
+    success = PrepareViewData();
+  else
+    success = false;
+
   return success;
 }
 
+//--------------------------------------------------------------------------
+// PrepareFitData
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+bool PRunNonMusr::PrepareFitData()
+{
+  bool success = true;
+
+  // get the proper run
+  PRawRunData* runData = fRawData->GetRunData(fRunInfo->fRunName);
+  if (!runData) { // couldn't get run
+    cout << endl << "PRunNonMusr::PrepareFitData(): **ERROR** Couldn't get run " << fRunInfo->fRunName.Data() << "!";
+    return false;
+  }
+
+  // keep start/stop time for fit: here the meaning is of course start x, stop x
+  fFitStartTime = fRunInfo->fFitRange[0];
+  fFitStopTime  = fRunInfo->fFitRange[1];
+
+  // pack the raw data
+  double value  = 0.0;
+  double err = 0.0;
+  for (unsigned int i=0; i<runData->fXData.size(); i++) {
+    if ((i % fRunInfo->fPacking == 0) && (i != 0)) { // fill data
+      fData.fX.push_back(runData->fXData[i]-(runData->fXData[i]-runData->fXData[i-fRunInfo->fPacking])/2.0);
+      fData.fValue.push_back(value);
+      fData.fError.push_back(TMath::Sqrt(err));
+      value = 0.0;
+      err = 0.0;
+    }
+    // sum raw data values
+    value += runData->fYData[i];
+    err += runData->fErrYData[i]*runData->fErrYData[i];
+  }
+
+  // count the number of bins to be fitted
+  fNoOfFitBins=0; // STILL MISSING!!
+
+  return success;
+}
+
+//--------------------------------------------------------------------------
+// PrepareViewData
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+bool PRunNonMusr::PrepareViewData()
+{
+  bool success = true;
+
+  return success;
+}

@@ -49,6 +49,8 @@ class PRunNonMusr : public PRunBase
 
   protected:
     virtual bool PrepareData();
+    virtual bool PrepareFitData();
+    virtual bool PrepareViewData();
 
   private:
     double fFitStartTime;
