@@ -117,7 +117,16 @@ double PRunSingleHisto::CalcChiSquare(const std::vector<double>& par)
     tau = PMUON_LIFETIME;
 
   // get background
-  double bkg = par[fRunInfo->fBkgFitParamNo-1];
+  double bkg;
+  if (fRunInfo->fBkgFitParamNo == -1) { // bkg not fitted
+    if (isnan(fRunInfo->fBkgFix[0])) { // no fixed background given (background interval)
+      bkg = fBackground;
+    } else { // fixed bkg given
+      bkg = fRunInfo->fBkgFix[0];
+    }
+  } else { // bkg fitted
+    bkg = par[fRunInfo->fBkgFitParamNo-1];
+  }
 
   // calculate functions
   for (int i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
@@ -136,6 +145,8 @@ double PRunSingleHisto::CalcChiSquare(const std::vector<double>& par)
       chisq += diff*diff / (fData.fError[i]*fData.fError[i]);
     }
   }
+
+//cout << endl << "chisq=" << chisq*fRunInfo->fPacking;
 
   return chisq;
 }
@@ -172,7 +183,16 @@ double PRunSingleHisto::CalcMaxLikelihood(const std::vector<double>& par)
     tau = PMUON_LIFETIME;
 
   // get background
-  double bkg = par[fRunInfo->fBkgFitParamNo-1];
+  double bkg;
+  if (fRunInfo->fBkgFitParamNo == -1) { // bkg not fitted
+    if (isnan(fRunInfo->fBkgFix[0])) { // no fixed background given (background interval)
+      bkg = fBackground;
+    } else { // fixed bkg given
+      bkg = fRunInfo->fBkgFix[0];
+    }
+  } else { // bkg fitted
+    bkg = par[fRunInfo->fBkgFitParamNo-1];
+  }
 
   // calculate functions
   for (int i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
@@ -237,7 +257,16 @@ void PRunSingleHisto::CalcTheory()
     tau = PMUON_LIFETIME;
 
   // get background
-  double bkg = par[fRunInfo->fBkgFitParamNo-1];
+  double bkg;
+  if (fRunInfo->fBkgFitParamNo == -1) { // bkg not fitted
+    if (isnan(fRunInfo->fBkgFix[0])) { // no fixed background given (background interval)
+      bkg = fBackground;
+    } else { // fixed bkg given
+      bkg = fRunInfo->fBkgFix[0];
+    }
+  } else { // bkg fitted
+    bkg = par[fRunInfo->fBkgFitParamNo-1];
+  }
 
   // calculate functions
   for (int i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
@@ -380,8 +409,23 @@ bool PRunSingleHisto::PrepareFitData()
     return false;
   }
 
+  // check how the background shall be handled
+  if (fRunInfo->fBkgFitParamNo == -1) { // bkg shall **NOT** be fitted
+    // subtract background from histogramms ------------------------------------------
+    if (isnan(fRunInfo->fBkgFix[0])) { // no fixed background given
+      if (fRunInfo->fBkgRange[0] != 0) {
+        if (!EstimateBkg(histoNo))
+          return false;
+      } else { // no background given to do the job
+        cout << endl << "PRunSingleHisto::PrepareData(): Neither fix background nor background bins are given!";
+        cout << endl << "One of the two is needed! Will quit ...";
+        return false;
+      }
+    }
+  }
+
   // everything looks fine, hence fill data set
-  double value  = 0.0;
+  double value = 0.0;
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
   fData.fDataTimeStart = fTimeResolution*(((double)start-t0)+(double)fRunInfo->fPacking/2.0);
@@ -396,6 +440,7 @@ bool PRunSingleHisto::PrepareFitData()
         fData.fError.push_back(1.0);
       else
         fData.fError.push_back(TMath::Sqrt(value/fRunInfo->fPacking));
+      // reset values
       value = 0.0;
     }
     value += runData->fDataBin[histoNo][i];
@@ -509,7 +554,7 @@ bool PRunSingleHisto::PrepareRawViewData()
   }
 
   // everything looks fine, hence fill data set
-  double value  = 0.0;
+  double value = 0.0;
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
   fData.fDataTimeStart = fTimeResolution*(((double)start-t0)+(double)fRunInfo->fPacking/2.0);
@@ -524,6 +569,7 @@ bool PRunSingleHisto::PrepareRawViewData()
         fData.fError.push_back(1.0);
       else
         fData.fError.push_back(TMath::Sqrt(value/fRunInfo->fPacking));
+      // reset values
       value = 0.0;
     }
     value += runData->fDataBin[histoNo][i];
@@ -565,7 +611,18 @@ bool PRunSingleHisto::PrepareRawViewData()
     tau = PMUON_LIFETIME;
 
   // get background
-  double bkg = par[fRunInfo->fBkgFitParamNo-1];
+  double bkg;
+  if (fRunInfo->fBkgFitParamNo == -1) { // bkg not fitted
+    if (isnan(fRunInfo->fBkgFix[0])) { // no fixed background given (background interval)
+      if (!EstimateBkg(histoNo))
+        return false;
+      bkg = fBackground;
+    } else { // fixed bkg given
+      bkg = fRunInfo->fBkgFix[0];
+    }
+  } else { // bkg fitted
+    bkg = par[fRunInfo->fBkgFitParamNo-1];
+  }
 
   // calculate functions
   for (int i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
@@ -720,8 +777,18 @@ bool PRunSingleHisto::PrepareViewData()
 //cout << endl << ">> tau = " << tau;
 
   // get background
-  double bkg = par[fRunInfo->fBkgFitParamNo-1];
-//cout << endl << ">> bkg = " << bkg;
+  double bkg;
+  if (fRunInfo->fBkgFitParamNo == -1) { // bkg not fitted
+    if (isnan(fRunInfo->fBkgFix[0])) { // no fixed background given (background interval)
+      if (!EstimateBkg(histoNo))
+        return false;
+      bkg = fBackground;
+    } else { // fixed bkg given
+      bkg = fRunInfo->fBkgFix[0];
+    }
+  } else { // bkg fitted
+    bkg = par[fRunInfo->fBkgFitParamNo-1];
+  }
 
   double value  = 0.0;
   double expval;
@@ -771,6 +838,80 @@ bool PRunSingleHisto::PrepareViewData()
 
   // clean up
   par.clear();
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// EstimatBkg
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ */
+bool PRunSingleHisto::EstimateBkg(unsigned int histoNo)
+{
+  double beamPeriod = 0.0;
+
+  // check if data are from PSI, RAL, or TRIUMF
+  if (fRunInfo->fInstitute.Contains("psi"))
+    beamPeriod = ACCEL_PERIOD_PSI;
+  else if (fRunInfo->fInstitute.Contains("ral"))
+    beamPeriod = ACCEL_PERIOD_RAL;
+  else if (fRunInfo->fInstitute.Contains("triumf"))
+    beamPeriod = ACCEL_PERIOD_TRIUMF;
+  else
+    beamPeriod = 0.0;
+
+  // check if start and end are in proper order
+  unsigned int start = fRunInfo->fBkgRange[0];
+  unsigned int end   = fRunInfo->fBkgRange[1];
+  if (end < start) {
+    cout << endl << "PRunSingleHisto::EstimatBkg(): end = " << end << " > start = " << start << "! Will swap them!";
+    unsigned int keep = end;
+    end = start;
+    start = keep;
+  }
+
+  // calculate proper background range
+  if (beamPeriod != 0.0) {
+    double beamPeriodBins = beamPeriod/fRunInfo->fPacking;
+    unsigned int periods = (unsigned int)((double)(end - start + 1) / beamPeriodBins);
+    end = start + (unsigned int)round((double)periods*beamPeriodBins);
+    cout << endl << "PRunSingleHisto::EstimatBkg(): Background " << start << ", " << end;
+    if (end == start)
+      end = fRunInfo->fBkgRange[1];
+  }
+
+  // get the proper run
+  PRawRunData* runData = fRawData->GetRunData(fRunInfo->fRunName);
+
+  // check if start is within histogram bounds
+  if ((start < 0) || (start >= runData->fDataBin[histoNo].size())) {
+    cout << endl << "PRunSingleHisto::EstimatBkg(): background bin values out of bound!";
+    cout << endl << "  histo lengths    = " << runData->fDataBin[histoNo].size();
+    cout << endl << "  background start = " << start;
+    return false;
+  }
+
+  // check if end is within histogram bounds
+  if ((end < 0) || (end >= runData->fDataBin[histoNo].size())) {
+    cout << endl << "PRunSingleHisto::EstimatBkg(): background bin values out of bound!";
+    cout << endl << "  histo lengths  = " << runData->fDataBin[histoNo].size();
+    cout << endl << "  background end = " << end;
+    return false;
+  }
+
+  // calculate background
+  double bkg    = 0.0;
+
+  // forward
+  for (unsigned int i=start; i<end; i++)
+    bkg += runData->fDataBin[histoNo][i];
+  bkg /= static_cast<double>(end - start + 1);
+
+  fBackground = bkg; // keep background (per bin) for chisq, max.log.likelihood
+
+  cout << endl << ">> fRunInfo->fRunName=" << fRunInfo->fRunName.Data() << ", histNo=" << histoNo << ", bkg=" << bkg;
 
   return true;
 }

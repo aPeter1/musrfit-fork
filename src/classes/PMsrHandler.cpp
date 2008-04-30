@@ -510,9 +510,11 @@ int PMsrHandler::WriteMsrLogFile()
       f.width(15);
       f << endl << left << "backgr.fix";
       for (unsigned int j=0; j<2; j++) {
-        f.precision(prec);
-        f.width(12);
-        f << left << fRuns[i].fBkgFix[j];
+        if (!isnan(fRuns[i].fBkgFix[j])) {
+          f.precision(prec);
+          f.width(12);
+          f << left << fRuns[i].fBkgFix[j];
+        }
       }
       CheckAndWriteComment(f, ++lineNo);
     }
@@ -1053,10 +1055,11 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     // RUN line ----------------------------------------------
     if (iter->fLine.BeginsWith("run", TString::kIgnoreCase)) {
 
-      if (!first) // not the first run in the list
+      if (!first) { // not the first run in the list
         fRuns.push_back(param);
-      else
+      } else {
         first = false;
+      }
 
       InitRunParameterStructure(param);
 
@@ -1252,10 +1255,10 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
 
     // backgr.fix ----------------------------------------------
     if (iter->fLine.BeginsWith("backgr.fix", TString::kIgnoreCase)) {
-      if (tokens->GetEntries() != 3) {
+      if ((tokens->GetEntries() != 2) && (tokens->GetEntries() != 3)) {
         error = true;
       } else {
-        for (int i=1; i<3; i++) {
+        for (int i=1; i<tokens->GetEntries(); i++) {
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsFloat())
@@ -1439,11 +1442,37 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
 
   if (error) {
     --iter;
-    cout << endl << "ERROR in line " << iter->fLineNo << ":";
+    cout << endl << "**ERROR** in line " << iter->fLineNo << ":";
     cout << endl << iter->fLine.Data();
     cout << endl << "RUN block syntax is too complex to print it here. Please check the manual.";
   } else { // save last run found
     fRuns.push_back(param);
+  }
+
+  // check if for fittypes: single histo, asymmetry, RRF any background info is given
+  for (unsigned int i=0; i<fRuns.size(); i++) {
+    if ((fRuns[i].fFitType == MSR_FITTYPE_SINGLE_HISTO) ||
+        (fRuns[i].fFitType == MSR_FITTYPE_ASYM) ||
+        (fRuns[i].fFitType == MSR_FITTYPE_ASYM_RRF)) {
+      bool found;
+      if (fRuns[i].fBkgFitParamNo >= 0) { // check if backgr.fit is given
+        found = true;
+      } else if (!isnan(fRuns[i].fBkgFix[0])) { // check if backgr.fix is given
+        found = true;
+      } else if (fRuns[i].fBkgRange[0] >= 0) { // check if background window is given
+        found = true;
+      } else {
+        found = false;
+      }
+      if (!found) {
+        cout << endl << "**ERROR** for run " << fRuns[i].fRunName << ",  forward " << fRuns[i].fForwardHistoNo;
+        cout << endl << "   no background information found!";
+        cout << endl << "   Either of the tags 'backgr.fit', 'backgr.fix', 'background'";
+        cout << endl << "   with data is needed.";
+        cout << endl;
+        return false;
+      }
+    }
   }
 
   return !error;

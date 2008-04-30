@@ -57,6 +57,9 @@ class PRunSingleHisto : public PRunBase
     double fFitStartTime;
     double fFitStopTime;
     unsigned int fNoOfFitBins;
+    double fBackground;         ///< needed if background range is given. In units per bin
+
+    bool EstimateBkg(unsigned int histoNo);
 };
 
 #endif // _PRUNSINGLEHISTO_H_

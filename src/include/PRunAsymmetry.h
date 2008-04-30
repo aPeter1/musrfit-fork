@@ -59,10 +59,10 @@ class PRunAsymmetry : public PRunBase
     double fFitStopTime;
     unsigned int fNoOfFitBins;
 
-    vector<double> fForward;     ///< forward histo data
-    vector<double> fForwardErr;  ///< forward histo errors
-    vector<double> fBackward;    ///< backward histo data
-    vector<double> fBackwardErr; ///< backward histo errors
+    PDoubleVector fForward;     ///< forward histo data
+    PDoubleVector fForwardErr;  ///< forward histo errors
+    PDoubleVector fBackward;    ///< backward histo data
+    PDoubleVector fBackwardErr; ///< backward histo errors
 
     bool SubtractFixBkg();
     bool SubtractEstimatedBkg();
