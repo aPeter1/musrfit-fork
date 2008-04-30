@@ -117,8 +117,9 @@ int main(int argc, char *argv[])
   status = saxParser->ParseFile(startup_path_name);
   // check for parse errors
   if (status) { // error
-    cout << endl << "**WARNING** reading/parsing musrfit_startup.xml.";
+    cout << endl << "**WARNING** reading/parsing musrfit_startup.xml failed.";
     cout << endl;
+/*    
     // clean up
     if (saxParser) {
       delete saxParser;
@@ -128,7 +129,9 @@ int main(int argc, char *argv[])
       delete startupHandler;
       startupHandler = 0;
     }
+*/    
   }
+  startupHandler->CheckLists();
 
   // read msr-file
   PMsrHandler *msrHandler = new PMsrHandler(argv[1]);

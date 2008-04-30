@@ -84,44 +84,7 @@ void PStartupHandler::OnStartDocument()
 void PStartupHandler::OnEndDocument()
 {
   // check if anything was set, and if not set some default stuff
-
-  // check if any data path is given
-  if (fDataPathList.size() == 0) {
-    fDataPathList.push_back(TString("/mnt/data/nemu/his"));
-    fDataPathList.push_back(TString("/mnt/data/nemu/wkm"));
-  }
-
-  // check if any markers are given
-  if (fMarkerList.size() == 0) {
-    fMarkerList.push_back(24); // open circle
-    fMarkerList.push_back(25); // open square
-    fMarkerList.push_back(26); // open triangle
-    fMarkerList.push_back(27); // open diamond
-    fMarkerList.push_back(28); // open cross
-    fMarkerList.push_back(29); // full star
-    fMarkerList.push_back(30); // open star
-    fMarkerList.push_back(20); // full circle
-    fMarkerList.push_back(21); // full square
-    fMarkerList.push_back(22); // full triangle
-    fMarkerList.push_back(23); // full down triangle
-    fMarkerList.push_back(2);  // thin cross
-    fMarkerList.push_back(3);  // thin star
-    fMarkerList.push_back(5);  // thin cross 45° rotated
-  }
-
-  // check if any colors are given
-  if (fColorList.size() == 0) {
-    fColorList.push_back(TColor::GetColor(0, 0, 0));     // kBlack
-    fColorList.push_back(TColor::GetColor(255, 0, 0));   // kRed
-    fColorList.push_back(TColor::GetColor(0, 255, 0));   // kGreen
-    fColorList.push_back(TColor::GetColor(0, 0, 255));   // kBlue
-    fColorList.push_back(TColor::GetColor(255, 0, 255)); // kMagneta
-    fColorList.push_back(TColor::GetColor(0, 255, 255)); // kCyan
-    fColorList.push_back(TColor::GetColor(156, 0, 255)); // kViolette-3
-    fColorList.push_back(TColor::GetColor(99, 101, 49)); // kYellow-1
-    fColorList.push_back(TColor::GetColor(49, 101, 49)); // kGreen-1
-    fColorList.push_back(TColor::GetColor(156, 48, 0));  // kOrange-4
-  }
+  CheckLists();
 }
 
 //--------------------------------------------------------------------------
@@ -316,6 +279,62 @@ void PStartupHandler::OnFatalError(const char *str)
 void PStartupHandler::OnCdataBlock(const char *str, Int_t len)
 {
   // nothing to be done for now
+}
+
+//--------------------------------------------------------------------------
+// CheckLists
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PStartupHandler::CheckLists()
+{
+  // check if anything was set, and if not set some default stuff
+
+  // check if any data path is given
+cout << endl << ">> check data path list ...";  
+  if (fDataPathList.size() == 0) {
+cout << endl << ">> data path list empty, will set default ones";  
+    fDataPathList.push_back(TString("/mnt/data/nemu/his"));
+    fDataPathList.push_back(TString("/mnt/data/nemu/wkm"));
+  }
+
+  // check if any markers are given
+cout << endl << ">> check marker list ...";  
+  if (fMarkerList.size() == 0) {
+cout << endl << ">> marker list empty, will set default ones";  
+    fMarkerList.push_back(24); // open circle
+    fMarkerList.push_back(25); // open square
+    fMarkerList.push_back(26); // open triangle
+    fMarkerList.push_back(27); // open diamond
+    fMarkerList.push_back(28); // open cross
+    fMarkerList.push_back(29); // full star
+    fMarkerList.push_back(30); // open star
+    fMarkerList.push_back(20); // full circle
+    fMarkerList.push_back(21); // full square
+    fMarkerList.push_back(22); // full triangle
+    fMarkerList.push_back(23); // full down triangle
+    fMarkerList.push_back(2);  // thin cross
+    fMarkerList.push_back(3);  // thin star
+    fMarkerList.push_back(5);  // thin cross 45° rotated
+  }
+
+  // check if any colors are given
+cout << endl << ">> check color list ...";  
+  if (fColorList.size() == 0) {
+cout << endl << ">> color list empty, will set default ones";  
+    fColorList.push_back(TColor::GetColor(0, 0, 0));     // kBlack
+    fColorList.push_back(TColor::GetColor(255, 0, 0));   // kRed
+    fColorList.push_back(TColor::GetColor(0, 255, 0));   // kGreen
+    fColorList.push_back(TColor::GetColor(0, 0, 255));   // kBlue
+    fColorList.push_back(TColor::GetColor(255, 0, 255)); // kMagneta
+    fColorList.push_back(TColor::GetColor(0, 255, 255)); // kCyan
+    fColorList.push_back(TColor::GetColor(156, 0, 255)); // kViolette-3
+    fColorList.push_back(TColor::GetColor(99, 101, 49)); // kYellow-1
+    fColorList.push_back(TColor::GetColor(49, 101, 49)); // kGreen-1
+    fColorList.push_back(TColor::GetColor(156, 48, 0));  // kOrange-4
+  }
 }
 
 // end ---------------------------------------------------------------------

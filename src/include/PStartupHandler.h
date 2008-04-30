@@ -56,6 +56,8 @@ class PStartupHandler : public TObject, public TQObject
     virtual void OnFatalError(const char*); // SLOT
     virtual void OnCdataBlock(const char*, Int_t); // SLOT
 
+    virtual void CheckLists();
+    
     virtual const PStringVector GetDataPathList() const { return fDataPathList; }
     virtual const PIntVector    GetMarkerList() const { return fMarkerList; }
     virtual const PIntVector    GetColorList() const { return fColorList; }
