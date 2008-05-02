@@ -1,0 +1,307 @@
+#!/bin/bash
+
+if [ ! -e /usr/bin/awk ]; then 
+	echo Please make sure you have installed awk!
+	exit 1
+fi
+
+if [ $# -lt 3 ] ; then
+
+        cat <<EOFHELP
+
+        "musrfit-mlog to db converter"
+
+USAGE:   mlog2db FIRSTRUN# LASTRUN# BLABLA [noheader | fit-TEMPLATERUN# | -oDB_OUTPUT_FILE]
+
+This small script converts subsequent musrfit output files (mlog) into one db file using bash/awk.
+
+Example 1:
+mlog2db 1423 1424 _ZF-LF-TF-supermeasurement
+generates the db-file "out.db" (or whatever filename you specified with the -o option) from 1423_ZF-LF-TF-supermeasurement.mlog and 1424_ZF-LF-TF-supermeasurement.mlog .
+It also includes the db header.
+If you want to generate a file without the header information just run the script with the option "noheader".
+
+If you additionally want to fit some data using musrfit specify the option "fit-TEMPLATERUN#".
+In this case a mlog-outputfile has to be present for the specified template run. The subsequent inputfiles will be created.
+
+Example 2:
+mlog2db 200 220 _tf_h13 -oABC.db fit-199
+
+This will fit the runs 200 to 220 using musrfit. The file 199_tf_h13.mlog is used as template for the first musrfit input file.
+The results of the fits will be written to ABC.db.
+
+
+CAUTION:
+The "indexing number" of the .mlog has to be at the beginning of the filename.
+Furthermore the histogram files that were fitted have to have the name "XXX_RUN#_YYY" or "ZZZ_his_RUN#", where XXX,YYY,ZZZ are strings 
+without whitespaces ("/" is OK).
+If you want to use the fitting feature, musrfit has to be installed either on the PATH or in the local directory.
+
+EOFHELP
+
+else
+
+export PATH=./:$PATH
+
+COUNT=$1
+SUMMDIR="/mnt/data/nemu/summ"
+
+if [ "${4:0:3}" == "fit" ]; then
+        TEMP=${4:4}
+else if [ "${5:0:3}" == "fit" ]; then
+        TEMP=${5:4}
+else if [ "${6:0:3}" == "fit" ]; then
+        TEMP=${6:4}
+fi
+fi
+fi
+
+if [ "$TEMP" != "" ]; then
+	if [ -e $TEMP$3.mlog ]; then
+		TEMPLATE=$TEMP$3.mlog
+	else if [ -e $TEMP$3.msr ]; then
+		TEMPLATE=$TEMP$3.msr
+	fi
+	fi
+fi
+
+while [ $COUNT -le $2 ]
+do
+
+let NEXTCOUNT=COUNT+1
+NEXTINPUT=$NEXTCOUNT$3.msr
+FIRSTINPUT=$1$3.msr
+
+if [ "$TEMP" != "" ]; then
+
+	if [ "$TEMPLATE" == "" ]; then
+		echo The specified musrfit files $TEMP$3.mlog and $TEMP$3.msr do not exist!
+		exit 1
+	fi
+
+	if [ "$COUNT" == "$1" ]; then
+		awk -v count=$TEMP -v nextcount=$1 -v nextinput=$FIRSTINPUT '{
+                        if(NR==1) print nextcount > nextinput
+                        else if($1 == "RUN") {
+                                if (substr(count,1,1) != "_"){ count = sprintf("_%04u", count); nextcount = sprintf("_%04u", nextcount);}
+                                sub(count, nextcount, $0);
+                                print $0 >> nextinput
+                        }
+                        else print $0 >> nextinput
+                }' $TEMPLATE
+	fi
+
+	musrfit $COUNT$3.msr
+
+	if [ $NEXTCOUNT -le $2 ]; then
+		awk -v count=$COUNT -v nextcount=$NEXTCOUNT -v nextinput=$NEXTINPUT '{
+			if(NR==1) print nextcount > nextinput
+			else if($1 == "RUN") {
+				if (substr(count,1,1) != "_"){ count = sprintf("_%04u", count); nextcount = sprintf("_%04u", nextcount);}
+				sub(count, nextcount, $0);
+				print $0 >> nextinput
+			}
+			else print $0 >> nextinput
+		}' $COUNT$3.mlog
+	fi
+fi
+
+if [ ! -e $COUNT$3.mlog ]; then
+                echo The specified musrfit output file $COUNT$3.mlog does not exist!
+                exit 1
+fi
+
+if [ -d $SUMMDIR ]; then
+RUNNUMBER=$( awk '{
+		if(NR==1) X=0
+		if($1 ~ /^RUN/ && X==0) {
+			split($2, runNumber, "_")
+			if(runNumber[1] ~ /lem/ && runNumber[2] != "his") {print runNumber[2] }
+			if(runNumber[1] ~ /lem/ && runNumber[2] == "his") {print substr(runNumber[3],1,4) }
+			X=1 
+		}
+	}' $COUNT$3.mlog )
+
+RUNYEAR=$( awk '{
+                if(NR==1) X=0
+                if($1 ~ /^RUN/ && X==0) {
+                        split($2, runNumber, "_")
+                        if(runNumber[1] ~ /lem/) {print substr(runNumber[1],length(runNumber[1])-1)}
+			else print "XX"
+			X=1
+                }
+        }' $COUNT$3.mlog )
+
+if [ "$RUNYEAR" != "XX" ]; then
+
+SUMMFILE=$SUMMDIR/20$RUNYEAR/lem$RUNYEAR\_$RUNNUMBER.summ
+
+TITLE=$( awk '{ if(NR==4) print $0 }' $SUMMFILE )
+
+ENERGY=$( awk '{ if($0 ~ /implantation energy/) print $(NF-1)}' $SUMMFILE ) 
+
+TEMPERATURE=$( awk '{ if($1 == "Sample_CF1") print $(NF-1)}' $SUMMFILE )
+
+RALRAR=$( awk '{ if($5 == "RA-L") RAL=$7; if($1 == "RA-R") { RAR=$3; print RAL-RAR; nextfile } }' $SUMMFILE )
+
+RATRAB=$( awk '{ if($5 == "RA-T") RAT=$7; if($1 == "RA-B") { RAB=$3; print RAT-RAB; nextfile } }' $SUMMFILE )
+
+TRANSPORT=$( awk '{ if($1 == "Moderator") print $3}' $SUMMFILE )
+
+fi
+
+fi
+
+awk -v parFOUR=$4 -v parFIVE=$5 -v parSIX=$6 '{  
+	
+	outfile="out.db"
+	if(parFOUR ~ /^-o/) outfile = substr(parFOUR,3)
+	if(parFIVE ~ /^-o/) outfile = substr(parFIVE,3)
+	if(parSIX ~ /^-o/) outfile = substr(parSIX,3)
+
+	FS = " "
+        OFS = " "
+
+	if(NR==1){title=$0; X=0; Y=0; i=1}
+
+	if(NR>4){
+                if(X == 0){
+                        if($0 != ""){
+                                parArray[i] = $2
+				dataArray[i] = $3
+				if($4 ~ /^-/) 
+					negErrArray[i] = (-1.0)*$4
+				else
+					negErrArray[i] = $4
+				
+				if($5 ~ /none/)
+					posErrArray[i] = $4
+				else
+					posErrArray[i] = $5
+				i++                         
+                        }
+                        if($0 == "") X=1
+		}
+	}
+
+	if($1 ~ /^RUN/ && X==1){ split($2, runNumber, "_"); X=2 }	
+	
+	if($1 ~ /^chi/ && X==2){
+		parArray[i] = "CHISQ"
+                parArray[i+1] = "NDF"
+                parArray[i+2] = "CHISQred"
+                parArray[i+3] = "RUN"
+
+		sub(/,/, "", $3); sub(/,/, "", $6);
+
+		dataArray[i] = $3
+                dataArray[i+1] = $6
+                dataArray[i+2] = $9
+		
+		if(runNumber[2] != "his") {dataArray[i+3] = runNumber[2] }
+                if(runNumber[2] == "his") {dataArray[i+3] = substr(runNumber[3],1,4) }
+
+		negErrArray[i] = ""
+                negErrArray[i+1] = ""
+                negErrArray[i+2] = ""
+                negErrArray[i+3] = ""
+
+		posErrArray[i] = ""
+                posErrArray[i+1] = ""
+                posErrArray[i+2] = ""
+                posErrArray[i+3] = ""	
+
+	
+# Output to file in the case, the LEM summary file is accessible
+
+		if("'"$TEMPERATURE"'" != "") {
+
+			if("'"$COUNT"'" == "'"$1"'" && parFOUR != "noheader" && parFIVE != "noheader" && parSIX != "noheader"){
+				print "TITLE" >> outfile
+        			print ">>>Put your title here<<<\n" >> outfile
+        			print "Abstract" >> outfile
+        			print ">>>Put your abstract here<<<\n" >> outfile
+        			print "LABELS" >> outfile
+				print "T" >> outfile
+				print "Tr" >> outfile
+				print "E" >> outfile
+				print "RAL-RAR" >> outfile
+				print "RAT-RAB" >> outfile
+				
+				for(k=1;k<i+4;k++){
+					print parArray[k] >> outfile
+				}
+
+				$1 = "Data"
+				$2 = "T"
+				$3 = "Tr"
+				$4 = "E"
+				$5 = "RALRAR"
+				$6 = "RATRAB"
+				for(k=1;k<i+4;k++){
+					$(k+6)=parArray[k]
+				}
+				print "\n" $0 >> outfile
+				print "\\-e" >> outfile
+			}
+
+			print "T = " "'"$TEMPERATURE"'" ",,,\\" >> outfile
+			print "Tr = " "'"$TRANSPORT"'" ",,,\\" >> outfile
+			if ("'"$ENERGY"'" != "") print "E = " "'"$ENERGY"'" ",,,\\" >> outfile
+			else print "E = -999,,,\\" >> outfile
+			if ("'"$RALRAR"'" != "") print "RALRAR = " "'"$RALRAR"'" ",,,\\" >> outfile	
+			else print "RALRAR = -999,,,\\" >> outfile
+			if ("'"$RATRAB"'" != "") print "RATRAB = " "'"$RATRAB"'" ",,,\\" >> outfile
+			else print "RATRAB = -999,,,\\" >> outfile
+
+			for(l=1;l<i+3;l++){
+				print parArray[l] " = " dataArray[l] ", " posErrArray[l] ", " negErrArray[l] ",\\" >> outfile
+			}
+
+			print dataArray[i+3] ",,, " "'"$TITLE"'" >> outfile
+		
+			if("'"$COUNT"'" == "'"$2"'") print "\n" >> outfile
+
+		}
+
+# If we do not have the information from the summary file
+
+		else {
+			if("'"$COUNT"'" == "'"$1"'" && parFOUR != "noheader" && parFIVE != "noheader" && parSIX != "noheader"){
+                                print "TITLE" >> outfile
+                                print ">>>Put your title here<<<\n" >> outfile
+                                print "Abstract" >> outfile
+                                print ">>>Put your abstract here<<<\n" >> outfile
+                                print "LABELS" >> outfile
+
+                                for(k=1;k<i+4;k++){
+                                        print parArray[k] >> outfile
+                                }
+
+                                $1 = "Data"
+                                for(k=1;k<i+4;k++){
+                                        $(k+2)=parArray[k]
+                                }
+                                print "\n" $0 >> outfile
+                                print "\\-e" >> outfile
+                        }
+
+                        for(l=1;l<i+3;l++){
+                                print parArray[l] " = " dataArray[l] ", " posErrArray[l] ", " negErrArray[l] ",\\" >> outfile
+                        }
+
+                        print dataArray[i+3] ",,, " title >> outfile
+
+                        if("'"$COUNT"'" == "'"$2"'") print "\n" >> outfile
+
+
+		}
+
+	}
+}' $COUNT$3.mlog
+
+((COUNT++))
+
+done
+
+fi
