@@ -100,17 +100,17 @@ bool msr2msr_run(char *str)
     sprintf(str, "RUN %s MUE4 PSI NEMU   (name beamline institute data-file-format)", ostr[0]->GetString().Data());
   } else if (run.Contains("PSI")) {
     ostr[0] = dynamic_cast<TObjString*>(tokens->At(1)); // file name
-    ostr[1] = dynamic_cast<TObjString*>(tokens->At(1)); // beamline
+    ostr[1] = dynamic_cast<TObjString*>(tokens->At(2)); // beamline
     sprintf(str, "RUN %s %s PSI PSI-BIN   (name beamline institute data-file-format)", 
             ostr[0]->GetString().Data(), ostr[1]->GetString().Data());
   } else if (run.Contains("TRIUMF")) {
     ostr[0] = dynamic_cast<TObjString*>(tokens->At(1)); // file name
-    ostr[1] = dynamic_cast<TObjString*>(tokens->At(1)); // beamline
+    ostr[1] = dynamic_cast<TObjString*>(tokens->At(2)); // beamline
     sprintf(str, "RUN %s %s TRIUMF MUD   (name beamline institute data-file-format)", 
             ostr[0]->GetString().Data(), ostr[1]->GetString().Data());
   } else if (run.Contains("RAL")) {
     ostr[0] = dynamic_cast<TObjString*>(tokens->At(1)); // file name
-    ostr[1] = dynamic_cast<TObjString*>(tokens->At(1)); // beamline
+    ostr[1] = dynamic_cast<TObjString*>(tokens->At(2)); // beamline
     sprintf(str, "RUN %s %s RAL NEXUS   (name beamline institute data-file-format)", 
             ostr[0]->GetString().Data(), ostr[1]->GetString().Data());
   }
