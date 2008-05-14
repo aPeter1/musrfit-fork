@@ -118,6 +118,7 @@ PRawRunData* PRunDataHandler::GetRunData(TString runName)
   unsigned int i;
 
   for (i=0; i<fData.size(); i++) {
+cout << endl << ">> run name = " << fData[i].fRunName.Data(); 
     if (!fData[i].fRunName.CompareTo(runName)) // run found
       break;
   }
@@ -299,6 +300,7 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo)
             runInfo.fInstitute + TString("/") +
             runInfo.fBeamline + TString("/") +
             runInfo.fRunName + TString(".") + ext;
+cout << endl << ">> generated path: " << str.Data() << endl;
       if (gSystem->AccessPathName(str.Data())!=true) { // found
         pathName = str;
         break;
@@ -798,7 +800,7 @@ bool PRunDataHandler::ReadMudFile()
 // ReadAsciiFile
 //--------------------------------------------------------------------------
 /**
- * <p>Reads ascii files. Intended for the No-muSR data.
+ * <p>Reads ascii files. Intended for the nonMuSR data.
  *
  * The file format definition is:
  * Comment lines start with a '#' or '%' character.
@@ -842,6 +844,8 @@ bool PRunDataHandler::ReadAsciiFile()
   }
 
   PRawRunData runData;
+
+  runData.fRunName = fRunName; // keep the run name
 
   int     lineNo = 0;
   char    instr[512];

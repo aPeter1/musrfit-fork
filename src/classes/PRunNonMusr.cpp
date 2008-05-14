@@ -60,12 +60,9 @@ PRunNonMusr::PRunNonMusr() : PRunBase()
  */
 PRunNonMusr::PRunNonMusr(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
 {
-  bool success;
-
-  // calculate fFitData
-  if (success) {
-    success = PrepareData();
-  }
+  // calculate fData
+  if (!PrepareData())
+    fValid = false;
 }
 
 //--------------------------------------------------------------------------
@@ -91,6 +88,23 @@ double PRunNonMusr::CalcChiSquare(const std::vector<double>& par)
 {
   double chisq = 0.0;
   double diff = 0.0;
+
+  // calculate functions
+  for (int i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
+    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), fRunInfo->fMap, par);
+  }
+
+  // calculate chi square
+  double x;
+  for (unsigned int i=0; i<fData.fValue.size(); i++) {
+    x = fData.fX[i];
+    if ((x>=fFitStartTime) && (x<=fFitStopTime)) {
+      diff = fData.fValue[i] - fTheory->Func(x, par, fFuncValues);
+      chisq += diff*diff / (fData.fError[i]*fData.fError[i]);
+    }
+  }
+
+//cout << endl << ">> chisq=" << chisq;
 
   return chisq;
 }
@@ -169,8 +183,11 @@ bool PRunNonMusr::PrepareFitData()
   // pack the raw data
   double value  = 0.0;
   double err = 0.0;
+cout << endl << ">> runData->fXData.size()=" << runData->fXData.size();
   for (unsigned int i=0; i<runData->fXData.size(); i++) {
+cout << endl << ">> i=" << i << ", packing=" << fRunInfo->fPacking;
     if ((i % fRunInfo->fPacking == 0) && (i != 0)) { // fill data
+cout << endl << "-> i=" << i;
       fData.fX.push_back(runData->fXData[i]-(runData->fXData[i]-runData->fXData[i-fRunInfo->fPacking])/2.0);
       fData.fValue.push_back(value);
       fData.fError.push_back(TMath::Sqrt(err));
@@ -181,9 +198,17 @@ bool PRunNonMusr::PrepareFitData()
     value += runData->fYData[i];
     err += runData->fErrYData[i]*runData->fErrYData[i];
   }
+cout << endl << ">> fData.fValue.size()=" << fData.fValue.size();
 
   // count the number of bins to be fitted
-  fNoOfFitBins=0; // STILL MISSING!!
+  fNoOfFitBins=0;
+  double x;
+  for (unsigned int i=0; i<fData.fValue.size(); i++) {
+    x = fData.fX[i];
+    if ((x >= fFitStartTime) && (x <= fFitStopTime))
+      fNoOfFitBins++;
+  }
+cout << endl << ">> fNoOfFitBins=" << fNoOfFitBins;
 
   return success;
 }
