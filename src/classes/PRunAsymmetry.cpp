@@ -672,6 +672,12 @@ return false;
  */
 bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2])
 {
+  // feed the parameter vector
+  std::vector<double> par;
+  PMsrParamList *paramList = fMsrInfo->GetMsrParamList();
+  for (unsigned int i=0; i<paramList->size(); i++)
+    par.push_back((*paramList)[i].fValue);
+
   // transform raw histo data. This is done the following way (for details see the manual):
   // first rebin the data, than calculate the asymmetry
   // first get start data, end data, and t0
@@ -763,11 +769,35 @@ bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2
 
   // form asymmetry including error propagation
   double asym;
-  double f, b, ef, eb;
+  double f, b, ef, eb, alpha, beta;
   // fill data time start, and step
   // data start at data_start-t0
   fData.fDataTimeStart = fTimeResolution*(((double)start[0]-t0[0])+(double)fRunInfo->fPacking/2.0);
   fData.fDataTimeStep  = fTimeResolution*(double)fRunInfo->fPacking;
+
+  // get the proper alpha and beta
+  switch (fAlphaBetaTag) {
+    case 1: // alpha == 1, beta == 1
+      alpha = 1.0;
+      beta  = 1.0;
+      break;
+    case 2: // alpha != 1, beta == 1
+      alpha = par[fRunInfo->fAlphaParamNo-1];
+      beta  = 1.0;
+      break;
+    case 3: // alpha == 1, beta != 1
+      alpha = 1.0;
+      beta  = par[fRunInfo->fBetaParamNo-1];
+      break;
+    case 4: // alpha != 1, beta != 1
+      alpha = par[fRunInfo->fAlphaParamNo-1];
+      beta  = par[fRunInfo->fBetaParamNo-1];
+      break;
+    default:
+      break;
+  }
+cout << endl << ">> alpha = " << alpha << ", beta = " << beta;
+
   for (unsigned int i=0; i<forwardPacked.fValue.size(); i++) {
     // to make the formulae more readable
     f  = forwardPacked.fValue[i];
@@ -776,7 +806,7 @@ bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2
     eb = backwardPacked.fError[i];
     // check that there are indeed bins
     if (f+b != 0.0)
-      asym = (f-b) / (f+b);
+      asym = (alpha*f-b) / (alpha*beta*f+b);
     else
       asym = 0.0;
     fData.fValue.push_back(asym);
@@ -808,12 +838,6 @@ bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2
   fBackwardErr.clear();
 
   // fill theory vector for kView
-  // feed the parameter vector
-  std::vector<double> par;
-  PMsrParamList *paramList = fMsrInfo->GetMsrParamList();
-  for (unsigned int i=0; i<paramList->size(); i++)
-    par.push_back((*paramList)[i].fValue);
-
   // calculate functions
   for (int i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
     fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), fRunInfo->fMap, par);
