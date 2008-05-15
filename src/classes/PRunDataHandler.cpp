@@ -42,6 +42,7 @@ using namespace std;
 #include <TFile.h>
 #include <TFolder.h>
 #include <TH1F.h>
+#include <TDatime.h>
 
 #include "TLemRunHeader.h"
 #include "MuSR_td_PSI_bin.h"
@@ -118,7 +119,7 @@ PRawRunData* PRunDataHandler::GetRunData(TString runName)
   unsigned int i;
 
   for (i=0; i<fData.size(); i++) {
-cout << endl << ">> run name = " << fData[i].fRunName.Data(); 
+// cout << endl << ">> run name = " << fData[i].fRunName.Data(); 
     if (!fData[i].fRunName.CompareTo(runName)) // run found
       break;
   }
@@ -294,11 +295,17 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo)
     // WKMFULLDATAPATH has the structure: path_1:path_2:...:path_n
     TObjArray *tokens = str.Tokenize(":");
     TObjString *ostr;
+    runInfo.fInstitute.ToUpper();
+    runInfo.fBeamline.ToUpper();
+    TDatime datetime;
+    TString dt;
+    dt += datetime.GetYear();
     for (int i=0; i<tokens->GetEntries(); i++) {
       ostr = dynamic_cast<TObjString*>(tokens->At(i));
-      str = ostr->GetString() + TString("/data/") +
+      str = ostr->GetString() + TString("/DATA/") +
             runInfo.fInstitute + TString("/") +
             runInfo.fBeamline + TString("/") +
+            dt + TString("/") +
             runInfo.fRunName + TString(".") + ext;
 cout << endl << ">> generated path: " << str.Data() << endl;
       if (gSystem->AccessPathName(str.Data())!=true) { // found

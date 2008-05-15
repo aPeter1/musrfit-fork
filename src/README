@@ -41,6 +41,11 @@ In order to get musrfit compiled, you need first to build the shared library lib
 make -f Makefile.musrfit
 make -f Makefile.musrfit install
 
+If it doesn't work for linux, try to set first
+
+export OSTYPE=linux
+
+for some shells this is needed but I have no clue why it is NOT recognised automatically ...
 
 #---------------------------------------------------------------------
 # this is the end ...

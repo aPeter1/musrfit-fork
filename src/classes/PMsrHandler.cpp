@@ -1208,17 +1208,13 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(i));
         str = ostr->GetString();
         if (str.IsDigit())
-          // only fill map vector until a first zero is encountered
-          if (str.Atoi() != 0)
-            param.fMap.push_back(str.Atoi());
-          else
-            break;
+          param.fMap.push_back(str.Atoi());
         else
           error = true;
       }
       // check map entries, i.e. if the map values are within parameter bounds
       for (unsigned int i=0; i<param.fMap.size(); i++) {
-        if ((param.fMap[i] <= 0) || (param.fMap[i] > (int) fParam.size())) {
+        if ((param.fMap[i] < 0) || (param.fMap[i] > (int) fParam.size())) {
           cout << endl << "**SEVERE ERROR** in PMsrHandler::HandleRunEntry: map value " << param.fMap[i] << " in line " << iter->fLineNo << " is out of range!";
           error = true;
           break;
@@ -2023,7 +2019,8 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
     // everything to lower case
     str.ToLower();
 
-//cout << endl << ">> " << str.Data();
+// cout << endl << "-----------------------";
+// cout << endl << ">> " << str.Data();
 
     tokens = str.Tokenize(" /t");
     if (!tokens)
@@ -2038,8 +2035,9 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 
     // check if fun number is used, and if yes, filter parameter numbers and maps
     TString sstr;
+// cout << endl << ">> fun.size() = " << fun.size();
     for (unsigned int i=0; i<fun.size(); i++) {
-//cout << endl << ">> funNo: " << fun[i];
+// cout << endl << ">> funNo: " << fun[i];
       if (fun[i] == ival) { // function number found
         // filter for parX
         sstr = iter->fLine;
@@ -2047,7 +2045,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
         while (sstr.Index("par") != -1) {
           memset(sval, 0, sizeof(sval));
           sstr = &sstr[sstr.Index("par")+3]; // trunc sstr
-//cout << endl << ">> par:sstr: " << sstr.Data();
+// cout << endl << ">> par:sstr: " << sstr.Data();
           for (int j=0; j<sstr.Sizeof(); j++) {
             if (!isdigit(sstr[j]))
               break;
@@ -2063,14 +2061,14 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
         while (sstr.Index("map") != -1) {
           memset(sval, 0, sizeof(sval));
           sstr = &sstr[sstr.Index("map")+3]; // trunc sstr
-//cout << endl << ">> map:sstr: " << sstr.Data();
+// cout << endl << ">> map:sstr: " << sstr.Data();
           for (int j=0; j<sstr.Sizeof(); j++) {
             if (!isdigit(sstr[j]))
               break;
             sval[j] = sstr[j];
           }
           sscanf(sval, "%d", &ival);
-//cout << endl << ">>>> mapX from func 1st, X = " << ival;
+// cout << endl << ">>>> mapX from func 1st, X = " << ival;
           // check if map value already in map, otherwise add it
           if (ival > 0) {
             unsigned int pos;
@@ -2150,13 +2148,17 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
       // get the parameter number via map
 //cout << endl << ">> map.size() = " << map.size();
       for (unsigned int i=0; i<map.size(); i++) {
+        if (map[i] == 0)
+          continue;
         if (map[i] < tokens->GetEntries()) {
           ostr = dynamic_cast<TObjString*>(tokens->At(map[i]));
           str = ostr->GetString();
           if (str.IsDigit()) {
             ival = str.Atoi();
-            fParamInUse[ival-1]++; // this is OK since map is ranging from 1 ..
+            if (ival > 0) {
+              fParamInUse[ival-1]++; // this is OK since map is ranging from 1 ..
 //cout << endl << ">>>> param no : " << ival << ", via map no : " << map[i];
+            }
           }
         }
       }
@@ -2178,6 +2180,9 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 
     // everything to lower case
     str.ToLower();
+
+// cout << endl << "===========================";
+// cout << endl << ">> " << str.Data();
 
     tokens = str.Tokenize(" /t");
     if (!tokens)
@@ -2206,8 +2211,8 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
             sval[j] = sstr[j];
           }
           sscanf(sval, "%d", &ival);
-//cout << endl << ">>>> parX from func 2nd, X = " << ival;
           fParamInUse[ival-1]++;
+//cout << endl << ">>>> parX from func 2nd, X = " << ival;
         }
 
         // filter for mapX
@@ -2221,7 +2226,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
             sval[j] = sstr[j];
           }
           sscanf(sval, "%d", &ival);
-//cout << endl << ">>>> mapX from func 2nd, X = " << ival;
+// cout << endl << ">>>> mapX from func 2nd, X = " << ival;
           // check if map value already in map, otherwise add it
           if (ival > 0) {
             unsigned int pos;
@@ -2241,6 +2246,50 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
     if (tokens) {
       delete tokens;
       tokens = 0;
+    }
+  }
+
+  // go through all the run block lines 2nd time to filter remaining maps
+  for (iter = run.begin(); iter != run.end(); ++iter) {
+    // remove potential comments
+    str = iter->fLine;
+    if (str.First('#') != -1)
+      str.Resize(str.First('#'));
+
+    // everything to lower case
+    str.ToLower();
+
+    // handle the maps
+    if (str.Contains("map")) {
+//cout << endl << ">> " << str.Data();
+      // tokenize string
+      tokens = str.Tokenize(" \t");
+      if (!tokens)
+        continue;
+
+      // get the parameter number via map
+//cout << endl << ">> map.size() = " << map.size();
+      for (unsigned int i=0; i<map.size(); i++) {
+        if (map[i] == 0)
+          continue;
+        if (map[i] < tokens->GetEntries()) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(map[i]));
+          str = ostr->GetString();
+          if (str.IsDigit()) {
+            ival = str.Atoi();
+            if (ival > 0) {
+              fParamInUse[ival-1]++; // this is OK since map is ranging from 1 ..
+//cout << endl << ">>>> param no : " << ival << ", via map no : " << map[i];
+            }
+          }
+        }
+      }
+
+      // delete tokens
+      if (tokens) {
+        delete tokens;
+        tokens = 0;
+      }
     }
   }
 
