@@ -37,8 +37,8 @@ template for the first musrfit input file. The results of the fits will be writt
 
 CAUTION:
 The "indexing number" of the .mlog has to be at the beginning of the filename.
-Furthermore the data files that were fitted have to have the name "XXX_RUN#[_YYY]" or "ZZZ_his_RUN#", where 
-XXX,YYY,ZZZ are strings without whitespaces ("/" is OK).
+Furthermore the data files that were fitted have to have the name "XXX_RUN#[_YYY]", "ZZZ_his_RUN#" or "WWW_pta_VVV_RUN#", where 
+WWW,VVV,XXX,YYY,ZZZ are strings without whitespaces ("/" is OK).
 
 If you want to use the fitting feature, musrfit has to be installed either on the PATH or in the working directory.
 
@@ -216,9 +216,10 @@ awk -v parFOUR=$4 -v parFIVE=$5 -v parSIX=$6 '{
                 dataArray[i+1] = $6
                 dataArray[i+2] = $9
 		
-		if(runNumber[2] != "his") {dataArray[i+3] = runNumber[2] }
                 if(runNumber[2] == "his") {dataArray[i+3] = substr(runNumber[3],1,4) }
-
+		else if(runNumber[2] == "pta") {dataArray[i+3] = substr(runNumber[4],1,4)}
+		else {dataArray[i+3] = runNumber[2] }
+		
 		negErrArray[i] = ""
                 negErrArray[i+1] = ""
                 negErrArray[i+2] = ""
@@ -291,18 +292,22 @@ awk -v parFOUR=$4 -v parFIVE=$5 -v parSIX=$6 '{
                                 print "Abstract" >> outfile
                                 print ">>>Put your abstract here<<<\n" >> outfile
                                 print "LABELS" >> outfile
-
+				print "T [K]" >> outfile
+				
                                 for(k=1;k<i+4;k++){
                                         print parArray[k] >> outfile
                                 }
 
                                 $1 = "Data"
+				$2 = "T"
                                 for(k=1;k<i+4;k++){
                                         $(k+2)=parArray[k]
                                 }
                                 print "\n" $0 >> outfile
                                 print "\\-e" >> outfile
                         }
+
+			print "T = 000,,,\\" >> outfile
 
                         for(l=1;l<i+3;l++){
                                 print parArray[l] " = " dataArray[l] ", " posErrArray[l] ", " negErrArray[l] ",\\" >> outfile
