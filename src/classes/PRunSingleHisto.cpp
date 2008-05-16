@@ -557,7 +557,12 @@ bool PRunSingleHisto::PrepareRawViewData()
   double value = 0.0;
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.fDataTimeStart = fTimeResolution*(((double)start-t0)+(double)fRunInfo->fPacking/2.0);
+  fData.fDataTimeStart = fTimeResolution*((double)start-t0+(double)fRunInfo->fPacking/2.0);
+/*
+cout << endl << ">> time resolution = " << fTimeResolution;
+cout << endl << ">> start = " << start << ", t0 = " << t0 << ", packing = " << fRunInfo->fPacking;
+cout << endl << ">> data start time = " << fData.fDataTimeStart;
+*/
   fData.fDataTimeStep  = fTimeResolution*fRunInfo->fPacking;
   for (unsigned i=start; i<end; i++) {
     if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
@@ -575,8 +580,9 @@ bool PRunSingleHisto::PrepareRawViewData()
     value += runData->fDataBin[histoNo][i];
   }
 
-  // count the number of bins to be fitted
+  // count the number of bins
   fNoOfFitBins=0;
+
   double time;
   for (unsigned int i=0; i<fData.fValue.size(); i++) {
     time = fData.fDataTimeStart + (double)i*fData.fDataTimeStep;
@@ -633,10 +639,19 @@ bool PRunSingleHisto::PrepareRawViewData()
   unsigned int size = runData->fDataBin[histoNo].size();
   double startTime  = -fT0s[0]*fTimeResolution;
   fData.fTheoryTimeStart = startTime;
+//cout << endl << ">> theory start time = " << fData.fTheoryTimeStart;
   fData.fTheoryTimeStep  = fTimeResolution;
   for (unsigned int i=0; i<size; i++) {
     time = startTime + (double)i*fTimeResolution;
     fData.fTheory.push_back(N0*TMath::Exp(-time/tau)*(1+fTheory->Func(time, par, fFuncValues))+bkg);
+if (i==126) {
+cout << endl << ">> time = " << time;
+cout << endl << ">> value = " << N0*TMath::Exp(-time/tau)*(1+fTheory->Func(time, par, fFuncValues))+bkg;
+cout << endl << ">> N0  = " << N0;
+cout << endl << ">> bkg = " << bkg;
+cout << endl << ">> TMath::Exp(-time/tau) = " << TMath::Exp(-time/tau);
+cout << endl << ">> theory = " << fTheory->Func(time, par, fFuncValues);
+}
   }
 
   // clean up
@@ -789,16 +804,18 @@ bool PRunSingleHisto::PrepareViewData()
   } else { // bkg fitted
     bkg = par[fRunInfo->fBkgFitParamNo-1];
   }
+//cout << endl << ">> bkg = " << bkg;
 
   double value  = 0.0;
   double expval;
   double time;
+
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.fDataTimeStart = fTimeResolution*(((double)start-t0)+(double)fRunInfo->fPacking/2.0);
+  fData.fDataTimeStart = fTimeResolution*((double)start-t0+(double)fRunInfo->fPacking/2.0);
   fData.fDataTimeStep  = fTimeResolution*fRunInfo->fPacking;
 //cout << endl << ">> start = " << fData.fDataTimeStart << ", step = " << fData.fDataTimeStep;
-  for (unsigned i=start; i<end; i++) {
+  for (unsigned int i=start; i<end; i++) {
     if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
       // in order that after rebinning the fit does not need to be redone (important for plots)
       // the value is normalize to per bin

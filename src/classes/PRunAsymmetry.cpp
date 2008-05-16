@@ -796,7 +796,7 @@ bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2
     default:
       break;
   }
-cout << endl << ">> alpha = " << alpha << ", beta = " << beta;
+//cout << endl << ">> alpha = " << alpha << ", beta = " << beta;
 
   for (unsigned int i=0; i<forwardPacked.fValue.size(); i++) {
     // to make the formulae more readable

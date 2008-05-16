@@ -730,16 +730,16 @@ void PMusrCanvas::HandleDataSet(unsigned int runNo, PRunData *data)
   // create histo specific infos
   name  = fMsrHandler->GetMsrRunList()->at(runNo).fRunName + "_DataRunNo";
   name += (int)runNo;
-  start = data->fDataTimeStart;
-  end   = data->fDataTimeStart + (data->fValue.size()-1)*data->fDataTimeStep;
+  start = data->fDataTimeStart - data->fDataTimeStep/2.0;
+  end   = data->fDataTimeStart + data->fValue.size()*data->fDataTimeStep + data->fDataTimeStep/2.0;
 
   // invoke histo
-  dataHisto = new TH1F(name, name, data->fValue.size(), start, end);
+  dataHisto = new TH1F(name, name, data->fValue.size()+2, start, end);
 
   // fill histogram
   for (unsigned int i=0; i<data->fValue.size(); i++) {
-    dataHisto->SetBinContent(i, data->fValue[i]);
-    dataHisto->SetBinError(i, data->fError[i]);
+    dataHisto->SetBinContent(i+1, data->fValue[i]);
+    dataHisto->SetBinError(i+1, data->fError[i]);
   }
 
   // set marker and line color
@@ -766,17 +766,17 @@ void PMusrCanvas::HandleDataSet(unsigned int runNo, PRunData *data)
   // create histo specific infos
   name  = fMsrHandler->GetMsrRunList()->at(runNo).fRunName + "_TheoRunNo";
   name += (int)runNo;
-  start = data->fTheoryTimeStart;
-  end   = data->fTheoryTimeStart + (data->fTheory.size()-1)*data->fTheoryTimeStep;
+  start = data->fTheoryTimeStart - data->fTheoryTimeStep/2.0;
+  end   = data->fTheoryTimeStart + data->fTheory.size()*data->fTheoryTimeStep + data->fTheoryTimeStep/2.0;
 
 //cout << endl << ">> start = " << start << ", end = " << end << endl;
 
   // invoke histo
-  theoHisto = new TH1F(name, name, data->fTheory.size(), start, end);
+  theoHisto = new TH1F(name, name, data->fTheory.size()+2, start, end);
 
   // fill histogram
   for (unsigned int i=0; i<data->fTheory.size(); i++) {
-    theoHisto->SetBinContent(i, data->fTheory[i]);
+    theoHisto->SetBinContent(i+1, data->fTheory[i]);
   }
 
   // set the line color

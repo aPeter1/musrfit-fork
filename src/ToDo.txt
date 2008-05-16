@@ -54,6 +54,8 @@ short term:
 
 * something is strange with the coordinate system in TPaveText! **CHECK**
 
+* something is wrong with lifetimecorrection plot of musrview (up shifted data)
+
 
 ---------------------
 intermediate term:
