@@ -814,15 +814,22 @@ bool PRunSingleHisto::PrepareViewData()
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
   fData.fDataTimeStart = fTimeResolution*((double)start-t0+(double)fRunInfo->fPacking/2.0);
   fData.fDataTimeStep  = fTimeResolution*fRunInfo->fPacking;
-//cout << endl << ">> start = " << fData.fDataTimeStart << ", step = " << fData.fDataTimeStep;
+/*
+cout << endl << ">> start time = " << fData.fDataTimeStart << ", step = " << fData.fDataTimeStep;
+cout << endl << ">> start = " << start << ", end = " << end;
+cout << endl << "--------------------------------";
+*/
   for (unsigned int i=start; i<end; i++) {
     if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
       // in order that after rebinning the fit does not need to be redone (important for plots)
       // the value is normalize to per bin
       value /= fRunInfo->fPacking;
-      time = fData.fDataTimeStart+(double)i*fData.fDataTimeStep/fRunInfo->fPacking;
+      // 1st term start time, 2nd term offset to the center of the rebinned bin
+      time = ((double)start-t0)*fTimeResolution +
+             (double)(i-start-fRunInfo->fPacking/2.0)*fTimeResolution;
       expval = TMath::Exp(+time/tau)/N0;
       fData.fValue.push_back(-1.0+expval*(value-bkg));
+//cout << endl << ">> i=" << i << ",time=" << time << ",expval=" << expval << ",value=" << value << ",bkg=" << bkg << ",expval*(value-bkg)-1=" << expval*(value-bkg)-1.0;
       fData.fError.push_back(expval*TMath::Sqrt(value/fRunInfo->fPacking));
 //cout << endl << ">> " << time << ", " << expval << ", " << -1.0+expval*(value-bkg) << ", " << expval*TMath::Sqrt(value/fRunInfo->fPacking);
       value = 0.0;
