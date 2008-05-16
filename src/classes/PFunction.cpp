@@ -373,7 +373,10 @@ double PFunction::EvalNode(PFuncTreeNode &node)
   } else if (node.fID == PFunctionGrammar::parameterID) {
     return fParam[node.fIvalue-1];
   } else if (node.fID == PFunctionGrammar::mapID) {
-    return fParam[fMap[node.fIvalue-1]-1];
+    if (fMap[node.fIvalue-1] == 0) // map == 0
+      return 0.0;
+    else
+      return fParam[fMap[node.fIvalue-1]-1];
   } else if (node.fID == PFunctionGrammar::functionID) {
     if (node.fFunctionTag == FUN_COS) {
       return cos(EvalNode(node.children[0]));
