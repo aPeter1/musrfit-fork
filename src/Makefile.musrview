@@ -67,6 +67,7 @@ MNLIB         = -L$(ROOTSYS)/lib -lMinuit2
 # MathMore lib
 MMLIB         = -L$(ROOTSYS)/lib -lMathMore
 
+INSTALLPATH = $(HOME)/analysis/bin
 
 EXEC = musrview
 
@@ -96,5 +97,6 @@ $(OBJS): %.o: %.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
 
 install: all
-	@echo "doesn't do anything yet ..."
+	@echo "copy $(EXEC) to $(INSTALLPATH)"
+	cp -p $(EXEC) $(INSTALLPATH)
 
