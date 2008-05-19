@@ -37,6 +37,7 @@ using namespace std;
 #include <TF1.h>
 #include <TObjString.h>
 #include <TObjArray.h>
+#include <TClass.h>
 #include <TMath.h>
 
 #include <Math/SpecFuncMathMore.h>
@@ -91,6 +92,7 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
   fAdd = 0;
   fMul = 0;
   fStaticKTLFFunc = 0;
+  fUserFcnClassName = TString("");
 
   static unsigned int lineNo = 1; // lineNo
   static unsigned int depth  = 0; // needed to handle '+' properly
@@ -163,7 +165,7 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
   }
 
   // line is a valid function, hence analyze parameters
-  if ((unsigned int)(tokens->GetEntries()-1) != fNoOfParam) {
+  if (((unsigned int)(tokens->GetEntries()-1) != fNoOfParam) && (idx != THEORY_USER_FCN)) {
     cout << endl << "**ERROR**: PTheory():  Theory line '" << line->fLine.Data() << "'";
     cout << "  in line no " << line->fLineNo;
     cout << "  expecting " << fgTheoDataBase[idx].fNoOfParam << ", but found " << tokens->GetEntries()-1; 
@@ -178,6 +180,12 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
   for (int i=1; i<tokens->GetEntries(); i++) {
     ostr = dynamic_cast<TObjString*>(tokens->At(i));
     str = ostr->GetString();
+
+    // if userFcn, the first entry is the function name and needs to be handled specially
+    if ((fType == THEORY_USER_FCN) && (i == 1)) {
+      fUserFcnClassName = str;
+      continue;
+    }
 
     // check if str is map
     if (str.Contains("map")) {
@@ -244,6 +252,15 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
   // make clean and tidy theory block for the msr-file
   if (fValid && !hasParent) { // parent theory object
     MakeCleanAndTidyTheoryBlock(fullTheoryBlock);
+  }
+
+  // check if user function, if so, check if it is reachable (root)
+  if (!fUserFcnClassName.IsWhitespace()) {
+    cout << endl << ">> user function class name: " << fUserFcnClassName.Data() << endl;
+    if (!TClass::GetDict(fUserFcnClassName.Data())) {
+      cout << endl << "**ERROR**: PTheory: user function class '" << fUserFcnClassName.Data() << "' not found. See line no " << line->fLineNo;
+      fValid = false;
+    }
   }
 
   // clean up
@@ -385,6 +402,10 @@ double PTheory::Func(register double t, const vector<double>& paramValues, const
           return SkewedGauss(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
           break;
+        case THEORY_USER_FCN:
+          return UserFcn(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
+                 fAdd->Func(t, paramValues, funcValues);
+          break;
         default:
           cout << endl << "**PANIC ERROR**: PTheory::Func: You never should have reached this line?!?! (" << fType << ")";
           cout << endl;
@@ -439,6 +460,9 @@ double PTheory::Func(register double t, const vector<double>& paramValues, const
           break;
         case THEORY_SKEWED_GAUSS:
           return SkewedGauss(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
+          break;
+        case THEORY_USER_FCN:
+          return UserFcn(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
         default:
           cout << endl << "**PANIC ERROR**: PTheory::Func: You never should have reached this line?!?! (" << fType << ")";
@@ -497,6 +521,9 @@ double PTheory::Func(register double t, const vector<double>& paramValues, const
         case THEORY_SKEWED_GAUSS:
           return SkewedGauss(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
+        case THEORY_USER_FCN:
+          return UserFcn(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
+          break;
         default:
           cout << endl << "**PANIC ERROR**: PTheory::Func: You never should have reached this line?!?! (" << fType << ")";
           cout << endl;
@@ -551,6 +578,9 @@ double PTheory::Func(register double t, const vector<double>& paramValues, const
           break;
         case THEORY_SKEWED_GAUSS:
           return SkewedGauss(t, paramValues, funcValues);
+          break;
+        case THEORY_USER_FCN:
+          return UserFcn(t, paramValues, funcValues);
           break;
         default:
           cout << endl << "**PANIC ERROR**: PTheory::Func: You never should have reached this line?!?! (" << fType << ")";
@@ -1084,4 +1114,27 @@ double PTheory::SkewedGauss(register double t, const vector<double>& paramValues
                                       wp*gp*2.0*zp/SQRT_PI*ROOT::Math::conf_hyperg(0.5,1.5,zp*zp));
 
   return skg;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$
+ * \param paramValues
+ */
+double PTheory::UserFcn(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+{
+  static bool first = true;
+
+if (first) {
+  first = false;
+  cout << endl << ">> UserFcn: fParamNo.size()=" << fParamNo.size();
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
+    cout << endl << ">> " << i << ": " << fParamNo[i]+1;
+  }
+  cout << endl;
+}
+
+  return 0.0;
 }

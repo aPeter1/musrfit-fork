@@ -67,7 +67,7 @@
 #define THEORY_BESSEL                      13
 #define THEORY_INTERNAL_BESSEL             14
 #define THEORY_SKEWED_GAUSS                15
-#define THEORY_USER                        16
+#define THEORY_USER_FCN                    16
 
 // function parameter tags, i.e. how many parameters has a specific function
 #define THEORY_PARAM_ASYMMETRY                    1 // asymetry
@@ -88,7 +88,7 @@
 #define THEORY_PARAM_SKEWED_GAUSS                 4 // phase, frequency, rate minus, rate plus
 
 // number of available user functions
-#define THEORY_MAX 16
+#define THEORY_MAX 17
 
 // deg -> rad factor
 #define DEG_TO_RAD 0.0174532925199432955
@@ -162,7 +162,10 @@ static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
          "internBsl", "ib", "(phase frequency Trate Lrate)"},
 
         {THEORY_SKEWED_GAUSS, THEORY_PARAM_SKEWED_GAUSS, false,
-         "skewedGss", "skg", "(phase frequency rate_m rate_p)"}};
+         "skewedGss", "skg", "(phase frequency rate_m rate_p)"},
+
+        {THEORY_USER_FCN, 0, false,
+         "userFcn", "u", ""}};
 
 //--------------------------------------------------------------------------------------
 /**
@@ -197,6 +200,7 @@ class PTheory
     virtual double Bessel(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
     virtual double InternalBessel(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
     virtual double SkewedGauss(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
+    virtual double UserFcn(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
 
     // variables
     bool fValid;
@@ -209,6 +213,8 @@ class PTheory
 //    TString fUserFun;
 //    TString fUserFunPreParsed;
     TF1 *fStaticKTLFFunc;
+
+    TString fUserFcnClassName; ///< name of the user function class for within root
 
     PMsrHandler *fMsrInfo;
 };
