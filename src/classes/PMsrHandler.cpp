@@ -312,7 +312,7 @@ int PMsrHandler::WriteMsrLogFile()
     f.width(11);
     f.precision(prec);
     if ((fParam[i].fNoOfParams == 5) || (fParam[i].fNoOfParams == 7)) // pos. error given
-      if (fParam[i].fPosErrorPresent) // pos error is a number
+      if (fParam[i].fPosErrorPresent && (fParam[i].fStep != 0)) // pos error is a number
         f << left << fParam[i].fPosError;
       else // pos error is a none
         f << left << "none";
