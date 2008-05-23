@@ -1,0 +1,113 @@
+/***************************************************************************
+
+  TPofTCalc.cpp
+
+  Author: Bastian M. Wojek
+  e-mail: bastian.wojek@psi.ch
+
+  2008/05/23
+
+***************************************************************************/
+
+#include "TPofTCalc.h"
+#include "fftw3.h"
+#include <cmath>
+#include <cstdio>
+#include <iostream>
+
+TPofTCalc::TPofTCalc (const vector<double> &par) {
+
+  fNFFT = ( int(1.0/gBar/par[1]/par[2]+1.0) % 2 ) ? int(1.0/gBar/par[1]/par[2]+2.0) : int(1.0/gBar/par[1]/par[2]+1.0);
+  fTBin = 1.0/gBar/double(fNFFT-1)/par[2];
+//  tBin = 1.0/gBar/(*(PofB.DataB().end()-1));
+//  nFFT = PofB.DataB().size();
+  
+  fFFTin = (double *)malloc(sizeof(double) * fNFFT);
+  fFFTout = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * (fNFFT/2+1));
+  
+  cout << "Check for the FFT plan..." << endl;
+    
+  // Load wisdom from file
+    
+  int wisdomLoaded(0);
+  
+  FILE *wordsOfWisdomR;
+  wordsOfWisdomR = fopen("WordsOfWisdom.dat", "r");
+  if (wordsOfWisdomR == NULL) {
+    cout << "Couldn't open wisdom file ..." << endl;
+  } else { 
+    wisdomLoaded = fftw_import_wisdom_from_file(wordsOfWisdomR);
+    fclose(wordsOfWisdomR);
+  }
+  
+  if (!wisdomLoaded) {
+    cout << "No wisdom is imported..." << endl;
+  }
+  
+  fFFTplan = fftw_plan_dft_r2c_1d(fNFFT, fFFTin, fFFTout, FFTW_EXHAUSTIVE);
+  
+}
+
+void TPofTCalc::DoFFT(const TPofBCalc &PofB, const vector<double> &par) {
+  
+  vector<double> pB(PofB.DataPB());
+  
+  for (unsigned int i(0); i<fNFFT; i++) {
+    fFFTin[i] = pB[i];
+  }
+  for (unsigned int i(0); i<fNFFT/2+1; i++) {
+    fFFTout[i][0] = 0.0;
+    fFFTout[i][1] = 0.0;
+  }
+  
+  cout << "perform the Fourier transform..." << endl;
+  
+  fftw_execute(fFFTplan);
+
+  // Calculate polarisation
+  
+  double sinph(sin(par[0]*PI/180.0)), cosph(cos(par[0]*PI/180.0));
+  
+  double polTemp(0.0);  
+  
+  for (unsigned int i(0); i<fNFFT/2+1; i++){
+    fT.push_back(double(i)*fTBin);
+    polTemp = cosph*fFFTout[i][0]*par[2] + sinph*fFFTout[i][1]*par[2];
+    fPT.push_back(polTemp);
+  }
+
+}
+
+double TPofTCalc::Eval(double t) const {
+  for (unsigned int i(0); i<fT.size()-1; i++) {
+    if (t < fT[i+1]) {
+      return fPT[i]+(fPT[i+1]-fPT[i])/(fT[i+1]-fT[i])*(t-fT[i]);
+    }
+  }  
+  
+  cout << "No data for the time " << t << " us available! Quitting..." << endl;
+  exit(0);
+}
+
+TPofTCalc::~TPofTCalc() {
+  // export wisdom
+  
+  FILE *wordsOfWisdomW;
+  wordsOfWisdomW = fopen("WordsOfWisdom.dat", "w");
+  if (wordsOfWisdomW == NULL) {
+    cout << "couldn't open file ... No wisdom is exported..." << endl;
+  }
+  
+  fftw_export_wisdom_to_file(wordsOfWisdomW);
+  
+  fclose(wordsOfWisdomW);
+  
+  fftw_destroy_plan(fFFTplan);
+  free(fFFTin);
+  fftw_free(fFFTout);
+  fT.clear();
+  fPT.clear();
+  
+}
+
+

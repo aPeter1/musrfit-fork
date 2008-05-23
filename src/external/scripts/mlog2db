@@ -223,12 +223,9 @@ awk -v parFOUR=$4 -v parFIVE=$5 -v parSIX=$6 '{
 				dataArray[i+3] = runNumber[j]
 				break
 			}
+			else dataArray[i+3] = "0000"
 		}
 
-#               if(runNumber[2] == "his") {dataArray[i+3] = substr(runNumber[3],1,4) }
-#		else if(runNumber[2] == "pta") {dataArray[i+3] = substr(runNumber[4],1,4)}
-#		else {dataArray[i+3] = runNumber[2] }
-		
 		negErrArray[i] = ""
                 negErrArray[i+1] = ""
                 negErrArray[i+2] = ""

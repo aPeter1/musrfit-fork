@@ -1,0 +1,39 @@
+CXX           = g++
+CXXFLAGS      = -g -Wall -Wno-trigraphs -fPIC
+LOCALINCLUDE  = ../include/
+INCLUDES      = -I$(LOCALINCLUDE)
+LD            = g++
+LDFLAGS       = -g
+SOFLAGS       = -O -shared
+
+# some definitions: headers (used to generate *Dict* stuff), sources, objects,...
+OBJS =
+OBJS += TTrimSPDataHandler.o
+OBJS += TBofZCalc.o
+OBJS += TPofBCalc.o
+OBJS += TPofTCalc.o
+OBJS += TFitPofB.o
+
+SHLIB = libTFitPofB.so
+
+# make the shared lib:
+#
+all:  $(SHLIB)
+
+$(SHLIB): $(OBJS)
+	@echo "---> Building shared library $(SHLIB) ..."
+	/bin/rm -f $(SHLIB)
+	$(LD) $(OBJS) $(EXTOBJS) $(SOFLAGS) -o $(SHLIB)
+	@echo "done"
+
+# clean up: remove all object file (and core files)
+# semicolon needed to tell make there is no source
+# for this target!
+#
+clean:; 	@rm -f $(OBJS) *Dict* core*
+	@echo "---> removing $(OBJS)"
+
+#
+$(OBJS): %.o: %.cpp
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
+
