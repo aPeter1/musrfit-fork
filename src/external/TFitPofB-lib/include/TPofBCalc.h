@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/23
+  2008/05/24
 
 ***************************************************************************/
 
@@ -27,10 +27,14 @@ public:
 
   vector<double> DataB() const {return fB;}
   vector<double> DataPB() const {return fPB;}
+  double GetBmin() const {return fBmin;}
+  double GetBmax() const {return fBmax;}
 
 private:
   vector<double> fB;
   vector<double> fPB;
+  double fBmin;
+  double fBmax;
   static const double gBar = 0.0135538817;
 
 };

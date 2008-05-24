@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/23
+  2008/05/24
 
 ***************************************************************************/
 
@@ -23,7 +23,8 @@ public:
 
   vector<double> DataT() const {return fT;}
   vector<double> DataPT() const {return fPT;}
-  void DoFFT(const TPofBCalc&, const vector<double>&);
+  void DoFFT(const TPofBCalc&);
+  void CalcPol(const vector<double>&);
   double Eval(double) const;
 
 private:

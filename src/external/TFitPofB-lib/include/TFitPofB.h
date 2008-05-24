@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/23
+  2008/05/24
 
 ***************************************************************************/
 
@@ -19,9 +19,9 @@ class TFitPofB {
 public:
   TFitPofB(const vector<unsigned int>& , const vector<double>&);
   ~TFitPofB();
-  
+
   double Eval(double, const vector<double>&) const;
-  
+
 private:
   mutable vector<double> fPar;
   TTrimSPData *fImpProfile;

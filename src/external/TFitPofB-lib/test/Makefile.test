@@ -1,0 +1,33 @@
+CXX           = g++
+CXXFLAGS      = -g -Wall
+LOCALINCLUDE  = ../include/
+INCLUDES      = -I$(LOCALINCLUDE)
+LD            = g++
+LDFLAGS       = -g -L../classes/ -lTFitPofB -lfftw3 -lm
+
+EXEC = test
+
+# some definitions: headers, sources, objects,...
+OBJS =
+OBJS += $(EXEC).o
+
+# make the executable:
+#
+all:  $(EXEC)
+
+$(EXEC): $(OBJS)
+	@echo "---> Building $(EXEC) ..."
+	$(LD) $(LDFLAGS) $(OBJS) -o $(EXEC)
+	@echo "done"
+
+# clean up: remove all object file (and core files)
+# semicolon needed to tell make there is no source
+# for this target!
+#
+clean:; 	@rm -f $(OBJS)
+	@echo "---> removing $(OBJS)"
+
+#
+$(OBJS): %.o: %.cpp
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
+

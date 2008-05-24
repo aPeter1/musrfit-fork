@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/23
+  2008/05/24
 
 ***************************************************************************/
 
@@ -15,7 +15,10 @@
 #include <vector>
 using namespace std;
 
+//--------------------
 // Base class for any kind of theory function B(z)
+// In principle only constructors for the different models have to be implemented
+//--------------------
 
 class TBofZCalc {
 
@@ -41,7 +44,9 @@ protected:
   double fDZ;
 };
 
+//--------------------
 // Class "for Meissner screening" in a thin superconducting film
+//--------------------
 
 class TLondon1D_1L : public TBofZCalc {
 
@@ -51,8 +56,9 @@ public:
 
 };
 
-
+//--------------------
 // Class "for Meissner screening" in a thin superconducting film - bilayer with two different lambdas
+//--------------------
 
 class TLondon1D_2L : public TBofZCalc {
 
@@ -62,7 +68,9 @@ public:
 
 };
 
+//--------------------
 // Class "for Meissner screening" in a thin superconducting film - tri-layer with two different lambdas
+//--------------------
 
 class TLondon1D_3L : public TBofZCalc {
 
