@@ -5,16 +5,20 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/24
+  2008/05/25
 
 ***************************************************************************/
 
 #include "TPofTCalc.h"
 #include "fftw3.h"
 #include <cmath>
-#include <cstdio>
-#include <fstream>
 #include <iostream>
+#include <cstdio>
+
+/* USED FOR DEBUGGING -----------------------
+#include <ctime>
+#include <fstream>
+--------------------------------------------*/
 
 //------------------
 // Constructor of the TPofTCalc class - it creates the FFT plan
@@ -61,11 +65,15 @@ void TPofTCalc::DoFFT(const TPofBCalc &PofB) {
   vector<double> pB(PofB.DataPB());
 
 /* USED FOR DEBUGGING -----------------------
+
+  time_t seconds;
+  seconds = time(NULL);
+
   vector<double> B(PofB.DataB());
   double Bmin(PofB.GetBmin());
 
   char debugfile[50];
-  int n = sprintf (debugfile, "test_PB_%f.dat", Bmin);
+  int n = sprintf (debugfile, "test_PB_%f_%ld.dat", Bmin, seconds);
 
   if (n > 0) {
     ofstream of(debugfile);

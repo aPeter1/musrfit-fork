@@ -1,24 +1,25 @@
 /***************************************************************************
 
-  TFitPofB.cpp
+  TUserLondon.cpp
 
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/24
+  2008/05/25
 
 ***************************************************************************/
 
-#include "TFitPofB.h"
+#include "TUserLondon.h"
 #include <iostream>
 using namespace std;
 
 //------------------
-// Constructor of the TFitPofB class -- reading available implantation profiles and
+// Constructor of the TUserLondon class -- reading available implantation profiles and
 // creates (a pointer to) the TPofTCalc object (with the FFT plan)
 //------------------
 
-TFitPofB::TFitPofB(const vector<unsigned int> &parNo, const vector<double> &par) : fCalcNeeded(true) {
+TUserLondon::TUserLondon(const vector<unsigned int> &parNo, const vector<double> &par) 
+  : fCalcNeeded(true), fLastTwoChanged(true), fLastThreeChanged(true) {
 
   for(unsigned int i(0); i<parNo.size(); i++) {
     fPar.push_back(par[parNo[i]-1]);
@@ -47,10 +48,10 @@ TFitPofB::TFitPofB(const vector<unsigned int> &parNo, const vector<double> &par)
 }
 
 //------------------
-// Destructor of the TFitPofB class -- cleaning up
+// Destructor of the TUserLondon class -- cleaning up
 //------------------
 
-TFitPofB::~TFitPofB() {
+TUserLondon::~TUserLondon() {
     fPar.clear();
     delete fImpProfile;
     fImpProfile = 0;
@@ -61,10 +62,10 @@ TFitPofB::~TFitPofB() {
 //------------------
 // Method that calls the procedures to create B(z), p(B) and P(t)
 // It finally returns P(t) for a given t.
-// Parameters: all the parameters for the function to be fitted through TFitPofB
+// Parameters: all the parameters for the function to be fitted through TUserLondon
 //------------------
 
-double TFitPofB::Eval(double t, const vector<double> &par) const {
+double TUserLondon::Eval(double t, const vector<double> &par) const {
 
   // check if any parameter has changed
 
@@ -77,11 +78,17 @@ double TFitPofB::Eval(double t, const vector<double> &par) const {
       par_changed = true;
       if(i == 0 || i == 2 || i == 3 || i == 4) {
         cout << "You are varying the model-flag, dt, dB or E! These parameters have to be fixed! Quitting..." << endl; 
-        exit(0);
+        exit(-1);
       } else if (i == 1) {
         only_phase_changed = true;
       } else {
         only_phase_changed = false;
+      }
+      if(i == fPar.size()-3) {
+        fLastThreeChanged = true; 
+      } else if (i == fPar.size()-2 || i == fPar.size()-1) {
+        fLastTwoChanged = true;
+        fLastThreeChanged = true;
       }
     }
   }
@@ -140,6 +147,17 @@ double TFitPofB::Eval(double t, const vector<double> &par) const {
         case 2:
         {
 //          cout << "Found the 1D-London model.2L" << endl;
+          if(fLastTwoChanged) {
+            vector<double> interfaces;
+            interfaces.push_back(par[6]+par[7]);
+
+            vector<double> weights;
+            for(unsigned int i(11); i<par.size(); i++)
+              weights.push_back(par[i]);
+
+            cout << "Weighting has changed, re-calculating n(z) now..." << endl;
+            fImpProfile->WeightLayers(par[4], interfaces, weights);
+          }
           TLondon1D_2L BofZ2(par_for_BofZ);
           TPofBCalc PofB2(BofZ2, *fImpProfile, par_for_PofB);
           fPofT->DoFFT(PofB2);
@@ -148,6 +166,18 @@ double TFitPofB::Eval(double t, const vector<double> &par) const {
         case 3:
         {
 //          cout << "Found the 1D-London model.3L" << endl;
+          if(fLastThreeChanged) {
+            vector<double> interfaces;
+            interfaces.push_back(par[6]+par[7]);
+            interfaces.push_back(par[6]+par[7]+par[8]);
+
+            vector<double> weights;
+            for(unsigned int i(12); i<par.size(); i++)
+              weights.push_back(par[i]);
+
+            cout << "Weighting has changed, re-calculating n(z) now..." << endl;
+            fImpProfile->WeightLayers(par[4], interfaces, weights);
+          }
           TLondon1D_3L BofZ3(par_for_BofZ);
           TPofBCalc PofB3(BofZ3, *fImpProfile, par_for_PofB);
           fPofT->DoFFT(PofB3);
@@ -155,7 +185,7 @@ double TFitPofB::Eval(double t, const vector<double> &par) const {
           break;
         default:
           cout << "The user function you specified with the first parameter, does not exist. Quitting..." << endl;
-          exit(0);
+          exit(-1);
       }
     } else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
@@ -164,6 +194,8 @@ double TFitPofB::Eval(double t, const vector<double> &par) const {
     fPofT->CalcPol(par_for_PofT);
 
     fCalcNeeded = false;
+    fLastTwoChanged = false;
+    fLastThreeChanged = false;
 
   }
 

@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/24
+  2008/05/25
 
 ***************************************************************************/
 
@@ -65,6 +65,8 @@ TTrimSPData::TTrimSPData(const string &path, vector<string> &energyVec) {
 
     }
   }
+
+  fOrigDataNZ = fDataNZ;
 }
 
 //---------------------
@@ -86,7 +88,7 @@ vector<double> TTrimSPData::DataZ(double e) const {
 }
 
 //---------------------
-// Method returning n(z)-vector calculated by trim.SP for given energy[keV]
+// Method returning actual n(z)-vector calculated by trim.SP and potentially altered by the WeightLayers-method for given energy[keV]
 //---------------------
 
 vector<double> TTrimSPData::DataNZ(double e) const {
@@ -99,6 +101,79 @@ vector<double> TTrimSPData::DataNZ(double e) const {
   // default
   cout << "No implantation profile available for the specified energy... You get back the first one." << endl;
   return fDataNZ[0];
+
+}
+
+//---------------------
+// Method returning original n(z)-vector calculated by trim.SP for given energy[keV]
+//---------------------
+
+vector<double> TTrimSPData::OrigDataNZ(double e) const {
+
+  for(unsigned int i(0); i<fEnergy.size(); i++) {
+    if(!(fEnergy[i] - e)) {
+      return fOrigDataNZ[i];
+    }
+  }
+  // default
+  cout << "No implantation profile available for the specified energy... You get back the first one." << endl;
+  return fOrigDataNZ[0];
+
+}
+
+//---------------------
+// Method putting different weight to different layers of your thin film
+// Parameters: Implantation Energy[keV], Interfaces[nm], Weights [0.0 <= w[i] <= 1.0]
+// Example: 25.0, (50, 100), (1.0, 0.33, 1.0)
+//          at 25keV consider 3 layers, where the first ends after 50nm, the second after 100nm (these are NOT the layer thicknesses!!)
+//          the first and last layers get the full n(z), where only one third of the muons in the second layer will be taken into account
+//---------------------
+
+void TTrimSPData::WeightLayers(double e, const vector<double>& interface, const vector<double>& weight) const {
+
+  if(weight.size()-interface.size()-1) {
+    cout << "For the weighting the number of interfaces has to be one less than the number of weights!" << endl;
+    cout << "No weighting of the implantation profile will be done unless you take care of that!" << endl;
+    return;
+  }
+
+  for(unsigned int i(0); i<interface.size(); i++) {
+    if (interface[i]<0.0) {
+      cout << "One of your layer interfaces has a negative coordinate! - No weighting will be done!" << endl;
+      return;
+    }
+    else if (i>1) {
+      if (interface[i]<interface[i-1]) {
+        cout << "The specified interfaces appear to be not in ascending order! - No weighting will be done!" << endl;
+        return;
+      }
+    }
+  }
+
+  for(unsigned int i(0); i<weight.size(); i++) {
+    if (weight[i]>1.0 || weight[i]<0.0) {
+      cout << "At least one of the specified weights is out of range - no weighting will be done!" << endl;
+      return;
+    }
+  }
+
+  for(unsigned int i(0); i<fEnergy.size(); i++) {
+    if(!(fEnergy[i] - e)) {
+      unsigned int k(0);
+      for(unsigned int j(0); j<fDataZ[i].size(); j++) {
+        if(k<interface.size()) {
+          if(fDataZ[i][j] < interface[k]*10.0)
+            fDataNZ[i][j] = fOrigDataNZ[i][j]*weight[k];
+          else {
+            k++;
+            fDataNZ[i][j] = fOrigDataNZ[i][j]*weight[k];
+          }
+        }
+        else
+          fDataNZ[i][j] = fOrigDataNZ[i][j]*weight[k];
+      }
+    }
+  }
 
 }
 

@@ -12,7 +12,7 @@ OBJS += TTrimSPDataHandler.o
 OBJS += TBofZCalc.o
 OBJS += TPofBCalc.o
 OBJS += TPofTCalc.o
-OBJS += TFitPofB.o
+OBJS += TUserLondon.o
 
 SHLIB = libTFitPofB.so
 

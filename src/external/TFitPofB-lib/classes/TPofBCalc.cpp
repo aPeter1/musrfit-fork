@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/24
+  2008/05/25
 
 ***************************************************************************/
 
@@ -13,7 +13,11 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
-//#include <cstdio>
+
+/* USED FOR DEBUGGING-----------------------------------
+#include <cstdio>
+#include <ctime>
+-------------------------------------------------------*/
 
 //-----------
 // Constructor that does the P(B) calculation for given B(z) and n(z)
@@ -46,8 +50,11 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
 /* USED FOR DEBUGGING-----------------------------------
   cout << "Bmin = " << fBmin << ", Bmax = " << fBmax << endl;
 
+  time_t seconds;
+  seconds = time (NULL);
+
   char debugfile[50];
-  int n = sprintf (debugfile, "test_Bz_%f.dat", fBmin);
+  int n = sprintf (debugfile, "test_Bz_%f_%ld.dat", fBmin, seconds);
 
   if (n > 0) {
     ofstream of(debugfile);
@@ -57,6 +64,19 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
     }
     of.close();
   }
+
+  char debugfile1[50];
+  int n1 = sprintf (debugfile1, "test_NZ_%f_%ld.dat", para[2], seconds);
+
+  if (n1 > 0) {
+    ofstream of1(debugfile1);
+
+    for (unsigned int i(0); i<dataTrimSP.DataZ(para[2]).size(); i++) {
+      of1 << dataTrimSP.DataZ(para[2])[i] << " " << dataTrimSP.DataNZ(para[2])[i] << " " << dataTrimSP.OrigDataNZ(para[2])[i] << endl;
+    }
+    of1.close();
+  }
+
 ---------------------------------------------------------*/
 
   double nn;

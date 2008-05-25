@@ -1,24 +1,24 @@
 /***************************************************************************
 
-  TFitPofB.h
+  TUserLondon.h
 
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/24
+  2008/05/25
 
 ***************************************************************************/
 
-#ifndef _TFitPofB_H_
-#define _TFitPofB_H_
+#ifndef _TUserLondon_H_
+#define _TUserLondon_H_
 
 #include "TPofTCalc.h"
 
-class TFitPofB {
+class TUserLondon {
 
 public:
-  TFitPofB(const vector<unsigned int>& , const vector<double>&);
-  ~TFitPofB();
+  TUserLondon(const vector<unsigned int>& , const vector<double>&);
+  ~TUserLondon();
 
   double Eval(double, const vector<double>&) const;
 
@@ -27,7 +27,9 @@ private:
   TTrimSPData *fImpProfile;
   TPofTCalc *fPofT;
   mutable bool fCalcNeeded;
-  
+  mutable bool fLastTwoChanged;
+  mutable bool fLastThreeChanged;
+
 };
 
-#endif //_TFitPofB_H_
+#endif //_TUserLondon_H_

@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/24
+  2008/05/25
 
 ***************************************************************************/
 
@@ -14,6 +14,8 @@
 
 #include "TBofZCalc.h"
 #include "TTrimSPDataHandler.h"
+
+#define gBar 0.0135538817
 
 class TPofBCalc {
 
@@ -35,7 +37,6 @@ private:
   vector<double> fPB;
   double fBmin;
   double fBmax;
-  static const double gBar = 0.0135538817;
 
 };
 

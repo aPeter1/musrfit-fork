@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/24
+  2008/05/25
 
 ***************************************************************************/
 
@@ -30,12 +30,15 @@ public:
   vector<double> Energy() const {return fEnergy;}
   vector<double> DataZ(double) const;
   vector<double> DataNZ(double) const;
+  vector<double> OrigDataNZ(double) const;
+  void WeightLayers(double, const vector<double>&, const vector<double>&) const;
   double GetNofZ(double, double) const;
 
 private:
   vector<double> fEnergy;
   vector< vector<double> > fDataZ;
-  vector< vector<double> > fDataNZ;
+  mutable vector< vector<double> > fDataNZ;
+  vector< vector<double> > fOrigDataNZ;
 };
 
 #endif // _TTrimSPDataHandler_H_

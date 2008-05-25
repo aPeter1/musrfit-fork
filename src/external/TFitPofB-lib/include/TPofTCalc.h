@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/24
+  2008/05/25
 
 ***************************************************************************/
 
@@ -14,6 +14,8 @@
 
 #include "TPofBCalc.h"
 #include "fftw3.h"
+
+#define PI 3.14159265358979323846
 
 class TPofTCalc {
 
@@ -35,8 +37,6 @@ private:
   vector<double> fPT;
   double fTBin;
   unsigned int fNFFT;
-  static const double PI = 3.14159265358979323846;
-  static const double gBar = 0.0135538817;
 
 };
 
