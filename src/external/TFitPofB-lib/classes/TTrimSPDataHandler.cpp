@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/25
+  2008/05/26
 
 ***************************************************************************/
 
@@ -67,6 +67,10 @@ TTrimSPData::TTrimSPData(const string &path, vector<string> &energyVec) {
   }
 
   fOrigDataNZ = fDataNZ;
+
+  for(unsigned int i(0); i<fEnergy.size();i++)
+    fIsNormalized.push_back(false);
+
 }
 
 //---------------------
@@ -88,7 +92,8 @@ vector<double> TTrimSPData::DataZ(double e) const {
 }
 
 //---------------------
-// Method returning actual n(z)-vector calculated by trim.SP and potentially altered by the WeightLayers-method for given energy[keV]
+// Method returning actual n(z)-vector calculated by trim.SP and
+// potentially altered by the WeightLayers- or the Normalize-method for given energy[keV]
 //---------------------
 
 vector<double> TTrimSPData::DataNZ(double e) const {
@@ -157,6 +162,20 @@ void TTrimSPData::WeightLayers(double e, const vector<double>& interface, const 
     }
   }
 
+  for(unsigned int i(0); i<weight.size(); i++) {
+    if(weight[i]-1.0)
+      break;
+    if(i == weight.size() - 1) {
+      for(unsigned int j(0); j<fEnergy.size(); j++) {
+        if(!(fEnergy[j] - e)) {
+          fDataNZ[j] = fOrigDataNZ[j];
+          fIsNormalized[j] = false;
+          return;
+        }
+      }
+    }
+  }
+
   for(unsigned int i(0); i<fEnergy.size(); i++) {
     if(!(fEnergy[i] - e)) {
       unsigned int k(0);
@@ -172,9 +191,13 @@ void TTrimSPData::WeightLayers(double e, const vector<double>& interface, const 
         else
           fDataNZ[i][j] = fOrigDataNZ[i][j]*weight[k];
       }
+    fIsNormalized[i] = false;
+    return;
     }
   }
 
+  cout << "No implantation profile available for the specified energy... No weighting done." << endl;
+  return;
 }
 
 //---------------------
@@ -187,9 +210,13 @@ double TTrimSPData::GetNofZ(double zz, double e) const {
 
   for(unsigned int i(0); i<fEnergy.size(); i++) {
     if(!(fEnergy[i] - e)) {
-      z = DataZ(e);
-      nz = DataNZ(e);
+      z = fDataZ[i];
+      nz = fDataNZ[i];
       break;
+    }
+    if(i == fEnergy.size() - 1) {
+      cout << "No implantation profile available for the specified energy... Quitting!" << endl;
+      exit(-1);
     }
   }
 
@@ -209,4 +236,44 @@ double TTrimSPData::GetNofZ(double zz, double e) const {
     return nz[0]*10.0*zz/z[0];
 
   return fabs(nz[i-1]+(nz[i]-nz[i-1])*(10.0*zz-z[i-1])/(z[i]-z[i-1]));
+}
+
+//---------------------
+// Method normalizing the n(z)-vector calculated by trim.SP for a given energy[keV]
+//---------------------
+
+void TTrimSPData::Normalize(double e) {
+
+  for(unsigned int i(0); i<fEnergy.size(); i++) {
+    if(!(fEnergy[i] - e)) {
+      double nZsum = 0.0;
+      for (unsigned int j(0); j<fDataZ[i].size(); j++)
+        nZsum += fDataNZ[i][j];
+      nZsum *= (fDataZ[i][1]-fDataZ[i][0]);
+      for (unsigned int j(0); j<fDataZ[i].size(); j++)
+        fDataNZ[i][j] /= nZsum;
+
+      fIsNormalized[i] = true;
+      return;
+    }
+  }
+  // default
+  cout << "No implantation profile available for the specified energy... No normalization done." << endl;
+  return;
+
+}
+
+//---------------------
+// Method telling you if the n(z)-vector calculated by trim.SP for a given energy [keV] has been normalized
+//---------------------
+
+bool TTrimSPData::IsNormalized(double e) const {
+  for(unsigned int i(0); i<fEnergy.size(); i++) {
+    if(!(fEnergy[i] - e)) {
+      return fIsNormalized[i];
+    }
+  }
+
+  cout << "No implantation profile available for the specified energy... Returning false! Check your code!" << endl;
+  return false;
 }

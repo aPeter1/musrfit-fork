@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/25
+  2008/05/26
 
 ***************************************************************************/
 
@@ -25,8 +25,11 @@ TUserLondon::TUserLondon(const vector<unsigned int> &parNo, const vector<double>
     fPar.push_back(par[parNo[i]-1]);
   }
 
-  string rge_path("/home/l_wojek/nt/wojek/g/Bastian/ImplantationDepth/YBCO_PBCO-");
-  string energy_arr[] = {"02_1", "02_5", "03_5", "05_0", "07_5", "10_0", "12_5", "15_0", "17_5", "19_0", "20_0", "22_5", "25_0"};
+//  string rge_path("/home/l_wojek/nt/wojek/g/Bastian/ImplantationDepth/YBCO_PBCO-");
+//  string energy_arr[] = {"02_1", "02_5", "03_5", "05_0", "07_5", "10_0", "12_5", "15_0", "17_5", "19_0", "20_0", "22_5", "25_0"};
+
+  string rge_path("/home/l_wojek/TrimSP/AuYBCO_2005/AuYBCO-500000-");
+  string energy_arr[] = {"04_6", "09_6", "14_6", "18_6", "21_6", "24_6", "28_7"};
 
   vector<string> energy_vec(energy_arr, energy_arr+(sizeof(energy_arr)/sizeof(energy_arr[0])));
 
@@ -96,9 +99,10 @@ double TUserLondon::Eval(double t, const vector<double> &par) const {
   if (par_changed)
     fCalcNeeded = true;
 
-  // if model parameters have changed, recalculate B(z), P(B) and P(t)
 
 /* DEBUGGING CODE COMMENTED -- quite a mess... sorry*/
+
+  // if model parameters have changed, recalculate B(z), P(B) and P(t)
 
   if (fCalcNeeded) {
 
