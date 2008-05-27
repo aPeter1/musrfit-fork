@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/25
+  2008/05/27
 
 ***************************************************************************/
 
@@ -30,7 +30,7 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
   fBmax = BofZ.GetBmax();
 
   double BB, BBnext;
-  double zm, zp, zNextm, zNextp, dz;
+  double zm, zp, zNext, dz;
 
   // fill not used Bs before Bmin with 0.0
 
@@ -54,7 +54,7 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
   seconds = time (NULL);
 
   char debugfile[50];
-  int n = sprintf (debugfile, "test_Bz_%f_%ld.dat", fBmin, seconds);
+  int n = sprintf (debugfile, "test_Bz_%ld_%f.dat", seconds, fBmin);
 
   if (n > 0) {
     ofstream of(debugfile);
@@ -66,7 +66,7 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
   }
 
   char debugfile1[50];
-  int n1 = sprintf (debugfile1, "test_NZ_%f_%ld.dat", para[2], seconds);
+  int n1 = sprintf (debugfile1, "test_NZ_%ld_%f.dat", seconds, para[2]);
 
   if (n1 > 0) {
     ofstream of1(debugfile1);
@@ -80,6 +80,8 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
 ---------------------------------------------------------*/
 
   double nn;
+  bool zNextFound(false);
+
   for ( ; BB <= fBmax ; BB += para[1]) {
     BBnext = BB + para[1];
     fB.push_back(BB);
@@ -92,16 +94,21 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
         for (unsigned int k(0); k < j; k++) {
           if ( ( bofzBZ[j-k] <= BBnext && bofzBZ[j-k-1] >= BBnext ) ) {
 //           cout << "1 " << j << " " << k << endl;
-            zNextm = (BBnext-bofzBZ[j-k-1])*ddZ/(bofzBZ[j-k]-bofzBZ[j-k-1]) + bofzZ[j-k-1];
+            zNext = (BBnext-bofzBZ[j-k-1])*ddZ/(bofzBZ[j-k]-bofzBZ[j-k-1]) + bofzZ[j-k-1];
+            zNextFound = true;
             break;
           }
         }
 
-        dz = zNextm-zm;
-        nn = dataTrimSP.GetNofZ(zm, para[2]);
-        if (nn != -1.0) {
+        if(zNextFound) {
+          zNextFound = false;
+
+          dz = zNext-zm;
+          nn = dataTrimSP.GetNofZ(zm, para[2]);
+          if (nn != -1.0) {
 //          cout << "zNext = " << zNextm << ", zm = " << zm << ", dz = " << dz << endl;
-          *(fPB.end()-1) += nn*fabs(dz/para[1]);
+            *(fPB.end()-1) += nn*fabs(dz/para[1]);
+          }
         }
 
       } else if (bofzBZ[j] <= BB && bofzBZ[j+1] >= BB ) {
@@ -110,16 +117,21 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
         for (unsigned int k(0); k < bofzZ.size() - j - 1; k++) {
           if ( ( bofzBZ[j+k] <= BBnext && bofzBZ[j+k+1] >= BBnext ) ) {
 //            cout << "2 " << j << " " << k << endl;
-            zNextp = (BBnext-bofzBZ[j+k])*ddZ/(bofzBZ[j+k+1]-bofzBZ[j+k]) + bofzZ[j+k];
+            zNext = (BBnext-bofzBZ[j+k])*ddZ/(bofzBZ[j+k+1]-bofzBZ[j+k]) + bofzZ[j+k];
+            zNextFound = true;
             break;
           }
         }
 
-        dz = zNextp-zp;
-        nn = dataTrimSP.GetNofZ(zp, para[2]);
-        if (nn != -1.0) {
-//          cout << "zNext = " << zNextp << ", zp = " << zp << ", dz = " << dz << endl;
-          *(fPB.end()-1) += nn*fabs(dz/para[1]);
+        if(zNextFound) {
+          zNextFound = false;
+
+          dz = zNext-zp;
+          nn = dataTrimSP.GetNofZ(zp, para[2]);
+          if (nn != -1.0) {
+//            cout << "zNext = " << zNextp << ", zp = " << zp << ", dz = " << dz << endl;
+            *(fPB.end()-1) += nn*fabs(dz/para[1]);
+          }
         }
      }
     }
