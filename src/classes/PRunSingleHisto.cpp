@@ -638,20 +638,17 @@ cout << endl << ">> data start time = " << fData.fDataTimeStart;
   // calculate theory
   unsigned int size = runData->fDataBin[histoNo].size();
   double startTime  = -fT0s[0]*fTimeResolution;
+  double theoryValue;
   fData.fTheoryTimeStart = startTime;
 //cout << endl << ">> theory start time = " << fData.fTheoryTimeStart;
   fData.fTheoryTimeStep  = fTimeResolution;
   for (unsigned int i=0; i<size; i++) {
     time = startTime + (double)i*fTimeResolution;
-    fData.fTheory.push_back(N0*TMath::Exp(-time/tau)*(1+fTheory->Func(time, par, fFuncValues))+bkg);
-if (i==126) {
-cout << endl << ">> time = " << time;
-cout << endl << ">> value = " << N0*TMath::Exp(-time/tau)*(1+fTheory->Func(time, par, fFuncValues))+bkg;
-cout << endl << ">> N0  = " << N0;
-cout << endl << ">> bkg = " << bkg;
-cout << endl << ">> TMath::Exp(-time/tau) = " << TMath::Exp(-time/tau);
-cout << endl << ">> theory = " << fTheory->Func(time, par, fFuncValues);
-}
+    theoryValue = fTheory->Func(time, par, fFuncValues);
+    if (theoryValue > 10.0) {  // dirty hack needs to be fixed!!
+      theoryValue = 0.0;
+    }
+    fData.fTheory.push_back(N0*TMath::Exp(-time/tau)*(1+theoryValue)+bkg);
   }
 
   // clean up
@@ -853,11 +850,16 @@ cout << endl << "--------------------------------";
   // calculate theory
   unsigned int size = runData->fDataBin[histoNo].size();
   double startTime  = -fT0s[0]*fTimeResolution;
+  double theoryValue;
   fData.fTheoryTimeStart = startTime;
   fData.fTheoryTimeStep  = fTimeResolution;
   for (unsigned int i=0; i<size; i++) {
     time = startTime + (double)i*fTimeResolution;
-    fData.fTheory.push_back(fTheory->Func(time, par, fFuncValues));
+    theoryValue = fTheory->Func(time, par, fFuncValues);
+    if (theoryValue > 10.0) { // dirty hack needs to be fixed!!
+      theoryValue = 0.0;
+    }
+    fData.fTheory.push_back(theoryValue);
   }
 
   // clean up

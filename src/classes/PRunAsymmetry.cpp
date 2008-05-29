@@ -851,8 +851,9 @@ bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2
   for (unsigned int i=0; i<size; i++) {
     time = startTime + (double)i*fTimeResolution;
     value = fTheory->Func(time, par, fFuncValues);
-    if (value > 1.0e2)
+    if (value > 10.0) {  // dirty hack needs to be fixed!!
       value = 0.0;
+    }
     fData.fTheory.push_back(value);
   }
 
