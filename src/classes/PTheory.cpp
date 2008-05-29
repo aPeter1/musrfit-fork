@@ -254,12 +254,21 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
     MakeCleanAndTidyTheoryBlock(fullTheoryBlock);
   }
 
-  // check if user function, if so, check if it is reachable (root)
+  // check if user function, if so, check if it is reachable (root) and if yes invoke object
   if (!fUserFcnClassName.IsWhitespace()) {
     cout << endl << ">> user function class name: " << fUserFcnClassName.Data() << endl;
     if (!TClass::GetDict(fUserFcnClassName.Data())) {
       cout << endl << "**ERROR**: PTheory: user function class '" << fUserFcnClassName.Data() << "' not found. See line no " << line->fLineNo;
       fValid = false;
+    } else { // invoke user function object
+      fUserFcn = 0;
+      fUserFcn = TClass::GetClass(fUserFcnClassName.Data())->New();
+cout << endl << ">> fUserFcn = " << fUserFcn;
+      if (fUserFcn == 0) {
+        cout << endl << "**ERROR**: PTheory: user function object could not be invoked. See line no " << line->fLineNo;
+        fValid = false;
+      } else { // get the pointer to the user function evaluation routine
+      }
     }
   }
 
@@ -295,6 +304,12 @@ PTheory::~PTheory()
   if (fStaticKTLFFunc) {
     delete fStaticKTLFFunc;
     fStaticKTLFFunc = 0;
+  }
+
+  if (fUserFcn) {
+/*
+    fUserFcn = 0;
+*/
   }
 }
 

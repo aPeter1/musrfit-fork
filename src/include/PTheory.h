@@ -214,7 +214,8 @@ class PTheory
 //    TString fUserFunPreParsed;
     TF1 *fStaticKTLFFunc;
 
-    TString fUserFcnClassName; ///< name of the user function class for within root
+    TString  fUserFcnClassName; ///< name of the user function class for within root
+    void    *fUserFcn;          ///< pointer to the user function object
 
     PMsrHandler *fMsrInfo;
 };

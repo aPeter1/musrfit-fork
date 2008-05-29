@@ -54,19 +54,19 @@ short term:
 
 * something is strange with the coordinate system in TPaveText! **CHECK**
 
-* something is wrong with lifetimecorrection plot of musrview (up shifted data) **DONE** 08-05-16
+* something is wrong with lifetimecorrection plot of musrview (up shifted data) **FIXED** 08-05-16
 
 
 ---------------------
 intermediate term:
 ---------------------
 
+* implement access to user-function, i.e. functions not
 * start writing docu, i.e. transferring WKM doc from German -> English and
   describe new features with examples!
 * introduce error numbers with corresponding docu/explanation in the latex-docu.  
 * implement RRF stuff
 * implement NonMuSR stuff
-* implement access to user-function, i.e. functions not
   defined within musrfit, using the ROOT dictionary feature
   to look for them and use them.
 * think about if it is worth to modify wkm in order to read

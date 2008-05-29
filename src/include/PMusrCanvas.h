@@ -140,16 +140,4 @@ class PMusrCanvas : public TObject, public TQObject
   ClassDef(PMusrCanvas, 1)
 };
 
-// root dictionary stuff --------------------------------------------------
-#ifdef __CINT__
-
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
-
-#pragma link C++ class PMusrCanvas+;
-
-#endif
-// root dictionary stuff --------------------------------------------------
-
 #endif // _PMUSRCANVAS_H_

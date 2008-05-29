@@ -57,7 +57,7 @@ class PStartupHandler : public TObject, public TQObject
     virtual void OnCdataBlock(const char*, Int_t); // SLOT
 
     virtual void CheckLists();
-    
+
     virtual const PStringVector GetDataPathList() const { return fDataPathList; }
     virtual const PIntVector    GetMarkerList() const { return fMarkerList; }
     virtual const PIntVector    GetColorList() const { return fColorList; }
@@ -74,18 +74,6 @@ class PStartupHandler : public TObject, public TQObject
 
   ClassDef(PStartupHandler, 1)
 };
-
-// root dictionary stuff --------------------------------------------------
-#ifdef __CINT__
-
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
-
-#pragma link C++ class PStartupHandler+;
-
-#endif
-// root dictionary stuff --------------------------------------------------
 
 #endif // _PSTARTUPHANDLER_H_
 

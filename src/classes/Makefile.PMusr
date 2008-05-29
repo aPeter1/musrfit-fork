@@ -124,11 +124,11 @@ $(OBJS): %.o: %.cpp
 MuSR_td_PSI_bin.o: ../external/MuSR_software/Class_MuSR_PSI/MuSR_td_PSI_bin.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c ../external/MuSR_software/Class_MuSR_PSI/MuSR_td_PSI_bin.cpp
 
-PStartupHandlerDict.cpp: ../include/PStartupHandler.h
+PStartupHandlerDict.cpp: ../include/PStartupHandler.h ../include/PStartupHandlerLinkDef.h
 	@echo "Generating dictionary $@..."
 	rootcint -f $@ -c -p $^
 
-PMusrCanvasDict.cpp: ../include/PMusrCanvas.h
+PMusrCanvasDict.cpp: ../include/PMusrCanvas.h ../include/PMusrCanvasLinkDef.h
 	@echo "Generating dictionary $@..."
 	rootcint -v -f $@ -c -p $^
 
