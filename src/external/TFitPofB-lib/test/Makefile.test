@@ -1,9 +1,25 @@
+#---------------------------------------------------
+# get compilation and library flags from root-config
+
+ROOTCFLAGS    = $(shell $(ROOTSYS)/bin/root-config --cflags)
+ROOTLIBS      = $(shell $(ROOTSYS)/bin/root-config --libs)
+
+#---------------------------------------------------
+
 CXX           = g++
 CXXFLAGS      = -g -Wall
-LOCALINCLUDE  = ../include/
-INCLUDES      = -I$(LOCALINCLUDE)
+LOCALINCLUDE  = ../include
+ROOTINCLUDE   = $(ROOTSYS)/include
+INCLUDES      = -I$(LOCALINCLUDE) -I$(ROOTINCLUDE)
 LD            = g++
-LDFLAGS       = -g -L../classes/ -lTFitPofB -lfftw3 -lm
+LDFLAGS       = -g -L../classes -lTFitPofB -lfftw3 -lm
+
+# the output from the root-config script:
+CXXFLAGS      += $(ROOTCFLAGS)
+LDFLAGS       +=
+
+# the ROOT libraries
+LIBS          = $(ROOTLIBS)
 
 EXEC = test
 
@@ -17,7 +33,7 @@ all:  $(EXEC)
 
 $(EXEC): $(OBJS)
 	@echo "---> Building $(EXEC) ..."
-	$(LD) $(LDFLAGS) $(OBJS) -o $(EXEC)
+	$(LD) $(LDFLAGS) $(OBJS) -o $(EXEC) $(LIBS)
 	@echo "done"
 
 # clean up: remove all object file (and core files)

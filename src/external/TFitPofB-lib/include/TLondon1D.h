@@ -5,16 +5,17 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/27
+  2008/05/29
 
 ***************************************************************************/
 
 #ifndef _TLondon1D_H_
 #define _TLondon1D_H_
 
+#include "TObject.h"
 #include "TPofTCalc.h"
 
-class TLondon1D {
+class TLondon1D : public TObject {
 
 public:
   TLondon1D() : fCalcNeeded(true) {}
@@ -27,21 +28,26 @@ protected:
   TTrimSPData *fImpProfile;
   TPofTCalc *fPofT;
   mutable bool fCalcNeeded;
+
+  ClassDef(TLondon1D,1)
 };
 
 class TLondon1D1L : public TLondon1D {
 
 public:
+  TLondon1D1L() {}
   TLondon1D1L(const vector<unsigned int>& , const vector<double>&);
   ~TLondon1D1L() {}
 
   double Eval(double, const vector<double>&) const;
 
+  ClassDef(TLondon1D1L,1)
 };
 
 class TLondon1D2L : public TLondon1D {
 
 public:
+  TLondon1D2L() : fLastTwoChanged(true) {}
   TLondon1D2L(const vector<unsigned int>& , const vector<double>&);
   ~TLondon1D2L() {}
 
@@ -50,11 +56,13 @@ public:
 private:
   mutable bool fLastTwoChanged;
 
+  ClassDef(TLondon1D2L,1)
 };
 
 class TLondon1D3LS : public TLondon1D {
 
 public:
+  TLondon1D3LS() : fLastThreeChanged(true) {}
   TLondon1D3LS(const vector<unsigned int>& , const vector<double>&);
   ~TLondon1D3LS() {}
 
@@ -63,6 +71,7 @@ public:
 private:
   mutable bool fLastThreeChanged;
 
+  ClassDef(TLondon1D3LS,1)
 };
 
-#endif //_TUserLondon1D_H_
+#endif //_TLondon1D_H_

@@ -5,13 +5,18 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/27
+  2008/05/29
 
 ***************************************************************************/
 
 #include "TLondon1D.h"
 #include <iostream>
 using namespace std;
+
+ClassImp(TLondon1D)
+ClassImp(TLondon1D1L)
+ClassImp(TLondon1D2L)
+ClassImp(TLondon1D3LS)
 
 //------------------
 // Destructor of the TLondon1D class -- cleaning up
@@ -78,8 +83,8 @@ double TLondon1D1L::Eval(double t, const vector<double> &par) const {
     if( fPar[i]-par[i] ) {
       fPar[i] = par[i];
       par_changed = true;
-      if(i == 1 || i == 2 || i == 3) {
-        cout << "You are varying dt, dB or E! These parameters have to be fixed! Quitting..." << endl; 
+      if(i == 1 || i == 2) {
+        cout << "You are varying dt or dB! These parameters have to be fixed! Quitting..." << endl; 
         exit(-1);
       } else if (i == 0) {
         only_phase_changed = true;
@@ -201,8 +206,8 @@ double TLondon1D2L::Eval(double t, const vector<double> &par) const {
     if( fPar[i]-par[i] ) {
       fPar[i] = par[i];
       par_changed = true;
-      if(i == 1 || i == 2 || i == 3) {
-        cout << "You are varying dt, dB or E! These parameters have to be fixed! Quitting..." << endl; 
+      if(i == 1 || i == 2) {
+        cout << "You are varying dt or dB! These parameters have to be fixed! Quitting..." << endl; 
         exit(-1);
       } else if (i == 0) {
         only_phase_changed = true;
@@ -339,8 +344,8 @@ double TLondon1D3LS::Eval(double t, const vector<double> &par) const {
     if( fPar[i]-par[i] ) {
       fPar[i] = par[i];
       par_changed = true;
-      if(i == 1 || i == 2 || i == 3) {
-        cout << "You are varying dt, dB or E! These parameters have to be fixed! Quitting..." << endl; 
+      if(i == 1 || i == 2) {
+        cout << "You are varying dt or dB! These parameters have to be fixed! Quitting..." << endl; 
         exit(-1);
       } else if (i == 0) {
         only_phase_changed = true;

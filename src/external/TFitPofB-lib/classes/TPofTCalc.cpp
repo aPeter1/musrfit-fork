@@ -15,10 +15,10 @@
 #include <iostream>
 #include <cstdio>
 
-/* USED FOR DEBUGGING -----------------------*/
+/* USED FOR DEBUGGING -----------------------
 #include <ctime>
 #include <fstream>
-/*--------------------------------------------*/
+--------------------------------------------*/
 
 //------------------
 // Constructor of the TPofTCalc class - it creates the FFT plan
@@ -154,6 +154,7 @@ TPofTCalc::~TPofTCalc() {
   fftw_destroy_plan(fFFTplan);
   free(fFFTin);
   fftw_free(fFFTout);
+  fftw_cleanup();
   fT.clear();
   fPT.clear();
 

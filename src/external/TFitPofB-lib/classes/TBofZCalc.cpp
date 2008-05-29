@@ -69,7 +69,7 @@ double TBofZCalc::GetBofZ(double zz) const {
 
 TLondon1D_1L::TLondon1D_1L(const vector<double> &param) {
 
-  unsigned int n(2000); // number of steps for the calculation
+  unsigned int n(5000); // number of steps for the calculation
 
   double N(cosh(param[2]/2.0/param[3]));
 
@@ -93,7 +93,7 @@ TLondon1D_1L::TLondon1D_1L(const vector<double> &param) {
 
 TLondon1D_2L::TLondon1D_2L(const vector<double> &param) {
 
-  unsigned int n(4000); // number of steps for the calculation
+  unsigned int n(5000); // number of steps for the calculation
 
   double N1(param[5]*cosh(param[3]/param[5])*sinh(param[2]/param[4]) + param[4]*cosh(param[2]/param[4])*sinh(param[3]/param[5]));
   double N2(4.0*N1);
@@ -122,7 +122,7 @@ TLondon1D_2L::TLondon1D_2L(const vector<double> &param) {
 
 TLondon1D_3L::TLondon1D_3L(const vector<double> &param) {
 
-  unsigned int n(4000); // number of steps for the calculation
+  unsigned int n(5000); // number of steps for the calculation
 
   double N1(8.0*(param[5]*param[6]*cosh(param[3]/param[6])*sinh((param[2]+param[4])/param[5]) + ((param[5]*param[5]*cosh(param[2]/param[5])*cosh(param[4]/param[5])) +  (param[6]*param[6]*sinh(param[2]/param[5])*sinh(param[4]/param[5])))*sinh(param[3]/param[6])));
 
