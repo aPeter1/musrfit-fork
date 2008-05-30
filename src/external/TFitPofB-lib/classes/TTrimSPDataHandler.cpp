@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/26
+  2008/05/30
 
 ***************************************************************************/
 
@@ -37,13 +37,12 @@ TTrimSPData::TTrimSPData(const string &path, vector<string> &energyVec) {
 
     energyStr = path + energyVec[i] + ".rge";
 
-    fEnergy.push_back(atof(energyVec[i].replace(2,1,".").c_str()));
-
     ifstream *rgeFile = new ifstream(energyStr.c_str());
     if(! *rgeFile) {
-      cout << "rge-file not found! Exit now." << endl;
-      exit(-1);
+      cout << "rge-file not found! Try next energy..." << endl;
+      delete rgeFile;
     } else {
+      fEnergy.push_back(atof(energyVec[i].replace(2,1,".").c_str()));
 
       while(*rgeFile >> word)
         if(word == "PARTICLES") break;
@@ -65,6 +64,8 @@ TTrimSPData::TTrimSPData(const string &path, vector<string> &energyVec) {
 
     }
   }
+
+  cout << "Read in " << fDataNZ.size() << " implantation profiles in total." << endl;
 
   fOrigDataNZ = fDataNZ;
 

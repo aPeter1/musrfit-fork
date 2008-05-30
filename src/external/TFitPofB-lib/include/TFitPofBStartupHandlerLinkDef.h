@@ -16,11 +16,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class TLondon1D+;
-#pragma link C++ class TLondon1D1L+;
-#pragma link C++ class TLondon1D2L+;
-#pragma link C++ class TLondon1D3L+;
-#pragma link C++ class TLondon1D3LS+;
+#pragma link C++ class TFitPofBStartupHandler+;
 
 #endif //__CINT__
 // root dictionary stuff --------------------------------------------------

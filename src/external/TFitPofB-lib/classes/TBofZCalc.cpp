@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/24
+  2008/05/30
 
 ***************************************************************************/
 
@@ -116,11 +116,47 @@ TLondon1D_2L::TLondon1D_2L(const vector<double> &param) {
 
 //------------------
 // Constructor of the TLondon1D_3L class
+// 1D-London screening in a thin superconducting film, three layers, three lambdas
+// Parameters: Bext[G], deadlayer[nm], thickness1[nm], thickness2[nm], thickness3[nm], lambda1[nm], lambda2[nm], lambda3[nm]
+//------------------
+
+TLondon1D_3L::TLondon1D_3L(const vector<double> &param) {
+
+  unsigned int n(5000); // number of steps for the calculation
+
+  double N1(param[7]*cosh(param[4]/param[7])*((exp(2.0*param[2]/param[5])-1.0)*param[6]*cosh(param[3]/param[6]) + (1.0+exp(2.0*param[2]/param[5]))*param[5]*sinh(param[3]/param[6])) + 2.0*exp(param[2]/param[5])*param[6]*(param[5]*cosh(param[2]/param[5])*cosh(param[3]/param[6]) + param[6]*sinh(param[2]/param[5])*sinh(param[3]/param[6]))*sinh(param[4]/param[7]));
+
+  double N21(2.0*(param[7]*cosh(param[4]/param[7])*((-1.0+exp(2.0*param[2]/param[5]))*param[6]*cosh(param[3]/param[6]) + (1.0+exp(2.0*param[2]/param[5]))*param[5]*sinh(param[3]/param[6])) + 2.0*exp(param[2]/param[5])*param[6]*(param[5]*cosh(param[2]/param[5])*cosh(param[3]/param[6]) + param[6]*sinh(param[2]/param[5])*sinh(param[3]/param[6]))*sinh(param[4]/param[7])));
+
+  double N22(((param[5]+exp(2.0*param[2]/param[5])*(param[5]-param[6])+param[6])*(-param[7]*cosh(param[4]/param[7]) + param[6]*sinh(param[4]/param[7]))+exp(2.0*param[3]/param[6])*(param[5]-param[6] + exp(2.0*param[2]/param[5])*(param[5]+param[6]))*(param[7]*cosh(param[4]/param[7])+param[6]*sinh(param[4]/param[7]))));
+
+  double N3(4.0*((1.0+exp(2.0*param[2]/param[5]))*param[5]*(param[7]*cosh(param[4]/param[7])*sinh(param[3]/param[6]) + param[6]*cosh(param[3]/param[6])*sinh(param[4]/param[7])) + (-1.0+exp(2.0*param[2]/param[5]))*param[6]*(param[7]*cosh(param[3]/param[6])*cosh(param[4]/param[7]) + param[6]*sinh(param[3]/param[6])*sinh(param[4]/param[7]))));
+
+  fDZ = (param[2]+param[3]+param[4])/double(n);
+  double ZZ, BBz;
+
+  for (unsigned int j(0); j<n; j++) {
+    ZZ = param[1] + (double)j*fDZ;
+    fZ.push_back(ZZ);
+    if (ZZ < param[1]+param[2]) {
+      BBz = (2.0*param[0]*exp(param[2]/param[5])*(-param[6]*param[7]*sinh((param[1]-ZZ)/param[5]) + param[7]*cosh(param[4]/param[7])*(param[6]*cosh(param[3]/param[6])*sinh((param[2]+param[1]-ZZ)/param[5]) + param[5]*cosh((param[2]+param[1]-ZZ)/param[5])*sinh(param[3]/param[6])) + param[6]*(param[5]*cosh((param[2]+param[1]-ZZ)/param[5])*cosh(param[3]/param[6]) + param[6]*sinh((param[2]+param[1]-ZZ)/param[5])*sinh(param[3]/param[6]))*sinh(param[4]/param[7])))/N1;
+    } else if (ZZ < param[1]+param[2]+param[3]) {
+      BBz = (param[0]*exp((param[2]+param[1]-ZZ)/param[6])*(-param[5]-param[6]+exp(2.0*param[2]/param[5])*(param[6]-param[5]))*param[7])/N21 + (param[0]*exp(-(param[2]+param[1]+ZZ)/param[6])*(exp((param[3]+2.0*ZZ)/param[6])*(param[5]-param[6] + exp(2.0*param[2]/param[5])*(param[5]+param[6]))*param[7] + 2.0*exp(param[2]/param[5])*param[5]*(exp(2.0*ZZ/param[6])*(-param[7]*cosh(param[4]/param[7]) + param[6]*sinh(param[4]/param[7]))+(cosh(2.0*(param[2]+param[3]+param[1])/param[6]) + sinh(2.0*(param[2]+param[3]+param[1])/param[6]))*(param[7]*cosh(param[4]/param[7])+param[6]*sinh(param[4]/param[7])))))/N22;
+    } else {
+      BBz = (param[0]*exp(-(param[2]+param[3]+param[1]+ZZ)/param[7])*(-exp(-param[3]/param[6] + 2.0*(param[2]+param[3]+param[1])/param[7])*(-4.0*exp(param[2]/param[5]+param[3]/param[6]+param[4]/param[7])*param[5]*param[6] + (-1.0+exp(2.0*param[2]/param[5]))*param[6]*(-param[6]+exp(2.0*param[3]/param[6])*(param[6]-param[7])-param[7]) + (1.0+exp(2.0*param[2]/param[5]))*param[5]*(param[6]+exp(2.0*param[3]/param[6])*(param[6]-param[7])+param[7])) + 4.0*exp(param[2]/param[5]-(param[4]-2.0*ZZ)/param[7])*(-param[5]*param[6]+exp(param[4]/param[7]) * (param[6]*sinh(param[2]/param[5])*(param[7]*cosh(param[3]/param[6])+param[6]*sinh(param[3]/param[6])) + param[5]*cosh(param[2]/param[5])*(param[6]*cosh(param[3]/param[6])+param[7]*sinh(param[3]/param[6]))))))/N3;
+    }
+    fBZ.push_back(BBz);
+  }
+}
+
+
+//------------------
+// Constructor of the TLondon1D_3LS class
 // 1D-London screening in a thin superconducting film, three layers, two lambdas (top and bottom layer: lambda1)
 // Parameters: Bext[G], deadlayer[nm], thickness1[nm], thickness2[nm], thickness3[nm], lambda1[nm], lambda2[nm] 
 //------------------
 
-TLondon1D_3L::TLondon1D_3L(const vector<double> &param) {
+TLondon1D_3LS::TLondon1D_3LS(const vector<double> &param) {
 
   unsigned int n(5000); // number of steps for the calculation
 

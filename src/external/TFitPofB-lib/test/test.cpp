@@ -101,7 +101,7 @@ int main(){
 /**************** Test TLondon1D1L *********************************
 
   unsigned int parNo_arr[] = {1, 3, 5, 7, 9, 10, 11, 12};
-  double par_arr[] = {0.0, 999.0, 0.01, 999.0, 0.01, 999.0, 21.6, 999.0, 100.0, 5.0, 190.0, 180.0};
+  double par_arr[] = {0.0, 999.0, 0.01, 999.0, 0.01, 999.0, 4.6, 999.0, 100.0, 5.0, 190.0, 180.0};
   
   vector<unsigned int> parNo_vec(parNo_arr, parNo_arr+(sizeof(parNo_arr)/sizeof(parNo_arr[0])));
   vector<double> par_vec(par_arr, par_arr+(sizeof(par_arr)/sizeof(par_arr[0])));
@@ -136,6 +136,25 @@ int main(){
 
 /**************** Test TLondon1D3LS *********************************/
 
+  unsigned int parNo_arr[] = {1, 3, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+  double par_arr[] = {0.0, 999.0, 0.01, 999.0, 0.01, 999.0, 4.6, 999.0, 100.0, 5.0, 70.0, 50.0, 70.0, 180.0, 180.0, 180.0, 1.0, 1.0, 1.0};
+  
+  vector<unsigned int> parNo_vec(parNo_arr, parNo_arr+(sizeof(parNo_arr)/sizeof(parNo_arr[0])));
+  vector<double> par_vec(par_arr, par_arr+(sizeof(par_arr)/sizeof(par_arr[0])));
+  
+  vector<double> par_vec_sub;
+  
+  for(unsigned int i(0); i<parNo_vec.size(); i++) {
+    par_vec_sub.push_back(par_vec[parNo_vec[i]-1]);
+  }
+  
+  TLondon1D3L fitter(parNo_vec, par_vec);
+
+/************************************************************************/
+
+
+/**************** Test TLondon1D3LS *********************************
+
   unsigned int parNo_arr[] = {1, 3, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18};
   double par_arr[] = {0.0, 999.0, 0.01, 999.0, 0.01, 999.0, 21.6, 999.0, 100.0, 5.0, 70.0, 50.0, 70.0, 180.0, 500.0, 1.0, 0.3, 1.0};
   
@@ -150,7 +169,7 @@ int main(){
   
   TLondon1D3LS fitter(parNo_vec, par_vec);
 
-/************************************************************************/
+************************************************************************/
 
   ofstream of01("test_fitter01.dat");
   ofstream of02("test_fitter02.dat");
@@ -169,46 +188,44 @@ int main(){
   }
   of01.close();
   
-  par_vec_sub[0] += 10.0;
-  par_vec_sub[10] -= 10.0;
+  par_vec_sub[3] = 9.6;
+  par_vec_sub[10] = 300.0;
   
   for (double i(0.); i<12.0; i+=0.003) {
     of02 << i << " " << fitter.Eval(i, par_vec_sub) << endl;
   }
   of02.close();
-  
-    par_vec_sub[0] += 10.0;
-    par_vec_sub[10] -= 10.0;
+
+    par_vec_sub[0] = 40.6;
   
   for (double i(0.); i<12.0; i+=0.003) {
     of03 << i << " " << fitter.Eval(i, par_vec_sub) << endl;
   }
   of03.close();
   
-    par_vec_sub[0] += 10.0;
+    par_vec_sub[13] = 0.3;
   
   for (double i(0.); i<12.0; i+=0.003) {
     of04 << i << " " << fitter.Eval(i, par_vec_sub) << endl;
   }
   of04.close();
-  
-    par_vec_sub[0] += 10.0;
-    par_vec_sub[10] -= 10.0;
+
+    par_vec_sub[11] = 500.0;
   
   for (double i(0.); i<12.0; i+=0.003) {
     of05 << i << " " << fitter.Eval(i, par_vec_sub) << endl;
   }
   of05.close();
-  
-    par_vec_sub[0] += 10.0;
-    par_vec_sub[10] -= 10.0;
+/*  
+    par_vec_sub[3] = 24.6;
+    par_vec_sub[7] -= 10.0;
   
   for (double i(0.); i<12.0; i+=0.003) {
     of06 << i << " " << fitter.Eval(i, par_vec_sub) << endl;
   }
   of06.close();
   
-    par_vec_sub[0] += 10.0;
+    par_vec_sub[3] = 28.7;
   
   for (double i(0.); i<12.0; i+=0.003) {
     of07 << i << " " << fitter.Eval(i, par_vec_sub) << endl;
@@ -223,7 +240,7 @@ int main(){
   of08.close();
   
     par_vec_sub[0] = 0.0;
-    par_vec_sub[10] = 1000.0;
+    par_vec_sub[7] = 1000.0;
   
   for (double i(0.); i<12.0; i+=0.003) {
     of09 << i << " " << fitter.Eval(i, par_vec_sub) << endl;
@@ -231,13 +248,13 @@ int main(){
   of09.close();
   
     par_vec_sub[0] = 0.0;
-    par_vec_sub[12] = 1.0;
+    par_vec_sub[7] = 10.0;
   
   for (double i(0.); i<12.0; i+=0.003) {
     of10 << i << " " << fitter.Eval(i, par_vec_sub) << endl;
   }
   of10.close();
-
+*/
 /*
     vector<double> data01, data02, data03, data04, data05, data06, data07, data08, data09, data10;
     

@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/29
+  2008/05/30
 
 ***************************************************************************/
 
@@ -18,6 +18,7 @@
 class TLondon1D : public TObject {
 
 public:
+  // default conctructor only for the ROOT dictionary - DO NOT USE IT OTHERWISE!
   TLondon1D() : fCalcNeeded(true) {}
   virtual ~TLondon1D();
 
@@ -35,6 +36,7 @@ protected:
 class TLondon1D1L : public TLondon1D {
 
 public:
+  // default conctructor only for the ROOT dictionary - DO NOT USE IT OTHERWISE!
   TLondon1D1L() {}
   TLondon1D1L(const vector<unsigned int>& , const vector<double>&);
   ~TLondon1D1L() {}
@@ -47,6 +49,7 @@ public:
 class TLondon1D2L : public TLondon1D {
 
 public:
+  // default conctructor only for the ROOT dictionary - DO NOT USE IT OTHERWISE!
   TLondon1D2L() : fLastTwoChanged(true) {}
   TLondon1D2L(const vector<unsigned int>& , const vector<double>&);
   ~TLondon1D2L() {}
@@ -59,9 +62,27 @@ private:
   ClassDef(TLondon1D2L,1)
 };
 
+class TLondon1D3L : public TLondon1D {
+
+public:
+  // default conctructor only for the ROOT dictionary - DO NOT USE IT OTHERWISE!
+  TLondon1D3L() : fLastThreeChanged(true) {}
+  TLondon1D3L(const vector<unsigned int>& , const vector<double>&);
+  ~TLondon1D3L() {}
+
+  double Eval(double, const vector<double>&) const;
+
+private:
+  mutable bool fLastThreeChanged;
+
+  ClassDef(TLondon1D3L,1)
+};
+
+
 class TLondon1D3LS : public TLondon1D {
 
 public:
+  // default conctructor only for the ROOT dictionary - DO NOT USE IT OTHERWISE!
   TLondon1D3LS() : fLastThreeChanged(true) {}
   TLondon1D3LS(const vector<unsigned int>& , const vector<double>&);
   ~TLondon1D3LS() {}

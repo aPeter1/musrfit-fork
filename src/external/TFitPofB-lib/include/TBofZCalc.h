@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/24
+  2008/05/30
 
 ***************************************************************************/
 
@@ -69,7 +69,7 @@ public:
 };
 
 //--------------------
-// Class "for Meissner screening" in a thin superconducting film - tri-layer with two different lambdas
+// Class "for Meissner screening" in a thin superconducting film - tri-layer with three different lambdas
 //--------------------
 
 class TLondon1D_3L : public TBofZCalc {
@@ -77,6 +77,18 @@ class TLondon1D_3L : public TBofZCalc {
 public:
 
   TLondon1D_3L( const vector<double>& );
+
+};
+
+//--------------------
+// Class "for Meissner screening" in a thin superconducting film - tri-layer with two different lambdas
+//--------------------
+
+class TLondon1D_3LS : public TBofZCalc {
+
+public:
+
+  TLondon1D_3LS( const vector<double>& );
 
 };
 

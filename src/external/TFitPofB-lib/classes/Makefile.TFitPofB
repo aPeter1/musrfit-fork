@@ -25,6 +25,7 @@ OBJS += TTrimSPDataHandler.o
 OBJS += TBofZCalc.o
 OBJS += TPofBCalc.o
 OBJS += TPofTCalc.o
+OBJS += TFitPofBStartupHandler.o TFitPofBStartupHandlerDict.o
 OBJS += TLondon1D.o TLondon1DDict.o
 
 SHLIB = libTFitPofB.so
@@ -56,3 +57,7 @@ TLondon1DDict.cpp: ../include/TLondon1D.h ../include/TLondon1DLinkDef.h
 	@echo "Generating dictionary $@..."
 	rootcint -f $@ -c -p $^
 
+TFitPofBStartupHandlerDict.cpp: ../include/TFitPofBStartupHandler.h ../include/TFitPofBStartupHandlerLinkDef.h
+	@echo "Generating dictionary $@..."
+	rootcint -f $@ -c -p $^
+	

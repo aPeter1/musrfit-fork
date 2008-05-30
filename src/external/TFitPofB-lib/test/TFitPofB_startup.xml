@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TFitPofB>
+    <comment>
+        TFitPofB_startup.xml 
+        Defines path and energies of TrimSP-rge-files to be read in
+    </comment>
+    <data_path>/home/l_wojek/TrimSP/AuYBCO_2005/AuYBCO-500000-</data_path>
+    <energy_list>
+    	<energy>04_6</energy>
+	<energy>09_6</energy>
+	<energy>14_6</energy>
+	<energy>18_6</energy>
+	<energy>21_6</energy>
+	<energy>24_6</energy>
+	<energy>28_7</energy>
+    </energy_list>
+</TFitPofB>

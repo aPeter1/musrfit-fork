@@ -19,7 +19,7 @@ CXXFLAGS      += $(ROOTCFLAGS)
 LDFLAGS       +=
 
 # the ROOT libraries
-LIBS          = $(ROOTLIBS)
+LIBS          = $(ROOTLIBS) -lXMLParser
 
 EXEC = test
 

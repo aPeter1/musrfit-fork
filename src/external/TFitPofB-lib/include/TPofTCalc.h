@@ -20,6 +20,7 @@
 class TPofTCalc {
 
 public:
+
   TPofTCalc(const vector<double>&);
   ~TPofTCalc();
 
