@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/30
+  2008/06/03
 
 ***************************************************************************/
 
@@ -67,16 +67,14 @@ double TBofZCalc::GetBofZ(double zz) const {
 // Parameters: Bext[G], deadlayer[nm], thickness[nm], lambda[nm] 
 //------------------
 
-TLondon1D_1L::TLondon1D_1L(const vector<double> &param) {
-
-  unsigned int n(5000); // number of steps for the calculation
+TLondon1D_1L::TLondon1D_1L(unsigned int steps, const vector<double> &param) {
 
   double N(cosh(param[2]/2.0/param[3]));
 
-  fDZ = param[2]/double(n);
+  fDZ = param[2]/double(steps);
   double ZZ, BBz;
 
-  for (unsigned int j(0); j<n; j++) {
+  for (unsigned int j(0); j<steps; j++) {
     ZZ = param[1] + (double)j*fDZ;
     fZ.push_back(ZZ);
     BBz = param[0]*cosh((param[2]/2.0-(ZZ-param[1]))/param[3])/N;
@@ -91,17 +89,15 @@ TLondon1D_1L::TLondon1D_1L(const vector<double> &param) {
 // Parameters: Bext[G], deadlayer[nm], thickness1[nm], thickness2[nm], lambda1[nm], lambda2[nm] 
 //------------------
 
-TLondon1D_2L::TLondon1D_2L(const vector<double> &param) {
-
-  unsigned int n(5000); // number of steps for the calculation
+TLondon1D_2L::TLondon1D_2L(unsigned int steps, const vector<double> &param) {
 
   double N1(param[5]*cosh(param[3]/param[5])*sinh(param[2]/param[4]) + param[4]*cosh(param[2]/param[4])*sinh(param[3]/param[5]));
   double N2(4.0*N1);
 
-  fDZ = (param[2]+param[3])/double(n);
+  fDZ = (param[2]+param[3])/double(steps);
   double ZZ, BBz;
 
-  for (unsigned int j(0); j<n; j++) {
+  for (unsigned int j(0); j<steps; j++) {
     ZZ = param[1] + (double)j*fDZ;
     fZ.push_back(ZZ);
     if (ZZ < param[1]+param[2]) {
@@ -120,9 +116,7 @@ TLondon1D_2L::TLondon1D_2L(const vector<double> &param) {
 // Parameters: Bext[G], deadlayer[nm], thickness1[nm], thickness2[nm], thickness3[nm], lambda1[nm], lambda2[nm], lambda3[nm]
 //------------------
 
-TLondon1D_3L::TLondon1D_3L(const vector<double> &param) {
-
-  unsigned int n(5000); // number of steps for the calculation
+TLondon1D_3L::TLondon1D_3L(unsigned int steps, const vector<double> &param) {
 
   double N1(param[7]*cosh(param[4]/param[7])*((exp(2.0*param[2]/param[5])-1.0)*param[6]*cosh(param[3]/param[6]) + (1.0+exp(2.0*param[2]/param[5]))*param[5]*sinh(param[3]/param[6])) + 2.0*exp(param[2]/param[5])*param[6]*(param[5]*cosh(param[2]/param[5])*cosh(param[3]/param[6]) + param[6]*sinh(param[2]/param[5])*sinh(param[3]/param[6]))*sinh(param[4]/param[7]));
 
@@ -132,10 +126,10 @@ TLondon1D_3L::TLondon1D_3L(const vector<double> &param) {
 
   double N3(4.0*((1.0+exp(2.0*param[2]/param[5]))*param[5]*(param[7]*cosh(param[4]/param[7])*sinh(param[3]/param[6]) + param[6]*cosh(param[3]/param[6])*sinh(param[4]/param[7])) + (-1.0+exp(2.0*param[2]/param[5]))*param[6]*(param[7]*cosh(param[3]/param[6])*cosh(param[4]/param[7]) + param[6]*sinh(param[3]/param[6])*sinh(param[4]/param[7]))));
 
-  fDZ = (param[2]+param[3]+param[4])/double(n);
+  fDZ = (param[2]+param[3]+param[4])/double(steps);
   double ZZ, BBz;
 
-  for (unsigned int j(0); j<n; j++) {
+  for (unsigned int j(0); j<steps; j++) {
     ZZ = param[1] + (double)j*fDZ;
     fZ.push_back(ZZ);
     if (ZZ < param[1]+param[2]) {
@@ -156,9 +150,7 @@ TLondon1D_3L::TLondon1D_3L(const vector<double> &param) {
 // Parameters: Bext[G], deadlayer[nm], thickness1[nm], thickness2[nm], thickness3[nm], lambda1[nm], lambda2[nm] 
 //------------------
 
-TLondon1D_3LS::TLondon1D_3LS(const vector<double> &param) {
-
-  unsigned int n(5000); // number of steps for the calculation
+TLondon1D_3LS::TLondon1D_3LS(unsigned int steps, const vector<double> &param) {
 
   double N1(8.0*(param[5]*param[6]*cosh(param[3]/param[6])*sinh((param[2]+param[4])/param[5]) + ((param[5]*param[5]*cosh(param[2]/param[5])*cosh(param[4]/param[5])) +  (param[6]*param[6]*sinh(param[2]/param[5])*sinh(param[4]/param[5])))*sinh(param[3]/param[6])));
 
@@ -166,10 +158,10 @@ TLondon1D_3LS::TLondon1D_3LS(const vector<double> &param) {
 
   double N3(8.0*(param[5]*param[6]*cosh(param[3]/param[6])*sinh((param[2]+param[4])/param[5]) + (param[5]*param[5]*cosh(param[2]/param[5])*cosh(param[4]/param[5]) + param[6]*param[6]*sinh(param[2]/param[5])*sinh(param[4]/param[5]))*sinh(param[3]/param[6])));
 
-  fDZ = (param[2]+param[3]+param[4])/double(n);
+  fDZ = (param[2]+param[3]+param[4])/double(steps);
   double ZZ, BBz;
 
-  for (unsigned int j(0); j<n; j++) {
+  for (unsigned int j(0); j<steps; j++) {
     ZZ = param[1] + (double)j*fDZ;
     fZ.push_back(ZZ);
     if (ZZ < param[1]+param[2]) {

@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/30
+  2008/06/03
 
 ***************************************************************************/
 
@@ -52,7 +52,7 @@ class TLondon1D_1L : public TBofZCalc {
 
 public:
 
-  TLondon1D_1L( const vector<double>& );
+  TLondon1D_1L(unsigned int, const vector<double>& );
 
 };
 
@@ -64,7 +64,7 @@ class TLondon1D_2L : public TBofZCalc {
 
 public:
 
-  TLondon1D_2L( const vector<double>& );
+  TLondon1D_2L(unsigned int, const vector<double>& );
 
 };
 
@@ -76,7 +76,7 @@ class TLondon1D_3L : public TBofZCalc {
 
 public:
 
-  TLondon1D_3L( const vector<double>& );
+  TLondon1D_3L(unsigned int, const vector<double>& );
 
 };
 
@@ -88,7 +88,7 @@ class TLondon1D_3LS : public TBofZCalc {
 
 public:
 
-  TLondon1D_3LS( const vector<double>& );
+  TLondon1D_3LS(unsigned int, const vector<double>& );
 
 };
 

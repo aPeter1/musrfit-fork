@@ -64,9 +64,10 @@ class TFitPofBStartupHandler : public TQObject {
     virtual const double GetDeltat() const { return fDeltat; }
     virtual const double GetDeltaB() const { return fDeltaB; }
     virtual const string GetWisdomFile() const { return fWisdomFile; }
+    virtual const unsigned int GetNSteps() const { return fNSteps; }
 
   private:
-    enum EKeyWords {eEmpty, eComment, eDataPath, eEnergy, eEnergyList, eDeltat, eDeltaB, eWisdomFile};
+    enum EKeyWords {eEmpty, eComment, eDataPath, eEnergy, eEnergyList, eDeltat, eDeltaB, eWisdomFile, eNSteps};
 
     EKeyWords       fKey;
 
@@ -75,6 +76,7 @@ class TFitPofBStartupHandler : public TQObject {
     double          fDeltat;
     double          fDeltaB;
     string          fWisdomFile;
+    unsigned int    fNSteps;
 
   ClassDef(TFitPofBStartupHandler, 1)
 };

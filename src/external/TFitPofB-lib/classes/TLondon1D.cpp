@@ -60,6 +60,7 @@ TLondon1D1L::TLondon1D1L(const vector<unsigned int> &parNo, const vector<double>
     cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
   }
 
+  fNSteps = startupHandler->GetNSteps();
   fWisdom = startupHandler->GetWisdomFile();
   string rge_path(startupHandler->GetDataPath());
   vector<string> energy_vec(startupHandler->GetEnergyList());
@@ -140,7 +141,7 @@ double TLondon1D1L::Eval(double t, const vector<double> &par) const {
 
       fParForPofB[2] = par[1]; // energy
 
-      TLondon1D_1L BofZ1(fParForBofZ);
+      TLondon1D_1L BofZ1(fNSteps, fParForBofZ);
       TPofBCalc PofB1(BofZ1, *fImpProfile, fParForPofB);
       fPofT->DoFFT(PofB1);
 
@@ -181,6 +182,7 @@ TLondon1D2L::TLondon1D2L(const vector<unsigned int> &parNo, const vector<double>
     cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
   }
 
+  fNSteps = startupHandler->GetNSteps();
   fWisdom = startupHandler->GetWisdomFile();
   string rge_path(startupHandler->GetDataPath());
   vector<string> energy_vec(startupHandler->GetEnergyList());
@@ -274,7 +276,7 @@ double TLondon1D2L::Eval(double t, const vector<double> &par) const {
         fImpProfile->WeightLayers(par[1], interfaces, weights);
       }
 
-      TLondon1D_2L BofZ2(fParForBofZ);
+      TLondon1D_2L BofZ2(fNSteps, fParForBofZ);
       TPofBCalc PofB2(BofZ2, *fImpProfile, fParForPofB);
       fPofT->DoFFT(PofB2);
 
@@ -316,6 +318,7 @@ TLondon1D3L::TLondon1D3L(const vector<unsigned int> &parNo, const vector<double>
     cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
   }
 
+  fNSteps = startupHandler->GetNSteps();
   fWisdom = startupHandler->GetWisdomFile();
   string rge_path(startupHandler->GetDataPath());
   vector<string> energy_vec(startupHandler->GetEnergyList());
@@ -425,7 +428,7 @@ double TLondon1D3L::Eval(double t, const vector<double> &par) const {
         fImpProfile->WeightLayers(par[1], interfaces, weights);
       }
 
-      TLondon1D_3L BofZ3(fParForBofZ);
+      TLondon1D_3L BofZ3(fNSteps, fParForBofZ);
       TPofBCalc PofB3(BofZ3, *fImpProfile, fParForPofB);
       fPofT->DoFFT(PofB3);
 
@@ -467,6 +470,7 @@ TLondon1D3LS::TLondon1D3LS(const vector<unsigned int> &parNo, const vector<doubl
     cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
   }
 
+  fNSteps = startupHandler->GetNSteps();
   fWisdom = startupHandler->GetWisdomFile();
   string rge_path(startupHandler->GetDataPath());
   vector<string> energy_vec(startupHandler->GetEnergyList());
@@ -562,7 +566,7 @@ double TLondon1D3LS::Eval(double t, const vector<double> &par) const {
         fImpProfile->WeightLayers(par[1], interfaces, weights);
       }
 
-      TLondon1D_3LS BofZ3S(fParForBofZ);
+      TLondon1D_3LS BofZ3S(fNSteps, fParForBofZ);
       TPofBCalc PofB3S(BofZ3S, *fImpProfile, fParForPofB);
       fPofT->DoFFT(PofB3S);
 

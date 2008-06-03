@@ -33,6 +33,7 @@ protected:
   mutable vector<double> fParForBofZ;
   mutable vector<double> fParForPofB;
   string fWisdom;
+  unsigned int fNSteps;
 
   ClassDef(TLondon1D,1)
 };

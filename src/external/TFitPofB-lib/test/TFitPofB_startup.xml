@@ -2,12 +2,15 @@
 <TFitPofB>
     <comment>
         TFitPofB_startup.xml 
-        Defines path and energies (keV, format: %02u_%1u) of TrimSP-rge-files, path to the FFTW-wisdom-file and time/field binning (us/G)
-    </comment>
+        Defines path/prefix and energies (keV, format: %02u_%1u) of TrimSP-rge-files,
+        path/name to the FFTW-wisdom-file and time/field binning (us/G)
+        N_theory determines the number of points in "real space" where the theory function will be calculated
+      </comment>
     <data_path>/home/l_wojek/TrimSP/AuYBCO_2005/AuYBCO-500000-</data_path>
     <wisdom>WordsOfWisdom.dat</wisdom>
     <delta_t>0.01</delta_t>
     <delta_B>0.01</delta_B>
+    <N_theory>5000</N_theory>
     <energy_list>
         <energy>04_6</energy>
         <energy>09_6</energy>

@@ -46,7 +46,7 @@ ClassImpQ(TFitPofBStartupHandler)
 /**
  * <p>
  */
-TFitPofBStartupHandler::TFitPofBStartupHandler() : fDeltat(0.), fDeltaB(0.)
+TFitPofBStartupHandler::TFitPofBStartupHandler() : fDeltat(0.), fDeltaB(0.), fNSteps(0)
 {
 }
 
@@ -106,6 +106,8 @@ void TFitPofBStartupHandler::OnStartElement(const char *str, const TList *attrib
     fKey = eDeltaB;
   } else if (!strcmp(str, "wisdom")) {
     fKey = eWisdomFile;
+  } if (!strcmp(str, "N_theory")) {
+    fKey = eNSteps;
   }
 }
 
@@ -152,6 +154,10 @@ void TFitPofBStartupHandler::OnCharacters(const char *str)
     case eWisdomFile:
       // set the wisdom file to the given name
       fWisdomFile = str;
+      break;
+    case eNSteps:
+      // convert str to int and assign it to the deltat-member
+      fNSteps = atoi(str);
       break;
     default:
       break;
@@ -276,6 +282,13 @@ void TFitPofBStartupHandler::CheckLists()
   if (!fWisdomFile.size()) {
     cout << endl << ">> You did not specify a wisdom file. Setting the default." << endl;
     fWisdomFile = "WordsOfWisdom.dat";
+  }
+
+  // check if any number of steps for the theory function is specified
+  cout << endl << ">> check number of steps for theory ..." << endl;
+  if (!fNSteps) {
+    cout << endl << ">> You did not specify the number of steps for the theory. Setting the default." << endl;
+    fNSteps = 3000;
   }
 
 }
