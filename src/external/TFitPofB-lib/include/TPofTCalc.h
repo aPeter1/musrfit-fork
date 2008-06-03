@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/25
+  2008/06/03
 
 ***************************************************************************/
 
@@ -14,6 +14,7 @@
 
 #include "TPofBCalc.h"
 #include "fftw3.h"
+#include <string>
 
 #define PI 3.14159265358979323846
 
@@ -21,7 +22,7 @@ class TPofTCalc {
 
 public:
 
-  TPofTCalc(const vector<double>&);
+  TPofTCalc(const string&, const vector<double>&);
   ~TPofTCalc();
 
   vector<double> DataT() const {return fT;}
@@ -38,6 +39,7 @@ private:
   vector<double> fPT;
   double fTBin;
   unsigned int fNFFT;
+  const string fWisdom;
 
 };
 

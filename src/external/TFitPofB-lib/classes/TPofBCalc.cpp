@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/27
+  2008/06/03
 
 ***************************************************************************/
 
@@ -58,6 +58,7 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
 
   if (n > 0) {
     ofstream of(debugfile);
+    assure(of, debugfile);
 
     for (unsigned int i(0); i<bofzZ.size(); i++) {
       of << bofzZ[i] << " " << bofzBZ[i] << endl;
@@ -70,6 +71,7 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
 
   if (n1 > 0) {
     ofstream of1(debugfile1);
+    assure(of1, debugfile1);
 
     for (unsigned int i(0); i<dataTrimSP.DataZ(para[2]).size(); i++) {
       of1 << dataTrimSP.DataZ(para[2])[i] << " " << dataTrimSP.DataNZ(para[2])[i] << " " << dataTrimSP.OrigDataNZ(para[2])[i] << endl;

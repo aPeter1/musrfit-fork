@@ -2,16 +2,19 @@
 <TFitPofB>
     <comment>
         TFitPofB_startup.xml 
-        Defines path and energies of TrimSP-rge-files to be read in
+        Defines path and energies (keV, format: %02u_%1u) of TrimSP-rge-files, path to the FFTW-wisdom-file and time/field binning (us/G)
     </comment>
     <data_path>/home/l_wojek/TrimSP/AuYBCO_2005/AuYBCO-500000-</data_path>
+    <wisdom>WordsOfWisdom.dat</wisdom>
+    <delta_t>0.01</delta_t>
+    <delta_B>0.01</delta_B>
     <energy_list>
-    	<energy>04_6</energy>
-	<energy>09_6</energy>
-	<energy>14_6</energy>
-	<energy>18_6</energy>
-	<energy>21_6</energy>
-	<energy>24_6</energy>
-	<energy>28_7</energy>
+        <energy>04_6</energy>
+        <energy>09_6</energy>
+        <energy>14_6</energy>
+        <energy>18_6</energy>
+        <energy>21_6</energy>
+        <energy>24_6</energy>
+        <energy>28_7</energy>
     </energy_list>
 </TFitPofB>

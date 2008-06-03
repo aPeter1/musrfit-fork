@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/30
+  2008/06/03
 
   based upon:
   $Id: PStartupHandler.h 3396 2008-05-29 14:41:33Z nemu $
@@ -61,14 +61,20 @@ class TFitPofBStartupHandler : public TQObject {
 
     virtual const string GetDataPath() const { return fDataPath; }
     virtual vector<string> GetEnergyList() const { return fEnergyList; }
+    virtual const double GetDeltat() const { return fDeltat; }
+    virtual const double GetDeltaB() const { return fDeltaB; }
+    virtual const string GetWisdomFile() const { return fWisdomFile; }
 
   private:
-    enum EKeyWords {eEmpty, eComment, eDataPath, eEnergy, eEnergyList};
+    enum EKeyWords {eEmpty, eComment, eDataPath, eEnergy, eEnergyList, eDeltat, eDeltaB, eWisdomFile};
 
     EKeyWords       fKey;
 
     string          fDataPath;
     vector<string>  fEnergyList;
+    double          fDeltat;
+    double          fDeltaB;
+    string          fWisdomFile;
 
   ClassDef(TFitPofBStartupHandler, 1)
 };

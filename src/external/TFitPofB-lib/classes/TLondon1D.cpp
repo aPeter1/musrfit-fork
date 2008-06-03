@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/30
+  2008/06/03
 
 ***************************************************************************/
 
@@ -27,6 +27,9 @@ ClassImp(TLondon1D3LS)
 
 TLondon1D::~TLondon1D() {
     fPar.clear();
+    fParForBofZ.clear();
+    fParForPofB.clear();
+    fParForPofT.clear();
     delete fImpProfile;
     fImpProfile = 0;
     delete fPofT;
@@ -56,22 +59,28 @@ TLondon1D1L::TLondon1D1L(const vector<unsigned int> &parNo, const vector<double>
   if (status) { // error
     cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
   }
-  startupHandler->CheckLists();
 
+  fWisdom = startupHandler->GetWisdomFile();
   string rge_path(startupHandler->GetDataPath());
   vector<string> energy_vec(startupHandler->GetEnergyList());
+
+  fParForPofT.push_back(fPar[0]);
+  fParForPofT.push_back(startupHandler->GetDeltat());
+  fParForPofT.push_back(startupHandler->GetDeltaB());
+
+  for (unsigned int i(2); i<fPar.size(); i++)
+    fParForBofZ.push_back(fPar[i]);
+
+  fParForPofB.push_back(startupHandler->GetDeltat());
+  fParForPofB.push_back(startupHandler->GetDeltaB());
+  fParForPofB.push_back(fPar[1]);
 
   TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
   fImpProfile = x;
   x = 0;
   delete x;
 
-  vector<double> par_for_PofT;
-
-  for (unsigned int i(0); i<3; i++)
-      par_for_PofT.push_back(fPar[i]);
-
-  TPofTCalc *y = new TPofTCalc(par_for_PofT);
+  TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
   fPofT = y;
   y = 0;
   delete y;
@@ -105,10 +114,7 @@ double TLondon1D1L::Eval(double t, const vector<double> &par) const {
     if( fPar[i]-par[i] ) {
       fPar[i] = par[i];
       par_changed = true;
-      if(i == 1 || i == 2) {
-        cout << "You are varying dt or dB! These parameters have to be fixed! Quitting..." << endl; 
-        exit(-1);
-      } else if (i == 0) {
+      if (i == 0) {
         only_phase_changed = true;
       } else {
         only_phase_changed = false;
@@ -119,54 +125,30 @@ double TLondon1D1L::Eval(double t, const vector<double> &par) const {
   if (par_changed)
     fCalcNeeded = true;
 
-/* DEBUGGING CODE COMMENTED -- quite a mess... sorry*/
-
   // if model parameters have changed, recalculate B(z), P(B) and P(t)
 
   if (fCalcNeeded) {
 
-    vector<double> par_for_PofT;
-
-//    cout << "par_for_PofT: ";
-
-    for (unsigned int i(0); i<3; i++) {
-      par_for_PofT.push_back(par[i]);
-//      cout << par[i] << " ";
-    }
-//    cout << endl;
+    fParForPofT[0] = par[0]; // phase
 
     if(!only_phase_changed) {
 
       cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
 
-      vector<double> par_for_BofZ;
-      vector<double> par_for_PofB;
+      for (unsigned int i(2); i<par.size(); i++)
+        fParForBofZ[i-2] = par[i];
 
-//      cout << "par_for_BofZ: ";
+      fParForPofB[2] = par[1]; // energy
 
-      for (unsigned int i(4); i<par.size(); i++) {
-        par_for_BofZ.push_back(par[i]);
-//        cout << par[i] << " ";
-      }
-//      cout << endl;
-
-//      cout << "par_for_PofB: ";
-
-      for (unsigned int i(1); i<4; i++) {
-        par_for_PofB.push_back(par[i]);
-//        cout << par[i] << " ";
-      }
-//      cout << endl;
-
-      TLondon1D_1L BofZ1(par_for_BofZ);
-      TPofBCalc PofB1(BofZ1, *fImpProfile, par_for_PofB);
+      TLondon1D_1L BofZ1(fParForBofZ);
+      TPofBCalc PofB1(BofZ1, *fImpProfile, fParForPofB);
       fPofT->DoFFT(PofB1);
 
     } else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
     }
 
-    fPofT->CalcPol(par_for_PofT);
+    fPofT->CalcPol(fParForPofT);
 
     fCalcNeeded = false;
   }
@@ -198,26 +180,31 @@ TLondon1D2L::TLondon1D2L(const vector<unsigned int> &parNo, const vector<double>
   if (status) { // error
     cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
   }
-  startupHandler->CheckLists();
 
+  fWisdom = startupHandler->GetWisdomFile();
   string rge_path(startupHandler->GetDataPath());
   vector<string> energy_vec(startupHandler->GetEnergyList());
+
+  fParForPofT.push_back(fPar[0]);
+  fParForPofT.push_back(startupHandler->GetDeltat());
+  fParForPofT.push_back(startupHandler->GetDeltaB());
+
+  for (unsigned int i(2); i<fPar.size(); i++)
+    fParForBofZ.push_back(fPar[i]);
+
+  fParForPofB.push_back(startupHandler->GetDeltat());
+  fParForPofB.push_back(startupHandler->GetDeltaB());
+  fParForPofB.push_back(fPar[1]);
 
   TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
   fImpProfile = x;
   x = 0;
   delete x;
 
-  vector<double> par_for_PofT;
-
-  for (unsigned int i(0); i<3; i++)
-      par_for_PofT.push_back(fPar[i]);
-
-  TPofTCalc *y = new TPofTCalc(par_for_PofT);
+  TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
   fPofT = y;
   y = 0;
   delete y;
-
 
   // clean up
   if (saxParser) {
@@ -247,10 +234,7 @@ double TLondon1D2L::Eval(double t, const vector<double> &par) const {
     if( fPar[i]-par[i] ) {
       fPar[i] = par[i];
       par_changed = true;
-      if(i == 1 || i == 2) {
-        cout << "You are varying dt or dB! These parameters have to be fixed! Quitting..." << endl; 
-        exit(-1);
-      } else if (i == 0) {
+      if (i == 0) {
         only_phase_changed = true;
       } else {
         only_phase_changed = false;
@@ -263,66 +247,42 @@ double TLondon1D2L::Eval(double t, const vector<double> &par) const {
   if (par_changed)
     fCalcNeeded = true;
 
-/* DEBUGGING CODE COMMENTED -- quite a mess... sorry*/
-
   // if model parameters have changed, recalculate B(z), P(B) and P(t)
 
   if (fCalcNeeded) {
 
-    vector<double> par_for_PofT;
-
-//    cout << "par_for_PofT: ";
-
-    for (unsigned int i(0); i<3; i++) {
-      par_for_PofT.push_back(par[i]);
-//      cout << par[i] << " ";
-    }
-//    cout << endl;
+    fParForPofT[0] = par[0]; // phase
 
     if(!only_phase_changed) {
 
       cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
 
-      vector<double> par_for_BofZ;
-      vector<double> par_for_PofB;
+      for (unsigned int i(2); i<par.size(); i++)
+        fParForBofZ[i-2] = par[i];
 
-//      cout << "par_for_BofZ: ";
-
-      for (unsigned int i(4); i<par.size()-2; i++) {
-        par_for_BofZ.push_back(par[i]);
-//        cout << par[i] << " ";
-      }
-//      cout << endl;
-
-//      cout << "par_for_PofB: ";
-
-      for (unsigned int i(1); i<4; i++) {
-        par_for_PofB.push_back(par[i]);
-//        cout << par[i] << " ";
-      }
-//      cout << endl;
+      fParForPofB[2] = par[1]; // energy
 
       if(fLastTwoChanged) {
         vector<double> interfaces;
-        interfaces.push_back(par[5]+par[6]);
+        interfaces.push_back(par[3]+par[4]);
 
         vector<double> weights;
         for(unsigned int i(par.size()-2); i<par.size(); i++)
           weights.push_back(par[i]);
 
         cout << "Weighting has changed, re-calculating n(z) now..." << endl;
-        fImpProfile->WeightLayers(par[3], interfaces, weights);
+        fImpProfile->WeightLayers(par[1], interfaces, weights);
       }
 
-      TLondon1D_2L BofZ2(par_for_BofZ);
-      TPofBCalc PofB2(BofZ2, *fImpProfile, par_for_PofB);
+      TLondon1D_2L BofZ2(fParForBofZ);
+      TPofBCalc PofB2(BofZ2, *fImpProfile, fParForPofB);
       fPofT->DoFFT(PofB2);
 
     } else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
     }
 
-    fPofT->CalcPol(par_for_PofT);
+    fPofT->CalcPol(fParForPofT);
 
     fCalcNeeded = false;
     fLastTwoChanged = false;
@@ -355,22 +315,28 @@ TLondon1D3L::TLondon1D3L(const vector<unsigned int> &parNo, const vector<double>
   if (status) { // error
     cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
   }
-  startupHandler->CheckLists();
 
+  fWisdom = startupHandler->GetWisdomFile();
   string rge_path(startupHandler->GetDataPath());
   vector<string> energy_vec(startupHandler->GetEnergyList());
+
+  fParForPofT.push_back(fPar[0]);
+  fParForPofT.push_back(startupHandler->GetDeltat());
+  fParForPofT.push_back(startupHandler->GetDeltaB());
+
+  for (unsigned int i(2); i<fPar.size(); i++)
+    fParForBofZ.push_back(fPar[i]);
+
+  fParForPofB.push_back(startupHandler->GetDeltat());
+  fParForPofB.push_back(startupHandler->GetDeltaB());
+  fParForPofB.push_back(fPar[1]);
 
   TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
   fImpProfile = x;
   x = 0;
   delete x;
 
-  vector<double> par_for_PofT;
-
-  for (unsigned int i(0); i<3; i++)
-      par_for_PofT.push_back(fPar[i]);
-
-  TPofTCalc *y = new TPofTCalc(par_for_PofT);
+  TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
   fPofT = y;
   y = 0;
   delete y;
@@ -404,10 +370,7 @@ double TLondon1D3L::Eval(double t, const vector<double> &par) const {
     if( fPar[i]-par[i] ) {
       fPar[i] = par[i];
       par_changed = true;
-      if(i == 1 || i == 2) {
-        cout << "You are varying dt or dB! These parameters have to be fixed! Quitting..." << endl; 
-        exit(-1);
-      } else if (i == 0) {
+      if (i == 0) {
         only_phase_changed = true;
       } else {
         only_phase_changed = false;
@@ -420,67 +383,57 @@ double TLondon1D3L::Eval(double t, const vector<double> &par) const {
   if (par_changed)
     fCalcNeeded = true;
 
-/* DEBUGGING CODE COMMENTED -- quite a mess... sorry*/
-
   // if model parameters have changed, recalculate B(z), P(B) and P(t)
 
   if (fCalcNeeded) {
 
-    vector<double> par_for_PofT;
-
-//    cout << "par_for_PofT: ";
-
-    for (unsigned int i(0); i<3; i++) {
-      par_for_PofT.push_back(par[i]);
-//      cout << par[i] << " ";
-    }
-//    cout << endl;
+    fParForPofT[0] = par[0]; // phase
 
     if(!only_phase_changed) {
 
       cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
 
-      vector<double> par_for_BofZ;
-      vector<double> par_for_PofB;
+      for (unsigned int i(2); i<par.size(); i++)
+        fParForBofZ[i-2] = par[i];
 
-//      cout << "par_for_BofZ: ";
+      fParForPofB[2] = par[1]; // energy
 
-      for (unsigned int i(4); i<par.size()-2; i++) {
-        par_for_BofZ.push_back(par[i]);
-//        cout << par[i] << " ";
+/* DEBUG ---------------------------
+      for(unsigned int i(0); i<fParForBofZ.size(); i++) {
+        cout << "ParForBofZ[" << i << "] = " << fParForBofZ[i] << endl;
       }
-//      cout << endl;
 
-//      cout << "par_for_PofB: ";
-
-      for (unsigned int i(1); i<4; i++) {
-        par_for_PofB.push_back(par[i]);
-//        cout << par[i] << " ";
+      for(unsigned int i(0); i<fParForPofB.size(); i++) {
+        cout << "ParForPofB[" << i << "] = " << fParForPofB[i] << endl;
       }
-//      cout << endl;
+
+      for(unsigned int i(0); i<fParForPofT.size(); i++) {
+        cout << "ParForPofT[" << i << "] = " << fParForPofT[i] << endl;
+      }
+------------------------------------*/
 
       if(fLastThreeChanged) {
         vector<double> interfaces;
-        interfaces.push_back(par[5]+par[6]);
-        interfaces.push_back(par[5]+par[6]+par[7]);
+        interfaces.push_back(par[3]+par[4]);
+        interfaces.push_back(par[3]+par[4]+par[5]);
 
         vector<double> weights;
         for(unsigned int i(par.size()-3); i<par.size(); i++)
           weights.push_back(par[i]);
 
         cout << "Weighting has changed, re-calculating n(z) now..." << endl;
-        fImpProfile->WeightLayers(par[3], interfaces, weights);
+        fImpProfile->WeightLayers(par[1], interfaces, weights);
       }
 
-      TLondon1D_3L BofZ3(par_for_BofZ);
-      TPofBCalc PofB3(BofZ3, *fImpProfile, par_for_PofB);
+      TLondon1D_3L BofZ3(fParForBofZ);
+      TPofBCalc PofB3(BofZ3, *fImpProfile, fParForPofB);
       fPofT->DoFFT(PofB3);
 
     } else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
     }
 
-    fPofT->CalcPol(par_for_PofT);
+    fPofT->CalcPol(fParForPofT);
 
     fCalcNeeded = false;
     fLastThreeChanged = false;
@@ -495,7 +448,7 @@ double TLondon1D3L::Eval(double t, const vector<double> &par) const {
 // creates (a pointer to) the TPofTCalc object (with the FFT plan)
 //------------------
 
-TLondon1D3LS::TLondon1D3LS(const vector<unsigned int> &parNo, const vector<double> &par) {
+TLondon1D3LS::TLondon1D3LS(const vector<unsigned int> &parNo, const vector<double> &par) : fLastThreeChanged(true) {
 
   // extract function parameters
   for(unsigned int i(0); i<parNo.size(); i++) {
@@ -513,22 +466,28 @@ TLondon1D3LS::TLondon1D3LS(const vector<unsigned int> &parNo, const vector<doubl
   if (status) { // error
     cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
   }
-  startupHandler->CheckLists();
 
+  fWisdom = startupHandler->GetWisdomFile();
   string rge_path(startupHandler->GetDataPath());
   vector<string> energy_vec(startupHandler->GetEnergyList());
+
+  fParForPofT.push_back(fPar[0]);
+  fParForPofT.push_back(startupHandler->GetDeltat());
+  fParForPofT.push_back(startupHandler->GetDeltaB());
+
+  for (unsigned int i(2); i<fPar.size(); i++)
+    fParForBofZ.push_back(fPar[i]);
+
+  fParForPofB.push_back(startupHandler->GetDeltat());
+  fParForPofB.push_back(startupHandler->GetDeltaB());
+  fParForPofB.push_back(fPar[1]);
 
   TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
   fImpProfile = x;
   x = 0;
   delete x;
 
-  vector<double> par_for_PofT;
-
-  for (unsigned int i(0); i<3; i++)
-      par_for_PofT.push_back(fPar[i]);
-
-  TPofTCalc *y = new TPofTCalc(par_for_PofT);
+  TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
   fPofT = y;
   y = 0;
   delete y;
@@ -562,10 +521,7 @@ double TLondon1D3LS::Eval(double t, const vector<double> &par) const {
     if( fPar[i]-par[i] ) {
       fPar[i] = par[i];
       par_changed = true;
-      if(i == 1 || i == 2) {
-        cout << "You are varying dt or dB! These parameters have to be fixed! Quitting..." << endl; 
-        exit(-1);
-      } else if (i == 0) {
+      if (i == 0) {
         only_phase_changed = true;
       } else {
         only_phase_changed = false;
@@ -578,67 +534,43 @@ double TLondon1D3LS::Eval(double t, const vector<double> &par) const {
   if (par_changed)
     fCalcNeeded = true;
 
-/* DEBUGGING CODE COMMENTED -- quite a mess... sorry*/
-
   // if model parameters have changed, recalculate B(z), P(B) and P(t)
 
   if (fCalcNeeded) {
 
-    vector<double> par_for_PofT;
-
-//    cout << "par_for_PofT: ";
-
-    for (unsigned int i(0); i<3; i++) {
-      par_for_PofT.push_back(par[i]);
-//      cout << par[i] << " ";
-    }
-//    cout << endl;
+    fParForPofT[0] = par[0]; // phase
 
     if(!only_phase_changed) {
 
       cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
 
-      vector<double> par_for_BofZ;
-      vector<double> par_for_PofB;
+      for (unsigned int i(2); i<par.size(); i++)
+        fParForBofZ[i-2] = par[i];
 
-//      cout << "par_for_BofZ: ";
-
-      for (unsigned int i(4); i<par.size()-2; i++) {
-        par_for_BofZ.push_back(par[i]);
-//        cout << par[i] << " ";
-      }
-//      cout << endl;
-
-//      cout << "par_for_PofB: ";
-
-      for (unsigned int i(1); i<4; i++) {
-        par_for_PofB.push_back(par[i]);
-//        cout << par[i] << " ";
-      }
-//      cout << endl;
+      fParForPofB[2] = par[1]; // energy
 
       if(fLastThreeChanged) {
         vector<double> interfaces;
-        interfaces.push_back(par[5]+par[6]);
-        interfaces.push_back(par[5]+par[6]+par[7]);
+        interfaces.push_back(par[3]+par[4]);
+        interfaces.push_back(par[3]+par[4]+par[5]);
 
         vector<double> weights;
         for(unsigned int i(par.size()-3); i<par.size(); i++)
           weights.push_back(par[i]);
 
         cout << "Weighting has changed, re-calculating n(z) now..." << endl;
-        fImpProfile->WeightLayers(par[3], interfaces, weights);
+        fImpProfile->WeightLayers(par[1], interfaces, weights);
       }
 
-      TLondon1D_3LS BofZ3S(par_for_BofZ);
-      TPofBCalc PofB3S(BofZ3S, *fImpProfile, par_for_PofB);
+      TLondon1D_3LS BofZ3S(fParForBofZ);
+      TPofBCalc PofB3S(BofZ3S, *fImpProfile, fParForPofB);
       fPofT->DoFFT(PofB3S);
 
     } else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
     }
 
-    fPofT->CalcPol(par_for_PofT);
+    fPofT->CalcPol(fParForPofT);
 
     fCalcNeeded = false;
     fLastThreeChanged = false;

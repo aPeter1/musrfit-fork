@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/30
+  2008/06/03
 
 ***************************************************************************/
 
@@ -29,6 +29,10 @@ protected:
   TTrimSPData *fImpProfile;
   TPofTCalc *fPofT;
   mutable bool fCalcNeeded;
+  mutable vector<double> fParForPofT;
+  mutable vector<double> fParForBofZ;
+  mutable vector<double> fParForPofB;
+  string fWisdom;
 
   ClassDef(TLondon1D,1)
 };

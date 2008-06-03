@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/26
+  2008/06/03
 
 ***************************************************************************/
 
@@ -25,7 +25,7 @@
 // Parameters: phase, dt, dB
 //------------------
 
-TPofTCalc::TPofTCalc (const vector<double> &par) {
+TPofTCalc::TPofTCalc (const string &wisdom, const vector<double> &par) : fWisdom(wisdom) {
 
   fNFFT = ( int(1.0/gBar/par[1]/par[2]+1.0) % 2 ) ? int(1.0/gBar/par[1]/par[2]+2.0) : int(1.0/gBar/par[1]/par[2]+1.0);
   fTBin = 1.0/gBar/double(fNFFT-1)/par[2];
@@ -40,7 +40,7 @@ TPofTCalc::TPofTCalc (const vector<double> &par) {
   int wisdomLoaded(0);
 
   FILE *wordsOfWisdomR;
-  wordsOfWisdomR = fopen("WordsOfWisdom.dat", "r");
+  wordsOfWisdomR = fopen(fWisdom.c_str(), "r");
   if (wordsOfWisdomR == NULL) {
     cout << "Couldn't open wisdom file ..." << endl;
   } else { 
@@ -142,7 +142,7 @@ TPofTCalc::~TPofTCalc() {
   // export wisdom so it has not to be checked for the FFT-plan next time
 
   FILE *wordsOfWisdomW;
-  wordsOfWisdomW = fopen("WordsOfWisdom.dat", "w");
+  wordsOfWisdomW = fopen(fWisdom.c_str(), "w");
   if (wordsOfWisdomW == NULL) {
     cout << "couldn't open file ... No wisdom is exported..." << endl;
   }

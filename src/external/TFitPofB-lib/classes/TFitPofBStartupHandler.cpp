@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/30
+  2008/06/03
 
   based upon:
   $Id: PStartupHandler.cpp 3340 2008-04-30 12:27:01Z nemu $
@@ -46,7 +46,7 @@ ClassImpQ(TFitPofBStartupHandler)
 /**
  * <p>
  */
-TFitPofBStartupHandler::TFitPofBStartupHandler()
+TFitPofBStartupHandler::TFitPofBStartupHandler() : fDeltat(0.), fDeltaB(0.)
 {
 }
 
@@ -100,6 +100,12 @@ void TFitPofBStartupHandler::OnStartElement(const char *str, const TList *attrib
     fKey = eDataPath;
   } else if (!strcmp(str, "energy")) {
     fKey = eEnergy;
+  } else if (!strcmp(str, "delta_t")) {
+    fKey = eDeltat;
+  } else if (!strcmp(str, "delta_B")) {
+    fKey = eDeltaB;
+  } else if (!strcmp(str, "wisdom")) {
+    fKey = eWisdomFile;
   }
 }
 
@@ -134,6 +140,18 @@ void TFitPofBStartupHandler::OnCharacters(const char *str)
     case eEnergy:
       // add str to the energy list
       fEnergyList.push_back(str);
+      break;
+    case eDeltat:
+      // convert str to double and assign it to the deltat-member
+      fDeltat = atof(str);
+      break;
+    case eDeltaB:
+      // convert str to double and assign it to the deltaB-member
+      fDeltaB = atof(str);
+      break;
+    case eWisdomFile:
+      // set the wisdom file to the given name
+      fWisdomFile = str;
       break;
     default:
       break;
@@ -229,7 +247,7 @@ void TFitPofBStartupHandler::CheckLists()
   // check if any energies are given
   cout << endl << ">> check energy list ..." << endl;
   if (!fEnergyList.size()) {
-  cout << endl << ">> Energy list empty! Setting the default list.";
+    cout << endl << ">> Energy list empty! Setting the default list." << endl;
     char eChar[5];
     for(unsigned int i(0); i<33; i++) {
       for(unsigned int j(0); j<10; j++) {
@@ -238,6 +256,28 @@ void TFitPofBStartupHandler::CheckLists()
       }
     }
   }
+
+  // check if delta_t is given, if not set default
+  cout << endl << ">> check specified time resolution ..." << endl;
+  if(!fDeltat) {
+    cout << endl << ">> You did not specify the time resolution. Setting the default." << endl;
+    fDeltat = 0.01;
+  }
+
+  // check if delta_B is given, if not set default
+  cout << endl << ">> check specified field resolution ..." << endl;
+  if(!fDeltaB) {
+    cout << endl << ">> You did not specify the field resolution. Setting the default." << endl;
+    fDeltaB = 0.05;
+  }
+
+  // check if any wisdom-file is specified
+  cout << endl << ">> check wisdom-file ..." << endl;
+  if (!fWisdomFile.size()) {
+    cout << endl << ">> You did not specify a wisdom file. Setting the default." << endl;
+    fWisdomFile = "WordsOfWisdom.dat";
+  }
+
 }
 
 // end ---------------------------------------------------------------------
