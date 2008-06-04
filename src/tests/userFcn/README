@@ -1,0 +1,52 @@
+/***************************************************************************
+
+  README
+
+  Author: Andreas Suter
+  e-mail: andreas.suter@psi.ch
+
+  $Id$
+
+***************************************************************************/
+
+**Overview**
+
+The collection of files here demonstrate how to implement a plugin
+mechanism for a user function, i.e. also loading classes at runtime.
+For a discussion see also 
+
+http://root.cern.ch/phpBB2/viewtopic.php?p=28117#28117
+
+The idea is that a main program has an interface such that specific
+user functions can be added without recompiling the main. Therefore
+class identification at runtime are needed. This is possible in root
+via the dictionary mechanism and the class TClass.
+
+**Description of the files and their purposes**
+
+The class TUserFcnBase is "almost pure virtual" and only needed to define
+an interface of a user function. This is needed to efficiently call
+the function at runtime.
+
+The class TUserFcn ist the implementation of the user function.
+
+userFcnTest is the main demonstrating how to invoke all the necessary
+objects, how to cast them, and how to execute the wanted user function.
+
+* Makefiles:
+
+  userFcnTest.cpp,       main to demonstrate how to use a user function
+
+  TUserFcnBase.h         interface definition for the user function including
+  TUserFcnBaseLinkDef.h  a dictionary
+  TUserFcnBase.cpp
+
+  TUserFcn.h             implementaion class of the user function including
+  TUserFcnLinkDef.h      a dictionary
+  TUserFcn.cpp
+
+  Makefile,              will generate userFcnTest
+  Makefile.TUserFcnBase, will generate the shared library libUserFcnBase
+                         needed for runtime loading of the user function
+  Makefile.TUserFcn,     will generate the shared library libUserFcn
+                         needed for runtime loading of the user function
