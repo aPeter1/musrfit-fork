@@ -59,9 +59,9 @@ PStartupHandler::PStartupHandler()
 PStartupHandler::~PStartupHandler()
 {
   // clean up
-  fDataPathList.empty();
-  fMarkerList.empty();
-  fColorList.empty();
+  fDataPathList.clear();
+  fMarkerList.clear();
+  fColorList.clear();
 }
 
 //--------------------------------------------------------------------------
