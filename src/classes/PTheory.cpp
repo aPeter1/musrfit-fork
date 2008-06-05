@@ -262,12 +262,13 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
       fValid = false;
     } else { // invoke user function object
       fUserFcn = 0;
-      fUserFcn = TClass::GetClass(fUserFcnClassName.Data())->New();
+      fUserFcn = (PUserFcnBase*)TClass::GetClass(fUserFcnClassName.Data())->New();
 cout << endl << ">> fUserFcn = " << fUserFcn;
       if (fUserFcn == 0) {
         cout << endl << "**ERROR**: PTheory: user function object could not be invoked. See line no " << line->fLineNo;
         fValid = false;
-      } else { // get the pointer to the user function evaluation routine
+      } else { // user function valid, hence expand the fUserParam vector to the proper size
+        fUserParam.resize(fParamNo.size());
       }
     }
   }
@@ -290,6 +291,7 @@ PTheory::~PTheory()
 //cout << endl << "PTheory::~PTheory() ..." << endl;
 
   fParamNo.clear();
+  fUserParam.clear();
 
   if (fMul) {
     delete fMul;
@@ -307,9 +309,8 @@ PTheory::~PTheory()
   }
 
   if (fUserFcn) {
-/*
+    delete fUserFcn;
     fUserFcn = 0;
-*/
   }
 }
 
@@ -347,7 +348,7 @@ bool PTheory::IsValid()
  * \param t
  * \param paramValues
  */
-double PTheory::Func(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::Func(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
 
   if (fMul) {
@@ -714,7 +715,7 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
  * \param paramValues is an array of parameter values [par1, par2, ..., parX1, 
  *                    internalPar1, ..., internalParX2, map1, ..., mapX3, fun1, ..., funX4]
  */
-double PTheory::Asymmetry(const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::Asymmetry(const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   double asym;
 
@@ -740,7 +741,7 @@ double PTheory::Asymmetry(const vector<double>& paramValues, const vector<double
  * \param paramValues parameter values, here only one, namely the depolarization 
  * rate \f$\lambda\f$ in \f$(1/\mu\mathrm{s})\f$
  */
-double PTheory::SimpleExp(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::SimpleExp(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   double lambda;
 
@@ -761,7 +762,7 @@ double PTheory::SimpleExp(register double t, const vector<double>& paramValues, 
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::GeneralExp(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::GeneralExp(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   double val[2];
 
@@ -784,7 +785,7 @@ double PTheory::GeneralExp(register double t, const vector<double>& paramValues,
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::SimpleGauss(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::SimpleGauss(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   double sigma;
 
@@ -805,7 +806,7 @@ double PTheory::SimpleGauss(register double t, const vector<double>& paramValues
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::StaticGaussKT(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::StaticGaussKT(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   double sigma;
 
@@ -828,7 +829,7 @@ double PTheory::StaticGaussKT(register double t, const vector<double>& paramValu
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::StaticKTLF(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::StaticKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   double val[2]; // frequency, damping
 
@@ -868,7 +869,7 @@ double PTheory::StaticKTLF(register double t, const vector<double>& paramValues,
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::DynamicKTLF(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::DynamicKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   return 0.0;
 }
@@ -880,7 +881,7 @@ double PTheory::DynamicKTLF(register double t, const vector<double>& paramValues
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::CombiLGKT(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::CombiLGKT(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   double val[2];
 
@@ -907,7 +908,7 @@ double PTheory::CombiLGKT(register double t, const vector<double>& paramValues, 
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::SpinGlass(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::SpinGlass(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   if (paramValues[fParamNo[0]] == 0.0)
     return 1.0;
@@ -940,7 +941,7 @@ double PTheory::SpinGlass(register double t, const vector<double>& paramValues, 
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::RandomAnisotropicHyperfine(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::RandomAnisotropicHyperfine(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   double val[2];
 
@@ -967,7 +968,7 @@ double PTheory::RandomAnisotropicHyperfine(register double t, const vector<doubl
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::Abragam(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::Abragam(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   double val[2];
 
@@ -993,7 +994,7 @@ double PTheory::Abragam(register double t, const vector<double>& paramValues, co
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::InternalField(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::InternalField(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   double val[4]; // phase, freq, transversal rate, longitudinal rate
 
@@ -1019,7 +1020,7 @@ double PTheory::InternalField(register double t, const vector<double>& paramValu
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::TFCos(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::TFCos(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   double val[2];
 
@@ -1042,7 +1043,7 @@ double PTheory::TFCos(register double t, const vector<double>& paramValues, cons
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::Bessel(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::Bessel(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   double val[2];
 
@@ -1065,7 +1066,7 @@ double PTheory::Bessel(register double t, const vector<double>& paramValues, con
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::InternalBessel(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::InternalBessel(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   double val[4]; // phase, frequency, Trate, Lrate
 
@@ -1091,7 +1092,7 @@ double PTheory::InternalBessel(register double t, const vector<double>& paramVal
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::SkewedGauss(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::SkewedGauss(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   double val[4]; // phase, freq, sigma-, sigma+
   double skg;
@@ -1138,18 +1139,33 @@ double PTheory::SkewedGauss(register double t, const vector<double>& paramValues
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::UserFcn(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const
+double PTheory::UserFcn(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  static bool first = true;
-
+static bool first = true;
 if (first) {
-  first = false;
-  cout << endl << ">> UserFcn: fParamNo.size()=" << fParamNo.size();
+  cout << endl << ">> UserFcn: fParamNo.size()=" << fParamNo.size() << ", fUserParam.size()=" << fUserParam.size();
   for (unsigned int i=0; i<fParamNo.size(); i++) {
     cout << endl << ">> " << i << ": " << fParamNo[i]+1;
   }
   cout << endl;
 }
 
-  return 0.0;
+  // check if FUNCTIONS are used
+  for (unsigned int i=0; i<fUserParam.size(); i++) {
+    if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
+      fUserParam[i] = paramValues[fParamNo[i]];
+    } else { // function
+      fUserParam[i] = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
+    }
+  }
+
+if (first) {
+  first = false;
+  for (unsigned int i=0; i<fUserParam.size(); i++) {
+    cout << endl << "-> " << i << ": " << fUserParam[i];
+  }
+  cout << endl;
+}
+
+  return (*fUserFcn)(t, fUserParam);
 }

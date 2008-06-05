@@ -94,6 +94,7 @@ OBJS += PTheory.o
 OBJS += PFitterFcn.o
 OBJS += PFitter.o
 OBJS += PMusrCanvas.o PMusrCanvasDict.o
+OBJS += PUserFcnBase.o PUserFcnBaseDict.o
 
 EXTOBJS  =
 EXTOBJS += MuSR_td_PSI_bin.o
@@ -129,6 +130,10 @@ PStartupHandlerDict.cpp: ../include/PStartupHandler.h ../include/PStartupHandler
 	rootcint -f $@ -c -p $^
 
 PMusrCanvasDict.cpp: ../include/PMusrCanvas.h ../include/PMusrCanvasLinkDef.h
+	@echo "Generating dictionary $@..."
+	rootcint -v -f $@ -c -p $^
+
+PUserFcnBaseDict.cpp: ../include/PUserFcnBase.h ../include/PUserFcnBaseLinkDef.h
 	@echo "Generating dictionary $@..."
 	rootcint -v -f $@ -c -p $^
 

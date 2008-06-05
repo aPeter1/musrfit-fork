@@ -32,12 +32,12 @@
 #ifndef _PTHEORY_H_
 #define _PTHEORY_H_
 
-#include <vector>
-
 #include <TString.h>
 #include <TF1.h>
 
+#include "PMusr.h"
 #include "PMsrHandler.h"
+#include "PUserFcnBase.h"
 
 // #include <gsl_sf_hyperg.h>
 // 
@@ -178,29 +178,29 @@ class PTheory
     virtual ~PTheory();
 
     virtual bool IsValid();
-    virtual double Func(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
+    virtual double Func(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
 
   private:
     virtual int SearchDataBase(TString name);
     virtual void MakeCleanAndTidyTheoryBlock(PMsrLines* fullTheoryBlock);
 
-    virtual double Asymmetry(const vector<double>& paramValues, const vector<double>& funcValues) const;
-    virtual double SimpleExp(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
-    virtual double GeneralExp(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
-    virtual double SimpleGauss(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
-    virtual double StaticGaussKT(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
-    virtual double StaticKTLF(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
-    virtual double DynamicKTLF(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
-    virtual double CombiLGKT(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
-    virtual double SpinGlass(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
-    virtual double RandomAnisotropicHyperfine(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
-    virtual double Abragam(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
-    virtual double InternalField(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
-    virtual double TFCos(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
-    virtual double Bessel(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
-    virtual double InternalBessel(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
-    virtual double SkewedGauss(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
-    virtual double UserFcn(register double t, const vector<double>& paramValues, const vector<double>& funcValues) const;
+    virtual double Asymmetry(const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double SimpleExp(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double GeneralExp(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double SimpleGauss(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double StaticGaussKT(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double StaticKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double DynamicKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double CombiLGKT(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double SpinGlass(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double RandomAnisotropicHyperfine(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double Abragam(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double InternalField(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double TFCos(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double Bessel(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double InternalBessel(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double SkewedGauss(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double UserFcn(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
 
     // variables
     bool fValid;
@@ -214,8 +214,9 @@ class PTheory
 //    TString fUserFunPreParsed;
     TF1 *fStaticKTLFFunc;
 
-    TString  fUserFcnClassName; ///< name of the user function class for within root
-    void    *fUserFcn;          ///< pointer to the user function object
+    TString fUserFcnClassName; ///< name of the user function class for within root
+    PUserFcnBase *fUserFcn;    ///< pointer to the user function object
+    mutable PDoubleVector fUserParam;  ///< vector holding the resolved user function parameters, i.e. map and function resolved.
 
     PMsrHandler *fMsrInfo;
 };

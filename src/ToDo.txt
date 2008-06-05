@@ -56,19 +56,19 @@ short term:
 
 * something is wrong with lifetimecorrection plot of musrview (up shifted data) **FIXED** 08-05-16
 
+* implement access to user-function, i.e. functions not
+  defined within musrfit, using the ROOT dictionary feature
+  to look for them and use them. **UNDER WAY, NOT TESTED YET** 08-06-05
 
 ---------------------
 intermediate term:
 ---------------------
 
-* implement access to user-function, i.e. functions not
 * start writing docu, i.e. transferring WKM doc from German -> English and
   describe new features with examples!
 * introduce error numbers with corresponding docu/explanation in the latex-docu.  
 * implement RRF stuff
 * implement NonMuSR stuff
-  defined within musrfit, using the ROOT dictionary feature
-  to look for them and use them.
 * think about if it is worth to modify wkm in order to read
   the new msr-files, so that wkmview can be used for an intermediate
   time.
