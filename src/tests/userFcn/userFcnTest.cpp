@@ -36,7 +36,7 @@
 #include <cassert>
 using namespace std;
 
-#include <TApplication.h>
+#include <TSystem.h>
 #include <TClass.h>
 #include <TString.h>
 #include <TTime.h>
@@ -54,9 +54,14 @@ int main(int argc, char *argv[])
 {
   // check if class is found (argv[1] == class name)
   if (!TClass::GetDict("TUserFcn")) {
-    cout << endl << "**ERROR**: user function class 'TUserFcn' not found.";
-    cout << endl << endl;
-    return 0;
+    cout << endl << "could find TUserFcn, will try to load the shared lib ...";
+    // try to load the shared library
+    TString libName = TString("libTUserFcn.so");
+    if (gSystem->Load(libName.Data())<0) {
+      cout << endl << "**ERROR**: user function class 'TUserFcn' not found.";
+      cout << endl << endl;
+      return 0;
+    }
   }
 
   // generate class object

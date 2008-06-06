@@ -32,6 +32,7 @@
 #ifndef _PTHEORY_H_
 #define _PTHEORY_H_
 
+#include <TSystem.h>
 #include <TString.h>
 #include <TF1.h>
 

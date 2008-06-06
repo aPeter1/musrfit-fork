@@ -93,6 +93,7 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
   fMul = 0;
   fStaticKTLFFunc = 0;
   fUserFcnClassName = TString("");
+  fUserFcn = 0;
 
   static unsigned int lineNo = 1; // lineNo
   static unsigned int depth  = 0; // needed to handle '+' properly
@@ -258,8 +259,12 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
   if (!fUserFcnClassName.IsWhitespace()) {
     cout << endl << ">> user function class name: " << fUserFcnClassName.Data() << endl;
     if (!TClass::GetDict(fUserFcnClassName.Data())) {
-      cout << endl << "**ERROR**: PTheory: user function class '" << fUserFcnClassName.Data() << "' not found. See line no " << line->fLineNo;
-      fValid = false;
+      char libname[256];
+      sprintf(libname, "lib%s.so", fUserFcnClassName.Data()); // add path needed??
+      if (gSystem->Load(libname) < 0) {
+        cout << endl << "**ERROR**: PTheory: user function class '" << fUserFcnClassName.Data() << "' not found. See line no " << line->fLineNo;
+        fValid = false;
+      }
     } else { // invoke user function object
       fUserFcn = 0;
       fUserFcn = (PUserFcnBase*)TClass::GetClass(fUserFcnClassName.Data())->New();

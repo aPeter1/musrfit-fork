@@ -27,10 +27,12 @@ ROOTGLIBS     = $(shell $(ROOTSYS)/bin/root-config --glibs)
 # linker, and the flags to use
 #
 
-ifeq ($(OSTYPE),linux)
+OSTYPE = $(shell uname)
+
+ifeq ($(OSTYPE),Linux)
 OS = LINUX
 endif
-ifeq ($(OSTYPE),linux-gnu)
+ifeq ($(OSTYPE),Linux-gnu)
 OS = LINUX
 endif
 ifeq ($(OSTYPE),darwin)

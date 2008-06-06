@@ -19,12 +19,12 @@ ROOTGLIBS     = $(shell $(ROOTSYS)/bin/root-config --glibs)
 # linker, and the flags to use
 #
 
-OSTYPE = linux
+OSTYPE = $(shell uname)
 
-ifeq ($(OSTYPE),linux)
+ifeq ($(OSTYPE),Linux)
 OS = LINUX
 endif
-ifeq ($(OSTYPE),linux-gnu)
+ifeq ($(OSTYPE),Linux-gnu)
 OS = LINUX
 endif
 ifeq ($(OSTYPE),darwin)
@@ -58,7 +58,8 @@ LIBS          = $(ROOTLIBS) -lXMLParser
 GLIBS         = $(ROOTGLIBS) -lXMLParser
 
 # UserFcn lib
-USERFCNLIB    = -lTUserFcnBase -lTUserFcn
+USERFCNLIB    = -lTUserFcnBase 
+#-lTUserFcn
 
 INSTALLPATH   = ./
 
