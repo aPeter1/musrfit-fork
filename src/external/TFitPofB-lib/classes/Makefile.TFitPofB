@@ -8,9 +8,11 @@ ROOTCFLAGS    = $(shell $(ROOTSYS)/bin/root-config --cflags)
 
 CXX           = g++
 CXXFLAGS      = -g -Wall -Wno-trigraphs -fPIC
+MUSRFITINCLUDE = ../../../include
+#MUSRFITINCLUDE = /home/l_wojek/rep/analysis/musrfit/src/include
 LOCALINCLUDE  = ../include
 ROOTINCLUDE   = $(ROOTSYS)/include
-INCLUDES      = -I$(LOCALINCLUDE) -I$(ROOTINCLUDE)
+INCLUDES      = -I$(LOCALINCLUDE) -I$(MUSRFITINCLUDE) -I$(ROOTINCLUDE)
 LD            = g++
 LDFLAGS       = -g
 SOFLAGS       = -O -shared
@@ -55,7 +57,7 @@ $(OBJS): %.o: %.cpp
 
 TLondon1DDict.cpp: ../include/TLondon1D.h ../include/TLondon1DLinkDef.h
 	@echo "Generating dictionary $@..."
-	rootcint -f $@ -c -p $^
+	rootcint -f $@ -c -p -I$(MUSRFITINCLUDE) $^
 
 TFitPofBStartupHandlerDict.cpp: ../include/TFitPofBStartupHandler.h ../include/TFitPofBStartupHandlerLinkDef.h
 	@echo "Generating dictionary $@..."

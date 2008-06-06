@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/06/03
+  2008/06/06
 
 ***************************************************************************/
 
@@ -41,12 +41,14 @@ TLondon1D::~TLondon1D() {
 // creates (a pointer to) the TPofTCalc object (with the FFT plan)
 //------------------
 
-TLondon1D1L::TLondon1D1L(const vector<unsigned int> &parNo, const vector<double> &par) {
+TLondon1D1L::TLondon1D1L(const vector<double> &par) {
 
   // extract function parameters
-  for(unsigned int i(0); i<parNo.size(); i++) {
-    fPar.push_back(par[parNo[i]-1]);
-  }
+  //  for(unsigned int i(0); i<parNo.size(); i++) {
+  //    fPar.push_back(par[parNo[i]-1]);
+  //  }
+
+  fPar = par;
 
   // read startup file
   string startup_path_name("TFitPofB_startup.xml");
@@ -104,7 +106,7 @@ TLondon1D1L::TLondon1D1L(const vector<unsigned int> &parNo, const vector<double>
 // Parameters: all the parameters for the function to be fitted through TLondon1D1L
 //------------------
 
-double TLondon1D1L::Eval(double t, const vector<double> &par) const {
+double TLondon1D1L::operator()(double t, const vector<double> &par) const {
 
   // check if any parameter has changed
 
@@ -163,12 +165,14 @@ double TLondon1D1L::Eval(double t, const vector<double> &par) const {
 // creates (a pointer to) the TPofTCalc object (with the FFT plan)
 //------------------
 
-TLondon1D2L::TLondon1D2L(const vector<unsigned int> &parNo, const vector<double> &par) : fLastTwoChanged(true) {
+TLondon1D2L::TLondon1D2L(const vector<double> &par) : fLastTwoChanged(true) {
 
 // extract function parameters
-  for(unsigned int i(0); i<parNo.size(); i++) {
-    fPar.push_back(par[parNo[i]-1]);
-  }
+//  for(unsigned int i(0); i<parNo.size(); i++) {
+//    fPar.push_back(par[parNo[i]-1]);
+//  }
+
+  fPar = par;
 
   // read startup file
   string startup_path_name("TFitPofB_startup.xml");
@@ -225,7 +229,7 @@ TLondon1D2L::TLondon1D2L(const vector<unsigned int> &parNo, const vector<double>
 // Parameters: all the parameters for the function to be fitted through TLondon1D2L
 //------------------
 
-double TLondon1D2L::Eval(double t, const vector<double> &par) const {
+double TLondon1D2L::operator()(double t, const vector<double> &par) const {
 
   // check if any parameter has changed
 
@@ -299,12 +303,14 @@ double TLondon1D2L::Eval(double t, const vector<double> &par) const {
 // creates (a pointer to) the TPofTCalc object (with the FFT plan)
 //------------------
 
-TLondon1D3L::TLondon1D3L(const vector<unsigned int> &parNo, const vector<double> &par) : fLastThreeChanged(true) {
+TLondon1D3L::TLondon1D3L(const vector<double> &par) : fLastThreeChanged(true) {
 
   // extract function parameters
-  for(unsigned int i(0); i<parNo.size(); i++) {
-    fPar.push_back(par[parNo[i]-1]);
-  }
+  // for(unsigned int i(0); i<parNo.size(); i++) {
+  //   fPar.push_back(par[parNo[i]-1]);
+  // }
+
+  fPar = par;
 
   // read startup file
   string startup_path_name("TFitPofB_startup.xml");
@@ -362,7 +368,7 @@ TLondon1D3L::TLondon1D3L(const vector<unsigned int> &parNo, const vector<double>
 // Parameters: all the parameters for the function to be fitted through TLondon1D3L
 //------------------
 
-double TLondon1D3L::Eval(double t, const vector<double> &par) const {
+double TLondon1D3L::operator()(double t, const vector<double> &par) const {
 
   // check if any parameter has changed
 
@@ -451,12 +457,14 @@ double TLondon1D3L::Eval(double t, const vector<double> &par) const {
 // creates (a pointer to) the TPofTCalc object (with the FFT plan)
 //------------------
 
-TLondon1D3LS::TLondon1D3LS(const vector<unsigned int> &parNo, const vector<double> &par) : fLastThreeChanged(true) {
+TLondon1D3LS::TLondon1D3LS(const vector<double> &par) : fLastThreeChanged(true) {
 
   // extract function parameters
-  for(unsigned int i(0); i<parNo.size(); i++) {
-    fPar.push_back(par[parNo[i]-1]);
-  }
+  // for(unsigned int i(0); i<parNo.size(); i++) {
+  //   fPar.push_back(par[parNo[i]-1]);
+  // }
+
+  fPar = par;
 
   // read startup file
   string startup_path_name("TFitPofB_startup.xml");
@@ -514,7 +522,7 @@ TLondon1D3LS::TLondon1D3LS(const vector<unsigned int> &parNo, const vector<doubl
 // Parameters: all the parameters for the function to be fitted through TLondon1D3LS
 //------------------
 
-double TLondon1D3LS::Eval(double t, const vector<double> &par) const {
+double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
 
   // check if any parameter has changed
 
