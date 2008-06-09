@@ -314,10 +314,15 @@ bool PFitter::ExecuteMigrad()
     fMnUserParams = fFcnMin->UserParameters();
 
   // create migrad object
-  ROOT::Minuit2::MnMigrad migrad((*fFitterFcn), fMnUserParams);
+  // set MnStrategy to high == 2, see MINUIT2 manual MnStrategy
+  ROOT::Minuit2::MnMigrad migrad((*fFitterFcn), fMnUserParams, 2);
 
   // minimize
-  ROOT::Minuit2::FunctionMinimum min = migrad();
+  // maxfcn is 10*MINUIT2 Default maxfcn
+  unsigned int maxfcn = 10*(200 + 100*fParams.size() + 5*fParams.size()*fParams.size());
+  // tolerance = MINUIT2 Default tolerance
+  double tolerance = 0.1;
+  ROOT::Minuit2::FunctionMinimum min = migrad(maxfcn, tolerance);
   if (!min.IsValid()) {
     cout << endl << "**WARNING**: PFitter::ExecuteMigrad(): Fit did not converge, sorry ...";
     return false;
@@ -367,10 +372,16 @@ bool PFitter::ExecuteMinimize()
     fMnUserParams = fFcnMin->UserParameters();
 
   // create minimizer object
-  ROOT::Minuit2::MnMinimize minimize((*fFitterFcn), fMnUserParams);
+  // set MnStrategy to high == 2, see MINUIT2 manual MnStrategy
+  ROOT::Minuit2::MnMinimize minimize((*fFitterFcn), fMnUserParams, 2);
 
   // minimize
-  ROOT::Minuit2::FunctionMinimum min = minimize(); 
+  // maxfcn is 10*MINUIT2 Default maxfcn
+  unsigned int maxfcn = 10*(200 + 100*fParams.size() + 5*fParams.size()*fParams.size());
+cout << endl << "maxfcn=" << maxfcn << endl;
+  // tolerance = MINUIT2 Default tolerance
+  double tolerance = 0.1;
+  ROOT::Minuit2::FunctionMinimum min = minimize(maxfcn, tolerance); 
   if (!min.IsValid()) {
     cout << endl << "**WARNING**: PFitter::ExecuteMinimize(): Fit did not converge, sorry ...";
     return false;
@@ -692,10 +703,15 @@ bool PFitter::ExecuteSimplex()
     fMnUserParams = fFcnMin->UserParameters();
 
   // create minimizer object
-  ROOT::Minuit2::MnSimplex simplex((*fFitterFcn), fMnUserParams);
+  // set MnStrategy to high == 2, see MINUIT2 manual MnStrategy
+  ROOT::Minuit2::MnSimplex simplex((*fFitterFcn), fMnUserParams, 2);
 
   // minimize
-  ROOT::Minuit2::FunctionMinimum min = simplex();
+  // maxfcn is 10*MINUIT2 Default maxfcn
+  unsigned int maxfcn = 10*(200 + 100*fParams.size() + 5*fParams.size()*fParams.size());
+  // tolerance = MINUIT2 Default tolerance
+  double tolerance = 0.1;
+  ROOT::Minuit2::FunctionMinimum min = simplex(maxfcn, tolerance);
   if (!min.IsValid()) {
     cout << endl << "**WARNING**: PFitter::ExecuteSimplex(): Fit did not converge, sorry ...";
     return false;

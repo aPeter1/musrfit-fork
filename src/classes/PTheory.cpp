@@ -183,8 +183,14 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
     str = ostr->GetString();
 
     // if userFcn, the first entry is the function name and needs to be handled specially
-    if ((fType == THEORY_USER_FCN) && (i == 1)) {
-      fUserFcnClassName = str;
+    if ((fType == THEORY_USER_FCN) && ((i == 1) || (i == 2))) {
+cout << endl << ">> userFcn: i=" << i << ", str=" << str.Data() << endl;
+      if (i == 1) {
+        fUserFcnSharedLibName = str;
+      }
+      if (i == 2) {
+        fUserFcnClassName = str;
+      }
       continue;
     }
 
@@ -259,22 +265,28 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
   if (!fUserFcnClassName.IsWhitespace()) {
     cout << endl << ">> user function class name: " << fUserFcnClassName.Data() << endl;
     if (!TClass::GetDict(fUserFcnClassName.Data())) {
-      char libname[256];
-      sprintf(libname, "lib%s.so", fUserFcnClassName.Data()); // add path needed??
-      if (gSystem->Load(libname) < 0) {
-        cout << endl << "**ERROR**: PTheory: user function class '" << fUserFcnClassName.Data() << "' not found. See line no " << line->fLineNo;
+      if (gSystem->Load(fUserFcnSharedLibName.Data()) < 0) {
+        cout << endl << "**ERROR**: PTheory: user function class '" << fUserFcnClassName.Data() << "' not found.";
+        cout << endl << "           Tried to load " << fUserFcnSharedLibName.Data() << " but failed.";
+        cout << endl << "           See line no " << line->fLineNo;
         fValid = false;
+        // clean up
+        if (tokens) {
+          delete tokens;
+          tokens = 0;
+        }
+        return;
       }
-    } else { // invoke user function object
-      fUserFcn = 0;
-      fUserFcn = (PUserFcnBase*)TClass::GetClass(fUserFcnClassName.Data())->New();
-cout << endl << ">> fUserFcn = " << fUserFcn;
-      if (fUserFcn == 0) {
-        cout << endl << "**ERROR**: PTheory: user function object could not be invoked. See line no " << line->fLineNo;
-        fValid = false;
-      } else { // user function valid, hence expand the fUserParam vector to the proper size
-        fUserParam.resize(fParamNo.size());
-      }
+    }
+    // invoke user function object
+    fUserFcn = 0;
+    fUserFcn = (PUserFcnBase*)TClass::GetClass(fUserFcnClassName.Data())->New();
+cout << endl << ">> fUserFcn = " << fUserFcn << endl;
+    if (fUserFcn == 0) {
+      cout << endl << "**ERROR**: PTheory: user function object could not be invoked. See line no " << line->fLineNo;
+      fValid = false;
+    } else { // user function valid, hence expand the fUserParam vector to the proper size
+       fUserParam.resize(fParamNo.size());
     }
   }
 
@@ -663,8 +675,8 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
     // make a handable string out of the asymmetry token
     ostr = dynamic_cast<TObjString*>(tokens->At(0));
     str = ostr->GetString();
-    // check if the line is just a '+'; if so nothing to be done
-    if (str.Contains("+"))
+    // check if the line is just a '+'or a userFcn; if so nothing to be done
+    if (str.Contains("+") || str.Contains("userFcn"))
       continue;
     // search the theory function
     for (unsigned int j=0; j<THEORY_MAX; j++) {
@@ -1169,6 +1181,8 @@ if (first) {
   for (unsigned int i=0; i<fUserParam.size(); i++) {
     cout << endl << "-> " << i << ": " << fUserParam[i];
   }
+  cout << endl;
+  cout << endl << ">> t=" << t << ", function value=" << (*fUserFcn)(t, fUserParam);
   cout << endl;
 }
 

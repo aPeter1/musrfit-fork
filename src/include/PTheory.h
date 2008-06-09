@@ -216,6 +216,7 @@ class PTheory
     TF1 *fStaticKTLFFunc;
 
     TString fUserFcnClassName; ///< name of the user function class for within root
+    TString fUserFcnSharedLibName; ///< name of the shared lib to which the user function belongs
     PUserFcnBase *fUserFcn;    ///< pointer to the user function object
     mutable PDoubleVector fUserParam;  ///< vector holding the resolved user function parameters, i.e. map and function resolved.
 
