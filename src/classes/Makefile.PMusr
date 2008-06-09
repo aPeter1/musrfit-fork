@@ -47,7 +47,8 @@ PMUSRPATH     = ../include
 MNPATH        = $(ROOTSYS)/include
 GSLPATH       = /usr/include/gsl
 PSIBINPATH    = ../external/MuSR_software/Class_MuSR_PSI
-INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(GSLPATH) -I$(PSIBINPATH)
+FFTW3PATH     = /usr/local/include
+INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(GSLPATH) -I$(PSIBINPATH) -I$(FFTW3PATH)
 LD            = g++
 LDFLAGS       = -g
 SOFLAGS       = -O -shared
@@ -77,6 +78,8 @@ PSILIBS       = -lTLemRunHeader
 MNLIB         = -L$(ROOTSYS)/lib -lMinuit2
 # GSL lib
 GSLLIB        = -lgslcblas -lgsl
+# FFTW lib
+FFTW3LIB      = -lfftw3
 
 
 # some definitions: headers (used to generate *Dict* stuff), sources, objects,...
@@ -110,7 +113,7 @@ all:  $(SHLIB)
 $(SHLIB): $(OBJS)
 	@echo "---> Building shared library $(SHLIB) ..."
 	/bin/rm -f $(SHLIB)
-	$(LD) $(OBJS) $(EXTOBJS) $(SOFLAGS) -o $(SHLIB) $(GLIBS) $(PSILIBS) $(MNLIB) $(GSLLIB)
+	$(LD) $(OBJS) $(EXTOBJS) $(SOFLAGS) -o $(SHLIB) $(FFTW3LIB) $(GLIBS) $(PSILIBS) $(MNLIB) $(GSLLIB)
 	@echo "done"
 
 # clean up: remove all object file (and core files)
