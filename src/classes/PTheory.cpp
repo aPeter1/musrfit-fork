@@ -166,10 +166,11 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
   }
 
   // line is a valid function, hence analyze parameters
-  if (((unsigned int)(tokens->GetEntries()-1) != fNoOfParam) && (idx != THEORY_USER_FCN)) {
+  if (((unsigned int)(tokens->GetEntries()-1) != fNoOfParam) &&
+      ((idx != THEORY_USER_FCN) && (idx != THEORY_POLYNOM))) {
     cout << endl << "**ERROR**: PTheory():  Theory line '" << line->fLine.Data() << "'";
-    cout << "  in line no " << line->fLineNo;
-    cout << "  expecting " << fgTheoDataBase[idx].fNoOfParam << ", but found " << tokens->GetEntries()-1; 
+    cout << endl << "  in line no " << line->fLineNo;
+    cout << endl << "  expecting " << fgTheoDataBase[idx].fNoOfParam << ", but found " << tokens->GetEntries()-1; 
     fValid = false;
   }
   // keep function index
@@ -435,6 +436,10 @@ double PTheory::Func(register double t, const PDoubleVector& paramValues, const 
           return SkewedGauss(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
           break;
+        case THEORY_POLYNOM:
+          return Polynom(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
+                 fAdd->Func(t, paramValues, funcValues);
+          break;
         case THEORY_USER_FCN:
           return UserFcn(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
@@ -493,6 +498,9 @@ double PTheory::Func(register double t, const PDoubleVector& paramValues, const 
           break;
         case THEORY_SKEWED_GAUSS:
           return SkewedGauss(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
+          break;
+        case THEORY_POLYNOM:
+          return Polynom(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
         case THEORY_USER_FCN:
           return UserFcn(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
@@ -554,6 +562,9 @@ double PTheory::Func(register double t, const PDoubleVector& paramValues, const 
         case THEORY_SKEWED_GAUSS:
           return SkewedGauss(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
+        case THEORY_POLYNOM:
+          return Polynom(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
+          break;
         case THEORY_USER_FCN:
           return UserFcn(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
@@ -611,6 +622,9 @@ double PTheory::Func(register double t, const PDoubleVector& paramValues, const 
           break;
         case THEORY_SKEWED_GAUSS:
           return SkewedGauss(t, paramValues, funcValues);
+          break;
+        case THEORY_POLYNOM:
+          return Polynom(t, paramValues, funcValues);
           break;
         case THEORY_USER_FCN:
           return UserFcn(t, paramValues, funcValues);
@@ -675,9 +689,19 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
     // make a handable string out of the asymmetry token
     ostr = dynamic_cast<TObjString*>(tokens->At(0));
     str = ostr->GetString();
-    // check if the line is just a '+'or a userFcn; if so nothing to be done
-    if (str.Contains("+") || str.Contains("userFcn"))
+    // check if the line is just a '+' if so nothing to be done
+    if (str.Contains("+"))
       continue;
+    // check if the function is a polynom
+    if (!str.CompareTo("p") || str.Contains("polynom")) {
+      MakeCleanAndTidyPolynom(i, fullTheoryBlock);
+      continue;
+    }
+    // check if the function is a userFcn
+    if (!str.CompareTo("u") || str.Contains("userFcn")) {
+      MakeCleanAndTidyUserFcn(i, fullTheoryBlock);
+      continue;
+    }
     // search the theory function
     for (unsigned int j=0; j<THEORY_MAX; j++) {
       if (!str.CompareTo(fgTheoDataBase[j].fName, TString::kIgnoreCase) ||
@@ -709,6 +733,95 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
     // write tidy string back into theory block
     (*fullTheoryBlock)[i].fLine = tidy;
   }
+
+  // clean up
+  if (tokens) {
+    delete tokens;
+    tokens = 0;
+  }
+}
+
+//--------------------------------------------------------------------------
+// MakeCleanAndTidyPolynom private
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param fullTheoryBlock
+ */
+void PTheory::MakeCleanAndTidyPolynom(unsigned int i, PMsrLines *fullTheoryBlock)
+{
+  PMsrLineStructure *line;
+  TString str, tidy;
+  TObjArray *tokens = 0;
+  TObjString *ostr;
+  char substr[256];
+
+cout << endl << ">> MakeCleanAndTidyPolynom: " << (*fullTheoryBlock)[i].fLine.Data();
+
+  // init tidy
+  tidy = TString("polynom ");
+  // get the line to be prettyfied
+  line = &(*fullTheoryBlock)[i];
+  // copy line content to str in order to remove comments
+  str = line->fLine.Copy();
+  // tokenize line
+  tokens = str.Tokenize(" \t");
+
+  for (unsigned int j=1; j<(unsigned int)tokens->GetEntries(); j++) {
+    ostr = dynamic_cast<TObjString*>(tokens->At(j));
+    str = ostr->GetString();
+    sprintf(substr, "%6s", str.Data());
+    tidy += TString(substr);
+  }
+
+  // add comment
+  tidy += " (tshift p0 p1 ... pn)";
+
+  // write tidy string back into theory block
+  (*fullTheoryBlock)[i].fLine = tidy;
+
+  // clean up
+  if (tokens) {
+    delete tokens;
+    tokens = 0;
+  }
+}
+
+//--------------------------------------------------------------------------
+// MakeCleanAndTidyUserFcn private
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param fullTheoryBlock
+ */
+void PTheory::MakeCleanAndTidyUserFcn(unsigned int i, PMsrLines *fullTheoryBlock)
+{
+  PMsrLineStructure *line;
+  TString str, tidy;
+  TObjArray *tokens = 0;
+  TObjString *ostr;
+
+cout << endl << ">> MakeCleanAndTidyUserFcn: " << (*fullTheoryBlock)[i].fLine.Data();
+
+  // init tidy
+  tidy = TString("userFcn ");
+  // get the line to be prettyfied
+  line = &(*fullTheoryBlock)[i];
+  // copy line content to str in order to remove comments
+  str = line->fLine.Copy();
+  // tokenize line
+  tokens = str.Tokenize(" \t");
+
+  for (unsigned int j=1; j<(unsigned int)tokens->GetEntries(); j++) {
+    ostr = dynamic_cast<TObjString*>(tokens->At(j));
+    str = ostr->GetString();
+    tidy += str;
+  }
+
+  // write tidy string back into theory block
+  (*fullTheoryBlock)[i].fLine = tidy;
 
   // clean up
   if (tokens) {
@@ -1147,6 +1260,38 @@ double PTheory::SkewedGauss(register double t, const PDoubleVector& paramValues,
                                       wp*gp*2.0*zp/SQRT_PI*ROOT::Math::conf_hyperg(0.5,1.5,zp*zp));
 
   return skg;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$
+ * \param paramValues tshift, p0, p1, ..., pn
+ */
+double PTheory::Polynom(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+{
+  double result = 0.0;
+  double tshift;
+  double val;
+  double expo = 0.0;
+
+  // check if FUNCTIONS are used
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
+    if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
+      val = paramValues[fParamNo[i]];
+    } else { // function
+      val = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
+    }
+    if (i==0) { // tshift
+      tshift = val;
+      continue;
+    }
+    result += val*pow(t-tshift, expo);
+    expo++;
+  }
+
+  return result;
 }
 
 //--------------------------------------------------------------------------

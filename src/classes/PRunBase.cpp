@@ -68,7 +68,9 @@ PRunBase::PRunBase()
  * <p>
  *
  * \param msrInfo pointer to the msr info structure
- * \param runNo number of the run of the msr-file
+ * \param rawData
+ * \param runNo
+ * \param tag
  */
 PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo, EPMusrHandleTag tag)
 {
