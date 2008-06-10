@@ -316,9 +316,9 @@ void PMusrCanvas::UpdateParamTheoryPad()
       str += " ";
     // parameter value
     if (round(param[i].fValue)-param[i].fValue==0)
-      sprintf(cnum, "%.1lg", param[i].fValue);
+      sprintf(cnum, "%.1lf", param[i].fValue);
     else
-      sprintf(cnum, "%.6lg", param[i].fValue);
+      sprintf(cnum, "%.6lf", param[i].fValue);
     str += cnum;
     for (int j=0; j<9-(int)strlen(cnum); j++) // fill spaces
       str += " ";
@@ -332,21 +332,21 @@ void PMusrCanvas::UpdateParamTheoryPad()
       if ((fabs(fabs(param[i].fStep) - param[i].fPosError) < 0.1*fabs(param[i].fStep)) &&
           (fabs(fabs(param[i].fStep) - param[i].fPosError) < 0.1*param[i].fPosError)) {
         if (round(err)-err==0)
-          sprintf(cnum, "%.1lg", err);
+          sprintf(cnum, "%.1lf", err);
         else
-          sprintf(cnum, "%.6lg", err);
+          sprintf(cnum, "%.6lf", err);
       } else {
         if (round(err)-err==0)
-          sprintf(cnum, "%.1lg!!", err);
+          sprintf(cnum, "%.1lf!!", err);
         else
-          sprintf(cnum, "%.6lg!!", err);
+          sprintf(cnum, "%.6lf!!", err);
       }
       str += cnum;
     } else { // minos was not used
       if (round(param[i].fStep)-param[i].fStep==0)
-        sprintf(cnum, "%.1lg", param[i].fStep);
+        sprintf(cnum, "%.1lf", param[i].fStep);
       else
-        sprintf(cnum, "%.6lg", param[i].fStep);
+        sprintf(cnum, "%.6lf", param[i].fStep);
       str += cnum;
     }
     ypos = 0.925-i*0.025;

@@ -89,8 +89,8 @@ using namespace std;
 
 //-------------------------------------------------------------
 // map and fun offsets for parameter parsing
-#define MSR_PARAM_MAP_OFFSET 1000
-#define MSR_PARAM_FUN_OFFSET 2000
+#define MSR_PARAM_MAP_OFFSET 10000
+#define MSR_PARAM_FUN_OFFSET 20000
 
 //-------------------------------------------------------------
 /**
