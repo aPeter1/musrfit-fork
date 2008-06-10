@@ -817,7 +817,7 @@ cout << endl << ">> MakeCleanAndTidyUserFcn: " << (*fullTheoryBlock)[i].fLine.Da
   for (unsigned int j=1; j<(unsigned int)tokens->GetEntries(); j++) {
     ostr = dynamic_cast<TObjString*>(tokens->At(j));
     str = ostr->GetString();
-    tidy += str;
+    tidy += TString(" ") + str;
   }
 
   // write tidy string back into theory block
