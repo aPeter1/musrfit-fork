@@ -53,7 +53,7 @@ TPofTCalc::TPofTCalc (const string &wisdom, const vector<double> &par) : fWisdom
   }
 
   fFFTplan = fftw_plan_dft_r2c_1d(fNFFT, fFFTin, fFFTout, FFTW_EXHAUSTIVE);
-
+  cout << &fFFTplan << endl;
 }
 
 //--------------
@@ -93,7 +93,7 @@ void TPofTCalc::DoFFT(const TPofBCalc &PofB) {
     fFFTout[i][1] = 0.0;
   }
 
-  cout << "perform the Fourier transform..." << endl;
+//  cout << "perform the Fourier transform..." << endl;
 
   fftw_execute(fFFTplan);
 
@@ -154,7 +154,7 @@ TPofTCalc::~TPofTCalc() {
   fftw_destroy_plan(fFFTplan);
   free(fFFTin);
   fftw_free(fFFTout);
-  fftw_cleanup();
+//  fftw_cleanup();
   fT.clear();
   fPT.clear();
 

@@ -16,16 +16,54 @@ using namespace std;
 #include <TSAXParser.h>
 #include "TFitPofBStartupHandler.h"
 
-ClassImp(TLondon1D)
 ClassImp(TLondon1D1L)
 ClassImp(TLondon1D2L)
+ClassImp(TLondon1D3L)
 ClassImp(TLondon1D3LS)
 
+
 //------------------
-// Destructor of the TLondon1D class -- cleaning up
+// Destructor of the TLondon1D1L/2L/3L/3LS classes -- cleaning up
 //------------------
 
-TLondon1D::~TLondon1D() {
+TLondon1D1L::~TLondon1D1L() {
+    cout << "This is the TLondon1D1L-destructor. Jippieh!" << endl;
+    fPar.clear();
+    fParForBofZ.clear();
+    fParForPofB.clear();
+    fParForPofT.clear();
+    delete fImpProfile;
+    fImpProfile = 0;
+    delete fPofT;
+    fPofT = 0;
+}
+
+TLondon1D2L::~TLondon1D2L() {
+    cout << "This is the TLondon1D2L-destructor. Jippieh!" << endl;
+    fPar.clear();
+    fParForBofZ.clear();
+    fParForPofB.clear();
+    fParForPofT.clear();
+    delete fImpProfile;
+    fImpProfile = 0;
+    delete fPofT;
+    fPofT = 0;
+}
+
+TLondon1D3L::~TLondon1D3L() {
+    cout << "This is the TLondon1D3L-destructor. Jippieh!" << endl;
+    fPar.clear();
+    fParForBofZ.clear();
+    fParForPofB.clear();
+    fParForPofT.clear();
+    delete fImpProfile;
+    fImpProfile = 0;
+    delete fPofT;
+    fPofT = 0;
+}
+
+TLondon1D3LS::~TLondon1D3LS() {
+    cout << "This is the TLondon1D3LS-destructor. Jippieh!" << endl;
     fPar.clear();
     fParForBofZ.clear();
     fParForPofB.clear();
@@ -41,63 +79,53 @@ TLondon1D::~TLondon1D() {
 // creates (a pointer to) the TPofTCalc object (with the FFT plan)
 //------------------
 
-TLondon1D1L::TLondon1D1L(const vector<double> &par) {
+TLondon1D1L::TLondon1D1L() : fCalcNeeded(true), fFirstCall(true) {
+    cout << "This is the TLondon1D1L-constructor. Juhu!" << endl;
 
-  // extract function parameters
-  //  for(unsigned int i(0); i<parNo.size(); i++) {
-  //    fPar.push_back(par[parNo[i]-1]);
-  //  }
+    // read startup file
+    string startup_path_name("TFitPofB_startup.xml");
 
-  fPar = par;
+    TSAXParser *saxParser = new TSAXParser();
+    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
+    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    int status (saxParser->ParseFile(startup_path_name.c_str()));
+    // check for parse errors
+    if (status) { // error
+      cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+    }
 
-  // read startup file
-  string startup_path_name("TFitPofB_startup.xml");
+    fNSteps = startupHandler->GetNSteps();
+    fWisdom = startupHandler->GetWisdomFile();
+    string rge_path(startupHandler->GetDataPath());
+    vector<string> energy_vec(startupHandler->GetEnergyList());
 
-  TSAXParser *saxParser = new TSAXParser();
-  TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-  saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
-  int status (saxParser->ParseFile(startup_path_name.c_str()));
-  // check for parse errors
-  if (status) { // error
-    cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
-  }
+    fParForPofT.push_back(0.0);
+    fParForPofT.push_back(startupHandler->GetDeltat());
+    fParForPofT.push_back(startupHandler->GetDeltaB());
 
-  fNSteps = startupHandler->GetNSteps();
-  fWisdom = startupHandler->GetWisdomFile();
-  string rge_path(startupHandler->GetDataPath());
-  vector<string> energy_vec(startupHandler->GetEnergyList());
+    fParForPofB.push_back(startupHandler->GetDeltat());
+    fParForPofB.push_back(startupHandler->GetDeltaB());
+    fParForPofB.push_back(0.0);
 
-  fParForPofT.push_back(fPar[0]);
-  fParForPofT.push_back(startupHandler->GetDeltat());
-  fParForPofT.push_back(startupHandler->GetDeltaB());
+    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
+    fImpProfile = x;
+    x = 0;
+    delete x;
 
-  for (unsigned int i(2); i<fPar.size(); i++)
-    fParForBofZ.push_back(fPar[i]);
+    TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
+    fPofT = y;
+    y = 0;
+    delete y;
 
-  fParForPofB.push_back(startupHandler->GetDeltat());
-  fParForPofB.push_back(startupHandler->GetDeltaB());
-  fParForPofB.push_back(fPar[1]);
-
-  TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
-  fImpProfile = x;
-  x = 0;
-  delete x;
-
-  TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
-  fPofT = y;
-  y = 0;
-  delete y;
-
-
-  // clean up
-  if (saxParser) {
-    delete saxParser;
-    saxParser = 0;
-  }
-  if (startupHandler) {
-    delete startupHandler;
-    startupHandler = 0;
-  }
+    // clean up
+    if (saxParser) {
+      delete saxParser;
+      saxParser = 0;
+    }
+    if (startupHandler) {
+      delete startupHandler;
+      startupHandler = 0;
+    }
 }
 
 //------------------
@@ -107,6 +135,25 @@ TLondon1D1L::TLondon1D1L(const vector<double> &par) {
 //------------------
 
 double TLondon1D1L::operator()(double t, const vector<double> &par) const {
+  if(t<0.0)
+    return 0.0;
+
+  // check if the function is called the first time and if yes, read in parameters
+
+  if(fFirstCall){
+    fPar = par;
+
+    for (unsigned int i(0); i<fPar.size(); i++){
+      cout << "fPar[" << i << "] = " << fPar[i] << endl;
+    }
+
+    for (unsigned int i(2); i<fPar.size(); i++){
+      fParForBofZ.push_back(fPar[i]);
+      cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << endl;
+    }
+    fFirstCall=false;
+  cout << this << endl;
+  }
 
   // check if any parameter has changed
 
@@ -136,9 +183,9 @@ double TLondon1D1L::operator()(double t, const vector<double> &par) const {
 
     if(!only_phase_changed) {
 
-      cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
+//      cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
 
-      for (unsigned int i(2); i<par.size(); i++)
+      for (unsigned int i(2); i<fPar.size(); i++)
         fParForBofZ[i-2] = par[i];
 
       fParForPofB[2] = par[1]; // energy
@@ -147,9 +194,9 @@ double TLondon1D1L::operator()(double t, const vector<double> &par) const {
       TPofBCalc PofB1(BofZ1, *fImpProfile, fParForPofB);
       fPofT->DoFFT(PofB1);
 
-    } else {
+    }/* else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
-    }
+    }*/
 
     fPofT->CalcPol(fParForPofT);
 
@@ -165,62 +212,51 @@ double TLondon1D1L::operator()(double t, const vector<double> &par) const {
 // creates (a pointer to) the TPofTCalc object (with the FFT plan)
 //------------------
 
-TLondon1D2L::TLondon1D2L(const vector<double> &par) : fLastTwoChanged(true) {
-
-// extract function parameters
-//  for(unsigned int i(0); i<parNo.size(); i++) {
-//    fPar.push_back(par[parNo[i]-1]);
-//  }
-
-  fPar = par;
-
+TLondon1D2L::TLondon1D2L() : fCalcNeeded(true), fFirstCall(true), fLastTwoChanged(true) {
   // read startup file
-  string startup_path_name("TFitPofB_startup.xml");
+    string startup_path_name("TFitPofB_startup.xml");
 
-  TSAXParser *saxParser = new TSAXParser();
-  TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-  saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
-  int status (saxParser->ParseFile(startup_path_name.c_str()));
-  // check for parse errors
-  if (status) { // error
-    cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
-  }
+    TSAXParser *saxParser = new TSAXParser();
+    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
+    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    int status (saxParser->ParseFile(startup_path_name.c_str()));
+    // check for parse errors
+    if (status) { // error
+      cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+    }
 
-  fNSteps = startupHandler->GetNSteps();
-  fWisdom = startupHandler->GetWisdomFile();
-  string rge_path(startupHandler->GetDataPath());
-  vector<string> energy_vec(startupHandler->GetEnergyList());
+    fNSteps = startupHandler->GetNSteps();
+    fWisdom = startupHandler->GetWisdomFile();
+    string rge_path(startupHandler->GetDataPath());
+    vector<string> energy_vec(startupHandler->GetEnergyList());
 
-  fParForPofT.push_back(fPar[0]);
-  fParForPofT.push_back(startupHandler->GetDeltat());
-  fParForPofT.push_back(startupHandler->GetDeltaB());
+    fParForPofT.push_back(0.0);
+    fParForPofT.push_back(startupHandler->GetDeltat());
+    fParForPofT.push_back(startupHandler->GetDeltaB());
 
-  for (unsigned int i(2); i<fPar.size(); i++)
-    fParForBofZ.push_back(fPar[i]);
+    fParForPofB.push_back(startupHandler->GetDeltat());
+    fParForPofB.push_back(startupHandler->GetDeltaB());
+    fParForPofB.push_back(0.0);
 
-  fParForPofB.push_back(startupHandler->GetDeltat());
-  fParForPofB.push_back(startupHandler->GetDeltaB());
-  fParForPofB.push_back(fPar[1]);
+    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
+    fImpProfile = x;
+    x = 0;
+    delete x;
 
-  TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
-  fImpProfile = x;
-  x = 0;
-  delete x;
+    TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
+    fPofT = y;
+    y = 0;
+    delete y;
 
-  TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
-  fPofT = y;
-  y = 0;
-  delete y;
-
-  // clean up
-  if (saxParser) {
-    delete saxParser;
-    saxParser = 0;
-  }
-  if (startupHandler) {
-    delete startupHandler;
-    startupHandler = 0;
-  }
+    // clean up
+    if (saxParser) {
+      delete saxParser;
+      saxParser = 0;
+    }
+    if (startupHandler) {
+      delete startupHandler;
+      startupHandler = 0;
+    }
 }
 
 //------------------
@@ -230,6 +266,24 @@ TLondon1D2L::TLondon1D2L(const vector<double> &par) : fLastTwoChanged(true) {
 //------------------
 
 double TLondon1D2L::operator()(double t, const vector<double> &par) const {
+  if(t<0.0)
+    return 0.0;
+
+  // check if the function is called the first time and if yes, read in parameters
+
+  if(fFirstCall){
+    fPar = par;
+
+    for (unsigned int i(0); i<fPar.size(); i++){
+      cout << "fPar[" << i << "] = " << fPar[i] << endl;
+    }
+
+    for (unsigned int i(2); i<fPar.size(); i++){
+      fParForBofZ.push_back(fPar[i]);
+      cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << endl;
+    }
+    fFirstCall=false;
+  }
 
   // check if any parameter has changed
 
@@ -261,7 +315,7 @@ double TLondon1D2L::operator()(double t, const vector<double> &par) const {
 
     if(!only_phase_changed) {
 
-      cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
+//      cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
 
       for (unsigned int i(2); i<par.size(); i++)
         fParForBofZ[i-2] = par[i];
@@ -284,9 +338,9 @@ double TLondon1D2L::operator()(double t, const vector<double> &par) const {
       TPofBCalc PofB2(BofZ2, *fImpProfile, fParForPofB);
       fPofT->DoFFT(PofB2);
 
-    } else {
+    }/* else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
-    }
+    }*/
 
     fPofT->CalcPol(fParForPofT);
 
@@ -303,63 +357,51 @@ double TLondon1D2L::operator()(double t, const vector<double> &par) const {
 // creates (a pointer to) the TPofTCalc object (with the FFT plan)
 //------------------
 
-TLondon1D3L::TLondon1D3L(const vector<double> &par) : fLastThreeChanged(true) {
+TLondon1D3L::TLondon1D3L() : fCalcNeeded(true), fFirstCall(true), fLastThreeChanged(true) {
+    // read startup file
+    string startup_path_name("TFitPofB_startup.xml");
 
-  // extract function parameters
-  // for(unsigned int i(0); i<parNo.size(); i++) {
-  //   fPar.push_back(par[parNo[i]-1]);
-  // }
+    TSAXParser *saxParser = new TSAXParser();
+    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
+    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    int status (saxParser->ParseFile(startup_path_name.c_str()));
+    // check for parse errors
+    if (status) { // error
+      cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+    }
 
-  fPar = par;
+    fNSteps = startupHandler->GetNSteps();
+    fWisdom = startupHandler->GetWisdomFile();
+    string rge_path(startupHandler->GetDataPath());
+    vector<string> energy_vec(startupHandler->GetEnergyList());
 
-  // read startup file
-  string startup_path_name("TFitPofB_startup.xml");
+    fParForPofT.push_back(0.0);
+    fParForPofT.push_back(startupHandler->GetDeltat());
+    fParForPofT.push_back(startupHandler->GetDeltaB());
 
-  TSAXParser *saxParser = new TSAXParser();
-  TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-  saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
-  int status (saxParser->ParseFile(startup_path_name.c_str()));
-  // check for parse errors
-  if (status) { // error
-    cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
-  }
+    fParForPofB.push_back(startupHandler->GetDeltat());
+    fParForPofB.push_back(startupHandler->GetDeltaB());
+    fParForPofB.push_back(0.0);
 
-  fNSteps = startupHandler->GetNSteps();
-  fWisdom = startupHandler->GetWisdomFile();
-  string rge_path(startupHandler->GetDataPath());
-  vector<string> energy_vec(startupHandler->GetEnergyList());
+    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
+    fImpProfile = x;
+    x = 0;
+    delete x;
 
-  fParForPofT.push_back(fPar[0]);
-  fParForPofT.push_back(startupHandler->GetDeltat());
-  fParForPofT.push_back(startupHandler->GetDeltaB());
+    TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
+    fPofT = y;
+    y = 0;
+    delete y;
 
-  for (unsigned int i(2); i<fPar.size(); i++)
-    fParForBofZ.push_back(fPar[i]);
-
-  fParForPofB.push_back(startupHandler->GetDeltat());
-  fParForPofB.push_back(startupHandler->GetDeltaB());
-  fParForPofB.push_back(fPar[1]);
-
-  TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
-  fImpProfile = x;
-  x = 0;
-  delete x;
-
-  TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
-  fPofT = y;
-  y = 0;
-  delete y;
-
-  // clean up
-  if (saxParser) {
-    delete saxParser;
-    saxParser = 0;
-  }
-  if (startupHandler) {
-    delete startupHandler;
-    startupHandler = 0;
-  }
-
+    // clean up
+    if (saxParser) {
+      delete saxParser;
+      saxParser = 0;
+    }
+    if (startupHandler) {
+      delete startupHandler;
+      startupHandler = 0;
+    }
 }
 
 //------------------
@@ -369,6 +411,24 @@ TLondon1D3L::TLondon1D3L(const vector<double> &par) : fLastThreeChanged(true) {
 //------------------
 
 double TLondon1D3L::operator()(double t, const vector<double> &par) const {
+  if(t<0.0)
+    return 0.0;
+
+  // check if the function is called the first time and if yes, read in parameters
+
+  if(fFirstCall){
+    fPar = par;
+
+    for (unsigned int i(0); i<fPar.size(); i++){
+      cout << "fPar[" << i << "] = " << fPar[i] << endl;
+    }
+
+    for (unsigned int i(2); i<fPar.size(); i++){
+      fParForBofZ.push_back(fPar[i]);
+      cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << endl;
+    }
+    fFirstCall=false;
+  }
 
   // check if any parameter has changed
 
@@ -400,7 +460,7 @@ double TLondon1D3L::operator()(double t, const vector<double> &par) const {
 
     if(!only_phase_changed) {
 
-      cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
+//      cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
 
       for (unsigned int i(2); i<par.size(); i++)
         fParForBofZ[i-2] = par[i];
@@ -438,9 +498,9 @@ double TLondon1D3L::operator()(double t, const vector<double> &par) const {
       TPofBCalc PofB3(BofZ3, *fImpProfile, fParForPofB);
       fPofT->DoFFT(PofB3);
 
-    } else {
+    }/* else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
-    }
+    }*/
 
     fPofT->CalcPol(fParForPofT);
 
@@ -457,63 +517,51 @@ double TLondon1D3L::operator()(double t, const vector<double> &par) const {
 // creates (a pointer to) the TPofTCalc object (with the FFT plan)
 //------------------
 
-TLondon1D3LS::TLondon1D3LS(const vector<double> &par) : fLastThreeChanged(true) {
+TLondon1D3LS::TLondon1D3LS() : fCalcNeeded(true), fFirstCall(true), fLastThreeChanged(true) {
+    // read startup file
+    string startup_path_name("TFitPofB_startup.xml");
 
-  // extract function parameters
-  // for(unsigned int i(0); i<parNo.size(); i++) {
-  //   fPar.push_back(par[parNo[i]-1]);
-  // }
+    TSAXParser *saxParser = new TSAXParser();
+    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
+    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    int status (saxParser->ParseFile(startup_path_name.c_str()));
+    // check for parse errors
+    if (status) { // error
+      cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+    }
 
-  fPar = par;
+    fNSteps = startupHandler->GetNSteps();
+    fWisdom = startupHandler->GetWisdomFile();
+    string rge_path(startupHandler->GetDataPath());
+    vector<string> energy_vec(startupHandler->GetEnergyList());
 
-  // read startup file
-  string startup_path_name("TFitPofB_startup.xml");
+    fParForPofT.push_back(0.0);
+    fParForPofT.push_back(startupHandler->GetDeltat());
+    fParForPofT.push_back(startupHandler->GetDeltaB());
 
-  TSAXParser *saxParser = new TSAXParser();
-  TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-  saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
-  int status (saxParser->ParseFile(startup_path_name.c_str()));
-  // check for parse errors
-  if (status) { // error
-    cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
-  }
+    fParForPofB.push_back(startupHandler->GetDeltat());
+    fParForPofB.push_back(startupHandler->GetDeltaB());
+    fParForPofB.push_back(0.0);
 
-  fNSteps = startupHandler->GetNSteps();
-  fWisdom = startupHandler->GetWisdomFile();
-  string rge_path(startupHandler->GetDataPath());
-  vector<string> energy_vec(startupHandler->GetEnergyList());
+    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
+    fImpProfile = x;
+    x = 0;
+    delete x;
 
-  fParForPofT.push_back(fPar[0]);
-  fParForPofT.push_back(startupHandler->GetDeltat());
-  fParForPofT.push_back(startupHandler->GetDeltaB());
+    TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
+    fPofT = y;
+    y = 0;
+    delete y;
 
-  for (unsigned int i(2); i<fPar.size(); i++)
-    fParForBofZ.push_back(fPar[i]);
-
-  fParForPofB.push_back(startupHandler->GetDeltat());
-  fParForPofB.push_back(startupHandler->GetDeltaB());
-  fParForPofB.push_back(fPar[1]);
-
-  TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
-  fImpProfile = x;
-  x = 0;
-  delete x;
-
-  TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
-  fPofT = y;
-  y = 0;
-  delete y;
-
-  // clean up
-  if (saxParser) {
-    delete saxParser;
-    saxParser = 0;
-  }
-  if (startupHandler) {
-    delete startupHandler;
-    startupHandler = 0;
-  }
-
+    // clean up
+    if (saxParser) {
+      delete saxParser;
+      saxParser = 0;
+    }
+    if (startupHandler) {
+      delete startupHandler;
+      startupHandler = 0;
+    }
 }
 
 //------------------
@@ -523,6 +571,24 @@ TLondon1D3LS::TLondon1D3LS(const vector<double> &par) : fLastThreeChanged(true) 
 //------------------
 
 double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
+  if(t<0.0)
+    return 0.0;
+
+  // check if the function is called the first time and if yes, read in parameters
+
+  if(fFirstCall){
+    fPar = par;
+
+    for (unsigned int i(0); i<fPar.size(); i++){
+      cout << "fPar[" << i << "] = " << fPar[i] << endl;
+    }
+
+    for (unsigned int i(2); i<fPar.size(); i++){
+      fParForBofZ.push_back(fPar[i]);
+      cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << endl;
+    }
+    fFirstCall=false;
+  }
 
   // check if any parameter has changed
 
@@ -554,7 +620,7 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
 
     if(!only_phase_changed) {
 
-      cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
+//      cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
 
       for (unsigned int i(2); i<par.size(); i++)
         fParForBofZ[i-2] = par[i];
@@ -578,9 +644,9 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
       TPofBCalc PofB3S(BofZ3S, *fImpProfile, fParForPofB);
       fPofT->DoFFT(PofB3S);
 
-    } else {
+    }/* else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
-    }
+    }*/
 
     fPofT->CalcPol(fParForPofT);
 

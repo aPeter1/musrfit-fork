@@ -5,7 +5,7 @@ ROOTCFLAGS    = $(shell $(ROOTSYS)/bin/root-config --cflags)
 
 #---------------------------------------------------
 
-
+OS            = LINUX
 CXX           = g++
 CXXFLAGS      = -g -Wall -Wno-trigraphs -fPIC
 MUSRFITINCLUDE = ../../../include
@@ -63,3 +63,9 @@ TFitPofBStartupHandlerDict.cpp: ../include/TFitPofBStartupHandler.h ../include/T
 	@echo "Generating dictionary $@..."
 	rootcint -f $@ -c -p $^
 	
+install: all
+	@echo "Installing shared lib: libTFitPofB.so"
+ifeq ($(OS),LINUX)
+	cp -pv $(SHLIB) $(ROOTSYS)/lib
+	cp -pv $(LOCALINCLUDE)/*.h $(ROOTSYS)/include
+endif

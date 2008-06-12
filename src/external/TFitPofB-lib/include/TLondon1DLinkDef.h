@@ -16,7 +16,6 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class TLondon1D+;
 #pragma link C++ class TLondon1D1L+;
 #pragma link C++ class TLondon1D2L+;
 #pragma link C++ class TLondon1D3L+;
