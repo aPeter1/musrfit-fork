@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
   if (status) { // error
     cout << endl << "**WARNING** reading/parsing musrfit_startup.xml failed.";
     cout << endl;
-/*    
+/*
     // clean up
     if (saxParser) {
       delete saxParser;
@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
       delete startupHandler;
       startupHandler = 0;
     }
-*/    
+*/
   }
   startupHandler->CheckLists();
 
@@ -149,6 +149,32 @@ int main(int argc, char *argv[])
     }
     return status;
   }
+  // make a plot list vector
+  PMsrPlotList *msrPlotList = msrHandler->GetMsrPlotList();
+  PIntVector plotList;
+  bool runPresent;
+  for (unsigned int i=0; i<msrPlotList->size(); i++) {
+    for (unsigned int j=0; j<msrPlotList->at(i).fRuns.size(); j++) {
+      // check that run is not already in the plotList
+      runPresent = false;
+      for (unsigned int k=0; k<plotList.size(); k++) {
+        if (msrPlotList->at(i).fRuns[j].Re() == static_cast<int>(plotList[k])) {
+          runPresent = true;
+          break;
+        }
+      }
+      if (!runPresent) {
+        plotList.push_back(static_cast<int>(msrPlotList->at(i).fRuns[j].Re()));
+      }
+    }
+  }
+/*
+cout << endl << ">> plotList:" << endl;
+for(unsigned int i=0; i<plotList.size(); i++){
+  cout << plotList[i] << ", ";
+}
+cout << endl;
+*/
 
   // read all the necessary runs (raw data)
   PRunDataHandler *dataHandler;
@@ -162,17 +188,28 @@ int main(int argc, char *argv[])
     cout << endl << "**ERROR** Couldn't read all data files, will quit ..." << endl;
   }
 
-  // generate the necessary fit histogramms for the view
+  // generate the necessary histogramms for the view
   PRunListCollection *runListCollection = 0;
   if (success) {
     // feed all the necessary histogramms for the view
     runListCollection = new PRunListCollection(msrHandler, dataHandler);
-    for (unsigned int i=0; i < msrHandler->GetMsrRunList()->size(); i++) {
-      success = runListCollection->Add(i, kView);
-      if (!success) {
-        cout << endl << "**ERROR** Couldn't handle run no " << i << " ";
-        cout << (*msrHandler->GetMsrRunList())[i].fRunName.Data();
-        break;
+    for (unsigned int i=0; i<msrHandler->GetMsrRunList()->size(); i++) {
+      // if run is in plotList add it, otherwise go to the next
+      runPresent = false;
+      for (unsigned int j=0; j<plotList.size(); j++) {
+        if (static_cast<unsigned int>(plotList[j]) == i+1) {
+          runPresent = true;
+          break;
+        }
+      }
+      if (runPresent) {
+//cout << endl << ">> Will add run " << i << endl;
+        success = runListCollection->Add(i, kView);
+        if (!success) {
+          cout << endl << "**ERROR** Couldn't handle run no " << i << " ";
+          cout << (*msrHandler->GetMsrRunList())[i].fRunName.Data();
+          break;
+        }
       }
     }
   }
@@ -236,6 +273,7 @@ cout << endl << "clean up canvas vector ...";
 cout << endl;
 
   // clean up
+  plotList.clear();
   if (saxParser) {
     delete saxParser;
     saxParser = 0;
