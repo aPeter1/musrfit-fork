@@ -111,6 +111,7 @@ typedef struct theo_data_base {
   TString fName;           ///< name of the function as written into the msr-file
   TString fAbbrev;         ///< abbreviation of the function name
   TString fComment;        ///< comment added in the msr-file theory block to help the used
+  TString fCommentTimeShift; ///< comment added in the msr-file theory block if there is a time shift
 } PTheoDataBase;
 
 //--------------------------------------------------------------------------------------
@@ -120,58 +121,58 @@ typedef struct theo_data_base {
 static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
 
         {THEORY_ASYMMETRY, THEORY_PARAM_ASYMMETRY, false,
-         "asymmetry", "a", ""},
+         "asymmetry", "a", "", ""},
 
         {THEORY_SIMPLE_EXP, THEORY_PARAM_SIMPLE_EXP, false,
-         "simplExpo", "se", "(rate)"},
+         "simplExpo", "se", "(rate)", "(rate tshift)"},
 
         {THEORY_GENERAL_EXP, THEORY_PARAM_GENERAL_EXP, false,
-         "generExpo", "ge", "(rate exponent)"},
+         "generExpo", "ge", "(rate exponent)", "(rate exponent tshift)"},
 
         {THEORY_SIMPLE_GAUSS, THEORY_PARAM_SIMPLE_GAUSS, false,
-         "simpleGss", "sg", "(rate)"},
+         "simpleGss", "sg", "(rate)", "(rate tshift)"},
 
         {THEORY_STATIC_GAUSS_KT, THEORY_PARAM_STATIC_GAUSS_KT, false,
-         "statGssKt", "stg", "(rate)"},
+         "statGssKt", "stg", "(rate)", "(rate tshift)"},
 
         {THEORY_STATIC_KT_LF, THEORY_PARAM_STATIC_KT_LF, true,
-         "statKTTab", "sktt", "(frequency damping)"},
+         "statKTTab", "sktt", "(frequency damping)", "(frequency damping tshift)"},
 
         {THEORY_DYNAMIC_KT_LF, THEORY_PARAM_DYNAMIC_KT_LF, true,
-         "dynmKTTab", "dktt", "(frequency damping hopprate)"},
+         "dynmKTTab", "dktt", "(frequency damping hopprate)", "(frequency damping hopprate tshift)"},
 
         {THEORY_COMBI_LGKT, THEORY_PARAM_COMBI_LGKT, false,
-         "combiLGKT", "lgkt", "(LorentzRate GaussRate)"},
+         "combiLGKT", "lgkt", "(LorentzRate GaussRate)", "(LorentzRate GaussRate tshift)"},
 
         {THEORY_SPIN_GLASS, THEORY_PARAM_SPIN_GLASS, false,
-         "spinGlass",  "spg", "(rate hopprate order)"},
+         "spinGlass",  "spg", "(rate hopprate order)", "(rate hopprate order tshift)"},
 
         {THEORY_RANDOM_ANISOTROPIC_HYPERFINE, THEORY_PARAM_RANDOM_ANISOTROPIC_HYPERFINE, false,
-         "rdAnisoHf", "rahf", "(frequency rate)"},
+         "rdAnisoHf", "rahf", "(frequency rate)", "(frequency rate tshift)"},
 
         {THEORY_ABRAGAM, THEORY_PARAM_ABRAGAM, false,
-         "abragam", "ab", "(rate hopprate)"},
+         "abragam", "ab", "(rate hopprate)", "(rate hopprate tshift)"},
 
         {THEORY_INTERNAL_FIELD, THEORY_PARAM_INTERNAL_FIELD, false,
-         "internFld", "if", "(phase frequency Trate Lrate)"},
+         "internFld", "if", "(phase frequency Trate Lrate)", "(phase frequency Trate Lrate tshift)"},
 
         {THEORY_TF_COS, THEORY_PARAM_TF_COS, false,
-         "TFieldCos", "tf", "(phase frequency)"},
+         "TFieldCos", "tf", "(phase frequency)", "(phase frequency tshift)"},
 
         {THEORY_BESSEL, THEORY_PARAM_BESSEL, false,
-         "bessel", "b", "(phase frequency)"},
+         "bessel", "b", "(phase frequency)", "(phase frequency tshift)"},
 
         {THEORY_INTERNAL_BESSEL, THEORY_PARAM_INTERNAL_BESSEL, false,
-         "internBsl", "ib", "(phase frequency Trate Lrate)"},
+         "internBsl", "ib", "(phase frequency Trate Lrate)", "(phase frequency Trate Lrate tshift)"},
 
         {THEORY_SKEWED_GAUSS, THEORY_PARAM_SKEWED_GAUSS, false,
-         "skewedGss", "skg", "(phase frequency rate_m rate_p)"},
+         "skewedGss", "skg", "(phase frequency rate_m rate_p)", "(phase frequency rate_m rate_p tshift)"},
 
         {THEORY_POLYNOM, 0, false,
-         "polynom", "p", "(tshift p0 p1 ... pn)"},
+         "polynom", "p", "(tshift p0 p1 ... pn)", "(tshift p0 p1 ... pn)"},
 
         {THEORY_USER_FCN, 0, false,
-         "userFcn", "u", ""}};
+         "userFcn", "u", "", ""}};
 
 //--------------------------------------------------------------------------------------
 /**

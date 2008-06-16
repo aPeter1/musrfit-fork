@@ -60,6 +60,12 @@ short term:
   defined within musrfit, using the ROOT dictionary feature
   to look for them and use them. **UNDER WAY, NOT TESTED YET** 08-06-05
 
+* tshift implementation under way. Wrong and needs to be fixed: 
+  MakeCleanAndTidyTheoryBlock should only handle the currently parsed line!!
+
+* faulty dependency check in the Makefile when handling the PSI-Bin-Class stuff.
+  Needs to be fixed!
+
 ---------------------
 intermediate term:
 ---------------------

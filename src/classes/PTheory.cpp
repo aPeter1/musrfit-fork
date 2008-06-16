@@ -166,7 +166,7 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
   }
 
   // line is a valid function, hence analyze parameters
-  if (((unsigned int)(tokens->GetEntries()-1) != fNoOfParam) &&
+  if (((unsigned int)(tokens->GetEntries()-1) < fNoOfParam) &&
       ((idx != THEORY_USER_FCN) && (idx != THEORY_POLYNOM))) {
     cout << endl << "**ERROR**: PTheory():  Theory line '" << line->fLine.Data() << "'";
     cout << endl << "  in line no " << line->fLineNo;
@@ -178,7 +178,7 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
   // filter out the parameters
   int status;
   unsigned int value;
-  bool ok = false;;
+  bool ok = false;
   for (int i=1; i<tokens->GetEntries(); i++) {
     ostr = dynamic_cast<TObjString*>(tokens->At(i));
     str = ostr->GetString();
@@ -684,23 +684,28 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
     line = &(*fullTheoryBlock)[i];
     // copy line content to str in order to remove comments
     str = line->fLine.Copy();
+    // remove theory line comment if present, i.e. something starting with '('
+    int index = str.Index("(");
+    if (index > 0) // theory line comment present
+      str.Resize(index);
     // tokenize line
     tokens = str.Tokenize(" \t");
+cout << endl << ">> #tokens=" << tokens->GetEntries() << ", str=" << str.Data();
     // make a handable string out of the asymmetry token
     ostr = dynamic_cast<TObjString*>(tokens->At(0));
     str = ostr->GetString();
     // check if the line is just a '+' if so nothing to be done
     if (str.Contains("+"))
-      continue;
+      return;
     // check if the function is a polynom
     if (!str.CompareTo("p") || str.Contains("polynom")) {
       MakeCleanAndTidyPolynom(i, fullTheoryBlock);
-      continue;
+      return;
     }
     // check if the function is a userFcn
     if (!str.CompareTo("u") || str.Contains("userFcn")) {
       MakeCleanAndTidyUserFcn(i, fullTheoryBlock);
-      continue;
+      return;
     }
     // search the theory function
     for (unsigned int j=0; j<THEORY_MAX; j++) {
@@ -711,14 +716,14 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
     }
     // check if theory is indeed defined. This should not be necessay at this point but ...
     if (idx == THEORY_UNDEFINED)
-      continue;
+      return;
     // check that there enough tokens. This should not be necessay at this point but ...
     if ((unsigned int)tokens->GetEntries() < fgTheoDataBase[idx].fNoOfParam + 1)
-      continue;
+      return;
     // make tidy string
     sprintf(substr, "%-10s", fgTheoDataBase[idx].fName.Data());
     tidy = TString(substr);
-    for (unsigned j=1; j<fgTheoDataBase[idx].fNoOfParam+1; j++) {
+    for (unsigned int j=1; j<(unsigned int)tokens->GetEntries(); j++) {
       ostr = dynamic_cast<TObjString*>(tokens->At(j));
       str = ostr->GetString();
       sprintf(substr, "%6s", str.Data());
@@ -728,7 +733,10 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
       unsigned int size = tidy.Length();
       for (unsigned int k=0; k<35-size; k++)
         tidy += TString(" ");
-      tidy += fgTheoDataBase[idx].fComment;
+      if ((unsigned int)tokens->GetEntries() == fgTheoDataBase[idx].fNoOfParam + 1) // no tshift
+        tidy += fgTheoDataBase[idx].fComment;
+      else
+        tidy += fgTheoDataBase[idx].fCommentTimeShift;
     }
     // write tidy string back into theory block
     (*fullTheoryBlock)[i].fLine = tidy;
@@ -835,18 +843,12 @@ cout << endl << ">> MakeCleanAndTidyUserFcn: " << (*fullTheoryBlock)[i].fLine.Da
  * <p> Asymmetry
  * \f[ = A \f]
  *
- * <p> Every theory-function handles its parameters the following way: It holds
- * an array fParamNo which is holding the parameter/map/function number. The numbering
- * is as such: par1, par2, ..., parX1, internalPar1, internalParX2, map1, ..., mapX3, 
- * fun1, ..., funX4, where X1 is the number of parameters, X2 the number of internal 
- * parameters, i.e. parameters listed in the runs, X3 the number of maps, and X4 the 
- * number of used functions.
- *
- * \param paramValues is an array of parameter values [par1, par2, ..., parX1, 
- *                    internalPar1, ..., internalParX2, map1, ..., mapX3, fun1, ..., funX4]
+ * \param paramValues
  */
 double PTheory::Asymmetry(const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
+  // expected parameters: asym
+
   double asym;
 
   // check if FUNCTIONS are used
@@ -862,27 +864,40 @@ double PTheory::Asymmetry(const PDoubleVector& paramValues, const PDoubleVector&
 //--------------------------------------------------------------------------
 /**
  * <p> Simple exponential
- * \f[ = \exp\left(-\lambda t\right) \f].
+ * \f[ = \exp\left(-\lambda t\right) \f] or
+ * \f[ = \exp\left(-\lambda (t-t_{\rm shift} \right) \f]
  *
  * <p> For details concerning fParamNo and paramValues see PTheory::Asymmetry and
  * PTheory::PTheory.
  *
  * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues parameter values, here only one, namely the depolarization 
- * rate \f$\lambda\f$ in \f$(1/\mu\mathrm{s})\f$
+ * \param paramValues parameter values: depolarization rate \f$\lambda\f$ 
+ *          in \f$(1/\mu\mathrm{s})\f$, optionally \f$t_{\rm shift}\f$
  */
 double PTheory::SimpleExp(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  double lambda;
+  // expected parameters: lambda [tshift]
+
+  double val[2];
+
+  assert(fParamNo.size() <= 2);
 
   // check if FUNCTIONS are used
-  if (fParamNo[0] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
-    lambda = paramValues[fParamNo[0]];
-  } else { // function
-    lambda = funcValues[fParamNo[0]-MSR_PARAM_FUN_OFFSET];
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
+    if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
+      val[i] = paramValues[fParamNo[i]];
+    } else { // function
+      val[i] = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
+    }
   }
 
-  return TMath::Exp(-t*lambda);
+  double tt;
+  if (fParamNo.size() == 1) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[1];
+
+  return TMath::Exp(-tt*val[0]);
 }
 
 //--------------------------------------------------------------------------
@@ -894,10 +909,14 @@ double PTheory::SimpleExp(register double t, const PDoubleVector& paramValues, c
  */
 double PTheory::GeneralExp(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  double val[2];
+  // expected parameters: lambda beta [tshift]
+
+  double val[3];
+
+  assert(fParamNo.size() <= 3);
 
   // check if FUNCTIONS are used
-  for (unsigned int i=0; i<2; i++) {
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
     if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
       val[i] = paramValues[fParamNo[i]];
     } else { // function
@@ -905,7 +924,13 @@ double PTheory::GeneralExp(register double t, const PDoubleVector& paramValues, 
     }
   }
 
-  return TMath::Exp(-TMath::Power(t*val[0], val[1]));
+  double tt;
+  if (fParamNo.size() == 2) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[2];
+
+  return TMath::Exp(-TMath::Power(tt*val[0], val[1]));;
 }
 
 //--------------------------------------------------------------------------
@@ -917,16 +942,28 @@ double PTheory::GeneralExp(register double t, const PDoubleVector& paramValues, 
  */
 double PTheory::SimpleGauss(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  double sigma;
+  // expected parameters: sigma [tshift]
+
+  double val[2];
+
+  assert(fParamNo.size() <= 2);
 
   // check if FUNCTIONS are used
-  if (fParamNo[0] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
-    sigma = paramValues[fParamNo[0]];
-  } else { // function
-    sigma = funcValues[fParamNo[0]-MSR_PARAM_FUN_OFFSET];
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
+    if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
+      val[i] = paramValues[fParamNo[i]];
+    } else { // function
+      val[i] = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
+    }
   }
 
-  return TMath::Exp(-0.5*TMath::Power(t*sigma, 2.0));
+  double tt;
+  if (fParamNo.size() == 1) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[1];
+
+  return TMath::Exp(-0.5*TMath::Power(tt*val[0], 2.0));
 }
 
 //--------------------------------------------------------------------------
@@ -938,16 +975,26 @@ double PTheory::SimpleGauss(register double t, const PDoubleVector& paramValues,
  */
 double PTheory::StaticGaussKT(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  double sigma;
+  // expected parameters: sigma [tshift]
+
+  double val[2];
+
+  assert(fParamNo.size() <= 2);
 
   // check if FUNCTIONS are used
-  if (fParamNo[0] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
-    sigma = paramValues[fParamNo[0]];
-  } else { // function
-    sigma = funcValues[fParamNo[0]-MSR_PARAM_FUN_OFFSET];
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
+    if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
+      val[i] = paramValues[fParamNo[i]];
+    } else { // function
+      val[i] = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
+    }
   }
 
-  double sigma_t_2 = t*t*sigma*sigma;
+  double sigma_t_2;
+  if (fParamNo.size() == 1) // no tshift
+    sigma_t_2 = t*t*val[0]*val[0];
+  else // tshift present
+    sigma_t_2 = (t-val[1])*(t-val[1])*val[0]*val[0];
 
   return 0.333333333333333 * (1.0 + 2.0*(1.0 - sigma_t_2)*TMath::Exp(-0.5*sigma_t_2));
 }
@@ -961,10 +1008,15 @@ double PTheory::StaticGaussKT(register double t, const PDoubleVector& paramValue
  */
 double PTheory::StaticKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  double val[2]; // frequency, damping
+  // expected parameters: frequency damping [tshift]
+
+  double val[3];
+  double result;
+
+  assert(fParamNo.size() <= 3);
 
   // check if FUNCTIONS are used
-  for (unsigned int i=0; i<2; i++) {
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
     if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
       val[i] = paramValues[fParamNo[i]];
     } else { // function
@@ -972,10 +1024,14 @@ double PTheory::StaticKTLF(register double t, const PDoubleVector& paramValues, 
     }
   }
 
-  double result;
-  if (val[0] == 0.0) {
-    double sigma_t_2 = t*t*val[1]*val[1];
+  double tt;
+  if (fParamNo.size() == 2) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[2];
 
+  if (val[0] == 0.0) {
+    double sigma_t_2 = tt*tt*val[1]*val[1];
     result = 0.333333333333333 * (1.0 + 2.0*(1.0 - sigma_t_2)*TMath::Exp(-0.5*sigma_t_2));
   } else {
     fStaticKTLFFunc->SetParameters(val[1], val[0]); // damping, frequency
@@ -984,9 +1040,9 @@ double PTheory::StaticKTLF(register double t, const PDoubleVector& paramValues, 
     double w0    = 2.0*TMath::Pi()*val[0];
 
     result = 1.0 - 2.0*TMath::Power(delta/w0,2.0)*(1.0 - 
-                TMath::Exp(-0.5*TMath::Power(delta*t, 2.0))*TMath::Cos(w0*t)) +
+                TMath::Exp(-0.5*TMath::Power(delta*tt, 2.0))*TMath::Cos(w0*tt)) +
                 2.0*TMath::Power(delta, 4.0)/TMath::Power(w0, 3.0)*
-                fStaticKTLFFunc->Integral(0.0, t);
+                fStaticKTLFFunc->Integral(0.0, tt);
   }
 
   return result;
@@ -1013,10 +1069,14 @@ double PTheory::DynamicKTLF(register double t, const PDoubleVector& paramValues,
  */
 double PTheory::CombiLGKT(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  double val[2];
+  // expected parameters: lambdaL lambdaG [tshift]
+
+  double val[3];
+
+  assert(fParamNo.size() <= 3);
 
   // check if FUNCTIONS are used
-  for (unsigned int i=0; i<2; i++) {
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
     if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
       val[i] = paramValues[fParamNo[i]];
     } else { // function
@@ -1024,8 +1084,14 @@ double PTheory::CombiLGKT(register double t, const PDoubleVector& paramValues, c
     }
   }
 
-  double lambdaL_t   = t*val[0];
-  double lambdaG_t_2 = t*t*val[1]*val[1];
+  double tt;
+  if (fParamNo.size() == 2) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[2];
+
+  double lambdaL_t   = tt*val[0];
+  double lambdaG_t_2 = tt*tt*val[1]*val[1];
 
   return 0.333333333333333 * 
          (1.0 + 2.0*(1.0-lambdaL_t-lambdaG_t_2)*TMath::Exp(-(lambdaL_t+0.5*lambdaG_t_2)));
@@ -1040,13 +1106,17 @@ double PTheory::CombiLGKT(register double t, const PDoubleVector& paramValues, c
  */
 double PTheory::SpinGlass(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
+  // expected parameters: lambda gamma q [tshift]
+
   if (paramValues[fParamNo[0]] == 0.0)
     return 1.0;
 
-  double val[3];
+  double val[4];
+
+  assert(fParamNo.size() <= 4);
 
   // check if FUNCTIONS are used
-  for (unsigned int i=0; i<3; i++) {
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
     if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
       val[i] = paramValues[fParamNo[i]];
     } else { // function
@@ -1054,9 +1124,15 @@ double PTheory::SpinGlass(register double t, const PDoubleVector& paramValues, c
     }
   }
 
+  double tt;
+  if (fParamNo.size() == 3) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[3];
+
   double lambda_2     = val[0]*val[0];
-  double lambda_t_2_q = t*t*lambda_2*val[2];
-  double rate_2       = 4.0*lambda_2*(1.0-val[2])*t/val[1];
+  double lambda_t_2_q = tt*tt*lambda_2*val[2];
+  double rate_2       = 4.0*lambda_2*(1.0-val[2])*tt/val[1];
 
   double rateL = TMath::Sqrt(rate_2);
   double rateT = TMath::Sqrt(rate_2+lambda_t_2_q);
@@ -1073,10 +1149,14 @@ double PTheory::SpinGlass(register double t, const PDoubleVector& paramValues, c
  */
 double PTheory::RandomAnisotropicHyperfine(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  double val[2];
+  // expected parameters: nu lambda [tshift]
+
+  double val[3];
+
+  assert(fParamNo.size() <= 3);
 
   // check if FUNCTIONS are used
-  for (unsigned int i=0; i<2; i++) {
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
     if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
       val[i] = paramValues[fParamNo[i]];
     } else { // function
@@ -1084,8 +1164,14 @@ double PTheory::RandomAnisotropicHyperfine(register double t, const PDoubleVecto
     }
   }
 
-  double nu_t     = t*val[0];
-  double lambda_t = t*val[1];
+  double tt;
+  if (fParamNo.size() == 2) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[2];
+
+  double nu_t     = tt*val[0];
+  double lambda_t = tt*val[1];
 
   return 0.166666666666667*(1.0-0.5*nu_t)*TMath::Exp(-0.5*nu_t) +
          0.333333333333333*(1.0-0.25*nu_t)*TMath::Exp(-0.25*(nu_t+2.44949*lambda_t));
@@ -1100,10 +1186,14 @@ double PTheory::RandomAnisotropicHyperfine(register double t, const PDoubleVecto
  */
 double PTheory::Abragam(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  double val[2];
+  // expected parameters: sigma gamma [tshift]
+
+  double val[3];
+
+  assert(fParamNo.size() <= 3);
 
   // check if FUNCTIONS are used
-  for (unsigned int i=0; i<2; i++) {
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
     if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
       val[i] = paramValues[fParamNo[i]];
     } else { // function
@@ -1111,7 +1201,13 @@ double PTheory::Abragam(register double t, const PDoubleVector& paramValues, con
     }
   }
 
-  double gamma_t = t*val[1];
+  double tt;
+  if (fParamNo.size() == 2) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[2];
+
+  double gamma_t = tt*val[1];
 
   return TMath::Exp(-TMath::Power(val[0]/val[1],2.0)*
                     (TMath::Exp(-gamma_t)-1.0-gamma_t));
@@ -1126,10 +1222,14 @@ double PTheory::Abragam(register double t, const PDoubleVector& paramValues, con
  */
 double PTheory::InternalField(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  double val[4]; // phase, freq, transversal rate, longitudinal rate
+  // expected parameters: phase frequency rateT rateL [tshift]
+
+  double val[5];
+
+  assert(fParamNo.size() <= 5);
 
   // check if FUNCTIONS are used
-  for (unsigned int i=0; i<4; i++) {
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
     if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
       val[i] = paramValues[fParamNo[i]];
     } else { // function
@@ -1137,10 +1237,16 @@ double PTheory::InternalField(register double t, const PDoubleVector& paramValue
     }
   }
 
+  double tt;
+  if (fParamNo.size() == 4) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[4];
+
   return 0.666666666666667*
-                 TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t)*
-                 TMath::Exp(-val[2]*t) +
-         0.333333333333333*TMath::Exp(-val[3]*t);
+                 TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*tt)*
+                 TMath::Exp(-val[2]*tt) +
+         0.333333333333333*TMath::Exp(-val[3]*tt);
 }
 
 //--------------------------------------------------------------------------
@@ -1152,10 +1258,14 @@ double PTheory::InternalField(register double t, const PDoubleVector& paramValue
  */
 double PTheory::TFCos(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  double val[2];
+  // expected parameters: phase frequency [tshift]
+
+  double val[3];
+
+  assert(fParamNo.size() <= 3);
 
   // check if FUNCTIONS are used
-  for (unsigned int i=0; i<2; i++) {
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
     if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
       val[i] = paramValues[fParamNo[i]];
     } else { // function
@@ -1163,7 +1273,13 @@ double PTheory::TFCos(register double t, const PDoubleVector& paramValues, const
     }
   }
 
-  return TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t);
+  double tt;
+  if (fParamNo.size() == 2) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[2];
+
+  return TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*tt);
 }
 
 //--------------------------------------------------------------------------
@@ -1175,10 +1291,14 @@ double PTheory::TFCos(register double t, const PDoubleVector& paramValues, const
  */
 double PTheory::Bessel(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  double val[2];
+  // expected parameters: phase frequency [tshift]
+
+  double val[3];
+
+  assert(fParamNo.size() <= 3);
 
   // check if FUNCTIONS are used
-  for (unsigned int i=0; i<2; i++) {
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
     if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
       val[i] = paramValues[fParamNo[i]];
     } else { // function
@@ -1186,7 +1306,13 @@ double PTheory::Bessel(register double t, const PDoubleVector& paramValues, cons
     }
   }
 
-  return TMath::BesselJ0(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t);
+  double tt;
+  if (fParamNo.size() == 2) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[2];
+
+  return TMath::BesselJ0(DEG_TO_RAD*val[0]+TWO_PI*val[1]*tt);
 }
 
 //--------------------------------------------------------------------------
@@ -1198,10 +1324,14 @@ double PTheory::Bessel(register double t, const PDoubleVector& paramValues, cons
  */
 double PTheory::InternalBessel(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  double val[4]; // phase, frequency, Trate, Lrate
+  // expected parameters: phase frequency rateT rateL [tshift]
+
+  double val[5];
+
+  assert(fParamNo.size() <= 5);
 
   // check if FUNCTIONS are used
-  for (unsigned int i=0; i<4; i++) {
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
     if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
       val[i] = paramValues[fParamNo[i]];
     } else { // function
@@ -1209,10 +1339,16 @@ double PTheory::InternalBessel(register double t, const PDoubleVector& paramValu
     }
   }
 
+  double tt;
+  if (fParamNo.size() == 4) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[4];
+
   return 0.666666666666667*
-                 TMath::BesselJ0(DEG_TO_RAD*val[0]+TWO_PI*val[1]*t)*
-                 TMath::Exp(-val[2]*t) +
-         0.333333333333333*TMath::Exp(-val[3]*t);
+                 TMath::BesselJ0(DEG_TO_RAD*val[0]+TWO_PI*val[1]*tt)*
+                 TMath::Exp(-val[2]*tt) +
+         0.333333333333333*TMath::Exp(-val[3]*tt);
 }
 
 //--------------------------------------------------------------------------
@@ -1224,11 +1360,15 @@ double PTheory::InternalBessel(register double t, const PDoubleVector& paramValu
  */
 double PTheory::SkewedGauss(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  double val[4]; // phase, freq, sigma-, sigma+
+  // expected parameters: phase frequency sigma- sigma+ [tshift]
+
+  double val[5];
   double skg;
 
+  assert(fParamNo.size() <= 5);
+
   // check if FUNCTIONS are used
-  for (unsigned int i=0; i<4; i++) {
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
     if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
       val[i] = paramValues[fParamNo[i]];
     } else { // function
@@ -1237,11 +1377,17 @@ double PTheory::SkewedGauss(register double t, const PDoubleVector& paramValues,
   }
 
 
+  double tt;
+  if (fParamNo.size() == 4) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[4];
+
   // val[2] = sigma-, val[3] = sigma+
-  double zp = val[3]*t/SQRT_TWO; // sigma+
-  double zm = val[2]*t/SQRT_TWO; // sigma-
-  double gp = TMath::Exp(-0.5*TMath::Power(t*val[3], 2.0)); // gauss sigma+
-  double gm = TMath::Exp(-0.5*TMath::Power(t*val[2], 2.0)); // gauss sigma-
+  double zp = val[3]*tt/SQRT_TWO; // sigma+
+  double zm = val[2]*tt/SQRT_TWO; // sigma-
+  double gp = TMath::Exp(-0.5*TMath::Power(tt*val[3], 2.0)); // gauss sigma+
+  double gm = TMath::Exp(-0.5*TMath::Power(tt*val[2], 2.0)); // gauss sigma-
   double wp = val[3]/(val[2]+val[3]); // sigma+ / (sigma+ + sigma-)
   double wm = 1.0-wp;
   double phase = DEG_TO_RAD*val[0];
@@ -1271,6 +1417,8 @@ double PTheory::SkewedGauss(register double t, const PDoubleVector& paramValues,
  */
 double PTheory::Polynom(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
+  // expected parameters: tshift p0 p1 p2 ...
+
   double result = 0.0;
   double tshift;
   double val;
