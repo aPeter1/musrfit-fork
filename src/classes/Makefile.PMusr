@@ -110,7 +110,7 @@ SHLIB = libPMusr.so
 #
 all:  $(SHLIB)
 
-$(SHLIB): $(OBJS)
+$(SHLIB): $(OBJS) $(EXTOBJS)
 	@echo "---> Building shared library $(SHLIB) ..."
 	/bin/rm -f $(SHLIB)
 	$(LD) $(OBJS) $(EXTOBJS) $(SOFLAGS) -o $(SHLIB) $(FFTW3LIB) $(GLIBS) $(PSILIBS) $(MNLIB) $(GSLLIB)
@@ -127,7 +127,7 @@ clean:; 	@rm -f $(OBJS) *Dict* core*
 $(OBJS): %.o: %.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
 
-MuSR_td_PSI_bin.o: ../external/MuSR_software/Class_MuSR_PSI/MuSR_td_PSI_bin.cpp
+$(EXTOBJS): ../external/MuSR_software/Class_MuSR_PSI/MuSR_td_PSI_bin.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c ../external/MuSR_software/Class_MuSR_PSI/MuSR_td_PSI_bin.cpp
 
 PStartupHandlerDict.cpp: ../include/PStartupHandler.h ../include/PStartupHandlerLinkDef.h

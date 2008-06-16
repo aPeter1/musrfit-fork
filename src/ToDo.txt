@@ -61,10 +61,10 @@ short term:
   to look for them and use them. **UNDER WAY, NOT TESTED YET** 08-06-05
 
 * tshift implementation under way. Wrong and needs to be fixed: 
-  MakeCleanAndTidyTheoryBlock should only handle the currently parsed line!!
+  **FIXED** 08-06-16
 
 * faulty dependency check in the Makefile when handling the PSI-Bin-Class stuff.
-  Needs to be fixed!
+  Needs to be fixed! **FIXED** 08-06-16
 
 ---------------------
 intermediate term:
