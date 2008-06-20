@@ -224,5 +224,111 @@ bool PRunNonMusr::PrepareViewData()
 {
   bool success = true;
 
+  // get the proper run
+  PRawRunData* runData = fRawData->GetRunData(fRunInfo->fRunName);
+  if (!runData) { // couldn't get run
+    cout << endl << "PRunNonMusr::PrepareViewData(): **ERROR** Couldn't get run " << fRunInfo->fRunName.Data() << "!";
+    return false;
+  }
+
+  // fill data histo
+  // pack the raw data
+  double value  = 0.0;
+  double err = 0.0;
+cout << endl << ">> runData->fXData.size()=" << runData->fXData.size();
+  for (unsigned int i=0; i<runData->fXData.size(); i++) {
+cout << endl << ">> i=" << i << ", packing=" << fRunInfo->fPacking;
+    if ((i % fRunInfo->fPacking == 0) && (i != 0)) { // fill data
+cout << endl << "-> i=" << i;
+      fData.fX.push_back(runData->fXData[i]-(runData->fXData[i]-runData->fXData[i-fRunInfo->fPacking])/2.0);
+      fData.fValue.push_back(value);
+      fData.fError.push_back(TMath::Sqrt(err));
+      value = 0.0;
+      err = 0.0;
+    }
+    // sum raw data values
+    value += runData->fYData[i];
+    err += runData->fErrYData[i]*runData->fErrYData[i];
+  }
+cout << endl << ">> fData.fValue.size()=" << fData.fValue.size();
+
+  // count the number of bins to be fitted
+  fNoOfFitBins = fData.fValue.size();
+cout << endl << ">> fNoOfFitBins=" << fNoOfFitBins;
+
+  // fill theory histo
+  // feed the parameter vector
+  std::vector<double> par;
+  PMsrParamList *paramList = fMsrInfo->GetMsrParamList();
+  for (unsigned int i=0; i<paramList->size(); i++)
+    par.push_back((*paramList)[i].fValue);
+  // calculate functions
+  for (int i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
+    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), fRunInfo->fMap, par);
+  }
+
+cout << endl << ">> after parameter fill" << endl;
+  // get plot range
+  PMsrPlotList *plotList;
+  PMsrPlotStructure plotBlock;
+  plotList = fMsrInfo->GetMsrPlotList();
+  // find the proper plot block
+  // Here a small complication has to be handled: there are potentially multiple
+  // run blocks and the run might be present in various of these run blocks. In
+  // order to get a nice resolution on the theory the following procedure will be
+  // followed: the smallest x-interval found will be used to for the fXTheory resolution
+  // which is 1000 function points. The function will be calculated from the smallest
+  // xmin found up to the largest xmax found.
+  double xMin, xMax;
+  double xAbsMin, xAbsMax;
+  bool first = true;
+cout << endl << ">> plotList->size()=" << plotList->size();
+  for (unsigned int i=0; i<plotList->size(); i++) {
+    plotBlock = plotList->at(i);
+cout << endl << ">> plotBlock.fRuns.size()=" << plotBlock.fRuns.size() << endl;
+    for (unsigned int j=0; j<plotBlock.fRuns.size(); j++) {
+cout << endl << ">> j=" << j;
+cout << endl << ">> fRunNo=" << fRunNo;
+cout << endl << ">> plotBlock.fRuns[j].Re()=" << plotBlock.fRuns[j].Re();
+cout << endl;
+      if (fRunNo == plotBlock.fRuns[j].Re()-1) { // run found
+        if (first) {
+          first = false;
+          xMin = plotBlock.fTmin;
+          xMax = plotBlock.fTmax;
+          xAbsMin = xMin;
+          xAbsMax = xMax;
+cout << endl << ">> first: xMin=" << xMin << ", xMax=" << xMax << endl;
+        } else {
+          if (fabs(xMax-xMin) > fabs(plotBlock.fTmax-plotBlock.fTmin)) {
+            xMin = plotBlock.fTmin;
+            xMax = plotBlock.fTmax;
+          }
+          if (xMin < xAbsMin)
+            xAbsMin = xMin;
+          if (xMax > xAbsMax)
+            xAbsMax = xMax;
+cout << endl << ">> !first: xMin=" << xMin << ", xMax=" << xMax << endl;
+        }
+cout << endl << ">> xMin=" << xMin << ", xMax=" << xMax << endl;
+      }
+    }
+  }
+cout << endl << ">> after the xmin/xmax loop." << endl;
+
+  double xStep = (xMax-xMin)/1000.0;
+  double xx = xAbsMin;
+  do {
+    // fill x-vector
+    fData.fXTheory.push_back(xx);
+    // fill y-vector
+    fData.fTheory.push_back(fTheory->Func(xx, par, fFuncValues));
+    // calculate next xx
+    xx += xStep;
+  } while (xx < xAbsMax);
+
+  // clean up
+  par.clear();
+
   return success;
 }

@@ -129,6 +129,11 @@ cout << "~PMusrCanvas() called" << endl;
       CleanupDataSet(fData[i]);
     fData.clear();
   }
+  if (fNonMusrData.size() > 0) {
+    for (unsigned int i=0; i<fNonMusrData.size(); i++)
+      CleanupDataSet(fNonMusrData[i]);
+    fNonMusrData.clear();
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -466,7 +471,7 @@ cout << endl;
           return;
         }
         // handle data
-        HandleDataSet(runNo, data);
+        HandleNonMusrDataSet(runNo, data);
         break;
       default:
         fValid = false;
@@ -480,25 +485,49 @@ cout << endl;
 
   // generate the histo plot
   fDataTheoryPad->cd();
-  if (fData.size() > 0) {
-    fData[0].data->Draw("pe");
-    // set time range
-    Double_t xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin;
-    Double_t xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax;
-    fData[0].data->GetXaxis()->SetRangeUser(xmin, xmax);
-    // check if it is necessary to set the y-axis range
-    Double_t ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin;
-    Double_t ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax;
-    if ((ymin != -999.0) && (ymax != -999.0)) {
-      fData[0].data->GetYaxis()->SetRangeUser(ymin, ymax);
+  if (plotInfo.fPlotType != MSR_PLOT_NO_MUSR) {
+    if (fData.size() > 0) {
+      fData[0].data->Draw("pe");
+      // set time range
+      Double_t xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin;
+      Double_t xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax;
+      fData[0].data->GetXaxis()->SetRangeUser(xmin, xmax);
+      // check if it is necessary to set the y-axis range
+      Double_t ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin;
+      Double_t ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax;
+      if ((ymin != -999.0) && (ymax != -999.0)) {
+        fData[0].data->GetYaxis()->SetRangeUser(ymin, ymax);
+      }
+      // plot all remaining data
+      for (unsigned int i=1; i<fData.size(); i++) {
+        fData[i].data->Draw("pesame");
+      }
+      // plot all the theory
+      for (unsigned int i=0; i<fData.size(); i++) {
+        fData[i].theory->Draw("csame");
+      }
     }
-    // plot all remaining data
-    for (unsigned int i=1; i<fData.size(); i++) {
-      fData[i].data->Draw("pesame");
-    }
-    // plot all the theory
-    for (unsigned int i=0; i<fData.size(); i++) {
-      fData[i].theory->Draw("csame");
+  } else { // plotInfo.fPlotType == MSR_PLOT_NO_MUSR
+    if (fNonMusrData.size() > 0) {
+      fNonMusrData[0].data->Draw("ap");
+      // set x-range
+      Double_t xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin;
+      Double_t xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax;
+      fNonMusrData[0].data->GetXaxis()->SetRangeUser(xmin, xmax);
+      // check if it is necessary to set the y-axis range
+      Double_t ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin;
+      Double_t ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax;
+      if ((ymin != -999.0) && (ymax != -999.0)) {
+        fNonMusrData[0].data->GetYaxis()->SetRangeUser(ymin, ymax);
+      }
+      // plot all remaining data
+      for (unsigned int i=1; i<fNonMusrData.size(); i++) {
+        fNonMusrData[i].data->Draw("psame");
+      }
+      // plot all the theory
+      for (unsigned int i=0; i<fNonMusrData.size(); i++) {
+        fNonMusrData[i].theory->Draw("csame");
+      }
     }
   }
   fMainCanvas->cd();
@@ -634,6 +663,33 @@ void PMusrCanvas::InitDataSet(PMusrCanvasDataSet &dataSet)
 }
 
 //--------------------------------------------------------------------------
+// InitDataSet
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param dataSet
+ */
+void PMusrCanvas::InitDataSet(PMusrCanvasNonMusrDataSet &dataSet)
+{
+  dataSet.data = 0;
+  dataSet.dataFourierRe = 0;
+  dataSet.dataFourierIm = 0;
+  dataSet.dataFourierPwr = 0;
+  dataSet.dataFourierPhase = 0;
+  dataSet.theory = 0;
+  dataSet.theoryFourierRe = 0;
+  dataSet.theoryFourierIm = 0;
+  dataSet.theoryFourierPwr = 0;
+  dataSet.theoryFourierPhase = 0;
+  dataSet.diff = 0;
+  dataSet.diffFourierRe = 0;
+  dataSet.diffFourierIm = 0;
+  dataSet.diffFourierPwr = 0;
+  dataSet.diffFourierPhase = 0;
+}
+
+//--------------------------------------------------------------------------
 // CleanupDataSet
 //--------------------------------------------------------------------------
 /**
@@ -642,6 +698,78 @@ void PMusrCanvas::InitDataSet(PMusrCanvasDataSet &dataSet)
  * \param dataSet
  */
 void PMusrCanvas::CleanupDataSet(PMusrCanvasDataSet &dataSet)
+{
+  if (dataSet.data) {
+    delete dataSet.data;
+    dataSet.data = 0;
+  }
+  if (dataSet.dataFourierRe) {
+    delete dataSet.dataFourierRe;
+    dataSet.dataFourierRe = 0;
+  }
+  if (dataSet.dataFourierIm) {
+    delete dataSet.dataFourierIm;
+    dataSet.dataFourierIm = 0;
+  }
+  if (dataSet.dataFourierPwr) {
+    delete dataSet.dataFourierPwr;
+    dataSet.dataFourierPwr = 0;
+  }
+  if (dataSet.dataFourierPhase) {
+    delete dataSet.dataFourierPhase;
+    dataSet.dataFourierPhase = 0;
+  }
+  if (dataSet.theory) {
+    delete dataSet.theory;
+    dataSet.theory = 0;
+  }
+  if (dataSet.theoryFourierRe) {
+    delete dataSet.theoryFourierRe;
+    dataSet.theoryFourierRe = 0;
+  }
+  if (dataSet.theoryFourierIm) {
+    delete dataSet.theoryFourierIm;
+    dataSet.theoryFourierIm = 0;
+  }
+  if (dataSet.theoryFourierPwr) {
+    delete dataSet.theoryFourierPwr;
+    dataSet.theoryFourierPwr = 0;
+  }
+  if (dataSet.theoryFourierPhase) {
+    delete dataSet.theoryFourierPhase;
+    dataSet.theoryFourierPhase = 0;
+  }
+  if (dataSet.diff) {
+    delete dataSet.diff;
+    dataSet.diff = 0;
+  }
+  if (dataSet.diffFourierRe) {
+    delete dataSet.diffFourierRe;
+    dataSet.diffFourierRe = 0;
+  }
+  if (dataSet.diffFourierIm) {
+    delete dataSet.diffFourierIm;
+    dataSet.diffFourierIm = 0;
+  }
+  if (dataSet.diffFourierPwr) {
+    delete dataSet.diffFourierPwr;
+    dataSet.diffFourierPwr = 0;
+  }
+  if (dataSet.diffFourierPhase) {
+    delete dataSet.diffFourierPhase;
+    dataSet.diffFourierPhase = 0;
+  }
+}
+
+//--------------------------------------------------------------------------
+// CleanupDataSet
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param dataSet
+ */
+void PMusrCanvas::CleanupDataSet(PMusrCanvasNonMusrDataSet &dataSet)
 {
   if (dataSet.data) {
     delete dataSet.data;
@@ -793,4 +921,79 @@ void PMusrCanvas::HandleDataSet(unsigned int runNo, PRunData *data)
   dataSet.theory = theoHisto;
 
   fData.push_back(dataSet);
+}
+
+//--------------------------------------------------------------------------
+// HandleNonMusrDataSet
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param runNo
+ * \param data
+ */
+void PMusrCanvas::HandleNonMusrDataSet(unsigned int runNo, PRunData *data)
+{
+  PMusrCanvasNonMusrDataSet dataSet;
+  TGraphErrors *dataHisto;
+  TGraphErrors *theoHisto;
+
+  InitDataSet(dataSet);
+
+  // dataHisto -------------------------------------------------------------
+
+  // invoke graph
+  dataHisto = new TGraphErrors(data->fX.size());
+
+  // fill graph
+  for (unsigned int i=0; i<data->fX.size(); i++) {
+    dataHisto->SetPoint(i, data->fX[i], data->fValue[i]);
+    dataHisto->SetPointError(i, 0.0, data->fError[i]);
+  }
+
+  // set marker and line color
+  if (runNo < fColorList.size()) {
+    dataHisto->SetMarkerColor(fColorList[runNo]);
+    dataHisto->SetLineColor(fColorList[runNo]);
+  } else {
+    TRandom rand(runNo);
+    Int_t color = TColor::GetColor((Int_t)rand.Integer(255), (Int_t)rand.Integer(255), (Int_t)rand.Integer(255));
+    dataHisto->SetMarkerColor(color);
+    dataHisto->SetLineColor(color);
+  }
+  // set marker size
+  dataHisto->SetMarkerSize(1);
+  // set marker type
+  if (runNo < fMarkerList.size()) {
+    dataHisto->SetMarkerStyle(fMarkerList[runNo]);
+  } else {
+    TRandom rand(runNo);
+    dataHisto->SetMarkerStyle(20+(Int_t)rand.Integer(10));
+  }
+
+  // theoHisto -------------------------------------------------------------
+
+  // invoke graph
+  theoHisto = new TGraphErrors(data->fXTheory.size());
+
+  // fill graph
+  for (unsigned int i=0; i<data->fXTheory.size(); i++) {
+    theoHisto->SetPoint(i, data->fXTheory[i], data->fTheory[i]);
+    theoHisto->SetPointError(i, 0.0, 0.0);
+  }
+
+  // set the line color
+  if (runNo < fColorList.size()) {
+    theoHisto->SetLineColor(fColorList[runNo]);
+  } else {
+    TRandom rand(runNo);
+    Int_t color = TColor::GetColor((Int_t)rand.Integer(255), (Int_t)rand.Integer(255), (Int_t)rand.Integer(255));
+    theoHisto->SetLineColor(color);
+  }
+
+  // fill handler list -----------------------------------------------------
+  dataSet.data   = dataHisto;
+  dataSet.theory = theoHisto;
+
+  fNonMusrData.push_back(dataSet);
 }

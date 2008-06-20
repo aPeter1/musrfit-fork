@@ -837,8 +837,6 @@ bool PRunDataHandler::ReadAsciiFile()
 {
   bool success = true;
 
-  cout << endl << "PRunDataHandler::ReadAsciiFile(): Sorry, not yet implemented ...";
-
   // open file
   ifstream f;
 

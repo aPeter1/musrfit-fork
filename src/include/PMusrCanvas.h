@@ -40,6 +40,7 @@
 #include <TLegend.h>
 #include <TPad.h>
 #include <TH1F.h>
+#include <TGraphErrors.h>
 
 #include "PMusr.h"
 #ifndef __MAKECINT__
@@ -78,6 +79,34 @@ typedef struct {
  * <p>
  */
 typedef vector<PMusrCanvasDataSet> PMusrCanvasDataList;
+
+//------------------------------------------------------------------------
+/**
+ * <p>
+ */
+typedef struct {
+  TGraphErrors *data;
+  TGraphErrors *dataFourierRe;
+  TGraphErrors *dataFourierIm;
+  TGraphErrors *dataFourierPwr;
+  TGraphErrors *dataFourierPhase;
+  TGraphErrors *theory;
+  TGraphErrors *theoryFourierRe;
+  TGraphErrors *theoryFourierIm;
+  TGraphErrors *theoryFourierPwr;
+  TGraphErrors *theoryFourierPhase;
+  TGraphErrors *diff;
+  TGraphErrors *diffFourierRe;
+  TGraphErrors *diffFourierIm;
+  TGraphErrors *diffFourierPwr;
+  TGraphErrors *diffFourierPhase;
+} PMusrCanvasNonMusrDataSet;
+
+//------------------------------------------------------------------------
+/**
+ * <p>
+ */
+typedef vector<PMusrCanvasNonMusrDataSet> PMusrCanvasNonMusrDataList;
 
 //--------------------------------------------------------------------------
 /**
@@ -127,6 +156,7 @@ class PMusrCanvas : public TObject, public TQObject
 #endif // __MAKECINT__
 
     PMusrCanvasDataList fData;
+    PMusrCanvasNonMusrDataList fNonMusrData;
 
     PIntVector fMarkerList;
     PIntVector fColorList;
@@ -134,8 +164,11 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void CreateStyle();
     virtual void InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh);
     virtual void InitDataSet(PMusrCanvasDataSet &dataSet);
+    virtual void InitDataSet(PMusrCanvasNonMusrDataSet &dataSet);
     virtual void CleanupDataSet(PMusrCanvasDataSet &dataSet);
+    virtual void CleanupDataSet(PMusrCanvasNonMusrDataSet &dataSet);
     virtual void HandleDataSet(unsigned int runNo, PRunData *data);
+    virtual void HandleNonMusrDataSet(unsigned int runNo, PRunData *data);
 
   ClassDef(PMusrCanvas, 1)
 };

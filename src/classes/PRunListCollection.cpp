@@ -318,7 +318,6 @@ PRunData* PRunListCollection::GetSingleHisto(unsigned int index, EDataSwitch tag
       }
       break;
     default: // error
-      return 0;
       break;
   }
 
@@ -357,7 +356,6 @@ PRunData* PRunListCollection::GetAsymmetry(unsigned int index, EDataSwitch tag)
       }
       break;
     default: // error
-      return 0;
       break;
   }
 
@@ -387,11 +385,10 @@ PRunData* PRunListCollection::GetRRF(unsigned int index, EDataSwitch tag)
     case kRunNo:
       break;
     default: // error
-      return 0;
       break;
   }
 
-  return 0;
+  return data;
 }
 
 //--------------------------------------------------------------------------
@@ -415,13 +412,18 @@ PRunData* PRunListCollection::GetNonMusr(unsigned int index, EDataSwitch tag)
       }
       break;
     case kRunNo:
+      for (unsigned int i=0; i<fRunNonMusrList.size(); i++) {
+        if (fRunNonMusrList[i]->GetRunNo() == index) {
+          data = fRunNonMusrList[i]->GetData();
+          break;
+        }
+      }
       break;
     default: // error
-      return 0;
       break;
   }
 
-  return 0;
+  return data;
 }
 
 //--------------------------------------------------------------------------
