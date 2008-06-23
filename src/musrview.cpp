@@ -38,6 +38,7 @@ using namespace std;
 
 #include <TApplication.h>
 #include <TSAXParser.h>
+#include <TROOT.h>
 
 #include "PMusr.h"
 #include "PStartupHandler.h"
@@ -264,9 +265,16 @@ cout << endl;
 
     // clean up
 cout << endl << "clean up canvas vector ...";
+    char canvasName[32];
     for (unsigned int i=0; i<canvasVector.size(); i++) {
       // check if canvas is still there before calling the destructor **TO BE DONE**
-      canvasVector[i]->~PMusrCanvas();
+      sprintf(canvasName, "fMainCanvas%d", i);
+cout << endl << ">> canvasName=" << canvasName;
+      if (gROOT->GetListOfCanvases()->FindObject(canvasName) != 0) {
+cout << endl << ">> canvasName=" << canvasName << ", found ...";
+cout << endl;
+        canvasVector[i]->~PMusrCanvas();
+      }
     }
     canvasVector.empty();
   }

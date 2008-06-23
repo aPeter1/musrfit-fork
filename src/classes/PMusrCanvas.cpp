@@ -95,7 +95,7 @@ PMusrCanvas::PMusrCanvas(const int number, const char* title,
  */
 PMusrCanvas::~PMusrCanvas()
 {
-cout << "~PMusrCanvas() called" << endl;
+cout << "~PMusrCanvas() called. fMainCanvas name=" << fMainCanvas->GetName() << endl;
   // cleanup
   if (fStyle) {
     delete fStyle;
@@ -332,7 +332,7 @@ void PMusrCanvas::UpdateParamTheoryPad()
     if (param[i].fPosErrorPresent) { // minos was used
       // calculate the arithmetic average of the pos. and neg. error
       double err;
-      err = param[i].fPosError + param[i].fStep / 2.0;
+      err = (param[i].fPosError - param[i].fStep) / 2.0;
       // check if the pos. and neg. error within 10%
       if ((fabs(fabs(param[i].fStep) - param[i].fPosError) < 0.1*fabs(param[i].fStep)) &&
           (fabs(fabs(param[i].fStep) - param[i].fPosError) < 0.1*param[i].fPosError)) {
