@@ -394,6 +394,10 @@ void PMusrCanvas::UpdateParamTheoryPad()
  */
 void PMusrCanvas::UpdateDataTheoryPad()
 {
+  // NonMusr axis titles
+  TString xAxisTitle;
+  TString yAxisTitle;
+
   // some checks first
   unsigned int runNo;
   PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
@@ -415,6 +419,11 @@ cout << endl;
       cout << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** plottype = " << plotInfo.fPlotType << ", fittype = " << runs[runNo].fFitType << ", however they have to correspond!";
       cout << endl;
       return;
+    }
+    // check if NonMusr type plot and if yes get x- and y-axis title
+    if (plotInfo.fPlotType == MSR_PLOT_NO_MUSR) {
+      xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName);
+      yAxisTitle = fRunList->GetYAxisTitle(runs[runNo].fRunName);
     }
   }
 
@@ -498,6 +507,28 @@ cout << endl;
       if ((ymin != -999.0) && (ymax != -999.0)) {
         fData[0].data->GetYaxis()->SetRangeUser(ymin, ymax);
       }
+      // set x-axis label
+      fData[0].data->GetXaxis()->SetTitle("time (#mus)");
+      // set y-axis label
+      TString yAxisTitle;
+      PMsrRunList *runList = fMsrHandler->GetMsrRunList();
+      switch (plotInfo.fPlotType) {
+        case MSR_PLOT_SINGLE_HISTO:
+          if (runList->at(0).fLifetimeCorrection) { // lifetime correction
+            yAxisTitle = "asymmetry";
+          } else { // no liftime correction
+            yAxisTitle = "N(t) per bin";
+          }
+          break;
+        case MSR_PLOT_ASYM:
+        case MSR_PLOT_ASYM_RRF:
+          yAxisTitle = "asymmetry";
+          break;
+        default:
+          yAxisTitle = "??";
+          break;
+      }
+      fData[0].data->GetYaxis()->SetTitle(yAxisTitle.Data());
       // plot all remaining data
       for (unsigned int i=1; i<fData.size(); i++) {
         fData[i].data->Draw("pesame");
@@ -520,6 +551,10 @@ cout << endl;
       if ((ymin != -999.0) && (ymax != -999.0)) {
         fNonMusrData[0].data->GetYaxis()->SetRangeUser(ymin, ymax);
       }
+      // set x-axis label
+      fNonMusrData[0].data->GetXaxis()->SetTitle(xAxisTitle.Data());
+      // set y-axis label
+      fNonMusrData[0].data->GetYaxis()->SetTitle(yAxisTitle.Data());
       // plot all remaining data
       for (unsigned int i=1; i<fNonMusrData.size(); i++) {
         fNonMusrData[i].data->Draw("psame");

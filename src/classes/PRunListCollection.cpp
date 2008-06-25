@@ -478,3 +478,29 @@ const char* PRunListCollection::GetSetup(TString &runName)
   return fData->GetRunData(runName)->fSetup.Data();
 }
 
+//--------------------------------------------------------------------------
+// GetXAxisTitle
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param runName
+ */
+const char* PRunListCollection::GetXAxisTitle(TString &runName)
+{
+  return fData->GetRunData(runName)->fXAxisTitle.Data();
+}
+
+//--------------------------------------------------------------------------
+// GetYAxisTitle
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param runName
+ */
+const char* PRunListCollection::GetYAxisTitle(TString &runName)
+{
+  return fData->GetRunData(runName)->fYAxisTitle.Data();
+}
+

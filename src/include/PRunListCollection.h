@@ -79,6 +79,8 @@ class PRunListCollection
     virtual double GetField(TString &runName);
     virtual double GetEnergy(TString &runName);
     virtual const char* GetSetup(TString &runName);
+    virtual const char* GetXAxisTitle(TString &runName);
+    virtual const char* GetYAxisTitle(TString &runName);
 
   private:
     PMsrHandler *fMsrInfo;  ///< keeps all msr file info

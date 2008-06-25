@@ -816,6 +816,8 @@ bool PRunDataHandler::ReadMudFile()
  *
  * HEADER
  * TITLE:  title
+ * X-AXIS-TITLE: x-axis title
+ * Y-AXIS-TITLE: y-axis title
  * SETUP:  setup
  * FIELD:  field
  * TEMP:   temperature
@@ -849,6 +851,10 @@ bool PRunDataHandler::ReadAsciiFile()
   }
 
   PRawRunData runData;
+
+  // init some stuff
+  runData.fXAxisTitle = "??";
+  runData.fYAxisTitle = "??";
 
   runData.fRunName = fRunName; // keep the run name
 
@@ -904,6 +910,10 @@ bool PRunDataHandler::ReadAsciiFile()
           break;
         }
         runData.fField = workStr.Atof();
+      } else if (workStr.BeginsWith("x-axis-title:", TString::kIgnoreCase)) {
+        runData.fXAxisTitle = TString(workStr.Data()+workStr.First(":")+2);
+      } else if (workStr.BeginsWith("y-axis-title:", TString::kIgnoreCase)) {
+        runData.fYAxisTitle = TString(workStr.Data()+workStr.First(":")+2);
       } else if (workStr.BeginsWith("temp:", TString::kIgnoreCase)) {
         workStr = TString(workStr.Data()+workStr.First(":")+2);
         if (!workStr.IsFloat()) {

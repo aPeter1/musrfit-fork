@@ -147,6 +147,8 @@ typedef struct {
 typedef struct {
   TString fRunName;               ///< name of the run
   TString fRunTitle;              ///< run title
+  TString fXAxisTitle;            ///< x-axis title for noMusr view
+  TString fYAxisTitle;            ///< x-axis title for noMusr view
   TString fSetup;                 ///< description of the setup of this run
   double fField;                  ///< magnetic field value
   double fTemp;                   ///< temperature during the run
