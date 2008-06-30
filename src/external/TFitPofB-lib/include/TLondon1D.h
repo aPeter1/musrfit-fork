@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/06/06
+  2008/06/30
 
 ***************************************************************************/
 
@@ -14,6 +14,30 @@
 
 #include "PUserFcnBase.h"
 #include "TPofTCalc.h"
+
+class TLondon1DHS : public PUserFcnBase {
+
+public:
+  // default conctructor
+  TLondon1DHS();
+  ~TLondon1DHS();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  mutable vector<double> fPar;
+  TTrimSPData *fImpProfile;
+  TPofTCalc *fPofT;
+  mutable bool fCalcNeeded;
+  mutable bool fFirstCall;
+  mutable vector<double> fParForPofT;
+  mutable vector<double> fParForBofZ;
+  mutable vector<double> fParForPofB;
+  string fWisdom;
+  unsigned int fNSteps;
+
+  ClassDef(TLondon1DHS,1)
+};
 
 class TLondon1D1L : public PUserFcnBase {
 

@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/06/03
+  2008/06/30
 
 ***************************************************************************/
 
@@ -42,6 +42,18 @@ protected:
   vector<double> fZ;
   vector<double> fBZ;
   double fDZ;
+};
+
+//--------------------
+// Class "for Meissner screening" in a superconducting half-space
+//--------------------
+
+class TLondon1D_HS : public TBofZCalc {
+
+public:
+
+  TLondon1D_HS(unsigned int, const vector<double>& );
+
 };
 
 //--------------------

@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/06/03
+  2008/06/30
 
 ***************************************************************************/
 
@@ -58,6 +58,26 @@ double TBofZCalc::GetBofZ(double zz) const {
   }
 
   return fBZ[i-1]+(fBZ[i]-fBZ[i-1])*(zz-fZ[i-1])/(fZ[i]-fZ[i-1]);
+
+}
+
+//------------------
+// Constructor of the TLondon1D_1L class
+// 1D-London screening in a superconducting half-space
+// Parameters: Bext[G], deadlayer[nm], lambda[nm] 
+//------------------
+
+TLondon1D_HS::TLondon1D_HS(unsigned int steps, const vector<double> &param) {
+
+  fDZ = 200.0/double(steps);
+  double ZZ, BBz;
+
+  for (unsigned int j(0); j<steps; j++) {
+    ZZ = param[1] + (double)j*fDZ;
+    fZ.push_back(ZZ);
+    BBz = param[0]*exp(-(ZZ-param[1])/param[2]);
+    fBZ.push_back(BBz);
+  }
 
 }
 

@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/29
+  2008/06/30
 
 ***************************************************************************/
 
@@ -16,6 +16,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+#pragma link C++ class TLondon1DHS+;
 #pragma link C++ class TLondon1D1L+;
 #pragma link C++ class TLondon1D2L+;
 #pragma link C++ class TLondon1D3L+;
