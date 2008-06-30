@@ -240,6 +240,9 @@ cout << endl;
         ok = false;
         break;
       }
+      // connect signal/slot
+      TQObject::Connect("TCanvas", "Closed()", "PMusrCanvas", musrCanvas, "LastCanvasClosed()");
+
       // ugly but rootcint cannot handle the spirit-parser framework
       musrCanvas->SetMsrHandler(msrHandler);
       musrCanvas->SetRunListCollection(runListCollection);
@@ -269,11 +272,14 @@ cout << endl << "clean up canvas vector ...";
     for (unsigned int i=0; i<canvasVector.size(); i++) {
       // check if canvas is still there before calling the destructor **TO BE DONE**
       sprintf(canvasName, "fMainCanvas%d", i);
-cout << endl << ">> canvasName=" << canvasName;
+cout << endl << ">> canvasName=" << canvasName << ", canvasVector[" << i << "]=" << canvasVector[i];
       if (gROOT->GetListOfCanvases()->FindObject(canvasName) != 0) {
 cout << endl << ">> canvasName=" << canvasName << ", found ...";
 cout << endl;
         canvasVector[i]->~PMusrCanvas();
+      } else {
+cout << endl << ">> canvasName=" << canvasName << ", NOT found ...";
+cout << endl;
       }
     }
     canvasVector.empty();

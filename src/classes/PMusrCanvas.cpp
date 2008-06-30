@@ -34,6 +34,7 @@ using namespace std;
 
 #include <TColor.h>
 #include <TRandom.h>
+#include <TROOT.h>
 
 #include "PMusrCanvas.h"
 
@@ -274,9 +275,30 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   TString str((Char_t)x);
   if (x == 'q') {
     Done(0);
+  } else if (x == 'd') {
+    cout << endl << ">> will show the difference between the theory and the signal, to be implemented yet. fMainCanvas name = " << fMainCanvas->GetName() << endl;
+  } else if (x == 'f') {
+    cout << endl << ">> will show the Fourier transform, to be implemented yet." << endl;
+  } else if (x == 'S') {
+    cout << endl << ">> will save the shown data into a file, to be implemented yet." << endl;
   } else {
     // do all the necessary stuff **TO BE DONE**
     fMainCanvas->Update();
+  }
+}
+
+//--------------------------------------------------------------------------
+// LastCanvasClosed (SLOT)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrCanvas::LastCanvasClosed()
+{
+//  cout << endl << ">> in last canvas closed check ...";
+  if (gROOT->GetListOfCanvases()->IsEmpty()) {
+    Done(0);
   }
 }
 

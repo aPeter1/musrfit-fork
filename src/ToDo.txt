@@ -79,9 +79,6 @@ intermediate term:
   describe new features with examples!
 * introduce error numbers with corresponding docu/explanation in the latex-docu.  
 * implement RRF stuff
-* think about if it is worth to modify wkm in order to read
-  the new msr-files, so that wkmview can be used for an intermediate
-  time.
 
 ---------------------
 long term:
@@ -90,7 +87,7 @@ long term:
 * implement ROOT based wkmview, i.e. all the graphical stuff needed
   including event handler, etc.
 * implement FFT with msr-interface
-* switch from qmake to cmake
+* switch from make to cmake
 
 ---------------------
 bugs:
