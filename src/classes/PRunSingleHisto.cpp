@@ -431,19 +431,28 @@ bool PRunSingleHisto::PrepareFitData()
   fData.fDataTimeStart = fTimeResolution*(((double)start-t0)+(double)fRunInfo->fPacking/2.0);
   fData.fDataTimeStep  = fTimeResolution*fRunInfo->fPacking;
   for (unsigned i=start; i<end; i++) {
-    if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
-      // in order that after rebinning the fit does not need to be redone (important for plots)
-      // the value is normalize to per bin
-      value /= fRunInfo->fPacking;
+    if (fRunInfo->fPacking == 1) {
+      value = runData->fDataBin[histoNo][i];
       fData.fValue.push_back(value);
       if (value == 0.0)
         fData.fError.push_back(1.0);
       else
-        fData.fError.push_back(TMath::Sqrt(value/fRunInfo->fPacking));
-      // reset values
-      value = 0.0;
+        fData.fError.push_back(TMath::Sqrt(value));
+    } else { // packed data, i.e. fRunInfo->fPacking > 1
+      if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
+        // in order that after rebinning the fit does not need to be redone (important for plots)
+        // the value is normalize to per bin
+        value /= fRunInfo->fPacking;
+        fData.fValue.push_back(value);
+        if (value == 0.0)
+          fData.fError.push_back(1.0);
+        else
+          fData.fError.push_back(TMath::Sqrt(value/fRunInfo->fPacking));
+        // reset values
+        value = 0.0;
+      }
+      value += runData->fDataBin[histoNo][i];
     }
-    value += runData->fDataBin[histoNo][i];
   }
 
   // count the number of bins to be fitted

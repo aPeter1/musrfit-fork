@@ -69,6 +69,10 @@ short term:
 
 * implement NonMuSR stuff **DONE** 08-06-20, some more testing needed
 
+* Minuit2: name length is now unlimited and hence the 10 char restriction can be lifted.
+
+* nonMusr: check why in nonMusr view there is NO legend??
+
 * implement FFT with msr-interface
 
 ---------------------

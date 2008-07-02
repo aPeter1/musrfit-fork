@@ -564,37 +564,47 @@ bool PRunAsymmetry::PrepareFitData(PRawRunData* runData, unsigned int histoNo[2]
   double error = 0.0;
   // forward
   for (unsigned i=start[0]; i<end[0]; i++) {
-    if (((i-start[0]) % fRunInfo->fPacking == 0) && (i != start[0])) { // fill data
-      // in order that after rebinning the fit does not need to be redone (important for plots)
-      // the value is normalize to per bin
-      value /= fRunInfo->fPacking;
-      forwardPacked.fValue.push_back(value);
-      if (value == 0.0)
-        forwardPacked.fError.push_back(1.0);
-      else
-        forwardPacked.fError.push_back(TMath::Sqrt(error)/fRunInfo->fPacking);
-      value = 0.0;
-      error = 0.0;
+    if (fRunInfo->fPacking == 1) {
+      forwardPacked.fValue.push_back(fForward[i]);
+      forwardPacked.fError.push_back(fForwardErr[i]);
+    } else { // packed data, i.e. fRunInfo->fPacking > 1
+      if (((i-start[0]) % fRunInfo->fPacking == 0) && (i != start[0])) { // fill data
+        // in order that after rebinning the fit does not need to be redone (important for plots)
+        // the value is normalize to per bin
+        value /= fRunInfo->fPacking;
+        forwardPacked.fValue.push_back(value);
+        if (value == 0.0)
+          forwardPacked.fError.push_back(1.0);
+        else
+          forwardPacked.fError.push_back(TMath::Sqrt(error)/fRunInfo->fPacking);
+        value = 0.0;
+        error = 0.0;
+      }
+      value += fForward[i];
+      error += fForwardErr[i]*fForwardErr[i];
     }
-    value += fForward[i];
-    error += fForwardErr[i]*fForwardErr[i];
   }
   // backward
   for (unsigned i=start[1]; i<end[1]; i++) {
-    if (((i-start[1]) % fRunInfo->fPacking == 0) && (i != start[1])) { // fill data
-      // in order that after rebinning the fit does not need to be redone (important for plots)
-      // the value is normalize to per bin
-      value /= fRunInfo->fPacking;
-      backwardPacked.fValue.push_back(value);
-      if (value == 0.0)
-        backwardPacked.fError.push_back(1.0);
-      else
-        backwardPacked.fError.push_back(TMath::Sqrt(error)/fRunInfo->fPacking);
-      value = 0.0;
-      error = 0.0;
+    if (fRunInfo->fPacking == 1) {
+      backwardPacked.fValue.push_back(fBackward[i]);
+      backwardPacked.fError.push_back(fBackwardErr[i]);
+    } else { // packed data, i.e. fRunInfo->fPacking > 1
+      if (((i-start[1]) % fRunInfo->fPacking == 0) && (i != start[1])) { // fill data
+        // in order that after rebinning the fit does not need to be redone (important for plots)
+        // the value is normalize to per bin
+        value /= fRunInfo->fPacking;
+        backwardPacked.fValue.push_back(value);
+        if (value == 0.0)
+          backwardPacked.fError.push_back(1.0);
+        else
+          backwardPacked.fError.push_back(TMath::Sqrt(error)/fRunInfo->fPacking);
+        value = 0.0;
+        error = 0.0;
+      }
+      value += fBackward[i];
+      error += fBackwardErr[i]*fBackwardErr[i];
     }
-    value += fBackward[i];
-    error += fBackwardErr[i]*fBackwardErr[i];
   }
 
   // check if packed forward and backward hist have the same size, otherwise something is wrong

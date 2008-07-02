@@ -522,7 +522,7 @@ int PMsrHandler::WriteMsrLogFile()
     // background
     if (fRuns[i].fBkgRange[0] != -1) {
       f.width(16);
-      f << endl << "background";
+      f << endl << left << "background";
       for (unsigned int j=0; j<4; j++) {
         if (fRuns[i].fBkgRange[j] == -1)
           break;
@@ -534,7 +534,7 @@ int PMsrHandler::WriteMsrLogFile()
     // data
     if (fRuns[i].fDataRange[0] != -1) {
       f.width(16);
-      f << endl << "data";
+      f << endl << left << "data";
       for (unsigned int j=0; j<4; j++) {
         if (fRuns[i].fDataRange[j] == -1)
           break;
@@ -546,7 +546,7 @@ int PMsrHandler::WriteMsrLogFile()
     // t0
     if (fRuns[i].fT0[0] != -1) {
       f.width(16);
-      f << endl << "t0";
+      f << endl << left << "t0";
       for (unsigned int j=0; j<2; j++) {
         if (fRuns[i].fT0[j] == -1)
           break;
@@ -558,7 +558,7 @@ int PMsrHandler::WriteMsrLogFile()
     // fit
     if (fRuns[i].fFitRange[0] != -1) {
       f.width(16);
-      f << endl << "fit";
+      f << endl << left << "fit";
       for (unsigned int j=0; j<2; j++) {
         if (fRuns[i].fFitRange[j] == -1)
           break;

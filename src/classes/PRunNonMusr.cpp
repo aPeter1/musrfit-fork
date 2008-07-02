@@ -186,17 +186,23 @@ bool PRunNonMusr::PrepareFitData()
 cout << endl << ">> runData->fXData.size()=" << runData->fXData.size();
   for (unsigned int i=0; i<runData->fXData.size(); i++) {
 cout << endl << ">> i=" << i << ", packing=" << fRunInfo->fPacking;
-    if ((i % fRunInfo->fPacking == 0) && (i != 0)) { // fill data
+    if (fRunInfo->fPacking == 1) {
+      fData.fX.push_back(runData->fXData[i]);
+      fData.fValue.push_back(runData->fYData[i]);
+      fData.fError.push_back(runData->fErrYData[i]);
+    } else { // packed data, i.e. fRunInfo->fPacking > 1
+      if ((i % fRunInfo->fPacking == 0) && (i != 0)) { // fill data
 cout << endl << "-> i=" << i;
-      fData.fX.push_back(runData->fXData[i]-(runData->fXData[i]-runData->fXData[i-fRunInfo->fPacking])/2.0);
-      fData.fValue.push_back(value);
-      fData.fError.push_back(TMath::Sqrt(err));
-      value = 0.0;
-      err = 0.0;
+        fData.fX.push_back(runData->fXData[i]-(runData->fXData[i]-runData->fXData[i-fRunInfo->fPacking])/2.0);
+        fData.fValue.push_back(value);
+        fData.fError.push_back(TMath::Sqrt(err));
+        value = 0.0;
+        err = 0.0;
+      }
+      // sum raw data values
+      value += runData->fYData[i];
+      err += runData->fErrYData[i]*runData->fErrYData[i];
     }
-    // sum raw data values
-    value += runData->fYData[i];
-    err += runData->fErrYData[i]*runData->fErrYData[i];
   }
 cout << endl << ">> fData.fValue.size()=" << fData.fValue.size();
 
@@ -238,17 +244,23 @@ bool PRunNonMusr::PrepareViewData()
 cout << endl << ">> runData->fXData.size()=" << runData->fXData.size();
   for (unsigned int i=0; i<runData->fXData.size(); i++) {
 cout << endl << ">> i=" << i << ", packing=" << fRunInfo->fPacking;
-    if ((i % fRunInfo->fPacking == 0) && (i != 0)) { // fill data
+    if (fRunInfo->fPacking == 1) {
+      fData.fX.push_back(runData->fXData[i]);
+      fData.fValue.push_back(runData->fYData[i]);
+      fData.fError.push_back(runData->fErrYData[i]);
+    } else { // packed data, i.e. fRunInfo->fPacking > 1
+      if ((i % fRunInfo->fPacking == 0) && (i != 0)) { // fill data
 cout << endl << "-> i=" << i;
-      fData.fX.push_back(runData->fXData[i]-(runData->fXData[i]-runData->fXData[i-fRunInfo->fPacking])/2.0);
-      fData.fValue.push_back(value);
-      fData.fError.push_back(TMath::Sqrt(err));
-      value = 0.0;
-      err = 0.0;
+        fData.fX.push_back(runData->fXData[i]-(runData->fXData[i]-runData->fXData[i-fRunInfo->fPacking])/2.0);
+        fData.fValue.push_back(value);
+        fData.fError.push_back(TMath::Sqrt(err));
+        value = 0.0;
+        err = 0.0;
+      }
+      // sum raw data values
+      value += runData->fYData[i];
+      err += runData->fErrYData[i]*runData->fErrYData[i];
     }
-    // sum raw data values
-    value += runData->fYData[i];
-    err += runData->fErrYData[i]*runData->fErrYData[i];
   }
 cout << endl << ">> fData.fValue.size()=" << fData.fValue.size();
 
