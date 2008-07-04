@@ -1384,26 +1384,23 @@ double PTheory::SkewedGauss(register double t, const PDoubleVector& paramValues,
     tt = t-val[4];
 
   // val[2] = sigma-, val[3] = sigma+
-  double zp = val[3]*tt/SQRT_TWO; // sigma+
-  double zm = val[2]*tt/SQRT_TWO; // sigma-
+  double zp = fabs(val[3])*tt/SQRT_TWO; // sigma+
+  double zm = fabs(val[2])*tt/SQRT_TWO; // sigma-
   double gp = TMath::Exp(-0.5*TMath::Power(tt*val[3], 2.0)); // gauss sigma+
   double gm = TMath::Exp(-0.5*TMath::Power(tt*val[2], 2.0)); // gauss sigma-
-  double wp = val[3]/(val[2]+val[3]); // sigma+ / (sigma+ + sigma-)
+  double wp = fabs(val[3])/(fabs(val[2])+fabs(val[3])); // sigma+ / (sigma+ + sigma-)
   double wm = 1.0-wp;
   double phase = DEG_TO_RAD*val[0];
   double freq  = TWO_PI*val[1];
 
   if ((zp >= 25.0) || (zm >= 25.0)) // needed to prevent crash of 1F1
     skg = 2.0e300;
-  else if (val[2] == val[3]) // sigma+ == sigma- -> Gaussian
-    skg = TMath::Cos(phase+freq*t) * gp;
+  else if (fabs(val[2]) == fabs(val[3])) // sigma+ == sigma- -> Gaussian
+    skg = TMath::Cos(phase+freq*tt) * gp;
   else
-//     skg = TMath::Cos(phase+freq*t) * (wm*gm + wp*gp) +
-//           TMath::Sin(phase+freq*t) * (wm*gm*2.0*zm/SQRT_PI*gsl_sf_hyperg_1F1(0.5,1.5,zm*zm) -
-//                                       wp*gp*2.0*zp/SQRT_PI*gsl_sf_hyperg_1F1(0.5,1.5,zp*zp));
-    skg = TMath::Cos(phase+freq*t) * (wm*gm + wp*gp) +
-          TMath::Sin(phase+freq*t) * (wm*gm*2.0*zm/SQRT_PI*ROOT::Math::conf_hyperg(0.5,1.5,zm*zm) -
-                                      wp*gp*2.0*zp/SQRT_PI*ROOT::Math::conf_hyperg(0.5,1.5,zp*zp));
+    skg = TMath::Cos(phase+freq*tt) * (wm*gm + wp*gp) +
+          TMath::Sin(phase+freq*tt) * (wm*gm*2.0*zm/SQRT_PI*ROOT::Math::conf_hyperg(0.5,1.5,zm*zm) -
+                                       wp*gp*2.0*zp/SQRT_PI*ROOT::Math::conf_hyperg(0.5,1.5,zp*zp));
 
   return skg;
 }
