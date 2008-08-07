@@ -68,6 +68,7 @@ class PRunDataHandler
     virtual bool ReadPsiBinFile();
     virtual bool ReadMudFile();
     virtual bool ReadAsciiFile();
+    virtual bool ReadDBFile();
 
     virtual bool StripWhitespace(TString &str);
     virtual bool IsWhitespace(const char *str);

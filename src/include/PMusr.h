@@ -145,20 +145,29 @@ typedef struct {
  * <p>
  */
 typedef struct {
-  TString fRunName;               ///< name of the run
-  TString fRunTitle;              ///< run title
-  TString fXAxisTitle;            ///< x-axis title for noMusr view
-  TString fYAxisTitle;            ///< x-axis title for noMusr view
-  TString fSetup;                 ///< description of the setup of this run
-  double fField;                  ///< magnetic field value
-  double fTemp;                   ///< temperature during the run
-  double fEnergy;                 ///< implantation energy of the muon
-  double fTimeResolution;         ///< time resolution of the run
-  PDoubleVector fT0s;             ///< vector of t0's of a run
-  vector<PDoubleVector> fDataBin; ///< vector of all histos of a run
-  PDoubleVector fXData;           ///< vector of all x-data if noMuSR fit
-  PDoubleVector fYData;           ///< vector of all x-data if noMuSR fit
-  PDoubleVector fErrYData;        ///< vector of all x-data if noMuSR fit
+  int fXIndex;                    ///< index for the x-data vector
+  int fYIndex;                    ///< index for the y-data vector
+  PStringVector fLabels;          ///< vector of all labels (used for x-, y-axis title in view)
+  PStringVector fDataTags;        ///< vector of all data tags
+  vector<PDoubleVector> fData;    ///< vector of all data
+  vector<PDoubleVector> fErrData; ///< vector of all data errors
+} PNonMusrRawRunData;
+
+//-------------------------------------------------------------
+/**
+ * <p>
+ */
+typedef struct {
+  TString fRunName;                ///< name of the run
+  TString fRunTitle;               ///< run title
+  TString fSetup;                  ///< description of the setup of this run
+  double fField;                   ///< magnetic field value
+  double fTemp;                    ///< temperature during the run
+  double fEnergy;                  ///< implantation energy of the muon
+  double fTimeResolution;          ///< time resolution of the run
+  PDoubleVector fT0s;              ///< vector of t0's of a run
+  vector<PDoubleVector> fDataBin;  ///< vector of all histos of a run
+  PNonMusrRawRunData fDataNonMusr; ///< keeps all ascii- or db-file info in case of nonMusr fit
 } PRawRunData;
 
 //-------------------------------------------------------------
@@ -210,33 +219,35 @@ typedef vector<PMsrParamStructure> PMsrParamList;
  *
  */
 typedef struct {
-  TString fRunName;     ///< name of the run file
-  TString fBeamline;    ///< e.g. mue4, mue1, pim3, emu, m15, ... (former: run type)
-  TString fInstitute;   ///< e.g. psi, ral, triumf (former: run format)
-  TString fFileFormat;  ///< e.g. root, nexus, psi-bin, mud
-  int fFitType;         ///< fit type: 0=single histo fit, 2=asymmetry fit, 4=asymmetry in RRF, 8=non muSR
-  int fAlphaParamNo;    ///< alpha
-  int fBetaParamNo;     ///<
-  int fNormParamNo;     ///<
-  int fBkgFitParamNo;   ///<
-  int fPhaseParamNo;    ///<
-  int fLifetimeParamNo; ///<
+  TString fRunName;       ///< name of the run file
+  TString fBeamline;       ///< e.g. mue4, mue1, pim3, emu, m15, ... (former: run type)
+  TString fInstitute;      ///< e.g. psi, ral, triumf (former: run format)
+  TString fFileFormat;     ///< e.g. root, nexus, psi-bin, mud, ascii, db
+  int fFitType;            ///< fit type: 0=single histo fit, 2=asymmetry fit, 4=asymmetry in RRF, 8=non muSR
+  int fAlphaParamNo;       ///< alpha
+  int fBetaParamNo;        ///<
+  int fNormParamNo;        ///<
+  int fBkgFitParamNo;      ///<
+  int fPhaseParamNo;       ///<
+  int fLifetimeParamNo;    ///<
   bool fLifetimeCorrection; ///<
-  PIntVector fMap;      ///<
-  int fForwardHistoNo;  ///<
-  int fBackwardHistoNo; ///<
-  double fBkgFix[2];    ///<
-  int fBkgRange[4];     ///<
-  int fDataRange[4];    ///<
-  int fT0[2];           ///<
-  double fFitRange[2];  ///<
-  int fPacking;         ///<
-  double fRRFFreq;      ///< rotating reference frequency
-  int fRRFPacking;      ///< rotating reference packing
-  int fAlpha2ParamNo;   ///<
-  int fBeta2ParamNo;    ///<
-  int fRightHistoNo;    ///<
-  int fLeftHistoNo;     ///<
+  PIntVector fMap;         ///<
+  int fForwardHistoNo;     ///<
+  int fBackwardHistoNo;    ///<
+  double fBkgFix[2];       ///<
+  int fBkgRange[4];        ///<
+  int fDataRange[4];       ///<
+  int fT0[2];              ///<
+  double fFitRange[2];     ///<
+  int fPacking;            ///<
+  double fRRFFreq;         ///< rotating reference frequency
+  int fRRFPacking;         ///< rotating reference packing
+  int fAlpha2ParamNo;      ///<
+  int fBeta2ParamNo;       ///<
+  int fRightHistoNo;       ///<
+  int fLeftHistoNo;        ///<
+  int fXYDataIndex[2];     ///< used to get the data indices when using db-files
+  TString fXYDataLabel[2]; ///< used to get the indices via labels when using db-files
 } PMsrRunStructure;
 
 //-------------------------------------------------------------

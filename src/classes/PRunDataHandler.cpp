@@ -174,6 +174,8 @@ bool PRunDataHandler::ReadFile()
       success = ReadNemuFile();
     else if (!run_it->fFileFormat.CompareTo("ascii"))
       success = ReadAsciiFile();
+    else if (!run_it->fFileFormat.CompareTo("db"))
+      success = ReadDBFile();
     else
       success = false;
   }
@@ -235,6 +237,8 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo)
     ext = TString("nemu");
   else if (!runInfo.fFileFormat.CompareTo("ascii"))
     ext = TString("dat");
+  else if (!runInfo.fFileFormat.CompareTo("db"))
+    ext = TString("db");
   else
     success = false;
 
@@ -251,6 +255,7 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo)
     cout << endl << "  MUD      -> triumf mud file format";
     cout << endl << "  NEMU     -> lem ascii file format";
     cout << endl << "  ASCII    -> column like file format";
+    cout << endl << "  DB       -> triumf db file \"format\"";
     cout << endl;
     return success;
   }
@@ -853,8 +858,10 @@ bool PRunDataHandler::ReadAsciiFile()
   PRawRunData runData;
 
   // init some stuff
-  runData.fXAxisTitle = "??";
-  runData.fYAxisTitle = "??";
+  runData.fDataNonMusr.fXIndex = 0;
+  runData.fDataNonMusr.fYIndex = 1;
+  runData.fDataNonMusr.fLabels.push_back("??"); // x default label
+  runData.fDataNonMusr.fLabels.push_back("??"); // y default label
 
   runData.fRunName = fRunName; // keep the run name
 
@@ -864,6 +871,7 @@ bool PRunDataHandler::ReadAsciiFile()
   bool    headerTag = false;
   bool    dataTag = false;
   double  x, y, ey;
+  PDoubleVector xVec, exVec, yVec, eyVec;
 
   while (!f.eof()) {
     f.getline(instr, sizeof(instr));
@@ -876,7 +884,7 @@ bool PRunDataHandler::ReadAsciiFile()
 
     // check if header tag
     workStr = line;
-    workStr.Remove(TString::kLeading, ' '); // remove spaces from the beining
+    workStr.Remove(TString::kLeading, ' '); // remove spaces from the begining
     if (workStr.BeginsWith("header", TString::kIgnoreCase)) {
       headerTag = true;
       dataTag = false;
@@ -911,9 +919,9 @@ bool PRunDataHandler::ReadAsciiFile()
         }
         runData.fField = workStr.Atof();
       } else if (workStr.BeginsWith("x-axis-title:", TString::kIgnoreCase)) {
-        runData.fXAxisTitle = TString(workStr.Data()+workStr.First(":")+2);
+        runData.fDataNonMusr.fLabels[0] = TString(workStr.Data()+workStr.First(":")+2);
       } else if (workStr.BeginsWith("y-axis-title:", TString::kIgnoreCase)) {
-        runData.fYAxisTitle = TString(workStr.Data()+workStr.First(":")+2);
+        runData.fDataNonMusr.fLabels[1] = TString(workStr.Data()+workStr.First(":")+2);
       } else if (workStr.BeginsWith("temp:", TString::kIgnoreCase)) {
         workStr = TString(workStr.Data()+workStr.First(":")+2);
         if (!workStr.IsFloat()) {
@@ -994,9 +1002,12 @@ bool PRunDataHandler::ReadAsciiFile()
       }
 
       // keep values
-      runData.fXData.push_back(x);
-      runData.fYData.push_back(y);
-      runData.fErrYData.push_back(ey);
+      xVec.push_back(x);
+      exVec.push_back(1.0);
+      yVec.push_back(y);
+      eyVec.push_back(ey);
+cout << endl << ">> (x/y/ey) = (" << x << "/" << y << "/" << ey << ")";
+
     } else {
       cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << " neither header nor data line. No idea how to handle it!";
       cout << endl;
@@ -1006,6 +1017,232 @@ bool PRunDataHandler::ReadAsciiFile()
   }
 
   f.close();
+
+  // keep values
+  runData.fDataNonMusr.fData.push_back(xVec);
+  runData.fDataNonMusr.fErrData.push_back(exVec);
+  runData.fDataNonMusr.fData.push_back(yVec);
+  runData.fDataNonMusr.fErrData.push_back(eyVec);
+
+  fData.push_back(runData);
+
+  // clean up
+  xVec.clear();
+  exVec.clear();
+  yVec.clear();
+  eyVec.clear();
+  runData.fDataNonMusr.fData.clear();
+  runData.fDataNonMusr.fErrData.clear();
+
+cout << endl << ">> end of ReadAsciiFile()";
+
+  return success;
+}
+
+//--------------------------------------------------------------------------
+// ReadDBFile
+//--------------------------------------------------------------------------
+/**
+ * <p>Reads triumf db-files. Intended for the nonMuSR data.
+ *
+ * <p>The file format definition is:
+ * The following is a description of the features of the TRIUMF .db file format that are 
+ * currently recognized by musrfit/musrview. The available commands include: title, abstract, 
+ * comments, labels, and data.
+ *
+ * \verbatim
+ * TITLE
+ *  The following line must contain the title.
+ *
+ *
+ * ABSTRACT
+ *  The abstract is read in starting with the following line until an empty line is reached.
+ *
+ * COMMENTS
+ *  The comments are read in starting with the following line until an empty line is reached.
+ *
+ *
+ * LABELS
+ *  One label must occupy each subsequent line until an empty line is reached. The number 
+ *  of labels should preferably match the number of variables in the data.
+ *
+ * DATA
+ *  On the same line as the DATA command, there must appear a comma-delimited list of variable 
+ *  names. These names should be kept short (some applications truncate to 4 characters). The 
+ *  numerical data is read in beginning with the following line until an empty line is reached.
+ *
+ *  In every line, there must appear exactly 3 comma-delimited fields for each specified name. 
+ *  The first field is the value, the second is the positive error, and the third is the negative 
+ *  error. If you leave the last field blank (the comma is still required), then the positive error 
+ *  will be interpreted as a symmetric error. If you include only the value, then the errors will be 
+ *  set to zero.
+ *
+ * To reiterate, if you provide a DATA command with 2 names, e.g. "DATA 1st, 2nd", then every subsequent 
+ * line must contain 2*3 - 1 = 5 commas. If you give 3 names, then there must be 3*3 - 1 = 8 commas.
+ * 
+ * Example 
+ * TITLE
+ *  Most Excellent Fake Data
+ *
+ * ABSTRACT
+ *  This data was collected over
+ *  many minutes of light work
+ *  that was required to make it up.
+ *
+ * COMMENTS
+ *  This data was generated using C++.
+ *  The file was formatted with Emacs.
+ *
+ * LABEL
+ *  Randomized Linear
+ *  Randomized Gaussian
+ *  Randomized Lorentzian
+ *  Run
+ *
+ * DATA line, gauss, lrntz, run
+ * -1.966, -0.168, -0.106,  0.048, 0.002, 0.005,  0.184, 0.010, 0.017, 1001,,, run 1001 title
+ * -1.895, -0.151, -0.128,  0.014, 0.001, 0.001,  0.259, 0.017, 0.015, 1002,,, run 1002 title
+ * -1.836, -0.127, -0.184,  0.013, 0.001, 0.001,  0.202, 0.017, 0.020, 1003,,, run 1003 title
+ * -1.739, -0.064, -0.166,  0.057, 0.003, 0.004,  0.237, 0.016, 0.018, 1004,,, run 1004 title
+ * -1.601, -0.062, -0.147,  0.104, 0.008, 0.006,  0.271, 0.012, 0.025, 1005,,, run 1005 title
+ *  .        .        .          .        .        .          .        .        .
+ *  .        .        .          .        .        .          .        .        .
+ *  .        .        .          .        .        .          .        .        .
+ * Alternatively, the data often utilizes the continuation character ('\') and is labelled like so...
+ * DATA line, gauss, lrntz
+ * linear = -1.966,  -0.168,  -0.106, \
+ * gaussn =  0.048,   0.002,   0.005, \
+ * lorntz =  0.184,   0.010,   0.017, \
+ * 1001,,, run 1001 title
+ * linear = -1.895,  -0.151,  -0.128, \
+ * gaussn =  0.014,   0.001,   0.001, \
+ * lorntz =  0.259,   0.017,   0.015, |
+ * 1002,,, run 1002 title
+ * linear = -1.836,  -0.127,  -0.184, \
+ * gaussn =  0.013,   0.001,   0.001, \
+ * lorntz =  0.202,   0.017,   0.020, |
+ * 1003,,, run 1003 title
+ *   .        .        .        .
+ *   .        .        .        .
+ *   .        .        .        .
+ * If there is a run line as in the above examples, it must be at the end of the data and given
+ * in this just slight odd manner (do not blame me, I haven't invented this format ;-) ).
+ * \endverbatim
+ *
+ * <p>Some db-files do have a '\-e' or '\e' label just between the DATA tag line and the real data.
+ * This tag will just be ignored.
+ */
+bool PRunDataHandler::ReadDBFile()
+{
+  bool success = true;
+
+  cout << endl << "not implemented yet ...";
+
+  // open file
+  ifstream f;
+
+  // open db-file
+  f.open(fRunPathName.Data(), ifstream::in);
+  if (!f.is_open()) {
+    cout << endl << "Couldn't open data file (" << fRunPathName.Data() << ") for reading, sorry ...";
+    cout << endl;
+    return false;
+  }
+
+  PRawRunData runData;
+
+  int     lineNo = 0;
+  int     dbTag = -1;
+  char    instr[512];
+  TString line, workStr;
+  double  x, y, ey;
+  bool firstData = true; // needed as a switch to check in which format the data are given.
+  bool labelledFormat = true; // flag showing if the data are given in row format, or as labelled format (see description above, default is labelled format)
+
+  while (!f.eof()) {
+    // get next line from file
+    f.getline(instr, sizeof(instr));
+    line = TString(instr);
+    lineNo++;
+
+    // check if comment line
+    if (line.BeginsWith("#") || line.BeginsWith("%"))
+      continue;
+
+    // ignore empty lines
+    if (line.IsWhitespace())
+      continue;
+
+    // check for db specific tags
+    workStr = line;
+    workStr.Remove(TString::kLeading, ' '); // remove spaces from the begining
+    if (workStr.BeginsWith("title", TString::kIgnoreCase)) {
+cout << endl << ">> TITLE line found ...";
+      dbTag = 0;
+      continue;
+    } else if (workStr.BeginsWith("abstract", TString::kIgnoreCase)) {
+cout << endl << ">> ABSTRACT line found ...";
+      dbTag = 1;
+      continue;
+    } else if (workStr.BeginsWith("comments", TString::kIgnoreCase)) {
+cout << endl << ">> COMMENTS line found ...";
+      dbTag = 2;
+      continue;
+    } else if (workStr.BeginsWith("label", TString::kIgnoreCase)) {
+cout << endl << ">> LABEL line found ...";
+      dbTag = 3;
+      continue;
+    } else if (workStr.BeginsWith("data", TString::kIgnoreCase)) {
+cout << endl << ">> DATA line found ...";
+      dbTag = 4;
+      continue;
+    }
+
+    switch (dbTag) {
+      case 0: // TITLE
+        runData.fRunTitle = workStr;
+        break;
+      case 1: // ABSTRACT
+        // nothing to be done for now
+        break;
+      case 2: // COMMENTS
+        // nothing to be done for now
+        break;
+      case 3: // LABEL
+// cout << endl << ">> label: " << workStr.Data();
+        runData.fDataNonMusr.fLabels.push_back(workStr);
+        break;
+      case 4: // DATA
+        // filter out potential start data tag
+        if (workStr.BeginsWith("\\-e", TString::kIgnoreCase) ||
+            workStr.BeginsWith("\\e", TString::kIgnoreCase)  ||
+            workStr.BeginsWith("/-e", TString::kIgnoreCase)  ||
+            workStr.BeginsWith("/e", TString::kIgnoreCase)) {
+cout << endl << ">> \\-e like tag found ...";
+          continue;
+        }
+        // check if data are given just as rows are as labelled columns (see description above)
+        if (firstData) {
+          if (workStr.Contains("=")) {
+            labelledFormat = true;
+cout << endl << ">> data give in labelled format ...";
+          } else {
+            labelledFormat = false;
+cout << endl << ">> data give in row format ...";
+          }
+          firstData = false;
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  f.close();
+
+cout << endl << ">> run title: '" << runData.fRunTitle.Data() << "'";
+cout << endl;
+assert(0);
 
   fData.push_back(runData);
 

@@ -180,28 +180,32 @@ bool PRunNonMusr::PrepareFitData()
   fFitStartTime = fRunInfo->fFitRange[0];
   fFitStopTime  = fRunInfo->fFitRange[1];
 
+  // get x-, y-index
+  unsigned int xIndex = GetXIndex(runData);
+  unsigned int yIndex = GetYIndex(runData);
+
   // pack the raw data
   double value  = 0.0;
   double err = 0.0;
-cout << endl << ">> runData->fXData.size()=" << runData->fXData.size();
-  for (unsigned int i=0; i<runData->fXData.size(); i++) {
+cout << endl << ">> runData->fDataNonMusr.fData[" <<  xIndex << "].size()=" << runData->fDataNonMusr.fData[xIndex].size();
+  for (unsigned int i=0; i<runData->fDataNonMusr.fData[xIndex].size(); i++) {
 cout << endl << ">> i=" << i << ", packing=" << fRunInfo->fPacking;
     if (fRunInfo->fPacking == 1) {
-      fData.fX.push_back(runData->fXData[i]);
-      fData.fValue.push_back(runData->fYData[i]);
-      fData.fError.push_back(runData->fErrYData[i]);
+      fData.fX.push_back(runData->fDataNonMusr.fData[xIndex][i]);
+      fData.fValue.push_back(runData->fDataNonMusr.fData[yIndex][i]);
+      fData.fError.push_back(runData->fDataNonMusr.fErrData[yIndex][i]);
     } else { // packed data, i.e. fRunInfo->fPacking > 1
       if ((i % fRunInfo->fPacking == 0) && (i != 0)) { // fill data
 cout << endl << "-> i=" << i;
-        fData.fX.push_back(runData->fXData[i]-(runData->fXData[i]-runData->fXData[i-fRunInfo->fPacking])/2.0);
+        fData.fX.push_back(runData->fDataNonMusr.fData[xIndex][i]-(runData->fDataNonMusr.fData[xIndex][i]-runData->fDataNonMusr.fData[xIndex][i-fRunInfo->fPacking])/2.0);
         fData.fValue.push_back(value);
         fData.fError.push_back(TMath::Sqrt(err));
         value = 0.0;
         err = 0.0;
       }
       // sum raw data values
-      value += runData->fYData[i];
-      err += runData->fErrYData[i]*runData->fErrYData[i];
+      value += runData->fDataNonMusr.fData[yIndex][i];
+      err += runData->fDataNonMusr.fErrData[yIndex][i]*runData->fDataNonMusr.fErrData[yIndex][i];
     }
   }
 cout << endl << ">> fData.fValue.size()=" << fData.fValue.size();
@@ -237,29 +241,33 @@ bool PRunNonMusr::PrepareViewData()
     return false;
   }
 
+  // get x-, y-index
+  unsigned int xIndex = GetXIndex(runData);
+  unsigned int yIndex = GetYIndex(runData);
+
   // fill data histo
   // pack the raw data
   double value  = 0.0;
   double err = 0.0;
-cout << endl << ">> runData->fXData.size()=" << runData->fXData.size();
-  for (unsigned int i=0; i<runData->fXData.size(); i++) {
+cout << endl << ">> runData->fDataNonMusr.fData[" << xIndex << "].size()=" << runData->fDataNonMusr.fData[xIndex].size();
+  for (unsigned int i=0; i<runData->fDataNonMusr.fData[xIndex].size(); i++) {
 cout << endl << ">> i=" << i << ", packing=" << fRunInfo->fPacking;
     if (fRunInfo->fPacking == 1) {
-      fData.fX.push_back(runData->fXData[i]);
-      fData.fValue.push_back(runData->fYData[i]);
-      fData.fError.push_back(runData->fErrYData[i]);
+      fData.fX.push_back(runData->fDataNonMusr.fData[xIndex][i]);
+      fData.fValue.push_back(runData->fDataNonMusr.fData[yIndex][i]);
+      fData.fError.push_back(runData->fDataNonMusr.fErrData[yIndex][i]);
     } else { // packed data, i.e. fRunInfo->fPacking > 1
       if ((i % fRunInfo->fPacking == 0) && (i != 0)) { // fill data
 cout << endl << "-> i=" << i;
-        fData.fX.push_back(runData->fXData[i]-(runData->fXData[i]-runData->fXData[i-fRunInfo->fPacking])/2.0);
+        fData.fX.push_back(runData->fDataNonMusr.fData[xIndex][i]-(runData->fDataNonMusr.fData[xIndex][i]-runData->fDataNonMusr.fData[xIndex][i-fRunInfo->fPacking])/2.0);
         fData.fValue.push_back(value);
         fData.fError.push_back(TMath::Sqrt(err));
         value = 0.0;
         err = 0.0;
       }
       // sum raw data values
-      value += runData->fYData[i];
-      err += runData->fErrYData[i]*runData->fErrYData[i];
+      value += runData->fDataNonMusr.fData[yIndex][i];
+      err += runData->fDataNonMusr.fErrData[yIndex][i]*runData->fDataNonMusr.fErrData[yIndex][i];
     }
   }
 cout << endl << ">> fData.fValue.size()=" << fData.fValue.size();
@@ -343,4 +351,82 @@ cout << endl << ">> after the xmin/xmax loop." << endl;
   par.clear();
 
   return success;
+}
+
+//--------------------------------------------------------------------------
+// GetXIndex
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param runData
+ */
+unsigned int PRunNonMusr::GetXIndex(PRawRunData* runData)
+{
+  unsigned int index = 0;
+  bool found = false;
+
+  if (runData->fDataNonMusr.fXIndex >= 0) { // ascii-file format
+    index = runData->fDataNonMusr.fXIndex;
+    found = true;
+  } else { // db-file format
+    if (fRunInfo->fXYDataIndex[0] > 0) { // xy-data already indices
+      index = fRunInfo->fXYDataIndex[0]-1; // since xy-data start with 1 ...
+      found = true;
+    } else { // xy-data data tags which needs to be converted to an index
+      for (unsigned int i=0; i<runData->fDataNonMusr.fDataTags.size(); i++) {
+        if (runData->fDataNonMusr.fDataTags[i].CompareTo(fRunInfo->fXYDataLabel[0]) == 0) {
+          found = true;
+          break;
+        }
+      }
+    }
+  }
+
+  if (!found) {
+    cout << endl << "PRunNonMusr::GetXIndex(): **ERROR** Couldn't obtain x-data index!";
+    cout << endl;
+    assert(0);
+  }
+
+  return index;
+}
+
+//--------------------------------------------------------------------------
+// GetYIndex
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param runData
+ */
+unsigned int PRunNonMusr::GetYIndex(PRawRunData* runData)
+{
+  unsigned int index = 0;
+  bool found = false;
+
+  if (runData->fDataNonMusr.fYIndex >= 0) { // ascii-file format
+    index = runData->fDataNonMusr.fYIndex;
+    found = true;
+  } else { // db-file format
+    if (fRunInfo->fXYDataIndex[1] > 0) { // xy-data already indices
+      index = fRunInfo->fXYDataIndex[1]-1; // since xy-data start with 1 ...
+      found = true;
+    } else { // xy-data data tags which needs to be converted to an index
+      for (unsigned int i=0; i<runData->fDataNonMusr.fDataTags.size(); i++) {
+        if (runData->fDataNonMusr.fDataTags[i].CompareTo(fRunInfo->fXYDataLabel[1]) == 0) {
+          found = true;
+          break;
+        }
+      }
+    }
+  }
+
+  if (!found) {
+    cout << endl << "PRunNonMusr::GetYIndex(): **ERROR** Couldn't obtain y-data index!";
+    cout << endl;
+    assert(0);
+  }
+
+  return index;
 }

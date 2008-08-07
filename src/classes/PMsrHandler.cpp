@@ -1043,6 +1043,12 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
   TObjString *ostr;
   TObjArray *tokens;
 
+  // init some stuff
+  param.fXYDataIndex[0]  = -1;
+  param.fXYDataIndex[1]  = -1;
+  param.fXYDataLabel[0]  = TString("");
+  param.fXYDataLabel[1]  = TString("");
+
   iter = lines.begin();
   while ((iter != lines.end()) && !error) {
     // tokenize line
@@ -1425,6 +1431,30 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
           param.fLeftHistoNo = str.Atoi();
         else
           error = true;
+      }
+    }
+
+    // xy-data -----------------------------------------------
+    if (iter->fLine.BeginsWith("xy-data", TString::kIgnoreCase)) {
+      if (tokens->GetEntries() != 3) { // xy-data x-label y-label
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit()) { // xy-data indices given
+          param.fXYDataIndex[0] = str.Atoi(); // x-index
+          ostr = dynamic_cast<TObjString*>(tokens->At(2));
+          str = ostr->GetString();
+          if (str.IsDigit())
+            param.fXYDataIndex[1] = str.Atoi(); // y-index
+          else
+            error = true;
+        } else { // xy-data labels given
+          param.fXYDataLabel[0] = str; // x-label
+          ostr = dynamic_cast<TObjString*>(tokens->At(2));
+          str = ostr->GetString();
+          param.fXYDataLabel[1] = str; // y-label
+        }
       }
     }
 

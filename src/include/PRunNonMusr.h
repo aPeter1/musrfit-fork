@@ -56,6 +56,9 @@ class PRunNonMusr : public PRunBase
     double fFitStartTime;
     double fFitStopTime;
     unsigned int fNoOfFitBins;
+
+    unsigned int GetXIndex(PRawRunData* runData);
+    unsigned int GetYIndex(PRawRunData* runData);
 };
 
 #endif // _PRUNNONMUSR_H_

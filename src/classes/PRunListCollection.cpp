@@ -488,7 +488,10 @@ const char* PRunListCollection::GetSetup(TString &runName)
  */
 const char* PRunListCollection::GetXAxisTitle(TString &runName)
 {
-  return fData->GetRunData(runName)->fXAxisTitle.Data();
+  PRawRunData *runData = fData->GetRunData(runName);
+  int index = fData->GetRunData(runName)->fDataNonMusr.fXIndex;
+
+  return runData->fDataNonMusr.fLabels[index].Data();
 }
 
 //--------------------------------------------------------------------------
@@ -501,6 +504,9 @@ const char* PRunListCollection::GetXAxisTitle(TString &runName)
  */
 const char* PRunListCollection::GetYAxisTitle(TString &runName)
 {
-  return fData->GetRunData(runName)->fYAxisTitle.Data();
+  PRawRunData *runData = fData->GetRunData(runName);
+  int index = fData->GetRunData(runName)->fDataNonMusr.fYIndex;
+
+  return runData->fDataNonMusr.fLabels[index].Data();
 }
 
