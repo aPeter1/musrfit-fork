@@ -79,14 +79,7 @@ short term:
   **DONE** 08-08-08
 
 * Minuit2: name length is now unlimited and hence the 10 char restriction can be lifted.
-
-* nonMusr: check why in nonMusr view there is NO legend??
-
-* musrparam should be extended that is also can produce a db-file output.
-  I would suggest two switches:
-  --db     -> will produce db-files but still expecting the independent variables in the par-list-file
-  --db-lem -> will extract some default independent variables from the system (to be checked what and
-              from where the data shall be taken).
+  **DONE** 08-08-08
 
 * implement FFT with msr-interface
 

@@ -220,7 +220,6 @@ int PMsrHandler::ReadMsrFile()
   unsigned int parX, parY;
   if (!CheckUniquenessOfParamNames(parX, parY)) {
     cout << endl << "PMsrHandler::ReadMsrFile: **SEVERE ERROR** parameter name " << fParam[parX].fName.Data() << " is identical for parameter no " << fParam[parX].fNo << " and " << fParam[parY].fNo << "!";
-    cout << endl << "It might be that only the 10 first characters are identical. Due to a current MINUIT2 limitation, this means they are \"identical\", sorry.";
     cout << endl << "Needs to be fixed first!";
     error = PMUSR_MSR_SYNTAX_ERROR;
   }
@@ -2375,19 +2374,10 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 bool PMsrHandler::CheckUniquenessOfParamNames(unsigned int &parX, unsigned int &parY)
 {
   bool unique = true;
-  char name1[11], name2[11];
 
   for (unsigned int i=0; i<fParam.size()-1; i++) {
     for (unsigned int j=i+1; j<fParam.size(); j++) {
-      // due to the current minuit2 limitation of 10 characters for the parameter name
-      memset(name1, 0, sizeof(name1));
-      strncpy(name1, fParam[i].fName.Data(), 10);
-      memset(name2, 0, sizeof(name2));
-      strncpy(name2, fParam[j].fName.Data(), 10);
-/* as soon as the minuit2 parameter name limit is lifted, the if should become this:
       if (fParam[i].fName.CompareTo(fParam[j].fName) == 0) { // equal
-*/
-      if (!strcmp(name1, name2)) { // equal
         unique = false;
         parX = i;
         parY = j;
