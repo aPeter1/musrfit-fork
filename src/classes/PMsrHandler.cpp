@@ -555,6 +555,32 @@ int PMsrHandler::WriteMsrLogFile()
       }
       CheckAndWriteComment(f, ++lineNo);
     }
+    // xy-data (indices)
+    if (fRuns[i].fXYDataIndex[0] != -1) {
+      f.width(16);
+      f << endl << left << "xy-data";
+      for (unsigned int j=0; j<2; j++) {
+        if (fRuns[i].fXYDataIndex[j] == -1)
+          break;
+        f.width(8);
+        f.precision(2);
+        f << left << fixed << fRuns[i].fXYDataIndex[j];
+      }
+      CheckAndWriteComment(f, ++lineNo);
+    }
+    // xy-data (labels)
+    if (!fRuns[i].fXYDataLabel[0].IsWhitespace()) {
+      f.width(16);
+      f << endl << left << "xy-data";
+      for (unsigned int j=0; j<2; j++) {
+        if (fRuns[i].fXYDataLabel[j].IsWhitespace())
+          break;
+        f.width(8);
+        f.precision(2);
+        f << left << fixed << fRuns[i].fXYDataLabel[j].Data();
+      }
+      CheckAndWriteComment(f, ++lineNo);
+    }
     // fit
     if (fRuns[i].fFitRange[0] != -1) {
       f.width(16);
@@ -1547,6 +1573,10 @@ void PMsrHandler::InitRunParameterStructure(PMsrRunStructure &param)
   param.fBeta2ParamNo  = -1;
   param.fRightHistoNo  = -1;
   param.fLeftHistoNo   = -1;
+  for (int i=0; i<2; i++)
+    param.fXYDataIndex[i] = -1;
+  for (int i=0; i<2; i++)
+    param.fXYDataLabel[i] = "";
 }
 
 //--------------------------------------------------------------------------

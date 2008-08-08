@@ -850,7 +850,7 @@ bool PRunDataHandler::ReadAsciiFile()
   // open dump-file
   f.open(fRunPathName.Data(), ifstream::in);
   if (!f.is_open()) {
-    cout << endl << "Couldn't open data file (" << fRunPathName.Data() << ") for reading, sorry ...";
+    cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** Couldn't open data file (" << fRunPathName.Data() << ") for reading, sorry ...";
     cout << endl;
     return false;
   }
@@ -952,7 +952,7 @@ bool PRunDataHandler::ReadAsciiFile()
       TObjString *ostr;
       TObjArray *tokens;
       // check if data have x, y [, error y] structure, and that x, y, and error y are numbers
-      tokens = line.Tokenize(" ,/t");
+      tokens = line.Tokenize(" ,\t");
       // check if the number of data line entries is 2 or 3
       if ((tokens->GetEntries() != 2) && (tokens->GetEntries() != 3)) {
         cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** found data line with a structure different than \"x, y [, error y]\", cannot be handled (line no " << lineNo << ")";
@@ -1006,7 +1006,7 @@ bool PRunDataHandler::ReadAsciiFile()
       exVec.push_back(1.0);
       yVec.push_back(y);
       eyVec.push_back(ey);
-cout << endl << ">> (x/y/ey) = (" << x << "/" << y << "/" << ey << ")";
+//cout << endl << ">> (x/y/ey) = (" << x << "/" << y << "/" << ey << ")";
 
     } else {
       cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << " neither header nor data line. No idea how to handle it!";
@@ -1034,7 +1034,7 @@ cout << endl << ">> (x/y/ey) = (" << x << "/" << y << "/" << ey << ")";
   runData.fDataNonMusr.fData.clear();
   runData.fDataNonMusr.fErrData.clear();
 
-cout << endl << ">> end of ReadAsciiFile()";
+//cout << endl << ">> end of ReadAsciiFile()";
 
   return success;
 }
@@ -1100,15 +1100,15 @@ cout << endl << ">> end of ReadAsciiFile()";
  *  Run
  *
  * DATA line, gauss, lrntz, run
- * -1.966, -0.168, -0.106,  0.048, 0.002, 0.005,  0.184, 0.010, 0.017, 1001,,, run 1001 title
- * -1.895, -0.151, -0.128,  0.014, 0.001, 0.001,  0.259, 0.017, 0.015, 1002,,, run 1002 title
- * -1.836, -0.127, -0.184,  0.013, 0.001, 0.001,  0.202, 0.017, 0.020, 1003,,, run 1003 title
- * -1.739, -0.064, -0.166,  0.057, 0.003, 0.004,  0.237, 0.016, 0.018, 1004,,, run 1004 title
- * -1.601, -0.062, -0.147,  0.104, 0.008, 0.006,  0.271, 0.012, 0.025, 1005,,, run 1005 title
+ * -1.966, -0.168, -0.106,  0.048, 0.002, 0.005,  0.184, 0.010, 0.017, 1001, , , run 1001 title
+ * -1.895, -0.151, -0.128,  0.014, 0.001, 0.001,  0.259, 0.017, 0.015, 1002, , , run 1002 title
+ * -1.836, -0.127, -0.184,  0.013, 0.001, 0.001,  0.202, 0.017, 0.020, 1003, , , run 1003 title
+ * -1.739, -0.064, -0.166,  0.057, 0.003, 0.004,  0.237, 0.016, 0.018, 1004, , , run 1004 title
+ * -1.601, -0.062, -0.147,  0.104, 0.008, 0.006,  0.271, 0.012, 0.025, 1005, , , run 1005 title
  *  .        .        .          .        .        .          .        .        .
  *  .        .        .          .        .        .          .        .        .
  *  .        .        .          .        .        .          .        .        .
- * Alternatively, the data often utilizes the continuation character ('\') and is labelled like so...
+ * Alternatively, the data often utilizes the continuation character ('\') and is labelled like
  * DATA line, gauss, lrntz
  * linear = -1.966,  -0.168,  -0.106, \
  * gaussn =  0.048,   0.002,   0.005, \
@@ -1129,6 +1129,22 @@ cout << endl << ">> end of ReadAsciiFile()";
  * in this just slight odd manner (do not blame me, I haven't invented this format ;-) ).
  * \endverbatim
  *
+ * <p><b>WARNING:</b>For the row like data representation (the top DATA representation shown) 
+ * it is essential that there are always at least one space inbetween commas (the reason is that
+ * I am too lazy to write my own tokenizer), e.g.
+ *
+ * \verbatim
+ * -1.966, -0.168, ,  0.048, , ,  0.184, 0.010, 0.017, 1001, , , run 1001 title
+ * \endverbatim
+ *
+ * <p>which is ok, but
+ *
+ * \verbatim
+ * -1.966, -0.168,,  0.048,,,  0.184, 0.010, 0.017, 1001,,, run 1001 title
+ * \endverbatim
+ *
+ * <p>will <b>not</b> work!
+ *
  * <p>Some db-files do have a '\-e' or '\e' label just between the DATA tag line and the real data.
  * This tag will just be ignored.
  */
@@ -1136,28 +1152,35 @@ bool PRunDataHandler::ReadDBFile()
 {
   bool success = true;
 
-  cout << endl << "not implemented yet ...";
-
   // open file
   ifstream f;
 
   // open db-file
   f.open(fRunPathName.Data(), ifstream::in);
   if (!f.is_open()) {
-    cout << endl << "Couldn't open data file (" << fRunPathName.Data() << ") for reading, sorry ...";
+    cout << endl << "PRunDataHandler::ReadDBFile **ERROR** Couldn't open data file (" << fRunPathName.Data() << ") for reading, sorry ...";
     cout << endl;
     return false;
   }
 
   PRawRunData runData;
 
+  runData.fDataNonMusr.fXIndex = -1;
+  runData.fDataNonMusr.fYIndex = -1;
+
   int     lineNo = 0;
+  int     dataNo = 0;
   int     dbTag = -1;
   char    instr[512];
   TString line, workStr;
-  double  x, y, ey;
+  double  val;
   bool firstData = true; // needed as a switch to check in which format the data are given.
   bool labelledFormat = true; // flag showing if the data are given in row format, or as labelled format (see description above, default is labelled format)
+
+  // variables needed to tokenize strings
+  TString tstr;
+  TObjString *ostr;
+  TObjArray *tokens;
 
   while (!f.eof()) {
     // get next line from file
@@ -1177,24 +1200,38 @@ bool PRunDataHandler::ReadDBFile()
     workStr = line;
     workStr.Remove(TString::kLeading, ' '); // remove spaces from the begining
     if (workStr.BeginsWith("title", TString::kIgnoreCase)) {
-cout << endl << ">> TITLE line found ...";
+// cout << endl << ">> TITLE line found ...";
       dbTag = 0;
       continue;
     } else if (workStr.BeginsWith("abstract", TString::kIgnoreCase)) {
-cout << endl << ">> ABSTRACT line found ...";
+// cout << endl << ">> ABSTRACT line found ...";
       dbTag = 1;
       continue;
     } else if (workStr.BeginsWith("comments", TString::kIgnoreCase)) {
-cout << endl << ">> COMMENTS line found ...";
+// cout << endl << ">> COMMENTS line found ...";
       dbTag = 2;
       continue;
     } else if (workStr.BeginsWith("label", TString::kIgnoreCase)) {
-cout << endl << ">> LABEL line found ...";
+// cout << endl << ">> LABEL line found ...";
       dbTag = 3;
       continue;
     } else if (workStr.BeginsWith("data", TString::kIgnoreCase)) {
-cout << endl << ">> DATA line found ...";
+// cout << endl << ">> DATA line found ...";
       dbTag = 4;
+
+      // filter out all data tags
+      tokens = workStr.Tokenize(" ,\t");
+      for (int i=1; i<tokens->GetEntries(); i++) {
+        ostr = dynamic_cast<TObjString*>(tokens->At(i));
+        runData.fDataNonMusr.fDataTags.push_back(ostr->GetString());
+// cout << endl << ">> DATA tag " << i << ": " << ostr->GetString().Data();
+      }
+
+      // clean up tokens
+      if (tokens) {
+        delete tokens;
+        tokens = 0;
+      }
       continue;
     }
 
@@ -1218,19 +1255,171 @@ cout << endl << ">> DATA line found ...";
             workStr.BeginsWith("\\e", TString::kIgnoreCase)  ||
             workStr.BeginsWith("/-e", TString::kIgnoreCase)  ||
             workStr.BeginsWith("/e", TString::kIgnoreCase)) {
-cout << endl << ">> \\-e like tag found ...";
+// cout << endl << ">> \\-e like tag found ...";
           continue;
         }
-        // check if data are given just as rows are as labelled columns (see description above)
+
+        // check if first real data line
         if (firstData) {
-          if (workStr.Contains("=")) {
+          // check if data are given just as rows are as labelled columns (see description above)
+          tokens = workStr.Tokenize(",");
+          ostr = dynamic_cast<TObjString*>(tokens->At(0));
+          if (!ostr->GetString().IsFloat()) {
             labelledFormat = true;
-cout << endl << ">> data give in labelled format ...";
+// cout << endl << ">> data give in labelled format ...";
           } else {
             labelledFormat = false;
-cout << endl << ">> data give in row format ...";
+// cout << endl << ">> data give in row format ...";
           }
+          // clean up tokens
+          if (tokens) {
+            delete tokens;
+            tokens = 0;
+          }
+
+          // prepare data vector for use
+          PDoubleVector dummy;
+          for (unsigned int i=0; i<runData.fDataNonMusr.fDataTags.size(); i++) {
+            runData.fDataNonMusr.fData.push_back(dummy);
+            runData.fDataNonMusr.fErrData.push_back(dummy);
+          }
+
           firstData = false;
+        }
+
+        if (labelledFormat) { // handle labelled formated data
+
+          // check if run line
+          const char *str = workStr.Data();
+          if (isdigit(str[0])) { // run line
+            // split string in tokens
+            tokens = workStr.Tokenize(","); // line has structure: runNo,,, runTitle
+            ostr = dynamic_cast<TObjString*>(tokens->At(0));
+            tstr = ostr->GetString();
+            if (!tstr.IsFloat()) {
+              cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+              cout << endl << ">> " << workStr.Data();
+              cout << endl << ">> Expected db-data line with structure: runNo,,, runTitle";
+              cout << endl << ">> runNo = " << tstr.Data() << ", seems to be not a number.";
+              delete tokens;
+              return false;
+            }
+            val = tstr.Atof();
+            runData.fDataNonMusr.fData[dataNo].push_back(val);
+            runData.fDataNonMusr.fErrData[dataNo].push_back(0.0);
+            dataNo = 0; // next run block starts
+          } else { // tag = data line
+            // split string in tokens
+            tokens = workStr.Tokenize("=,"); // line has structure: tag = val,err1,err2,
+            if (tokens->GetEntries() < 3) {
+              cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+              cout << endl << ">> " << workStr.Data();
+              cout << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
+              delete tokens;
+              return false;
+            }
+
+            switch (tokens->GetEntries()) {
+              case 3: // tag = val,,,
+                ostr = dynamic_cast<TObjString*>(tokens->At(1));
+                tstr = ostr->GetString();
+                if (!tstr.IsFloat()) {
+                  cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+                  cout << endl << ">> " << workStr.Data();
+                  cout << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
+                  cout << endl << ">> val = " << tstr.Data() << ", seems to be not a number.";
+                  delete tokens;
+                  return false;
+                }
+                val = tstr.Atof();
+                runData.fDataNonMusr.fData[dataNo].push_back(val);
+                runData.fDataNonMusr.fErrData[dataNo].push_back(0.0);
+                break;
+              case 4: // tag = val,err,,
+              case 5: // tag = val,err1,err2,
+                // handle val
+                ostr = dynamic_cast<TObjString*>(tokens->At(1));
+                tstr = ostr->GetString();
+                if (!tstr.IsFloat()) {
+                  cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+                  cout << endl << ">> " << workStr.Data();
+                  cout << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
+                  cout << endl << ">> val = " << tstr.Data() << ", seems to be not a number.";
+                  delete tokens;
+                  return false;
+                }
+                val = tstr.Atof();
+                runData.fDataNonMusr.fData[dataNo].push_back(val);
+                // handle err1 (err2 will be ignored for the time being)
+                ostr = dynamic_cast<TObjString*>(tokens->At(2));
+                tstr = ostr->GetString();
+                if (!tstr.IsFloat()) {
+                  cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+                  cout << endl << ">> " << workStr.Data();
+                  cout << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
+                  cout << endl << ">> err1 = " << tstr.Data() << ", seems to be not a number.";
+                  delete tokens;
+                  return false;
+                }
+                val = tstr.Atof();
+                runData.fDataNonMusr.fErrData[dataNo].push_back(val);
+                break;
+              default:
+                cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+                cout << endl << ">> " << workStr.Data();
+                cout << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
+                delete tokens;
+                return false;
+                break;
+            }
+            dataNo++;
+          }
+
+        } else { // handle row formated data
+          // split string in tokens
+          tokens = workStr.Tokenize(","); // line has structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle
+          if (tokens->GetEntries() != (int)(3*runData.fDataNonMusr.fDataTags.size()+1)) {
+            cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+            cout << endl << ">> " << workStr.Data();
+            cout << endl << ">> Expected db-data line with structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle";
+            cout << endl << ">> found = " << tokens->GetEntries() << " tokens, however expected " << 3*runData.fDataNonMusr.fDataTags.size()+1;
+            cout << endl << ">> Perhaps there are commas without space inbetween, like 12.3,, 3.2,...";
+            delete tokens;
+            return false;
+          }
+          // extract data
+          int j=0;
+          for (int i=0; i<tokens->GetEntries()-1; i+=3) {
+            // handle value
+            ostr = dynamic_cast<TObjString*>(tokens->At(i));
+            tstr = ostr->GetString();
+            if (!tstr.IsFloat()) {
+              cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+              cout << endl << ">> " << workStr.Data();
+              cout << endl << ">> Expected db-data line with structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle";
+              cout << endl << ">> value=" << tstr.Data() << " seems not to be a number";
+              delete tokens;
+              return false;
+            }
+            runData.fDataNonMusr.fData[j].push_back(tstr.Atof());
+
+            // handle 1st error if present (2nd will be ignored for now)
+            ostr = dynamic_cast<TObjString*>(tokens->At(i+1));
+            tstr = ostr->GetString();
+            if (tstr.IsWhitespace()) {
+              runData.fDataNonMusr.fErrData[j].push_back(0.0);
+            } else if (tstr.IsFloat()) {
+              runData.fDataNonMusr.fErrData[j].push_back(tstr.Atof());
+            } else {
+              cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+              cout << endl << ">> " << workStr.Data();
+              cout << endl << ">> Expected db-data line with structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle";
+              cout << endl << ">> error1=" << tstr.Data() << " seems not to be a number";
+              delete tokens;
+              return false;
+            }
+            j++;
+          }
         }
         break;
       default:
@@ -1240,9 +1429,26 @@ cout << endl << ">> data give in row format ...";
 
   f.close();
 
-cout << endl << ">> run title: '" << runData.fRunTitle.Data() << "'";
-cout << endl;
-assert(0);
+// cout << endl << ">> run title: '" << runData.fRunTitle.Data() << "'";
+// cout << endl;
+// 
+// cout << endl << ">> first data vector:";
+// cout << endl << ">> label:" << runData.fDataNonMusr.fLabels[28].Data();
+// for (unsigned int i=0; i<runData.fDataNonMusr.fData[28].size(); i++) {
+// cout << endl << ">> "  << runData.fDataNonMusr.fData[28][i] << " +- " << runData.fDataNonMusr.fErrData[28][i];
+// }
+// cout << endl;
+// 
+// assert(0);
+
+  // clean up tokens
+  if (tokens) {
+    delete tokens;
+    tokens = 0;
+  }
+
+  // keep run name
+  runData.fRunName = fRunName;
 
   fData.push_back(runData);
 

@@ -69,17 +69,6 @@ short term:
 
 * implement NonMuSR stuff **DONE** 08-06-20, some more testing needed
 
-* Minuit2: name length is now unlimited and hence the 10 char restriction can be lifted.
-
-* nonMusr: check why in nonMusr view there is NO legend??
-
-* PRawRunData needs to be changed for nonMusr: ascii and db handling should be on the
-  same footing. Since db handles vectors of data, PRawRunData should handle it as the
-  db-format and ascii should follow that philosophy even though ascii will only contain
-  one x- and one y-vector.
-  fXAxisTitle and fYAxisTitle should be removed and being replaced by a fDataLabel vector.
-  fXData, fYData, and fErrYData should be removed and being fDataBin and fErrDataBin vectors.
-
 * nonMusr: db-file format should be added. That this is going to work, in the 
            RUN block part, a new entry is needed, namely
            xy-data. Indices or label are used to pick to proper data
@@ -87,8 +76,17 @@ short term:
            xy-data T asym <- labels
            or
            xy-data 3 6    <- indices
+  **DONE** 08-08-08
+
+* Minuit2: name length is now unlimited and hence the 10 char restriction can be lifted.
+
+* nonMusr: check why in nonMusr view there is NO legend??
 
 * musrparam should be extended that is also can produce a db-file output.
+  I would suggest two switches:
+  --db     -> will produce db-files but still expecting the independent variables in the par-list-file
+  --db-lem -> will extract some default independent variables from the system (to be checked what and
+              from where the data shall be taken).
 
 * implement FFT with msr-interface
 

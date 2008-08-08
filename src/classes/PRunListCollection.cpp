@@ -491,6 +491,9 @@ const char* PRunListCollection::GetXAxisTitle(TString &runName)
   PRawRunData *runData = fData->GetRunData(runName);
   int index = fData->GetRunData(runName)->fDataNonMusr.fXIndex;
 
+// cout << endl << ">>PRunListCollection::GetXAxisTitle, x-index = " << index;
+// cout << endl;
+
   return runData->fDataNonMusr.fLabels[index].Data();
 }
 
@@ -506,6 +509,9 @@ const char* PRunListCollection::GetYAxisTitle(TString &runName)
 {
   PRawRunData *runData = fData->GetRunData(runName);
   int index = fData->GetRunData(runName)->fDataNonMusr.fYIndex;
+
+// cout << endl << ">>PRunListCollection::GetYAxisTitle, y-index = " << index;
+// cout << endl;
 
   return runData->fDataNonMusr.fLabels[index].Data();
 }
