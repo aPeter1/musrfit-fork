@@ -276,7 +276,7 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   if (x == 'q') {
     Done(0);
   } else if (x == 'd') {
-    cout << endl << ">> will show the difference between the theory and the signal, to be implemented yet. fMainCanvas name = " << fMainCanvas->GetName() << endl;
+    HandleDifference();
   } else if (x == 'f') {
     cout << endl << ">> will show the Fourier transform, to be implemented yet." << endl;
   } else if (x == 'S') {
@@ -466,7 +466,7 @@ cout << endl;
           return;
         }
         // handle data
-        HandleDataSet(runNo, data);
+        HandleDataSet(i, runNo, data);
         break;
       case MSR_FITTYPE_ASYM:
         data = fRunList->GetAsymmetry(runNo, PRunListCollection::kRunNo);
@@ -478,7 +478,7 @@ cout << endl;
           return;
         }
         // handle data
-        HandleDataSet(runNo, data);
+        HandleDataSet(i, runNo, data);
         break;
       case MSR_FITTYPE_ASYM_RRF:
         data = fRunList->GetRRF(runNo, PRunListCollection::kRunNo);
@@ -490,7 +490,7 @@ cout << endl;
           return;
         }
         // handle data
-        HandleDataSet(runNo, data);
+        HandleDataSet(i, runNo, data);
         break;
       case MSR_FITTYPE_NO_MUSR:
         data = fRunList->GetNonMusr(runNo, PRunListCollection::kRunNo);
@@ -502,7 +502,7 @@ cout << endl;
           return;
         }
         // handle data
-        HandleNonMusrDataSet(runNo, data);
+        HandleNonMusrDataSet(i, runNo, data);
         break;
       default:
         fValid = false;
@@ -899,7 +899,7 @@ void PMusrCanvas::CleanupDataSet(PMusrCanvasNonMusrDataSet &dataSet)
  * \param runNo
  * \param data
  */
-void PMusrCanvas::HandleDataSet(unsigned int runNo, PRunData *data)
+void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunData *data)
 {
   PMusrCanvasDataSet dataSet;
   TH1F *dataHisto;
@@ -928,11 +928,11 @@ void PMusrCanvas::HandleDataSet(unsigned int runNo, PRunData *data)
   }
 
   // set marker and line color
-  if (runNo < fColorList.size()) {
-    dataHisto->SetMarkerColor(fColorList[runNo]);
-    dataHisto->SetLineColor(fColorList[runNo]);
+  if (plotNo < fColorList.size()) {
+    dataHisto->SetMarkerColor(fColorList[plotNo]);
+    dataHisto->SetLineColor(fColorList[plotNo]);
   } else {
-    TRandom rand(runNo);
+    TRandom rand(plotNo);
     Int_t color = TColor::GetColor((Int_t)rand.Integer(255), (Int_t)rand.Integer(255), (Int_t)rand.Integer(255));
     dataHisto->SetMarkerColor(color);
     dataHisto->SetLineColor(color);
@@ -940,10 +940,10 @@ void PMusrCanvas::HandleDataSet(unsigned int runNo, PRunData *data)
   // set marker size
   dataHisto->SetMarkerSize(1);
   // set marker type
-  if (runNo < fMarkerList.size()) {
-    dataHisto->SetMarkerStyle(fMarkerList[runNo]);
+  if (plotNo < fMarkerList.size()) {
+    dataHisto->SetMarkerStyle(fMarkerList[plotNo]);
   } else {
-    TRandom rand(runNo);
+    TRandom rand(plotNo);
     dataHisto->SetMarkerStyle(20+(Int_t)rand.Integer(10));
   }
 
@@ -965,10 +965,10 @@ void PMusrCanvas::HandleDataSet(unsigned int runNo, PRunData *data)
   }
 
   // set the line color
-  if (runNo < fColorList.size()) {
-    theoHisto->SetLineColor(fColorList[runNo]);
+  if (plotNo < fColorList.size()) {
+    theoHisto->SetLineColor(fColorList[plotNo]);
   } else {
-    TRandom rand(runNo);
+    TRandom rand(plotNo);
     Int_t color = TColor::GetColor((Int_t)rand.Integer(255), (Int_t)rand.Integer(255), (Int_t)rand.Integer(255));
     theoHisto->SetLineColor(color);
   }
@@ -989,7 +989,7 @@ void PMusrCanvas::HandleDataSet(unsigned int runNo, PRunData *data)
  * \param runNo
  * \param data
  */
-void PMusrCanvas::HandleNonMusrDataSet(unsigned int runNo, PRunData *data)
+void PMusrCanvas::HandleNonMusrDataSet(unsigned int plotNo, unsigned int runNo, PRunData *data)
 {
   PMusrCanvasNonMusrDataSet dataSet;
   TGraphErrors *dataHisto;
@@ -1009,11 +1009,11 @@ void PMusrCanvas::HandleNonMusrDataSet(unsigned int runNo, PRunData *data)
   }
 
   // set marker and line color
-  if (runNo < fColorList.size()) {
-    dataHisto->SetMarkerColor(fColorList[runNo]);
-    dataHisto->SetLineColor(fColorList[runNo]);
+  if (plotNo < fColorList.size()) {
+    dataHisto->SetMarkerColor(fColorList[plotNo]);
+    dataHisto->SetLineColor(fColorList[plotNo]);
   } else {
-    TRandom rand(runNo);
+    TRandom rand(plotNo);
     Int_t color = TColor::GetColor((Int_t)rand.Integer(255), (Int_t)rand.Integer(255), (Int_t)rand.Integer(255));
     dataHisto->SetMarkerColor(color);
     dataHisto->SetLineColor(color);
@@ -1021,10 +1021,10 @@ void PMusrCanvas::HandleNonMusrDataSet(unsigned int runNo, PRunData *data)
   // set marker size
   dataHisto->SetMarkerSize(1);
   // set marker type
-  if (runNo < fMarkerList.size()) {
-    dataHisto->SetMarkerStyle(fMarkerList[runNo]);
+  if (plotNo < fMarkerList.size()) {
+    dataHisto->SetMarkerStyle(fMarkerList[plotNo]);
   } else {
-    TRandom rand(runNo);
+    TRandom rand(plotNo);
     dataHisto->SetMarkerStyle(20+(Int_t)rand.Integer(10));
   }
 
@@ -1040,10 +1040,10 @@ void PMusrCanvas::HandleNonMusrDataSet(unsigned int runNo, PRunData *data)
   }
 
   // set the line color
-  if (runNo < fColorList.size()) {
-    theoHisto->SetLineColor(fColorList[runNo]);
+  if (plotNo < fColorList.size()) {
+    theoHisto->SetLineColor(fColorList[plotNo]);
   } else {
-    TRandom rand(runNo);
+    TRandom rand(plotNo);
     Int_t color = TColor::GetColor((Int_t)rand.Integer(255), (Int_t)rand.Integer(255), (Int_t)rand.Integer(255));
     theoHisto->SetLineColor(color);
   }
@@ -1053,4 +1053,17 @@ void PMusrCanvas::HandleNonMusrDataSet(unsigned int runNo, PRunData *data)
   dataSet.theory = theoHisto;
 
   fNonMusrData.push_back(dataSet);
+}
+
+//--------------------------------------------------------------------------
+// HandleDifference
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrCanvas::HandleDifference()
+{
+  cout << endl << ">> will show the difference between the theory and the signal, to be implemented yet. fMainCanvas name = " << fMainCanvas->GetName();
+  cout << endl;
 }

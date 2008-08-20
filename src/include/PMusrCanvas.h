@@ -168,8 +168,9 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void InitDataSet(PMusrCanvasNonMusrDataSet &dataSet);
     virtual void CleanupDataSet(PMusrCanvasDataSet &dataSet);
     virtual void CleanupDataSet(PMusrCanvasNonMusrDataSet &dataSet);
-    virtual void HandleDataSet(unsigned int runNo, PRunData *data);
-    virtual void HandleNonMusrDataSet(unsigned int runNo, PRunData *data);
+    virtual void HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunData *data);
+    virtual void HandleNonMusrDataSet(unsigned int plotNo, unsigned int runNo, PRunData *data);
+    virtual void HandleDifference();
 
   ClassDef(PMusrCanvas, 1)
 };

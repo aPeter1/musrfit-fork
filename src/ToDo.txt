@@ -100,6 +100,8 @@ long term:
   including event handler, etc.
 * implement FFT with msr-interface
 * switch from make to cmake
+* add the possibility for cuts to db-files
+* add the possibility for variable transformations to db-files
 
 ---------------------
 bugs:
