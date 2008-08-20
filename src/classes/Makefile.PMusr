@@ -148,3 +148,5 @@ ifeq ($(OS),LINUX)
 	cp -pv $(SHLIB) $(ROOTSYS)/lib
 	cp -pv $(PMUSRPATH)/*.h $(ROOTSYS)/include
 endif
+
+cleaninstall: clean install

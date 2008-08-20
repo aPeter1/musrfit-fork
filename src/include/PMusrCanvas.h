@@ -141,6 +141,7 @@ class PMusrCanvas : public TObject, public TQObject
 
   private:
     Bool_t fValid;
+    Bool_t fDifferencePlot; /// flag showing is a difference plot is shown
     Int_t  fPlotNumber;
 
     TStyle    *fStyle;

@@ -49,6 +49,7 @@ ClassImpQ(PMusrCanvas)
 PMusrCanvas::PMusrCanvas()
 {
   fValid = false;
+  fDifferencePlot = false;
   fPlotNumber = -1;
 
   fStyle               = 0;
@@ -166,6 +167,7 @@ void PMusrCanvas::CreateStyle()
 void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh)
 {
   fValid = false;
+  fDifferencePlot = false;
 
   fMainCanvas          = 0;
   fTitlePad            = 0;
@@ -1066,4 +1068,19 @@ void PMusrCanvas::HandleDifference()
 {
   cout << endl << ">> will show the difference between the theory and the signal, to be implemented yet. fMainCanvas name = " << fMainCanvas->GetName();
   cout << endl;
+
+  if (fDifferencePlot)
+    fDifferencePlot = kFALSE;
+  else
+    fDifferencePlot = kTRUE;
+
+  // difference plot wished hence feed difference data and plot them 
+  if (fDifferencePlot) {
+    // check if it is necessary to calculate diff data
+    // get current x-range
+  }
+
+  // switch back to the "normal" view
+  if (!fDifferencePlot) {
+  }
 }
