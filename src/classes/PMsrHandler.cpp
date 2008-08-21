@@ -377,8 +377,8 @@ int PMsrHandler::WriteMsrLogFile()
       case MSR_FITTYPE_ASYM_RRF:
         f << endl << left << "fittype" << MSR_FITTYPE_ASYM_RRF << "         (RRF asymmetry fit)";
         break;
-      case MSR_FITTYPE_NO_MUSR:
-        f << endl << left << "fittype" << MSR_FITTYPE_NO_MUSR << "         (non muSR fit)";
+      case MSR_FITTYPE_NON_MUSR:
+        f << endl << left << "fittype" << MSR_FITTYPE_NON_MUSR << "         (non muSR fit)";
         break;
       default:
         break;
@@ -621,7 +621,7 @@ int PMsrHandler::WriteMsrLogFile()
       case MSR_PLOT_ASYM_RRF:
         f << endl << "PLOT " << fPlots[i].fPlotType << "   (rotating reference frame plot)";
         break;
-      case MSR_PLOT_NO_MUSR:
+      case MSR_PLOT_NON_MUSR:
         f << endl << "PLOT " << fPlots[i].fPlotType << "   (non muSR plot)";
         break;
       default:
@@ -1126,7 +1126,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
           if ((fittype == MSR_FITTYPE_SINGLE_HISTO) ||
               (fittype == MSR_FITTYPE_ASYM) ||
               (fittype == MSR_FITTYPE_ASYM_RRF) ||
-              (fittype == MSR_FITTYPE_NO_MUSR)) {
+              (fittype == MSR_FITTYPE_NON_MUSR)) {
             param.fFitType = fittype;
           } else {
             error = true;
@@ -1731,7 +1731,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
             break;
           case MSR_PLOT_SINGLE_HISTO: // like: runs 1 5 13
           case MSR_PLOT_ASYM:
-          case MSR_PLOT_NO_MUSR:
+          case MSR_PLOT_NON_MUSR:
             tokens = iter1->fLine.Tokenize(" \t");
             if (!tokens) {
               cout << endl << "SEVERE ERROR: Couldn't tokenize PLOT in line " << iter1->fLineNo;

@@ -142,6 +142,7 @@ class PMusrCanvas : public TObject, public TQObject
   private:
     Bool_t fValid;
     Bool_t fDifferencePlot; /// flag showing is a difference plot is shown
+    Int_t  fPlotType;
     Int_t  fPlotNumber;
 
     TStyle    *fStyle;
@@ -172,6 +173,12 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunData *data);
     virtual void HandleNonMusrDataSet(unsigned int plotNo, unsigned int runNo, PRunData *data);
     virtual void HandleDifference();
+
+    virtual double CalculateDiff(const double x, const double y, TH1F *theo);
+
+    virtual void PlotData();
+    virtual void PlotDifference();
+    virtual void PlotFourier(int fourierType);
 
   ClassDef(PMusrCanvas, 1)
 };

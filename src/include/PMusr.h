@@ -78,14 +78,14 @@ using namespace std;
 #define MSR_FITTYPE_SINGLE_HISTO 0
 #define MSR_FITTYPE_ASYM         2
 #define MSR_FITTYPE_ASYM_RRF     4
-#define MSR_FITTYPE_NO_MUSR      8
+#define MSR_FITTYPE_NON_MUSR     8
 
 //-------------------------------------------------------------
 // msr plot type tags
 #define MSR_PLOT_SINGLE_HISTO 0
 #define MSR_PLOT_ASYM         2
 #define MSR_PLOT_ASYM_RRF     4
-#define MSR_PLOT_NO_MUSR      8
+#define MSR_PLOT_NON_MUSR     8
 
 //-------------------------------------------------------------
 // map and fun offsets for parameter parsing

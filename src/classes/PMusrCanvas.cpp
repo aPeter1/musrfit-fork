@@ -50,6 +50,7 @@ PMusrCanvas::PMusrCanvas()
 {
   fValid = false;
   fDifferencePlot = false;
+  fPlotType = -1;
   fPlotNumber = -1;
 
   fStyle               = 0;
@@ -168,6 +169,7 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
 {
   fValid = false;
   fDifferencePlot = false;
+  fPlotType = -1;
 
   fMainCanvas          = 0;
   fTitlePad            = 0;
@@ -272,7 +274,7 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
 //   cout << ">fMainCanvas   " << fMainCanvas << endl;
 //   cout << ">selected      " << selected << endl;
 // 
-//   cout << "px: "  << (char)fMainCanvas->GetEventX() << endl;
+cout << "px: "  << (char)fMainCanvas->GetEventX() << endl;
 
   TString str((Char_t)x);
   if (x == 'q') {
@@ -418,14 +420,17 @@ void PMusrCanvas::UpdateParamTheoryPad()
  */
 void PMusrCanvas::UpdateDataTheoryPad()
 {
+/*
   // NonMusr axis titles
   TString xAxisTitle;
   TString yAxisTitle;
-
+*/
   // some checks first
   unsigned int runNo;
   PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
   PMsrRunList runs = *fMsrHandler->GetMsrRunList();
+
+  fPlotType = plotInfo.fPlotType;
   for (unsigned int i=0; i<plotInfo.fRuns.size(); i++) {
     // first check that plot number is smaller than the maximal number of runs
     if ((int)plotInfo.fRuns[i].Re() > (int)runs.size()) {
@@ -438,17 +443,19 @@ void PMusrCanvas::UpdateDataTheoryPad()
     runNo = (unsigned int)plotInfo.fRuns[i].Re()-1;
 cout << endl << ">> runNo = " << runNo;
 cout << endl;
-    if (plotInfo.fPlotType != runs[runNo].fFitType) {
+    if (fPlotType != runs[runNo].fFitType) {
       fValid = false;
-      cout << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** plottype = " << plotInfo.fPlotType << ", fittype = " << runs[runNo].fFitType << ", however they have to correspond!";
+      cout << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** plottype = " << fPlotType << ", fittype = " << runs[runNo].fFitType << ", however they have to correspond!";
       cout << endl;
       return;
     }
+/*
     // check if NonMusr type plot and if yes get x- and y-axis title
-    if (plotInfo.fPlotType == MSR_PLOT_NO_MUSR) {
+    if (fPlotType == MSR_PLOT_NON_MUSR) {
       xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName);
       yAxisTitle = fRunList->GetYAxisTitle(runs[runNo].fRunName);
     }
+*/
   }
 
   PRunData *data;
@@ -494,7 +501,7 @@ cout << endl;
         // handle data
         HandleDataSet(i, runNo, data);
         break;
-      case MSR_FITTYPE_NO_MUSR:
+      case MSR_FITTYPE_NON_MUSR:
         data = fRunList->GetNonMusr(runNo, PRunListCollection::kRunNo);
         if (!data) { // something wrong
           fValid = false;
@@ -517,79 +524,7 @@ cout << endl;
   }
 
   // generate the histo plot
-  fDataTheoryPad->cd();
-  if (plotInfo.fPlotType != MSR_PLOT_NO_MUSR) {
-    if (fData.size() > 0) {
-      fData[0].data->Draw("pe");
-      // set time range
-      Double_t xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin;
-      Double_t xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax;
-      fData[0].data->GetXaxis()->SetRangeUser(xmin, xmax);
-      // check if it is necessary to set the y-axis range
-      Double_t ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin;
-      Double_t ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax;
-      if ((ymin != -999.0) && (ymax != -999.0)) {
-        fData[0].data->GetYaxis()->SetRangeUser(ymin, ymax);
-      }
-      // set x-axis label
-      fData[0].data->GetXaxis()->SetTitle("time (#mus)");
-      // set y-axis label
-      TString yAxisTitle;
-      PMsrRunList *runList = fMsrHandler->GetMsrRunList();
-      switch (plotInfo.fPlotType) {
-        case MSR_PLOT_SINGLE_HISTO:
-          if (runList->at(0).fLifetimeCorrection) { // lifetime correction
-            yAxisTitle = "asymmetry";
-          } else { // no liftime correction
-            yAxisTitle = "N(t) per bin";
-          }
-          break;
-        case MSR_PLOT_ASYM:
-        case MSR_PLOT_ASYM_RRF:
-          yAxisTitle = "asymmetry";
-          break;
-        default:
-          yAxisTitle = "??";
-          break;
-      }
-      fData[0].data->GetYaxis()->SetTitle(yAxisTitle.Data());
-      // plot all remaining data
-      for (unsigned int i=1; i<fData.size(); i++) {
-        fData[i].data->Draw("pesame");
-      }
-      // plot all the theory
-      for (unsigned int i=0; i<fData.size(); i++) {
-        fData[i].theory->Draw("csame");
-      }
-    }
-  } else { // plotInfo.fPlotType == MSR_PLOT_NO_MUSR
-    if (fNonMusrData.size() > 0) {
-      fNonMusrData[0].data->Draw("ap");
-      // set x-range
-      Double_t xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin;
-      Double_t xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax;
-      fNonMusrData[0].data->GetXaxis()->SetRangeUser(xmin, xmax);
-      // check if it is necessary to set the y-axis range
-      Double_t ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin;
-      Double_t ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax;
-      if ((ymin != -999.0) && (ymax != -999.0)) {
-        fNonMusrData[0].data->GetYaxis()->SetRangeUser(ymin, ymax);
-      }
-      // set x-axis label
-      fNonMusrData[0].data->GetXaxis()->SetTitle(xAxisTitle.Data());
-      // set y-axis label
-      fNonMusrData[0].data->GetYaxis()->SetTitle(yAxisTitle.Data());
-      // plot all remaining data
-      for (unsigned int i=1; i<fNonMusrData.size(); i++) {
-        fNonMusrData[i].data->Draw("psame");
-      }
-      // plot all the theory
-      for (unsigned int i=0; i<fNonMusrData.size(); i++) {
-        fNonMusrData[i].theory->Draw("csame");
-      }
-    }
-  }
-  fMainCanvas->cd();
+  PlotData();
 }
 
 //--------------------------------------------------------------------------
@@ -1077,10 +1012,221 @@ void PMusrCanvas::HandleDifference()
   // difference plot wished hence feed difference data and plot them 
   if (fDifferencePlot) {
     // check if it is necessary to calculate diff data
-    // get current x-range
+    if ((fPlotType != MSR_PLOT_NON_MUSR) && (fData[0].diff == 0)) {
+      TH1F *diffHisto;
+      TString name;
+      // loop over all histos
+      for (unsigned int i=0; i<fData.size(); i++) {
+        // create difference histos
+        name = TString(fData[i].data->GetTitle()) + "_diff";
+cout << endl << ">> diff-name = " << name.Data() << endl;
+        diffHisto = new TH1F(name, name, fData[i].data->GetNbinsX(),
+                             fData[i].data->GetXaxis()->GetXmin(),
+                             fData[i].data->GetXaxis()->GetXmax());
+
+        // set marker and line color
+        if (i < fColorList.size()) {
+          diffHisto->SetMarkerColor(fColorList[i]);
+          diffHisto->SetLineColor(fColorList[i]);
+        } else {
+          TRandom rand(i);
+          Int_t color = TColor::GetColor((Int_t)rand.Integer(255), (Int_t)rand.Integer(255), (Int_t)rand.Integer(255));
+          diffHisto->SetMarkerColor(color);
+          diffHisto->SetLineColor(color);
+        }
+        // set marker size
+        diffHisto->SetMarkerSize(1);
+        // set marker type
+        if (i < fMarkerList.size()) {
+          diffHisto->SetMarkerStyle(fMarkerList[i]);
+        } else {
+          TRandom rand(i);
+          diffHisto->SetMarkerStyle(20+(Int_t)rand.Integer(10));
+        }
+
+        // keep difference histo
+        fData[i].diff = diffHisto;
+        // calculate diff histo entry
+        double value;
+        for (int j=1; j<fData[i].data->GetNbinsX()-1; j++) {
+          // set diff bin value
+          value = CalculateDiff(fData[i].data->GetBinCenter(j),
+                                fData[i].data->GetBinContent(j),
+                                fData[i].theory);
+          fData[i].diff->SetBinContent(j, value);
+          // set error diff bin value
+          value = fData[i].data->GetBinError(j);
+          fData[i].diff->SetBinError(j, value);
+        }
+      }
+      // set current x-axis range
+      Int_t xminBin = fData[0].data->GetXaxis()->GetFirst(); // first bin of the zoomed range
+      Int_t xmaxBin = fData[0].data->GetXaxis()->GetLast();  // last bin of the zoomed range
+      Double_t xmin = fData[0].data->GetXaxis()->GetBinCenter(xminBin);
+      Double_t xmax = fData[0].data->GetXaxis()->GetBinCenter(xmaxBin);
+      fData[0].diff->GetXaxis()->SetRangeUser(xmin, xmax);
+    } else if ((fPlotType == MSR_PLOT_NON_MUSR) && (fNonMusrData[0].diff == 0)) {
+    }
   }
 
   // switch back to the "normal" view
   if (!fDifferencePlot) {
+    PlotData();
+  } else {
+    PlotDifference();
   }
 }
+
+//--------------------------------------------------------------------------
+// CalculateDiff
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param x x-value of the data
+ * \param y y-value of the data
+ * \param theo theory histogram
+ */
+double PMusrCanvas::CalculateDiff(const double x, const double y, TH1F *theo)
+{
+  Int_t bin = theo->FindBin(x);
+
+  return y - theo->GetBinContent(bin);
+}
+
+//--------------------------------------------------------------------------
+// PlotData
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrCanvas::PlotData()
+{
+  fDataTheoryPad->cd();
+
+  if (fPlotType < 0) // plot type not defined
+    return;
+
+  if (fPlotType != MSR_PLOT_NON_MUSR) {
+    if (fData.size() > 0) {
+      fData[0].data->Draw("pe");
+      // set time range
+      Double_t xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin;
+      Double_t xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax;
+      fData[0].data->GetXaxis()->SetRangeUser(xmin, xmax);
+      // check if it is necessary to set the y-axis range
+      Double_t ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin;
+      Double_t ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax;
+      if ((ymin != -999.0) && (ymax != -999.0)) {
+        fData[0].data->GetYaxis()->SetRangeUser(ymin, ymax);
+      }
+      // set x-axis label
+      fData[0].data->GetXaxis()->SetTitle("time (#mus)");
+      // set y-axis label
+      TString yAxisTitle;
+      PMsrRunList *runList = fMsrHandler->GetMsrRunList();
+      switch (fPlotType) {
+        case MSR_PLOT_SINGLE_HISTO:
+          if (runList->at(0).fLifetimeCorrection) { // lifetime correction
+            yAxisTitle = "asymmetry";
+          } else { // no liftime correction
+            yAxisTitle = "N(t) per bin";
+          }
+          break;
+        case MSR_PLOT_ASYM:
+        case MSR_PLOT_ASYM_RRF:
+          yAxisTitle = "asymmetry";
+          break;
+        default:
+          yAxisTitle = "??";
+          break;
+      }
+      fData[0].data->GetYaxis()->SetTitle(yAxisTitle.Data());
+      // plot all remaining data
+      for (unsigned int i=1; i<fData.size(); i++) {
+        fData[i].data->Draw("pesame");
+      }
+      // plot all the theory
+      for (unsigned int i=0; i<fData.size(); i++) {
+        fData[i].theory->Draw("csame");
+      }
+    }
+  } else { // fPlotType == MSR_PLOT_NO_MUSR
+    PMsrRunList runs = *fMsrHandler->GetMsrRunList();
+    PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
+    unsigned int runNo = (unsigned int)plotInfo.fRuns[0].Re()-1;
+    TString xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName);
+    TString yAxisTitle = fRunList->GetYAxisTitle(runs[runNo].fRunName);
+
+    if (fNonMusrData.size() > 0) {
+      fNonMusrData[0].data->Draw("ap");
+      // set x-range
+      Double_t xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin;
+      Double_t xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax;
+      fNonMusrData[0].data->GetXaxis()->SetRangeUser(xmin, xmax);
+      // check if it is necessary to set the y-axis range
+      Double_t ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin;
+      Double_t ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax;
+      if ((ymin != -999.0) && (ymax != -999.0)) {
+        fNonMusrData[0].data->GetYaxis()->SetRangeUser(ymin, ymax);
+      }
+      // set x-axis label
+      fNonMusrData[0].data->GetXaxis()->SetTitle(xAxisTitle.Data());
+      // set y-axis label
+      fNonMusrData[0].data->GetYaxis()->SetTitle(yAxisTitle.Data());
+      // plot all remaining data
+      for (unsigned int i=1; i<fNonMusrData.size(); i++) {
+        fNonMusrData[i].data->Draw("psame");
+      }
+      // plot all the theory
+      for (unsigned int i=0; i<fNonMusrData.size(); i++) {
+        fNonMusrData[i].theory->Draw("csame");
+      }
+    }
+  }
+
+  fMainCanvas->cd();
+}
+
+//--------------------------------------------------------------------------
+// PlotDifference
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrCanvas::PlotDifference()
+{
+  fDataTheoryPad->cd();
+
+  if (fPlotType < 0) // plot type not defined
+    return;
+
+  if (fPlotType != MSR_PLOT_NON_MUSR) {
+cout << endl << ">> going to plot diff spectra ... (" << fData[0].diff->GetNbinsX() << ")" << endl;
+    fData[0].diff->Draw("pe");
+    // set x-axis label
+    // set y-axis label
+    // plot all remaining diff data
+    for (unsigned int i=1; i<fData.size(); i++) {
+      fData[i].diff->Draw("pesame");
+    }
+  } else { // fPlotType == MSR_PLOT_NON_MUSR
+  }
+
+  fMainCanvas->cd();
+}
+
+//--------------------------------------------------------------------------
+// PlotFourier
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param fourierType flag showing if real-, imaginary-, power-, or phase-spectra are wished
+ */
+void PMusrCanvas::PlotFourier(int fourierType)
+{
+}
+
