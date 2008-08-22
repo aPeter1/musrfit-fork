@@ -1059,20 +1059,21 @@ cout << endl << ">> diff-name = " << name.Data() << endl;
           fData[i].diff->SetBinError(j, value);
         }
       }
-      // set current x-axis range
-      Int_t xminBin = fData[0].data->GetXaxis()->GetFirst(); // first bin of the zoomed range
-      Int_t xmaxBin = fData[0].data->GetXaxis()->GetLast();  // last bin of the zoomed range
-      Double_t xmin = fData[0].data->GetXaxis()->GetBinCenter(xminBin);
-      Double_t xmax = fData[0].data->GetXaxis()->GetBinCenter(xmaxBin);
-      fData[0].diff->GetXaxis()->SetRangeUser(xmin, xmax);
     } else if ((fPlotType == MSR_PLOT_NON_MUSR) && (fNonMusrData[0].diff == 0)) {
     }
   }
 
   // switch back to the "normal" view
   if (!fDifferencePlot) {
+    // set current x-axis range
     PlotData();
   } else {
+    // set current x-axis range
+    Int_t xminBin = fData[0].data->GetXaxis()->GetFirst(); // first bin of the zoomed range
+    Int_t xmaxBin = fData[0].data->GetXaxis()->GetLast();  // last bin of the zoomed range
+    Double_t xmin = fData[0].data->GetXaxis()->GetBinCenter(xminBin);
+    Double_t xmax = fData[0].data->GetXaxis()->GetBinCenter(xmaxBin);
+    fData[0].diff->GetXaxis()->SetRangeUser(xmin, xmax);
     PlotDifference();
   }
 }
@@ -1186,7 +1187,10 @@ void PMusrCanvas::PlotData()
     }
   }
 
+  fDataTheoryPad->Update();
+
   fMainCanvas->cd();
+  fMainCanvas->Update();
 }
 
 //--------------------------------------------------------------------------
@@ -1215,7 +1219,10 @@ cout << endl << ">> going to plot diff spectra ... (" << fData[0].diff->GetNbins
   } else { // fPlotType == MSR_PLOT_NON_MUSR
   }
 
+  fDataTheoryPad->Update();
+
   fMainCanvas->cd();
+  fMainCanvas->Update();
 }
 
 //--------------------------------------------------------------------------
