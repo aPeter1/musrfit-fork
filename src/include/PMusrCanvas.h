@@ -175,6 +175,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void HandleDifference();
 
     virtual double CalculateDiff(const double x, const double y, TH1F *theo);
+    virtual double CalculateDiff(const double x, const double y, TGraphErrors *theo);
 
     virtual void PlotData();
     virtual void PlotDifference();

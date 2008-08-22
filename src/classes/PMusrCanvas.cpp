@@ -1060,6 +1060,53 @@ cout << endl << ">> diff-name = " << name.Data() << endl;
         }
       }
     } else if ((fPlotType == MSR_PLOT_NON_MUSR) && (fNonMusrData[0].diff == 0)) {
+      TGraphErrors *diffHisto;
+      TString name;
+      // loop over all histos
+      for (unsigned int i=0; i<fNonMusrData.size(); i++) {
+        // create difference histos
+        diffHisto = new TGraphErrors(fNonMusrData[i].data->GetN());
+
+        // create difference histos
+        name = TString(fNonMusrData[i].data->GetTitle()) + "_diff";
+cout << endl << ">> diff-name = " << name.Data() << endl;
+        diffHisto->SetNameTitle(name.Data(), name.Data());
+
+        // set marker and line color
+        if (i < fColorList.size()) {
+          diffHisto->SetMarkerColor(fColorList[i]);
+          diffHisto->SetLineColor(fColorList[i]);
+        } else {
+          TRandom rand(i);
+          Int_t color = TColor::GetColor((Int_t)rand.Integer(255), (Int_t)rand.Integer(255), (Int_t)rand.Integer(255));
+          diffHisto->SetMarkerColor(color);
+          diffHisto->SetLineColor(color);
+        }
+        // set marker size
+        diffHisto->SetMarkerSize(1);
+        // set marker type
+        if (i < fMarkerList.size()) {
+          diffHisto->SetMarkerStyle(fMarkerList[i]);
+        } else {
+          TRandom rand(i);
+          diffHisto->SetMarkerStyle(20+(Int_t)rand.Integer(10));
+        }
+
+        // keep difference histo
+        fNonMusrData[i].diff = diffHisto;
+        // calculate diff histo entry
+        double value;
+        double x, y;
+        for (int j=0; j<fNonMusrData[i].data->GetN(); j++) {
+          // set diff bin value
+          fNonMusrData[i].data->GetPoint(j, x, y);
+          value = CalculateDiff(x, y, fNonMusrData[i].theory);
+          fNonMusrData[i].diff->SetPoint(j, x, value);
+          // set error diff bin value
+          value = fNonMusrData[i].data->GetErrorY(j);
+          fNonMusrData[i].diff->SetPointError(j, 0.0, value);
+        }
+      }
     }
   }
 
@@ -1068,12 +1115,14 @@ cout << endl << ">> diff-name = " << name.Data() << endl;
     // set current x-axis range
     PlotData();
   } else {
-    // set current x-axis range
-    Int_t xminBin = fData[0].data->GetXaxis()->GetFirst(); // first bin of the zoomed range
-    Int_t xmaxBin = fData[0].data->GetXaxis()->GetLast();  // last bin of the zoomed range
-    Double_t xmin = fData[0].data->GetXaxis()->GetBinCenter(xminBin);
-    Double_t xmax = fData[0].data->GetXaxis()->GetBinCenter(xmaxBin);
-    fData[0].diff->GetXaxis()->SetRangeUser(xmin, xmax);
+    if (fPlotType != MSR_PLOT_NON_MUSR) {
+      // set current x-axis range
+      Int_t xminBin = fData[0].data->GetXaxis()->GetFirst(); // first bin of the zoomed range
+      Int_t xmaxBin = fData[0].data->GetXaxis()->GetLast();  // last bin of the zoomed range
+      Double_t xmin = fData[0].data->GetXaxis()->GetBinCenter(xminBin);
+      Double_t xmax = fData[0].data->GetXaxis()->GetBinCenter(xmaxBin);
+      fData[0].diff->GetXaxis()->SetRangeUser(xmin, xmax);
+    }
     PlotDifference();
   }
 }
@@ -1093,6 +1142,41 @@ double PMusrCanvas::CalculateDiff(const double x, const double y, TH1F *theo)
   Int_t bin = theo->FindBin(x);
 
   return y - theo->GetBinContent(bin);
+}
+
+//--------------------------------------------------------------------------
+// CalculateDiff
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param x x-value of the data
+ * \param y y-value of the data
+ * \param theo theory error graph
+ */
+double PMusrCanvas::CalculateDiff(const double x, const double y, TGraphErrors *theo)
+{
+  Int_t i, bin = 0;
+  Double_t *xTheo = theo->GetX();
+  Double_t xVal, yVal;
+
+  // find proper bin of the theory
+  for (i=0; i<theo->GetN(); i++) {
+    if (*(xTheo+i) >= x) {
+      bin = i;
+      break;
+    }
+  }
+  // in case it is the last point
+  if (i == theo->GetN()) {
+    bin = i;
+  }
+
+  theo->GetPoint(bin, xVal, yVal);
+
+cout << endl << ">> bin=" << bin << ", x=" << xVal << " (xData=" << x << "), y=" << yVal;
+
+  return y - yVal;
 }
 
 //--------------------------------------------------------------------------
@@ -1211,12 +1295,28 @@ void PMusrCanvas::PlotDifference()
 cout << endl << ">> going to plot diff spectra ... (" << fData[0].diff->GetNbinsX() << ")" << endl;
     fData[0].diff->Draw("pe");
     // set x-axis label
+    fData[0].diff->GetXaxis()->SetTitle("time (#mus)");
     // set y-axis label
+    fData[0].diff->GetYaxis()->SetTitle("data-theory");
     // plot all remaining diff data
     for (unsigned int i=1; i<fData.size(); i++) {
       fData[i].diff->Draw("pesame");
     }
   } else { // fPlotType == MSR_PLOT_NON_MUSR
+    PMsrRunList runs = *fMsrHandler->GetMsrRunList();
+    PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
+    unsigned int runNo = (unsigned int)plotInfo.fRuns[0].Re()-1;
+    TString xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName);
+
+    fNonMusrData[0].diff->Draw("ap");
+    // set x-axis label
+    fNonMusrData[0].diff->GetXaxis()->SetTitle(xAxisTitle.Data());
+    // set y-axis label
+    fNonMusrData[0].diff->GetYaxis()->SetTitle("data-theory");
+    // plot all remaining diff data
+    for (unsigned int i=1; i<fNonMusrData.size(); i++) {
+      fNonMusrData[i].diff->Draw("psame");
+    }
   }
 
   fDataTheoryPad->Update();
