@@ -189,7 +189,7 @@ void musrfit_debug_info(PMsrHandler* msrHandler)
       switch (plot_it->fPlotType) {
         case MSR_PLOT_SINGLE_HISTO:
         case MSR_PLOT_ASYM:
-        case MSR_PLOT_NO_MUSR:
+        case MSR_PLOT_NON_MUSR:
           cout << plot_run_it->Re() << ", ";
           break;
         case MSR_PLOT_ASYM_RRF:

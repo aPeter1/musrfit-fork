@@ -274,9 +274,9 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
 //   cout << ">fMainCanvas   " << fMainCanvas << endl;
 //   cout << ">selected      " << selected << endl;
 // 
+cout << "x : "  << (char)x << endl;
 cout << "px: "  << (char)fMainCanvas->GetEventX() << endl;
 
-  TString str((Char_t)x);
   if (x == 'q') {
     Done(0);
   } else if (x == 'd') {
