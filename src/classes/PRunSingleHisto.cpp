@@ -455,19 +455,6 @@ bool PRunSingleHisto::PrepareFitData()
     }
   }
 
-  // crude estimate of the initial N0 (experimental), the idea is that the integral
-  // over N(t) would be N0 tau if there would be no asymmetry and bkg
-  value = 0.0;
-  for (unsigned i=start; i<runData->fDataBin[histoNo].size(); i++) {
-    value += runData->fDataBin[histoNo][i];
-  }
-  // the factor 0.8 takes into account bkg and asymmetry uncertainties
-  value = value*fTimeResolution/PMUON_LIFETIME*0.8;
-cout << endl << ">> histoNo = " << histoNo << ", NormParamNo = " << fRunInfo->fNormParamNo << ", N0 estimate = " << value;
-  // only update parameter list if fRunInfo->fNormParamNo is a parameter and not a function
-  if (fRunInfo->fNormParamNo < (int)fMsrInfo->GetNoOfParams())
-    fMsrInfo->SetMsrParamValue(fRunInfo->fNormParamNo, value);
-
   // count the number of bins to be fitted
   fNoOfFitBins=0;
   double time;
