@@ -6,18 +6,31 @@
         path/name to the FFTW-wisdom-file and time/field binning (us/G)
         N_theory determines the number of points in "real space" where the theory function will be calculated
       </comment>
-    <data_path>/home/l_wojek/TrimSP/AuYBCO_2005/AuYBCO-500000-</data_path>
-    <wisdom>WordsOfWisdom.dat</wisdom>
+    <data_path>/home/l_wojek/TrimSP/YBCOxtal/YBCOxtal-500000-</data_path>
+    <wisdom>/home/l_wojek/analysis/WordsOfWisdom.dat</wisdom>
     <delta_t>0.01</delta_t>
-    <delta_B>0.01</delta_B>
+    <delta_B>0.1</delta_B>
     <N_theory>5000</N_theory>
     <energy_list>
-        <energy>04_6</energy>
-        <energy>09_6</energy>
-        <energy>14_6</energy>
-        <energy>18_6</energy>
-        <energy>21_6</energy>
+        <energy>03_0</energy>
+        <energy>03_6</energy>
+        <energy>05_0</energy>
+        <energy>05_3</energy>
+        <energy>07_0</energy>
+        <energy>07_7</energy>
+        <energy>08_0</energy>
+        <energy>09_0</energy>
+        <energy>10_0</energy>
+        <energy>10_2</energy>
+        <energy>12_0</energy>
+        <energy>14_1</energy>
+        <energy>16_0</energy>
+        <energy>16_4</energy>    
+        <energy>18_0</energy>
+        <energy>19_7</energy>
+        <energy>20_0</energy>
+        <energy>22_0</energy>
+        <energy>24_0</energy>
         <energy>24_6</energy>
-        <energy>28_7</energy>
-    </energy_list>
+     </energy_list>
 </TFitPofB>

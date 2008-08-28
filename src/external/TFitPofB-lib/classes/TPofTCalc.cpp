@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/06/03
+  2008/08/28
 
 ***************************************************************************/
 
@@ -43,7 +43,7 @@ TPofTCalc::TPofTCalc (const string &wisdom, const vector<double> &par) : fWisdom
   wordsOfWisdomR = fopen(fWisdom.c_str(), "r");
   if (wordsOfWisdomR == NULL) {
     cout << "Couldn't open wisdom file ..." << endl;
-  } else { 
+  } else {
     wisdomLoaded = fftw_import_wisdom_from_file(wordsOfWisdomR);
     fclose(wordsOfWisdomR);
   }
@@ -53,7 +53,8 @@ TPofTCalc::TPofTCalc (const string &wisdom, const vector<double> &par) : fWisdom
   }
 
   fFFTplan = fftw_plan_dft_r2c_1d(fNFFT, fFFTin, fFFTout, FFTW_EXHAUSTIVE);
-  cout << &fFFTplan << endl;
+
+//  cout << &fFFTplan << endl;
 }
 
 //--------------

@@ -12,14 +12,14 @@ LOCALINCLUDE  = ../include
 ROOTINCLUDE   = $(ROOTSYS)/include
 INCLUDES      = -I$(LOCALINCLUDE) -I$(ROOTINCLUDE)
 LD            = g++
-LDFLAGS       = -g -L../classes -lTFitPofB -lfftw3 -lm
+LDFLAGS       = -g -L../classes -lTFitPofB -lfftw3 -lm -L/apps/cern/root/lib -lPMusr
 
 # the output from the root-config script:
 CXXFLAGS      += $(ROOTCFLAGS)
 LDFLAGS       +=
 
 # the ROOT libraries
-LIBS          = $(ROOTLIBS) -lXMLParser
+LIBS          = $(ROOTLIBS) -lXMLParser -lMathMore
 
 EXEC = test
 

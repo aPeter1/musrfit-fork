@@ -97,6 +97,24 @@ int main(){
   of8.close();
 
 */
+/**************** Test TLondon1DHS *********************************/
+
+//  unsigned int parNo_arr[] = {1, 2, 5, 7, 9, 10, 11, 12};
+  double par_arr[] = {20.0, 24.6, 100.0, 15.0, 140.0};
+  
+//  vector<unsigned int> parNo_vec(parNo_arr, parNo_arr+(sizeof(parNo_arr)/sizeof(parNo_arr[0])));
+  vector<double> par_vec(par_arr, par_arr+(sizeof(par_arr)/sizeof(par_arr[0])));
+  
+//  vector<double> par_vec_sub;
+  
+//  for(unsigned int i(0); i<parNo_vec.size(); i++) {
+//    par_vec_sub.push_back(par_vec[parNo_vec[i]-1]);
+//  }
+  
+  TLondon1DHS fitter;
+
+/************************************************************************/
+
 
 /**************** Test TLondon1D1L *********************************
 
@@ -134,7 +152,7 @@ int main(){
 
 ************************************************************************/
 
-/**************** Test TLondon1D3L *********************************/
+/**************** Test TLondon1D3L ********************************
 
   unsigned int parNo_arr[] = {1, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
   double par_arr[] = {0.0, 999.0, 0.01, 999.0, 0.01, 999.0, 4.6, 999.0, 100.0, 5.0, 70.0, 50.0, 70.0, 180.0, 180.0, 180.0, 1.0, 1.0, 1.0};
@@ -150,7 +168,7 @@ int main(){
   
   TLondon1D3L fitter(parNo_vec, par_vec);
 
-/************************************************************************/
+************************************************************************/
 
 
 /**************** Test TLondon1D3LS *********************************
@@ -179,66 +197,76 @@ int main(){
   ofstream of06("test_fitter06.dat");
   ofstream of07("test_fitter07.dat");
   ofstream of08("test_fitter08.dat");
-  ofstream of09("test_fitter09.dat");
-  ofstream of10("test_fitter10.dat");
+//  ofstream of09("test_fitter09.dat");
+//  ofstream of10("test_fitter10.dat");
   
 
   for (double i(0.); i<12.0; i+=0.003) {
-    of01 << i << " " << fitter.Eval(i, par_vec_sub) << endl;
+    of01 << i << " " << fitter(i, par_vec) << endl;
   }
   of01.close();
   
-  par_vec_sub[1] = 9.6;
-  par_vec_sub[8] = 300.0;
+  par_vec[1] = 7.7;
   
   for (double i(0.); i<12.0; i+=0.003) {
-    of02 << i << " " << fitter.Eval(i, par_vec_sub) << endl;
+    of02 << i << " " << fitter(i, par_vec) << endl;
   }
   of02.close();
 
-    par_vec_sub[0] = 40.6;
+  par_vec[0] = 0.0;
   
   for (double i(0.); i<12.0; i+=0.003) {
-    of03 << i << " " << fitter.Eval(i, par_vec_sub) << endl;
+    of03 << i << " " << fitter(i, par_vec) << endl;
   }
   of03.close();
   
-    par_vec_sub[11] = 0.3;
+    par_vec[2] = 200.0;
   
   for (double i(0.); i<12.0; i+=0.003) {
-    of04 << i << " " << fitter.Eval(i, par_vec_sub) << endl;
+    of04 << i << " " << fitter(i, par_vec) << endl;
   }
   of04.close();
 
-    par_vec_sub[9] = 500.0;
+    par_vec[4] = 100.0;
   
   for (double i(0.); i<12.0; i+=0.003) {
-    of05 << i << " " << fitter.Eval(i, par_vec_sub) << endl;
+    of05 << i << " " << fitter(i, par_vec) << endl;
   }
   of05.close();
-/*  
-    par_vec_sub[3] = 24.6;
-    par_vec_sub[7] -= 10.0;
+
+  par_vec[0] = 20.0;
+  par_vec[1] = 24.6;
+  par_vec[2] = 96.5;
+  par_vec[3] = 15.0;
+  par_vec[4] = 130.0;
   
   for (double i(0.); i<12.0; i+=0.003) {
-    of06 << i << " " << fitter.Eval(i, par_vec_sub) << endl;
+    of06 << i << " " << fitter(i, par_vec) << endl;
   }
   of06.close();
   
-    par_vec_sub[3] = 28.7;
+  par_vec[0] = 20.0;
+  par_vec[1] = 24.6;
+  par_vec[2] = 96.5;
+  par_vec[3] = 15.0;
+  par_vec[4] = 140.0;
   
   for (double i(0.); i<12.0; i+=0.003) {
-    of07 << i << " " << fitter.Eval(i, par_vec_sub) << endl;
+    of07 << i << " " << fitter(i, par_vec) << endl;
   }
   of07.close();
   
-    par_vec_sub[0] += 10.0;
+  par_vec[0] = 20.0;
+  par_vec[1] = 24.6;
+  par_vec[2] = 96.5;
+  par_vec[3] = 20.0;
+  par_vec[4] = 130.0;
   
   for (double i(0.); i<12.0; i+=0.003) {
-    of08 << i << " " << fitter.Eval(i, par_vec_sub) << endl;
+    of08 << i << " " << fitter(i, par_vec) << endl;
   }
   of08.close();
-  
+/*
     par_vec_sub[0] = 0.0;
     par_vec_sub[7] = 1000.0;
   
@@ -318,10 +346,9 @@ int main(){
   
   */
   
-  parNo_vec.clear();
+
   par_vec.clear();
-  par_vec_sub.clear();
-  
+ 
   
   
   

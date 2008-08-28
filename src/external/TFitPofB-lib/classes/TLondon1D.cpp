@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/06/30
+  2008/08/28
 
 ***************************************************************************/
 
@@ -28,7 +28,6 @@ ClassImp(TLondon1D3LS)
 //------------------
 
 TLondon1DHS::~TLondon1DHS() {
-    cout << "This is the TLondon1DHS-destructor. Jippieh!" << endl;
     fPar.clear();
     fParForBofZ.clear();
     fParForPofB.clear();
@@ -40,7 +39,6 @@ TLondon1DHS::~TLondon1DHS() {
 }
 
 TLondon1D1L::~TLondon1D1L() {
-    cout << "This is the TLondon1D1L-destructor. Jippieh!" << endl;
     fPar.clear();
     fParForBofZ.clear();
     fParForPofB.clear();
@@ -52,7 +50,6 @@ TLondon1D1L::~TLondon1D1L() {
 }
 
 TLondon1D2L::~TLondon1D2L() {
-    cout << "This is the TLondon1D2L-destructor. Jippieh!" << endl;
     fPar.clear();
     fParForBofZ.clear();
     fParForPofB.clear();
@@ -64,7 +61,6 @@ TLondon1D2L::~TLondon1D2L() {
 }
 
 TLondon1D3L::~TLondon1D3L() {
-    cout << "This is the TLondon1D3L-destructor. Jippieh!" << endl;
     fPar.clear();
     fParForBofZ.clear();
     fParForPofB.clear();
@@ -76,7 +72,6 @@ TLondon1D3L::~TLondon1D3L() {
 }
 
 TLondon1D3LS::~TLondon1D3LS() {
-    cout << "This is the TLondon1D3LS-destructor. Jippieh!" << endl;
     fPar.clear();
     fParForBofZ.clear();
     fParForPofB.clear();
@@ -93,7 +88,6 @@ TLondon1D3LS::~TLondon1D3LS() {
 //------------------
 
 TLondon1DHS::TLondon1DHS() : fCalcNeeded(true), fFirstCall(true) {
-    cout << "This is the TLondon1DHS-constructor. Juhu!" << endl;
 
     // read startup file
     string startup_path_name("TFitPofB_startup.xml");
@@ -156,16 +150,16 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
   if(fFirstCall){
     fPar = par;
 
-    for (unsigned int i(0); i<fPar.size(); i++){
-      cout << "fPar[" << i << "] = " << fPar[i] << endl;
-    }
+//    for (unsigned int i(0); i<fPar.size(); i++){
+//      cout << "fPar[" << i << "] = " << fPar[i] << endl;
+//    }
 
     for (unsigned int i(2); i<fPar.size(); i++){
       fParForBofZ.push_back(fPar[i]);
-      cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << endl;
+//      cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << endl;
     }
     fFirstCall=false;
-  cout << this << endl;
+//  cout << this << endl;
   }
 
   // check if any parameter has changed
@@ -227,7 +221,6 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
 //------------------
 
 TLondon1D1L::TLondon1D1L() : fCalcNeeded(true), fFirstCall(true) {
-    cout << "This is the TLondon1D1L-constructor. Juhu!" << endl;
 
     // read startup file
     string startup_path_name("TFitPofB_startup.xml");

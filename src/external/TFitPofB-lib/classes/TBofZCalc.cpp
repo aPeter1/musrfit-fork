@@ -62,7 +62,7 @@ double TBofZCalc::GetBofZ(double zz) const {
 }
 
 //------------------
-// Constructor of the TLondon1D_1L class
+// Constructor of the TLondon1D_HS class
 // 1D-London screening in a superconducting half-space
 // Parameters: Bext[G], deadlayer[nm], lambda[nm] 
 //------------------
