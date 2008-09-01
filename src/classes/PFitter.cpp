@@ -36,6 +36,7 @@ using namespace std;
 #include <math.h>
 
 #include "Minuit2/FunctionMinimum.h"
+#include "Minuit2/MnHesse.h"
 #include "Minuit2/MnMinimize.h"
 #include "Minuit2/MnMigrad.h"
 #include "Minuit2/MnMinos.h"
@@ -310,6 +311,23 @@ bool PFitter::ExecuteHesse()
   // if already some minimization is done use the minuit2 output as input
   if (fFcnMin)
     fMnUserParams = fFcnMin->UserParameters();
+
+  // create the hesse object
+  ROOT::Minuit2::MnHesse hesse;
+
+  // call hesse
+  ROOT::Minuit2::MnUserParameterState mnState = hesse((*fFitterFcn), fMnUserParams);
+
+  if (!mnState.IsValid()) {
+    cout << endl << "**WARNING** PFitter::ExecuteHesse(): Hesse encountered some problems!";
+    cout << endl;
+    return false;
+  }
+
+  // fill parabolic errors
+  for (unsigned int i=0; i<fParams.size(); i++) {
+    fRunInfo->SetMsrParamStep(i, mnState.Error(i));
+  }
 
   return true;
 }
