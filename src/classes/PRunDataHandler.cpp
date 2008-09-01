@@ -488,10 +488,10 @@ bool PRunDataHandler::ReadNemuFile()
   runData.fRunName        = TString("");
   runData.fRunTitle       = TString("");
   runData.fSetup          = TString("");
-  runData.fField          = nan("NAN");
-  runData.fTemp           = nan("NAN");
-  runData.fEnergy         = nan("NAN");
-  runData.fTimeResolution = nan("NAN");
+  runData.fField          = -9.9e99;
+  runData.fTemp           = -9.9e99;
+  runData.fEnergy         = -9.9e99;
+  runData.fTimeResolution = 0.0;
 
   // open file
   ifstream f;
@@ -578,7 +578,7 @@ bool PRunDataHandler::ReadNemuFile()
     f.getline(instr, sizeof(instr));
   } while (headerInfo && !f.eof());
 
-  if ((groups == 0) || (channels == 0) || isnan(runData.fTimeResolution)) {
+  if ((groups == 0) || (channels == 0) || runData.fTimeResolution == 0.0) {
     cout << endl << "PRunDataHandler::ReadNemuFile(): essential header informations are missing!";
     f.close();
     return false;

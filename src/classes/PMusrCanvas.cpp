@@ -594,7 +594,7 @@ void PMusrCanvas::UpdateInfoPad()
     // temperature if present
     tstr += TString("T=");
     dval = fRunList->GetTemp(runs[runNo].fRunName);
-    if (isnan(dval)) {
+    if (dval == -9.9e99) {
       tstr += TString("??,");
     } else {
       sprintf(sval, "%0.2lf", dval);
@@ -603,7 +603,7 @@ void PMusrCanvas::UpdateInfoPad()
     // field if present
     tstr += TString("B=");
     dval = fRunList->GetField(runs[runNo].fRunName);
-    if (isnan(dval)) {
+    if (dval == -9.9e99) {
       tstr += TString("??,");
     } else {
       sprintf(sval, "%0.2lf", dval);
@@ -612,7 +612,7 @@ void PMusrCanvas::UpdateInfoPad()
     // energy if present
     tstr += TString("E=");
     dval = fRunList->GetEnergy(runs[runNo].fRunName);
-    if (isnan(dval)) {
+    if (dval == -9.9e99) {
       tstr += TString("??,");
     } else {
       sprintf(sval, "%0.2lf", dval);

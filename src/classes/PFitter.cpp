@@ -134,8 +134,7 @@ bool PFitter::DoFit()
         cout << endl;
         break;
       case PMN_HESSE:
-        cout << endl << "**WARNING** from PFitter::DoFit() : the command HESSE is not yet implemented.";
-        cout << endl;
+        status = ExecuteHesse();
         break;
       case PMN_MACHINE_PRECISION:
         cout << endl << "**WARNING** from PFitter::DoFit() : the command MACHINE_PRECISION is not yet implemented.";
@@ -270,18 +269,17 @@ bool PFitter::CheckCommands()
  */
 bool PFitter::SetParameters()
 {
-  PMsrParamList::iterator it;
-
-  for (it = fParams.begin(); it != fParams.end(); ++it) {
+  for (unsigned int i=0; i<fParams.size(); i++) {
     // check if parameter is fixed
-    if (it->fStep == 0.0) { // add fixed parameter
-      fMnUserParams.Add(it->fName.Data(), it->fValue);
+    if (fParams[i].fStep == 0.0) { // add fixed parameter
+      fMnUserParams.Add(fParams[i].fName.Data(), fParams[i].fValue);
     } else { // add free parameter
       // check if boundaries are given
-      if (it->fNoOfParams > 5) { // boundaries given
-        fMnUserParams.Add(it->fName.Data(), it->fValue, it->fStep, it->fLowerBoundary, it->fUpperBoundary);
+      if (fParams[i].fNoOfParams > 5) { // boundaries given
+        fMnUserParams.Add(fParams[i].fName.Data(), fParams[i].fValue, fParams[i].fStep,
+                          fParams[i].fLowerBoundary, fParams[i].fUpperBoundary);
       } else { // no boundaries given
-        fMnUserParams.Add(it->fName.Data(), it->fValue, it->fStep);
+        fMnUserParams.Add(fParams[i].fName.Data(), fParams[i].fValue, fParams[i].fStep);
       }
     }
   }
@@ -294,6 +292,24 @@ bool PFitter::SetParameters()
       cout << endl << "**WARNING** : Parameter No " << i+1 << " is not used at all, will fix it" << endl;
     }
   }
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// ExecuteHesse
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+bool PFitter::ExecuteHesse()
+{
+  cout << "PFitter::ExecuteHesse(): will call hesse ..." << endl;
+
+  // if already some minimization is done use the minuit2 output as input
+  if (fFcnMin)
+    fMnUserParams = fFcnMin->UserParameters();
 
   return true;
 }
@@ -534,7 +550,7 @@ bool PFitter::ExecuteSave()
     fout.setf(ios::left, ios::adjustfield);
     fout.precision(6);
     fout.width(11);
-    fout << fMnUserParams.Error(i);
+    fout << mnState.Error(i);
     // write minos errors
     if (fParams[i].fPosErrorPresent) {
       fout.setf(ios::left, ios::adjustfield);
@@ -554,7 +570,7 @@ bool PFitter::ExecuteSave()
       fout << "---";
     }
     // write limits
-    if (!isnan(fParams[i].fLowerBoundary)) {
+    if (fParams[i].fNoOfParams > 5) {
       fout.setf(ios::left, ios::adjustfield);
       fout.width(7);
       fout << fParams[i].fLowerBoundary;

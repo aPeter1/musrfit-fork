@@ -89,6 +89,7 @@ short term:
 * PFitter.cpp: the value of the parabolic error in the MINUIT2.OUTPUT is wrong (only MIGRAD is
   called and neither HESSE nor MINOS). Suspect the problem in the ExecuteSave() routine.
   Needs to be checked.
+  **DONE** 08-09-01
 
 * PFitter.cpp: implement HESSE
 

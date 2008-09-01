@@ -87,6 +87,7 @@ class PFitter
     bool CheckCommands();
     bool SetParameters();
 
+    bool ExecuteHesse();
     bool ExecuteMigrad();
     bool ExecuteMinimize();
     bool ExecuteMinos();

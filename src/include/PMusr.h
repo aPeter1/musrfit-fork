@@ -234,6 +234,7 @@ typedef struct {
   PIntVector fMap;         ///<
   int fForwardHistoNo;     ///<
   int fBackwardHistoNo;    ///<
+  bool fBkgFixPresent[2];  ///< flag showing if a fixed background is present
   double fBkgFix[2];       ///<
   int fBkgRange[4];        ///<
   int fDataRange[4];       ///<

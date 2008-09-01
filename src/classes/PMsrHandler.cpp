@@ -506,15 +506,16 @@ int PMsrHandler::WriteMsrLogFile()
       CheckAndWriteComment(f, ++lineNo);
     }
     // backgr.fix
-    if (!isnan(fRuns[i].fBkgFix[0])) {
+    if (fRuns[i].fBkgFixPresent[0]) {
       f.width(15);
       f << endl << left << "backgr.fix";
-      for (unsigned int j=0; j<2; j++) {
-        if (!isnan(fRuns[i].fBkgFix[j])) {
-          f.precision(prec);
-          f.width(12);
-          f << left << fRuns[i].fBkgFix[j];
-        }
+      f.precision(prec);
+      f.width(12);
+      f << left << fRuns[i].fBkgFix[0];
+      if (fRuns[i].fBkgFixPresent[1]) {
+        f.precision(prec);
+        f.width(12);
+        f << left << fRuns[i].fBkgFix[1];
       }
       CheckAndWriteComment(f, ++lineNo);
     }
@@ -830,20 +831,20 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
   TObjString *ostr;
   TString str;
 
-  // init param structure
-  param.fNoOfParams      = -1;
-  param.fNo              = -1;
-  param.fName            = TString("");
-  param.fValue           = nan("NAN");
-  param.fStep            = nan("NAN");
-  param.fPosErrorPresent = nan("NAN");
-  param.fPosError        = nan("NAN");
-  param.fLowerBoundary   = nan("NAN");
-  param.fUpperBoundary   = nan("NAN");
-
   // fill param structure
   iter = lines.begin();
   while ((iter != lines.end()) && !error) {
+
+    // init param structure
+    param.fNoOfParams      = -1;
+    param.fNo              = -1;
+    param.fName            = TString("");
+    param.fValue           = 0.0;
+    param.fStep            = 0.0;
+    param.fPosErrorPresent = false;
+    param.fPosError        = 0.0;
+    param.fLowerBoundary   = 0.0;
+    param.fUpperBoundary   = 0.0;
 
     tokens = iter->fLine.Tokenize(" \t");
     if (!tokens) {
@@ -991,6 +992,7 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
       cout << endl;
     } else { // everything is OK, therefore add the parameter to the parameter list
       fParam.push_back(param);
+cout << endl << ">> PMsrHandler::HandleFitParameterEntry: i=" << fParam.size() << ", param.fLowerBoundary=" << param.fLowerBoundary << ", param.fUpperBoundary=" << param.fUpperBoundary;
     }
 
     // clean up
@@ -1509,7 +1511,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
       bool found;
       if (fRuns[i].fBkgFitParamNo >= 0) { // check if backgr.fit is given
         found = true;
-      } else if (!isnan(fRuns[i].fBkgFix[0])) { // check if backgr.fix is given
+      } else if (fRuns[i].fBkgFixPresent[0]) { // check if backgr.fix is given
         found = true;
       } else if (fRuns[i].fBkgRange[0] >= 0) { // check if background window is given
         found = true;
@@ -1555,8 +1557,10 @@ void PMsrHandler::InitRunParameterStructure(PMsrRunStructure &param)
   param.fMap.clear(); // empty list
   param.fForwardHistoNo  = -1;
   param.fBackwardHistoNo = -1;
-  for (int i=0; i<2; i++)
-    param.fBkgFix[i] = nan("NAN");
+  for (int i=0; i<2; i++) {
+    param.fBkgFixPresent[i] = false;
+    param.fBkgFix[i] = 0.0;
+  }
   for (int i=0; i<4; i++)
     param.fBkgRange[i] = -1;
   for (int i=0; i<4; i++)

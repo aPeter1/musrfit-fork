@@ -356,7 +356,7 @@ bool PRunAsymmetry::PrepareData()
   }
 
   // subtract background from histogramms ------------------------------------------
-  if (isnan(fRunInfo->fBkgFix[0])) { // no fixed background given
+  if (!fRunInfo->fBkgFixPresent[0]) { // no fixed background given
     if (fRunInfo->fBkgRange[0] != 0) {
       if (!SubtractEstimatedBkg())
         return false;
