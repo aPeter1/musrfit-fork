@@ -81,6 +81,17 @@ short term:
 * Minuit2: name length is now unlimited and hence the 10 char restriction can be lifted.
   **DONE** 08-08-08
 
+* musrfit: switch "--keep-output-mn2" and "-k" needed. It will rename the MINUIT2.OUTPUT and 
+  MINUIT2.root files to fln-mn2.output and fln-mn2.root.
+  This is sometimes nice to have.
+  **DONE** 08-09-01
+
+* PFitter.cpp: the value of the parabolic error in the MINUIT2.OUTPUT is wrong (only MIGRAD is
+  called and neither HESSE nor MINOS). Suspect the problem in the ExecuteSave() routine.
+  Needs to be checked.
+
+* PFitter.cpp: implement HESSE
+
 * implement FFT with msr-interface
 
 ---------------------

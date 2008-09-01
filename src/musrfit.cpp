@@ -57,14 +57,17 @@ using namespace std;
  */
 void musrfit_syntax()
 {
-  cout << endl << "usage: musrfit [<msr-file> [--debug] | [--dump <type>]] | --version | --help";
+  cout << endl << "usage: musrfit [<msr-file> [-k, --keep-mn2-ouput] [--debug] [--dump <type>]] | --version | --help";
   cout << endl << "       <msr-file>: msr input file";
   cout << endl << "       'musrfit <msr-file>' will execute msrfit";
   cout << endl << "       'musrfit' or 'musrfit --help' will show this help";
   cout << endl << "       'musrfit --version' will print the msrfit version";
+  cout << endl << "       -k, --keep-mn2-output: will rename the files MINUIT2.OUTPUT and ";
+  cout << endl << "              MINUIT2.root to <msr-file>-mn2.output and <msr-file>-mn2.root, repectively,";
+  cout << endl << "              e.g. <msr-file> = 147.msr -> 147-mn2.output, 147-mn2.root";
   cout << endl << "       --debug is used to print additional infos";
   cout << endl << "       --dump <type> is writing a data file with the fit data and the theory";
-  cout << endl << "              <type> can be 'ascii', 'root'"; 
+  cout << endl << "              <type> can be 'ascii', 'root'";
   cout << endl << endl;
 }
 
@@ -469,43 +472,72 @@ int main(int argc, char *argv[])
   bool show_syntax = false;
   int  status;
   bool debug = false;
+  bool keep_mn2_output = false;
   TString dump("");
 
   // check syntax
+  if (argc < 2) {
+    musrfit_syntax();
+    return PMUSR_WRONG_STARTUP_SYNTAX;
+  }
+
   if (argc == 2) {
     if (!strcmp(argv[1], "--version")) {
       cout << endl << "musrfit version: $Id$";
       cout << endl << endl;
       return PMUSR_SUCCESS; 
-    } else if (!strcmp(argv[1], "--help")) {
-      show_syntax = true;
-    } else { // assume file name
-      // check if filename has extension msr
-      if (!strstr(argv[1], ".msr")) {
-        cout << endl << "ERROR: " << argv[1] << " is not a msr-file!" << endl;
-        show_syntax = true;
-      } else {
-        show_syntax = false;
-      }
     }
-  } else if (argc == 3) {
-    if (!strcmp(argv[2], "--debug"))
-      debug = true;
-    else
+
+    if (!strcmp(argv[1], "--help")) {
       show_syntax = true;
-  } else if (argc == 4) {
-    if (!strcmp(argv[2], "--dump"))
-      dump = TString(argv[3]);
-    else
-      show_syntax = true;
-  } else {
-    show_syntax = true;
+    }
   }
 
   if (show_syntax) {
     musrfit_syntax();
     return PMUSR_WRONG_STARTUP_SYNTAX;
   }
+
+  // check file name
+  if (!strstr(argv[1], ".msr")) {
+    cout << endl << "**ERROR** " << argv[1] << " is not a msr-file!" << endl;
+    musrfit_syntax();
+    return PMUSR_WRONG_STARTUP_SYNTAX;
+  }
+
+  for (int i=2; i<argc; i++) {
+    if (!strcmp(argv[i], "-k") || !strcmp(argv[i], "--keep-mn2-output")) {
+      keep_mn2_output = true;
+    } else if (!strcmp(argv[i], "--debug")) {
+      debug = true;
+    } else if (!strcmp(argv[i], "--dump")) {
+      if (i<argc-1) {
+        dump = TString(argv[i+1]);
+        i++;
+      } else {
+        show_syntax = true;
+        break;
+      }
+    } else {
+      show_syntax = true;
+      break;
+    }
+  }
+
+  if (show_syntax) {
+    musrfit_syntax();
+    return PMUSR_WRONG_STARTUP_SYNTAX;
+  }
+
+  // check if dump string does make sense
+  if (!dump.IsNull()) {
+    dump.ToLower();
+    if (!dump.Contains("ascii") && !dump.Contains("root")) {
+      musrfit_syntax();
+      return PMUSR_WRONG_STARTUP_SYNTAX;
+    }
+  }
+
 
   // get default path (for the moment only linux like)
   char *pmusrpath;
@@ -624,6 +656,22 @@ int main(int argc, char *argv[])
       musrfit_dump_root(argv[1], runListCollection);
     else
       cout << endl << "do not know format " << dump.Data() << ", sorry :-| " << endl;
+  }
+
+  // rename MINUIT2.OUTPUT and MINUIT2.root file if wanted
+  if (keep_mn2_output) {
+    // 1st rename MINUIT2.OUTPUT
+    TString fln = TString(argv[1]);
+    char ext[32];
+    strcpy(ext, "-mn2.output");
+    fln.ReplaceAll(".msr", 4, ext, strlen(ext));
+    gSystem->CopyFile("MINUIT2.OUTPUT", fln.Data(), kTRUE);
+
+    // 2nd rename MINUIT2.ROOT
+    fln = TString(argv[1]);
+    strcpy(ext, "-mn2.root");
+    fln.ReplaceAll(".msr", 4, ext, strlen(ext));
+    gSystem->CopyFile("MINUIT2.root", fln.Data(), kTRUE);
   }
 
   // clean up
