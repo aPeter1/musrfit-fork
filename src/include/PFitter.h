@@ -82,7 +82,8 @@ class PFitter
 
     PFitterFcn *fFitterFcn;
     ROOT::Minuit2::MnUserParameters fMnUserParams; ///< minuit2 input parameter list
-    ROOT::Minuit2::FunctionMinimum *fFcnMin; ///<
+    ROOT::Minuit2::FunctionMinimum *fFcnMin;       ///< function minimum object
+    ROOT::Minuit2::MnUserParameterState *fMnUserParamState; ///< keeps the current user parameter state
 
     bool CheckCommands();
     bool SetParameters();

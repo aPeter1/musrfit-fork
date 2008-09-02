@@ -992,7 +992,6 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
       cout << endl;
     } else { // everything is OK, therefore add the parameter to the parameter list
       fParam.push_back(param);
-cout << endl << ">> PMsrHandler::HandleFitParameterEntry: i=" << fParam.size() << ", param.fLowerBoundary=" << param.fLowerBoundary << ", param.fUpperBoundary=" << param.fUpperBoundary;
     }
 
     // clean up

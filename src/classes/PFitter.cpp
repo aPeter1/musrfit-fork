@@ -70,6 +70,7 @@ PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection) :
   // init class variables
   fFitterFcn = 0;
   fFcnMin = 0;
+  fMnUserParamState = 0;
 
   // check msr minuit commands
   if (!CheckCommands()) {
@@ -324,6 +325,12 @@ bool PFitter::ExecuteHesse()
     return false;
   }
 
+  // keep the user parameter state
+  if (fMnUserParamState) {
+    delete fMnUserParamState;
+  }
+  fMnUserParamState = new ROOT::Minuit2::MnUserParameterState(mnState);
+
   // fill parabolic errors
   for (unsigned int i=0; i<fParams.size(); i++) {
     fRunInfo->SetMsrParamStep(i, mnState.Error(i));
@@ -367,6 +374,12 @@ bool PFitter::ExecuteMigrad()
     delete fFcnMin;
   }
   fFcnMin = new ROOT::Minuit2::FunctionMinimum(min);
+
+  // keep user parameter state
+  if (fMnUserParamState) {
+    delete fMnUserParamState;
+  }
+  fMnUserParamState = new ROOT::Minuit2::MnUserParameterState(min.UserState());
 
   // fill run info
   for (unsigned int i=0; i<fParams.size(); i++) {
@@ -426,6 +439,12 @@ cout << endl << "maxfcn=" << maxfcn << endl;
     delete fFcnMin;
   }
   fFcnMin = new ROOT::Minuit2::FunctionMinimum(min);
+
+  // keep user parameter state
+  if (fMnUserParamState) {
+    delete fMnUserParamState;
+  }
+  fMnUserParamState = new ROOT::Minuit2::MnUserParameterState(min.UserState());
 
   // fill run info
   for (unsigned int i=0; i<fParams.size(); i++) {
@@ -568,7 +587,7 @@ bool PFitter::ExecuteSave()
     fout.setf(ios::left, ios::adjustfield);
     fout.precision(6);
     fout.width(11);
-    fout << mnState.Error(i);
+    fout << fMnUserParamState->Error(i);
     // write minos errors
     if (fParams[i].fPosErrorPresent) {
       fout.setf(ios::left, ios::adjustfield);
