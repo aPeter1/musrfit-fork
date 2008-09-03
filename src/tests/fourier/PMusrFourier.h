@@ -82,7 +82,7 @@ class PMusrFourier
   public:
     PMusrFourier(int dataType, PDoubleVector &data, double timeResolution, 
                  double startTime = 0.0, double endTime = 0.0, unsigned int binning = 1,
-                 bool estimateN0AndBkg = false);
+                 unsigned int zeroPaddingPower = 0, bool estimateN0AndBkg = false);
     virtual ~PMusrFourier();
 
     virtual void SetN0(double n0) { fN0 = n0; }
@@ -113,6 +113,7 @@ class PMusrFourier
     double fStartTime;
     double fEndTime;
     unsigned int fRebin;
+    unsigned int fZeroPaddingPower;
     double fFieldResolution;
     double fPhaseCorrection;
 
@@ -120,11 +121,12 @@ class PMusrFourier
     PDoubleVector fDataRebinned;
 
     unsigned int fNoOfData;
+    unsigned int fNoOfBins;
     fftw_plan fFFTwPlan;
     fftw_complex *fIn;
     fftw_complex *fOut;
 
-    virtual void PrepareFFTwInputData();
+    virtual void PrepareSingleHistoFFTwInputData();
     virtual void EstimateN0AndBkg();
 };
 

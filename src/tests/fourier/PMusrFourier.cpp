@@ -52,9 +52,10 @@
  */
 PMusrFourier::PMusrFourier(int dataType, PDoubleVector &data, double timeResolution,
                            double startTime, double endTime, unsigned int rebin,
-                           bool estimateN0AndBkg) :
+                           unsigned int zeroPaddingPower, bool estimateN0AndBkg) :
                            fDataType(dataType), fTimeResolution(timeResolution),
-                           fStartTime(startTime), fEndTime(endTime), fRebin(rebin)
+                           fStartTime(startTime), fEndTime(endTime), fRebin(rebin),
+                           fZeroPaddingPower(zeroPaddingPower)
 {
   // init stuff
   fData = data;
@@ -116,11 +117,18 @@ cout << endl << "dB = " << 1.0/(F_GAMMA_BAR_MUON * (fEndTime-fStartTime)) << " (
   // calculate start and end bin
   unsigned int start = (unsigned int)(fStartTime/fTimeResolution);
   unsigned int end = (unsigned int)(fEndTime/fTimeResolution);
+  fNoOfData = end-start;
+
+  // check if zero padding is whished
+  if (fZeroPaddingPower > 0) {
+    fNoOfBins = static_cast<unsigned int>(pow(2.0, static_cast<double>(fZeroPaddingPower)));
+  } else {
+    fNoOfBins = fNoOfData;
+  }
 
   // allocate necessary memory
-  fNoOfData = end-start;
-  fIn  = (fftw_complex *)fftw_malloc(sizeof(fftw_complex)*fNoOfData);
-  fOut = (fftw_complex *)fftw_malloc(sizeof(fftw_complex)*fNoOfData);
+  fIn  = (fftw_complex *)fftw_malloc(sizeof(fftw_complex)*fNoOfBins);
+  fOut = (fftw_complex *)fftw_malloc(sizeof(fftw_complex)*fNoOfBins);
 
   // check if memory allocation has been successful
   if ((fIn == 0) || (fOut == 0)) {
@@ -128,21 +136,16 @@ cout << endl << "dB = " << 1.0/(F_GAMMA_BAR_MUON * (fEndTime-fStartTime)) << " (
     return;
   }
 
-  for (unsigned int i=0; i<fNoOfData; i++) {
-    fIn[i][0] = fDataRebinned[i+start];
-    fIn[i][1] = 0.0;
-  }
-
 // has to be removed after testing
 TH1F test_raw_in("test_raw_in", "test_raw_in", fNoOfData+1,
              fStartTime - fTimeResolution/2.0, fEndTime + fTimeResolution/2.0);
 for (unsigned int i=0; i<fNoOfData; i++)
-  test_raw_in.SetBinContent(i+1, fIn[i][0]);
+  test_raw_in.SetBinContent(i+1, fDataRebinned[i+start]);
 TFile f("test_raw_in.root", "RECREATE");
 test_raw_in.Write();
 f.Close();
 
-  fFFTwPlan = fftw_plan_dft_1d(fNoOfData, fIn, fOut, FFTW_FORWARD, FFTW_ESTIMATE);
+  fFFTwPlan = fftw_plan_dft_1d(fNoOfBins, fIn, fOut, FFTW_FORWARD, FFTW_ESTIMATE);
 
   if (!fFFTwPlan) {
     fValid = false;
@@ -182,14 +185,14 @@ void PMusrFourier::Transform(int apodization, int filter)
     return;
 
   if (fDataType == F_SINGLE_HISTO) {
-    PrepareFFTwInputData();
+    PrepareSingleHistoFFTwInputData();
   }
 
 // for test only
 // keep data
 fftw_complex *data; 
-data = (fftw_complex *)fftw_malloc(sizeof(fftw_complex)*fNoOfData);
-for (unsigned int i=0; i<fNoOfData; i++) {
+data = (fftw_complex *)fftw_malloc(sizeof(fftw_complex)*fNoOfBins);
+for (unsigned int i=0; i<fNoOfBins; i++) {
   data[i][0] = fIn[i][0];
   data[i][1] = 0.0;
 }
@@ -197,18 +200,20 @@ for (unsigned int i=0; i<fNoOfData; i++) {
 // loop over the phase
 double sum;
 TH1F sumHist("sumHist", "sumHist", 361, -180.5, 180.5);
-TH1F re("re", "re", fNoOfData+1, -0.5, (double)fNoOfData+0.5);
-TH1F im("im", "im", fNoOfData+1, -0.5, (double)fNoOfData+0.5);
+double dB   = 1.0/(2.0 * F_GAMMA_BAR_MUON * (fEndTime-fStartTime));
+double Bmax = 1.0/(2.0 * F_GAMMA_BAR_MUON * fTimeResolution);
+TH1F re("re", "re", fNoOfBins/2+1, -dB/2.0, Bmax+dB/2.0);
+TH1F im("im", "im", fNoOfBins/2+1, -dB/2.0, Bmax+dB/2.0);
 for (int p=-180; p<180; p++) {
-  for (unsigned int i=0; i<fNoOfData; i++) {
+  for (unsigned int i=0; i<fNoOfBins; i++) {
     // recalculate fIn including the phase
     fIn[i][0] = data[i][0]*cos(p/180.0*PI);
     fIn[i][1] = data[i][0]*sin(p/180.0*PI);
   }
   fftw_execute(fFFTwPlan);
 
-  if (p==51) {
-    for (unsigned int j=0; j<fNoOfData; j++) {
+  if (p==8) {
+    for (unsigned int j=0; j<fNoOfBins/2; j++) {
       re.SetBinContent(j+1, fOut[j][0]);
       im.SetBinContent(j+1, fOut[j][1]);
     }
@@ -216,7 +221,7 @@ for (int p=-180; p<180; p++) {
 
   // calculate sum of the imaginary part of fOut
   sum = 0.0;
-  for (unsigned int i=0; i<fNoOfData/2; i++) {
+  for (unsigned int i=0; i<fNoOfBins/2; i++) {
     sum += fOut[i][1];
   }
   sumHist.SetBinContent(p+181, fabs(sum));
@@ -248,7 +253,7 @@ void PMusrFourier::GetRealFourier(PDoubleVector &realFourier)
   realFourier.clear();
 
   // fill realFourier vector
-  for (unsigned int i=0; i<fNoOfData; i++) {
+  for (unsigned int i=0; i<fNoOfBins; i++) {
     realFourier.push_back(fOut[i][0]);
   }
 }
@@ -271,7 +276,7 @@ void PMusrFourier::GetImaginaryFourier(PDoubleVector &imaginaryFourier)
   imaginaryFourier.clear();
 
   // fill imaginaryFourier vector
-  for (unsigned int i=0; i<fNoOfData; i++) {
+  for (unsigned int i=0; i<fNoOfBins; i++) {
     imaginaryFourier.push_back(fOut[i][1]);
   }
 }
@@ -294,7 +299,7 @@ void PMusrFourier::GetPowerFourier(PDoubleVector &powerFourier)
   powerFourier.clear();
 
   // fill powerFourier vector
-  for (unsigned int i=0; i<fNoOfData; i++) {
+  for (unsigned int i=0; i<fNoOfBins; i++) {
     powerFourier.push_back(sqrt(fOut[i][0]*fOut[i][0]+fOut[i][0]*fOut[i][0]));
   }
 }
@@ -318,7 +323,7 @@ void PMusrFourier::GetPhaseFourier(PDoubleVector &phaseFourier)
 
   // fill phaseFourier vector
   double value = 0.0;
-  for (unsigned int i=0; i<fNoOfData; i++) {
+  for (unsigned int i=0; i<fNoOfBins; i++) {
     // calculate the phase
     if (fOut[i][0] == 0) {
       if (fOut[i][1] >= 0.0)
@@ -395,31 +400,41 @@ cout << endl << ">> N0/per bin=" << A/(PMUON_LIFETIME*1000.0)*fTimeResolution <<
 }
 
 //--------------------------------------------------------------------------
-// PrepareFFTwInputData
+// PrepareSingleHistoFFTwInputData
 //--------------------------------------------------------------------------
 /**
  * <p>
  *
  */
-void PMusrFourier::PrepareFFTwInputData()
+void PMusrFourier::PrepareSingleHistoFFTwInputData()
 {
-  // 1st subtract the Bkg from the data
+  // 1st fill fIn
+  unsigned int start = (unsigned int)(fStartTime/fTimeResolution);
+  for (unsigned int i=0; i<fNoOfData; i++) {
+    fIn[i][0] = fDataRebinned[i+start];
+    fIn[i][1] = 0.0;
+  }
+  for (unsigned int i=fNoOfData; i<fNoOfBins; i++) {
+    fIn[i][0] = 0.0;
+    fIn[i][1] = 0.0;
+  }
+
+  // 2nd subtract the Bkg from the data
   for (unsigned int i=0; i<fNoOfData; i++)
     fIn[i][0] -= fBkg;
 
-  // 2nd remove the lifetime term
-  unsigned int start = (unsigned int)(fStartTime/fTimeResolution);
+  // 3rd remove the lifetime term
   for (unsigned int i=0; i<fNoOfData; i++)
     fIn[i][0] *= exp((start+i)*fTimeResolution/(PMUON_LIFETIME*1000.0));
 
-  // 3rd remove the constant N0 term
+  // 4th remove the constant N0 term
   for (unsigned int i=0; i<fNoOfData; i++)
     fIn[i][0] -= fN0;
 
 // has to be removed after testing
-TH1F test_in("test_in", "test_in", fNoOfData,
-             fStartTime - fTimeResolution/2.0, fEndTime + fTimeResolution/2.0);
-for (unsigned int i=0; i<fNoOfData; i++)
+TH1F test_in("test_in", "test_in", fNoOfBins,
+             fStartTime - fTimeResolution/2.0, fNoOfBins*fTimeResolution + fTimeResolution/2.0);
+for (unsigned int i=0; i<fNoOfBins; i++)
   test_in.SetBinContent(i, fIn[i][0]);
 TFile f("test_in.root", "RECREATE");
 test_in.Write();

@@ -151,8 +151,16 @@ cout << endl << "#bins=" << histo->GetNbinsX();
   cout << endl << ">> End Time in (us): ";
   cin >> endTime;
 
+  unsigned int zeroPaddingPower = 0;
+  cout << endl << ">> Do you wish zero padding (y/n)? ";
+  cin >> answer;
+  if (strstr(answer, "y")) {
+    cout << endl << ">> zero padding as 2^n. n = ";
+    cin >> zeroPaddingPower;
+  }
+
   PMusrFourier fourier(F_SINGLE_HISTO, data, timeResolution, startTime, endTime, 
-                       rebin, F_ESTIMATE_N0_AND_BKG);
+                       rebin, zeroPaddingPower, F_ESTIMATE_N0_AND_BKG);
 
   if (fourier.IsValid()) {
     fourier.Transform(F_APODIZATION_NONE, F_FILTER_NONE);
