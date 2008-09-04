@@ -2317,7 +2317,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
   }
 
   // go through all the run block lines 2nd time to filter remaining maps
-cout << endl << ">> run block check (2nd time) ...";
+//cout << endl << ">> run block check (2nd time) ...";
   for (iter = run.begin(); iter != run.end(); ++iter) {
     // remove potential comments
     str = iter->fLine;
@@ -2336,7 +2336,7 @@ cout << endl << ">> run block check (2nd time) ...";
         continue;
 
       // get the parameter number via map
-cout << endl << ">> map.size() = " << map.size();
+//cout << endl << ">> map.size() = " << map.size();
       for (unsigned int i=0; i<map.size(); i++) {
         if (map[i] == 0)
           continue;
@@ -2347,7 +2347,7 @@ cout << endl << ">> map.size() = " << map.size();
             ival = str.Atoi();
             if (ival > 0) {
               fParamInUse[ival-1]++; // this is OK since map is ranging from 1 ..
-cout << endl << ">>>> param no : " << ival << ", via map no : " << map[i];
+//cout << endl << ">>>> param no : " << ival << ", via map no : " << map[i];
             }
           }
         }
@@ -2361,10 +2361,10 @@ cout << endl << ">>>> param no : " << ival << ", via map no : " << map[i];
     }
   }
 
-cout << endl << ">> fParamInUse: ";
-for (unsigned int i=0; i<fParamInUse.size(); i++)
-  cout << endl << i+1 << ", " << fParamInUse[i];
-cout << endl;
+// cout << endl << ">> fParamInUse: ";
+// for (unsigned int i=0; i<fParamInUse.size(); i++)
+//   cout << endl << i+1 << ", " << fParamInUse[i];
+// cout << endl;
 
   // clean up
   map.clear();
