@@ -2023,13 +2023,14 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
   TObjArray  *tokens = 0;
   TObjString *ostr = 0;
   TString    str;
-  int        ival;
+  int        ival, funNo;
 
   // create and initialize fParamInUse vector
   for (unsigned int i=0; i<fParam.size(); i++)
     fParamInUse.push_back(0);
 
   // go through all the theory lines ------------------------------------
+//cout << endl << ">> theory block check ...";
   for (iter = theory.begin(); iter != theory.end(); ++iter) {
     // remove potential comments
     str = iter->fLine;
@@ -2072,6 +2073,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
   }
 
   // go through all the function lines: 1st time -----------------------------
+//cout << endl << ">> function block check (1st time) ...";
   for (iter = funcs.begin(); iter != funcs.end(); ++iter) {
     // remove potential comments
     str = iter->fLine;
@@ -2091,23 +2093,23 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
     // filter fun number
     ostr = dynamic_cast<TObjString*>(tokens->At(0));
     str = ostr->GetString();
-    if (!FilterFunMapNumber(str, "fun", ival))
+    if (!FilterFunMapNumber(str, "fun", funNo))
       continue;
-    ival -= MSR_PARAM_FUN_OFFSET;
+    funNo -= MSR_PARAM_FUN_OFFSET;
 
     // check if fun number is used, and if yes, filter parameter numbers and maps
     TString sstr;
-// cout << endl << ">> fun.size() = " << fun.size();
+//cout << endl << ">> fun.size() = " << fun.size();
     for (unsigned int i=0; i<fun.size(); i++) {
-// cout << endl << ">> funNo: " << fun[i];
-      if (fun[i] == ival) { // function number found
+//cout << endl << ">> funNo: " << fun[i] << ", funNo: " << funNo;
+      if (fun[i] == funNo) { // function number found
         // filter for parX
         sstr = iter->fLine;
         char sval[128];
         while (sstr.Index("par") != -1) {
           memset(sval, 0, sizeof(sval));
           sstr = &sstr[sstr.Index("par")+3]; // trunc sstr
-// cout << endl << ">> par:sstr: " << sstr.Data();
+//cout << endl << ">> par:sstr: " << sstr.Data();
           for (int j=0; j<sstr.Sizeof(); j++) {
             if (!isdigit(sstr[j]))
               break;
@@ -2123,14 +2125,14 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
         while (sstr.Index("map") != -1) {
           memset(sval, 0, sizeof(sval));
           sstr = &sstr[sstr.Index("map")+3]; // trunc sstr
-// cout << endl << ">> map:sstr: " << sstr.Data();
+//cout << endl << ">> map:sstr: " << sstr.Data();
           for (int j=0; j<sstr.Sizeof(); j++) {
             if (!isdigit(sstr[j]))
               break;
             sval[j] = sstr[j];
           }
           sscanf(sval, "%d", &ival);
-// cout << endl << ">>>> mapX from func 1st, X = " << ival;
+//cout << endl << ">>>> mapX from func 1st, X = " << ival;
           // check if map value already in map, otherwise add it
           if (ival > 0) {
             unsigned int pos;
@@ -2155,6 +2157,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
   }
 
   // go through all the run block lines -------------------------------------
+//cout << endl << ">> run block check (1st time) ...";
   for (iter = run.begin(); iter != run.end(); ++iter) {
     // remove potential comments
     str = iter->fLine;
@@ -2234,6 +2237,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
   }
 
   // go through all the function lines: 2nd time -----------------------------
+//cout << endl << ">> function block check (2nd time) ...";
   for (iter = funcs.begin(); iter != funcs.end(); ++iter) {
     // remove potential comments
     str = iter->fLine;
@@ -2253,14 +2257,15 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
     // filter fun number
     ostr = dynamic_cast<TObjString*>(tokens->At(0));
     str = ostr->GetString();
-    if (!FilterFunMapNumber(str, "fun", ival))
+    if (!FilterFunMapNumber(str, "fun", funNo))
       continue;
-    ival -= MSR_PARAM_FUN_OFFSET;
+    funNo -= MSR_PARAM_FUN_OFFSET;
 
     // check if fun number is used, and if yes, filter parameter numbers and maps
     TString sstr;
     for (unsigned int i=0; i<fun.size(); i++) {
-      if (fun[i] == ival) { // function number found
+//cout << endl << ">> funNo: " << fun[i] << ", funNo: " << funNo;
+      if (fun[i] == funNo) { // function number found
         // filter for parX
         sstr = iter->fLine;
         char sval[128];
@@ -2288,7 +2293,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
             sval[j] = sstr[j];
           }
           sscanf(sval, "%d", &ival);
-// cout << endl << ">>>> mapX from func 2nd, X = " << ival;
+//cout << endl << ">>>> mapX from func 2nd, X = " << ival;
           // check if map value already in map, otherwise add it
           if (ival > 0) {
             unsigned int pos;
@@ -2296,7 +2301,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
               if (ival == map[pos])
                 break;
             }
-            if ((unsigned int)ival == map.size()) { // new map value
+            if ((unsigned int)pos == map.size()) { // new map value
               map.push_back(ival);
             }
           }
@@ -2312,6 +2317,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
   }
 
   // go through all the run block lines 2nd time to filter remaining maps
+cout << endl << ">> run block check (2nd time) ...";
   for (iter = run.begin(); iter != run.end(); ++iter) {
     // remove potential comments
     str = iter->fLine;
@@ -2330,7 +2336,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
         continue;
 
       // get the parameter number via map
-//cout << endl << ">> map.size() = " << map.size();
+cout << endl << ">> map.size() = " << map.size();
       for (unsigned int i=0; i<map.size(); i++) {
         if (map[i] == 0)
           continue;
@@ -2341,7 +2347,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
             ival = str.Atoi();
             if (ival > 0) {
               fParamInUse[ival-1]++; // this is OK since map is ranging from 1 ..
-//cout << endl << ">>>> param no : " << ival << ", via map no : " << map[i];
+cout << endl << ">>>> param no : " << ival << ", via map no : " << map[i];
             }
           }
         }
@@ -2355,10 +2361,10 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
     }
   }
 
-// cout << endl << ">> fParamInUse: ";
-// for (unsigned int i=0; i<fParamInUse.size(); i++)
-//   cout << endl << i+1 << ", " << fParamInUse[i];
-// cout << endl;
+cout << endl << ">> fParamInUse: ";
+for (unsigned int i=0; i<fParamInUse.size(); i++)
+  cout << endl << i+1 << ", " << fParamInUse[i];
+cout << endl;
 
   // clean up
   map.clear();
