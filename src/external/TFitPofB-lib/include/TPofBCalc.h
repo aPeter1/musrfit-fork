@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/25
+  2008/09/04
 
 ***************************************************************************/
 
@@ -31,13 +31,15 @@ public:
   vector<double> DataPB() const {return fPB;}
   double GetBmin() const {return fBmin;}
   double GetBmax() const {return fBmax;}
+  void ConvolveGss(double);
 
 private:
   vector<double> fB;
   vector<double> fPB;
   double fBmin;
   double fBmax;
-
+  double fDT;
+  double fDB;
 };
 
 #endif // _TPofBCalc_H_

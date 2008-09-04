@@ -5,11 +5,11 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/06/03
+  2008/09/04
 
 ***************************************************************************/
 
-#include "TPofBCalc.h"
+#include "TPofTCalc.h"
 #include <cmath>
 #include <iostream>
 #include <fstream>
@@ -17,14 +17,14 @@
 /* USED FOR DEBUGGING-----------------------------------
 #include <cstdio>
 #include <ctime>
--------------------------------------------------------*/
+/-------------------------------------------------------*/
 
 //-----------
 // Constructor that does the P(B) calculation for given B(z) and n(z)
 // Parameters: dt[us], dB[G], Energy[keV]
 //-----------
 
-TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, const vector<double> &para ) {
+TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, const vector<double> &para ) : fDT(para[0]), fDB(para[1]) {
 
   fBmin = BofZ.GetBmin();
   fBmax = BofZ.GetBmax();
@@ -34,7 +34,7 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
 
   // fill not used Bs before Bmin with 0.0
 
-  for ( BB = 0.0 ; BB < fBmin ; BB += para[1] ) {
+  for ( BB = 0.0 ; BB < fBmin ; BB += fDB ) {
     fB.push_back(BB);
     fPB.push_back(0.0);
   }
@@ -69,9 +69,14 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
   char debugfile1[50];
   int n1 = sprintf (debugfile1, "test_NZ_%ld_%f.dat", seconds, para[2]);
 
+  char debugfile2[50];
+  int n2 = sprintf (debugfile2, "test_NZgss_%ld_%f.dat", seconds, para[2]);
+
   if (n1 > 0) {
     ofstream of1(debugfile1);
 //    assure(of1, debugfile1);
+
+    dataTrimSP.Normalize(para[2]);
 
     for (unsigned int i(0); i<dataTrimSP.DataZ(para[2]).size(); i++) {
       of1 << dataTrimSP.DataZ(para[2])[i] << " " << dataTrimSP.DataNZ(para[2])[i] << " " << dataTrimSP.OrigDataNZ(para[2])[i] << endl;
@@ -79,13 +84,28 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
     of1.close();
   }
 
----------------------------------------------------------*/
+  if (n2 > 0) {
+    ofstream of2(debugfile2);
+//    assure(of1, debugfile1);
+
+    dataTrimSP.ConvolveGss(10.0,para[2]);
+    dataTrimSP.Normalize(para[2]);
+    
+    for (unsigned int i(0); i<dataTrimSP.DataZ(para[2]).size(); i++) {
+      of2 << dataTrimSP.DataZ(para[2])[i] << " " << dataTrimSP.DataNZ(para[2])[i] << " " << dataTrimSP.OrigDataNZ(para[2])[i] << endl;
+    }
+    of2.close();
+  }
+
+/---------------------------------------------------------*/
+
+//  dataTrimSP.ConvolveGss(10.0,para[2]); // convolve implantation profile by gaussian
 
   double nn;
   bool zNextFound(false);
 
-  for ( ; BB <= fBmax ; BB += para[1]) {
-    BBnext = BB + para[1];
+  for ( ; BB <= fBmax ; BB += fDB) {
+    BBnext = BB + fDB;
     fB.push_back(BB);
     fPB.push_back(0.0);
 
@@ -109,7 +129,7 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
           nn = dataTrimSP.GetNofZ(zm, para[2]);
           if (nn != -1.0) {
 //          cout << "zNext = " << zNextm << ", zm = " << zm << ", dz = " << dz << endl;
-            *(fPB.end()-1) += nn*fabs(dz/para[1]);
+            *(fPB.end()-1) += nn*fabs(dz/fDB);
           }
         }
 
@@ -132,7 +152,7 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
           nn = dataTrimSP.GetNofZ(zp, para[2]);
           if (nn != -1.0) {
 //            cout << "zNext = " << zNextp << ", zp = " << zp << ", dz = " << dz << endl;
-            *(fPB.end()-1) += nn*fabs(dz/para[1]);
+            *(fPB.end()-1) += nn*fabs(dz/fDB);
           }
         }
      }
@@ -144,11 +164,11 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
 
   // fill not used Bs after Bext with 0.0
 
-  double BmaxFFT(1.0/gBar/para[0]);
+  double BmaxFFT(1.0/gBar/fDT);
 
 //  cout << "N = " << int(BmaxFFT/para[1]+1.0) << endl;
 
-  for ( ; BB <= BmaxFFT ; BB += para[1] ) {
+  for ( ; BB <= BmaxFFT ; BB += fDB ) {
     fB.push_back(BB);
     fPB.push_back(0.0);
   }
@@ -167,8 +187,82 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
   double pBsum = 0.0;
   for (unsigned int i(firstZerosEnd); i<lastZerosStart; i++)
     pBsum += fPB[i];
-  pBsum *= para[1];
+  pBsum *= fDB;
   for (unsigned int i(firstZerosEnd); i<lastZerosStart; i++)
     fPB[i] /= pBsum;
 
+}
+
+
+void TPofBCalc::ConvolveGss(double w) {
+
+  if(!w)
+    return;
+
+  unsigned int NFFT;
+  double TBin;
+  fftw_plan FFTplanToTimeDomain;
+  fftw_plan FFTplanToFieldDomain;
+  fftw_complex *FFTout;
+  double *FFTin;
+
+  NFFT = ( int(1.0/gBar/fDT/fDB+1.0) % 2 ) ? int(1.0/gBar/fDT/fDB+2.0) : int(1.0/gBar/fDT/fDB+1.0);
+  TBin = 1.0/gBar/double(NFFT-1)/fDB;
+
+  FFTin = (double *)malloc(sizeof(double) * NFFT);
+  FFTout = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * (NFFT/2+1));
+
+  // do the FFT to time domain
+
+  FFTplanToTimeDomain = fftw_plan_dft_r2c_1d(NFFT, FFTin, FFTout, FFTW_ESTIMATE);
+
+  for (unsigned int i(0); i<NFFT; i++) {
+    FFTin[i] = fPB[i];
+  }
+  for (unsigned int i(0); i<NFFT/2+1; i++) {
+    FFTout[i][0] = 0.0;
+    FFTout[i][1] = 0.0;
+  }
+
+  fftw_execute(FFTplanToTimeDomain);
+
+  // multiply everything by a gaussian
+
+  double GssInTimeDomain;
+  double expo(-2.0*PI*PI*gBar*gBar*w*w*TBin*TBin);
+
+  for (unsigned int i(0); i<NFFT/2+1; i++) {
+    GssInTimeDomain = exp(expo*double(i)*double(i));
+    FFTout[i][0] *= GssInTimeDomain;
+    FFTout[i][1] *= GssInTimeDomain;
+  }
+
+  // FFT back to the field domain
+
+  FFTplanToFieldDomain = fftw_plan_dft_c2r_1d(NFFT, FFTout, FFTin, FFTW_ESTIMATE);
+
+  fftw_execute(FFTplanToFieldDomain);
+
+  for (unsigned int i(0); i<NFFT; i++) {
+    fPB[i] = FFTin[i];
+  }
+
+  // cleanup
+
+  fftw_destroy_plan(FFTplanToTimeDomain);
+  fftw_destroy_plan(FFTplanToFieldDomain);
+  free(FFTin);
+  fftw_free(FFTout);
+//  fftw_cleanup();
+
+  // normalize p(B)
+
+  double pBsum = 0.0;
+  for (unsigned int i(0); i<NFFT; i++)
+    pBsum += fPB[i];
+  pBsum *= fDB;
+  for (unsigned int i(0); i<NFFT; i++)
+    fPB[i] /= pBsum;
+
+  return;
 }

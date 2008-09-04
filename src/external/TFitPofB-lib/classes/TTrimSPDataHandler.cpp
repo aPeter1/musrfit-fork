@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/30
+  2008/09/02
 
 ***************************************************************************/
 
@@ -221,6 +221,9 @@ double TTrimSPData::GetNofZ(double zz, double e) const {
     }
   }
 
+  if(zz < 0)
+    return 0.0;
+
   bool found = false;
   unsigned int i;
   for (i=0; i<z.size(); i++) {
@@ -231,7 +234,7 @@ double TTrimSPData::GetNofZ(double zz, double e) const {
   }
 
   if (!found)
-    return -1.0;
+    return 0.0;
 
   if (i == 0)
     return nz[0]*10.0*zz/z[0];
@@ -243,7 +246,7 @@ double TTrimSPData::GetNofZ(double zz, double e) const {
 // Method normalizing the n(z)-vector calculated by trim.SP for a given energy[keV]
 //---------------------
 
-void TTrimSPData::Normalize(double e) {
+void TTrimSPData::Normalize(double e) const {
 
   for(unsigned int i(0); i<fEnergy.size(); i++) {
     if(!(fEnergy[i] - e)) {
@@ -277,4 +280,41 @@ bool TTrimSPData::IsNormalized(double e) const {
 
   cout << "No implantation profile available for the specified energy... Returning false! Check your code!" << endl;
   return false;
+}
+
+//---------------------
+// Convolve the n(z)-vector calculated by trim.SP for a given energy e [keV] with a gaussian exp(-z^2/(2*w^2))
+// No normalization is done!
+//---------------------
+
+void TTrimSPData::ConvolveGss(double w, double e) const {
+  if(!w)
+    return;
+
+  vector<double> z, nz, gss;
+  double nn;
+
+  for(unsigned int i(0); i<fEnergy.size(); i++) {
+    if(!(fEnergy[i] - e)) {
+      z = fDataZ[i];
+      nz = fOrigDataNZ[i];
+
+      for(unsigned int k(0); k<z.size(); k++) {
+        gss.push_back(exp(-z[k]*z[k]/200.0/w/w));
+      }
+
+      for(unsigned int k(0); k<nz.size(); k++) {
+        nn = 0.0;
+        for(unsigned int j(0); j<nz.size(); j++) {
+          nn += nz[j]*gss[abs(int(k)-int(j))];
+        }
+        fDataNZ[i][k] = nn;
+      }
+
+      return;
+    }
+  }
+
+  cout << "No implantation profile available for the specified energy... No convolution done!" << endl;
+  return;
 }

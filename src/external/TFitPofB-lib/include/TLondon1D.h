@@ -18,7 +18,7 @@
 class TLondon1DHS : public PUserFcnBase {
 
 public:
-  // default conctructor
+  // default constructor
   TLondon1DHS();
   ~TLondon1DHS();
 
@@ -42,7 +42,7 @@ private:
 class TLondon1D1L : public PUserFcnBase {
 
 public:
-  // default conctructor
+  // default constructor
   TLondon1D1L();
   ~TLondon1D1L();
 
@@ -59,6 +59,7 @@ private:
   mutable vector<double> fParForPofB;
   string fWisdom;
   unsigned int fNSteps;
+  mutable unsigned int fCallCounter;
 
   ClassDef(TLondon1D1L,1)
 };
@@ -66,7 +67,7 @@ private:
 class TLondon1D2L : public PUserFcnBase {
 
 public:
-  // default conctructor
+  // default constructor
   TLondon1D2L();
   ~TLondon1D2L();
 
@@ -91,7 +92,7 @@ private:
 class TLondon1D3L : public PUserFcnBase {
 
 public:
-  // default conctructor
+  // default constructor
   TLondon1D3L();
   ~TLondon1D3L();
 
@@ -117,7 +118,7 @@ private:
 class TLondon1D3LS : public PUserFcnBase {
 
 public:
-  // default conctructor
+  // default constructor
   TLondon1D3LS();
   ~TLondon1D3LS();
 

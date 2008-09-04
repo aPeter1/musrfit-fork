@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/26
+  2008/09/02
 
 ***************************************************************************/
 
@@ -33,8 +33,9 @@ public:
   vector<double> OrigDataNZ(double) const;
   void WeightLayers(double, const vector<double>&, const vector<double>&) const;
   double GetNofZ(double, double) const;
-  void Normalize(double);
+  void Normalize(double) const;
   bool IsNormalized(double) const;
+  void ConvolveGss(double, double) const;
 
 private:
   vector<double> fEnergy;

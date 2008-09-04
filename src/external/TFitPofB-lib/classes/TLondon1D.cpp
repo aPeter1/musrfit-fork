@@ -113,6 +113,7 @@ TLondon1DHS::TLondon1DHS() : fCalcNeeded(true), fFirstCall(true) {
     fParForPofB.push_back(startupHandler->GetDeltat());
     fParForPofB.push_back(startupHandler->GetDeltaB());
     fParForPofB.push_back(0.0);
+//    fParForPofB.push_back(0.0);
 
     TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
     fImpProfile = x;
@@ -196,6 +197,7 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
         fParForBofZ[i-2] = par[i];
 
       fParForPofB[2] = par[1]; // energy
+//      fParForPofB[3] = par[3]; // deadlayer for convolution of field profile
 
       TLondon1D_HS BofZ(fNSteps, fParForBofZ);
       TPofBCalc PofB(BofZ, *fImpProfile, fParForPofB);
@@ -220,7 +222,7 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
 // creates (a pointer to) the TPofTCalc object (with the FFT plan)
 //------------------
 
-TLondon1D1L::TLondon1D1L() : fCalcNeeded(true), fFirstCall(true) {
+TLondon1D1L::TLondon1D1L() : fCalcNeeded(true), fFirstCall(true), fCallCounter(0) {
 
     // read startup file
     string startup_path_name("TFitPofB_startup.xml");
@@ -275,6 +277,11 @@ TLondon1D1L::TLondon1D1L() : fCalcNeeded(true), fFirstCall(true) {
 //------------------
 
 double TLondon1D1L::operator()(double t, const vector<double> &par) const {
+
+  // Debugging
+  // Count the number of function calls
+  fCallCounter++;
+
   if(t<0.0)
     return 0.0;
 
@@ -283,16 +290,16 @@ double TLondon1D1L::operator()(double t, const vector<double> &par) const {
   if(fFirstCall){
     fPar = par;
 
-    for (unsigned int i(0); i<fPar.size(); i++){
+/*    for (unsigned int i(0); i<fPar.size(); i++){
       cout << "fPar[" << i << "] = " << fPar[i] << endl;
     }
-
+*/
     for (unsigned int i(2); i<fPar.size(); i++){
       fParForBofZ.push_back(fPar[i]);
-      cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << endl;
+//      cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << endl;
     }
     fFirstCall=false;
-  cout << this << endl;
+//  cout << this << endl;
   }
 
   // check if any parameter has changed
@@ -342,6 +349,16 @@ double TLondon1D1L::operator()(double t, const vector<double> &par) const {
 
     fCalcNeeded = false;
   }
+  
+  // Debugging start
+  if (!(fCallCounter%10000)){
+    cout << fCallCounter-1 << "\t";
+    for (unsigned int i(0); i<fPar.size(); i++){
+      cout << fPar[i] << "\t";
+    }
+    cout << endl;
+  }
+  // Debugging end
 
   return fPofT->Eval(t);
 
@@ -414,13 +431,13 @@ double TLondon1D2L::operator()(double t, const vector<double> &par) const {
   if(fFirstCall){
     fPar = par;
 
-    for (unsigned int i(0); i<fPar.size(); i++){
+/*    for (unsigned int i(0); i<fPar.size(); i++){
       cout << "fPar[" << i << "] = " << fPar[i] << endl;
     }
-
+*/
     for (unsigned int i(2); i<fPar.size(); i++){
       fParForBofZ.push_back(fPar[i]);
-      cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << endl;
+//      cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << endl;
     }
     fFirstCall=false;
   }
@@ -470,7 +487,7 @@ double TLondon1D2L::operator()(double t, const vector<double> &par) const {
         for(unsigned int i(par.size()-2); i<par.size(); i++)
           weights.push_back(par[i]);
 
-        cout << "Weighting has changed, re-calculating n(z) now..." << endl;
+//        cout << "Weighting has changed, re-calculating n(z) now..." << endl;
         fImpProfile->WeightLayers(par[1], interfaces, weights);
       }
 
@@ -559,13 +576,13 @@ double TLondon1D3L::operator()(double t, const vector<double> &par) const {
   if(fFirstCall){
     fPar = par;
 
-    for (unsigned int i(0); i<fPar.size(); i++){
+/*    for (unsigned int i(0); i<fPar.size(); i++){
       cout << "fPar[" << i << "] = " << fPar[i] << endl;
     }
-
+*/
     for (unsigned int i(2); i<fPar.size(); i++){
       fParForBofZ.push_back(fPar[i]);
-      cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << endl;
+//      cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << endl;
     }
     fFirstCall=false;
   }
@@ -630,7 +647,7 @@ double TLondon1D3L::operator()(double t, const vector<double> &par) const {
         for(unsigned int i(par.size()-3); i<par.size(); i++)
           weights.push_back(par[i]);
 
-        cout << "Weighting has changed, re-calculating n(z) now..." << endl;
+//        cout << "Weighting has changed, re-calculating n(z) now..." << endl;
         fImpProfile->WeightLayers(par[1], interfaces, weights);
       }
 
@@ -719,13 +736,13 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
   if(fFirstCall){
     fPar = par;
 
-    for (unsigned int i(0); i<fPar.size(); i++){
+/*    for (unsigned int i(0); i<fPar.size(); i++){
       cout << "fPar[" << i << "] = " << fPar[i] << endl;
     }
-
+*/
     for (unsigned int i(2); i<fPar.size(); i++){
       fParForBofZ.push_back(fPar[i]);
-      cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << endl;
+//      cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << endl;
     }
     fFirstCall=false;
   }
@@ -776,7 +793,7 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
         for(unsigned int i(par.size()-3); i<par.size(); i++)
           weights.push_back(par[i]);
 
-        cout << "Weighting has changed, re-calculating n(z) now..." << endl;
+//        cout << "Weighting has changed, re-calculating n(z) now..." << endl;
         fImpProfile->WeightLayers(par[1], interfaces, weights);
       }
 
