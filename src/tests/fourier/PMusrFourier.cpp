@@ -75,6 +75,9 @@ PMusrFourier::PMusrFourier(int dataType, PDoubleVector &data, double timeResolut
   fIn  = 0;
   fOut = 0;
 
+  fApodization = F_APODIZATION_NONE;
+  fFilter      = F_FILTER_NONE;
+
   // if endTime == 0 set is to the last time slot
   if (fEndTime == 0.0)
     fEndTime = (fData.size()-1)*fTimeResolution;
@@ -106,7 +109,7 @@ PMusrFourier::PMusrFourier(int dataType, PDoubleVector &data, double timeResolut
     }
   }
 
-cout << endl << "dB = " << 1.0/(F_GAMMA_BAR_MUON * (fEndTime-fStartTime)) << " (G), Bmax = " << 1.0/(F_GAMMA_BAR_MUON*fTimeResolution) << " (G)" << endl;
+cout << endl << "dB = " << 1.0/(2.0 * F_GAMMA_BAR_MUON * (fEndTime-fStartTime)) << " (G), Bmax = " << 1.0/(2.0 * F_GAMMA_BAR_MUON * fTimeResolution) << " (G)" << endl;
 
 
   // try to estimate N0 and Bkg just out of the raw data
@@ -175,17 +178,18 @@ cout << endl << "in ~PMusrFourier() ..." << endl;
 /**
  * <p>
  *
- * \param apodization
- * \param filter
- * \param estimateN0AndBkg
+ * \param apodizationTag 0=no apod., 1=weak apod., 2=medium apod., 3=strong apod., 4=user apod.
+ * \param filterTag 0=no filter, 1=low pass, 2=band pass, 3=high pass, 4=..., n=user filter
  */
-void PMusrFourier::Transform(int apodization, int filter)
+void PMusrFourier::Transform(unsigned int apodizationTag, unsigned int filterTag)
 {
   if (!fValid)
     return;
 
   if (fDataType == F_SINGLE_HISTO) {
-    PrepareSingleHistoFFTwInputData();
+    PrepareSingleHistoFFTwInputData(apodizationTag, filterTag);
+  } else {
+    PrepareFFTwInputData(apodizationTag, filterTag);
   }
 
 // for test only
@@ -212,7 +216,7 @@ for (int p=-180; p<180; p++) {
   }
   fftw_execute(fFFTwPlan);
 
-  if (p==8) {
+  if (p == 7) {
     for (unsigned int j=0; j<fNoOfBins/2; j++) {
       re.SetBinContent(j+1, fOut[j][0]);
       im.SetBinContent(j+1, fOut[j][1]);
@@ -223,6 +227,9 @@ for (int p=-180; p<180; p++) {
   sum = 0.0;
   for (unsigned int i=0; i<fNoOfBins/2; i++) {
     sum += fOut[i][1];
+  }
+  if (p == 7) {
+    cout << endl << ">> sum = " << sum << endl;
   }
   sumHist.SetBinContent(p+181, fabs(sum));
 }
@@ -406,7 +413,7 @@ cout << endl << ">> N0/per bin=" << A/(PMUON_LIFETIME*1000.0)*fTimeResolution <<
  * <p>
  *
  */
-void PMusrFourier::PrepareSingleHistoFFTwInputData()
+void PMusrFourier::PrepareSingleHistoFFTwInputData(unsigned int apodizationTag, unsigned int filterTag)
 {
   // 1st fill fIn
   unsigned int start = (unsigned int)(fStartTime/fTimeResolution);
@@ -431,6 +438,9 @@ void PMusrFourier::PrepareSingleHistoFFTwInputData()
   for (unsigned int i=0; i<fNoOfData; i++)
     fIn[i][0] -= fN0;
 
+  // 5th apodize data (if wished)
+  ApodizeData(apodizationTag);
+
 // has to be removed after testing
 TH1F test_in("test_in", "test_in", fNoOfBins,
              fStartTime - fTimeResolution/2.0, fNoOfBins*fTimeResolution + fTimeResolution/2.0);
@@ -439,4 +449,94 @@ for (unsigned int i=0; i<fNoOfBins; i++)
 TFile f("test_in.root", "RECREATE");
 test_in.Write();
 f.Close();
+}
+
+//--------------------------------------------------------------------------
+// PrepareFFTwInputData
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrFourier::PrepareFFTwInputData(unsigned int apodizationTag, unsigned int filterTag)
+{
+  // 1st fill fIn
+  unsigned int start = (unsigned int)(fStartTime/fTimeResolution);
+  for (unsigned int i=0; i<fNoOfData; i++) {
+    fIn[i][0] = fDataRebinned[i+start];
+    fIn[i][1] = 0.0;
+  }
+  for (unsigned int i=fNoOfData; i<fNoOfBins; i++) {
+    fIn[i][0] = 0.0;
+    fIn[i][1] = 0.0;
+  }
+
+  // 2nd apodize data (if wished)
+  ApodizeData(apodizationTag);
+
+// has to be removed after testing
+TH1F test_in("test_in", "test_in", fNoOfBins,
+             fStartTime - fTimeResolution/2.0, fNoOfBins*fTimeResolution + fTimeResolution/2.0);
+for (unsigned int i=0; i<fNoOfBins; i++)
+  test_in.SetBinContent(i, fIn[i][0]);
+TFile f("test_in.root", "RECREATE");
+test_in.Write();
+f.Close();
+}
+
+//--------------------------------------------------------------------------
+// ApodizeData
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param apodizationTag
+ */
+void PMusrFourier::ApodizeData(int apodizationTag) {
+
+  const double cweak[3]   = { 0.384093, -0.087577, 0.703484 };
+  const double cmedium[3] = { 0.152442, -0.136176, 0.983734 };
+  const double cstrong[3] = { 0.045335,  0.554883, 0.399782 };
+
+  double c[5];
+  for (unsigned int i=0; i<5; i++) {
+    c[i] = 0.0;
+  }
+
+  switch (apodizationTag) {
+    case F_APODIZATION_NONE:
+      break;
+    case F_APODIZATION_WEAK:
+      c[0] = cweak[0]+cweak[1]+cweak[2];
+      c[1] = -(cweak[1]+2.0*cweak[2]);
+      c[2] = cweak[2];
+      break;
+    case F_APODIZATION_MEDIUM:
+      c[0] = cmedium[0]+cmedium[1]+cmedium[2];
+      c[1] = -(cmedium[1]+2.0*cmedium[2]);
+      c[2] = cmedium[2];
+      break;
+    case F_APODIZATION_STRONG:
+      c[0] = cstrong[0]+cstrong[1]+cstrong[2];
+      c[1] = -2.0*(cstrong[1]+2.0*cstrong[2]);
+      c[2] = cstrong[1]+6.0*cstrong[2];
+      c[3] = -4.0*cstrong[2];
+      c[4] = cstrong[2];
+      break;
+    case F_APODIZATION_USER:
+      cout << endl << ">> User Apodization not yet implemented, sorry ..." << endl;
+      break;
+    default:
+      cout << endl << ">> **ERROR** User Apodization tag " << apodizationTag << " unknown, sorry ..." << endl;
+      break;
+  }
+
+  double q;
+  for (unsigned int i=0; i<fNoOfData; i++) {
+    q = c[0];
+    for (unsigned int j=1; j<5; j++) {
+      q += c[j] * pow((double)i/(double)fNoOfData, 2.0*(double)j);
+    }
+    fIn[i][0] *= q;
+  }
 }

@@ -39,8 +39,9 @@ using namespace std;
 
 #define F_ESTIMATE_N0_AND_BKG true
 
-#define F_SINGLE_HISTO 0
-#define F_ASYMMETRY    1
+#define F_SINGLE_HISTO_RAW 0
+#define F_SINGLE_HISTO     1
+#define F_ASYMMETRY        2
 
 #define F_APODIZATION_NONE   0
 #define F_APODIZATION_WEAK   1
@@ -87,8 +88,9 @@ class PMusrFourier
 
     virtual void SetN0(double n0) { fN0 = n0; }
     virtual void SetBkg(double bkg) { fBkg = bkg; }
+    virtual void SetPhase(double phase) { fPhase = phase; }
 
-    virtual void Transform(int apodization = -1, int filter = -1);
+    virtual void Transform(unsigned int apodizationTag = 0, unsigned int filter = 0);
 
     virtual double GetFieldResolution() { return fFieldResolution; }
     virtual double GetPhaseCorrection() { return fPhaseCorrection; }
@@ -103,11 +105,12 @@ class PMusrFourier
     bool fValid;
 
     int fDataType; ///< 0=Single Histo, 1=Asymmetry
-    int fUseApodization; ///< 0=no apod., 1=weak apod., 2=medium apod., 3=strong apod., 4=user apod.
-    int fUseFilter; ///< 0=no filter, 1=low pass, 2=band pass, 3=high pass, 4=..., n=user filter
+    int fApodization; ///< 0=no apod., 1=weak apod., 2=medium apod., 3=strong apod., 4=user apod.
+    int fFilter; ///< 0=no filter, 1=low pass, 2=band pass, 3=high pass, 4=..., n=user filter
 
     double fN0;
     double fBkg;
+    double fPhase;
 
     double fTimeResolution;
     double fStartTime;
@@ -126,7 +129,9 @@ class PMusrFourier
     fftw_complex *fIn;
     fftw_complex *fOut;
 
-    virtual void PrepareSingleHistoFFTwInputData();
+    virtual void PrepareSingleHistoFFTwInputData(unsigned int apodizationTag, unsigned int filterTag);
+    virtual void PrepareFFTwInputData(unsigned int apodizationTag, unsigned int filterTag);
+    virtual void ApodizeData(int apodizationTag);
     virtual void EstimateN0AndBkg();
 };
 

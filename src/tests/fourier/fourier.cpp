@@ -159,11 +159,38 @@ cout << endl << "#bins=" << histo->GetNbinsX();
     cin >> zeroPaddingPower;
   }
 
+  bool estimateN0AndBkg = true;
+  double N0, bkg, phase;
+  cout << endl << ">> Do you want to give N0, Bkg, and phase explicitly (y/n)? ";
+  cin >> answer;
+  if (strstr(answer, "y")) {
+    estimateN0AndBkg = false;
+    cout << endl << ">> N0    = ";
+    cin >> N0;
+    cout << endl << ">> bkg   = ";
+    cin >> bkg;
+    cout << endl << ">> phase = ";
+    cin >> phase;
+  }
+
   PMusrFourier fourier(F_SINGLE_HISTO, data, timeResolution, startTime, endTime, 
-                       rebin, zeroPaddingPower, F_ESTIMATE_N0_AND_BKG);
+                       rebin, zeroPaddingPower, estimateN0AndBkg);
 
   if (fourier.IsValid()) {
-    fourier.Transform(F_APODIZATION_NONE, F_FILTER_NONE);
+    if (!estimateN0AndBkg) {
+      fourier.SetN0(N0);
+      fourier.SetBkg(bkg);
+      fourier.SetPhase(phase);
+    }
+
+    cout << endl << ">> Do you wish to apodize your data (y/n)? ";
+    cin >> answer;
+    unsigned int apodizationTag=0;
+    if (strstr(answer, "y")) {
+      cout << endl << ">> apodization (1=weak, 2=medium, 3=strong, 4=user) = ";
+      cin >> apodizationTag;
+    }
+    fourier.Transform(apodizationTag, F_FILTER_NONE);
   } else {
     cout << endl << "**ERROR** something went wrong when invoking the PMusrFourier object ...";
     cout << endl << endl;
