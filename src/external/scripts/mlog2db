@@ -78,22 +78,16 @@ if [ "${1:0:1}" == "[" ]; then
       else
         RUNARRAY[$i]=${RUNARRAY[$i]%"]"}
         LASTRUN=$i
+        EMPTYENTRY=0
       fi
     fi
 #    echo ${RUNARRAY[$i]}
   done
 
-  if [ "$EMPTYENTRY" == "1" ]; then
-    EXTENSION=${RUNARRAY[ (( LASTRUN + 2 )) ]}
-    OPT_PAR_ONE=${RUNARRAY[ (( LASTRUN + 3 )) ]}
-    OPT_PAR_TWO=${RUNARRAY[ (( LASTRUN + 4 )) ]}
-    OPT_PAR_THREE=${RUNARRAY[ (( LASTRUN + 5 )) ]}
-  else
-    EXTENSION=${RUNARRAY[ (( LASTRUN + 1 )) ]}
-    OPT_PAR_ONE=${RUNARRAY[ (( LASTRUN + 2 )) ]}
-    OPT_PAR_TWO=${RUNARRAY[ (( LASTRUN + 3 )) ]}
-    OPT_PAR_THREE=${RUNARRAY[ (( LASTRUN + 4 )) ]}
-  fi
+  EXTENSION=${RUNARRAY[ (( LASTRUN + EMPTYENTRY + 1 )) ]}
+  OPT_PAR_ONE=${RUNARRAY[ (( LASTRUN + EMPTYENTRY + 2 )) ]}
+  OPT_PAR_TWO=${RUNARRAY[ (( LASTRUN + EMPTYENTRY + 3 )) ]}
+  OPT_PAR_THREE=${RUNARRAY[ (( LASTRUN + EMPTYENTRY + 4 )) ]}
 
 else # start and end-runs are given
   for (( j=0; j<=$2-$1; j++ ));
