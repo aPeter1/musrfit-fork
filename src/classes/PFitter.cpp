@@ -120,7 +120,11 @@ bool PFitter::DoFit()
   SetParameters();
 
   bool status;
-  bool minosUsed = false;
+  // init positive errors to default false, if minos is called, it will be set true there
+  for (unsigned int i=0; i<fParams.size(); i++) {
+    fRunInfo->SetMsrParamPosErrorPresent(i, false);
+  }
+
   for (unsigned int i=0; i<fCmdList.size(); i++) {
     switch (fCmdList[i]) {
       case PMN_INTERACTIVE:
@@ -150,7 +154,10 @@ bool PFitter::DoFit()
         break;
       case PMN_MINOS:
         status = ExecuteMinos();
-        minosUsed = true;
+        // set positive errors true
+        for (unsigned int i=0; i<fParams.size(); i++) {
+          fRunInfo->SetMsrParamPosErrorPresent(i, true);
+        }
         break;
       case PMN_PLOT:
         cout << endl << "**WARNING** from PFitter::DoFit() : the command PLOT is not yet implemented.";
@@ -180,13 +187,6 @@ bool PFitter::DoFit()
         cout << endl << "**PANIC ERROR**: PFitter::DoFit(): You should never have reached this point" << endl;
         exit(0);
         break;
-    }
-  }
-
-  // if minos was not used, there are NO valid positive errors
-  if (!minosUsed) {
-    for (unsigned int i=0; i<fParams.size(); i++) {
-      fRunInfo->SetMsrParamPosErrorPresent(i, false);
     }
   }
 
