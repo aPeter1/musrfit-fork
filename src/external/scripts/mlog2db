@@ -11,9 +11,9 @@ if [ $# -lt 3 ] ; then
 
         "musrfit-mlog to db converter"
 
-USAGE:   mlog2db FIRSTRUN# LASTRUN# BLABLA [noheader | fit-TEMPLATERUN# | -oDB_OUTPUT_FILE]
+USAGE:   mlog2db FIRSTRUN# LASTRUN# BLABLA [noheader | fit-TEMPLATERUN# | -oDB_OUTPUT_FILE | -k]
          OR
-         mlog2db \[LIST OF RUNS\] BLABLA [noheader | fit-TEMPLATERUN# | -oDB_OUTPUT_FILE]
+         mlog2db \[LIST OF RUNS\] BLABLA [noheader | fit-TEMPLATERUN# | -oDB_OUTPUT_FILE | -k]
 
 This small script converts subsequent musrfit output files (mlog) into one db file using bash/awk.
 
@@ -41,6 +41,7 @@ mlog2db 200 220 _tf_h13 -oABC.db fit-199
 This will fit the runs 200 to 220 using musrfit. The file 199_tf_h13.mlog (or if that is not available: 199_tf_h13.msr) is used as 
 template for the first musrfit input file. The results of the fits will be written to ABC.db.
 
+For keeping the MINUIT2 output files after calling musrfit, i.e. invoke musrfit with the option "--keep-mn2-output" just pass the option "-k" to mlog2db. If you pass this option to mlog2db but do not fit any data, the option will just be ignored.
 
 CAUTION:
 The "indexing number" of the .mlog has to be at the begin of the filename.
@@ -88,6 +89,7 @@ if [ "${1:0:1}" == "[" ]; then
   OPT_PAR_ONE=${RUNARRAY[ (( LASTRUN + EMPTYENTRY + 2 )) ]}
   OPT_PAR_TWO=${RUNARRAY[ (( LASTRUN + EMPTYENTRY + 3 )) ]}
   OPT_PAR_THREE=${RUNARRAY[ (( LASTRUN + EMPTYENTRY + 4 )) ]}
+  OPT_PAR_FOUR=${RUNARRAY[ (( LASTRUN + EMPTYENTRY + 5 )) ]}
 
 else # start and end-runs are given
   for (( j=0; j<=$2-$1; j++ ));
@@ -100,6 +102,7 @@ else # start and end-runs are given
   OPT_PAR_ONE=$4
   OPT_PAR_TWO=$5
   OPT_PAR_THREE=$6
+  OPT_PAR_FOUR=$7
 fi
 
 # Check if fitting should be done
@@ -109,6 +112,9 @@ else if [ "${OPT_PAR_TWO:0:3}" == "fit" ]; then
         TEMP=${OPT_PAR_TWO:4}
 else if [ "${OPT_PAR_THREE:0:3}" == "fit" ]; then
         TEMP=${OPT_PAR_THREE:4}
+else if [ "${OPT_PAR_FOUR:0:3}" == "fit" ]; then
+        TEMP=${OPT_PAR_FOUR:4}
+fi
 fi
 fi
 fi
@@ -160,8 +166,12 @@ if [ "$TEMP" != "" ]; then
                         else print $0 >> nextinput
                 }' $TEMPLATE
 	fi
-        
-	musrfit $COUNT$EXTENSION.msr -k
+	
+	if [ "${OPT_PAR_ONE}" == "-k" ] || [ "${OPT_PAR_TWO}" == "-k" ] || [ "${OPT_PAR_THREE}" == "-k" ] || [ "${OPT_PAR_FOUR}" == "-k" ]; then
+        	MUSRFITPARAM="-k"
+        fi
+
+        musrfit $COUNT$EXTENSION.msr $MUSRFITPARAM
 
 	if [ "$NEXTCOUNT" != "${RUNARRAY[$LASTRUN]}" ]; then
 		awk -v count=$COUNT -v nextcount=$NEXTCOUNT -v nextinput=$NEXTINPUT '{
@@ -222,12 +232,13 @@ fi
 
 fi
 
-awk -v optPARone=$OPT_PAR_ONE -v optPARtwo=$OPT_PAR_TWO -v optPARthree=$OPT_PAR_THREE '{  
+awk -v optPARone=$OPT_PAR_ONE -v optPARtwo=$OPT_PAR_TWO -v optPARthree=$OPT_PAR_THREE -v optPARfour=$OPT_PAR_FOUR '{  
 	
 	outfile="out.db"
 	if(optPARone ~ /^-o/) outfile = substr(optPARone,3)
 	if(optPARtwo ~ /^-o/) outfile = substr(optPARtwo,3)
 	if(optPARthree ~ /^-o/) outfile = substr(optPARthree,3)
+	if(optPARfour ~ /^-o/) outfile = substr(optPARfour,3)
 
 	FS = " "
         OFS = " "
@@ -294,7 +305,7 @@ awk -v optPARone=$OPT_PAR_ONE -v optPARtwo=$OPT_PAR_TWO -v optPARthree=$OPT_PAR_
 
 		if("'"$TEMPERATURE"'" != "") {
 
-			if("'"$COUNT"'" == "'"${RUNARRAY[0]}"'" && optPARone != "noheader" && optPARtwo != "noheader" && optPARthree != "noheader"){
+			if("'"$COUNT"'" == "'"${RUNARRAY[0]}"'" && optPARone != "noheader" && optPARtwo != "noheader" && optPARthree != "noheader" && optPARfour != "noheader"){
 				print "TITLE" >> outfile
         			print ">>>Put your title here<<<\n" >> outfile
         			print "Abstract" >> outfile
@@ -345,7 +356,7 @@ awk -v optPARone=$OPT_PAR_ONE -v optPARtwo=$OPT_PAR_TWO -v optPARthree=$OPT_PAR_
 # If we do not have the information from the summary file
 
 		else {
-			if("'"$COUNT"'" == "'"${RUNARRAY[0]}"'" && optPARone != "noheader" && optPARtwo != "noheader" && optPARthree != "noheader"){
+			if("'"$COUNT"'" == "'"${RUNARRAY[0]}"'" && optPARone != "noheader" && optPARtwo != "noheader" && optPARthree != "noheader" && optPARfour != "noheader"){
                                 print "TITLE" >> outfile
                                 print ">>>Put your title here<<<\n" >> outfile
                                 print "Abstract" >> outfile
