@@ -668,6 +668,7 @@ int PMsrHandler::WriteMsrLogFile()
       line.fLine += fStatistic.fNdf;
       line.fLine += ", chisq/NDF = ";
       line.fLine += fStatistic.fMin / fStatistic.fNdf;
+      cout << endl << line.fLine.Data() << endl;
     } else {
       line.fLine  = "  maxLH = ";
       line.fLine += fStatistic.fMin;
@@ -675,6 +676,7 @@ int PMsrHandler::WriteMsrLogFile()
       line.fLine += fStatistic.fNdf;
       line.fLine += ", maxLH/NDF = ";
       line.fLine += fStatistic.fMin / fStatistic.fNdf;
+      cout << endl << line.fLine.Data() << endl;
     }
     fStatistic.fStatLines.push_back(line);
   }

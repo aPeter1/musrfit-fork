@@ -355,12 +355,12 @@ bool PFitter::ExecuteMigrad()
     fMnUserParams = fFcnMin->UserParameters();
 
   // create migrad object
-  // set MnStrategy to high == 2, see MINUIT2 manual MnStrategy
-  ROOT::Minuit2::MnMigrad migrad((*fFitterFcn), fMnUserParams, 2);
+  // set MnStrategy to default == 1, high == 2, see MINUIT2 manual MnStrategy
+  ROOT::Minuit2::MnMigrad migrad((*fFitterFcn), fMnUserParams, 1);
 
   // minimize
-  // maxfcn is 10*MINUIT2 Default maxfcn
-  unsigned int maxfcn = 10*(200 + 100*fParams.size() + 5*fParams.size()*fParams.size());
+  // maxfcn is MINUIT2 Default maxfcn
+  unsigned int maxfcn = (200 + 100*fParams.size() + 5*fParams.size()*fParams.size());
   // tolerance = MINUIT2 Default tolerance
   double tolerance = 0.1;
   ROOT::Minuit2::FunctionMinimum min = migrad(maxfcn, tolerance);
