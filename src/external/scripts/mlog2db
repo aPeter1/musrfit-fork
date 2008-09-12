@@ -148,6 +148,8 @@ NEXTCOUNT=${RUNARRAY[ (( q + 1 )) ]}
 NEXTINPUT=$NEXTCOUNT$EXTENSION.msr
 FIRSTINPUT=${RUNARRAY[0]}$EXTENSION.msr
 
+#echo COUNT: $COUNT, NEXTCOUNT: $NEXTCOUNT, NEXTINPUT: $NEXTINPUT, FIRSTINPUT: $FIRSTINPUT
+
 if [ "$TEMP" != "" ]; then
 
 	if [ "$TEMPLATE" == "" ]; then
@@ -173,7 +175,7 @@ if [ "$TEMP" != "" ]; then
 
         musrfit $COUNT$EXTENSION.msr $MUSRFITPARAM
 
-	if [ "$NEXTCOUNT" != "${RUNARRAY[$LASTRUN]}" ]; then
+	if [ "$COUNT" != "${RUNARRAY[$LASTRUN]}" ]; then
 		awk -v count=$COUNT -v nextcount=$NEXTCOUNT -v nextinput=$NEXTINPUT '{
 			if(NR==1) print nextcount > nextinput
 			else if($1 == "RUN") {
