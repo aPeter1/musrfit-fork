@@ -366,6 +366,10 @@ bool PFitter::ExecuteMigrad()
   ROOT::Minuit2::FunctionMinimum min = migrad(maxfcn, tolerance);
   if (!min.IsValid()) {
     cout << endl << "**WARNING**: PFitter::ExecuteMigrad(): Fit did not converge, sorry ...";
+    // set flag positive error present to false
+    for (unsigned int i=0; i<fParams.size(); i++) {
+      fRunInfo->SetMsrParamPosErrorPresent(i, false);
+    }
     return false;
   }
 
@@ -419,18 +423,22 @@ bool PFitter::ExecuteMinimize()
     fMnUserParams = fFcnMin->UserParameters();
 
   // create minimizer object
-  // set MnStrategy to high == 2, see MINUIT2 manual MnStrategy
-  ROOT::Minuit2::MnMinimize minimize((*fFitterFcn), fMnUserParams, 2);
+  // set MnStrategy to default == 1, high == 2, see MINUIT2 manual MnStrategy
+  ROOT::Minuit2::MnMinimize minimize((*fFitterFcn), fMnUserParams, 1);
 
   // minimize
-  // maxfcn is 10*MINUIT2 Default maxfcn
-  unsigned int maxfcn = 10*(200 + 100*fParams.size() + 5*fParams.size()*fParams.size());
-cout << endl << "maxfcn=" << maxfcn << endl;
+  // maxfcn is MINUIT2 Default maxfcn
+  unsigned int maxfcn = (200 + 100*fParams.size() + 5*fParams.size()*fParams.size());
+//cout << endl << "maxfcn=" << maxfcn << endl;
   // tolerance = MINUIT2 Default tolerance
   double tolerance = 0.1;
   ROOT::Minuit2::FunctionMinimum min = minimize(maxfcn, tolerance); 
   if (!min.IsValid()) {
     cout << endl << "**WARNING**: PFitter::ExecuteMinimize(): Fit did not converge, sorry ...";
+    // set flag positive error present to false
+    for (unsigned int i=0; i<fParams.size(); i++) {
+      fRunInfo->SetMsrParamPosErrorPresent(i, false);
+    }
     return false;
   }
 
@@ -635,11 +643,14 @@ bool PFitter::ExecuteSave()
     for (unsigned int i=0; i<cov.Nrow(); i++) {
       fout << endl;
       for (unsigned int j=0; j<i; j++) {
-        if (cov(i,j) > 0.0)
-          fout << " ";
         fout.setf(ios::left, ios::adjustfield);
         fout.precision(6);
-        fout.width(14);
+        if (cov(i,j) > 0.0) {
+          fout << " ";
+          fout.width(13);
+        } else {
+          fout.width(14);
+        }
         fout << cov(i,j);
       }
     }
@@ -656,12 +667,12 @@ bool PFitter::ExecuteSave()
     ROOT::Minuit2::MnGlobalCorrelationCoeff corr = mnState.GlobalCC();
     ROOT::Minuit2::MnUserCovariance cov = mnState.Covariance();
     PIntVector parNo;
-    fout << endl << " No   Global      ";
+    fout << endl << " No   Global       ";
     for (unsigned int i=0; i<fParams.size(); i++) {
-      fout.setf(ios::left, ios::adjustfield);
-      fout.width(9);
       // only free parameters, i.e. not fixed, and not unsed ones!
       if ((fParams[i].fStep != 0) && fRunInfo->ParameterInUse(i) > 0) {
+        fout.setf(ios::left, ios::adjustfield);
+        fout.width(9);
         fout << i+1;
         parNo.push_back(i);
       }
@@ -686,15 +697,16 @@ bool PFitter::ExecuteSave()
         fout << parNo[i]+1;
         // global correlation coefficient
         fout.setf(ios::left, ios::adjustfield);
+        fout.precision(6);
         fout.width(12);
         fout << corr.GlobalCC()[i];
         // correlations matrix
         for (unsigned int j=0; j<cov.Nrow(); j++) {
           fout.setf(ios::left, ios::adjustfield);
-          fout.precision(4);
-          fout.width(9);
+//          fout.precision(4);
           if (i==j) {
-            fout << "1.0";
+            fout.width(9);
+            fout << " 1.0 ";
             hcorr->Fill((double)i,(double)i,1.0);
           } else {
             // check that errors are none zero
@@ -710,7 +722,20 @@ bool PFitter::ExecuteSave()
               dval = cov(i,j)/(fMnUserParams.Error(parNo[i])*fMnUserParams.Error(parNo[j]));
             }
             hcorr->Fill((double)i,(double)j,dval);
-            fout << dval;
+            // handle precision, ugly but ...
+            if (dval < 1.0e-2) {
+              fout.precision(2);
+            } else {
+              fout.precision(4);
+            }
+            // handle sign
+            if (dval > 0.0) {
+              fout << " ";
+              fout.width(7);
+            } else {
+              fout.width(8);
+            }
+            fout << dval << " ";
           }
         }
       }
