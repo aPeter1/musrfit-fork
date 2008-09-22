@@ -505,6 +505,7 @@ void PMusrFourier::ApodizeData(int apodizationTag) {
 
   switch (apodizationTag) {
     case F_APODIZATION_NONE:
+      return;
       break;
     case F_APODIZATION_WEAK:
       c[0] = cweak[0]+cweak[1]+cweak[2];

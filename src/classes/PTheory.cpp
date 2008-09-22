@@ -185,7 +185,7 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
 
     // if userFcn, the first entry is the function name and needs to be handled specially
     if ((fType == THEORY_USER_FCN) && ((i == 1) || (i == 2))) {
-cout << endl << ">> userFcn: i=" << i << ", str=" << str.Data() << endl;
+//cout << endl << ">> userFcn: i=" << i << ", str=" << str.Data() << endl;
       if (i == 1) {
         fUserFcnSharedLibName = str;
       }
@@ -282,7 +282,7 @@ cout << endl << ">> userFcn: i=" << i << ", str=" << str.Data() << endl;
     // invoke user function object
     fUserFcn = 0;
     fUserFcn = (PUserFcnBase*)TClass::GetClass(fUserFcnClassName.Data())->New();
-cout << endl << ">> fUserFcn = " << fUserFcn << endl;
+//cout << endl << ">> fUserFcn = " << fUserFcn << endl;
     if (fUserFcn == 0) {
       cout << endl << "**ERROR**: PTheory: user function object could not be invoked. See line no " << line->fLineNo;
       fValid = false;
@@ -690,7 +690,7 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
       str.Resize(index);
     // tokenize line
     tokens = str.Tokenize(" \t");
-cout << endl << ">> #tokens=" << tokens->GetEntries() << ", str=" << str.Data();
+//cout << endl << ">> #tokens=" << tokens->GetEntries() << ", str=" << str.Data();
     // make a handable string out of the asymmetry token
     ostr = dynamic_cast<TObjString*>(tokens->At(0));
     str = ostr->GetString();
@@ -765,7 +765,7 @@ void PTheory::MakeCleanAndTidyPolynom(unsigned int i, PMsrLines *fullTheoryBlock
   TObjString *ostr;
   char substr[256];
 
-cout << endl << ">> MakeCleanAndTidyPolynom: " << (*fullTheoryBlock)[i].fLine.Data();
+//cout << endl << ">> MakeCleanAndTidyPolynom: " << (*fullTheoryBlock)[i].fLine.Data();
 
   // init tidy
   tidy = TString("polynom ");
@@ -811,7 +811,7 @@ void PTheory::MakeCleanAndTidyUserFcn(unsigned int i, PMsrLines *fullTheoryBlock
   TObjArray *tokens = 0;
   TObjString *ostr;
 
-cout << endl << ">> MakeCleanAndTidyUserFcn: " << (*fullTheoryBlock)[i].fLine.Data();
+//cout << endl << ">> MakeCleanAndTidyUserFcn: " << (*fullTheoryBlock)[i].fLine.Data();
 
   // init tidy
   tidy = TString("userFcn ");
@@ -1448,6 +1448,7 @@ double PTheory::Polynom(register double t, const PDoubleVector& paramValues, con
  */
 double PTheory::UserFcn(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
+/*
 static bool first = true;
 if (first) {
   cout << endl << ">> UserFcn: fParamNo.size()=" << fParamNo.size() << ", fUserParam.size()=" << fUserParam.size();
@@ -1456,6 +1457,7 @@ if (first) {
   }
   cout << endl;
 }
+*/
 
   // check if FUNCTIONS are used
   for (unsigned int i=0; i<fUserParam.size(); i++) {
@@ -1466,6 +1468,7 @@ if (first) {
     }
   }
 
+/*
 if (first) {
   first = false;
   for (unsigned int i=0; i<fUserParam.size(); i++) {
@@ -1475,6 +1478,6 @@ if (first) {
   cout << endl << ">> t=" << t << ", function value=" << (*fUserFcn)(t, fUserParam);
   cout << endl;
 }
-
+*/
   return (*fUserFcn)(t, fUserParam);
 }

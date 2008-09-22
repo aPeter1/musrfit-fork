@@ -92,11 +92,11 @@ bool PRunListCollection::Add(int runNo, EPMusrHandleTag tag)
 {
   bool success = true;
 
-  PMsrRunStructure *runList = &(*fMsrInfo->GetMsrRunList())[runNo];
+//  PMsrRunStructure *runList = &(*fMsrInfo->GetMsrRunList())[runNo];
 
-  cout << endl << "PRunListCollection::Add(): will add run no " << runNo;
-  cout << ", name = " << runList->fRunName.Data();
-  cout << ", type = " << runList->fFitType;
+//   cout << endl << "PRunListCollection::Add(): will add run no " << runNo;
+//   cout << ", name = " << runList->fRunName.Data();
+//   cout << ", type = " << runList->fFitType;
 
   int fitType = (*fMsrInfo->GetMsrRunList())[runNo].fFitType;
 

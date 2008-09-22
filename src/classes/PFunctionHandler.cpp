@@ -47,7 +47,7 @@ PFunctionHandler::PFunctionHandler(PMsrLines lines)
   fValid = true;
   fLines = lines;
 
-  cout << endl << "in PFunctionHandler(PMsrLines lines)";
+//  cout << endl << "in PFunctionHandler(PMsrLines lines)";
 }
 
 //-------------------------------------------------------------
@@ -59,7 +59,7 @@ PFunctionHandler::PFunctionHandler(PMsrLines lines)
  */
 PFunctionHandler::~PFunctionHandler()
 {
-  cout << endl << "in ~PFunctionHandler()" << endl << endl;
+//  cout << endl << "in ~PFunctionHandler()" << endl << endl;
 
   fLines.clear();
   fFuncs.clear();
@@ -74,7 +74,7 @@ PFunctionHandler::~PFunctionHandler()
  */
 bool PFunctionHandler::DoParse()
 {
-  cout << endl << "in PFunctionHandler::DoParse() ...";
+//  cout << endl << "in PFunctionHandler::DoParse() ...";
 
   bool success = true;
   PFunctionGrammar function;
@@ -82,7 +82,7 @@ bool PFunctionHandler::DoParse()
 
   // feed the function block into the parser. Start with i=1, since i=0 is FUNCTIONS
   for (unsigned int i=1; i<fLines.size(); i++) {
-cout << endl << "fLines[" << i << "] = '" << fLines[i].fLine.Data() << "'";
+// cout << endl << "fLines[" << i << "] = '" << fLines[i].fLine.Data() << "'";
 
     // function line to upper case
     line = fLines[i].fLine;
@@ -92,7 +92,7 @@ cout << endl << "fLines[" << i << "] = '" << fLines[i].fLine.Data() << "'";
     tree_parse_info<> info = ast_parse(line.Data(), function, space_p);
 
     if (info.full) {
-      cout << endl << "parse successful ..." << endl;
+//      cout << endl << "parse successful ..." << endl;
       PFunction func(info);
       fFuncs.push_back(func);
     } else {
@@ -115,10 +115,10 @@ cout << endl << "fLines[" << i << "] = '" << fLines[i].fLine.Data() << "'";
     }
   }
 
-  if (success) {
-    for (unsigned int i=0; i<fFuncs.size(); i++)
-      cout << endl << "func number = " << fFuncs[i].GetFuncNo();
-  }
+//   if (success) {
+//     for (unsigned int i=0; i<fFuncs.size(); i++)
+//       cout << endl << "func number = " << fFuncs[i].GetFuncNo();
+//   }
 
   return success;
 }

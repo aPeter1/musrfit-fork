@@ -78,17 +78,17 @@ void minuit2test()
   // set parameters
   gFitFcn->SetParNames("N0", "asym", "lambda", "B", "phase", "Bkg");
   gFitFcn->SetParameter(0, 30.0);   // N0
-//  gFitFcn->SetParLimits(0, 0.0, 1.0e6);
+  gFitFcn->SetParLimits(0, 0.0, 1.0e6);
   gFitFcn->SetParameter(1, 0.26);    // asym
-//  gFitFcn->SetParLimits(1, 0.0, 0.33);
+  gFitFcn->SetParLimits(1, 0.0, 0.33);
   gFitFcn->SetParameter(2, 0.3);     // lambda
-//  gFitFcn->SetParLimits(2, 0.0, 100.0);
+  gFitFcn->SetParLimits(2, 0.0, 100.0);
   gFitFcn->SetParameter(3, 100.0);   // B
-//  gFitFcn->SetParLimits(3, 0.0, 1000.0);
+  gFitFcn->SetParLimits(3, 0.0, 1000.0);
   gFitFcn->SetParameter(4, 0.0);     // phase
-//  gFitFcn->SetParLimits(4, -90.0, 90.0);
+  gFitFcn->SetParLimits(4, -90.0, 90.0);
   gFitFcn->SetParameter(5, 5.0);    // Bkg
-//  gFitFcn->SetParLimits(5, 0.0, 1000.0);
+  gFitFcn->SetParLimits(5, 0.0, 1000.0);
 
   cout << endl << "gFitFcn->Integral(0.0, 12.0) = " << gFitFcn->Integral(0.0, 12.0);
   cout << endl;
@@ -100,9 +100,13 @@ void minuit2test()
 
   histo->Draw();
 
-  gFitFcn->SetParameter(0, 150.0);   // N0
-  gFitFcn->SetParameter(5, 23.0);    // Bkg
+  gFitFcn->SetParameter(0, 1000.0); // N0
+  gFitFcn->SetParameter(1, 0.1);    // asym
+  gFitFcn->SetParameter(2, 1.0);    // lambda
+  gFitFcn->SetParameter(3, 50.0);   // B
+  gFitFcn->SetParameter(4, 0.0);    // phase
+  gFitFcn->SetParameter(5, 300.0);  // Bkg
   
   TVirtualFitter::SetDefaultFitter("Minuit2");
-  histo->Fit("gFitFcn", "L"); // L->likleyhood, E->minos 
+  histo->Fit("gFitFcn", ""); // L->likleyhood, E->minos 
 }

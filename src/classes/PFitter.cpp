@@ -154,9 +154,11 @@ bool PFitter::DoFit()
         break;
       case PMN_MINOS:
         status = ExecuteMinos();
-        // set positive errors true
-        for (unsigned int i=0; i<fParams.size(); i++) {
-          fRunInfo->SetMsrParamPosErrorPresent(i, true);
+        // set positive errors true if minos has been successfull
+        if (status) {
+          for (unsigned int i=0; i<fParams.size(); i++) {
+            fRunInfo->SetMsrParamPosErrorPresent(i, true);
+          }
         }
         break;
       case PMN_PLOT:
@@ -366,10 +368,12 @@ bool PFitter::ExecuteMigrad()
   ROOT::Minuit2::FunctionMinimum min = migrad(maxfcn, tolerance);
   if (!min.IsValid()) {
     cout << endl << "**WARNING**: PFitter::ExecuteMigrad(): Fit did not converge, sorry ...";
+/*
     // set flag positive error present to false
     for (unsigned int i=0; i<fParams.size(); i++) {
       fRunInfo->SetMsrParamPosErrorPresent(i, false);
     }
+*/
     return false;
   }
 
@@ -435,10 +439,12 @@ bool PFitter::ExecuteMinimize()
   ROOT::Minuit2::FunctionMinimum min = minimize(maxfcn, tolerance); 
   if (!min.IsValid()) {
     cout << endl << "**WARNING**: PFitter::ExecuteMinimize(): Fit did not converge, sorry ...";
+/*
     // set flag positive error present to false
     for (unsigned int i=0; i<fParams.size(); i++) {
       fRunInfo->SetMsrParamPosErrorPresent(i, false);
     }
+*/
     return false;
   }
 

@@ -161,9 +161,9 @@ bool PRunDataHandler::ReadFile()
       return false;
     // everything looks fine, hence try to read the data file
     if (!run_it->fFileFormat.CompareTo("root-npp")) // not post pile up corrected histos
-      success = ReadRootFile();
+      success = ReadRootFile(true);
     else if (!run_it->fFileFormat.CompareTo("root-ppc")) // post pile up corrected histos
-      success = ReadRootFile();
+      success = ReadRootFile(false);
     else if (!run_it->fFileFormat.CompareTo("nexus"))
       success = ReadNexusFile();
     else if (!run_it->fFileFormat.CompareTo("psi-bin"))
@@ -342,12 +342,15 @@ cout << endl << ">> generated path: " << str.Data() << endl;
 /**
  * <p>
  *
+ * \param notPostPileup This flag is used as a switch between "Not Post Pileup Corrected" 
+ *                      and "Post Pileup Corrected" histogramms.
  */
-bool PRunDataHandler::ReadRootFile()
+bool PRunDataHandler::ReadRootFile(bool notPostPileup)
 {
   PDoubleVector histoData;
   PRawRunData   runData;
 
+//cout << endl << ">> in ReadRootFile() ...";
   TFile f(fRunPathName.Data());
   if (f.IsZombie()) {
     return false;
@@ -379,6 +382,7 @@ bool PRunDataHandler::ReadRootFile()
 
   // get implantation energy
   runData.fEnergy = runHeader->GetImpEnergy();
+//cout << endl << ">> runData.fEnergy = " << runData.fEnergy;
 
   // get setup
   runData.fSetup = runHeader->GetLemSetup().GetString();
@@ -408,38 +412,42 @@ bool PRunDataHandler::ReadRootFile()
   }
   // get all the data
   char histoName[32];
-  // read first the data which are NOT post pileup corrected
-  for (int i=0; i<noOfHistos; i++) {
-    sprintf(histoName, "hDecay%02d", i);
-    TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
-    if (!histo) {
-      cout << endl << "PRunDataHandler::ReadRootFile: Couldn't get histo " << histoName;
-      return false;
+  if (notPostPileup) { // read the data which are NOT post pileup corrected
+    for (int i=0; i<noOfHistos; i++) {
+      sprintf(histoName, "hDecay%02d", i);
+//cout << endl << ">> histoName = " << histoName;
+      TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
+      if (!histo) {
+        cout << endl << "PRunDataHandler::ReadRootFile: Couldn't get histo " << histoName;
+        return false;
+      }
+      // fill data
+      for (int j=1; j<histo->GetNbinsX(); j++)
+        histoData.push_back(histo->GetBinContent(j));
+      // store them in runData vector
+      runData.fDataBin.push_back(histoData);
+      // clear histoData for the next histo
+      histoData.clear();
     }
-    // fill data
-    for (int j=1; j<histo->GetNbinsX(); j++)
-      histoData.push_back(histo->GetBinContent(j));
-    // store them in runData vector
-    runData.fDataBin.push_back(histoData);
-    // clear histoData for the next histo
-    histoData.clear();
-  }
-  // now read the data which ARE post pileup corrected
-  for (int i=0; i<noOfHistos; i++) {
-    sprintf(histoName, "hDecay%02d", i+POST_PILEUP_HISTO_OFFSET);
-    TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
-    if (!histo) {
-      cout << endl << "PRunDataHandler::ReadRootFile: Couldn't get histo " << histoName;
-      return false;
+  } else { // read the data which ARE post pileup corrected
+    for (int i=0; i<noOfHistos; i++) {
+      sprintf(histoName, "hDecay%02d", i+POST_PILEUP_HISTO_OFFSET);
+//cout << endl << ">> histoName = " << histoName;
+      TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
+      if (!histo) {
+        cout << endl << "PRunDataHandler::ReadRootFile: Couldn't get histo " << histoName;
+        return false;
+      }
+      // fill data
+      for (int j=1; j<histo->GetNbinsX(); j++)
+        histoData.push_back(histo->GetBinContent(j));
+      // store them in runData vector
+      runData.fDataBin.push_back(histoData);
+      // clear histoData for the next histo
+      histoData.clear();
     }
-    // fill data
-    for (int j=1; j<histo->GetNbinsX(); j++)
-      histoData.push_back(histo->GetBinContent(j));
-    // store them in runData vector
-    runData.fDataBin.push_back(histoData);
-    // clear histoData for the next histo
-    histoData.clear();
   }
+//cout << endl;
 
   f.Close();
 

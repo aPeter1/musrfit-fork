@@ -62,7 +62,7 @@ class PRunDataHandler
     virtual bool ReadFile();
     virtual bool FileAlreadyRead(PMsrRunStructure &runInfo);
     virtual bool FileExistsCheck(PMsrRunStructure &runInfo);
-    virtual bool ReadRootFile();
+    virtual bool ReadRootFile(bool notPostPileup);
     virtual bool ReadNexusFile();
     virtual bool ReadNemuFile();
     virtual bool ReadPsiBinFile();

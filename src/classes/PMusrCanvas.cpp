@@ -612,6 +612,7 @@ void PMusrCanvas::UpdateInfoPad()
     // energy if present
     tstr += TString("E=");
     dval = fRunList->GetEnergy(runs[runNo].fRunName);
+cout << endl << ">> dval = " << dval << " (Engery)";
     if (dval == -9.9e99) {
       tstr += TString("??,");
     } else {

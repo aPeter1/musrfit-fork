@@ -59,7 +59,7 @@ using namespace std;
  */
 PFunction::PFunction(tree_parse_info<> info)
 {
-  cout << endl << "in PFunction ...";
+//  cout << endl << "in PFunction ...";
 
   fInfo  = info;
 
@@ -528,7 +528,7 @@ void PFunction::EvalTreeForStringExpression(iter_t const& i)
   } else if (i->value.id() == PFunctionGrammar::termID) {
     termOp++;
     if (*i->value.begin() == '*') {
-cout << endl << ">> i->children.size() = " << i->children.size() << endl;
+//cout << endl << ">> i->children.size() = " << i->children.size() << endl;
       assert(i->children.size() == 2);
       EvalTreeForStringExpression(i->children.begin());
       fFuncString += " * ";

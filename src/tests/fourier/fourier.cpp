@@ -185,7 +185,7 @@ cout << endl << "#bins=" << histo->GetNbinsX();
 
     cout << endl << ">> Do you wish to apodize your data (y/n)? ";
     cin >> answer;
-    unsigned int apodizationTag=0;
+    unsigned int apodizationTag = F_APODIZATION_NONE;
     if (strstr(answer, "y")) {
       cout << endl << ">> apodization (1=weak, 2=medium, 3=strong, 4=user) = ";
       cin >> apodizationTag;
