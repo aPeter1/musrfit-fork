@@ -280,13 +280,28 @@ bool PFitter::SetParameters()
     } else { // add free parameter
       // check if boundaries are given
       if (fParams[i].fNoOfParams > 5) { // boundaries given
-        fMnUserParams.Add(fParams[i].fName.Data(), fParams[i].fValue, fParams[i].fStep,
-                          fParams[i].fLowerBoundary, fParams[i].fUpperBoundary);
+cout << endl << ">> name=" << fParams[i].fName.Data() << ", lower=" << fParams[i].fLowerBoundaryPresent << ", upper=" << fParams[i].fUpperBoundaryPresent;
+        if (fParams[i].fLowerBoundaryPresent && 
+            fParams[i].fUpperBoundaryPresent) { // upper and lower boundaries given
+cout << endl << ">> lower and upper";
+          fMnUserParams.Add(fParams[i].fName.Data(), fParams[i].fValue, fParams[i].fStep,
+                            fParams[i].fLowerBoundary, fParams[i].fUpperBoundary);
+        } else if (fParams[i].fLowerBoundaryPresent && 
+                   !fParams[i].fUpperBoundaryPresent) { // lower boundary limited
+cout << endl << ">> lower only";
+          fMnUserParams.Add(fParams[i].fName.Data(), fParams[i].fValue, fParams[i].fStep);
+          fMnUserParams.SetLowerLimit(fParams[i].fName.Data(), fParams[i].fLowerBoundary);
+        } else { // upper boundary limited
+cout << endl << ">> upper only";
+          fMnUserParams.Add(fParams[i].fName.Data(), fParams[i].fValue, fParams[i].fStep);
+          fMnUserParams.SetUpperLimit(fParams[i].fName.Data(), fParams[i].fUpperBoundary);
+        }
       } else { // no boundaries given
         fMnUserParams.Add(fParams[i].fName.Data(), fParams[i].fValue, fParams[i].fStep);
       }
     }
   }
+cout << endl;
 
   // check if there is an unused parameter, if so, fix it
   for (unsigned int i=0; i<fParams.size(); i++) {

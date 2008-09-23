@@ -322,11 +322,17 @@ int PMsrHandler::WriteMsrLogFile()
     if (fParam[i].fNoOfParams > 5) {
       f.width(7);
       f.precision(prec);
-      f << left << fParam[i].fLowerBoundary;
+      if (fParam[i].fLowerBoundaryPresent)
+        f << left << fParam[i].fLowerBoundary;
+      else
+        f << left << "none";
       f << " ";
       f.width(7);
       f.precision(prec);
-      f << left << fParam[i].fUpperBoundary;
+      if (fParam[i].fUpperBoundaryPresent)
+        f << left << fParam[i].fUpperBoundary;
+      else
+        f << left << "none";
       f << " ";
     }
     CheckAndWriteComment(f, ++lineNo);
@@ -812,7 +818,6 @@ int PMsrHandler::ParameterInUse(unsigned int paramNo)
  * \code
  * No Name Value Step/Neg_Error Pos_Error Boundary_Low Boundary_High
  * x  x    x     x              x         x            x              -> 7 Parameters, e.g. after a MINOS fit
- * x  x    x     x                        x            x              -> 6 Parameters, e.g. after a MIGRAD fit
  * x  x    x     x              x                                     -> 5 Parameters, e.g. after a MINOS fit
  *                                                                                     without boundaries
  * x  x    x     x                                                    -> 4 Parameters, e.g. after MIGRAD fit
@@ -838,15 +843,17 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
   while ((iter != lines.end()) && !error) {
 
     // init param structure
-    param.fNoOfParams      = -1;
-    param.fNo              = -1;
-    param.fName            = TString("");
-    param.fValue           = 0.0;
-    param.fStep            = 0.0;
-    param.fPosErrorPresent = false;
-    param.fPosError        = 0.0;
-    param.fLowerBoundary   = 0.0;
-    param.fUpperBoundary   = 0.0;
+    param.fNoOfParams           = -1;
+    param.fNo                   = -1;
+    param.fName                 = TString("");
+    param.fValue                = 0.0;
+    param.fStep                 = 0.0;
+    param.fPosErrorPresent      = false;
+    param.fPosError             = 0.0;
+    param.fLowerBoundaryPresent = false;
+    param.fLowerBoundary        = 0.0;
+    param.fUpperBoundaryPresent = false;
+    param.fUpperBoundary        = 0.0;
 
     tokens = iter->fLine.Tokenize(" \t");
     if (!tokens) {
@@ -856,7 +863,7 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
     }
 
     // handle various input possiblities
-    if ((tokens->GetEntries() < 4) || (tokens->GetEntries() > 7)) {
+    if ((tokens->GetEntries() < 4) || (tokens->GetEntries() > 7) || (tokens->GetEntries() == 6)) {
       error = true;
     } else { // handle the first 4 parameter since they are always the same
       // parameter number
@@ -905,32 +912,11 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
           param.fPosError = (double)str.Atof();
         } else {
           str.ToLower();
-          if (!str.CompareTo("none"))
+          if (!str.CompareTo("none", TString::kIgnoreCase))
             param.fPosErrorPresent = false;
           else
             error = true;
         }
-      }
-
-      // 6 values, i.e. No Name Value Error Lower_Bounderay Upper_Boundary
-      if (tokens->GetEntries() == 6) {
-        param.fNoOfParams = 6;
-
-        // lower boundary
-        ostr = dynamic_cast<TObjString*>(tokens->At(4));
-        str = ostr->GetString();
-        if (str.IsFloat())
-          param.fLowerBoundary = (double)str.Atof();
-        else
-          error = true;
-
-        // upper boundary
-        ostr = dynamic_cast<TObjString*>(tokens->At(5));
-        str = ostr->GetString();
-        if (str.IsFloat())
-          param.fUpperBoundary = (double)str.Atof();
-        else
-          error = true;
       }
 
       // 7 values, i.e. No Name Value Neg_Error Pos_Error Lower_Bounderay Upper_Boundary
@@ -945,7 +931,7 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
           param.fPosError = (double)str.Atof();
         } else {
           str.ToLower();
-          if (!str.CompareTo("none"))
+          if (!str.CompareTo("none", TString::kIgnoreCase))
             param.fPosErrorPresent = false;
           else
             error = true;
@@ -954,18 +940,32 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
         // lower boundary
         ostr = dynamic_cast<TObjString*>(tokens->At(5));
         str = ostr->GetString();
-        if (str.IsFloat())
-          param.fLowerBoundary = (double)str.Atof();
-        else
-          error = true;
+        // check if lower boundary is "none", i.e. upper boundary limited only
+        if (!str.CompareTo("none", TString::kIgnoreCase)) { // none
+          param.fLowerBoundaryPresent = false;
+        } else { // assuming that the lower boundary is a number
+          if (str.IsFloat()) {
+            param.fLowerBoundary = (double)str.Atof();
+            param.fLowerBoundaryPresent = true;
+          } else {
+            error = true;
+          }
+        }
 
         // upper boundary
         ostr = dynamic_cast<TObjString*>(tokens->At(6));
         str = ostr->GetString();
-        if (str.IsFloat())
-          param.fUpperBoundary = (double)str.Atof();
-        else
-          error = true;
+        // check if upper boundary is "none", i.e. lower boundary limited only
+        if (!str.CompareTo("none", TString::kIgnoreCase)) { // none
+          param.fUpperBoundaryPresent = false;
+        } else { // assuming a number
+          if (str.IsFloat()) {
+            param.fUpperBoundary = (double)str.Atof();
+            param.fUpperBoundaryPresent = true;
+          } else {
+            error = true;
+          }
+        }
       }
     }
 
@@ -988,9 +988,9 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
       cout << endl << "Step/Neg_Error: the starting step value in a fit  (a double), or";
       cout << endl << "                the symmetric error (MIGRAD, SIMPLEX), or";
       cout << endl << "                the negative error (MINOS)";
-      cout << endl << "Pos_Error:      the positive error (MINOS),  (a double)";
-      cout << endl << "Lower_Boundary: the lower boundary allowed for the fit parameter  (a double)";
-      cout << endl << "Upper_Boundary: the upper boundary allowed for the fit parameter  (a double)";
+      cout << endl << "Pos_Error:      the positive error (MINOS),  (a double or \"none\")";
+      cout << endl << "Lower_Boundary: the lower boundary allowed for the fit parameter  (a double or \"none\")";
+      cout << endl << "Upper_Boundary: the upper boundary allowed for the fit parameter  (a double or \"none\")";
       cout << endl;
     } else { // everything is OK, therefore add the parameter to the parameter list
       fParam.push_back(param);

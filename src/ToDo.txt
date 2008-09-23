@@ -94,6 +94,14 @@ short term:
 * PFitter.cpp: implement HESSE
   **DONE** 08-09-01
 
+* implement the handling for single side limited boundaries for parameters which is 
+  possible in MINUIT2
+  syntax would be:
+  0.0 100.0  // lower and upper limit
+  0.0 none   // lower limit only
+  none 100.0 // upper limit only
+  **FIRST IMPLEMENTATION DONE, NEEDS EXTENSIVE TESTING** 08-09-23
+
 * implement FFT with msr-interface
 
 ---------------------

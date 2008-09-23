@@ -196,15 +196,17 @@ typedef vector<PMsrLineStructure> PMsrLines;
  * <p> Holds the information of a parameter.
  */
 typedef struct {
-  int fNoOfParams;         ///< how many parameters are given
-  int fNo;                 ///< parameter number
-  TString fName;           ///< name
-  double fValue;           ///< value
-  double fStep;            ///< step / error / neg_error, depending on the situation
-  bool   fPosErrorPresent; ///< positive error is defined (as a number)
-  double fPosError;        ///< positive error if present
-  double fLowerBoundary;   ///< lower boundary for the fit parameter
-  double fUpperBoundary;   ///< upper boundary for the fit parameter
+  int fNoOfParams;              ///< how many parameters are given
+  int fNo;                      ///< parameter number
+  TString fName;                ///< name
+  double fValue;                ///< value
+  double fStep;                 ///< step / error / neg_error, depending on the situation
+  bool   fPosErrorPresent;      ///< positive error is defined (as a number)
+  double fPosError;             ///< positive error if present
+  bool   fLowerBoundaryPresent; ///< flag showing if a lower boundary is present
+  double fLowerBoundary;        ///< lower boundary for the fit parameter
+  bool   fUpperBoundaryPresent; ///< flag showing if an upper boundary is present
+  double fUpperBoundary;        ///< upper boundary for the fit parameter
 } PMsrParamStructure;
 
 //-------------------------------------------------------------
