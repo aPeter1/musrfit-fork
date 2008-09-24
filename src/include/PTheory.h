@@ -87,7 +87,7 @@
 #define THEORY_PARAM_INTERNAL_FIELD               4 // phase, frequency, TF damping, damping (tshift)
 #define THEORY_PARAM_TF_COS                       2 // phase, frequency (tshift)
 #define THEORY_PARAM_BESSEL                       2 // phase, frequency (tshift)
-#define THEORY_PARAM_INTERNAL_BESSEL              5 // fraction, phase, frequency, TF damping, damping (tshift)
+#define THEORY_PARAM_INTERNAL_BESSEL              5 // fraction, phase, frequency, TF damping, LF damping (tshift)
 #define THEORY_PARAM_SKEWED_GAUSS                 4 // phase, frequency, rate minus, rate plus (tshift)
 
 // number of available user functions
@@ -163,7 +163,7 @@ static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
          "bessel", "b", "(phase frequency)", "(phase frequency tshift)"},
 
         {THEORY_INTERNAL_BESSEL, THEORY_PARAM_INTERNAL_BESSEL, false,
-         "internBsl", "ib", "(phase frequency Trate Lrate)", "(phase frequency Trate Lrate tshift)"},
+         "internBsl", "ib", "(fraction phase frequency Trate Lrate)", "(fraction phase frequency Trate Lrate tshift)"},
 
         {THEORY_SKEWED_GAUSS, THEORY_PARAM_SKEWED_GAUSS, false,
          "skewedGss", "skg", "(phase frequency rate_m rate_p)", "(phase frequency rate_m rate_p tshift)"},

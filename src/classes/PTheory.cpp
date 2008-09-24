@@ -684,6 +684,7 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
     line = &(*fullTheoryBlock)[i];
     // copy line content to str in order to remove comments
     str = line->fLine.Copy();
+cout << endl << ">> str = " << str.Data();
     // remove theory line comment if present, i.e. something starting with '('
     int index = str.Index("(");
     if (index > 0) // theory line comment present
@@ -696,16 +697,16 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
     str = ostr->GetString();
     // check if the line is just a '+' if so nothing to be done
     if (str.Contains("+"))
-      return;
+      continue;
     // check if the function is a polynom
     if (!str.CompareTo("p") || str.Contains("polynom")) {
       MakeCleanAndTidyPolynom(i, fullTheoryBlock);
-      return;
+      continue;
     }
     // check if the function is a userFcn
     if (!str.CompareTo("u") || str.Contains("userFcn")) {
       MakeCleanAndTidyUserFcn(i, fullTheoryBlock);
-      return;
+      continue;
     }
     // search the theory function
     for (unsigned int j=0; j<THEORY_MAX; j++) {
@@ -1324,11 +1325,11 @@ double PTheory::Bessel(register double t, const PDoubleVector& paramValues, cons
  */
 double PTheory::InternalBessel(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  // expected parameters: phase frequency rateT rateL [tshift]
+  // expected parameters: fraction phase frequency rateT rateL [tshift]
 
-  double val[5];
+  double val[6];
 
-  assert(fParamNo.size() <= 5);
+  assert(fParamNo.size() <= 6);
 
   // check if FUNCTIONS are used
   for (unsigned int i=0; i<fParamNo.size(); i++) {
@@ -1340,15 +1341,14 @@ double PTheory::InternalBessel(register double t, const PDoubleVector& paramValu
   }
 
   double tt;
-  if (fParamNo.size() == 4) // no tshift
+  if (fParamNo.size() == 5) // no tshift
     tt = t;
   else // tshift present
-    tt = t-val[4];
+    tt = t-val[5];
 
-  return 0.666666666666667*
-                 TMath::BesselJ0(DEG_TO_RAD*val[0]+TWO_PI*val[1]*tt)*
-                 TMath::Exp(-val[2]*tt) +
-         0.333333333333333*TMath::Exp(-val[3]*tt);
+  return val[0]* TMath::BesselJ0(DEG_TO_RAD*val[1]+TWO_PI*val[2]*tt)*
+                 TMath::Exp(-val[3]*tt) +
+         (1.0-val[0])*TMath::Exp(-val[4]*tt);
 }
 
 //--------------------------------------------------------------------------
