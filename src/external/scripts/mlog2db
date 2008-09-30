@@ -122,6 +122,7 @@ else
     OPT_PAR_THREE=$( eval echo \$$((RIGHTBRACKET + 4)) )
     OPT_PAR_FOUR=$( eval echo \$$((RIGHTBRACKET + 5)) )
     OPT_PAR_FIVE=$( eval echo \$$((RIGHTBRACKET + 6)) )
+    OPT_PAR_SIX=$( eval echo \$$((RIGHTBRACKET + 7)) )
     RUNLIST_USED=0
     NUM_OF_IND_VAR=1 # 1 for the run number
 
@@ -140,6 +141,7 @@ else
       OPT_PAR_THREE=$6
       OPT_PAR_FOUR=$7
       OPT_PAR_FIVE=$8
+      OPT_PAR_SIX=$9
       RUNLIST_USED=0
       NUM_OF_IND_VAR=1 # 1 for the run number
 
@@ -173,6 +175,7 @@ else
       OPT_PAR_THREE=$5
       OPT_PAR_FOUR=$6
       OPT_PAR_FIVE=$7
+      OPT_PAR_SIX=$8
       RUNLIST_USED=1
     fi
   fi
@@ -188,6 +191,8 @@ else
     TEMP=${OPT_PAR_FOUR:4}
   elif [ "${OPT_PAR_FIVE:0:3}" == "fit" ]; then
     TEMP=${OPT_PAR_FIVE:4}
+  elif [ "${OPT_PAR_SIX:0:3}" == "fit" ]; then
+    TEMP=${OPT_PAR_SIX:4}
   fi
 
   if [ "$TEMP" != "" ]; then # runs should be fitted using musrfit
@@ -238,7 +243,7 @@ else
       fi
 
       if [ "${OPT_PAR_ONE}" == "-k" ] || [ "${OPT_PAR_TWO}" == "-k" ] || [ "${OPT_PAR_THREE}" == "-k" ] || [ "${OPT_PAR_FOUR}" == "-k" ] \
-      || [ "${OPT_PAR_FIVE}" == "-k" ]; then
+      || [ "${OPT_PAR_FIVE}" == "-k" ] || [ "${OPT_PAR_SIX}" == "-k" ]; then
         MUSRFITPARAM="-k"
       fi
 
@@ -266,7 +271,7 @@ else
 
     # if the "nosummary"-option is not set and the summary files are present, get some information from there
     if [ "${OPT_PAR_ONE}" != "nosummary" ] && [ "${OPT_PAR_TWO}" != "nosummary" ] && [ "${OPT_PAR_THREE}" != "nosummary" ] \
-    && [ "${OPT_PAR_FOUR}" != "nosummary" ] && [ "${OPT_PAR_FIVE}" != "nosummary" ]; then
+    && [ "${OPT_PAR_FOUR}" != "nosummary" ] && [ "${OPT_PAR_FIVE}" != "nosummary" ] && [ "${OPT_PAR_SIX}" != "nosummary" ]; then
 
       if [ -d $SUMMDIR ]; then
         # extract runnumber from mlog-file
@@ -305,14 +310,60 @@ else
 
     # put together all data to db-format and write it to the file
     awk -v optPARone=$OPT_PAR_ONE -v optPARtwo=$OPT_PAR_TWO -v optPARthree=$OPT_PAR_THREE -v optPARfour=$OPT_PAR_FOUR \
-    -v optPARfive=$OPT_PAR_FIVE -v runList=$RUNLIST_USED -v numIndVar=$NUM_OF_IND_VAR '{
+    -v optPARfive=$OPT_PAR_FIVE -v optPARsix=$OPT_PAR_SIX -v runList=$RUNLIST_USED -v numIndVar=$NUM_OF_IND_VAR '{
 
       outfile="out.db"
-      if(optPARone ~ /^-o/) outfile = substr(optPARone,3)
-      if(optPARtwo ~ /^-o/) outfile = substr(optPARtwo,3)
-      if(optPARthree ~ /^-o/) outfile = substr(optPARthree,3)
-      if(optPARfour ~ /^-o/) outfile = substr(optPARfour,3)
-      if(optPARfive ~ /^-o/) outfile = substr(optPARfive,3)
+      if(optPARone ~ /^-o/){
+        if(optPARone == "-o"){
+          if(optPARtwo != "noheader" && optPARtwo != "nosummary" && optPARtwo !~ /^fit/ && optPARtwo != "-k"){
+            outfile = optPARtwo
+          }
+          else if(NR==1) print "You did not specify an output file! The default one (out.db) will be used."
+        }
+        else outfile = substr(optPARone,3)
+      }
+      else if(optPARtwo ~ /^-o/){
+        if(optPARtwo == "-o"){
+          if(optPARthree != "noheader" && optPARthree != "nosummary" && optPARthree !~ /^fit/ && optPARthree != "-k"){
+            outfile = optPARthree
+          }
+          else if(NR==1) print "You did not specify an output file! The default one (out.db) will be used."
+        }
+        else outfile = substr(optPARtwo,3)
+      }
+      else if(optPARthree ~ /^-o/){
+        if(optPARthree == "-o"){
+          if(optPARfour != "noheader" && optPARfour != "nosummary" && optPARfour !~ /^fit/ && optPARfour != "-k"){
+            outfile = optPARfour
+          }
+          else if(NR==1) print "You did not specify an output file! The default one (out.db) will be used."
+        }
+        else outfile = substr(optPARthree,3)
+      }
+      else if(optPARfour ~ /^-o/){
+        if(optPARfour == "-o"){
+          if(optPARfive != "noheader" && optPARfive != "nosummary" && optPARfive !~ /^fit/ && optPARfive != "-k"){
+            outfile = optPARfive
+          }
+          else if(NR==1) print "You did not specify an output file! The default one (out.db) will be used."
+        }
+        else outfile = substr(optPARfour,3)
+      }
+      else if(optPARfive ~ /^-o/){
+        if(optPARfive == "-o"){
+          if(optPARsix != "noheader" && optPARsix != "nosummary" && optPARsix !~ /^fit/ && optPARsix != "-k"){
+            outfile = optPARsix
+          }
+          else if(NR==1) print "You did not specify an output file! The default one (out.db) will be used."
+        }
+        else outfile = substr(optPARfive,3)
+      }
+      else if(optPARsix ~ /^-o/){
+        if(optPARsix == "-o"){
+          if(NR==1) print "You did not specify an output file! The default one (out.db) will be used."
+        }
+        else outfile = substr(optPARsix,3)
+      }
 
       FS = " "
       OFS = " "
@@ -384,7 +435,7 @@ else
         if("'"$TEMPERATURE"'" != "") {
 
           # Write the db-header
-          if("'"$q"'" == 0 && optPARone != "noheader" && optPARtwo != "noheader" && optPARthree != "noheader" && optPARfour != "noheader" && optPARfive != "noheader"){
+          if("'"$q"'" == 0 && optPARone != "noheader" && optPARtwo != "noheader" && optPARthree != "noheader" && optPARfour != "noheader" && optPARfive != "noheader" && optPARsix != "noheader"){
 
             print "TITLE" >> outfile
             print ">>>Put your title here<<<\n" >> outfile
@@ -455,7 +506,7 @@ else
 
         # If we do not have the information from the summary file or "nosummary" is set
         else {
-          if("'"$q"'" == 0 && optPARone != "noheader" && optPARtwo != "noheader" && optPARthree != "noheader" && optPARfour != "noheader" && optPARfive != "noheader"){
+          if("'"$q"'" == 0 && optPARone != "noheader" && optPARtwo != "noheader" && optPARthree != "noheader" && optPARfour != "noheader" && optPARfive != "noheader" && optPARsix != "noheader"){
 
             print "TITLE" >> outfile
             print ">>>Put your title here<<<\n" >> outfile
