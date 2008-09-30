@@ -107,6 +107,10 @@ PMusrFourier::PMusrFourier(int dataType, PDoubleVector &data, double timeResolut
         rebinCounter = 0;
       }
     }
+  } else { // no rebinning, just copy data
+    for (unsigned int i=0; i<fData.size(); i++) {
+      fDataRebinned.push_back(fData[i]);
+    }
   }
 
 cout << endl << "dB = " << 1.0/(2.0 * F_GAMMA_BAR_MUON * (fEndTime-fStartTime)) << " (G), Bmax = " << 1.0/(2.0 * F_GAMMA_BAR_MUON * fTimeResolution) << " (G)" << endl;
@@ -192,54 +196,50 @@ void PMusrFourier::Transform(unsigned int apodizationTag, unsigned int filterTag
     PrepareFFTwInputData(apodizationTag, filterTag);
   }
 
-// for test only
-// keep data
-fftw_complex *data; 
-data = (fftw_complex *)fftw_malloc(sizeof(fftw_complex)*fNoOfBins);
-for (unsigned int i=0; i<fNoOfBins; i++) {
-  data[i][0] = fIn[i][0];
-  data[i][1] = 0.0;
-}
+  fftw_execute(fFFTwPlan);
 
+// for test only
 // loop over the phase
 double sum;
-TH1F sumHist("sumHist", "sumHist", 361, -180.5, 180.5);
+double corr_phase;
+double min, min_phase;;
+TH1F sumHist("sumHist", "sumHist", 181, -90.5, 90.5);
 double dB   = 1.0/(2.0 * F_GAMMA_BAR_MUON * (fEndTime-fStartTime));
 double Bmax = 1.0/(2.0 * F_GAMMA_BAR_MUON * fTimeResolution);
 TH1F re("re", "re", fNoOfBins/2+1, -dB/2.0, Bmax+dB/2.0);
 TH1F im("im", "im", fNoOfBins/2+1, -dB/2.0, Bmax+dB/2.0);
-for (int p=-180; p<180; p++) {
-  for (unsigned int i=0; i<fNoOfBins; i++) {
-    // recalculate fIn including the phase
-    fIn[i][0] = data[i][0]*cos(p/180.0*PI);
-    fIn[i][1] = data[i][0]*sin(p/180.0*PI);
-  }
-  fftw_execute(fFFTwPlan);
-
-  if (p == 7) {
-    for (unsigned int j=0; j<fNoOfBins/2; j++) {
-      re.SetBinContent(j+1, fOut[j][0]);
-      im.SetBinContent(j+1, fOut[j][1]);
-    }
-  }
-
-  // calculate sum of the imaginary part of fOut
+for (int p=-90; p<90; p++) {
+  // calculate sum of the rotated imaginary part of fOut
   sum = 0.0;
+  corr_phase = (double)p/180.0*PI;
   for (unsigned int i=0; i<fNoOfBins/2; i++) {
-    sum += fOut[i][1];
+    sum += fOut[i][0]*sin(corr_phase) + fOut[i][1]*cos(corr_phase);
   }
-  if (p == 7) {
-    cout << endl << ">> sum = " << sum << endl;
+cout << endl << "-> sum = " << fabs(sum) << ", min = " << min << ", min_phase = " << min_phase/PI*180.0;
+  if (p==-90) {
+    min = fabs(sum);
+    min_phase = corr_phase;
+cout << endl << "!> min = " << min << ", min_phase = " << min_phase/PI*180.0;
   }
-  sumHist.SetBinContent(p+181, fabs(sum));
+  if (fabs(sum) < min) {
+    min = fabs(sum);
+    min_phase = corr_phase;
+cout << endl << "-> min = " << min << ", min_phase = " << min_phase/PI*180.0;
+  }
+  sumHist.SetBinContent(p+91, fabs(sum));
 }
+cout << endl << ">> min = " << min << ", min_phase = " << min_phase/PI*180.0;
+
+for (unsigned int i=0; i<fNoOfBins/2; i++) {
+  re.SetBinContent(i+1, fOut[i][0]*cos(min_phase) - fOut[i][1]*sin(min_phase));
+  im.SetBinContent(i+1, fOut[i][0]*sin(min_phase) + fOut[i][1]*cos(min_phase));
+}
+
 TFile f("test_out.root", "RECREATE");
 re.Write();
 im.Write();
 sumHist.Write();
 f.Close();
-
-fftw_free(data);
 }
 
 //--------------------------------------------------------------------------
