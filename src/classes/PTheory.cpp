@@ -684,7 +684,7 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
     line = &(*fullTheoryBlock)[i];
     // copy line content to str in order to remove comments
     str = line->fLine.Copy();
-cout << endl << ">> str = " << str.Data();
+//cout << endl << ">> str = " << str.Data();
     // remove theory line comment if present, i.e. something starting with '('
     int index = str.Index("(");
     if (index > 0) // theory line comment present
@@ -913,6 +913,7 @@ double PTheory::GeneralExp(register double t, const PDoubleVector& paramValues, 
   // expected parameters: lambda beta [tshift]
 
   double val[3];
+  double result;
 
   assert(fParamNo.size() <= 3);
 
@@ -931,7 +932,14 @@ double PTheory::GeneralExp(register double t, const PDoubleVector& paramValues, 
   else // tshift present
     tt = t-val[2];
 
-  return TMath::Exp(-TMath::Power(tt*val[0], val[1]));;
+  // check if tt*val[0] < 0 and 
+  if ((tt*val[0] < 0) && (trunc(val[1])-val[1] != 0.0)) {
+    result = 0.0;
+  } else {
+    result = TMath::Exp(-TMath::Power(tt*val[0], val[1]));
+  }
+
+  return result;
 }
 
 //--------------------------------------------------------------------------

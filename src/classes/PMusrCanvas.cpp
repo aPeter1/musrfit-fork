@@ -274,8 +274,8 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
 //   cout << ">fMainCanvas   " << fMainCanvas << endl;
 //   cout << ">selected      " << selected << endl;
 // 
-cout << "x : "  << (char)x << endl;
-cout << "px: "  << (char)fMainCanvas->GetEventX() << endl;
+//cout << "x : "  << (char)x << endl;
+//cout << "px: "  << (char)fMainCanvas->GetEventX() << endl;
 
   if (x == 'q') {
     Done(0);
@@ -612,7 +612,7 @@ void PMusrCanvas::UpdateInfoPad()
     // energy if present
     tstr += TString("E=");
     dval = fRunList->GetEnergy(runs[runNo].fRunName);
-cout << endl << ">> dval = " << dval << " (Engery)";
+//cout << endl << ">> dval = " << dval << " (Engery)";
     if (dval == -9.9e99) {
       tstr += TString("??,");
     } else {

@@ -146,7 +146,15 @@ double PRunSingleHisto::CalcChiSquare(const std::vector<double>& par)
     }
   }
 
-//cout << endl << "chisq=" << chisq*fRunInfo->fPacking;
+/*
+static int firstTime = 0;
+if (firstTime < 4) {
+firstTime++;
+cout << endl << "size=" << fData.fValue.size() << ", fDataTimeStart=" << fData.fDataTimeStart << ", fDataTimeStep=" << fData.fDataTimeStep << ", fFitStartTime=" << fFitStartTime << ", fFitStopTime=" << fFitStopTime;
+cout << endl << "chisq=" << chisq*fRunInfo->fPacking;
+cout << endl << "----";
+}
+*/
 
   return chisq;
 }
@@ -458,6 +466,7 @@ bool PRunSingleHisto::PrepareFitData()
   // count the number of bins to be fitted
   fNoOfFitBins=0;
   double time;
+//cout << endl << ">> size=" << fData.fValue.size() << ", fDataTimeStart=" << fData.fDataTimeStart << ", fDataTimeStep=" << fData.fDataTimeStep << ", fFitStartTime=" << fFitStartTime << ", fFitStopTime=" << fFitStopTime;
   for (unsigned int i=0; i<fData.fValue.size(); i++) {
     time = fData.fDataTimeStart + (double)i*fData.fDataTimeStep;
     if ((time >= fFitStartTime) && (time <= fFitStopTime))
@@ -862,6 +871,7 @@ cout << endl << "--------------------------------";
   double theoryValue;
   fData.fTheoryTimeStart = startTime;
   fData.fTheoryTimeStep  = fTimeResolution;
+//cout << endl << ">> size=" << size << ", startTime=" << startTime << ", fTimeResolution=" << fTimeResolution;
   for (unsigned int i=0; i<size; i++) {
     time = startTime + (double)i*fTimeResolution;
     theoryValue = fTheory->Func(time, par, fFuncValues);
@@ -940,6 +950,7 @@ bool PRunSingleHisto::EstimateBkg(unsigned int histoNo)
   double bkg    = 0.0;
 
   // forward
+//cout << endl << ">> bkg start=" << start << ", end=" << end;
   for (unsigned int i=start; i<end; i++)
     bkg += runData->fDataBin[histoNo][i];
   bkg /= static_cast<double>(end - start + 1);
