@@ -260,9 +260,13 @@ int PMsrHandler::WriteMsrLogFile()
   tokens = fFileName.Tokenize(".");
   if (!tokens)
     return PMUSR_TOKENIZE_ERROR;
-  ostr = dynamic_cast<TObjString*>(tokens->At(0));
-  str = ostr->GetString();
-  str += ".mlog";
+  // in order to handle names with "." correctly this slightly odd mlog-filename generation
+  str = TString("");
+  for (int i=0; i<tokens->GetEntries()-1; i++) {
+    ostr = dynamic_cast<TObjString*>(tokens->At(i));
+    str += ostr->GetString() + TString(".");
+  }
+  str += "mlog";
 
   // clean up
   if (tokens) {
