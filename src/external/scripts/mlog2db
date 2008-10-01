@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ ! -x /usr/bin/awk ]; then 
-  echo Please make sure you have installed awk!
+  echo ">> mlog2db: Please make sure you have installed awk!"
   exit 1
 fi
 
@@ -113,8 +113,17 @@ else
       if [ "${RIGHTBRACKET:(-1)}" == "]" ]; then
         RIGHTBRACKET=$i
         break
+      else
+        RIGHTBRACKET=0
       fi
     done
+
+    if [ "$RIGHTBRACKET" -eq 0 ]; then
+        echo
+        echo ">> mlog2db: Syntax error - you used the list specification without closing bracket (])! Quitting now."
+        echo
+        exit 1
+    fi
 
     EXTENSION=$( eval echo \$$((RIGHTBRACKET + 1)) )
     OPT_PAR_ONE=$( eval echo \$$((RIGHTBRACKET + 2)) )
@@ -127,13 +136,23 @@ else
     NUM_OF_IND_VAR=1 # 1 for the run number
 
   else 
-    ISDIGIT=$( echo $1 | awk '{ if (( $1 + 0 ) == $1 ) {print 1} else {print 0}}' ) # check if the first parameter is a number or not
-    if [ "$ISDIGIT" == 1 ]; then # start and end-runs are given
-      for (( j=0; j<=$2-$1; j++ ))
-      do
-        RUNARRAY[$j]=$(( $1 + $j ))
-      done
-      LASTRUN=$(( $2 - $1 )) # RUNARRAY-index of the last run
+    ISDIGIT1=$( echo $1 | awk '{ if (( $1 + 0 ) == $1 ) {print 1} else {print 0}}' ) # check if the first parameter is a number or not
+    ISDIGIT2=$( echo $2 | awk '{ if (( $1 + 0 ) == $1 ) {print 1} else {print 0}}' ) # check if the second parameter is a number or not
+    if [ "$ISDIGIT1" -eq 1 ] && [ "$ISDIGIT2" -eq 1 ]; then # start and end-runs are given
+      if [ "$1" -le "$2" ]; then # runs are given with increasing run numbers
+        for (( j=0; j<=$2-$1; j++ ))
+        do
+          RUNARRAY[$j]=$(( $1 + $j ))
+        done
+        LASTRUN=$(( $2 - $1 )) # RUNARRAY-index of the last run
+      else # runs are given with decreasing run numbers
+        for (( j=0; j<=$1-$2; j++ ))
+        do
+          RUNARRAY[$j]=$(( $1 - $j ))
+        done
+        LASTRUN=$(( $1 - $2 )) # RUNARRAY-index of the last run
+      fi
+
       EXTENSION=$3
 
       OPT_PAR_ONE=$4
@@ -145,10 +164,25 @@ else
       RUNLIST_USED=0
       NUM_OF_IND_VAR=1 # 1 for the run number
 
+    elif [ "$ISDIGIT1" -eq 1 ] && [ "$ISDIGIT2" -eq 0 ]; then # only one run number is given
+      RUNARRAY[0]=$1
+
+      LASTRUN=0 # RUNARRAY-index of the last run
+      EXTENSION=$2
+
+      OPT_PAR_ONE=$3
+      OPT_PAR_TWO=$4
+      OPT_PAR_THREE=$5
+      OPT_PAR_FOUR=$6
+      OPT_PAR_FIVE=$7
+      OPT_PAR_SIX=$8
+      RUNLIST_USED=0
+      NUM_OF_IND_VAR=1 # 1 for the run number
+
     else # assume a runlist-file with "independent variables" is given
       if [ ! -r $1 ]; then
         echo
-        echo "The specified runlist file $1 is not present... Bye bye!"
+        echo ">> mlog2db: The specified runlist file $1 is not present... Bye bye!"
         echo
         exit 1
       fi
@@ -201,8 +235,8 @@ else
   PATHTOMUSRFIT=$(echo `which musrfit`)
     if [ "$PATHTOMUSRFIT" == "" ]; then
       echo
-      echo "No musrfit executable was found on the PATH or in the current directory!"
-      echo "Please install musrfit first!"
+      echo ">> mlog2db: No musrfit executable was found on the PATH or in the current directory!"
+      echo ">> mlog2db: Please install musrfit first!"
       echo
       exit 1
     else
@@ -224,7 +258,7 @@ else
     if [ "$TEMP" != "" ]; then # if fitting should be done
       if [ "$TEMPLATE" == "" ]; then
         echo
-        echo "The specified musrfit template files "$TEMP$3".mlog and $TEMP$3.msr do not exist!"
+        echo ">> mlog2db: The specified musrfit template files "$TEMP$3".mlog and $TEMP$3.msr do not exist!"
         echo
         exit 1
       fi
@@ -264,7 +298,7 @@ else
 
     if [ ! -r $COUNT$EXTENSION.mlog ]; then
       echo
-      echo "The specified musrfit output file $COUNT$EXTENSION.mlog does not exist!"
+      echo ">> mlog2db: The specified musrfit output file $COUNT$EXTENSION.mlog does not exist!"
       echo
       exit 1
     fi
@@ -318,7 +352,7 @@ else
           if(optPARtwo != "noheader" && optPARtwo != "nosummary" && optPARtwo !~ /^fit/ && optPARtwo != "-k"){
             outfile = optPARtwo
           }
-          else if(NR==1) print "You did not specify an output file! The default one (out.db) will be used."
+          else if(NR==1) print ">> mlog2db: You did not specify an output file! The default one (out.db) will be used."
         }
         else outfile = substr(optPARone,3)
       }
@@ -327,7 +361,7 @@ else
           if(optPARthree != "noheader" && optPARthree != "nosummary" && optPARthree !~ /^fit/ && optPARthree != "-k"){
             outfile = optPARthree
           }
-          else if(NR==1) print "You did not specify an output file! The default one (out.db) will be used."
+          else if(NR==1) print ">> mlog2db: You did not specify an output file! The default one (out.db) will be used."
         }
         else outfile = substr(optPARtwo,3)
       }
@@ -336,7 +370,7 @@ else
           if(optPARfour != "noheader" && optPARfour != "nosummary" && optPARfour !~ /^fit/ && optPARfour != "-k"){
             outfile = optPARfour
           }
-          else if(NR==1) print "You did not specify an output file! The default one (out.db) will be used."
+          else if(NR==1) print ">> mlog2db: You did not specify an output file! The default one (out.db) will be used."
         }
         else outfile = substr(optPARthree,3)
       }
@@ -345,7 +379,7 @@ else
           if(optPARfive != "noheader" && optPARfive != "nosummary" && optPARfive !~ /^fit/ && optPARfive != "-k"){
             outfile = optPARfive
           }
-          else if(NR==1) print "You did not specify an output file! The default one (out.db) will be used."
+          else if(NR==1) print ">> mlog2db: You did not specify an output file! The default one (out.db) will be used."
         }
         else outfile = substr(optPARfour,3)
       }
@@ -354,13 +388,13 @@ else
           if(optPARsix != "noheader" && optPARsix != "nosummary" && optPARsix !~ /^fit/ && optPARsix != "-k"){
             outfile = optPARsix
           }
-          else if(NR==1) print "You did not specify an output file! The default one (out.db) will be used."
+          else if(NR==1) print ">> mlog2db: You did not specify an output file! The default one (out.db) will be used."
         }
         else outfile = substr(optPARfive,3)
       }
       else if(optPARsix ~ /^-o/){
         if(optPARsix == "-o"){
-          if(NR==1) print "You did not specify an output file! The default one (out.db) will be used."
+          if(NR==1) print ">> mlog2db: You did not specify an output file! The default one (out.db) will be used."
         }
         else outfile = substr(optPARsix,3)
       }
