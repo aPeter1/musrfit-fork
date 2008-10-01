@@ -242,7 +242,7 @@ else
     else
       if [ -r $TEMP$EXTENSION.mlog ]; then
         TEMPLATE=$TEMP$EXTENSION.mlog
-      elif [ -r $TEMP$3.msr ]; then
+      elif [ -r $TEMP$EXTENSION.msr ]; then
         TEMPLATE=$TEMP$EXTENSION.msr
       fi
     fi
