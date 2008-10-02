@@ -582,6 +582,7 @@ int main(int argc, char *argv[])
         break;
       case PMUSR_MSR_SYNTAX_ERROR:
         cout << endl << "**SYNTAX ERROR** in file " << argv[1] << ", full stop here." << endl << endl;
+        break;
       default:
         cout << endl << "**UNKOWN ERROR** when trying to read the msr-file" << endl << endl;
         break;

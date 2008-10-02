@@ -103,7 +103,7 @@ int PMsrHandler::ReadMsrFile()
   char str[256];
   TString line;
   int line_no = 0;
-  int error = PMUSR_SUCCESS;
+  int result = PMUSR_SUCCESS;
 
   PMsrLineStructure current;
 
@@ -199,29 +199,38 @@ int PMsrHandler::ReadMsrFile()
 
   // execute handler of the various blocks
   if (!HandleFitParameterEntry(fit_parameter))
-    error = PMUSR_MSR_SYNTAX_ERROR;
-  if (!HandleTheoryEntry(theory))
-    error = PMUSR_MSR_SYNTAX_ERROR;
-  if (!HandleFunctionsEntry(functions))
-    error = PMUSR_MSR_SYNTAX_ERROR;
-  if (!HandleRunEntry(run))
-    error = PMUSR_MSR_SYNTAX_ERROR;
-  if (!HandleCommandsEntry(commands))
-    error = PMUSR_MSR_SYNTAX_ERROR;
-  if (!HandlePlotEntry(plot))
-    error = PMUSR_MSR_SYNTAX_ERROR;
-  if (!HandleStatisticEntry(statistic))
-    error = PMUSR_MSR_SYNTAX_ERROR;
+    result = PMUSR_MSR_SYNTAX_ERROR;
+  if (result == PMUSR_SUCCESS)
+    if (!HandleTheoryEntry(theory))
+      result = PMUSR_MSR_SYNTAX_ERROR;
+  if (result == PMUSR_SUCCESS)
+    if (!HandleFunctionsEntry(functions))
+      result = PMUSR_MSR_SYNTAX_ERROR;
+  if (result == PMUSR_SUCCESS)
+    if (!HandleRunEntry(run))
+      result = PMUSR_MSR_SYNTAX_ERROR;
+  if (result == PMUSR_SUCCESS)
+    if (!HandleCommandsEntry(commands))
+      result = PMUSR_MSR_SYNTAX_ERROR;
+  if (result == PMUSR_SUCCESS)
+    if (!HandlePlotEntry(plot))
+      result = PMUSR_MSR_SYNTAX_ERROR;
+  if (result == PMUSR_SUCCESS)
+    if (!HandleStatisticEntry(statistic))
+      result = PMUSR_MSR_SYNTAX_ERROR;
 
   // fill parameter-in-use vector
-  FillParameterInUse(theory, functions, run);
+  if (result == PMUSR_SUCCESS)
+    FillParameterInUse(theory, functions, run);
 
   // check that parameter names are unique
-  unsigned int parX, parY;
-  if (!CheckUniquenessOfParamNames(parX, parY)) {
-    cout << endl << "PMsrHandler::ReadMsrFile: **SEVERE ERROR** parameter name " << fParam[parX].fName.Data() << " is identical for parameter no " << fParam[parX].fNo << " and " << fParam[parY].fNo << "!";
-    cout << endl << "Needs to be fixed first!";
-    error = PMUSR_MSR_SYNTAX_ERROR;
+  if (result == PMUSR_SUCCESS) {
+    unsigned int parX, parY;
+    if (!CheckUniquenessOfParamNames(parX, parY)) {
+      cout << endl << ">> PMsrHandler::ReadMsrFile: **SEVERE ERROR** parameter name " << fParam[parX].fName.Data() << " is identical for parameter no " << fParam[parX].fNo << " and " << fParam[parY].fNo << "!";
+      cout << endl << "Needs to be fixed first!";
+      result = PMUSR_MSR_SYNTAX_ERROR;
+    }
   }
 
   // clean up
@@ -239,7 +248,7 @@ int PMsrHandler::ReadMsrFile()
 // }
 // cout << endl;
 
-  return error;
+  return result;
 }
 
 //--------------------------------------------------------------------------
@@ -861,7 +870,7 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
 
     tokens = iter->fLine.Tokenize(" \t");
     if (!tokens) {
-      cout << endl << "SEVERE ERROR: Couldn't tokenize Parameters in line " << iter->fLineNo;
+      cout << endl << ">> PMsrHandler::HandleFitParameterEntry: **SEVERE ERROR** Couldn't tokenize Parameters in line " << iter->fLineNo;
       cout << endl << endl;
       return false;
     }
@@ -975,7 +984,8 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
 
     // check if enough elements found
     if (error) {
-      cout << endl << "ERROR in line " << iter->fLineNo << ":";
+      cout << endl;
+      cout << endl << ">> PMsrHandler::HandleFitParameterEntry: **ERROR** in line " << iter->fLineNo << ":";
       cout << endl << iter->fLine.Data();
       cout << endl << "A Fit Parameter line needs to have the following form: ";
       cout << endl;
@@ -1044,7 +1054,7 @@ bool PMsrHandler::HandleFunctionsEntry(PMsrLines &lines)
   // create function handler
   fFuncHandler = new PFunctionHandler(fFunctions);
   if (fFuncHandler == 0) {
-    cout << endl << "**ERROR**: PMsrHandler::HandleFunctionsEntry: Couldn't invoke PFunctionHandler";
+    cout << endl << ">> PMsrHandler::HandleFunctionsEntry: **ERROR**: PMsrHandler::HandleFunctionsEntry: Couldn't invoke PFunctionHandler";
     return false;
   }
 
@@ -1086,7 +1096,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     // tokenize line
     tokens = iter->fLine.Tokenize(" \t");
     if (!tokens) {
-      cout << endl << "SEVERE ERROR: Couldn't tokenize Parameters in line " << iter->fLineNo;
+      cout << endl << ">> PMsrHandler::HandleRunEntry: **SEVERE ERROR** Couldn't tokenize Parameters in line " << iter->fLineNo;
       cout << endl << endl;
       return false;
     }
@@ -1253,7 +1263,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
       // check map entries, i.e. if the map values are within parameter bounds
       for (unsigned int i=0; i<param.fMap.size(); i++) {
         if ((param.fMap[i] < 0) || (param.fMap[i] > (int) fParam.size())) {
-          cout << endl << "**SEVERE ERROR** in PMsrHandler::HandleRunEntry: map value " << param.fMap[i] << " in line " << iter->fLineNo << " is out of range!";
+          cout << endl << ">> PMsrHandler::HandleRunEntry: **SEVERE ERROR** map value " << param.fMap[i] << " in line " << iter->fLineNo << " is out of range!";
           error = true;
           break;
         }
@@ -1501,7 +1511,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
 
   if (error) {
     --iter;
-    cout << endl << "**ERROR** in line " << iter->fLineNo << ":";
+    cout << endl << ">> PMsrHandler::HandleRunEntry: **ERROR** in line " << iter->fLineNo << ":";
     cout << endl << iter->fLine.Data();
     cout << endl << "RUN block syntax is too complex to print it here. Please check the manual.";
   } else { // save last run found
@@ -1524,7 +1534,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
         found = false;
       }
       if (!found) {
-        cout << endl << "**ERROR** for run " << fRuns[i].fRunName << ",  forward " << fRuns[i].fForwardHistoNo;
+        cout << endl << ">> PMsrHandler::HandleRunEntry: **ERROR** for run " << fRuns[i].fRunName << ",  forward " << fRuns[i].fForwardHistoNo;
         cout << endl << "   no background information found!";
         cout << endl << "   Either of the tags 'backgr.fit', 'backgr.fix', 'background'";
         cout << endl << "   with data is needed.";
@@ -1711,7 +1721,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
       if (iter1->fLine.Contains("PLOT")) { // handle plot header
         tokens = iter1->fLine.Tokenize(" \t");
         if (!tokens) {
-          cout << endl << "SEVERE ERROR: Couldn't tokenize PLOT in line " << iter1->fLineNo;
+          cout << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
           cout << endl << endl;
           return false;
         }
@@ -1743,7 +1753,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           case MSR_PLOT_NON_MUSR:
             tokens = iter1->fLine.Tokenize(" \t");
             if (!tokens) {
-              cout << endl << "SEVERE ERROR: Couldn't tokenize PLOT in line " << iter1->fLineNo;
+              cout << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
               cout << endl << endl;
               return false;
             }
@@ -1770,7 +1780,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           case MSR_PLOT_ASYM_RRF: // like: runs 1,1 1,2
             tokens = iter1->fLine.Tokenize(" \t");
             if (!tokens) {
-              cout << endl << "SEVERE ERROR: Couldn't tokenize PLOT in line " << iter1->fLineNo;
+              cout << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
               cout << endl << endl;
               return false;
             }
@@ -1816,7 +1826,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
       if (iter1->fLine.Contains("range")) { // handle plot range
         tokens = iter1->fLine.Tokenize(" \t");
         if (!tokens) {
-          cout << endl << "SEVERE ERROR: Couldn't tokenize PLOT in line " << iter1->fLineNo;
+          cout << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
           cout << endl << endl;
           return false;
         }
@@ -1897,7 +1907,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
 
     if (error) { // print error message
       --iter1;
-      cout << endl << "ERROR in line " << iter1->fLineNo << ": " << iter1->fLine.Data();
+      cout << endl << ">> PMsrHandler::HandlePlotEntry: **ERROR** in line " << iter1->fLineNo << ": " << iter1->fLine.Data();
       cout << endl << "A PLOT block needs to have the following structure:";
       cout << endl;
       cout << endl << "PLOT <plot_type>";
@@ -1935,7 +1945,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
 bool PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
 {
   if (lines.empty()) {
-    cout << endl << "WARNING: There is no STATISTIC block! Do you really want this?";
+    cout << endl << ">> PMsrHandler::HandleStatisticEntry: **WARNING** There is no STATISTIC block! Do you really want this?";
     cout << endl;
     return false;
   }
