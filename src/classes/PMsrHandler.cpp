@@ -233,6 +233,19 @@ int PMsrHandler::ReadMsrFile()
     }
   }
 
+  // check that if maps are present in the theory- and/or function-block,
+  // that there are really present in the run block
+  if (result == PMUSR_SUCCESS)
+    if (!CheckMaps())
+      result = PMUSR_MSR_SYNTAX_ERROR;
+
+
+  // check that if functions are present in the theory- and/or run-block, that they
+  // are really present in the function block
+  if (result == PMUSR_SUCCESS)
+    if (!CheckFuncs())
+      result = PMUSR_MSR_SYNTAX_ERROR;
+
   // clean up
   fit_parameter.clear();
   theory.clear();
@@ -2412,6 +2425,197 @@ bool PMsrHandler::CheckUniquenessOfParamNames(unsigned int &parX, unsigned int &
   }
 
   return unique;
+}
+
+//--------------------------------------------------------------------------
+// CheckMaps (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Checks if map entries found in the theory- or function-block are also
+ * present in the run-block, if yes return true otherwise return false.
+ */
+bool PMsrHandler::CheckMaps()
+{
+  bool result = true;
+
+  PIntVector mapVec;
+  PIntVector mapBlock;
+  PIntVector mapLineNo;
+
+  TObjArray  *tokens = 0;
+  TObjString *ostr = 0;
+  TString    str;
+
+  int no;
+
+  // check if map is present in the theory-block
+  for (unsigned int i=0; i<fTheory.size(); i++) {
+    if (fTheory[i].fLine.Contains("map", TString::kIgnoreCase)) {
+      // map found hence filter out map number
+      tokens = fTheory[i].fLine.Tokenize(" \t");
+      for (int j=0; j<tokens->GetEntries(); j++) {
+        ostr = dynamic_cast<TObjString*>(tokens->At(j));
+        str = ostr->GetString();
+        if (str.Contains("map", TString::kIgnoreCase)) {
+          if (FilterFunMapNumber(str, "map", no)) {
+            mapVec.push_back(no);
+            mapBlock.push_back(0); // 0 = theory-block
+            mapLineNo.push_back(fTheory[i].fLineNo);
+          }
+        }
+      }
+      // clean up tokens
+      if (tokens) {
+        delete tokens;
+        tokens = 0;
+      }
+    }
+  }
+
+  // check if map is present in the function-block
+  for (unsigned int i=0; i<fFunctions.size(); i++) {
+    if (fFunctions[i].fLine.Contains("map", TString::kIgnoreCase)) {
+      // map found hence filter out map number
+      tokens = fFunctions[i].fLine.Tokenize(" \t");
+      for (int j=0; j<tokens->GetEntries(); j++) {
+        ostr = dynamic_cast<TObjString*>(tokens->At(j));
+        str = ostr->GetString();
+        if (str.Contains("map", TString::kIgnoreCase)) {
+          if (FilterFunMapNumber(str, "map", no)) {
+            mapVec.push_back(no);
+            mapBlock.push_back(1); // 1 = theory-block
+            mapLineNo.push_back(fTheory[i].fLineNo);
+          }
+        }
+      }
+      // clean up tokens
+      if (tokens) {
+        delete tokens;
+        tokens = 0;
+      }
+    }
+  }
+
+  // check if present maps are found in the run-block
+  bool found;
+  for (unsigned int i=0; i<mapVec.size(); i++) { // loop over found maps in theory- and function-block
+    found = false;
+    for (unsigned int j=0; j<fRuns.size(); j++) { // loop over all run-blocks
+      if ((mapVec[i]-MSR_PARAM_MAP_OFFSET < (int)fRuns[j].fMap.size()) &&
+          (mapVec[i]-MSR_PARAM_MAP_OFFSET-1 >= 0)) { // map value smaller than run-block map length
+        if (fRuns[j].fMap[mapVec[i]-MSR_PARAM_MAP_OFFSET-1] != 0) { // map value in the run-block != 0
+          found = true;
+          break;
+        }
+      }
+    }
+    if (!found) { // map not found
+      result = false;
+      cout << endl << ">> PMsrHandler::CheckMaps: **ERROR** map" << mapVec[i]-MSR_PARAM_MAP_OFFSET << " found in the ";
+      if (mapBlock[i] == 0)
+        cout << "theory-block ";
+      else
+        cout << "functions-block ";
+      cout << "in line " << mapLineNo[i] << " is not present in the run-block!";
+      if (mapVec[i]-MSR_PARAM_MAP_OFFSET == 0) {
+        cout << endl << ">> by the way: map must be > 0 ...";
+      }
+    }
+  }
+
+  // clean up
+  mapVec.clear();
+  mapBlock.clear();
+  mapLineNo.clear();
+
+  return result;
+}
+
+//--------------------------------------------------------------------------
+// CheckFuncs (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Checks if fun entries found in the theory- and run-block are also
+ * present in the functions-block, if yes return true otherwise return false.
+ */
+bool PMsrHandler::CheckFuncs()
+{
+  bool result = true;
+
+  PIntVector funVec;
+  PIntVector funBlock;
+  PIntVector funLineBlockNo;
+
+  TObjArray  *tokens = 0;
+  TObjString *ostr = 0;
+  TString    str;
+
+  int no;
+
+  // check if func is present in the theory-block
+  for (unsigned int i=0; i<fTheory.size(); i++) {
+    if (fTheory[i].fLine.Contains("fun", TString::kIgnoreCase)) {
+      // func found hence filter out func number
+      tokens = fTheory[i].fLine.Tokenize(" \t");
+      for (int j=0; j<tokens->GetEntries(); j++) {
+        ostr = dynamic_cast<TObjString*>(tokens->At(j));
+        str = ostr->GetString();
+        if (str.Contains("fun", TString::kIgnoreCase)) {
+          if (FilterFunMapNumber(str, "fun", no)) {
+            funVec.push_back(no);
+            funBlock.push_back(0); // 0 = theory-block
+            funLineBlockNo.push_back(fTheory[i].fLineNo);
+          }
+        }
+      }
+      // clean up tokens
+      if (tokens) {
+        delete tokens;
+        tokens = 0;
+      }
+    }
+  }
+
+  // check if func is present in the run-block
+  for (unsigned int i=0; i<fRuns.size(); i++) {
+    if (fRuns[i].fNormParamNo >= MSR_PARAM_FUN_OFFSET) { // function found
+      funVec.push_back(fRuns[i].fNormParamNo);
+      funBlock.push_back(1); // 1 = run-block
+      funLineBlockNo.push_back(i+1);
+    }
+  }
+
+  // check if present funcs are found in the functions-block
+  bool found;
+  for (unsigned int i=0; i<funVec.size(); i++) { // loop over found funcs in theory- and run-block
+    found = false;
+    // check if function is present in the functions-block
+    for (unsigned int j=0; j<fFunctions.size(); j++) {
+      if (fFunctions[j].fLine.BeginsWith("#") || fFunctions[j].fLine.IsWhitespace())
+        continue;
+      str = TString("fun");
+      str += funVec[i] - MSR_PARAM_FUN_OFFSET;
+      if (fFunctions[j].fLine.Contains(str, TString::kIgnoreCase)) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) { // func not found
+      result = false;
+      cout << endl << ">> PMsrHandler::CheckFuncs: **ERROR** fun" << funVec[i]-MSR_PARAM_FUN_OFFSET << " found in the ";
+      if (funBlock[i] == 0)
+        cout << "theory-block in line " << funLineBlockNo[i] << " is not present in the functions-block!";
+      else
+        cout << "run-block No " << funLineBlockNo[i] << " (norm) is not present in the functions-block!";
+    }
+  }
+
+  // clean up
+  funVec.clear();
+  funBlock.clear();
+  funLineBlockNo.clear();
+
+  return result;
 }
 
 //--------------------------------------------------------------------------

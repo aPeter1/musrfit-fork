@@ -83,6 +83,8 @@ class PMsrHandler
 
     virtual int ParameterInUse(unsigned int paramNo);
     virtual bool CheckUniquenessOfParamNames(unsigned int &parX, unsigned int &parY);
+    virtual bool CheckMaps();
+    virtual bool CheckFuncs();
 
   private:
     PMsrLines              fComments;  ///< holds the comments of the msr-file
