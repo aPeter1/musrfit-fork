@@ -107,7 +107,7 @@ else
     done
 
     # search for the parameter including the "]"
-    for (( i=0; i<="$#"; i++ ))
+    for (( i=1; i<="$#"; i++ ))
     do
       RIGHTBRACKET=$( eval echo \$$i )
       if [ "${RIGHTBRACKET:(-1)}" == "]" ]; then
@@ -126,12 +126,8 @@ else
     fi
 
     EXTENSION=$( eval echo \$$((RIGHTBRACKET + 1)) )
-    OPT_PAR_ONE=$( eval echo \$$((RIGHTBRACKET + 2)) )
-    OPT_PAR_TWO=$( eval echo \$$((RIGHTBRACKET + 3)) )
-    OPT_PAR_THREE=$( eval echo \$$((RIGHTBRACKET + 4)) )
-    OPT_PAR_FOUR=$( eval echo \$$((RIGHTBRACKET + 5)) )
-    OPT_PAR_FIVE=$( eval echo \$$((RIGHTBRACKET + 6)) )
-    OPT_PAR_SIX=$( eval echo \$$((RIGHTBRACKET + 7)) )
+    FIRST_OPT_PAR=$((RIGHTBRACKET + 2))
+    LAST_OPT_PAR=$#
     RUNLIST_USED=0
     NUM_OF_IND_VAR=1 # 1 for the run number
 
@@ -155,12 +151,8 @@ else
 
       EXTENSION=$3
 
-      OPT_PAR_ONE=$4
-      OPT_PAR_TWO=$5
-      OPT_PAR_THREE=$6
-      OPT_PAR_FOUR=$7
-      OPT_PAR_FIVE=$8
-      OPT_PAR_SIX=$9
+      FIRST_OPT_PAR=4
+      LAST_OPT_PAR=$#
       RUNLIST_USED=0
       NUM_OF_IND_VAR=1 # 1 for the run number
 
@@ -170,12 +162,8 @@ else
       LASTRUN=0 # RUNARRAY-index of the last run
       EXTENSION=$2
 
-      OPT_PAR_ONE=$3
-      OPT_PAR_TWO=$4
-      OPT_PAR_THREE=$5
-      OPT_PAR_FOUR=$6
-      OPT_PAR_FIVE=$7
-      OPT_PAR_SIX=$8
+      FIRST_OPT_PAR=3
+      LAST_OPT_PAR=$#
       RUNLIST_USED=0
       NUM_OF_IND_VAR=1 # 1 for the run number
 
@@ -204,30 +192,21 @@ else
       LASTRUN=$(( ${#RUNARRAY[@]} - 1 )) # RUNARRAY-index of the last run
       EXTENSION=$2
 
-      OPT_PAR_ONE=$3
-      OPT_PAR_TWO=$4
-      OPT_PAR_THREE=$5
-      OPT_PAR_FOUR=$6
-      OPT_PAR_FIVE=$7
-      OPT_PAR_SIX=$8
+      FIRST_OPT_PAR=3
+      LAST_OPT_PAR=$#
       RUNLIST_USED=1
     fi
   fi
 
   # Check if fitting should be done
-  if [ "${OPT_PAR_ONE:0:3}" == "fit" ]; then
-    TEMP=${OPT_PAR_ONE:4}
-  elif [ "${OPT_PAR_TWO:0:3}" == "fit" ]; then
-    TEMP=${OPT_PAR_TWO:4}
-  elif [ "${OPT_PAR_THREE:0:3}" == "fit" ]; then
-    TEMP=${OPT_PAR_THREE:4}
-  elif [ "${OPT_PAR_FOUR:0:3}" == "fit" ]; then
-    TEMP=${OPT_PAR_FOUR:4}
-  elif [ "${OPT_PAR_FIVE:0:3}" == "fit" ]; then
-    TEMP=${OPT_PAR_FIVE:4}
-  elif [ "${OPT_PAR_SIX:0:3}" == "fit" ]; then
-    TEMP=${OPT_PAR_SIX:4}
-  fi
+  TEMP=""
+  for PAR in "$@"
+  do
+    if [ "${PAR:0:3}" == "fit" ]; then
+      TEMP=${PAR:4}
+      break
+    fi
+  done
 
   if [ "$TEMP" != "" ]; then # runs should be fitted using musrfit
 
@@ -269,6 +248,12 @@ else
           if(NR==1) print nextcount > nextinput
           else if($1 == "RUN") {
             if (substr(count,1,1) != "_"){ count = sprintf("_%04u", count); nextcount = sprintf("_%04u", nextcount);}
+            if ($2 !~ count){
+              print " "
+              print ">> mlog2db: ATTENTION The run-numbers in the filename and the RUN-block of the template file do not match!"
+              print ">> mlog2db: The run-number substitution is most likely going wrong!"
+              print " "
+            }
             sub(count, nextcount, $0);
             print $0 >> nextinput
           }
@@ -276,11 +261,18 @@ else
         }' $TEMPLATE
       fi
 
-      if [ "${OPT_PAR_ONE}" == "-k" ] || [ "${OPT_PAR_TWO}" == "-k" ] || [ "${OPT_PAR_THREE}" == "-k" ] || [ "${OPT_PAR_FOUR}" == "-k" ] \
-      || [ "${OPT_PAR_FIVE}" == "-k" ] || [ "${OPT_PAR_SIX}" == "-k" ]; then
-        MUSRFITPARAM="-k"
-      fi
+      MUSRFITPARAM=""
+      for PAR in "$@"
+      do
+        if [ "$PAR" == "-k" ]; then
+          MUSRFITPARAM="-k"
+          break
+        fi
+      done
 
+      echo
+      echo ">> mlog2db: musrfit $COUNT$EXTENSION.msr $MUSRFITPARAM"
+      echo
       musrfit $COUNT$EXTENSION.msr $MUSRFITPARAM # the fit
 
       if [ "$q" -ne "$LASTRUN" ]; then # create the next musrfit input file if not the last specified run was fitted already
@@ -288,6 +280,12 @@ else
           if(NR==1) print nextcount > nextinput
           else if($1 == "RUN") {
             if (substr(count,1,1) != "_"){ count = sprintf("_%04u", count); nextcount = sprintf("_%04u", nextcount);}
+            if ($2 !~ count){
+              print " "
+              print ">> mlog2db: ATTENTION The run-numbers in the filename and the RUN-block of the file do not match!"
+              print ">> mlog2db: The run-number substitution is most likely going wrong!"
+              print " "
+            }
             sub(count, nextcount, $0);
             print $0 >> nextinput
           }
@@ -304,8 +302,16 @@ else
     fi
 
     # if the "nosummary"-option is not set and the summary files are present, get some information from there
-    if [ "${OPT_PAR_ONE}" != "nosummary" ] && [ "${OPT_PAR_TWO}" != "nosummary" ] && [ "${OPT_PAR_THREE}" != "nosummary" ] \
-    && [ "${OPT_PAR_FOUR}" != "nosummary" ] && [ "${OPT_PAR_FIVE}" != "nosummary" ] && [ "${OPT_PAR_SIX}" != "nosummary" ]; then
+    NOSUMMARY=0
+    for PAR in "$@"
+    do
+      if [ "$PAR" == "nosummary" ]; then
+        NOSUMMARY=1
+        break
+      fi
+    done
+
+    if [ "$NOSUMMARY" -eq 0 ]; then
 
       if [ -d $SUMMDIR ]; then
         # extract runnumber from mlog-file
@@ -342,71 +348,52 @@ else
       fi
     fi
 
-    # put together all data to db-format and write it to the file
-    awk -v optPARone=$OPT_PAR_ONE -v optPARtwo=$OPT_PAR_TWO -v optPARthree=$OPT_PAR_THREE -v optPARfour=$OPT_PAR_FOUR \
-    -v optPARfive=$OPT_PAR_FIVE -v optPARsix=$OPT_PAR_SIX -v runList=$RUNLIST_USED -v numIndVar=$NUM_OF_IND_VAR '{
+    # determine the output-file
+    OUTFILE="out.db"
 
-      outfile="out.db"
-      if(optPARone ~ /^-o/){
-        if(optPARone == "-o"){
-          if(optPARtwo != "noheader" && optPARtwo != "nosummary" && optPARtwo !~ /^fit/ && optPARtwo != "-k"){
-            outfile = optPARtwo
-          }
-          else if(NR==1) print ">> mlog2db: You did not specify an output file! The default one (out.db) will be used."
-        }
-        else outfile = substr(optPARone,3)
-      }
-      else if(optPARtwo ~ /^-o/){
-        if(optPARtwo == "-o"){
-          if(optPARthree != "noheader" && optPARthree != "nosummary" && optPARthree !~ /^fit/ && optPARthree != "-k"){
-            outfile = optPARthree
-          }
-          else if(NR==1) print ">> mlog2db: You did not specify an output file! The default one (out.db) will be used."
-        }
-        else outfile = substr(optPARtwo,3)
-      }
-      else if(optPARthree ~ /^-o/){
-        if(optPARthree == "-o"){
-          if(optPARfour != "noheader" && optPARfour != "nosummary" && optPARfour !~ /^fit/ && optPARfour != "-k"){
-            outfile = optPARfour
-          }
-          else if(NR==1) print ">> mlog2db: You did not specify an output file! The default one (out.db) will be used."
-        }
-        else outfile = substr(optPARthree,3)
-      }
-      else if(optPARfour ~ /^-o/){
-        if(optPARfour == "-o"){
-          if(optPARfive != "noheader" && optPARfive != "nosummary" && optPARfive !~ /^fit/ && optPARfive != "-k"){
-            outfile = optPARfive
-          }
-          else if(NR==1) print ">> mlog2db: You did not specify an output file! The default one (out.db) will be used."
-        }
-        else outfile = substr(optPARfour,3)
-      }
-      else if(optPARfive ~ /^-o/){
-        if(optPARfive == "-o"){
-          if(optPARsix != "noheader" && optPARsix != "nosummary" && optPARsix !~ /^fit/ && optPARsix != "-k"){
-            outfile = optPARsix
-          }
-          else if(NR==1) print ">> mlog2db: You did not specify an output file! The default one (out.db) will be used."
-        }
-        else outfile = substr(optPARfive,3)
-      }
-      else if(optPARsix ~ /^-o/){
-        if(optPARsix == "-o"){
-          if(NR==1) print ">> mlog2db: You did not specify an output file! The default one (out.db) will be used."
-        }
-        else outfile = substr(optPARsix,3)
-      }
+    for (( l="$FIRST_OPT_PAR"; l<="$LAST_OPT_PAR"; l++ ))
+    do
+      CUR_PAR=$( eval echo \$$l )
+      NEXT_PAR=$( eval echo \$$((l+1)) )
+      if [ "${CUR_PAR:0:2}" == "-o" ]; then
+        if [ "$CUR_PAR" == "-o" ]; then
+          if [ "$l" -ne "$LAST_OPT_PAR" ] && [ "$NEXT_PAR" != "noheader" ] && [ "$NEXT_PAR" != "nosummary" ] \
+          && [ "${NEXT_PAR:0:3}" != "fit" ] && [ "$NEXT_PAR" != "-k" ]; then
+            OUTFILE=$NEXT_PAR
+            break
+          else
+            echo
+            echo ">> mlog2db: You did not specify an output file! The default one (out.db) will be used."
+            echo
+          fi
+        else
+          OUTFILE=${CUR_PAR:2}
+          break
+        fi
+      fi
+    done
+
+    # determine, if the db-header should be written to the output file, default: YES
+    NOHEADER=0
+    for PAR in "$@"
+    do
+      if [ "$PAR" == "noheader" ]; then
+        NOHEADER=1
+        break
+      fi
+    done
+
+    # put together all data to db-format and write it to the file
+    awk -v outfile=$OUTFILE -v noheader=$NOHEADER -v runList=$RUNLIST_USED -v numIndVar=$NUM_OF_IND_VAR '{
 
       FS = " "
       OFS = " "
 
       if(NR==1){title=$0; X=0; Y=0; i=1}
 
-      if(NR>4){
+      if(NR>1){
         if(X == 0){
-          if($0 != ""){
+          if($1 == i){
             parArray[i] = $2
             dataArray[i] = $3
             if($4 ~ /^-/)
@@ -419,7 +406,7 @@ else
               posErrArray[i] = $5
             i++
           }
-          if($0 == "") X=1
+          if($1 ~ /^THEORY/) X=1
         }
       }
 
@@ -469,7 +456,7 @@ else
         if("'"$TEMPERATURE"'" != "") {
 
           # Write the db-header
-          if("'"$q"'" == 0 && optPARone != "noheader" && optPARtwo != "noheader" && optPARthree != "noheader" && optPARfour != "noheader" && optPARfive != "noheader" && optPARsix != "noheader"){
+          if("'"$q"'" == 0 && noheader != 1){
 
             print "TITLE" >> outfile
             print ">>>Put your title here<<<\n" >> outfile
@@ -540,7 +527,7 @@ else
 
         # If we do not have the information from the summary file or "nosummary" is set
         else {
-          if("'"$q"'" == 0 && optPARone != "noheader" && optPARtwo != "noheader" && optPARthree != "noheader" && optPARfour != "noheader" && optPARfive != "noheader" && optPARsix != "noheader"){
+          if("'"$q"'" == 0 && noheader != 1){
 
             print "TITLE" >> outfile
             print ">>>Put your title here<<<\n" >> outfile
