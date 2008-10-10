@@ -2501,7 +2501,7 @@ bool PMsrHandler::CheckMaps()
   for (unsigned int i=0; i<mapVec.size(); i++) { // loop over found maps in theory- and function-block
     found = false;
     for (unsigned int j=0; j<fRuns.size(); j++) { // loop over all run-blocks
-      if ((mapVec[i]-MSR_PARAM_MAP_OFFSET < (int)fRuns[j].fMap.size()) &&
+      if ((mapVec[i]-MSR_PARAM_MAP_OFFSET-1 < (int)fRuns[j].fMap.size()) &&
           (mapVec[i]-MSR_PARAM_MAP_OFFSET-1 >= 0)) { // map value smaller than run-block map length
         if (fRuns[j].fMap[mapVec[i]-MSR_PARAM_MAP_OFFSET-1] != 0) { // map value in the run-block != 0
           found = true;
