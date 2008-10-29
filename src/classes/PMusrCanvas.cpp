@@ -53,6 +53,10 @@ PMusrCanvas::PMusrCanvas()
   fPlotType = -1;
   fPlotNumber = -1;
 
+  fImp   = 0;
+  fBar   = 0;
+  fPopup = 0;
+
   fStyle               = 0;
   fMainCanvas          = 0;
   fTitlePad            = 0;
@@ -171,6 +175,10 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
   fDifferencePlot = false;
   fPlotType = -1;
 
+  fImp   = 0;
+  fBar   = 0;
+  fPopup = 0;
+
   fMainCanvas          = 0;
   fTitlePad            = 0;
   fDataTheoryPad       = 0;
@@ -186,6 +194,19 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
     cout << endl;
     return;
   }
+
+  // add canvas menu
+  TRootCanvas *fImp = (TRootCanvas*)fMainCanvas->GetCanvasImp(); 
+  TGMenuBar *fBar = fImp->GetMenuBar(); 
+  TGPopupMenu *fPopup = fBar->AddPopup("&Musrfit");
+  fPopup->AddEntry("&Fourier", P_MENU_ID_FOURIER);
+  fPopup->AddEntry("&Difference", P_MENU_ID_DIFFERENCE);
+  fPopup->AddSeparator();
+  fPopup->AddEntry("&Save Data", P_MENU_ID_SAVE_DATA);
+  fBar->MapSubwindows(); 
+  fBar->Layout();
+
+  fPopup->Connect("TGPopupMenu", "Activated(Int_t)", "PMusrCanvas", this, "HandleMenuPopup(Int_t)");
 
   // divide the canvas into 4 pads
   // title pad
@@ -288,6 +309,30 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   } else {
     // do all the necessary stuff **TO BE DONE**
     fMainCanvas->Update();
+  }
+}
+
+//--------------------------------------------------------------------------
+// HandleMenuPopup (SLOT)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrCanvas::HandleMenuPopup(Int_t id)
+{
+  switch (id) {
+    case P_MENU_ID_FOURIER:
+      cout << endl << ">> will handle Fourier ..." << endl;
+      break;
+    case P_MENU_ID_DIFFERENCE:
+      cout << endl << ">> will handle Difference ..." << endl;
+      break;
+    case P_MENU_ID_SAVE_DATA:
+      cout << endl << ">> will handle Save Data ..." << endl;
+      break;
+    default:
+      break;
   }
 }
 

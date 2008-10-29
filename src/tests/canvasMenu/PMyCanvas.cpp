@@ -34,9 +34,9 @@ using namespace std;
 
 #include "PMyCanvas.h"
 
-#define P_ID_FOURIER    1
-#define P_ID_DIFFERENCE 2
-#define P_ID_SAVE_DATA  3
+#define P_ID_FOURIER    10001
+#define P_ID_DIFFERENCE 10002
+#define P_ID_SAVE_DATA  10003
 
 ClassImpQ(PMyCanvas)
 
@@ -58,10 +58,10 @@ cout << endl << ">> fImp=" << fImp << endl;
 cout << endl << ">> fBar=" << fBar << endl;
   TGPopupMenu *fPopup = fBar->AddPopup("m&y menu");
 cout << endl << ">> fPopup=" << fPopup << endl;
-  fPopup->AddEntry("F&ourier", 1);
-  fPopup->AddEntry("&Difference", 2);
+  fPopup->AddEntry("F&ourier", P_ID_FOURIER);
+  fPopup->AddEntry("&Difference", P_ID_DIFFERENCE);
   fPopup->AddSeparator();
-  fPopup->AddEntry("Save Data", 3);
+  fPopup->AddEntry("Save Data", P_ID_SAVE_DATA);
   fBar->MapSubwindows(); 
   fBar->Layout();
 

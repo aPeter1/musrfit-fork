@@ -35,6 +35,8 @@
 #include <TObject.h>
 #include <TQObject.h>
 #include <TStyle.h>
+#include <TRootCanvas.h>
+#include <TGMenu.h>
 #include <TCanvas.h>
 #include <TPaveText.h>
 #include <TLegend.h>
@@ -51,6 +53,11 @@
 #define YINFO  0.1
 #define YTITLE 0.95
 #define XTHEO  0.75
+
+// Canvas menu id's
+#define P_MENU_ID_FOURIER    10001
+#define P_MENU_ID_DIFFERENCE 10002
+#define P_MENU_ID_SAVE_DATA  10003
 
 //------------------------------------------------------------------------
 /**
@@ -137,6 +144,7 @@ class PMusrCanvas : public TObject, public TQObject
 
     virtual void Done(Int_t status=0); // *SIGNAL*
     virtual void HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected); // SLOT
+    virtual void HandleMenuPopup(Int_t id); // SLOT
     virtual void LastCanvasClosed(); // SLOT
 
   private:
@@ -147,6 +155,12 @@ class PMusrCanvas : public TObject, public TQObject
 
     TStyle    *fStyle;
 
+    // canvas menu related variables
+    TRootCanvas *fImp;
+    TGMenuBar   *fBar;
+    TGPopupMenu *fPopup;
+
+    // canvas related variables
     TCanvas   *fMainCanvas;
     TPaveText *fTitlePad;
     TPad      *fDataTheoryPad;
