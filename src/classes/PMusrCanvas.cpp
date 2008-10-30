@@ -55,7 +55,8 @@ PMusrCanvas::PMusrCanvas()
 
   fImp   = 0;
   fBar   = 0;
-  fPopup = 0;
+  fPopupMain = 0;
+  fPopupSave = 0;
 
   fStyle               = 0;
   fMainCanvas          = 0;
@@ -104,6 +105,10 @@ PMusrCanvas::~PMusrCanvas()
 {
 cout << "~PMusrCanvas() called. fMainCanvas name=" << fMainCanvas->GetName() << endl;
   // cleanup
+  if (fPopupSave) {
+    delete fPopupSave;
+    fPopupSave = 0;
+  }
   if (fStyle) {
     delete fStyle;
     fStyle = 0;
@@ -177,7 +182,8 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
 
   fImp   = 0;
   fBar   = 0;
-  fPopup = 0;
+  fPopupMain = 0;
+  fPopupSave = 0;
 
   fMainCanvas          = 0;
   fTitlePad            = 0;
@@ -196,17 +202,21 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
   }
 
   // add canvas menu
-  TRootCanvas *fImp = (TRootCanvas*)fMainCanvas->GetCanvasImp(); 
-  TGMenuBar *fBar = fImp->GetMenuBar(); 
-  TGPopupMenu *fPopup = fBar->AddPopup("&Musrfit");
-  fPopup->AddEntry("&Fourier", P_MENU_ID_FOURIER);
-  fPopup->AddEntry("&Difference", P_MENU_ID_DIFFERENCE);
-  fPopup->AddSeparator();
-  fPopup->AddEntry("&Save Data", P_MENU_ID_SAVE_DATA);
+  fImp = (TRootCanvas*)fMainCanvas->GetCanvasImp(); 
+  fBar = fImp->GetMenuBar(); 
+  fPopupMain = fBar->AddPopup("&Musrfit");
+  fPopupMain->AddEntry("&Fourier", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber);
+  fPopupMain->AddEntry("&Difference", P_MENU_ID_DIFFERENCE+P_MENU_PLOT_OFFSET*fPlotNumber);
+  fPopupMain->AddSeparator();
+//  fPopupMain->AddEntry("&Save Data", P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
+  fPopupSave = new TGPopupMenu();
+  fPopupSave->AddEntry("Save ascii", P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_ASCII);
+  fPopupSave->AddEntry("Save db", P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_DB);
+  fPopupMain->AddPopup("&Save Data", fPopupSave);
   fBar->MapSubwindows(); 
   fBar->Layout();
 
-  fPopup->Connect("TGPopupMenu", "Activated(Int_t)", "PMusrCanvas", this, "HandleMenuPopup(Int_t)");
+  fPopupMain->Connect("TGPopupMenu", "Activated(Int_t)", "PMusrCanvas", this, "HandleMenuPopup(Int_t)");
 
   // divide the canvas into 4 pads
   // title pad
@@ -321,18 +331,14 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
  */
 void PMusrCanvas::HandleMenuPopup(Int_t id)
 {
-  switch (id) {
-    case P_MENU_ID_FOURIER:
-      cout << endl << ">> will handle Fourier ..." << endl;
-      break;
-    case P_MENU_ID_DIFFERENCE:
-      cout << endl << ">> will handle Difference ..." << endl;
-      break;
-    case P_MENU_ID_SAVE_DATA:
-      cout << endl << ">> will handle Save Data ..." << endl;
-      break;
-    default:
-      break;
+  if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber) {
+    cout << endl << ">> will handle Fourier ..." << endl;
+  } else if (id == P_MENU_ID_DIFFERENCE+P_MENU_PLOT_OFFSET*fPlotNumber) {
+    HandleDifference();
+  } else if (id == P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_ASCII) {
+    SaveDataAscii();
+  } else if (id == P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_DB) {
+    SaveDataDb();
   }
 }
 
@@ -1381,5 +1387,29 @@ cout << endl << ">> going to plot diff spectra ... (" << fData[0].diff->GetNbins
  */
 void PMusrCanvas::PlotFourier(int fourierType)
 {
+}
+
+//--------------------------------------------------------------------------
+// SaveDataAscii
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrCanvas::SaveDataAscii()
+{
+  cout << endl << ">> will handle Save Data in ascii format ..." << endl;
+}
+
+//--------------------------------------------------------------------------
+// SaveDataDb
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrCanvas::SaveDataDb()
+{
+  cout << endl << ">> will handle Save Data in db format ..." << endl;
 }
 

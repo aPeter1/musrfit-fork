@@ -59,6 +59,10 @@
 #define P_MENU_ID_DIFFERENCE 10002
 #define P_MENU_ID_SAVE_DATA  10003
 
+#define P_MENU_PLOT_OFFSET   1000
+#define P_MENU_ID_SAVE_ASCII 100
+#define P_MENU_ID_SAVE_DB    101
+
 //------------------------------------------------------------------------
 /**
  * <p>
@@ -158,7 +162,8 @@ class PMusrCanvas : public TObject, public TQObject
     // canvas menu related variables
     TRootCanvas *fImp;
     TGMenuBar   *fBar;
-    TGPopupMenu *fPopup;
+    TGPopupMenu *fPopupMain;
+    TGPopupMenu *fPopupSave;
 
     // canvas related variables
     TCanvas   *fMainCanvas;
@@ -194,6 +199,9 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void PlotData();
     virtual void PlotDifference();
     virtual void PlotFourier(int fourierType);
+
+    virtual void SaveDataAscii();
+    virtual void SaveDataDb();
 
   ClassDef(PMusrCanvas, 1)
 };
