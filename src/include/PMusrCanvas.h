@@ -54,14 +54,27 @@
 #define YTITLE 0.95
 #define XTHEO  0.75
 
-// Canvas menu id's
-#define P_MENU_ID_FOURIER    10001
-#define P_MENU_ID_DIFFERENCE 10002
-#define P_MENU_ID_SAVE_DATA  10003
+// Current Plot Views
+#define PV_DATA          1
+#define PV_FOURIER_REAL  2
+#define PV_FOURIER_IMAG  3
+#define PV_FOURIER_PWR   4
+#define PV_FOURIER_PHASE 5
 
-#define P_MENU_PLOT_OFFSET   1000
-#define P_MENU_ID_SAVE_ASCII 100
-#define P_MENU_ID_SAVE_DB    101
+// Canvas menu id's
+#define P_MENU_ID_FOURIER       10001
+#define P_MENU_ID_DIFFERENCE    10002
+#define P_MENU_ID_SAVE_DATA     10003
+
+#define P_MENU_PLOT_OFFSET      1000
+
+#define P_MENU_ID_FOURIER_REAL  100
+#define P_MENU_ID_FOURIER_IMAG  101
+#define P_MENU_ID_FOURIER_PWR   102
+#define P_MENU_ID_FOURIER_PHASE 103
+
+#define P_MENU_ID_SAVE_ASCII    200
+#define P_MENU_ID_SAVE_DB       201
 
 //------------------------------------------------------------------------
 /**
@@ -153,7 +166,8 @@ class PMusrCanvas : public TObject, public TQObject
 
   private:
     Bool_t fValid;
-    Bool_t fDifferencePlot; /// flag showing is a difference plot is shown
+    Bool_t fDifferenceView;  /// tag showing that the shown data, fourier, are the difference between data and theory
+    Int_t  fCurrentPlotView; /// tag showing what the current plot view is: data, fourier, ...
     Int_t  fPlotType;
     Int_t  fPlotNumber;
 
@@ -164,6 +178,7 @@ class PMusrCanvas : public TObject, public TQObject
     TGMenuBar   *fBar;
     TGPopupMenu *fPopupMain;
     TGPopupMenu *fPopupSave;
+    TGPopupMenu *fPopupFourier;
 
     // canvas related variables
     TCanvas   *fMainCanvas;
@@ -195,6 +210,7 @@ class PMusrCanvas : public TObject, public TQObject
 
     virtual double CalculateDiff(const double x, const double y, TH1F *theo);
     virtual double CalculateDiff(const double x, const double y, TGraphErrors *theo);
+    virtual Int_t  FindBin(const double x, TGraphErrors *graph);
 
     virtual void PlotData();
     virtual void PlotDifference();
