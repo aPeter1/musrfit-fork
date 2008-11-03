@@ -1679,6 +1679,283 @@ void PMusrCanvas::SaveDataAscii()
  */
 void PMusrCanvas::SaveDataDb()
 {
-  cout << endl << ">> will eventually handle Save Data in db format ..." << endl;
+  // generate output filename
+
+  // in order to handle names with "." correctly this slightly odd data-filename generation
+  TObjArray *tokens = fMsrHandler->GetFileName().Tokenize(".");
+  TObjString *ostr;
+  TString str = TString("");
+  for (int i=0; i<tokens->GetEntries()-1; i++) {
+    ostr = dynamic_cast<TObjString*>(tokens->At(i));
+    str += ostr->GetString() + TString(".");
+  }
+  str += "db";
+
+  if (tokens) {
+    delete tokens;
+    tokens = 0;
+  }
+
+  if (tokens) {
+    delete tokens;
+    tokens = 0;
+  }
+
+  // open file
+  ofstream fout;
+
+  // open mlog-file
+  fout.open(str.Data(), iostream::out);
+  if (!fout.is_open()) {
+    cout << endl << ">> PMusrCanvas::SaveDataDb: **ERROR** couldn't open file " << str.Data() << " for writing." << endl;
+    return;
+  }
+
+  // extract data
+  Double_t time, xval, yval;
+  Int_t xminBin;
+  Int_t xmaxBin;
+  Int_t theoBin;
+  Double_t xmin;
+  Double_t xmax;
+  switch (fPlotType) {
+    case MSR_PLOT_SINGLE_HISTO:
+    case MSR_PLOT_ASYM:
+    case MSR_PLOT_ASYM_RRF:
+      if (fDifferenceView) { // difference view plot
+        switch (fCurrentPlotView) {
+          case PV_DATA:
+            // write header
+            fout << "TITLE" << endl;
+            fout << "  " << fMsrHandler->GetMsrTitle()->Data() << endl;
+            fout << "LABELS" << endl;
+            fout << "  Time (us)" << endl;
+            for (unsigned int j=0; j<fData.size(); j++) {
+              fout << "  Diff" << j << endl;
+            }
+            fout << endl;
+            fout << "DATA t ";
+            for (unsigned int j=0; j<fData.size(); j++) {
+              fout << "diff" << j << " ";
+            }
+            fout << endl;
+            fout << "\\-e" << endl;
+
+            // get current x-range
+            xminBin = fData[0].diff->GetXaxis()->GetFirst(); // first bin of the zoomed range
+            xmaxBin = fData[0].diff->GetXaxis()->GetLast();  // last bin of the zoomed range
+            xmin = fData[0].diff->GetXaxis()->GetBinCenter(xminBin);
+            xmax = fData[0].diff->GetXaxis()->GetBinCenter(xmaxBin);
+            // get difference data
+            for (int i=1; i<fData[0].diff->GetNbinsX()-1; i++) {
+              time = fData[0].diff->GetBinCenter(i); // get time
+              if ((time < xmin) || (time > xmax))
+                continue;
+              fout << time << ",,, ";
+              for (unsigned int j=0; j<fData.size()-1; j++) {
+                fout << fData[j].diff->GetBinContent(i) << ", ";
+                fout << fData[j].diff->GetBinError(i) << ",, ";
+              }
+              // write last data set
+              fout << fData[fData.size()-1].diff->GetBinContent(i) << ", ";
+              fout << fData[fData.size()-1].diff->GetBinError(i) << ",,";
+              fout << endl;
+            }
+            break;
+          case PV_FOURIER_REAL:
+            break;
+          case PV_FOURIER_IMAG:
+            break;
+          case PV_FOURIER_PWR:
+            break;
+          case PV_FOURIER_PHASE:
+            break;
+          default:
+            break;
+        }
+      } else { // not a difference view plot
+        switch (fCurrentPlotView) {
+          case PV_DATA:
+            // write header
+            fout << "TITLE" << endl;
+            fout << "  " << fMsrHandler->GetMsrTitle()->Data() << endl;
+            fout << "LABELS" << endl;
+            fout << "  Time (us)" << endl;
+            for (unsigned int j=0; j<fData.size(); j++) {
+              fout << "  Data" << j << endl;
+              fout << "  Theo" << j << endl;
+            }
+            fout << endl;
+            fout << "DATA t ";
+            for (unsigned int j=0; j<fData.size(); j++) {
+              fout << "diff" << j << " " << "theo" << j << " ";
+            }
+            fout << endl;
+            fout << "\\-e" << endl;
+
+            // get current x-range
+            xminBin = fData[0].data->GetXaxis()->GetFirst(); // first bin of the zoomed range
+            xmaxBin = fData[0].data->GetXaxis()->GetLast();  // last bin of the zoomed range
+            xmin = fData[0].data->GetXaxis()->GetBinCenter(xminBin);
+            xmax = fData[0].data->GetXaxis()->GetBinCenter(xmaxBin);
+            // get data
+            for (int i=1; i<fData[0].data->GetNbinsX()-1; i++) {
+              time = fData[0].data->GetBinCenter(i); // get time
+              if ((time < xmin) || (time > xmax))
+                continue;
+              fout << time << ",,, ";
+              for (unsigned int j=0; j<fData.size()-1; j++) {
+                fout << fData[j].data->GetBinContent(i) << ", ";
+                fout << fData[j].data->GetBinError(i) << ",, ";
+                theoBin = fData[j].theory->FindBin(time);
+                fout << fData[j].theory->GetBinContent(theoBin) << ",,, ";
+              }
+              // write last data set
+              fout << fData[fData.size()-1].data->GetBinContent(i) << ", ";
+              fout << fData[fData.size()-1].data->GetBinError(i) << ",, ";
+              theoBin = fData[fData.size()-1].theory->FindBin(time);
+              fout << fData[fData.size()-1].theory->GetBinContent(theoBin) << ",,, ";
+              fout << endl;
+            }
+            break;
+          case PV_FOURIER_REAL:
+            break;
+          case PV_FOURIER_IMAG:
+            break;
+          case PV_FOURIER_PWR:
+            break;
+          case PV_FOURIER_PHASE:
+            break;
+          default:
+            break;
+        }
+      }
+      break;
+    case MSR_PLOT_NON_MUSR:
+      if (fDifferenceView) { // difference view plot
+        switch (fCurrentPlotView) {
+          case PV_DATA:
+            // write header
+            fout << "TITLE" << endl;
+            fout << "  " << fMsrHandler->GetMsrTitle()->Data() << endl;
+            fout << "LABELS" << endl;
+            fout << "  Time (us)" << endl;
+            for (unsigned int j=0; j<fNonMusrData.size(); j++) {
+              fout << "  Diff" << j << endl;
+            }
+            fout << endl;
+            fout << "DATA t ";
+            for (unsigned int j=0; j<fNonMusrData.size(); j++) {
+              fout << "diff" << j << " ";
+            }
+            fout << endl;
+            fout << "\\-e" << endl;
+
+            // write data
+            // get current x-range
+            xminBin = fNonMusrData[0].diff->GetXaxis()->GetFirst(); // first bin of the zoomed range
+            xmaxBin = fNonMusrData[0].diff->GetXaxis()->GetLast();  // last bin of the zoomed range
+            xmin = fNonMusrData[0].diff->GetXaxis()->GetBinCenter(xminBin);
+            xmax = fNonMusrData[0].diff->GetXaxis()->GetBinCenter(xmaxBin);
+            // get data
+            for (int i=0; i<fNonMusrData[0].diff->GetN(); i++) {
+              fNonMusrData[0].diff->GetPoint(i,xval,yval); // get values
+              if ((xval < xmin) || (xval > xmax))
+                continue;
+              fout << xval << ",,, ";
+              for (unsigned int j=0; j<fNonMusrData.size()-1; j++) {
+                fNonMusrData[j].diff->GetPoint(i,xval,yval); // get values
+                fout << yval << ", ";
+                fout << fNonMusrData[j].diff->GetErrorY(i) << ",, ";
+              }
+              // write last data set
+              fNonMusrData[fNonMusrData.size()-1].diff->GetPoint(i,xval,yval); // get values
+              fout << yval << ", ";
+              fout << fNonMusrData[fNonMusrData.size()-1].diff->GetErrorY(i) << ",,";
+              fout << endl;
+            }
+            break;
+          case PV_FOURIER_REAL:
+            break;
+          case PV_FOURIER_IMAG:
+            break;
+          case PV_FOURIER_PWR:
+            break;
+          case PV_FOURIER_PHASE:
+            break;
+          default:
+            break;
+        }
+      } else { // not a difference view plot
+        switch (fCurrentPlotView) {
+          case PV_DATA:
+            // write header
+            fout << "TITLE" << endl;
+            fout << "  " << fMsrHandler->GetMsrTitle()->Data() << endl;
+            fout << "LABELS" << endl;
+            fout << "  Time (us)" << endl;
+            for (unsigned int j=0; j<fNonMusrData.size(); j++) {
+              fout << "  Data" << j << endl;
+              fout << "  Theo" << j << endl;
+            }
+            fout << endl;
+            fout << "DATA t ";
+            for (unsigned int j=0; j<fNonMusrData.size(); j++) {
+              fout << "diff" << j << " " << "theo" << j << " ";
+            }
+            fout << endl;
+            fout << "\\-e" << endl;
+
+            // write data
+            // get current x-range
+            xminBin = fNonMusrData[0].data->GetXaxis()->GetFirst(); // first bin of the zoomed range
+            xmaxBin = fNonMusrData[0].data->GetXaxis()->GetLast();  // last bin of the zoomed range
+            xmin = fNonMusrData[0].data->GetXaxis()->GetBinCenter(xminBin);
+            xmax = fNonMusrData[0].data->GetXaxis()->GetBinCenter(xmaxBin);
+            // get data
+            for (int i=0; i<fNonMusrData[0].data->GetN(); i++) {
+              fNonMusrData[0].data->GetPoint(i,xval,yval); // get values
+              if ((xval < xmin) || (xval > xmax))
+                continue;
+              fout << xval << ",,, ";
+              for (unsigned int j=0; j<fNonMusrData.size()-1; j++) {
+                fNonMusrData[j].data->GetPoint(i,xval,yval); // get values
+                fout << yval << ", ";
+                fout << fNonMusrData[j].data->GetErrorY(i) << ",, ";
+                theoBin = FindBin(xval, fNonMusrData[j].theory);
+                fNonMusrData[j].theory->GetPoint(theoBin,xval,yval); // get values
+                fout << yval << ",,,";
+              }
+              // write last data set
+              fNonMusrData[fNonMusrData.size()-1].data->GetPoint(i,xval,yval); // get values
+              fout << yval << ", ";
+              fout << fNonMusrData[fNonMusrData.size()-1].data->GetErrorY(i) << ",, ";
+              theoBin = FindBin(xval, fNonMusrData[fNonMusrData.size()-1].theory);
+              fNonMusrData[fNonMusrData.size()-1].theory->GetPoint(theoBin,xval,yval); // get values
+              fout << yval << ",,,";
+              fout << endl;
+            }
+            break;
+          case PV_FOURIER_REAL:
+            break;
+          case PV_FOURIER_IMAG:
+            break;
+          case PV_FOURIER_PWR:
+            break;
+          case PV_FOURIER_PHASE:
+            break;
+          default:
+            break;
+        }
+      }
+      break;
+    default:
+      break;
+  }
+
+  // close file
+  fout.close();
+
+  cout << endl << ">> Data windows saved in db format ..." << endl;
 }
 
