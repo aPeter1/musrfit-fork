@@ -102,6 +102,9 @@ short term:
   none 100.0 // upper limit only
   **FIRST IMPLEMENTATION DONE, NEEDS EXTENSIVE TESTING** 08-09-23
 
+* CHECK: the normalization for single histo fits should ALWAYS be (1/ns)! (as discussed with Dima) but
+  I guess it is (1/bin) at the moment. (1/ns) has the advantage that it is really instrument independent!
+
 * implement FFT with msr-interface
 
 ---------------------
