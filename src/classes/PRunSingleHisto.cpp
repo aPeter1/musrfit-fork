@@ -434,6 +434,7 @@ bool PRunSingleHisto::PrepareFitData()
 
   // everything looks fine, hence fill data set
   double value = 0.0;
+  double normalizer = 1.0;
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
   fData.fDataTimeStart = fTimeResolution*(((double)start-t0)+(double)fRunInfo->fPacking/2.0);
@@ -449,13 +450,14 @@ bool PRunSingleHisto::PrepareFitData()
     } else { // packed data, i.e. fRunInfo->fPacking > 1
       if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
         // in order that after rebinning the fit does not need to be redone (important for plots)
-        // the value is normalize to per bin
-        value /= fRunInfo->fPacking;
+        // the value is normalize to per 1 nsec
+        normalizer = fRunInfo->fPacking * (fTimeResolution * 1e3); // fTimeResolution us->ns
+        value /= normalizer;
         fData.fValue.push_back(value);
         if (value == 0.0)
           fData.fError.push_back(1.0);
         else
-          fData.fError.push_back(TMath::Sqrt(value/fRunInfo->fPacking));
+          fData.fError.push_back(TMath::Sqrt(value/normalizer));
         // reset values
         value = 0.0;
       }
@@ -581,17 +583,19 @@ cout << endl << ">> time resolution = " << fTimeResolution;
 cout << endl << ">> start = " << start << ", t0 = " << t0 << ", packing = " << fRunInfo->fPacking;
 cout << endl << ">> data start time = " << fData.fDataTimeStart;
 */
+  double normalizer = 1.0;
   fData.fDataTimeStep  = fTimeResolution*fRunInfo->fPacking;
   for (unsigned i=start; i<end; i++) {
     if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
       // in order that after rebinning the fit does not need to be redone (important for plots)
-      // the value is normalize to per bin
-      value /= fRunInfo->fPacking;
+      // the value is normalize to per 1 nsec
+      normalizer = fRunInfo->fPacking * (fTimeResolution * 1e3); // fTimeResolution us->ns
+      value /= normalizer;
       fData.fValue.push_back(value);
       if (value == 0.0)
         fData.fError.push_back(1.0);
       else
-        fData.fError.push_back(TMath::Sqrt(value/fRunInfo->fPacking));
+        fData.fError.push_back(TMath::Sqrt(value/normalizer));
       // reset values
       value = 0.0;
     }
@@ -834,18 +838,20 @@ cout << endl << ">> start time = " << fData.fDataTimeStart << ", step = " << fDa
 cout << endl << ">> start = " << start << ", end = " << end;
 cout << endl << "--------------------------------";
 */
+  double normalizer = 1.0;
   for (unsigned int i=start; i<end; i++) {
     if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
       // in order that after rebinning the fit does not need to be redone (important for plots)
-      // the value is normalize to per bin
-      value /= fRunInfo->fPacking;
+      // the value is normalize to per 1 nsec
+      normalizer = fRunInfo->fPacking * (fTimeResolution * 1e3); // fTimeResolution us->ns
+      value /= normalizer;
       // 1st term start time, 2nd term offset to the center of the rebinned bin
       time = ((double)start-t0)*fTimeResolution +
              (double)(i-start-fRunInfo->fPacking/2.0)*fTimeResolution;
       expval = TMath::Exp(+time/tau)/N0;
       fData.fValue.push_back(-1.0+expval*(value-bkg));
 //cout << endl << ">> i=" << i << ",time=" << time << ",expval=" << expval << ",value=" << value << ",bkg=" << bkg << ",expval*(value-bkg)-1=" << expval*(value-bkg)-1.0;
-      fData.fError.push_back(expval*TMath::Sqrt(value/fRunInfo->fPacking));
+      fData.fError.push_back(expval*TMath::Sqrt(value/normalizer));
 //cout << endl << ">> " << time << ", " << expval << ", " << -1.0+expval*(value-bkg) << ", " << expval*TMath::Sqrt(value/fRunInfo->fPacking);
       value = 0.0;
     }
@@ -955,9 +961,9 @@ bool PRunSingleHisto::EstimateBkg(unsigned int histoNo)
     bkg += runData->fDataBin[histoNo][i];
   bkg /= static_cast<double>(end - start + 1);
 
-  fBackground = bkg; // keep background (per bin) for chisq, max.log.likelihood
+  fBackground = bkg / (fTimeResolution * 1e3); // keep background (per 1 nsec) for chisq, max.log.likelihood, fTimeResolution us->ns
 
-  cout << endl << ">> fRunInfo->fRunName=" << fRunInfo->fRunName.Data() << ", histNo=" << histoNo << ", bkg=" << bkg;
+  cout << endl << ">> fRunInfo->fRunName=" << fRunInfo->fRunName.Data() << ", histNo=" << histoNo << ", fBackground=" << fBackground;
 
   return true;
 }

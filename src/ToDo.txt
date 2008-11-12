@@ -104,6 +104,7 @@ short term:
 
 * CHECK: the normalization for single histo fits should ALWAYS be (1/ns)! (as discussed with Dima) but
   I guess it is (1/bin) at the moment. (1/ns) has the advantage that it is really instrument independent!
+  **CHECKED AND FIXED** 08-11-12
 
 * implement FFT with msr-interface
 

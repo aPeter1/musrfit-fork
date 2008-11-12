@@ -1303,7 +1303,7 @@ void PMusrCanvas::PlotData()
           if (runList->at(0).fLifetimeCorrection) { // lifetime correction
             yAxisTitle = "asymmetry";
           } else { // no liftime correction
-            yAxisTitle = "N(t) per bin";
+            yAxisTitle = "N(t) per nsec";
           }
           break;
         case MSR_PLOT_ASYM:
