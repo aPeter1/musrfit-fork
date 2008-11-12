@@ -195,3 +195,49 @@ TLondon1D_3LS::TLondon1D_3LS(unsigned int steps, const vector<double> &param) {
     fBZ.push_back(BBz);
   }
 }
+
+//------------------
+// Constructor of the TLondon1D_4L class
+// 1D-London screening in a thin superconducting film, four layers, four lambdas
+// Parameters: Bext[G], deadlayer[nm], thickness1[nm], thickness2[nm], thickness3[nm], thickness4[nm],
+// lambda1[nm], lambda2[nm], lambda3[nm], lambda4[nm]
+//------------------
+
+TLondon1D_4L::TLondon1D_4L(unsigned int steps, const vector<double> &param) {
+
+  double N1((param[6]+exp(2.0*param[2]/param[6])*(param[6]-param[7])+param[7])*(-1.0*param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])-param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])-param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]))+exp(2.0*param[3]/param[7])*(param[6]-param[7]+exp(2.0*param[2]/param[6])*(param[6]+param[7]))*(param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])+param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9])));
+
+  double N11(param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])*(param[7]*cosh(param[3]/param[7])-param[6]*sinh(param[3]/param[7]))+param[7]*(-1.0*param[6]*cosh(param[3]/param[7])+param[7]*sinh(param[3]/param[7]))*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])*(-1.0*param[6]*cosh(param[3]/param[7])+param[7]*sinh(param[3]/param[7]))+param[8]*(param[7]*cosh(param[3]/param[7])-param[6]*sinh(param[3]/param[7]))*sinh(param[4]/param[8]))*sinh(param[5]/param[9]));
+
+  double N12(exp(2.0*(param[2]+param[1])/param[6])*(param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])*(param[7]*cosh(param[3]/param[7])+param[6]*sinh(param[3]/param[7]))+param[7]*(param[6]*cosh(param[3]/param[7])+param[7]*sinh(param[3]/param[7]))*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])*(param[6]*cosh(param[3]/param[7])+param[7]*sinh(param[3]/param[7]))+param[8]*(param[7]*cosh(param[3]/param[7])+param[6]*sinh(param[3]/param[7]))*sinh(param[4]/param[8]))*sinh(param[5]/param[9])));
+
+  double N2((param[6]+param[7]+(param[6]-param[7])*exp(2.0*param[2]/param[6]))*(-1.0*param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])-param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])-param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]))+exp(2.0*param[3]/param[7])*(param[6]-param[7]+exp(2.0*param[2]/param[6])*(param[6]+param[7]))*(param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])+param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9])));
+
+  double N21(exp(param[3]/param[7])*param[8]*param[9]*(param[6]*cosh(param[2]/param[6])+param[7]*sinh(param[2]/param[6]))+param[6]*param[9]*cosh(param[5]/param[9])*(-1.0*param[8]*cosh(param[4]/param[8])+param[7]*sinh(param[4]/param[8]))+param[6]*param[8]*(param[7]*cosh(param[4]/param[8])-param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]));
+
+  double N22(exp((2.0*param[2]+param[3]+2.0*param[1])/param[7])*(-1.0*param[6]*param[8]*param[9]*cosh(param[2]/param[6])+param[7]*param[8]*param[9]*sinh(param[2]/param[6])+exp(param[3]/param[7])*param[6]*param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])+param[7]*sinh(param[4]/param[8]))+exp(param[3]/param[7])*param[6]*param[8]*(param[7]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9])));
+
+  double N3(2.0*((param[6]+exp(2.0*param[2]/param[6])*(param[6]-param[7])+param[7])*(-1.0*param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])-param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])-param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]))+exp(2.0*param[3]/param[7])*(param[6]-param[7]+exp(2.0*param[2]/param[6])*(param[6]+param[7]))*(param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])+param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]))));
+
+  double N4(4.0*((param[6]+exp(2.0*param[2]/param[6])*(param[6]-param[7])+param[7])*(-1.0*param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])-param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])-param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]))+exp(2.0*param[3]/param[7])*(param[6]-param[7]+exp(2.0*param[2]/param[6])*(param[6]+param[7]))*(param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])+param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]))));
+
+  double N42(-1.0*param[6]*param[7]*param[8]+exp(param[5]/param[9])*(param[6]*cosh(param[2]/param[6])*(param[8]*sinh(param[3]/param[7])*(param[9]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))+param[7]*cosh(param[3]/param[7])*(param[8]*cosh(param[4]/param[8])+param[9]*sinh(param[4]/param[8])))+param[7]*sinh(param[2]/param[6])*(param[8]*cosh(param[3]/param[7])*(param[9]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))+param[7]*sinh(param[3]/param[7])*(param[8]*cosh(param[4]/param[8])+param[9]*sinh(param[4]/param[8])))));
+
+  fDZ = (param[2]+param[3]+param[4]+param[5])/double(steps);
+  double ZZ, BBz;
+
+  for (unsigned int j(0); j<steps; j++) {
+    ZZ = param[1] + (double)j*fDZ;
+    fZ.push_back(ZZ);
+    if (ZZ < param[1]+param[2]) {
+      BBz = (2.0*param[0]*exp(-(param[1]+ZZ)/param[6]+param[3]/param[7])*(-1.0*exp(param[2]/param[6])*(exp(2.0*param[1]/param[6])-exp(2.0*ZZ/param[6]))*param[7]*param[8]*param[9]-exp(2.0*ZZ/param[6])*N11+N12))/N1;
+    } else if (ZZ < param[1]+param[2]+param[3]) {
+      BBz = (2.0*param[0]*exp(param[2]/param[6]-(param[2]+param[1]+ZZ)/param[7])*(exp(2.0*ZZ/param[7])*N21+N22))/N2;
+    } else if (ZZ < param[1]+param[2]+param[3]+param[4]) {
+      BBz = (param[0]*exp(-1.0*(param[2]+param[3]+param[1]+ZZ)/param[8]-param[5]/param[9])*(2.0*exp(param[2]/param[6]+param[3]/param[7]+(2.0*param[2]+2.0*param[3]+param[4]+2.0*param[1])/param[8])*param[6]*param[7]*(param[9]-param[8]+exp(2.0*param[5]/param[9])*(param[8]+param[9]))+4.0*exp(param[2]/param[6]+param[3]/param[7]-param[4]/param[8]+param[5]/param[9])*(-1.0*exp((2.0*param[2]+2.0*param[3]+param[4]+2.0*param[1])/param[8])*param[9]*(param[7]*sinh(param[2]/param[6])*(-1.0*param[8]*cosh(param[3]/param[7])+param[7]*sinh(param[3]/param[7]))+param[6]*cosh(param[2]/param[6])*(param[7]*cosh(param[3]/param[7])-param[8]*sinh(param[3]/param[7])))+exp(2.0*ZZ/param[8])*(exp(param[4]/param[8])*param[9]*(param[7]*sinh(param[2]/param[6])*(param[8]*cosh(param[3]/param[7])+param[7]*sinh(param[3]/param[7]))+param[6]*cosh(param[2]/param[6])*(param[7]*cosh(param[3]/param[7])+param[8]*sinh(param[3]/param[7])))+param[6]*param[7]*(-1.0*param[9]*cosh(param[5]/param[9])+param[8]*sinh(param[5]/param[9]))))))/N3;
+    } else {
+      BBz = (param[0]*exp(-1.0*(param[2]+param[3]+param[4]+param[1]+ZZ)/param[9])*(-1.0*exp(-1.0*param[4]/param[8]+2.0*(param[2]+param[3]+param[4]+param[1])/param[9])*((-1.0+exp(2.0*param[2]/param[6]))*param[7]*(exp(2.0*param[4]/param[8])*(param[8]-param[7]+exp(2.0*param[3]/param[7])*(param[7]+param[8]))*(param[8]-param[9])+exp(2.0*param[3]/param[7])*(param[7]-param[8])*(param[8]+param[9])-(param[7]+param[8])*(param[8]+param[9]))+param[6]*(-8.0*exp(param[2]/param[6]+param[3]/param[7]+param[4]/param[8]+param[5]/param[9])*param[7]*param[8]+(1.0+exp(2.0*param[2]/param[6]))*(-1.0+exp(2.0*param[3]/param[7]))*param[8]*(-1.0*param[8]+exp(2.0*param[4]/param[8])*(param[8]-param[9])-param[9])+(1.0+exp(2.0*param[2]/param[6]))*(1.0+exp(2.0*param[3]/param[7]))*param[7]*(param[8]+exp(2.0*param[4]/param[8])*(param[8]-param[9])+param[9])))+8.0*exp(param[2]/param[6]+param[3]/param[7]-(param[5]-2.0*ZZ)/param[9])*N42))/N4;
+    }
+    fBZ.push_back(BBz);
+  }
+}

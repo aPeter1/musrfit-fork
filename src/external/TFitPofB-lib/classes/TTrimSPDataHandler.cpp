@@ -128,6 +128,52 @@ vector<double> TTrimSPData::OrigDataNZ(double e) const {
 }
 
 //---------------------
+// Method returning fraction of muons implanted in the specified layer for a given energy[keV]
+// Parameters: Energy[keV], LayerNumber[1], Interfaces[nm]
+//---------------------
+
+double TTrimSPData::LayerFraction(double e, unsigned int layno, const vector<double>& interface) const {
+
+  if(layno < 1 && layno > (interface.size()+1)) {
+    cout << "No such layer available according to your specified interfaces... Returning 0.0!" << endl;
+    return 0.0;
+  }
+
+  for(unsigned int i(0); i<fEnergy.size(); i++) {
+    if(!(fEnergy[i] - e)) {
+      // Because we do not know if the implantation profile is normalized or not, do not care about this and calculate the fraction from the beginning
+      // Total "number of muons"
+      double totalNumber(0.0);
+      for(unsigned int j(0); j<fDataZ[i].size(); j++)
+        totalNumber += fDataNZ[i][j];
+      // "number of muons" in layer layno
+      double layerNumber(0.0);
+      if(!(layno-1)){
+        for(unsigned int j(0); j<fDataZ[i].size(); j++)
+          if(fDataZ[i][j] < interface[0]*10.0)
+            layerNumber += fDataNZ[i][j];
+      } else if(!(layno-interface.size()-1)){
+        for(unsigned int j(0); j<fDataZ[i].size(); j++)
+          if(fDataZ[i][j] >= *(interface.end()-1)*10.0)
+            layerNumber += fDataNZ[i][j];
+      } else {
+        for(unsigned int j(0); j<fDataZ[i].size(); j++)
+          if(fDataZ[i][j] >= interface[layno-2]*10.0 && fDataZ[i][j] < interface[layno-1]*10.0)
+            layerNumber += fDataNZ[i][j];
+      }
+      // fraction of muons in layer layno
+      cout << "Fraction of muons in layer " << layno << ": " << layerNumber/totalNumber << endl;
+      return layerNumber/totalNumber;
+    }
+  }
+
+  // default
+  cout << "No implantation profile available for the specified energy... Returning 0.0" << endl;
+  return 0.0;
+
+}
+
+//---------------------
 // Method putting different weight to different layers of your thin film
 // Parameters: Implantation Energy[keV], Interfaces[nm], Weights [0.0 <= w[i] <= 1.0]
 // Example: 25.0, (50, 100), (1.0, 0.33, 1.0)

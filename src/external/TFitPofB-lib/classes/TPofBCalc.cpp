@@ -193,6 +193,42 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
 
 }
 
+// TPofBCalc::AddBackground, Parameters: field B[G], width s[us], weight w
+
+void TPofBCalc::AddBackground(double B, double s, double w) {
+
+  if(!s || w<0.0 || w>1.0 || B<0.0)
+    return;
+
+  unsigned int sizePB(fPB.size());
+  double BsSq(s*s/gBar/gBar/4.0/pi/pi);
+
+  // calculate Gaussian background
+  vector<double> bg;
+  for(unsigned int i(0); i < sizePB; i++) {
+    bg.push_back(exp(-(fB[i]-B)*(fB[i]-B)/2.0/BsSq));
+  }
+
+  // normalize background
+  double bgsum(0.0);
+  for (unsigned int i(0); i < sizePB; i++)
+    bgsum += bg[i];
+  bgsum *= fDB;
+  for (unsigned int i(0); i < sizePB; i++)
+    bg[i] /= bgsum;
+
+  // add background to P(B)
+  for (unsigned int i(0); i < sizePB; i++)
+    fPB[i] = (1.0 - w)*fPB[i] + w*bg[i];
+
+//   // check if normalization is still valid
+//   double pBsum(0.0);
+//   for (unsigned int i(0); i < sizePB; i++)
+//     pBsum += fPB[i];
+//
+//   cout << "pBsum = " << pBsum << endl;
+
+}
 
 void TPofBCalc::ConvolveGss(double w) {
 
