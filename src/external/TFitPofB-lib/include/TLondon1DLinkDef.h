@@ -21,6 +21,8 @@
 #pragma link C++ class TLondon1D2L+;
 #pragma link C++ class TLondon1D3L+;
 #pragma link C++ class TLondon1D3LS+;
+#pragma link C++ class TLondon1D4L+;
+#pragma link C++ class TLondon1D3LSub+;
 
 #endif //__CINT__
 // root dictionary stuff --------------------------------------------------

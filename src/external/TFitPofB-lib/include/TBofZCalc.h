@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/06/30
+  2008/11/07
 
 ***************************************************************************/
 
@@ -101,6 +101,18 @@ class TLondon1D_3LS : public TBofZCalc {
 public:
 
   TLondon1D_3LS(unsigned int, const vector<double>& );
+
+};
+
+//--------------------
+// Class "for Meissner screening" in a thin superconducting film - four layers with four different lambdas
+//--------------------
+
+class TLondon1D_4L : public TBofZCalc {
+
+public:
+
+  TLondon1D_4L(unsigned int, const vector<double>& );
 
 };
 

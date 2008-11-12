@@ -16,6 +16,7 @@
 #include "TTrimSPDataHandler.h"
 
 #define gBar 0.0135538817
+#define pi 3.14159265358979323846
 
 class TPofBCalc {
 
@@ -32,6 +33,7 @@ public:
   double GetBmin() const {return fBmin;}
   double GetBmax() const {return fBmax;}
   void ConvolveGss(double);
+  void AddBackground(double, double, double);
 
 private:
   vector<double> fB;

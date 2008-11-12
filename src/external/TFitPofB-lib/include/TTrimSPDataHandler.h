@@ -32,6 +32,7 @@ public:
   vector<double> DataNZ(double) const;
   vector<double> OrigDataNZ(double) const;
   void WeightLayers(double, const vector<double>&, const vector<double>&) const;
+  double LayerFraction(double, unsigned int, const vector<double>&) const;
   double GetNofZ(double, double) const;
   void Normalize(double) const;
   bool IsNormalized(double) const;
