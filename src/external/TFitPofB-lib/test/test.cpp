@@ -1,6 +1,7 @@
 #include "TLondon1D.h"
 #include <iostream>
 #include <fstream>
+#include <cstdio>
 
 using namespace std;
 
@@ -8,6 +9,8 @@ int main(){
   string rge_path("/home/l_wojek/TrimSP/YBCOxtal/YBCOxtal-500000-");
   string energy_arr[] = {"03_0", "03_6", "05_0", "05_3", "07_0", "07_7", "08_0", "09_0", "10_0", "10_2", "12_0", "14_1", "16_0", "16_4", "18_0", "19_7", "20_0", "22_0", "24_0", "24_6"};
     
+  double E(24.0); 
+  
   vector<string> energy_vec(energy_arr, energy_arr+(sizeof(energy_arr)/sizeof(energy_arr[0])));
 
   TTrimSPData calcData(rge_path, energy_vec);
@@ -16,10 +19,10 @@ int main(){
   for (unsigned int i(0); i<energies.size(); i++)
     cout << energies[i] << endl;
 */
-  calcData.Normalize(22.0);
+  calcData.Normalize(E);
 
-  vector<double> z(calcData.DataZ(22.0));
-  vector<double> nz(calcData.DataNZ(22.0));
+  vector<double> z(calcData.DataZ(E));
+  vector<double> nz(calcData.DataNZ(E));
 
   ofstream of("Implantation-profile-normal.dat");
   for (unsigned int i(0); i<z.size(); i++) {
@@ -27,8 +30,13 @@ int main(){
   }
   of.close();
    
-  double par_arr[] = {24.4974, 22.0, 95.8253, 7.62096, 143.215};
+  double par_arr[] = {24.4974, E, 95.8253, 0.0, 45.0, 45.0, 45.0, 200.0, 400.0, 200.0};
   vector<double> par_vec(par_arr, par_arr+(sizeof(par_arr)/sizeof(par_arr[0])));
+  
+  vector<double> interfaces;
+  interfaces.push_back(par_vec[3]+par_vec[4]);
+  interfaces.push_back(par_vec[3]+par_vec[4]+par_vec[5]);
+  interfaces.push_back(par_vec[3]+par_vec[4]+par_vec[5]+par_vec[6]);
   
   vector<double> parForBofZ;
   for (unsigned int i(2); i<par_vec.size(); i++)
@@ -36,34 +44,89 @@ int main(){
 
   vector<double> parForPofB;
   parForPofB.push_back(0.01); //dt
-  parForPofB.push_back(0.2); //dB
+  parForPofB.push_back(0.05); //dB
   parForPofB.push_back(par_vec[1]);
 
-  TLondon1D_HS BofZ(3000, parForBofZ);
+  vector<double> parForPofT;
+  parForPofT.push_back(par_vec[0]); //phase
+  parForPofT.push_back(0.01); //dt
+  parForPofT.push_back(0.05); //dB
+
+  TLondon1D_3L BofZ(5000, parForBofZ);
+
+  vector<double> zz;
+  vector<double> Bz;
+  for(double i(0.5); i<2001; i+=1.0) {
+    zz.push_back(i/10.0);
+    if(!(i/10.0 < parForBofZ[1]) && !(i/10.0 > parForBofZ[1]+parForBofZ[2]+parForBofZ[3]+parForBofZ[4])) {
+      Bz.push_back(BofZ.GetBofZ(i/10.0));
+    }
+    else {
+      Bz.push_back(parForBofZ[0]);
+    }
+  }
+  
+  char debugfile1[50];
+  int nn = sprintf (debugfile1, "4Ltest-Bz_z-%.4f_l-%.3f_E-%.1f_normal.dat", par_vec[2], par_vec[11], par_vec[1]);
+  if (nn > 0) {
+    ofstream of01(debugfile1);
+    for (unsigned int i(0); i<2000; i++) {
+      of01 << zz[i] << " " << Bz[i] << endl;
+    }
+    of01.close();
+  }
 
   TPofBCalc PofB(BofZ, calcData, parForPofB);
+
+  PofB.AddBackground(par_vec[2], 0.01, calcData.LayerFraction(E, 4, interfaces));
+//  PofB.ConvolveGss(1.17);
 
   vector<double> hurgaB(PofB.DataB());
   vector<double> hurgaPB(PofB.DataPB());
   
-  ofstream of7("BpB-normal.dat");
-  for (unsigned int i(0); i<hurgaB.size(); i++) {
-    of7 << hurgaB[i] << " " << hurgaPB[i] << endl;
+  char debugfile[50];
+  int n = sprintf (debugfile, "4Ltest-BpB_B-%.4f_l-%.3f_E-%.1f_normal.dat", par_vec[2], par_vec[11], par_vec[1]);
+
+  if (n > 0) {
+    ofstream of7(debugfile);
+    for (unsigned int i(0); i<hurgaB.size(); i++) {
+      of7 << hurgaB[i] << " " << hurgaPB[i] << endl;
+    }
+    of7.close();
   }
-  of7.close();
   
-  PofB.ConvolveGss(5.0);
+  TPofTCalc poft("/home/l_wojek/analysis/WordsOfWisdom.dat", parForPofT);
+  
+  poft.DoFFT(PofB);
+  poft.CalcPol(parForPofT);
+  
+  char debugfilex[50];
+  int nx = sprintf (debugfilex, "4Ltest-P_t-%.4f_l-%.3f_E-%.1f_normal.dat", par_vec[2], par_vec[11], par_vec[1]);
+  
+  if (nx > 0) { 
+    ofstream of8(debugfilex);
+    for (double i(0.); i<12.0; i+=0.003) {
+      of8 << i << " " << poft.Eval(i) << endl;
+    }
+    of8.close();
+  }
+/*  
+  PofB.ConvolveGss(8.8);
   
   vector<double> hurgaB1(PofB.DataB());
   vector<double> hurgaPB1(PofB.DataPB());
   
-  ofstream of1("BpB-field-broad.dat");
-  for (unsigned int i(0); i<hurgaB1.size(); i++) {
-    of1 << hurgaB1[i] << " " << hurgaPB1[i] << endl;
+  n = sprintf (debugfile, "BpB_B-%.4f_l-%.3f_E-%.1f_broadend8.8G.dat", par_vec[2], par_vec[4], par_vec[1]);
+  
+  if (n > 0) {
+    ofstream of1(debugfile);
+    for (unsigned int i(0); i<hurgaB1.size(); i++) {
+      of1 << hurgaB1[i] << " " << hurgaPB1[i] << endl;
+    }
+    of1.close();
   }
-  of1.close();
 
-  calcData.ConvolveGss(15.0, par_vec[1]);
+  calcData.ConvolveGss(10.0, par_vec[1]);
   calcData.Normalize(par_vec[1]);
   
   TPofBCalc PofB2(BofZ, calcData, parForPofB);
@@ -80,28 +143,36 @@ int main(){
   vector<double> hurgaB2(PofB2.DataB());
   vector<double> hurgaPB2(PofB2.DataPB());
   
-  ofstream of8("BpB-profile-broad.dat");
-  for (unsigned int i(0); i<hurgaB2.size(); i++) {
-    of8 << hurgaB2[i] << " " << hurgaPB2[i] << endl;
-  }
-  of8.close();
+  n = sprintf (debugfile, "BpB_B-%.4f_l-%.3f_E-%.1f_broadend10nm.dat", par_vec[2], par_vec[4], par_vec[1]);
   
-  PofB2.ConvolveGss(5.0);
+  if (n>0) {
+    ofstream of8(debugfile);
+    for (unsigned int i(0); i<hurgaB2.size(); i++) {
+      of8 << hurgaB2[i] << " " << hurgaPB2[i] << endl;
+    }
+    of8.close();
+  }
+  
+  PofB2.ConvolveGss(7.5);
   
   vector<double> hurgaB3(PofB2.DataB());
   vector<double> hurgaPB3(PofB2.DataPB());
   
-  ofstream of9("BpB-profile+field-broad.dat");
-  for (unsigned int i(0); i<hurgaB3.size(); i++) {
-    of9 << hurgaB3[i] << " " << hurgaPB3[i] << endl;
+  n = sprintf (debugfile, "BpB_B-%.4f_l-%.3f_E-%.1f_broadend10nm+7.5G.dat", par_vec[2], par_vec[4], par_vec[1]);
+  
+  if (n > 0) {
+    ofstream of9(debugfile);
+    for (unsigned int i(0); i<hurgaB3.size(); i++) {
+      of9 << hurgaB3[i] << " " << hurgaPB3[i] << endl;
+    }
+    of9.close();
   }
-  of9.close();
   
   z.clear();
   nz.clear();
   z2.clear();
   nz2.clear();
-  
+*/
 /*
 
   double param[8] = {100.0, 5.0, 50.0, 100.0, 40.0, 0.01, 0.1, 15.0};
