@@ -166,7 +166,7 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     node.fDvalue = 3.14159265358979323846; // keep the value
   } else if (i->value.id() == PFunctionGrammar::constGammaMuID) { // handle constant gamma_mu
     node.fID = PFunctionGrammar::constGammaMuID; // keep the ID
-    node.fDvalue = 0.01355; // keep the value
+    node.fDvalue = 0.0135538817; // keep the value
   } else if (i->value.id() == PFunctionGrammar::parameterID) { // handle parameter number
     str = string(i->value.begin(), i->value.end()); // get string
     status = sscanf(str.c_str(), "PAR%d", &ivalue); // convert string to parameter number

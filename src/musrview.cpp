@@ -57,9 +57,9 @@ void musrview_syntax()
 {
   cout << endl << "usage: musrview <msr-file> | --version | --help";
   cout << endl << "       <msr-file>: msr/mlog input file";
-  cout << endl << "       'musrview <msr-file>' will execute msrfit";
-  cout << endl << "       'musrview' or 'msrfit --help' will show this help";
-  cout << endl << "       'musrview --version' will print the msrfit version";
+  cout << endl << "       'musrview <msr-file>' will execute musrview";
+  cout << endl << "       'musrview' or 'musrview --help' will show this help";
+  cout << endl << "       'musrview --version' will print the musrview version";
   cout << endl << endl;
 }
 

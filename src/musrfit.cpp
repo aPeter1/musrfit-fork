@@ -59,9 +59,9 @@ void musrfit_syntax()
 {
   cout << endl << "usage: musrfit [<msr-file> [-k, --keep-mn2-ouput] [--debug] [--dump <type>]] | --version | --help";
   cout << endl << "       <msr-file>: msr input file";
-  cout << endl << "       'musrfit <msr-file>' will execute msrfit";
+  cout << endl << "       'musrfit <msr-file>' will execute musrfit";
   cout << endl << "       'musrfit' or 'musrfit --help' will show this help";
-  cout << endl << "       'musrfit --version' will print the msrfit version";
+  cout << endl << "       'musrfit --version' will print the musrfit version";
   cout << endl << "       -k, --keep-mn2-output: will rename the files MINUIT2.OUTPUT and ";
   cout << endl << "              MINUIT2.root to <msr-file>-mn2.output and <msr-file>-mn2.root, repectively,";
   cout << endl << "              e.g. <msr-file> = 147.msr -> 147-mn2.output, 147-mn2.root";
