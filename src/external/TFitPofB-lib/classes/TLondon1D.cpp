@@ -1071,9 +1071,9 @@ TLondon1D3LSub::TLondon1D3LSub() : fCalcNeeded(true), fFirstCall(true), fWeights
 }
 
 //------------------
-// TLondon1D3L-Method that calls the procedures to create B(z), p(B) and P(t)
+// TLondon1D3LSub-Method that calls the procedures to create B(z), p(B) and P(t)
 // It finally returns P(t) for a given t.
-// Parameters: all the parameters for the function to be fitted through TLondon1D3L
+// Parameters: all the parameters for the function to be fitted through TLondon1D3LSub
 //------------------
 
 double TLondon1D3LSub::operator()(double t, const vector<double> &par) const {

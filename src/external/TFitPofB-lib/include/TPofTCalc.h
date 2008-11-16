@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/06/03
+  2008/11/16
 
 ***************************************************************************/
 
@@ -17,6 +17,7 @@
 #include <string>
 
 #define PI 3.14159265358979323846
+#define tauMu 2.197147
 
 class TPofTCalc {
 
@@ -29,6 +30,7 @@ public:
   vector<double> DataPT() const {return fPT;}
   void DoFFT(const TPofBCalc&);
   void CalcPol(const vector<double>&);
+  void FakeData(const vector<double>&, const string&); 
   double Eval(double) const;
 
 private:
