@@ -608,8 +608,9 @@ int PMsrHandler::WriteMsrLogFile()
         if (fRuns[i].fXYDataLabel[j].IsWhitespace())
           break;
         f.width(8);
-        f.precision(2);
         f << left << fixed << fRuns[i].fXYDataLabel[j].Data();
+        if (j == 0)
+          f << " ";
       }
       CheckAndWriteComment(f, ++lineNo);
     }
