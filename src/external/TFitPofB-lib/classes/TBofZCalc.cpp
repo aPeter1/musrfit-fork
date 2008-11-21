@@ -52,8 +52,8 @@ double TBofZCalc::GetBofZ(double zz) const {
   }
 
   if (!found || i == 0) {
-    cout << "B(z) cannot be calculated for z = " << zz << " !" << endl;
-    cout << "Check your theory function!" << endl;
+    cout << "TBofZCalc::GetBofZ: B(z) cannot be calculated for z = " << zz << " !" << endl;
+    cout << "TBofZCalc::GetBofZ: Check your theory function!" << endl;
     return -1.0;
   }
 

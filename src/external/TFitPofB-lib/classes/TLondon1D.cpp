@@ -1113,7 +1113,7 @@ double TLondon1D3LSub::operator()(double t, const vector<double> &par) const {
       } else {
         only_phase_changed = false;
       }
-      if (i == fPar.size()-5 || i == fPar.size()-5 || i == fPar.size()-3 || i == fPar.size()-2)
+      if (i == fPar.size()-5 || i == fPar.size()-4 || i == fPar.size()-3 || i == fPar.size()-2)
         fWeightsChanged = true;
     }
   }

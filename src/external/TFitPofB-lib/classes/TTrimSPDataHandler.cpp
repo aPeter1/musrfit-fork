@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/09/02
+  2008/11/21
 
 ***************************************************************************/
 
@@ -14,6 +14,7 @@
 #include <fstream>
 #include <string>
 #include <cmath>
+#include <cassert>
 
 using namespace std;
 
@@ -25,6 +26,13 @@ using namespace std;
 //          vector<string> energyVec(energyArr, energyArr+(sizeof(energyArr)/sizeof(energyArr[0])));
 //
 // This will read the files "/home/user/TrimSP/SomeSample-02_1.rge", "/home/user/TrimSP/SomeSample-02_5.rge" and so on.
+//
+// Alternative supported energy formats in the energyVec are, e.g. for E=2.1keV:
+// <some_path>02-1.rge
+// <some_path>02.1.rge
+// <some_path>021.rge
+//
+// <some_path>21.rge is explicitly not possible since it is not clear, if this denotes 2.1keV or 21.0keV!
 //--------------------
 
 TTrimSPData::TTrimSPData(const string &path, vector<string> &energyVec) {
@@ -39,10 +47,24 @@ TTrimSPData::TTrimSPData(const string &path, vector<string> &energyVec) {
 
     ifstream *rgeFile = new ifstream(energyStr.c_str());
     if(! *rgeFile) {
-      cout << "rge-file not found! Try next energy..." << endl;
+      cout << "TTrimSPData::TTrimSPData: rge-file not found! Try next energy..." << endl;
       delete rgeFile;
+      rgeFile = 0;
     } else {
-      fEnergy.push_back(atof(energyVec[i].replace(2,1,".").c_str()));
+      if (energyVec[i].length() == 4)
+        fEnergy.push_back(atof(energyVec[i].replace(2,1,".").c_str()));
+      else if (energyVec[i].length() == 3) {
+        energyVec[i].insert(energyVec[i].end()-1, 1, '.');
+        fEnergy.push_back(atof(energyVec[i].c_str()));
+      } else {
+        cout << "TTrimSPData::TTrimSPData: The energy cannot be correctly extracted from the rge-file name!" << endl;
+        cout << "TTrimSPData::TTrimSPData: Please use file names in one of the following formats, e.g. for E=2.1keV use:" << endl;
+        cout << "TTrimSPData::TTrimSPData: <some_path>02_1.rge" << endl;
+        cout << "TTrimSPData::TTrimSPData: <some_path>02-1.rge" << endl;
+        cout << "TTrimSPData::TTrimSPData: <some_path>02.1.rge" << endl;
+        cout << "TTrimSPData::TTrimSPData: <some_path>021.rge" << endl;
+        assert(false);
+      }
 
       while(*rgeFile >> word)
         if(word == "PARTICLES") break;
@@ -53,19 +75,29 @@ TTrimSPData::TTrimSPData(const string &path, vector<string> &energyVec) {
         vnzz.push_back(nzz);
       }
 
+      fDZ.push_back(vzz[1]-vzz[0]);
+
+      while(zz < 2100.0){
+        zz += *(fDZ.end()-1);
+        vzz.push_back(zz);
+        vnzz.push_back(0.0);
+      }
+
       fDataZ.push_back(vzz);
       fDataNZ.push_back(vnzz);
+
 
       rgeFile->close();
       delete rgeFile;
       rgeFile = 0;
+
       vzz.clear();
       vnzz.clear();
 
     }
   }
 
-  cout << "Read in " << fDataNZ.size() << " implantation profiles in total." << endl;
+  cout << "TTrimSPData::TTrimSPData: Read in " << fDataNZ.size() << " implantation profiles in total." << endl;
 
   fOrigDataNZ = fDataNZ;
 
@@ -87,7 +119,7 @@ vector<double> TTrimSPData::DataZ(double e) const {
     }
   }
   // default
-  cout << "No implantation profile available for the specified energy... You get back the first one." << endl;
+  cout << "TTrimSPData::DataZ: No implantation profile available for the specified energy... You get back the first one." << endl;
   return fDataZ[0];
 
 }
@@ -105,7 +137,7 @@ vector<double> TTrimSPData::DataNZ(double e) const {
     }
   }
   // default
-  cout << "No implantation profile available for the specified energy... You get back the first one." << endl;
+  cout << "TTrimSPData::DataNZ: No implantation profile available for the specified energy... You get back the first one." << endl;
   return fDataNZ[0];
 
 }
@@ -122,7 +154,7 @@ vector<double> TTrimSPData::OrigDataNZ(double e) const {
     }
   }
   // default
-  cout << "No implantation profile available for the specified energy... You get back the first one." << endl;
+  cout << "TTrimSPData::OrigDataNZ: No implantation profile available for the specified energy... You get back the first one." << endl;
   return fOrigDataNZ[0];
 
 }
@@ -135,7 +167,7 @@ vector<double> TTrimSPData::OrigDataNZ(double e) const {
 double TTrimSPData::LayerFraction(double e, unsigned int layno, const vector<double>& interface) const {
 
   if(layno < 1 && layno > (interface.size()+1)) {
-    cout << "No such layer available according to your specified interfaces... Returning 0.0!" << endl;
+    cout << "TTrimSPData::LayerFraction: No such layer available according to your specified interfaces... Returning 0.0!" << endl;
     return 0.0;
   }
 
@@ -162,13 +194,13 @@ double TTrimSPData::LayerFraction(double e, unsigned int layno, const vector<dou
             layerNumber += fDataNZ[i][j];
       }
       // fraction of muons in layer layno
-      cout << "Fraction of muons in layer " << layno << ": " << layerNumber/totalNumber << endl;
+      // cout << "Fraction of muons in layer " << layno << ": " << layerNumber/totalNumber << endl;
       return layerNumber/totalNumber;
     }
   }
 
   // default
-  cout << "No implantation profile available for the specified energy... Returning 0.0" << endl;
+  cout << "TTrimSPData::LayerFraction: No implantation profile available for the specified energy... Returning 0.0" << endl;
   return 0.0;
 
 }
@@ -184,19 +216,19 @@ double TTrimSPData::LayerFraction(double e, unsigned int layno, const vector<dou
 void TTrimSPData::WeightLayers(double e, const vector<double>& interface, const vector<double>& weight) const {
 
   if(weight.size()-interface.size()-1) {
-    cout << "For the weighting the number of interfaces has to be one less than the number of weights!" << endl;
-    cout << "No weighting of the implantation profile will be done unless you take care of that!" << endl;
+    cout << "TTrimSPData::WeightLayers: For the weighting the number of interfaces has to be one less than the number of weights!" << endl;
+    cout << "TTrimSPData::WeightLayers: No weighting of the implantation profile will be done unless you take care of that!" << endl;
     return;
   }
 
   for(unsigned int i(0); i<interface.size(); i++) {
     if (interface[i]<0.0) {
-      cout << "One of your layer interfaces has a negative coordinate! - No weighting will be done!" << endl;
+      cout << "TTrimSPData::WeightLayers: One of your layer interfaces has a negative coordinate! - No weighting will be done!" << endl;
       return;
     }
     else if (i>1) {
       if (interface[i]<interface[i-1]) {
-        cout << "The specified interfaces appear to be not in ascending order! - No weighting will be done!" << endl;
+        cout << "TTrimSPData::WeightLayers: The specified interfaces appear to be not in ascending order! - No weighting will be done!" << endl;
         return;
       }
     }
@@ -204,7 +236,7 @@ void TTrimSPData::WeightLayers(double e, const vector<double>& interface, const 
 
   for(unsigned int i(0); i<weight.size(); i++) {
     if (weight[i]>1.0 || weight[i]<0.0) {
-      cout << "At least one of the specified weights is out of range - no weighting will be done!" << endl;
+      cout << "TTrimSPData::WeightLayers: At least one of the specified weights is out of range - no weighting will be done!" << endl;
       return;
     }
   }
@@ -243,7 +275,7 @@ void TTrimSPData::WeightLayers(double e, const vector<double>& interface, const 
     }
   }
 
-  cout << "No implantation profile available for the specified energy... No weighting done." << endl;
+  cout << "TTrimSPData::WeightLayers: No implantation profile available for the specified energy... No weighting done." << endl;
   return;
 }
 
@@ -262,7 +294,7 @@ double TTrimSPData::GetNofZ(double zz, double e) const {
       break;
     }
     if(i == fEnergy.size() - 1) {
-      cout << "No implantation profile available for the specified energy... Quitting!" << endl;
+      cout << "TTrimSPData::GetNofZ: No implantation profile available for the specified energy... Quitting!" << endl;
       exit(-1);
     }
   }
@@ -299,7 +331,7 @@ void TTrimSPData::Normalize(double e) const {
       double nZsum = 0.0;
       for (unsigned int j(0); j<fDataZ[i].size(); j++)
         nZsum += fDataNZ[i][j];
-      nZsum *= (fDataZ[i][1]-fDataZ[i][0]);
+      nZsum *= fDZ[i];
       for (unsigned int j(0); j<fDataZ[i].size(); j++)
         fDataNZ[i][j] /= nZsum;
 
@@ -308,7 +340,7 @@ void TTrimSPData::Normalize(double e) const {
     }
   }
   // default
-  cout << "No implantation profile available for the specified energy... No normalization done." << endl;
+  cout << "TTrimSPData::Normalize: No implantation profile available for the specified energy... No normalization done." << endl;
   return;
 
 }
@@ -324,8 +356,30 @@ bool TTrimSPData::IsNormalized(double e) const {
     }
   }
 
-  cout << "No implantation profile available for the specified energy... Returning false! Check your code!" << endl;
+  cout << "TTrimSPData::IsNormalized: No implantation profile available for the specified energy... Returning false! Check your code!" << endl;
   return false;
+}
+
+//---------------------
+// Calculate the mean range in (nm) for a given energy e
+//---------------------
+
+double TTrimSPData::MeanRange(double e) const {
+  for(unsigned int i(0); i<fEnergy.size(); i++) {
+    if(!(fEnergy[i] - e)) {
+      if (!fIsNormalized[i])
+        Normalize(e);
+      double mean(0.0);
+      for(unsigned int j(0); j<fDataNZ[i].size(); j++){
+        mean += fDataNZ[i][j]*fDataZ[i][j];
+      }
+      mean *= fDZ[i]/10.0;
+      return mean;
+    }
+  }
+
+  cout << "TTrimSPData::MeanRange: No implantation profile available for the specified energy... Returning -1! Check your code!" << endl;
+  return -1.;
 }
 
 //---------------------
@@ -357,10 +411,12 @@ void TTrimSPData::ConvolveGss(double w, double e) const {
         fDataNZ[i][k] = nn;
       }
 
+      fIsNormalized[i] = false;
+
       return;
     }
   }
 
-  cout << "No implantation profile available for the specified energy... No convolution done!" << endl;
+  cout << "TTrimSPData::ConvolveGss: No implantation profile available for the specified energy... No convolution done!" << endl;
   return;
 }

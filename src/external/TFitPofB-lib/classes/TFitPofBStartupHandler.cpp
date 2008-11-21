@@ -187,7 +187,7 @@ void TFitPofBStartupHandler::OnComment(const char *str)
  */
 void TFitPofBStartupHandler::OnWarning(const char *str)
 {
-  cout << endl << "TFitPofBStartupHandler **WARNING** " << str;
+  cout << endl << "TFitPofBStartupHandler::OnWarning: TFitPofBStartupHandler **WARNING** " << str;
   cout << endl;
 }
 
@@ -201,7 +201,7 @@ void TFitPofBStartupHandler::OnWarning(const char *str)
  */
 void TFitPofBStartupHandler::OnError(const char *str)
 {
-  cout << endl << "TFitPofBStartupHandler **ERROR** " << str;
+  cout << endl << "TFitPofBStartupHandler::OnError: TFitPofBStartupHandler **ERROR** " << str;
   cout << endl;
 }
 
@@ -215,7 +215,7 @@ void TFitPofBStartupHandler::OnError(const char *str)
  */
 void TFitPofBStartupHandler::OnFatalError(const char *str)
 {
-  cout << endl << "TFitPofBStartupHandler **FATAL ERROR** " << str;
+  cout << endl << "TFitPofBStartupHandler::OnFatalError: TFitPofBStartupHandler **FATAL ERROR** " << str;
   cout << endl;
 }
 
@@ -244,16 +244,16 @@ void TFitPofBStartupHandler::CheckLists()
   // check if anything was set, and if not set some default stuff
 
   // check if any data path is given
-  cout << endl << ">> check data path ...";
+  cout << endl << "TFitPofBStartupHandler::CheckLists: check data path ...";
   if (!fDataPath.size()) {
-    cout << endl << ">> This is not going to work, you have to set a valid data path where to find the rge-files in the xml-file!" << endl;
+    cout << endl << "TFitPofBStartupHandler::CheckLists: This is not going to work, you have to set a valid data path where to find the rge-files in the xml-file!" << endl;
     exit(-1);
   }
 
   // check if any energies are given
-  cout << endl << ">> check energy list ..." << endl;
+  cout << endl << "TFitPofBStartupHandler::CheckLists: check energy list ..." << endl;
   if (!fEnergyList.size()) {
-    cout << endl << ">> Energy list empty! Setting the default list." << endl;
+    cout << endl << "TFitPofBStartupHandler::CheckLists: Energy list empty! Setting the default list." << endl;
     char eChar[5];
     for(unsigned int i(0); i<33; i++) {
       for(unsigned int j(0); j<10; j++) {
@@ -264,30 +264,30 @@ void TFitPofBStartupHandler::CheckLists()
   }
 
   // check if delta_t is given, if not set default
-  cout << endl << ">> check specified time resolution ..." << endl;
+  cout << endl << "TFitPofBStartupHandler::CheckLists: check specified time resolution ..." << endl;
   if(!fDeltat) {
-    cout << endl << ">> You did not specify the time resolution. Setting the default." << endl;
+    cout << endl << "TFitPofBStartupHandler::CheckLists: You did not specify the time resolution. Setting the default." << endl;
     fDeltat = 0.01;
   }
 
   // check if delta_B is given, if not set default
-  cout << endl << ">> check specified field resolution ..." << endl;
+  cout << endl << "TFitPofBStartupHandler::CheckLists: check specified field resolution ..." << endl;
   if(!fDeltaB) {
-    cout << endl << ">> You did not specify the field resolution. Setting the default." << endl;
+    cout << endl << "TFitPofBStartupHandler::CheckLists: You did not specify the field resolution. Setting the default." << endl;
     fDeltaB = 0.05;
   }
 
   // check if any wisdom-file is specified
-  cout << endl << ">> check wisdom-file ..." << endl;
+  cout << endl << "TFitPofBStartupHandler::CheckLists: check wisdom-file ..." << endl;
   if (!fWisdomFile.size()) {
-    cout << endl << ">> You did not specify a wisdom file. Setting the default." << endl;
+    cout << endl << "TFitPofBStartupHandler::CheckLists: You did not specify a wisdom file. Setting the default." << endl;
     fWisdomFile = "WordsOfWisdom.dat";
   }
 
   // check if any number of steps for the theory function is specified
-  cout << endl << ">> check number of steps for theory ..." << endl;
+  cout << endl << "TFitPofBStartupHandler::CheckLists: check number of steps for theory ..." << endl;
   if (!fNSteps) {
-    cout << endl << ">> You did not specify the number of steps for the theory. Setting the default." << endl;
+    cout << endl << "TFitPofBStartupHandler::CheckLists: You did not specify the number of steps for the theory. Setting the default." << endl;
     fNSteps = 3000;
   }
 

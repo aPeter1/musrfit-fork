@@ -68,7 +68,7 @@ TPofTCalc::TPofTCalc (const string &wisdom, const vector<double> &par) : fWisdom
   fFFTin = (double *)malloc(sizeof(double) * fNFFT);
   fFFTout = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * (fNFFT/2+1));
 
-  cout << "Check for the FFT plan..." << endl;
+  cout << "TPofTCalc::TPofTCalc: Check for the FFT plan..." << endl;
 
   // Load wisdom from file
 
@@ -77,14 +77,14 @@ TPofTCalc::TPofTCalc (const string &wisdom, const vector<double> &par) : fWisdom
   FILE *wordsOfWisdomR;
   wordsOfWisdomR = fopen(fWisdom.c_str(), "r");
   if (wordsOfWisdomR == NULL) {
-    cout << "Couldn't open wisdom file ..." << endl;
+    cout << "TPofTCalc::TPofTCalc: Couldn't open wisdom file ..." << endl;
   } else {
     wisdomLoaded = fftw_import_wisdom_from_file(wordsOfWisdomR);
     fclose(wordsOfWisdomR);
   }
 
   if (!wisdomLoaded) {
-    cout << "No wisdom is imported..." << endl;
+    cout << "TPofTCalc::TPofTCalc: No wisdom is imported..." << endl;
   }
 
   fFFTplan = fftw_plan_dft_r2c_1d(fNFFT, fFFTin, fFFTout, FFTW_EXHAUSTIVE);
@@ -157,10 +157,10 @@ void TPofTCalc::CalcPol(const vector<double> &par) {
 
 //---------------------
 // Method for generating fake LEM decay histograms from p(B)
-// Parameters: par(dt, dB, timeres, channels, asyms, phases, t0s, N0s, bgs), output filename
+// Parameters: output filename, par(dt, dB, timeres, channels, asyms, phases, t0s, N0s, bgs)
 //---------------------
 
-void TPofTCalc::FakeData(const vector<double> &par, const string &rootOutputFileName) {
+void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> &par) {
 
   //determine the number of histograms to be built
   unsigned int numHist(0);
@@ -168,16 +168,30 @@ void TPofTCalc::FakeData(const vector<double> &par, const string &rootOutputFile
     numHist=(par.size()-4)/5;
 
   if(!numHist){
-    cout << "The number of parameters for the histogram creation is not correct. Do nothing." << endl;
+    cout << "TPofTCalc::FakeData: The number of parameters for the histogram creation is not correct. Do nothing." << endl;
     return;
   }
 
-  cout << numHist << " histograms to be built" << endl;
+  cout << "TPofTCalc::FakeData: " << numHist << " histograms to be built" << endl;
 
-  vector<double> param;
-  param.push_back(0.0);
-  param.push_back(par[0]);
-  param.push_back(par[1]);
+  vector<unsigned int> t0;
+  vector<double> asy0;
+  vector<double> phase0;
+  vector<double> N0;
+  vector<double> bg;
+
+  for(unsigned int i(0); i<numHist; i++) {
+    t0.push_back(int(par[i+4+numHist*2]));
+    asy0.push_back(par[i+4]);
+    phase0.push_back(par[i+4+numHist]);
+    N0.push_back(par[i+4+numHist*3]);
+    bg.push_back(par[i+4+numHist*4]);
+  }
+
+  vector<double> param; // Parameters for TPofTCalc::CalcPol
+  param.push_back(0.0); // phase
+  param.push_back(par[0]); // dt
+  param.push_back(par[1]); // dB
 
   vector< vector<double> > asy;
   vector<double> asydata;
@@ -185,7 +199,7 @@ void TPofTCalc::FakeData(const vector<double> &par, const string &rootOutputFile
   double pol(0.0);
 
   for(unsigned int i(0); i<numHist; i++) {
-    param[0]=par[i+numHist*1+4];
+    param[0]=phase0[i];
     // calculate asymmetry
     CalcPol(param);
     for(unsigned int j(0); j<par[3]; j++){
@@ -193,14 +207,14 @@ void TPofTCalc::FakeData(const vector<double> &par, const string &rootOutputFile
       for(unsigned int k(0); k<fT.size()-1; k++){
         if (ttime < fT[k+1]) {
           pol=fPT[k]+(fPT[k+1]-fPT[k])/(fT[k+1]-fT[k])*(ttime-fT[k]);
-          asydata.push_back(par[i+numHist*0+4]*pol);
+          asydata.push_back(asy0[i]*pol);
           break;
         }
       }
     }
     asy.push_back(asydata);
     asydata.clear();
-    cout << "Asymmetry " << i+1 << "/" << numHist << " calculated!" << endl;
+    cout << "TPofTCalc::FakeData: " << i+1 << "/" << numHist << " calculated!" << endl;
   }
 
   // calculate the histograms
@@ -210,20 +224,20 @@ void TPofTCalc::FakeData(const vector<double> &par, const string &rootOutputFile
 
   for (unsigned int i(0); i<numHist; i++) {    // loop over all histos
     for (unsigned int j(0); j<par[3]; j++) { // loop over time
-      if (j < par[i+numHist*2+4]) // j<t0
-        value = par[i+numHist*4+4]; // background
+      if (j < t0[i]) // j<t0
+        value = bg[i]; // background
       else
-        value = par[i+numHist*3+4]*exp(-par[2]*(j-par[i+numHist*2+4])/tauMu)*(1.0+asy[i][j- int(par[i+numHist*2+4])])+par[i+numHist*4+4];
+        value = N0[i]*exp(-par[2]*double(j-t0[i])/tauMu)*(1.0+asy[i][j-t0[i]])+bg[i];
       data.push_back(value);
     }
     histo.push_back(data);
     data.clear();
-    cout << endl << ">> histo " << i+1 << "/" << numHist << " done ...";
+    cout << "TPofTCalc::FakeData: " << i+1 << "/" << numHist << " done ...";
   }
 
   // add Poisson noise to the histograms
 
-  cout << endl << ">> add Poisson noise ..." << endl;
+  cout << endl << "TPofTCalc::FakeData: Adding Poisson noise ..." << endl;
 
   TH1F* theoHisto;
   TH1F* fakeHisto;
@@ -269,7 +283,7 @@ void TPofTCalc::FakeData(const vector<double> &par, const string &rootOutputFile
   runHeader->SetNHist(histoData.size());
   double *t0array = new double[histoData.size()];
   for (unsigned int i(0); i<histoData.size(); i++)
-    t0array[i] = par[i+numHist*2+4];
+    t0array[i] = t0[i];
   runHeader->SetTimeZero(t0array);
   if (t0array)
     delete t0array;
@@ -316,7 +330,13 @@ void TPofTCalc::FakeData(const vector<double> &par, const string &rootOutputFile
   histoData.clear();
   histoDataPPC.clear();
 
-  cout << endl << ">> DONE." << endl;
+  t0.clear();
+  asy0.clear();
+  phase0.clear();
+  N0.clear();
+  bg.clear();
+
+  cout << endl << "TPofTCalc::FakeData: DONE." << endl;
 
   return;
 }
@@ -331,7 +351,7 @@ double TPofTCalc::Eval(double t) const {
       return fPT[i]+(fPT[i+1]-fPT[i])/(fT[i+1]-fT[i])*(t-fT[i]);
   }
 
-  cout << "No data for the time " << t << " us available! Returning -999.0 ..." << endl;
+  cout << "TPofTCalc::Eval: No data for the time " << t << " us available! Returning -999.0 ..." << endl;
   return -999.0;
 }
 
@@ -345,7 +365,7 @@ TPofTCalc::~TPofTCalc() {
   FILE *wordsOfWisdomW;
   wordsOfWisdomW = fopen(fWisdom.c_str(), "w");
   if (wordsOfWisdomW == NULL) {
-    cout << "couldn't open file ... No wisdom is exported..." << endl;
+    cout << "TPofTCalc::~TPofTCalc(): Could not open file ... No wisdom is exported..." << endl;
   }
 
   fftw_export_wisdom_to_file(wordsOfWisdomW);

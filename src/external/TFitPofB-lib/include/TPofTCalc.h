@@ -30,7 +30,7 @@ public:
   vector<double> DataPT() const {return fPT;}
   void DoFFT(const TPofBCalc&);
   void CalcPol(const vector<double>&);
-  void FakeData(const vector<double>&, const string&); 
+  void FakeData(const string&, const vector<double>&); 
   double Eval(double) const;
 
 private:

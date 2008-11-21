@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/09/02
+  2008/11/21
 
 ***************************************************************************/
 
@@ -25,6 +25,10 @@ public:
   ~TTrimSPData() {
     fDataZ.clear();
     fDataNZ.clear();
+    fOrigDataNZ.clear();
+    fEnergy.clear();
+    fDZ.clear();
+    fIsNormalized.clear();
   }
 
   vector<double> Energy() const {return fEnergy;}
@@ -37,9 +41,11 @@ public:
   void Normalize(double) const;
   bool IsNormalized(double) const;
   void ConvolveGss(double, double) const;
+  double MeanRange(double) const;
 
 private:
   vector<double> fEnergy;
+  vector<double> fDZ;
   vector< vector<double> > fDataZ;
   mutable vector< vector<double> > fDataNZ;
   vector< vector<double> > fOrigDataNZ;
