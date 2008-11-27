@@ -60,6 +60,8 @@ LDFLAGS       +=
 LIBS          = $(ROOTLIBS)
 GLIBS         = $(ROOTGLIBS)
 
+INSTALLPATH = $(HOME)/analysis/bin
+
 EXEC = musrparam
 
 # some definitions: headers, sources, objects,...
@@ -87,5 +89,6 @@ $(OBJS): %.o: %.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
 
 install: all
-	@echo "doesn't do anything yet ..."
+	@echo "copy $(EXEC) to $(INSTALLPATH)"
+	cp -p $(EXEC) $(INSTALLPATH)
 
