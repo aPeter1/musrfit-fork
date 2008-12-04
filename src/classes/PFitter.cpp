@@ -639,10 +639,16 @@ bool PFitter::ExecuteSave()
     if (fParams[i].fNoOfParams > 5) {
       fout.setf(ios::left, ios::adjustfield);
       fout.width(7);
-      fout << fParams[i].fLowerBoundary;
+      if (fParams[i].fLowerBoundaryPresent)
+	fout << fParams[i].fLowerBoundary;
+      else
+	fout << "---";
       fout.setf(ios::left, ios::adjustfield);
       fout.width(7);
-      fout << fParams[i].fUpperBoundary;
+      if (fParams[i].fUpperBoundaryPresent)
+	fout << fParams[i].fUpperBoundary;
+      else
+	fout << "---";
     } else {
       fout.setf(ios::left, ios::adjustfield);
       fout.width(7);
