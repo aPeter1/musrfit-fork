@@ -1316,7 +1316,9 @@ bool PRunDataHandler::ReadDBFile()
             runData.fDataNonMusr.fData[dataNo].push_back(val);
             runData.fDataNonMusr.fErrData[dataNo].push_back(0.0);
             dataNo = 0; // next run block starts
-          } else { // tag = data line
+	  } else { // tag = data line
+	    // remove all possible spaces
+	    workStr.ReplaceAll(" ", "");
             // split string in tokens
             tokens = workStr.Tokenize("=,"); // line has structure: tag = val,err1,err2,
             if (tokens->GetEntries() < 3) {
