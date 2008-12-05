@@ -1,0 +1,19 @@
+/***************************************************************************
+
+  Author: Bastian M. Wojek
+  e-mail: bastian.wojek@psi.ch
+
+  2008/12/05
+
+***************************************************************************/
+
+Implementation of a userFcn-interface to Gaussian and Lorentzian static and dynamic LF relaxation functions.
+At the moment this is localized to l_wojek@pc5405, because an absolute path had to be set. Of course this can be easily 
+changed in the code if needed.
+
+The functions are then called from within musrfit as:
+
+userFcn  libLFRelaxation.so TLFStatGssKT 1 2       (frequency rate)
+userFcn  libLFRelaxation.so TLFStatLorKT 1 2       (frequency rate)
+userFcn  libLFRelaxation.so TLFDynGssKT 1 2 3      (frequency rate fluct.rate)
+userFcn  libLFRelaxation.so TLFDynLorKT 1 2 3      (frequency rate fluct.rate)

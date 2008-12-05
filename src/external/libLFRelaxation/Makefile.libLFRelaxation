@@ -1,0 +1,64 @@
+#---------------------------------------------------
+# get compilation flags from root-config
+
+ROOTCFLAGS    = $(shell $(ROOTSYS)/bin/root-config --cflags)
+# ROOTLIBS    = $(shell $(ROOTSYS)/bin/root-config --libs)
+
+#---------------------------------------------------
+
+OS            = LINUX
+CXX           = g++
+CXXFLAGS      = -g -Wall -Wno-trigraphs -fPIC
+MUSRFITINCLUDE = ../../include
+#MUSRFITINCLUDE = /home/l_wojek/rep/analysis/musrfit/src/include
+LOCALINCLUDE  = .
+ROOTINCLUDE   = $(ROOTSYS)/include/root
+INCLUDES      = -I$(LOCALINCLUDE) -I$(MUSRFITINCLUDE) -I$(ROOTINCLUDE)
+LD            = g++
+LDFLAGS       = -g
+SOFLAGS       = -O -shared
+
+# the output from the root-config script:
+CXXFLAGS      += $(ROOTCFLAGS)
+LDFLAGS       +=
+
+# some definitions: headers (used to generate *Dict* stuff), sources, objects,...
+OBJS =
+OBJS += TIntegrator.o
+OBJS += TLFRelaxation.o TLFRelaxationDict.o
+
+SHLIB = libLFRelaxation.so
+
+# make the shared lib:
+#
+all:  $(SHLIB)
+
+$(SHLIB): $(OBJS)
+	@echo "---> Building shared library $(SHLIB) ..."
+	/bin/rm -f $(SHLIB)
+	$(LD) $(LDFLAGS) $(OBJS) $(SOFLAGS) -o $(SHLIB)
+	@echo "done"
+
+# clean up: remove all object file (and core files)
+# semicolon needed to tell make there is no source
+# for this target!
+#
+clean:; 	@rm -f $(OBJS) $(SHLIB) *Dict* core* *~
+	@echo "---> removing $(OBJS) $(SHLIB)"
+
+#
+$(OBJS): %.o: %.cpp
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
+
+# Generate the ROOT CINT dictionary
+
+TLFRelaxationDict.cpp: ./TLFRelaxation.h ./TLFRelaxationLinkDef.h
+	@echo "Generating dictionary $@..."
+	rootcint -f $@ -c -p -I$(MUSRFITINCLUDE) $^
+
+install: all
+	@echo "Installing shared lib: libLFRelaxation.so"
+ifeq ($(OS),LINUX)
+	cp -pv $(SHLIB) $(ROOTSYS)/lib
+	cp -pv $(LOCALINCLUDE)/*.h $(ROOTSYS)/include
+endif
