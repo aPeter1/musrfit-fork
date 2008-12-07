@@ -84,6 +84,7 @@ else
   # In case a list of runs is given by [...]
   if [ "${1:0:1}" == "[" ]; then
     RUNARRAY=($@)
+
     if [ "$1" == "[" ]; then
       RUNARRAY[0]=""
     else
@@ -109,7 +110,7 @@ else
     # search for the parameter including the "]"
     for (( i=1; i<="$#"; i++ ))
     do
-      RIGHTBRACKET=$( eval echo \$$i )
+      RIGHTBRACKET=$( eval echo \${$i} )
       if [ "${RIGHTBRACKET:(-1)}" == "]" ]; then
         RIGHTBRACKET=$i
         break
@@ -125,7 +126,7 @@ else
         exit 1
     fi
 
-    EXTENSION=$( eval echo \$$((RIGHTBRACKET + 1)) )
+    EXTENSION=$( eval echo \${$((RIGHTBRACKET + 1))} )
     FIRST_OPT_PAR=$((RIGHTBRACKET + 2))
     LAST_OPT_PAR=$#
     RUNLIST_USED=0
@@ -353,8 +354,8 @@ else
 
     for (( l="$FIRST_OPT_PAR"; l<="$LAST_OPT_PAR"; l++ ))
     do
-      CUR_PAR=$( eval echo \$$l )
-      NEXT_PAR=$( eval echo \$$((l+1)) )
+      CUR_PAR=$( eval echo \${$l} )
+      NEXT_PAR=$( eval echo \${$((l+1))} )
       if [ "${CUR_PAR:0:2}" == "-o" ]; then
         if [ "$CUR_PAR" == "-o" ]; then
           if [ "$l" -ne "$LAST_OPT_PAR" ] && [ "$NEXT_PAR" != "noheader" ] && [ "$NEXT_PAR" != "nosummary" ] \
