@@ -2396,6 +2396,16 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 //   cout << endl << i+1 << ", " << fParamInUse[i];
 // cout << endl;
 
+  // if unused parameters are present, set the step value to 0.0
+  for (unsigned int i=0; i<fParam.size(); i++) {
+    if (!ParameterInUse(i)) {
+      if (fParam[i].fStep != 0.0) {
+        cout << endl << "**WARNING** : Parameter No " << i+1 << " is not used at all, will fix it" << endl;
+        fParam[i].fStep = 0.0;
+      }
+    }
+  }
+
   // clean up
   map.clear();
   fun.clear();
