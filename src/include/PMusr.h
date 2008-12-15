@@ -70,8 +70,9 @@ using namespace std;
 #define MSR_TAG_FUNCTIONS    3
 #define MSR_TAG_RUN          4
 #define MSR_TAG_COMMANDS     5
-#define MSR_TAG_PLOT         6
-#define MSR_TAG_STATISTIC    7
+#define MSR_TAG_FOURIER      6
+#define MSR_TAG_PLOT         7
+#define MSR_TAG_STATISTIC    8
 
 //-------------------------------------------------------------
 // msr fit type tags
@@ -91,6 +92,25 @@ using namespace std;
 // map and fun offsets for parameter parsing
 #define MSR_PARAM_MAP_OFFSET 10000
 #define MSR_PARAM_FUN_OFFSET 20000
+
+//-------------------------------------------------------------
+// fourier related tags
+#define FOURIER_UNIT_NOT_GIVEN 0
+#define FOURIER_UNIT_FIELD     1
+#define FOURIER_UNIT_FREQ      2
+
+#define FOURIER_APOD_NOT_GIVEN 0
+#define FOURIER_APOD_NONE      1
+#define FOURIER_APOD_WEAK      2
+#define FOURIER_APOD_MEDIUM    3
+#define FOURIER_APOD_STRONG    4
+
+#define FOURIER_PLOT_NOT_GIVEN     0
+#define FOURIER_PLOT_REAL          1
+#define FOURIER_PLOT_IMAG          2
+#define FOURIER_PLOT_REAL_AND_IMAG 3
+#define FOURIER_PLOT_POWER         4
+#define FOURIER_PLOT_PHASE         5
 
 //-------------------------------------------------------------
 /**
@@ -258,6 +278,21 @@ typedef struct {
  * <p>  typedef to make to code more readable: list of runs with its parameters.
  */
 typedef vector<PMsrRunStructure> PMsrRunList;
+
+//-------------------------------------------------------------
+/**
+ * <p> Holds the information of the Fourier block
+ */
+typedef struct {
+  bool fFourierBlockPresent; ///< flag indicating if a Fourier block is present in the msr-file
+  bool fUnits;               ///< flag used to indicate the units. 0=field units (G); 1=frequency units (MHz)
+  int  fFourierPower;        ///< i.e. zero padding up to 2^fFourierPower, default = 0 which means NO zero padding
+  int  fApodization;         ///< tag indicating the kind of apodization wished, 0=no appodization (default), 1=weak, 2=medium, 3=strong (for details see the docu)
+  int  fPlotTag;             ///< tag used for initial plot. 0=real, 1=imaginary, 2=real & imaginary (default), 3=power, 4=phase
+  double fPhase;             ///< phase
+  double fRangeForPhaseCorrection[2]; ///< field/frequency range for automatic phase correction
+  double fPlotRange[2];      ///< field/frequency plot range
+} PMsrFourierStructure;
 
 //-------------------------------------------------------------
 /**

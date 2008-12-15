@@ -59,6 +59,7 @@ class PMsrHandler
     virtual PMsrLines*              GetMsrFunctions() { return &fFunctions; }
     virtual PMsrRunList*            GetMsrRunList() { return &fRuns; }
     virtual PMsrLines*              GetMsrCommands() { return &fCommands; }
+    virtual PMsrFourierStructure*   GetMsrFourierList() { return &fFourier; }
     virtual PMsrPlotList*           GetMsrPlotList() { return &fPlots; }
     virtual PMsrStatisticStructure* GetMsrStatistic() { return &fStatistic; }
 
@@ -95,6 +96,7 @@ class PMsrHandler
     PMsrLines              fFunctions; ///< holds the user defined functions
     PMsrRunList            fRuns;      ///< holds a list of run information
     PMsrLines              fCommands;  ///< holds a list of the minuit commands
+    PMsrFourierStructure   fFourier;   ///< holds the parameters used for the Fourier transform
     PMsrPlotList           fPlots;     ///< holds a list of the plot input parameters
     PMsrStatisticStructure fStatistic; ///< holds the statistic info
 
@@ -109,6 +111,7 @@ class PMsrHandler
     virtual bool HandleFunctionsEntry(PMsrLines &line);
     virtual bool HandleRunEntry(PMsrLines &line);
     virtual bool HandleCommandsEntry(PMsrLines &line);
+    virtual bool HandleFourierEntry(PMsrLines &line);
     virtual bool HandlePlotEntry(PMsrLines &line);
     virtual bool HandleStatisticEntry(PMsrLines &line);
 
@@ -117,6 +120,8 @@ class PMsrHandler
     virtual void FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLines &run);
 
     virtual void InitRunParameterStructure(PMsrRunStructure &param);
+    virtual void InitFourierParameterStructure(PMsrFourierStructure &fourier);
+
     virtual bool FilterFunMapNumber(TString str, const char *filter, int &no);
 };
 

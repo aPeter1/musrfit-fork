@@ -202,12 +202,14 @@ void PMusrFourier::Transform(unsigned int apodizationTag, unsigned int filterTag
 // loop over the phase
 double sum;
 double corr_phase;
-double min, min_phase;;
+double min, min_phase;
 TH1F sumHist("sumHist", "sumHist", 181, -90.5, 90.5);
 double dB   = 1.0/(2.0 * F_GAMMA_BAR_MUON * (fEndTime-fStartTime));
 double Bmax = 1.0/(2.0 * F_GAMMA_BAR_MUON * fTimeResolution);
 TH1F re("re", "re", fNoOfBins/2+1, -dB/2.0, Bmax+dB/2.0);
 TH1F im("im", "im", fNoOfBins/2+1, -dB/2.0, Bmax+dB/2.0);
+TH1F pwr("pwr", "pwr", fNoOfBins/2+1, -dB/2.0, Bmax+dB/2.0);
+/*
 for (int p=-90; p<90; p++) {
   // calculate sum of the rotated imaginary part of fOut
   sum = 0.0;
@@ -229,15 +231,18 @@ cout << endl << "-> min = " << min << ", min_phase = " << min_phase/PI*180.0;
   sumHist.SetBinContent(p+91, fabs(sum));
 }
 cout << endl << ">> min = " << min << ", min_phase = " << min_phase/PI*180.0;
-
+*/
+min_phase = 0.0;
 for (unsigned int i=0; i<fNoOfBins/2; i++) {
   re.SetBinContent(i+1, fOut[i][0]*cos(min_phase) - fOut[i][1]*sin(min_phase));
   im.SetBinContent(i+1, fOut[i][0]*sin(min_phase) + fOut[i][1]*cos(min_phase));
+  pwr.SetBinContent(i+1, sqrt(fOut[i][0]*fOut[i][0] + fOut[i][1]*fOut[i][1]));
 }
 
 TFile f("test_out.root", "RECREATE");
 re.Write();
 im.Write();
+pwr.Write();
 sumHist.Write();
 f.Close();
 }

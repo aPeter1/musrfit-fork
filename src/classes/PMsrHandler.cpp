@@ -112,8 +112,12 @@ int PMsrHandler::ReadMsrFile()
   PMsrLines functions;
   PMsrLines run;
   PMsrLines commands;
+  PMsrLines fourier;
   PMsrLines plot;
   PMsrLines statistic;
+
+  // init stuff
+  InitFourierParameterStructure(fFourier);
 
   // open msr-file
   f.open(fFileName.Data(), iostream::in);
@@ -157,6 +161,9 @@ int PMsrHandler::ReadMsrFile()
       } else if (line.Contains("COMMANDS")) {     // COMMANDS block tag
         fMsrBlockCounter = MSR_TAG_COMMANDS;
         commands.push_back(current);
+      } else if (line.Contains("FOURIER")) {      // FOURIER block tag
+        fMsrBlockCounter = MSR_TAG_FOURIER;
+        fourier.push_back(current);
       } else if (line.Contains("PLOT")) {         // PLOT block tag
         fMsrBlockCounter = MSR_TAG_PLOT;
         plot.push_back(current);
@@ -180,6 +187,9 @@ int PMsrHandler::ReadMsrFile()
             break;
           case MSR_TAG_COMMANDS:     // COMMANDS block
             commands.push_back(current);
+            break;
+          case MSR_TAG_FOURIER:      // FOURIER block
+            fourier.push_back(current);
             break;
           case MSR_TAG_PLOT:         // PLOT block
             plot.push_back(current);
@@ -211,6 +221,9 @@ int PMsrHandler::ReadMsrFile()
       result = PMUSR_MSR_SYNTAX_ERROR;
   if (result == PMUSR_SUCCESS)
     if (!HandleCommandsEntry(commands))
+      result = PMUSR_MSR_SYNTAX_ERROR;
+  if (result == PMUSR_SUCCESS)
+    if (!HandleFourierEntry(fourier))
       result = PMUSR_MSR_SYNTAX_ERROR;
   if (result == PMUSR_SUCCESS)
     if (!HandlePlotEntry(plot))
@@ -252,6 +265,7 @@ int PMsrHandler::ReadMsrFile()
   functions.clear();
   run.clear();
   commands.clear();
+  fourier.clear();
   plot.clear();
   statistic.clear();
 
@@ -260,6 +274,17 @@ int PMsrHandler::ReadMsrFile()
 //   cout << endl << fComments[i].fLineNo << " " << fComments[i].fLine.Data();
 // }
 // cout << endl;
+
+cout << endl << ">> FOURIER Block:";
+cout << endl << ">>   Fourier Block Present       : " << fFourier.fFourierBlockPresent;
+cout << endl << ">>   Fourier Units               : " << fFourier.fUnits;
+cout << endl << ">>   Fourier Power               : " << fFourier.fFourierPower;
+cout << endl << ">>   Apodization                 : " << fFourier.fApodization;
+cout << endl << ">>   Plot Tag                    : " << fFourier.fPlotTag;
+cout << endl << ">>   Phase                       : " << fFourier.fPhase;
+cout << endl << ">>   Range for Freq. Corrections : " << fFourier.fRangeForPhaseCorrection[0] << ", " << fFourier.fRangeForPhaseCorrection[1];
+cout << endl << ">>   Plot Range                  : " << fFourier.fPlotRange[0] << ", " << fFourier.fPlotRange[1];
+cout << endl;
 
   return result;
 }
@@ -640,6 +665,82 @@ int PMsrHandler::WriteMsrLogFile()
   for (unsigned int i=0; i<fCommands.size(); i++) {
     f << endl << fCommands[i].fLine.Data();
     CheckAndWriteComment(f, ++lineNo);
+  }
+
+  // write fourier block if present
+  if (fFourier.fFourierBlockPresent) {
+    f << endl << "FOURIER";
+    CheckAndWriteComment(f, ++lineNo);
+
+    // write 'units' parameter if present
+    if (fFourier.fUnits != FOURIER_UNIT_NOT_GIVEN) {
+      f << endl << "units            ";
+      if (fFourier.fUnits == FOURIER_UNIT_FIELD) {
+        f << "Gauss";
+      } else if (fFourier.fUnits == FOURIER_UNIT_FREQ) {
+        f << "MHz ";
+      }
+      f << "   # units either 'Gauss' or 'MHz'";
+      CheckAndWriteComment(f, ++lineNo);
+    }
+
+    // write 'fourier_power' parameter if present
+    if (fFourier.fFourierPower != 0) {
+      f << endl << "fourier_power    " << fFourier.fFourierPower;
+      CheckAndWriteComment(f, ++lineNo);
+    }
+
+    // write 'appodization' if present
+    if (fFourier.fApodization != FOURIER_APOD_NOT_GIVEN) {
+      f << endl << "apodization      ";
+      if (fFourier.fApodization == FOURIER_APOD_NONE) {
+        f << "NONE  ";
+      } else if (fFourier.fApodization == FOURIER_APOD_WEAK) {
+        f << "WEAK  ";
+      } else if (fFourier.fApodization == FOURIER_APOD_MEDIUM) {
+        f << "MEDIUM";
+      } else if (fFourier.fApodization == FOURIER_APOD_STRONG) {
+        f << "STRONG";
+      }
+      f << "  # NONE, WEAK, MEDIUM, STRONG";
+      CheckAndWriteComment(f, ++lineNo);
+    }
+
+    // write 'plot' if present
+    if (fFourier.fPlotTag != FOURIER_PLOT_NOT_GIVEN) {
+      f << endl << "plot             ";
+      if (fFourier.fPlotTag == FOURIER_PLOT_REAL) {
+        f << "REAL ";
+      } else if (fFourier.fPlotTag == FOURIER_PLOT_IMAG) {
+        f << "IMAG ";
+      } else if (fFourier.fPlotTag == FOURIER_PLOT_REAL_AND_IMAG) {
+        f << "REAL_AND_IMAG";
+      } else if (fFourier.fPlotTag == FOURIER_PLOT_POWER) {
+        f << "POWER";
+      } else if (fFourier.fPlotTag == FOURIER_PLOT_PHASE) {
+        f << "PHASE";
+      }
+      f << "   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE";
+      CheckAndWriteComment(f, ++lineNo);
+    }
+
+    // write 'phase' if present
+    if (fFourier.fPhase != -999.0) {
+      f << endl << "phase            " << fFourier.fPhase;
+      CheckAndWriteComment(f, ++lineNo);
+    }
+
+    // write 'range_for_phase_correction' if present
+    if (fFourier.fRangeForPhaseCorrection[0] != -1.0) {
+      f << endl << "range_for_phase_correction  " << fFourier.fRangeForPhaseCorrection[0] << "    " << fFourier.fRangeForPhaseCorrection[1];
+      CheckAndWriteComment(f, ++lineNo);
+    }
+
+    // write 'range' if present
+    if (fFourier.fPlotRange[0] != -1.0) {
+      f << endl << "range                       " << fFourier.fPlotRange[0] << "    " << fFourier.fPlotRange[1];
+      CheckAndWriteComment(f, ++lineNo);
+    }
   }
 
   // write plot block
@@ -1682,6 +1783,244 @@ bool PMsrHandler::HandleCommandsEntry(PMsrLines &lines)
   }
 
   return true;
+}
+
+//--------------------------------------------------------------------------
+// InitFourierParameterStructure (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param fourier fourier parameters
+ */
+void PMsrHandler::InitFourierParameterStructure(PMsrFourierStructure &fourier)
+{
+  fourier.fFourierBlockPresent = false;           // fourier block present
+  fourier.fUnits = FOURIER_UNIT_NOT_GIVEN;        // fourier untis in field, i.e. Gauss
+  fourier.fFourierPower = 0;                      // no zero padding
+  fourier.fApodization = FOURIER_APOD_NOT_GIVEN;  // no apodization
+  fourier.fPlotTag = FOURIER_PLOT_NOT_GIVEN;      // initial plot tag: show real and imaginary part at once
+  fourier.fPhase = -999.0;                        // fourier phase
+  for (unsigned int i=0; i<2; i++) {
+    fourier.fRangeForPhaseCorrection[i] = -1.0;  // frequency range for phase correction
+    fourier.fPlotRange[i] = -1.0;                // fourier plot range
+  }
+}
+
+//--------------------------------------------------------------------------
+// HandleFourierEntry (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param lines is a list of lines containing the fourier parameter block
+ */
+bool PMsrHandler::HandleFourierEntry(PMsrLines &lines)
+{
+cout << endl << ">> in PMsrHandler::HandleFourierEntry ...";
+
+  bool error = false;
+
+  if (lines.empty()) // no fourier block present
+    return true;
+
+cout << endl << ">> in PMsrHandler::HandleFourierEntry, Fourier block present ...";
+
+  PMsrFourierStructure fourier;
+
+  InitFourierParameterStructure(fourier);
+
+  fourier.fFourierBlockPresent = true;
+
+  PMsrLines::iterator iter;
+
+  TObjArray *tokens;
+  TObjString *ostr;
+  TString str;
+
+  int ival;
+
+  iter = lines.begin();
+  while ((iter != lines.end()) && !error) {
+    // tokenize line
+    tokens = iter->fLine.Tokenize(" \t");
+    if (!tokens) {
+      cout << endl << ">> PMsrHandler::HandleRunEntry: **SEVERE ERROR** Couldn't tokenize Parameters in line " << iter->fLineNo;
+      cout << endl << endl;
+      return false;
+    }
+
+    // units -----------------------------------------------
+    if (iter->fLine.BeginsWith("units", TString::kIgnoreCase)) {
+      if (tokens->GetEntries() < 2) { // units are missing
+        error = true;
+        continue;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (!str.CompareTo("gauss", TString::kIgnoreCase)) {
+          fourier.fUnits = FOURIER_UNIT_FIELD;
+        } else if (!str.CompareTo("mhz", TString::kIgnoreCase)) {
+          fourier.fUnits = FOURIER_UNIT_FREQ;
+        } else {
+          error = true;
+          continue;
+        }
+      }
+    }
+
+    // fourier power (zero padding) ------------------------
+    if (iter->fLine.BeginsWith("fourier_power", TString::kIgnoreCase)) {
+      if (tokens->GetEntries() < 2) { // fourier power exponent is missing
+        error = true;
+        continue;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit()) {
+          ival = str.Atoi();
+          if ((ival >= 0) && (ival <= 20)) {
+            fourier.fFourierPower = ival;
+          } else { // fourier power out of range
+            error = true;
+            continue;
+          }
+        } else { // fourier power not a number
+          error = true;
+          continue;
+        }
+      }
+    }
+
+    // apodization -----------------------------------------
+    if (iter->fLine.BeginsWith("apodization", TString::kIgnoreCase)) {
+      if (tokens->GetEntries() < 2) { // apodization tag is missing
+        error = true;
+        continue;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (!str.CompareTo("none", TString::kIgnoreCase)) {
+          fourier.fApodization = FOURIER_APOD_NONE;
+        } else if (!str.CompareTo("weak", TString::kIgnoreCase)) {
+          fourier.fApodization = FOURIER_APOD_WEAK;
+        } else if (!str.CompareTo("medium", TString::kIgnoreCase)) {
+          fourier.fApodization = FOURIER_APOD_MEDIUM;
+        } else if (!str.CompareTo("strong", TString::kIgnoreCase)) {
+          fourier.fApodization = FOURIER_APOD_STRONG;
+        } else { // unrecognized apodization tag
+          error = true;
+          continue;
+        }
+      }
+    }
+
+    // plot tag --------------------------------------------
+    if (iter->fLine.BeginsWith("plot", TString::kIgnoreCase)) {
+      if (tokens->GetEntries() < 2) { // plot tag is missing
+        error = true;
+        continue;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (!str.CompareTo("real", TString::kIgnoreCase)) {
+          fourier.fPlotTag = FOURIER_PLOT_REAL;
+        } else if (!str.CompareTo("imag", TString::kIgnoreCase)) {
+          fourier.fPlotTag = FOURIER_PLOT_IMAG;
+        } else if (!str.CompareTo("real_and_imag", TString::kIgnoreCase)) {
+          fourier.fPlotTag = FOURIER_PLOT_REAL_AND_IMAG;
+        } else if (!str.CompareTo("power", TString::kIgnoreCase)) {
+          fourier.fPlotTag = FOURIER_PLOT_POWER;
+        } else if (!str.CompareTo("phase", TString::kIgnoreCase)) {
+          fourier.fPlotTag = FOURIER_PLOT_PHASE;
+        } else { // unrecognized plot tag
+          error = true;
+          continue;
+        }
+      }
+    }
+
+    // phase -----------------------------------------------
+    if (iter->fLine.BeginsWith("phase", TString::kIgnoreCase)) {
+      if (tokens->GetEntries() < 2) { // phase value is missing
+        error = true;
+        continue;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsFloat()) {
+          fourier.fPhase = str.Atof();
+        } else {
+          error = true;
+          continue;
+        }
+      }
+    }
+
+    // range for automatic phase correction ----------------
+    if (iter->fLine.BeginsWith("range_for_phase_correction", TString::kIgnoreCase)) {
+      if (tokens->GetEntries() < 3) { // range values are missing
+        error = true;
+        continue;
+      } else {
+        for (unsigned int i=0; i<2; i++) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(i+1));
+          str = ostr->GetString();
+          if (str.IsFloat()) {
+            fourier.fRangeForPhaseCorrection[i] = str.Atof();
+          } else {
+            error = true;
+            continue;
+          }
+        }
+      }
+    }
+
+    // fourier plot range ----------------------------------
+    if (iter->fLine.BeginsWith("range", TString::kIgnoreCase)) {
+      if (tokens->GetEntries() < 3) { // plot range values are missing
+        error = true;
+        continue;
+      } else {
+        for (unsigned int i=0; i<2; i++) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(i+1));
+          str = ostr->GetString();
+          if (str.IsFloat()) {
+            fourier.fPlotRange[i] = str.Atof();
+          } else {
+            error = true;
+            continue;
+          }
+        }
+      }
+    }
+
+    ++iter;
+  }
+
+  if (error) {
+    cout << endl << ">> PMsrHandler::HandleFourierEntry: **ERROR** in line " << iter->fLineNo << ":";
+    cout << endl;
+    cout << endl << iter->fLine.Data();
+    cout << endl;
+    cout << endl << "FOURIER block syntax, parameters in [] are optinal:";
+    cout << endl;
+    cout << endl << "FOURIER";
+    cout << endl << "[units Gauss | MHz]";
+    cout << endl << "[fourier_power n # n is a number such that zero padding up to 2^n will be used]";
+    cout << endl << "   n=0 means no zero padding";
+    cout << endl << "   0 <= n <= 20 are allowed values";
+    cout << endl << "[apodization none | weak | medium | strong]";
+    cout << endl << "[plot real | imag | real_and_imag | power | phase]";
+    cout << endl << "[phase value]";
+    cout << endl << "[range_for_phase_correction min max]";
+    cout << endl << "[range min max]";
+    cout << endl;
+  } else { // save last run found
+    fFourier = fourier;
+  }
+
+  return !error;
 }
 
 //--------------------------------------------------------------------------
