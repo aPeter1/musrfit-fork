@@ -210,10 +210,14 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
 
   fPopupFourier = new TGPopupMenu();
   fPopupMain->AddPopup("&Fourier", fPopupFourier);
-  fPopupFourier->AddEntry("Real", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL);
-  fPopupFourier->AddEntry("Imag", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG);
-  fPopupFourier->AddEntry("Power", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR);
-  fPopupFourier->AddEntry("Phase", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE);
+  fPopupFourier->AddEntry("Show Real", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL);
+  fPopupFourier->AddEntry("Show Imag", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG);
+  fPopupFourier->AddEntry("Show Real+Imag", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG);
+  fPopupFourier->AddEntry("Show Power", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR);
+  fPopupFourier->AddEntry("Show Phase", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE);
+  fPopupFourier->AddSeparator();
+  fPopupFourier->AddEntry("Phase +", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+  fPopupFourier->AddEntry("Phase -", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
 
   fPopupMain->AddEntry("&Difference", P_MENU_ID_DIFFERENCE+P_MENU_PLOT_OFFSET*fPlotNumber);
   fPopupMain->AddSeparator();
@@ -324,8 +328,10 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
     HandleDifference();
   } else if (x == 'f') {
     cout << endl << ">> will show the Fourier transform, to be implemented yet." << endl;
-  } else if (x == 'S') {
-    cout << endl << ">> will save the shown data into a file, to be implemented yet." << endl;
+  } else if (x == '+') {
+    cout << endl << ">> if Fourier is shown, will add +1° to the Fourier." << endl;
+  } else if (x == '-') {
+    cout << endl << ">> if Fourier is shown, will add -1° to the Fourier." << endl;
   } else {
     // do all the necessary stuff **TO BE DONE**
     fMainCanvas->Update();
@@ -342,14 +348,34 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
 void PMusrCanvas::HandleMenuPopup(Int_t id)
 {
   if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL) {
+    fPopupFourier->UnCheckEntries();
+    fPopupFourier->CheckEntry(id);
     cout << endl << ">> will handle Real Part Fourier ..." << endl;
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG) {
+    fPopupFourier->UnCheckEntries();
+    fPopupFourier->CheckEntry(id);
     cout << endl << ">> will handle Imaginary Part Fourier ..." << endl;
+  } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG) {
+    fPopupFourier->UnCheckEntries();
+    fPopupFourier->CheckEntry(id);
+    cout << endl << ">> will handle Real+Imaginary Part Fourier ..." << endl;
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR) {
+    fPopupFourier->UnCheckEntries();
+    fPopupFourier->CheckEntry(id);
     cout << endl << ">> will handle Power Fourier ..." << endl;
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE) {
+    fPopupFourier->UnCheckEntries();
+    fPopupFourier->CheckEntry(id);
     cout << endl << ">> will handle Phase Fourier ..." << endl;
+  } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS) {
+    cout << endl << ">> will add +1° Phase to the Fourier ..." << endl;
+  } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS) {
+    cout << endl << ">> will add -1° Phase to the Fourier ..." << endl;
   } else if (id == P_MENU_ID_DIFFERENCE+P_MENU_PLOT_OFFSET*fPlotNumber) {
+    if (fPopupMain->IsEntryChecked(id))
+      fPopupMain->UnCheckEntry(id);
+    else
+      fPopupMain->CheckEntry(id);
     HandleDifference();
   } else if (id == P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_ASCII) {
     SaveDataAscii();

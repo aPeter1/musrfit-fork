@@ -275,6 +275,7 @@ int PMsrHandler::ReadMsrFile()
 // }
 // cout << endl;
 
+/*
 cout << endl << ">> FOURIER Block:";
 cout << endl << ">>   Fourier Block Present       : " << fFourier.fFourierBlockPresent;
 cout << endl << ">>   Fourier Units               : " << fFourier.fUnits;
@@ -285,6 +286,7 @@ cout << endl << ">>   Phase                       : " << fFourier.fPhase;
 cout << endl << ">>   Range for Freq. Corrections : " << fFourier.fRangeForPhaseCorrection[0] << ", " << fFourier.fRangeForPhaseCorrection[1];
 cout << endl << ">>   Plot Range                  : " << fFourier.fPlotRange[0] << ", " << fFourier.fPlotRange[1];
 cout << endl;
+*/
 
   return result;
 }
