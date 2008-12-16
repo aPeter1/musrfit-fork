@@ -681,8 +681,10 @@ int PMsrHandler::WriteMsrLogFile()
         f << "Gauss";
       } else if (fFourier.fUnits == FOURIER_UNIT_FREQ) {
         f << "MHz ";
+      } else if (fFourier.fUnits == FOURIER_UNIT_CYCLES) {
+        f << "Mc/s";
       }
-      f << "   # units either 'Gauss' or 'MHz'";
+      f << "   # units either 'Gauss', 'MHz', or 'Mc/s'";
       CheckAndWriteComment(f, ++lineNo);
     }
 
@@ -1864,6 +1866,8 @@ cout << endl << ">> in PMsrHandler::HandleFourierEntry, Fourier block present ..
           fourier.fUnits = FOURIER_UNIT_FIELD;
         } else if (!str.CompareTo("mhz", TString::kIgnoreCase)) {
           fourier.fUnits = FOURIER_UNIT_FREQ;
+        } else if (!str.CompareTo("mc/s", TString::kIgnoreCase)) {
+          fourier.fUnits = FOURIER_UNIT_CYCLES;
         } else {
           error = true;
           continue;
@@ -2008,7 +2012,7 @@ cout << endl << ">> in PMsrHandler::HandleFourierEntry, Fourier block present ..
     cout << endl << "FOURIER block syntax, parameters in [] are optinal:";
     cout << endl;
     cout << endl << "FOURIER";
-    cout << endl << "[units Gauss | MHz]";
+    cout << endl << "[units Gauss | MHz | Mc/s]";
     cout << endl << "[fourier_power n # n is a number such that zero padding up to 2^n will be used]";
     cout << endl << "   n=0 means no zero padding";
     cout << endl << "   0 <= n <= 20 are allowed values";

@@ -55,11 +55,12 @@
 #define XTHEO  0.75
 
 // Current Plot Views
-#define PV_DATA          1
-#define PV_FOURIER_REAL  2
-#define PV_FOURIER_IMAG  3
-#define PV_FOURIER_PWR   4
-#define PV_FOURIER_PHASE 5
+#define PV_DATA                  1
+#define PV_FOURIER_REAL          2
+#define PV_FOURIER_IMAG          3
+#define PV_FOURIER_REAL_AND_IMAG 4
+#define PV_FOURIER_PWR           5
+#define PV_FOURIER_PHASE         6
 
 // Canvas menu id's
 #define P_MENU_ID_FOURIER       10001
@@ -210,6 +211,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunData *data);
     virtual void HandleNonMusrDataSet(unsigned int plotNo, unsigned int runNo, PRunData *data);
     virtual void HandleDifference();
+    virtual void HandleFourier();
 
     virtual double CalculateDiff(const double x, const double y, TH1F *theo);
     virtual double CalculateDiff(const double x, const double y, TGraphErrors *theo);

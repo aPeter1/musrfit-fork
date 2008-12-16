@@ -327,7 +327,9 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   } else if (x == 'd') {
     HandleDifference();
   } else if (x == 'f') {
-    cout << endl << ">> will show the Fourier transform, to be implemented yet." << endl;
+    if (fPlotType != MSR_PLOT_NON_MUSR) {
+      cout << endl << ">> will show the Fourier transform, to be implemented yet." << endl;
+    }
   } else if (x == '+') {
     cout << endl << ">> if Fourier is shown, will add +1° to the Fourier." << endl;
   } else if (x == '-') {
@@ -605,6 +607,14 @@ cout << endl;
         }
         // handle data
         HandleNonMusrDataSet(i, runNo, data);
+        // disable Fourier menus
+        fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL);
+        fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG);
+        fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG);
+        fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR);
+        fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE);
+        fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+        fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
         break;
       default:
         fValid = false;
@@ -1985,3 +1995,13 @@ void PMusrCanvas::SaveDataDb()
   cout << endl << ">> Data windows saved in db format ..." << endl;
 }
 
+//--------------------------------------------------------------------------
+// HandleFourier
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrCanvas::HandleFourier()
+{
+}

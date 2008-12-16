@@ -98,6 +98,7 @@ using namespace std;
 #define FOURIER_UNIT_NOT_GIVEN 0
 #define FOURIER_UNIT_FIELD     1
 #define FOURIER_UNIT_FREQ      2
+#define FOURIER_UNIT_CYCLES    3
 
 #define FOURIER_APOD_NOT_GIVEN 0
 #define FOURIER_APOD_NONE      1

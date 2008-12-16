@@ -100,6 +100,7 @@ OBJS += PFitterFcn.o
 OBJS += PFitter.o
 OBJS += PMusrCanvas.o PMusrCanvasDict.o
 OBJS += PUserFcnBase.o PUserFcnBaseDict.o
+OBJS += PFourier.o
 
 EXTOBJS  =
 EXTOBJS += MuSR_td_PSI_bin.o
