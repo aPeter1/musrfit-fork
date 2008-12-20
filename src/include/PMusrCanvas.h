@@ -149,6 +149,7 @@ class PMusrCanvas : public TObject, public TQObject
                 Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh);
     PMusrCanvas(const int number, const char* title, 
                 Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
+                PMsrFourierStructure *fourierDefault,
                 const PIntVector markerList, const PIntVector colorList);
     virtual ~PMusrCanvas();
 
@@ -199,6 +200,7 @@ class PMusrCanvas : public TObject, public TQObject
     PMusrCanvasDataList fData;
     PMusrCanvasNonMusrDataList fNonMusrData;
 
+    PMsrFourierStructure *fFourier;
     PIntVector fMarkerList;
     PIntVector fColorList;
 
@@ -211,7 +213,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunData *data);
     virtual void HandleNonMusrDataSet(unsigned int plotNo, unsigned int runNo, PRunData *data);
     virtual void HandleDifference();
-    virtual void HandleFourier();
+    virtual void HandleFourier(int tag);
 
     virtual double CalculateDiff(const double x, const double y, TH1F *theo);
     virtual double CalculateDiff(const double x, const double y, TGraphErrors *theo);

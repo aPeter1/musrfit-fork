@@ -92,8 +92,10 @@ PMusrCanvas::PMusrCanvas(const int number, const char* title,
  */
 PMusrCanvas::PMusrCanvas(const int number, const char* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
+                         PMsrFourierStructure* fourierDefault,
                          const PIntVector markerList, const PIntVector colorList) :
-                         fPlotNumber(number), fMarkerList(markerList), fColorList(colorList)
+                         fPlotNumber(number), fFourier(fourierDefault),
+                         fMarkerList(markerList), fColorList(colorList)
 {
   CreateStyle();
   InitMusrCanvas(title, wtopx, wtopy, ww, wh);
@@ -352,23 +354,23 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
   if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL) {
     fPopupFourier->UnCheckEntries();
     fPopupFourier->CheckEntry(id);
-    cout << endl << ">> will handle Real Part Fourier ..." << endl;
+    HandleFourier(FOURIER_PLOT_REAL);
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG) {
     fPopupFourier->UnCheckEntries();
     fPopupFourier->CheckEntry(id);
-    cout << endl << ">> will handle Imaginary Part Fourier ..." << endl;
+    HandleFourier(FOURIER_PLOT_IMAG);
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG) {
     fPopupFourier->UnCheckEntries();
     fPopupFourier->CheckEntry(id);
-    cout << endl << ">> will handle Real+Imaginary Part Fourier ..." << endl;
+    HandleFourier(FOURIER_PLOT_REAL_AND_IMAG);
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR) {
     fPopupFourier->UnCheckEntries();
     fPopupFourier->CheckEntry(id);
-    cout << endl << ">> will handle Power Fourier ..." << endl;
+    HandleFourier(FOURIER_PLOT_POWER);
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE) {
     fPopupFourier->UnCheckEntries();
     fPopupFourier->CheckEntry(id);
-    cout << endl << ">> will handle Phase Fourier ..." << endl;
+    HandleFourier(FOURIER_PLOT_PHASE);
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS) {
     cout << endl << ">> will add +1° Phase to the Fourier ..." << endl;
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS) {
@@ -2001,7 +2003,27 @@ void PMusrCanvas::SaveDataDb()
 /**
  * <p>
  *
+ * \param tag
  */
-void PMusrCanvas::HandleFourier()
+void PMusrCanvas::HandleFourier(int tag)
 {
+  switch (tag) {
+    case FOURIER_PLOT_REAL:
+      cout << endl << ">> will handle Real Part Fourier ..." << endl;
+      break;
+    case FOURIER_PLOT_IMAG:
+      cout << endl << ">> will handle Imaginary Part Fourier ..." << endl;
+      break;
+    case FOURIER_PLOT_REAL_AND_IMAG:
+      cout << endl << ">> will handle Real+Imaginary Part Fourier ..." << endl;
+      break;
+    case FOURIER_PLOT_POWER:
+      cout << endl << ">> will handle Power Fourier ..." << endl;
+      break;
+    case FOURIER_PLOT_PHASE:
+      cout << endl << ">> will handle Phase Fourier ..." << endl;
+      break;
+    default:
+      break;
+  }
 }

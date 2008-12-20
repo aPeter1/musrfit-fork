@@ -58,7 +58,7 @@ class PStartupHandler : public TObject, public TQObject
 
     virtual void CheckLists();
 
-    virtual const PMsrFourierStructure* GetFourierDefaults() const { return &fFourierDefaults; }
+    virtual PMsrFourierStructure* GetFourierDefaults() { return &fFourierDefaults; }
     virtual const PStringVector GetDataPathList() const { return fDataPathList; }
     virtual const PIntVector    GetMarkerList() const { return fMarkerList; }
     virtual const PIntVector    GetColorList() const { return fColorList; }

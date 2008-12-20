@@ -229,6 +229,7 @@ cout << endl;
       if (startupHandler)
         musrCanvas = new PMusrCanvas(i, msrHandler->GetMsrTitle()->Data(), 
                                      10+i*100, 10+i*100, 800, 600,
+                                     startupHandler->GetFourierDefaults(),
                                      startupHandler->GetMarkerList(),
                                      startupHandler->GetColorList());
       else
