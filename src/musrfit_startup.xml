@@ -6,6 +6,13 @@
     </comment>
     <data_path>/mnt/data/nemu/his</data_path>
     <data_path>/mnt/data/nemu/wkm</data_path>
+    <fourier_settings>
+        <units>Gauss</units>
+        <fourier_power>0</fourier_power>
+        <apodization>none</apodization>
+        <plot>real_and_imag</plot>
+        <phase>0.0</phase>
+    </fourier_settings>
     <root_settings>
         <marker_list>
             <!-- Root marker numbers -->

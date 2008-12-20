@@ -58,19 +58,22 @@ class PStartupHandler : public TObject, public TQObject
 
     virtual void CheckLists();
 
+    virtual const PMsrFourierStructure* GetFourierDefaults() const { return &fFourierDefaults; }
     virtual const PStringVector GetDataPathList() const { return fDataPathList; }
     virtual const PIntVector    GetMarkerList() const { return fMarkerList; }
     virtual const PIntVector    GetColorList() const { return fColorList; }
 
   private:
     enum EKeyWords {eEmpty, eComment, eDataPath,
+                    eFourierSettings, eUnits, eFourierPower, eApodization, ePlot, ePhase,
                     eRootSettings, eMarkerList, eMarker, 
                     eColorList, eColor};
     EKeyWords       fKey;
 
-    PStringVector   fDataPathList;
-    PIntVector      fMarkerList;
-    PIntVector      fColorList;
+    PMsrFourierStructure fFourierDefaults;
+    PStringVector        fDataPathList;
+    PIntVector           fMarkerList;
+    PIntVector           fColorList;
 
   ClassDef(PStartupHandler, 1)
 };

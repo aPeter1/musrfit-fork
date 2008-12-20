@@ -73,6 +73,18 @@ PStartupHandler::~PStartupHandler()
 void PStartupHandler::OnStartDocument()
 {
   fKey = eEmpty;
+
+  // init fourier default variables
+  fFourierDefaults.fFourierBlockPresent = false;
+  fFourierDefaults.fUnits = FOURIER_UNIT_FIELD;
+  fFourierDefaults.fFourierPower = 0;
+  fFourierDefaults.fApodization = FOURIER_APOD_NONE;
+  fFourierDefaults.fPlotTag = FOURIER_PLOT_REAL_AND_IMAG;
+  fFourierDefaults.fPhase = 0.0;
+  fFourierDefaults.fRangeForPhaseCorrection[0] = 0.0;
+  fFourierDefaults.fRangeForPhaseCorrection[1] = 0.0;
+  fFourierDefaults.fPlotRange[0] = 0.0;
+  fFourierDefaults.fPlotRange[1] = 0.0;
 }
 
 //--------------------------------------------------------------------------
@@ -104,6 +116,16 @@ void PStartupHandler::OnStartElement(const char *str, const TList *attributes)
     fKey = eMarker;
   } else if (!strcmp(str, "color")) {
     fKey = eColor;
+  } else if (!strcmp(str, "units")) {
+    fKey = eUnits;
+  } else if (!strcmp(str, "fourier_power")) {
+    fKey = eFourierPower;
+  } else if (!strcmp(str, "apodization")) {
+    fKey = eApodization;
+  } else if (!strcmp(str, "plot")) {
+    fKey = ePlot;
+  } else if (!strcmp(str, "phase")) {
+    fKey = ePhase;
   }
 }
 
@@ -133,7 +155,7 @@ void PStartupHandler::OnCharacters(const char *str)
   TObjArray  *tokens;
   TObjString *ostr;
   TString    tstr;
-  Int_t      color, r, g, b;
+  Int_t      color, r, g, b, ival;
 
   switch (fKey) {
     case eDataPath:
@@ -207,6 +229,68 @@ void PStartupHandler::OnCharacters(const char *str)
       color = TColor::GetColor(r,g,b);
       // add the color code to the color list
       fColorList.push_back(color);
+      break;
+    case eUnits:
+      tstr = TString(str);
+      if (!tstr.CompareTo("gauss", TString::kIgnoreCase)) {
+        fFourierDefaults.fUnits = FOURIER_UNIT_FIELD;
+      } else if (!tstr.CompareTo("mhz", TString::kIgnoreCase)) {
+        fFourierDefaults.fUnits = FOURIER_UNIT_FREQ;
+      } else if (!tstr.CompareTo("mc/s", TString::kIgnoreCase)) {
+        fFourierDefaults.fUnits = FOURIER_UNIT_CYCLES;
+      } else {
+        cout << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid unit, will ignore it.";
+        cout << endl;
+      }
+      break;
+    case eFourierPower:
+      tstr = TString(str);
+      if (tstr.IsDigit()) {
+        ival = tstr.Atoi();
+        if ((ival >= 0) && (ival <= 20)) {
+          fFourierDefaults.fFourierPower = ival;
+        } else {
+          cout << endl << "PStartupHandler **WARNING** fourier power '" << str << "' is not a valid number (0..20), will ignore it.";
+          cout << endl;
+        }
+      } else {
+        cout << endl << "PStartupHandler **WARNING** fourier power '" << str << "' is not a valid number (0..20), will ignore it.";
+        cout << endl;
+      }
+      break;
+    case eApodization:
+      tstr = TString(str);
+      if (!tstr.CompareTo("none", TString::kIgnoreCase)) {
+        fFourierDefaults.fApodization = FOURIER_APOD_NONE;
+      } else if (!tstr.CompareTo("weak", TString::kIgnoreCase)) {
+        fFourierDefaults.fApodization = FOURIER_APOD_WEAK;
+      } else if (!tstr.CompareTo("medium", TString::kIgnoreCase)) {
+        fFourierDefaults.fApodization = FOURIER_APOD_MEDIUM;
+      } else if (!tstr.CompareTo("strong", TString::kIgnoreCase)) {
+        fFourierDefaults.fApodization = FOURIER_APOD_STRONG;
+      } else {
+        cout << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid apodization, will ignore it.";
+        cout << endl;
+      }
+      break;
+    case ePlot:
+      tstr = TString(str);
+      if (!tstr.CompareTo("real", TString::kIgnoreCase)) {
+        fFourierDefaults.fPlotTag = FOURIER_PLOT_REAL;
+      } else if (!tstr.CompareTo("imag", TString::kIgnoreCase)) {
+        fFourierDefaults.fPlotTag = FOURIER_PLOT_IMAG;
+      } else if (!tstr.CompareTo("real_and_imag", TString::kIgnoreCase)) {
+        fFourierDefaults.fPlotTag = FOURIER_PLOT_REAL_AND_IMAG;
+      } else if (!tstr.CompareTo("power", TString::kIgnoreCase)) {
+        fFourierDefaults.fPlotTag = FOURIER_PLOT_POWER;
+      } else if (!tstr.CompareTo("phase", TString::kIgnoreCase)) {
+        fFourierDefaults.fPlotTag = FOURIER_PLOT_PHASE;
+      } else {
+        cout << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid plot option, will ignore it.";
+        cout << endl;
+      }
+      break;
+    case ePhase:
       break;
     default:
       break;
