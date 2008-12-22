@@ -12,6 +12,7 @@
         <apodization>none</apodization>
         <plot>real_and_imag</plot>
         <phase>0.0</phase>
+        <phase_increment>1.0</phase_increment>
     </fourier_settings>
     <root_settings>
         <marker_list>

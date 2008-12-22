@@ -330,12 +330,13 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
     HandleDifference();
   } else if (x == 'f') {
     if (fPlotType != MSR_PLOT_NON_MUSR) {
+      HandleFourier(-1);
       cout << endl << ">> will show the Fourier transform, to be implemented yet." << endl;
     }
   } else if (x == '+') {
-    cout << endl << ">> if Fourier is shown, will add +1° to the Fourier." << endl;
+    cout << endl << ">> if Fourier is shown, will add " << fFourier->fPhaseIncerement << "° to the Fourier." << endl;
   } else if (x == '-') {
-    cout << endl << ">> if Fourier is shown, will add -1° to the Fourier." << endl;
+    cout << endl << ">> if Fourier is shown, will subtract " << fFourier->fPhaseIncerement << "° to the Fourier." << endl;
   } else {
     // do all the necessary stuff **TO BE DONE**
     fMainCanvas->Update();
@@ -2007,7 +2008,16 @@ void PMusrCanvas::SaveDataDb()
  */
 void PMusrCanvas::HandleFourier(int tag)
 {
-  switch (tag) {
+  if (fMsrHandler->GetMsrFourierList()->fFourierBlockPresent) {
+cout << endl << ">> fourier block in msr-file present" << endl;
+    fFourier = fMsrHandler->GetMsrFourierList();
+  }
+
+  if (tag == -1) { // called via cmd key 'f'
+    tag = fFourier->fPlotTag;
+  }
+
+  switch (tag) { // called via popup menu
     case FOURIER_PLOT_REAL:
       cout << endl << ">> will handle Real Part Fourier ..." << endl;
       break;

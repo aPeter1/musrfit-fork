@@ -85,6 +85,7 @@ void PStartupHandler::OnStartDocument()
   fFourierDefaults.fRangeForPhaseCorrection[1] = 0.0;
   fFourierDefaults.fPlotRange[0] = 0.0;
   fFourierDefaults.fPlotRange[1] = 0.0;
+  fFourierDefaults.fPhaseIncerement = 1.0;
 }
 
 //--------------------------------------------------------------------------
@@ -126,6 +127,8 @@ void PStartupHandler::OnStartElement(const char *str, const TList *attributes)
     fKey = ePlot;
   } else if (!strcmp(str, "phase")) {
     fKey = ePhase;
+  } else if (!strcmp(str, "phase_increment")) {
+    fKey = ePhaseIncrement;
   }
 }
 
@@ -291,6 +294,22 @@ void PStartupHandler::OnCharacters(const char *str)
       }
       break;
     case ePhase:
+      tstr = TString(str);
+      if (tstr.IsFloat()) {
+        fFourierDefaults.fPhase = tstr.Atof();
+      } else {
+        cout << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid phase, will ignore it.";
+        cout << endl;
+      }
+      break;
+    case ePhaseIncrement:
+      tstr = TString(str);
+      if (tstr.IsFloat()) {
+        fFourierDefaults.fPhaseIncerement = tstr.Atof();
+      } else {
+        cout << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid phase increment, will ignore it.";
+        cout << endl;
+      }
       break;
     default:
       break;

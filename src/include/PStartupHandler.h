@@ -65,7 +65,7 @@ class PStartupHandler : public TObject, public TQObject
 
   private:
     enum EKeyWords {eEmpty, eComment, eDataPath,
-                    eFourierSettings, eUnits, eFourierPower, eApodization, ePlot, ePhase,
+                    eFourierSettings, eUnits, eFourierPower, eApodization, ePlot, ePhase, ePhaseIncrement,
                     eRootSettings, eMarkerList, eMarker, 
                     eColorList, eColor};
     EKeyWords       fKey;

@@ -293,6 +293,7 @@ typedef struct {
   double fPhase;             ///< phase
   double fRangeForPhaseCorrection[2]; ///< field/frequency range for automatic phase correction
   double fPlotRange[2];      ///< field/frequency plot range
+  double fPhaseIncerement;   ///< phase increment for manual phase optimization
 } PMsrFourierStructure;
 
 //-------------------------------------------------------------
