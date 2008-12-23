@@ -286,14 +286,14 @@ typedef vector<PMsrRunStructure> PMsrRunList;
  */
 typedef struct {
   bool fFourierBlockPresent; ///< flag indicating if a Fourier block is present in the msr-file
-  bool fUnits;               ///< flag used to indicate the units. 0=field units (G); 1=frequency units (MHz)
+  int  fUnits;               ///< flag used to indicate the units. 0=field units (G); 1=frequency units (MHz); 2=Mc/s
   int  fFourierPower;        ///< i.e. zero padding up to 2^fFourierPower, default = 0 which means NO zero padding
   int  fApodization;         ///< tag indicating the kind of apodization wished, 0=no appodization (default), 1=weak, 2=medium, 3=strong (for details see the docu)
   int  fPlotTag;             ///< tag used for initial plot. 0=real, 1=imaginary, 2=real & imaginary (default), 3=power, 4=phase
   double fPhase;             ///< phase
   double fRangeForPhaseCorrection[2]; ///< field/frequency range for automatic phase correction
   double fPlotRange[2];      ///< field/frequency plot range
-  double fPhaseIncerement;   ///< phase increment for manual phase optimization
+  double fPhaseIncrement;    ///< phase increment for manual phase optimization
 } PMsrFourierStructure;
 
 //-------------------------------------------------------------

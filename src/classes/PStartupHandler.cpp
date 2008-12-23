@@ -81,11 +81,11 @@ void PStartupHandler::OnStartDocument()
   fFourierDefaults.fApodization = FOURIER_APOD_NONE;
   fFourierDefaults.fPlotTag = FOURIER_PLOT_REAL_AND_IMAG;
   fFourierDefaults.fPhase = 0.0;
-  fFourierDefaults.fRangeForPhaseCorrection[0] = 0.0;
-  fFourierDefaults.fRangeForPhaseCorrection[1] = 0.0;
-  fFourierDefaults.fPlotRange[0] = 0.0;
-  fFourierDefaults.fPlotRange[1] = 0.0;
-  fFourierDefaults.fPhaseIncerement = 1.0;
+  fFourierDefaults.fRangeForPhaseCorrection[0] = -1.0;
+  fFourierDefaults.fRangeForPhaseCorrection[1] = -1.0;
+  fFourierDefaults.fPlotRange[0] = -1.0;
+  fFourierDefaults.fPlotRange[1] = -1.0;
+  fFourierDefaults.fPhaseIncrement = 1.0;
 }
 
 //--------------------------------------------------------------------------
@@ -305,7 +305,7 @@ void PStartupHandler::OnCharacters(const char *str)
     case ePhaseIncrement:
       tstr = TString(str);
       if (tstr.IsFloat()) {
-        fFourierDefaults.fPhaseIncerement = tstr.Atof();
+        fFourierDefaults.fPhaseIncrement = tstr.Atof();
       } else {
         cout << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid phase increment, will ignore it.";
         cout << endl;

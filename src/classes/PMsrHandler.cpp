@@ -689,7 +689,7 @@ int PMsrHandler::WriteMsrLogFile()
     }
 
     // write 'fourier_power' parameter if present
-    if (fFourier.fFourierPower != 0) {
+    if (fFourier.fFourierPower >= 0) {
       f << endl << "fourier_power    " << fFourier.fFourierPower;
       CheckAndWriteComment(f, ++lineNo);
     }
@@ -1800,14 +1800,14 @@ bool PMsrHandler::HandleCommandsEntry(PMsrLines &lines)
 void PMsrHandler::InitFourierParameterStructure(PMsrFourierStructure &fourier)
 {
   fourier.fFourierBlockPresent = false;           // fourier block present
-  fourier.fUnits = FOURIER_UNIT_NOT_GIVEN;        // fourier untis in field, i.e. Gauss
-  fourier.fFourierPower = 0;                      // no zero padding
-  fourier.fApodization = FOURIER_APOD_NOT_GIVEN;  // no apodization
-  fourier.fPlotTag = FOURIER_PLOT_NOT_GIVEN;      // initial plot tag: show real and imaginary part at once
-  fourier.fPhase = -999.0;                        // fourier phase
+  fourier.fUnits = FOURIER_UNIT_NOT_GIVEN;        // fourier untis, default: NOT GIVEN
+  fourier.fFourierPower = -1;                     // zero padding, default: -1 = NOT GIVEN
+  fourier.fApodization = FOURIER_APOD_NOT_GIVEN;  // apodization, default: NOT GIVEN
+  fourier.fPlotTag = FOURIER_PLOT_NOT_GIVEN;      // initial plot tag, default: NOT GIVEN
+  fourier.fPhase = -999.0;                        // fourier phase: -999 = NOT GIVEN
   for (unsigned int i=0; i<2; i++) {
-    fourier.fRangeForPhaseCorrection[i] = -1.0;  // frequency range for phase correction
-    fourier.fPlotRange[i] = -1.0;                // fourier plot range
+    fourier.fRangeForPhaseCorrection[i] = -1.0;  // frequency range for phase correction, default: {-1, -1} = NOT GIVEN
+    fourier.fPlotRange[i] = -1.0;                // fourier plot range, default: {-1, -1} = NOT GIVEN
   }
 }
 

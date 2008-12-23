@@ -59,7 +59,7 @@ class PMsrHandler
     virtual PMsrLines*              GetMsrFunctions() { return &fFunctions; }
     virtual PMsrRunList*            GetMsrRunList() { return &fRuns; }
     virtual PMsrLines*              GetMsrCommands() { return &fCommands; }
-    virtual PMsrFourierStructure*   GetMsrFourierList() { return &fFourier; }
+    virtual PMsrFourierStructure    GetMsrFourierList() { return fFourier; }
     virtual PMsrPlotList*           GetMsrPlotList() { return &fPlots; }
     virtual PMsrStatisticStructure* GetMsrStatistic() { return &fStatistic; }
 

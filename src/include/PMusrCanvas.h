@@ -149,14 +149,14 @@ class PMusrCanvas : public TObject, public TQObject
                 Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh);
     PMusrCanvas(const int number, const char* title, 
                 Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
-                PMsrFourierStructure *fourierDefault,
+                PMsrFourierStructure fourierDefault,
                 const PIntVector markerList, const PIntVector colorList);
     virtual ~PMusrCanvas();
 
     virtual Bool_t IsValid() { return fValid; }
 
 #ifndef __MAKECINT__
-    virtual void SetMsrHandler(PMsrHandler *msrHandler) { fMsrHandler = msrHandler; }
+    virtual void SetMsrHandler(PMsrHandler *msrHandler);
     virtual void SetRunListCollection(PRunListCollection *runList) { fRunList = runList; }
 #endif // __MAKECINT__
 
@@ -200,11 +200,12 @@ class PMusrCanvas : public TObject, public TQObject
     PMusrCanvasDataList fData;
     PMusrCanvasNonMusrDataList fNonMusrData;
 
-    PMsrFourierStructure *fFourier;
+    PMsrFourierStructure fFourier;
     PIntVector fMarkerList;
     PIntVector fColorList;
 
     virtual void CreateStyle();
+    virtual void InitFourier();
     virtual void InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh);
     virtual void InitDataSet(PMusrCanvasDataSet &dataSet);
     virtual void InitDataSet(PMusrCanvasNonMusrDataSet &dataSet);
@@ -219,9 +220,12 @@ class PMusrCanvas : public TObject, public TQObject
     virtual double CalculateDiff(const double x, const double y, TGraphErrors *theo);
     virtual Int_t  FindBin(const double x, TGraphErrors *graph);
 
+    virtual double GetGlobalMaximum(TH1F* histo);
+    virtual double GetGlobalMinimum(TH1F* histo);
+
     virtual void PlotData();
     virtual void PlotDifference();
-    virtual void PlotFourier(int fourierType);
+    virtual void PlotFourier();
 
     virtual void SaveDataAscii();
     virtual void SaveDataDb();
