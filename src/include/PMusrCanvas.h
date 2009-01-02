@@ -226,6 +226,8 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void PlotData();
     virtual void PlotDifference();
     virtual void PlotFourier();
+    virtual void IncrementFourierPhase();
+    virtual void DecrementFourierPhase();
 
     virtual void SaveDataAscii();
     virtual void SaveDataDb();
