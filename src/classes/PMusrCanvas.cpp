@@ -2410,46 +2410,25 @@ cout << endl << ">> data scale = " << scale;
         fData[i].dataFourierPhase = fourierData.GetPhaseFourier();
 
         // set marker and line color
-        if (i < fColorList.size()) {
-          fData[i].dataFourierRe->SetMarkerColor(fColorList[i]);
-          fData[i].dataFourierRe->SetLineColor(fColorList[i]);
-          fData[i].dataFourierIm->SetMarkerColor(fColorList[i]);
-          fData[i].dataFourierIm->SetLineColor(fColorList[i]);
-          fData[i].dataFourierPwr->SetMarkerColor(fColorList[i]);
-          fData[i].dataFourierPwr->SetLineColor(fColorList[i]);
-          fData[i].dataFourierPhase->SetMarkerColor(fColorList[i]);
-          fData[i].dataFourierPhase->SetLineColor(fColorList[i]);
-        } else {
-          TRandom rand(i);
-          Int_t color = TColor::GetColor((Int_t)rand.Integer(255), (Int_t)rand.Integer(255), (Int_t)rand.Integer(255));
-          fData[i].dataFourierRe->SetMarkerColor(color);
-          fData[i].dataFourierRe->SetLineColor(color);
-          fData[i].dataFourierIm->SetMarkerColor(color);
-          fData[i].dataFourierIm->SetLineColor(color);
-          fData[i].dataFourierPwr->SetMarkerColor(color);
-          fData[i].dataFourierPwr->SetLineColor(color);
-          fData[i].dataFourierPhase->SetMarkerColor(color);
-          fData[i].dataFourierPhase->SetLineColor(color);
-        }
+        fData[i].dataFourierRe->SetMarkerColor(fData[i].data->GetMarkerColor());
+        fData[i].dataFourierRe->SetLineColor(fData[i].data->GetLineColor());
+        fData[i].dataFourierIm->SetMarkerColor(fData[i].data->GetMarkerColor());
+        fData[i].dataFourierIm->SetLineColor(fData[i].data->GetLineColor());
+        fData[i].dataFourierPwr->SetMarkerColor(fData[i].data->GetMarkerColor());
+        fData[i].dataFourierPwr->SetLineColor(fData[i].data->GetLineColor());
+        fData[i].dataFourierPhase->SetMarkerColor(fData[i].data->GetMarkerColor());
+        fData[i].dataFourierPhase->SetLineColor(fData[i].data->GetLineColor());
+
         // set marker size
         fData[i].dataFourierRe->SetMarkerSize(1);
         fData[i].dataFourierIm->SetMarkerSize(1);
         fData[i].dataFourierPwr->SetMarkerSize(1);
         fData[i].dataFourierPhase->SetMarkerSize(1);
         // set marker type
-        if (i < fMarkerList.size()) {
-          fData[i].dataFourierRe->SetMarkerStyle(fMarkerList[i]);
-          fData[i].dataFourierIm->SetMarkerStyle(fMarkerList[i]);
-          fData[i].dataFourierPwr->SetMarkerStyle(fMarkerList[i]);
-          fData[i].dataFourierPhase->SetMarkerStyle(fMarkerList[i]);
-        } else {
-          TRandom rand(i);
-          int marker = 20+(Int_t)rand.Integer(10);
-          fData[i].dataFourierRe->SetMarkerStyle(marker);
-          fData[i].dataFourierIm->SetMarkerStyle(marker);
-          fData[i].dataFourierPwr->SetMarkerStyle(marker);
-          fData[i].dataFourierPhase->SetMarkerStyle(marker);
-        }
+        fData[i].dataFourierRe->SetMarkerStyle(fData[i].data->GetMarkerStyle());
+        fData[i].dataFourierIm->SetMarkerStyle(fData[i].data->GetMarkerStyle());
+        fData[i].dataFourierPwr->SetMarkerStyle(fData[i].data->GetMarkerStyle());
+        fData[i].dataFourierPhase->SetMarkerStyle(fData[i].data->GetMarkerStyle());
 
         // calculate fourier transform of the theory
         int powerPad = (int)round(log((endTime-startTime)/fData[i].theory->GetBinWidth(1))/log(2))+3;
@@ -2471,6 +2450,12 @@ cout << endl << ">> theory scale = " << scale << ", data.res/theory.res = " << f
         fData[i].theoryFourierPwr = fourierTheory.GetPowerFourier(scale);
         // get phase part of the data
         fData[i].theoryFourierPhase = fourierTheory.GetPhaseFourier();
+
+        // set line colors for the theory
+        fData[i].theoryFourierRe->SetLineColor(fData[i].theory->GetLineColor());
+        fData[i].theoryFourierIm->SetLineColor(fData[i].theory->GetLineColor());
+        fData[i].theoryFourierPwr->SetLineColor(fData[i].theory->GetLineColor());
+        fData[i].theoryFourierPhase->SetLineColor(fData[i].theory->GetLineColor());
       }
     } else { // calculate diff fourier
       // delete fourier components
