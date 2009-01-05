@@ -1713,6 +1713,64 @@ cout << endl << ">> in PlotFourier() ..." << endl;
 
       break;
     case PV_FOURIER_REAL_AND_IMAG:
+      // plot first histo
+      fData[0].dataFourierRe->Draw("pe");
+
+      // set x-range
+      if ((fFourier.fPlotRange[0] != -1) && (fFourier.fPlotRange[1] != -1)) {
+        min = fFourier.fPlotRange[0];
+        max = fFourier.fPlotRange[1];
+      } else {
+        min = fData[0].dataFourierRe->GetBinLowEdge(1);
+        max = fData[0].dataFourierRe->GetBinLowEdge(fData[0].dataFourierRe->GetNbinsX())+fData[0].dataFourierRe->GetBinWidth(1);
+      }
+      fData[0].dataFourierRe->GetXaxis()->SetRangeUser(min, max);
+
+      // set y-range
+      // first find minimum/maximum of all histos
+      // real part first
+      min = GetGlobalMinimum(fData[0].dataFourierRe);
+      max = GetGlobalMaximum(fData[0].dataFourierRe);
+      for (unsigned int i=1; i<fData.size(); i++) {
+        binContent = GetGlobalMinimum(fData[i].dataFourierRe);
+        if (binContent < min)
+          min = binContent;
+        binContent = GetGlobalMaximum(fData[i].dataFourierRe);
+        if (binContent > max)
+          max = binContent;
+      }
+      // imag part min/max
+      for (unsigned int i=0; i<fData.size(); i++) {
+        binContent = GetGlobalMinimum(fData[i].dataFourierIm);
+        if (binContent < min)
+          min = binContent;
+        binContent = GetGlobalMaximum(fData[i].dataFourierIm);
+        if (binContent > max)
+          max = binContent;
+      }
+      fData[0].dataFourierRe->GetYaxis()->SetRangeUser(1.05*min, 1.05*max);
+
+      // set x-axis title
+      fData[0].dataFourierRe->GetXaxis()->SetTitle(xAxisTitle.Data());
+
+      // set y-axis title
+      fData[0].dataFourierRe->GetYaxis()->SetTitle("Real/Imag Fourier");
+
+      // plot all remaining data
+      fData[0].dataFourierIm->Draw("pesame");
+      for (unsigned int i=1; i<fData.size(); i++) {
+        fData[i].dataFourierRe->Draw("pesame");
+        fData[i].dataFourierIm->Draw("pesame");
+      }
+
+      // plot theories
+      for (unsigned int i=0; i<fData.size(); i++) {
+        fData[i].theoryFourierRe->Draw("esame");
+        fData[i].theoryFourierIm->Draw("esame");
+      }
+
+      PlotFourierPhaseValue();
+
       break;
     case PV_FOURIER_PWR:
       // plot first histo
