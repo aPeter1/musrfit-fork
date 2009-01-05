@@ -1988,6 +1988,8 @@ void PMusrCanvas::SaveDataAscii()
             break;
           case PV_FOURIER_IMAG:
             break;
+          case PV_FOURIER_REAL_AND_IMAG:
+            break;
           case PV_FOURIER_PWR:
             break;
           case PV_FOURIER_PHASE:
@@ -2031,12 +2033,247 @@ void PMusrCanvas::SaveDataAscii()
             }
             break;
           case PV_FOURIER_REAL:
+            // write header
+            str = TString("% ");
+            switch (fFourier.fUnits) {
+              case FOURIER_UNIT_FIELD:
+                str += TString(" Field (G)");
+                break;
+              case FOURIER_UNIT_FREQ:
+                str += TString(" Frequency (MHz)");
+                break;
+              case FOURIER_UNIT_CYCLES:
+                str += TString(" Angular Frequency (Mc/s)");
+                break;
+              default:
+                str += TString(" ????");
+                break;
+            }
+            str += TString(", ");
+            fout << endl << str.Data();
+            for (unsigned int j=0; j<fData.size()-1; j++) {
+              fout << "RealFourierData" << j << ", RealFourierTheo" << j << ", ";
+            }
+            fout << "RealFourierData" << fData.size()-1 << ", RealFourierTheo" << fData.size()-1;
+            fout << endl;
+            // get current x-range
+            xminBin = fData[0].dataFourierRe->GetXaxis()->GetFirst(); // first bin of the zoomed range
+            xmaxBin = fData[0].dataFourierRe->GetXaxis()->GetLast();  // last bin of the zoomed range
+            xmin = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xminBin);
+            xmax = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xmaxBin);
+            // get data
+            for (int i=1; i<fData[0].dataFourierRe->GetNbinsX()-1; i++) {
+              xval = fData[0].dataFourierRe->GetBinCenter(i); // get x-unit
+              if ((xval < xmin) || (xval > xmax))
+                continue;
+              fout << xval << ", ";
+              for (unsigned int j=0; j<fData.size()-1; j++) {
+                fout << fData[j].dataFourierRe->GetBinContent(i) << ", ";
+                theoBin = fData[j].theoryFourierRe->FindBin(xval);
+                fout << fData[j].theoryFourierRe->GetBinContent(theoBin) << ", ";
+              }
+              // write last data set
+              fout << fData[fData.size()-1].dataFourierRe->GetBinContent(i) << ", ";
+              theoBin = fData[fData.size()-1].theoryFourierRe->FindBin(xval);
+              fout << fData[fData.size()-1].theoryFourierRe->GetBinContent(theoBin);
+              fout << endl;
+            }
             break;
           case PV_FOURIER_IMAG:
+            // write header
+            str = TString("% ");
+            switch (fFourier.fUnits) {
+              case FOURIER_UNIT_FIELD:
+                str += TString(" Field (G)");
+                break;
+              case FOURIER_UNIT_FREQ:
+                str += TString(" Frequency (MHz)");
+                break;
+              case FOURIER_UNIT_CYCLES:
+                str += TString(" Angular Frequency (Mc/s)");
+                break;
+              default:
+                str += TString(" ????");
+                break;
+            }
+            str += TString(", ");
+            fout << endl << str.Data();
+            for (unsigned int j=0; j<fData.size()-1; j++) {
+              fout << "ImagFourierData" << j << ", ImagFourierTheo" << j << ", ";
+            }
+            fout << "ImagFourierData" << fData.size()-1 << ", ImagFourierTheo" << fData.size()-1;
+            fout << endl;
+            // get current x-range
+            xminBin = fData[0].dataFourierIm->GetXaxis()->GetFirst(); // first bin of the zoomed range
+            xmaxBin = fData[0].dataFourierIm->GetXaxis()->GetLast();  // last bin of the zoomed range
+            xmin = fData[0].dataFourierIm->GetXaxis()->GetBinCenter(xminBin);
+            xmax = fData[0].dataFourierIm->GetXaxis()->GetBinCenter(xmaxBin);
+            // get data
+            for (int i=1; i<fData[0].dataFourierIm->GetNbinsX()-1; i++) {
+              xval = fData[0].dataFourierIm->GetBinCenter(i); // get x-unit
+              if ((xval < xmin) || (xval > xmax))
+                continue;
+              fout << xval << ", ";
+              for (unsigned int j=0; j<fData.size()-1; j++) {
+                fout << fData[j].dataFourierIm->GetBinContent(i) << ", ";
+                theoBin = fData[j].theoryFourierIm->FindBin(xval);
+                fout << fData[j].theoryFourierIm->GetBinContent(theoBin) << ", ";
+              }
+              // write last data set
+              fout << fData[fData.size()-1].dataFourierIm->GetBinContent(i) << ", ";
+              theoBin = fData[fData.size()-1].theoryFourierIm->FindBin(xval);
+              fout << fData[fData.size()-1].theoryFourierIm->GetBinContent(theoBin);
+              fout << endl;
+            }
+            break;
+          case PV_FOURIER_REAL_AND_IMAG:
+            // write header
+            str = TString("% ");
+            switch (fFourier.fUnits) {
+              case FOURIER_UNIT_FIELD:
+                str += TString(" Field (G)");
+                break;
+              case FOURIER_UNIT_FREQ:
+                str += TString(" Frequency (MHz)");
+                break;
+              case FOURIER_UNIT_CYCLES:
+                str += TString(" Angular Frequency (Mc/s)");
+                break;
+              default:
+                str += TString(" ????");
+                break;
+            }
+            str += TString(", ");
+            fout << endl << str.Data();
+            for (unsigned int j=0; j<fData.size()-1; j++) {
+              fout << "RealFourierData" << j << ", RealFourierTheo" << j << ", ";
+              fout << "ImagFourierData" << j << ", ImagFourierTheo" << j << ", ";
+            }
+            fout << "RealFourierData" << fData.size()-1 << ", RealFourierTheo" << fData.size()-1 << ", ";
+            fout << "ImagFourierData" << fData.size()-1 << ", ImagFourierTheo" << fData.size()-1;
+            fout << endl;
+            // get current x-range
+            xminBin = fData[0].dataFourierRe->GetXaxis()->GetFirst(); // first bin of the zoomed range
+            xmaxBin = fData[0].dataFourierRe->GetXaxis()->GetLast();  // last bin of the zoomed range
+            xmin = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xminBin);
+            xmax = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xmaxBin);
+            // get data
+            for (int i=1; i<fData[0].dataFourierRe->GetNbinsX()-1; i++) {
+              xval = fData[0].dataFourierRe->GetBinCenter(i); // get x-unit
+              if ((xval < xmin) || (xval > xmax))
+                continue;
+              fout << xval << ", ";
+              for (unsigned int j=0; j<fData.size()-1; j++) {
+                fout << fData[j].dataFourierRe->GetBinContent(i) << ", ";
+                theoBin = fData[j].theoryFourierRe->FindBin(xval);
+                fout << fData[j].theoryFourierRe->GetBinContent(theoBin) << ", ";
+                fout << fData[j].dataFourierIm->GetBinContent(i) << ", ";
+                theoBin = fData[j].theoryFourierIm->FindBin(xval);
+                fout << fData[j].theoryFourierIm->GetBinContent(theoBin) << ", ";
+              }
+              // write last data set
+              fout << fData[fData.size()-1].dataFourierRe->GetBinContent(i) << ", ";
+              theoBin = fData[fData.size()-1].theoryFourierRe->FindBin(xval);
+              fout << fData[fData.size()-1].theoryFourierRe->GetBinContent(theoBin) << ", ";
+              fout << fData[fData.size()-1].dataFourierIm->GetBinContent(i) << ", ";
+              theoBin = fData[fData.size()-1].theoryFourierIm->FindBin(xval);
+              fout << fData[fData.size()-1].theoryFourierIm->GetBinContent(theoBin);
+              fout << endl;
+            }
             break;
           case PV_FOURIER_PWR:
+            // write header
+            str = TString("% ");
+            switch (fFourier.fUnits) {
+              case FOURIER_UNIT_FIELD:
+                str += TString(" Field (G)");
+                break;
+              case FOURIER_UNIT_FREQ:
+                str += TString(" Frequency (MHz)");
+                break;
+              case FOURIER_UNIT_CYCLES:
+                str += TString(" Angular Frequency (Mc/s)");
+                break;
+              default:
+                str += TString(" ????");
+                break;
+            }
+            str += TString(", ");
+            fout << endl << str.Data();
+            for (unsigned int j=0; j<fData.size()-1; j++) {
+              fout << "PwrFourierData" << j << ", PwrFourierTheo" << j << ", ";
+            }
+            fout << "PwrFourierData" << fData.size()-1 << ", PwrFourierTheo" << fData.size()-1;
+            fout << endl;
+            // get current x-range
+            xminBin = fData[0].dataFourierPwr->GetXaxis()->GetFirst(); // first bin of the zoomed range
+            xmaxBin = fData[0].dataFourierPwr->GetXaxis()->GetLast();  // last bin of the zoomed range
+            xmin = fData[0].dataFourierPwr->GetXaxis()->GetBinCenter(xminBin);
+            xmax = fData[0].dataFourierPwr->GetXaxis()->GetBinCenter(xmaxBin);
+            // get data
+            for (int i=1; i<fData[0].dataFourierPwr->GetNbinsX()-1; i++) {
+              xval = fData[0].dataFourierPwr->GetBinCenter(i); // get x-unit
+              if ((xval < xmin) || (xval > xmax))
+                continue;
+              fout << xval << ", ";
+              for (unsigned int j=0; j<fData.size()-1; j++) {
+                fout << fData[j].dataFourierPwr->GetBinContent(i) << ", ";
+                theoBin = fData[j].theoryFourierPwr->FindBin(xval);
+                fout << fData[j].theoryFourierPwr->GetBinContent(theoBin) << ", ";
+              }
+              // write last data set
+              fout << fData[fData.size()-1].dataFourierPwr->GetBinContent(i) << ", ";
+              theoBin = fData[fData.size()-1].theoryFourierPwr->FindBin(xval);
+              fout << fData[fData.size()-1].theoryFourierPwr->GetBinContent(theoBin);
+              fout << endl;
+            }
             break;
           case PV_FOURIER_PHASE:
+            // write header
+            str = TString("% ");
+            switch (fFourier.fUnits) {
+              case FOURIER_UNIT_FIELD:
+                str += TString(" Field (G)");
+                break;
+              case FOURIER_UNIT_FREQ:
+                str += TString(" Frequency (MHz)");
+                break;
+              case FOURIER_UNIT_CYCLES:
+                str += TString(" Angular Frequency (Mc/s)");
+                break;
+              default:
+                str += TString(" ????");
+                break;
+            }
+            str += TString(", ");
+            fout << endl << str.Data();
+            for (unsigned int j=0; j<fData.size()-1; j++) {
+              fout << "PhaseFourierData" << j << ", PhaseFourierTheo" << j << ", ";
+            }
+            fout << "PhaseFourierData" << fData.size()-1 << ", PhaseFourierTheo" << fData.size()-1;
+            fout << endl;
+            // get current x-range
+            xminBin = fData[0].dataFourierPhase->GetXaxis()->GetFirst(); // first bin of the zoomed range
+            xmaxBin = fData[0].dataFourierPhase->GetXaxis()->GetLast();  // last bin of the zoomed range
+            xmin = fData[0].dataFourierPhase->GetXaxis()->GetBinCenter(xminBin);
+            xmax = fData[0].dataFourierPhase->GetXaxis()->GetBinCenter(xmaxBin);
+            // get data
+            for (int i=1; i<fData[0].dataFourierPhase->GetNbinsX()-1; i++) {
+              xval = fData[0].dataFourierPhase->GetBinCenter(i); // get x-unit
+              if ((xval < xmin) || (xval > xmax))
+                continue;
+              fout << xval << ", ";
+              for (unsigned int j=0; j<fData.size()-1; j++) {
+                fout << fData[j].dataFourierPhase->GetBinContent(i) << ", ";
+                theoBin = fData[j].theoryFourierPhase->FindBin(xval);
+                fout << fData[j].theoryFourierPhase->GetBinContent(theoBin) << ", ";
+              }
+              // write last data set
+              fout << fData[fData.size()-1].dataFourierPhase->GetBinContent(i) << ", ";
+              theoBin = fData[fData.size()-1].theoryFourierPhase->FindBin(xval);
+              fout << fData[fData.size()-1].theoryFourierPhase->GetBinContent(theoBin);
+              fout << endl;
+            }
             break;
           default:
             break;
@@ -2081,6 +2318,8 @@ void PMusrCanvas::SaveDataAscii()
           case PV_FOURIER_REAL:
             break;
           case PV_FOURIER_IMAG:
+            break;
+          case PV_FOURIER_REAL_AND_IMAG:
             break;
           case PV_FOURIER_PWR:
             break;
@@ -2132,6 +2371,8 @@ void PMusrCanvas::SaveDataAscii()
           case PV_FOURIER_REAL:
             break;
           case PV_FOURIER_IMAG:
+            break;
+          case PV_FOURIER_REAL_AND_IMAG:
             break;
           case PV_FOURIER_PWR:
             break;
@@ -2248,6 +2489,8 @@ void PMusrCanvas::SaveDataDb()
             break;
           case PV_FOURIER_IMAG:
             break;
+          case PV_FOURIER_REAL_AND_IMAG:
+            break;
           case PV_FOURIER_PWR:
             break;
           case PV_FOURIER_PHASE:
@@ -2270,7 +2513,7 @@ void PMusrCanvas::SaveDataDb()
             fout << endl;
             fout << "DATA t ";
             for (unsigned int j=0; j<fData.size(); j++) {
-              fout << "diff" << j << " " << "theo" << j << " ";
+              fout << "data" << j << " " << "theo" << j << " ";
             }
             fout << endl;
             fout << "\\-e" << endl;
@@ -2301,12 +2544,362 @@ void PMusrCanvas::SaveDataDb()
             }
             break;
           case PV_FOURIER_REAL:
+            // write header
+            fout << "TITLE" << endl;
+            fout << "  " << fMsrHandler->GetMsrTitle()->Data() << endl;
+            fout << "LABELS" << endl;
+            switch (fFourier.fUnits) {
+              case FOURIER_UNIT_FIELD:
+                str = TString("  Field (G)");
+                break;
+              case FOURIER_UNIT_FREQ:
+                str = TString("  Frequency (MHz)");
+                break;
+              case FOURIER_UNIT_CYCLES:
+                str = TString("  Angular Frequency (Mc/s)");
+                break;
+              default:
+                str = TString("  ????");
+                break;
+            }
+            fout << str.Data() << endl;
+            for (unsigned int j=0; j<fData.size(); j++) {
+              fout << "  DataFourierRe" << j << endl;
+              fout << "  TheoFourierRe" << j << endl;
+            }
+            fout << endl;
+            fout << "DATA ";
+            switch (fFourier.fUnits) {
+              case FOURIER_UNIT_FIELD:
+                str = TString("field");
+                break;
+              case FOURIER_UNIT_FREQ:
+                str = TString("freq");
+                break;
+              case FOURIER_UNIT_CYCLES:
+                str = TString("cycles");
+                break;
+              default:
+                str = TString("????");
+                break;
+            }
+            fout << str.Data() << " ";
+            for (unsigned int j=0; j<fData.size(); j++) {
+              fout << "dataFourierRe" << j << " " << "theoFourierRe" << j << " ";
+            }
+            fout << endl;
+            fout << "\\-e" << endl;
+
+            // get current x-range
+            xminBin = fData[0].dataFourierRe->GetXaxis()->GetFirst(); // first bin of the zoomed range
+            xmaxBin = fData[0].dataFourierRe->GetXaxis()->GetLast();  // last bin of the zoomed range
+            xmin = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xminBin);
+            xmax = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xmaxBin);
+            // get data
+            for (int i=1; i<fData[0].dataFourierRe->GetNbinsX()-1; i++) {
+              xval = fData[0].dataFourierRe->GetBinCenter(i); // get x-val
+              if ((xval < xmin) || (xval > xmax))
+                continue;
+              fout << xval << ",,, ";
+              for (unsigned int j=0; j<fData.size()-1; j++) {
+                fout << fData[j].dataFourierRe->GetBinContent(i) << ",,, ";
+                theoBin = fData[j].theoryFourierRe->FindBin(xval);
+                fout << fData[j].theoryFourierRe->GetBinContent(theoBin) << ",,, ";
+              }
+              // write last data set
+              fout << fData[fData.size()-1].dataFourierRe->GetBinContent(i) << ",,, ";
+              theoBin = fData[fData.size()-1].theoryFourierRe->FindBin(xval);
+              fout << fData[fData.size()-1].theoryFourierRe->GetBinContent(theoBin) << ",,, ";
+              fout << endl;
+            }
             break;
           case PV_FOURIER_IMAG:
+            // write header
+            fout << "TITLE" << endl;
+            fout << "  " << fMsrHandler->GetMsrTitle()->Data() << endl;
+            fout << "LABELS" << endl;
+            switch (fFourier.fUnits) {
+              case FOURIER_UNIT_FIELD:
+                str = TString("  Field (G)");
+                break;
+              case FOURIER_UNIT_FREQ:
+                str = TString("  Frequency (MHz)");
+                break;
+              case FOURIER_UNIT_CYCLES:
+                str = TString("  Angular Frequency (Mc/s)");
+                break;
+              default:
+                str = TString("  ????");
+                break;
+            }
+            fout << str.Data() << endl;
+            for (unsigned int j=0; j<fData.size(); j++) {
+              fout << "  DataFourierIm" << j << endl;
+              fout << "  TheoFourierIm" << j << endl;
+            }
+            fout << endl;
+            fout << "DATA ";
+            switch (fFourier.fUnits) {
+              case FOURIER_UNIT_FIELD:
+                str = TString("field");
+                break;
+              case FOURIER_UNIT_FREQ:
+                str = TString("freq");
+                break;
+              case FOURIER_UNIT_CYCLES:
+                str = TString("cycles");
+                break;
+              default:
+                str = TString("????");
+                break;
+            }
+            fout << str.Data() << " ";
+            for (unsigned int j=0; j<fData.size(); j++) {
+              fout << "dataFourierIm" << j << " " << "theoFourierIm" << j << " ";
+            }
+            fout << endl;
+            fout << "\\-e" << endl;
+
+            // get current x-range
+            xminBin = fData[0].dataFourierIm->GetXaxis()->GetFirst(); // first bin of the zoomed range
+            xmaxBin = fData[0].dataFourierIm->GetXaxis()->GetLast();  // last bin of the zoomed range
+            xmin = fData[0].dataFourierIm->GetXaxis()->GetBinCenter(xminBin);
+            xmax = fData[0].dataFourierIm->GetXaxis()->GetBinCenter(xmaxBin);
+            // get data
+            for (int i=1; i<fData[0].dataFourierIm->GetNbinsX()-1; i++) {
+              xval = fData[0].dataFourierIm->GetBinCenter(i); // get x-val
+              if ((xval < xmin) || (xval > xmax))
+                continue;
+              fout << xval << ",,, ";
+              for (unsigned int j=0; j<fData.size()-1; j++) {
+                fout << fData[j].dataFourierIm->GetBinContent(i) << ",,, ";
+                theoBin = fData[j].theoryFourierIm->FindBin(xval);
+                fout << fData[j].theoryFourierIm->GetBinContent(theoBin) << ",,, ";
+              }
+              // write last data set
+              fout << fData[fData.size()-1].dataFourierIm->GetBinContent(i) << ",,, ";
+              theoBin = fData[fData.size()-1].theoryFourierIm->FindBin(xval);
+              fout << fData[fData.size()-1].theoryFourierIm->GetBinContent(theoBin) << ",,, ";
+              fout << endl;
+            }
+            break;
+          case PV_FOURIER_REAL_AND_IMAG:
+            // write header
+            fout << "TITLE" << endl;
+            fout << "  " << fMsrHandler->GetMsrTitle()->Data() << endl;
+            fout << "LABELS" << endl;
+            switch (fFourier.fUnits) {
+              case FOURIER_UNIT_FIELD:
+                str = TString("  Field (G)");
+                break;
+              case FOURIER_UNIT_FREQ:
+                str = TString("  Frequency (MHz)");
+                break;
+              case FOURIER_UNIT_CYCLES:
+                str = TString("  Angular Frequency (Mc/s)");
+                break;
+              default:
+                str = TString("  ????");
+                break;
+            }
+            fout << str.Data() << endl;
+            for (unsigned int j=0; j<fData.size(); j++) {
+              fout << "  DataFourierRe" << j << endl;
+              fout << "  TheoFourierRe" << j << endl;
+              fout << "  DataFourierIm" << j << endl;
+              fout << "  TheoFourierIm" << j << endl;
+            }
+            fout << endl;
+            fout << "DATA ";
+            switch (fFourier.fUnits) {
+              case FOURIER_UNIT_FIELD:
+                str = TString("field");
+                break;
+              case FOURIER_UNIT_FREQ:
+                str = TString("freq");
+                break;
+              case FOURIER_UNIT_CYCLES:
+                str = TString("cycles");
+                break;
+              default:
+                str = TString(" ????");
+                break;
+            }
+            fout << str.Data() << " ";
+            for (unsigned int j=0; j<fData.size(); j++) {
+              fout << "dataFourierRe" << j << " " << "theoFourierRe" << j << " " << "dataFourierIm" << j << " " << "theoFourierIm" << j << " ";
+            }
+            fout << endl;
+            fout << "\\-e" << endl;
+
+            // get current x-range
+            xminBin = fData[0].dataFourierRe->GetXaxis()->GetFirst(); // first bin of the zoomed range
+            xmaxBin = fData[0].dataFourierRe->GetXaxis()->GetLast();  // last bin of the zoomed range
+            xmin = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xminBin);
+            xmax = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xmaxBin);
+            // get data
+            for (int i=1; i<fData[0].dataFourierRe->GetNbinsX()-1; i++) {
+              xval = fData[0].dataFourierRe->GetBinCenter(i); // get x-val
+              if ((xval < xmin) || (xval > xmax))
+                continue;
+              fout << xval << ",,, ";
+              for (unsigned int j=0; j<fData.size()-1; j++) {
+                fout << fData[j].dataFourierRe->GetBinContent(i) << ",,, ";
+                theoBin = fData[j].theoryFourierRe->FindBin(xval);
+                fout << fData[j].theoryFourierRe->GetBinContent(theoBin) << ",,, ";
+                fout << fData[j].dataFourierIm->GetBinContent(i) << ",,, ";
+                theoBin = fData[j].theoryFourierIm->FindBin(xval);
+                fout << fData[j].theoryFourierIm->GetBinContent(theoBin) << ",,, ";
+              }
+              // write last data set
+              fout << fData[fData.size()-1].dataFourierRe->GetBinContent(i) << ",,, ";
+              theoBin = fData[fData.size()-1].theoryFourierRe->FindBin(xval);
+              fout << fData[fData.size()-1].theoryFourierRe->GetBinContent(theoBin) << ",,, ";
+              fout << fData[fData.size()-1].dataFourierIm->GetBinContent(i) << ",,, ";
+              theoBin = fData[fData.size()-1].theoryFourierIm->FindBin(xval);
+              fout << fData[fData.size()-1].theoryFourierIm->GetBinContent(theoBin) << ",,, ";
+              fout << endl;
+            }
             break;
           case PV_FOURIER_PWR:
+            // write header
+            fout << "TITLE" << endl;
+            fout << "  " << fMsrHandler->GetMsrTitle()->Data() << endl;
+            fout << "LABELS" << endl;
+            switch (fFourier.fUnits) {
+              case FOURIER_UNIT_FIELD:
+                str = TString("  Field (G)");
+                break;
+              case FOURIER_UNIT_FREQ:
+                str = TString("  Frequency (MHz)");
+                break;
+              case FOURIER_UNIT_CYCLES:
+                str = TString("  Angular Frequency (Mc/s)");
+                break;
+              default:
+                str = TString("  ????");
+                break;
+            }
+            fout << str.Data() << endl;
+            for (unsigned int j=0; j<fData.size(); j++) {
+              fout << "  DataFourierPwr" << j << endl;
+              fout << "  TheoFourierPwr" << j << endl;
+            }
+            fout << endl;
+            fout << "DATA ";
+            switch (fFourier.fUnits) {
+              case FOURIER_UNIT_FIELD:
+                str = TString("field");
+                break;
+              case FOURIER_UNIT_FREQ:
+                str = TString("freq");
+                break;
+              case FOURIER_UNIT_CYCLES:
+                str = TString("cycles");
+                break;
+              default:
+                str = TString("????");
+                break;
+            }
+            fout << str.Data() << " ";
+            for (unsigned int j=0; j<fData.size(); j++) {
+              fout << "dataFourierPwr" << j << " " << "theoFourierPwr" << j << " ";
+            }
+            fout << endl;
+            fout << "\\-e" << endl;
+
+            // get current x-range
+            xminBin = fData[0].dataFourierPwr->GetXaxis()->GetFirst(); // first bin of the zoomed range
+            xmaxBin = fData[0].dataFourierPwr->GetXaxis()->GetLast();  // last bin of the zoomed range
+            xmin = fData[0].dataFourierPwr->GetXaxis()->GetBinCenter(xminBin);
+            xmax = fData[0].dataFourierPwr->GetXaxis()->GetBinCenter(xmaxBin);
+            // get data
+            for (int i=1; i<fData[0].dataFourierPwr->GetNbinsX()-1; i++) {
+              xval = fData[0].dataFourierPwr->GetBinCenter(i); // get x-val
+              if ((xval < xmin) || (xval > xmax))
+                continue;
+              fout << xval << ",,, ";
+              for (unsigned int j=0; j<fData.size()-1; j++) {
+                fout << fData[j].dataFourierPwr->GetBinContent(i) << ",,, ";
+                theoBin = fData[j].theoryFourierPwr->FindBin(xval);
+                fout << fData[j].theoryFourierPwr->GetBinContent(theoBin) << ",,, ";
+              }
+              // write last data set
+              fout << fData[fData.size()-1].dataFourierPwr->GetBinContent(i) << ",,, ";
+              theoBin = fData[fData.size()-1].theoryFourierPwr->FindBin(xval);
+              fout << fData[fData.size()-1].theoryFourierPwr->GetBinContent(theoBin) << ",,, ";
+              fout << endl;
+            }
             break;
           case PV_FOURIER_PHASE:
+            // write header
+            fout << "TITLE" << endl;
+            fout << "  " << fMsrHandler->GetMsrTitle()->Data() << endl;
+            fout << "LABELS" << endl;
+            switch (fFourier.fUnits) {
+              case FOURIER_UNIT_FIELD:
+                str = TString("  Field (G)");
+                break;
+              case FOURIER_UNIT_FREQ:
+                str = TString("  Frequency (MHz)");
+                break;
+              case FOURIER_UNIT_CYCLES:
+                str = TString("  Angular Frequency (Mc/s)");
+                break;
+              default:
+                str = TString("  ????");
+                break;
+            }
+            fout << str.Data() << endl;
+            for (unsigned int j=0; j<fData.size(); j++) {
+              fout << "  DataFourierPhase" << j << endl;
+              fout << "  TheoFourierPhase" << j << endl;
+            }
+            fout << endl;
+            fout << "DATA ";
+            switch (fFourier.fUnits) {
+              case FOURIER_UNIT_FIELD:
+                str = TString("field");
+                break;
+              case FOURIER_UNIT_FREQ:
+                str = TString("freq");
+                break;
+              case FOURIER_UNIT_CYCLES:
+                str = TString("cycles");
+                break;
+              default:
+                str = TString("????");
+                break;
+            }
+            fout << str.Data() << " ";
+            for (unsigned int j=0; j<fData.size(); j++) {
+              fout << "dataFourierPhase" << j << " " << "theoFourierPhase" << j << " ";
+            }
+            fout << endl;
+            fout << "\\-e" << endl;
+
+            // get current x-range
+            xminBin = fData[0].dataFourierPhase->GetXaxis()->GetFirst(); // first bin of the zoomed range
+            xmaxBin = fData[0].dataFourierPhase->GetXaxis()->GetLast();  // last bin of the zoomed range
+            xmin = fData[0].dataFourierPhase->GetXaxis()->GetBinCenter(xminBin);
+            xmax = fData[0].dataFourierPhase->GetXaxis()->GetBinCenter(xmaxBin);
+            // get data
+            for (int i=1; i<fData[0].dataFourierPhase->GetNbinsX()-1; i++) {
+              xval = fData[0].dataFourierPhase->GetBinCenter(i); // get x-val
+              if ((xval < xmin) || (xval > xmax))
+                continue;
+              fout << xval << ",,, ";
+              for (unsigned int j=0; j<fData.size()-1; j++) {
+                fout << fData[j].dataFourierPhase->GetBinContent(i) << ",,, ";
+                theoBin = fData[j].theoryFourierPhase->FindBin(xval);
+                fout << fData[j].theoryFourierPhase->GetBinContent(theoBin) << ",,, ";
+              }
+              // write last data set
+              fout << fData[fData.size()-1].dataFourierPhase->GetBinContent(i) << ",,, ";
+              theoBin = fData[fData.size()-1].theoryFourierPhase->FindBin(xval);
+              fout << fData[fData.size()-1].theoryFourierPhase->GetBinContent(theoBin) << ",,, ";
+              fout << endl;
+            }
             break;
           default:
             break;
@@ -2360,6 +2953,8 @@ void PMusrCanvas::SaveDataDb()
           case PV_FOURIER_REAL:
             break;
           case PV_FOURIER_IMAG:
+            break;
+          case PV_FOURIER_REAL_AND_IMAG:
             break;
           case PV_FOURIER_PWR:
             break;
@@ -2421,6 +3016,8 @@ void PMusrCanvas::SaveDataDb()
           case PV_FOURIER_REAL:
             break;
           case PV_FOURIER_IMAG:
+            break;
+          case PV_FOURIER_REAL_AND_IMAG:
             break;
           case PV_FOURIER_PWR:
             break;
