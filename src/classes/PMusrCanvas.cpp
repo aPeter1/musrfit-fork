@@ -71,6 +71,9 @@ PMusrCanvas::PMusrCanvas()
   fInfoPad             = 0;
 
   InitFourier();
+
+  fCurrentFourierPhase = fFourier.fPhaseIncrement;
+  fCurrentFourierPhaseText = 0;
 }
 
 //--------------------------------------------------------------------------
@@ -86,6 +89,9 @@ PMusrCanvas::PMusrCanvas(const int number, const char* title,
   InitFourier();
   CreateStyle();
   InitMusrCanvas(title, wtopx, wtopy, ww, wh);
+
+  fCurrentFourierPhase = fFourier.fPhaseIncrement;
+  fCurrentFourierPhaseText = 0;
 }
 
 //--------------------------------------------------------------------------
@@ -103,6 +109,9 @@ PMusrCanvas::PMusrCanvas(const int number, const char* title,
 {
   CreateStyle();
   InitMusrCanvas(title, wtopx, wtopy, ww, wh);
+
+  fCurrentFourierPhase = fFourier.fPhaseIncrement;
+  fCurrentFourierPhaseText = 0;
 }
 
 //--------------------------------------------------------------------------
@@ -151,6 +160,10 @@ cout << "~PMusrCanvas() called. fMainCanvas name=" << fMainCanvas->GetName() << 
     for (unsigned int i=0; i<fNonMusrData.size(); i++)
       CleanupDataSet(fNonMusrData[i]);
     fNonMusrData.clear();
+  }
+  if (fCurrentFourierPhaseText) {
+    delete fCurrentFourierPhaseText;
+    fCurrentFourierPhaseText = 0;
   }
 }
 
@@ -1596,10 +1609,11 @@ cout << endl << ">> in PlotFourier() ..." << endl;
     xAxisTitle = TString("??");
   }
 
+
   // plot data
   double min, max, binContent;
   switch (fCurrentPlotView) {
-    case PV_FOURIER_REAL:
+    case PV_FOURIER_REAL:     
 //cout << endl << ">> fData[0].dataFourierRe->GetNbinsX() = " << fData[0].dataFourierRe->GetNbinsX();
       // plot first histo
       fData[0].dataFourierRe->Draw("pe");
@@ -1647,6 +1661,9 @@ cout << endl << ">> in PlotFourier() ..." << endl;
       for (unsigned int i=0; i<fData.size(); i++) {
         fData[i].theoryFourierRe->Draw("esame");
       }
+
+      PlotFourierPhaseValue();
+
       break;
     case PV_FOURIER_IMAG:
       // plot first histo
@@ -1691,6 +1708,9 @@ cout << endl << ">> in PlotFourier() ..." << endl;
       for (unsigned int i=0; i<fData.size(); i++) {
         fData[i].theoryFourierIm->Draw("esame");
       }
+
+      PlotFourierPhaseValue();
+
       break;
     case PV_FOURIER_REAL_AND_IMAG:
       break;
@@ -1790,6 +1810,42 @@ cout << endl << ">> in PlotFourier() ..." << endl;
 
   fMainCanvas->cd();
   fMainCanvas->Update();
+}
+
+//--------------------------------------------------------------------------
+// PlotFourierPhaseValue
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrCanvas::PlotFourierPhaseValue()
+{
+  // check if phase TLatex object is present
+  if (fCurrentFourierPhaseText) {
+    delete fCurrentFourierPhaseText;
+    fCurrentFourierPhaseText = 0;
+  }
+
+  double x, y;
+  TString str;
+
+   // plot Fourier phase
+   str = TString("phase = ");
+   str += fCurrentFourierPhase;   
+   x = 0.7;
+   y = 0.85;
+   fCurrentFourierPhaseText = new TLatex();
+   fCurrentFourierPhaseText->SetNDC(kTRUE);
+   fCurrentFourierPhaseText->SetText(x, y, str.Data());
+   fCurrentFourierPhaseText->SetTextFont(62);
+   fCurrentFourierPhaseText->SetTextSize(0.03);
+
+   fDataTheoryPad->cd();
+
+   fCurrentFourierPhaseText->Draw();
+
+   fDataTheoryPad->Update();
 }
 
 //--------------------------------------------------------------------------
@@ -2457,6 +2513,38 @@ cout << endl << ">> theory scale = " << scale << ", data.res/theory.res = " << f
         fData[i].theoryFourierPwr->SetLineColor(fData[i].theory->GetLineColor());
         fData[i].theoryFourierPhase->SetLineColor(fData[i].theory->GetLineColor());
       }
+
+      // apply global phase
+      if (fFourier.fPhase != 0.0) {
+        double re, im;
+        const double cp = TMath::Cos(fFourier.fPhase/180.0*TMath::Pi());
+        const double sp = TMath::Sin(fFourier.fPhase/180.0*TMath::Pi());
+
+        fCurrentFourierPhase = fFourier.fPhase;
+
+        for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
+          if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
+            for (int j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+              // calculate new fourier data set value
+              re = fData[i].dataFourierRe->GetBinContent(j) * cp + fData[i].dataFourierIm->GetBinContent(j) * sp;
+              im = fData[i].dataFourierIm->GetBinContent(j) * cp - fData[i].dataFourierRe->GetBinContent(j) * sp;
+              // overwrite fourier data set value
+              fData[i].dataFourierRe->SetBinContent(j, re);
+              fData[i].dataFourierIm->SetBinContent(j, im);
+            }
+          }
+          if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
+            for (int j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+              // calculate new fourier data set value
+              re = fData[i].theoryFourierRe->GetBinContent(j) * cp + fData[i].theoryFourierIm->GetBinContent(j) * sp;
+              im = fData[i].theoryFourierIm->GetBinContent(j) * cp - fData[i].theoryFourierRe->GetBinContent(j) * sp;
+              // overwrite fourier data set value
+              fData[i].theoryFourierRe->SetBinContent(j, re);
+              fData[i].theoryFourierIm->SetBinContent(j, im);
+            }
+          }
+        }
+      }
     } else { // calculate diff fourier
       // delete fourier components
       for (unsigned int i=0; i<fData.size(); i++) {
@@ -2532,22 +2620,25 @@ void PMusrCanvas::IncrementFourierPhase()
   const double cp = TMath::Cos(fFourier.fPhaseIncrement/180.0*TMath::Pi());
   const double sp = TMath::Sin(fFourier.fPhaseIncrement/180.0*TMath::Pi());
 
+  fCurrentFourierPhase += fFourier.fPhaseIncrement;
+  PlotFourierPhaseValue();
+
   for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
     if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
-      for (int j=1; j<fData[i].dataFourierRe->GetNbinsX()-1; j++) { // loop over a fourier data set
+      for (int j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
         // calculate new fourier data set value
-        re = fData[i].dataFourierRe->GetBinContent(j) * cp - fData[i].dataFourierIm->GetBinContent(j) * sp;
-        im = fData[i].dataFourierIm->GetBinContent(j) * cp + fData[i].dataFourierIm->GetBinContent(j) * sp;
+        re = fData[i].dataFourierRe->GetBinContent(j) * cp + fData[i].dataFourierIm->GetBinContent(j) * sp;
+        im = fData[i].dataFourierIm->GetBinContent(j) * cp - fData[i].dataFourierRe->GetBinContent(j) * sp;
         // overwrite fourier data set value
         fData[i].dataFourierRe->SetBinContent(j, re);
         fData[i].dataFourierIm->SetBinContent(j, im);
       }
     }
     if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
-      for (int j=1; j<fData[i].theoryFourierRe->GetNbinsX()-1; j++) { // loop over a fourier data set
+      for (int j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
         // calculate new fourier data set value
-        re = fData[i].theoryFourierRe->GetBinContent(j) * cp - fData[i].theoryFourierIm->GetBinContent(j) * sp;
-        im = fData[i].theoryFourierIm->GetBinContent(j) * cp + fData[i].theoryFourierIm->GetBinContent(j) * sp;
+        re = fData[i].theoryFourierRe->GetBinContent(j) * cp + fData[i].theoryFourierIm->GetBinContent(j) * sp;
+        im = fData[i].theoryFourierIm->GetBinContent(j) * cp - fData[i].theoryFourierRe->GetBinContent(j) * sp;
         // overwrite fourier data set value
         fData[i].theoryFourierRe->SetBinContent(j, re);
         fData[i].theoryFourierIm->SetBinContent(j, im);
@@ -2570,22 +2661,25 @@ void PMusrCanvas::DecrementFourierPhase()
   const double cp = TMath::Cos(fFourier.fPhaseIncrement/180.0*TMath::Pi());
   const double sp = TMath::Sin(fFourier.fPhaseIncrement/180.0*TMath::Pi());
 
+  fCurrentFourierPhase -= fFourier.fPhaseIncrement;
+  PlotFourierPhaseValue();
+
   for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
     if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
-      for (int j=1; j<fData[i].dataFourierRe->GetNbinsX()-1; j++) { // loop over a fourier data set
+      for (int j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
         // calculate new fourier data set value
-        re = fData[i].dataFourierRe->GetBinContent(j) * cp + fData[i].dataFourierIm->GetBinContent(j) * sp;
-        im = fData[i].dataFourierIm->GetBinContent(j) * cp - fData[i].dataFourierIm->GetBinContent(j) * sp;
+        re = fData[i].dataFourierRe->GetBinContent(j) * cp - fData[i].dataFourierIm->GetBinContent(j) * sp;
+        im = fData[i].dataFourierIm->GetBinContent(j) * cp + fData[i].dataFourierRe->GetBinContent(j) * sp;
         // overwrite fourier data set value
         fData[i].dataFourierRe->SetBinContent(j, re);
         fData[i].dataFourierIm->SetBinContent(j, im);
       }
     }
     if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
-      for (int j=1; j<fData[i].theoryFourierRe->GetNbinsX()-1; j++) { // loop over a fourier data set
+      for (int j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
         // calculate new fourier data set value
-        re = fData[i].theoryFourierRe->GetBinContent(j) * cp + fData[i].theoryFourierIm->GetBinContent(j) * sp;
-        im = fData[i].theoryFourierIm->GetBinContent(j) * cp - fData[i].theoryFourierIm->GetBinContent(j) * sp;
+        re = fData[i].theoryFourierRe->GetBinContent(j) * cp - fData[i].theoryFourierIm->GetBinContent(j) * sp;
+        im = fData[i].theoryFourierIm->GetBinContent(j) * cp + fData[i].theoryFourierRe->GetBinContent(j) * sp;
         // overwrite fourier data set value
         fData[i].theoryFourierRe->SetBinContent(j, re);
         fData[i].theoryFourierIm->SetBinContent(j, im);

@@ -43,6 +43,7 @@
 #include <TPad.h>
 #include <TH1F.h>
 #include <TGraphErrors.h>
+#include <TLatex.h>
 
 #include "PMusr.h"
 #ifndef __MAKECINT__
@@ -176,6 +177,9 @@ class PMusrCanvas : public TObject, public TQObject
     Int_t  fPlotType;
     Int_t  fPlotNumber;
 
+    Double_t fCurrentFourierPhase;    /// holds the current Fourier phase
+    TLatex *fCurrentFourierPhaseText; /// used in Re/Im Fourier to show the current phase in the pad
+
     TStyle    *fStyle;
 
     // canvas menu related variables
@@ -226,6 +230,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void PlotData();
     virtual void PlotDifference();
     virtual void PlotFourier();
+    virtual void PlotFourierPhaseValue();
     virtual void IncrementFourierPhase();
     virtual void DecrementFourierPhase();
 
