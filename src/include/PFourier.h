@@ -34,10 +34,10 @@
 
 #include "fftw3.h"
 
-#define F_APODIZATION_NONE   0
-#define F_APODIZATION_WEAK   1
-#define F_APODIZATION_MEDIUM 2
-#define F_APODIZATION_STRONG 3
+#define F_APODIZATION_NONE   1
+#define F_APODIZATION_WEAK   2
+#define F_APODIZATION_MEDIUM 3
+#define F_APODIZATION_STRONG 4
 
 // gamma_muon / (2 pi) = 1.355342e-2 (MHz/G)
 #define F_GAMMA_BAR_MUON  1.355342e-2
