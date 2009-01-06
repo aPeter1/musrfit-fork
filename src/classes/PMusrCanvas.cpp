@@ -410,7 +410,6 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   } else if (x == 'f') {
     if (fPlotType != MSR_PLOT_NON_MUSR) {
       HandleFourier(-1);
-      cout << endl << ">> will show the Fourier transform, to be implemented yet." << endl;
     }
   } else if (x == '+') {
     IncrementFourierPhase();
@@ -456,10 +455,6 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS) {
     DecrementFourierPhase();
   } else if (id == P_MENU_ID_DIFFERENCE+P_MENU_PLOT_OFFSET*fPlotNumber) {
-    if (fPopupMain->IsEntryChecked(id))
-      fPopupMain->UnCheckEntry(id);
-    else
-      fPopupMain->CheckEntry(id);
     HandleDifference();
   } else if (id == P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_ASCII) {
     SaveDataAscii();
@@ -1187,13 +1182,16 @@ void PMusrCanvas::HandleNonMusrDataSet(unsigned int plotNo, unsigned int runNo, 
  */
 void PMusrCanvas::HandleDifference()
 {
-  cout << endl << ">> will show the difference between the theory and the signal, to be implemented yet. fMainCanvas name = " << fMainCanvas->GetName();
-  cout << endl;
-
   // toggle difference view flag
   fDifferenceView = !fDifferenceView;
 
-  // difference plot wished hence feed difference data and plot them 
+  // handle popup menu entry
+  if (fDifferenceView)
+    fPopupMain->CheckEntry(P_MENU_ID_DIFFERENCE+P_MENU_PLOT_OFFSET*fPlotNumber);
+  else
+    fPopupMain->UnCheckEntry(P_MENU_ID_DIFFERENCE+P_MENU_PLOT_OFFSET*fPlotNumber);
+
+  // difference plot wished hence feed difference data and plot them
   if (fDifferenceView && (fCurrentPlotView == PV_DATA)) {
     // check if it is necessary to calculate diff data
     if ((fPlotType != MSR_PLOT_NON_MUSR) && (fData[0].diff == 0)) {
@@ -1296,9 +1294,21 @@ void PMusrCanvas::HandleDifference()
 
   // switch back to the "normal" view
   if (!fDifferenceView) {
-    // set current x-axis range
     if (fCurrentPlotView == PV_DATA)
-      PlotData();
+    switch (fCurrentPlotView) {
+      case PV_DATA:
+        PlotData();
+        break;
+      case PV_FOURIER_REAL:
+      case PV_FOURIER_IMAG:
+      case PV_FOURIER_REAL_AND_IMAG:
+      case PV_FOURIER_PWR:
+      case PV_FOURIER_PHASE:
+        PlotFourier();
+        break;
+      default:
+        break;
+    }
   } else {
     if (fCurrentPlotView == PV_DATA) {
       if (fPlotType != MSR_PLOT_NON_MUSR) {
@@ -1612,256 +1622,490 @@ cout << endl << ">> in PlotFourier() ..." << endl;
 
   // plot data
   double min, max, binContent;
-  switch (fCurrentPlotView) {
-    case PV_FOURIER_REAL:     
+  if (!fDifferenceView) { // not a difference view
+    switch (fCurrentPlotView) {
+      case PV_FOURIER_REAL:
 //cout << endl << ">> fData[0].dataFourierRe->GetNbinsX() = " << fData[0].dataFourierRe->GetNbinsX();
-      // plot first histo
-      fData[0].dataFourierRe->Draw("pe");
+        // plot first histo
+        fData[0].dataFourierRe->Draw("p");
 
-      // set x-range
+        // set x-range
 //cout << endl << ">> fPlotRange = " << fFourier.fPlotRange[0] << ", " << fFourier.fPlotRange[1];
-      if ((fFourier.fPlotRange[0] != -1) && (fFourier.fPlotRange[1] != -1)) {
-        min = fFourier.fPlotRange[0];
-        max = fFourier.fPlotRange[1];
-      } else {
-        min = fData[0].dataFourierRe->GetBinLowEdge(1);
-        max = fData[0].dataFourierRe->GetBinLowEdge(fData[0].dataFourierRe->GetNbinsX())+fData[0].dataFourierRe->GetBinWidth(1);
-      }
+        if ((fFourier.fPlotRange[0] != -1) && (fFourier.fPlotRange[1] != -1)) {
+          min = fFourier.fPlotRange[0];
+          max = fFourier.fPlotRange[1];
+        } else {
+          min = fData[0].dataFourierRe->GetBinLowEdge(1);
+          max = fData[0].dataFourierRe->GetBinLowEdge(fData[0].dataFourierRe->GetNbinsX())+fData[0].dataFourierRe->GetBinWidth(1);
+        }
 //cout << endl << ">> x-range: min, max = " << min << ", " << max;
-      fData[0].dataFourierRe->GetXaxis()->SetRangeUser(min, max);
+        fData[0].dataFourierRe->GetXaxis()->SetRangeUser(min, max);
 
-      // set y-range
-      // first find minimum/maximum of all histos
-      min = GetGlobalMinimum(fData[0].dataFourierRe);
-      max = GetGlobalMaximum(fData[0].dataFourierRe);
+        // set y-range
+        // first find minimum/maximum of all histos
+        min = GetGlobalMinimum(fData[0].dataFourierRe);
+        max = GetGlobalMaximum(fData[0].dataFourierRe);
 //cout << endl << ">> y-range: min, max = " << min << ", " << max;
-      for (unsigned int i=1; i<fData.size(); i++) {
-        binContent = GetGlobalMinimum(fData[i].dataFourierRe);
-        if (binContent < min)
-          min = binContent;
-        binContent = GetGlobalMaximum(fData[i].dataFourierRe);
-        if (binContent > max)
-          max = binContent;
-      }
-      fData[0].dataFourierRe->GetYaxis()->SetRangeUser(1.05*min, 1.05*max);
+        for (unsigned int i=1; i<fData.size(); i++) {
+          binContent = GetGlobalMinimum(fData[i].dataFourierRe);
+          if (binContent < min)
+            min = binContent;
+          binContent = GetGlobalMaximum(fData[i].dataFourierRe);
+          if (binContent > max)
+            max = binContent;
+        }
+        fData[0].dataFourierRe->GetYaxis()->SetRangeUser(1.05*min, 1.05*max);
 //cout << endl << "-> min, max = " << min << ", " << max;
 
-      // set x-axis title
-      fData[0].dataFourierRe->GetXaxis()->SetTitle(xAxisTitle.Data());
+        // set x-axis title
+        fData[0].dataFourierRe->GetXaxis()->SetTitle(xAxisTitle.Data());
 
-      // set y-axis title
-      fData[0].dataFourierRe->GetYaxis()->SetTitle("Real Fourier");
+        // set y-axis title
+        fData[0].dataFourierRe->GetYaxis()->SetTitle("Real Fourier");
 
-      // plot all remaining data
-      for (unsigned int i=1; i<fData.size(); i++) {
-        fData[i].dataFourierRe->Draw("pesame");
-      }
+        // plot all remaining data
+        for (unsigned int i=1; i<fData.size(); i++) {
+          fData[i].dataFourierRe->Draw("psame");
+        }
 
-      // plot theories
-      for (unsigned int i=0; i<fData.size(); i++) {
-        fData[i].theoryFourierRe->Draw("esame");
-      }
+        // plot theories
+        for (unsigned int i=0; i<fData.size(); i++) {
+          fData[i].theoryFourierRe->Draw("same");
+        }
 
-      PlotFourierPhaseValue();
+        PlotFourierPhaseValue();
 
-      break;
-    case PV_FOURIER_IMAG:
-      // plot first histo
-      fData[0].dataFourierIm->Draw("pe");
+        break;
+      case PV_FOURIER_IMAG:
+        // plot first histo
+        fData[0].dataFourierIm->Draw("p");
 
-      // set x-range
-      if ((fFourier.fPlotRange[0] != -1) && (fFourier.fPlotRange[1] != -1)) {
-        min = fFourier.fPlotRange[0];
-        max = fFourier.fPlotRange[1];
-      } else {
-        min = fData[0].dataFourierIm->GetBinLowEdge(1);
-        max = fData[0].dataFourierIm->GetBinLowEdge(fData[0].dataFourierIm->GetNbinsX())+fData[0].dataFourierIm->GetBinWidth(1);
-      }
-      fData[0].dataFourierIm->GetXaxis()->SetRangeUser(min, max);
+        // set x-range
+        if ((fFourier.fPlotRange[0] != -1) && (fFourier.fPlotRange[1] != -1)) {
+          min = fFourier.fPlotRange[0];
+          max = fFourier.fPlotRange[1];
+        } else {
+          min = fData[0].dataFourierIm->GetBinLowEdge(1);
+          max = fData[0].dataFourierIm->GetBinLowEdge(fData[0].dataFourierIm->GetNbinsX())+fData[0].dataFourierIm->GetBinWidth(1);
+        }
+        fData[0].dataFourierIm->GetXaxis()->SetRangeUser(min, max);
 
-      // set y-range
-      // first find minimum/maximum of all histos
-      min = GetGlobalMinimum(fData[0].dataFourierIm);
-      max = GetGlobalMaximum(fData[0].dataFourierIm);
-      for (unsigned int i=1; i<fData.size(); i++) {
-        binContent = GetGlobalMinimum(fData[i].dataFourierIm);
-        if (binContent < min)
-          min = binContent;
-        binContent = GetGlobalMaximum(fData[i].dataFourierIm);
-        if (binContent > max)
-          max = binContent;
-      }
-      fData[0].dataFourierIm->GetYaxis()->SetRangeUser(1.05*min, 1.05*max);
+        // set y-range
+        // first find minimum/maximum of all histos
+        min = GetGlobalMinimum(fData[0].dataFourierIm);
+        max = GetGlobalMaximum(fData[0].dataFourierIm);
+        for (unsigned int i=1; i<fData.size(); i++) {
+          binContent = GetGlobalMinimum(fData[i].dataFourierIm);
+          if (binContent < min)
+            min = binContent;
+          binContent = GetGlobalMaximum(fData[i].dataFourierIm);
+          if (binContent > max)
+            max = binContent;
+        }
+        fData[0].dataFourierIm->GetYaxis()->SetRangeUser(1.05*min, 1.05*max);
 
-      // set x-axis title
-      fData[0].dataFourierIm->GetXaxis()->SetTitle(xAxisTitle.Data());
+        // set x-axis title
+        fData[0].dataFourierIm->GetXaxis()->SetTitle(xAxisTitle.Data());
 
-      // set y-axis title
-      fData[0].dataFourierIm->GetYaxis()->SetTitle("Imaginary Fourier");
+        // set y-axis title
+        fData[0].dataFourierIm->GetYaxis()->SetTitle("Imaginary Fourier");
 
-      // plot all remaining data
-      for (unsigned int i=1; i<fData.size(); i++) {
-        fData[i].dataFourierIm->Draw("pesame");
-      }
+        // plot all remaining data
+        for (unsigned int i=1; i<fData.size(); i++) {
+          fData[i].dataFourierIm->Draw("psame");
+        }
 
-      // plot theories
-      for (unsigned int i=0; i<fData.size(); i++) {
-        fData[i].theoryFourierIm->Draw("esame");
-      }
+        // plot theories
+        for (unsigned int i=0; i<fData.size(); i++) {
+          fData[i].theoryFourierIm->Draw("same");
+        }
 
-      PlotFourierPhaseValue();
+        PlotFourierPhaseValue();
 
-      break;
-    case PV_FOURIER_REAL_AND_IMAG:
-      // plot first histo
-      fData[0].dataFourierRe->Draw("pe");
+        break;
+      case PV_FOURIER_REAL_AND_IMAG:
+        // plot first histo
+        fData[0].dataFourierRe->Draw("p");
 
-      // set x-range
-      if ((fFourier.fPlotRange[0] != -1) && (fFourier.fPlotRange[1] != -1)) {
-        min = fFourier.fPlotRange[0];
-        max = fFourier.fPlotRange[1];
-      } else {
-        min = fData[0].dataFourierRe->GetBinLowEdge(1);
-        max = fData[0].dataFourierRe->GetBinLowEdge(fData[0].dataFourierRe->GetNbinsX())+fData[0].dataFourierRe->GetBinWidth(1);
-      }
-      fData[0].dataFourierRe->GetXaxis()->SetRangeUser(min, max);
+        // set x-range
+        if ((fFourier.fPlotRange[0] != -1) && (fFourier.fPlotRange[1] != -1)) {
+          min = fFourier.fPlotRange[0];
+          max = fFourier.fPlotRange[1];
+        } else {
+          min = fData[0].dataFourierRe->GetBinLowEdge(1);
+          max = fData[0].dataFourierRe->GetBinLowEdge(fData[0].dataFourierRe->GetNbinsX())+fData[0].dataFourierRe->GetBinWidth(1);
+        }
+        fData[0].dataFourierRe->GetXaxis()->SetRangeUser(min, max);
 
-      // set y-range
-      // first find minimum/maximum of all histos
-      // real part first
-      min = GetGlobalMinimum(fData[0].dataFourierRe);
-      max = GetGlobalMaximum(fData[0].dataFourierRe);
-      for (unsigned int i=1; i<fData.size(); i++) {
-        binContent = GetGlobalMinimum(fData[i].dataFourierRe);
-        if (binContent < min)
-          min = binContent;
-        binContent = GetGlobalMaximum(fData[i].dataFourierRe);
-        if (binContent > max)
-          max = binContent;
-      }
-      // imag part min/max
-      for (unsigned int i=0; i<fData.size(); i++) {
-        binContent = GetGlobalMinimum(fData[i].dataFourierIm);
-        if (binContent < min)
-          min = binContent;
-        binContent = GetGlobalMaximum(fData[i].dataFourierIm);
-        if (binContent > max)
-          max = binContent;
-      }
-      fData[0].dataFourierRe->GetYaxis()->SetRangeUser(1.05*min, 1.05*max);
+        // set y-range
+        // first find minimum/maximum of all histos
+        // real part first
+        min = GetGlobalMinimum(fData[0].dataFourierRe);
+        max = GetGlobalMaximum(fData[0].dataFourierRe);
+        for (unsigned int i=1; i<fData.size(); i++) {
+          binContent = GetGlobalMinimum(fData[i].dataFourierRe);
+          if (binContent < min)
+            min = binContent;
+          binContent = GetGlobalMaximum(fData[i].dataFourierRe);
+          if (binContent > max)
+            max = binContent;
+        }
+        // imag part min/max
+        for (unsigned int i=0; i<fData.size(); i++) {
+          binContent = GetGlobalMinimum(fData[i].dataFourierIm);
+          if (binContent < min)
+            min = binContent;
+          binContent = GetGlobalMaximum(fData[i].dataFourierIm);
+          if (binContent > max)
+            max = binContent;
+        }
+        fData[0].dataFourierRe->GetYaxis()->SetRangeUser(1.05*min, 1.05*max);
 
-      // set x-axis title
-      fData[0].dataFourierRe->GetXaxis()->SetTitle(xAxisTitle.Data());
+        // set x-axis title
+        fData[0].dataFourierRe->GetXaxis()->SetTitle(xAxisTitle.Data());
 
-      // set y-axis title
-      fData[0].dataFourierRe->GetYaxis()->SetTitle("Real/Imag Fourier");
+        // set y-axis title
+        fData[0].dataFourierRe->GetYaxis()->SetTitle("Real/Imag Fourier");
 
-      // plot all remaining data
-      fData[0].dataFourierIm->Draw("pesame");
-      for (unsigned int i=1; i<fData.size(); i++) {
-        fData[i].dataFourierRe->Draw("pesame");
-        fData[i].dataFourierIm->Draw("pesame");
-      }
+        // plot all remaining data
+        fData[0].dataFourierIm->Draw("psame");
+        for (unsigned int i=1; i<fData.size(); i++) {
+          fData[i].dataFourierRe->Draw("psame");
+          fData[i].dataFourierIm->Draw("psame");
+        }
 
-      // plot theories
-      for (unsigned int i=0; i<fData.size(); i++) {
-        fData[i].theoryFourierRe->Draw("esame");
-        fData[i].theoryFourierIm->Draw("esame");
-      }
+        // plot theories
+        for (unsigned int i=0; i<fData.size(); i++) {
+          fData[i].theoryFourierRe->Draw("same");
+          fData[i].theoryFourierIm->Draw("same");
+        }
 
-      PlotFourierPhaseValue();
+        PlotFourierPhaseValue();
 
-      break;
-    case PV_FOURIER_PWR:
-      // plot first histo
-      fData[0].dataFourierPwr->Draw("pe");
+        break;
+      case PV_FOURIER_PWR:
+        // plot first histo
+        fData[0].dataFourierPwr->Draw("p");
 
-      // set x-range
-      if ((fFourier.fPlotRange[0] != -1) && (fFourier.fPlotRange[1] != -1)) {
-        min = fFourier.fPlotRange[0];
-        max = fFourier.fPlotRange[1];
-      } else {
-        min = fData[0].dataFourierPwr->GetBinLowEdge(1);
-        max = fData[0].dataFourierPwr->GetBinLowEdge(fData[0].dataFourierPwr->GetNbinsX())+fData[0].dataFourierPwr->GetBinWidth(1);
-      }
-      fData[0].dataFourierPwr->GetXaxis()->SetRangeUser(min, max);
+        // set x-range
+        if ((fFourier.fPlotRange[0] != -1) && (fFourier.fPlotRange[1] != -1)) {
+          min = fFourier.fPlotRange[0];
+          max = fFourier.fPlotRange[1];
+        } else {
+          min = fData[0].dataFourierPwr->GetBinLowEdge(1);
+          max = fData[0].dataFourierPwr->GetBinLowEdge(fData[0].dataFourierPwr->GetNbinsX())+fData[0].dataFourierPwr->GetBinWidth(1);
+        }
+        fData[0].dataFourierPwr->GetXaxis()->SetRangeUser(min, max);
 
-      // set y-range
-      // first find minimum/maximum of all histos
-      min = GetGlobalMinimum(fData[0].dataFourierPwr);
-      max = GetGlobalMaximum(fData[0].dataFourierPwr);
-      for (unsigned int i=1; i<fData.size(); i++) {
-        binContent = GetGlobalMinimum(fData[i].dataFourierPwr);
-        if (binContent < min)
-          min = binContent;
-        binContent = GetGlobalMaximum(fData[i].dataFourierPwr);
-        if (binContent > max)
-          max = binContent;
-      }
-      fData[0].dataFourierPwr->GetYaxis()->SetRangeUser(1.05*min, 1.05*max);
+        // set y-range
+        // first find minimum/maximum of all histos
+        min = GetGlobalMinimum(fData[0].dataFourierPwr);
+        max = GetGlobalMaximum(fData[0].dataFourierPwr);
+        for (unsigned int i=1; i<fData.size(); i++) {
+          binContent = GetGlobalMinimum(fData[i].dataFourierPwr);
+          if (binContent < min)
+            min = binContent;
+          binContent = GetGlobalMaximum(fData[i].dataFourierPwr);
+          if (binContent > max)
+            max = binContent;
+        }
+        fData[0].dataFourierPwr->GetYaxis()->SetRangeUser(1.05*min, 1.05*max);
 
-      // set x-axis title
-      fData[0].dataFourierPwr->GetXaxis()->SetTitle(xAxisTitle.Data());
+        // set x-axis title
+        fData[0].dataFourierPwr->GetXaxis()->SetTitle(xAxisTitle.Data());
 
-      // set y-axis title
-      fData[0].dataFourierPwr->GetYaxis()->SetTitle("Power Fourier");
+        // set y-axis title
+        fData[0].dataFourierPwr->GetYaxis()->SetTitle("Power Fourier");
 
-      // plot all remaining data
-      for (unsigned int i=1; i<fData.size(); i++) {
-        fData[i].dataFourierPwr->Draw("pesame");
-      }
+        // plot all remaining data
+        for (unsigned int i=1; i<fData.size(); i++) {
+          fData[i].dataFourierPwr->Draw("psame");
+        }
 
-      // plot theories
-      for (unsigned int i=0; i<fData.size(); i++) {
-        fData[i].theoryFourierPwr->Draw("esame");
-      }
-      break;
-    case PV_FOURIER_PHASE:
-      // plot first histo
-      fData[0].dataFourierPhase->Draw("pe");
+        // plot theories
+        for (unsigned int i=0; i<fData.size(); i++) {
+          fData[i].theoryFourierPwr->Draw("same");
+        }
 
-      // set x-range
-      if ((fFourier.fPlotRange[0] != -1) && (fFourier.fPlotRange[1] != -1)) {
-        min = fFourier.fPlotRange[0];
-        max = fFourier.fPlotRange[1];
-      } else {
-        min = fData[0].dataFourierPhase->GetBinLowEdge(1);
-        max = fData[0].dataFourierPhase->GetBinLowEdge(fData[0].dataFourierPhase->GetNbinsX())+fData[0].dataFourierPhase->GetBinWidth(1);
-      }
-      fData[0].dataFourierPhase->GetXaxis()->SetRangeUser(min, max);
+        break;
+      case PV_FOURIER_PHASE:
+        // plot first histo
+        fData[0].dataFourierPhase->Draw("p");
 
-      // set y-range
-      // first find minimum/maximum of all histos
-      min = GetGlobalMinimum(fData[0].dataFourierPhase);
-      max = GetGlobalMaximum(fData[0].dataFourierPhase);
-      for (unsigned int i=1; i<fData.size(); i++) {
-        binContent = GetGlobalMinimum(fData[i].dataFourierPhase);
-        if (binContent < min)
-          min = binContent;
-        binContent = GetGlobalMaximum(fData[i].dataFourierPhase);
-        if (binContent > max)
-          max = binContent;
-      }
-      fData[0].dataFourierPhase->GetYaxis()->SetRangeUser(1.05*min, 1.05*max);
+        // set x-range
+        if ((fFourier.fPlotRange[0] != -1) && (fFourier.fPlotRange[1] != -1)) {
+          min = fFourier.fPlotRange[0];
+          max = fFourier.fPlotRange[1];
+        } else {
+          min = fData[0].dataFourierPhase->GetBinLowEdge(1);
+          max = fData[0].dataFourierPhase->GetBinLowEdge(fData[0].dataFourierPhase->GetNbinsX())+fData[0].dataFourierPhase->GetBinWidth(1);
+        }
+        fData[0].dataFourierPhase->GetXaxis()->SetRangeUser(min, max);
 
-      // set x-axis title
-      fData[0].dataFourierPhase->GetXaxis()->SetTitle(xAxisTitle.Data());
+        // set y-range
+        // first find minimum/maximum of all histos
+        min = GetGlobalMinimum(fData[0].dataFourierPhase);
+        max = GetGlobalMaximum(fData[0].dataFourierPhase);
+        for (unsigned int i=1; i<fData.size(); i++) {
+          binContent = GetGlobalMinimum(fData[i].dataFourierPhase);
+          if (binContent < min)
+            min = binContent;
+          binContent = GetGlobalMaximum(fData[i].dataFourierPhase);
+          if (binContent > max)
+            max = binContent;
+        }
+        fData[0].dataFourierPhase->GetYaxis()->SetRangeUser(1.05*min, 1.05*max);
 
-      // set y-axis title
-      fData[0].dataFourierPhase->GetYaxis()->SetTitle("Phase Fourier");
+        // set x-axis title
+        fData[0].dataFourierPhase->GetXaxis()->SetTitle(xAxisTitle.Data());
 
-      // plot all remaining data
-      for (unsigned int i=1; i<fData.size(); i++) {
-        fData[i].dataFourierPhase->Draw("pesame");
-      }
+        // set y-axis title
+        fData[0].dataFourierPhase->GetYaxis()->SetTitle("Phase Fourier");
 
-      // plot theories
-      for (unsigned int i=0; i<fData.size(); i++) {
-        fData[i].theoryFourierPhase->Draw("esame");
-      }
-      break;
-    default:
-      break;
+        // plot all remaining data
+        for (unsigned int i=1; i<fData.size(); i++) {
+          fData[i].dataFourierPhase->Draw("psame");
+        }
+
+        // plot theories
+        for (unsigned int i=0; i<fData.size(); i++) {
+          fData[i].theoryFourierPhase->Draw("same");
+        }
+
+        break;
+      default:
+        break;
+    }
+  } else { // difference view
+    switch (fCurrentPlotView) {
+      case PV_FOURIER_REAL:
+//cout << endl << ">> fData[0].diffFourierRe->GetNbinsX() = " << fData[0].diffFourierRe->GetNbinsX();
+        // plot first histo
+        fData[0].diffFourierRe->Draw("pl");
+
+        // set x-range
+//cout << endl << ">> fPlotRange = " << fFourier.fPlotRange[0] << ", " << fFourier.fPlotRange[1];
+        if ((fFourier.fPlotRange[0] != -1) && (fFourier.fPlotRange[1] != -1)) {
+          min = fFourier.fPlotRange[0];
+          max = fFourier.fPlotRange[1];
+        } else {
+          min = fData[0].diffFourierRe->GetBinLowEdge(1);
+          max = fData[0].diffFourierRe->GetBinLowEdge(fData[0].diffFourierRe->GetNbinsX())+fData[0].diffFourierRe->GetBinWidth(1);
+        }
+//cout << endl << ">> x-range: min, max = " << min << ", " << max;
+        fData[0].diffFourierRe->GetXaxis()->SetRangeUser(min, max);
+
+        // set y-range
+        // first find minimum/maximum of all histos
+        min = GetGlobalMinimum(fData[0].diffFourierRe);
+        max = GetGlobalMaximum(fData[0].diffFourierRe);
+//cout << endl << ">> y-range: min, max = " << min << ", " << max;
+        for (unsigned int i=1; i<fData.size(); i++) {
+          binContent = GetGlobalMinimum(fData[i].diffFourierRe);
+          if (binContent < min)
+            min = binContent;
+          binContent = GetGlobalMaximum(fData[i].diffFourierRe);
+          if (binContent > max)
+            max = binContent;
+        }
+        fData[0].diffFourierRe->GetYaxis()->SetRangeUser(1.05*min, 1.05*max);
+//cout << endl << "-> min, max = " << min << ", " << max;
+
+        // set x-axis title
+        fData[0].diffFourierRe->GetXaxis()->SetTitle(xAxisTitle.Data());
+
+        // set y-axis title
+        fData[0].diffFourierRe->GetYaxis()->SetTitle("Real Fourier");
+
+        // plot all remaining data
+        for (unsigned int i=1; i<fData.size(); i++) {
+          fData[i].diffFourierRe->Draw("plsame");
+        }
+
+        PlotFourierPhaseValue();
+
+        break;
+      case PV_FOURIER_IMAG:
+        // plot first histo
+        fData[0].diffFourierIm->Draw("pl");
+
+        // set x-range
+        if ((fFourier.fPlotRange[0] != -1) && (fFourier.fPlotRange[1] != -1)) {
+          min = fFourier.fPlotRange[0];
+          max = fFourier.fPlotRange[1];
+        } else {
+          min = fData[0].diffFourierIm->GetBinLowEdge(1);
+          max = fData[0].diffFourierIm->GetBinLowEdge(fData[0].diffFourierIm->GetNbinsX())+fData[0].diffFourierIm->GetBinWidth(1);
+        }
+        fData[0].diffFourierIm->GetXaxis()->SetRangeUser(min, max);
+
+        // set y-range
+        // first find minimum/maximum of all histos
+        min = GetGlobalMinimum(fData[0].diffFourierIm);
+        max = GetGlobalMaximum(fData[0].diffFourierIm);
+        for (unsigned int i=1; i<fData.size(); i++) {
+          binContent = GetGlobalMinimum(fData[i].diffFourierIm);
+          if (binContent < min)
+            min = binContent;
+          binContent = GetGlobalMaximum(fData[i].diffFourierIm);
+          if (binContent > max)
+            max = binContent;
+        }
+        fData[0].diffFourierIm->GetYaxis()->SetRangeUser(1.05*min, 1.05*max);
+
+        // set x-axis title
+        fData[0].diffFourierIm->GetXaxis()->SetTitle(xAxisTitle.Data());
+
+        // set y-axis title
+        fData[0].diffFourierIm->GetYaxis()->SetTitle("Imaginary Fourier");
+
+        // plot all remaining data
+        for (unsigned int i=1; i<fData.size(); i++) {
+          fData[i].diffFourierIm->Draw("plsame");
+        }
+
+        PlotFourierPhaseValue();
+
+        break;
+      case PV_FOURIER_REAL_AND_IMAG:
+        // plot first histo
+        fData[0].diffFourierRe->Draw("pl");
+
+        // set x-range
+        if ((fFourier.fPlotRange[0] != -1) && (fFourier.fPlotRange[1] != -1)) {
+          min = fFourier.fPlotRange[0];
+          max = fFourier.fPlotRange[1];
+        } else {
+          min = fData[0].diffFourierRe->GetBinLowEdge(1);
+          max = fData[0].diffFourierRe->GetBinLowEdge(fData[0].diffFourierRe->GetNbinsX())+fData[0].diffFourierRe->GetBinWidth(1);
+        }
+        fData[0].diffFourierRe->GetXaxis()->SetRangeUser(min, max);
+
+        // set y-range
+        // first find minimum/maximum of all histos
+        min = GetGlobalMinimum(fData[0].diffFourierRe);
+        max = GetGlobalMaximum(fData[0].diffFourierRe);
+        for (unsigned int i=1; i<fData.size(); i++) {
+          binContent = GetGlobalMinimum(fData[i].diffFourierRe);
+          if (binContent < min)
+            min = binContent;
+          binContent = GetGlobalMaximum(fData[i].diffFourierRe);
+          if (binContent > max)
+            max = binContent;
+        }
+        for (unsigned int i=0; i<fData.size(); i++) {
+          binContent = GetGlobalMinimum(fData[i].diffFourierIm);
+          if (binContent < min)
+            min = binContent;
+          binContent = GetGlobalMaximum(fData[i].diffFourierIm);
+          if (binContent > max)
+            max = binContent;
+        }
+        fData[0].diffFourierRe->GetYaxis()->SetRangeUser(1.05*min, 1.05*max);
+
+        // set x-axis title
+        fData[0].diffFourierRe->GetXaxis()->SetTitle(xAxisTitle.Data());
+
+        // set y-axis title
+        fData[0].diffFourierRe->GetYaxis()->SetTitle("Real+Imag Fourier");
+
+        // plot all remaining data
+        fData[0].diffFourierIm->Draw("plsame");
+        for (unsigned int i=1; i<fData.size(); i++) {
+          fData[i].diffFourierRe->Draw("plsame");
+          fData[i].diffFourierIm->Draw("plsame");
+        }
+
+        PlotFourierPhaseValue();
+
+        break;
+      case PV_FOURIER_PWR:
+        // plot first histo
+        fData[0].diffFourierPwr->Draw("pl");
+
+        // set x-range
+        if ((fFourier.fPlotRange[0] != -1) && (fFourier.fPlotRange[1] != -1)) {
+          min = fFourier.fPlotRange[0];
+          max = fFourier.fPlotRange[1];
+        } else {
+          min = fData[0].diffFourierPwr->GetBinLowEdge(1);
+          max = fData[0].diffFourierPwr->GetBinLowEdge(fData[0].diffFourierPwr->GetNbinsX())+fData[0].diffFourierPwr->GetBinWidth(1);
+        }
+        fData[0].diffFourierPwr->GetXaxis()->SetRangeUser(min, max);
+
+        // set y-range
+        // first find minimum/maximum of all histos
+        min = GetGlobalMinimum(fData[0].diffFourierPwr);
+        max = GetGlobalMaximum(fData[0].diffFourierPwr);
+        for (unsigned int i=1; i<fData.size(); i++) {
+          binContent = GetGlobalMinimum(fData[i].diffFourierPwr);
+          if (binContent < min)
+            min = binContent;
+          binContent = GetGlobalMaximum(fData[i].diffFourierPwr);
+          if (binContent > max)
+            max = binContent;
+        }
+        fData[0].diffFourierPwr->GetYaxis()->SetRangeUser(1.05*min, 1.05*max);
+
+        // set x-axis title
+        fData[0].diffFourierPwr->GetXaxis()->SetTitle(xAxisTitle.Data());
+
+        // set y-axis title
+        fData[0].diffFourierPwr->GetYaxis()->SetTitle("Power Fourier");
+
+        // plot all remaining data
+        for (unsigned int i=1; i<fData.size(); i++) {
+          fData[i].diffFourierPwr->Draw("plsame");
+        }
+
+        PlotFourierPhaseValue();
+
+        break;
+      case PV_FOURIER_PHASE:
+        // plot first histo
+        fData[0].diffFourierPhase->Draw("pl");
+
+        // set x-range
+        if ((fFourier.fPlotRange[0] != -1) && (fFourier.fPlotRange[1] != -1)) {
+          min = fFourier.fPlotRange[0];
+          max = fFourier.fPlotRange[1];
+        } else {
+          min = fData[0].diffFourierPhase->GetBinLowEdge(1);
+          max = fData[0].diffFourierPhase->GetBinLowEdge(fData[0].diffFourierPhase->GetNbinsX())+fData[0].diffFourierPhase->GetBinWidth(1);
+        }
+        fData[0].diffFourierPhase->GetXaxis()->SetRangeUser(min, max);
+
+        // set y-range
+        // first find minimum/maximum of all histos
+        min = GetGlobalMinimum(fData[0].diffFourierPhase);
+        max = GetGlobalMaximum(fData[0].diffFourierPhase);
+        for (unsigned int i=1; i<fData.size(); i++) {
+          binContent = GetGlobalMinimum(fData[i].diffFourierPhase);
+          if (binContent < min)
+            min = binContent;
+          binContent = GetGlobalMaximum(fData[i].diffFourierPhase);
+          if (binContent > max)
+            max = binContent;
+        }
+        fData[0].diffFourierPhase->GetYaxis()->SetRangeUser(1.05*min, 1.05*max);
+
+        // set x-axis title
+        fData[0].diffFourierPhase->GetXaxis()->SetTitle(xAxisTitle.Data());
+
+        // set y-axis title
+        fData[0].diffFourierPhase->GetYaxis()->SetTitle("Phase Fourier");
+
+        // plot all remaining data
+        for (unsigned int i=1; i<fData.size(); i++) {
+          fData[i].diffFourierPhase->Draw("plsame");
+        }
+
+        PlotFourierPhaseValue();
+
+        break;
+      default:
+        break;
+    }
   }
 
   fDataTheoryPad->Update();
@@ -3218,6 +3462,77 @@ cout << endl << ">> theory scale = " << scale << ", data.res/theory.res = " << f
         if (fData[i].diffFourierPhase != 0) {
           delete fData[i].diffFourierPhase;
           fData[i].diffFourierPhase = 0;
+        }
+      }
+
+      int bin;
+      bin = fData[0].diff->GetXaxis()->GetFirst();
+      double startTime = fData[0].diff->GetBinCenter(bin);
+      bin = fData[0].diff->GetXaxis()->GetLast();
+      double endTime   = fData[0].diff->GetBinCenter(bin);
+cout << endl << ">> startTime = " << startTime << ", endTime = " << endTime << endl;
+      for (unsigned int i=0; i<fData.size(); i++) {
+        // calculate fourier transform of the data
+        PFourier fourierData(fData[i].diff, fFourier.fUnits, startTime, endTime, fFourier.fFourierPower);
+        if (!fourierData.IsValid()) {
+          cout << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier diff ..." << endl;
+          return;
+        }
+        fourierData.Transform(fFourier.fApodization);
+        double scale;
+        scale = sqrt(fData[0].diff->GetBinWidth(1)/(endTime-startTime));
+cout << endl << ">> data scale = " << scale;
+        // get real part of the data
+        fData[i].diffFourierRe = fourierData.GetRealFourier(scale);
+//cout << endl << ">> i: " << i << ", fData[i].diffFourierRe = " << fData[i].diffFourierRe;
+        // get imaginary part of the data
+        fData[i].diffFourierIm = fourierData.GetImaginaryFourier(scale);
+        // get power part of the data
+        fData[i].diffFourierPwr = fourierData.GetPowerFourier(scale);
+        // get phase part of the data
+        fData[i].diffFourierPhase = fourierData.GetPhaseFourier();
+
+        // set marker and line color
+        fData[i].diffFourierRe->SetMarkerColor(fData[i].diff->GetMarkerColor());
+        fData[i].diffFourierRe->SetLineColor(fData[i].diff->GetLineColor());
+        fData[i].diffFourierIm->SetMarkerColor(fData[i].diff->GetMarkerColor());
+        fData[i].diffFourierIm->SetLineColor(fData[i].diff->GetLineColor());
+        fData[i].diffFourierPwr->SetMarkerColor(fData[i].diff->GetMarkerColor());
+        fData[i].diffFourierPwr->SetLineColor(fData[i].diff->GetLineColor());
+        fData[i].diffFourierPhase->SetMarkerColor(fData[i].diff->GetMarkerColor());
+        fData[i].diffFourierPhase->SetLineColor(fData[i].diff->GetLineColor());
+
+        // set marker size
+        fData[i].diffFourierRe->SetMarkerSize(1);
+        fData[i].diffFourierIm->SetMarkerSize(1);
+        fData[i].diffFourierPwr->SetMarkerSize(1);
+        fData[i].diffFourierPhase->SetMarkerSize(1);
+        // set marker type
+        fData[i].diffFourierRe->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
+        fData[i].diffFourierIm->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
+        fData[i].diffFourierPwr->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
+        fData[i].diffFourierPhase->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
+      }
+
+      // apply global phase
+      if (fFourier.fPhase != 0.0) {
+        double re, im;
+        const double cp = TMath::Cos(fFourier.fPhase/180.0*TMath::Pi());
+        const double sp = TMath::Sin(fFourier.fPhase/180.0*TMath::Pi());
+
+        fCurrentFourierPhase = fFourier.fPhase;
+
+        for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
+          if ((fData[i].diffFourierRe != 0) && (fData[i].diffFourierIm != 0)) {
+            for (int j=0; j<fData[i].diffFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+              // calculate new fourier data set value
+              re = fData[i].diffFourierRe->GetBinContent(j) * cp + fData[i].diffFourierIm->GetBinContent(j) * sp;
+              im = fData[i].diffFourierIm->GetBinContent(j) * cp - fData[i].diffFourierRe->GetBinContent(j) * sp;
+              // overwrite fourier data set value
+              fData[i].diffFourierRe->SetBinContent(j, re);
+              fData[i].diffFourierIm->SetBinContent(j, im);
+            }
+          }
         }
       }
     }

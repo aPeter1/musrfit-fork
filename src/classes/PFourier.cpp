@@ -96,7 +96,11 @@ cout << endl << ">> fTimeResolution = " << fTimeResolution;
 
 // check if zero padding is whished
   if (fZeroPaddingPower > 0) {
-    fNoOfBins = static_cast<unsigned int>(pow(2.0, static_cast<double>(fZeroPaddingPower)));
+    unsigned int noOfBins = static_cast<unsigned int>(pow(2.0, static_cast<double>(fZeroPaddingPower)));
+    if (noOfBins > fNoOfData)
+      fNoOfBins = noOfBins;
+    else
+      fNoOfBins = fNoOfData;
   } else {
     fNoOfBins = fNoOfData;
   }
