@@ -168,28 +168,7 @@ cout << "~PMusrCanvas() called. fMainCanvas name=" << fMainCanvas->GetName() << 
 }
 
 //--------------------------------------------------------------------------
-// InitFourier
-//--------------------------------------------------------------------------
-/**
- * <p>Initializes the Fourier structure.
- */
-void PMusrCanvas::InitFourier()
-{
-  fFourier.fFourierBlockPresent = false;           // fourier block present
-  fFourier.fUnits = FOURIER_UNIT_FIELD;            // fourier untis
-  fFourier.fFourierPower = 0;                      // no zero padding
-  fFourier.fApodization = FOURIER_APOD_NONE;       // no apodization
-  fFourier.fPlotTag = FOURIER_PLOT_REAL_AND_IMAG;  // initial plot tag, plot real and imaginary part
-  fFourier.fPhase = 0.0;                           // fourier phase 0°
-  for (unsigned int i=0; i<2; i++) {
-    fFourier.fRangeForPhaseCorrection[i] = -1.0;   // frequency range for phase correction, default: {-1, -1} = NOT GIVEN
-    fFourier.fPlotRange[i] = -1.0;                 // fourier plot range, default: {-1, -1} = NOT GIVEN
-  }
-  fFourier.fPhaseIncrement = 1.0;                  // fourier phase increment
-}
-
-//--------------------------------------------------------------------------
-// SetMsrHandler
+// SetMsrHandler (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Keep the msr-handler object pointer and fill the Fourier structure if present.
@@ -230,256 +209,7 @@ void PMusrCanvas::SetMsrHandler(PMsrHandler *msrHandler)
 }
 
 //--------------------------------------------------------------------------
-// CreateStyle
-//--------------------------------------------------------------------------
-/**
- * <p> Set styles for the canvas. Perhaps one could transfer them to the startup-file in the future.
- */
-void PMusrCanvas::CreateStyle()
-{
-  fStyle = new TStyle("musrStyle", "musrStyle");
-  fStyle->SetOptStat(0);  // no statistics options
-  fStyle->SetOptTitle(0); // no title
-  fStyle->cd();
-}
-
-//--------------------------------------------------------------------------
-// InitMusrCanvas
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param title
- * \param wtopx
- * \param wtopy
- * \param ww
- * \param wh
- */
-void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh)
-{
-  fValid = false;
-  fDifferenceView  = false;
-  fCurrentPlotView = PV_DATA;
-  fPlotType = -1;
-
-  fImp   = 0;
-  fBar   = 0;
-  fPopupMain    = 0;
-  fPopupSave    = 0;
-  fPopupFourier = 0;
-
-  fMainCanvas          = 0;
-  fTitlePad            = 0;
-  fDataTheoryPad       = 0;
-  fParameterTheoryPad  = 0;
-  fInfoPad             = 0;
-
-  // invoke canvas
-  TString canvasName = TString("fMainCanvas");
-  canvasName += fPlotNumber;
-  fMainCanvas = new TCanvas(canvasName.Data(), title, wtopx, wtopy, ww, wh);
-  if (fMainCanvas == 0) {
-    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke " << canvasName.Data();
-    cout << endl;
-    return;
-  }
-
-  // add canvas menu
-  fImp = (TRootCanvas*)fMainCanvas->GetCanvasImp(); 
-  fBar = fImp->GetMenuBar(); 
-  fPopupMain = fBar->AddPopup("&Musrfit");
-
-  fPopupFourier = new TGPopupMenu();
-  fPopupMain->AddPopup("&Fourier", fPopupFourier);
-  fPopupFourier->AddEntry("Show Real", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL);
-  fPopupFourier->AddEntry("Show Imag", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG);
-  fPopupFourier->AddEntry("Show Real+Imag", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG);
-  fPopupFourier->AddEntry("Show Power", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR);
-  fPopupFourier->AddEntry("Show Phase", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE);
-  fPopupFourier->AddSeparator();
-  fPopupFourier->AddEntry("Phase +", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
-  fPopupFourier->AddEntry("Phase -", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
-
-  fPopupMain->AddEntry("&Difference", P_MENU_ID_DIFFERENCE+P_MENU_PLOT_OFFSET*fPlotNumber);
-  fPopupMain->AddSeparator();
-
-  fPopupSave = new TGPopupMenu();
-  fPopupSave->AddEntry("Save ascii", P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_ASCII);
-  fPopupSave->AddEntry("Save db", P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_DB);
-
-  fPopupMain->AddPopup("&Save Data", fPopupSave);
-  fBar->MapSubwindows(); 
-  fBar->Layout();
-
-  fPopupMain->Connect("TGPopupMenu", "Activated(Int_t)", "PMusrCanvas", this, "HandleMenuPopup(Int_t)");
-
-  // divide the canvas into 4 pads
-  // title pad
-  fTitlePad = new TPaveText(0.0, YTITLE, 1.0, 1.0, "NDC");
-  if (fTitlePad == 0) {
-    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fTitlePad";
-    cout << endl;
-    return;
-  }
-  fTitlePad->SetFillColor(TColor::GetColor(255,255,255));
-  fTitlePad->SetTextAlign(12); // middle, left
-  fTitlePad->AddText(title);
-  fTitlePad->Draw();
-
-  // data/theory pad
-  fDataTheoryPad = new TPad("dataTheoryCanvas", "dataTheoryCanvas", 0.0, YINFO, XTHEO, YTITLE);
-  if (fDataTheoryPad == 0) {
-    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fDataTheoryPad";
-    cout << endl;
-    return;
-  }
-  fDataTheoryPad->SetFillColor(TColor::GetColor(255,255,255));
-  fDataTheoryPad->Draw();
-
-  // parameter/theory pad
-  fParameterTheoryPad = new TPaveText(XTHEO, 0.1, 1.0, YTITLE, "NDC");
-  if (fParameterTheoryPad == 0) {
-    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fParameterTheoryPad";
-    cout << endl;
-    return;
-  }
-  fParameterTheoryPad->SetFillColor(TColor::GetColor(255,255,255));
-  fParameterTheoryPad->SetTextAlign(13); // top, left
-  fParameterTheoryPad->SetTextFont(102); // courier bold, scalable so that greek parameters will be plotted properly
-
-  // info pad
-  fInfoPad = new TLegend(0.0, 0.0, 1.0, YINFO, "NDC");
-  if (fInfoPad == 0) {
-    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fInfoPad";
-    cout << endl;
-    return;
-  }
-  fInfoPad->SetFillColor(TColor::GetColor(255,255,255));
-  fInfoPad->SetTextAlign(12); // middle, left
-
-  fValid = true;
-
-  fMainCanvas->cd();
-  fMainCanvas->Show();
-  fMainCanvas->Connect("ProcessedEvent(Int_t,Int_t,Int_t,TObject*)", "PMusrCanvas", 
-                       this, "HandleCmdKey(Int_t,Int_t,Int_t,TObject*)");
-
-// cout << "this                 " << this << endl;
-// cout << "fMainCanvas          " << fMainCanvas << endl;
-// cout << "fTitlePad            " << fTitlePad << endl;
-// cout << "fDataTheoryPad       " << fDataTheoryPad << endl;
-// cout << "fParameterTheoryPad  " << fParameterTheoryPad << endl;
-// cout << "fInfoPad             " << fInfoPad << endl;
-}
-
-//--------------------------------------------------------------------------
-// Done (SIGNAL)
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- */
-void PMusrCanvas::Done(Int_t status)
-{
-  Emit("Done(Int_t)", status);
-}
-
-//--------------------------------------------------------------------------
-// HandleCmdKey (SLOT)
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- */
-void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
-{
-  if (event != kKeyPress)
-     return;
-
-//   cout << ">this          " << this << endl;
-//   cout << ">fMainCanvas   " << fMainCanvas << endl;
-//   cout << ">selected      " << selected << endl;
-// 
-//cout << "x : "  << (char)x << endl;
-//cout << "px: "  << (char)fMainCanvas->GetEventX() << endl;
-
-  if (x == 'q') {
-    Done(0);
-  } else if (x == 'd') {
-    HandleDifference();
-  } else if (x == 'f') {
-    if (fPlotType != MSR_PLOT_NON_MUSR) {
-      HandleFourier(-1);
-    }
-  } else if (x == '+') {
-    IncrementFourierPhase();
-  } else if (x == '-') {
-    DecrementFourierPhase();
-  } else {
-    // do all the necessary stuff **TO BE DONE**
-    fMainCanvas->Update();
-  }
-}
-
-//--------------------------------------------------------------------------
-// HandleMenuPopup (SLOT)
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- */
-void PMusrCanvas::HandleMenuPopup(Int_t id)
-{
-  if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL) {
-    fPopupFourier->UnCheckEntries();
-    fPopupFourier->CheckEntry(id);
-    HandleFourier(FOURIER_PLOT_REAL);
-  } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG) {
-    fPopupFourier->UnCheckEntries();
-    fPopupFourier->CheckEntry(id);
-    HandleFourier(FOURIER_PLOT_IMAG);
-  } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG) {
-    fPopupFourier->UnCheckEntries();
-    fPopupFourier->CheckEntry(id);
-    HandleFourier(FOURIER_PLOT_REAL_AND_IMAG);
-  } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR) {
-    fPopupFourier->UnCheckEntries();
-    fPopupFourier->CheckEntry(id);
-    HandleFourier(FOURIER_PLOT_POWER);
-  } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE) {
-    fPopupFourier->UnCheckEntries();
-    fPopupFourier->CheckEntry(id);
-    HandleFourier(FOURIER_PLOT_PHASE);
-  } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS) {
-    IncrementFourierPhase();
-  } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS) {
-    DecrementFourierPhase();
-  } else if (id == P_MENU_ID_DIFFERENCE+P_MENU_PLOT_OFFSET*fPlotNumber) {
-    HandleDifference();
-  } else if (id == P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_ASCII) {
-    SaveDataAscii();
-  } else if (id == P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_DB) {
-    SaveDataDb();
-  }
-}
-
-//--------------------------------------------------------------------------
-// LastCanvasClosed (SLOT)
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- */
-void PMusrCanvas::LastCanvasClosed()
-{
-//  cout << endl << ">> in last canvas closed check ...";
-  if (gROOT->GetListOfCanvases()->IsEmpty()) {
-    Done(0);
-  }
-}
-
-//--------------------------------------------------------------------------
-// UpdateParamTheoryPad
+// UpdateParamTheoryPad (public)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -585,7 +315,7 @@ void PMusrCanvas::UpdateParamTheoryPad()
 }
 
 //--------------------------------------------------------------------------
-// UpdateDataTheoryPad
+// UpdateDataTheoryPad (public)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -708,7 +438,7 @@ cout << endl;
 }
 
 //--------------------------------------------------------------------------
-// UpdateInfoPad
+// UpdateInfoPad (public)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -811,7 +541,299 @@ void PMusrCanvas::UpdateInfoPad()
 }
 
 //--------------------------------------------------------------------------
-// InitDataSet
+// Done (SIGNAL)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrCanvas::Done(Int_t status)
+{
+  Emit("Done(Int_t)", status);
+}
+
+//--------------------------------------------------------------------------
+// HandleCmdKey (SLOT)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
+{
+  if (event != kKeyPress)
+     return;
+
+//   cout << ">this          " << this << endl;
+//   cout << ">fMainCanvas   " << fMainCanvas << endl;
+//   cout << ">selected      " << selected << endl;
+//
+//cout << "x : "  << (char)x << endl;
+//cout << "px: "  << (char)fMainCanvas->GetEventX() << endl;
+
+  if (x == 'q') {
+    Done(0);
+  } else if (x == 'd') {
+    HandleDifference();
+  } else if (x == 'f') {
+    if (fPlotType != MSR_PLOT_NON_MUSR) {
+      HandleFourier(-1);
+    }
+  } else if (x == '+') {
+    if (fCurrentPlotView != PV_DATA)
+      IncrementFourierPhase();
+  } else if (x == '-') {
+    if (fCurrentPlotView != PV_DATA)
+      DecrementFourierPhase();
+  } else {
+    fMainCanvas->Update();
+  }
+
+  // check if phase increment/decrement needs to be ghost
+  if (fCurrentPlotView == PV_DATA) {
+    fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+    fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+  } else {
+    fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+    fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+  }
+}
+
+//--------------------------------------------------------------------------
+// HandleMenuPopup (SLOT)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrCanvas::HandleMenuPopup(Int_t id)
+{
+  if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL) {
+    fPopupFourier->UnCheckEntries();
+    fPopupFourier->CheckEntry(id);
+    fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+    fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+    HandleFourier(FOURIER_PLOT_REAL);
+  } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG) {
+    fPopupFourier->UnCheckEntries();
+    fPopupFourier->CheckEntry(id);
+    fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+    fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+    HandleFourier(FOURIER_PLOT_IMAG);
+  } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG) {
+    fPopupFourier->UnCheckEntries();
+    fPopupFourier->CheckEntry(id);
+    fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+    fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+    HandleFourier(FOURIER_PLOT_REAL_AND_IMAG);
+  } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR) {
+    fPopupFourier->UnCheckEntries();
+    fPopupFourier->CheckEntry(id);
+    fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+    fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+    HandleFourier(FOURIER_PLOT_POWER);
+  } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE) {
+    fPopupFourier->UnCheckEntries();
+    fPopupFourier->CheckEntry(id);
+    fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+    fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+    HandleFourier(FOURIER_PLOT_PHASE);
+  } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS) {
+    IncrementFourierPhase();
+  } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS) {
+    DecrementFourierPhase();
+  } else if (id == P_MENU_ID_DIFFERENCE+P_MENU_PLOT_OFFSET*fPlotNumber) {
+    HandleDifference();
+  } else if (id == P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_ASCII) {
+    SaveDataAscii();
+  } else if (id == P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_DB) {
+    SaveDataDb();
+  }
+}
+
+//--------------------------------------------------------------------------
+// LastCanvasClosed (SLOT)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrCanvas::LastCanvasClosed()
+{
+//  cout << endl << ">> in last canvas closed check ...";
+  if (gROOT->GetListOfCanvases()->IsEmpty()) {
+    Done(0);
+  }
+}
+
+//--------------------------------------------------------------------------
+// CreateStyle (private)
+//--------------------------------------------------------------------------
+/**
+ * <p> Set styles for the canvas. Perhaps one could transfer them to the startup-file in the future.
+ */
+void PMusrCanvas::CreateStyle()
+{
+  fStyle = new TStyle("musrStyle", "musrStyle");
+  fStyle->SetOptStat(0);  // no statistics options
+  fStyle->SetOptTitle(0); // no title
+  fStyle->cd();
+}
+
+//--------------------------------------------------------------------------
+// InitFourier (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Initializes the Fourier structure.
+ */
+void PMusrCanvas::InitFourier()
+{
+  fFourier.fFourierBlockPresent = false;           // fourier block present
+  fFourier.fUnits = FOURIER_UNIT_FIELD;            // fourier untis
+  fFourier.fFourierPower = 0;                      // no zero padding
+  fFourier.fApodization = FOURIER_APOD_NONE;       // no apodization
+  fFourier.fPlotTag = FOURIER_PLOT_REAL_AND_IMAG;  // initial plot tag, plot real and imaginary part
+  fFourier.fPhase = 0.0;                           // fourier phase 0°
+  for (unsigned int i=0; i<2; i++) {
+    fFourier.fRangeForPhaseCorrection[i] = -1.0;   // frequency range for phase correction, default: {-1, -1} = NOT GIVEN
+    fFourier.fPlotRange[i] = -1.0;                 // fourier plot range, default: {-1, -1} = NOT GIVEN
+  }
+  fFourier.fPhaseIncrement = 1.0;                  // fourier phase increment
+}
+
+//--------------------------------------------------------------------------
+// InitMusrCanvas (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param title
+ * \param wtopx
+ * \param wtopy
+ * \param ww
+ * \param wh
+ */
+void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh)
+{
+  fValid = false;
+  fDifferenceView  = false;
+  fCurrentPlotView = PV_DATA;
+  fPlotType = -1;
+
+  fImp   = 0;
+  fBar   = 0;
+  fPopupMain    = 0;
+  fPopupSave    = 0;
+  fPopupFourier = 0;
+
+  fMainCanvas          = 0;
+  fTitlePad            = 0;
+  fDataTheoryPad       = 0;
+  fParameterTheoryPad  = 0;
+  fInfoPad             = 0;
+
+  // invoke canvas
+  TString canvasName = TString("fMainCanvas");
+  canvasName += fPlotNumber;
+  fMainCanvas = new TCanvas(canvasName.Data(), title, wtopx, wtopy, ww, wh);
+  if (fMainCanvas == 0) {
+    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke " << canvasName.Data();
+    cout << endl;
+    return;
+  }
+
+  // add canvas menu
+  fImp = (TRootCanvas*)fMainCanvas->GetCanvasImp(); 
+  fBar = fImp->GetMenuBar(); 
+  fPopupMain = fBar->AddPopup("&Musrfit");
+
+  fPopupFourier = new TGPopupMenu();
+  fPopupMain->AddPopup("&Fourier", fPopupFourier);
+  fPopupFourier->AddEntry("Show Real", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL);
+  fPopupFourier->AddEntry("Show Imag", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG);
+  fPopupFourier->AddEntry("Show Real+Imag", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG);
+  fPopupFourier->AddEntry("Show Power", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR);
+  fPopupFourier->AddEntry("Show Phase", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE);
+  fPopupFourier->AddSeparator();
+  fPopupFourier->AddEntry("Phase +", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+  fPopupFourier->AddEntry("Phase -", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+  fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+  fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+
+  fPopupMain->AddEntry("&Difference", P_MENU_ID_DIFFERENCE+P_MENU_PLOT_OFFSET*fPlotNumber);
+  fPopupMain->AddSeparator();
+
+  fPopupSave = new TGPopupMenu();
+  fPopupSave->AddEntry("Save ascii", P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_ASCII);
+  fPopupSave->AddEntry("Save db", P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_DB);
+
+  fPopupMain->AddPopup("&Save Data", fPopupSave);
+  fBar->MapSubwindows(); 
+  fBar->Layout();
+
+  fPopupMain->Connect("TGPopupMenu", "Activated(Int_t)", "PMusrCanvas", this, "HandleMenuPopup(Int_t)");
+
+  // divide the canvas into 4 pads
+  // title pad
+  fTitlePad = new TPaveText(0.0, YTITLE, 1.0, 1.0, "NDC");
+  if (fTitlePad == 0) {
+    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fTitlePad";
+    cout << endl;
+    return;
+  }
+  fTitlePad->SetFillColor(TColor::GetColor(255,255,255));
+  fTitlePad->SetTextAlign(12); // middle, left
+  fTitlePad->AddText(title);
+  fTitlePad->Draw();
+
+  // data/theory pad
+  fDataTheoryPad = new TPad("dataTheoryCanvas", "dataTheoryCanvas", 0.0, YINFO, XTHEO, YTITLE);
+  if (fDataTheoryPad == 0) {
+    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fDataTheoryPad";
+    cout << endl;
+    return;
+  }
+  fDataTheoryPad->SetFillColor(TColor::GetColor(255,255,255));
+  fDataTheoryPad->Draw();
+
+  // parameter/theory pad
+  fParameterTheoryPad = new TPaveText(XTHEO, 0.1, 1.0, YTITLE, "NDC");
+  if (fParameterTheoryPad == 0) {
+    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fParameterTheoryPad";
+    cout << endl;
+    return;
+  }
+  fParameterTheoryPad->SetFillColor(TColor::GetColor(255,255,255));
+  fParameterTheoryPad->SetTextAlign(13); // top, left
+  fParameterTheoryPad->SetTextFont(102); // courier bold, scalable so that greek parameters will be plotted properly
+
+  // info pad
+  fInfoPad = new TLegend(0.0, 0.0, 1.0, YINFO, "NDC");
+  if (fInfoPad == 0) {
+    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fInfoPad";
+    cout << endl;
+    return;
+  }
+  fInfoPad->SetFillColor(TColor::GetColor(255,255,255));
+  fInfoPad->SetTextAlign(12); // middle, left
+
+  fValid = true;
+
+  fMainCanvas->cd();
+  fMainCanvas->Show();
+  fMainCanvas->Connect("ProcessedEvent(Int_t,Int_t,Int_t,TObject*)", "PMusrCanvas", 
+                       this, "HandleCmdKey(Int_t,Int_t,Int_t,TObject*)");
+
+// cout << "this                 " << this << endl;
+// cout << "fMainCanvas          " << fMainCanvas << endl;
+// cout << "fTitlePad            " << fTitlePad << endl;
+// cout << "fDataTheoryPad       " << fDataTheoryPad << endl;
+// cout << "fParameterTheoryPad  " << fParameterTheoryPad << endl;
+// cout << "fInfoPad             " << fInfoPad << endl;
+}
+
+//--------------------------------------------------------------------------
+// InitDataSet (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -838,7 +860,7 @@ void PMusrCanvas::InitDataSet(PMusrCanvasDataSet &dataSet)
 }
 
 //--------------------------------------------------------------------------
-// InitDataSet
+// InitDataSet (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -865,7 +887,7 @@ void PMusrCanvas::InitDataSet(PMusrCanvasNonMusrDataSet &dataSet)
 }
 
 //--------------------------------------------------------------------------
-// CleanupDataSet
+// CleanupDataSet (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -937,7 +959,7 @@ void PMusrCanvas::CleanupDataSet(PMusrCanvasDataSet &dataSet)
 }
 
 //--------------------------------------------------------------------------
-// CleanupDataSet
+// CleanupDataSet (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -1009,7 +1031,7 @@ void PMusrCanvas::CleanupDataSet(PMusrCanvasNonMusrDataSet &dataSet)
 }
 
 //--------------------------------------------------------------------------
-// HandleDataSet
+// HandleDataSet (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -1099,7 +1121,7 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
 }
 
 //--------------------------------------------------------------------------
-// HandleNonMusrDataSet
+// HandleNonMusrDataSet (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -1174,7 +1196,7 @@ void PMusrCanvas::HandleNonMusrDataSet(unsigned int plotNo, unsigned int runNo, 
 }
 
 //--------------------------------------------------------------------------
-// HandleDifference
+// HandleDifference (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -1192,109 +1214,115 @@ void PMusrCanvas::HandleDifference()
     fPopupMain->UnCheckEntry(P_MENU_ID_DIFFERENCE+P_MENU_PLOT_OFFSET*fPlotNumber);
 
   // difference plot wished hence feed difference data and plot them
-  if (fDifferenceView && (fCurrentPlotView == PV_DATA)) {
-    // check if it is necessary to calculate diff data
-    if ((fPlotType != MSR_PLOT_NON_MUSR) && (fData[0].diff == 0)) {
-      TH1F *diffHisto;
-      TString name;
-      // loop over all histos
-      for (unsigned int i=0; i<fData.size(); i++) {
-        // create difference histos
-        name = TString(fData[i].data->GetTitle()) + "_diff";
+  if (fDifferenceView) {
+    switch (fCurrentPlotView) {
+      case PV_DATA:
+        // check if it is necessary to calculate diff data
+        if ((fPlotType != MSR_PLOT_NON_MUSR) && (fData[0].diff == 0)) {
+          TH1F *diffHisto;
+          TString name;
+          // loop over all histos
+          for (unsigned int i=0; i<fData.size(); i++) {
+            // create difference histos
+            name = TString(fData[i].data->GetTitle()) + "_diff";
 //cout << endl << ">> diff-name = " << name.Data() << endl;
-        diffHisto = new TH1F(name, name, fData[i].data->GetNbinsX(),
-                             fData[i].data->GetXaxis()->GetXmin(),
-                             fData[i].data->GetXaxis()->GetXmax());
+            diffHisto = new TH1F(name, name, fData[i].data->GetNbinsX(),
+                                 fData[i].data->GetXaxis()->GetXmin(),
+                                 fData[i].data->GetXaxis()->GetXmax());
 
-        // set marker and line color
-        if (i < fColorList.size()) {
-          diffHisto->SetMarkerColor(fColorList[i]);
-          diffHisto->SetLineColor(fColorList[i]);
-        } else {
-          TRandom rand(i);
-          Int_t color = TColor::GetColor((Int_t)rand.Integer(255), (Int_t)rand.Integer(255), (Int_t)rand.Integer(255));
-          diffHisto->SetMarkerColor(color);
-          diffHisto->SetLineColor(color);
-        }
-        // set marker size
-        diffHisto->SetMarkerSize(1);
-        // set marker type
-        if (i < fMarkerList.size()) {
-          diffHisto->SetMarkerStyle(fMarkerList[i]);
-        } else {
-          TRandom rand(i);
-          diffHisto->SetMarkerStyle(20+(Int_t)rand.Integer(10));
-        }
+            // set marker and line color
+            diffHisto->SetMarkerColor(fData[i].data->GetMarkerColor());
+            diffHisto->SetLineColor(fData[i].data->GetLineColor());
+            // set marker size
+            diffHisto->SetMarkerSize(fData[i].data->GetMarkerSize());
+            // set marker type
+            diffHisto->SetMarkerStyle(fData[i].data->GetMarkerStyle());
 
-        // keep difference histo
-        fData[i].diff = diffHisto;
-        // calculate diff histo entry
-        double value;
-        for (int j=1; j<fData[i].data->GetNbinsX()-1; j++) {
-          // set diff bin value
-          value = CalculateDiff(fData[i].data->GetBinCenter(j),
-                                fData[i].data->GetBinContent(j),
-                                fData[i].theory);
-          fData[i].diff->SetBinContent(j, value);
-          // set error diff bin value
-          value = fData[i].data->GetBinError(j);
-          fData[i].diff->SetBinError(j, value);
-        }
-      }
-    } else if ((fPlotType == MSR_PLOT_NON_MUSR) && (fNonMusrData[0].diff == 0)) {
-      TGraphErrors *diffHisto;
-      TString name;
-      // loop over all histos
-      for (unsigned int i=0; i<fNonMusrData.size(); i++) {
-        // create difference histos
-        diffHisto = new TGraphErrors(fNonMusrData[i].data->GetN());
+            // keep difference histo
+            fData[i].diff = diffHisto;
+            // calculate diff histo entry
+            double value;
+            for (int j=1; j<fData[i].data->GetNbinsX()-1; j++) {
+              // set diff bin value
+              value = CalculateDiff(fData[i].data->GetBinCenter(j),
+                                    fData[i].data->GetBinContent(j),
+                                    fData[i].theory);
+              fData[i].diff->SetBinContent(j, value);
+              // set error diff bin value
+              value = fData[i].data->GetBinError(j);
+              fData[i].diff->SetBinError(j, value);
+            }
+          }
+        } else if ((fPlotType == MSR_PLOT_NON_MUSR) && (fNonMusrData[0].diff == 0)) {
+          TGraphErrors *diffHisto;
+          TString name;
+          // loop over all histos
+          for (unsigned int i=0; i<fNonMusrData.size(); i++) {
+            // create difference histos
+            diffHisto = new TGraphErrors(fNonMusrData[i].data->GetN());
 
-        // create difference histos
-        name = TString(fNonMusrData[i].data->GetTitle()) + "_diff";
+            // create difference histos
+            name = TString(fNonMusrData[i].data->GetTitle()) + "_diff";
 //cout << endl << ">> diff-name = " << name.Data() << endl;
-        diffHisto->SetNameTitle(name.Data(), name.Data());
+            diffHisto->SetNameTitle(name.Data(), name.Data());
 
-        // set marker and line color
-        if (i < fColorList.size()) {
-          diffHisto->SetMarkerColor(fColorList[i]);
-          diffHisto->SetLineColor(fColorList[i]);
-        } else {
-          TRandom rand(i);
-          Int_t color = TColor::GetColor((Int_t)rand.Integer(255), (Int_t)rand.Integer(255), (Int_t)rand.Integer(255));
-          diffHisto->SetMarkerColor(color);
-          diffHisto->SetLineColor(color);
-        }
-        // set marker size
-        diffHisto->SetMarkerSize(1);
-        // set marker type
-        if (i < fMarkerList.size()) {
-          diffHisto->SetMarkerStyle(fMarkerList[i]);
-        } else {
-          TRandom rand(i);
-          diffHisto->SetMarkerStyle(20+(Int_t)rand.Integer(10));
+            // set marker and line color
+            diffHisto->SetMarkerColor(fNonMusrData[i].data->GetMarkerColor());
+            // set marker size
+            diffHisto->SetMarkerSize(fNonMusrData[i].data->GetMarkerSize());
+            // set marker type
+            diffHisto->SetMarkerStyle(fNonMusrData[i].data->GetMarkerStyle());
+
+            // keep difference histo
+            fNonMusrData[i].diff = diffHisto;
+            // calculate diff histo entry
+            double value;
+            double x, y;
+            for (int j=0; j<fNonMusrData[i].data->GetN(); j++) {
+              // set diff bin value
+              fNonMusrData[i].data->GetPoint(j, x, y);
+              value = CalculateDiff(x, y, fNonMusrData[i].theory);
+              fNonMusrData[i].diff->SetPoint(j, x, value);
+              // set error diff bin value
+              value = fNonMusrData[i].data->GetErrorY(j);
+              fNonMusrData[i].diff->SetPointError(j, 0.0, value);
+            }
+          }
         }
 
-        // keep difference histo
-        fNonMusrData[i].diff = diffHisto;
-        // calculate diff histo entry
-        double value;
-        double x, y;
-        for (int j=0; j<fNonMusrData[i].data->GetN(); j++) {
-          // set diff bin value
-          fNonMusrData[i].data->GetPoint(j, x, y);
-          value = CalculateDiff(x, y, fNonMusrData[i].theory);
-          fNonMusrData[i].diff->SetPoint(j, x, value);
-          // set error diff bin value
-          value = fNonMusrData[i].data->GetErrorY(j);
-          fNonMusrData[i].diff->SetPointError(j, 0.0, value);
+        // set x-axis plot range properly
+        Int_t xminBin, xmaxBin;
+        Double_t xmin, xmax;
+        if (fPlotType != MSR_PLOT_NON_MUSR) { // muSR Data
+          xminBin = fData[0].data->GetXaxis()->GetFirst(); // first bin of the zoomed range
+          xmaxBin = fData[0].data->GetXaxis()->GetLast();  // last bin of the zoomed range
+          xmin = fData[0].data->GetXaxis()->GetBinCenter(xminBin);
+          xmax = fData[0].data->GetXaxis()->GetBinCenter(xmaxBin);
+          fData[0].diff->GetXaxis()->SetRangeUser(xmin, xmax);
+        } else { // non-muSR Data
+          xminBin = fNonMusrData[0].data->GetXaxis()->GetFirst(); // first bin of the zoomed range
+          xmaxBin = fNonMusrData[0].data->GetXaxis()->GetLast();  // last bin of the zoomed range
+          xmin = fNonMusrData[0].data->GetXaxis()->GetBinCenter(xminBin);
+          xmax = fNonMusrData[0].data->GetXaxis()->GetBinCenter(xmaxBin);
+          fNonMusrData[0].diff->GetXaxis()->SetRangeUser(xmin, xmax);
         }
-      }
+
+        // plot difference
+        PlotDifference();
+        break;
+      case PV_FOURIER_REAL:
+      case PV_FOURIER_IMAG:
+      case PV_FOURIER_REAL_AND_IMAG:
+      case PV_FOURIER_PWR:
+      case PV_FOURIER_PHASE:
+        if (fPlotType != MSR_PLOT_NON_MUSR) { // muSR Data
+          HandleFourier(fCurrentPlotView);
+        }
+        break;
+      default:
+        break;
     }
-  }
-
-  // switch back to the "normal" view
-  if (!fDifferenceView) {
-    if (fCurrentPlotView == PV_DATA)
+  } else { // switch back to the "normal" view
     switch (fCurrentPlotView) {
       case PV_DATA:
         PlotData();
@@ -1309,23 +1337,322 @@ void PMusrCanvas::HandleDifference()
       default:
         break;
     }
-  } else {
-    if (fCurrentPlotView == PV_DATA) {
-      if (fPlotType != MSR_PLOT_NON_MUSR) {
-        // set current x-axis range
-        Int_t xminBin = fData[0].data->GetXaxis()->GetFirst(); // first bin of the zoomed range
-        Int_t xmaxBin = fData[0].data->GetXaxis()->GetLast();  // last bin of the zoomed range
-        Double_t xmin = fData[0].data->GetXaxis()->GetBinCenter(xminBin);
-        Double_t xmax = fData[0].data->GetXaxis()->GetBinCenter(xmaxBin);
-        fData[0].diff->GetXaxis()->SetRangeUser(xmin, xmax);
-      }
-      PlotDifference();
-    }
   }
 }
 
 //--------------------------------------------------------------------------
-// CalculateDiff
+// HandleFourier (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param tag
+ */
+void PMusrCanvas::HandleFourier(int tag)
+{
+  // if fourier was invoked via the 'f' cmd key, take the default plot tag
+  if (tag == -1) { // called via cmd key 'f'
+    tag = fFourier.fPlotTag;
+    switch (tag) {
+      case FOURIER_PLOT_REAL:
+        fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL);
+        break;
+      case FOURIER_PLOT_IMAG:
+        fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG);
+        break;
+      case FOURIER_PLOT_REAL_AND_IMAG:
+        fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG);
+        break;
+      case FOURIER_PLOT_POWER:
+        fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR);
+        break;
+      case FOURIER_PLOT_PHASE:
+        fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE);
+        break;
+      default:
+        break;
+    }
+  }
+
+
+  // if the current view is a data plot, fourier needs to be calculated
+  if (fCurrentPlotView == PV_DATA) {
+    if (!fDifferenceView) { // data view
+      // delete fourier components
+      for (unsigned int i=0; i<fData.size(); i++) {
+        if (fData[i].dataFourierRe != 0) {
+          delete fData[i].dataFourierRe;
+          fData[i].dataFourierRe = 0;
+        }
+        if (fData[i].dataFourierIm != 0) {
+          delete fData[i].dataFourierIm;
+          fData[i].dataFourierIm = 0;
+        }
+        if (fData[i].dataFourierPwr != 0) {
+          delete fData[i].dataFourierPwr;
+          fData[i].dataFourierPwr = 0;
+        }
+        if (fData[i].dataFourierPhase != 0) {
+          delete fData[i].dataFourierPhase;
+          fData[i].dataFourierPhase = 0;
+        }
+        if (fData[i].theoryFourierRe != 0) {
+          delete fData[i].theoryFourierRe;
+          fData[i].theoryFourierRe = 0;
+        }
+        if (fData[i].theoryFourierIm != 0) {
+          delete fData[i].theoryFourierIm;
+          fData[i].theoryFourierIm = 0;
+        }
+        if (fData[i].theoryFourierPwr != 0) {
+          delete fData[i].theoryFourierPwr;
+          fData[i].theoryFourierPwr = 0;
+        }
+        if (fData[i].theoryFourierPhase != 0) {
+          delete fData[i].theoryFourierPhase;
+          fData[i].theoryFourierPhase = 0;
+        }
+      }
+
+      int bin;
+      bin = fData[0].data->GetXaxis()->GetFirst();
+      double startTime = fData[0].data->GetBinCenter(bin);
+      bin = fData[0].data->GetXaxis()->GetLast();
+      double endTime   = fData[0].data->GetBinCenter(bin);
+//cout << endl << ">> startTime = " << startTime << ", endTime = " << endTime << endl;
+      for (unsigned int i=0; i<fData.size(); i++) {
+        // calculate fourier transform of the data
+        PFourier fourierData(fData[i].data, fFourier.fUnits, startTime, endTime, fFourier.fFourierPower);
+        if (!fourierData.IsValid()) {
+          cout << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier data ..." << endl;
+          return;
+        }
+        fourierData.Transform(fFourier.fApodization);
+        double scale;
+        scale = sqrt(fData[0].data->GetBinWidth(1)/(endTime-startTime));
+cout << endl << ">> data scale = " << scale;
+        // get real part of the data
+        fData[i].dataFourierRe = fourierData.GetRealFourier(scale);
+//cout << endl << ">> i: " << i << ", fData[i].dataFourierRe = " << fData[i].dataFourierRe;
+        // get imaginary part of the data
+        fData[i].dataFourierIm = fourierData.GetImaginaryFourier(scale);
+        // get power part of the data
+        fData[i].dataFourierPwr = fourierData.GetPowerFourier(scale);
+        // get phase part of the data
+        fData[i].dataFourierPhase = fourierData.GetPhaseFourier();
+
+        // set marker and line color
+        fData[i].dataFourierRe->SetMarkerColor(fData[i].data->GetMarkerColor());
+        fData[i].dataFourierRe->SetLineColor(fData[i].data->GetLineColor());
+        fData[i].dataFourierIm->SetMarkerColor(fData[i].data->GetMarkerColor());
+        fData[i].dataFourierIm->SetLineColor(fData[i].data->GetLineColor());
+        fData[i].dataFourierPwr->SetMarkerColor(fData[i].data->GetMarkerColor());
+        fData[i].dataFourierPwr->SetLineColor(fData[i].data->GetLineColor());
+        fData[i].dataFourierPhase->SetMarkerColor(fData[i].data->GetMarkerColor());
+        fData[i].dataFourierPhase->SetLineColor(fData[i].data->GetLineColor());
+
+        // set marker size
+        fData[i].dataFourierRe->SetMarkerSize(1);
+        fData[i].dataFourierIm->SetMarkerSize(1);
+        fData[i].dataFourierPwr->SetMarkerSize(1);
+        fData[i].dataFourierPhase->SetMarkerSize(1);
+        // set marker type
+        fData[i].dataFourierRe->SetMarkerStyle(fData[i].data->GetMarkerStyle());
+        fData[i].dataFourierIm->SetMarkerStyle(fData[i].data->GetMarkerStyle());
+        fData[i].dataFourierPwr->SetMarkerStyle(fData[i].data->GetMarkerStyle());
+        fData[i].dataFourierPhase->SetMarkerStyle(fData[i].data->GetMarkerStyle());
+
+        // calculate fourier transform of the theory
+        int powerPad = (int)round(log((endTime-startTime)/fData[i].theory->GetBinWidth(1))/log(2))+3;
+cout << endl << ">> powerPad = " << powerPad;
+        PFourier fourierTheory(fData[i].theory, fFourier.fUnits, startTime, endTime, powerPad);
+        if (!fourierTheory.IsValid()) {
+          cout << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier theory ..." << endl;
+          return;
+        }
+        fourierTheory.Transform(fFourier.fApodization);
+        scale = sqrt(fData[0].theory->GetBinWidth(1)/(endTime-startTime)*fData[0].theory->GetBinWidth(1)/fData[0].data->GetBinWidth(1));
+cout << endl << ">> theory scale = " << scale << ", data.res/theory.res = " << fData[0].theory->GetBinWidth(1)/fData[0].data->GetBinWidth(1);
+        // get real part of the data
+        fData[i].theoryFourierRe = fourierTheory.GetRealFourier(scale);
+//cout << endl << ">> i: " << i << ", fData[i].dataFourierRe = " << fData[i].dataFourierRe;
+        // get imaginary part of the data
+        fData[i].theoryFourierIm = fourierTheory.GetImaginaryFourier(scale);
+        // get power part of the data
+        fData[i].theoryFourierPwr = fourierTheory.GetPowerFourier(scale);
+        // get phase part of the data
+        fData[i].theoryFourierPhase = fourierTheory.GetPhaseFourier();
+
+        // set line colors for the theory
+        fData[i].theoryFourierRe->SetLineColor(fData[i].theory->GetLineColor());
+        fData[i].theoryFourierIm->SetLineColor(fData[i].theory->GetLineColor());
+        fData[i].theoryFourierPwr->SetLineColor(fData[i].theory->GetLineColor());
+        fData[i].theoryFourierPhase->SetLineColor(fData[i].theory->GetLineColor());
+      }
+
+      // apply global phase
+      if (fFourier.fPhase != 0.0) {
+        double re, im;
+        const double cp = TMath::Cos(fFourier.fPhase/180.0*TMath::Pi());
+        const double sp = TMath::Sin(fFourier.fPhase/180.0*TMath::Pi());
+
+        fCurrentFourierPhase = fFourier.fPhase;
+
+        for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
+          if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
+            for (int j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+              // calculate new fourier data set value
+              re = fData[i].dataFourierRe->GetBinContent(j) * cp + fData[i].dataFourierIm->GetBinContent(j) * sp;
+              im = fData[i].dataFourierIm->GetBinContent(j) * cp - fData[i].dataFourierRe->GetBinContent(j) * sp;
+              // overwrite fourier data set value
+              fData[i].dataFourierRe->SetBinContent(j, re);
+              fData[i].dataFourierIm->SetBinContent(j, im);
+            }
+          }
+          if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
+            for (int j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+              // calculate new fourier data set value
+              re = fData[i].theoryFourierRe->GetBinContent(j) * cp + fData[i].theoryFourierIm->GetBinContent(j) * sp;
+              im = fData[i].theoryFourierIm->GetBinContent(j) * cp - fData[i].theoryFourierRe->GetBinContent(j) * sp;
+              // overwrite fourier data set value
+              fData[i].theoryFourierRe->SetBinContent(j, re);
+              fData[i].theoryFourierIm->SetBinContent(j, im);
+            }
+          }
+        }
+      }
+    } else { // calculate diff fourier
+      // delete fourier components
+      for (unsigned int i=0; i<fData.size(); i++) {
+        if (fData[i].diffFourierRe != 0) {
+          delete fData[i].diffFourierRe;
+          fData[i].diffFourierRe = 0;
+        }
+        if (fData[i].diffFourierIm != 0) {
+          delete fData[i].diffFourierIm;
+          fData[i].diffFourierIm = 0;
+        }
+        if (fData[i].diffFourierPwr != 0) {
+          delete fData[i].diffFourierPwr;
+          fData[i].diffFourierPwr = 0;
+        }
+        if (fData[i].diffFourierPhase != 0) {
+          delete fData[i].diffFourierPhase;
+          fData[i].diffFourierPhase = 0;
+        }
+      }
+
+      int bin;
+      bin = fData[0].diff->GetXaxis()->GetFirst();
+      double startTime = fData[0].diff->GetBinCenter(bin);
+      bin = fData[0].diff->GetXaxis()->GetLast();
+      double endTime   = fData[0].diff->GetBinCenter(bin);
+cout << endl << ">> startTime = " << startTime << ", endTime = " << endTime << endl;
+      for (unsigned int i=0; i<fData.size(); i++) {
+        // calculate fourier transform of the data
+        PFourier fourierData(fData[i].diff, fFourier.fUnits, startTime, endTime, fFourier.fFourierPower);
+        if (!fourierData.IsValid()) {
+          cout << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier diff ..." << endl;
+          return;
+        }
+        fourierData.Transform(fFourier.fApodization);
+        double scale;
+        scale = sqrt(fData[0].diff->GetBinWidth(1)/(endTime-startTime));
+cout << endl << ">> data scale = " << scale;
+        // get real part of the data
+        fData[i].diffFourierRe = fourierData.GetRealFourier(scale);
+//cout << endl << ">> i: " << i << ", fData[i].diffFourierRe = " << fData[i].diffFourierRe;
+        // get imaginary part of the data
+        fData[i].diffFourierIm = fourierData.GetImaginaryFourier(scale);
+        // get power part of the data
+        fData[i].diffFourierPwr = fourierData.GetPowerFourier(scale);
+        // get phase part of the data
+        fData[i].diffFourierPhase = fourierData.GetPhaseFourier();
+
+        // set marker and line color
+        fData[i].diffFourierRe->SetMarkerColor(fData[i].diff->GetMarkerColor());
+        fData[i].diffFourierRe->SetLineColor(fData[i].diff->GetLineColor());
+        fData[i].diffFourierIm->SetMarkerColor(fData[i].diff->GetMarkerColor());
+        fData[i].diffFourierIm->SetLineColor(fData[i].diff->GetLineColor());
+        fData[i].diffFourierPwr->SetMarkerColor(fData[i].diff->GetMarkerColor());
+        fData[i].diffFourierPwr->SetLineColor(fData[i].diff->GetLineColor());
+        fData[i].diffFourierPhase->SetMarkerColor(fData[i].diff->GetMarkerColor());
+        fData[i].diffFourierPhase->SetLineColor(fData[i].diff->GetLineColor());
+
+        // set marker size
+        fData[i].diffFourierRe->SetMarkerSize(1);
+        fData[i].diffFourierIm->SetMarkerSize(1);
+        fData[i].diffFourierPwr->SetMarkerSize(1);
+        fData[i].diffFourierPhase->SetMarkerSize(1);
+        // set marker type
+        fData[i].diffFourierRe->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
+        fData[i].diffFourierIm->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
+        fData[i].diffFourierPwr->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
+        fData[i].diffFourierPhase->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
+      }
+
+      // apply global phase
+      if (fFourier.fPhase != 0.0) {
+        double re, im;
+        const double cp = TMath::Cos(fFourier.fPhase/180.0*TMath::Pi());
+        const double sp = TMath::Sin(fFourier.fPhase/180.0*TMath::Pi());
+
+        fCurrentFourierPhase = fFourier.fPhase;
+
+        for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
+          if ((fData[i].diffFourierRe != 0) && (fData[i].diffFourierIm != 0)) {
+            for (int j=0; j<fData[i].diffFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+              // calculate new fourier data set value
+              re = fData[i].diffFourierRe->GetBinContent(j) * cp + fData[i].diffFourierIm->GetBinContent(j) * sp;
+              im = fData[i].diffFourierIm->GetBinContent(j) * cp - fData[i].diffFourierRe->GetBinContent(j) * sp;
+              // overwrite fourier data set value
+              fData[i].diffFourierRe->SetBinContent(j, re);
+              fData[i].diffFourierIm->SetBinContent(j, im);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  int plotView = -1;
+  switch (tag) { // called via popup menu
+    case FOURIER_PLOT_REAL:
+      plotView = PV_FOURIER_REAL;
+      break;
+    case FOURIER_PLOT_IMAG:
+      plotView = PV_FOURIER_IMAG;
+      break;
+    case FOURIER_PLOT_REAL_AND_IMAG:
+      plotView = PV_FOURIER_REAL_AND_IMAG;
+      break;
+    case FOURIER_PLOT_POWER:
+      plotView = PV_FOURIER_PWR;
+      break;
+    case FOURIER_PLOT_PHASE:
+      plotView = PV_FOURIER_PHASE;
+      break;
+    default:
+      break;
+  }
+
+  if (plotView == fCurrentPlotView) { // twice checked the same -> switch back to data view
+    fCurrentPlotView = PV_DATA;
+    // uncheck fourier menu entries
+    fPopupFourier->UnCheckEntries();
+    // plot data
+    if (!fDifferenceView)
+      PlotData();
+    else
+      PlotDifference();
+  } else { // plot fourier
+    fCurrentPlotView = plotView;
+    PlotFourier();
+  }
+}
+
+//--------------------------------------------------------------------------
+// CalculateDiff (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -1342,7 +1669,7 @@ double PMusrCanvas::CalculateDiff(const double x, const double y, TH1F *theo)
 }
 
 //--------------------------------------------------------------------------
-// CalculateDiff
+// CalculateDiff (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -1366,7 +1693,7 @@ double PMusrCanvas::CalculateDiff(const double x, const double y, TGraphErrors *
 }
 
 //--------------------------------------------------------------------------
-// FindBin
+// FindBin (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Analog to FindBin for histograms (TH1F) but here for TGraphErrors.
@@ -1395,7 +1722,7 @@ Int_t PMusrCanvas::FindBin(const double x, TGraphErrors *graph)
 }
 
 //--------------------------------------------------------------------------
-// GetGlobalMaximum
+// GetGlobalMaximum (private)
 //--------------------------------------------------------------------------
 /**
  * <p>returns the global maximum of a histogram
@@ -1419,7 +1746,7 @@ double PMusrCanvas::GetGlobalMaximum(TH1F* histo)
 }
 
 //--------------------------------------------------------------------------
-// GetGlobalMinimum
+// GetGlobalMinimum (private)
 //--------------------------------------------------------------------------
 /**
  * <p>returns the global minimum of a histogram
@@ -1443,7 +1770,7 @@ double PMusrCanvas::GetGlobalMinimum(TH1F* histo)
 }
 
 //--------------------------------------------------------------------------
-// PlotData
+// PlotData (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -1452,6 +1779,9 @@ double PMusrCanvas::GetGlobalMinimum(TH1F* histo)
 void PMusrCanvas::PlotData()
 {
   fDataTheoryPad->cd();
+
+  // uncheck fourier menu entries
+  fPopupFourier->UnCheckEntries();
 
   if (fPlotType < 0) // plot type not defined
     return;
@@ -1541,7 +1871,7 @@ void PMusrCanvas::PlotData()
 }
 
 //--------------------------------------------------------------------------
-// PlotDifference
+// PlotDifference (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -1589,7 +1919,7 @@ cout << endl << ">> going to plot diff spectra ... (" << fData[0].diff->GetNbins
 }
 
 //--------------------------------------------------------------------------
-// PlotFourier
+// PlotFourier (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -2115,7 +2445,7 @@ cout << endl << ">> in PlotFourier() ..." << endl;
 }
 
 //--------------------------------------------------------------------------
-// PlotFourierPhaseValue
+// PlotFourierPhaseValue (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -2151,7 +2481,89 @@ void PMusrCanvas::PlotFourierPhaseValue()
 }
 
 //--------------------------------------------------------------------------
-// SaveDataAscii
+// IncrementFourierPhase (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param tag
+ */
+void PMusrCanvas::IncrementFourierPhase()
+{
+  double re, im;
+  const double cp = TMath::Cos(fFourier.fPhaseIncrement/180.0*TMath::Pi());
+  const double sp = TMath::Sin(fFourier.fPhaseIncrement/180.0*TMath::Pi());
+
+  fCurrentFourierPhase += fFourier.fPhaseIncrement;
+  PlotFourierPhaseValue();
+
+  for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
+    if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
+      for (int j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+        // calculate new fourier data set value
+        re = fData[i].dataFourierRe->GetBinContent(j) * cp + fData[i].dataFourierIm->GetBinContent(j) * sp;
+        im = fData[i].dataFourierIm->GetBinContent(j) * cp - fData[i].dataFourierRe->GetBinContent(j) * sp;
+        // overwrite fourier data set value
+        fData[i].dataFourierRe->SetBinContent(j, re);
+        fData[i].dataFourierIm->SetBinContent(j, im);
+      }
+    }
+    if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
+      for (int j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+        // calculate new fourier data set value
+        re = fData[i].theoryFourierRe->GetBinContent(j) * cp + fData[i].theoryFourierIm->GetBinContent(j) * sp;
+        im = fData[i].theoryFourierIm->GetBinContent(j) * cp - fData[i].theoryFourierRe->GetBinContent(j) * sp;
+        // overwrite fourier data set value
+        fData[i].theoryFourierRe->SetBinContent(j, re);
+        fData[i].theoryFourierIm->SetBinContent(j, im);
+      }
+    }
+  }
+}
+
+//--------------------------------------------------------------------------
+// DecrementFourierPhase (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param tag
+ */
+void PMusrCanvas::DecrementFourierPhase()
+{
+  double re, im;
+  const double cp = TMath::Cos(fFourier.fPhaseIncrement/180.0*TMath::Pi());
+  const double sp = TMath::Sin(fFourier.fPhaseIncrement/180.0*TMath::Pi());
+
+  fCurrentFourierPhase -= fFourier.fPhaseIncrement;
+  PlotFourierPhaseValue();
+
+  for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
+    if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
+      for (int j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+        // calculate new fourier data set value
+        re = fData[i].dataFourierRe->GetBinContent(j) * cp - fData[i].dataFourierIm->GetBinContent(j) * sp;
+        im = fData[i].dataFourierIm->GetBinContent(j) * cp + fData[i].dataFourierRe->GetBinContent(j) * sp;
+        // overwrite fourier data set value
+        fData[i].dataFourierRe->SetBinContent(j, re);
+        fData[i].dataFourierIm->SetBinContent(j, im);
+      }
+    }
+    if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
+      for (int j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+        // calculate new fourier data set value
+        re = fData[i].theoryFourierRe->GetBinContent(j) * cp - fData[i].theoryFourierIm->GetBinContent(j) * sp;
+        im = fData[i].theoryFourierIm->GetBinContent(j) * cp + fData[i].theoryFourierRe->GetBinContent(j) * sp;
+        // overwrite fourier data set value
+        fData[i].theoryFourierRe->SetBinContent(j, re);
+        fData[i].theoryFourierIm->SetBinContent(j, im);
+      }
+    }
+  }
+}
+
+//--------------------------------------------------------------------------
+// SaveDataAscii (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -2638,7 +3050,7 @@ void PMusrCanvas::SaveDataAscii()
 }
 
 //--------------------------------------------------------------------------
-// SaveDataDb
+// SaveDataDb (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -3280,380 +3692,4 @@ void PMusrCanvas::SaveDataDb()
   fout.close();
 
   cout << endl << ">> Data windows saved in db format ..." << endl;
-}
-
-//--------------------------------------------------------------------------
-// HandleFourier
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param tag
- */
-void PMusrCanvas::HandleFourier(int tag)
-{
-  // if fourier was invoked via the 'f' cmd key, take the default plot tag
-  if (tag == -1) { // called via cmd key 'f'
-    tag = fFourier.fPlotTag;
-  }
-
-
-  // if the current view is a data plot, fourier needs to be calculated
-  if (fCurrentPlotView == PV_DATA) {
-    if (!fDifferenceView) { // data view
-      // delete fourier components
-      for (unsigned int i=0; i<fData.size(); i++) {
-        if (fData[i].dataFourierRe != 0) {
-          delete fData[i].dataFourierRe;
-          fData[i].dataFourierRe = 0;
-        }
-        if (fData[i].dataFourierIm != 0) {
-          delete fData[i].dataFourierIm;
-          fData[i].dataFourierIm = 0;
-        }
-        if (fData[i].dataFourierPwr != 0) {
-          delete fData[i].dataFourierPwr;
-          fData[i].dataFourierPwr = 0;
-        }
-        if (fData[i].dataFourierPhase != 0) {
-          delete fData[i].dataFourierPhase;
-          fData[i].dataFourierPhase = 0;
-        }
-        if (fData[i].theoryFourierRe != 0) {
-          delete fData[i].theoryFourierRe;
-          fData[i].theoryFourierRe = 0;
-        }
-        if (fData[i].theoryFourierIm != 0) {
-          delete fData[i].theoryFourierIm;
-          fData[i].theoryFourierIm = 0;
-        }
-        if (fData[i].theoryFourierPwr != 0) {
-          delete fData[i].theoryFourierPwr;
-          fData[i].theoryFourierPwr = 0;
-        }
-        if (fData[i].theoryFourierPhase != 0) {
-          delete fData[i].theoryFourierPhase;
-          fData[i].theoryFourierPhase = 0;
-        }
-      }
-
-      int bin;
-      bin = fData[0].data->GetXaxis()->GetFirst();
-      double startTime = fData[0].data->GetBinCenter(bin);
-      bin = fData[0].data->GetXaxis()->GetLast();
-      double endTime   = fData[0].data->GetBinCenter(bin);
-//cout << endl << ">> startTime = " << startTime << ", endTime = " << endTime << endl;
-      for (unsigned int i=0; i<fData.size(); i++) {
-        // calculate fourier transform of the data
-        PFourier fourierData(fData[i].data, fFourier.fUnits, startTime, endTime, fFourier.fFourierPower);
-        if (!fourierData.IsValid()) {
-          cout << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier data ..." << endl;
-          return;
-        }
-        fourierData.Transform(fFourier.fApodization);
-        double scale;
-        scale = sqrt(fData[0].data->GetBinWidth(1)/(endTime-startTime));
-cout << endl << ">> data scale = " << scale;
-        // get real part of the data
-        fData[i].dataFourierRe = fourierData.GetRealFourier(scale);
-//cout << endl << ">> i: " << i << ", fData[i].dataFourierRe = " << fData[i].dataFourierRe;
-        // get imaginary part of the data
-        fData[i].dataFourierIm = fourierData.GetImaginaryFourier(scale);
-        // get power part of the data
-        fData[i].dataFourierPwr = fourierData.GetPowerFourier(scale);
-        // get phase part of the data
-        fData[i].dataFourierPhase = fourierData.GetPhaseFourier();
-
-        // set marker and line color
-        fData[i].dataFourierRe->SetMarkerColor(fData[i].data->GetMarkerColor());
-        fData[i].dataFourierRe->SetLineColor(fData[i].data->GetLineColor());
-        fData[i].dataFourierIm->SetMarkerColor(fData[i].data->GetMarkerColor());
-        fData[i].dataFourierIm->SetLineColor(fData[i].data->GetLineColor());
-        fData[i].dataFourierPwr->SetMarkerColor(fData[i].data->GetMarkerColor());
-        fData[i].dataFourierPwr->SetLineColor(fData[i].data->GetLineColor());
-        fData[i].dataFourierPhase->SetMarkerColor(fData[i].data->GetMarkerColor());
-        fData[i].dataFourierPhase->SetLineColor(fData[i].data->GetLineColor());
-
-        // set marker size
-        fData[i].dataFourierRe->SetMarkerSize(1);
-        fData[i].dataFourierIm->SetMarkerSize(1);
-        fData[i].dataFourierPwr->SetMarkerSize(1);
-        fData[i].dataFourierPhase->SetMarkerSize(1);
-        // set marker type
-        fData[i].dataFourierRe->SetMarkerStyle(fData[i].data->GetMarkerStyle());
-        fData[i].dataFourierIm->SetMarkerStyle(fData[i].data->GetMarkerStyle());
-        fData[i].dataFourierPwr->SetMarkerStyle(fData[i].data->GetMarkerStyle());
-        fData[i].dataFourierPhase->SetMarkerStyle(fData[i].data->GetMarkerStyle());
-
-        // calculate fourier transform of the theory
-        int powerPad = (int)round(log((endTime-startTime)/fData[i].theory->GetBinWidth(1))/log(2))+3;
-cout << endl << ">> powerPad = " << powerPad;
-        PFourier fourierTheory(fData[i].theory, fFourier.fUnits, startTime, endTime, powerPad);
-        if (!fourierTheory.IsValid()) {
-          cout << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier theory ..." << endl;
-          return;
-        }
-        fourierTheory.Transform(fFourier.fApodization);
-        scale = sqrt(fData[0].theory->GetBinWidth(1)/(endTime-startTime)*fData[0].theory->GetBinWidth(1)/fData[0].data->GetBinWidth(1));
-cout << endl << ">> theory scale = " << scale << ", data.res/theory.res = " << fData[0].theory->GetBinWidth(1)/fData[0].data->GetBinWidth(1);
-        // get real part of the data
-        fData[i].theoryFourierRe = fourierTheory.GetRealFourier(scale);
-//cout << endl << ">> i: " << i << ", fData[i].dataFourierRe = " << fData[i].dataFourierRe;
-        // get imaginary part of the data
-        fData[i].theoryFourierIm = fourierTheory.GetImaginaryFourier(scale);
-        // get power part of the data
-        fData[i].theoryFourierPwr = fourierTheory.GetPowerFourier(scale);
-        // get phase part of the data
-        fData[i].theoryFourierPhase = fourierTheory.GetPhaseFourier();
-
-        // set line colors for the theory
-        fData[i].theoryFourierRe->SetLineColor(fData[i].theory->GetLineColor());
-        fData[i].theoryFourierIm->SetLineColor(fData[i].theory->GetLineColor());
-        fData[i].theoryFourierPwr->SetLineColor(fData[i].theory->GetLineColor());
-        fData[i].theoryFourierPhase->SetLineColor(fData[i].theory->GetLineColor());
-      }
-
-      // apply global phase
-      if (fFourier.fPhase != 0.0) {
-        double re, im;
-        const double cp = TMath::Cos(fFourier.fPhase/180.0*TMath::Pi());
-        const double sp = TMath::Sin(fFourier.fPhase/180.0*TMath::Pi());
-
-        fCurrentFourierPhase = fFourier.fPhase;
-
-        for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
-          if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
-            for (int j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
-              // calculate new fourier data set value
-              re = fData[i].dataFourierRe->GetBinContent(j) * cp + fData[i].dataFourierIm->GetBinContent(j) * sp;
-              im = fData[i].dataFourierIm->GetBinContent(j) * cp - fData[i].dataFourierRe->GetBinContent(j) * sp;
-              // overwrite fourier data set value
-              fData[i].dataFourierRe->SetBinContent(j, re);
-              fData[i].dataFourierIm->SetBinContent(j, im);
-            }
-          }
-          if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
-            for (int j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
-              // calculate new fourier data set value
-              re = fData[i].theoryFourierRe->GetBinContent(j) * cp + fData[i].theoryFourierIm->GetBinContent(j) * sp;
-              im = fData[i].theoryFourierIm->GetBinContent(j) * cp - fData[i].theoryFourierRe->GetBinContent(j) * sp;
-              // overwrite fourier data set value
-              fData[i].theoryFourierRe->SetBinContent(j, re);
-              fData[i].theoryFourierIm->SetBinContent(j, im);
-            }
-          }
-        }
-      }
-    } else { // calculate diff fourier
-      // delete fourier components
-      for (unsigned int i=0; i<fData.size(); i++) {
-        if (fData[i].diffFourierRe != 0) {
-          delete fData[i].diffFourierRe;
-          fData[i].diffFourierRe = 0;
-        }
-        if (fData[i].diffFourierIm != 0) {
-          delete fData[i].diffFourierIm;
-          fData[i].diffFourierIm = 0;
-        }
-        if (fData[i].diffFourierPwr != 0) {
-          delete fData[i].diffFourierPwr;
-          fData[i].diffFourierPwr = 0;
-        }
-        if (fData[i].diffFourierPhase != 0) {
-          delete fData[i].diffFourierPhase;
-          fData[i].diffFourierPhase = 0;
-        }
-      }
-
-      int bin;
-      bin = fData[0].diff->GetXaxis()->GetFirst();
-      double startTime = fData[0].diff->GetBinCenter(bin);
-      bin = fData[0].diff->GetXaxis()->GetLast();
-      double endTime   = fData[0].diff->GetBinCenter(bin);
-cout << endl << ">> startTime = " << startTime << ", endTime = " << endTime << endl;
-      for (unsigned int i=0; i<fData.size(); i++) {
-        // calculate fourier transform of the data
-        PFourier fourierData(fData[i].diff, fFourier.fUnits, startTime, endTime, fFourier.fFourierPower);
-        if (!fourierData.IsValid()) {
-          cout << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier diff ..." << endl;
-          return;
-        }
-        fourierData.Transform(fFourier.fApodization);
-        double scale;
-        scale = sqrt(fData[0].diff->GetBinWidth(1)/(endTime-startTime));
-cout << endl << ">> data scale = " << scale;
-        // get real part of the data
-        fData[i].diffFourierRe = fourierData.GetRealFourier(scale);
-//cout << endl << ">> i: " << i << ", fData[i].diffFourierRe = " << fData[i].diffFourierRe;
-        // get imaginary part of the data
-        fData[i].diffFourierIm = fourierData.GetImaginaryFourier(scale);
-        // get power part of the data
-        fData[i].diffFourierPwr = fourierData.GetPowerFourier(scale);
-        // get phase part of the data
-        fData[i].diffFourierPhase = fourierData.GetPhaseFourier();
-
-        // set marker and line color
-        fData[i].diffFourierRe->SetMarkerColor(fData[i].diff->GetMarkerColor());
-        fData[i].diffFourierRe->SetLineColor(fData[i].diff->GetLineColor());
-        fData[i].diffFourierIm->SetMarkerColor(fData[i].diff->GetMarkerColor());
-        fData[i].diffFourierIm->SetLineColor(fData[i].diff->GetLineColor());
-        fData[i].diffFourierPwr->SetMarkerColor(fData[i].diff->GetMarkerColor());
-        fData[i].diffFourierPwr->SetLineColor(fData[i].diff->GetLineColor());
-        fData[i].diffFourierPhase->SetMarkerColor(fData[i].diff->GetMarkerColor());
-        fData[i].diffFourierPhase->SetLineColor(fData[i].diff->GetLineColor());
-
-        // set marker size
-        fData[i].diffFourierRe->SetMarkerSize(1);
-        fData[i].diffFourierIm->SetMarkerSize(1);
-        fData[i].diffFourierPwr->SetMarkerSize(1);
-        fData[i].diffFourierPhase->SetMarkerSize(1);
-        // set marker type
-        fData[i].diffFourierRe->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
-        fData[i].diffFourierIm->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
-        fData[i].diffFourierPwr->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
-        fData[i].diffFourierPhase->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
-      }
-
-      // apply global phase
-      if (fFourier.fPhase != 0.0) {
-        double re, im;
-        const double cp = TMath::Cos(fFourier.fPhase/180.0*TMath::Pi());
-        const double sp = TMath::Sin(fFourier.fPhase/180.0*TMath::Pi());
-
-        fCurrentFourierPhase = fFourier.fPhase;
-
-        for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
-          if ((fData[i].diffFourierRe != 0) && (fData[i].diffFourierIm != 0)) {
-            for (int j=0; j<fData[i].diffFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
-              // calculate new fourier data set value
-              re = fData[i].diffFourierRe->GetBinContent(j) * cp + fData[i].diffFourierIm->GetBinContent(j) * sp;
-              im = fData[i].diffFourierIm->GetBinContent(j) * cp - fData[i].diffFourierRe->GetBinContent(j) * sp;
-              // overwrite fourier data set value
-              fData[i].diffFourierRe->SetBinContent(j, re);
-              fData[i].diffFourierIm->SetBinContent(j, im);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  int plotView = -1;
-  switch (tag) { // called via popup menu
-    case FOURIER_PLOT_REAL:
-      plotView = PV_FOURIER_REAL;
-      cout << endl << ">> will handle Real Part Fourier ..." << endl;
-      break;
-    case FOURIER_PLOT_IMAG:
-      plotView = PV_FOURIER_IMAG;
-      cout << endl << ">> will handle Imaginary Part Fourier ..." << endl;
-      break;
-    case FOURIER_PLOT_REAL_AND_IMAG:
-      plotView = PV_FOURIER_REAL_AND_IMAG;
-      cout << endl << ">> will handle Real+Imaginary Part Fourier ..." << endl;
-      break;
-    case FOURIER_PLOT_POWER:
-      plotView = PV_FOURIER_PWR;
-      cout << endl << ">> will handle Power Fourier ..." << endl;
-      break;
-    case FOURIER_PLOT_PHASE:
-      plotView = PV_FOURIER_PHASE;
-      cout << endl << ">> will handle Phase Fourier ..." << endl;
-      break;
-    default:
-      break;
-  }
-
-  if (plotView == fCurrentPlotView) { // twice checked the same -> switch back to data view
-    fCurrentPlotView = PV_DATA;
-    // uncheck fourier menu entries
-    fPopupFourier->UnCheckEntries();
-    // plot data
-    PlotData();
-  } else { // plot fourier
-    fCurrentPlotView = plotView;
-    PlotFourier();
-  }
-}
-
-//--------------------------------------------------------------------------
-// IncrementFourierPhase (private)
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param tag
- */
-void PMusrCanvas::IncrementFourierPhase()
-{
-  double re, im;
-  const double cp = TMath::Cos(fFourier.fPhaseIncrement/180.0*TMath::Pi());
-  const double sp = TMath::Sin(fFourier.fPhaseIncrement/180.0*TMath::Pi());
-
-  fCurrentFourierPhase += fFourier.fPhaseIncrement;
-  PlotFourierPhaseValue();
-
-  for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
-    if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
-      for (int j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
-        // calculate new fourier data set value
-        re = fData[i].dataFourierRe->GetBinContent(j) * cp + fData[i].dataFourierIm->GetBinContent(j) * sp;
-        im = fData[i].dataFourierIm->GetBinContent(j) * cp - fData[i].dataFourierRe->GetBinContent(j) * sp;
-        // overwrite fourier data set value
-        fData[i].dataFourierRe->SetBinContent(j, re);
-        fData[i].dataFourierIm->SetBinContent(j, im);
-      }
-    }
-    if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
-      for (int j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
-        // calculate new fourier data set value
-        re = fData[i].theoryFourierRe->GetBinContent(j) * cp + fData[i].theoryFourierIm->GetBinContent(j) * sp;
-        im = fData[i].theoryFourierIm->GetBinContent(j) * cp - fData[i].theoryFourierRe->GetBinContent(j) * sp;
-        // overwrite fourier data set value
-        fData[i].theoryFourierRe->SetBinContent(j, re);
-        fData[i].theoryFourierIm->SetBinContent(j, im);
-      }
-    }
-  }
-}
-
-//--------------------------------------------------------------------------
-// DecrementFourierPhase (private)
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param tag
- */
-void PMusrCanvas::DecrementFourierPhase()
-{
-  double re, im;
-  const double cp = TMath::Cos(fFourier.fPhaseIncrement/180.0*TMath::Pi());
-  const double sp = TMath::Sin(fFourier.fPhaseIncrement/180.0*TMath::Pi());
-
-  fCurrentFourierPhase -= fFourier.fPhaseIncrement;
-  PlotFourierPhaseValue();
-
-  for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
-    if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
-      for (int j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
-        // calculate new fourier data set value
-        re = fData[i].dataFourierRe->GetBinContent(j) * cp - fData[i].dataFourierIm->GetBinContent(j) * sp;
-        im = fData[i].dataFourierIm->GetBinContent(j) * cp + fData[i].dataFourierRe->GetBinContent(j) * sp;
-        // overwrite fourier data set value
-        fData[i].dataFourierRe->SetBinContent(j, re);
-        fData[i].dataFourierIm->SetBinContent(j, im);
-      }
-    }
-    if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
-      for (int j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
-        // calculate new fourier data set value
-        re = fData[i].theoryFourierRe->GetBinContent(j) * cp - fData[i].theoryFourierIm->GetBinContent(j) * sp;
-        im = fData[i].theoryFourierIm->GetBinContent(j) * cp + fData[i].theoryFourierRe->GetBinContent(j) * sp;
-        // overwrite fourier data set value
-        fData[i].theoryFourierRe->SetBinContent(j, re);
-        fData[i].theoryFourierIm->SetBinContent(j, im);
-      }
-    }
-  }
 }
