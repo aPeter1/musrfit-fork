@@ -64,9 +64,10 @@
 #define PV_FOURIER_PHASE         6
 
 // Canvas menu id's
-#define P_MENU_ID_FOURIER       10001
-#define P_MENU_ID_DIFFERENCE    10002
-#define P_MENU_ID_SAVE_DATA     10003
+#define P_MENU_ID_DATA          10001
+#define P_MENU_ID_FOURIER       10002
+#define P_MENU_ID_DIFFERENCE    10003
+#define P_MENU_ID_SAVE_DATA     10004
 
 #define P_MENU_PLOT_OFFSET      1000
 
@@ -218,7 +219,11 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunData *data);
     virtual void HandleNonMusrDataSet(unsigned int plotNo, unsigned int runNo, PRunData *data);
     virtual void HandleDifference();
-    virtual void HandleFourier(int tag);
+    virtual void HandleFourier();
+    virtual void HandleFourierDifference();
+    virtual void CleanupDifference();
+    virtual void CleanupFourier();
+    virtual void CleanupFourierDifference();
 
     virtual double CalculateDiff(const double x, const double y, TH1F *theo);
     virtual double CalculateDiff(const double x, const double y, TGraphErrors *theo);
@@ -230,6 +235,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void PlotData();
     virtual void PlotDifference();
     virtual void PlotFourier();
+    virtual void PlotFourierDifference();
     virtual void PlotFourierPhaseValue();
     virtual void IncrementFourierPhase();
     virtual void DecrementFourierPhase();

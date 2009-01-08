@@ -107,6 +107,7 @@ short term:
   **CHECKED AND FIXED** 08-11-12
 
 * implement FFT with msr-interface
+  **DONE** 2009-01
 
 ---------------------
 intermediate term:
