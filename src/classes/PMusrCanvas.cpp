@@ -322,11 +322,6 @@ void PMusrCanvas::UpdateParamTheoryPad()
  */
 void PMusrCanvas::UpdateDataTheoryPad()
 {
-/*
-  // NonMusr axis titles
-  TString xAxisTitle;
-  TString yAxisTitle;
-*/
   // some checks first
   unsigned int runNo;
   PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
@@ -343,21 +338,14 @@ void PMusrCanvas::UpdateDataTheoryPad()
     }
     // check that the plottype and the fittype do correspond
     runNo = (unsigned int)plotInfo.fRuns[i].Re()-1;
-cout << endl << ">> runNo = " << runNo;
-cout << endl;
+//cout << endl << ">> runNo = " << runNo;
+//cout << endl;
     if (fPlotType != runs[runNo].fFitType) {
       fValid = false;
       cout << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** plottype = " << fPlotType << ", fittype = " << runs[runNo].fFitType << ", however they have to correspond!";
       cout << endl;
       return;
     }
-/*
-    // check if NonMusr type plot and if yes get x- and y-axis title
-    if (fPlotType == MSR_PLOT_NON_MUSR) {
-      xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName);
-      yAxisTitle = fRunList->GetYAxisTitle(runs[runNo].fRunName);
-    }
-*/
   }
 
   PRunData *data;
@@ -625,12 +613,6 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
       // set the current view to data
       fCurrentPlotView = PV_DATA;
     }
-/*
-    if (fPlotType != MSR_PLOT_NON_MUSR) {
-      fPopupMain->UnCheckEntry(P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
-      HandleFourier(-1);
-    }
-*/
   } else if (x == '+') {
     if (fCurrentPlotView != PV_DATA)
       IncrementFourierPhase();
@@ -646,7 +628,6 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
     if (fDifferenceView) { // difference view
       switch (fCurrentPlotView) {
         case PV_DATA:
-cout << endl << ">> HandleCmdKey(): fDifferenceView==true, fCurrentPlotView==PV_DATA -> HandleDifference()" << endl;
           CleanupFourierDifference();
           HandleDifference();
           break;
@@ -655,7 +636,6 @@ cout << endl << ">> HandleCmdKey(): fDifferenceView==true, fCurrentPlotView==PV_
         case PV_FOURIER_REAL_AND_IMAG:
         case PV_FOURIER_PWR:
         case PV_FOURIER_PHASE:
-cout << endl << ">> HandleCmdKey(): fDifferenceView==true, fCurrentPlotView==" << fCurrentPlotView << " -> HandleFourierDifference()" << endl;
           HandleFourierDifference();
           break;
         default:
@@ -664,7 +644,6 @@ cout << endl << ">> HandleCmdKey(): fDifferenceView==true, fCurrentPlotView==" <
     } else { // not a difference view
       switch (fCurrentPlotView) {
         case PV_DATA:
-cout << endl << ">> HandleCmdKey(): fDifferenceView==false, fCurrentPlotView==PV_DATA -> PlotData()" << endl;
           CleanupDifference();
           CleanupFourier();
           PlotData();
@@ -674,7 +653,6 @@ cout << endl << ">> HandleCmdKey(): fDifferenceView==false, fCurrentPlotView==PV
         case PV_FOURIER_REAL_AND_IMAG:
         case PV_FOURIER_PWR:
         case PV_FOURIER_PHASE:
-cout << endl << ">> HandleCmdKey(): fDifferenceView==false, fCurrentPlotView==" << fCurrentPlotView << " -> HandleFourier()" << endl;
           HandleFourier();
           break;
         default:
@@ -1426,7 +1404,7 @@ void PMusrCanvas::HandleDifference()
 {
   // check if it is necessary to calculate diff data
   if ((fPlotType != MSR_PLOT_NON_MUSR) && (fData[0].diff == 0)) {
-cout << endl << ">> calculate diff ..." << endl;
+//cout << endl << ">> calculate diff ..." << endl;
     TH1F *diffHisto;
     TString name;
     // loop over all histos
@@ -1530,7 +1508,7 @@ void PMusrCanvas::HandleFourier()
   if (fPlotType == MSR_PLOT_NON_MUSR)
     return;
 
-cout << endl << ">> in HandleFourier ..." << endl;
+//cout << endl << ">> in HandleFourier ..." << endl;
 
   // check if fourier needs to be calculated
   if (fData[0].dataFourierRe == 0) {
@@ -1642,246 +1620,7 @@ cout << endl << ">> theory scale = " << scale << ", data.res/theory.res = " << f
       }
     }
   }
-/*
-  if (fCurrentPlotView == PV_DATA) {
-    if (!fDifferenceView) { // data view
-      // delete fourier components
-      for (unsigned int i=0; i<fData.size(); i++) {
-        if (fData[i].dataFourierRe != 0) {
-          delete fData[i].dataFourierRe;
-          fData[i].dataFourierRe = 0;
-        }
-        if (fData[i].dataFourierIm != 0) {
-          delete fData[i].dataFourierIm;
-          fData[i].dataFourierIm = 0;
-        }
-        if (fData[i].dataFourierPwr != 0) {
-          delete fData[i].dataFourierPwr;
-          fData[i].dataFourierPwr = 0;
-        }
-        if (fData[i].dataFourierPhase != 0) {
-          delete fData[i].dataFourierPhase;
-          fData[i].dataFourierPhase = 0;
-        }
-        if (fData[i].theoryFourierRe != 0) {
-          delete fData[i].theoryFourierRe;
-          fData[i].theoryFourierRe = 0;
-        }
-        if (fData[i].theoryFourierIm != 0) {
-          delete fData[i].theoryFourierIm;
-          fData[i].theoryFourierIm = 0;
-        }
-        if (fData[i].theoryFourierPwr != 0) {
-          delete fData[i].theoryFourierPwr;
-          fData[i].theoryFourierPwr = 0;
-        }
-        if (fData[i].theoryFourierPhase != 0) {
-          delete fData[i].theoryFourierPhase;
-          fData[i].theoryFourierPhase = 0;
-        }
-      }
 
-      int bin;
-      bin = fData[0].data->GetXaxis()->GetFirst();
-      double startTime = fData[0].data->GetBinCenter(bin);
-      bin = fData[0].data->GetXaxis()->GetLast();
-      double endTime   = fData[0].data->GetBinCenter(bin);
-//cout << endl << ">> startTime = " << startTime << ", endTime = " << endTime << endl;
-      for (unsigned int i=0; i<fData.size(); i++) {
-        // calculate fourier transform of the data
-        PFourier fourierData(fData[i].data, fFourier.fUnits, startTime, endTime, fFourier.fFourierPower);
-        if (!fourierData.IsValid()) {
-          cout << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier data ..." << endl;
-          return;
-        }
-        fourierData.Transform(fFourier.fApodization);
-        double scale;
-        scale = sqrt(fData[0].data->GetBinWidth(1)/(endTime-startTime));
-cout << endl << ">> data scale = " << scale;
-        // get real part of the data
-        fData[i].dataFourierRe = fourierData.GetRealFourier(scale);
-//cout << endl << ">> i: " << i << ", fData[i].dataFourierRe = " << fData[i].dataFourierRe;
-        // get imaginary part of the data
-        fData[i].dataFourierIm = fourierData.GetImaginaryFourier(scale);
-        // get power part of the data
-        fData[i].dataFourierPwr = fourierData.GetPowerFourier(scale);
-        // get phase part of the data
-        fData[i].dataFourierPhase = fourierData.GetPhaseFourier();
-
-        // set marker and line color
-        fData[i].dataFourierRe->SetMarkerColor(fData[i].data->GetMarkerColor());
-        fData[i].dataFourierRe->SetLineColor(fData[i].data->GetLineColor());
-        fData[i].dataFourierIm->SetMarkerColor(fData[i].data->GetMarkerColor());
-        fData[i].dataFourierIm->SetLineColor(fData[i].data->GetLineColor());
-        fData[i].dataFourierPwr->SetMarkerColor(fData[i].data->GetMarkerColor());
-        fData[i].dataFourierPwr->SetLineColor(fData[i].data->GetLineColor());
-        fData[i].dataFourierPhase->SetMarkerColor(fData[i].data->GetMarkerColor());
-        fData[i].dataFourierPhase->SetLineColor(fData[i].data->GetLineColor());
-
-        // set marker size
-        fData[i].dataFourierRe->SetMarkerSize(1);
-        fData[i].dataFourierIm->SetMarkerSize(1);
-        fData[i].dataFourierPwr->SetMarkerSize(1);
-        fData[i].dataFourierPhase->SetMarkerSize(1);
-        // set marker type
-        fData[i].dataFourierRe->SetMarkerStyle(fData[i].data->GetMarkerStyle());
-        fData[i].dataFourierIm->SetMarkerStyle(fData[i].data->GetMarkerStyle());
-        fData[i].dataFourierPwr->SetMarkerStyle(fData[i].data->GetMarkerStyle());
-        fData[i].dataFourierPhase->SetMarkerStyle(fData[i].data->GetMarkerStyle());
-
-        // calculate fourier transform of the theory
-        int powerPad = (int)round(log((endTime-startTime)/fData[i].theory->GetBinWidth(1))/log(2))+3;
-cout << endl << ">> powerPad = " << powerPad;
-        PFourier fourierTheory(fData[i].theory, fFourier.fUnits, startTime, endTime, powerPad);
-        if (!fourierTheory.IsValid()) {
-          cout << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier theory ..." << endl;
-          return;
-        }
-        fourierTheory.Transform(fFourier.fApodization);
-        scale = sqrt(fData[0].theory->GetBinWidth(1)/(endTime-startTime)*fData[0].theory->GetBinWidth(1)/fData[0].data->GetBinWidth(1));
-cout << endl << ">> theory scale = " << scale << ", data.res/theory.res = " << fData[0].theory->GetBinWidth(1)/fData[0].data->GetBinWidth(1);
-        // get real part of the data
-        fData[i].theoryFourierRe = fourierTheory.GetRealFourier(scale);
-//cout << endl << ">> i: " << i << ", fData[i].dataFourierRe = " << fData[i].dataFourierRe;
-        // get imaginary part of the data
-        fData[i].theoryFourierIm = fourierTheory.GetImaginaryFourier(scale);
-        // get power part of the data
-        fData[i].theoryFourierPwr = fourierTheory.GetPowerFourier(scale);
-        // get phase part of the data
-        fData[i].theoryFourierPhase = fourierTheory.GetPhaseFourier();
-
-        // set line colors for the theory
-        fData[i].theoryFourierRe->SetLineColor(fData[i].theory->GetLineColor());
-        fData[i].theoryFourierIm->SetLineColor(fData[i].theory->GetLineColor());
-        fData[i].theoryFourierPwr->SetLineColor(fData[i].theory->GetLineColor());
-        fData[i].theoryFourierPhase->SetLineColor(fData[i].theory->GetLineColor());
-      }
-
-      // apply global phase
-      if (fFourier.fPhase != 0.0) {
-        double re, im;
-        const double cp = TMath::Cos(fFourier.fPhase/180.0*TMath::Pi());
-        const double sp = TMath::Sin(fFourier.fPhase/180.0*TMath::Pi());
-
-        fCurrentFourierPhase = fFourier.fPhase;
-
-        for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
-          if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
-            for (int j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
-              // calculate new fourier data set value
-              re = fData[i].dataFourierRe->GetBinContent(j) * cp + fData[i].dataFourierIm->GetBinContent(j) * sp;
-              im = fData[i].dataFourierIm->GetBinContent(j) * cp - fData[i].dataFourierRe->GetBinContent(j) * sp;
-              // overwrite fourier data set value
-              fData[i].dataFourierRe->SetBinContent(j, re);
-              fData[i].dataFourierIm->SetBinContent(j, im);
-            }
-          }
-          if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
-            for (int j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
-              // calculate new fourier data set value
-              re = fData[i].theoryFourierRe->GetBinContent(j) * cp + fData[i].theoryFourierIm->GetBinContent(j) * sp;
-              im = fData[i].theoryFourierIm->GetBinContent(j) * cp - fData[i].theoryFourierRe->GetBinContent(j) * sp;
-              // overwrite fourier data set value
-              fData[i].theoryFourierRe->SetBinContent(j, re);
-              fData[i].theoryFourierIm->SetBinContent(j, im);
-            }
-          }
-        }
-      }
-    } else { // calculate diff fourier
-      // delete fourier components
-      for (unsigned int i=0; i<fData.size(); i++) {
-        if (fData[i].diffFourierRe != 0) {
-          delete fData[i].diffFourierRe;
-          fData[i].diffFourierRe = 0;
-        }
-        if (fData[i].diffFourierIm != 0) {
-          delete fData[i].diffFourierIm;
-          fData[i].diffFourierIm = 0;
-        }
-        if (fData[i].diffFourierPwr != 0) {
-          delete fData[i].diffFourierPwr;
-          fData[i].diffFourierPwr = 0;
-        }
-        if (fData[i].diffFourierPhase != 0) {
-          delete fData[i].diffFourierPhase;
-          fData[i].diffFourierPhase = 0;
-        }
-      }
-
-      int bin;
-      bin = fData[0].diff->GetXaxis()->GetFirst();
-      double startTime = fData[0].diff->GetBinCenter(bin);
-      bin = fData[0].diff->GetXaxis()->GetLast();
-      double endTime   = fData[0].diff->GetBinCenter(bin);
-cout << endl << ">> startTime = " << startTime << ", endTime = " << endTime << endl;
-      for (unsigned int i=0; i<fData.size(); i++) {
-        // calculate fourier transform of the data
-        PFourier fourierData(fData[i].diff, fFourier.fUnits, startTime, endTime, fFourier.fFourierPower);
-        if (!fourierData.IsValid()) {
-          cout << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier diff ..." << endl;
-          return;
-        }
-        fourierData.Transform(fFourier.fApodization);
-        double scale;
-        scale = sqrt(fData[0].diff->GetBinWidth(1)/(endTime-startTime));
-cout << endl << ">> data scale = " << scale;
-        // get real part of the data
-        fData[i].diffFourierRe = fourierData.GetRealFourier(scale);
-//cout << endl << ">> i: " << i << ", fData[i].diffFourierRe = " << fData[i].diffFourierRe;
-        // get imaginary part of the data
-        fData[i].diffFourierIm = fourierData.GetImaginaryFourier(scale);
-        // get power part of the data
-        fData[i].diffFourierPwr = fourierData.GetPowerFourier(scale);
-        // get phase part of the data
-        fData[i].diffFourierPhase = fourierData.GetPhaseFourier();
-
-        // set marker and line color
-        fData[i].diffFourierRe->SetMarkerColor(fData[i].diff->GetMarkerColor());
-        fData[i].diffFourierRe->SetLineColor(fData[i].diff->GetLineColor());
-        fData[i].diffFourierIm->SetMarkerColor(fData[i].diff->GetMarkerColor());
-        fData[i].diffFourierIm->SetLineColor(fData[i].diff->GetLineColor());
-        fData[i].diffFourierPwr->SetMarkerColor(fData[i].diff->GetMarkerColor());
-        fData[i].diffFourierPwr->SetLineColor(fData[i].diff->GetLineColor());
-        fData[i].diffFourierPhase->SetMarkerColor(fData[i].diff->GetMarkerColor());
-        fData[i].diffFourierPhase->SetLineColor(fData[i].diff->GetLineColor());
-
-        // set marker size
-        fData[i].diffFourierRe->SetMarkerSize(1);
-        fData[i].diffFourierIm->SetMarkerSize(1);
-        fData[i].diffFourierPwr->SetMarkerSize(1);
-        fData[i].diffFourierPhase->SetMarkerSize(1);
-        // set marker type
-        fData[i].diffFourierRe->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
-        fData[i].diffFourierIm->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
-        fData[i].diffFourierPwr->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
-        fData[i].diffFourierPhase->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
-      }
-
-      // apply global phase
-      if (fFourier.fPhase != 0.0) {
-        double re, im;
-        const double cp = TMath::Cos(fFourier.fPhase/180.0*TMath::Pi());
-        const double sp = TMath::Sin(fFourier.fPhase/180.0*TMath::Pi());
-
-        fCurrentFourierPhase = fFourier.fPhase;
-
-        for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
-          if ((fData[i].diffFourierRe != 0) && (fData[i].diffFourierIm != 0)) {
-            for (int j=0; j<fData[i].diffFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
-              // calculate new fourier data set value
-              re = fData[i].diffFourierRe->GetBinContent(j) * cp + fData[i].diffFourierIm->GetBinContent(j) * sp;
-              im = fData[i].diffFourierIm->GetBinContent(j) * cp - fData[i].diffFourierRe->GetBinContent(j) * sp;
-              // overwrite fourier data set value
-              fData[i].diffFourierRe->SetBinContent(j, re);
-              fData[i].diffFourierIm->SetBinContent(j, im);
-            }
-          }
-        }
-      }
-    }
-  }
-*/
   PlotFourier();
 }
 
@@ -1901,12 +1640,16 @@ cout << endl << ">> in HandleFourierDifference ..." << endl;
 
   // check if fourier needs to be calculated
   if (fData[0].diffFourierRe == 0) {
+//cout << endl << ">> will calculate Fourier diff ..." << endl;
+    // check if difference has been already calcualted, if not do it
+    if (fData[0].diff == 0)
+      HandleDifference();
     int bin;
     bin = fData[0].diff->GetXaxis()->GetFirst();
     double startTime = fData[0].diff->GetBinCenter(bin);
     bin = fData[0].diff->GetXaxis()->GetLast();
     double endTime   = fData[0].diff->GetBinCenter(bin);
-cout << endl << ">> startTime = " << startTime << ", endTime = " << endTime << endl;
+//cout << endl << ">> startTime = " << startTime << ", endTime = " << endTime << endl;
     for (unsigned int i=0; i<fData.size(); i++) {
       // calculate fourier transform of the data
       PFourier fourierData(fData[i].diff, fFourier.fUnits, startTime, endTime, fFourier.fFourierPower);
@@ -2301,7 +2044,7 @@ void PMusrCanvas::PlotDifference()
     return;
 
   if (fPlotType != MSR_PLOT_NON_MUSR) {
-cout << endl << ">> PlotDifference(): going to plot diff spectra ... (" << fData[0].diff->GetNbinsX() << ")" << endl;
+//cout << endl << ">> PlotDifference(): going to plot diff spectra ... (" << fData[0].diff->GetNbinsX() << ")" << endl;
     fData[0].diff->Draw("pe");
     // set x-axis label
     fData[0].diff->GetXaxis()->SetTitle("time (#mus)");
@@ -2343,7 +2086,7 @@ cout << endl << ">> PlotDifference(): going to plot diff spectra ... (" << fData
  */
 void PMusrCanvas::PlotFourier()
 {
-cout << endl << ">> in PlotFourier() ..." << endl;
+//cout << endl << ">> in PlotFourier() ..." << endl;
 
   fDataTheoryPad->cd();
 
