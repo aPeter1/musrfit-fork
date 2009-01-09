@@ -1589,9 +1589,9 @@ cout << endl << ">> theory scale = " << scale << ", data.res/theory.res = " << f
     }
 
     // apply global phase if present
-cout << endl << ">> fFourier.fPhase = " << fFourier.fPhase;
+//cout << endl << ">> fFourier.fPhase = " << fFourier.fPhase;
     if (fFourier.fPhase != 0.0) {
-cout << endl << ">> apply global phase fFourier.fPhase = " << fFourier.fPhase;
+//cout << endl << ">> apply global phase fFourier.fPhase = " << fFourier.fPhase;
       double re, im;
       const double cp = TMath::Cos(fFourier.fPhase/180.0*TMath::Pi());
       const double sp = TMath::Sin(fFourier.fPhase/180.0*TMath::Pi());
@@ -1772,7 +1772,7 @@ cout << endl << ">> in FindOptimalFourierPhase ... ";
   if ((fData[0].dataFourierRe == 0) || (fData[0].dataFourierIm == 0))
     return 0.0;
 
-  double minPhase, x, valIm;
+  double minPhase, x, valIm, val_xMin, val_xMax;
   double minIm, maxIm, asymmetry;
   // get min/max of the imaginary part for phase = 0.0 as a starting point
   minPhase = 0.0;
@@ -1784,16 +1784,18 @@ cout << endl << ">> in FindOptimalFourierPhase ... ";
       if (first) {
         minIm = valIm;
         maxIm = valIm;
+        val_xMin = valIm;
         first = false;
       } else {
         if (valIm < minIm)
           minIm = valIm;
         if (valIm > maxIm)
           maxIm = valIm;
+        val_xMax = valIm;
       }
     }
   }
-  asymmetry = maxIm + minIm;
+  asymmetry = (maxIm+minIm)*(val_xMin-val_xMax);
 
   // go through all phases an check if there is a larger max-min value of the imaginary part
   double cp, sp;
@@ -1808,19 +1810,21 @@ cout << endl << ">> in FindOptimalFourierPhase ... ";
         if (first) {
           minIm = valIm;
           maxIm = valIm;
+        val_xMin = valIm;
           first = false;
         } else {
           if (valIm < minIm)
             minIm = valIm;
           if (valIm > maxIm)
             maxIm = valIm;
+        val_xMax = valIm;
         }
       }
     }
-    if (fabs(asymmetry) > fabs(maxIm+minIm)) {
-cout << endl << ">> phase = " << phase << ", asymmetry = " << asymmetry << ", min/max = " << minIm << "/" << maxIm;
+    if (fabs(asymmetry) > fabs((maxIm+minIm)*(val_xMin-val_xMax))) {
+//cout << endl << ">> phase = " << phase << ", asymmetry = " << asymmetry << ", min/max = " << minIm << "/" << maxIm;
       minPhase = phase;
-      asymmetry = maxIm+minIm;
+      asymmetry = (maxIm+minIm)*(val_xMin-val_xMax);
     }
   }
 cout << endl << ">> optimal phase = " << minPhase << endl;
