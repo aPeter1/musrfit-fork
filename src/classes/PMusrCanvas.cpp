@@ -1588,13 +1588,49 @@ cout << endl << ">> theory scale = " << scale << ", data.res/theory.res = " << f
       fData[i].theoryFourierPhase->SetLineColor(fData[i].theory->GetLineColor());
     }
 
-    // apply global phase
+    // apply global phase if present
+cout << endl << ">> fFourier.fPhase = " << fFourier.fPhase;
     if (fFourier.fPhase != 0.0) {
+cout << endl << ">> apply global phase fFourier.fPhase = " << fFourier.fPhase;
       double re, im;
       const double cp = TMath::Cos(fFourier.fPhase/180.0*TMath::Pi());
       const double sp = TMath::Sin(fFourier.fPhase/180.0*TMath::Pi());
 
       fCurrentFourierPhase = fFourier.fPhase;
+
+      for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
+        if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
+          for (int j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+            // calculate new fourier data set value
+            re = fData[i].dataFourierRe->GetBinContent(j) * cp + fData[i].dataFourierIm->GetBinContent(j) * sp;
+            im = fData[i].dataFourierIm->GetBinContent(j) * cp - fData[i].dataFourierRe->GetBinContent(j) * sp;
+            // overwrite fourier data set value
+            fData[i].dataFourierRe->SetBinContent(j, re);
+            fData[i].dataFourierIm->SetBinContent(j, im);
+          }
+        }
+        if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
+          for (int j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+            // calculate new fourier data set value
+            re = fData[i].theoryFourierRe->GetBinContent(j) * cp + fData[i].theoryFourierIm->GetBinContent(j) * sp;
+            im = fData[i].theoryFourierIm->GetBinContent(j) * cp - fData[i].theoryFourierRe->GetBinContent(j) * sp;
+            // overwrite fourier data set value
+            fData[i].theoryFourierRe->SetBinContent(j, re);
+            fData[i].theoryFourierIm->SetBinContent(j, im);
+          }
+        }
+      }
+    }
+
+    // find optimal Fourier phase if range is given
+    if ((fFourier.fRangeForPhaseCorrection[0] != -1.0) && (fFourier.fRangeForPhaseCorrection[1] != -1.0)) {
+
+      fCurrentFourierPhase = FindOptimalFourierPhase();
+
+      // apply optimal Fourier phase
+      double re, im;
+      const double cp = TMath::Cos(fCurrentFourierPhase/180.0*TMath::Pi());
+      const double sp = TMath::Sin(fCurrentFourierPhase/180.0*TMath::Pi());
 
       for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
         if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
@@ -1717,6 +1753,79 @@ cout << endl << ">> data scale = " << scale;
   }
 
   PlotFourierDifference();
+}
+
+
+//--------------------------------------------------------------------------
+// FindOptimalFourierPhase (private)
+//--------------------------------------------------------------------------
+/**
+ * <p> The idea to estimate the optimal phase is that the imaginary part of the fourier should be
+ * an antisymmetric function around the resonance, hence the asymmetry defined as asymmetry = max+min,
+ * where max/min is the maximum and minimum of the imaginary part, should be a minimum for the correct phase.
+ */
+double PMusrCanvas::FindOptimalFourierPhase()
+{
+cout << endl << ">> in FindOptimalFourierPhase ... ";
+
+  // check that Fourier is really present
+  if ((fData[0].dataFourierRe == 0) || (fData[0].dataFourierIm == 0))
+    return 0.0;
+
+  double minPhase, x, valIm;
+  double minIm, maxIm, asymmetry;
+  // get min/max of the imaginary part for phase = 0.0 as a starting point
+  minPhase = 0.0;
+  bool first = true;
+  for (int i=0; i<fData[0].dataFourierIm->GetNbinsX(); i++) {
+    x = fData[0].dataFourierIm->GetBinCenter(i);
+    if ((x > fFourier.fRangeForPhaseCorrection[0]) && (x < fFourier.fRangeForPhaseCorrection[1])) {
+      valIm = fData[0].dataFourierIm->GetBinContent(i);
+      if (first) {
+        minIm = valIm;
+        maxIm = valIm;
+        first = false;
+      } else {
+        if (valIm < minIm)
+          minIm = valIm;
+        if (valIm > maxIm)
+          maxIm = valIm;
+      }
+    }
+  }
+  asymmetry = maxIm + minIm;
+
+  // go through all phases an check if there is a larger max-min value of the imaginary part
+  double cp, sp;
+  for (double phase=0.1; phase < 180.0; phase += 0.1) {
+    cp = TMath::Cos(phase / 180.0 * TMath::Pi());
+    sp = TMath::Sin(phase / 180.0 * TMath::Pi());
+    first = true;
+    for (int i=0; i<fData[0].dataFourierIm->GetNbinsX(); i++) {
+      x = fData[0].dataFourierIm->GetBinCenter(i);
+      if ((x > fFourier.fRangeForPhaseCorrection[0]) && (x < fFourier.fRangeForPhaseCorrection[1])) {
+        valIm = -sp * fData[0].dataFourierRe->GetBinContent(i) + cp * fData[0].dataFourierIm->GetBinContent(i);
+        if (first) {
+          minIm = valIm;
+          maxIm = valIm;
+          first = false;
+        } else {
+          if (valIm < minIm)
+            minIm = valIm;
+          if (valIm > maxIm)
+            maxIm = valIm;
+        }
+      }
+    }
+    if (fabs(asymmetry) > fabs(maxIm+minIm)) {
+cout << endl << ">> phase = " << phase << ", asymmetry = " << asymmetry << ", min/max = " << minIm << "/" << maxIm;
+      minPhase = phase;
+      asymmetry = maxIm+minIm;
+    }
+  }
+cout << endl << ">> optimal phase = " << minPhase << endl;
+
+  return minPhase;
 }
 
 //--------------------------------------------------------------------------

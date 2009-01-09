@@ -221,6 +221,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void HandleDifference();
     virtual void HandleFourier();
     virtual void HandleFourierDifference();
+    virtual double FindOptimalFourierPhase();
     virtual void CleanupDifference();
     virtual void CleanupFourier();
     virtual void CleanupFourierDifference();
