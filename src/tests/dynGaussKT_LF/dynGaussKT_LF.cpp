@@ -124,7 +124,6 @@ int main(int argc, char *argv[])
   PDoubleVector t(N);
   PDoubleVector f(N);
   PDoubleVector gi(N);
-  PDoubleVector abragam(N);
   PDoubleVector keren(N);
 
   // get start time
@@ -147,15 +146,6 @@ int main(int argc, char *argv[])
   gettimeofday(&tv_stop, 0);
   t2 = (tv_stop.tv_sec - tv_start.tv_sec)*1000.0 + (tv_stop.tv_usec - tv_start.tv_usec)/1000.0;
 
-  bool abragam_present = false;
-  if (param[1] != 0) {
-    if (param[2]/param[1] >= 1.0) {
-      for (unsigned int i=0; i<t.size(); i++)
-        abragam[i]  = exp(-2.0*pow(param[1]/param[2],2.0)*(exp(-param[2]*t[i])-1.0+param[2]*t[i]));
-      abragam_present = true;
-    }
-  }
-
   // calculate keren LF
   double w02, nu2, Delta2, Gamma_t;
   for (unsigned int i=0; i<t.size(); i++) {
@@ -174,16 +164,10 @@ int main(int argc, char *argv[])
   cout << "# N = " << param[3] << endl;
   cout << "# calculation time: t1 = " << t1 << " (ms), t2 = " << t2 << " (ms)" << endl;
 
-  if (abragam_present)
-    cout <<  setw(12) << "# time" <<  setw(13) << "Pz_dyn_LF" << setw(13) << "g" << setw(13) << "gi" << setw(13) << "agragam" << setw(13) << "keren" << endl;
-  else
-    cout <<  setw(12) << "# time" <<  setw(13) << "Pz_dyn_LF" << setw(13) << "g" << setw(13) << "gi" << setw(13) << "keren" << endl;
+  cout <<  setw(12) << "# time" <<  setw(13) << "Pz_dyn_LF" << setw(13) << "g" << setw(13) << "gi" << setw(13) << "keren" << endl;
   cout << fixed << setprecision(6);
   for (unsigned int nn=0; nn<N; nn++) {
-    if (abragam_present)
-      cout << setw(12) << t[nn] << setw(13) << f[nn] << setw(13) << g(nn,t,param,gi) << setw(13) << gi[nn] << setw(13) << abragam[nn] << setw(13) << keren[nn];
-    else
-      cout << setw(12) << t[nn] << setw(13) << f[nn] << setw(13) << g(nn,t,param,gi) << setw(13) << gi[nn] << setw(13) << keren[nn];
+    cout << setw(12) << t[nn] << setw(13) << f[nn] << setw(13) << g(nn,t,param,gi) << setw(13) << gi[nn] << setw(13) << keren[nn];
     cout << endl;
    }
 
