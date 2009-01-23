@@ -10,8 +10,11 @@
 
 MAKEFILE = Makefile
 
-CONFIG += warn_on debug
+CONFIG -= qt
+CONFIG += warn_on console debug
 
 SOURCES = dynGaussKT_LF.cpp
 
 TARGET=dynGaussKT_LF
+
+unix:LIBS += -lgsl -lgslcblas -lm

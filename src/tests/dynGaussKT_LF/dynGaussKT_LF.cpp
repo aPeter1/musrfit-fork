@@ -7,6 +7,8 @@
 #include <cmath>
 using namespace std;
 
+#include <gsl/gsl_sf_bessel.h>
+
 typedef vector<double> PDoubleVector;
 
 #define PI 3.14159265359
@@ -35,9 +37,9 @@ void voltra(const double h, PDoubleVector &t, PDoubleVector &param, PDoubleVecto
   }
 }
 
-double g(const int i, const PDoubleVector &tvec, const PDoubleVector &param, const PDoubleVector &gi)
+double g_gauss(const int i, const PDoubleVector &tvec, const PDoubleVector &param, const PDoubleVector &gi)
 {
-  // param: 0=w0, 1=Delta, 2=nu
+  // param: 0=w0, 1=sigma, 2=nu
   double result;
   double t = tvec[i];
   double Dt2 = pow(param[1]*t, 2.0)/2.0;
@@ -54,7 +56,29 @@ double g(const int i, const PDoubleVector &tvec, const PDoubleVector &param, con
   return result;
 }
 
-void calc_gi(const double h, PDoubleVector &t, PDoubleVector &param, PDoubleVector &f)
+double g_lorentz(const int i, const PDoubleVector &tvec, const PDoubleVector &param, const PDoubleVector &gi)
+{
+  // param: 0=w0, 1=lambda, 2=nu
+  double result;
+  double t = tvec[i];
+  double at = param[1]*t;
+
+  if (param[0] == 0.0) {
+    result = 0.333333333333333333333333 + 0.66666666666666666666 * (1.0-at) * exp(-at);
+  } else {
+    double awL = param[1]/param[0];
+    double wLt = param[0]*t;
+    double expat = exp(-param[1]*t);
+    result = 1.0 - awL*gsl_sf_bessel_j1(wLt)*expat - awL*awL*(gsl_sf_bessel_j0(wLt)*expat-1.0) -
+             (1.0+awL*awL)*param[1]*gi[i];
+  }
+
+  result *= exp(-param[2]*t);
+
+  return result;
+}
+
+void calc_gi_gauss(const double h, PDoubleVector &t, PDoubleVector &param, PDoubleVector &f)
 {
   // if w0=0 nothing to be done
   if (param[0] == 0.0)
@@ -71,54 +95,76 @@ void calc_gi(const double h, PDoubleVector &t, PDoubleVector &param, PDoubleVect
   }
 }
 
+void calc_gi_lorentz(const double h, PDoubleVector &t, PDoubleVector &param, PDoubleVector &f)
+{
+  // if w0=0 nothing to be done
+  if (param[0] == 0.0)
+    return;
+
+  double dtHalf = h/2.0;
+  PDoubleVector hh(t.size());
+
+  hh[0] = 0.0;
+  f[0] = 0.0;
+  for (unsigned int i=1; i<t.size(); i++) {
+    hh[i] = gsl_sf_bessel_j0(param[0]*t[i]) * exp(-param[1]*t[i]);
+    f[i] = f[i-1] + dtHalf*(hh[i]+hh[i-1]);
+  }
+}
+
 int main(int argc, char *argv[])
 {
 
   bool useKeren = false;
 
-  if (argc != 5) {
-    cout << endl << "usage: dynGaussKT_LF w0 Delta nu [N]";
+  if (argc < 4) {
+    cout << endl << "usage: dynGaussKT_LF w0 width nu [G|L N]";
     cout << endl << "          w0:    external field in Mc/s";
-    cout << endl << "          Delta: static field width in Mc/s";
+    cout << endl << "          width: static field width in Mc/s";
     cout << endl << "          nu:    hopping rate in Mc/s";
+    cout << endl << "          G/L:   G=Gaussian field distribution; L=Lorentzain field distribution";
+    cout << endl << "          if G/L not given, G is set as default";
     cout << endl << "          N:     number of sampling points";
-    cout << endl << "          if N == -1 -> calc N internally";
-    cout << endl << "          if N is not given, N=1000";
+    cout << endl << "          if N is not given, calc N internally";
     cout << endl << endl;
     return 0;
   }
 
-  PDoubleVector param(4);
+  PDoubleVector param(3);
   const double Tmax = 15.0;
+  unsigned int N;
+  bool gaussian = true;
 
   // feed parameter vector
   param[0] = atof(argv[1]); // w0
-  param[1] = atof(argv[2]); // Delta
+  param[1] = atof(argv[2]); // width
   param[2] = atof(argv[3]); // nu
-  if (argc == 5) {
-    param[3] = atof(argv[4]); // N
-    if (param[3] == -1.0) { // estimate N by itself
-      // w0 criteria, i.e. w0 T = 2 pi, ts = T/16, N = Tmax/ts, if N < 300, N == 300
-      double val = 8.0/PI*Tmax*param[0];
-      if (val < 250)
-        param[3] = 250;
-      else
-        param[3] = val;
+  if (argc == 6) {
+    N = atoi(argv[5]); // N
+  } else {
+    // w0 criteria, i.e. w0 T = 2 pi, ts = T/16, N = Tmax/ts, if N < 300, N == 300
+    double val = 8.0/PI*Tmax*param[0];
+    if (val < 250)
+      N = 250;
+    else
+      N = static_cast<unsigned int>(val);
 
-      // nu/Delta criteria
-      if (param[1] != 0.0) { // Delta != 0
-        val = param[2]/param[1]; // nu/Delta
-        if (val > 5.0) {
-          useKeren = true;
-          param[3] = 1000;
-        }
+    // nu/Delta criteria
+    if (param[1] != 0.0) { // Delta != 0
+      val = param[2]/param[1]; // nu/Delta
+      if (val > 5.0) {
+        useKeren = true;
+        N = 3000;
       }
     }
-  } else {
-    param[3] = 1000;
   }
 
-  const unsigned int N=static_cast<unsigned int>(param[3]);
+  if (argc > 4) {
+    if (*argv[4] == 'L') {
+      gaussian = false;
+    }
+  }
+
   const double H = Tmax/N;
 
   PDoubleVector t(N);
@@ -136,11 +182,20 @@ int main(int argc, char *argv[])
     t[i] = H*i;
   }
 
-  calc_gi(H, t, param, gi);
+  if (gaussian) {
+    calc_gi_gauss(H, t, param, gi);
+  } else {
+    calc_gi_lorentz(H, t, param, gi);
+  }
   gettimeofday(&tv_stop, 0);
   t1 = (tv_stop.tv_sec - tv_start.tv_sec)*1000.0 + (tv_stop.tv_usec - tv_start.tv_usec)/1000.0;
+
   gettimeofday(&tv_start, 0);
-  voltra(H, t, param, f, g, gi);
+  if (gaussian) {
+    voltra(H, t, param, f, g_gauss, gi);
+  } else {
+    voltra(H, t, param, f, g_lorentz, gi);
+  }
 
   // get stop time
   gettimeofday(&tv_stop, 0);
@@ -156,19 +211,39 @@ int main(int argc, char *argv[])
     keren[i] = exp(-Gamma_t);
   }
 
-  if (useKeren)
-    cout << "# use Keren = true" << endl;
-  else
-    cout << "# use Keren = false" << endl;
+  if (gaussian) {
+    if (useKeren)
+      cout << "# use Keren = true" << endl;
+    else
+      cout << "# use Keren = false" << endl;
+  }
 
-  cout << "# N = " << param[3] << endl;
+  cout << "# N = " << N << endl;
+  if (gaussian) {
+    cout << "# Gaussian field distribution" << endl;
+    cout << "# w0 = " << param[0] << ", sigma = " << param[1] << ", nu = " << param[2] << endl;
+  } else {
+    cout << "# Lorentzian field distribution" << endl;
+    cout << "# w0 = " << param[0] << ", lambda = " << param[1] << ", nu = " << param[2] << endl;
+  }
   cout << "# calculation time: t1 = " << t1 << " (ms), t2 = " << t2 << " (ms)" << endl;
 
-  cout <<  setw(12) << "# time" <<  setw(13) << "Pz_dyn_LF" << setw(13) << "g" << setw(13) << "gi" << setw(13) << "keren" << endl;
+  if (gaussian) {
+    cout <<  "#       time" <<  setw(13) << "Pz_dyn_LF" << setw(13) << "g" << setw(13) << "gi" << setw(13) << "keren" << endl;
+  } else {
+    cout <<  "#       time" <<  setw(13) << "Pz_dyn_LF" << setw(13) << "g" << setw(13) << "gi" << endl;
+  }
   cout << fixed << setprecision(6);
-  for (unsigned int nn=0; nn<N; nn++) {
-    cout << setw(12) << t[nn] << setw(13) << f[nn] << setw(13) << g(nn,t,param,gi) << setw(13) << gi[nn] << setw(13) << keren[nn];
-    cout << endl;
+  if (gaussian) {
+    for (unsigned int nn=0; nn<N; nn++) {
+      cout << setw(12) << t[nn] << setw(13) << f[nn] << setw(13) << g_gauss(nn,t,param,gi) << setw(13) << gi[nn] << setw(13) << keren[nn];
+      cout << endl;
+     }
+   } else {
+    for (unsigned int nn=0; nn<N; nn++) {
+      cout << setw(12) << t[nn] << setw(13) << f[nn] << setw(13) << g_lorentz(nn,t,param,gi) << setw(13) << gi[nn];
+      cout << endl;
+     }
    }
 
   return 0;
