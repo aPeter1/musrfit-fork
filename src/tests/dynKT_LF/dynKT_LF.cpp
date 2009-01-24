@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <vector>
 #include <cmath>
+#include <fstream>
 using namespace std;
 
 #include <gsl/gsl_sf_bessel.h>
@@ -165,6 +166,12 @@ int main(int argc, char *argv[])
     }
   }
 
+  char fln[128];
+  if (gaussian)
+    sprintf(fln, "dynKT_LF_w0_%1.1f_width%1.1f_nu%1.1f_N%d_G.dat", param[0], param[1], param[2], N);
+  else 
+    sprintf(fln, "dynKT_LF_w0_%1.1f_width%1.1f_nu%1.1f_N%d_L.dat", param[0], param[1], param[2], N);
+
   const double H = Tmax/N;
 
   PDoubleVector t(N);
@@ -202,49 +209,51 @@ int main(int argc, char *argv[])
   t2 = (tv_stop.tv_sec - tv_start.tv_sec)*1000.0 + (tv_stop.tv_usec - tv_start.tv_usec)/1000.0;
 
   // calculate keren LF
-  double w02, nu2, Delta2, Gamma_t;
+  double w02, nu2, width2, Gamma_t;
   for (unsigned int i=0; i<t.size(); i++) {
     w02 = pow(param[0], 2.0);
-    Delta2 = pow(param[1], 2.0);
+    width2 = pow(param[1], 2.0);
     nu2 = pow(param[2], 2.0);
-    Gamma_t = 2.0*Delta2/pow(w02+nu2,2.0)*((w02+nu2)*param[2]*t[i]+(w02-nu2)*(1.0-exp(-param[2]*t[i])*cos(param[0]*t[i]))-2.0*param[2]*param[0]*exp(-param[2]*t[i])*sin(param[0]*t[i]));
-    keren[i] = exp(-Gamma_t);
+    Gamma_t = 2.0*width2/pow(w02+nu2,2.0)*((w02+nu2)*param[2]*t[i]+(w02-nu2)*(1.0-exp(-param[2]*t[i])*cos(param[0]*t[i]))-2.0*param[2]*param[0]*exp(-param[2]*t[i])*sin(param[0]*t[i]));
+    if (gaussian)
+      keren[i] = exp(-Gamma_t);
+    else
+      keren[i] = exp(-sqrt(2.0*Gamma_t));
+  }
+
+  ofstream fout;
+
+  // open mlog-file
+  fout.open(fln, iostream::out);
+  if (!fout.is_open()) {
+    return -1;
   }
 
   if (gaussian) {
     if (useKeren)
-      cout << "# use Keren = true" << endl;
+      fout << "# use Keren = true" << endl;
     else
-      cout << "# use Keren = false" << endl;
+      fout << "# use Keren = false" << endl;
   }
 
-  cout << "# N = " << N << endl;
+  fout << "# N = " << N << endl;
   if (gaussian) {
-    cout << "# Gaussian field distribution" << endl;
-    cout << "# w0 = " << param[0] << ", sigma = " << param[1] << ", nu = " << param[2] << endl;
+    fout << "# Gaussian field distribution" << endl;
+    fout << "# w0 = " << param[0] << ", sigma = " << param[1] << ", nu = " << param[2] << endl;
   } else {
-    cout << "# Lorentzian field distribution" << endl;
-    cout << "# w0 = " << param[0] << ", lambda = " << param[1] << ", nu = " << param[2] << endl;
+    fout << "# Lorentzian field distribution" << endl;
+    fout << "# w0 = " << param[0] << ", lambda = " << param[1] << ", nu = " << param[2] << endl;
   }
-  cout << "# calculation time: t1 = " << t1 << " (ms), t2 = " << t2 << " (ms)" << endl;
+  fout << "# calculation time: t1 = " << t1 << " (ms), t2 = " << t2 << " (ms)" << endl;
 
-  if (gaussian) {
-    cout <<  "#       time" <<  setw(13) << "Pz_dyn_LF" << setw(13) << "g" << setw(13) << "gi" << setw(13) << "keren" << endl;
-  } else {
-    cout <<  "#       time" <<  setw(13) << "Pz_dyn_LF" << setw(13) << "g" << setw(13) << "gi" << endl;
+  fout <<  "#       time" <<  setw(13) << "Pz_dyn_LF" << setw(13) << "g" << setw(13) << "gi" << setw(13) << "keren" << endl;
+  fout << fixed << setprecision(6);
+  for (unsigned int nn=0; nn<N; nn++) {
+    fout << setw(12) << t[nn] << setw(13) << f[nn] << setw(13) << g_gauss(nn,t,param,gi) << setw(13) << gi[nn] << setw(13) << keren[nn];
+    fout << endl;
   }
-  cout << fixed << setprecision(6);
-  if (gaussian) {
-    for (unsigned int nn=0; nn<N; nn++) {
-      cout << setw(12) << t[nn] << setw(13) << f[nn] << setw(13) << g_gauss(nn,t,param,gi) << setw(13) << gi[nn] << setw(13) << keren[nn];
-      cout << endl;
-     }
-   } else {
-    for (unsigned int nn=0; nn<N; nn++) {
-      cout << setw(12) << t[nn] << setw(13) << f[nn] << setw(13) << g_lorentz(nn,t,param,gi) << setw(13) << gi[nn];
-      cout << endl;
-     }
-   }
+
+  fout.close();
 
   return 0;
 }

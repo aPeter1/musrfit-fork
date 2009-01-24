@@ -1,6 +1,6 @@
 #------------------------------------------------------
-# dynGaussKT_LF.pro
-# qmake file for dynGaussKT_LF
+# dynKT_LF.pro
+# qmake file for dynKT_LF
 #
 # Andreas Suter, 2009/01/13
 #
@@ -13,8 +13,8 @@ MAKEFILE = Makefile
 CONFIG -= qt
 CONFIG += warn_on console debug
 
-SOURCES = dynGaussKT_LF.cpp
+SOURCES = dynKT_LF.cpp
 
-TARGET=dynGaussKT_LF
+TARGET=dynKT_LF
 
 unix:LIBS += -lgsl -lgslcblas -lm
