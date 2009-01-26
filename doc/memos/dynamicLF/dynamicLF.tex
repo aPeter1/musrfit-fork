@@ -1,0 +1,75 @@
+% $Id$
+\documentclass[twoside]{article}
+
+\usepackage[english]{babel}
+\usepackage{a4}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{xspace}
+\usepackage{rotating}
+\usepackage{dcolumn}
+
+\setlength{\topmargin}{10mm}
+\setlength{\topmargin}{-13mm}
+% \setlength{\oddsidemargin}{0.5cm}
+% \setlength{\evensidemargin}{0cm}
+\setlength{\oddsidemargin}{1cm}
+\setlength{\evensidemargin}{1cm}
+\setlength{\textwidth}{14.5cm}
+\setlength{\textheight}{23.8cm}
+
+\pagestyle{fancyplain}
+\addtolength{\headwidth}{0.6cm}
+\fancyhead{}%
+\fancyhead[RE,LO]{\bf Static and Dynamic LF Functions}%
+\fancyhead[LE,RO]{\thepage}
+\cfoot{--- Andreas Suter, Bastian Wojek -- \today ---}
+\rfoot{\includegraphics[width=2cm]{logo_n.eps}}
+
+\DeclareMathAlphabet{\bi}{OML}{cmm}{b}{it}
+
+\newcommand{\mean}[1]{\langle #1 \rangle}
+\newcommand{\lem}{LE-$\mu$SR\xspace}
+\newcommand{\musr}{$\mu$SR\xspace}
+\newcommand{\etal}{\emph{et al.\xspace}}
+
+\newcolumntype{d}[1]{D{.}{.}{#1}}
+
+\begin{document}
+% Header info --------------------------------------------------
+\thispagestyle{empty}
+\noindent
+\begin{tabular}{@{\hspace{-0.7cm}}l@{\hspace{6cm}}r}
+\noindent\includegraphics[width=3.4cm]{logo_n.eps} &
+  {\Huge\sf Memorandum}
+\end{tabular}
+%
+\vskip 1cm
+%
+\begin{tabular}{@{\hspace{-0.5cm}}ll@{\hspace{4cm}}ll}
+Datum:   & \today        &     & \\[3ex]
+Von:     & Andreas Suter & An: & \\
+         & Bastian Wojek &     & \\
+Telefon: & +41\, (0)56\, 310\, 4238        &     & \\
+Raum:    & WLGA / 119    & cc: & \\
+e-mail:  & \verb?andreas.suter@psi.ch? & & \\
+         & \verb?bastian.wojek@psi.ch? & &
+\end{tabular}
+%
+\vskip 0.3cm
+\noindent\hrulefill
+\vskip 1cm
+%
+
+\section*{Dynamic LF}
+
+Hayano \etal \cite{Hayano79}
+
+\bibliographystyle{amsplain}
+\bibliography{dynamicLF}
+
+\end{document}
