@@ -109,6 +109,10 @@ short term:
 * implement FFT with msr-interface
   **DONE** 2009-01
 
+* implement dynamic LF-KT by using the integral equation representation (Volterra Eq) and an optimzed
+  implementation of the gauss * sine integral
+  **START** 2009-01-13
+
 ---------------------
 intermediate term:
 ---------------------
@@ -124,7 +128,6 @@ long term:
 
 * implement ROOT based wkmview, i.e. all the graphical stuff needed
   including event handler, etc.
-* implement FFT with msr-interface
 * switch from make to cmake
 * add the possibility for cuts to db-files
 * add the possibility for variable transformations to db-files

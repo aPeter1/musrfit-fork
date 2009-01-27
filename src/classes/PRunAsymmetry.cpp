@@ -340,12 +340,12 @@ bool PRunAsymmetry::PrepareData()
     histoNo[1] = fRunInfo->fBackwardHistoNo-1;
   }
   // first check if forward/backward given in the msr-file are valid
-  if ((runData->fDataBin.size() < histoNo[0]) || (histoNo[0] < 0) ||
-      (runData->fDataBin.size() < histoNo[1]) || (histoNo[1] < 0)) {
-    cout << endl << "PRunAsymmetry::PrepareData(): PANIC ERROR:";
-    cout << endl << "   forward/backward histo no found = " << histoNo[0];
-    cout << ", " << histoNo[1] << ", but there are only " << runData->fDataBin.size() << " runs!?!?";
-    cout << endl << "   Will quite :-(";
+  if ((runData->fDataBin.size() < histoNo[0]+1) || (histoNo[0] < 0) ||
+      (runData->fDataBin.size() < histoNo[1]+1) || (histoNo[1] < 0)) {
+    cout << endl << "PRunAsymmetry::PrepareData(): **PANIC ERROR**:";
+    cout << endl << "   forward/backward histo no found = " << histoNo[0]+1;
+    cout << ", " << histoNo[1]+1 << ", but there are only " << runData->fDataBin.size() << " histo sets!?!?";
+    cout << endl << "   Will quit :-(";
     cout << endl;
     return false;
   }

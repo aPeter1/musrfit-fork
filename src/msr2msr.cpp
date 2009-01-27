@@ -97,7 +97,7 @@ bool msr2msr_run(char *str)
 
   if (run.Contains("NEMU")) {
     ostr[0] = dynamic_cast<TObjString*>(tokens->At(1)); // file name
-    sprintf(str, "RUN %s MUE4 PSI NEMU   (name beamline institute data-file-format)", ostr[0]->GetString().Data());
+    sprintf(str, "RUN %s MUE4 PSI WKM   (name beamline institute data-file-format)", ostr[0]->GetString().Data());
   } else if (run.Contains("PSI")) {
     ostr[0] = dynamic_cast<TObjString*>(tokens->At(1)); // file name
     ostr[1] = dynamic_cast<TObjString*>(tokens->At(2)); // beamline

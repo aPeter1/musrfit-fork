@@ -396,17 +396,17 @@ void PStartupHandler::CheckLists()
   // check if anything was set, and if not set some default stuff
 
   // check if any data path is given
-cout << endl << ">> check data path list ...";  
+//cout << endl << ">> check data path list ...";  
   if (fDataPathList.size() == 0) {
-cout << endl << ">> data path list empty, will set default ones";  
+//cout << endl << ">> data path list empty, will set default ones";  
     fDataPathList.push_back(TString("/mnt/data/nemu/his"));
     fDataPathList.push_back(TString("/mnt/data/nemu/wkm"));
   }
 
   // check if any markers are given
-cout << endl << ">> check marker list ...";  
+//cout << endl << ">> check marker list ...";  
   if (fMarkerList.size() == 0) {
-cout << endl << ">> marker list empty, will set default ones";  
+//cout << endl << ">> marker list empty, will set default ones";  
     fMarkerList.push_back(24); // open circle
     fMarkerList.push_back(25); // open square
     fMarkerList.push_back(26); // open triangle
@@ -424,9 +424,9 @@ cout << endl << ">> marker list empty, will set default ones";
   }
 
   // check if any colors are given
-cout << endl << ">> check color list ...";  
+//cout << endl << ">> check color list ...";  
   if (fColorList.size() == 0) {
-cout << endl << ">> color list empty, will set default ones";  
+//cout << endl << ">> color list empty, will set default ones";  
     fColorList.push_back(TColor::GetColor(0, 0, 0));     // kBlack
     fColorList.push_back(TColor::GetColor(255, 0, 0));   // kRed
     fColorList.push_back(TColor::GetColor(0, 255, 0));   // kGreen

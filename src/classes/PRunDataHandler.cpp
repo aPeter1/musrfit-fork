@@ -170,8 +170,8 @@ bool PRunDataHandler::ReadFile()
       success = ReadPsiBinFile();
     else if (!run_it->fFileFormat.CompareTo("mud"))
       success = ReadMudFile();
-    else if (!run_it->fFileFormat.CompareTo("nemu"))
-      success = ReadNemuFile();
+    else if (!run_it->fFileFormat.CompareTo("wkm"))
+      success = ReadWkmFile();
     else if (!run_it->fFileFormat.CompareTo("ascii"))
       success = ReadAsciiFile();
     else if (!run_it->fFileFormat.CompareTo("db"))
@@ -233,8 +233,12 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo)
     ext = TString("bin");
   else if (!runInfo.fFileFormat.CompareTo("mud"))
     ext = TString("mud");
-  else if (!runInfo.fFileFormat.CompareTo("nemu"))
-    ext = TString("nemu");
+  else if (!runInfo.fFileFormat.CompareTo("wkm")) {
+    if (!runInfo.fBeamline.CompareTo("mue4"))
+      ext = TString("nemu");
+    else
+      ext = runInfo.fBeamline;
+  }
   else if (!runInfo.fFileFormat.CompareTo("ascii"))
     ext = TString("dat");
   else if (!runInfo.fFileFormat.CompareTo("db"))
@@ -253,7 +257,7 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo)
     cout << endl << "  NEXUS    -> nexus file format";
     cout << endl << "  PSI-BIN  -> psi bin file format";
     cout << endl << "  MUD      -> triumf mud file format";
-    cout << endl << "  NEMU     -> lem ascii file format";
+    cout << endl << "  WKM      -> wkm ascii file format";
     cout << endl << "  ASCII    -> column like file format";
     cout << endl << "  DB       -> triumf db file \"format\"";
     cout << endl;
@@ -479,15 +483,15 @@ bool PRunDataHandler::ReadNexusFile()
 }
 
 //--------------------------------------------------------------------------
-// ReadNemuFile
+// ReadWkmFile
 //--------------------------------------------------------------------------
 /**
  * <p>
  *
  */
-bool PRunDataHandler::ReadNemuFile()
+bool PRunDataHandler::ReadWkmFile()
 {
-//  cout << endl << "PRunDataHandler::ReadNemuFile(): Sorry, not yet implemented ...";
+//  cout << endl << "PRunDataHandler::ReadWkmFile(): Sorry, not yet implemented ...";
 
   PDoubleVector histoData;
   PRawRunData runData;
@@ -533,10 +537,10 @@ bool PRunDataHandler::ReadNemuFile()
   Ssiz_t idx;
   do {
     line = TString(instr);
-    if (line.IsWhitespace()) { // end of header reached
+    if (line.IsDigit()) { // end of header reached
       headerInfo = false;
     } else { // real stuff, hence filter data
-      if (line.Contains("Title")) {
+      if (line.Contains("Title") || line.Contains("Titel")) {
         idx = line.Index(":");
         line.Replace(0, idx+1, 0, 0); // remove 'Title:'
         StripWhitespace(line);
@@ -545,6 +549,9 @@ bool PRunDataHandler::ReadNemuFile()
         idx = line.Index(":");
         line.Replace(0, idx+1, 0, 0); // remove 'Field:'
         StripWhitespace(line);
+        idx = line.Index("G"); // check if unit is given
+        if (idx > 0) // unit is indeed given
+          line.Resize(idx);
         dval = ToDouble(line, ok);
         if (ok)
           runData.fField = dval;
@@ -557,6 +564,12 @@ bool PRunDataHandler::ReadNemuFile()
         idx = line.Index(":");
         line.Replace(0, idx+1, 0, 0); // remove 'Temp:'
         StripWhitespace(line);
+        idx = line.Index("+-"); // remove "+- ..." part
+        if (idx > 0)
+          line.Resize(idx);
+        idx = line.Index("K"); // remove "K ..." part
+        if (idx > 0)
+          line.Resize(idx);
         dval = ToDouble(line, ok);
         if (ok)
           runData.fTemp = dval;
@@ -583,11 +596,17 @@ bool PRunDataHandler::ReadNemuFile()
           runData.fTimeResolution = dval * 1000.0;
       }
     }
-    f.getline(instr, sizeof(instr));
+
+    if (headerInfo)
+      f.getline(instr, sizeof(instr));
   } while (headerInfo && !f.eof());
 
   if ((groups == 0) || (channels == 0) || runData.fTimeResolution == 0.0) {
-    cout << endl << "PRunDataHandler::ReadNemuFile(): essential header informations are missing!";
+    cout << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** essential header informations are missing!";
+    cout << endl << "  >> groups          = " << groups;
+    cout << endl << "  >> channels        = " << channels;
+    cout << endl << "  >> time resolution = " << runData.fTimeResolution;
+    cout << endl;
     f.close();
     return false;
   }
@@ -602,9 +621,11 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
 */
 
   // read data ---------------------------------------------------------
-  int status;
   unsigned int group_counter = 0;
-  int val[10];
+  int val;
+  TObjArray *tokens;
+  TObjString *ostr;
+  TString str;
   do {
     // check if empty line, i.e. new group
     if (IsWhitespace(instr)) {
@@ -613,21 +634,43 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
       group_counter++;
     } else {
       // extract values
-      status = sscanf(instr, "%d %d %d %d %d %d %d %d %d %d", 
-                      &val[0], &val[1], &val[2], &val[3], &val[4],
-                      &val[5], &val[6], &val[7], &val[8], &val[9]);
-      // no values found: error
-      if (status == 0) {
-        cout << endl << "PRunDataHandler::ReadNemuFile(): **ERROR** while reading data ...";
+      line = TString(instr);
+      // check if line starts with character. Needed for RAL WKM format
+      if (!line.IsDigit()) {
+        f.getline(instr, sizeof(instr));
+        continue;
+      }
+      tokens = line.Tokenize(" ");
+
+      if (!tokens) { // no tokens found
+        cout << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: coulnd't tokenize run data.";
         // clean up
         for (unsigned int i=0; i<group_counter; i++)
           runData.fDataBin[i].clear();
         runData.fDataBin.clear();
         return false;
       }
-      // feed data
-      for (int i=0; i<status; i++)
-        histoData.push_back(val[i]);
+      for (int i=0; i<tokens->GetEntries(); i++) {
+        ostr = dynamic_cast<TObjString*>(tokens->At(i));
+        str = ostr->GetString();
+        val = ToInt(str, ok);
+        if (ok) {
+          histoData.push_back(val);
+        } else {
+          cout << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: data line contains non-integer values.";
+          // clean up
+          for (unsigned int i=0; i<group_counter; i++)
+            runData.fDataBin[i].clear();
+          runData.fDataBin.clear();
+          delete tokens;
+          return false;
+        }
+      }
+      // clean up
+      if (tokens) {
+        delete tokens;
+        tokens = 0;
+      }
     }
 
     f.getline(instr, sizeof(instr));
@@ -637,13 +680,36 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
   // handle last line if present
   if (strlen(instr) != 0) {
     // extract values
-    status = sscanf(instr, "%d %d %d %d %d %d %d %d %d %d", 
-                    &val[0], &val[1], &val[2], &val[3], &val[4],
-                    &val[5], &val[6], &val[7], &val[8], &val[9]);
-    if (status > 0) {
-      // feed data
-      for (int i=0; i<status; i++)
-        histoData.push_back(val[i]);
+    line = TString(instr);
+    tokens = line.Tokenize(" ");
+    if (!tokens) { // no tokens found
+      cout << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: coulnd't tokenize run data.";
+      // clean up
+      for (unsigned int i=0; i<group_counter; i++)
+        runData.fDataBin[i].clear();
+      runData.fDataBin.clear();
+      return false;
+    }
+    for (int i=0; i<tokens->GetEntries(); i++) {
+      ostr = dynamic_cast<TObjString*>(tokens->At(i));
+      str = ostr->GetString();
+      val = ToInt(str, ok);
+      if (ok) {
+        histoData.push_back(val);
+      } else {
+        cout << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: data line contains non-integer values.";
+        // clean up
+        for (unsigned int i=0; i<group_counter; i++)
+          runData.fDataBin[i].clear();
+        runData.fDataBin.clear();
+        delete tokens;
+        return false;
+      }
+    }
+    // clean up
+    if (tokens) {
+      delete tokens;
+      tokens = 0;
     }
   }
 
@@ -658,7 +724,7 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
 
   // check if all groups are found
   if ((int) runData.fDataBin.size() != groups) {
-    cout << endl << "PRunDataHandler::ReadNemuFile(): **ERROR**";
+    cout << endl << "PRunDataHandler::ReadWkmFile(): **ERROR**";
     cout << endl << "  expected " << groups << " histos, but found " << runData.fDataBin.size();
     // clean up
     for (unsigned int i=0; i<runData.fDataBin.size(); i++)
@@ -670,7 +736,7 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
   // check if all groups have enough channels
   for (unsigned int i=0; i<runData.fDataBin.size(); i++) {
     if ((int) runData.fDataBin[i].size() != channels) {
-      cout << endl << "PRunDataHandler::ReadNemuFile(): **ERROR**";
+      cout << endl << "PRunDataHandler::ReadWkmFile(): **ERROR**";
       cout << endl << "  expected " << channels << " bins in histo " << i << ", but found " << runData.fDataBin[i].size();
       // clean up
       for (unsigned int j=0; j<runData.fDataBin.size(); j++)
@@ -1188,7 +1254,7 @@ bool PRunDataHandler::ReadDBFile()
   // variables needed to tokenize strings
   TString tstr;
   TObjString *ostr;
-  TObjArray *tokens;
+  TObjArray *tokens = 0;
 
   while (!f.eof()) {
     // get next line from file
