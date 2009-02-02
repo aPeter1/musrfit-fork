@@ -74,6 +74,7 @@ class PRunDataHandler
     virtual bool IsWhitespace(const char *str);
     virtual double ToDouble(TString &str, bool &ok);
     virtual int ToInt(TString &str, bool &ok);
+    virtual int GetDataTagIndex(TString &str, PStringVector &fLabels);
 };
 
 #endif //  _PRUNDATAHANDLER_H_

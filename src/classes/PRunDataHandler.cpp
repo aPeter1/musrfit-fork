@@ -1243,7 +1243,7 @@ bool PRunDataHandler::ReadDBFile()
   runData.fDataNonMusr.fYIndex = -1;
 
   int     lineNo = 0;
-  int     dataNo = 0;
+  int     idx;
   int     dbTag = -1;
   char    instr[512];
   TString line, workStr;
@@ -1260,6 +1260,7 @@ bool PRunDataHandler::ReadDBFile()
     // get next line from file
     f.getline(instr, sizeof(instr));
     line = TString(instr);
+// cout << endl << instr;
     lineNo++;
 
     // check if comment line
@@ -1362,10 +1363,17 @@ bool PRunDataHandler::ReadDBFile()
         }
 
         if (labelledFormat) { // handle labelled formated data
-
           // check if run line
           const char *str = workStr.Data();
           if (isdigit(str[0])) { // run line
+            TString run("run");
+            idx = GetDataTagIndex(run, runData.fDataNonMusr.fDataTags);
+            if (idx == -1) {
+              cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+              cout << endl << ">> " << workStr.Data();
+              cout << endl << ">> found potential run data line without run data tag.";
+              return false;
+            }
             // split string in tokens
             tokens = workStr.Tokenize(","); // line has structure: runNo,,, runTitle
             ostr = dynamic_cast<TObjString*>(tokens->At(0));
@@ -1379,12 +1387,11 @@ bool PRunDataHandler::ReadDBFile()
               return false;
             }
             val = tstr.Atof();
-            runData.fDataNonMusr.fData[dataNo].push_back(val);
-            runData.fDataNonMusr.fErrData[dataNo].push_back(0.0);
-            dataNo = 0; // next run block starts
-	  } else { // tag = data line
-	    // remove all possible spaces
-	    workStr.ReplaceAll(" ", "");
+            runData.fDataNonMusr.fData[idx].push_back(val);
+            runData.fDataNonMusr.fErrData[idx].push_back(1.0);
+          } else { // tag = data line
+            // remove all possible spaces
+            workStr.ReplaceAll(" ", "");
             // split string in tokens
             tokens = workStr.Tokenize("=,"); // line has structure: tag = val,err1,err2,
             if (tokens->GetEntries() < 3) {
@@ -1394,11 +1401,23 @@ bool PRunDataHandler::ReadDBFile()
               delete tokens;
               return false;
             }
+            ostr = dynamic_cast<TObjString*>(tokens->At(0));
+            tstr = ostr->GetString();
+            idx = GetDataTagIndex(tstr, runData.fDataNonMusr.fDataTags);
+// cout << endl << "->> " << tstr.Data() << ", " << idx;
+            if (idx == -1) {
+              cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+              cout << endl << ">> " << workStr.Data();
+              cout << endl << ">> data tag error: " << tstr.Data() << " seems not present in the data tag list";
+              delete tokens;
+              return false;
+            }
 
             switch (tokens->GetEntries()) {
               case 3: // tag = val,,,
                 ostr = dynamic_cast<TObjString*>(tokens->At(1));
                 tstr = ostr->GetString();
+// cout << endl << ">>> " << tstr.Data();
                 if (!tstr.IsFloat()) {
                   cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
                   cout << endl << ">> " << workStr.Data();
@@ -1408,8 +1427,11 @@ bool PRunDataHandler::ReadDBFile()
                   return false;
                 }
                 val = tstr.Atof();
-                runData.fDataNonMusr.fData[dataNo].push_back(val);
-                runData.fDataNonMusr.fErrData[dataNo].push_back(0.0);
+// cout << endl << ">>> " << val << ", " << idx << endl;
+                runData.fDataNonMusr.fData[idx].push_back(val);
+// cout << endl << ">>> " << endl;
+                runData.fDataNonMusr.fErrData[idx].push_back(1.0);
+// cout << endl << ">>> done <<<" << endl;
                 break;
               case 4: // tag = val,err,,
               case 5: // tag = val,err1,err2,
@@ -1425,7 +1447,7 @@ bool PRunDataHandler::ReadDBFile()
                   return false;
                 }
                 val = tstr.Atof();
-                runData.fDataNonMusr.fData[dataNo].push_back(val);
+                runData.fDataNonMusr.fData[idx].push_back(val);
                 // handle err1 (err2 will be ignored for the time being)
                 ostr = dynamic_cast<TObjString*>(tokens->At(2));
                 tstr = ostr->GetString();
@@ -1438,7 +1460,7 @@ bool PRunDataHandler::ReadDBFile()
                   return false;
                 }
                 val = tstr.Atof();
-                runData.fDataNonMusr.fErrData[dataNo].push_back(val);
+                runData.fDataNonMusr.fErrData[idx].push_back(val);
                 break;
               default:
                 cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
@@ -1448,7 +1470,6 @@ bool PRunDataHandler::ReadDBFile()
                 return false;
                 break;
             }
-            dataNo++;
           }
 
         } else { // handle row formated data
@@ -1483,7 +1504,7 @@ bool PRunDataHandler::ReadDBFile()
             ostr = dynamic_cast<TObjString*>(tokens->At(i+1));
             tstr = ostr->GetString();
             if (tstr.IsWhitespace()) {
-              runData.fDataNonMusr.fErrData[j].push_back(0.0);
+              runData.fDataNonMusr.fErrData[j].push_back(1.0);
             } else if (tstr.IsFloat()) {
               runData.fDataNonMusr.fErrData[j].push_back(tstr.Atof());
             } else {
@@ -1507,15 +1528,39 @@ bool PRunDataHandler::ReadDBFile()
 
 // cout << endl << ">> run title: '" << runData.fRunTitle.Data() << "'";
 // cout << endl;
-// 
-// cout << endl << ">> first data vector:";
-// cout << endl << ">> label:" << runData.fDataNonMusr.fLabels[28].Data();
-// for (unsigned int i=0; i<runData.fDataNonMusr.fData[28].size(); i++) {
-// cout << endl << ">> "  << runData.fDataNonMusr.fData[28][i] << " +- " << runData.fDataNonMusr.fErrData[28][i];
-// }
-// cout << endl;
-// 
-// assert(0);
+
+  // check that the number of labels == the number of data tags
+  if (runData.fDataNonMusr.fLabels.size() != runData.fDataNonMusr.fDataTags.size()) {
+    cout << endl << "PRunDataHandler::ReadDBFile **ERROR**";
+    cout << endl << ">> number of LABELS found    = " << runData.fDataNonMusr.fLabels.size();
+    cout << endl << ">> number of Data tags found = " << runData.fDataNonMusr.fDataTags.size();
+    cout << endl << ">> They have to be equal!!";
+    if (tokens) {
+      delete tokens;
+      tokens = 0;
+    }
+    return false;
+  }
+
+  // check if all vectors have the same size
+  for (unsigned int i=1; i<runData.fDataNonMusr.fData.size(); i++) {
+    if (runData.fDataNonMusr.fData[i].size() != runData.fDataNonMusr.fData[i-1].size()) {
+      cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo;
+      cout << endl << ">> label: " << runData.fDataNonMusr.fDataTags[i-1].Data() << ", number data elements = " << runData.fDataNonMusr.fData[i-1].size();
+      cout << endl << ">> label: " << runData.fDataNonMusr.fDataTags[i].Data() << ", number data elements = " << runData.fDataNonMusr.fData[i].size();
+      cout << endl << ">> They have to be equal!!";
+      success = false;
+      break;
+    }
+    if (runData.fDataNonMusr.fErrData[i].size() != runData.fDataNonMusr.fErrData[i-1].size()) {
+      cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo;
+      cout << endl << ">> label: " << runData.fDataNonMusr.fDataTags[i-1].Data() << ", number data elements = " << runData.fDataNonMusr.fData[i-1].size();
+      cout << endl << ">> label: " << runData.fDataNonMusr.fDataTags[i].Data() << ", number error data elements = " << runData.fDataNonMusr.fErrData[i].size();
+      cout << endl << ">> They have to be equal!!";
+      success = false;
+      break;
+    }
+  }
 
   // clean up tokens
   if (tokens) {
@@ -1532,7 +1577,7 @@ bool PRunDataHandler::ReadDBFile()
 }
 
 //--------------------------------------------------------------------------
-// StripWhitespace
+// StripWhitespace (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -1599,7 +1644,7 @@ bool PRunDataHandler::StripWhitespace(TString &str)
 }
 
 //--------------------------------------------------------------------------
-// IsWhitespace
+// IsWhitespace (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -1620,7 +1665,7 @@ bool PRunDataHandler::IsWhitespace(const char *str)
 }
 
 //--------------------------------------------------------------------------
-// ToDouble
+// ToDouble (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -1666,7 +1711,7 @@ double PRunDataHandler::ToDouble(TString &str, bool &ok)
 }
 
 //--------------------------------------------------------------------------
-// ToInt
+// ToInt (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -1710,3 +1755,28 @@ int PRunDataHandler::ToInt(TString &str, bool &ok)
 
   return value;
 }
+
+//--------------------------------------------------------------------------
+// GetDataTagIndex (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param str
+ * \param dataTags
+ */
+int PRunDataHandler::GetDataTagIndex(TString &str, PStringVector &dataTags)
+{
+  int result = -1;
+
+  // check all the other possible data tags
+  for (unsigned int i=0; i<dataTags.size(); i++) {
+    if (!dataTags[i].CompareTo(str, TString::kIgnoreCase)) {
+      result = i;
+      break;
+    }
+  }
+
+  return result;
+}
+
