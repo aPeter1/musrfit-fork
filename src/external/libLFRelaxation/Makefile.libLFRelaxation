@@ -24,7 +24,6 @@ LDFLAGS       +=
 
 # some definitions: headers (used to generate *Dict* stuff), sources, objects,...
 OBJS =
-OBJS += TIntegrator.o
 OBJS += TLFRelaxation.o TLFRelaxationDict.o
 
 SHLIB = libLFRelaxation.so

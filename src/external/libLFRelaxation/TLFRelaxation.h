@@ -14,10 +14,17 @@
 
 #include<vector>
 #include<cstdio>
+#include<cmath>
 
 using namespace std;
 
-#include "TMath.h"
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_sf_exp.h>
+#include <gsl/gsl_sf_log.h>
+#include <gsl/gsl_sf_trig.h>
+#include <gsl/gsl_sf_bessel.h>
+
+//#include "TMath.h"
 #include "PUserFcnBase.h"
 #include "fftw3.h"
 #include "TIntegrator.h"
@@ -98,8 +105,14 @@ private:
   double *fFFTtime;
   fftw_complex *fFFTfreq;
   mutable unsigned int fCounter;
+  static const double fX[16];
+  static const double fY[20];
+  mutable double fA;
+  mutable double fL1;
+  mutable double fL2;
 
   ClassDef(TLFDynLorKT,1)
 };
+
 
 #endif //_LFRelaxation_H_

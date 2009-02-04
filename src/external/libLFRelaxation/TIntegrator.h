@@ -15,7 +15,7 @@
 #include "Math/GSLIntegrator.h"
 #include "TMath.h"
 
-#include<vector>
+#include <vector>
 
 using namespace std;
 
@@ -37,6 +37,19 @@ class TIntegrator {
     ROOT::Math::GSLIntegrator *fIntegrator;
     mutable double (*fFunc)(double, void *);
 };
+
+inline TIntegrator::TIntegrator() : fFunc(0) {
+  ROOT::Math::GSLIntegrator *integrator = new ROOT::Math::GSLIntegrator(ROOT::Math::Integration::kADAPTIVE,ROOT::Math::Integration::kGAUSS31);
+  fIntegrator = integrator;
+  integrator = 0;
+  delete integrator;
+}
+
+inline TIntegrator::~TIntegrator(){
+  delete fIntegrator;
+  fIntegrator=0;
+  fFunc=0;
+}
 
 inline double TIntegrator::FuncAtXgsl(double x, void *obj)
 {
