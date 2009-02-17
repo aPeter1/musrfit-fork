@@ -561,9 +561,9 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
 
   // handle keys and popup menu entries
   bool relevantKey = false;
-  if (x == 'q') {
+  if (x == 'q') { // quit
     Done(0);
-  } else if (x == 'd') {
+  } else if (x == 'd') { // difference
     relevantKey = true;
     // toggle difference tag
     fDifferenceView = !fDifferenceView;
@@ -573,7 +573,9 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
     } else {
       fPopupMain->UnCheckEntry(P_MENU_ID_DIFFERENCE+P_MENU_PLOT_OFFSET*fPlotNumber);
     }
-  } else if (x == 'f') {
+  } else if (x == 'u') { // unzoom to the original range
+    relevantKey = true;
+  } else if (x == 'f') { // Fourier
     relevantKey = true;
     if (fCurrentPlotView == PV_DATA) { // current view is data view
       // uncheck data popup entry
