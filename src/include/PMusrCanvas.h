@@ -43,6 +43,7 @@
 #include <TPad.h>
 #include <TH1F.h>
 #include <TGraphErrors.h>
+#include <TMultiGraph.h>
 #include <TLatex.h>
 
 #include "PMusr.h"
@@ -204,6 +205,8 @@ class PMusrCanvas : public TObject, public TQObject
 
     PMusrCanvasDataList fData;
     PMusrCanvasNonMusrDataList fNonMusrData;
+    TMultiGraph *fMultiGraphData;
+    TMultiGraph *fMultiGraphDiff;
 
     PMsrFourierStructure fFourier;
     PIntVector fMarkerList;

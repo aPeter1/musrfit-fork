@@ -70,6 +70,9 @@ PMusrCanvas::PMusrCanvas()
   fParameterTheoryPad  = 0;
   fInfoPad             = 0;
 
+  fMultiGraphData = 0;
+  fMultiGraphDiff = 0;
+
   InitFourier();
 
   fCurrentFourierPhase = fFourier.fPhaseIncrement;
@@ -86,6 +89,9 @@ PMusrCanvas::PMusrCanvas(const int number, const char* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh) :
                          fPlotNumber(number)
 {
+  fMultiGraphData = 0;
+  fMultiGraphDiff = 0;
+
   InitFourier();
   CreateStyle();
   InitMusrCanvas(title, wtopx, wtopy, ww, wh);
@@ -107,6 +113,9 @@ PMusrCanvas::PMusrCanvas(const int number, const char* title,
                          fPlotNumber(number), fFourier(fourierDefault),
                          fMarkerList(markerList), fColorList(colorList)
 {
+  fMultiGraphData = 0;
+  fMultiGraphDiff = 0;
+
   CreateStyle();
   InitMusrCanvas(title, wtopx, wtopy, ww, wh);
 
@@ -156,9 +165,19 @@ cout << "~PMusrCanvas() called. fMainCanvas name=" << fMainCanvas->GetName() << 
       CleanupDataSet(fData[i]);
     fData.clear();
   }
+  if (fMultiGraphData) {
+    delete fMultiGraphData;
+    fMultiGraphData = 0;
+  }
+  if (fMultiGraphDiff) {
+    delete fMultiGraphDiff;
+    fMultiGraphDiff = 0;
+  }
   if (fNonMusrData.size() > 0) {
+/*
     for (unsigned int i=0; i<fNonMusrData.size(); i++)
       CleanupDataSet(fNonMusrData[i]);
+*/
     fNonMusrData.clear();
   }
   if (fCurrentFourierPhaseText) {
@@ -1456,6 +1475,7 @@ void PMusrCanvas::HandleDifference()
 
       // set marker and line color
       diffHisto->SetMarkerColor(fNonMusrData[i].data->GetMarkerColor());
+      diffHisto->SetLineColor(fNonMusrData[i].data->GetLineColor());
       // set marker size
       diffHisto->SetMarkerSize(fNonMusrData[i].data->GetMarkerSize());
       // set marker type
@@ -2112,29 +2132,41 @@ void PMusrCanvas::PlotData()
     TString yAxisTitle = fRunList->GetYAxisTitle(runs[runNo].fRunName);
 
     if (fNonMusrData.size() > 0) {
-      fNonMusrData[0].data->Draw("ap");
+      // check if fMultiGraphData needs to be created, and if yes add all data and theory
+      if (!fMultiGraphData) {
+        fMultiGraphData = new TMultiGraph();
+        assert(fMultiGraphData != 0);
+
+        // add all data to fMultiGraphData
+        for (unsigned int i=0; i<fNonMusrData.size(); i++) {
+          fMultiGraphData->Add(fNonMusrData[i].data, "p");
+        }
+        // add all the theory to fMultiGraphData
+        for (unsigned int i=0; i<fNonMusrData.size(); i++) {
+          fMultiGraphData->Add(fNonMusrData[i].theory, "l");
+        }
+      }
+
+      fMultiGraphData->Draw("a");
+
       // set x-range
       Double_t xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin;
       Double_t xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax;
-      fNonMusrData[0].data->GetXaxis()->SetRangeUser(xmin, xmax);
+      fMultiGraphData->GetXaxis()->SetRangeUser(xmin, xmax);
       // check if it is necessary to set the y-axis range
       Double_t ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin;
       Double_t ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax;
       if ((ymin != -999.0) && (ymax != -999.0)) {
-        fNonMusrData[0].data->GetYaxis()->SetRangeUser(ymin, ymax);
+        fMultiGraphData->GetYaxis()->SetRangeUser(ymin, ymax);
+      } else {
+        fMultiGraphData->GetYaxis()->UnZoom();
       }
       // set x-axis label
-      fNonMusrData[0].data->GetXaxis()->SetTitle(xAxisTitle.Data());
+      fMultiGraphData->GetXaxis()->SetTitle(xAxisTitle.Data());
       // set y-axis label
-      fNonMusrData[0].data->GetYaxis()->SetTitle(yAxisTitle.Data());
-      // plot all remaining data
-      for (unsigned int i=1; i<fNonMusrData.size(); i++) {
-        fNonMusrData[i].data->Draw("psame");
-      }
-      // plot all the theory
-      for (unsigned int i=0; i<fNonMusrData.size(); i++) {
-        fNonMusrData[i].theory->Draw("csame");
-      }
+      fMultiGraphData->GetYaxis()->SetTitle(yAxisTitle.Data());
+
+      fMultiGraphData->Draw("a");
     }
   }
 
@@ -2175,15 +2207,25 @@ void PMusrCanvas::PlotDifference()
     unsigned int runNo = (unsigned int)plotInfo.fRuns[0].Re()-1;
     TString xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName);
 
-    fNonMusrData[0].diff->Draw("ap");
-    // set x-axis label
-    fNonMusrData[0].diff->GetXaxis()->SetTitle(xAxisTitle.Data());
-    // set y-axis label
-    fNonMusrData[0].diff->GetYaxis()->SetTitle("data-theory");
-    // plot all remaining diff data
-    for (unsigned int i=1; i<fNonMusrData.size(); i++) {
-      fNonMusrData[i].diff->Draw("psame");
+    // if fMultiGraphDiff is not present create it and add the diff data
+    if (!fMultiGraphDiff) {
+      fMultiGraphDiff = new TMultiGraph();
+      assert(fMultiGraphDiff != 0);
+
+      // add all diff data to fMultiGraphDiff
+      for (unsigned int i=0; i<fNonMusrData.size(); i++) {
+        fMultiGraphDiff->Add(fNonMusrData[i].diff, "p");
+      }
     }
+
+    fMultiGraphDiff->Draw("a");
+
+    // set x-axis label
+    fMultiGraphDiff->GetXaxis()->SetTitle(xAxisTitle.Data());
+    // set y-axis label
+    fMultiGraphDiff->GetYaxis()->SetTitle("data-theory");
+
+    fMultiGraphDiff->Draw("a");
   }
 
   fDataTheoryPad->Update();
