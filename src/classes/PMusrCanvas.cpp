@@ -1006,7 +1006,7 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
   fTitlePad->Draw();
 
   // data/theory pad
-  fDataTheoryPad = new TPad("dataTheoryCanvas", "dataTheoryCanvas", 0.0, YINFO, XTHEO, YTITLE);
+  fDataTheoryPad = new TPad("dataTheoryPad", "dataTheoryPad", 0.0, YINFO, XTHEO, YTITLE);
   if (fDataTheoryPad == 0) {
     cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fDataTheoryPad";
     cout << endl;
@@ -2125,6 +2125,13 @@ void PMusrCanvas::PlotData()
       }
     }
   } else { // fPlotType == MSR_PLOT_NO_MUSR
+    // ugly workaround since multigraphs axis are not going away when switching TMultiGraphs
+    delete fDataTheoryPad;
+    fDataTheoryPad = new TPad("dataTheoryPad", "dataTheoryPad", 0.0, YINFO, XTHEO, YTITLE);
+    fDataTheoryPad->SetFillColor(TColor::GetColor(255,255,255));
+    fDataTheoryPad->Draw();
+    fDataTheoryPad->cd();
+
     PMsrRunList runs = *fMsrHandler->GetMsrRunList();
     PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
     unsigned int runNo = (unsigned int)plotInfo.fRuns[0].Re()-1;
@@ -2202,6 +2209,13 @@ void PMusrCanvas::PlotDifference()
       fData[i].diff->Draw("pesame");
     }
   } else { // fPlotType == MSR_PLOT_NON_MUSR
+    // ugly workaround since multigraphs axis are not going away when switching TMultiGraphs
+    delete fDataTheoryPad;
+    fDataTheoryPad = new TPad("dataTheoryPad", "dataTheoryPad", 0.0, YINFO, XTHEO, YTITLE);
+    fDataTheoryPad->SetFillColor(TColor::GetColor(255,255,255));
+    fDataTheoryPad->Draw();
+    fDataTheoryPad->cd();
+
     PMsrRunList runs = *fMsrHandler->GetMsrRunList();
     PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
     unsigned int runNo = (unsigned int)plotInfo.fRuns[0].Re()-1;
