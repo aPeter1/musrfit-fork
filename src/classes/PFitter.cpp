@@ -58,9 +58,10 @@ using namespace std;
  *
  * \param runInfo
  * \param runListCollection
+ * \param chisq_only
  */
-PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection) :
-  fRunInfo(runInfo)
+PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, bool chisq_only) :
+  fChisqOnly(chisq_only), fRunInfo(runInfo)
 {
   fUseChi2 = true; // chi^2 is the default
 
@@ -111,13 +112,34 @@ PFitter::~PFitter()
  */
 bool PFitter::DoFit()
 {
+  // feed minuit parameters
+  SetParameters();
+
+  // check if only chisq/maxLH shall be calculated once
+  if (fChisqOnly) {
+    std::vector<double> param = fMnUserParams.Params();
+    std::vector<double> error = fMnUserParams.Errors();
+    int usedParams = 0;
+    for (unsigned int i=0; i<error.size(); i++) {
+      if (error[i] != 0.0)
+        usedParams++;
+    }
+    int ndf = fFitterFcn->GetTotalNoOfFittedBins() - usedParams;
+    double val = (*fFitterFcn)(param);
+    if (fUseChi2) {
+      cout << endl << endl << ">> chisq = " << val << ", NDF = " << ndf << ", chisq/NDF = " << val/ndf;
+    } else { // max. log likelihood
+      cout << endl << endl << ">> maxLH = " << val << ", NDF = " << ndf << ", maxLH/NDF = " << val/ndf;
+    }
+    cout << endl << endl;
+    return true;
+  }
+
+  // real fit wanted
   if (fUseChi2)
     cout << endl << "Chi Square fit will be executed" << endl;
   else
     cout << endl << "Maximum Likelihood fit will be executed" << endl;
-
-  // feed minuit parameters
-  SetParameters();
 
   bool status;
   // init positive errors to default false, if minos is called, it will be set true there

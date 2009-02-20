@@ -57,7 +57,7 @@ using namespace std;
  */
 void musrfit_syntax()
 {
-  cout << endl << "usage: musrfit [<msr-file> [-k, --keep-mn2-ouput] [--debug] [--dump <type>]] | --version | --help";
+  cout << endl << "usage: musrfit [<msr-file> [-k, --keep-mn2-ouput] [-c, --chisq-only] [--debug] [--dump <type>]] | --version | --help";
   cout << endl << "       <msr-file>: msr input file";
   cout << endl << "       'musrfit <msr-file>' will execute musrfit";
   cout << endl << "       'musrfit' or 'musrfit --help' will show this help";
@@ -65,6 +65,9 @@ void musrfit_syntax()
   cout << endl << "       -k, --keep-mn2-output: will rename the files MINUIT2.OUTPUT and ";
   cout << endl << "              MINUIT2.root to <msr-file>-mn2.output and <msr-file>-mn2.root, repectively,";
   cout << endl << "              e.g. <msr-file> = 147.msr -> 147-mn2.output, 147-mn2.root";
+  cout << endl << "       -c, --chisq-only: instead of fitting the data, chisq is just calculated";
+  cout << endl << "              once and the result is set to the stdout. This feature is useful";
+  cout << endl << "              to adjust initial parameters.";
   cout << endl << "       --debug is used to print additional infos";
   cout << endl << "       --dump <type> is writing a data file with the fit data and the theory";
   cout << endl << "              <type> can be 'ascii', 'root'";
@@ -473,6 +476,7 @@ int main(int argc, char *argv[])
   int  status;
   bool debug = false;
   bool keep_mn2_output = false;
+  bool chisq_only = false;
   TString dump("");
 
   // check syntax
@@ -508,6 +512,8 @@ int main(int argc, char *argv[])
   for (int i=2; i<argc; i++) {
     if (!strcmp(argv[i], "-k") || !strcmp(argv[i], "--keep-mn2-output")) {
       keep_mn2_output = true;
+    } else if (!strcmp(argv[i], "-c") || !strcmp(argv[1], "--chisq-only")) {
+      chisq_only = true;
     } else if (!strcmp(argv[i], "--debug")) {
       debug = true;
     } else if (!strcmp(argv[i], "--dump")) {
@@ -623,14 +629,14 @@ int main(int argc, char *argv[])
   // do fitting
   PFitter *fitter = 0;
   if (success) {
-    fitter = new PFitter(msrHandler, runListCollection);
+    fitter = new PFitter(msrHandler, runListCollection, chisq_only);
     success = fitter->IsValid();
     if (success)
       fitter->DoFit();
   }
 
   // write log file
-  if (success) {
+  if (success && !chisq_only) {
     status = msrHandler->WriteMsrLogFile();
     if (status != PMUSR_SUCCESS) {
       switch (status) {
@@ -648,7 +654,7 @@ int main(int argc, char *argv[])
   }
 
   // check if dump is wanted
-  if (success && !dump.IsNull()) {
+  if (success && !dump.IsNull() && !chisq_only) {
     cout << endl << "will write dump file ..." << endl;
     dump.ToLower();
     if (dump.Contains("ascii"))
@@ -660,7 +666,7 @@ int main(int argc, char *argv[])
   }
 
   // rename MINUIT2.OUTPUT and MINUIT2.root file if wanted
-  if (keep_mn2_output) {
+  if (keep_mn2_output && !chisq_only) {
     // 1st rename MINUIT2.OUTPUT
     TString fln = TString(argv[1]);
     char ext[32];
@@ -697,7 +703,7 @@ int main(int argc, char *argv[])
     fitter = 0;
   }
 
-cout << endl << "done ..." << endl;
+  cout << endl << "done ..." << endl;
 
   return PMUSR_SUCCESS;
 }

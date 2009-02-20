@@ -63,7 +63,7 @@ Will handle all the possible minuit commands and actually do things ...
 class PFitter
 {
   public:
-    PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection);
+    PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, bool chisq_only = false);
     virtual ~PFitter();
 
     bool IsValid() { return fIsValid; }
@@ -71,6 +71,7 @@ class PFitter
 
   private:
     bool fIsValid;
+    bool fChisqOnly;
     bool fUseChi2;
 
     PMsrHandler *fRunInfo;
