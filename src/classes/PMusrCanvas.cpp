@@ -67,7 +67,8 @@ PMusrCanvas::PMusrCanvas()
   fMainCanvas          = 0;
   fTitlePad            = 0;
   fDataTheoryPad       = 0;
-  fParameterTheoryPad  = 0;
+  fParameterPad        = 0;
+  fTheoryPad           = 0;
   fInfoPad             = 0;
 
   fMultiGraphData = 0;
@@ -146,10 +147,15 @@ cout << "~PMusrCanvas() called. fMainCanvas name=" << fMainCanvas->GetName() << 
     delete fDataTheoryPad;
     fDataTheoryPad = 0;
   }
-  if (fParameterTheoryPad) {
-    fParameterTheoryPad->Clear();
-    delete fParameterTheoryPad;
-    fParameterTheoryPad = 0;
+  if (fParameterPad) {
+    fParameterPad->Clear();
+    delete fParameterPad;
+    fParameterPad = 0;
+  }
+  if (fTheoryPad) {
+    fTheoryPad->Clear();
+    delete fTheoryPad;
+    fTheoryPad = 0;
   }
   if (fInfoPad) {
     fInfoPad->Clear();
@@ -241,7 +247,7 @@ void PMusrCanvas::UpdateParamTheoryPad()
   TString  str;
   char     cnum[128];
   int      maxLength = 0;
-  Double_t ypos;
+  Double_t ypos, yoffset;
   int      idx;
 
   // add parameters ------------------------------------------------------------
@@ -253,6 +259,15 @@ void PMusrCanvas::UpdateParamTheoryPad()
       maxLength = param[i].fName.Length();
   }
   maxLength += 2;
+
+  // calculate yoffset based on the number of parameters
+  if (param.size() > 20)
+    yoffset = 1.0 / (param.size()+1);
+  else
+    yoffset = 0.05;
+
+cout << endl << ">> yoffset parameter = " << yoffset;
+
   // add parameters to the pad
   for (unsigned int i=0; i<param.size(); i++) {
     str = "";
@@ -301,13 +316,18 @@ void PMusrCanvas::UpdateParamTheoryPad()
         sprintf(cnum, "%.6lf", param[i].fStep);
       str += cnum;
     }
-    ypos = 0.925-i*0.025;
-    fParameterTheoryPad->AddText(0.03, ypos, str.Data());
+    ypos = 0.98-i*yoffset;
+cout << endl << ">> ypos = " << ypos;
+    fParameterPad->AddText(0.03, ypos, str.Data());
   }
 
   // add theory ------------------------------------------------------------
-  ypos -= 0.025;
   PMsrLines theory = *fMsrHandler->GetMsrTheory();
+  if (theory.size() > 20)
+    yoffset = 1.0/(theory.size()+1);
+  else
+    yoffset = 0.05;
+cout << endl << ">> yoffset theory = " << yoffset << endl;
   for (unsigned int i=1; i<theory.size(); i++) {
     // remove comment if present
     str = theory[i].fLine;
@@ -316,19 +336,20 @@ void PMusrCanvas::UpdateParamTheoryPad()
       str.Resize(idx-1);
       str.Resize(str.Strip().Length());
     }
-    ypos -= 0.025;
-    fParameterTheoryPad->AddText(0.03, ypos, str.Data());
+    ypos = 0.98 - i*yoffset;
+    fTheoryPad->AddText(0.03, ypos, str.Data());
   }
 
   // add functions --------------------------------------------------------
-  ypos -= 0.025;
+  ypos -= 0.05;
   PMsrLines functions = *fMsrHandler->GetMsrFunctions();
   for (unsigned int i=1; i<functions.size(); i++) {
-    ypos -= 0.025;
-    fParameterTheoryPad->AddText(0.03, ypos, functions[i].fLine.Data());
+    ypos -= 0.05;
+    fTheoryPad->AddText(0.03, ypos, functions[i].fLine.Data());
   }
 
-  fParameterTheoryPad->Draw();
+  fParameterPad->Draw();
+  fTheoryPad->Draw();
   fMainCanvas->cd();
   fMainCanvas->Update();
 }
@@ -943,7 +964,8 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
   fMainCanvas          = 0;
   fTitlePad            = 0;
   fDataTheoryPad       = 0;
-  fParameterTheoryPad  = 0;
+  fParameterPad        = 0;
+  fTheoryPad           = 0;
   fInfoPad             = 0;
 
   // invoke canvas
@@ -1015,16 +1037,28 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
   fDataTheoryPad->SetFillColor(TColor::GetColor(255,255,255));
   fDataTheoryPad->Draw();
 
-  // parameter/theory pad
-  fParameterTheoryPad = new TPaveText(XTHEO, 0.1, 1.0, YTITLE, "NDC");
-  if (fParameterTheoryPad == 0) {
-    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fParameterTheoryPad";
+  // parameter pad
+  fParameterPad = new TPaveText(XTHEO, 0.5, 1.0, YTITLE, "NDC");
+  if (fParameterPad == 0) {
+    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fParameterPad";
     cout << endl;
     return;
   }
-  fParameterTheoryPad->SetFillColor(TColor::GetColor(255,255,255));
-  fParameterTheoryPad->SetTextAlign(13); // top, left
-  fParameterTheoryPad->SetTextFont(102); // courier bold, scalable so that greek parameters will be plotted properly
+  fParameterPad->SetFillColor(TColor::GetColor(255,255,255));
+  fParameterPad->SetTextAlign(13); // top, left
+  fParameterPad->SetTextFont(102); // courier bold, scalable so that greek parameters will be plotted properly
+
+  // theory pad
+  fTheoryPad = new TPaveText(XTHEO, 0.1, 1.0, 0.5, "NDC");
+  if (fTheoryPad == 0) {
+    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fTheoryPad";
+    cout << endl;
+    return;
+  }
+  fTheoryPad->SetFillColor(TColor::GetColor(255,255,255));
+  fTheoryPad->SetTextAlign(13); // top, left
+  fTheoryPad->SetTextFont(102); // courier bold, scalable so that greek parameters will be plotted properly
+
 
   // info pad
   fInfoPad = new TLegend(0.0, 0.0, 1.0, YINFO, "NDC");
@@ -1047,7 +1081,8 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
 // cout << "fMainCanvas          " << fMainCanvas << endl;
 // cout << "fTitlePad            " << fTitlePad << endl;
 // cout << "fDataTheoryPad       " << fDataTheoryPad << endl;
-// cout << "fParameterTheoryPad  " << fParameterTheoryPad << endl;
+// cout << "fParameterPad        " << fParameterPad << endl;
+// cout << "fTheoryPad           " << fTheoryPad << endl;
 // cout << "fInfoPad             " << fInfoPad << endl;
 }
 

@@ -195,7 +195,8 @@ class PMusrCanvas : public TObject, public TQObject
     TCanvas   *fMainCanvas;
     TPaveText *fTitlePad;
     TPad      *fDataTheoryPad;
-    TPaveText *fParameterTheoryPad;
+    TPaveText *fParameterPad;
+    TPaveText *fTheoryPad;
     TLegend   *fInfoPad;
 
 #ifndef __MAKECINT__
