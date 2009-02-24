@@ -51,25 +51,27 @@
 // --------------------------------------------------------
 
 // function tags
-#define THEORY_UNDEFINED                   -1
-#define THEORY_ASYMMETRY                    0
-#define THEORY_SIMPLE_EXP                   1
-#define THEORY_GENERAL_EXP                  2
-#define THEORY_SIMPLE_GAUSS                 3
-#define THEORY_STATIC_GAUSS_KT              4
-#define THEORY_STATIC_KT_LF                 5
-#define THEORY_DYNAMIC_KT_LF                6
-#define THEORY_COMBI_LGKT                   7
-#define THEORY_SPIN_GLASS                   8
-#define THEORY_RANDOM_ANISOTROPIC_HYPERFINE 9
-#define THEORY_ABRAGAM                     10
-#define THEORY_INTERNAL_FIELD              11
-#define THEORY_TF_COS                      12
-#define THEORY_BESSEL                      13
-#define THEORY_INTERNAL_BESSEL             14
-#define THEORY_SKEWED_GAUSS                15
-#define THEORY_POLYNOM                     16
-#define THEORY_USER_FCN                    17
+#define THEORY_UNDEFINED                    -1
+#define THEORY_ASYMMETRY                     0
+#define THEORY_SIMPLE_EXP                    1
+#define THEORY_GENERAL_EXP                   2
+#define THEORY_SIMPLE_GAUSS                  3
+#define THEORY_STATIC_GAUSS_KT               4
+#define THEORY_STATIC_GAUSS_KT_LF            5
+#define THEORY_DYNAMIC_GAUSS_KT_LF           6
+#define THEORY_STATIC_LORENTZ_KT_LF          7
+#define THEORY_DYNAMIC_LORENTZ_KT_LF         8
+#define THEORY_COMBI_LGKT                    9
+#define THEORY_SPIN_GLASS                   10
+#define THEORY_RANDOM_ANISOTROPIC_HYPERFINE 11
+#define THEORY_ABRAGAM                      12
+#define THEORY_INTERNAL_FIELD               13
+#define THEORY_TF_COS                       14
+#define THEORY_BESSEL                       15
+#define THEORY_INTERNAL_BESSEL              16
+#define THEORY_SKEWED_GAUSS                 17
+#define THEORY_POLYNOM                      18
+#define THEORY_USER_FCN                     19
 
 // function parameter tags, i.e. how many parameters has a specific function
 // if there is a comment with a (tshift), the number of parameters is increased by one
@@ -78,8 +80,10 @@
 #define THEORY_PARAM_GENERAL_EXP                  2 // damping, exponents  (tshift)
 #define THEORY_PARAM_SIMPLE_GAUSS                 1 // damping (tshift)
 #define THEORY_PARAM_STATIC_GAUSS_KT              1 // damping (tshift)
-#define THEORY_PARAM_STATIC_KT_LF                 2 // frequency, damping (tshift)
-#define THEORY_PARAM_DYNAMIC_KT_LF                3 // frequency, damping, hop-rate (tshift)
+#define THEORY_PARAM_STATIC_GAUSS_KT_LF           2 // frequency, damping (tshift)
+#define THEORY_PARAM_DYNAMIC_GAUSS_KT_LF          3 // frequency, damping, hop-rate (tshift)
+#define THEORY_PARAM_STATIC_LORENTZ_KT_LF         2 // frequency, damping (tshift)
+#define THEORY_PARAM_DYNAMIC_LORENTZ_KT_LF        3 // frequency, damping, hop-rate (tshift)
 #define THEORY_PARAM_COMBI_LGKT                   2 // Lorentz rate, Gauss rate (tshift)
 #define THEORY_PARAM_SPIN_GLASS                   3 // rate, hop-rate, order parameter (tshift)
 #define THEORY_PARAM_RANDOM_ANISOTROPIC_HYPERFINE 2 // frequency, rate (tshift)
@@ -91,7 +95,7 @@
 #define THEORY_PARAM_SKEWED_GAUSS                 4 // phase, frequency, rate minus, rate plus (tshift)
 
 // number of available user functions
-#define THEORY_MAX 18
+#define THEORY_MAX 20
 
 // deg -> rad factor
 #define DEG_TO_RAD 0.0174532925199432955
@@ -135,11 +139,17 @@ static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
         {THEORY_STATIC_GAUSS_KT, THEORY_PARAM_STATIC_GAUSS_KT, false,
          "statGssKt", "stg", "(rate)", "(rate tshift)"},
 
-        {THEORY_STATIC_KT_LF, THEORY_PARAM_STATIC_KT_LF, true,
-         "statKTTab", "sktt", "(frequency damping)", "(frequency damping tshift)"},
+        {THEORY_STATIC_GAUSS_KT_LF, THEORY_PARAM_STATIC_GAUSS_KT_LF, true,
+         "statGssKTLF", "sgktlf", "(frequency damping)", "(frequency damping tshift)"},
 
-        {THEORY_DYNAMIC_KT_LF, THEORY_PARAM_DYNAMIC_KT_LF, true,
-         "dynmKTTab", "dktt", "(frequency damping hopprate)", "(frequency damping hopprate tshift)"},
+        {THEORY_DYNAMIC_GAUSS_KT_LF, THEORY_PARAM_DYNAMIC_GAUSS_KT_LF, true,
+         "dynGssKTLF", "dgktt", "(frequency damping hopping-rate)", "(frequency damping hopping-rate tshift)"},
+
+        {THEORY_STATIC_LORENTZ_KT_LF, THEORY_PARAM_STATIC_LORENTZ_KT_LF, true,
+         "statExpKTLF", "sektlf", "(frequency damping)", "(frequency damping tshift)"},
+
+        {THEORY_DYNAMIC_LORENTZ_KT_LF, THEORY_PARAM_DYNAMIC_LORENTZ_KT_LF, true,
+         "dynExpKTLF", "dektt", "(frequency damping hopping-rate)", "(frequency damping hopping-rate tshift)"},
 
         {THEORY_COMBI_LGKT, THEORY_PARAM_COMBI_LGKT, false,
          "combiLGKT", "lgkt", "(LorentzRate GaussRate)", "(LorentzRate GaussRate tshift)"},
@@ -198,8 +208,10 @@ class PTheory
     virtual double GeneralExp(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual double SimpleGauss(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual double StaticGaussKT(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double StaticKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double DynamicKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double StaticGaussKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double DynamicGaussKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double StaticLorentzKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double DynamicLorentzKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual double CombiLGKT(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual double SpinGlass(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual double RandomAnisotropicHyperfine(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
@@ -217,11 +229,7 @@ class PTheory
     unsigned int fType;
     vector<unsigned int> fParamNo; ///< holds the parameter numbers for the theory (including maps and functions, see constructor desciption)
     unsigned int fNoOfParam;
-//    PTable *fTable;
     PTheory *fAdd, *fMul;
-//    unsigned int fTotalNoOfMsrParam;
-//    TString fUserFun;
-//    TString fUserFunPreParsed;
     TF1 *fStaticKTLFFunc;
 
     TString fUserFcnClassName; ///< name of the user function class for within root

@@ -150,7 +150,7 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
   }
 
   // for static KT LF some TF1 object needs to be invoked 
-  if (idx == (unsigned int) THEORY_STATIC_KT_LF) {
+  if (idx == (unsigned int) THEORY_STATIC_GAUSS_KT_LF) {
     // check if it is necessary to create fStaticKTLFFunc
     if (fStaticKTLFFunc == 0) {
       fStaticKTLFFunc = new TF1("fStaticKTLFFunc",
@@ -392,12 +392,20 @@ double PTheory::Func(register double t, const PDoubleVector& paramValues, const 
           return StaticGaussKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
           break;
-        case THEORY_STATIC_KT_LF:
-          return StaticKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
+        case THEORY_STATIC_GAUSS_KT_LF:
+          return StaticGaussKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
           break;
-        case THEORY_DYNAMIC_KT_LF:
-          return DynamicKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
+        case THEORY_DYNAMIC_GAUSS_KT_LF:
+          return DynamicGaussKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
+                 fAdd->Func(t, paramValues, funcValues);
+          break;
+        case THEORY_STATIC_LORENTZ_KT_LF:
+          return StaticLorentzKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
+                 fAdd->Func(t, paramValues, funcValues);
+          break;
+        case THEORY_DYNAMIC_LORENTZ_KT_LF:
+          return DynamicLorentzKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
           break;
         case THEORY_COMBI_LGKT:
@@ -466,11 +474,17 @@ double PTheory::Func(register double t, const PDoubleVector& paramValues, const 
         case THEORY_STATIC_GAUSS_KT:
           return StaticGaussKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
-        case THEORY_STATIC_KT_LF:
-          return StaticKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
+        case THEORY_STATIC_GAUSS_KT_LF:
+          return StaticGaussKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
-        case THEORY_DYNAMIC_KT_LF:
-          return DynamicKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
+        case THEORY_DYNAMIC_GAUSS_KT_LF:
+          return DynamicGaussKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
+          break;
+        case THEORY_STATIC_LORENTZ_KT_LF:
+          return StaticLorentzKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
+          break;
+        case THEORY_DYNAMIC_LORENTZ_KT_LF:
+          return DynamicLorentzKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
         case THEORY_COMBI_LGKT:
           return CombiLGKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
@@ -529,11 +543,17 @@ double PTheory::Func(register double t, const PDoubleVector& paramValues, const 
         case THEORY_STATIC_GAUSS_KT:
           return StaticGaussKT(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
-        case THEORY_STATIC_KT_LF:
-          return StaticKTLF(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
+        case THEORY_STATIC_GAUSS_KT_LF:
+          return StaticGaussKTLF(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
-        case THEORY_DYNAMIC_KT_LF:
-          return DynamicKTLF(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
+        case THEORY_DYNAMIC_GAUSS_KT_LF:
+          return DynamicGaussKTLF(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
+          break;
+        case THEORY_STATIC_LORENTZ_KT_LF:
+          return StaticLorentzKTLF(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
+          break;
+        case THEORY_DYNAMIC_LORENTZ_KT_LF:
+          return DynamicLorentzKTLF(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
         case THEORY_COMBI_LGKT:
           return CombiLGKT(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
@@ -590,11 +610,17 @@ double PTheory::Func(register double t, const PDoubleVector& paramValues, const 
         case THEORY_STATIC_GAUSS_KT:
           return StaticGaussKT(t, paramValues, funcValues);
           break;
-        case THEORY_STATIC_KT_LF:
-          return StaticKTLF(t, paramValues, funcValues);
+        case THEORY_STATIC_GAUSS_KT_LF:
+          return StaticGaussKTLF(t, paramValues, funcValues);
           break;
-        case THEORY_DYNAMIC_KT_LF:
-          return DynamicKTLF(t, paramValues, funcValues);
+        case THEORY_DYNAMIC_GAUSS_KT_LF:
+          return DynamicGaussKTLF(t, paramValues, funcValues);
+          break;
+        case THEORY_STATIC_LORENTZ_KT_LF:
+          return StaticLorentzKTLF(t, paramValues, funcValues);
+          break;
+        case THEORY_DYNAMIC_LORENTZ_KT_LF:
+          return DynamicLorentzKTLF(t, paramValues, funcValues);
           break;
         case THEORY_COMBI_LGKT:
           return CombiLGKT(t, paramValues, funcValues);
@@ -1015,7 +1041,7 @@ double PTheory::StaticGaussKT(register double t, const PDoubleVector& paramValue
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::StaticKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+double PTheory::StaticGaussKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: frequency damping [tshift]
 
@@ -1064,7 +1090,31 @@ double PTheory::StaticKTLF(register double t, const PDoubleVector& paramValues, 
  * \param t time in \f$(\mu\mathrm{s})\f$
  * \param paramValues
  */
-double PTheory::DynamicKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+double PTheory::DynamicGaussKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+{
+  return 0.0;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$
+ * \param paramValues
+ */
+double PTheory::StaticLorentzKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+{
+  return 0.0;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$
+ * \param paramValues
+ */
+double PTheory::DynamicLorentzKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   return 0.0;
 }
