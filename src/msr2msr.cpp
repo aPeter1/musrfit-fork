@@ -54,6 +54,9 @@ using namespace std;
 #define MSR_TAG_NO_BLOCK     8
 
 //--------------------------------------------------------------------------
+/**
+ * <p>
+ */
 void msr2msr_syntax()
 {
   cout << endl << "usage: msr2msr <msr-file-in> <msr-file-out> | [--help]";
@@ -65,8 +68,17 @@ void msr2msr_syntax()
 }
 
 //--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param str
+ */
 bool msr2msr_run(char *str)
 {
+  // not the RUN line itself, hence nothing to be done
+  if (!strstr(str, "RUN"))
+    return true;
+
   TString run(str);
   TString line(str);
   TObjArray *tokens;
@@ -90,7 +102,7 @@ bool msr2msr_run(char *str)
     return false;
   }
 
-  if (tokens->GetEntries() == 5) { // alread new msr file, do only add the proper run comment
+  if (tokens->GetEntries() == 5) { // already a new msr file, do only add the proper run comment
     sprintf(str, "%s (name beamline institute data-file-format)", line.Data());
     return true;
   }
@@ -114,7 +126,6 @@ bool msr2msr_run(char *str)
     sprintf(str, "RUN %s %s RAL NEXUS   (name beamline institute data-file-format)", 
             ostr[0]->GetString().Data(), ostr[1]->GetString().Data());
   }
-  cout << endl;
 
   // clean up
   if (tokens) {
@@ -126,12 +137,18 @@ bool msr2msr_run(char *str)
 }
 
 //--------------------------------------------------------------------------
-void msr2msr_param(char *str, int &tag)
+/**
+ * <p>
+ *
+ * \param str
+ */
+//void msr2msr_param(char *str, int &tag)
+bool msr2msr_param(char *str)
 {
   // check for comment header which needs to be replaced
   if (strstr(str, "Nr.")) {
     strcpy(str, "#       No Name        Value     Step        Pos_Error   Boundaries");
-    return;
+    return true;
   }
 
   // handle parameter line
@@ -142,7 +159,7 @@ void msr2msr_param(char *str, int &tag)
   char spaces[256];
 
   tokens = line.Tokenize(" \t");
-  unsigned int noTokens = tokens->GetEntries();
+  Int_t noTokens = tokens->GetEntries();
   if (noTokens == 4) {
     for (unsigned int i=0; i<4; i++)
       ostr[i] = dynamic_cast<TObjString*>(tokens->At(i));
@@ -225,6 +242,7 @@ void msr2msr_param(char *str, int &tag)
     tokens = 0;
   }
 
+/*
   // check if the end of the parameter block is reached
   unsigned int i;
   for (i=0; i<strlen(str); i++) {
@@ -233,9 +251,76 @@ void msr2msr_param(char *str, int &tag)
   }
   if (i == strlen(str)) // end reached
     tag = MSR_TAG_NO_BLOCK;
+*/
+  return true;
 }
 
 //--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param str
+ */
+bool msr2msr_theory(char *str)
+{
+  // handle theory line
+  TString line(str);
+  TObjArray *tokens;
+  TObjString *ostr;
+  char sstr[256];
+
+  if (line.Contains("sktt") || line.Contains("statKTTab")) {
+    // change cmd name
+    strcpy(sstr, "statGssKTLF ");
+
+    // tokenize the rest and extract the first two parameters
+    tokens = line.Tokenize(" \t");
+    Int_t noTokens = tokens->GetEntries();
+    if (noTokens < 3) {
+      cout << endl << "**ERROR** in THEORY block";
+      cout << endl << "  Line: '" << str << "' is not a valid statKTTab statement.";
+      cout << endl << "  Cannot handle file." << endl;
+      return false;
+    }
+    for (Int_t i=1; i<3; i++) {
+      strcat(sstr, "  ");
+      ostr = dynamic_cast<TObjString*>(tokens->At(i));
+      strcat(sstr, ostr->GetString().Data());
+    }
+    strcat(sstr, "  (freq sigma)");
+    strcpy(str, sstr);
+  } else if (line.Contains("dktt") || line.Contains("dynmKTTab")) {
+    // change cmd name
+    strcpy(sstr, "dynGssKTLF ");
+
+    // tokenize the rest and extract the first three parameters
+    tokens = line.Tokenize(" \t");
+    Int_t noTokens = tokens->GetEntries();
+    if (noTokens < 4) {
+      cout << endl << "**ERROR** in THEORY block";
+      cout << endl << "  Line: '" << str << "' is not a valid dynmKTTab statement.";
+      cout << endl << "  Cannot handle file." << endl;
+      return false;
+    }
+    for (Int_t i=1; i<4; i++) {
+      strcat(sstr, "  ");
+      ostr = dynamic_cast<TObjString*>(tokens->At(i));
+      strcat(sstr, ostr->GetString().Data());
+    }
+    strcat(sstr, "  (freq sigma hopping_rate)");
+    strcpy(str, sstr);
+  }
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param argc
+ * \param argv
+ */
 int main(int argc, char *argv[])
 {
 
@@ -270,14 +355,29 @@ int main(int argc, char *argv[])
   bool success = true;
   while (!fin.eof() && success) {
     fin.getline(str, sizeof(str));
+
     if (strstr(str, "FITPARAMETER")) {
       tag = MSR_TAG_FITPARAMETER;
     } else if (strstr(str, "RUN")) { // analyze and change header
-      success = msr2msr_run(str);
+      tag = MSR_TAG_RUN;
+    } else if (strstr(str, "THEORY")) {
+      tag = MSR_TAG_THEORY;
     }
-    if (tag == MSR_TAG_FITPARAMETER) {
-      msr2msr_param(str, tag);
+
+    switch (tag) {
+      case MSR_TAG_FITPARAMETER:
+        success = msr2msr_param(str);
+        break;
+      case MSR_TAG_THEORY:
+        success = msr2msr_theory(str);
+        break;
+      case MSR_TAG_RUN:
+        success = msr2msr_run(str);
+        break;
+      default:
+        break;
     }
+
     fout << str << endl;
   }
 
@@ -292,6 +392,8 @@ int main(int argc, char *argv[])
   }
 
   // clean up
+
+  cout << endl << "done ..." << endl;
 
   return 1;
 }
