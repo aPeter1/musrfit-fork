@@ -91,7 +91,6 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
   fValid = true;
   fAdd = 0;
   fMul = 0;
-  fStaticKTLFFunc = 0;
   fUserFcnClassName = TString("");
   fUserFcn = 0;
 
@@ -102,6 +101,9 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
     lineNo = 1; // the lineNo counter and the depth counter need to be
     depth  = 0; // reset for every root object (new run).
   }
+
+  for (unsigned int i=0; i<THEORY_MAX_PARAM; i++)
+    fPrevParam[i] = 0.0;
 
   // get the input to be analyzed from the msr handler
   PMsrLines *fullTheoryBlock = msrInfo->GetMsrTheory();
@@ -147,22 +149,6 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
     cout << endl << "  in line no " << line->fLineNo << " is undefined!";
     fValid = false;
     return;
-  }
-
-  // for static KT LF some TF1 object needs to be invoked 
-  if (idx == (unsigned int) THEORY_STATIC_GAUSS_KT_LF) {
-    // check if it is necessary to create fStaticKTLFFunc
-    if (fStaticKTLFFunc == 0) {
-      fStaticKTLFFunc = new TF1("fStaticKTLFFunc",
-                                "exp(-0.5*pow([0]*x,2.0))*sin(2.0*pi*[1]*x)",
-                                0.0, 13.0);
-      if (!fStaticKTLFFunc) {
-        cout << endl << "**WARNING** in StaticKTLF: Couldn't invoke necessary function";
-        fValid = false;
-      } else {
-        fStaticKTLFFunc->SetNpx(1000);
-      }
-    }
   }
 
   // line is a valid function, hence analyze parameters
@@ -311,6 +297,8 @@ PTheory::~PTheory()
   fParamNo.clear();
   fUserParam.clear();
 
+  fLFIntegral.clear();
+
   if (fMul) {
     delete fMul;
     fMul = 0;
@@ -319,11 +307,6 @@ PTheory::~PTheory()
   if (fAdd) {
     delete fAdd;
     fAdd = 0;
-  }
-
-  if (fStaticKTLFFunc) {
-    delete fStaticKTLFFunc;
-    fStaticKTLFFunc = 0;
   }
 
   if (fUserFcn) {
@@ -1059,25 +1042,40 @@ double PTheory::StaticGaussKTLF(register double t, const PDoubleVector& paramVal
     }
   }
 
+  // check if the parameter values have changed, and if yes recalculate the non-analytic integral
+  bool newParam = false;
+  for (unsigned int i=0; i<3; i++) {
+    if (val[i] != fPrevParam[i]) {
+      newParam = true;
+      break;
+    }
+  }
+
+  if (newParam) { // new parameters found
+    for (unsigned int i=0; i<3; i++)
+      fPrevParam[i] = val[i];
+    CalculateGaussLFIntegral(val);
+  }
+
   double tt;
   if (fParamNo.size() == 2) // no tshift
     tt = t;
   else // tshift present
     tt = t-val[2];
 
-  if (val[0] == 0.0) {
+  if (tt < 0.0) // for times < 0 return a function value of 0.0
+    return 0.0;
+
+  if (val[0] < 0.02) { // if smaller 20kHz ~ 0.27G use zero field formula
     double sigma_t_2 = tt*tt*val[1]*val[1];
     result = 0.333333333333333 * (1.0 + 2.0*(1.0 - sigma_t_2)*TMath::Exp(-0.5*sigma_t_2));
   } else {
-    fStaticKTLFFunc->SetParameters(val[1], val[0]); // damping, frequency
-
     double delta = val[1];
     double w0    = 2.0*TMath::Pi()*val[0];
 
     result = 1.0 - 2.0*TMath::Power(delta/w0,2.0)*(1.0 - 
                 TMath::Exp(-0.5*TMath::Power(delta*tt, 2.0))*TMath::Cos(w0*tt)) +
-                2.0*TMath::Power(delta, 4.0)/TMath::Power(w0, 3.0)*
-                fStaticKTLFFunc->Integral(0.0, tt);
+                GetLFIntegralValue(tt);
   }
 
   return result;
@@ -1104,7 +1102,69 @@ double PTheory::DynamicGaussKTLF(register double t, const PDoubleVector& paramVa
  */
 double PTheory::StaticLorentzKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  return 0.0;
+  // expected parameters: frequency damping [tshift]
+
+  double val[3];
+  double result;
+
+  assert(fParamNo.size() <= 3);
+
+  // check if FUNCTIONS are used
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
+    if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
+      val[i] = paramValues[fParamNo[i]];
+    } else { // function
+      val[i] = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
+    }
+  }
+
+  // check if the parameter values have changed, and if yes recalculate the non-analytic integral
+  bool newParam = false;
+  for (unsigned int i=0; i<3; i++) {
+    if (val[i] != fPrevParam[i]) {
+      newParam = true;
+      break;
+    }
+  }
+
+  if (newParam) { // new parameters found
+    for (unsigned int i=0; i<3; i++)
+      fPrevParam[i] = val[i];
+    CalculateLorentzLFIntegral(val);
+  }
+
+  double tt;
+  if (fParamNo.size() == 2) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[2];
+
+ if (tt < 0.0) // for times < 0 return a function value of 0.0
+   return 0.0;
+
+ if (val[0] < 0.02) { // if smaller 20kHz ~ 0.27G use zero field formula
+    double at = tt*val[1];
+    result = 0.333333333333333 * (1.0 + 2.0*(1.0 - at)*TMath::Exp(-at));
+  } else {
+    double a    = val[1];
+    double at   = a*tt;
+    double w0   = 2.0*TMath::Pi()*val[0];
+    double a_w0 = a/w0;
+    double w0t  = w0*t;
+
+    double j1, j0;
+    if (fabs(w0t) < 0.001) { // check zero time limits of the spherical bessel functions j0(x) and j1(x)
+      j0 = 1.0;
+      j1 = 0.0;
+    } else {
+      j0 = sin(w0t)/w0t;
+      j1 = (sin(w0t)-w0t*cos(w0t))/(w0t*w0t);
+    }
+
+    result = 1.0 - a_w0*j1*exp(-at) - a_w0*a_w0*(j0*exp(-at) - 1.0) - GetLFIntegralValue(tt);
+  }
+
+  return result;
 }
 
 //--------------------------------------------------------------------------
@@ -1539,3 +1599,103 @@ if (first) {
 */
   return (*fUserFcn)(t, fUserParam);
 }
+
+//--------------------------------------------------------------------------
+/**
+ * <p>The fLFIntegral is given in steps of 1 ns, e.g. index i=100 coresponds to t=100ns
+ *
+ * \param val parameters needed to calculate the non-analytic integral of the static Gauss LF function.
+ */
+void PTheory::CalculateGaussLFIntegral(const double *val) const
+{
+  // val[0] = nu, val[1] = Delta
+
+  if (val[0] == 0.0) // field == 0.0, hence nothing to be done
+    return;
+
+  const double dt=0.001; // all times in usec
+  double t, ft;
+  double w0 = TMath::TwoPi()*val[0];
+  double Delta = val[1];
+  double preFactor = 2.0*TMath::Power(Delta, 4.0) / TMath::Power(w0, 3.0);
+
+  // clear previously allocated vector
+  fLFIntegral.clear();
+
+  // calculate integral
+  t  = 0.0;
+  fLFIntegral.push_back(0.0); // start value of the integral
+
+  ft = 0.0;
+  for (unsigned int i=1; i<2e4; i++) {
+    t  += dt;
+    ft += 0.5*dt*preFactor*(TMath::Exp(-0.5*TMath::Power(Delta * (t-dt), 2.0))*TMath::Sin(w0*(t-dt))+
+                           TMath::Exp(-0.5*TMath::Power(Delta * t, 2.0))*TMath::Sin(w0*t));
+    fLFIntegral.push_back(ft);
+  }
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param val parameters needed to calculate the non-analytic integral of the static Lorentz LF function.
+ */
+void PTheory::CalculateLorentzLFIntegral(const double *val) const
+{
+  // val[0] = nu, val[1] = a
+
+  if (val[0] == 0.0) // field == 0.0, hence nothing to be done
+    return;
+
+  const double dt=0.001; // all times in usec
+  double t, ft;
+  double w0 = TMath::TwoPi()*val[0];
+  double a = val[1];
+  double preFactor = a*(1+pow(a/w0,2.0));
+
+  // clear previously allocated vector
+  fLFIntegral.clear();
+
+  // calculate integral
+  t  = 0.0;
+  fLFIntegral.push_back(0.0); // start value of the integral
+
+  ft = 0.0;
+  // calculate first integral bin value (needed bcause of sin(x)/x x->0)
+  t  += dt;
+  ft += 0.5*dt*preFactor*(1.0+sin(w0*t)/(w0*t)*exp(-a*t));
+  fLFIntegral.push_back(ft);
+  // calculate all the other integral bin values
+  for (unsigned int i=2; i<2e4; i++) {
+    t  += dt;
+    ft += 0.5*dt*preFactor*(sin(w0*(t-dt))/(w0*(t-dt))*exp(-a*(t-dt))+sin(w0*t)/(w0*t)*exp(-a*t));
+    fLFIntegral.push_back(ft);
+  }
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param t time in (usec)
+ */
+double PTheory::GetLFIntegralValue(const double t) const
+{
+  unsigned int idx = static_cast<unsigned int>(t/0.001); // since LF-integral is calculated in nsec
+
+  if (idx < 0)
+    return 0.0;
+
+  if (idx > fLFIntegral.size()-1)
+    return fLFIntegral[fLFIntegral.size()-1];
+
+  // liniarly interpolate between the two relvant function bins
+  double df = (fLFIntegral[idx+1]-fLFIntegral[idx])/0.001*(t-idx*0.001);
+
+  return fLFIntegral[idx]+df;
+}
+
+//--------------------------------------------------------------------------
+// END
+//--------------------------------------------------------------------------

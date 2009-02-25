@@ -266,8 +266,6 @@ void PMusrCanvas::UpdateParamTheoryPad()
   else
     yoffset = 0.05;
 
-cout << endl << ">> yoffset parameter = " << yoffset;
-
   // add parameters to the pad
   for (unsigned int i=0; i<param.size(); i++) {
     str = "";
@@ -317,7 +315,6 @@ cout << endl << ">> yoffset parameter = " << yoffset;
       str += cnum;
     }
     ypos = 0.98-i*yoffset;
-cout << endl << ">> ypos = " << ypos;
     fParameterPad->AddText(0.03, ypos, str.Data());
   }
 
@@ -327,7 +324,6 @@ cout << endl << ">> ypos = " << ypos;
     yoffset = 1.0/(theory.size()+1);
   else
     yoffset = 0.05;
-cout << endl << ">> yoffset theory = " << yoffset << endl;
   for (unsigned int i=1; i<theory.size(); i++) {
     // remove comment if present
     str = theory[i].fLine;
@@ -2156,7 +2152,7 @@ void PMusrCanvas::PlotData()
       }
       // plot all the theory
       for (unsigned int i=0; i<fData.size(); i++) {
-        fData[i].theory->Draw("csame");
+        fData[i].theory->Draw("lsame");
       }
     }
   } else { // fPlotType == MSR_PLOT_NO_MUSR

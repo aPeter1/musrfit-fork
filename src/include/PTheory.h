@@ -34,17 +34,10 @@
 
 #include <TSystem.h>
 #include <TString.h>
-#include <TF1.h>
 
 #include "PMusr.h"
 #include "PMsrHandler.h"
 #include "PUserFcnBase.h"
-
-// #include <gsl_sf_hyperg.h>
-// 
-// extern "C" {
-//   double gsl_sf_hyperg_1F1(double a, double b, double x);
-// }
 
 // --------------------------------------------------------
 // function handling tags
@@ -96,6 +89,9 @@
 
 // number of available user functions
 #define THEORY_MAX 20
+
+// maximal number of parameters. Needed in the contents of LF
+#define THEORY_MAX_PARAM 10
 
 // deg -> rad factor
 #define DEG_TO_RAD 0.0174532925199432955
@@ -224,13 +220,16 @@ class PTheory
     virtual double Polynom(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual double UserFcn(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
 
+    virtual void CalculateGaussLFIntegral(const double *val) const;
+    virtual void CalculateLorentzLFIntegral(const double *val) const;
+    virtual double GetLFIntegralValue(const double t) const;
+
     // variables
     bool fValid;
     unsigned int fType;
     vector<unsigned int> fParamNo; ///< holds the parameter numbers for the theory (including maps and functions, see constructor desciption)
     unsigned int fNoOfParam;
     PTheory *fAdd, *fMul;
-    TF1 *fStaticKTLFFunc;
 
     TString fUserFcnClassName; ///< name of the user function class for within root
     TString fUserFcnSharedLibName; ///< name of the shared lib to which the user function belongs
@@ -238,6 +237,9 @@ class PTheory
     mutable PDoubleVector fUserParam;  ///< vector holding the resolved user function parameters, i.e. map and function resolved.
 
     PMsrHandler *fMsrInfo;
+
+    mutable double fPrevParam[THEORY_MAX_PARAM]; ///< needed for LF-stuff
+    mutable PDoubleVector fLFIntegral;           ///< needed for LF-stuff. Keeps the non-analytic integral values
 };
 
 #endif //  _PTHEORY_H_
