@@ -1,0 +1,338 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>PGetDefaultDialogBase</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>PGetDefaultDialogBase</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>511</width>
+            <height>222</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>RUN</string>
+    </property>
+    <property name="sizeGripEnabled">
+        <bool>true</bool>
+    </property>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fRunFileName_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>20</x>
+                <y>20</y>
+                <width>100</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Run File Name</string>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fBeamline_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>20</x>
+                <y>60</y>
+                <width>71</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Beamline</string>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fInstitute_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>20</x>
+                <y>100</y>
+                <width>71</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Institute</string>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>textLabel4</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>20</x>
+                <y>140</y>
+                <width>80</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>File Format</string>
+        </property>
+    </widget>
+    <widget class="QLayoutWidget">
+        <property name="name">
+            <cstring>Layout1</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>20</x>
+                <y>180</y>
+                <width>476</width>
+                <height>33</height>
+            </rect>
+        </property>
+        <hbox>
+            <property name="name">
+                <cstring>unnamed</cstring>
+            </property>
+            <property name="margin">
+                <number>0</number>
+            </property>
+            <property name="spacing">
+                <number>6</number>
+            </property>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>buttonHelp</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;Help</string>
+                </property>
+                <property name="accel">
+                    <string>F1</string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+            </widget>
+            <spacer>
+                <property name="name">
+                    <cstring>Horizontal Spacing2</cstring>
+                </property>
+                <property name="orientation">
+                    <enum>Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                    <enum>Expanding</enum>
+                </property>
+                <property name="sizeHint">
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>buttonOk</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;OK</string>
+                </property>
+                <property name="accel">
+                    <string></string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+                <property name="default">
+                    <bool>true</bool>
+                </property>
+            </widget>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>buttonCancel</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;Cancel</string>
+                </property>
+                <property name="accel">
+                    <string></string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+            </widget>
+        </hbox>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fBeamline_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>130</x>
+                <y>60</y>
+                <width>360</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+    <widget class="QComboBox">
+        <item>
+            <property name="text">
+                <string>NeXuS</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>ROOT-NPP</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>ROOT-PPC</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>PSIBIN</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>MUD</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>WKM</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>ASCII</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>DB</string>
+            </property>
+        </item>
+        <property name="name">
+            <cstring>fFileFormat_comboBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>130</x>
+                <y>140</y>
+                <width>99</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+    <widget class="QComboBox">
+        <item>
+            <property name="text">
+                <string>PSI</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>RAL</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>TRIUMF</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>JPARC</string>
+            </property>
+        </item>
+        <property name="name">
+            <cstring>fInstitute_comboBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>130</x>
+                <y>100</y>
+                <width>99</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fRunFileName_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>130</x>
+                <y>20</y>
+                <width>360</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+</widget>
+<connections>
+    <connection>
+        <sender>buttonOk</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetDefaultDialogBase</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>buttonCancel</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetDefaultDialogBase</receiver>
+        <slot>reject()</slot>
+    </connection>
+    <connection>
+        <sender>fRunFileName_lineEdit</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>PGetDefaultDialogBase</receiver>
+        <slot>runFileNameChanged(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>fBeamline_lineEdit</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>PGetDefaultDialogBase</receiver>
+        <slot>beamlineChanged(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>fInstitute_comboBox</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>PGetDefaultDialogBase</receiver>
+        <slot>instituteChanged(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>fFileFormat_comboBox</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>PGetDefaultDialogBase</receiver>
+        <slot>fileFormatChanged(const QString&amp;)</slot>
+    </connection>
+</connections>
+<tabstops>
+    <tabstop>fRunFileName_lineEdit</tabstop>
+    <tabstop>fBeamline_lineEdit</tabstop>
+    <tabstop>fInstitute_comboBox</tabstop>
+    <tabstop>fFileFormat_comboBox</tabstop>
+    <tabstop>buttonOk</tabstop>
+    <tabstop>buttonCancel</tabstop>
+    <tabstop>buttonHelp</tabstop>
+</tabstops>
+<slots>
+    <slot>runFileNameChanged(const QString&amp;)</slot>
+    <slot>beamlineChanged(const QString&amp;)</slot>
+    <slot>instituteChanged(const QString&amp;)</slot>
+    <slot>fileFormatChanged(const QString&amp;)</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

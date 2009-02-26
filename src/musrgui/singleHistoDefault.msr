@@ -1,0 +1,60 @@
+TITLE
+###############################################################
+FITPARAMETER
+#      Nr. Name       Value     Step      Pos_Error Bounderies   
+        1 Asy         0.26      0.01      none      0       0.33    
+        2 Rate        0.36      0.01      none
+        3 Field       100.0     1.0       none      0       200     
+        4 N0_L        150.0     0.01      none   
+        5 Bkg_L       4.9       0.01      none
+        6 Phase_L     7.0       1.5       none     -50     50      
+
+###############################################################
+THEORY
+asymmetry      1
+simplExpo      2                   (rate)
+TFieldCos   map1  fun1             (phase frequency)
+
+###############################################################
+FUNCTIONS
+fun1 = par3 * gamma_mu
+
+###############################################################
+RUN lem07_his_0111 MUE4 PSI ROOT-NPP   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            4
+backgr.fit      5
+lifetimecorrection
+map             6    0    0    0    0    0    0    0    0    0
+forward         1
+data            3413    65000   
+t0              3413    
+fit             0.20    8.2
+packing         50
+
+###############################################################
+COMMANDS
+SET BATCH
+MINIMIZE
+MINOS
+SAVE
+END RETURN
+
+###############################################################
+PLOT 0   (single histo plot)
+runs     1 
+range    0.00   7.00   -0.30   0.30
+
+###############################################################
+FOURIER
+units   Gauss  # fourier in field units
+fourier_power 12
+apodization NONE # NONE, WEAK, MEDIUM, STRONG
+plot power
+phase   8.5
+#range_for_phase_correction 50.0 70.0
+range   0.0  200.0
+
+###############################################################
+STATISTIC --- 2008-06-09 14:09:39
+  chisq = 1446.93547, NDF = 1377, chisq/NDF = 1.05078829
