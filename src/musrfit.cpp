@@ -512,7 +512,7 @@ int main(int argc, char *argv[])
   for (int i=2; i<argc; i++) {
     if (!strcmp(argv[i], "-k") || !strcmp(argv[i], "--keep-mn2-output")) {
       keep_mn2_output = true;
-    } else if (!strcmp(argv[i], "-c") || !strcmp(argv[1], "--chisq-only")) {
+    } else if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--chisq-only")) {
       chisq_only = true;
     } else if (!strcmp(argv[i], "--debug")) {
       debug = true;

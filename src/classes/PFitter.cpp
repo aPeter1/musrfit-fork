@@ -63,6 +63,19 @@ using namespace std;
 PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, bool chisq_only) :
   fChisqOnly(chisq_only), fRunInfo(runInfo)
 {
+/*
+PRunData *data=runListCollection->GetSingleHisto(0);
+fstream fout( "__test.dat", ios_base::out ); 
+fout << data->fDataTimeStart << endl;
+fout << data->fDataTimeStep << endl;
+fout << "------" << endl;
+fout << data->fValue.size() << endl;
+fout << "------" << endl;
+for (unsigned int i=0; i<data->fValue.size(); i++) {
+  fout << data->fValue[i] << ", " << data->fError[i] << endl;
+}
+fout.close();
+*/
   fUseChi2 = true; // chi^2 is the default
 
   fParams = *(runInfo->GetMsrParamList());
@@ -141,7 +154,7 @@ bool PFitter::DoFit()
   else
     cout << endl << "Maximum Likelihood fit will be executed" << endl;
 
-  bool status;
+  bool status = true;
   // init positive errors to default false, if minos is called, it will be set true there
   for (unsigned int i=0; i<fParams.size(); i++) {
     fRunInfo->SetMsrParamPosErrorPresent(i, false);
@@ -212,6 +225,16 @@ bool PFitter::DoFit()
         exit(0);
         break;
     }
+
+    // check if command has been successful
+    if (!status)
+      break;
+  }
+
+  if (IsValid()) {
+    fRunInfo->GetMsrStatistic()->fValid = true;
+  } else {
+    fRunInfo->GetMsrStatistic()->fValid = false;
   }
 
   return true;
@@ -411,6 +434,7 @@ bool PFitter::ExecuteMigrad()
       fRunInfo->SetMsrParamPosErrorPresent(i, false);
     }
 */
+    fIsValid = false;
     return false;
   }
 
@@ -482,6 +506,7 @@ bool PFitter::ExecuteMinimize()
       fRunInfo->SetMsrParamPosErrorPresent(i, false);
     }
 */
+    fIsValid = false;
     return false;
   }
 
@@ -539,7 +564,7 @@ bool PFitter::ExecuteMinos()
 
   // check if minimum was valid
   if (!fFcnMin->IsValid()) {
-    cout << endl << "**ERROR**: MINOS cannot started since the previews minimization faild :-(";
+    cout << endl << "**ERROR**: MINOS cannot started since the previews minimization failed :-(";
     cout << endl;
     return false;
   }
@@ -841,6 +866,7 @@ bool PFitter::ExecuteSimplex()
   ROOT::Minuit2::FunctionMinimum min = simplex(maxfcn, tolerance);
   if (!min.IsValid()) {
     cout << endl << "**WARNING**: PFitter::ExecuteSimplex(): Fit did not converge, sorry ...";
+    fIsValid = false;
     return false;
   }
 

@@ -141,7 +141,7 @@ double PRunSingleHisto::CalcChiSquare(const std::vector<double>& par)
     time = fData.fDataTimeStart + (double)i*fData.fDataTimeStep;
     if ((time>=fFitStartTime) && (time<=fFitStopTime)) {
       diff = fData.fValue[i] -
-            (N0*TMath::Exp(-time/tau)*(1+fTheory->Func(time, par, fFuncValues))+bkg);
+            (N0*TMath::Exp(-time/tau)*(1.0+fTheory->Func(time, par, fFuncValues))+bkg);
       chisq += diff*diff / (fData.fError[i]*fData.fError[i]);
     }
   }

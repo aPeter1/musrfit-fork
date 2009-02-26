@@ -60,6 +60,7 @@ PMsrHandler::PMsrHandler(char *fileName)
 
   fTitle = "";
 
+  fStatistic.fValid = false;
   fStatistic.fChisq = true;
   fStatistic.fMin   = -1.0;
   fStatistic.fNdf   = 0;
@@ -799,21 +800,26 @@ int PMsrHandler::WriteMsrLogFile()
     fStatistic.fStatLines.clear();
     // create the new statistics block
     PMsrLineStructure line;
-    if (fStatistic.fChisq) { // chi^2
-      line.fLine  = "  chisq = ";
-      line.fLine += fStatistic.fMin;
-      line.fLine += ", NDF = ";
-      line.fLine += fStatistic.fNdf;
-      line.fLine += ", chisq/NDF = ";
-      line.fLine += fStatistic.fMin / fStatistic.fNdf;
-      cout << endl << line.fLine.Data() << endl;
+    if (fStatistic.fValid) { // valid fit result
+      if (fStatistic.fChisq) { // chi^2
+        line.fLine  = "  chisq = ";
+        line.fLine += fStatistic.fMin;
+        line.fLine += ", NDF = ";
+        line.fLine += fStatistic.fNdf;
+        line.fLine += ", chisq/NDF = ";
+        line.fLine += fStatistic.fMin / fStatistic.fNdf;
+        cout << endl << line.fLine.Data() << endl;
+      } else {
+        line.fLine  = "  maxLH = ";
+        line.fLine += fStatistic.fMin;
+        line.fLine += ", NDF = ";
+        line.fLine += fStatistic.fNdf;
+        line.fLine += ", maxLH/NDF = ";
+        line.fLine += fStatistic.fMin / fStatistic.fNdf;
+        cout << endl << line.fLine.Data() << endl;
+      }
     } else {
-      line.fLine  = "  maxLH = ";
-      line.fLine += fStatistic.fMin;
-      line.fLine += ", NDF = ";
-      line.fLine += fStatistic.fNdf;
-      line.fLine += ", maxLH/NDF = ";
-      line.fLine += fStatistic.fMin / fStatistic.fNdf;
+      line.fLine = "*** FIT DID NOT CONVERGE ***";
       cout << endl << line.fLine.Data() << endl;
     }
     fStatistic.fStatLines.push_back(line);
