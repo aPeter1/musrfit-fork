@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>428</width>
-            <height>192</height>
+            <width>453</width>
+            <height>204</height>
         </rect>
     </property>
     <property name="caption">
@@ -18,20 +18,20 @@
     <property name="icon">
         <pixmap>image0</pixmap>
     </property>
-    <widget class="QLabel">
+    <widget class="QPushButton">
         <property name="name">
-            <cstring>fMusrGui_textLabel</cstring>
+            <cstring>fOk_pushButton</cstring>
         </property>
         <property name="geometry">
             <rect>
-                <x>130</x>
-                <y>0</y>
-                <width>199</width>
-                <height>45</height>
+                <x>11</x>
+                <y>161</y>
+                <width>430</width>
+                <height>26</height>
             </rect>
         </property>
         <property name="text">
-            <string>&lt;b&gt;&lt;i&gt;&lt;font size="+4"&gt;musrgui...&lt;/font&gt;&lt;/i&gt;&lt;/b&gt;</string>
+            <string>OK</string>
         </property>
     </widget>
     <widget class="QLabel">
@@ -40,10 +40,10 @@
         </property>
         <property name="geometry">
             <rect>
-                <x>10</x>
-                <y>130</y>
-                <width>400</width>
-                <height>20</height>
+                <x>11</x>
+                <y>134</y>
+                <width>430</width>
+                <height>21</height>
             </rect>
         </property>
         <property name="text">
@@ -56,10 +56,10 @@
         </property>
         <property name="geometry">
             <rect>
-                <x>150</x>
-                <y>50</y>
-                <width>140</width>
-                <height>70</height>
+                <x>158</x>
+                <y>52</y>
+                <width>144</width>
+                <height>75</height>
             </rect>
         </property>
         <property name="text">
@@ -69,26 +69,26 @@ Paul Scherrer Institut&lt;br&gt;
 Switzerland&lt;/p&gt;</string>
         </property>
     </widget>
-    <widget class="QPushButton">
+    <widget class="QLabel">
         <property name="name">
-            <cstring>fOk_pushButton</cstring>
+            <cstring>fMusrGui_textLabel</cstring>
         </property>
         <property name="geometry">
             <rect>
-                <x>183</x>
-                <y>160</y>
-                <width>70</width>
-                <height>26</height>
+                <x>141</x>
+                <y>2</y>
+                <width>199</width>
+                <height>42</height>
             </rect>
         </property>
         <property name="text">
-            <string>OK</string>
+            <string>&lt;b&gt;&lt;i&gt;&lt;font size="+4"&gt;musrgui...&lt;/font&gt;&lt;/i&gt;&lt;/b&gt;</string>
         </property>
     </widget>
 </widget>
 <images>
     <image name="image0">
-        <data format="PNG" length="411">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000016249444154388d95544dae86200c9c1a169e471217707e5890d4f3b830e95b687d15e51349889982fd19a6252e0c6c001cb06e2b4637629abde0584b61aacf7bf0b06eebc5e88d5360b74fc18b9ed7f75bd82908210a01e0c204e33c8628029c99e8fd373ca853009023c3a530290d1a619abdf464aa7818dd682b3f232f8569ddd6cb594fa6578eab9f2f0f5105ede57888214ace692f3d33d591951602be719c72a2d18dc839512b93737de0989e74dcc2d3eca557d7371db7b0364daf3a865eceded41142949b8e7b38b32b86288fe7371d77bcb66d1ace4ceadcce9669f6a2f79dcdf0edbb1426752200c874ec8da6c37e6e2e0cfbadb798cd99c18571b11546ca090ed807cf85db23b2da6388a27ab7034a39d54a08403afc383c7514dab8a5e3a530a5431d4b667200e0c37f16e968efa70adede40a7e414bc3875663b4833d44a6adc548f59832dd3ce865fb8a9fbdaf1178e7f656ea724a59cba75fce5fb0774073f42f0dd40cc0000000049454e44ae426082</data>
+        <data format="PNG" length="415">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000016649444154388dad54c18dc4200c1ca33cd3409ea1801440ea870228c079d2007fee9138326cd865578784d0d8891986c1c491810c6006524e58e605eb660bae7144a6363f824dcaa90a5a551438e3abb345f2edf73d4c1c19292738b71702c09149332600e507e6468ae22a90723a8b5cc5648775b36584a960b3cc8b3ef9bdf31199524e554e3393623d6c9e7eae8ed76c3aac3180e28327e7f67204a627cdd6cd9efa77f28f1afbe069991784e0a9c7e41e5f684c4f3eeee175b365d41d2f3eee61b1e0a83bcca7dbbd3ffee00ee7f6a2b119d54c8fddede531ff1f1a5b678b5cfc536f9934c34f2bd4732f0048bdd81799aef83d3932f4dacea22607064746158b0c1f3c0c70361e1f3cb17ac629a73b0e0092afc49eebde428af104e0d50de863747c7c44267fb9e3084c13705e8490108695b60deeadd2255767cb24c5f4ed0b4339498bbbbe57c354c754bde11deefabe2dfc8dc6ef98874bc62330910f7ed8c7dfac7f004a406a2bc502fb0000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
