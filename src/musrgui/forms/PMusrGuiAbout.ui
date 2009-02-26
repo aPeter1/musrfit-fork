@@ -1,0 +1,103 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>PMusrGuiAbout</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>PMusrGuiAbout</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>428</width>
+            <height>192</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>musrgui About</string>
+    </property>
+    <property name="icon">
+        <pixmap>image0</pixmap>
+    </property>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fMusrGui_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>130</x>
+                <y>0</y>
+                <width>199</width>
+                <height>45</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>&lt;b&gt;&lt;i&gt;&lt;font size="+4"&gt;musrgui...&lt;/font&gt;&lt;/i&gt;&lt;/b&gt;</string>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fSVN_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>130</y>
+                <width>400</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>&lt;i&gt;SVN $Id$&lt;/i&gt;</string>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fAbout_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>150</x>
+                <y>50</y>
+                <width>140</width>
+                <height>70</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>&lt;p align="center"&gt;by Andreas Suter&lt;br&gt;
+andreas.suter@psi.ch&lt;br&gt;
+Paul Scherrer Institut&lt;br&gt;
+Switzerland&lt;/p&gt;</string>
+        </property>
+    </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>fOk_pushButton</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>183</x>
+                <y>160</y>
+                <width>70</width>
+                <height>26</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>OK</string>
+        </property>
+    </widget>
+</widget>
+<images>
+    <image name="image0">
+        <data format="PNG" length="411">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000016249444154388d95544dae86200c9c1a169e471217707e5890d4f3b830e95b687d15e51349889982fd19a6252e0c6c001cb06e2b4637629abde0584b61aacf7bf0b06eebc5e88d5360b74fc18b9ed7f75bd82908210a01e0c204e33c8628029c99e8fd373ca853009023c3a530290d1a619abdf464aa7818dd682b3f232f8569ddd6cb594fa6578eab9f2f0f5105ede57888214ace692f3d33d591951602be719c72a2d18dc839512b93737de0989e74dcc2d3eca557d7371db7b0364daf3a865eceded41142949b8e7b38b32b86288fe7371d77bcb66d1ace4ceadcce9669f6a2f79dcdf0edbb1426752200c874ec8da6c37e6e2e0cfbadb798cd99c18571b11546ca090ed807cf85db23b2da6388a27ab7034a39d54a08403afc383c7514dab8a5e3a530a5431d4b667200e0c37f16e968efa70adede40a7e414bc3875663b4833d44a6adc548f59832dd3ce865fb8a9fbdaf1178e7f656ea724a59cba75fce5fb0774073f42f0dd40cc0000000049454e44ae426082</data>
+    </image>
+</images>
+<connections>
+    <connection>
+        <sender>fOk_pushButton</sender>
+        <signal>clicked()</signal>
+        <receiver>PMusrGuiAbout</receiver>
+        <slot>accept()</slot>
+    </connection>
+</connections>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

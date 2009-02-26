@@ -55,6 +55,7 @@
 #include "PAdmin.h"
 #include "PFitOutputHandler.h"
 #include "PGetDefaultDialog.h"
+#include "forms/PMusrGuiAbout.h"
 
 //----------------------------------------------------------------------------------------------------
 /**
@@ -65,7 +66,7 @@ PTextEdit::PTextEdit( QWidget *parent, const char *name )
 {
   fAdmin = new PAdmin();
 
-  fShowMlog = true;
+  fShowMlog = fAdmin->getShowMlog();
 
   setupFileActions();
   setupEditActions();
@@ -701,6 +702,16 @@ void PTextEdit::musrCalcChisq()
   if ( !currentEditor() )
     return;
 
+  QString tabLabel = fTabWidget->label(fTabWidget->currentPageIndex());
+  if (tabLabel == "noname") {
+    QMessageBox::critical(this, "**ERROR**", "For a fit a real msr-file is needed.");
+    return;
+  } else if (tabLabel == "noname*") {
+    fileSaveAs();
+  } else if (tabLabel.find("*") > 0) {
+    fileSave();
+  }
+
   QValueVector<QString> cmd;
   QString str;
   str = fAdmin->getExecPath() + "/musrfit";
@@ -722,6 +733,16 @@ void PTextEdit::musrFit()
   if ( !currentEditor() )
     return;
 
+  QString tabLabel = fTabWidget->label(fTabWidget->currentPageIndex());
+  if (tabLabel == "noname") {
+    QMessageBox::critical(this, "**ERROR**", "For a fit a real msr-file is needed.");
+    return;
+  } else if (tabLabel == "noname*") {
+    fileSaveAs();
+  } else if (tabLabel.find("*") > 0) {
+    fileSave();
+  }
+
   QValueVector<QString> cmd;
   QString str;
   str = fAdmin->getExecPath() + "/musrfit";
@@ -742,9 +763,29 @@ void PTextEdit::musrView()
   if ( !currentEditor() )
     return;
 
-  QMessageBox::information( this, "musrView",
-  "Will call musrview.\n"
-  "NOT IMPLEMENTED YET :-(" );
+  QString tabLabel = fTabWidget->label(fTabWidget->currentPageIndex());
+  if (tabLabel == "noname") {
+    QMessageBox::critical(this, "**ERROR**", "For a view a real mlog/msr-file is needed.");
+    return;
+  } else if (tabLabel == "noname*") {
+    fileSaveAs();
+  } else if (tabLabel.find("*") > 0) {
+    fileSave();
+  }
+
+  QString cmd;
+  QString str;
+
+  str = fAdmin->getExecPath() + "/musrview";
+  cmd = str + " ";
+
+  str = *fFilenames.find( currentEditor());
+  if (fShowMlog) {
+    str.replace(str.find(".msr"), 4, ".mlog");
+  }
+  cmd += str + " &";
+
+  system(cmd.latin1());
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -789,8 +830,8 @@ void PTextEdit::helpContents()
  */
 void PTextEdit::helpAbout()
 {
-  QMessageBox::about(this, "MuSR-GUI",
-                     "andreas.suter@psi.ch");
+  PMusrGuiAbout *about = new PMusrGuiAbout();
+  about->show();
 }
 
 //----------------------------------------------------------------------------------------------------

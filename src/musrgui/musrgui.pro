@@ -25,22 +25,23 @@ SOURCES		= PTextEdit.cpp \
                   PGetDefaultDialog.cpp \
 		  main.cpp
 		  
-FORMS           = forms/PGetDefaultDialogBase.ui
+FORMS           = forms/PGetDefaultDialogBase.ui \
+                  forms/PMusrGuiAbout.ui
 
-IMAGES 		= editcopy.xpm        \
-                  editcut.xpm         \
-		  editpaste.xpm       \
-		  editredo.xpm        \
-		  editundo.xpm        \
-		  filenew.xpm         \
-		  fileopen.xpm        \
-		  fileprint.xpm       \
-		  filesave.xpm        \
-		  musrasym.xpm        \
-		  musrsinglehisto.xpm \
-		  musrcalcchisq.xpm   \
-		  musrfit.xpm         \
-		  musrview.xpm        \
-		  musrt0.xpm          \
-		  musrprefs.xpm
+IMAGES 		= images/editcopy.xpm        \
+                  images/editcut.xpm         \
+		  images/editpaste.xpm       \
+		  images/editredo.xpm        \
+		  images/editundo.xpm        \
+		  images/filenew.xpm         \
+		  images/fileopen.xpm        \
+		  images/fileprint.xpm       \
+		  images/filesave.xpm        \
+		  images/musrasym.xpm        \
+		  images/musrsinglehisto.xpm \
+		  images/musrcalcchisq.xpm   \
+		  images/musrfit.xpm         \
+		  images/musrview.xpm        \
+		  images/musrt0.xpm          \
+		  images/musrprefs.xpm
 		  
