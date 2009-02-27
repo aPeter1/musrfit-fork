@@ -15,18 +15,21 @@ CONFIG		+= qt warn_on debug
 
 
 HEADERS		= PTextEdit.h \
+                  PSubTextEdit.h \
                   PAdmin.h \
                   PFitOutputHandler.h \
                   PGetDefaultDialog.h
 		  
 SOURCES		= PTextEdit.cpp \
+                  PSubTextEdit.cpp \
                   PAdmin.cpp \
                   PFitOutputHandler.cpp \
                   PGetDefaultDialog.cpp \
 		  main.cpp
 		  
 FORMS           = forms/PGetDefaultDialogBase.ui \
-                  forms/PMusrGuiAbout.ui
+                  forms/PMusrGuiAbout.ui \
+		  forms/PGetTitleDialog.ui
 
 IMAGES 		= images/editcopy.xpm        \
                   images/editcut.xpm         \

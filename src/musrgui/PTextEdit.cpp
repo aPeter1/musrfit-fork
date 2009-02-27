@@ -52,6 +52,7 @@
 #include <qvaluevector.h>
 
 #include "PTextEdit.h"
+#include "PSubTextEdit.h"
 #include "PAdmin.h"
 #include "PFitOutputHandler.h"
 #include "PGetDefaultDialog.h"
@@ -216,6 +217,8 @@ void PTextEdit::setupMusrActions()
   a->addTo( tb );
   a->addTo( menu );
 
+  menu->insertSeparator();
+
   a = new QAction( QPixmap::fromMimeSource( "musrcalcchisq.xpm" ), tr( "Calc Chisq" ), ALT + Key_C, this, "cacluates for the given parameters chiSq/maxLH" );
   connect( a, SIGNAL( activated() ), this, SLOT( musrCalcChisq() ) );
   a->addTo( tb );
@@ -225,6 +228,8 @@ void PTextEdit::setupMusrActions()
   connect( a, SIGNAL( activated() ), this, SLOT( musrFit() ) );
   a->addTo( tb );
   a->addTo( menu );
+
+  menu->insertSeparator();
 
   a = new QAction( QPixmap::fromMimeSource( "musrview.xpm" ), tr( "&View" ), ALT + Key_V, this, "musrView" );
   connect( a, SIGNAL( activated() ), this, SLOT( musrView() ) );
@@ -284,7 +289,7 @@ void PTextEdit::load( const QString &f )
 {
   if ( !QFile::exists( f ) )
     return;
-  QTextEdit *edit = new QTextEdit( fTabWidget );
+  PSubTextEdit *edit = new PSubTextEdit( fTabWidget );
   edit->setTextFormat( PlainText );
   edit->setFamily("Courier");
   edit->setPointSize(11); // 11pt
@@ -306,10 +311,10 @@ void PTextEdit::load( const QString &f )
 /**
  * <p>
  */
-QTextEdit *PTextEdit::currentEditor() const
+PSubTextEdit *PTextEdit::currentEditor() const
 {
-  if ( fTabWidget->currentPage() && fTabWidget->currentPage()->inherits( "QTextEdit" ) )
-    return (QTextEdit*)fTabWidget->currentPage();
+  if ( fTabWidget->currentPage() && fTabWidget->currentPage()->inherits( "PSubTextEdit" ) )
+    return (PSubTextEdit*)fTabWidget->currentPage();
   return 0;
 }
 
@@ -317,7 +322,7 @@ QTextEdit *PTextEdit::currentEditor() const
 /**
  * <p>
  */
-void PTextEdit::doConnections( QTextEdit *e )
+void PTextEdit::doConnections( PSubTextEdit *e )
 {
   connect( e, SIGNAL( currentFontChanged( const QFont & ) ),
            this, SLOT( fontChanged( const QFont & ) ) );
@@ -331,7 +336,7 @@ void PTextEdit::doConnections( QTextEdit *e )
  */
 void PTextEdit::fileNew()
 {
-  QTextEdit *edit = new QTextEdit( fTabWidget );
+  PSubTextEdit *edit = new PSubTextEdit( fTabWidget );
   edit->setTextFormat( PlainText );
   edit->setFamily("Courier");
   edit->setPointSize(11); // 11pt

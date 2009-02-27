@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  PTextEdit.h
+  PSubTextEdit.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -29,85 +29,34 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PTEXTEDIT_H_
-#define _PTEXTEDIT_H_
+#ifndef _PSUBTEXTEDIT_H_
+#define _PSUBTEXTEDIT_H_
 
-#include <qmainwindow.h>
-#include <qmap.h>
+#include <qtextedit.h>
 
-class PSubTextEdit;
-class PAdmin;
-class QAction;
-class QComboBox;
-class QTabWidget;
-class QTextEdit;
-class QPopupMenu;
-
-class PTextEdit : public QMainWindow
+class PSubTextEdit : public QTextEdit
 {
     Q_OBJECT
 
 public:
-  PTextEdit( QWidget *parent = 0, const char *name = 0 );
+  PSubTextEdit( QWidget *parent = 0, const char *name = 0 );
 
-private:
-  void setupFileActions();
-  void setupEditActions();
-  void setupTextActions();
-  void setupMusrActions();
-  void setupHelpActions();
-  void load( const QString &f );
-  PSubTextEdit *currentEditor() const;
-  void doConnections( PSubTextEdit *e );
+protected:
+  virtual QPopupMenu *createPopupMenu( const QPoint &pos);
 
 private slots:
-  void fileNew();
-  void fileOpen();
-  void fileSave();
-  void fileSaveAs();
-  void filePrint();
-  void fileClose();
-  void fileExit();
-
-  void editUndo();
-  void editRedo();
-  void editSelectAll();
-  void editCut();
-  void editCopy();
-  void editPaste();
-
-  void textFamily( const QString &f );
-  void textSize( const QString &p );
-
-  void musrGetAsymetryDefault();
-  void musrGetSingleHistoDefault();
-  void musrCalcChisq();
-  void musrFit();
-  void musrView();
-  void musrT0();
-  void musrPrefs();
-  void musrShowMlog( const QString &str );
-
-  void helpContents();
-  void helpAboutQt();
-  void helpAbout();
-
-  void fontChanged( const QFont &f );
-  void textChanged();
-
-private:
-  PAdmin *fAdmin;
-
-  bool fShowMlog;
-
-  QComboBox *fComboFont;
-  QComboBox *fComboSize;
-
-  QComboBox *fComboShowMlog;
-
-  QTabWidget *fTabWidget;
-  QMap<PSubTextEdit*, QString> fFilenames;
+  void insertTitle();
+  void insertParameterBlock();
+  void insertParameter();
+  void insertTheoryBlock();
+  void insertFunctionBlock();
+  void insertAsymRunBlock();
+  void insertSingleHistRunBlock();
+  void insertNonMusrRunBlock();
+  void insertCommandBlock();
+  void insertFourierBlock();
+  void insertPlotBlock();
+  void insertStatisticBlock();
 };
 
-
-#endif // _PTEXTEDIT_H_
+#endif // _PSUBTEXTEDIT_H_
