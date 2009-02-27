@@ -206,27 +206,27 @@ void PTextEdit::setupMusrActions()
   menuBar()->insertItem( tr( "&MusrFit" ), menu );
 
   QAction *a;
-  a = new QAction( QPixmap::fromMimeSource( "musrasym.xpm" ), tr( "&Asymetry Default" ), CTRL + SHIFT + Key_A, this, "musrGetAsymetryDefault" );
+  a = new QAction( QPixmap::fromMimeSource( "musrasym.xpm" ), tr( "&Asymetry Default" ), ALT + Key_A, this, "musrGetAsymetryDefault" );
   connect( a, SIGNAL( activated() ), this, SLOT( musrGetAsymetryDefault() ) );
   a->addTo( tb );
   a->addTo( menu );
 
-  a = new QAction( QPixmap::fromMimeSource( "musrsinglehisto.xpm" ), tr( "Single &Histo Default" ), CTRL + SHIFT + Key_H, this, "musrGetSinglHistoDefault" );
+  a = new QAction( QPixmap::fromMimeSource( "musrsinglehisto.xpm" ), tr( "Single &Histo Default" ), ALT + Key_H, this, "musrGetSinglHistoDefault" );
   connect( a, SIGNAL( activated() ), this, SLOT( musrGetSingleHistoDefault() ) );
   a->addTo( tb );
   a->addTo( menu );
 
-  a = new QAction( QPixmap::fromMimeSource( "musrcalcchisq.xpm" ), tr( "Calc Chisq" ), CTRL + SHIFT + Key_C, this, "cacluates for the given parameters chiSq/maxLH" );
+  a = new QAction( QPixmap::fromMimeSource( "musrcalcchisq.xpm" ), tr( "Calc Chisq" ), ALT + Key_C, this, "cacluates for the given parameters chiSq/maxLH" );
   connect( a, SIGNAL( activated() ), this, SLOT( musrCalcChisq() ) );
   a->addTo( tb );
   a->addTo( menu );
 
-  a = new QAction( QPixmap::fromMimeSource( "musrfit.xpm" ), tr( "&Fit" ), CTRL + SHIFT + Key_F, this, "musrFit" );
+  a = new QAction( QPixmap::fromMimeSource( "musrfit.xpm" ), tr( "&Fit" ), ALT + Key_F, this, "musrFit" );
   connect( a, SIGNAL( activated() ), this, SLOT( musrFit() ) );
   a->addTo( tb );
   a->addTo( menu );
 
-  a = new QAction( QPixmap::fromMimeSource( "musrview.xpm" ), tr( "&View" ), CTRL + SHIFT + Key_V, this, "musrView" );
+  a = new QAction( QPixmap::fromMimeSource( "musrview.xpm" ), tr( "&View" ), ALT + Key_V, this, "musrView" );
   connect( a, SIGNAL( activated() ), this, SLOT( musrView() ) );
   a->addTo( tb );
   a->addTo( menu );

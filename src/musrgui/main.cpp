@@ -29,14 +29,28 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <iostream>
+using namespace std;
+
 #include <qapplication.h>
 
 #include "PTextEdit.h"
-
 #include "PFitOutputHandler.h"
 
 int main( int argc, char ** argv ) 
 {
+    if (argc == 2) {
+      if (!strcmp(argv[1], "--help") || !strcmp(argv[1], "-h")) {
+        cout << endl << "usage: musrgui [<msr-files>] | -h, --help | -v, --version";
+        cout << endl << endl;
+        return 0;
+      } else if (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-v")) {
+        cout << endl << "musrgui version: $Id$";
+        cout << endl << endl;
+        return 0;
+      }
+    }
+
     QApplication a( argc, argv );
 
     PTextEdit * mw = new PTextEdit();
