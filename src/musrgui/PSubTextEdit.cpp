@@ -119,7 +119,6 @@ void PSubTextEdit::insertTitle()
   if (dlg->exec() == QDialog::Accepted) {
     QString title = dlg->fTitle_lineEdit->text();
     insert(title+"\n");
-    insert("###############################################################\n");
   }
 }
 
@@ -129,7 +128,10 @@ void PSubTextEdit::insertTitle()
  */
 void PSubTextEdit::insertParameterBlock()
 {
-  insert("will insert a real parameter block");
+  insert("###############################################################\n");
+  insert("FITPARAMETER\n");
+  insert("#      Nr. Name        Value     Step      Pos_Error  Bounderies\n");
+  insert("         1 alpha       1.0       0.1       none       0         none\n\n");
 }
 
 //----------------------------------------------------------------------------------------------------
