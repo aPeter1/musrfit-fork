@@ -1239,7 +1239,49 @@ double PTheory::StaticLorentzKTLF(register double t, const PDoubleVector& paramV
  */
 double PTheory::DynamicLorentzKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  return 0.0;
+  // expected parameters: frequency damping hopping [tshift]
+
+  double val[4];
+  double result = 0.0;
+
+  assert(fParamNo.size() <= 4);
+
+  // check if FUNCTIONS are used
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
+    if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
+      val[i] = paramValues[fParamNo[i]];
+    } else { // function
+      val[i] = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
+    }
+  }
+
+  // check if the parameter values have changed, and if yes recalculate the non-analytic integral
+  bool newParam = false;
+  for (unsigned int i=0; i<4; i++) {
+    if (val[i] != fPrevParam[i]) {
+      newParam = true;
+      break;
+    }
+  }
+
+  if (newParam) { // new parameters found
+    for (unsigned int i=0; i<4; i++)
+      fPrevParam[i] = val[i];
+    CalculateDynKTLF(val, 1); // 0 means Lorentz
+  }
+
+  double tt;
+  if (fParamNo.size() == 3) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[3];
+
+  if (tt < 0.0) // for times < 0 return a function value of 0.0
+    return 0.0;
+
+  result = GetDynKTLFValue(tt);
+
+  return result;
 }
 
 //--------------------------------------------------------------------------
