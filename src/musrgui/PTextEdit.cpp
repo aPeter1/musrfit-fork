@@ -240,6 +240,17 @@ void PTextEdit::setupMusrActions()
   connect( a, SIGNAL( activated() ), this, SLOT( musrPrefs() ) );
   a->addTo( tb );
   a->addTo( menu );
+
+  fComboShowMlog = new QComboBox( TRUE, tb );
+  fComboShowMlog->setEditable(false);
+  fComboShowMlog->insertItem("view mlog");
+  fComboShowMlog->insertItem("view msr");
+  connect( fComboShowMlog, SIGNAL( activated( const QString & ) ),
+           this, SLOT( musrShowMlog( const QString & ) ) );
+  if (fShowMlog)
+    fComboShowMlog->setCurrentItem(0);
+  else
+    fComboShowMlog->setCurrentItem(1);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -811,6 +822,18 @@ void PTextEdit::musrPrefs()
   QMessageBox::information( this, "musrPrefs",
   "Will call musr related perferences dialog.\n"
   "NOT IMPLEMENTED YET :-(" );
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PTextEdit::musrShowMlog( const QString &str )
+{
+  if (str.find("mlog") > 0)
+    fShowMlog = true;
+  else
+    fShowMlog = false;
 }
 
 //----------------------------------------------------------------------------------------------------

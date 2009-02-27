@@ -84,6 +84,7 @@ private slots:
     void musrView();
     void musrT0();
     void musrPrefs();
+    void musrShowMlog( const QString &str );
 
     void helpContents();
     void helpAboutQt();
@@ -99,6 +100,8 @@ private:
 
     QComboBox *fComboFont;
     QComboBox *fComboSize;
+
+    QComboBox *fComboShowMlog;
 
     QTabWidget *fTabWidget;
     QMap<QTextEdit*, QString> fFilenames;
