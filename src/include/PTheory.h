@@ -223,6 +223,8 @@ class PTheory
     virtual void CalculateGaussLFIntegral(const double *val) const;
     virtual void CalculateLorentzLFIntegral(const double *val) const;
     virtual double GetLFIntegralValue(const double t) const;
+    virtual void CalculateDynKTLF(const double *val, int tag) const;
+    virtual double GetDynKTLFValue(const double t) const;
 
     // variables
     bool fValid;
@@ -240,6 +242,8 @@ class PTheory
 
     mutable double fPrevParam[THEORY_MAX_PARAM]; ///< needed for LF-stuff
     mutable PDoubleVector fLFIntegral;           ///< needed for LF-stuff. Keeps the non-analytic integral values
+    mutable double fDynLFdt;
+    mutable PDoubleVector fDynLFFuncValue;      ///< needed for LF-stuff. Keeps the dynamic LF KT function values
 };
 
 #endif //  _PTHEORY_H_

@@ -93,6 +93,7 @@ PTheory::PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent)
   fMul = 0;
   fUserFcnClassName = TString("");
   fUserFcn = 0;
+  fDynLFdt = 0.0;
 
   static unsigned int lineNo = 1; // lineNo
   static unsigned int depth  = 0; // needed to handle '+' properly
@@ -298,6 +299,7 @@ PTheory::~PTheory()
   fUserParam.clear();
 
   fLFIntegral.clear();
+  fDynLFFuncValue.clear();
 
   if (fMul) {
     delete fMul;
@@ -1090,7 +1092,68 @@ double PTheory::StaticGaussKTLF(register double t, const PDoubleVector& paramVal
  */
 double PTheory::DynamicGaussKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  return 0.0;
+  // expected parameters: frequency damping hopping [tshift]
+
+  double val[4];
+  double result = 0.0;
+  bool useKeren = false;
+
+  assert(fParamNo.size() <= 4);
+
+  // check if FUNCTIONS are used
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
+    if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
+      val[i] = paramValues[fParamNo[i]];
+    } else { // function
+      val[i] = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
+    }
+  }
+
+  // check if Keren approximation can be used
+  if (val[2]/val[1] > 5.0) // nu/Delta > 5.0
+    useKeren = true;
+
+  if (!useKeren) {
+    // check if the parameter values have changed, and if yes recalculate the non-analytic integral
+    bool newParam = false;
+    for (unsigned int i=0; i<4; i++) {
+      if (val[i] != fPrevParam[i]) {
+        newParam = true;
+        break;
+      }
+    }
+
+    if (newParam) { // new parameters found
+      for (unsigned int i=0; i<4; i++)
+        fPrevParam[i] = val[i];
+      CalculateDynKTLF(val, 0); // 0 means Gauss
+    }
+  }
+
+  double tt;
+  if (fParamNo.size() == 3) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[3];
+
+  if (tt < 0.0) // for times < 0 return a function value of 0.0
+    return 0.0;
+
+
+  if (useKeren) { // see PRB50, 10039 (1994)
+    double wL  = TWO_PI * val[0];
+    double wL2 = wL*wL;
+    double nu2 = val[2]*val[2];
+    double Gamma_t = 2.0*val[1]*val[1]/((wL2+nu2)*(wL2+nu2))*
+                       ((wL2+nu2)*val[2]*t
+                        + (wL2-nu2)*(1.0 - TMath::Exp(-val[2]*t)*TMath::Cos(wL*t))
+                        - 2.0*val[2]*wL*TMath::Exp(-val[2]*t)*TMath::Sin(wL*t));
+    result = TMath::Exp(-Gamma_t);
+  } else { // from Voltera
+    result = GetDynKTLFValue(tt);
+  }
+
+  return result;
 }
 
 //--------------------------------------------------------------------------
@@ -1150,7 +1213,7 @@ double PTheory::StaticLorentzKTLF(register double t, const PDoubleVector& paramV
     double at   = a*tt;
     double w0   = 2.0*TMath::Pi()*val[0];
     double a_w0 = a/w0;
-    double w0t  = w0*t;
+    double w0t  = w0*tt;
 
     double j1, j0;
     if (fabs(w0t) < 0.001) { // check zero time limits of the spherical bessel functions j0(x) and j1(x)
@@ -1694,6 +1757,132 @@ double PTheory::GetLFIntegralValue(const double t) const
   double df = (fLFIntegral[idx+1]-fLFIntegral[idx])/0.001*(t-idx*0.001);
 
   return fLFIntegral[idx]+df;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>Number of sampling points is estimated according to w0: w0 T = 2 pi
+ * t_sampling = T/16 (i.e. 16 points on 1 period)
+ * N = 8/pi w0 Tmax = 16 nu0 Tmax
+ *
+ * \param val parameters needed to solve the voltera integral equation
+ * \param tag 0=Gauss, 1=Lorentz
+ */
+void PTheory::CalculateDynKTLF(const double *val, int tag) const
+{
+  // val: 0=nu0, 1=Delta (Gauss) / a (Lorentz), 2=nu
+  const double Tmax = 20.0; // 20 usec
+  unsigned int N = static_cast<unsigned int>(16.0*Tmax*val[0]);
+
+  if (N < 300) // if too view points, i.e. nu0 very small, take 300 points
+    N = 300;
+
+  // allocate memory for dyn KT LF function vector
+  fDynLFFuncValue.clear(); // get rid of a possible previous vector
+  fDynLFFuncValue.resize(N);
+
+  // calculate the non-analytic integral of the static KT LF function
+  switch (tag) {
+    case 0: // Gauss
+      CalculateGaussLFIntegral(val);
+      break;
+    case 1: // Lorentz
+      CalculateLorentzLFIntegral(val);
+      break;
+    default:
+      cout << endl << "**FATAL ERROR** in PTheory::CalculateDynKTLF: You should never have reached this point." << endl;
+      assert(false);
+      break;
+  }
+
+  // calculate the P^(0)(t) exp(-nu t) vector
+  PDoubleVector p0exp(N);
+  double t = 0.0;
+  double dt = Tmax/N;
+  fDynLFdt = dt; // keep it since it is needed in GetDynKTLFValue()
+  for (unsigned int i=0; i<N; i++) {
+    switch (tag) {
+      case 0: // Gauss
+        if (val[0] < 0.02) { // if smaller 20kHz ~ 0.27G use zero field formula
+          double sigma_t_2 = t*t*val[1]*val[1];
+          p0exp[i] = 0.333333333333333 * (1.0 + 2.0*(1.0 - sigma_t_2)*TMath::Exp(-0.5*sigma_t_2));
+        } else {
+          double delta = val[1];
+          double w0    = TWO_PI*val[0];
+
+          p0exp[i] = 1.0 - 2.0*TMath::Power(delta/w0,2.0)*(1.0 -
+                    TMath::Exp(-0.5*TMath::Power(delta*t, 2.0))*TMath::Cos(w0*t)) +
+                    GetLFIntegralValue(t);
+        }
+        break;
+      case 1: // Lorentz
+        if (val[0] < 0.02) { // if smaller 20kHz ~ 0.27G use zero field formula
+          double at = t*val[1];
+          p0exp[i] = 0.333333333333333 * (1.0 + 2.0*(1.0 - at)*TMath::Exp(-at));
+        } else {
+          double a    = val[1];
+          double at   = a*t;
+          double w0   = TWO_PI*val[0];
+          double a_w0 = a/w0;
+          double w0t  = w0*t;
+
+          double j1, j0;
+          if (fabs(w0t) < 0.001) { // check zero time limits of the spherical bessel functions j0(x) and j1(x)
+            j0 = 1.0;
+            j1 = 0.0;
+          } else {
+            j0 = sin(w0t)/w0t;
+            j1 = (sin(w0t)-w0t*cos(w0t))/(w0t*w0t);
+          }
+
+          p0exp[i] = 1.0 - a_w0*j1*exp(-at) - a_w0*a_w0*(j0*exp(-at) - 1.0) - GetLFIntegralValue(t);
+        }
+        break;
+      default:
+        break;
+    }
+    p0exp[i] *= TMath::Exp(-val[2]*t);
+    t += dt;
+  }
+
+  // solve the volterra equation (trapezoid integration)
+  fDynLFFuncValue[0]=p0exp[0];
+
+  double sum;
+  double a;
+  double preFactor = dt*val[2];
+  for (unsigned i=1; i<N; i++) {
+    sum = p0exp[i];
+    sum += 0.5*preFactor*p0exp[i]*fDynLFFuncValue[0];
+    for (unsigned int j=1; j<i; j++) {
+      sum += preFactor*p0exp[i-j]*fDynLFFuncValue[j];
+    }
+    a = 1.0-0.5*preFactor*p0exp[0];
+
+    fDynLFFuncValue[i]=sum/a;
+  }
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param t time in (usec)
+ */
+double PTheory::GetDynKTLFValue(const double t) const
+{
+  unsigned int idx = static_cast<unsigned int>(t/fDynLFdt);
+
+  if (idx < 0)
+    return 0.0;
+
+  if (idx > fDynLFFuncValue.size()-1)
+    return fDynLFFuncValue[fDynLFFuncValue.size()-1];
+
+  // liniarly interpolate between the two relvant function bins
+  double df = (fDynLFFuncValue[idx+1]-fDynLFFuncValue[idx])*(t-idx*fDynLFdt)/fDynLFdt;
+
+  return fDynLFFuncValue[idx]+df;
 }
 
 //--------------------------------------------------------------------------

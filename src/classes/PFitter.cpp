@@ -65,17 +65,18 @@ PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, bo
 {
 /*
 PRunData *data=runListCollection->GetSingleHisto(0);
-fstream fout( "__test.dat", ios_base::out ); 
-fout << data->fDataTimeStart << endl;
-fout << data->fDataTimeStep << endl;
-fout << "------" << endl;
-fout << data->fValue.size() << endl;
-fout << "------" << endl;
-for (unsigned int i=0; i<data->fValue.size(); i++) {
-  fout << data->fValue[i] << ", " << data->fError[i] << endl;
-}
+fstream fout( "__test.dat", ios_base::out | ios_base::binary);
+fout.write(reinterpret_cast<char *>(&data->fDataTimeStart),sizeof(double));
+fout.write(reinterpret_cast<char *>(&data->fDataTimeStep),sizeof(double));
+unsigned int ss=data->fValue.size();
+fout.write(reinterpret_cast<char *>(&ss),sizeof(ss));
+for (unsigned int i=0; i<ss; i++)
+  fout.write(reinterpret_cast<char *>(&data->fValue[i]),sizeof(double));
+for (unsigned int i=0; i<ss; i++)
+  fout.write(reinterpret_cast<char *>(&data->fError[i]),sizeof(double));
 fout.close();
 */
+
   fUseChi2 = true; // chi^2 is the default
 
   fParams = *(runInfo->GetMsrParamList());

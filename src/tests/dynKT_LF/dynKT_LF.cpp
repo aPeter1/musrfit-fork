@@ -145,8 +145,8 @@ int main(int argc, char *argv[])
   } else {
     // w0 criteria, i.e. w0 T = 2 pi, ts = T/16, N = Tmax/ts, if N < 300, N == 300
     double val = 8.0/PI*Tmax*param[0];
-    if (val < 250)
-      N = 250;
+    if (val < 300)
+      N = 300;
     else
       N = static_cast<unsigned int>(val);
 
