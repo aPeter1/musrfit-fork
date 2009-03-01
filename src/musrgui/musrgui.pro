@@ -18,18 +18,21 @@ HEADERS		= PTextEdit.h \
                   PSubTextEdit.h \
                   PAdmin.h \
                   PFitOutputHandler.h \
-                  PGetDefaultDialog.h
-		  
+                  PGetDefaultDialog.h \
+		  PGetParameterDialog.h
+		  		  
 SOURCES		= PTextEdit.cpp \
                   PSubTextEdit.cpp \
                   PAdmin.cpp \
                   PFitOutputHandler.cpp \
                   PGetDefaultDialog.cpp \
+		  PGetParameterDialog.cpp \
 		  main.cpp
 		  
 FORMS           = forms/PGetDefaultDialogBase.ui \
                   forms/PMusrGuiAbout.ui \
-		  forms/PGetTitleDialog.ui
+		  forms/PGetTitleDialog.ui \
+		  forms/PGetParameterDialogBase.ui
 
 IMAGES 		= images/editcopy.xpm        \
                   images/editcut.xpm         \
@@ -44,6 +47,7 @@ IMAGES 		= images/editcopy.xpm        \
 		  images/musrsinglehisto.xpm \
 		  images/musrcalcchisq.xpm   \
 		  images/musrfit.xpm         \
+		  images/musrmlog2db.xpm     \
 		  images/musrview.xpm        \
 		  images/musrt0.xpm          \
 		  images/musrprefs.xpm

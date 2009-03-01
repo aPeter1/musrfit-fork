@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  PSubTextEdit.h
+  PGetParameterDialog.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -29,33 +29,20 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PSUBTEXTEDIT_H_
-#define _PSUBTEXTEDIT_H_
+#ifndef _PGETPARAMETERDIALOG_H_
+#define _PGETPARAMETERDIALOG_H_
 
-#include <qtextedit.h>
+#include "forms/PGetParameterDialogBase.h"
 
-class PSubTextEdit : public QTextEdit
+class PGetParameterDialog : public PGetParameterDialogBase
 {
-    Q_OBJECT
+  public:
+    PGetParameterDialog();
 
-public:
-  PSubTextEdit( QWidget *parent = 0, const char *name = 0 );
+    QString getParams() { return fParam_textEdit->text(); }
 
-protected:
-  virtual QPopupMenu *createPopupMenu( const QPoint &pos);
-
-private slots:
-  void insertTitle();
-  void insertParameterBlock();
-  void insertTheoryBlock();
-  void insertFunctionBlock();
-  void insertAsymRunBlock();
-  void insertSingleHistRunBlock();
-  void insertNonMusrRunBlock();
-  void insertCommandBlock();
-  void insertFourierBlock();
-  void insertPlotBlock();
-  void insertStatisticBlock();
+  public slots:
+    void paramAdd();
 };
 
-#endif // _PSUBTEXTEDIT_H_
+#endif // _PGETPARAMETERDIALOG_H_

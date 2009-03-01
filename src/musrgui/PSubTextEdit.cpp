@@ -36,6 +36,7 @@
 
 #include "PSubTextEdit.h"
 #include "forms/PGetTitleDialog.h"
+#include "PGetParameterDialog.h"
 
 //----------------------------------------------------------------------------------------------------
 /**
@@ -58,17 +59,9 @@ QPopupMenu* PSubTextEdit::createPopupMenu(const QPoint &pos)
   connect(a, SIGNAL( activated() ), this, SLOT( insertTitle() ));
   a->addTo( menu );
 
-  menu->insertSeparator();
-
   a = new QAction(tr("insert Parameter Block"), 0, this, "insertParameterBlock");
   connect(a, SIGNAL( activated() ), this, SLOT( insertParameterBlock() ));
   a->addTo( menu );
-
-  a = new QAction(tr("insert Parameter"), 0, this, "insertParameter");
-  connect(a, SIGNAL( activated() ), this, SLOT( insertParameter() ));
-  a->addTo( menu );
-
-  menu->insertSeparator();
 
   a = new QAction(tr("insert Theory Block"), 0, this, "insertTheoryBlock");
   connect(a, SIGNAL( activated() ), this, SLOT( insertTheoryBlock() ));
@@ -77,6 +70,8 @@ QPopupMenu* PSubTextEdit::createPopupMenu(const QPoint &pos)
   a = new QAction(tr("insert Function Block"), 0, this, "insertFunctionBlock");
   connect(a, SIGNAL( activated() ), this, SLOT( insertFunctionBlock() ));
   a->addTo( menu );
+
+  menu->insertSeparator();
 
   a = new QAction(tr("insert Asymmetry Block"), 0, this, "insertAsymRunBlock");
   connect(a, SIGNAL( activated() ), this, SLOT( insertAsymRunBlock() ));
@@ -89,6 +84,8 @@ QPopupMenu* PSubTextEdit::createPopupMenu(const QPoint &pos)
   a = new QAction(tr("insert NonMusr Block"), 0, this, "insertNonMusrRunBlock");
   connect(a, SIGNAL( activated() ), this, SLOT( insertNonMusrRunBlock() ));
   a->addTo( menu );
+
+  menu->insertSeparator();
 
   a = new QAction(tr("insert Command Block"), 0, this, "insertCommandBlock");
   connect(a, SIGNAL( activated() ), this, SLOT( insertCommandBlock() ));
@@ -128,18 +125,10 @@ void PSubTextEdit::insertTitle()
  */
 void PSubTextEdit::insertParameterBlock()
 {
-  insert("###############################################################\n");
-  insert("FITPARAMETER\n");
-  insert("#      Nr. Name        Value     Step      Pos_Error  Bounderies\n");
-  insert("         1 alpha       1.0       0.1       none       0         none\n\n");
-}
-
-//----------------------------------------------------------------------------------------------------
-/**
- * <p>
- */
-void PSubTextEdit::insertParameter()
-{
+  PGetParameterDialog *dlg = new PGetParameterDialog();
+  if (dlg->exec() == QDialog::Accepted) {
+    insert(dlg->getParams());
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

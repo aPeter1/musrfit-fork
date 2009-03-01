@@ -229,6 +229,11 @@ void PTextEdit::setupMusrActions()
   a->addTo( tb );
   a->addTo( menu );
 
+  a = new QAction( QPixmap::fromMimeSource( "musrmlog2db.xpm" ), tr( "&Mlog2dB" ), ALT + Key_M, this, "musrMlog2Db" );
+  connect( a, SIGNAL( activated() ), this, SLOT( musrMlog2Db() ) );
+  a->addTo( tb );
+  a->addTo( menu );
+
   menu->insertSeparator();
 
   a = new QAction( QPixmap::fromMimeSource( "musrview.xpm" ), tr( "&View" ), ALT + Key_V, this, "musrView" );
@@ -768,6 +773,20 @@ void PTextEdit::musrFit()
   PFitOutputHandler fitOutputHandler(cmd);
   fitOutputHandler.setModal(true);
   fitOutputHandler.exec();
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PTextEdit::musrMlog2Db()
+{
+  if ( !currentEditor() )
+    return;
+
+  QMessageBox::information( this, "musrMlog2Db",
+  "Will call mlog2db.\n"
+  "NOT IMPLEMENTED YET :-(" );
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -7,7 +7,7 @@
   <general>
     <exec_path>/home/nemu/analysis/bin</exec_path>
     <default_save_path>/mnt/home/nemu/analysis</default_save_path>
-    <msr_default_file_path>/afs/psi.ch/user/s/suter_a/development/musrgui</msr_default_file_path>
+    <msr_default_file_path>/home/nemu/analysis/musrfit/src/musrgui</msr_default_file_path>
     <show_mlog>y</show_mlog>
   </general>
   <msr_file_defaults>

@@ -1,0 +1,396 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>PGetParameterDialogBase</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>PGetParameterDialogBase</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>662</width>
+            <height>428</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Get Parameter</string>
+    </property>
+    <property name="sizeGripEnabled">
+        <bool>true</bool>
+    </property>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fName_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>70</x>
+                <y>70</y>
+                <width>140</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fStep_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>300</x>
+                <y>70</y>
+                <width>70</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fStep_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>300</x>
+                <y>40</y>
+                <width>40</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Step</string>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fValue_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>220</x>
+                <y>40</y>
+                <width>50</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Value</string>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fName_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>70</x>
+                <y>40</y>
+                <width>71</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Name</string>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fNo_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>40</y>
+                <width>40</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>No</string>
+        </property>
+    </widget>
+    <widget class="QFrame">
+        <property name="name">
+            <cstring>frame5</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>380</x>
+                <y>11</y>
+                <width>170</width>
+                <height>90</height>
+            </rect>
+        </property>
+        <property name="frameShape">
+            <enum>StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+            <enum>Raised</enum>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fLower_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>30</y>
+                    <width>71</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Lower</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fUpper_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>90</x>
+                    <y>30</y>
+                    <width>71</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Upper</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fLower_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>60</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>none</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fUpper_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>90</x>
+                    <y>60</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>none</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fBoundaries_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>10</y>
+                    <width>110</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Boundaries</string>
+            </property>
+        </widget>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fValue_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>220</x>
+                <y>70</y>
+                <width>70</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+    <widget class="QSpinBox">
+        <property name="name">
+            <cstring>fParamNo_spinBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>70</y>
+                <width>50</width>
+                <height>24</height>
+            </rect>
+        </property>
+        <property name="maxValue">
+            <number>999</number>
+        </property>
+        <property name="minValue">
+            <number>1</number>
+        </property>
+    </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>fCancel_pushButton</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>11</x>
+                <y>391</y>
+                <width>75</width>
+                <height>26</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>&amp;Cancel</string>
+        </property>
+        <property name="accel">
+            <string></string>
+        </property>
+        <property name="autoDefault">
+            <bool>true</bool>
+        </property>
+    </widget>
+    <spacer>
+        <property name="name">
+            <cstring>Horizontal Spacing2</cstring>
+        </property>
+        <property name="orientation">
+            <enum>Horizontal</enum>
+        </property>
+        <property name="sizeType">
+            <enum>Expanding</enum>
+        </property>
+        <property name="sizeHint">
+            <size>
+                <width>440</width>
+                <height>20</height>
+            </size>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>92</x>
+                <y>394</y>
+                <width>440</width>
+                <height>20</height>
+            </rect>
+        </property>
+    </spacer>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>fAdd_pushButton</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>538</x>
+                <y>391</y>
+                <width>56</width>
+                <height>26</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>&amp;Add</string>
+        </property>
+        <property name="accel">
+            <string>Alt+A</string>
+        </property>
+    </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>fOk_PushButton</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>600</x>
+                <y>391</y>
+                <width>49</width>
+                <height>26</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>&amp;OK</string>
+        </property>
+        <property name="accel">
+            <string></string>
+        </property>
+        <property name="autoDefault">
+            <bool>true</bool>
+        </property>
+        <property name="default">
+            <bool>true</bool>
+        </property>
+    </widget>
+    <widget class="QTextEdit">
+        <property name="name">
+            <cstring>fParam_textEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>110</y>
+                <width>640</width>
+                <height>270</height>
+            </rect>
+        </property>
+        <property name="font">
+            <font>
+                <family>Courier</family>
+            </font>
+        </property>
+        <property name="text">
+            <string>###############################################################
+FITPARAMETER
+#      Nr. Name         Value     Step      Pos_Error  Bounderies</string>
+        </property>
+        <property name="wordWrap">
+            <enum>WidgetWidth</enum>
+        </property>
+    </widget>
+</widget>
+<connections>
+    <connection>
+        <sender>fOk_PushButton</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetParameterDialogBase</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>fCancel_pushButton</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetParameterDialogBase</receiver>
+        <slot>reject()</slot>
+    </connection>
+    <connection>
+        <sender>fAdd_pushButton</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetParameterDialogBase</receiver>
+        <slot>paramAdd()</slot>
+    </connection>
+</connections>
+<tabstops>
+    <tabstop>fParamNo_spinBox</tabstop>
+    <tabstop>fName_lineEdit</tabstop>
+    <tabstop>fValue_lineEdit</tabstop>
+    <tabstop>fStep_lineEdit</tabstop>
+    <tabstop>fLower_lineEdit</tabstop>
+    <tabstop>fUpper_lineEdit</tabstop>
+    <tabstop>fAdd_pushButton</tabstop>
+    <tabstop>fOk_PushButton</tabstop>
+    <tabstop>fCancel_pushButton</tabstop>
+    <tabstop>fParam_textEdit</tabstop>
+</tabstops>
+<slots>
+    <slot>paramAdd()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

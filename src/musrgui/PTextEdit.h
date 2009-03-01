@@ -83,6 +83,7 @@ private slots:
   void musrGetSingleHistoDefault();
   void musrCalcChisq();
   void musrFit();
+  void musrMlog2Db();
   void musrView();
   void musrT0();
   void musrPrefs();
