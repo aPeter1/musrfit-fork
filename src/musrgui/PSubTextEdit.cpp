@@ -37,6 +37,7 @@
 #include "PSubTextEdit.h"
 #include "forms/PGetTitleDialog.h"
 #include "PGetParameterDialog.h"
+#include "PGetFourierDialog.h"
 
 //----------------------------------------------------------------------------------------------------
 /**
@@ -193,6 +194,11 @@ void PSubTextEdit::insertCommandBlock()
  */
 void PSubTextEdit::insertFourierBlock()
 {
+  PGetFourierDialog *dlg = new PGetFourierDialog();
+
+  if (dlg->exec() == QDialog::Accepted) {
+    insert(dlg->getFourierBlock()+"\n");
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

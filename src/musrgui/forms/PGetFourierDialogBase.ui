@@ -1,0 +1,429 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>PGetFourierDialogBase</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>PGetFourierDialogBase</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>288</width>
+            <height>289</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Get Fourier</string>
+    </property>
+    <property name="sizeGripEnabled">
+        <bool>true</bool>
+    </property>
+    <property name="modal">
+        <bool>true</bool>
+    </property>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fPhaseCorrectionRangeUp_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>210</x>
+                <y>170</y>
+                <width>60</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fRangeUp_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>210</x>
+                <y>210</y>
+                <width>60</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fUnits_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>20</x>
+                <y>22</y>
+                <width>71</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Units</string>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fFourierPower_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>20</x>
+                <y>52</y>
+                <width>110</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Fourier Power</string>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fApodization_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>20</x>
+                <y>82</y>
+                <width>90</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Apodization</string>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fPlot_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>20</x>
+                <y>112</y>
+                <width>71</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Plot</string>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fPhase_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>20</x>
+                <y>142</y>
+                <width>71</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Phase</string>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>textLabel6</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>20</x>
+                <y>160</y>
+                <width>110</width>
+                <height>50</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>&lt;p align="center"&gt;Phase Correction&lt;br&gt;Range&lt;/p&gt;</string>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>textLabel7</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>20</x>
+                <y>210</y>
+                <width>71</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Range</string>
+        </property>
+    </widget>
+    <widget class="QComboBox">
+        <item>
+            <property name="text">
+                <string>Gauss</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>MHz</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>Mc/s</string>
+            </property>
+        </item>
+        <property name="name">
+            <cstring>fUnits_comboBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>140</x>
+                <y>20</y>
+                <width>99</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fFourierPower_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>140</x>
+                <y>50</y>
+                <width>100</width>
+                <height>24</height>
+            </rect>
+        </property>
+        <property name="whatsThis" stdset="0">
+            <string>If &lt;b&gt;no&lt;/b&gt; Fourier power is given. The Fourier transform will be done on the number of bins (N) given. If a Fourier power (FP) &gt; N is given, zero padding will be applied, i.e. filling the data vector &gt; N with zeros up to 2^FP.</string>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fPhase_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>140</x>
+                <y>140</y>
+                <width>100</width>
+                <height>24</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>0.0</string>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fPhaseCorrectionRangeLow_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>140</x>
+                <y>170</y>
+                <width>60</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fRangeLow_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>140</x>
+                <y>210</y>
+                <width>60</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+    <widget class="QComboBox">
+        <item>
+            <property name="text">
+                <string>Power</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>Real</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>Imag</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>Real &amp; Imag</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>Phase</string>
+            </property>
+        </item>
+        <property name="name">
+            <cstring>fPlot_comboBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>140</x>
+                <y>110</y>
+                <width>99</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>fCancel_button</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>11</x>
+                <y>251</y>
+                <width>75</width>
+                <height>26</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>&amp;Cancel</string>
+        </property>
+        <property name="accel">
+            <string></string>
+        </property>
+        <property name="autoDefault">
+            <bool>true</bool>
+        </property>
+    </widget>
+    <spacer>
+        <property name="name">
+            <cstring>Horizontal Spacing2</cstring>
+        </property>
+        <property name="orientation">
+            <enum>Horizontal</enum>
+        </property>
+        <property name="sizeType">
+            <enum>Expanding</enum>
+        </property>
+        <property name="sizeHint">
+            <size>
+                <width>122</width>
+                <height>20</height>
+            </size>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>92</x>
+                <y>254</y>
+                <width>122</width>
+                <height>20</height>
+            </rect>
+        </property>
+    </spacer>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>fOk_button</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>220</x>
+                <y>251</y>
+                <width>49</width>
+                <height>26</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>&amp;OK</string>
+        </property>
+        <property name="accel">
+            <string></string>
+        </property>
+        <property name="autoDefault">
+            <bool>true</bool>
+        </property>
+        <property name="default">
+            <bool>true</bool>
+        </property>
+    </widget>
+    <widget class="QComboBox">
+        <item>
+            <property name="text">
+                <string>none</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>weak</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>medium</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>strong</string>
+            </property>
+        </item>
+        <property name="name">
+            <cstring>fApodization_comboBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>140</x>
+                <y>80</y>
+                <width>99</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+</widget>
+<connections>
+    <connection>
+        <sender>fOk_button</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetFourierDialogBase</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>fCancel_button</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetFourierDialogBase</receiver>
+        <slot>reject()</slot>
+    </connection>
+    <connection>
+        <sender>fOk_button</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetFourierDialogBase</receiver>
+        <slot>fillFourierBlock()</slot>
+    </connection>
+</connections>
+<tabstops>
+    <tabstop>fUnits_comboBox</tabstop>
+    <tabstop>fFourierPower_lineEdit</tabstop>
+    <tabstop>fApodization_comboBox</tabstop>
+    <tabstop>fPlot_comboBox</tabstop>
+    <tabstop>fPhase_lineEdit</tabstop>
+    <tabstop>fPhaseCorrectionRangeLow_lineEdit</tabstop>
+    <tabstop>fPhaseCorrectionRangeUp_lineEdit</tabstop>
+    <tabstop>fRangeLow_lineEdit</tabstop>
+    <tabstop>fRangeUp_lineEdit</tabstop>
+    <tabstop>fOk_button</tabstop>
+    <tabstop>fCancel_button</tabstop>
+</tabstops>
+<slots>
+    <slot>fillFourierBlock()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

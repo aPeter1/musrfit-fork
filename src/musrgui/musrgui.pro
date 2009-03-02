@@ -19,7 +19,8 @@ HEADERS		= PTextEdit.h \
                   PAdmin.h \
                   PFitOutputHandler.h \
                   PGetDefaultDialog.h \
-		  PGetParameterDialog.h
+		  PGetParameterDialog.h \
+		  PGetFourierDialog.h
 		  		  
 SOURCES		= PTextEdit.cpp \
                   PSubTextEdit.cpp \
@@ -27,12 +28,14 @@ SOURCES		= PTextEdit.cpp \
                   PFitOutputHandler.cpp \
                   PGetDefaultDialog.cpp \
 		  PGetParameterDialog.cpp \
+		  PGetFourierDialog.cpp \
 		  main.cpp
 		  
 FORMS           = forms/PGetDefaultDialogBase.ui \
                   forms/PMusrGuiAbout.ui \
 		  forms/PGetTitleDialog.ui \
-		  forms/PGetParameterDialogBase.ui
+		  forms/PGetParameterDialogBase.ui \
+		  forms/PGetFourierDialogBase.ui
 
 IMAGES 		= images/editcopy.xpm        \
                   images/editcut.xpm         \
