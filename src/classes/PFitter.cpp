@@ -43,10 +43,13 @@ using namespace std;
 #include "Minuit2/MnSimplex.h"
 #include "Minuit2/MnUserParameterState.h"
 
-#include "TCanvas.h"
-#include "TH2.h"
-#include "TFile.h"
-#include "TDatime.h"
+#include <TCanvas.h>
+#include <TH2.h>
+#include <TFile.h>
+#include <TDatime.h>
+#include <TString.h>
+#include <TObjArray.h>
+#include <TObjString.h>
 
 #include "PFitter.h"
 
@@ -78,6 +81,8 @@ fout.close();
 */
 
   fUseChi2 = true; // chi^2 is the default
+
+  fStrategy = 1; // 0=low, 1=default, 2=high
 
   fParams = *(runInfo->GetMsrParamList());
   fCmdLines = *runInfo->GetMsrCommands();
@@ -290,7 +295,33 @@ bool PFitter::CheckCommands()
     } else if (it->fLine.Contains("SIMPLEX")) {
       fCmdList.push_back(PMN_SIMPLEX);
     } else if (it->fLine.Contains("STRATEGY")) {
-      fCmdList.push_back(PMN_STRATEGY);
+      TObjArray *tokens = 0;
+      TObjString *ostr;
+      TString str;
+
+      tokens = it->fLine.Tokenize(" \t");
+      if (tokens->GetEntries() == 2) {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.CompareTo("0") == 0) { // low
+          fStrategy = 0;
+        } else if (str.CompareTo("1") == 0) { // default
+          fStrategy = 1;
+        } else if (str.CompareTo("2") == 0) { // high
+          fStrategy = 2;
+        } else if (str.CompareTo("LOW") == 0) { // low
+          fStrategy = 0;
+        } else if (str.CompareTo("DEFAULT") == 0) { // default
+          fStrategy = 1;
+        } else if (str.CompareTo("HIGH") == 0) { // high
+          fStrategy = 2;
+        }
+      }
+
+      if (tokens) {
+        delete tokens;
+        tokens = 0;
+      }
     } else if (it->fLine.Contains("USER_COVARIANCE")) {
       fCmdList.push_back(PMN_USER_COVARIANCE);
     } else if (it->fLine.Contains("USER_PARAM_STATE")) {
@@ -418,8 +449,8 @@ bool PFitter::ExecuteMigrad()
     fMnUserParams = fFcnMin->UserParameters();
 
   // create migrad object
-  // set MnStrategy to default == 1, high == 2, see MINUIT2 manual MnStrategy
-  ROOT::Minuit2::MnMigrad migrad((*fFitterFcn), fMnUserParams, 1);
+  // strategy is by default = 'default'
+  ROOT::Minuit2::MnMigrad migrad((*fFitterFcn), fMnUserParams, fStrategy);
 
   // minimize
   // maxfcn is MINUIT2 Default maxfcn
@@ -489,8 +520,8 @@ bool PFitter::ExecuteMinimize()
     fMnUserParams = fFcnMin->UserParameters();
 
   // create minimizer object
-  // set MnStrategy to default == 1, high == 2, see MINUIT2 manual MnStrategy
-  ROOT::Minuit2::MnMinimize minimize((*fFitterFcn), fMnUserParams, 1);
+  // strategy is by default = 'default'
+  ROOT::Minuit2::MnMinimize minimize((*fFitterFcn), fMnUserParams, fStrategy);
 
   // minimize
   // maxfcn is MINUIT2 Default maxfcn
@@ -856,8 +887,8 @@ bool PFitter::ExecuteSimplex()
     fMnUserParams = fFcnMin->UserParameters();
 
   // create minimizer object
-  // set MnStrategy to high == 2, see MINUIT2 manual MnStrategy
-  ROOT::Minuit2::MnSimplex simplex((*fFitterFcn), fMnUserParams, 2);
+  // strategy is by default = 'default'
+  ROOT::Minuit2::MnSimplex simplex((*fFitterFcn), fMnUserParams, fStrategy);
 
   // minimize
   // maxfcn is 10*MINUIT2 Default maxfcn

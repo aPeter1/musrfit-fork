@@ -74,6 +74,8 @@ class PFitter
     bool fChisqOnly;
     bool fUseChi2;
 
+    unsigned int fStrategy;
+
     PMsrHandler *fRunInfo;
 
     PMsrParamList fParams; ///< msr-file parameters
