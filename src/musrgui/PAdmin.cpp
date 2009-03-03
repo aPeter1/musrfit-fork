@@ -29,6 +29,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <cstdlib>
+
 #include <qmessagebox.h>
 
 #include "PAdmin.h"
@@ -165,7 +167,10 @@ PAdmin::PAdmin()
   fShowMlog = true;
 
   // XML Parser part
-  QString fln = "/home/nemu/analysis/bin/musrgui_startup.xml";
+  QString path = getenv("MUSRFITPATH");
+  if (path.isEmpty())
+    path = "/home/nemu/analysis/bin";
+  QString fln = path + "/musrgui_startup.xml";
   if (QFile::exists(fln)) { // administrations file present
     PAdminXMLParser handler(this);
     QFile xmlFile(fln);
