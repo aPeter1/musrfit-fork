@@ -35,7 +35,8 @@ FORMS           = forms/PGetDefaultDialogBase.ui \
                   forms/PMusrGuiAbout.ui \
 		  forms/PGetTitleDialog.ui \
 		  forms/PGetParameterDialogBase.ui \
-		  forms/PGetFourierDialogBase.ui
+		  forms/PGetFourierDialogBase.ui \
+		  forms/PGetPlotDialogBase.ui
 
 IMAGES 		= images/editcopy.xpm        \
                   images/editcut.xpm         \

@@ -1,0 +1,310 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>PGetPlotDialogBase</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>PGetPlotDialogBase</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>511</width>
+            <height>312</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Get Plot</string>
+    </property>
+    <property name="sizeGripEnabled">
+        <bool>true</bool>
+    </property>
+    <widget class="QLayoutWidget">
+        <property name="name">
+            <cstring>layout2</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>270</y>
+                <width>490</width>
+                <height>28</height>
+            </rect>
+        </property>
+        <hbox>
+            <property name="name">
+                <cstring>unnamed</cstring>
+            </property>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>fCancel_button</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;Cancel</string>
+                </property>
+                <property name="accel">
+                    <string></string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+            </widget>
+            <spacer>
+                <property name="name">
+                    <cstring>Horizontal Spacing2</cstring>
+                </property>
+                <property name="orientation">
+                    <enum>Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                    <enum>Expanding</enum>
+                </property>
+                <property name="sizeHint">
+                    <size>
+                        <width>290</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>fAdd_pushButton</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;Add</string>
+                </property>
+                <property name="accel">
+                    <string>Alt+A</string>
+                </property>
+            </widget>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>fOk_button</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;OK</string>
+                </property>
+                <property name="accel">
+                    <string></string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+                <property name="default">
+                    <bool>true</bool>
+                </property>
+            </widget>
+        </hbox>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fXRangeUp_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>440</x>
+                <y>10</y>
+                <width>60</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fYRangeUp_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>440</x>
+                <y>40</y>
+                <width>60</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fYRangeLow_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>370</x>
+                <y>40</y>
+                <width>60</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fXRangeLow_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>370</x>
+                <y>10</y>
+                <width>60</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fYRange_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>260</x>
+                <y>43</y>
+                <width>71</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>y-Range</string>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fXRange_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>260</x>
+                <y>13</y>
+                <width>100</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Time-/x-Range</string>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fType_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>13</y>
+                <width>71</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Type</string>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fRunList_textLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>43</y>
+                <width>71</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Run List</string>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fRunList_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>90</x>
+                <y>40</y>
+                <width>150</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+    <widget class="QComboBox">
+        <item>
+            <property name="text">
+                <string>Asymmetry</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>Single Histo</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>RRF</string>
+            </property>
+        </item>
+        <item>
+            <property name="text">
+                <string>NonMusr</string>
+            </property>
+        </item>
+        <property name="name">
+            <cstring>fType_comboBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>90</x>
+                <y>10</y>
+                <width>150</width>
+                <height>24</height>
+            </rect>
+        </property>
+    </widget>
+    <widget class="QTextEdit">
+        <property name="name">
+            <cstring>fPlot_textEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>80</y>
+                <width>490</width>
+                <height>180</height>
+            </rect>
+        </property>
+    </widget>
+</widget>
+<connections>
+    <connection>
+        <sender>fOk_button</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetPlotDialogBase</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>fCancel_button</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetPlotDialogBase</receiver>
+        <slot>reject()</slot>
+    </connection>
+    <connection>
+        <sender>fAdd_pushButton</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetPlotDialogBase</receiver>
+        <slot>addPlot()</slot>
+    </connection>
+</connections>
+<tabstops>
+    <tabstop>fType_comboBox</tabstop>
+    <tabstop>fRunList_lineEdit</tabstop>
+    <tabstop>fXRangeLow_lineEdit</tabstop>
+    <tabstop>fXRangeUp_lineEdit</tabstop>
+    <tabstop>fYRangeLow_lineEdit</tabstop>
+    <tabstop>fYRangeUp_lineEdit</tabstop>
+    <tabstop>fAdd_pushButton</tabstop>
+    <tabstop>fOk_button</tabstop>
+    <tabstop>fCancel_button</tabstop>
+    <tabstop>fPlot_textEdit</tabstop>
+</tabstops>
+<slots>
+    <slot>addPlot()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>
