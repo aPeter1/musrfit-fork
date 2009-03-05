@@ -38,6 +38,7 @@
 #include "forms/PGetTitleDialog.h"
 #include "PGetParameterDialog.h"
 #include "PGetFourierDialog.h"
+#include "PGetPlotDialog.h"
 
 //----------------------------------------------------------------------------------------------------
 /**
@@ -207,6 +208,11 @@ void PSubTextEdit::insertFourierBlock()
  */
 void PSubTextEdit::insertPlotBlock()
 {
+  PGetPlotDialog *dlg = new PGetPlotDialog();
+
+  if (dlg->exec() == QDialog::Accepted) {
+    insert(dlg->getPlotBlock()+"\n");
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
