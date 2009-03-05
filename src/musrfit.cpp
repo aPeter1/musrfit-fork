@@ -654,7 +654,7 @@ int main(int argc, char *argv[])
   }
 
   // check if dump is wanted
-  if (success && !dump.IsNull() && !chisq_only) {
+  if (success && !dump.IsNull()) {
     cout << endl << "will write dump file ..." << endl;
     dump.ToLower();
     if (dump.Contains("ascii"))
