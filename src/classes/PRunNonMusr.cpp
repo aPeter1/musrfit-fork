@@ -341,7 +341,13 @@ bool PRunNonMusr::PrepareViewData()
   }
 // cout << endl << ">> after the xmin/xmax loop." << endl;
 
-  double xStep = (xMax-xMin)/1000.0;
+  // typically take 1000 points to calculate the theory, except if there are more data points, than take that number
+  double xStep;
+  if (fData.fX.size() > 1000.0)
+    xStep = fData.fX.size();
+  else
+    xStep = (xMax-xMin)/1000.0;
+
   double xx = xAbsMin;
   do {
     // fill x-vector
