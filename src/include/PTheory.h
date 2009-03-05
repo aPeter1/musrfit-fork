@@ -139,13 +139,13 @@ static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
          "statGssKTLF", "sgktlf", "(frequency damping)", "(frequency damping tshift)"},
 
         {THEORY_DYNAMIC_GAUSS_KT_LF, THEORY_PARAM_DYNAMIC_GAUSS_KT_LF, true,
-         "dynGssKTLF", "dgktt", "(frequency damping hopping-rate)", "(frequency damping hopping-rate tshift)"},
+         "dynGssKTLF", "dgktlf", "(frequency damping hopping-rate)", "(frequency damping hopping-rate tshift)"},
 
         {THEORY_STATIC_LORENTZ_KT_LF, THEORY_PARAM_STATIC_LORENTZ_KT_LF, true,
          "statExpKTLF", "sektlf", "(frequency damping)", "(frequency damping tshift)"},
 
         {THEORY_DYNAMIC_LORENTZ_KT_LF, THEORY_PARAM_DYNAMIC_LORENTZ_KT_LF, true,
-         "dynExpKTLF", "dektt", "(frequency damping hopping-rate)", "(frequency damping hopping-rate tshift)"},
+         "dynExpKTLF", "dektlf", "(frequency damping hopping-rate)", "(frequency damping hopping-rate tshift)"},
 
         {THEORY_COMBI_LGKT, THEORY_PARAM_COMBI_LGKT, false,
          "combiLGKT", "lgkt", "(LorentzRate GaussRate)", "(LorentzRate GaussRate tshift)"},
