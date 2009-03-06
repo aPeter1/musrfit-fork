@@ -478,6 +478,7 @@ int main(int argc, char *argv[])
   bool keep_mn2_output = false;
   bool chisq_only = false;
   TString dump("");
+  char filename[256];
 
   // check syntax
   if (argc < 2) {
@@ -502,15 +503,11 @@ int main(int argc, char *argv[])
     return PMUSR_WRONG_STARTUP_SYNTAX;
   }
 
-  // check file name
-  if (!strstr(argv[1], ".msr")) {
-    cout << endl << "**ERROR** " << argv[1] << " is not a msr-file!" << endl;
-    musrfit_syntax();
-    return PMUSR_WRONG_STARTUP_SYNTAX;
-  }
-
-  for (int i=2; i<argc; i++) {
-    if (!strcmp(argv[i], "-k") || !strcmp(argv[i], "--keep-mn2-output")) {
+  strcpy(filename, "");
+  for (int i=1; i<argc; i++) {
+    if (strstr(argv[i], ".msr")) {
+      strncpy(filename, argv[i], sizeof(filename));
+    } else if (!strcmp(argv[i], "-k") || !strcmp(argv[i], "--keep-mn2-output")) {
       keep_mn2_output = true;
     } else if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--chisq-only")) {
       chisq_only = true;
@@ -528,6 +525,12 @@ int main(int argc, char *argv[])
       show_syntax = true;
       break;
     }
+  }
+
+  // check if a filename is present
+  if (strlen(filename) == 0) {
+    show_syntax = true;
+    cout << endl << "**ERROR** no msr-file present!" << endl;
   }
 
   if (show_syntax) {
@@ -579,15 +582,15 @@ int main(int argc, char *argv[])
   }
 
   // read msr-file
-  PMsrHandler *msrHandler = new PMsrHandler(argv[1]);
+  PMsrHandler *msrHandler = new PMsrHandler(filename);
   status = msrHandler->ReadMsrFile();
   if (status != PMUSR_SUCCESS) {
     switch (status) {
       case PMUSR_MSR_FILE_NOT_FOUND:
-        cout << endl << "**ERROR** couldn't find " << argv[1] << endl << endl;
+        cout << endl << "**ERROR** couldn't find " << filename << endl << endl;
         break;
       case PMUSR_MSR_SYNTAX_ERROR:
-        cout << endl << "**SYNTAX ERROR** in file " << argv[1] << ", full stop here." << endl << endl;
+        cout << endl << "**SYNTAX ERROR** in file " << filename << ", full stop here." << endl << endl;
         break;
       default:
         cout << endl << "**UNKOWN ERROR** when trying to read the msr-file" << endl << endl;
@@ -658,9 +661,9 @@ int main(int argc, char *argv[])
     cout << endl << "will write dump file ..." << endl;
     dump.ToLower();
     if (dump.Contains("ascii"))
-      musrfit_dump_ascii(argv[1], runListCollection);
+      musrfit_dump_ascii(filename, runListCollection);
     else if (dump.Contains("root"))
-      musrfit_dump_root(argv[1], runListCollection);
+      musrfit_dump_root(filename, runListCollection);
     else
       cout << endl << "do not know format " << dump.Data() << ", sorry :-| " << endl;
   }
@@ -668,14 +671,14 @@ int main(int argc, char *argv[])
   // rename MINUIT2.OUTPUT and MINUIT2.root file if wanted
   if (keep_mn2_output && !chisq_only) {
     // 1st rename MINUIT2.OUTPUT
-    TString fln = TString(argv[1]);
+    TString fln = TString(filename);
     char ext[32];
     strcpy(ext, "-mn2.output");
     fln.ReplaceAll(".msr", 4, ext, strlen(ext));
     gSystem->CopyFile("MINUIT2.OUTPUT", fln.Data(), kTRUE);
 
     // 2nd rename MINUIT2.ROOT
-    fln = TString(argv[1]);
+    fln = TString(filename);
     strcpy(ext, "-mn2.root");
     fln.ReplaceAll(".msr", 4, ext, strlen(ext));
     gSystem->CopyFile("MINUIT2.root", fln.Data(), kTRUE);
