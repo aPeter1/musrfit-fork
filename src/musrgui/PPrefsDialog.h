@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  PTextEdit.h
+  PPrefsDialog.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -29,88 +29,24 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PTEXTEDIT_H_
-#define _PTEXTEDIT_H_
+#ifndef _PPREFSDIALOG_H_
+#define _PPREFSDIALOG_H_
 
-#include <qmainwindow.h>
-#include <qmap.h>
+#include <qcheckbox.h>
 
-class PSubTextEdit;
-class PAdmin;
-class QAction;
-class QComboBox;
-class QTabWidget;
-class QTextEdit;
-class QPopupMenu;
+#include "forms/PPrefsDialogBase.h"
 
-class PTextEdit : public QMainWindow
+class PPrefsDialog : public PPrefsDialogBase
 {
-    Q_OBJECT
+  public:
+    PPrefsDialog(const bool keep_mn2_output, const int dump_tag);
 
-public:
-  PTextEdit( QWidget *parent = 0, const char *name = 0 );
+    bool keepMinuit2Output() { return fKeepMn2Output_checkBox->isChecked(); }
+    int  getDump();
 
-private:
-  void setupFileActions();
-  void setupEditActions();
-  void setupTextActions();
-  void setupMusrActions();
-  void setupHelpActions();
-  void load( const QString &f );
-  PSubTextEdit *currentEditor() const;
-  void doConnections( PSubTextEdit *e );
-
-private slots:
-  void fileNew();
-  void fileOpen();
-  void fileSave();
-  void fileSaveAs();
-  void filePrint();
-  void fileClose();
-  void fileExit();
-
-  void editUndo();
-  void editRedo();
-  void editSelectAll();
-  void editCut();
-  void editCopy();
-  void editPaste();
-
-  void textFamily( const QString &f );
-  void textSize( const QString &p );
-
-  void musrGetAsymetryDefault();
-  void musrGetSingleHistoDefault();
-  void musrCalcChisq();
-  void musrFit();
-  void musrMlog2Db();
-  void musrView();
-  void musrT0();
-  void musrPrefs();
-  void musrShowMlog( const QString &str );
-
-  void helpContents();
-  void helpAboutQt();
-  void helpAbout();
-
-  void fontChanged( const QFont &f );
-  void textChanged();
-
-private:
-  PAdmin *fAdmin;
-
-  bool fShowMlog;
-  bool fKeepMinuit2Output;
-  int  fDump;
-
-  QComboBox *fComboFont;
-  QComboBox *fComboSize;
-
-  QComboBox *fComboShowMlog;
-
-  QTabWidget *fTabWidget;
-  QMap<PSubTextEdit*, QString> fFilenames;
+  public slots:
+    void dumpAscii();
+    void dumpRoot();
 };
 
-
-#endif // _PTEXTEDIT_H_
+#endif // _PPREFSDIALOG_H_

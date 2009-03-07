@@ -1,0 +1,217 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>PPrefsDialogBase</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>PPrefsDialogBase</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>541</width>
+            <height>186</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Preferences</string>
+    </property>
+    <property name="sizeGripEnabled">
+        <bool>true</bool>
+    </property>
+    <widget class="QTabWidget">
+        <property name="name">
+            <cstring>fTabWidget</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>20</y>
+                <width>520</width>
+                <height>110</height>
+            </rect>
+        </property>
+        <widget class="QWidget">
+            <property name="name">
+                <cstring>tab</cstring>
+            </property>
+            <attribute name="title">
+                <string>musrfit</string>
+            </attribute>
+            <widget class="QCheckBox">
+                <property name="name">
+                    <cstring>fKeepMn2Output_checkBox</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>10</x>
+                        <y>10</y>
+                        <width>160</width>
+                        <height>22</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>keep minuit2 output</string>
+                </property>
+            </widget>
+            <widget class="QCheckBox">
+                <property name="name">
+                    <cstring>fDumpAscii_checkBox</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>10</x>
+                        <y>30</y>
+                        <width>95</width>
+                        <height>22</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>dump ascii</string>
+                </property>
+            </widget>
+            <widget class="QCheckBox">
+                <property name="name">
+                    <cstring>fDumpRoot_checkBox</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>10</x>
+                        <y>50</y>
+                        <width>95</width>
+                        <height>22</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>dump root</string>
+                </property>
+            </widget>
+        </widget>
+    </widget>
+    <widget class="QLayoutWidget">
+        <property name="name">
+            <cstring>Layout1</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>140</y>
+                <width>520</width>
+                <height>33</height>
+            </rect>
+        </property>
+        <hbox>
+            <property name="name">
+                <cstring>unnamed</cstring>
+            </property>
+            <property name="margin">
+                <number>0</number>
+            </property>
+            <property name="spacing">
+                <number>6</number>
+            </property>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>buttonHelp</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;Help</string>
+                </property>
+                <property name="accel">
+                    <string>F1</string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+            </widget>
+            <spacer>
+                <property name="name">
+                    <cstring>Horizontal Spacing2</cstring>
+                </property>
+                <property name="orientation">
+                    <enum>Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                    <enum>Expanding</enum>
+                </property>
+                <property name="sizeHint">
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>buttonOk</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;OK</string>
+                </property>
+                <property name="accel">
+                    <string></string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+                <property name="default">
+                    <bool>true</bool>
+                </property>
+            </widget>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>buttonCancel</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;Cancel</string>
+                </property>
+                <property name="accel">
+                    <string></string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+            </widget>
+        </hbox>
+    </widget>
+</widget>
+<connections>
+    <connection>
+        <sender>buttonOk</sender>
+        <signal>clicked()</signal>
+        <receiver>PPrefsDialogBase</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>buttonCancel</sender>
+        <signal>clicked()</signal>
+        <receiver>PPrefsDialogBase</receiver>
+        <slot>reject()</slot>
+    </connection>
+    <connection>
+        <sender>fDumpAscii_checkBox</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>PPrefsDialogBase</receiver>
+        <slot>dumpAscii()</slot>
+    </connection>
+    <connection>
+        <sender>fDumpRoot_checkBox</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>PPrefsDialogBase</receiver>
+        <slot>dumpRoot()</slot>
+    </connection>
+</connections>
+<tabstops>
+    <tabstop>fTabWidget</tabstop>
+    <tabstop>fKeepMn2Output_checkBox</tabstop>
+    <tabstop>fDumpAscii_checkBox</tabstop>
+    <tabstop>fDumpRoot_checkBox</tabstop>
+    <tabstop>buttonOk</tabstop>
+    <tabstop>buttonCancel</tabstop>
+    <tabstop>buttonHelp</tabstop>
+</tabstops>
+<slots>
+    <slot>dumpAscii()</slot>
+    <slot>dumpRoot()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  PTextEdit.h
+  PPrefsDialog.cpp
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -29,88 +29,67 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PTEXTEDIT_H_
-#define _PTEXTEDIT_H_
+#include "PPrefsDialog.h"
 
-#include <qmainwindow.h>
-#include <qmap.h>
-
-class PSubTextEdit;
-class PAdmin;
-class QAction;
-class QComboBox;
-class QTabWidget;
-class QTextEdit;
-class QPopupMenu;
-
-class PTextEdit : public QMainWindow
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+PPrefsDialog::PPrefsDialog(const bool keep_mn2_output, const int dump_tag)
 {
-    Q_OBJECT
+  if (keep_mn2_output)
+    fKeepMn2Output_checkBox->setChecked(true);
+  else
+    fKeepMn2Output_checkBox->setChecked(false);
 
-public:
-  PTextEdit( QWidget *parent = 0, const char *name = 0 );
+  if (dump_tag == 1) {
+    fDumpAscii_checkBox->setChecked(true);
+    fDumpRoot_checkBox->setChecked(false);
+  } else if (dump_tag == 2) {
+    fDumpAscii_checkBox->setChecked(false);
+    fDumpRoot_checkBox->setChecked(true);
+  } else {
+    fDumpAscii_checkBox->setChecked(false);
+    fDumpRoot_checkBox->setChecked(false);
+  }
+}
 
-private:
-  void setupFileActions();
-  void setupEditActions();
-  void setupTextActions();
-  void setupMusrActions();
-  void setupHelpActions();
-  void load( const QString &f );
-  PSubTextEdit *currentEditor() const;
-  void doConnections( PSubTextEdit *e );
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+int PPrefsDialog::getDump()
+{
+  int result = 0;
 
-private slots:
-  void fileNew();
-  void fileOpen();
-  void fileSave();
-  void fileSaveAs();
-  void filePrint();
-  void fileClose();
-  void fileExit();
+  if (fDumpAscii_checkBox->isChecked())
+    result = 1;
+  else if (fDumpRoot_checkBox->isChecked())
+    result = 2;
 
-  void editUndo();
-  void editRedo();
-  void editSelectAll();
-  void editCut();
-  void editCopy();
-  void editPaste();
+  return result;
+}
 
-  void textFamily( const QString &f );
-  void textSize( const QString &p );
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PPrefsDialog::dumpAscii()
+{
+  if (fDumpAscii_checkBox->isChecked())
+    fDumpRoot_checkBox->setChecked(false);
+}
 
-  void musrGetAsymetryDefault();
-  void musrGetSingleHistoDefault();
-  void musrCalcChisq();
-  void musrFit();
-  void musrMlog2Db();
-  void musrView();
-  void musrT0();
-  void musrPrefs();
-  void musrShowMlog( const QString &str );
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PPrefsDialog::dumpRoot()
+{
+  if (fDumpRoot_checkBox->isChecked())
+    fDumpAscii_checkBox->setChecked(false);
+}
 
-  void helpContents();
-  void helpAboutQt();
-  void helpAbout();
-
-  void fontChanged( const QFont &f );
-  void textChanged();
-
-private:
-  PAdmin *fAdmin;
-
-  bool fShowMlog;
-  bool fKeepMinuit2Output;
-  int  fDump;
-
-  QComboBox *fComboFont;
-  QComboBox *fComboSize;
-
-  QComboBox *fComboShowMlog;
-
-  QTabWidget *fTabWidget;
-  QMap<PSubTextEdit*, QString> fFilenames;
-};
-
-
-#endif // _PTEXTEDIT_H_
+//----------------------------------------------------------------------------------------------------
+// END
+//----------------------------------------------------------------------------------------------------

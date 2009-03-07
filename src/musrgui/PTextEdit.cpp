@@ -29,9 +29,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <iostream>
-using namespace std;
-
 #include <qtextedit.h>
 #include <qaction.h>
 #include <qmenubar.h>
@@ -58,6 +55,7 @@ using namespace std;
 #include "PSubTextEdit.h"
 #include "PAdmin.h"
 #include "PFitOutputHandler.h"
+#include "PPrefsDialog.h"
 #include "PGetDefaultDialog.h"
 #include "forms/PMusrGuiAbout.h"
 
@@ -71,6 +69,8 @@ PTextEdit::PTextEdit( QWidget *parent, const char *name )
   fAdmin = new PAdmin();
 
   fShowMlog = fAdmin->getShowMlog();
+  fKeepMinuit2Output = false;
+  fDump = 0; // 0 = no dump, 1 = ascii dump, 2 = root dump
 
   setupFileActions();
   setupEditActions();
@@ -773,6 +773,25 @@ void PTextEdit::musrFit()
 
   cmd.append(str);
   cmd.append(*fFilenames.find( currentEditor()));
+
+  // check if keep minuit2 output is wished
+  if (fKeepMinuit2Output)
+    cmd.append("--keep-mn2-output");
+
+  // check if dump files are wished
+  switch (fDump) {
+    case 1: // ascii dump
+      cmd.append("--dump");
+      cmd.append("ascii");
+      break;
+    case 2: // root dump
+      cmd.append("--dump");
+      cmd.append("root");
+      break;
+    default:
+      break;
+  }
+
   PFitOutputHandler fitOutputHandler(cmd);
   fitOutputHandler.setModal(true);
   fitOutputHandler.exec();
@@ -825,8 +844,6 @@ void PTextEdit::musrView()
   }
   cmd += str + " &";
 
-cout << endl << "str = " << str << endl;
-
   system(cmd.latin1());
 }
 
@@ -850,9 +867,12 @@ void PTextEdit::musrT0()
  */
 void PTextEdit::musrPrefs()
 {
-  QMessageBox::information( this, "musrPrefs",
-  "Will call musr related perferences dialog.\n"
-  "NOT IMPLEMENTED YET :-(" );
+  PPrefsDialog *dlg = new PPrefsDialog(fKeepMinuit2Output, fDump);
+
+  if (dlg->exec() == QDialog::Accepted) {
+    fKeepMinuit2Output = dlg->keepMinuit2Output();
+    fDump = dlg->getDump();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

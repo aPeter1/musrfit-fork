@@ -14,25 +14,6 @@
     <beamline>mue4</beamline>
     <institute>psi</institute>
     <file_format>root-npp</file_format>
-    <msr_parameters>
-      <asymmetry>
-        <fittype>
-         <required>y</required>
-        </fittype>
-        <alpha>
-          <required>n</required>
-        </alpha>
-        <beta>
-          <required>n</required>
-        </beta>
-      </asymmetry>
-      <single_histo>
-      </single_histo>
-      <rrf>
-      </rrf>
-      <nonMusr>
-      </nonMusr>
-    </msr_parameters>
   </msr_file_defaults>
 </musrgui_startup>
 
