@@ -29,6 +29,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <iostream>
+using namespace std;
+
 #include <qtextedit.h>
 #include <qaction.h>
 #include <qmenubar.h>
@@ -814,11 +817,15 @@ void PTextEdit::musrView()
   str = fAdmin->getExecPath() + "/musrview";
   cmd = str + " ";
 
-  str = *fFilenames.find( currentEditor());
+  str = *fFilenames.find( currentEditor() );
   if (fShowMlog) {
-    str.replace(str.find(".msr"), 4, ".mlog");
+    int idx = str.find(".msr");
+    if (idx > 0)
+      str.replace(idx, 4, ".mlog");
   }
   cmd += str + " &";
+
+cout << endl << "str = " << str << endl;
 
   system(cmd.latin1());
 }
