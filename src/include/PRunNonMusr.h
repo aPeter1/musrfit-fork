@@ -32,6 +32,7 @@
 #ifndef _PRUNNONMUSR_H_
 #define _PRUNNONMUSR_H_
 
+#include "PMusr.h"
 #include "PRunBase.h"
 
 class PRunNonMusr : public PRunBase
@@ -47,18 +48,20 @@ class PRunNonMusr : public PRunBase
 
     virtual unsigned int GetNoOfFitBins() { return fNoOfFitBins; }
 
+    virtual unsigned int GetXIndex();
+    virtual unsigned int GetYIndex();
+
   protected:
     virtual bool PrepareData();
     virtual bool PrepareFitData();
     virtual bool PrepareViewData();
 
   private:
+    PRawRunData *fRawRunData;
+
     double fFitStartTime;
     double fFitStopTime;
     unsigned int fNoOfFitBins;
-
-    unsigned int GetXIndex(PRawRunData* runData);
-    unsigned int GetYIndex(PRawRunData* runData);
 };
 
 #endif // _PRUNNONMUSR_H_

@@ -484,12 +484,14 @@ const char* PRunListCollection::GetSetup(TString &runName)
 /**
  * <p>
  *
- * \param runName
+ * \param runName name of the run file
+ * \param idx msr-file run index
  */
-const char* PRunListCollection::GetXAxisTitle(TString &runName)
+const char* PRunListCollection::GetXAxisTitle(TString &runName, const unsigned int idx)
 {
   PRawRunData *runData = fData->GetRunData(runName);
-  int index = fData->GetRunData(runName)->fDataNonMusr.fXIndex;
+
+  int index = fRunNonMusrList[idx]->GetXIndex();
 
 // cout << endl << ">>PRunListCollection::GetXAxisTitle, x-index = " << index;
 // cout << endl;
@@ -503,12 +505,14 @@ const char* PRunListCollection::GetXAxisTitle(TString &runName)
 /**
  * <p>
  *
- * \param runName
+ * \param runName name of the run file
+ * \param idx msr-file run index
  */
-const char* PRunListCollection::GetYAxisTitle(TString &runName)
+const char* PRunListCollection::GetYAxisTitle(TString &runName, const unsigned int idx)
 {
   PRawRunData *runData = fData->GetRunData(runName);
-  int index = fData->GetRunData(runName)->fDataNonMusr.fYIndex;
+
+  int index = fRunNonMusrList[idx]->GetYIndex();
 
 // cout << endl << ">>PRunListCollection::GetYAxisTitle, y-index = " << index;
 // cout << endl;

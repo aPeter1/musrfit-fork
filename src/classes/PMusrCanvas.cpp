@@ -2166,8 +2166,8 @@ void PMusrCanvas::PlotData()
     PMsrRunList runs = *fMsrHandler->GetMsrRunList();
     PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
     unsigned int runNo = (unsigned int)plotInfo.fRuns[0].Re()-1;
-    TString xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName);
-    TString yAxisTitle = fRunList->GetYAxisTitle(runs[runNo].fRunName);
+    TString xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName, runNo);
+    TString yAxisTitle = fRunList->GetYAxisTitle(runs[runNo].fRunName, runNo);
 
     if (fNonMusrData.size() > 0) {
       // check if fMultiGraphData needs to be created, and if yes add all data and theory
@@ -2250,7 +2250,7 @@ void PMusrCanvas::PlotDifference()
     PMsrRunList runs = *fMsrHandler->GetMsrRunList();
     PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
     unsigned int runNo = (unsigned int)plotInfo.fRuns[0].Re()-1;
-    TString xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName);
+    TString xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName, runNo);
 
     // if fMultiGraphDiff is not present create it and add the diff data
     if (!fMultiGraphDiff) {
