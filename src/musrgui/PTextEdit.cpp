@@ -29,6 +29,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <iostream>
+using namespace std;
+
 #include <qtextedit.h>
 #include <qaction.h>
 #include <qmenubar.h>
@@ -58,6 +61,7 @@
 #include "PPrefsDialog.h"
 #include "PGetDefaultDialog.h"
 #include "forms/PMusrGuiAbout.h"
+#include "PMlog2DbDialog.h"
 
 //----------------------------------------------------------------------------------------------------
 /**
@@ -336,6 +340,40 @@ void PTextEdit::doConnections( PSubTextEdit *e )
            this, SLOT( fontChanged( const QFont & ) ) );
 
   connect( e, SIGNAL( textChanged() ), this, SLOT( textChanged() ));
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+bool PTextEdit::validRunList(const QString runList)
+{
+  bool success = true;
+
+  int i = 0;
+  QString subStr;
+  bool done = false;
+  int val;
+  bool ok;
+  while (!done) {
+    subStr = runList.section(' ', i, i);
+    if (subStr.isEmpty()) {
+      done = true;
+      continue;
+    }
+    i++;
+    val = subStr.toInt(&ok);
+    if (!ok) {
+      done = true;
+      success = false;
+    }
+  }
+
+  if (i == 0) { // no token found
+    success = false;
+  }
+
+  return success;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -806,9 +844,142 @@ void PTextEdit::musrMlog2Db()
   if ( !currentEditor() )
     return;
 
-  QMessageBox::information( this, "musrMlog2Db",
-  "Will call mlog2db.\n"
-  "NOT IMPLEMENTED YET :-(" );
+  PMlog2DbDialog *dlg = new PMlog2DbDialog(fKeepMinuit2Output);
+
+  if (dlg->exec() == QDialog::Accepted) {
+    QString first, last;
+    QString runList;
+    QString runListFileName;
+    QFileInfo fi;
+    QString str;
+    int i, end;
+
+    // analyze parameters
+    switch (dlg->getRunTag()) {
+      case -1: // not valid
+        QMessageBox::critical(this, "**ERROR**",
+           "No valid run list input found :-(\nCannot do anything.",
+           QMessageBox::Ok, QMessageBox::NoButton);
+        return;
+        break;
+      case 0:  // first last
+        first = dlg->getFirstRunNo();
+        last  = dlg->getLastRunNo();
+        if (first.isEmpty() || last.isEmpty()) {
+          QMessageBox::critical(this, "**ERROR**",
+            "If you choose the first/last option,\nfirst AND last needs to be provided.",
+            QMessageBox::Ok, QMessageBox::NoButton);
+          return;
+        }
+        break;
+      case 1:  // run list
+        runList = dlg->getRunList();
+        if (!validRunList(runList)) {
+          QMessageBox::critical(this, "**ERROR**",
+            "Invalid Run List!\nThe run list needs to be a space separated list of run numbers.",
+            QMessageBox::Ok, QMessageBox::NoButton);
+          return;
+        }
+        break;
+      case 2:  // run list file name
+        runListFileName = dlg->getRunListFileName();
+        fi = runListFileName;
+        if (!fi.exists()) {
+          str = QString("Run List File '%1' doesn't exist.").arg(runListFileName);
+          QMessageBox::critical(this, "**ERROR**",
+                str, QMessageBox::Ok, QMessageBox::NoButton);
+          return;
+        }
+        break;
+      default: // never should reach this point
+        QMessageBox::critical(this, "**ERROR**",
+           "No idea how you could reach this point.\nPlease contact the developers.",
+           QMessageBox::Ok, QMessageBox::NoButton);
+        return;
+        break;
+    }
+
+    // form command
+    QValueVector<QString> cmd;
+    str = fAdmin->getExecPath() + "/mlog2db";
+    cmd.append(str);
+
+    // run list argument
+    switch (dlg->getRunTag()) {
+      case 0:
+        cmd.append(first);
+        cmd.append(last);
+        break;
+      case 1:
+        end = 0;
+        while (!runList.section(' ', end, end).isEmpty()) {
+          end++;
+        }
+        // first element
+        if (end == 1) {
+          str = "[" + runList.section(' ', 0, 0) + "]";
+        } else {
+          str = "[" + runList.section(' ', 0, 0);
+          cmd.append(str);
+          // middle elements
+          for (i=1; i<end-1; i++) {
+            cmd.append(runList.section(' ', i, i));
+          }
+          // last element
+          str = runList.section(' ', end-1, end-1) + "]";
+          cmd.append(str);
+        }
+        break;
+      case 2:
+        cmd.append(runListFileName);
+        break;
+      default:
+        break;
+    }
+
+    // file extension
+    str = dlg->getExtension();
+    if (str.isEmpty())
+      cmd.append("");
+    else
+      cmd.append(str);
+
+    // options
+
+    // no header flag?
+    if (!dlg->getWriteDbHeaderFlag())
+      cmd.append("noheader");
+
+    // no summary flag?
+    if (!dlg->getSummaryFilePresentFlag())
+      cmd.append("nosummary");
+
+    // template run no
+    if (!dlg->getTemplateRunNo().isEmpty()) {
+      str = "fit-" + dlg->getTemplateRunNo();
+      cmd.append(str);
+    }
+
+    // keep minuit2 output
+    if (dlg->getMinuit2OutputFlag()) {
+      fKeepMinuit2Output = dlg->getMinuit2OutputFlag();
+      cmd.append("-k");
+    }
+
+    // DB output wished
+    if (!dlg->getDbOutputFileName().isEmpty()) {
+      str = "-o" + dlg->getDbOutputFileName();
+      cmd.append(str);
+    }
+
+for (unsigned int i=0; i<cmd.size(); i++)
+  cout << endl << ">> " << cmd[i].latin1();
+cout << endl;
+
+    PFitOutputHandler fitOutputHandler(cmd);
+    fitOutputHandler.setModal(true);
+    fitOutputHandler.exec();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

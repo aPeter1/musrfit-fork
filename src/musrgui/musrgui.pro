@@ -21,6 +21,7 @@ HEADERS = PTextEdit.h \
     PGetDefaultDialog.h \
     PGetParameterDialog.h \
     PGetFourierDialog.h \
+    PMlog2DbDialog.h \
     PGetPlotDialog.h
 
 SOURCES = PTextEdit.cpp \
@@ -32,6 +33,7 @@ SOURCES = PTextEdit.cpp \
     PGetParameterDialog.cpp \
     PGetFourierDialog.cpp \
     PGetPlotDialog.cpp \
+    PMlog2DbDialog.cpp \
     main.cpp 
 
 FORMS = forms/PGetDefaultDialogBase.ui \
@@ -40,7 +42,8 @@ FORMS = forms/PGetDefaultDialogBase.ui \
     forms/PGetTitleDialog.ui \
     forms/PGetParameterDialogBase.ui \
     forms/PGetFourierDialogBase.ui \
-    forms/PGetPlotDialogBase.ui
+    forms/PGetPlotDialogBase.ui \
+    forms/PMlog2DbDialogBase.ui
 
 IMAGES = images/editcopy.xpm \
     images/editcut.xpm \

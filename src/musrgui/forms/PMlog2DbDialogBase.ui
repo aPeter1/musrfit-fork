@@ -1,0 +1,541 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>PMlog2DbDialogBase</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>PMlog2DbDialogBase</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>604</width>
+            <height>576</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>mlog2db input</string>
+    </property>
+    <property name="icon">
+        <pixmap>image0</pixmap>
+    </property>
+    <property name="sizeGripEnabled">
+        <bool>true</bool>
+    </property>
+    <property name="modal">
+        <bool>true</bool>
+    </property>
+    <widget class="QGroupBox">
+        <property name="name">
+            <cstring>fRunList_groupBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>580</width>
+                <height>150</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>run list input</string>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fFirst_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>33</y>
+                    <width>40</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>First</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fFirst_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>50</x>
+                    <y>30</y>
+                    <width>90</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fLast_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>180</x>
+                    <y>33</y>
+                    <width>40</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Last</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fLast_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>220</x>
+                    <y>30</y>
+                    <width>100</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fRunList_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>70</y>
+                    <width>71</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Run List</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fOr2_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>540</x>
+                    <y>70</y>
+                    <width>29</width>
+                    <height>21</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>&lt;b&gt;OR&lt;/b&gt;</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fOr1_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>540</x>
+                    <y>30</y>
+                    <width>30</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>&lt;b&gt;OR&lt;/b&gt;</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fRunListFileName_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>113</y>
+                    <width>130</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Run List File Name</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fRunListFileName_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>150</x>
+                    <y>110</y>
+                    <width>370</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fRunList_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>80</x>
+                    <y>70</y>
+                    <width>440</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+    </widget>
+    <widget class="QLayoutWidget">
+        <property name="name">
+            <cstring>Layout1</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>530</y>
+                <width>580</width>
+                <height>33</height>
+            </rect>
+        </property>
+        <hbox>
+            <property name="name">
+                <cstring>unnamed</cstring>
+            </property>
+            <property name="margin">
+                <number>0</number>
+            </property>
+            <property name="spacing">
+                <number>6</number>
+            </property>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>fHelp_button</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;Help</string>
+                </property>
+                <property name="accel">
+                    <string>F1</string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+            </widget>
+            <spacer>
+                <property name="name">
+                    <cstring>Horizontal Spacing2</cstring>
+                </property>
+                <property name="orientation">
+                    <enum>Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                    <enum>Expanding</enum>
+                </property>
+                <property name="sizeHint">
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>fOk_button</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;OK</string>
+                </property>
+                <property name="accel">
+                    <string></string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+                <property name="default">
+                    <bool>true</bool>
+                </property>
+            </widget>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>fCancel_button</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;Cancel</string>
+                </property>
+                <property name="accel">
+                    <string></string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+            </widget>
+        </hbox>
+    </widget>
+    <widget class="QGroupBox">
+        <property name="name">
+            <cstring>fExtension_groupBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>170</y>
+                <width>580</width>
+                <height>65</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>msr file extension</string>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fExtension_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>20</x>
+                    <y>30</y>
+                    <width>71</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Extension</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fExtension_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>170</x>
+                    <y>27</y>
+                    <width>140</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+    </widget>
+    <widget class="QGroupBox">
+        <property name="name">
+            <cstring>fTemplateRunInput_groupBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>250</y>
+                <width>580</width>
+                <height>65</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>template run input</string>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fTemplateRunNumber_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>30</y>
+                    <width>150</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Template Run Number</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fTemplateRunNumber_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>170</x>
+                    <y>27</y>
+                    <width>140</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+    </widget>
+    <widget class="QGroupBox">
+        <property name="name">
+            <cstring>fDbOutputFileName_groupBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>325</y>
+                <width>580</width>
+                <height>65</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>DB output file name</string>
+        </property>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fDbOutputFileName_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>170</x>
+                    <y>25</y>
+                    <width>350</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fDbOutputFileName_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>30</y>
+                    <width>150</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>DB Output File Name</string>
+            </property>
+        </widget>
+    </widget>
+    <widget class="QGroupBox">
+        <property name="name">
+            <cstring>fOptions_groupBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>400</y>
+                <width>581</width>
+                <height>110</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>options</string>
+        </property>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>fKeepMinuit2Output_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>20</x>
+                    <y>70</y>
+                    <width>170</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Keep Minuit2 Output</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>fNoHeader_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>20</x>
+                    <y>30</y>
+                    <width>150</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Write DB Header</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>fSummaryPresent_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>20</x>
+                    <y>50</y>
+                    <width>180</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Summary Files Present</string>
+            </property>
+        </widget>
+    </widget>
+</widget>
+<images>
+    <image name="image0">
+        <data format="PNG" length="228">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000ab49444154388dbd93510ec420084421e9a9e0fc702dfbc5c6b580a8db9d9fa68a30be4e5154201313b7fe5d5490899b3dc77a51410080cb3b181547eb36a8dfbba243a72a39b69a151325c73bb77a383e6df869fc1663048029e3adc6b31c7b22e2a613035f8c7f89e57f393679034704199265c6d419c9386fa5a2f2f1b6525151c97174fd0c4b39157670c410adbba9c886a90a967e90d31c1b8e078a951c7b0a51ac3aae6000783115376b3ca3338719d7820000000049454e44ae426082</data>
+    </image>
+</images>
+<connections>
+    <connection>
+        <sender>fOk_button</sender>
+        <signal>clicked()</signal>
+        <receiver>PMlog2DbDialogBase</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>fCancel_button</sender>
+        <signal>clicked()</signal>
+        <receiver>PMlog2DbDialogBase</receiver>
+        <slot>reject()</slot>
+    </connection>
+    <connection>
+        <sender>fFirst_lineEdit</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>PMlog2DbDialogBase</receiver>
+        <slot>runFirstLastEntered()</slot>
+    </connection>
+    <connection>
+        <sender>fLast_lineEdit</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>PMlog2DbDialogBase</receiver>
+        <slot>runFirstLastEntered()</slot>
+    </connection>
+    <connection>
+        <sender>fRunList_lineEdit</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>PMlog2DbDialogBase</receiver>
+        <slot>runListEntered()</slot>
+    </connection>
+    <connection>
+        <sender>fRunListFileName_lineEdit</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>PMlog2DbDialogBase</receiver>
+        <slot>runListFileNameEntered()</slot>
+    </connection>
+</connections>
+<tabstops>
+    <tabstop>fFirst_lineEdit</tabstop>
+    <tabstop>fLast_lineEdit</tabstop>
+    <tabstop>fRunList_lineEdit</tabstop>
+    <tabstop>fRunListFileName_lineEdit</tabstop>
+    <tabstop>fExtension_lineEdit</tabstop>
+    <tabstop>fTemplateRunNumber_lineEdit</tabstop>
+    <tabstop>fDbOutputFileName_lineEdit</tabstop>
+    <tabstop>fNoHeader_checkBox</tabstop>
+    <tabstop>fSummaryPresent_checkBox</tabstop>
+    <tabstop>fKeepMinuit2Output_checkBox</tabstop>
+    <tabstop>fOk_button</tabstop>
+    <tabstop>fCancel_button</tabstop>
+    <tabstop>fHelp_button</tabstop>
+</tabstops>
+<slots>
+    <slot>runFirstLastEntered()</slot>
+    <slot>runListEntered()</slot>
+    <slot>runListFileNameEntered()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

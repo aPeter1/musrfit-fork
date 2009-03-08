@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  PTextEdit.h
+  PMlog2DbDialog.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -29,89 +29,35 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PTEXTEDIT_H_
-#define _PTEXTEDIT_H_
+#ifndef _PMLOG2DBDIALOG_H_
+#define _PMLOG2DBDIALOG_H_
 
-#include <qmainwindow.h>
-#include <qmap.h>
+#include "forms/PMlog2DbDialogBase.h"
 
-class PSubTextEdit;
-class PAdmin;
-class QAction;
-class QComboBox;
-class QTabWidget;
-class QTextEdit;
-class QPopupMenu;
-
-class PTextEdit : public QMainWindow
+class PMlog2DbDialog : public PMlog2DbDialogBase
 {
-    Q_OBJECT
+  public:
+    PMlog2DbDialog(const bool keepMinuit2Output);
 
-public:
-  PTextEdit( QWidget *parent = 0, const char *name = 0 );
+    int getRunTag() { return fRunTag; }
+    QString getFirstRunNo() { return fFirst_lineEdit->text(); }
+    QString getLastRunNo() { return fLast_lineEdit->text(); }
+    QString getRunList() { return fRunList_lineEdit->text(); }
+    QString getRunListFileName() { return fRunListFileName_lineEdit->text(); }
+    QString getExtension() { return fExtension_lineEdit->text(); }
+    QString getTemplateRunNo() { return fTemplateRunNumber_lineEdit->text(); }
+    QString getDbOutputFileName() { return fDbOutputFileName_lineEdit->text(); }
+    bool getWriteDbHeaderFlag() { return fNoHeader_checkBox->isChecked(); }
+    bool getSummaryFilePresentFlag() { return fSummaryPresent_checkBox->isChecked(); }
+    bool getMinuit2OutputFlag() { return fKeepMinuit2Output_checkBox->isChecked(); }
 
-private:
-  void setupFileActions();
-  void setupEditActions();
-  void setupTextActions();
-  void setupMusrActions();
-  void setupHelpActions();
-  void load( const QString &f );
-  PSubTextEdit *currentEditor() const;
-  void doConnections( PSubTextEdit *e );
-  bool validRunList(const QString runList);
+  public slots:
+    void runFirstLastEntered();
+    void runListEntered();
+    void runListFileNameEntered();
 
-private slots:
-  void fileNew();
-  void fileOpen();
-  void fileSave();
-  void fileSaveAs();
-  void filePrint();
-  void fileClose();
-  void fileExit();
-
-  void editUndo();
-  void editRedo();
-  void editSelectAll();
-  void editCut();
-  void editCopy();
-  void editPaste();
-
-  void textFamily( const QString &f );
-  void textSize( const QString &p );
-
-  void musrGetAsymetryDefault();
-  void musrGetSingleHistoDefault();
-  void musrCalcChisq();
-  void musrFit();
-  void musrMlog2Db();
-  void musrView();
-  void musrT0();
-  void musrPrefs();
-  void musrShowMlog( const QString &str );
-
-  void helpContents();
-  void helpAboutQt();
-  void helpAbout();
-
-  void fontChanged( const QFont &f );
-  void textChanged();
-
-private:
-  PAdmin *fAdmin;
-
-  bool fShowMlog;
-  bool fKeepMinuit2Output;
-  int  fDump;
-
-  QComboBox *fComboFont;
-  QComboBox *fComboSize;
-
-  QComboBox *fComboShowMlog;
-
-  QTabWidget *fTabWidget;
-  QMap<PSubTextEdit*, QString> fFilenames;
+  private:
+    int fRunTag; // -1 = not valid, 0 = first last, 1 = run list, 2 = run list file name
 };
 
-
-#endif // _PTEXTEDIT_H_
+#endif // _PMLOG2DBDIALOG_H_
