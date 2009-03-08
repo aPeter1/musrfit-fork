@@ -1,0 +1,837 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>PGetAsymmetryRunBlockDialogBase</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>PGetAsymmetryRunBlockDialogBase</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>483</width>
+            <height>527</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Get Asymmetry Run Block Parameters</string>
+    </property>
+    <property name="sizeGripEnabled">
+        <bool>true</bool>
+    </property>
+    <property name="modal">
+        <bool>true</bool>
+    </property>
+    <widget class="QGroupBox">
+        <property name="name">
+            <cstring>fRunHeader_groupBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>460</width>
+                <height>120</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>Run Header Info</string>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fRunFileName_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>24</y>
+                    <width>96</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Run File Name</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fBeamline_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>110</x>
+                    <y>50</y>
+                    <width>140</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fBeamline_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>53</y>
+                    <width>70</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Beamline</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fInstitute_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>83</y>
+                    <width>60</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Institute</string>
+            </property>
+        </widget>
+        <widget class="QComboBox">
+            <item>
+                <property name="text">
+                    <string>PSI</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>RAL</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>TRIUMF</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>JPARC</string>
+                </property>
+            </item>
+            <property name="name">
+                <cstring>fInstitute_comboBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>112</x>
+                    <y>80</y>
+                    <width>99</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fRunFileName_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>110</x>
+                    <y>20</y>
+                    <width>340</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QComboBox">
+            <item>
+                <property name="text">
+                    <string>NeXuS</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>ROOT-NPP</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>ROOT-PPC</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>PSIBIN</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>MUD</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>WKM</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>ASCII</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>DB</string>
+                </property>
+            </item>
+            <property name="name">
+                <cstring>fFileFormat_comboBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>350</x>
+                    <y>80</y>
+                    <width>99</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fFileFormat_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>270</x>
+                    <y>83</y>
+                    <width>80</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>File Format</string>
+            </property>
+        </widget>
+    </widget>
+    <widget class="QGroupBox">
+        <property name="name">
+            <cstring>fOptionalEntries_groupBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>380</y>
+                <width>460</width>
+                <height>90</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>Optional Entries</string>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fAplha_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>23</y>
+                    <width>125</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Alpha (default = 1)</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fT0_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>53</y>
+                    <width>201</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>t0 (requiered if not in data file)</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fT0Backward_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>300</x>
+                    <y>50</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fBeta_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>220</x>
+                    <y>23</y>
+                    <width>118</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Beta (default = 1)</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fBeta_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>350</x>
+                    <y>20</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fAlpha_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>140</x>
+                    <y>20</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fT0Forward_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>220</x>
+                    <y>50</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+    </widget>
+    <widget class="QLayoutWidget">
+        <property name="name">
+            <cstring>Layout1</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>480</y>
+                <width>460</width>
+                <height>33</height>
+            </rect>
+        </property>
+        <hbox>
+            <property name="name">
+                <cstring>unnamed</cstring>
+            </property>
+            <property name="margin">
+                <number>0</number>
+            </property>
+            <property name="spacing">
+                <number>6</number>
+            </property>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>fHelp_button</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;Help</string>
+                </property>
+                <property name="accel">
+                    <string>F1</string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+            </widget>
+            <spacer>
+                <property name="name">
+                    <cstring>Horizontal Spacing2</cstring>
+                </property>
+                <property name="orientation">
+                    <enum>Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                    <enum>Expanding</enum>
+                </property>
+                <property name="sizeHint">
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>fOk_button</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;OK</string>
+                </property>
+                <property name="accel">
+                    <string></string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+                <property name="default">
+                    <bool>true</bool>
+                </property>
+            </widget>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>fCancel_button</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;Cancel</string>
+                </property>
+                <property name="accel">
+                    <string></string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+            </widget>
+        </hbox>
+    </widget>
+    <widget class="QGroupBox">
+        <property name="name">
+            <cstring>fRequiredEntries_groupBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>135</y>
+                <width>460</width>
+                <height>240</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>Required Entries</string>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fMap_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>23</y>
+                    <width>50</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Map</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fForward_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>53</y>
+                    <width>113</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Forward Histo No</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fDataRange_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>83</y>
+                    <width>79</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Data Range</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fBackward_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>210</x>
+                    <y>53</y>
+                    <width>116</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Backward Hist No</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fFitRange_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>173</y>
+                    <width>71</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Fit Range</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fPacking_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>203</y>
+                    <width>110</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Packing/Binning</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fFitRangeEnd_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>220</x>
+                    <y>170</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fForward_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>140</x>
+                    <y>50</y>
+                    <width>50</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string></string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fFitRangeStart_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>140</x>
+                    <y>170</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fPacking_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>140</x>
+                    <y>200</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fBackward_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>340</x>
+                    <y>50</y>
+                    <width>50</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fMap_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>70</x>
+                    <y>20</y>
+                    <width>380</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>0  0  0  0  0  0  0  0  0  0</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fBackgroundBackwardStart_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>300</x>
+                    <y>140</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fBackgroundForwardEnd_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>220</x>
+                    <y>140</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fBackgroundForwardStart_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>140</x>
+                    <y>140</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fBackground_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>143</y>
+                    <width>123</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Background Range</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fBackgroundBackwardEnd_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>380</x>
+                    <y>140</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fBackgroundFix_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>110</y>
+                    <width>110</width>
+                    <height>21</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Background Fix</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fOr_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>300</x>
+                    <y>110</y>
+                    <width>30</width>
+                    <height>21</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>&lt;b&gt;OR&lt;/b&gt;</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fBackgroundForwardFix_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>140</x>
+                    <y>110</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fBackgroundBackwardFix_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>220</x>
+                    <y>110</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fDataForwardStart_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>140</x>
+                    <y>80</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fDataForwardEnd_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>220</x>
+                    <y>80</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fDataBackwardStart_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>300</x>
+                    <y>80</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fDataBackwardEnd_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>380</x>
+                    <y>80</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+    </widget>
+</widget>
+<connections>
+    <connection>
+        <sender>fOk_button</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetAsymmetryRunBlockDialogBase</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>fCancel_button</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetAsymmetryRunBlockDialogBase</receiver>
+        <slot>reject()</slot>
+    </connection>
+</connections>
+<tabstops>
+    <tabstop>fRunFileName_lineEdit</tabstop>
+    <tabstop>fBeamline_lineEdit</tabstop>
+    <tabstop>fInstitute_comboBox</tabstop>
+    <tabstop>fFileFormat_comboBox</tabstop>
+    <tabstop>fMap_lineEdit</tabstop>
+    <tabstop>fForward_lineEdit</tabstop>
+    <tabstop>fBackward_lineEdit</tabstop>
+    <tabstop>fDataForwardStart_lineEdit</tabstop>
+    <tabstop>fDataForwardEnd_lineEdit</tabstop>
+    <tabstop>fDataBackwardStart_lineEdit</tabstop>
+    <tabstop>fDataBackwardEnd_lineEdit</tabstop>
+    <tabstop>fBackgroundForwardFix_lineEdit</tabstop>
+    <tabstop>fBackgroundBackwardFix_lineEdit</tabstop>
+    <tabstop>fBackgroundForwardStart_lineEdit</tabstop>
+    <tabstop>fBackgroundForwardEnd_lineEdit</tabstop>
+    <tabstop>fBackgroundBackwardStart_lineEdit</tabstop>
+    <tabstop>fBackgroundBackwardEnd_lineEdit</tabstop>
+    <tabstop>fFitRangeStart_lineEdit</tabstop>
+    <tabstop>fFitRangeEnd_lineEdit</tabstop>
+    <tabstop>fPacking_lineEdit</tabstop>
+    <tabstop>fAlpha_lineEdit</tabstop>
+    <tabstop>fBeta_lineEdit</tabstop>
+    <tabstop>fT0Forward_lineEdit</tabstop>
+    <tabstop>fT0Backward_lineEdit</tabstop>
+    <tabstop>fOk_button</tabstop>
+    <tabstop>fCancel_button</tabstop>
+    <tabstop>fHelp_button</tabstop>
+</tabstops>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

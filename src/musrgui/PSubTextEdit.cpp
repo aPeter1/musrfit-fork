@@ -33,10 +33,13 @@
 #include <qpopupmenu.h>
 #include <qdatetime.h>
 #include <qlineedit.h>
+#include <qcombobox.h>
+#include <qmessagebox.h>
 
 #include "PSubTextEdit.h"
 #include "forms/PGetTitleDialog.h"
 #include "PGetParameterDialog.h"
+#include "PGetAsymmetryRunBlockDialog.h"
 #include "PGetFourierDialog.h"
 #include "PGetPlotDialog.h"
 
@@ -155,6 +158,111 @@ void PSubTextEdit::insertFunctionBlock()
  */
 void PSubTextEdit::insertAsymRunBlock()
 {
+  PGetAsymmetryRunBlockDialog *dlg = new PGetAsymmetryRunBlockDialog();
+  if (dlg->exec() == QDialog::Accepted) {
+    QString str, workStr;
+    // check if there is already a run block present, necessary because of the '####' line
+    // STILL MISSING
+
+    // add run line
+    str += "RUN " + dlg->fRunFileName_lineEdit->text() + " ";
+    str += dlg->fBeamline_lineEdit->text().upper() + " ";
+    str += dlg->fInstitute_comboBox->currentText() + " ";
+    str += dlg->fFileFormat_comboBox->currentText() + "   (name beamline institute data-file-format)\n";
+
+    // add fittype
+    str += "fittype         2         (asymmetry fit)\n";
+
+    // add alpha if present
+    workStr = dlg->fAlpha_lineEdit->text();
+    if (!workStr.isEmpty()) {
+      str += "alpha           " + workStr + "\n";
+    }
+
+    // add beta if present
+    workStr = dlg->fBeta_lineEdit->text();
+    if (!workStr.isEmpty()) {
+      str += "beta            " + workStr + "\n";
+    }
+
+    // add map
+    str += "map             " + dlg->fMap_lineEdit->text() + "\n";
+
+    // add forward
+    str += "forward         " + dlg->fForward_lineEdit->text() + "\n";
+
+    // add backward
+    str += "backward        " + dlg->fBackward_lineEdit->text() + "\n";
+
+    // check that either background or background.fix is given
+    if (dlg->fBackgroundForwardStart_lineEdit->text().isEmpty() && dlg->fBackgroundForwardEnd_lineEdit->text().isEmpty() &&
+        dlg->fBackgroundBackwardStart_lineEdit->text().isEmpty() && dlg->fBackgroundBackwardEnd_lineEdit->text().isEmpty() &&
+        dlg->fBackgroundForwardFix_lineEdit->text().isEmpty() && dlg->fBackgroundBackwardFix_lineEdit->text().isEmpty()) {
+      QMessageBox::critical(this, "**ERROR**",
+         "Either Background or Background.Fix is needed!\nWill set Background to 0..10, please correct!",
+         QMessageBox::Ok, QMessageBox::NoButton);
+      str += "background      0  10  0  10\n";
+    } else {
+      if (!dlg->fBackgroundForwardStart_lineEdit->text().isEmpty()) { // assume the rest is given, not fool prove but ...
+        str += "background      ";
+        str += dlg->fBackgroundForwardStart_lineEdit->text() + "   ";
+        str += dlg->fBackgroundForwardEnd_lineEdit->text() + "   ";
+        str += dlg->fBackgroundBackwardStart_lineEdit->text() + "   ";
+        str += dlg->fBackgroundBackwardEnd_lineEdit->text() + "\n";
+      }
+      if (!dlg->fBackgroundForwardFix_lineEdit->text().isEmpty()) { // assume the rest is given, not fool prove but ...
+        str += "backgr.fix      ";
+        str += dlg->fBackgroundForwardFix_lineEdit->text() + "   ";
+        str += dlg->fBackgroundBackwardFix_lineEdit->text() + "\n";
+      }
+    }
+
+    // add data
+    if (dlg->fDataForwardStart_lineEdit->text().isEmpty() || dlg->fDataForwardEnd_lineEdit->text().isEmpty() ||
+        dlg->fDataBackwardStart_lineEdit->text().isEmpty() || dlg->fDataBackwardEnd_lineEdit->text().isEmpty()) {
+      QMessageBox::critical(this, "**ERROR**",
+         "Not all Data entries are present.Fix is needed!\nWill not set anything!",
+         QMessageBox::Ok, QMessageBox::NoButton);
+    } else {
+      str += "data            ";
+      str += dlg->fDataForwardStart_lineEdit->text() + "   ";
+      str += dlg->fDataForwardEnd_lineEdit->text() + "   ";
+      str += dlg->fDataBackwardStart_lineEdit->text() + "   ";
+      str += dlg->fDataBackwardEnd_lineEdit->text() + "\n";
+    }
+
+    // add t0 if present
+    if (!dlg->fT0Forward_lineEdit->text().isEmpty() && !dlg->fT0Forward_lineEdit->text().isEmpty()) {
+      str += "t0              ";
+      str += dlg->fT0Forward_lineEdit->text() + "   ";
+      str += dlg->fT0Backward_lineEdit->text() + "\n";
+    }
+
+    // add fit range
+    if (dlg->fFitRangeStart_lineEdit->text().isEmpty() || dlg->fFitRangeEnd_lineEdit->text().isEmpty()) {
+      QMessageBox::critical(this, "**ERROR**",
+         "No valid fit range is given.Fix is needed!\nWill add a default one!",
+         QMessageBox::Ok, QMessageBox::NoButton);
+      str += "fit             0.0   10.0\n";
+    } else {
+      str += "fit             ";
+      str += dlg->fFitRangeStart_lineEdit->text() + "   ";
+      str += dlg->fFitRangeEnd_lineEdit->text() + "\n";
+    }
+
+    // add packing
+    if (dlg->fPacking_lineEdit->text().isEmpty()) {
+      QMessageBox::critical(this, "**ERROR**",
+         "No valid packing/binning is given.Fix is needed!\nWill add a default one!",
+         QMessageBox::Ok, QMessageBox::NoButton);
+      str += "packing         1\n";
+    } else {
+      str += "packing         " + dlg->fPacking_lineEdit->text() + "\n\n";
+    }
+
+    // insert Asymmetry Run Block at the current cursor position
+    insert(str);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
