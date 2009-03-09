@@ -632,8 +632,6 @@ bool PFitter::ExecuteMinos()
  */
 bool PFitter::ExecuteSave()
 {
-  cout << "PFitter::ExecuteSave(): will write minuit2 output file ..." << endl;
-
   // if any minimization was done, otherwise get out immediately
   if (!fFcnMin) {
     cout << endl << "PFitter::ExecuteSave(): nothing to be saved ...";
@@ -648,6 +646,8 @@ bool PFitter::ExecuteSave()
     cout << endl;
     return false;
   }
+
+  cout << "PFitter::ExecuteSave(): will write minuit2 output file ..." << endl;
 
   ofstream fout;
 
@@ -880,7 +880,7 @@ bool PFitter::ExecuteSave()
  */
 bool PFitter::ExecuteSimplex()
 {
-  cout << "PFitter::ExecuteSimplex(): will call minimize ..." << endl;
+  cout << "PFitter::ExecuteSimplex(): will call simplex ..." << endl;
 
   // if already some minimization is done use the minuit2 output as input
   if (fFcnMin)
