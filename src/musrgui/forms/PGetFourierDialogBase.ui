@@ -21,32 +21,6 @@
     <property name="modal">
         <bool>true</bool>
     </property>
-    <widget class="QLineEdit">
-        <property name="name">
-            <cstring>fPhaseCorrectionRangeUp_lineEdit</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>210</x>
-                <y>170</y>
-                <width>60</width>
-                <height>24</height>
-            </rect>
-        </property>
-    </widget>
-    <widget class="QLineEdit">
-        <property name="name">
-            <cstring>fRangeUp_lineEdit</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>210</x>
-                <y>210</y>
-                <width>60</width>
-                <height>24</height>
-            </rect>
-        </property>
-    </widget>
     <widget class="QLabel">
         <property name="name">
             <cstring>fUnits_textLabel</cstring>
@@ -183,64 +157,6 @@
                 <x>140</x>
                 <y>20</y>
                 <width>99</width>
-                <height>24</height>
-            </rect>
-        </property>
-    </widget>
-    <widget class="QLineEdit">
-        <property name="name">
-            <cstring>fFourierPower_lineEdit</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>140</x>
-                <y>50</y>
-                <width>100</width>
-                <height>24</height>
-            </rect>
-        </property>
-        <property name="whatsThis" stdset="0">
-            <string>If &lt;b&gt;no&lt;/b&gt; Fourier power is given. The Fourier transform will be done on the number of bins (N) given. If a Fourier power (FP) &gt; N is given, zero padding will be applied, i.e. filling the data vector &gt; N with zeros up to 2^FP.</string>
-        </property>
-    </widget>
-    <widget class="QLineEdit">
-        <property name="name">
-            <cstring>fPhase_lineEdit</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>140</x>
-                <y>140</y>
-                <width>100</width>
-                <height>24</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>0.0</string>
-        </property>
-    </widget>
-    <widget class="QLineEdit">
-        <property name="name">
-            <cstring>fPhaseCorrectionRangeLow_lineEdit</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>140</x>
-                <y>170</y>
-                <width>60</width>
-                <height>24</height>
-            </rect>
-        </property>
-    </widget>
-    <widget class="QLineEdit">
-        <property name="name">
-            <cstring>fRangeLow_lineEdit</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>140</x>
-                <y>210</y>
-                <width>60</width>
                 <height>24</height>
             </rect>
         </property>
@@ -386,6 +302,108 @@
                 <width>99</width>
                 <height>24</height>
             </rect>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fFourierPower_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>140</x>
+                <y>50</y>
+                <width>100</width>
+                <height>24</height>
+            </rect>
+        </property>
+        <property name="toolTip" stdset="0">
+            <string>no -&gt; bins are used for Fourier. N -&gt; 2^N bins will be used, i.e. zero padding is applied before FFT</string>
+        </property>
+        <property name="whatsThis" stdset="0">
+            <string>If &lt;b&gt;no&lt;/b&gt; Fourier power is given. The Fourier transform will be done on the number of bins (N) given. If a Fourier power (FP) &gt; N is given, zero padding will be applied, i.e. filling the data vector &gt; N with zeros up to 2^FP.</string>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fPhase_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>140</x>
+                <y>140</y>
+                <width>100</width>
+                <height>24</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>0.0</string>
+        </property>
+        <property name="toolTip" stdset="0">
+            <string>phased used to calculate Re/Im Parts, given in (°)</string>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fPhaseCorrectionRangeLow_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>140</x>
+                <y>170</y>
+                <width>60</width>
+                <height>24</height>
+            </rect>
+        </property>
+        <property name="toolTip" stdset="0">
+            <string>start given in units of the chosen units</string>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fPhaseCorrectionRangeUp_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>210</x>
+                <y>170</y>
+                <width>60</width>
+                <height>24</height>
+            </rect>
+        </property>
+        <property name="toolTip" stdset="0">
+            <string>end given in units of the chosen units</string>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fRangeLow_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>140</x>
+                <y>210</y>
+                <width>60</width>
+                <height>24</height>
+            </rect>
+        </property>
+        <property name="toolTip" stdset="0">
+            <string>plot range start</string>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fRangeUp_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>210</x>
+                <y>210</y>
+                <width>60</width>
+                <height>24</height>
+            </rect>
+        </property>
+        <property name="toolTip" stdset="0">
+            <string>plot range end</string>
         </property>
     </widget>
 </widget>

@@ -18,58 +18,6 @@
     <property name="sizeGripEnabled">
         <bool>true</bool>
     </property>
-    <widget class="QLineEdit">
-        <property name="name">
-            <cstring>fXRangeUp_lineEdit</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>440</x>
-                <y>10</y>
-                <width>60</width>
-                <height>24</height>
-            </rect>
-        </property>
-    </widget>
-    <widget class="QLineEdit">
-        <property name="name">
-            <cstring>fYRangeUp_lineEdit</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>440</x>
-                <y>40</y>
-                <width>60</width>
-                <height>24</height>
-            </rect>
-        </property>
-    </widget>
-    <widget class="QLineEdit">
-        <property name="name">
-            <cstring>fYRangeLow_lineEdit</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>370</x>
-                <y>40</y>
-                <width>60</width>
-                <height>24</height>
-            </rect>
-        </property>
-    </widget>
-    <widget class="QLineEdit">
-        <property name="name">
-            <cstring>fXRangeLow_lineEdit</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>370</x>
-                <y>10</y>
-                <width>60</width>
-                <height>24</height>
-            </rect>
-        </property>
-    </widget>
     <widget class="QLabel">
         <property name="name">
             <cstring>fYRange_textLabel</cstring>
@@ -162,19 +110,6 @@
             <rect>
                 <x>90</x>
                 <y>10</y>
-                <width>150</width>
-                <height>24</height>
-            </rect>
-        </property>
-    </widget>
-    <widget class="QLineEdit">
-        <property name="name">
-            <cstring>fRunList_lineEdit</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>90</x>
-                <y>40</y>
                 <width>150</width>
                 <height>24</height>
             </rect>
@@ -282,6 +217,86 @@
         </property>
         <property name="default">
             <bool>true</bool>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fRunList_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>90</x>
+                <y>40</y>
+                <width>150</width>
+                <height>24</height>
+            </rect>
+        </property>
+        <property name="toolTip" stdset="0">
+            <string>msr run list, e.g. 1 3 4</string>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fXRangeLow_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>370</x>
+                <y>10</y>
+                <width>60</width>
+                <height>24</height>
+            </rect>
+        </property>
+        <property name="toolTip" stdset="0">
+            <string>start value</string>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fXRangeUp_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>440</x>
+                <y>10</y>
+                <width>60</width>
+                <height>24</height>
+            </rect>
+        </property>
+        <property name="toolTip" stdset="0">
+            <string>end value</string>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fYRangeLow_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>370</x>
+                <y>40</y>
+                <width>60</width>
+                <height>24</height>
+            </rect>
+        </property>
+        <property name="toolTip" stdset="0">
+            <string>start value</string>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fYRangeUp_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>440</x>
+                <y>40</y>
+                <width>60</width>
+                <height>24</height>
+            </rect>
+        </property>
+        <property name="toolTip" stdset="0">
+            <string>end value</string>
         </property>
     </widget>
 </widget>

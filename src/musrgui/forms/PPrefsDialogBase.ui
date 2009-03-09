@@ -52,6 +52,9 @@
                 <property name="text">
                     <string>keep minuit2 output</string>
                 </property>
+                <property name="toolTip" stdset="0">
+                    <string>will keep the Minuit2 output files (correlation matrix, etc.)</string>
+                </property>
             </widget>
             <widget class="QCheckBox">
                 <property name="name">
@@ -68,6 +71,9 @@
                 <property name="text">
                     <string>dump ascii</string>
                 </property>
+                <property name="toolTip" stdset="0">
+                    <string>will generate an ascii dump file after the fit with the data and the theory</string>
+                </property>
             </widget>
             <widget class="QCheckBox">
                 <property name="name">
@@ -83,6 +89,9 @@
                 </property>
                 <property name="text">
                     <string>dump root</string>
+                </property>
+                <property name="toolTip" stdset="0">
+                    <string>will generate a ROOT dump file after the fit with the data and the theory</string>
                 </property>
             </widget>
         </widget>

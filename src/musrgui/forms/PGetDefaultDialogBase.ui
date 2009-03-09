@@ -168,19 +168,6 @@
             </widget>
         </hbox>
     </widget>
-    <widget class="QLineEdit">
-        <property name="name">
-            <cstring>fBeamline_lineEdit</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>130</x>
-                <y>60</y>
-                <width>360</width>
-                <height>24</height>
-            </rect>
-        </property>
-    </widget>
     <widget class="QComboBox">
         <item>
             <property name="text">
@@ -278,6 +265,25 @@
                 <width>360</width>
                 <height>24</height>
             </rect>
+        </property>
+        <property name="toolTip" stdset="0">
+            <string>e.g. 2007/lem07_his_0147</string>
+        </property>
+    </widget>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fBeamline_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>130</x>
+                <y>60</y>
+                <width>360</width>
+                <height>24</height>
+            </rect>
+        </property>
+        <property name="toolTip" stdset="0">
+            <string>e.g. mue4</string>
         </property>
     </widget>
 </widget>

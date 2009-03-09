@@ -55,19 +55,6 @@
                 <string>First</string>
             </property>
         </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fFirst_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>50</x>
-                    <y>30</y>
-                    <width>90</width>
-                    <height>24</height>
-                </rect>
-            </property>
-        </widget>
         <widget class="QLabel">
             <property name="name">
                 <cstring>fLast_textLabel</cstring>
@@ -82,19 +69,6 @@
             </property>
             <property name="text">
                 <string>Last</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fLast_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>220</x>
-                    <y>30</y>
-                    <width>100</width>
-                    <height>24</height>
-                </rect>
             </property>
         </widget>
         <widget class="QLabel">
@@ -163,15 +137,34 @@
         </widget>
         <widget class="QLineEdit">
             <property name="name">
-                <cstring>fRunListFileName_lineEdit</cstring>
+                <cstring>fFirst_lineEdit</cstring>
             </property>
             <property name="geometry">
                 <rect>
-                    <x>150</x>
-                    <y>110</y>
-                    <width>370</width>
+                    <x>50</x>
+                    <y>30</y>
+                    <width>90</width>
                     <height>24</height>
                 </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>first run no, e.g. 147</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fLast_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>220</x>
+                    <y>30</y>
+                    <width>100</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>last run no, .e.g. 275</string>
             </property>
         </widget>
         <widget class="QLineEdit">
@@ -185,6 +178,25 @@
                     <width>440</width>
                     <height>24</height>
                 </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>e.g. 273 275 289 311</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fRunListFileName_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>150</x>
+                    <y>110</y>
+                    <width>370</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string></string>
             </property>
         </widget>
     </widget>
@@ -295,7 +307,7 @@
             </property>
             <property name="geometry">
                 <rect>
-                    <x>20</x>
+                    <x>10</x>
                     <y>30</y>
                     <width>71</width>
                     <height>20</height>
@@ -316,6 +328,9 @@
                     <width>140</width>
                     <height>24</height>
                 </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>e.g. '_h13' if the msr-file name is something like '146_h13.msr'</string>
             </property>
         </widget>
     </widget>
@@ -362,6 +377,9 @@
                     <height>24</height>
                 </rect>
             </property>
+            <property name="toolTip" stdset="0">
+                <string>e.g. 2089</string>
+            </property>
         </widget>
     </widget>
     <widget class="QGroupBox">
@@ -379,19 +397,6 @@
         <property name="title">
             <string>DB output file name</string>
         </property>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fDbOutputFileName_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>170</x>
-                    <y>25</y>
-                    <width>350</width>
-                    <height>24</height>
-                </rect>
-            </property>
-        </widget>
         <widget class="QLabel">
             <property name="name">
                 <cstring>fDbOutputFileName_textLabel</cstring>
@@ -406,6 +411,22 @@
             </property>
             <property name="text">
                 <string>DB Output File Name</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fDbOutputFileName_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>170</x>
+                    <y>25</y>
+                    <width>350</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>e.g. MyPrefectFitCollection.db</string>
             </property>
         </widget>
     </widget>
@@ -426,22 +447,6 @@
         </property>
         <widget class="QCheckBox">
             <property name="name">
-                <cstring>fKeepMinuit2Output_checkBox</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>20</x>
-                    <y>70</y>
-                    <width>170</width>
-                    <height>22</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Keep Minuit2 Output</string>
-            </property>
-        </widget>
-        <widget class="QCheckBox">
-            <property name="name">
                 <cstring>fNoHeader_checkBox</cstring>
             </property>
             <property name="geometry">
@@ -454,6 +459,9 @@
             </property>
             <property name="text">
                 <string>Write DB Header</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>will add a default header to the DB-file</string>
             </property>
         </widget>
         <widget class="QCheckBox">
@@ -471,12 +479,34 @@
             <property name="text">
                 <string>Summary Files Present</string>
             </property>
+            <property name="toolTip" stdset="0">
+                <string>will try to extract information from the summary file (LEM)</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>fKeepMinuit2Output_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>20</x>
+                    <y>70</y>
+                    <width>170</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Keep Minuit2 Output</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>will keep the Minuit2 output files</string>
+            </property>
         </widget>
     </widget>
 </widget>
 <images>
     <image name="image0">
-        <data format="PNG" length="228">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000ab49444154388dbd93510ec420084421e9a9e0fc702dfbc5c6b580a8db9d9fa68a30be4e5154201313b7fe5d5490899b3dc77a51410080cb3b181547eb36a8dfbba243a72a39b69a151325c73bb77a383e6df869fc1663048029e3adc6b31c7b22e2a613035f8c7f89e57f393679034704199265c6d419c9386fa5a2f2f1b6525151c97174fd0c4b39157670c410adbba9c886a90a967e90d31c1b8e078a951c7b0a51ac3aae6000783115376b3ca3338719d7820000000049454e44ae426082</data>
+        <data format="PNG" length="340">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000011b49444154388db594c16ec4200c44c71207bea791f600df1f0e91d8efe180440fad776dea0089b6b9a021100f8f89291f19a8001c506a81775ee918628378f291697b6c8d47744f3e32a102ae7fb9a79dbcf3ef22bf8b59975a00fc14e5f91862ebf739b9c9740eadb9d848975ad61c330e36218b59fae5d8722a37e59449bd07d01757da62fce722a08b5e72fc1f8c09c090f1dd916639b6f4d7636bcfc94915e33eaf67a3c574cab8bf5d4b5b4ca7391eb10e21b6947662c7ac3fc23888dec11fb5d6df4ac5c8a972bc9a862b7ac9b175fcd1fc52afe014706e4388ed9932c979542084ad49e6662acefaaf771e29edc41f51bf3bb49969af18f606e085839d5fcab17426b564dbffe6a78ccffaef9b31d4491496d51cdf49c53749ce1f9de06199f60000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
