@@ -1,19 +1,19 @@
 <!DOCTYPE UI><UI version="3.3" stdsetdef="1">
-<class>PGetAsymmetryRunBlockDialogBase</class>
+<class>PGetSingleHistoRunBlockDialogBase</class>
 <widget class="QDialog">
     <property name="name">
-        <cstring>PGetAsymmetryRunBlockDialogBase</cstring>
+        <cstring>PGetSingleHistoRunBlockDialogBase</cstring>
     </property>
     <property name="geometry">
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>483</width>
-            <height>527</height>
+            <width>442</width>
+            <height>595</height>
         </rect>
     </property>
     <property name="caption">
-        <string>Get Asymmetry Run Block Parameters</string>
+        <string>Get Single Histo Run Block Parameters</string>
     </property>
     <property name="sizeGripEnabled">
         <bool>true</bool>
@@ -29,7 +29,7 @@
             <rect>
                 <x>10</x>
                 <y>10</y>
-                <width>460</width>
+                <width>420</width>
                 <height>120</height>
             </rect>
         </property>
@@ -117,6 +117,22 @@
                 </rect>
             </property>
         </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fBeamline_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>110</x>
+                    <y>50</y>
+                    <width>140</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>e.g. mue4</string>
+            </property>
+        </widget>
         <widget class="QComboBox">
             <item>
                 <property name="text">
@@ -163,7 +179,7 @@
             </property>
             <property name="geometry">
                 <rect>
-                    <x>350</x>
+                    <x>310</x>
                     <y>80</y>
                     <width>99</width>
                     <height>24</height>
@@ -176,7 +192,7 @@
             </property>
             <property name="geometry">
                 <rect>
-                    <x>270</x>
+                    <x>230</x>
                     <y>83</y>
                     <width>80</width>
                     <height>20</height>
@@ -194,7 +210,7 @@
                 <rect>
                     <x>110</x>
                     <y>20</y>
-                    <width>340</width>
+                    <width>300</width>
                     <height>24</height>
                 </rect>
             </property>
@@ -202,20 +218,382 @@
                 <string>e.g. 2007/lem07_his_0147</string>
             </property>
         </widget>
-        <widget class="QLineEdit">
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fOr_textLabel_2</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>230</x>
+                <y>303</y>
+                <width>30</width>
+                <height>21</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>&lt;b&gt;OR&lt;/b&gt;</string>
+        </property>
+    </widget>
+    <widget class="QGroupBox">
+        <property name="name">
+            <cstring>fRequiredEntries_groupBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>135</y>
+                <width>420</width>
+                <height>290</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>Required Entries</string>
+        </property>
+        <widget class="QLabel">
             <property name="name">
-                <cstring>fBeamline_lineEdit</cstring>
+                <cstring>fMap_textLabel</cstring>
             </property>
             <property name="geometry">
                 <rect>
-                    <x>110</x>
-                    <y>50</y>
-                    <width>140</width>
+                    <x>10</x>
+                    <y>23</y>
+                    <width>50</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Map</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fBackgroundFix_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>140</x>
+                    <y>140</y>
+                    <width>70</width>
                     <height>24</height>
                 </rect>
             </property>
             <property name="toolTip" stdset="0">
-                <string>e.g. mue4</string>
+                <string>histo bkg (1/ns)</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fDataRange_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>113</y>
+                    <width>79</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Data Range</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fBackgroundFix_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>140</y>
+                    <width>110</width>
+                    <height>21</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Background Fix</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fDataEnd_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>220</x>
+                    <y>110</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>histo end bin</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fDataStart_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>140</x>
+                    <y>110</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>histo start bin</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fHistoNo_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>83</y>
+                    <width>113</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Histo No</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fHistoNo_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>140</x>
+                    <y>80</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string></string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fMap_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>70</x>
+                    <y>20</y>
+                    <width>340</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>0  0  0  0  0  0  0  0  0  0</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fNorm_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>53</y>
+                    <width>71</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Norm</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fNorm_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>140</x>
+                    <y>50</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>Param No for the N0</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fBackgroundEnd_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>220</x>
+                    <y>200</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>histo end bkg bin</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fPacking_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>263</y>
+                    <width>110</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Packing/Binning</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fFitRange_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>233</y>
+                    <width>71</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Fit Range</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fFitRangeEnd_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>220</x>
+                    <y>230</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>end in (us)</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fBackground_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>203</y>
+                    <width>123</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Background Range</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fBackgroundStart_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>140</x>
+                    <y>200</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>histo start bkg bin</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fFitRangeStart_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>140</x>
+                    <y>230</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>start in (us)</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fPacking_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>140</x>
+                    <y>260</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fOr_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>220</x>
+                    <y>140</y>
+                    <width>30</width>
+                    <height>21</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>&lt;b&gt;OR&lt;/b&gt;</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fBackgroundFit_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>173</y>
+                    <width>110</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Background Fit</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fBackgroundFit_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>140</x>
+                    <y>170</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
             </property>
         </widget>
     </widget>
@@ -226,108 +604,28 @@
         <property name="geometry">
             <rect>
                 <x>10</x>
-                <y>380</y>
-                <width>460</width>
-                <height>90</height>
+                <y>430</y>
+                <width>420</width>
+                <height>110</height>
             </rect>
         </property>
         <property name="title">
             <string>Optional Entries</string>
         </property>
-        <widget class="QLabel">
+        <widget class="QLineEdit">
             <property name="name">
-                <cstring>fAplha_textLabel</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>23</y>
-                    <width>125</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Alpha (default = 1)</string>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>fBeta_textLabel</cstring>
+                <cstring>fT0_lineEdit</cstring>
             </property>
             <property name="geometry">
                 <rect>
                     <x>220</x>
-                    <y>23</y>
-                    <width>118</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Beta (default = 1)</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fAlpha_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>140</x>
                     <y>20</y>
                     <width>70</width>
                     <height>24</height>
                 </rect>
             </property>
             <property name="toolTip" stdset="0">
-                <string>alpha parameter number</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fBeta_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>350</x>
-                    <y>20</y>
-                    <width>70</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>beta parameter no</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fT0Forward_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>220</x>
-                    <y>50</y>
-                    <width>70</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>forward t0 bin</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fT0Backward_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>300</x>
-                    <y>50</y>
-                    <width>70</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>backward t0 bin</string>
+                <string>t0 bin</string>
             </property>
         </widget>
         <widget class="QLabel">
@@ -337,13 +635,67 @@
             <property name="geometry">
                 <rect>
                     <x>10</x>
-                    <y>53</y>
+                    <y>23</y>
                     <width>201</width>
                     <height>20</height>
                 </rect>
             </property>
             <property name="text">
                 <string>t0 (required if not in data file)</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>fLifetimeCorrection_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>80</y>
+                    <width>150</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Lifetime Correction</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>use muon lifetime correction for plotting</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fLifetime_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>220</x>
+                    <y>50</y>
+                    <width>70</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>muon lifetime parameter no</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fLifetime_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>53</y>
+                    <width>164</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Muon Lifetime Parameter</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string></string>
             </property>
         </widget>
     </widget>
@@ -354,8 +706,8 @@
         <property name="geometry">
             <rect>
                 <x>10</x>
-                <y>480</y>
-                <width>460</width>
+                <y>550</y>
+                <width>420</width>
                 <height>33</height>
             </rect>
         </property>
@@ -433,428 +785,18 @@
             </widget>
         </hbox>
     </widget>
-    <widget class="QGroupBox">
-        <property name="name">
-            <cstring>fRequiredEntries_groupBox</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>10</x>
-                <y>135</y>
-                <width>460</width>
-                <height>240</height>
-            </rect>
-        </property>
-        <property name="title">
-            <string>Required Entries</string>
-        </property>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>fMap_textLabel</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>23</y>
-                    <width>50</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Map</string>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>fForward_textLabel</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>53</y>
-                    <width>113</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Forward Histo No</string>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>fDataRange_textLabel</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>83</y>
-                    <width>79</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Data Range</string>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>fBackward_textLabel</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>210</x>
-                    <y>53</y>
-                    <width>116</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Backward Hist No</string>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>fFitRange_textLabel</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>173</y>
-                    <width>71</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Fit Range</string>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>fPacking_textLabel</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>203</y>
-                    <width>110</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Packing/Binning</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fForward_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>140</x>
-                    <y>50</y>
-                    <width>50</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string></string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fPacking_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>140</x>
-                    <y>200</y>
-                    <width>70</width>
-                    <height>24</height>
-                </rect>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fBackward_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>340</x>
-                    <y>50</y>
-                    <width>50</width>
-                    <height>24</height>
-                </rect>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fMap_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>70</x>
-                    <y>20</y>
-                    <width>380</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>0  0  0  0  0  0  0  0  0  0</string>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>fBackground_textLabel</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>143</y>
-                    <width>123</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Background Range</string>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>fBackgroundFix_textLabel</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>110</y>
-                    <width>110</width>
-                    <height>21</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Background Fix</string>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>fOr_textLabel</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>300</x>
-                    <y>110</y>
-                    <width>30</width>
-                    <height>21</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>&lt;b&gt;OR&lt;/b&gt;</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fDataForwardStart_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>140</x>
-                    <y>80</y>
-                    <width>70</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>forward histo start bin</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fDataForwardEnd_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>220</x>
-                    <y>80</y>
-                    <width>70</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>forward histo end bin</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fDataBackwardStart_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>300</x>
-                    <y>80</y>
-                    <width>70</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>backward histo start bin</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fDataBackwardEnd_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>380</x>
-                    <y>80</y>
-                    <width>70</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>backward histo end bin</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fBackgroundForwardFix_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>140</x>
-                    <y>110</y>
-                    <width>70</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>forward hist bkg (1/ns)</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fBackgroundBackwardFix_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>220</x>
-                    <y>110</y>
-                    <width>70</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>backward hist bkg (1/ns)</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fBackgroundForwardStart_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>140</x>
-                    <y>140</y>
-                    <width>70</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>forward histo start bkg bin</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fBackgroundForwardEnd_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>220</x>
-                    <y>140</y>
-                    <width>70</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>forward histo end bkg bin</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fBackgroundBackwardStart_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>300</x>
-                    <y>140</y>
-                    <width>70</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>backward histo start bkg bin</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fBackgroundBackwardEnd_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>380</x>
-                    <y>140</y>
-                    <width>70</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>backward histo end bkg bin</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fFitRangeStart_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>140</x>
-                    <y>170</y>
-                    <width>70</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>start in (us)</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fFitRangeEnd_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>220</x>
-                    <y>170</y>
-                    <width>70</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>end in (us)</string>
-            </property>
-        </widget>
-    </widget>
 </widget>
 <connections>
     <connection>
         <sender>fOk_button</sender>
         <signal>clicked()</signal>
-        <receiver>PGetAsymmetryRunBlockDialogBase</receiver>
+        <receiver>PGetSingleHistoRunBlockDialogBase</receiver>
         <slot>accept()</slot>
     </connection>
     <connection>
         <sender>fCancel_button</sender>
         <signal>clicked()</signal>
-        <receiver>PGetAsymmetryRunBlockDialogBase</receiver>
+        <receiver>PGetSingleHistoRunBlockDialogBase</receiver>
         <slot>reject()</slot>
     </connection>
 </connections>
@@ -864,25 +806,20 @@
     <tabstop>fInstitute_comboBox</tabstop>
     <tabstop>fFileFormat_comboBox</tabstop>
     <tabstop>fMap_lineEdit</tabstop>
-    <tabstop>fForward_lineEdit</tabstop>
-    <tabstop>fBackward_lineEdit</tabstop>
-    <tabstop>fDataForwardStart_lineEdit</tabstop>
-    <tabstop>fDataForwardEnd_lineEdit</tabstop>
-    <tabstop>fDataBackwardStart_lineEdit</tabstop>
-    <tabstop>fDataBackwardEnd_lineEdit</tabstop>
-    <tabstop>fBackgroundForwardFix_lineEdit</tabstop>
-    <tabstop>fBackgroundBackwardFix_lineEdit</tabstop>
-    <tabstop>fBackgroundForwardStart_lineEdit</tabstop>
-    <tabstop>fBackgroundForwardEnd_lineEdit</tabstop>
-    <tabstop>fBackgroundBackwardStart_lineEdit</tabstop>
-    <tabstop>fBackgroundBackwardEnd_lineEdit</tabstop>
+    <tabstop>fNorm_lineEdit</tabstop>
+    <tabstop>fHistoNo_lineEdit</tabstop>
+    <tabstop>fDataStart_lineEdit</tabstop>
+    <tabstop>fDataEnd_lineEdit</tabstop>
+    <tabstop>fBackgroundFix_lineEdit</tabstop>
+    <tabstop>fBackgroundFit_lineEdit</tabstop>
+    <tabstop>fBackgroundStart_lineEdit</tabstop>
+    <tabstop>fBackgroundEnd_lineEdit</tabstop>
     <tabstop>fFitRangeStart_lineEdit</tabstop>
     <tabstop>fFitRangeEnd_lineEdit</tabstop>
     <tabstop>fPacking_lineEdit</tabstop>
-    <tabstop>fAlpha_lineEdit</tabstop>
-    <tabstop>fBeta_lineEdit</tabstop>
-    <tabstop>fT0Forward_lineEdit</tabstop>
-    <tabstop>fT0Backward_lineEdit</tabstop>
+    <tabstop>fT0_lineEdit</tabstop>
+    <tabstop>fLifetime_lineEdit</tabstop>
+    <tabstop>fLifetimeCorrection_checkBox</tabstop>
     <tabstop>fOk_button</tabstop>
     <tabstop>fCancel_button</tabstop>
     <tabstop>fHelp_button</tabstop>
