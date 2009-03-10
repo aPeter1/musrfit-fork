@@ -402,12 +402,17 @@ int PMsrHandler::WriteMsrLogFile()
   }
 
   // write functions block
-  f << endl << "FUNCTIONS";
-  CheckAndWriteComment(f, ++lineNo);
-  for (int i=0; i<GetNoOfFuncs(); i++) {
-    str = *fFuncHandler->GetFuncString(i);
-    str.ToLower();
-    f << endl << str.Data();
+cout << endl << ">> GetNoOfFuncs() = " << GetNoOfFuncs() << endl;
+  if (GetNoOfFuncs() != 0) {
+    f << endl << "FUNCTIONS";
+    CheckAndWriteComment(f, ++lineNo);
+    for (int i=0; i<GetNoOfFuncs(); i++) {
+      str = *fFuncHandler->GetFuncString(i);
+      str.ToLower();
+      f << endl << str.Data();
+      CheckAndWriteComment(f, ++lineNo);
+    }
+  } else {
     CheckAndWriteComment(f, ++lineNo);
   }
 
