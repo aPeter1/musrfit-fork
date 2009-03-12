@@ -63,7 +63,7 @@ PRunNonMusr::PRunNonMusr() : PRunBase()
 PRunNonMusr::PRunNonMusr(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
 {
   // get the proper run
-  fRawRunData = fRawData->GetRunData(fRunInfo->fRunName);
+  fRawRunData = fRawData->GetRunData(fRunInfo->fRunName[0]);
   if (!fRawRunData) { // couldn't get run
     cout << endl << "PRunNonMusr::PRunNonMusr(): **ERROR** Couldn't get raw run  data!";
     fValid = false;
@@ -237,7 +237,7 @@ bool PRunNonMusr::PrepareViewData()
 {
   bool success = true;
 
-cout << endl << ">> fRunInfo->fRunName = " << fRunInfo->fRunName.Data();
+cout << endl << ">> fRunInfo->fRunName = " << fRunInfo->fRunName[0].Data();
 
   // get x-, y-index
   unsigned int xIndex = GetXIndex();

@@ -133,7 +133,13 @@ void musrfit_debug_info(PMsrHandler* msrHandler)
     cout << endl << "******";
     cout << endl << "run no " << runNo++;
     cout << endl << "run (name, beamline, institute, data-file-format): ";
-    cout << endl << "     " << runs_it->fRunName << ", " << runs_it->fBeamline << ", " << runs_it->fInstitute << ", " << runs_it->fFileFormat;
+    cout << endl << "     " << runs_it->fRunName[0] << ", " << runs_it->fBeamline[0] << ", " << runs_it->fInstitute[0] << ", " << runs_it->fFileFormat[0];
+    if (runs_it->fRunName.size() > 1) {
+      for (unsigned int i=1; i<runs_it->fRunName.size(); i++) {
+        cout << endl << "runadd (name, beamline, institute, data-file-format): ";
+        cout << endl << "     " << runs_it->fRunName[i] << ", " << runs_it->fBeamline[i] << ", " << runs_it->fInstitute[i] << ", " << runs_it->fFileFormat[i];
+      }
+    }
     cout << endl << "fittype    " << runs_it->fFitType;
     cout << endl << "alpha      " << runs_it->fAlphaParamNo;
     cout << endl << "beta       " << runs_it->fBetaParamNo;
@@ -623,7 +629,7 @@ int main(int argc, char *argv[])
       success = runListCollection->Add(i, kFit);
       if (!success) {
         cout << endl << "**ERROR** Couldn't handle run no " << i << " ";
-        cout << (*msrHandler->GetMsrRunList())[i].fRunName.Data();
+        cout << (*msrHandler->GetMsrRunList())[i].fRunName[0].Data();
         break;
       }
     }

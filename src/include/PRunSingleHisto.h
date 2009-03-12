@@ -49,9 +49,9 @@ class PRunSingleHisto : public PRunBase
 
   protected:
     virtual bool PrepareData();
-    virtual bool PrepareFitData();
-    virtual bool PrepareRawViewData();
-    virtual bool PrepareViewData();
+    virtual bool PrepareFitData(PRawRunData* runData, const unsigned int histoNo);
+    virtual bool PrepareRawViewData(PRawRunData* runData, const unsigned int histoNo);
+    virtual bool PrepareViewData(PRawRunData* runData, const unsigned int histoNo);
 
   private:
     double fFitStartTime;

@@ -280,9 +280,9 @@ bool PRunAsymmetry::PrepareData()
 
   // get forward/backward histo from PRunDataHandler object ------------------------
   // get the correct run
-  PRawRunData *runData = fRawData->GetRunData(fRunInfo->fRunName);
+  PRawRunData *runData = fRawData->GetRunData(fRunInfo->fRunName[0]);
   if (!runData) { // run not found
-    cout << endl << "PRunAsymmetry::PrepareData(): Couldn't get run " << fRunInfo->fRunName.Data() << "!";
+    cout << endl << "PRunAsymmetry::PrepareData(): Couldn't get run " << fRunInfo->fRunName[0].Data() << "!";
     return false;
   }
 
@@ -332,7 +332,7 @@ bool PRunAsymmetry::PrepareData()
 
   // check if post pile up data shall be used
   unsigned int histoNo[2]; // forward/backward
-  if (fRunInfo->fFileFormat.Contains("ppc")) {
+  if (fRunInfo->fFileFormat[0].Contains("ppc")) {
     histoNo[0] = runData->fDataBin.size()/2 + fRunInfo->fForwardHistoNo-1;
     histoNo[1] = runData->fDataBin.size()/2 + fRunInfo->fBackwardHistoNo-1;
   } else {
@@ -349,10 +349,90 @@ bool PRunAsymmetry::PrepareData()
     cout << endl;
     return false;
   }
+
   // get raw forward/backward histo data
   for (unsigned int i=0; i<runData->fDataBin[histoNo[0]].size(); i++) {
     fForward.push_back(runData->fDataBin[histoNo[0]][i]);
     fBackward.push_back(runData->fDataBin[histoNo[1]][i]);
+  }
+
+  // check if addrun's are present, and if yes add data
+  // check if there are runs to be added to the current one
+  if (fRunInfo->fRunName.size() > 1) { // runs to be added present
+    PRawRunData *addRunData;
+    for (unsigned int i=1; i<fRunInfo->fRunName.size(); i++) {
+      // get run to be added to the main one
+      addRunData = fRawData->GetRunData(fRunInfo->fRunName[i]);
+      if (addRunData == 0) { // couldn't get run
+        cout << endl << "PRunAsymmetry::PrepareData(): **ERROR** Couldn't get addrun " << fRunInfo->fRunName[i].Data() << "!";
+        return false;
+      }
+
+      // get T0's of the to be added run
+      int t0Add[2] = {0, 0};
+      // check if the t0's are given in the msr-file
+      if (fRunInfo->fT0[0] == -1) { // t0's are NOT in the msr-file
+        // check if the t0's are in the data file
+        if (addRunData->fT0s.size() != 0) { // t0's in the run data
+          // keep the proper t0's. For asymmetry runs, forward/backward are holding the histo no
+          // fForwardHistoNo starts with 1 not with 0 etc. ;-)
+          t0Add[0] = addRunData->fT0s[fRunInfo->fForwardHistoNo-1];  // forward  t0
+          t0Add[1] = addRunData->fT0s[fRunInfo->fBackwardHistoNo-1]; // backward t0
+        } else { // t0's are neither in the run data nor in the msr-file -> not acceptable!
+          cout << endl << "PRunAsymmetry::PrepareData(): NO t0's found, neither in the addrun (" << fRunInfo->fRunName[i].Data() << ") data nor in the msr-file!";
+          return false;
+        }
+      } else { // t0's in the msr-file
+        // check if t0's are given in the data file
+        if (addRunData->fT0s.size() != 0) {
+          // compare t0's of the msr-file with the one in the data file
+          if (fabs(t0Add[0]-addRunData->fT0s[fRunInfo->fForwardHistoNo-1])>5.0) { // given in bins!!
+            cout << endl << "PRunAsymmetry::PrepareData(): **WARNING**: forward histo";
+            cout << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[0];
+            cout << endl << "  t0 from the data file is " << addRunData->fT0s[fRunInfo->fForwardHistoNo-1];
+            cout << endl << "  This is quite a deviation! Is this done intentionally??";
+            cout << endl << "  addrun: " << fRunInfo->fRunName[i].Data();
+            cout << endl;
+          }
+          if (fabs(t0Add[1]-addRunData->fT0s[fRunInfo->fBackwardHistoNo-1])>5.0) { // given in bins!!
+            cout << endl << "PRunAsymmetry::PrepareData(): **WARNING**: backward histo";
+            cout << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[1];
+            cout << endl << "  t0 from the data file is " << addRunData->fT0s[fRunInfo->fBackwardHistoNo-1];
+            cout << endl << "  This is quite a deviation! Is this done intentionally??";
+            cout << endl << "  addrun: " << fRunInfo->fRunName[i].Data();
+            cout << endl;
+          }
+        }
+        if (2*i+1 < fRunInfo->fT0.size()) {
+          t0Add[0] = fRunInfo->fT0[2*i];
+          t0Add[1] = fRunInfo->fT0[2*i+1];
+        } else {
+          cout << endl << "PRunAsymmetry::PrepareData(): **WARNING** NO t0's found, neither in the addrun data (";
+          cout << fRunInfo->fRunName[i].Data();
+          cout << "), nor in the msr-file! Will try to use the T0 of the run data (";
+          cout << fRunInfo->fRunName[i].Data();
+          cout << ") without any warranty!";
+          t0Add[0] = fRunInfo->fT0[0];
+          t0Add[1] = fRunInfo->fT0[1];
+        }
+      }
+
+      // add forward run
+      for (unsigned int j=0; j<runData->fDataBin[histoNo[0]].size(); j++) {
+        // make sure that the index stays in the proper range        
+        if ((j-t0Add[0]+fT0s[0] >= 0) && (j-t0Add[0]+fT0s[0] < addRunData->fDataBin[histoNo[0]].size())) {
+          fForward[j] += addRunData->fDataBin[histoNo[0]][j-t0Add[0]+fT0s[0]];
+        }
+      }
+
+      // add backward run
+      for (unsigned int j=0; j<runData->fDataBin[histoNo[1]].size(); j++) {
+        // make sure that the index stays in the proper range
+        if ((j-t0Add[1]+fT0s[1] >= 0) && (j-t0Add[1]+fT0s[1] < addRunData->fDataBin[histoNo[1]].size())) {
+          fBackward[j] += addRunData->fDataBin[histoNo[1]][j-t0Add[1]+fT0s[1]];
+        }
+      }
+    }
   }
 
   // subtract background from histogramms ------------------------------------------
@@ -435,11 +515,11 @@ bool PRunAsymmetry::SubtractEstimatedBkg()
   double beamPeriod = 0.0;
 
   // check if data are from PSI, RAL, or TRIUMF
-  if (fRunInfo->fInstitute.Contains("psi"))
+  if (fRunInfo->fInstitute[0].Contains("psi"))
     beamPeriod = ACCEL_PERIOD_PSI;
-  else if (fRunInfo->fInstitute.Contains("ral"))
+  else if (fRunInfo->fInstitute[0].Contains("ral"))
     beamPeriod = ACCEL_PERIOD_RAL;
-  else if (fRunInfo->fInstitute.Contains("triumf"))
+  else if (fRunInfo->fInstitute[0].Contains("triumf"))
     beamPeriod = ACCEL_PERIOD_TRIUMF;
   else
     beamPeriod = 0.0;
@@ -641,15 +721,6 @@ bool PRunAsymmetry::PrepareFitData(PRawRunData* runData, unsigned int histoNo[2]
       error = 1.0;
     fData.fError.push_back(error);
   }
-
-/*
-FILE *fp = fopen("asym.dat", "w");
-for (unsigned int i=0; i<fData.fValue.size(); i++) {
-  fprintf(fp, "%lf, %lf, %lf\n", fData.fDataTimeStart+(double)i*fData.fDataTimeStep, fData.fValue[i], fData.fError[i]);
-}
-fclose(fp);
-return false;
-*/
 
   // count the number of bins to be fitted
   double time;

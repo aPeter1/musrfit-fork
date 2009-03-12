@@ -88,7 +88,7 @@ class PRunBase
 
     PRunData fData;             ///< data to be fitted, viewed, i.e. binned data
     double fTimeResolution;     ///< time resolution
-    PDoubleVector fT0s;         ///< all t0's of a run! The derived classes will handle it
+    PIntVector fT0s;            ///< all t0's of a run! The derived classes will handle it
 
     virtual bool PrepareData() = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
 

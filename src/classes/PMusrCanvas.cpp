@@ -512,7 +512,7 @@ void PMusrCanvas::UpdateInfoPad()
   for (unsigned int i=0; i<fData.size(); i++) {
     // run label = run_name/histo/T=0K/B=0G/E=0keV/...
     runNo = (unsigned int)plotInfo.fRuns[i].Re()-1;
-    tstr  = runs[runNo].fRunName + TString(","); // run_name
+    tstr  = runs[runNo].fRunName[0] + TString(","); // run_name
     // histo info (depending on the fittype
     if (runs[runNo].fFitType == MSR_FITTYPE_SINGLE_HISTO) {
       tstr += TString("h:");
@@ -527,7 +527,7 @@ void PMusrCanvas::UpdateInfoPad()
     }
     // temperature if present
     tstr += TString("T=");
-    dval = fRunList->GetTemp(runs[runNo].fRunName);
+    dval = fRunList->GetTemp(runs[runNo].fRunName[0]);
     if (dval == -9.9e99) {
       tstr += TString("??,");
     } else {
@@ -536,7 +536,7 @@ void PMusrCanvas::UpdateInfoPad()
     }
     // field if present
     tstr += TString("B=");
-    dval = fRunList->GetField(runs[runNo].fRunName);
+    dval = fRunList->GetField(runs[runNo].fRunName[0]);
     if (dval == -9.9e99) {
       tstr += TString("??,");
     } else {
@@ -545,7 +545,7 @@ void PMusrCanvas::UpdateInfoPad()
     }
     // energy if present
     tstr += TString("E=");
-    dval = fRunList->GetEnergy(runs[runNo].fRunName);
+    dval = fRunList->GetEnergy(runs[runNo].fRunName[0]);
 //cout << endl << ">> dval = " << dval << " (Engery)";
     if (dval == -9.9e99) {
       tstr += TString("??,");
@@ -554,7 +554,7 @@ void PMusrCanvas::UpdateInfoPad()
       tstr += TString(sval) + TString("(keV),");
     }
     // setup if present
-    tstr += fRunList->GetSetup(runs[runNo].fRunName);
+    tstr += fRunList->GetSetup(runs[runNo].fRunName[0]);
     // add entry
     fInfoPad->AddEntry(fData[i].data, tstr.Data(), "p");
   }
@@ -1303,7 +1303,7 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
 
   // dataHisto -------------------------------------------------------------
   // create histo specific infos
-  name  = fMsrHandler->GetMsrRunList()->at(runNo).fRunName + "_DataRunNo";
+  name  = fMsrHandler->GetMsrRunList()->at(runNo).fRunName[0] + "_DataRunNo";
   name += (int)runNo;
   start = data->fDataTimeStart - data->fDataTimeStep/2.0;
   end   = data->fDataTimeStart + data->fValue.size()*data->fDataTimeStep + data->fDataTimeStep/2.0;
@@ -1339,7 +1339,7 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
 
   // theoHisto -------------------------------------------------------------
   // create histo specific infos
-  name  = fMsrHandler->GetMsrRunList()->at(runNo).fRunName + "_TheoRunNo";
+  name  = fMsrHandler->GetMsrRunList()->at(runNo).fRunName[0] + "_TheoRunNo";
   name += (int)runNo;
   start = data->fTheoryTimeStart - data->fTheoryTimeStep/2.0;
   end   = data->fTheoryTimeStart + data->fTheory.size()*data->fTheoryTimeStep + data->fTheoryTimeStep/2.0;
@@ -2166,8 +2166,8 @@ void PMusrCanvas::PlotData()
     PMsrRunList runs = *fMsrHandler->GetMsrRunList();
     PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
     unsigned int runNo = (unsigned int)plotInfo.fRuns[0].Re()-1;
-    TString xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName, runNo);
-    TString yAxisTitle = fRunList->GetYAxisTitle(runs[runNo].fRunName, runNo);
+    TString xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName[0], runNo);
+    TString yAxisTitle = fRunList->GetYAxisTitle(runs[runNo].fRunName[0], runNo);
 
     if (fNonMusrData.size() > 0) {
       // check if fMultiGraphData needs to be created, and if yes add all data and theory
@@ -2250,7 +2250,7 @@ void PMusrCanvas::PlotDifference()
     PMsrRunList runs = *fMsrHandler->GetMsrRunList();
     PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
     unsigned int runNo = (unsigned int)plotInfo.fRuns[0].Re()-1;
-    TString xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName, runNo);
+    TString xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName[0], runNo);
 
     // if fMultiGraphDiff is not present create it and add the diff data
     if (!fMultiGraphDiff) {

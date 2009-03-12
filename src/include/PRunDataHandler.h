@@ -60,8 +60,8 @@ class PRunDataHandler
     PRawRunDataList fData;  ///< keeping all the raw data
 
     virtual bool ReadFile();
-    virtual bool FileAlreadyRead(PMsrRunStructure &runInfo);
-    virtual bool FileExistsCheck(PMsrRunStructure &runInfo);
+    virtual bool FileAlreadyRead(TString runName);
+    virtual bool FileExistsCheck(PMsrRunStructure &runInfo, const unsigned int idx);
     virtual bool ReadRootFile(bool notPostPileup);
     virtual bool ReadNexusFile();
     virtual bool ReadWkmFile();

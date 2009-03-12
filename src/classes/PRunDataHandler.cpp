@@ -149,35 +149,36 @@ bool PRunDataHandler::ReadFile()
     return false;
   }
 
-  PMsrRunList::iterator run_it;
-  for (run_it = runList->begin(); run_it != runList->end(); ++run_it) {
-//cout << endl << "run : " << run_it->fRunName.Data();
-    fRunName = run_it->fRunName;
-    // check is file is already read
-    if (FileAlreadyRead(*run_it))
-      continue;
-    // check if file actually exists
-    if (!FileExistsCheck(*run_it))
-      return false;
-    // everything looks fine, hence try to read the data file
-    if (!run_it->fFileFormat.CompareTo("root-npp")) // not post pile up corrected histos
-      success = ReadRootFile(true);
-    else if (!run_it->fFileFormat.CompareTo("root-ppc")) // post pile up corrected histos
-      success = ReadRootFile(false);
-    else if (!run_it->fFileFormat.CompareTo("nexus"))
-      success = ReadNexusFile();
-    else if (!run_it->fFileFormat.CompareTo("psi-bin"))
-      success = ReadPsiBinFile();
-    else if (!run_it->fFileFormat.CompareTo("mud"))
-      success = ReadMudFile();
-    else if (!run_it->fFileFormat.CompareTo("wkm"))
-      success = ReadWkmFile();
-    else if (!run_it->fFileFormat.CompareTo("ascii"))
-      success = ReadAsciiFile();
-    else if (!run_it->fFileFormat.CompareTo("db"))
-      success = ReadDBFile();
-    else
-      success = false;
+  for (unsigned int i=0; i<runList->size(); i++) {
+    for (unsigned int j=0; j<runList->at(i).fRunName.size(); j++) {
+// cout << endl << "run : " << runList->at(i).fRunName[j].Data();
+      fRunName = runList->at(i).fRunName[j];
+      // check is file is already read
+      if (FileAlreadyRead(runList->at(i).fRunName[j]))
+        continue;
+      // check if file actually exists
+      if (!FileExistsCheck(runList->at(i), j))
+        return false;
+      // everything looks fine, hence try to read the data file
+      if (!runList->at(i).fFileFormat[j].CompareTo("root-npp")) // not post pile up corrected histos
+        success = ReadRootFile(true);
+      else if (!runList->at(i).fFileFormat[j].CompareTo("root-ppc")) // post pile up corrected histos
+        success = ReadRootFile(false);
+      else if (!runList->at(i).fFileFormat[j].CompareTo("nexus"))
+        success = ReadNexusFile();
+      else if (!runList->at(i).fFileFormat[j].CompareTo("psi-bin"))
+        success = ReadPsiBinFile();
+      else if (!runList->at(i).fFileFormat[j].CompareTo("mud"))
+        success = ReadMudFile();
+      else if (!runList->at(i).fFileFormat[j].CompareTo("wkm"))
+        success = ReadWkmFile();
+      else if (!runList->at(i).fFileFormat[j].CompareTo("ascii"))
+        success = ReadAsciiFile();
+      else if (!runList->at(i).fFileFormat[j].CompareTo("db"))
+        success = ReadDBFile();
+      else
+        success = false;
+    }
   }
 
   return success;
@@ -190,10 +191,10 @@ bool PRunDataHandler::ReadFile()
  * <p>
  *
  */
-bool PRunDataHandler::FileAlreadyRead(PMsrRunStructure &runInfo)
+bool PRunDataHandler::FileAlreadyRead(TString runName)
 {
   for (unsigned int i=0; i<fData.size(); i++) {
-    if (!fData[i].fRunName.CompareTo(runInfo.fRunName)) { // run alread read
+    if (!fData[i].fRunName.CompareTo(runName)) { // run alread read
       return true;
     }
   }
@@ -208,7 +209,7 @@ bool PRunDataHandler::FileAlreadyRead(PMsrRunStructure &runInfo)
  * <p>
  *
  */
-bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo)
+bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const unsigned int idx)
 {
   bool success = true;
 
@@ -218,37 +219,37 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo)
   TString str;
   TString ext;
 
-  runInfo.fBeamline.ToLower();
-  runInfo.fInstitute.ToLower();
-  runInfo.fFileFormat.ToLower();
+  runInfo.fBeamline[idx].ToLower();
+  runInfo.fInstitute[idx].ToLower();
+  runInfo.fFileFormat[idx].ToLower();
 
   // file extensions for the various formats
-  if (!runInfo.fFileFormat.CompareTo("root-npp")) // not post pile up corrected histos
+  if (!runInfo.fFileFormat[idx].CompareTo("root-npp")) // not post pile up corrected histos
     ext = TString("root");
-  else if (!runInfo.fFileFormat.CompareTo("root-ppc")) // post pile up corrected histos
+  else if (!runInfo.fFileFormat[idx].CompareTo("root-ppc")) // post pile up corrected histos
     ext = TString("root");
-  else if (!runInfo.fFileFormat.CompareTo("nexus"))
+  else if (!runInfo.fFileFormat[idx].CompareTo("nexus"))
     ext = TString("nexus");
-  else if (!runInfo.fFileFormat.CompareTo("psi-bin"))
+  else if (!runInfo.fFileFormat[idx].CompareTo("psi-bin"))
     ext = TString("bin");
-  else if (!runInfo.fFileFormat.CompareTo("mud"))
+  else if (!runInfo.fFileFormat[idx].CompareTo("mud"))
     ext = TString("mud");
-  else if (!runInfo.fFileFormat.CompareTo("wkm")) {
-    if (!runInfo.fBeamline.CompareTo("mue4"))
+  else if (!runInfo.fFileFormat[idx].CompareTo("wkm")) {
+    if (!runInfo.fBeamline[idx].CompareTo("mue4"))
       ext = TString("nemu");
     else
-      ext = runInfo.fBeamline;
+      ext = runInfo.fBeamline[idx];
   }
-  else if (!runInfo.fFileFormat.CompareTo("ascii"))
+  else if (!runInfo.fFileFormat[idx].CompareTo("ascii"))
     ext = TString("dat");
-  else if (!runInfo.fFileFormat.CompareTo("db"))
+  else if (!runInfo.fFileFormat[idx].CompareTo("db"))
     ext = TString("db");
   else
     success = false;
 
   // unkown file format found
   if (!success) {
-    str = runInfo.fFileFormat;
+    str = runInfo.fFileFormat[idx];
     str.ToUpper();
     cout << endl << "File Format '" << str.Data() << "' unsupported.";
     cout << endl << "  support file formats are:";
@@ -265,7 +266,7 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo)
   }
 
   // check if the file is in the local directory
-  str = runInfo.fRunName + TString(".") + ext;
+  str = runInfo.fRunName[idx] + TString(".") + ext;
   if (gSystem->AccessPathName(str.Data())!=true) { // found in the local dir
     pathName = str;
   }
@@ -273,7 +274,7 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo)
   // check if the file is found in the directory given in the startup file
   if (pathName.CompareTo("???") == 0) { // not found in local directory search
     for (unsigned int i=0; i<fDataPath.size(); i++) {
-      str = fDataPath[i] + TString("/") + runInfo.fRunName + TString(".") + ext;
+      str = fDataPath[i] + TString("/") + runInfo.fRunName[idx] + TString(".") + ext;
       if (gSystem->AccessPathName(str.Data())!=true) { // found
         pathName = str;
         break;
@@ -290,7 +291,7 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo)
     TObjString *ostr;
     for (int i=0; i<tokens->GetEntries(); i++) {
       ostr = dynamic_cast<TObjString*>(tokens->At(i));
-      str = ostr->GetString() + TString("/") + runInfo.fRunName + TString(".") + ext;
+      str = ostr->GetString() + TString("/") + runInfo.fRunName[idx] + TString(".") + ext;
       if (gSystem->AccessPathName(str.Data())!=true) { // found
         pathName = str;
         break;
@@ -304,18 +305,18 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo)
     // WKMFULLDATAPATH has the structure: path_1:path_2:...:path_n
     TObjArray *tokens = str.Tokenize(":");
     TObjString *ostr;
-    runInfo.fInstitute.ToUpper();
-    runInfo.fBeamline.ToUpper();
+    runInfo.fInstitute[idx].ToUpper();
+    runInfo.fBeamline[idx].ToUpper();
     TDatime datetime;
     TString dt;
     dt += datetime.GetYear();
     for (int i=0; i<tokens->GetEntries(); i++) {
       ostr = dynamic_cast<TObjString*>(tokens->At(i));
       str = ostr->GetString() + TString("/DATA/") +
-            runInfo.fInstitute + TString("/") +
-            runInfo.fBeamline + TString("/") +
+            runInfo.fInstitute[idx] + TString("/") +
+            runInfo.fBeamline[idx] + TString("/") +
             dt + TString("/") +
-            runInfo.fRunName + TString(".") + ext;
+            runInfo.fRunName[idx] + TString(".") + ext;
 cout << endl << ">> generated path: " << str.Data() << endl;
       if (gSystem->AccessPathName(str.Data())!=true) { // found
         pathName = str;
@@ -326,7 +327,7 @@ cout << endl << ">> generated path: " << str.Data() << endl;
 
   // no proper path name found
   if (pathName.CompareTo("???") == 0) {
-    cout << endl << "**ERROR** Couldn't find '" << runInfo.fRunName << "' in any standard path.";
+    cout << endl << "**ERROR** Couldn't find '" << runInfo.fRunName[idx] << "' in any standard path.";
     cout << endl << "  standard search pathes are:";
     cout << endl << "  1. the local directory";
     cout << endl << "  2. the data directory given in the startup XML file";
@@ -355,6 +356,7 @@ bool PRunDataHandler::ReadRootFile(bool notPostPileup)
   PRawRunData   runData;
 
 //cout << endl << ">> in ReadRootFile() ...";
+//cout << endl << ">> fRunPathName = " << fRunPathName.Data();
   TFile f(fRunPathName.Data());
   if (f.IsZombie()) {
     return false;
@@ -402,8 +404,9 @@ bool PRunDataHandler::ReadRootFile(bool notPostPileup)
   // check if t0's are there
   if (t0[0] != -1) { // ugly, but at the moment there is no other way
     // copy t0's so they are not lost
-    for (int i=0; i<noOfHistos; i++)
-      runData.fT0s.push_back(t0[i]);
+    for (int i=0; i<noOfHistos; i++) {
+      runData.fT0s.push_back((int)t0[i]);
+    }
   }
 
   // read data ---------------------------------------------------------
@@ -843,7 +846,7 @@ cout << endl;
     return false;
   }
   for (unsigned int i=0; i<ivec.size(); i++)
-    runData.fT0s.push_back((double)ivec[i]);
+    runData.fT0s.push_back(ivec[i]);
 
   // fill raw data
   PDoubleVector histoData;

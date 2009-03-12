@@ -402,7 +402,6 @@ int PMsrHandler::WriteMsrLogFile()
   }
 
   // write functions block
-cout << endl << ">> GetNoOfFuncs() = " << GetNoOfFuncs() << endl;
   if (GetNoOfFuncs() != 0) {
     f << endl << "FUNCTIONS";
     CheckAndWriteComment(f, ++lineNo);
@@ -419,17 +418,33 @@ cout << endl << ">> GetNoOfFuncs() = " << GetNoOfFuncs() << endl;
   // write run block
   for (unsigned int i=0; i<fRuns.size(); i++) {
     // run header
-    f << endl << "RUN " << fRuns[i].fRunName.Data() << " ";
-    str = fRuns[i].fBeamline;
+    f << endl << "RUN " << fRuns[i].fRunName[0].Data() << " ";
+    str = fRuns[i].fBeamline[0];
     str.ToUpper();
     f << str.Data() << " ";
-    str = fRuns[i].fInstitute;
+    str = fRuns[i].fInstitute[0];
     str.ToUpper();
     f << str.Data() << " ";
-    str = fRuns[i].fFileFormat;
+    str = fRuns[i].fFileFormat[0];
     str.ToUpper();
     f << str.Data() << "   (name beamline institute data-file-format)";
     CheckAndWriteComment(f, ++lineNo);
+    // check for ADDRUN entries
+    if (fRuns[i].fRunName.size() > 1) {
+      for (unsigned int j=1; j<fRuns[i].fRunName.size(); j++) {
+        f << endl << "ADDRUN " << fRuns[i].fRunName[j].Data() << " ";
+        str = fRuns[i].fBeamline[j];
+        str.ToUpper();
+        f << str.Data() << " ";
+        str = fRuns[i].fInstitute[j];
+        str.ToUpper();
+        f << str.Data() << " ";
+        str = fRuns[i].fFileFormat[j];
+        str.ToUpper();
+        f << str.Data() << "   (name beamline institute data-file-format)";
+        CheckAndWriteComment(f, ++lineNo);
+      }
+    }
     // fittype
     f.width(16);
     switch (fRuns[i].fFitType) {
@@ -609,12 +624,10 @@ cout << endl << ">> GetNoOfFuncs() = " << GetNoOfFuncs() << endl;
       CheckAndWriteComment(f, ++lineNo);
     }
     // t0
-    if (fRuns[i].fT0[0] != -1) {
+    if (fRuns[i].fT0.size() > 0) {
       f.width(16);
       f << endl << left << "t0";
-      for (unsigned int j=0; j<2; j++) {
-        if (fRuns[i].fT0[j] == -1)
-          break;
+      for (unsigned int j=0; j<fRuns[i].fT0.size(); j++) {
         f.width(8);
         f << left << fRuns[i].fT0[j];
       }
@@ -1248,16 +1261,37 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
       } else {
         // run name
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
-        param.fRunName = ostr->GetString();
+        param.fRunName.push_back(ostr->GetString());
         // beamline
         ostr = dynamic_cast<TObjString*>(tokens->At(2));
-        param.fBeamline = ostr->GetString();
+        param.fBeamline.push_back(ostr->GetString());
         // institute
         ostr = dynamic_cast<TObjString*>(tokens->At(3));
-        param.fInstitute = ostr->GetString();
+        param.fInstitute.push_back(ostr->GetString());
         // data file format
         ostr = dynamic_cast<TObjString*>(tokens->At(4));
-        param.fFileFormat = ostr->GetString();
+        param.fFileFormat.push_back(ostr->GetString());
+      }
+    }
+
+    // ADDRUN line ---------------------------------------------
+    if (iter->fLine.BeginsWith("addrun", TString::kIgnoreCase)) {
+      // get run name, beamline, institute, and file-format
+      if (tokens->GetEntries() < 5) {
+        error = true;
+      } else {
+        // run name
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        param.fRunName.push_back(ostr->GetString());
+        // beamline
+        ostr = dynamic_cast<TObjString*>(tokens->At(2));
+        param.fBeamline.push_back(ostr->GetString());
+        // institute
+        ostr = dynamic_cast<TObjString*>(tokens->At(3));
+        param.fInstitute.push_back(ostr->GetString());
+        // data file format
+        ostr = dynamic_cast<TObjString*>(tokens->At(4));
+        param.fFileFormat.push_back(ostr->GetString());
       }
     }
 
@@ -1478,14 +1512,14 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
 
     // t0 -----------------------------------------------------
     if (iter->fLine.BeginsWith("t0", TString::kIgnoreCase)) {
-      if ((tokens->GetEntries() != 2) && (tokens->GetEntries() != 3)) {
+      if (tokens->GetEntries() < 2) {
         error = true;
       } else {
         for (int i=1; i<tokens->GetEntries(); i++) {
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsDigit())
-            param.fT0[i-1] = str.Atoi();
+            param.fT0.push_back(str.Atoi());
           else
             error = true;
         }
@@ -1664,7 +1698,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
         found = false;
       }
       if (!found) {
-        cout << endl << ">> PMsrHandler::HandleRunEntry: **ERROR** for run " << fRuns[i].fRunName << ",  forward " << fRuns[i].fForwardHistoNo;
+        cout << endl << ">> PMsrHandler::HandleRunEntry: **ERROR** for run " << fRuns[i].fRunName[0].Data() << ",  forward " << fRuns[i].fForwardHistoNo;
         cout << endl << "   no background information found!";
         cout << endl << "   Either of the tags 'backgr.fit', 'backgr.fix', 'background'";
         cout << endl << "   with data is needed.";
@@ -1687,10 +1721,10 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
  */
 void PMsrHandler::InitRunParameterStructure(PMsrRunStructure &param)
 {
-  param.fRunName         = "";
-  param.fBeamline        = "";
-  param.fInstitute       = "";
-  param.fFileFormat      = "";
+  param.fRunName.clear();
+  param.fBeamline.clear();
+  param.fInstitute.clear();
+  param.fFileFormat.clear();
   param.fFitType         = -1;
   param.fAlphaParamNo    = -1;
   param.fBetaParamNo     = -1;
@@ -1710,8 +1744,7 @@ void PMsrHandler::InitRunParameterStructure(PMsrRunStructure &param)
     param.fBkgRange[i] = -1;
   for (int i=0; i<4; i++)
     param.fDataRange[i] = -1;
-  for (int i=0; i<2; i++)
-    param.fT0[i] = -1;
+  param.fT0.clear();
   for (int i=0; i<4; i++)
     param.fFitRange[i] = -1;
   param.fPacking = 1;
