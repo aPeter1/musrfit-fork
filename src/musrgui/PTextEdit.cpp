@@ -53,6 +53,8 @@ using namespace std;
 #include <qmessagebox.h>
 #include <qdialog.h>
 #include <qvaluevector.h>
+#include <qimage.h>
+#include <qpixmap.h>
 
 #include "PTextEdit.h"
 #include "PSubTextEdit.h"
@@ -62,6 +64,35 @@ using namespace std;
 #include "PGetDefaultDialog.h"
 #include "forms/PMusrGuiAbout.h"
 #include "PMlog2DbDialog.h"
+
+/* XPM */
+static const char * const musrfit_xpm[] = {
+"22 22 3 1",
+" 	c None",
+".	c #FF0000",
+"+	c #000000",
+"     ...              ",
+"    +... .            ",
+"  .+ ...+.            ",
+" ...  . ...           ",
+" ...    ...           ",
+" ...    ...           ",
+"+ .      .+           ",
+"         .+           ",
+"           .          ",
+"          ...         ",
+"          ...     .   ",
+"          ...+    .   ",
+"           .  +  ...  ",
+"            ...++...  ",
+"++++ + +++++...  ...  ",
+"+    +   +  ...   .+  ",
+"+    +   +          . ",
+"++++ +   +         ...",
+"+    +   +         ...",
+"+    +   +         ...",
+"+    +   +          . ",
+"                      "};
 
 //----------------------------------------------------------------------------------------------------
 /**
@@ -87,6 +118,10 @@ PTextEdit::PTextEdit( QWidget *parent, const char *name )
 
   textFamily("Courier");
   textSize("11"); // 11pt
+
+  QImage img(musrfit_xpm);
+  QPixmap image0 = img;
+  setIcon( image0 );
 
   if ( qApp->argc() != 1 ) {
     for ( int i = 1; i < qApp->argc(); ++i )
