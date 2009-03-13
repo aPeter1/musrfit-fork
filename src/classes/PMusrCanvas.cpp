@@ -512,7 +512,10 @@ void PMusrCanvas::UpdateInfoPad()
   for (unsigned int i=0; i<fData.size(); i++) {
     // run label = run_name/histo/T=0K/B=0G/E=0keV/...
     runNo = (unsigned int)plotInfo.fRuns[i].Re()-1;
-    tstr  = runs[runNo].fRunName[0] + TString(","); // run_name
+    if (runs[runNo].fRunName.size() > 1)
+      tstr  = "++" + runs[runNo].fRunName[0] + TString(","); // run_name
+    else
+      tstr  = runs[runNo].fRunName[0] + TString(","); // run_name
     // histo info (depending on the fittype
     if (runs[runNo].fFitType == MSR_FITTYPE_SINGLE_HISTO) {
       tstr += TString("h:");
