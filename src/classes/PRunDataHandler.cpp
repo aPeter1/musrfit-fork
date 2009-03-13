@@ -494,8 +494,6 @@ bool PRunDataHandler::ReadNexusFile()
  */
 bool PRunDataHandler::ReadWkmFile()
 {
-//  cout << endl << "PRunDataHandler::ReadWkmFile(): Sorry, not yet implemented ...";
-
   PDoubleVector histoData;
   PRawRunData runData;
 
@@ -511,7 +509,7 @@ bool PRunDataHandler::ReadWkmFile()
   // open file
   ifstream f;
 
-  // open dump-file
+  // open wkm-file
   f.open(fRunPathName.Data(), ifstream::in);
   if (!f.is_open()) {
     cout << endl << "Couldn't open run data (" << fRunPathName.Data() << ") file for reading, sorry ...";

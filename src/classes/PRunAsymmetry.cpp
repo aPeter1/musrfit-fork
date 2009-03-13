@@ -371,7 +371,7 @@ bool PRunAsymmetry::PrepareData()
       // get T0's of the to be added run
       int t0Add[2] = {0, 0};
       // check if the t0's are given in the msr-file
-      if (fRunInfo->fT0[0] == -1) { // t0's are NOT in the msr-file
+      if (i >= fRunInfo->fT0.size()) { // t0's are NOT in the msr-file
         // check if the t0's are in the data file
         if (addRunData->fT0s.size() != 0) { // t0's in the run data
           // keep the proper t0's. For asymmetry runs, forward/backward are holding the histo no
@@ -384,25 +384,6 @@ bool PRunAsymmetry::PrepareData()
         }
       } else { // t0's in the msr-file
         // check if t0's are given in the data file
-        if (addRunData->fT0s.size() != 0) {
-          // compare t0's of the msr-file with the one in the data file
-          if (fabs(t0Add[0]-addRunData->fT0s[fRunInfo->fForwardHistoNo-1])>5.0) { // given in bins!!
-            cout << endl << "PRunAsymmetry::PrepareData(): **WARNING**: forward histo";
-            cout << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[0];
-            cout << endl << "  t0 from the data file is " << addRunData->fT0s[fRunInfo->fForwardHistoNo-1];
-            cout << endl << "  This is quite a deviation! Is this done intentionally??";
-            cout << endl << "  addrun: " << fRunInfo->fRunName[i].Data();
-            cout << endl;
-          }
-          if (fabs(t0Add[1]-addRunData->fT0s[fRunInfo->fBackwardHistoNo-1])>5.0) { // given in bins!!
-            cout << endl << "PRunAsymmetry::PrepareData(): **WARNING**: backward histo";
-            cout << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[1];
-            cout << endl << "  t0 from the data file is " << addRunData->fT0s[fRunInfo->fBackwardHistoNo-1];
-            cout << endl << "  This is quite a deviation! Is this done intentionally??";
-            cout << endl << "  addrun: " << fRunInfo->fRunName[i].Data();
-            cout << endl;
-          }
-        }
         if (2*i+1 < fRunInfo->fT0.size()) {
           t0Add[0] = fRunInfo->fT0[2*i];
           t0Add[1] = fRunInfo->fT0[2*i+1];
@@ -414,6 +395,25 @@ bool PRunAsymmetry::PrepareData()
           cout << ") without any warranty!";
           t0Add[0] = fRunInfo->fT0[0];
           t0Add[1] = fRunInfo->fT0[1];
+        }
+        if (addRunData->fT0s.size() != 0) {
+          // compare t0's of the msr-file with the one in the data file
+          if (fabs(t0Add[0]-addRunData->fT0s[fRunInfo->fForwardHistoNo-1])>5.0) { // given in bins!!
+            cout << endl << "PRunAsymmetry::PrepareData(): **WARNING**: forward histo";
+            cout << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[2*i];
+            cout << endl << "  t0 from the data file is " << addRunData->fT0s[fRunInfo->fForwardHistoNo-1];
+            cout << endl << "  This is quite a deviation! Is this done intentionally??";
+            cout << endl << "  addrun: " << fRunInfo->fRunName[i].Data();
+            cout << endl;
+          }
+          if (fabs(t0Add[1]-addRunData->fT0s[fRunInfo->fBackwardHistoNo-1])>5.0) { // given in bins!!
+            cout << endl << "PRunAsymmetry::PrepareData(): **WARNING**: backward histo";
+            cout << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[2*i+1];
+            cout << endl << "  t0 from the data file is " << addRunData->fT0s[fRunInfo->fBackwardHistoNo-1];
+            cout << endl << "  This is quite a deviation! Is this done intentionally??";
+            cout << endl << "  addrun: " << fRunInfo->fRunName[i].Data();
+            cout << endl;
+          }
         }
       }
 
