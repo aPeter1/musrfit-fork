@@ -157,6 +157,10 @@ bool PRunNonMusr::PrepareData()
 
   cout << endl << "in PRunNonMusr::PrepareData(): will feed fFitData";
 
+  if (fRunInfo->fRunName.size() > 1) { // ADDRUN present which is not supported for NonMusr
+    cout << endl << ">> PRunNonMusr::PrepareData(): **WARNING** ADDRUN NOT SUPPORTED FOR THIS FIT TYPE, WILL IGNORE IT." << endl;
+  }
+
   if (fHandleTag == kFit)
     success = PrepareFitData();
   else if (fHandleTag == kView)
