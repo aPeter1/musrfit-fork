@@ -101,6 +101,7 @@ private:
   PAdmin *fAdmin;
 
   bool fShowMlog;
+  bool fOpenMlogAfterFit;
   bool fKeepMinuit2Output;
   int  fDump;
 

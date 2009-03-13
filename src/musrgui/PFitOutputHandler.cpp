@@ -50,6 +50,7 @@ PFitOutputHandler::PFitOutputHandler(QValueVector<QString> &cmd)
   connect( quitButton, SIGNAL(clicked()),
            this, SLOT(accept()) );
   resize( 800, 500 );
+  quitButton->setFocus();
 
   // QProcess related code
   proc = new QProcess( this );
@@ -93,17 +94,6 @@ void PFitOutputHandler::readFromStdErr()
   // Bear in mind that the data might be output in chunks.
   output->append( proc->readStderr() );
 }
-
-//----------------------------------------------------------------------------------------------------
-/**
- * <p>
- */
-/*
-void PFitOutputHandler::scrollToTop()
-{
-  output->setContentsPos( 0, 0 );
-}
-*/
 
 //----------------------------------------------------------------------------------------------------
 // END

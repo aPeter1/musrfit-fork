@@ -54,7 +54,6 @@ public:
 public slots:
     void readFromStdOut();
     void readFromStdErr();
-//    void scrollToTop();
 
 private:
     QProcess *proc;

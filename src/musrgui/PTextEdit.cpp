@@ -104,6 +104,7 @@ PTextEdit::PTextEdit( QWidget *parent, const char *name )
   fAdmin = new PAdmin();
 
   fShowMlog = fAdmin->getShowMlog();
+  fOpenMlogAfterFit = fAdmin->getOpenMlogAfterFit();
   fKeepMinuit2Output = false;
   fDump = 0; // 0 = no dump, 1 = ascii dump, 2 = root dump
 
@@ -868,6 +869,25 @@ void PTextEdit::musrFit()
   PFitOutputHandler fitOutputHandler(cmd);
   fitOutputHandler.setModal(true);
   fitOutputHandler.exec();
+
+  if (fOpenMlogAfterFit) {
+    // get current file name and replace the msr-extension through mlog
+    str = fTabWidget->label(fTabWidget->currentPageIndex());
+    int idx = str.find(".msr");
+    if (idx > 0) {
+      str.replace(idx, 4, ".mlog");
+    }
+
+    // check if mlog-file is already open, and if yes close it
+    for (int i=0; i<fTabWidget->count(); i++) {
+      if (fTabWidget->label(i).find(str) >= 0) {
+        delete fTabWidget->page(i);
+      }
+    }
+
+    // open mlog files
+    load(str);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1007,10 +1027,6 @@ void PTextEdit::musrMlog2Db()
       cmd.append(str);
     }
 
-for (unsigned int i=0; i<cmd.size(); i++)
-  cout << endl << ">> " << cmd[i].latin1();
-cout << endl;
-
     PFitOutputHandler fitOutputHandler(cmd);
     fitOutputHandler.setModal(true);
     fitOutputHandler.exec();
@@ -1073,10 +1089,11 @@ void PTextEdit::musrT0()
  */
 void PTextEdit::musrPrefs()
 {
-  PPrefsDialog *dlg = new PPrefsDialog(fKeepMinuit2Output, fDump);
+  PPrefsDialog *dlg = new PPrefsDialog(fKeepMinuit2Output, fOpenMlogAfterFit, fDump);
 
   if (dlg->exec() == QDialog::Accepted) {
     fKeepMinuit2Output = dlg->keepMinuit2Output();
+    fOpenMlogAfterFit = dlg->openMlogAfterFit();
     fDump = dlg->getDump();
   }
 }

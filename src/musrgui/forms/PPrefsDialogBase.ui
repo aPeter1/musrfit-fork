@@ -9,13 +9,19 @@
             <x>0</x>
             <y>0</y>
             <width>541</width>
-            <height>186</height>
+            <height>206</height>
         </rect>
     </property>
     <property name="caption">
         <string>Preferences</string>
     </property>
+    <property name="icon">
+        <pixmap>image0</pixmap>
+    </property>
     <property name="sizeGripEnabled">
+        <bool>true</bool>
+    </property>
+    <property name="modal">
         <bool>true</bool>
     </property>
     <widget class="QTabWidget">
@@ -27,7 +33,7 @@
                 <x>10</x>
                 <y>20</y>
                 <width>520</width>
-                <height>110</height>
+                <height>130</height>
             </rect>
         </property>
         <widget class="QWidget">
@@ -94,6 +100,22 @@
                     <string>will generate a ROOT dump file after the fit with the data and the theory</string>
                 </property>
             </widget>
+            <widget class="QCheckBox">
+                <property name="name">
+                    <cstring>fOpenMlogAfterFit_checkBox</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>10</x>
+                        <y>70</y>
+                        <width>140</width>
+                        <height>22</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>open mlog after fit</string>
+                </property>
+            </widget>
         </widget>
     </widget>
     <widget class="QLayoutWidget">
@@ -103,7 +125,7 @@
         <property name="geometry">
             <rect>
                 <x>10</x>
-                <y>140</y>
+                <y>160</y>
                 <width>520</width>
                 <height>33</height>
             </rect>
@@ -183,6 +205,11 @@
         </hbox>
     </widget>
 </widget>
+<images>
+    <image name="image0">
+        <data format="PNG" length="270">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000d549444154388db594510e84200c44a78653d1f34faf853fd66d2a2aa8fb1222697068cb80d0884cadda7c6e46392c1860c9010da2bd8d4629f1670140a3200869d536ad8a2d63cfc805bc7c338ac766b33eb4c279dadb5be1b72c5ab5c5d2f3028fcda6bff042f40dd2f3f119355477c7708fdd15a3eef8ecf0f2868f847bb733332c1c9d43a344f15e9bca51e25a3cde52493736d3e2d85cb27ff36861d0081ad18b15607b783a785cabb67d4da7bf5e890070f34eb5c245cee2c4cfebc533ca593e211ee2652bdef0bfd7ed4bb1e8f5a947688615932a98c849f587290000000049454e44ae426082</data>
+    </image>
+</images>
 <connections>
     <connection>
         <sender>buttonOk</sender>

@@ -9,6 +9,7 @@
     <default_save_path>/mnt/home/nemu/analysis</default_save_path>
     <msr_default_file_path>/home/nemu/analysis/musrfit/src/musrgui</msr_default_file_path>
     <show_mlog>y</show_mlog>
+    <open_mlog_after_fit>y</open_mlog_after_fit>
   </general>
   <msr_file_defaults>
     <beamline>mue4</beamline>
