@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  PGetAsymmetryRunBlockDialog.h
+  PGetSingleHistoRunBlockDialog.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -29,27 +29,30 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PGETASYMMETRYRUNBLOCKDIALOG_H_
-#define _PGETASYMMETRYRUNBLOCKDIALOG_H_
+#ifndef _PGETSINGLEHISTORUNBLOCKDIALOG_H_
+#define _PGETSINGLEHISTORUNBLOCKDIALOG_H_
 
-#include "forms/PGetAsymmetryRunBlockDialogBase.h"
+#include <qstring.h>
+#include <qlineedit.h>
 
-class PGetAsymmetryRunBlockDialog : public PGetAsymmetryRunBlockDialogBase
+#include "forms/PGetSingleHistoRunBlockDialogBase.h"
+
+class PGetSingleHistoRunBlockDialog : public PGetSingleHistoRunBlockDialogBase
 {
   public:
-    PGetAsymmetryRunBlockDialog();
+    PGetSingleHistoRunBlockDialog();
 
     QString GetRunHeaderInfo();
-    QString GetAlphaParameter(bool &present);
-    QString GetBetaParameter(bool &present);
     QString GetMap(bool &valid);
     QString GetForward() { return QString("forward         " + fForward_lineEdit->text() + "\n"); }
-    QString GetBackward() { return QString("backward        " + fBackward_lineEdit->text() + "\n"); }
-    QString GetBackground(bool &valid);
+    QString GetNorm() { return QString("norm            " + fNorm_lineEdit->text() + "\n"); }
     QString GetData(bool &valid);
-    QString GetT0(bool &present);
+    QString GetBackground(bool &valid);
     QString GetFitRange(bool &valid);
     QString GetPacking(bool &present);
+    QString GetT0(bool &present);
+    QString GetMuonLifetimeParam(bool &present);
+    QString GetLifetimeCorrection(bool &present);
 };
 
-#endif // _PGETASYMMETRYRUNBLOCKDIALOG_H_
+#endif // _PGETSINGLEHISTORUNBLOCKDIALOG_H_
