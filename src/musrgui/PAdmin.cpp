@@ -80,10 +80,6 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eFileFormat;
   } else if (qName == "msr_default_file_path") {
     fKeyWord = eMsrDefaultFilePath;
-  } else if (qName == "show_mlog") {
-    fKeyWord = eShowMlog;
-  } else if (qName == "open_mlog_after_fit") {
-    fKeyWord = eOpenMlogAfterFit;
   }
 
   return true;
@@ -127,18 +123,6 @@ bool PAdminXMLParser::characters(const QString& str)
     case eMsrDefaultFilePath:
       fAdmin->setMsrDefaultFilePath(QString(str.ascii()).stripWhiteSpace());
       break;
-    case eShowMlog:
-      if (str == "n")
-        fAdmin->setShowMlog(false);
-      else
-        fAdmin->setShowMlog(true);
-      break;
-    case eOpenMlogAfterFit:
-      if (str == "n")
-        fAdmin->setOpenMlogAfterFit(false);
-      else
-        fAdmin->setOpenMlogAfterFit(true);
-      break;
     default:
       break;
   }
@@ -171,9 +155,6 @@ PAdmin::PAdmin()
   fBeamline   = QString("");
   fInstitute  = QString("");
   fFileFormat = QString("");
-
-  fShowMlog = true;
-  fOpenMlogAfterFit = true;
 
   // XML Parser part
   QString path = getenv("MUSRFITPATH");

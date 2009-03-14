@@ -35,17 +35,12 @@
 /**
  * <p>
  */
-PPrefsDialog::PPrefsDialog(const bool keep_mn2_output, const bool open_mlog_after_fit, const int dump_tag)
+PPrefsDialog::PPrefsDialog(const bool keep_mn2_output, const int dump_tag)
 {
   if (keep_mn2_output)
     fKeepMn2Output_checkBox->setChecked(true);
   else
     fKeepMn2Output_checkBox->setChecked(false);
-
-  if (open_mlog_after_fit)
-    fOpenMlogAfterFit_checkBox->setChecked(true);
-  else
-    fOpenMlogAfterFit_checkBox->setChecked(false);
 
   if (dump_tag == 1) {
     fDumpAscii_checkBox->setChecked(true);

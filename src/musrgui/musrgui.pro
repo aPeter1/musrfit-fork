@@ -64,4 +64,5 @@ IMAGES = images/editcopy.xpm \
     images/musrmlog2db.xpm \
     images/musrview.xpm \
     images/musrt0.xpm \
-    images/musrprefs.xpm
+    images/musrprefs.xpm \
+    images/musrswap.xpm

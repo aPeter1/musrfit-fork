@@ -103,8 +103,6 @@ PTextEdit::PTextEdit( QWidget *parent, const char *name )
 {
   fAdmin = new PAdmin();
 
-  fShowMlog = fAdmin->getShowMlog();
-  fOpenMlogAfterFit = fAdmin->getOpenMlogAfterFit();
   fKeepMinuit2Output = false;
   fDump = 0; // 0 = no dump, 1 = ascii dump, 2 = root dump
 
@@ -272,6 +270,11 @@ void PTextEdit::setupMusrActions()
   a->addTo( tb );
   a->addTo( menu );
 
+  a = new QAction( QPixmap::fromMimeSource( "musrswap.xpm" ), tr( "&Swap Msr <-> Mlog" ), ALT + Key_S, this, "musrSwapMsrMlog" );
+  connect( a, SIGNAL( activated() ), this, SLOT( musrSwapMsrMlog() ) );
+  a->addTo( tb );
+  a->addTo( menu );
+
   a = new QAction( QPixmap::fromMimeSource( "musrmlog2db.xpm" ), tr( "&Mlog2dB" ), ALT + Key_M, this, "musrMlog2Db" );
   connect( a, SIGNAL( activated() ), this, SLOT( musrMlog2Db() ) );
   a->addTo( tb );
@@ -293,17 +296,6 @@ void PTextEdit::setupMusrActions()
   connect( a, SIGNAL( activated() ), this, SLOT( musrPrefs() ) );
   a->addTo( tb );
   a->addTo( menu );
-
-  fComboShowMlog = new QComboBox( TRUE, tb );
-  fComboShowMlog->setEditable(false);
-  fComboShowMlog->insertItem("view mlog");
-  fComboShowMlog->insertItem("view msr");
-  connect( fComboShowMlog, SIGNAL( activated( const QString & ) ),
-           this, SLOT( musrShowMlog( const QString & ) ) );
-  if (fShowMlog)
-    fComboShowMlog->setCurrentItem(0);
-  else
-    fComboShowMlog->setCurrentItem(1);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -870,6 +862,8 @@ void PTextEdit::musrFit()
   fitOutputHandler.setModal(true);
   fitOutputHandler.exec();
 
+  musrSwapMsrMlog();
+/*
   if (fOpenMlogAfterFit) {
     // get current file name and replace the msr-extension through mlog
     str = fTabWidget->label(fTabWidget->currentPageIndex());
@@ -888,6 +882,7 @@ void PTextEdit::musrFit()
     // open mlog files
     load(str);
   }
+*/
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1059,11 +1054,6 @@ void PTextEdit::musrView()
   cmd = str + " ";
 
   str = *fFilenames.find( currentEditor() );
-  if (fShowMlog) {
-    int idx = str.find(".msr");
-    if (idx > 0)
-      str.replace(idx, 4, ".mlog");
-  }
   cmd += str + " &";
 
   system(cmd.latin1());
@@ -1089,11 +1079,10 @@ void PTextEdit::musrT0()
  */
 void PTextEdit::musrPrefs()
 {
-  PPrefsDialog *dlg = new PPrefsDialog(fKeepMinuit2Output, fOpenMlogAfterFit, fDump);
+  PPrefsDialog *dlg = new PPrefsDialog(fKeepMinuit2Output, fDump);
 
   if (dlg->exec() == QDialog::Accepted) {
     fKeepMinuit2Output = dlg->keepMinuit2Output();
-    fOpenMlogAfterFit = dlg->openMlogAfterFit();
     fDump = dlg->getDump();
   }
 }
@@ -1102,12 +1091,74 @@ void PTextEdit::musrPrefs()
 /**
  * <p>
  */
-void PTextEdit::musrShowMlog( const QString &str )
+void PTextEdit::musrSwapMsrMlog()
 {
-  if (str.find("mlog") > 0)
-    fShowMlog = true;
-  else
-    fShowMlog = false;
+  if ( !currentEditor() )
+    return;
+
+  // get current file name
+  QString currentFileName = *fFilenames.find( currentEditor() );
+  QString swapFileName;
+  QString tempFileName = QString("__swap__.msr");
+
+  // check if it is a msr-, mlog-, or another file
+  int idx;
+  if ((idx = currentFileName.find(".msr")) > 0) { // msr-file
+    swapFileName = currentFileName;
+    swapFileName.replace(idx, 5, ".mlog");
+  } else if ((idx = currentFileName.find(".mlog")) > 0) { // mlog-file
+    swapFileName = currentFileName;
+    swapFileName.replace(idx, 5, ".msr ").stripWhiteSpace();
+  } else { // neither a msr- nor a mlog-file
+    QMessageBox::information( this, "musrSwapMsrMlog",
+    "This is neither a msr- nor a mlog-file, hence nothing to be swapped.\n",
+    QMessageBox::Ok );
+    return;
+  }
+
+  // check if the swapFile exists
+  if (!QFile::exists(swapFileName)) {
+    QString msg = "swap file '" + swapFileName + "' doesn't exist.\nCannot swap anything.";
+    QMessageBox::warning( this, "musrSwapMsrMlog",
+                          msg, QMessageBox::Ok, QMessageBox::NoButton );
+    return;
+  }
+
+  // check if the file needs to be saved
+  if (fTabWidget->label(fTabWidget->currentPageIndex()).find("*") > 0) { // needs to be saved first
+    fileSave();
+  }
+
+  // swap files
+  QString cmd;
+  cmd = QString("cp ") + currentFileName + QString(" ") + tempFileName;
+  system(cmd.latin1());
+  cmd = QString("cp ") + swapFileName + QString(" ") + currentFileName;
+  system(cmd.latin1());
+  cmd = QString("cp ") + tempFileName + QString(" ") + swapFileName;
+  system(cmd.latin1());
+  cmd = QString("rm ") + tempFileName;
+  system(cmd.latin1());
+
+  // reload current file
+  fileClose();
+  load(currentFileName);
+
+  // check if swap file is open as well, and if yes, reload it
+  idx = -1;
+  for (int i=0; i<fTabWidget->count(); i++) {
+    if (fTabWidget->label(i).find(swapFileName) >= 0) {
+      idx = i;
+      break;
+    }
+  }
+  if (idx >= 0) { // swap file is open
+    int currentIdx = fTabWidget->currentPageIndex();
+    fTabWidget->setCurrentPage(idx);
+    fileClose();
+    load(swapFileName);
+    fTabWidget->setCurrentPage(currentIdx);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

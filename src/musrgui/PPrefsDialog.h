@@ -39,10 +39,9 @@
 class PPrefsDialog : public PPrefsDialogBase
 {
   public:
-    PPrefsDialog(const bool keep_mn2_output, const bool open_mlog_after_fit, const int dump_tag);
+    PPrefsDialog(const bool keep_mn2_output, const int dump_tag);
 
     bool keepMinuit2Output() { return fKeepMn2Output_checkBox->isChecked(); }
-    bool openMlogAfterFit() { return fOpenMlogAfterFit_checkBox->isChecked(); }
     int  getDump();
 
   public slots:

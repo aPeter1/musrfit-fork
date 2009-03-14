@@ -47,7 +47,7 @@ class PAdminXMLParser : public QXmlDefaultHandler
 
   private:
     enum EAdminKeyWords {eEmpty, eExecPath, eDefaultSavePath, eBeamline, eInstitute, eFileFormat,
-                         eMsrDefaultFilePath, eShowMlog, eOpenMlogAfterFit};
+                         eMsrDefaultFilePath};
 
     bool startDocument();
     bool startElement( const QString&, const QString&, const QString& ,
@@ -74,8 +74,6 @@ class PAdmin
     QString getInstitute() { return fInstitute; }
     QString getFileFormat() { return fFileFormat; }
     QString getMsrDefaultFilePath() { return fMsrDefaultFilePath; }
-    bool    getShowMlog() { return fShowMlog; }
-    bool    getOpenMlogAfterFit() { return fOpenMlogAfterFit; }
 
   protected:
     void setExecPath(const QString str) { fExecPath = str; }
@@ -84,8 +82,6 @@ class PAdmin
     void setInstitute(const QString str) { fInstitute = str; }
     void setFileFormat(const QString str) { fFileFormat = str; }
     void setMsrDefaultFilePath(const QString str) { fMsrDefaultFilePath = str; }
-    void setShowMlog(const bool flag) { fShowMlog = flag; }
-    void setOpenMlogAfterFit(const bool flag) { fOpenMlogAfterFit = flag; }
 
   private:
     friend class PAdminXMLParser;
@@ -98,8 +94,6 @@ class PAdmin
     QString fFileFormat;
 
     QString fMsrDefaultFilePath;
-    bool fShowMlog;
-    bool fOpenMlogAfterFit;
 };
 
 #endif // _PADMIN_H_

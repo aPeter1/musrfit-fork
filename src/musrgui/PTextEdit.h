@@ -88,7 +88,7 @@ private slots:
   void musrView();
   void musrT0();
   void musrPrefs();
-  void musrShowMlog( const QString &str );
+  void musrSwapMsrMlog();
 
   void helpContents();
   void helpAboutQt();
@@ -100,15 +100,11 @@ private slots:
 private:
   PAdmin *fAdmin;
 
-  bool fShowMlog;
-  bool fOpenMlogAfterFit;
   bool fKeepMinuit2Output;
   int  fDump;
 
   QComboBox *fComboFont;
   QComboBox *fComboSize;
-
-  QComboBox *fComboShowMlog;
 
   QTabWidget *fTabWidget;
   QMap<PSubTextEdit*, QString> fFilenames;
