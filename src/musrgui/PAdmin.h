@@ -47,7 +47,8 @@ class PAdminXMLParser : public QXmlDefaultHandler
 
   private:
     enum EAdminKeyWords {eEmpty, eExecPath, eDefaultSavePath, eBeamline, eInstitute, eFileFormat,
-                         eMsrDefaultFilePath};
+                         eLifetimeCorrection, eMsrDefaultFilePath,
+                         eHelpMain};
 
     bool startDocument();
     bool startElement( const QString&, const QString&, const QString& ,
@@ -73,7 +74,9 @@ class PAdmin
     QString getBeamline() { return fBeamline; }
     QString getInstitute() { return fInstitute; }
     QString getFileFormat() { return fFileFormat; }
+    bool    getLifetimeCorrectionFlag() { return fLifetimeCorrection; }
     QString getMsrDefaultFilePath() { return fMsrDefaultFilePath; }
+    QString getHelpMain() { return fHelpMain; }
 
   protected:
     void setExecPath(const QString str) { fExecPath = str; }
@@ -81,7 +84,9 @@ class PAdmin
     void setBeamline(const QString str) { fBeamline = str; }
     void setInstitute(const QString str) { fInstitute = str; }
     void setFileFormat(const QString str) { fFileFormat = str; }
+    void setLifetimeCorrectionFlag(const bool flag) { fLifetimeCorrection = flag; }
     void setMsrDefaultFilePath(const QString str) { fMsrDefaultFilePath = str; }
+    void setHelpMain(const QString str) { fHelpMain = str; }
 
   private:
     friend class PAdminXMLParser;
@@ -92,8 +97,11 @@ class PAdmin
     QString fBeamline;
     QString fInstitute;
     QString fFileFormat;
+    bool fLifetimeCorrection;
 
     QString fMsrDefaultFilePath;
+
+    QString fHelpMain;
 };
 
 #endif // _PADMIN_H_

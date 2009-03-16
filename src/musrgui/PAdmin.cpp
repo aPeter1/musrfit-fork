@@ -78,8 +78,12 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eInstitute;
   } else if (qName == "file_format") {
     fKeyWord = eFileFormat;
+  } else if (qName == "lifetime_correction") {
+    fKeyWord = eLifetimeCorrection;
   } else if (qName == "msr_default_file_path") {
     fKeyWord = eMsrDefaultFilePath;
+  } else if (qName == "help_main") {
+    fKeyWord = eHelpMain;
   }
 
   return true;
@@ -120,8 +124,18 @@ bool PAdminXMLParser::characters(const QString& str)
     case eFileFormat:
       fAdmin->setFileFormat(QString(str.ascii()).stripWhiteSpace());
       break;
+    case eLifetimeCorrection:
+      bool flag;
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->setLifetimeCorrectionFlag(flag);
     case eMsrDefaultFilePath:
       fAdmin->setMsrDefaultFilePath(QString(str.ascii()).stripWhiteSpace());
+      break;
+    case eHelpMain:
+      fAdmin->setHelpMain(str);
       break;
     default:
       break;

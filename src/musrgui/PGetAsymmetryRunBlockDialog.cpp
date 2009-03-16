@@ -68,14 +68,14 @@ PGetAsymmetryRunBlockDialog::PGetAsymmetryRunBlockDialog()
  */
 QString PGetAsymmetryRunBlockDialog::GetRunHeaderInfo()
 {
-    QString str;
+  QString str;
 
-    str  = "RUN " + fRunFileName_lineEdit->text() + " ";
-    str += fBeamline_lineEdit->text().upper() + " ";
-    str += fInstitute_comboBox->currentText() + " ";
-    str += fFileFormat_comboBox->currentText() + "   (name beamline institute data-file-format)\n";
+  str  = "RUN " + fRunFileName_lineEdit->text() + " ";
+  str += fBeamline_lineEdit->text().upper() + " ";
+  str += fInstitute_comboBox->currentText() + " ";
+  str += fFileFormat_comboBox->currentText() + "   (name beamline institute data-file-format)\n";
 
-    return str;
+  return str;
 }
 
 //----------------------------------------------------------------------------------------------------

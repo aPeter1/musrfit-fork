@@ -40,7 +40,8 @@
 class PGetSingleHistoRunBlockDialog : public PGetSingleHistoRunBlockDialogBase
 {
   public:
-    PGetSingleHistoRunBlockDialog();
+    PGetSingleHistoRunBlockDialog(QWidget * parent = 0, const char * name = 0, bool modal = FALSE,
+                                  WFlags f = 0, const bool lifetimeCorrection = true);
 
     QString GetRunHeaderInfo();
     QString GetMap(bool &valid);

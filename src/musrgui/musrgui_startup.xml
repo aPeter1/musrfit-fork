@@ -13,6 +13,12 @@
     <beamline>mue4</beamline>
     <institute>psi</institute>
     <file_format>root-npp</file_format>
+    <lifetime_correction>y</lifetime_correction>
   </msr_file_defaults>
+  <help_section>
+    <help_main>
+      For a detailed description of the aim and structure of a msr-file see http://wiki.intranet.psi.ch.
+    </help_main>
+  </help_section>
 </musrgui_startup>
 

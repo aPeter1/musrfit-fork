@@ -40,6 +40,7 @@
 #include "forms/PGetTitleDialog.h"
 #include "PGetParameterDialog.h"
 #include "PGetAsymmetryRunBlockDialog.h"
+#include "PGetSingleHistoRunBlockDialog.h"
 #include "PGetFourierDialog.h"
 #include "PGetPlotDialog.h"
 
@@ -47,7 +48,8 @@
 /**
  * <p>
  */
-PSubTextEdit::PSubTextEdit(QWidget *parent, const char *name) : QTextEdit(parent, name)
+PSubTextEdit::PSubTextEdit(QWidget *parent, const char *name, const bool lifetimeCorrectionFlag) :
+    QTextEdit(parent, name), fLifetimeCorrectionFlag(lifetimeCorrectionFlag)
 {
 }
 
@@ -177,7 +179,7 @@ void PSubTextEdit::insertAsymRunBlock()
       str += workStr;
     }
 
-    // add alpha if present
+    // add beta if present
     workStr = dlg->GetBetaParameter(present);
     if (present) {
       str += workStr;
@@ -205,7 +207,7 @@ void PSubTextEdit::insertAsymRunBlock()
     str += workStr;
     if (!valid) {
       QMessageBox::critical(this, "**ERROR**",
-         "Either Background or Background.Fix is needed!\nWill set Background to 0..10, please correct!",
+         "Either <b>background</b> or <b>backgr.fix</b> is needed!\nWill set <b>background</b> to 0..10, please correct!",
          QMessageBox::Ok, QMessageBox::NoButton);
     }
 
@@ -258,6 +260,98 @@ void PSubTextEdit::insertAsymRunBlock()
  */
 void PSubTextEdit::insertSingleHistRunBlock()
 {
+  PGetSingleHistoRunBlockDialog *dlg = new PGetSingleHistoRunBlockDialog();
+  if (dlg->exec() == QDialog::Accepted) {
+    QString str, workStr;
+    bool valid = true, present = true;
+    // check if there is already a run block present, necessary because of the '####' line
+    // STILL MISSING
+
+    // add run line
+    str += dlg->GetRunHeaderInfo();
+
+    // add fittype
+    str += "fittype         0         (single histogram fit)\n";
+
+    // add map
+    workStr = dlg->GetMap(valid);
+    if (valid) {
+      str += workStr;
+    } else {
+      QMessageBox::critical(this, "**ERROR**",
+         "Given map not valid, will add a default map line",
+         QMessageBox::Ok, QMessageBox::NoButton);
+      str += "map             0  0  0  0  0  0  0  0  0  0\n";
+    }
+
+    // add forward
+    str += dlg->GetForward();
+
+    // add norm
+    str += dlg->GetNorm();
+
+    // add lifetime parameter
+    workStr = dlg->GetMuonLifetimeParam(present);
+    if (present) {
+      str += workStr;
+    }
+
+    // add lifetime correction flag if present
+    workStr = dlg->GetLifetimeCorrection(present);
+    if (present) {
+      str += workStr;
+    }
+
+    // add background, backgr.fix or backgr.fit
+    workStr = dlg->GetBackground(valid);
+    str += workStr;
+    if (!valid) {
+      QMessageBox::critical(this, "**ERROR**",
+         "Either <b>background</b>, <b>backgr.fix</b>, or <b>backgr.fit</b> is needed!\nWill set <b>background</b> to 0..10, please correct!",
+         QMessageBox::Ok, QMessageBox::NoButton);
+    }
+
+    // add t0 if present
+    workStr = dlg->GetT0(present);
+    if (present) {
+      str += workStr;
+    } else {
+      QMessageBox::warning(this, "**ERROR**",
+         "T0's not given, assume that they are present in the data file!",
+         QMessageBox::Ok, QMessageBox::NoButton);
+    }
+
+    // add data
+    workStr = dlg->GetData(valid);
+    if (valid) {
+      str += workStr;
+    } else {
+      QMessageBox::critical(this, "**ERROR**",
+         "Not all Data entries are present.Fix is needed!\nWill not set anything!",
+         QMessageBox::Ok, QMessageBox::NoButton);
+    }
+
+    // add fit range
+    workStr = dlg->GetFitRange(valid);
+    str += workStr;
+    if (!valid) {
+      QMessageBox::critical(this, "**ERROR**",
+         "No valid fit range is given.Fix is needed!\nWill add a default one!",
+         QMessageBox::Ok, QMessageBox::NoButton);
+    }
+
+    // add packing
+    workStr = dlg->GetPacking(present);
+    str += workStr;
+    if (!present) {
+      QMessageBox::critical(this, "**ERROR**",
+         "No valid packing/binning is given.Fix is needed!\nWill add a default one!",
+         QMessageBox::Ok, QMessageBox::NoButton);
+    }
+
+    // insert Asymmetry Run Block at the current cursor position
+    insert(str);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

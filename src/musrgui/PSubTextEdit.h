@@ -38,24 +38,28 @@ class PSubTextEdit : public QTextEdit
 {
     Q_OBJECT
 
-public:
-  PSubTextEdit( QWidget *parent = 0, const char *name = 0 );
+  public:
+    PSubTextEdit( QWidget *parent = 0, const char *name = 0 , const bool lifetimeCorrectionFlag = true);
 
-protected:
-  virtual QPopupMenu *createPopupMenu( const QPoint &pos);
+  protected:
+    virtual QPopupMenu *createPopupMenu( const QPoint &pos);
 
-private slots:
-  void insertTitle();
-  void insertParameterBlock();
-  void insertTheoryBlock();
-  void insertFunctionBlock();
-  void insertAsymRunBlock();
-  void insertSingleHistRunBlock();
-  void insertNonMusrRunBlock();
-  void insertCommandBlock();
-  void insertFourierBlock();
-  void insertPlotBlock();
-  void insertStatisticBlock();
+  private slots:
+    void insertTitle();
+    void insertParameterBlock();
+    void insertTheoryBlock();
+    void insertFunctionBlock();
+    void insertAsymRunBlock();
+    void insertSingleHistRunBlock();
+    void insertNonMusrRunBlock();
+    void insertCommandBlock();
+    void insertFourierBlock();
+    void insertPlotBlock();
+    void insertStatisticBlock();
+
+  private:
+    bool fLifetimeCorrectionFlag;
+
 };
 
 #endif // _PSUBTEXTEDIT_H_
