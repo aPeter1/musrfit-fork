@@ -33,6 +33,7 @@
 #include <qvalidator.h>
 #include <qcombobox.h>
 #include <qcheckbox.h>
+#include <qmessagebox.h>
 
 #include "PGetSingleHistoRunBlockDialog.h"
 
@@ -40,10 +41,11 @@
 /**
  * <p>
  */
-PGetSingleHistoRunBlockDialog::PGetSingleHistoRunBlockDialog(QWidget * parent, const char *name,
-                                                             bool modal, WFlags f,
-                                                             const bool lifetimeCorrection) :
-   PGetSingleHistoRunBlockDialogBase(parent, name, modal, f)
+PGetSingleHistoRunBlockDialog::PGetSingleHistoRunBlockDialog(const QString help, const bool lifetimeCorrection,
+                                                             QWidget * parent, const char *name,
+                                                             bool modal, WFlags f) :
+              PGetSingleHistoRunBlockDialogBase(parent, name, modal, f),
+              fHelp(help)
 {
   fForward_lineEdit->setValidator( new QIntValidator(fForward_lineEdit) );
   fNorm_lineEdit->setValidator( new QIntValidator(fNorm_lineEdit) );
@@ -65,7 +67,7 @@ PGetSingleHistoRunBlockDialog::PGetSingleHistoRunBlockDialog(QWidget * parent, c
 /**
  * <p>
  */
-QString PGetSingleHistoRunBlockDialog::GetRunHeaderInfo()
+QString PGetSingleHistoRunBlockDialog::getRunHeaderInfo()
 {
   QString str="";
 
@@ -81,7 +83,7 @@ QString PGetSingleHistoRunBlockDialog::GetRunHeaderInfo()
 /**
  * <p>
  */
-QString PGetSingleHistoRunBlockDialog::GetMap(bool &valid)
+QString PGetSingleHistoRunBlockDialog::getMap(bool &valid)
 {
   QString str = fMap_lineEdit->text().stripWhiteSpace().remove(" ");
 
@@ -102,7 +104,7 @@ QString PGetSingleHistoRunBlockDialog::GetMap(bool &valid)
 /**
  * <p>
  */
-QString PGetSingleHistoRunBlockDialog::GetData(bool &valid)
+QString PGetSingleHistoRunBlockDialog::getData(bool &valid)
 {
   QString str="";
 
@@ -122,7 +124,7 @@ QString PGetSingleHistoRunBlockDialog::GetData(bool &valid)
 /**
  * <p>
  */
-QString PGetSingleHistoRunBlockDialog::GetBackground(bool &valid)
+QString PGetSingleHistoRunBlockDialog::getBackground(bool &valid)
 {
   QString str="";
 
@@ -157,7 +159,7 @@ QString PGetSingleHistoRunBlockDialog::GetBackground(bool &valid)
 /**
  * <p>
  */
-QString PGetSingleHistoRunBlockDialog::GetFitRange(bool &valid)
+QString PGetSingleHistoRunBlockDialog::getFitRange(bool &valid)
 {
   QString str="";
 
@@ -178,7 +180,7 @@ QString PGetSingleHistoRunBlockDialog::GetFitRange(bool &valid)
 /**
  * <p>
  */
-QString PGetSingleHistoRunBlockDialog::GetPacking(bool &present)
+QString PGetSingleHistoRunBlockDialog::getPacking(bool &present)
 {
   QString str="";
 
@@ -197,7 +199,7 @@ QString PGetSingleHistoRunBlockDialog::GetPacking(bool &present)
 /**
  * <p>
  */
-QString PGetSingleHistoRunBlockDialog::GetT0(bool &present)
+QString PGetSingleHistoRunBlockDialog::getT0(bool &present)
 {
   QString str="";
 
@@ -216,7 +218,7 @@ QString PGetSingleHistoRunBlockDialog::GetT0(bool &present)
 /**
  * <p>
  */
-QString PGetSingleHistoRunBlockDialog::GetMuonLifetimeParam(bool &present)
+QString PGetSingleHistoRunBlockDialog::getMuonLifetimeParam(bool &present)
 {
   QString str="";
 
@@ -235,7 +237,7 @@ QString PGetSingleHistoRunBlockDialog::GetMuonLifetimeParam(bool &present)
 /**
  * <p>
  */
-QString PGetSingleHistoRunBlockDialog::GetLifetimeCorrection(bool &present)
+QString PGetSingleHistoRunBlockDialog::getLifetimeCorrection(bool &present)
 {
   QString str="";
 
@@ -247,6 +249,16 @@ QString PGetSingleHistoRunBlockDialog::GetLifetimeCorrection(bool &present)
   }
 
   return str;
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PGetSingleHistoRunBlockDialog::helpContents()
+{
+  QMessageBox::information(this, "helpContents",
+                            fHelp, QMessageBox::Ok);
 }
 
 //----------------------------------------------------------------------------------------------------

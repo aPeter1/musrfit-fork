@@ -108,6 +108,8 @@ bool PAdminXMLParser::endElement( const QString&, const QString&, const QString&
  */
 bool PAdminXMLParser::characters(const QString& str)
 {
+  QString help;
+
   switch (fKeyWord) {
     case eExecPath:
       fAdmin->setExecPath(QString(str.ascii()).stripWhiteSpace());
@@ -135,7 +137,10 @@ bool PAdminXMLParser::characters(const QString& str)
       fAdmin->setMsrDefaultFilePath(QString(str.ascii()).stripWhiteSpace());
       break;
     case eHelpMain:
-      fAdmin->setHelpMain(str);
+      help = str;
+      help.replace("&gt;", ">");
+      help.replace("&lt;", "<");
+      fAdmin->setHelpMain(help);
       break;
     default:
       break;
@@ -169,6 +174,8 @@ PAdmin::PAdmin()
   fBeamline   = QString("");
   fInstitute  = QString("");
   fFileFormat = QString("");
+
+  fHelpMain   = QString("");
 
   // XML Parser part
   QString path = getenv("MUSRFITPATH");

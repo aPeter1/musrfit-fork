@@ -39,7 +39,7 @@ class PSubTextEdit : public QTextEdit
     Q_OBJECT
 
   public:
-    PSubTextEdit( QWidget *parent = 0, const char *name = 0 , const bool lifetimeCorrectionFlag = true);
+    PSubTextEdit(const bool lifetimeCorrectionFlag = true, const QString help ="", QWidget *parent = 0, const char *name = 0);
 
   protected:
     virtual QPopupMenu *createPopupMenu( const QPoint &pos);
@@ -59,6 +59,7 @@ class PSubTextEdit : public QTextEdit
 
   private:
     bool fLifetimeCorrectionFlag;
+    QString fHelp;
 
 };
 

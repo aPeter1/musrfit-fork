@@ -329,7 +329,7 @@ void PTextEdit::load( const QString &f )
 {
   if ( !QFile::exists( f ) )
     return;
-  PSubTextEdit *edit = new PSubTextEdit( fTabWidget, "PSubTextEdit", fAdmin->getLifetimeCorrectionFlag() );
+  PSubTextEdit *edit = new PSubTextEdit( fAdmin->getLifetimeCorrectionFlag(), fAdmin->getHelpMain() );
   edit->setTextFormat( PlainText );
   edit->setFamily("Courier");
   edit->setPointSize(11); // 11pt
@@ -410,7 +410,7 @@ bool PTextEdit::validRunList(const QString runList)
  */
 void PTextEdit::fileNew()
 {
-  PSubTextEdit *edit = new PSubTextEdit( fTabWidget, "PSubTextEdit", fAdmin->getLifetimeCorrectionFlag() );
+  PSubTextEdit *edit = new PSubTextEdit( fAdmin->getLifetimeCorrectionFlag(), fAdmin->getHelpMain() );
   edit->setTextFormat( PlainText );
   edit->setFamily("Courier");
   edit->setPointSize(11); // 11pt
@@ -1168,8 +1168,8 @@ void PTextEdit::musrSwapMsrMlog()
 void PTextEdit::helpContents()
 {
   QMessageBox::information( this, "helpContents",
-  "Will deliver eventually a help content.\n"
-  "NOT IMPLEMENTED YET :-(" );
+                            fAdmin->getHelpMain(),
+                            QMessageBox::Ok );
 }
 
 //----------------------------------------------------------------------------------------------------

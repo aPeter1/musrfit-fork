@@ -32,6 +32,7 @@
 #include <qlineedit.h>
 #include <qvalidator.h>
 #include <qcombobox.h>
+#include <qmessagebox.h>
 
 #include "PGetAsymmetryRunBlockDialog.h"
 
@@ -39,7 +40,10 @@
 /**
  * <p>
  */
-PGetAsymmetryRunBlockDialog::PGetAsymmetryRunBlockDialog()
+PGetAsymmetryRunBlockDialog::PGetAsymmetryRunBlockDialog(const QString help, QWidget *parent, const char *name,
+                                                         bool modal, WFlags f) :
+                                                         fHelp(help),
+                                                         PGetAsymmetryRunBlockDialogBase(parent, name, modal, f)
 {
   fForward_lineEdit->setValidator( new QIntValidator(fForward_lineEdit) );
   fBackward_lineEdit->setValidator( new QIntValidator(fBackward_lineEdit) );
@@ -66,7 +70,7 @@ PGetAsymmetryRunBlockDialog::PGetAsymmetryRunBlockDialog()
 /**
  * <p>
  */
-QString PGetAsymmetryRunBlockDialog::GetRunHeaderInfo()
+QString PGetAsymmetryRunBlockDialog::getRunHeaderInfo()
 {
   QString str;
 
@@ -82,7 +86,7 @@ QString PGetAsymmetryRunBlockDialog::GetRunHeaderInfo()
 /**
  * <p>
  */
-QString PGetAsymmetryRunBlockDialog::GetAlphaParameter(bool &present)
+QString PGetAsymmetryRunBlockDialog::getAlphaParameter(bool &present)
 {
   QString str = "alpha           " + fAlpha_lineEdit->text() + "\n";
 
@@ -98,7 +102,7 @@ QString PGetAsymmetryRunBlockDialog::GetAlphaParameter(bool &present)
 /**
  * <p>
  */
-QString PGetAsymmetryRunBlockDialog::GetBetaParameter(bool &present)
+QString PGetAsymmetryRunBlockDialog::getBetaParameter(bool &present)
 {
   QString str = "beta            " + fBeta_lineEdit->text() + "\n";
 
@@ -114,7 +118,7 @@ QString PGetAsymmetryRunBlockDialog::GetBetaParameter(bool &present)
 /**
  * <p>
  */
-QString PGetAsymmetryRunBlockDialog::GetMap(bool &valid)
+QString PGetAsymmetryRunBlockDialog::getMap(bool &valid)
 {
   QString str = fMap_lineEdit->text().stripWhiteSpace().remove(" ");
 
@@ -135,7 +139,7 @@ QString PGetAsymmetryRunBlockDialog::GetMap(bool &valid)
 /**
  * <p>
  */
-QString PGetAsymmetryRunBlockDialog::GetBackground(bool &valid)
+QString PGetAsymmetryRunBlockDialog::getBackground(bool &valid)
 {
   QString str = "";
 
@@ -169,7 +173,7 @@ QString PGetAsymmetryRunBlockDialog::GetBackground(bool &valid)
 /**
  * <p>
  */
-QString PGetAsymmetryRunBlockDialog::GetData(bool &valid)
+QString PGetAsymmetryRunBlockDialog::getData(bool &valid)
 {
   QString str = "";
 
@@ -192,7 +196,7 @@ QString PGetAsymmetryRunBlockDialog::GetData(bool &valid)
 /**
  * <p>
  */
-QString PGetAsymmetryRunBlockDialog::GetT0(bool &present)
+QString PGetAsymmetryRunBlockDialog::getT0(bool &present)
 {
   QString str = "";
 
@@ -212,7 +216,7 @@ QString PGetAsymmetryRunBlockDialog::GetT0(bool &present)
 /**
  * <p>
  */
-QString PGetAsymmetryRunBlockDialog::GetFitRange(bool &valid)
+QString PGetAsymmetryRunBlockDialog::getFitRange(bool &valid)
 {
   QString str = "";
 
@@ -233,7 +237,7 @@ QString PGetAsymmetryRunBlockDialog::GetFitRange(bool &valid)
 /**
  * <p>
  */
-QString PGetAsymmetryRunBlockDialog::GetPacking(bool &present)
+QString PGetAsymmetryRunBlockDialog::getPacking(bool &present)
 {
   QString str = "";
 
@@ -246,6 +250,16 @@ QString PGetAsymmetryRunBlockDialog::GetPacking(bool &present)
   }
 
   return str;
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PGetAsymmetryRunBlockDialog::helpContents()
+{
+  QMessageBox::information(this, "helpContents",
+                            fHelp, QMessageBox::Ok);
 }
 
 //----------------------------------------------------------------------------------------------------

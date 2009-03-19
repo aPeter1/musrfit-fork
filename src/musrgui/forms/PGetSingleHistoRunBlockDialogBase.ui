@@ -804,6 +804,12 @@
         <receiver>PGetSingleHistoRunBlockDialogBase</receiver>
         <slot>reject()</slot>
     </connection>
+    <connection>
+        <sender>fHelp_button</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetSingleHistoRunBlockDialogBase</receiver>
+        <slot>helpContents()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>fRunFileName_lineEdit</tabstop>
@@ -829,5 +835,8 @@
     <tabstop>fCancel_button</tabstop>
     <tabstop>fHelp_button</tabstop>
 </tabstops>
+<slots>
+    <slot access="private">helpContents()</slot>
+</slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

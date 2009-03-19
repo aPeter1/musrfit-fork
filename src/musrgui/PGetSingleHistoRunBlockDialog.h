@@ -40,20 +40,27 @@
 class PGetSingleHistoRunBlockDialog : public PGetSingleHistoRunBlockDialogBase
 {
   public:
-    PGetSingleHistoRunBlockDialog(QWidget * parent = 0, const char * name = 0, bool modal = FALSE,
-                                  WFlags f = 0, const bool lifetimeCorrection = true);
+    PGetSingleHistoRunBlockDialog(const QString help = "", const bool lifetimeCorrection = true,
+                                  QWidget * parent = 0, const char * name = 0, bool modal = FALSE,
+                                  WFlags f = 0);
 
-    QString GetRunHeaderInfo();
-    QString GetMap(bool &valid);
-    QString GetForward() { return QString("forward         " + fForward_lineEdit->text() + "\n"); }
-    QString GetNorm() { return QString("norm            " + fNorm_lineEdit->text() + "\n"); }
-    QString GetData(bool &valid);
-    QString GetBackground(bool &valid);
-    QString GetFitRange(bool &valid);
-    QString GetPacking(bool &present);
-    QString GetT0(bool &present);
-    QString GetMuonLifetimeParam(bool &present);
-    QString GetLifetimeCorrection(bool &present);
+    QString getRunHeaderInfo();
+    QString getMap(bool &valid);
+    QString getForward() { return QString("forward         " + fForward_lineEdit->text() + "\n"); }
+    QString getNorm() { return QString("norm            " + fNorm_lineEdit->text() + "\n"); }
+    QString getData(bool &valid);
+    QString getBackground(bool &valid);
+    QString getFitRange(bool &valid);
+    QString getPacking(bool &present);
+    QString getT0(bool &present);
+    QString getMuonLifetimeParam(bool &present);
+    QString getLifetimeCorrection(bool &present);
+
+  private slots:
+    void helpContents();
+
+  private:
+    QString fHelp;
 };
 
 #endif // _PGETSINGLEHISTORUNBLOCKDIALOG_H_

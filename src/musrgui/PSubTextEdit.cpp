@@ -48,8 +48,11 @@
 /**
  * <p>
  */
-PSubTextEdit::PSubTextEdit(QWidget *parent, const char *name, const bool lifetimeCorrectionFlag) :
-    QTextEdit(parent, name), fLifetimeCorrectionFlag(lifetimeCorrectionFlag)
+PSubTextEdit::PSubTextEdit(const bool lifetimeCorrectionFlag, const QString help,
+                           QWidget *parent, const char *name) :
+                           QTextEdit(parent, name),
+                           fLifetimeCorrectionFlag(lifetimeCorrectionFlag),
+                           fHelp(help)
 {
 }
 
@@ -160,7 +163,7 @@ void PSubTextEdit::insertFunctionBlock()
  */
 void PSubTextEdit::insertAsymRunBlock()
 {
-  PGetAsymmetryRunBlockDialog *dlg = new PGetAsymmetryRunBlockDialog();
+  PGetAsymmetryRunBlockDialog *dlg = new PGetAsymmetryRunBlockDialog(fHelp);
   if (dlg->exec() == QDialog::Accepted) {
     QString str, workStr;
     bool valid = true, present = true;
@@ -168,25 +171,25 @@ void PSubTextEdit::insertAsymRunBlock()
     // STILL MISSING
 
     // add run line
-    str += dlg->GetRunHeaderInfo();
+    str += dlg->getRunHeaderInfo();
 
     // add fittype
     str += "fittype         2         (asymmetry fit)\n";
 
     // add alpha if present
-    workStr = dlg->GetAlphaParameter(present);
+    workStr = dlg->getAlphaParameter(present);
     if (present) {
       str += workStr;
     }
 
     // add beta if present
-    workStr = dlg->GetBetaParameter(present);
+    workStr = dlg->getBetaParameter(present);
     if (present) {
       str += workStr;
     }
 
     // add map
-    workStr = dlg->GetMap(valid);
+    workStr = dlg->getMap(valid);
     if (valid) {
       str += workStr;
     } else {
@@ -197,13 +200,13 @@ void PSubTextEdit::insertAsymRunBlock()
     }
 
     // add forward
-    str += dlg->GetForward();
+    str += dlg->getForward();
 
     // add backward
-    str += dlg->GetBackward();
+    str += dlg->getBackward();
 
     // add background or backgr.fix
-    workStr = dlg->GetBackground(valid);
+    workStr = dlg->getBackground(valid);
     str += workStr;
     if (!valid) {
       QMessageBox::critical(this, "**ERROR**",
@@ -212,7 +215,7 @@ void PSubTextEdit::insertAsymRunBlock()
     }
 
     // add data
-    workStr = dlg->GetData(valid);
+    workStr = dlg->getData(valid);
     if (valid) {
       str += workStr;
     } else {
@@ -222,7 +225,7 @@ void PSubTextEdit::insertAsymRunBlock()
     }
 
     // add t0 if present
-    workStr = dlg->GetT0(present);
+    workStr = dlg->getT0(present);
     if (present) {
       str += workStr;
     } else {
@@ -232,7 +235,7 @@ void PSubTextEdit::insertAsymRunBlock()
     }
 
     // add fit range
-    workStr = dlg->GetFitRange(valid);
+    workStr = dlg->getFitRange(valid);
     str += workStr;
     if (!valid) {
       QMessageBox::critical(this, "**ERROR**",
@@ -241,7 +244,7 @@ void PSubTextEdit::insertAsymRunBlock()
     }
 
     // add packing
-    workStr = dlg->GetPacking(present);
+    workStr = dlg->getPacking(present);
     str += workStr;
     if (!present) {
       QMessageBox::critical(this, "**ERROR**",
@@ -260,7 +263,7 @@ void PSubTextEdit::insertAsymRunBlock()
  */
 void PSubTextEdit::insertSingleHistRunBlock()
 {
-  PGetSingleHistoRunBlockDialog *dlg = new PGetSingleHistoRunBlockDialog();
+  PGetSingleHistoRunBlockDialog *dlg = new PGetSingleHistoRunBlockDialog(fHelp);
   if (dlg->exec() == QDialog::Accepted) {
     QString str, workStr;
     bool valid = true, present = true;
@@ -268,13 +271,13 @@ void PSubTextEdit::insertSingleHistRunBlock()
     // STILL MISSING
 
     // add run line
-    str += dlg->GetRunHeaderInfo();
+    str += dlg->getRunHeaderInfo();
 
     // add fittype
     str += "fittype         0         (single histogram fit)\n";
 
     // add map
-    workStr = dlg->GetMap(valid);
+    workStr = dlg->getMap(valid);
     if (valid) {
       str += workStr;
     } else {
@@ -285,25 +288,25 @@ void PSubTextEdit::insertSingleHistRunBlock()
     }
 
     // add forward
-    str += dlg->GetForward();
+    str += dlg->getForward();
 
     // add norm
-    str += dlg->GetNorm();
+    str += dlg->getNorm();
 
     // add lifetime parameter
-    workStr = dlg->GetMuonLifetimeParam(present);
+    workStr = dlg->getMuonLifetimeParam(present);
     if (present) {
       str += workStr;
     }
 
     // add lifetime correction flag if present
-    workStr = dlg->GetLifetimeCorrection(present);
+    workStr = dlg->getLifetimeCorrection(present);
     if (present) {
       str += workStr;
     }
 
     // add background, backgr.fix or backgr.fit
-    workStr = dlg->GetBackground(valid);
+    workStr = dlg->getBackground(valid);
     str += workStr;
     if (!valid) {
       QMessageBox::critical(this, "**ERROR**",
@@ -312,7 +315,7 @@ void PSubTextEdit::insertSingleHistRunBlock()
     }
 
     // add t0 if present
-    workStr = dlg->GetT0(present);
+    workStr = dlg->getT0(present);
     if (present) {
       str += workStr;
     } else {
@@ -322,7 +325,7 @@ void PSubTextEdit::insertSingleHistRunBlock()
     }
 
     // add data
-    workStr = dlg->GetData(valid);
+    workStr = dlg->getData(valid);
     if (valid) {
       str += workStr;
     } else {
@@ -332,7 +335,7 @@ void PSubTextEdit::insertSingleHistRunBlock()
     }
 
     // add fit range
-    workStr = dlg->GetFitRange(valid);
+    workStr = dlg->getFitRange(valid);
     str += workStr;
     if (!valid) {
       QMessageBox::critical(this, "**ERROR**",
@@ -341,7 +344,7 @@ void PSubTextEdit::insertSingleHistRunBlock()
     }
 
     // add packing
-    workStr = dlg->GetPacking(present);
+    workStr = dlg->getPacking(present);
     str += workStr;
     if (!present) {
       QMessageBox::critical(this, "**ERROR**",

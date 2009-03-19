@@ -245,6 +245,25 @@
             <number>1</number>
         </property>
     </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>fAdd_pushButton</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>390</y>
+                <width>56</width>
+                <height>26</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>&amp;Add</string>
+        </property>
+        <property name="accel">
+            <string>Alt+A</string>
+        </property>
+    </widget>
     <widget class="QTextEdit">
         <property name="name">
             <cstring>fParam_textEdit</cstring>
@@ -273,21 +292,24 @@ FITPARAMETER
     </widget>
     <widget class="QPushButton">
         <property name="name">
-            <cstring>fAdd_pushButton</cstring>
+            <cstring>fCancel_pushButton</cstring>
         </property>
         <property name="geometry">
             <rect>
-                <x>10</x>
+                <x>575</x>
                 <y>390</y>
-                <width>56</width>
+                <width>75</width>
                 <height>26</height>
             </rect>
         </property>
         <property name="text">
-            <string>&amp;Add</string>
+            <string>&amp;Cancel</string>
         </property>
         <property name="accel">
-            <string>Alt+A</string>
+            <string></string>
+        </property>
+        <property name="autoDefault">
+            <bool>true</bool>
         </property>
     </widget>
     <spacer>
@@ -321,7 +343,7 @@ FITPARAMETER
         </property>
         <property name="geometry">
             <rect>
-                <x>600</x>
+                <x>515</x>
                 <y>390</y>
                 <width>49</width>
                 <height>26</height>
@@ -337,28 +359,6 @@ FITPARAMETER
             <bool>true</bool>
         </property>
         <property name="default">
-            <bool>true</bool>
-        </property>
-    </widget>
-    <widget class="QPushButton">
-        <property name="name">
-            <cstring>fCancel_pushButton</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>520</x>
-                <y>390</y>
-                <width>75</width>
-                <height>26</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>&amp;Cancel</string>
-        </property>
-        <property name="accel">
-            <string></string>
-        </property>
-        <property name="autoDefault">
             <bool>true</bool>
         </property>
     </widget>
