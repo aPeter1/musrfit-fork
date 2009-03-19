@@ -17,7 +17,7 @@
   </msr_file_defaults>
   <help_section>
     <help_main>
-      For a detailed description of the aim and structure of a msr-file see &lt;b&gt;http://wiki.intranet.psi.ch.&lt;/b&gt;
+      For a detailed description of the aim and structure of a msr-file see &lt;b&gt;https://wiki.intranet.psi.ch/MUSR/MusrFit&lt;/b&gt;
       Starting with &gt;= Qt4.2 this will be linked automatically but until then ...; sorry ;-)
     </help_main>
   </help_section>

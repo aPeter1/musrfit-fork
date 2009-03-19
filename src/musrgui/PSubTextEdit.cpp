@@ -41,6 +41,7 @@
 #include "PGetParameterDialog.h"
 #include "PGetAsymmetryRunBlockDialog.h"
 #include "PGetSingleHistoRunBlockDialog.h"
+#include "PGetNonMusrRunBlockDialog.h"
 #include "PGetFourierDialog.h"
 #include "PGetPlotDialog.h"
 
@@ -352,7 +353,7 @@ void PSubTextEdit::insertSingleHistRunBlock()
          QMessageBox::Ok, QMessageBox::NoButton);
     }
 
-    // insert Asymmetry Run Block at the current cursor position
+    // insert Single Histogram Run Block at the current cursor position
     insert(str);
   }
 }
@@ -363,6 +364,55 @@ void PSubTextEdit::insertSingleHistRunBlock()
  */
 void PSubTextEdit::insertNonMusrRunBlock()
 {
+  PGetNonMusrRunBlockDialog *dlg = new PGetNonMusrRunBlockDialog(fHelp);
+  if (dlg->exec() == QDialog::Accepted) {
+    QString str, workStr;
+    bool valid = true;
+    // check if there is already a run block present, necessary because of the '####' line
+    // STILL MISSING
+
+    // add run line
+    str += dlg->getRunHeaderInfo();
+
+    // add fittype
+    str += "fittype         8         (non musr fit)\n";
+
+    // add map
+    workStr = dlg->getMap(valid);
+    if (valid) {
+      str += workStr;
+    } else {
+      QMessageBox::critical(this, "**ERROR**",
+         "Given map not valid, will add a default map line",
+         QMessageBox::Ok, QMessageBox::NoButton);
+      str += "map             0  0  0  0  0  0  0  0  0  0\n";
+    }
+
+    // add xy-data
+    workStr = dlg->getXYData(valid);
+    if (valid) {
+      str += workStr;
+    } else {
+      QMessageBox::critical(this, "**ERROR**",
+         "Not all xy-data entries are present.Fix is needed!\nWill not set anything!",
+         QMessageBox::Ok, QMessageBox::NoButton);
+    }
+
+    // add fit range
+    workStr = dlg->getFitRange(valid);
+    str += workStr;
+    if (!valid) {
+      QMessageBox::critical(this, "**ERROR**",
+         "No valid fit range is given.Fix is needed!\nWill add a default one!",
+         QMessageBox::Ok, QMessageBox::NoButton);
+    }
+
+    // add packing
+    str += "packing         1\n";
+
+    // insert NonMusr Run Block at the current cursor position
+    insert(str);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
