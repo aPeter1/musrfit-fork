@@ -1,0 +1,286 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>PGetFunctionsBlockDialogBase</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>PGetFunctionsBlockDialogBase</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>649</width>
+            <height>630</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Get Functions</string>
+    </property>
+    <property name="icon">
+        <pixmap>image0</pixmap>
+    </property>
+    <property name="sizeGripEnabled">
+        <bool>true</bool>
+    </property>
+    <property name="modal">
+        <bool>true</bool>
+    </property>
+    <widget class="QTextEdit">
+        <property name="name">
+            <cstring>fHelp_textEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>621</width>
+                <height>230</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Supported basic arithmetics: &lt;tt&gt;+, -, *, /, ()&lt;/tt&gt;&lt;br&gt;
+Supported built-in functions: &lt;tt&gt;cos(), sin(), tan(), acos(), asin(), atan(), cosh(), sinh(), tanh(), acosh(), asinh(), atanh(), exp(), log(), ln()&lt;/tt&gt;&lt;br&gt;
+Supported pre-defined constants: &lt;br&gt;&lt;tt&gt;
+gamma_mu = 0.0135538817 (MHz/G)&lt;br&gt;
+pi = 3.1415926535897932846&lt;/tt&gt;&lt;br&gt;
+Parameters and Maps are reached via parX, mapY, where X, Y are numbers, e.g. par1, map13&lt;br&gt;
+Examples:&lt;br&gt;
+&lt;tt&gt;fun1 = gamma_mu * par3&lt;/tt&gt; valid&lt;br&gt;
+&lt;tt&gt;fun2 = par2/map4 * sin(par3*par5)&lt;/tt&gt; valid&lt;br&gt;
+&lt;tt&gt;fun3 = fun1 + par5&lt;/tt&gt; invalid, since functions can not be used with the functions definition</string>
+        </property>
+        <property name="wordWrap">
+            <enum>WidgetWidth</enum>
+        </property>
+        <property name="readOnly">
+            <bool>true</bool>
+        </property>
+    </widget>
+    <widget class="QLayoutWidget">
+        <property name="name">
+            <cstring>Layout1</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>16</x>
+                <y>580</y>
+                <width>610</width>
+                <height>33</height>
+            </rect>
+        </property>
+        <hbox>
+            <property name="name">
+                <cstring>unnamed</cstring>
+            </property>
+            <property name="margin">
+                <number>0</number>
+            </property>
+            <property name="spacing">
+                <number>6</number>
+            </property>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>buttonHelp</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;Help</string>
+                </property>
+                <property name="accel">
+                    <string>F1</string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+            </widget>
+            <spacer>
+                <property name="name">
+                    <cstring>Horizontal Spacing2</cstring>
+                </property>
+                <property name="orientation">
+                    <enum>Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                    <enum>Expanding</enum>
+                </property>
+                <property name="sizeHint">
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>buttonOk</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;OK</string>
+                </property>
+                <property name="accel">
+                    <string></string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+                <property name="default">
+                    <bool>true</bool>
+                </property>
+            </widget>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>buttonCancel</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;Cancel</string>
+                </property>
+                <property name="accel">
+                    <string></string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+            </widget>
+        </hbox>
+    </widget>
+    <widget class="QTextEdit">
+        <property name="name">
+            <cstring>fFunctionBlock_textEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>366</y>
+                <width>621</width>
+                <height>200</height>
+            </rect>
+        </property>
+        <property name="font">
+            <font>
+                <family>Courier</family>
+            </font>
+        </property>
+        <property name="text">
+            <string>###############################################################
+FUNCTIONS
+</string>
+        </property>
+        <property name="wordWrap">
+            <enum>WidgetWidth</enum>
+        </property>
+        <property name="readOnly">
+            <bool>true</bool>
+        </property>
+    </widget>
+    <widget class="QGroupBox">
+        <property name="name">
+            <cstring>fFunctionInput_groupBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>250</y>
+                <width>621</width>
+                <height>100</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>Input</string>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fFunctionInput_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>30</y>
+                    <width>71</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Function:</string>
+            </property>
+        </widget>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>fAdd_pushButton</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>490</x>
+                    <y>60</y>
+                    <width>113</width>
+                    <height>26</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Add</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fFunctionInput_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>90</x>
+                    <y>30</y>
+                    <width>513</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+    </widget>
+</widget>
+<images>
+    <image name="image0">
+        <data format="PNG" length="270">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000d549444154388db594510e84200c44a78653d1f34faf853fd66d2a2aa8fb1222697068cb80d0884cadda7c6e46392c1860c9010da2bd8d4629f1670140a3200869d536ad8a2d63cfc805bc7c338ac766b33eb4c279dadb5be1b72c5ab5c5d2f3028fcda6bff042f40dd2f3f119355477c7708fdd15a3eef8ecf0f2868f847bb733332c1c9d43a344f15e9bca51e25a3cde52493736d3e2d85cb27ff36861d0081ad18b15607b783a785cabb67d4da7bf5e890070f34eb5c245cee2c4cfebc533ca593e211ee2652bdef0bfd7ed4bb1e8f5a947688615932a98c849f587290000000049454e44ae426082</data>
+    </image>
+</images>
+<connections>
+    <connection>
+        <sender>buttonOk</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetFunctionsBlockDialogBase</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>buttonCancel</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetFunctionsBlockDialogBase</receiver>
+        <slot>reject()</slot>
+    </connection>
+    <connection>
+        <sender>buttonHelp</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetFunctionsBlockDialogBase</receiver>
+        <slot>helpContents()</slot>
+    </connection>
+    <connection>
+        <sender>fAdd_pushButton</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetFunctionsBlockDialogBase</receiver>
+        <slot>addFunction()</slot>
+    </connection>
+    <connection>
+        <sender>fFunctionInput_lineEdit</sender>
+        <signal>returnPressed()</signal>
+        <receiver>PGetFunctionsBlockDialogBase</receiver>
+        <slot>addFunction()</slot>
+    </connection>
+</connections>
+<tabstops>
+    <tabstop>fFunctionInput_lineEdit</tabstop>
+    <tabstop>fAdd_pushButton</tabstop>
+    <tabstop>buttonOk</tabstop>
+    <tabstop>buttonCancel</tabstop>
+    <tabstop>buttonHelp</tabstop>
+    <tabstop>fFunctionBlock_textEdit</tabstop>
+    <tabstop>fHelp_textEdit</tabstop>
+</tabstops>
+<slots>
+    <slot access="private">helpContents()</slot>
+    <slot access="private">addFunction()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

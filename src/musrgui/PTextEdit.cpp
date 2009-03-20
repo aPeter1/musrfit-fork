@@ -534,8 +534,8 @@ void PTextEdit::fileClose()
   if (fTabWidget->label(idx).find("*")>0) {
     int result = QMessageBox::warning(this, "**WARNING**", 
                    "Do you really want to close this file.\nChanges will be lost",
-                   QMessageBox::Yes, QMessageBox::Cancel);
-    if (result == QMessageBox::Cancel)
+                   "Exit", "Cancel");
+    if (result == 1) // Cancel
       return;
   }
 
@@ -555,8 +555,8 @@ void PTextEdit::fileExit()
     if (fTabWidget->label(i).find("*") > 0) {
       int result = QMessageBox::warning(this, "**WARNING**", 
                      "Do you really want to exit from the applcation.\nChanges will be lost",
-                     QMessageBox::Yes, QMessageBox::Cancel);
-      if (result == QMessageBox::Cancel)
+                     "Exit", "Cancel");
+      if (result == 1) // Cancel
         return;
       break;
     }

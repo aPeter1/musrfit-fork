@@ -39,6 +39,7 @@
 #include "PSubTextEdit.h"
 #include "forms/PGetTitleDialog.h"
 #include "PGetParameterDialog.h"
+#include "PGetFunctionsBlockDialog.h"
 #include "PGetAsymmetryRunBlockDialog.h"
 #include "PGetSingleHistoRunBlockDialog.h"
 #include "PGetNonMusrRunBlockDialog.h"
@@ -156,6 +157,11 @@ void PSubTextEdit::insertTheoryBlock()
  */
 void PSubTextEdit::insertFunctionBlock()
 {
+  PGetFunctionsBlockDialog *dlg = new PGetFunctionsBlockDialog(fHelp);
+  if (dlg->exec() == QDialog::Accepted) {
+    insert(dlg->getFunctionsBlock());
+    insert("\n\n");
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
