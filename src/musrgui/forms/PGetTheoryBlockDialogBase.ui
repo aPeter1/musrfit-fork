@@ -1,0 +1,262 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>PGetTheoryBlockDialogBase</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>PGetTheoryBlockDialogBase</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>591</width>
+            <height>659</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Get Theory</string>
+    </property>
+    <property name="icon">
+        <pixmap>image0</pixmap>
+    </property>
+    <property name="sizeGripEnabled">
+        <bool>true</bool>
+    </property>
+    <property name="modal">
+        <bool>true</bool>
+    </property>
+    <widget class="QLayoutWidget">
+        <property name="name">
+            <cstring>Layout1</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>610</y>
+                <width>570</width>
+                <height>33</height>
+            </rect>
+        </property>
+        <hbox>
+            <property name="name">
+                <cstring>unnamed</cstring>
+            </property>
+            <property name="margin">
+                <number>0</number>
+            </property>
+            <property name="spacing">
+                <number>6</number>
+            </property>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>buttonHelp</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;Help</string>
+                </property>
+                <property name="accel">
+                    <string>F1</string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+            </widget>
+            <spacer>
+                <property name="name">
+                    <cstring>Horizontal Spacing2</cstring>
+                </property>
+                <property name="orientation">
+                    <enum>Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                    <enum>Expanding</enum>
+                </property>
+                <property name="sizeHint">
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>buttonOk</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;OK</string>
+                </property>
+                <property name="accel">
+                    <string></string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+                <property name="default">
+                    <bool>true</bool>
+                </property>
+            </widget>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>buttonCancel</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;Cancel</string>
+                </property>
+                <property name="accel">
+                    <string></string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+            </widget>
+        </hbox>
+    </widget>
+    <widget class="QTextEdit">
+        <property name="name">
+            <cstring>fTheoryBlock_textEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>346</y>
+                <width>570</width>
+                <height>250</height>
+            </rect>
+        </property>
+        <property name="font">
+            <font>
+                <family>Courier</family>
+            </font>
+        </property>
+        <property name="text">
+            <string>###############################################################
+THEORY
+</string>
+        </property>
+        <property name="wordWrap">
+            <enum>WidgetWidth</enum>
+        </property>
+    </widget>
+    <widget class="QGroupBox">
+        <property name="name">
+            <cstring>groupBox1</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>270</y>
+                <width>570</width>
+                <height>71</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>Theory Input</string>
+        </property>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>fMultiply_pushButton</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>510</x>
+                    <y>30</y>
+                    <width>40</width>
+                    <height>26</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>*</string>
+            </property>
+        </widget>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>fPlus_pushButton</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>460</x>
+                    <y>30</y>
+                    <width>40</width>
+                    <height>26</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>+</string>
+            </property>
+        </widget>
+        <widget class="QComboBox">
+            <item>
+                <property name="text">
+                    <string>Static Gauss KT</string>
+                </property>
+                <property name="pixmap">
+                    <pixmap>image1</pixmap>
+                </property>
+            </item>
+            <property name="name">
+                <cstring>fTheoryFunction_comboBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>30</y>
+                    <width>440</width>
+                    <height>24</height>
+                </rect>
+            </property>
+        </widget>
+    </widget>
+    <widget class="QTextEdit">
+        <property name="name">
+            <cstring>fDescription_textEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>570</width>
+                <height>260</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Every theory function has to be written on a single line. It starts with the theory function name or its abbreviation followed by the parameters. Consecutive lines of theory functions will be multiplied. If theory functions need to be added, a line with a '+' has to separate them. The parameters are given as the numbers assigned to them in the FITPARAMETER-block.
+
+Example:
+asymmetry 2
+simplExpo 3
+TFieldCos map1 fun2
++
+asymmetry 6
+simplExpo 7</string>
+        </property>
+        <property name="wordWrap">
+            <enum>WidgetWidth</enum>
+        </property>
+        <property name="readOnly">
+            <bool>true</bool>
+        </property>
+    </widget>
+</widget>
+<images>
+    <image name="image0">
+        <data format="PNG" length="270">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000d549444154388db594510e84200c44a78653d1f34faf853fd66d2a2aa8fb1222697068cb80d0884cadda7c6e46392c1860c9010da2bd8d4629f1670140a3200869d536ad8a2d63cfc805bc7c338ac766b33eb4c279dadb5be1b72c5ab5c5d2f3028fcda6bff042f40dd2f3f119355477c7708fdd15a3eef8ecf0f2868f847bb733332c1c9d43a344f15e9bca51e25a3cde52493736d3e2d85cb27ff36861d0081ad18b15607b783a785cabb67d4da7bf5e890070f34eb5c245cee2c4cfebc533ca593e211ee2652bdef0bfd7ed4bb1e8f5a947688615932a98c849f587290000000049454e44ae426082</data>
+    </image>
+    <image name="image1">
+        <data format="XPM.GZ" length="5109">789ced984973b2481880eff91556b8a5a6fa0304223535075470c1c4ac9f265373689a6689411391903835ff7d7a43518931c961bec3bcc6e581b79ba757a8fc38a98d2fce6a273f8ed2055cc4a8862238af9df85992bcfdf9d71f7f1f1d2bba51538d9a21d794e3df8e8e2f6ba826c90dfaa2f85320e258a7a8c88aa6c81415860dfaa2a809441ccf29aa327d51bc16a871bc6768aa0dd5a478251071d429d695ba5c67561702358e2a43b3dea8b3e43b8188a3475153345963c903811ac75b86506b6890e28d40c47148515775595729ca02758e7d86503775963ca268a88662b0b373813ac736436898064b3e13e8735c503cad9f2aa7758a8f02758ecf0cbd53f3d4a30805fa1c11c5469df43a4b7e11a8737c62e835cc064b7e15e8737ca3686aa6626a14b1409da3cf1099a689287604fa1ca714a10615c89243813a4787218210b2e4ae40cc31a3e8699eeab1e49e408363ccd0f7a0e7537405628e1245a42315e9149b020d8e13863e828825cf04628e16455ff7559f252f051a1c6d86d8873ea6f82010731c53c40656b14131116870cc19620c314b8e04628e29c5c008d48025b7041a1c03864100838022101808041204bf68303fe8fdda7e00fdeff7c5d8f6f3717040a930faf485e2874f170113beb6ca7e8fc901e5a607356233a2f01dc159f957f0f43c5f1f4c93c5b6df21039dcd3ece299b3dc1907c052f9567a578659763a20416141078856f54e72b7ee172cfc93c2f93452f9c8166fc5ed5ada7d295c95f30cd5811d29afcadf083ed365c670160570cdf8333d9f24bd22abd4e6bc3af4b1452d09bbce797f8a40bfb8f7df771f0021ea6c1fce58ca746acace8bf75903376f77cf7ca5d6c0d9fcb7e49f7c2aab85ebbd4b78e44ea236fe0ba60c72f823466c42f401119d988f456fa0a2c6b29a6c2d201d57ef9ec72e5e7140bb59d82e82a29f945b3eb0abfc94d096e7bfc80e4daee8e9f08e297e3a09d019c74a81f0b4ce6c832047eb51f003f577eb8984d7df2e3fca1e407c055859f1f32cb388e27513c7472d01ae5c9082e9a1b7ead582a7e926e0b3acf6461f82861234a0391f708d25575b01f89de504cadcef85dbf3b369c59789559a97f2f91debfc976ea92cea4acb76ad17a430b10ffb6c3b50e7b1e6231def64bc8c145463ef86ac96f9ac2532c39e117f1e2525af85964860fc88275303db2f66b75f8bed4ea3bf1cbca2a98ae64e2b168ffbabdcc2f66616ffb8dc9c133877c703fb91893277bc32fe7c5e3a8f09bbb20f5c8821df436fd8024f3ee51d6c3fb511c3ebe648b7079a393e756d96f23a89fe70287982ceff2895df62b66977d4e7aedc01b64e5fab52e9b45f7affcc2fbe1d013fdcfd6476a5d77c73bf561b22984f34c26c52c55226aadd16a248bf5d11a4dade96ed13d7e3984c5b645f73fc7718a3bd8caaf470e161b34f31b9303cd9dfa26b7e443725829896e2a9341b9e93c52c739504ff891095d0fb62ae161b776cbecbdbfcdb7ce2177d7ef13c1fd3400f46abfcad8e7976cdedfd84de0db7ea4cbfb9fa864eff341b2f180567ed2f9861fbc2db6c46ffbedb9d657ca14ebb7d8060ea9c40eab66e54731ee7c9cb313627f26f3583c9cdcc2031e8ded41fe71d256e4fea78b0017f2ff6fb81bebec970a36be1e84e8bf1679278efff9fde85ff6152716</data>
+    </image>
+</images>
+<connections>
+    <connection>
+        <sender>buttonOk</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetTheoryBlockDialogBase</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>buttonCancel</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetTheoryBlockDialogBase</receiver>
+        <slot>reject()</slot>
+    </connection>
+</connections>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>
