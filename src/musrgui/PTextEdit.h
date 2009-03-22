@@ -80,7 +80,7 @@ private slots:
   void textFamily( const QString &f );
   void textSize( const QString &p );
 
-  void musrGetAsymetryDefault();
+  void musrGetAsymmetryDefault();
   void musrGetSingleHistoDefault();
   void musrCalcChisq();
   void musrFit();

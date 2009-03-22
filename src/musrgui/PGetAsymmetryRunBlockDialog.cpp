@@ -42,8 +42,8 @@
  */
 PGetAsymmetryRunBlockDialog::PGetAsymmetryRunBlockDialog(const QString help, QWidget *parent, const char *name,
                                                          bool modal, WFlags f) :
-                                                         fHelp(help),
-                                                         PGetAsymmetryRunBlockDialogBase(parent, name, modal, f)
+                                                         PGetAsymmetryRunBlockDialogBase(parent, name, modal, f),
+                                                         fHelp(help)
 {
   fForward_lineEdit->setValidator( new QIntValidator(fForward_lineEdit) );
   fBackward_lineEdit->setValidator( new QIntValidator(fBackward_lineEdit) );

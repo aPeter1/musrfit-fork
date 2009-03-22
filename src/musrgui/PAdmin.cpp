@@ -159,6 +159,7 @@ bool PAdminXMLParser::characters(const QString& str)
       else
         flag = false;
       fAdmin->setLifetimeCorrectionFlag(flag);
+      break;
     case eMsrDefaultFilePath:
       fAdmin->setMsrDefaultFilePath(QString(str.ascii()).stripWhiteSpace());
       break;
@@ -224,6 +225,7 @@ PAdmin::PAdmin()
 {
   fExecPath = QString("");
   fDefaultSavePath = QString("");
+  fMsrDefaultFilePath = QString("");
   fTheoFuncPixmapPath = QString("");
 
   fBeamline   = QString("");

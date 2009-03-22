@@ -111,14 +111,13 @@ class PAdmin
 
     QString fExecPath;
     QString fDefaultSavePath;
+    QString fMsrDefaultFilePath;
     QString fTheoFuncPixmapPath;
 
     QString fBeamline;
     QString fInstitute;
     QString fFileFormat;
     bool fLifetimeCorrection;
-
-    QString fMsrDefaultFilePath;
 
     QString fHelpMain;
 

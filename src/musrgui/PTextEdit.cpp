@@ -248,8 +248,8 @@ void PTextEdit::setupMusrActions()
   menuBar()->insertItem( tr( "&MusrFit" ), menu );
 
   QAction *a;
-  a = new QAction( QPixmap::fromMimeSource( "musrasym.xpm" ), tr( "&Asymetry Default" ), ALT + Key_A, this, "musrGetAsymetryDefault" );
-  connect( a, SIGNAL( activated() ), this, SLOT( musrGetAsymetryDefault() ) );
+  a = new QAction( QPixmap::fromMimeSource( "musrasym.xpm" ), tr( "&Asymmetry Default" ), ALT + Key_A, this, "musrGetAsymmetryDefault" );
+  connect( a, SIGNAL( activated() ), this, SLOT( musrGetAsymmetryDefault() ) );
   a->addTo( tb );
   a->addTo( menu );
 
@@ -659,7 +659,7 @@ void PTextEdit::textSize( const QString &p )
 /**
  * <p>
  */
-void PTextEdit::musrGetAsymetryDefault()
+void PTextEdit::musrGetAsymmetryDefault()
 {
   QString runFileName, beamline, institute, fileFormat;
 
