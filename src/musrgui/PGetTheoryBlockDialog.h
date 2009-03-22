@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  PSubTextEdit.h
+  PGetTheoryBlockDialog.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -29,39 +29,26 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PSUBTEXTEDIT_H_
-#define _PSUBTEXTEDIT_H_
-
-#include <qtextedit.h>
+#ifndef _PGETTHEORYBLOCKDIALOG_H_
+#define _PGETTHEORYBLOCKDIALOG_H_
 
 #include "PAdmin.h"
+#include "forms/PGetTheoryBlockDialogBase.h"
 
-class PSubTextEdit : public QTextEdit
+class PGetTheoryBlockDialog : public PGetTheoryBlockDialogBase
 {
-    Q_OBJECT
-
   public:
-    PSubTextEdit(PAdmin *admin = 0, QWidget *parent = 0, const char *name = 0);
+    PGetTheoryBlockDialog(PAdmin *admin = 0,
+                          QWidget * parent = 0, const char * name = 0, bool modal = FALSE,
+                          WFlags f = 0);
 
-  protected:
-    virtual QPopupMenu *createPopupMenu( const QPoint &pos);
+    QString getTheoryBlock() { return fTheoryBlock_textEdit->text(); }
 
   private slots:
-    void insertTitle();
-    void insertParameterBlock();
-    void insertTheoryBlock();
-    void insertFunctionBlock();
-    void insertAsymRunBlock();
-    void insertSingleHistRunBlock();
-    void insertNonMusrRunBlock();
-    void insertCommandBlock();
-    void insertFourierBlock();
-    void insertPlotBlock();
-    void insertStatisticBlock();
+    void helpContents();
 
   private:
     PAdmin *fAdmin;
-
 };
 
-#endif // _PSUBTEXTEDIT_H_
+#endif // _PGETTHEORYBLOCKDIALOG_H_

@@ -29,8 +29,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <cstdlib>
-
 #include <qmessagebox.h>
 
 #include "PAdmin.h"
@@ -46,6 +44,7 @@
 PAdminXMLParser::PAdminXMLParser(PAdmin *admin) : fAdmin(admin)
 {
   fKeyWord = eEmpty;
+  fFunc = false;
 }
 
 //--------------------------------------------------------------------------
@@ -84,6 +83,28 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eMsrDefaultFilePath;
   } else if (qName == "help_main") {
     fKeyWord = eHelpMain;
+  } else if (qName == "func_pixmap_path") {
+    fKeyWord = eTheoFuncPixmapPath;
+  } else if (qName == "func") {
+    fKeyWord = eFunc;
+    fFunc = true;
+    // init theory item
+    fTheoryItem.name = "";
+    fTheoryItem.comment = "";
+    fTheoryItem.label = "";
+    fTheoryItem.pixmapName = "";
+    fTheoryItem.pixmap = 0;
+    fTheoryItem.params = -1;
+  } else if (qName == "name") {
+    fKeyWord = eFuncName;
+  } else if (qName == "comment") {
+    fKeyWord = eFuncComment;
+  } else if (qName == "label") {
+    fKeyWord = eFuncLabel;
+  } else if (qName == "pixmap") {
+    fKeyWord = eFuncPixmap;
+  } else if (qName == "params") {
+    fKeyWord = eFuncParams;
   }
 
   return true;
@@ -94,9 +115,14 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
  * <p>Routine called when the end XML tag is found. It is used to
  * put the filtering tag to 'empty'.
  */
-bool PAdminXMLParser::endElement( const QString&, const QString&, const QString& )
+bool PAdminXMLParser::endElement( const QString&, const QString&, const QString &qName )
 {
   fKeyWord = eEmpty;
+
+  if (qName == "func") {
+    fFunc = false;
+    fAdmin->addTheoryItem(fTheoryItem);
+  }
 
   return true;
 }
@@ -142,8 +168,36 @@ bool PAdminXMLParser::characters(const QString& str)
       help.replace("&lt;", "<");
       fAdmin->setHelpMain(help);
       break;
+    case eTheoFuncPixmapPath:
+      fAdmin->setTheoFuncPixmapPath(QString(str.ascii()).stripWhiteSpace());
+      break;
     default:
       break;
+  }
+
+  if (fFunc) {
+    bool ok;
+    switch (fKeyWord) {
+      case eFuncName:
+        fTheoryItem.name = QString(str.latin1()).stripWhiteSpace();
+        break;
+      case eFuncComment:
+        fTheoryItem.comment = QString(str.latin1()).stripWhiteSpace();
+        break;
+      case eFuncLabel:
+        fTheoryItem.label = QString(str.latin1()).stripWhiteSpace();
+        break;
+      case eFuncPixmap:
+        fTheoryItem.pixmapName = QString(str.latin1()).stripWhiteSpace();
+        break;
+      case eFuncParams:
+        fTheoryItem.params = str.toInt(&ok);
+        if (!ok)
+          return false;
+        break;
+      default:
+        break;
+    }
   }
 
   return true;
@@ -170,6 +224,7 @@ PAdmin::PAdmin()
 {
   fExecPath = QString("");
   fDefaultSavePath = QString("");
+  fTheoFuncPixmapPath = QString("");
 
   fBeamline   = QString("");
   fInstitute  = QString("");
@@ -190,6 +245,20 @@ PAdmin::PAdmin()
     reader.setContentHandler( &handler );
     reader.parse( source );
   }
+}
+
+//--------------------------------------------------------------------------
+// implementation of PAdmin class
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ */
+PTheory* PAdmin::getTheoryItem(const unsigned int idx)
+{
+  if (idx > fTheory.size())
+    return 0;
+  else
+    return &fTheory[idx];
 }
 
 //--------------------------------------------------------------------------

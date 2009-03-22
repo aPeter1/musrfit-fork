@@ -21,53 +21,54 @@
       Starting with &gt;= Qt4.2 this will be linked automatically but until then ...; sorry ;-)
     </help_main>
   </help_section>
+  <func_pixmap_path>/home/nemu/analysis/musrfit/src/musrgui/latex_images</func_pixmap_path>
   <theory_functions>
     <func>
       <name>asymmetry</name>
       <comment></comment>
       <label>  : Asymmetry</label>
-      <pixmap>latex_images/asymmetry.png</pixmap>
+      <pixmap>asymmetry.png</pixmap>
       <params>1</params>
     </func>
     <func>
       <name>simplExpo</name>
       <comment>(rate)</comment>
       <label>  : simple Exp</label>
-      <pixmap>latex_images/simpleExp.png</pixmap>
+      <pixmap>simpleExp.png</pixmap>
       <params>1</params>
     </func>
     <func>
       <name>generExpo</name>
       <comment>(rate exponent)</comment>
       <label>  : general Exp</label>
-      <pixmap>latex_images/generalExp.png</pixmap>
+      <pixmap>generalExp.png</pixmap>
       <params>2</params>
     </func>
     <func>
       <name>simplGss</name>
       <comment>(rate)</comment>
       <label>  : simple Gauss</label>
-      <pixmap>latex_images/simpleGauss.png</pixmap>
+      <pixmap>simpleGauss.png</pixmap>
       <params>1</params>
     </func>
     <func>
       <name>statGssKT</name>
       <comment>(rate)</comment>
       <label>  : static Gauss KT</label>
-      <pixmap>latex_images/statGssKT.png</pixmap>
+      <pixmap>statGssKT.png</pixmap>
       <params>1</params>
     </func>
     <func>
       <name>statGssKTLF</name>
       <comment>(frequency damping)</comment>
-      <label>  : static Gauss KT LF</label>
+      <label>static Gauss KT LF</label>
       <pixmap></pixmap>
       <params>2</params>
     </func>
     <func>
       <name>dynGssKTLF</name>
       <comment>(frequency damping hopping-rate)</comment>
-      <label>  : dynamic Gauss KT LF</label>
+      <label>dynamic Gauss KT LF</label>
       <pixmap></pixmap>
       <params>3</params>
     </func>
@@ -75,20 +76,20 @@
       <name>statExpKT</name>
       <comment>(rate)</comment>
       <label>  : static Lorentz KT</label>
-      <pixmap>latex_images/statExpKT.png</pixmap>
+      <pixmap>statExpKT.png</pixmap>
       <params>1</params>
     </func>
     <func>
       <name>statExpKTLF</name>
       <comment>(frequency damping)</comment>
-      <label>  : static Gauss KT LF</label>
+      <label>static Gauss KT LF</label>
       <pixmap></pixmap>
       <params>2</params>
     </func>
     <func>
       <name>dynExpKTLF</name>
       <comment>(frequency damping hopping-rate)</comment>
-      <label>  : static Lorentz KT LF</label>
+      <label>static Lorentz KT LF</label>
       <pixmap></pixmap>
       <params>3</params>
     </func>
@@ -96,20 +97,20 @@
       <name>combiLGKT</name>
       <comment>(LorentzRate GaussRate)</comment>
       <label>  : combined Lorentz-Gauss KT</label>
-      <pixmap>latex_images/combiLGKT.png</pixmap>
+      <pixmap>combiLGKT.png</pixmap>
       <params>2</params>
     </func>
     <func>
       <name>spinGlass</name>
       <comment>(rate hopping-rate order)</comment>
-      <label>  : zero field spin glass function</label>
+      <label>zero field spin glass function</label>
       <pixmap></pixmap>
       <params>3</params>
     </func>
     <func>
       <name>rdAnisoHf</name>
       <comment>(frequency rate)</comment>
-      <label>  : random anisotropic hyperfine function</label>
+      <label>random anisotropic hyperfine function</label>
       <pixmap></pixmap>
       <params>2</params>
     </func>
@@ -117,41 +118,41 @@
       <name>abragam</name>
       <comment>(rate hopping-rate)</comment>
       <label>  : Abragam</label>
-      <pixmap>latex_images/abragam.png</pixmap>
+      <pixmap>abragam.png</pixmap>
       <params>2</params>
     </func>
     <func>
       <name>internFld</name>
       <comment>(phase frequency Trate Lrate)</comment>
       <label>  : internal Lorentz field</label>
-      <pixmap>latex_images/internalField.png</pixmap>
+      <pixmap>internalField.png</pixmap>
       <params>4</params>
     </func>
     <func>
       <name>TFieldCos</name>
       <comment>(phase frequency)</comment>
       <label>  : TF cos</label>
-      <pixmap>latex_images/tfCos.png</pixmap>
+      <pixmap>tfCos.png</pixmap>
       <params>2</params>
     </func>
     <func>
       <name>bessel</name>
       <comment>(phase frequency)</comment>
       <label>  : spherical Bessel 0th order</label>
-      <pixmap>latex_images/bessel.png</pixmap>
+      <pixmap>bessel.png</pixmap>
       <params>2</params>
     </func>
     <func>
       <name>internBsl</name>
       <comment>(fraction phase frequency Trate Lrate)</comment>
       <label>  : static internal Bessel</label>
-      <pixmap>latex_images/internalBessel.png</pixmap>
+      <pixmap>internalBessel.png</pixmap>
       <params>5</params>
     </func>
     <func>
       <name>skewedGss</name>
       <comment>(phase frequency rate_m rate_p)</comment>
-      <label>  : skewed Gaussian</label>
+      <label>skewed Gaussian</label>
       <pixmap></pixmap>
       <params>4</params>
     </func>
@@ -159,13 +160,13 @@
       <name>polynom</name>
       <comment>(tshift p0 p1 ... pn)</comment>
       <label>  : polynom</label>
-      <pixmap>latex_images/polynom.png</pixmap>
+      <pixmap>polynom.png</pixmap>
       <params>4</params>
     </func> 
     <func>
       <name>userFcn</name>
       <comment></comment>
-      <label>  : user function</label>
+      <label>user function</label>
       <pixmap></pixmap>
       <params>0</params>
     </func> 

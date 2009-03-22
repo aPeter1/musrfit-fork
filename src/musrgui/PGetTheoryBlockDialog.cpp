@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  PSubTextEdit.h
+  PGetTheoryBlockDialog.cpp
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -29,39 +29,48 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PSUBTEXTEDIT_H_
-#define _PSUBTEXTEDIT_H_
-
+#include <qmessagebox.h>
 #include <qtextedit.h>
+#include <qcombobox.h>
+#include <qpixmap.h>
+#include <qimage.h>
 
-#include "PAdmin.h"
+#include "PGetTheoryBlockDialog.h"
 
-class PSubTextEdit : public QTextEdit
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+PGetTheoryBlockDialog::PGetTheoryBlockDialog(PAdmin *admin,
+                                             QWidget * parent, const char *name,
+                                             bool modal, WFlags f) :
+              PGetTheoryBlockDialogBase(parent, name, modal, f),
+              fAdmin(admin)
 {
-    Q_OBJECT
+  // feed theory function combo box
+  QString pixmapPath = fAdmin->getTheoFuncPixmapPath();
+  PTheory *theoItem;
+  for (unsigned int i=0; i<fAdmin->getTheoryCounts();  i++) {
+    theoItem = fAdmin->getTheoryItem(i);
+    if (theoItem->pixmapName.length() > 0) {
+      QPixmap pixmap( QImage(pixmapPath+"/"+theoItem->pixmapName, "PNG") );
+      fTheoryFunction_comboBox->insertItem(pixmap, theoItem->label);
+    } else {
+      fTheoryFunction_comboBox->insertItem(theoItem->label);
+    }
+  }
+}
 
-  public:
-    PSubTextEdit(PAdmin *admin = 0, QWidget *parent = 0, const char *name = 0);
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PGetTheoryBlockDialog::helpContents()
+{
+  QMessageBox::information(this, "helpContents",
+                           fAdmin->getHelpMain(), QMessageBox::Ok);
+}
 
-  protected:
-    virtual QPopupMenu *createPopupMenu( const QPoint &pos);
-
-  private slots:
-    void insertTitle();
-    void insertParameterBlock();
-    void insertTheoryBlock();
-    void insertFunctionBlock();
-    void insertAsymRunBlock();
-    void insertSingleHistRunBlock();
-    void insertNonMusrRunBlock();
-    void insertCommandBlock();
-    void insertFourierBlock();
-    void insertPlotBlock();
-    void insertStatisticBlock();
-
-  private:
-    PAdmin *fAdmin;
-
-};
-
-#endif // _PSUBTEXTEDIT_H_
+//----------------------------------------------------------------------------------------------------
+// END
+//----------------------------------------------------------------------------------------------------

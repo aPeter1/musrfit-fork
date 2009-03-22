@@ -33,10 +33,21 @@
 #define _PADMIN_H_
 
 #include <qstring.h>
-#include <qptrlist.h>
+#include <qvaluevector.h>
+#include <qpixmap.h>
 #include <qxml.h>
 
 class PAdmin;
+
+//---------------------------------------------------------------------------
+typedef struct {
+  QString name;
+  QString comment;
+  QString label;
+  QString pixmapName;
+  QPixmap pixmap;
+  int     params;
+} PTheory;
 
 //---------------------------------------------------------------------------
 class PAdminXMLParser : public QXmlDefaultHandler
@@ -47,8 +58,8 @@ class PAdminXMLParser : public QXmlDefaultHandler
 
   private:
     enum EAdminKeyWords {eEmpty, eExecPath, eDefaultSavePath, eBeamline, eInstitute, eFileFormat,
-                         eLifetimeCorrection, eMsrDefaultFilePath,
-                         eHelpMain};
+                         eLifetimeCorrection, eMsrDefaultFilePath, eHelpMain, eTheoFuncPixmapPath,
+                         eFunc, eFuncName, eFuncComment, eFuncLabel, eFuncPixmap, eFuncParams};
 
     bool startDocument();
     bool startElement( const QString&, const QString&, const QString& ,
@@ -59,6 +70,8 @@ class PAdminXMLParser : public QXmlDefaultHandler
     bool endDocument();
 
     EAdminKeyWords fKeyWord;
+    bool           fFunc;
+    PTheory        fTheoryItem;
     PAdmin         *fAdmin;
 };
 
@@ -77,6 +90,9 @@ class PAdmin
     bool    getLifetimeCorrectionFlag() { return fLifetimeCorrection; }
     QString getMsrDefaultFilePath() { return fMsrDefaultFilePath; }
     QString getHelpMain() { return fHelpMain; }
+    QString getTheoFuncPixmapPath() { return fTheoFuncPixmapPath; }
+    unsigned int getTheoryCounts() { return fTheory.size(); }
+    PTheory* getTheoryItem(const unsigned int idx);
 
   protected:
     void setExecPath(const QString str) { fExecPath = str; }
@@ -87,12 +103,15 @@ class PAdmin
     void setLifetimeCorrectionFlag(const bool flag) { fLifetimeCorrection = flag; }
     void setMsrDefaultFilePath(const QString str) { fMsrDefaultFilePath = str; }
     void setHelpMain(const QString str) { fHelpMain = str; }
+    void setTheoFuncPixmapPath (const QString str) { fTheoFuncPixmapPath = str; }
+    void addTheoryItem(const PTheory theo) { fTheory.push_back(theo); }
 
   private:
     friend class PAdminXMLParser;
 
     QString fExecPath;
     QString fDefaultSavePath;
+    QString fTheoFuncPixmapPath;
 
     QString fBeamline;
     QString fInstitute;
@@ -102,6 +121,8 @@ class PAdmin
     QString fMsrDefaultFilePath;
 
     QString fHelpMain;
+
+    QValueVector<PTheory> fTheory;
 };
 
 #endif // _PADMIN_H_

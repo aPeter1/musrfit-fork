@@ -36,9 +36,11 @@
 #include <qcombobox.h>
 #include <qmessagebox.h>
 
+#include "PAdmin.h"
 #include "PSubTextEdit.h"
 #include "forms/PGetTitleDialog.h"
 #include "PGetParameterDialog.h"
+#include "PGetTheoryBlockDialog.h"
 #include "PGetFunctionsBlockDialog.h"
 #include "PGetAsymmetryRunBlockDialog.h"
 #include "PGetSingleHistoRunBlockDialog.h"
@@ -50,11 +52,10 @@
 /**
  * <p>
  */
-PSubTextEdit::PSubTextEdit(const bool lifetimeCorrectionFlag, const QString help,
+PSubTextEdit::PSubTextEdit(PAdmin *admin,
                            QWidget *parent, const char *name) :
                            QTextEdit(parent, name),
-                           fLifetimeCorrectionFlag(lifetimeCorrectionFlag),
-                           fHelp(help)
+                           fAdmin(admin)
 {
 }
 
@@ -149,6 +150,11 @@ void PSubTextEdit::insertParameterBlock()
  */
 void PSubTextEdit::insertTheoryBlock()
 {
+  PGetTheoryBlockDialog *dlg = new PGetTheoryBlockDialog(fAdmin);
+  if (dlg->exec() == QDialog::Accepted) {
+    insert(dlg->getTheoryBlock());
+    insert("\n\n");
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -157,7 +163,7 @@ void PSubTextEdit::insertTheoryBlock()
  */
 void PSubTextEdit::insertFunctionBlock()
 {
-  PGetFunctionsBlockDialog *dlg = new PGetFunctionsBlockDialog(fHelp);
+  PGetFunctionsBlockDialog *dlg = new PGetFunctionsBlockDialog(fAdmin->getHelpMain());
   if (dlg->exec() == QDialog::Accepted) {
     insert(dlg->getFunctionsBlock());
     insert("\n\n");
@@ -170,7 +176,7 @@ void PSubTextEdit::insertFunctionBlock()
  */
 void PSubTextEdit::insertAsymRunBlock()
 {
-  PGetAsymmetryRunBlockDialog *dlg = new PGetAsymmetryRunBlockDialog(fHelp);
+  PGetAsymmetryRunBlockDialog *dlg = new PGetAsymmetryRunBlockDialog(fAdmin->getHelpMain());
   if (dlg->exec() == QDialog::Accepted) {
     QString str, workStr;
     bool valid = true, present = true;
@@ -270,7 +276,7 @@ void PSubTextEdit::insertAsymRunBlock()
  */
 void PSubTextEdit::insertSingleHistRunBlock()
 {
-  PGetSingleHistoRunBlockDialog *dlg = new PGetSingleHistoRunBlockDialog(fHelp);
+  PGetSingleHistoRunBlockDialog *dlg = new PGetSingleHistoRunBlockDialog(fAdmin->getHelpMain());
   if (dlg->exec() == QDialog::Accepted) {
     QString str, workStr;
     bool valid = true, present = true;
@@ -370,7 +376,7 @@ void PSubTextEdit::insertSingleHistRunBlock()
  */
 void PSubTextEdit::insertNonMusrRunBlock()
 {
-  PGetNonMusrRunBlockDialog *dlg = new PGetNonMusrRunBlockDialog(fHelp);
+  PGetNonMusrRunBlockDialog *dlg = new PGetNonMusrRunBlockDialog(fAdmin->getHelpMain());
   if (dlg->exec() == QDialog::Accepted) {
     QString str, workStr;
     bool valid = true;

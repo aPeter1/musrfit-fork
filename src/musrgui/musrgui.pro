@@ -20,6 +20,7 @@ HEADERS = PTextEdit.h \
     PPrefsDialog.h \
     PGetDefaultDialog.h \
     PGetParameterDialog.h \
+    PGetTheoryBlockDialog.h \
     PGetFunctionsBlockDialog.h \
     PGetAsymmetryRunBlockDialog.h \
     PGetSingleHistoRunBlockDialog.h \
@@ -35,6 +36,7 @@ SOURCES = PTextEdit.cpp \
     PPrefsDialog.cpp \
     PGetDefaultDialog.cpp \
     PGetParameterDialog.cpp \
+    PGetTheoryBlockDialog.cpp \
     PGetFunctionsBlockDialog.cpp \
     PGetAsymmetryRunBlockDialog.cpp \
     PGetSingleHistoRunBlockDialog.cpp \
@@ -49,6 +51,7 @@ FORMS = forms/PGetDefaultDialogBase.ui \
     forms/PPrefsDialogBase.ui \
     forms/PGetTitleDialog.ui \
     forms/PGetParameterDialogBase.ui \
+    forms/PGetTheoryBlockDialogBase.ui \
     forms/PGetFunctionsBlockDialogBase.ui \
     forms/PGetAsymmetryRunBlockDialogBase.ui \
     forms/PGetSingleHistoRunBlockDialogBase.ui \
