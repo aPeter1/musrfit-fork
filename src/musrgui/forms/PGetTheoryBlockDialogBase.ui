@@ -110,32 +110,6 @@
             </widget>
         </hbox>
     </widget>
-    <widget class="QTextEdit">
-        <property name="name">
-            <cstring>fTheoryBlock_textEdit</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>10</x>
-                <y>346</y>
-                <width>570</width>
-                <height>250</height>
-            </rect>
-        </property>
-        <property name="font">
-            <font>
-                <family>Courier</family>
-            </font>
-        </property>
-        <property name="text">
-            <string>###############################################################
-THEORY
-</string>
-        </property>
-        <property name="wordWrap">
-            <enum>WidgetWidth</enum>
-        </property>
-    </widget>
     <widget class="QGroupBox">
         <property name="name">
             <cstring>groupBox1</cstring>
@@ -227,10 +201,36 @@ simplExpo 7</string>
             <bool>true</bool>
         </property>
     </widget>
+    <widget class="QTextEdit">
+        <property name="name">
+            <cstring>fTheoryBlock_textEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>346</y>
+                <width>570</width>
+                <height>250</height>
+            </rect>
+        </property>
+        <property name="font">
+            <font>
+                <family>Courier</family>
+            </font>
+        </property>
+        <property name="text">
+            <string>###############################################################
+THEORY
+</string>
+        </property>
+        <property name="wordWrap">
+            <enum>WidgetWidth</enum>
+        </property>
+    </widget>
 </widget>
 <images>
     <image name="image0">
-        <data format="PNG" length="407">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000015e49444154388dad54318ec4200c1ca31429f38ed06d09ef8792ce7907653aae088e0c1b6ed9d321213490d8e361307162e004b002f9ccd8d60dfbcb16d47124a6fe7c069b7ce666d3aaa0c0b5bf3b5be4bcff7e848913239f19cef94200383169c604a0fc81b991a0a801f299af20359864d85fb6cc30156cb675d395df998fc494cfdc9c6966126c84cdd3cf4d795dd2598d8d77bec418aed223539f596421608aa9601362a06ddd1063a011937b7ca1313df97884f7972db3ee78f3f1088b0567dd616635fbe40ee77c69349ed54c0fef7c793cff0f8dadb3452efea9b72c9ae1a7f550cfbd0020f562df64aafbf7e4c4d06b3f8b9a1c199c18cd5e628418b00057e369b4ad9965df3b7f970dddfd563495108050e32c787a5118e3918f8fc414aa3b8ec8b400d7450889509ff753059fee40bae4ee6c592498be7d612895f478e87b358c2e53f786dff0d0f77de06f34fe8db9ee92146298f6f137eb0f98104228d12bbd020000000049454e44ae426082</data>
+        <data format="PNG" length="415">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000016649444154388dad54c18dc4200c1ca33cd3409ea1801440ea870228c079d2007fee9138326cd865578784d0d8891986c1c491810c6006524e58e605eb660bae7144a6363f824dcaa90a5a551438e3abb345f2edf73d4c1c19292738b71702c09149332600e507e6468ae22a90723a8b5cc5648775b36584a960b3cc8b3ef9bdf31199524e554e3393623d6c9e7eae8ed76c3aac3180e28327e7f67204a627cdd6cd9efa77f28f1afbe069991784e0a9c7e41e5f684c4f3eeee175b365d41d2f3eee61b1e0a83bcca7dbbd3ffee00ee7f6a2b119d54c8fddede531ff1f1a5b678b5cfc536f9934c34f2bd4732f0048bdd81799aef83d3932f4dacea22607064746158b0c1f3c0c70361e1f3cb17ac629a73b0e0092afc49eebde428af104e0d50de863747c7c44267fb9e3084c13705e8490108695b60deeadd2255767cb24c5f4ed0b4339498bbbbe57c354c754bde11deefabe2dfc8dc6ef98874bc62330910f7ed8c7dfac7f004a406a2bc502fb0000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -252,9 +252,23 @@ simplExpo 7</string>
         <receiver>PGetTheoryBlockDialogBase</receiver>
         <slot>helpContents()</slot>
     </connection>
+    <connection>
+        <sender>fPlus_pushButton</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetTheoryBlockDialogBase</receiver>
+        <slot>addPlus()</slot>
+    </connection>
+    <connection>
+        <sender>fMultiply_pushButton</sender>
+        <signal>clicked()</signal>
+        <receiver>PGetTheoryBlockDialogBase</receiver>
+        <slot>addMultiply()</slot>
+    </connection>
 </connections>
 <slots>
     <slot access="private">helpContents()</slot>
+    <slot access="private">addPlus()</slot>
+    <slot access="private">addMultiply()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

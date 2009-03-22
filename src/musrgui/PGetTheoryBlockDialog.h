@@ -45,6 +45,9 @@ class PGetTheoryBlockDialog : public PGetTheoryBlockDialogBase
     QString getTheoryBlock() { return fTheoryBlock_textEdit->text(); }
 
   private slots:
+    QString getTheoFuncString();
+    void addPlus();
+    void addMultiply();
     void helpContents();
 
   private:

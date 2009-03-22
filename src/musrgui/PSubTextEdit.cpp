@@ -153,7 +153,7 @@ void PSubTextEdit::insertTheoryBlock()
   PGetTheoryBlockDialog *dlg = new PGetTheoryBlockDialog(fAdmin);
   if (dlg->exec() == QDialog::Accepted) {
     insert(dlg->getTheoryBlock());
-    insert("\n\n");
+    insert("\n");
   }
 }
 

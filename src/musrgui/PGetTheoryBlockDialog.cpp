@@ -65,6 +65,53 @@ PGetTheoryBlockDialog::PGetTheoryBlockDialog(PAdmin *admin,
 /**
  * <p>
  */
+QString PGetTheoryBlockDialog::getTheoFuncString()
+{
+  QString str = "????";
+  int idx = fTheoryFunction_comboBox->currentItem();
+  PTheory *theoItem = fAdmin->getTheoryItem(idx);
+  if (theoItem == 0)
+    return str;
+
+  // add theory function name
+  str = theoItem->name + "   ";
+  if (theoItem->name == "userFcn") {
+    str += "libMyLibrary.so  TMyFunction  ";
+  }
+  // add pseudo parameters
+  for (int i=0; i<theoItem->params; i++) {
+    str += QString("%1").arg(i+1) + "   ";
+  }
+  // add comment
+  str += theoItem->comment;
+
+  return str;
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PGetTheoryBlockDialog::addPlus()
+{
+  QString str = getTheoFuncString() + "\n+\n";
+  fTheoryBlock_textEdit->append(str);
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PGetTheoryBlockDialog::addMultiply()
+{
+  QString str = getTheoFuncString() + "\n";
+  fTheoryBlock_textEdit->append(str);
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
 void PGetTheoryBlockDialog::helpContents()
 {
   QMessageBox::information(this, "helpContents",
