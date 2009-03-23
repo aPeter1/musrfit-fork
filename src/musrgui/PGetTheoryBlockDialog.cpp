@@ -49,12 +49,14 @@ PGetTheoryBlockDialog::PGetTheoryBlockDialog(PAdmin *admin,
 {
   // feed theory function combo box
   QString pixmapPath = fAdmin->getTheoFuncPixmapPath();
+  QString label;
   PTheory *theoItem;
   for (unsigned int i=0; i<fAdmin->getTheoryCounts();  i++) {
     theoItem = fAdmin->getTheoryItem(i);
     if (theoItem->pixmapName.length() > 0) {
       QPixmap pixmap( QImage(pixmapPath+"/"+theoItem->pixmapName, "PNG") );
-      fTheoryFunction_comboBox->insertItem(pixmap, theoItem->label);
+      label = "  : " + theoItem->label;
+      fTheoryFunction_comboBox->insertItem(pixmap, label);
     } else {
       fTheoryFunction_comboBox->insertItem(theoItem->label);
     }

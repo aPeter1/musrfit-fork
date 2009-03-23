@@ -49,6 +49,7 @@ class PSubTextEdit : public QTextEdit
   private slots:
     void insertTitle();
     void insertParameterBlock();
+    void insertTheoryFunction(int idx);
     void insertTheoryBlock();
     void insertFunctionBlock();
     void insertAsymRunBlock();

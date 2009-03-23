@@ -26,35 +26,35 @@
     <func>
       <name>asymmetry</name>
       <comment></comment>
-      <label>  : Asymmetry</label>
+      <label>Asymmetry</label>
       <pixmap>asymmetry.png</pixmap>
       <params>1</params>
     </func>
     <func>
       <name>simplExpo</name>
       <comment>(rate)</comment>
-      <label>  : simple Exp</label>
+      <label>simple Exp</label>
       <pixmap>simpleExp.png</pixmap>
       <params>1</params>
     </func>
     <func>
       <name>generExpo</name>
       <comment>(rate exponent)</comment>
-      <label>  : general Exp</label>
+      <label>general Exp</label>
       <pixmap>generalExp.png</pixmap>
       <params>2</params>
     </func>
     <func>
       <name>simplGss</name>
       <comment>(rate)</comment>
-      <label>  : simple Gauss</label>
+      <label>simple Gauss</label>
       <pixmap>simpleGauss.png</pixmap>
       <params>1</params>
     </func>
     <func>
       <name>statGssKT</name>
       <comment>(rate)</comment>
-      <label>  : static Gauss KT</label>
+      <label>static Gauss KT</label>
       <pixmap>statGssKT.png</pixmap>
       <params>1</params>
     </func>
@@ -75,7 +75,7 @@
     <func>
       <name>statExpKT</name>
       <comment>(rate)</comment>
-      <label>  : static Lorentz KT</label>
+      <label>static Lorentz KT</label>
       <pixmap>statExpKT.png</pixmap>
       <params>1</params>
     </func>
@@ -96,7 +96,7 @@
     <func>
       <name>combiLGKT</name>
       <comment>(LorentzRate GaussRate)</comment>
-      <label>  : combined Lorentz-Gauss KT</label>
+      <label>combined Lorentz-Gauss KT</label>
       <pixmap>combiLGKT.png</pixmap>
       <params>2</params>
     </func>
@@ -117,35 +117,35 @@
     <func>
       <name>abragam</name>
       <comment>(rate hopping-rate)</comment>
-      <label>  : Abragam</label>
+      <label>Abragam</label>
       <pixmap>abragam.png</pixmap>
       <params>2</params>
     </func>
     <func>
       <name>internFld</name>
       <comment>(phase frequency Trate Lrate)</comment>
-      <label>  : internal Lorentz field</label>
+      <label>internal Lorentz field</label>
       <pixmap>internalField.png</pixmap>
       <params>4</params>
     </func>
     <func>
       <name>TFieldCos</name>
       <comment>(phase frequency)</comment>
-      <label>  : TF cos</label>
+      <label>TF cos</label>
       <pixmap>tfCos.png</pixmap>
       <params>2</params>
     </func>
     <func>
       <name>bessel</name>
       <comment>(phase frequency)</comment>
-      <label>  : spherical Bessel 0th order</label>
+      <label>spherical Bessel 0th order</label>
       <pixmap>bessel.png</pixmap>
       <params>2</params>
     </func>
     <func>
       <name>internBsl</name>
       <comment>(fraction phase frequency Trate Lrate)</comment>
-      <label>  : static internal Bessel</label>
+      <label>static internal Bessel</label>
       <pixmap>internalBessel.png</pixmap>
       <params>5</params>
     </func>
@@ -159,7 +159,7 @@
     <func>
       <name>polynom</name>
       <comment>(tshift p0 p1 ... pn)</comment>
-      <label>  : polynom</label>
+      <label>polynom</label>
       <pixmap>polynom.png</pixmap>
       <params>4</params>
     </func> 

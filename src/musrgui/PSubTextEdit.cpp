@@ -35,6 +35,9 @@
 #include <qlineedit.h>
 #include <qcombobox.h>
 #include <qmessagebox.h>
+#include <qiconset.h>
+#include <qpixmap.h>
+#include <qimage.h>
 
 #include "PAdmin.h"
 #include "PSubTextEdit.h"
@@ -66,6 +69,7 @@ PSubTextEdit::PSubTextEdit(PAdmin *admin,
 QPopupMenu* PSubTextEdit::createPopupMenu(const QPoint &pos)
 {
   QPopupMenu *menu = new QPopupMenu( this );
+  QPopupMenu *theoryFunctions = new QPopupMenu( menu );
 
   QAction *a;
   a = new QAction(tr("insert Title"), 0, this, "insertTitle");
@@ -75,6 +79,14 @@ QPopupMenu* PSubTextEdit::createPopupMenu(const QPoint &pos)
   a = new QAction(tr("insert Parameter Block"), 0, this, "insertParameterBlock");
   connect(a, SIGNAL( activated() ), this, SLOT( insertParameterBlock() ));
   a->addTo( menu );
+
+  // feed the theoryFunctions popup menu
+  for (unsigned int i=0; i<fAdmin->getTheoryCounts(); i++) {
+    PTheory *theoryItem = fAdmin->getTheoryItem(i);
+    theoryFunctions->insertItem(theoryItem->label, 300+i);
+  }
+  menu->insertItem("insert Theory Function", theoryFunctions);
+  connect(theoryFunctions, SIGNAL( activated(int) ), this, SLOT( insertTheoryFunction(int) ));
 
   a = new QAction(tr("insert Theory Block"), 0, this, "insertTheoryBlock");
   connect(a, SIGNAL( activated() ), this, SLOT( insertTheoryBlock() ));
@@ -142,6 +154,45 @@ void PSubTextEdit::insertParameterBlock()
   if (dlg->exec() == QDialog::Accepted) {
     insert(dlg->getParams());
   }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PSubTextEdit::insertTheoryFunction(int idx)
+{
+  if (idx < 300)
+    return;
+
+  int index = idx - 300;
+
+  if (index >= fAdmin->getTheoryCounts())
+    return;
+
+  QString str = "????";
+  PTheory *theoItem = fAdmin->getTheoryItem(index);
+  if (theoItem == 0)
+    return;
+
+  // add theory function name
+  str = theoItem->name + "   ";
+  if (theoItem->name == "userFcn") {
+    str += "libMyLibrary.so  TMyFunction  ";
+  }
+
+  // add pseudo parameters
+  for (int i=0; i<theoItem->params; i++) {
+    str += QString("%1").arg(i+1) + "   ";
+  }
+
+  // add comment
+  str += theoItem->comment;
+
+  // add newline
+  str += "\n";
+
+  insert(str);
 }
 
 //----------------------------------------------------------------------------------------------------
