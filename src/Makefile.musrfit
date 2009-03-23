@@ -98,4 +98,5 @@ $(OBJS): %.o: %.cpp
 install: all
 	@echo "copy $(EXEC) to $(INSTALLPATH)"
 	cp -p $(EXEC) $(INSTALLPATH)
+	cp -p musrfit_startup.xml $(INSTALLPATH)
 
