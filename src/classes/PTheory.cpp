@@ -385,6 +385,10 @@ double PTheory::Func(register double t, const PDoubleVector& paramValues, const 
           return DynamicGaussKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
           break;
+        case THEORY_STATIC_LORENTZ_KT:
+          return StaticLorentzKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
+                 fAdd->Func(t, paramValues, funcValues);
+          break;
         case THEORY_STATIC_LORENTZ_KT_LF:
           return StaticLorentzKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
@@ -465,6 +469,9 @@ double PTheory::Func(register double t, const PDoubleVector& paramValues, const 
         case THEORY_DYNAMIC_GAUSS_KT_LF:
           return DynamicGaussKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
+        case THEORY_STATIC_LORENTZ_KT:
+          return StaticLorentzKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
+          break;
         case THEORY_STATIC_LORENTZ_KT_LF:
           return StaticLorentzKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
@@ -534,6 +541,9 @@ double PTheory::Func(register double t, const PDoubleVector& paramValues, const 
         case THEORY_DYNAMIC_GAUSS_KT_LF:
           return DynamicGaussKTLF(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
+        case THEORY_STATIC_LORENTZ_KT:
+          return StaticLorentzKT(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
+          break;
         case THEORY_STATIC_LORENTZ_KT_LF:
           return StaticLorentzKTLF(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
@@ -600,6 +610,9 @@ double PTheory::Func(register double t, const PDoubleVector& paramValues, const 
           break;
         case THEORY_DYNAMIC_GAUSS_KT_LF:
           return DynamicGaussKTLF(t, paramValues, funcValues);
+          break;
+        case THEORY_STATIC_LORENTZ_KT:
+          return StaticLorentzKT(t, paramValues, funcValues);
           break;
         case THEORY_STATIC_LORENTZ_KT_LF:
           return StaticLorentzKTLF(t, paramValues, funcValues);
@@ -1158,6 +1171,39 @@ double PTheory::DynamicGaussKTLF(register double t, const PDoubleVector& paramVa
 
 //--------------------------------------------------------------------------
 /**
+ * <p> (see Uemura et al. PRB 31, 546 (85))
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$
+ * \param paramValues
+ */
+double PTheory::StaticLorentzKT(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+{
+  // expected parameters: lambda [tshift]
+
+  double val[2];
+
+  assert(fParamNo.size() <= 2);
+
+  // check if FUNCTIONS are used
+  for (unsigned int i=0; i<fParamNo.size(); i++) {
+    if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
+      val[i] = paramValues[fParamNo[i]];
+    } else { // function
+      val[i] = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
+    }
+  }
+
+  double a_t;
+  if (fParamNo.size() == 1) // no tshift
+    a_t = t*val[0];
+  else // tshift present
+    a_t = (t-val[1])*val[0];
+
+  return 0.333333333333333 * (1.0 + 2.0*(1.0 - a_t)*TMath::Exp(-a_t));
+}
+
+//--------------------------------------------------------------------------
+/**
  * <p>
  *
  * \param t time in \f$(\mu\mathrm{s})\f$
@@ -1446,11 +1492,11 @@ double PTheory::Abragam(register double t, const PDoubleVector& paramValues, con
  */
 double PTheory::InternalField(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  // expected parameters: phase frequency rateT rateL [tshift]
+  // expected parameters: fraction phase frequency rateT rateL [tshift]
 
-  double val[5];
+  double val[6];
 
-  assert(fParamNo.size() <= 5);
+  assert(fParamNo.size() <= 6);
 
   // check if FUNCTIONS are used
   for (unsigned int i=0; i<fParamNo.size(); i++) {
@@ -1465,12 +1511,10 @@ double PTheory::InternalField(register double t, const PDoubleVector& paramValue
   if (fParamNo.size() == 4) // no tshift
     tt = t;
   else // tshift present
-    tt = t-val[4];
+    tt = t-val[5];
 
-  return 0.666666666666667*
-                 TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*tt)*
-                 TMath::Exp(-val[2]*tt) +
-         0.333333333333333*TMath::Exp(-val[3]*tt);
+  return val[0]*TMath::Cos(DEG_TO_RAD*val[1]+TWO_PI*val[2]*tt)*TMath::Exp(-val[3]*tt) +
+         (1-val[0])*TMath::Exp(-val[4]*tt);
 }
 
 //--------------------------------------------------------------------------
@@ -1640,7 +1684,7 @@ double PTheory::Polynom(register double t, const PDoubleVector& paramValues, con
   // expected parameters: tshift p0 p1 p2 ...
 
   double result = 0.0;
-  double tshift;
+  double tshift = 0.0;
   double val;
   double expo = 0.0;
 

@@ -52,19 +52,20 @@
 #define THEORY_STATIC_GAUSS_KT               4
 #define THEORY_STATIC_GAUSS_KT_LF            5
 #define THEORY_DYNAMIC_GAUSS_KT_LF           6
-#define THEORY_STATIC_LORENTZ_KT_LF          7
-#define THEORY_DYNAMIC_LORENTZ_KT_LF         8
-#define THEORY_COMBI_LGKT                    9
-#define THEORY_SPIN_GLASS                   10
-#define THEORY_RANDOM_ANISOTROPIC_HYPERFINE 11
-#define THEORY_ABRAGAM                      12
-#define THEORY_INTERNAL_FIELD               13
-#define THEORY_TF_COS                       14
-#define THEORY_BESSEL                       15
-#define THEORY_INTERNAL_BESSEL              16
-#define THEORY_SKEWED_GAUSS                 17
-#define THEORY_POLYNOM                      18
-#define THEORY_USER_FCN                     19
+#define THEORY_STATIC_LORENTZ_KT             7
+#define THEORY_STATIC_LORENTZ_KT_LF          8
+#define THEORY_DYNAMIC_LORENTZ_KT_LF         9
+#define THEORY_COMBI_LGKT                   10
+#define THEORY_SPIN_GLASS                   11
+#define THEORY_RANDOM_ANISOTROPIC_HYPERFINE 12
+#define THEORY_ABRAGAM                      13
+#define THEORY_INTERNAL_FIELD               14
+#define THEORY_TF_COS                       15
+#define THEORY_BESSEL                       16
+#define THEORY_INTERNAL_BESSEL              17
+#define THEORY_SKEWED_GAUSS                 18
+#define THEORY_POLYNOM                      19
+#define THEORY_USER_FCN                     20
 
 // function parameter tags, i.e. how many parameters has a specific function
 // if there is a comment with a (tshift), the number of parameters is increased by one
@@ -75,20 +76,21 @@
 #define THEORY_PARAM_STATIC_GAUSS_KT              1 // damping (tshift)
 #define THEORY_PARAM_STATIC_GAUSS_KT_LF           2 // frequency, damping (tshift)
 #define THEORY_PARAM_DYNAMIC_GAUSS_KT_LF          3 // frequency, damping, hop-rate (tshift)
+#define THEORY_PARAM_STATIC_LORENTZ_KT            1 // damping (tshift)
 #define THEORY_PARAM_STATIC_LORENTZ_KT_LF         2 // frequency, damping (tshift)
 #define THEORY_PARAM_DYNAMIC_LORENTZ_KT_LF        3 // frequency, damping, hop-rate (tshift)
 #define THEORY_PARAM_COMBI_LGKT                   2 // Lorentz rate, Gauss rate (tshift)
 #define THEORY_PARAM_SPIN_GLASS                   3 // rate, hop-rate, order parameter (tshift)
 #define THEORY_PARAM_RANDOM_ANISOTROPIC_HYPERFINE 2 // frequency, rate (tshift)
 #define THEORY_PARAM_ABRAGAM                      2 // rate, hop-rate (tshift)
-#define THEORY_PARAM_INTERNAL_FIELD               4 // phase, frequency, TF damping, damping (tshift)
+#define THEORY_PARAM_INTERNAL_FIELD               5 // fraction, phase, frequency, TF damping, damping (tshift)
 #define THEORY_PARAM_TF_COS                       2 // phase, frequency (tshift)
 #define THEORY_PARAM_BESSEL                       2 // phase, frequency (tshift)
 #define THEORY_PARAM_INTERNAL_BESSEL              5 // fraction, phase, frequency, TF damping, LF damping (tshift)
 #define THEORY_PARAM_SKEWED_GAUSS                 4 // phase, frequency, rate minus, rate plus (tshift)
 
 // number of available user functions
-#define THEORY_MAX 20
+#define THEORY_MAX 21
 
 // maximal number of parameters. Needed in the contents of LF
 #define THEORY_MAX_PARAM 10
@@ -140,6 +142,9 @@ static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
 
         {THEORY_DYNAMIC_GAUSS_KT_LF, THEORY_PARAM_DYNAMIC_GAUSS_KT_LF, true,
          "dynGssKTLF", "dgktlf", "(frequency damping hopping-rate)", "(frequency damping hopping-rate tshift)"},
+
+        {THEORY_STATIC_LORENTZ_KT, THEORY_PARAM_STATIC_LORENTZ_KT, true,
+         "statExpKT", "sekt", "(rate)", "(rate tshift)"},
 
         {THEORY_STATIC_LORENTZ_KT_LF, THEORY_PARAM_STATIC_LORENTZ_KT_LF, true,
          "statExpKTLF", "sektlf", "(frequency damping)", "(frequency damping tshift)"},
@@ -206,6 +211,7 @@ class PTheory
     virtual double StaticGaussKT(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual double StaticGaussKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual double DynamicGaussKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual double StaticLorentzKT(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual double StaticLorentzKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual double DynamicLorentzKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual double CombiLGKT(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
