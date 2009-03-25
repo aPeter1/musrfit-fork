@@ -34,6 +34,8 @@
 
 #include <qstring.h>
 #include <qwidget.h>
+#include <qlineedit.h>
+#include <qcombobox.h>
 
 #include "forms/PGetDefaultDialogBase.h"
 
@@ -46,22 +48,10 @@ class PGetDefaultDialog : public PGetDefaultDialogBase
                       bool modal = TRUE, WFlags f = 0);
     virtual ~PGetDefaultDialog() {}
 
-    virtual const QString getRunFileName() const { return fRunFileName; }
-    virtual const QString getBeamline() const { return fBeamline; }
-    virtual const QString getInstitute() const { return fInstitute; }
-    virtual const QString getFileFormat() const { return fFileFormat; }
-
-  private:
-    QString fRunFileName;
-    QString fBeamline;
-    QString fInstitute;
-    QString fFileFormat;
-
-  private slots:
-    void runFileNameChanged(const QString&);
-    void beamlineChanged(const QString&);
-    void instituteChanged(const QString&);
-    void fileFormatChanged(const QString&);
+    virtual const QString getRunFileName() const { return fRunFileName_lineEdit->text(); }
+    virtual const QString getBeamline() const { return fBeamline_lineEdit->text(); }
+    virtual const QString getInstitute() const { return fInstitute_comboBox->currentText(); }
+    virtual const QString getFileFormat() const { return fFileFormat_comboBox->currentText(); }
 };
 
 #endif // _PGETDEFAULTDIALOG_H_

@@ -239,13 +239,17 @@ PAdmin::PAdmin()
   if (path.isEmpty())
     path = "/home/nemu/analysis/bin";
   QString fln = path + "/musrgui_startup.xml";
-  if (QFile::exists(fln)) { // administrations file present
+  if (QFile::exists(fln)) { // administration file present
     PAdminXMLParser handler(this);
     QFile xmlFile(fln);
     QXmlInputSource source( &xmlFile );
     QXmlSimpleReader reader;
     reader.setContentHandler( &handler );
     reader.parse( source );
+  } else {
+    QMessageBox::critical(0, "ERROR",
+                          "Couldn't find the musrgui_startup.xml settings file.\nProbably a few things will not work porperly.\nPlease fix this first.",
+                          QMessageBox::Ok, QMessageBox::NoButton);
   }
 }
 

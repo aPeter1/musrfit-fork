@@ -57,45 +57,8 @@ PGetDefaultDialog::PGetDefaultDialog(QWidget *parent, const char *name,
                       bool modal, WFlags f) :
                       PGetDefaultDialogBase(parent, name, modal, f)
 {
-  fInstitute  = fInstitute_comboBox->currentText();
-  fFileFormat = fFileFormat_comboBox->currentText();
 }
 
-//---------------------------------------------------------------------------
-/**
- * <p>
- */
-void PGetDefaultDialog::runFileNameChanged(const QString &text)
-{
-  fRunFileName = text;
-}
-
-//---------------------------------------------------------------------------
-/**
- * <p>
- */
-void PGetDefaultDialog::beamlineChanged(const QString &text)
-{
-  fBeamline = text;
-}
-
-//---------------------------------------------------------------------------
-/**
- * <p>
- */
-void PGetDefaultDialog::instituteChanged(const QString &text)
-{
- fInstitute = text;
-}
-
-//---------------------------------------------------------------------------
-/**
- * <p>
- */
-void PGetDefaultDialog::fileFormatChanged(const QString &text)
-{
-  fFileFormat = text;
-}
 //---------------------------------------------------------------------------
 // END
 //---------------------------------------------------------------------------
