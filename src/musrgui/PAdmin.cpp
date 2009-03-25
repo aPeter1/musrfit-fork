@@ -235,10 +235,13 @@ PAdmin::PAdmin()
   fHelpMain   = QString("");
 
   // XML Parser part
-  QString path = getenv("MUSRFITPATH");
-  if (path.isEmpty())
-    path = "/home/nemu/analysis/bin";
-  QString fln = path + "/musrgui_startup.xml";
+  QString fln = "./musrgui_startup.xml";
+  if (!QFile::exists(fln)) {
+    QString path = getenv("MUSRFITPATH");
+    if (path.isEmpty())
+      path = "/home/nemu/analysis/bin";
+    fln = path + "/musrgui_startup.xml";
+  }
   if (QFile::exists(fln)) { // administration file present
     PAdminXMLParser handler(this);
     QFile xmlFile(fln);

@@ -30,6 +30,7 @@
  ***************************************************************************/
 
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 #include <TObjArray.h>
@@ -48,6 +49,34 @@ ClassImpQ(PStartupHandler)
  */
 PStartupHandler::PStartupHandler()
 {
+  fStartupFileFound = false;
+  fStartupFilePath = "";
+
+  // get default path (for the moment only linux like)
+  char *pmusrpath;
+  char musrpath[128];
+  char startup_path_name[128];
+
+  // check if the startup file is found in the current directory
+  strcpy(startup_path_name, "./musrfit_startup.xml");
+  if (StartupFileExists(startup_path_name)) {
+    fStartupFileFound = true;
+    fStartupFilePath = TString(startup_path_name);
+  } else { // startup file is not found in the current directory
+    // check if the MUSRFITPATH system variable is set
+    pmusrpath = getenv("MUSRFITPATH");
+    if (pmusrpath == 0) { // not set, will try default one
+      strcpy(musrpath, "/home/nemu/analysis/bin");
+      cout << endl << "**WARNING** MUSRFITPATH environment variable not set will try " << musrpath << endl;
+    } else {
+      strncpy(musrpath, pmusrpath, sizeof(musrpath));
+    }
+    sprintf(startup_path_name, "%s/musrfit_startup.xml", musrpath);
+    if (StartupFileExists(startup_path_name)) {
+      fStartupFileFound = true;
+      fStartupFilePath = TString(startup_path_name);
+    }
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -440,5 +469,30 @@ void PStartupHandler::CheckLists()
   }
 }
 
-// end ---------------------------------------------------------------------
+//--------------------------------------------------------------------------
+// StartupFileExists
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+bool PStartupHandler::StartupFileExists(char *fln)
+{
+  bool result = false;
+
+  ifstream ifile(fln);
+
+  if (ifile.fail()) {
+    result = false;
+  } else {
+    result = true;
+    ifile.close();
+  }
+
+  return result;
+}
+
+// -------------------------------------------------------------------------
+// end
+// -------------------------------------------------------------------------
 
