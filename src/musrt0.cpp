@@ -63,6 +63,34 @@ void musrt0_syntax()
 }
 
 //--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+bool musrt0_item(TApplication &app, PMsrHandler *msrHandler, PRawRunData *rawRunData, unsigned int histoNo)
+{
+  PMusrT0 *musrT0 = new PMusrT0(rawRunData, histoNo);
+
+  if (musrT0 == 0) {
+    cout << endl << "**ERROR** Couldn't invoke musrT0 ...";
+    cout << endl << "          run name " << rawRunData->fRunName.Data();
+    cout << endl << "          histo No " << histoNo;
+    cout << endl;
+    return false;
+  }
+
+  musrT0->SetMsrHandler(msrHandler);
+
+  musrT0->Connect("Done(Int_t)", "TApplication", &app, "Terminate(Int_t)");
+
+  app.Run(true); // true needed that Run will return after quit
+  delete musrT0;
+  musrT0 = 0;
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
   bool show_syntax = false;
@@ -165,40 +193,37 @@ int main(int argc, char *argv[])
   }
 
 
-  vector<PMusrT0*> t0Vector;
   if (success) {
-/*
     // generate Root application needed for PMusrCanvas
     TApplication app("App", &argc, argv);
-*/
+
     // generate vector of all necessary PMusrT0 objects
-    PMusrT0 *musrT0;
     for (unsigned int i=0; i<runList->size(); i++) {
       switch (runList->at(i).fFitType) {
         case MSR_FITTYPE_SINGLE_HISTO:
           for (unsigned int j=0; j<runList->at(i).fRunName.size(); j++) { // necessary in case of ADDRUN
-            musrT0 = new PMusrT0(dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fForwardHistoNo);
-            t0Vector.push_back(musrT0);
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fForwardHistoNo))
+              exit(0);
           }
           break;
         case MSR_FITTYPE_ASYM:
           for (unsigned int j=0; j<runList->at(i).fRunName.size(); j++) { // necessary in case of ADDRUN
-            musrT0 = new PMusrT0(dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fForwardHistoNo);
-            t0Vector.push_back(musrT0);
-            musrT0 = new PMusrT0(dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fBackwardHistoNo);
-            t0Vector.push_back(musrT0);
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fForwardHistoNo))
+              exit(0);
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fBackwardHistoNo))
+              exit(0);
           }
           break;
         case MSR_FITTYPE_ASYM_RRF:
           for (unsigned int j=0; j<runList->at(i).fRunName.size(); j++) { // necessary in case of ADDRUN
-            musrT0 = new PMusrT0(dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fForwardHistoNo);
-            t0Vector.push_back(musrT0);
-            musrT0 = new PMusrT0(dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fBackwardHistoNo);
-            t0Vector.push_back(musrT0);
-            musrT0 = new PMusrT0(dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fRightHistoNo);
-            t0Vector.push_back(musrT0);
-            musrT0 = new PMusrT0(dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fLeftHistoNo);
-            t0Vector.push_back(musrT0);
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fForwardHistoNo))
+              exit(0);
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fBackwardHistoNo))
+              exit(0);
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fRightHistoNo))
+              exit(0);
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fLeftHistoNo))
+              exit(0);
           }
           break;
         default:
@@ -288,15 +313,6 @@ cout << endl;
   if (dataHandler) {
     delete dataHandler;
     dataHandler = 0;
-  }
-  if (t0Vector.size() > 0) {
-    for (unsigned int i=0; i<t0Vector.size(); i++) {
-      if (t0Vector[i] != 0) {
-        delete t0Vector[i];
-        t0Vector[i] = 0;
-      }
-    }
-    t0Vector.clear();
   }
 
   return 0;

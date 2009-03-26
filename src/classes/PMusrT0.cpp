@@ -50,6 +50,7 @@ ClassImpQ(PMusrT0)
  */
 PMusrT0::PMusrT0()
 {
+  fMainCanvas = 0;
 }
 
 //--------------------------------------------------------------------------
@@ -62,6 +63,57 @@ PMusrT0::PMusrT0()
  */
 PMusrT0::PMusrT0(PRawRunData *rawRunData, unsigned int histoNo)
 {
+  cout << endl << "run Name = " << rawRunData->fRunName.Data() << ", histoNo = " << histoNo << endl;
+
+  TString str = rawRunData->fRunName + TString(" : ");
+  str += histoNo;
+
+  // feed necessary objects
+
+  // feed raw data histo
+  Int_t noOfBins = rawRunData->fDataBin[histoNo].size();
+  Double_t start = -0.5;
+  Double_t end   = noOfBins + 0.5;
+  fHisto = new TH1F("fHisto", str.Data(), noOfBins, start, end);
+  fHisto->SetMarkerStyle(21);
+  fHisto->SetMarkerSize(1);
+  fHisto->SetMarkerColor(TColor::GetColor(0,0,0)); // black
+
+  for (unsigned int i=0; i<rawRunData->fDataBin[histoNo].size(); i++) {
+    fHisto->SetBinContent(i+1, rawRunData->fDataBin[histoNo][i]);
+  }
+
+  // generate canvas etc
+  fMainCanvas = new TCanvas("fMainCanvas", str);
+
+  // add canvas menu
+  fImp = (TRootCanvas*)fMainCanvas->GetCanvasImp();
+  fBar = fImp->GetMenuBar();
+  fPopupMain = fBar->AddPopup("&MusrT0");
+
+  fPopupMain->AddEntry("&T0", P_MENU_ID_T0);
+  fPopupMain->AddSeparator();
+  fPopupMain->AddEntry("First Bkg Channel", P_MENU_ID_FIRST_BKG_CHANNEL);
+  fPopupMain->AddEntry("Last  Bkg Channel", P_MENU_ID_LAST_BKG_CHANNEL);
+  fPopupMain->AddSeparator();
+  fPopupMain->AddEntry("First Data Channel", P_MENU_ID_FIRST_DATA_CHANNEL);
+  fPopupMain->AddEntry("Last  Data Channel", P_MENU_ID_LAST_DATA_CHANNEL);
+  fPopupMain->AddSeparator();
+  fPopupMain->AddEntry("UnZoom", P_MENU_ID_UNZOOM);
+
+
+  fBar->MapSubwindows();
+  fBar->Layout();
+  fPopupMain->Connect("TGPopupMenu", "Activated(Int_t)", "PMusrT0", this, "HandleMenuPopup(Int_t)");
+
+  fMainCanvas->cd();
+  fMainCanvas->Show();
+
+  fMainCanvas->Connect("ProcessedEvent(Int_t,Int_t,Int_t,TObject*)", "PMusrT0",
+                       this, "HandleCmdKey(Int_t,Int_t,Int_t,TObject*)");
+
+  // draw histos etc
+  fHisto->Draw("p");
 }
 
 //--------------------------------------------------------------------------
@@ -72,6 +124,14 @@ PMusrT0::PMusrT0(PRawRunData *rawRunData, unsigned int histoNo)
  */
 PMusrT0::~PMusrT0()
 {
+  if (fMainCanvas) {
+    delete fMainCanvas;
+    fMainCanvas = 0;
+  }
+  if (fHisto) {
+    delete fHisto;
+    fHisto = 0;
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -132,6 +192,36 @@ void PMusrT0::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
  */
 void PMusrT0::HandleMenuPopup(Int_t id)
 {
+}
+
+//--------------------------------------------------------------------------
+// HandleMenuPopup (SLOT)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrT0::SetMsrHandler(PMsrHandler *msrHandler)
+{
+  fMsrHandler = msrHandler;
+
+  InitDataAndBkg();
+}
+
+//--------------------------------------------------------------------------
+// HandleMenuPopup (SLOT)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrT0::InitDataAndBkg()
+{
+  // feed data range histo
+
+  // feed background histo
+
+  // add lines
 }
 
 //--------------------------------------------------------------------------
