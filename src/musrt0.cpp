@@ -66,10 +66,17 @@ void musrt0_syntax()
 /**
  * <p>
  *
+ * \param app
+ * \param msrHandler
+ * \param rawRunData
+ * \param histoNo
+ * \param runNo
+ * \param detectorTag 0=forward, 1=backward, 2=left, 3=right
  */
-bool musrt0_item(TApplication &app, PMsrHandler *msrHandler, PRawRunData *rawRunData, unsigned int histoNo)
+bool musrt0_item(TApplication &app, PMsrHandler *msrHandler, PRawRunData *rawRunData,
+                 unsigned int histoNo, unsigned int runNo, unsigned int detectorTag)
 {
-  PMusrT0 *musrT0 = new PMusrT0(rawRunData, histoNo);
+  PMusrT0 *musrT0 = new PMusrT0(rawRunData, histoNo, runNo, detectorTag);
 
   if (musrT0 == 0) {
     cout << endl << "**ERROR** Couldn't invoke musrT0 ...";
@@ -202,27 +209,27 @@ int main(int argc, char *argv[])
       switch (runList->at(i).fFitType) {
         case MSR_FITTYPE_SINGLE_HISTO:
           for (unsigned int j=0; j<runList->at(i).fRunName.size(); j++) { // necessary in case of ADDRUN
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fForwardHistoNo))
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fForwardHistoNo, 0))
               exit(0);
           }
           break;
         case MSR_FITTYPE_ASYM:
           for (unsigned int j=0; j<runList->at(i).fRunName.size(); j++) { // necessary in case of ADDRUN
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fForwardHistoNo))
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fForwardHistoNo, 0))
               exit(0);
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fBackwardHistoNo))
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fBackwardHistoNo, 1))
               exit(0);
           }
           break;
         case MSR_FITTYPE_ASYM_RRF:
           for (unsigned int j=0; j<runList->at(i).fRunName.size(); j++) { // necessary in case of ADDRUN
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fForwardHistoNo))
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fForwardHistoNo, 0))
               exit(0);
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fBackwardHistoNo))
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fBackwardHistoNo, 1))
               exit(0);
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fRightHistoNo))
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fRightHistoNo, 2))
               exit(0);
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), runList->at(i).fLeftHistoNo))
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fLeftHistoNo, 3))
               exit(0);
           }
           break;

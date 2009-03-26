@@ -40,6 +40,11 @@ using namespace std;
 
 #include "PMusrT0.h"
 
+#define DETECTOR_TAG_FORWARD  0
+#define DETECTOR_TAG_BACKWARD 1
+#define DETECTOR_TAG_RIGHT    2
+#define DETECTOR_TAG_LEFT     3
+
 ClassImpQ(PMusrT0)
 
 //--------------------------------------------------------------------------
@@ -50,7 +55,20 @@ ClassImpQ(PMusrT0)
  */
 PMusrT0::PMusrT0()
 {
+  fRunNo       = -1;
+  fDetectorTag = -1;
+
   fMainCanvas = 0;
+
+  fHisto = 0;
+  fData  = 0;
+  fBkg   = 0;
+
+  fT0Line        = 0;
+  fFirstBkgLine  = 0;
+  fLastBkgLine   = 0;
+  fFirstDataLine = 0;
+  fLastDataLine  = 0;
 }
 
 //--------------------------------------------------------------------------
@@ -61,9 +79,12 @@ PMusrT0::PMusrT0()
  * \param rawRunData
  * \param histoNo
  */
-PMusrT0::PMusrT0(PRawRunData *rawRunData, unsigned int histoNo)
+PMusrT0::PMusrT0(PRawRunData *rawRunData, int runNo, int histoNo, int detectorTag)
 {
   cout << endl << "run Name = " << rawRunData->fRunName.Data() << ", histoNo = " << histoNo << endl;
+
+  fRunNo       = runNo;
+  fDetectorTag = detectorTag;
 
   TString str = rawRunData->fRunName + TString(" : ");
   str += histoNo;
@@ -76,7 +97,7 @@ PMusrT0::PMusrT0(PRawRunData *rawRunData, unsigned int histoNo)
   Double_t end   = noOfBins + 0.5;
   fHisto = new TH1F("fHisto", str.Data(), noOfBins, start, end);
   fHisto->SetMarkerStyle(21);
-  fHisto->SetMarkerSize(1);
+  fHisto->SetMarkerSize(0.5);
   fHisto->SetMarkerColor(TColor::GetColor(0,0,0)); // black
 
   for (unsigned int i=0; i<rawRunData->fDataBin[histoNo].size(); i++) {
@@ -113,7 +134,7 @@ PMusrT0::PMusrT0(PRawRunData *rawRunData, unsigned int histoNo)
                        this, "HandleCmdKey(Int_t,Int_t,Int_t,TObject*)");
 
   // draw histos etc
-  fHisto->Draw("p");
+  fHisto->Draw("p0 hist");
 }
 
 //--------------------------------------------------------------------------
@@ -131,6 +152,14 @@ PMusrT0::~PMusrT0()
   if (fHisto) {
     delete fHisto;
     fHisto = 0;
+  }
+  if (fData) {
+    delete fData;
+    fData = 0;
+  }
+  if (fBkg) {
+    delete fBkg;
+    fBkg = 0;
   }
 }
 
@@ -218,10 +247,130 @@ void PMusrT0::SetMsrHandler(PMsrHandler *msrHandler)
 void PMusrT0::InitDataAndBkg()
 {
   // feed data range histo
+  int dataRange[2];
+  switch (fDetectorTag) {
+    case DETECTOR_TAG_FORWARD:
+      dataRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[0];
+      dataRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[1];
+      break;
+    case DETECTOR_TAG_BACKWARD:
+      dataRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[2];
+      dataRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[3];
+      break;
+    case DETECTOR_TAG_RIGHT:
+      // not clear yet what to be done
+      break;
+    case DETECTOR_TAG_LEFT:
+      // not clear yet what to be done
+      break;
+    default:
+      // not clear yet what to be done
+      break;
+  }
+
+  Int_t noOfBins = dataRange[1]-dataRange[0]+1;
+  Double_t start = dataRange[0] - 0.5;
+  Double_t end   = dataRange[1] + 0.5;
+  fData = new TH1F("fData", "fData", noOfBins, start, end);
+  fData->SetMarkerStyle(21);
+  fData->SetMarkerSize(0.5);
+  fData->SetMarkerColor(TColor::GetColor(0,0,255)); // blue
+
+  for (int i=0; i<noOfBins; i++) {
+    fData->SetBinContent(i+1, fHisto->GetBinContent(dataRange[0]+i+1));
+  }
+  fData->Draw("p0 hist same");
 
   // feed background histo
+  int bkgRange[2];
+  switch (fDetectorTag) {
+    case DETECTOR_TAG_FORWARD:
+      bkgRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[0];
+      bkgRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[1];
+      break;
+    case DETECTOR_TAG_BACKWARD:
+      bkgRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[2];
+      bkgRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[3];
+      break;
+    case DETECTOR_TAG_RIGHT:
+      // not clear yet what to be done
+      break;
+    case DETECTOR_TAG_LEFT:
+      // not clear yet what to be done
+      break;
+    default:
+      // not clear yet what to be done
+      break;
+  }
+
+  noOfBins = bkgRange[1]-bkgRange[0]+1;
+  start = bkgRange[0] - 0.5;
+  end   = bkgRange[1] + 0.5;
+  fBkg = new TH1F("fBkg", "fBkg", noOfBins, start, end);
+  fBkg->SetMarkerStyle(21);
+  fBkg->SetMarkerSize(0.5);
+  fBkg->SetMarkerColor(TColor::GetColor(255,0,0)); // red
+
+  for (int i=0; i<noOfBins; i++) {
+    fBkg->SetBinContent(i+1, fHisto->GetBinContent(bkgRange[0]+i+1));
+  }
+  fBkg->Draw("p0 hist same");
 
   // add lines
+  // t0 line
+  int t0Bin;
+  switch (fDetectorTag) {
+    case DETECTOR_TAG_FORWARD:
+      t0Bin = fMsrHandler->GetMsrRunList()->at(fRunNo).fT0[0];
+      break;
+    case DETECTOR_TAG_BACKWARD:
+      t0Bin = fMsrHandler->GetMsrRunList()->at(fRunNo).fT0[1];
+      break;
+    case DETECTOR_TAG_RIGHT:
+      // not clear yet what to be done
+      break;
+    case DETECTOR_TAG_LEFT:
+      // not clear yet what to be done
+      break;
+    default:
+      // not clear yet what to be done
+      break;
+  }
+  Double_t max = fHisto->GetMaximum();
+  fT0Line = new TLine((double)t0Bin, 0.0, (double)t0Bin, max);
+  fT0Line->SetLineStyle(1); // solid
+  fT0Line->SetLineColor(TColor::GetColor(0,255,0)); // green
+  fT0Line->SetLineWidth(2);
+  fT0Line->Draw();
+
+  // data lines
+  fFirstDataLine = new TLine((double)dataRange[0], 0.0, (double)dataRange[0], max);
+  fFirstDataLine->SetLineStyle(3); // doted
+  fFirstDataLine->SetLineColor(TColor::GetColor(0,0,255)); // blue
+  fFirstDataLine->SetLineWidth(2);
+  fFirstDataLine->Draw();
+
+  fLastDataLine = new TLine((double)dataRange[1], 0.0, (double)dataRange[1], max);
+  fLastDataLine->SetLineStyle(3); // doted
+  fLastDataLine->SetLineColor(TColor::GetColor(0,0,255)); // blue
+  fLastDataLine->SetLineWidth(2);
+  fLastDataLine->Draw();
+
+  // bkg lines
+  fFirstBkgLine = new TLine((double)bkgRange[0], 0.0, (double)bkgRange[0], max);
+  fFirstBkgLine->SetLineStyle(6); // _..._...
+  fFirstBkgLine->SetLineColor(TColor::GetColor(255,0,0)); // red
+  fFirstBkgLine->SetLineWidth(2);
+  fFirstBkgLine->Draw();
+
+  fLastBkgLine = new TLine((double)bkgRange[1], 0.0, (double)bkgRange[1], max);
+  fLastBkgLine->SetLineStyle(6); // _..._...
+  fLastBkgLine->SetLineColor(TColor::GetColor(255,0,0)); // red
+  fLastBkgLine->SetLineWidth(2);
+  fLastBkgLine->Draw();
+
+  fMainCanvas->cd();
+  fMainCanvas->Update();
 }
 
 //--------------------------------------------------------------------------
