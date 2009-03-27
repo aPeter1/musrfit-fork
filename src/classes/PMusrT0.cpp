@@ -131,6 +131,8 @@ PMusrT0::PMusrT0(PRawRunData *rawRunData, int runNo, int histoNo, int detectorTa
   fBar->Layout();
   fPopupMain->Connect("TGPopupMenu", "Activated(Int_t)", "PMusrT0", this, "HandleMenuPopup(Int_t)");
 
+
+  fMainCanvas->SetCrosshair(2);
   fMainCanvas->Show();
 
   fMainCanvas->Connect("ProcessedEvent(Int_t,Int_t,Int_t,TObject*)", "PMusrT0",
@@ -220,7 +222,7 @@ void PMusrT0::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   } else if (x == 'u') { // unzoom to the original range
     UnZoom();
   } else if (x == 't') { // set t0 channel
-    cout << endl << "will set t0 channel ..." << endl;
+    SetT0Channel();
   } else if (x == 'b') { // set first background channel
     cout << endl << "will set first background channel ..." << endl;
   } else if (x == 'B') { // set last background channel
@@ -243,6 +245,7 @@ void PMusrT0::HandleMenuPopup(Int_t id)
 {
   switch (id) {
     case P_MENU_ID_T0:
+      SetT0Channel();
       break;
     case P_MENU_ID_FIRST_BKG_CHANNEL:
       break;
@@ -418,6 +421,18 @@ void PMusrT0::InitDataAndBkg()
   fLastBkgLine->Draw();
 
   fMainCanvas->Update();
+}
+
+//--------------------------------------------------------------------------
+// SetT0Channel
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrT0::SetT0Channel()
+{
+  cout << endl << "Set T0 Channel";
 }
 
 //--------------------------------------------------------------------------

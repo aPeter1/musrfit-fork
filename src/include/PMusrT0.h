@@ -107,6 +107,7 @@ class PMusrT0 : public TObject, public TQObject
     TLine *fLastDataLine;
 
     void InitDataAndBkg();
+    void SetT0Channel();
     void UnZoom();
 
   ClassDef(PMusrT0, 1)
