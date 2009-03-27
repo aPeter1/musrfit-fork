@@ -69,14 +69,15 @@ void musrt0_syntax()
  * \param app
  * \param msrHandler
  * \param rawRunData
- * \param histoNo
  * \param runNo
+ * \param histoNo
  * \param detectorTag 0=forward, 1=backward, 2=left, 3=right
+ * \param addRunNo
  */
 bool musrt0_item(TApplication &app, PMsrHandler *msrHandler, PRawRunData *rawRunData,
-                 unsigned int histoNo, unsigned int runNo, unsigned int detectorTag)
+                 unsigned int runNo, int histoNo, int detectorTag, int addRunNo)
 {
-  PMusrT0 *musrT0 = new PMusrT0(rawRunData, histoNo, runNo, detectorTag);
+  PMusrT0 *musrT0 = new PMusrT0(rawRunData, runNo, histoNo, detectorTag, addRunNo);
 
   if (musrT0 == 0) {
     cout << endl << "**ERROR** Couldn't invoke musrT0 ...";
@@ -91,10 +92,41 @@ bool musrt0_item(TApplication &app, PMsrHandler *msrHandler, PRawRunData *rawRun
   musrT0->Connect("Done(Int_t)", "TApplication", &app, "Terminate(Int_t)");
 
   app.Run(true); // true needed that Run will return after quit
+  bool result = true;
+  if (musrT0->GetStatus() == 1)
+    result = false;
+  else
+    result = true;
+
   delete musrT0;
   musrT0 = 0;
 
-  return true;
+  return result;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void musrt0_cleanup(TSAXParser *saxParser, PStartupHandler *startupHandler, PMsrHandler *msrHandler, PRunDataHandler *dataHandler)
+{
+  if (saxParser) {
+    delete saxParser;
+    saxParser = 0;
+  }
+  if (startupHandler) {
+    delete startupHandler;
+    startupHandler = 0;
+  }
+  if (msrHandler) {
+    delete msrHandler;
+    msrHandler = 0;
+  }
+  if (dataHandler) {
+    delete dataHandler;
+    dataHandler = 0;
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -209,118 +241,53 @@ int main(int argc, char *argv[])
       switch (runList->at(i).fFitType) {
         case MSR_FITTYPE_SINGLE_HISTO:
           for (unsigned int j=0; j<runList->at(i).fRunName.size(); j++) { // necessary in case of ADDRUN
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fForwardHistoNo, 0))
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fForwardHistoNo, 0, j)) {
+              musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
+            }
           }
           break;
         case MSR_FITTYPE_ASYM:
           for (unsigned int j=0; j<runList->at(i).fRunName.size(); j++) { // necessary in case of ADDRUN
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fForwardHistoNo, 0))
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fForwardHistoNo, 0, j)) {
+              musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fBackwardHistoNo, 1))
+            }
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fBackwardHistoNo, 1, j)) {
+              musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
+            }
           }
           break;
         case MSR_FITTYPE_ASYM_RRF:
           for (unsigned int j=0; j<runList->at(i).fRunName.size(); j++) { // necessary in case of ADDRUN
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fForwardHistoNo, 0))
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fForwardHistoNo, 0, j)) {
+              musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fBackwardHistoNo, 1))
+            }
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fBackwardHistoNo, 1, j)) {
+              musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fRightHistoNo, 2))
+            }
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fRightHistoNo, 2, j)) {
+              musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fLeftHistoNo, 3))
+            }
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(runList->at(i).fRunName[j]), i, runList->at(i).fLeftHistoNo, 3, j)) {
+              musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
+            }
           }
           break;
         default:
           break;
       }
     }
-
-/*
-    vector<PMusrT0*> t0CanvasVector;
-    PMusrT0 *t0Canvas;
-
-    bool ok = true;
-    for (unsigned int i=0; i<msrHandler->GetMsrPlotList()->size(); i++) {
-
-      if (startupHandler)
-        musrCanvas = new PMusrCanvas(i, msrHandler->GetMsrTitle()->Data(), 
-                                     10+i*100, 10+i*100, 800, 600,
-                                     startupHandler->GetFourierDefaults(),
-                                     startupHandler->GetMarkerList(),
-                                     startupHandler->GetColorList());
-      else
-        musrCanvas = new PMusrCanvas(i, msrHandler->GetMsrTitle()->Data(), 
-                                     10+i*100, 10+i*100, 800, 600);
-
-      if (!musrCanvas->IsValid()) {
-        cout << endl << "**SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
-        cout << endl;
-        ok = false;
-        break;
-      }
-      // connect signal/slot
-      TQObject::Connect("TCanvas", "Closed()", "PMusrCanvas", musrCanvas, "LastCanvasClosed()");
-
-      // ugly but rootcint cannot handle the spirit-parser framework
-      musrCanvas->SetMsrHandler(msrHandler);
-      musrCanvas->SetRunListCollection(runListCollection);
-
-      if (!musrCanvas->IsValid()) { // something went wrong
-        ok = false;
-        break;
-      }
-
-      musrCanvas->Connect("Done(Int_t)", "TApplication", &app, "Terminate(Int_t)");
-
-      // keep musrCanvas objects
-      canvasVector.push_back(musrCanvas);
-    }
-
-    // check that everything is ok
-    if (ok)
-      app.Run(true); // true needed that Run will return after quit so that cleanup works
-
-    // clean up
-cout << endl << "clean up canvas vector ...";
-    char canvasName[32];
-    for (unsigned int i=0; i<canvasVector.size(); i++) {
-      // check if canvas is still there before calling the destructor **TO BE DONE**
-      sprintf(canvasName, "fMainCanvas%d", i);
-cout << endl << ">> canvasName=" << canvasName << ", canvasVector[" << i << "]=" << canvasVector[i];
-      if (gROOT->GetListOfCanvases()->FindObject(canvasName) != 0) {
-cout << endl << ">> canvasName=" << canvasName << ", found ...";
-cout << endl;
-        canvasVector[i]->~PMusrCanvas();
-      } else {
-cout << endl << ">> canvasName=" << canvasName << ", NOT found ...";
-cout << endl;
-      }
-    }
-    canvasVector.empty();
-*/
   }
 cout << endl;
 
   // clean up
-  if (saxParser) {
-    delete saxParser;
-    saxParser = 0;
-  }
-  if (startupHandler) {
-    delete startupHandler;
-    startupHandler = 0;
-  }
-  if (msrHandler) {
-    delete msrHandler;
-    msrHandler = 0;
-  }
-  if (dataHandler) {
-    delete dataHandler;
-    dataHandler = 0;
-  }
+  musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
 
   return 0;
 }

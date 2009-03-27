@@ -79,12 +79,15 @@ PMusrT0::PMusrT0()
  * \param rawRunData
  * \param histoNo
  */
-PMusrT0::PMusrT0(PRawRunData *rawRunData, int runNo, int histoNo, int detectorTag)
+PMusrT0::PMusrT0(PRawRunData *rawRunData, int runNo, int histoNo, int detectorTag, int addRunNo)
 {
   cout << endl << "run Name = " << rawRunData->fRunName.Data() << ", histoNo = " << histoNo << endl;
 
+  fStatus = 0; // default is quit locally
+
   fRunNo       = runNo;
   fDetectorTag = detectorTag;
+  fAddRunNo    = addRunNo;
 
   TString str = rawRunData->fRunName + TString(" : ");
   str += histoNo;
@@ -92,7 +95,7 @@ PMusrT0::PMusrT0(PRawRunData *rawRunData, int runNo, int histoNo, int detectorTa
   // feed necessary objects
 
   // feed raw data histo
-  Int_t noOfBins = rawRunData->fDataBin[histoNo].size();
+  Int_t noOfBins = rawRunData->fDataBin[histoNo-1].size();
   Double_t start = -0.5;
   Double_t end   = noOfBins + 0.5;
   fHisto = new TH1F("fHisto", str.Data(), noOfBins, start, end);
@@ -100,12 +103,13 @@ PMusrT0::PMusrT0(PRawRunData *rawRunData, int runNo, int histoNo, int detectorTa
   fHisto->SetMarkerSize(0.5);
   fHisto->SetMarkerColor(TColor::GetColor(0,0,0)); // black
 
-  for (unsigned int i=0; i<rawRunData->fDataBin[histoNo].size(); i++) {
-    fHisto->SetBinContent(i+1, rawRunData->fDataBin[histoNo][i]);
+  for (unsigned int i=0; i<rawRunData->fDataBin[histoNo-1].size(); i++) {
+    fHisto->SetBinContent(i+1, rawRunData->fDataBin[histoNo-1][i]);
   }
 
   // generate canvas etc
   fMainCanvas = new TCanvas("fMainCanvas", str);
+  fMainCanvas->SetFillColor(TColor::GetColor(255,255,255));
 
   // add canvas menu
   fImp = (TRootCanvas*)fMainCanvas->GetCanvasImp();
@@ -127,14 +131,13 @@ PMusrT0::PMusrT0(PRawRunData *rawRunData, int runNo, int histoNo, int detectorTa
   fBar->Layout();
   fPopupMain->Connect("TGPopupMenu", "Activated(Int_t)", "PMusrT0", this, "HandleMenuPopup(Int_t)");
 
-  fMainCanvas->cd();
   fMainCanvas->Show();
 
   fMainCanvas->Connect("ProcessedEvent(Int_t,Int_t,Int_t,TObject*)", "PMusrT0",
                        this, "HandleCmdKey(Int_t,Int_t,Int_t,TObject*)");
 
   // draw histos etc
-  fHisto->Draw("p0 hist");
+  fHisto->Draw("p0 9 hist");
 }
 
 //--------------------------------------------------------------------------
@@ -145,10 +148,6 @@ PMusrT0::PMusrT0(PRawRunData *rawRunData, int runNo, int histoNo, int detectorTa
  */
 PMusrT0::~PMusrT0()
 {
-  if (fMainCanvas) {
-    delete fMainCanvas;
-    fMainCanvas = 0;
-  }
   if (fHisto) {
     delete fHisto;
     fHisto = 0;
@@ -160,6 +159,30 @@ PMusrT0::~PMusrT0()
   if (fBkg) {
     delete fBkg;
     fBkg = 0;
+  }
+  if (fT0Line) {
+    delete fT0Line;
+    fT0Line = 0;
+  }
+  if (fFirstBkgLine) {
+    delete fFirstBkgLine;
+    fFirstBkgLine = 0;
+  }
+  if (fLastBkgLine) {
+    delete fLastBkgLine;
+    fLastBkgLine = 0;
+  }
+  if (fFirstDataLine) {
+    delete fFirstDataLine;
+    fFirstDataLine = 0;
+  }
+  if (fLastDataLine) {
+    delete fLastDataLine;
+    fLastDataLine = 0;
+  }
+  if (fMainCanvas) {
+    delete fMainCanvas;
+    fMainCanvas = 0;
   }
 }
 
@@ -187,18 +210,15 @@ void PMusrT0::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   if (event != kKeyPress)
      return;
 
-//   cout << ">this          " << this << endl;
-//   cout << ">fMainCanvas   " << fMainCanvas << endl;
-//   cout << ">selected      " << selected << endl;
-//
-//cout << "x : "  << (char)x << endl;
-//cout << "px: "  << (char)fMainCanvas->GetEventX() << endl;
-
   // handle keys and popup menu entries
   if (x == 'q') { // quit
+    fStatus = 0; // will quit locally
+    Done(0);
+  } else if (x == 'Q') { // terminate musrt0
+    fStatus = 1; // will quit globally
     Done(0);
   } else if (x == 'u') { // unzoom to the original range
-    cout << endl << "will unzoom ..." << endl;
+    UnZoom();
   } else if (x == 't') { // set t0 channel
     cout << endl << "will set t0 channel ..." << endl;
   } else if (x == 'b') { // set first background channel
@@ -221,6 +241,23 @@ void PMusrT0::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
  */
 void PMusrT0::HandleMenuPopup(Int_t id)
 {
+  switch (id) {
+    case P_MENU_ID_T0:
+      break;
+    case P_MENU_ID_FIRST_BKG_CHANNEL:
+      break;
+    case P_MENU_ID_LAST_BKG_CHANNEL:
+      break;
+    case P_MENU_ID_FIRST_DATA_CHANNEL:
+      break;
+    case P_MENU_ID_LAST_DATA_CHANNEL:
+      break;
+    case P_MENU_ID_UNZOOM:
+      UnZoom();
+      break;
+    default:
+      break;
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -246,16 +283,27 @@ void PMusrT0::SetMsrHandler(PMsrHandler *msrHandler)
  */
 void PMusrT0::InitDataAndBkg()
 {
+  // get addRun offset which depends on the fit type
+  int addRunOffset = 0;
+  int fitType = fMsrHandler->GetMsrRunList()->at(fRunNo).fFitType;
+  if (fitType == MSR_FITTYPE_SINGLE_HISTO) {
+    addRunOffset = 2;
+  } else if (fitType == MSR_FITTYPE_ASYM) {
+    addRunOffset = 4;
+  } else if (fitType == MSR_FITTYPE_ASYM_RRF) {
+    addRunOffset = 8;
+  }
+
   // feed data range histo
   int dataRange[2];
   switch (fDetectorTag) {
     case DETECTOR_TAG_FORWARD:
-      dataRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[0];
-      dataRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[1];
+      dataRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[0 + fAddRunNo * addRunOffset];
+      dataRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[1 + fAddRunNo * addRunOffset];
       break;
     case DETECTOR_TAG_BACKWARD:
-      dataRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[2];
-      dataRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[3];
+      dataRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[2 + fAddRunNo * addRunOffset];
+      dataRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[3 + fAddRunNo * addRunOffset];
       break;
     case DETECTOR_TAG_RIGHT:
       // not clear yet what to be done
@@ -279,18 +327,18 @@ void PMusrT0::InitDataAndBkg()
   for (int i=0; i<noOfBins; i++) {
     fData->SetBinContent(i+1, fHisto->GetBinContent(dataRange[0]+i+1));
   }
-  fData->Draw("p0 hist same");
+  fData->Draw("p0 9 hist same");
 
   // feed background histo
   int bkgRange[2];
   switch (fDetectorTag) {
     case DETECTOR_TAG_FORWARD:
-      bkgRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[0];
-      bkgRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[1];
+      bkgRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[0 + fAddRunNo * addRunOffset];
+      bkgRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[1 + fAddRunNo * addRunOffset];
       break;
     case DETECTOR_TAG_BACKWARD:
-      bkgRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[2];
-      bkgRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[3];
+      bkgRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[2 + fAddRunNo * addRunOffset];
+      bkgRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[3 + fAddRunNo * addRunOffset];
       break;
     case DETECTOR_TAG_RIGHT:
       // not clear yet what to be done
@@ -314,17 +362,17 @@ void PMusrT0::InitDataAndBkg()
   for (int i=0; i<noOfBins; i++) {
     fBkg->SetBinContent(i+1, fHisto->GetBinContent(bkgRange[0]+i+1));
   }
-  fBkg->Draw("p0 hist same");
+  fBkg->Draw("p0 9 hist same");
 
   // add lines
   // t0 line
   int t0Bin;
   switch (fDetectorTag) {
     case DETECTOR_TAG_FORWARD:
-      t0Bin = fMsrHandler->GetMsrRunList()->at(fRunNo).fT0[0];
+      t0Bin = fMsrHandler->GetMsrRunList()->at(fRunNo).fT0[0 + fAddRunNo * addRunOffset/2];
       break;
     case DETECTOR_TAG_BACKWARD:
-      t0Bin = fMsrHandler->GetMsrRunList()->at(fRunNo).fT0[1];
+      t0Bin = fMsrHandler->GetMsrRunList()->at(fRunNo).fT0[1 + fAddRunNo * addRunOffset/2];
       break;
     case DETECTOR_TAG_RIGHT:
       // not clear yet what to be done
@@ -369,7 +417,23 @@ void PMusrT0::InitDataAndBkg()
   fLastBkgLine->SetLineWidth(2);
   fLastBkgLine->Draw();
 
-  fMainCanvas->cd();
+  fMainCanvas->Update();
+}
+
+//--------------------------------------------------------------------------
+// UnZoom
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrT0::UnZoom()
+{
+  cout << endl << ">> in UnZoom ..." << endl;
+
+  fHisto->GetXaxis()->UnZoom();
+
+  fMainCanvas->Modified(); // needed that Update is actually working
   fMainCanvas->Update();
 }
 
