@@ -46,14 +46,6 @@
 #include "PMsrHandler.h"
 #endif // __MAKECINT__
 
-// Canvas menu id's
-#define P_MENU_ID_T0                 100
-#define P_MENU_ID_FIRST_BKG_CHANNEL  101
-#define P_MENU_ID_LAST_BKG_CHANNEL   102
-#define P_MENU_ID_FIRST_DATA_CHANNEL 103
-#define P_MENU_ID_LAST_DATA_CHANNEL  104
-#define P_MENU_ID_UNZOOM             105
-
 //--------------------------------------------------------------------------
 /**
  * <p>The preprocessor tag __MAKECINT__ is used to hide away from rootcint
@@ -69,7 +61,6 @@ class PMusrT0 : public TObject, public TQObject
 
     virtual void Done(Int_t status=0); // *SIGNAL*
     virtual void HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected); // SLOT
-    virtual void HandleMenuPopup(Int_t id); // SLOT
 
 #ifndef __MAKECINT__
     virtual void SetMsrHandler(PMsrHandler *msrHandler);
@@ -87,11 +78,7 @@ class PMusrT0 : public TObject, public TQObject
     int fRunNo;
     int fDetectorTag;
     int fAddRunNo;
-
-    // canvas menu related variables
-    TRootCanvas *fImp;
-    TGMenuBar   *fBar;
-    TGPopupMenu *fPopupMain;
+    int fAddRunOffset;
 
     // canvas related variables
     TCanvas   *fMainCanvas;
@@ -106,8 +93,18 @@ class PMusrT0 : public TObject, public TQObject
     TLine *fFirstDataLine;
     TLine *fLastDataLine;
 
+    Int_t fPx;
+    Int_t fPy;
+
+    Int_t fDataRange[2];
+    Int_t fBkgRange[2];
+
     void InitDataAndBkg();
     void SetT0Channel();
+    void SetDataFirstChannel();
+    void SetDataLastChannel();
+    void SetBkgFirstChannel();
+    void SetBkgLastChannel();
     void UnZoom();
 
   ClassDef(PMusrT0, 1)

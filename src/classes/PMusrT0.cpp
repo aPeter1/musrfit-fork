@@ -64,6 +64,11 @@ PMusrT0::PMusrT0()
   fData  = 0;
   fBkg   = 0;
 
+  fDataRange[0] = 0;
+  fDataRange[1] = 0;
+  fBkgRange[0]  = 0;
+  fBkgRange[1]  = 0;
+
   fT0Line        = 0;
   fFirstBkgLine  = 0;
   fLastBkgLine   = 0;
@@ -85,9 +90,10 @@ PMusrT0::PMusrT0(PRawRunData *rawRunData, int runNo, int histoNo, int detectorTa
 
   fStatus = 0; // default is quit locally
 
-  fRunNo       = runNo;
-  fDetectorTag = detectorTag;
-  fAddRunNo    = addRunNo;
+  fRunNo        = runNo;
+  fDetectorTag  = detectorTag;
+  fAddRunNo     = addRunNo;
+  fAddRunOffset = 0;
 
   TString str = rawRunData->fRunName + TString(" : ");
   str += histoNo;
@@ -111,28 +117,6 @@ PMusrT0::PMusrT0(PRawRunData *rawRunData, int runNo, int histoNo, int detectorTa
   fMainCanvas = new TCanvas("fMainCanvas", str);
   fMainCanvas->SetFillColor(TColor::GetColor(255,255,255));
 
-  // add canvas menu
-  fImp = (TRootCanvas*)fMainCanvas->GetCanvasImp();
-  fBar = fImp->GetMenuBar();
-  fPopupMain = fBar->AddPopup("&MusrT0");
-
-  fPopupMain->AddEntry("&T0", P_MENU_ID_T0);
-  fPopupMain->AddSeparator();
-  fPopupMain->AddEntry("First Bkg Channel", P_MENU_ID_FIRST_BKG_CHANNEL);
-  fPopupMain->AddEntry("Last  Bkg Channel", P_MENU_ID_LAST_BKG_CHANNEL);
-  fPopupMain->AddSeparator();
-  fPopupMain->AddEntry("First Data Channel", P_MENU_ID_FIRST_DATA_CHANNEL);
-  fPopupMain->AddEntry("Last  Data Channel", P_MENU_ID_LAST_DATA_CHANNEL);
-  fPopupMain->AddSeparator();
-  fPopupMain->AddEntry("UnZoom", P_MENU_ID_UNZOOM);
-
-
-  fBar->MapSubwindows();
-  fBar->Layout();
-  fPopupMain->Connect("TGPopupMenu", "Activated(Int_t)", "PMusrT0", this, "HandleMenuPopup(Int_t)");
-
-
-  fMainCanvas->SetCrosshair(2);
   fMainCanvas->Show();
 
   fMainCanvas->Connect("ProcessedEvent(Int_t,Int_t,Int_t,TObject*)", "PMusrT0",
@@ -209,8 +193,11 @@ void PMusrT0::Done(Int_t status)
  */
 void PMusrT0::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
 {
-  if (event != kKeyPress)
-     return;
+  if (event != kKeyPress) {
+    fPx = x;
+    fPy = y;
+    return;
+  }
 
   // handle keys and popup menu entries
   if (x == 'q') { // quit
@@ -224,47 +211,18 @@ void PMusrT0::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   } else if (x == 't') { // set t0 channel
     SetT0Channel();
   } else if (x == 'b') { // set first background channel
-    cout << endl << "will set first background channel ..." << endl;
+    SetBkgFirstChannel();
   } else if (x == 'B') { // set last background channel
-    cout << endl << "will set last background channel ..." << endl;
+    SetBkgLastChannel();
   } else if (x == 'd') { // set first data channel
-    cout << endl << "will set first data channel ..." << endl;
+    SetDataFirstChannel();
   } else if (x == 'D') { // set last data channel
-    cout << endl << "will set last data channel ..." << endl;
+    SetDataLastChannel();
   }
 }
 
 //--------------------------------------------------------------------------
-// HandleMenuPopup (SLOT)
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- */
-void PMusrT0::HandleMenuPopup(Int_t id)
-{
-  switch (id) {
-    case P_MENU_ID_T0:
-      SetT0Channel();
-      break;
-    case P_MENU_ID_FIRST_BKG_CHANNEL:
-      break;
-    case P_MENU_ID_LAST_BKG_CHANNEL:
-      break;
-    case P_MENU_ID_FIRST_DATA_CHANNEL:
-      break;
-    case P_MENU_ID_LAST_DATA_CHANNEL:
-      break;
-    case P_MENU_ID_UNZOOM:
-      UnZoom();
-      break;
-    default:
-      break;
-  }
-}
-
-//--------------------------------------------------------------------------
-// HandleMenuPopup (SLOT)
+// SetMsrHandler
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -278,7 +236,7 @@ void PMusrT0::SetMsrHandler(PMsrHandler *msrHandler)
 }
 
 //--------------------------------------------------------------------------
-// HandleMenuPopup (SLOT)
+// InitDataAndBkg
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -287,26 +245,24 @@ void PMusrT0::SetMsrHandler(PMsrHandler *msrHandler)
 void PMusrT0::InitDataAndBkg()
 {
   // get addRun offset which depends on the fit type
-  int addRunOffset = 0;
   int fitType = fMsrHandler->GetMsrRunList()->at(fRunNo).fFitType;
   if (fitType == MSR_FITTYPE_SINGLE_HISTO) {
-    addRunOffset = 2;
+    fAddRunOffset = 2;
   } else if (fitType == MSR_FITTYPE_ASYM) {
-    addRunOffset = 4;
+    fAddRunOffset = 4;
   } else if (fitType == MSR_FITTYPE_ASYM_RRF) {
-    addRunOffset = 8;
+    fAddRunOffset = 8;
   }
 
   // feed data range histo
-  int dataRange[2];
   switch (fDetectorTag) {
     case DETECTOR_TAG_FORWARD:
-      dataRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[0 + fAddRunNo * addRunOffset];
-      dataRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[1 + fAddRunNo * addRunOffset];
+      fDataRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[0 + fAddRunNo * fAddRunOffset];
+      fDataRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[1 + fAddRunNo * fAddRunOffset];
       break;
     case DETECTOR_TAG_BACKWARD:
-      dataRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[2 + fAddRunNo * addRunOffset];
-      dataRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[3 + fAddRunNo * addRunOffset];
+      fDataRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[2 + fAddRunNo * fAddRunOffset];
+      fDataRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[3 + fAddRunNo * fAddRunOffset];
       break;
     case DETECTOR_TAG_RIGHT:
       // not clear yet what to be done
@@ -319,29 +275,29 @@ void PMusrT0::InitDataAndBkg()
       break;
   }
 
-  Int_t noOfBins = dataRange[1]-dataRange[0]+1;
-  Double_t start = dataRange[0] - 0.5;
-  Double_t end   = dataRange[1] + 0.5;
+  Int_t noOfBins = fDataRange[1]-fDataRange[0]+1;
+  Double_t start = fDataRange[0] - 0.5;
+  Double_t end   = fDataRange[1] + 0.5;
   fData = new TH1F("fData", "fData", noOfBins, start, end);
   fData->SetMarkerStyle(21);
   fData->SetMarkerSize(0.5);
   fData->SetMarkerColor(TColor::GetColor(0,0,255)); // blue
 
   for (int i=0; i<noOfBins; i++) {
-    fData->SetBinContent(i+1, fHisto->GetBinContent(dataRange[0]+i+1));
+    fData->SetBinContent(i+1, fHisto->GetBinContent(fDataRange[0]+i+1));
   }
   fData->Draw("p0 9 hist same");
 
   // feed background histo
-  int bkgRange[2];
+  int fBkgRange[2];
   switch (fDetectorTag) {
     case DETECTOR_TAG_FORWARD:
-      bkgRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[0 + fAddRunNo * addRunOffset];
-      bkgRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[1 + fAddRunNo * addRunOffset];
+      fBkgRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[0 + fAddRunNo * fAddRunOffset];
+      fBkgRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[1 + fAddRunNo * fAddRunOffset];
       break;
     case DETECTOR_TAG_BACKWARD:
-      bkgRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[2 + fAddRunNo * addRunOffset];
-      bkgRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[3 + fAddRunNo * addRunOffset];
+      fBkgRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[2 + fAddRunNo * fAddRunOffset];
+      fBkgRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[3 + fAddRunNo * fAddRunOffset];
       break;
     case DETECTOR_TAG_RIGHT:
       // not clear yet what to be done
@@ -354,16 +310,16 @@ void PMusrT0::InitDataAndBkg()
       break;
   }
 
-  noOfBins = bkgRange[1]-bkgRange[0]+1;
-  start = bkgRange[0] - 0.5;
-  end   = bkgRange[1] + 0.5;
+  noOfBins = fBkgRange[1]-fBkgRange[0]+1;
+  start = fBkgRange[0] - 0.5;
+  end   = fBkgRange[1] + 0.5;
   fBkg = new TH1F("fBkg", "fBkg", noOfBins, start, end);
   fBkg->SetMarkerStyle(21);
   fBkg->SetMarkerSize(0.5);
   fBkg->SetMarkerColor(TColor::GetColor(255,0,0)); // red
 
   for (int i=0; i<noOfBins; i++) {
-    fBkg->SetBinContent(i+1, fHisto->GetBinContent(bkgRange[0]+i+1));
+    fBkg->SetBinContent(i+1, fHisto->GetBinContent(fBkgRange[0]+i+1));
   }
   fBkg->Draw("p0 9 hist same");
 
@@ -372,10 +328,10 @@ void PMusrT0::InitDataAndBkg()
   int t0Bin;
   switch (fDetectorTag) {
     case DETECTOR_TAG_FORWARD:
-      t0Bin = fMsrHandler->GetMsrRunList()->at(fRunNo).fT0[0 + fAddRunNo * addRunOffset/2];
+      t0Bin = fMsrHandler->GetMsrRunList()->at(fRunNo).fT0[0 + fAddRunNo * fAddRunOffset/2];
       break;
     case DETECTOR_TAG_BACKWARD:
-      t0Bin = fMsrHandler->GetMsrRunList()->at(fRunNo).fT0[1 + fAddRunNo * addRunOffset/2];
+      t0Bin = fMsrHandler->GetMsrRunList()->at(fRunNo).fT0[1 + fAddRunNo * fAddRunOffset/2];
       break;
     case DETECTOR_TAG_RIGHT:
       // not clear yet what to be done
@@ -395,26 +351,26 @@ void PMusrT0::InitDataAndBkg()
   fT0Line->Draw();
 
   // data lines
-  fFirstDataLine = new TLine((double)dataRange[0], 0.0, (double)dataRange[0], max);
+  fFirstDataLine = new TLine((double)fDataRange[0], 0.0, (double)fDataRange[0], max);
   fFirstDataLine->SetLineStyle(3); // doted
   fFirstDataLine->SetLineColor(TColor::GetColor(0,0,255)); // blue
   fFirstDataLine->SetLineWidth(2);
   fFirstDataLine->Draw();
 
-  fLastDataLine = new TLine((double)dataRange[1], 0.0, (double)dataRange[1], max);
+  fLastDataLine = new TLine((double)fDataRange[1], 0.0, (double)fDataRange[1], max);
   fLastDataLine->SetLineStyle(3); // doted
   fLastDataLine->SetLineColor(TColor::GetColor(0,0,255)); // blue
   fLastDataLine->SetLineWidth(2);
   fLastDataLine->Draw();
 
   // bkg lines
-  fFirstBkgLine = new TLine((double)bkgRange[0], 0.0, (double)bkgRange[0], max);
+  fFirstBkgLine = new TLine((double)fBkgRange[0], 0.0, (double)fBkgRange[0], max);
   fFirstBkgLine->SetLineStyle(6); // _..._...
   fFirstBkgLine->SetLineColor(TColor::GetColor(255,0,0)); // red
   fFirstBkgLine->SetLineWidth(2);
   fFirstBkgLine->Draw();
 
-  fLastBkgLine = new TLine((double)bkgRange[1], 0.0, (double)bkgRange[1], max);
+  fLastBkgLine = new TLine((double)fBkgRange[1], 0.0, (double)fBkgRange[1], max);
   fLastBkgLine->SetLineStyle(6); // _..._...
   fLastBkgLine->SetLineColor(TColor::GetColor(255,0,0)); // red
   fLastBkgLine->SetLineWidth(2);
@@ -432,7 +388,188 @@ void PMusrT0::InitDataAndBkg()
  */
 void PMusrT0::SetT0Channel()
 {
-  cout << endl << "Set T0 Channel";
+  double x=0, y=0;
+  fMainCanvas->AbsPixeltoXY(fPx,fPy,x,y);
+
+  // get binx to set t0 corresponding to fPx
+  Int_t binx = fHisto->GetXaxis()->FindFixBin(x);
+
+  // set t0 bin in msr-Handler
+
+  // shift line to the proper position
+  fT0Line->SetX1(x);
+  fT0Line->SetX2(x);
+
+  fMainCanvas->Modified(); // needed that Update is actually working
+  fMainCanvas->Update();
+}
+
+//--------------------------------------------------------------------------
+// SetDataFirstChannel
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrT0::SetDataFirstChannel()
+{
+  double x=0, y=0;
+  fMainCanvas->AbsPixeltoXY(fPx,fPy,x,y);
+
+  // get binx to set the data first channel corresponding to fPx
+  fDataRange[0] = fHisto->GetXaxis()->FindFixBin(x);
+
+  // set the data first bin in msr-Handler
+
+  // shift line to the proper position
+  fFirstDataLine->SetX1(x);
+  fFirstDataLine->SetX2(x);
+
+  // recreate data histo
+  delete fData;
+  fData = 0;
+
+  // refill data histo
+  Int_t noOfBins = fDataRange[1]-fDataRange[0]+1;
+  Double_t start = fDataRange[0] - 0.5;
+  Double_t end   = fDataRange[1] + 0.5;
+  fData = new TH1F("fData", "fData", noOfBins, start, end);
+  fData->SetMarkerStyle(21);
+  fData->SetMarkerSize(0.5);
+  fData->SetMarkerColor(TColor::GetColor(0,0,255)); // blue
+  for (int i=0; i<noOfBins; i++) {
+    fData->SetBinContent(i+1, fHisto->GetBinContent(fDataRange[0]+i+1));
+  }
+  fData->Draw("p0 9 hist same");
+
+  fMainCanvas->Modified(); // needed that Update is actually working
+  fMainCanvas->Update();
+}
+
+//--------------------------------------------------------------------------
+// SetDataLastChannel
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrT0::SetDataLastChannel()
+{
+  double x=0, y=0;
+  fMainCanvas->AbsPixeltoXY(fPx,fPy,x,y);
+
+  // get binx to set the data last channel corresponding to fPx
+  fDataRange[1] = fHisto->GetXaxis()->FindFixBin(x);
+
+  // set the data last bin in msr-Handler
+
+  // shift line to the proper position
+  fLastDataLine->SetX1(x);
+  fLastDataLine->SetX2(x);
+
+  // recreate data histo
+  delete fData;
+  fData = 0;
+
+  // refill data histo
+  Int_t noOfBins = fDataRange[1]-fDataRange[0]+1;
+  Double_t start = fDataRange[0] - 0.5;
+  Double_t end   = fDataRange[1] + 0.5;
+  fData = new TH1F("fData", "fData", noOfBins, start, end);
+  fData->SetMarkerStyle(21);
+  fData->SetMarkerSize(0.5);
+  fData->SetMarkerColor(TColor::GetColor(0,0,255)); // blue
+  for (int i=0; i<noOfBins; i++) {
+    fData->SetBinContent(i+1, fHisto->GetBinContent(fDataRange[0]+i+1));
+  }
+  fData->Draw("p0 9 hist same");
+
+  fMainCanvas->Modified(); // needed that Update is actually working
+  fMainCanvas->Update();
+}
+
+//--------------------------------------------------------------------------
+// SetBkgFirstChannel
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrT0::SetBkgFirstChannel()
+{
+  double x=0, y=0;
+  fMainCanvas->AbsPixeltoXY(fPx,fPy,x,y);
+
+  // get binx to set the background first channel corresponding to fPx
+  fBkgRange[0] = fHisto->GetXaxis()->FindFixBin(x);
+
+  // set the background first bin in msr-Handler
+
+  // shift line to the proper position
+  fFirstBkgLine->SetX1(x);
+  fFirstBkgLine->SetX2(x);
+
+  // recreate data histo
+  delete fBkg;
+  fBkg = 0;
+
+  // refill data histo
+  Int_t noOfBins = fBkgRange[1]-fBkgRange[0]+1;
+  Double_t start = fBkgRange[0] - 0.5;
+  Double_t end   = fBkgRange[1] + 0.5;
+  fBkg = new TH1F("fBkg", "fBkg", noOfBins, start, end);
+  fBkg->SetMarkerStyle(21);
+  fBkg->SetMarkerSize(0.5);
+  fBkg->SetMarkerColor(TColor::GetColor(255,0,0)); // red
+  for (int i=0; i<noOfBins; i++) {
+    fBkg->SetBinContent(i+1, fHisto->GetBinContent(fBkgRange[0]+i+1));
+  }
+  fBkg->Draw("p0 9 hist same");
+
+  fMainCanvas->Modified(); // needed that Update is actually working
+  fMainCanvas->Update();
+}
+
+//--------------------------------------------------------------------------
+// SetBkgLastChannel
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrT0::SetBkgLastChannel()
+{
+  double x=0, y=0;
+  fMainCanvas->AbsPixeltoXY(fPx,fPy,x,y);
+
+  // get binx to set the background last channel corresponding to fPx
+  fBkgRange[1] = fHisto->GetXaxis()->FindFixBin(x);
+
+  // set the background last bin in msr-Handler
+
+  // shift line to the proper position
+  fLastBkgLine->SetX1(x);
+  fLastBkgLine->SetX2(x);
+
+  // recreate data histo
+  delete fBkg;
+  fBkg = 0;
+
+  // refill data histo
+  Int_t noOfBins = fBkgRange[1]-fBkgRange[0]+1;
+  Double_t start = fBkgRange[0] - 0.5;
+  Double_t end   = fBkgRange[1] + 0.5;
+  fBkg = new TH1F("fBkg", "fBkg", noOfBins, start, end);
+  fBkg->SetMarkerStyle(21);
+  fBkg->SetMarkerSize(0.5);
+  fBkg->SetMarkerColor(TColor::GetColor(255,0,0)); // red
+  for (int i=0; i<noOfBins; i++) {
+    fBkg->SetBinContent(i+1, fHisto->GetBinContent(fBkgRange[0]+i+1));
+  }
+  fBkg->Draw("p0 9 hist same");
+
+  fMainCanvas->Modified(); // needed that Update is actually working
+  fMainCanvas->Update();
 }
 
 //--------------------------------------------------------------------------
