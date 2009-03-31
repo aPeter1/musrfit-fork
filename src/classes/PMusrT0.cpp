@@ -420,6 +420,24 @@ void PMusrT0::SetDataFirstChannel()
   fDataRange[0] = fHisto->GetXaxis()->FindFixBin(x);
 
   // set the data first bin in msr-Handler
+  unsigned int idx = 0;
+  switch(fDetectorTag) {
+    case DETECTOR_TAG_FORWARD:
+      idx = fAddRunNo * fAddRunOffset;
+      break;
+    case DETECTOR_TAG_BACKWARD:
+      idx = 2 + fAddRunNo * fAddRunOffset;
+      break;
+    case DETECTOR_TAG_LEFT:
+      idx = 4 + fAddRunNo * fAddRunOffset;
+      break;
+    case DETECTOR_TAG_RIGHT:
+      idx = 6 + fAddRunNo * fAddRunOffset;
+      break;
+    default:
+      break;
+  }
+  fMsrHandler->SetMsrDataRangeEntry(fRunNo, idx, fDataRange[0]);
 
   // shift line to the proper position
   fFirstDataLine->SetX1(x);
@@ -461,7 +479,25 @@ void PMusrT0::SetDataLastChannel()
   // get binx to set the data last channel corresponding to fPx
   fDataRange[1] = fHisto->GetXaxis()->FindFixBin(x);
 
-  // set the data last bin in msr-Handler
+  // set the data first bin in msr-Handler
+  unsigned int idx = 0;
+  switch(fDetectorTag) {
+    case DETECTOR_TAG_FORWARD:
+      idx = 1 + fAddRunNo * fAddRunOffset;
+      break;
+    case DETECTOR_TAG_BACKWARD:
+      idx = 3 + fAddRunNo * fAddRunOffset;
+      break;
+    case DETECTOR_TAG_LEFT:
+      idx = 5 + fAddRunNo * fAddRunOffset;
+      break;
+    case DETECTOR_TAG_RIGHT:
+      idx = 7 + fAddRunNo * fAddRunOffset;
+      break;
+    default:
+      break;
+  }
+  fMsrHandler->SetMsrDataRangeEntry(fRunNo, idx, fDataRange[1]);
 
   // shift line to the proper position
   fLastDataLine->SetX1(x);
@@ -504,6 +540,24 @@ void PMusrT0::SetBkgFirstChannel()
   fBkgRange[0] = fHisto->GetXaxis()->FindFixBin(x);
 
   // set the background first bin in msr-Handler
+  unsigned int idx = 0;
+  switch(fDetectorTag) {
+    case DETECTOR_TAG_FORWARD:
+      idx = fAddRunNo * fAddRunOffset;
+      break;
+    case DETECTOR_TAG_BACKWARD:
+      idx = 2 + fAddRunNo * fAddRunOffset;
+      break;
+    case DETECTOR_TAG_LEFT:
+      idx = 4 + fAddRunNo * fAddRunOffset;
+      break;
+    case DETECTOR_TAG_RIGHT:
+      idx = 6 + fAddRunNo * fAddRunOffset;
+      break;
+    default:
+      break;
+  }
+  fMsrHandler->SetMsrBkgRangeEntry(fRunNo, idx, fBkgRange[0]);
 
   // shift line to the proper position
   fFirstBkgLine->SetX1(x);
@@ -545,7 +599,25 @@ void PMusrT0::SetBkgLastChannel()
   // get binx to set the background last channel corresponding to fPx
   fBkgRange[1] = fHisto->GetXaxis()->FindFixBin(x);
 
-  // set the background last bin in msr-Handler
+  // set the background first bin in msr-Handler
+  unsigned int idx = 0;
+  switch(fDetectorTag) {
+    case DETECTOR_TAG_FORWARD:
+      idx = 1 + fAddRunNo * fAddRunOffset;
+      break;
+    case DETECTOR_TAG_BACKWARD:
+      idx = 3 + fAddRunNo * fAddRunOffset;
+      break;
+    case DETECTOR_TAG_LEFT:
+      idx = 5 + fAddRunNo * fAddRunOffset;
+      break;
+    case DETECTOR_TAG_RIGHT:
+      idx = 7 + fAddRunNo * fAddRunOffset;
+      break;
+    default:
+      break;
+  }
+  fMsrHandler->SetMsrBkgRangeEntry(fRunNo, idx, fBkgRange[1]);
 
   // shift line to the proper position
   fLastBkgLine->SetX1(x);

@@ -242,36 +242,35 @@ typedef vector<PMsrParamStructure> PMsrParamList;
  *
  */
 typedef struct {
-  PStringVector fRunName;    ///< name of the run file
-  PStringVector fBeamline;   ///< e.g. mue4, mue1, pim3, emu, m15, ... (former: run type)
-  PStringVector fInstitute;  ///< e.g. psi, ral, triumf (former: run format)
-  PStringVector fFileFormat; ///< e.g. root, nexus, psi-bin, mud, ascii, db
-  int fFitType;              ///< fit type: 0=single histo fit, 2=asymmetry fit, 4=asymmetry in RRF, 8=non muSR
-  int fAlphaParamNo;         ///< alpha parameter number (fit type 2, 4)
-  int fBetaParamNo;          ///< beta parameter number  (fit type 2, 4)
-  int fNormParamNo;          ///< N0 parameter number (fit type 0)
-  int fBkgFitParamNo;        ///< background fit parameter number (fit type 0)
-  int fPhaseParamNo;         ///< ??? NEEDED ??? NEEDS TO BE CHECKED !!!
-  int fLifetimeParamNo;      ///< muon lifetime parameter number (fit type 0)
-  bool fLifetimeCorrection;  ///< lifetime correction flag for viewing (fit type 0)
-  PIntVector fMap;           ///< map vector needed to switch parameters for different runs within a single theory
-  int fForwardHistoNo;       ///< forward histogram number (fit type 0, 2, 4)
-  int fBackwardHistoNo;      ///< backward histogram number (fit type 2, 4)
-  bool fBkgFixPresent[2];    ///< flag showing if a fixed background is present (fit type 0, 2, 4).
-  double fBkgFix[2];         ///< fixed background in (1/ns) (fit type 0, 2, 4)
-  int fBkgRange[4];          ///< background bin range (fit type 0, 2, 4)
-  int fDataRange[4];         ///< data bin range (fit type 0, 2, 4)
-  PIntVector fT0;            ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
-  double fFitRange[2];       ///< fit range in (us)
-  int fPacking;              ///< packing/rebinning
-  double fRRFFreq;           ///< rotating reference frequency (fit type 4)
-  int fRRFPacking;           ///< rotating reference packing (fit type 4)
-  int fAlpha2ParamNo;        ///< rotating reference alpha2 (fit type 4)
-  int fBeta2ParamNo;         ///< rotating reference beta2 (fit type 4)
-  int fRightHistoNo;         ///< rotating reference right histogram number (fit type 4)
-  int fLeftHistoNo;          ///< rotating reference left histogram number (fit type 4)
-  int fXYDataIndex[2];       ///< used to get the data indices when using db-files (fit type 8)
-  TString fXYDataLabel[2];   ///< used to get the indices via labels when using db-files  (fit type 8)
+  PStringVector fRunName;     ///< name of the run file
+  PStringVector fBeamline;    ///< e.g. mue4, mue1, pim3, emu, m15, ... (former: run type)
+  PStringVector fInstitute;   ///< e.g. psi, ral, triumf (former: run format)
+  PStringVector fFileFormat;  ///< e.g. root, nexus, psi-bin, mud, ascii, db
+  int fFitType;               ///< fit type: 0=single histo fit, 2=asymmetry fit, 4=asymmetry in RRF, 8=non muSR
+  int fAlphaParamNo;          ///< alpha parameter number (fit type 2, 4)
+  int fBetaParamNo;           ///< beta parameter number  (fit type 2, 4)
+  int fNormParamNo;           ///< N0 parameter number (fit type 0)
+  int fBkgFitParamNo;         ///< background fit parameter number (fit type 0)
+  int fPhaseParamNo;          ///< ??? NEEDED ??? NEEDS TO BE CHECKED !!!
+  int fLifetimeParamNo;       ///< muon lifetime parameter number (fit type 0)
+  bool fLifetimeCorrection;   ///< lifetime correction flag for viewing (fit type 0)
+  PIntVector fMap;            ///< map vector needed to switch parameters for different runs within a single theory
+  int fForwardHistoNo;        ///< forward histogram number (fit type 0, 2, 4)
+  int fBackwardHistoNo;       ///< backward histogram number (fit type 2, 4)
+  PDoubleVector fBkgFix;      ///< fixed background in (1/ns) (fit type 0, 2, 4)
+  PIntVector fBkgRange;       ///< background bin range (fit type 0, 2, 4)
+  PIntVector fDataRange;      ///< data bin range (fit type 0, 2, 4)
+  PIntVector fT0;             ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
+  double fFitRange[2];        ///< fit range in (us)
+  int fPacking;               ///< packing/rebinning
+  double fRRFFreq;            ///< rotating reference frequency (fit type 4)
+  int fRRFPacking;            ///< rotating reference packing (fit type 4)
+  int fAlpha2ParamNo;         ///< rotating reference alpha2 (fit type 4)
+  int fBeta2ParamNo;          ///< rotating reference beta2 (fit type 4)
+  int fRightHistoNo;          ///< rotating reference right histogram number (fit type 4)
+  int fLeftHistoNo;           ///< rotating reference left histogram number (fit type 4)
+  int fXYDataIndex[2];        ///< used to get the data indices when using db-files (fit type 8)
+  TString fXYDataLabel[2];    ///< used to get the indices via labels when using db-files  (fit type 8)
 } PMsrRunStructure;
 
 //-------------------------------------------------------------

@@ -80,6 +80,17 @@ PMsrHandler::~PMsrHandler()
   fParam.clear();
   fTheory.clear();
   fFunctions.clear();
+  for (unsigned int i=0; i<fRuns.size(); i++) {
+    fRuns[i].fRunName.clear();
+    fRuns[i].fBeamline.clear();
+    fRuns[i].fInstitute.clear();
+    fRuns[i].fFileFormat.clear();
+    fRuns[i].fMap.clear();
+    fRuns[i].fBkgFix.clear();
+    fRuns[i].fBkgRange.clear();
+    fRuns[i].fDataRange.clear();
+    fRuns[i].fT0.clear();
+  }
   fRuns.clear();
   fCommands.clear();
   fPlots.clear();
@@ -586,38 +597,31 @@ int PMsrHandler::WriteMsrLogFile()
       CheckAndWriteComment(f, ++lineNo);
     }
     // backgr.fix
-    if (fRuns[i].fBkgFixPresent[0]) {
+    if (fRuns[i].fBkgFix.size() > 0) {
       f.width(15);
       f << endl << left << "backgr.fix";
-      f.precision(prec);
-      f.width(12);
-      f << left << fRuns[i].fBkgFix[0];
-      if (fRuns[i].fBkgFixPresent[1]) {
+      for (unsigned int j=0; j<fRuns[i].fBkgFix.size(); j++) {
         f.precision(prec);
         f.width(12);
-        f << left << fRuns[i].fBkgFix[1];
+        f << left << fRuns[i].fBkgFix[j];
       }
       CheckAndWriteComment(f, ++lineNo);
     }
     // background
-    if (fRuns[i].fBkgRange[0] != -1) {
+    if (fRuns[i].fBkgRange.size() > 0) {
       f.width(16);
       f << endl << left << "background";
-      for (unsigned int j=0; j<4; j++) {
-        if (fRuns[i].fBkgRange[j] == -1)
-          break;
+      for (unsigned int j=0; j<fRuns[i].fBkgRange.size(); j++) {
         f.width(8);
         f << left << fRuns[i].fBkgRange[j];
       }
       CheckAndWriteComment(f, ++lineNo);
     }
     // data
-    if (fRuns[i].fDataRange[0] != -1) {
+    if (fRuns[i].fDataRange.size() > 0) {
       f.width(16);
       f << endl << left << "data";
-      for (unsigned int j=0; j<4; j++) {
-        if (fRuns[i].fDataRange[j] == -1)
-          break;
+      for (unsigned int j=0; j<fRuns[i].fDataRange.size(); j++) {
         f.width(8);
         f << left << fRuns[i].fDataRange[j];
       }
@@ -941,6 +945,60 @@ bool PMsrHandler::SetMsrParamPosError(unsigned int i, double value)
   fParam[i].fPosError = value;
 
   return true;
+}
+
+//--------------------------------------------------------------------------
+// SetMsrDataRangeEntry (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param runNo
+ * \param idx
+ * \param bin
+ */
+void PMsrHandler::SetMsrDataRangeEntry(unsigned int runNo, unsigned int idx, int bin)
+{
+  if ((runNo < 0) || (runNo > fRuns.size())) { // error
+    cout << endl << "**ERROR** in PMsrHandler::SetMsrDataRangeEntry: runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
+    cout << endl;
+    return;
+  }
+
+  if ((idx < 0) || (idx > fRuns[runNo].fDataRange.size())) { // error
+    cout << endl << "**ERROR** in PMsrHandler::SetMsrDataRangeEntry: idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].fDataRange.size();
+    cout << endl;
+    return;
+  }
+
+  fRuns[runNo].fDataRange[idx] = bin;
+}
+
+//--------------------------------------------------------------------------
+// SetMsrBkgRangeEntry (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param runNo
+ * \param idx
+ * \param bin
+ */
+void PMsrHandler::SetMsrBkgRangeEntry(unsigned int runNo, unsigned int idx, int bin)
+{
+  if ((runNo < 0) || (runNo > fRuns.size())) { // error
+    cout << endl << "**ERROR** in PMsrHandler::SetMsrBkgRangeEntry: runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
+    cout << endl;
+    return;
+  }
+
+  if ((idx < 0) || (idx > fRuns[runNo].fBkgRange.size())) { // error
+    cout << endl << "**ERROR** in PMsrHandler::SetMsrBkgRangeEntry: idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].fBkgRange.size();
+    cout << endl;
+    return;
+  }
+
+  fRuns[runNo].fBkgRange[idx] = bin;
 }
 
 //--------------------------------------------------------------------------
@@ -1464,14 +1522,14 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
 
     // backgr.fix ----------------------------------------------
     if (iter->fLine.BeginsWith("backgr.fix", TString::kIgnoreCase)) {
-      if ((tokens->GetEntries() != 2) && (tokens->GetEntries() != 3)) {
+      if (tokens->GetEntries() < 2) {
         error = true;
       } else {
         for (int i=1; i<tokens->GetEntries(); i++) {
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsFloat())
-            param.fBkgFix[i-1] = str.Atof();
+            param.fBkgFix.push_back(str.Atof());
           else
             error = true;
         }
@@ -1480,14 +1538,14 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
 
     // background ---------------------------------------------
     if (iter->fLine.BeginsWith("background", TString::kIgnoreCase)) {
-      if ((tokens->GetEntries() != 3) && (tokens->GetEntries() != 5)) {
+      if ((tokens->GetEntries() < 3) || (tokens->GetEntries() % 2 != 1)) { // odd number (>=3) of entries needed
         error = true;
       } else {
         for (int i=1; i<tokens->GetEntries(); i++) {
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsDigit())
-            param.fBkgRange[i-1] = str.Atoi();
+            param.fBkgRange.push_back(str.Atoi());
           else
             error = true;
         }
@@ -1496,14 +1554,14 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
 
     // data --------------------------------------------------
     if (iter->fLine.BeginsWith("data", TString::kIgnoreCase)) {
-      if ((tokens->GetEntries() != 3) && (tokens->GetEntries() != 5)) {
+      if ((tokens->GetEntries() < 3) || (tokens->GetEntries() % 2 != 1)) { // odd number (>=3) of entries needed
         error = true;
       } else {
         for (int i=1; i<tokens->GetEntries(); i++) {
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsDigit())
-            param.fDataRange[i-1] = str.Atoi();
+            param.fDataRange.push_back(str.Atoi());
           else
             error = true;
         }
@@ -1690,9 +1748,9 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
       bool found;
       if (fRuns[i].fBkgFitParamNo >= 0) { // check if backgr.fit is given
         found = true;
-      } else if (fRuns[i].fBkgFixPresent[0]) { // check if backgr.fix is given
+      } else if (fRuns[i].fBkgFix.size() > 0) { // check if backgr.fix is given
         found = true;
-      } else if (fRuns[i].fBkgRange[0] >= 0) { // check if background window is given
+      } else if (fRuns[i].fBkgRange.size() > 0) { // check if background window is given
         found = true;
       } else {
         found = false;
@@ -1736,14 +1794,9 @@ void PMsrHandler::InitRunParameterStructure(PMsrRunStructure &param)
   param.fMap.clear(); // empty list
   param.fForwardHistoNo  = -1;
   param.fBackwardHistoNo = -1;
-  for (int i=0; i<2; i++) {
-    param.fBkgFixPresent[i] = false;
-    param.fBkgFix[i] = 0.0;
-  }
-  for (int i=0; i<4; i++)
-    param.fBkgRange[i] = -1;
-  for (int i=0; i<4; i++)
-    param.fDataRange[i] = -1;
+  param.fBkgFix.clear();
+  param.fBkgRange.clear();
+  param.fDataRange.clear();
   param.fT0.clear();
   for (int i=0; i<4; i++)
     param.fFitRange[i] = -1;

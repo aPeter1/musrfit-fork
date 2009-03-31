@@ -119,7 +119,7 @@ double PRunSingleHisto::CalcChiSquare(const std::vector<double>& par)
   // get background
   double bkg;
   if (fRunInfo->fBkgFitParamNo == -1) { // bkg not fitted
-    if (!fRunInfo->fBkgFixPresent[0]) { // no fixed background given (background interval)
+    if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given (background interval)
       bkg = fBackground;
     } else { // fixed bkg given
       bkg = fRunInfo->fBkgFix[0];
@@ -193,7 +193,7 @@ double PRunSingleHisto::CalcMaxLikelihood(const std::vector<double>& par)
   // get background
   double bkg;
   if (fRunInfo->fBkgFitParamNo == -1) { // bkg not fitted
-    if (!fRunInfo->fBkgFixPresent[0]) { // no fixed background given (background interval)
+    if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given (background interval)
       bkg = fBackground;
     } else { // fixed bkg given
       bkg = fRunInfo->fBkgFix[0];
@@ -267,7 +267,7 @@ void PRunSingleHisto::CalcTheory()
   // get background
   double bkg;
   if (fRunInfo->fBkgFitParamNo == -1) { // bkg not fitted
-    if (!fRunInfo->fBkgFixPresent[0]) { // no fixed background given (background interval)
+    if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given (background interval)
       bkg = fBackground;
     } else { // fixed bkg given
       bkg = fRunInfo->fBkgFix[0];
@@ -605,8 +605,8 @@ bool PRunSingleHisto::PrepareFitData(PRawRunData* runData, const unsigned int hi
   // check how the background shall be handled
   if (fRunInfo->fBkgFitParamNo == -1) { // bkg shall **NOT** be fitted
     // subtract background from histogramms ------------------------------------------
-    if (!fRunInfo->fBkgFixPresent[0]) { // no fixed background given
-      if (fRunInfo->fBkgRange[0] != 0) {
+    if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given
+      if (fRunInfo->fBkgRange.size() != 0) {
         if (!EstimateBkg(histoNo))
           return false;
       } else { // no background given to do the job
@@ -771,7 +771,7 @@ cout << endl << ">> data start time = " << fData.fDataTimeStart;
   // get background
   double bkg;
   if (fRunInfo->fBkgFitParamNo == -1) { // bkg not fitted
-    if (!fRunInfo->fBkgFixPresent[0]) { // no fixed background given (background interval)
+    if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given (background interval)
       if (!EstimateBkg(histoNo))
         return false;
       bkg = fBackground;
@@ -885,7 +885,7 @@ bool PRunSingleHisto::PrepareViewData(PRawRunData* runData, const unsigned int h
   // get background
   double bkg;
   if (fRunInfo->fBkgFitParamNo == -1) { // bkg not fitted
-    if (!fRunInfo->fBkgFixPresent[0]) { // no fixed background given (background interval)
+    if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given (background interval)
       if (!EstimateBkg(histoNo))
         return false;
       bkg = fBackground;
