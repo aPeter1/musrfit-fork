@@ -286,6 +286,9 @@ int main(int argc, char *argv[])
   }
 cout << endl;
 
+  // write msr-file
+  msrHandler->WriteMsrLogFile("msr");
+
   // clean up
   musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
 

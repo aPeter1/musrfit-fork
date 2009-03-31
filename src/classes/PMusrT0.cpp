@@ -86,7 +86,7 @@ PMusrT0::PMusrT0()
  */
 PMusrT0::PMusrT0(PRawRunData *rawRunData, int runNo, int histoNo, int detectorTag, int addRunNo)
 {
-  cout << endl << "run Name = " << rawRunData->fRunName.Data() << ", histoNo = " << histoNo << endl;
+//  cout << endl << "run Name = " << rawRunData->fRunName.Data() << ", histoNo = " << histoNo << endl;
 
   fStatus = 0; // default is quit locally
 
@@ -289,7 +289,6 @@ void PMusrT0::InitDataAndBkg()
   fData->Draw("p0 9 hist same");
 
   // feed background histo
-  int fBkgRange[2];
   switch (fDetectorTag) {
     case DETECTOR_TAG_FORWARD:
       fBkgRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[0 + fAddRunNo * fAddRunOffset];
@@ -653,8 +652,6 @@ void PMusrT0::SetBkgLastChannel()
  */
 void PMusrT0::UnZoom()
 {
-  cout << endl << ">> in UnZoom ..." << endl;
-
   fHisto->GetXaxis()->UnZoom();
 
   fMainCanvas->Modified(); // needed that Update is actually working

@@ -309,7 +309,7 @@ cout << endl;
 /**
  * <p>
  */
-int PMsrHandler::WriteMsrLogFile()
+int PMsrHandler::WriteMsrLogFile(TString ext)
 {
   const unsigned int prec = 6; // output precision for float/doubles
 
@@ -327,7 +327,10 @@ int PMsrHandler::WriteMsrLogFile()
     ostr = dynamic_cast<TObjString*>(tokens->At(i));
     str += ostr->GetString() + TString(".");
   }
-  str += "mlog";
+  if (ext.Length() != 0)
+    str += ext;
+  else
+    str += "mlog";
 
   // clean up
   if (tokens) {
@@ -1874,7 +1877,7 @@ bool PMsrHandler::HandleCommandsEntry(PMsrLines &lines)
   PMsrLines::iterator iter;
 
   if (lines.empty()) {
-    cout << endl << "WARNING: There is no COMMANDS block! Do you really want this?";
+    cout << endl << "**WARNING**: There is no COMMANDS block! Do you really want this?";
     cout << endl;
   }
 
@@ -1918,14 +1921,14 @@ void PMsrHandler::InitFourierParameterStructure(PMsrFourierStructure &fourier)
  */
 bool PMsrHandler::HandleFourierEntry(PMsrLines &lines)
 {
-cout << endl << ">> in PMsrHandler::HandleFourierEntry ...";
+//cout << endl << ">> in PMsrHandler::HandleFourierEntry ...";
 
   bool error = false;
 
   if (lines.empty()) // no fourier block present
     return true;
 
-cout << endl << ">> in PMsrHandler::HandleFourierEntry, Fourier block present ...";
+//cout << endl << ">> in PMsrHandler::HandleFourierEntry, Fourier block present ...";
 
   PMsrFourierStructure fourier;
 
@@ -2149,7 +2152,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
   TString str2;
 
   if (lines.empty()) {
-    cout << endl << "WARNING: There is no PLOT block! Do you really want this?";
+    cout << endl << "**WARNING**: There is no PLOT block! Do you really want this?";
     cout << endl;
   }
 
