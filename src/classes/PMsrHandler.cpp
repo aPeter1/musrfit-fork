@@ -951,6 +951,33 @@ bool PMsrHandler::SetMsrParamPosError(unsigned int i, double value)
 }
 
 //--------------------------------------------------------------------------
+// SetMsrT0Entry (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param runNo
+ * \param idx
+ * \param bin
+ */
+void PMsrHandler::SetMsrT0Entry(unsigned int runNo, unsigned int idx, int bin)
+{
+  if ((runNo < 0) || (runNo > fRuns.size())) { // error
+    cout << endl << "**ERROR** in PMsrHandler::SetMsrT0Entry: runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
+    cout << endl;
+    return;
+  }
+
+  if ((idx < 0) || (idx > fRuns[runNo].fT0.size())) { // error
+    cout << endl << "**ERROR** in PMsrHandler::SetMsrT0Entry: idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].fT0.size();
+    cout << endl;
+    return;
+  }
+
+  fRuns[runNo].fT0[idx] = bin;
+}
+
+//--------------------------------------------------------------------------
 // SetMsrDataRangeEntry (public)
 //--------------------------------------------------------------------------
 /**

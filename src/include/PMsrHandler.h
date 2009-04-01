@@ -71,6 +71,7 @@ class PMsrHandler
     virtual bool SetMsrParamPosErrorPresent(unsigned int i, bool value);
     virtual bool SetMsrParamPosError(unsigned int i, double value);
 
+    virtual void SetMsrT0Entry(unsigned int runNo, unsigned int idx, int bin);
     virtual void SetMsrDataRangeEntry(unsigned int runNo, unsigned int idx, int bin);
     virtual void SetMsrBkgRangeEntry(unsigned int runNo, unsigned int idx, int bin);
 

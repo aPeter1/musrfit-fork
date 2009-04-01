@@ -687,12 +687,11 @@ bool PRunAsymmetry::PrepareFitData(PRawRunData* runData, unsigned int histoNo[2]
     }
   }
 
-  // check if packed forward and backward hist have the same size, otherwise something is wrong
+  // check if packed forward and backward hist have the same size, otherwise take the minimum size
+  unsigned int noOfBins = forwardPacked.fValue.size();
   if (forwardPacked.fValue.size() != backwardPacked.fValue.size()) {
-    cout << endl << "PRunAsymmetry::PrepareFitData(): **PANIC ERROR**:";
-    cout << endl << "  packed forward and backward histo should have the same number of bins!";
-    cout << endl << "  however found (f/b) : " << forwardPacked.fValue.size() << "/" << backwardPacked.fValue.size(); 
-    return false;
+    if (forwardPacked.fValue.size() > backwardPacked.fValue.size())
+      noOfBins = backwardPacked.fValue.size();
   }
 
   // form asymmetry including error propagation
@@ -702,7 +701,7 @@ bool PRunAsymmetry::PrepareFitData(PRawRunData* runData, unsigned int histoNo[2]
   // data start at data_start-t0
   fData.fDataTimeStart = fTimeResolution*(((double)start[0]-t0[0])+(double)fRunInfo->fPacking/2.0);
   fData.fDataTimeStep  = fTimeResolution*(double)fRunInfo->fPacking;
-  for (unsigned int i=0; i<forwardPacked.fValue.size(); i++) {
+  for (unsigned int i=0; i<noOfBins; i++) {
     // to make the formulae more readable
     f  = forwardPacked.fValue[i];
     b  = backwardPacked.fValue[i];
@@ -840,17 +839,16 @@ bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2
     error += fBackwardErr[i]*fBackwardErr[i];
   }
 
-  // check if packed forward and backward hist have the same size, otherwise something is wrong
+  // check if packed forward and backward hist have the same size, otherwise take the minimum size
+  unsigned int noOfBins = forwardPacked.fValue.size();
   if (forwardPacked.fValue.size() != backwardPacked.fValue.size()) {
-    cout << endl << "PRunAsymmetry::PrepareViewData(): **PANIC ERROR**:";
-    cout << endl << "  packed forward and backward histo should have the same number of bins!";
-    cout << endl << "  however found (f/b) : " << forwardPacked.fValue.size() << "/" << backwardPacked.fValue.size(); 
-    return false;
+    if (forwardPacked.fValue.size() > backwardPacked.fValue.size())
+      noOfBins = backwardPacked.fValue.size();
   }
 
   // form asymmetry including error propagation
   double asym;
-  double f, b, ef, eb, alpha, beta;
+  double f, b, ef, eb, alpha = 1.0, beta = 1.0;
   // fill data time start, and step
   // data start at data_start-t0
   fData.fDataTimeStart = fTimeResolution*(((double)start[0]-t0[0])+(double)fRunInfo->fPacking/2.0);
@@ -879,7 +877,7 @@ bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2
   }
 //cout << endl << ">> alpha = " << alpha << ", beta = " << beta;
 
-  for (unsigned int i=0; i<forwardPacked.fValue.size(); i++) {
+  for (unsigned int i=0; i<noOfBins; i++) {
     // to make the formulae more readable
     f  = forwardPacked.fValue[i];
     b  = backwardPacked.fValue[i];

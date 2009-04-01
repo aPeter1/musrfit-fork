@@ -394,6 +394,25 @@ void PMusrT0::SetT0Channel()
   Int_t binx = fHisto->GetXaxis()->FindFixBin(x);
 
   // set t0 bin in msr-Handler
+  unsigned int idx = 0;
+  switch(fDetectorTag) {
+    case DETECTOR_TAG_FORWARD:
+      idx = fAddRunNo * fAddRunOffset / 2;
+      break;
+    case DETECTOR_TAG_BACKWARD:
+      idx = 1 + fAddRunNo * fAddRunOffset / 2;
+      break;
+    case DETECTOR_TAG_LEFT:
+      idx = 2 + fAddRunNo * fAddRunOffset / 2;
+      break;
+    case DETECTOR_TAG_RIGHT:
+      idx = 3 + fAddRunNo * fAddRunOffset / 2;
+      break;
+    default:
+      break;
+  }
+  fMsrHandler->SetMsrT0Entry(fRunNo, idx, binx);
+
 
   // shift line to the proper position
   fT0Line->SetX1(x);
