@@ -801,7 +801,18 @@ void PTheory::MakeCleanAndTidyPolynom(unsigned int i, PMsrLines *fullTheoryBlock
   // tokenize line
   tokens = str.Tokenize(" \t");
 
-  for (unsigned int j=1; j<(unsigned int)tokens->GetEntries(); j++) {
+  // check if comment is already present, and if yes ignore it by setting max correctly
+  unsigned int max = (unsigned int)tokens->GetEntries();
+  for (unsigned int j=1; j<max; j++) {
+    ostr = dynamic_cast<TObjString*>(tokens->At(j));
+    str = ostr->GetString();
+    if (str.Contains("(")) { // comment present
+      max=j;
+      break;
+    }
+  }
+
+  for (unsigned int j=1; j<max; j++) {
     ostr = dynamic_cast<TObjString*>(tokens->At(j));
     str = ostr->GetString();
     sprintf(substr, "%6s", str.Data());

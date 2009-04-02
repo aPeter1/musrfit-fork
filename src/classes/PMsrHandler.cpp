@@ -159,27 +159,27 @@ int PMsrHandler::ReadMsrFile()
       // check for a msr block
       if (line_no == 1) { // title
         fTitle = line;
-      } else if (line.Contains("FITPARAMETER")) { // FITPARAMETER block tag
+      } else if (line.BeginsWith("FITPARAMETER")) { // FITPARAMETER block tag
         fMsrBlockCounter = MSR_TAG_FITPARAMETER;
-      } else if (line.Contains("THEORY")) {       // THEORY block tag
+      } else if (line.BeginsWith("THEORY")) {       // THEORY block tag
         fMsrBlockCounter = MSR_TAG_THEORY;
         theory.push_back(current);
-      } else if (line.Contains("FUNCTIONS")) {    // FUNCTIONS block tag
+      } else if (line.BeginsWith("FUNCTIONS")) {    // FUNCTIONS block tag
         fMsrBlockCounter = MSR_TAG_FUNCTIONS;
         functions.push_back(current);
-      } else if (line.Contains("RUN")) {          // RUN block tag
+      } else if (line.BeginsWith("RUN")) {          // RUN block tag
         fMsrBlockCounter = MSR_TAG_RUN;
         run.push_back(current);
-      } else if (line.Contains("COMMANDS")) {     // COMMANDS block tag
+      } else if (line.BeginsWith("COMMANDS")) {     // COMMANDS block tag
         fMsrBlockCounter = MSR_TAG_COMMANDS;
         commands.push_back(current);
-      } else if (line.Contains("FOURIER")) {      // FOURIER block tag
+      } else if (line.BeginsWith("FOURIER")) {      // FOURIER block tag
         fMsrBlockCounter = MSR_TAG_FOURIER;
         fourier.push_back(current);
-      } else if (line.Contains("PLOT")) {         // PLOT block tag
+      } else if (line.BeginsWith("PLOT")) {         // PLOT block tag
         fMsrBlockCounter = MSR_TAG_PLOT;
         plot.push_back(current);
-      } else if (line.Contains("STATISTIC")) {    // STATISTIC block tag
+      } else if (line.BeginsWith("STATISTIC")) {    // STATISTIC block tag
         fMsrBlockCounter = MSR_TAG_STATISTIC;
         statistic.push_back(current);
       } else { // the read line is some real stuff
@@ -425,8 +425,6 @@ int PMsrHandler::WriteMsrLogFile(TString ext)
       f << endl << str.Data();
       CheckAndWriteComment(f, ++lineNo);
     }
-  } else {
-    CheckAndWriteComment(f, ++lineNo);
   }
 
   // write run block
@@ -1285,12 +1283,20 @@ bool PMsrHandler::HandleFunctionsEntry(PMsrLines &lines)
   // create function handler
   fFuncHandler = new PFunctionHandler(fFunctions);
   if (fFuncHandler == 0) {
-    cout << endl << ">> PMsrHandler::HandleFunctionsEntry: **ERROR**: PMsrHandler::HandleFunctionsEntry: Couldn't invoke PFunctionHandler";
+    cout << endl << ">> PMsrHandler::HandleFunctionsEntry: **ERROR** Couldn't invoke PFunctionHandler." << endl;
     return false;
   }
 
   // do the parsing
   if (!fFuncHandler->DoParse()) {
+    return false;
+  }
+
+  // check if an empty FUNCTIONS block is present
+  if ((fFuncHandler->GetNoOfFuncs() == 0) && !lines.empty()) {
+    cout << endl << ">> PMsrHandler::HandleFunctionsEntry: **ERROR** empty FUNCTIONS block are not supported!";
+    cout << endl << ">> If you want to keep it, just comment the whole block ;-)";
+    cout << endl;
     return false;
   }
 
