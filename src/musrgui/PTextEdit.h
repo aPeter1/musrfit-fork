@@ -76,6 +76,7 @@ private slots:
   void editCut();
   void editCopy();
   void editPaste();
+  void editComment();
 
   void textFamily( const QString &f );
   void textSize( const QString &p );

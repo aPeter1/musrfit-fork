@@ -208,6 +208,11 @@ void PTextEdit::setupEditActions()
   connect( a, SIGNAL( activated() ), this, SLOT( editPaste() ) );
   a->addTo( tb );
   a->addTo( menu );
+  menu->insertSeparator();
+  a = new QAction( tr( "(Un)Co&mment" ), CTRL + Key_M, this, "editComment" );
+  connect( a, SIGNAL( activated() ), this, SLOT( editComment() ) );
+  a->addTo( tb );
+  a->addTo( menu );
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -629,6 +634,64 @@ void PTextEdit::editPaste()
   if ( !currentEditor() )
     return;
   currentEditor()->paste();
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PTextEdit::editComment()
+{
+  if ( !currentEditor() )
+    return;
+
+  QString str;
+  if (currentEditor()->hasSelectedText()) { // selected text present
+    int paraFrom, paraTo;
+    int indexFrom, indexTo;
+    // get selection
+    currentEditor()->getSelection(&paraFrom, &indexFrom, &paraTo, &indexTo);
+    // check that indexFrom == 0, if not change the selection accordingly
+    if (indexFrom != 0) {
+      indexFrom = 0;
+      currentEditor()->setSelection(paraFrom, indexFrom, paraTo, indexTo);
+    }
+    // check that indexTo == end of line of paraTo
+    if (indexTo != (int)currentEditor()->text(paraTo).length()) {
+      indexTo = currentEditor()->text(paraTo).length();
+      currentEditor()->setSelection(paraFrom, indexFrom, paraTo, indexTo);
+    }
+    // get selection text
+    str = currentEditor()->selectedText();
+    // check line by line if (un)comment is needed
+    QStringList strList = QStringList::split("\n", str);
+    for (QStringList::Iterator it = strList.begin(); it != strList.end(); ++it) {
+      if ((*it).stripWhiteSpace().startsWith("#")) { // comment -> uncomment it
+        (*it).remove(0,1);
+        (*it) = (*it).stripWhiteSpace();
+      } else { // no comment -> comment it
+        (*it).prepend("# ");
+      }
+    }
+    str = strList.join("\n");
+    currentEditor()->insert(str);
+  } else { // no text selected
+    int para, index;
+    currentEditor()->getCursorPosition(&para, &index);
+    // get current text line
+    str = currentEditor()->text(para);
+    // check if it is a comment line or not
+    if (str.stripWhiteSpace().startsWith("#")) { // comment -> uncomment it
+      str.remove(0,1);
+      str = str.stripWhiteSpace();
+    } else { // no comment -> comment it
+      str.prepend("# ");
+    }
+    // select current line
+    currentEditor()->setSelection(para, 0, para, currentEditor()->text(para).length());
+    // insert altered text
+    currentEditor()->insert(str);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
