@@ -241,12 +241,12 @@ bool PRunNonMusr::PrepareViewData()
 {
   bool success = true;
 
-cout << endl << ">> fRunInfo->fRunName = " << fRunInfo->fRunName[0].Data();
+// cout << endl << ">> fRunInfo->fRunName = " << fRunInfo->fRunName[0].Data();
 
   // get x-, y-index
   unsigned int xIndex = GetXIndex();
   unsigned int yIndex = GetYIndex();
-cout << endl << "PRunNonMusr::PrepareViewData: xIndex=" << xIndex << ", yIndex=" << yIndex << endl;
+// cout << endl << "PRunNonMusr::PrepareViewData: xIndex=" << xIndex << ", yIndex=" << yIndex << endl;
 
   // fill data histo
   // pack the raw data
@@ -342,7 +342,7 @@ cout << endl << "PRunNonMusr::PrepareViewData: xIndex=" << xIndex << ", yIndex="
   // typically take 1000 points to calculate the theory, except if there are more data points, than take that number
   double xStep;
   if (fData.fX.size() > 1000.0)
-    xStep = fData.fX.size();
+    xStep = (xMax-xMin)/fData.fX.size();
   else
     xStep = (xMax-xMin)/1000.0;
 
