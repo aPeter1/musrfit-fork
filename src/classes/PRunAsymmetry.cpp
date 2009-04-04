@@ -761,8 +761,8 @@ bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2
   // transform raw histo data. This is done the following way (for details see the manual):
   // first rebin the data, than calculate the asymmetry
   // first get start data, end data, and t0
-  unsigned int start[2] = {(int)fT0s[0]-fRunInfo->fPacking*((int)fT0s[0]/fRunInfo->fPacking),
-                           (int)fT0s[1]-fRunInfo->fPacking*((int)fT0s[1]/fRunInfo->fPacking)};
+  unsigned int start[2] = {fRunInfo->fDataRange[0]-fRunInfo->fPacking*(fRunInfo->fDataRange[0]/fRunInfo->fPacking),
+                           fRunInfo->fDataRange[2]-fRunInfo->fPacking*(fRunInfo->fDataRange[2]/fRunInfo->fPacking)};
   unsigned int end[2];
   double t0[2]          = {fT0s[0], fT0s[1]};
 
