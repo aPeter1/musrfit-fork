@@ -11,11 +11,11 @@ if [ "$#" -lt 2 ] ; then
 
         "musrfit-mlog to db converter"
 
-USAGE:   mlog2db FIRSTRUN# LASTRUN# EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oDB_OUTPUT_FILE | -k]
+USAGE:   mlog2db FIRSTRUN# LASTRUN# EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oDB_OUTPUT_FILE | -k | -s]
          OR
-         mlog2db \[SPACE SEPARATED LIST OF RUNS\] EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oDB_OUTPUT_FILE | -k]
+         mlog2db \[SPACE SEPARATED LIST OF RUNS\] EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oDB_OUTPUT_FILE | -k | -s]
          OR
-         mlog2db RUNLISTFILE EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oDB_OUTPUT_FILE | -k]
+         mlog2db RUNLISTFILE EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oDB_OUTPUT_FILE | -k | -s]
 
 This small script converts subsequent musrfit output files (mlog) into one db file using bash/awk.
 
@@ -60,7 +60,9 @@ template for the first musrfit input file. The results of the fits will be writt
 
 For keeping the MINUIT2 output files after calling musrfit, i.e. invoke musrfit with the option "--keep-mn2-output" just pass the option "-k" to mlog2db. If you pass this option to mlog2db but do not fit any data, the option will just be ignored.
 
-If your .mlog files do not have an extension as specified above like "200.mlog" you have to call the script as in the following example.
+If the script should be used as "msr2db", i.e. using the files with the extension .msr as output from musrfit after calling it with the option "--swap-msr-mlog", pass the option "-s" to mlog2db.
+
+If your musrfit output files do not have an extension as specified above like "200.mlog" you have to call the script as in the following example.
 
 Example 5:
 mlog2db 200 220 "" -oABC.db fit-199
@@ -209,6 +211,20 @@ else
     fi
   done
 
+  # Check if the swap-option of musrfit should be used -> then the msr-files will be used as output of musrfit instead of the mlog-files
+  MUSRFITPARAM=""
+  INPUTEXT=msr
+  OUTPUTEXT=mlog
+  for PAR in "$@"
+  do
+    if [ "$PAR" == "-s" ]; then
+      MUSRFITPARAM="-s"
+      INPUTEXT=mlog
+      OUTPUTEXT=msr
+      break
+    fi
+  done
+
   if [ "$TEMP" != "" ]; then # runs should be fitted using musrfit
 
   # Check for musrfit on the PATH and if found continue with searching the fit-template
@@ -220,10 +236,10 @@ else
       echo
       exit 1
     else
-      if [ -r $TEMP$EXTENSION.mlog ]; then
-        TEMPLATE=$TEMP$EXTENSION.mlog
-      elif [ -r $TEMP$EXTENSION.msr ]; then
-        TEMPLATE=$TEMP$EXTENSION.msr
+      if [ -r $TEMP$EXTENSION.$OUTPUTEXT ]; then
+        TEMPLATE=$TEMP$EXTENSION.$OUTPUTEXT
+      elif [ -r $TEMP$EXTENSION.$INPUTEXT ]; then
+        TEMPLATE=$TEMP$EXTENSION.$INPUTEXT
       fi
     fi
   fi
@@ -238,7 +254,7 @@ else
     if [ "$TEMP" != "" ]; then # if fitting should be done
       if [ "$TEMPLATE" == "" ]; then
         echo
-        echo ">> mlog2db: The specified musrfit template files "$TEMP$3".mlog and $TEMP$3.msr do not exist!"
+        echo ">> mlog2db: The specified musrfit template files $TEMP$3.mlog and $TEMP$3.msr do not exist!"
         echo
         exit 1
       fi
@@ -262,11 +278,10 @@ else
         }' $TEMPLATE
       fi
 
-      MUSRFITPARAM=""
       for PAR in "$@"
       do
         if [ "$PAR" == "-k" ]; then
-          MUSRFITPARAM="-k"
+          MUSRFITPARAM="-k $MUSRFITPARAM"
           break
         fi
       done
@@ -291,13 +306,13 @@ else
             print $0 >> nextinput
           }
           else print $0 >> nextinput
-        }' $COUNT$EXTENSION.mlog
+        }' $COUNT$EXTENSION.$OUTPUTEXT
       fi
     fi
 
-    if [ ! -r $COUNT$EXTENSION.mlog ]; then
+    if [ ! -r $COUNT$EXTENSION.$OUTPUTEXT ]; then
       echo
-      echo ">> mlog2db: The specified musrfit output file $COUNT$EXTENSION.mlog does not exist!"
+      echo ">> mlog2db: The specified musrfit output file $COUNT$EXTENSION.$OUTPUTEXT does not exist!"
       echo
       exit 1
     fi
@@ -315,7 +330,7 @@ else
     if [ "$NOSUMMARY" -eq 0 ]; then
 
       if [ -d $SUMMDIR ]; then
-        # extract runnumber from mlog-file
+        # extract runnumber from mlog/msr-file
         RUNNUMBER=$( awk '{
           if(NR==1) X=0
           if($1 ~ /^RUN/ && X==0) {
@@ -324,9 +339,9 @@ else
             if(runNumber[1] ~ /lem/ && runNumber[2] == "his") {print substr(runNumber[3],1,4) }
             X=1 
           }
-        }' $COUNT$EXTENSION.mlog )
+        }' $COUNT$EXTENSION.$OUTPUTEXT )
 
-        # extract runyear from mlog-file in case of LEM-data
+        # extract runyear from mlog/msr-file in case of LEM-data
         RUNYEAR=$( awk '{
           if(NR==1) X=0
           if($1 ~ /^RUN/ && X==0) {
@@ -335,7 +350,7 @@ else
             else print "XX"
             X=1
           }
-        }' $COUNT$EXTENSION.mlog )
+        }' $COUNT$EXTENSION.$OUTPUTEXT )
 
         if [ "$RUNYEAR" != "XX" ]; then # in case of LEM-data search the summary-file
           SUMMFILE=$SUMMDIR/20$RUNYEAR/lem$RUNYEAR\_$RUNNUMBER.summ
@@ -359,7 +374,7 @@ else
       if [ "${CUR_PAR:0:2}" == "-o" ]; then
         if [ "$CUR_PAR" == "-o" ]; then
           if [ "$l" -ne "$LAST_OPT_PAR" ] && [ "$NEXT_PAR" != "noheader" ] && [ "$NEXT_PAR" != "nosummary" ] \
-          && [ "${NEXT_PAR:0:3}" != "fit" ] && [ "$NEXT_PAR" != "-k" ]; then
+          && [ "${NEXT_PAR:0:3}" != "fit" ] && [ "$NEXT_PAR" != "-k" ] && [ "$NEXT_PAR" != "-s" ]; then
             OUTFILE=$NEXT_PAR
             break
           else
@@ -577,6 +592,6 @@ else
           if("'"$q"'" == "'"$LASTRUN"'") print "\n" >> outfile
         }
       }
-    }' $COUNT$EXTENSION.mlog
+    }' $COUNT$EXTENSION.$OUTPUTEXT
   done
 fi
