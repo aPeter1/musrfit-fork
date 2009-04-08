@@ -67,10 +67,12 @@ class PFitter
     virtual ~PFitter();
 
     bool IsValid() { return fIsValid; }
+    bool HasConverged() { return fConverged; }
     bool DoFit();
 
   private:
     bool fIsValid;
+    bool fConverged;
     bool fChisqOnly;
     bool fUseChi2;
 

@@ -66,20 +66,7 @@ using namespace std;
 PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, bool chisq_only) :
   fChisqOnly(chisq_only), fRunInfo(runInfo)
 {
-/*
-PRunData *data=runListCollection->GetSingleHisto(0);
-fstream fout( "__test.dat", ios_base::out | ios_base::binary);
-fout.write(reinterpret_cast<char *>(&data->fDataTimeStart),sizeof(double));
-fout.write(reinterpret_cast<char *>(&data->fDataTimeStep),sizeof(double));
-unsigned int ss=data->fValue.size();
-fout.write(reinterpret_cast<char *>(&ss),sizeof(ss));
-for (unsigned int i=0; i<ss; i++)
-  fout.write(reinterpret_cast<char *>(&data->fValue[i]),sizeof(double));
-for (unsigned int i=0; i<ss; i++)
-  fout.write(reinterpret_cast<char *>(&data->fError[i]),sizeof(double));
-fout.close();
-*/
-
+  fConverged = false;
   fUseChi2 = true; // chi^2 is the default
 
   fStrategy = 1; // 0=low, 1=default, 2=high
@@ -460,12 +447,6 @@ bool PFitter::ExecuteMigrad()
   ROOT::Minuit2::FunctionMinimum min = migrad(maxfcn, tolerance);
   if (!min.IsValid()) {
     cout << endl << "**WARNING**: PFitter::ExecuteMigrad(): Fit did not converge, sorry ...";
-/*
-    // set flag positive error present to false
-    for (unsigned int i=0; i<fParams.size(); i++) {
-      fRunInfo->SetMsrParamPosErrorPresent(i, false);
-    }
-*/
     fIsValid = false;
     return false;
   }
@@ -500,6 +481,8 @@ bool PFitter::ExecuteMigrad()
   // feed run info with new statistics info
   fRunInfo->SetMsrStatisticMin(minVal);
   fRunInfo->SetMsrStatisticNdf(ndf);
+
+  fConverged = true;
 
   return true;
 }
@@ -532,12 +515,6 @@ bool PFitter::ExecuteMinimize()
   ROOT::Minuit2::FunctionMinimum min = minimize(maxfcn, tolerance); 
   if (!min.IsValid()) {
     cout << endl << "**WARNING**: PFitter::ExecuteMinimize(): Fit did not converge, sorry ...";
-/*
-    // set flag positive error present to false
-    for (unsigned int i=0; i<fParams.size(); i++) {
-      fRunInfo->SetMsrParamPosErrorPresent(i, false);
-    }
-*/
     fIsValid = false;
     return false;
   }
@@ -573,6 +550,8 @@ bool PFitter::ExecuteMinimize()
   fRunInfo->SetMsrStatisticMin(minVal);
   fRunInfo->SetMsrStatisticNdf(ndf);
 
+  fConverged = true;
+
   return true;
 }
 
@@ -596,7 +575,7 @@ bool PFitter::ExecuteMinos()
 
   // check if minimum was valid
   if (!fFcnMin->IsValid()) {
-    cout << endl << "**ERROR**: MINOS cannot started since the previews minimization failed :-(";
+    cout << endl << "**ERROR**: MINOS cannot started since the previous minimization failed :-(";
     cout << endl;
     return false;
   }
@@ -926,6 +905,8 @@ bool PFitter::ExecuteSimplex()
   // feed run info with new statistics info
   fRunInfo->SetMsrStatisticMin(minVal);
   fRunInfo->SetMsrStatisticNdf(ndf);
+
+  fConverged = true;
 
   return true;
 }

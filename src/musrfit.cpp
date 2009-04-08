@@ -635,9 +635,10 @@ int main(int argc, char *argv[])
   PFitter *fitter = 0;
   if (success) {
     fitter = new PFitter(msrHandler, runListCollection, chisq_only);
-    success = fitter->IsValid();
-    if (success)
+    if (fitter->IsValid()) {
       fitter->DoFit();
+      msrHandler->SetMsrStatisticConverged(fitter->HasConverged());
+    }
   }
 
   // write log file

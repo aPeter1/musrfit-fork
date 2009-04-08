@@ -75,6 +75,7 @@ class PMsrHandler
     virtual void SetMsrDataRangeEntry(unsigned int runNo, unsigned int idx, int bin);
     virtual void SetMsrBkgRangeEntry(unsigned int runNo, unsigned int idx, int bin);
 
+    virtual void SetMsrStatisticConverged(bool converged) { fStatistic.fValid = converged; }
     virtual void SetMsrStatisticMin(double min) { fStatistic.fMin = min; }
     virtual void SetMsrStatisticNdf(unsigned int ndf) { fStatistic.fNdf = ndf; }
 

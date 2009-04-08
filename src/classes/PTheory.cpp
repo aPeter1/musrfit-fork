@@ -1949,7 +1949,7 @@ void PTheory::CalculateDynKTLF(const double *val, int tag) const
   double sum;
   double a;
   double preFactor = dt*val[2];
-  for (unsigned i=1; i<N; i++) {
+  for (unsigned int i=1; i<N; i++) {
     sum = p0exp[i];
     sum += 0.5*preFactor*p0exp[i]*fDynLFFuncValue[0];
     for (unsigned int j=1; j<i; j++) {

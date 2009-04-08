@@ -449,128 +449,6 @@ bool PRunSingleHisto::PrepareData()
  */
 bool PRunSingleHisto::PrepareFitData(PRawRunData* runData, const unsigned int histoNo)
 {
-/*
-  // get the proper run
-  PRawRunData* runData = fRawData->GetRunData(fRunInfo->fRunName[0]);
-  if (runData == 0) { // couldn't get run
-    cout << endl << "PRunSingleHisto::PrepareFitData(): **ERROR** Couldn't get run " << fRunInfo->fRunName[0].Data() << "!";
-    return false;
-  }
-
-  // get the proper histo number and check if post pile up data shall be used (LEM)
-  unsigned int histoNo;
-  if (fRunInfo->fFileFormat[0].Contains("ppc")) {
-    histoNo = runData->fDataBin.size()/2 + fRunInfo->fForwardHistoNo-1;
-  } else {
-    histoNo = fRunInfo->fForwardHistoNo-1;
-  }
-
-  if ((runData->fDataBin.size() < histoNo) || (histoNo < 0)) {
-    cout << endl << "PRunSingleHisto::PrepareFitData(): **PANIC ERROR**:";
-    cout << endl << "   histoNo found = " << histoNo << ", but there are only " << runData->fDataBin.size() << " runs!?!?";
-    cout << endl << "   Will quit :-(";
-    cout << endl;
-    return false;
-  }
-
-  // check if the t0's are given in the msr-file
-  if (fRunInfo->fT0[0] == -1) { // t0's are NOT in the msr-file
-    // check if the t0's are in the data file
-    if (runData->fT0s.size() != 0) { // t0's in the run data
-      // keep the proper t0's. For single histo runs, forward is holding the histo no
-      // fForwardHistoNo starts with 1 not with 0 ;-)
-      fT0s.push_back(runData->fT0s[fRunInfo->fForwardHistoNo-1]);
-    } else { // t0's are neither in the run data nor in the msr-file -> not acceptable!
-      cout << endl << "PRunSingleHisto::PrepareFitData(): **ERROR** NO t0's found, neither in the run data nor in the msr-file!";
-      cout << endl << " run: " << fRunInfo->fRunName[0].Data();
-      return false;
-    }
-  } else { // t0's in the msr-file
-    // check if t0's are given in the data file
-    if (runData->fT0s.size() != 0) {
-      // compare t0's of the msr-file with the one in the data file
-      if (fabs(fRunInfo->fT0[0]-runData->fT0s[fRunInfo->fForwardHistoNo-1])>5.0) { // given in bins!!
-        cout << endl << "PRunSingleHisto::PrepareFitData(): **WARNING**:";
-        cout << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[0];
-        cout << endl << "  t0 from the data file is " << runData->fT0s[fRunInfo->fForwardHistoNo-1];
-        cout << endl << "  This is quite a deviation! Is this done intentionally??";
-        cout << endl;
-      }
-    }
-    fT0s.push_back(fRunInfo->fT0[0]);
-  }
-
-  // check if t0 is within proper bounds
-  int t0 = fT0s[0];
-  if ((t0 < 0) || (t0 > (int)runData->fDataBin[histoNo].size())) {
-    cout << endl << "PRunSingleHisto::PrepareFitData(): **ERROR** t0 data bin doesn't make any sense!";
-    return false;
-  }
-
-  // check if there are runs to be added to the current one
-  if (fRunInfo->fRunName.size() > 1) { // runs to be added present
-    PRawRunData *addRunData;
-    for (unsigned int i=1; i<fRunInfo->fRunName.size(); i++) {
-
-      // get run to be added to the main one
-      addRunData = fRawData->GetRunData(fRunInfo->fRunName[i]);
-      if (addRunData == 0) { // couldn't get run
-        cout << endl << "PRunSingleHisto::PrepareFitData(): **ERROR** Couldn't get addrun " << fRunInfo->fRunName[i].Data() << "!";
-        return false;
-      }
-
-      // get T0's of the to be added run
-      int t0Add;
-      // check if the t0's are given in the msr-file
-      if (fRunInfo->fT0[i] == -1) { // t0's are NOT in the msr-file
-        // check if the t0's are in the data file
-        if (addRunData->fT0s.size() != 0) { // t0's in the run data
-          // keep the proper t0's. For single histo runs, forward is holding the histo no
-          // fForwardHistoNo starts with 1 not with 0 ;-)
-          t0Add = addRunData->fT0s[fRunInfo->fForwardHistoNo-1];
-        } else { // t0's are neither in the run data nor in the msr-file -> not acceptable!
-          cout << endl << "PRunSingleHisto::PrepareFitData(): **ERROR** NO t0's found, neither in the addrun data nor in the msr-file!";
-          cout << endl << " addrun: " << fRunInfo->fRunName[i].Data();
-          return false;
-        }
-      } else { // t0's in the msr-file
-        // check if t0's are given in the data file
-        if (addRunData->fT0s.size() != 0) {
-          // compare t0's of the msr-file with the one in the data file
-          if (fabs(fRunInfo->fT0[i]-addRunData->fT0s[fRunInfo->fForwardHistoNo-1])>5.0) { // given in bins!!
-            cout << endl << "PRunSingleHisto::PrepareFitData(): **WARNING**:";
-            cout << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[i];
-            cout << endl << "  t0 from the data file is " << addRunData->fT0s[fRunInfo->fForwardHistoNo-1];
-            cout << endl << "  This is quite a deviation! Is this done intentionally??";
-            cout << endl;
-          }
-        }
-        if (i < fRunInfo->fT0.size()) {
-          t0Add = fRunInfo->fT0[i];
-        } else {
-          cout << endl << "PRunSingleHisto::PrepareFitData(): **WARNING** NO t0's found, neither in the addrun data (";
-          cout << fRunInfo->fRunName[i].Data();
-          cout << "), nor in the msr-file! Will try to use the T0 of the run data (";
-          cout << fRunInfo->fRunName[i].Data();
-          cout << ") without any warranty!";
-          t0Add = fRunInfo->fT0[0];
-        }
-      }
-
-      // add run
-      for (unsigned int j=0; j<runData->fDataBin[histoNo].size(); j++) {
-        // make sure that the index stays in the proper range
-        if ((j-t0Add+t0 >= 0) && (j-t0Add+t0 < addRunData->fDataBin[histoNo].size())) {
-          runData->fDataBin[histoNo][j] += addRunData->fDataBin[histoNo][j-t0Add+t0];
-        }
-      }
-    }
-  }
-
-  // keep the time resolution in (us)
-  fTimeResolution = runData->fTimeResolution/1.0e3;
-*/
-
   // keep start/stop time for fit
   fFitStartTime = fRunInfo->fFitRange[0];
   fFitStopTime  = fRunInfo->fFitRange[1];
@@ -580,8 +458,8 @@ bool PRunSingleHisto::PrepareFitData(PRawRunData* runData, const unsigned int hi
   // for the single histo fit, just the rebinned raw data are copied
 
   // first get start data, end data, and t0
-  unsigned int start;
-  unsigned int end;
+  int start;
+  int end;
   start = fRunInfo->fDataRange[0];
   end   = fRunInfo->fDataRange[1];
   // check if start, end, and t0 make any sense
@@ -592,12 +470,12 @@ bool PRunSingleHisto::PrepareFitData(PRawRunData* runData, const unsigned int hi
     start = keep;
   }
   // 2nd check if start is within proper bounds
-  if ((start < 0) || (start > runData->fDataBin[histoNo].size())) {
+  if ((start < 0) || (start > (int)runData->fDataBin[histoNo].size())) {
     cout << endl << "PRunSingleHisto::PrepareFitData(): **ERROR** start data bin doesn't make any sense!";
     return false;
   }
   // 3rd check if end is within proper bounds
-  if ((end < 0) || (end > runData->fDataBin[histoNo].size())) {
+  if ((end < 0) || (end > (int)runData->fDataBin[histoNo].size())) {
     cout << endl << "PRunSingleHisto::PrepareFitData(): **ERROR** end data bin doesn't make any sense!";
     return false;
   }
@@ -623,9 +501,9 @@ bool PRunSingleHisto::PrepareFitData(PRawRunData* runData, const unsigned int hi
   double normalizer = 1.0;
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.fDataTimeStart = fTimeResolution*((double)(start-t0)+(double)(fRunInfo->fPacking-1)/2.0);
+  fData.fDataTimeStart = fTimeResolution*(((double)start-(double)t0)+(double)(fRunInfo->fPacking-1)/2.0);
   fData.fDataTimeStep  = fTimeResolution*fRunInfo->fPacking;
-  for (unsigned i=start; i<end; i++) {
+  for (int i=start; i<end; i++) {
     if (fRunInfo->fPacking == 1) {
       value = runData->fDataBin[histoNo][i];
       fData.fValue.push_back(value);
@@ -673,16 +551,11 @@ bool PRunSingleHisto::PrepareFitData(PRawRunData* runData, const unsigned int hi
  */
 bool PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const unsigned int histoNo)
 {
-  // transform raw histo data. This is done the following way (for details see the manual):
-  // for the single histo fit, just the rebinned raw data are copied
-  // first get start data, end data, and t0
-  unsigned int start;
-  unsigned int end;
   // raw data, since PMusrCanvas is doing ranging etc.
   // start = the first bin which is a multiple of packing backward from first good data bin
-  start = fRunInfo->fDataRange[0] - (fRunInfo->fDataRange[0]/fRunInfo->fPacking)*fRunInfo->fPacking;
+  int start = fRunInfo->fDataRange[0] - (fRunInfo->fDataRange[0]/fRunInfo->fPacking)*fRunInfo->fPacking;
   // end = last bin starting from start which is a multipl of packing and still within the data 
-  end   = start + ((runData->fDataBin[histoNo].size()-start-1)/fRunInfo->fPacking)*fRunInfo->fPacking;
+  int end   = start + ((runData->fDataBin[histoNo].size()-start-1)/fRunInfo->fPacking)*fRunInfo->fPacking;
   // check if start, end, and t0 make any sense
   // 1st check if start and end are in proper order
   if (end < start) { // need to swap them
@@ -691,12 +564,12 @@ bool PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const unsigned in
     start = keep;
   }
   // 2nd check if start is within proper bounds
-  if ((start < 0) || (start > runData->fDataBin[histoNo].size())) {
+  if ((start < 0) || (start > (int)runData->fDataBin[histoNo].size())) {
     cout << endl << "PRunSingleHisto::PrepareRawViewData(): **ERROR** start data bin doesn't make any sense!";
     return false;
   }
   // 3rd check if end is within proper bounds
-  if ((end < 0) || (end > runData->fDataBin[histoNo].size())) {
+  if ((end < 0) || (end > (int)runData->fDataBin[histoNo].size())) {
     cout << endl << "PRunSingleHisto::PrepareRawViewData(): **ERROR** end data bin doesn't make any sense!";
     return false;
   }
@@ -715,7 +588,7 @@ cout << endl << ">> data start time = " << fData.fDataTimeStart;
 */
 
   double normalizer = 1.0;
-  for (unsigned i=start; i<end; i++) {
+  for (int i=start; i<end; i++) {
     if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
       // in order that after rebinning the fit does not need to be redone (important for plots)
       // the value is normalize to per 1 nsec
@@ -826,14 +699,12 @@ bool PRunSingleHisto::PrepareViewData(PRawRunData* runData, const unsigned int h
   // transform raw histo data. This is done the following way (for details see the manual):
   // for the single histo fit, just the rebinned raw data are copied
   // first get start data, end data, and t0
-  unsigned int start;
-  unsigned int end;
   int t0 = fT0s[0];
 
   // start = the first bin which is a multiple of packing backward from first good data bin
-  start = fRunInfo->fDataRange[0] - (fRunInfo->fDataRange[0]/fRunInfo->fPacking)*fRunInfo->fPacking;
+  int start = fRunInfo->fDataRange[0] - (fRunInfo->fDataRange[0]/fRunInfo->fPacking)*fRunInfo->fPacking;
   // end = last bin starting from start which is a multipl of packing and still within the data
-  end   = start + ((runData->fDataBin[histoNo].size()-start-1)/fRunInfo->fPacking)*fRunInfo->fPacking;
+  int end   = start + ((runData->fDataBin[histoNo].size()-start-1)/fRunInfo->fPacking)*fRunInfo->fPacking;
 
   // check if start, end, and t0 make any sense
   // 1st check if start and end are in proper order
@@ -843,12 +714,12 @@ bool PRunSingleHisto::PrepareViewData(PRawRunData* runData, const unsigned int h
     start = keep;
   }
   // 2nd check if start is within proper bounds
-  if ((start < 0) || (start > runData->fDataBin[histoNo].size())) {
+  if ((start < 0) || (start > (int)runData->fDataBin[histoNo].size())) {
     cout << endl << "PRunSingleHisto::PrepareViewData(): **ERROR** start data bin doesn't make any sense!";
     return false;
   }
   // 3rd check if end is within proper bounds
-  if ((end < 0) || (end > runData->fDataBin[histoNo].size())) {
+  if ((end < 0) || (end > (int)runData->fDataBin[histoNo].size())) {
     cout << endl << "PRunSingleHisto::PrepareViewData(): **ERROR** end data bin doesn't make any sense!";
     return false;
   }
@@ -911,7 +782,7 @@ cout << endl << ">> start = " << start << ", end = " << end;
 cout << endl << "--------------------------------";
 */
   double normalizer = 1.0;
-  for (unsigned int i=start; i<end; i++) {
+  for (int i=start; i<end; i++) {
     if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
       // in order that after rebinning the fit does not need to be redone (important for plots)
       // the value is normalize to per 1 nsec

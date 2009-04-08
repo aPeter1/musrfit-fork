@@ -609,9 +609,9 @@ bool PRunAsymmetry::PrepareFitData(PRawRunData* runData, unsigned int histoNo[2]
   // transform raw histo data. This is done the following way (for details see the manual):
   // first rebin the data, than calculate the asymmetry
   // first get start data, end data, and t0
-  unsigned int start[2] = {fRunInfo->fDataRange[0], fRunInfo->fDataRange[2]};
-  unsigned int end[2]   = {fRunInfo->fDataRange[1], fRunInfo->fDataRange[3]};
-  double t0[2]          = {fT0s[0], fT0s[1]};
+  int start[2] = {fRunInfo->fDataRange[0], fRunInfo->fDataRange[2]};
+  int end[2]   = {fRunInfo->fDataRange[1], fRunInfo->fDataRange[3]};
+  double t0[2] = {fT0s[0], fT0s[1]};
   // check if start, end, and t0 make any sense
   // 1st check if start and end are in proper order
   for (unsigned int i=0; i<2; i++) {
@@ -621,17 +621,17 @@ bool PRunAsymmetry::PrepareFitData(PRawRunData* runData, unsigned int histoNo[2]
       start[i] = keep;
     }
     // 2nd check if start is within proper bounds
-    if ((start[i] < 0) || (start[i] > runData->fDataBin[histoNo[i]].size())) {
+    if ((start[i] < 0) || (start[i] > (int)runData->fDataBin[histoNo[i]].size())) {
       cout << endl << "PRunAsymmetry::PrepareFitData(): **ERROR** start data bin doesn't make any sense!";
       return false;
     }
     // 3rd check if end is within proper bounds
-    if ((end[i] < 0) || (end[i] > runData->fDataBin[histoNo[i]].size())) {
+    if ((end[i] < 0) || (end[i] > (int)runData->fDataBin[histoNo[i]].size())) {
       cout << endl << "PRunAsymmetry::PrepareFitData(): **ERROR** end data bin doesn't make any sense!";
       return false;
     }
     // 4th check if t0 is within proper bounds
-    if ((t0[i] < 0) || (t0[i] > runData->fDataBin[histoNo[i]].size())) {
+    if ((t0[i] < 0) || (t0[i] > (int)runData->fDataBin[histoNo[i]].size())) {
       cout << endl << "PRunAsymmetry::PrepareFitData(): **ERROR** t0 data bin doesn't make any sense!";
       return false;
     }
@@ -643,7 +643,7 @@ bool PRunAsymmetry::PrepareFitData(PRawRunData* runData, unsigned int histoNo[2]
   double value = 0.0;
   double error = 0.0;
   // forward
-  for (unsigned i=start[0]; i<end[0]; i++) {
+  for (int i=start[0]; i<end[0]; i++) {
     if (fRunInfo->fPacking == 1) {
       forwardPacked.fValue.push_back(fForward[i]);
       forwardPacked.fError.push_back(fForwardErr[i]);
@@ -665,7 +665,7 @@ bool PRunAsymmetry::PrepareFitData(PRawRunData* runData, unsigned int histoNo[2]
     }
   }
   // backward
-  for (unsigned i=start[1]; i<end[1]; i++) {
+  for (int i=start[1]; i<end[1]; i++) {
     if (fRunInfo->fPacking == 1) {
       backwardPacked.fValue.push_back(fBackward[i]);
       backwardPacked.fError.push_back(fBackwardErr[i]);
@@ -761,10 +761,10 @@ bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2
   // transform raw histo data. This is done the following way (for details see the manual):
   // first rebin the data, than calculate the asymmetry
   // first get start data, end data, and t0
-  unsigned int start[2] = {fRunInfo->fDataRange[0]-fRunInfo->fPacking*(fRunInfo->fDataRange[0]/fRunInfo->fPacking),
-                           fRunInfo->fDataRange[2]-fRunInfo->fPacking*(fRunInfo->fDataRange[2]/fRunInfo->fPacking)};
-  unsigned int end[2];
-  double t0[2]          = {fT0s[0], fT0s[1]};
+  int start[2] = {fRunInfo->fDataRange[0]-fRunInfo->fPacking*(fRunInfo->fDataRange[0]/fRunInfo->fPacking),
+                  fRunInfo->fDataRange[2]-fRunInfo->fPacking*(fRunInfo->fDataRange[2]/fRunInfo->fPacking)};
+  int end[2];
+  double t0[2] = {fT0s[0], fT0s[1]};
 
   // make sure that there are equal number of rebinned bins in forward and backward
   unsigned int noOfBins0 = (runData->fDataBin[histoNo[0]].size()-start[0])/fRunInfo->fPacking;
@@ -783,17 +783,17 @@ bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2
       start[i] = keep;
     }
     // 2nd check if start is within proper bounds
-    if ((start[i] < 0) || (start[i] > runData->fDataBin[histoNo[i]].size())) {
+    if ((start[i] < 0) || (start[i] > (int)runData->fDataBin[histoNo[i]].size())) {
       cout << endl << "PRunAsymmetry::PrepareViewData(): **ERROR** start data bin doesn't make any sense!";
       return false;
     }
     // 3rd check if end is within proper bounds
-    if ((end[i] < 0) || (end[i] > runData->fDataBin[histoNo[i]].size())) {
+    if ((end[i] < 0) || (end[i] > (int)runData->fDataBin[histoNo[i]].size())) {
       cout << endl << "PRunAsymmetry::PrepareViewData(): **ERROR** end data bin doesn't make any sense!";
       return false;
     }
     // 4th check if t0 is within proper bounds
-    if ((t0[i] < 0) || (t0[i] > runData->fDataBin[histoNo[i]].size())) {
+    if ((t0[i] < 0) || (t0[i] > (int)runData->fDataBin[histoNo[i]].size())) {
       cout << endl << "PRunAsymmetry::PrepareViewData(): **ERROR** t0 data bin doesn't make any sense!";
       return false;
     }
@@ -805,7 +805,7 @@ bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2
   double value = 0.0;
   double error = 0.0;
   // forward
-  for (unsigned i=start[0]; i<end[0]; i++) {
+  for (int i=start[0]; i<end[0]; i++) {
     if (((i-start[0]) % fRunInfo->fPacking == 0) && (i != start[0])) { // fill data
       // in order that after rebinning the fit does not need to be redone (important for plots)
       // the value is normalize to per bin
@@ -822,7 +822,7 @@ bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2
     error += fForwardErr[i]*fForwardErr[i];
   }
   // backward
-  for (unsigned i=start[1]; i<end[1]; i++) {
+  for (int i=start[1]; i<end[1]; i++) {
     if (((i-start[1]) % fRunInfo->fPacking == 0) && (i != start[1])) { // fill data
       // in order that after rebinning the fit does not need to be redone (important for plots)
       // the value is normalize to per bin

@@ -1171,7 +1171,8 @@ void PTextEdit::musrSwapMsrMlog()
     swapFileName.replace(idx, 5, ".mlog");
   } else if ((idx = currentFileName.find(".mlog")) > 0) { // mlog-file
     swapFileName = currentFileName;
-    swapFileName.replace(idx, 5, ".msr ").stripWhiteSpace();
+    swapFileName.replace(idx, 5, ".msr ");
+    swapFileName = swapFileName.stripWhiteSpace();
   } else { // neither a msr- nor a mlog-file
     QMessageBox::information( this, "musrSwapMsrMlog",
     "This is neither a msr- nor a mlog-file, hence nothing to be swapped.\n",
