@@ -811,10 +811,12 @@ bool PRunDataHandler::ReadPsiBinFile()
   if (!success)
     return success;
 
+/*
 cout << endl << "> " << psiBin.get_numberHisto_int() << ": ";
 for (int i=0; i<psiBin.get_numberHisto_int(); i++)
   cout << endl << "> " << psiBin.get_nameHisto(i);
 cout << endl;
+*/
 
   // fill necessary header informations
   PIntVector ivec;
@@ -866,6 +868,8 @@ cout << endl;
   for (unsigned int i=0; i<runData.fDataBin.size(); i++)
     runData.fDataBin[i].clear();
   runData.fDataBin.clear();
+
+// cout << endl << "end of ReadPsiBinFile() ..." << endl;
 
   return success;
 }

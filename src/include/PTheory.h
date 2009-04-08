@@ -165,7 +165,7 @@ static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
          "abragam", "ab", "(rate hopprate)", "(rate hopprate tshift)"},
 
         {THEORY_INTERNAL_FIELD, THEORY_PARAM_INTERNAL_FIELD, false,
-         "internFld", "if", "(phase frequency Trate Lrate)", "(phase frequency Trate Lrate tshift)"},
+         "internFld", "if", "(fraction phase frequency Trate Lrate)", "(fraction phase frequency Trate Lrate tshift)"},
 
         {THEORY_TF_COS, THEORY_PARAM_TF_COS, false,
          "TFieldCos", "tf", "(phase frequency)", "(phase frequency tshift)"},

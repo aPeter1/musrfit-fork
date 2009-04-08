@@ -708,14 +708,12 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
     line = &(*fullTheoryBlock)[i];
     // copy line content to str in order to remove comments
     str = line->fLine.Copy();
-//cout << endl << ">> str = " << str.Data();
     // remove theory line comment if present, i.e. something starting with '('
     int index = str.Index("(");
     if (index > 0) // theory line comment present
       str.Resize(index);
     // tokenize line
     tokens = str.Tokenize(" \t");
-//cout << endl << ">> #tokens=" << tokens->GetEntries() << ", str=" << str.Data();
     // make a handable string out of the asymmetry token
     ostr = dynamic_cast<TObjString*>(tokens->At(0));
     str = ostr->GetString();
@@ -755,9 +753,12 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
       tidy += TString(substr);
     }
     if (fgTheoDataBase[idx].fComment.Length() != 0) {
-      unsigned int size = tidy.Length();
-      for (unsigned int k=0; k<35-size; k++)
+      if (tidy.Length() < 35) {
+        for (unsigned int k=0; k<35-(unsigned int)tidy.Length(); k++)
+          tidy += TString(" ");
+      } else {
         tidy += TString(" ");
+      }
       if ((unsigned int)tokens->GetEntries() == fgTheoDataBase[idx].fNoOfParam + 1) // no tshift
         tidy += fgTheoDataBase[idx].fComment;
       else
@@ -1519,7 +1520,7 @@ double PTheory::InternalField(register double t, const PDoubleVector& paramValue
   }
 
   double tt;
-  if (fParamNo.size() == 4) // no tshift
+  if (fParamNo.size() == 5) // no tshift
     tt = t;
   else // tshift present
     tt = t-val[5];
