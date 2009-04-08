@@ -11,13 +11,13 @@ if [ "$#" -lt 2 ] ; then
 
         "musrfit-mlog to db converter"
 
-USAGE:   mlog2db FIRSTRUN# LASTRUN# EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oDB_OUTPUT_FILE | -k | -s]
+USAGE:   mlog2db FIRSTRUN# LASTRUN# EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oOUTPUT_FILE | data | -k | -s]
          OR
-         mlog2db \[SPACE SEPARATED LIST OF RUNS\] EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oDB_OUTPUT_FILE | -k | -s]
+         mlog2db \[SPACE SEPARATED LIST OF RUNS\] EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oOUTPUT_FILE | data | -k | -s ]
          OR
-         mlog2db RUNLISTFILE EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oDB_OUTPUT_FILE | -k | -s]
+         mlog2db RUNLISTFILE EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oOUTPUT_FILE | data | -k | -s]
 
-This small script converts subsequent musrfit output files (mlog) into one db file using bash/awk.
+This small script converts subsequent musrfit output files (mlog or msr) into one db- or column-ASCII-file using bash/awk.
 
 Example 1:
 mlog2db 1423 1425 _tf_h13
@@ -66,6 +66,8 @@ If your musrfit output files do not have an extension as specified above like "2
 
 Example 5:
 mlog2db 200 220 "" -oABC.db fit-199
+
+As an alternative to the db-format as output-format of the script it is possible to choose an ASCII file with simple data columns by invoking the script with the option "data". All features described above are available also for that case!
 
 CAUTION:
 The "indexing number" of the .mlog has to be at the begin of the filename.
@@ -399,8 +401,18 @@ else
       fi
     done
 
+    # determine the output file-format, default: db
+    FORMAT=db
+    for PAR in "$@"
+    do
+      if [ "$PAR" == "data" ]; then
+        FORMAT=dat
+        break
+      fi
+    done
+
     # put together all data to db-format and write it to the file
-    awk -v outfile=$OUTFILE -v noheader=$NOHEADER -v runList=$RUNLIST_USED -v numIndVar=$NUM_OF_IND_VAR '{
+    awk -v outfile=$OUTFILE -v noheader=$NOHEADER -v runList=$RUNLIST_USED -v numIndVar=$NUM_OF_IND_VAR -v format=$FORMAT '{
 
       FS = " "
       OFS = " "
@@ -467,129 +479,245 @@ else
           split(line, indVar, " ")
         }
 
-        # Output to file in the case, the LEM summary file is accessible and the option "nosummary" is not set
+        # Output to db-file in the case, the LEM summary file is accessible and the option "nosummary" is not set
 
-        if("'"$TEMPERATURE"'" != "") {
+        if(format != "dat") {
+          if("'"$TEMPERATURE"'" != "") {
 
-          # Write the db-header
-          if("'"$q"'" == 0 && noheader != 1){
+            # Write the db-header
+            if("'"$q"'" == 0 && noheader != 1){
 
-            print "TITLE" >> outfile
-            print ">>>Put your title here<<<\n" >> outfile
-            print "Abstract" >> outfile
-            print ">>>Put your abstract here<<<\n" >> outfile
-            print "LABELS" >> outfile
-            print "T (K)" >> outfile
-            print "Tr (kV)" >> outfile
-            print "E (keV)" >> outfile
-            print "RAL-RAR (kV)" >> outfile
-            print "RAT-RAB (kV)" >> outfile
+              print "TITLE" >> outfile
+              print ">>>Put your title here<<<\n" >> outfile
+              print "Abstract" >> outfile
+              print ">>>Put your abstract here<<<\n" >> outfile
+              print "LABELS" >> outfile
+              print "T (K)" >> outfile
+              print "Tr (kV)" >> outfile
+              print "E (keV)" >> outfile
+              print "RAL-RAR (kV)" >> outfile
+              print "RAT-RAB (kV)" >> outfile
 
-            if(runList == 1){
-              for(k=2;k<=numIndVar;k++){print indVar[k] >> outfile}
+              if(runList == 1){
+                for(k=2;k<=numIndVar;k++){print indVar[k] >> outfile}
+              }
+
+              for(k=1;k<i+4;k++){
+                print parArray[k] >> outfile
+              }
+
+              $1 = "Data"
+              $2 = "T"
+              $3 = "Tr"
+              $4 = "E"
+              $5 = "RALRAR"
+              $6 = "RATRAB"
+
+              for(k=1;k<numIndVar;k++){
+                $(k+6)=indVar[k+1]
+              }
+
+              for(k=1;k<i+4;k++){
+                $(k+6+numIndVar-1)=parArray[k]
+              }
+
+              print "\n" $0 >> outfile
+              print "\\-e" >> outfile
             }
 
-            for(k=1;k<i+4;k++){
-              print parArray[k] >> outfile
-            }
+            # Write the data-block
+            print "T = " "'"$TEMPERATURE"'" ",,,\\" >> outfile
+            print "Tr = " "'"$TRANSPORT"'" ",,,\\" >> outfile
+            if ("'"$ENERGY"'" != "") print "E = " "'"$ENERGY"'" ",,,\\" >> outfile
+            else print "E = -999,,,\\" >> outfile
+            if ("'"$RALRAR"'" != "") print "RALRAR = " "'"$RALRAR"'" ",,,\\" >> outfile	
+            else print "RALRAR = -999,,,\\" >> outfile
+            if ("'"$RATRAB"'" != "") print "RATRAB = " "'"$RATRAB"'" ",,,\\" >> outfile
+            else print "RATRAB = -999,,,\\" >> outfile
 
-            $1 = "Data"
-            $2 = "T"
-            $3 = "Tr"
-            $4 = "E"
-            $5 = "RALRAR"
-            $6 = "RATRAB"
-
-            for(k=1;k<numIndVar;k++){
-              $(k+6)=indVar[k+1]
-            }
-
-            for(k=1;k<i+4;k++){
-              $(k+6+numIndVar-1)=parArray[k]
-            }
-
-            print "\n" $0 >> outfile
-            print "\\-e" >> outfile
-          }
-
-          # Write the data-block
-          print "T = " "'"$TEMPERATURE"'" ",,,\\" >> outfile
-          print "Tr = " "'"$TRANSPORT"'" ",,,\\" >> outfile
-          if ("'"$ENERGY"'" != "") print "E = " "'"$ENERGY"'" ",,,\\" >> outfile
-          else print "E = -999,,,\\" >> outfile
-          if ("'"$RALRAR"'" != "") print "RALRAR = " "'"$RALRAR"'" ",,,\\" >> outfile	
-          else print "RALRAR = -999,,,\\" >> outfile
-          if ("'"$RATRAB"'" != "") print "RATRAB = " "'"$RATRAB"'" ",,,\\" >> outfile
-          else print "RATRAB = -999,,,\\" >> outfile
-
-          if(runList == 1) { # process the "independent variables" from the file
-            while((getline line < "'"$1"'") > 0){
-              split(line, indVarValue, " ")
-              if (indVarValue[1] == "'"$COUNT"'"){
-                for(k=2;k<=numIndVar;k++){print indVar[k] " = " indVarValue[k] ",,,\\" >> outfile}
-                break
+            if(runList == 1) { # process the "independent variables" from the file
+              while((getline line < "'"$1"'") > 0){
+                split(line, indVarValue, " ")
+                if (indVarValue[1] == "'"$COUNT"'"){
+                  for(k=2;k<=numIndVar;k++){print indVar[k] " = " indVarValue[k] ",,,\\" >> outfile}
+                  break
+                }
               }
             }
+
+            for(l=1;l<i+3;l++){
+              print parArray[l] " = " dataArray[l] ", " posErrArray[l] ", " negErrArray[l] ",\\" >> outfile
+            }
+
+            print dataArray[i+3] ",,, " "'"$TITLE"'" >> outfile
+
+            if("'"$q"'" == "'"$LASTRUN"'") print "\n" >> outfile
           }
 
-          for(l=1;l<i+3;l++){
-            print parArray[l] " = " dataArray[l] ", " posErrArray[l] ", " negErrArray[l] ",\\" >> outfile
+          # If we do not have the information from the summary file or "nosummary" is set
+          else {
+            if("'"$q"'" == 0 && noheader != 1){
+
+              print "TITLE" >> outfile
+              print ">>>Put your title here<<<\n" >> outfile
+              print "Abstract" >> outfile
+              print ">>>Put your abstract here<<<\n" >> outfile
+              print "LABELS" >> outfile
+
+              if(runList == 1){
+                for(k=2;k<=numIndVar;k++){print indVar[k] >> outfile}
+              }
+
+              for(k=1;k<i+4;k++){
+                print parArray[k] >> outfile
+              }
+
+              $1 = "Data"
+
+              for(k=1;k<numIndVar;k++){
+                $(k+1)=indVar[k+1]
+              }
+
+              for(k=1;k<i+4;k++){
+                $(k+1+numIndVar-1)=parArray[k]
+              }
+
+              print "\n" $0 >> outfile
+              print "\\-e" >> outfile
+            }
+
+            if(runList == 1) {
+              while((getline line < "'"$1"'") > 0){
+                split(line, indVarValue, " ")
+                if (indVarValue[1] == "'"$COUNT"'"){
+                  for(k=2;k<=numIndVar;k++){print indVar[k] " = " indVarValue[k] ",,,\\" >> outfile}
+                  break
+                }
+              }
+            }
+
+            for(l=1;l<i+3;l++){
+              print parArray[l] " = " dataArray[l] ", " posErrArray[l] ", " negErrArray[l] ",\\" >> outfile
+            }
+
+            print dataArray[i+3] ",,, " title >> outfile
+
+            if("'"$q"'" == "'"$LASTRUN"'") print "\n" >> outfile
           }
-
-          print dataArray[i+3] ",,, " "'"$TITLE"'" >> outfile
-
-          if("'"$q"'" == "'"$LASTRUN"'") print "\n" >> outfile
         }
 
-        # If we do not have the information from the summary file or "nosummary" is set
+        # output to a data-file with simple column-structure
+        # first if the LEM-summary files are present and "nosummary" has not been set
         else {
-          if("'"$q"'" == 0 && noheader != 1){
+          if("'"$TEMPERATURE"'" != "") {
 
-            print "TITLE" >> outfile
-            print ">>>Put your title here<<<\n" >> outfile
-            print "Abstract" >> outfile
-            print ">>>Put your abstract here<<<\n" >> outfile
-            print "LABELS" >> outfile
+            # Write the dat-header
+            if("'"$q"'" == 0 && noheader != 1){
 
-            if(runList == 1){
-              for(k=2;k<=numIndVar;k++){print indVar[k] >> outfile}
+              $1 = "T"
+              $2 = "Tr"
+              $3 = "E"
+              $4 = "RALRAR"
+              $5 = "RATRAB"
+
+              for(k=1;k<numIndVar;k++){
+                $(k+5)=indVar[k+1]
+              }
+
+              for(k=1;k<i;k++){ # musrfit parameters
+                $(3*k-2+5+numIndVar-1)=parArray[k]
+                $(3*k-2+5+numIndVar)="PosErr"
+                $(3*k-2+5+numIndVar+1)="NegErr"
+              }
+
+              for(k=0;k<4;k++){ # CHI2, NDF, CHI2red, RUN (without errors)
+                $(3*i-2+5+numIndVar-1+k)=parArray[i+k]
+              }
+
+              print $0 >> outfile
             }
 
-            for(k=1;k<i+4;k++){
-              print parArray[k] >> outfile
-            }
+            # Write the data-block
+            $1 = "'"$TEMPERATURE"'"
+            $2 = "'"$TRANSPORT"'"
+            if ("'"$ENERGY"'" != "") { $3 = "'"$ENERGY"'" } else { $3 = "-999" }
+            if ("'"$RALRAR"'" != "") { $4 = "'"$RALRAR"'" } else { $4 = "-999" }
+            if ("'"$RATRAB"'" != "") { $5 = "'"$RATRAB"'" } else { $5 = "-999" }
 
-            $1 = "Data"
-
-            for(k=1;k<numIndVar;k++){
-              $(k+1)=indVar[k+1]
-            }
-
-            for(k=1;k<i+4;k++){
-              $(k+1+numIndVar-1)=parArray[k]
-            }
-
-            print "\n" $0 >> outfile
-            print "\\-e" >> outfile
-          }
-
-          if(runList == 1) {
-            while((getline line < "'"$1"'") > 0){
-              split(line, indVarValue, " ")
-              if (indVarValue[1] == "'"$COUNT"'"){
-                for(k=2;k<=numIndVar;k++){print indVar[k] " = " indVarValue[k] ",,,\\" >> outfile}
-                break
+            if(runList == 1) { # process the "independent variables" from the file
+              while((getline line < "'"$1"'") > 0){
+                split(line, indVarValue, " ")
+                if (indVarValue[1] == "'"$COUNT"'"){
+                  for(k=2;k<=numIndVar;k++){ $(k+4) = indVarValue[k] }
+                  break
+                }
               }
             }
+
+            for(l=1;l<i;l++){ # musrfit parameters
+              $(3*l-2+5+numIndVar-1)=dataArray[l]
+              $(3*l-2+5+numIndVar)=posErrArray[l]
+              $(3*l-2+5+numIndVar+1)=negErrArray[l]
+            }
+
+            for(l=0;l<4;l++){ # CHI2, NDF, CHI2red, RUN (without errors)
+              $(3*i-2+5+numIndVar-1+l)=dataArray[i+l]
+            }
+
+            print $0 >> outfile
+
+            if("'"$q"'" == "'"$LASTRUN"'") print "\n" >> outfile
           }
 
-          for(l=1;l<i+3;l++){
-            print parArray[l] " = " dataArray[l] ", " posErrArray[l] ", " negErrArray[l] ",\\" >> outfile
+          # If we do not have the information from the summary file or "nosummary" is set
+          # Writing to column-data file
+          else {
+            if("'"$q"'" == 0 && noheader != 1){
+
+              for(k=1;k<numIndVar;k++){
+                $(k)=indVar[k+1]
+              }
+
+              for(k=1;k<i;k++){ # musrfit parameters
+                $(3*k-2+numIndVar-1)=parArray[k]
+                $(3*k-2+numIndVar)="PosErr"
+                $(3*k-2+numIndVar+1)="NegErr"
+              }
+
+              for(k=0;k<4;k++){ # CHI2, NDF, CHI2red, RUN (without errors)
+                $(3*i-2+numIndVar-1+k)=parArray[i+k]
+              }
+
+              print $0 >> outfile
+            }
+
+            # Write the data-block
+
+            if(runList == 1) { # process the "independent variables" from the file
+              while((getline line < "'"$1"'") > 0){
+                split(line, indVarValue, " ")
+                if (indVarValue[1] == "'"$COUNT"'"){
+                  for(k=2;k<=numIndVar;k++){ $(k-1) = indVarValue[k] }
+                  break
+                }
+              }
+            }
+
+            for(l=1;l<i;l++){ # musrfit parameters
+              $(3*l-2+numIndVar-1)=dataArray[l]
+              $(3*l-2+numIndVar)=posErrArray[l]
+              $(3*l-2+numIndVar+1)=negErrArray[l]
+            }
+
+            for(l=0;l<4;l++){ # CHI2, NDF, CHI2red, RUN (without errors)
+              $(3*i-2+numIndVar-1+l)=dataArray[i+l]
+            }
+
+            print $0 >> outfile
+
+            if("'"$q"'" == "'"$LASTRUN"'") print "\n" >> outfile
+
           }
-
-          print dataArray[i+3] ",,, " title >> outfile
-
-          if("'"$q"'" == "'"$LASTRUN"'") print "\n" >> outfile
         }
       }
     }' $COUNT$EXTENSION.$OUTPUTEXT
