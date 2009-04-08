@@ -17,33 +17,33 @@
     <root_settings>
         <marker_list>
             <!-- Root marker numbers -->
-            <marker>24</marker>
-            <marker>25</marker>
-            <marker>26</marker>
-            <marker>27</marker>
-            <marker>28</marker>
-            <marker>29</marker>
-            <marker>30</marker>
-            <marker>20</marker>
-            <marker>21</marker>
-            <marker>22</marker>
-            <marker>23</marker>
-            <marker>2</marker>
-            <marker>3</marker>
-            <marker>5</marker>
+            <marker>24</marker> <!-- open circle -->
+            <marker>25</marker> <!-- open square -->
+            <marker>26</marker> <!-- open triangle -->
+            <marker>27</marker> <!-- open diamond -->
+            <marker>28</marker> <!-- open cross -->
+            <marker>29</marker> <!-- full star -->
+            <marker>30</marker> <!-- open star -->
+            <marker>20</marker> <!-- full circle -->
+            <marker>21</marker> <!-- full square -->
+            <marker>22</marker> <!-- full triangle -->
+            <marker>23</marker> <!-- full triangle down -->
+            <marker>2</marker>  <!-- thin cross -->
+            <marker>3</marker>  <!-- thin star -->
+            <marker>5</marker>  <!-- thin x -->
         </marker_list>
         <color_list>
             <!-- Color as RGB coded string -->
-            <color>0,0,0</color>
-            <color>255,0,0</color>
-            <color>0,255,0</color>
-            <color>0,0,255</color>
-            <color>255,0,255</color>
-            <color>0,255,255</color>
-            <color>156,0,255</color>
-            <color>99,101,49</color>
-            <color>49,101,49</color>
-            <color>156,48,0</color>
+            <color>0,0,0</color>      <!-- kBlack -->
+            <color>255,0,0</color>    <!-- kRed -->
+            <color>0,255,0</color>    <!-- kGreen -->
+            <color>0,0,255</color>    <!-- kBlue -->
+            <color>255,0,255</color>  <!-- kMagenta -->
+            <color>0,255,255</color>  <!-- kCyan -->
+            <color>153,0,255</color>  <!-- kViolet-3 -->
+            <color>102,102,51</color> <!-- kYellow-1 --> 
+            <color>51,102,51</color>  <!-- kGreen-1 -->
+            <color>153,0,0</color>    <!-- kRed+2 -->
         </color_list>
     </root_settings>
 </musrfit>
