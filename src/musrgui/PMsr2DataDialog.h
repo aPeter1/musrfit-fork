@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  PMlog2DbDialog.h
+  PMsr2DataDialog.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -29,19 +29,19 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PMLOG2DBDIALOG_H_
-#define _PMLOG2DBDIALOG_H_
+#ifndef _PMSR2DATADIALOG_H_
+#define _PMSR2DATADIALOG_H_
 
 #include "musrgui.h"
-#include "forms/PMlog2DbDialogBase.h"
+#include "forms/PMsr2DataDialogBase.h"
 
-class PMlog2DbDialog : public PMlog2DbDialogBase
+class PMsr2DataDialog : public PMsr2DataDialogBase
 {
   public:
-    PMlog2DbDialog(PMlog2DbDataSet *mlog2DbDataSet);
+    PMsr2DataDialog(PMsr2DataParam *msr2DataParam);
 
     virtual int getRunTag() { return fRunTag; }
-    virtual PMlog2DbDataSet* getMlog2DbDataSet();
+    virtual PMsr2DataParam* getMsr2DataParam();
 
   public slots:
     void runFirstLastEntered();
@@ -50,7 +50,7 @@ class PMlog2DbDialog : public PMlog2DbDialogBase
 
   private:
     int fRunTag; // -1 = not valid, 0 = first last, 1 = run list, 2 = run list file name
-    PMlog2DbDataSet *fMlog2DbDataSet;
+    PMsr2DataParam *fMsr2DataParam;
 };
 
-#endif // _PMLOG2DBDIALOG_H_
+#endif // _PMSR2DATADIALOG_H_

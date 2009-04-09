@@ -63,7 +63,7 @@ using namespace std;
 #include "PPrefsDialog.h"
 #include "PGetDefaultDialog.h"
 #include "forms/PMusrGuiAbout.h"
-#include "PMlog2DbDialog.h"
+#include "PMsr2DataDialog.h"
 
 /* XPM */
 static const char * const musrfit_xpm[] = {
@@ -103,7 +103,7 @@ PTextEdit::PTextEdit( QWidget *parent, const char *name )
 {
   fAdmin = new PAdmin();
 
-  fMlog2DbDataSet = 0;
+  fMsr2DataParam = 0;
 
   fKeepMinuit2Output = false;
   fDump = 0; // 0 = no dump, 1 = ascii dump, 2 = root dump
@@ -138,9 +138,9 @@ PTextEdit::PTextEdit( QWidget *parent, const char *name )
  */
 PTextEdit::~PTextEdit()
 {
-  if (fMlog2DbDataSet) {
-    delete fMlog2DbDataSet;
-    fMlog2DbDataSet = 0;
+  if (fMsr2DataParam) {
+    delete fMsr2DataParam;
+    fMsr2DataParam = 0;
   }
 }
 
@@ -294,8 +294,8 @@ void PTextEdit::setupMusrActions()
   a->addTo( tb );
   a->addTo( menu );
 
-  a = new QAction( QPixmap::fromMimeSource( "musrmlog2db.xpm" ), tr( "&Mlog2dB" ), ALT + Key_M, this, "musrMlog2Db" );
-  connect( a, SIGNAL( activated() ), this, SLOT( musrMlog2Db() ) );
+  a = new QAction( QPixmap::fromMimeSource( "musrmsr2data.xpm" ), tr( "&Msr2Data" ), ALT + Key_M, this, "musrMsr2Data" );
+  connect( a, SIGNAL( activated() ), this, SLOT( musrMsr2Data() ) );
   a->addTo( tb );
   a->addTo( menu );
 
@@ -939,36 +939,76 @@ void PTextEdit::musrFit()
   fitOutputHandler.setModal(true);
   fitOutputHandler.exec();
 
-  musrSwapMsrMlog();
+  // handle the reloading of the files
+
+  // get current file name
+  QString currentFileName = *fFilenames.find( currentEditor() );
+  QString complementFileName;
+  // check if it is a msr-, mlog-, or another file
+  int idx;
+  if ((idx = currentFileName.find(".msr")) > 0) { // msr-file
+    complementFileName = currentFileName;
+    complementFileName.replace(idx, 5, ".mlog");
+  } else if ((idx = currentFileName.find(".mlog")) > 0) { // mlog-file
+    complementFileName = currentFileName;
+    complementFileName.replace(idx, 5, ".msr ");
+    complementFileName = complementFileName.stripWhiteSpace();
+  } else { // neither a msr- nor a mlog-file
+    QMessageBox::information( this, "musrFit",
+    "This is neither a msr- nor a mlog-file, hence no idea what to be done.\n",
+    QMessageBox::Ok );
+    return;
+  }
+
+  int currentIdx = fTabWidget->currentPageIndex();
+
+  // reload current file
+  fileClose();
+  load(currentFileName);
+
+  // check if swap file is open as well, and if yes, reload it
+  idx = -1;
+  for (int i=0; i<fTabWidget->count(); i++) {
+    if (fTabWidget->label(i).find(complementFileName) >= 0) {
+      idx = i;
+      break;
+    }
+  }
+  if (idx >= 0) { // complement file is open
+    fTabWidget->setCurrentPage(idx);
+    fileClose();
+    load(complementFileName);
+    fTabWidget->setCurrentPage(currentIdx);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>
  */
-void PTextEdit::musrMlog2Db()
+void PTextEdit::musrMsr2Data()
 {
   if ( !currentEditor() )
     return;
 
-  if (fMlog2DbDataSet == 0) {
-    fMlog2DbDataSet = new PMlog2DbDataSet();
-    // init fMlog2DbDataSet
-    fMlog2DbDataSet->firstRun = -1;
-    fMlog2DbDataSet->lastRun  = -1;
-    fMlog2DbDataSet->runList = QString("");
-    fMlog2DbDataSet->runListFileName = QString("");
-    fMlog2DbDataSet->msrFileExtension = QString("");
-    fMlog2DbDataSet->templateRunNo = -1;
-    fMlog2DbDataSet->dbOutputFileName = QString("");
-    fMlog2DbDataSet->writeDbHeader = false;
-    fMlog2DbDataSet->summaryFilePresent = false;
-    fMlog2DbDataSet->keepMinuit2Output = fKeepMinuit2Output;
-    fMlog2DbDataSet->writeColumnData = false;
-    fMlog2DbDataSet->recreateDbFile = false;
+  if (fMsr2DataParam == 0) {
+    fMsr2DataParam = new PMsr2DataParam();
+    // init fMsr2DataParam
+    fMsr2DataParam->firstRun = -1;
+    fMsr2DataParam->lastRun  = -1;
+    fMsr2DataParam->runList = QString("");
+    fMsr2DataParam->runListFileName = QString("");
+    fMsr2DataParam->msrFileExtension = QString("");
+    fMsr2DataParam->templateRunNo = -1;
+    fMsr2DataParam->dbOutputFileName = QString("");
+    fMsr2DataParam->writeDbHeader = false;
+    fMsr2DataParam->summaryFilePresent = false;
+    fMsr2DataParam->keepMinuit2Output = fKeepMinuit2Output;
+    fMsr2DataParam->writeColumnData = false;
+    fMsr2DataParam->recreateDbFile = false;
   }
 
-  PMlog2DbDialog *dlg = new PMlog2DbDialog(fMlog2DbDataSet);
+  PMsr2DataDialog *dlg = new PMsr2DataDialog(fMsr2DataParam);
 
   if (dlg->exec() == QDialog::Accepted) {
     QString first, last;
@@ -978,7 +1018,7 @@ void PTextEdit::musrMlog2Db()
     QString str;
     int i, end;
 
-    fMlog2DbDataSet = dlg->getMlog2DbDataSet();
+    fMsr2DataParam = dlg->getMsr2DataParam();
 
     // analyze parameters
     switch (dlg->getRunTag()) {
@@ -989,8 +1029,8 @@ void PTextEdit::musrMlog2Db()
         return;
         break;
       case 0:  // first last
-        first = QString("%1").arg(fMlog2DbDataSet->firstRun);
-        last  = QString("%1").arg(fMlog2DbDataSet->lastRun);
+        first = QString("%1").arg(fMsr2DataParam->firstRun);
+        last  = QString("%1").arg(fMsr2DataParam->lastRun);
         if (first.isEmpty() || last.isEmpty()) {
           QMessageBox::critical(this, "**ERROR**",
             "If you choose the first/last option,\nfirst AND last needs to be provided.",
@@ -999,7 +1039,7 @@ void PTextEdit::musrMlog2Db()
         }
         break;
       case 1:  // run list
-        runList = fMlog2DbDataSet->runList;
+        runList = fMsr2DataParam->runList;
         if (!validRunList(runList)) {
           QMessageBox::critical(this, "**ERROR**",
             "Invalid Run List!\nThe run list needs to be a space separated list of run numbers.",
@@ -1008,7 +1048,7 @@ void PTextEdit::musrMlog2Db()
         }
         break;
       case 2:  // run list file name
-        runListFileName = fMlog2DbDataSet->runListFileName;
+        runListFileName = fMsr2DataParam->runListFileName;
         fi = runListFileName;
         if (!fi.exists()) {
           str = QString("Run List File '%1' doesn't exist.").arg(runListFileName);
@@ -1027,7 +1067,7 @@ void PTextEdit::musrMlog2Db()
 
     // form command
     QValueVector<QString> cmd;
-    str = fAdmin->getExecPath() + "/mlog2db";
+    str = fAdmin->getExecPath() + "/msr2data";
     cmd.append(str);
 
     // run list argument
@@ -1064,7 +1104,7 @@ void PTextEdit::musrMlog2Db()
     }
 
     // file extension
-    str = fMlog2DbDataSet->msrFileExtension;
+    str = fMsr2DataParam->msrFileExtension;
     if (str.isEmpty())
       cmd.append("");
     else
@@ -1073,55 +1113,50 @@ void PTextEdit::musrMlog2Db()
     // options
 
     // no header flag?
-    if (!fMlog2DbDataSet->writeDbHeader)
+    if (!fMsr2DataParam->writeDbHeader)
       cmd.append("noheader");
 
     // no summary flag?
-    if (!fMlog2DbDataSet->summaryFilePresent)
+    if (!fMsr2DataParam->summaryFilePresent)
       cmd.append("nosummary");
 
     // template run no
-    if (fMlog2DbDataSet->templateRunNo != -1) {
-      str = QString("%1").arg(fMlog2DbDataSet->templateRunNo);
+    if (fMsr2DataParam->templateRunNo != -1) {
+      str = QString("%1").arg(fMsr2DataParam->templateRunNo);
       str = "fit-" + str;
       cmd.append(str);
     }
 
     // keep minuit2 output
-    if (fMlog2DbDataSet->keepMinuit2Output) {
+    if (fMsr2DataParam->keepMinuit2Output) {
       cmd.append("-k");
     }
 
     // DB output wished
-    if (!fMlog2DbDataSet->dbOutputFileName.isEmpty()) {
-      str = "-o" + fMlog2DbDataSet->dbOutputFileName;
+    if (!fMsr2DataParam->dbOutputFileName.isEmpty()) {
+      str = "-o" + fMsr2DataParam->dbOutputFileName;
       cmd.append(str);
     }
 
     // write column data
-    if (fMlog2DbDataSet->writeColumnData) {
+    if (fMsr2DataParam->writeColumnData) {
       cmd.append("data");
     }
 
     // recreate db file
-    if (fMlog2DbDataSet->recreateDbFile) {
-      if (!QFile::remove(fMlog2DbDataSet->dbOutputFileName)) {
-        str = QString("Couldn't delete db-file '%1'. Will **NOT** proceed.").arg(fMlog2DbDataSet->dbOutputFileName);
+    if (fMsr2DataParam->recreateDbFile) {
+      if (!QFile::remove(fMsr2DataParam->dbOutputFileName)) {
+        str = QString("Couldn't delete db-file '%1'. Will **NOT** proceed.").arg(fMsr2DataParam->dbOutputFileName);
         QMessageBox::critical(this, "**ERROR**", str,
            QMessageBox::Ok, QMessageBox::NoButton);
         return;
       }
     }
 
-    // add the swap flag
-    cmd.append("-s");
-
-/*
 for (unsigned int i=0; i<cmd.size(); i++) {
   cout << endl << ">> " << cmd[i].latin1();
 }
 cout << endl;
-*/
 
     PFitOutputHandler fitOutputHandler(cmd);
     fitOutputHandler.setModal(true);
@@ -1242,6 +1277,8 @@ void PTextEdit::musrSwapMsrMlog()
   cmd = QString("rm ") + tempFileName;
   system(cmd.latin1());
 
+  int currentIdx = fTabWidget->currentPageIndex();
+
   // reload current file
   fileClose();
   load(currentFileName);
@@ -1255,7 +1292,6 @@ void PTextEdit::musrSwapMsrMlog()
     }
   }
   if (idx >= 0) { // swap file is open
-    int currentIdx = fTabWidget->currentPageIndex();
     fTabWidget->setCurrentPage(idx);
     fileClose();
     load(swapFileName);

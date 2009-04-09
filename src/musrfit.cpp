@@ -58,7 +58,7 @@ using namespace std;
 void musrfit_syntax()
 {
   cout << endl << "usage: musrfit [<msr-file> [-k, --keep-mn2-ouput] [-c, --chisq-only]";
-  cout << endl << "                           [-s, --swap-msr-mlog] [--debug] [--dump <type>]] |";
+  cout << endl << "                           [--debug] [--dump <type>]] |";
   cout << endl << "                           --version | --help";
   cout << endl << "       <msr-file>: msr input file";
   cout << endl << "       'musrfit <msr-file>' will execute musrfit";
@@ -71,10 +71,12 @@ void musrfit_syntax()
   cout << endl << "       -c, --chisq-only: instead of fitting the data, chisq is just calculated";
   cout << endl << "              once and the result is set to the stdout. This feature is useful";
   cout << endl << "              to adjust initial parameters.";
-  cout << endl << "       -s, --swap-msr-mlog: will swap msr-, mlog-file at the end of execution";
   cout << endl << "       --debug is used to print additional infos";
   cout << endl << "       --dump <type> is writing a data file with the fit data and the theory";
-  cout << endl << "              <type> can be 'ascii', 'root'";
+  cout << endl << "              <type> can be 'ascii', 'root'" << endl;
+  cout << endl << "       At the end of a fit, musrfit writes the fit results into an <mlog-file> and";
+  cout << endl << "       swaps them, i.e. in the <msr-file> you will find the fit results and in the";
+  cout << endl << "       <mlog-file> your initial guess values.";
   cout << endl << endl;
 }
 
@@ -487,7 +489,6 @@ int main(int argc, char *argv[])
   bool debug = false;
   bool keep_mn2_output = false;
   bool chisq_only = false;
-  bool swap_msr_mlog = false;
   TString dump("");
   char filename[256];
 
@@ -532,8 +533,6 @@ int main(int argc, char *argv[])
         show_syntax = true;
         break;
       }
-    } else if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "--swap-msr-mlog")) {
-      swap_msr_mlog = true;
     } else {
       show_syntax = true;
       break;
@@ -687,8 +686,8 @@ int main(int argc, char *argv[])
     gSystem->CopyFile("MINUIT2.root", fln.Data(), kTRUE);
   }
 
-  // swap msr-, mlog-file if wished
-  if (swap_msr_mlog) {
+  if (!chisq_only) {
+    // swap msr- and mlog-file
     cout << endl << ">> swapping msr-, mlog-file ..." << endl;
     // copy msr-file -> __temp.msr
     gSystem->CopyFile(filename, "__temp.msr", kTRUE);

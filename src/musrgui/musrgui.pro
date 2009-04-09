@@ -27,7 +27,7 @@ HEADERS = musrgui.h \
     PGetSingleHistoRunBlockDialog.h \
     PGetNonMusrRunBlockDialog.h \
     PGetFourierDialog.h \
-    PMlog2DbDialog.h \
+    PMsr2DataDialog.h \
     PGetPlotDialog.h
 
 SOURCES = PTextEdit.cpp \
@@ -44,7 +44,7 @@ SOURCES = PTextEdit.cpp \
     PGetNonMusrRunBlockDialog.cpp \
     PGetFourierDialog.cpp \
     PGetPlotDialog.cpp \
-    PMlog2DbDialog.cpp \
+    PMsr2DataDialog.cpp \
     main.cpp 
 
 FORMS = forms/PGetDefaultDialogBase.ui \
@@ -59,7 +59,7 @@ FORMS = forms/PGetDefaultDialogBase.ui \
     forms/PGetNonMusrRunBlockDialogBase.ui \
     forms/PGetFourierDialogBase.ui \
     forms/PGetPlotDialogBase.ui \
-    forms/PMlog2DbDialogBase.ui
+    forms/PMsr2DataDialogBase.ui
 
 IMAGES = images/editcopy.xpm \
     images/editcut.xpm \
@@ -74,7 +74,7 @@ IMAGES = images/editcopy.xpm \
     images/musrsinglehisto.xpm \
     images/musrcalcchisq.xpm \
     images/musrfit.xpm \
-    images/musrmlog2db.xpm \
+    images/musrmsr2data.xpm \
     images/musrview.xpm \
     images/musrt0.xpm \
     images/musrprefs.xpm \

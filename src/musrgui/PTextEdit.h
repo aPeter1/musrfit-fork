@@ -88,7 +88,7 @@ private slots:
   void musrGetSingleHistoDefault();
   void musrCalcChisq();
   void musrFit();
-  void musrMlog2Db();
+  void musrMsr2Data();
   void musrView();
   void musrT0();
   void musrPrefs();
@@ -107,7 +107,7 @@ private:
   bool fKeepMinuit2Output;
   int  fDump;
 
-  PMlog2DbDataSet *fMlog2DbDataSet;
+  PMsr2DataParam *fMsr2DataParam;
 
   QComboBox *fComboFont;
   QComboBox *fComboSize;

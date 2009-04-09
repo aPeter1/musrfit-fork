@@ -1,8 +1,8 @@
 <!DOCTYPE UI><UI version="3.3" stdsetdef="1">
-<class>PMlog2DbDialogBase</class>
+<class>PMsr2DataDialogBase</class>
 <widget class="QDialog">
     <property name="name">
-        <cstring>PMlog2DbDialogBase</cstring>
+        <cstring>PMsr2DataDialogBase</cstring>
     </property>
     <property name="geometry">
         <rect>
@@ -551,37 +551,37 @@
     <connection>
         <sender>fOk_button</sender>
         <signal>clicked()</signal>
-        <receiver>PMlog2DbDialogBase</receiver>
+        <receiver>PMsr2DataDialogBase</receiver>
         <slot>accept()</slot>
     </connection>
     <connection>
         <sender>fCancel_button</sender>
         <signal>clicked()</signal>
-        <receiver>PMlog2DbDialogBase</receiver>
+        <receiver>PMsr2DataDialogBase</receiver>
         <slot>reject()</slot>
     </connection>
     <connection>
         <sender>fFirst_lineEdit</sender>
         <signal>textChanged(const QString&amp;)</signal>
-        <receiver>PMlog2DbDialogBase</receiver>
+        <receiver>PMsr2DataDialogBase</receiver>
         <slot>runFirstLastEntered()</slot>
     </connection>
     <connection>
         <sender>fLast_lineEdit</sender>
         <signal>textChanged(const QString&amp;)</signal>
-        <receiver>PMlog2DbDialogBase</receiver>
+        <receiver>PMsr2DataDialogBase</receiver>
         <slot>runFirstLastEntered()</slot>
     </connection>
     <connection>
         <sender>fRunList_lineEdit</sender>
         <signal>textChanged(const QString&amp;)</signal>
-        <receiver>PMlog2DbDialogBase</receiver>
+        <receiver>PMsr2DataDialogBase</receiver>
         <slot>runListEntered()</slot>
     </connection>
     <connection>
         <sender>fRunListFileName_lineEdit</sender>
         <signal>textChanged(const QString&amp;)</signal>
-        <receiver>PMlog2DbDialogBase</receiver>
+        <receiver>PMsr2DataDialogBase</receiver>
         <slot>runListFileNameEntered()</slot>
     </connection>
 </connections>

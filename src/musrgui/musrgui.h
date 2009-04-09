@@ -47,6 +47,6 @@ typedef struct {
   bool keepMinuit2Output;
   bool writeColumnData;
   bool recreateDbFile;
-} PMlog2DbDataSet;
+} PMsr2DataParam;
 
 #endif // _MUSRGUI_H_

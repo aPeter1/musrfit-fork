@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  PMlog2DbDialog.cpp
+  PMsr2DataDialog.cpp
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -35,98 +35,98 @@
 #include <qtextedit.h>
 #include <qcheckbox.h>
 
-#include "PMlog2DbDialog.h"
+#include "PMsr2DataDialog.h"
 
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>
  */
-PMlog2DbDialog::PMlog2DbDialog(PMlog2DbDataSet *mlog2DbDataSet) : fMlog2DbDataSet(mlog2DbDataSet)
+PMsr2DataDialog::PMsr2DataDialog(PMsr2DataParam *msr2DataParam) : fMsr2DataParam(msr2DataParam)
 {
   QString str;
 
   fRunTag = -1;
 
   fFirst_lineEdit->setValidator( new QIntValidator(fFirst_lineEdit) );
-  if (fMlog2DbDataSet->firstRun != -1) {
-    str = QString("%1").arg(fMlog2DbDataSet->firstRun);
+  if (fMsr2DataParam->firstRun != -1) {
+    str = QString("%1").arg(fMsr2DataParam->firstRun);
     fFirst_lineEdit->setText(str);
   }
 
   fLast_lineEdit->setValidator( new QIntValidator(fLast_lineEdit) );
-  if (fMlog2DbDataSet->lastRun != -1) {
-    str = QString("%1").arg(fMlog2DbDataSet->lastRun);
+  if (fMsr2DataParam->lastRun != -1) {
+    str = QString("%1").arg(fMsr2DataParam->lastRun);
     fLast_lineEdit->setText(str);
   }
 
-  if (!fMlog2DbDataSet->runListFileName.isEmpty()) {
-    fRunListFileName_lineEdit->setText(fMlog2DbDataSet->runListFileName);
+  if (!fMsr2DataParam->runListFileName.isEmpty()) {
+    fRunListFileName_lineEdit->setText(fMsr2DataParam->runListFileName);
   }
 
-  if (!fMlog2DbDataSet->runList.isEmpty()) {
-    fRunList_lineEdit->setText(fMlog2DbDataSet->runList);
+  if (!fMsr2DataParam->runList.isEmpty()) {
+    fRunList_lineEdit->setText(fMsr2DataParam->runList);
   }
 
-  if (!fMlog2DbDataSet->msrFileExtension.isEmpty()) {
-    fExtension_lineEdit->setText(fMlog2DbDataSet->msrFileExtension);
+  if (!fMsr2DataParam->msrFileExtension.isEmpty()) {
+    fExtension_lineEdit->setText(fMsr2DataParam->msrFileExtension);
   }
 
   fTemplateRunNumber_lineEdit->setValidator( new QIntValidator(fTemplateRunNumber_lineEdit) );
-  if (fMlog2DbDataSet->templateRunNo != -1) {
-    str = QString("%1").arg(fMlog2DbDataSet->templateRunNo);
+  if (fMsr2DataParam->templateRunNo != -1) {
+    str = QString("%1").arg(fMsr2DataParam->templateRunNo);
     fTemplateRunNumber_lineEdit->setText(str);
   }
 
-  if (!fMlog2DbDataSet->dbOutputFileName.isEmpty()) {
-    fDbOutputFileName_lineEdit->setText(fMlog2DbDataSet->dbOutputFileName);
+  if (!fMsr2DataParam->dbOutputFileName.isEmpty()) {
+    fDbOutputFileName_lineEdit->setText(fMsr2DataParam->dbOutputFileName);
   }
 
-  fWriteDbHeader_checkBox->setChecked(fMlog2DbDataSet->writeDbHeader);
-  fSummaryPresent_checkBox->setChecked(fMlog2DbDataSet->summaryFilePresent);
-  fKeepMinuit2Output_checkBox->setChecked(fMlog2DbDataSet->keepMinuit2Output);
-  fWriteColumnData_checkBox->setChecked(fMlog2DbDataSet->writeColumnData);
-  fRecreateDbFile_checkBox->setChecked(fMlog2DbDataSet->recreateDbFile);
+  fWriteDbHeader_checkBox->setChecked(fMsr2DataParam->writeDbHeader);
+  fSummaryPresent_checkBox->setChecked(fMsr2DataParam->summaryFilePresent);
+  fKeepMinuit2Output_checkBox->setChecked(fMsr2DataParam->keepMinuit2Output);
+  fWriteColumnData_checkBox->setChecked(fMsr2DataParam->writeColumnData);
+  fRecreateDbFile_checkBox->setChecked(fMsr2DataParam->recreateDbFile);
 }
 
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>
  */
-PMlog2DbDataSet* PMlog2DbDialog::getMlog2DbDataSet()
+PMsr2DataParam* PMsr2DataDialog::getMsr2DataParam()
 {
   if (fFirst_lineEdit->text().isEmpty()) {
-    fMlog2DbDataSet->firstRun = -1;
+    fMsr2DataParam->firstRun = -1;
   } else {
-    fMlog2DbDataSet->firstRun = fFirst_lineEdit->text().toInt();
+    fMsr2DataParam->firstRun = fFirst_lineEdit->text().toInt();
   }
   if (fLast_lineEdit->text().isEmpty()) {
-    fMlog2DbDataSet->lastRun  = -1;
+    fMsr2DataParam->lastRun  = -1;
   } else {
-    fMlog2DbDataSet->lastRun  = fLast_lineEdit->text().toInt();
+    fMsr2DataParam->lastRun  = fLast_lineEdit->text().toInt();
   }
-  fMlog2DbDataSet->runList  = fRunList_lineEdit->text();
-  fMlog2DbDataSet->runListFileName = fRunListFileName_lineEdit->text();
-  fMlog2DbDataSet->msrFileExtension = fExtension_lineEdit->text();
+  fMsr2DataParam->runList  = fRunList_lineEdit->text();
+  fMsr2DataParam->runListFileName = fRunListFileName_lineEdit->text();
+  fMsr2DataParam->msrFileExtension = fExtension_lineEdit->text();
   if (fTemplateRunNumber_lineEdit->text().isEmpty()) {
-    fMlog2DbDataSet->templateRunNo = -1;
+    fMsr2DataParam->templateRunNo = -1;
   } else {
-    fMlog2DbDataSet->templateRunNo = fTemplateRunNumber_lineEdit->text().toInt();
+    fMsr2DataParam->templateRunNo = fTemplateRunNumber_lineEdit->text().toInt();
   }
-  fMlog2DbDataSet->dbOutputFileName = fDbOutputFileName_lineEdit->text();
-  fMlog2DbDataSet->writeDbHeader = fWriteDbHeader_checkBox->isChecked();
-  fMlog2DbDataSet->summaryFilePresent = fSummaryPresent_checkBox->isChecked();
-  fMlog2DbDataSet->keepMinuit2Output = fKeepMinuit2Output_checkBox->isChecked();
-  fMlog2DbDataSet->writeColumnData = fWriteColumnData_checkBox->isChecked();
-  fMlog2DbDataSet->recreateDbFile = fRecreateDbFile_checkBox->isChecked();
+  fMsr2DataParam->dbOutputFileName = fDbOutputFileName_lineEdit->text();
+  fMsr2DataParam->writeDbHeader = fWriteDbHeader_checkBox->isChecked();
+  fMsr2DataParam->summaryFilePresent = fSummaryPresent_checkBox->isChecked();
+  fMsr2DataParam->keepMinuit2Output = fKeepMinuit2Output_checkBox->isChecked();
+  fMsr2DataParam->writeColumnData = fWriteColumnData_checkBox->isChecked();
+  fMsr2DataParam->recreateDbFile = fRecreateDbFile_checkBox->isChecked();
 
-  return fMlog2DbDataSet;
+  return fMsr2DataParam;
 }
 
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>
  */
-void PMlog2DbDialog::runFirstLastEntered()
+void PMsr2DataDialog::runFirstLastEntered()
 {
   fRunTag = 0;
 
@@ -140,7 +140,7 @@ void PMlog2DbDialog::runFirstLastEntered()
 /**
  * <p>
  */
-void PMlog2DbDialog::runListEntered()
+void PMsr2DataDialog::runListEntered()
 {
   fRunTag = 1;
 
@@ -156,7 +156,7 @@ void PMlog2DbDialog::runListEntered()
 /**
  * <p>
  */
-void PMlog2DbDialog::runListFileNameEntered()
+void PMsr2DataDialog::runListFileNameEntered()
 {
   fRunTag = 2;
 
