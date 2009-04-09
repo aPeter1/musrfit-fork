@@ -1153,10 +1153,12 @@ void PTextEdit::musrMsr2Data()
       }
     }
 
+/*
 for (unsigned int i=0; i<cmd.size(); i++) {
   cout << endl << ">> " << cmd[i].latin1();
 }
 cout << endl;
+*/
 
     PFitOutputHandler fitOutputHandler(cmd);
     fitOutputHandler.setModal(true);
