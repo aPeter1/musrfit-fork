@@ -13,7 +13,8 @@ CONFIG += qt \
     warn_on \
     debug
 
-HEADERS = PTextEdit.h \
+HEADERS = musrgui.h \
+    PTextEdit.h \
     PSubTextEdit.h \
     PAdmin.h \
     PFitOutputHandler.h \

@@ -167,7 +167,7 @@ void PSubTextEdit::insertTheoryFunction(int idx)
 
   int index = idx - 300;
 
-  if (index >= fAdmin->getTheoryCounts())
+  if (index >= (int)fAdmin->getTheoryCounts())
     return;
 
   QString str = "????";

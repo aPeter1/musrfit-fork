@@ -137,22 +137,6 @@
         </widget>
         <widget class="QLineEdit">
             <property name="name">
-                <cstring>fFirst_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>50</x>
-                    <y>30</y>
-                    <width>90</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>first run no, e.g. 147</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
                 <cstring>fLast_lineEdit</cstring>
             </property>
             <property name="geometry">
@@ -165,6 +149,22 @@
             </property>
             <property name="toolTip" stdset="0">
                 <string>last run no, .e.g. 275</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fFirst_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>50</x>
+                    <y>30</y>
+                    <width>90</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>first run no, e.g. 147</string>
             </property>
         </widget>
         <widget class="QLineEdit">
@@ -447,7 +447,26 @@
         </property>
         <widget class="QCheckBox">
             <property name="name">
-                <cstring>fNoHeader_checkBox</cstring>
+                <cstring>fKeepMinuit2Output_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>20</x>
+                    <y>70</y>
+                    <width>170</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Keep Minuit2 Output</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>will keep the Minuit2 output files</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>fWriteDbHeader_checkBox</cstring>
             </property>
             <property name="geometry">
                 <rect>
@@ -485,21 +504,40 @@
         </widget>
         <widget class="QCheckBox">
             <property name="name">
-                <cstring>fKeepMinuit2Output_checkBox</cstring>
+                <cstring>fWriteColumnData_checkBox</cstring>
             </property>
             <property name="geometry">
                 <rect>
-                    <x>20</x>
-                    <y>70</y>
-                    <width>170</width>
+                    <x>230</x>
+                    <y>30</y>
+                    <width>150</width>
                     <height>22</height>
                 </rect>
             </property>
             <property name="text">
-                <string>Keep Minuit2 Output</string>
+                <string>Write Column Data</string>
             </property>
             <property name="toolTip" stdset="0">
-                <string>will keep the Minuit2 output files</string>
+                <string>will write the output data in column like format, to be read by gnuplot ...</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>fRecreateDbFile_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>230</x>
+                    <y>50</y>
+                    <width>140</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Recreate DB File</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>will recreate the db-file. Default (unchecked) will append data</string>
             </property>
         </widget>
     </widget>
@@ -555,7 +593,7 @@
     <tabstop>fExtension_lineEdit</tabstop>
     <tabstop>fTemplateRunNumber_lineEdit</tabstop>
     <tabstop>fDbOutputFileName_lineEdit</tabstop>
-    <tabstop>fNoHeader_checkBox</tabstop>
+    <tabstop>fWriteDbHeader_checkBox</tabstop>
     <tabstop>fSummaryPresent_checkBox</tabstop>
     <tabstop>fKeepMinuit2Output_checkBox</tabstop>
     <tabstop>fOk_button</tabstop>

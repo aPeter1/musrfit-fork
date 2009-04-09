@@ -62,7 +62,6 @@ class PSubTextEdit : public QTextEdit
 
   private:
     PAdmin *fAdmin;
-
 };
 
 #endif // _PSUBTEXTEDIT_H_

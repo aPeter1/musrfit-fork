@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  PTextEdit.h
+  musrgui.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -29,92 +29,24 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PTEXTEDIT_H_
-#define _PTEXTEDIT_H_
+#ifndef _MUSRGUI_H_
+#define _MUSRGUI_H_
 
-#include <qmainwindow.h>
-#include <qmap.h>
+#include <qstring.h>
 
-#include "musrgui.h"
+typedef struct {
+  int firstRun;
+  int lastRun;
+  QString runList;
+  QString runListFileName;
+  QString msrFileExtension;
+  int templateRunNo;
+  QString dbOutputFileName;
+  bool writeDbHeader;
+  bool summaryFilePresent;
+  bool keepMinuit2Output;
+  bool writeColumnData;
+  bool recreateDbFile;
+} PMlog2DbDataSet;
 
-class PSubTextEdit;
-class PAdmin;
-class QAction;
-class QComboBox;
-class QTabWidget;
-class QTextEdit;
-class QPopupMenu;
-
-class PTextEdit : public QMainWindow
-{
-  Q_OBJECT
-
-public:
-  PTextEdit( QWidget *parent = 0, const char *name = 0 );
-  virtual ~PTextEdit();
-
-private:
-  void setupFileActions();
-  void setupEditActions();
-  void setupTextActions();
-  void setupMusrActions();
-  void setupHelpActions();
-  void load( const QString &f );
-  PSubTextEdit *currentEditor() const;
-  void doConnections( PSubTextEdit *e );
-  bool validRunList(const QString runList);
-
-private slots:
-  void fileNew();
-  void fileOpen();
-  void fileSave();
-  void fileSaveAs();
-  void filePrint();
-  void fileClose();
-  void fileExit();
-
-  void editUndo();
-  void editRedo();
-  void editSelectAll();
-  void editCut();
-  void editCopy();
-  void editPaste();
-  void editComment();
-
-  void textFamily( const QString &f );
-  void textSize( const QString &p );
-
-  void musrGetAsymmetryDefault();
-  void musrGetSingleHistoDefault();
-  void musrCalcChisq();
-  void musrFit();
-  void musrMlog2Db();
-  void musrView();
-  void musrT0();
-  void musrPrefs();
-  void musrSwapMsrMlog();
-
-  void helpContents();
-  void helpAboutQt();
-  void helpAbout();
-
-  void fontChanged( const QFont &f );
-  void textChanged();
-
-private:
-  PAdmin *fAdmin;
-
-  bool fKeepMinuit2Output;
-  int  fDump;
-
-  PMlog2DbDataSet *fMlog2DbDataSet;
-
-  QComboBox *fComboFont;
-  QComboBox *fComboSize;
-
-  QTabWidget *fTabWidget;
-  QMap<PSubTextEdit*, QString> fFilenames;
-};
-
-
-#endif // _PTEXTEDIT_H_
+#endif // _MUSRGUI_H_

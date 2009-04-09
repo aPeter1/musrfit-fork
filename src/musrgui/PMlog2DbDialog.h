@@ -32,24 +32,16 @@
 #ifndef _PMLOG2DBDIALOG_H_
 #define _PMLOG2DBDIALOG_H_
 
+#include "musrgui.h"
 #include "forms/PMlog2DbDialogBase.h"
 
 class PMlog2DbDialog : public PMlog2DbDialogBase
 {
   public:
-    PMlog2DbDialog(const bool keepMinuit2Output);
+    PMlog2DbDialog(PMlog2DbDataSet *mlog2DbDataSet);
 
-    int getRunTag() { return fRunTag; }
-    QString getFirstRunNo() { return fFirst_lineEdit->text(); }
-    QString getLastRunNo() { return fLast_lineEdit->text(); }
-    QString getRunList() { return fRunList_lineEdit->text(); }
-    QString getRunListFileName() { return fRunListFileName_lineEdit->text(); }
-    QString getExtension() { return fExtension_lineEdit->text(); }
-    QString getTemplateRunNo() { return fTemplateRunNumber_lineEdit->text(); }
-    QString getDbOutputFileName() { return fDbOutputFileName_lineEdit->text(); }
-    bool getWriteDbHeaderFlag() { return fNoHeader_checkBox->isChecked(); }
-    bool getSummaryFilePresentFlag() { return fSummaryPresent_checkBox->isChecked(); }
-    bool getMinuit2OutputFlag() { return fKeepMinuit2Output_checkBox->isChecked(); }
+    virtual int getRunTag() { return fRunTag; }
+    virtual PMlog2DbDataSet* getMlog2DbDataSet();
 
   public slots:
     void runFirstLastEntered();
@@ -58,6 +50,7 @@ class PMlog2DbDialog : public PMlog2DbDialogBase
 
   private:
     int fRunTag; // -1 = not valid, 0 = first last, 1 = run list, 2 = run list file name
+    PMlog2DbDataSet *fMlog2DbDataSet;
 };
 
 #endif // _PMLOG2DBDIALOG_H_

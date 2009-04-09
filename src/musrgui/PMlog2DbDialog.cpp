@@ -41,15 +41,85 @@
 /**
  * <p>
  */
-PMlog2DbDialog::PMlog2DbDialog(const bool keepMinuit2Output)
+PMlog2DbDialog::PMlog2DbDialog(PMlog2DbDataSet *mlog2DbDataSet) : fMlog2DbDataSet(mlog2DbDataSet)
 {
+  QString str;
+
   fRunTag = -1;
 
   fFirst_lineEdit->setValidator( new QIntValidator(fFirst_lineEdit) );
-  fLast_lineEdit->setValidator( new QIntValidator(fLast_lineEdit) );
-  fTemplateRunNumber_lineEdit->setValidator( new QIntValidator(fTemplateRunNumber_lineEdit) );
+  if (fMlog2DbDataSet->firstRun != -1) {
+    str = QString("%1").arg(fMlog2DbDataSet->firstRun);
+    fFirst_lineEdit->setText(str);
+  }
 
-  fKeepMinuit2Output_checkBox->setChecked(keepMinuit2Output);
+  fLast_lineEdit->setValidator( new QIntValidator(fLast_lineEdit) );
+  if (fMlog2DbDataSet->lastRun != -1) {
+    str = QString("%1").arg(fMlog2DbDataSet->lastRun);
+    fLast_lineEdit->setText(str);
+  }
+
+  if (!fMlog2DbDataSet->runListFileName.isEmpty()) {
+    fRunListFileName_lineEdit->setText(fMlog2DbDataSet->runListFileName);
+  }
+
+  if (!fMlog2DbDataSet->runList.isEmpty()) {
+    fRunList_lineEdit->setText(fMlog2DbDataSet->runList);
+  }
+
+  if (!fMlog2DbDataSet->msrFileExtension.isEmpty()) {
+    fExtension_lineEdit->setText(fMlog2DbDataSet->msrFileExtension);
+  }
+
+  fTemplateRunNumber_lineEdit->setValidator( new QIntValidator(fTemplateRunNumber_lineEdit) );
+  if (fMlog2DbDataSet->templateRunNo != -1) {
+    str = QString("%1").arg(fMlog2DbDataSet->templateRunNo);
+    fTemplateRunNumber_lineEdit->setText(str);
+  }
+
+  if (!fMlog2DbDataSet->dbOutputFileName.isEmpty()) {
+    fDbOutputFileName_lineEdit->setText(fMlog2DbDataSet->dbOutputFileName);
+  }
+
+  fWriteDbHeader_checkBox->setChecked(fMlog2DbDataSet->writeDbHeader);
+  fSummaryPresent_checkBox->setChecked(fMlog2DbDataSet->summaryFilePresent);
+  fKeepMinuit2Output_checkBox->setChecked(fMlog2DbDataSet->keepMinuit2Output);
+  fWriteColumnData_checkBox->setChecked(fMlog2DbDataSet->writeColumnData);
+  fRecreateDbFile_checkBox->setChecked(fMlog2DbDataSet->recreateDbFile);
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+PMlog2DbDataSet* PMlog2DbDialog::getMlog2DbDataSet()
+{
+  if (fFirst_lineEdit->text().isEmpty()) {
+    fMlog2DbDataSet->firstRun = -1;
+  } else {
+    fMlog2DbDataSet->firstRun = fFirst_lineEdit->text().toInt();
+  }
+  if (fLast_lineEdit->text().isEmpty()) {
+    fMlog2DbDataSet->lastRun  = -1;
+  } else {
+    fMlog2DbDataSet->lastRun  = fLast_lineEdit->text().toInt();
+  }
+  fMlog2DbDataSet->runList  = fRunList_lineEdit->text();
+  fMlog2DbDataSet->runListFileName = fRunListFileName_lineEdit->text();
+  fMlog2DbDataSet->msrFileExtension = fExtension_lineEdit->text();
+  if (fTemplateRunNumber_lineEdit->text().isEmpty()) {
+    fMlog2DbDataSet->templateRunNo = -1;
+  } else {
+    fMlog2DbDataSet->templateRunNo = fTemplateRunNumber_lineEdit->text().toInt();
+  }
+  fMlog2DbDataSet->dbOutputFileName = fDbOutputFileName_lineEdit->text();
+  fMlog2DbDataSet->writeDbHeader = fWriteDbHeader_checkBox->isChecked();
+  fMlog2DbDataSet->summaryFilePresent = fSummaryPresent_checkBox->isChecked();
+  fMlog2DbDataSet->keepMinuit2Output = fKeepMinuit2Output_checkBox->isChecked();
+  fMlog2DbDataSet->writeColumnData = fWriteColumnData_checkBox->isChecked();
+  fMlog2DbDataSet->recreateDbFile = fRecreateDbFile_checkBox->isChecked();
+
+  return fMlog2DbDataSet;
 }
 
 //----------------------------------------------------------------------------------------------------

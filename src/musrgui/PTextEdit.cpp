@@ -103,6 +103,8 @@ PTextEdit::PTextEdit( QWidget *parent, const char *name )
 {
   fAdmin = new PAdmin();
 
+  fMlog2DbDataSet = 0;
+
   fKeepMinuit2Output = false;
   fDump = 0; // 0 = no dump, 1 = ascii dump, 2 = root dump
 
@@ -127,6 +129,18 @@ PTextEdit::PTextEdit( QWidget *parent, const char *name )
       load( qApp->argv()[ i ] );
   } else {
     fileNew();
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+PTextEdit::~PTextEdit()
+{
+  if (fMlog2DbDataSet) {
+    delete fMlog2DbDataSet;
+    fMlog2DbDataSet = 0;
   }
 }
 
@@ -926,26 +940,6 @@ void PTextEdit::musrFit()
   fitOutputHandler.exec();
 
   musrSwapMsrMlog();
-/*
-  if (fOpenMlogAfterFit) {
-    // get current file name and replace the msr-extension through mlog
-    str = fTabWidget->label(fTabWidget->currentPageIndex());
-    int idx = str.find(".msr");
-    if (idx > 0) {
-      str.replace(idx, 4, ".mlog");
-    }
-
-    // check if mlog-file is already open, and if yes close it
-    for (int i=0; i<fTabWidget->count(); i++) {
-      if (fTabWidget->label(i).find(str) >= 0) {
-        delete fTabWidget->page(i);
-      }
-    }
-
-    // open mlog files
-    load(str);
-  }
-*/
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -957,7 +951,24 @@ void PTextEdit::musrMlog2Db()
   if ( !currentEditor() )
     return;
 
-  PMlog2DbDialog *dlg = new PMlog2DbDialog(fKeepMinuit2Output);
+  if (fMlog2DbDataSet == 0) {
+    fMlog2DbDataSet = new PMlog2DbDataSet();
+    // init fMlog2DbDataSet
+    fMlog2DbDataSet->firstRun = -1;
+    fMlog2DbDataSet->lastRun  = -1;
+    fMlog2DbDataSet->runList = QString("");
+    fMlog2DbDataSet->runListFileName = QString("");
+    fMlog2DbDataSet->msrFileExtension = QString("");
+    fMlog2DbDataSet->templateRunNo = -1;
+    fMlog2DbDataSet->dbOutputFileName = QString("");
+    fMlog2DbDataSet->writeDbHeader = false;
+    fMlog2DbDataSet->summaryFilePresent = false;
+    fMlog2DbDataSet->keepMinuit2Output = fKeepMinuit2Output;
+    fMlog2DbDataSet->writeColumnData = false;
+    fMlog2DbDataSet->recreateDbFile = false;
+  }
+
+  PMlog2DbDialog *dlg = new PMlog2DbDialog(fMlog2DbDataSet);
 
   if (dlg->exec() == QDialog::Accepted) {
     QString first, last;
@@ -966,6 +977,8 @@ void PTextEdit::musrMlog2Db()
     QFileInfo fi;
     QString str;
     int i, end;
+
+    fMlog2DbDataSet = dlg->getMlog2DbDataSet();
 
     // analyze parameters
     switch (dlg->getRunTag()) {
@@ -976,8 +989,8 @@ void PTextEdit::musrMlog2Db()
         return;
         break;
       case 0:  // first last
-        first = dlg->getFirstRunNo();
-        last  = dlg->getLastRunNo();
+        first = QString("%1").arg(fMlog2DbDataSet->firstRun);
+        last  = QString("%1").arg(fMlog2DbDataSet->lastRun);
         if (first.isEmpty() || last.isEmpty()) {
           QMessageBox::critical(this, "**ERROR**",
             "If you choose the first/last option,\nfirst AND last needs to be provided.",
@@ -986,7 +999,7 @@ void PTextEdit::musrMlog2Db()
         }
         break;
       case 1:  // run list
-        runList = dlg->getRunList();
+        runList = fMlog2DbDataSet->runList;
         if (!validRunList(runList)) {
           QMessageBox::critical(this, "**ERROR**",
             "Invalid Run List!\nThe run list needs to be a space separated list of run numbers.",
@@ -995,7 +1008,7 @@ void PTextEdit::musrMlog2Db()
         }
         break;
       case 2:  // run list file name
-        runListFileName = dlg->getRunListFileName();
+        runListFileName = fMlog2DbDataSet->runListFileName;
         fi = runListFileName;
         if (!fi.exists()) {
           str = QString("Run List File '%1' doesn't exist.").arg(runListFileName);
@@ -1051,7 +1064,7 @@ void PTextEdit::musrMlog2Db()
     }
 
     // file extension
-    str = dlg->getExtension();
+    str = fMlog2DbDataSet->msrFileExtension;
     if (str.isEmpty())
       cmd.append("");
     else
@@ -1060,30 +1073,55 @@ void PTextEdit::musrMlog2Db()
     // options
 
     // no header flag?
-    if (!dlg->getWriteDbHeaderFlag())
+    if (!fMlog2DbDataSet->writeDbHeader)
       cmd.append("noheader");
 
     // no summary flag?
-    if (!dlg->getSummaryFilePresentFlag())
+    if (!fMlog2DbDataSet->summaryFilePresent)
       cmd.append("nosummary");
 
     // template run no
-    if (!dlg->getTemplateRunNo().isEmpty()) {
-      str = "fit-" + dlg->getTemplateRunNo();
+    if (fMlog2DbDataSet->templateRunNo != -1) {
+      str = QString("%1").arg(fMlog2DbDataSet->templateRunNo);
+      str = "fit-" + str;
       cmd.append(str);
     }
 
     // keep minuit2 output
-    if (dlg->getMinuit2OutputFlag()) {
-      fKeepMinuit2Output = dlg->getMinuit2OutputFlag();
+    if (fMlog2DbDataSet->keepMinuit2Output) {
       cmd.append("-k");
     }
 
     // DB output wished
-    if (!dlg->getDbOutputFileName().isEmpty()) {
-      str = "-o" + dlg->getDbOutputFileName();
+    if (!fMlog2DbDataSet->dbOutputFileName.isEmpty()) {
+      str = "-o" + fMlog2DbDataSet->dbOutputFileName;
       cmd.append(str);
     }
+
+    // write column data
+    if (fMlog2DbDataSet->writeColumnData) {
+      cmd.append("data");
+    }
+
+    // recreate db file
+    if (fMlog2DbDataSet->recreateDbFile) {
+      if (!QFile::remove(fMlog2DbDataSet->dbOutputFileName)) {
+        str = QString("Couldn't delete db-file '%1'. Will **NOT** proceed.").arg(fMlog2DbDataSet->dbOutputFileName);
+        QMessageBox::critical(this, "**ERROR**", str,
+           QMessageBox::Ok, QMessageBox::NoButton);
+        return;
+      }
+    }
+
+    // add the swap flag
+    cmd.append("-s");
+
+/*
+for (unsigned int i=0; i<cmd.size(); i++) {
+  cout << endl << ">> " << cmd[i].latin1();
+}
+cout << endl;
+*/
 
     PFitOutputHandler fitOutputHandler(cmd);
     fitOutputHandler.setModal(true);
