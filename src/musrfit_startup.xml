@@ -6,6 +6,10 @@
     </comment>
     <data_path>/mnt/data/nemu/his</data_path>
     <data_path>/mnt/data/nemu/wkm</data_path>
+    <data_path>/afs/psi.ch/project/bulkmusr/data/gps</data_path>
+    <data_path>/afs/psi.ch/project/bulkmusr/data/dolly</data_path>
+    <data_path>/afs/psi.ch/project/bulkmusr/data/gpd</data_path>
+    <data_path>/afs/psi.ch/project/bulkmusr/data/ltf</data_path>
     <fourier_settings>
         <units>Gauss</units>
         <fourier_power>0</fourier_power>
