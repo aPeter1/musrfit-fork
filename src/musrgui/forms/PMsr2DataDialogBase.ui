@@ -13,7 +13,7 @@
         </rect>
     </property>
     <property name="caption">
-        <string>mlog2db input</string>
+        <string>msr2data input</string>
     </property>
     <property name="icon">
         <pixmap>image0</pixmap>
