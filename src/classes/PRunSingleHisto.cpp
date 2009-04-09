@@ -668,7 +668,7 @@ cout << endl << ">> data start time = " << fData.fDataTimeStart;
   for (unsigned int i=0; i<size; i++) {
     time = fData.fTheoryTimeStart + i*fTimeResolution;
     theoryValue = fTheory->Func(time, par, fFuncValues);
-    if (theoryValue > 10.0) {  // dirty hack needs to be fixed!!
+    if (fabs(theoryValue) > 10.0) {  // dirty hack needs to be fixed!!
       theoryValue = 0.0;
     }
     fData.fTheory.push_back(N0*TMath::Exp(-time/tau)*(1+theoryValue)+bkg);
@@ -823,7 +823,7 @@ cout << endl << "--------------------------------";
   for (unsigned int i=0; i<size; i++) {
     time = fData.fTheoryTimeStart + (double)i*fTimeResolution;
     theoryValue = fTheory->Func(time, par, fFuncValues);
-    if (theoryValue > 10.0) { // dirty hack needs to be fixed!!
+    if (fabs(theoryValue) > 10.0) { // dirty hack needs to be fixed!!
       theoryValue = 0.0;
     }
     fData.fTheory.push_back(theoryValue);

@@ -42,7 +42,8 @@ endif
 # -- Linux
 ifeq ($(OS),LINUX)
 CXX           = g++
-CXXFLAGS      = -O3 -Wall -Wno-trigraphs -fPIC
+#CXXFLAGS      = -O3 -Wall -Wno-trigraphs -fPIC
+CXXFLAGS      = -O1 -Wall -Wno-trigraphs -fPIC
 PMUSRPATH     = ../include
 MNPATH        = $(ROOTSYS)/include
 GSLPATH       = /usr/include/gsl
