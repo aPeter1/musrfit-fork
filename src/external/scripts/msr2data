@@ -1,0 +1,718 @@
+#!/bin/bash
+
+if [ ! -x /usr/bin/awk ]; then 
+  echo ">> msr2data: Please make sure you have installed awk!"
+  exit 1
+fi
+
+if [ "$#" -lt 2 ] ; then
+
+        cat <<EOFHELP
+
+        "musrfit-msr to db/dat converter"
+
+USAGE:   msr2data FIRSTRUN# LASTRUN# EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oOUTPUT_FILE | -k | data ]
+         OR
+         msr2data \[SPACE SEPARATED LIST OF RUNS\] EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oOUTPUT_FILE | -k | data ]
+         OR
+         msr2data RUNLISTFILE EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oOUTPUT_FILE | -k | data ]
+
+This small script converts subsequent musrfit msr output files into one db- or column-ASCII-file using bash/awk.
+
+Example 1:
+msr2data 1423 1425 _tf_h13
+generates the db-file "out.db" (or whatever filename you additionally specify with the -o option) from 1423_tf_h13.msr, 1424_tf_h13.msr, and 1425_tf_h13.msr .
+
+Example 2:
+msr2data [1487 1435] _tf_h13
+generates the db-file "out.db" (or whatever filename you additionally specify with the -o option) from 1487_tf_h13.msr and 1435_tf_h13.msr .
+
+Example 3:
+msr2data runs.txt _tf_h13
+generates the db-file "out.db" (or whatever filename you additionally specify with the -o option) from all runs listed in the ASCII-file
+"runs.txt" in the working directory. In the file it's also possible to include external parameters which should be put in the resulting db-file.
+The structure of the "runs.txt" is the following:
+
+RUN VAR1 VAR2 VAR3 ...
+2716 200 27.1 46.2 ...
+2787 205 27.1 46.3 ...
+2260 210 27.2 45.9 ...
+...
+
+The first line specifies the db-parameter names and labels and has to be present!
+
+The output files in all examples above also include the db header.
+In the case you are dealing with LEM-data AND have locally mounted the /mnt/data/nemu directory some available parameters like the 
+temperature or transport settings will be taken from the summary files and added to the db-file.
+You can suppress the reading of the summary files with the option "nosummary".
+
+If you want to generate a file without the header information just run the script with the option "noheader".
+
+If you additionally want to fit some data using musrfit specify the option "fit-TEMPLATERUN#".
+In this case either a mlog-outputfile or a msr-inputfile have to be present for the specified template run.
+The subsequent inputfiles will be created.
+
+Example 4:
+msr2data 200 220 _tf_h13 -oABC.db fit-199
+
+This will fit the runs 200 to 220 using musrfit. The file 199_tf_h13.msr (or if that is not available: 199_tf_h13.mlog) is used as 
+template for the first musrfit input file. The results of the fits will be written to ABC.db.
+
+For keeping the MINUIT2 output files after calling musrfit, i.e. invoke musrfit with the option "--keep-mn2-output" just pass the option "-k" to msr2data. If you pass this option to msr2data but do not fit any data, the option will just be ignored.
+
+If your musrfit output files do not have an extension as specified above like "200.msr" you have to call the script as in the following example.
+
+Example 5:
+msr2data 200 220 "" -oABC.db fit-199
+
+As an alternative to the db-format as output-format of the script it is possible to choose an ASCII file with simple data columns by invoking the script with the option "data". All features described above are available also for that case!
+
+CAUTION:
+The "indexing number" of the .msr has to be at the begin of the filename.
+Furthermore the data files that were fitted have to have the name "XXX_RUN#[_YYY]", where XXX,YYY are strings without whitespaces ("/" is OK).
+
+If you want to use the fitting feature, musrfit has to be installed either on the PATH or in the working directory.
+
+Those of you who do not like scripting without functions better do not look at the code. Still it is more or less straight forward.
+
+EOFHELP
+
+else
+
+  export PATH=./:$PATH
+
+  SUMMDIR="/mnt/data/nemu/summ"
+
+  # In case a list of runs is given by [...]
+  if [ "${1:0:1}" == "[" ]; then
+    RUNARRAY=($@)
+
+    if [ "$1" == "[" ]; then
+      RUNARRAY[0]=""
+    else
+      RUNARRAY[0]=${RUNARRAY[0]#"["}
+    fi
+    tLen=${#RUNARRAY[@]}
+    for (( i=0; i<${tLen}; i++ ))
+    do
+      if [ "$1" == "[" ]; then
+        RUNARRAY[$i]=${RUNARRAY[ (( i + 1 )) ]}
+      fi
+      if [ "${RUNARRAY[$i]:(-1)}" == "]" ]; then
+        if [ "${RUNARRAY[$i]}" == "]" ]; then
+          RUNARRAY[$i]=""
+          LASTRUN=$(( i - 1 )) # RUNARRAY-index of the last run
+        else
+          RUNARRAY[$i]=${RUNARRAY[$i]%"]"}
+          LASTRUN=$i # RUNARRAY-index of the last run
+        fi
+      fi
+    done
+
+    # search for the parameter including the "]"
+    for (( i=1; i<="$#"; i++ ))
+    do
+      RIGHTBRACKET=$( eval echo \${$i} )
+      if [ "${RIGHTBRACKET:(-1)}" == "]" ]; then
+        RIGHTBRACKET=$i
+        break
+      else
+        RIGHTBRACKET=0
+      fi
+    done
+
+    if [ "$RIGHTBRACKET" -eq 0 ]; then
+        echo
+        echo ">> msr2data: Syntax error - you used the list specification without closing bracket (])! Quitting now."
+        echo
+        exit 1
+    fi
+
+    EXTENSION=$( eval echo \${$((RIGHTBRACKET + 1))} )
+    FIRST_OPT_PAR=$((RIGHTBRACKET + 2))
+    LAST_OPT_PAR=$#
+    RUNLIST_USED=0
+    NUM_OF_IND_VAR=1 # 1 for the run number
+
+  else 
+    ISDIGIT1=$( echo $1 | awk '{ if (( $1 + 0 ) == $1 ) {print 1} else {print 0}}' ) # check if the first parameter is a number or not
+    ISDIGIT2=$( echo $2 | awk '{ if (( $1 + 0 ) == $1 ) {print 1} else {print 0}}' ) # check if the second parameter is a number or not
+    if [ "$ISDIGIT1" -eq 1 ] && [ "$ISDIGIT2" -eq 1 ]; then # start and end-runs are given
+      if [ "$1" -le "$2" ]; then # runs are given with increasing run numbers
+        for (( j=0; j<=$2-$1; j++ ))
+        do
+          RUNARRAY[$j]=$(( $1 + $j ))
+        done
+        LASTRUN=$(( $2 - $1 )) # RUNARRAY-index of the last run
+      else # runs are given with decreasing run numbers
+        for (( j=0; j<=$1-$2; j++ ))
+        do
+          RUNARRAY[$j]=$(( $1 - $j ))
+        done
+        LASTRUN=$(( $1 - $2 )) # RUNARRAY-index of the last run
+      fi
+
+      EXTENSION=$3
+
+      FIRST_OPT_PAR=4
+      LAST_OPT_PAR=$#
+      RUNLIST_USED=0
+      NUM_OF_IND_VAR=1 # 1 for the run number
+
+    elif [ "$ISDIGIT1" -eq 1 ] && [ "$ISDIGIT2" -eq 0 ]; then # only one run number is given
+      RUNARRAY[0]=$1
+
+      LASTRUN=0 # RUNARRAY-index of the last run
+      EXTENSION=$2
+
+      FIRST_OPT_PAR=3
+      LAST_OPT_PAR=$#
+      RUNLIST_USED=0
+      NUM_OF_IND_VAR=1 # 1 for the run number
+
+    else # assume a runlist-file with "independent variables" is given
+      if [ ! -r $1 ]; then
+        echo
+        echo ">> msr2data: The specified runlist file $1 is not present... Bye bye!"
+        echo
+        exit 1
+      fi
+
+      numberOfReadInLines=0
+
+      exec 3< $1 # open file for reading in the runlist-file the first time and get the runnumbers to be processed
+      while read -u 3 -a runList
+      do
+        if [ "$numberOfReadInLines" -eq 0 ]; then
+          NUM_OF_IND_VAR=${#runList[@]}
+        else
+          RUNARRAY[(( numberOfReadInLines - 1 ))]=${runList[0]}
+        fi
+        ((numberOfReadInLines++))
+      done
+      exec 3<&- # close file
+
+      LASTRUN=$(( ${#RUNARRAY[@]} - 1 )) # RUNARRAY-index of the last run
+      EXTENSION=$2
+
+      FIRST_OPT_PAR=3
+      LAST_OPT_PAR=$#
+      RUNLIST_USED=1
+    fi
+  fi
+
+  # Check if fitting should be done
+  TEMP=""
+  for PAR in "$@"
+  do
+    if [ "${PAR:0:3}" == "fit" ]; then
+      TEMP=${PAR:4}
+      break
+    fi
+  done
+
+  # define which file (msr or mlog) contains the musrfit-output
+  INPUTEXT=mlog
+  OUTPUTEXT=msr
+
+  if [ "$TEMP" != "" ]; then # runs should be fitted using musrfit
+
+  # Check for musrfit on the PATH and if found continue with searching the fit-template
+  PATHTOMUSRFIT=$(echo `which musrfit`)
+    if [ "$PATHTOMUSRFIT" == "" ]; then
+      echo
+      echo ">> msr2data: No musrfit executable was found on the PATH or in the current directory!"
+      echo ">> msr2data: Please install musrfit first!"
+      echo
+      exit 1
+    else
+      if [ -r $TEMP$EXTENSION.$OUTPUTEXT ]; then
+        TEMPLATE=$TEMP$EXTENSION.$OUTPUTEXT
+      elif [ -r $TEMP$EXTENSION.$INPUTEXT ]; then
+        TEMPLATE=$TEMP$EXTENSION.$INPUTEXT
+      fi
+    fi
+  fi
+
+  for (( q=0; q<=LASTRUN; q++ )) # loop over all RUNARRAY entries - the actual data-processing
+  do
+    COUNT=${RUNARRAY[$q]}
+    NEXTCOUNT=${RUNARRAY[ (( q + 1 )) ]}
+    NEXTINPUT=$NEXTCOUNT$EXTENSION.msr
+    FIRSTINPUT=${RUNARRAY[0]}$EXTENSION.msr
+
+    if [ "$TEMP" != "" ]; then # if fitting should be done
+      if [ "$TEMPLATE" == "" ]; then
+        echo
+        echo ">> msr2data: The specified musrfit template files $TEMP$EXTENSION.$OUTPUTEXT and $TEMP$EXTENSION.$INPUTEXT do not exist!"
+        echo
+        exit 1
+      fi
+
+      # if it's the first run to be fitted, take the template and substitute the runnumber to match the first run
+      if [ "$q" -eq 0 ]; then
+        awk -v count=$TEMP -v nextcount=${RUNARRAY[0]} -v nextinput=$FIRSTINPUT '{
+          if(NR==1) print nextcount > nextinput
+          else if($1 == "RUN") {
+            if (substr(count,1,1) != "_"){ count = sprintf("_%04u", count); nextcount = sprintf("_%04u", nextcount);}
+            if ($2 !~ count){
+              print " "
+              print ">> msr2data: ATTENTION The run-numbers in the filename and the RUN-block of the template file do not match!"
+              print ">> msr2data: The run-number substitution is most likely going wrong!"
+              print " "
+            }
+            sub(count, nextcount, $0);
+            print $0 >> nextinput
+          }
+          else print $0 >> nextinput
+        }' $TEMPLATE
+      fi
+
+      MUSRFITPARAM=""
+      for PAR in "$@"
+      do
+        if [ "$PAR" == "-k" ]; then
+          MUSRFITPARAM="-k"
+          break
+        fi
+      done
+
+      echo
+      echo ">> msr2data: musrfit $COUNT$EXTENSION.msr $MUSRFITPARAM"
+      echo
+      musrfit $COUNT$EXTENSION.msr $MUSRFITPARAM # the fit
+
+      if [ "$q" -ne "$LASTRUN" ]; then # create the next musrfit input file if not the last specified run was fitted already
+        awk -v count=$COUNT -v nextcount=$NEXTCOUNT -v nextinput=$NEXTINPUT '{
+          if(NR==1) print nextcount > nextinput
+          else if($1 == "RUN") {
+            if (substr(count,1,1) != "_"){ count = sprintf("_%04u", count); nextcount = sprintf("_%04u", nextcount);}
+            if ($2 !~ count){
+              print " "
+              print ">> msr2data: ATTENTION The run-numbers in the filename and the RUN-block of the file do not match!"
+              print ">> msr2data: The run-number substitution is most likely going wrong!"
+              print " "
+            }
+            sub(count, nextcount, $0);
+            print $0 >> nextinput
+          }
+          else print $0 >> nextinput
+        }' $COUNT$EXTENSION.$OUTPUTEXT
+      fi
+    fi
+
+    if [ ! -r $COUNT$EXTENSION.$OUTPUTEXT ]; then
+      echo
+      echo ">> msr2data: The specified musrfit output file $COUNT$EXTENSION.$OUTPUTEXT does not exist!"
+      echo
+      exit 1
+    fi
+
+    # if the "nosummary"-option is not set and the summary files are present, get some information from there
+    NOSUMMARY=0
+    for PAR in "$@"
+    do
+      if [ "$PAR" == "nosummary" ]; then
+        NOSUMMARY=1
+        break
+      fi
+    done
+
+    if [ "$NOSUMMARY" -eq 0 ]; then
+
+      if [ -d $SUMMDIR ]; then
+        # extract runnumber from mlog/msr-file
+        RUNNUMBER=$( awk '{
+          if(NR==1) X=0
+          if($1 ~ /^RUN/ && X==0) {
+            split($2, runNumber, "_")
+            if(runNumber[1] ~ /lem/ && runNumber[2] != "his") {print runNumber[2] }
+            if(runNumber[1] ~ /lem/ && runNumber[2] == "his") {print substr(runNumber[3],1,4) }
+            X=1 
+          }
+        }' $COUNT$EXTENSION.$OUTPUTEXT )
+
+        # extract runyear from mlog/msr-file in case of LEM-data
+        RUNYEAR=$( awk '{
+          if(NR==1) X=0
+          if($1 ~ /^RUN/ && X==0) {
+            split($2, runNumber, "_")
+            if(runNumber[1] ~ /lem/) {print substr(runNumber[1],length(runNumber[1])-1)}
+            else print "XX"
+            X=1
+          }
+        }' $COUNT$EXTENSION.$OUTPUTEXT )
+
+        if [ "$RUNYEAR" != "XX" ]; then # in case of LEM-data search the summary-file
+          SUMMFILE=$SUMMDIR/20$RUNYEAR/lem$RUNYEAR\_$RUNNUMBER.summ
+          TITLE=$( awk '{ if(NR==4) print $0 }' $SUMMFILE )
+          ENERGY=$( awk '{ if($0 ~ /implantation energy/) print $(NF-1)}' $SUMMFILE ) 
+          TEMPERATURE=$( awk '{ if($1 == "Sample_CF1") print $(NF-1)}' $SUMMFILE )
+          RALRAR=$( awk '{ if($5 == "RA-L") RAL=$7; if($1 == "RA-R") { RAR=$3; print RAL-RAR; nextfile } }' $SUMMFILE )
+          RATRAB=$( awk '{ if($5 == "RA-T") RAT=$7; if($1 == "RA-B") { RAB=$3; print RAT-RAB; nextfile } }' $SUMMFILE )
+          TRANSPORT=$( awk '{ if($1 == "Moderator") print $3}' $SUMMFILE )
+        fi
+      fi
+    fi
+
+    # determine the script-output file format, default: db
+    FORMAT=db
+    for PAR in "$@"
+    do
+      if [ "$PAR" == "data" ]; then
+        FORMAT=dat
+        break
+      fi
+    done
+
+    # determine the output-file
+    if [ "$FORMAT" == "dat" ]; then
+      OUTFILE="out.dat"
+    else
+      OUTFILE="out.db"
+    fi
+
+    for (( l="$FIRST_OPT_PAR"; l<="$LAST_OPT_PAR"; l++ ))
+    do
+      CUR_PAR=$( eval echo \${$l} )
+      NEXT_PAR=$( eval echo \${$((l+1))} )
+      if [ "${CUR_PAR:0:2}" == "-o" ]; then
+        if [ "$CUR_PAR" == "-o" ]; then
+          if [ "$l" -ne "$LAST_OPT_PAR" ] && [ "$NEXT_PAR" != "noheader" ] && [ "$NEXT_PAR" != "nosummary" ] \
+          && [ "${NEXT_PAR:0:3}" != "fit" ] && [ "$NEXT_PAR" != "-k" ]; then
+            OUTFILE=$NEXT_PAR
+            break
+          else
+            echo
+            echo ">> msr2data: You did not specify an output file! The default one ($OUTFILE) will be used."
+            echo
+          fi
+        else
+          OUTFILE=${CUR_PAR:2}
+          break
+        fi
+      fi
+    done
+
+    # determine, if the header should be written to the output file, default: YES
+    NOHEADER=0
+    for PAR in "$@"
+    do
+      if [ "$PAR" == "noheader" ]; then
+        NOHEADER=1
+        break
+      fi
+    done
+
+    # put together all data to db- or column-format and write it to the file
+    awk -v outfile=$OUTFILE -v noheader=$NOHEADER -v runList=$RUNLIST_USED -v numIndVar=$NUM_OF_IND_VAR -v format=$FORMAT '{
+
+      FS = " "
+      OFS = " "
+
+      if(NR==1){title=$0; X=0; Y=0; i=1}
+
+      if(NR>1){
+        if(X == 0){
+          if($1 == i){
+            parArray[i] = $2
+            dataArray[i] = $3
+            if($4 ~ /^-/)
+              negErrArray[i] = (-1.0)*$4
+            else
+              negErrArray[i] = $4
+            if($5 ~ /none/)
+              posErrArray[i] = $4
+            else
+              posErrArray[i] = $5
+            i++
+          }
+          if($1 ~ /^THEORY/) X=1
+        }
+      }
+
+      if($1 ~ /^RUN/ && X==1){ split($2, runNumber, "_"); X=2 }	
+
+      if($1 ~ /^chi/ && X==2){
+        parArray[i] = "CHISQ"
+        parArray[i+1] = "NDF"
+        parArray[i+2] = "CHISQred"
+        parArray[i+3] = "RUN"
+
+        sub(/,/, "", $3); sub(/,/, "", $6);
+
+        dataArray[i] = $3
+        dataArray[i+1] = $6
+        dataArray[i+2] = $9
+
+        for (j in runNumber) {
+          if ( runNumber[j] ~ /^0/ ) {
+            sub(/0+/, "", runNumber[j])
+          }
+          if (int(runNumber[j]) == runNumber[j]) {
+            dataArray[i+3] = runNumber[j]
+            break
+          }
+          else dataArray[i+3] = "0000"
+        }
+
+        negErrArray[i] = "0"
+        negErrArray[i+1] = "0"
+        negErrArray[i+2] = "0"
+        negErrArray[i+3] = "0"
+
+        posErrArray[i] = "0"
+        posErrArray[i+1] = "0"
+        posErrArray[i+2] = "0"
+        posErrArray[i+3] = "0"
+
+        # Read in the runlist-variable names
+        if(runList == 1){
+          getline line < "'"$1"'"
+          split(line, indVar, " ")
+        }
+
+        # Output to db-file in the case, the LEM summary file is accessible and the option "nosummary" is not set
+
+        if(format != "dat") {
+          if("'"$TEMPERATURE"'" != "") {
+
+            # Write the db-header
+            if("'"$q"'" == 0 && noheader != 1){
+
+              print "TITLE" >> outfile
+              print ">>>Put your title here<<<\n" >> outfile
+              print "Abstract" >> outfile
+              print ">>>Put your abstract here<<<\n" >> outfile
+              print "LABELS" >> outfile
+              print "T (K)" >> outfile
+              print "Tr (kV)" >> outfile
+              print "E (keV)" >> outfile
+              print "RAL-RAR (kV)" >> outfile
+              print "RAT-RAB (kV)" >> outfile
+
+              if(runList == 1){
+                for(k=2;k<=numIndVar;k++){print indVar[k] >> outfile}
+              }
+
+              for(k=1;k<i+4;k++){
+                print parArray[k] >> outfile
+              }
+
+              $1 = "Data"
+              $2 = "T"
+              $3 = "Tr"
+              $4 = "E"
+              $5 = "RALRAR"
+              $6 = "RATRAB"
+
+              for(k=1;k<numIndVar;k++){
+                $(k+6)=indVar[k+1]
+              }
+
+              for(k=1;k<i+4;k++){
+                $(k+6+numIndVar-1)=parArray[k]
+              }
+
+              print "\n" $0 >> outfile
+              print "\\-e" >> outfile
+            }
+
+            # Write the data-block
+            print "T = " "'"$TEMPERATURE"'" ",,,\\" >> outfile
+            print "Tr = " "'"$TRANSPORT"'" ",,,\\" >> outfile
+            if ("'"$ENERGY"'" != "") print "E = " "'"$ENERGY"'" ",,,\\" >> outfile
+            else print "E = -999,,,\\" >> outfile
+            if ("'"$RALRAR"'" != "") print "RALRAR = " "'"$RALRAR"'" ",,,\\" >> outfile	
+            else print "RALRAR = -999,,,\\" >> outfile
+            if ("'"$RATRAB"'" != "") print "RATRAB = " "'"$RATRAB"'" ",,,\\" >> outfile
+            else print "RATRAB = -999,,,\\" >> outfile
+
+            if(runList == 1) { # process the "independent variables" from the file
+              while((getline line < "'"$1"'") > 0){
+                split(line, indVarValue, " ")
+                if (indVarValue[1] == "'"$COUNT"'"){
+                  for(k=2;k<=numIndVar;k++){print indVar[k] " = " indVarValue[k] ",,,\\" >> outfile}
+                  break
+                }
+              }
+            }
+
+            for(l=1;l<i+3;l++){
+              print parArray[l] " = " dataArray[l] ", " posErrArray[l] ", " negErrArray[l] ",\\" >> outfile
+            }
+
+            print dataArray[i+3] ",,, " "'"$TITLE"'" >> outfile
+
+            if("'"$q"'" == "'"$LASTRUN"'") print "\n" >> outfile
+          }
+
+          # If we do not have the information from the summary file or "nosummary" is set
+          else {
+            if("'"$q"'" == 0 && noheader != 1){
+
+              print "TITLE" >> outfile
+              print ">>>Put your title here<<<\n" >> outfile
+              print "Abstract" >> outfile
+              print ">>>Put your abstract here<<<\n" >> outfile
+              print "LABELS" >> outfile
+
+              if(runList == 1){
+                for(k=2;k<=numIndVar;k++){print indVar[k] >> outfile}
+              }
+
+              for(k=1;k<i+4;k++){
+                print parArray[k] >> outfile
+              }
+
+              $1 = "Data"
+
+              for(k=1;k<numIndVar;k++){
+                $(k+1)=indVar[k+1]
+              }
+
+              for(k=1;k<i+4;k++){
+                $(k+1+numIndVar-1)=parArray[k]
+              }
+
+              print "\n" $0 >> outfile
+              print "\\-e" >> outfile
+            }
+
+            if(runList == 1) {
+              while((getline line < "'"$1"'") > 0){
+                split(line, indVarValue, " ")
+                if (indVarValue[1] == "'"$COUNT"'"){
+                  for(k=2;k<=numIndVar;k++){print indVar[k] " = " indVarValue[k] ",,,\\" >> outfile}
+                  break
+                }
+              }
+            }
+
+            for(l=1;l<i+3;l++){
+              print parArray[l] " = " dataArray[l] ", " posErrArray[l] ", " negErrArray[l] ",\\" >> outfile
+            }
+
+            print dataArray[i+3] ",,, " title >> outfile
+
+            if("'"$q"'" == "'"$LASTRUN"'") print "\n" >> outfile
+          }
+        }
+
+        # output to a data-file with simple column-structure
+        # first if the LEM-summary files are present and "nosummary" has not been set
+        else {
+          if("'"$TEMPERATURE"'" != "") {
+
+            # Write the dat-header
+            if("'"$q"'" == 0 && noheader != 1){
+
+              $1 = "T"
+              $2 = "Tr"
+              $3 = "E"
+              $4 = "RALRAR"
+              $5 = "RATRAB"
+
+              for(k=1;k<numIndVar;k++){
+                $(k+5)=indVar[k+1]
+              }
+
+              for(k=1;k<i;k++){ # musrfit parameters
+                $(3*k-2+5+numIndVar-1)=parArray[k]
+                $(3*k-2+5+numIndVar)="PosErr"
+                $(3*k-2+5+numIndVar+1)="NegErr"
+              }
+
+              for(k=0;k<4;k++){ # CHI2, NDF, CHI2red, RUN (without errors)
+                $(3*i-2+5+numIndVar-1+k)=parArray[i+k]
+              }
+
+              print $0 >> outfile
+            }
+
+            # Write the data-block
+            $1 = "'"$TEMPERATURE"'"
+            $2 = "'"$TRANSPORT"'"
+            if ("'"$ENERGY"'" != "") { $3 = "'"$ENERGY"'" } else { $3 = "-999" }
+            if ("'"$RALRAR"'" != "") { $4 = "'"$RALRAR"'" } else { $4 = "-999" }
+            if ("'"$RATRAB"'" != "") { $5 = "'"$RATRAB"'" } else { $5 = "-999" }
+
+            if(runList == 1) { # process the "independent variables" from the file
+              while((getline line < "'"$1"'") > 0){
+                split(line, indVarValue, " ")
+                if (indVarValue[1] == "'"$COUNT"'"){
+                  for(k=2;k<=numIndVar;k++){ $(k+4) = indVarValue[k] }
+                  break
+                }
+              }
+            }
+
+            for(l=1;l<i;l++){ # musrfit parameters
+              $(3*l-2+5+numIndVar-1)=dataArray[l]
+              $(3*l-2+5+numIndVar)=posErrArray[l]
+              $(3*l-2+5+numIndVar+1)=negErrArray[l]
+            }
+
+            for(l=0;l<4;l++){ # CHI2, NDF, CHI2red, RUN (without errors)
+              $(3*i-2+5+numIndVar-1+l)=dataArray[i+l]
+            }
+
+            print $0 >> outfile
+
+            if("'"$q"'" == "'"$LASTRUN"'") print "\n" >> outfile
+          }
+
+          # If we do not have the information from the summary file or "nosummary" is set
+          # Writing to column-data file
+          else {
+            if("'"$q"'" == 0 && noheader != 1){
+
+              for(k=1;k<numIndVar;k++){
+                $(k)=indVar[k+1]
+              }
+
+              for(k=1;k<i;k++){ # musrfit parameters
+                $(3*k-2+numIndVar-1)=parArray[k]
+                $(3*k-2+numIndVar)="PosErr"
+                $(3*k-2+numIndVar+1)="NegErr"
+              }
+
+              for(k=0;k<4;k++){ # CHI2, NDF, CHI2red, RUN (without errors)
+                $(3*i-2+numIndVar-1+k)=parArray[i+k]
+              }
+
+              print $0 >> outfile
+            }
+
+            # Write the data-block
+
+            if(runList == 1) { # process the "independent variables" from the file
+              while((getline line < "'"$1"'") > 0){
+                split(line, indVarValue, " ")
+                if (indVarValue[1] == "'"$COUNT"'"){
+                  for(k=2;k<=numIndVar;k++){ $(k-1) = indVarValue[k] }
+                  break
+                }
+              }
+            }
+
+            for(l=1;l<i;l++){ # musrfit parameters
+              $(3*l-2+numIndVar-1)=dataArray[l]
+              $(3*l-2+numIndVar)=posErrArray[l]
+              $(3*l-2+numIndVar+1)=negErrArray[l]
+            }
+
+            for(l=0;l<4;l++){ # CHI2, NDF, CHI2red, RUN (without errors)
+              $(3*i-2+numIndVar-1+l)=dataArray[i+l]
+            }
+
+            print $0 >> outfile
+
+            if("'"$q"'" == "'"$LASTRUN"'") print "\n" >> outfile
+
+          }
+        }
+      }
+    }' $COUNT$EXTENSION.$OUTPUTEXT
+  done
+fi
