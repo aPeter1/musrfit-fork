@@ -49,8 +49,9 @@ You can suppress the reading of the summary files with the option "nosummary".
 If you want to generate a file without the header information just run the script with the option "noheader".
 
 If you additionally want to fit some data using musrfit specify the option "fit-TEMPLATERUN#".
-In this case either a mlog-outputfile or a msr-inputfile have to be present for the specified template run.
-The subsequent inputfiles will be created.
+In this case either a msr-file or a mlog-file have to be present for the specified template run.
+The subsequent input files will be created.
+If you add a "!" to the fit option, e.g. "fit-199!" the specified template will serve as template for ALL runs, not only for the first one.
 
 Example 4:
 msr2data 200 220 _tf_h13 -oABC.db fit-199
@@ -217,8 +218,14 @@ else
 
   if [ "$TEMP" != "" ]; then # runs should be fitted using musrfit
 
+    SETBATCH=0 # check if the TEMPLATE file should ALWAYS be the template or only for the first run
+    if [ "${TEMP:(-1)}" == "!" ]; then
+      SETBATCH=1
+      TEMP=${TEMP%"!"}
+    fi
+
   # Check for musrfit on the PATH and if found continue with searching the fit-template
-  PATHTOMUSRFIT=$(echo `which musrfit`)
+    PATHTOMUSRFIT=$(echo `which musrfit`)
     if [ "$PATHTOMUSRFIT" == "" ]; then
       echo
       echo ">> msr2data: No musrfit executable was found on the PATH or in the current directory!"
@@ -283,7 +290,14 @@ else
       musrfit $COUNT$EXTENSION.msr $MUSRFITPARAM # the fit
 
       if [ "$q" -ne "$LASTRUN" ]; then # create the next musrfit input file if not the last specified run was fitted already
-        awk -v count=$COUNT -v nextcount=$NEXTCOUNT -v nextinput=$NEXTINPUT '{
+        if [ "$SETBATCH" -eq 1 ]; then # check if the TEMPLATE should be ALWAYS used or only the first time and use the according file
+          COUNTX=$TEMP
+          TEMPLATEX=$TEMPLATE
+        else
+          COUNTX=$COUNT
+          TEMPLATEX=$COUNT$EXTENSION.$OUTPUTEXT
+        fi
+        awk -v count=$COUNTX -v nextcount=$NEXTCOUNT -v nextinput=$NEXTINPUT '{
           if(NR==1) print nextcount > nextinput
           else if($1 == "RUN") {
             if (substr(count,1,1) != "_"){ count = sprintf("_%04u", count); nextcount = sprintf("_%04u", nextcount);}
@@ -297,7 +311,7 @@ else
             print $0 >> nextinput
           }
           else print $0 >> nextinput
-        }' $COUNT$EXTENSION.$OUTPUTEXT
+        }' $TEMPLATEX
       fi
     fi
 
@@ -712,6 +726,12 @@ else
 
           }
         }
+      }
+      if($2 ~ /FIT/ && $3 ~ /DID/ && $4 ~ /NOT/ && $5 ~ /CONVERGE/ && X==2){
+        print " "
+        print ">> msr2data: ATTENTION At least one of the performed fits has not been converged!"
+        print ">> msr2data: The data of " ARGV[1] " has not been included in " outfile "!"
+        print " "
       }
     }' $COUNT$EXTENSION.$OUTPUTEXT
   done
