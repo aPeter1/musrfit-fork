@@ -4,48 +4,21 @@
 # $Id$
 #---------------------------------------------------------------------
 
-The following programs are available:
+To get it all build:
 
-1) msr2msr
-2) musrfit
+1) go to the subdiretory 'classes' and execute
 
-which will be described below (including build instructions).
-
-*************
-1) msr2msr
-*************
-
-The original msr-files used in WKM (wkmfit, wkmview, ...) do have some shortcomings, hence it was necessary to slightly change the file format of these msr-files and hence sacrify the backwards compatibility. In order to be able to use old wkm-files, msr2msr was written. This program takes an old msr-file and converts it to a new one. If a new msr-file is fed to msr2msr, the output will be just a mere copy of the file, and hence it doesn't harm. This means, whenever you are not sure if the given msr-file is a new or and old one, just execute msr2msr.
-
-usage: msr2msr <msr-file-in> <msr-file-out> | [--help]
-  <msr-file-in> : input msr-file
-  <msr-file-out>: converted msr-output-file
-
-Build Instructions:
--------------------
-
-make -f Makefile.msr2msr
-make -f Makefile.msr2msr install
-
-*************
-1) musrfit
-*************
-
-musrfit is the first program in a series to be written which will be a full replacement for the corresponding WKM programs, e.g. wkmfit -> musrfit, etc.
-
-Build Instructions:
--------------------
-
-In order to get musrfit compiled, you need first to build the shared library libPMusr.so. In order to do so, please follow the instruction given in the file classes/BUILD.
-
-make -f Makefile.musrfit
-make -f Makefile.musrfit install
-
-If it doesn't work for linux, try to set first
-
-export OSTYPE=linux
-
-for some shells this is needed but I have no clue why it is NOT recognised automatically ...
+   make -f Makefile.PMusr
+   make -f Makefile.PMusr install (as root)
+   
+2) if the privous step worked execute in the current directory (in which 
+   you found this README)
+   
+   make clean
+   make 
+   make install
+   
+In the optimal case, everything is setup ;-)
 
 #---------------------------------------------------------------------
 # this is the end ...

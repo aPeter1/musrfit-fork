@@ -1,5 +1,5 @@
 #---------------------------------------------------
-# Makefile.musrt0
+# Makefile
 #
 # Author: Andreas Suter
 # e-mail: andreas.suter@psi.ch
@@ -37,7 +37,6 @@ CXX           = g++
 CXXFLAGS      = -g -Wall -fPIC
 PMUSRPATH     = ./include
 MNPATH        = $(ROOTSYS)/include
-#GSLPATH       = /usr/include/gsl
 INCLUDES      = -I $(PMUSRPATH) -I $(MNPATH)
 LD            = g++
 LDFLAGS       = -g
@@ -69,20 +68,20 @@ MMLIB         = -L$(ROOTSYS)/lib -lMathMore
 
 INSTALLPATH = $(HOME)/analysis/bin
 
-EXEC = musrt0
+EXEC = musrfit musrview musrparam musrt0 msr2msr
 
 # some definitions: headers, sources, objects,...
 OBJS =
-OBJS += $(EXEC).o
+OBJS += musrfit.o musrview.o musrparam.o musrt0.o msr2msr.o
 
 # make the executable:
 #
 all:  $(EXEC)
 
 $(EXEC): $(OBJS)
-	@echo "---> Building $(EXEC) ..."
+	@echo "---> Building $@ ..."
 	/bin/rm -f $(SHLIB)
-	$(LD) $(OBJS) -o $(EXEC) $(GLIBS) $(PSILIBS) $(MNLIB) $(MMLIB)
+	$(LD) $< -o $@ $(GLIBS) $(PSILIBS) $(MNLIB) $(MMLIB)
 	@echo "done"
 
 # clean up: remove all object file (and core files)
@@ -95,8 +94,7 @@ clean:; 	@rm -f $(OBJS)
 #
 $(OBJS): %.o: %.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
-
+	
 install: all
-	@echo "copy $(EXEC) to $(INSTALLPATH)"
 	cp -p $(EXEC) $(INSTALLPATH)
-
+	cp -p musrfit_startup.xml $(INSTALLPATH)
