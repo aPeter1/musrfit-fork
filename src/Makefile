@@ -78,7 +78,31 @@ OBJS += musrfit.o musrview.o musrparam.o musrt0.o msr2msr.o
 #
 all:  $(EXEC)
 
-$(EXEC): $(OBJS)
+musrfit: musrfit.o
+	@echo "---> Building $@ ..."
+	/bin/rm -f $(SHLIB)
+	$(LD) $< -o $@ $(GLIBS) $(PSILIBS) $(MNLIB) $(MMLIB)
+	@echo "done"
+
+musrview: musrview.o
+	@echo "---> Building $@ ..."
+	/bin/rm -f $(SHLIB)
+	$(LD) $< -o $@ $(GLIBS) $(PSILIBS) $(MNLIB) $(MMLIB)
+	@echo "done"
+
+musrt0: musrt0.o
+	@echo "---> Building $@ ..."
+	/bin/rm -f $(SHLIB)
+	$(LD) $< -o $@ $(GLIBS) $(PSILIBS) $(MNLIB) $(MMLIB)
+	@echo "done"
+
+musrparam: musrparam.o
+	@echo "---> Building $@ ..."
+	/bin/rm -f $(SHLIB)
+	$(LD) $< -o $@ $(GLIBS) $(PSILIBS) $(MNLIB) $(MMLIB)
+	@echo "done"
+
+msr2msr: msr2msr.o
 	@echo "---> Building $@ ..."
 	/bin/rm -f $(SHLIB)
 	$(LD) $< -o $@ $(GLIBS) $(PSILIBS) $(MNLIB) $(MMLIB)
