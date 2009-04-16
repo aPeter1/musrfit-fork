@@ -670,8 +670,13 @@ void PTextEdit::editComment()
       indexFrom = 0;
       currentEditor()->setSelection(paraFrom, indexFrom, paraTo, indexTo);
     }
+    // check that cursor is not in next line without selecting anything
+    if (indexTo == 0) {
+      paraTo--;
+      indexTo++;
+    }
     // check that indexTo == end of line of paraTo
-    if (indexTo != (int)currentEditor()->text(paraTo).length()) {
+    if ((indexTo != (int)currentEditor()->text(paraTo).length()) && (indexTo != 0)) {
       indexTo = currentEditor()->text(paraTo).length();
       currentEditor()->setSelection(paraFrom, indexFrom, paraTo, indexTo);
     }
@@ -689,6 +694,8 @@ void PTextEdit::editComment()
     }
     str = strList.join("\n");
     currentEditor()->insert(str);
+    // set the cursor position
+    currentEditor()->setCursorPosition(++paraTo, 0);
   } else { // no text selected
     int para, index;
     currentEditor()->getCursorPosition(&para, &index);
@@ -705,6 +712,8 @@ void PTextEdit::editComment()
     currentEditor()->setSelection(para, 0, para, currentEditor()->text(para).length());
     // insert altered text
     currentEditor()->insert(str);
+    // set the cursor position
+    currentEditor()->setCursorPosition(para, 0);
   }
 }
 
