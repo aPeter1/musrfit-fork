@@ -371,20 +371,16 @@ else
 
     # determine the script-output file format, default: db
     FORMAT=db
+    OUTFILE="out.db"
+
     for PAR in "$@"
     do
       if [ "$PAR" == "data" ]; then
         FORMAT=dat
+        OUTFILE="out.dat"
         break
       fi
     done
-
-    # determine the output-file
-    if [ "$FORMAT" == "dat" ]; then
-      OUTFILE="out.dat"
-    else
-      OUTFILE="out.db"
-    fi
 
     for (( l="$FIRST_OPT_PAR"; l<="$LAST_OPT_PAR"; l++ ))
     do
@@ -447,10 +443,15 @@ else
 
       if($1 ~ /^RUN/ && X==1){ split($2, runNumber, "_"); X=2 }	
 
-      if($1 ~ /^chi/ && X==2){
-        parArray[i] = "CHISQ"
+      if(($1 ~ /^chisq/ || $1 ~ /^maxLH/) && X==2){
+        if($1 ~ /^maxLH/){
+          parArray[i] = "maxLH"
+          parArray[i+2] = "maxLHred"
+        } else {
+          parArray[i] = "CHISQ"
+          parArray[i+2] = "CHISQred"
+        }
         parArray[i+1] = "NDF"
-        parArray[i+2] = "CHISQred"
         parArray[i+3] = "RUN"
 
         sub(/,/, "", $3); sub(/,/, "", $6);
@@ -727,7 +728,7 @@ else
           }
         }
       }
-      if($2 ~ /FIT/ && $3 ~ /DID/ && $4 ~ /NOT/ && $5 ~ /CONVERGE/ && X==2){
+      if($0 ~ /*** FIT DID NOT CONVERGE ***/ && X==2){
         print " "
         print ">> msr2data: ATTENTION At least one of the performed fits has not been converged!"
         print ">> msr2data: The data of " ARGV[1] " has not been included in " outfile "!"
