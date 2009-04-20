@@ -199,6 +199,7 @@ class PTheory
     virtual double Func(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
 
   private:
+    virtual void CleanUp(PTheory *theo);
     virtual int SearchDataBase(TString name);
     virtual void MakeCleanAndTidyTheoryBlock(PMsrLines* fullTheoryBlock);
     virtual void MakeCleanAndTidyPolynom(unsigned int i, PMsrLines* fullTheoryBlock);

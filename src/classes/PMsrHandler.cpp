@@ -96,6 +96,11 @@ PMsrHandler::~PMsrHandler()
   fPlots.clear();
   fStatistic.fStatLines.clear();
   fParamInUse.clear();
+
+  if (fFuncHandler) {
+    delete fFuncHandler;
+    fFuncHandler = 0;
+  }
 }
 
 //--------------------------------------------------------------------------

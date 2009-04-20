@@ -123,10 +123,10 @@
     </func>
     <func>
       <name>internFld</name>
-      <comment>(phase frequency Trate Lrate)</comment>
+      <comment>(fraction phase frequency Trate Lrate)</comment>
       <label>internal Lorentz field</label>
       <pixmap>internalField.png</pixmap>
-      <params>4</params>
+      <params>5</params>
     </func>
     <func>
       <name>TFieldCos</name>

@@ -351,7 +351,7 @@ int main(int argc, char *argv[])
 
   // read input file and write output file
   char str[256];
-  int  tag;
+  int  tag = -1;
   bool success = true;
   while (!fin.eof() && success) {
     fin.getline(str, sizeof(str));

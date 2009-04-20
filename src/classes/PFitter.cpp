@@ -103,6 +103,16 @@ PFitter::~PFitter()
 {
   fCmdList.clear();
 
+  if (fMnUserParamState) {
+    delete fMnUserParamState;
+    fMnUserParamState = 0;
+  }
+
+  if (fFcnMin) {
+    delete fFcnMin;
+    fFcnMin = 0;
+  }
+
   if (fFitterFcn) {
     delete fFitterFcn;
     fFitterFcn = 0;
@@ -831,13 +841,17 @@ bool PFitter::ExecuteSave()
         hcorr->Draw("COLZTEXT");
       else
         hcorr->Draw("COLZ");
-      ccorr->Write();
+      ccorr->Write("ccorr", TObject::kOverwrite, sizeof(ccorr));
       ff.Close();
       // clean up
-      if (ccorr)
+      if (ccorr) {
         delete ccorr;
-      if (hcorr)
+        ccorr = 0;
+      }
+      if (hcorr) {
         delete hcorr;
+        hcorr = 0;
+      }
     }
     parNo.clear(); // clean up
   } else {

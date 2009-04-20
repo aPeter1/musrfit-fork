@@ -301,15 +301,8 @@ PTheory::~PTheory()
   fLFIntegral.clear();
   fDynLFFuncValue.clear();
 
-  if (fMul) {
-    delete fMul;
-    fMul = 0;
-  }
-
-  if (fAdd) {
-    delete fAdd;
-    fAdd = 0;
-  }
+  // recursive clean up
+  CleanUp(this);
 
   if (fUserFcn) {
     delete fUserFcn;
@@ -662,6 +655,30 @@ double PTheory::Func(register double t, const PDoubleVector& paramValues, const 
   }
 
   return 0.0;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p> Recursively clean up theory
+ *
+ * \param theo
+ */
+void PTheory::CleanUp(PTheory *theo)
+{
+  if (theo->fMul) { // '*' present
+    CleanUp(theo->fMul);
+    if (theo->fAdd) {
+      CleanUp(theo->fAdd);
+      delete theo;
+      theo = 0;
+    }
+  } else { // '*' NOT present
+    if (theo->fAdd) {
+      CleanUp(theo->fAdd);
+      delete theo;
+      theo = 0;
+    }
+  }
 }
 
 //--------------------------------------------------------------------------

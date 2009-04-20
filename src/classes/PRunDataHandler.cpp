@@ -1660,8 +1660,11 @@ bool PRunDataHandler::IsWhitespace(const char *str)
 {
   unsigned int i=0;
 
-  while (isblank(str[i]) || (iscntrl(str[i])) && str[i] != 0)
+  while (isblank(str[i]) || iscntrl(str[i])) {
+    if (str[i] == 0)
+      break;
     i++;
+  }
 
   if (i == strlen(str))
     return true;
