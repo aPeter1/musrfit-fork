@@ -45,7 +45,7 @@
       <params>2</params>
     </func>
     <func>
-      <name>simplGss</name>
+      <name>simpleGss</name>
       <comment>(rate)</comment>
       <label>simple Gauss</label>
       <pixmap>simpleGauss.png</pixmap>
@@ -82,14 +82,14 @@
     <func>
       <name>statExpKTLF</name>
       <comment>(frequency damping)</comment>
-      <label>static Gauss KT LF</label>
+      <label>static Lorentz KT LF</label>
       <pixmap></pixmap>
       <params>2</params>
     </func>
     <func>
       <name>dynExpKTLF</name>
       <comment>(frequency damping hopping-rate)</comment>
-      <label>static Lorentz KT LF</label>
+      <label>dynamic Lorentz KT LF</label>
       <pixmap></pixmap>
       <params>3</params>
     </func>

@@ -384,54 +384,6 @@
     </widget>
     <widget class="QGroupBox">
         <property name="name">
-            <cstring>fDbOutputFileName_groupBox</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>10</x>
-                <y>325</y>
-                <width>580</width>
-                <height>65</height>
-            </rect>
-        </property>
-        <property name="title">
-            <string>DB output file name</string>
-        </property>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>fDbOutputFileName_textLabel</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>30</y>
-                    <width>150</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>DB Output File Name</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fDbOutputFileName_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>170</x>
-                    <y>25</y>
-                    <width>350</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>e.g. MyPrefectFitCollection.db</string>
-            </property>
-        </widget>
-    </widget>
-    <widget class="QGroupBox">
-        <property name="name">
             <cstring>fOptions_groupBox</cstring>
         </property>
         <property name="geometry">
@@ -462,25 +414,6 @@
             </property>
             <property name="toolTip" stdset="0">
                 <string>will keep the Minuit2 output files</string>
-            </property>
-        </widget>
-        <widget class="QCheckBox">
-            <property name="name">
-                <cstring>fWriteDbHeader_checkBox</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>20</x>
-                    <y>30</y>
-                    <width>150</width>
-                    <height>22</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Write DB Header</string>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>will add a default header to the DB-file</string>
             </property>
         </widget>
         <widget class="QCheckBox">
@@ -523,21 +456,88 @@
         </widget>
         <widget class="QCheckBox">
             <property name="name">
+                <cstring>fWriteDbHeader_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>20</x>
+                    <y>30</y>
+                    <width>150</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Write Data Header</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>will add a default header to the DB-file</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox">
+            <property name="name">
                 <cstring>fRecreateDbFile_checkBox</cstring>
             </property>
             <property name="geometry">
                 <rect>
                     <x>230</x>
                     <y>50</y>
-                    <width>140</width>
+                    <width>150</width>
                     <height>22</height>
                 </rect>
             </property>
             <property name="text">
-                <string>Recreate DB File</string>
+                <string>Recreate Data File</string>
             </property>
             <property name="toolTip" stdset="0">
                 <string>will recreate the db-file. Default (unchecked) will append data</string>
+            </property>
+        </widget>
+    </widget>
+    <widget class="QGroupBox">
+        <property name="name">
+            <cstring>fDbOutputFileName_groupBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>325</y>
+                <width>580</width>
+                <height>65</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>Data output file name</string>
+        </property>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fDbOutputFileName_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>170</x>
+                    <y>25</y>
+                    <width>350</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>e.g. MyPrefectFitCollection.db</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fDbOutputFileName_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>30</y>
+                    <width>160</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Data Output File Name</string>
             </property>
         </widget>
     </widget>

@@ -1,7 +1,7 @@
 TITLE
 ###############################################################
 FITPARAMETER
-#      Nr. Name       Value     Step      Pos_Error Bounderies   
+#      Nr. Name       Value     Step      Pos_Error Boundaries   
         1 Asy         0.26      0.01      none      0       0.33    
         2 Rate        0.36      0.01      none
         3 Field       100.0     1.0       none      0       200     

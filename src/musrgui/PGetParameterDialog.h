@@ -43,6 +43,9 @@ class PGetParameterDialog : public PGetParameterDialogBase
 
   public slots:
     void paramAdd();
+
+  protected:
+    bool eventFilter( QObject *obj, QEvent *ev );
 };
 
 #endif // _PGETPARAMETERDIALOG_H_

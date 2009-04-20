@@ -1,7 +1,7 @@
 TITLE
 ###############################################################
 FITPARAMETER
-#      Nr. Name        Value     Step      Pos_Error  Bounderies
+#      Nr. Name        Value     Step      Pos_Error  Boundaries
          1 alpha       0.989765  1.0       none       0         none      
          2 asy         0.26      0.1       none       0         0.33     
          3 phase       8.5       1.0       none

@@ -1872,6 +1872,25 @@ void PTheory::CalculateDynKTLF(const double *val, int tag) const
   const double Tmax = 20.0; // 20 usec
   unsigned int N = static_cast<unsigned int>(16.0*Tmax*val[0]);
 
+  // check if rate (Delta/a) is very high
+  if (fabs(val[1]) > 0.1) {
+    double tmin = 20.0;
+    switch (tag) {
+      case 0: // Gauss
+        tmin = sqrt(3.0)/val[1];
+        break;
+      case 1: // Lorentz
+        tmin = 2.0/val[1];
+        break;
+      default:
+        break;
+    }
+    unsigned int Nrate = static_cast<unsigned int>(25.0 * Tmax / tmin);
+    if (Nrate > N) {
+      N = Nrate;
+    }
+  }
+
   if (N < 300) // if too view points, i.e. nu0 very small, take 300 points
     N = 300;
 

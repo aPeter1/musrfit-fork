@@ -1063,7 +1063,7 @@ int PMsrHandler::ParameterInUse(unsigned int paramNo)
  * x  x    x     x              x                                     -> 5 Parameters, e.g. after a MINOS fit
  *                                                                                     without boundaries
  * x  x    x     x                                                    -> 4 Parameters, e.g. after MIGRAD fit
- *                                                                                     without bounderies, or
+ *                                                                                     without boundaries, or
  *                                                                                     when starting
  * \endcode
  *
@@ -1161,7 +1161,7 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
         }
       }
 
-      // 7 values, i.e. No Name Value Neg_Error Pos_Error Lower_Bounderay Upper_Boundary
+      // 7 values, i.e. No Name Value Neg_Error Pos_Error Lower_Boundary Upper_Boundary
       if (tokens->GetEntries() == 7) {
         param.fNoOfParams = 7;
 

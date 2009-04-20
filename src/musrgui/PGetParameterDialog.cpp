@@ -34,6 +34,8 @@
 #include <qmessagebox.h>
 #include <qspinbox.h>
 #include <qtextedit.h>
+#include <qpushbutton.h>
+#include <qevent.h>
 
 #include "PGetParameterDialog.h"
 
@@ -43,6 +45,9 @@
  */
 PGetParameterDialog::PGetParameterDialog()
 {
+  // setup event filter
+  installEventFilter(this);
+
   fValue_lineEdit->setValidator( new QDoubleValidator(fValue_lineEdit) );
   fStep_lineEdit->setValidator( new QDoubleValidator(fStep_lineEdit) );
 
@@ -173,6 +178,30 @@ void PGetParameterDialog::paramAdd()
   fUpper_lineEdit->setText("none");
 
   fName_lineEdit->setFocus();
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>This event filter is filtering out the return key, and if present adds the current parameters
+ * to the parameter list.
+ */
+bool PGetParameterDialog::eventFilter( QObject *obj, QEvent *ev )
+{
+  if (obj == this) {
+    if (ev->type() == QEvent::KeyPress) {
+      QKeyEvent *k = (QKeyEvent*)ev;
+      if (k->key() == Qt::Key_Return) {
+        paramAdd();
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  } else {
+    return false;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

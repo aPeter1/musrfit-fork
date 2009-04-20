@@ -272,14 +272,15 @@ void PTextEdit::setupMusrActions()
   a->addTo( tb );
   a->addTo( menu );
 
-  a = new QAction( QPixmap::fromMimeSource( "musrsinglehisto.xpm" ), tr( "Single &Histo Default" ), ALT + Key_H, this, "musrGetSinglHistoDefault" );
+  a = new QAction( QPixmap::fromMimeSource( "musrsinglehisto.xpm" ), tr( "Single &Histogram Default" ), ALT + Key_H, this, "musrGetSinglHistoDefault" );
   connect( a, SIGNAL( activated() ), this, SLOT( musrGetSingleHistoDefault() ) );
   a->addTo( tb );
   a->addTo( menu );
 
   menu->insertSeparator();
+  tb->addSeparator();
 
-  a = new QAction( QPixmap::fromMimeSource( "musrcalcchisq.xpm" ), tr( "Calc Chisq" ), ALT + Key_C, this, "cacluates for the given parameters chiSq/maxLH" );
+  a = new QAction( QPixmap::fromMimeSource( "musrcalcchisq.xpm" ), tr( "Calculate Chisq" ), ALT + Key_C, this, "cacluates for the given parameters chiSq/maxLH" );
   connect( a, SIGNAL( activated() ), this, SLOT( musrCalcChisq() ) );
   a->addTo( tb );
   a->addTo( menu );
@@ -300,6 +301,7 @@ void PTextEdit::setupMusrActions()
   a->addTo( menu );
 
   menu->insertSeparator();
+  tb->addSeparator();
 
   a = new QAction( QPixmap::fromMimeSource( "musrview.xpm" ), tr( "&View" ), ALT + Key_V, this, "musrView" );
   connect( a, SIGNAL( activated() ), this, SLOT( musrView() ) );
@@ -553,7 +555,7 @@ void PTextEdit::fileClose()
   if (fTabWidget->label(idx).find("*")>0) {
     int result = QMessageBox::warning(this, "**WARNING**", 
                    "Do you really want to close this file.\nChanges will be lost",
-                   "Exit", "Cancel");
+                   "Close", "Cancel");
     if (result == 1) // Cancel
       return;
   }
@@ -863,7 +865,7 @@ void PTextEdit::musrGetSingleHistoDefault()
     file.close();
   } else {
     QMessageBox::critical(this, "**ERROR**",
-       "Couldn't find default single histo file template :-(",
+       "Couldn't find default single histogram file template :-(",
        QMessageBox::Ok, QMessageBox::NoButton);
   }
 
