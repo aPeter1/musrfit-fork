@@ -33,6 +33,7 @@
 #include <qlineedit.h>
 #include <qmessagebox.h>
 #include <qregexp.h>
+#include <qevent.h>
 
 #include "PGetFunctionsBlockDialog.h"
 

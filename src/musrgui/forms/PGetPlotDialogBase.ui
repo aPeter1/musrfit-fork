@@ -314,7 +314,7 @@
 <connections>
     <connection>
         <sender>fOk_button</sender>
-        <signal>clicked()</signal>
+        <signal>released()</signal>
         <receiver>PGetPlotDialogBase</receiver>
         <slot>accept()</slot>
     </connection>

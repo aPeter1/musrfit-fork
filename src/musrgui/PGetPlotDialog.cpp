@@ -44,6 +44,9 @@
  */
 PGetPlotDialog::PGetPlotDialog()
 {
+  // setup event filter
+  installEventFilter(this);
+
   fXRangeLow_lineEdit->setValidator( new QDoubleValidator(fXRangeLow_lineEdit) );
   fXRangeUp_lineEdit->setValidator( new QDoubleValidator(fXRangeUp_lineEdit) );
   fYRangeLow_lineEdit->setValidator( new QDoubleValidator(fYRangeLow_lineEdit) );
@@ -142,6 +145,29 @@ void PGetPlotDialog::addPlot()
   fYRangeLow_lineEdit->clear();
   fYRangeUp_lineEdit->clear();
   fRunList_lineEdit->setFocus();
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>This event filter is filtering out the return key, and if present adds the current plot.
+ */
+bool PGetPlotDialog::eventFilter( QObject *obj, QEvent *ev )
+{
+  if (obj == this) {
+    if (ev->type() == QEvent::KeyPress) {
+      QKeyEvent *k = (QKeyEvent*)ev;
+      if (k->key() == Qt::Key_Return) {
+        addPlot();
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  } else {
+    return false;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

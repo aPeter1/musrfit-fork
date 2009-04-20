@@ -240,7 +240,7 @@ FUNCTIONS
 <connections>
     <connection>
         <sender>buttonOk</sender>
-        <signal>clicked()</signal>
+        <signal>released()</signal>
         <receiver>PGetFunctionsBlockDialogBase</receiver>
         <slot>accept()</slot>
     </connection>

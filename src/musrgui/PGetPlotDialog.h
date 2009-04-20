@@ -43,6 +43,9 @@ class PGetPlotDialog : public PGetPlotDialogBase
 
   public slots:
     void addPlot();
+
+  protected:
+    bool eventFilter( QObject *obj, QEvent *ev );
 };
 
 #endif // _PGETPLOTDIALOG_H_
