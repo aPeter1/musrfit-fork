@@ -63,6 +63,14 @@ PFourier::PFourier(TH1F *data, int unitTag, double startTime, double endTime, un
     return;
   }
 
+//cout << endl << "PFourier::PFourier: fData = " << fData;
+/*
+for (unsigned int i=0; i<10; i++) {
+  cout << endl << "PFourier::PFourier: i=" << i << ", t=" << fData->GetBinCenter(i) << ", value=" << fData->GetBinContent(i);
+}
+*/
+//cout << endl;
+
   fValid = true;
   fIn  = 0;
   fOut = 0;
@@ -71,7 +79,7 @@ PFourier::PFourier(TH1F *data, int unitTag, double startTime, double endTime, un
 
   // calculate time resolution in (us)
   fTimeResolution = fData->GetBinWidth(1);
-cout << endl << ">> fTimeResolution = " << fTimeResolution;
+//cout << endl << ">> fTimeResolution = " << fTimeResolution;
 
   // if endTime == 0 set it to the last time slot
   if (fEndTime == 0.0) {
@@ -105,7 +113,7 @@ cout << endl << ">> fTimeResolution = " << fTimeResolution;
     fNoOfBins = fNoOfData;
   }
 
-cout << endl << ">> fNoOfBins = " << fNoOfBins;
+//cout << endl << ">> fNoOfBins = " << fNoOfBins;
 
   // calculate fourier resolution
   double resolution = 1.0/(fTimeResolution*fNoOfBins); // in MHz
@@ -125,7 +133,7 @@ cout << endl << ">> fNoOfBins = " << fNoOfBins;
       break;
   }
 
-cout << endl << ">> fResolution = " << fResolution;
+//cout << endl << ">> fResolution = " << fResolution;
 
   // allocate necessary memory
   fIn  = (fftw_complex *)fftw_malloc(sizeof(fftw_complex)*fNoOfBins);
@@ -140,6 +148,7 @@ cout << endl << ">> fResolution = " << fResolution;
     return;
   }
 
+//cout << endl << "PFourier::PFourier: fNoOfBins=" << fNoOfBins << endl;
   fFFTwPlan = fftw_plan_dft_1d(fNoOfBins, fIn, fOut, FFTW_FORWARD, FFTW_ESTIMATE);
 
   if (!fFFTwPlan) {
@@ -159,7 +168,7 @@ cout << endl << ">> fResolution = " << fResolution;
  */
 PFourier::~PFourier()
 {
-cout << endl << "in ~PFourier() ..." << endl;
+//cout << endl << "in ~PFourier() ..." << endl;
   if (fValid) {
     fftw_destroy_plan(fFFTwPlan);
     fftw_free(fIn);
@@ -180,11 +189,27 @@ void PFourier::Transform(unsigned int apodizationTag)
   if (!fValid)
     return;
 
-cout << endl << ">> PFourier::Transform ..." << endl;
+//cout << endl << ">> PFourier::Transform (apodizationTag=" << apodizationTag << ") ..." << endl;
 
   PrepareFFTwInputData(apodizationTag);
 
+/*
+if (fNoOfBins < 200) {
+for (unsigned int i=0; i<fNoOfBins; i++) {
+  cout << endl << ">> PFourier::PrepareFFTwInputData: " << i << ": fIn[i][0] = " << fIn[i][0];
+}
+cout << endl;
+}
+*/
+
   fftw_execute(fFFTwPlan);
+
+/*
+for (unsigned int i=fNoOfBins-10; i<fNoOfBins; i++) {
+  cout << endl << ">> PFourier::PrepareFFTwInputData: " << i << ": fOut[i][0] = " << fOut[i][0];
+}
+cout << endl;
+*/
 }
 
 //--------------------------------------------------------------------------
@@ -219,7 +244,7 @@ TH1F* PFourier::GetRealFourier(const double scale)
     realFourier->SetBinContent(i+1, scale*fOut[i][0]);
     realFourier->SetBinError(i+1, 0.0);
   }
-cout << endl << ">> realFourier = " << realFourier;
+//cout << endl << ">> realFourier = " << realFourier;
   return realFourier;
 }
 
@@ -359,7 +384,9 @@ void PFourier::PrepareFFTwInputData(unsigned int apodizationTag)
 {
   // 1st find t==0. fData start at times t<0!!
   int t0bin = -1;
-  for (int i=0; i<fData->GetNbinsX(); i++) {
+//cout << ">> PFourier::PrepareFFTwInputData: fData=" << fData << ", fData->GetNbinsX() = " << fData->GetNbinsX();
+    for (int i=0; i<fData->GetNbinsX(); i++) {
+//if (i<20) cout << endl << ">> PFourier::PrepareFFTwInputData: i=" << i << ", fData->GetBinCenter(i)=" << fData->GetBinCenter(i);
     if (fData->GetBinCenter(i) >= 0.0) {
       t0bin = i;
       break;
@@ -372,13 +399,22 @@ void PFourier::PrepareFFTwInputData(unsigned int apodizationTag)
     fIn[i][0] = fData->GetBinContent(i+start+1);
     fIn[i][1] = 0.0;
   }
-  for (unsigned int i=fNoOfData; i<fNoOfBins; i++) {
+  for (unsigned int i=fNoOfData-start; i<fNoOfBins; i++) {
     fIn[i][0] = 0.0;
     fIn[i][1] = 0.0;
   }
 
+//cout << ">> PFourier::PrepareFFTwInputData: t0bin = " << t0bin << ", start = " << start << endl;
   // 3rd apodize data (if wished)
   ApodizeData(apodizationTag);
+
+/*
+cout << ">> PFourier::PrepareFFTwInputData: fNoOfData = " << fNoOfData << ", fNoOfBins = " << fNoOfBins << endl;
+for (unsigned int i=0; i<10; i++) {
+  cout << endl << ">> PFourier::PrepareFFTwInputData: " << i << ": fIn[i][0] = " << fIn[i][0];
+}
+cout << endl;
+*/
 }
 
 //--------------------------------------------------------------------------

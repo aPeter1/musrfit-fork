@@ -1568,12 +1568,16 @@ void PMusrCanvas::HandleFourier()
 
   // check if fourier needs to be calculated
   if (fData[0].dataFourierRe == 0) {
+//cout << endl << ">> Recalculate Fourier ----------------------------------------";
+//cout << endl << ">> fData[0].data = " << fData[0].data;
     int bin;
     bin = fData[0].data->GetXaxis()->GetFirst();
+//cout << endl << ">> start bin  = " << bin;
     double startTime = fData[0].data->GetBinCenter(bin);
+//cout << endl << ">> start time = " << startTime;
     bin = fData[0].data->GetXaxis()->GetLast();
     double endTime   = fData[0].data->GetBinCenter(bin);
-//cout << endl << ">> startTime = " << startTime << ", endTime = " << endTime << endl;
+//cout << endl << ">> Fourier: startTime = " << startTime << ", endTime = " << endTime;
     for (unsigned int i=0; i<fData.size(); i++) {
       // calculate fourier transform of the data
       PFourier fourierData(fData[i].data, fFourier.fUnits, startTime, endTime, fFourier.fFourierPower);
@@ -1594,6 +1598,13 @@ void PMusrCanvas::HandleFourier()
       fData[i].dataFourierPwr = fourierData.GetPowerFourier(scale);
       // get phase part of the data
       fData[i].dataFourierPhase = fourierData.GetPhaseFourier();
+/*
+cout << endl << ">> Fourier: i=" << i;
+for (unsigned j=0; j<10; j++) {
+  cout << endl << ">> Fourier: " << j << ", data = " << fData[i].data->GetBinContent(j) << ", fourier.power = " << fData[i].dataFourierPwr->GetBinContent(j);
+}
+cout << endl;
+*/
 
       // set marker and line color
       fData[i].dataFourierRe->SetMarkerColor(fData[i].data->GetMarkerColor());
@@ -1618,7 +1629,7 @@ void PMusrCanvas::HandleFourier()
 
       // calculate fourier transform of the theory
       int powerPad = (int)round(log((endTime-startTime)/fData[i].theory->GetBinWidth(1))/log(2))+3;
-cout << endl << ">> powerPad = " << powerPad;
+//cout << endl << ">> powerPad = " << powerPad;
       PFourier fourierTheory(fData[i].theory, fFourier.fUnits, startTime, endTime, powerPad);
       if (!fourierTheory.IsValid()) {
         cout << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier theory ..." << endl;
@@ -1626,7 +1637,7 @@ cout << endl << ">> powerPad = " << powerPad;
       }
       fourierTheory.Transform(fFourier.fApodization);
       scale = sqrt(fData[0].theory->GetBinWidth(1)/(endTime-startTime)*fData[0].theory->GetBinWidth(1)/fData[0].data->GetBinWidth(1));
-cout << endl << ">> theory scale = " << scale << ", data.res/theory.res = " << fData[0].theory->GetBinWidth(1)/fData[0].data->GetBinWidth(1);
+//cout << endl << ">> theory scale = " << scale << ", data.res/theory.res = " << fData[0].theory->GetBinWidth(1)/fData[0].data->GetBinWidth(1);
       // get real part of the data
       fData[i].theoryFourierRe = fourierTheory.GetRealFourier(scale);
 //cout << endl << ">> i: " << i << ", fData[i].dataFourierRe = " << fData[i].dataFourierRe;
@@ -2313,7 +2324,7 @@ void PMusrCanvas::PlotFourier()
     xAxisTitle = TString("??");
   }
 
-  // plot data
+  // plot fourier data
   double min, max, binContent;
   switch (fCurrentPlotView) {
     case PV_FOURIER_REAL:
