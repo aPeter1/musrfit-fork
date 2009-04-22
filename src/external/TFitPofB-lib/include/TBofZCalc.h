@@ -13,6 +13,7 @@
 #define _TBofZCalc_H_
 
 #include <vector>
+#include <pair>
 using namespace std;
 
 //--------------------
@@ -26,22 +27,25 @@ public:
 
   TBofZCalc() {}
 
-  ~TBofZCalc() {
+  virtual ~TBofZCalc() {
     fZ.clear();
     fBZ.clear();
   }
 
-  vector<double> DataZ() const {return fZ;}
-  vector<double> DataBZ() const {return fBZ;}
-  double GetBmin() const;
-  double GetBmax() const;
-  double GetBofZ(double) const;
+  virtual vector<double> DataZ() const;
+  virtual vector<double> DataBZ() const;
+  virtual void Calculate() = 0;
+  virtual double GetBofZ(double) const = 0;
+  virtual double GetBmin() const = 0;
+  virtual double GetBmax() const = 0;
   double GetdZ() const {return fDZ;}
 
 protected:
   vector<double> fZ;
   vector<double> fBZ;
   double fDZ;
+  vector<double> fParam;
+  unsigned int fSteps;
 };
 
 //--------------------
@@ -89,6 +93,20 @@ class TLondon1D_3L : public TBofZCalc {
 public:
 
   TLondon1D_3L(unsigned int, const vector<double>& );
+  void Calculate();
+  double GetBofZ(double) const;
+  vector< pair<double, double> > GetInverseAndDerivative(double) const;
+  double GetBmin() const;
+  double GetBmax() const;
+
+private:
+  void SetBmin();
+
+  int fMinTag;
+  double fMinZ;
+  double fMinB;
+  double fCoeff[6];
+  double fInterfaces[4];
 
 };
 
