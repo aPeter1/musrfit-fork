@@ -1017,6 +1017,7 @@ void PTextEdit::musrMsr2Data()
     fMsr2DataParam->keepMinuit2Output = fKeepMinuit2Output;
     fMsr2DataParam->writeColumnData = false;
     fMsr2DataParam->recreateDbFile = false;
+    fMsr2DataParam->chainFit = true;
   }
 
   PMsr2DataDialog *dlg = new PMsr2DataDialog(fMsr2DataParam);
@@ -1135,6 +1136,9 @@ void PTextEdit::musrMsr2Data()
     if (fMsr2DataParam->templateRunNo != -1) {
       str = QString("%1").arg(fMsr2DataParam->templateRunNo);
       str = "fit-" + str;
+      if (!fMsr2DataParam->chainFit) {
+        str += "!";
+      }
       cmd.append(str);
     }
 
