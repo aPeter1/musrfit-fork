@@ -758,9 +758,14 @@ int PMsrHandler::WriteMsrLogFile(TString ext)
     }
 
     // write 'phase' if present
-    if (fFourier.fPhase != -999.0) {
-      f << endl << "phase            " << fFourier.fPhase;
+    if (fFourier.fPhaseParamNo > 0) {
+      f << endl << "phase            par" << fFourier.fPhaseParamNo;
       CheckAndWriteComment(f, ++lineNo);
+    } else {
+      if (fFourier.fPhase != -999.0) {
+        f << endl << "phase            " << fFourier.fPhase;
+        CheckAndWriteComment(f, ++lineNo);
+      }
     }
 
     // write 'range_for_phase_correction' if present
@@ -1937,6 +1942,7 @@ void PMsrHandler::InitFourierParameterStructure(PMsrFourierStructure &fourier)
   fourier.fFourierPower = -1;                     // zero padding, default: -1 = NOT GIVEN
   fourier.fApodization = FOURIER_APOD_NOT_GIVEN;  // apodization, default: NOT GIVEN
   fourier.fPlotTag = FOURIER_PLOT_NOT_GIVEN;      // initial plot tag, default: NOT GIVEN
+  fourier.fPhaseParamNo = 0;                      // initial parameter no = 0 means not a parameter
   fourier.fPhase = -999.0;                        // fourier phase: -999 = NOT GIVEN
   for (unsigned int i=0; i<2; i++) {
     fourier.fRangeForPhaseCorrection[i] = -1.0;  // frequency range for phase correction, default: {-1, -1} = NOT GIVEN
@@ -2095,6 +2101,8 @@ bool PMsrHandler::HandleFourierEntry(PMsrLines &lines)
               error = true;
               continue;
             }
+            // keep the parameter number
+            fourier.fPhaseParamNo = no;
             // get parameter value
             fourier.fPhase = fParam[no-1].fValue;
           } else {

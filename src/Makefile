@@ -34,7 +34,7 @@ endif
 # -- Linux
 ifeq ($(OS),LINUX)
 CXX           = g++
-CXXFLAGS      = -g -Wall -fPIC
+CXXFLAGS      = -Wall -fPIC
 PMUSRPATH     = ./include
 MNPATH        = $(ROOTSYS)/include
 INCLUDES      = -I $(PMUSRPATH) -I $(MNPATH)

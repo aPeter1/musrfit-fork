@@ -289,6 +289,7 @@ typedef struct {
   int  fFourierPower;        ///< i.e. zero padding up to 2^fFourierPower, default = 0 which means NO zero padding
   int  fApodization;         ///< tag indicating the kind of apodization wished, 0=no appodization (default), 1=weak, 2=medium, 3=strong (for details see the docu)
   int  fPlotTag;             ///< tag used for initial plot. 0=real, 1=imaginary, 2=real & imaginary (default), 3=power, 4=phase
+  int  fPhaseParamNo;        ///< parameter number if used instead of a phase value
   double fPhase;             ///< phase
   double fRangeForPhaseCorrection[2]; ///< field/frequency range for automatic phase correction
   double fPlotRange[2];      ///< field/frequency plot range

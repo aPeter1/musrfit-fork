@@ -35,7 +35,7 @@ endif
 # -- Linux
 ifeq ($(OS),LINUX)
 CXX           = g++
-CXXFLAGS      = -g -Wall -Wno-trigraphs -fPIC
+CXXFLAGS      = -Wall -Wno-trigraphs -fPIC
 INCLUDES      = -I../include
 LD            = g++
 LDFLAGS       = -g
@@ -45,7 +45,7 @@ endif
 # -- Darwin
 ifeq ($(OS),DARWIN)
 CXX           = g++
-CXXFLAGS      = -g -Wall -Wno-trigraphs -fPIC
+CXXFLAGS      = -Wall -Wno-trigraphs -fPIC
 INCLUDES      = -I../include
 LD            = g++
 LDFLAGS       = -g
