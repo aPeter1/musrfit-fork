@@ -611,10 +611,13 @@
     <tabstop>fRunListFileName_lineEdit</tabstop>
     <tabstop>fExtension_lineEdit</tabstop>
     <tabstop>fTemplateRunNumber_lineEdit</tabstop>
+    <tabstop>fChainFit_checkBox</tabstop>
     <tabstop>fDbOutputFileName_lineEdit</tabstop>
     <tabstop>fWriteDbHeader_checkBox</tabstop>
     <tabstop>fSummaryPresent_checkBox</tabstop>
     <tabstop>fKeepMinuit2Output_checkBox</tabstop>
+    <tabstop>fWriteColumnData_checkBox</tabstop>
+    <tabstop>fRecreateDbFile_checkBox</tabstop>
     <tabstop>fOk_button</tabstop>
     <tabstop>fCancel_button</tabstop>
     <tabstop>fHelp_button</tabstop>
