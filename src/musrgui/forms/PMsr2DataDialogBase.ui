@@ -349,6 +349,22 @@
         <property name="title">
             <string>template run input</string>
         </property>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fTemplateRunNumber_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>170</x>
+                    <y>27</y>
+                    <width>140</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>e.g. 2089</string>
+            </property>
+        </widget>
         <widget class="QLabel">
             <property name="name">
                 <cstring>fTemplateRunNumber_textLabel</cstring>
@@ -365,20 +381,23 @@
                 <string>Template Run Number</string>
             </property>
         </widget>
-        <widget class="QLineEdit">
+        <widget class="QCheckBox">
             <property name="name">
-                <cstring>fTemplateRunNumber_lineEdit</cstring>
+                <cstring>fChainFit_checkBox</cstring>
             </property>
             <property name="geometry">
                 <rect>
-                    <x>170</x>
-                    <y>27</y>
-                    <width>140</width>
-                    <height>24</height>
+                    <x>330</x>
+                    <y>28</y>
+                    <width>95</width>
+                    <height>22</height>
                 </rect>
             </property>
+            <property name="text">
+                <string>Chain Fit</string>
+            </property>
             <property name="toolTip" stdset="0">
-                <string>e.g. 2089</string>
+                <string>on: chain fit, off: always start from the template run</string>
             </property>
         </widget>
     </widget>
@@ -490,25 +509,6 @@
             </property>
             <property name="toolTip" stdset="0">
                 <string>will recreate the db-file. Default (unchecked) will append data</string>
-            </property>
-        </widget>
-        <widget class="QCheckBox">
-            <property name="name">
-                <cstring>fChainFit_checkBox</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>230</x>
-                    <y>70</y>
-                    <width>95</width>
-                    <height>22</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Chain Fit</string>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>on: chain fit, off: always start from the template run</string>
             </property>
         </widget>
     </widget>
