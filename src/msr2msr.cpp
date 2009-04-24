@@ -53,6 +53,11 @@ using namespace std;
 #define MSR_TAG_STATISTIC    7
 #define MSR_TAG_NO_BLOCK     8
 
+//-------------------------------------------------------------
+// msr theory tags
+#define MSR_THEORY_INTERN_FLD    0
+#define MSR_THEORY_INTERN_BESSEL 1
+
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -260,8 +265,10 @@ bool msr2msr_param(char *str)
  * <p>
  *
  * \param str
+ * \param tag
+ * \param noOfAddionalParams
  */
-bool msr2msr_theory(char *str)
+bool msr2msr_theory(char *str, int &tag, int &noOfAddionalParams)
 {
   // handle theory line
   TString line(str);
@@ -269,7 +276,7 @@ bool msr2msr_theory(char *str)
   TObjString *ostr;
   char sstr[256];
 
-  if (line.Contains("sktt") || line.Contains("statKTTab")) {
+  if ((line.Contains("sktt") || line.Contains("statKTTab")) && line.Contains("glf")) { // static Gauss KT LF table
     // change cmd name
     strcpy(sstr, "statGssKTLF ");
 
@@ -287,9 +294,29 @@ bool msr2msr_theory(char *str)
       ostr = dynamic_cast<TObjString*>(tokens->At(i));
       strcat(sstr, ostr->GetString().Data());
     }
-    strcat(sstr, "  (freq sigma)");
+    strcat(sstr, "  (frequency damping)");
     strcpy(str, sstr);
-  } else if (line.Contains("dktt") || line.Contains("dynmKTTab")) {
+  } else if ((line.Contains("sktt") || line.Contains("statKTTab")) && line.Contains("llf")) { // static Lorentz KT LF table
+    // change cmd name
+    strcpy(sstr, "statExpKTLF ");
+
+    // tokenize the rest and extract the first two parameters
+    tokens = line.Tokenize(" \t");
+    Int_t noTokens = tokens->GetEntries();
+    if (noTokens < 3) {
+      cout << endl << "**ERROR** in THEORY block";
+      cout << endl << "  Line: '" << str << "' is not a valid statKTTab statement.";
+      cout << endl << "  Cannot handle file." << endl;
+      return false;
+    }
+    for (Int_t i=1; i<3; i++) {
+      strcat(sstr, "  ");
+      ostr = dynamic_cast<TObjString*>(tokens->At(i));
+      strcat(sstr, ostr->GetString().Data());
+    }
+    strcat(sstr, "  (frequency damping)");
+    strcpy(str, sstr);
+  } else if ((line.Contains("dktt") || line.Contains("dynmKTTab")) && line.Contains("kdglf")) { // dynamic Gauss KT LF table
     // change cmd name
     strcpy(sstr, "dynGssKTLF ");
 
@@ -307,9 +334,240 @@ bool msr2msr_theory(char *str)
       ostr = dynamic_cast<TObjString*>(tokens->At(i));
       strcat(sstr, ostr->GetString().Data());
     }
-    strcat(sstr, "  (freq sigma hopping_rate)");
+    strcat(sstr, "  (frequency damping hopping-rate)");
+    strcpy(str, sstr);
+  } else if ((line.Contains("dktt") || line.Contains("dynmKTTab")) && line.Contains("kdllf")) { // dynamic Lorentz KT LF table
+    // change cmd name
+    strcpy(sstr, "dynExpKTLF ");
+
+    // tokenize the rest and extract the first three parameters
+    tokens = line.Tokenize(" \t");
+    Int_t noTokens = tokens->GetEntries();
+    if (noTokens < 4) {
+      cout << endl << "**ERROR** in THEORY block";
+      cout << endl << "  Line: '" << str << "' is not a valid dynmKTTab statement.";
+      cout << endl << "  Cannot handle file." << endl;
+      return false;
+    }
+    for (Int_t i=1; i<4; i++) {
+      strcat(sstr, "  ");
+      ostr = dynamic_cast<TObjString*>(tokens->At(i));
+      strcat(sstr, ostr->GetString().Data());
+    }
+    strcat(sstr, "  (frequency damping hopping-rate)");
+    strcpy(str, sstr);
+  } else if (line.Contains("internFld")) {
+    tag = MSR_THEORY_INTERN_FLD;
+    noOfAddionalParams++;
+
+    // change cmd name
+    strcpy(sstr, "internFld ");
+
+    // tokenize the rest and extract the first three parameters
+    tokens = line.Tokenize(" \t");
+    Int_t noTokens = tokens->GetEntries();
+    if (noTokens < 4) {
+      cout << endl << "**ERROR** in THEORY block";
+      cout << endl << "  Line: '" << str << "' is not a valid internFld statement.";
+      cout << endl << "  Cannot handle file." << endl;
+      return false;
+    }
+    strcat(sstr, "  _x_");
+    for (Int_t i=1; i<4; i++) {
+      strcat(sstr, "  ");
+      ostr = dynamic_cast<TObjString*>(tokens->At(i));
+      strcat(sstr, ostr->GetString().Data());
+    }
+    strcat(sstr, "  (fraction phase frequency Trate Lrate)");
+    strcpy(str, sstr);
+  } else if (line.Contains("internBsl")) {
+    tag = MSR_THEORY_INTERN_BESSEL;
+    noOfAddionalParams++;
+
+    // change cmd name
+    strcpy(sstr, "internBsl ");
+
+    // tokenize the rest and extract the first three parameters
+    tokens = line.Tokenize(" \t");
+    Int_t noTokens = tokens->GetEntries();
+    if (noTokens < 4) {
+      cout << endl << "**ERROR** in THEORY block";
+      cout << endl << "  Line: '" << str << "' is not a valid internBsl statement.";
+      cout << endl << "  Cannot handle file." << endl;
+      return false;
+    }
+    strcat(sstr, "  _x_");
+    for (Int_t i=1; i<4; i++) {
+      strcat(sstr, "  ");
+      ostr = dynamic_cast<TObjString*>(tokens->At(i));
+      strcat(sstr, ostr->GetString().Data());
+    }
+    strcat(sstr, "  (fraction phase frequency Trate Lrate)");
     strcpy(str, sstr);
   }
+
+  return true;
+}
+
+
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param str
+ */
+bool msr2msr_is_comment(char *str)
+{
+  bool isComment = false;
+
+  for (unsigned int i=0; i<strlen(str); i++) {
+    if ((str[i] == ' ') || (str[i] == '\t'))
+      continue;
+    if (str[i] == '#') {
+      isComment = true;
+      break;
+    } else {
+      isComment = false;
+      break;
+    }
+  }
+
+  return isComment;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param str
+ */
+bool msr2msr_is_whitespace(char *str)
+{
+  bool isWhitespace = true;
+
+  if (strlen(str) != 0) {
+    for (unsigned int i=0; i<strlen(str); i++) {
+      if ((str[i] != ' ') && (str[i] != '\t')) {
+        isWhitespace = false;
+        break;
+      }
+    }
+  }
+
+  return isWhitespace;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param str
+ * \param paramNo
+ */
+void msr2msr_replace(char *str, int paramNo)
+{
+  char temp[128];
+  char no[16];
+
+  memset(temp, 0, sizeof(temp));
+
+  sprintf(no, "%d", paramNo);
+
+  int j=0;
+  for (unsigned int i=0; i<strlen(str); i++) {
+    if (str[i] != '_') {
+      temp[j] = str[i];
+      j++;
+    } else {
+      for (unsigned int k=0; k<strlen(no); k++)
+        temp[j+k] = no[k];
+      j += strlen(no);
+      i += 2;
+    }
+  }
+
+  strcpy(str, temp);
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param fln in/out file name
+ * \param tag
+ * \param noOfAddionalParams
+ */
+bool msr2msr_finalize_theory(char *fln, int theoryTag, int noOfAddionalParams)
+{  
+  ifstream fin;
+  fin.open(fln, iostream::in);
+  if (!fin.is_open()) {
+    cout << endl << "**ERROR**: Couldn't open input msr-file " << fln;
+    cout << endl << "           Will quit." << endl;
+    return 0;
+  }
+
+  // open temporary output msr-file
+  ofstream fout;
+  fout.open("__temp.msr", iostream::out);
+  if (!fout.is_open()) {
+    cout << endl << "**ERROR**: Couldn't open output msr-file __temp.msr";
+    cout << endl << "           Will quit." << endl;
+    fin.close();
+    return 0;
+  }
+
+  char str[256];
+  int  tag = -1;
+  bool success = true;
+  int  param = 0;
+  int  count = 0;
+  while (!fin.eof() && success) {
+    fin.getline(str, sizeof(str));
+
+    if (strstr(str, "FITPARAMETER")) {
+      tag = MSR_TAG_FITPARAMETER;
+    } else if (strstr(str, "THEORY")) {
+      tag = MSR_TAG_THEORY;
+    }
+
+    if ((tag == MSR_TAG_FITPARAMETER) && !strstr(str, "FITPARAMETER")) {
+      if ((theoryTag == MSR_THEORY_INTERN_FLD) || (theoryTag == MSR_THEORY_INTERN_BESSEL)) {
+        if (!msr2msr_is_comment(str)) {
+          param++;
+          if (msr2msr_is_whitespace(str)) {
+            // add needed parameters
+            for (int i=0; i<noOfAddionalParams; i++) {
+              fout << "        " << param+i << " frac" << i+1 << "       0.333333 0.0        none" << endl;
+            }
+          }
+        }
+      }
+    }
+
+    if (tag == MSR_TAG_THEORY) {
+      if ((theoryTag == MSR_THEORY_INTERN_FLD) || (theoryTag == MSR_THEORY_INTERN_BESSEL)) {
+        if (strstr(str, "_x_")) {
+          msr2msr_replace(str, param+count);
+          count++;
+        }
+      }
+    }
+
+    fout << str << endl;
+  }
+
+  // close files
+  fout.close();
+  fin.close();
+
+
+  // cp __temp.msr fln
+  sprintf(str, "cp __temp.msr %s", fln);
+  system(str);
+  // rm __temp.msr
+  strcpy(str, "rm __temp.msr");
+  system(str);
 
   return true;
 }
@@ -339,7 +597,7 @@ int main(int argc, char *argv[])
     return 0;
   }
 
-  // open input msr-file
+  // open output msr-file
   ofstream fout;
   fout.open(argv[2], iostream::out);
   if (!fout.is_open()) {
@@ -352,6 +610,8 @@ int main(int argc, char *argv[])
   // read input file and write output file
   char str[256];
   int  tag = -1;
+  int  theoryTag = -1;
+  int  noOfAddionalParams = 0;
   bool success = true;
   while (!fin.eof() && success) {
     fin.getline(str, sizeof(str));
@@ -369,7 +629,7 @@ int main(int argc, char *argv[])
         success = msr2msr_param(str);
         break;
       case MSR_TAG_THEORY:
-        success = msr2msr_theory(str);
+        success = msr2msr_theory(str, theoryTag, noOfAddionalParams);
         break;
       case MSR_TAG_RUN:
         success = msr2msr_run(str);
@@ -391,7 +651,9 @@ int main(int argc, char *argv[])
     system(str);
   }
 
-  // clean up
+  if (theoryTag != -1) {
+    msr2msr_finalize_theory(argv[2], theoryTag, noOfAddionalParams);
+  }
 
   cout << endl << "done ..." << endl;
 
