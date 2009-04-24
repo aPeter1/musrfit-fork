@@ -127,7 +127,7 @@ class PMsrHandler
     virtual void InitRunParameterStructure(PMsrRunStructure &param);
     virtual void InitFourierParameterStructure(PMsrFourierStructure &fourier);
 
-    virtual bool FilterFunMapNumber(TString str, const char *filter, int &no);
+    virtual bool FilterNumber(TString str, const char *filter, int offset, int &no);
 };
 
 #endif // _PMSRHANDLER_H_

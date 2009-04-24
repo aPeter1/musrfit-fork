@@ -1456,7 +1456,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
           param.fNormParamNo = str.Atoi();
         } else if (str.Contains("fun")) {
           int no;
-          if (FilterFunMapNumber(str, "fun", no))
+          if (FilterNumber(str, "fun", MSR_PARAM_FUN_OFFSET, no))
             param.fNormParamNo = no;
           else
             error = true;
@@ -1855,39 +1855,34 @@ void PMsrHandler::InitRunParameterStructure(PMsrRunStructure &param)
 }
 
 //--------------------------------------------------------------------------
-// FilterFunMapNumber (private)
+// FilterNumber (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Used to filter numbers from a string of the structure strX, where
  * X is a number. The filter string is used to define the offset to X.
  * It is used to filter strings like: map1 or fun4. At the moment only
- * the filter strings 'map' and 'fun' are supported.
+ * the filter strings 'map', 'fun', and 'par' are supported.
  *
  * \param str  input string
  * \param filter filter string
+ * \param offset it is used to offset to found number, e.g. strX -> no = X+offset
  * \param no filtered number
  */
-bool PMsrHandler::FilterFunMapNumber(TString str, const char *filter, int &no)
+bool PMsrHandler::FilterNumber(TString str, const char *filter, int offset, int &no)
 {
   int  found, no_found=-1;
 
   // copy str to an ordinary c-like string
-  char *cstr;
+  char *cstr, filterStr[32];
   cstr = new char[str.Sizeof()];
   strncpy(cstr, str.Data(), str.Sizeof());
+  sprintf(filterStr, "%s%%d", filter);
 
   // get number if present
-  if (!strcmp(filter, "fun")) {
-    found = sscanf(cstr, "fun%d", &no_found);
-    if (found == 1)
-      if (no_found < 1000)
-        no = no_found + MSR_PARAM_FUN_OFFSET;
-  } else if (!strcmp(filter, "map")) {
-    found = sscanf(cstr, "map%d", &no_found);
-    if (found == 1)
-      if (no_found < 1000)
-        no = no_found + MSR_PARAM_MAP_OFFSET;
-  }
+  found = sscanf(cstr, filterStr, &no_found);
+  if (found == 1)
+    if (no_found < 1000)
+      no = no_found + offset;
 
   // clean up
   if (cstr) {
@@ -2092,7 +2087,21 @@ bool PMsrHandler::HandleFourierEntry(PMsrLines &lines)
       } else {
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
-        if (str.IsFloat()) {
+        if (str.BeginsWith("par", TString::kIgnoreCase)) { // parameter value
+          int no = 0;
+          if (FilterNumber(str, "par", 0, no)) {
+            // check that the parameter is in range
+            if ((int)fParam.size() < no) {
+              error = true;
+              continue;
+            }
+            // get parameter value
+            fourier.fPhase = fParam[no-1].fValue;
+          } else {
+            error = true;
+            continue;
+          }
+        } else if (str.IsFloat()) { // phase value
           fourier.fPhase = str.Atof();
         } else {
           error = true;
@@ -2569,11 +2578,11 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 //cout << endl << ">>>> theo: param no : " << ival;
         }
       } else if (str.Contains("map")) { // map
-        if (FilterFunMapNumber(str, "map", ival))
+        if (FilterNumber(str, "map", MSR_PARAM_MAP_OFFSET, ival))
           map.push_back(ival-MSR_PARAM_MAP_OFFSET);
       } else if (str.Contains("fun")) { // fun
 //cout << endl << "theo:fun: " << str.Data();
-        if (FilterFunMapNumber(str, "fun", ival))
+        if (FilterNumber(str, "fun", MSR_PARAM_FUN_OFFSET, ival))
           fun.push_back(ival-MSR_PARAM_FUN_OFFSET);
       }
     }
@@ -2606,7 +2615,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
     // filter fun number
     ostr = dynamic_cast<TObjString*>(tokens->At(0));
     str = ostr->GetString();
-    if (!FilterFunMapNumber(str, "fun", funNo))
+    if (!FilterNumber(str, "fun", MSR_PARAM_FUN_OFFSET, funNo))
       continue;
     funNo -= MSR_PARAM_FUN_OFFSET;
 
@@ -2702,7 +2711,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
       }
       // check if fun
       if (str.Contains("fun")) {
-        if (FilterFunMapNumber(str, "fun", ival)) {
+        if (FilterNumber(str, "fun", MSR_PARAM_FUN_OFFSET, ival)) {
           fun.push_back(ival-MSR_PARAM_FUN_OFFSET);
 //cout << endl << ">>>> run : fun no : " << ival-MSR_PARAM_FUN_OFFSET;
         }
@@ -2770,7 +2779,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
     // filter fun number
     ostr = dynamic_cast<TObjString*>(tokens->At(0));
     str = ostr->GetString();
-    if (!FilterFunMapNumber(str, "fun", funNo))
+    if (!FilterNumber(str, "fun", MSR_PARAM_FUN_OFFSET, funNo))
       continue;
     funNo -= MSR_PARAM_FUN_OFFSET;
 
@@ -2951,7 +2960,7 @@ bool PMsrHandler::CheckMaps()
         ostr = dynamic_cast<TObjString*>(tokens->At(j));
         str = ostr->GetString();
         if (str.Contains("map", TString::kIgnoreCase)) {
-          if (FilterFunMapNumber(str, "map", no)) {
+          if (FilterNumber(str, "map", MSR_PARAM_MAP_OFFSET, no)) {
             mapVec.push_back(no);
             mapBlock.push_back(0); // 0 = theory-block
             mapLineNo.push_back(fTheory[i].fLineNo);
@@ -2975,7 +2984,7 @@ bool PMsrHandler::CheckMaps()
         ostr = dynamic_cast<TObjString*>(tokens->At(j));
         str = ostr->GetString();
         if (str.Contains("map", TString::kIgnoreCase)) {
-          if (FilterFunMapNumber(str, "map", no)) {
+          if (FilterNumber(str, "map", MSR_PARAM_MAP_OFFSET, no)) {
             mapVec.push_back(no);
             mapBlock.push_back(1); // 1 = theory-block
             mapLineNo.push_back(fTheory[i].fLineNo);
@@ -3055,7 +3064,7 @@ bool PMsrHandler::CheckFuncs()
         ostr = dynamic_cast<TObjString*>(tokens->At(j));
         str = ostr->GetString();
         if (str.Contains("fun", TString::kIgnoreCase)) {
-          if (FilterFunMapNumber(str, "fun", no)) {
+          if (FilterNumber(str, "fun", MSR_PARAM_FUN_OFFSET, no)) {
             funVec.push_back(no);
             funBlock.push_back(0); // 0 = theory-block
             funLineBlockNo.push_back(fTheory[i].fLineNo);
