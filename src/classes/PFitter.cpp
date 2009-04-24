@@ -678,13 +678,13 @@ bool PFitter::ExecuteSave()
     // write value
     fout.setf(ios::left, ios::adjustfield);
     fout.precision(6);
-    fout.width(11);
-    fout << fParams[i].fValue;
+    fout.width(10);
+    fout << fParams[i].fValue << " ";
     // write parabolic error
     fout.setf(ios::left, ios::adjustfield);
     fout.precision(6);
-    fout.width(11);
-    fout << fMnUserParamState->Error(i);
+    fout.width(10);
+    fout << fMnUserParamState->Error(i) << " ";
     // write minos errors
     if (fParams[i].fPosErrorPresent) {
       fout.setf(ios::left, ios::adjustfield);
@@ -693,8 +693,8 @@ bool PFitter::ExecuteSave()
       fout << fParams[i].fStep; 
       fout.setf(ios::left, ios::adjustfield);
       fout.precision(6);
-      fout.width(12);
-      fout << fParams[i].fPosError;
+      fout.width(11);
+      fout << fParams[i].fPosError << " ";
     } else {
       fout.setf(ios::left, ios::adjustfield);
       fout.width(12);
