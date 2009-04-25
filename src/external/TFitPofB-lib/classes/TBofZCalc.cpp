@@ -5,26 +5,38 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/06/30
+  2009/04/25
 
 ***************************************************************************/
 
 #include "TBofZCalc.h"
 #include <omp.h>
 #include <cmath>
-#include <iostream>
-#include <algorithm>
+//#include <iostream>
+//#include <algorithm>
+#include <cassert>
 
-vector<double> DataZ() const{
-  if (fZ.empty)
-    Calculate();
-  return fZ;
-}
+//------------------
+// Method filling the z and B(z)-vectors for the case B(z) should be used numerically
+//------------------
 
-vector<double> DataBZ() const{
-  if (fBZ.empty)
-    Calculate();
-  return fBZ;
+void TBofZCalc::Calculate()
+{
+  if (!fBZ.empty())
+    return;
+
+  double ZZ;
+  int j;
+  fZ.resize(fSteps);
+  fBZ.resize(fSteps);
+
+#pragma omp parallel for default(shared) private(j,ZZ) schedule(dynamic)
+  for (j=0; j<fSteps; j++) {
+    ZZ = fParam[1] + (double)j*fDZ;
+    fZ[j] = ZZ;
+    fBZ[j] = GetBofZ(ZZ);
+  }
+  return;
 }
 
 // //------------------
@@ -80,19 +92,50 @@ vector<double> DataBZ() const{
 // Parameters: Bext[G], deadlayer[nm], lambda[nm] 
 //------------------
 
-TLondon1D_HS::TLondon1D_HS(unsigned int steps, const vector<double> &param) {
-
+TLondon1D_HS::TLondon1D_HS(const vector<double> &param, unsigned int steps)
+{
+  fSteps = steps;
   fDZ = 200.0/double(steps);
-  double ZZ, BBz;
-
-  for (unsigned int j(0); j<steps; j++) {
-    ZZ = param[1] + (double)j*fDZ;
-    fZ.push_back(ZZ);
-    BBz = param[0]*exp(-(ZZ-param[1])/param[2]);
-    fBZ.push_back(BBz);
-  }
-
+  fParam = param;
 }
+
+double TLondon1D_HS::GetBofZ(double ZZ) const
+{
+  if(ZZ < 0. || ZZ < fParam[1])
+    return fParam[0];
+
+  return fParam[0]*exp((fParam[1]-ZZ)/fParam[2]);
+}
+
+double TLondon1D_HS::GetBmax() const
+{
+  // return applied field
+  return fParam[0];
+}
+
+double TLondon1D_HS::GetBmin() const
+{
+  // return field minimum
+  return fParam[0]*exp((fParam[1]-200.0)/fParam[2]);
+}
+
+vector< pair<double, double> > TLondon1D_HS::GetInverseAndDerivative(double BB) const
+{
+  vector< pair<double, double> > inv;
+
+  if(BB <= 0.0 || BB > fParam[0])
+    return inv;
+
+  pair<double, double> invAndDerivative;
+
+  invAndDerivative.first = fParam[1] - fParam[2]*log(BB/fParam[0]);
+  invAndDerivative.second = -fParam[2]/BB;
+
+  inv.push_back(invAndDerivative);
+
+  return inv;
+}
+
 
 //------------------
 // Constructor of the TLondon1D_1L class
@@ -100,21 +143,99 @@ TLondon1D_HS::TLondon1D_HS(unsigned int steps, const vector<double> &param) {
 // Parameters: Bext[G], deadlayer[nm], thickness[nm], lambda[nm] 
 //------------------
 
-TLondon1D_1L::TLondon1D_1L(unsigned int steps, const vector<double> &param) {
-
-  double N(cosh(param[2]/2.0/param[3]));
-
+TLondon1D_1L::TLondon1D_1L(const vector<double> &param, unsigned int steps)
+{
+  fSteps = steps;
   fDZ = param[2]/double(steps);
-  double ZZ, BBz;
+  fParam = param;
+  fMinZ = -1.0;
+  fMinB = -1.0;
 
-  for (unsigned int j(0); j<steps; j++) {
-    ZZ = param[1] + (double)j*fDZ;
-    fZ.push_back(ZZ);
-    BBz = param[0]*cosh((param[2]/2.0-(ZZ-param[1]))/param[3])/N;
-    fBZ.push_back(BBz);
+// thicknesses have to be greater or equal to zero
+  for(unsigned int i(1); i<3; i++)
+    assert(param[i]>=0.);
+
+// lambdas have to be greater than zero
+    assert(param[3]!=0.);
+
+// Calculate the coefficients of the exponentials
+  double N0(param[0]/(1.0+exp(param[2]/param[3])));
+
+  fCoeff[0]=N0*exp((param[1]+param[2])/param[3]);
+  fCoeff[1]=N0*exp(-param[1]/param[3]);
+
+// none of the coefficients should be zero
+  for(unsigned int i(0); i<2; i++)
+    assert(fCoeff[i]);
+
+  SetBmin();
+}
+
+double TLondon1D_1L::GetBofZ(double ZZ) const
+{
+  if(ZZ < 0. || ZZ < fParam[1] || ZZ > fParam[1]+fParam[2])
+    return fParam[0];
+
+  return fCoeff[0]*exp(-ZZ/fParam[3])+fCoeff[1]*exp(ZZ/fParam[3]);
+}
+
+double TLondon1D_1L::GetBmax() const
+{
+  // return applied field
+  return fParam[0];
+}
+
+double TLondon1D_1L::GetBmin() const
+{
+  // return field minimum
+  return fMinB;
+}
+
+void TLondon1D_1L::SetBmin()
+{
+  double b_a(fCoeff[1]/fCoeff[0]);
+  assert (b_a>0.);
+
+  double minZ;
+  // check if the minimum is in the first layer
+  minZ=-0.5*fParam[3]*log(b_a);
+  if (minZ > fParam[1] && minZ <= fParam[2]) {
+    fMinZ = minZ;
+    fMinB = GetBofZ(minZ);
+    return;
   }
 
+  assert(fMinZ > 0. && fMinB > 0.);
+  return;
 }
+
+vector< pair<double, double> > TLondon1D_1L::GetInverseAndDerivative(double BB) const
+{
+  vector< pair<double, double> > inv;
+
+  if(BB <= fMinB || BB > fParam[0])
+    return inv;
+
+  double inverse[2];
+  pair<double, double> invAndDerivative;
+
+  inverse[0]=fParam[3]*log((BB-sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]))/(2.0*fCoeff[1]));
+  inverse[1]=fParam[3]*log((BB+sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]))/(2.0*fCoeff[1]));
+
+  if(inverse[0] > fParam[1] && inverse[0] < fMinZ) {
+    invAndDerivative.first = inverse[0];
+    invAndDerivative.second = -fParam[3]/sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]);
+    inv.push_back(invAndDerivative);
+  }
+  if(inverse[1] > fMinZ && inverse[1] <= fParam[1]+fParam[2]) {
+    invAndDerivative.first = inverse[1];
+    invAndDerivative.second = +fParam[3]/sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]);
+    inv.push_back(invAndDerivative);
+  }
+
+  return inv;
+}
+
 
 //------------------
 // Constructor of the TLondon1D_2L class
@@ -122,25 +243,164 @@ TLondon1D_1L::TLondon1D_1L(unsigned int steps, const vector<double> &param) {
 // Parameters: Bext[G], deadlayer[nm], thickness1[nm], thickness2[nm], lambda1[nm], lambda2[nm] 
 //------------------
 
-TLondon1D_2L::TLondon1D_2L(unsigned int steps, const vector<double> &param) {
-
-  double N1(param[5]*cosh(param[3]/param[5])*sinh(param[2]/param[4]) + param[4]*cosh(param[2]/param[4])*sinh(param[3]/param[5]));
-  double N2(4.0*N1);
-
+TLondon1D_2L::TLondon1D_2L(const vector<double> &param, unsigned int steps)
+{
+  fSteps = steps;
   fDZ = (param[2]+param[3])/double(steps);
-  double ZZ, BBz;
+  fParam = param;
+  fMinTag = -1;
+  fMinZ = -1.0;
+  fMinB = -1.0;
 
-  for (unsigned int j(0); j<steps; j++) {
-    ZZ = param[1] + (double)j*fDZ;
-    fZ.push_back(ZZ);
-    if (ZZ < param[1]+param[2]) {
-      BBz = param[0]*(param[4]*cosh((param[2]+param[1]-ZZ)/param[4])*sinh(param[3]/param[5]) - param[5]*sinh((param[1]-ZZ)/param[4]) +  param[5]*cosh(param[3]/param[5])*sinh((param[2]+param[1]-ZZ)/param[4]))/N1;
-    } else {
-      BBz = param[0]*(exp(-param[2]/param[4]-(param[2]+param[3]+param[1]+ZZ)/param[5]) * (exp((param[3]+2.0*param[1])/param[5])*(exp(2.0*param[2]*(param[4]+param[5])/param[4]/param[5]) * (param[5]-param[4]) - exp(2.0*param[2]/param[5]) * (param[4]-2.0*param[4]*exp(param[2]/param[4]+param[3]/param[5])+param[5])) +  exp(2.0*ZZ/param[5])*((param[4]-param[5]+(param[4]+param[5]) * exp(2.0*param[2]/param[4]))*exp(param[3]/param[5])-2.0*param[4]*exp(param[2]/param[4]))))/N2;
-    }
-    fBZ.push_back(BBz);
+// thicknesses have to be greater or equal to zero
+  for(unsigned int i(1); i<4; i++)
+    assert(param[i]>=0.);
+
+// lambdas have to be greater than zero
+  for(unsigned int i(4); i<6; i++){
+    assert(param[i]!=0.);
+  }
+  fInterfaces[0]=param[1];
+  fInterfaces[1]=param[1]+param[2];
+  fInterfaces[2]=param[1]+param[2]+param[3];
+
+// Calculate the coefficients of the exponentials
+  double B0(param[0]), dd(param[1]), d1(param[2]), d2(param[3]), l1(param[4]), l2(param[5]);
+
+  double N0((1.0+exp(2.0*d1/l1))*(-1.0+exp(2.0*d2/l2))*l1+(-1.0+exp(2.0*d1/l1))*(1.0+exp(2.0*d2/l2))*l2);
+
+  double N1(4.0*(l2*cosh(d2/l2)*sinh(d1/l1)+l1*cosh(d1/l1)*sinh(d2/l2)));
+
+  fCoeff[0]=B0*exp((d1+dd)/l1)*(-2.0*exp(d2/l2)*l2+exp(d1/l1)*(l2-l1)+exp(d1/l1+2.0*d2/l2)*(l1+l2))/N0;
+
+  fCoeff[1]=-B0*exp(-(dd+d1)/l1-d2/l2)*(l1-exp(2.0*d2/l2)*l1+(1.0-2.0*exp(d1/l1+d2/l2)+exp(2.0*d2/l2))*l2)/N1;
+
+  fCoeff[2]=B0*exp((d1+d2+dd)/l2)*(-(1.0+exp(2.0*d1/l1)-2.0*exp(d1/l1+d2/l2))*l1+(-1.0+exp(2.0*d1/l1))*l2)/N0;
+
+  fCoeff[3]=B0*exp(-d1/l1-(d1+d2+dd)/l2)*(-2.0*exp(d1/l1)*l1+exp(d2/l2)*(l1-l2+exp(2.0*d1/l1)*(l1+l2)))/N1;
+
+// none of the coefficients should be zero
+  for(unsigned int i(0); i<4; i++)
+    assert(fCoeff[i]);
+
+  SetBmin();
+}
+
+double TLondon1D_2L::GetBofZ(double ZZ) const
+{
+  if(ZZ < 0. || ZZ < fInterfaces[0] || ZZ > fInterfaces[2])
+    return fParam[0];
+
+  if (ZZ < fInterfaces[1]) {
+    return fCoeff[0]*exp(-ZZ/fParam[4])+fCoeff[1]*exp(ZZ/fParam[4]);
+  } else {
+    return fCoeff[2]*exp(-ZZ/fParam[5])+fCoeff[3]*exp(ZZ/fParam[5]);
+  }
+}
+
+double TLondon1D_2L::GetBmax() const
+{
+  // return applied field
+  return fParam[0];
+}
+
+double TLondon1D_2L::GetBmin() const
+{
+  // return field minimum
+  return fMinB;
+}
+
+void TLondon1D_2L::SetBmin()
+{
+  double b_a(fCoeff[1]/fCoeff[0]);
+  assert (b_a>0.);
+
+  double minZ;
+  // check if the minimum is in the first layer
+  minZ=-0.5*fParam[4]*log(b_a);
+  if (minZ > fInterfaces[0] && minZ <= fInterfaces[1]) {
+    fMinTag = 1;
+    fMinZ = minZ;
+    fMinB = GetBofZ(minZ);
+    return;
   }
 
+  double d_c(fCoeff[3]/fCoeff[2]);
+  assert (d_c>0.);
+
+  // check if the minimum is in the second layer
+  minZ=-0.5*fParam[5]*log(d_c);
+  if (minZ > fInterfaces[1] && minZ <= fInterfaces[2]) {
+    fMinTag = 2;
+    fMinZ = minZ;
+    fMinB = GetBofZ(minZ);
+    return;
+  }
+
+  assert(fMinZ > 0. && fMinB > 0.);
+  return;
+}
+
+vector< pair<double, double> > TLondon1D_2L::GetInverseAndDerivative(double BB) const
+{
+  vector< pair<double, double> > inv;
+
+  if(BB <= fMinB || BB > fParam[0])
+    return inv;
+
+  double inverse[3];
+  pair<double, double> invAndDerivative;
+
+  switch(fMinTag)
+  {
+    case 1:
+      inverse[0]=fParam[4]*log((BB-sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]))/(2.0*fCoeff[1]));
+      inverse[1]=fParam[4]*log((BB+sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]))/(2.0*fCoeff[1]));
+      inverse[2]=fParam[5]*log((BB+sqrt(BB*BB-4.0*fCoeff[2]*fCoeff[3]))/(2.0*fCoeff[3]));
+
+      if(inverse[0] > fInterfaces[0] && inverse[0] < fMinZ) {
+        invAndDerivative.first = inverse[0];
+        invAndDerivative.second = -fParam[4]/sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]);
+        inv.push_back(invAndDerivative);
+      }
+      if(inverse[1] > fMinZ && inverse[1] <= fInterfaces[1]) {
+        invAndDerivative.first = inverse[1];
+        invAndDerivative.second = +fParam[4]/sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]);
+        inv.push_back(invAndDerivative);
+      }
+      if(inverse[2] > fInterfaces[1] && inverse[2] <= fInterfaces[2]) {
+        invAndDerivative.first = inverse[2];
+        invAndDerivative.second = +fParam[5]/sqrt(BB*BB-4.0*fCoeff[2]*fCoeff[3]);
+        inv.push_back(invAndDerivative);
+      }
+      break;
+
+    case 2:
+      inverse[0]=fParam[4]*log((BB-sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]))/(2.0*fCoeff[1]));
+      inverse[1]=fParam[5]*log((BB-sqrt(BB*BB-4.0*fCoeff[2]*fCoeff[3]))/(2.0*fCoeff[3]));
+      inverse[2]=fParam[5]*log((BB+sqrt(BB*BB-4.0*fCoeff[2]*fCoeff[3]))/(2.0*fCoeff[3]));
+
+      if(inverse[0] > fInterfaces[0] && inverse[0] <= fInterfaces[1]) {
+        invAndDerivative.first = inverse[0];
+        invAndDerivative.second = -fParam[4]/sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]);
+        inv.push_back(invAndDerivative);
+      }
+      if(inverse[1] > fInterfaces[1] && inverse[1] < fMinZ) {
+        invAndDerivative.first = inverse[1];
+        invAndDerivative.second = -fParam[5]/sqrt(BB*BB-4.0*fCoeff[2]*fCoeff[3]);
+        inv.push_back(invAndDerivative);
+      }
+      if(inverse[2] > fMinZ && inverse[2] <= fInterfaces[2]) {
+        invAndDerivative.first = inverse[2];
+        invAndDerivative.second = +fParam[5]/sqrt(BB*BB-4.0*fCoeff[2]*fCoeff[3]);
+        inv.push_back(invAndDerivative);
+      }
+      break;
+
+    default:
+      break;
+  }
+  return inv;
 }
 
 //------------------
@@ -149,67 +409,62 @@ TLondon1D_2L::TLondon1D_2L(unsigned int steps, const vector<double> &param) {
 // Parameters: Bext[G], deadlayer[nm], thickness1[nm], thickness2[nm], thickness3[nm], lambda1[nm], lambda2[nm], lambda3[nm]
 //------------------
 
-TLondon1D_3L::TLondon1D_3L(unsigned int steps, const vector<double> &param)
- : fSteps(steps), fDZ((param[2]+param[3]+param[4])/double(steps)), fParam(param), fMinTag(-1), fMinZ(-1.0), fMinB(-1.0)
+TLondon1D_3L::TLondon1D_3L(const vector<double> &param, unsigned int steps)
+// : fSteps(steps), fDZ((param[2]+param[3]+param[4])/double(steps)), fParam(param), fMinTag(-1), fMinZ(-1.0), fMinB(-1.0)
 {
+// no members of TLondon1D_3L, therefore the initialization list cannot be used!!
+  fSteps = steps;
+  fDZ = (param[2]+param[3]+param[4])/double(steps);
+  fParam = param;
+  fMinTag = -1;
+  fMinZ = -1.0;
+  fMinB = -1.0;
+
 // thicknesses have to be greater or equal to zero
   for(unsigned int i(1); i<5; i++)
     assert(param[i]>=0.);
 
 // lambdas have to be greater than zero
-  for(unsigned int i(5); i<param.size(); i++)
-    assert(param[i]>0.);
+  for(unsigned int i(5); i<8; i++)
+    assert(param[i]!=0.);
 
-  fInterfaces={param[1], param[1]+param[2], param[1]+param[2]+param[3], param[1]+param[2]+param[3]+param[4]};
+  fInterfaces[0]=param[1];
+  fInterfaces[1]=param[1]+param[2];
+  fInterfaces[2]=param[1]+param[2]+param[3];
+  fInterfaces[3]=param[1]+param[2]+param[3]+param[4];
 
 // Calculate the coefficients of the exponentials
-  double N0(4.0*((1.0+exp(2.0*param[2]/param[5]))*param[5]*(param[7]*cosh(param[4]/param[7])*sinh(param[3]/param[6]) + \
-   param[6]*cosh(param[3]/param[6])*sinh(param[4]/param[7]))+(-1.0+exp(2.0*param[2]/param[5])) * \
-    param[6]*(param[7]*cosh(param[3]/param[6])*cosh(param[4]/param[7])+param[6]*sinh(param[3]/param[6])*sinh(param[4]/param[7]))));
+  double B0(param[0]), dd(param[1]), d1(param[2]), d2(param[3]), d3(param[4]), l1(param[5]), l2(param[6]), l3(param[7]);
 
-  double N2(2.0*param[7]*cosh(param[4]/param[7])*((-1.0+exp(2.0*param[2]/param[5]))*param[6]*cosh(param[3]/param[6]) + \
-   (1.0+exp(2.0*param[2]/param[5]))*param[5]*sinh(param[3]/param[6])) + \
-    4.0*exp(param[2]/param[5])*param[6]*(param[5]*cosh(param[2]/param[5])*cosh(param[3]/param[6]) + \
-     param[6]*sinh(param[2]/param[5])*sinh(param[3]/param[6]))*sinh(param[4]/param[7]));
+  double N0(4.0*((1.0+exp(2.0*d1/l1))*l1*(l3*cosh(d3/l3)*sinh(d2/l2) + l2*cosh(d2/l2)*sinh(d3/l3))+(-1.0+exp(2.0*d1/l1)) * \
+    l2*(l3*cosh(d2/l2)*cosh(d3/l3)+l2*sinh(d2/l2)*sinh(d3/l3))));
 
-  double N3(2.0*((1.0+exp(2.0*param[2]/param[5]))*param[5]*(param[7]*cosh(param[4]/param[7])*sinh(param[3]/param[6]) + \
-   param[6]*cosh(param[3]/param[6])*sinh(param[4]/param[7])) + \
-    (-1.0+exp(2.0*param[2]/param[5]))*param[6]*(param[7]*cosh(param[3]/param[6]) * \
-     cosh(param[4]/param[7])+param[6]*sinh(param[3]/param[6])*sinh(param[4]/param[7]))));
+  double N2(2.0*l3*cosh(d3/l3)*((-1.0+exp(2.0*d1/l1))*l2*cosh(d2/l2) + (1.0+exp(2.0*d1/l1))*l1*sinh(d2/l2)) + \
+    4.0*exp(d1/l1)*l2*(l1*cosh(d1/l1)*cosh(d2/l2) + l2*sinh(d1/l1)*sinh(d2/l2))*sinh(d3/l3));
 
-  double N5((1.0+exp(2.0*param[2]/param[5]))*param[5]*(param[7]*cosh(param[4]/param[7])*sinh(param[3]/param[6]) + \
-   param[6]*cosh(param[3]/param[6])*sinh(param[4]/param[7])) + \
-    (-1.0+exp(2.0*param[2]/param[5]))*param[6]*(param[7]*cosh(param[3]/param[6]) * \
-     cosh(param[4]/param[7])+param[6]*sinh(param[3]/param[6])*sinh(param[4]/param[7])));
+  double N3(2.0*((1.0+exp(2.0*d1/l1))*l1*(l3*cosh(d3/l3)*sinh(d2/l2) + l2*cosh(d2/l2)*sinh(d3/l3)) + \
+    (-1.0+exp(2.0*d1/l1))*l2*(l3*cosh(d2/l2) * cosh(d3/l3)+l2*sinh(d2/l2)*sinh(d3/l3))));
 
-  fCoeff[0]=(B0*exp((param[2]+param[1])/param[5]-param[3]/param[6]-param[4]/param[7]) * \
-   (exp(param[2]/param[5])*(param[5]-param[6])*(-param[6]+exp(2.0*param[4]/param[7])*(param[6]-param[7])-param[7]) - \
-    4.0*exp(param[3]/param[6]+param[4]/param[7]) * param[6]*param[7] + \
-     exp(param[2]/param[5]+2.0*param[3]/param[6])*(param[5]+param[6]) * \
-      (-param[6]+param[7]+exp(2.0*param[4]/param[7])*(param[6]+param[7]))))/N0;
+  double N5((1.0+exp(2.0*d1/l1))*l1*(l3*cosh(d3/l3)*sinh(d2/l2) + l2*cosh(d2/l2)*sinh(d3/l3)) + \
+    (-1.0+exp(2.0*d1/l1))*l2*(l3*cosh(d2/l2) * cosh(d3/l3)+l2*sinh(d2/l2)*sinh(d3/l3)));
 
-  fCoeff[1]=(B0*exp(-param[1]/param[5]-param[3]/param[6]-param[4]/param[7])*(-param[6]*((-1.0+exp(2.0*param[3]/param[6])) * \
-   (-1.0+exp(2.0*param[4]/param[7]))*param[6]+(1.0+exp(2.0*param[3]/param[6]) - \
-    4.0*exp(param[2]/param[5]+param[3]/param[6]+param[4]/param[7]) + exp(2.0*param[4]/param[7])*(1.0+exp(2.0*param[3]/param[6])))*param[7]) + \
-     4.0*exp(param[3]/param[6]+param[4]/param[7])*param[5]*(param[7]*cosh(param[4]/param[7]) * \
-      sinh(param[3]/param[6])+param[6]*cosh(param[3]/param[6])*sinh(param[4]/param[7]))))/N0;
+  fCoeff[0]=(B0*exp((d1+dd)/l1-d2/l2-d3/l3) * (exp(d1/l1)*(l1-l2)*(-l2+exp(2.0*d3/l3)*(l2-l3)-l3) - \
+    4.0*exp(d2/l2+d3/l3) * l2*l3 + exp(d1/l1+2.0*d2/l2)*(l1+l2) * (-l2+l3+exp(2.0*d3/l3)*(l2+l3))))/N0;
 
-  fCoeff[2]=(B0*exp((param[2]+param[1])/param[6])*(-exp(2.0*param[2]/param[5])*(param[5]-param[6])*param[7]-(param[5]+param[6])*param[7] + \
-   2.0*exp(param[2]/param[5]+param[3]/param[6])*param[5]*(param[7]*cosh(param[4]/param[7])+param[6]*sinh(param[4]/param[7]))))/N2;
+  fCoeff[1]=(B0*exp(-dd/l1-d2/l2-d3/l3)*(-l2*((-1.0+exp(2.0*d2/l2)) * (-1.0+exp(2.0*d3/l3))*l2+(1.0+exp(2.0*d2/l2) - \
+    4.0*exp(d1/l1+d2/l2+d3/l3) + exp(2.0*d3/l3)*(1.0+exp(2.0*d2/l2)))*l3) + 4.0*exp(d2/l2+d3/l3)*l1*(l3*cosh(d3/l3) * \
+      sinh(d2/l2)+l2*cosh(d2/l2)*sinh(d3/l3))))/N0;
 
-  fCoeff[3]=(B0*exp(-(param[2]+param[3]+param[1])/param[6]-param[4]/param[7])*(exp(param[3]/param[6]+param[4]/param[7]) * \
-   (param[5]-param[6]+exp(2.0*param[2]/param[5])*(param[5]+param[6]))*param[7] - \
-    exp(param[2]/param[5])*param[5]*(param[6]+param[7]+exp(2.0*param[4]/param[7])*(param[7]-param[6]))))/N3;
+  fCoeff[2]=(B0*exp((d1+dd)/l2)*(-exp(2.0*d1/l1)*(l1-l2)*l3-(l1+l2)*l3 + 2.0*exp(d1/l1+d2/l2)*l1*(l3*cosh(d3/l3)+l2*sinh(d3/l3))))/N2;
 
-  fCoeff[4]=(0.25*B0*exp(-param[3]/param[6]+(param[2]+param[3]+param[1])/param[7]) * \
-   (4.0*exp(param[2]/param[5]+param[3]/param[6]+param[4]/param[7])*param[5]*param[6] - \
-    (-1.0+exp(2.0*param[2]/param[5]))*param[6]*(-param[6]+exp(2.0*param[3]/param[6])*(param[6]-param[7])-param[7]) - \
-     (1.0+exp(2.0*param[2]/param[5])*param[5]*(param[6]+exp(2.0*param[3]/param[6])*(param[6]-param[7])+param[7])))/N5;
+  fCoeff[3]=(B0*exp(-(d1+d2+dd)/l2-d3/l3)*(exp(d2/l2+d3/l3) * (l1-l2+exp(2.0*d1/l1)*(l1+l2))*l3 - \
+   exp(d1/l1)*l1*(l2+l3+exp(2.0*d3/l3)*(l3-l2))))/N3;
 
-  fCoeff[5]=(B0*exp(-(param[2]+param[3]+param[4]+param[1])/param[7]+param[2]/param[5]) * \
-   (-param[5]*param[6]+exp(param[4]/param[7])*(param[6]*sinh(param[2]/param[5])*(param[7]*cosh(param[3]/param[6]) + \
-    param[6]*sinh(param[3]/param[6])) + param[5]*cosh(param[2]/param[5]) * \
-     (param[6]*cosh(param[3]/param[6])+param[7]*sinh(param[3]/param[6])))))/N5;
+  fCoeff[4]=(0.25*B0*exp(-d2/l2+(d1+d2+dd)/l3) * (4.0*exp(d1/l1+d2/l2+d3/l3)*l1*l2 - \
+    (-1.0+exp(2.0*d1/l1))*l2*(-l2+exp(2.0*d2/l2)*(l2-l3)-l3) - (1.0+exp(2.0*d1/l1))*l1*(l2+exp(2.0*d2/l2)*(l2-l3)+l3)))/N5;
+
+  fCoeff[5]=(B0*exp(-(d1+d2+d3+dd)/l3+d1/l1) * (-l1*l2+exp(d3/l3)*(l2*sinh(d1/l1)*(l3*cosh(d2/l2) + \
+    l2*sinh(d2/l2)) + l1*cosh(d1/l1) * (l2*cosh(d2/l2)+l3*sinh(d2/l2)))))/N5;
 
 // none of the coefficients should be zero
   for(unsigned int i(0); i<6; i++)
@@ -218,70 +473,17 @@ TLondon1D_3L::TLondon1D_3L(unsigned int steps, const vector<double> &param)
   SetBmin();
 }
 
-void TLondon1D_3L::Calculate()
-{
-  if (!fBZ.empty())
-    return;
-
-  double ZZ;
-  int j;
-  fZ.resize(fSteps);
-  fBZ.resize(fSteps);
-
-#pragma omp parallel for default(shared) private(j,ZZ) schedule(dynamic)
-  for (j=0; j<fSteps; j++) {
-    ZZ = fParam[1] + (double)j*fDZ;
-    fZ[j] = ZZ;
-    fBZ[j] = GetBofZ(ZZ);
-  }
-  return;
-}
-
 double TLondon1D_3L::GetBofZ(double ZZ) const
 {
   if(ZZ < 0. || ZZ < fInterfaces[0] || ZZ > fInterfaces[3])
     return fParam[0];
 
-  double N1(fParam[7]*cosh(fParam[4]/fParam[7])*((exp(2.0*fParam[2]/fParam[5])-1.0)*fParam[6]*cosh(fParam[3]/fParam[6]) + \
-   (1.0+exp(2.0*fParam[2]/fParam[5]))*fParam[5]*sinh(fParam[3]/fParam[6])) + \
-    2.0*exp(fParam[2]/fParam[5])*fParam[6]*(fParam[5]*cosh(fParam[2]/fParam[5])*cosh(fParam[3]/fParam[6]) + \
-     fParam[6]*sinh(fParam[2]/fParam[5])*sinh(fParam[3]/fParam[6]))*sinh(fParam[4]/fParam[7]));
-
-  double N21(2.0*(fParam[7]*cosh(fParam[4]/fParam[7])*((-1.0+exp(2.0*fParam[2]/fParam[5]))*fParam[6]*cosh(fParam[3]/fParam[6]) + \
-   (1.0+exp(2.0*fParam[2]/fParam[5]))*fParam[5]*sinh(fParam[3]/fParam[6])) + \
-    2.0*exp(fParam[2]/fParam[5])*fParam[6]*(fParam[5]*cosh(fParam[2]/fParam[5])*cosh(fParam[3]/fParam[6]) + \
-     fParam[6]*sinh(fParam[2]/fParam[5])*sinh(fParam[3]/fParam[6]))*sinh(fParam[4]/fParam[7])));
-
-  double N22(((fParam[5]+exp(2.0*fParam[2]/fParam[5])*(fParam[5]-fParam[6])+fParam[6])*(-fParam[7]*cosh(fParam[4]/fParam[7]) + \
-   fParam[6]*sinh(fParam[4]/fParam[7]))+exp(2.0*fParam[3]/fParam[6])*(fParam[5]-fParam[6] + \
-    exp(2.0*fParam[2]/fParam[5])*(fParam[5]+fParam[6]))*(fParam[7]*cosh(fParam[4]/fParam[7])+fParam[6]*sinh(fParam[4]/fParam[7]))));
-
-  double N3(4.0*((1.0+exp(2.0*fParam[2]/fParam[5]))*fParam[5]*(fParam[7]*cosh(fParam[4]/fParam[7])*sinh(fParam[3]/fParam[6]) + \
-   fParam[6]*cosh(fParam[3]/fParam[6])*sinh(fParam[4]/fParam[7])) + \
-    (-1.0+exp(2.0*fParam[2]/fParam[5]))*fParam[6]*(fParam[7]*cosh(fParam[3]/fParam[6])*cosh(fParam[4]/fParam[7]) + \
-     fParam[6]*sinh(fParam[3]/fParam[6])*sinh(fParam[4]/fParam[7]))));
-
   if (ZZ < fInterfaces[1]) {
-    return (2.0*fParam[0]*exp(fParam[2]/fParam[5])*(-fParam[6]*fParam[7]*sinh((fParam[1]-ZZ)/fParam[5]) + \
-     fParam[7]*cosh(fParam[4]/fParam[7])*(fParam[6]*cosh(fParam[3]/fParam[6])*sinh((fParam[2]+fParam[1]-ZZ)/fParam[5]) + \
-      fParam[5]*cosh((fParam[2]+fParam[1]-ZZ)/fParam[5])*sinh(fParam[3]/fParam[6])) + \
-       fParam[6]*(fParam[5]*cosh((fParam[2]+fParam[1]-ZZ)/fParam[5])*cosh(fParam[3]/fParam[6]) + \
-        fParam[6]*sinh((fParam[2]+fParam[1]-ZZ)/fParam[5])*sinh(fParam[3]/fParam[6]))*sinh(fParam[4]/fParam[7])))/N1;
+    return fCoeff[0]*exp(-ZZ/fParam[5])+fCoeff[1]*exp(ZZ/fParam[5]);
   } else if (ZZ < fInterfaces[2]) {
-    return (fParam[0]*exp((fParam[2]+fParam[1]-ZZ)/fParam[6])*(-fParam[5]-fParam[6]+exp(2.0*fParam[2]/fParam[5])*(fParam[6]-fParam[5]))*fParam[7])/N21 + \
-     (fParam[0]*exp(-(fParam[2]+fParam[1]+ZZ)/fParam[6])*(exp((fParam[3]+2.0*ZZ)/fParam[6])*(fParam[5]-fParam[6] + \
-      exp(2.0*fParam[2]/fParam[5])*(fParam[5]+fParam[6]))*fParam[7] + \
-       2.0*exp(fParam[2]/fParam[5])*fParam[5]*(exp(2.0*ZZ/fParam[6])*(-fParam[7]*cosh(fParam[4]/fParam[7]) + \
-        fParam[6]*sinh(fParam[4]/fParam[7]))+(cosh(2.0*(fParam[2]+fParam[3]+fParam[1])/fParam[6]) + \
-         sinh(2.0*(fParam[2]+fParam[3]+fParam[1])/fParam[6]))*(fParam[7]*cosh(fParam[4]/fParam[7])+fParam[6]*sinh(fParam[4]/fParam[7])))))/N22;
+    return fCoeff[2]*exp(-ZZ/fParam[6])+fCoeff[3]*exp(ZZ/fParam[6]);
   } else {
-    return (fParam[0]*exp(-(fParam[2]+fParam[3]+fParam[1]+ZZ)/fParam[7])*(-exp(-fParam[3]/fParam[6] + \
-     2.0*(fParam[2]+fParam[3]+fParam[1])/fParam[7])*(-4.0*exp(fParam[2]/fParam[5]+fParam[3]/fParam[6]+fParam[4]/fParam[7])*fParam[5]*fParam[6] + \
-      (-1.0+exp(2.0*fParam[2]/fParam[5]))*fParam[6]*(-fParam[6]+exp(2.0*fParam[3]/fParam[6])*(fParam[6]-fParam[7])-fParam[7]) + \
-       (1.0+exp(2.0*fParam[2]/fParam[5]))*fParam[5]*(fParam[6]+exp(2.0*fParam[3]/fParam[6])*(fParam[6]-fParam[7])+fParam[7])) + \
-        4.0*exp(fParam[2]/fParam[5]-(fParam[4]-2.0*ZZ)/fParam[7])*(-fParam[5]*fParam[6]+exp(fParam[4]/fParam[7]) * \
-         (fParam[6]*sinh(fParam[2]/fParam[5])*(fParam[7]*cosh(fParam[3]/fParam[6])+fParam[6]*sinh(fParam[3]/fParam[6])) + \
-          fParam[5]*cosh(fParam[2]/fParam[5])*(fParam[6]*cosh(fParam[3]/fParam[6])+fParam[7]*sinh(fParam[3]/fParam[6]))))))/N3;
+    return fCoeff[4]*exp(-ZZ/fParam[7])+fCoeff[5]*exp(ZZ/fParam[7]);
   }
 }
 
@@ -336,7 +538,7 @@ void TLondon1D_3L::SetBmin()
     return;
   }
 
-  assert(fminZ > 0. && fminB > 0.);
+  assert(fMinZ > 0. && fMinB > 0.);
   return;
 }
 
@@ -344,7 +546,7 @@ vector< pair<double, double> > TLondon1D_3L::GetInverseAndDerivative(double BB) 
 {
   vector< pair<double, double> > inv;
 
-  if(BB <= fminB || BB > fParam[0])
+  if(BB <= fMinB || BB > fParam[0])
     return inv;
 
   double inverse[4];
@@ -358,12 +560,12 @@ vector< pair<double, double> > TLondon1D_3L::GetInverseAndDerivative(double BB) 
       inverse[2]=fParam[6]*log((BB+sqrt(BB*BB-4.0*fCoeff[2]*fCoeff[3]))/(2.0*fCoeff[3]));
       inverse[3]=fParam[7]*log((BB+sqrt(BB*BB-4.0*fCoeff[4]*fCoeff[5]))/(2.0*fCoeff[5]));
 
-      if(inverse[0] > fInterfaces[0] && inverse[0] < fminZ) {
+      if(inverse[0] > fInterfaces[0] && inverse[0] < fMinZ) {
         invAndDerivative.first = inverse[0];
         invAndDerivative.second = -fParam[5]/sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]);
         inv.push_back(invAndDerivative);
       }
-      if(inverse[1] > fminZ && inverse[1] <= fInterfaces[1]) {
+      if(inverse[1] > fMinZ && inverse[1] <= fInterfaces[1]) {
         invAndDerivative.first = inverse[1];
         invAndDerivative.second = +fParam[5]/sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]);
         inv.push_back(invAndDerivative);
@@ -391,12 +593,12 @@ vector< pair<double, double> > TLondon1D_3L::GetInverseAndDerivative(double BB) 
         invAndDerivative.second = -fParam[5]/sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]);
         inv.push_back(invAndDerivative);
       }
-      if(inverse[1] > fInterfaces[1] && inverse[1] < fminZ) {
+      if(inverse[1] > fInterfaces[1] && inverse[1] < fMinZ) {
         invAndDerivative.first = inverse[1];
         invAndDerivative.second = -fParam[6]/sqrt(BB*BB-4.0*fCoeff[2]*fCoeff[3]);
         inv.push_back(invAndDerivative);
       }
-      if(inverse[2] > fminZ && inverse[2] <= fInterfaces[2]) {
+      if(inverse[2] > fMinZ && inverse[2] <= fInterfaces[2]) {
         invAndDerivative.first = inverse[2];
         invAndDerivative.second = +fParam[6]/sqrt(BB*BB-4.0*fCoeff[2]*fCoeff[3]);
         inv.push_back(invAndDerivative);
@@ -425,12 +627,12 @@ vector< pair<double, double> > TLondon1D_3L::GetInverseAndDerivative(double BB) 
         invAndDerivative.second = -fParam[6]/sqrt(BB*BB-4.0*fCoeff[2]*fCoeff[3]);
         inv.push_back(invAndDerivative);
       }
-      if(inverse[2] > fInterfaces[2] && inverse[2] < fminZ) {
+      if(inverse[2] > fInterfaces[2] && inverse[2] < fMinZ) {
         invAndDerivative.first = inverse[2];
         invAndDerivative.second = -fParam[7]/sqrt(BB*BB-4.0*fCoeff[4]*fCoeff[5]);
         inv.push_back(invAndDerivative);
       }
-      if(inverse[3] > fminZ && inverse[3] <= fInterfaces[3]) {
+      if(inverse[3] > fMinZ && inverse[3] <= fInterfaces[3]) {
         invAndDerivative.first = inverse[3];
         invAndDerivative.second = +fParam[7]/sqrt(BB*BB-4.0*fCoeff[4]*fCoeff[5]);
         inv.push_back(invAndDerivative);
@@ -450,74 +652,274 @@ vector< pair<double, double> > TLondon1D_3L::GetInverseAndDerivative(double BB) 
 // Parameters: Bext[G], deadlayer[nm], thickness1[nm], thickness2[nm], thickness3[nm], lambda1[nm], lambda2[nm] 
 //------------------
 
-TLondon1D_3LS::TLondon1D_3LS(unsigned int steps, const vector<double> &param) {
-
-  double N1(8.0*(param[5]*param[6]*cosh(param[3]/param[6])*sinh((param[2]+param[4])/param[5]) + ((param[5]*param[5]*cosh(param[2]/param[5])*cosh(param[4]/param[5])) +  (param[6]*param[6]*sinh(param[2]/param[5])*sinh(param[4]/param[5])))*sinh(param[3]/param[6])));
-
-  double N2(2.0*param[5]*param[6]*cosh(param[3]/param[6])*sinh((param[2]+param[4])/param[5]) + 2.0*(param[5]*param[5]*cosh(param[2]/param[5])*cosh(param[4]/param[5]) + param[6]*param[6]*sinh(param[2]/param[5])*sinh(param[4]/param[5]))*sinh(param[3]/param[6]));
-
-  double N3(8.0*(param[5]*param[6]*cosh(param[3]/param[6])*sinh((param[2]+param[4])/param[5]) + (param[5]*param[5]*cosh(param[2]/param[5])*cosh(param[4]/param[5]) + param[6]*param[6]*sinh(param[2]/param[5])*sinh(param[4]/param[5]))*sinh(param[3]/param[6])));
-
+TLondon1D_3LS::TLondon1D_3LS(const vector<double> &param, unsigned int steps)
+{
+  fSteps = steps;
   fDZ = (param[2]+param[3]+param[4])/double(steps);
-  double ZZ, BBz;
+  fParam = param;
+  fMinTag = -1;
+  fMinZ = -1.0;
+  fMinB = -1.0;
 
-  for (unsigned int j(0); j<steps; j++) {
-    ZZ = param[1] + (double)j*fDZ;
-    fZ.push_back(ZZ);
-    if (ZZ < param[1]+param[2]) {
-      BBz = (param[0]*exp(-1.0*((param[2]+param[4]+param[1]+ZZ)/param[5]+(param[3]/param[6]))) *
-        (-4.0*exp((param[2]+param[4])/param[5]+(param[3]/param[6]))*(exp((2.0*param[1])/param[5]) - exp((2.0*ZZ)/param[5]))*param[5]*param[6]+exp((2.0*param[3])/param[6])*(param[5]-param[6] + (exp((2.0*param[4])/param[5])*(param[5]+param[6])))*((exp((2.0*ZZ)/param[5])*(param[5]-param[6])) + (exp((2.0*(param[2]+param[1]))/param[5])*(param[5]+param[6]))) - 4.0*((param[5]*cosh(param[4]/param[5]))-(param[6]*sinh(param[4]/param[5])))*((param[5]*cosh((param[2]+param[1]-ZZ)/param[5])) - (param[6]*sinh((param[2]+param[1]-ZZ)/param[5])))*(cosh((param[2]+param[4]+param[1]+ZZ)/param[5]) + sinh((param[2]+param[4]+param[1]+ZZ)/param[5]))))/N1;
-    } else if (ZZ < param[1]+param[2]+param[3]) {
-      BBz = (param[0]*param[5]*(2.0*param[6]*cosh((param[2]+param[3]+param[1]-ZZ)/param[6])*sinh(param[4]/param[5]) + (param[5]+param[6])*sinh(param[2]/param[5]-(param[2]+param[1]-ZZ)/param[6]) - (param[5]-param[6])*sinh(param[2]/param[5]+(param[2]+param[1]-ZZ)/param[6]) + 2.0*param[5]*cosh(param[4]/param[5])*sinh((param[2]+param[3]+param[1]-ZZ)/param[6])))/N2;
-    } else {
-      BBz = (param[0]*exp(-((2.0*param[2]+param[3]+param[4]+param[1]+ZZ)/param[5])-param[3]/param[6]) * (4.0*exp(param[2]/param[5]+param[3]/param[6])*param[5]*param[6]*((-1.0)*exp(2.0*ZZ/param[5]) + cosh(2.0*(param[2]+param[3]+param[4]+param[1])/param[5])+sinh(2.0*(param[2]+param[3]+param[4]+param[1])/param[5])) + 4.0*exp(((2.0*param[2]+param[3]+param[4]+param[1]+ZZ)/param[5]) + ((2.0*param[3])/param[6]))*(param[5]*cosh(param[2]/param[5]) + param[6]*sinh(param[2]/param[5]))*(param[5]*cosh((param[2]+param[3]+param[1]-ZZ)/param[5]) - param[6]*sinh((param[2]+param[3]+param[1]-ZZ)/param[5])) - 4.0*(param[5]*cosh(param[2]/param[5])-param[6]*sinh(param[2]/param[5])) * (param[5]*cosh((param[2]+param[3]+param[1]-ZZ)/param[5]) + param[6]*sinh((param[2]+param[3]+param[1]-ZZ)/param[5]))*(cosh((2.0*param[2]+param[3]+param[4]+param[1]+ZZ)/param[5]) + sinh((2.0*param[2]+param[3]+param[4]+param[1]+ZZ)/param[5]))))/N3;
-    }
-    fBZ.push_back(BBz);
+// thicknesses have to be greater or equal to zero
+  for(unsigned int i(1); i<5; i++)
+    assert(param[i]>=0.);
+
+// lambdas have to be greater than zero
+  for(unsigned int i(5); i<7; i++){
+    assert(param[i]!=0.);
+  }
+  fInterfaces[0]=param[1];
+  fInterfaces[1]=param[1]+param[2];
+  fInterfaces[2]=param[1]+param[2]+param[3];
+  fInterfaces[3]=param[1]+param[2]+param[3]+param[4];
+
+// Calculate the coefficients of the exponentials
+  double B0(param[0]), dd(param[1]), d1(param[2]), d2(param[3]), d3(param[4]), l1(param[5]), l2(param[6]);
+
+  double N0(8.0*(l1*l2*cosh(d2/l2)*sinh((d1+d3)/l1)+(l1*l1*cosh(d1/l1)*cosh(d3/l1)+l2*l2*sinh(d1/l1)*sinh(d3/l1))*sinh(d2/l2)));
+
+  fCoeff[0]=B0*exp((dd-d3)/l1-d2/l2)*(-4.0*exp(d3/l1+d2/l2)*l1*l2-exp(d1/l1)*(l1-l2)*(l1+exp(2.0*d3/l1)*(l1-l2)+l2) + \
+   exp(d1/l1+2.0*d2/l2)*(l1+l2)*(l1-l2+exp(2.0*d3/l1)*(l1+l2)))/N0;
+
+  fCoeff[1]=B0*exp(-(d1+d3+dd)/l1-d2/l2)*((1.0+exp(2.0*d3/l1))*(-1.0+exp(2.0*d2/l2))*l1*l1-2.0*(1.0-2.0*exp((d1+d3)/l1+d2/l2) + \
+   exp(2.0*d2/l2))*l1*l2-(-1.0+exp(2.0*d3/l1))*(-1.0+exp(2.0*d2/l2))*l2*l2)/N0;
+
+  fCoeff[2]=2.0*B0*exp(-(d1+d3)/l1+(d1+dd)/l2)*l1*(-exp(d3/l1)*(l1+exp(2.0*d1/l1)*(l1-l2)+l2) + \
+   exp(d1/l1+d2/l2)*(l1-l2+exp(2.0*d3/l1)*(l1+l2)))/N0;
+
+  fCoeff[3]=2.0*B0*exp(-(d1+d3)/l1-(d1+d2+dd)/l2)*l1*(-exp(d1/l1)*(l1+exp(2.0*d3/l1)*(l1-l2)+l2) + \
+   exp(d3/l1+d2/l2)*(l1-l2+exp(2.0*d1/l1)*(l1+l2)))/N0;
+
+  fCoeff[4]=B0*exp((d2+dd)/l1-d2/l2)*((1.0+exp(2.0*d1/l1))*(-1.0+exp(2.0*d2/l2))*l1*l1-2.0*(1.0-2.0*exp((d1+d3)/l1+d2/l2) + \
+   exp(2.0*d2/l2))*l1*l2-(-1.0+exp(2.0*d1/l1))*(-1.0+exp(2.0*d2/l2))*l2*l2)/N0;
+
+  fCoeff[5]=B0*exp(-(2.0*d1+d2+d3+dd)/l1-d2/l2)*(-4.0*exp(d1/l1+d2/l2)*l1*l2+exp(d3/l1)*(-l1*l1-exp(2.0*d1/l1)*(l1-l2)*(l1-l2)+l2*l2) + \
+   exp(d3/l1+2.0*d2/l2)*(l1*l1-l2*l2+exp(2.0*d1/l1)*(l1+l2)*(l1+l2)))/N0;
+
+// none of the coefficients should be zero
+  for(unsigned int i(0); i<6; i++)
+    assert(fCoeff[i]);
+
+  SetBmin();
+}
+
+double TLondon1D_3LS::GetBofZ(double ZZ) const
+{
+  if(ZZ < 0. || ZZ < fInterfaces[0] || ZZ > fInterfaces[3])
+    return fParam[0];
+
+  if (ZZ < fInterfaces[1]) {
+    return fCoeff[0]*exp(-ZZ/fParam[5])+fCoeff[1]*exp(ZZ/fParam[5]);
+  } else if (ZZ < fInterfaces[2]) {
+    return fCoeff[2]*exp(-ZZ/fParam[6])+fCoeff[3]*exp(ZZ/fParam[6]);
+  } else {
+    return fCoeff[4]*exp(-ZZ/fParam[5])+fCoeff[5]*exp(ZZ/fParam[5]);
   }
 }
 
-//------------------
-// Constructor of the TLondon1D_4L class
-// 1D-London screening in a thin superconducting film, four layers, four lambdas
-// Parameters: Bext[G], deadlayer[nm], thickness1[nm], thickness2[nm], thickness3[nm], thickness4[nm],
-// lambda1[nm], lambda2[nm], lambda3[nm], lambda4[nm]
-//------------------
-
-TLondon1D_4L::TLondon1D_4L(unsigned int steps, const vector<double> &param) {
-
-  double N1((param[6]+exp(2.0*param[2]/param[6])*(param[6]-param[7])+param[7])*(-1.0*param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])-param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])-param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]))+exp(2.0*param[3]/param[7])*(param[6]-param[7]+exp(2.0*param[2]/param[6])*(param[6]+param[7]))*(param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])+param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9])));
-
-  double N11(param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])*(param[7]*cosh(param[3]/param[7])-param[6]*sinh(param[3]/param[7]))+param[7]*(-1.0*param[6]*cosh(param[3]/param[7])+param[7]*sinh(param[3]/param[7]))*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])*(-1.0*param[6]*cosh(param[3]/param[7])+param[7]*sinh(param[3]/param[7]))+param[8]*(param[7]*cosh(param[3]/param[7])-param[6]*sinh(param[3]/param[7]))*sinh(param[4]/param[8]))*sinh(param[5]/param[9]));
-
-  double N12(exp(2.0*(param[2]+param[1])/param[6])*(param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])*(param[7]*cosh(param[3]/param[7])+param[6]*sinh(param[3]/param[7]))+param[7]*(param[6]*cosh(param[3]/param[7])+param[7]*sinh(param[3]/param[7]))*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])*(param[6]*cosh(param[3]/param[7])+param[7]*sinh(param[3]/param[7]))+param[8]*(param[7]*cosh(param[3]/param[7])+param[6]*sinh(param[3]/param[7]))*sinh(param[4]/param[8]))*sinh(param[5]/param[9])));
-
-  double N2((param[6]+param[7]+(param[6]-param[7])*exp(2.0*param[2]/param[6]))*(-1.0*param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])-param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])-param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]))+exp(2.0*param[3]/param[7])*(param[6]-param[7]+exp(2.0*param[2]/param[6])*(param[6]+param[7]))*(param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])+param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9])));
-
-  double N21(exp(param[3]/param[7])*param[8]*param[9]*(param[6]*cosh(param[2]/param[6])+param[7]*sinh(param[2]/param[6]))+param[6]*param[9]*cosh(param[5]/param[9])*(-1.0*param[8]*cosh(param[4]/param[8])+param[7]*sinh(param[4]/param[8]))+param[6]*param[8]*(param[7]*cosh(param[4]/param[8])-param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]));
-
-  double N22(exp((2.0*param[2]+param[3]+2.0*param[1])/param[7])*(-1.0*param[6]*param[8]*param[9]*cosh(param[2]/param[6])+param[7]*param[8]*param[9]*sinh(param[2]/param[6])+exp(param[3]/param[7])*param[6]*param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])+param[7]*sinh(param[4]/param[8]))+exp(param[3]/param[7])*param[6]*param[8]*(param[7]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9])));
-
-  double N3(2.0*((param[6]+exp(2.0*param[2]/param[6])*(param[6]-param[7])+param[7])*(-1.0*param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])-param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])-param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]))+exp(2.0*param[3]/param[7])*(param[6]-param[7]+exp(2.0*param[2]/param[6])*(param[6]+param[7]))*(param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])+param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]))));
-
-  double N4(4.0*((param[6]+exp(2.0*param[2]/param[6])*(param[6]-param[7])+param[7])*(-1.0*param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])-param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])-param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]))+exp(2.0*param[3]/param[7])*(param[6]-param[7]+exp(2.0*param[2]/param[6])*(param[6]+param[7]))*(param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])+param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]))));
-
-  double N42(-1.0*param[6]*param[7]*param[8]+exp(param[5]/param[9])*(param[6]*cosh(param[2]/param[6])*(param[8]*sinh(param[3]/param[7])*(param[9]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))+param[7]*cosh(param[3]/param[7])*(param[8]*cosh(param[4]/param[8])+param[9]*sinh(param[4]/param[8])))+param[7]*sinh(param[2]/param[6])*(param[8]*cosh(param[3]/param[7])*(param[9]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))+param[7]*sinh(param[3]/param[7])*(param[8]*cosh(param[4]/param[8])+param[9]*sinh(param[4]/param[8])))));
-
-  fDZ = (param[2]+param[3]+param[4]+param[5])/double(steps);
-  double ZZ, BBz;
-
-  for (unsigned int j(0); j<steps; j++) {
-    ZZ = param[1] + (double)j*fDZ;
-    fZ.push_back(ZZ);
-    if (ZZ < param[1]+param[2]) {
-      BBz = (2.0*param[0]*exp(-(param[1]+ZZ)/param[6]+param[3]/param[7])*(-1.0*exp(param[2]/param[6])*(exp(2.0*param[1]/param[6])-exp(2.0*ZZ/param[6]))*param[7]*param[8]*param[9]-exp(2.0*ZZ/param[6])*N11+N12))/N1;
-    } else if (ZZ < param[1]+param[2]+param[3]) {
-      BBz = (2.0*param[0]*exp(param[2]/param[6]-(param[2]+param[1]+ZZ)/param[7])*(exp(2.0*ZZ/param[7])*N21+N22))/N2;
-    } else if (ZZ < param[1]+param[2]+param[3]+param[4]) {
-      BBz = (param[0]*exp(-1.0*(param[2]+param[3]+param[1]+ZZ)/param[8]-param[5]/param[9])*(2.0*exp(param[2]/param[6]+param[3]/param[7]+(2.0*param[2]+2.0*param[3]+param[4]+2.0*param[1])/param[8])*param[6]*param[7]*(param[9]-param[8]+exp(2.0*param[5]/param[9])*(param[8]+param[9]))+4.0*exp(param[2]/param[6]+param[3]/param[7]-param[4]/param[8]+param[5]/param[9])*(-1.0*exp((2.0*param[2]+2.0*param[3]+param[4]+2.0*param[1])/param[8])*param[9]*(param[7]*sinh(param[2]/param[6])*(-1.0*param[8]*cosh(param[3]/param[7])+param[7]*sinh(param[3]/param[7]))+param[6]*cosh(param[2]/param[6])*(param[7]*cosh(param[3]/param[7])-param[8]*sinh(param[3]/param[7])))+exp(2.0*ZZ/param[8])*(exp(param[4]/param[8])*param[9]*(param[7]*sinh(param[2]/param[6])*(param[8]*cosh(param[3]/param[7])+param[7]*sinh(param[3]/param[7]))+param[6]*cosh(param[2]/param[6])*(param[7]*cosh(param[3]/param[7])+param[8]*sinh(param[3]/param[7])))+param[6]*param[7]*(-1.0*param[9]*cosh(param[5]/param[9])+param[8]*sinh(param[5]/param[9]))))))/N3;
-    } else {
-      BBz = (param[0]*exp(-1.0*(param[2]+param[3]+param[4]+param[1]+ZZ)/param[9])*(-1.0*exp(-1.0*param[4]/param[8]+2.0*(param[2]+param[3]+param[4]+param[1])/param[9])*((-1.0+exp(2.0*param[2]/param[6]))*param[7]*(exp(2.0*param[4]/param[8])*(param[8]-param[7]+exp(2.0*param[3]/param[7])*(param[7]+param[8]))*(param[8]-param[9])+exp(2.0*param[3]/param[7])*(param[7]-param[8])*(param[8]+param[9])-(param[7]+param[8])*(param[8]+param[9]))+param[6]*(-8.0*exp(param[2]/param[6]+param[3]/param[7]+param[4]/param[8]+param[5]/param[9])*param[7]*param[8]+(1.0+exp(2.0*param[2]/param[6]))*(-1.0+exp(2.0*param[3]/param[7]))*param[8]*(-1.0*param[8]+exp(2.0*param[4]/param[8])*(param[8]-param[9])-param[9])+(1.0+exp(2.0*param[2]/param[6]))*(1.0+exp(2.0*param[3]/param[7]))*param[7]*(param[8]+exp(2.0*param[4]/param[8])*(param[8]-param[9])+param[9])))+8.0*exp(param[2]/param[6]+param[3]/param[7]-(param[5]-2.0*ZZ)/param[9])*N42))/N4;
-    }
-    fBZ.push_back(BBz);
-  }
+double TLondon1D_3LS::GetBmax() const
+{
+  // return applied field
+  return fParam[0];
 }
+
+double TLondon1D_3LS::GetBmin() const
+{
+  // return field minimum
+  return fMinB;
+}
+
+void TLondon1D_3LS::SetBmin()
+{
+  double b_a(fCoeff[1]/fCoeff[0]);
+  assert (b_a>0.);
+
+  double minZ;
+  // check if the minimum is in the first layer
+  minZ=-0.5*fParam[5]*log(b_a);
+  if (minZ > fInterfaces[0] && minZ <= fInterfaces[1]) {
+    fMinTag = 1;
+    fMinZ = minZ;
+    fMinB = GetBofZ(minZ);
+    return;
+  }
+
+  double d_c(fCoeff[3]/fCoeff[2]);
+  assert (d_c>0.);
+
+  // check if the minimum is in the second layer
+  minZ=-0.5*fParam[6]*log(d_c);
+  if (minZ > fInterfaces[1] && minZ <= fInterfaces[2]) {
+    fMinTag = 2;
+    fMinZ = minZ;
+    fMinB = GetBofZ(minZ);
+    return;
+  }
+
+  double f_e(fCoeff[5]/fCoeff[4]);
+  assert (f_e>0.);
+
+  // check if the minimum is in the third layer
+  minZ=-0.5*fParam[5]*log(f_e);
+  if (minZ > fInterfaces[2] && minZ <= fInterfaces[3]) {
+    fMinTag = 3;
+    fMinZ = minZ;
+    fMinB = GetBofZ(minZ);
+    return;
+  }
+
+  assert(fMinZ > 0. && fMinB > 0.);
+  return;
+}
+
+vector< pair<double, double> > TLondon1D_3LS::GetInverseAndDerivative(double BB) const
+{
+  vector< pair<double, double> > inv;
+
+  if(BB <= fMinB || BB > fParam[0])
+    return inv;
+
+  double inverse[4];
+  pair<double, double> invAndDerivative;
+
+  switch(fMinTag)
+  {
+    case 1:
+      inverse[0]=fParam[5]*log((BB-sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]))/(2.0*fCoeff[1]));
+      inverse[1]=fParam[5]*log((BB+sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]))/(2.0*fCoeff[1]));
+      inverse[2]=fParam[6]*log((BB+sqrt(BB*BB-4.0*fCoeff[2]*fCoeff[3]))/(2.0*fCoeff[3]));
+      inverse[3]=fParam[5]*log((BB+sqrt(BB*BB-4.0*fCoeff[4]*fCoeff[5]))/(2.0*fCoeff[5]));
+
+      if(inverse[0] > fInterfaces[0] && inverse[0] < fMinZ) {
+        invAndDerivative.first = inverse[0];
+        invAndDerivative.second = -fParam[5]/sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]);
+        inv.push_back(invAndDerivative);
+      }
+      if(inverse[1] > fMinZ && inverse[1] <= fInterfaces[1]) {
+        invAndDerivative.first = inverse[1];
+        invAndDerivative.second = +fParam[5]/sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]);
+        inv.push_back(invAndDerivative);
+      }
+      if(inverse[2] > fInterfaces[1] && inverse[2] <= fInterfaces[2]) {
+        invAndDerivative.first = inverse[2];
+        invAndDerivative.second = +fParam[6]/sqrt(BB*BB-4.0*fCoeff[2]*fCoeff[3]);
+        inv.push_back(invAndDerivative);
+      }
+      if(inverse[3] > fInterfaces[2] && inverse[3] <= fInterfaces[3]) {
+        invAndDerivative.first = inverse[3];
+        invAndDerivative.second = +fParam[5]/sqrt(BB*BB-4.0*fCoeff[4]*fCoeff[5]);
+        inv.push_back(invAndDerivative);
+      }
+      break;
+
+    case 2:
+      inverse[0]=fParam[5]*log((BB-sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]))/(2.0*fCoeff[1]));
+      inverse[1]=fParam[6]*log((BB-sqrt(BB*BB-4.0*fCoeff[2]*fCoeff[3]))/(2.0*fCoeff[3]));
+      inverse[2]=fParam[6]*log((BB+sqrt(BB*BB-4.0*fCoeff[2]*fCoeff[3]))/(2.0*fCoeff[3]));
+      inverse[3]=fParam[5]*log((BB+sqrt(BB*BB-4.0*fCoeff[4]*fCoeff[5]))/(2.0*fCoeff[5]));
+
+      if(inverse[0] > fInterfaces[0] && inverse[0] <= fInterfaces[1]) {
+        invAndDerivative.first = inverse[0];
+        invAndDerivative.second = -fParam[5]/sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]);
+        inv.push_back(invAndDerivative);
+      }
+      if(inverse[1] > fInterfaces[1] && inverse[1] < fMinZ) {
+        invAndDerivative.first = inverse[1];
+        invAndDerivative.second = -fParam[6]/sqrt(BB*BB-4.0*fCoeff[2]*fCoeff[3]);
+        inv.push_back(invAndDerivative);
+      }
+      if(inverse[2] > fMinZ && inverse[2] <= fInterfaces[2]) {
+        invAndDerivative.first = inverse[2];
+        invAndDerivative.second = +fParam[6]/sqrt(BB*BB-4.0*fCoeff[2]*fCoeff[3]);
+        inv.push_back(invAndDerivative);
+      }
+      if(inverse[3] > fInterfaces[2] && inverse[3] <= fInterfaces[3]) {
+        invAndDerivative.first = inverse[3];
+        invAndDerivative.second = +fParam[5]/sqrt(BB*BB-4.0*fCoeff[4]*fCoeff[5]);
+        inv.push_back(invAndDerivative);
+      }
+
+      break;
+
+    case 3:
+      inverse[0]=fParam[5]*log((BB-sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]))/(2.0*fCoeff[1]));
+      inverse[1]=fParam[6]*log((BB-sqrt(BB*BB-4.0*fCoeff[2]*fCoeff[3]))/(2.0*fCoeff[3]));
+      inverse[2]=fParam[5]*log((BB-sqrt(BB*BB-4.0*fCoeff[4]*fCoeff[5]))/(2.0*fCoeff[5]));
+      inverse[3]=fParam[5]*log((BB+sqrt(BB*BB-4.0*fCoeff[4]*fCoeff[5]))/(2.0*fCoeff[5]));
+
+      if(inverse[0] > fInterfaces[0] && inverse[0] <= fInterfaces[1]) {
+        invAndDerivative.first = inverse[0];
+        invAndDerivative.second = -fParam[5]/sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]);
+        inv.push_back(invAndDerivative);
+      }
+      if(inverse[1] > fInterfaces[1] && inverse[1] <= fInterfaces[2]) {
+        invAndDerivative.first = inverse[1];
+        invAndDerivative.second = -fParam[6]/sqrt(BB*BB-4.0*fCoeff[2]*fCoeff[3]);
+        inv.push_back(invAndDerivative);
+      }
+      if(inverse[2] > fInterfaces[2] && inverse[2] < fMinZ) {
+        invAndDerivative.first = inverse[2];
+        invAndDerivative.second = -fParam[5]/sqrt(BB*BB-4.0*fCoeff[4]*fCoeff[5]);
+        inv.push_back(invAndDerivative);
+      }
+      if(inverse[3] > fMinZ && inverse[3] <= fInterfaces[3]) {
+        invAndDerivative.first = inverse[3];
+        invAndDerivative.second = +fParam[5]/sqrt(BB*BB-4.0*fCoeff[4]*fCoeff[5]);
+        inv.push_back(invAndDerivative);
+      }
+
+      break;
+
+    default:
+      break;
+  }
+  return inv;
+}
+
+
+// //------------------
+// // Constructor of the TLondon1D_4L class
+// // 1D-London screening in a thin superconducting film, four layers, four lambdas
+// // Parameters: Bext[G], deadlayer[nm], thickness1[nm], thickness2[nm], thickness3[nm], thickness4[nm],
+// // lambda1[nm], lambda2[nm], lambda3[nm], lambda4[nm]
+// //------------------
+// 
+// TLondon1D_4L::TLondon1D_4L(unsigned int steps, const vector<double> &param) {
+// 
+//   double N1((param[6]+exp(2.0*param[2]/param[6])*(param[6]-param[7])+param[7])*(-1.0*param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])-param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])-param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]))+exp(2.0*param[3]/param[7])*(param[6]-param[7]+exp(2.0*param[2]/param[6])*(param[6]+param[7]))*(param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])+param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9])));
+// 
+//   double N11(param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])*(param[7]*cosh(param[3]/param[7])-param[6]*sinh(param[3]/param[7]))+param[7]*(-1.0*param[6]*cosh(param[3]/param[7])+param[7]*sinh(param[3]/param[7]))*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])*(-1.0*param[6]*cosh(param[3]/param[7])+param[7]*sinh(param[3]/param[7]))+param[8]*(param[7]*cosh(param[3]/param[7])-param[6]*sinh(param[3]/param[7]))*sinh(param[4]/param[8]))*sinh(param[5]/param[9]));
+// 
+//   double N12(exp(2.0*(param[2]+param[1])/param[6])*(param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])*(param[7]*cosh(param[3]/param[7])+param[6]*sinh(param[3]/param[7]))+param[7]*(param[6]*cosh(param[3]/param[7])+param[7]*sinh(param[3]/param[7]))*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])*(param[6]*cosh(param[3]/param[7])+param[7]*sinh(param[3]/param[7]))+param[8]*(param[7]*cosh(param[3]/param[7])+param[6]*sinh(param[3]/param[7]))*sinh(param[4]/param[8]))*sinh(param[5]/param[9])));
+// 
+//   double N2((param[6]+param[7]+(param[6]-param[7])*exp(2.0*param[2]/param[6]))*(-1.0*param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])-param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])-param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]))+exp(2.0*param[3]/param[7])*(param[6]-param[7]+exp(2.0*param[2]/param[6])*(param[6]+param[7]))*(param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])+param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9])));
+// 
+//   double N21(exp(param[3]/param[7])*param[8]*param[9]*(param[6]*cosh(param[2]/param[6])+param[7]*sinh(param[2]/param[6]))+param[6]*param[9]*cosh(param[5]/param[9])*(-1.0*param[8]*cosh(param[4]/param[8])+param[7]*sinh(param[4]/param[8]))+param[6]*param[8]*(param[7]*cosh(param[4]/param[8])-param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]));
+// 
+//   double N22(exp((2.0*param[2]+param[3]+2.0*param[1])/param[7])*(-1.0*param[6]*param[8]*param[9]*cosh(param[2]/param[6])+param[7]*param[8]*param[9]*sinh(param[2]/param[6])+exp(param[3]/param[7])*param[6]*param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])+param[7]*sinh(param[4]/param[8]))+exp(param[3]/param[7])*param[6]*param[8]*(param[7]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9])));
+// 
+//   double N3(2.0*((param[6]+exp(2.0*param[2]/param[6])*(param[6]-param[7])+param[7])*(-1.0*param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])-param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])-param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]))+exp(2.0*param[3]/param[7])*(param[6]-param[7]+exp(2.0*param[2]/param[6])*(param[6]+param[7]))*(param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])+param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]))));
+// 
+//   double N4(4.0*((param[6]+exp(2.0*param[2]/param[6])*(param[6]-param[7])+param[7])*(-1.0*param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])-param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])-param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]))+exp(2.0*param[3]/param[7])*(param[6]-param[7]+exp(2.0*param[2]/param[6])*(param[6]+param[7]))*(param[9]*cosh(param[5]/param[9])*(param[8]*cosh(param[4]/param[8])+param[7]*sinh(param[4]/param[8]))+param[8]*(param[7]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))*sinh(param[5]/param[9]))));
+// 
+//   double N42(-1.0*param[6]*param[7]*param[8]+exp(param[5]/param[9])*(param[6]*cosh(param[2]/param[6])*(param[8]*sinh(param[3]/param[7])*(param[9]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))+param[7]*cosh(param[3]/param[7])*(param[8]*cosh(param[4]/param[8])+param[9]*sinh(param[4]/param[8])))+param[7]*sinh(param[2]/param[6])*(param[8]*cosh(param[3]/param[7])*(param[9]*cosh(param[4]/param[8])+param[8]*sinh(param[4]/param[8]))+param[7]*sinh(param[3]/param[7])*(param[8]*cosh(param[4]/param[8])+param[9]*sinh(param[4]/param[8])))));
+// 
+//   fDZ = (param[2]+param[3]+param[4]+param[5])/double(steps);
+//   double ZZ, BBz;
+// 
+//   for (unsigned int j(0); j<steps; j++) {
+//     ZZ = param[1] + (double)j*fDZ;
+//     fZ.push_back(ZZ);
+//     if (ZZ < param[1]+param[2]) {
+//       BBz = (2.0*param[0]*exp(-(param[1]+ZZ)/param[6]+param[3]/param[7])*(-1.0*exp(param[2]/param[6])*(exp(2.0*param[1]/param[6])-exp(2.0*ZZ/param[6]))*param[7]*param[8]*param[9]-exp(2.0*ZZ/param[6])*N11+N12))/N1;
+//     } else if (ZZ < param[1]+param[2]+param[3]) {
+//       BBz = (2.0*param[0]*exp(param[2]/param[6]-(param[2]+param[1]+ZZ)/param[7])*(exp(2.0*ZZ/param[7])*N21+N22))/N2;
+//     } else if (ZZ < param[1]+param[2]+param[3]+param[4]) {
+//       BBz = (param[0]*exp(-1.0*(param[2]+param[3]+param[1]+ZZ)/param[8]-param[5]/param[9])*(2.0*exp(param[2]/param[6]+param[3]/param[7]+(2.0*param[2]+2.0*param[3]+param[4]+2.0*param[1])/param[8])*param[6]*param[7]*(param[9]-param[8]+exp(2.0*param[5]/param[9])*(param[8]+param[9]))+4.0*exp(param[2]/param[6]+param[3]/param[7]-param[4]/param[8]+param[5]/param[9])*(-1.0*exp((2.0*param[2]+2.0*param[3]+param[4]+2.0*param[1])/param[8])*param[9]*(param[7]*sinh(param[2]/param[6])*(-1.0*param[8]*cosh(param[3]/param[7])+param[7]*sinh(param[3]/param[7]))+param[6]*cosh(param[2]/param[6])*(param[7]*cosh(param[3]/param[7])-param[8]*sinh(param[3]/param[7])))+exp(2.0*ZZ/param[8])*(exp(param[4]/param[8])*param[9]*(param[7]*sinh(param[2]/param[6])*(param[8]*cosh(param[3]/param[7])+param[7]*sinh(param[3]/param[7]))+param[6]*cosh(param[2]/param[6])*(param[7]*cosh(param[3]/param[7])+param[8]*sinh(param[3]/param[7])))+param[6]*param[7]*(-1.0*param[9]*cosh(param[5]/param[9])+param[8]*sinh(param[5]/param[9]))))))/N3;
+//     } else {
+//       BBz = (param[0]*exp(-1.0*(param[2]+param[3]+param[4]+param[1]+ZZ)/param[9])*(-1.0*exp(-1.0*param[4]/param[8]+2.0*(param[2]+param[3]+param[4]+param[1])/param[9])*((-1.0+exp(2.0*param[2]/param[6]))*param[7]*(exp(2.0*param[4]/param[8])*(param[8]-param[7]+exp(2.0*param[3]/param[7])*(param[7]+param[8]))*(param[8]-param[9])+exp(2.0*param[3]/param[7])*(param[7]-param[8])*(param[8]+param[9])-(param[7]+param[8])*(param[8]+param[9]))+param[6]*(-8.0*exp(param[2]/param[6]+param[3]/param[7]+param[4]/param[8]+param[5]/param[9])*param[7]*param[8]+(1.0+exp(2.0*param[2]/param[6]))*(-1.0+exp(2.0*param[3]/param[7]))*param[8]*(-1.0*param[8]+exp(2.0*param[4]/param[8])*(param[8]-param[9])-param[9])+(1.0+exp(2.0*param[2]/param[6]))*(1.0+exp(2.0*param[3]/param[7]))*param[7]*(param[8]+exp(2.0*param[4]/param[8])*(param[8]-param[9])+param[9])))+8.0*exp(param[2]/param[6]+param[3]/param[7]-(param[5]-2.0*ZZ)/param[9])*N42))/N4;
+//     }
+//     fBZ.push_back(BBz);
+//   }
+// }

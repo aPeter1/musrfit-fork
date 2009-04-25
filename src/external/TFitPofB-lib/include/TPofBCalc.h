@@ -22,7 +22,10 @@ class TPofBCalc {
 
 public:
 
-  TPofBCalc( const TBofZCalc&, const TTrimSPData&, const vector<double>& );
+  TPofBCalc( const string&, const vector<double>& );
+  TPofBCalc( const TBofZCalc&, const TTrimSPData&, const vector<double>&, unsigned int );
+  TPofBCalc( const TBofZCalcInverse&, const TTrimSPData&, const vector<double>& );
+  TPofBCalc( const vector<double>&, const vector<double>& , double dt = 0.01 );
   ~TPofBCalc() {
     fB.clear();
     fPB.clear();

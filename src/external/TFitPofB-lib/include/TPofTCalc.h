@@ -40,7 +40,7 @@ private:
   vector<double> fT;
   vector<double> fPT;
   double fTBin;
-  unsigned int fNFFT;
+  int fNFFT;
   const string fWisdom;
 
 };

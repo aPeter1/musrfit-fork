@@ -6,16 +6,16 @@ ROOTCFLAGS    = $(shell $(ROOTSYS)/bin/root-config --cflags)
 #---------------------------------------------------
 
 OS            = LINUX
-CXX           = g++
-CXXFLAGS      = -g -Wall -Wno-trigraphs -fPIC
+CXX           = g++-4.2.4
+CXXFLAGS      = -O3 -Wall -fopenmp -Wno-trigraphs -fPIC
 MUSRFITINCLUDE = ../../../include
 #MUSRFITINCLUDE = /home/l_wojek/rep/analysis/musrfit/src/include
 LOCALINCLUDE  = ../include
 ROOTINCLUDE   = $(ROOTSYS)/include
 INCLUDES      = -I$(LOCALINCLUDE) -I$(MUSRFITINCLUDE) -I$(ROOTINCLUDE)
-LD            = g++
-LDFLAGS       = -g
-SOFLAGS       = -O -shared
+LD            = g++-4.2.4
+LDFLAGS       = -O3
+SOFLAGS       = -O3 -shared -fopenmp -lfftw3_threads -lfftw3 -lm -lpthread
 
 # the output from the root-config script:
 CXXFLAGS      += $(ROOTCFLAGS)
@@ -29,6 +29,7 @@ OBJS += TPofBCalc.o
 OBJS += TPofTCalc.o
 OBJS += TFitPofBStartupHandler.o TFitPofBStartupHandlerDict.o
 OBJS += TLondon1D.o TLondon1DDict.o
+OBJS += TSkewedGss.o TSkewedGssDict.o
 
 SHLIB = libTFitPofB.so
 
@@ -59,10 +60,14 @@ TLondon1DDict.cpp: ../include/TLondon1D.h ../include/TLondon1DLinkDef.h
 	@echo "Generating dictionary $@..."
 	rootcint -f $@ -c -p -I$(MUSRFITINCLUDE) $^
 
+TSkewedGssDict.cpp: ../include/TSkewedGss.h ../include/TSkewedGssLinkDef.h
+	@echo "Generating dictionary $@..."
+	rootcint -f $@ -c -p -I$(MUSRFITINCLUDE) $^
+
 TFitPofBStartupHandlerDict.cpp: ../include/TFitPofBStartupHandler.h ../include/TFitPofBStartupHandlerLinkDef.h
 	@echo "Generating dictionary $@..."
 	rootcint -f $@ -c -p $^
-	
+
 install: all
 	@echo "Installing shared lib: libTFitPofB.so"
 ifeq ($(OS),LINUX)

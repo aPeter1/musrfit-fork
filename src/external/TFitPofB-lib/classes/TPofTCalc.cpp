@@ -41,6 +41,8 @@
 #include <iostream>
 #include <cstdio>
 
+#include <omp.h>
+
 #include <TString.h>
 #include <TObjArray.h>
 #include <TObjString.h>
@@ -62,8 +64,24 @@
 
 TPofTCalc::TPofTCalc (const string &wisdom, const vector<double> &par) : fWisdom(wisdom) {
 
+  int init_threads(fftw_init_threads());
+  if (!init_threads)
+    cout << "TPofTCalc::TPofTCalc: Couldn't initialize multiple FFTW-threads ..." << endl;
+  else
+    fftw_plan_with_nthreads(2);
+
   fNFFT = ( int(1.0/gBar/par[1]/par[2]+1.0) % 2 ) ? int(1.0/gBar/par[1]/par[2]+2.0) : int(1.0/gBar/par[1]/par[2]+1.0);
   fTBin = 1.0/gBar/double(fNFFT-1)/par[2];
+
+  fT.resize(fNFFT/2+1);
+  fPT.resize(fNFFT/2+1);
+
+  int i;
+
+#pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  for (i=0; i<fNFFT/2+1; i++){
+    fT[i] = double(i)*fTBin;
+  }
 
   fFFTin = (double *)malloc(sizeof(double) * fNFFT);
   fFFTout = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * (fNFFT/2+1));
@@ -121,13 +139,17 @@ void TPofTCalc::DoFFT(const TPofBCalc &PofB) {
   }
 /--------------------------------------------*/
 
-  for (unsigned int i(0); i<fNFFT; i++) {
+  int i;
+
+#pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  for (i=0; i<fNFFT; i++) {
     fFFTin[i] = pB[i];
   }
-  for (unsigned int i(0); i<fNFFT/2+1; i++) {
-    fFFTout[i][0] = 0.0;
-    fFFTout[i][1] = 0.0;
-  }
+
+//  for (unsigned int i(0); i<fNFFT/2+1; i++) {
+//    fFFTout[i][0] = 0.0;
+//    fFFTout[i][1] = 0.0;
+//  }
 
 //  cout << "perform the Fourier transform..." << endl;
 
@@ -143,15 +165,12 @@ void TPofTCalc::DoFFT(const TPofBCalc &PofB) {
 void TPofTCalc::CalcPol(const vector<double> &par) {
 
   double sinph(sin(par[0]*PI/180.0)), cosph(cos(par[0]*PI/180.0));
+  int i;
 
-  double polTemp(0.0);
-  fT.clear();
-  fPT.clear();
-
-  for (unsigned int i(0); i<fNFFT/2+1; i++){
-    fT.push_back(double(i)*fTBin);
-    polTemp = cosph*fFFTout[i][0]*par[2] + sinph*fFFTout[i][1]*par[2];
-    fPT.push_back(polTemp);
+#pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  for (i=0; i<fNFFT/2+1; i++){
+//    fT[i] = double(i)*fTBin;
+    fPT[i] = cosph*fFFTout[i][0]*par[2] + sinph*fFFTout[i][1]*par[2];
   }
 }
 
@@ -346,10 +365,15 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
 //---------------------
 
 double TPofTCalc::Eval(double t) const {
-  for (unsigned int i(0); i<fT.size()-1; i++) {
-    if (t < fT[i+1])
-      return fPT[i]+(fPT[i+1]-fPT[i])/(fT[i+1]-fT[i])*(t-fT[i]);
-  }
+
+  unsigned int i(int(t/fTBin));
+  if (i<fT.size()-1)
+    return fPT[i]+(fPT[i+1]-fPT[i])/(fT[i+1]-fT[i])*(t-fT[i]);
+
+//  for (unsigned int i(0); i<fT.size()-1; i++) {
+//    if (t < fT[i+1])
+//      return fPT[i]+(fPT[i+1]-fPT[i])/(fT[i+1]-fT[i])*(t-fT[i]);
+//  }
 
   cout << "TPofTCalc::Eval: No data for the time " << t << " us available! Returning -999.0 ..." << endl;
   return -999.0;
@@ -376,6 +400,7 @@ TPofTCalc::~TPofTCalc() {
   free(fFFTin);
   fftw_free(fFFTout);
 //  fftw_cleanup();
+//  fftw_cleanup_threads();
   fT.clear();
   fPT.clear();
 

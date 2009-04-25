@@ -13,18 +13,189 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include <cassert>
 
 /* USED FOR DEBUGGING-----------------------------------
 #include <cstdio>
 #include <ctime>
 /-------------------------------------------------------*/
 
+// Do not actually calculate P(B) but take it from a B and a P(B) vector of the same size
+
+TPofBCalc::TPofBCalc( const vector<double>& b, const vector<double>& pb, double dt) {
+  assert(b.size() == pb.size() && b.size() >= 2);
+
+  fB = b;
+  fPB = pb;
+
+  vector<double>::const_iterator iter, iterB;
+  iterB = b.begin();
+
+  for(iter = pb.begin(); iter != pb.end(); iter++){
+    if(*iter != 0.0) {
+      fBmin = *iterB;
+      cout << fBmin << endl;
+      break;
+    }
+    iterB++;
+  }
+
+  for( ; iter != b.end(); iter++){
+    if(*iter == 0.0) {
+      fBmax = *(iterB-1);
+      cout << fBmax << endl;
+      break;
+    }
+    iterB++;
+  }
+
+  fDT = dt; // needed if a convolution should be done
+  fDB = b[1]-b[0];
+  
+  cout << fDB << endl;
+}
+
+
+TPofBCalc::TPofBCalc( const string &type, const vector<double> &para ) : fDT(para[0]), fDB(para[1]) {
+
+if (type == "skg"){ // skewed Gaussian
+
+  fBmin = 0.0;
+  fBmax = para[2]/gBar+10.0*fabs(para[4])/(2.0*pi*gBar);
+
+  double BB;
+  double expominus(para[3]*para[3]/(2.0*pi*pi*gBar*gBar));
+  double expoplus(para[4]*para[4]/(2.0*pi*pi*gBar*gBar));
+  double B0(para[2]/gBar);
+  double BmaxFFT(1.0/gBar/fDT);
+
+  for ( BB = 0.0 ; BB < B0 ; BB += fDB ) {
+    fB.push_back(BB);
+    fPB.push_back(exp(-(BB-B0)*(BB-B0)/expominus));
+  }
+
+  for ( ; BB < fBmax ; BB += fDB ) {
+    fB.push_back(BB);
+    fPB.push_back(exp(-(BB-B0)*(BB-B0)/expoplus));
+  }
+
+  unsigned int lastZerosStart(fB.size());
+
+  for ( ; BB <= BmaxFFT ; BB += fDB ) {
+    fB.push_back(BB);
+    fPB.push_back(0.0);
+  }
+
+  // make sure that we have an even number of elements in p(B) for FFT, so we do not have to care later
+
+  if (fB.size() % 2) {
+    fB.push_back(BB);
+    fPB.push_back(0.0);
+  }
+
+  // normalize p(B)
+
+  double pBsum = 0.0;
+  for (unsigned int i(0); i<lastZerosStart; i++)
+    pBsum += fPB[i];
+  pBsum *= fDB;
+  for (unsigned int i(0); i<lastZerosStart; i++)
+    fPB[i] /= pBsum;
+
+} else { // fill the vectors with zeros
+
+  fBmin = 0.0;
+  fBmax = 1.0/gBar/fDT;
+
+  double BB;
+
+  for (BB=0.0 ; BB < fBmax ; BB += fDB ) {
+    fB.push_back(BB);
+    fPB.push_back(0.0);
+  }
+
+  // make sure that we have an even number of elements in p(B) for FFT, so we do not have to care later
+
+  if (fB.size() % 2) {
+    fB.push_back(BB);
+    fPB.push_back(0.0);
+  }
+
+}
+
+}
+
+//-----------
+// Constructor that does the P(B) calculation for given analytical inverse of B(z) and its derivative and n(z)
+// Parameters: dt[us], dB[G], Energy[keV]
+//-----------
+
+TPofBCalc::TPofBCalc( const TBofZCalcInverse &BofZ, const TTrimSPData &dataTrimSP, const vector<double> &para ) : fDT(para[0]), fDB(para[1])
+{
+
+  fBmin = BofZ.GetBmin();
+  fBmax = BofZ.GetBmax();
+
+  double BB;
+
+  // fill not used Bs before Bmin with 0.0
+
+  for (BB = 0.0; BB < fBmin; BB += fDB)
+    fB.push_back(BB);
+  fPB.resize(fB.size(),0.0);
+
+  unsigned int firstZerosEnd(fB.size());
+
+  // calculate p(B) from the inverse of B(z)
+
+  for ( ; BB <= fBmax ; BB += fDB) {
+    fB.push_back(BB);
+    fPB.push_back(0.0);
+
+    vector< pair<double, double> > inv;
+    inv = BofZ.GetInverseAndDerivative(BB);
+
+    for (unsigned int i(0); i<inv.size(); i++)
+      *(fPB.end()-1) += dataTrimSP.GetNofZ(inv[i].first, para[2])*fabs(inv[i].second);
+
+  }
+
+  unsigned int lastZerosStart(fB.size());
+
+  // fill not used Bs after Bext with 0.0
+
+  double BmaxFFT(1.0/gBar/fDT);
+
+  for ( ; BB <= BmaxFFT ; BB += fDB )
+    fB.push_back(BB);
+  fPB.resize(fB.size(),0.0);
+
+
+  // make sure that we have an even number of elements in p(B) for FFT, so we do not have to care later
+  if (fB.size() % 2) {
+    fB.push_back(BB);
+    fPB.push_back(0.0);
+  }
+
+  // normalize p(B)
+
+  double pBsum = 0.0;
+  for (unsigned int i(firstZerosEnd); i<lastZerosStart; i++)
+    pBsum += fPB[i];
+  pBsum *= fDB;
+  for (unsigned int i(firstZerosEnd); i<lastZerosStart; i++)
+    fPB[i] /= pBsum;
+
+}
+
+
+
 //-----------
 // Constructor that does the P(B) calculation for given B(z) and n(z)
 // Parameters: dt[us], dB[G], Energy[keV]
 //-----------
 
-TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, const vector<double> &para ) : fDT(para[0]), fDB(para[1]) {
+TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, const vector<double> &para, unsigned int zonk ) : fDT(para[0]), fDB(para[1]) {
 
   fBmin = BofZ.GetBmin();
   fBmax = BofZ.GetBmax();
@@ -34,7 +205,7 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
 
   // fill not used Bs before Bmin with 0.0
 
-  for ( BB = 0.0 ; BB < fBmin ; BB += fDB ) {
+  for (BB = 0.0; BB < fBmin; BB += fDB) {
     fB.push_back(BB);
     fPB.push_back(0.0);
   }
@@ -45,7 +216,7 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
 
   vector<double> bofzZ(BofZ.DataZ());
   vector<double> bofzBZ(BofZ.DataBZ());
-  double ddZ(BofZ.GetdZ());
+  double ddZ(BofZ.GetDZ());
 
 /* USED FOR DEBUGGING-----------------------------------
   cout << "Bmin = " << fBmin << ", Bmax = " << fBmax << endl;
