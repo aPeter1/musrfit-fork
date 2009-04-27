@@ -250,7 +250,7 @@ class PTheory
     mutable double fPrevParam[THEORY_MAX_PARAM]; ///< needed for LF-stuff
     mutable PDoubleVector fLFIntegral;           ///< needed for LF-stuff. Keeps the non-analytic integral values
     mutable double fDynLFdt;
-    mutable PDoubleVector fDynLFFuncValue;      ///< needed for LF-stuff. Keeps the dynamic LF KT function values
+    mutable PDoubleVector fDynLFFuncValue;       ///< needed for LF-stuff. Keeps the dynamic LF KT function values
 };
 
 #endif //  _PTHEORY_H_

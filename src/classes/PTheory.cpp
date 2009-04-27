@@ -1107,8 +1107,8 @@ double PTheory::StaticGaussKTLF(register double t, const PDoubleVector& paramVal
   else // tshift present
     tt = t-val[2];
 
-  if (tt < 0.0) // for times < 0 return a function value of 0.0
-    return 0.0;
+  if (tt < 0.0) // for times < 0 return a function value of 1.0
+    return 1.0;
 
   if (val[0] < 0.02) { // if smaller 20kHz ~ 0.27G use zero field formula
     double sigma_t_2 = tt*tt*val[1]*val[1];
@@ -1149,6 +1149,11 @@ double PTheory::DynamicGaussKTLF(register double t, const PDoubleVector& paramVa
     } else { // function
       val[i] = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
     }
+  }
+
+  // check that Delta != 0, if not (i.e. stupid parameter) return 1, which is the correct limit
+  if (fabs(val[1]) < 1.0e-6) {
+    return 1.0;
   }
 
   // check if Keren approximation can be used
@@ -1277,8 +1282,8 @@ double PTheory::StaticLorentzKTLF(register double t, const PDoubleVector& paramV
   else // tshift present
     tt = t-val[2];
 
- if (tt < 0.0) // for times < 0 return a function value of 0.0
-   return 0.0;
+ if (tt < 0.0) // for times < 0 return a function value of 1.0
+   return 1.0;
 
  if (val[0] < 0.02) { // if smaller 20kHz ~ 0.27G use zero field formula
     double at = tt*val[1];
@@ -1351,8 +1356,8 @@ double PTheory::DynamicLorentzKTLF(register double t, const PDoubleVector& param
   else // tshift present
     tt = t-val[3];
 
-  if (tt < 0.0) // for times < 0 return a function value of 0.0
-    return 0.0;
+  if (tt < 0.0) // for times < 0 return a function value of 1.0
+    return 1.0;
 
   result = GetDynKTLFValue(tt);
 
@@ -1786,7 +1791,7 @@ if (first) {
  */
 void PTheory::CalculateGaussLFIntegral(const double *val) const
 {
-  // val[0] = nu, val[1] = Delta
+  // val[0] = nu (field), val[1] = Delta
 
   if (val[0] == 0.0) // field == 0.0, hence nothing to be done
     return;
@@ -1889,7 +1894,7 @@ void PTheory::CalculateDynKTLF(const double *val, int tag) const
   const double Tmax = 20.0; // 20 usec
   unsigned int N = static_cast<unsigned int>(16.0*Tmax*val[0]);
 
-  // check if rate (Delta/a) is very high
+  // check if rate (Delta or a) is very high
   if (fabs(val[1]) > 0.1) {
     double tmin = 20.0;
     switch (tag) {
@@ -1995,6 +2000,9 @@ void PTheory::CalculateDynKTLF(const double *val, int tag) const
 
     fDynLFFuncValue[i]=sum/a;
   }
+
+  // clean up
+  p0exp.clear();
 }
 
 //--------------------------------------------------------------------------
@@ -2005,12 +2013,12 @@ void PTheory::CalculateDynKTLF(const double *val, int tag) const
  */
 double PTheory::GetDynKTLFValue(const double t) const
 {
-  unsigned int idx = static_cast<unsigned int>(t/fDynLFdt);
+  int idx = static_cast<int>(t/fDynLFdt);
 
   if (idx < 0)
     return 0.0;
 
-  if (idx > fDynLFFuncValue.size()-1)
+  if (idx > static_cast<int>(fDynLFFuncValue.size())-1)
     return fDynLFFuncValue[fDynLFFuncValue.size()-1];
 
   // liniarly interpolate between the two relvant function bins
