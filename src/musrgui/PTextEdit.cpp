@@ -153,7 +153,7 @@ void PTextEdit::setupFileActions()
   QToolBar *tb = new QToolBar( this );
   tb->setLabel( "File Actions" );
   QPopupMenu *menu = new QPopupMenu( this );
-  menuBar()->insertItem( tr( "&File" ), menu );
+  menuBar()->insertItem( tr( "F&ile" ), menu );
 
   QAction *a;
   a = new QAction( QPixmap::fromMimeSource( "filenew.xpm" ), tr( "&New..." ), CTRL + Key_N, this, "fileNew" );
