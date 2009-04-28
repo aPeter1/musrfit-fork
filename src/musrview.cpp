@@ -55,9 +55,17 @@ using namespace std;
  */
 void musrview_syntax()
 {
-  cout << endl << "usage: musrview <msr-file> | --version | --help";
+  cout << endl << "usage: musrview <msr-file> [--<graphic-format-extension>] | --version | --help";
   cout << endl << "       <msr-file>: msr/mlog input file";
   cout << endl << "       'musrview <msr-file>' will execute musrview";
+  cout << endl << ">> ----- NOT YET IMPLEMENTED ----- << ";
+  cout << endl << "       --<graphic-format-extension>: ";
+  cout << endl << "           will produce a graphics-output-file without starting a root session.";
+  cout << endl << "           the name is based on the <msr-file>, e.g. 3310.msr -> 3310.png";
+  cout << endl << "           supported graphic-format-extension:";
+  cout << endl << "           eps, pdf, gif, jpg, png, svg, xpm, root";
+  cout << endl << "           example: musrview 3310.msr --png, will produce a file 3310.png";
+  cout << endl << ">> ----- NOT YET IMPLEMENTED ----- << ";
   cout << endl << "       'musrview' or 'musrview --help' will show this help";
   cout << endl << "       'musrview --version' will print the musrview version";
   cout << endl << endl;
@@ -69,6 +77,9 @@ int main(int argc, char *argv[])
   bool show_syntax = false;
   int  status;
   bool success = true;
+  char fileName[128];
+  bool graphicsOutput = false;
+  char graphicsExtension[32];
 
   switch (argc) {
     case 1:
@@ -84,9 +95,40 @@ int main(int argc, char *argv[])
       } else {
         // check if filename has extension msr or mlog
         if (!strstr(argv[1], ".msr") && !strstr(argv[1], ".mlog")) {
-          cout << endl << "**ERROR** " << argv[1] << " is not a msr/mlog-file!" << endl;
+          cout << endl << "**ERROR** " << argv[1] << " is not a msr/mlog-file, nor is it a supported graphics extension." << endl;
           show_syntax = true;
+        } else {
+          strcpy(fileName, argv[1]);
         }
+      }
+      break;
+    case 3:
+      if (!strcmp(argv[1], "--eps") || !strcmp(argv[1], "--pdf") || !strcmp(argv[1], "--gif") ||
+          !strcmp(argv[1], "--jpg") || !strcmp(argv[1], "--png") || !strcmp(argv[1], "--svg") ||
+          !strcmp(argv[1], "--xpm") || !strcmp(argv[1], "--root")) {
+        graphicsOutput = true;
+        strcpy(graphicsExtension, argv[1]+2);
+        // check if filename has extension msr or mlog
+        if (!strstr(argv[2], ".msr") && !strstr(argv[2], ".mlog")) {
+          cout << endl << "**ERROR** " << argv[2] << " is not a msr/mlog-file, nor is it a supported graphics extension." << endl;
+          show_syntax = true;
+        } else {
+          strcpy(fileName, argv[2]);
+        }
+      } else if (!strcmp(argv[2], "--eps") || !strcmp(argv[2], "--pdf") || !strcmp(argv[2], "--gif") ||
+                 !strcmp(argv[2], "--jpg") || !strcmp(argv[2], "--png") || !strcmp(argv[2], "--svg") ||
+                 !strcmp(argv[2], "--xpm") || !strcmp(argv[2], "--root")) {
+        graphicsOutput = true;
+        strcpy(graphicsExtension, argv[2]+2);
+        // check if filename has extension msr or mlog
+        if (!strstr(argv[1], ".msr") && !strstr(argv[1], ".mlog")) {
+          cout << endl << "**ERROR** " << argv[1] << " is not a msr/mlog-file, nor is it a supported graphics extension." << endl;
+          show_syntax = true;
+        } else {
+          strcpy(fileName, argv[1]);
+        }
+      } else {
+        show_syntax = true;
       }
       break;
     default:
@@ -124,15 +166,15 @@ int main(int argc, char *argv[])
   startupHandler->CheckLists();
 
   // read msr-file
-  PMsrHandler *msrHandler = new PMsrHandler(argv[1]);
+  PMsrHandler *msrHandler = new PMsrHandler(fileName);
   status = msrHandler->ReadMsrFile();
   if (status != PMUSR_SUCCESS) {
     switch (status) {
       case PMUSR_MSR_FILE_NOT_FOUND:
-        cout << endl << "**ERROR** couldn't find '" << argv[1] << "'" << endl << endl;
+        cout << endl << "**ERROR** couldn't find '" << fileName << "'" << endl << endl;
         break;
       case PMUSR_MSR_SYNTAX_ERROR:
-        cout << endl << "**SYNTAX ERROR** in file " << argv[1] << ", full stop here." << endl << endl;
+        cout << endl << "**SYNTAX ERROR** in file " << fileName << ", full stop here." << endl << endl;
         break;
       default:
         cout << endl << "**UNKNOWN ERROR** when trying to read the msr-file" << endl << endl;
