@@ -324,7 +324,7 @@ void PMusrT0::InitDataAndBkg()
 
   // add lines
   // t0 line
-  int t0Bin;
+  Int_t t0Bin = 0;
   switch (fDetectorTag) {
     case DETECTOR_TAG_FORWARD:
       t0Bin = fMsrHandler->GetMsrRunList()->at(fRunNo).fT0[0 + fAddRunNo * fAddRunOffset/2];

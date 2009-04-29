@@ -302,8 +302,8 @@ bool PRunNonMusr::PrepareViewData()
   // followed: the smallest x-interval found will be used to for the fXTheory resolution
   // which is 1000 function points. The function will be calculated from the smallest
   // xmin found up to the largest xmax found.
-  double xMin, xMax;
-  double xAbsMin, xAbsMax;
+  Double_t xMin = 0.0, xMax = 0.0;
+  Double_t xAbsMin = 0.0, xAbsMax = 0.0;
   bool first = true;
 // cout << endl << ">> plotList->size()=" << plotList->size();
   for (unsigned int i=0; i<plotList->size(); i++) {

@@ -172,6 +172,8 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void HandleMenuPopup(Int_t id); // SLOT
     virtual void LastCanvasClosed(); // SLOT
 
+    virtual void SaveGraphicsAndQuit(char *fileName, char *graphicsFormat);
+
   private:
     Bool_t fValid;
     Bool_t fDifferenceView;  /// tag showing that the shown data, fourier, are the difference between data and theory

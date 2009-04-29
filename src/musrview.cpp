@@ -58,14 +58,13 @@ void musrview_syntax()
   cout << endl << "usage: musrview <msr-file> [--<graphic-format-extension>] | --version | --help";
   cout << endl << "       <msr-file>: msr/mlog input file";
   cout << endl << "       'musrview <msr-file>' will execute musrview";
-  cout << endl << ">> ----- NOT YET IMPLEMENTED ----- << ";
   cout << endl << "       --<graphic-format-extension>: ";
   cout << endl << "           will produce a graphics-output-file without starting a root session.";
-  cout << endl << "           the name is based on the <msr-file>, e.g. 3310.msr -> 3310.png";
+  cout << endl << "           the name is based on the <msr-file>, e.g. 3310.msr -> 3310_0.png";
   cout << endl << "           supported graphic-format-extension:";
   cout << endl << "           eps, pdf, gif, jpg, png, svg, xpm, root";
-  cout << endl << "           example: musrview 3310.msr --png, will produce a file 3310.png";
-  cout << endl << ">> ----- NOT YET IMPLEMENTED ----- << ";
+  cout << endl << "           example: musrview 3310.msr --png, will produce a files 3310_X.png";
+  cout << endl << "                    where 'X' stands for the plot number (starting form 0)";
   cout << endl << "       'musrview' or 'musrview --help' will show this help";
   cout << endl << "       'musrview --version' will print the musrview version";
   cout << endl << endl;
@@ -79,8 +78,10 @@ int main(int argc, char *argv[])
   bool success = true;
   char fileName[128];
   bool graphicsOutput = false;
-  char graphicsExtension[32];
+  char graphicsExtension[128];
 
+
+  // check input arguments
   switch (argc) {
     case 1:
       show_syntax = true;
@@ -291,6 +292,10 @@ cout << endl;
 
       musrCanvas->Connect("Done(Int_t)", "TApplication", &app, "Terminate(Int_t)");
 
+      if (graphicsOutput) {
+        musrCanvas->SaveGraphicsAndQuit(fileName, graphicsExtension);
+      }
+
       // keep musrCanvas objects
       canvasVector.push_back(musrCanvas);
     }
@@ -300,24 +305,24 @@ cout << endl;
       app.Run(true); // true needed that Run will return after quit so that cleanup works
 
     // clean up
-cout << endl << "clean up canvas vector ...";
+//cout << endl << "clean up canvas vector ...";
     char canvasName[32];
     for (unsigned int i=0; i<canvasVector.size(); i++) {
       // check if canvas is still there before calling the destructor **TO BE DONE**
       sprintf(canvasName, "fMainCanvas%d", i);
-cout << endl << ">> canvasName=" << canvasName << ", canvasVector[" << i << "]=" << canvasVector[i];
+//cout << endl << ">> canvasName=" << canvasName << ", canvasVector[" << i << "]=" << canvasVector[i];
       if (gROOT->GetListOfCanvases()->FindObject(canvasName) != 0) {
-cout << endl << ">> canvasName=" << canvasName << ", found ...";
-cout << endl;
+//cout << endl << ">> canvasName=" << canvasName << ", found ...";
+//cout << endl;
         canvasVector[i]->~PMusrCanvas();
       } else {
-cout << endl << ">> canvasName=" << canvasName << ", NOT found ...";
-cout << endl;
+//cout << endl << ">> canvasName=" << canvasName << ", NOT found ...";
+//cout << endl;
       }
     }
     canvasVector.empty();
   }
-cout << endl;
+//cout << endl;
 
   // clean up
   plotList.clear();

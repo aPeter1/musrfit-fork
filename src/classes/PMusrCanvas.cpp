@@ -132,7 +132,7 @@ PMusrCanvas::PMusrCanvas(const int number, const char* title,
  */
 PMusrCanvas::~PMusrCanvas()
 {
-cout << "~PMusrCanvas() called. fMainCanvas name=" << fMainCanvas->GetName() << endl;
+//cout << "~PMusrCanvas() called. fMainCanvas name=" << fMainCanvas->GetName() << endl;
   // cleanup
   if (fStyle) {
     delete fStyle;
@@ -180,10 +180,8 @@ cout << "~PMusrCanvas() called. fMainCanvas name=" << fMainCanvas->GetName() << 
     fMultiGraphDiff = 0;
   }
   if (fNonMusrData.size() > 0) {
-/*
     for (unsigned int i=0; i<fNonMusrData.size(); i++)
       CleanupDataSet(fNonMusrData[i]);
-*/
     fNonMusrData.clear();
   }
   if (fCurrentFourierPhaseText) {
@@ -247,8 +245,8 @@ void PMusrCanvas::UpdateParamTheoryPad()
   TString  str;
   char     cnum[128];
   int      maxLength = 0;
-  Double_t ypos, yoffset;
-  int      idx;
+  Double_t ypos = 0.0, yoffset = 0.0;
+  int      idx = -1;
 
   // add parameters ------------------------------------------------------------
   PMsrParamList param = *fMsrHandler->GetMsrParamList();
@@ -343,6 +341,7 @@ void PMusrCanvas::UpdateParamTheoryPad()
     ypos -= 0.05;
     fTheoryPad->AddText(0.03, ypos, functions[i].fLine.Data());
   }
+
 
   fParameterPad->Draw();
   fTheoryPad->Draw();
@@ -901,6 +900,52 @@ void PMusrCanvas::LastCanvasClosed()
 }
 
 //--------------------------------------------------------------------------
+// SaveGraphicsAndQuit
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param graphicsFormat One of the supported graphics formats.
+ */
+void PMusrCanvas::SaveGraphicsAndQuit(char *fileName, char *graphicsFormat)
+{
+  cout << endl << ">> SaveGraphicsAndQuit: will dump the canvas into a graphics output file (" << graphicsFormat << ") ..."<< endl;
+
+  TString str(fileName);
+  Int_t idx = -1;
+  Int_t size = 0;
+  char ext[32];
+
+  if (str.Contains(".msr")) {
+    idx = str.Index(".msr");
+    size = 4;
+  }
+  if (str.Contains(".mlog")) {
+    idx = str.Index(".mlog");
+    size = 5;
+  }
+
+  if (idx == -1) {
+    cout << endl << "PMusrCanvas::SaveGraphicsAndQuit **ERROR**: fileName (" << fileName << ") is invalid." << endl;
+    return;
+  }
+
+  sprintf(ext, "_%d", fPlotNumber);
+  str.Replace(idx, size, ext, strlen(ext));
+  idx += strlen(ext);
+  size = strlen(ext);
+  sprintf(ext, ".%s", graphicsFormat);
+  str.Replace(idx, size, ext, strlen(ext));
+
+  cout << endl << ">> SaveGraphicsAndQuit: " << str.Data() << endl;
+
+  fMainCanvas->SaveAs(str.Data());
+
+  if (fPlotNumber == static_cast<int>(fMsrHandler->GetMsrPlotList()->size()) - 1)
+    Done(0);
+}
+
+//--------------------------------------------------------------------------
 // CreateStyle (private)
 //--------------------------------------------------------------------------
 /**
@@ -908,7 +953,9 @@ void PMusrCanvas::LastCanvasClosed()
  */
 void PMusrCanvas::CreateStyle()
 {
-  fStyle = new TStyle("musrStyle", "musrStyle");
+  TString musrStyle("musrStyle");
+  musrStyle += fPlotNumber;
+  fStyle = new TStyle(musrStyle, musrStyle);
   fStyle->SetOptStat(0);  // no statistics options
   fStyle->SetOptTitle(0); // no title
   fStyle->cd();
@@ -1073,6 +1120,7 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
 
   fMainCanvas->cd();
   fMainCanvas->Show();
+
   fMainCanvas->Connect("ProcessedEvent(Int_t,Int_t,Int_t,TObject*)", "PMusrCanvas", 
                        this, "HandleCmdKey(Int_t,Int_t,Int_t,TObject*)");
 
@@ -1308,6 +1356,8 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   // create histo specific infos
   name  = fMsrHandler->GetMsrRunList()->at(runNo).fRunName[0] + "_DataRunNo";
   name += (int)runNo;
+  name += "_";
+  name += fPlotNumber;
   start = data->fDataTimeStart - data->fDataTimeStep/2.0;
   end   = data->fDataTimeStart + data->fValue.size()*data->fDataTimeStep + data->fDataTimeStep/2.0;
 
@@ -1344,6 +1394,8 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   // create histo specific infos
   name  = fMsrHandler->GetMsrRunList()->at(runNo).fRunName[0] + "_TheoRunNo";
   name += (int)runNo;
+  name += "_";
+  name += fPlotNumber;
   start = data->fTheoryTimeStart - data->fTheoryTimeStep/2.0;
   end   = data->fTheoryTimeStart + data->fTheory.size()*data->fTheoryTimeStep + data->fTheoryTimeStep/2.0;
 
@@ -1833,14 +1885,14 @@ cout << endl << ">> data scale = " << scale;
  */
 double PMusrCanvas::FindOptimalFourierPhase()
 {
-cout << endl << ">> in FindOptimalFourierPhase ... ";
+//cout << endl << ">> in FindOptimalFourierPhase ... ";
 
   // check that Fourier is really present
   if ((fData[0].dataFourierRe == 0) || (fData[0].dataFourierIm == 0))
     return 0.0;
 
-  double minPhase, x, valIm, val_xMin, val_xMax;
-  double minIm, maxIm, asymmetry;
+  Double_t minPhase, x, valIm, val_xMin = 0.0, val_xMax = 0.0;
+  Double_t minIm = 0.0, maxIm = 0.0, asymmetry;
   // get min/max of the imaginary part for phase = 0.0 as a starting point
   minPhase = 0.0;
   bool first = true;
@@ -2873,22 +2925,22 @@ void PMusrCanvas::PlotFourierPhaseValue()
   double x, y;
   TString str;
 
-   // plot Fourier phase
-   str = TString("phase = ");
-   str += fCurrentFourierPhase;   
-   x = 0.7;
-   y = 0.85;
-   fCurrentFourierPhaseText = new TLatex();
-   fCurrentFourierPhaseText->SetNDC(kTRUE);
-   fCurrentFourierPhaseText->SetText(x, y, str.Data());
-   fCurrentFourierPhaseText->SetTextFont(62);
-   fCurrentFourierPhaseText->SetTextSize(0.03);
+  // plot Fourier phase
+  str = TString("phase = ");
+  str += fCurrentFourierPhase;
+  x = 0.7;
+  y = 0.85;
+  fCurrentFourierPhaseText = new TLatex();
+  fCurrentFourierPhaseText->SetNDC(kTRUE);
+  fCurrentFourierPhaseText->SetText(x, y, str.Data());
+  fCurrentFourierPhaseText->SetTextFont(62);
+  fCurrentFourierPhaseText->SetTextSize(0.03);
 
-   fDataTheoryPad->cd();
+  fDataTheoryPad->cd();
 
-   fCurrentFourierPhaseText->Draw();
+  fCurrentFourierPhaseText->Draw();
 
-   fDataTheoryPad->Update();
+  fDataTheoryPad->Update();
 }
 
 //--------------------------------------------------------------------------
