@@ -180,14 +180,17 @@ else
       fi
 
       numberOfReadInLines=0
+      numberOfComments=0
 
       exec 3< $1 # open file for reading in the runlist-file the first time and get the runnumbers to be processed
       while read -u 3 -a runList
       do
         if [ "$numberOfReadInLines" -eq 0 ]; then
           NUM_OF_IND_VAR=${#runList[@]}
+        elif [ "${runList[0]:0:1}" == "#" ] || [ "${runList[0]}" == "" ]; then
+          ((numberOfComments++))
         else
-          RUNARRAY[(( numberOfReadInLines - 1 ))]=${runList[0]}
+          RUNARRAY[(( numberOfReadInLines - numberOfComments - 1 ))]=${runList[0]}
         fi
         ((numberOfReadInLines++))
       done
