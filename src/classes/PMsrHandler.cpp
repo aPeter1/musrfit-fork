@@ -69,7 +69,7 @@ PMsrHandler::PMsrHandler(char *fileName) : fFileName(fileName)
   if (fFileName.Contains("/")) {
     Int_t idx = -1;
     while (fFileName.Index("/", idx+1) != -1) {
-      idx = fFileName.Index("/", idx);
+      idx = fFileName.Index("/", idx+1);
     }
     fMsrFileDirectoryPath = fFileName;
     fMsrFileDirectoryPath.Remove(idx+1);
@@ -328,32 +328,27 @@ int PMsrHandler::WriteMsrLogFile(TString ext)
 {
   const unsigned int prec = 6; // output precision for float/doubles
 
-  TObjArray *tokens;
-  TObjString *ostr;
   TString str;
 
   // construct log file name
-  tokens = fFileName.Tokenize(".");
-  if (!tokens)
-    return PMUSR_TOKENIZE_ERROR;
-  // in order to handle names with "." correctly this slightly odd mlog-filename generation
-  str = TString("");
-  for (int i=0; i<tokens->GetEntries()-1; i++) {
-    ostr = dynamic_cast<TObjString*>(tokens->At(i));
-    str += ostr->GetString() + TString(".");
+  // first find the last '.' in the filename
+  Int_t idx = -1;
+  while (fFileName.Index(".", idx+1) != -1) {
+    idx = fFileName.Index(".", idx+1);
   }
+  if (idx == -1)
+    return PMUSR_MSR_SYNTAX_ERROR;
+
+  // remove extension
+  str = fFileName;
+  str.Remove(idx+1);
+
+  // add new extension
   if (ext.Length() != 0)
     str += ext;
   else
     str += "mlog";
 
-  str = fMsrFileDirectoryPath + str;
-
-  // clean up
-  if (tokens) {
-    delete tokens;
-    tokens = 0;
-  }
 
   ofstream f;
 
