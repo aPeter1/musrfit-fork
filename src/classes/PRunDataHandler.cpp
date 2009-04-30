@@ -271,6 +271,15 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const unsigned 
     pathName = str;
   }
 
+  // check if the file is found in the <msr-file-directory>
+  if (pathName.CompareTo("???") == 0) { // not found in local directory search
+    str  = *fMsrInfo->GetMsrFileDirectoryPath();
+    str += runInfo.fRunName[idx] + TString(".") + ext;
+    if (gSystem->AccessPathName(str.Data())!=true) { // found
+      pathName = str;
+    }
+  }
+
   // check if the file is found in the directory given in the startup file
   if (pathName.CompareTo("???") == 0) { // not found in local directory search
     for (unsigned int i=0; i<fDataPath.size(); i++) {

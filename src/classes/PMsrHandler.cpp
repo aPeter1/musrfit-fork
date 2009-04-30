@@ -52,10 +52,9 @@ using namespace std;
  *
  * \param fileName
  */
-PMsrHandler::PMsrHandler(char *fileName)
+PMsrHandler::PMsrHandler(char *fileName) : fFileName(fileName)
 {
   // init variables
-  fFileName = fileName;
   fMsrBlockCounter = 0;
 
   fTitle = "";
@@ -66,6 +65,17 @@ PMsrHandler::PMsrHandler(char *fileName)
   fStatistic.fNdf   = 0;
 
   fFuncHandler = 0;
+
+  if (fFileName.Contains("/")) {
+    Int_t idx = -1;
+    while (fFileName.Index("/", idx+1) != -1) {
+      idx = fFileName.Index("/", idx);
+    }
+    fMsrFileDirectoryPath = fFileName;
+    fMsrFileDirectoryPath.Remove(idx+1);
+  } else {
+    fMsrFileDirectoryPath = "./";
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -336,6 +346,8 @@ int PMsrHandler::WriteMsrLogFile(TString ext)
     str += ext;
   else
     str += "mlog";
+
+  str = fMsrFileDirectoryPath + str;
 
   // clean up
   if (tokens) {

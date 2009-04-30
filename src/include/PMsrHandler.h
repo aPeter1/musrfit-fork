@@ -63,6 +63,8 @@ class PMsrHandler
     virtual PMsrPlotList*           GetMsrPlotList() { return &fPlots; }
     virtual PMsrStatisticStructure* GetMsrStatistic() { return &fStatistic; }
 
+    virtual TString* GetMsrFileDirectoryPath() { return &fMsrFileDirectoryPath; }
+
     virtual unsigned int GetNoOfParams() { return fParam.size(); }
     virtual const TString& GetFileName() const { return fFileName; }
 
@@ -95,6 +97,7 @@ class PMsrHandler
   private:
     PMsrLines              fComments;  ///< holds the comments of the msr-file
     TString                fFileName;  ///< file name of the msr-file
+    TString                fMsrFileDirectoryPath; ///< msr-file directory path
     TString                fTitle;     ///< holds the title string of the msr-file
     PMsrParamList          fParam;     ///< holds a list of the fit parameters
     PMsrLines              fTheory;    ///< holds the theory definition
