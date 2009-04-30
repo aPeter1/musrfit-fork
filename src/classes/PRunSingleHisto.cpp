@@ -331,7 +331,7 @@ bool PRunSingleHisto::PrepareData()
   }
 
   // check if the t0's are given in the msr-file
-  if (fRunInfo->fT0[0] == -1) { // t0's are NOT in the msr-file
+  if (fRunInfo->fT0.size() == 0) { // t0's are NOT in the msr-file
     // check if the t0's are in the data file
     if (runData->fT0s.size() != 0) { // t0's in the run data
       // keep the proper t0's. For single histo runs, forward is holding the histo no
