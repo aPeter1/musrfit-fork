@@ -48,7 +48,7 @@ class PFitOutputHandler : public QDialog
   Q_OBJECT
 
 public:
-  PFitOutputHandler(QValueVector<QString> &cmd);
+  PFitOutputHandler(QString workingDirectory, QValueVector<QString> &cmd);
   ~PFitOutputHandler() {}
 
 public slots:

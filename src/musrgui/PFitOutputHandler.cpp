@@ -35,7 +35,7 @@
 /**
  * <p>
  */
-PFitOutputHandler::PFitOutputHandler(QValueVector<QString> &cmd)
+PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QValueVector<QString> &cmd)
 {
   if (cmd.empty())
     return;
@@ -55,6 +55,8 @@ PFitOutputHandler::PFitOutputHandler(QValueVector<QString> &cmd)
   // QProcess related code
   proc = new QProcess( this );
 
+  proc->setWorkingDirectory(workingDirectory);
+
   // Set up the command and arguments.
   for (unsigned int i=0; i<cmd.size(); i++)
     proc->addArgument(cmd[i]);
@@ -67,7 +69,7 @@ PFitOutputHandler::PFitOutputHandler(QValueVector<QString> &cmd)
     // error handling
     QMessageBox::critical( 0,
                 tr("Fatal error"),
-                tr("Could not start the musrfit command: "+cmd[0]),
+                tr("Could not execute the output command: "+cmd[0]),
                 tr("Quit") );
     done(0);
   }

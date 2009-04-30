@@ -350,19 +350,23 @@ void PTextEdit::load( const QString &f )
 {
   if ( !QFile::exists( f ) )
     return;
+
   PSubTextEdit *edit = new PSubTextEdit( fAdmin );
   edit->setTextFormat( PlainText );
   edit->setFamily("Courier");
   edit->setPointSize(11); // 11pt
   edit->setFont(QFont("Courier", 11));
+
   fTabWidget->addTab( edit, QFileInfo( f ).fileName() );
   QFile file( f );
   if ( !file.open( IO_ReadOnly ) )
     return;
+
   QTextStream ts( &file );
   QString txt = ts.read();
   edit->setText( txt );
   doConnections( edit );
+
   fTabWidget->showPage( edit );
   edit->viewport()->setFocus();
   fFilenames.replace( edit, f );
@@ -374,8 +378,10 @@ void PTextEdit::load( const QString &f )
  */
 PSubTextEdit *PTextEdit::currentEditor() const
 {
-  if ( fTabWidget->currentPage() && fTabWidget->currentPage()->inherits( "PSubTextEdit" ) )
+  if ( fTabWidget->currentPage() && fTabWidget->currentPage()->inherits( "PSubTextEdit" ) ) {
     return (PSubTextEdit*)fTabWidget->currentPage();
+  }
+
   return 0;
 }
 
@@ -897,7 +903,7 @@ void PTextEdit::musrCalcChisq()
   cmd.append(str);
   cmd.append(*fFilenames.find( currentEditor()));
   cmd.append("--chisq-only");
-  PFitOutputHandler fitOutputHandler(cmd);
+  PFitOutputHandler fitOutputHandler(QFileInfo(fFilenames[currentEditor()]).dirPath(), cmd);
   fitOutputHandler.setModal(true);
   fitOutputHandler.exec();
 }
@@ -946,7 +952,7 @@ void PTextEdit::musrFit()
       break;
   }
 
-  PFitOutputHandler fitOutputHandler(cmd);
+  PFitOutputHandler fitOutputHandler(QFileInfo(fFilenames[currentEditor()]).dirPath(), cmd);
   fitOutputHandler.setModal(true);
   fitOutputHandler.exec();
 
@@ -1079,6 +1085,7 @@ void PTextEdit::musrMsr2Data()
 
     // form command
     QValueVector<QString> cmd;
+
     str = fAdmin->getExecPath() + "/msr2data";
     cmd.append(str);
 
@@ -1175,7 +1182,7 @@ for (unsigned int i=0; i<cmd.size(); i++) {
 cout << endl;
 */
 
-    PFitOutputHandler fitOutputHandler(cmd);
+    PFitOutputHandler fitOutputHandler(QFileInfo(fFilenames[currentEditor()]).dirPath(), cmd);
     fitOutputHandler.setModal(true);
     fitOutputHandler.exec();
   }
