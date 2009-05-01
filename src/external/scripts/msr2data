@@ -431,7 +431,7 @@ else
             parArray[i] = $2
             dataArray[i] = $3
             if($4 ~ /^-/)
-              negErrArray[i] = (-1.0)*$4
+              negErrArray[i] = substr($4, 2)
             else
               negErrArray[i] = $4
             if($5 ~ /none/)
