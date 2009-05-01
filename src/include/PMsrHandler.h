@@ -77,6 +77,7 @@ class PMsrHandler
     virtual void SetMsrDataRangeEntry(unsigned int runNo, unsigned int idx, int bin);
     virtual void SetMsrBkgRangeEntry(unsigned int runNo, unsigned int idx, int bin);
 
+    virtual void CopyMsrStatisticBlock() { fCopyStatisticsBlock = true; }
     virtual void SetMsrStatisticConverged(bool converged) { fStatistic.fValid = converged; }
     virtual void SetMsrStatisticMin(double min) { fStatistic.fMin = min; }
     virtual void SetMsrStatisticNdf(unsigned int ndf) { fStatistic.fNdf = ndf; }
@@ -113,6 +114,8 @@ class PMsrHandler
     PFunctionHandler *fFuncHandler; ///< needed to parse functions
 
     PIntVector fParamInUse; ///< array holding the information if a particular parameter is used at all, i.e. if the theory is using it (perhaps via maps or functions)
+
+    bool fCopyStatisticsBlock; ///< flag, if true: just copy to old statistics block (musrt0), otherwise write a new one (musrfit)
 
     virtual bool HandleFitParameterEntry(PMsrLines &line);
     virtual bool HandleTheoryEntry(PMsrLines &line);

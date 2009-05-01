@@ -59,6 +59,7 @@ PMsrHandler::PMsrHandler(char *fileName) : fFileName(fileName)
 
   fTitle = "";
 
+  fCopyStatisticsBlock = false;
   fStatistic.fValid = false;
   fStatistic.fChisq = true;
   fStatistic.fMin   = -1.0;
@@ -830,39 +831,41 @@ int PMsrHandler::WriteMsrLogFile(TString ext)
     CheckAndWriteComment(f, ++lineNo);
   }
 
-  // write statistic block
-  TDatime dt;
-  f << endl << "STATISTIC --- " << dt.AsSQLString();
-  CheckAndWriteComment(f, ++lineNo);
-  // if fMin and fNdf are given, make new statistic block
-  if ((fStatistic.fMin != -1.0) && (fStatistic.fNdf != 0)) {
-    // throw away the old statistics block
-    fStatistic.fStatLines.clear();
-    // create the new statistics block
-    PMsrLineStructure line;
-    if (fStatistic.fValid) { // valid fit result
-      if (fStatistic.fChisq) { // chi^2
-        line.fLine  = "  chisq = ";
-        line.fLine += fStatistic.fMin;
-        line.fLine += ", NDF = ";
-        line.fLine += fStatistic.fNdf;
-        line.fLine += ", chisq/NDF = ";
-        line.fLine += fStatistic.fMin / fStatistic.fNdf;
-        cout << endl << line.fLine.Data() << endl;
+  if (!fCopyStatisticsBlock) { // write a new statistics block
+    // write statistic block
+    TDatime dt;
+    f << endl << "STATISTIC --- " << dt.AsSQLString();
+    CheckAndWriteComment(f, ++lineNo);
+    // if fMin and fNdf are given, make new statistic block
+    if ((fStatistic.fMin != -1.0) && (fStatistic.fNdf != 0)) {
+      // throw away the old statistics block
+      fStatistic.fStatLines.clear();
+      // create the new statistics block
+      PMsrLineStructure line;
+      if (fStatistic.fValid) { // valid fit result
+        if (fStatistic.fChisq) { // chi^2
+          line.fLine  = "  chisq = ";
+          line.fLine += fStatistic.fMin;
+          line.fLine += ", NDF = ";
+          line.fLine += fStatistic.fNdf;
+          line.fLine += ", chisq/NDF = ";
+          line.fLine += fStatistic.fMin / fStatistic.fNdf;
+          cout << line.fLine.Data() << endl;
+        } else {
+          line.fLine  = "  maxLH = ";
+          line.fLine += fStatistic.fMin;
+          line.fLine += ", NDF = ";
+          line.fLine += fStatistic.fNdf;
+          line.fLine += ", maxLH/NDF = ";
+          line.fLine += fStatistic.fMin / fStatistic.fNdf;
+          cout << line.fLine.Data() << endl;
+        }
       } else {
-        line.fLine  = "  maxLH = ";
-        line.fLine += fStatistic.fMin;
-        line.fLine += ", NDF = ";
-        line.fLine += fStatistic.fNdf;
-        line.fLine += ", maxLH/NDF = ";
-        line.fLine += fStatistic.fMin / fStatistic.fNdf;
+        line.fLine = "*** FIT DID NOT CONVERGE ***";
         cout << endl << line.fLine.Data() << endl;
       }
-    } else {
-      line.fLine = "*** FIT DID NOT CONVERGE ***";
-      cout << endl << line.fLine.Data() << endl;
+      fStatistic.fStatLines.push_back(line);
     }
-    fStatistic.fStatLines.push_back(line);
   }
   // write the statistics block
   for (unsigned int i=0; i<fStatistic.fStatLines.size(); i++) {

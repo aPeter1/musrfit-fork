@@ -206,6 +206,7 @@ int main(int argc, char *argv[])
     }
     return status;
   }
+  msrHandler->CopyMsrStatisticBlock(); // just copy the statistics block since no fit is preformed
 
   // check if the fittype is not NonMusr
   PMsrRunList *runList = msrHandler->GetMsrRunList();
@@ -284,7 +285,6 @@ int main(int argc, char *argv[])
       }
     }
   }
-cout << endl;
 
   // write msr-file
   msrHandler->WriteMsrLogFile("msr");
