@@ -103,7 +103,7 @@ PMusrT0::PMusrT0(PRawRunData *rawRunData, int runNo, int histoNo, int detectorTa
   // feed raw data histo
   Int_t noOfBins = rawRunData->fDataBin[histoNo-1].size();
   Double_t start = -0.5;
-  Double_t end   = noOfBins + 0.5;
+  Double_t end   = noOfBins - 0.5; // -0.5 is correct since the data start at 0.0
   fHisto = new TH1F("fHisto", str.Data(), noOfBins, start, end);
   fHisto->SetMarkerStyle(21);
   fHisto->SetMarkerSize(0.5);
@@ -391,7 +391,9 @@ void PMusrT0::SetT0Channel()
   fMainCanvas->AbsPixeltoXY(fPx,fPy,x,y);
 
   // get binx to set t0 corresponding to fPx
-  Int_t binx = fHisto->GetXaxis()->FindFixBin(x);
+  Int_t binx = fHisto->GetXaxis()->FindFixBin(x) - 1;
+
+cout << endl << ">> PMusrT0::SetT0Channel(): binx = " << binx << endl;
 
   // set t0 bin in msr-Handler
   unsigned int idx = 0;
@@ -412,7 +414,6 @@ void PMusrT0::SetT0Channel()
       break;
   }
   fMsrHandler->SetMsrT0Entry(fRunNo, idx, binx);
-
 
   // shift line to the proper position
   fT0Line->SetX1(x);
@@ -435,7 +436,9 @@ void PMusrT0::SetDataFirstChannel()
   fMainCanvas->AbsPixeltoXY(fPx,fPy,x,y);
 
   // get binx to set the data first channel corresponding to fPx
-  fDataRange[0] = fHisto->GetXaxis()->FindFixBin(x);
+  fDataRange[0] = fHisto->GetXaxis()->FindFixBin(x) - 1;
+
+cout << endl << ">> PMusrT0::SetDataFirstChannel(): fDataRange[0] = " << fDataRange[0] << endl;
 
   // set the data first bin in msr-Handler
   unsigned int idx = 0;
@@ -495,7 +498,9 @@ void PMusrT0::SetDataLastChannel()
   fMainCanvas->AbsPixeltoXY(fPx,fPy,x,y);
 
   // get binx to set the data last channel corresponding to fPx
-  fDataRange[1] = fHisto->GetXaxis()->FindFixBin(x);
+  fDataRange[1] = fHisto->GetXaxis()->FindFixBin(x) - 1;
+
+cout << endl << ">> PMusrT0::SetDataLastChannel(): fDataRange[1] = " << fDataRange[1] << endl;
 
   // set the data first bin in msr-Handler
   unsigned int idx = 0;
@@ -555,7 +560,9 @@ void PMusrT0::SetBkgFirstChannel()
   fMainCanvas->AbsPixeltoXY(fPx,fPy,x,y);
 
   // get binx to set the background first channel corresponding to fPx
-  fBkgRange[0] = fHisto->GetXaxis()->FindFixBin(x);
+  fBkgRange[0] = fHisto->GetXaxis()->FindFixBin(x) - 1;
+
+cout << endl << ">> PMusrT0::SetBkgFirstChannel(): fBkgRange[0] = " << fBkgRange[0] << endl;
 
   // set the background first bin in msr-Handler
   unsigned int idx = 0;
@@ -615,7 +622,9 @@ void PMusrT0::SetBkgLastChannel()
   fMainCanvas->AbsPixeltoXY(fPx,fPy,x,y);
 
   // get binx to set the background last channel corresponding to fPx
-  fBkgRange[1] = fHisto->GetXaxis()->FindFixBin(x);
+  fBkgRange[1] = fHisto->GetXaxis()->FindFixBin(x) - 1;
+
+cout << endl << ">> PMusrT0::SetBkgLastChannel(): fBkgRange[1] = " << fBkgRange[1] << endl;
 
   // set the background first bin in msr-Handler
   unsigned int idx = 0;
