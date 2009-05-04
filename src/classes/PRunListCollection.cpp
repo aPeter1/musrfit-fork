@@ -489,14 +489,27 @@ const char* PRunListCollection::GetSetup(TString &runName)
  */
 const char* PRunListCollection::GetXAxisTitle(TString &runName, const unsigned int idx)
 {
+//cout << endl << ">> PRunListCollection::GetXAxisTitle: runName = " << runName.Data() << ", idx = " << idx;
+//cout << endl << ">> PRunListCollection::GetXAxisTitle: fRunNonMusrList.size() = " << fRunNonMusrList.size();
+//cout << endl;
+
   PRawRunData *runData = fData->GetRunData(runName);
 
-  int index = fRunNonMusrList[idx]->GetXIndex();
+  const char *result = 0;
 
-// cout << endl << ">>PRunListCollection::GetXAxisTitle, x-index = " << index;
-// cout << endl;
+  if (runData->fDataNonMusr.fFromAscii) {
+    result = runData->fDataNonMusr.fLabels[0].Data();
+  } else {
+    for (unsigned int i=0; i<fRunNonMusrList.size(); i++) {
+      if (fRunNonMusrList[i]->GetRunNo() == idx) {
+        int index = fRunNonMusrList[i]->GetXIndex();
+        result = runData->fDataNonMusr.fLabels[index].Data();
+        break;
+      }
+    }
+  }
 
-  return runData->fDataNonMusr.fLabels[index].Data();
+  return result;
 }
 
 //--------------------------------------------------------------------------
@@ -510,13 +523,25 @@ const char* PRunListCollection::GetXAxisTitle(TString &runName, const unsigned i
  */
 const char* PRunListCollection::GetYAxisTitle(TString &runName, const unsigned int idx)
 {
+//cout << endl << ">> PRunListCollection::GetYAxisTitle: runName = " << runName.Data() << ", idx = " << idx;
+//cout << endl;
+
   PRawRunData *runData = fData->GetRunData(runName);
 
-  int index = fRunNonMusrList[idx]->GetYIndex();
+  const char *result = 0;
 
-// cout << endl << ">>PRunListCollection::GetYAxisTitle, y-index = " << index;
-// cout << endl;
+  if (runData->fDataNonMusr.fFromAscii) {
+    result = runData->fDataNonMusr.fLabels[1].Data();
+  } else {
+    for (unsigned int i=0; i<fRunNonMusrList.size(); i++) {
+      if (fRunNonMusrList[i]->GetRunNo() == idx) {
+        int index = fRunNonMusrList[i]->GetYIndex();
+        result = runData->fDataNonMusr.fLabels[index].Data();
+        break;
+      }
+    }
+  }
 
-  return runData->fDataNonMusr.fLabels[index].Data();
+  return result;
 }
 

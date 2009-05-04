@@ -70,6 +70,7 @@ PMusrCanvas::PMusrCanvas()
   fParameterPad        = 0;
   fTheoryPad           = 0;
   fInfoPad             = 0;
+  fMultiGraphLegend    = 0;
 
   fMultiGraphData = 0;
   fMultiGraphDiff = 0;
@@ -143,6 +144,28 @@ PMusrCanvas::~PMusrCanvas()
     delete fTitlePad;
     fTitlePad = 0;
   }
+  if (fData.size() > 0) {
+    for (unsigned int i=0; i<fData.size(); i++)
+      CleanupDataSet(fData[i]);
+    fData.clear();
+  }
+  if (fNonMusrData.size() > 0) {
+    for (unsigned int i=0; i<fNonMusrData.size(); i++)
+      CleanupDataSet(fNonMusrData[i]);
+    fNonMusrData.clear();
+  }
+  if (fMultiGraphData) {
+    delete fMultiGraphData;
+    fMultiGraphData = 0;
+  }
+  if (fMultiGraphDiff) {
+    delete fMultiGraphDiff;
+    fMultiGraphDiff = 0;
+  }
+  if (fCurrentFourierPhaseText) {
+    delete fCurrentFourierPhaseText;
+    fCurrentFourierPhaseText = 0;
+  }
   if (fDataTheoryPad) {
     delete fDataTheoryPad;
     fDataTheoryPad = 0;
@@ -162,31 +185,14 @@ PMusrCanvas::~PMusrCanvas()
     delete fInfoPad;
     fInfoPad = 0;
   }
+  if (fMultiGraphLegend) {
+    fMultiGraphLegend->Clear();
+    delete fMultiGraphLegend;
+    fMultiGraphLegend = 0;
+  }
   if (fMainCanvas) {
     delete fMainCanvas;
     fMainCanvas = 0;
-  }
-  if (fData.size() > 0) {
-    for (unsigned int i=0; i<fData.size(); i++)
-      CleanupDataSet(fData[i]);
-    fData.clear();
-  }
-  if (fMultiGraphData) {
-    delete fMultiGraphData;
-    fMultiGraphData = 0;
-  }
-  if (fMultiGraphDiff) {
-    delete fMultiGraphDiff;
-    fMultiGraphDiff = 0;
-  }
-  if (fNonMusrData.size() > 0) {
-    for (unsigned int i=0; i<fNonMusrData.size(); i++)
-      CleanupDataSet(fNonMusrData[i]);
-    fNonMusrData.clear();
-  }
-  if (fCurrentFourierPhaseText) {
-    delete fCurrentFourierPhaseText;
-    fCurrentFourierPhaseText = 0;
   }
 }
 
@@ -1013,6 +1019,7 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
   fParameterPad        = 0;
   fTheoryPad           = 0;
   fInfoPad             = 0;
+  fMultiGraphLegend    = 0;
 
   // invoke canvas
   TString canvasName = TString("fMainCanvas");
@@ -2265,12 +2272,36 @@ void PMusrCanvas::PlotData()
       } else {
         fMultiGraphData->GetYaxis()->UnZoom();
       }
-      // set x-axis label
-      fMultiGraphData->GetXaxis()->SetTitle(xAxisTitle.Data());
-      // set y-axis label
-      fMultiGraphData->GetYaxis()->SetTitle(yAxisTitle.Data());
+
+      // set x-, y-axis label only if there is just one data set
+      if (fNonMusrData.size() == 1) {
+        // set x-axis label
+        fMultiGraphData->GetXaxis()->SetTitle(xAxisTitle.Data());
+        // set y-axis label
+        fMultiGraphData->GetYaxis()->SetTitle(yAxisTitle.Data());
+      } else { // more than one data set present, hence add a legend
+        if (fMultiGraphLegend) {
+          delete fMultiGraphLegend;
+        }
+        fMultiGraphLegend = new TLegend(0.8, 0.8, 1.0, 1.0);
+        assert(fMultiGraphLegend != 0);
+        PStringVector legendLabel;
+        for (unsigned int i=0; i<plotInfo.fRuns.size(); i++) {
+           runNo = (unsigned int)plotInfo.fRuns[i].Re()-1;
+           xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName[0], runNo);
+           yAxisTitle = fRunList->GetYAxisTitle(runs[runNo].fRunName[0], runNo);
+           legendLabel.push_back(xAxisTitle + " vs. " + yAxisTitle);
+        }
+        for (unsigned int i=0; i<fNonMusrData.size(); i++) {
+          fMultiGraphLegend->AddEntry(fNonMusrData[i].data, legendLabel[i].Data(), "p");
+        }
+        legendLabel.clear();
+      }
 
       fMultiGraphData->Draw("a");
+
+      if (fMultiGraphLegend)
+        fMultiGraphLegend->Draw();
     }
   }
 

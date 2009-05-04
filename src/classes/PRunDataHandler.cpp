@@ -935,7 +935,7 @@ bool PRunDataHandler::ReadAsciiFile()
   // open file
   ifstream f;
 
-  // open dump-file
+  // open data-file
   f.open(fRunPathName.Data(), ifstream::in);
   if (!f.is_open()) {
     cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** Couldn't open data file (" << fRunPathName.Data() << ") for reading, sorry ...";
@@ -946,8 +946,7 @@ bool PRunDataHandler::ReadAsciiFile()
   PRawRunData runData;
 
   // init some stuff
-  runData.fDataNonMusr.fXIndex = 0;
-  runData.fDataNonMusr.fYIndex = 1;
+  runData.fDataNonMusr.fFromAscii = true;
   runData.fDataNonMusr.fLabels.push_back("??"); // x default label
   runData.fDataNonMusr.fLabels.push_back("??"); // y default label
 
@@ -1253,8 +1252,7 @@ bool PRunDataHandler::ReadDBFile()
 
   PRawRunData runData;
 
-  runData.fDataNonMusr.fXIndex = -1;
-  runData.fDataNonMusr.fYIndex = -1;
+  runData.fDataNonMusr.fFromAscii = false;
 
   int     lineNo = 0;
   int     idx;

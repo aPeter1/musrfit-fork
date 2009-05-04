@@ -200,6 +200,7 @@ class PMusrCanvas : public TObject, public TQObject
     TPaveText *fParameterPad;
     TPaveText *fTheoryPad;
     TLegend   *fInfoPad;
+    TLegend   *fMultiGraphLegend;
 
 #ifndef __MAKECINT__
     PMsrHandler        *fMsrHandler;

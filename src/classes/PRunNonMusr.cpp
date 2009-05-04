@@ -155,7 +155,7 @@ bool PRunNonMusr::PrepareData()
 {
   bool success = true;
 
-  cout << endl << "in PRunNonMusr::PrepareData(): will feed fFitData";
+//cout << endl << "in PRunNonMusr::PrepareData(): will feed fFitData";
 
   if (fRunInfo->fRunName.size() > 1) { // ADDRUN present which is not supported for NonMusr
     cout << endl << ">> PRunNonMusr::PrepareData(): **WARNING** ADDRUN NOT SUPPORTED FOR THIS FIT TYPE, WILL IGNORE IT." << endl;
@@ -374,10 +374,10 @@ unsigned int PRunNonMusr::GetXIndex()
   unsigned int index = 0;
   bool found = false;
 
-//cout << endl << ">> PRunNonMusr::GetXIndex: fRawRunData->fDataNonMusr.fXIndex = " << fRawRunData->fDataNonMusr.fXIndex;
-  if (fRawRunData->fDataNonMusr.fXIndex >= 0) { // ascii-file format
+//cout << endl << ">> PRunNonMusr::GetXIndex: fRawRunData->fDataNonMusr.fFromAscii = " << fRawRunData->fDataNonMusr.fFromAscii;
+  if (fRawRunData->fDataNonMusr.fFromAscii) { // ascii-file format
 //cout << endl << ">> PRunNonMusr::GetXIndex: ascii-file format";
-    index = fRawRunData->fDataNonMusr.fXIndex;
+    index = 0;
     found = true;
   } else { // db-file format
 //cout << endl << ">> PRunNonMusr::GetXIndex: db-file format";
@@ -421,8 +421,8 @@ unsigned int PRunNonMusr::GetYIndex()
   bool found = false;
 
 // cout << endl << ">> PRunNonMusr::GetYIndex:";
-  if (fRawRunData->fDataNonMusr.fYIndex >= 0) { // ascii-file format
-    index = fRawRunData->fDataNonMusr.fYIndex;
+  if (fRawRunData->fDataNonMusr.fFromAscii) { // ascii-file format
+    index = 1;
     found = true;
   } else { // db-file format
     if (fRunInfo->fXYDataIndex[1] > 0) { // xy-data already indices

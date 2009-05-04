@@ -166,8 +166,7 @@ typedef struct {
  * <p>
  */
 typedef struct {
-  int fXIndex;                    ///< index for the x-data vector
-  int fYIndex;                    ///< index for the y-data vector
+  bool fFromAscii;                ///< if true: data file was an ascii input file, otherwise it is a db input file
   PStringVector fLabels;          ///< vector of all labels (used for x-, y-axis title in view)
   PStringVector fDataTags;        ///< vector of all data tags
   vector<PDoubleVector> fData;    ///< vector of all data
