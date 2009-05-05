@@ -661,23 +661,31 @@ double PTheory::Func(register double t, const PDoubleVector& paramValues, const 
 /**
  * <p> Recursively clean up theory
  *
+ * If data were a pointer to some data on the heap,
+ * here, we would call delete on it. If it were a "composed" object,
+ * its destructor would get called automatically after our own
+ * destructor, so we would not have to worry about it.
+ *
+ * So all we have to clean up is the left and right subchild.
+ * It turns out that we don't have to check for null pointers;
+ * C++ automatically ignores a call to delete on a NULL pointer
+ * (according to the man page, the same is true with malloc() in C)
+ *
+ * the COOLEST part is that if right is a non-null pointer,
+ * the destructor gets called recursively!
+ *
  * \param theo
  */
 void PTheory::CleanUp(PTheory *theo)
 {
   if (theo->fMul) { // '*' present
-    CleanUp(theo->fMul);
-    if (theo->fAdd) {
-      CleanUp(theo->fAdd);
-      delete theo;
-      theo = 0;
-    }
-  } else { // '*' NOT present
-    if (theo->fAdd) {
-      CleanUp(theo->fAdd);
-      delete theo;
-      theo = 0;
-    }
+     delete theo->fMul;
+     theo->fMul = 0;
+  }
+
+  if (theo->fAdd) {
+     delete theo->fAdd;
+     theo->fAdd = 0;
   }
 }
 
