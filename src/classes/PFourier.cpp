@@ -189,27 +189,20 @@ void PFourier::Transform(unsigned int apodizationTag)
   if (!fValid)
     return;
 
-//cout << endl << ">> PFourier::Transform (apodizationTag=" << apodizationTag << ") ..." << endl;
-
   PrepareFFTwInputData(apodizationTag);
-
-/*
-if (fNoOfBins < 200) {
-for (unsigned int i=0; i<fNoOfBins; i++) {
-  cout << endl << ">> PFourier::PrepareFFTwInputData: " << i << ": fIn[i][0] = " << fIn[i][0];
-}
-cout << endl;
-}
-*/
 
   fftw_execute(fFFTwPlan);
 
-/*
-for (unsigned int i=fNoOfBins-10; i<fNoOfBins; i++) {
-  cout << endl << ">> PFourier::PrepareFFTwInputData: " << i << ": fOut[i][0] = " << fOut[i][0];
-}
-cout << endl;
-*/
+  // correct the phase for tstart != 0.0
+  double phase, re, im;
+  for (unsigned int i=0; i<fNoOfBins; i++) {
+    phase = 2.0*PI/(fTimeResolution*fNoOfBins) * i * fStartTime;
+    re =  fOut[i][0] * cos(phase) + fOut[i][1] * sin(phase);
+    im = -fOut[i][0] * sin(phase) + fOut[i][1] * cos(phase);
+    fOut[i][0] = re;
+    fOut[i][1] = im;
+  }
+
 }
 
 //--------------------------------------------------------------------------
@@ -392,14 +385,15 @@ void PFourier::PrepareFFTwInputData(unsigned int apodizationTag)
       break;
     }
   }
+//cout << endl << "t0bin = " << t0bin << endl;
 
   // 2nd fill fIn
   unsigned int start = (unsigned int)(fStartTime/fTimeResolution) + t0bin;
-  for (unsigned int i=0; i<fNoOfData-start; i++) {
+  for (unsigned int i=0; i<fNoOfData; i++) {
     fIn[i][0] = fData->GetBinContent(i+start+1);
     fIn[i][1] = 0.0;
   }
-  for (unsigned int i=fNoOfData-start; i<fNoOfBins; i++) {
+  for (unsigned int i=fNoOfData; i<fNoOfBins; i++) {
     fIn[i][0] = 0.0;
     fIn[i][1] = 0.0;
   }
