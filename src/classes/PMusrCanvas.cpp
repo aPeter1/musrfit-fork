@@ -88,8 +88,9 @@ PMusrCanvas::PMusrCanvas()
  *
  */
 PMusrCanvas::PMusrCanvas(const int number, const char* title,
-                         Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh) :
-                         fPlotNumber(number)
+                         Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
+                         const Bool_t batch) :
+                         fBatchMode(batch), fPlotNumber(number)
 {
   fMultiGraphData = 0;
   fMultiGraphDiff = 0;
@@ -111,7 +112,9 @@ PMusrCanvas::PMusrCanvas(const int number, const char* title,
 PMusrCanvas::PMusrCanvas(const int number, const char* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
                          PMsrFourierStructure fourierDefault,
-                         const PIntVector markerList, const PIntVector colorList) :
+                         const PIntVector markerList, const PIntVector colorList,
+                         const Bool_t batch) :
+                         fBatchMode(batch),
                          fPlotNumber(number), fFourier(fourierDefault),
                          fMarkerList(markerList), fColorList(colorList)
 {
@@ -443,14 +446,16 @@ void PMusrCanvas::UpdateDataTheoryPad()
         }
         // handle data
         HandleNonMusrDataSet(i, runNo, data);
-        // disable Fourier menus
-        fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL);
-        fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG);
-        fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG);
-        fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR);
-        fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE);
-        fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
-        fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+        if (!fBatchMode) {
+          // disable Fourier menus
+          fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL);
+          fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG);
+          fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG);
+          fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR);
+          fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE);
+          fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+          fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+        }
         break;
       default:
         fValid = false;
@@ -596,6 +601,9 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   if (event != kKeyPress)
      return;
 
+  if (fBatchMode)
+    return;
+
 //   cout << ">this          " << this << endl;
 //   cout << ">fMainCanvas   " << fMainCanvas << endl;
 //   cout << ">selected      " << selected << endl;
@@ -726,6 +734,9 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
  */
 void PMusrCanvas::HandleMenuPopup(Int_t id)
 {
+  if (fBatchMode)
+    return;
+
   if (id == P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber) {
     // set appropriate plot view
     fCurrentPlotView = PV_DATA;
@@ -1031,41 +1042,43 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
     return;
   }
 
-  // add canvas menu
-  fImp = (TRootCanvas*)fMainCanvas->GetCanvasImp(); 
-  fBar = fImp->GetMenuBar(); 
-  fPopupMain = fBar->AddPopup("&Musrfit");
+  // add canvas menu if not in batch mode
+  if (!fBatchMode) {
+    fImp = (TRootCanvas*)fMainCanvas->GetCanvasImp();
+    fBar = fImp->GetMenuBar();
+    fPopupMain = fBar->AddPopup("&Musrfit");
 
-  fPopupFourier = new TGPopupMenu();
-  fPopupMain->AddEntry("&Data", P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
-  fPopupMain->AddSeparator();
+    fPopupFourier = new TGPopupMenu();
+    fPopupMain->AddEntry("&Data", P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
+    fPopupMain->AddSeparator();
 
-  fPopupMain->AddPopup("&Fourier", fPopupFourier);
-  fPopupFourier->AddEntry("Show Real", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL);
-  fPopupFourier->AddEntry("Show Imag", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG);
-  fPopupFourier->AddEntry("Show Real+Imag", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG);
-  fPopupFourier->AddEntry("Show Power", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR);
-  fPopupFourier->AddEntry("Show Phase", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE);
-  fPopupFourier->AddSeparator();
-  fPopupFourier->AddEntry("Phase +", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
-  fPopupFourier->AddEntry("Phase -", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
-  fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
-  fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+    fPopupMain->AddPopup("&Fourier", fPopupFourier);
+    fPopupFourier->AddEntry("Show Real", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL);
+    fPopupFourier->AddEntry("Show Imag", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG);
+    fPopupFourier->AddEntry("Show Real+Imag", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG);
+    fPopupFourier->AddEntry("Show Power", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR);
+    fPopupFourier->AddEntry("Show Phase", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE);
+    fPopupFourier->AddSeparator();
+    fPopupFourier->AddEntry("Phase +", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+    fPopupFourier->AddEntry("Phase -", P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+    fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+    fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
 
-  fPopupMain->AddEntry("D&ifference", P_MENU_ID_DIFFERENCE+P_MENU_PLOT_OFFSET*fPlotNumber);
-  fPopupMain->AddSeparator();
+    fPopupMain->AddEntry("D&ifference", P_MENU_ID_DIFFERENCE+P_MENU_PLOT_OFFSET*fPlotNumber);
+    fPopupMain->AddSeparator();
 
-  fPopupSave = new TGPopupMenu();
-  fPopupSave->AddEntry("Save ascii", P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_ASCII);
-  fPopupSave->AddEntry("Save db", P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_DB);
+    fPopupSave = new TGPopupMenu();
+    fPopupSave->AddEntry("Save ascii", P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_ASCII);
+    fPopupSave->AddEntry("Save db", P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_DB);
 
-  fPopupMain->AddPopup("&Save Data", fPopupSave);
-  fBar->MapSubwindows(); 
-  fBar->Layout();
+    fPopupMain->AddPopup("&Save Data", fPopupSave);
+    fBar->MapSubwindows();
+    fBar->Layout();
 
-  fPopupMain->Connect("TGPopupMenu", "Activated(Int_t)", "PMusrCanvas", this, "HandleMenuPopup(Int_t)");
+    fPopupMain->Connect("TGPopupMenu", "Activated(Int_t)", "PMusrCanvas", this, "HandleMenuPopup(Int_t)");
 
-  fPopupMain->CheckEntry(P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
+    fPopupMain->CheckEntry(P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
+  }
 
   // divide the canvas into 4 pads
   // title pad
@@ -2178,8 +2191,10 @@ void PMusrCanvas::PlotData()
 {
   fDataTheoryPad->cd();
 
-  // uncheck fourier menu entries
-  fPopupFourier->UnCheckEntries();
+  if (!fBatchMode) {
+    // uncheck fourier menu entries
+    fPopupFourier->UnCheckEntries();
+  }
 
   if (fPlotType < 0) // plot type not defined
     return;

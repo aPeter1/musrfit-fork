@@ -149,11 +149,11 @@ class PMusrCanvas : public TObject, public TQObject
   public:
     PMusrCanvas();
     PMusrCanvas(const int number, const char* title, 
-                Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh);
+                Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh, const Bool_t batch);
     PMusrCanvas(const int number, const char* title, 
                 Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
                 PMsrFourierStructure fourierDefault,
-                const PIntVector markerList, const PIntVector colorList);
+                const PIntVector markerList, const PIntVector colorList, const Bool_t batch);
     virtual ~PMusrCanvas();
 
     virtual Bool_t IsValid() { return fValid; }
@@ -175,6 +175,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void SaveGraphicsAndQuit(char *fileName, char *graphicsFormat);
 
   private:
+    Bool_t fBatchMode;       /// musrview in ROOT batch mode
     Bool_t fValid;
     Bool_t fDifferenceView;  /// tag showing that the shown data, fourier, are the difference between data and theory
     Int_t  fCurrentPlotView; /// tag showing what the current plot view is: data, fourier, ...

@@ -250,6 +250,11 @@ cout << endl;
 
   if (success) {
     // generate Root application needed for PMusrCanvas
+    if (graphicsOutput) {
+      argv[argc] = (char*)malloc(16*sizeof(char));
+      strcpy(argv[argc], "-b");
+      argc++;
+    }
     TApplication app("App", &argc, argv);
 
     vector<PMusrCanvas*> canvasVector;
@@ -263,10 +268,11 @@ cout << endl;
                                      10+i*100, 10+i*100, 800, 600,
                                      startupHandler->GetFourierDefaults(),
                                      startupHandler->GetMarkerList(),
-                                     startupHandler->GetColorList());
+                                     startupHandler->GetColorList(),
+                                     graphicsOutput);
       else
         musrCanvas = new PMusrCanvas(i, msrHandler->GetMsrTitle()->Data(), 
-                                     10+i*100, 10+i*100, 800, 600);
+                                     10+i*100, 10+i*100, 800, 600, graphicsOutput);
 
       if (!musrCanvas->IsValid()) {
         cout << endl << "**SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
