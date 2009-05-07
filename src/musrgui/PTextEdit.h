@@ -67,6 +67,7 @@ private:
 private slots:
   void fileNew();
   void fileOpen();
+  void fileReload();
   void fileSave();
   void fileSaveAs();
   void filePrint();
@@ -79,6 +80,10 @@ private slots:
   void editCut();
   void editCopy();
   void editPaste();
+  void editFind();
+  void editFindNext();
+  void editFindPrevious();
+  void editFindAndReplace();
   void editComment();
 
   void textFamily( const QString &f );

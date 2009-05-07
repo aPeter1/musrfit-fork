@@ -164,6 +164,10 @@ void PTextEdit::setupFileActions()
   connect( a, SIGNAL( activated() ), this, SLOT( fileOpen() ) );
   a->addTo( tb );
   a->addTo( menu );
+  a = new QAction( QPixmap::fromMimeSource( "filereload.xpm" ), tr( "Reload..." ), 0, this, "fileReload" );
+  connect( a, SIGNAL( activated() ), this, SLOT( fileReload() ) );
+  a->addTo( tb );
+  a->addTo( menu );
   menu->insertSeparator();
   a = new QAction( QPixmap::fromMimeSource( "filesave.xpm" ), tr( "&Save..." ), CTRL + Key_S, this, "fileSave" );
   connect( a, SIGNAL( activated() ), this, SLOT( fileSave() ) );
@@ -220,6 +224,23 @@ void PTextEdit::setupEditActions()
   a->addTo( menu );
   a = new QAction( QPixmap::fromMimeSource( "editpaste.xpm" ), tr( "&Paste" ), CTRL + Key_V, this, "editPaste" );
   connect( a, SIGNAL( activated() ), this, SLOT( editPaste() ) );
+  a->addTo( tb );
+  a->addTo( menu );
+  menu->insertSeparator();
+  a = new QAction( QPixmap::fromMimeSource( "editfind.xpm" ), tr( "&Find" ), CTRL + Key_F, this, "editFind" );
+  connect( a, SIGNAL( activated() ), this, SLOT( editFind() ) );
+  a->addTo( tb );
+  a->addTo( menu );
+  a = new QAction( QPixmap::fromMimeSource( "editnext.xpm" ), tr( "Find &Next" ), Key_F3, this, "editFindNext" );
+  connect( a, SIGNAL( activated() ), this, SLOT( editFindNext() ) );
+  a->addTo( tb );
+  a->addTo( menu );
+  a = new QAction( QPixmap::fromMimeSource( "editprevious.xpm" ), tr( "Find Pre&vious" ), SHIFT + Key_F3, this, "editFindPrevious" );
+  connect( a, SIGNAL( activated() ), this, SLOT( editFindPrevious() ) );
+  a->addTo( tb );
+  a->addTo( menu );
+  a = new QAction( tr( "Replace..." ), CTRL + Key_R, this, "editReplace" );
+  connect( a, SIGNAL( activated() ), this, SLOT( editFindAndReplace() ) );
   a->addTo( tb );
   a->addTo( menu );
   menu->insertSeparator();
@@ -468,6 +489,15 @@ void PTextEdit::fileOpen()
 /**
  * <p>
  */
+void PTextEdit::fileReload()
+{
+  QMessageBox::information(this, "**INFO**", "Not Yet Implemented", QMessageBox::Ok);
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
 void PTextEdit::fileSave()
 {
   if ( !currentEditor() )
@@ -656,6 +686,42 @@ void PTextEdit::editPaste()
   if ( !currentEditor() )
     return;
   currentEditor()->paste();
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PTextEdit::editFind()
+{
+  QMessageBox::information(this, "**INFO**", "Not Yet Implemented", QMessageBox::Ok);
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PTextEdit::editFindNext()
+{
+  QMessageBox::information(this, "**INFO**", "Not Yet Implemented", QMessageBox::Ok);
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PTextEdit::editFindPrevious()
+{
+  QMessageBox::information(this, "**INFO**", "Not Yet Implemented", QMessageBox::Ok);
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PTextEdit::editFindAndReplace()
+{
+  QMessageBox::information(this, "**INFO**", "Not Yet Implemented", QMessageBox::Ok);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1228,9 +1294,26 @@ void PTextEdit::musrT0()
   if ( !currentEditor() )
     return;
 
-  QMessageBox::information( this, "musrT0",
-  "Will call musrt0.\n"
-  "NOT IMPLEMENTED YET :-(" );
+  QString tabLabel = fTabWidget->label(fTabWidget->currentPageIndex());
+  if (tabLabel == "noname") {
+    QMessageBox::critical(this, "**ERROR**", "For a view a real mlog/msr-file is needed.");
+    return;
+  } else if (tabLabel == "noname*") {
+    fileSaveAs();
+  } else if (tabLabel.find("*") > 0) {
+    fileSave();
+  }
+
+  QString cmd;
+  QString str;
+
+  str = fAdmin->getExecPath() + "/musrt0";
+  cmd = str + " ";
+
+  str = *fFilenames.find( currentEditor() );
+  cmd += str + " &";
+
+  system(cmd.latin1());
 }
 
 //----------------------------------------------------------------------------------------------------

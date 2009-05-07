@@ -66,8 +66,12 @@ IMAGES = images/editcopy.xpm \
     images/editpaste.xpm \
     images/editredo.xpm \
     images/editundo.xpm \
+    images/editfind.xpm \
+    images/editnext.xpm \
+    images/editprevious.xpm \
     images/filenew.xpm \
     images/fileopen.xpm \
+    images/filereload.xpm \
     images/fileprint.xpm \
     images/filesave.xpm \
     images/musrasym.xpm \
