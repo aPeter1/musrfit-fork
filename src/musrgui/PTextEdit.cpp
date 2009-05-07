@@ -367,7 +367,7 @@ void PTextEdit::setupHelpActions()
 /**
  * <p>
  */
-void PTextEdit::load( const QString &f )
+void PTextEdit::load( const QString &f, const int index )
 {
   if ( !QFile::exists( f ) )
     return;
@@ -378,7 +378,10 @@ void PTextEdit::load( const QString &f )
   edit->setPointSize(11); // 11pt
   edit->setFont(QFont("Courier", 11));
 
-  fTabWidget->addTab( edit, QFileInfo( f ).fileName() );
+  if (index == -1)
+    fTabWidget->addTab( edit, QFileInfo( f ).fileName() );
+  else
+    fTabWidget->insertTab( edit, QFileInfo( f ).fileName(), index );
   QFile file( f );
   if ( !file.open( IO_ReadOnly ) )
     return;
@@ -491,7 +494,14 @@ void PTextEdit::fileOpen()
  */
 void PTextEdit::fileReload()
 {
-  QMessageBox::information(this, "**INFO**", "Not Yet Implemented", QMessageBox::Ok);
+  if ( fFilenames.find( currentEditor() ) == fFilenames.end() ) {
+    QMessageBox::critical(this, "**ERROR**", "Cannot reload a file not previously saved ;-)");
+  } else {
+    int index = fTabWidget->currentPageIndex();
+    QString fln = *fFilenames.find( currentEditor() );
+    fileClose(false);
+    load(fln, index);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -584,11 +594,11 @@ void PTextEdit::filePrint()
 /**
  * <p>
  */
-void PTextEdit::fileClose()
+void PTextEdit::fileClose(const bool check)
 {
   // check if the has modification
   int idx = fTabWidget->currentPageIndex();
-  if (fTabWidget->label(idx).find("*")>0) {
+  if ((fTabWidget->label(idx).find("*")>0) && check) {
     int result = QMessageBox::warning(this, "**WARNING**", 
                    "Do you really want to close this file.\nChanges will be lost",
                    "Close", "Cancel");

@@ -59,7 +59,7 @@ private:
   void setupTextActions();
   void setupMusrActions();
   void setupHelpActions();
-  void load( const QString &f );
+  void load( const QString &f, const int index=-1 );
   PSubTextEdit *currentEditor() const;
   void doConnections( PSubTextEdit *e );
   bool validRunList(const QString runList);
@@ -71,7 +71,7 @@ private slots:
   void fileSave();
   void fileSaveAs();
   void filePrint();
-  void fileClose();
+  void fileClose( const bool check = true );
   void fileExit();
 
   void editUndo();
