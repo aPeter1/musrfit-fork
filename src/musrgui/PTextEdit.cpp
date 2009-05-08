@@ -213,7 +213,10 @@ void PTextEdit::setupEditActions()
   a = new QAction( tr( "Select &All" ), CTRL + Key_A, this, "editSelectAll" );
   connect( a, SIGNAL( activated() ), this, SLOT( editSelectAll() ) );
   a->addTo( menu );
+
   menu->insertSeparator();
+  tb->addSeparator();
+
   a = new QAction( QPixmap::fromMimeSource( "editcopy.xpm" ), tr( "&Copy" ), CTRL + Key_C, this, "editCopy" );
   connect( a, SIGNAL( activated() ), this, SLOT( editCopy() ) );
   a->addTo( tb );
@@ -226,7 +229,10 @@ void PTextEdit::setupEditActions()
   connect( a, SIGNAL( activated() ), this, SLOT( editPaste() ) );
   a->addTo( tb );
   a->addTo( menu );
+
   menu->insertSeparator();
+  tb->addSeparator();
+
   a = new QAction( QPixmap::fromMimeSource( "editfind.xpm" ), tr( "&Find" ), CTRL + Key_F, this, "editFind" );
   connect( a, SIGNAL( activated() ), this, SLOT( editFind() ) );
   a->addTo( tb );
@@ -241,12 +247,12 @@ void PTextEdit::setupEditActions()
   a->addTo( menu );
   a = new QAction( tr( "Replace..." ), CTRL + Key_R, this, "editReplace" );
   connect( a, SIGNAL( activated() ), this, SLOT( editFindAndReplace() ) );
-  a->addTo( tb );
+//  a->addTo( tb );
   a->addTo( menu );
   menu->insertSeparator();
   a = new QAction( tr( "(Un)Co&mment" ), CTRL + Key_M, this, "editComment" );
   connect( a, SIGNAL( activated() ), this, SLOT( editComment() ) );
-  a->addTo( tb );
+//  a->addTo( tb );
   a->addTo( menu );
 }
 
@@ -1057,7 +1063,7 @@ void PTextEdit::musrFit()
 
   // reload current file
   fileClose();
-  load(currentFileName);
+  load(currentFileName, currentIdx);
 
   // check if swap file is open as well, and if yes, reload it
   idx = -1;
@@ -1070,7 +1076,7 @@ void PTextEdit::musrFit()
   if (idx >= 0) { // complement file is open
     fTabWidget->setCurrentPage(idx);
     fileClose();
-    load(complementFileName);
+    load(complementFileName, idx);
     fTabWidget->setCurrentPage(currentIdx);
   }
 }
