@@ -17,6 +17,8 @@ HEADERS = musrgui.h \
     PTextEdit.h \
     PSubTextEdit.h \
     PAdmin.h \
+    PFindDialog.h \
+    PReplaceDialog.h \
     PFitOutputHandler.h \
     PPrefsDialog.h \
     PGetDefaultDialog.h \
@@ -33,6 +35,8 @@ HEADERS = musrgui.h \
 SOURCES = PTextEdit.cpp \
     PSubTextEdit.cpp \
     PAdmin.cpp \
+    PFindDialog.cpp \
+    PReplaceDialog.cpp \
     PFitOutputHandler.cpp \
     PPrefsDialog.cpp \
     PGetDefaultDialog.cpp \
@@ -47,7 +51,9 @@ SOURCES = PTextEdit.cpp \
     PMsr2DataDialog.cpp \
     main.cpp 
 
-FORMS = forms/PGetDefaultDialogBase.ui \
+FORMS = forms/PFindDialogBase.ui \
+    forms/PReplaceDialogBase.ui \ 
+    forms/PGetDefaultDialogBase.ui \
     forms/PMusrGuiAbout.ui \
     forms/PPrefsDialogBase.ui \
     forms/PGetTitleDialog.ui \

@@ -113,6 +113,7 @@ private:
   int  fDump;
 
   PMsr2DataParam *fMsr2DataParam;
+  PFindReplaceData *fFindReplaceData;
 
   QComboBox *fComboFont;
   QComboBox *fComboSize;

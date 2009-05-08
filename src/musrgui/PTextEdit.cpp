@@ -59,6 +59,8 @@ using namespace std;
 #include "PTextEdit.h"
 #include "PSubTextEdit.h"
 #include "PAdmin.h"
+#include "PFindDialog.h"
+#include "PReplaceDialog.h"
 #include "PFitOutputHandler.h"
 #include "PPrefsDialog.h"
 #include "PGetDefaultDialog.h"
@@ -104,6 +106,7 @@ PTextEdit::PTextEdit( QWidget *parent, const char *name )
   fAdmin = new PAdmin();
 
   fMsr2DataParam = 0;
+  fFindReplaceData = 0,
 
   fKeepMinuit2Output = false;
   fDump = 0; // 0 = no dump, 1 = ascii dump, 2 = root dump
@@ -141,6 +144,10 @@ PTextEdit::~PTextEdit()
   if (fMsr2DataParam) {
     delete fMsr2DataParam;
     fMsr2DataParam = 0;
+  }
+  if (fFindReplaceData) {
+    delete fFindReplaceData;
+    fFindReplaceData = 0;
   }
 }
 
@@ -710,6 +717,40 @@ void PTextEdit::editPaste()
  */
 void PTextEdit::editFind()
 {
+  if ( !currentEditor() )
+    return;
+
+  // check if first time called, and if yes create find and replace data structure
+  if (fFindReplaceData == 0) {
+    fFindReplaceData = new PFindReplaceData();
+    fFindReplaceData->findText = QString("");
+    fFindReplaceData->replaceText = QString("");
+    fFindReplaceData->caseSensitive = true;
+    fFindReplaceData->wholeWordsOnly = false;
+    fFindReplaceData->fromCursor = true;
+    fFindReplaceData->findBackwards = false;
+    fFindReplaceData->selectedText = false;
+    fFindReplaceData->promptOnReplace = true;
+  }
+
+  if (fFindReplaceData == 0) {
+    QMessageBox::critical(this, "**ERROR**", "Couldn't invoke find dialog, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
+    return;
+  }
+
+  PFindDialog *dlg = new PFindDialog(fFindReplaceData);
+
+  dlg->exec();
+
+  if (dlg->result() != QDialog::Accepted) {
+    delete dlg;
+    return;
+  }
+
+  fFindReplaceData = dlg->getData();
+
+  delete dlg;
+
   QMessageBox::information(this, "**INFO**", "Not Yet Implemented", QMessageBox::Ok);
 }
 
@@ -737,6 +778,39 @@ void PTextEdit::editFindPrevious()
  */
 void PTextEdit::editFindAndReplace()
 {
+  if ( !currentEditor() )
+    return;
+
+  // check if first time called, and if yes create find and replace data structure
+  if (fFindReplaceData == 0) {
+    fFindReplaceData = new PFindReplaceData();
+    fFindReplaceData->findText = QString("");
+    fFindReplaceData->replaceText = QString("");
+    fFindReplaceData->caseSensitive = true;
+    fFindReplaceData->wholeWordsOnly = false;
+    fFindReplaceData->fromCursor = true;
+    fFindReplaceData->findBackwards = false;
+    fFindReplaceData->selectedText = false;
+    fFindReplaceData->promptOnReplace = true;
+  }
+
+  if (fFindReplaceData == 0) {
+    QMessageBox::critical(this, "**ERROR**", "Couldn't invoke find&replace dialog, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
+    return;
+  }
+
+  PReplaceDialog *dlg = new PReplaceDialog(fFindReplaceData);
+
+  dlg->exec();
+
+  if (dlg->result() != QDialog::Accepted) {
+    delete dlg;
+    return;
+  }
+
+  fFindReplaceData = dlg->getData();
+
+  delete dlg;
   QMessageBox::information(this, "**INFO**", "Not Yet Implemented", QMessageBox::Ok);
 }
 

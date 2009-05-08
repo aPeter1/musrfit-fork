@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  musrgui.h
+  PFindDialog.cpp
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -29,36 +29,26 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _MUSRGUI_H_
-#define _MUSRGUI_H_
+#include "PFindDialog.h"
 
-#include <qstring.h>
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+PFindDialog::PFindDialog(PFindReplaceData *data, QWidget *parent, const char *name, bool modal, WFlags f) :
+    PFindDialogBase(parent, name, modal, f), fData(data)
+{
+}
 
-typedef struct {
-  int firstRun;
-  int lastRun;
-  QString runList;
-  QString runListFileName;
-  QString msrFileExtension;
-  int templateRunNo;
-  QString dbOutputFileName;
-  bool writeDbHeader;
-  bool summaryFilePresent;
-  bool keepMinuit2Output;
-  bool writeColumnData;
-  bool recreateDbFile;
-  bool chainFit;
-} PMsr2DataParam;
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+PFindReplaceData* PFindDialog::getData()
+{
+  return fData;
+}
 
-typedef struct {
-  QString findText;
-  QString replaceText;
-  bool caseSensitive;
-  bool wholeWordsOnly;
-  bool fromCursor;
-  bool findBackwards;
-  bool selectedText;
-  bool promptOnReplace;
-} PFindReplaceData;
-
-#endif // _MUSRGUI_H_
+//----------------------------------------------------------------------------------------------------
+// END
+//----------------------------------------------------------------------------------------------------
