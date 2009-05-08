@@ -1,0 +1,322 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>PReplaceDialogBase</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>PReplaceDialogBase</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>341</width>
+            <height>346</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Replace Text - musrgui</string>
+    </property>
+    <property name="sizeGripEnabled">
+        <bool>true</bool>
+    </property>
+    <widget class="QGroupBox">
+        <property name="name">
+            <cstring>fFind_groupBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>320</width>
+                <height>80</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>Find</string>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fFind_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>20</y>
+                    <width>90</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Text to find:</string>
+            </property>
+        </widget>
+        <widget class="QComboBox">
+            <property name="name">
+                <cstring>fFind_comboBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>45</y>
+                    <width>300</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="editable">
+                <bool>true</bool>
+            </property>
+        </widget>
+    </widget>
+    <widget class="QGroupBox">
+        <property name="name">
+            <cstring>fReplace_groupBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>100</y>
+                <width>320</width>
+                <height>80</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>Replace With</string>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fReplace_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>20</y>
+                    <width>140</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Replacement text:</string>
+            </property>
+        </widget>
+        <widget class="QComboBox">
+            <property name="name">
+                <cstring>fReplacementText_comboBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>45</y>
+                    <width>300</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="editable">
+                <bool>true</bool>
+            </property>
+        </widget>
+    </widget>
+    <widget class="QGroupBox">
+        <property name="name">
+            <cstring>fOptions_groupBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>190</y>
+                <width>320</width>
+                <height>110</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>Options</string>
+        </property>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>fCaseSensitive_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>11</x>
+                    <y>25</y>
+                    <width>140</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>C&amp;ase sensitive</string>
+            </property>
+            <property name="accel">
+                <string>Alt+A</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>fWholeWordsOnly_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>11</x>
+                    <y>50</y>
+                    <width>140</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>&amp;Whole words only</string>
+            </property>
+            <property name="accel">
+                <string>Alt+W</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>fFromCursor_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>11</x>
+                    <y>75</y>
+                    <width>140</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>From c&amp;ursor</string>
+            </property>
+            <property name="accel">
+                <string>Alt+U</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>fPromptOnReplace_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>170</x>
+                    <y>75</y>
+                    <width>145</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>&amp;Prompt on replace</string>
+            </property>
+            <property name="accel">
+                <string>Alt+P</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>fSelectedText_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>170</x>
+                    <y>50</y>
+                    <width>124</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>&amp;Selected text</string>
+            </property>
+            <property name="accel">
+                <string>Alt+S</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>fFindBackwards_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>170</x>
+                    <y>25</y>
+                    <width>124</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Find &amp;backwards</string>
+            </property>
+            <property name="accel">
+                <string>Alt+B</string>
+            </property>
+        </widget>
+    </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>fFind_button</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>200</x>
+                <y>310</y>
+                <width>60</width>
+                <height>26</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>&amp;Find</string>
+        </property>
+        <property name="accel">
+            <string>Alt+F</string>
+        </property>
+        <property name="autoDefault">
+            <bool>true</bool>
+        </property>
+        <property name="default">
+            <bool>true</bool>
+        </property>
+    </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>fClose_button</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>268</x>
+                <y>310</y>
+                <width>60</width>
+                <height>26</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>&amp;Close</string>
+        </property>
+        <property name="accel">
+            <string></string>
+        </property>
+        <property name="autoDefault">
+            <bool>true</bool>
+        </property>
+    </widget>
+</widget>
+<connections>
+    <connection>
+        <sender>fClose_button</sender>
+        <signal>clicked()</signal>
+        <receiver>PReplaceDialogBase</receiver>
+        <slot>reject()</slot>
+    </connection>
+    <connection>
+        <sender>fFind_button</sender>
+        <signal>clicked()</signal>
+        <receiver>PReplaceDialogBase</receiver>
+        <slot>accept()</slot>
+    </connection>
+</connections>
+<tabstops>
+    <tabstop>fFind_comboBox</tabstop>
+    <tabstop>fReplacementText_comboBox</tabstop>
+    <tabstop>fCaseSensitive_checkBox</tabstop>
+    <tabstop>fWholeWordsOnly_checkBox</tabstop>
+    <tabstop>fFromCursor_checkBox</tabstop>
+    <tabstop>fFindBackwards_checkBox</tabstop>
+    <tabstop>fSelectedText_checkBox</tabstop>
+    <tabstop>fPromptOnReplace_checkBox</tabstop>
+    <tabstop>fFind_button</tabstop>
+    <tabstop>fClose_button</tabstop>
+</tabstops>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>
