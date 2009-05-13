@@ -738,7 +738,7 @@ void PTextEdit::editFind()
     return;
   }
 
-  PFindDialog *dlg = new PFindDialog(fFindReplaceData);
+  PFindDialog *dlg = new PFindDialog(fFindReplaceData, currentEditor()->hasSelectedText());
 
   dlg->exec();
 
@@ -751,7 +751,23 @@ void PTextEdit::editFind()
 
   delete dlg;
 
-  QMessageBox::information(this, "**INFO**", "Not Yet Implemented", QMessageBox::Ok);
+  // try to find the search text
+  int para = 1, index = 1;
+  if (fFindReplaceData->fromCursor) {
+    currentEditor()->getCursorPosition(&para, &index);
+  } else {
+    para  = 1;
+    index = 1;
+  }
+
+  if (currentEditor()->find(fFindReplaceData->findText,
+                            fFindReplaceData->caseSensitive,
+                            fFindReplaceData->wholeWordsOnly,
+                            !fFindReplaceData->findBackwards,
+                            &para, &index)) {
+    // set cursor to the correct position
+    currentEditor()->setCursorPosition(para, index);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -760,7 +776,17 @@ void PTextEdit::editFind()
  */
 void PTextEdit::editFindNext()
 {
-  QMessageBox::information(this, "**INFO**", "Not Yet Implemented", QMessageBox::Ok);
+  int para = 1, index = 1;
+  currentEditor()->getCursorPosition(&para, &index);
+  index++;
+  if (currentEditor()->find(fFindReplaceData->findText,
+                            fFindReplaceData->caseSensitive,
+                            fFindReplaceData->wholeWordsOnly,
+                            true,
+                            &para, &index)) {
+    // set cursor to the correct position
+    currentEditor()->setCursorPosition(para, index);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -769,7 +795,16 @@ void PTextEdit::editFindNext()
  */
 void PTextEdit::editFindPrevious()
 {
-  QMessageBox::information(this, "**INFO**", "Not Yet Implemented", QMessageBox::Ok);
+  int para = 1, index = 1;
+  currentEditor()->getCursorPosition(&para, &index);
+  if (currentEditor()->find(fFindReplaceData->findText,
+                            fFindReplaceData->caseSensitive,
+                            fFindReplaceData->wholeWordsOnly,
+                            false,
+                            &para, &index)) {
+    // set cursor to the correct position
+    currentEditor()->setCursorPosition(para, index);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -238,6 +238,12 @@
         <receiver>PFindDialogBase</receiver>
         <slot>accept()</slot>
     </connection>
+    <connection>
+        <sender>fFind_comboBox</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>PFindDialogBase</receiver>
+        <slot>onFindTextAvailable()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>fFind_comboBox</tabstop>
@@ -249,5 +255,8 @@
     <tabstop>fFind_button</tabstop>
     <tabstop>fClose_button</tabstop>
 </tabstops>
+<slots>
+    <slot access="protected">onFindTextAvailable()</slot>
+</slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

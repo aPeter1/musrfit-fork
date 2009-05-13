@@ -40,11 +40,14 @@ class PFindDialog : public PFindDialogBase
   Q_OBJECT
 
   public:
-    PFindDialog(PFindReplaceData *data, QWidget *parent = 0, const char *name = 0,
+    PFindDialog(PFindReplaceData *data, const bool selection, QWidget *parent = 0, const char *name = 0,
                 bool modal = TRUE, WFlags f = 0);
     virtual ~PFindDialog() {}
 
     virtual PFindReplaceData *getData();
+
+  protected slots:
+    virtual void onFindTextAvailable();
 
   private:
     PFindReplaceData *fData;

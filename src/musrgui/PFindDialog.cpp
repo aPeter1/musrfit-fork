@@ -29,15 +29,39 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <qpushbutton.h>
+#include <qcombobox.h>
+#include <qcheckbox.h>
+
 #include "PFindDialog.h"
 
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>
  */
-PFindDialog::PFindDialog(PFindReplaceData *data, QWidget *parent, const char *name, bool modal, WFlags f) :
+PFindDialog::PFindDialog(PFindReplaceData *data, const bool selection, QWidget *parent, const char *name, bool modal, WFlags f) :
     PFindDialogBase(parent, name, modal, f), fData(data)
 {
+  // if only empty text, disable find button
+  if (fData->findText == "") {
+    fFind_button->setEnabled(false);
+  }
+
+  // if there is no selection, disable that option
+  if (!selection) {
+    fSelectedText_checkBox->setChecked(false);
+    fSelectedText_checkBox->setEnabled(false);
+  }
+
+  fFind_comboBox->setCurrentText(fData->findText);
+  fCaseSensitive_checkBox->setChecked(fData->caseSensitive);
+  fWholeWordsOnly_checkBox->setChecked(fData->wholeWordsOnly);
+  fFromCursor_checkBox->setChecked(fData->fromCursor);
+  fFindBackwards_checkBox->setChecked(fData->findBackwards);
+
+  if (selection) {
+    fSelectedText_checkBox->setChecked(fData->selectedText);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -46,7 +70,27 @@ PFindDialog::PFindDialog(PFindReplaceData *data, QWidget *parent, const char *na
  */
 PFindReplaceData* PFindDialog::getData()
 {
+  fData->findText = fFind_comboBox->currentText();
+  fData->caseSensitive = fCaseSensitive_checkBox->isChecked();
+  fData->wholeWordsOnly = fWholeWordsOnly_checkBox->isChecked();
+  fData->fromCursor = fFromCursor_checkBox->isChecked();
+  fData->findBackwards = fFindBackwards_checkBox->isChecked();
+  if (fSelectedText_checkBox->isEnabled())
+    fData->selectedText = fSelectedText_checkBox->isChecked();
+
   return fData;
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PFindDialog::onFindTextAvailable()
+{
+  if (fFind_comboBox->currentText() != "")
+    fFind_button->setEnabled(true);
+  else
+    fFind_button->setEnabled(false);
 }
 
 //----------------------------------------------------------------------------------------------------
