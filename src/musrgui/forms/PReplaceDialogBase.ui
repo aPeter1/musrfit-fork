@@ -246,31 +246,6 @@
     </widget>
     <widget class="QPushButton">
         <property name="name">
-            <cstring>fFind_button</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>200</x>
-                <y>310</y>
-                <width>60</width>
-                <height>26</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>&amp;Find</string>
-        </property>
-        <property name="accel">
-            <string>Alt+F</string>
-        </property>
-        <property name="autoDefault">
-            <bool>true</bool>
-        </property>
-        <property name="default">
-            <bool>true</bool>
-        </property>
-    </widget>
-    <widget class="QPushButton">
-        <property name="name">
             <cstring>fClose_button</cstring>
         </property>
         <property name="geometry">
@@ -291,6 +266,31 @@
             <bool>true</bool>
         </property>
     </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>fReplace_button</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>190</x>
+                <y>310</y>
+                <width>70</width>
+                <height>26</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>&amp;Replace</string>
+        </property>
+        <property name="accel">
+            <string>Alt+R</string>
+        </property>
+        <property name="autoDefault">
+            <bool>true</bool>
+        </property>
+        <property name="default">
+            <bool>true</bool>
+        </property>
+    </widget>
 </widget>
 <connections>
     <connection>
@@ -300,10 +300,16 @@
         <slot>reject()</slot>
     </connection>
     <connection>
-        <sender>fFind_button</sender>
+        <sender>fReplace_button</sender>
         <signal>clicked()</signal>
         <receiver>PReplaceDialogBase</receiver>
         <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>fFind_comboBox</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>PReplaceDialogBase</receiver>
+        <slot>onFindTextAvailable()</slot>
     </connection>
 </connections>
 <tabstops>
@@ -315,8 +321,11 @@
     <tabstop>fFindBackwards_checkBox</tabstop>
     <tabstop>fSelectedText_checkBox</tabstop>
     <tabstop>fPromptOnReplace_checkBox</tabstop>
-    <tabstop>fFind_button</tabstop>
+    <tabstop>fReplace_button</tabstop>
     <tabstop>fClose_button</tabstop>
 </tabstops>
+<slots>
+    <slot access="protected">onFindTextAvailable()</slot>
+</slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

@@ -52,7 +52,8 @@ SOURCES = PTextEdit.cpp \
     main.cpp 
 
 FORMS = forms/PFindDialogBase.ui \
-    forms/PReplaceDialogBase.ui \ 
+    forms/PReplaceDialogBase.ui \
+    forms/PReplaceConfirmationDialog.ui \
     forms/PGetDefaultDialogBase.ui \
     forms/PMusrGuiAbout.ui \
     forms/PPrefsDialogBase.ui \

@@ -1,0 +1,182 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>PReplaceConfirmationDialog</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>PReplaceConfirmationDialog</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>524</width>
+            <height>86</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Replace Confirmation - musrgui</string>
+    </property>
+    <property name="icon">
+        <pixmap>image0</pixmap>
+    </property>
+    <property name="sizeGripEnabled">
+        <bool>true</bool>
+    </property>
+    <property name="modal">
+        <bool>true</bool>
+    </property>
+    <widget class="Line">
+        <property name="name">
+            <cstring>line1</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>30</y>
+                <width>501</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="frameShape">
+            <enum>HLine</enum>
+        </property>
+        <property name="frameShadow">
+            <enum>Sunken</enum>
+        </property>
+        <property name="orientation">
+            <enum>Horizontal</enum>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>fTextLabel</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>435</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Found an occurrence of your search term. What do you want to do?</string>
+        </property>
+    </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>fReplaceAndClose_pushButton</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>100</x>
+                <y>50</y>
+                <width>130</width>
+                <height>26</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Re&amp;place &amp;&amp; Close</string>
+        </property>
+        <property name="accel">
+            <string>Alt+P</string>
+        </property>
+    </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>fClose_pushButton</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>450</x>
+                <y>50</y>
+                <width>60</width>
+                <height>26</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>&amp;Close</string>
+        </property>
+        <property name="accel">
+            <string>Alt+C</string>
+        </property>
+    </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>fReplaceAll_pushButton</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>240</x>
+                <y>50</y>
+                <width>100</width>
+                <height>26</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Replace &amp;All</string>
+        </property>
+        <property name="accel">
+            <string>Alt+A</string>
+        </property>
+    </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>fReplace_pushButton</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>50</y>
+                <width>80</width>
+                <height>26</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>&amp;Replace</string>
+        </property>
+        <property name="accel">
+            <string>Alt+R</string>
+        </property>
+    </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>fFindNext_pushButton</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>350</x>
+                <y>50</y>
+                <width>90</width>
+                <height>26</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>&amp;Find Next</string>
+        </property>
+        <property name="accel">
+            <string>Alt+F</string>
+        </property>
+    </widget>
+</widget>
+<images>
+    <image name="image0">
+        <data format="PNG" length="268">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000d349444154388db594510e84200c44a7864bd9fb673c16fe50b7a95501dd97104983435b06842422ab6ab5f946ca6941074b0ca813cd36eaa5f89f050049811352d53aac8a96b165640256fe468ac546b33eb5c298ededa3f05b1655adbef4b8c062a3e92fbc117d83643ebe6275d53dd1dd637345af3b3e3bbcb8e19470763b23ddc2de3924c58b676d2a67897b717f4b25dcd848f5a3b9e4f8c651dd200992c86205680f4f82c555b51e6b92fe5a2502c0cc3bd40a13b98a133faf17cb286639833fc4db56bce17fafdb9762deeb438fd0083bbf3298df1bba5b870000000049454e44ae426082</data>
+    </image>
+</images>
+<connections>
+    <connection>
+        <sender>fClose_pushButton</sender>
+        <signal>clicked()</signal>
+        <receiver>PReplaceConfirmationDialog</receiver>
+        <slot>reject()</slot>
+    </connection>
+</connections>
+<tabstops>
+    <tabstop>fReplace_pushButton</tabstop>
+    <tabstop>fReplaceAndClose_pushButton</tabstop>
+    <tabstop>fReplaceAll_pushButton</tabstop>
+    <tabstop>fFindNext_pushButton</tabstop>
+    <tabstop>fClose_pushButton</tabstop>
+</tabstops>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

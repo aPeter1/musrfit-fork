@@ -61,6 +61,7 @@ using namespace std;
 #include "PAdmin.h"
 #include "PFindDialog.h"
 #include "PReplaceDialog.h"
+#include "forms/PReplaceConfirmationDialog.h"
 #include "PFitOutputHandler.h"
 #include "PPrefsDialog.h"
 #include "PGetDefaultDialog.h"
@@ -834,7 +835,7 @@ void PTextEdit::editFindAndReplace()
     return;
   }
 
-  PReplaceDialog *dlg = new PReplaceDialog(fFindReplaceData);
+  PReplaceDialog *dlg = new PReplaceDialog(fFindReplaceData, currentEditor()->hasSelectedText());
 
   dlg->exec();
 
@@ -846,7 +847,21 @@ void PTextEdit::editFindAndReplace()
   fFindReplaceData = dlg->getData();
 
   delete dlg;
-  QMessageBox::information(this, "**INFO**", "Not Yet Implemented", QMessageBox::Ok);
+
+  editFindNext();
+
+  PReplaceConfirmationDialog *confirmDlg = new PReplaceConfirmationDialog(this);
+
+  // connect all the necessary signals/slots
+  QObject::connect(confirmDlg->fReplace_pushButton, SIGNAL(clicked()), this, SLOT(replace()));
+  QObject::connect(confirmDlg->fReplaceAndClose_pushButton, SIGNAL(clicked()), this, SLOT(replaceAndClose()));
+  QObject::connect(confirmDlg->fReplaceAll_pushButton, SIGNAL(clicked()), this, SLOT(replaceAll()));
+  QObject::connect(confirmDlg->fFindNext_pushButton, SIGNAL(clicked()), this, SLOT(editFindNext()));
+  QObject::connect(this, SIGNAL(close()), confirmDlg, SLOT(accept()));
+
+  confirmDlg->exec();
+
+  delete confirmDlg;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1596,6 +1611,57 @@ void PTextEdit::textChanged()
   if ((fTabWidget->label(fTabWidget->currentPageIndex()).find("*") < 0) &&
       currentEditor()->isModified())
     fTabWidget->setTabLabel(fTabWidget->currentPage(), tabLabel+"*");
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PTextEdit::replace()
+{
+  currentEditor()->insert(fFindReplaceData->replaceText);
+
+  editFindNext();
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PTextEdit::replaceAndClose()
+{
+  currentEditor()->insert(fFindReplaceData->replaceText);
+
+  emit close();
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PTextEdit::replaceAll()
+{
+  int currentPara, currentIndex;
+  currentEditor()->getCursorPosition(&currentPara, &currentIndex);
+
+  currentEditor()->setCursorPosition(0,0);
+
+  int para = 0, index = 0;
+  while (currentEditor()->find(fFindReplaceData->findText,
+                               fFindReplaceData->caseSensitive,
+                               fFindReplaceData->wholeWordsOnly,
+                               true,
+                               &para, &index)) {
+    // set cursor to the correct position
+    currentEditor()->setCursorPosition(para, index);
+
+    // replace the text
+    currentEditor()->insert(fFindReplaceData->replaceText);
+  }
+
+  emit close();
+
+  currentEditor()->setCursorPosition(currentPara, currentIndex);
 }
 
 //----------------------------------------------------------------------------------------------------

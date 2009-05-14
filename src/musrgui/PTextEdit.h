@@ -53,6 +53,9 @@ public:
   PTextEdit( QWidget *parent = 0, const char *name = 0 );
   virtual ~PTextEdit();
 
+signals:
+  void close();
+
 private:
   void setupFileActions();
   void setupEditActions();
@@ -105,6 +108,10 @@ private slots:
 
   void fontChanged( const QFont &f );
   void textChanged();
+
+  void replace();
+  void replaceAndClose();
+  void replaceAll();
 
 private:
   PAdmin *fAdmin;
