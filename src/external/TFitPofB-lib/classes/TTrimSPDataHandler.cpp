@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/11/21
+  2009/05/15
 
 ***************************************************************************/
 
@@ -15,6 +15,7 @@
 #include <string>
 #include <cmath>
 #include <cassert>
+#include <algorithm>
 
 using namespace std;
 
@@ -33,9 +34,14 @@ using namespace std;
 // <some_path>021.rge
 //
 // <some_path>21.rge is explicitly not possible since it is not clear, if this denotes 2.1keV or 21.0keV!
+//
+// Also always use the same format within one energyVec - otherwise sorting of the vector will not work properly!
 //--------------------
 
 TTrimSPData::TTrimSPData(const string &path, vector<string> &energyVec) {
+
+  // sort the energies in ascending orders - this might be useful for later applications (energy-interpolations etc.)
+  sort(energyVec.begin(), energyVec.end());
 
   double zz(0.0), nzz(0.0);
   vector<double> vzz, vnzz;
@@ -104,6 +110,31 @@ TTrimSPData::TTrimSPData(const string &path, vector<string> &energyVec) {
   for(unsigned int i(0); i<fEnergy.size();i++)
     fIsNormalized.push_back(false);
 
+  fEnergyIter = fEnergy.end();
+}
+
+void TTrimSPData::UseHighResolution(double e) {
+
+  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+
+  if(fEnergyIter != fEnergy.end()) {
+    unsigned int i(fEnergyIter - fEnergy.begin());
+    vector<double> vecZ;
+    vector<double> vecNZ;
+    for(double zz(1.); zz<2100.; zz+=1.) {
+      vecZ.push_back(zz);
+      vecNZ.push_back(GetNofZ(zz/10.0, e));
+    }
+    fDataZ[i] = vecZ;
+    fDataNZ[i] = vecNZ;
+    fOrigDataNZ[i] = vecNZ;
+    fDZ[i] = 1.;
+    fIsNormalized[i] = false;
+    return;
+  }
+
+  cout << "TTrimSPData::DataZ: No implantation profile available for the specified energy... Nothing happens." << endl;
+  return;
 }
 
 //---------------------
@@ -112,16 +143,15 @@ TTrimSPData::TTrimSPData(const string &path, vector<string> &energyVec) {
 
 vector<double> TTrimSPData::DataZ(double e) const {
 
-  for(unsigned int i(0); i<fEnergy.size(); i++) {
-//    cout << tEnergy[i] << " " << e << " " << tEnergy[i] - e << endl;
-    if(!(fEnergy[i] - e)) {
-      return fDataZ[i];
-    }
+  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+
+  if(fEnergyIter != fEnergy.end()) {
+    unsigned int i(fEnergyIter - fEnergy.begin());
+    return fDataZ[i];
   }
   // default
   cout << "TTrimSPData::DataZ: No implantation profile available for the specified energy... You get back the first one." << endl;
   return fDataZ[0];
-
 }
 
 //---------------------
@@ -131,10 +161,11 @@ vector<double> TTrimSPData::DataZ(double e) const {
 
 vector<double> TTrimSPData::DataNZ(double e) const {
 
-  for(unsigned int i(0); i<fEnergy.size(); i++) {
-    if(!(fEnergy[i] - e)) {
-      return fDataNZ[i];
-    }
+  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+
+  if(fEnergyIter != fEnergy.end()) {
+    unsigned int i(fEnergyIter - fEnergy.begin());
+    return fDataNZ[i];
   }
   // default
   cout << "TTrimSPData::DataNZ: No implantation profile available for the specified energy... You get back the first one." << endl;
@@ -148,10 +179,11 @@ vector<double> TTrimSPData::DataNZ(double e) const {
 
 vector<double> TTrimSPData::OrigDataNZ(double e) const {
 
-  for(unsigned int i(0); i<fEnergy.size(); i++) {
-    if(!(fEnergy[i] - e)) {
-      return fOrigDataNZ[i];
-    }
+  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+
+  if(fEnergyIter != fEnergy.end()) {
+    unsigned int i(fEnergyIter - fEnergy.begin());
+    return fOrigDataNZ[i];
   }
   // default
   cout << "TTrimSPData::OrigDataNZ: No implantation profile available for the specified energy... You get back the first one." << endl;
@@ -171,32 +203,33 @@ double TTrimSPData::LayerFraction(double e, unsigned int layno, const vector<dou
     return 0.0;
   }
 
-  for(unsigned int i(0); i<fEnergy.size(); i++) {
-    if(!(fEnergy[i] - e)) {
-      // Because we do not know if the implantation profile is normalized or not, do not care about this and calculate the fraction from the beginning
-      // Total "number of muons"
-      double totalNumber(0.0);
+  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+
+  if(fEnergyIter != fEnergy.end()) {
+    unsigned int i(fEnergyIter - fEnergy.begin());
+    // Because we do not know if the implantation profile is normalized or not, do not care about this and calculate the fraction from the beginning
+    // Total "number of muons"
+    double totalNumber(0.0);
+    for(unsigned int j(0); j<fDataZ[i].size(); j++)
+      totalNumber += fDataNZ[i][j];
+    // "number of muons" in layer layno
+    double layerNumber(0.0);
+    if(!(layno-1)){
       for(unsigned int j(0); j<fDataZ[i].size(); j++)
-        totalNumber += fDataNZ[i][j];
-      // "number of muons" in layer layno
-      double layerNumber(0.0);
-      if(!(layno-1)){
-        for(unsigned int j(0); j<fDataZ[i].size(); j++)
-          if(fDataZ[i][j] < interface[0]*10.0)
-            layerNumber += fDataNZ[i][j];
-      } else if(!(layno-interface.size()-1)){
-        for(unsigned int j(0); j<fDataZ[i].size(); j++)
-          if(fDataZ[i][j] >= *(interface.end()-1)*10.0)
-            layerNumber += fDataNZ[i][j];
-      } else {
-        for(unsigned int j(0); j<fDataZ[i].size(); j++)
-          if(fDataZ[i][j] >= interface[layno-2]*10.0 && fDataZ[i][j] < interface[layno-1]*10.0)
-            layerNumber += fDataNZ[i][j];
-      }
-      // fraction of muons in layer layno
-      // cout << "Fraction of muons in layer " << layno << ": " << layerNumber/totalNumber << endl;
-      return layerNumber/totalNumber;
+        if(fDataZ[i][j] < interface[0]*10.0)
+          layerNumber += fDataNZ[i][j];
+    } else if(!(layno-interface.size()-1)){
+      for(unsigned int j(0); j<fDataZ[i].size(); j++)
+        if(fDataZ[i][j] >= *(interface.end()-1)*10.0)
+          layerNumber += fDataNZ[i][j];
+    } else {
+      for(unsigned int j(0); j<fDataZ[i].size(); j++)
+        if(fDataZ[i][j] >= interface[layno-2]*10.0 && fDataZ[i][j] < interface[layno-1]*10.0)
+          layerNumber += fDataNZ[i][j];
     }
+    // fraction of muons in layer layno
+    // cout << "Fraction of muons in layer " << layno << ": " << layerNumber/totalNumber << endl;
+    return layerNumber/totalNumber;
   }
 
   // default
@@ -241,38 +274,39 @@ void TTrimSPData::WeightLayers(double e, const vector<double>& interface, const 
     }
   }
 
+  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+
+  // If all weights are equal to one, use the original n(z) vector
   for(unsigned int i(0); i<weight.size(); i++) {
     if(weight[i]-1.0)
       break;
     if(i == weight.size() - 1) {
-      for(unsigned int j(0); j<fEnergy.size(); j++) {
-        if(!(fEnergy[j] - e)) {
-          fDataNZ[j] = fOrigDataNZ[j];
-          fIsNormalized[j] = false;
-          return;
-        }
+      if(fEnergyIter != fEnergy.end()) {
+        unsigned int j(fEnergyIter - fEnergy.begin());
+        fDataNZ[j] = fOrigDataNZ[j];
+        fIsNormalized[j] = false;
+        return;
       }
     }
   }
 
-  for(unsigned int i(0); i<fEnergy.size(); i++) {
-    if(!(fEnergy[i] - e)) {
-      unsigned int k(0);
-      for(unsigned int j(0); j<fDataZ[i].size(); j++) {
-        if(k<interface.size()) {
-          if(fDataZ[i][j] < interface[k]*10.0)
-            fDataNZ[i][j] = fOrigDataNZ[i][j]*weight[k];
-          else {
-            k++;
-            fDataNZ[i][j] = fOrigDataNZ[i][j]*weight[k];
-          }
-        }
-        else
+  if(fEnergyIter != fEnergy.end()) {
+    unsigned int i(fEnergyIter - fEnergy.begin());
+    unsigned int k(0);
+    for(unsigned int j(0); j<fDataZ[i].size(); j++) {
+      if(k<interface.size()) {
+        if(fDataZ[i][j] < interface[k]*10.0)
           fDataNZ[i][j] = fOrigDataNZ[i][j]*weight[k];
+        else {
+          k++;
+          fDataNZ[i][j] = fOrigDataNZ[i][j]*weight[k];
+        }
       }
-    fIsNormalized[i] = false;
-    return;
+      else
+        fDataNZ[i][j] = fOrigDataNZ[i][j]*weight[k];
     }
+  fIsNormalized[i] = false;
+  return;
   }
 
   cout << "TTrimSPData::WeightLayers: No implantation profile available for the specified energy... No weighting done." << endl;
@@ -287,16 +321,15 @@ double TTrimSPData::GetNofZ(double zz, double e) const {
 
   vector<double> z, nz;
 
-  for(unsigned int i(0); i<fEnergy.size(); i++) {
-    if(!(fEnergy[i] - e)) {
-      z = fDataZ[i];
-      nz = fDataNZ[i];
-      break;
-    }
-    if(i == fEnergy.size() - 1) {
+  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+
+  if(fEnergyIter != fEnergy.end()) {
+    unsigned int i(fEnergyIter - fEnergy.begin());
+    z = fDataZ[i];
+    nz = fDataNZ[i];
+  } else {
       cout << "TTrimSPData::GetNofZ: No implantation profile available for the specified energy... Quitting!" << endl;
       exit(-1);
-    }
   }
 
   if(zz < 0)
@@ -326,18 +359,19 @@ double TTrimSPData::GetNofZ(double zz, double e) const {
 
 void TTrimSPData::Normalize(double e) const {
 
-  for(unsigned int i(0); i<fEnergy.size(); i++) {
-    if(!(fEnergy[i] - e)) {
-      double nZsum = 0.0;
-      for (unsigned int j(0); j<fDataZ[i].size(); j++)
-        nZsum += fDataNZ[i][j];
-      nZsum *= fDZ[i];
-      for (unsigned int j(0); j<fDataZ[i].size(); j++)
-        fDataNZ[i][j] /= nZsum;
+  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
 
-      fIsNormalized[i] = true;
-      return;
-    }
+  if(fEnergyIter != fEnergy.end()) {
+    unsigned int i(fEnergyIter - fEnergy.begin());
+    double nZsum = 0.0;
+    for (unsigned int j(0); j<fDataZ[i].size(); j++)
+      nZsum += fDataNZ[i][j];
+    nZsum *= fDZ[i];
+    for (unsigned int j(0); j<fDataZ[i].size(); j++)
+      fDataNZ[i][j] /= nZsum;
+
+    fIsNormalized[i] = true;
+    return;
   }
   // default
   cout << "TTrimSPData::Normalize: No implantation profile available for the specified energy... No normalization done." << endl;
@@ -350,10 +384,11 @@ void TTrimSPData::Normalize(double e) const {
 //---------------------
 
 bool TTrimSPData::IsNormalized(double e) const {
-  for(unsigned int i(0); i<fEnergy.size(); i++) {
-    if(!(fEnergy[i] - e)) {
-      return fIsNormalized[i];
-    }
+  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+
+  if(fEnergyIter != fEnergy.end()) {
+    unsigned int i(fEnergyIter - fEnergy.begin());
+    return fIsNormalized[i];
   }
 
   cout << "TTrimSPData::IsNormalized: No implantation profile available for the specified energy... Returning false! Check your code!" << endl;
@@ -365,20 +400,47 @@ bool TTrimSPData::IsNormalized(double e) const {
 //---------------------
 
 double TTrimSPData::MeanRange(double e) const {
-  for(unsigned int i(0); i<fEnergy.size(); i++) {
-    if(!(fEnergy[i] - e)) {
-      if (!fIsNormalized[i])
-        Normalize(e);
-      double mean(0.0);
-      for(unsigned int j(0); j<fDataNZ[i].size(); j++){
-        mean += fDataNZ[i][j]*fDataZ[i][j];
-      }
-      mean *= fDZ[i]/10.0;
-      return mean;
+  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+
+  if(fEnergyIter != fEnergy.end()) {
+    unsigned int i(fEnergyIter - fEnergy.begin());
+    if (!fIsNormalized[i])
+      Normalize(e);
+    double mean(0.0);
+    for(unsigned int j(0); j<fDataNZ[i].size(); j++){
+      mean += fDataNZ[i][j]*fDataZ[i][j];
     }
+    mean *= fDZ[i]/10.0;
+    return mean;
   }
 
   cout << "TTrimSPData::MeanRange: No implantation profile available for the specified energy... Returning -1! Check your code!" << endl;
+  return -1.;
+}
+
+//---------------------
+// Find the peak range in (nm) for a given energy e
+//---------------------
+
+double TTrimSPData::PeakRange(double e) const {
+
+  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+
+  if(fEnergyIter != fEnergy.end()) {
+    unsigned int i(fEnergyIter - fEnergy.begin());
+
+    vector<double>::const_iterator nziter;
+    nziter = max_element(fDataNZ[i].begin(),fDataNZ[i].end());
+
+    if(nziter != fDataNZ[i].end()){
+      unsigned int j(nziter - fDataNZ[i].begin());
+      return fDataZ[i][j];
+    }
+    cout << "TTrimSPData::PeakRange: No maximum found in the implantation profile... Returning -1! Please check the profile!" << endl;
+    return -1.;
+  }
+
+  cout << "TTrimSPData::PeakRange: No implantation profile available for the specified energy... Returning -1! Check your code!" << endl;
   return -1.;
 }
 
@@ -394,27 +456,28 @@ void TTrimSPData::ConvolveGss(double w, double e) const {
   vector<double> z, nz, gss;
   double nn;
 
-  for(unsigned int i(0); i<fEnergy.size(); i++) {
-    if(!(fEnergy[i] - e)) {
-      z = fDataZ[i];
-      nz = fOrigDataNZ[i];
+  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
 
-      for(unsigned int k(0); k<z.size(); k++) {
-        gss.push_back(exp(-z[k]*z[k]/200.0/w/w));
-      }
+  if(fEnergyIter != fEnergy.end()) {
+    unsigned int i(fEnergyIter - fEnergy.begin());
+    z = fDataZ[i];
+    nz = fOrigDataNZ[i];
 
-      for(unsigned int k(0); k<nz.size(); k++) {
-        nn = 0.0;
-        for(unsigned int j(0); j<nz.size(); j++) {
-          nn += nz[j]*gss[abs(int(k)-int(j))];
-        }
-        fDataNZ[i][k] = nn;
-      }
-
-      fIsNormalized[i] = false;
-
-      return;
+    for(unsigned int k(0); k<z.size(); k++) {
+      gss.push_back(exp(-z[k]*z[k]/200.0/w/w));
     }
+
+    for(unsigned int k(0); k<nz.size(); k++) {
+      nn = 0.0;
+      for(unsigned int j(0); j<nz.size(); j++) {
+        nn += nz[j]*gss[abs(int(k)-int(j))];
+      }
+      fDataNZ[i][k] = nn;
+    }
+
+    fIsNormalized[i] = false;
+
+    return;
   }
 
   cout << "TTrimSPData::ConvolveGss: No implantation profile available for the specified energy... No convolution done!" << endl;

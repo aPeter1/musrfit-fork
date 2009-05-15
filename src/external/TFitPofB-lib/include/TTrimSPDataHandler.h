@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/11/21
+  2009/05/15
 
 ***************************************************************************/
 
@@ -35,6 +35,7 @@ public:
   vector<double> DataZ(double) const;
   vector<double> DataNZ(double) const;
   vector<double> OrigDataNZ(double) const;
+  void UseHighResolution(double);
   void WeightLayers(double, const vector<double>&, const vector<double>&) const;
   double LayerFraction(double, unsigned int, const vector<double>&) const;
   double GetNofZ(double, double) const;
@@ -42,6 +43,7 @@ public:
   bool IsNormalized(double) const;
   void ConvolveGss(double, double) const;
   double MeanRange(double) const;
+  double PeakRange(double) const;
 
 private:
   vector<double> fEnergy;
@@ -50,6 +52,7 @@ private:
   mutable vector< vector<double> > fDataNZ;
   vector< vector<double> > fOrigDataNZ;
   mutable vector<bool> fIsNormalized;
+  mutable vector<double>::const_iterator fEnergyIter;
 };
 
 #endif // _TTrimSPDataHandler_H_
