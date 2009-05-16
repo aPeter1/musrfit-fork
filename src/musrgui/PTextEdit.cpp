@@ -196,7 +196,7 @@ void PTextEdit::setupFileActions()
   a = new QAction( tr( "Close &All" ), 0, this, "fileCloseAll" );
   connect( a, SIGNAL( activated() ), this, SLOT( fileCloseAll() ) );
   a->addTo( menu );
-  a = new QAction( tr( "Clo&se All Others" ), 0, this, "fileCloseAllOthers" );
+  a = new QAction( tr( "Clo&se All Others" ), CTRL + SHIFT + Key_W, this, "fileCloseAllOthers" );
   connect( a, SIGNAL( activated() ), this, SLOT( fileCloseAllOthers() ) );
   a->addTo( menu );
   menu->insertSeparator();
