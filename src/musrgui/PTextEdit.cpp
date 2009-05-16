@@ -189,9 +189,17 @@ void PTextEdit::setupFileActions()
   connect( a, SIGNAL( activated() ), this, SLOT( filePrint() ) );
   a->addTo( tb );
   a->addTo( menu );
+  menu->insertSeparator();
   a = new QAction( tr( "&Close" ), CTRL + Key_W, this, "fileClose" );
   connect( a, SIGNAL( activated() ), this, SLOT( fileClose() ) );
   a->addTo( menu );
+  a = new QAction( tr( "Close &All" ), 0, this, "fileCloseAll" );
+  connect( a, SIGNAL( activated() ), this, SLOT( fileCloseAll() ) );
+  a->addTo( menu );
+  a = new QAction( tr( "Clo&se All Others" ), 0, this, "fileCloseAllOthers" );
+  connect( a, SIGNAL( activated() ), this, SLOT( fileCloseAllOthers() ) );
+  a->addTo( menu );
+  menu->insertSeparator();
   a = new QAction( tr( "E&xit" ), CTRL + Key_Q, this, "fileExit" );
   connect( a, SIGNAL( activated() ), this, SLOT( fileExit() ) );
   a->addTo( menu );
@@ -623,6 +631,65 @@ void PTextEdit::fileClose(const bool check)
   delete currentEditor();
   if ( currentEditor() )
     currentEditor()->viewport()->setFocus();
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PTextEdit::fileCloseAll()
+{
+  // check if any editor tab is present, if not: get out of here
+  if ( !currentEditor() )
+    return;
+
+  int result = QMessageBox::warning(this, "**WARNING**",
+                   "Do you really want to close all files.\nChanges of unsaved files will be lost",
+                   "Close", "Cancel");
+  if (result == 1) // Cancel
+    return;
+
+  // close all editor tabs
+  do {
+    delete currentEditor();
+    if ( currentEditor() )
+      currentEditor()->viewport()->setFocus();
+  } while ( currentEditor() );
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PTextEdit::fileCloseAllOthers()
+{
+  // check if any editor tab is present, if not: get out of here
+  if ( !currentEditor() )
+    return;
+
+  int result = QMessageBox::warning(this, "**WARNING**",
+                   "Do you really want to close all files.\nChanges of unsaved files will be lost",
+                   "Close", "Cancel");
+  if (result == 1) // Cancel
+    return;
+
+  // keep label of the current editor
+  QString label = fTabWidget->label(fTabWidget->currentPageIndex());
+
+  // check if only the current editor is present. If yes: nothing to be done
+  if (fTabWidget->count() == 1)
+    return;
+
+  // close all editor tabs
+  int i=0;
+  do {
+    if (fTabWidget->label(i) != label)
+      delete fTabWidget->page(i);
+    else
+      i++;
+  } while ( fTabWidget->count() > 1 );
+
+  currentEditor()->viewport()->setFocus();
 }
 
 //----------------------------------------------------------------------------------------------------

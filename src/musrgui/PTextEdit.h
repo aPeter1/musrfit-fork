@@ -75,6 +75,8 @@ private slots:
   void fileSaveAs();
   void filePrint();
   void fileClose( const bool check = true );
+  void fileCloseAll();
+  void fileCloseAllOthers();
   void fileExit();
 
   void editUndo();
