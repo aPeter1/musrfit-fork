@@ -730,6 +730,8 @@ else
 
           }
         }
+        print " "
+        print ">> msr2data: The parameter data of " ARGV[1] " have been appended to " outfile
       }
       if($0 ~ /*** FIT DID NOT CONVERGE ***/ && X==2){
         print " "
