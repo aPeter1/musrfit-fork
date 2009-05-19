@@ -82,7 +82,8 @@ void fakeDataNemuSyntax()
 int main(int argc, char *argv[])
 {
   const Double_t gamma_mu = TMath::TwoPi() * 0.1355; // in (rad/ns/T)
-  const Double_t tau_mu   = 2197.147; // muon life time in ns
+  // muon life time in (us), see PRL99, 032001 (2007)
+  const Double_t tau_mu   = 2197.019; // muon life time in ns
 
   if ((argc != 4) && (argc !=6)) {
     fakeDataNemuSyntax();

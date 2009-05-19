@@ -1382,7 +1382,7 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   end   = data->fDataTimeStart + data->fValue.size()*data->fDataTimeStep + data->fDataTimeStep/2.0;
 
   // invoke histo
-  dataHisto = new TH1F(name, name, data->fValue.size()+2, start, end);
+  dataHisto = new TH1F(name, name, data->fValue.size()+1, start, end);
 
   // fill histogram
   for (unsigned int i=0; i<data->fValue.size(); i++) {
@@ -1422,7 +1422,7 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
 //cout << endl << ">> start = " << start << ", end = " << end << endl;
 
   // invoke histo
-  theoHisto = new TH1F(name, name, data->fTheory.size()+2, start, end);
+  theoHisto = new TH1F(name, name, data->fTheory.size()+1, start, end);
 
   // fill histogram
   for (unsigned int i=0; i<data->fTheory.size(); i++) {

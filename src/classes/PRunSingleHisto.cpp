@@ -501,11 +501,13 @@ bool PRunSingleHisto::PrepareFitData(PRawRunData* runData, const unsigned int hi
   double normalizer = 1.0;
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.fDataTimeStart = fTimeResolution*(((double)start-(double)t0)+(double)(fRunInfo->fPacking-1)/2.0);
+  fData.fDataTimeStart = fTimeResolution*((double)start-(double)t0);
   fData.fDataTimeStep  = fTimeResolution*fRunInfo->fPacking;
   for (int i=start; i<end; i++) {
     if (fRunInfo->fPacking == 1) {
       value = runData->fDataBin[histoNo][i];
+      normalizer = fRunInfo->fPacking * (fTimeResolution * 1e3); // fTimeResolution us->ns
+      value /= normalizer;
       fData.fValue.push_back(value);
       if (value == 0.0)
         fData.fError.push_back(1.0);
@@ -579,8 +581,9 @@ bool PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const unsigned in
   double value = 0.0;
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.fDataTimeStart = fTimeResolution*((double)start-(double)t0+(double)(fRunInfo->fPacking-1)/2.0);
+  fData.fDataTimeStart = fTimeResolution*((double)start-(double)t0);
   fData.fDataTimeStep  = fTimeResolution*fRunInfo->fPacking;
+
 /*
 cout << endl << ">> time resolution = " << fTimeResolution;
 cout << endl << ">> start = " << start << ", t0 = " << t0 << ", packing = " << fRunInfo->fPacking;
@@ -662,11 +665,17 @@ cout << endl << ">> data start time = " << fData.fDataTimeStart;
 
   // calculate theory
   unsigned int size = runData->fDataBin[histoNo].size();
+  double factor = 1.0;
+  if (fData.fValue.size() * 10 > runData->fDataBin[histoNo].size()) {
+    size = fData.fValue.size() * 10;
+    factor = (double)runData->fDataBin[histoNo].size() / (double)size;
+  }
+//cout << endl << ">> runData->fDataBin[histoNo].size() = " << runData->fDataBin[histoNo].size() << ",  fData.fValue.size() * 10 = " << fData.fValue.size() * 10 << ", size = " << size << ", factor = " << factor << endl;
   double theoryValue;
   fData.fTheoryTimeStart = fData.fDataTimeStart;
-  fData.fTheoryTimeStep  = fTimeResolution;
+  fData.fTheoryTimeStep  = fTimeResolution*factor;
   for (unsigned int i=0; i<size; i++) {
-    time = fData.fTheoryTimeStart + i*fTimeResolution;
+    time = fData.fTheoryTimeStart + i*fTimeResolution*factor;
     theoryValue = fTheory->Func(time, par, fFuncValues);
     if (fabs(theoryValue) > 10.0) {  // dirty hack needs to be fixed!!
       theoryValue = 0.0;
@@ -773,14 +782,15 @@ bool PRunSingleHisto::PrepareViewData(PRawRunData* runData, const unsigned int h
   double time;
 
   // data start at data_start-t0
-  // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.fDataTimeStart = fTimeResolution*((double)start-(double)t0+(double)(fRunInfo->fPacking-1)/2.0);
+  fData.fDataTimeStart = fTimeResolution*((double)start-(double)t0);
   fData.fDataTimeStep  = fTimeResolution*fRunInfo->fPacking;
+
 /*
 cout << endl << ">> start time = " << fData.fDataTimeStart << ", step = " << fData.fDataTimeStep;
 cout << endl << ">> start = " << start << ", end = " << end;
-cout << endl << "--------------------------------";
+cout << endl << "--------------------------------" << endl;
 */
+
   double normalizer = 1.0;
   for (int i=start; i<end; i++) {
     if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
@@ -815,13 +825,19 @@ cout << endl << "--------------------------------";
   }
 
   // calculate theory
-  unsigned int size = runData->fDataBin[histoNo].size();
   double theoryValue;
+  unsigned int size = runData->fDataBin[histoNo].size();
+  double factor = 1.0;
+  if (fData.fValue.size() * 10 > runData->fDataBin[histoNo].size()) {
+    size = fData.fValue.size() * 10;
+    factor = (double)runData->fDataBin[histoNo].size() / (double)size;
+  }
+//cout << endl << ">> runData->fDataBin[histoNo].size() = " << runData->fDataBin[histoNo].size() << ",  fData.fValue.size() * 10 = " << fData.fValue.size() * 10 << ", size = " << size << ", factor = " << factor << endl;
   fData.fTheoryTimeStart = fData.fDataTimeStart;
-  fData.fTheoryTimeStep  = fTimeResolution;
+  fData.fTheoryTimeStep  = fTimeResolution*factor;
 //cout << endl << ">> size=" << size << ", startTime=" << startTime << ", fTimeResolution=" << fTimeResolution;
   for (unsigned int i=0; i<size; i++) {
-    time = fData.fTheoryTimeStart + (double)i*fTimeResolution;
+    time = fData.fTheoryTimeStart + (double)i*fTimeResolution*factor;
     theoryValue = fTheory->Func(time, par, fFuncValues);
     if (fabs(theoryValue) > 10.0) { // dirty hack needs to be fixed!!
       theoryValue = 0.0;

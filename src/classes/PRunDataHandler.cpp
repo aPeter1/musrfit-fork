@@ -865,6 +865,7 @@ cout << endl;
     for (int j=0; j<psiBin.get_histoLength_bin(); j++) {
       histoData.push_back(histo[j]);
     }
+    delete histo;
     runData.fDataBin.push_back(histoData);
     histoData.clear();
   }

@@ -699,7 +699,7 @@ bool PRunAsymmetry::PrepareFitData(PRawRunData* runData, unsigned int histoNo[2]
   double f, b, ef, eb;
   // fill data time start, and step
   // data start at data_start-t0
-  fData.fDataTimeStart = fTimeResolution*(((double)start[0]-t0[0])+(double)fRunInfo->fPacking/2.0);
+  fData.fDataTimeStart = fTimeResolution*((double)start[0]-t0[0]);
   fData.fDataTimeStep  = fTimeResolution*(double)fRunInfo->fPacking;
   for (unsigned int i=0; i<noOfBins; i++) {
     // to make the formulae more readable
@@ -761,10 +761,21 @@ bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2
   // transform raw histo data. This is done the following way (for details see the manual):
   // first rebin the data, than calculate the asymmetry
   // first get start data, end data, and t0
-  int start[2] = {fRunInfo->fDataRange[0]-fRunInfo->fPacking*(fRunInfo->fDataRange[0]/fRunInfo->fPacking),
-                  fRunInfo->fDataRange[2]-fRunInfo->fPacking*(fRunInfo->fDataRange[2]/fRunInfo->fPacking)};
+  int val = fRunInfo->fDataRange[0]-fRunInfo->fPacking*(fRunInfo->fDataRange[0]/fRunInfo->fPacking);
+  do {
+    if (fRunInfo->fDataRange[2] - fRunInfo->fDataRange[0] < 0)
+      val += fRunInfo->fPacking;
+  } while (val + fRunInfo->fDataRange[2] - fRunInfo->fDataRange[0] < 0);
+
+  int start[2] = {val, val + fRunInfo->fDataRange[2] - fRunInfo->fDataRange[0]};
   int end[2];
   double t0[2] = {fT0s[0], fT0s[1]};
+
+/*
+cout << endl << ">> start[0]=" << start[0] << ", end[0]=" << end[0];
+cout << endl << ">> start[1]=" << start[1] << ", end[1]=" << end[1];
+cout << endl;
+*/
 
   // make sure that there are equal number of rebinned bins in forward and backward
   unsigned int noOfBins0 = (runData->fDataBin[histoNo[0]].size()-start[0])/fRunInfo->fPacking;
@@ -806,34 +817,44 @@ bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2
   double error = 0.0;
   // forward
   for (int i=start[0]; i<end[0]; i++) {
-    if (((i-start[0]) % fRunInfo->fPacking == 0) && (i != start[0])) { // fill data
-      // in order that after rebinning the fit does not need to be redone (important for plots)
-      // the value is normalize to per bin
-      value /= fRunInfo->fPacking;
-      forwardPacked.fValue.push_back(value);
-      if (value == 0.0)
-        forwardPacked.fError.push_back(1.0);
-      else
-        forwardPacked.fError.push_back(TMath::Sqrt(error)/fRunInfo->fPacking);
-      value = 0.0;
-      error = 0.0;
+    if (fRunInfo->fPacking == 1) {
+      forwardPacked.fValue.push_back(fForward[i]);
+      forwardPacked.fError.push_back(fForwardErr[i]);
+    } else { // packed data, i.e. fRunInfo->fPacking > 1
+      if (((i-start[0]) % fRunInfo->fPacking == 0) && (i != start[0])) { // fill data
+        // in order that after rebinning the fit does not need to be redone (important for plots)
+        // the value is normalize to per bin
+        value /= fRunInfo->fPacking;
+        forwardPacked.fValue.push_back(value);
+        if (value == 0.0)
+          forwardPacked.fError.push_back(1.0);
+        else
+          forwardPacked.fError.push_back(TMath::Sqrt(error)/fRunInfo->fPacking);
+        value = 0.0;
+        error = 0.0;
+      }
     }
     value += fForward[i];
     error += fForwardErr[i]*fForwardErr[i];
   }
   // backward
   for (int i=start[1]; i<end[1]; i++) {
-    if (((i-start[1]) % fRunInfo->fPacking == 0) && (i != start[1])) { // fill data
-      // in order that after rebinning the fit does not need to be redone (important for plots)
-      // the value is normalize to per bin
-      value /= fRunInfo->fPacking;
-      backwardPacked.fValue.push_back(value);
-      if (value == 0.0)
-        backwardPacked.fError.push_back(1.0);
-      else
-        backwardPacked.fError.push_back(TMath::Sqrt(error)/fRunInfo->fPacking);
-      value = 0.0;
-      error = 0.0;
+    if (fRunInfo->fPacking == 1) {
+      backwardPacked.fValue.push_back(fBackward[i]);
+      backwardPacked.fError.push_back(fBackwardErr[i]);
+    } else { // packed data, i.e. fRunInfo->fPacking > 1
+      if (((i-start[1]) % fRunInfo->fPacking == 0) && (i != start[1])) { // fill data
+        // in order that after rebinning the fit does not need to be redone (important for plots)
+        // the value is normalize to per bin
+        value /= fRunInfo->fPacking;
+        backwardPacked.fValue.push_back(value);
+        if (value == 0.0)
+          backwardPacked.fError.push_back(1.0);
+        else
+          backwardPacked.fError.push_back(TMath::Sqrt(error)/fRunInfo->fPacking);
+        value = 0.0;
+        error = 0.0;
+      }
     }
     value += fBackward[i];
     error += fBackwardErr[i]*fBackwardErr[i];
@@ -851,8 +872,13 @@ bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2
   double f, b, ef, eb, alpha = 1.0, beta = 1.0;
   // fill data time start, and step
   // data start at data_start-t0
-  fData.fDataTimeStart = fTimeResolution*(((double)start[0]-t0[0])+(double)fRunInfo->fPacking/2.0);
+  fData.fDataTimeStart = fTimeResolution*((double)start[0]-t0[0]);
   fData.fDataTimeStep  = fTimeResolution*(double)fRunInfo->fPacking;
+
+/*
+cout << endl << ">> start time = " << fData.fDataTimeStart << ", step = " << fData.fDataTimeStep;
+cout << endl << "--------------------------------" << endl;
+*/
 
   // get the proper alpha and beta
   switch (fAlphaBetaTag) {
@@ -877,7 +903,7 @@ bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2
   }
 //cout << endl << ">> alpha = " << alpha << ", beta = " << beta;
 
-  for (unsigned int i=0; i<noOfBins; i++) {
+  for (unsigned int i=0; i<forwardPacked.fValue.size(); i++) {
     // to make the formulae more readable
     f  = forwardPacked.fValue[i];
     b  = backwardPacked.fValue[i];
@@ -924,11 +950,16 @@ bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2
 
   // calculate theory
   unsigned int size = runData->fDataBin[histoNo[0]].size();
-  double startTime  = -fT0s[0]*fTimeResolution;
-  fData.fTheoryTimeStart = startTime;
-  fData.fTheoryTimeStep  = fTimeResolution;
+  double factor = 1.0;
+  if (fData.fValue.size() * 10 > runData->fDataBin[histoNo[0]].size()) {
+    size = fData.fValue.size() * 10;
+    factor = (double)runData->fDataBin[histoNo[0]].size() / (double)size;
+  }
+//cout << endl << ">> runData->fDataBin[histoNo[0]].size() = " << runData->fDataBin[histoNo[0]].size() << ",  fData.fValue.size() * 10 = " << fData.fValue.size() * 10 << ", size = " << size << ", factor = " << factor << endl;
+  fData.fTheoryTimeStart = fData.fDataTimeStart;
+  fData.fTheoryTimeStep  = fTimeResolution*factor;
   for (unsigned int i=0; i<size; i++) {
-    time = startTime + (double)i*fTimeResolution;
+    time = fData.fTheoryTimeStart + (double)i*fTimeResolution*factor;
     value = fTheory->Func(time, par, fFuncValues);
     if (fabs(value) > 10.0) {  // dirty hack needs to be fixed!!
       value = 0.0;

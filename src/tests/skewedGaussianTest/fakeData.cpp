@@ -83,7 +83,8 @@ void fakeDataSyntax()
 int main(int argc, char *argv[])
 {
   const Double_t gamma_mu = TMath::TwoPi() * 0.1355; // in (rad/ns/T)
-  const Double_t tau_mu   = 2197.147; // muon life time in ns
+  // muon life time in (us), see PRL99, 032001 (2007)
+  const Double_t tau_mu   = 2197.019; // muon life time in ns
 
   if ((argc != 4) && (argc !=6)) {
     fakeDataSyntax();
@@ -285,10 +286,11 @@ int main(int argc, char *argv[])
   for (UInt_t i=0; i<asym.size(); i++) {   // loop over all histos
     for (Int_t j=0; j<noOfChannels; j++) { // loop over time
       for (UInt_t k=0; k<pB.size(); k++) { // loop over p(B)
-        if (j < t0[i])
+        if (j < t0[i]) {
           dval += 0.0;
-        else
+        } else {
           dval += pB[k]*TMath::Cos(gamma_mu*B[k]*timeResolution*(j-t0[i])+phase[i]);
+        }
       }
       ddata.push_back(asym[i]*dval);
       dval = 0.0;
@@ -353,10 +355,10 @@ int main(int argc, char *argv[])
       name  += i;
       title  = "asym";
       title += i;
-      hh = new TH1F(name.Data(), title.Data(), noOfChannels, 
-                    -timeResolution/2.0, (noOfChannels+0.5)*timeResolution);
+      hh = new TH1F(name.Data(), title.Data(), noOfChannels+1, 
+                    -timeResolution*0.5, (noOfChannels+0.5)*timeResolution);
       for (Int_t j=0; j<noOfChannels; j++) {
-        hh->SetBinContent(j, asymmetry[i][j]);
+        hh->SetBinContent(j+1, asymmetry[i][j]);
       }
       hh->Draw("*H HIST");
 
@@ -380,10 +382,10 @@ int main(int argc, char *argv[])
       name  += i;
       title  = "histo";
       title += i;
-      hh = new TH1F(name.Data(), title.Data(), noOfChannels, 
-                    -timeResolution/2.0, (noOfChannels+0.5)*timeResolution);
+      hh = new TH1F(name.Data(), title.Data(), noOfChannels+1, 
+                    -timeResolution*0.5, (noOfChannels+0.5)*timeResolution);
       for (Int_t j=0; j<noOfChannels; j++) {
-        hh->SetBinContent(j, histo[i][j]);
+        hh->SetBinContent(j+1, histo[i][j]);
       }
       hh->Draw("*H HIST");
 
@@ -411,18 +413,18 @@ int main(int argc, char *argv[])
     // create histos
     name   = "theoHisto";
     name  += i;
-    theoHisto = new TH1F(name.Data(), name.Data(), noOfChannels,
-                         -timeResolution/2.0, (noOfChannels+0.5)*timeResolution);
+    theoHisto = new TH1F(name.Data(), name.Data(), noOfChannels+1,
+                         -timeResolution*0.5, (noOfChannels+0.5)*timeResolution);
     if (i < 10)
       name   = "hDecay0";
     else
       name   = "hDecay";
     name  += i;
-    fakeHisto = new TH1F(name.Data(), name.Data(), noOfChannels,
-                         -timeResolution/2.0, (noOfChannels+0.5)*timeResolution);
+    fakeHisto = new TH1F(name.Data(), name.Data(), noOfChannels+1,
+                         -timeResolution*0.5, (noOfChannels+0.5)*timeResolution);
     // fill theoHisto
     for (Int_t j=0; j<noOfChannels; j++)
-      theoHisto->SetBinContent(j, histo[i][j]);
+      theoHisto->SetBinContent(j+1, histo[i][j]);
     // fill fakeHisto
     fakeHisto->FillRandom(theoHisto, (Int_t)theoHisto->Integral());
 
