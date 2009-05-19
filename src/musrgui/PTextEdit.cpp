@@ -643,11 +643,17 @@ void PTextEdit::fileCloseAll()
   if ( !currentEditor() )
     return;
 
-  int result = QMessageBox::warning(this, "**WARNING**",
-                   "Do you really want to close all files.\nChanges of unsaved files will be lost",
-                   "Close", "Cancel");
-  if (result == 1) // Cancel
-    return;
+  // check if there are any unsaved tabs
+  for (int i=0; i<fTabWidget->count(); i++) {
+    if (fTabWidget->label(i).find("*") > 0) {
+      int result = QMessageBox::warning(this, "**WARNING**",
+                     "Do you really want to close all files.\nChanges of unsaved files will be lost",
+                     "Close", "Cancel");
+      if (result == 1) // Cancel
+        return;
+      break;
+    }
+  }
 
   // close all editor tabs
   do {
@@ -667,11 +673,17 @@ void PTextEdit::fileCloseAllOthers()
   if ( !currentEditor() )
     return;
 
-  int result = QMessageBox::warning(this, "**WARNING**",
-                   "Do you really want to close all files.\nChanges of unsaved files will be lost",
-                   "Close", "Cancel");
-  if (result == 1) // Cancel
-    return;
+  // check if there are any unsaved tabs
+  for (int i=0; i<fTabWidget->count(); i++) {
+    if (fTabWidget->label(i).find("*") > 0) {
+      int result = QMessageBox::warning(this, "**WARNING**",
+                     "Do you really want to close all files.\nChanges of unsaved files will be lost",
+                     "Close", "Cancel");
+      if (result == 1) // Cancel
+        return;
+      break;
+    }
+  }
 
   // keep label of the current editor
   QString label = fTabWidget->label(fTabWidget->currentPageIndex());
