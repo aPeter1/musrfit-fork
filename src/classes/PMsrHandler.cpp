@@ -831,7 +831,7 @@ int PMsrHandler::WriteMsrLogFile(TString ext)
            fout << "*** FIT DID NOT CONVERGE ***" << endl;
            cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
           }
-        } else if (sstr.BeginsWith("chisq")) {
+        } else if (sstr.BeginsWith("maxLH")) {
           if (fStatistic.fValid) { // valid fit result
             str  = "  maxLH = ";
             str += fStatistic.fMin;
@@ -841,6 +841,31 @@ int PMsrHandler::WriteMsrLogFile(TString ext)
             str += fStatistic.fMin / fStatistic.fNdf;
             fout << str.Data() << endl;
             cout << endl << str.Data() << endl;
+          } else {
+           fout << "*** FIT DID NOT CONVERGE ***" << endl;
+           cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
+          }
+        } else if (sstr.BeginsWith("*** FIT DID NOT CONVERGE ***")) {
+          if (fStatistic.fValid) { // valid fit result
+            if (fStatistic.fChisq) { // chisq
+              str  = "  chisq = ";
+              str += fStatistic.fMin;
+              str += ", NDF = ";
+              str += fStatistic.fNdf;
+              str += ", chisq/NDF = ";
+              str += fStatistic.fMin / fStatistic.fNdf;
+              fout << str.Data() << endl;
+              cout << endl << str.Data() << endl;
+            } else { // max. log. liklihood
+              str  = "  maxLH = ";
+              str += fStatistic.fMin;
+              str += ", NDF = ";
+              str += fStatistic.fNdf;
+              str += ", maxLH/NDF = ";
+              str += fStatistic.fMin / fStatistic.fNdf;
+              fout << str.Data() << endl;
+              cout << endl << str.Data() << endl;
+            }
           } else {
            fout << "*** FIT DID NOT CONVERGE ***" << endl;
            cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
