@@ -80,7 +80,8 @@ EOFHELP
 
 else
 
-  export PATH=./:$PATH
+  PATH=./:$PATH
+  LC_NUMERIC=en_US.UTF-8
 
   SUMMDIR="/mnt/data/nemu/summ"
 
@@ -260,7 +261,7 @@ else
       fi
 
       # if it's the first run to be fitted, take the template and substitute the runnumber to match the first run
-      if [ "$q" -eq 0 ]; then
+      if [ "$q" -eq 0 ] && [ "$TEMPLATE" != "$FIRSTINPUT" ]; then
         awk -v count=$TEMP -v nextcount=${RUNARRAY[0]} -v nextinput=$FIRSTINPUT '{
           if(NR==1) print nextcount > nextinput
           else if($1 == "RUN") {
@@ -300,21 +301,23 @@ else
           COUNTX=$COUNT
           TEMPLATEX=$COUNT$EXTENSION.$OUTPUTEXT
         fi
-        awk -v count=$COUNTX -v nextcount=$NEXTCOUNT -v nextinput=$NEXTINPUT '{
-          if(NR==1) print nextcount > nextinput
-          else if($1 == "RUN") {
-            if (substr(count,1,1) != "_"){ count = sprintf("_%04u", count); nextcount = sprintf("_%04u", nextcount);}
-            if ($2 !~ count){
-              print " "
-              print ">> msr2data: ATTENTION The run-numbers in the filename and the RUN-block of the file do not match!"
-              print ">> msr2data: The run-number substitution is most likely going wrong!"
-              print " "
+        if [ "$TEMPLATEX" != "$NEXTINPUT" ]; then
+          awk -v count=$COUNTX -v nextcount=$NEXTCOUNT -v nextinput=$NEXTINPUT '{
+            if(NR==1) print nextcount > nextinput
+            else if($1 == "RUN") {
+              if (substr(count,1,1) != "_"){ count = sprintf("_%04u", count); nextcount = sprintf("_%04u", nextcount);}
+              if ($2 !~ count){
+                print " "
+                print ">> msr2data: ATTENTION The run-numbers in the filename and the RUN-block of the file do not match!"
+                print ">> msr2data: The run-number substitution is most likely going wrong!"
+                print " "
+              }
+              sub(count, nextcount, $0);
+              print $0 >> nextinput
             }
-            sub(count, nextcount, $0);
-            print $0 >> nextinput
-          }
-          else print $0 >> nextinput
-        }' $TEMPLATEX
+            else print $0 >> nextinput
+          }' $TEMPLATEX
+        fi
       fi
     fi
 
@@ -419,6 +422,9 @@ else
 
     # put together all data to db- or column-format and write it to the file
     awk -v outfile=$OUTFILE -v noheader=$NOHEADER -v runList=$RUNLIST_USED -v numIndVar=$NUM_OF_IND_VAR -v format=$FORMAT '{
+
+      if(tolower(outfile) == "none")
+        exit 0
 
       FS = " "
       OFS = " "
