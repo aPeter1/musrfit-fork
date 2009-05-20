@@ -1387,7 +1387,8 @@ void PTextEdit::musrMsr2Data()
         }
         // first element
         if (end == 1) {
-          str = "[" + runList.section(' ', 0, 0) + "]";
+          str = "[" + runList + "]";
+          cmd.append(str);
         } else {
           str = "[" + runList.section(' ', 0, 0);
           cmd.append(str);
