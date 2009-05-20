@@ -75,7 +75,7 @@ void PGetPlotDialog::addPlot()
   // write type
   param += "PLOT ";
   if (fType_comboBox->currentText() == "Single Histo") {
-    param += "1   (single histo plot)\n";
+    param += "0   (single histo plot)\n";
   } else if (fType_comboBox->currentText() == "Asymmetry") {
     param += "2   (asymmetry plot)\n";
   } else if (fType_comboBox->currentText() == "RRF") {
