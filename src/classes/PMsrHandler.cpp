@@ -329,7 +329,14 @@ int PMsrHandler::WriteMsrLogFile(TString ext)
 {
   const unsigned int prec = 6; // output precision for float/doubles
 
-  TString str;
+  int tag, lineNo = 0, number;
+  int runNo = -1, addRunNo = 0;
+  int plotNo = -1;
+  char line[128];
+  TString str, sstr;
+  TObjArray *tokens;
+  TObjString *ostr;
+  bool found = false;
 
   // construct log file name
   // first find the last '.' in the filename
@@ -351,530 +358,505 @@ int PMsrHandler::WriteMsrLogFile(TString ext)
     str += "mlog";
 
 
-  ofstream f;
+  ifstream fin;
+  ofstream fout;
 
-  // open mlog-file
-  f.open(str.Data(), iostream::out);
-  if (!f.is_open()) {
+  // open msr-file for reading
+  fin.open(fFileName.Data(), iostream::in);
+  if (!fin.is_open()) {
     return PMUSR_MSR_LOG_FILE_WRITE_ERROR;
   }
 
-  // write mlog-file
-  int lineNo = 1;
-
-  // write title
-  f << fTitle.Data();
-  CheckAndWriteComment(f, ++lineNo);
-
-  // write fit parameter block
-  f << endl << "FITPARAMETER";
-  CheckAndWriteComment(f, ++lineNo);
-  f << endl;
-  for (unsigned int i=0; i<fParam.size(); i++) {
-    // parameter no
-    f.width(9);
-    f << right << fParam[i].fNo;
-    f << " ";
-    // parameter name
-    f.width(11);
-    f << left << fParam[i].fName.Data();
-    f << " ";
-    // value of the parameter
-    f.width(9);
-    f.precision(prec);
-    f << left << fParam[i].fValue;
-    f << " ";
-    // value of step/error/neg.error
-    f.width(11);
-    f.precision(prec);
-    f << left << fParam[i].fStep;
-    f << " ";
-    f.width(11);
-    f.precision(prec);
-    if ((fParam[i].fNoOfParams == 5) || (fParam[i].fNoOfParams == 7)) // pos. error given
-      if (fParam[i].fPosErrorPresent && (fParam[i].fStep != 0)) // pos error is a number
-        f << left << fParam[i].fPosError;
-      else // pos error is a none
-        f << left << "none";
-    else // no pos. error
-      f << left << "none";
-    f << " ";
-    // boundaries
-    if (fParam[i].fNoOfParams > 5) {
-      f.width(7);
-      f.precision(prec);
-      if (fParam[i].fLowerBoundaryPresent)
-        f << left << fParam[i].fLowerBoundary;
-      else
-        f << left << "none";
-      f << " ";
-      f.width(7);
-      f.precision(prec);
-      if (fParam[i].fUpperBoundaryPresent)
-        f << left << fParam[i].fUpperBoundary;
-      else
-        f << left << "none";
-      f << " ";
-    }
-    CheckAndWriteComment(f, ++lineNo);
-    // terminate parameter line if not the last line
-    if (i != fParam.size()-1)
-      f << endl;
+  // open mlog-file for writing
+  fout.open(str.Data(), iostream::out);
+  if (!fout.is_open()) {
+    return PMUSR_MSR_LOG_FILE_WRITE_ERROR;
   }
 
-  // write theory block
-  for (unsigned int i=0; i<fTheory.size(); i++) {
-    f << endl << fTheory[i].fLine.Data();
-    CheckAndWriteComment(f, ++lineNo);
-  }
+  tag = MSR_TAG_TITLE;
+  // read msr-file
+  while (!fin.eof()) {
 
-  // write functions block
-  if (GetNoOfFuncs() != 0) {
-    f << endl << "FUNCTIONS";
-    CheckAndWriteComment(f, ++lineNo);
-    for (int i=0; i<GetNoOfFuncs(); i++) {
-      str = *fFuncHandler->GetFuncString(i);
-      str.ToLower();
-      f << endl << str.Data();
-      CheckAndWriteComment(f, ++lineNo);
-    }
-  }
+    // read a line
+    fin.getline(line, sizeof(line));
+    str = line;
+    lineNo++;
 
-  // write run block
-  for (unsigned int i=0; i<fRuns.size(); i++) {
-    // run header
-    f << endl << "RUN " << fRuns[i].fRunName[0].Data() << " ";
-    str = fRuns[i].fBeamline[0];
-    str.ToUpper();
-    f << str.Data() << " ";
-    str = fRuns[i].fInstitute[0];
-    str.ToUpper();
-    f << str.Data() << " ";
-    str = fRuns[i].fFileFormat[0];
-    str.ToUpper();
-    f << str.Data() << "   (name beamline institute data-file-format)";
-    CheckAndWriteComment(f, ++lineNo);
-    // check for ADDRUN entries
-    if (fRuns[i].fRunName.size() > 1) {
-      for (unsigned int j=1; j<fRuns[i].fRunName.size(); j++) {
-        f << endl << "ADDRUN " << fRuns[i].fRunName[j].Data() << " ";
-        str = fRuns[i].fBeamline[j];
-        str.ToUpper();
-        f << str.Data() << " ";
-        str = fRuns[i].fInstitute[j];
-        str.ToUpper();
-        f << str.Data() << " ";
-        str = fRuns[i].fFileFormat[j];
-        str.ToUpper();
-        f << str.Data() << "   (name beamline institute data-file-format)";
-        CheckAndWriteComment(f, ++lineNo);
-      }
+    // check for tag
+    if (str.BeginsWith("FITPARAMETER")) { // FITPARAMETER block tag
+      tag = MSR_TAG_FITPARAMETER;
+    } else if (str.BeginsWith("THEORY")) {       // THEORY block tag
+      tag = MSR_TAG_THEORY;
+      fout << str.Data() << endl;
+      continue;
+    } else if (str.BeginsWith("FUNCTIONS")) {    // FUNCTIONS block tag
+      tag = MSR_TAG_FUNCTIONS;
+      fout << str.Data() << endl;
+      continue;
+    } else if (str.BeginsWith("RUN")) {          // RUN block tag
+      tag = MSR_TAG_RUN;
+      runNo++;
+    } else if (str.BeginsWith("COMMANDS")) {     // COMMANDS block tag
+      tag = MSR_TAG_COMMANDS;
+      fout << str.Data() << endl;
+      continue;
+    } else if (str.BeginsWith("FOURIER")) {      // FOURIER block tag
+      tag = MSR_TAG_FOURIER;
+      fout << str.Data() << endl;
+      continue;
+    } else if (str.BeginsWith("PLOT")) {         // PLOT block tag
+      tag = MSR_TAG_PLOT;
+      plotNo++;
+    } else if (str.BeginsWith("STATISTIC")) {    // STATISTIC block tag
+      tag = MSR_TAG_STATISTIC;
     }
-    // fittype
-    f.width(16);
-    switch (fRuns[i].fFitType) {
-      case MSR_FITTYPE_SINGLE_HISTO:
-        f << endl << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)";
+
+    // handle blocks
+    switch (tag) {
+      case MSR_TAG_TITLE:
+        fout << str.Data() << endl;
         break;
-      case MSR_FITTYPE_ASYM:
-        f << endl << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)";
-        break;
-      case MSR_FITTYPE_ASYM_RRF:
-        f << endl << left << "fittype" << MSR_FITTYPE_ASYM_RRF << "         (RRF asymmetry fit)";
-        break;
-      case MSR_FITTYPE_NON_MUSR:
-        f << endl << left << "fittype" << MSR_FITTYPE_NON_MUSR << "         (non muSR fit)";
-        break;
-      default:
-        break;
-    }
-    CheckAndWriteComment(f, ++lineNo);
-    // rrffrequency
-    if (fRuns[i].fRRFFreq != -1.0) {
-      f.width(16);
-      f << endl << left << "rrffrequency";
-      f.precision(prec);
-      f << fRuns[i].fRRFFreq;
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // rrfpacking
-    if (fRuns[i].fRRFPacking != -1) {
-      f.width(16);
-      f << endl << left << "rrfpacking";
-      f.precision(prec);
-      f << fRuns[i].fRRFPacking;
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // alpha
-    if (fRuns[i].fAlphaParamNo != -1) {
-      f.width(16);
-      f << endl << left << "alpha";
-      f << fRuns[i].fAlphaParamNo;
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // beta
-    if (fRuns[i].fBetaParamNo != -1) {
-      f.width(16);
-      f << endl << left << "beta";
-      f << fRuns[i].fBetaParamNo;
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // alpha2
-    if (fRuns[i].fAlpha2ParamNo != -1) {
-      f.width(16);
-      f << endl << left << "alpha2";
-      f << fRuns[i].fAlpha2ParamNo;
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // beta2
-    if (fRuns[i].fBeta2ParamNo != -1) {
-      f.width(16);
-      f << endl << left << "beta2";
-      f << fRuns[i].fBeta2ParamNo;
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // norm
-    if (fRuns[i].fNormParamNo != -1) {
-      f.width(16);
-      f << endl << left << "norm";
-      // check if norm is give as a function
-      if (fRuns[i].fNormParamNo >= MSR_PARAM_FUN_OFFSET)
-        f << "fun" << fRuns[i].fNormParamNo-MSR_PARAM_FUN_OFFSET;
-      else
-        f << fRuns[i].fNormParamNo;
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // backgr.fit
-    if (fRuns[i].fBkgFitParamNo != -1) {
-      f.width(16);
-      f << endl << left << "backgr.fit";
-      f << fRuns[i].fBkgFitParamNo;
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // rphase
-    if (fRuns[i].fPhaseParamNo != -1) {
-      f.width(16);
-      f << endl << left << "rphase";
-      f << fRuns[i].fPhaseParamNo;
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // lifetime
-    if (fRuns[i].fLifetimeParamNo != -1) {
-      f.width(16);
-      f << endl << left << "lifetime";
-      f << fRuns[i].fLifetimeParamNo;
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // lifetimecorrection
-    if ((fRuns[i].fLifetimeCorrection) && (fRuns[i].fFitType == MSR_FITTYPE_SINGLE_HISTO)) {
-      f << endl << "lifetimecorrection";
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // map
-    f << endl << "map         ";
-    for (unsigned int j=0; j<fRuns[i].fMap.size(); j++) {
-      f.width(5);
-      f << right << fRuns[i].fMap[j];
-    }
-    // if there are less maps then 10 fill with zeros
-    if (fRuns[i].fMap.size() < 10) {
-      for (unsigned int j=fRuns[i].fMap.size(); j<10; j++)
-        f << "    0";
-    }
-    CheckAndWriteComment(f, ++lineNo);
-    // forward
-    if (fRuns[i].fForwardHistoNo != -1) {
-      f.width(16);
-      f << endl << left << "forward";
-      f << fRuns[i].fForwardHistoNo;
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // backward
-    if (fRuns[i].fBackwardHistoNo != -1) {
-      f.width(16);
-      f << endl << left << "backward";
-      f << fRuns[i].fBackwardHistoNo;
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // right
-    if (fRuns[i].fRightHistoNo != -1) {
-      f.width(16);
-      f << endl << left << "right";
-      f << fRuns[i].fRightHistoNo;
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // left
-    if (fRuns[i].fLeftHistoNo != -1) {
-      f.width(16);
-      f << endl << left << "left";
-      f << fRuns[i].fLeftHistoNo;
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // backgr.fix
-    if (fRuns[i].fBkgFix.size() > 0) {
-      f.width(15);
-      f << endl << left << "backgr.fix";
-      for (unsigned int j=0; j<fRuns[i].fBkgFix.size(); j++) {
-        f.precision(prec);
-        f.width(12);
-        f << left << fRuns[i].fBkgFix[j];
-      }
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // background
-    if (fRuns[i].fBkgRange.size() > 0) {
-      f.width(16);
-      f << endl << left << "background";
-      for (unsigned int j=0; j<fRuns[i].fBkgRange.size(); j++) {
-        f.width(8);
-        f << left << fRuns[i].fBkgRange[j];
-      }
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // data
-    if (fRuns[i].fDataRange.size() > 0) {
-      f.width(16);
-      f << endl << left << "data";
-      for (unsigned int j=0; j<fRuns[i].fDataRange.size(); j++) {
-        f.width(8);
-        f << left << fRuns[i].fDataRange[j];
-      }
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // t0
-    if (fRuns[i].fT0.size() > 0) {
-      f.width(16);
-      f << endl << left << "t0";
-      for (unsigned int j=0; j<fRuns[i].fT0.size(); j++) {
-        f.width(8);
-        f << left << fRuns[i].fT0[j];
-      }
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // xy-data (indices)
-    if (fRuns[i].fXYDataIndex[0] != -1) {
-      f.width(16);
-      f << endl << left << "xy-data";
-      for (unsigned int j=0; j<2; j++) {
-        if (fRuns[i].fXYDataIndex[j] == -1)
-          break;
-        f.width(8);
-        f.precision(2);
-        f << left << fixed << fRuns[i].fXYDataIndex[j];
-      }
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // xy-data (labels)
-    if (!fRuns[i].fXYDataLabel[0].IsWhitespace()) {
-      f.width(16);
-      f << endl << left << "xy-data";
-      for (unsigned int j=0; j<2; j++) {
-        if (fRuns[i].fXYDataLabel[j].IsWhitespace())
-          break;
-        f.width(8);
-        f << left << fixed << fRuns[i].fXYDataLabel[j].Data();
-        if (j == 0)
-          f << " ";
-      }
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // fit
-    if (fRuns[i].fFitRange[0] != -1) {
-      f.width(16);
-      f << endl << left << "fit";
-      for (unsigned int j=0; j<2; j++) {
-        if (fRuns[i].fFitRange[j] == -1)
-          break;
-        f.width(8);
-        f.precision(2);
-        f << left << fixed << fRuns[i].fFitRange[j];
-      }
-      CheckAndWriteComment(f, ++lineNo);
-    }
-    // packing
-    f.width(16);
-    f << endl << left << "packing";
-    f << fRuns[i].fPacking;
-    CheckAndWriteComment(f, ++lineNo);
-  }
-
-  // write command block
-  f << endl << "COMMANDS";
-  CheckAndWriteComment(f, ++lineNo);
-  for (unsigned int i=0; i<fCommands.size(); i++) {
-    f << endl << fCommands[i].fLine.Data();
-    CheckAndWriteComment(f, ++lineNo);
-  }
-
-  // write fourier block if present
-  if (fFourier.fFourierBlockPresent) {
-    f << endl << "FOURIER";
-    CheckAndWriteComment(f, ++lineNo);
-
-    // write 'units' parameter if present
-    if (fFourier.fUnits != FOURIER_UNIT_NOT_GIVEN) {
-      f << endl << "units            ";
-      if (fFourier.fUnits == FOURIER_UNIT_FIELD) {
-        f << "Gauss";
-      } else if (fFourier.fUnits == FOURIER_UNIT_FREQ) {
-        f << "MHz ";
-      } else if (fFourier.fUnits == FOURIER_UNIT_CYCLES) {
-        f << "Mc/s";
-      }
-      f << "   # units either 'Gauss', 'MHz', or 'Mc/s'";
-      CheckAndWriteComment(f, ++lineNo);
-    }
-
-    // write 'fourier_power' parameter if present
-    if (fFourier.fFourierPower >= 0) {
-      f << endl << "fourier_power    " << fFourier.fFourierPower;
-      CheckAndWriteComment(f, ++lineNo);
-    }
-
-    // write 'appodization' if present
-    if (fFourier.fApodization != FOURIER_APOD_NOT_GIVEN) {
-      f << endl << "apodization      ";
-      if (fFourier.fApodization == FOURIER_APOD_NONE) {
-        f << "NONE  ";
-      } else if (fFourier.fApodization == FOURIER_APOD_WEAK) {
-        f << "WEAK  ";
-      } else if (fFourier.fApodization == FOURIER_APOD_MEDIUM) {
-        f << "MEDIUM";
-      } else if (fFourier.fApodization == FOURIER_APOD_STRONG) {
-        f << "STRONG";
-      }
-      f << "  # NONE, WEAK, MEDIUM, STRONG";
-      CheckAndWriteComment(f, ++lineNo);
-    }
-
-    // write 'plot' if present
-    if (fFourier.fPlotTag != FOURIER_PLOT_NOT_GIVEN) {
-      f << endl << "plot             ";
-      if (fFourier.fPlotTag == FOURIER_PLOT_REAL) {
-        f << "REAL ";
-      } else if (fFourier.fPlotTag == FOURIER_PLOT_IMAG) {
-        f << "IMAG ";
-      } else if (fFourier.fPlotTag == FOURIER_PLOT_REAL_AND_IMAG) {
-        f << "REAL_AND_IMAG";
-      } else if (fFourier.fPlotTag == FOURIER_PLOT_POWER) {
-        f << "POWER";
-      } else if (fFourier.fPlotTag == FOURIER_PLOT_PHASE) {
-        f << "PHASE";
-      }
-      f << "   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE";
-      CheckAndWriteComment(f, ++lineNo);
-    }
-
-    // write 'phase' if present
-    if (fFourier.fPhaseParamNo > 0) {
-      f << endl << "phase            par" << fFourier.fPhaseParamNo;
-      CheckAndWriteComment(f, ++lineNo);
-    } else {
-      if (fFourier.fPhase != -999.0) {
-        f << endl << "phase            " << fFourier.fPhase;
-        CheckAndWriteComment(f, ++lineNo);
-      }
-    }
-
-    // write 'range_for_phase_correction' if present
-    if (fFourier.fRangeForPhaseCorrection[0] != -1.0) {
-      f << endl << "range_for_phase_correction  " << fFourier.fRangeForPhaseCorrection[0] << "    " << fFourier.fRangeForPhaseCorrection[1];
-      CheckAndWriteComment(f, ++lineNo);
-    }
-
-    // write 'range' if present
-    if (fFourier.fPlotRange[0] != -1.0) {
-      f << endl << "range                       " << fFourier.fPlotRange[0] << "    " << fFourier.fPlotRange[1];
-      CheckAndWriteComment(f, ++lineNo);
-    }
-  }
-
-  // write plot block
-  for (unsigned int i=0; i<fPlots.size(); i++) {
-    // plot header
-    switch (fPlots[i].fPlotType) {
-      case MSR_PLOT_SINGLE_HISTO:
-        f << endl << "PLOT " << fPlots[i].fPlotType << "   (single histo plot)";
-        break;
-      case MSR_PLOT_ASYM:
-        f << endl << "PLOT " << fPlots[i].fPlotType << "   (asymmetry plot)";
-        break;
-      case MSR_PLOT_ASYM_RRF:
-        f << endl << "PLOT " << fPlots[i].fPlotType << "   (rotating reference frame plot)";
-        break;
-      case MSR_PLOT_NON_MUSR:
-        f << endl << "PLOT " << fPlots[i].fPlotType << "   (non muSR plot)";
-        break;
-      default:
-        break;
-    }
-    CheckAndWriteComment(f, ++lineNo);
-    // runs
-    f << endl << "runs     ";
-    f.precision(0);
-    for (unsigned int j=0; j<fPlots[i].fRuns.size(); j++) {
-      if (fPlots[i].fPlotType != MSR_PLOT_ASYM_RRF) { // all but MSR_PLOT_ASYM_RRF
-        f.width(4);
-        f << fPlots[i].fRuns[j].Re();
-      } else { // MSR_PLOT_ASYM_RRF
-        f << fPlots[i].fRuns[j].Re() << "," << fPlots[i].fRuns[j].Im() << "    ";
-      }
-    }
-    CheckAndWriteComment(f, ++lineNo);
-    // range
-    f << endl << "range    ";
-    f.precision(2);
-    f << fPlots[i].fTmin << "   " << fPlots[i].fTmax;
-    if (fPlots[i].fYmin != -999.0) {
-      f << "   " << fPlots[i].fYmin << "   " << fPlots[i].fYmax;
-    }
-    CheckAndWriteComment(f, ++lineNo);
-  }
-
-  if (!fCopyStatisticsBlock) { // write a new statistics block
-    // write statistic block
-    TDatime dt;
-    f << endl << "STATISTIC --- " << dt.AsSQLString();
-    CheckAndWriteComment(f, ++lineNo);
-    // if fMin and fNdf are given, make new statistic block
-    if ((fStatistic.fMin != -1.0) && (fStatistic.fNdf != 0)) {
-      // throw away the old statistics block
-      fStatistic.fStatLines.clear();
-      // create the new statistics block
-      PMsrLineStructure line;
-      if (fStatistic.fValid) { // valid fit result
-        if (fStatistic.fChisq) { // chi^2
-          line.fLine  = "  chisq = ";
-          line.fLine += fStatistic.fMin;
-          line.fLine += ", NDF = ";
-          line.fLine += fStatistic.fNdf;
-          line.fLine += ", chisq/NDF = ";
-          line.fLine += fStatistic.fMin / fStatistic.fNdf;
-          cout << line.fLine.Data() << endl;
+      case MSR_TAG_FITPARAMETER:
+        tokens = str.Tokenize(" \t");
+        if (tokens->GetEntries() == 0) { // not a parameter line
+          fout << str.Data() << endl;
         } else {
-          line.fLine  = "  maxLH = ";
-          line.fLine += fStatistic.fMin;
-          line.fLine += ", NDF = ";
-          line.fLine += fStatistic.fNdf;
-          line.fLine += ", maxLH/NDF = ";
-          line.fLine += fStatistic.fMin / fStatistic.fNdf;
-          cout << line.fLine.Data() << endl;
+          ostr = dynamic_cast<TObjString*>(tokens->At(0));
+          sstr = ostr->GetString();
+          if (sstr.IsDigit()) { // parameter
+            number = sstr.Atoi();
+            number--;
+            // make sure number makes sense
+            assert ((number >= 0) && (number < (int)fParam.size()));
+            // parameter no
+            fout.width(9);
+            fout << right << fParam[number].fNo;
+            fout << " ";
+            // parameter name
+            fout.width(11);
+            fout << left << fParam[number].fName.Data();
+            fout << " ";
+            // value of the parameter
+            fout.width(9);
+            fout.precision(prec);
+            fout << left << fParam[number].fValue;
+            fout << " ";
+            // value of step/error/neg.error
+            fout.width(11);
+            fout.precision(prec);
+            fout << left << fParam[number].fStep;
+            fout << " ";
+            fout.width(11);
+            fout.precision(prec);
+            if ((fParam[number].fNoOfParams == 5) || (fParam[number].fNoOfParams == 7)) // pos. error given
+              if (fParam[number].fPosErrorPresent && (fParam[number].fStep != 0)) // pos error is a number
+                fout << left << fParam[number].fPosError;
+            else // pos error is a none
+              fout << left << "none";
+            else // no pos. error
+              fout << left << "none";
+            fout << " ";
+            // boundaries
+            if (fParam[number].fNoOfParams > 5) {
+              fout.width(7);
+              fout.precision(prec);
+              if (fParam[number].fLowerBoundaryPresent)
+                fout << left << fParam[number].fLowerBoundary;
+              else
+                fout << left << "none";
+              fout << " ";
+              fout.width(7);
+              fout.precision(prec);
+              if (fParam[number].fUpperBoundaryPresent)
+                fout << left << fParam[number].fUpperBoundary;
+              else
+                fout << left << "none";
+              fout << " ";
+            }
+            fout << endl;
+          } else { // not a parameter, hence just copy it
+            fout << str.Data() << endl;
+          }
         }
-      } else {
-        line.fLine = "*** FIT DID NOT CONVERGE ***";
-        cout << endl << line.fLine.Data() << endl;
-      }
-      fStatistic.fStatLines.push_back(line);
+        break;
+      case MSR_TAG_THEORY:
+        found = false;
+        for (unsigned int i=0; i<fTheory.size(); i++) {
+          if (fTheory[i].fLineNo == lineNo) {
+            fout << fTheory[i].fLine.Data() << endl;
+            found = true;
+          }
+        }
+        if (!found) {
+          fout << str.Data() << endl;
+        }
+        break;
+      case MSR_TAG_FUNCTIONS:
+        sstr = str;
+        sstr.Remove(TString::kLeading, ' ');
+        if (str.BeginsWith("fun")) {
+          if (FilterNumber(sstr, "fun", 0, number)) {
+            sstr = *fFuncHandler->GetFuncString(number-1);
+            sstr.ToLower();
+            fout << sstr.Data() << endl;
+          }
+        } else {
+          fout << str.Data() << endl;
+        }
+        break;
+      case MSR_TAG_RUN:
+        sstr = str;
+        sstr.Remove(TString::kLeading, ' ');
+        if (sstr.BeginsWith("RUN")) {
+          fout << "RUN " << fRuns[runNo].fRunName[0].Data() << " ";
+          str = fRuns[runNo].fBeamline[0];
+          str.ToUpper();
+          fout << str.Data() << " ";
+          str = fRuns[runNo].fInstitute[0];
+          str.ToUpper();
+          fout << str.Data() << " ";
+          str = fRuns[runNo].fFileFormat[0];
+          str.ToUpper();
+          fout << str.Data() << "   (name beamline institute data-file-format)" << endl;
+        } else if (sstr.BeginsWith("ADDRUN")) {
+          addRunNo++;
+          fout << "ADDRUN " << fRuns[runNo].fRunName[addRunNo].Data() << " ";
+          str = fRuns[runNo].fBeamline[addRunNo];
+          str.ToUpper();
+          fout << str.Data() << " ";
+          str = fRuns[runNo].fInstitute[addRunNo];
+          str.ToUpper();
+          fout << str.Data() << " ";
+          str = fRuns[runNo].fFileFormat[addRunNo];
+          str.ToUpper();
+          fout << str.Data() << "   (name beamline institute data-file-format)" << endl;
+        } else if (sstr.BeginsWith("fittype")) {
+          fout.width(16);
+          switch (fRuns[runNo].fFitType) {
+          case MSR_FITTYPE_SINGLE_HISTO:
+            fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)" << endl;
+            break;
+          case MSR_FITTYPE_ASYM:
+            fout << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)" << endl ;
+            break;
+          case MSR_FITTYPE_ASYM_RRF:
+            fout << left << "fittype" << MSR_FITTYPE_ASYM_RRF << "         (RRF asymmetry fit)" << endl ;
+            break;
+          case MSR_FITTYPE_NON_MUSR:
+            fout << left << "fittype" << MSR_FITTYPE_NON_MUSR << "         (non muSR fit)" << endl ;
+            break;
+          default:
+            break;
+          }
+        } else if (sstr.BeginsWith("rrffrequency")) {
+          fout.width(16);
+          fout << left << "rrffrequency";
+          fout.precision(prec);
+          fout << fRuns[runNo].fRRFFreq << endl;
+        } else if (sstr.BeginsWith("rrfpacking")) {
+          fout.width(16);
+          fout << left << "rrfpacking";
+          fout.precision(prec);
+          fout << fRuns[runNo].fRRFPacking << endl;
+        } else if (sstr.BeginsWith("alpha ")) {
+          fout.width(16);
+          fout << left << "alpha";
+          fout << fRuns[runNo].fAlphaParamNo << endl;
+        } else if (sstr.BeginsWith("beta ")) {
+          fout.width(16);
+          fout << left << "beta";
+          fout << fRuns[runNo].fBetaParamNo  << endl;
+        } else if (sstr.BeginsWith("alpha2")) {
+          fout.width(16);
+          fout << left << "alpha2";
+          fout << fRuns[runNo].fAlphaParamNo << endl;
+        } else if (sstr.BeginsWith("beta2")) {
+          fout.width(16);
+          fout << left << "beta2";
+          fout << fRuns[runNo].fBetaParamNo  << endl;
+        } else if (sstr.BeginsWith("norm")) {
+          fout.width(16);
+          fout << left << "norm";
+          // check if norm is give as a function
+          if (fRuns[runNo].fNormParamNo >= MSR_PARAM_FUN_OFFSET)
+            fout << "fun" << fRuns[runNo].fNormParamNo-MSR_PARAM_FUN_OFFSET;
+          else
+            fout << fRuns[runNo].fNormParamNo;
+          fout << endl;
+        } else if (sstr.BeginsWith("backgr.fit")) {
+          fout.width(16);
+          fout << left << "backgr.fit";
+          fout << fRuns[runNo].fBkgFitParamNo << endl;
+        } else if (sstr.BeginsWith("rphase")) {
+          fout.width(16);
+          fout << left << "rphase";
+          fout << fRuns[runNo].fPhaseParamNo << endl;
+        } else if (sstr.BeginsWith("lifetime ")) {
+          fout.width(16);
+          fout << left << "lifetime";
+          fout << fRuns[runNo].fLifetimeParamNo << endl;
+        } else if (sstr.BeginsWith("lifetimecorrection")) {
+          if ((fRuns[runNo].fLifetimeCorrection) && (fRuns[runNo].fFitType == MSR_FITTYPE_SINGLE_HISTO)) {
+            fout << "lifetimecorrection" << endl;
+          }
+        } else if (sstr.BeginsWith("map")) {
+          fout << "map         ";
+          for (unsigned int j=0; j<fRuns[runNo].fMap.size(); j++) {
+            fout.width(5);
+            fout << right << fRuns[runNo].fMap[j];
+          }
+          // if there are less maps then 10 fill with zeros
+          if (fRuns[runNo].fMap.size() < 10) {
+            for (unsigned int j=fRuns[runNo].fMap.size(); j<10; j++)
+              fout << "    0";
+          }
+          fout << endl;
+        } else if (sstr.BeginsWith("forward")) {
+          fout.width(16);
+          fout << left << "forward";
+          fout << fRuns[runNo].fForwardHistoNo << endl;
+        } else if (sstr.BeginsWith("backward")) {
+          fout.width(16);
+          fout << left << "backward";
+          fout << fRuns[runNo].fBackwardHistoNo << endl;
+        } else if (sstr.BeginsWith("right")) {
+          fout.width(16);
+          fout << left << "right";
+          fout << fRuns[runNo].fRightHistoNo << endl;
+        } else if (sstr.BeginsWith("left")) {
+          fout.width(16);
+          fout << left << "left";
+          fout << fRuns[runNo].fLeftHistoNo << endl;
+        } else if (sstr.BeginsWith("backgr.fix")) {
+          fout.width(15);
+          fout << left << "backgr.fix";
+          for (unsigned int j=0; j<fRuns[runNo].fBkgFix.size(); j++) {
+            fout.precision(prec);
+            fout.width(12);
+            fout << left << fRuns[runNo].fBkgFix[j];
+          }
+          fout << endl;
+        } else if (sstr.BeginsWith("background")) {
+          fout.width(16);
+          fout << left << "background";
+          for (unsigned int j=0; j<fRuns[runNo].fBkgRange.size(); j++) {
+            fout.width(8);
+            fout << left << fRuns[runNo].fBkgRange[j];
+          }
+          fout << endl;
+        } else if (sstr.BeginsWith("data")) {
+          fout.width(16);
+          fout << left << "data";
+          for (unsigned int j=0; j<fRuns[runNo].fDataRange.size(); j++) {
+            fout.width(8);
+            fout << left << fRuns[runNo].fDataRange[j];
+          }
+          fout << endl;
+        } else if (sstr.BeginsWith("t0")) {
+          fout.width(16);
+          fout << left << "t0";
+          for (unsigned int j=0; j<fRuns[runNo].fT0.size(); j++) {
+            fout.width(8);
+            fout << left << fRuns[runNo].fT0[j];
+          }
+          fout << endl;
+        } else if (sstr.BeginsWith("xy-data")) {
+          if (fRuns[runNo].fXYDataIndex[0] != -1) { // indices
+            fout.width(16);
+            fout << left << "xy-data";
+            for (unsigned int j=0; j<2; j++) {
+              if (fRuns[runNo].fXYDataIndex[j] == -1)
+                break;
+              fout.width(8);
+              fout.precision(2);
+              fout << left << fixed << fRuns[runNo].fXYDataIndex[j];
+            }
+            fout << endl;
+          } else if (!fRuns[runNo].fXYDataLabel[0].IsWhitespace()) { // labels
+            fout.width(16);
+            fout << endl << left << "xy-data";
+            for (unsigned int j=0; j<2; j++) {
+              if (fRuns[runNo].fXYDataLabel[j].IsWhitespace())
+                break;
+              fout.width(8);
+              fout << left << fixed << fRuns[runNo].fXYDataLabel[j].Data();
+              if (j == 0)
+                fout << " ";
+            }
+            fout << endl;
+          }
+        } else if (sstr.BeginsWith("fit")) {
+          fout.width(16);
+          fout << left << "fit";
+          for (unsigned int j=0; j<2; j++) {
+            if (fRuns[runNo].fFitRange[j] == -1)
+              break;
+            fout.width(8);
+            fout.precision(2);
+            fout << left << fixed << fRuns[runNo].fFitRange[j];
+          }
+          fout << endl;
+        } else if (sstr.BeginsWith("packing")) {
+          fout.width(16);
+          fout << left << "packing";
+          fout << fRuns[runNo].fPacking << endl;
+        } else {
+          fout << str.Data() << endl;
+        }
+        break;
+      case MSR_TAG_COMMANDS:
+        fout << str.Data() << endl;
+        break;
+      case MSR_TAG_FOURIER:
+        sstr = str;
+        sstr.Remove(TString::kLeading, ' ');
+        if (sstr.BeginsWith("units")) {
+          fout << "units            ";
+          if (fFourier.fUnits == FOURIER_UNIT_FIELD) {
+            fout << "Gauss";
+          } else if (fFourier.fUnits == FOURIER_UNIT_FREQ) {
+            fout << "MHz ";
+          } else if (fFourier.fUnits == FOURIER_UNIT_CYCLES) {
+            fout << "Mc/s";
+          }
+          fout << "   # units either 'Gauss', 'MHz', or 'Mc/s'";
+          fout << endl;
+        } else if (sstr.BeginsWith("fourier_power")) {
+          fout << "fourier_power    " << fFourier.fFourierPower << endl;
+        } else if (sstr.BeginsWith("apodization")) {
+          fout << "apodization      ";
+          if (fFourier.fApodization == FOURIER_APOD_NONE) {
+            fout << "NONE  ";
+          } else if (fFourier.fApodization == FOURIER_APOD_WEAK) {
+            fout << "WEAK  ";
+          } else if (fFourier.fApodization == FOURIER_APOD_MEDIUM) {
+            fout << "MEDIUM";
+          } else if (fFourier.fApodization == FOURIER_APOD_STRONG) {
+            fout << "STRONG";
+          }
+          fout << "  # NONE, WEAK, MEDIUM, STRONG";
+          fout << endl;
+        } else if (sstr.BeginsWith("plot")) {
+          fout << "plot             ";
+          if (fFourier.fPlotTag == FOURIER_PLOT_REAL) {
+            fout << "REAL ";
+          } else if (fFourier.fPlotTag == FOURIER_PLOT_IMAG) {
+            fout << "IMAG ";
+          } else if (fFourier.fPlotTag == FOURIER_PLOT_REAL_AND_IMAG) {
+            fout << "REAL_AND_IMAG";
+          } else if (fFourier.fPlotTag == FOURIER_PLOT_POWER) {
+            fout << "POWER";
+          } else if (fFourier.fPlotTag == FOURIER_PLOT_PHASE) {
+            fout << "PHASE";
+          }
+          fout << "   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE";
+          fout << endl;
+        } else if (sstr.BeginsWith("phase")) {
+          if (fFourier.fPhaseParamNo > 0) {
+            fout << "phase            par" << fFourier.fPhaseParamNo << endl;
+          } else {
+            if (fFourier.fPhase != -999.0) {
+              fout << "phase            " << fFourier.fPhase << endl;
+            }
+          }
+        } else if (sstr.BeginsWith("range_for_phase_correction")) {
+          fout << "range_for_phase_correction  " << fFourier.fRangeForPhaseCorrection[0] << "    " << fFourier.fRangeForPhaseCorrection[1] << endl;
+        } else if (sstr.BeginsWith("range ")) {
+          fout << "range            " << fFourier.fPlotRange[0] << "    " << fFourier.fPlotRange[1] << endl;
+        } else {
+          fout << str.Data() << endl;
+        }
+        break;
+      case MSR_TAG_PLOT:
+        sstr = str;
+        sstr.Remove(TString::kLeading, ' ');
+        if (sstr.BeginsWith("PLOT")) {
+          switch (fPlots[plotNo].fPlotType) {
+          case MSR_PLOT_SINGLE_HISTO:
+            fout << "PLOT " << fPlots[plotNo].fPlotType << "   (single histo plot)" << endl;
+            break;
+          case MSR_PLOT_ASYM:
+            fout << "PLOT " << fPlots[plotNo].fPlotType << "   (asymmetry plot)" << endl;
+            break;
+          case MSR_PLOT_ASYM_RRF:
+            fout << "PLOT " << fPlots[plotNo].fPlotType << "   (rotating reference frame plot)" << endl;
+            break;
+          case MSR_PLOT_NON_MUSR:
+            fout << "PLOT " << fPlots[plotNo].fPlotType << "   (non muSR plot)" << endl;
+            break;
+          default:
+            break;
+          }
+        } else if (sstr.BeginsWith("runs")) {
+          fout << "runs     ";
+          fout.precision(0);
+          for (unsigned int j=0; j<fPlots[plotNo].fRuns.size(); j++) {
+            if (fPlots[plotNo].fPlotType != MSR_PLOT_ASYM_RRF) { // all but MSR_PLOT_ASYM_RRF
+              fout.width(4);
+              fout << fPlots[plotNo].fRuns[j].Re();
+            } else { // MSR_PLOT_ASYM_RRF
+              fout << fPlots[plotNo].fRuns[j].Re() << "," << fPlots[plotNo].fRuns[j].Im() << "    ";
+            }
+          }
+          fout << endl;
+        } else if (sstr.BeginsWith("range")) {
+          fout << "range    ";
+          fout.precision(2);
+          fout << fPlots[plotNo].fTmin << "   " << fPlots[plotNo].fTmax;
+          if (fPlots[plotNo].fYmin != -999.0) {
+            fout << "   " << fPlots[plotNo].fYmin << "   " << fPlots[plotNo].fYmax;
+          }
+          fout << endl;
+        } else {
+          fout << str.Data() << endl;
+        }
+        break;
+      case MSR_TAG_STATISTIC:
+        sstr = str;
+        sstr.Remove(TString::kLeading, ' ');
+        if (sstr.BeginsWith("STATISTIC")) {
+          TDatime dt;
+          fout << "STATISTIC --- " << dt.AsSQLString() << endl;
+        } else if (sstr.BeginsWith("chisq")) {
+          if (fStatistic.fValid) { // valid fit result
+            str  = "  chisq = ";
+            str += fStatistic.fMin;
+            str += ", NDF = ";
+            str += fStatistic.fNdf;
+            str += ", chisq/NDF = ";
+            str += fStatistic.fMin / fStatistic.fNdf;
+            fout << str.Data() << endl;
+            cout << endl << str.Data() << endl;
+          } else {
+           fout << "*** FIT DID NOT CONVERGE ***" << endl;
+           cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
+          }
+        } else if (sstr.BeginsWith("chisq")) {
+          if (fStatistic.fValid) { // valid fit result
+            str  = "  maxLH = ";
+            str += fStatistic.fMin;
+            str += ", NDF = ";
+            str += fStatistic.fNdf;
+            str += ", maxLH/NDF = ";
+            str += fStatistic.fMin / fStatistic.fNdf;
+            fout << str.Data() << endl;
+            cout << endl << str.Data() << endl;
+          } else {
+           fout << "*** FIT DID NOT CONVERGE ***" << endl;
+           cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
+          }
+        } else {
+          fout << str.Data() << endl;
+        }
+        break;
+      default:
+        break;
     }
   }
-  // write the statistics block
-  for (unsigned int i=0; i<fStatistic.fStatLines.size(); i++) {
-    f << endl << fStatistic.fStatLines[i].fLine.Data();
-    CheckAndWriteComment(f, ++lineNo);
-  }
 
-  // close mlog-file
-  f.close();
+  // close files
+  fout.close();
+  fin.close();
 
   return PMUSR_SUCCESS;
 }
@@ -3137,32 +3119,6 @@ bool PMsrHandler::CheckFuncs()
   funLineBlockNo.clear();
 
   return result;
-}
-
-//--------------------------------------------------------------------------
-// CheckAndWriteComment
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param f
- * \param lineNo
- */
-void PMsrHandler::CheckAndWriteComment(ofstream &f, int &lineNo)
-{
-  unsigned int i;
-
-  // check if lineNo is present
-  for (i=0; i<fComments.size(); i++) {
-    if (fComments[i].fLineNo == lineNo) {
-      break;
-    }
-  }
-
-  if (i<fComments.size()) {
-    f << endl << fComments[i].fLine.Data();
-    CheckAndWriteComment(f, ++lineNo);
-  }
 }
 
 // end ---------------------------------------------------------------------

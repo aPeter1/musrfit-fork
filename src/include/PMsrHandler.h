@@ -126,8 +126,6 @@ class PMsrHandler
     virtual bool HandlePlotEntry(PMsrLines &line);
     virtual bool HandleStatisticEntry(PMsrLines &line);
 
-    virtual void CheckAndWriteComment(ofstream &f, int &lineNo);
-
     virtual void FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLines &run);
 
     virtual void InitRunParameterStructure(PMsrRunStructure &param);
