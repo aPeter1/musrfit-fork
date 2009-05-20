@@ -675,7 +675,7 @@ cout << endl << ">> data start time = " << fData.fDataTimeStart;
   fData.fTheoryTimeStart = fData.fDataTimeStart;
   fData.fTheoryTimeStep  = fTimeResolution*factor;
   for (unsigned int i=0; i<size; i++) {
-    time = fData.fTheoryTimeStart + i*fTimeResolution*factor;
+    time = fData.fTheoryTimeStart + i*fData.fTheoryTimeStep;
     theoryValue = fTheory->Func(time, par, fFuncValues);
     if (fabs(theoryValue) > 10.0) {  // dirty hack needs to be fixed!!
       theoryValue = 0.0;
@@ -798,12 +798,10 @@ cout << endl << "--------------------------------" << endl;
       // the value is normalize to per 1 nsec
       normalizer = fRunInfo->fPacking * (fTimeResolution * 1e3); // fTimeResolution us->ns
       value /= normalizer;
-      // 1st term start time, 2nd term offset to the center of the rebinned bin
-      time = ((double)start-t0)*fTimeResolution +
-             (double)(i-start-fRunInfo->fPacking/2.0)*fTimeResolution;
+      time = ((double)(i-fRunInfo->fPacking)-t0)*fTimeResolution;
       expval = TMath::Exp(+time/tau)/N0;
       fData.fValue.push_back(-1.0+expval*(value-bkg));
-//cout << endl << ">> i=" << i << ",time=" << time << ",expval=" << expval << ",value=" << value << ",bkg=" << bkg << ",expval*(value-bkg)-1=" << expval*(value-bkg)-1.0;
+//cout << endl << ">> i=" << i << ",t0=" << t0 << ",time=" << time << ",expval=" << expval << ",value=" << value << ",bkg=" << bkg << ",expval*(value-bkg)-1=" << expval*(value-bkg)-1.0;
       fData.fError.push_back(expval*TMath::Sqrt(value/normalizer));
 //cout << endl << ">> " << time << ", " << expval << ", " << -1.0+expval*(value-bkg) << ", " << expval*TMath::Sqrt(value/fRunInfo->fPacking);
       value = 0.0;
@@ -837,7 +835,7 @@ cout << endl << "--------------------------------" << endl;
   fData.fTheoryTimeStep  = fTimeResolution*factor;
 //cout << endl << ">> size=" << size << ", startTime=" << startTime << ", fTimeResolution=" << fTimeResolution;
   for (unsigned int i=0; i<size; i++) {
-    time = fData.fTheoryTimeStart + (double)i*fTimeResolution*factor;
+    time = fData.fTheoryTimeStart + (double)i*fData.fTheoryTimeStep;
     theoryValue = fTheory->Func(time, par, fFuncValues);
     if (fabs(theoryValue) > 10.0) { // dirty hack needs to be fixed!!
       theoryValue = 0.0;
