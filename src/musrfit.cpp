@@ -490,7 +490,7 @@ int main(int argc, char *argv[])
   bool keep_mn2_output = false;
   bool chisq_only = false;
   TString dump("");
-  char filename[256];
+  char filename[1024];
 
   // check syntax
   if (argc < 2) {

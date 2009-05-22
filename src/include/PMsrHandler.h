@@ -51,7 +51,7 @@ class PMsrHandler
     virtual ~PMsrHandler();
 
     virtual int ReadMsrFile();
-    virtual int WriteMsrLogFile(TString ext=TString(""));
+    virtual int WriteMsrLogFile(const bool messages = true);
 
     virtual TString*                GetMsrTitle() { return &fTitle; }
     virtual PMsrParamList*          GetMsrParamList() { return &fParam; }

@@ -39,6 +39,7 @@ using namespace std;
 #include <TApplication.h>
 #include <TSAXParser.h>
 #include <TROOT.h>
+#include <TSystem.h>
 
 #include "PMusr.h"
 #include "PStartupHandler.h"
@@ -55,7 +56,7 @@ using namespace std;
 void musrt0_syntax()
 {
   cout << endl << "usage: musrt0 <msr-file> | --version | --help";
-  cout << endl << "       <msr-file>: msr/mlog input file";
+  cout << endl << "       <msr-file>: msr input file";
   cout << endl << "       'musrt0 <msr-file>' will execute musrt0";
   cout << endl << "       'musrt0' or 'musrt0 --help' will show this help";
   cout << endl << "       'musrt0 --version' will print the musrt0 version";
@@ -135,6 +136,7 @@ int main(int argc, char *argv[])
   bool show_syntax = false;
   int  status;
   bool success = true;
+  char filename[1024];
 
   switch (argc) {
     case 1:
@@ -149,9 +151,11 @@ int main(int argc, char *argv[])
         show_syntax = true;
       } else {
         // check if filename has extension msr or mlog
-        if (!strstr(argv[1], ".msr") && !strstr(argv[1], ".mlog")) {
-          cout << endl << "**ERROR** " << argv[1] << " is not a msr/mlog-file!" << endl;
+        if (!strstr(argv[1], ".msr")) {
+          cout << endl << "**ERROR** " << argv[1] << " is not a msr-file!" << endl;
           show_syntax = true;
+        } else {
+          strncpy(filename, argv[1], sizeof(filename));
         }
       }
       break;
@@ -190,15 +194,15 @@ int main(int argc, char *argv[])
   startupHandler->CheckLists();
 
   // read msr-file
-  PMsrHandler *msrHandler = new PMsrHandler(argv[1]);
+  PMsrHandler *msrHandler = new PMsrHandler(filename);
   status = msrHandler->ReadMsrFile();
   if (status != PMUSR_SUCCESS) {
     switch (status) {
       case PMUSR_MSR_FILE_NOT_FOUND:
-        cout << endl << "**ERROR** couldn't find '" << argv[1] << "'" << endl << endl;
+        cout << endl << "**ERROR** couldn't find '" << filename << "'" << endl << endl;
         break;
       case PMUSR_MSR_SYNTAX_ERROR:
-        cout << endl << "**SYNTAX ERROR** in file " << argv[1] << ", full stop here." << endl << endl;
+        cout << endl << "**SYNTAX ERROR** in file " << filename << ", full stop here." << endl << endl;
         break;
       default:
         cout << endl << "**UNKNOWN ERROR** when trying to read the msr-file" << endl << endl;
@@ -287,7 +291,21 @@ int main(int argc, char *argv[])
   }
 
   // write msr-file
-  msrHandler->WriteMsrLogFile("msr");
+  msrHandler->WriteMsrLogFile(false);
+
+  // swap msr- and mlog-file
+  // copy msr-file -> __temp.msr
+  gSystem->CopyFile(filename, "__temp.msr", kTRUE);
+  // copy mlog-file -> msr-file
+  TString fln = TString(filename);
+  char ext[32];
+  strcpy(ext, ".mlog");
+  fln.ReplaceAll(".msr", 4, ext, strlen(ext));
+  gSystem->CopyFile(fln.Data(), filename, kTRUE);
+  // copy __temp.msr -> mlog-file
+  gSystem->CopyFile("__temp.msr", fln.Data(), kTRUE);
+  // delete __temp.msr
+  gSystem->Exec("rm __temp.msr");
 
   // clean up
   musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);

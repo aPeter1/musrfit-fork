@@ -325,7 +325,7 @@ cout << endl;
 /**
  * <p>
  */
-int PMsrHandler::WriteMsrLogFile(TString ext)
+int PMsrHandler::WriteMsrLogFile(const bool messages)
 {
   const unsigned int prec = 6; // output precision for float/doubles
 
@@ -350,13 +350,7 @@ int PMsrHandler::WriteMsrLogFile(TString ext)
   // remove extension
   str = fFileName;
   str.Remove(idx+1);
-
-  // add new extension
-  if (ext.Length() != 0)
-    str += ext;
-  else
-    str += "mlog";
-
+  str += "mlog";
 
   ifstream fin;
   ofstream fout;
@@ -826,10 +820,12 @@ int PMsrHandler::WriteMsrLogFile(TString ext)
             str += ", chisq/NDF = ";
             str += fStatistic.fMin / fStatistic.fNdf;
             fout << str.Data() << endl;
-            cout << endl << str.Data() << endl;
+            if (messages)
+              cout << endl << str.Data() << endl;
           } else {
            fout << "*** FIT DID NOT CONVERGE ***" << endl;
-           cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
+           if (messages)
+             cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
           }
         } else if (sstr.BeginsWith("maxLH")) {
           if (fStatistic.fValid) { // valid fit result
@@ -840,10 +836,12 @@ int PMsrHandler::WriteMsrLogFile(TString ext)
             str += ", maxLH/NDF = ";
             str += fStatistic.fMin / fStatistic.fNdf;
             fout << str.Data() << endl;
-            cout << endl << str.Data() << endl;
+            if (messages)
+              cout << endl << str.Data() << endl;
           } else {
            fout << "*** FIT DID NOT CONVERGE ***" << endl;
-           cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
+           if (messages)
+             cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
           }
         } else if (sstr.BeginsWith("*** FIT DID NOT CONVERGE ***")) {
           if (fStatistic.fValid) { // valid fit result
@@ -855,7 +853,8 @@ int PMsrHandler::WriteMsrLogFile(TString ext)
               str += ", chisq/NDF = ";
               str += fStatistic.fMin / fStatistic.fNdf;
               fout << str.Data() << endl;
-              cout << endl << str.Data() << endl;
+              if (messages)
+                cout << endl << str.Data() << endl;
             } else { // max. log. liklihood
               str  = "  maxLH = ";
               str += fStatistic.fMin;
@@ -864,11 +863,13 @@ int PMsrHandler::WriteMsrLogFile(TString ext)
               str += ", maxLH/NDF = ";
               str += fStatistic.fMin / fStatistic.fNdf;
               fout << str.Data() << endl;
-              cout << endl << str.Data() << endl;
+              if (messages)
+                cout << endl << str.Data() << endl;
             }
           } else {
            fout << "*** FIT DID NOT CONVERGE ***" << endl;
-           cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
+           if (messages)
+             cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
           }
         } else {
           fout << str.Data() << endl;
