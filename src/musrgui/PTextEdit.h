@@ -36,6 +36,7 @@
 #include <qmap.h>
 
 #include "musrgui.h"
+#include "PFileWatcher.h"
 
 class PSubTextEdit;
 class PAdmin;
@@ -109,11 +110,13 @@ private slots:
   void helpAbout();
 
   void fontChanged( const QFont &f );
-  void textChanged();
+  void textChanged(const bool forced = false);
 
   void replace();
   void replaceAndClose();
   void replaceAll();
+
+  void checkIfModified(QWidget*);
 
 private:
   PAdmin *fAdmin;
@@ -129,6 +132,8 @@ private:
 
   QTabWidget *fTabWidget;
   QMap<PSubTextEdit*, QString> fFilenames;
+
+  PFileWatcher *fFileWatcher;
 };
 
 

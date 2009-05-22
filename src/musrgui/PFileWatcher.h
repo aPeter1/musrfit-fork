@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  PSubTextEdit.h
+  PFileWatcher.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -29,44 +29,38 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PSUBTEXTEDIT_H_
-#define _PSUBTEXTEDIT_H_
+#ifndef _PFILEWATCHER_H_
+#define _PFILEWATCHER_H_
 
-#include <qtextedit.h>
-#include <qdatetime.h>
+#include <qobject.h>
+#include <qfileinfo.h>
 
-#include "PAdmin.h"
-
-class PSubTextEdit : public QTextEdit
+class PFileWatcher : public QObject
 {
-    Q_OBJECT
+  Q_OBJECT
 
   public:
-    PSubTextEdit(PAdmin *admin = 0, QWidget *parent = 0, const char *name = 0);
+    PFileWatcher(const QString &fileName, const QDateTime &lastModified);
+    virtual ~PFileWatcher();
 
-    void setLastModified(const QDateTime &lastModified) { fLastModified = lastModified; }
-    QDateTime getLastModified() const { return fLastModified; }
+    virtual bool isValid() { return fValid; }
+    virtual bool modified();
+    virtual void modified(int timeout);
 
-  protected:
-    virtual QPopupMenu *createPopupMenu( const QPoint &pos);
+  signals:
+    void changed();
 
   private slots:
-    void insertTitle();
-    void insertParameterBlock();
-    void insertTheoryFunction(int idx);
-    void insertTheoryBlock();
-    void insertFunctionBlock();
-    void insertAsymRunBlock();
-    void insertSingleHistRunBlock();
-    void insertNonMusrRunBlock();
-    void insertCommandBlock();
-    void insertFourierBlock();
-    void insertPlotBlock();
-    void insertStatisticBlock();
+    void checkIfModified();
+    void stopFileCheck();
 
   private:
-    PAdmin *fAdmin;
-    QDateTime fLastModified;
+    bool       fValid;
+    QString    fFileName;
+    QFileInfo *fFileInfo;
+    QDateTime  fLastModified;
+
+    QTimer    *fTimerCheck;
 };
 
-#endif // _PSUBTEXTEDIT_H_
+#endif // _PFILEWATCHER_H_

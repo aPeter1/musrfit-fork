@@ -14,6 +14,7 @@ CONFIG += qt \
     debug
 
 HEADERS = musrgui.h \
+    PFileWatcher.h \
     PTextEdit.h \
     PSubTextEdit.h \
     PAdmin.h \
@@ -32,7 +33,8 @@ HEADERS = musrgui.h \
     PMsr2DataDialog.h \
     PGetPlotDialog.h
 
-SOURCES = PTextEdit.cpp \
+SOURCES = PFileWatcher.cpp \
+    PTextEdit.cpp \
     PSubTextEdit.cpp \
     PAdmin.cpp \
     PFindDialog.cpp \

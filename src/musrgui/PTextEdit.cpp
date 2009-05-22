@@ -29,8 +29,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+/*
 #include <iostream>
 using namespace std;
+*/
 
 #include <qtextedit.h>
 #include <qaction.h>
@@ -57,6 +59,7 @@ using namespace std;
 #include <qpixmap.h>
 
 #include "PTextEdit.h"
+#include "PFileWatcher.h"
 #include "PSubTextEdit.h"
 #include "PAdmin.h"
 #include "PFindDialog.h"
@@ -109,6 +112,8 @@ PTextEdit::PTextEdit( QWidget *parent, const char *name )
   fMsr2DataParam = 0;
   fFindReplaceData = 0,
 
+  fFileWatcher = 0;
+
   fKeepMinuit2Output = false;
   fDump = 0; // 0 = no dump, 1 = ascii dump, 2 = root dump
 
@@ -134,6 +139,8 @@ PTextEdit::PTextEdit( QWidget *parent, const char *name )
   } else {
     fileNew();
   }
+
+  connect( fTabWidget, SIGNAL( currentChanged(QWidget*) ), this, SLOT( checkIfModified(QWidget*) ));
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -149,6 +156,10 @@ PTextEdit::~PTextEdit()
   if (fFindReplaceData) {
     delete fFindReplaceData;
     fFindReplaceData = 0;
+  }
+  if (fFileWatcher) {
+    delete fFileWatcher;
+    fFileWatcher = 0;
   }
 }
 
@@ -394,7 +405,10 @@ void PTextEdit::load( const QString &f, const int index )
   if ( !QFile::exists( f ) )
     return;
 
+  QFileInfo info(f);
+
   PSubTextEdit *edit = new PSubTextEdit( fAdmin );
+  edit->setLastModified(info.lastModified());
   edit->setTextFormat( PlainText );
   edit->setFamily("Courier");
   edit->setPointSize(11); // 11pt
@@ -523,6 +537,12 @@ void PTextEdit::fileReload()
     QString fln = *fFilenames.find( currentEditor() );
     fileClose(false);
     load(fln, index);
+  }
+
+  // clean up file watcher object if present
+  if (fFileWatcher) {
+    delete fFileWatcher;
+    fFileWatcher = 0;
   }
 }
 
@@ -1534,6 +1554,11 @@ void PTextEdit::musrT0()
   cmd += str + " &";
 
   system(cmd.latin1());
+
+  QString fln = *fFilenames.find( currentEditor() );
+  fFileWatcher = new PFileWatcher(fln, currentEditor()->getLastModified());
+  fFileWatcher->modified(3600);
+  connect(fFileWatcher, SIGNAL( changed() ), this, SLOT( fileReload() ));
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1675,7 +1700,7 @@ void PTextEdit::fontChanged( const QFont &f )
 /**
  * <p>
  */
-void PTextEdit::textChanged()
+void PTextEdit::textChanged(const bool forced)
 {
   if (!currentEditor())
     return;
@@ -1690,6 +1715,10 @@ void PTextEdit::textChanged()
 
   if ((fTabWidget->label(fTabWidget->currentPageIndex()).find("*") < 0) &&
       currentEditor()->isModified())
+    fTabWidget->setTabLabel(fTabWidget->currentPage(), tabLabel+"*");
+
+  if ((fTabWidget->label(fTabWidget->currentPageIndex()).find("*") < 0) &&
+      forced)
     fTabWidget->setTabLabel(fTabWidget->currentPage(), tabLabel+"*");
 }
 
@@ -1742,6 +1771,30 @@ void PTextEdit::replaceAll()
   emit close();
 
   currentEditor()->setCursorPosition(currentPara, currentIndex);
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PTextEdit::checkIfModified(QWidget*)
+{
+  if ( fTabWidget->currentPage() && fTabWidget->currentPage()->inherits( "PSubTextEdit" ) ) {
+    QString fln = *fFilenames.find( currentEditor() );
+    PFileWatcher fw(fln, currentEditor()->getLastModified());
+    if (fw.isValid()) {
+      if (fw.modified()) {
+        int result = QMessageBox::information( this, "**INFO**",
+                                               "File modified on disk. Do you want to reload it?",
+                                               QMessageBox::Yes,  QMessageBox::No);
+        if (result == QMessageBox::Yes) {
+          fileReload();
+        } else {
+          textChanged(true);
+        }
+      }
+    }
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

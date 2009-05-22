@@ -60,6 +60,7 @@ PSubTextEdit::PSubTextEdit(PAdmin *admin,
                            QTextEdit(parent, name),
                            fAdmin(admin)
 {
+//  fLastModified = QDateTime::fromString("1900-01-01 00:00:00");
 }
 
 //----------------------------------------------------------------------------------------------------
