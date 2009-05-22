@@ -996,11 +996,21 @@ void PTextEdit::editComment()
     // get selection text
     str = currentEditor()->selectedText();
     // check line by line if (un)comment is needed
-    QStringList strList = QStringList::split("\n", str);
+    QStringList strList = QStringList::split("\n", str, TRUE);
     for (QStringList::Iterator it = strList.begin(); it != strList.end(); ++it) {
-      if ((*it).stripWhiteSpace().startsWith("#")) { // comment -> uncomment it
-        (*it).remove(0,1);
-        (*it) = (*it).stripWhiteSpace();
+      str = *it;
+      if (str.stripWhiteSpace().startsWith("#")) { // comment -> uncomment it
+        int idx = -1;
+        for (unsigned int i=0; i<(*it).length(); i++) {
+          if ((*it)[i] == '#') {
+            idx = i;
+            break;
+          }
+        }
+        (*it).remove(idx,1);
+        if ((*it)[idx] == ' ') {
+          (*it).remove(idx,1);
+        }
       } else { // no comment -> comment it
         (*it).prepend("# ");
       }
@@ -1016,10 +1026,21 @@ void PTextEdit::editComment()
     str = currentEditor()->text(para);
     // check if it is a comment line or not
     if (str.stripWhiteSpace().startsWith("#")) { // comment -> uncomment it
-      str.remove(0,1);
-      str = str.stripWhiteSpace();
+      str = currentEditor()->text(para);
+      int idx = -1;
+      for (unsigned int i=0; i<str.length(); i++) {
+        if (str[i] == '#') {
+          idx = i;
+          break;
+        }
+      }
+      str.remove(idx,1);
+      if (str[idx] == ' ') {
+        str.remove(idx,1);
+      }
     } else { // no comment -> comment it
-      str.prepend("# ");
+      if (!str.isEmpty())
+        str.prepend("# ");
     }
     // select current line
     currentEditor()->setSelection(para, 0, para, currentEditor()->text(para).length());
