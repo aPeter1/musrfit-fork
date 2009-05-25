@@ -501,7 +501,7 @@ bool PRunSingleHisto::PrepareFitData(PRawRunData* runData, const unsigned int hi
   double normalizer = 1.0;
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.fDataTimeStart = fTimeResolution*((double)start-(double)t0);
+  fData.fDataTimeStart = fTimeResolution*((double)start-(double)t0+(double)(fRunInfo->fPacking-1)/2.0);
   fData.fDataTimeStep  = fTimeResolution*fRunInfo->fPacking;
   for (int i=start; i<end; i++) {
     if (fRunInfo->fPacking == 1) {
@@ -581,7 +581,7 @@ bool PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const unsigned in
   double value = 0.0;
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.fDataTimeStart = fTimeResolution*((double)start-(double)t0);
+  fData.fDataTimeStart = fTimeResolution*((double)start-(double)t0+(double)(fRunInfo->fPacking-1)/2.0);
   fData.fDataTimeStep  = fTimeResolution*fRunInfo->fPacking;
 
 /*
@@ -781,8 +781,8 @@ bool PRunSingleHisto::PrepareViewData(PRawRunData* runData, const unsigned int h
   double expval;
   double time;
 
-  // data start at data_start-t0
-  fData.fDataTimeStart = fTimeResolution*((double)start-(double)t0);
+  // data start at data_start-t0 shifted by (pack-1)/2
+  fData.fDataTimeStart = fTimeResolution*((double)start-(double)t0+(double)(fRunInfo->fPacking-1)/2.0);
   fData.fDataTimeStep  = fTimeResolution*fRunInfo->fPacking;
 
 /*
