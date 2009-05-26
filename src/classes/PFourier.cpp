@@ -226,7 +226,7 @@ TH1F* PFourier::GetRealFourier(const double scale)
   snprintf(name, sizeof(name), "%s_Fourier_Re", fData->GetName());
   snprintf(title, sizeof(title), "%s_Fourier_Re", fData->GetTitle());
 
-  TH1F *realFourier = new TH1F(name, title, fNoOfBins/2, -fResolution/2.0, fNoOfBins/2.0*fResolution+fResolution/2.0);
+  TH1F *realFourier = new TH1F(name, title, fNoOfBins/2, -fResolution/2.0, (double)fNoOfBins/2.0*fResolution+fResolution/2.0);
   if (realFourier == 0) {
     fValid = false;
     cout << endl << "**SEVERE ERROR** couldn't allocate memory for the real part of the Fourier transform." << endl;
@@ -262,7 +262,7 @@ TH1F* PFourier::GetImaginaryFourier(const double scale)
   snprintf(name, sizeof(name), "%s_Fourier_Im", fData->GetName());
   snprintf(title, sizeof(title), "%s_Fourier_Im", fData->GetTitle());
 
-  TH1F* imaginaryFourier = new TH1F(name, title, fNoOfBins/2, -fResolution/2.0, fNoOfBins/2.0*fResolution+fResolution/2.0);
+  TH1F* imaginaryFourier = new TH1F(name, title, fNoOfBins/2, -fResolution/2.0, (double)fNoOfBins/2.0*fResolution+fResolution/2.0);
   if (imaginaryFourier == 0) {
     fValid = false;
     cout << endl << "**SEVERE ERROR** couldn't allocate memory for the imaginary part of the Fourier transform." << endl;
@@ -298,7 +298,7 @@ TH1F* PFourier::GetPowerFourier(const double scale)
   snprintf(name, sizeof(name), "%s_Fourier_Pwr", fData->GetName());
   snprintf(title, sizeof(title), "%s_Fourier_Pwr", fData->GetTitle());
 
-  TH1F* pwrFourier = new TH1F(name, title, fNoOfBins/2, -fResolution/2.0, fNoOfBins/2.0*fResolution+fResolution/2.0);
+  TH1F* pwrFourier = new TH1F(name, title, fNoOfBins/2, -fResolution/2.0, (double)fNoOfBins/2.0*fResolution+fResolution/2.0);
   if (pwrFourier == 0) {
     fValid = false;
     cout << endl << "**SEVERE ERROR** couldn't allocate memory for the power part of the Fourier transform." << endl;
@@ -334,7 +334,7 @@ TH1F* PFourier::GetPhaseFourier(const double scale)
   snprintf(name, sizeof(name), "%s_Fourier_Phase", fData->GetName());
   snprintf(title, sizeof(title), "%s_Fourier_Phase", fData->GetTitle());
 
-  TH1F* phaseFourier = new TH1F(name, title, fNoOfBins/2, -fResolution/2.0, fNoOfBins/2.0*fResolution+fResolution/2.0);
+  TH1F* phaseFourier = new TH1F(name, title, fNoOfBins/2, -fResolution/2.0, (double)fNoOfBins/2.0*fResolution+fResolution/2.0);
   if (phaseFourier == 0) {
     fValid = false;
     cout << endl << "**SEVERE ERROR** couldn't allocate memory for the phase part of the Fourier transform." << endl;
@@ -390,8 +390,9 @@ void PFourier::PrepareFFTwInputData(unsigned int apodizationTag)
 
   // 2nd fill fIn
   unsigned int start = (unsigned int)(fStartTime/fTimeResolution) + t0bin;
+//cout << endl << "start = " << start << endl;
   for (unsigned int i=0; i<fNoOfData; i++) {
-    fIn[i][0] = fData->GetBinContent(i+start+1);
+    fIn[i][0] = fData->GetBinContent(i+start);
     fIn[i][1] = 0.0;
   }
   for (unsigned int i=fNoOfData; i<fNoOfBins; i++) {
