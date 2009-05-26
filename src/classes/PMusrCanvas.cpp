@@ -99,7 +99,7 @@ PMusrCanvas::PMusrCanvas(const int number, const char* title,
   CreateStyle();
   InitMusrCanvas(title, wtopx, wtopy, ww, wh);
 
-  fCurrentFourierPhase = fFourier.fPhaseIncrement;
+  fCurrentFourierPhase = 0.0;
   fCurrentFourierPhaseText = 0;
 }
 
@@ -124,7 +124,7 @@ PMusrCanvas::PMusrCanvas(const int number, const char* title,
   CreateStyle();
   InitMusrCanvas(title, wtopx, wtopy, ww, wh);
 
-  fCurrentFourierPhase = fFourier.fPhaseIncrement;
+  fCurrentFourierPhase = 0.0;
   fCurrentFourierPhaseText = 0;
 }
 
@@ -1379,10 +1379,10 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   name += "_";
   name += fPlotNumber;
   start = data->fDataTimeStart - data->fDataTimeStep/2.0;
-  end   = data->fDataTimeStart + data->fValue.size()*data->fDataTimeStep + data->fDataTimeStep/2.0;
+  end   = data->fDataTimeStart + data->fValue.size()*data->fDataTimeStep;
 
   // invoke histo
-  dataHisto = new TH1F(name, name, data->fValue.size()+1, start, end);
+  dataHisto = new TH1F(name, name, data->fValue.size(), start, end);
 
   // fill histogram
   for (unsigned int i=0; i<data->fValue.size(); i++) {
@@ -1417,12 +1417,12 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   name += "_";
   name += fPlotNumber;
   start = data->fTheoryTimeStart - data->fTheoryTimeStep/2.0;
-  end   = data->fTheoryTimeStart + data->fTheory.size()*data->fTheoryTimeStep + data->fTheoryTimeStep/2.0;
+  end   = data->fTheoryTimeStart + data->fTheory.size()*data->fTheoryTimeStep;
 
 //cout << endl << ">> start = " << start << ", end = " << end << endl;
 
   // invoke histo
-  theoHisto = new TH1F(name, name, data->fTheory.size()+1, start, end);
+  theoHisto = new TH1F(name, name, data->fTheory.size(), start, end);
 
   // fill histogram
   for (unsigned int i=0; i<data->fTheory.size(); i++) {
@@ -1728,7 +1728,7 @@ cout << endl;
     }
 
     // apply global phase if present
-//cout << endl << ">> fFourier.fPhase = " << fFourier.fPhase;
+//cout << endl << ">> fFourier.fPhase = " << fFourier.fPhase << endl;
     if (fFourier.fPhase != 0.0) {
 //cout << endl << ">> apply global phase fFourier.fPhase = " << fFourier.fPhase;
       double re, im;
@@ -1811,7 +1811,7 @@ void PMusrCanvas::HandleFourierDifference()
   if (fPlotType == MSR_PLOT_NON_MUSR)
     return;
 
-cout << endl << ">> in HandleFourierDifference ..." << endl;
+//cout << endl << ">> in HandleFourierDifference ..." << endl;
 
   // check if fourier needs to be calculated
   if (fData[0].diffFourierRe == 0) {
@@ -1835,7 +1835,7 @@ cout << endl << ">> in HandleFourierDifference ..." << endl;
       fourierData.Transform(fFourier.fApodization);
       double scale;
       scale = sqrt(fData[0].diff->GetBinWidth(1)/(endTime-startTime));
-cout << endl << ">> data scale = " << scale;
+//cout << endl << ">> data scale = " << scale;
       // get real part of the data
       fData[i].diffFourierRe = fourierData.GetRealFourier(scale);
 //cout << endl << ">> i: " << i << ", fData[i].diffFourierRe = " << fData[i].diffFourierRe;
@@ -2693,7 +2693,7 @@ void PMusrCanvas::PlotFourier()
  */
 void PMusrCanvas::PlotFourierDifference()
 {
-cout << endl << ">> in PlotFourierDifference() ..." << endl;
+//cout << endl << ">> in PlotFourierDifference() ..." << endl;
 
   fDataTheoryPad->cd();
 

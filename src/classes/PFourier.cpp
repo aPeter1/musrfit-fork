@@ -95,6 +95,8 @@ for (unsigned int i=0; i<10; i++) {
     fEndTime = keep;
   }
 
+//cout << endl << "start time = " << fStartTime << endl;
+
   // calculate start and end bin
   unsigned int start = (unsigned int)(fStartTime/fTimeResolution);
   unsigned int end = (unsigned int)(fEndTime/fTimeResolution);
@@ -202,7 +204,6 @@ void PFourier::Transform(unsigned int apodizationTag)
     fOut[i][0] = re;
     fOut[i][1] = im;
   }
-
 }
 
 //--------------------------------------------------------------------------
@@ -378,7 +379,7 @@ void PFourier::PrepareFFTwInputData(unsigned int apodizationTag)
   // 1st find t==0. fData start at times t<0!!
   int t0bin = -1;
 //cout << ">> PFourier::PrepareFFTwInputData: fData=" << fData << ", fData->GetNbinsX() = " << fData->GetNbinsX();
-    for (int i=0; i<fData->GetNbinsX(); i++) {
+    for (int i=1; i<fData->GetNbinsX(); i++) {
 //if (i<20) cout << endl << ">> PFourier::PrepareFFTwInputData: i=" << i << ", fData->GetBinCenter(i)=" << fData->GetBinCenter(i);
     if (fData->GetBinCenter(i) >= 0.0) {
       t0bin = i;

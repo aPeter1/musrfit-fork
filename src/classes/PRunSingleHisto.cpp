@@ -557,7 +557,7 @@ bool PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const unsigned in
   // start = the first bin which is a multiple of packing backward from first good data bin
   int start = fRunInfo->fDataRange[0] - (fRunInfo->fDataRange[0]/fRunInfo->fPacking)*fRunInfo->fPacking;
   // end = last bin starting from start which is a multipl of packing and still within the data 
-  int end   = start + ((runData->fDataBin[histoNo].size()-start-1)/fRunInfo->fPacking)*fRunInfo->fPacking;
+  int end   = start + ((runData->fDataBin[histoNo].size()-start)/fRunInfo->fPacking)*fRunInfo->fPacking;
   // check if start, end, and t0 make any sense
   // 1st check if start and end are in proper order
   if (end < start) { // need to swap them
@@ -712,8 +712,8 @@ bool PRunSingleHisto::PrepareViewData(PRawRunData* runData, const unsigned int h
 
   // start = the first bin which is a multiple of packing backward from first good data bin
   int start = fRunInfo->fDataRange[0] - (fRunInfo->fDataRange[0]/fRunInfo->fPacking)*fRunInfo->fPacking;
-  // end = last bin starting from start which is a multipl of packing and still within the data
-  int end   = start + ((runData->fDataBin[histoNo].size()-start-1)/fRunInfo->fPacking)*fRunInfo->fPacking;
+  // end = last bin starting from start which is a multiple of packing and still within the data
+  int end   = start + ((runData->fDataBin[histoNo].size()-start)/fRunInfo->fPacking)*fRunInfo->fPacking;
 
   // check if start, end, and t0 make any sense
   // 1st check if start and end are in proper order
