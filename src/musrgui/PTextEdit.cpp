@@ -29,10 +29,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-/*
 #include <iostream>
 using namespace std;
-*/
 
 #include <qtextedit.h>
 #include <qaction.h>
@@ -601,33 +599,35 @@ void PTextEdit::filePrint()
   if ( printer.setup( this ) ) {
     QPainter p( &printer );
     // Check that there is a valid device to print to.
-    if ( !p.device() ) return;
-    QPaintDeviceMetrics metrics( p.device() );
-    int dpiy = metrics.logicalDpiY();
-    int margin = (int) ( (2/2.54)*dpiy ); // 2 cm margins
-    QRect view( margin, margin, metrics.width() - 2*margin, metrics.height() - 2*margin );
+    if ( !p.device() )
+      return;
+
     QFont font( currentEditor()->QWidget::font() );
     font.setPointSize( 10 ); // we define 10pt to be a nice base size for printing
+    p.setFont( font );
 
-    QSimpleRichText richText( currentEditor()->text(), font,
-                              currentEditor()->context(),
-                              currentEditor()->styleSheet(),
-                              currentEditor()->mimeSourceFactory(),
-                              view.height() );
-    richText.setWidth( &p, view.width() );
-    int page = 1;
-    do {
-      richText.draw( &p, margin, margin, view, colorGroup() );
-      view.moveBy( 0, view.height() );
-      p.translate( 0 , -view.height() );
-      p.setFont( font );
-      p.drawText( view.right() - p.fontMetrics().width( QString::number( page ) ),
-                  view.bottom() + p.fontMetrics().ascent() + 5, QString::number( page ) );
-      if ( view.top() - margin >= richText.height() )
-        break;
-      printer.newPage();
-      page++;
-    } while (TRUE);
+    int yPos        = 0;                    // y-position for each line
+    QFontMetrics fm = p.fontMetrics();
+    QPaintDeviceMetrics metrics( &printer ); // need width/height
+    int dpiy = metrics.logicalDpiY();
+    int margin = (int) ( (2/2.54)*dpiy ); // 2 cm margins
+
+    // print msr-file
+    QStringList strList = QStringList::split("\n", currentEditor()->text());
+    for (QStringList::Iterator it = strList.begin(); it != strList.end(); ++it) {
+      // new page needed?
+      if ( margin + yPos > metrics.height() - margin ) {
+        printer.newPage();             // no more room on this page
+        yPos = 0;                       // back to top of page
+      }
+
+      // print data
+      p.drawText(margin, margin+yPos, metrics.width(), fm.lineSpacing(),
+                 ExpandTabs | DontClip, *it);
+      yPos += fm.lineSpacing();
+    }
+
+    p.end();
   }
 #endif
 }
