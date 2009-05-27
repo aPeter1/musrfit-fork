@@ -273,9 +273,11 @@ void musrfit_write_ascii(TString fln, PRunData *data, int runCounter)
   f << "% number of data values = " << data->fValue.size() << endl;
   f << "% time (us), value, error, theory" << endl;
   double time;
+  unsigned int idx;
   for (unsigned int i=0; i<data->fValue.size(); i++) {
     time = data->fDataTimeStart + (double)i*data->fDataTimeStep;
-    f << time << ", " << data->fValue[i] << ", " << data->fError[i] << ", " << data->fTheory[i] << endl;
+    idx = static_cast<unsigned int>((time - data->fTheoryTimeStart)/data->fTheoryTimeStep);
+    f << time << ", " << data->fValue[i] << ", " << data->fError[i] << ", " << data->fTheory[idx] << endl;
   }
 
   // close file
@@ -380,10 +382,14 @@ void musrfit_write_root(TFile &f, TString fln, PRunData *data, int runCounter)
   TH1F *htheo = new TH1F("htheo", "run theory", data->fValue.size(), start, end);
 
   // fill data
+  double time;
+  unsigned int idx;
   for (unsigned int i=0; i<data->fValue.size(); i++) {
     hdata->SetBinContent(i, data->fValue[i]);
     hdata->SetBinError(i, data->fError[i]);
-    htheo->SetBinContent(i, data->fTheory[i]);
+    time = data->fDataTimeStart + (double)i*data->fDataTimeStep;
+    idx = static_cast<unsigned int>((time - data->fTheoryTimeStart)/data->fTheoryTimeStep);
+    htheo->SetBinContent(i, data->fTheory[idx]);
   }
 
   hdata->SetMarkerStyle(20);
