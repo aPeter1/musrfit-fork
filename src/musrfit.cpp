@@ -57,8 +57,7 @@ using namespace std;
  */
 void musrfit_syntax()
 {
-  cout << endl << "usage: musrfit [<msr-file> [-k, --keep-mn2-ouput] [-c, --chisq-only]";
-  cout << endl << "                           [--debug] [--dump <type>]] |";
+  cout << endl << "usage: musrfit [<msr-file> [-k, --keep-mn2-ouput] [-c, --chisq-only] [--dump <type>] |";
   cout << endl << "                           --version | --help";
   cout << endl << "       <msr-file>: msr input file";
   cout << endl << "       'musrfit <msr-file>' will execute musrfit";
@@ -71,174 +70,12 @@ void musrfit_syntax()
   cout << endl << "       -c, --chisq-only: instead of fitting the data, chisq is just calculated";
   cout << endl << "              once and the result is set to the stdout. This feature is useful";
   cout << endl << "              to adjust initial parameters.";
-  cout << endl << "       --debug is used to print additional infos";
   cout << endl << "       --dump <type> is writing a data file with the fit data and the theory";
   cout << endl << "              <type> can be 'ascii', 'root'" << endl;
   cout << endl << "       At the end of a fit, musrfit writes the fit results into an <mlog-file> and";
   cout << endl << "       swaps them, i.e. in the <msr-file> you will find the fit results and in the";
   cout << endl << "       <mlog-file> your initial guess values.";
   cout << endl << endl;
-}
-
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param msrHandler
- */
-void musrfit_debug_info(PMsrHandler* msrHandler)
-{
-  int i;
-
-  // print title
-  cout << endl << "----------";
-  cout << endl << "title = " << msrHandler->GetMsrTitle()->Data();
-
-  // print parameters
-  cout << endl << "----------";
-  cout << endl << "parameters";
-  PMsrParamList::iterator param_it;
-  for (param_it = msrHandler->GetMsrParamList()->begin(); param_it != msrHandler->GetMsrParamList()->end(); ++param_it) {
-    cout << endl << param_it->fNo << ": ";
-    cout << param_it->fName << ", ";
-    cout << param_it->fValue << ", ";
-    cout << param_it->fStep << ", ";
-    switch (param_it->fNoOfParams) {
-      case 5:
-        cout << param_it->fPosError;
-        break;
-      case 6:
-        cout << param_it->fLowerBoundary << ", ";
-        cout << param_it->fUpperBoundary;
-        break;
-      case 7:
-        cout << param_it->fPosError << ", ";
-        cout << param_it->fLowerBoundary << ", ";
-        cout << param_it->fUpperBoundary;
-        break;
-      default:
-        break;
-    }
-  }
-
-  // print theory
-  cout << endl << "----------";
-  PMsrLines::iterator theo_it;
-  theo_it = msrHandler->GetMsrTheory()->begin();
-  for (; theo_it != msrHandler->GetMsrTheory()->end(); ++theo_it)
-    cout << endl << theo_it->fLine.Data();
-
-  // print functions
-
-  // print run
-  cout << endl << "----------";
-  cout << endl << "runs";
-  PMsrRunList::iterator runs_it;
-  int runNo = 1;
-  for (runs_it = msrHandler->GetMsrRunList()->begin(); runs_it != msrHandler->GetMsrRunList()->end(); ++runs_it) {
-    cout << endl << "******";
-    cout << endl << "run no " << runNo++;
-    cout << endl << "run (name, beamline, institute, data-file-format): ";
-    cout << endl << "     " << runs_it->fRunName[0] << ", " << runs_it->fBeamline[0] << ", " << runs_it->fInstitute[0] << ", " << runs_it->fFileFormat[0];
-    if (runs_it->fRunName.size() > 1) {
-      for (unsigned int i=1; i<runs_it->fRunName.size(); i++) {
-        cout << endl << "runadd (name, beamline, institute, data-file-format): ";
-        cout << endl << "     " << runs_it->fRunName[i] << ", " << runs_it->fBeamline[i] << ", " << runs_it->fInstitute[i] << ", " << runs_it->fFileFormat[i];
-      }
-    }
-    cout << endl << "fittype    " << runs_it->fFitType;
-    cout << endl << "alpha      " << runs_it->fAlphaParamNo;
-    cout << endl << "beta       " << runs_it->fBetaParamNo;
-    cout << endl << "norm       " << runs_it->fNormParamNo;
-    cout << endl << "backgr.fit " << runs_it->fBkgFitParamNo;
-    cout << endl << "rphase     " << runs_it->fPhaseParamNo;
-    cout << endl << "lifetime   " << runs_it->fLifetimeParamNo;
-    if (runs_it->fLifetimeCorrection)
-      cout << endl << "lifetimecorrection true";
-    else
-      cout << endl << "lifetimecorrection false";
-    cout << endl << "map        ";
-    for (PIntVector::iterator it = runs_it->fMap.begin(); it != runs_it->fMap.end(); ++it)
-      cout << *it << ", ";
-    cout << endl << "forward    " << runs_it->fForwardHistoNo;
-    cout << endl << "backward   " << runs_it->fBackwardHistoNo;
-    cout << endl << "backgr.fix ";
-    for (int i=0; i<2; i++)
-      cout << runs_it->fBkgFix[i] << ", ";
-    cout << endl << "background ";
-    for (int i=0; i<4; i++)
-      cout << runs_it->fBkgRange[i] << ", ";
-    cout << endl << "data       ";
-    for (int i=0; i<4; i++)
-      cout << runs_it->fDataRange[i] << ", ";
-    cout << endl << "t0         ";
-    for (int i=0; i<2; i++)
-      cout << runs_it->fT0[i] << ", ";
-    cout << endl << "fit        ";
-    for (int i=0; i<2; i++)
-      cout << runs_it->fFitRange[i] << ", ";
-    cout << endl << "packing    " << runs_it->fPacking;
-    cout << endl << "rrffrequency " << runs_it->fRRFFreq;
-    cout << endl << "rrfpacking   " << runs_it->fRRFPacking;
-    cout << endl << "alpha2       " << runs_it->fAlpha2ParamNo;
-    cout << endl << "beta2        " << runs_it->fBeta2ParamNo;
-    cout << endl << "right        " << runs_it->fRightHistoNo;
-    cout << endl << "left         " << runs_it->fLeftHistoNo;
-  }
-
-  // print commands
-  cout << endl << "----------";
-  cout << endl << "commands";
-  PMsrLines::iterator commands_it;
-  commands_it = msrHandler->GetMsrCommands()->begin();
-  ++commands_it; // the first entry is just the COMMANDS block statment
-  for (; commands_it != msrHandler->GetMsrCommands()->end(); ++commands_it)
-    cout << endl << commands_it->fLine.Data();
-
-  // print plot
-  cout << endl << "----------";
-  PMsrPlotList::iterator plot_it;
-  i = 1;
-  for (plot_it = msrHandler->GetMsrPlotList()->begin(); plot_it != msrHandler->GetMsrPlotList()->end(); ++plot_it) {
-    cout << endl << i++ << ". plot " << plot_it->fPlotType;
-    cout << endl << "runs = ";
-    PComplexVector::iterator plot_run_it;
-    for (plot_run_it = plot_it->fRuns.begin(); plot_run_it != plot_it->fRuns.end(); ++plot_run_it) {
-      switch (plot_it->fPlotType) {
-        case MSR_PLOT_SINGLE_HISTO:
-        case MSR_PLOT_ASYM:
-        case MSR_PLOT_NON_MUSR:
-          cout << plot_run_it->Re() << ", ";
-          break;
-        case MSR_PLOT_ASYM_RRF:
-          cout << "(" << plot_run_it->Re() << "," << plot_run_it->Im() << "), ";
-          break;
-        default:
-          cout << endl << "??";
-          break;
-      }
-    }
-    if (plot_it->fTmin == -999.0) {
-      cout << endl << "range = autorange";
-    } else {
-      if (plot_it->fYmin == -999.0) { // only time range given
-        cout << endl << "range = [ " << plot_it->fTmin << ", " << plot_it->fTmax << "]";
-      } else {
-        cout << endl << "range = [ " << plot_it->fTmin << ", " << plot_it->fTmax << ", " << plot_it->fYmin << ", " << plot_it->fYmax << "]";
-      }
-    }
-  }
-
-  // print statistic
-  cout << endl << "----------";
-  cout << endl << "statistic";
-  PMsrLines::iterator statistic_it;
-  statistic_it = msrHandler->GetMsrStatistic()->fStatLines.begin();
-  ++statistic_it; // the first entry is just the STATISTIC block statment
-  for (; statistic_it != msrHandler->GetMsrStatistic()->fStatLines.end(); ++statistic_it)
-    cout << endl << statistic_it->fLine.Data();
-
-  cout << endl << "----------" << endl;
 }
 
 //--------------------------------------------------------------------------
@@ -273,11 +110,9 @@ void musrfit_write_ascii(TString fln, PRunData *data, int runCounter)
   f << "% number of data values = " << data->fValue.size() << endl;
   f << "% time (us), value, error, theory" << endl;
   double time;
-  unsigned int idx;
   for (unsigned int i=0; i<data->fValue.size(); i++) {
     time = data->fDataTimeStart + (double)i*data->fDataTimeStep;
-    idx = static_cast<unsigned int>((time - data->fTheoryTimeStart)/data->fTheoryTimeStep);
-    f << time << ", " << data->fValue[i] << ", " << data->fError[i] << ", " << data->fTheory[idx] << endl;
+    f << time << ", " << data->fValue[i] << ", " << data->fError[i] << ", " << data->fTheory[i] << endl;
   }
 
   // close file
@@ -377,19 +212,15 @@ void musrfit_write_root(TFile &f, TString fln, PRunData *data, int runCounter)
   // create histos
   Double_t diff = data->fDataTimeStep;
   Double_t start = -diff/2.0;
-  Double_t end = data->fDataTimeStep*(data->fValue.size()-1)+diff/2.0;
+  Double_t end = data->fDataTimeStep*data->fValue.size();
   TH1F *hdata = new TH1F("hdata", "run data", data->fValue.size(), start, end);
   TH1F *htheo = new TH1F("htheo", "run theory", data->fValue.size(), start, end);
 
   // fill data
-  double time;
-  unsigned int idx;
   for (unsigned int i=0; i<data->fValue.size(); i++) {
-    hdata->SetBinContent(i, data->fValue[i]);
-    hdata->SetBinError(i, data->fError[i]);
-    time = data->fDataTimeStart + (double)i*data->fDataTimeStep;
-    idx = static_cast<unsigned int>((time - data->fTheoryTimeStart)/data->fTheoryTimeStep);
-    htheo->SetBinContent(i, data->fTheory[idx]);
+    hdata->SetBinContent(i+1, data->fValue[i]);
+    hdata->SetBinError(i+1, data->fError[i]);
+    htheo->SetBinContent(i+1, data->fTheory[i]);
   }
 
   hdata->SetMarkerStyle(20);
@@ -492,7 +323,6 @@ int main(int argc, char *argv[])
 {
   bool show_syntax = false;
   int  status;
-  bool debug = false;
   bool keep_mn2_output = false;
   bool chisq_only = false;
   TString dump("");
@@ -529,8 +359,6 @@ int main(int argc, char *argv[])
       keep_mn2_output = true;
     } else if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--chisq-only")) {
       chisq_only = true;
-    } else if (!strcmp(argv[i], "--debug")) {
-      debug = true;
     } else if (!strcmp(argv[i], "--dump")) {
       if (i<argc-1) {
         dump = TString(argv[i+1]);
@@ -605,9 +433,6 @@ int main(int argc, char *argv[])
     }
     return status;
   }
-
-  if (debug)
-    musrfit_debug_info(msrHandler);
 
   // read all the necessary runs (raw data)
   PRunDataHandler *dataHandler;
