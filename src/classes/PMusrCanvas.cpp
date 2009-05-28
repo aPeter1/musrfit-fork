@@ -2191,6 +2191,11 @@ void PMusrCanvas::PlotData()
 {
   fDataTheoryPad->cd();
 
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogX)
+    fDataTheoryPad->SetLogx(1);
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogY)
+    fDataTheoryPad->SetLogy(1);
+
   if (!fBatchMode) {
     // uncheck fourier menu entries
     fPopupFourier->UnCheckEntries();
