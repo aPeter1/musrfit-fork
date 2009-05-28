@@ -111,6 +111,7 @@ private slots:
 
   void fontChanged( const QFont &f );
   void textChanged(const bool forced = false);
+  void currentCursorPosition(int para, int pos);
 
   void replace();
   void replaceAndClose();

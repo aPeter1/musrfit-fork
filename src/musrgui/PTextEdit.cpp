@@ -33,6 +33,7 @@
 using namespace std;
 
 #include <qtextedit.h>
+#include <qstatusbar.h>
 #include <qaction.h>
 #include <qmenubar.h>
 #include <qpopupmenu.h>
@@ -453,6 +454,8 @@ void PTextEdit::doConnections( PSubTextEdit *e )
            this, SLOT( fontChanged( const QFont & ) ) );
 
   connect( e, SIGNAL( textChanged() ), this, SLOT( textChanged() ));
+
+  connect( e, SIGNAL( cursorPositionChanged(int, int) ), this, SLOT( currentCursorPosition(int, int) ));
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1741,6 +1744,18 @@ void PTextEdit::textChanged(const bool forced)
   if ((fTabWidget->label(fTabWidget->currentPageIndex()).find("*") < 0) &&
       forced)
     fTabWidget->setTabLabel(fTabWidget->currentPage(), tabLabel+"*");
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PTextEdit::currentCursorPosition(int para, int pos)
+{
+  QString str;
+
+  str = QString("cursor pos: %1, %2").arg(para+1).arg(pos+1);
+  statusBar()->message(str);
 }
 
 //----------------------------------------------------------------------------------------------------
