@@ -42,11 +42,11 @@ void skewedGaussian()
   char fln[256];
 
   const Double_t w  = 1.0;   // weight of the skewed Gaussian
-  const Double_t B0 = 30.0; // skewed Gaussian B0 (G)
-  const Double_t sm = 2.0;   // skewed Gaussian sigma- (G)
-  const Double_t sp = 2.0;   // skewed Gaussian sigma+ (G)
+  const Double_t B0 = 1000.0; // skewed Gaussian B0 (G)
+  const Double_t sm = 5.0;   // skewed Gaussian sigma- (G)
+  const Double_t sp = 5.0;   // skewed Gaussian sigma+ (G)
 
-  const Double_t B0ext = 30.0; // external field Gaussian B0 (G)
+  const Double_t B0ext = 1000.0; // external field Gaussian B0 (G)
   const Double_t sext  = 10;   // external field Gaussian sigma (G)
 
   sprintf(fln, "skewedGauss-B%0.2lf-sm%0.2lf-sp%0.2lf-w%0.1lf-Bext%0.2lf-sext%0.2lf.dat",
@@ -54,7 +54,7 @@ void skewedGaussian()
 
   const Int_t noOfPoints = 8000;
 
-  const Double_t res = 0.1;
+  const Double_t res = 0.25;
 
   fp = fopen(fln, "w");
 

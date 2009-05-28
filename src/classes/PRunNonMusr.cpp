@@ -317,15 +317,15 @@ bool PRunNonMusr::PrepareViewData()
       if (fRunNo == plotBlock.fRuns[j].Re()-1) { // run found
         if (first) {
           first = false;
-          xMin = plotBlock.fTmin;
-          xMax = plotBlock.fTmax;
+          xMin = plotBlock.fTmin[0];
+          xMax = plotBlock.fTmax[0];
           xAbsMin = xMin;
           xAbsMax = xMax;
 // cout << endl << ">> first: xMin=" << xMin << ", xMax=" << xMax << endl;
         } else {
-          if (fabs(xMax-xMin) > fabs(plotBlock.fTmax-plotBlock.fTmin)) {
-            xMin = plotBlock.fTmin;
-            xMax = plotBlock.fTmax;
+          if (fabs(xMax-xMin) > fabs(plotBlock.fTmax[0]-plotBlock.fTmin[0])) {
+            xMin = plotBlock.fTmin[0];
+            xMax = plotBlock.fTmax[0];
           }
           if (xMin < xAbsMin)
             xAbsMin = xMin;

@@ -2202,15 +2202,17 @@ void PMusrCanvas::PlotData()
   if (fPlotType != MSR_PLOT_NON_MUSR) {
     if (fData.size() > 0) {
       fData[0].data->Draw("pe");
-      // set time range
-      Double_t xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin;
-      Double_t xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax;
-      fData[0].data->GetXaxis()->SetRangeUser(xmin, xmax);
-      // check if it is necessary to set the y-axis range
-      Double_t ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin;
-      Double_t ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax;
-      if ((ymin != -999.0) && (ymax != -999.0)) {
-        fData[0].data->GetYaxis()->SetRangeUser(ymin, ymax);
+      // set time range if present
+      if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 0) {
+        Double_t xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[0];
+        Double_t xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[0];
+        fData[0].data->GetXaxis()->SetRangeUser(xmin, xmax);
+        // check if it is necessary to set the y-axis range
+        if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin.size() > 0) {
+          Double_t ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin[0];
+          Double_t ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax[0];
+          fData[0].data->GetYaxis()->SetRangeUser(ymin, ymax);
+        }
       }
       // set x-axis label
       fData[0].data->GetXaxis()->SetTitle("time (#mus)");
@@ -2276,16 +2278,18 @@ void PMusrCanvas::PlotData()
       fMultiGraphData->Draw("a");
 
       // set x-range
-      Double_t xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin;
-      Double_t xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax;
-      fMultiGraphData->GetXaxis()->SetRangeUser(xmin, xmax);
-      // check if it is necessary to set the y-axis range
-      Double_t ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin;
-      Double_t ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax;
-      if ((ymin != -999.0) && (ymax != -999.0)) {
-        fMultiGraphData->GetYaxis()->SetRangeUser(ymin, ymax);
-      } else {
-        fMultiGraphData->GetYaxis()->UnZoom();
+      if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 0) {
+        Double_t xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[0];
+        Double_t xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[0];
+        fMultiGraphData->GetXaxis()->SetRangeUser(xmin, xmax);
+        // check if it is necessary to set the y-axis range
+        if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin.size() > 0) {
+          Double_t ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin[0];
+          Double_t ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax[0];
+          fMultiGraphData->GetYaxis()->SetRangeUser(ymin, ymax);
+        } else {
+          fMultiGraphData->GetYaxis()->UnZoom();
+        }
       }
 
       // set x-, y-axis label only if there is just one data set

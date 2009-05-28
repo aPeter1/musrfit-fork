@@ -338,7 +338,7 @@ PRunData* PRunListCollection::GetAsymmetry(unsigned int index, EDataSwitch tag)
   PRunData *data = 0;
 
   switch (tag) {
-    case kIndex:
+    case kIndex: // called from musrfit when dumping the data
       if ((index < 0) || (index > fRunAsymmetryList.size())) {
         cout << endl << "PRunListCollection::GetAsymmetry: index = " << index << " out of bounds";
         return 0;
@@ -347,7 +347,7 @@ PRunData* PRunListCollection::GetAsymmetry(unsigned int index, EDataSwitch tag)
       fRunAsymmetryList[index]->CalcTheory();
       data = fRunAsymmetryList[index]->GetData();
       break;
-    case kRunNo:
+    case kRunNo: // called from PMusrCanvas
       for (unsigned int i=0; i<fRunAsymmetryList.size(); i++) {
         if (fRunAsymmetryList[i]->GetRunNo() == index) {
           data = fRunAsymmetryList[i]->GetData();

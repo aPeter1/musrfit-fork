@@ -301,11 +301,15 @@ typedef struct {
  */
 typedef struct {
   int    fPlotType;     ///< plot type
+  bool   fUseFitRanges; ///< yes -> use the fit ranges to plot the data, no (default) -> use range information if present
+  bool   fLogX;         ///< yes -> x-axis in log-scale, no (default) -> x-axis in lin-scale
+  bool   fLogY;         ///< yes -> y-axis in log-scale, no (default) -> y-axis in lin-scale
+  int    fViewPacking;  ///< -1 -> use the run packing to generate the view, otherwise is fViewPacking for the binning of ALL runs.
   PComplexVector fRuns; ///< list of runs to be plotted
-  double fTmin;         ///< time minimum
-  double fTmax;         ///< time maximum
-  double fYmin;         ///< asymmetry/counts minimum
-  double fYmax;         ///< asymmetry/counts maximum
+  PDoubleVector  fTmin; ///< time minimum
+  PDoubleVector  fTmax; ///< time maximum
+  PDoubleVector  fYmin; ///< asymmetry/counts minimum
+  PDoubleVector  fYmax; ///< asymmetry/counts maximum
 } PMsrPlotStructure;
 
 //-------------------------------------------------------------

@@ -120,5 +120,5 @@ $(OBJS): %.o: %.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
 	
 install: all
-	cp -p $(EXEC) $(INSTALLPATH)
-	cp -p musrfit_startup.xml $(INSTALLPATH)
+	cp -fp $(EXEC) $(INSTALLPATH)
+	cp -fp musrfit_startup.xml $(INSTALLPATH)

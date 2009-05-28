@@ -796,9 +796,9 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
         } else if (sstr.BeginsWith("range")) {
           fout << "range    ";
           fout.precision(2);
-          fout << fPlots[plotNo].fTmin << "   " << fPlots[plotNo].fTmax;
-          if (fPlots[plotNo].fYmin != -999.0) {
-            fout << "   " << fPlots[plotNo].fYmin << "   " << fPlots[plotNo].fYmax;
+          fout << fPlots[plotNo].fTmin[0] << "   " << fPlots[plotNo].fTmax[0];
+          if (fPlots[plotNo].fYmin.size() > 0) {
+            fout << "   " << fPlots[plotNo].fYmin[0] << "   " << fPlots[plotNo].fYmax[0];
           }
           fout << endl;
         } else {
@@ -2234,10 +2234,10 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
 
     // initialize param structure
     param.fPlotType = -1;
-    param.fTmin = -999.0;
-    param.fTmax = -999.0;
-    param.fYmin = -999.0;
-    param.fYmax = -999.0;
+    param.fUseFitRanges = false; // i.e. if not overwritten use the range info of the plot block
+    param.fLogX = false; // i.e. if not overwritten use linear x-axis
+    param.fLogY = false; // i.e. if not overwritten use linear y-axis
+    param.fViewPacking = -1; // i.e. if not overwritten use the packing of the run blocks
 
     // find next plot if any is present
     iter2 = iter1;
@@ -2272,9 +2272,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           delete tokens;
           tokens = 0;
         }
-      }
-
-      if (iter1->fLine.Contains("runs")) { // handle plot runs
+      } else if (iter1->fLine.Contains("runs", TString::kIgnoreCase)) { // handle plot runs
         TComplex run;
         switch (param.fPlotType) {
           case -1:
@@ -2353,9 +2351,13 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
             error = true;
             break;
         }
-      }
+      } else if (iter1->fLine.Contains("range ", TString::kIgnoreCase)) { // handle plot range
+        // remove previous entries
+        param.fTmin.clear();
+        param.fTmax.clear();
+        param.fYmin.clear();
+        param.fYmax.clear();
 
-      if (iter1->fLine.Contains("range")) { // handle plot range
         tokens = iter1->fLine.Tokenize(" \t");
         if (!tokens) {
           cout << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
@@ -2370,7 +2372,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(1));
           str = ostr->GetString();
           if (str.IsFloat())
-            param.fTmin =  (double)str.Atof();
+            param.fTmin.push_back((double)str.Atof());
           else
             error = true;
 
@@ -2378,7 +2380,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(2));
           str = ostr->GetString();
           if (str.IsFloat())
-            param.fTmax =  (double)str.Atof();
+            param.fTmax.push_back((double)str.Atof());
           else
             error = true;
 
@@ -2388,7 +2390,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
             ostr = dynamic_cast<TObjString*>(tokens->At(3));
             str = ostr->GetString();
             if (str.IsFloat())
-              param.fYmin =  (double)str.Atof();
+              param.fYmin.push_back((double)str.Atof());
             else
               error = true;
 
@@ -2396,7 +2398,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
             ostr = dynamic_cast<TObjString*>(tokens->At(4));
             str = ostr->GetString();
             if (str.IsFloat())
-              param.fYmax =  (double)str.Atof();
+              param.fYmax.push_back((double)str.Atof());
             else
               error = true;
           }
@@ -2406,6 +2408,117 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           delete tokens;
           tokens = 0;
         }
+      } else if (iter1->fLine.Contains("sub_ranges", TString::kIgnoreCase)) {
+        // remove previous entries
+        param.fTmin.clear();
+        param.fTmax.clear();
+        param.fYmin.clear();
+        param.fYmax.clear();
+
+        tokens = iter1->fLine.Tokenize(" \t");
+        if (!tokens) {
+          cout << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
+          cout << endl << endl;
+          return false;
+        }
+        if ((tokens->GetEntries() != (int)(2*param.fRuns.size() + 1)) && (tokens->GetEntries() != (int)(2*param.fRuns.size() + 3))) {
+          error = true;
+        } else {
+          // get all the times
+          for (unsigned int i=0; i<param.fRuns.size(); i++) {
+
+            // handle t_min
+            ostr = dynamic_cast<TObjString*>(tokens->At(2*i+1));
+            str = ostr->GetString();
+            if (str.IsFloat())
+              param.fTmin.push_back((double)str.Atof());
+            else
+              error = true;
+
+            // handle t_max
+            ostr = dynamic_cast<TObjString*>(tokens->At(2*i+2));
+            str = ostr->GetString();
+            if (str.IsFloat())
+              param.fTmax.push_back((double)str.Atof());
+            else
+              error = true;
+          }
+
+          // get y-range if present
+          if (tokens->GetEntries() == (int)(2*param.fRuns.size() + 3)) {
+
+            // handle y_min
+            ostr = dynamic_cast<TObjString*>(tokens->At(2*param.fRuns.size()+1));
+            str = ostr->GetString();
+            if (str.IsFloat())
+              param.fYmin.push_back((double)str.Atof());
+            else
+              error = true;
+
+            // handle y_max
+            ostr = dynamic_cast<TObjString*>(tokens->At(2*param.fRuns.size()+2));
+            str = ostr->GetString();
+            if (str.IsFloat())
+              param.fYmax.push_back((double)str.Atof());
+            else
+              error = true;
+          }
+        }
+
+        // clean up
+        if (tokens) {
+          delete tokens;
+          tokens = 0;
+        }
+cout << endl << ">> PMsrHandler::HandlePlotEntry(): will eventually handle sub_ranges ..." << endl;
+cout << endl << ">> time ranges: ";
+for (unsigned int i=0; i<param.fTmin.size(); i++) {
+  cout << param.fTmin[i] << ", " << param.fTmax[i] << " / ";
+}
+if (param.fYmin.size() > 0) {
+  cout << endl << " >> y-range: " << param.fYmin[0] << ", " << param.fYmax[0];
+}
+cout << endl;
+      } else if (iter1->fLine.Contains("use_fit_ranges", TString::kIgnoreCase)) {
+        param.fUseFitRanges = true;
+cout << endl << ">> PMsrHandler::HandlePlotEntry(): will eventually use fit ranges for plotting ..." << endl;
+      } else if (iter1->fLine.Contains("logx", TString::kIgnoreCase)) {
+        param.fLogX = true;
+cout << endl << ">> PMsrHandler::HandlePlotEntry(): will eventually plot log x-axis ..." << endl;
+      } else if (iter1->fLine.Contains("logy", TString::kIgnoreCase)) {
+        param.fLogY = true;
+cout << endl << ">> PMsrHandler::HandlePlotEntry(): will eventually plot log y-axis ..." << endl;
+      } else if (iter1->fLine.Contains("view_packing", TString::kIgnoreCase)) {
+        tokens = iter1->fLine.Tokenize(" \t");
+        if (!tokens) {
+          cout << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
+          cout << endl << endl;
+          return false;
+        }
+        if (tokens->GetEntries() != 2) {
+          error = true;
+        } else {
+          ostr = dynamic_cast<TObjString*>(tokens->At(1));
+          str = ostr->GetString();
+          if (str.IsDigit()) {
+            int val = str.Atoi();
+            if (val > 0)
+              param.fViewPacking = val;
+            else
+              error = true;
+          } else {
+            error = true;
+          }
+        }
+cout << endl << ">> PMsrHandler::HandlePlotEntry(): will eventually handle view_packing = " << param.fViewPacking << endl;
+
+        // clean up
+        if (tokens) {
+          delete tokens;
+          tokens = 0;
+        }
+      } else {
+        error = true;
       }
 
       ++iter1;
@@ -2413,23 +2526,28 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
     }
 
     // analyze if the plot block is valid
+    double keep;
     if (!error) {
       if (param.fRuns.empty()) { // there was no run tag
         error = true;
       } else { // everything ok
-        if ((param.fTmin != -999.0) || (param.fTmax != -999.0)) { // if range is given, check that it is ordered properly
-          if (param.fTmin > param.fTmax) {
-            double keep = param.fTmin;
-            param.fTmin = param.fTmax;
-            param.fTmax = keep;
+        if ((param.fTmin.size() > 0) || (param.fTmax.size() > 0)) { // if range is given, check that it is ordered properly
+          for (unsigned int i=0; i<param.fTmin.size(); i++) {
+            if (param.fTmin[i] > param.fTmax[i]) {
+              keep = param.fTmin[i];
+              param.fTmin[i] = param.fTmax[i];
+              param.fTmax[i] = keep;
+            }
           }
         }
 
-        if ((param.fYmin != -999.0) || (param.fYmax != -999.0)) { // if range is given, check that it is ordered properly
-          if (param.fYmin > param.fYmax) {
-            double keep = param.fYmin;
-            param.fYmin = param.fYmax;
-            param.fYmax = keep;
+        if ((param.fYmin.size() > 0) || (param.fYmax.size() > 0)) { // if range is given, check that it is ordered properly
+          for (unsigned int i=0; i<param.fYmin.size(); i++) {
+            if (param.fYmin[i] > param.fYmax[i]) {
+              keep = param.fYmin[i];
+              param.fYmin[i] = param.fYmax[i];
+              param.fYmax[i] = keep;
+            }
           }
         }
 
@@ -2445,6 +2563,10 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
       cout << endl << "PLOT <plot_type>";
       cout << endl << "runs <run_list>";
       cout << endl << "[range tmin tmax [ymin ymax]]";
+      cout << endl << "[sub_ranges tmin1 tmax1 tmin2 tmax2 ... tminN tmaxN [ymin ymax]";
+      cout << endl << "[logx | logy]";
+      cout << endl << "[use_fit_ranges]";
+      cout << endl << "[view_packing n]";
       cout << endl;
       cout << endl << "where <plot_type> is: 0=single histo asym,";
       cout << endl << "                      2=forward-backward asym,"; 
@@ -2457,6 +2579,11 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
       cout << endl << "                         imaginary one is 1=real part or 2=imag part, e.g.";
       cout << endl << "                         runs 1,1 1,2";
       cout << endl << "range is optional";
+      cout << endl << "sub_ranges (if present) will plot the N given runs each on its own sub-range";
+      cout << endl << "logx, logy (if present) will present the x-, y-axis in log-scale";
+      cout << endl << "use_fit_ranges (if present) will plot each run on its fit-range";
+      cout << endl << "view_packing n (if present) will bin all data by n (> 0) rather than the binning of the fit";
+      cout << endl;
     }
 
     param.fRuns.clear();
