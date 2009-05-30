@@ -80,8 +80,8 @@ EOFHELP
 
 else
 
-  PATH=./:$PATH
-  LC_NUMERIC=en_US.UTF-8
+  export PATH=./:$PATH
+  export LC_NUMERIC=en_US.UTF-8
 
   SUMMDIR="/mnt/data/nemu/summ"
 
