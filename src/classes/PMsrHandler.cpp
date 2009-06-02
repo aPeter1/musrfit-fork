@@ -525,6 +525,7 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
           str.ToUpper();
           fout << str.Data() << "   (name beamline institute data-file-format)" << endl;
         } else if (sstr.BeginsWith("fittype")) {
+          addRunNo = 0;
           fout.width(16);
           switch (fRuns[runNo].fFitType) {
           case MSR_FITTYPE_SINGLE_HISTO:
@@ -2550,7 +2551,6 @@ cout << endl << ">> PMsrHandler::HandlePlotEntry(): will eventually handle view_
             }
           }
         }
-
         fPlots.push_back(param);
       }
     }
