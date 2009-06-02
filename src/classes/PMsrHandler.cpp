@@ -2471,24 +2471,12 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           delete tokens;
           tokens = 0;
         }
-cout << endl << ">> PMsrHandler::HandlePlotEntry(): will eventually handle sub_ranges ..." << endl;
-cout << endl << ">> time ranges: ";
-for (unsigned int i=0; i<param.fTmin.size(); i++) {
-  cout << param.fTmin[i] << ", " << param.fTmax[i] << " / ";
-}
-if (param.fYmin.size() > 0) {
-  cout << endl << " >> y-range: " << param.fYmin[0] << ", " << param.fYmax[0];
-}
-cout << endl;
       } else if (iter1->fLine.Contains("use_fit_ranges", TString::kIgnoreCase)) {
         param.fUseFitRanges = true;
-cout << endl << ">> PMsrHandler::HandlePlotEntry(): will eventually use fit ranges for plotting ..." << endl;
       } else if (iter1->fLine.Contains("logx", TString::kIgnoreCase)) {
         param.fLogX = true;
-cout << endl << ">> PMsrHandler::HandlePlotEntry(): will eventually plot log x-axis ..." << endl;
       } else if (iter1->fLine.Contains("logy", TString::kIgnoreCase)) {
         param.fLogY = true;
-cout << endl << ">> PMsrHandler::HandlePlotEntry(): will eventually plot log y-axis ..." << endl;
       } else if (iter1->fLine.Contains("view_packing", TString::kIgnoreCase)) {
         tokens = iter1->fLine.Tokenize(" \t");
         if (!tokens) {
@@ -2511,7 +2499,6 @@ cout << endl << ">> PMsrHandler::HandlePlotEntry(): will eventually plot log y-a
             error = true;
           }
         }
-cout << endl << ">> PMsrHandler::HandlePlotEntry(): will eventually handle view_packing = " << param.fViewPacking << endl;
 
         // clean up
         if (tokens) {

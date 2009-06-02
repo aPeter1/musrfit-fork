@@ -1357,11 +1357,13 @@ void PMusrCanvas::CleanupDataSet(PMusrCanvasNonMusrDataSet &dataSet)
 /**
  * <p>
  *
- * \param runNo
+ * \param plotNo is the number of the histo within the run list (fPlotNumber is the number of the plot BLOCK)
+ * \param runNo is the number of the run
  * \param data
  */
 void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunData *data)
 {
+//cout << endl << ">> PMusrCanvas::HandleDataSet(): start ...; plotNo = " << plotNo << ", fPlotNumber = " << fPlotNumber << ", runNo = " << runNo << endl;
   PMusrCanvasDataSet dataSet;
   TH1F *dataHisto;
   TH1F *theoHisto;
@@ -1369,8 +1371,10 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   TString name;
   double start;
   double end;
+  int    size;
 
   InitDataSet(dataSet);
+//cout << endl << ">> PMusrCanvas::HandleDataSet(): after InitDataSet ..." << endl;
 
   // dataHisto -------------------------------------------------------------
   // create histo specific infos
@@ -1380,14 +1384,50 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   name += fPlotNumber;
   start = data->fDataTimeStart - data->fDataTimeStep/2.0;
   end   = data->fDataTimeStart + data->fValue.size()*data->fDataTimeStep;
+  size  = data->fValue.size();
+
+//cout << endl << ">> PMusrCanvas::HandleDataSet(): after create histo info ..." << endl;
+
+  // check if 'use_fit_range' plotting is whished
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
+    start = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->fDataTimeStep/2.0;
+    end   = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[1] + data->fDataTimeStep/2.0;
+    size  = (int) ((end - start) / data->fDataTimeStep) + 1;
+  }
+
+  // check if 'sub_ranges' plotting is whished
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) {    
+    start = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->fDataTimeStep/2.0;
+    end   = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] + data->fDataTimeStep/2.0;
+    size  = (int) ((end - start) / data->fDataTimeStep) + 1;
+  }
+
+//cout << endl << ">> PMusrCanvas::HandleDataSet(): start = " << start << ", end = " << end << ", size = " << size << ", data->fDataTimeStep = " << data->fDataTimeStep << endl;
 
   // invoke histo
-  dataHisto = new TH1F(name, name, data->fValue.size(), start, end);
+  dataHisto = new TH1F(name, name, size, start, end);
 
   // fill histogram
-  for (unsigned int i=0; i<data->fValue.size(); i++) {
-    dataHisto->SetBinContent(i+1, data->fValue[i]);
-    dataHisto->SetBinError(i+1, data->fError[i]);
+  // 1st calculate the bin-range according to the plot options
+  UInt_t startBin = 0;
+  UInt_t endBin   = data->fValue.size();
+
+  // check if 'use_fit_range' plotting is whished
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
+    startBin = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->fDataTimeStart)/data->fDataTimeStep);
+    endBin   = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[1] - data->fDataTimeStart)/data->fDataTimeStep);
+  }
+//cout << endl << ">> PMusrCanvas::HandleDataSet(): data: startBin = " << startBin << ", endBin = " << endBin << endl;
+
+  // check if 'sub_ranges' plotting is whished
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) {
+    startBin = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->fDataTimeStart)/data->fDataTimeStep);
+    endBin   = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] - data->fDataTimeStart)/data->fDataTimeStep);
+  }
+
+  for (UInt_t i=startBin; i<endBin; i++) {
+    dataHisto->SetBinContent(i-startBin+1, data->fValue[i]);
+    dataHisto->SetBinError(i-startBin+1, data->fError[i]);
   }
 
   // set marker and line color
@@ -1418,16 +1458,49 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   name += fPlotNumber;
   start = data->fTheoryTimeStart - data->fTheoryTimeStep/2.0;
   end   = data->fTheoryTimeStart + data->fTheory.size()*data->fTheoryTimeStep;
+  size  = data->fTheory.size();
 
-//cout << endl << ">> start = " << start << ", end = " << end << endl;
+  // check if 'use_fit_range' plotting is whished
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
+    start = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->fTheoryTimeStep/2.0;
+    end   = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[1] + data->fTheoryTimeStep/2.0;
+    size  = (int) ((end - start) / data->fTheoryTimeStep) + 1;
+  }
+
+  // check if 'sub_ranges' plotting is whished
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) {
+    start = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->fTheoryTimeStep/2.0;
+    end   = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] + data->fTheoryTimeStep/2.0;
+    size  = (int) ((end - start) / data->fTheoryTimeStep) + 1;
+ }
+
+//cout << endl << ">> PMusrCanvas::HandleDataSet(): start = " << start << ", end = " << end << ", size = " << size << ", data->fTheoryTimeStep = " << data->fTheoryTimeStep << endl;
 
   // invoke histo
-  theoHisto = new TH1F(name, name, data->fTheory.size(), start, end);
+  theoHisto = new TH1F(name, name, size, start, end);
 
   // fill histogram
-  for (unsigned int i=0; i<data->fTheory.size(); i++) {
-    theoHisto->SetBinContent(i+1, data->fTheory[i]);
+  startBin = 0;
+  endBin   = data->fTheory.size();
+
+  // check if 'use_fit_range' plotting is whished
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
+    startBin = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->fDataTimeStart)/data->fTheoryTimeStep);
+    endBin   = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[1] - data->fDataTimeStart)/data->fTheoryTimeStep);
   }
+//cout << endl << ">> PMusrCanvas::HandleDataSet(): theory: startBin = " << startBin << ", endBin = " << endBin << endl;
+
+  // check if 'sub_ranges' plotting is whished
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) {
+    startBin = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] -data->fDataTimeStart)/data->fTheoryTimeStep);
+    endBin   = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] -data->fDataTimeStart)/data->fTheoryTimeStep);
+  }
+
+  for (UInt_t i=startBin; i<endBin; i++) {
+    theoHisto->SetBinContent(i-startBin+1, data->fTheory[i]);
+  }
+
+//cout << endl << ">> PMusrCanvas::HandleDataSet(): after fill theory histo" << endl;
 
   // set the line color
   if (plotNo < fColorList.size()) {
@@ -1443,6 +1516,9 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   dataSet.theory = theoHisto;
 
   fData.push_back(dataSet);
+
+//cout << endl << ">> PMusrCanvas::HandleDataSet(): after data push_back";
+//cout << endl << ">> --------------------------------------- <<" << endl;
 }
 
 //--------------------------------------------------------------------------
@@ -2206,21 +2282,59 @@ void PMusrCanvas::PlotData()
 
   if (fPlotType != MSR_PLOT_NON_MUSR) {
     if (fData.size() > 0) {
-      fData[0].data->Draw("pe");
-      // set time range if present
-      if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 0) {
-        Double_t xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[0];
-        Double_t xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[0];
-        fData[0].data->GetXaxis()->SetRangeUser(xmin, xmax);
+
+      if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) { // use fit ranges
+        fXmin = fData[0].data->GetXaxis()->GetXmin();
+        fXmax = fData[0].data->GetXaxis()->GetXmax();
+        fYmin = fData[0].data->GetMinimum();
+        fYmax = fData[0].data->GetMaximum();
+        for (unsigned int i=1; i<fData.size(); i++) {
+          if (fData[i].data->GetXaxis()->GetXmin() < fXmin)
+            fXmin = fData[i].data->GetXaxis()->GetXmin();
+          if (fData[i].data->GetXaxis()->GetXmax() > fXmax)
+            fXmax = fData[i].data->GetXaxis()->GetXmax();
+          if (fData[i].data->GetMinimum() < fYmin)
+            fYmin = fData[i].data->GetMinimum();
+          if (fData[i].data->GetMaximum() > fYmax)
+            fYmax = fData[i].data->GetMaximum();
+        }
+      } else if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) { // sub range plot
+        fXmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[0];
+        fXmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[0];
+        fYmin = fData[0].data->GetMinimum();
+        fYmax = fData[0].data->GetMaximum();
+        for (unsigned int i=1; i<fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size(); i++) {
+          if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[i] < fXmin)
+            fXmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[i];
+          if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[i] > fXmax)
+            fXmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[i];
+        }
         // check if it is necessary to set the y-axis range
         if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin.size() > 0) {
-          Double_t ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin[0];
-          Double_t ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax[0];
-          fData[0].data->GetYaxis()->SetRangeUser(ymin, ymax);
+          fYmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin[0];
+          fYmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax[0];
+        }
+      } else { // standard range plot
+        // set time range if present
+        fXmin = fData[0].data->GetXaxis()->GetXmin();
+        fXmax = fData[0].data->GetXaxis()->GetXmax();
+        fYmin = fData[0].data->GetMinimum();
+        fYmax = fData[0].data->GetMaximum();
+        if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 0) {
+          fXmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[0];
+          fXmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[0];
+          // check if it is necessary to set the y-axis range
+          if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin.size() > 0) {
+            fYmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin[0];
+            fYmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax[0];
+          }
         }
       }
+
+      TH1F *hframe = fDataTheoryPad->DrawFrame(fXmin, fYmin, fXmax, fYmax);
+
       // set x-axis label
-      fData[0].data->GetXaxis()->SetTitle("time (#mus)");
+      hframe->GetXaxis()->SetTitle("time (#mus)");
       // set y-axis label
       TString yAxisTitle;
       PMsrRunList *runList = fMsrHandler->GetMsrRunList();
@@ -2240,9 +2354,9 @@ void PMusrCanvas::PlotData()
           yAxisTitle = "??";
           break;
       }
-      fData[0].data->GetYaxis()->SetTitle(yAxisTitle.Data());
-      // plot all remaining data
-      for (unsigned int i=1; i<fData.size(); i++) {
+      hframe->GetYaxis()->SetTitle(yAxisTitle.Data());
+      // plot all data
+      for (unsigned int i=0; i<fData.size(); i++) {
         fData[i].data->Draw("pesame");
       }
       // plot all the theory
@@ -2351,13 +2465,13 @@ void PMusrCanvas::PlotDifference()
 
   if (fPlotType != MSR_PLOT_NON_MUSR) {
 //cout << endl << ">> PlotDifference(): going to plot diff spectra ... (" << fData[0].diff->GetNbinsX() << ")" << endl;
-    fData[0].diff->Draw("pe");
+    TH1F *hframe = fDataTheoryPad->DrawFrame(fXmin, fYmin, fXmax, fYmax);
     // set x-axis label
-    fData[0].diff->GetXaxis()->SetTitle("time (#mus)");
+    hframe->GetXaxis()->SetTitle("time (#mus)");
     // set y-axis label
-    fData[0].diff->GetYaxis()->SetTitle("data-theory");
+    hframe->GetYaxis()->SetTitle("data-theory");
     // plot all remaining diff data
-    for (unsigned int i=1; i<fData.size(); i++) {
+    for (unsigned int i=0; i<fData.size(); i++) {
       fData[i].diff->Draw("pesame");
     }
   } else { // fPlotType == MSR_PLOT_NON_MUSR
