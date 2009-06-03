@@ -471,7 +471,8 @@ bool PRunAsymmetry::PrepareData()
 // SubtractFixBkg
 //--------------------------------------------------------------------------
 /**
- * <p>Subtracts a fixed background from the raw data. The error propagation
+ * <p>Subtracts a fixed background from the raw data. The background is given
+ * in units of (1/ns). The error propagation
  * is done the following way: it is assumed that the error of the background
  * is Poisson like, i.e. \f$\Delta\mathrm{bkg} = \sqrt{\mathrm{bkg}}\f$.
  *
@@ -482,14 +483,14 @@ bool PRunAsymmetry::PrepareData()
  * and \f$ \mathrm{bkg} \f$ the fix given background.
  */
 bool PRunAsymmetry::SubtractFixBkg()
-{
+{  
   for (unsigned int i=0; i<fForward.size(); i++) {
-    fForwardErr.push_back(TMath::Sqrt(fForward[i]+fRunInfo->fBkgFix[0]));
-    fForward[i] -= fRunInfo->fBkgFix[0];
-    fBackwardErr.push_back(TMath::Sqrt(fBackward[i]+fRunInfo->fBkgFix[1]));
-    fBackward[i] -= fRunInfo->fBkgFix[1];
+    fForwardErr.push_back(TMath::Sqrt(fForward[i]+fRunInfo->fBkgFix[0] * fTimeResolution * 1.0e3));
+    fForward[i] -= fRunInfo->fBkgFix[0] * fTimeResolution * 1.0e3; // bkg per ns -> bkg per bin; 1.0e3: us -> ns
+    fBackwardErr.push_back(TMath::Sqrt(fBackward[i]+fRunInfo->fBkgFix[1] * fTimeResolution * 1.0e3));
+    fBackward[i] -= fRunInfo->fBkgFix[1] * fTimeResolution * 1.0e3; // bkg per ns -> bkg per bin; 1.0e3: us -> ns
   }
-
+  
   return true;
 }
 
@@ -575,12 +576,14 @@ bool PRunAsymmetry::SubtractEstimatedBkg()
     bkg[0] += fForward[i];
   errBkg[0] = TMath::Sqrt(bkg[0])/(end[0] - start[0] + 1);
   bkg[0] /= static_cast<double>(end[0] - start[0] + 1);
+//cout << endl << ">> bkg[0] = " << bkg[0];
 
   // backward
   for (unsigned int i=start[1]; i<end[1]; i++)
     bkg[1] += fBackward[i];
   errBkg[1] = TMath::Sqrt(bkg[1])/(end[0] - start[0] + 1);
   bkg[1] /= static_cast<double>(end[1] - start[1] + 1);
+//cout << endl << ">> bkg[1] = " << bkg[1] << endl;
 
   // correct error for forward, backward
   for (unsigned int i=0; i<fForward.size(); i++) {

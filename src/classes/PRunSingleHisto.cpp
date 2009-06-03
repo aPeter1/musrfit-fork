@@ -752,7 +752,6 @@ bool PRunSingleHisto::PrepareViewData(PRawRunData* runData, const unsigned int h
     // evaluate function
     N0 = fMsrInfo->EvalFunc(funNo,fRunInfo->fMap,par);
   }
-//cout << endl << ">> N0 = " << N0;
 
   // get tau
   double tau;
@@ -775,7 +774,6 @@ bool PRunSingleHisto::PrepareViewData(PRawRunData* runData, const unsigned int h
   } else { // bkg fitted
     bkg = par[fRunInfo->fBkgFitParamNo-1];
   }
-//cout << endl << ">> bkg = " << bkg;
 
   double value  = 0.0;
   double expval;
@@ -796,9 +794,9 @@ cout << endl << "--------------------------------" << endl;
     if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
       // in order that after rebinning the fit does not need to be redone (important for plots)
       // the value is normalize to per 1 nsec
-      normalizer = fRunInfo->fPacking * (fTimeResolution * 1e3); // fTimeResolution us->ns
+      normalizer = fRunInfo->fPacking * (fTimeResolution * 1.0e3); // fTimeResolution us->ns
       value /= normalizer;
-      time = ((double)(i-fRunInfo->fPacking)-t0)*fTimeResolution;
+      time = (((double)i-(double)(fRunInfo->fPacking-1)/2.0)-t0)*fTimeResolution;
       expval = TMath::Exp(+time/tau)/N0;
       fData.fValue.push_back(-1.0+expval*(value-bkg));
 //cout << endl << ">> i=" << i << ",t0=" << t0 << ",time=" << time << ",expval=" << expval << ",value=" << value << ",bkg=" << bkg << ",expval*(value-bkg)-1=" << expval*(value-bkg)-1.0;
