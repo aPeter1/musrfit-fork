@@ -205,6 +205,8 @@ class PMusrCanvas : public TObject, public TQObject
     TLegend   *fInfoPad;
     TLegend   *fMultiGraphLegend;
 
+    TH1F *fHistoFrame;
+
 #ifndef __MAKECINT__
     PMsrHandler        *fMsrHandler;
     PRunListCollection *fRunList;

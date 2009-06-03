@@ -72,6 +72,8 @@ PMusrCanvas::PMusrCanvas()
   fInfoPad             = 0;
   fMultiGraphLegend    = 0;
 
+  fHistoFrame     = 0;
+
   fMultiGraphData = 0;
   fMultiGraphDiff = 0;
 
@@ -94,6 +96,8 @@ PMusrCanvas::PMusrCanvas(const int number, const char* title,
 {
   fMultiGraphData = 0;
   fMultiGraphDiff = 0;
+
+  fHistoFrame     = 0;
 
   InitFourier();
   CreateStyle();
@@ -120,6 +124,8 @@ PMusrCanvas::PMusrCanvas(const int number, const char* title,
 {
   fMultiGraphData = 0;
   fMultiGraphDiff = 0;
+
+  fHistoFrame     = 0;
 
   CreateStyle();
   InitMusrCanvas(title, wtopx, wtopy, ww, wh);
@@ -1386,7 +1392,7 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   end   = data->fDataTimeStart + data->fValue.size()*data->fDataTimeStep;
   size  = data->fValue.size();
 
-//cout << endl << ">> PMusrCanvas::HandleDataSet(): after create histo info ..." << endl;
+cout << endl << ">> PMusrCanvas::HandleDataSet(): data->fDataTimeStart = " << data->fDataTimeStart << ", data->fDataTimeStep = " << data->fDataTimeStep << endl;
 
   // check if 'use_fit_range' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
@@ -1719,12 +1725,13 @@ void PMusrCanvas::HandleFourier()
 //cout << endl << ">> Recalculate Fourier ----------------------------------------";
 //cout << endl << ">> fData[0].data = " << fData[0].data;
     int bin;
-    bin = fData[0].data->GetXaxis()->GetFirst();
+    bin = fHistoFrame->GetXaxis()->GetFirst();
 //cout << endl << ">> start bin  = " << bin;
-    double startTime = fData[0].data->GetBinCenter(bin);
+    double startTime = fHistoFrame->GetBinCenter(bin);
 //cout << endl << ">> start time = " << startTime;
-    bin = fData[0].data->GetXaxis()->GetLast();
-    double endTime   = fData[0].data->GetBinCenter(bin);
+    bin = fHistoFrame->GetXaxis()->GetLast();
+//cout << endl << ">> end bin    = " << bin;
+    double endTime   = fHistoFrame->GetBinCenter(bin);
 //cout << endl << ">> Fourier: startTime = " << startTime << ", endTime = " << endTime;
     for (unsigned int i=0; i<fData.size(); i++) {
       // calculate fourier transform of the data
@@ -2283,21 +2290,27 @@ void PMusrCanvas::PlotData()
   if (fPlotType != MSR_PLOT_NON_MUSR) {
     if (fData.size() > 0) {
 
+      // data range min/max
+      Double_t dataXmin = fData[0].data->GetXaxis()->GetXmin();
+      Double_t dataXmax = fData[0].data->GetXaxis()->GetXmax();
+      Double_t dataYmin = fData[0].data->GetMinimum();
+      Double_t dataYmax = fData[0].data->GetMaximum();
+      for (unsigned int i=1; i<fData.size(); i++) {
+        if (fData[i].data->GetXaxis()->GetXmin() < dataXmin)
+          dataXmin = fData[i].data->GetXaxis()->GetXmin();
+        if (fData[i].data->GetXaxis()->GetXmax() > dataXmax)
+          dataXmax = fData[i].data->GetXaxis()->GetXmax();
+        if (fData[i].data->GetMinimum() < dataYmin)
+          dataYmin = fData[i].data->GetMinimum();
+        if (fData[i].data->GetMaximum() > dataYmax)
+          dataYmax = fData[i].data->GetMaximum();
+      }
+
       if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) { // use fit ranges
-        fXmin = fData[0].data->GetXaxis()->GetXmin();
-        fXmax = fData[0].data->GetXaxis()->GetXmax();
-        fYmin = fData[0].data->GetMinimum();
-        fYmax = fData[0].data->GetMaximum();
-        for (unsigned int i=1; i<fData.size(); i++) {
-          if (fData[i].data->GetXaxis()->GetXmin() < fXmin)
-            fXmin = fData[i].data->GetXaxis()->GetXmin();
-          if (fData[i].data->GetXaxis()->GetXmax() > fXmax)
-            fXmax = fData[i].data->GetXaxis()->GetXmax();
-          if (fData[i].data->GetMinimum() < fYmin)
-            fYmin = fData[i].data->GetMinimum();
-          if (fData[i].data->GetMaximum() > fYmax)
-            fYmax = fData[i].data->GetMaximum();
-        }
+        fXmin = dataXmin;
+        fXmax = dataXmax;
+        fYmin = dataYmin;
+        fYmax = dataYmax;
       } else if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) { // sub range plot
         fXmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[0];
         fXmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[0];
@@ -2331,10 +2344,13 @@ void PMusrCanvas::PlotData()
         }
       }
 
-      TH1F *hframe = fDataTheoryPad->DrawFrame(fXmin, fYmin, fXmax, fYmax);
+      // create histo frame in order to plot histograms possibly with different x-frames
+      fHistoFrame = fDataTheoryPad->DrawFrame(dataXmin, dataYmin, dataXmax, dataYmax);
+      fHistoFrame->GetXaxis()->SetRangeUser(fXmin, fXmax);
+      fHistoFrame->GetYaxis()->SetRangeUser(fYmin, fYmax);
 
       // set x-axis label
-      hframe->GetXaxis()->SetTitle("time (#mus)");
+      fHistoFrame->GetXaxis()->SetTitle("time (#mus)");
       // set y-axis label
       TString yAxisTitle;
       PMsrRunList *runList = fMsrHandler->GetMsrRunList();
@@ -2354,7 +2370,7 @@ void PMusrCanvas::PlotData()
           yAxisTitle = "??";
           break;
       }
-      hframe->GetYaxis()->SetTitle(yAxisTitle.Data());
+      fHistoFrame->GetYaxis()->SetTitle(yAxisTitle.Data());
       // plot all data
       for (unsigned int i=0; i<fData.size(); i++) {
         fData[i].data->Draw("pesame");
