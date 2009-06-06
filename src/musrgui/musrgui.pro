@@ -2,6 +2,9 @@ TEMPLATE = app
 TARGET = musrgui
 target.path = $$(HOME)/analysis/bin
 INSTALLS += target
+QMAKE_CC = gcc
+QMAKE_CXX = g++
+QMAKE_LFLAGS_SHAPP = -W1,--enable-auto-import
 
 # install path for the XML configuration file
 unix:xml.path = $$(HOME)/analysis/bin/
