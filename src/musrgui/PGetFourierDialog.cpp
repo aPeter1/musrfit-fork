@@ -34,6 +34,7 @@
 #include <qvalidator.h>
 #include <qlineedit.h>
 #include <qbutton.h>
+#include <qmessagebox.h>
 
 #include "PGetFourierDialog.h"
 
@@ -45,11 +46,49 @@ PGetFourierDialog::PGetFourierDialog()
 {
   fFourierBlock = "";
   fFourierPower_lineEdit->setValidator( new QIntValidator(fFourierPower_lineEdit) );
-  fPhase_lineEdit->setValidator( new QDoubleValidator(fPhase_lineEdit) );
   fPhaseCorrectionRangeLow_lineEdit->setValidator( new QDoubleValidator(fPhaseCorrectionRangeLow_lineEdit) );
   fPhaseCorrectionRangeUp_lineEdit->setValidator( new QDoubleValidator(fPhaseCorrectionRangeUp_lineEdit) );
   fRangeLow_lineEdit->setValidator( new QDoubleValidator(fRangeLow_lineEdit) );
   fRangeUp_lineEdit->setValidator( new QDoubleValidator(fRangeUp_lineEdit) );
+
+  connect( fPhase_lineEdit, SIGNAL( lostFocus() ), this, SLOT( checkPhaseParameter() ) );
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PGetFourierDialog::checkPhaseParameter()
+{
+  QString str = fPhase_lineEdit->text();
+
+  if (str.isEmpty())
+    return;
+
+  bool ok;
+  double dval = str.toDouble(&ok);
+  int ival;
+
+  if (!ok) { // i.e. the phase entry is not a number. Check for parXX
+    str.stripWhiteSpace();
+    if (str.startsWith("par")) { //
+      str.remove("par");
+      ival = str.toInt(&ok);
+      if (!ok) {
+        fPhase_lineEdit->clear();
+        QMessageBox::critical(this, "**ERROR**",
+                              "Allowed phase entries are either a parameter number,\n or an parXX entry, where XX is a parameter number",
+                              QMessageBox::Ok, QMessageBox::NoButton);
+        fPhase_lineEdit->setFocus();
+      }
+    } else { // neither a parXX nor a number
+      fPhase_lineEdit->clear();
+      QMessageBox::critical(this, "**ERROR**",
+                            "Allowed phase entries are either a parameter number,\n or an parXX entry, where XX is a parameter number",
+                            QMessageBox::Ok, QMessageBox::NoButton);
+        fPhase_lineEdit->setFocus();
+    }
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

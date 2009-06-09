@@ -44,6 +44,7 @@ class PGetFourierDialog : public PGetFourierDialogBase
     QString getFourierBlock() { return fFourierBlock; }
 
   private slots:
+    void checkPhaseParameter();
     void fillFourierBlock();
 
   private:

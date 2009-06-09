@@ -256,25 +256,6 @@
     </widget>
     <widget class="QLineEdit">
         <property name="name">
-            <cstring>fPhase_lineEdit</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>140</x>
-                <y>140</y>
-                <width>100</width>
-                <height>24</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>0.0</string>
-        </property>
-        <property name="toolTip" stdset="0">
-            <string>phased used to calculate Re/Im Parts, given in (°)</string>
-        </property>
-    </widget>
-    <widget class="QLineEdit">
-        <property name="name">
             <cstring>fPhaseCorrectionRangeLow_lineEdit</cstring>
         </property>
         <property name="geometry">
@@ -409,6 +390,25 @@
             </rect>
         </property>
     </spacer>
+    <widget class="QLineEdit">
+        <property name="name">
+            <cstring>fPhase_lineEdit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>140</x>
+                <y>140</y>
+                <width>100</width>
+                <height>24</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>0.0</string>
+        </property>
+        <property name="toolTip" stdset="0">
+            <string>phased used to calculate Re/Im Parts, given in (°)</string>
+        </property>
+    </widget>
 </widget>
 <images>
     <image name="image0">
@@ -450,6 +450,7 @@
 </tabstops>
 <slots>
     <slot>fillFourierBlock()</slot>
+    <slot access="private">checkPhaseParameter()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

@@ -403,6 +403,54 @@
     </widget>
     <widget class="QGroupBox">
         <property name="name">
+            <cstring>fDbOutputFileName_groupBox</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>325</y>
+                <width>580</width>
+                <height>65</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>Data output file name</string>
+        </property>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fDbOutputFileName_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>170</x>
+                    <y>25</y>
+                    <width>350</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>e.g. MyPrefectFitCollection.db</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>fDbOutputFileName_textLabel</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>30</y>
+                    <width>160</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Data Output File Name</string>
+            </property>
+        </widget>
+    </widget>
+    <widget class="QGroupBox">
+        <property name="name">
             <cstring>fOptions_groupBox</cstring>
         </property>
         <property name="geometry">
@@ -511,52 +559,20 @@
                 <string>will recreate the db-file. Default (unchecked) will append data</string>
             </property>
         </widget>
-    </widget>
-    <widget class="QGroupBox">
-        <property name="name">
-            <cstring>fDbOutputFileName_groupBox</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>10</x>
-                <y>325</y>
-                <width>580</width>
-                <height>65</height>
-            </rect>
-        </property>
-        <property name="title">
-            <string>Data output file name</string>
-        </property>
-        <widget class="QLineEdit">
+        <widget class="QCheckBox">
             <property name="name">
-                <cstring>fDbOutputFileName_lineEdit</cstring>
+                <cstring>fOpenAfterFitting_checkBox</cstring>
             </property>
             <property name="geometry">
                 <rect>
-                    <x>170</x>
-                    <y>25</y>
-                    <width>350</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>e.g. MyPrefectFitCollection.db</string>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>fDbOutputFileName_textLabel</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>30</y>
-                    <width>160</width>
-                    <height>20</height>
+                    <x>230</x>
+                    <y>70</y>
+                    <width>170</width>
+                    <height>22</height>
                 </rect>
             </property>
             <property name="text">
-                <string>Data Output File Name</string>
+                <string>Open Files after Fitting</string>
             </property>
         </widget>
     </widget>
