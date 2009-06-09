@@ -755,6 +755,12 @@ bool PRunAsymmetry::PrepareFitData(PRawRunData* runData, unsigned int histoNo[2]
  */
 bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2])
 {
+  // check if view_packing is wished
+  int packing = fRunInfo->fPacking;
+  if (fMsrInfo->GetMsrPlotList()->at(0).fViewPacking > 0) {
+    packing = fMsrInfo->GetMsrPlotList()->at(0).fViewPacking;
+  }
+
   // feed the parameter vector
   std::vector<double> par;
   PMsrParamList *paramList = fMsrInfo->GetMsrParamList();
@@ -764,10 +770,10 @@ bool PRunAsymmetry::PrepareViewData(PRawRunData* runData, unsigned int histoNo[2
   // transform raw histo data. This is done the following way (for details see the manual):
   // first rebin the data, than calculate the asymmetry
   // first get start data, end data, and t0
-  int val = fRunInfo->fDataRange[0]-fRunInfo->fPacking*(fRunInfo->fDataRange[0]/fRunInfo->fPacking);
+  int val = fRunInfo->fDataRange[0]-packing*(fRunInfo->fDataRange[0]/packing);
   do {
     if (fRunInfo->fDataRange[2] - fRunInfo->fDataRange[0] < 0)
-      val += fRunInfo->fPacking;
+      val += packing;
   } while (val + fRunInfo->fDataRange[2] - fRunInfo->fDataRange[0] < 0);
 
   int start[2] = {val, val + fRunInfo->fDataRange[2] - fRunInfo->fDataRange[0]};
@@ -781,12 +787,12 @@ cout << endl;
 */
 
   // make sure that there are equal number of rebinned bins in forward and backward
-  unsigned int noOfBins0 = (runData->fDataBin[histoNo[0]].size()-start[0])/fRunInfo->fPacking;
-  unsigned int noOfBins1 = (runData->fDataBin[histoNo[1]].size()-start[1])/fRunInfo->fPacking;
+  unsigned int noOfBins0 = (runData->fDataBin[histoNo[0]].size()-start[0])/packing;
+  unsigned int noOfBins1 = (runData->fDataBin[histoNo[1]].size()-start[1])/packing;
   if (noOfBins0 > noOfBins1)
     noOfBins0 = noOfBins1;
-  end[0] = start[0] + noOfBins0 * fRunInfo->fPacking;
-  end[1] = start[1] + noOfBins0 * fRunInfo->fPacking;
+  end[0] = start[0] + noOfBins0 * packing;
+  end[1] = start[1] + noOfBins0 * packing;
 
   // check if start, end, and t0 make any sense
   // 1st check if start and end are in proper order
@@ -820,19 +826,19 @@ cout << endl;
   double error = 0.0;
   // forward
   for (int i=start[0]; i<end[0]; i++) {
-    if (fRunInfo->fPacking == 1) {
+    if (packing == 1) {
       forwardPacked.fValue.push_back(fForward[i]);
       forwardPacked.fError.push_back(fForwardErr[i]);
-    } else { // packed data, i.e. fRunInfo->fPacking > 1
-      if (((i-start[0]) % fRunInfo->fPacking == 0) && (i != start[0])) { // fill data
+    } else { // packed data, i.e. packing > 1
+      if (((i-start[0]) % packing == 0) && (i != start[0])) { // fill data
         // in order that after rebinning the fit does not need to be redone (important for plots)
         // the value is normalize to per bin
-        value /= fRunInfo->fPacking;
+        value /= packing;
         forwardPacked.fValue.push_back(value);
         if (value == 0.0)
           forwardPacked.fError.push_back(1.0);
         else
-          forwardPacked.fError.push_back(TMath::Sqrt(error)/fRunInfo->fPacking);
+          forwardPacked.fError.push_back(TMath::Sqrt(error)/packing);
         value = 0.0;
         error = 0.0;
       }
@@ -842,19 +848,19 @@ cout << endl;
   }
   // backward
   for (int i=start[1]; i<end[1]; i++) {
-    if (fRunInfo->fPacking == 1) {
+    if (packing == 1) {
       backwardPacked.fValue.push_back(fBackward[i]);
       backwardPacked.fError.push_back(fBackwardErr[i]);
-    } else { // packed data, i.e. fRunInfo->fPacking > 1
-      if (((i-start[1]) % fRunInfo->fPacking == 0) && (i != start[1])) { // fill data
+    } else { // packed data, i.e. packing > 1
+      if (((i-start[1]) % packing == 0) && (i != start[1])) { // fill data
         // in order that after rebinning the fit does not need to be redone (important for plots)
         // the value is normalize to per bin
-        value /= fRunInfo->fPacking;
+        value /= packing;
         backwardPacked.fValue.push_back(value);
         if (value == 0.0)
           backwardPacked.fError.push_back(1.0);
         else
-          backwardPacked.fError.push_back(TMath::Sqrt(error)/fRunInfo->fPacking);
+          backwardPacked.fError.push_back(TMath::Sqrt(error)/packing);
         value = 0.0;
         error = 0.0;
       }
@@ -875,8 +881,8 @@ cout << endl;
   double f, b, ef, eb, alpha = 1.0, beta = 1.0;
   // fill data time start, and step
   // data start at data_start-t0
-  fData.fDataTimeStart = fTimeResolution*((double)start[0]-t0[0]+(double)(fRunInfo->fPacking-1)/2.0);
-  fData.fDataTimeStep  = fTimeResolution*(double)fRunInfo->fPacking;
+  fData.fDataTimeStart = fTimeResolution*((double)start[0]-t0[0]+(double)(packing-1)/2.0);
+  fData.fDataTimeStep  = fTimeResolution*(double)packing;
 
 /*
 cout << endl << ">> start time = " << fData.fDataTimeStart << ", step = " << fData.fDataTimeStep;

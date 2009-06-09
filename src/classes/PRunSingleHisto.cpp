@@ -553,11 +553,17 @@ bool PRunSingleHisto::PrepareFitData(PRawRunData* runData, const unsigned int hi
  */
 bool PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const unsigned int histoNo)
 {
+  // check if view_packing is wished
+  int packing = fRunInfo->fPacking;
+  if (fMsrInfo->GetMsrPlotList()->at(0).fViewPacking > 0) {
+    packing = fMsrInfo->GetMsrPlotList()->at(0).fViewPacking;
+  }
+
   // raw data, since PMusrCanvas is doing ranging etc.
   // start = the first bin which is a multiple of packing backward from first good data bin
-  int start = fRunInfo->fDataRange[0] - (fRunInfo->fDataRange[0]/fRunInfo->fPacking)*fRunInfo->fPacking;
+  int start = fRunInfo->fDataRange[0] - (fRunInfo->fDataRange[0]/packing)*packing;
   // end = last bin starting from start which is a multipl of packing and still within the data 
-  int end   = start + ((runData->fDataBin[histoNo].size()-start)/fRunInfo->fPacking)*fRunInfo->fPacking;
+  int end   = start + ((runData->fDataBin[histoNo].size()-start)/packing)*packing;
   // check if start, end, and t0 make any sense
   // 1st check if start and end are in proper order
   if (end < start) { // need to swap them
@@ -581,21 +587,21 @@ bool PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const unsigned in
   double value = 0.0;
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.fDataTimeStart = fTimeResolution*((double)start-(double)t0+(double)(fRunInfo->fPacking-1)/2.0);
-  fData.fDataTimeStep  = fTimeResolution*fRunInfo->fPacking;
+  fData.fDataTimeStart = fTimeResolution*((double)start-(double)t0+(double)(packing-1)/2.0);
+  fData.fDataTimeStep  = fTimeResolution*packing;
 
 /*
 cout << endl << ">> time resolution = " << fTimeResolution;
-cout << endl << ">> start = " << start << ", t0 = " << t0 << ", packing = " << fRunInfo->fPacking;
+cout << endl << ">> start = " << start << ", t0 = " << t0 << ", packing = " << packing;
 cout << endl << ">> data start time = " << fData.fDataTimeStart;
 */
 
   double normalizer = 1.0;
   for (int i=start; i<end; i++) {
-    if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
+    if (((i-start) % packing == 0) && (i != start)) { // fill data
       // in order that after rebinning the fit does not need to be redone (important for plots)
       // the value is normalize to per 1 nsec
-      normalizer = fRunInfo->fPacking * (fTimeResolution * 1e3); // fTimeResolution us->ns
+      normalizer = packing * (fTimeResolution * 1e3); // fTimeResolution us->ns
       value /= normalizer;
       fData.fValue.push_back(value);
       if (value == 0.0)
@@ -705,15 +711,21 @@ cout << endl << ">> data start time = " << fData.fDataTimeStart;
  */
 bool PRunSingleHisto::PrepareViewData(PRawRunData* runData, const unsigned int histoNo)
 {
+  // check if view_packing is wished
+  int packing = fRunInfo->fPacking;
+  if (fMsrInfo->GetMsrPlotList()->at(0).fViewPacking > 0) {
+    packing = fMsrInfo->GetMsrPlotList()->at(0).fViewPacking;
+  }
+
   // transform raw histo data. This is done the following way (for details see the manual):
   // for the single histo fit, just the rebinned raw data are copied
   // first get start data, end data, and t0
   int t0 = fT0s[0];
 
   // start = the first bin which is a multiple of packing backward from first good data bin
-  int start = fRunInfo->fDataRange[0] - (fRunInfo->fDataRange[0]/fRunInfo->fPacking)*fRunInfo->fPacking;
+  int start = fRunInfo->fDataRange[0] - (fRunInfo->fDataRange[0]/packing)*packing;
   // end = last bin starting from start which is a multiple of packing and still within the data
-  int end   = start + ((runData->fDataBin[histoNo].size()-start)/fRunInfo->fPacking)*fRunInfo->fPacking;
+  int end   = start + ((runData->fDataBin[histoNo].size()-start)/packing)*packing;
 
   // check if start, end, and t0 make any sense
   // 1st check if start and end are in proper order
@@ -780,8 +792,8 @@ bool PRunSingleHisto::PrepareViewData(PRawRunData* runData, const unsigned int h
   double time;
 
   // data start at data_start-t0 shifted by (pack-1)/2
-  fData.fDataTimeStart = fTimeResolution*((double)start-(double)t0+(double)(fRunInfo->fPacking-1)/2.0);
-  fData.fDataTimeStep  = fTimeResolution*fRunInfo->fPacking;
+  fData.fDataTimeStart = fTimeResolution*((double)start-(double)t0+(double)(packing-1)/2.0);
+  fData.fDataTimeStep  = fTimeResolution*packing;
 
 /*
 cout << endl << ">> start time = " << fData.fDataTimeStart << ", step = " << fData.fDataTimeStep;
@@ -791,17 +803,17 @@ cout << endl << "--------------------------------" << endl;
 
   double normalizer = 1.0;
   for (int i=start; i<end; i++) {
-    if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
+    if (((i-start) % packing == 0) && (i != start)) { // fill data
       // in order that after rebinning the fit does not need to be redone (important for plots)
       // the value is normalize to per 1 nsec
-      normalizer = fRunInfo->fPacking * (fTimeResolution * 1.0e3); // fTimeResolution us->ns
+      normalizer = packing * (fTimeResolution * 1.0e3); // fTimeResolution us->ns
       value /= normalizer;
-      time = (((double)i-(double)(fRunInfo->fPacking-1)/2.0)-t0)*fTimeResolution;
+      time = (((double)i-(double)(packing-1)/2.0)-t0)*fTimeResolution;
       expval = TMath::Exp(+time/tau)/N0;
       fData.fValue.push_back(-1.0+expval*(value-bkg));
 //cout << endl << ">> i=" << i << ",t0=" << t0 << ",time=" << time << ",expval=" << expval << ",value=" << value << ",bkg=" << bkg << ",expval*(value-bkg)-1=" << expval*(value-bkg)-1.0;
       fData.fError.push_back(expval*TMath::Sqrt(value/normalizer));
-//cout << endl << ">> " << time << ", " << expval << ", " << -1.0+expval*(value-bkg) << ", " << expval*TMath::Sqrt(value/fRunInfo->fPacking);
+//cout << endl << ">> " << time << ", " << expval << ", " << -1.0+expval*(value-bkg) << ", " << expval*TMath::Sqrt(value/packing);
       value = 0.0;
     }
     value += runData->fDataBin[histoNo][i];

@@ -1392,7 +1392,7 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   end   = data->fDataTimeStart + data->fValue.size()*data->fDataTimeStep;
   size  = data->fValue.size();
 
-cout << endl << ">> PMusrCanvas::HandleDataSet(): data->fDataTimeStart = " << data->fDataTimeStart << ", data->fDataTimeStep = " << data->fDataTimeStep << endl;
+//cout << endl << ">> PMusrCanvas::HandleDataSet(): data->fDataTimeStart = " << data->fDataTimeStart << ", data->fDataTimeStep = " << data->fDataTimeStep << endl;
 
   // check if 'use_fit_range' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
