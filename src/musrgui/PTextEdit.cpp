@@ -519,8 +519,28 @@ void PTextEdit::fileOpen()
                         tr( fAdmin->getDefaultSavePath() ), this);
 
   QStringList::Iterator it = flns.begin();
+  QFileInfo finfo1, finfo2;
+  QString tabFln;
+  bool alreadyOpen = false;
+
   while( it != flns.end() ) {
-    load(*it);
+    // check if the file is not already open
+    finfo1.setFile(*it);
+    for (int i=0; i<fTabWidget->count(); i++) {
+      tabFln = *fFilenames.find( (PSubTextEdit*)fTabWidget->page(i) );
+      finfo2.setFile(tabFln);
+      if (finfo1.absFilePath() == finfo2.absFilePath()) {
+        alreadyOpen = true;
+        fTabWidget->setCurrentPage(i);
+        break;
+      }
+    }
+
+    if (!alreadyOpen)
+      load(*it);
+    else
+      fileReload();
+
     ++it;
   }
 }

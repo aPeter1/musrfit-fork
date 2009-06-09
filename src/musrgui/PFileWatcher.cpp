@@ -73,8 +73,10 @@ bool PFileWatcher::modified()
 
   fFileInfo->refresh();
 
-  if (fFileInfo->lastModified() > fLastModified)
+  if (fFileInfo->lastModified() > fLastModified) {
+    fLastModified = fFileInfo->lastModified();
     result = true;
+  }
 
   return result;
 }
@@ -102,6 +104,7 @@ void PFileWatcher::checkIfModified()
   fFileInfo->refresh();
 
   if (fFileInfo->lastModified() > fLastModified) {
+    fLastModified = fFileInfo->lastModified();
     fTimerCheck->stop();
     emit changed();
   }
