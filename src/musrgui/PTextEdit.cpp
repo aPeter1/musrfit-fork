@@ -1811,7 +1811,7 @@ void PTextEdit::replaceAll()
 
   currentEditor()->setCursorPosition(0,0);
 
-  int para = 0, index = 0;
+  int para = 1, index = 1;
   while (currentEditor()->find(fFindReplaceData->findText,
                                fFindReplaceData->caseSensitive,
                                fFindReplaceData->wholeWordsOnly,
@@ -1822,6 +1822,8 @@ void PTextEdit::replaceAll()
 
     // replace the text
     currentEditor()->insert(fFindReplaceData->replaceText);
+
+    index++;
   }
 
   emit close();
