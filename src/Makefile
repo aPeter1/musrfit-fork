@@ -24,10 +24,13 @@ ARCH = $(shell $(ROOTSYS)/bin/root-config --arch)
 ifeq ($(ARCH),linux)
 OS = LINUX
 endif
+ifeq ($(ARCH),linuxx8664gcc)
+OS = LINUX
+endif
 ifeq ($(ARCH),win32gcc)
 OS = WIN32GCC
 endif
-ifeq ($(ARCH),darwin)
+ifeq ($(ARCH),macosx)
 OS = DARWIN
 endif
 
@@ -37,10 +40,10 @@ CXX           = g++
 CXXFLAGS      = -O3 -Wall -fPIC
 PMUSRPATH     = ./include
 MNPATH        = $(ROOTSYS)/include
-INCLUDES      = -I $(PMUSRPATH) -I $(MNPATH)
+INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH)
 LD            = g++
 LDFLAGS       = -O
-INSTALLPATH   = $(HOME)/analysis/bin
+INSTALLPATH   = $(ROOTSYS)/bin
 EXEC          = musrfit musrview musrparam musrt0 msr2msr
 SUFFIX        =
 endif
@@ -51,8 +54,8 @@ CXX           = g++
 CXXFLAGS      = -O3 -Wall
 PMUSRPATH     = ./include
 MNPATH        = $(ROOTSYS)/include
-BOOSTPATH     = /usr/include/boost
-INCLUDES      = -I $(PMUSRPATH) -I $(MNPATH) -I $(BOOSTPATH)
+BOOSTPATH     = /usr/include
+INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(BOOSTPATH)
 LD            = g++
 LDFLAGS       = -O -Wl,--enable-auto-import -Wl,--enable-runtime-pseudo-reloc
 INSTALLPATH   = $(ROOTSYS)/bin
@@ -60,14 +63,17 @@ EXEC          = musrfit.exe musrview.exe musrparam.exe musrt0.exe msr2msr.exe
 SUFFIX        = .exe
 endif
 
-# -- Darwin
+# -- MacOSX/Darwin
 ifeq ($(OS),DARWIN)
 CXX           = g++
-CXXFLAGS      = -g -Wall -fPIC
-INCLUDES      = -I../include
+CXXFLAGS      = -O3 -Wall -fPIC
+PMUSRPATH     = ./include
+MNPATH        = $(ROOTSYS)/include
+BOOSTPATH     = /sw/include
+INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(BOOSTPATH)
 LD            = g++
-LDFLAGS       = -g
-INSTALLPATH   = $(HOME)/analysis/bin
+LDFLAGS       = -O
+INSTALLPATH   = $(ROOTSYS)/bin
 EXEC          = musrfit musrview musrparam musrt0 msr2msr
 SUFFIX        =
 endif
@@ -97,31 +103,31 @@ all:  $(EXEC)
 
 musrfit$(SUFFIX): musrfit.o
 	@echo "---> Building $@ ..."
-	/bin/rm -f $(SHLIB)
+	/bin/rm -f $@
 	$(LD) $< -o $@ $(LDFLAGS) $(GLIBS) $(PSILIBS) $(MNLIB) $(MMLIB)
 	@echo "done"
 
 musrview$(SUFFIX): musrview.o
 	@echo "---> Building $@ ..."
-	/bin/rm -f $(SHLIB)
+	/bin/rm -f $@
 	$(LD) $< -o $@ $(LDFLAGS) $(GLIBS) $(PSILIBS) $(MNLIB) $(MMLIB)
 	@echo "done"
 
 musrt0$(SUFFIX): musrt0.o
 	@echo "---> Building $@ ..."
-	/bin/rm -f $(SHLIB)
+	/bin/rm -f $@
 	$(LD) $< -o $@ $(LDFLAGS) $(GLIBS) $(PSILIBS) $(MNLIB) $(MMLIB)
 	@echo "done"
 
 musrparam$(SUFFIX): musrparam.o
 	@echo "---> Building $@ ..."
-	/bin/rm -f $(SHLIB)
+	/bin/rm -f $@
 	$(LD) $< -o $@ $(LDFLAGS) $(GLIBS) $(PSILIBS) $(MNLIB) $(MMLIB)
 	@echo "done"
 
 msr2msr$(SUFFIX): msr2msr.o
 	@echo "---> Building $@ ..."
-	/bin/rm -f $(SHLIB)
+	/bin/rm -f $@
 	$(LD) $< -o $@ $(LDFLAGS) $(GLIBS) $(PSILIBS) $(MNLIB) $(MMLIB)
 	@echo "done"
 

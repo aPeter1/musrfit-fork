@@ -32,10 +32,13 @@ ARCH = $(shell $(ROOTSYS)/bin/root-config --arch)
 ifeq ($(ARCH),linux)
 OS = LINUX
 endif
+ifeq ($(ARCH),linuxx8664gcc)
+OS = LINUX
+endif
 ifeq ($(ARCH),win32gcc)
 OS = WIN32GCC
 endif
-ifeq ($(ARCH),darwin)
+ifeq ($(ARCH),macosx)
 OS = DARWIN
 endif
 
@@ -46,12 +49,15 @@ CXXFLAGS      = -O3 -Wall -Wno-trigraphs -fPIC
 PMUSRPATH     = ../include
 MNPATH        = $(ROOTSYS)/include
 GSLPATH       = /usr/include/gsl
-PSIBINPATH    = ../external/MuSR_software/Class_MuSR_PSI
+BOOSTPATH     = /usr/include
 FFTW3PATH     = /usr/local/include
-INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(GSLPATH) -I$(PSIBINPATH) -I$(FFTW3PATH)
+LEMPATH       = ../external/TLemRunHeader
+PSIBINPATH    = ../external/MuSR_software/Class_MuSR_PSI
+INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(GSLPATH) -I$(BOOSTPATH) -I$(LEMPATH) -I$(PSIBINPATH) -I$(FFTW3PATH)
 LD            = g++
 LDFLAGS       = -O
 SOFLAGS       = -shared
+LEMLIB        = libTLemRunHeader.so
 SHLIB         = libPMusr.so
 endif
 
@@ -62,25 +68,36 @@ CXXFLAGS      = -O3 -Wall -Wno-trigraphs -D_DLL
 PMUSRPATH     = ../include
 MNPATH        = $(ROOTSYS)/include
 GSLPATH       = /usr/include/gsl
-BOOSTPATH     = /usr/include/boost
-PSIBINPATH    = ../external/MuSR_software/Class_MuSR_PSI
+BOOSTPATH     = /usr/include
 FFTW3PATH     = /usr/include
-INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(GSLPATH) -I$(BOOSTPATH) -I$(PSIBINPATH) -I$(FFTW3PATH)
+LEMPATH       = ../external/TLemRunHeader
+PSIBINPATH    = ../external/MuSR_software/Class_MuSR_PSI
+INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(GSLPATH) -I$(BOOSTPATH) -I$(LEMPATH) -I$(PSIBINPATH) -I$(FFTW3PATH)
 LD            = g++
 LDFLAGS       = -O -Wl,--enable-auto-import -Wl,--enable-runtime-pseudo-reloc
 SOFLAGS       = -shared -Wl,--export-all-symbols
+LEMLIB        = libTLemRunHeader.dll
 SHLIB         = libPMusr.dll
 endif
 
-# -- Darwin
+# -- MacOSX/Darwin
 ifeq ($(OS),DARWIN)
 CXX           = g++
-CXXFLAGS      = -g -Wall -Wno-trigraphs -fPIC
-INCLUDES      = -I../include
+CXXFLAGS      = -O3 -Wall -Wno-trigraphs -fPIC
+PMUSRPATH     = ../include
+MNPATH        = $(ROOTSYS)/include
+FINKPATH      = /sw/include
+GSLPATH       = $(FINKPATH)/gsl
+BOOSTPATH     = $(FINKPATH)
+FFTW3PATH     = $(FINKPATH)
+LEMPATH       = ../external/TLemRunHeader
+PSIBINPATH    = ../external/MuSR_software/Class_MuSR_PSI
+INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(GSLPATH) -I$(BOOSTPATH) -I$(LEMPATH) -I$(PSIBINPATH) -I$(FFTW3PATH)
 LD            = g++
-LDFLAGS       = -g
-SOFLAGS       = -dynamic
-SHLIB         = libPMusr.so
+LDFLAGS       = -O -Xlinker -bind_at_load
+SOFLAGS       = -dynamiclib -flat_namespace -undefined suppress -Wl,-x
+LEMLIB        = libTLemRunHeader.dylib
+SHLIB         = libPMusr.dylib
 endif
 
 # the output from the root-config script:
@@ -91,8 +108,8 @@ LDFLAGS       +=
 LIBS          = $(ROOTLIBS) -lXMLParser
 GLIBS         = $(ROOTGLIBS) -lXMLParser
 
-# PSI libs
-PSILIBS       = -L$(ROOTSYS)/lib -lTLemRunHeader
+# LEM run header
+PSILIB        = -L. -lTLemRunHeader
 # Minuit2 lib
 MNLIB         = -L$(ROOTSYS)/lib -lMinuit2
 # GSL lib
@@ -109,6 +126,14 @@ GSLLIB        = -L/usr/lib -lgslcblas -lgsl
 FFTW3LIB      = -L/usr/lib -lfftw3
 endif
 
+ifeq ($(OS),DARWIN)
+# Minuit2 lib
+MNLIB         = -L$(ROOTSYS)/lib -lMinuit2 -lMathMore
+# GSL lib
+GSLLIB        = -L/sw/lib -lgslcblas -lgsl
+# FFTW lib
+FFTW3LIB      = -L/sw/lib -lfftw3
+endif
 
 # some definitions: headers (used to generate *Dict* stuff), sources, objects,...
 OBJS =
@@ -131,32 +156,57 @@ OBJS += PUserFcnBase.o PUserFcnBaseDict.o
 OBJS += PFourier.o
 OBJS += PMusrT0.o PMusrT0Dict.o
 
+LEMOBJS  =
+LEMOBJS += TLemStats.o TLemStatsDict.o
+LEMOBJS += TLemRunHeader.o TLemRunHeaderDict.o
+
 EXTOBJS  =
 EXTOBJS += MuSR_td_PSI_bin.o
 
-# make the shared lib:
-#
-all:  $(SHLIB)
+# make the shared libs:
+
+all:  lemlib musrlib
+
+lemlib:   $(LEMLIB)
+
+musrlib:  $(SHLIB)
+
+$(LEMLIB): $(LEMOBJS)
+	@echo "---> Building shared library $(LEMLIB) ..."
+	/bin/rm -f $(LEMLIB)
+	$(LD) $(SOFLAGS) $(LDFLAGS) $(LEMOBJS) -o $(LEMLIB)
+	@echo "done"
 
 $(SHLIB): $(OBJS) $(EXTOBJS)
 	@echo "---> Building shared library $(SHLIB) ..."
 	/bin/rm -f $(SHLIB)
-	$(LD) $(SOFLAGS) $(LDFLAGS) $(OBJS) $(EXTOBJS) -o $(SHLIB) $(FFTW3LIB) $(GLIBS) $(PSILIBS) $(MNLIB) $(GSLLIB)
+	$(LD) $(SOFLAGS) $(LDFLAGS) $(OBJS) $(EXTOBJS) -o $(SHLIB) $(FFTW3LIB) $(GLIBS) $(PSILIB) $(MNLIB) $(GSLLIB)
 	@echo "done"
 
 # clean up: remove all object file (and core files)
 # semicolon needed to tell make there is no source
 # for this target!
 #
-clean:; 	@rm -f $(OBJS) *Dict* core*
-	@echo "---> removing $(OBJS)"
+clean:; 	@rm -f $(OBJS) $(EXTOBJS) $(LEMOBJS) *Dict* core*
+	@echo "---> removing $(OBJS) $(EXTOBJS) $(LEMOBJS)"
 
 #
 $(OBJS): %.o: %.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
 
+$(LEMOBJS): ../external/TLemRunHeader/TLemRunHeader.cxx TLemRunHeaderDict.cxx ../external/TLemRunHeader/TLemStats.cxx TLemStatsDict.cxx
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $^	
+
 $(EXTOBJS): ../external/MuSR_software/Class_MuSR_PSI/MuSR_td_PSI_bin.cpp
-	$(CXX) $(INCLUDES) $(CXXFLAGS) -c ../external/MuSR_software/Class_MuSR_PSI/MuSR_td_PSI_bin.cpp
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $^
+
+TLemRunHeaderDict.cxx: ../external/TLemRunHeader/TLemRunHeader.h ../external/TLemRunHeader/TLemRunHeaderLinkDef.h
+	@echo "Generating dictionary $@..."
+	rootcint -f $@ -c -p $^
+
+TLemStatsDict.cxx: ../external/TLemRunHeader/TLemStats.h ../external/TLemRunHeader/TLemStatsLinkDef.h
+	@echo "Generating dictionary $@..."
+	rootcint -f $@ -c -p $^
 
 PStartupHandlerDict.cpp: ../include/PStartupHandler.h ../include/PStartupHandlerLinkDef.h
 	@echo "Generating dictionary $@..."
@@ -174,7 +224,25 @@ PUserFcnBaseDict.cpp: ../include/PUserFcnBase.h ../include/PUserFcnBaseLinkDef.h
 	@echo "Generating dictionary $@..."
 	rootcint -v -f $@ -c -p $^
 
-install: all
+install: leminstall musrinstall
+
+leminstall: lemlib
+	@echo "Installing shared lib: $(LEMLIB) ( you must be root ;-) )"
+ifeq ($(OS),LINUX)
+	cp -pv $(LEMLIB) $(ROOTSYS)/lib
+	cp -pv $(LEMPATH)/*.h $(ROOTSYS)/include
+endif
+ifeq ($(OS),WIN32GCC)
+	cp -pv $(LEMLIB) $(ROOTSYS)/bin
+	ln -sf $(ROOTSYS)/bin/$(LEMLIB) $(ROOTSYS)/lib/$(LEMLIB)
+	cp -pv $(LEMPATH)/*.h $(ROOTSYS)/include
+endif
+ifeq ($(OS),DARWIN)
+	cp -pv $(LEMLIB) $(ROOTSYS)/lib
+	cp -pv $(LEMPATH)/*.h $(ROOTSYS)/include
+endif
+
+musrinstall: musrlib
 	@echo "Installing shared lib: $(SHLIB) ( you must be root ;-) )"
 ifeq ($(OS),LINUX)
 	cp -pv $(SHLIB) $(ROOTSYS)/lib
@@ -183,6 +251,10 @@ endif
 ifeq ($(OS),WIN32GCC)
 	cp -pv $(SHLIB) $(ROOTSYS)/bin
 	ln -sf $(ROOTSYS)/bin/$(SHLIB) $(ROOTSYS)/lib/$(SHLIB)
+	cp -pv $(PMUSRPATH)/*.h $(ROOTSYS)/include
+endif
+ifeq ($(OS),DARWIN)
+	cp -pv $(SHLIB) $(ROOTSYS)/lib
 	cp -pv $(PMUSRPATH)/*.h $(ROOTSYS)/include
 endif
 
