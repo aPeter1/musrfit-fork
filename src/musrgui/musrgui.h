@@ -48,6 +48,7 @@ typedef struct {
   bool writeColumnData;
   bool recreateDbFile;
   bool chainFit;
+  bool openFilesAfterFitting;
 } PMsr2DataParam;
 
 typedef struct {

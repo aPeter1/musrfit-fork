@@ -87,6 +87,7 @@ PMsr2DataDialog::PMsr2DataDialog(PMsr2DataParam *msr2DataParam) : fMsr2DataParam
   fWriteColumnData_checkBox->setChecked(fMsr2DataParam->writeColumnData);
   fRecreateDbFile_checkBox->setChecked(fMsr2DataParam->recreateDbFile);
   fChainFit_checkBox->setChecked(fMsr2DataParam->chainFit);
+  fOpenAfterFitting_checkBox->setChecked(fMsr2DataParam->openFilesAfterFitting);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -120,6 +121,7 @@ PMsr2DataParam* PMsr2DataDialog::getMsr2DataParam()
   fMsr2DataParam->writeColumnData = fWriteColumnData_checkBox->isChecked();
   fMsr2DataParam->recreateDbFile = fRecreateDbFile_checkBox->isChecked();
   fMsr2DataParam->chainFit = fChainFit_checkBox->isChecked();
+  fMsr2DataParam->openFilesAfterFitting = fOpenAfterFitting_checkBox->isChecked();
 
   return fMsr2DataParam;
 }

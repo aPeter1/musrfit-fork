@@ -1373,6 +1373,7 @@ void PTextEdit::musrMsr2Data()
     fMsr2DataParam->writeColumnData = false;
     fMsr2DataParam->recreateDbFile = false;
     fMsr2DataParam->chainFit = true;
+    fMsr2DataParam->openFilesAfterFitting = false;
   }
 
   PMsr2DataDialog *dlg = new PMsr2DataDialog(fMsr2DataParam);
@@ -1535,6 +1536,74 @@ cout << endl;
     PFitOutputHandler fitOutputHandler(QFileInfo(fFilenames[currentEditor()]).dirPath(), cmd);
     fitOutputHandler.setModal(true);
     fitOutputHandler.exec();
+
+    // check if it is necessary to load msr-files
+    if (fMsr2DataParam->openFilesAfterFitting) {
+      QString fln;
+      QFile *file;
+      QTextStream *stream;
+
+      switch(dlg->getRunTag()) {
+        case 0: // first run / last run list
+          if (fMsr2DataParam->firstRun != -1) {
+            for (int i=fMsr2DataParam->firstRun; i<=fMsr2DataParam->lastRun; i++) {
+              if (fMsr2DataParam->msrFileExtension.isEmpty())
+                fln = QString("%1").arg(i) + ".msr";
+              else
+                fln = QString("%1").arg(i) + fMsr2DataParam->msrFileExtension + ".msr";
+
+              load(fln);
+            }
+          }
+          break;
+        case 1: // run list
+          end = 0;
+          while (!runList.section(' ', end, end).isEmpty()) {
+            end++;
+          }
+          for (int i=0; i<end; i++) {
+            fln = runList.section(' ', i, i);
+            if (fMsr2DataParam->msrFileExtension.isEmpty())
+              fln += ".msr";
+            else
+              fln += fMsr2DataParam->msrFileExtension + ".msr";
+
+            load(fln);
+          }
+          break;
+        case 2: // run list file
+          file = new QFile(fMsr2DataParam->runListFileName);
+          if (!file->open(IO_ReadOnly)) {
+            str = QString("Couldn't open run list file %1, sorry.").arg(fMsr2DataParam->runListFileName);
+            QMessageBox::critical(this, "**ERROR**", str.latin1(), QMessageBox::Ok, QMessageBox::NoButton);
+            return;
+          }
+
+          stream = new QTextStream(file);
+          while ( !stream->atEnd() ) {
+            str = stream->readLine(); // line of text excluding '\n'
+            str.stripWhiteSpace();
+            if (!str.isEmpty() && !str.startsWith("#")) {
+              fln = str.section(' ', 0, 0);
+              if (fMsr2DataParam->msrFileExtension.isEmpty())
+                fln += ".msr";
+              else
+                fln += fMsr2DataParam->msrFileExtension + ".msr";
+
+              load(fln);
+            }
+          }
+
+          file->close();
+
+          // clean up
+          delete stream;
+          delete file;
+          break;
+        default:
+          break;
+      }
+    }
   }
 }
 
