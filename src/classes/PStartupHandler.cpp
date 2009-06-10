@@ -54,6 +54,7 @@ PStartupHandler::PStartupHandler()
 
   // get default path (for the moment only linux like)
   char *pmusrpath;
+  char *home;
   char musrpath[128];
   char startup_path_name[128];
 
@@ -66,7 +67,8 @@ PStartupHandler::PStartupHandler()
     // check if the MUSRFITPATH system variable is set
     pmusrpath = getenv("MUSRFITPATH");
     if (pmusrpath == 0) { // not set, will try default one
-      strcpy(musrpath, "/home/nemu/analysis/bin");
+      home = getenv("HOME");
+      sprintf(musrpath, "%s/analysis/bin", home);
       cout << endl << "**WARNING** MUSRFITPATH environment variable not set will try " << musrpath << endl;
     } else {
       strncpy(musrpath, pmusrpath, sizeof(musrpath));
