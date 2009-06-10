@@ -5,9 +5,9 @@
     This is handling default setting parameters for the musrgui.
   </comment>
   <general>
-    <exec_path>/home/nemu/analysis/bin</exec_path>
+    <exec_path>$HOME/analysis/bin</exec_path>
     <default_save_path>./</default_save_path>
-    <msr_default_file_path>/home/nemu/analysis/musrfit/src/musrgui</msr_default_file_path>
+    <msr_default_file_path>$HOME/analysis/musrfit/src/musrgui</msr_default_file_path>
   </general>
   <msr_file_defaults>
     <beamline>mue4</beamline>
@@ -170,6 +170,6 @@
       <pixmap></pixmap>
       <params>0</params>
     </func> 
-  </theory_function>
+  </theory_functions>
 </musrgui_startup>
 

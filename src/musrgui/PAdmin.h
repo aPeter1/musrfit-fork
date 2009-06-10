@@ -69,6 +69,8 @@ class PAdminXMLParser : public QXmlDefaultHandler
     bool characters(const QString&);
     bool endDocument();
 
+    QString expandPath(const QString&);
+
     EAdminKeyWords fKeyWord;
     bool           fFunc;
     PTheory        fTheoryItem;

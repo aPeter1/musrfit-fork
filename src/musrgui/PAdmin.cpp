@@ -213,8 +213,60 @@ bool PAdminXMLParser::characters(const QString& str)
 bool PAdminXMLParser::endDocument()
 {
   // check if all necessary items are found
+  QString str;
+
+  if (fAdmin->getExecPath().find('$') >= 0) {
+    str = expandPath(fAdmin->getExecPath());
+    if (!str.isEmpty())
+      fAdmin->setExecPath(str);
+  }
+
+  if (fAdmin->getDefaultSavePath().find('$') >= 0) {
+    str = expandPath(fAdmin->getDefaultSavePath());
+    if (!str.isEmpty())
+      fAdmin->setDefaultSavePath(str);
+  }
+
+  if (fAdmin->getMsrDefaultFilePath().find('$') >= 0) {
+    expandPath(fAdmin->getMsrDefaultFilePath());
+    if (!str.isEmpty())
+      fAdmin->setMsrDefaultFilePath(str);
+  }
 
   return true;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>Called at the end of the XML parse process.
+ */
+QString PAdminXMLParser::expandPath(const QString &str)
+{
+  QString token;
+  QString path;
+  QString msg;
+  QString newStr="";
+
+  QStringList list = QStringList::split("/", str);
+
+  for ( QStringList::Iterator it = list.begin(); it != list.end(); ++it ) {
+    token = *it;
+    if (token.contains("$")) {
+      token.remove('$');
+      path = std::getenv(token.latin1());
+      if (path.isEmpty()) {
+        msg = QString("Couldn't expand '%1'. Some things might not work properly").arg(token);
+        QMessageBox::warning(0, "**WARNING**", msg, QMessageBox::Ok, QMessageBox::NoButton);
+        newStr = "";
+        break;
+      }
+      newStr += "/" + path;
+    } else {
+      newStr += "/" + token;
+    }
+  }
+
+  return newStr;
 }
 
 //--------------------------------------------------------------------------
