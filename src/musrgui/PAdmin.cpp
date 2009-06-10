@@ -240,8 +240,9 @@ PAdmin::PAdmin()
   QString fln = "./musrgui_startup.xml";
   if (!QFile::exists(fln)) {
     QString path = std::getenv("MUSRFITPATH");
+    QString home = std::getenv("HOME");
     if (path.isEmpty())
-      path = "/home/nemu/analysis/bin";
+      path = home + "/analysis/bin";
     fln = path + "/musrgui_startup.xml";
   }
   if (QFile::exists(fln)) { // administration file present
