@@ -372,12 +372,12 @@ void TPofBCalc::AddBackground(double B, double s, double w) {
     return;
 
   unsigned int sizePB(fPB.size());
-  double BsSq(s*s/gBar/gBar/4.0/pi/pi);
+  double BsSq(s*s/(gBar*gBar*4.0*pi*pi));
 
   // calculate Gaussian background
   vector<double> bg;
   for(unsigned int i(0); i < sizePB; i++) {
-    bg.push_back(exp(-(fB[i]-B)*(fB[i]-B)/2.0/BsSq));
+    bg.push_back(exp(-(fB[i]-B)*(fB[i]-B)/(2.0*BsSq)));
   }
 
   // normalize background

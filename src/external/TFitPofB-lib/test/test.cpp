@@ -67,7 +67,7 @@ int main(){
   }
   
   char debugfile1[50];
-  int nn = sprintf (debugfile1, "4Ltest-Bz_z-%.4f_l-%.3f_E-%.1f_normal.dat", par_vec[2], par_vec[11], par_vec[1]);
+  int nn = sprintf (debugfile1, "4Ltest-Bz_z-%.4f_l-%.3f_E-%.1f_normal.dat", par_vec[2], par_vec[9], par_vec[1]);
   if (nn > 0) {
     ofstream of01(debugfile1);
     for (unsigned int i(0); i<2000; i++) {
@@ -77,15 +77,16 @@ int main(){
   }
 
   TPofBCalc PofB(BofZ, calcData, parForPofB);
-
-  PofB.AddBackground(par_vec[2], 0.01, calcData.LayerFraction(E, 4, interfaces));
 //  PofB.ConvolveGss(1.17);
+
+  PofB.AddBackground(par_vec[2], 0.2, calcData.LayerFraction(E, 4, interfaces));
+  PofB.ConvolveGss(1.17);
 
   vector<double> hurgaB(PofB.DataB());
   vector<double> hurgaPB(PofB.DataPB());
   
   char debugfile[50];
-  int n = sprintf (debugfile, "4Ltest-BpB_B-%.4f_l-%.3f_E-%.1f_normal.dat", par_vec[2], par_vec[11], par_vec[1]);
+  int n = sprintf (debugfile, "4Ltest-BpB_B-%.4f_l-%.3f_E-%.1f_normal.dat", par_vec[2], par_vec[9], par_vec[1]);
 
   if (n > 0) {
     ofstream of7(debugfile);
@@ -101,7 +102,7 @@ int main(){
   poft.CalcPol(parForPofT);
   
   char debugfilex[50];
-  int nx = sprintf (debugfilex, "4Ltest-P_t-%.4f_l-%.3f_E-%.1f_normal.dat", par_vec[2], par_vec[11], par_vec[1]);
+  int nx = sprintf (debugfilex, "4Ltest-P_t-%.4f_l-%.3f_E-%.1f_normal.dat", par_vec[2], par_vec[9], par_vec[1]);
   
   if (nx > 0) { 
     ofstream of8(debugfilex);

@@ -434,7 +434,7 @@ double TTrimSPData::PeakRange(double e) const {
 
     if(nziter != fDataNZ[i].end()){
       unsigned int j(nziter - fDataNZ[i].begin());
-      return fDataZ[i][j];
+      return fDataZ[i][j]/10.0;
     }
     cout << "TTrimSPData::PeakRange: No maximum found in the implantation profile... Returning -1! Please check the profile!" << endl;
     return -1.;

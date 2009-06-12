@@ -124,6 +124,53 @@ private:
   double fCoeff[4];
 };
 
+
+//--------------------
+// Class "for proximity screening" in a thin superconducting film - one layer + superconducting half space
+//--------------------
+
+class TProximity1D_1LHS : public TBofZCalcInverse {
+
+public:
+
+  TProximity1D_1LHS(const vector<double>&, unsigned int steps = 3000);
+  double GetBofZ(double) const;
+  double GetBmin() const;
+  double GetBmax() const;
+  vector< pair<double, double> > GetInverseAndDerivative(double) const;
+
+private:
+  void SetBmin();
+
+  int fMinTag;
+  double fMinZ;
+  double fMinB;
+  double fInterfaces[2];
+};
+
+//--------------------
+// Class "for proximity screening" in a thin superconducting film - one layer + superconducting half space
+//--------------------
+
+class TProximity1D_1LHSGss : public TBofZCalcInverse {
+
+public:
+
+  TProximity1D_1LHSGss(const vector<double>&, unsigned int steps = 3000);
+  double GetBofZ(double) const;
+  double GetBmin() const;
+  double GetBmax() const;
+  vector< pair<double, double> > GetInverseAndDerivative(double) const;
+
+private:
+  void SetBmin();
+
+  int fMinTag;
+  double fMinZ;
+  double fMinB;
+  double fInterfaces[2];
+};
+
 //--------------------
 // Class "for Meissner screening" in a thin superconducting film - tri-layer with three different lambdas
 //--------------------

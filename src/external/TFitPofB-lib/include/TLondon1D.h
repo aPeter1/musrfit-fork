@@ -89,6 +89,55 @@ private:
   ClassDef(TLondon1D2L,1)
 };
 
+class TProximity1D1LHS : public PUserFcnBase {
+
+public:
+  // default constructor
+  TProximity1D1LHS();
+  ~TProximity1D1LHS();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  mutable vector<double> fPar;
+  TTrimSPData *fImpProfile;
+  TPofTCalc *fPofT;
+  mutable bool fCalcNeeded;
+  mutable bool fFirstCall;
+  mutable vector<double> fParForPofT;
+  mutable vector<double> fParForBofZ;
+  mutable vector<double> fParForPofB;
+  string fWisdom;
+  unsigned int fNSteps;
+
+  ClassDef(TProximity1D1LHS,1)
+};
+
+class TProximity1D1LHSGss : public PUserFcnBase {
+
+public:
+  // default constructor
+  TProximity1D1LHSGss();
+  ~TProximity1D1LHSGss();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  mutable vector<double> fPar;
+  TTrimSPData *fImpProfile;
+  TPofTCalc *fPofT;
+  mutable bool fCalcNeeded;
+  mutable bool fFirstCall;
+  mutable vector<double> fParForPofT;
+  mutable vector<double> fParForBofZ;
+  mutable vector<double> fParForPofB;
+  string fWisdom;
+  unsigned int fNSteps;
+
+  ClassDef(TProximity1D1LHSGss,1)
+};
+
+
 class TLondon1D3L : public PUserFcnBase {
 
 public:

@@ -193,7 +193,8 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
 
   cout << "TPofTCalc::FakeData: " << numHist << " histograms to be built" << endl;
 
-  vector<unsigned int> t0;
+  int nChannels = int(par[3]);
+  vector<int> t0;
   vector<double> asy0;
   vector<double> phase0;
   vector<double> N0;
@@ -213,44 +214,51 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
   param.push_back(par[1]); // dB
 
   vector< vector<double> > asy;
-  vector<double> asydata;
+  vector<double> asydata(nChannels);
   double ttime(0.0);
-  double pol(0.0);
+  int j,k;
 
   for(unsigned int i(0); i<numHist; i++) {
     param[0]=phase0[i];
     // calculate asymmetry
     CalcPol(param);
-    for(unsigned int j(0); j<par[3]; j++){
+
+#pragma omp parallel for default(shared) private(j,ttime,k) schedule(dynamic)
+    for(j=0; j<nChannels; j++){
       ttime=j*par[2];
-      for(unsigned int k(0); k<fT.size()-1; k++){
-        if (ttime < fT[k+1]) {
-          pol=fPT[k]+(fPT[k+1]-fPT[k])/(fT[k+1]-fT[k])*(ttime-fT[k]);
-          asydata.push_back(asy0[i]*pol);
-          break;
-        }
-      }
+      k = floor(ttime/fTBin);
+      asydata[j]=asy0[i]*(fPT[k]+(fPT[k+1]-fPT[k])/fTBin*(ttime-fT[k]));
     }
+// end omp
+
+//       for(unsigned int k(0); k<fT.size()-1; k++){
+//         if (ttime < fT[k+1]) {
+//           pol=fPT[k]+(fPT[k+1]-fPT[k])/(fT[k+1]-fT[k])*(ttime-fT[k]);
+//           asydata.push_back(asy0[i]*pol);
+//           break;
+//         }
+//       }
     asy.push_back(asydata);
-    asydata.clear();
+//    asydata.clear();
     cout << "TPofTCalc::FakeData: " << i+1 << "/" << numHist << " calculated!" << endl;
   }
 
   // calculate the histograms
   vector< vector<double> > histo;
-  vector<double> data;
-  double value;
+  vector<double> data(nChannels);
 
   for (unsigned int i(0); i<numHist; i++) {    // loop over all histos
-    for (unsigned int j(0); j<par[3]; j++) { // loop over time
+
+#pragma omp parallel for default(shared) private(j) schedule(dynamic)
+    for (j = 0; j<nChannels; j++) { // loop over time
       if (j < t0[i]) // j<t0
-        value = bg[i]; // background
+        data[j] = bg[i]; // background
       else
-        value = N0[i]*exp(-par[2]*double(j-t0[i])/tauMu)*(1.0+asy[i][j-t0[i]])+bg[i];
-      data.push_back(value);
+        data[j] = N0[i]*exp(-par[2]*double(j-t0[i])/tauMu)*(1.0+asy[i][j-t0[i]])+bg[i];
     }
+// end omp
+
     histo.push_back(data);
-    data.clear();
     cout << "TPofTCalc::FakeData: " << i+1 << "/" << numHist << " done ...";
   }
 
@@ -275,8 +283,11 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
     name  += i;
     fakeHisto = new TH1F(name.Data(), name.Data(), int(par[3]), -par[2]/2.0, (par[3]+0.5)*par[2]);
     // fill theoHisto
-    for (unsigned int j(0); j<par[3]; j++)
+#pragma omp parallel for default(shared) private(j) schedule(dynamic)
+    for (j = 0; j<nChannels; j++)
       theoHisto->SetBinContent(j, histo[i][j]);
+// end omp
+
     // fill fakeHisto
     fakeHisto->FillRandom(theoHisto, (int)theoHisto->Integral());
 
@@ -298,14 +309,16 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
   runHeader->SetRunTitle("Fake Data");
   float fval = par[2]*1000.; //us->ns
   runHeader->SetTimeResolution(fval);
-  runHeader->SetNChannels(int(par[3]));
+  runHeader->SetNChannels(nChannels);
   runHeader->SetNHist(histoData.size());
   double *t0array = new double[histoData.size()];
   for (unsigned int i(0); i<histoData.size(); i++)
     t0array[i] = t0[i];
   runHeader->SetTimeZero(t0array);
-  if (t0array)
+  if (t0array) {
     delete t0array;
+    t0array = 0;
+  }
   runInfoFolder->Add(runHeader);
 
   // create decay histo folder and content
@@ -348,6 +361,13 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
   }
   histoData.clear();
   histoDataPPC.clear();
+  fakeHisto = 0;
+
+  delete histoFolder; histoFolder = 0;
+  delete decayAnaModule; decayAnaModule = 0;
+
+  delete runInfoFolder; runInfoFolder = 0;
+  delete runHeader; runHeader = 0;
 
   t0.clear();
   asy0.clear();

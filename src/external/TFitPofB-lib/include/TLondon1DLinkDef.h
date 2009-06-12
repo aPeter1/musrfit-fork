@@ -19,6 +19,8 @@
 #pragma link C++ class TLondon1DHS+;
 #pragma link C++ class TLondon1D1L+;
 #pragma link C++ class TLondon1D2L+;
+#pragma link C++ class TProximity1D1LHS+;
+#pragma link C++ class TProximity1D1LHSGss+;
 #pragma link C++ class TLondon1D3L+;
 #pragma link C++ class TLondon1D3LS+;
 //#pragma link C++ class TLondon1D4L+;

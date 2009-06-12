@@ -404,6 +404,182 @@ vector< pair<double, double> > TLondon1D_2L::GetInverseAndDerivative(double BB) 
 }
 
 //------------------
+// Constructor of the TProximity1D_1LHS class
+// 1D-Proximity screening in a thin superconducting film, 1layer+bulk, linear + exponential decay
+// Parameters: Bext[G], B1[G], deadlayer[nm], thickness1[nm], lambda[nm]
+//------------------
+
+TProximity1D_1LHS::TProximity1D_1LHS(const vector<double> &param, unsigned int steps)
+{
+  fSteps = steps;
+  fDZ = 200./double(steps);
+  fMinTag = -1;
+  fMinZ = -1.0;
+  fMinB = -1.0;
+
+  // replaced the former assertions of positive lengths by fixed parameter limits
+
+  fParam.resize(param.size());
+  fParam[0] = param[0]; // Bext
+  (param[0] != param[1]) ? fParam[1] = param[1] : fParam[1] = param[1]-0.01; // B1
+  (param[2] >= 0.) ? fParam[2] = param[2] : fParam[2] = 0.; // deadlayer
+  (param[3] >= 0.) ? fParam[3] = param[3] : fParam[3] = 0.; // thickness1
+  (param[3] >= 1.) ? fParam[4] = param[4] : fParam[4] = 1.; // lambda
+
+  fInterfaces[0]=fParam[2];
+  fInterfaces[1]=fParam[2]+fParam[3];
+
+  SetBmin();
+}
+
+double TProximity1D_1LHS::GetBofZ(double ZZ) const
+{
+  if(ZZ < fInterfaces[0])
+    return fParam[0];
+
+  if (ZZ < fInterfaces[1]) {
+    return fParam[0]-(fParam[0]-fParam[1])/fParam[3]*(ZZ-fParam[2]);
+  } else {
+    return fParam[1]*exp((fParam[2]+fParam[3]-ZZ)/fParam[4]);
+  }
+}
+
+double TProximity1D_1LHS::GetBmax() const
+{
+  // return applied field
+  return fParam[0];
+}
+
+double TProximity1D_1LHS::GetBmin() const
+{
+  // return field minimum
+  return fMinB;
+}
+
+void TProximity1D_1LHS::SetBmin()
+{
+  fMinTag = 2;
+  fMinZ = 200.;
+  fMinB = GetBofZ(fMinZ);
+  return;
+}
+
+vector< pair<double, double> > TProximity1D_1LHS::GetInverseAndDerivative(double BB) const
+{
+  vector< pair<double, double> > inv;
+
+  if(BB <= fMinB || BB > fParam[0])
+    return inv;
+
+  double inverse[2];
+  pair<double, double> invAndDerivative;
+
+  inverse[0]=(fParam[0]*(fParam[2]+fParam[3])-fParam[1]*fParam[2]-BB*fParam[3])/(fParam[0]-fParam[1]);
+  inverse[1]=fParam[2]+fParam[3]-fParam[4]*log(BB/fParam[1]);
+
+  if(inverse[0] > fInterfaces[0] && inverse[0] <= fInterfaces[1]) {
+    invAndDerivative.first = inverse[0];
+    invAndDerivative.second = fParam[3]/(fParam[1]-fParam[0]);
+    inv.push_back(invAndDerivative);
+  }
+  if(inverse[1] > fInterfaces[1]) {
+    invAndDerivative.first = inverse[1];
+    invAndDerivative.second = -fParam[4]/BB;
+    inv.push_back(invAndDerivative);
+  }
+
+  return inv;
+}
+
+//------------------
+// Constructor of the TProximity1D_1LHSGss class
+// 1D-Proximity screening in a thin superconducting film, 1layer+bulk, linear + exponential decay
+// Parameters: Bext[G], B1[G], deadlayer[nm], thickness1[nm], sigma[nm]
+//------------------
+
+TProximity1D_1LHSGss::TProximity1D_1LHSGss(const vector<double> &param, unsigned int steps)
+{
+  fSteps = steps;
+  fDZ = 200./double(steps);
+  fMinTag = -1;
+  fMinZ = -1.0;
+  fMinB = -1.0;
+
+  // replaced the former assertions of positive lengths by fixed parameter limits
+
+  fParam.resize(param.size());
+  fParam[0] = param[0]; // Bext
+  (param[0] != param[1]) ? fParam[1] = param[1] : fParam[1] = param[1]-0.01; // B1
+  (param[2] >= 0.) ? fParam[2] = param[2] : fParam[2] = 0.; // deadlayer
+  (param[3] >= 0.) ? fParam[3] = param[3] : fParam[3] = 0.; // thickness1
+  (param[3] >= 1.) ? fParam[4] = param[4] : fParam[4] = 1.; // sigma
+
+  fInterfaces[0]=fParam[2];
+  fInterfaces[1]=fParam[2]+fParam[3];
+
+  SetBmin();
+}
+
+double TProximity1D_1LHSGss::GetBofZ(double ZZ) const
+{
+  if(ZZ < fInterfaces[0])
+    return fParam[0];
+
+  if (ZZ < fInterfaces[1]) {
+    return fParam[0]-(fParam[0]-fParam[1])/fParam[3]*(ZZ-fParam[2]);
+  } else {
+    return fParam[1]*exp(-(ZZ-fParam[2]-fParam[3])*(ZZ-fParam[2]-fParam[3])/(4.0*fParam[4]*fParam[4]));
+  }
+}
+
+double TProximity1D_1LHSGss::GetBmax() const
+{
+  // return applied field
+  return fParam[0];
+}
+
+double TProximity1D_1LHSGss::GetBmin() const
+{
+  // return field minimum
+  return fMinB;
+}
+
+void TProximity1D_1LHSGss::SetBmin()
+{
+  fMinTag = 2;
+  fMinZ = 200.;
+  fMinB = GetBofZ(fMinZ);
+  return;
+}
+
+vector< pair<double, double> > TProximity1D_1LHSGss::GetInverseAndDerivative(double BB) const
+{
+  vector< pair<double, double> > inv;
+
+  if(BB <= fMinB || BB > fParam[0])
+    return inv;
+
+  double inverse[2];
+  pair<double, double> invAndDerivative;
+
+  inverse[0]=(fParam[0]*(fParam[2]+fParam[3])-fParam[1]*fParam[2]-BB*fParam[3])/(fParam[0]-fParam[1]);
+  inverse[1]=fParam[2]+fParam[3]+fParam[4]*sqrt(2.0*log(fParam[1]/BB));
+
+  if(inverse[0] > fInterfaces[0] && inverse[0] <= fInterfaces[1]) {
+    invAndDerivative.first = inverse[0];
+    invAndDerivative.second = fParam[3]/(fParam[1]-fParam[0]);
+    inv.push_back(invAndDerivative);
+  }
+  if(inverse[1] > fInterfaces[1]) {
+    invAndDerivative.first = inverse[1];
+    invAndDerivative.second = -fParam[4]/(BB*sqrt(2.0*log(fParam[1]/BB)));
+    inv.push_back(invAndDerivative);
+  }
+
+  return inv;
+}
+
+//------------------
 // Constructor of the TLondon1D_3L class
 // 1D-London screening in a thin superconducting film, three layers, three lambdas
 // Parameters: Bext[G], deadlayer[nm], thickness1[nm], thickness2[nm], thickness3[nm], lambda1[nm], lambda2[nm], lambda3[nm]
