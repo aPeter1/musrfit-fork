@@ -50,7 +50,7 @@ PMUSRPATH     = ../include
 MNPATH        = $(ROOTSYS)/include
 GSLPATH       = /usr/include/gsl
 BOOSTPATH     = /usr/include
-FFTW3PATH     = /usr/local/include
+FFTW3PATH     = /usr/include
 LEMPATH       = ../external/TLemRunHeader
 PSIBINPATH    = ../external/MuSR_software/Class_MuSR_PSI
 INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(GSLPATH) -I$(BOOSTPATH) -I$(LEMPATH) -I$(PSIBINPATH) -I$(FFTW3PATH)
@@ -174,7 +174,7 @@ musrlib:  $(SHLIB)
 $(LEMLIB): $(LEMOBJS)
 	@echo "---> Building shared library $(LEMLIB) ..."
 	/bin/rm -f $(LEMLIB)
-	$(LD) $(SOFLAGS) $(LDFLAGS) $(LEMOBJS) -o $(LEMLIB)
+	$(LD) $(SOFLAGS) $(LDFLAGS) $(LEMOBJS) -o $(LEMLIB) $(LIBS)
 	@echo "done"
 
 $(SHLIB): $(OBJS) $(EXTOBJS)

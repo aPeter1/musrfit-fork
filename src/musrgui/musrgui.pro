@@ -1,17 +1,20 @@
 TEMPLATE = app
 TARGET = musrgui
-target.path = $$(HOME)/analysis/bin
+unix:target.path = $(ROOTSYS)/bin
+macx:target.path = /Applications
+
+exists( /usr/bin/cygwin1.dll ) {
+      QMAKE_LFLAGS_SHAPP = -Wl,--enable-auto-import
+      TARGET = musrgui.exe
+}
+
 INSTALLS += target
 QMAKE_CC = gcc
 QMAKE_CXX = g++
 
-exists( /usr/bin/cygwin1.dll ) {
-      QMAKE_LFLAGS_SHAPP = -Wl,--enable-auto-import
-}
-
 # install path for the XML configuration file
-unix:xml.path = $$(HOME)/analysis/bin/
-win32:xml.path = $$(HOME)/analysis/bin/
+unix:xml.path = $(ROOTSYS)/bin/
+macx:xml.path = $(ROOTSYS)/bin/
 xml.files = musrgui_startup.xml
 INSTALLS += xml
 
