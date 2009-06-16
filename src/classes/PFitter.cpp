@@ -684,7 +684,10 @@ bool PFitter::ExecuteSave()
     fout.setf(ios::left, ios::adjustfield);
     fout.precision(6);
     fout.width(10);
-    fout << fMnUserParamState->Error(i) << " ";
+    if (fMnUserParamState)
+      fout << fMnUserParamState->Error(i) << " ";
+    else
+      fout << "---";
     // write minos errors
     if (fParams[i].fPosErrorPresent) {
       fout.setf(ios::left, ios::adjustfield);
