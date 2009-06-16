@@ -127,7 +127,7 @@ if (type == "skg"){ // skewed Gaussian
 
 //-----------
 // Constructor that does the P(B) calculation for given analytical inverse of B(z) and its derivative and n(z)
-// Parameters: dt[us], dB[G], Energy[keV]
+// Parameters: dt[us], dB[G], Energy[keV], Bbg[G], width[us^{-1}], weight[1]
 //-----------
 
 TPofBCalc::TPofBCalc( const TBofZCalcInverse &BofZ, const TTrimSPData &dataTrimSP, const vector<double> &para ) : fDT(para[0]), fDB(para[1])
@@ -185,6 +185,8 @@ TPofBCalc::TPofBCalc( const TBofZCalcInverse &BofZ, const TTrimSPData &dataTrimS
   pBsum *= fDB;
   for (unsigned int i(firstZerosEnd); i<lastZerosStart; i++)
     fPB[i] /= pBsum;
+
+  AddBackground(para[3], para[4], para[5]);
 
 }
 

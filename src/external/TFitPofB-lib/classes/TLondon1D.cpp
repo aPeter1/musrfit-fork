@@ -140,7 +140,7 @@ TLondon1D3LSub::~TLondon1D3LSub() {
 // creates (a pointer to) the TPofTCalc object (with the FFT plan)
 //------------------
 
-TLondon1DHS::TLondon1DHS() : fCalcNeeded(true), fFirstCall(true) {
+TLondon1DHS::TLondon1DHS() : fCalcNeeded(true), fFirstCall(true), fDeadLayerChanged(true) {
 
     // read startup file
     string startup_path_name("TFitPofB_startup.xml");
@@ -165,8 +165,10 @@ TLondon1DHS::TLondon1DHS() : fCalcNeeded(true), fFirstCall(true) {
 
     fParForPofB.push_back(startupHandler->GetDeltat());
     fParForPofB.push_back(startupHandler->GetDeltaB());
-    fParForPofB.push_back(0.0);
-//    fParForPofB.push_back(0.0);
+    fParForPofB.push_back(0.0); // Energy
+    fParForPofB.push_back(0.0); // Bkg-Field
+    fParForPofB.push_back(0.005); // Bkg-width
+    fParForPofB.push_back(0.0); // Bkg-weight
 
     TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
     fImpProfile = x;
@@ -230,6 +232,9 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
       par_changed = true;
       if (i == 0) {
         only_phase_changed = true;
+      } else if (i == 3) {
+        fDeadLayerChanged = true;
+        only_phase_changed = false;
       } else {
         only_phase_changed = false;
       }
@@ -253,7 +258,16 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
         fParForBofZ[i-2] = par[i];
 
       fParForPofB[2] = par[1]; // energy
-//      fParForPofB[3] = par[3]; // deadlayer for convolution of field profile
+      fParForPofB[3] = par[2]; // Bkg-Field
+      //fParForPofB[4] = 0.005; // Bkg-width (in principle zero)
+
+      if(fDeadLayerChanged){
+        vector<double> interfaces;
+        interfaces.push_back(par[3]);// dead layer
+        fParForPofB[5] = fImpProfile->LayerFraction(par[1], 1, interfaces); // Fraction of muons in the deadlayer
+        interfaces.clear();
+        fDeadLayerChanged = false;
+      }
 
       TLondon1D_HS BofZ(fParForBofZ);
       TPofBCalc PofB(BofZ, *fImpProfile, fParForPofB);
