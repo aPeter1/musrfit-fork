@@ -228,9 +228,15 @@ bool PAdminXMLParser::endDocument()
   }
 
   if (fAdmin->getMsrDefaultFilePath().find('$') >= 0) {
-    expandPath(fAdmin->getMsrDefaultFilePath());
+    str = expandPath(fAdmin->getMsrDefaultFilePath());
     if (!str.isEmpty())
       fAdmin->setMsrDefaultFilePath(str);
+  }
+
+  if (fAdmin->getTheoFuncPixmapPath().find('$') >=0) {
+    str = expandPath(fAdmin->getTheoFuncPixmapPath());
+    if (!str.isEmpty())
+      fAdmin->setTheoFuncPixmapPath(str);
   }
 
   return true;
@@ -292,9 +298,9 @@ PAdmin::PAdmin()
   QString fln = "./musrgui_startup.xml";
   if (!QFile::exists(fln)) {
     QString path = std::getenv("MUSRFITPATH");
-    QString home = std::getenv("HOME");
+    QString rootsys = std::getenv("ROOTSYS");
     if (path.isEmpty())
-      path = home + "/analysis/bin";
+      path = rootsys + "/bin";
     fln = path + "/musrgui_startup.xml";
   }
   if (QFile::exists(fln)) { // administration file present

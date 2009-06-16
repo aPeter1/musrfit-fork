@@ -145,3 +145,5 @@ $(OBJS): %.o: %.cpp
 install: all
 	cp -fvp $(EXEC) $(INSTALLPATH)
 	cp -fvp musrfit_startup.xml $(INSTALLPATH)
+	cp -fvp external/scripts/msr2data $(INSTALLPATH)
+	chmod 755 $(INSTALLPATH)/msr2data

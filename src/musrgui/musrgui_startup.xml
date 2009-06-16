@@ -5,7 +5,7 @@
     This is handling default setting parameters for the musrgui.
   </comment>
   <general>
-    <exec_path>$HOME/analysis/bin</exec_path>
+    <exec_path>$ROOTSYS/bin</exec_path>
     <default_save_path>./</default_save_path>
     <msr_default_file_path>$HOME/analysis/musrfit/src/musrgui</msr_default_file_path>
   </general>
@@ -21,7 +21,7 @@
       Starting with &gt;= Qt4.2 this will be linked automatically but until then ...; sorry ;-)
     </help_main>
   </help_section>
-  <func_pixmap_path>/home/nemu/analysis/musrfit/src/musrgui/latex_images</func_pixmap_path>
+  <func_pixmap_path>$HOME/analysis/musrfit/src/musrgui/latex_images</func_pixmap_path>
   <theory_functions>
     <func>
       <name>asymmetry</name>
