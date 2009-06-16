@@ -747,4 +747,7 @@ else
       }
     }' $COUNT$EXTENSION.$OUTPUTEXT
   done
+  echo
+  echo ">> msr2data: done"
+  echo
 fi
