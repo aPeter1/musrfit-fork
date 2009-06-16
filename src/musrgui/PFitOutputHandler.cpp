@@ -29,6 +29,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <qtimer.h>
+
 #include "PFitOutputHandler.h"
 
 //----------------------------------------------------------------------------------------------------
@@ -41,31 +43,30 @@ PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QValueVector<QStr
     return;
 
   // Layout
-  vbox = new QVBox( this );
-  vbox->resize(800, 500);
-  output = new QTextEdit( vbox );
-  output->setMinimumSize(800, 455);
-  output->setReadOnly(true);
-  quitButton = new QPushButton( tr("Done"), vbox );
-  connect( quitButton, SIGNAL(clicked()),
-           this, SLOT(accept()) );
+  fVbox = new QVBox( this );
+  fVbox->resize(800, 500);
+  fOutput = new QTextEdit( fVbox );
+  fOutput->setMinimumSize(800, 455);
+  fOutput->setReadOnly(true);
+  fQuitButton = new QPushButton( tr("Fitting..."), fVbox );
+  connect( fQuitButton, SIGNAL( clicked() ), this, SLOT( quitButtonPressed() ) );
   resize( 800, 500 );
-  quitButton->setFocus();
+  fQuitButton->setFocus();
 
   // QProcess related code
-  proc = new QProcess( this );
+  fProc = new QProcess( this );
 
-  proc->setWorkingDirectory(workingDirectory);
+  fProc->setWorkingDirectory(workingDirectory);
 
   // Set up the command and arguments.
   for (unsigned int i=0; i<cmd.size(); i++)
-    proc->addArgument(cmd[i]);
+    fProc->addArgument(cmd[i]);
 
-  connect( proc, SIGNAL(readyReadStdout()), this, SLOT(readFromStdOut()) );
-  connect( proc, SIGNAL(readyReadStderr()), this, SLOT(readFromStdErr()) );
-//  connect( proc, SIGNAL(processExited()), this, SLOT(scrollToTop()) );
+  connect( fProc, SIGNAL( readyReadStdout() ), this, SLOT( readFromStdOut() ) );
+  connect( fProc, SIGNAL( readyReadStderr() ), this, SLOT( readFromStdErr() ) );
+  connect( fProc, SIGNAL( processExited() ),   this, SLOT( processDone() ) );
 
-  if ( !proc->start() ) {
+  if ( !fProc->start() ) {
     // error handling
     QMessageBox::critical( 0,
                 tr("Fatal error"),
@@ -83,7 +84,7 @@ void PFitOutputHandler::readFromStdOut()
 {
   // Read and process the data.
   // Bear in mind that the data might be output in chunks.
-  output->append( proc->readStdout() );
+  fOutput->append( fProc->readStdout() );
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -94,7 +95,31 @@ void PFitOutputHandler::readFromStdErr()
 {
   // Read and process the data.
   // Bear in mind that the data might be output in chunks.
-  output->append( proc->readStderr() );
+  fOutput->append( fProc->readStderr() );
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PFitOutputHandler::processDone()
+{
+  fQuitButton->setText("Done");
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PFitOutputHandler::quitButtonPressed()
+{
+  // if the fitting is still taking place, kill it
+  if (fProc->isRunning()) {
+    fProc->tryTerminate();
+    QTimer::singleShot( 100, fProc, SLOT( kill() ) );
+  }
+
+  accept();
 }
 
 //----------------------------------------------------------------------------------------------------
