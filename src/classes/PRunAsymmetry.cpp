@@ -543,7 +543,7 @@ bool PRunAsymmetry::SubtractEstimatedBkg()
       double beamPeriodBins = beamPeriod/fRunInfo->fPacking;
       unsigned int periods = (unsigned int)((double)(end[i] - start[i] + 1) / beamPeriodBins);
       end[i] = start[i] + (unsigned int)round((double)periods*beamPeriodBins);
-      cout << endl << "PRunAsymmetry::SubtractEstimatedBkg(): Background " << start[i] << ", " << end[i];
+      cout << "PRunAsymmetry::SubtractEstimatedBkg(): Background " << start[i] << ", " << end[i] << endl;
       if (end[i] == start[i])
         end[i] = fRunInfo->fBkgRange[2*i+1];
     }

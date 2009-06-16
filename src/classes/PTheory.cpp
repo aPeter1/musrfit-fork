@@ -1290,8 +1290,8 @@ double PTheory::StaticLorentzKTLF(register double t, const PDoubleVector& paramV
   else // tshift present
     tt = t-val[2];
 
- if (tt < 0.0) // for times < 0 return a function value of 1.0
-   return 1.0;
+  if (tt < 0.0) // for times < 0 return a function value of 1.0
+    return 1.0;
 
  if (val[0] < 0.02) { // if smaller 20kHz ~ 0.27G use zero field formula
     double at = tt*val[1];
@@ -1343,6 +1343,50 @@ double PTheory::DynamicLorentzKTLF(register double t, const PDoubleVector& param
     }
   }
 
+  double tt;
+  if (fParamNo.size() == 3) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[3];
+
+  if (tt < 0.0) // for times < 0 return a function value of 1.0
+    return 1.0;
+
+  // check if hopping > 5 * damping, of Larmor angular frequency is > 30 * damping (BMW limit)
+  Double_t w0 = 2.0*TMath::Pi()*val[0];
+  Double_t a  = val[1];
+  Double_t nu = val[2];
+  if ((nu > 5.0 * a) || (w0 >= 30.0 * a)) {
+    // 'c' and 'd' are parameters BMW obtained by fitting large parameter space LF-curves to the model below
+    const Double_t c[7] = {1.15331, 1.64826, -0.71763, 3.0, 0.386683, -5.01876, 2.41854};
+    const Double_t d[4] = {2.44056, 2.92063, 1.69581, 0.667277};
+    Double_t w0N[4];
+    Double_t nuN[4];
+    w0N[0] = w0;
+    nuN[0] = nu;
+    for (unsigned int i=1; i<4; i++) {
+      w0N[i] = w0 * w0N[i-1];
+      nuN[i] = nu * nuN[i-1];
+    }
+    Double_t denom = w0N[3]+d[0]*w0N[2]*nuN[0]+d[1]*w0N[1]*nuN[1]+d[2]*w0N[0]*nuN[2]+d[3]*nuN[3];
+    Double_t b1 = (c[0]*w0N[2]+c[1]*w0N[1]*nuN[0]+c[2]*w0N[0]*nuN[1])/denom;
+    Double_t b2 = (c[3]*w0N[2]+c[4]*w0N[1]*nuN[0]+c[5]*w0N[0]*nuN[1]+c[6]*nuN[2])/denom;
+
+    Double_t w0t = w0*tt;
+    Double_t j1, j0;
+    if (fabs(w0t) < 0.001) { // check zero time limits of the spherical bessel functions j0(x) and j1(x)
+      j0 = 1.0;
+      j1 = 0.0;
+    } else {
+      j0 = sin(w0t)/w0t;
+      j1 = (sin(w0t)-w0t*cos(w0t))/(w0t*w0t);
+    }
+
+    Double_t Gamma_t = -4.0/3.0*a*(b1*(1.0-j0*TMath::Exp(-nu*tt))+b2*j1*TMath::Exp(-nu*tt)+(1.0-b2*w0/3.0-b1*nu)*tt);
+
+    return TMath::Exp(Gamma_t);
+  }
+
   // check if the parameter values have changed, and if yes recalculate the non-analytic integral
   bool newParam = false;
   for (unsigned int i=0; i<4; i++) {
@@ -1357,15 +1401,6 @@ double PTheory::DynamicLorentzKTLF(register double t, const PDoubleVector& param
       fPrevParam[i] = val[i];
     CalculateDynKTLF(val, 1); // 0 means Lorentz
   }
-
-  double tt;
-  if (fParamNo.size() == 3) // no tshift
-    tt = t;
-  else // tshift present
-    tt = t-val[3];
-
-  if (tt < 0.0) // for times < 0 return a function value of 1.0
-    return 1.0;
 
   result = GetDynKTLFValue(tt);
 
