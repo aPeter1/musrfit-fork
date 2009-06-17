@@ -42,6 +42,7 @@ using namespace std;
 #include "Minuit2/MnMinos.h"
 #include "Minuit2/MnSimplex.h"
 #include "Minuit2/MnUserParameterState.h"
+#include "Minuit2/MinosError.h"
 
 #include <TCanvas.h>
 #include <TH2.h>
@@ -601,11 +602,13 @@ bool PFitter::ExecuteMinos()
     // the 2nd condition is from an all together unused variable
     if ((fMnUserParams.Error(i) != 0) && (fRunInfo->ParameterInUse(i) != 0)) {
       // 1-sigma MINOS errors
-      std::pair<double, double> err = minos(i);
+      ROOT::Minuit2::MinosError err = minos.Minos(i);
 
-      // fill msr-file structure
-      fRunInfo->SetMsrParamStep(i, err.first);
-      fRunInfo->SetMsrParamPosError(i, err.second);
+      if (err.IsValid()) {
+        // fill msr-file structure
+        fRunInfo->SetMsrParamStep(i, err.Lower());
+        fRunInfo->SetMsrParamPosError(i, err.Upper());
+      }
     }
   }
 
