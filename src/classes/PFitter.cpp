@@ -426,6 +426,7 @@ bool PFitter::ExecuteHesse()
   // fill parabolic errors
   for (unsigned int i=0; i<fParams.size(); i++) {
     fRunInfo->SetMsrParamStep(i, mnState.Error(i));
+    fRunInfo->SetMsrParamPosErrorPresent(i, false);
   }
 
   return true;
@@ -478,6 +479,7 @@ bool PFitter::ExecuteMigrad()
   for (unsigned int i=0; i<fParams.size(); i++) {
     fRunInfo->SetMsrParamValue(i, min.UserState().Value(i));
     fRunInfo->SetMsrParamStep(i, min.UserState().Error(i));
+    fRunInfo->SetMsrParamPosErrorPresent(i, false);
   }
 
   // handle statistics
@@ -546,6 +548,7 @@ bool PFitter::ExecuteMinimize()
   for (unsigned int i=0; i<fParams.size(); i++) {
     fRunInfo->SetMsrParamValue(i, min.UserState().Value(i));
     fRunInfo->SetMsrParamStep(i, min.UserState().Error(i));
+    fRunInfo->SetMsrParamPosErrorPresent(i, false);
   }
 
   // handle statistics
@@ -608,6 +611,8 @@ bool PFitter::ExecuteMinos()
         // fill msr-file structure
         fRunInfo->SetMsrParamStep(i, err.Lower());
         fRunInfo->SetMsrParamPosError(i, err.Upper());
+      } else {
+        fRunInfo->SetMsrParamPosErrorPresent(i, false);
       }
     }
   }
@@ -911,6 +916,7 @@ bool PFitter::ExecuteSimplex()
   for (unsigned int i=0; i<fParams.size(); i++) {
     fRunInfo->SetMsrParamValue(i, min.UserState().Value(i));
     fRunInfo->SetMsrParamStep(i, min.UserState().Error(i));
+    fRunInfo->SetMsrParamPosErrorPresent(i, false);
   }
 
   // handle statistics
