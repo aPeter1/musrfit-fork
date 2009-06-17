@@ -1334,6 +1334,10 @@ double PTheory::DynamicLorentzKTLF(register double t, const PDoubleVector& param
 
   assert(fParamNo.size() <= 4);
 
+  // check if all parameters == 0
+  if ((val[0] == 0.0) && (val[1] == 0.0) && (val[2] == 0.0))
+    return 1.0;
+
   // check if FUNCTIONS are used
   for (unsigned int i=0; i<fParamNo.size(); i++) {
     if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
