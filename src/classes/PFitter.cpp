@@ -31,6 +31,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <limits>
 using namespace std;
 
 #include <math.h>
@@ -408,8 +409,11 @@ bool PFitter::ExecuteHesse()
   // create the hesse object
   ROOT::Minuit2::MnHesse hesse;
 
+  // specify maximal number of function calls
+  unsigned int maxfcn = numeric_limits<unsigned int>::max();
+
   // call hesse
-  ROOT::Minuit2::MnUserParameterState mnState = hesse((*fFitterFcn), fMnUserParams);
+  ROOT::Minuit2::MnUserParameterState mnState = hesse((*fFitterFcn), fMnUserParams, maxfcn);
 
   if (!mnState.IsValid()) {
     cout << endl << "**WARNING** PFitter::ExecuteHesse(): Hesse encountered some problems!";
@@ -453,7 +457,7 @@ bool PFitter::ExecuteMigrad()
 
   // minimize
   // maxfcn is MINUIT2 Default maxfcn
-  unsigned int maxfcn = (200 + 100*fParams.size() + 5*fParams.size()*fParams.size());
+  unsigned int maxfcn = numeric_limits<unsigned int>::max();
   // tolerance = MINUIT2 Default tolerance
   double tolerance = 0.1;
   ROOT::Minuit2::FunctionMinimum min = migrad(maxfcn, tolerance);
@@ -521,7 +525,7 @@ bool PFitter::ExecuteMinimize()
 
   // minimize
   // maxfcn is MINUIT2 Default maxfcn
-  unsigned int maxfcn = (200 + 100*fParams.size() + 5*fParams.size()*fParams.size());
+  unsigned int maxfcn = numeric_limits<unsigned int>::max();
 //cout << endl << "maxfcn=" << maxfcn << endl;
   // tolerance = MINUIT2 Default tolerance
   double tolerance = 0.1;
@@ -896,7 +900,7 @@ bool PFitter::ExecuteSimplex()
 
   // minimize
   // maxfcn is 10*MINUIT2 Default maxfcn
-  unsigned int maxfcn = 10*(200 + 100*fParams.size() + 5*fParams.size()*fParams.size());
+  unsigned int maxfcn = numeric_limits<unsigned int>::max();
   // tolerance = MINUIT2 Default tolerance
   double tolerance = 0.1;
   ROOT::Minuit2::FunctionMinimum min = simplex(maxfcn, tolerance);

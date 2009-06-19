@@ -9,8 +9,8 @@ exists( /usr/bin/cygwin1.dll ) {
 }
 
 INSTALLS += target
-QMAKE_CC = gcc
-QMAKE_CXX = g++
+QMAKE_CC = gcc-4.2.4
+QMAKE_CXX = g++-4.2.4
 
 # install path for the XML configuration file
 unix:xml.path = $(ROOTSYS)/bin/

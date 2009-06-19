@@ -186,7 +186,8 @@ TPofBCalc::TPofBCalc( const TBofZCalcInverse &BofZ, const TTrimSPData &dataTrimS
   for (unsigned int i(firstZerosEnd); i<lastZerosStart; i++)
     fPB[i] /= pBsum;
 
-  AddBackground(para[3], para[4], para[5]);
+  if(para.size() == 6)
+    AddBackground(para[3], para[4], para[5]);
 
 }
 

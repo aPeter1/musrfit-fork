@@ -152,11 +152,16 @@ TLondon1D_1L::TLondon1D_1L(const vector<double> &param, unsigned int steps)
   fMinB = -1.0;
 
 // thicknesses have to be greater or equal to zero
-  for(unsigned int i(1); i<3; i++)
-    assert(param[i]>=0.);
+  for(unsigned int i(1); i<3; i++){
+    if(param[i] < 0.){
+      fParam[i] = 0.;
+    }
+  }
 
 // lambdas have to be greater than zero
-    assert(param[3]!=0.);
+  if(param[3] < 0.1){
+    fParam[3] = 0.1;
+  }
 
 // Calculate the coefficients of the exponentials
   double N0(param[0]/(1.0+exp(param[2]/param[3])));
@@ -194,7 +199,10 @@ double TLondon1D_1L::GetBmin() const
 void TLondon1D_1L::SetBmin()
 {
   double b_a(fCoeff[1]/fCoeff[0]);
-  assert (b_a>0.);
+// assert(b_a>0.);
+  if(b_a<10E-7){
+    b_a = 10E-7;
+  }
 
   double minZ;
   // check if the minimum is in the first layer
@@ -205,7 +213,14 @@ void TLondon1D_1L::SetBmin()
     return;
   }
 
-  assert(fMinZ > 0. && fMinB > 0.);
+//  assert(fMinZ > 0. && fMinB > 0.);
+  if(fMinZ <= 0.){
+    fMinZ = 0.;
+  }
+  if(fMinB <= 0.){
+    fMinB = 0.;
+  }
+
   return;
 }
 

@@ -30,7 +30,6 @@ private:
   TPofTCalc *fPofT;
   mutable bool fCalcNeeded;
   mutable bool fFirstCall;
-  mutable bool fDeadLayerChanged;
   mutable vector<double> fParForPofT;
   mutable vector<double> fParForBofZ;
   mutable vector<double> fParForPofB;

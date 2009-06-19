@@ -204,6 +204,8 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
   if(t<0.0)
     return cos(par[0]*0.017453293);
 
+  bool dead_layer_changed(false);
+
   // check if the function is called the first time and if yes, read in parameters
 
   if(fFirstCall){
@@ -217,7 +219,8 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
       fParForBofZ.push_back(fPar[i]);
 //      cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << endl;
     }
-    fFirstCall=false;
+    fFirstCall = false;
+    dead_layer_changed = true;
 //  cout << this << endl;
   }
 
@@ -232,11 +235,11 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
       par_changed = true;
       if (i == 0) {
         only_phase_changed = true;
-      } else if (i == 3) {
-        fDeadLayerChanged = true;
-        only_phase_changed = false;
       } else {
         only_phase_changed = false;
+        if (i == 3) {
+          dead_layer_changed = true;
+        }
       }
     }
   }
@@ -261,12 +264,11 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
       fParForPofB[3] = par[2]; // Bkg-Field
       //fParForPofB[4] = 0.005; // Bkg-width (in principle zero)
 
-      if(fDeadLayerChanged){
+      if(dead_layer_changed){
         vector<double> interfaces;
         interfaces.push_back(par[3]);// dead layer
         fParForPofB[5] = fImpProfile->LayerFraction(par[1], 1, interfaces); // Fraction of muons in the deadlayer
         interfaces.clear();
-        fDeadLayerChanged = false;
       }
 
       TLondon1D_HS BofZ(fParForBofZ);
@@ -615,7 +617,9 @@ TProximity1D1LHS::TProximity1D1LHS() : fCalcNeeded(true), fFirstCall(true) {
     fParForPofB.push_back(startupHandler->GetDeltat());
     fParForPofB.push_back(startupHandler->GetDeltaB());
     fParForPofB.push_back(0.0);
-//    fParForPofB.push_back(0.0);
+    fParForPofB.push_back(0.0); // Bkg-Field
+    fParForPofB.push_back(0.005); // Bkg-width
+    fParForPofB.push_back(0.0); // Bkg-weight
 
     TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
     fImpProfile = x;
@@ -652,6 +656,7 @@ double TProximity1D1LHS::operator()(double t, const vector<double> &par) const {
   // check if the function is called the first time and if yes, read in parameters
 
   bool width_changed(false);
+  bool dead_layer_changed(false);
 
   if(fFirstCall){
     fPar = par;
@@ -666,6 +671,7 @@ double TProximity1D1LHS::operator()(double t, const vector<double> &par) const {
     }
     fFirstCall=false;
     width_changed = true;
+    dead_layer_changed = true;
 //  cout << this << endl;
   }
 
@@ -684,6 +690,9 @@ double TProximity1D1LHS::operator()(double t, const vector<double> &par) const {
         only_phase_changed = false;
         if (i == 7){
           width_changed = true;
+        }
+        if (i == 4){
+          dead_layer_changed = true;
         }
       }
     }
@@ -705,11 +714,19 @@ double TProximity1D1LHS::operator()(double t, const vector<double> &par) const {
       for (unsigned int i(2); i<fPar.size(); i++)
         fParForBofZ[i-2] = par[i];
 
-      fParForPofB[2] = par[1]; // energy
-
       if(width_changed) { // Convolution of the implantation profile with Gaussian
         fImpProfile->ConvolveGss(par[7], par[1]);
-        width_changed = false;
+      }
+
+      fParForPofB[2] = par[1]; // energy
+      fParForPofB[3] = par[2]; // Bkg-Field
+      //fParForPofB[4] = 0.005; // Bkg-width (in principle zero)
+
+      if(dead_layer_changed){
+        vector<double> interfaces;
+        interfaces.push_back(par[4]);// dead layer
+        fParForPofB[5] = fImpProfile->LayerFraction(par[1], 1, interfaces); // Fraction of muons in the deadlayer
+        interfaces.clear();
       }
 
       TProximity1D_1LHS BofZ(fParForBofZ);

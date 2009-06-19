@@ -1,21 +1,14 @@
 #---------------------------------------------------------------------
-# README
+# INSTALL
 # Andreas Suter, 2008/01/15
-# $Id$
+# $Id: README 3854 2009-04-14 19:32:35Z nemu $
 #---------------------------------------------------------------------
 
 To get it all build:
 
-1) go to the subdiretory 'classes' and execute
-
-   make -f Makefile.PMusr
-   make -f Makefile.PMusr install (as root)
-   
-2) if the privous step worked execute in the current directory (in which 
-   you found this README)
-   
-   make clean
-   make 
+   ./autogen.sh
+   ./configure --prefix=/apps/cern/root
+   make
    make install
    
 In the optimal case, everything is setup ;-)
