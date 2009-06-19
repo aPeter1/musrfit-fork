@@ -34,10 +34,10 @@ endif
 
 # -- Linux
 ifeq ($(OS),LINUX)
-CXX           = g++-4.3.3
+CXX           = g++
 CXXFLAGS      = -Wall -Wno-trigraphs -fPIC
 INCLUDES      = -I../include
-LD            = g++-4.3.3
+LD            = g++
 LDFLAGS       = -g
 SOFLAGS       = -O -shared
 endif

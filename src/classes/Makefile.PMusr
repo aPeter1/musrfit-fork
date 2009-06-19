@@ -44,7 +44,7 @@ endif
 
 # -- Linux
 ifeq ($(OS),LINUX)
-CXX           = g++-4.2.4
+CXX           = g++
 CXXFLAGS      = -O3 -Wall -Wno-trigraphs -fPIC
 PMUSRPATH     = ../include
 MNPATH        = $(ROOTSYS)/include
@@ -54,7 +54,7 @@ FFTW3PATH     = /usr/include
 LEMPATH       = ../external/TLemRunHeader
 PSIBINPATH    = ../external/MuSR_software/Class_MuSR_PSI
 INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(GSLPATH) -I$(BOOSTPATH) -I$(LEMPATH) -I$(PSIBINPATH) -I$(FFTW3PATH)
-LD            = g++-4.2.4
+LD            = g++
 LDFLAGS       = -O
 SOFLAGS       = -shared
 LEMLIB        = libTLemRunHeader.so
