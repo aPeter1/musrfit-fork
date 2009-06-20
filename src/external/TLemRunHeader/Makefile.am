@@ -23,6 +23,7 @@ dict_cpp_sources = \
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 INCLUDES = -I. $(ROOT_CFLAGS)
+AM_CXXFLAGS = -Wall -Wno-trigraphs
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dist_h_sources)
 AM_CPPFLAGS = -I@ROOTINCDIR@

@@ -64,10 +64,10 @@ ext_source_dir = $(top_srcdir)/src/external/MuSR_software/Class_MuSR_PSI
 ext_h_sources = $(ext_source_dir)/MuSR_td_PSI_bin.h $(ext_source_dir)/tydefs.h
 ext_cpp_sources = $(ext_source_dir)/MuSR_td_PSI_bin.cpp 
 
-include_HEADERS = $(h_sources) $(ext_h_sources)
-noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
+include_HEADERS = $(h_sources) $(ext_source_dir)/MuSR_td_PSI_bin.h
+noinst_HEADERS = $(h_linkdef) $(dict_h_sources) $(ext_source_dir)/tydefs.h
 INCLUDES = -I$(top_srcdir)/src/include -I$(ext_source_dir) $(LEM_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(BOOST_CFLAGS) $(ROOT_CFLAGS)
-AM_CXXFLAGS = -g -O3 -Wall -Wno-trigraphs
+AM_CXXFLAGS = -Wall -Wno-trigraphs
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources)
 AM_CPPFLAGS = -I@ROOTINCDIR@

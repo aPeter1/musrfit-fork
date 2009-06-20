@@ -85,8 +85,8 @@ dnl Ask user for path to fftw3 stuff
 dnl -----------------------------------------------
 
 FFTW3_FOUND=0
-AC_ARG_WITH(fftw3,
-    [  --with-fftw3=<path>             prefix of FFTW3 installation. e.g. /usr/local or /usr],
+AC_ARG_WITH([fftw3],
+    [AC_HELP_STRING([--with-fftw3],[prefix of FFTW3 installation. e.g. /usr/local or /usr])],
     [FFTW3_PREFIX=$with_fftw3
      if !(test -r ${FFTW3_PREFIX}/include/fftw3.h); then
        AC_MSG_ERROR(FFTW3 cannot be found at the specified path!)
@@ -96,7 +96,7 @@ AC_ARG_WITH(fftw3,
      [if test -r /usr/local/include/fftw3.h; then
         FFTW3_PREFIX="/usr/local"
         AC_MSG_RESULT([using ${FFTW3_PREFIX} as prefix of the FFTW3 installation... (ignore the no just above)])
-      else if test -r /usr/include/fftw3.h; then
+      elif test -r /usr/include/fftw3.h; then
         FFTW3_PREFIX="/usr"
         AC_MSG_RESULT([using ${FFTW3_PREFIX} as prefix of the FFTW3 installation... (ignore the no just above)])
       else
@@ -105,7 +105,6 @@ AC_ARG_WITH(fftw3,
         This tells configure where to find the FFTW3 C libraries and headers.
         e.g. --with-fftw3=/usr/local or --with-fftw3=/usr]
         )
-      fi
       fi
      ]
     )
@@ -125,8 +124,8 @@ dnl Ask user for path to gsl stuff
 dnl -----------------------------------------------
 
 GSL_FOUND=0
-AC_ARG_WITH(gsl,
-    [  --with-gsl=<path>             prefix of GSL installation. e.g. /usr/local or /usr],
+AC_ARG_WITH([gsl],
+    [AC_HELP_STRING([--with-gsl],[prefix of GSL installation. e.g. /usr/local or /usr])],
     [GSL_PREFIX=$with_gsl
      if !(test -r ${GSL_PREFIX}/include/gsl/gsl_sf_hyperg.h); then
        AC_MSG_ERROR(GSL cannot be found at the specified path!)
@@ -136,7 +135,7 @@ AC_ARG_WITH(gsl,
      [if test -r /usr/local/include/gsl/gsl_sf_hyperg.h; then
         GSL_PREFIX="/usr/local"
         AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation... (ignore the no just above)])
-      else if test -r /usr/include/gsl/gsl_sf_hyperg.h; then
+      elif test -r /usr/include/gsl/gsl_sf_hyperg.h; then
         GSL_PREFIX="/usr"
         AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation... (ignore the no just above)])
       else
@@ -145,7 +144,6 @@ AC_ARG_WITH(gsl,
         This tells configure where to find the GSL C libraries and headers.
         e.g. --with-gsl=/usr/local or --with-gsl=/usr]
         )
-      fi
       fi
      ]
     )
@@ -165,8 +163,8 @@ dnl Ask user for path to boost stuff
 dnl -----------------------------------------------
 
 BOOST_FOUND=0
-AC_ARG_WITH(boostinc,
-    [  --with-boostinc=<path>             path to the header files of the Boost installation. e.g. /usr/local/include or /usr/include],
+AC_ARG_WITH([boostinc],
+    [AC_HELP_STRING([--with-boostinc],[path to the header files of the Boost installation, e.g. /usr/local/include or /usr/include])],
     [BOOST_INCLUDE=$with_boostinc
      if !(test -r ${BOOST_INCLUDE}/boost/spirit.hpp); then
        AC_MSG_ERROR(Boost cannot be found at the specified path!)
@@ -176,7 +174,7 @@ AC_ARG_WITH(boostinc,
      [if test -r /usr/local/include/boost/spirit.hpp; then
         BOOST_INCLUDE="/usr/local/include"
         AC_MSG_RESULT([using ${BOOST_INCLUDE} as include path for the Boost headers... (ignore the no just above)])
-      else if test -r /usr/include/boost/spirit.hpp; then
+      elif test -r /usr/include/boost/spirit.hpp; then
         BOOST_INCLUDE="/usr/include"
         AC_MSG_RESULT([using ${BOOST_INCLUDE} as include path for the Boost headers... (ignore the no just above)])
       else
@@ -185,7 +183,6 @@ AC_ARG_WITH(boostinc,
         This tells configure where to find the Boost C++ headers.
         e.g. --with-boostinc=/usr/local/include or --with-boostinc=/usr/include or --with-boostinc=/usr/include/boost-1_33_0]
         )
-      fi
       fi
      ]
     )

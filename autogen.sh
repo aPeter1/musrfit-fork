@@ -1,10 +1,10 @@
 #! /bin/sh
 
-# $Id: autogen.sh,v 1.4 2002/12/02 01:39:49 murrayc Exp $
+# autogen.sh
 #
 # Copyright (c) 2009  BMW
 #
-# Based on a autogen.sh script written by Daniel Elstner <daniel.elstner@gmx.net>
+# Based on an autogen.sh script written by Daniel Elstner <daniel.elstner@gmx.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License VERSION 2 as
@@ -27,22 +27,32 @@ test "x${dir}" = "x" && dir='.'
 
 if test "x`cd "${dir}" 2>/dev/null && pwd`" != "x`pwd`"
 then
-    echo "This script must be executed directly from the source directory."
+    echo "This script must be executed directly from the source directory!"
     exit 1
 fi
 
-rm -f config.cache acconfig.h
+rm -f config.cache
 
-echo "--> libtoolize"		&& \
-libtoolize --force		&& \
-echo "--> aclocal"		&& \
-aclocal				&& \
-echo "--> autoconf"		&& \
-autoconf			&& \
-echo "--> autoheader"		&& \
-autoheader			&& \
-echo "--> automake"		&& \
-automake --add-missing --gnu	&& exit 0
+if test -e admin/depcomp          && \
+   test -e admin/install-sh       && \
+   test -e admin/ltmain.sh        && \
+   test -e admin/missing          && \
+   test -e aclocal.m4
+then
+    echo ">> autoreconf"          && \
+    autoreconf                    && exit 0
+else
+    echo ">> libtoolize"          && \
+    libtoolize --force            && \
+    echo ">> aclocal"             && \
+    aclocal                       && \
+    echo ">> autoconf"		  && \
+    autoconf                      && \
+    echo ">> autoheader"          && \
+    autoheader			  && \
+    echo ">> automake"		  && \
+    automake --add-missing --gnu  && exit 0
+fi
 
 exit 1
 

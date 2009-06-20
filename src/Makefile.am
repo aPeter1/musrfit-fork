@@ -14,7 +14,7 @@ xml_DATA = musrfit_startup.xml
 
 LIBADD = $(LEM_LIBS) $(PMUSR_LIBS)
 
-AM_CFLAGS = -g -O3 -Wall -Wno-trigraphs
+AM_CXXFLAGS = -Wall -Wno-trigraphs
 INCLUDES = $(PMUSR_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(BOOST_CFLAGS) $(ROOT_CFLAGS)
 LIBS = $(LEM_LIBS) $(PMUSR_LIBS) $(FFTW3_LIBS) $(GSL_LIBS) $(ROOT_LIBS)
 
