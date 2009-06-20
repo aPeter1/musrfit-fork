@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 
-SUBDIRS = classes external
+SUBDIRS = external classes
 
 bin_PROGRAMS = musrfit musrview musrt0 musrparam msr2msr
 musrfit_SOURCES = musrfit.cpp
@@ -12,9 +12,14 @@ msr2msr_SOURCES = msr2msr.cpp
 xmldir = $(bindir)
 xml_DATA = musrfit_startup.xml
 
-LIBADD = $(LEM_LIBS) $(PMUSR_LIBS)
+LIBADD = $(PMUSR_LIBS) $(LEM_LIBS)
 
-AM_CXXFLAGS = -Wall -Wno-trigraphs
+# The ROOT flags and libs have to be specified here... different automake-versions do not expand the  @...@ in the variable of configure.ac
+ROOT_CFLAGS = -I@ROOTINCDIR@ @ROOTCFLAGS@
+ROOT_LIBS = -L@ROOTLIBDIR@ @ROOTGLIBS@ -lMinuit2 -lMathMore -lXMLParser
+
+AM_CXXFLAGS = $(LOCAL_BIN_CXXFLAGS)
+AM_LDFLAGS = $(LOCAL_BIN_LDFLAGS)
 INCLUDES = $(PMUSR_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(BOOST_CFLAGS) $(ROOT_CFLAGS)
 LIBS = $(LEM_LIBS) $(PMUSR_LIBS) $(FFTW3_LIBS) $(GSL_LIBS) $(ROOT_LIBS)
 

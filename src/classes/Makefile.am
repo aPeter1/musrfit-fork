@@ -66,24 +66,26 @@ ext_cpp_sources = $(ext_source_dir)/MuSR_td_PSI_bin.cpp
 
 include_HEADERS = $(h_sources) $(ext_source_dir)/MuSR_td_PSI_bin.h
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources) $(ext_source_dir)/tydefs.h
+
+# The ROOT flags and libs have to be specified here... different automake-versions do not expand the  @...@ in the variable of configure.ac
+ROOT_CFLAGS = -I@ROOTINCDIR@ @ROOTCFLAGS@
+ROOT_LIBS = -L@ROOTLIBDIR@ @ROOTGLIBS@ -lMinuit2 -lMathMore -lXMLParser
+
 INCLUDES = -I$(top_srcdir)/src/include -I$(ext_source_dir) $(LEM_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(BOOST_CFLAGS) $(ROOT_CFLAGS)
-AM_CXXFLAGS = -Wall -Wno-trigraphs
+AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources)
-AM_CPPFLAGS = -I@ROOTINCDIR@
-AM_LDFLAGS = -L@ROOTLIBDIR@
+AM_LDFLAGS = -L@ROOTLIBDIR@ $(LOCAL_LIB_LDFLAGS)
 CLEANFILES = *Dict.cpp *Dict.h *~ core
 
 %Dict.cpp %Dict.h: ../include/%.h ../include/%LinkDef.h
-	@ROOTCINT@ -v -f $*Dict.cpp -c -p $(INCLUDES) $(AM_CPPFLAGS) $^
+	@ROOTCINT@ -v -f $*Dict.cpp -c -p $(INCLUDES) $^
 
 lib_LTLIBRARIES = libPMusr.la
 
-LIBADD = $(LEM_LIBS)
-
 libPMusr_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources) $(ext_h_sources) $(ext_cpp_sources)
-libPMusr_la_LIBADD = $(FFTW3_LIBS) $(GSL_LIBS) $(ROOT_LIBS)
-libPMusr_la_LDFLAGS = -version-info $(MUSR_LIBRARY_VERSION) -release $(MUSR_RELEASE)
+libPMusr_la_LIBADD = $(LEM_LIBS) $(FFTW3_LIBS) $(GSL_LIBS) $(ROOT_LIBS)
+libPMusr_la_LDFLAGS = -version-info $(MUSR_LIBRARY_VERSION) -release $(MUSR_RELEASE) $(AM_LDFLAGS)
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = PMusr.pc

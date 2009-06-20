@@ -22,22 +22,25 @@ dict_cpp_sources = \
 
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
+
+ROOT_CFLAGS = -I@ROOTINCDIR@ @ROOTCFLAGS@
+ROOT_LIBS = -L@ROOTLIBDIR@ @ROOTGLIBS@
+
 INCLUDES = -I. $(ROOT_CFLAGS)
-AM_CXXFLAGS = -Wall -Wno-trigraphs
+AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dist_h_sources)
-AM_CPPFLAGS = -I@ROOTINCDIR@
-AM_LDFLAGS = -L@ROOTLIBDIR@
+AM_LDFLAGS = -L@ROOTLIBDIR@ $(LOCAL_LIB_LDFLAGS)
 CLEANFILES = *Dict.cxx *Dict.h *~ core
 
 %Dict.cxx %Dict.h: %.h %LinkDef.h
-	@ROOTCINT@ -v -f $*Dict.cxx -c -p $(INCLUDES) $(AM_CPPFLAGS) $^
+	@ROOTCINT@ -v -f $*Dict.cxx -c -p $(INCLUDES) $^
 
 lib_LTLIBRARIES = libTLemRunHeader.la
 
 libTLemRunHeader_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources)
 libTLemRunHeader_la_LIBADD = $(ROOT_LIBS)
-libTLemRunHeader_la_LDFLAGS = -version-info $(LEM_LIBRARY_VERSION) -release $(LEM_RELEASE)
+libTLemRunHeader_la_LDFLAGS = -version-info $(LEM_LIBRARY_VERSION) -release $(LEM_RELEASE) $(AM_LDFLAGS)
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = TLemRunHeader.pc

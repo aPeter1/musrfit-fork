@@ -131,7 +131,7 @@ AC_ARG_WITH([gsl],
        AC_MSG_ERROR(GSL cannot be found at the specified path!)
      fi
      AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation...])],
-    [PKG_CHECK_MODULES(GSL, gsl >= 1.9 gslcblas >= 1.9, [GSL_FOUND=1],
+    [PKG_CHECK_MODULES(GSL, gsl >= 1.9, [GSL_FOUND=1],
      [if test -r /usr/local/include/gsl/gsl_sf_hyperg.h; then
         GSL_PREFIX="/usr/local"
         AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation... (ignore the no just above)])
@@ -203,8 +203,8 @@ dnl -----------------------------------------------
 
 ROOT_PATH([5.22/00], [], AC_MSG_ERROR([Either ROOT is not installed correctly or the version is too old... please check!]))
 
-ROOT_LIBS="-L@ROOTLIBDIR@ @ROOTGLIBS@ -lMinuit2 -lMathMore -lXMLParser "
-ROOT_CFLAGS="-I@ROOTINCDIR@ @ROOTCFLAGS@"
+ROOT_LIBS="[-L@ROOTLIBDIR@ @ROOTGLIBS@ -lMinuit2 -lMathMore -lXMLParser]"
+ROOT_CFLAGS="[-I@ROOTINCDIR@ @ROOTCFLAGS@]"
 AC_SUBST(ROOT_LIBS)
 AC_SUBST(ROOT_CFLAGS)
 
@@ -225,6 +225,30 @@ PMUSR_LIBS="-L${SRCDIR}/src/classes -l${MUSR_LIBRARY_NAME}"
 PMUSR_CFLAGS="-I${SRCDIR}/src/include"
 AC_SUBST(PMUSR_LIBS)
 AC_SUBST(PMUSR_CFLAGS)
+
+
+dnl -----------------------------------------------
+dnl Set host specific compiler and linker flags
+dnl -----------------------------------------------
+
+LOCAL_BIN_CXXFLAGS="-Wall -Wno-trigraphs"
+LOCAL_LIB_CXXFLAGS="${LOCAL_BIN_CXXFLAGS}"
+LOCAL_BIN_LDFLAGS=
+LOCAL_LIB_LDFLAGS=
+
+case "$host" in
+  *-*-cygwin)
+    LOCAL_BIN_CXXFLAGS="${LOCAL_BIN_CXXFLAGS}"
+    LOCAL_LIB_CXXFLAGS="${LOCAL_BIN_CXXFLAGS} -D_DLL"
+    LOCAL_BIN_LDFLAGS="${LOCAL_BIN_LDFLAGS} -Wl,--enable-auto-import -Wl,--enable-runtime-pseudo-reloc"
+    LOCAL_LIB_LDFLAGS="${LOCAL_BIN_LDFLAGS} -Wl,--export-all-symbols"
+    ;;
+esac
+
+AC_SUBST(LOCAL_BIN_CXXFLAGS)
+AC_SUBST(LOCAL_LIB_CXXFLAGS)
+AC_SUBST(LOCAL_BIN_LDFLAGS)
+AC_SUBST(LOCAL_LIB_LDFLAGS)
 
 
 dnl -----------------------------------------------
