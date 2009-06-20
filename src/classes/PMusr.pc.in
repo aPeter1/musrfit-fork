@@ -5,6 +5,6 @@ includedir=@includedir@
 
 Name: PMusr
 Description: C++ shared library providing musr classes
-Version: @VERSION@
+Version: @MUSR_VERSION@
 Libs: -L${libdir} -l@MUSR_LIBRARY_NAME@
 Cflags: -I${includedir}

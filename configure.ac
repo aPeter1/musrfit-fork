@@ -99,6 +99,9 @@ AC_ARG_WITH([fftw3],
       elif test -r /usr/include/fftw3.h; then
         FFTW3_PREFIX="/usr"
         AC_MSG_RESULT([using ${FFTW3_PREFIX} as prefix of the FFTW3 installation... (ignore the no just above)])
+      elif test -r /sw/include/fftw3.h; then
+        FFTW3_PREFIX="/sw"
+        AC_MSG_RESULT([using ${FFTW3_PREFIX} as prefix of the FFTW3 installation... (ignore the no just above)])
       else
         AC_MSG_ERROR(
         [FFTW3 not found. Please call configure with the --with-fftw3 option.
@@ -137,6 +140,9 @@ AC_ARG_WITH([gsl],
         AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation... (ignore the no just above)])
       elif test -r /usr/include/gsl/gsl_sf_hyperg.h; then
         GSL_PREFIX="/usr"
+        AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation... (ignore the no just above)])
+      elif test -r /sw/include/gsl/gsl_sf_hyperg.h; then
+        GSL_PREFIX="/sw"
         AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation... (ignore the no just above)])
       else
         AC_MSG_ERROR(
@@ -177,6 +183,9 @@ AC_ARG_WITH([boostinc],
       elif test -r /usr/include/boost/spirit.hpp; then
         BOOST_INCLUDE="/usr/include"
         AC_MSG_RESULT([using ${BOOST_INCLUDE} as include path for the Boost headers... (ignore the no just above)])
+      elif test -r /sw/include/boost/spirit.hpp; then
+        BOOST_INCLUDE="/sw/include"
+        AC_MSG_RESULT([using ${BOOST_INCLUDE} as include path for the Boost headers... (ignore the no just above)])
       else
         AC_MSG_ERROR(
         [Boost not found. Please call configure with the --with-boostinc option.
@@ -203,8 +212,8 @@ dnl -----------------------------------------------
 
 ROOT_PATH([5.22/00], [], AC_MSG_ERROR([Either ROOT is not installed correctly or the version is too old... please check!]))
 
-ROOT_LIBS="[-L@ROOTLIBDIR@ @ROOTGLIBS@ -lMinuit2 -lMathMore -lXMLParser]"
-ROOT_CFLAGS="[-I@ROOTINCDIR@ @ROOTCFLAGS@]"
+ROOT_LIBS="-L@ROOTLIBDIR@ @ROOTGLIBS@ -lMinuit2 -lMathMore -lXMLParser"
+ROOT_CFLAGS="-I@ROOTINCDIR@ @ROOTCFLAGS@"
 AC_SUBST(ROOT_LIBS)
 AC_SUBST(ROOT_CFLAGS)
 

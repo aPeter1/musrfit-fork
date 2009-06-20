@@ -5,6 +5,6 @@ includedir=@includedir@
 
 Name: TLemRunHeader
 Description: C++ shared library providing the LEM Run Header class
-Version: @VERSION@
+Version: @LEM_VERSION@
 Libs: -L${libdir} -l@LEM_LIBRARY_NAME@
 Cflags: -I${includedir}
