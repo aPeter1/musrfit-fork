@@ -1,5 +1,5 @@
 #! /bin/sh
-
+ 
 # autogen.sh
 #
 # Copyright (c) 2009  BMW
