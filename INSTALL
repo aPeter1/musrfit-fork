@@ -1,17 +1,17 @@
 #---------------------------------------------------------------------
 # INSTALL
-# Andreas Suter, 2008/01/15
-# $Id: INSTALL 3854 2009-04-14 19:32:35Z nemu $
+# Andreas Suter, 2009/06/21
+# $Id: README 4013 2009-06-21
 #---------------------------------------------------------------------
 
 To get it all build:
 
    ./autogen.sh
-   ./configure --prefix=/apps/cern/root
+   ./configure --prefix=/apps/cern/root      (or whereever musrfit should be installed)
    make
-   make install
+   make install                              (as superuser -- maybe)
    
-In the optimal case, everything is setup ;-)
+In the optimal case, everything is set up ;-)
 
 #---------------------------------------------------------------------
 # this is the end ...

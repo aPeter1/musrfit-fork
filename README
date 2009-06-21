@@ -1,17 +1,16 @@
 #---------------------------------------------------------------------
 # README
-# Andreas Suter, 2008/01/15
-# $Id: README 3854 2009-04-14 19:32:35Z nemu $
+# Andreas Suter, 2009/06/21
+# $Id: README 4013 2009-06-21
 #---------------------------------------------------------------------
 
-To get it all build:
+musrfit - muSR data analysis package
 
-   ./autogen.sh
-   ./configure --prefix=/apps/cern/root
-   make
-   make install
-   
-In the optimal case, everything is setup ;-)
+Installation instructions can be found in INSTALL and at
+https://wiki.intranet.psi.ch/MUSR/MusrFitSetup
+
+For further documentation, please visit
+https://wiki.intranet.psi.ch/MUSR/MusrFit
 
 #---------------------------------------------------------------------
 # this is the end ...

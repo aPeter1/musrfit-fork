@@ -75,7 +75,7 @@ INCLUDES = -I$(top_srcdir)/src/include -I$(ext_source_dir) $(LEM_CFLAGS) $(FFTW3
 AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources)
-AM_LDFLAGS = -L@ROOTLIBDIR@ $(LOCAL_LIB_LDFLAGS)
+AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS) -L@ROOTLIBDIR@
 CLEANFILES = *Dict.cpp *Dict.h *~ core
 
 %Dict.cpp %Dict.h: ../include/%.h ../include/%LinkDef.h

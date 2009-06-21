@@ -30,7 +30,7 @@ INCLUDES = -I. $(ROOT_CFLAGS)
 AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dist_h_sources)
-AM_LDFLAGS = -L@ROOTLIBDIR@ $(LOCAL_LIB_LDFLAGS)
+AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS) -L@ROOTLIBDIR@
 CLEANFILES = *Dict.cxx *Dict.h *~ core
 
 %Dict.cxx %Dict.h: %.h %LinkDef.h
