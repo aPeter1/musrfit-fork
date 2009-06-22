@@ -67,10 +67,6 @@ ext_cpp_sources = $(ext_source_dir)/MuSR_td_PSI_bin.cpp
 include_HEADERS = $(h_sources) $(ext_source_dir)/MuSR_td_PSI_bin.h
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources) $(ext_source_dir)/tydefs.h
 
-# The ROOT flags and libs have to be specified here... different automake-versions do not expand the  @...@ in the variable of configure.ac
-ROOT_CFLAGS = -I@ROOTINCDIR@ @ROOTCFLAGS@
-ROOT_LIBS = -L@ROOTLIBDIR@ @ROOTGLIBS@ -lMinuit2 -lMathMore -lXMLParser
-
 INCLUDES = -I$(top_srcdir)/src/include -I$(ext_source_dir) $(LEM_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(BOOST_CFLAGS) $(ROOT_CFLAGS)
 AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 

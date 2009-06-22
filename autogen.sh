@@ -3,8 +3,7 @@
 # autogen.sh
 #
 # Copyright (c) 2009  BMW
-#
-# Based on an autogen.sh script written by Daniel Elstner <daniel.elstner@gmx.net>
+# Copyright (c) 2002  Daniel Elstner  <daniel.elstner@gmx.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License VERSION 2 as

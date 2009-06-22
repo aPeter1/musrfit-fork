@@ -95,13 +95,13 @@ AC_ARG_WITH([fftw3],
     [PKG_CHECK_MODULES(FFTW3, fftw3 >= 3.1.0, [FFTW3_FOUND=1],
      [if test -r /usr/local/include/fftw3.h; then
         FFTW3_PREFIX="/usr/local"
-        AC_MSG_RESULT([using ${FFTW3_PREFIX} as prefix of the FFTW3 installation... (ignore the no just above)])
+        AC_MSG_RESULT([using ${FFTW3_PREFIX} as prefix of the FFTW3 installation... (ignore the negative check result just above)])
       elif test -r /usr/include/fftw3.h; then
         FFTW3_PREFIX="/usr"
-        AC_MSG_RESULT([using ${FFTW3_PREFIX} as prefix of the FFTW3 installation... (ignore the no just above)])
+        AC_MSG_RESULT([using ${FFTW3_PREFIX} as prefix of the FFTW3 installation... (ignore the negative check result just above)])
       elif test -r /sw/include/fftw3.h; then
         FFTW3_PREFIX="/sw"
-        AC_MSG_RESULT([using ${FFTW3_PREFIX} as prefix of the FFTW3 installation... (ignore the no just above)])
+        AC_MSG_RESULT([using ${FFTW3_PREFIX} as prefix of the FFTW3 installation... (ignore the negative check result just above)])
       else
         AC_MSG_ERROR(
         [FFTW3 not found. Please call configure with the --with-fftw3 option.
@@ -137,13 +137,13 @@ AC_ARG_WITH([gsl],
     [PKG_CHECK_MODULES(GSL, gsl >= 1.9, [GSL_FOUND=1],
      [if test -r /usr/local/include/gsl/gsl_sf_hyperg.h; then
         GSL_PREFIX="/usr/local"
-        AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation... (ignore the no just above)])
+        AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation... (ignore the negative check result just above)])
       elif test -r /usr/include/gsl/gsl_sf_hyperg.h; then
         GSL_PREFIX="/usr"
-        AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation... (ignore the no just above)])
+        AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation... (ignore the negative check result just above)])
       elif test -r /sw/include/gsl/gsl_sf_hyperg.h; then
         GSL_PREFIX="/sw"
-        AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation... (ignore the no just above)])
+        AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation... (ignore the negative check result just above)])
       else
         AC_MSG_ERROR(
         [GSL not found. Please call configure with the --with-gsl option.
@@ -179,13 +179,13 @@ AC_ARG_WITH([boostinc],
     [PKG_CHECK_MODULES(BOOST, boost >= 1.30, [BOOST_FOUND=1],
      [if test -r /usr/local/include/boost/spirit.hpp; then
         BOOST_INCLUDE="/usr/local/include"
-        AC_MSG_RESULT([using ${BOOST_INCLUDE} as include path for the Boost headers... (ignore the no just above)])
+        AC_MSG_RESULT([using ${BOOST_INCLUDE} as include path for the Boost headers... (ignore the negative check result just above)])
       elif test -r /usr/include/boost/spirit.hpp; then
         BOOST_INCLUDE="/usr/include"
-        AC_MSG_RESULT([using ${BOOST_INCLUDE} as include path for the Boost headers... (ignore the no just above)])
+        AC_MSG_RESULT([using ${BOOST_INCLUDE} as include path for the Boost headers... (ignore the negative check result just above)])
       elif test -r /sw/include/boost/spirit.hpp; then
         BOOST_INCLUDE="/sw/include"
-        AC_MSG_RESULT([using ${BOOST_INCLUDE} as include path for the Boost headers... (ignore the no just above)])
+        AC_MSG_RESULT([using ${BOOST_INCLUDE} as include path for the Boost headers... (ignore the negative check result just above)])
       else
         AC_MSG_ERROR(
         [Boost not found. Please call configure with the --with-boostinc option.
@@ -212,10 +212,15 @@ dnl -----------------------------------------------
 
 ROOT_PATH([5.22/00], [], AC_MSG_ERROR([Either ROOT is not installed correctly or the version is too old... please check!]))
 
-ROOT_LIBS="-L@ROOTLIBDIR@ @ROOTGLIBS@ -lMinuit2 -lMathMore -lXMLParser"
-ROOT_CFLAGS="-I@ROOTINCDIR@ @ROOTCFLAGS@"
+ROOT_LIBS="-L${ROOTLIBDIR} ${ROOTGLIBS} ${ROOTAUXLIBS} -lMinuit2 -lMathMore -lXMLParser"
+ROOT_CFLAGS="-I${ROOTINCDIR} ${ROOTCFLAGS} ${ROOTAUXCFLAGS}"
 AC_SUBST(ROOT_LIBS)
 AC_SUBST(ROOT_CFLAGS)
+
+# It should be checked properly for -lMinuit2 -- at the moment we simply look if a header file is present in the include directory:
+
+AC_CHECK_FILE([${ROOTINCDIR}/../include/Minuit2/MnMinimize.h], AC_MSG_RESULT([Minuit2 headers found... OK]),
+  AC_MSG_ERROR([Minuit2 headers not found... Please check!]))
 
 
 dnl -----------------------------------------------

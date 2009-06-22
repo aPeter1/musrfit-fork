@@ -23,9 +23,6 @@ dict_cpp_sources = \
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 
-ROOT_CFLAGS = -I@ROOTINCDIR@ @ROOTCFLAGS@
-ROOT_LIBS = -L@ROOTLIBDIR@ @ROOTGLIBS@
-
 INCLUDES = -I. $(ROOT_CFLAGS)
 AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
