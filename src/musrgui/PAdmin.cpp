@@ -266,7 +266,7 @@ QString PAdminXMLParser::expandPath(const QString &str)
         newStr = "";
         break;
       }
-      newStr += "/" + path;
+      newStr += path;
     } else {
       newStr += "/" + token;
     }
