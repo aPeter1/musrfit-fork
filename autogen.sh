@@ -30,6 +30,10 @@ then
     exit 1
 fi
 
+if !(test -d admin); then
+  mkdir admin
+fi
+
 rm -f config.cache
 
 if test -e admin/depcomp          && \
