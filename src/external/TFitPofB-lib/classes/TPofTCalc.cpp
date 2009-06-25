@@ -40,6 +40,7 @@
 #include <cmath>
 #include <iostream>
 #include <cstdio>
+#include <cstdlib>
 
 #include <omp.h>
 

@@ -140,7 +140,7 @@ TLondon1D3LSub::~TLondon1D3LSub() {
 // creates (a pointer to) the TPofTCalc object (with the FFT plan)
 //------------------
 
-TLondon1DHS::TLondon1DHS() : fCalcNeeded(true), fFirstCall(true), fDeadLayerChanged(true) {
+TLondon1DHS::TLondon1DHS() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
     string startup_path_name("TFitPofB_startup.xml");
@@ -618,7 +618,7 @@ TProximity1D1LHS::TProximity1D1LHS() : fCalcNeeded(true), fFirstCall(true) {
     fParForPofB.push_back(startupHandler->GetDeltaB());
     fParForPofB.push_back(0.0);
     fParForPofB.push_back(0.0); // Bkg-Field
-    fParForPofB.push_back(0.005); // Bkg-width
+    fParForPofB.push_back(0.01); // Bkg-width
     fParForPofB.push_back(0.0); // Bkg-weight
 
     TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
@@ -669,7 +669,7 @@ double TProximity1D1LHS::operator()(double t, const vector<double> &par) const {
       fParForBofZ.push_back(fPar[i]);
 //      cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << endl;
     }
-    fFirstCall=false;
+    fFirstCall = false;
     width_changed = true;
     dead_layer_changed = true;
 //  cout << this << endl;

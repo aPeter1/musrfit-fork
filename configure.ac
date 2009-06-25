@@ -220,7 +220,7 @@ AC_SUBST(ROOT_CFLAGS)
 # It should be checked properly for -lMinuit2 -- at the moment we simply look if a header file is present in the include directory:
 
 AC_CHECK_FILE([${ROOTINCDIR}/../include/Minuit2/MnMinimize.h], AC_MSG_RESULT([Minuit2 headers found... OK]),
-  AC_MSG_ERROR([Minuit2 headers not found... Please check!]))
+  AC_MSG_WARN([Minuit2 headers not found... Please check!]))
 
 
 dnl -----------------------------------------------

@@ -11,6 +11,7 @@
 
 #include "TPofTCalc.h"
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <cassert>

@@ -6,14 +6,14 @@ ROOTCFLAGS    = $(shell $(ROOTSYS)/bin/root-config --cflags)
 #---------------------------------------------------
 
 OS            = LINUX
-CXX           = g++-4.2.4
+CXX           = g++-4.4.0
 CXXFLAGS      = -O3 -Wall -fopenmp -Wno-trigraphs -fPIC
 MUSRFITINCLUDE = ../../../include
 #MUSRFITINCLUDE = /home/l_wojek/rep/analysis/musrfit/src/include
 LOCALINCLUDE  = ../include
 ROOTINCLUDE   = $(ROOTSYS)/include
 INCLUDES      = -I$(LOCALINCLUDE) -I$(MUSRFITINCLUDE) -I$(ROOTINCLUDE)
-LD            = g++-4.2.4
+LD            = g++-4.4.0
 LDFLAGS       = -O3
 SOFLAGS       = -O3 -shared -fopenmp -lfftw3_threads -lfftw3 -lm -lpthread
 

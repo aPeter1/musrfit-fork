@@ -11,11 +11,11 @@ if [ "$#" -lt 2 ] ; then
 
         "musrfit-msr to db/dat converter"
 
-USAGE:   msr2data FIRSTRUN# LASTRUN# EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oOUTPUT_FILE | -k | data ]
+USAGE:   msr2data FIRSTRUN# LASTRUN# EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oOUTPUT_FILE | -k | -t | data ]
          OR
-         msr2data \[SPACE SEPARATED LIST OF RUNS\] EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oOUTPUT_FILE | -k | data ]
+         msr2data \[SPACE SEPARATED LIST OF RUNS\] EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oOUTPUT_FILE | -k | -t | data ]
          OR
-         msr2data RUNLISTFILE EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oOUTPUT_FILE | -k | data ]
+         msr2data RUNLISTFILE EXTENSION [noheader | nosummary | fit-TEMPLATERUN# | -oOUTPUT_FILE | -k | -t | data ]
 
 This small script converts subsequent musrfit msr output files into one db- or column-ASCII-file using bash/awk.
 
@@ -60,6 +60,8 @@ This will fit the runs 200 to 220 using musrfit. The file 199_tf_h13.msr (or if 
 template for the first musrfit input file. The results of the fits will be written to ABC.db.
 
 For keeping the MINUIT2 output files after calling musrfit, i.e. invoke musrfit with the option "--keep-mn2-output" just pass the option "-k" to msr2data. If you pass this option to msr2data but do not fit any data, the option will just be ignored.
+
+If musrfit should add the title present in the first data file mentioned in a RUN block to the title line of the mlog output file, pass the option "-t" to msr2data. Then musrfit is called with the option "--title-from-data-file". If you pass this option to msr2data but do not fit any data, the option will just be ignored.
 
 If your musrfit output files do not have an extension as specified above like "200.msr" you have to call the script as in the following example.
 
@@ -283,7 +285,15 @@ else
       for PAR in "$@"
       do
         if [ "$PAR" == "-k" ]; then
-          MUSRFITPARAM="-k"
+          MUSRFITPARAM+=" -k"
+          break
+        fi
+      done
+
+      for PAR in "$@"
+      do
+        if [ "$PAR" == "-t" ]; then
+          MUSRFITPARAM+=" -t"
           break
         fi
       done
@@ -395,7 +405,7 @@ else
       if [ "${CUR_PAR:0:2}" == "-o" ]; then
         if [ "$CUR_PAR" == "-o" ]; then
           if [ "$l" -ne "$LAST_OPT_PAR" ] && [ "$NEXT_PAR" != "noheader" ] && [ "$NEXT_PAR" != "nosummary" ] \
-          && [ "${NEXT_PAR:0:3}" != "fit" ] && [ "$NEXT_PAR" != "-k" ]; then
+          && [ "${NEXT_PAR:0:3}" != "fit" ] && [ "$NEXT_PAR" != "-k" ] && [ "$NEXT_PAR" != "-t" ]; then
             OUTFILE=$NEXT_PAR
             break
           else
