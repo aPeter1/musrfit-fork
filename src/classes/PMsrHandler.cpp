@@ -2692,7 +2692,8 @@ bool PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
     tstr = lines[i].fLine;
     tstr.Remove(TString::kLeading, ' ');
     if (tstr.Length() > 0) {
-      if (!tstr.BeginsWith("#") && (!tstr.BeginsWith("STATISTIC")) && (!tstr.BeginsWith("chisq")) && (!tstr.BeginsWith("maxLH"))) {
+      if (!tstr.BeginsWith("#") && !tstr.BeginsWith("STATISTIC") && !tstr.BeginsWith("chisq") &&
+          !tstr.BeginsWith("maxLH") && !tstr.BeginsWith("*** FIT DID NOT CONVERGE ***")) {
         cout << endl << ">> PMsrHandler::HandleStatisticEntry: **SYNTAX ERROR** in line " << lines[i].fLineNo;
         cout << endl << ">> '" << lines[i].fLine.Data() << "'";
         cout << endl << ">> not a valid STATISTIC block line";
