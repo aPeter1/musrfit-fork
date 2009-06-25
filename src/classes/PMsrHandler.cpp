@@ -2686,7 +2686,22 @@ bool PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
   int  status;
   double dval;
   unsigned int ival;
+  TString tstr;
   for (unsigned int i=0; i<lines.size(); i++) {
+    // check if the statistic block line is illegal
+    tstr = lines[i].fLine;
+    tstr.Remove(TString::kLeading, ' ');
+    if (tstr.Length() > 0) {
+      if (!tstr.BeginsWith("#") && (!tstr.BeginsWith("STATISTIC")) && (!tstr.BeginsWith("chisq")) && (!tstr.BeginsWith("maxLH"))) {
+        cout << endl << ">> PMsrHandler::HandleStatisticEntry: **SYNTAX ERROR** in line " << lines[i].fLineNo;
+        cout << endl << ">> '" << lines[i].fLine.Data() << "'";
+        cout << endl << ">> not a valid STATISTIC block line";
+        cout << endl << ">> If you do not understand this, just remove the STATISTIC block, musrfit will recreate after fitting";
+        cout << endl << endl;
+        return false;
+      }
+    }
+
     // filter date and chisq etc from strings
     // extract date and time
     if (lines[i].fLine.Contains("STATISTIC")) {
