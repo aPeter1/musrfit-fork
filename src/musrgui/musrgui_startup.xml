@@ -14,6 +14,7 @@
     <institute>psi</institute>
     <file_format>root-npp</file_format>
     <lifetime_correction>y</lifetime_correction>
+    <title_from_data_file>n</title_from_data_file>
   </msr_file_defaults>
   <help_section>
     <help_main>

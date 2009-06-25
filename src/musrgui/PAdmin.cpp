@@ -81,6 +81,8 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eFileFormat;
   } else if (qName == "lifetime_correction") {
     fKeyWord = eLifetimeCorrection;
+  } else if (qName == "title_from_data_file") {
+    fKeyWord = eTitleFromDataFile;
   } else if (qName == "msr_default_file_path") {
     fKeyWord = eMsrDefaultFilePath;
   } else if (qName == "help_main") {
@@ -137,6 +139,7 @@ bool PAdminXMLParser::endElement( const QString&, const QString&, const QString 
 bool PAdminXMLParser::characters(const QString& str)
 {
   QString help;
+  bool flag;
 
   switch (fKeyWord) {
     case eExecPath:
@@ -155,12 +158,18 @@ bool PAdminXMLParser::characters(const QString& str)
       fAdmin->setFileFormat(QString(str.ascii()).stripWhiteSpace());
       break;
     case eLifetimeCorrection:
-      bool flag;
       if (str == "y")
         flag = true;
       else
         flag = false;
       fAdmin->setLifetimeCorrectionFlag(flag);
+      break;
+    case eTitleFromDataFile:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->setTitleFromDataFileFlag(flag);
       break;
     case eMsrDefaultFilePath:
       fAdmin->setMsrDefaultFilePath(QString(str.ascii()).stripWhiteSpace());
@@ -293,6 +302,9 @@ PAdmin::PAdmin()
   fFileFormat = QString("");
 
   fHelpMain   = QString("");
+
+  fLifetimeCorrection = true;
+  fTitleFromDataFile  = false;
 
   // XML Parser part
   QString fln = "./musrgui_startup.xml";

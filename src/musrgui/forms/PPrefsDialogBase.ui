@@ -100,6 +100,22 @@
                     <string>will generate a ROOT dump file after the fit with the data and the theory</string>
                 </property>
             </widget>
+            <widget class="QCheckBox">
+                <property name="name">
+                    <cstring>fTitleFromData_checkBox</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>198</x>
+                        <y>11</y>
+                        <width>140</width>
+                        <height>22</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>take data file title</string>
+                </property>
+            </widget>
         </widget>
     </widget>
     <widget class="QLayoutWidget">

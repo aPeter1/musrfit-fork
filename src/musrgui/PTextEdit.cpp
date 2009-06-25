@@ -114,6 +114,7 @@ PTextEdit::PTextEdit( QWidget *parent, const char *name )
   fFileWatcher = 0;
 
   fKeepMinuit2Output = false;
+  fTitleFromDataFile = fAdmin->getTitleFromDataFileFlag();
   fDump = 0; // 0 = no dump, 1 = ascii dump, 2 = root dump
 
   setupFileActions();
@@ -1287,6 +1288,10 @@ void PTextEdit::musrFit()
   if (fKeepMinuit2Output)
     cmd.append("--keep-mn2-output");
 
+  // check if title of the data file should be used to replace the msr-file title
+  if (fTitleFromDataFile)
+    cmd.append("--title-from-data-file");
+
   // check if dump files are wished
   switch (fDump) {
     case 1: // ascii dump
@@ -1374,6 +1379,7 @@ void PTextEdit::musrMsr2Data()
     fMsr2DataParam->recreateDbFile = false;
     fMsr2DataParam->chainFit = true;
     fMsr2DataParam->openFilesAfterFitting = false;
+    fMsr2DataParam->titleFromDataFile = fTitleFromDataFile;
   }
 
   PMsr2DataDialog *dlg = new PMsr2DataDialog(fMsr2DataParam);
@@ -1503,6 +1509,11 @@ void PTextEdit::musrMsr2Data()
     // keep minuit2 output
     if (fMsr2DataParam->keepMinuit2Output) {
       cmd.append("-k");
+    }
+
+    // replace msr-file title by data file title
+    if (fMsr2DataParam->titleFromDataFile) {
+      cmd.append("-t");
     }
 
     // DB output wished
@@ -1680,10 +1691,11 @@ void PTextEdit::musrT0()
  */
 void PTextEdit::musrPrefs()
 {
-  PPrefsDialog *dlg = new PPrefsDialog(fKeepMinuit2Output, fDump);
+  PPrefsDialog *dlg = new PPrefsDialog(fKeepMinuit2Output, fDump, fTitleFromDataFile);
 
   if (dlg->exec() == QDialog::Accepted) {
     fKeepMinuit2Output = dlg->keepMinuit2Output();
+    fTitleFromDataFile = dlg->titleFromDataFileFlag();
     fDump = dlg->getDump();
   }
 }

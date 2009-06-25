@@ -123,6 +123,7 @@ private:
   PAdmin *fAdmin;
 
   bool fKeepMinuit2Output;
+  bool fTitleFromDataFile;
   int  fDump;
 
   PMsr2DataParam *fMsr2DataParam;

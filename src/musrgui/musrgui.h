@@ -49,6 +49,7 @@ typedef struct {
   bool recreateDbFile;
   bool chainFit;
   bool openFilesAfterFitting;
+  bool titleFromDataFile;
 } PMsr2DataParam;
 
 typedef struct {

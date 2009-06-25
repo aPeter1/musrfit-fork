@@ -35,7 +35,7 @@
 /**
  * <p>
  */
-PPrefsDialog::PPrefsDialog(const bool keep_mn2_output, const int dump_tag)
+PPrefsDialog::PPrefsDialog(const bool keep_mn2_output, const int dump_tag, const bool title_from_data_file)
 {
   if (keep_mn2_output)
     fKeepMn2Output_checkBox->setChecked(true);
@@ -52,6 +52,8 @@ PPrefsDialog::PPrefsDialog(const bool keep_mn2_output, const int dump_tag)
     fDumpAscii_checkBox->setChecked(false);
     fDumpRoot_checkBox->setChecked(false);
   }
+
+  fTitleFromData_checkBox->setChecked(title_from_data_file);
 }
 
 //----------------------------------------------------------------------------------------------------

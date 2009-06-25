@@ -39,9 +39,10 @@
 class PPrefsDialog : public PPrefsDialogBase
 {
   public:
-    PPrefsDialog(const bool keep_mn2_output, const int dump_tag);
+    PPrefsDialog(const bool keep_mn2_output, const int dump_tag, const bool title_from_data_file);
 
     bool keepMinuit2Output() { return fKeepMn2Output_checkBox->isChecked(); }
+    bool titleFromDataFileFlag() { return fTitleFromData_checkBox->isChecked(); }
     int  getDump();
 
   public slots:
