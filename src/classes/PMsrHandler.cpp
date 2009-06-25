@@ -337,6 +337,8 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
   TObjArray *tokens;
   TObjString *ostr;
   bool found = false;
+  bool statisticBlockFound = false;
+  bool partialStatisticBlockFound = true;
 
   // construct log file name
   // first find the last '.' in the filename
@@ -807,12 +809,14 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
         }
         break;
       case MSR_TAG_STATISTIC:
+        statisticBlockFound = true;
         sstr = str;
         sstr.Remove(TString::kLeading, ' ');
         if (sstr.BeginsWith("STATISTIC")) {
           TDatime dt;
           fout << "STATISTIC --- " << dt.AsSQLString() << endl;
         } else if (sstr.BeginsWith("chisq")) {
+          partialStatisticBlockFound = false;
           if (fStatistic.fValid) { // valid fit result
             str  = "  chisq = ";
             str += fStatistic.fMin;
@@ -829,6 +833,7 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
              cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
           }
         } else if (sstr.BeginsWith("maxLH")) {
+          partialStatisticBlockFound = false;
           if (fStatistic.fValid) { // valid fit result
             str  = "  maxLH = ";
             str += fStatistic.fMin;
@@ -845,6 +850,7 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
              cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
           }
         } else if (sstr.BeginsWith("*** FIT DID NOT CONVERGE ***")) {
+          partialStatisticBlockFound = false;
           if (fStatistic.fValid) { // valid fit result
             if (fStatistic.fChisq) { // chisq
               str  = "  chisq = ";
@@ -878,6 +884,76 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
         break;
       default:
         break;
+    }
+  }
+
+  // there was no statistic block present in the msr-input-file
+  if (!statisticBlockFound) {
+    cout << endl << "PMsrHandler::WriteMsrLogFile: **WARNING** no STATISTIC block present, will write a default one" << endl;
+    fout << "###############################################################" << endl;
+    TDatime dt;
+    fout << "STATISTIC --- " << dt.AsSQLString() << endl;
+    if (fStatistic.fValid) { // valid fit result
+      if (fStatistic.fChisq) { // chisq
+        str  = "  chisq = ";
+        str += fStatistic.fMin;
+        str += ", NDF = ";
+        str += fStatistic.fNdf;
+        str += ", chisq/NDF = ";
+        str += fStatistic.fMin / fStatistic.fNdf;
+        fout << str.Data() << endl;
+        if (messages)
+          cout << endl << str.Data() << endl;
+      } else { // max. log. liklihood
+        str  = "  maxLH = ";
+        str += fStatistic.fMin;
+        str += ", NDF = ";
+        str += fStatistic.fNdf;
+        str += ", maxLH/NDF = ";
+        str += fStatistic.fMin / fStatistic.fNdf;
+        fout << str.Data() << endl;
+        if (messages)
+          cout << endl << str.Data() << endl;
+      }
+    } else {
+      fout << "*** FIT DID NOT CONVERGE ***" << endl;
+      if (messages)
+        cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
+    }
+  }
+
+  // there was only a partial statistic block present in the msr-input-file
+  if (partialStatisticBlockFound) {
+    cout << endl << "PMsrHandler::WriteMsrLogFile: **WARNING** garbage STATISTIC block present in the msr-input file.";
+    cout << endl << "** WILL ADD SOME SENSIBLE STUFF, BUT YOU HAVE TO CHECK IT SINCE I AM **NOT** REMOVING THE GARBAGE! **" << endl;
+    TDatime dt;
+    fout << "STATISTIC --- " << dt.AsSQLString() << endl;
+    if (fStatistic.fValid) { // valid fit result
+      if (fStatistic.fChisq) { // chisq
+        str  = "  chisq = ";
+        str += fStatistic.fMin;
+        str += ", NDF = ";
+        str += fStatistic.fNdf;
+        str += ", chisq/NDF = ";
+        str += fStatistic.fMin / fStatistic.fNdf;
+        fout << str.Data() << endl;
+        if (messages)
+          cout << endl << str.Data() << endl;
+      } else { // max. log. liklihood
+        str  = "  maxLH = ";
+        str += fStatistic.fMin;
+        str += ", NDF = ";
+        str += fStatistic.fNdf;
+        str += ", maxLH/NDF = ";
+        str += fStatistic.fMin / fStatistic.fNdf;
+        fout << str.Data() << endl;
+        if (messages)
+          cout << endl << str.Data() << endl;
+      }
+    } else {
+      fout << "*** FIT DID NOT CONVERGE ***" << endl;
+      if (messages)
+        cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
     }
   }
 
@@ -2593,7 +2669,7 @@ bool PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
   if (lines.empty()) {
     cout << endl << ">> PMsrHandler::HandleStatisticEntry: **WARNING** There is no STATISTIC block! Do you really want this?";
     cout << endl;
-    return false;
+    return true;
   }
 
   // check if chisq or max.log likelihood

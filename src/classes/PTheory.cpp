@@ -1094,6 +1094,10 @@ double PTheory::StaticGaussKTLF(register double t, const PDoubleVector& paramVal
     }
   }
 
+  // check if all parameters == 0
+  if ((val[0] == 0.0) && (val[1] == 0.0))
+    return 1.0;
+
   // check if the parameter values have changed, and if yes recalculate the non-analytic integral
   bool newParam = false;
   for (unsigned int i=0; i<3; i++) {
@@ -1158,6 +1162,10 @@ double PTheory::DynamicGaussKTLF(register double t, const PDoubleVector& paramVa
       val[i] = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
     }
   }
+
+  // check if all parameters == 0
+  if ((val[0] == 0.0) && (val[1] == 0.0) && (val[2] == 0.0))
+    return 1.0;
 
   // check that Delta != 0, if not (i.e. stupid parameter) return 1, which is the correct limit
   if (fabs(val[1]) < 1.0e-6) {
@@ -1269,6 +1277,10 @@ double PTheory::StaticLorentzKTLF(register double t, const PDoubleVector& paramV
     }
   }
 
+  // check if all parameters == 0
+  if ((val[0] == 0.0) && (val[1] == 0.0))
+    return 1.0;
+
   // check if the parameter values have changed, and if yes recalculate the non-analytic integral
   bool newParam = false;
   for (unsigned int i=0; i<3; i++) {
@@ -1334,10 +1346,6 @@ double PTheory::DynamicLorentzKTLF(register double t, const PDoubleVector& param
 
   assert(fParamNo.size() <= 4);
 
-  // check if all parameters == 0
-  if ((val[0] == 0.0) && (val[1] == 0.0) && (val[2] == 0.0))
-    return 1.0;
-
   // check if FUNCTIONS are used
   for (unsigned int i=0; i<fParamNo.size(); i++) {
     if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
@@ -1346,6 +1354,10 @@ double PTheory::DynamicLorentzKTLF(register double t, const PDoubleVector& param
       val[i] = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
     }
   }
+
+  // check if all parameters == 0
+  if ((val[0] == 0.0) && (val[1] == 0.0) && (val[2] == 0.0))
+    return 1.0;
 
   double tt;
   if (fParamNo.size() == 3) // no tshift
