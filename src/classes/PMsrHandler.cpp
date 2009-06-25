@@ -889,6 +889,7 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
 
   // there was no statistic block present in the msr-input-file
   if (!statisticBlockFound) {
+    partialStatisticBlockFound = false;
     cout << endl << "PMsrHandler::WriteMsrLogFile: **WARNING** no STATISTIC block present, will write a default one" << endl;
     fout << "###############################################################" << endl;
     TDatime dt;
