@@ -68,6 +68,8 @@ class PMsrHandler
     virtual unsigned int GetNoOfParams() { return fParam.size(); }
     virtual const TString& GetFileName() const { return fFileName; }
 
+    virtual void SetMsrTitle(const TString &title) { fTitle = title; }
+
     virtual bool SetMsrParamValue(unsigned int i, double value);
     virtual bool SetMsrParamStep(unsigned int i, double value);
     virtual bool SetMsrParamPosErrorPresent(unsigned int i, bool value);
@@ -96,7 +98,6 @@ class PMsrHandler
     virtual bool CheckFuncs();
 
   private:
-    PMsrLines              fComments;  ///< holds the comments of the msr-file
     TString                fFileName;  ///< file name of the msr-file
     TString                fMsrFileDirectoryPath; ///< msr-file directory path
     TString                fTitle;     ///< holds the title string of the msr-file

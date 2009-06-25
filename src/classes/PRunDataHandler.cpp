@@ -389,6 +389,10 @@ bool PRunDataHandler::ReadRootFile(bool notPostPileup)
     return false;
   }
 
+  // get run title
+  TObjString ostr = runHeader->GetRunTitle();
+  runData.fRunTitle = ostr.GetString();
+
   // get temperature
   runData.fTemp = runHeader->GetSampleTemperature();
 
@@ -490,7 +494,7 @@ bool PRunDataHandler::ReadRootFile(bool notPostPileup)
  */
 bool PRunDataHandler::ReadNexusFile()
 {
-  cout << endl << "PRunDataHandler::ReadNexusFile(): Sorry, not yet implemented ...";
+  cout << endl << "PRunDataHandler::ReadNexusFile(): Sorry, not yet implemented, ask Alex Amato ...";
   return false;
 }
 

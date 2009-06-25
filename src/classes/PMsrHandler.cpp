@@ -87,7 +87,6 @@ PMsrHandler::PMsrHandler(char *fileName) : fFileName(fileName)
  */
 PMsrHandler::~PMsrHandler()
 {
-  fComments.clear();
   fParam.clear();
   fTheory.clear();
   fFunctions.clear();
@@ -166,8 +165,7 @@ int PMsrHandler::ReadMsrFile()
     current.fLineNo = line_no;
     current.fLine   = line;
 
-    if (line.BeginsWith("#") || line.IsWhitespace()) { // if the line is a comment/empty line keep it
-      fComments.push_back(current);
+    if (line.BeginsWith("#") || line.IsWhitespace()) { // if the line is a comment/empty go to the next one
       continue;
     }
 
@@ -297,12 +295,6 @@ int PMsrHandler::ReadMsrFile()
   plot.clear();
   statistic.clear();
 
-// cout << endl << "# Comments: ";
-// for (unsigned int i=0; i<fComments.size(); i++) {
-//   cout << endl << fComments[i].fLineNo << " " << fComments[i].fLine.Data();
-// }
-// cout << endl;
-
 /*
 cout << endl << ">> FOURIER Block:";
 cout << endl << ">>   Fourier Block Present       : " << fFourier.fFourierBlockPresent;
@@ -410,7 +402,10 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
     // handle blocks
     switch (tag) {
       case MSR_TAG_TITLE:
-        fout << str.Data() << endl;
+        if (lineNo == 1)
+          fout << fTitle.Data() << endl;
+        else
+          fout << str.Data() << endl;
         break;
       case MSR_TAG_FITPARAMETER:
         tokens = str.Tokenize(" \t");

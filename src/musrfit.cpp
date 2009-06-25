@@ -57,8 +57,8 @@ using namespace std;
  */
 void musrfit_syntax()
 {
-  cout << endl << "usage: musrfit [<msr-file> [-k, --keep-mn2-ouput] [-c, --chisq-only] [--dump <type>] |";
-  cout << endl << "                           --version | --help";
+  cout << endl << "usage: musrfit [<msr-file> [-k, --keep-mn2-ouput] [-c, --chisq-only] [-t, --title-from-data-file]";
+  cout << endl << "                            [--dump <type>] | --version | --help";
   cout << endl << "       <msr-file>: msr input file";
   cout << endl << "       'musrfit <msr-file>' will execute musrfit";
   cout << endl << "       'musrfit' or 'musrfit --help' will show this help";
@@ -70,6 +70,9 @@ void musrfit_syntax()
   cout << endl << "       -c, --chisq-only: instead of fitting the data, chisq is just calculated";
   cout << endl << "              once and the result is set to the stdout. This feature is useful";
   cout << endl << "              to adjust initial parameters.";
+  cout << endl << "       -t, --title-from-data-file: will replace the <msr-file> run title by the";
+  cout << endl << "              run title of the FIRST run of the <msr-file> run block, if a run title";
+  cout << endl << "              is present in the data file.";
   cout << endl << "       --dump <type> is writing a data file with the fit data and the theory";
   cout << endl << "              <type> can be 'ascii', 'root'" << endl;
   cout << endl << "       At the end of a fit, musrfit writes the fit results into an <mlog-file> and";
@@ -325,6 +328,8 @@ int main(int argc, char *argv[])
   int  status;
   bool keep_mn2_output = false;
   bool chisq_only = false;
+  bool title_from_data_file = false;
+
   TString dump("");
   char filename[1024];
 
@@ -359,6 +364,8 @@ int main(int argc, char *argv[])
       keep_mn2_output = true;
     } else if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--chisq-only")) {
       chisq_only = true;
+    } else if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "--title-from-data-file")) {
+      title_from_data_file = true;
     } else if (!strcmp(argv[i], "--dump")) {
       if (i<argc-1) {
         dump = TString(argv[i+1]);
@@ -444,6 +451,14 @@ int main(int argc, char *argv[])
   bool success = dataHandler->IsAllDataAvailable();
   if (!success) {
     cout << endl << "**ERROR** Couldn't read all data files, will quit ..." << endl;
+  }
+
+  // if present, replace the run title of the <msr-file> with the run title of the FIRST run in the run block of the msr-file
+  if (title_from_data_file) {
+    PMsrRunList *rl  = msrHandler->GetMsrRunList();
+    PRawRunData *rrd = dataHandler->GetRunData(rl->at(0).fRunName[0]);
+    if (rrd->fRunTitle.Length() > 0)
+      msrHandler->SetMsrTitle(rrd->fRunTitle);
   }
 
   // generate the necessary fit histogramms for the fit
