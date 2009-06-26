@@ -73,6 +73,10 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eExecPath;
   } else if (qName == "default_save_path") {
     fKeyWord = eDefaultSavePath;
+  } else if (qName == "title_from_data_file") {
+    fKeyWord = eTitleFromDataFile;
+  } else if (qName == "enable_musrt0") {
+    fKeyWord = eEnableMusrT0;
   } else if (qName == "beamline") {
     fKeyWord = eBeamline;
   } else if (qName == "institute") {
@@ -81,8 +85,6 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eFileFormat;
   } else if (qName == "lifetime_correction") {
     fKeyWord = eLifetimeCorrection;
-  } else if (qName == "title_from_data_file") {
-    fKeyWord = eTitleFromDataFile;
   } else if (qName == "msr_default_file_path") {
     fKeyWord = eMsrDefaultFilePath;
   } else if (qName == "help_main") {
@@ -148,6 +150,20 @@ bool PAdminXMLParser::characters(const QString& str)
     case eDefaultSavePath:
       fAdmin->setDefaultSavePath(QString(str.ascii()).stripWhiteSpace());
       break;
+    case eTitleFromDataFile:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->setTitleFromDataFileFlag(flag);
+      break;
+    case eEnableMusrT0:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->setEnableMusrT0Flag(flag);
+      break;
     case eBeamline:
       fAdmin->setBeamline(QString(str.ascii()).stripWhiteSpace());
       break;
@@ -163,13 +179,6 @@ bool PAdminXMLParser::characters(const QString& str)
       else
         flag = false;
       fAdmin->setLifetimeCorrectionFlag(flag);
-      break;
-    case eTitleFromDataFile:
-      if (str == "y")
-        flag = true;
-      else
-        flag = false;
-      fAdmin->setTitleFromDataFileFlag(flag);
       break;
     case eMsrDefaultFilePath:
       fAdmin->setMsrDefaultFilePath(QString(str.ascii()).stripWhiteSpace());
@@ -303,8 +312,9 @@ PAdmin::PAdmin()
 
   fHelpMain   = QString("");
 
-  fLifetimeCorrection = true;
   fTitleFromDataFile  = false;
+  fEnableMusrT0       = false;
+  fLifetimeCorrection = true;
 
   // XML Parser part
   QString fln = "./musrgui_startup.xml";

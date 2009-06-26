@@ -24,100 +24,6 @@
     <property name="modal">
         <bool>true</bool>
     </property>
-    <widget class="QTabWidget">
-        <property name="name">
-            <cstring>fTabWidget</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>10</x>
-                <y>20</y>
-                <width>520</width>
-                <height>110</height>
-            </rect>
-        </property>
-        <widget class="QWidget">
-            <property name="name">
-                <cstring>tab</cstring>
-            </property>
-            <attribute name="title">
-                <string>musrfit</string>
-            </attribute>
-            <widget class="QCheckBox">
-                <property name="name">
-                    <cstring>fKeepMn2Output_checkBox</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>10</y>
-                        <width>160</width>
-                        <height>22</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>keep minuit2 output</string>
-                </property>
-                <property name="toolTip" stdset="0">
-                    <string>will keep the Minuit2 output files (correlation matrix, etc.)</string>
-                </property>
-            </widget>
-            <widget class="QCheckBox">
-                <property name="name">
-                    <cstring>fDumpAscii_checkBox</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>30</y>
-                        <width>95</width>
-                        <height>22</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>dump ascii</string>
-                </property>
-                <property name="toolTip" stdset="0">
-                    <string>will generate an ascii dump file after the fit with the data and the theory</string>
-                </property>
-            </widget>
-            <widget class="QCheckBox">
-                <property name="name">
-                    <cstring>fDumpRoot_checkBox</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>50</y>
-                        <width>95</width>
-                        <height>22</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>dump root</string>
-                </property>
-                <property name="toolTip" stdset="0">
-                    <string>will generate a ROOT dump file after the fit with the data and the theory</string>
-                </property>
-            </widget>
-            <widget class="QCheckBox">
-                <property name="name">
-                    <cstring>fTitleFromData_checkBox</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>198</x>
-                        <y>11</y>
-                        <width>140</width>
-                        <height>22</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>take data file title</string>
-                </property>
-            </widget>
-        </widget>
-    </widget>
     <widget class="QLayoutWidget">
         <property name="name">
             <cstring>Layout1</cstring>
@@ -203,6 +109,124 @@
                 </property>
             </widget>
         </hbox>
+    </widget>
+    <widget class="QTabWidget">
+        <property name="name">
+            <cstring>fTabWidget</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>20</y>
+                <width>520</width>
+                <height>110</height>
+            </rect>
+        </property>
+        <widget class="QWidget">
+            <property name="name">
+                <cstring>tab</cstring>
+            </property>
+            <attribute name="title">
+                <string>musrfit</string>
+            </attribute>
+            <widget class="QCheckBox">
+                <property name="name">
+                    <cstring>fDumpAscii_checkBox</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>10</x>
+                        <y>30</y>
+                        <width>95</width>
+                        <height>22</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>dump ascii</string>
+                </property>
+                <property name="toolTip" stdset="0">
+                    <string>will generate an ascii dump file after the fit with the data and the theory</string>
+                </property>
+            </widget>
+            <widget class="QCheckBox">
+                <property name="name">
+                    <cstring>fDumpRoot_checkBox</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>10</x>
+                        <y>50</y>
+                        <width>95</width>
+                        <height>22</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>dump root</string>
+                </property>
+                <property name="toolTip" stdset="0">
+                    <string>will generate a ROOT dump file after the fit with the data and the theory</string>
+                </property>
+            </widget>
+            <widget class="QCheckBox">
+                <property name="name">
+                    <cstring>fTitleFromData_checkBox</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>198</x>
+                        <y>11</y>
+                        <width>140</width>
+                        <height>22</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>take data file title</string>
+                </property>
+            </widget>
+            <widget class="QCheckBox">
+                <property name="name">
+                    <cstring>fKeepMn2Output_checkBox</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>10</x>
+                        <y>10</y>
+                        <width>160</width>
+                        <height>22</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>keep minuit2 output</string>
+                </property>
+                <property name="toolTip" stdset="0">
+                    <string>will keep the Minuit2 output files (correlation matrix, etc.)</string>
+                </property>
+            </widget>
+        </widget>
+        <widget class="QWidget">
+            <property name="name">
+                <cstring>TabPage</cstring>
+            </property>
+            <attribute name="title">
+                <string>musrt0</string>
+            </attribute>
+            <widget class="QCheckBox">
+                <property name="name">
+                    <cstring>fEnableMusrT0_checkBox</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>10</x>
+                        <y>10</y>
+                        <width>95</width>
+                        <height>22</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>enable it</string>
+                </property>
+            </widget>
+        </widget>
     </widget>
 </widget>
 <images>

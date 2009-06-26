@@ -8,13 +8,14 @@
     <exec_path>$ROOTSYS/bin</exec_path>
     <default_save_path>./</default_save_path>
     <msr_default_file_path>$HOME/analysis/musrfit/src/musrgui</msr_default_file_path>
+    <title_from_data_file>n</title_from_data_file>
+    <enable_musrt0>n</enable_musrt0>
   </general>
   <msr_file_defaults>
     <beamline>mue4</beamline>
     <institute>psi</institute>
     <file_format>root-npp</file_format>
     <lifetime_correction>y</lifetime_correction>
-    <title_from_data_file>n</title_from_data_file>
   </msr_file_defaults>
   <help_section>
     <help_main>

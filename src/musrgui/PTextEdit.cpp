@@ -108,6 +108,8 @@ PTextEdit::PTextEdit( QWidget *parent, const char *name )
 {
   fAdmin = new PAdmin();
 
+  fMusrT0Action = 0;
+
   fMsr2DataParam = 0;
   fFindReplaceData = 0,
 
@@ -115,6 +117,7 @@ PTextEdit::PTextEdit( QWidget *parent, const char *name )
 
   fKeepMinuit2Output = false;
   fTitleFromDataFile = fAdmin->getTitleFromDataFileFlag();
+  fEnableMusrT0      = fAdmin->getEnableMusrT0Flag();
   fDump = 0; // 0 = no dump, 1 = ascii dump, 2 = root dump
 
   setupFileActions();
@@ -149,6 +152,14 @@ PTextEdit::PTextEdit( QWidget *parent, const char *name )
  */
 PTextEdit::~PTextEdit()
 {
+  if (fAdmin) {
+    delete fAdmin;
+    fAdmin = 0;
+  }
+  if (fMusrT0Action) {
+    delete fMusrT0Action;
+    fMusrT0Action = 0;
+  }
   if (fMsr2DataParam) {
     delete fMsr2DataParam;
     fMsr2DataParam = 0;
@@ -362,10 +373,11 @@ void PTextEdit::setupMusrActions()
   a->addTo( tb );
   a->addTo( menu );
 
-  a = new QAction( QPixmap::fromMimeSource( "musrt0.xpm" ), tr( "&T0" ), 0, this, "musrT0" );
-  connect( a, SIGNAL( activated() ), this, SLOT( musrT0() ) );
-  a->addTo( tb );
-  a->addTo( menu );
+  fMusrT0Action = new QAction( QPixmap::fromMimeSource( "musrt0.xpm" ), tr( "&T0" ), 0, this, "musrT0" );
+  connect( fMusrT0Action, SIGNAL( activated() ), this, SLOT( musrT0() ) );
+  fMusrT0Action->addTo( tb );
+  fMusrT0Action->addTo( menu );
+  fMusrT0Action->setEnabled(fEnableMusrT0);
 
   a = new QAction( QPixmap::fromMimeSource( "musrprefs.xpm" ), tr( "&Preferences" ), 0, this, "musrPrefs" );
   connect( a, SIGNAL( activated() ), this, SLOT( musrPrefs() ) );
@@ -1691,11 +1703,13 @@ void PTextEdit::musrT0()
  */
 void PTextEdit::musrPrefs()
 {
-  PPrefsDialog *dlg = new PPrefsDialog(fKeepMinuit2Output, fDump, fTitleFromDataFile);
+  PPrefsDialog *dlg = new PPrefsDialog(fKeepMinuit2Output, fDump, fTitleFromDataFile, fEnableMusrT0);
 
   if (dlg->exec() == QDialog::Accepted) {
-    fKeepMinuit2Output = dlg->keepMinuit2Output();
-    fTitleFromDataFile = dlg->titleFromDataFileFlag();
+    fKeepMinuit2Output = dlg->getKeepMinuit2OutputFlag();
+    fTitleFromDataFile = dlg->getTitleFromDataFileFlag();
+    fEnableMusrT0 = dlg->getEnableMusrT0Flag();
+    fMusrT0Action->setEnabled(fEnableMusrT0);
     fDump = dlg->getDump();
   }
 }

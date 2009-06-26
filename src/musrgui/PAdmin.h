@@ -57,9 +57,10 @@ class PAdminXMLParser : public QXmlDefaultHandler
     virtual ~PAdminXMLParser() {}
 
   private:
-    enum EAdminKeyWords {eEmpty, eExecPath, eDefaultSavePath, eBeamline, eInstitute, eFileFormat,
-                         eLifetimeCorrection, eTitleFromDataFile, eMsrDefaultFilePath, eHelpMain, eTheoFuncPixmapPath,
-                         eFunc, eFuncName, eFuncComment, eFuncLabel, eFuncPixmap, eFuncParams};
+    enum EAdminKeyWords {eEmpty, eExecPath, eDefaultSavePath, eTitleFromDataFile, eEnableMusrT0,
+                         eBeamline, eInstitute, eFileFormat, eLifetimeCorrection, eMsrDefaultFilePath,
+                         eHelpMain, eTheoFuncPixmapPath, eFunc, eFuncName, eFuncComment, eFuncLabel,
+                         eFuncPixmap, eFuncParams};
 
     bool startDocument();
     bool startElement( const QString&, const QString&, const QString& ,
@@ -86,11 +87,12 @@ class PAdmin
 
     QString getExecPath() { return fExecPath; }
     QString getDefaultSavePath() { return fDefaultSavePath; }
+    bool    getTitleFromDataFileFlag() { return fTitleFromDataFile; }
+    bool    getEnableMusrT0Flag() { return fEnableMusrT0; }
     QString getBeamline() { return fBeamline; }
     QString getInstitute() { return fInstitute; }
     QString getFileFormat() { return fFileFormat; }
     bool    getLifetimeCorrectionFlag() { return fLifetimeCorrection; }
-    bool    getTitleFromDataFileFlag() { return fTitleFromDataFile; }
     QString getMsrDefaultFilePath() { return fMsrDefaultFilePath; }
     QString getHelpMain() { return fHelpMain; }
     QString getTheoFuncPixmapPath() { return fTheoFuncPixmapPath; }
@@ -100,11 +102,12 @@ class PAdmin
   protected:
     void setExecPath(const QString str) { fExecPath = str; }
     void setDefaultSavePath(const QString str) { fDefaultSavePath = str; }
+    void setTitleFromDataFileFlag(const bool flag) { fTitleFromDataFile = flag; }
+    void setEnableMusrT0Flag(const bool flag) { fEnableMusrT0 = flag; }
     void setBeamline(const QString str) { fBeamline = str; }
     void setInstitute(const QString str) { fInstitute = str; }
     void setFileFormat(const QString str) { fFileFormat = str; }
     void setLifetimeCorrectionFlag(const bool flag) { fLifetimeCorrection = flag; }
-    void setTitleFromDataFileFlag(const bool flag) { fTitleFromDataFile = flag; }
     void setMsrDefaultFilePath(const QString str) { fMsrDefaultFilePath = str; }
     void setHelpMain(const QString str) { fHelpMain = str; }
     void setTheoFuncPixmapPath (const QString str) { fTheoFuncPixmapPath = str; }
@@ -118,11 +121,13 @@ class PAdmin
     QString fMsrDefaultFilePath;
     QString fTheoFuncPixmapPath;
 
+    bool fTitleFromDataFile;
+    bool fEnableMusrT0;
+
     QString fBeamline;
     QString fInstitute;
     QString fFileFormat;
     bool fLifetimeCorrection;
-    bool fTitleFromDataFile;
 
     QString fHelpMain;
 

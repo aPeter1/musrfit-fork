@@ -122,8 +122,11 @@ private slots:
 private:
   PAdmin *fAdmin;
 
+  QAction *fMusrT0Action;
+
   bool fKeepMinuit2Output;
   bool fTitleFromDataFile;
+  bool fEnableMusrT0;
   int  fDump;
 
   PMsr2DataParam *fMsr2DataParam;
