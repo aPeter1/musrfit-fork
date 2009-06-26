@@ -84,15 +84,13 @@ PMusrT0::PMusrT0()
  * \param rawRunData
  * \param histoNo
  */
-PMusrT0::PMusrT0(PRawRunData *rawRunData, int runNo, int histoNo, int detectorTag, int addRunNo)
+PMusrT0::PMusrT0(PRawRunData *rawRunData, int runNo, int histoNo, int detectorTag, int addRunNo) :
+    fRunNo(runNo), fDetectorTag(detectorTag), fAddRunNo(addRunNo)
 {
-//  cout << endl << "run Name = " << rawRunData->fRunName.Data() << ", histoNo = " << histoNo << endl;
+cout << endl << "run Name = " << rawRunData->fRunName.Data() << ", runNo = " << fRunNo << ", histoNo = " << histoNo << endl;
 
   fStatus = 0; // default is quit locally
 
-  fRunNo        = runNo;
-  fDetectorTag  = detectorTag;
-  fAddRunNo     = addRunNo;
   fAddRunOffset = 0;
 
   TString str = rawRunData->fRunName + TString(" : ");
