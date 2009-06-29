@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nonlocal xmlns="http://nemu.web.psi.ch/musrfit/nonlocal">
+    <comment>
+        $Id$
+    </comment>
+    <nonlocal_par>
+        <fourier_points>200000</fourier_points>
+    </nonlocal_par>
+    <trim_sp_part>
+        <data_path>/afs/psi.ch/project/nemu/analysis/2009/Nonlocal/In-37/In37</data_path>
+        <energy_list>
+            <energy>2.5</energy>
+            <energy>4.0</energy>
+            <energy>6.0</energy>
+            <energy>8.0</energy>
+            <energy>10.0</energy>
+            <energy>12.5</energy>
+            <energy>14.1</energy>
+            <energy>17.5</energy>
+            <energy>22.0</energy>
+            <energy>25.0</energy>
+            <energy>28.2</energy>
+        </energy_list>
+    </trim_sp_part>
+</nonlocal>
