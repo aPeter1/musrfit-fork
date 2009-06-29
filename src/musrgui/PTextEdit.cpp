@@ -194,7 +194,7 @@ void PTextEdit::setupFileActions()
   connect( a, SIGNAL( activated() ), this, SLOT( fileOpen() ) );
   a->addTo( tb );
   a->addTo( menu );
-  a = new QAction( QPixmap::fromMimeSource( "filereload.xpm" ), tr( "Reload..." ), 0, this, "fileReload" );
+  a = new QAction( QPixmap::fromMimeSource( "filereload.xpm" ), tr( "Reload..." ), Key_F5, this, "fileReload" );
   connect( a, SIGNAL( activated() ), this, SLOT( fileReload() ) );
   a->addTo( tb );
   a->addTo( menu );
