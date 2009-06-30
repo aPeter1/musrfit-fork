@@ -101,7 +101,7 @@ install: all
 	@echo "Installing shared lib: libPUserFcn.so ( you must be root ;-) )"
 ifeq ($(OS),LINUX)
 	cp -pv $(SHLIB) $(ROOTSYS)/lib
-#	cp -pv ../include/PNonlocal.h $(ROOTSYS)/include
-#	cp -pv ../include/PNL_StartupHandler.h $(ROOTSYS)/include
-#	cp -pv ../include/PNL_PippardFitter.h $(ROOTSYS)/include
+#	cp -pv PNonlocal.h $(ROOTSYS)/include
+#	cp -pv PNL_StartupHandler.h $(ROOTSYS)/include
+	cp -pv PNL_PippardFitter.h $(ROOTSYS)/include
 endif

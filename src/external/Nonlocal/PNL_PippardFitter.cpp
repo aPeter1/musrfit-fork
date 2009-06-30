@@ -77,6 +77,10 @@ PNL_PippardFitter::PNL_PippardFitter()
     saxParser = 0;
   }
 
+  // check if everything went fine with the startup handler
+  if (!fStartupHandler->IsValid())
+    assert(false);
+
   // load all the TRIM.SP rge-files
   fRgeHandler = new PNL_RgeHandler(fStartupHandler->GetTrimSpDataPathList());
   if (!fRgeHandler->IsValid())
@@ -106,7 +110,7 @@ PNL_PippardFitter::~PNL_PippardFitter()
 Double_t PNL_PippardFitter::operator()(Double_t t, const std::vector<Double_t> &param) const
 {
   // expected parameters: energy, temp, thickness, meanFreePath, xi0, lambdaL
-  assert(param.size() != 6);
+  assert(param.size() == 6);
 
   return 0.0;
 }

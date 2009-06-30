@@ -45,6 +45,8 @@ ClassImpQ(PNL_StartupHandler)
  */
 PNL_StartupHandler::PNL_StartupHandler()
 {
+  fIsValid = true;
+
   fStartupFileFound = false;
   fStartupFilePath = "";
 
@@ -150,6 +152,8 @@ void PNL_StartupHandler::OnEndElement(const char *str)
 void PNL_StartupHandler::OnCharacters(const char *str)
 {
   TString tstr;
+  Double_t dval;
+  char sstr[128];
 
   switch (fKey) {
     case eFourierPoints:
@@ -166,7 +170,19 @@ void PNL_StartupHandler::OnCharacters(const char *str)
       fTrimSpDataPath = str;
       break;
     case eEnergy:
-      tstr = fTrimSpDataPath + TString(str);
+      tstr = str;
+      if (tstr.IsFloat()) {
+        dval = tstr.Atof();
+      } else {
+        cout << endl << "PNL_StartupHandler::OnCharacters: **ERROR** when finding energy:";
+        cout << endl << "\"" << str << "\" is not a double.";
+        cout << endl;
+        fIsValid = false;
+      }
+      tstr = fTrimSpDataPath;
+      sprintf(sstr, "%03d", (int)(dval*10.0));
+      tstr += sstr;
+      tstr += ".rge";      
       fTrimSpDataPathList.push_back(tstr);
       break;
     default:

@@ -138,7 +138,7 @@ Bool_t PNL_RgeHandler::LoadRgeData(const PStringVector &rgeDataPathList)
   ifstream fin;
   PNL_RgeData data;
   Int_t idx=0;
-  TString dataName;
+  TString dataName, tstr;
   char line[512];
   int result;
   double dist, val;
@@ -172,6 +172,12 @@ Bool_t PNL_RgeHandler::LoadRgeData(const PStringVector &rgeDataPathList)
       // ignore first line
       if (idx == 1)
         continue;
+
+      // ignore empty lines
+      tstr = line;
+      if (tstr.IsWhitespace())
+        continue;
+
 
       // get values
       result = sscanf(line, "%lf %lf", &dist, &val);
