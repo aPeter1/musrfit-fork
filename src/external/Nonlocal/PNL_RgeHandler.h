@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  PNL_PippardFitter.h
+  PNL_RgeHandler.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -29,26 +29,27 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PNL_PIPPARDFITTER_H_
-#define _PNL_PIPPARDFITTER_H_
+#ifndef _PNL_RGEHANDLER_H_
+#define _PNL_RGEHANDLER_H_
 
-#include "PUserFcnBase.h"
-#include "PNL_StartupHandler.h"
-#include "PNL_RgeHandler.h"
+#include "PNonlocal.h"
 
-class PNL_PippardFitter : public PUserFcnBase
+class PNL_RgeHandler
 {
   public:
-    PNL_PippardFitter();
-    virtual ~PNL_PippardFitter();
+    PNL_RgeHandler(const PStringVector &rgeDataPathList);
+    virtual ~PNL_RgeHandler();
 
-    virtual Double_t operator()(Double_t t, const std::vector<Double_t> &param) const;
+    virtual Bool_t IsValid() { return fIsValid; }
+    virtual Int_t GetRgeEnergyIndex(const Double_t energy);
+    virtual Double_t GetRgeValue(const Double_t energy, const Double_t dist);
+    virtual Double_t GetRgeValue(const Int_t index, const Double_t dist);
 
   private:
-    PNL_StartupHandler *fStartupHandler;
-    PNL_RgeHandler *fRgeHandler;
+    Bool_t fIsValid;
+    PNL_RgeDataList fRgeDataList;
 
-  ClassDef(PNL_PippardFitter, 1)
+    virtual Bool_t LoadRgeData(const PStringVector &rgeDataPathList);
 };
 
-#endif // _PNL_PIPPARDFITTER_H_
+#endif // _PNL_RGEHANDLER_H_

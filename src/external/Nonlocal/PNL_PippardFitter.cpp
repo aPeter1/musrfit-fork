@@ -29,6 +29,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <cassert>
+
+#include <iostream>
+using namespace std;
+
+#include <TSAXParser.h>
+
 #include "PNL_PippardFitter.h"
 
 ClassImp(PNL_PippardFitter)
@@ -41,6 +48,39 @@ ClassImp(PNL_PippardFitter)
  */
 PNL_PippardFitter::PNL_PippardFitter()
 {
+  // read XML startup file
+  char startup_path_name[128];
+  TSAXParser *saxParser = new TSAXParser();
+  PNL_StartupHandler *fStartupHandler = new PNL_StartupHandler();
+  strcpy(startup_path_name, fStartupHandler->GetStartupFilePath().Data());
+  saxParser->ConnectToHandler("PNL_StartupHandler", fStartupHandler);
+  Int_t status = saxParser->ParseFile(startup_path_name);
+  // check for parse errors
+  if (status) { // error
+    cout << endl << "**WARNING** reading/parsing nonlocal_startup.xml.";
+    cout << endl;
+    // clean up
+    if (saxParser) {
+      delete saxParser;
+      saxParser = 0;
+    }
+    if (fStartupHandler) {
+      delete fStartupHandler;
+      fStartupHandler = 0;
+    }
+    assert(false);
+  }
+
+  // clean up
+  if (saxParser) {
+    delete saxParser;
+    saxParser = 0;
+  }
+
+  // load all the TRIM.SP rge-files
+  fRgeHandler = new PNL_RgeHandler(fStartupHandler->GetTrimSpDataPathList());
+  if (!fRgeHandler->IsValid())
+    assert(false);
 }
 
 //--------------------------------------------------------------------------
@@ -51,6 +91,10 @@ PNL_PippardFitter::PNL_PippardFitter()
  */
 PNL_PippardFitter::~PNL_PippardFitter()
 {
+  if (fStartupHandler) {
+    delete fStartupHandler;
+    fStartupHandler = 0;
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -61,7 +105,8 @@ PNL_PippardFitter::~PNL_PippardFitter()
  */
 Double_t PNL_PippardFitter::operator()(Double_t t, const std::vector<Double_t> &param) const
 {
-//  assert(param.size() >= 4);
+  // expected parameters: energy, temp, thickness, meanFreePath, xi0, lambdaL
+  assert(param.size() != 6);
 
   return 0.0;
 }

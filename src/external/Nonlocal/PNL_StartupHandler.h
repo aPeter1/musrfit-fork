@@ -55,6 +55,7 @@ class PNL_StartupHandler : public TObject
     virtual void OnFatalError(const char*); // SLOT
     virtual void OnCdataBlock(const char*, Int_t); // SLOT
 
+    virtual TString GetStartupFilePath() { return fStartupFilePath; }
     virtual const Int_t GetFourierPoints() const { return fFourierPoints; }
     virtual const PStringVector GetTrimSpDataPathList() const { return fTrimSpDataPathList; }
 

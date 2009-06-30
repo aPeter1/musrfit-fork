@@ -42,5 +42,26 @@
  */
 typedef std::vector<TString> PStringVector;
 
+//-------------------------------------------------------------
+/**
+ * <p> typedef to make to code more readable.
+ */
+typedef std::vector<Double_t> PDoubleVector;
+
+//-------------------------------------------------------------
+/**
+ * <p>
+ */
+typedef struct {
+  Double_t energy;
+  PDoubleVector stoppingDistance;
+  PDoubleVector stoppingAmplitude;
+} PNL_RgeData;
+
+//-------------------------------------------------------------
+/**
+ * <p>
+ */
+typedef std::vector<PNL_RgeData> PNL_RgeDataList;
 
 #endif // _PNONLOCAL_H_

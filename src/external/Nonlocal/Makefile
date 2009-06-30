@@ -63,6 +63,7 @@ GLIBS         = $(ROOTGLIBS) -lXMLParser
 # some definitions: headers (used to generate *Dict* stuff), sources, objects,...
 OBJS =
 OBJS += PNL_StartupHandler.o PNL_StartupHandlerDict.o
+OBJS += PNL_RgeHandler.o
 OBJS += PNL_PippardFitter.o PNL_PippardFitterDict.o
 
 SHLIB = libPNL_PippardFitter.so
