@@ -1263,9 +1263,9 @@ void PTextEdit::musrCalcChisq()
   str = fAdmin->getExecPath() + "/musrfit";
 
   cmd.append(str);
-  cmd.append(*fFilenames.find( currentEditor()));
+  cmd.append(*fFilenames.find( currentEditor()) );
   cmd.append("--chisq-only");
-  PFitOutputHandler fitOutputHandler(QFileInfo(fFilenames[currentEditor()]).dirPath(), cmd);
+  PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() ).dirPath(), cmd);
   fitOutputHandler.setModal(true);
   fitOutputHandler.exec();
 }
@@ -1318,7 +1318,7 @@ void PTextEdit::musrFit()
       break;
   }
 
-  PFitOutputHandler fitOutputHandler(QFileInfo(fFilenames[currentEditor()]).dirPath(), cmd);
+  PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() )).dirPath(), cmd);
   fitOutputHandler.setModal(true);
   fitOutputHandler.exec();
 
@@ -1556,7 +1556,7 @@ for (unsigned int i=0; i<cmd.size(); i++) {
 cout << endl;
 */
 
-    PFitOutputHandler fitOutputHandler(QFileInfo(fFilenames[currentEditor()]).dirPath(), cmd);
+    PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() )).dirPath(), cmd);
     fitOutputHandler.setModal(true);
     fitOutputHandler.exec();
 
