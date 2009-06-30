@@ -1265,7 +1265,7 @@ void PTextEdit::musrCalcChisq()
   cmd.append(str);
   cmd.append(*fFilenames.find( currentEditor()) );
   cmd.append("--chisq-only");
-  PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() ).dirPath(), cmd);
+  PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() )).dirPath(), cmd);
   fitOutputHandler.setModal(true);
   fitOutputHandler.exec();
 }
