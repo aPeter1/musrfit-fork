@@ -147,6 +147,9 @@ Bool_t PNL_RgeHandler::LoadRgeData(const PStringVector &rgeDataPathList)
     // open rge-file for reading
     fin.open(rgeDataPathList[i].Data(), iostream::in);
     if (!fin.is_open()) {
+      cout << endl << "PNL_RgeHandler::LoadRgeData **ERROR**";
+      cout << endl << "  Could not open file " << rgeDataPathList[i].Data();
+      cout << endl;
       return false;
     }
 

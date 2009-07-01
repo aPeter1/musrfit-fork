@@ -29,6 +29,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <cmath>
+
 #include <iostream>
 #include <fstream>
 using namespace std;
@@ -180,7 +182,7 @@ void PNL_StartupHandler::OnCharacters(const char *str)
         fIsValid = false;
       }
       tstr = fTrimSpDataPath;
-      sprintf(sstr, "%03d", (int)(dval*10.0));
+      sprintf(sstr, "%03d", (int)(round(dval*10.0)));
       tstr += sstr;
       tstr += ".rge";      
       fTrimSpDataPathList.push_back(tstr);
