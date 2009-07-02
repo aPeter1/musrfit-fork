@@ -20,6 +20,29 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+PATHTOAUTOCONF=$(which autoconf)
+PATHTOAUTOMAKE=$(which automake)
+PATHTOLIBTOOL=$(which libtoolize)
+
+if [ "$PATHTOAUTOCONF" == "" ]; then
+  echo
+  echo ">> GNU autoconf has not been found!"
+  echo ">> Please install it first and then re-run the script!"
+  echo
+  exit 1
+elif [ "$PATHTOAUTOMAKE" == "" ]; then
+  echo
+  echo ">> GNU automake has not been found!"
+  echo ">> Please install it first and then re-run the script!"
+  echo
+  exit 1
+elif [ "$PATHTOLIBTOOL" == "" ]; then
+  echo
+  echo ">> GNU libtool has not been found!"
+  echo ">> Please install it first and then re-run the script!"
+  echo
+  exit 1
+fi
 
 dir=`echo "$0" | sed 's,[^/]*$,,'`
 test "x${dir}" = "x" && dir='.'
