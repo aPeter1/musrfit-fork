@@ -4,7 +4,7 @@
         $Id$
     </comment>
     <nonlocal_par>
-        <fourier_points>200000</fourier_points>
+        <fourier_points>262144</fourier_points>
     </nonlocal_par>
     <trim_sp_part>
         <data_path>/afs/psi.ch/project/nemu/analysis/2009/Nonlocal/trimsp/InSne</data_path>

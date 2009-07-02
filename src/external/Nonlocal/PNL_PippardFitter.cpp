@@ -40,6 +40,9 @@ using namespace std;
 
 #include "PNL_PippardFitter.h"
 
+#define GAMMA_MU   0.0851615503527
+#define DEGREE2RAD 0.0174532925199
+
 ClassImp(PNL_PippardFitter)
 
 //--------------------------------------------------------------------------
@@ -87,6 +90,8 @@ PNL_PippardFitter::PNL_PippardFitter()
     assert(false);
   }
 
+  fFourierPoints = fStartupHandler->GetFourierPoints();
+
   // load all the TRIM.SP rge-files
   fRgeHandler = new PNL_RgeHandler(fStartupHandler->GetTrimSpDataPathList());
   if (!fRgeHandler->IsValid()) {
@@ -112,15 +117,6 @@ PNL_PippardFitter::PNL_PippardFitter()
  */
 PNL_PippardFitter::~PNL_PippardFitter()
 {
-  if (fStartupHandler) {
-    delete fStartupHandler;
-    fStartupHandler = 0;
-  }
-  if (fRgeHandler) {
-    delete fRgeHandler;
-    fRgeHandler = 0;
-  }
-
   fPreviousParam.clear();
 
   if (fPlanPresent) {
@@ -135,6 +131,17 @@ PNL_PippardFitter::~PNL_PippardFitter()
     fftw_free(fFieldq);
     fFieldB = 0;
   }
+
+  if (fRgeHandler) {
+    delete fRgeHandler;
+    fRgeHandler = 0;
+  }
+/*
+  if (fStartupHandler) {
+    delete fStartupHandler;
+    fStartupHandler = 0;
+  }
+*/
 }
 
 //--------------------------------------------------------------------------
@@ -145,18 +152,52 @@ PNL_PippardFitter::~PNL_PippardFitter()
  */
 Double_t PNL_PippardFitter::operator()(Double_t t, const std::vector<Double_t> &param) const
 {
-  // expected parameters: energy, temp, thickness, meanFreePath, xi0, lambdaL, phase
-  assert(param.size() == 7);
+  // param: [0] energy, [1] temp, [2] thickness, [3] meanFreePath, [4] xi0, [5] lambdaL, [6] Bext, [7] phase, [8] dead-layer
+  assert(param.size() == 9);
 
+  // for negative time return polarization == 1
+  if (t <= 0.0)
+    return 1.0;
+
+  // calculate field if parameter have changed
   if (NewParameters(param)) { // new parameters, hence B(z), P(t), ..., needs to be calculated
     // keep parameters
     for (UInt_t i=0; i<param.size(); i++)
       fPreviousParam[i] = param[i];
+    fEnergyIndex = fRgeHandler->GetRgeEnergyIndex(param[0]);
     CalculateField(param);
-    CalculatePolarization(param);
   }
 
-  return 0.0;
+  // calcualte polarization
+  Bool_t done = false;
+  Double_t pol = 0.0, dPol = 0.0;
+  Double_t z=0.0;
+  Int_t terminate = 0;
+  Double_t dz = 1.0;
+  do {
+
+    if (z < param[8]) { // z < dead-layer
+      dPol = fRgeHandler->GetRgeValue(fEnergyIndex, z);
+    } else {
+      dPol = fRgeHandler->GetRgeValue(fEnergyIndex, z) * cos(GAMMA_MU * param[6] * GetMagneticField(z-param[8]) * t + param[7] * DEGREE2RAD);
+    }
+    z += dz;
+    pol += dPol;
+
+    // change in polarization is very small hence start termination counting
+    if (fabs(dPol) < 1.0e-7) {
+      terminate++;
+    } else {
+      terminate = 0;
+    }
+
+    if (terminate > 10) // polarization died out hence one can stop
+      done = true;
+  } while (!done);
+
+//  cout << endl << "t = " << t << ", pol = " << pol*dz;
+
+  return pol*dz;
 }
 
 //--------------------------------------------------------------------------
@@ -170,6 +211,7 @@ Bool_t PNL_PippardFitter::NewParameters(const std::vector<Double_t> &param) cons
   if (fPreviousParam.size() == 0) {
     for (UInt_t i=0; i<param.size(); i++)
       fPreviousParam.push_back(param[i]);
+    return true;
   }
 
   assert(param.size() == fPreviousParam.size());
@@ -194,15 +236,18 @@ Bool_t PNL_PippardFitter::NewParameters(const std::vector<Double_t> &param) cons
  */
 void PNL_PippardFitter::CalculateField(const std::vector<Double_t> &param) const
 {
-  // param: [0] energy, [1] temp, [2] thickness, [3] meanFreePath, [4] xi0, [5] lambdaL, [6] phase
+  // param: [0] energy, [1] temp, [2] thickness, [3] meanFreePath, [4] xi0, [5] lambdaL, [6] Bext, [7] phase, [8] dead-layer
 
-  Int_t pippardFourierPoints = fStartupHandler->GetFourierPoints();
+//cout << endl << "in CalculateField ..." << endl;
+//cout << endl << "fFourierPoints = " << fFourierPoints;
 
-  f_dz = XiP_T(param[4], param[3], param[1])*TMath::TwoPi()/pippardFourierPoints/f_dx; // see lab-book p.137, used for specular reflection boundary conditions (default)
+
+  f_dz = XiP_T(param[4], param[3], param[1])*TMath::TwoPi()/fFourierPoints/f_dx; // see lab-book p.137, used for specular reflection boundary conditions (default)
+//cout << endl << "f_dz = " << f_dz;
 
   // check if it is necessary to allocate memory
   if (fFieldq == 0) {
-    fFieldq = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * pippardFourierPoints);
+    fFieldq = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * fFourierPoints);
     if (fFieldq == 0) {
       cout << endl << "PPippard::CalculateField(): **ERROR** couldn't allocate memory for fFieldq";
       cout << endl;
@@ -210,7 +255,7 @@ void PNL_PippardFitter::CalculateField(const std::vector<Double_t> &param) const
     }
   }
   if (fFieldB == 0) {
-    fFieldB = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * pippardFourierPoints);
+    fFieldB = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * fFourierPoints);
     if (fFieldB == 0) {
       cout << endl << "PPippard::CalculateField(): **ERROR** couldn't allocate memory for fFieldB";
       cout << endl;
@@ -228,7 +273,7 @@ void PNL_PippardFitter::CalculateField(const std::vector<Double_t> &param) const
   Double_t x;
   fFieldq[0][0] = 0.0;
   fFieldq[0][1] = 0.0;
-  for (Int_t i=1; i<pippardFourierPoints; i++) {
+  for (Int_t i=1; i<fFourierPoints; i++) {
     x = i * f_dx;
     fFieldq[i][0] = x/(pow(x,2.0)+preFactor*(1.5*((1.0+pow(x,2.0))*atan(x)-x)/pow(x,3.0)));
     fFieldq[i][1] = 0.0;
@@ -236,7 +281,8 @@ void PNL_PippardFitter::CalculateField(const std::vector<Double_t> &param) const
 
   // Fourier transform
   if (!fPlanPresent) {
-    fPlan = fftw_plan_dft_1d(pippardFourierPoints, fFieldq, fFieldB, FFTW_FORWARD, FFTW_EXHAUSTIVE);
+//    fPlan = fftw_plan_dft_1d(fFourierPoints, fFieldq, fFieldB, FFTW_FORWARD, FFTW_EXHAUSTIVE);
+    fPlan = fftw_plan_dft_1d(fFourierPoints, fFieldq, fFieldB, FFTW_FORWARD, FFTW_ESTIMATE);
     fPlanPresent = true;
   }
 
@@ -245,41 +291,57 @@ void PNL_PippardFitter::CalculateField(const std::vector<Double_t> &param) const
   // normalize fFieldB
   Double_t norm = 0.0;
   fShift=0;
-  for (Int_t i=0; i<pippardFourierPoints/2; i++) {
+  for (Int_t i=0; i<fFourierPoints/2; i++) {
     if (fabs(fFieldB[i][1]) > fabs(norm)) {
       norm = fFieldB[i][1];
       fShift = i;
     }
   }
 
-  for (Int_t i=0; i<pippardFourierPoints; i++) {
+  for (Int_t i=0; i<fFourierPoints; i++) {
     fFieldB[i][1] /= norm;
   }
 
-  if (param[2] < pippardFourierPoints/2.0*f_dz) {
+  if (param[2] < fFourierPoints/2.0*f_dz) {
     // B(z) = b(z)+b(D-z)/(1+b(D)) is the B(z) result
     Int_t idx = (Int_t)(param[2]/f_dz);
     norm = 1.0 + fFieldB[idx+fShift][1];
-    for (Int_t i=0; i<pippardFourierPoints; i++) {
+    for (Int_t i=0; i<fFourierPoints; i++) {
       fFieldB[i][0] = 0.0;
     }
     for (Int_t i=fShift; i<idx+fShift; i++) {
       fFieldB[i][0] = (fFieldB[i][1] + fFieldB[idx-i+2*fShift][1])/norm;
     }
-    for (Int_t i=0; i<pippardFourierPoints; i++) {
+    for (Int_t i=0; i<fFourierPoints; i++) {
       fFieldB[i][1] = fFieldB[i][0];
     }
   }
 }
 
 //--------------------------------------------------------------------------
-// CalculatePolarization
+// GetMagneticField
 //--------------------------------------------------------------------------
 /**
  *
  */
-void PNL_PippardFitter::CalculatePolarization(const std::vector<Double_t> &param) const
+Double_t PNL_PippardFitter::GetMagneticField(const Double_t z) const
 {
+  Double_t result = -1.0;
+
+  if (fFieldB == 0)
+    return -1.0;
+
+  if (z <= 0.0)
+    return 1.0;
+
+  if (z > f_dz*fFourierPoints/2.0)
+    return 0.0;
+
+  Int_t bin = (Int_t)(z/f_dz);
+
+  result = fFieldB[bin+fShift][1];
+
+  return result;
 }
 
 //--------------------------------------------------------------------------

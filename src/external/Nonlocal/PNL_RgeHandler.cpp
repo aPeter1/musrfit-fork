@@ -29,6 +29,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <cassert>
+
 #include <iostream>
 #include <fstream>
 using namespace std;
@@ -95,9 +97,20 @@ Double_t PNL_RgeHandler::GetRgeValue(const Int_t index, const Double_t dist)
     rgeVal = 0.0;
   } else {
     rgeVal = fRgeDataList[index].stoppingAmplitude[distIdx] +
-             (fRgeDataList[index].stoppingAmplitude[distIdx] - fRgeDataList[index].stoppingAmplitude[distIdx+1]) *
+             (fRgeDataList[index].stoppingAmplitude[distIdx+1] - fRgeDataList[index].stoppingAmplitude[distIdx]) *
              (fRgeDataList[index].stoppingDistance[distIdx+1]-dist)/(fRgeDataList[index].stoppingDistance[distIdx+1]-fRgeDataList[index].stoppingDistance[distIdx]);
   }
+
+/*
+cout << endl << "distIdx = " << distIdx << ", fRgeDataList[index].stoppingDistance.size() = " << fRgeDataList[index].stoppingDistance.size();
+cout << endl << "fRgeDataList[index].stoppingAmplitude[distIdx]   = " << fRgeDataList[index].stoppingAmplitude[distIdx];
+cout << endl << "fRgeDataList[index].stoppingAmplitude[distIdx+1] = " << fRgeDataList[index].stoppingAmplitude[distIdx+1];
+cout << endl << "dist = " << dist;
+cout << endl << "fRgeDataList[index].stoppingDistance[distIdx] = " << fRgeDataList[index].stoppingDistance[distIdx];
+cout << endl << "fRgeDataList[index].stoppingDistance[distIdx+1] = " << fRgeDataList[index].stoppingDistance[distIdx+1];
+cout << endl << "rgeVal = " << rgeVal;
+cout << endl << "----" << endl;
+*/
 
   return rgeVal;
 }
@@ -198,10 +211,10 @@ Bool_t PNL_RgeHandler::LoadRgeData(const PStringVector &rgeDataPathList)
     // normalize stopping distribution
     Double_t norm = 0.0;
     for (UInt_t j=0; j<data.stoppingAmplitude.size(); j++)
-      norm += data.stoppingAmplitude[i];
+      norm += data.stoppingAmplitude[j];
     norm *= (data.stoppingDistance[1] - data.stoppingDistance[0]);
     for (UInt_t j=0; j<data.stoppingAmplitude.size(); j++)
-      data.stoppingAmplitude[i] /= norm;
+      data.stoppingAmplitude[j] /= norm;
 
     // keep data
     fRgeDataList.push_back(data);
