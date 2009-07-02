@@ -177,7 +177,7 @@ Double_t PNL_PippardFitter::operator()(Double_t t, const std::vector<Double_t> &
   do {
 
     if (z < param[8]) { // z < dead-layer
-      dPol = fRgeHandler->GetRgeValue(fEnergyIndex, z);
+      dPol = fRgeHandler->GetRgeValue(fEnergyIndex, z) * cos(GAMMA_MU * param[6] * t + param[7] * DEGREE2RAD);;
     } else {
       dPol = fRgeHandler->GetRgeValue(fEnergyIndex, z) * cos(GAMMA_MU * param[6] * GetMagneticField(z-param[8]) * t + param[7] * DEGREE2RAD);
     }
