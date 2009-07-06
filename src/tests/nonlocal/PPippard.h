@@ -9,6 +9,7 @@
 #include <fftw3.h>
 
 #include <Rtypes.h>
+#include <TString.h>
 
 #include <Eigen/Core>
 #include <Eigen/LU>
@@ -17,32 +18,43 @@ using namespace Eigen;
 const Int_t PippardFourierPoints = 200000;
 const Int_t PippardDiffusePoints = 500;
 
+typedef struct {
+  Bool_t valid;
+  Double_t t;             // reduced temperature
+  Double_t lambdaL;       // lambda London
+  Double_t xi0;           // Pippard coherence length
+  Double_t meanFreePath;  // mean free path
+  Double_t filmThickness; // film thickness
+  Bool_t specular;        // true -> specular reflection boundary conditions, false -> diffuse scattering boundary conditions
+  Double_t specularIntegral; // int_x=0^infty B(x) dx / Bext
+  TString rgeFileName;
+  TString outputFileName;
+  Double_t meanB;         // int_x=0^infty B(x) n(x) dx / int_x=0^infty n(x) dx / Bext
+} PippardParams;
+
 class PPippard
 {
   public:
-    PPippard(Double_t temp, Double_t lambdaL, Double_t xi0, Double_t meanFreePath, Double_t filmThickness, Bool_t specular = true);
+    PPippard(const PippardParams &params);
     virtual ~PPippard();
 
-    virtual void SetTemp(Double_t temp) { fTemp = temp; }
-    virtual void SetLambdaL(Double_t lambdaL) { fLambdaL = lambdaL; }
-    virtual void SetXi0(Double_t xi0) { fXi0 = xi0; }
-    virtual void SetMeanFreePath(Double_t meanFreePath) { fMeanFreePath = meanFreePath; }
-    virtual void SetFilmThickness(Double_t thickness) { fFilmThickness = thickness; }
-    virtual void SetSpecular(Bool_t specular) { fSpecular = specular; }
+    virtual void SetTemp(Double_t temp) { fParams.t = temp; }
+    virtual void SetLambdaL(Double_t lambdaL) { fParams.lambdaL = lambdaL; }
+    virtual void SetXi0(Double_t xi0) { fParams.xi0 = xi0; }
+    virtual void SetMeanFreePath(Double_t meanFreePath) { fParams.meanFreePath = meanFreePath; }
+    virtual void SetFilmThickness(Double_t thickness) { fParams.filmThickness = thickness; }
+    virtual void SetSpecular(Bool_t specular) { fParams.specular = specular; }
+    virtual void SetMeanB(Double_t meanB) { fParams.meanB = meanB; }
 
     virtual void CalculateField();
 
+    virtual Double_t GetStepDistance() { return f_dz; }
     virtual Double_t GetMagneticField(const Double_t x) const;
 
-    virtual void SaveField(const char *fileName);
+    virtual void SaveField();
 
   private:
-    Double_t fTemp;          // reduced temperature, i.e. t = T/T_c
-    Double_t fLambdaL;       // lambdaL in (nm)
-    Double_t fXi0;           // xi0 in (nm)
-    Double_t fMeanFreePath;  // mean free path in (nm)
-    Double_t fFilmThickness; // film thickness in (nm)
-    Bool_t   fSpecular;      // = 1 -> specular, 0 -> diffuse
+    PippardParams fParams;
 
     Double_t f_dx;           // dx = xiPT dq
     Double_t f_dz;           // spatial step size

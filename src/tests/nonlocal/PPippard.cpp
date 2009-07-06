@@ -19,8 +19,7 @@ using namespace std;
 /**
  *
  */
-PPippard::PPippard(Double_t temp, Double_t lambdaL, Double_t xi0, Double_t meanFreePath, Double_t filmThickness, Bool_t specular) :
-    fTemp(temp), fLambdaL(lambdaL), fXi0(xi0), fMeanFreePath(meanFreePath), fFilmThickness(filmThickness), fSpecular(specular)
+PPippard::PPippard(const PippardParams &params) : fParams(params)
 {
   fPlanPresent = false;
   fFieldq = 0;
@@ -32,7 +31,7 @@ PPippard::PPippard(Double_t temp, Double_t lambdaL, Double_t xi0, Double_t meanF
   fFieldDiffuse = 0;
 
   f_dx = 0.02;
-  f_dz = XiP_T(fTemp)*TMath::TwoPi()/PippardFourierPoints/f_dx; // see lab-book p.137, used for specular reflection boundary conditions (default)
+  f_dz = XiP_T(fParams.t)*TMath::TwoPi()/PippardFourierPoints/f_dx; // see lab-book p.137, used for specular reflection boundary conditions (default)
   fShift  = 0;
 }
 
@@ -80,7 +79,7 @@ Double_t PPippard::GetMagneticField(const Double_t z) const
 {
   Double_t result = -1.0;
 
-  if (fSpecular) {
+  if (fParams.specular) {
 
     if (fFieldB == 0)
       return -1.0;
@@ -103,10 +102,10 @@ Double_t PPippard::GetMagneticField(const Double_t z) const
     if (z < 0.0)
       return 1.0;
 
-    if (z > PippardDiffusePoints * f_dz * XiP_T(fTemp))
+    if (z > PippardDiffusePoints * f_dz * XiP_T(fParams.xi0))
       return 0.0;
 
-    Int_t bin = (Int_t)(z/(f_dz*XiP_T(fTemp)));
+    Int_t bin = (Int_t)(z/(f_dz*XiP_T(fParams.xi0)));
 
     result = (*fFieldDiffuse)(bin);
   }
@@ -160,7 +159,7 @@ Double_t PPippard::DeltaBCS(const Double_t t) const
  */
 Double_t PPippard::LambdaL_T(const Double_t t) const
 {
-  return fLambdaL/sqrt(1.0-pow(t,4.0));
+  return fParams.lambdaL/sqrt(1.0-pow(t,4.0));
 }
 
 //-----------------------------------------------------------------------------------------------------------
@@ -175,7 +174,7 @@ Double_t PPippard::XiP_T(Double_t t) const
 
   Double_t J0T = DeltaBCS(t)/(1.0-pow(t,2.0)) * tanh(0.881925 * DeltaBCS(t) / t);
 
-  return fXi0*fMeanFreePath/(fMeanFreePath*J0T+fXi0);
+  return fParams.xi0*fParams.meanFreePath/(fParams.meanFreePath*J0T+fParams.xi0);
 }
 
 //-----------------------------------------------------------------------------------------------------------
@@ -185,7 +184,7 @@ Double_t PPippard::XiP_T(Double_t t) const
 void PPippard::CalculateField()
 {
   // calculate the field
-  if (fSpecular)
+  if (fParams.specular)
     CalculateFieldSpecular();
   else
     CalculateFieldDiffuse();
@@ -216,8 +215,8 @@ void PPippard::CalculateFieldSpecular()
   }
 
   // calculate the prefactor of the reduced kernel
-  Double_t xiP = XiP_T(fTemp);
-  Double_t preFactor = pow(xiP/(LambdaL_T(fTemp)),2.0)*xiP/fXi0;
+  Double_t xiP = XiP_T(fParams.t);
+  Double_t preFactor = pow(xiP/(LambdaL_T(fParams.t)),2.0)*xiP/fParams.xi0;
 
 
   // calculate the fFieldq vector, which is x/(x^2 + alpha k(x)), with alpha = xiP(T)^3/(lambdaL(T)^2 xiP(0)), and
@@ -255,9 +254,9 @@ cout << endl << "fShift = " << fShift;
     fFieldB[i][1] /= norm;
   }
 
-  if (fFilmThickness < PippardFourierPoints/2.0*f_dz) {
+  if (fParams.filmThickness < PippardFourierPoints/2.0*f_dz) {
     // B(z) = b(z)+b(D-z)/(1+b(D)) is the B(z) result
-    Int_t idx = (Int_t)(fFilmThickness/f_dz);
+    Int_t idx = (Int_t)(fParams.filmThickness/f_dz);
     norm = 1.0 + fFieldB[idx+fShift][1];
     for (Int_t i=0; i<PippardFourierPoints; i++) {
       fFieldB[i][0] = 0.0;
@@ -273,7 +272,8 @@ cout << endl << "fShift = " << fShift;
   Double_t integral = 0.0;
   for (Int_t i=fShift; i<PippardFourierPoints/2; i++)
     integral += fFieldB[i][1];
-  cout << endl << "specular Integral = " << integral*f_dz;
+  cout << endl << ">> specular Integral = " << integral*f_dz;
+  fParams.specularIntegral = integral*f_dz;
 }
 
 //-----------------------------------------------------------------------------------------------------------
@@ -282,12 +282,12 @@ cout << endl << "fShift = " << fShift;
  */
 void PPippard::CalculateFieldDiffuse()
 {
-  f_dz = 5.0/XiP_T(fTemp);
+  f_dz = 5.0/XiP_T(fParams.t);
 
   Double_t invL = 1/f_dz;
-  Double_t ampl = 1.0/pow(f_dz,2.0)/(3.0/4.0*pow(XiP_T(fTemp),3.0)/(fXi0*pow(LambdaL_T(fTemp),2.0)));
+  Double_t ampl = 1.0/pow(f_dz,2.0)/(3.0/4.0*pow(XiP_T(fParams.t),3.0)/(fParams.xi0*pow(LambdaL_T(fParams.t),2.0)));
 
-cout << endl << ">> 1/alpha = " << 1.0/(3.0/4.0*pow(XiP_T(fTemp),3.0)/(fXi0*pow(LambdaL_T(fTemp),2.0)));
+cout << endl << ">> 1/alpha = " << 1.0/(3.0/4.0*pow(XiP_T(fParams.t),3.0)/(fParams.xi0*pow(LambdaL_T(fParams.t),2.0)));
 cout << endl << ">> 1/l^2   = " << 1.0/pow(f_dz,2.0);
 cout << endl << ">> ampl    = " << ampl << endl;
 
@@ -358,20 +358,20 @@ cout << endl << ">> ampl    = " << ampl << endl;
   Double_t integral = 0.0;
   for (Int_t i=0; i<PippardDiffusePoints+1; i++)
     integral += (*fFieldDiffuse)(i);
-  cout << endl << "Diffuse Integral = " << integral*f_dz*XiP_T(fTemp);
+  cout << endl << "Diffuse Integral = " << integral*f_dz*XiP_T(fParams.t);
 }
 
 //-----------------------------------------------------------------------------------------------------------
 /**
  *
  */
-void PPippard::SaveField(const char *fileName)
+void PPippard::SaveField()
 {
   FILE *fp;
 
-  fp = fopen(fileName, "w");
+  fp = fopen(fParams.outputFileName.Data(), "w");
   if (fp == NULL) {
-    cout << endl << "Coudln't open " << fileName << " for writting, sorry ...";
+    cout << endl << "Coudln't open " << fParams.outputFileName.Data() << " for writting, sorry ...";
     cout << endl << endl;
     return;
   }
@@ -379,26 +379,33 @@ void PPippard::SaveField(const char *fileName)
   // write header
   fprintf(fp, "%% Header ------------------------------------\n");
   fprintf(fp, "%% Parameters:\n");
-  fprintf(fp, "%%   Reduced Temperature = %lf\n", fTemp);
-  fprintf(fp, "%%   LambdaL(0)          = %lf, LambdaL(t) = %lf\n", fLambdaL, LambdaL_T(fTemp));
-  fprintf(fp, "%%   xiP(0)              = %lf, xiP(t)     = %lf\n", fXi0, XiP_T(fTemp));
-  fprintf(fp, "%%   Mean Free Path      = %lf\n", fMeanFreePath);
-  if (fSpecular)
+  fprintf(fp, "%%   Reduced Temperature = %lf\n", fParams.t);
+  fprintf(fp, "%%   LambdaL(0)          = %lf, LambdaL(t) = %lf\n", fParams.lambdaL, LambdaL_T(fParams.t));
+  if (fParams.specularIntegral > 0.0)
+    fprintf(fp, "%%   int_x=0^infty B(x) dx / Bext = %lf\n", fParams.specularIntegral);
+  fprintf(fp, "%%   xiP(0)              = %lf, xiP(t)     = %lf\n", fParams.xi0, XiP_T(fParams.t));
+  fprintf(fp, "%%   Mean Free Path      = %lf\n", fParams.meanFreePath);
+  fprintf(fp, "%%   Film Thickness      = %lf\n", fParams.filmThickness);
+  if (fParams.specular)
     fprintf(fp, "%%   Boundary Conditions: Specular\n");
   else
     fprintf(fp, "%%   Boundary Conditions: Diffuse\n");
+  if (fParams.rgeFileName.Length() > 0)
+    fprintf(fp, "%%   rge file name : %s\n", fParams.rgeFileName.Data());
+  if (fParams.meanB != 0.0)
+    fprintf(fp, "%%   Mean Field/Bext     = %lf\n", fParams.meanB);
   fprintf(fp, "%%\n");
 
   // write data
   fprintf(fp, "%% Data --------------------------------------\n");
   fprintf(fp, "%% z (nm), B/B_0 \n");
-  if (fSpecular) {
+  if (fParams.specular) {
     for (Int_t i=0; i<PippardFourierPoints/2; i++) {
       fprintf(fp, "%lf, %lf\n", f_dz*(Double_t)i, fFieldB[i+fShift][1]);
     }
   } else {
     for (Int_t i=0; i<PippardDiffusePoints; i++) {
-      fprintf(fp, "%lf, %lf\n", f_dz * XiP_T(fTemp) * (Double_t)i, (*fFieldDiffuse)(i));
+      fprintf(fp, "%lf, %lf\n", f_dz * XiP_T(fParams.t) * (Double_t)i, (*fFieldDiffuse)(i));
     }
   }
 
