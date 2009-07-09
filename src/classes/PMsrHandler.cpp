@@ -127,7 +127,7 @@ PMsrHandler::~PMsrHandler()
 int PMsrHandler::ReadMsrFile()
 {
   ifstream f;
-  char str[8192];
+  string str;
   TString line;
   int line_no = 0;
   int result = PMUSR_SUCCESS;
@@ -158,8 +158,8 @@ int PMsrHandler::ReadMsrFile()
   while (!f.eof()) {
 
     // read a line
-    f.getline(str, sizeof(str));
-    line = str;
+    getline(f, str);
+    line = str.c_str();
     line_no++;
 
     current.fLineNo = line_no;
@@ -324,7 +324,7 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
   int tag, lineNo = 0, number;
   int runNo = -1, addRunNo = 0;
   int plotNo = -1;
-  char line[8192];
+  string line;
   TString str, sstr;
   TObjArray *tokens;
   TObjString *ostr;
@@ -366,8 +366,8 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
   while (!fin.eof()) {
 
     // read a line
-    fin.getline(line, sizeof(line));
-    str = line;
+    getline(fin, line);
+    str = line.c_str();
     lineNo++;
 
     // check for tag
