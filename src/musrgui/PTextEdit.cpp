@@ -528,7 +528,7 @@ void PTextEdit::fileNew()
 void PTextEdit::fileOpen()
 {
   QStringList flns = QFileDialog::getOpenFileNames( 
-                        tr( "msr-Files (*.msr *.mlog);;All Files (*)" ),
+                        tr( "msr-Files (*.msr);;msr-Files (*.msr *.mlog);;All Files (*)" ),
                         tr( fAdmin->getDefaultSavePath() ), this);
 
   QStringList::Iterator it = flns.begin();
