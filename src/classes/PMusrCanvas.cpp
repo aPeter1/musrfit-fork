@@ -1389,23 +1389,31 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   name += "_";
   name += fPlotNumber;
   start = data->fDataTimeStart - data->fDataTimeStep/2.0;
-  end   = data->fDataTimeStart + data->fValue.size()*data->fDataTimeStep;
+  end   = start + data->fValue.size()*data->fDataTimeStep;
   size  = data->fValue.size();
 
 //cout << endl << ">> PMusrCanvas::HandleDataSet(): data->fDataTimeStart = " << data->fDataTimeStart << ", data->fDataTimeStep = " << data->fDataTimeStep << endl;
 
   // check if 'use_fit_range' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
-    start = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->fDataTimeStep/2.0;
-    end   = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[1] + data->fDataTimeStep/2.0;
+    start = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0]; // needed to estimate size
+    end   = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[1]; // needed to estimate size
     size  = (int) ((end - start) / data->fDataTimeStep) + 1;
+    start = data->fDataTimeStart +
+            (int)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->fDataTimeStart)/data->fDataTimeStep) * data->fDataTimeStep -
+            data->fDataTimeStep/2.0; // closesd start value compatible with the user given
+    end   = start + size * data->fDataTimeStep; // closesd end value compatible with the user given
   }
 
   // check if 'sub_ranges' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) {    
-    start = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->fDataTimeStep/2.0;
-    end   = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] + data->fDataTimeStep/2.0;
+    start = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo]; // needed to estimate size
+    end   = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo]; // needed to estimate size
     size  = (int) ((end - start) / data->fDataTimeStep) + 1;
+    start = data->fDataTimeStart +
+            (int)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->fDataTimeStart)/data->fDataTimeStep) * data->fDataTimeStep -
+            data->fDataTimeStep/2.0; // closesd start value compatible with the user given
+    end   = start + size * data->fDataTimeStep; // closesd end value compatible with the user given
   }
 
 //cout << endl << ">> PMusrCanvas::HandleDataSet(): start = " << start << ", end = " << end << ", size = " << size << ", data->fDataTimeStep = " << data->fDataTimeStep << endl;
@@ -1423,13 +1431,13 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
     startBin = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->fDataTimeStart)/data->fDataTimeStep);
     endBin   = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[1] - data->fDataTimeStart)/data->fDataTimeStep);
   }
-//cout << endl << ">> PMusrCanvas::HandleDataSet(): data: startBin = " << startBin << ", endBin = " << endBin << endl;
 
   // check if 'sub_ranges' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) {
     startBin = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->fDataTimeStart)/data->fDataTimeStep);
     endBin   = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] - data->fDataTimeStart)/data->fDataTimeStep);
   }
+//cout << endl << ">> PMusrCanvas::HandleDataSet(): data: startBin = " << startBin << ", endBin = " << endBin << endl;
 
   for (UInt_t i=startBin; i<endBin; i++) {
     dataHisto->SetBinContent(i-startBin+1, data->fValue[i]);
@@ -1463,22 +1471,30 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   name += "_";
   name += fPlotNumber;
   start = data->fTheoryTimeStart - data->fTheoryTimeStep/2.0;
-  end   = data->fTheoryTimeStart + data->fTheory.size()*data->fTheoryTimeStep;
+  end   = start + data->fTheory.size()*data->fTheoryTimeStep;
   size  = data->fTheory.size();
 
   // check if 'use_fit_range' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
-    start = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->fTheoryTimeStep/2.0;
-    end   = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[1] + data->fTheoryTimeStep/2.0;
+    start = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0]; // needed to estimate size
+    end   = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[1]; // needed to estimate size
     size  = (int) ((end - start) / data->fTheoryTimeStep) + 1;
+    start = data->fTheoryTimeStart +
+            (int)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->fTheoryTimeStart)/data->fTheoryTimeStep) * data->fTheoryTimeStep -
+            data->fTheoryTimeStep/2.0; // closesd start value compatible with the user given
+    end   = start + size * data->fTheoryTimeStep; // closesd end value compatible with the user given
   }
 
   // check if 'sub_ranges' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) {
-    start = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->fTheoryTimeStep/2.0;
-    end   = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] + data->fTheoryTimeStep/2.0;
+    start = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo]; // needed to estimate size
+    end   = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo]; // needed to estimate size
     size  = (int) ((end - start) / data->fTheoryTimeStep) + 1;
- }
+    start = data->fTheoryTimeStart +
+            (int)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->fTheoryTimeStart)/data->fTheoryTimeStep) * data->fTheoryTimeStep -
+            data->fTheoryTimeStep/2.0; // closesd start value compatible with the user given
+    end   = start + size * data->fTheoryTimeStep; // closesd end value compatible with the user given
+}
 
 //cout << endl << ">> PMusrCanvas::HandleDataSet(): start = " << start << ", end = " << end << ", size = " << size << ", data->fTheoryTimeStep = " << data->fTheoryTimeStep << endl;
 
