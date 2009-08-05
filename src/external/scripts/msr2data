@@ -285,7 +285,7 @@ else
       for PAR in "$@"
       do
         if [ "$PAR" == "-k" ]; then
-          MUSRFITPARAM+=" -k"
+          MUSRFITPARAM="$MUSRFITPARAM -k"
           break
         fi
       done
@@ -293,7 +293,7 @@ else
       for PAR in "$@"
       do
         if [ "$PAR" == "-t" ]; then
-          MUSRFITPARAM+=" -t"
+          MUSRFITPARAM="$MUSRFITPARAM -t"
           break
         fi
       done
