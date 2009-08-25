@@ -1451,6 +1451,9 @@
     <property name="name">
         <cstring>MenuBar</cstring>
     </property>
+    <property name="enabled">
+        <bool>true</bool>
+    </property>
     <property name="geometry">
         <rect>
             <x>0</x>
@@ -1524,6 +1527,9 @@
         <property name="name">
             <cstring>fileOpenAction</cstring>
         </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
         <property name="iconSet">
             <iconset>image2</iconset>
         </property>
@@ -1572,6 +1578,9 @@
         <property name="name">
             <cstring>filePrintAction</cstring>
         </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
         <property name="iconSet">
             <iconset>image4</iconset>
         </property>
@@ -1603,6 +1612,9 @@
         <property name="name">
             <cstring>editUndoAction</cstring>
         </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
         <property name="iconSet">
             <iconset>image5</iconset>
         </property>
@@ -1619,6 +1631,9 @@
     <action>
         <property name="name">
             <cstring>editRedoAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
         </property>
         <property name="iconSet">
             <iconset>image6</iconset>
@@ -1637,6 +1652,9 @@
         <property name="name">
             <cstring>editCutAction</cstring>
         </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
         <property name="iconSet">
             <iconset>image7</iconset>
         </property>
@@ -1654,6 +1672,9 @@
         <property name="name">
             <cstring>editCopyAction</cstring>
         </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
         <property name="iconSet">
             <iconset>image8</iconset>
         </property>
@@ -1670,6 +1691,9 @@
     <action>
         <property name="name">
             <cstring>editPasteAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
         </property>
         <property name="iconSet">
             <iconset>image9</iconset>
@@ -1705,6 +1729,9 @@
         <property name="name">
             <cstring>helpContentsAction</cstring>
         </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
         <property name="text">
             <string>Contents</string>
         </property>
@@ -1718,6 +1745,9 @@
     <action>
         <property name="name">
             <cstring>helpIndexAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
         </property>
         <property name="text">
             <string>Index</string>

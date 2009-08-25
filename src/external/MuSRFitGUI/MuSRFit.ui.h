@@ -41,6 +41,10 @@ void Form1::fileOpen()
 	    "open file dialog",
 	    "Choose a MSR file");
     print "Selected file: $file\n";
+# TODO: Possibly decipher the MSR file and setup the GUI accordingly
+# Find run numbers, beamlines etc.
+# Get theory block and understand it
+# Get parameters list and update table
     
 }
 

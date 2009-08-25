@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Tue Aug 25 15:09:19 2009
+# Created: Tue Aug 25 15:21:53 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -819,27 +819,36 @@ sub NEW
     fileNewAction= Qt::Action(this, "fileNewAction");
     fileNewAction->setIconSet( Qt::IconSet($image1) );
     fileOpenAction= Qt::Action(this, "fileOpenAction");
+    fileOpenAction->setEnabled( 0 );
     fileOpenAction->setIconSet( Qt::IconSet($image2) );
     fileSaveAction= Qt::Action(this, "fileSaveAction");
     fileSaveAction->setIconSet( Qt::IconSet($image3) );
     fileSaveAsAction= Qt::Action(this, "fileSaveAsAction");
     filePrintAction= Qt::Action(this, "filePrintAction");
+    filePrintAction->setEnabled( 0 );
     filePrintAction->setIconSet( Qt::IconSet($image4) );
     fileExitAction= Qt::Action(this, "fileExitAction");
     editUndoAction= Qt::Action(this, "editUndoAction");
+    editUndoAction->setEnabled( 0 );
     editUndoAction->setIconSet( Qt::IconSet($image5) );
     editRedoAction= Qt::Action(this, "editRedoAction");
+    editRedoAction->setEnabled( 0 );
     editRedoAction->setIconSet( Qt::IconSet($image6) );
     editCutAction= Qt::Action(this, "editCutAction");
+    editCutAction->setEnabled( 0 );
     editCutAction->setIconSet( Qt::IconSet($image7) );
     editCopyAction= Qt::Action(this, "editCopyAction");
+    editCopyAction->setEnabled( 0 );
     editCopyAction->setIconSet( Qt::IconSet($image8) );
     editPasteAction= Qt::Action(this, "editPasteAction");
+    editPasteAction->setEnabled( 0 );
     editPasteAction->setIconSet( Qt::IconSet($image9) );
     editFindAction= Qt::Action(this, "editFindAction");
     editFindAction->setIconSet( Qt::IconSet($image10) );
     helpContentsAction= Qt::Action(this, "helpContentsAction");
+    helpContentsAction->setEnabled( 0 );
     helpIndexAction= Qt::Action(this, "helpIndexAction");
+    helpIndexAction->setEnabled( 0 );
     helpAboutAction= Qt::Action(this, "helpAboutAction");
     Action= Qt::Action(this, "Action");
     separatorAction= Qt::Action(this, "separatorAction");
@@ -861,6 +870,7 @@ sub NEW
 
     MenuBar= Qt::MenuBar( this, "MenuBar");
 
+    MenuBar->setEnabled( 1 );
     MenuBar->setGeometry( Qt::Rect(0, 0, 567, 27) );
 
     fileMenu = Qt::PopupMenu( this );
@@ -870,7 +880,7 @@ sub NEW
     filePrintAction->addTo( fileMenu );
     fileMenu->insertSeparator();
     fileExitAction->addTo( fileMenu );
-    MenuBar->insertItem( "", fileMenu, 2 );
+    MenuBar->insertItem( "", fileMenu, 3 );
 
     editMenu = Qt::PopupMenu( this );
     editUndoAction->addTo( editMenu );
@@ -879,21 +889,21 @@ sub NEW
     editCutAction->addTo( editMenu );
     editCopyAction->addTo( editMenu );
     editPasteAction->addTo( editMenu );
-    MenuBar->insertItem( "", editMenu, 3 );
+    MenuBar->insertItem( "", editMenu, 4 );
 
     Options = Qt::PopupMenu( this );
     FileExistCheck->addTo( Options );
     MaualFile->addTo( Options );
-    MenuBar->insertItem( "", Options, 4 );
+    MenuBar->insertItem( "", Options, 5 );
 
     helpMenu = Qt::PopupMenu( this );
     helpContentsAction->addTo( helpMenu );
     helpIndexAction->addTo( helpMenu );
     helpMenu->insertSeparator();
     helpAboutAction->addTo( helpMenu );
-    MenuBar->insertItem( "", helpMenu, 5 );
+    MenuBar->insertItem( "", helpMenu, 6 );
 
-    MenuBar->insertSeparator( 6 );
+    MenuBar->insertSeparator( 7 );
 
     languageChange();
     my $resize = Qt::Size(567, 490);
@@ -1145,10 +1155,10 @@ sub languageChange
     MaualFile->setText( trUtf8("Maual file selection") );
     MaualFile->setMenuText( trUtf8("Maual file selection") );
     toolBar->setLabel( trUtf8("Tools") );
-    MenuBar->findItem( 2 )->setText( trUtf8("&File") );
-    MenuBar->findItem( 3 )->setText( trUtf8("&Edit") );
-    MenuBar->findItem( 4 )->setText( trUtf8("Options") );
-    MenuBar->findItem( 5 )->setText( trUtf8("&Help") );
+    MenuBar->findItem( 3 )->setText( trUtf8("&File") );
+    MenuBar->findItem( 4 )->setText( trUtf8("&Edit") );
+    MenuBar->findItem( 5 )->setText( trUtf8("Options") );
+    MenuBar->findItem( 6 )->setText( trUtf8("&Help") );
 }
 
 
@@ -1167,6 +1177,10 @@ sub fileOpen
 	    "open file dialog",
 	    "Choose a MSR file");
     print "Selected file: $file\n";
+# TODO: Possibly decipher the MSR file and setup the GUI accordingly
+# Find run numbers, beamlines etc.
+# Get theory block and understand it
+# Get parameters list and update table
     
 
 }
