@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Tue Aug 25 15:21:53 2009
+# Created: Tue Aug 25 16:34:16 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -17,6 +17,7 @@ use Qt::slots
     fileNew => [],
     fileOpen => [],
     fileSave => [],
+    fileChangeDir => [],
     filePrint => [],
     fileExit => [],
     editUndo => [],
@@ -127,6 +128,7 @@ use Qt::attributes qw(
     separatorAction
     FileExistCheck
     MaualFile
+    fileChangeDirAction
 );
 
 
@@ -857,6 +859,7 @@ sub NEW
     FileExistCheck->setOn( 1 );
     MaualFile= Qt::Action(this, "MaualFile");
     MaualFile->setToggleAction( 1 );
+    fileChangeDirAction= Qt::Action(this, "fileChangeDirAction");
 
 
     toolBar = Qt::ToolBar("", this, &DockTop);
@@ -876,6 +879,7 @@ sub NEW
     fileMenu = Qt::PopupMenu( this );
     fileOpenAction->addTo( fileMenu );
     fileSaveAction->addTo( fileMenu );
+    fileChangeDirAction->addTo( fileMenu );
     fileMenu->insertSeparator();
     filePrintAction->addTo( fileMenu );
     fileMenu->insertSeparator();
@@ -927,6 +931,7 @@ sub NEW
     Qt::Object::connect(fileNewAction, SIGNAL "activated()", this, SLOT "fileNew()");
     Qt::Object::connect(go, SIGNAL "clicked()", this, SLOT "GoFit()");
     Qt::Object::connect(InitParamTable, SIGNAL "valueChanged(int,int)", this, SLOT "UpdeateTable()");
+    Qt::Object::connect(fileChangeDirAction, SIGNAL "activated()", this, SLOT "fileChangeDir()");
 
     setTabOrder(musrfit_tabs, TITLE);
     setTabOrder(TITLE, FILENAME);
@@ -1108,6 +1113,7 @@ sub languageChange
     fileOpenAction->setAccel( Qt::KeySequence( trUtf8("Ctrl+O") ) );
     fileSaveAction->setText( trUtf8("&Save MSR") );
     fileSaveAction->setMenuText( trUtf8("&Save MSR") );
+    fileSaveAction->setStatusTip( trUtf8("&Save MSRave") );
     fileSaveAction->setAccel( Qt::KeySequence( trUtf8("Ctrl+S") ) );
     fileSaveAsAction->setText( trUtf8("Save MSR &As...") );
     fileSaveAsAction->setMenuText( trUtf8("Save MSR &As...") );
@@ -1154,6 +1160,8 @@ sub languageChange
     FileExistCheck->setWhatsThis( trUtf8("Enable/Disable checking for MSR files.") );
     MaualFile->setText( trUtf8("Maual file selection") );
     MaualFile->setMenuText( trUtf8("Maual file selection") );
+    fileChangeDirAction->setText( trUtf8("Change dir") );
+    fileChangeDirAction->setMenuText( trUtf8("Change dir") );
     toolBar->setLabel( trUtf8("Tools") );
     MenuBar->findItem( 3 )->setText( trUtf8("&File") );
     MenuBar->findItem( 4 )->setText( trUtf8("&Edit") );
@@ -1206,6 +1214,19 @@ sub fileSave
 	    my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
 	}
     }    
+
+}
+
+sub fileChangeDir
+{
+
+    my $newdir=Qt::FileDialog::getExistingDirectory(
+	    "",
+	    this,
+	    "get existing directory",
+	    "Choose a directory",
+	    1);
+   chdir ("$newdir");
 
 }
 

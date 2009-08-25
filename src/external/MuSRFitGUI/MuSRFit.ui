@@ -1465,6 +1465,7 @@
     <item text="&amp;File" name="fileMenu">
         <action name="fileOpenAction"/>
         <action name="fileSaveAction"/>
+        <action name="fileChangeDirAction"/>
         <separator/>
         <action name="filePrintAction"/>
         <separator/>
@@ -1555,6 +1556,9 @@
         </property>
         <property name="menuText">
             <string>&amp;Save MSR</string>
+        </property>
+        <property name="statusTip">
+            <string>&amp;Save MSRave</string>
         </property>
         <property name="accel">
             <string>Ctrl+S</string>
@@ -1829,6 +1833,17 @@
             <string>Maual file selection</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>fileChangeDirAction</cstring>
+        </property>
+        <property name="text">
+            <string>Change dir</string>
+        </property>
+        <property name="menuText">
+            <string>Change dir</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -1962,6 +1977,12 @@
         <receiver>MuSRFitform</receiver>
         <slot>UpdeateTable()</slot>
     </connection>
+    <connection>
+        <sender>fileChangeDirAction</sender>
+        <signal>activated()</signal>
+        <receiver>MuSRFitform</receiver>
+        <slot>fileChangeDir()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>musrfit_tabs</tabstop>
@@ -2003,6 +2024,7 @@
     <slot>fileNew()</slot>
     <slot>fileOpen()</slot>
     <slot>fileSave()</slot>
+    <slot>fileChangeDir()</slot>
     <slot>filePrint()</slot>
     <slot>fileExit()</slot>
     <slot>editUndo()</slot>

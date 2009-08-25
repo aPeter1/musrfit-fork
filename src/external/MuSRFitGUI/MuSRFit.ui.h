@@ -71,6 +71,17 @@ void Form1::fileSave()
     }    
 }
 
+void MuSRFitform::fileChangeDir()
+{
+    my $newdir=Qt::FileDialog::getExistingDirectory(
+	    "",
+	    this,
+	    "get existing directory",
+	    "Choose a directory",
+	    1);
+   chdir ("$newdir");
+}
+
 void Form1::filePrint()
 {
     
@@ -618,3 +629,5 @@ void MuSRFitform::UpdeateTable()
 {
 
 }
+
+
