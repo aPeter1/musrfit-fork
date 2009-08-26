@@ -2248,7 +2248,7 @@
         <sender>InitParamTable</sender>
         <signal>valueChanged(int,int)</signal>
         <receiver>MuSRFitform</receiver>
-        <slot>UpdeateTable()</slot>
+        <slot>UpdateMSRFileInitTable()</slot>
     </connection>
 </connections>
 <tabstops>
