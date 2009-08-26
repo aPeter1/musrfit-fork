@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>567</width>
+            <width>570</width>
             <height>490</height>
         </rect>
     </property>
@@ -731,7 +731,7 @@
                                 </item>
                                 <item>
                                     <property name="text">
-                                        <string>Single Histogram</string>
+                                        <string>SingleHist</string>
                                     </property>
                                 </item>
                                 <property name="name">
@@ -803,342 +803,612 @@
                 <property name="checkable">
                     <bool>false</bool>
                 </property>
-                <widget class="QLayoutWidget">
+                <widget class="QButtonGroup">
                     <property name="name">
-                        <cstring>layoutShComp</cstring>
+                        <cstring>SharingComp1</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>false</bool>
                     </property>
                     <property name="geometry">
                         <rect>
-                            <x>30</x>
-                            <y>50</y>
-                            <width>500</width>
-                            <height>311</height>
+                            <x>31</x>
+                            <y>25</y>
+                            <width>162</width>
+                            <height>335</height>
                         </rect>
                     </property>
-                    <hbox>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>3</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="title">
+                        <string>1st Component</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignLeft</set>
+                    </property>
+                    <widget class="QLabel">
                         <property name="name">
-                            <cstring>unnamed</cstring>
+                            <cstring>Comp1ShLabel</cstring>
                         </property>
-                        <widget class="QButtonGroup">
+                        <property name="geometry">
+                            <rect>
+                                <x>2</x>
+                                <y>30</y>
+                                <width>185</width>
+                                <height>20</height>
+                            </rect>
+                        </property>
+                        <property name="paletteBackgroundColor">
+                            <color>
+                                <red>255</red>
+                                <green>255</green>
+                                <blue>127</blue>
+                            </color>
+                        </property>
+                        <property name="text">
+                            <string>FitType1</string>
+                        </property>
+                    </widget>
+                    <widget class="QLayoutWidget">
+                        <property name="name">
+                            <cstring>layout14</cstring>
+                        </property>
+                        <property name="geometry">
+                            <rect>
+                                <x>40</x>
+                                <y>60</y>
+                                <width>81</width>
+                                <height>266</height>
+                            </rect>
+                        </property>
+                        <vbox>
                             <property name="name">
-                                <cstring>SharingComp1</cstring>
+                                <cstring>unnamed</cstring>
                             </property>
-                            <property name="enabled">
-                                <bool>false</bool>
+                            <property name="margin">
+                                <number>0</number>
                             </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>5</hsizetype>
-                                    <vsizetype>3</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
+                            <property name="spacing">
+                                <number>0</number>
                             </property>
-                            <property name="title">
-                                <string>1st Component</string>
-                            </property>
-                            <property name="alignment">
-                                <set>AlignLeft</set>
-                            </property>
-                            <widget class="QLayoutWidget">
+                            <widget class="QCheckBox">
                                 <property name="name">
-                                    <cstring>layoutComp1</cstring>
+                                    <cstring>ShParam_1_1</cstring>
                                 </property>
-                                <property name="geometry">
-                                    <rect>
-                                        <x>30</x>
-                                        <y>70</y>
-                                        <width>81</width>
-                                        <height>190</height>
-                                    </rect>
+                                <property name="text">
+                                    <string>Param1</string>
                                 </property>
-                                <vbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QCheckBox">
-                                        <property name="name">
-                                            <cstring>ShParam_1_1</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Param1</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QCheckBox">
-                                        <property name="name">
-                                            <cstring>ShParam_1_2</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Param2</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QCheckBox">
-                                        <property name="name">
-                                            <cstring>ShParam_1_3</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Param3</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QCheckBox">
-                                        <property name="name">
-                                            <cstring>ShParam_1_4</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Param4</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QCheckBox">
-                                        <property name="name">
-                                            <cstring>ShParam_1_5</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="paletteBackgroundColor">
-                                            <color>
-                                                <red>234</red>
-                                                <green>233</green>
-                                                <blue>232</blue>
-                                            </color>
-                                        </property>
-                                        <property name="text">
-                                            <string>Param5</string>
-                                        </property>
-                                        <property name="tristate">
-                                            <bool>false</bool>
-                                        </property>
-                                    </widget>
-                                </vbox>
                             </widget>
-                            <widget class="QLabel">
+                            <widget class="QCheckBox">
                                 <property name="name">
-                                    <cstring>Comp1ShLabel</cstring>
+                                    <cstring>ShParam_1_2</cstring>
                                 </property>
-                                <property name="geometry">
-                                    <rect>
-                                        <x>2</x>
-                                        <y>30</y>
-                                        <width>185</width>
-                                        <height>20</height>
-                                    </rect>
+                                <property name="text">
+                                    <string>Param2</string>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_1_3</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Param3</string>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_1_4</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Param4</string>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_1_5</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
                                 </property>
                                 <property name="paletteBackgroundColor">
                                     <color>
-                                        <red>255</red>
-                                        <green>255</green>
-                                        <blue>127</blue>
+                                        <red>234</red>
+                                        <green>233</green>
+                                        <blue>232</blue>
                                     </color>
                                 </property>
                                 <property name="text">
-                                    <string>FitType1</string>
+                                    <string>Param5</string>
+                                </property>
+                                <property name="tristate">
+                                    <bool>false</bool>
                                 </property>
                             </widget>
-                        </widget>
-                        <widget class="QButtonGroup">
-                            <property name="name">
-                                <cstring>SharingComp2</cstring>
-                            </property>
-                            <property name="enabled">
-                                <bool>false</bool>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>5</hsizetype>
-                                    <vsizetype>3</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="title">
-                                <string>2nd Component</string>
-                            </property>
-                            <widget class="QLabel">
+                            <widget class="QCheckBox">
                                 <property name="name">
-                                    <cstring>Comp2ShLabel</cstring>
+                                    <cstring>ShParam_1_6</cstring>
                                 </property>
-                                <property name="geometry">
-                                    <rect>
-                                        <x>2</x>
-                                        <y>30</y>
-                                        <width>185</width>
-                                        <height>20</height>
-                                    </rect>
+                                <property name="enabled">
+                                    <bool>false</bool>
                                 </property>
                                 <property name="paletteBackgroundColor">
                                     <color>
-                                        <red>255</red>
-                                        <green>255</green>
-                                        <blue>127</blue>
+                                        <red>234</red>
+                                        <green>233</green>
+                                        <blue>232</blue>
                                     </color>
                                 </property>
                                 <property name="text">
-                                    <string>FitType2</string>
+                                    <string>Param6</string>
+                                </property>
+                                <property name="tristate">
+                                    <bool>false</bool>
                                 </property>
                             </widget>
-                            <widget class="QLayoutWidget">
+                            <widget class="QCheckBox">
                                 <property name="name">
-                                    <cstring>layoutComp2</cstring>
+                                    <cstring>ShParam_1_7</cstring>
                                 </property>
-                                <property name="geometry">
-                                    <rect>
-                                        <x>20</x>
-                                        <y>70</y>
-                                        <width>81</width>
-                                        <height>190</height>
-                                    </rect>
-                                </property>
-                                <vbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QCheckBox">
-                                        <property name="name">
-                                            <cstring>ShParam_2_1</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Param1</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QCheckBox">
-                                        <property name="name">
-                                            <cstring>ShParam_2_2</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Param2</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QCheckBox">
-                                        <property name="name">
-                                            <cstring>ShParam_2_3</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Param3</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QCheckBox">
-                                        <property name="name">
-                                            <cstring>ShParam_2_4</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Param4</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QCheckBox">
-                                        <property name="name">
-                                            <cstring>ShParam_2_5</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Param5</string>
-                                        </property>
-                                    </widget>
-                                </vbox>
-                            </widget>
-                        </widget>
-                        <widget class="QButtonGroup">
-                            <property name="name">
-                                <cstring>SharingComp3</cstring>
-                            </property>
-                            <property name="enabled">
-                                <bool>false</bool>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>5</hsizetype>
-                                    <vsizetype>3</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="title">
-                                <string>3rd Component</string>
-                            </property>
-                            <property name="alignment">
-                                <set>AlignJustify|AlignVCenter</set>
-                            </property>
-                            <widget class="QLabel">
-                                <property name="name">
-                                    <cstring>Comp3ShLabel</cstring>
-                                </property>
-                                <property name="geometry">
-                                    <rect>
-                                        <x>2</x>
-                                        <y>30</y>
-                                        <width>185</width>
-                                        <height>20</height>
-                                    </rect>
+                                <property name="enabled">
+                                    <bool>false</bool>
                                 </property>
                                 <property name="paletteBackgroundColor">
                                     <color>
-                                        <red>255</red>
-                                        <green>255</green>
-                                        <blue>127</blue>
+                                        <red>234</red>
+                                        <green>233</green>
+                                        <blue>232</blue>
                                     </color>
                                 </property>
                                 <property name="text">
-                                    <string>FitType3</string>
+                                    <string>Param7</string>
+                                </property>
+                                <property name="tristate">
+                                    <bool>false</bool>
                                 </property>
                             </widget>
-                            <widget class="QLayoutWidget">
+                            <widget class="QCheckBox">
                                 <property name="name">
-                                    <cstring>layoutComp3</cstring>
+                                    <cstring>ShParam_1_8</cstring>
                                 </property>
-                                <property name="geometry">
-                                    <rect>
-                                        <x>30</x>
-                                        <y>70</y>
-                                        <width>81</width>
-                                        <height>190</height>
-                                    </rect>
+                                <property name="enabled">
+                                    <bool>false</bool>
                                 </property>
-                                <vbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QCheckBox">
-                                        <property name="name">
-                                            <cstring>ShParam_3_1</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Param1</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QCheckBox">
-                                        <property name="name">
-                                            <cstring>ShParam_3_2</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Param2</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QCheckBox">
-                                        <property name="name">
-                                            <cstring>ShParam_3_3</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Param3</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QCheckBox">
-                                        <property name="name">
-                                            <cstring>ShParam_3_4</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Param4</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QCheckBox">
-                                        <property name="name">
-                                            <cstring>ShParam_3_5</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Param5</string>
-                                        </property>
-                                    </widget>
-                                </vbox>
+                                <property name="paletteBackgroundColor">
+                                    <color>
+                                        <red>234</red>
+                                        <green>233</green>
+                                        <blue>232</blue>
+                                    </color>
+                                </property>
+                                <property name="text">
+                                    <string>Param8</string>
+                                </property>
+                                <property name="tristate">
+                                    <bool>false</bool>
+                                </property>
                             </widget>
-                        </widget>
-                    </hbox>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_1_9</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="paletteBackgroundColor">
+                                    <color>
+                                        <red>234</red>
+                                        <green>233</green>
+                                        <blue>232</blue>
+                                    </color>
+                                </property>
+                                <property name="text">
+                                    <string>Param9</string>
+                                </property>
+                                <property name="tristate">
+                                    <bool>false</bool>
+                                </property>
+                            </widget>
+                        </vbox>
+                    </widget>
+                </widget>
+                <widget class="QButtonGroup">
+                    <property name="name">
+                        <cstring>SharingComp2</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>false</bool>
+                    </property>
+                    <property name="geometry">
+                        <rect>
+                            <x>199</x>
+                            <y>25</y>
+                            <width>162</width>
+                            <height>335</height>
+                        </rect>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>3</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="title">
+                        <string>2nd Component</string>
+                    </property>
+                    <widget class="QLabel">
+                        <property name="name">
+                            <cstring>Comp2ShLabel</cstring>
+                        </property>
+                        <property name="geometry">
+                            <rect>
+                                <x>2</x>
+                                <y>30</y>
+                                <width>185</width>
+                                <height>20</height>
+                            </rect>
+                        </property>
+                        <property name="paletteBackgroundColor">
+                            <color>
+                                <red>255</red>
+                                <green>255</green>
+                                <blue>127</blue>
+                            </color>
+                        </property>
+                        <property name="text">
+                            <string>FitType2</string>
+                        </property>
+                    </widget>
+                    <widget class="QLayoutWidget">
+                        <property name="name">
+                            <cstring>layout13</cstring>
+                        </property>
+                        <property name="geometry">
+                            <rect>
+                                <x>40</x>
+                                <y>60</y>
+                                <width>81</width>
+                                <height>266</height>
+                            </rect>
+                        </property>
+                        <vbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <property name="margin">
+                                <number>0</number>
+                            </property>
+                            <property name="spacing">
+                                <number>0</number>
+                            </property>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_2_1</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Param1</string>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_2_2</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Param2</string>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_2_3</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Param3</string>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_2_4</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Param4</string>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_2_5</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Param5</string>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_2_6</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="paletteBackgroundColor">
+                                    <color>
+                                        <red>234</red>
+                                        <green>233</green>
+                                        <blue>232</blue>
+                                    </color>
+                                </property>
+                                <property name="text">
+                                    <string>Param6</string>
+                                </property>
+                                <property name="tristate">
+                                    <bool>false</bool>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_2_7</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="paletteBackgroundColor">
+                                    <color>
+                                        <red>234</red>
+                                        <green>233</green>
+                                        <blue>232</blue>
+                                    </color>
+                                </property>
+                                <property name="text">
+                                    <string>Param7</string>
+                                </property>
+                                <property name="tristate">
+                                    <bool>false</bool>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_2_8</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="paletteBackgroundColor">
+                                    <color>
+                                        <red>234</red>
+                                        <green>233</green>
+                                        <blue>232</blue>
+                                    </color>
+                                </property>
+                                <property name="text">
+                                    <string>Param8</string>
+                                </property>
+                                <property name="tristate">
+                                    <bool>false</bool>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_2_9</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="paletteBackgroundColor">
+                                    <color>
+                                        <red>234</red>
+                                        <green>233</green>
+                                        <blue>232</blue>
+                                    </color>
+                                </property>
+                                <property name="text">
+                                    <string>Param9</string>
+                                </property>
+                                <property name="tristate">
+                                    <bool>false</bool>
+                                </property>
+                            </widget>
+                        </vbox>
+                    </widget>
+                </widget>
+                <widget class="QButtonGroup">
+                    <property name="name">
+                        <cstring>SharingComp3</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>false</bool>
+                    </property>
+                    <property name="geometry">
+                        <rect>
+                            <x>367</x>
+                            <y>25</y>
+                            <width>162</width>
+                            <height>335</height>
+                        </rect>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>3</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="title">
+                        <string>3rd Component</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignJustify|AlignVCenter</set>
+                    </property>
+                    <widget class="QLabel">
+                        <property name="name">
+                            <cstring>Comp3ShLabel</cstring>
+                        </property>
+                        <property name="geometry">
+                            <rect>
+                                <x>2</x>
+                                <y>30</y>
+                                <width>185</width>
+                                <height>20</height>
+                            </rect>
+                        </property>
+                        <property name="paletteBackgroundColor">
+                            <color>
+                                <red>255</red>
+                                <green>255</green>
+                                <blue>127</blue>
+                            </color>
+                        </property>
+                        <property name="text">
+                            <string>FitType3</string>
+                        </property>
+                    </widget>
+                    <widget class="QLayoutWidget">
+                        <property name="name">
+                            <cstring>layout15</cstring>
+                        </property>
+                        <property name="geometry">
+                            <rect>
+                                <x>41</x>
+                                <y>58</y>
+                                <width>81</width>
+                                <height>266</height>
+                            </rect>
+                        </property>
+                        <vbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_3_1</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Param1</string>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_3_2</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Param2</string>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_3_3</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Param3</string>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_3_4</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Param4</string>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_3_5</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Param5</string>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_3_6</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="paletteBackgroundColor">
+                                    <color>
+                                        <red>234</red>
+                                        <green>233</green>
+                                        <blue>232</blue>
+                                    </color>
+                                </property>
+                                <property name="text">
+                                    <string>Param6</string>
+                                </property>
+                                <property name="tristate">
+                                    <bool>false</bool>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_3_7</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="paletteBackgroundColor">
+                                    <color>
+                                        <red>234</red>
+                                        <green>233</green>
+                                        <blue>232</blue>
+                                    </color>
+                                </property>
+                                <property name="text">
+                                    <string>Param7</string>
+                                </property>
+                                <property name="tristate">
+                                    <bool>false</bool>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_3_8</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="paletteBackgroundColor">
+                                    <color>
+                                        <red>234</red>
+                                        <green>233</green>
+                                        <blue>232</blue>
+                                    </color>
+                                </property>
+                                <property name="text">
+                                    <string>Param8</string>
+                                </property>
+                                <property name="tristate">
+                                    <bool>false</bool>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>ShParam_3_9</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="paletteBackgroundColor">
+                                    <color>
+                                        <red>234</red>
+                                        <green>233</green>
+                                        <blue>232</blue>
+                                    </color>
+                                </property>
+                                <property name="text">
+                                    <string>Param9</string>
+                                </property>
+                                <property name="tristate">
+                                    <bool>false</bool>
+                                </property>
+                            </widget>
+                        </vbox>
+                    </widget>
                 </widget>
             </widget>
         </widget>
@@ -1458,7 +1728,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>567</width>
+            <width>570</width>
             <height>27</height>
         </rect>
     </property>
@@ -1558,7 +1828,7 @@
             <string>&amp;Save MSR</string>
         </property>
         <property name="statusTip">
-            <string>&amp;Save MSRave</string>
+            <string>&amp;Save MSR</string>
         </property>
         <property name="accel">
             <string>Ctrl+S</string>
@@ -1838,10 +2108,13 @@
             <cstring>fileChangeDirAction</cstring>
         </property>
         <property name="text">
-            <string>Change dir</string>
+            <string>&amp;Change dir</string>
         </property>
         <property name="menuText">
-            <string>Change dir</string>
+            <string>&amp;Change dir</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+C</string>
         </property>
     </action>
 </actions>
@@ -1881,12 +2154,6 @@
     </image>
 </images>
 <connections>
-    <connection>
-        <sender>musrfit_tabs</sender>
-        <signal>selected(const QString&amp;)</signal>
-        <receiver>MuSRFitform</receiver>
-        <slot>TabChanged()</slot>
-    </connection>
     <connection>
         <sender>helpAboutAction</sender>
         <signal>activated()</signal>
@@ -1960,10 +2227,16 @@
         <slot>fileOpen()</slot>
     </connection>
     <connection>
-        <sender>fileNewAction</sender>
+        <sender>fileChangeDirAction</sender>
         <signal>activated()</signal>
         <receiver>MuSRFitform</receiver>
-        <slot>fileNew()</slot>
+        <slot>fileChangeDir()</slot>
+    </connection>
+    <connection>
+        <sender>musrfit_tabs</sender>
+        <signal>selected(const QString&amp;)</signal>
+        <receiver>MuSRFitform</receiver>
+        <slot>TabChanged()</slot>
     </connection>
     <connection>
         <sender>go</sender>
@@ -1976,12 +2249,6 @@
         <signal>valueChanged(int,int)</signal>
         <receiver>MuSRFitform</receiver>
         <slot>UpdeateTable()</slot>
-    </connection>
-    <connection>
-        <sender>fileChangeDirAction</sender>
-        <signal>activated()</signal>
-        <receiver>MuSRFitform</receiver>
-        <slot>fileChangeDir()</slot>
     </connection>
 </connections>
 <tabstops>
@@ -2021,7 +2288,6 @@
     <include location="local" impldecl="in implementation">MuSRFit.ui.h</include>
 </includes>
 <slots>
-    <slot>fileNew()</slot>
     <slot>fileOpen()</slot>
     <slot>fileSave()</slot>
     <slot>fileChangeDir()</slot>

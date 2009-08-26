@@ -28,10 +28,6 @@
 # Copyright 2009 by Zaher Salman and the LEM Group.
 # <zaher.salman@psi.ch>
 
-void Form1::fileNew()
-{
-}
-
 void Form1::fileOpen()
 {
     my $file=Qt::FileDialog::getOpenFileName(
@@ -177,6 +173,7 @@ void MuSRFitform::CreateAllInput()
     $All{"LRBF"} = LRBF->text;
     $All{"RunNumbers"} =~ s/[\ \.\~\/\&\*\[\;\>\<\^\$\(\)\`\|\]\'\@]/,/g;
     my @RUNS = split( /,/, $All{"RunNumbers"} );
+    my @Hists = split(/,/, $All{"LRBF"} );
     
 # Construct fittypes that can be understood by MSR.pm
     my %FTs=(0,"Exponential",
@@ -256,12 +253,17 @@ void MuSRFitform::CreateAllInput()
 # Change state/label of parameters
 	foreach my $Param (@Params) {
 	    my $Param_ORG = $Param;
+# TODO: I need to take care of single hist fits here
+	    if ( $All{"FitAsyType"} eq "SingleHist" ) {		$Param=$Param.$Hists[0];	    }
 	    if ( $#FitTypes != 0 && (   $Param ne "Alpha" && $Param ne "N0" && $Param ne "NBg" ) ){
 		$Param = join( "", $Param, "_", $Component);
 	    }
 		
 # Is there any point of sharing, multiple runs?
-	    if ( $#RUNS == 0 ) {
+	    if ( $#RUNS == 0 && $All{"FitAsyType"} eq "Asymmetry") {
+		$Shared = 1;
+	    }
+	    elsif ( $#RUNS == 0 && $#Hists == 0 &&  $All{"FitAsyType"} eq "SingleHist" )  {
 		$Shared = 1;
 	    } else {	
 # Check if shared or not, construct name of checkbox, find its handle and then 
@@ -321,7 +323,12 @@ void MuSRFitform::CallMSRCreate()
     use MSR;
     my %All=CreateAllInput();
     if ($All{"RunNumbers"} ne "") {
-	my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
+	if ( $All{"FitAsyType"} eq "Asymmetry" ) {
+	    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
+	}
+	elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
+	    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSRSingleHist(\%All);
+	}
 	UpdateMSRFileInitTable();
     }
 }
@@ -407,7 +414,7 @@ void MuSRFitform::ActivateShComp()
 	$CompShL->setText($All{"FitType$Component"});
 	
 # Change state/label of parameters
-	for (my $i=1; $i<=5;$i++) {		
+	for (my $i=1; $i<=9;$i++) {		
 	    my $ParamChkBx="ShParam_".$Component."_".$i;
 	    my $ChkBx = child($ParamChkBx);
 	    if ($Params[$i-1] ne "") {
@@ -587,8 +594,11 @@ void MuSRFitform::TabChanged()
     if ($All{"RunNumbers"} ne "" && $SlectedTab==4 && $FileExistCheck==1) {
 	if (-e $FILENAME) {
 # Warning: MSR file exists
-	    my $Warning = "Warning: MSR file $FILENAME Already exists!\nChange name or backup file if you do not want to loose it.";
+	    my $Warning = "Warning: MSR file $FILENAME Already exists!\nIf you continue it will overwriten.";
 	    my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
+#	    my $Answer= Qt::MessageBox::warning( this, "Warning",$Warning, "&No", "&Yes", undef, 1,1);
+# $Answer =1,0 for yes and no
+#	    print "Answer=$Answer\n";
 	}
     }
  
