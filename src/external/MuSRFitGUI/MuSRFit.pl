@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Thu Aug 27 09:03:25 2009
+# Created: Thu Aug 27 15:58:41 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -30,12 +30,14 @@ use Qt::slots
     CreateAllInput => [],
     CallMSRCreate => [],
     UpdateMSRFileInitTable => [],
+    ActivateT0Hists => [],
     ActivateShComp => [],
     InitializeTab => [],
     TabChanged => [],
     GoFit => [],
-    UpdeateTable => [];
+    ShowMuSRT0 => [];
 use Qt::attributes qw(
+    textLabel2_2
     musrfit_tabs
     RUNSPage
     TITLELabel
@@ -102,18 +104,58 @@ use Qt::attributes qw(
     ShParam_3_9
     InitializationPage
     InitParamTable
+    TableUpdate
     FittingPage
     textMSROutput
     TabPage
+    ErrorCalc
+    HESSE
+    MINOS
     Minimization
     MINIMIZE
     MIGRAD
     SIMPLEX
-    ErrorCalc
-    HESSE
-    MINOS
-    go
     FitTextOutput
+    go
+    TabPage_2
+    FPlot
+    FApodization
+    FApodizationLabel
+    FUnits
+    FPlotLabel
+    FUnitsLabel
+    TabPage_3
+    groupHist0
+    textLabel2
+    textLabel2_2_2_3
+    textLabel2_2_2
+    textLabel2_2_2_2
+    textLabel2_2_2_2_2
+    groupHist1
+    t01
+    Bg11
+    Bg21
+    Data11
+    Data21
+    groupHist2
+    t02
+    Bg12
+    Bg22
+    Data12
+    Data22
+    groupHist3
+    t03
+    Bg13
+    Bg23
+    Data13
+    Data23
+    groupHist4
+    t04
+    Bg14
+    Bg24
+    Data14
+    Data24
+    ShowT0
     MenuBar
     fileMenu
     editMenu
@@ -510,6 +552,9 @@ sub NEW
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
 
+    textLabel2_2 = Qt::Label(centralWidget(), "textLabel2_2");
+    textLabel2_2->setGeometry( Qt::Rect(13, 78, 55, 19) );
+
     musrfit_tabs = Qt::TabWidget(centralWidget(), "musrfit_tabs");
     musrfit_tabs->setEnabled( 1 );
     musrfit_tabs->setGeometry( Qt::Rect(5, 0, 560, 400) );
@@ -830,7 +875,7 @@ sub NEW
     InitParamTable->horizontalHeader()->setLabel(InitParamTable->numCols() - 1, trUtf8("Min"));
     InitParamTable->setNumCols(InitParamTable->numCols() + 1);
     InitParamTable->horizontalHeader()->setLabel(InitParamTable->numCols() - 1, trUtf8("Max"));
-    InitParamTable->setGeometry( Qt::Rect(5, 0, 545, 560) );
+    InitParamTable->setGeometry( Qt::Rect(5, 5, 545, 325) );
     InitParamTable->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, InitParamTable->sizePolicy()->hasHeightForWidth()) );
     InitParamTable->setMaximumSize( Qt::Size(32767, 32767) );
     InitParamTable->setFocusPolicy( &Qt::Table::TabFocus() );
@@ -846,6 +891,9 @@ sub NEW
     InitParamTable->setShowGrid( 1 );
     InitParamTable->setRowMovingEnabled( 0 );
     InitParamTable->setFocusStyle( &Qt::Table::SpreadSheet() );
+
+    TableUpdate = Qt::PushButton(InitializationPage, "TableUpdate");
+    TableUpdate->setGeometry( Qt::Rect(435, 335, 115, 28) );
     musrfit_tabs->insertTab( InitializationPage, "" );
 
     FittingPage = Qt::Widget(musrfit_tabs, "FittingPage");
@@ -856,6 +904,20 @@ sub NEW
     musrfit_tabs->insertTab( FittingPage, "" );
 
     TabPage = Qt::Widget(musrfit_tabs, "TabPage");
+
+    ErrorCalc = Qt::ButtonGroup(TabPage, "ErrorCalc");
+    ErrorCalc->setGeometry( Qt::Rect(223, 11, 211, 125) );
+    ErrorCalc->setAlignment( int(&Qt::ButtonGroup::AlignTop) );
+    ErrorCalc->setExclusive( 1 );
+    ErrorCalc->setRadioButtonExclusive( 1 );
+    ErrorCalc->setProperty( "selectedId", Qt::Variant(int(0) ) );
+
+    HESSE = Qt::RadioButton(ErrorCalc, "HESSE");
+    HESSE->setGeometry( Qt::Rect(19, 30, 69, 22) );
+    HESSE->setChecked( 1 );
+
+    MINOS = Qt::RadioButton(ErrorCalc, "MINOS");
+    MINOS->setGeometry( Qt::Rect(19, 59, 69, 22) );
 
     Minimization = Qt::ButtonGroup(TabPage, "Minimization");
     Minimization->setGeometry( Qt::Rect(6, 11, 211, 125) );
@@ -873,29 +935,180 @@ sub NEW
     SIMPLEX = Qt::RadioButton(Minimization, "SIMPLEX");
     SIMPLEX->setGeometry( Qt::Rect(16, 88, 83, 22) );
 
-    ErrorCalc = Qt::ButtonGroup(TabPage, "ErrorCalc");
-    ErrorCalc->setGeometry( Qt::Rect(223, 11, 211, 125) );
-    ErrorCalc->setAlignment( int(&Qt::ButtonGroup::AlignTop) );
-    ErrorCalc->setExclusive( 1 );
-    ErrorCalc->setRadioButtonExclusive( 1 );
-    ErrorCalc->setProperty( "selectedId", Qt::Variant(int(0) ) );
-
-    HESSE = Qt::RadioButton(ErrorCalc, "HESSE");
-    HESSE->setGeometry( Qt::Rect(19, 30, 69, 22) );
-    HESSE->setChecked( 1 );
-
-    MINOS = Qt::RadioButton(ErrorCalc, "MINOS");
-    MINOS->setGeometry( Qt::Rect(19, 59, 69, 22) );
+    FitTextOutput = Qt::TextEdit(TabPage, "FitTextOutput");
+    FitTextOutput->setGeometry( Qt::Rect(5, 140, 545, 225) );
+    FitTextOutput->setOverwriteMode( 1 );
 
     go = Qt::PushButton(TabPage, "go");
     go->setGeometry( Qt::Rect(440, 15, 111, 31) );
     go->setAutoDefault( 0 );
     go->setDefault( 1 );
-
-    FitTextOutput = Qt::TextEdit(TabPage, "FitTextOutput");
-    FitTextOutput->setGeometry( Qt::Rect(5, 140, 545, 225) );
-    FitTextOutput->setOverwriteMode( 1 );
     musrfit_tabs->insertTab( TabPage, "" );
+
+    TabPage_2 = Qt::Widget(musrfit_tabs, "TabPage_2");
+
+    my $LayoutWidget_5 = Qt::Widget(TabPage_2, '$LayoutWidget_5');
+    $LayoutWidget_5->setGeometry( Qt::Rect(8, 18, 225, 92) );
+    my $layout11 = Qt::GridLayout($LayoutWidget_5, 1, 1, 11, 6, '$layout11');
+
+    FPlot = Qt::ComboBox(0, $LayoutWidget_5, "FPlot");
+    FPlot->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FPlot->sizePolicy()->hasHeightForWidth()) );
+
+    $layout11->addWidget(FPlot, 2, 1);
+
+    FApodization = Qt::ComboBox(0, $LayoutWidget_5, "FApodization");
+    FApodization->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FApodization->sizePolicy()->hasHeightForWidth()) );
+
+    $layout11->addWidget(FApodization, 1, 1);
+
+    FApodizationLabel = Qt::Label($LayoutWidget_5, "FApodizationLabel");
+
+    $layout11->addWidget(FApodizationLabel, 1, 0);
+
+    FUnits = Qt::ComboBox(0, $LayoutWidget_5, "FUnits");
+    FUnits->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FUnits->sizePolicy()->hasHeightForWidth()) );
+
+    $layout11->addWidget(FUnits, 0, 1);
+
+    FPlotLabel = Qt::Label($LayoutWidget_5, "FPlotLabel");
+
+    $layout11->addWidget(FPlotLabel, 2, 0);
+
+    FUnitsLabel = Qt::Label($LayoutWidget_5, "FUnitsLabel");
+
+    $layout11->addWidget(FUnitsLabel, 0, 0);
+    musrfit_tabs->insertTab( TabPage_2, "" );
+
+    TabPage_3 = Qt::Widget(musrfit_tabs, "TabPage_3");
+
+    my $LayoutWidget_6 = Qt::Widget(TabPage_3, '$LayoutWidget_6');
+    $LayoutWidget_6->setGeometry( Qt::Rect(7, 5, 540, 180) );
+    my $layout27 = Qt::HBoxLayout($LayoutWidget_6, 0, 6, '$layout27');
+
+    groupHist0 = Qt::GroupBox($LayoutWidget_6, "groupHist0");
+    groupHist0->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, groupHist0->sizePolicy()->hasHeightForWidth()) );
+    groupHist0->setMinimumSize( Qt::Size(0, 0) );
+
+    my $LayoutWidget_7 = Qt::Widget(groupHist0, '$LayoutWidget_7');
+    $LayoutWidget_7->setGeometry( Qt::Rect(5, 28, 100, 135) );
+    my $layout16_2 = Qt::VBoxLayout($LayoutWidget_7, 11, 0, '$layout16_2');
+
+    textLabel2 = Qt::Label($LayoutWidget_7, "textLabel2");
+    $layout16_2->addWidget(textLabel2);
+
+    textLabel2_2_2_3 = Qt::Label($LayoutWidget_7, "textLabel2_2_2_3");
+    $layout16_2->addWidget(textLabel2_2_2_3);
+
+    textLabel2_2_2 = Qt::Label($LayoutWidget_7, "textLabel2_2_2");
+    $layout16_2->addWidget(textLabel2_2_2);
+
+    textLabel2_2_2_2 = Qt::Label($LayoutWidget_7, "textLabel2_2_2_2");
+    $layout16_2->addWidget(textLabel2_2_2_2);
+
+    textLabel2_2_2_2_2 = Qt::Label($LayoutWidget_7, "textLabel2_2_2_2_2");
+    $layout16_2->addWidget(textLabel2_2_2_2_2);
+    $layout27->addWidget(groupHist0);
+
+    groupHist1 = Qt::GroupBox($LayoutWidget_6, "groupHist1");
+    groupHist1->setFrameShadow( &Qt::GroupBox::Plain() );
+
+    my $LayoutWidget_8 = Qt::Widget(groupHist1, '$LayoutWidget_8');
+    $LayoutWidget_8->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18_2 = Qt::VBoxLayout($LayoutWidget_8, 0, 0, '$layout18_2');
+
+    t01 = Qt::LineEdit($LayoutWidget_8, "t01");
+    $layout18_2->addWidget(t01);
+
+    Bg11 = Qt::LineEdit($LayoutWidget_8, "Bg11");
+    $layout18_2->addWidget(Bg11);
+
+    Bg21 = Qt::LineEdit($LayoutWidget_8, "Bg21");
+    $layout18_2->addWidget(Bg21);
+
+    Data11 = Qt::LineEdit($LayoutWidget_8, "Data11");
+    $layout18_2->addWidget(Data11);
+
+    Data21 = Qt::LineEdit($LayoutWidget_8, "Data21");
+    $layout18_2->addWidget(Data21);
+    $layout27->addWidget(groupHist1);
+
+    groupHist2 = Qt::GroupBox($LayoutWidget_6, "groupHist2");
+    groupHist2->setEnabled( 1 );
+    groupHist2->setFrameShadow( &Qt::GroupBox::Plain() );
+
+    my $LayoutWidget_9 = Qt::Widget(groupHist2, '$LayoutWidget_9');
+    $LayoutWidget_9->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18_2_2 = Qt::VBoxLayout($LayoutWidget_9, 0, 0, '$layout18_2_2');
+
+    t02 = Qt::LineEdit($LayoutWidget_9, "t02");
+    $layout18_2_2->addWidget(t02);
+
+    Bg12 = Qt::LineEdit($LayoutWidget_9, "Bg12");
+    $layout18_2_2->addWidget(Bg12);
+
+    Bg22 = Qt::LineEdit($LayoutWidget_9, "Bg22");
+    $layout18_2_2->addWidget(Bg22);
+
+    Data12 = Qt::LineEdit($LayoutWidget_9, "Data12");
+    $layout18_2_2->addWidget(Data12);
+
+    Data22 = Qt::LineEdit($LayoutWidget_9, "Data22");
+    $layout18_2_2->addWidget(Data22);
+    $layout27->addWidget(groupHist2);
+
+    groupHist3 = Qt::GroupBox($LayoutWidget_6, "groupHist3");
+    groupHist3->setEnabled( 1 );
+    groupHist3->setFrameShadow( &Qt::GroupBox::Plain() );
+
+    my $LayoutWidget_10 = Qt::Widget(groupHist3, '$LayoutWidget_10');
+    $LayoutWidget_10->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18_3 = Qt::VBoxLayout($LayoutWidget_10, 0, 0, '$layout18_3');
+
+    t03 = Qt::LineEdit($LayoutWidget_10, "t03");
+    $layout18_3->addWidget(t03);
+
+    Bg13 = Qt::LineEdit($LayoutWidget_10, "Bg13");
+    $layout18_3->addWidget(Bg13);
+
+    Bg23 = Qt::LineEdit($LayoutWidget_10, "Bg23");
+    $layout18_3->addWidget(Bg23);
+
+    Data13 = Qt::LineEdit($LayoutWidget_10, "Data13");
+    $layout18_3->addWidget(Data13);
+
+    Data23 = Qt::LineEdit($LayoutWidget_10, "Data23");
+    $layout18_3->addWidget(Data23);
+    $layout27->addWidget(groupHist3);
+
+    groupHist4 = Qt::GroupBox($LayoutWidget_6, "groupHist4");
+    groupHist4->setEnabled( 1 );
+    groupHist4->setFrameShadow( &Qt::GroupBox::Plain() );
+
+    my $LayoutWidget_11 = Qt::Widget(groupHist4, '$LayoutWidget_11');
+    $LayoutWidget_11->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18_4 = Qt::VBoxLayout($LayoutWidget_11, 0, 0, '$layout18_4');
+
+    t04 = Qt::LineEdit($LayoutWidget_11, "t04");
+    $layout18_4->addWidget(t04);
+
+    Bg14 = Qt::LineEdit($LayoutWidget_11, "Bg14");
+    $layout18_4->addWidget(Bg14);
+
+    Bg24 = Qt::LineEdit($LayoutWidget_11, "Bg24");
+    $layout18_4->addWidget(Bg24);
+
+    Data14 = Qt::LineEdit($LayoutWidget_11, "Data14");
+    $layout18_4->addWidget(Data14);
+
+    Data24 = Qt::LineEdit($LayoutWidget_11, "Data24");
+    $layout18_4->addWidget(Data24);
+    $layout27->addWidget(groupHist4);
+
+    ShowT0 = Qt::PushButton(TabPage_3, "ShowT0");
+    ShowT0->setGeometry( Qt::Rect(435, 190, 111, 31) );
+    ShowT0->setAutoDefault( 0 );
+    ShowT0->setDefault( 1 );
+    musrfit_tabs->insertTab( TabPage_3, "" );
 
     fileNewAction= Qt::Action(this, "fileNewAction");
     fileNewAction->setIconSet( Qt::IconSet($image1) );
@@ -1009,7 +1222,8 @@ sub NEW
     Qt::Object::connect(fileChangeDirAction, SIGNAL "activated()", this, SLOT "fileChangeDir()");
     Qt::Object::connect(musrfit_tabs, SIGNAL "selected(const QString&)", this, SLOT "TabChanged()");
     Qt::Object::connect(go, SIGNAL "clicked()", this, SLOT "GoFit()");
-    Qt::Object::connect(InitParamTable, SIGNAL "valueChanged(int,int)", this, SLOT "UpdateMSRFileInitTable()");
+    Qt::Object::connect(TableUpdate, SIGNAL "clicked()", this, SLOT "CallMSRCreate()");
+    Qt::Object::connect(ShowT0, SIGNAL "clicked()", this, SLOT "ShowMuSRT0()");
 
     setTabOrder(musrfit_tabs, TITLE);
     setTabOrder(TITLE, FILENAME);
@@ -1059,6 +1273,7 @@ sub languageChange
 {
     setCaption(trUtf8("MuSRFit GUI") );
     setIconText(trUtf8("MuSRFitGUI") );
+    textLabel2_2->setText( trUtf8("Bg1") );
     TITLELabel->setText( trUtf8("Enter the label (defaul is run title from the first run)") );
     TITLE->setText( trUtf8("","Title line for MSR file (optional)") );
     Qt::ToolTip::add(TITLE, trUtf8("Title line for MSR file (optional)"));
@@ -1184,17 +1399,49 @@ sub languageChange
     InitParamTable->horizontalHeader()->setLabel( 1, trUtf8("Error") );
     InitParamTable->horizontalHeader()->setLabel( 2, trUtf8("Min") );
     InitParamTable->horizontalHeader()->setLabel( 3, trUtf8("Max") );
+    TableUpdate->setText( trUtf8("Update") );
     musrfit_tabs->changeTab( InitializationPage, trUtf8("Initialization") );
     musrfit_tabs->changeTab( FittingPage, trUtf8("MSR File") );
+    ErrorCalc->setTitle( trUtf8("Error Calculation") );
+    HESSE->setText( trUtf8("Hesse") );
+    MINOS->setText( trUtf8("Minos") );
     Minimization->setTitle( trUtf8("Minimization") );
     MINIMIZE->setText( trUtf8("Minimize") );
     MIGRAD->setText( trUtf8("Migrad") );
     SIMPLEX->setText( trUtf8("Simplex") );
-    ErrorCalc->setTitle( trUtf8("Error Calculation") );
-    HESSE->setText( trUtf8("Hesse") );
-    MINOS->setText( trUtf8("Minos") );
     go->setText( trUtf8("Fit") );
     musrfit_tabs->changeTab( TabPage, trUtf8("Fitting") );
+    FPlot->clear();
+    FPlot->insertItem( trUtf8("power") );
+    FPlot->insertItem( trUtf8("real") );
+    FPlot->insertItem( trUtf8("imag") );
+    FPlot->insertItem( trUtf8("real_and_imag") );
+    FPlot->insertItem( trUtf8("phase") );
+    FApodization->clear();
+    FApodization->insertItem( trUtf8("NONE") );
+    FApodization->insertItem( trUtf8("WEAK") );
+    FApodization->insertItem( trUtf8("MEDIUM") );
+    FApodization->insertItem( trUtf8("STRONG") );
+    FApodizationLabel->setText( trUtf8("Apodization") );
+    FUnits->clear();
+    FUnits->insertItem( trUtf8("MHz") );
+    FUnits->insertItem( trUtf8("Gauss") );
+    FUnits->insertItem( trUtf8("Mc/s") );
+    FPlotLabel->setText( trUtf8("Plot") );
+    FUnitsLabel->setText( trUtf8("Units") );
+    musrfit_tabs->changeTab( TabPage_2, trUtf8("Fourier") );
+    groupHist0->setTitle( undef );
+    textLabel2->setText( trUtf8("t0") );
+    textLabel2_2_2_3->setText( trUtf8("Bg1") );
+    textLabel2_2_2->setText( trUtf8("Bg2") );
+    textLabel2_2_2_2->setText( trUtf8("Data 1") );
+    textLabel2_2_2_2_2->setText( trUtf8("Data 2") );
+    groupHist1->setTitle( trUtf8("Hist1") );
+    groupHist2->setTitle( trUtf8("Hist2") );
+    groupHist3->setTitle( trUtf8("Hist3") );
+    groupHist4->setTitle( trUtf8("Hist4") );
+    ShowT0->setText( trUtf8("Show") );
+    musrfit_tabs->changeTab( TabPage_3, trUtf8("t0/Bg Bins") );
     fileNewAction->setText( trUtf8("&New") );
     fileNewAction->setMenuText( trUtf8("&New") );
     fileNewAction->setAccel( Qt::KeySequence( trUtf8("Ctrl+N") ) );
@@ -1395,6 +1642,7 @@ sub CreateAllInput
 
 # TODO: Need to deliver shared parameters also
     my %All=();
+# From RUNS Tab    
     $All{"TITLE"}= TITLE->text;
     $All{"FILENAME"}= FILENAME->text;
     $All{"RunNumbers"} = RunNumbers->text;
@@ -1408,6 +1656,11 @@ sub CreateAllInput
     $All{"RunNumbers"} =~ s/[\ \.\~\/\&\*\[\;\>\<\^\$\(\)\`\|\]\'\@]/,/g;
     my @RUNS = split( /,/, $All{"RunNumbers"} );
     my @Hists = split(/,/, $All{"LRBF"} );
+    
+# From Fourier Tab
+    $All{"FUNITS"}= FUnits->currentText;
+    $All{"FAPODIZATION"}= FApodization->currentText;
+    $All{"FPLOT"}= FPlot->currentText;
     
 # Construct fittypes that can be understood by MSR.pm
     my %FTs=(0,"Exponential",
@@ -1488,7 +1741,9 @@ sub CreateAllInput
 	foreach my $Param (@Params) {
 	    my $Param_ORG = $Param;
 # TODO: I need to take care of single hist fits here
-	    if ( $All{"FitAsyType"} eq "SingleHist" ) {		$Param=$Param.$Hists[0];	    }
+	    if ( $All{"FitAsyType"} eq "SingleHist" ) {
+		$Param=$Param.$Hists[0];	    
+	    }
 	    if ( $#FitTypes != 0 && (   $Param ne "Alpha" && $Param ne "N0" && $Param ne "NBg" ) ){
 		$Param = join( "", $Param, "_", $Component);
 	    }
@@ -1598,6 +1853,32 @@ sub UpdateMSRFileInitTable
 	InitParamTable->setText($PCount-1,3,1.0*$Param[6]);
     }
     return;
+
+}
+
+sub ActivateT0Hists
+{
+
+    my %All=CreateAllInput();
+    my @Hists = split(/,/, $All{"LRBF"} );
+    my $HistBox = "";
+    for (my $iHist=1; $iHist<=4; $iHist++) {
+	$HistBox="groupHist$iHist";
+	my $HistBoxHandle = child($HistBox);
+	if ($iHist<=$#Hists+1) {
+# Activate this histogram box
+	    $HistBoxHandle->setHidden(0);
+	    $HistBoxHandle->setEnabled(1);
+	    $HistBoxHandle->setTitle("Hist # $Hists[$iHist-1]");
+	} else {
+# Deactivate this histogram box
+	    $HistBoxHandle->setHidden(1);
+	    $HistBoxHandle->setEnabled(0);
+	}
+    }
+    
+# TODO: Set default values
+    
 
 }
 
@@ -1850,6 +2131,8 @@ sub TabChanged
     ActivateShComp();
     InitializeTab();
     UpdateMSRFileInitTable();
+# And also setup T0 and Bg bins
+    ActivateT0Hists();
 
 }
 
@@ -1879,9 +2162,11 @@ sub GoFit
 
 }
 
-sub UpdeateTable
+sub ShowMuSRT0
 {
-    print "MuSRFitform->UpdeateTable(): Not implemented yet.\n";
+
+# Create MSR file and then run musrt0
+
 }
 
 1;

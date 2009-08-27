@@ -194,8 +194,10 @@ FITPARAMETER
             my @Params = split( /\s+/, $Parameters );
 
             # For the first component we need Alpha for Asymmetry fits
-	    unshift( @Params, "Alpha" );
-	    
+	    if ($component == 1) {
+		unshift( @Params, "Alpha" );
+	    }
+
             foreach $Param (@Params) {
                 $Param_ORG = $Param;
                 if ( ($#FitTypes != 0) && ($Param ne "Alpha") ) {
@@ -361,12 +363,16 @@ FITPARAMETER
 	$Bg_Line   = "background      66000   66500   66000   66500";
 	$Data_Line = "data            3419    63000   3419    63000";
         
-        # Omit background and data lines for LTG,GPS and Dolly
-        if ( $BeamLine ne "LEM" ) {
+        # Omit background and data lines for LTF,GPS and Dolly
+        if ( $BeamLine eq "Dolly" ) {
             $Bg_Line = "background 50 250 50 250";
             $Data_Line =
 "t0              287     284\ndata            297     8000    294     8000";
-        }
+        } elsif ( $BeamLine eq "GPS" ) {
+	    $Bg_Line = "background      40      120     40      120";
+	    $Data_Line = "t0              124     129\ndata            135     8000    135     8000";    
+#	    $Data_Line = "data            135     8000    135     8000";    
+	}
 
         $FRANGE_Line = "fit             TINI    TFIN";
         $PAC_Line    = "packing         BINNING";
@@ -443,14 +449,23 @@ runs     $RUNS_Line
 $PRANGE_Line
 $logxy";
 
+    if ($All{"FUNITS"} eq "") {$All{"FUNITS"}="MHz";}
+    if ($All{"FAPODIZATION"} eq "") {$All{"FAPODIZATION"}="STRONG";}
+    if ($All{"FPLOT"} eq "") {$All{"FPLOT"}="POWER";}
+
+
     $FOURIER_Block=
       "###################################################################
 FOURIER
-units            MHz    # units either 'Gauss', 'MHz', or 'Mc/s'
+units            FUNITS    # units either 'Gauss', 'MHz', or 'Mc/s'
 fourier_power    12
-apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
-plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+apodization      FAPODIZATION  # NONE, WEAK, MEDIUM, STRONG
+plot             FPLOT   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
 phase            8.50";
+
+    $FOURIER_Block=~ s/FUNITS/$All{"FUNITS"}/g;
+    $FOURIER_Block=~ s/FAPODIZATION/$All{"FAPODIZATION"}/g;
+    $FOURIER_Block=~ s/FPLOT/$All{"FPLOT"}/g;
 
     # Don't know why but it is needed initially
     $STAT_Block =
@@ -796,10 +811,14 @@ FITPARAMETER
 	    $Data_Line  = "data            3419    63000";
 	    
 	    # Omit background and data lines for LTG,GPS and Dolly
-	    if ( $BeamLine ne "LEM" ) {
+	    if ( $BeamLine eq "Dolly" ) {
 		$Bg_Line = "background 50 250 50 250";
 		$Data_Line =
 		    "t0              287     284\ndata            297     8000    294     8000";
+	    } elsif ( $BeamLine eq "GPS" ) {
+		$Bg_Line = "background      40      120     40      120";
+		$Data_Line = "t0              124     129\ndata            135     8000    135     8000";    
+#		$Data_Line = "data            135     8000    135     8000";    
 	    }
 	    
 	    #	$MAP_Line = "map             0    0    0    0    0    0    0    0    0    0";
@@ -881,14 +900,23 @@ runs     $RUNS_Line
 $PRANGE_Line
 $logxy";
 
+    if ($All{"FUNITS"} eq "") {$All{"FUNITS"}="MHz";}
+    if ($All{"FAPODIZATION"} eq "") {$All{"FAPODIZATION"}="STRONG";}
+    if ($All{"FPLOT"} eq "") {$All{"FPLOT"}="POWER";}
+
+
     $FOURIER_Block=
       "###################################################################
 FOURIER
-units            MHz    # units either 'Gauss', 'MHz', or 'Mc/s'
+units            FUNITS    # units either 'Gauss', 'MHz', or 'Mc/s'
 fourier_power    12
-apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
-plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+apodization      FAPODIZATION  # NONE, WEAK, MEDIUM, STRONG
+plot             FPLOT   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
 phase            8.50";
+
+    $FOURIER_Block=~ s/FUNITS/$All{"FUNITS"}/g;
+    $FOURIER_Block=~ s/FAPODIZATION/$All{"FAPODIZATION"}/g;
+    $FOURIER_Block=~ s/FPLOT/$All{"FPLOT"}/g;
 
     # Don't know why but it is needed initially
     $STAT_Block =

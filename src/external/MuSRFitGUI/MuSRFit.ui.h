@@ -161,6 +161,7 @@ void MuSRFitform::CreateAllInput()
 {
 # TODO: Need to deliver shared parameters also
     my %All=();
+# From RUNS Tab    
     $All{"TITLE"}= TITLE->text;
     $All{"FILENAME"}= FILENAME->text;
     $All{"RunNumbers"} = RunNumbers->text;
@@ -174,6 +175,11 @@ void MuSRFitform::CreateAllInput()
     $All{"RunNumbers"} =~ s/[\ \.\~\/\&\*\[\;\>\<\^\$\(\)\`\|\]\'\@]/,/g;
     my @RUNS = split( /,/, $All{"RunNumbers"} );
     my @Hists = split(/,/, $All{"LRBF"} );
+    
+# From Fourier Tab
+    $All{"FUNITS"}= FUnits->currentText;
+    $All{"FAPODIZATION"}= FApodization->currentText;
+    $All{"FPLOT"}= FPlot->currentText;
     
 # Construct fittypes that can be understood by MSR.pm
     my %FTs=(0,"Exponential",
@@ -254,7 +260,9 @@ void MuSRFitform::CreateAllInput()
 	foreach my $Param (@Params) {
 	    my $Param_ORG = $Param;
 # TODO: I need to take care of single hist fits here
-	    if ( $All{"FitAsyType"} eq "SingleHist" ) {		$Param=$Param.$Hists[0];	    }
+	    if ( $All{"FitAsyType"} eq "SingleHist" ) {
+		$Param=$Param.$Hists[0];	    
+	    }
 	    if ( $#FitTypes != 0 && (   $Param ne "Alpha" && $Param ne "N0" && $Param ne "NBg" ) ){
 		$Param = join( "", $Param, "_", $Component);
 	    }
@@ -362,6 +370,29 @@ void MuSRFitform::UpdateMSRFileInitTable()
     return;
 }
 
+void MuSRFitform::ActivateT0Hists()
+{
+    my %All=CreateAllInput();
+    my @Hists = split(/,/, $All{"LRBF"} );
+    my $HistBox = "";
+    for (my $iHist=1; $iHist<=4; $iHist++) {
+	$HistBox="groupHist$iHist";
+	my $HistBoxHandle = child($HistBox);
+	if ($iHist<=$#Hists+1) {
+# Activate this histogram box
+	    $HistBoxHandle->setHidden(0);
+	    $HistBoxHandle->setEnabled(1);
+	    $HistBoxHandle->setTitle("Hist # $Hists[$iHist-1]");
+	} else {
+# Deactivate this histogram box
+	    $HistBoxHandle->setHidden(1);
+	    $HistBoxHandle->setEnabled(0);
+	}
+    }
+    
+# TODO: Set default values
+    
+}
 void MuSRFitform::ActivateShComp()
 {
     my %All=CreateAllInput();
@@ -606,6 +637,8 @@ void MuSRFitform::TabChanged()
     ActivateShComp();
     InitializeTab();
     UpdateMSRFileInitTable();
+# And also setup T0 and Bg bins
+    ActivateT0Hists();
 }
 
 
@@ -633,11 +666,7 @@ void MuSRFitform::GoFit()
     return;
 }
 
-
-
-void MuSRFitform::UpdeateTable()
+void MuSRFitform::ShowMuSRT0()
 {
-
+# Create MSR file and then run musrt0
 }
-
-
