@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Wed Aug 26 17:07:14 2009
+# Created: Thu Aug 27 09:03:25 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -1009,7 +1009,7 @@ sub NEW
     Qt::Object::connect(fileChangeDirAction, SIGNAL "activated()", this, SLOT "fileChangeDir()");
     Qt::Object::connect(musrfit_tabs, SIGNAL "selected(const QString&)", this, SLOT "TabChanged()");
     Qt::Object::connect(go, SIGNAL "clicked()", this, SLOT "GoFit()");
-    Qt::Object::connect(InitParamTable, SIGNAL "valueChanged(int,int)", this, SLOT "UpdeateTable()");
+    Qt::Object::connect(InitParamTable, SIGNAL "valueChanged(int,int)", this, SLOT "UpdateMSRFileInitTable()");
 
     setTabOrder(musrfit_tabs, TITLE);
     setTabOrder(TITLE, FILENAME);

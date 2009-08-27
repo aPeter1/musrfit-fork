@@ -443,6 +443,15 @@ runs     $RUNS_Line
 $PRANGE_Line
 $logxy";
 
+    $FOURIER_Block=
+      "###################################################################
+FOURIER
+units            MHz    # units either 'Gauss', 'MHz', or 'Mc/s'
+fourier_power    12
+apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            8.50";
+
     # Don't know why but it is needed initially
     $STAT_Block =
       "###############################################################
@@ -450,7 +459,7 @@ STATISTIC --- 0000-00-00 00:00:00
 *** FIT DID NOT CONVERGE ***";
 
     # Empty line at the end of each block
-    my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$STAT_Block\n";
+    my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$FOURIER_Block\n$STAT_Block\n";
 
 # Open output file FILENAME.msr
     open( OUTF,q{>},"$FILENAME.msr" );
@@ -872,6 +881,15 @@ runs     $RUNS_Line
 $PRANGE_Line
 $logxy";
 
+    $FOURIER_Block=
+      "###################################################################
+FOURIER
+units            MHz    # units either 'Gauss', 'MHz', or 'Mc/s'
+fourier_power    12
+apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            8.50";
+
     # Don't know why but it is needed initially
     $STAT_Block =
       "###############################################################
@@ -879,7 +897,7 @@ STATISTIC --- 0000-00-00 00:00:00
 *** FIT DID NOT CONVERGE ***";
 
     # Empty line at the end of each block
-    my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$STAT_Block\n";
+    my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$FOURIER_Block\n$STAT_Block\n";
 
 # Open output file FILENAME.msr
     open( OUTF,q{>},"$FILENAME.msr" );
