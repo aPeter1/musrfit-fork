@@ -666,6 +666,21 @@ void MuSRFitform::GoFit()
     return;
 }
 
+void MuSRFitform::GoPlot()
+{
+    my %All=CreateAllInput();
+    CallMSRCreate();
+    my $FILENAME=$All{"FILENAME"}.".msr";
+    if (-e $FILENAME) {
+	my $cmd="musrview $FILENAME &";
+	my $pid = system($cmd);
+    } else {
+	FitTextOutput->append("Cannot find MSR file!");
+    }
+    return;
+}
+
+
 void MuSRFitform::ShowMuSRT0()
 {
 # Create MSR file and then run musrt0
