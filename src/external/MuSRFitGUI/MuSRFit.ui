@@ -2965,6 +2965,7 @@
     <slot>helpIndex()</slot>
     <slot>helpContents()</slot>
     <slot>helpAbout()</slot>
+    <slot>T0BgData()</slot>
     <slot>CreateAllInput()</slot>
     <slot>CallMSRCreate()</slot>
     <slot>UpdateMSRFileInitTable()</slot>

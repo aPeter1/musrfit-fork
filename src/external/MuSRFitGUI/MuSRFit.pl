@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Thu Aug 27 17:57:40 2009
+# Created: Fri Aug 28 18:06:21 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -27,6 +27,7 @@ use Qt::slots
     helpIndex => [],
     helpContents => [],
     helpAbout => [],
+    T0BgData => [],
     CreateAllInput => [],
     CallMSRCreate => [],
     UpdateMSRFileInitTable => [],
@@ -1660,6 +1661,44 @@ Copyright 2009 by Zaher Salman and the LEM Group.
 
 }
 
+sub T0BgData
+{
+
+# Take this information as input arguments
+    (my $Name, my $Hist, my $BeamLine) = @_;
+    
+# These are the default values, ordered by beamline
+# Comma at the beginning means take default t0 from file
+# The order is pairs of "HistNumber","t0,Bg1,Bg2,Data1,Data2"
+    my %LEM=("1",",66000,66500,3419,63000",
+	     "2",",66000,66500,3419,63000",
+	     "3",",66000,66500,3419,63000",
+	     "4",",66000,66500,3419,63000");
+    
+    my %GPS=("1",",40,120,135,8000",
+	     "2",",40,120,135,8000",
+	     "3",",40,120,135,8000",
+	     "4",",40,120,135,8000");
+    
+    my %Dolly=("1",",50,250,297,8000",
+	     "2",",50,250,297,8000",
+	     "3",",50,250,297,8000",
+	     "4",",50,250,297,8000");
+    
+     
+#    print "Name = $Name,Hist= $Hist, BeamLine= $BeamLine \n";
+    if ($BeamLine = "LEM") {
+    } 
+    elsif ($BeamLine = "Dolly") {
+    }
+    elsif ($BeamLine = "GPS") {
+    }
+
+    
+    return "";
+
+}
+
 sub CreateAllInput
 {
 
@@ -1684,6 +1723,21 @@ sub CreateAllInput
     $All{"FUNITS"}= FUnits->currentText;
     $All{"FAPODIZATION"}= FApodization->currentText;
     $All{"FPLOT"}= FPlot->currentText;
+    
+# Get values of t0 and Bg/Data bins if given
+    my $NHist = 1;
+    foreach my $Hist (@Hists) {
+	foreach ("t0","Bg1","Bg2","Data1","Data2") {
+	    my $Name = "$_$NHist";
+	    $All{$Name}=child($Name)->text;
+# TODO: If empty fill with defaults
+	    if ($All{$Name} eq "") {
+		$All{$Name}=T0BgData($_,$Hist,$All{"BeamLine"});
+		child($Name)->setText($All{$Name});
+	    }
+	}
+	$NHist++
+    }
     
 # Construct fittypes that can be understood by MSR.pm
     my %FTs=(0,"Exponential",
@@ -1740,7 +1794,7 @@ sub CreateAllInput
 	    $All{"$Param$maxadd"}=1.0*InitParamTable->text($i,3);
 	}
     }
-
+    
     
 # Shared settings are detected here
     my $Shared = 0; 
@@ -1756,7 +1810,7 @@ sub CreateAllInput
 	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
 	    unshift( @Params, ( "N0", "NBg" ) );
 	}
-	    
+	
 # This is the counter for parameters of this component
 	my $NP=1;
 	$Shared = 0;
@@ -1770,7 +1824,7 @@ sub CreateAllInput
 	    if ( $#FitTypes != 0 && (   $Param ne "Alpha" && $Param ne "N0" && $Param ne "NBg" ) ){
 		$Param = join( "", $Param, "_", $Component);
 	    }
-		
+	    
 # Is there any point of sharing, multiple runs?
 	    if ( $#RUNS == 0 && $All{"FitAsyType"} eq "Asymmetry") {
 		$Shared = 1;
@@ -1869,11 +1923,38 @@ sub UpdateMSRFileInitTable
 	$PCount++;
 #	print "line $PCount:  $line \n";
 	my @Param=split(/\s+/,$line);
+# Depending on home many elements in @Param determine what they mean
+# 0th element is empty (always)
+# 1st element is the order (always)	
+# 2nd element is the name (always)
+# 3rd element is the value (always)
+# 4th element can be taken as step/error (always)
+# 5th element can be
+#  if it is last element or there are two more = positive error, check $#Param=5/7
+#  if there is only one more                            = minimum, check $#Param=6
+	
+# To summarize, check the value of $#Param
+	my $value=1.0*$Param[3];
+	my $error = 1.0*$Param[4];
+	my $minvalue=0.0;
+	my $maxvalue=0.0;
+	if ($#Param == 4) {
+	    $minvalue=0.0;
+	    $maxvalue=0.0;
+	}
+	elsif ($#Param == 6) {
+	    $minvalue=1.0*$Param[5];
+	    $maxvalue=1.0*$Param[6];
+	}
+	elsif ($#Param == 5 || $#Param == 7) {
+	    $minvalue=1.0*$Param[6];
+	    $maxvalue=1.0*$Param[7];
+	}	    
 #	print "$Param[2]=$Param[3]+-$Param[4]  from $Param[5] to $Param[6]\n";
-	InitParamTable->setText($PCount-1,0,1.0*$Param[3]);
-	InitParamTable->setText($PCount-1,1,1.0*$Param[4]);
-	InitParamTable->setText($PCount-1,2,1.0*$Param[5]);
-	InitParamTable->setText($PCount-1,3,1.0*$Param[6]);
+	InitParamTable->setText($PCount-1,0,$value);
+	InitParamTable->setText($PCount-1,1,$error);
+	InitParamTable->setText($PCount-1,2,$minvalue);
+	InitParamTable->setText($PCount-1,3,$maxvalue);
     }
     return;
 

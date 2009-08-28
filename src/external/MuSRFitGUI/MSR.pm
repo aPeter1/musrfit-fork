@@ -366,11 +366,10 @@ FITPARAMETER
         # Omit background and data lines for LTF,GPS and Dolly
         if ( $BeamLine eq "Dolly" ) {
             $Bg_Line = "background 50 250 50 250";
-            $Data_Line =
-"t0              287     284\ndata            297     8000    294     8000";
+            $Data_Line ="data            297     8000    294     8000";
         } elsif ( $BeamLine eq "GPS" ) {
 	    $Bg_Line = "background      40      120     40      120";
-	    $Data_Line = "t0              124     129\ndata            135     8000    135     8000";    
+	    $Data_Line = "data            135     8000    135     8000";    
 #	    $Data_Line = "data            135     8000    135     8000";    
 	}
 
@@ -813,11 +812,10 @@ FITPARAMETER
 	    # Omit background and data lines for LTG,GPS and Dolly
 	    if ( $BeamLine eq "Dolly" ) {
 		$Bg_Line = "background 50 250 50 250";
-		$Data_Line =
-		    "t0              287     284\ndata            297     8000    294     8000";
+		$Data_Line ="data            297     8000    294     8000";
 	    } elsif ( $BeamLine eq "GPS" ) {
 		$Bg_Line = "background      40      120     40      120";
-		$Data_Line = "t0              124     129\ndata            135     8000    135     8000";    
+		$Data_Line = "data            135     8000    135     8000";    
 #		$Data_Line = "data            135     8000    135     8000";    
 	    }
 	    
