@@ -8,22 +8,22 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>570</width>
-            <height>490</height>
+            <width>575</width>
+            <height>479</height>
         </rect>
     </property>
     <property name="sizePolicy">
         <sizepolicy>
-            <hsizetype>7</hsizetype>
-            <vsizetype>7</vsizetype>
+            <hsizetype>3</hsizetype>
+            <vsizetype>3</vsizetype>
             <horstretch>1</horstretch>
             <verstretch>1</verstretch>
         </sizepolicy>
     </property>
     <property name="minimumSize">
         <size>
-            <width>21</width>
-            <height>227</height>
+            <width>23</width>
+            <height>222</height>
         </size>
     </property>
     <property name="caption">
@@ -1971,6 +1971,50 @@
                     </widget>
                 </grid>
             </widget>
+            <widget class="QLayoutWidget">
+                <property name="name">
+                    <cstring>layout19</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>250</x>
+                        <y>20</y>
+                        <width>290</width>
+                        <height>40</height>
+                    </rect>
+                </property>
+                <hbox>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QLabel">
+                        <property name="name">
+                            <cstring>textLabel1</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Range: from</string>
+                        </property>
+                    </widget>
+                    <widget class="QLineEdit">
+                        <property name="name">
+                            <cstring>lineEdit28</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QLabel">
+                        <property name="name">
+                            <cstring>textLabel1_2</cstring>
+                        </property>
+                        <property name="text">
+                            <string>to</string>
+                        </property>
+                    </widget>
+                    <widget class="QLineEdit">
+                        <property name="name">
+                            <cstring>lineEdit28_2</cstring>
+                        </property>
+                    </widget>
+                </hbox>
+            </widget>
         </widget>
         <widget class="QWidget">
             <property name="name">
@@ -2380,8 +2424,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>570</width>
-            <height>27</height>
+            <width>575</width>
+            <height>25</height>
         </rect>
     </property>
     <item text="&amp;File" name="fileMenu">
@@ -2767,6 +2811,22 @@
         </property>
         <property name="accel">
             <string>Ctrl+C</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>Action_2</cstring>
+        </property>
+        <property name="text">
+            <string>Unnamed</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>Action_3</cstring>
+        </property>
+        <property name="text">
+            <string>Unnamed</string>
         </property>
     </action>
 </actions>

@@ -179,17 +179,23 @@ void MuSRFitform::T0BgData()
 	     "3",",50,250,297,8000",
 	     "4",",50,250,297,8000");
     
+    my %RV=();
      
-#    print "Name = $Name,Hist= $Hist, BeamLine= $BeamLine \n";
+    print "Name = $Name,Hist= $Hist, BeamLine= $BeamLine \n";
     if ($BeamLine = "LEM") {
+	my $HistParams=$LEM{$Hist};
+	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
     } 
     elsif ($BeamLine = "Dolly") {
-    }
+ 	my $HistParams=$Dolly{$Hist};
+	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
+   }
     elsif ($BeamLine = "GPS") {
-    }
-
+	my $HistParams=$GPS{$Hist};
+	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
+    } 
     
-    return "";
+    return $RV{$Name};
 }
 
 void MuSRFitform::CreateAllInput()
