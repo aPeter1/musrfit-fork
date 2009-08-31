@@ -1,0 +1,7 @@
+#!/bin/bash
+# Copyright 2009 by Zaher Salman and the LEM Group.
+
+export MUSRBIN=/usr/local/bin/
+export PERLLIB=$HOME/LEM/musrfit/src/external/MuSRFitGUI
+perl $HOME/LEM/musrfit/src/external/MuSRFitGUI/MuSRFit.pl
+
