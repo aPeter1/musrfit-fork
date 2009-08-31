@@ -316,11 +316,7 @@ bool PRunSingleHisto::PrepareData()
 
   // check if post pile up data shall be used
   unsigned int histoNo;
-  if (fRunInfo->fFileFormat[0].Contains("ppc")) {
-    histoNo = runData->fDataBin.size()/2 + fRunInfo->fForwardHistoNo-1;
-  } else {
-    histoNo = fRunInfo->fForwardHistoNo-1;
-  }
+  histoNo = fRunInfo->fForwardHistoNo-1;
 
   if ((runData->fDataBin.size() < histoNo) || (histoNo < 0)) {
     cout << endl << "PRunSingleHisto::PrepareData(): **PANIC ERROR**:";

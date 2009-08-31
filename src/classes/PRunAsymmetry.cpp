@@ -332,13 +332,8 @@ bool PRunAsymmetry::PrepareData()
 
   // check if post pile up data shall be used
   unsigned int histoNo[2]; // forward/backward
-  if (fRunInfo->fFileFormat[0].Contains("ppc")) {
-    histoNo[0] = runData->fDataBin.size()/2 + fRunInfo->fForwardHistoNo-1;
-    histoNo[1] = runData->fDataBin.size()/2 + fRunInfo->fBackwardHistoNo-1;
-  } else {
-    histoNo[0] = fRunInfo->fForwardHistoNo-1;
-    histoNo[1] = fRunInfo->fBackwardHistoNo-1;
-  }
+  histoNo[0] = fRunInfo->fForwardHistoNo-1;
+  histoNo[1] = fRunInfo->fBackwardHistoNo-1;
   // first check if forward/backward given in the msr-file are valid
   if ((runData->fDataBin.size() < histoNo[0]+1) || (histoNo[0] < 0) ||
       (runData->fDataBin.size() < histoNo[1]+1) || (histoNo[1] < 0)) {
