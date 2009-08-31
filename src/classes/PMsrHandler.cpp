@@ -2665,6 +2665,7 @@ bool PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
   if (lines.empty()) {
     cout << endl << ">> PMsrHandler::HandleStatisticEntry: **WARNING** There is no STATISTIC block! Do you really want this?";
     cout << endl;
+    fStatistic.fValid = false;
     return true;
   }
 
@@ -2710,6 +2711,7 @@ bool PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
     }
     // extract chisq
     if (lines[i].fLine.Contains("chisq =")) {
+      fStatistic.fValid = true;
       strncpy(str, lines[i].fLine.Data(), sizeof(str));
       status = sscanf(str+lines[i].fLine.Index("chisq = ")+8, "%lf", &dval);
       if (status == 1) {
@@ -2720,6 +2722,7 @@ bool PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
     }
     // extract maxLH
     if (lines[i].fLine.Contains("maxLH =")) {
+      fStatistic.fValid = true;
       strncpy(str, lines[i].fLine.Data(), sizeof(str));
       status = sscanf(str+lines[i].fLine.Index("maxLH = ")+8, "%lf", &dval);
       if (status == 1) {
