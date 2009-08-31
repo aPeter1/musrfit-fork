@@ -22,8 +22,8 @@
     </property>
     <property name="minimumSize">
         <size>
-            <width>23</width>
-            <height>222</height>
+            <width>21</width>
+            <height>227</height>
         </size>
     </property>
     <property name="caption">
@@ -2070,17 +2070,14 @@
                             <property name="geometry">
                                 <rect>
                                     <x>5</x>
-                                    <y>28</y>
+                                    <y>18</y>
                                     <width>100</width>
-                                    <height>135</height>
+                                    <height>150</height>
                                 </rect>
                             </property>
                             <vbox>
                                 <property name="name">
                                     <cstring>unnamed_2</cstring>
-                                </property>
-                                <property name="spacing">
-                                    <number>0</number>
                                 </property>
                                 <widget class="QLabel">
                                     <property name="name">
@@ -2425,7 +2422,7 @@
             <x>0</x>
             <y>0</y>
             <width>575</width>
-            <height>25</height>
+            <height>27</height>
         </rect>
     </property>
     <item text="&amp;File" name="fileMenu">
@@ -2974,6 +2971,12 @@
         <receiver>MuSRFitform</receiver>
         <slot>GoPlot()</slot>
     </connection>
+    <connection>
+        <sender>BeamLine</sender>
+        <signal>activated(int)</signal>
+        <receiver>MuSRFitform</receiver>
+        <slot>T0Update()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>musrfit_tabs</tabstop>
@@ -3025,7 +3028,6 @@
     <slot>helpIndex()</slot>
     <slot>helpContents()</slot>
     <slot>helpAbout()</slot>
-    <slot>T0BgData()</slot>
     <slot>CreateAllInput()</slot>
     <slot>CallMSRCreate()</slot>
     <slot>UpdateMSRFileInitTable()</slot>
@@ -3036,6 +3038,7 @@
     <slot>GoFit()</slot>
     <slot>GoPlot()</slot>
     <slot>ShowMuSRT0()</slot>
+    <slot>T0Update()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

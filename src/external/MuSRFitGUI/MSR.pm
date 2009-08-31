@@ -1183,4 +1183,52 @@ sub ExtractParamBlk {
 }
 
 
+########################
+# T0BgData
+# Function return the defaul value of t0, Bg and Data bin
+# input should be 
+# $Name is t0,Bg1,Bg2,Data1,Data2
+# $Hist is the histogram number
+# $BeamLine in the name of beamline
+########################
+sub T0BgData { 
+# Take this information as input arguments
+    (my $Name, my $Hist, my $BeamLine) = @_;
+    
+# These are the default values, ordered by beamline
+# Comma at the beginning means take default t0 from file
+# The order is pairs of "HistNumber","t0,Bg1,Bg2,Data1,Data2"
+    my %LEM=("1",",66000,66500,3419,63000",
+	     "2",",66000,66500,3419,63000",
+	     "3",",66000,66500,3419,63000",
+	     "4",",66000,66500,3419,63000");
+    
+    my %GPS=("1",",40,120,135,8000",
+	     "2",",40,120,135,8000",
+	     "3",",40,120,135,8000",
+	     "4",",40,120,135,8000");
+    
+    my %Dolly=("1",",50,250,297,8000",
+	     "2",",50,250,297,8000",
+	     "3",",50,250,297,8000",
+	     "4",",50,250,297,8000");
+    
+    my %RV=();
+     
+    if ($BeamLine eq "LEM") {
+	my $HistParams=$LEM{$Hist};
+	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
+    } 
+    elsif ($BeamLine eq "Dolly") {
+ 	my $HistParams=$Dolly{$Hist};
+	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
+   }
+    elsif ($BeamLine eq "GPS") {
+	my $HistParams=$GPS{$Hist};
+	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
+    } 
+    return $RV{$Name};
+
+}
+
 1;

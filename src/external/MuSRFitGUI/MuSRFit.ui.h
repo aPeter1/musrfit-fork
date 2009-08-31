@@ -156,48 +156,6 @@ Copyright 2009 by Zaher Salman and the LEM Group.
     my $AboutWindow = Qt::MessageBox::information( this, "About MuSRFit GUI",$AboutText);
 }
 
-void MuSRFitform::T0BgData()
-{
-# Take this information as input arguments
-    (my $Name, my $Hist, my $BeamLine) = @_;
-    
-# These are the default values, ordered by beamline
-# Comma at the beginning means take default t0 from file
-# The order is pairs of "HistNumber","t0,Bg1,Bg2,Data1,Data2"
-    my %LEM=("1",",66000,66500,3419,63000",
-	     "2",",66000,66500,3419,63000",
-	     "3",",66000,66500,3419,63000",
-	     "4",",66000,66500,3419,63000");
-    
-    my %GPS=("1",",40,120,135,8000",
-	     "2",",40,120,135,8000",
-	     "3",",40,120,135,8000",
-	     "4",",40,120,135,8000");
-    
-    my %Dolly=("1",",50,250,297,8000",
-	     "2",",50,250,297,8000",
-	     "3",",50,250,297,8000",
-	     "4",",50,250,297,8000");
-    
-    my %RV=();
-     
-    print "Name = $Name,Hist= $Hist, BeamLine= $BeamLine \n";
-    if ($BeamLine = "LEM") {
-	my $HistParams=$LEM{$Hist};
-	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
-    } 
-    elsif ($BeamLine = "Dolly") {
- 	my $HistParams=$Dolly{$Hist};
-	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
-   }
-    elsif ($BeamLine = "GPS") {
-	my $HistParams=$GPS{$Hist};
-	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
-    } 
-    
-    return $RV{$Name};
-}
-
 void MuSRFitform::CreateAllInput()
 {
 # TODO: Need to deliver shared parameters also
@@ -230,7 +188,7 @@ void MuSRFitform::CreateAllInput()
 	    $All{$Name}=child($Name)->text;
 # TODO: If empty fill with defaults
 	    if ($All{$Name} eq "") {
-		$All{$Name}=T0BgData($_,$Hist,$All{"BeamLine"});
+		$All{$Name}=MSR::T0BgData($_,$Hist,$All{"BeamLine"});
 		child($Name)->setText($All{$Name});
 	    }
 	}
@@ -415,8 +373,8 @@ void MuSRFitform::UpdateMSRFileInitTable()
     my $PCount=0;
     foreach my $line (@FPBloc) {
 	$PCount++;
-#	print "line $PCount:  $line \n";
 	my @Param=split(/\s+/,$line);
+	
 # Depending on home many elements in @Param determine what they mean
 # 0th element is empty (always)
 # 1st element is the order (always)	
@@ -444,7 +402,7 @@ void MuSRFitform::UpdateMSRFileInitTable()
 	    $minvalue=1.0*$Param[6];
 	    $maxvalue=1.0*$Param[7];
 	}	    
-#	print "$Param[2]=$Param[3]+-$Param[4]  from $Param[5] to $Param[6]\n";
+# Now update the initialization tabel	
 	InitParamTable->setText($PCount-1,0,$value);
 	InitParamTable->setText($PCount-1,1,$error);
 	InitParamTable->setText($PCount-1,2,$minvalue);
@@ -766,5 +724,30 @@ void MuSRFitform::GoPlot()
 
 void MuSRFitform::ShowMuSRT0()
 {
+    my %All=CreateAllInput();
 # Create MSR file and then run musrt0
+    CallMSRCreate();
+    my $FILENAME=$All{"FILENAME"}.".msr";
+    my $cmd="musrt0 $FILENAME &";
+    my $pid = system($cmd);
+    return;
+}
+
+
+void MuSRFitform::T0Update()
+{
+    my %All = CreateAllInput();
+    my @Hists = split(/,/, $All{"LRBF"} );
+    
+# Get values of t0 and Bg/Data bins if given
+    my $NHist = 1;
+    foreach my $Hist (@Hists) {
+	foreach ("t0","Bg1","Bg2","Data1","Data2") {
+	    my $Name = "$_$NHist";
+	    my $tmp=MSR::T0BgData($_,$Hist,$All{"BeamLine"});
+	    child($Name)->setText($tmp);
+	}
+	$NHist++
+    }
+
 }

@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Sun Aug 30 22:23:26 2009
+# Created: Mon Aug 31 10:21:34 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -27,7 +27,6 @@ use Qt::slots
     helpIndex => [],
     helpContents => [],
     helpAbout => [],
-    T0BgData => [],
     CreateAllInput => [],
     CallMSRCreate => [],
     UpdateMSRFileInitTable => [],
@@ -37,7 +36,8 @@ use Qt::slots
     TabChanged => [],
     GoFit => [],
     GoPlot => [],
-    ShowMuSRT0 => [];
+    ShowMuSRT0 => [],
+    T0Update => [];
 use Qt::attributes qw(
     textLabel2_2
     musrfit_tabs
@@ -556,7 +556,7 @@ sub NEW
         setName("MuSRFitform" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
-    setMinimumSize(Qt::Size(23, 222) );
+    setMinimumSize(Qt::Size(21, 227) );
     setIcon($image0 );
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
@@ -1032,8 +1032,8 @@ sub NEW
     groupHist0->setMinimumSize( Qt::Size(0, 0) );
 
     my $LayoutWidget_9 = Qt::Widget(groupHist0, '$LayoutWidget_9');
-    $LayoutWidget_9->setGeometry( Qt::Rect(5, 28, 100, 135) );
-    my $layout16_2 = Qt::VBoxLayout($LayoutWidget_9, 11, 0, '$layout16_2');
+    $LayoutWidget_9->setGeometry( Qt::Rect(5, 18, 100, 150) );
+    my $layout16_2 = Qt::VBoxLayout($LayoutWidget_9, 11, 6, '$layout16_2');
 
     textLabel2 = Qt::Label($LayoutWidget_9, "textLabel2");
     $layout16_2->addWidget(textLabel2);
@@ -1212,7 +1212,7 @@ sub NEW
     MenuBar= Qt::MenuBar( this, "MenuBar");
 
     MenuBar->setEnabled( 1 );
-    MenuBar->setGeometry( Qt::Rect(0, 0, 575, 25) );
+    MenuBar->setGeometry( Qt::Rect(0, 0, 575, 27) );
 
     fileMenu = Qt::PopupMenu( this );
     fileOpenAction->addTo( fileMenu );
@@ -1271,6 +1271,7 @@ sub NEW
     Qt::Object::connect(TableUpdate, SIGNAL "clicked()", this, SLOT "CallMSRCreate()");
     Qt::Object::connect(ShowT0, SIGNAL "clicked()", this, SLOT "ShowMuSRT0()");
     Qt::Object::connect(PlotMSR, SIGNAL "clicked()", this, SLOT "GoPlot()");
+    Qt::Object::connect(BeamLine, SIGNAL "activated(int)", this, SLOT "T0Update()");
 
     setTabOrder(musrfit_tabs, TITLE);
     setTabOrder(TITLE, FILENAME);
@@ -1689,50 +1690,6 @@ Copyright 2009 by Zaher Salman and the LEM Group.
 
 }
 
-sub T0BgData
-{
-
-# Take this information as input arguments
-    (my $Name, my $Hist, my $BeamLine) = @_;
-    
-# These are the default values, ordered by beamline
-# Comma at the beginning means take default t0 from file
-# The order is pairs of "HistNumber","t0,Bg1,Bg2,Data1,Data2"
-    my %LEM=("1",",66000,66500,3419,63000",
-	     "2",",66000,66500,3419,63000",
-	     "3",",66000,66500,3419,63000",
-	     "4",",66000,66500,3419,63000");
-    
-    my %GPS=("1",",40,120,135,8000",
-	     "2",",40,120,135,8000",
-	     "3",",40,120,135,8000",
-	     "4",",40,120,135,8000");
-    
-    my %Dolly=("1",",50,250,297,8000",
-	     "2",",50,250,297,8000",
-	     "3",",50,250,297,8000",
-	     "4",",50,250,297,8000");
-    
-    my %RV=();
-     
-    print "Name = $Name,Hist= $Hist, BeamLine= $BeamLine \n";
-    if ($BeamLine = "LEM") {
-	my $HistParams=$LEM{$Hist};
-	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
-    } 
-    elsif ($BeamLine = "Dolly") {
- 	my $HistParams=$Dolly{$Hist};
-	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
-   }
-    elsif ($BeamLine = "GPS") {
-	my $HistParams=$GPS{$Hist};
-	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
-    } 
-    
-    return $RV{$Name};
-
-}
-
 sub CreateAllInput
 {
 
@@ -1766,7 +1723,7 @@ sub CreateAllInput
 	    $All{$Name}=child($Name)->text;
 # TODO: If empty fill with defaults
 	    if ($All{$Name} eq "") {
-		$All{$Name}=T0BgData($_,$Hist,$All{"BeamLine"});
+		$All{$Name}=MSR::T0BgData($_,$Hist,$All{"BeamLine"});
 		child($Name)->setText($All{$Name});
 	    }
 	}
@@ -1955,8 +1912,8 @@ sub UpdateMSRFileInitTable
     my $PCount=0;
     foreach my $line (@FPBloc) {
 	$PCount++;
-#	print "line $PCount:  $line \n";
 	my @Param=split(/\s+/,$line);
+	
 # Depending on home many elements in @Param determine what they mean
 # 0th element is empty (always)
 # 1st element is the order (always)	
@@ -1984,7 +1941,7 @@ sub UpdateMSRFileInitTable
 	    $minvalue=1.0*$Param[6];
 	    $maxvalue=1.0*$Param[7];
 	}	    
-#	print "$Param[2]=$Param[3]+-$Param[4]  from $Param[5] to $Param[6]\n";
+# Now update the initialization tabel	
 	InitParamTable->setText($PCount-1,0,$value);
 	InitParamTable->setText($PCount-1,1,$error);
 	InitParamTable->setText($PCount-1,2,$minvalue);
@@ -2319,7 +2276,33 @@ sub GoPlot
 sub ShowMuSRT0
 {
 
+    my %All=CreateAllInput();
 # Create MSR file and then run musrt0
+    CallMSRCreate();
+    my $FILENAME=$All{"FILENAME"}.".msr";
+    my $cmd="musrt0 $FILENAME &";
+    my $pid = system($cmd);
+    return;
+
+}
+
+sub T0Update
+{
+
+    my %All = CreateAllInput();
+    my @Hists = split(/,/, $All{"LRBF"} );
+    
+# Get values of t0 and Bg/Data bins if given
+    my $NHist = 1;
+    foreach my $Hist (@Hists) {
+	foreach ("t0","Bg1","Bg2","Data1","Data2") {
+	    my $Name = "$_$NHist";
+	    my $tmp=MSR::T0BgData($_,$Hist,$All{"BeamLine"});
+	    child($Name)->setText($tmp);
+	}
+	$NHist++
+    }
+
 
 }
 
