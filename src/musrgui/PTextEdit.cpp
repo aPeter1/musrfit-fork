@@ -1371,8 +1371,10 @@ void PTextEdit::musrFit()
  */
 void PTextEdit::musrMsr2Data()
 {
+/*
   if ( !currentEditor() )
     return;
+*/
 
   if (fMsr2DataParam == 0) {
     fMsr2DataParam = new PMsr2DataParam();
