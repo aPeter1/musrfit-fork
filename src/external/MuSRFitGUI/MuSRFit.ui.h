@@ -192,7 +192,7 @@ void MuSRFitform::CreateAllInput()
 		child($Name)->setText($All{$Name});
 	    }
 	}
-	$NHist++
+	$NHist++;
     }
     
 # Construct fittypes that can be understood by MSR.pm

@@ -360,17 +360,21 @@ FITPARAMETER
 	$PLT       = 2;
 	$Hist_Lines =
 	    "forward         $Hists[0]\nbackward        $Hists[1]";
-	$Bg_Line   = "background      66000   66500   66000   66500";
-	$Data_Line = "data            3419    63000   3419    63000";
-        
-        # Omit background and data lines for LTF,GPS and Dolly
-        if ( $BeamLine eq "Dolly" ) {
-            $Bg_Line = "background 50 250 50 250";
-            $Data_Line ="data            297     8000    294     8000";
-        } elsif ( $BeamLine eq "GPS" ) {
-	    $Bg_Line = "background      40      120     40      120";
-	    $Data_Line = "data            135     8000    135     8000";    
-#	    $Data_Line = "data            135     8000    135     8000";    
+
+	$Bg_Line = "background";
+	$Data_Line = "data";
+	$NHist=1;
+	foreach $Hist (@Hists) {
+	    foreach ("t0","Bg1","Bg2","Data1","Data2") {
+		$Name = "$_$NHist";
+# If empty fill with defaults
+		if ($All{$Name} eq "") {
+		    $All{$Name}=MSR::T0BgData($_,$Hist,$BeamLine);
+		}
+	    }
+	    $Bg_Line = $Bg_Line."    ".$All{"Bg1$NHist"}."    ".$All{"Bg2$NHist"};
+	    $Data_Line =$Data_Line."    ".$All{"Data1$NHist"}."    ".$All{"Data2$NHist"};
+	    $NHist++;
 	}
 
         $FRANGE_Line = "fit             TINI    TFIN";

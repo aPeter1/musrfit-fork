@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Mon Aug 31 10:21:34 2009
+# Created: Mon Aug 31 17:50:38 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -1212,7 +1212,7 @@ sub NEW
     MenuBar= Qt::MenuBar( this, "MenuBar");
 
     MenuBar->setEnabled( 1 );
-    MenuBar->setGeometry( Qt::Rect(0, 0, 575, 27) );
+    MenuBar->setGeometry( Qt::Rect(0, 0, 574, 27) );
 
     fileMenu = Qt::PopupMenu( this );
     fileOpenAction->addTo( fileMenu );
@@ -1248,7 +1248,7 @@ sub NEW
     MenuBar->insertSeparator( 7 );
 
     languageChange();
-    my $resize = Qt::Size(575, 479);
+    my $resize = Qt::Size(574, 485);
     $resize = $resize->expandedTo(minimumSizeHint());
     resize( $resize );
     clearWState( &Qt::WState_Polished );
@@ -1727,7 +1727,7 @@ sub CreateAllInput
 		child($Name)->setText($All{$Name});
 	    }
 	}
-	$NHist++
+	$NHist++;
     }
     
 # Construct fittypes that can be understood by MSR.pm
