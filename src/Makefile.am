@@ -2,12 +2,13 @@
 
 SUBDIRS = external classes
 
-bin_PROGRAMS = musrfit musrview musrt0 musrparam msr2msr
+bin_PROGRAMS = musrfit musrview musrt0 musrparam msr2msr msr2data
 musrfit_SOURCES = musrfit.cpp
 musrview_SOURCES = musrview.cpp
 musrt0_SOURCES = musrt0.cpp
 musrparam_SOURCES = musrparam.cpp
 msr2msr_SOURCES = msr2msr.cpp
+msr2data_SOURCES = msr2data.cpp
 
 xmldir = $(bindir)
 xml_DATA = musrfit_startup.xml

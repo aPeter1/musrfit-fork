@@ -42,10 +42,9 @@
  * \param msrInfo pointer to the msr info structure
  * \param data
  */
-PRunListCollection::PRunListCollection(PMsrHandler *msrInfo, PRunDataHandler *data)
+PRunListCollection::PRunListCollection(PMsrHandler *msrInfo, PRunDataHandler *data) \
+ : fMsrInfo(msrInfo), fData(data)
 {
-  fMsrInfo = msrInfo;
-  fData = data;
 }
 
 //--------------------------------------------------------------------------
@@ -135,7 +134,7 @@ bool PRunListCollection::Add(int runNo, EPMusrHandleTag tag)
 /**
  * <p>
  */
-double PRunListCollection::GetSingleHistoChisq(const std::vector<double>& par)
+double PRunListCollection::GetSingleHistoChisq(const std::vector<double>& par) const
 {
   double chisq = 0.0;
 
@@ -151,7 +150,7 @@ double PRunListCollection::GetSingleHistoChisq(const std::vector<double>& par)
 /**
  * <p>
  */
-double PRunListCollection::GetAsymmetryChisq(const std::vector<double>& par)
+double PRunListCollection::GetAsymmetryChisq(const std::vector<double>& par) const
 {
   double chisq = 0.0;
 
@@ -167,7 +166,7 @@ double PRunListCollection::GetAsymmetryChisq(const std::vector<double>& par)
 /**
  * <p>
  */
-double PRunListCollection::GetRRFChisq(const std::vector<double>& par)
+double PRunListCollection::GetRRFChisq(const std::vector<double>& par) const
 {
   double chisq = 0.0;
 
@@ -183,7 +182,7 @@ double PRunListCollection::GetRRFChisq(const std::vector<double>& par)
 /**
  * <p>
  */
-double PRunListCollection::GetNonMusrChisq(const std::vector<double>& par)
+double PRunListCollection::GetNonMusrChisq(const std::vector<double>& par) const
 {
   double chisq = 0.0;
 
@@ -199,7 +198,7 @@ double PRunListCollection::GetNonMusrChisq(const std::vector<double>& par)
 /**
  * <p>
  */
-double PRunListCollection::GetSingleHistoMaximumLikelihood(const std::vector<double>& par)
+double PRunListCollection::GetSingleHistoMaximumLikelihood(const std::vector<double>& par) const
 {
   double mlh = 0.0;
 
@@ -216,7 +215,7 @@ double PRunListCollection::GetSingleHistoMaximumLikelihood(const std::vector<dou
  * <p> Since it is not clear yet how to handle asymmetry fits with max likelihood
  * the chi square will be used!
  */
-double PRunListCollection::GetAsymmetryMaximumLikelihood(const std::vector<double>& par)
+double PRunListCollection::GetAsymmetryMaximumLikelihood(const std::vector<double>& par) const
 {
   double mlh = 0.0;
 
@@ -233,7 +232,7 @@ double PRunListCollection::GetAsymmetryMaximumLikelihood(const std::vector<doubl
  * <p> Since it is not clear yet how to handle RRF fits with max likelihood
  * the chi square will be used!
  */
-double PRunListCollection::GetRRFMaximumLikelihood(const std::vector<double>& par)
+double PRunListCollection::GetRRFMaximumLikelihood(const std::vector<double>& par) const
 {
   double mlh = 0.0;
 
@@ -250,7 +249,7 @@ double PRunListCollection::GetRRFMaximumLikelihood(const std::vector<double>& pa
  * <p> Since it is not clear yet how to handle non musr fits with max likelihood
  * the chi square will be used!
  */
-double PRunListCollection::GetNonMusrMaximumLikelihood(const std::vector<double>& par)
+double PRunListCollection::GetNonMusrMaximumLikelihood(const std::vector<double>& par) const
 {
   double mlh = 0.0;
 
@@ -266,7 +265,7 @@ double PRunListCollection::GetNonMusrMaximumLikelihood(const std::vector<double>
 /**
  * <p>
  */
-unsigned int PRunListCollection::GetTotalNoOfBinsFitted()
+unsigned int PRunListCollection::GetTotalNoOfBinsFitted() const
 {
   unsigned int counts = 0;
 
@@ -434,7 +433,7 @@ PRunData* PRunListCollection::GetNonMusr(unsigned int index, EDataSwitch tag)
  *
  * \param runName
  */
-double PRunListCollection::GetTemp(TString &runName)
+vector< pair<double, double> > PRunListCollection::GetTemp(const TString &runName) const
 {
   return fData->GetRunData(runName)->fTemp;
 }
@@ -447,7 +446,7 @@ double PRunListCollection::GetTemp(TString &runName)
  *
  * \param runName
  */
-double PRunListCollection::GetField(TString &runName)
+double PRunListCollection::GetField(const TString &runName) const
 {
   return fData->GetRunData(runName)->fField;
 }
@@ -460,7 +459,7 @@ double PRunListCollection::GetField(TString &runName)
  *
  * \param runName
  */
-double PRunListCollection::GetEnergy(TString &runName)
+double PRunListCollection::GetEnergy(const TString &runName) const
 {
   return fData->GetRunData(runName)->fEnergy;
 }
@@ -473,7 +472,7 @@ double PRunListCollection::GetEnergy(TString &runName)
  *
  * \param runName
  */
-const char* PRunListCollection::GetSetup(TString &runName)
+const char* PRunListCollection::GetSetup(const TString &runName) const
 {
   return fData->GetRunData(runName)->fSetup.Data();
 }
@@ -487,7 +486,7 @@ const char* PRunListCollection::GetSetup(TString &runName)
  * \param runName name of the run file
  * \param idx msr-file run index
  */
-const char* PRunListCollection::GetXAxisTitle(TString &runName, const unsigned int idx)
+const char* PRunListCollection::GetXAxisTitle(const TString &runName, const unsigned int idx) const
 {
 //cout << endl << ">> PRunListCollection::GetXAxisTitle: runName = " << runName.Data() << ", idx = " << idx;
 //cout << endl << ">> PRunListCollection::GetXAxisTitle: fRunNonMusrList.size() = " << fRunNonMusrList.size();
@@ -521,7 +520,7 @@ const char* PRunListCollection::GetXAxisTitle(TString &runName, const unsigned i
  * \param runName name of the run file
  * \param idx msr-file run index
  */
-const char* PRunListCollection::GetYAxisTitle(TString &runName, const unsigned int idx)
+const char* PRunListCollection::GetYAxisTitle(const TString &runName, const unsigned int idx) const
 {
 //cout << endl << ">> PRunListCollection::GetYAxisTitle: runName = " << runName.Data() << ", idx = " << idx;
 //cout << endl;

@@ -47,8 +47,8 @@ class PRunDataHandler
     PRunDataHandler(PMsrHandler *msrInfo, const PStringVector dataPath);
     virtual ~PRunDataHandler();
 
-    virtual bool IsAllDataAvailable() { return fAllDataAvailable; }
-    virtual PRawRunData* GetRunData(TString runName);
+    virtual bool IsAllDataAvailable() const { return fAllDataAvailable; }
+    virtual PRawRunData* GetRunData(const TString &runName);
 
   private:
     PMsrHandler   *fMsrInfo;

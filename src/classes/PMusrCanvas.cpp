@@ -521,6 +521,7 @@ void PMusrCanvas::UpdateInfoPad()
 
   // get/set run plot info
   double dval;
+  vector< pair<double, double> > ddvec;
   char   sval[128];
   unsigned int runNo;
   PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
@@ -545,13 +546,21 @@ void PMusrCanvas::UpdateInfoPad()
       tstr += TString(",");
     }
     // temperature if present
-    tstr += TString("T=");
-    dval = fRunList->GetTemp(runs[runNo].fRunName[0]);
-    if (dval == -9.9e99) {
+    ddvec = fRunList->GetTemp(runs[runNo].fRunName[0]);
+    if (ddvec.empty()) {
+      tstr += TString("T=");
       tstr += TString("??,");
+    } else if (ddvec.size() == 1){
+      tstr += TString("T=");
+      sprintf(sval, "%0.2lf", ddvec[0].first);
+      tstr += TString(sval) + TString("K,");
     } else {
-      sprintf(sval, "%0.2lf", dval);
-      tstr += TString(sval) + TString("(K),");
+      for(unsigned int i(0); i<ddvec.size(); ++i){
+        sprintf(sval, "T%u=", i);
+        tstr += TString(sval);
+        sprintf(sval, "%0.2lf", ddvec[i].first);
+        tstr += TString(sval) + TString("K,");
+      }
     }
     // field if present
     tstr += TString("B=");
@@ -560,17 +569,17 @@ void PMusrCanvas::UpdateInfoPad()
       tstr += TString("??,");
     } else {
       sprintf(sval, "%0.2lf", dval);
-      tstr += TString(sval) + TString("(G),");
+      tstr += TString(sval) + TString("G,");
     }
     // energy if present
     tstr += TString("E=");
     dval = fRunList->GetEnergy(runs[runNo].fRunName[0]);
 //cout << endl << ">> dval = " << dval << " (Engery)";
-    if (dval == -9.9e99) {
+    if (dval == -999.0) {
       tstr += TString("??,");
     } else {
       sprintf(sval, "%0.2lf", dval);
-      tstr += TString(sval) + TString("(keV),");
+      tstr += TString(sval) + TString("keV,");
     }
     // setup if present
     tstr += fRunList->GetSetup(runs[runNo].fRunName[0]);

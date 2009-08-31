@@ -53,34 +53,34 @@ class PRunListCollection
 
     virtual bool Add(int runNo, EPMusrHandleTag tag);
 
-    virtual double GetSingleHistoChisq(const std::vector<double>& par);
-    virtual double GetAsymmetryChisq(const std::vector<double>& par);
-    virtual double GetRRFChisq(const std::vector<double>& par);
-    virtual double GetNonMusrChisq(const std::vector<double>& par);
+    virtual double GetSingleHistoChisq(const std::vector<double>& par) const;
+    virtual double GetAsymmetryChisq(const std::vector<double>& par) const;
+    virtual double GetRRFChisq(const std::vector<double>& par) const;
+    virtual double GetNonMusrChisq(const std::vector<double>& par) const;
 
-    virtual double GetSingleHistoMaximumLikelihood(const std::vector<double>& par);
-    virtual double GetAsymmetryMaximumLikelihood(const std::vector<double>& par);
-    virtual double GetRRFMaximumLikelihood(const std::vector<double>& par);
-    virtual double GetNonMusrMaximumLikelihood(const std::vector<double>& par);
+    virtual double GetSingleHistoMaximumLikelihood(const std::vector<double>& par) const;
+    virtual double GetAsymmetryMaximumLikelihood(const std::vector<double>& par) const;
+    virtual double GetRRFMaximumLikelihood(const std::vector<double>& par) const;
+    virtual double GetNonMusrMaximumLikelihood(const std::vector<double>& par) const;
 
-    virtual unsigned int GetTotalNoOfBinsFitted();
+    virtual unsigned int GetTotalNoOfBinsFitted() const;
 
-    virtual unsigned int GetNoOfSingleHisto() { return fRunSingleHistoList.size(); }
-    virtual unsigned int GetNoOfAsymmetry()   { return fRunAsymmetryList.size(); }
-    virtual unsigned int GetNoOfRRF()         { return fRunRRFList.size(); }
-    virtual unsigned int GetNoOfNonMusr()     { return fRunNonMusrList.size(); }
+    virtual unsigned int GetNoOfSingleHisto() const { return fRunSingleHistoList.size(); }
+    virtual unsigned int GetNoOfAsymmetry() const   { return fRunAsymmetryList.size(); }
+    virtual unsigned int GetNoOfRRF() const         { return fRunRRFList.size(); }
+    virtual unsigned int GetNoOfNonMusr() const     { return fRunNonMusrList.size(); }
 
     virtual PRunData* GetSingleHisto(unsigned int index, EDataSwitch tag=kIndex);
     virtual PRunData* GetAsymmetry(unsigned int index, EDataSwitch tag=kIndex);
     virtual PRunData* GetRRF(unsigned int index, EDataSwitch tag=kIndex);
     virtual PRunData* GetNonMusr(unsigned int index, EDataSwitch tag=kIndex);
 
-    virtual double GetTemp(TString &runName);
-    virtual double GetField(TString &runName);
-    virtual double GetEnergy(TString &runName);
-    virtual const char* GetSetup(TString &runName);
-    virtual const char* GetXAxisTitle(TString &runName, const unsigned int idx);
-    virtual const char* GetYAxisTitle(TString &runName, const unsigned int idx);
+    virtual vector< pair<double, double> > GetTemp(const TString &runName) const;
+    virtual double GetField(const TString &runName) const;
+    virtual double GetEnergy(const TString &runName) const;
+    virtual const char* GetSetup(const TString &runName) const;
+    virtual const char* GetXAxisTitle(const TString &runName, const unsigned int idx) const;
+    virtual const char* GetYAxisTitle(const TString &runName, const unsigned int idx) const;
 
   private:
     PMsrHandler *fMsrInfo;  ///< keeps all msr file info

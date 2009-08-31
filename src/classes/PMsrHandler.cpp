@@ -52,7 +52,7 @@ using namespace std;
  *
  * \param fileName
  */
-PMsrHandler::PMsrHandler(char *fileName) : fFileName(fileName)
+PMsrHandler::PMsrHandler(const char *fileName) : fFileName(fileName)
 {
   // init variables
   fMsrBlockCounter = 0;

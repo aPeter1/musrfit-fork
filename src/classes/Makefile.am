@@ -7,6 +7,7 @@ h_sources = \
   ../include/PFunctionGrammar.h \
   ../include/PFunction.h \
   ../include/PFunctionHandler.h \
+  ../include/PMsr2Data.h \
   ../include/PMsrHandler.h \
   ../include/PMusrCanvas.h \
   ../include/PMusr.h \
@@ -40,6 +41,7 @@ cpp_sources = \
   PFourier.cpp \
   PFunction.cpp \
   PFunctionHandler.cpp \
+  PMsr2Data.cpp \
   PMsrHandler.cpp \
   PMusrCanvas.cpp \
   PMusrT0.cpp \

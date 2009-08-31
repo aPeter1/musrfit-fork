@@ -47,7 +47,7 @@
 class PMsrHandler
 {
   public:
-    PMsrHandler(char *fileName);
+    PMsrHandler(const char *fileName);
     virtual ~PMsrHandler();
 
     virtual int ReadMsrFile();
