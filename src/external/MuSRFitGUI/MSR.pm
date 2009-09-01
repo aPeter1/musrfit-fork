@@ -56,49 +56,6 @@ my $maxadd = "_max";
 sub CreateMSR {
     my %All = %{$_[0]};
 
-# "Smart" default value of the fit parameters.
-    my %Defaults = (
-		    "Asy",           "0.15",  "dAsy",          "0.01",
-		    "Asy_min",       "0",     "Asy_max",       "0",
-		    "Alpha",         "1.0",   "dAlpha",        "0.01",
-		    "Alpha_min",     "0",     "Alpha_max",     "0",
-		    "N0",            "300.0", "dN0",           "0.01",
-		    "N0_min",        "0",     "N0_max",        "0",
-		    "NBg",           "30.0",  "dNBg",          "0.01",
-		    "NBg_min",       "0",     "NBg_max",       "0",
-		    "Lam",           "1.0",   "dLam",          "0.01",
-		    "Lam_min",       "0",     "Lam_max",       "0",
-		    "Gam",           "1.0",   "dGam",          "0.01",
-		    "Gam_min",       "0",     "Gam_max",       "0",
-		    "Bet",           "0.5",   "dBet",          "0.01",
-		    "Bet_min",       "0",     "Bet_max",       "0",
-		    "Two",           "2.0",   "dTwo",          "0.0",
-		    "Two_min",       "0",     "Two_max",       "0",
-		    "Del",           "0.1",   "dDel",          "0.01",
-		    "Del_min",       "0",     "Del_max",       "0",
-		    "Sgm",           "0.1",   "dSgm",          "0.01",
-		    "Sgm_min",       "0",     "Sgm_max",       "0",
-		    "Aa",            "0.1",   "dAa",           "0.01",
-		    "Aa_min",        "0",     "Aa_max",        "0",
-		    "q",             "0.1",   "dq",            "0.01",
-		    "q_min",         "0",     "q_max",         "0",
-		    "Bg",            "0.036", "dBg",           "0.01",
-		    "Bg_min",        "0",     "Bg_max",        "0",
-		    "bgrlx",         "0.",    "dbgrlx",        "0.0",
-		    "bgrlx_min",     "0",     "bgrlx_max",     "0",
-		    "Frq",           "1.0",   "dFrq",          "1.",
-		    "Frq_min",       "0",     "Frq_max",       "0",
-		    "Field",         "100.0", "dField",        "1.",
-		    "Field_min",     "0",     "Field_max",     "0",
-		    "Energy",        "14.1",  "dEnergy",       "0.",
-		    "Energy_min",    "0",     "Energy_max",    "0",
-		    "DeadLayer",     "10.",   "dDeadLayer",    "0.1",
-		    "DeadLayer_min", "0",     "DeadLayer_max", "0",
-		    "Lambda",        "128.1", "dLambda",       "0.1",
-		    "Lambda_min",    "0",     "Lambda_max",    "0",
-		    "Phi",           "1.",    "dPhi",          "0.01",
-		    "Phi_min",       "0",     "Phi_max",       "0"
-		    );
     # Start with empty array
     my @FitTypes = ();
 
@@ -139,13 +96,6 @@ sub CreateMSR {
 
     my $TitleLine = $All{"TITLE"}."\n# Run Numbers: ".$All{"RunNumbers"};
     $TitleLine =~ s/,/:/g;
-
-    # Fit parameters block
-    my $FitParaBlk = "
-###################################################################
-FITPARAMETER
-###################################################################
-#     No     Name       Value    Err     Min  Max                  ";
 
     # Counter for RUNS
     my $iRun = 1;
@@ -231,44 +181,17 @@ FITPARAMETER
                 # End of Alpha Line
 ####################################################################################################
 
-####################################################################################################
-                # Extract initial values, error and max/min from input
-                $Name     = $Param . "_" . $iRun;
-                $value    = $All{"$Name"};
-                $error    = $All{"$erradd$Name"};
-                $minvalue = $All{"$Name$minadd"};
-                $maxvalue = $All{"$Name$maxadd"};
-# If these values are not in the input then take the defaulst
-# I think that this can go at the end if we use a separate initialization routine
-		if ($value eq $EMPTY) {
-		    $value = $Defaults{"$Param_ORG"};
-		    $error = $Defaults{"$erradd$Param_ORG"};
-		    $minvalue = $Defaults{"$Param_ORG$minadd"};
-		    $maxvalue = $Defaults{"$Param_ORG$maxadd"};
-		}
-                if ( $minvalue == $maxvalue ) {
-                    $minvalue = $EMPTY;
-                    $maxvalue = $EMPTY;
-                }
-####################################################################################################
-
                 # Start preparing the parameters block
                 if ($Shared) {
 
                     # Parameter is shared enough to keep order from first run
                     if ( $iRun == 1 ) {
-                        $FitParaBlk = $FitParaBlk . "
-      $j      $Name    $value     $error    $error    $minvalue    $maxvalue";
                         $Full_T_Block =~ s/$Param_ORG/$j/;
                         ++$shcount;
                         ++$j;
                     }
                 } else {
-
-                # Parameter is not shared, use map unless it is a single RUN fit
-                    $FitParaBlk = $FitParaBlk . "
-      $j      $Name    $value     $error    $error    $minvalue    $maxvalue";
-
+		    # Parameter is not shared, use map unless it is a single RUN fit
                     # Skip adding to map line in these cases
                     if ( $Param ne "Alpha" && $#RUNS != 0 )
                     {
@@ -476,6 +399,27 @@ phase            8.50";
 STATISTIC --- 0000-00-00 00:00:00
 *** FIT DID NOT CONVERGE ***";
 
+    # Get parameter block from MSR::PrepParamTable(\%All);
+    my $FitParaBlk = "
+###################################################################
+FITPARAMETER
+###################################################################
+#     No     Name       Value    Err     Min  Max                  ";
+    my %PTable=MSR::PrepParamTable(\%All);
+    my $NParam=scalar keys( %PTable );
+# Fill the table with labels and values of parametr 
+    for (my $PCount=0;$PCount<$NParam;$PCount++) {
+	my ($Param,$value,$error,$minvalue,$maxvalue) = split(/,/,$PTable{$PCount});
+	if ( $minvalue == $maxvalue ) {
+	    $minvalue = $EMPTY;
+	    $maxvalue = $EMPTY;
+	}
+	$j=$PCount+1;
+	$FitParaBlk = $FitParaBlk."
+      $j      $Param    $value     $error    $error    $minvalue    $maxvalue";
+    }
+
+
     # Empty line at the end of each block
     my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$FOURIER_Block\n$STAT_Block\n";
 
@@ -492,49 +436,6 @@ STATISTIC --- 0000-00-00 00:00:00
 sub CreateMSRSingleHist {
     my %All = %{$_[0]};
 
-# "Smart" default value of the fit parameters.
-    my %Defaults = (
-		    "Asy",           "0.15",  "dAsy",          "0.01",
-		    "Asy_min",       "0",     "Asy_max",       "0",
-		    "Alpha",         "1.0",   "dAlpha",        "0.01",
-		    "Alpha_min",     "0",     "Alpha_max",     "0",
-		    "N0",            "300.0", "dN0",           "0.01",
-		    "N0_min",        "0",     "N0_max",        "0",
-		    "NBg",           "30.0",  "dNBg",          "0.01",
-		    "NBg_min",       "0",     "NBg_max",       "0",
-		    "Lam",           "1.0",   "dLam",          "0.01",
-		    "Lam_min",       "0",     "Lam_max",       "0",
-		    "Gam",           "1.0",   "dGam",          "0.01",
-		    "Gam_min",       "0",     "Gam_max",       "0",
-		    "Bet",           "0.5",   "dBet",          "0.01",
-		    "Bet_min",       "0",     "Bet_max",       "0",
-		    "Two",           "2.0",   "dTwo",          "0.0",
-		    "Two_min",       "0",     "Two_max",       "0",
-		    "Del",           "0.1",   "dDel",          "0.01",
-		    "Del_min",       "0",     "Del_max",       "0",
-		    "Sgm",           "0.1",   "dSgm",          "0.01",
-		    "Sgm_min",       "0",     "Sgm_max",       "0",
-		    "Aa",            "0.1",   "dAa",           "0.01",
-		    "Aa_min",        "0",     "Aa_max",        "0",
-		    "q",             "0.1",   "dq",            "0.01",
-		    "q_min",         "0",     "q_max",         "0",
-		    "Bg",            "0.036", "dBg",           "0.01",
-		    "Bg_min",        "0",     "Bg_max",        "0",
-		    "bgrlx",         "0.",    "dbgrlx",        "0.0",
-		    "bgrlx_min",     "0",     "bgrlx_max",     "0",
-		    "Frq",           "1.0",   "dFrq",          "1.",
-		    "Frq_min",       "0",     "Frq_max",       "0",
-		    "Field",         "100.0", "dField",        "1.",
-		    "Field_min",     "0",     "Field_max",     "0",
-		    "Energy",        "14.1",  "dEnergy",       "0.",
-		    "Energy_min",    "0",     "Energy_max",    "0",
-		    "DeadLayer",     "10.",   "dDeadLayer",    "0.1",
-		    "DeadLayer_min", "0",     "DeadLayer_max", "0",
-		    "Lambda",        "128.1", "dLambda",       "0.1",
-		    "Lambda_min",    "0",     "Lambda_max",    "0",
-		    "Phi",           "1.",    "dPhi",          "0.01",
-		    "Phi_min",       "0",     "Phi_max",       "0"
-		    );
     # Start with empty array
     my @FitTypes = ();
 
@@ -571,13 +472,6 @@ sub CreateMSRSingleHist {
 
     my $TitleLine = $All{"TITLE"}."\n# Run Numbers: ".$All{"RunNumbers"};
     $TitleLine =~ s/,/:/g;
-
-    # Fit parameters block
-    my $FitParaBlk = "
-###################################################################
-FITPARAMETER
-###################################################################
-#     No     Name       Value    Err     Min  Max                  ";
 
     # Counter for RUNS
     my $iRun = 1;
@@ -682,35 +576,12 @@ FITPARAMETER
 		    # End of N0 and NBg Lines
 ####################################################################################################
 		    
-####################################################################################################
-		    # Extract initial values, error and max/min from input
-		    $Name     = $Param . "_" . $iRun;
-		    $value    = $All{"$Name"};
-		    $error    = $All{"$erradd$Name"};
-		    $minvalue = $All{"$Name$minadd"};
-		    $maxvalue = $All{"$Name$maxadd"};
-# If these values are not in the input then take the defaulst
-# I think that this can go at the end if we use a separate initialization routine
-		    if ($value eq $EMPTY) {
-			$value = $Defaults{"$Param_ORG"};
-			$error = $Defaults{"$erradd$Param_ORG"};
-			$minvalue = $Defaults{"$Param_ORG$minadd"};
-			$maxvalue = $Defaults{"$Param_ORG$maxadd"};
-		    }
-		    if ( $minvalue == $maxvalue ) {
-			$minvalue = $EMPTY;
-			$maxvalue = $EMPTY;
-		    }
-####################################################################################################
-
 		    # Start preparing the parameters block
 		    print "Param=$Param_ORG is Shared=$Shared\n";
 		    if ($Shared) {
 			
 			# Parameter is shared enough to keep order from first run
 			if ( $iRun == 1 ) {
-			    $FitParaBlk = $FitParaBlk . "
-      $j      $Name    $value     $error    $error    $minvalue    $maxvalue";
 			    $Full_T_Block =~ s/$Param_ORG/$j/;
 			    ++$shcount;
 			    ++$j;
@@ -718,9 +589,6 @@ FITPARAMETER
 		    } else {
 
 			# Parameter is not shared, use map unless it is a single RUN fit
-			$FitParaBlk = $FitParaBlk . "
-      $j      $Name    $value     $error    $error    $minvalue    $maxvalue";
-			
 			# Skip adding to map line in these cases
 			if ( $Param ne "N0" && $Param ne "NBg" && ($#RUNS != 0 || $#Hist != 0)) {
 			    ++$nonsh;
@@ -925,6 +793,26 @@ phase            8.50";
       "###############################################################
 STATISTIC --- 0000-00-00 00:00:00
 *** FIT DID NOT CONVERGE ***";
+
+    # Get parameter block from MSR::PrepParamTable(\%All);
+    my $FitParaBlk = "
+###################################################################
+FITPARAMETER
+###################################################################
+#     No     Name       Value    Err     Min  Max                  ";
+    my %PTable=MSR::PrepParamTable(\%All);
+    my $NParam=scalar keys( %PTable );
+# Fill the table with labels and values of parametr 
+    for (my $PCount=0;$PCount<$NParam;$PCount++) {
+	my ($Param,$value,$error,$minvalue,$maxvalue) = split(/,/,$PTable{$PCount});
+	if ( $minvalue == $maxvalue ) {
+	    $minvalue = $EMPTY;
+	    $maxvalue = $EMPTY;
+	}
+	$j=$PCount+1;
+	$FitParaBlk = $FitParaBlk."
+      $j      $Param    $value     $error    $error    $minvalue    $maxvalue";
+    }
 
     # Empty line at the end of each block
     my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$FOURIER_Block\n$STAT_Block\n";

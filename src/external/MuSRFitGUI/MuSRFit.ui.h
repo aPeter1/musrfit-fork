@@ -520,7 +520,7 @@ void MuSRFitform::InitializeTab()
     
 # Setup the table with the right size    
     my $NParam=scalar keys( %PTable );
-    print "Size of P:".$NParam."\n";
+#    print "Size of P:".$NParam."\n";
     if ($NParam>$NRows) {	
 	InitParamTable->setNumRows($NParam);
     }

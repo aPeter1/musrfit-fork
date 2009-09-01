@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Tue Sep 1 10:19:23 2009
+# Created: Tue Sep 1 10:53:25 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -2067,7 +2067,7 @@ sub InitializeTab
     
 # Setup the table with the right size    
     my $NParam=scalar keys( %PTable );
-    print "Size of P:".$NParam."\n";
+#    print "Size of P:".$NParam."\n";
     if ($NParam>$NRows) {	
 	InitParamTable->setNumRows($NParam);
     }
