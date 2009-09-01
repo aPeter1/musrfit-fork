@@ -22,8 +22,8 @@
     </property>
     <property name="minimumSize">
         <size>
-            <width>582</width>
-            <height>505</height>
+            <width>23</width>
+            <height>222</height>
         </size>
     </property>
     <property name="caption">
@@ -61,9 +61,9 @@
         <property name="geometry">
             <rect>
                 <x>11</x>
-                <y>11</y>
+                <y>1</y>
                 <width>560</width>
-                <height>402</height>
+                <height>420</height>
             </rect>
         </property>
         <property name="sizePolicy">
@@ -95,14 +95,14 @@
             </attribute>
             <widget class="QLayoutWidget">
                 <property name="name">
-                    <cstring>layout24</cstring>
+                    <cstring>layout36</cstring>
                 </property>
                 <property name="geometry">
                     <rect>
                         <x>5</x>
-                        <y>1</y>
-                        <width>545</width>
-                        <height>360</height>
+                        <y>6</y>
+                        <width>550</width>
+                        <height>378</height>
                     </rect>
                 </property>
                 <vbox>
@@ -182,125 +182,232 @@
                             </widget>
                         </hbox>
                     </widget>
-                    <widget class="QLayoutWidget">
+                    <widget class="QButtonGroup">
                         <property name="name">
-                            <cstring>layout16</cstring>
+                            <cstring>RUNSelection</cstring>
                         </property>
-                        <hbox>
-                            <property name="name">
-                                <cstring>unnamed</cstring>
-                            </property>
-                            <widget class="QLabel">
-                                <property name="name">
-                                    <cstring>RUNSLabel</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Input the RUN numbers separated with commas</string>
-                                </property>
-                                <property name="buddy" stdset="0">
-                                    <cstring>RunNumbers</cstring>
-                                </property>
-                            </widget>
-                            <widget class="QLineEdit">
-                                <property name="name">
-                                    <cstring>RunNumbers</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>5</hsizetype>
-                                        <vsizetype>0</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                            </widget>
-                        </hbox>
-                    </widget>
-                    <widget class="QLayoutWidget">
-                        <property name="name">
-                            <cstring>layout18</cstring>
+                        <property name="margin">
+                            <number>0</number>
                         </property>
-                        <hbox>
+                        <property name="title">
+                            <string></string>
+                        </property>
+                        <property name="exclusive">
+                            <bool>true</bool>
+                        </property>
+                        <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>unnamed</cstring>
+                                <cstring>layout38</cstring>
                             </property>
-                            <widget class="QLabel">
+                            <property name="geometry">
+                                <rect>
+                                    <x>190</x>
+                                    <y>2</y>
+                                    <width>335</width>
+                                    <height>101</height>
+                                </rect>
+                            </property>
+                            <vbox>
                                 <property name="name">
-                                    <cstring>BeamLineLabel</cstring>
+                                    <cstring>unnamed</cstring>
                                 </property>
-                                <property name="text">
-                                    <string>On beam line</string>
-                                </property>
-                            </widget>
-                            <widget class="QComboBox">
-                                <item>
-                                    <property name="text">
-                                        <string>LEM</string>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>layout37</cstring>
                                     </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>GPS</string>
+                                    <hbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>RunFiles</cstring>
+                                            </property>
+                                            <property name="enabled">
+                                                <bool>false</bool>
+                                            </property>
+                                            <property name="sizePolicy">
+                                                <sizepolicy>
+                                                    <hsizetype>5</hsizetype>
+                                                    <vsizetype>0</vsizetype>
+                                                    <horstretch>0</horstretch>
+                                                    <verstretch>0</verstretch>
+                                                </sizepolicy>
+                                            </property>
+                                        </widget>
+                                        <widget class="QPushButton">
+                                            <property name="name">
+                                                <cstring>Browse</cstring>
+                                            </property>
+                                            <property name="enabled">
+                                                <bool>false</bool>
+                                            </property>
+                                            <property name="sizePolicy">
+                                                <sizepolicy>
+                                                    <hsizetype>0</hsizetype>
+                                                    <vsizetype>5</vsizetype>
+                                                    <horstretch>0</horstretch>
+                                                    <verstretch>0</verstretch>
+                                                </sizepolicy>
+                                            </property>
+                                            <property name="text">
+                                                <string>Browse</string>
+                                            </property>
+                                        </widget>
+                                    </hbox>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>RunNumbers</cstring>
                                     </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Dolly</string>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>5</hsizetype>
+                                            <vsizetype>0</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
                                     </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>LTF</string>
+                                </widget>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>layout35</cstring>
                                     </property>
-                                </item>
-                                <property name="name">
-                                    <cstring>BeamLine</cstring>
-                                </property>
-                            </widget>
-                            <widget class="QLabel">
-                                <property name="name">
-                                    <cstring>YEARLabel</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Year</string>
-                                </property>
-                            </widget>
-                            <widget class="QComboBox">
-                                <item>
-                                    <property name="text">
-                                        <string>2009</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>2008</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>2007</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>2006</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>2005</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>2004</string>
-                                    </property>
-                                </item>
-                                <property name="name">
-                                    <cstring>YEAR</cstring>
-                                </property>
-                            </widget>
-                        </hbox>
+                                    <hbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>BeamLineLabel</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>On beam line</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QComboBox">
+                                            <item>
+                                                <property name="text">
+                                                    <string>LEM</string>
+                                                </property>
+                                            </item>
+                                            <item>
+                                                <property name="text">
+                                                    <string>GPS</string>
+                                                </property>
+                                            </item>
+                                            <item>
+                                                <property name="text">
+                                                    <string>Dolly</string>
+                                                </property>
+                                            </item>
+                                            <item>
+                                                <property name="text">
+                                                    <string>LTF</string>
+                                                </property>
+                                            </item>
+                                            <property name="name">
+                                                <cstring>BeamLine</cstring>
+                                            </property>
+                                            <property name="sizePolicy">
+                                                <sizepolicy>
+                                                    <hsizetype>5</hsizetype>
+                                                    <vsizetype>5</vsizetype>
+                                                    <horstretch>0</horstretch>
+                                                    <verstretch>0</verstretch>
+                                                </sizepolicy>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>YEARLabel</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Year</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QComboBox">
+                                            <item>
+                                                <property name="text">
+                                                    <string>2009</string>
+                                                </property>
+                                            </item>
+                                            <item>
+                                                <property name="text">
+                                                    <string>2008</string>
+                                                </property>
+                                            </item>
+                                            <item>
+                                                <property name="text">
+                                                    <string>2007</string>
+                                                </property>
+                                            </item>
+                                            <item>
+                                                <property name="text">
+                                                    <string>2006</string>
+                                                </property>
+                                            </item>
+                                            <item>
+                                                <property name="text">
+                                                    <string>2005</string>
+                                                </property>
+                                            </item>
+                                            <item>
+                                                <property name="text">
+                                                    <string>2004</string>
+                                                </property>
+                                            </item>
+                                            <property name="name">
+                                                <cstring>YEAR</cstring>
+                                            </property>
+                                            <property name="sizePolicy">
+                                                <sizepolicy>
+                                                    <hsizetype>5</hsizetype>
+                                                    <vsizetype>5</vsizetype>
+                                                    <horstretch>0</horstretch>
+                                                    <verstretch>0</verstretch>
+                                                </sizepolicy>
+                                            </property>
+                                        </widget>
+                                    </hbox>
+                                </widget>
+                            </vbox>
+                        </widget>
+                        <widget class="QRadioButton">
+                            <property name="name">
+                                <cstring>RUNSAuto</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>10</x>
+                                    <y>35</y>
+                                    <width>175</width>
+                                    <height>22</height>
+                                </rect>
+                            </property>
+                            <property name="text">
+                                <string>Input the RUN numbers</string>
+                            </property>
+                            <property name="checked">
+                                <bool>true</bool>
+                            </property>
+                        </widget>
+                        <widget class="QRadioButton">
+                            <property name="name">
+                                <cstring>RUNSManual</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>10</x>
+                                    <y>5</y>
+                                    <width>175</width>
+                                    <height>22</height>
+                                </rect>
+                            </property>
+                            <property name="text">
+                                <string>Select RUNs Manually</string>
+                            </property>
+                        </widget>
                     </widget>
                     <widget class="QLabel">
                         <property name="name">
@@ -2516,7 +2623,7 @@
             <x>0</x>
             <y>0</y>
             <width>582</width>
-            <height>27</height>
+            <height>25</height>
         </rect>
     </property>
     <item text="&amp;File" name="fileMenu">
@@ -3071,6 +3178,12 @@
         <receiver>MuSRFitform</receiver>
         <slot>CallMSRCreate()</slot>
     </connection>
+    <connection>
+        <sender>RUNSManual</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>MuSRFitform</receiver>
+        <slot>RunSelectionToggle()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>musrfit_tabs</tabstop>
@@ -3133,6 +3246,7 @@
     <slot>GoPlot()</slot>
     <slot>ShowMuSRT0()</slot>
     <slot>T0Update()</slot>
+    <slot>RunSelectionToggle()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

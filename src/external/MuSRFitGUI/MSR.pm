@@ -72,7 +72,6 @@ sub CreateMSR {
     my $FILENAME = $All{"FILENAME"};
     my $BeamLine = $All{"BeamLine"};
     my $YEAR = $All{"YEAR"};
-    my $DATADIR = $DATADIRS{$BeamLine};
 
     my $Step = $All{"go"};
     if ( $Step eq "PLOT" ) {
@@ -100,7 +99,18 @@ sub CreateMSR {
     # Counter of Params
     my $j = 1;
 
-    my @RUNS=split( /,/, $All{"RunNumbers"});
+    # Need to select here RUNSAuto or RUNSManual
+    # $RUNSType = 0 (Auto) or 1 (Manual)
+    my $RUNSType = 0;
+    if ($All{"RunNumbers"} ne "") {
+	my @RUNS=split( /,/, $All{"RunNumbers"});
+	$RUNSType = 0;
+    }
+    elsif ($All{"RunFiles"} ne "") {
+	my @RUNS=split( /,/, $All{"RunFiles"});
+	$RUNSType = 1;
+    }
+
     # $shcount is a counter for shared parameters
     if ( $#RUNS == 0 ) {
         my $shcount = 1;
@@ -210,71 +220,11 @@ sub CreateMSR {
         # Also for Imaginaryand and Real for RRF fits
 
         $RUN = $RUNS[ $iRun - 1 ];
-        if    ( $RUN < 10 )   { $RUN = "000" . $RUN; }
-        elsif ( $RUN < 100 )  { $RUN = "00" . $RUN; }
-        elsif ( $RUN < 1000 ) { $RUN = "0" . $RUN; }
 
-        # Get current year
-        ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
-          localtime( time() );
-        my $current_year = $year + 1900;
-
-        #	    $TC="$TC<br>Data dir:".$DATADIRS{$BeamLine}."<br>";
-        if ( $BeamLine eq "LEM" ) {
-            $RUN_File_Name = "lem" . substr( $YEAR, 2 ) . "_his_" . $RUN;
-            $RUNFILE       = "$DATADIR/$YEAR/$RUN_File_Name";
-            $RUN_Line      = join( $SPACE,
-                "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
-                $Def_Format{$BeamLine} );
-        }
-        elsif ( $BeamLine eq "GPS" ) {
-            $RUN_File_Name = "deltat_pta_gps_" . $RUN;
-            if ( $YEAR == $current_year ) {
-                $RUNFILE = "$DATADIR/$RUN_File_Name";
-            }
-            else {
-                $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
-            }
-            $RUN_Line = join( $SPACE,
-                "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
-                $Def_Format{$BeamLine} );
-        }
-        elsif ( $BeamLine eq "LTF" ) {
-            $RUN_File_Name = "deltat_pta_ltf_" . $RUN;
-            if ( $YEAR == $current_year ) {
-                $RUNFILE = "$DATADIR/$RUN_File_Name";
-            }
-            else {
-                $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
-            }
-            $RUN_Line = join( $SPACE,
-                "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
-                $Def_Format{$BeamLine} );
-        }
-        elsif ( $BeamLine eq "Dolly" ) {
-            $RUN_File_Name = "deltat_pta_dolly_" . $RUN;
-            if ( $YEAR == $current_year ) {
-                $RUNFILE = "$DATADIR/$RUN_File_Name";
-            }
-            else {
-                $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
-            }
-            $RUN_Line = join( $SPACE,
-                "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
-                $Def_Format{$BeamLine} );
-        }
-        elsif ( $BeamLine eq "GPD" ) {
-            $RUN_File_Name = "deltat_pta_gpd_" . $RUN;
-            if ( $YEAR == $current_year ) {
-                $RUNFILE = "$DATADIR/$RUN_File_Name";
-            }
-            else {
-                $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
-            }
-            $RUN_Line = join( $SPACE,
-                "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
-                $Def_Format{$BeamLine} );
-        }
+	$RUNFILE = MSR::RUNFileName($RUN,$YEAR,$BeamLine);
+	$RUN_Line = join( $SPACE,
+			  "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
+			  $Def_Format{$BeamLine} );
 
 	$Type_Line = "fittype         2";
 	$PLT       = 2;
@@ -454,7 +404,6 @@ sub CreateMSRSingleHist {
     my $FILENAME = $All{"FILENAME"};
     my $BeamLine = $All{"BeamLine"};
     my $YEAR = $All{"YEAR"};
-    my $DATADIR = $DATADIRS{$BeamLine};
 
     my $Step = $All{"go"};
     if ( $Step eq "PLOT" ) {
@@ -478,7 +427,18 @@ sub CreateMSRSingleHist {
     # Counter of Params
     my $j = 1;
 
-    my @RUNS=split( /,/, $All{"RunNumbers"});
+    # Need to select here RUNSAuto or RUNSManual
+    # $RUNSType = 0 (Auto) or 1 (Manual)
+    my $RUNSType = 0;
+    if ($All{"RunNumbers"} ne "") {
+	my @RUNS=split( /,/, $All{"RunNumbers"});
+	$RUNSType = 0;
+    }
+    elsif ($All{"RunFiles"} ne "") {
+	my @RUNS=split( /,/, $All{"RunFiles"});
+	$RUNSType = 1;
+    }
+
     # $shcount is a counter for shared parameters
     if ( $#RUNS == 0 && $#Hists == 0) {
         my $shcount = 1;
@@ -603,72 +563,16 @@ sub CreateMSRSingleHist {
 	    # Also for each histogram in Single Histograms fits
 	    # Also for Imaginaryand and Real for RRF fits
 	    
+
+# This part can be shifted before the RUNS loop
+
 	    $RUN = $RUNS[ $iRun - 1 ];
-	    if    ( $RUN < 10 )   { $RUNtmp = "000" . $RUN; }
-	    elsif ( $RUN < 100 )  { $RUNtmp = "00" . $RUN; }
-	    elsif ( $RUN < 1000 ) { $RUNtmp = "0" . $RUN; }
-	    
-	    # Get current year
-	    ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
-		localtime( time() );
-	    my $current_year = $year + 1900;
-	    
-	    if ( $BeamLine eq "LEM" ) {
-		$RUN_File_Name = "lem" . substr( $YEAR, 2 ) . "_his_" . $RUNtmp;
-		$RUNFILE       = "$DATADIR/$YEAR/$RUN_File_Name";
-		$RUN_Line      = join( $SPACE,
-				       "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
-				       $Def_Format{$BeamLine} );
-	    }
-	    elsif ( $BeamLine eq "GPS" ) {
-		$RUN_File_Name = "deltat_pta_gps_" . $RUNtmp;
-		if ( $YEAR == $current_year ) {
-		    $RUNFILE = "$DATADIR/$RUN_File_Name";
-		}
-		else {
-		    $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
-		}
-		$RUN_Line = join( $SPACE,
-				  "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
-				  $Def_Format{$BeamLine} );
-	    }
-	    elsif ( $BeamLine eq "LTF" ) {
-		$RUN_File_Name = "deltat_pta_ltf_" . $RUNtmp;
-		if ( $YEAR == $current_year ) {
-		    $RUNFILE = "$DATADIR/$RUN_File_Name";
-		}
-		else {
-		    $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
-		}
-		$RUN_Line = join( $SPACE,
-				  "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
-				  $Def_Format{$BeamLine} );
-	    }
-	    elsif ( $BeamLine eq "Dolly" ) {
-		$RUN_File_Name = "deltat_pta_dolly_" . $RUNtmp;
-		if ( $YEAR == $current_year ) {
-		    $RUNFILE = "$DATADIR/$RUN_File_Name";
-		}
-		else {
-		    $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
-		}
-		$RUN_Line = join( $SPACE,
-				  "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
-				  $Def_Format{$BeamLine} );
-	    }
-	    elsif ( $BeamLine eq "GPD" ) {
-		$RUN_File_Name = "deltat_pta_gpd_" . $RUNtmp;
-		if ( $YEAR == $current_year ) {
-		    $RUNFILE = "$DATADIR/$RUN_File_Name";
-		}
-		else {
-		    $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
-		}
-		$RUN_Line = join( $SPACE,
-				  "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
-				  $Def_Format{$BeamLine} );
-	    }
-	    
+
+	    $RUNFILE = MSR::RUNFileName($RUN,$YEAR,$BeamLine);
+	    $RUN_Line = join( $SPACE,
+			      "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
+			      $Def_Format{$BeamLine} );
+
 	    # What kind of fit? 0 - Single Histogram, 2 - Asymmetry, 4 - RRF
 	    $Type_Line  = "fittype         0";
 	    $PLT        = 0;
@@ -1311,6 +1215,73 @@ sub PrepParamTable {
 
     }
     return %ParTable;
+}
+
+
+########################
+# RUNFileName
+# Function return the run file name
+# input should be 
+# $RUN is the run number
+# $YEAR is the year
+# $BeamLine in the name of beamline
+########################
+sub RUNFileName { 
+# Take this information as input arguments
+    (my $RUN, my $YEAR, my $BeamLine) = @_;
+
+    my $DATADIR = $DATADIRS{$BeamLine};
+    my $RUNtmp = $EMPTY;
+    if    ( $RUN < 10 )   { $RUNtmp = "000" . $RUN; }
+    elsif ( $RUN < 100 )  { $RUNtmp = "00" . $RUN; }
+    elsif ( $RUN < 1000 ) { $RUNtmp = "0" . $RUN; }
+	    
+    # Get current year
+    my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
+	localtime( time() );
+    my $current_year = $year + 1900;
+    
+    if ( $BeamLine eq "LEM" ) {
+	$RUN_File_Name = "lem" . substr( $YEAR, 2 ) . "_his_" . $RUNtmp;
+	$RUNFILE       = "$DATADIR/$YEAR/$RUN_File_Name";
+    }
+    elsif ( $BeamLine eq "GPS" ) {
+	$RUN_File_Name = "deltat_pta_gps_" . $RUNtmp;
+	if ( $YEAR == $current_year ) {
+	    $RUNFILE = "$DATADIR/$RUN_File_Name";
+	}
+	else {
+	    $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
+	}
+    }
+    elsif ( $BeamLine eq "LTF" ) {
+	$RUN_File_Name = "deltat_pta_ltf_" . $RUNtmp;
+	if ( $YEAR == $current_year ) {
+	    $RUNFILE = "$DATADIR/$RUN_File_Name";
+	}
+	else {
+	    $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
+	}
+    }
+    elsif ( $BeamLine eq "Dolly" ) {
+	$RUN_File_Name = "deltat_pta_dolly_" . $RUNtmp;
+	if ( $YEAR == $current_year ) {
+	    $RUNFILE = "$DATADIR/$RUN_File_Name";
+	}
+	else {
+	    $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
+	}
+    }
+    elsif ( $BeamLine eq "GPD" ) {
+	$RUN_File_Name = "deltat_pta_gpd_" . $RUNtmp;
+	if ( $YEAR == $current_year ) {
+	    $RUNFILE = "$DATADIR/$RUN_File_Name";
+	}
+	else {
+	    $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
+	}
+    }
+    return $RUNFILE
 }
 
 1;

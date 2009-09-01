@@ -168,6 +168,7 @@ void MuSRFitform::CreateAllInput()
     $All{"TITLE"}= TITLE->text;
     $All{"FILENAME"}= FILENAME->text;
     $All{"RunNumbers"} = RunNumbers->text;
+    $All{"RunFiles"} = RunFiles->text;
     $All{"BeamLine"} = BeamLine->currentText;
     $All{"YEAR"} =YEAR->currentText;
     $All{"Tis"} = Tis->text;
@@ -642,4 +643,10 @@ void MuSRFitform::T0Update()
 	$NHist++
     }
 
+}
+
+
+void MuSRFitform::RunSelectionToggle()
+{
+    print "Toggle selection\n";
 }
