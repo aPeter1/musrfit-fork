@@ -1452,7 +1452,7 @@
                             <x>5</x>
                             <y>5</y>
                             <width>545</width>
-                            <height>325</height>
+                            <height>355</height>
                         </rect>
                     </property>
                     <property name="sizePolicy">
@@ -1509,34 +1509,6 @@
                         <enum>SpreadSheet</enum>
                     </property>
                 </widget>
-                <widget class="QPushButton">
-                    <property name="name">
-                        <cstring>TableUpdate</cstring>
-                    </property>
-                    <property name="geometry">
-                        <rect>
-                            <x>460</x>
-                            <y>335</y>
-                            <width>90</width>
-                            <height>30</height>
-                        </rect>
-                    </property>
-                    <property name="minimumSize">
-                        <size>
-                            <width>90</width>
-                            <height>30</height>
-                        </size>
-                    </property>
-                    <property name="maximumSize">
-                        <size>
-                            <width>90</width>
-                            <height>30</height>
-                        </size>
-                    </property>
-                    <property name="text">
-                        <string>Update</string>
-                    </property>
-                </widget>
             </widget>
             <widget class="QWidget">
                 <property name="name">
@@ -1554,7 +1526,7 @@
                             <x>5</x>
                             <y>5</y>
                             <width>545</width>
-                            <height>365</height>
+                            <height>355</height>
                         </rect>
                     </property>
                     <property name="overwriteMode">
@@ -2935,12 +2907,6 @@
         <slot>GoFit()</slot>
     </connection>
     <connection>
-        <sender>TableUpdate</sender>
-        <signal>clicked()</signal>
-        <receiver>MuSRFitform</receiver>
-        <slot>CallMSRCreate()</slot>
-    </connection>
-    <connection>
         <sender>ShowT0</sender>
         <signal>clicked()</signal>
         <receiver>MuSRFitform</receiver>
@@ -2957,6 +2923,12 @@
         <signal>activated(int)</signal>
         <receiver>MuSRFitform</receiver>
         <slot>T0Update()</slot>
+    </connection>
+    <connection>
+        <sender>InitParamTable</sender>
+        <signal>valueChanged(int,int)</signal>
+        <receiver>MuSRFitform</receiver>
+        <slot>CallMSRCreate()</slot>
     </connection>
 </connections>
 <tabstops>

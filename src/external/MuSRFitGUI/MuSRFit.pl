@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Tue Sep 1 10:53:25 2009
+# Created: Tue Sep 1 11:46:17 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -106,7 +106,6 @@ use Qt::attributes qw(
     ShParam_3_9
     InitializationPage
     InitParamTable
-    TableUpdate
     FittingPage
     textMSROutput
     TabPage
@@ -885,7 +884,7 @@ sub NEW
     InitParamTable->horizontalHeader()->setLabel(InitParamTable->numCols() - 1, trUtf8("Min"));
     InitParamTable->setNumCols(InitParamTable->numCols() + 1);
     InitParamTable->horizontalHeader()->setLabel(InitParamTable->numCols() - 1, trUtf8("Max"));
-    InitParamTable->setGeometry( Qt::Rect(5, 5, 545, 325) );
+    InitParamTable->setGeometry( Qt::Rect(5, 5, 545, 355) );
     InitParamTable->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, InitParamTable->sizePolicy()->hasHeightForWidth()) );
     InitParamTable->setMaximumSize( Qt::Size(32767, 32767) );
     InitParamTable->setFocusPolicy( &Qt::Table::TabFocus() );
@@ -901,17 +900,12 @@ sub NEW
     InitParamTable->setShowGrid( 1 );
     InitParamTable->setRowMovingEnabled( 0 );
     InitParamTable->setFocusStyle( &Qt::Table::SpreadSheet() );
-
-    TableUpdate = Qt::PushButton(InitializationPage, "TableUpdate");
-    TableUpdate->setGeometry( Qt::Rect(460, 335, 90, 30) );
-    TableUpdate->setMinimumSize( Qt::Size(90, 30) );
-    TableUpdate->setMaximumSize( Qt::Size(90, 30) );
     musrfit_tabs->insertTab( InitializationPage, "" );
 
     FittingPage = Qt::Widget(musrfit_tabs, "FittingPage");
 
     textMSROutput = Qt::TextEdit(FittingPage, "textMSROutput");
-    textMSROutput->setGeometry( Qt::Rect(5, 5, 545, 365) );
+    textMSROutput->setGeometry( Qt::Rect(5, 5, 545, 355) );
     textMSROutput->setOverwriteMode( 1 );
     musrfit_tabs->insertTab( FittingPage, "" );
 
@@ -1270,10 +1264,10 @@ sub NEW
     Qt::Object::connect(fileChangeDirAction, SIGNAL "activated()", this, SLOT "fileChangeDir()");
     Qt::Object::connect(musrfit_tabs, SIGNAL "selected(const QString&)", this, SLOT "TabChanged()");
     Qt::Object::connect(go, SIGNAL "clicked()", this, SLOT "GoFit()");
-    Qt::Object::connect(TableUpdate, SIGNAL "clicked()", this, SLOT "CallMSRCreate()");
     Qt::Object::connect(ShowT0, SIGNAL "clicked()", this, SLOT "ShowMuSRT0()");
     Qt::Object::connect(PlotMSR, SIGNAL "clicked()", this, SLOT "GoPlot()");
     Qt::Object::connect(BeamLine, SIGNAL "activated(int)", this, SLOT "T0Update()");
+    Qt::Object::connect(InitParamTable, SIGNAL "valueChanged(int,int)", this, SLOT "CallMSRCreate()");
 
     setTabOrder(musrfit_tabs, TITLE);
     setTabOrder(TITLE, FILENAME);
@@ -1449,7 +1443,6 @@ sub languageChange
     InitParamTable->horizontalHeader()->setLabel( 1, trUtf8("Error") );
     InitParamTable->horizontalHeader()->setLabel( 2, trUtf8("Min") );
     InitParamTable->horizontalHeader()->setLabel( 3, trUtf8("Max") );
-    TableUpdate->setText( trUtf8("Update") );
     musrfit_tabs->changeTab( InitializationPage, trUtf8("Initialization") );
     musrfit_tabs->changeTab( FittingPage, trUtf8("MSR File") );
     Minimization->setTitle( trUtf8("Minimization") );
@@ -1584,24 +1577,29 @@ sub fileOpen
 sub fileSave
 {
 
+    my %All=CreateAllInput();      
+    my $FILENAME=$All{"FILENAME"}.".msr";
     my $file=Qt::FileDialog::getSaveFileName(
-	    "",
+	    "$FILENAME",
 	    "MSR Files (*.msr *.mlog)",
 	    this,
 	    "save file dialog",
 	    "Choose a filename to save under");
-    my %All=CreateAllInput();      
-    my $FILENAME=$All{"FILENAME"}.".msr";
-    if (-e $FILENAME) {
+    
+# If the user gave a filename the copy to it
+    print "file-$file\n";
+    if ($file ne "") {
 # TODO: check if the extension is correct, or add it.
-	my $cmd="cp $FILENAME $file";
-	my $pid=system($cmd);
-    } else {
-	if ($file ne "") {
-	    my $Warning = "Warning: No MSR file found yet!";
-	    my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
+	if (-e $FILENAME) {
+	    my $cmd="cp $FILENAME $file";
+	    my $pid=system($cmd);
+	} else {
+	    if ($file ne "") {
+		my $Warning = "Warning: No MSR file found yet!";
+		my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
+	    }
 	}
-    }    
+    }
 
 }
 
@@ -2067,7 +2065,6 @@ sub InitializeTab
     
 # Setup the table with the right size    
     my $NParam=scalar keys( %PTable );
-#    print "Size of P:".$NParam."\n";
     if ($NParam>$NRows) {	
 	InitParamTable->setNumRows($NParam);
     }

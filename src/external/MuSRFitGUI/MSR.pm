@@ -94,9 +94,6 @@ sub CreateMSR {
 
     my @Paramcomp = @$Paramcomp_ref;
 
-    my $TitleLine = $All{"TITLE"}."\n# Run Numbers: ".$All{"RunNumbers"};
-    $TitleLine =~ s/,/:/g;
-
     # Counter for RUNS
     my $iRun = 1;
 
@@ -332,6 +329,31 @@ sub CreateMSR {
     # The number of runs is
     $NRUNS = $iRun - 1;
 
+# Start constructing all blocks
+    my $TitleLine = $All{"TITLE"}."\n# Run Numbers: ".$All{"RunNumbers"};
+    $TitleLine =~ s/,/:/g;
+
+    # Get parameter block from MSR::PrepParamTable(\%All);
+    my $FitParaBlk = "
+###################################################################
+FITPARAMETER
+###################################################################
+#     No     Name       Value    Err     Min  Max                  ";
+    my %PTable=MSR::PrepParamTable(\%All);
+    my $NParam=scalar keys( %PTable );
+# Fill the table with labels and values of parametr 
+    for (my $PCount=0;$PCount<$NParam;$PCount++) {
+	my ($Param,$value,$error,$minvalue,$maxvalue) = split(/,/,$PTable{$PCount});
+	if ( $minvalue == $maxvalue ) {
+	    $minvalue = $EMPTY;
+	    $maxvalue = $EMPTY;
+	}
+	$j=$PCount+1;
+	$FitParaBlk = $FitParaBlk."
+      $j      $Param    $value     $error    $error    $minvalue    $maxvalue";
+    }
+
+
     $Full_T_Block = "
 ###################################################################
 THEORY
@@ -399,26 +421,6 @@ phase            8.50";
 STATISTIC --- 0000-00-00 00:00:00
 *** FIT DID NOT CONVERGE ***";
 
-    # Get parameter block from MSR::PrepParamTable(\%All);
-    my $FitParaBlk = "
-###################################################################
-FITPARAMETER
-###################################################################
-#     No     Name       Value    Err     Min  Max                  ";
-    my %PTable=MSR::PrepParamTable(\%All);
-    my $NParam=scalar keys( %PTable );
-# Fill the table with labels and values of parametr 
-    for (my $PCount=0;$PCount<$NParam;$PCount++) {
-	my ($Param,$value,$error,$minvalue,$maxvalue) = split(/,/,$PTable{$PCount});
-	if ( $minvalue == $maxvalue ) {
-	    $minvalue = $EMPTY;
-	    $maxvalue = $EMPTY;
-	}
-	$j=$PCount+1;
-	$FitParaBlk = $FitParaBlk."
-      $j      $Param    $value     $error    $error    $minvalue    $maxvalue";
-    }
-
 
     # Empty line at the end of each block
     my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$FOURIER_Block\n$STAT_Block\n";
@@ -469,9 +471,6 @@ sub CreateMSRSingleHist {
     my ($Full_T_Block,$Paramcomp_ref)=MSR::CreateTheory(@FitTypes);
 
     my @Paramcomp = @$Paramcomp_ref;
-
-    my $TitleLine = $All{"TITLE"}."\n# Run Numbers: ".$All{"RunNumbers"};
-    $TitleLine =~ s/,/:/g;
 
     # Counter for RUNS
     my $iRun = 1;
@@ -727,6 +726,30 @@ sub CreateMSRSingleHist {
     # The number of runs is
     $NRUNS = $iRun - 1;
 
+# Start constructing all block
+    my $TitleLine = $All{"TITLE"}."\n# Run Numbers: ".$All{"RunNumbers"};
+    $TitleLine =~ s/,/:/g;
+
+    # Get parameter block from MSR::PrepParamTable(\%All);
+    my $FitParaBlk = "
+###################################################################
+FITPARAMETER
+###################################################################
+#     No     Name       Value    Err     Min  Max                  ";
+    my %PTable=MSR::PrepParamTable(\%All);
+    my $NParam=scalar keys( %PTable );
+# Fill the table with labels and values of parametr 
+    for (my $PCount=0;$PCount<$NParam;$PCount++) {
+	my ($Param,$value,$error,$minvalue,$maxvalue) = split(/,/,$PTable{$PCount});
+	if ( $minvalue == $maxvalue ) {
+	    $minvalue = $EMPTY;
+	    $maxvalue = $EMPTY;
+	}
+	$j=$PCount+1;
+	$FitParaBlk = $FitParaBlk."
+      $j      $Param    $value     $error    $error    $minvalue    $maxvalue";
+    }
+
     $Full_T_Block = "
 ###################################################################
 THEORY
@@ -794,25 +817,6 @@ phase            8.50";
 STATISTIC --- 0000-00-00 00:00:00
 *** FIT DID NOT CONVERGE ***";
 
-    # Get parameter block from MSR::PrepParamTable(\%All);
-    my $FitParaBlk = "
-###################################################################
-FITPARAMETER
-###################################################################
-#     No     Name       Value    Err     Min  Max                  ";
-    my %PTable=MSR::PrepParamTable(\%All);
-    my $NParam=scalar keys( %PTable );
-# Fill the table with labels and values of parametr 
-    for (my $PCount=0;$PCount<$NParam;$PCount++) {
-	my ($Param,$value,$error,$minvalue,$maxvalue) = split(/,/,$PTable{$PCount});
-	if ( $minvalue == $maxvalue ) {
-	    $minvalue = $EMPTY;
-	    $maxvalue = $EMPTY;
-	}
-	$j=$PCount+1;
-	$FitParaBlk = $FitParaBlk."
-      $j      $Param    $value     $error    $error    $minvalue    $maxvalue";
-    }
 
     # Empty line at the end of each block
     my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$FOURIER_Block\n$STAT_Block\n";

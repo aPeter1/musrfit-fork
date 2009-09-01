@@ -47,24 +47,28 @@ void Form1::fileOpen()
 
 void Form1::fileSave()
 {
+    my %All=CreateAllInput();      
+    my $FILENAME=$All{"FILENAME"}.".msr";
     my $file=Qt::FileDialog::getSaveFileName(
-	    "",
+	    "$FILENAME",
 	    "MSR Files (*.msr *.mlog)",
 	    this,
 	    "save file dialog",
 	    "Choose a filename to save under");
-    my %All=CreateAllInput();      
-    my $FILENAME=$All{"FILENAME"}.".msr";
-    if (-e $FILENAME) {
+    
+# If the user gave a filename the copy to it
+    if ($file ne "") {
 # TODO: check if the extension is correct, or add it.
-	my $cmd="cp $FILENAME $file";
-	my $pid=system($cmd);
-    } else {
-	if ($file ne "") {
-	    my $Warning = "Warning: No MSR file found yet!";
-	    my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
+	if (-e $FILENAME) {
+	    my $cmd="cp $FILENAME $file";
+	    my $pid=system($cmd);
+	} else {
+	    if ($file ne "") {
+		my $Warning = "Warning: No MSR file found yet!";
+		my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
+	    }
 	}
-    }    
+    }
 }
 
 void MuSRFitform::fileChangeDir()
@@ -520,7 +524,6 @@ void MuSRFitform::InitializeTab()
     
 # Setup the table with the right size    
     my $NParam=scalar keys( %PTable );
-#    print "Size of P:".$NParam."\n";
     if ($NParam>$NRows) {	
 	InitParamTable->setNumRows($NParam);
     }
@@ -536,7 +539,6 @@ void MuSRFitform::InitializeTab()
 	InitParamTable->setText($PCount,3,$maxvalue);
     }
 }
-
 
 void MuSRFitform::TabChanged()
 {
