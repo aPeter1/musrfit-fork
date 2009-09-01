@@ -604,6 +604,7 @@ void MuSRFitform::GoPlot()
 	my $pid = system($cmd);
     } else {
 	FitTextOutput->append("Cannot find MSR file!");
+	FitTextOutput->append("-----------------------------------------------------------------------------------------------------------------------------");
     }
     return;
 }
@@ -615,8 +616,12 @@ void MuSRFitform::ShowMuSRT0()
 # Create MSR file and then run musrt0
     CallMSRCreate();
     my $FILENAME=$All{"FILENAME"}.".msr";
-    my $cmd="musrt0 $FILENAME &";
-    my $pid = system($cmd);
+    if (-e $FILENAME) {
+	my $cmd="musrt0 $FILENAME &";
+	my $pid = system($cmd);
+    } else {
+	print STDERR "Cannot find MSR file!\n";
+    }
     return;
 }
 

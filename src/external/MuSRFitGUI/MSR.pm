@@ -335,9 +335,9 @@ sub CreateMSR {
 
     # Get parameter block from MSR::PrepParamTable(\%All);
     my $FitParaBlk = "
-###################################################################
+###############################################################
 FITPARAMETER
-###################################################################
+###############################################################
 #     No     Name       Value    Err     Min  Max                  ";
     my %PTable=MSR::PrepParamTable(\%All);
     my $NParam=scalar keys( %PTable );
@@ -355,18 +355,18 @@ FITPARAMETER
 
 
     $Full_T_Block = "
-###################################################################
+###############################################################
 THEORY
-###################################################################
+###############################################################
 $Full_T_Block
 ";
 
     $RUN_Block =
-      "###################################################################
+      "###############################################################
 $RUN_Block";
 
     $COMMANDS_Block =
-      "###################################################################
+      "###############################################################
 COMMANDS
 FITMINTYPE
 SAVE
@@ -391,7 +391,7 @@ SAVE
     }
 
     $PLOT_Block =
-      "###################################################################
+      "###############################################################
 PLOT $PLT
 runs     $RUNS_Line
 $PRANGE_Line
@@ -403,7 +403,7 @@ $logxy";
 
 
     $FOURIER_Block=
-      "###################################################################
+      "###############################################################
 FOURIER
 units            FUNITS    # units either 'Gauss', 'MHz', or 'Mc/s'
 fourier_power    12
@@ -541,7 +541,6 @@ sub CreateMSRSingleHist {
 		    # Otherwise check input if it was marked as shared
 		    else {
 			$Shared = $All{"Sh_$Param"};
-			print "Shared=$Shared\n";
 		    }
 		    
 		    # N0 and NBg Lines
@@ -576,9 +575,7 @@ sub CreateMSRSingleHist {
 ####################################################################################################
 		    
 		    # Start preparing the parameters block
-		    print "Param=$Param_ORG is Shared=$Shared\n";
 		    if ($Shared) {
-			
 			# Parameter is shared enough to keep order from first run
 			if ( $iRun == 1 ) {
 			    $Full_T_Block =~ s/$Param_ORG/$j/;
@@ -586,7 +583,6 @@ sub CreateMSRSingleHist {
 			    ++$j;
 			}
 		    } else {
-
 			# Parameter is not shared, use map unless it is a single RUN fit
 			# Skip adding to map line in these cases
 			if ( $Param ne "N0" && $Param ne "NBg" && ($#RUNS != 0 || $#Hist != 0)) {
@@ -732,9 +728,9 @@ sub CreateMSRSingleHist {
 
     # Get parameter block from MSR::PrepParamTable(\%All);
     my $FitParaBlk = "
-###################################################################
+###############################################################
 FITPARAMETER
-###################################################################
+###############################################################
 #     No     Name       Value    Err     Min  Max                  ";
     my %PTable=MSR::PrepParamTable(\%All);
     my $NParam=scalar keys( %PTable );
@@ -751,18 +747,18 @@ FITPARAMETER
     }
 
     $Full_T_Block = "
-###################################################################
+###############################################################
 THEORY
-###################################################################
+###############################################################
 $Full_T_Block
 ";
 
     $RUN_Block =
-      "###################################################################
+      "###############################################################
 $RUN_Block";
 
     $COMMANDS_Block =
-      "###################################################################
+      "###############################################################
 COMMANDS
 FITMINTYPE
 SAVE
@@ -787,7 +783,7 @@ SAVE
     }
 
     $PLOT_Block =
-      "###################################################################
+      "###############################################################
 PLOT $PLT
 runs     $RUNS_Line
 $PRANGE_Line
@@ -799,7 +795,7 @@ $logxy";
 
 
     $FOURIER_Block=
-      "###################################################################
+      "###############################################################
 FOURIER
 units            FUNITS    # units either 'Gauss', 'MHz', or 'Mc/s'
 fourier_power    12
@@ -1191,6 +1187,7 @@ sub PrepParamTable {
  
     my %All = %{$_[0]};
     my @RUNS = split( /,/, $All{"RunNumbers"} );
+    my @Hists = split( /,/, $All{"LRBF"} );
 
     my @FitTypes =();
     foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
@@ -1208,61 +1205,110 @@ sub PrepParamTable {
     my $error    = 0;
     my $minvalue = 0;
     my $maxvalue = 0;
+    my $Component=1;
     
     foreach my $RUN (@RUNS) {
 	$iRun++;
-	my $Component=1;
-	foreach my $FitType (@FitTypes) {
-	    my $Parameters=$Paramcomp[$Component-1];
-	    my @Params = split( /\s+/, $Parameters );
-	
-	    if ( $Component == 1 && $All{"FitAsyType"} eq "Asymmetry" ) {
-		unshift( @Params, "Alpha" );
-	    }
-	    elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
-		unshift( @Params, ( "N0", "NBg" ) );
-	    }
-
-	    
-# This is the counter for parameters of this component
-	    my $NP=1;
-	    $Shared = 0;
-# Change state/label of parameters
-	    foreach my $Param (@Params) {
-		my $Param_ORG = $Param;
-		if ( $#FitTypes != 0 && (   $Param ne "Alpha" && $Param ne "N0" && $Param ne "NBg" ) ){
-		    $Param = join( "", $Param, "_", "$Component" );
+	$Component=1;
+	if ($All{"FitAsyType"} eq "Asymmetry") {
+	    foreach my $FitType (@FitTypes) {
+		my $Parameters=$Paramcomp[$Component-1];
+		my @Params = split( /\s+/, $Parameters );		
+		if ( $Component == 1 ) {
+		    unshift( @Params, "Alpha" );
 		}
 		
-		$Shared = $All{"Sh_$Param"};
+# This is the counter for parameters of this component
+		my $NP=1;
+		$Shared = 0;
+# Change state/label of parameters
+		foreach my $Param (@Params) {
+		    my $Param_ORG = $Param;
+		    if ( $#FitTypes != 0 && ( $Param ne "Alpha" ) ){
+			$Param = join( "", $Param, "_", "$Component" );
+		    }
+		    
+		    $Shared = $All{"Sh_$Param"};
 # It there are multiple runs index the parameters accordingly
-		$Param=$Param."_".$iRun;
+		    $Param=$Param."_".$iRun;
 # Check if this parameter has been initialized befor. If not take from defaults
-#		print "$Param=".$All{"$Param"}."\n";
-		$value = $All{"$Param"};
-		if ( $value ne "" ) {
-		    $error    = $All{"$erradd$Param"};
-		    $minvalue = $All{"$Param$minadd"};
-		    $maxvalue = $All{"$Param$maxadd"};
-		} else {
+		    $value = $All{"$Param"};
+		    if ( $value ne "" ) {
+			$error    = $All{"$erradd$Param"};
+			$minvalue = $All{"$Param$minadd"};
+			$maxvalue = $All{"$Param$maxadd"};
+		    } else {
 # I need this although it is already in the MSR.pm module, just for this table
 # We can remove it from the MSR module later...
 # Or keep in the MSR as function ??
-		    $value = $Defaults{$Param_ORG};
-		    $error = $Defaults{ join( "", $erradd, $Param_ORG ) };
-		    $minvalue = $Defaults{ join("", $Param_ORG, $minadd ) };
-		    $maxvalue = $Defaults{ join("", $Param_ORG, $maxadd ) };
+			$value = $Defaults{$Param_ORG};
+			$error = $Defaults{ join( "", $erradd, $Param_ORG ) };
+			$minvalue = $Defaults{ join("", $Param_ORG, $minadd ) };
+			$maxvalue = $Defaults{ join("", $Param_ORG, $maxadd ) };
+		    }
+		    $values=join(",",$Param,$value,$error,$minvalue,$maxvalue);
+		    $ParTable{$PCount}=$values;
+		    
+		    if ( $Shared!=1 || $iRun == 1 ) {
+			$PCount++;
+		    }
+		    $NP++;
 		}
-		$values=join(",",$Param,$value,$error,$minvalue,$maxvalue);
-		$ParTable{$PCount}=$values;
-
-		if ( $Shared!=1 || $iRun == 1 ) {
-		    $PCount++;
-		}
-		$NP++;
+		$Component++;
 	    }
-	    $Component++;
+	} 
+	elsif ($All{"FitAsyType"} eq "SingleHist") {
+# For a single histogram fit we basically need to repeat this for each hist
+	    foreach my $Hist (@Hists) {
+		$Component=1;
+		foreach my $FitType (@FitTypes) {
+		    my $Parameters=$Paramcomp[$Component-1];
+		    my @Params = split( /\s+/, $Parameters );		
+		    if ( $Component == 1 ) {
+			unshift( @Params, ( "N0", "NBg" ) );
+		    }
+		
+# This is the counter for parameters of this component
+		    my $NP=1;
+		    $Shared = 0;
+# Change state/label of parameters
+		    foreach my $Param (@Params) {
+			my $Param_ORG = $Param;
+			$Param=$Param.$Hist;
+			if ( $#FitTypes != 0 && ( $Param_ORG ne "N0" && $Param_ORG ne "NBg" ) ){
+			    $Param = join( "", $Param, "_", "$Component" );
+			}
+			
+			$Shared = $All{"Sh_$Param"};
+# It there are multiple runs index the parameters accordingly
+			$Param=$Param."_".$iRun;
+# Check if this parameter has been initialized befor. If not take from defaults
+			$value = $All{"$Param"};
+			if ( $value ne "" ) {
+			    $error    = $All{"$erradd$Param"};
+			    $minvalue = $All{"$Param$minadd"};
+			    $maxvalue = $All{"$Param$maxadd"};
+			} else {
+# I need this although it is already in the MSR.pm module, just for this table
+# We can remove it from the MSR module later...
+# Or keep in the MSR as function ??
+			    $value = $Defaults{$Param_ORG};
+			    $error = $Defaults{ join( "", $erradd, $Param_ORG ) };
+			    $minvalue = $Defaults{ join("", $Param_ORG, $minadd ) };
+			    $maxvalue = $Defaults{ join("", $Param_ORG, $maxadd ) };
+			}
+			$values=join(",",$Param,$value,$error,$minvalue,$maxvalue);
+			$ParTable{$PCount}=$values;
+			if ( $Shared!=1 || $iRun == 1 ) {
+			    $PCount++;
+			}
+			$NP++;
+		    }
+		    $Component++;
+		}
+	    }
 	}
+
     }
     return %ParTable;
 }
