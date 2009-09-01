@@ -1235,4 +1235,144 @@ sub T0BgData {
 
 }
 
+########################
+# PrepParamTable
+# Function return a Hash with a table of parameters for the fit
+# input should be 
+# %All
+########################
+sub PrepParamTable { 
+# Take this information as input arguments
+# "Smart" default value of the fit parameters.
+    my %Defaults = (
+    "Asy",           "0.15",  "dAsy",          "0.01",
+    "Asy_min",       "0",     "Asy_max",       "0",
+    "Alpha",         "1.0",   "dAlpha",        "0.01",
+    "Alpha_min",     "0",     "Alpha_max",     "0",
+    "N0",            "300.0", "dN0",           "0.01",
+    "N0_min",        "0",     "N0_max",        "0",
+    "NBg",           "30.0",  "dNBg",          "0.01",
+    "NBg_min",       "0",     "NBg_max",       "0",
+    "Lam",           "1.0",   "dLam",          "0.01",
+    "Lam_min",       "0",     "Lam_max",       "0",
+    "Gam",           "1.0",   "dGam",          "0.01",
+    "Gam_min",       "0",     "Gam_max",       "0",
+    "Bet",           "0.5",   "dBet",          "0.01",
+    "Bet_min",       "0",     "Bet_max",       "0",
+    "Two",           "2.0",   "dTwo",          "0.0",
+    "Two_min",       "0",     "Two_max",       "0",
+    "Del",           "0.1",   "dDel",          "0.01",
+    "Del_min",       "0",     "Del_max",       "0",
+    "Sgm",           "0.1",   "dSgm",          "0.01",
+    "Sgm_min",       "0",     "Sgm_max",       "0",
+    "Aa",            "0.1",   "dAa",           "0.01",
+    "Aa_min",        "0",     "Aa_max",        "0",
+    "q",             "0.1",   "dq",            "0.01",
+    "q_min",         "0",     "q_max",         "0",
+    "Bg",            "0.036", "dBg",           "0.01",
+    "Bg_min",        "0",     "Bg_max",        "0",
+    "bgrlx",         "0.",    "dbgrlx",        "0.0",
+    "bgrlx_min",     "0",     "bgrlx_max",     "0",
+    "Frq",           "1.0",   "dFrq",          "1.",
+    "Frq_min",       "0",     "Frq_max",       "0",
+    "Field",         "100.0", "dField",        "1.",
+    "Field_min",     "0",     "Field_max",     "0",
+    "Energy",        "14.1",  "dEnergy",       "0.",
+    "Energy_min",    "0",     "Energy_max",    "0",
+    "DeadLayer",     "10.",   "dDeadLayer",    "0.1",
+    "DeadLayer_min", "0",     "DeadLayer_max", "0",
+    "Lambda",        "128.1", "dLambda",       "0.1",
+    "Lambda_min",    "0",     "Lambda_max",    "0",
+    "Phi",           "1.",    "dPhi",          "0.01",
+    "Phi_min",       "0",     "Phi_max",       "0"
+    );
+
+    my $erradd = "d";
+    my $minadd = "_min";
+    my $maxadd = "_max";
+   
+# First assume nothing is shared
+    my $Shared = 0;
+
+# Reset output Hash
+    %ParTable = ();
+ 
+    my %All = %{$_[0]};
+    my @RUNS = split( /,/, $All{"RunNumbers"} );
+
+    my @FitTypes =();
+    foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
+	if ( $FitType ne "None" ) { push( @FitTypes, $FitType ); }
+    }
+# Get theory block to determine the size of the table 
+    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
+# For now the line below does not work. Why?    
+#    my $Paramcomp_ref=$All{"Paramcomp_ref"};
+    my @Paramcomp = @$Paramcomp_ref;
+    my $Full_T_Block= $All{"Full_T_Block"};
+    my $PCount =0;
+    my $iRun =0;
+    my $value =0;
+    my $error    = 0;
+    my $minvalue = 0;
+    my $maxvalue = 0;
+    
+    foreach my $RUN (@RUNS) {
+	$iRun++;
+	my $Component=1;
+	foreach my $FitType (@FitTypes) {
+	    my $Parameters=$Paramcomp[$Component-1];
+	    my @Params = split( /\s+/, $Parameters );
+	
+	    if ( $Component == 1 && $All{"FitAsyType"} eq "Asymmetry" ) {
+		unshift( @Params, "Alpha" );
+	    }
+	    elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
+		unshift( @Params, ( "N0", "NBg" ) );
+	    }
+
+	    
+# This is the counter for parameters of this component
+	    my $NP=1;
+	    $Shared = 0;
+# Change state/label of parameters
+	    foreach my $Param (@Params) {
+		my $Param_ORG = $Param;
+		if ( $#FitTypes != 0 && (   $Param ne "Alpha" && $Param ne "N0" && $Param ne "NBg" ) ){
+		    $Param = join( "", $Param, "_", "$Component" );
+		}
+		
+		$Shared = $All{"Sh_$Param"};
+# It there are multiple runs index the parameters accordingly
+		$Param=$Param."_".$iRun;
+# Check if this parameter has been initialized befor. If not take from defaults
+#		print "$Param=".$All{"$Param"}."\n";
+		$value = $All{"$Param"};
+		if ( $value ne "" ) {
+		    $error    = $All{"$erradd$Param"};
+		    $minvalue = $All{"$Param$minadd"};
+		    $maxvalue = $All{"$Param$maxadd"};
+		} else {
+# I need this although it is already in the MSR.pm module, just for this table
+# We can remove it from the MSR module later...
+# Or keep in the MSR as function ??
+		    $value = $Defaults{$Param_ORG};
+		    $error = $Defaults{ join( "", $erradd, $Param_ORG ) };
+		    $minvalue = $Defaults{ join("", $Param_ORG, $minadd ) };
+		    $maxvalue = $Defaults{ join("", $Param_ORG, $maxadd ) };
+		}
+		$values=join(",",$Param,$value,$error,$minvalue,$maxvalue);
+		$ParTable{$PCount}=$values;
+
+		if ( $Shared!=1 || $iRun == 1 ) {
+		    $PCount++;
+		}
+		$NP++;
+	    }
+	    $Component++;
+	}
+    }
+    return %ParTable;
+}
+
 1;

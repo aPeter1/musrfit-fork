@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Mon Aug 31 17:50:38 2009
+# Created: Tue Sep 1 10:19:23 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -556,17 +556,18 @@ sub NEW
         setName("MuSRFitform" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
-    setMinimumSize(Qt::Size(21, 227) );
+    setMinimumSize(Qt::Size(582, 505) );
     setIcon($image0 );
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
+    my $MuSRFitformLayout = Qt::GridLayout(centralWidget(), 1, 1, 11, 6, '$MuSRFitformLayout');
 
     textLabel2_2 = Qt::Label(centralWidget(), "textLabel2_2");
-    textLabel2_2->setGeometry( Qt::Rect(13, 78, 55, 19) );
+
+    $MuSRFitformLayout->addWidget(textLabel2_2, 0, 0);
 
     musrfit_tabs = Qt::TabWidget(centralWidget(), "musrfit_tabs");
     musrfit_tabs->setEnabled( 1 );
-    musrfit_tabs->setGeometry( Qt::Rect(5, 0, 560, 400) );
     musrfit_tabs->setSizePolicy( Qt::SizePolicy(7, 7, 1, 1, musrfit_tabs->sizePolicy()->hasHeightForWidth()) );
     musrfit_tabs->setMinimumSize( Qt::Size(560, 400) );
     musrfit_tabs->setMaximumSize( Qt::Size(95, 32767) );
@@ -1154,6 +1155,8 @@ sub NEW
     ShowT0->setDefault( 1 );
     musrfit_tabs->insertTab( TabPage_3, "" );
 
+    $MuSRFitformLayout->addWidget(musrfit_tabs, 0, 0);
+
     fileNewAction= Qt::Action(this, "fileNewAction");
     fileNewAction->setIconSet( Qt::IconSet($image1) );
     fileOpenAction= Qt::Action(this, "fileOpenAction");
@@ -1212,7 +1215,6 @@ sub NEW
     MenuBar= Qt::MenuBar( this, "MenuBar");
 
     MenuBar->setEnabled( 1 );
-    MenuBar->setGeometry( Qt::Rect(0, 0, 574, 27) );
 
     fileMenu = Qt::PopupMenu( this );
     fileOpenAction->addTo( fileMenu );
@@ -1222,7 +1224,7 @@ sub NEW
     filePrintAction->addTo( fileMenu );
     fileMenu->insertSeparator();
     fileExitAction->addTo( fileMenu );
-    MenuBar->insertItem( "", fileMenu, 3 );
+    MenuBar->insertItem( "", fileMenu, 2 );
 
     editMenu = Qt::PopupMenu( this );
     editUndoAction->addTo( editMenu );
@@ -1231,24 +1233,24 @@ sub NEW
     editCutAction->addTo( editMenu );
     editCopyAction->addTo( editMenu );
     editPasteAction->addTo( editMenu );
-    MenuBar->insertItem( "", editMenu, 4 );
+    MenuBar->insertItem( "", editMenu, 3 );
 
     Options = Qt::PopupMenu( this );
     FileExistCheck->addTo( Options );
     MaualFile->addTo( Options );
-    MenuBar->insertItem( "", Options, 5 );
+    MenuBar->insertItem( "", Options, 4 );
 
     helpMenu = Qt::PopupMenu( this );
     helpContentsAction->addTo( helpMenu );
     helpIndexAction->addTo( helpMenu );
     helpMenu->insertSeparator();
     helpAboutAction->addTo( helpMenu );
-    MenuBar->insertItem( "", helpMenu, 6 );
+    MenuBar->insertItem( "", helpMenu, 5 );
 
-    MenuBar->insertSeparator( 7 );
+    MenuBar->insertSeparator( 6 );
 
     languageChange();
-    my $resize = Qt::Size(574, 485);
+    my $resize = Qt::Size(582, 505);
     $resize = $resize->expandedTo(minimumSizeHint());
     resize( $resize );
     clearWState( &Qt::WState_Polished );
@@ -1554,10 +1556,10 @@ sub languageChange
     Action_2->setText( trUtf8("Unnamed") );
     Action_3->setText( trUtf8("Unnamed") );
     toolBar->setLabel( trUtf8("Tools") );
-    MenuBar->findItem( 3 )->setText( trUtf8("&File") );
-    MenuBar->findItem( 4 )->setText( trUtf8("&Edit") );
-    MenuBar->findItem( 5 )->setText( trUtf8("Options") );
-    MenuBar->findItem( 6 )->setText( trUtf8("&Help") );
+    MenuBar->findItem( 2 )->setText( trUtf8("&File") );
+    MenuBar->findItem( 3 )->setText( trUtf8("&Edit") );
+    MenuBar->findItem( 4 )->setText( trUtf8("Options") );
+    MenuBar->findItem( 5 )->setText( trUtf8("&Help") );
 }
 
 
@@ -2049,74 +2051,8 @@ sub ActivateShComp
 sub InitializeTab
 {
 
-# "Smart" default value of the fit parameters.
-    my %Defaults = (
-    "Asy",           "0.15",  "dAsy",          "0.01",
-    "Asy_min",       "0",     "Asy_max",       "0",
-    "Alpha",         "1.0",   "dAlpha",        "0.01",
-    "Alpha_min",     "0",     "Alpha_max",     "0",
-    "N0",            "300.0", "dN0",           "0.01",
-    "N0_min",        "0",     "N0_max",        "0",
-    "NBg",           "30.0",  "dNBg",          "0.01",
-    "NBg_min",       "0",     "NBg_max",       "0",
-    "Lam",           "1.0",   "dLam",          "0.01",
-    "Lam_min",       "0",     "Lam_max",       "0",
-    "Gam",           "1.0",   "dGam",          "0.01",
-    "Gam_min",       "0",     "Gam_max",       "0",
-    "Bet",           "0.5",   "dBet",          "0.01",
-    "Bet_min",       "0",     "Bet_max",       "0",
-    "Two",           "2.0",   "dTwo",          "0.0",
-    "Two_min",       "0",     "Two_max",       "0",
-    "Del",           "0.1",   "dDel",          "0.01",
-    "Del_min",       "0",     "Del_max",       "0",
-    "Sgm",           "0.1",   "dSgm",          "0.01",
-    "Sgm_min",       "0",     "Sgm_max",       "0",
-    "Aa",            "0.1",   "dAa",           "0.01",
-    "Aa_min",        "0",     "Aa_max",        "0",
-    "q",             "0.1",   "dq",            "0.01",
-    "q_min",         "0",     "q_max",         "0",
-    "Bg",            "0.036", "dBg",           "0.01",
-    "Bg_min",        "0",     "Bg_max",        "0",
-    "bgrlx",         "0.",    "dbgrlx",        "0.0",
-    "bgrlx_min",     "0",     "bgrlx_max",     "0",
-    "Frq",           "1.0",   "dFrq",          "1.",
-    "Frq_min",       "0",     "Frq_max",       "0",
-    "Field",         "100.0", "dField",        "1.",
-    "Field_min",     "0",     "Field_max",     "0",
-    "Energy",        "14.1",  "dEnergy",       "0.",
-    "Energy_min",    "0",     "Energy_max",    "0",
-    "DeadLayer",     "10.",   "dDeadLayer",    "0.1",
-    "DeadLayer_min", "0",     "DeadLayer_max", "0",
-    "Lambda",        "128.1", "dLambda",       "0.1",
-    "Lambda_min",    "0",     "Lambda_max",    "0",
-    "Phi",           "1.",    "dPhi",          "0.01",
-    "Phi_min",       "0",     "Phi_max",       "0"
-    );
-
-   my $erradd = "d";
-   my $minadd = "_min";
-   my $maxadd = "_max";
-   
-# First assume nothing is shared
-   my $Shared = 0;
- 
-   my %All=CreateAllInput();
-   my @RUNS = split( /,/, $All{"RunNumbers"} );
-
-    my @FitTypes =();
-    foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
-	if ( $FitType ne "None" ) { push( @FitTypes, $FitType ); }
-    }
-    
+    my %All=CreateAllInput();
     InitParamTable->setLeftMargin(100);
-		    
-# Get theory block to determine the size of the table 
-    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
-# For now the line below does not work. Why?    
-#    my $Paramcomp_ref=$All{"Paramcomp_ref"};
-    my @Paramcomp = @$Paramcomp_ref;
-    my $Full_T_Block= $All{"Full_T_Block"};
-  
     my $NRows = InitParamTable->numRows();
 
 # Remove any rows in table
@@ -2126,77 +2062,26 @@ sub InitializeTab
 	    InitParamTable->hideRow($i);
 	}
     }
-
-    my $PCount =0;
-    my $iRun =0;
-    my $value =0;
-    my $error    = 0;
-    my $minvalue = 0;
-    my $maxvalue = 0;
     
-    foreach my $RUN (@RUNS) {
-	$iRun++;
-	my $Component=1;
-	foreach my $FitType (@FitTypes) {
-	    my $Parameters=$Paramcomp[$Component-1];
-	    my @Params = split( /\s+/, $Parameters );
-	
-	    if ( $Component == 1 && $All{"FitAsyType"} eq "Asymmetry" ) {
-		unshift( @Params, "Alpha" );
-	    }
-	    elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
-		unshift( @Params, ( "N0", "NBg" ) );
-	    }
-
-	    
-# This is the counter for parameters of this component
-	    my $NP=1;
-	    $Shared = 0;
-# Change state/label of parameters
-	    foreach my $Param (@Params) {
-		my $Param_ORG = $Param;
-		if ( $#FitTypes != 0 && (   $Param ne "Alpha" && $Param ne "N0" && $Param ne "NBg" ) ){
-		    $Param = join( "", $Param, "_", "$Component" );
-		}
-		
-		$Shared = $All{"Sh_$Param"};
-# It there are multiple runs index the parameters accordingly
-		$Param=$Param."_".$iRun;
-# Check if this parameter has been initialized befor. If not take from defaults
-#		print "$Param=".$All{"$Param"}."\n";
-		$value = $All{"$Param"};
-		if ( $value ne "" ) {
-		    $error    = $All{"$erradd$Param"};
-		    $minvalue = $All{"$Param$minadd"};
-		    $maxvalue = $All{"$Param$maxadd"};
-		} else {
-# I need this although it is already in the MSR.pm module, just for this table
-# We can remove it from the MSR module later...
-		    $value = $Defaults{$Param_ORG};
-		    $error = $Defaults{ join( "", $erradd, $Param_ORG ) };
-		    $minvalue = $Defaults{ join("", $Param_ORG, $minadd ) };
-		    $maxvalue = $Defaults{ join("", $Param_ORG, $maxadd ) };
-		}
-		
-		if ( $Shared!=1 || $iRun == 1 ) {
-		    $PCount++;
-			
-# Add row in table, set its label and fill the values of parametr 	    
-		    if ($PCount>$NRows) {	
-			InitParamTable->setNumRows($PCount);
-		    }
-		    InitParamTable->verticalHeader()->setLabel( $PCount-1,$Param);
-		    InitParamTable->showRow($PCount-1);
-		    InitParamTable->setText($PCount-1,0,$value);
-		    InitParamTable->setText($PCount-1,1,$error);
-		    InitParamTable->setText($PCount-1,2,$minvalue);
-		    InitParamTable->setText($PCount-1,3,$maxvalue);
-		}
-		$NP++;
-	    }#Loop on parameters
-	    $Component++;
-	}# Loop on components
-    }# Loop on runs
+    my %PTable=MSR::PrepParamTable(\%All);
+    
+# Setup the table with the right size    
+    my $NParam=scalar keys( %PTable );
+    print "Size of P:".$NParam."\n";
+    if ($NParam>$NRows) {	
+	InitParamTable->setNumRows($NParam);
+    }
+    
+# Fill the table with labels and values of parametr 
+    for (my $PCount=0;$PCount<$NParam;$PCount++) {
+	my ($Param,$value,$error,$minvalue,$maxvalue) = split(/,/,$PTable{$PCount});
+	InitParamTable->verticalHeader()->setLabel( $PCount,$Param);
+	InitParamTable->showRow($PCount);
+	InitParamTable->setText($PCount,0,$value);
+	InitParamTable->setText($PCount,1,$error);
+	InitParamTable->setText($PCount,2,$minvalue);
+	InitParamTable->setText($PCount,3,$maxvalue);
+    }
 
 }
 
