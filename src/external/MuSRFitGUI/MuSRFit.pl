@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Tue Sep 1 22:56:56 2009
+# Created: Wed Sep 2 22:02:54 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -38,9 +38,9 @@ use Qt::slots
     GoPlot => [],
     ShowMuSRT0 => [],
     T0Update => [],
-    RunSelectionToggle => [];
+    RunSelectionToggle => [],
+    fileBrowse => [];
 use Qt::attributes qw(
-    textLabel2_2
     musrfit_tabs
     RUNSPage
     TITLELabel
@@ -48,6 +48,8 @@ use Qt::attributes qw(
     FILENAMELabel
     FILENAME
     RUNSelection
+    textLabel1_4
+    RUNSAuto
     RunFiles
     Browse
     RunNumbers
@@ -55,7 +57,6 @@ use Qt::attributes qw(
     BeamLine
     YEARLabel
     YEAR
-    RUNSAuto
     RUNSManual
     ComponentsLabel
     Comp1Label
@@ -568,17 +569,14 @@ sub NEW
         setName("MuSRFitform" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
-    setMinimumSize(Qt::Size(23, 222) );
+    setMinimumSize(Qt::Size(582, 505) );
     setIcon($image0 );
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
-
-    textLabel2_2 = Qt::Label(centralWidget(), "textLabel2_2");
-    textLabel2_2->setGeometry( Qt::Rect(13, 78, 55, 19) );
+    my $MuSRFitformLayout = Qt::VBoxLayout(centralWidget(), 11, 6, '$MuSRFitformLayout');
 
     musrfit_tabs = Qt::TabWidget(centralWidget(), "musrfit_tabs");
     musrfit_tabs->setEnabled( 1 );
-    musrfit_tabs->setGeometry( Qt::Rect(11, 1, 560, 420) );
     musrfit_tabs->setSizePolicy( Qt::SizePolicy(7, 7, 1, 1, musrfit_tabs->sizePolicy()->hasHeightForWidth()) );
     musrfit_tabs->setMinimumSize( Qt::Size(560, 400) );
     musrfit_tabs->setMaximumSize( Qt::Size(95, 32767) );
@@ -586,16 +584,16 @@ sub NEW
     RUNSPage = Qt::Widget(musrfit_tabs, "RUNSPage");
 
     my $LayoutWidget = Qt::Widget(RUNSPage, '$LayoutWidget');
-    $LayoutWidget->setGeometry( Qt::Rect(5, 6, 550, 378) );
-    my $layout36 = Qt::VBoxLayout($LayoutWidget, 11, 6, '$layout36');
+    $LayoutWidget->setGeometry( Qt::Rect(1, 2, 555, 380) );
+    my $layout28 = Qt::VBoxLayout($LayoutWidget, 4, 0, '$layout28');
 
     TITLELabel = Qt::Label($LayoutWidget, "TITLELabel");
     TITLELabel->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, TITLELabel->sizePolicy()->hasHeightForWidth()) );
-    $layout36->addWidget(TITLELabel);
+    $layout28->addWidget(TITLELabel);
 
     TITLE = Qt::LineEdit($LayoutWidget, "TITLE");
     TITLE->setSizePolicy( Qt::SizePolicy(5, 0, 1, 1, TITLE->sizePolicy()->hasHeightForWidth()) );
-    $layout36->addWidget(TITLE);
+    $layout28->addWidget(TITLE);
 
     my $layout17 = Qt::HBoxLayout(undef, 0, 6, '$layout17');
 
@@ -605,15 +603,22 @@ sub NEW
     FILENAME = Qt::LineEdit($LayoutWidget, "FILENAME");
     FILENAME->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, FILENAME->sizePolicy()->hasHeightForWidth()) );
     $layout17->addWidget(FILENAME);
-    $layout36->addLayout($layout17);
+    $layout28->addLayout($layout17);
 
     RUNSelection = Qt::ButtonGroup($LayoutWidget, "RUNSelection");
     RUNSelection->setMargin( int(0) );
     RUNSelection->setExclusive( 1 );
 
+    textLabel1_4 = Qt::Label(RUNSelection, "textLabel1_4");
+    textLabel1_4->setGeometry( Qt::Rect(11, 64, 181, 36) );
+
+    RUNSAuto = Qt::RadioButton(RUNSelection, "RUNSAuto");
+    RUNSAuto->setGeometry( Qt::Rect(10, 45, 180, 22) );
+    RUNSAuto->setChecked( 1 );
+
     my $LayoutWidget_2 = Qt::Widget(RUNSelection, '$LayoutWidget_2');
-    $LayoutWidget_2->setGeometry( Qt::Rect(190, 2, 335, 101) );
-    my $layout38 = Qt::VBoxLayout($LayoutWidget_2, 11, 6, '$layout38');
+    $LayoutWidget_2->setGeometry( Qt::Rect(196, 3, 340, 96) );
+    my $layout26 = Qt::VBoxLayout($LayoutWidget_2, 11, 6, '$layout26');
 
     my $layout37 = Qt::HBoxLayout(undef, 0, 6, '$layout37');
 
@@ -626,11 +631,11 @@ sub NEW
     Browse->setEnabled( 0 );
     Browse->setSizePolicy( Qt::SizePolicy(0, 5, 0, 0, Browse->sizePolicy()->hasHeightForWidth()) );
     $layout37->addWidget(Browse);
-    $layout38->addLayout($layout37);
+    $layout26->addLayout($layout37);
 
     RunNumbers = Qt::LineEdit($LayoutWidget_2, "RunNumbers");
     RunNumbers->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, RunNumbers->sizePolicy()->hasHeightForWidth()) );
-    $layout38->addWidget(RunNumbers);
+    $layout26->addWidget(RunNumbers);
 
     my $layout35 = Qt::HBoxLayout(undef, 0, 6, '$layout35');
 
@@ -647,18 +652,14 @@ sub NEW
     YEAR = Qt::ComboBox(0, $LayoutWidget_2, "YEAR");
     YEAR->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, YEAR->sizePolicy()->hasHeightForWidth()) );
     $layout35->addWidget(YEAR);
-    $layout38->addLayout($layout35);
-
-    RUNSAuto = Qt::RadioButton(RUNSelection, "RUNSAuto");
-    RUNSAuto->setGeometry( Qt::Rect(12, 42, 175, 22) );
-    RUNSAuto->setChecked( 1 );
+    $layout26->addLayout($layout35);
 
     RUNSManual = Qt::RadioButton(RUNSelection, "RUNSManual");
-    RUNSManual->setGeometry( Qt::Rect(12, 12, 175, 22) );
-    $layout36->addWidget(RUNSelection);
+    RUNSManual->setGeometry( Qt::Rect(10, 15, 180, 22) );
+    $layout28->addWidget(RUNSelection);
 
     ComponentsLabel = Qt::Label($LayoutWidget, "ComponentsLabel");
-    $layout36->addWidget(ComponentsLabel);
+    $layout28->addWidget(ComponentsLabel);
 
     my $layout19 = Qt::GridLayout(undef, 1, 1, 0, 6, '$layout19');
 
@@ -691,7 +692,7 @@ sub NEW
     Comp2Label = Qt::Label($LayoutWidget, "Comp2Label");
 
     $layout19->addWidget(Comp2Label, 0, 1);
-    $layout36->addLayout($layout19);
+    $layout28->addLayout($layout19);
 
     my $layout20 = Qt::GridLayout(undef, 1, 1, 0, 6, '$layout20');
 
@@ -721,7 +722,7 @@ sub NEW
     TisLabel = Qt::Label($LayoutWidget, "TisLabel");
 
     $layout20->addWidget(TisLabel, 0, 0);
-    $layout36->addLayout($layout20);
+    $layout28->addLayout($layout20);
 
     my $layout23 = Qt::HBoxLayout(undef, 0, 6, '$layout23');
 
@@ -737,7 +738,7 @@ sub NEW
     LRBF = Qt::LineEdit($LayoutWidget, "LRBF");
     LRBF->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, LRBF->sizePolicy()->hasHeightForWidth()) );
     $layout23->addWidget(LRBF);
-    $layout36->addLayout($layout23);
+    $layout28->addLayout($layout23);
     musrfit_tabs->insertTab( RUNSPage, "" );
 
     SharingPahe = Qt::Widget(musrfit_tabs, "SharingPahe");
@@ -980,7 +981,7 @@ sub NEW
 
     my $LayoutWidget_6 = Qt::Widget(TabPage, '$LayoutWidget_6');
     $LayoutWidget_6->setGeometry( Qt::Rect(418, 5, 125, 120) );
-    my $layout28 = Qt::VBoxLayout($LayoutWidget_6, 11, 6, '$layout28');
+    my $layout28_2 = Qt::VBoxLayout($LayoutWidget_6, 11, 6, '$layout28_2');
 
     go = Qt::PushButton($LayoutWidget_6, "go");
     go->setSizePolicy( Qt::SizePolicy(7, 0, 1, 0, go->sizePolicy()->hasHeightForWidth()) );
@@ -988,7 +989,7 @@ sub NEW
     go->setMaximumSize( Qt::Size(95, 30) );
     go->setAutoDefault( 0 );
     go->setDefault( 1 );
-    $layout28->addWidget(go);
+    $layout28_2->addWidget(go);
 
     PlotMSR = Qt::PushButton($LayoutWidget_6, "PlotMSR");
     PlotMSR->setSizePolicy( Qt::SizePolicy(7, 0, 1, 0, PlotMSR->sizePolicy()->hasHeightForWidth()) );
@@ -996,7 +997,7 @@ sub NEW
     PlotMSR->setMaximumSize( Qt::Size(95, 30) );
     PlotMSR->setAutoDefault( 0 );
     PlotMSR->setDefault( 1 );
-    $layout28->addWidget(PlotMSR);
+    $layout28_2->addWidget(PlotMSR);
 
     FitTextOutput = Qt::TextEdit(TabPage, "FitTextOutput");
     FitTextOutput->setGeometry( Qt::Rect(5, 135, 545, 230) );
@@ -1009,17 +1010,17 @@ sub NEW
     $LayoutWidget_7->setGeometry( Qt::Rect(5, 5, 545, 94) );
     my $layout33 = Qt::HBoxLayout($LayoutWidget_7, 11, 6, '$layout33');
 
-    my $layout26 = Qt::VBoxLayout(undef, 0, 6, '$layout26');
+    my $layout26_2 = Qt::VBoxLayout(undef, 0, 6, '$layout26_2');
 
     FUnitsLabel = Qt::Label($LayoutWidget_7, "FUnitsLabel");
-    $layout26->addWidget(FUnitsLabel);
+    $layout26_2->addWidget(FUnitsLabel);
 
     FApodizationLabel = Qt::Label($LayoutWidget_7, "FApodizationLabel");
-    $layout26->addWidget(FApodizationLabel);
+    $layout26_2->addWidget(FApodizationLabel);
 
     FPlotLabel = Qt::Label($LayoutWidget_7, "FPlotLabel");
-    $layout26->addWidget(FPlotLabel);
-    $layout33->addLayout($layout26);
+    $layout26_2->addWidget(FPlotLabel);
+    $layout33->addLayout($layout26_2);
 
     my $layout27 = Qt::VBoxLayout(undef, 0, 6, '$layout27');
 
@@ -1036,17 +1037,17 @@ sub NEW
     $layout27->addWidget(FPlot);
     $layout33->addLayout($layout27);
 
-    my $layout28_2 = Qt::VBoxLayout(undef, 0, 6, '$layout28_2');
+    my $layout28_3 = Qt::VBoxLayout(undef, 0, 6, '$layout28_3');
 
     textLabel1 = Qt::Label($LayoutWidget_7, "textLabel1");
-    $layout28_2->addWidget(textLabel1);
+    $layout28_3->addWidget(textLabel1);
 
     textLabel1_3 = Qt::Label($LayoutWidget_7, "textLabel1_3");
-    $layout28_2->addWidget(textLabel1_3);
+    $layout28_3->addWidget(textLabel1_3);
 
     textLabel1_3_5 = Qt::Label($LayoutWidget_7, "textLabel1_3_5");
-    $layout28_2->addWidget(textLabel1_3_5);
-    $layout33->addLayout($layout28_2);
+    $layout28_3->addWidget(textLabel1_3_5);
+    $layout33->addLayout($layout28_3);
 
     my $layout29 = Qt::VBoxLayout(undef, 0, 6, '$layout29');
 
@@ -1219,6 +1220,7 @@ sub NEW
     ShowT0->setAutoDefault( 0 );
     ShowT0->setDefault( 1 );
     musrfit_tabs->insertTab( TabPage_3, "" );
+    $MuSRFitformLayout->addWidget(musrfit_tabs);
 
     fileNewAction= Qt::Action(this, "fileNewAction");
     fileNewAction->setIconSet( Qt::IconSet($image1) );
@@ -1278,7 +1280,6 @@ sub NEW
     MenuBar= Qt::MenuBar( this, "MenuBar");
 
     MenuBar->setEnabled( 1 );
-    MenuBar->setGeometry( Qt::Rect(0, 0, 582, 25) );
 
     fileMenu = Qt::PopupMenu( this );
     fileOpenAction->addTo( fileMenu );
@@ -1288,7 +1289,7 @@ sub NEW
     filePrintAction->addTo( fileMenu );
     fileMenu->insertSeparator();
     fileExitAction->addTo( fileMenu );
-    MenuBar->insertItem( "", fileMenu, 3 );
+    MenuBar->insertItem( "", fileMenu, 2 );
 
     editMenu = Qt::PopupMenu( this );
     editUndoAction->addTo( editMenu );
@@ -1297,21 +1298,21 @@ sub NEW
     editCutAction->addTo( editMenu );
     editCopyAction->addTo( editMenu );
     editPasteAction->addTo( editMenu );
-    MenuBar->insertItem( "", editMenu, 4 );
+    MenuBar->insertItem( "", editMenu, 3 );
 
     Options = Qt::PopupMenu( this );
     FileExistCheck->addTo( Options );
     MaualFile->addTo( Options );
-    MenuBar->insertItem( "", Options, 5 );
+    MenuBar->insertItem( "", Options, 4 );
 
     helpMenu = Qt::PopupMenu( this );
     helpContentsAction->addTo( helpMenu );
     helpIndexAction->addTo( helpMenu );
     helpMenu->insertSeparator();
     helpAboutAction->addTo( helpMenu );
-    MenuBar->insertItem( "", helpMenu, 6 );
+    MenuBar->insertItem( "", helpMenu, 5 );
 
-    MenuBar->insertSeparator( 7 );
+    MenuBar->insertSeparator( 6 );
 
     languageChange();
     my $resize = Qt::Size(582, 505);
@@ -1339,6 +1340,7 @@ sub NEW
     Qt::Object::connect(BeamLine, SIGNAL "activated(int)", this, SLOT "T0Update()");
     Qt::Object::connect(InitParamTable, SIGNAL "valueChanged(int,int)", this, SLOT "CallMSRCreate()");
     Qt::Object::connect(RUNSManual, SIGNAL "toggled(bool)", this, SLOT "RunSelectionToggle()");
+    Qt::Object::connect(Browse, SIGNAL "clicked()", this, SLOT "fileBrowse()");
 
     setTabOrder(musrfit_tabs, TITLE);
     setTabOrder(TITLE, FILENAME);
@@ -1387,12 +1389,13 @@ sub languageChange
 {
     setCaption(trUtf8("MuSRFit GUI") );
     setIconText(trUtf8("MuSRFitGUI") );
-    textLabel2_2->setText( trUtf8("Bg1") );
     TITLELabel->setText( trUtf8("Enter the label (defaul is run title from the first run)") );
     TITLE->setText( trUtf8("","Title line for MSR file (optional)") );
     Qt::ToolTip::add(TITLE, trUtf8("Title line for MSR file (optional)"));
     FILENAMELabel->setText( trUtf8("Enter [name] for output [name].msr file (optional)") );
     RUNSelection->setTitle( undef );
+    textLabel1_4->setText( undef );
+    RUNSAuto->setText( trUtf8("Input the RUN numbers") );
     Browse->setText( trUtf8("Browse") );
     BeamLineLabel->setText( trUtf8("On beam line") );
     BeamLine->clear();
@@ -1408,7 +1411,6 @@ sub languageChange
     YEAR->insertItem( trUtf8("2006") );
     YEAR->insertItem( trUtf8("2005") );
     YEAR->insertItem( trUtf8("2004") );
-    RUNSAuto->setText( trUtf8("Input the RUN numbers") );
     RUNSManual->setText( trUtf8("Select RUNs Manually") );
     ComponentsLabel->setText( trUtf8("Chose type of fitting function") );
     Comp1Label->setText( trUtf8("First Component") );
@@ -1630,10 +1632,10 @@ sub languageChange
     Action_2->setText( trUtf8("Unnamed") );
     Action_3->setText( trUtf8("Unnamed") );
     toolBar->setLabel( trUtf8("Tools") );
-    MenuBar->findItem( 3 )->setText( trUtf8("&File") );
-    MenuBar->findItem( 4 )->setText( trUtf8("&Edit") );
-    MenuBar->findItem( 5 )->setText( trUtf8("Options") );
-    MenuBar->findItem( 6 )->setText( trUtf8("&Help") );
+    MenuBar->findItem( 2 )->setText( trUtf8("&File") );
+    MenuBar->findItem( 3 )->setText( trUtf8("&Edit") );
+    MenuBar->findItem( 4 )->setText( trUtf8("Options") );
+    MenuBar->findItem( 5 )->setText( trUtf8("&Help") );
 }
 
 
@@ -1779,17 +1781,26 @@ sub CreateAllInput
     $All{"TITLE"}= TITLE->text;
     $All{"FILENAME"}= FILENAME->text;
     $All{"RunNumbers"} = RunNumbers->text;
+    $All{"RunFiles"} = RunFiles->text;
     $All{"BeamLine"} = BeamLine->currentText;
+    $All{"RUNSType"} = RUNSManual->isChecked();
     $All{"YEAR"} =YEAR->currentText;
     $All{"Tis"} = Tis->text;
     $All{"Tfs"} = Tfs->text;
     $All{"BINS"} = BINS->text;
     $All{"FitAsyType"} = FitAsyType->currentText;
     $All{"LRBF"} = LRBF->text;
-    $All{"RunNumbers"} =~ s/[\ \.\~\/\&\*\[\;\>\<\^\$\(\)\`\|\]\'\@]/,/g;
-    my @RUNS = split( /,/, $All{"RunNumbers"} );
-    my @Hists = split(/,/, $All{"LRBF"} );
     
+    my @RUNS = ();
+    if ($All{"RUNSType"} ) {
+	@RUNS = split( /,/, $All{"RunFiles"});
+    } else {
+	$All{"RunNumbers"} =~ s/[\ \.\~\/\&\*\[\;\>\<\^\$\(\)\`\|\]\'\@]/,/g;
+	@RUNS = split( /,/, $All{"RunNumbers"} );	
+    }
+    
+    my @Hists = split(/,/, $All{"LRBF"} );
+        
 # From Fourier Tab
     $All{"FUNITS"}= FUnits->currentText;
     $All{"FAPODIZATION"}= FApodization->currentText;
@@ -1911,14 +1922,18 @@ sub CreateAllInput
 	    }
 	    $All{"Sh_$Param"}=$Shared;
 	    $NP++;
-	}#Loop on parameters
-                $Component++;
-      }# Loop on components
+	}
+#Loop on parameters
+	$Component++;
+    }
+# Loop on components
 # Done with shared parameters detecting
 
 # Construct a default filename if empty
-    if ( $All{"FILENAME"} eq "") {
+    if ( $All{"FILENAME"} eq ""  && !$All{"RUNSType"}) {
 	$All{"FILENAME"}=$RUNS[0]."_".$All{"BeamLine"}."_".$All{"YEAR"};
+    } else {
+	$All{"FILENAME"}="TMP";
     }
 
     if ( $All{"go"} eq "" ) {
@@ -1961,7 +1976,7 @@ sub CallMSRCreate
 
     use MSR;
     my %All=CreateAllInput();
-    if ($All{"RunNumbers"} ne "") {
+    if ($All{"RunNumbers"} ne ""  || $All{"RunFiles"} ne "") {
 	if ( $All{"FitAsyType"} eq "Asymmetry" ) {
 	    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
 	}
@@ -2276,7 +2291,40 @@ sub T0Update
 sub RunSelectionToggle
 {
 
+    my $RUNSType = RUNSManual->isChecked();
+    if ($RUNSType) {
+# Manual RUN selection
+	RunFiles->setEnabled(1);
+	Browse->setEnabled(1);
+	RunNumbers->setEnabled(0);
+	RunNumbers->setText("");
+	BeamLine->setEnabled(0);
+	YEAR->setEnabled(0);
+    } else {
+# Auto RUN selection
+	RunFiles->setEnabled(0);
+	RunFiles->setText("");
+	Browse->setEnabled(0);
+	RunNumbers->setEnabled(1);
+	BeamLine->setEnabled(1);
+	YEAR->setEnabled(1);
+    }
     print "Toggle selection\n";
+
+}
+
+sub fileBrowse
+{
+
+    my $files_ref=Qt::FileDialog::getOpenFileNames(
+	    "Data files (*.root *.bin)",
+	    "./",
+	    this,
+	    "open files dialog",
+	    "Select one or more files to fit");
+    my @files = @$files_ref;
+    my $RunFiles=join(",",@files);
+    RunFiles->setText($RunFiles);
 
 }
 

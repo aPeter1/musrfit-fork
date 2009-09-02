@@ -97,17 +97,18 @@ sub CreateMSR {
     my $iRun = 1;
 
     # Counter of Params
-    my $j = 1;
+    my $PCount = 1;
 
     # Need to select here RUNSAuto or RUNSManual
     # $RUNSType = 0 (Auto) or 1 (Manual)
     my $RUNSType = 0;
+    my @RUNS=();
     if ($All{"RunNumbers"} ne "") {
-	my @RUNS=split( /,/, $All{"RunNumbers"});
+	@RUNS=split( /,/, $All{"RunNumbers"});
 	$RUNSType = 0;
     }
     elsif ($All{"RunFiles"} ne "") {
-	my @RUNS=split( /,/, $All{"RunFiles"});
+	@RUNS=split( /,/, $All{"RunFiles"});
 	$RUNSType = 1;
     }
 
@@ -181,7 +182,7 @@ sub CreateMSR {
                     }
                     else {
                         # Otherwise modify alpha line accordingly
-                        $Alpha_Line = "alpha           $j\n";
+                        $Alpha_Line = "alpha           $PCount\n";
                     }
                 }
 
@@ -193,9 +194,9 @@ sub CreateMSR {
 
                     # Parameter is shared enough to keep order from first run
                     if ( $iRun == 1 ) {
-                        $Full_T_Block =~ s/$Param_ORG/$j/;
+                        $Full_T_Block =~ s/$Param_ORG/$PCount/;
                         ++$shcount;
-                        ++$j;
+                        ++$PCount;
                     }
                 } else {
 		    # Parameter is not shared, use map unless it is a single RUN fit
@@ -204,11 +205,11 @@ sub CreateMSR {
                     {
                         ++$nonsh;
                         $Full_T_Block =~ s/$Param_ORG/map$nonsh/;
-                        $MAP_Line = join( ' ', $MAP_Line, $j );
+                        $MAP_Line = join( ' ', $MAP_Line, $PCount );
                     }
-                    ++$j;
+                    ++$PCount;
                 }
-                $NtotPar = $j;
+                $NtotPar = $PCount;
             }
         }
 
@@ -221,10 +222,11 @@ sub CreateMSR {
 
         $RUN = $RUNS[ $iRun - 1 ];
 
-	$RUNFILE = MSR::RUNFileName($RUN,$YEAR,$BeamLine);
-	$RUN_Line = join( $SPACE,
-			  "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
-			  $Def_Format{$BeamLine} );
+	if ($All{"RUNSType"}) {
+	    $RUN_Line = MSR::RUNFileNameMan($RUN);
+	} else {
+	    $RUN_Line = MSR::RUNFileNameAuto($RUN,$YEAR,$BeamLine);
+	}
 
 	$Type_Line = "fittype         2";
 	$PLT       = 2;
@@ -292,15 +294,15 @@ FITPARAMETER
     my %PTable=MSR::PrepParamTable(\%All);
     my $NParam=scalar keys( %PTable );
 # Fill the table with labels and values of parametr 
-    for (my $PCount=0;$PCount<$NParam;$PCount++) {
-	my ($Param,$value,$error,$minvalue,$maxvalue) = split(/,/,$PTable{$PCount});
+    for (my $iP=0;$iP<$NParam;$iP++) {
+	my ($Param,$value,$error,$minvalue,$maxvalue) = split(/,/,$PTable{$iP});
 	if ( $minvalue == $maxvalue ) {
 	    $minvalue = $EMPTY;
 	    $maxvalue = $EMPTY;
 	}
-	$j=$PCount+1;
+	$PCount=$iP+1;
 	$FitParaBlk = $FitParaBlk."
-      $j      $Param    $value     $error    $error    $minvalue    $maxvalue";
+      $PCount      $Param    $value     $error    $error    $minvalue    $maxvalue";
     }
 
 
@@ -418,24 +420,24 @@ sub CreateMSRSingleHist {
 
     # First create the THEORY Block
     my ($Full_T_Block,$Paramcomp_ref)=MSR::CreateTheory(@FitTypes);
-
     my @Paramcomp = @$Paramcomp_ref;
 
     # Counter for RUNS
     my $iRun = 1;
 
     # Counter of Params
-    my $j = 1;
+    my $PCount = 1;
 
     # Need to select here RUNSAuto or RUNSManual
     # $RUNSType = 0 (Auto) or 1 (Manual)
     my $RUNSType = 0;
+    my @RUNS=();
     if ($All{"RunNumbers"} ne "") {
-	my @RUNS=split( /,/, $All{"RunNumbers"});
+	@RUNS=split( /,/, $All{"RunNumbers"});
 	$RUNSType = 0;
     }
     elsif ($All{"RunFiles"} ne "") {
-	my @RUNS=split( /,/, $All{"RunFiles"});
+	@RUNS=split( /,/, $All{"RunFiles"});
 	$RUNSType = 1;
     }
 
@@ -512,7 +514,7 @@ sub CreateMSRSingleHist {
 			    $N0Bg_Line = "norm            1\n";
 			}
 			else {
-			    $N0Bg_Line = "norm            $j\n";
+			    $N0Bg_Line = "norm            $PCount\n";
 			}
 			
 			# Optional - add lifetime correction for SingleHist fits
@@ -527,7 +529,7 @@ sub CreateMSRSingleHist {
 			    $N0Bg_Line = $N0Bg_Line . "backgr.fit      2\n";
 			}
 			else {
-			    $N0Bg_Line = $N0Bg_Line . "backgr.fit      $j\n";
+			    $N0Bg_Line = $N0Bg_Line . "backgr.fit      $PCount\n";
 			}
 		    }
 
@@ -538,9 +540,9 @@ sub CreateMSRSingleHist {
 		    if ($Shared) {
 			# Parameter is shared enough to keep order from first run
 			if ( $iRun == 1 ) {
-			    $Full_T_Block =~ s/$Param_ORG/$j/;
+			    $Full_T_Block =~ s/$Param_ORG/$PCount/;
 			    ++$shcount;
-			    ++$j;
+			    ++$PCount;
 			}
 		    } else {
 			# Parameter is not shared, use map unless it is a single RUN fit
@@ -548,11 +550,11 @@ sub CreateMSRSingleHist {
 			if ( $Param ne "N0" && $Param ne "NBg" && ($#RUNS != 0 || $#Hist != 0)) {
 			    ++$nonsh;
 			    $Full_T_Block =~ s/$Param_ORG/map$nonsh/;
-			    $MAP_Line = join( ' ', $MAP_Line, $j );
+			    $MAP_Line = join( ' ', $MAP_Line, $PCount );
 			}
-			++$j;
+			++$PCount;
 		    }
-		    $NtotPar = $j;
+		    $NtotPar = $PCount;
 		}
 	    }
 
@@ -568,10 +570,11 @@ sub CreateMSRSingleHist {
 
 	    $RUN = $RUNS[ $iRun - 1 ];
 
-	    $RUNFILE = MSR::RUNFileName($RUN,$YEAR,$BeamLine);
-	    $RUN_Line = join( $SPACE,
-			      "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
-			      $Def_Format{$BeamLine} );
+	    if ($All{"RUNSType"}) {
+		$RUN_Line = MSR::RUNFileNameMan($RUN);
+	    } else {
+		$RUN_Line = MSR::RUNFileNameAuto($RUN,$YEAR,$BeamLine);
+	    }
 
 	    # What kind of fit? 0 - Single Histogram, 2 - Asymmetry, 4 - RRF
 	    $Type_Line  = "fittype         0";
@@ -639,15 +642,15 @@ FITPARAMETER
     my %PTable=MSR::PrepParamTable(\%All);
     my $NParam=scalar keys( %PTable );
 # Fill the table with labels and values of parametr 
-    for (my $PCount=0;$PCount<$NParam;$PCount++) {
-	my ($Param,$value,$error,$minvalue,$maxvalue) = split(/,/,$PTable{$PCount});
+    for (my $iP=0;$iP<$NParam;$iP++) {
+	my ($Param,$value,$error,$minvalue,$maxvalue) = split(/,/,$PTable{$iP});
 	if ( $minvalue == $maxvalue ) {
 	    $minvalue = $EMPTY;
 	    $maxvalue = $EMPTY;
 	}
-	$j=$PCount+1;
+	$PCount=$iP+1;
 	$FitParaBlk = $FitParaBlk."
-      $j      $Param    $value     $error    $error    $minvalue    $maxvalue";
+      $PCount      $Param    $value     $error    $error    $minvalue    $maxvalue";
     }
 
     $Full_T_Block = "
@@ -1090,7 +1093,12 @@ sub PrepParamTable {
     %ParTable = ();
  
     my %All = %{$_[0]};
-    my @RUNS = split( /,/, $All{"RunNumbers"} );
+    my @RUNS = ();
+    if ($All{"RUNSType"}) {
+	@RUNS = split( /,/, $All{"RunFiles"} );
+    } else {
+	@RUNS = split( /,/, $All{"RunNumbers"} );
+    }
     my @Hists = split( /,/, $All{"LRBF"} );
 
     my @FitTypes =();
@@ -1219,14 +1227,14 @@ sub PrepParamTable {
 
 
 ########################
-# RUNFileName
-# Function return the run file name
+# RUNFileNameAuto
+# Function return the RUN_Line for a given RUN
 # input should be 
 # $RUN is the run number
 # $YEAR is the year
 # $BeamLine in the name of beamline
 ########################
-sub RUNFileName { 
+sub RUNFileNameAuto { 
 # Take this information as input arguments
     (my $RUN, my $YEAR, my $BeamLine) = @_;
 
@@ -1281,7 +1289,37 @@ sub RUNFileName {
 	    $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
 	}
     }
-    return $RUNFILE
+    my $RUN_Line = join( $SPACE,
+			 "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
+			 $Def_Format{$BeamLine} );
+
+    return $RUN_Line;
+}
+
+########################
+# RUNFileNameMan
+# Function return the RUN_Line for a given RUN
+# input should be 
+# $RUN is the run number
+# $YEAR is the year
+# $BeamLine in the name of beamline
+########################
+sub RUNFileNameMan { 
+    my %EXTs = ("root","ROOT-NPP",
+		"bin","PSIBIN",
+		"msr","MUD");
+
+# Take this information as input arguments
+    (my $RUN) = @_;
+    my @tmp = split(/\./,$RUN);
+    my $EXT = @tmp[$#tmp];
+
+    $RUN =~  s/\.[^.]+$//;
+
+    my $RUN_Line = join( $SPACE,
+			 "RUN", $RUN, "MUE4", "PSI",$EXTs{$EXT});
+
+    return $RUN_Line;
 }
 
 1;

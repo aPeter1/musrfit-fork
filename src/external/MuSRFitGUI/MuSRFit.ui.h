@@ -71,7 +71,7 @@ void Form1::fileSave()
     }
 }
 
-void MuSRFitform::fileChangeDir()
+void Form1::fileChangeDir()
 {
     my $newdir=Qt::FileDialog::getExistingDirectory(
 	    "",
@@ -170,16 +170,24 @@ void MuSRFitform::CreateAllInput()
     $All{"RunNumbers"} = RunNumbers->text;
     $All{"RunFiles"} = RunFiles->text;
     $All{"BeamLine"} = BeamLine->currentText;
+    $All{"RUNSType"} = RUNSManual->isChecked();
     $All{"YEAR"} =YEAR->currentText;
     $All{"Tis"} = Tis->text;
     $All{"Tfs"} = Tfs->text;
     $All{"BINS"} = BINS->text;
     $All{"FitAsyType"} = FitAsyType->currentText;
     $All{"LRBF"} = LRBF->text;
-    $All{"RunNumbers"} =~ s/[\ \.\~\/\&\*\[\;\>\<\^\$\(\)\`\|\]\'\@]/,/g;
-    my @RUNS = split( /,/, $All{"RunNumbers"} );
-    my @Hists = split(/,/, $All{"LRBF"} );
     
+    my @RUNS = ();
+    if ($All{"RUNSType"} ) {
+	@RUNS = split( /,/, $All{"RunFiles"});
+    } else {
+	$All{"RunNumbers"} =~ s/[\ \.\~\/\&\*\[\;\>\<\^\$\(\)\`\|\]\'\@]/,/g;
+	@RUNS = split( /,/, $All{"RunNumbers"} );	
+    }
+    
+    my @Hists = split(/,/, $All{"LRBF"} );
+        
 # From Fourier Tab
     $All{"FUNITS"}= FUnits->currentText;
     $All{"FAPODIZATION"}= FApodization->currentText;
@@ -301,14 +309,18 @@ void MuSRFitform::CreateAllInput()
 	    }
 	    $All{"Sh_$Param"}=$Shared;
 	    $NP++;
-	}#Loop on parameters
-                $Component++;
-      }# Loop on components
+	}
+#Loop on parameters
+	$Component++;
+    }
+# Loop on components
 # Done with shared parameters detecting
 
 # Construct a default filename if empty
-    if ( $All{"FILENAME"} eq "") {
+    if ( $All{"FILENAME"} eq ""  && !$All{"RUNSType"}) {
 	$All{"FILENAME"}=$RUNS[0]."_".$All{"BeamLine"}."_".$All{"YEAR"};
+    } else {
+	$All{"FILENAME"}="TMP";
     }
 
     if ( $All{"go"} eq "" ) {
@@ -349,7 +361,7 @@ void MuSRFitform::CallMSRCreate()
 {
     use MSR;
     my %All=CreateAllInput();
-    if ($All{"RunNumbers"} ne "") {
+    if ($All{"RunNumbers"} ne ""  || $All{"RunFiles"} ne "") {
 	if ( $All{"FitAsyType"} eq "Asymmetry" ) {
 	    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
 	}
@@ -648,5 +660,36 @@ void MuSRFitform::T0Update()
 
 void MuSRFitform::RunSelectionToggle()
 {
-    print "Toggle selection\n";
+    my $RUNSType = RUNSManual->isChecked();
+    if ($RUNSType) {
+# Manual RUN selection
+	RunFiles->setEnabled(1);
+	Browse->setEnabled(1);
+	RunNumbers->setEnabled(0);
+	RunNumbers->setText("");
+	BeamLine->setEnabled(0);
+	YEAR->setEnabled(0);
+    } else {
+# Auto RUN selection
+	RunFiles->setEnabled(0);
+	RunFiles->setText("");
+	Browse->setEnabled(0);
+	RunNumbers->setEnabled(1);
+	BeamLine->setEnabled(1);
+	YEAR->setEnabled(1);
+    }
 }
+
+void MuSRFitform::fileBrowse()
+{
+    my $files_ref=Qt::FileDialog::getOpenFileNames(
+	    "Data files (*.root *.bin)",
+	    "./",
+	    this,
+	    "open files dialog",
+	    "Select one or more files to fit");
+    my @files = @$files_ref;
+    my $RunFiles=join(",",@files);
+    RunFiles->setText($RunFiles);
+}
+
