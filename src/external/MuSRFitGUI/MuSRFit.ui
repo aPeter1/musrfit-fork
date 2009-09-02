@@ -23,7 +23,7 @@
     <property name="minimumSize">
         <size>
             <width>582</width>
-            <height>505</height>
+            <height>500</height>
         </size>
     </property>
     <property name="caption">
@@ -133,6 +133,9 @@
                             <property name="toolTip" stdset="0">
                                 <string>Title line for MSR file (optional)</string>
                             </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>Title line for MSR file (optional)</string>
+                            </property>
                         </widget>
                         <widget class="QLayoutWidget">
                             <property name="name">
@@ -164,6 +167,12 @@
                                             <horstretch>0</horstretch>
                                             <verstretch>0</verstretch>
                                         </sizepolicy>
+                                    </property>
+                                    <property name="toolTip" stdset="0">
+                                        <string>Name of the produced MSR file (optional)</string>
+                                    </property>
+                                    <property name="whatsThis" stdset="0">
+                                        <string>Name of the produced MSR file (optional)</string>
                                     </property>
                                 </widget>
                             </hbox>
@@ -255,6 +264,12 @@
                                                         <verstretch>0</verstretch>
                                                     </sizepolicy>
                                                 </property>
+                                                <property name="toolTip" stdset="0">
+                                                    <string>Names of data files to be fit. Multiple data files are comma separated.</string>
+                                                </property>
+                                                <property name="whatsThis" stdset="0">
+                                                    <string>Names of data files to be fit. Multiple data files are comma separated.</string>
+                                                </property>
                                             </widget>
                                             <widget class="QPushButton">
                                                 <property name="name">
@@ -274,6 +289,12 @@
                                                 <property name="text">
                                                     <string>Browse</string>
                                                 </property>
+                                                <property name="toolTip" stdset="0">
+                                                    <string>Browse to select data files for fitting.</string>
+                                                </property>
+                                                <property name="whatsThis" stdset="0">
+                                                    <string>Browse to select data files for fitting.</string>
+                                                </property>
                                             </widget>
                                         </hbox>
                                     </widget>
@@ -288,6 +309,12 @@
                                                 <horstretch>0</horstretch>
                                                 <verstretch>0</verstretch>
                                             </sizepolicy>
+                                        </property>
+                                        <property name="toolTip" stdset="0">
+                                            <string>Numbers of RUNs to fit. Multiple runs are comma separated.</string>
+                                        </property>
+                                        <property name="whatsThis" stdset="0">
+                                            <string>Numbers of RUNs to fit. Multiple runs are comma separated.</string>
                                         </property>
                                     </widget>
                                     <widget class="QLayoutWidget">
@@ -3190,6 +3217,9 @@
     <tabstop>musrfit_tabs</tabstop>
     <tabstop>TITLE</tabstop>
     <tabstop>FILENAME</tabstop>
+    <tabstop>RUNSAuto</tabstop>
+    <tabstop>RunFiles</tabstop>
+    <tabstop>Browse</tabstop>
     <tabstop>RunNumbers</tabstop>
     <tabstop>BeamLine</tabstop>
     <tabstop>YEAR</tabstop>
@@ -3206,18 +3236,61 @@
     <tabstop>ShParam_1_3</tabstop>
     <tabstop>ShParam_1_4</tabstop>
     <tabstop>ShParam_1_5</tabstop>
+    <tabstop>ShParam_1_6</tabstop>
+    <tabstop>ShParam_1_7</tabstop>
+    <tabstop>ShParam_1_8</tabstop>
+    <tabstop>ShParam_1_9</tabstop>
     <tabstop>ShParam_2_1</tabstop>
     <tabstop>ShParam_2_2</tabstop>
     <tabstop>ShParam_2_3</tabstop>
     <tabstop>ShParam_2_4</tabstop>
     <tabstop>ShParam_2_5</tabstop>
+    <tabstop>ShParam_2_6</tabstop>
+    <tabstop>ShParam_2_7</tabstop>
+    <tabstop>ShParam_2_8</tabstop>
+    <tabstop>ShParam_2_9</tabstop>
     <tabstop>ShParam_3_1</tabstop>
     <tabstop>ShParam_3_2</tabstop>
     <tabstop>ShParam_3_3</tabstop>
     <tabstop>ShParam_3_4</tabstop>
     <tabstop>ShParam_3_5</tabstop>
+    <tabstop>ShParam_3_6</tabstop>
+    <tabstop>ShParam_3_7</tabstop>
+    <tabstop>ShParam_3_8</tabstop>
+    <tabstop>ShParam_3_9</tabstop>
     <tabstop>InitParamTable</tabstop>
     <tabstop>textMSROutput</tabstop>
+    <tabstop>MINIMIZE</tabstop>
+    <tabstop>HESSE</tabstop>
+    <tabstop>go</tabstop>
+    <tabstop>PlotMSR</tabstop>
+    <tabstop>FitTextOutput</tabstop>
+    <tabstop>FUnits</tabstop>
+    <tabstop>FApodization</tabstop>
+    <tabstop>FPlot</tabstop>
+    <tabstop>lineEdit28</tabstop>
+    <tabstop>lineEdit28_2</tabstop>
+    <tabstop>t01</tabstop>
+    <tabstop>Bg11</tabstop>
+    <tabstop>Bg21</tabstop>
+    <tabstop>Data11</tabstop>
+    <tabstop>Data21</tabstop>
+    <tabstop>t02</tabstop>
+    <tabstop>Bg12</tabstop>
+    <tabstop>Bg22</tabstop>
+    <tabstop>Data12</tabstop>
+    <tabstop>Data22</tabstop>
+    <tabstop>t03</tabstop>
+    <tabstop>Bg13</tabstop>
+    <tabstop>Bg23</tabstop>
+    <tabstop>Data13</tabstop>
+    <tabstop>Data23</tabstop>
+    <tabstop>t04</tabstop>
+    <tabstop>Bg14</tabstop>
+    <tabstop>Bg24</tabstop>
+    <tabstop>Data14</tabstop>
+    <tabstop>Data24</tabstop>
+    <tabstop>ShowT0</tabstop>
 </tabstops>
 <includes>
     <include location="local" impldecl="in implementation">MuSRFit.ui.h</include>

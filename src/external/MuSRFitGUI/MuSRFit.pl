@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Wed Sep 2 22:02:54 2009
+# Created: Wed Sep 2 23:50:05 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -569,7 +569,7 @@ sub NEW
         setName("MuSRFitform" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
-    setMinimumSize(Qt::Size(582, 505) );
+    setMinimumSize(Qt::Size(582, 500) );
     setIcon($image0 );
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
@@ -1344,7 +1344,10 @@ sub NEW
 
     setTabOrder(musrfit_tabs, TITLE);
     setTabOrder(TITLE, FILENAME);
-    setTabOrder(FILENAME, RunNumbers);
+    setTabOrder(FILENAME, RUNSAuto);
+    setTabOrder(RUNSAuto, RunFiles);
+    setTabOrder(RunFiles, Browse);
+    setTabOrder(Browse, RunNumbers);
     setTabOrder(RunNumbers, BeamLine);
     setTabOrder(BeamLine, YEAR);
     setTabOrder(YEAR, FitType1);
@@ -1360,18 +1363,61 @@ sub NEW
     setTabOrder(ShParam_1_2, ShParam_1_3);
     setTabOrder(ShParam_1_3, ShParam_1_4);
     setTabOrder(ShParam_1_4, ShParam_1_5);
-    setTabOrder(ShParam_1_5, ShParam_2_1);
+    setTabOrder(ShParam_1_5, ShParam_1_6);
+    setTabOrder(ShParam_1_6, ShParam_1_7);
+    setTabOrder(ShParam_1_7, ShParam_1_8);
+    setTabOrder(ShParam_1_8, ShParam_1_9);
+    setTabOrder(ShParam_1_9, ShParam_2_1);
     setTabOrder(ShParam_2_1, ShParam_2_2);
     setTabOrder(ShParam_2_2, ShParam_2_3);
     setTabOrder(ShParam_2_3, ShParam_2_4);
     setTabOrder(ShParam_2_4, ShParam_2_5);
-    setTabOrder(ShParam_2_5, ShParam_3_1);
+    setTabOrder(ShParam_2_5, ShParam_2_6);
+    setTabOrder(ShParam_2_6, ShParam_2_7);
+    setTabOrder(ShParam_2_7, ShParam_2_8);
+    setTabOrder(ShParam_2_8, ShParam_2_9);
+    setTabOrder(ShParam_2_9, ShParam_3_1);
     setTabOrder(ShParam_3_1, ShParam_3_2);
     setTabOrder(ShParam_3_2, ShParam_3_3);
     setTabOrder(ShParam_3_3, ShParam_3_4);
     setTabOrder(ShParam_3_4, ShParam_3_5);
-    setTabOrder(ShParam_3_5, InitParamTable);
+    setTabOrder(ShParam_3_5, ShParam_3_6);
+    setTabOrder(ShParam_3_6, ShParam_3_7);
+    setTabOrder(ShParam_3_7, ShParam_3_8);
+    setTabOrder(ShParam_3_8, ShParam_3_9);
+    setTabOrder(ShParam_3_9, InitParamTable);
     setTabOrder(InitParamTable, textMSROutput);
+    setTabOrder(textMSROutput, MINIMIZE);
+    setTabOrder(MINIMIZE, HESSE);
+    setTabOrder(HESSE, go);
+    setTabOrder(go, PlotMSR);
+    setTabOrder(PlotMSR, FitTextOutput);
+    setTabOrder(FitTextOutput, FUnits);
+    setTabOrder(FUnits, FApodization);
+    setTabOrder(FApodization, FPlot);
+    setTabOrder(FPlot, lineEdit28);
+    setTabOrder(lineEdit28, lineEdit28_2);
+    setTabOrder(lineEdit28_2, t01);
+    setTabOrder(t01, Bg11);
+    setTabOrder(Bg11, Bg21);
+    setTabOrder(Bg21, Data11);
+    setTabOrder(Data11, Data21);
+    setTabOrder(Data21, t02);
+    setTabOrder(t02, Bg12);
+    setTabOrder(Bg12, Bg22);
+    setTabOrder(Bg22, Data12);
+    setTabOrder(Data12, Data22);
+    setTabOrder(Data22, t03);
+    setTabOrder(t03, Bg13);
+    setTabOrder(Bg13, Bg23);
+    setTabOrder(Bg23, Data13);
+    setTabOrder(Data13, Data23);
+    setTabOrder(Data23, t04);
+    setTabOrder(t04, Bg14);
+    setTabOrder(Bg14, Bg24);
+    setTabOrder(Bg24, Data14);
+    setTabOrder(Data14, Data24);
+    setTabOrder(Data24, ShowT0);
 
     TITLELabel->setBuddy(this->TITLE);
     FILENAMELabel->setBuddy(this->FILENAME);
@@ -1392,11 +1438,20 @@ sub languageChange
     TITLELabel->setText( trUtf8("Enter the label (defaul is run title from the first run)") );
     TITLE->setText( trUtf8("","Title line for MSR file (optional)") );
     Qt::ToolTip::add(TITLE, trUtf8("Title line for MSR file (optional)"));
+    Qt::WhatsThis::add(TITLE, trUtf8("Title line for MSR file (optional)"));
     FILENAMELabel->setText( trUtf8("Enter [name] for output [name].msr file (optional)") );
+    Qt::ToolTip::add(FILENAME, trUtf8("Name of the produced MSR file (optional)"));
+    Qt::WhatsThis::add(FILENAME, trUtf8("Name of the produced MSR file (optional)"));
     RUNSelection->setTitle( undef );
     textLabel1_4->setText( undef );
     RUNSAuto->setText( trUtf8("Input the RUN numbers") );
+    Qt::ToolTip::add(RunFiles, trUtf8("Names of data files to be fit. Multiple data files are comma separated."));
+    Qt::WhatsThis::add(RunFiles, trUtf8("Names of data files to be fit. Multiple data files are comma separated."));
     Browse->setText( trUtf8("Browse") );
+    Qt::ToolTip::add(Browse, trUtf8("Browse to select data files for fitting."));
+    Qt::WhatsThis::add(Browse, trUtf8("Browse to select data files for fitting."));
+    Qt::ToolTip::add(RunNumbers, trUtf8("Numbers of RUNs to fit. Multiple runs are comma separated."));
+    Qt::WhatsThis::add(RunNumbers, trUtf8("Numbers of RUNs to fit. Multiple runs are comma separated."));
     BeamLineLabel->setText( trUtf8("On beam line") );
     BeamLine->clear();
     BeamLine->insertItem( trUtf8("LEM") );
@@ -2309,7 +2364,6 @@ sub RunSelectionToggle
 	BeamLine->setEnabled(1);
 	YEAR->setEnabled(1);
     }
-    print "Toggle selection\n";
 
 }
 
