@@ -1,1 +1,1 @@
-SUBDIRS = TLemRunHeader scripts
+SUBDIRS = TLemRunHeader
