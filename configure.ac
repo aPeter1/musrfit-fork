@@ -1,5 +1,5 @@
 AC_PREREQ(2.59)
-AC_INIT(musrfit, 0.5.0, andreas.suter@psi.ch)
+AC_INIT(musrfit, 0.5.1, andreas.suter@psi.ch)
 AC_CONFIG_AUX_DIR(admin)
 
 dnl -----------------------------------------------
@@ -13,7 +13,7 @@ LEM_LIBRARY_NAME=TLemRunHeader
 #release versioning
 MUSR_MAJOR_VERSION=0
 MUSR_MINOR_VERSION=5
-MUSR_MICRO_VERSION=0
+MUSR_MICRO_VERSION=1
 
 #release versioning
 LEM_MAJOR_VERSION=1
@@ -296,6 +296,5 @@ AC_CONFIG_FILES([Makefile \
                  src/classes/PMusr.pc \
                  src/external/Makefile \
                  src/external/TLemRunHeader/Makefile \
-                 src/external/TLemRunHeader/TLemRunHeader.pc \
-                 src/external/scripts/Makefile])
+                 src/external/TLemRunHeader/TLemRunHeader.pc])
 AC_OUTPUT

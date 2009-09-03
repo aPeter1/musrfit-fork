@@ -1,8 +1,17 @@
 #---------------------------------------------------------------------
 # ChangeLog
-# Andreas Suter, 2009/06/21
-# $Id: ChangeLog 4013 2009-06-21
+# BMW, 2009/08/08
+# $Id:
 #---------------------------------------------------------------------
+
+musrfit 0.5.1
++ Read _measured_ temperature(s) from data files (ROOT, PSIBIN, WKM)
++ msr2data rewritten in C++ 
+  + Added support for taking parameters like temperatures
+    and the applied field from the data files (PSIBIN, WKM)
+  + For LEM-data RA-HVs are taken from the RunSummary in the 
+    ROOT file (if present) - other data is taken from the TLemRunHeader
+
 
 musrfit 0.5.0
 
