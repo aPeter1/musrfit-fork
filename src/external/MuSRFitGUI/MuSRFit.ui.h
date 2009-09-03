@@ -79,7 +79,7 @@ void Form1::fileChangeDir()
 	    "get existing directory",
 	    "Choose a directory",
 	    1);
-   chdir ("$newdir");
+    chdir ("$newdir");
 }
 
 void Form1::filePrint()
@@ -137,26 +137,26 @@ void Form1::helpContents()
 
 void Form1::helpAbout()
 {
-        my $AboutText="
-This is a GUI that uses the musrfit binary, developed by Andreas Suter,
-to fit muSR spectra. 
-
-MuSRFitGUI is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-MuSRFitGUI is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with MuSRFitGUI.  If not, see <http://www.gnu.org/licenses/>.
-
-Copyright 2009 by Zaher Salman and the LEM Group.
-<zaher.salman\@psi.ch>
-";
+    my $AboutText="
+		  This is a GUI that uses the musrfit binary, developed by Andreas Suter,
+		  to fit muSR spectra. 
+		  
+		  MuSRFitGUI is free software: you can redistribute it and/or modify
+		  it under the terms of the GNU General Public License as published by
+		  the Free Software Foundation, either version 3 of the License, or
+		  (at your option) any later version.
+		  
+		  MuSRFitGUI is distributed in the hope that it will be useful,
+		  but WITHOUT ANY WARRANTY; without even the implied warranty of
+		  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		  GNU General Public License for more details.
+		  
+		  You should have received a copy of the GNU General Public License
+		  along with MuSRFitGUI.  If not, see <http://www.gnu.org/licenses/>.
+		  
+		  Copyright 2009 by Zaher Salman and the LEM Group.
+		  <zaher.salman\@psi.ch>
+		  ";
     my $AboutWindow = Qt::MessageBox::information( this, "About MuSRFit GUI",$AboutText);
 }
 
@@ -170,7 +170,7 @@ void MuSRFitform::CreateAllInput()
     $All{"RunNumbers"} = RunNumbers->text;
     $All{"RunFiles"} = RunFiles->text;
     $All{"BeamLine"} = BeamLine->currentText;
-    $All{"RUNSType"} = RUNSManual->isChecked();
+    $All{"RUNSType"} = ManualFile->isOn();
     $All{"YEAR"} =YEAR->currentText;
     $All{"Tis"} = Tis->text;
     $All{"Tfs"} = Tfs->text;
@@ -187,7 +187,7 @@ void MuSRFitform::CreateAllInput()
     }
     
     my @Hists = split(/,/, $All{"LRBF"} );
-        
+    
 # From Fourier Tab
     $All{"FUNITS"}= FUnits->currentText;
     $All{"FAPODIZATION"}= FApodization->currentText;
@@ -315,18 +315,18 @@ void MuSRFitform::CreateAllInput()
     }
 # Loop on components
 # Done with shared parameters detecting
-
+    
 # Construct a default filename if empty
     if ( $All{"FILENAME"} eq ""  && !$All{"RUNSType"}) {
 	$All{"FILENAME"}=$RUNS[0]."_".$All{"BeamLine"}."_".$All{"YEAR"};
     } else {
 	$All{"FILENAME"}="TMP";
     }
-
+    
     if ( $All{"go"} eq "" ) {
 	$All{"go"}="PLOT";
     }
-
+    
 # Get minimization process
     my $Min = Minimization->selectedId();
     if ($Min==0) {
@@ -344,7 +344,7 @@ void MuSRFitform::CreateAllInput()
     
 # Get Error calculation process
     my $Err = ErrorCalc->selectedId();
-     if ($Err==0) {
+    if ($Err==0) {
 	$All{"ErrorCalc"}= "HESSE";
 #	$All{"go"}="MIGRAD";	
     }
@@ -383,10 +383,10 @@ void MuSRFitform::UpdateMSRFileInitTable()
     foreach my $line (@lines) {
 	textMSROutput->append("$line");
     }
-       
+    
     my $FPBlock_ref=MSR::ExtractParamBlk(@lines);
     my @FPBloc = @$FPBlock_ref;
-
+    
     my $PCount=0;
     foreach my $line (@FPBloc) {
 	$PCount++;
@@ -456,8 +456,8 @@ void MuSRFitform::ActivateShComp()
 {
     my %All=CreateAllInput();
     my @RUNS = split( /,/, $All{"RunNumbers"} );
-
-   # Hide all sharing components
+    
+# Hide all sharing components
     SharingComp1->setHidden(1);
     SharingComp2->setHidden(1);
     SharingComp3->setHidden(1);
@@ -471,14 +471,14 @@ void MuSRFitform::ActivateShComp()
 	    push( @FitTypes, $FitType );	    
 	}
     }
-
+    
 # Get number of parameters to determine the size of the table 
     my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
 # For now the line below does not work. Why?    
 #    my $Paramcomp_ref=$All{"Paramcomp_ref"};
     my @Paramcomp = @$Paramcomp_ref;
     my $Full_T_Block= $All{"Full_T_Block"};
-        
+    
     my $Component=1;
     foreach my $FitType (@FitTypes) {
 	my $Parameters=$Paramcomp[$Component-1];
@@ -490,7 +490,7 @@ void MuSRFitform::ActivateShComp()
 	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
 	    unshift( @Params, ( "N0", "NBg" ) );
 	}
-	    
+	
 	
 # Make the component appear first (only if we have multiple runs)
 	my $ShCompG="SharingComp".$Component;
@@ -499,7 +499,7 @@ void MuSRFitform::ActivateShComp()
 	    $ShCG->setHidden(0);
 	    $ShCG->setEnabled(1);
 	}
-                my $CompShLabel = "Comp".$Component."ShLabel";
+	my $CompShLabel = "Comp".$Component."ShLabel";
 	my $CompShL = child($CompShLabel);
 	$CompShL->setText($All{"FitType$Component"});
 	
@@ -524,7 +524,7 @@ void MuSRFitform::InitializeTab()
     my %All=CreateAllInput();
     InitParamTable->setLeftMargin(100);
     my $NRows = InitParamTable->numRows();
-
+    
 # Remove any rows in table
     if ($NRows > 0) {
 	for (my $i=0;$i<$NRows;$i++) {
@@ -573,7 +573,7 @@ void MuSRFitform::TabChanged()
 #	    print "Answer=$Answer\n";
 	}
     }
- 
+    
 # First make sure we have sharing initialized    
     ActivateShComp();
     InitializeTab();
@@ -653,30 +653,28 @@ void MuSRFitform::T0Update()
 	    child($Name)->setText($tmp);
 	}
 	$NHist++
-    }
-
+	    }
+    
 }
 
 
 void MuSRFitform::RunSelectionToggle()
 {
-    my $RUNSType = RUNSManual->isChecked();
-    if ($RUNSType) {
+    my $ManualFile= ManualFile->isOn();
+    if ($ManualFile) {
 # Manual RUN selection
-	RunFiles->setEnabled(1);
-	Browse->setEnabled(1);
-	RunNumbers->setEnabled(0);
+	FileTypeMan->setEnabled(1);
+	FileTypeMan->setHidden(0);
 	RunNumbers->setText("");
-	BeamLine->setEnabled(0);
-	YEAR->setEnabled(0);
+	FileTypeAuto->setEnabled(0);
+	FileTypeAuto->setHidden(1);
     } else {
 # Auto RUN selection
-	RunFiles->setEnabled(0);
+	FileTypeMan->setEnabled(0);
+	FileTypeMan->setHidden(1);
 	RunFiles->setText("");
-	Browse->setEnabled(0);
-	RunNumbers->setEnabled(1);
-	BeamLine->setEnabled(1);
-	YEAR->setEnabled(1);
+	FileTypeAuto->setEnabled(1);
+	FileTypeAuto->setHidden(0);
     }
 }
 
