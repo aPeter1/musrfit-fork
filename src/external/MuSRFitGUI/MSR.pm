@@ -221,7 +221,6 @@ sub CreateMSR {
         # Also for Imaginaryand and Real for RRF fits
 
         $RUN = $RUNS[ $iRun - 1 ];
-	print "RUN=$RUN\n";
 
 	if ($All{"RUNSType"}) {
 	    $RUN_Line = MSR::RUNFileNameMan($RUN);
@@ -229,7 +228,6 @@ sub CreateMSR {
 	    $RUN_Line = MSR::RUNFileNameAuto($RUN,$YEAR,$BeamLine);
 	}
 
-	print "Line=$RUN_Line\n";
 
 	$Type_Line = "fittype         2";
 	$PLT       = 2;
@@ -1144,27 +1142,26 @@ sub PrepParamTable {
 		    }
 		    
 		    $Shared = $All{"Sh_$Param"};
+		    if ( $Shared!=1 || $iRun == 1 ) {
 # It there are multiple runs index the parameters accordingly
-		    $Param=$Param."_".$iRun;
+			$Param=$Param."_".$iRun;
 # Check if this parameter has been initialized befor. If not take from defaults
-		    $value = $All{"$Param"};
-		    if ( $value ne "" ) {
-			$error    = $All{"$erradd$Param"};
-			$minvalue = $All{"$Param$minadd"};
-			$maxvalue = $All{"$Param$maxadd"};
-		    } else {
+			$value = $All{"$Param"};
+			if ( $value ne "" ) {
+			    $error    = $All{"$erradd$Param"};
+			    $minvalue = $All{"$Param$minadd"};
+			    $maxvalue = $All{"$Param$maxadd"};
+			} else {
 # I need this although it is already in the MSR.pm module, just for this table
 # We can remove it from the MSR module later...
 # Or keep in the MSR as function ??
-			$value = $Defaults{$Param_ORG};
-			$error = $Defaults{ join( "", $erradd, $Param_ORG ) };
-			$minvalue = $Defaults{ join("", $Param_ORG, $minadd ) };
-			$maxvalue = $Defaults{ join("", $Param_ORG, $maxadd ) };
-		    }
-		    $values=join(",",$Param,$value,$error,$minvalue,$maxvalue);
-		    $ParTable{$PCount}=$values;
-		    
-		    if ( $Shared!=1 || $iRun == 1 ) {
+			    $value = $Defaults{$Param_ORG};
+			    $error = $Defaults{ join( "", $erradd, $Param_ORG ) };
+			    $minvalue = $Defaults{ join("", $Param_ORG, $minadd ) };
+			    $maxvalue = $Defaults{ join("", $Param_ORG, $maxadd ) };
+			}
+			$values=join(",",$Param,$value,$error,$minvalue,$maxvalue);
+			$ParTable{$PCount}=$values;
 			$PCount++;
 		    }
 		    $NP++;
@@ -1195,26 +1192,27 @@ sub PrepParamTable {
 			}
 			
 			$Shared = $All{"Sh_$Param"};
+			if ( $Shared!=1 || $iRun == 1 ) {
 # It there are multiple runs index the parameters accordingly
-			$Param=$Param."_".$iRun;
+			    $Param=$Param."_".$iRun;
 # Check if this parameter has been initialized befor. If not take from defaults
-			$value = $All{"$Param"};
-			if ( $value ne "" ) {
-			    $error    = $All{"$erradd$Param"};
-			    $minvalue = $All{"$Param$minadd"};
-			    $maxvalue = $All{"$Param$maxadd"};
-			} else {
+			    $value = $All{"$Param"};
+			    if ( $value ne "" ) {
+				$error    = $All{"$erradd$Param"};
+				$minvalue = $All{"$Param$minadd"};
+				$maxvalue = $All{"$Param$maxadd"};
+			    } else {
 # I need this although it is already in the MSR.pm module, just for this table
 # We can remove it from the MSR module later...
 # Or keep in the MSR as function ??
-			    $value = $Defaults{$Param_ORG};
-			    $error = $Defaults{ join( "", $erradd, $Param_ORG ) };
-			    $minvalue = $Defaults{ join("", $Param_ORG, $minadd ) };
-			    $maxvalue = $Defaults{ join("", $Param_ORG, $maxadd ) };
-			}
-			$values=join(",",$Param,$value,$error,$minvalue,$maxvalue);
-			$ParTable{$PCount}=$values;
-			if ( $Shared!=1 || $iRun == 1 ) {
+				print "I got into here\n";
+				$value = $Defaults{$Param_ORG};
+				$error = $Defaults{ join( "", $erradd, $Param_ORG ) };
+				$minvalue = $Defaults{ join("", $Param_ORG, $minadd ) };
+				$maxvalue = $Defaults{ join("", $Param_ORG, $maxadd ) };
+			    }
+			    $values=join(",",$Param,$value,$error,$minvalue,$maxvalue);
+			    $ParTable{$PCount}=$values;
 			    $PCount++;
 			}
 			$NP++;
