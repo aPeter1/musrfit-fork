@@ -178,6 +178,7 @@ void MuSRFitform::CreateAllInput()
     $All{"FitAsyType"} = FitAsyType->currentText;
     $All{"LRBF"} = LRBF->text;
     
+    RunSelectionToggle();
     my @RUNS = ();
     if ($All{"RUNSType"} ) {
 	@RUNS = split( /,/, $All{"RunFiles"});
@@ -663,18 +664,18 @@ void MuSRFitform::RunSelectionToggle()
     my $ManualFile= ManualFile->isOn();
     if ($ManualFile) {
 # Manual RUN selection
-	FileTypeMan->setEnabled(1);
-	FileTypeMan->setHidden(0);
+	RUNSMan->setEnabled(1);
+	RUNSMan->setHidden(0);
 	RunNumbers->setText("");
-	FileTypeAuto->setEnabled(0);
-	FileTypeAuto->setHidden(1);
+	RUNSAuto->setEnabled(0);
+	RUNSAuto->setHidden(1);
     } else {
 # Auto RUN selection
-	FileTypeMan->setEnabled(0);
-	FileTypeMan->setHidden(1);
+	RUNSMan->setEnabled(0);
+	RUNSMan->setHidden(1);
 	RunFiles->setText("");
-	FileTypeAuto->setEnabled(1);
-	FileTypeAuto->setHidden(0);
+	RUNSAuto->setEnabled(1);
+	RUNSAuto->setHidden(0);
     }
 }
 

@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>582</width>
-            <height>580</height>
+            <width>579</width>
+            <height>578</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -22,8 +22,8 @@
     </property>
     <property name="minimumSize">
         <size>
-            <width>582</width>
-            <height>500</height>
+            <width>21</width>
+            <height>227</height>
         </size>
     </property>
     <property name="caption">
@@ -44,8 +44,8 @@
         </property>
         <property name="geometry">
             <rect>
-                <x>11</x>
-                <y>11</y>
+                <x>10</x>
+                <y>10</y>
                 <width>560</width>
                 <height>485</height>
             </rect>
@@ -77,107 +77,1443 @@
             <attribute name="title">
                 <string>RUNS</string>
             </attribute>
-            <widget class="QLayoutWidget">
+            <widget class="QGroupBox">
                 <property name="name">
-                    <cstring>layout32</cstring>
+                    <cstring>groupTitle</cstring>
                 </property>
                 <property name="geometry">
                     <rect>
-                        <x>2</x>
-                        <y>11</y>
-                        <width>555</width>
-                        <height>397</height>
+                        <x>11</x>
+                        <y>9</y>
+                        <width>538</width>
+                        <height>113</height>
+                    </rect>
+                </property>
+                <property name="margin">
+                    <number>5</number>
+                </property>
+                <property name="title">
+                    <string></string>
+                </property>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout25</cstring>
+                    </property>
+                    <property name="geometry">
+                        <rect>
+                            <x>6</x>
+                            <y>8</y>
+                            <width>530</width>
+                            <height>100</height>
+                        </rect>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>TITLELabel</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>Enter the label (defaul is run title from the first run)</string>
+                            </property>
+                            <property name="buddy" stdset="0">
+                                <cstring>TITLE</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>TITLE</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>1</horstretch>
+                                    <verstretch>1</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                                <comment>Title line for MSR file (optional)</comment>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Title line for MSR file (optional)</string>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>Title line for MSR file (optional)</string>
+                            </property>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout17</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>FILENAMELabel</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Enter [name] for output [name].msr file (optional)</string>
+                                    </property>
+                                    <property name="buddy" stdset="0">
+                                        <cstring>FILENAME</cstring>
+                                    </property>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>FILENAME</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>5</hsizetype>
+                                            <vsizetype>0</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="toolTip" stdset="0">
+                                        <string>Name of the produced MSR file (optional)</string>
+                                    </property>
+                                    <property name="whatsThis" stdset="0">
+                                        <string>Name of the produced MSR file (optional)</string>
+                                    </property>
+                                </widget>
+                            </hbox>
+                        </widget>
+                    </vbox>
+                </widget>
+            </widget>
+            <widget class="QLayoutWidget">
+                <property name="name">
+                    <cstring>layout23</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>21</x>
+                        <y>385</y>
+                        <width>515</width>
+                        <height>55</height>
+                    </rect>
+                </property>
+                <hbox>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QLabel">
+                        <property name="name">
+                            <cstring>FitAsyTypeLabel</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>5</hsizetype>
+                                <vsizetype>0</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
+                        <property name="text">
+                            <string>Fit type</string>
+                        </property>
+                    </widget>
+                    <widget class="QComboBox">
+                        <item>
+                            <property name="text">
+                                <string>Asymmetry</string>
+                            </property>
+                        </item>
+                        <item>
+                            <property name="text">
+                                <string>SingleHist</string>
+                            </property>
+                        </item>
+                        <property name="name">
+                            <cstring>FitAsyType</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>5</hsizetype>
+                                <vsizetype>0</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
+                    </widget>
+                    <widget class="QLabel">
+                        <property name="name">
+                            <cstring>LRBFLabel</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>5</hsizetype>
+                                <vsizetype>0</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
+                        <property name="text">
+                            <string>Histograms list</string>
+                        </property>
+                    </widget>
+                    <widget class="QLineEdit">
+                        <property name="name">
+                            <cstring>LRBF</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>5</hsizetype>
+                                <vsizetype>0</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
+                        <property name="text">
+                            <string>1,3</string>
+                        </property>
+                    </widget>
+                </hbox>
+            </widget>
+            <widget class="QGroupBox">
+                <property name="name">
+                    <cstring>groupBox7</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>11</x>
+                        <y>220</y>
+                        <width>538</width>
+                        <height>164</height>
+                    </rect>
+                </property>
+                <property name="margin">
+                    <number>5</number>
+                </property>
+                <property name="title">
+                    <string>Theory Function</string>
+                </property>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout42</cstring>
+                    </property>
+                    <property name="geometry">
+                        <rect>
+                            <x>8</x>
+                            <y>21</y>
+                            <width>520</width>
+                            <height>125</height>
+                        </rect>
+                    </property>
+                    <grid>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <property name="margin">
+                            <number>5</number>
+                        </property>
+                        <widget class="QComboBox" row="1" column="1">
+                            <item>
+                                <property name="text">
+                                    <string>Exponential</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Gaussian</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Stretch Exp.</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Exponential Cos</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Gaussian Cos</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Stretch Cos</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Lorentzian Dynamic KT</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Gaussian Dynamic KT</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Background</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Lorentzian Kubo-Toyabe LF x Exp</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Gaussian Kubo-Toyabe LF x Exp</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Lorentzian Kubo-Toyabe LF x Str Exp</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Gaussian Kubo-Toyabe LF x Str Exp</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Meissner State Model</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>None</string>
+                                </property>
+                            </item>
+                            <property name="name">
+                                <cstring>FitType2</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="currentItem">
+                                <number>14</number>
+                            </property>
+                        </widget>
+                        <widget class="QLabel" row="2" column="1">
+                            <property name="name">
+                                <cstring>TfsLabel</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>Final Time</string>
+                            </property>
+                            <property name="buddy" stdset="0">
+                                <cstring>Tfs</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QComboBox" row="1" column="0">
+                            <item>
+                                <property name="text">
+                                    <string>Exponential</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Gaussian</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Stretch Exp.</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Exponential Cos</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Gaussian Cos</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Stretch Cos</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Lorentzian Dynamic KT</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Gaussian Dynamic KT</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Background</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Lorentzian Kubo-Toyabe LF x Exp</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Gaussian Kubo-Toyabe LF x Exp</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Lorentzian Kubo-Toyabe LF x Str Exp</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Gaussian Kubo-Toyabe LF x Str Exp</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Meissner State Model</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>None</string>
+                                </property>
+                            </item>
+                            <property name="name">
+                                <cstring>FitType1</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="sizeLimit">
+                                <number>20</number>
+                            </property>
+                            <property name="autoCompletion">
+                                <bool>false</bool>
+                            </property>
+                            <property name="duplicatesEnabled">
+                                <bool>false</bool>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit" row="3" column="2">
+                            <property name="name">
+                                <cstring>BINS</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>100</string>
+                            </property>
+                        </widget>
+                        <widget class="QLabel" row="0" column="2">
+                            <property name="name">
+                                <cstring>Comp3Label</cstring>
+                            </property>
+                            <property name="palette">
+                                <palette>
+                                    <active>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>230</red>
+                                            <green>240</green>
+                                            <blue>249</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>242</red>
+                                            <green>247</green>
+                                            <blue>252</blue>
+                                        </color>
+                                        <color>
+                                            <red>115</red>
+                                            <green>120</green>
+                                            <blue>124</blue>
+                                        </color>
+                                        <color>
+                                            <red>154</red>
+                                            <green>160</green>
+                                            <blue>166</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>127</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>128</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                    </active>
+                                    <disabled>
+                                        <color>
+                                            <red>128</red>
+                                            <green>128</green>
+                                            <blue>128</blue>
+                                        </color>
+                                        <color>
+                                            <red>230</red>
+                                            <green>240</green>
+                                            <blue>249</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>115</red>
+                                            <green>120</green>
+                                            <blue>124</blue>
+                                        </color>
+                                        <color>
+                                            <red>154</red>
+                                            <green>160</green>
+                                            <blue>166</blue>
+                                        </color>
+                                        <color>
+                                            <red>128</red>
+                                            <green>128</green>
+                                            <blue>128</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>128</red>
+                                            <green>128</green>
+                                            <blue>128</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>127</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>128</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>238</blue>
+                                        </color>
+                                        <color>
+                                            <red>82</red>
+                                            <green>24</green>
+                                            <blue>139</blue>
+                                        </color>
+                                    </disabled>
+                                    <inactive>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>230</red>
+                                            <green>240</green>
+                                            <blue>249</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>115</red>
+                                            <green>120</green>
+                                            <blue>124</blue>
+                                        </color>
+                                        <color>
+                                            <red>154</red>
+                                            <green>160</green>
+                                            <blue>166</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>127</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>128</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>238</blue>
+                                        </color>
+                                        <color>
+                                            <red>82</red>
+                                            <green>24</green>
+                                            <blue>139</blue>
+                                        </color>
+                                    </inactive>
+                                </palette>
+                            </property>
+                            <property name="text">
+                                <string>Third Component</string>
+                            </property>
+                            <property name="buddy" stdset="0">
+                                <cstring>FitType1_2_2</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit" row="3" column="0">
+                            <property name="name">
+                                <cstring>Tis</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>0</string>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit" row="3" column="1">
+                            <property name="name">
+                                <cstring>Tfs</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>8</string>
+                            </property>
+                        </widget>
+                        <widget class="QLabel" row="0" column="0">
+                            <property name="name">
+                                <cstring>Comp1Label</cstring>
+                            </property>
+                            <property name="palette">
+                                <palette>
+                                    <active>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>230</red>
+                                            <green>240</green>
+                                            <blue>249</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>242</red>
+                                            <green>247</green>
+                                            <blue>252</blue>
+                                        </color>
+                                        <color>
+                                            <red>115</red>
+                                            <green>120</green>
+                                            <blue>124</blue>
+                                        </color>
+                                        <color>
+                                            <red>154</red>
+                                            <green>160</green>
+                                            <blue>166</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>127</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>128</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                    </active>
+                                    <disabled>
+                                        <color>
+                                            <red>128</red>
+                                            <green>128</green>
+                                            <blue>128</blue>
+                                        </color>
+                                        <color>
+                                            <red>230</red>
+                                            <green>240</green>
+                                            <blue>249</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>115</red>
+                                            <green>120</green>
+                                            <blue>124</blue>
+                                        </color>
+                                        <color>
+                                            <red>154</red>
+                                            <green>160</green>
+                                            <blue>166</blue>
+                                        </color>
+                                        <color>
+                                            <red>128</red>
+                                            <green>128</green>
+                                            <blue>128</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>128</red>
+                                            <green>128</green>
+                                            <blue>128</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>127</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>128</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>238</blue>
+                                        </color>
+                                        <color>
+                                            <red>82</red>
+                                            <green>24</green>
+                                            <blue>139</blue>
+                                        </color>
+                                    </disabled>
+                                    <inactive>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>230</red>
+                                            <green>240</green>
+                                            <blue>249</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>115</red>
+                                            <green>120</green>
+                                            <blue>124</blue>
+                                        </color>
+                                        <color>
+                                            <red>154</red>
+                                            <green>160</green>
+                                            <blue>166</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>127</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>128</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>238</blue>
+                                        </color>
+                                        <color>
+                                            <red>82</red>
+                                            <green>24</green>
+                                            <blue>139</blue>
+                                        </color>
+                                    </inactive>
+                                </palette>
+                            </property>
+                            <property name="text">
+                                <string>First Component</string>
+                            </property>
+                            <property name="buddy" stdset="0">
+                                <cstring>FitType1</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QLabel" row="2" column="2">
+                            <property name="name">
+                                <cstring>BINSLabel</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>Binning Factor</string>
+                            </property>
+                            <property name="buddy" stdset="0">
+                                <cstring>BINS</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QLabel" row="2" column="0">
+                            <property name="name">
+                                <cstring>TisLabel</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>Initial Time</string>
+                            </property>
+                            <property name="buddy" stdset="0">
+                                <cstring>Tis</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QComboBox" row="1" column="2">
+                            <item>
+                                <property name="text">
+                                    <string>Exponential</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Gaussian</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Stretch Exp.</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Exponential Cos</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Gaussian Cos</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Stretch Cos</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Lorentzian Dynamic KT</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Gaussian Dynamic KT</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Background</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Lorentzian Kubo-Toyabe LF x Exp</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Gaussian Kubo-Toyabe LF x Exp</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Lorentzian Kubo-Toyabe LF x Str Exp</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Gaussian Kubo-Toyabe LF x Str Exp</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Meissner State Model</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>None</string>
+                                </property>
+                            </item>
+                            <property name="name">
+                                <cstring>FitType3</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="currentItem">
+                                <number>14</number>
+                            </property>
+                        </widget>
+                        <widget class="QLabel" row="0" column="1">
+                            <property name="name">
+                                <cstring>Comp2Label</cstring>
+                            </property>
+                            <property name="palette">
+                                <palette>
+                                    <active>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>230</red>
+                                            <green>240</green>
+                                            <blue>249</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>242</red>
+                                            <green>247</green>
+                                            <blue>252</blue>
+                                        </color>
+                                        <color>
+                                            <red>115</red>
+                                            <green>120</green>
+                                            <blue>124</blue>
+                                        </color>
+                                        <color>
+                                            <red>154</red>
+                                            <green>160</green>
+                                            <blue>166</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>127</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>128</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                    </active>
+                                    <disabled>
+                                        <color>
+                                            <red>128</red>
+                                            <green>128</green>
+                                            <blue>128</blue>
+                                        </color>
+                                        <color>
+                                            <red>230</red>
+                                            <green>240</green>
+                                            <blue>249</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>115</red>
+                                            <green>120</green>
+                                            <blue>124</blue>
+                                        </color>
+                                        <color>
+                                            <red>154</red>
+                                            <green>160</green>
+                                            <blue>166</blue>
+                                        </color>
+                                        <color>
+                                            <red>128</red>
+                                            <green>128</green>
+                                            <blue>128</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>128</red>
+                                            <green>128</green>
+                                            <blue>128</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>127</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>128</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>238</blue>
+                                        </color>
+                                        <color>
+                                            <red>82</red>
+                                            <green>24</green>
+                                            <blue>139</blue>
+                                        </color>
+                                    </disabled>
+                                    <inactive>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>230</red>
+                                            <green>240</green>
+                                            <blue>249</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>115</red>
+                                            <green>120</green>
+                                            <blue>124</blue>
+                                        </color>
+                                        <color>
+                                            <red>154</red>
+                                            <green>160</green>
+                                            <blue>166</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>127</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>0</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>128</blue>
+                                        </color>
+                                        <color>
+                                            <red>255</red>
+                                            <green>255</green>
+                                            <blue>255</blue>
+                                        </color>
+                                        <color>
+                                            <red>0</red>
+                                            <green>0</green>
+                                            <blue>238</blue>
+                                        </color>
+                                        <color>
+                                            <red>82</red>
+                                            <green>24</green>
+                                            <blue>139</blue>
+                                        </color>
+                                    </inactive>
+                                </palette>
+                            </property>
+                            <property name="text">
+                                <string>Second Component</string>
+                            </property>
+                            <property name="buddy" stdset="0">
+                                <cstring>FitType1_2</cstring>
+                            </property>
+                        </widget>
+                    </grid>
+                </widget>
+            </widget>
+            <widget class="QLayoutWidget">
+                <property name="name">
+                    <cstring>layout43</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>4</x>
+                        <y>123</y>
+                        <width>550</width>
+                        <height>95</height>
                     </rect>
                 </property>
                 <vbox>
                     <property name="name">
                         <cstring>unnamed</cstring>
                     </property>
-                    <widget class="QLabel">
+                    <property name="margin">
+                        <number>5</number>
+                    </property>
+                    <widget class="QGroupBox">
                         <property name="name">
-                            <cstring>TITLELabel</cstring>
-                        </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>5</hsizetype>
-                                <vsizetype>5</vsizetype>
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                            </sizepolicy>
-                        </property>
-                        <property name="text">
-                            <string>Enter the label (defaul is run title from the first run)</string>
-                        </property>
-                        <property name="buddy" stdset="0">
-                            <cstring>TITLE</cstring>
-                        </property>
-                    </widget>
-                    <widget class="QLineEdit">
-                        <property name="name">
-                            <cstring>TITLE</cstring>
-                        </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>5</hsizetype>
-                                <vsizetype>0</vsizetype>
-                                <horstretch>1</horstretch>
-                                <verstretch>1</verstretch>
-                            </sizepolicy>
-                        </property>
-                        <property name="text">
-                            <string></string>
-                            <comment>Title line for MSR file (optional)</comment>
-                        </property>
-                        <property name="toolTip" stdset="0">
-                            <string>Title line for MSR file (optional)</string>
-                        </property>
-                        <property name="whatsThis" stdset="0">
-                            <string>Title line for MSR file (optional)</string>
-                        </property>
-                    </widget>
-                    <widget class="QLayoutWidget">
-                        <property name="name">
-                            <cstring>layout17</cstring>
-                        </property>
-                        <hbox>
-                            <property name="name">
-                                <cstring>unnamed</cstring>
-                            </property>
-                            <widget class="QLabel">
-                                <property name="name">
-                                    <cstring>FILENAMELabel</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Enter [name] for output [name].msr file (optional)</string>
-                                </property>
-                                <property name="buddy" stdset="0">
-                                    <cstring>FILENAME</cstring>
-                                </property>
-                            </widget>
-                            <widget class="QLineEdit">
-                                <property name="name">
-                                    <cstring>FILENAME</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>5</hsizetype>
-                                        <vsizetype>0</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="toolTip" stdset="0">
-                                    <string>Name of the produced MSR file (optional)</string>
-                                </property>
-                                <property name="whatsThis" stdset="0">
-                                    <string>Name of the produced MSR file (optional)</string>
-                                </property>
-                            </widget>
-                        </hbox>
-                    </widget>
-                    <widget class="QButtonGroup">
-                        <property name="name">
-                            <cstring>FileTypeMan</cstring>
+                            <cstring>RUNSAuto</cstring>
                         </property>
                         <property name="sizePolicy">
                             <sizepolicy>
@@ -188,772 +1524,281 @@
                             </sizepolicy>
                         </property>
                         <property name="margin">
-                            <number>0</number>
+                            <number>5</number>
                         </property>
                         <property name="title">
-                            <string></string>
+                            <string>RUN Numbers</string>
                         </property>
-                        <property name="exclusive">
-                            <bool>true</bool>
-                        </property>
-                        <widget class="QLayoutWidget">
+                        <widget class="QLineEdit">
                             <property name="name">
-                                <cstring>layout28</cstring>
+                                <cstring>RunNumbers</cstring>
                             </property>
                             <property name="geometry">
                                 <rect>
-                                    <x>5</x>
-                                    <y>15</y>
-                                    <width>540</width>
-                                    <height>25</height>
+                                    <x>15</x>
+                                    <y>25</y>
+                                    <width>510</width>
+                                    <height>26</height>
                                 </rect>
                             </property>
-                            <hbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>23</height>
+                                </size>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Numbers of RUNs to fit. Multiple runs are comma separated.</string>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>Numbers of RUNs to fit. Multiple runs are comma separated.</string>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>BeamLineLabel</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>22</x>
+                                    <y>55</y>
+                                    <width>99</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                            <property name="text">
+                                <string>On beam line</string>
+                            </property>
+                        </widget>
+                        <widget class="QComboBox">
+                            <item>
+                                <property name="text">
+                                    <string>LEM</string>
                                 </property>
-                                <widget class="QLabel">
-                                    <property name="name">
-                                        <cstring>textLabel1_5</cstring>
-                                    </property>
-                                    <property name="minimumSize">
-                                        <size>
-                                            <width>0</width>
-                                            <height>20</height>
-                                        </size>
-                                    </property>
-                                    <property name="text">
-                                        <string>Select RUNs Manually</string>
-                                    </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>RunFiles</cstring>
-                                    </property>
-                                    <property name="enabled">
-                                        <bool>true</bool>
-                                    </property>
-                                    <property name="sizePolicy">
-                                        <sizepolicy>
-                                            <hsizetype>5</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                            <horstretch>0</horstretch>
-                                            <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                    </property>
-                                    <property name="minimumSize">
-                                        <size>
-                                            <width>0</width>
-                                            <height>20</height>
-                                        </size>
-                                    </property>
-                                    <property name="toolTip" stdset="0">
-                                        <string>Names of data files to be fit. Multiple data files are comma separated.</string>
-                                    </property>
-                                    <property name="whatsThis" stdset="0">
-                                        <string>Names of data files to be fit. Multiple data files are comma separated.</string>
-                                    </property>
-                                </widget>
-                                <widget class="QPushButton">
-                                    <property name="name">
-                                        <cstring>Browse</cstring>
-                                    </property>
-                                    <property name="enabled">
-                                        <bool>true</bool>
-                                    </property>
-                                    <property name="sizePolicy">
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>5</vsizetype>
-                                            <horstretch>0</horstretch>
-                                            <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                    </property>
-                                    <property name="minimumSize">
-                                        <size>
-                                            <width>0</width>
-                                            <height>20</height>
-                                        </size>
-                                    </property>
-                                    <property name="text">
-                                        <string>Browse</string>
-                                    </property>
-                                    <property name="toolTip" stdset="0">
-                                        <string>Browse to select data files for fitting.</string>
-                                    </property>
-                                    <property name="whatsThis" stdset="0">
-                                        <string>Browse to select data files for fitting.</string>
-                                    </property>
-                                </widget>
-                            </hbox>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>GPS</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Dolly</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>LTF</string>
+                                </property>
+                            </item>
+                            <property name="name">
+                                <cstring>BeamLine</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>142</x>
+                                    <y>55</y>
+                                    <width>100</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </widget>
+                        <widget class="QComboBox">
+                            <item>
+                                <property name="text">
+                                    <string>2009</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2008</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2007</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2006</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2005</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2004</string>
+                                </property>
+                            </item>
+                            <property name="name">
+                                <cstring>YEAR</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>425</x>
+                                    <y>55</y>
+                                    <width>100</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>YEARLabel</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>361</x>
+                                    <y>55</y>
+                                    <width>55</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                            <property name="text">
+                                <string>Year</string>
+                            </property>
                         </widget>
                     </widget>
                     <widget class="QGroupBox">
                         <property name="name">
-                            <cstring>FileTypeAuto</cstring>
+                            <cstring>RUNSMan</cstring>
                         </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>5</hsizetype>
-                                <vsizetype>7</vsizetype>
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                            </sizepolicy>
+                        <property name="enabled">
+                            <bool>true</bool>
+                        </property>
+                        <property name="margin">
+                            <number>5</number>
                         </property>
                         <property name="title">
-                            <string></string>
+                            <string>RUN Files</string>
                         </property>
-                        <widget class="QLayoutWidget">
+                        <widget class="QLineEdit">
                             <property name="name">
-                                <cstring>layout27</cstring>
+                                <cstring>RunFiles</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
                             </property>
                             <property name="geometry">
                                 <rect>
-                                    <x>5</x>
-                                    <y>10</y>
-                                    <width>540</width>
-                                    <height>55</height>
+                                    <x>20</x>
+                                    <y>25</y>
+                                    <width>505</width>
+                                    <height>26</height>
                                 </rect>
                             </property>
-                            <grid>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <widget class="QComboBox" row="1" column="4">
-                                    <item>
-                                        <property name="text">
-                                            <string>2009</string>
-                                        </property>
-                                    </item>
-                                    <item>
-                                        <property name="text">
-                                            <string>2008</string>
-                                        </property>
-                                    </item>
-                                    <item>
-                                        <property name="text">
-                                            <string>2007</string>
-                                        </property>
-                                    </item>
-                                    <item>
-                                        <property name="text">
-                                            <string>2006</string>
-                                        </property>
-                                    </item>
-                                    <item>
-                                        <property name="text">
-                                            <string>2005</string>
-                                        </property>
-                                    </item>
-                                    <item>
-                                        <property name="text">
-                                            <string>2004</string>
-                                        </property>
-                                    </item>
-                                    <property name="name">
-                                        <cstring>YEAR</cstring>
-                                    </property>
-                                    <property name="sizePolicy">
-                                        <sizepolicy>
-                                            <hsizetype>5</hsizetype>
-                                            <vsizetype>5</vsizetype>
-                                            <horstretch>0</horstretch>
-                                            <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                    </property>
-                                    <property name="minimumSize">
-                                        <size>
-                                            <width>0</width>
-                                            <height>20</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                                <widget class="QLabel" row="1" column="1">
-                                    <property name="name">
-                                        <cstring>BeamLineLabel</cstring>
-                                    </property>
-                                    <property name="minimumSize">
-                                        <size>
-                                            <width>0</width>
-                                            <height>20</height>
-                                        </size>
-                                    </property>
-                                    <property name="text">
-                                        <string>On beam line</string>
-                                    </property>
-                                </widget>
-                                <widget class="QLabel" row="0" column="0">
-                                    <property name="name">
-                                        <cstring>textLabel1_5_2</cstring>
-                                    </property>
-                                    <property name="minimumSize">
-                                        <size>
-                                            <width>0</width>
-                                            <height>20</height>
-                                        </size>
-                                    </property>
-                                    <property name="text">
-                                        <string>Input the RUN numbers</string>
-                                    </property>
-                                </widget>
-                                <widget class="QLabel" row="1" column="3">
-                                    <property name="name">
-                                        <cstring>YEARLabel</cstring>
-                                    </property>
-                                    <property name="minimumSize">
-                                        <size>
-                                            <width>0</width>
-                                            <height>20</height>
-                                        </size>
-                                    </property>
-                                    <property name="text">
-                                        <string>Year</string>
-                                    </property>
-                                </widget>
-                                <widget class="QComboBox" row="1" column="2">
-                                    <item>
-                                        <property name="text">
-                                            <string>LEM</string>
-                                        </property>
-                                    </item>
-                                    <item>
-                                        <property name="text">
-                                            <string>GPS</string>
-                                        </property>
-                                    </item>
-                                    <item>
-                                        <property name="text">
-                                            <string>Dolly</string>
-                                        </property>
-                                    </item>
-                                    <item>
-                                        <property name="text">
-                                            <string>LTF</string>
-                                        </property>
-                                    </item>
-                                    <property name="name">
-                                        <cstring>BeamLine</cstring>
-                                    </property>
-                                    <property name="sizePolicy">
-                                        <sizepolicy>
-                                            <hsizetype>5</hsizetype>
-                                            <vsizetype>5</vsizetype>
-                                            <horstretch>0</horstretch>
-                                            <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                    </property>
-                                    <property name="minimumSize">
-                                        <size>
-                                            <width>0</width>
-                                            <height>20</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                                <widget class="QLineEdit" row="0" column="1" rowspan="1" colspan="4">
-                                    <property name="name">
-                                        <cstring>RunNumbers</cstring>
-                                    </property>
-                                    <property name="sizePolicy">
-                                        <sizepolicy>
-                                            <hsizetype>5</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                            <horstretch>0</horstretch>
-                                            <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                    </property>
-                                    <property name="minimumSize">
-                                        <size>
-                                            <width>0</width>
-                                            <height>23</height>
-                                        </size>
-                                    </property>
-                                    <property name="toolTip" stdset="0">
-                                        <string>Numbers of RUNs to fit. Multiple runs are comma separated.</string>
-                                    </property>
-                                    <property name="whatsThis" stdset="0">
-                                        <string>Numbers of RUNs to fit. Multiple runs are comma separated.</string>
-                                    </property>
-                                </widget>
-                            </grid>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>23</height>
+                                </size>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Names of data files to be fit. Multiple data files are comma separated.</string>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>Names of data files to be fit. Multiple data files are comma separated.</string>
+                            </property>
                         </widget>
-                    </widget>
-                    <widget class="QLabel">
-                        <property name="name">
-                            <cstring>ComponentsLabel</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Chose type of fitting function</string>
-                        </property>
-                    </widget>
-                    <widget class="QLayoutWidget">
-                        <property name="name">
-                            <cstring>layout19</cstring>
-                        </property>
-                        <grid>
+                        <widget class="QPushButton">
                             <property name="name">
-                                <cstring>unnamed</cstring>
+                                <cstring>Browse</cstring>
                             </property>
-                            <widget class="QLabel" row="0" column="0">
-                                <property name="name">
-                                    <cstring>Comp1Label</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>First Component</string>
-                                </property>
-                                <property name="buddy" stdset="0">
-                                    <cstring>FitType1</cstring>
-                                </property>
-                            </widget>
-                            <widget class="QLabel" row="0" column="2">
-                                <property name="name">
-                                    <cstring>Comp3Label</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Third Component</string>
-                                </property>
-                                <property name="buddy" stdset="0">
-                                    <cstring>FitType1_2_2</cstring>
-                                </property>
-                            </widget>
-                            <widget class="QComboBox" row="1" column="1">
-                                <item>
-                                    <property name="text">
-                                        <string>Exponential</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Gaussian</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Stretch Exp.</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Exponential Cos</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Gaussian Cos</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Stretch Cos</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Lorentzian Dynamic KT</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Gaussian Dynamic KT</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Background</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Lorentzian Kubo-Toyabe LF x Exp</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Gaussian Kubo-Toyabe LF x Exp</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Lorentzian Kubo-Toyabe LF x Str Exp</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Gaussian Kubo-Toyabe LF x Str Exp</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Meissner State Model</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>None</string>
-                                    </property>
-                                </item>
-                                <property name="name">
-                                    <cstring>FitType2</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>5</hsizetype>
-                                        <vsizetype>0</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="currentItem">
-                                    <number>14</number>
-                                </property>
-                            </widget>
-                            <widget class="QComboBox" row="1" column="0">
-                                <item>
-                                    <property name="text">
-                                        <string>Exponential</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Gaussian</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Stretch Exp.</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Exponential Cos</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Gaussian Cos</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Stretch Cos</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Lorentzian Dynamic KT</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Gaussian Dynamic KT</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Background</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Lorentzian Kubo-Toyabe LF x Exp</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Gaussian Kubo-Toyabe LF x Exp</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Lorentzian Kubo-Toyabe LF x Str Exp</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Gaussian Kubo-Toyabe LF x Str Exp</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Meissner State Model</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>None</string>
-                                    </property>
-                                </item>
-                                <property name="name">
-                                    <cstring>FitType1</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>5</hsizetype>
-                                        <vsizetype>0</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="sizeLimit">
-                                    <number>20</number>
-                                </property>
-                                <property name="autoCompletion">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="duplicatesEnabled">
-                                    <bool>false</bool>
-                                </property>
-                            </widget>
-                            <widget class="QComboBox" row="1" column="2">
-                                <item>
-                                    <property name="text">
-                                        <string>Exponential</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Gaussian</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Stretch Exp.</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Exponential Cos</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Gaussian Cos</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Stretch Cos</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Lorentzian Dynamic KT</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Gaussian Dynamic KT</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Background</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Lorentzian Kubo-Toyabe LF x Exp</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Gaussian Kubo-Toyabe LF x Exp</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Lorentzian Kubo-Toyabe LF x Str Exp</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Gaussian Kubo-Toyabe LF x Str Exp</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>Meissner State Model</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>None</string>
-                                    </property>
-                                </item>
-                                <property name="name">
-                                    <cstring>FitType3</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>5</hsizetype>
-                                        <vsizetype>0</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="currentItem">
-                                    <number>14</number>
-                                </property>
-                            </widget>
-                            <widget class="QLabel" row="0" column="1">
-                                <property name="name">
-                                    <cstring>Comp2Label</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Second Component</string>
-                                </property>
-                                <property name="buddy" stdset="0">
-                                    <cstring>FitType1_2</cstring>
-                                </property>
-                            </widget>
-                        </grid>
-                    </widget>
-                    <widget class="QLayoutWidget">
-                        <property name="name">
-                            <cstring>layout20</cstring>
-                        </property>
-                        <grid>
-                            <property name="name">
-                                <cstring>unnamed</cstring>
+                            <property name="enabled">
+                                <bool>true</bool>
                             </property>
-                            <widget class="QLineEdit" row="1" column="2">
-                                <property name="name">
-                                    <cstring>BINS</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>5</hsizetype>
-                                        <vsizetype>0</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="text">
-                                    <string>100</string>
-                                </property>
-                            </widget>
-                            <widget class="QLineEdit" row="1" column="1">
-                                <property name="name">
-                                    <cstring>Tfs</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>5</hsizetype>
-                                        <vsizetype>0</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="text">
-                                    <string>8</string>
-                                </property>
-                            </widget>
-                            <widget class="QLabel" row="0" column="2">
-                                <property name="name">
-                                    <cstring>BINSLabel</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Binning Factor</string>
-                                </property>
-                                <property name="buddy" stdset="0">
-                                    <cstring>BINS</cstring>
-                                </property>
-                            </widget>
-                            <widget class="QLineEdit" row="1" column="0">
-                                <property name="name">
-                                    <cstring>Tis</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>5</hsizetype>
-                                        <vsizetype>0</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="text">
-                                    <string>0</string>
-                                </property>
-                            </widget>
-                            <widget class="QLabel" row="0" column="1">
-                                <property name="name">
-                                    <cstring>TfsLabel</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Final Time</string>
-                                </property>
-                                <property name="buddy" stdset="0">
-                                    <cstring>Tfs</cstring>
-                                </property>
-                            </widget>
-                            <widget class="QLabel" row="0" column="0">
-                                <property name="name">
-                                    <cstring>TisLabel</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Initial Time</string>
-                                </property>
-                                <property name="buddy" stdset="0">
-                                    <cstring>Tis</cstring>
-                                </property>
-                            </widget>
-                        </grid>
-                    </widget>
-                    <widget class="QLayoutWidget">
-                        <property name="name">
-                            <cstring>layout23</cstring>
-                        </property>
-                        <hbox>
-                            <property name="name">
-                                <cstring>unnamed</cstring>
+                            <property name="geometry">
+                                <rect>
+                                    <x>425</x>
+                                    <y>55</y>
+                                    <width>100</width>
+                                    <height>26</height>
+                                </rect>
                             </property>
-                            <widget class="QLabel">
-                                <property name="name">
-                                    <cstring>FitAsyTypeLabel</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Fit type</string>
-                                </property>
-                            </widget>
-                            <widget class="QComboBox">
-                                <item>
-                                    <property name="text">
-                                        <string>Asymmetry</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>SingleHist</string>
-                                    </property>
-                                </item>
-                                <property name="name">
-                                    <cstring>FitAsyType</cstring>
-                                </property>
-                            </widget>
-                            <widget class="QLabel">
-                                <property name="name">
-                                    <cstring>LRBFLabel</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Histograms list</string>
-                                </property>
-                            </widget>
-                            <widget class="QLineEdit">
-                                <property name="name">
-                                    <cstring>LRBF</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>5</hsizetype>
-                                        <vsizetype>0</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="text">
-                                    <string>1,3</string>
-                                </property>
-                            </widget>
-                        </hbox>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                            <property name="text">
+                                <string>Browse</string>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Browse to select data files for fitting.</string>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>Browse to select data files for fitting.</string>
+                            </property>
+                        </widget>
                     </widget>
                 </vbox>
             </widget>
@@ -974,7 +1819,7 @@
                         <x>5</x>
                         <y>5</y>
                         <width>545</width>
-                        <height>355</height>
+                        <height>435</height>
                     </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1023,29 +1868,6 @@
                     <property name="alignment">
                         <set>AlignLeft</set>
                     </property>
-                    <widget class="QLabel">
-                        <property name="name">
-                            <cstring>Comp1ShLabel</cstring>
-                        </property>
-                        <property name="geometry">
-                            <rect>
-                                <x>2</x>
-                                <y>30</y>
-                                <width>185</width>
-                                <height>20</height>
-                            </rect>
-                        </property>
-                        <property name="paletteBackgroundColor">
-                            <color>
-                                <red>255</red>
-                                <green>255</green>
-                                <blue>127</blue>
-                            </color>
-                        </property>
-                        <property name="text">
-                            <string>FitType1</string>
-                        </property>
-                    </widget>
                     <widget class="QLayoutWidget">
                         <property name="name">
                             <cstring>layout14</cstring>
@@ -1206,6 +2028,29 @@
                                 </property>
                             </widget>
                         </vbox>
+                    </widget>
+                    <widget class="QLabel">
+                        <property name="name">
+                            <cstring>Comp1ShLabel</cstring>
+                        </property>
+                        <property name="geometry">
+                            <rect>
+                                <x>2</x>
+                                <y>30</y>
+                                <width>185</width>
+                                <height>20</height>
+                            </rect>
+                        </property>
+                        <property name="paletteBackgroundColor">
+                            <color>
+                                <red>255</red>
+                                <green>255</green>
+                                <blue>127</blue>
+                            </color>
+                        </property>
+                        <property name="text">
+                            <string>FitType1</string>
+                        </property>
                     </widget>
                 </widget>
                 <widget class="QButtonGroup">
@@ -1639,7 +2484,7 @@
                         <x>5</x>
                         <y>5</y>
                         <width>545</width>
-                        <height>355</height>
+                        <height>440</height>
                     </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1713,7 +2558,7 @@
                         <x>5</x>
                         <y>5</y>
                         <width>545</width>
-                        <height>355</height>
+                        <height>435</height>
                     </rect>
                 </property>
                 <property name="overwriteMode">
@@ -1962,7 +2807,7 @@
                         <x>5</x>
                         <y>135</y>
                         <width>545</width>
-                        <height>230</height>
+                        <height>305</height>
                     </rect>
                 </property>
                 <property name="overwriteMode">
@@ -3238,16 +4083,16 @@
         <slot>GoPlot()</slot>
     </connection>
     <connection>
-        <sender>BeamLine</sender>
-        <signal>activated(int)</signal>
-        <receiver>MuSRFitform</receiver>
-        <slot>T0Update()</slot>
-    </connection>
-    <connection>
         <sender>InitParamTable</sender>
         <signal>valueChanged(int,int)</signal>
         <receiver>MuSRFitform</receiver>
         <slot>CallMSRCreate()</slot>
+    </connection>
+    <connection>
+        <sender>ManualFile</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>MuSRFitform</receiver>
+        <slot>RunSelectionToggle()</slot>
     </connection>
     <connection>
         <sender>Browse</sender>
@@ -3256,10 +4101,10 @@
         <slot>fileBrowse()</slot>
     </connection>
     <connection>
-        <sender>ManualFile</sender>
-        <signal>toggled(bool)</signal>
+        <sender>BeamLine</sender>
+        <signal>activated(int)</signal>
         <receiver>MuSRFitform</receiver>
-        <slot>RunSelectionToggle()</slot>
+        <slot>T0Update()</slot>
     </connection>
 </connections>
 <tabstops>
