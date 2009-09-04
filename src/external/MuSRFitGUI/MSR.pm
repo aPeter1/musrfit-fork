@@ -221,12 +221,15 @@ sub CreateMSR {
         # Also for Imaginaryand and Real for RRF fits
 
         $RUN = $RUNS[ $iRun - 1 ];
+	print "RUN=$RUN\n";
 
 	if ($All{"RUNSType"}) {
 	    $RUN_Line = MSR::RUNFileNameMan($RUN);
 	} else {
 	    $RUN_Line = MSR::RUNFileNameAuto($RUN,$YEAR,$BeamLine);
 	}
+
+	print "Line=$RUN_Line\n";
 
 	$Type_Line = "fittype         2";
 	$PLT       = 2;
@@ -1243,6 +1246,7 @@ sub RUNFileNameAuto {
     if    ( $RUN < 10 )   { $RUNtmp = "000" . $RUN; }
     elsif ( $RUN < 100 )  { $RUNtmp = "00" . $RUN; }
     elsif ( $RUN < 1000 ) { $RUNtmp = "0" . $RUN; }
+    else { $RUNtmp=$RUN; }
 	    
     # Get current year
     my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
