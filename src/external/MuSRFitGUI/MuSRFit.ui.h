@@ -425,6 +425,7 @@ void MuSRFitform::UpdateMSRFileInitTable()
 	InitParamTable->setText($PCount-1,1,$error);
 	InitParamTable->setText($PCount-1,2,$minvalue);
 	InitParamTable->setText($PCount-1,3,$maxvalue);
+# Set bg color to mark different runs
     }
     return;
 }
@@ -540,12 +541,13 @@ void MuSRFitform::InitializeTab()
     my $NParam=scalar keys( %PTable );
     if ($NParam>$NRows) {	
 	InitParamTable->setNumRows($NParam);
-    }
+  }
     
 # Fill the table with labels and values of parametr 
     for (my $PCount=0;$PCount<$NParam;$PCount++) {
-	my ($Param,$value,$error,$minvalue,$maxvalue) = split(/,/,$PTable{$PCount});
-	InitParamTable->verticalHeader()->setLabel( $PCount,$Param);
+	my ($Param,$value,$error,$minvalue,$maxvalue,$RUN) = split(/,/,$PTable{$PCount});
+	InitParamTable->verticalHeader()->setLabel( $PCount,"$RUN: $Param");
+#	InitParamTable->verticalHeader()->setLabel( $PCount,"$Param");
 	InitParamTable->showRow($PCount);
 	InitParamTable->setText($PCount,0,$value);
 	InitParamTable->setText($PCount,1,$error);

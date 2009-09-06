@@ -296,7 +296,7 @@ FITPARAMETER
     my $NParam=scalar keys( %PTable );
 # Fill the table with labels and values of parametr 
     for (my $iP=0;$iP<$NParam;$iP++) {
-	my ($Param,$value,$error,$minvalue,$maxvalue) = split(/,/,$PTable{$iP});
+	my ($Param,$value,$error,$minvalue,$maxvalue,$RUNtmp) = split(/,/,$PTable{$iP});
 	if ( $minvalue == $maxvalue ) {
 	    $minvalue = $EMPTY;
 	    $maxvalue = $EMPTY;
@@ -644,7 +644,7 @@ FITPARAMETER
     my $NParam=scalar keys( %PTable );
 # Fill the table with labels and values of parametr 
     for (my $iP=0;$iP<$NParam;$iP++) {
-	my ($Param,$value,$error,$minvalue,$maxvalue) = split(/,/,$PTable{$iP});
+	my ($Param,$value,$error,$minvalue,$maxvalue,$RUNtmp) = split(/,/,$PTable{$iP});
 	if ( $minvalue == $maxvalue ) {
 	    $minvalue = $EMPTY;
 	    $maxvalue = $EMPTY;
@@ -1160,7 +1160,7 @@ sub PrepParamTable {
 			    $minvalue = $Defaults{ join("", $Param_ORG, $minadd ) };
 			    $maxvalue = $Defaults{ join("", $Param_ORG, $maxadd ) };
 			}
-			$values=join(",",$Param,$value,$error,$minvalue,$maxvalue);
+			$values=join(",",$Param,$value,$error,$minvalue,$maxvalue,$RUN);
 			$ParTable{$PCount}=$values;
 			$PCount++;
 		    }
@@ -1205,13 +1205,12 @@ sub PrepParamTable {
 # I need this although it is already in the MSR.pm module, just for this table
 # We can remove it from the MSR module later...
 # Or keep in the MSR as function ??
-				print "I got into here\n";
 				$value = $Defaults{$Param_ORG};
 				$error = $Defaults{ join( "", $erradd, $Param_ORG ) };
 				$minvalue = $Defaults{ join("", $Param_ORG, $minadd ) };
 				$maxvalue = $Defaults{ join("", $Param_ORG, $maxadd ) };
 			    }
-			    $values=join(",",$Param,$value,$error,$minvalue,$maxvalue);
+			    $values=join(",",$Param,$value,$error,$minvalue,$maxvalue,$RUN);
 			    $ParTable{$PCount}=$values;
 			    $PCount++;
 			}
