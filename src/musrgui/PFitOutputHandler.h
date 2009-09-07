@@ -47,18 +47,19 @@ class PFitOutputHandler : public QDialog
 {
   Q_OBJECT
 
-public:
-  PFitOutputHandler(QString workingDirectory, QValueVector<QString> &cmd);
-  ~PFitOutputHandler() {}
+  public:
+    PFitOutputHandler(QString workingDirectory, QValueVector<QString> &cmd);
+    virtual ~PFitOutputHandler();
 
-private slots:
-    void readFromStdOut();
-    void readFromStdErr();
-    void quitButtonPressed();
-    void processDone();
+  private slots:
+    virtual void readFromStdOut();
+    virtual void readFromStdErr();
+    virtual void quitButtonPressed();
+    virtual void processDone();
 
 private:
     QProcess *fProc;
+
     QVBox *fVbox;
     QTextEdit *fOutput;
     QPushButton *fQuitButton;

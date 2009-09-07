@@ -13,7 +13,7 @@
 %   [output file name]
 
 reducedTemp = 0.8492
-lambdaL = 33.6
+lambdaL = 32.3
 xi0 = 380.0
 meanFreePath = 12000.0
 filmThickness = 500000.0

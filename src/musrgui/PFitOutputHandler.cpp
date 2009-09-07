@@ -80,6 +80,27 @@ PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QValueVector<QStr
 /**
  * <p>
  */
+PFitOutputHandler::~PFitOutputHandler()
+{
+  if (fProc->isRunning()) {
+    qDebug("fProc still running");
+    fProc->kill();
+  }
+  if (fProc->isRunning()) {
+    QString msg = "fProc still running ...";
+    qDebug(msg);
+  }
+
+  if (fProc) {
+    delete fProc;
+    fProc = 0;
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
 void PFitOutputHandler::readFromStdOut()
 {
   // Read and process the data.
@@ -115,8 +136,11 @@ void PFitOutputHandler::quitButtonPressed()
 {
   // if the fitting is still taking place, kill it
   if (fProc->isRunning()) {
+/*
     fProc->tryTerminate();
     QTimer::singleShot( 100, fProc, SLOT( kill() ) );
+*/
+    fProc->kill();
   }
 
   accept();
