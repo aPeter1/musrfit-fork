@@ -27,6 +27,8 @@ void syntax()
   cout << endl << "%   mean free path";
   cout << endl << "%   film thickness";
   cout << endl << "%   boundary conditions";
+  cout << endl << "%   [Bext in (G)], i.e. this is optional";
+  cout << endl << "%   [dead layer in (nm)], i.e. this is optional";
   cout << endl << "%   [rge input file name], i.e. this is optional";
   cout << endl << "%   [output file name], i.e. this is optional";
   cout << endl;
@@ -36,6 +38,8 @@ void syntax()
   cout << endl << "meanFreePath = 12000.0";
   cout << endl << "filmThickness = 5000.0";
   cout << endl << "specular = 1";
+  cout << endl << "Bext = 47.14";
+  cout << endl << "deadLayer = 0.4";
   cout << endl << "rgeFileName = /afs/psi.ch/project/nemu/analysis/2009/Nonlocal/trimsp/InSne060.rge";
   cout << endl << "outputFileName = In_37_T2P83.dat";
   cout << endl << endl;
@@ -144,6 +148,30 @@ int readInputFile(char *fln, PippardParams &param)
         param.specular = true;
       else
         param.specular = false;
+    }
+
+    if (tstr.BeginsWith("Bext = ")) {
+      result = sscanf(line, "Bext = %lf", &dval);
+      if (result != 1) {
+        cout << endl << "**ERROR** while trying to extracted the external field value.";
+        cout << endl << "line = " << line;
+        cout << endl;
+        param.valid = false;
+        break;
+      }
+      param.b_ext = dval;
+    }
+
+    if (tstr.BeginsWith("deadLayer = ")) {
+      result = sscanf(line, "deadLayer = %lf", &dval);
+      if (result != 1) {
+        cout << endl << "**ERROR** while trying to extracted the dead layer value.";
+        cout << endl << "line = " << line;
+        cout << endl;
+        param.valid = false;
+        break;
+      }
+      param.deadLayer = dval;
     }
 
     if (tstr.BeginsWith("rgeFileName =")) {
@@ -255,8 +283,11 @@ int main(int argc, char *argv[])
   params.filmThickness = -1.0;
   params.specular = true;
   params.specularIntegral = -1.0;
+  params.b_ext = -1.0;
+  params.deadLayer = -1.0;
   params.rgeFileName = "";
   params.outputFileName = "";
+  params.meanX = 0.0;
   params.meanB = 0.0;
 
   if (!readInputFile(argv[1], params)) {
@@ -322,35 +353,29 @@ int main(int argc, char *argv[])
 
   // check if it is necessary to calculate the <B(x)>
   if (x.size() > 0) {
-    Double_t dz = pippard->GetStepDistance();
-    Int_t max = (Int_t)((Double_t)(x[x.size()-1])/dz);
-//cout << endl << "max = " << max;
-    Double_t mean = 0.0;
-    Double_t nn;
-    for (Int_t i=0; i<max; i++) {
-      // find propper z value index of n(z)
-      Int_t idx = -1;
-      for (unsigned int j=0; j<x.size(); j++) {
-        if (x[j] >= i*dz) {
-          idx = j;
-          break;
-        }
-      }
-      // get n(z) at the proper index
-      if (idx == -1) {
-        nn = 0.0;
-      } else if (idx == 0) {
-        nn = n[0];
-      } else {
-        nn = n[idx-1] + (n[idx]-n[idx-1]) * (i*dz-x[idx-1])/(x[idx]-x[idx-1]);
-      }
-//cout << endl << i << ", idx = " << idx << ", i*dz = " << i*dz << ", x[idx] = " << x[idx] << ", x[idx-1] = " << x[idx-1] << ", nn = " << nn;
-      mean += pippard->GetMagneticField(i*dz) * nn;
+    if ((params.b_ext == -1.0) || (params.deadLayer == -1.0)) {
+      cout << endl << "**ERROR** Bext or deadLayer missing :-(" << endl;
+      return 0;
     }
-    mean *= dz/(x[1]-x[0]);
 
-    cout << endl << ">> mean field = " << mean;
-    pippard->SetMeanB(mean);
+    Double_t meanX = 0.0;
+    for (unsigned int i=0; i<x.size(); i++) {
+      meanX += x[i]*n[i];
+    }
+    meanX *= (x[1]-x[0]);
+
+    Double_t meanB = 0.0;
+    for (unsigned int i=0; i<x.size()-1; i++) {
+      if (x[i] <= params.deadLayer)
+        meanB += 1.0 * n[i];
+      else
+        meanB += pippard->GetMagneticField(x[i]-params.deadLayer) * n[i];
+    }
+    meanB *= (x[1]-x[0]);
+
+    cout << endl << ">> mean x = " << meanX << ", mean field = " << params.b_ext * meanB;
+    pippard->SetMeanX(meanX);
+    pippard->SetMeanB(meanB);
   }
 
   if (params.outputFileName.Length() > 0)

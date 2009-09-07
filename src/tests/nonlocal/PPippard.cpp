@@ -392,8 +392,10 @@ void PPippard::SaveField()
     fprintf(fp, "%%   Boundary Conditions: Diffuse\n");
   if (fParams.rgeFileName.Length() > 0)
     fprintf(fp, "%%   rge file name : %s\n", fParams.rgeFileName.Data());
-  if (fParams.meanB != 0.0)
+  if (fParams.meanB != 0.0) {
+    fprintf(fp, "%%   Mean Distance       = %lf\n", fParams.meanX);
     fprintf(fp, "%%   Mean Field/Bext     = %lf\n", fParams.meanB);
+  }
   fprintf(fp, "%%\n");
 
   // write data

@@ -27,9 +27,12 @@ typedef struct {
   Double_t filmThickness; // film thickness
   Bool_t specular;        // true -> specular reflection boundary conditions, false -> diffuse scattering boundary conditions
   Double_t specularIntegral; // int_x=0^infty B(x) dx / Bext
+  Double_t b_ext;         // external field in (G)
+  Double_t deadLayer;     // dead layer in (nm)
   TString rgeFileName;
   TString outputFileName;
   Double_t meanB;         // int_x=0^infty B(x) n(x) dx / int_x=0^infty n(x) dx / Bext
+  Double_t meanX;         // int_x=0^infty x n(x) dx / int_x=0^infty n(x) dx
 } PippardParams;
 
 class PPippard
@@ -44,6 +47,7 @@ class PPippard
     virtual void SetMeanFreePath(Double_t meanFreePath) { fParams.meanFreePath = meanFreePath; }
     virtual void SetFilmThickness(Double_t thickness) { fParams.filmThickness = thickness; }
     virtual void SetSpecular(Bool_t specular) { fParams.specular = specular; }
+    virtual void SetMeanX(Double_t meanX) { fParams.meanX = meanX; }
     virtual void SetMeanB(Double_t meanB) { fParams.meanB = meanB; }
 
     virtual void CalculateField();
