@@ -1,0 +1,30 @@
+#---------------------------------------------------------------------
+# INSTALL
+# Bastian M. Wojek, 2009/09/07
+#---------------------------------------------------------------------
+
+Installation of the musrfit-plugin "libGapIntegrals.so"
+
+* Download the latest version of the Cuba library ( http://www.feynarts.de/cuba/ )
+* Install Cuba using the following inside the extracted directory
+ 
+   ./configure
+   make
+   make install
+
+* Build the plugin inside the plugin source directory:
+
+   make -f Makefile.libGapIntegrals
+
+* Install the plugin to your $ROOTSYS
+
+   make -f Makefile.libGapIntegrals install
+
+* The plugin classes can now be accessed inside THEORY blocks of musrfit msr-files via:
+
+   userFcn  libGapIntegrals.so TGapSWave 4 5
+   userFcn  libGapIntegrals.so TGapDWave 4 5
+
+#---------------------------------------------------------------------
+# this is the end ...
+#---------------------------------------------------------------------

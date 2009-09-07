@@ -1,0 +1,63 @@
+#---------------------------------------------------
+# get compilation flags from root-config
+
+ROOTCFLAGS    = $(shell $(ROOTSYS)/bin/root-config --cflags)
+# ROOTLIBS    = $(shell $(ROOTSYS)/bin/root-config --libs)
+
+#---------------------------------------------------
+
+OS            = LINUX
+CXX           = g++
+CXXFLAGS      = -O3 -Wall -Wno-trigraphs -fPIC
+MUSRFITINCLUDE = ../../include
+LOCALINCLUDE  = .
+ROOTINCLUDE   = $(ROOTSYS)/include
+INCLUDES      = -I$(LOCALINCLUDE) -I$(MUSRFITINCLUDE) -I$(ROOTINCLUDE)
+LD            = g++
+LDFLAGS       = -O
+SOFLAGS       = -shared 
+
+# the output from the root-config script:
+CXXFLAGS      += $(ROOTCFLAGS)
+LDFLAGS       += -L/usr/local/lib -lcuba -lm
+
+# some definitions: headers (used to generate *Dict* stuff), sources, objects,...
+OBJS =
+OBJS += TIntegrator.o
+OBJS += TGapIntegrals.o TGapIntegralsDict.o
+
+SHLIB = libGapIntegrals.so
+
+# make the shared lib:
+#
+all:  $(SHLIB)
+
+$(SHLIB): $(OBJS)
+	@echo "---> Building shared library $(SHLIB) ..."
+	/bin/rm -f $(SHLIB)
+	$(LD) $(SOFLAGS) -o $(SHLIB) $(OBJS) $(LDFLAGS)
+	@echo "done"
+
+# clean up: remove all object file (and core files)
+# semicolon needed to tell make there is no source
+# for this target!
+#
+clean:; 	@rm -f $(OBJS) $(SHLIB) *Dict* core* *~
+	@echo "---> removing $(OBJS) $(SHLIB)"
+
+#
+$(OBJS): %.o: %.cpp
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
+
+# Generate the ROOT CINT dictionary
+
+TGapIntegralsDict.cpp: ./TIntegrator.h ./TGapIntegrals.h ./TGapIntegralsLinkDef.h
+	@echo "Generating dictionary $@..."
+	rootcint -f $@ -c -p -I$(MUSRFITINCLUDE) $^
+
+install: all
+	@echo "Installing shared lib: $(SHLIB)"
+ifeq ($(OS),LINUX)
+	cp -pv $(SHLIB) $(ROOTSYS)/lib
+	cp -pv TIntegrator.h TGapIntegrals.h $(ROOTSYS)/include
+endif
