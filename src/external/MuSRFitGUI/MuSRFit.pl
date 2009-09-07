@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Sun Sep 6 15:38:11 2009
+# Created: Mon Sep 7 11:44:59 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -569,7 +569,7 @@ sub NEW
         setName("MuSRFitform" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
-    setMinimumSize(Qt::Size(23, 222) );
+    setMinimumSize(Qt::Size(21, 227) );
     setIcon($image0 );
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
@@ -2447,7 +2447,7 @@ sub InitializeTab
 # Fill the table with labels and values of parametr 
     for (my $PCount=0;$PCount<$NParam;$PCount++) {
 	my ($Param,$value,$error,$minvalue,$maxvalue,$RUN) = split(/,/,$PTable{$PCount});
-	InitParamTable->verticalHeader()->setLabel( $PCount,"$RUN: $Param");
+	InitParamTable->verticalHeader()->setLabel( $PCount,"$Param");
 #	InitParamTable->verticalHeader()->setLabel( $PCount,"$Param");
 	InitParamTable->showRow($PCount);
 	InitParamTable->setText($PCount,0,$value);

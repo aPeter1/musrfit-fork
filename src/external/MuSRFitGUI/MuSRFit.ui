@@ -22,8 +22,8 @@
     </property>
     <property name="minimumSize">
         <size>
-            <width>23</width>
-            <height>222</height>
+            <width>21</width>
+            <height>227</height>
         </size>
     </property>
     <property name="caption">
@@ -2855,32 +2855,20 @@
                     <property name="text">
                         <string>Value</string>
                     </property>
-                    <property name="pixmap">
-                        <pixmap></pixmap>
-                    </property>
                 </column>
                 <column>
                     <property name="text">
                         <string>Error</string>
-                    </property>
-                    <property name="pixmap">
-                        <pixmap></pixmap>
                     </property>
                 </column>
                 <column>
                     <property name="text">
                         <string>Min</string>
                     </property>
-                    <property name="pixmap">
-                        <pixmap></pixmap>
-                    </property>
                 </column>
                 <column>
                     <property name="text">
                         <string>Max</string>
-                    </property>
-                    <property name="pixmap">
-                        <pixmap></pixmap>
                     </property>
                 </column>
                 <property name="name">

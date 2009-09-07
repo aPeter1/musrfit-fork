@@ -546,8 +546,10 @@ void MuSRFitform::InitializeTab()
 # Fill the table with labels and values of parametr 
     for (my $PCount=0;$PCount<$NParam;$PCount++) {
 	my ($Param,$value,$error,$minvalue,$maxvalue,$RUN) = split(/,/,$PTable{$PCount});
-	InitParamTable->verticalHeader()->setLabel( $PCount,"$RUN: $Param");
-#	InitParamTable->verticalHeader()->setLabel( $PCount,"$Param");
+# If you use this then reading the parameters from the table is a problem
+# You need to extract the correct parameter name from the row label
+#	InitParamTable->verticalHeader()->setLabel( $PCount,"$RUN: $Param");
+	InitParamTable->verticalHeader()->setLabel( $PCount,"$Param");
 	InitParamTable->showRow($PCount);
 	InitParamTable->setText($PCount,0,$value);
 	InitParamTable->setText($PCount,1,$error);

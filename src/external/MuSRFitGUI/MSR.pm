@@ -1147,6 +1147,7 @@ sub PrepParamTable {
 			$Param=$Param."_".$iRun;
 # Check if this parameter has been initialized befor. If not take from defaults
 			$value = $All{"$Param"};
+			print "$Param=$value\n";
 			if ( $value ne "" ) {
 			    $error    = $All{"$erradd$Param"};
 			    $minvalue = $All{"$Param$minadd"};
@@ -1155,6 +1156,7 @@ sub PrepParamTable {
 # I need this although it is already in the MSR.pm module, just for this table
 # We can remove it from the MSR module later...
 # Or keep in the MSR as function ??
+			    print "I am here. Why?\n";
 			    $value = $Defaults{$Param_ORG};
 			    $error = $Defaults{ join( "", $erradd, $Param_ORG ) };
 			    $minvalue = $Defaults{ join("", $Param_ORG, $minadd ) };
