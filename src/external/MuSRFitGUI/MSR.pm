@@ -1307,7 +1307,7 @@ sub RUNFileNameAuto {
 ########################
 sub RUNFileNameMan { 
     my %EXTs = ("root","ROOT-NPP",
-		"bin","PSIBIN",
+		"bin","PSI-BIN",
 		"msr","MUD");
 
 # Take this information as input arguments
