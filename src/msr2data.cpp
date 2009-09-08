@@ -63,10 +63,14 @@ bool isNumber(const string &s)
  */
 void msr2data_syntax()
 {
-  cout << endl << "usage 1: msr2data <run> <extension> [-o<outputfile>] [data] [noheader] [nosummary] [fit-<template>[!]] [-k] [-t]";
-  cout << endl << "usage 2: msr2data <run1> <run2> <extension> [-o<outputfile>] [data] [noheader] [nosummary] [fit-<template>[!]] [-k] [-t]";
-  cout << endl << "usage 3: msr2data \\[<run1> <run2> ... <runN>\\] <extension> [-o<outputfile> ] [data] [noheader] [nosummary] [fit-<template>[!]] [-k] [-t]";
-  cout << endl << "usage 4: msr2data <runlist> <extension> [-o<outputfile>] [data] [noheader] [nosummary] [fit-<template>[!]] [-k] [-t]";
+  cout << endl << "usage 1: msr2data <run> <extension> [-o<outputfile>] [data] [noheader] [nosummary]";
+  cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
+  cout << endl << "usage 2: msr2data <run1> <run2> <extension> [-o<outputfile>] [data] [noheader] [nosummary]";
+  cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
+  cout << endl << "usage 3: msr2data \\[<run1> <run2> ... <runN>\\] <extension> [-o<outputfile> ] [data] [noheader] [nosummary]";
+  cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
+  cout << endl << "usage 4: msr2data <runlist> <extension> [-o<outputfile>] [data] [noheader] [nosummary]";
+  cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
   cout << endl;
   cout << endl << "       <run>, <run1>, <run2>, ... <runN> : run numbers";
   cout << endl << "       <extension> : msr-file extension, e.g. _tf_h13 for the file name 8472_tf_h13.msr";
@@ -74,10 +78,14 @@ void msr2data_syntax()
   cout << endl << "       data : instead of to a DB file the data are written to a simple column structure";
   cout << endl << "       noheader : no file header is written to the output file";
   cout << endl << "       nosummary : no additional data from the run data file is written to the output file";
+  cout << endl << "       fit : invoke musrfit to fit the specified runs";
+  cout << endl << "              All msr input files are assumed to be present, none is newly generated!";
   cout << endl << "       fit-<template>! : generate msr-files for the runs to be processed from the <template>-run";
   cout << endl << "              and call musrfit for fitting these runs";
   cout << endl << "       fit-<template> : same as above, but the <template>-run is only used for the first file creation - ";
-  cout << endl << "              the succeding files are generated using the musrfit-output from the last runs";
+  cout << endl << "              the succeding files are generated using the musrfit-output from the preceding runs";
+  cout << endl << "       msr-<template> : same as above without calling musrfit";
+  cout << endl << "              In case any fitting-option is present, this option is ignored!";
   cout << endl << "       -k : if fitting is used, pass the option --keep-mn2-output to musrfit";
   cout << endl << "       -t : if fitting is used, pass the option --title-from-data-file to musrfit";
   cout << endl;
@@ -107,7 +115,7 @@ string msr2data_outputfile(vector<string> &arg, bool db = true)
       if (!iter->compare("-o")) {
         if ((iterNext != arg.end()) && (iterNext->compare("noheader")) && (iterNext->compare("nosummary")) \
             && (iterNext->substr(0,3).compare("fit")) && (iterNext->compare("-k")) && (iterNext->compare("-t")) \
-            && (iterNext->compare("data")) ) {
+            && (iterNext->compare("data")) && (iterNext->substr(0,3).compare("msr")) ) {
           outputFile = *iterNext;
           arg.erase(iterNext);
           arg.erase(iter);
@@ -155,14 +163,28 @@ bool msr2data_useOption(vector<string> &arg, const string &s)
  * std::vector of std::string
  * bool
  */
-unsigned int msr2data_doFitting(vector<string> &arg, bool &chainfit)
+int msr2data_doFitting(vector<string> &arg, bool &chainfit)
 {
-  unsigned int temp(0);
+  int temp(0);
 
   string s;
   istringstream iss;
-  for (vector<string>::iterator iter(arg.begin()); iter != arg.end(); iter++) {
-    if (!iter->substr(0,4).compare("fit-")) {
+  vector<string>::iterator iter(arg.begin());
+  while (iter != arg.end()) {
+    if (!iter->compare("fit")) {
+      if (temp) {
+        return -2; // fatal error - another fit-<temp> option is specified
+      }
+      temp = -1;
+      chainfit = false;
+      iter = arg.erase(iter);
+      if (iter == arg.end())
+        break;
+    }
+    else if (!iter->substr(0,4).compare("fit-")) {
+      if (temp) {
+        return -2; // fatal error - another fit option is specified
+      }
       s = iter->substr(4);
       string::size_type loc = s.rfind('!');
       if (loc != string::npos)
@@ -171,7 +193,36 @@ unsigned int msr2data_doFitting(vector<string> &arg, bool &chainfit)
         chainfit = true;
       iss.str(s);
       iss >> temp;
+      iter = arg.erase(iter);
+      if (iter == arg.end())
+        break;
+    } else {
+      iter++;
+    }
+  }
+
+  return temp;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ * std::vector of std::string
+ * bool
+ */
+unsigned int msr2data_doInputCreation(vector<string> &arg, bool &inputOnly)
+{
+  unsigned int temp(0);
+
+  string s;
+  istringstream iss;
+  for (vector<string>::iterator iter(arg.begin()); iter != arg.end(); iter++) {
+    if (!iter->substr(0,4).compare("msr-")) {
+      s = iter->substr(4);
+      iss.str(s);
+      iss >> temp;
       arg.erase(iter);
+      inputOnly = true;
       break;
     }
   }
@@ -341,11 +392,19 @@ int main(int argc, char *argv[])
   run_vec.clear();
 
 // check if fitting should be done and in case, which template run number to use
-  unsigned int temp(0);
-  bool chainfit(true);
+  int temp(0);
+  bool chainfit(true), onlyInputCreation(false);
   string musrfitOptions;
 
   temp = msr2data_doFitting(arg, chainfit);
+
+  if (temp == -2) {
+    cout << endl;
+    cout << ">> msr2data: **ERROR** More than one fitting options are specified! Quitting..." << endl;
+    run_vec.clear();
+    arg.clear();
+    return status;
+  }
 
 // check if any options should be passed to musrfit
   if (temp) {
@@ -353,6 +412,17 @@ int main(int argc, char *argv[])
       musrfitOptions.append("-k ");
     if (!msr2data_useOption(arg, "-t"))
       musrfitOptions.append("-t ");
+  }
+
+// if no fitting should be done, check if only the input files should be created
+
+  if(!temp) {
+    temp = msr2data_doInputCreation(arg, onlyInputCreation);
+    if (onlyInputCreation) {
+      // if only input files should be created, do not write data to an output file (no matter, what has been determined earlier)
+      realOutput = false;
+      outputFile = "none";
+    }
   }
 
   bool writeHeader(false), writeSummary(false);
@@ -372,7 +442,7 @@ int main(int argc, char *argv[])
 
 // Processing the run list, do the fitting and write the data to the DB or data output file
   bool firstrun(true);
-  unsigned int oldtemp(temp);
+  unsigned int oldtemp(0); // should be accessed only when updated before...
 
   while (msr2dataHandler.GetPresentRun()) {
     ostringstream strInfile;
@@ -380,26 +450,30 @@ int main(int argc, char *argv[])
 
     // if fitting should be done, prepare a new input file
     if (temp) {
-      bool success(true);
-      if (firstrun || !chainfit)
-        success = msr2dataHandler.PrepareNewInputFile(temp);
-      else
-        success = msr2dataHandler.PrepareNewInputFile(oldtemp);
-      if (firstrun)
-        firstrun = false;
-      oldtemp = msr2dataHandler.GetPresentRun();
+      if (temp > 0) {
+        bool success(true);
+        if (firstrun || !chainfit)
+          success = msr2dataHandler.PrepareNewInputFile(temp);
+        else
+          success = msr2dataHandler.PrepareNewInputFile(oldtemp);
+        if (firstrun)
+          firstrun = false;
+        oldtemp = msr2dataHandler.GetPresentRun();
 
-      if (!success) {
-        cout << endl << ">> msr2data: **ERROR** Input file generation has not been successful! Quitting..." << endl;
-        arg.clear();
-        return -1;
+        if (!success) {
+          cout << endl << ">> msr2data: **ERROR** Input file generation has not been successful! Quitting..." << endl;
+          arg.clear();
+          return -1;
+        }
       }
 
     // and do the fitting
-      ostringstream oss;
-      oss << "musrfit" << " " << strInfile.str() << " " << musrfitOptions;
-      cout << endl << ">> msr2data: **INFO** Calling " << oss.str() << endl;
-      system(oss.str().c_str());
+      if (!onlyInputCreation) {
+        ostringstream oss;
+        oss << "musrfit" << " " << strInfile.str() << " " << musrfitOptions;
+        cout << endl << ">> msr2data: **INFO** Calling " << oss.str() << endl;
+        system(oss.str().c_str());
+      }
     }
 
   // read msr-file

@@ -98,7 +98,7 @@ void TAnSWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
                       const int *ncomp, double f[]) // x = {E, phi}, fPar = {T, Delta(T),a}
 {
   double twokt(2.0*0.08617384436*fPar[0]); // kB in meV/K
-  double Ec(4.0*(fPar[0]+fPar[1])); // upper limit of energy-integration: cutoff energy
+  double Ec(4.0*(fPar[0]+(1.0+fPar[2])*fPar[1])); // upper limit of energy-integration: cutoff energy
   double phic(TMath::PiOver2()); // upper limit of phi-integration
   double deltasq(TMath::Power(fPar[1]*(1.0+fPar[2]*TMath::Cos(4.0*x[1]*phic)),2.0));
   f[0] = -phic*Ec/(2.0*twokt*TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*Ec*Ec+deltasq)/twokt),2.0));
@@ -142,7 +142,7 @@ void TAnSWaveGapIntegralDivonne::Integrand(const int *ndim, const double x[],
                       const int *ncomp, double f[]) // x = {E, phi}, fPar = {T, Delta(T),a}
 {
   double twokt(2.0*0.08617384436*fPar[0]); // kB in meV/K
-  double Ec(4.0*(fPar[0]+fPar[1])); // upper limit of energy-integration: cutoff energy
+  double Ec(4.0*(fPar[0]+(1.0+fPar[2])*fPar[1])); // upper limit of energy-integration: cutoff energy
   double phic(TMath::PiOver2()); // upper limit of phi-integration
   double deltasq(TMath::Power(fPar[1]*(1.0+fPar[2]*TMath::Cos(4.0*x[1]*phic)),2.0));
   f[0] = -phic*Ec/(2.0*twokt*TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*Ec*Ec+deltasq)/twokt),2.0));

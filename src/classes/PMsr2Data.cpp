@@ -380,7 +380,7 @@ bool PMsr2Data::PrepareNewInputFile(unsigned int tempRun) const
        } else {
          cout << endl;
          cout << ">> msr2data: **WARNING** The template run file number does not match the \"file index\"" << endl;
-         cout << ">> msr2data: **WARNING** Unexpected things may happen... (for sure)" << endl;
+         cout << ">> msr2data: **WARNING** Unexpected things will happen... (for sure)" << endl;
        }
     }
     out << line << endl;
