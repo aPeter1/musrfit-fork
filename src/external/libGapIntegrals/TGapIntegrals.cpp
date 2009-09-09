@@ -74,7 +74,7 @@ TGapDWave::TGapDWave() {
 }
 
 TGapAnSWave::TGapAnSWave() {
-  TAnSWaveGapIntegralDivonne *gapint = new TAnSWaveGapIntegralDivonne();
+  TAnSWaveGapIntegralSuave *gapint = new TAnSWaveGapIntegralSuave();
   fGapIntegral = gapint;
   gapint = 0;
   delete gapint;
@@ -230,16 +230,17 @@ double TGapDWave::operator()(double t, const vector<double> &par) const {
 
     double ds;
     vector<double> intPar; // parameters for the integral, T & Delta(T)
-    intPar.push_back(t);
+    intPar.push_back(2.0*0.08617384436*t); // 2 kB T, kB in meV/K
     intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
-
+    intPar.push_back(4.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
+    intPar.push_back(TMath::PiOver2()); // upper limit of phi-integration
 
 //    double xl[] = {0.0, 0.0}; // lower bound E, phi
-//    double xu[] = {2.0*(t+intPar[1]), 0.5*PI}; // upper bound E, phi
+//    double xu[] = {4.0*(t+intPar[1]), 0.5*PI}; // upper bound E, phi
 
     fGapIntegral->SetParameters(intPar);
 //    ds = 1.0+4.0/PI*fGapIntegral->IntegrateFunc(2, xl, xu);
-    ds = 1.0+4.0/PI*fGapIntegral->IntegrateFunc();
+    ds = 1.0-intPar[2]/intPar[0]*fGapIntegral->IntegrateFunc();
 
     intPar.clear();
 
@@ -300,17 +301,18 @@ double TGapAnSWave::operator()(double t, const vector<double> &par) const {
 
     double ds;
     vector<double> intPar; // parameters for the integral, T & Delta(T)
-    intPar.push_back(t);
+    intPar.push_back(2.0*0.08617384436*t); // 2 kB T, kB in meV/K
     intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
     intPar.push_back(par[2]);
-
+    intPar.push_back(4.0*(t+(1.0+par[2])*intPar[1])); // upper limit of energy-integration: cutoff energy
+    intPar.push_back(TMath::PiOver2()); // upper limit of phi-integration
 
 //    double xl[] = {0.0, 0.0}; // lower bound E, phi
 //    double xu[] = {4.0*(t+intPar[1]), 0.5*PI}; // upper bound E, phi
 
     fGapIntegral->SetParameters(intPar);
 //    ds = 1.0+4.0/PI*fGapIntegral->IntegrateFunc(2, xl, xu);
-    ds = 1.0+4.0/PI*fGapIntegral->IntegrateFunc();
+    ds = 1.0-intPar[3]/intPar[0]*fGapIntegral->IntegrateFunc();
 
     intPar.clear();
 

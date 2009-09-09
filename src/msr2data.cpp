@@ -178,8 +178,6 @@ int msr2data_doFitting(vector<string> &arg, bool &chainfit)
       temp = -1;
       chainfit = false;
       iter = arg.erase(iter);
-      if (iter == arg.end())
-        break;
     }
     else if (!iter->substr(0,4).compare("fit-")) {
       if (temp) {
@@ -194,8 +192,6 @@ int msr2data_doFitting(vector<string> &arg, bool &chainfit)
       iss.str(s);
       iss >> temp;
       iter = arg.erase(iter);
-      if (iter == arg.end())
-        break;
     } else {
       iter++;
     }

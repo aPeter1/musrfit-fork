@@ -170,6 +170,20 @@ class TAnSWaveGapIntegralDivonne {
 
 };
 
+class TAnSWaveGapIntegralSuave {
+  public:
+    TAnSWaveGapIntegralSuave() : fNDim(2) {}
+    ~TAnSWaveGapIntegralSuave() { fPar.clear(); }
+    void SetParameters(const std::vector<double> &par) { fPar=par; }
+    static void Integrand(const int*, const double[], const int*, double[]);
+    double IntegrateFunc();
+
+  protected:
+    static vector<double> fPar;
+    unsigned int fNDim;
+
+};
+
 // To be integrated: x*y dx dy
 
 class T2DTest : public TMCIntegrator {

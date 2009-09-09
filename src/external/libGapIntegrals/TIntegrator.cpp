@@ -59,13 +59,10 @@ double TDWaveGapIntegralCuhre::IntegrateFunc()
 }
 
 void TDWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
-                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {T, Delta(T)}
+                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {twokBT, Delta(T), Ec, phic}
 {
-  double twokt(2.0*0.08617384436*fPar[0]); // kB in meV/K
-  double Ec(4.0*(fPar[0]+fPar[1])); // upper limit of energy-integration: cutoff energy
-  double phic(TMath::PiOver2()); // upper limit of phi-integration
-  double deltasq(TMath::Power(fPar[1]*TMath::Cos(2.0*x[1]*phic),2.0));
-  f[0] = -phic*Ec/(2.0*twokt*TMath::CosH(TMath::Sqrt(x[0]*x[0]*Ec*Ec+deltasq)/twokt)*TMath::CosH(TMath::Sqrt(x[0]*x[0]*Ec*Ec+deltasq)/twokt));
+  double deltasq(TMath::Power(fPar[1]*TMath::Cos(2.0*x[1]*fPar[3]),2.0));
+  f[0] = 1.0/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[2]*fPar[2]+deltasq)/fPar[0]),2.0);
   return;
 }
 
@@ -78,7 +75,7 @@ double TAnSWaveGapIntegralCuhre::IntegrateFunc()
   const double EPSABS (1e-6);
   const unsigned int VERBOSE (0);
   const unsigned int LAST (4);
-  const unsigned int MINEVAL (0);
+  const unsigned int MINEVAL (10000);
   const unsigned int MAXEVAL (1000000);
 
   const unsigned int KEY (13);
@@ -95,13 +92,10 @@ double TAnSWaveGapIntegralCuhre::IntegrateFunc()
 }
 
 void TAnSWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
-                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {T, Delta(T),a}
+                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {twokBT, Delta(T),a, Ec, phic}
 {
-  double twokt(2.0*0.08617384436*fPar[0]); // kB in meV/K
-  double Ec(4.0*(fPar[0]+(1.0+fPar[2])*fPar[1])); // upper limit of energy-integration: cutoff energy
-  double phic(TMath::PiOver2()); // upper limit of phi-integration
-  double deltasq(TMath::Power(fPar[1]*(1.0+fPar[2]*TMath::Cos(4.0*x[1]*phic)),2.0));
-  f[0] = -phic*Ec/(2.0*twokt*TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*Ec*Ec+deltasq)/twokt),2.0));
+  double deltasq(TMath::Power(fPar[1]*(1.0+fPar[2]*TMath::Cos(4.0*x[1]*fPar[4])),2.0));
+  f[0] = 1.0/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[3]*fPar[3]+deltasq)/fPar[0]),2.0);
   return;
 }
 
@@ -113,7 +107,7 @@ double TAnSWaveGapIntegralDivonne::IntegrateFunc()
   const double EPSREL (1e-4);
   const double EPSABS (1e-6);
   const unsigned int VERBOSE (0);
-  const unsigned int MINEVAL (0);
+  const unsigned int MINEVAL (10000);
   const unsigned int MAXEVAL (1000000);
   const unsigned int KEY1 (47);
   const unsigned int KEY2 (1);
@@ -139,12 +133,43 @@ double TAnSWaveGapIntegralDivonne::IntegrateFunc()
 }
 
 void TAnSWaveGapIntegralDivonne::Integrand(const int *ndim, const double x[],
-                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {T, Delta(T),a}
+                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {twokBT, Delta(T),a, Ec, phic}
 {
-  double twokt(2.0*0.08617384436*fPar[0]); // kB in meV/K
-  double Ec(4.0*(fPar[0]+(1.0+fPar[2])*fPar[1])); // upper limit of energy-integration: cutoff energy
-  double phic(TMath::PiOver2()); // upper limit of phi-integration
-  double deltasq(TMath::Power(fPar[1]*(1.0+fPar[2]*TMath::Cos(4.0*x[1]*phic)),2.0));
-  f[0] = -phic*Ec/(2.0*twokt*TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*Ec*Ec+deltasq)/twokt),2.0));
+  double deltasq(TMath::Power(fPar[1]*(1.0+fPar[2]*TMath::Cos(4.0*x[1]*fPar[4])),2.0));
+  f[0] = 1.0/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[3]*fPar[3]+deltasq)/fPar[0]),2.0);
+  return;
+}
+
+std::vector<double> TAnSWaveGapIntegralSuave::fPar;
+
+double TAnSWaveGapIntegralSuave::IntegrateFunc()
+{
+  const unsigned int NCOMP(1);
+  const double EPSREL (1e-4);
+  const double EPSABS (1e-6);
+  const unsigned int VERBOSE (0);
+  const unsigned int LAST (4);
+  const unsigned int MINEVAL (10000);
+  const unsigned int MAXEVAL (1000000);
+
+  const unsigned int NNEW (1000);
+  const double FLATNESS (25.);
+
+  int nregions, neval, fail;
+  double integral[NCOMP], error[NCOMP], prob[NCOMP];
+
+  Suave(fNDim, NCOMP, Integrand,
+    EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
+    NNEW, FLATNESS,
+    &nregions, &neval, &fail, integral, error, prob);
+
+  return integral[0];
+}
+
+void TAnSWaveGapIntegralSuave::Integrand(const int *ndim, const double x[],
+                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {twokBT, Delta(T),a, Ec, phic}
+{
+  double deltasq(TMath::Power(fPar[1]*(1.0+fPar[2]*TMath::Cos(4.0*x[1]*fPar[4])),2.0));
+  f[0] = 1.0/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[3]*fPar[3]+deltasq)/fPar[0]),2.0);
   return;
 }
