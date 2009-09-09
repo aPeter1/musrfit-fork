@@ -22,8 +22,8 @@
     </property>
     <property name="minimumSize">
         <size>
-            <width>21</width>
-            <height>227</height>
+            <width>23</width>
+            <height>222</height>
         </size>
     </property>
     <property name="caption">
@@ -4486,11 +4486,11 @@
 </connections>
 <tabstops>
     <tabstop>musrfit_tabs</tabstop>
-    <tabstop>RunFiles</tabstop>
-    <tabstop>Browse</tabstop>
     <tabstop>RunNumbers</tabstop>
     <tabstop>BeamLine</tabstop>
     <tabstop>YEAR</tabstop>
+    <tabstop>RunFiles</tabstop>
+    <tabstop>Browse</tabstop>
     <tabstop>FitType1</tabstop>
     <tabstop>FitType2</tabstop>
     <tabstop>FitType3</tabstop>
@@ -4499,6 +4499,13 @@
     <tabstop>BINS</tabstop>
     <tabstop>FitAsyType</tabstop>
     <tabstop>LRBF</tabstop>
+    <tabstop>PlotMSR_2</tabstop>
+    <tabstop>go_2</tabstop>
+    <tabstop>MINIMIZE</tabstop>
+    <tabstop>HESSE</tabstop>
+    <tabstop>go</tabstop>
+    <tabstop>PlotMSR</tabstop>
+    <tabstop>FitTextOutput</tabstop>
     <tabstop>ShParam_1_1</tabstop>
     <tabstop>ShParam_1_2</tabstop>
     <tabstop>ShParam_1_3</tabstop>
@@ -4527,12 +4534,9 @@
     <tabstop>ShParam_3_8</tabstop>
     <tabstop>ShParam_3_9</tabstop>
     <tabstop>InitParamTable</tabstop>
+    <tabstop>TITLE</tabstop>
+    <tabstop>FILENAME</tabstop>
     <tabstop>textMSROutput</tabstop>
-    <tabstop>MINIMIZE</tabstop>
-    <tabstop>HESSE</tabstop>
-    <tabstop>go</tabstop>
-    <tabstop>PlotMSR</tabstop>
-    <tabstop>FitTextOutput</tabstop>
     <tabstop>FUnits</tabstop>
     <tabstop>FApodization</tabstop>
     <tabstop>FPlot</tabstop>

@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Tue Sep 8 09:37:56 2009
+# Created: Wed Sep 9 22:45:41 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -83,7 +83,6 @@ use Qt::attributes qw(
     PlotMSR
     FitTextOutput
     SharingPahe
-    buttonGroupSharing
     SharingComp1
     ShParam_1_1
     ShParam_1_2
@@ -177,6 +176,67 @@ use Qt::attributes qw(
     Data14
     Data24
     ShowT0
+    TabPage_4
+    ConstComp1
+    Comp1ShLabel_2
+    lineEdit31_2
+    lineEdit31_3_2_2
+    CParam_1_8
+    CParam_1_5
+    CParam_1_3
+    lineEdit31_3_2_2_2_2_2
+    lineEdit31_3_2_2_2_2_2_2
+    CParam_1_1
+    lineEdit31_3
+    CParam_1_6
+    CParam_1_9
+    lineEdit31
+    lineEdit31_3_2
+    CParam_1_4
+    CParam_1_7
+    CParam_1_2
+    lineEdit31_3_2_2_2_2
+    lineEdit31_3_2_2_2
+    ConstComp2
+    Comp2ShLabel_2
+    lineEdit31_2_2
+    lineEdit31_3_2_2_3
+    CParam_1_8_2
+    CParam_1_5_2
+    CParam_1_3_2
+    lineEdit31_3_2_2_2_2_2_3
+    lineEdit31_3_2_2_2_2_2_2_2
+    CParam_1_1_2
+    lineEdit31_3_3
+    CParam_1_6_2
+    CParam_1_9_2
+    lineEdit31_4
+    lineEdit31_3_2_3
+    CParam_1_4_2
+    CParam_1_7_2
+    CParam_1_2_2
+    lineEdit31_3_2_2_2_2_3
+    lineEdit31_3_2_2_2_3
+    ConstComp3
+    Comp3ShLabel_2
+    lineEdit31_2_3
+    lineEdit31_3_2_2_4
+    CParam_1_8_3
+    CParam_1_5_3
+    CParam_1_3_3
+    lineEdit31_3_2_2_2_2_2_4
+    lineEdit31_3_2_2_2_2_2_2_3
+    CParam_1_1_3
+    lineEdit31_3_4
+    CParam_1_6_3
+    CParam_1_9_3
+    lineEdit31_5
+    lineEdit31_3_2_4
+    CParam_1_4_3
+    CParam_1_7_3
+    CParam_1_2_3
+    lineEdit31_3_2_2_2_2_4
+    lineEdit31_3_2_2_2_4
     MenuBar
     fileMenu
     editMenu
@@ -571,7 +631,7 @@ sub NEW
         setName("MuSRFitform" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
-    setMinimumSize(Qt::Size(21, 227) );
+    setMinimumSize(Qt::Size(23, 222) );
     setIcon($image0 );
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
@@ -1017,59 +1077,56 @@ sub NEW
 
     SharingPahe = Qt::Widget(musrfit_tabs, "SharingPahe");
 
-    buttonGroupSharing = Qt::ButtonGroup(SharingPahe, "buttonGroupSharing");
-    buttonGroupSharing->setGeometry( Qt::Rect(5, 5, 545, 355) );
-    buttonGroupSharing->setSizePolicy( Qt::SizePolicy(7, 7, 0, 0, buttonGroupSharing->sizePolicy()->hasHeightForWidth()) );
-    buttonGroupSharing->setAlignment( int(&Qt::ButtonGroup::AlignLeft) );
-    buttonGroupSharing->setCheckable( 0 );
+    my $LayoutWidget_6 = Qt::Widget(SharingPahe, '$LayoutWidget_6');
+    $LayoutWidget_6->setGeometry( Qt::Rect(8, 5, 545, 358) );
+    my $layout28_2 = Qt::HBoxLayout($LayoutWidget_6, 11, 6, '$layout28_2');
 
-    SharingComp1 = Qt::ButtonGroup(buttonGroupSharing, "SharingComp1");
+    SharingComp1 = Qt::ButtonGroup($LayoutWidget_6, "SharingComp1");
     SharingComp1->setEnabled( 0 );
-    SharingComp1->setGeometry( Qt::Rect(31, 20, 162, 330) );
     SharingComp1->setSizePolicy( Qt::SizePolicy(5, 3, 0, 0, SharingComp1->sizePolicy()->hasHeightForWidth()) );
     SharingComp1->setAlignment( int(&Qt::ButtonGroup::AlignLeft) );
 
-    my $LayoutWidget_6 = Qt::Widget(SharingComp1, '$LayoutWidget_6');
-    $LayoutWidget_6->setGeometry( Qt::Rect(40, 60, 81, 266) );
-    my $layout14 = Qt::VBoxLayout($LayoutWidget_6, 0, 0, '$layout14');
+    my $LayoutWidget_7 = Qt::Widget(SharingComp1, '$LayoutWidget_7');
+    $LayoutWidget_7->setGeometry( Qt::Rect(40, 60, 81, 266) );
+    my $layout14 = Qt::VBoxLayout($LayoutWidget_7, 0, 0, '$layout14');
 
-    ShParam_1_1 = Qt::CheckBox($LayoutWidget_6, "ShParam_1_1");
+    ShParam_1_1 = Qt::CheckBox($LayoutWidget_7, "ShParam_1_1");
     $layout14->addWidget(ShParam_1_1);
 
-    ShParam_1_2 = Qt::CheckBox($LayoutWidget_6, "ShParam_1_2");
+    ShParam_1_2 = Qt::CheckBox($LayoutWidget_7, "ShParam_1_2");
     $layout14->addWidget(ShParam_1_2);
 
-    ShParam_1_3 = Qt::CheckBox($LayoutWidget_6, "ShParam_1_3");
+    ShParam_1_3 = Qt::CheckBox($LayoutWidget_7, "ShParam_1_3");
     $layout14->addWidget(ShParam_1_3);
 
-    ShParam_1_4 = Qt::CheckBox($LayoutWidget_6, "ShParam_1_4");
+    ShParam_1_4 = Qt::CheckBox($LayoutWidget_7, "ShParam_1_4");
     $layout14->addWidget(ShParam_1_4);
 
-    ShParam_1_5 = Qt::CheckBox($LayoutWidget_6, "ShParam_1_5");
+    ShParam_1_5 = Qt::CheckBox($LayoutWidget_7, "ShParam_1_5");
     ShParam_1_5->setEnabled( 0 );
     ShParam_1_5->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_1_5->setTristate( 0 );
     $layout14->addWidget(ShParam_1_5);
 
-    ShParam_1_6 = Qt::CheckBox($LayoutWidget_6, "ShParam_1_6");
+    ShParam_1_6 = Qt::CheckBox($LayoutWidget_7, "ShParam_1_6");
     ShParam_1_6->setEnabled( 0 );
     ShParam_1_6->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_1_6->setTristate( 0 );
     $layout14->addWidget(ShParam_1_6);
 
-    ShParam_1_7 = Qt::CheckBox($LayoutWidget_6, "ShParam_1_7");
+    ShParam_1_7 = Qt::CheckBox($LayoutWidget_7, "ShParam_1_7");
     ShParam_1_7->setEnabled( 0 );
     ShParam_1_7->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_1_7->setTristate( 0 );
     $layout14->addWidget(ShParam_1_7);
 
-    ShParam_1_8 = Qt::CheckBox($LayoutWidget_6, "ShParam_1_8");
+    ShParam_1_8 = Qt::CheckBox($LayoutWidget_7, "ShParam_1_8");
     ShParam_1_8->setEnabled( 0 );
     ShParam_1_8->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_1_8->setTristate( 0 );
     $layout14->addWidget(ShParam_1_8);
 
-    ShParam_1_9 = Qt::CheckBox($LayoutWidget_6, "ShParam_1_9");
+    ShParam_1_9 = Qt::CheckBox($LayoutWidget_7, "ShParam_1_9");
     ShParam_1_9->setEnabled( 0 );
     ShParam_1_9->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_1_9->setTristate( 0 );
@@ -1078,62 +1135,62 @@ sub NEW
     Comp1ShLabel = Qt::Label(SharingComp1, "Comp1ShLabel");
     Comp1ShLabel->setGeometry( Qt::Rect(2, 30, 185, 20) );
     Comp1ShLabel->setPaletteBackgroundColor( Qt::Color(255, 255, 127) );
+    $layout28_2->addWidget(SharingComp1);
 
-    SharingComp2 = Qt::ButtonGroup(buttonGroupSharing, "SharingComp2");
+    SharingComp2 = Qt::ButtonGroup($LayoutWidget_6, "SharingComp2");
     SharingComp2->setEnabled( 0 );
-    SharingComp2->setGeometry( Qt::Rect(199, 20, 162, 330) );
     SharingComp2->setSizePolicy( Qt::SizePolicy(5, 3, 0, 0, SharingComp2->sizePolicy()->hasHeightForWidth()) );
 
     Comp2ShLabel = Qt::Label(SharingComp2, "Comp2ShLabel");
     Comp2ShLabel->setGeometry( Qt::Rect(2, 30, 185, 20) );
     Comp2ShLabel->setPaletteBackgroundColor( Qt::Color(255, 255, 127) );
 
-    my $LayoutWidget_7 = Qt::Widget(SharingComp2, '$LayoutWidget_7');
-    $LayoutWidget_7->setGeometry( Qt::Rect(40, 60, 81, 266) );
-    my $layout13 = Qt::VBoxLayout($LayoutWidget_7, 0, 0, '$layout13');
+    my $LayoutWidget_8 = Qt::Widget(SharingComp2, '$LayoutWidget_8');
+    $LayoutWidget_8->setGeometry( Qt::Rect(40, 60, 81, 266) );
+    my $layout13 = Qt::VBoxLayout($LayoutWidget_8, 0, 0, '$layout13');
 
-    ShParam_2_1 = Qt::CheckBox($LayoutWidget_7, "ShParam_2_1");
+    ShParam_2_1 = Qt::CheckBox($LayoutWidget_8, "ShParam_2_1");
     $layout13->addWidget(ShParam_2_1);
 
-    ShParam_2_2 = Qt::CheckBox($LayoutWidget_7, "ShParam_2_2");
+    ShParam_2_2 = Qt::CheckBox($LayoutWidget_8, "ShParam_2_2");
     $layout13->addWidget(ShParam_2_2);
 
-    ShParam_2_3 = Qt::CheckBox($LayoutWidget_7, "ShParam_2_3");
+    ShParam_2_3 = Qt::CheckBox($LayoutWidget_8, "ShParam_2_3");
     $layout13->addWidget(ShParam_2_3);
 
-    ShParam_2_4 = Qt::CheckBox($LayoutWidget_7, "ShParam_2_4");
+    ShParam_2_4 = Qt::CheckBox($LayoutWidget_8, "ShParam_2_4");
     $layout13->addWidget(ShParam_2_4);
 
-    ShParam_2_5 = Qt::CheckBox($LayoutWidget_7, "ShParam_2_5");
+    ShParam_2_5 = Qt::CheckBox($LayoutWidget_8, "ShParam_2_5");
     $layout13->addWidget(ShParam_2_5);
 
-    ShParam_2_6 = Qt::CheckBox($LayoutWidget_7, "ShParam_2_6");
+    ShParam_2_6 = Qt::CheckBox($LayoutWidget_8, "ShParam_2_6");
     ShParam_2_6->setEnabled( 0 );
     ShParam_2_6->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_2_6->setTristate( 0 );
     $layout13->addWidget(ShParam_2_6);
 
-    ShParam_2_7 = Qt::CheckBox($LayoutWidget_7, "ShParam_2_7");
+    ShParam_2_7 = Qt::CheckBox($LayoutWidget_8, "ShParam_2_7");
     ShParam_2_7->setEnabled( 0 );
     ShParam_2_7->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_2_7->setTristate( 0 );
     $layout13->addWidget(ShParam_2_7);
 
-    ShParam_2_8 = Qt::CheckBox($LayoutWidget_7, "ShParam_2_8");
+    ShParam_2_8 = Qt::CheckBox($LayoutWidget_8, "ShParam_2_8");
     ShParam_2_8->setEnabled( 0 );
     ShParam_2_8->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_2_8->setTristate( 0 );
     $layout13->addWidget(ShParam_2_8);
 
-    ShParam_2_9 = Qt::CheckBox($LayoutWidget_7, "ShParam_2_9");
+    ShParam_2_9 = Qt::CheckBox($LayoutWidget_8, "ShParam_2_9");
     ShParam_2_9->setEnabled( 0 );
     ShParam_2_9->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_2_9->setTristate( 0 );
     $layout13->addWidget(ShParam_2_9);
+    $layout28_2->addWidget(SharingComp2);
 
-    SharingComp3 = Qt::ButtonGroup(buttonGroupSharing, "SharingComp3");
+    SharingComp3 = Qt::ButtonGroup($LayoutWidget_6, "SharingComp3");
     SharingComp3->setEnabled( 0 );
-    SharingComp3->setGeometry( Qt::Rect(367, 20, 162, 330) );
     SharingComp3->setSizePolicy( Qt::SizePolicy(5, 3, 0, 0, SharingComp3->sizePolicy()->hasHeightForWidth()) );
     SharingComp3->setAlignment( int(&Qt::ButtonGroup::AlignJustify | &Qt::ButtonGroup::AlignVCenter) );
 
@@ -1141,48 +1198,49 @@ sub NEW
     Comp3ShLabel->setGeometry( Qt::Rect(2, 30, 185, 20) );
     Comp3ShLabel->setPaletteBackgroundColor( Qt::Color(255, 255, 127) );
 
-    my $LayoutWidget_8 = Qt::Widget(SharingComp3, '$LayoutWidget_8');
-    $LayoutWidget_8->setGeometry( Qt::Rect(41, 58, 81, 266) );
-    my $layout15 = Qt::VBoxLayout($LayoutWidget_8, 11, 6, '$layout15');
+    my $LayoutWidget_9 = Qt::Widget(SharingComp3, '$LayoutWidget_9');
+    $LayoutWidget_9->setGeometry( Qt::Rect(41, 58, 81, 266) );
+    my $layout15 = Qt::VBoxLayout($LayoutWidget_9, 11, 6, '$layout15');
 
-    ShParam_3_1 = Qt::CheckBox($LayoutWidget_8, "ShParam_3_1");
+    ShParam_3_1 = Qt::CheckBox($LayoutWidget_9, "ShParam_3_1");
     $layout15->addWidget(ShParam_3_1);
 
-    ShParam_3_2 = Qt::CheckBox($LayoutWidget_8, "ShParam_3_2");
+    ShParam_3_2 = Qt::CheckBox($LayoutWidget_9, "ShParam_3_2");
     $layout15->addWidget(ShParam_3_2);
 
-    ShParam_3_3 = Qt::CheckBox($LayoutWidget_8, "ShParam_3_3");
+    ShParam_3_3 = Qt::CheckBox($LayoutWidget_9, "ShParam_3_3");
     $layout15->addWidget(ShParam_3_3);
 
-    ShParam_3_4 = Qt::CheckBox($LayoutWidget_8, "ShParam_3_4");
+    ShParam_3_4 = Qt::CheckBox($LayoutWidget_9, "ShParam_3_4");
     $layout15->addWidget(ShParam_3_4);
 
-    ShParam_3_5 = Qt::CheckBox($LayoutWidget_8, "ShParam_3_5");
+    ShParam_3_5 = Qt::CheckBox($LayoutWidget_9, "ShParam_3_5");
     $layout15->addWidget(ShParam_3_5);
 
-    ShParam_3_6 = Qt::CheckBox($LayoutWidget_8, "ShParam_3_6");
+    ShParam_3_6 = Qt::CheckBox($LayoutWidget_9, "ShParam_3_6");
     ShParam_3_6->setEnabled( 0 );
     ShParam_3_6->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_3_6->setTristate( 0 );
     $layout15->addWidget(ShParam_3_6);
 
-    ShParam_3_7 = Qt::CheckBox($LayoutWidget_8, "ShParam_3_7");
+    ShParam_3_7 = Qt::CheckBox($LayoutWidget_9, "ShParam_3_7");
     ShParam_3_7->setEnabled( 0 );
     ShParam_3_7->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_3_7->setTristate( 0 );
     $layout15->addWidget(ShParam_3_7);
 
-    ShParam_3_8 = Qt::CheckBox($LayoutWidget_8, "ShParam_3_8");
+    ShParam_3_8 = Qt::CheckBox($LayoutWidget_9, "ShParam_3_8");
     ShParam_3_8->setEnabled( 0 );
     ShParam_3_8->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_3_8->setTristate( 0 );
     $layout15->addWidget(ShParam_3_8);
 
-    ShParam_3_9 = Qt::CheckBox($LayoutWidget_8, "ShParam_3_9");
+    ShParam_3_9 = Qt::CheckBox($LayoutWidget_9, "ShParam_3_9");
     ShParam_3_9->setEnabled( 0 );
     ShParam_3_9->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_3_9->setTristate( 0 );
     $layout15->addWidget(ShParam_3_9);
+    $layout28_2->addWidget(SharingComp3);
     musrfit_tabs->insertTab( SharingPahe, "" );
 
     InitializationPage = Qt::Widget(musrfit_tabs, "InitializationPage");
@@ -1216,247 +1274,247 @@ sub NEW
 
     FittingPage = Qt::Widget(musrfit_tabs, "FittingPage");
 
-    my $LayoutWidget_9 = Qt::Widget(FittingPage, '$LayoutWidget_9');
-    $LayoutWidget_9->setGeometry( Qt::Rect(5, 5, 545, 355) );
-    my $layout25 = Qt::VBoxLayout($LayoutWidget_9, 0, 6, '$layout25');
+    my $LayoutWidget_10 = Qt::Widget(FittingPage, '$LayoutWidget_10');
+    $LayoutWidget_10->setGeometry( Qt::Rect(5, 5, 545, 355) );
+    my $layout25 = Qt::VBoxLayout($LayoutWidget_10, 0, 6, '$layout25');
 
-    groupTitle = Qt::GroupBox($LayoutWidget_9, "groupTitle");
+    groupTitle = Qt::GroupBox($LayoutWidget_10, "groupTitle");
     groupTitle->setMargin( int(5) );
 
-    my $LayoutWidget_10 = Qt::Widget(groupTitle, '$LayoutWidget_10');
-    $LayoutWidget_10->setGeometry( Qt::Rect(6, 8, 515, 100) );
-    my $layout25_2 = Qt::VBoxLayout($LayoutWidget_10, 11, 6, '$layout25_2');
+    my $LayoutWidget_11 = Qt::Widget(groupTitle, '$LayoutWidget_11');
+    $LayoutWidget_11->setGeometry( Qt::Rect(6, 8, 515, 100) );
+    my $layout25_2 = Qt::VBoxLayout($LayoutWidget_11, 11, 6, '$layout25_2');
 
-    TITLELabel = Qt::Label($LayoutWidget_10, "TITLELabel");
+    TITLELabel = Qt::Label($LayoutWidget_11, "TITLELabel");
     TITLELabel->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, TITLELabel->sizePolicy()->hasHeightForWidth()) );
     $layout25_2->addWidget(TITLELabel);
 
-    TITLE = Qt::LineEdit($LayoutWidget_10, "TITLE");
+    TITLE = Qt::LineEdit($LayoutWidget_11, "TITLE");
     TITLE->setSizePolicy( Qt::SizePolicy(5, 0, 1, 1, TITLE->sizePolicy()->hasHeightForWidth()) );
     $layout25_2->addWidget(TITLE);
 
     my $layout17 = Qt::HBoxLayout(undef, 0, 6, '$layout17');
 
-    FILENAMELabel = Qt::Label($LayoutWidget_10, "FILENAMELabel");
+    FILENAMELabel = Qt::Label($LayoutWidget_11, "FILENAMELabel");
     $layout17->addWidget(FILENAMELabel);
 
-    FILENAME = Qt::LineEdit($LayoutWidget_10, "FILENAME");
+    FILENAME = Qt::LineEdit($LayoutWidget_11, "FILENAME");
     FILENAME->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, FILENAME->sizePolicy()->hasHeightForWidth()) );
     $layout17->addWidget(FILENAME);
     $layout25_2->addLayout($layout17);
     $layout25->addWidget(groupTitle);
 
-    textMSROutput = Qt::TextEdit($LayoutWidget_9, "textMSROutput");
+    textMSROutput = Qt::TextEdit($LayoutWidget_10, "textMSROutput");
     textMSROutput->setOverwriteMode( 1 );
     $layout25->addWidget(textMSROutput);
     musrfit_tabs->insertTab( FittingPage, "" );
 
     TabPage_2 = Qt::Widget(musrfit_tabs, "TabPage_2");
 
-    my $LayoutWidget_11 = Qt::Widget(TabPage_2, '$LayoutWidget_11');
-    $LayoutWidget_11->setGeometry( Qt::Rect(5, 5, 545, 94) );
-    my $layout33 = Qt::HBoxLayout($LayoutWidget_11, 11, 6, '$layout33');
+    my $LayoutWidget_12 = Qt::Widget(TabPage_2, '$LayoutWidget_12');
+    $LayoutWidget_12->setGeometry( Qt::Rect(5, 5, 545, 94) );
+    my $layout33 = Qt::HBoxLayout($LayoutWidget_12, 11, 6, '$layout33');
 
     my $layout26 = Qt::VBoxLayout(undef, 0, 6, '$layout26');
 
-    FUnitsLabel = Qt::Label($LayoutWidget_11, "FUnitsLabel");
+    FUnitsLabel = Qt::Label($LayoutWidget_12, "FUnitsLabel");
     $layout26->addWidget(FUnitsLabel);
 
-    FApodizationLabel = Qt::Label($LayoutWidget_11, "FApodizationLabel");
+    FApodizationLabel = Qt::Label($LayoutWidget_12, "FApodizationLabel");
     $layout26->addWidget(FApodizationLabel);
 
-    FPlotLabel = Qt::Label($LayoutWidget_11, "FPlotLabel");
+    FPlotLabel = Qt::Label($LayoutWidget_12, "FPlotLabel");
     $layout26->addWidget(FPlotLabel);
     $layout33->addLayout($layout26);
 
     my $layout27_2 = Qt::VBoxLayout(undef, 0, 6, '$layout27_2');
 
-    FUnits = Qt::ComboBox(0, $LayoutWidget_11, "FUnits");
+    FUnits = Qt::ComboBox(0, $LayoutWidget_12, "FUnits");
     FUnits->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FUnits->sizePolicy()->hasHeightForWidth()) );
     $layout27_2->addWidget(FUnits);
 
-    FApodization = Qt::ComboBox(0, $LayoutWidget_11, "FApodization");
+    FApodization = Qt::ComboBox(0, $LayoutWidget_12, "FApodization");
     FApodization->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FApodization->sizePolicy()->hasHeightForWidth()) );
     $layout27_2->addWidget(FApodization);
 
-    FPlot = Qt::ComboBox(0, $LayoutWidget_11, "FPlot");
+    FPlot = Qt::ComboBox(0, $LayoutWidget_12, "FPlot");
     FPlot->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FPlot->sizePolicy()->hasHeightForWidth()) );
     $layout27_2->addWidget(FPlot);
     $layout33->addLayout($layout27_2);
 
-    my $layout28_2 = Qt::VBoxLayout(undef, 0, 6, '$layout28_2');
+    my $layout28_3 = Qt::VBoxLayout(undef, 0, 6, '$layout28_3');
 
-    textLabel1 = Qt::Label($LayoutWidget_11, "textLabel1");
-    $layout28_2->addWidget(textLabel1);
+    textLabel1 = Qt::Label($LayoutWidget_12, "textLabel1");
+    $layout28_3->addWidget(textLabel1);
 
-    textLabel1_3 = Qt::Label($LayoutWidget_11, "textLabel1_3");
-    $layout28_2->addWidget(textLabel1_3);
+    textLabel1_3 = Qt::Label($LayoutWidget_12, "textLabel1_3");
+    $layout28_3->addWidget(textLabel1_3);
 
-    textLabel1_3_5 = Qt::Label($LayoutWidget_11, "textLabel1_3_5");
-    $layout28_2->addWidget(textLabel1_3_5);
-    $layout33->addLayout($layout28_2);
+    textLabel1_3_5 = Qt::Label($LayoutWidget_12, "textLabel1_3_5");
+    $layout28_3->addWidget(textLabel1_3_5);
+    $layout33->addLayout($layout28_3);
 
     my $layout29 = Qt::VBoxLayout(undef, 0, 6, '$layout29');
 
-    lineEdit28 = Qt::LineEdit($LayoutWidget_11, "lineEdit28");
+    lineEdit28 = Qt::LineEdit($LayoutWidget_12, "lineEdit28");
     lineEdit28->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, lineEdit28->sizePolicy()->hasHeightForWidth()) );
     $layout29->addWidget(lineEdit28);
 
-    textLabel1_3_2 = Qt::Label($LayoutWidget_11, "textLabel1_3_2");
+    textLabel1_3_2 = Qt::Label($LayoutWidget_12, "textLabel1_3_2");
     $layout29->addWidget(textLabel1_3_2);
 
-    textLabel1_3_6 = Qt::Label($LayoutWidget_11, "textLabel1_3_6");
+    textLabel1_3_6 = Qt::Label($LayoutWidget_12, "textLabel1_3_6");
     $layout29->addWidget(textLabel1_3_6);
     $layout33->addLayout($layout29);
 
     my $layout31 = Qt::VBoxLayout(undef, 0, 6, '$layout31');
 
-    textLabel1_2 = Qt::Label($LayoutWidget_11, "textLabel1_2");
+    textLabel1_2 = Qt::Label($LayoutWidget_12, "textLabel1_2");
     $layout31->addWidget(textLabel1_2);
 
-    textLabel1_3_3 = Qt::Label($LayoutWidget_11, "textLabel1_3_3");
+    textLabel1_3_3 = Qt::Label($LayoutWidget_12, "textLabel1_3_3");
     $layout31->addWidget(textLabel1_3_3);
 
-    textLabel1_3_7 = Qt::Label($LayoutWidget_11, "textLabel1_3_7");
+    textLabel1_3_7 = Qt::Label($LayoutWidget_12, "textLabel1_3_7");
     $layout31->addWidget(textLabel1_3_7);
     $layout33->addLayout($layout31);
 
     my $layout32 = Qt::VBoxLayout(undef, 0, 6, '$layout32');
 
-    lineEdit28_2 = Qt::LineEdit($LayoutWidget_11, "lineEdit28_2");
+    lineEdit28_2 = Qt::LineEdit($LayoutWidget_12, "lineEdit28_2");
     lineEdit28_2->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, lineEdit28_2->sizePolicy()->hasHeightForWidth()) );
     $layout32->addWidget(lineEdit28_2);
 
-    textLabel1_3_4 = Qt::Label($LayoutWidget_11, "textLabel1_3_4");
+    textLabel1_3_4 = Qt::Label($LayoutWidget_12, "textLabel1_3_4");
     $layout32->addWidget(textLabel1_3_4);
 
-    textLabel1_3_8 = Qt::Label($LayoutWidget_11, "textLabel1_3_8");
+    textLabel1_3_8 = Qt::Label($LayoutWidget_12, "textLabel1_3_8");
     $layout32->addWidget(textLabel1_3_8);
     $layout33->addLayout($layout32);
     musrfit_tabs->insertTab( TabPage_2, "" );
 
     TabPage_3 = Qt::Widget(musrfit_tabs, "TabPage_3");
 
-    my $LayoutWidget_12 = Qt::Widget(TabPage_3, '$LayoutWidget_12');
-    $LayoutWidget_12->setGeometry( Qt::Rect(7, 5, 540, 180) );
-    my $layout27_3 = Qt::HBoxLayout($LayoutWidget_12, 0, 6, '$layout27_3');
+    my $LayoutWidget_13 = Qt::Widget(TabPage_3, '$LayoutWidget_13');
+    $LayoutWidget_13->setGeometry( Qt::Rect(7, 5, 540, 180) );
+    my $layout27_3 = Qt::HBoxLayout($LayoutWidget_13, 0, 6, '$layout27_3');
 
-    groupHist0 = Qt::GroupBox($LayoutWidget_12, "groupHist0");
+    groupHist0 = Qt::GroupBox($LayoutWidget_13, "groupHist0");
     groupHist0->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, groupHist0->sizePolicy()->hasHeightForWidth()) );
     groupHist0->setMinimumSize( Qt::Size(0, 0) );
 
-    my $LayoutWidget_13 = Qt::Widget(groupHist0, '$LayoutWidget_13');
-    $LayoutWidget_13->setGeometry( Qt::Rect(5, 18, 100, 150) );
-    my $layout16_2 = Qt::VBoxLayout($LayoutWidget_13, 11, 6, '$layout16_2');
+    my $LayoutWidget_14 = Qt::Widget(groupHist0, '$LayoutWidget_14');
+    $LayoutWidget_14->setGeometry( Qt::Rect(5, 18, 100, 150) );
+    my $layout16_2 = Qt::VBoxLayout($LayoutWidget_14, 11, 6, '$layout16_2');
 
-    textLabel2 = Qt::Label($LayoutWidget_13, "textLabel2");
+    textLabel2 = Qt::Label($LayoutWidget_14, "textLabel2");
     $layout16_2->addWidget(textLabel2);
 
-    textLabel2_2_2_3 = Qt::Label($LayoutWidget_13, "textLabel2_2_2_3");
+    textLabel2_2_2_3 = Qt::Label($LayoutWidget_14, "textLabel2_2_2_3");
     $layout16_2->addWidget(textLabel2_2_2_3);
 
-    textLabel2_2_2 = Qt::Label($LayoutWidget_13, "textLabel2_2_2");
+    textLabel2_2_2 = Qt::Label($LayoutWidget_14, "textLabel2_2_2");
     $layout16_2->addWidget(textLabel2_2_2);
 
-    textLabel2_2_2_2 = Qt::Label($LayoutWidget_13, "textLabel2_2_2_2");
+    textLabel2_2_2_2 = Qt::Label($LayoutWidget_14, "textLabel2_2_2_2");
     $layout16_2->addWidget(textLabel2_2_2_2);
 
-    textLabel2_2_2_2_2 = Qt::Label($LayoutWidget_13, "textLabel2_2_2_2_2");
+    textLabel2_2_2_2_2 = Qt::Label($LayoutWidget_14, "textLabel2_2_2_2_2");
     $layout16_2->addWidget(textLabel2_2_2_2_2);
     $layout27_3->addWidget(groupHist0);
 
-    groupHist1 = Qt::GroupBox($LayoutWidget_12, "groupHist1");
+    groupHist1 = Qt::GroupBox($LayoutWidget_13, "groupHist1");
     groupHist1->setFrameShadow( &Qt::GroupBox::Plain() );
 
-    my $LayoutWidget_14 = Qt::Widget(groupHist1, '$LayoutWidget_14');
-    $LayoutWidget_14->setGeometry( Qt::Rect(8, 17, 75, 150) );
-    my $layout18 = Qt::VBoxLayout($LayoutWidget_14, 0, 0, '$layout18');
+    my $LayoutWidget_15 = Qt::Widget(groupHist1, '$LayoutWidget_15');
+    $LayoutWidget_15->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18 = Qt::VBoxLayout($LayoutWidget_15, 0, 0, '$layout18');
 
-    t01 = Qt::LineEdit($LayoutWidget_14, "t01");
+    t01 = Qt::LineEdit($LayoutWidget_15, "t01");
     $layout18->addWidget(t01);
 
-    Bg11 = Qt::LineEdit($LayoutWidget_14, "Bg11");
+    Bg11 = Qt::LineEdit($LayoutWidget_15, "Bg11");
     $layout18->addWidget(Bg11);
 
-    Bg21 = Qt::LineEdit($LayoutWidget_14, "Bg21");
+    Bg21 = Qt::LineEdit($LayoutWidget_15, "Bg21");
     $layout18->addWidget(Bg21);
 
-    Data11 = Qt::LineEdit($LayoutWidget_14, "Data11");
+    Data11 = Qt::LineEdit($LayoutWidget_15, "Data11");
     $layout18->addWidget(Data11);
 
-    Data21 = Qt::LineEdit($LayoutWidget_14, "Data21");
+    Data21 = Qt::LineEdit($LayoutWidget_15, "Data21");
     $layout18->addWidget(Data21);
     $layout27_3->addWidget(groupHist1);
 
-    groupHist2 = Qt::GroupBox($LayoutWidget_12, "groupHist2");
+    groupHist2 = Qt::GroupBox($LayoutWidget_13, "groupHist2");
     groupHist2->setEnabled( 1 );
     groupHist2->setFrameShadow( &Qt::GroupBox::Plain() );
 
-    my $LayoutWidget_15 = Qt::Widget(groupHist2, '$LayoutWidget_15');
-    $LayoutWidget_15->setGeometry( Qt::Rect(8, 17, 75, 150) );
-    my $layout18_2 = Qt::VBoxLayout($LayoutWidget_15, 0, 0, '$layout18_2');
+    my $LayoutWidget_16 = Qt::Widget(groupHist2, '$LayoutWidget_16');
+    $LayoutWidget_16->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18_2 = Qt::VBoxLayout($LayoutWidget_16, 0, 0, '$layout18_2');
 
-    t02 = Qt::LineEdit($LayoutWidget_15, "t02");
+    t02 = Qt::LineEdit($LayoutWidget_16, "t02");
     $layout18_2->addWidget(t02);
 
-    Bg12 = Qt::LineEdit($LayoutWidget_15, "Bg12");
+    Bg12 = Qt::LineEdit($LayoutWidget_16, "Bg12");
     $layout18_2->addWidget(Bg12);
 
-    Bg22 = Qt::LineEdit($LayoutWidget_15, "Bg22");
+    Bg22 = Qt::LineEdit($LayoutWidget_16, "Bg22");
     $layout18_2->addWidget(Bg22);
 
-    Data12 = Qt::LineEdit($LayoutWidget_15, "Data12");
+    Data12 = Qt::LineEdit($LayoutWidget_16, "Data12");
     $layout18_2->addWidget(Data12);
 
-    Data22 = Qt::LineEdit($LayoutWidget_15, "Data22");
+    Data22 = Qt::LineEdit($LayoutWidget_16, "Data22");
     $layout18_2->addWidget(Data22);
     $layout27_3->addWidget(groupHist2);
 
-    groupHist3 = Qt::GroupBox($LayoutWidget_12, "groupHist3");
+    groupHist3 = Qt::GroupBox($LayoutWidget_13, "groupHist3");
     groupHist3->setEnabled( 1 );
     groupHist3->setFrameShadow( &Qt::GroupBox::Plain() );
 
-    my $LayoutWidget_16 = Qt::Widget(groupHist3, '$LayoutWidget_16');
-    $LayoutWidget_16->setGeometry( Qt::Rect(8, 17, 75, 150) );
-    my $layout18_3 = Qt::VBoxLayout($LayoutWidget_16, 0, 0, '$layout18_3');
+    my $LayoutWidget_17 = Qt::Widget(groupHist3, '$LayoutWidget_17');
+    $LayoutWidget_17->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18_3 = Qt::VBoxLayout($LayoutWidget_17, 0, 0, '$layout18_3');
 
-    t03 = Qt::LineEdit($LayoutWidget_16, "t03");
+    t03 = Qt::LineEdit($LayoutWidget_17, "t03");
     $layout18_3->addWidget(t03);
 
-    Bg13 = Qt::LineEdit($LayoutWidget_16, "Bg13");
+    Bg13 = Qt::LineEdit($LayoutWidget_17, "Bg13");
     $layout18_3->addWidget(Bg13);
 
-    Bg23 = Qt::LineEdit($LayoutWidget_16, "Bg23");
+    Bg23 = Qt::LineEdit($LayoutWidget_17, "Bg23");
     $layout18_3->addWidget(Bg23);
 
-    Data13 = Qt::LineEdit($LayoutWidget_16, "Data13");
+    Data13 = Qt::LineEdit($LayoutWidget_17, "Data13");
     $layout18_3->addWidget(Data13);
 
-    Data23 = Qt::LineEdit($LayoutWidget_16, "Data23");
+    Data23 = Qt::LineEdit($LayoutWidget_17, "Data23");
     $layout18_3->addWidget(Data23);
     $layout27_3->addWidget(groupHist3);
 
-    groupHist4 = Qt::GroupBox($LayoutWidget_12, "groupHist4");
+    groupHist4 = Qt::GroupBox($LayoutWidget_13, "groupHist4");
     groupHist4->setEnabled( 1 );
     groupHist4->setFrameShadow( &Qt::GroupBox::Plain() );
 
-    my $LayoutWidget_17 = Qt::Widget(groupHist4, '$LayoutWidget_17');
-    $LayoutWidget_17->setGeometry( Qt::Rect(8, 17, 75, 150) );
-    my $layout18_4 = Qt::VBoxLayout($LayoutWidget_17, 0, 0, '$layout18_4');
+    my $LayoutWidget_18 = Qt::Widget(groupHist4, '$LayoutWidget_18');
+    $LayoutWidget_18->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18_4 = Qt::VBoxLayout($LayoutWidget_18, 0, 0, '$layout18_4');
 
-    t04 = Qt::LineEdit($LayoutWidget_17, "t04");
+    t04 = Qt::LineEdit($LayoutWidget_18, "t04");
     $layout18_4->addWidget(t04);
 
-    Bg14 = Qt::LineEdit($LayoutWidget_17, "Bg14");
+    Bg14 = Qt::LineEdit($LayoutWidget_18, "Bg14");
     $layout18_4->addWidget(Bg14);
 
-    Bg24 = Qt::LineEdit($LayoutWidget_17, "Bg24");
+    Bg24 = Qt::LineEdit($LayoutWidget_18, "Bg24");
     $layout18_4->addWidget(Bg24);
 
-    Data14 = Qt::LineEdit($LayoutWidget_17, "Data14");
+    Data14 = Qt::LineEdit($LayoutWidget_18, "Data14");
     $layout18_4->addWidget(Data14);
 
-    Data24 = Qt::LineEdit($LayoutWidget_17, "Data24");
+    Data24 = Qt::LineEdit($LayoutWidget_18, "Data24");
     $layout18_4->addWidget(Data24);
     $layout27_3->addWidget(groupHist4);
 
@@ -1467,6 +1525,349 @@ sub NEW
     ShowT0->setAutoDefault( 0 );
     ShowT0->setDefault( 1 );
     musrfit_tabs->insertTab( TabPage_3, "" );
+
+    TabPage_4 = Qt::Widget(musrfit_tabs, "TabPage_4");
+
+    my $LayoutWidget_19 = Qt::Widget(TabPage_4, '$LayoutWidget_19');
+    $LayoutWidget_19->setGeometry( Qt::Rect(8, 10, 545, 357) );
+    my $layout42_2 = Qt::HBoxLayout($LayoutWidget_19, 11, 6, '$layout42_2');
+
+    ConstComp1 = Qt::ButtonGroup($LayoutWidget_19, "ConstComp1");
+    ConstComp1->setEnabled( 0 );
+    ConstComp1->setSizePolicy( Qt::SizePolicy(5, 3, 0, 0, ConstComp1->sizePolicy()->hasHeightForWidth()) );
+    ConstComp1->setAlignment( int(&Qt::ButtonGroup::AlignLeft) );
+
+    Comp1ShLabel_2 = Qt::Label(ConstComp1, "Comp1ShLabel_2");
+    Comp1ShLabel_2->setGeometry( Qt::Rect(2, 30, 185, 20) );
+    Comp1ShLabel_2->setPaletteBackgroundColor( Qt::Color(255, 255, 127) );
+
+    my $LayoutWidget_20 = Qt::Widget(ConstComp1, '$LayoutWidget_20');
+    $LayoutWidget_20->setGeometry( Qt::Rect(6, 68, 150, 257) );
+    my $layout39 = Qt::GridLayout($LayoutWidget_20, 1, 1, 11, 6, '$layout39');
+
+    lineEdit31_2 = Qt::LineEdit($LayoutWidget_20, "lineEdit31_2");
+    lineEdit31_2->setEnabled( 0 );
+
+    $layout39->addWidget(lineEdit31_2, 1, 1);
+
+    lineEdit31_3_2_2 = Qt::LineEdit($LayoutWidget_20, "lineEdit31_3_2_2");
+    lineEdit31_3_2_2->setEnabled( 0 );
+
+    $layout39->addWidget(lineEdit31_3_2_2, 4, 1);
+
+    CParam_1_8 = Qt::CheckBox($LayoutWidget_20, "CParam_1_8");
+    CParam_1_8->setEnabled( 0 );
+    CParam_1_8->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    CParam_1_8->setTristate( 0 );
+
+    $layout39->addWidget(CParam_1_8, 7, 0);
+
+    CParam_1_5 = Qt::CheckBox($LayoutWidget_20, "CParam_1_5");
+    CParam_1_5->setEnabled( 0 );
+    CParam_1_5->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    CParam_1_5->setTristate( 0 );
+
+    $layout39->addWidget(CParam_1_5, 4, 0);
+
+    CParam_1_3 = Qt::CheckBox($LayoutWidget_20, "CParam_1_3");
+
+    $layout39->addWidget(CParam_1_3, 2, 0);
+
+    lineEdit31_3_2_2_2_2_2 = Qt::LineEdit($LayoutWidget_20, "lineEdit31_3_2_2_2_2_2");
+    lineEdit31_3_2_2_2_2_2->setEnabled( 0 );
+
+    $layout39->addWidget(lineEdit31_3_2_2_2_2_2, 7, 1);
+
+    lineEdit31_3_2_2_2_2_2_2 = Qt::LineEdit($LayoutWidget_20, "lineEdit31_3_2_2_2_2_2_2");
+    lineEdit31_3_2_2_2_2_2_2->setEnabled( 0 );
+
+    $layout39->addWidget(lineEdit31_3_2_2_2_2_2_2, 8, 1);
+
+    CParam_1_1 = Qt::CheckBox($LayoutWidget_20, "CParam_1_1");
+
+    $layout39->addWidget(CParam_1_1, 0, 0);
+
+    lineEdit31_3 = Qt::LineEdit($LayoutWidget_20, "lineEdit31_3");
+    lineEdit31_3->setEnabled( 0 );
+
+    $layout39->addWidget(lineEdit31_3, 2, 1);
+
+    CParam_1_6 = Qt::CheckBox($LayoutWidget_20, "CParam_1_6");
+    CParam_1_6->setEnabled( 0 );
+    CParam_1_6->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    CParam_1_6->setTristate( 0 );
+
+    $layout39->addWidget(CParam_1_6, 5, 0);
+
+    CParam_1_9 = Qt::CheckBox($LayoutWidget_20, "CParam_1_9");
+    CParam_1_9->setEnabled( 0 );
+    CParam_1_9->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    CParam_1_9->setTristate( 0 );
+
+    $layout39->addWidget(CParam_1_9, 8, 0);
+
+    lineEdit31 = Qt::LineEdit($LayoutWidget_20, "lineEdit31");
+
+    $layout39->addWidget(lineEdit31, 0, 1);
+
+    lineEdit31_3_2 = Qt::LineEdit($LayoutWidget_20, "lineEdit31_3_2");
+    lineEdit31_3_2->setEnabled( 0 );
+
+    $layout39->addWidget(lineEdit31_3_2, 3, 1);
+
+    CParam_1_4 = Qt::CheckBox($LayoutWidget_20, "CParam_1_4");
+
+    $layout39->addWidget(CParam_1_4, 3, 0);
+
+    CParam_1_7 = Qt::CheckBox($LayoutWidget_20, "CParam_1_7");
+    CParam_1_7->setEnabled( 0 );
+    CParam_1_7->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    CParam_1_7->setTristate( 0 );
+
+    $layout39->addWidget(CParam_1_7, 6, 0);
+
+    CParam_1_2 = Qt::CheckBox($LayoutWidget_20, "CParam_1_2");
+
+    $layout39->addWidget(CParam_1_2, 1, 0);
+
+    lineEdit31_3_2_2_2_2 = Qt::LineEdit($LayoutWidget_20, "lineEdit31_3_2_2_2_2");
+    lineEdit31_3_2_2_2_2->setEnabled( 0 );
+
+    $layout39->addWidget(lineEdit31_3_2_2_2_2, 6, 1);
+
+    lineEdit31_3_2_2_2 = Qt::LineEdit($LayoutWidget_20, "lineEdit31_3_2_2_2");
+    lineEdit31_3_2_2_2->setEnabled( 0 );
+
+    $layout39->addWidget(lineEdit31_3_2_2_2, 5, 1);
+    $layout42_2->addWidget(ConstComp1);
+
+    ConstComp2 = Qt::ButtonGroup($LayoutWidget_19, "ConstComp2");
+    ConstComp2->setEnabled( 0 );
+    ConstComp2->setSizePolicy( Qt::SizePolicy(5, 3, 0, 0, ConstComp2->sizePolicy()->hasHeightForWidth()) );
+
+    Comp2ShLabel_2 = Qt::Label(ConstComp2, "Comp2ShLabel_2");
+    Comp2ShLabel_2->setGeometry( Qt::Rect(2, 30, 185, 20) );
+    Comp2ShLabel_2->setPaletteBackgroundColor( Qt::Color(255, 255, 127) );
+
+    my $LayoutWidget_21 = Qt::Widget(ConstComp2, '$LayoutWidget_21');
+    $LayoutWidget_21->setGeometry( Qt::Rect(9, 68, 150, 257) );
+    my $layout39_2 = Qt::GridLayout($LayoutWidget_21, 1, 1, 11, 6, '$layout39_2');
+
+    lineEdit31_2_2 = Qt::LineEdit($LayoutWidget_21, "lineEdit31_2_2");
+    lineEdit31_2_2->setEnabled( 0 );
+
+    $layout39_2->addWidget(lineEdit31_2_2, 1, 1);
+
+    lineEdit31_3_2_2_3 = Qt::LineEdit($LayoutWidget_21, "lineEdit31_3_2_2_3");
+    lineEdit31_3_2_2_3->setEnabled( 0 );
+
+    $layout39_2->addWidget(lineEdit31_3_2_2_3, 4, 1);
+
+    CParam_1_8_2 = Qt::CheckBox($LayoutWidget_21, "CParam_1_8_2");
+    CParam_1_8_2->setEnabled( 0 );
+    CParam_1_8_2->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    CParam_1_8_2->setTristate( 0 );
+
+    $layout39_2->addWidget(CParam_1_8_2, 7, 0);
+
+    CParam_1_5_2 = Qt::CheckBox($LayoutWidget_21, "CParam_1_5_2");
+    CParam_1_5_2->setEnabled( 0 );
+    CParam_1_5_2->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    CParam_1_5_2->setTristate( 0 );
+
+    $layout39_2->addWidget(CParam_1_5_2, 4, 0);
+
+    CParam_1_3_2 = Qt::CheckBox($LayoutWidget_21, "CParam_1_3_2");
+    CParam_1_3_2->setEnabled( 0 );
+
+    $layout39_2->addWidget(CParam_1_3_2, 2, 0);
+
+    lineEdit31_3_2_2_2_2_2_3 = Qt::LineEdit($LayoutWidget_21, "lineEdit31_3_2_2_2_2_2_3");
+    lineEdit31_3_2_2_2_2_2_3->setEnabled( 0 );
+
+    $layout39_2->addWidget(lineEdit31_3_2_2_2_2_2_3, 7, 1);
+
+    lineEdit31_3_2_2_2_2_2_2_2 = Qt::LineEdit($LayoutWidget_21, "lineEdit31_3_2_2_2_2_2_2_2");
+    lineEdit31_3_2_2_2_2_2_2_2->setEnabled( 0 );
+
+    $layout39_2->addWidget(lineEdit31_3_2_2_2_2_2_2_2, 8, 1);
+
+    CParam_1_1_2 = Qt::CheckBox($LayoutWidget_21, "CParam_1_1_2");
+    CParam_1_1_2->setEnabled( 0 );
+
+    $layout39_2->addWidget(CParam_1_1_2, 0, 0);
+
+    lineEdit31_3_3 = Qt::LineEdit($LayoutWidget_21, "lineEdit31_3_3");
+    lineEdit31_3_3->setEnabled( 0 );
+
+    $layout39_2->addWidget(lineEdit31_3_3, 2, 1);
+
+    CParam_1_6_2 = Qt::CheckBox($LayoutWidget_21, "CParam_1_6_2");
+    CParam_1_6_2->setEnabled( 0 );
+    CParam_1_6_2->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    CParam_1_6_2->setTristate( 0 );
+
+    $layout39_2->addWidget(CParam_1_6_2, 5, 0);
+
+    CParam_1_9_2 = Qt::CheckBox($LayoutWidget_21, "CParam_1_9_2");
+    CParam_1_9_2->setEnabled( 0 );
+    CParam_1_9_2->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    CParam_1_9_2->setTristate( 0 );
+
+    $layout39_2->addWidget(CParam_1_9_2, 8, 0);
+
+    lineEdit31_4 = Qt::LineEdit($LayoutWidget_21, "lineEdit31_4");
+    lineEdit31_4->setEnabled( 0 );
+
+    $layout39_2->addWidget(lineEdit31_4, 0, 1);
+
+    lineEdit31_3_2_3 = Qt::LineEdit($LayoutWidget_21, "lineEdit31_3_2_3");
+    lineEdit31_3_2_3->setEnabled( 0 );
+
+    $layout39_2->addWidget(lineEdit31_3_2_3, 3, 1);
+
+    CParam_1_4_2 = Qt::CheckBox($LayoutWidget_21, "CParam_1_4_2");
+    CParam_1_4_2->setEnabled( 0 );
+
+    $layout39_2->addWidget(CParam_1_4_2, 3, 0);
+
+    CParam_1_7_2 = Qt::CheckBox($LayoutWidget_21, "CParam_1_7_2");
+    CParam_1_7_2->setEnabled( 0 );
+    CParam_1_7_2->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    CParam_1_7_2->setTristate( 0 );
+
+    $layout39_2->addWidget(CParam_1_7_2, 6, 0);
+
+    CParam_1_2_2 = Qt::CheckBox($LayoutWidget_21, "CParam_1_2_2");
+    CParam_1_2_2->setEnabled( 0 );
+
+    $layout39_2->addWidget(CParam_1_2_2, 1, 0);
+
+    lineEdit31_3_2_2_2_2_3 = Qt::LineEdit($LayoutWidget_21, "lineEdit31_3_2_2_2_2_3");
+    lineEdit31_3_2_2_2_2_3->setEnabled( 0 );
+
+    $layout39_2->addWidget(lineEdit31_3_2_2_2_2_3, 6, 1);
+
+    lineEdit31_3_2_2_2_3 = Qt::LineEdit($LayoutWidget_21, "lineEdit31_3_2_2_2_3");
+    lineEdit31_3_2_2_2_3->setEnabled( 0 );
+
+    $layout39_2->addWidget(lineEdit31_3_2_2_2_3, 5, 1);
+    $layout42_2->addWidget(ConstComp2);
+
+    ConstComp3 = Qt::ButtonGroup($LayoutWidget_19, "ConstComp3");
+    ConstComp3->setEnabled( 0 );
+    ConstComp3->setSizePolicy( Qt::SizePolicy(5, 3, 0, 0, ConstComp3->sizePolicy()->hasHeightForWidth()) );
+    ConstComp3->setAlignment( int(&Qt::ButtonGroup::AlignJustify | &Qt::ButtonGroup::AlignVCenter) );
+
+    Comp3ShLabel_2 = Qt::Label(ConstComp3, "Comp3ShLabel_2");
+    Comp3ShLabel_2->setGeometry( Qt::Rect(2, 30, 185, 20) );
+    Comp3ShLabel_2->setPaletteBackgroundColor( Qt::Color(255, 255, 127) );
+
+    my $LayoutWidget_22 = Qt::Widget(ConstComp3, '$LayoutWidget_22');
+    $LayoutWidget_22->setGeometry( Qt::Rect(6, 68, 150, 257) );
+    my $layout39_3 = Qt::GridLayout($LayoutWidget_22, 1, 1, 11, 6, '$layout39_3');
+
+    lineEdit31_2_3 = Qt::LineEdit($LayoutWidget_22, "lineEdit31_2_3");
+    lineEdit31_2_3->setEnabled( 0 );
+
+    $layout39_3->addWidget(lineEdit31_2_3, 1, 1);
+
+    lineEdit31_3_2_2_4 = Qt::LineEdit($LayoutWidget_22, "lineEdit31_3_2_2_4");
+    lineEdit31_3_2_2_4->setEnabled( 0 );
+
+    $layout39_3->addWidget(lineEdit31_3_2_2_4, 4, 1);
+
+    CParam_1_8_3 = Qt::CheckBox($LayoutWidget_22, "CParam_1_8_3");
+    CParam_1_8_3->setEnabled( 0 );
+    CParam_1_8_3->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    CParam_1_8_3->setTristate( 0 );
+
+    $layout39_3->addWidget(CParam_1_8_3, 7, 0);
+
+    CParam_1_5_3 = Qt::CheckBox($LayoutWidget_22, "CParam_1_5_3");
+    CParam_1_5_3->setEnabled( 0 );
+    CParam_1_5_3->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    CParam_1_5_3->setTristate( 0 );
+
+    $layout39_3->addWidget(CParam_1_5_3, 4, 0);
+
+    CParam_1_3_3 = Qt::CheckBox($LayoutWidget_22, "CParam_1_3_3");
+    CParam_1_3_3->setEnabled( 0 );
+
+    $layout39_3->addWidget(CParam_1_3_3, 2, 0);
+
+    lineEdit31_3_2_2_2_2_2_4 = Qt::LineEdit($LayoutWidget_22, "lineEdit31_3_2_2_2_2_2_4");
+    lineEdit31_3_2_2_2_2_2_4->setEnabled( 0 );
+
+    $layout39_3->addWidget(lineEdit31_3_2_2_2_2_2_4, 7, 1);
+
+    lineEdit31_3_2_2_2_2_2_2_3 = Qt::LineEdit($LayoutWidget_22, "lineEdit31_3_2_2_2_2_2_2_3");
+    lineEdit31_3_2_2_2_2_2_2_3->setEnabled( 0 );
+
+    $layout39_3->addWidget(lineEdit31_3_2_2_2_2_2_2_3, 8, 1);
+
+    CParam_1_1_3 = Qt::CheckBox($LayoutWidget_22, "CParam_1_1_3");
+    CParam_1_1_3->setEnabled( 0 );
+
+    $layout39_3->addWidget(CParam_1_1_3, 0, 0);
+
+    lineEdit31_3_4 = Qt::LineEdit($LayoutWidget_22, "lineEdit31_3_4");
+    lineEdit31_3_4->setEnabled( 0 );
+
+    $layout39_3->addWidget(lineEdit31_3_4, 2, 1);
+
+    CParam_1_6_3 = Qt::CheckBox($LayoutWidget_22, "CParam_1_6_3");
+    CParam_1_6_3->setEnabled( 0 );
+    CParam_1_6_3->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    CParam_1_6_3->setTristate( 0 );
+
+    $layout39_3->addWidget(CParam_1_6_3, 5, 0);
+
+    CParam_1_9_3 = Qt::CheckBox($LayoutWidget_22, "CParam_1_9_3");
+    CParam_1_9_3->setEnabled( 0 );
+    CParam_1_9_3->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    CParam_1_9_3->setTristate( 0 );
+
+    $layout39_3->addWidget(CParam_1_9_3, 8, 0);
+
+    lineEdit31_5 = Qt::LineEdit($LayoutWidget_22, "lineEdit31_5");
+    lineEdit31_5->setEnabled( 0 );
+
+    $layout39_3->addWidget(lineEdit31_5, 0, 1);
+
+    lineEdit31_3_2_4 = Qt::LineEdit($LayoutWidget_22, "lineEdit31_3_2_4");
+    lineEdit31_3_2_4->setEnabled( 0 );
+
+    $layout39_3->addWidget(lineEdit31_3_2_4, 3, 1);
+
+    CParam_1_4_3 = Qt::CheckBox($LayoutWidget_22, "CParam_1_4_3");
+    CParam_1_4_3->setEnabled( 0 );
+
+    $layout39_3->addWidget(CParam_1_4_3, 3, 0);
+
+    CParam_1_7_3 = Qt::CheckBox($LayoutWidget_22, "CParam_1_7_3");
+    CParam_1_7_3->setEnabled( 0 );
+    CParam_1_7_3->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    CParam_1_7_3->setTristate( 0 );
+
+    $layout39_3->addWidget(CParam_1_7_3, 6, 0);
+
+    CParam_1_2_3 = Qt::CheckBox($LayoutWidget_22, "CParam_1_2_3");
+    CParam_1_2_3->setEnabled( 0 );
+
+    $layout39_3->addWidget(CParam_1_2_3, 1, 0);
+
+    lineEdit31_3_2_2_2_2_4 = Qt::LineEdit($LayoutWidget_22, "lineEdit31_3_2_2_2_2_4");
+    lineEdit31_3_2_2_2_2_4->setEnabled( 0 );
+
+    $layout39_3->addWidget(lineEdit31_3_2_2_2_2_4, 6, 1);
+
+    lineEdit31_3_2_2_2_4 = Qt::LineEdit($LayoutWidget_22, "lineEdit31_3_2_2_2_4");
+    lineEdit31_3_2_2_2_4->setEnabled( 0 );
+
+    $layout39_3->addWidget(lineEdit31_3_2_2_2_4, 5, 1);
+    $layout42_2->addWidget(ConstComp3);
+    musrfit_tabs->insertTab( TabPage_4, "" );
 
     fileNewAction= Qt::Action(this, "fileNewAction");
     fileNewAction->setIconSet( Qt::IconSet($image1) );
@@ -1783,7 +2184,6 @@ sub languageChange
     go->setText( trUtf8("Fit") );
     PlotMSR->setText( trUtf8("Plot") );
     musrfit_tabs->changeTab( TabPage, trUtf8("Fitting") );
-    buttonGroupSharing->setTitle( trUtf8("Shared Parameters") );
     SharingComp1->setTitle( trUtf8("1st Component") );
     ShParam_1_1->setText( trUtf8("Param1") );
     ShParam_1_2->setText( trUtf8("Param2") );
@@ -1873,6 +2273,40 @@ sub languageChange
     groupHist4->setTitle( trUtf8("Hist4") );
     ShowT0->setText( trUtf8("Show") );
     musrfit_tabs->changeTab( TabPage_3, trUtf8("t0/Bg Bins") );
+    ConstComp1->setTitle( trUtf8("1st Component") );
+    Comp1ShLabel_2->setText( trUtf8("FitType1") );
+    CParam_1_8->setText( trUtf8("Param8") );
+    CParam_1_5->setText( trUtf8("Param5") );
+    CParam_1_3->setText( trUtf8("Param3") );
+    CParam_1_1->setText( trUtf8("Param1") );
+    CParam_1_6->setText( trUtf8("Param6") );
+    CParam_1_9->setText( trUtf8("Param9") );
+    CParam_1_4->setText( trUtf8("Param4") );
+    CParam_1_7->setText( trUtf8("Param7") );
+    CParam_1_2->setText( trUtf8("Param2") );
+    ConstComp2->setTitle( trUtf8("2nd Component") );
+    Comp2ShLabel_2->setText( trUtf8("FitType2") );
+    CParam_1_8_2->setText( trUtf8("Param8") );
+    CParam_1_5_2->setText( trUtf8("Param5") );
+    CParam_1_3_2->setText( trUtf8("Param3") );
+    CParam_1_1_2->setText( trUtf8("Param1") );
+    CParam_1_6_2->setText( trUtf8("Param6") );
+    CParam_1_9_2->setText( trUtf8("Param9") );
+    CParam_1_4_2->setText( trUtf8("Param4") );
+    CParam_1_7_2->setText( trUtf8("Param7") );
+    CParam_1_2_2->setText( trUtf8("Param2") );
+    ConstComp3->setTitle( trUtf8("3rd Component") );
+    Comp3ShLabel_2->setText( trUtf8("FitType3") );
+    CParam_1_8_3->setText( trUtf8("Param8") );
+    CParam_1_5_3->setText( trUtf8("Param5") );
+    CParam_1_3_3->setText( trUtf8("Param3") );
+    CParam_1_1_3->setText( trUtf8("Param1") );
+    CParam_1_6_3->setText( trUtf8("Param6") );
+    CParam_1_9_3->setText( trUtf8("Param9") );
+    CParam_1_4_3->setText( trUtf8("Param4") );
+    CParam_1_7_3->setText( trUtf8("Param7") );
+    CParam_1_2_3->setText( trUtf8("Param2") );
+    musrfit_tabs->changeTab( TabPage_4, trUtf8("Constraints") );
     fileNewAction->setText( trUtf8("&New") );
     fileNewAction->setMenuText( trUtf8("&New") );
     fileNewAction->setAccel( Qt::KeySequence( trUtf8("Ctrl+N") ) );
