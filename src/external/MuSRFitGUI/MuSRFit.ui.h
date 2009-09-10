@@ -592,7 +592,7 @@ void MuSRFitform::GoFit()
 {
     my %All=CreateAllInput();
     CallMSRCreate();
-    musrfit_tabs->setCurrentTab(1);
+#    musrfit_tabs->setCurrentTab(1);
     my $FILENAME=$All{"FILENAME"}.".msr";
     if (-e $FILENAME) {
 	my $cmd="musrfit -t $FILENAME";

@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Wed Sep 9 23:02:40 2009
+# Created: Thu Sep 10 08:22:47 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -571,7 +571,7 @@ sub NEW
         setName("MuSRFitform" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
-    setMinimumSize(Qt::Size(23, 222) );
+    setMinimumSize(Qt::Size(21, 227) );
     setIcon($image0 );
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
@@ -2526,7 +2526,7 @@ sub GoFit
 
     my %All=CreateAllInput();
     CallMSRCreate();
-    musrfit_tabs->setCurrentTab(1);
+#    musrfit_tabs->setCurrentTab(1);
     my $FILENAME=$All{"FILENAME"}.".msr";
     if (-e $FILENAME) {
 	my $cmd="musrfit -t $FILENAME";
