@@ -153,22 +153,6 @@
         </widget>
         <widget class="QLineEdit">
             <property name="name">
-                <cstring>fFirst_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>50</x>
-                    <y>30</y>
-                    <width>90</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>first run no, e.g. 147</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
                 <cstring>fRunList_lineEdit</cstring>
             </property>
             <property name="geometry">
@@ -197,6 +181,22 @@
             </property>
             <property name="toolTip" stdset="0">
                 <string></string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fFirst_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>50</x>
+                    <y>30</y>
+                    <width>90</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>first run no, e.g. 147</string>
             </property>
         </widget>
     </widget>
@@ -615,25 +615,25 @@
         <sender>fFirst_lineEdit</sender>
         <signal>textChanged(const QString&amp;)</signal>
         <receiver>PMsr2DataDialogBase</receiver>
-        <slot>runFirstLastEntered()</slot>
+        <slot>runFirstEntered(const QString&amp;)</slot>
     </connection>
     <connection>
         <sender>fLast_lineEdit</sender>
         <signal>textChanged(const QString&amp;)</signal>
         <receiver>PMsr2DataDialogBase</receiver>
-        <slot>runFirstLastEntered()</slot>
+        <slot>runLastEntered(const QString&amp;)</slot>
     </connection>
     <connection>
         <sender>fRunList_lineEdit</sender>
         <signal>textChanged(const QString&amp;)</signal>
         <receiver>PMsr2DataDialogBase</receiver>
-        <slot>runListEntered()</slot>
+        <slot>runListEntered(const QString&amp;)</slot>
     </connection>
     <connection>
         <sender>fRunListFileName_lineEdit</sender>
         <signal>textChanged(const QString&amp;)</signal>
         <receiver>PMsr2DataDialogBase</receiver>
-        <slot>runListFileNameEntered()</slot>
+        <slot>runListFileNameEntered(const QString&amp;)</slot>
     </connection>
 </connections>
 <tabstops>
@@ -655,9 +655,10 @@
     <tabstop>fHelp_button</tabstop>
 </tabstops>
 <slots>
-    <slot>runFirstLastEntered()</slot>
-    <slot>runListEntered()</slot>
-    <slot>runListFileNameEntered()</slot>
+    <slot>runFirstEntered(const QString&amp;)</slot>
+    <slot>runListEntered(const QString&amp;)</slot>
+    <slot>runListFileNameEntered(const QString&amp;)</slot>
+    <slot>runLastEntered(const QString&amp;)</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

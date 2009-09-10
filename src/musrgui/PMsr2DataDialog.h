@@ -44,9 +44,10 @@ class PMsr2DataDialog : public PMsr2DataDialogBase
     virtual PMsr2DataParam* getMsr2DataParam();
 
   public slots:
-    void runFirstLastEntered();
-    void runListEntered();
-    void runListFileNameEntered();
+    void runFirstEntered(const QString&);
+    void runLastEntered(const QString&);
+    void runListEntered(const QString&);
+    void runListFileNameEntered(const QString&);
 
   private:
     int fRunTag; // -1 = not valid, 0 = first last, 1 = run list, 2 = run list file name

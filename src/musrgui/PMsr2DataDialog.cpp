@@ -132,7 +132,7 @@ PMsr2DataParam* PMsr2DataDialog::getMsr2DataParam()
 /**
  * <p>
  */
-void PMsr2DataDialog::runFirstLastEntered()
+void PMsr2DataDialog::runFirstEntered(const QString &str)
 {
   fRunTag = 0;
 
@@ -140,13 +140,31 @@ void PMsr2DataDialog::runFirstLastEntered()
     fRunList_lineEdit->clear();
   if (!fRunListFileName_lineEdit->text().isEmpty())
     fRunListFileName_lineEdit->clear();
+
+  fFirst_lineEdit->setText(str);
 }
 
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>
  */
-void PMsr2DataDialog::runListEntered()
+void PMsr2DataDialog::runLastEntered(const QString &str)
+{
+  fRunTag = 0;
+
+  if (!fRunList_lineEdit->text().isEmpty())
+    fRunList_lineEdit->clear();
+  if (!fRunListFileName_lineEdit->text().isEmpty())
+    fRunListFileName_lineEdit->clear();
+
+  fLast_lineEdit->setText(str);
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PMsr2DataDialog::runListEntered(const QString &str)
 {
   fRunTag = 1;
 
@@ -156,13 +174,15 @@ void PMsr2DataDialog::runListEntered()
     fLast_lineEdit->clear();
   if (!fRunListFileName_lineEdit->text().isEmpty())
     fRunListFileName_lineEdit->clear();
+
+  fRunList_lineEdit->setText(str);
 }
 
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>
  */
-void PMsr2DataDialog::runListFileNameEntered()
+void PMsr2DataDialog::runListFileNameEntered(const QString &str)
 {
   fRunTag = 2;
 
@@ -172,6 +192,8 @@ void PMsr2DataDialog::runListFileNameEntered()
     fLast_lineEdit->clear();
   if (!fRunList_lineEdit->text().isEmpty())
     fRunList_lineEdit->clear();
+
+  fRunListFileName_lineEdit->setText(str);
 }
 
 //----------------------------------------------------------------------------------------------------
