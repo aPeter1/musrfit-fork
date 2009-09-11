@@ -349,22 +349,6 @@
         <property name="title">
             <string>template run input</string>
         </property>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>fTemplateRunNumber_lineEdit</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>170</x>
-                    <y>27</y>
-                    <width>140</width>
-                    <height>24</height>
-                </rect>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>e.g. 2089</string>
-            </property>
-        </widget>
         <widget class="QLabel">
             <property name="name">
                 <cstring>fTemplateRunNumber_textLabel</cstring>
@@ -398,6 +382,22 @@
             </property>
             <property name="toolTip" stdset="0">
                 <string>on: chain fit, off: always start from the template run</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>fTemplateRunNumber_lineEdit</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>170</x>
+                    <y>27</y>
+                    <width>140</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>e.g. 2089</string>
             </property>
         </widget>
     </widget>
@@ -591,6 +591,38 @@
                 <string>Take Data File Title</string>
             </property>
         </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>fCreateMsrFileOnly_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>400</x>
+                    <y>50</y>
+                    <width>160</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Create msr-File Only</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>fFitOnly_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>400</x>
+                    <y>70</y>
+                    <width>103</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Fit Only</string>
+            </property>
+        </widget>
     </widget>
 </widget>
 <images>
@@ -635,6 +667,24 @@
         <receiver>PMsr2DataDialogBase</receiver>
         <slot>runListFileNameEntered(const QString&amp;)</slot>
     </connection>
+    <connection>
+        <sender>fCreateMsrFileOnly_checkBox</sender>
+        <signal>stateChanged(int)</signal>
+        <receiver>PMsr2DataDialogBase</receiver>
+        <slot>createMsrFileOnlyChanged(int)</slot>
+    </connection>
+    <connection>
+        <sender>fFitOnly_checkBox</sender>
+        <signal>stateChanged(int)</signal>
+        <receiver>PMsr2DataDialogBase</receiver>
+        <slot>fitOnlyChanged(int)</slot>
+    </connection>
+    <connection>
+        <sender>fTemplateRunNumber_lineEdit</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>PMsr2DataDialogBase</receiver>
+        <slot>templateRunEntered(const QString&amp;)</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>fFirst_lineEdit</tabstop>
@@ -659,6 +709,9 @@
     <slot>runListEntered(const QString&amp;)</slot>
     <slot>runListFileNameEntered(const QString&amp;)</slot>
     <slot>runLastEntered(const QString&amp;)</slot>
+    <slot>createMsrFileOnlyChanged(int)</slot>
+    <slot>fitOnlyChanged(int)</slot>
+    <slot>templateRunEntered(const QString&amp;)</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

@@ -1394,6 +1394,8 @@ void PTextEdit::musrMsr2Data()
     fMsr2DataParam->chainFit = true;
     fMsr2DataParam->openFilesAfterFitting = false;
     fMsr2DataParam->titleFromDataFile = fTitleFromDataFile;
+    fMsr2DataParam->createMsrFileOnly = false;
+    fMsr2DataParam->fitOnly = false;
   }
 
   PMsr2DataDialog *dlg = new PMsr2DataDialog(fMsr2DataParam);
@@ -1510,13 +1512,26 @@ void PTextEdit::musrMsr2Data()
     if (!fMsr2DataParam->summaryFilePresent)
       cmd.append("nosummary");
 
-    // template run no
-    if (fMsr2DataParam->templateRunNo != -1) {
+    // template run no fitting but: (i) no fit only flag, (ii) no create msr-file only flag
+    if ((fMsr2DataParam->templateRunNo != -1) && !fMsr2DataParam->fitOnly && !fMsr2DataParam->createMsrFileOnly) {
       str = QString("%1").arg(fMsr2DataParam->templateRunNo);
       str = "fit-" + str;
       if (!fMsr2DataParam->chainFit) {
         str += "!";
       }
+      cmd.append(str);
+    }
+
+    // template run no AND create msr-file only flag
+    if ((fMsr2DataParam->templateRunNo != -1) && fMsr2DataParam->createMsrFileOnly) {
+      str = QString("%1").arg(fMsr2DataParam->templateRunNo);
+      str = "msr-" + str;
+      cmd.append(str);
+    }
+
+    // fit only
+    if (fMsr2DataParam->fitOnly) {
+      str = "fit";
       cmd.append(str);
     }
 

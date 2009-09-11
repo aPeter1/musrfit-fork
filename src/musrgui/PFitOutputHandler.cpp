@@ -83,14 +83,15 @@ PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QValueVector<QStr
 PFitOutputHandler::~PFitOutputHandler()
 {
   if (fProc->isRunning()) {
-    qDebug("fProc still running");
+//    qDebug("fProc still running");
     fProc->kill();
   }
+/*
   if (fProc->isRunning()) {
     QString msg = "fProc still running ...";
     qDebug(msg);
   }
-
+*/
   if (fProc) {
     delete fProc;
     fProc = 0;

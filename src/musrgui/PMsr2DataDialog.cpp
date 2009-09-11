@@ -89,6 +89,8 @@ PMsr2DataDialog::PMsr2DataDialog(PMsr2DataParam *msr2DataParam) : fMsr2DataParam
   fChainFit_checkBox->setChecked(fMsr2DataParam->chainFit);
   fOpenAfterFitting_checkBox->setChecked(fMsr2DataParam->openFilesAfterFitting);
   fTitleFromData_checkBox->setChecked(fMsr2DataParam->titleFromDataFile);
+  fCreateMsrFileOnly_checkBox->setChecked(fMsr2DataParam->createMsrFileOnly);
+  fFitOnly_checkBox->setChecked(fMsr2DataParam->fitOnly);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -124,6 +126,8 @@ PMsr2DataParam* PMsr2DataDialog::getMsr2DataParam()
   fMsr2DataParam->chainFit = fChainFit_checkBox->isChecked();
   fMsr2DataParam->openFilesAfterFitting = fOpenAfterFitting_checkBox->isChecked();
   fMsr2DataParam->titleFromDataFile = fTitleFromData_checkBox->isChecked();
+  fMsr2DataParam->createMsrFileOnly = fCreateMsrFileOnly_checkBox->isChecked();
+  fMsr2DataParam->fitOnly = fFitOnly_checkBox->isChecked();
 
   return fMsr2DataParam;
 }
@@ -194,6 +198,40 @@ void PMsr2DataDialog::runListFileNameEntered(const QString &str)
     fRunList_lineEdit->clear();
 
   fRunListFileName_lineEdit->setText(str);
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PMsr2DataDialog::templateRunEntered(const QString &str)
+{
+  if (!str.isEmpty())
+    fFitOnly_checkBox->setChecked(false);
+  fTemplateRunNumber_lineEdit->setText(str);
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PMsr2DataDialog::createMsrFileOnlyChanged(int buttonState)
+{
+  if (buttonState == QButton::On) {
+    fFitOnly_checkBox->setChecked(false);
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PMsr2DataDialog::fitOnlyChanged(int buttonState)
+{
+  if (buttonState == QButton::On) {
+    fCreateMsrFileOnly_checkBox->setChecked(false);
+    fTemplateRunNumber_lineEdit->clear();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

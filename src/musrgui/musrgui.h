@@ -50,6 +50,8 @@ typedef struct {
   bool chainFit;
   bool openFilesAfterFitting;
   bool titleFromDataFile;
+  bool createMsrFileOnly;
+  bool fitOnly;
 } PMsr2DataParam;
 
 typedef struct {
