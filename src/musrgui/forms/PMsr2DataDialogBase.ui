@@ -700,6 +700,10 @@
     <tabstop>fKeepMinuit2Output_checkBox</tabstop>
     <tabstop>fWriteColumnData_checkBox</tabstop>
     <tabstop>fRecreateDbFile_checkBox</tabstop>
+    <tabstop>fOpenAfterFitting_checkBox</tabstop>
+    <tabstop>fTitleFromData_checkBox</tabstop>
+    <tabstop>fCreateMsrFileOnly_checkBox</tabstop>
+    <tabstop>fFitOnly_checkBox</tabstop>
     <tabstop>fOk_button</tabstop>
     <tabstop>fCancel_button</tabstop>
     <tabstop>fHelp_button</tabstop>
