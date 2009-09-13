@@ -22,8 +22,8 @@
     </property>
     <property name="minimumSize">
         <size>
-            <width>21</width>
-            <height>227</height>
+            <width>23</width>
+            <height>246</height>
         </size>
     </property>
     <property name="caption">
@@ -3905,6 +3905,10 @@
         <separator/>
         <action name="fileExitAction"/>
     </item>
+    <item text="Parameters" name="Parameters">
+        <action name="parametersExport_AsAction"/>
+        <action name="parametersAppend_ToAction"/>
+    </item>
     <item text="&amp;Edit" name="editMenu">
         <action name="editUndoAction"/>
         <action name="editRedoAction"/>
@@ -3986,10 +3990,10 @@
             <iconset>image3</iconset>
         </property>
         <property name="text">
-            <string>&amp;Save MSR</string>
+            <string>&amp;Save MSR...</string>
         </property>
         <property name="menuText">
-            <string>&amp;Save MSR</string>
+            <string>&amp;Save MSR...</string>
         </property>
         <property name="statusTip">
             <string>&amp;Save MSR</string>
@@ -4308,6 +4312,28 @@
             <string>new item</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>parametersExport_AsAction</cstring>
+        </property>
+        <property name="text">
+            <string>&amp;Export As...</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Export As...</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>parametersAppend_ToAction</cstring>
+        </property>
+        <property name="text">
+            <string>&amp;Append To...</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Append To...</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -4483,6 +4509,18 @@
         <receiver>MuSRFitform</receiver>
         <slot>T0Update()</slot>
     </connection>
+    <connection>
+        <sender>parametersExport_AsAction</sender>
+        <signal>activated()</signal>
+        <receiver>MuSRFitform</receiver>
+        <slot>parametersExport()</slot>
+    </connection>
+    <connection>
+        <sender>parametersAppend_ToAction</sender>
+        <signal>activated()</signal>
+        <receiver>MuSRFitform</receiver>
+        <slot>parametersAppend()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>musrfit_tabs</tabstop>
@@ -4573,6 +4611,8 @@
     <slot>fileChangeDir()</slot>
     <slot>filePrint()</slot>
     <slot>fileExit()</slot>
+    <slot>parametersExport()</slot>
+    <slot>parametersAppend()</slot>
     <slot>editUndo()</slot>
     <slot>editRedo()</slot>
     <slot>editCut()</slot>

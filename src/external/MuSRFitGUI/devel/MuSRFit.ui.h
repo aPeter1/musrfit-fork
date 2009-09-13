@@ -106,16 +106,8 @@ void Form1::parametersExport()
     
 # If the user gave a filename the copy to it
     if ($file ne "") {
-# TODO: check if the extension is correct, or add it.
-	if (-e $FILENAME) {
-#	    my $cmd="cp $FILENAME $file";
-#	    my $pid=system($cmd);
-	} else {
-	    if ($file ne "") {
-#		my $Warning = "Warning: No MSR file found yet!";
-#		my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
-	    }
-	}
+	my $Text = MSR::ExportParams(\%All);
+	print $Text;
     }
 }
 
@@ -124,8 +116,8 @@ void Form1::parametersAppend()
 {
     my %All=CreateAllInput();      
     my $FILENAME=$All{"FILENAME"}.".dat";
-    my $file=Qt::FileDialog::getSaveFileName(
-	    "$FILENAME",
+    my $file=Qt::FileDialog::getOpneFileName(
+	    "./",
 	    "Data Files (*.dat)",
 	    this,
 	    "append file dialog",
@@ -133,17 +125,17 @@ void Form1::parametersAppend()
     
 # If the user gave a filename the copy to it
     if ($file ne "") {
-# TODO: check if the extension is correct, or add it.
 	if (-e $FILENAME) {
-#	    my $cmd="cp $FILENAME $file";
-#	    my $pid=system($cmd);
+	    my $Text = MSR::ExportParams(\%All);
+	    print $Text;
 	} else {
 	    if ($file ne "") {
-#		my $Warning = "Warning: No MSR file found yet!";
-#		my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
+		my $Warning = "Warning: No data file found yet!";
+		my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
 	    }
 	}
     }
+    MSR::ExportParams(\%All);
 }
 
 

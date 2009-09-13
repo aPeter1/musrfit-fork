@@ -1227,6 +1227,145 @@ sub PrepParamTable {
 
 
 ########################
+# ExportParams
+# Function return a tab separated table of parameters for the fit
+# input should be 
+# %All
+########################
+sub ExportParams { 
+    my $erradd = "d";
+    my $minadd = "_min";
+    my $maxadd = "_max";
+
+# First assume nothing is shared
+    my $Shared = 0;
+
+    my $TABLE="";
+
+    my %All = %{$_[0]};
+    my @RUNS = ();
+    if ($All{"RUNSType"}) {
+	@RUNS = split( /,/, $All{"RunFiles"} );
+    } else {
+	@RUNS = split( /,/, $All{"RunNumbers"} );
+    }
+    my @Hists = split( /,/, $All{"LRBF"} );
+
+    my @FitTypes =();
+    foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
+	if ( $FitType ne "None" ) { push( @FitTypes, $FitType ); }
+    }
+# Get theory block to determine the size of the table 
+    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
+# For now the line below does not work. Why?    
+#    my $Paramcomp_ref=$All{"Paramcomp_ref"};
+    my @Paramcomp = @$Paramcomp_ref;
+    my $Full_T_Block= $All{"Full_T_Block"};
+
+# Extract parameter block form the MSR file
+#    my $FILENAME=$All{"FILENAME"};
+#    open (MSRF,q{<},"$FILENAME.msr" );
+#    my @lines = <MSRF>;
+#    close(IFILE);
+#    my $FPBlock_ref=MSR::ExtractParamBlk(@lines);
+#    my @FPBloc = @$FPBlock_ref;
+
+# Then loop over expected parameters and extract their values and error bar
+    my $PCount =0;
+    my $iRun =0;
+    my $value =0;
+    my $error    = 0;
+    my $minvalue = 0;
+    my $maxvalue = 0;
+    my $Component=1;
+    
+    foreach my $RUN (@RUNS) {
+	my $line="$RUN";
+	$iRun++;
+	$Component=1;
+	if ($All{"FitAsyType"} eq "Asymmetry") {
+	    foreach my $FitType (@FitTypes) {
+		my $Parameters=$Paramcomp[$Component-1];
+		my @Params = split( /\s+/, $Parameters );		
+		if ( $Component == 1 ) {
+		    unshift( @Params, "Alpha" );
+		}
+		
+# This is the counter for parameters of this component
+		my $NP=1;
+		$Shared = 0;
+# Change state/label of parameters
+		foreach my $Param (@Params) {
+		    my $Param_ORG = $Param;
+		    if ( $#FitTypes != 0 && ( $Param ne "Alpha" ) ){
+			$Param = join( "", $Param, "_", "$Component" );
+		    }
+		    
+		    $Shared = $All{"Sh_$Param"};
+		    if ( $Shared!=1 || $iRun == 1 ) {
+# It there are multiple runs index the parameters accordingly
+			$Param=$Param."_".$iRun;
+# Check if this parameter has been initialized befor. (should be)
+			$value = $All{"$Param"};
+			$error    = $All{"$erradd$Param"};
+
+			$line=join("\t",$line,$value,$error);
+			$PCount++;
+		    }
+		    $NP++;
+		}
+		$Component++;
+	    }
+	} 
+	elsif ($All{"FitAsyType"} eq "SingleHist") {
+# For a single histogram fit we basically need to repeat this for each hist
+	    foreach my $Hist (@Hists) {
+		$Component=1;
+		foreach my $FitType (@FitTypes) {
+		    my $Parameters=$Paramcomp[$Component-1];
+		    my @Params = split( /\s+/, $Parameters );		
+		    if ( $Component == 1 ) {
+			unshift( @Params, ( "N0", "NBg" ) );
+		    }
+		
+# This is the counter for parameters of this component
+		    my $NP=1;
+		    $Shared = 0;
+# Change state/label of parameters
+		    foreach my $Param (@Params) {
+			my $Param_ORG = $Param;
+			$Param=$Param.$Hist;
+			if ( $#FitTypes != 0 && ( $Param_ORG ne "N0" && $Param_ORG ne "NBg" ) ){
+			    $Param = join( "", $Param, "_", "$Component" );
+			}
+			
+			$Shared = $All{"Sh_$Param"};
+			if ( $Shared!=1 || $iRun == 1 ) {
+# It there are multiple runs index the parameters accordingly
+			    $Param=$Param."_".$iRun;
+# Check if this parameter has been initialized befor. (should be)
+			    $value = $All{"$Param"};
+			    $error    = $All{"$erradd$Param"};
+			    $minvalue = $All{"$Param$minadd"};
+			    $maxvalue = $All{"$Param$maxadd"};
+
+			    $values=join("\t",$Param,$value,$error,$minvalue,$maxvalue,$RUN);
+			    $ParTable{$PCount}=$values;
+			    $PCount++;
+			}
+			$NP++;
+		    }
+		    $Component++;
+		}
+	    }
+	}
+	$TABLE=$TABLE."$line\n"
+    }
+    return $TABLE;
+}
+
+
+########################
 # RUNFileNameAuto
 # Function return the RUN_Line for a given RUN
 # input should be 

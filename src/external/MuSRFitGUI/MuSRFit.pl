@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Thu Sep 10 08:22:47 2009
+# Created: Sun Sep 13 23:09:01 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -19,6 +19,8 @@ use Qt::slots
     fileChangeDir => [],
     filePrint => [],
     fileExit => [],
+    parametersExport => [],
+    parametersAppend => [],
     editUndo => [],
     editRedo => [],
     editCut => [],
@@ -179,6 +181,7 @@ use Qt::attributes qw(
     ShowT0
     MenuBar
     fileMenu
+    Parameters
     editMenu
     Options
     helpMenu
@@ -206,6 +209,8 @@ use Qt::attributes qw(
     Action_2
     Action_3
     optionsnew_itemAction
+    parametersExport_AsAction
+    parametersAppend_ToAction
 );
 
 
@@ -1513,6 +1518,8 @@ sub NEW
     Action_2= Qt::Action(this, "Action_2");
     Action_3= Qt::Action(this, "Action_3");
     optionsnew_itemAction= Qt::Action(this, "optionsnew_itemAction");
+    parametersExport_AsAction= Qt::Action(this, "parametersExport_AsAction");
+    parametersAppend_ToAction= Qt::Action(this, "parametersAppend_ToAction");
 
 
     toolBar = Qt::ToolBar("", this, &DockTop);
@@ -1538,6 +1545,11 @@ sub NEW
     fileExitAction->addTo( fileMenu );
     MenuBar->insertItem( "", fileMenu, 2 );
 
+    Parameters = Qt::PopupMenu( this );
+    parametersExport_AsAction->addTo( Parameters );
+    parametersAppend_ToAction->addTo( Parameters );
+    MenuBar->insertItem( "", Parameters, 3 );
+
     editMenu = Qt::PopupMenu( this );
     editUndoAction->addTo( editMenu );
     editRedoAction->addTo( editMenu );
@@ -1545,21 +1557,21 @@ sub NEW
     editCutAction->addTo( editMenu );
     editCopyAction->addTo( editMenu );
     editPasteAction->addTo( editMenu );
-    MenuBar->insertItem( "", editMenu, 3 );
+    MenuBar->insertItem( "", editMenu, 4 );
 
     Options = Qt::PopupMenu( this );
     FileExistCheck->addTo( Options );
     ManualFile->addTo( Options );
-    MenuBar->insertItem( "", Options, 4 );
+    MenuBar->insertItem( "", Options, 5 );
 
     helpMenu = Qt::PopupMenu( this );
     helpContentsAction->addTo( helpMenu );
     helpIndexAction->addTo( helpMenu );
     helpMenu->insertSeparator();
     helpAboutAction->addTo( helpMenu );
-    MenuBar->insertItem( "", helpMenu, 5 );
+    MenuBar->insertItem( "", helpMenu, 6 );
 
-    MenuBar->insertSeparator( 6 );
+    MenuBar->insertSeparator( 7 );
 
     languageChange();
     my $resize = Qt::Size(579, 501);
@@ -1590,6 +1602,8 @@ sub NEW
     Qt::Object::connect(PlotMSR_2, SIGNAL "pressed()", this, SLOT "GoPlot()");
     Qt::Object::connect(Browse, SIGNAL "clicked()", this, SLOT "fileBrowse()");
     Qt::Object::connect(BeamLine, SIGNAL "activated(int)", this, SLOT "T0Update()");
+    Qt::Object::connect(parametersExport_AsAction, SIGNAL "activated()", this, SLOT "parametersExport()");
+    Qt::Object::connect(parametersAppend_ToAction, SIGNAL "activated()", this, SLOT "parametersAppend()");
 
     setTabOrder(musrfit_tabs, RunNumbers);
     setTabOrder(RunNumbers, BeamLine);
@@ -1883,8 +1897,8 @@ sub languageChange
     fileOpenAction->setText( trUtf8("&Open MSR...") );
     fileOpenAction->setMenuText( trUtf8("&Open MSR...") );
     fileOpenAction->setAccel( Qt::KeySequence( trUtf8("Ctrl+O") ) );
-    fileSaveAction->setText( trUtf8("&Save MSR") );
-    fileSaveAction->setMenuText( trUtf8("&Save MSR") );
+    fileSaveAction->setText( trUtf8("&Save MSR...") );
+    fileSaveAction->setMenuText( trUtf8("&Save MSR...") );
     fileSaveAction->setStatusTip( trUtf8("&Save MSR") );
     fileSaveAction->setAccel( Qt::KeySequence( trUtf8("Ctrl+S") ) );
     fileSaveAsAction->setText( trUtf8("Save MSR &As...") );
@@ -1939,11 +1953,16 @@ sub languageChange
     Action_3->setText( trUtf8("Unnamed") );
     optionsnew_itemAction->setText( trUtf8("new item") );
     optionsnew_itemAction->setMenuText( trUtf8("new item") );
+    parametersExport_AsAction->setText( trUtf8("&Export As...") );
+    parametersExport_AsAction->setMenuText( trUtf8("&Export As...") );
+    parametersAppend_ToAction->setText( trUtf8("&Append To...") );
+    parametersAppend_ToAction->setMenuText( trUtf8("&Append To...") );
     toolBar->setLabel( trUtf8("Tools") );
     MenuBar->findItem( 2 )->setText( trUtf8("&File") );
-    MenuBar->findItem( 3 )->setText( trUtf8("&Edit") );
-    MenuBar->findItem( 4 )->setText( trUtf8("Options") );
-    MenuBar->findItem( 5 )->setText( trUtf8("&Help") );
+    MenuBar->findItem( 3 )->setText( trUtf8("Parameters") );
+    MenuBar->findItem( 4 )->setText( trUtf8("&Edit") );
+    MenuBar->findItem( 5 )->setText( trUtf8("Options") );
+    MenuBar->findItem( 6 )->setText( trUtf8("&Help") );
 }
 
 
@@ -2015,6 +2034,54 @@ sub fileExit
 {
 
     Qt::Application::exit( 0 );
+
+}
+
+sub parametersExport
+{
+
+    my %All=CreateAllInput();      
+    my $FILENAME=$All{"FILENAME"}.".dat";
+    my $file=Qt::FileDialog::getSaveFileName(
+	    "$FILENAME",
+	    "Data Files (*.dat)",
+	    this,
+	    "export file dialog",
+	    "Choose a filename to export to");
+    
+# If the user gave a filename the copy to it
+    if ($file ne "") {
+	my $Text = MSR::ExportParams(\%All);
+	print $Text;
+    }
+
+}
+
+sub parametersAppend
+{
+
+    my %All=CreateAllInput();      
+    my $FILENAME=$All{"FILENAME"}.".dat";
+    my $file=Qt::FileDialog::getOpneFileName(
+	    "./",
+	    "Data Files (*.dat)",
+	    this,
+	    "append file dialog",
+	    "Choose a filename to append to");
+    
+# If the user gave a filename the copy to it
+    if ($file ne "") {
+	if (-e $FILENAME) {
+	    my $Text = MSR::ExportParams(\%All);
+	    print $Text;
+	} else {
+	    if ($file ne "") {
+		my $Warning = "Warning: No data file found yet!";
+		my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
+	    }
+	}
+    }
+    MSR::ExportParams(\%All);
 
 }
 
@@ -2168,7 +2235,7 @@ sub CreateAllInput
     $All{"Paramcomp_ref"}=$Paramcomp_ref;
     my @Paramcomp = @$Paramcomp_ref;
     
-# TODO: Read initial values of paramets from tabel
+# Read initial values of paramets from tabel
     my $erradd = "d";
     my $minadd = "_min";
     my $maxadd = "_max";

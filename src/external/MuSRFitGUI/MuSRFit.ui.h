@@ -93,6 +93,51 @@ void Form1::fileExit()
     Qt::Application::exit( 0 );
 }
 
+void Form1::parametersExport()
+{
+    my %All=CreateAllInput();      
+    my $FILENAME=$All{"FILENAME"}.".dat";
+    my $file=Qt::FileDialog::getSaveFileName(
+	    "$FILENAME",
+	    "Data Files (*.dat)",
+	    this,
+	    "export file dialog",
+	    "Choose a filename to export to");
+    
+# If the user gave a filename the copy to it
+    if ($file ne "") {
+	my $Text = MSR::ExportParams(\%All);
+	print $Text;
+    }
+}
+
+
+void Form1::parametersAppend()
+{
+    my %All=CreateAllInput();      
+    my $FILENAME=$All{"FILENAME"}.".dat";
+    my $file=Qt::FileDialog::getOpneFileName(
+	    "./",
+	    "Data Files (*.dat)",
+	    this,
+	    "append file dialog",
+	    "Choose a filename to append to");
+    
+# If the user gave a filename the copy to it
+    if ($file ne "") {
+	if (-e $FILENAME) {
+	    my $Text = MSR::ExportParams(\%All);
+	    print $Text;
+	} else {
+	    if ($file ne "") {
+		my $Warning = "Warning: No data file found yet!";
+		my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
+	    }
+	}
+    }
+    MSR::ExportParams(\%All);
+}
+
 
 void Form1::editUndo()
 {
@@ -247,7 +292,7 @@ void MuSRFitform::CreateAllInput()
     $All{"Paramcomp_ref"}=$Paramcomp_ref;
     my @Paramcomp = @$Paramcomp_ref;
     
-# TODO: Read initial values of paramets from tabel
+# Read initial values of paramets from tabel
     my $erradd = "d";
     my $minadd = "_min";
     my $maxadd = "_max";

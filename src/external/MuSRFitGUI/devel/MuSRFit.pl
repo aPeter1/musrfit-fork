@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Fri Sep 11 15:56:45 2009
+# Created: Sun Sep 13 23:02:53 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -585,7 +585,7 @@ sub NEW
         setName("MuSRFitform" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
-    setMinimumSize(Qt::Size(21, 251) );
+    setMinimumSize(Qt::Size(23, 246) );
     setIcon($image0 );
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
@@ -2208,16 +2208,8 @@ sub parametersExport
     
 # If the user gave a filename the copy to it
     if ($file ne "") {
-# TODO: check if the extension is correct, or add it.
-	if (-e $FILENAME) {
-#	    my $cmd="cp $FILENAME $file";
-#	    my $pid=system($cmd);
-	} else {
-	    if ($file ne "") {
-#		my $Warning = "Warning: No MSR file found yet!";
-#		my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
-	    }
-	}
+	my $Text = MSR::ExportParams(\%All);
+	print $Text;
     }
 
 }
@@ -2227,8 +2219,8 @@ sub parametersAppend
 
     my %All=CreateAllInput();      
     my $FILENAME=$All{"FILENAME"}.".dat";
-    my $file=Qt::FileDialog::getSaveFileName(
-	    "$FILENAME",
+    my $file=Qt::FileDialog::getOpneFileName(
+	    "./",
 	    "Data Files (*.dat)",
 	    this,
 	    "append file dialog",
@@ -2236,17 +2228,17 @@ sub parametersAppend
     
 # If the user gave a filename the copy to it
     if ($file ne "") {
-# TODO: check if the extension is correct, or add it.
 	if (-e $FILENAME) {
-#	    my $cmd="cp $FILENAME $file";
-#	    my $pid=system($cmd);
+	    my $Text = MSR::ExportParams(\%All);
+	    print $Text;
 	} else {
 	    if ($file ne "") {
-#		my $Warning = "Warning: No MSR file found yet!";
-#		my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
+		my $Warning = "Warning: No data file found yet!";
+		my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
 	    }
 	}
     }
+    MSR::ExportParams(\%All);
 
 }
 
