@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Sun Sep 13 23:09:01 2009
+# Created: Mon Sep 14 13:39:32 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -576,7 +576,7 @@ sub NEW
         setName("MuSRFitform" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
-    setMinimumSize(Qt::Size(21, 227) );
+    setMinimumSize(Qt::Size(23, 246) );
     setIcon($image0 );
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
@@ -2041,6 +2041,8 @@ sub parametersExport
 {
 
     my %All=CreateAllInput();      
+# Add also a flag for header
+    $All{"Header"}=1;
     my $FILENAME=$All{"FILENAME"}.".dat";
     my $file=Qt::FileDialog::getSaveFileName(
 	    "$FILENAME",
@@ -2052,7 +2054,9 @@ sub parametersExport
 # If the user gave a filename the copy to it
     if ($file ne "") {
 	my $Text = MSR::ExportParams(\%All);
-	print $Text;
+	open( DATF,q{>},"$file" );
+	print DATF $Text;
+	close(DATF);
     }
 
 }
@@ -2060,9 +2064,11 @@ sub parametersExport
 sub parametersAppend
 {
 
-    my %All=CreateAllInput();      
+    my %All=CreateAllInput();
+# Add also a flag for header
+    $All{"Header"}=0;
     my $FILENAME=$All{"FILENAME"}.".dat";
-    my $file=Qt::FileDialog::getOpneFileName(
+    my $file=Qt::FileDialog::getOpenFileName(
 	    "./",
 	    "Data Files (*.dat)",
 	    this,
@@ -2071,17 +2077,11 @@ sub parametersAppend
     
 # If the user gave a filename the copy to it
     if ($file ne "") {
-	if (-e $FILENAME) {
-	    my $Text = MSR::ExportParams(\%All);
-	    print $Text;
-	} else {
-	    if ($file ne "") {
-		my $Warning = "Warning: No data file found yet!";
-		my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
-	    }
-	}
+	my $Text = MSR::ExportParams(\%All);
+	open( DATF,q{>>},"$file" );
+	print DATF $Text;
+	close(DATF);
     }
-    MSR::ExportParams(\%All);
 
 }
 
