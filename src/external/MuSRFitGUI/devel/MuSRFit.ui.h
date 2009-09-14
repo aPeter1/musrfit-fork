@@ -96,6 +96,8 @@ void Form1::fileExit()
 void Form1::parametersExport()
 {
     my %All=CreateAllInput();      
+# Add also a flag for header
+    $All{"Header"}=1;
     my $FILENAME=$All{"FILENAME"}.".dat";
     my $file=Qt::FileDialog::getSaveFileName(
 	    "$FILENAME",
@@ -107,16 +109,20 @@ void Form1::parametersExport()
 # If the user gave a filename the copy to it
     if ($file ne "") {
 	my $Text = MSR::ExportParams(\%All);
-	print $Text;
+	open( DATF,q{>},"$file" );
+	print DATF $Text;
+	close(DATF);
     }
 }
 
 
 void Form1::parametersAppend()
 {
-    my %All=CreateAllInput();      
+    my %All=CreateAllInput();
+# Add also a flag for header
+    $All{"Header"}=0;
     my $FILENAME=$All{"FILENAME"}.".dat";
-    my $file=Qt::FileDialog::getOpneFileName(
+    my $file=Qt::FileDialog::getOpenFileName(
 	    "./",
 	    "Data Files (*.dat)",
 	    this,
@@ -125,17 +131,11 @@ void Form1::parametersAppend()
     
 # If the user gave a filename the copy to it
     if ($file ne "") {
-	if (-e $FILENAME) {
-	    my $Text = MSR::ExportParams(\%All);
-	    print $Text;
-	} else {
-	    if ($file ne "") {
-		my $Warning = "Warning: No data file found yet!";
-		my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
-	    }
-	}
+	my $Text = MSR::ExportParams(\%All);
+	open( DATF,q{>>},"$file" );
+	print DATF $Text;
+	close(DATF);
     }
-    MSR::ExportParams(\%All);
 }
 
 

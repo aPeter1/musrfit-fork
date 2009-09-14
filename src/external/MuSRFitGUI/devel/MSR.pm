@@ -1241,6 +1241,7 @@ sub ExportParams {
     my $Shared = 0;
 
     my $TABLE="";
+    my $HEADER="RUN";
 
     my %All = %{$_[0]};
     my @RUNS = ();
@@ -1300,6 +1301,10 @@ sub ExportParams {
 		    if ( $#FitTypes != 0 && ( $Param ne "Alpha" ) ){
 			$Param = join( "", $Param, "_", "$Component" );
 		    }
+		    # $All{"Header"} - 0/1 for with/without header
+		    if ($All{"Header"} && $iRun == 1) {
+			$HEADER=join("\t",$HEADER,$Param,"$erradd$Param");
+		    }
 		    
 		    $Shared = $All{"Sh_$Param"};
 		    if ( $Shared!=1 || $iRun == 1 ) {
@@ -1311,6 +1316,13 @@ sub ExportParams {
 
 			$line=join("\t",$line,$value,$error);
 			$PCount++;
+		    }
+		    elsif ($Shared==1) {
+# The parameter is shared, take the value from the first run
+			$Param=$Param."_1";
+			$value = $All{"$Param"};
+			$error    = $All{"$erradd$Param"};
+			$line=join("\t",$line,$value,$error);
 		    }
 		    $NP++;
 		}
@@ -1361,6 +1373,10 @@ sub ExportParams {
 	}
 	$TABLE=$TABLE."$line\n"
     }
+    if ($All{"Header"}) {
+	$TABLE=$HEADER."\n".$TABLE;
+    }
+
     return $TABLE;
 }
 
