@@ -74,7 +74,7 @@ TGapDWave::TGapDWave() {
 }
 
 TGapAnSWave::TGapAnSWave() {
-  TAnSWaveGapIntegralSuave *gapint = new TAnSWaveGapIntegralSuave();
+  TAnSWaveGapIntegralCuhre *gapint = new TAnSWaveGapIntegralCuhre();
   fGapIntegral = gapint;
   gapint = 0;
   delete gapint;

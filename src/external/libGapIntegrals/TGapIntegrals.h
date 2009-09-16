@@ -89,7 +89,7 @@ public:
   double operator()(double, const vector<double>&) const;
 
 private:
-  TAnSWaveGapIntegralSuave *fGapIntegral;
+  TAnSWaveGapIntegralCuhre *fGapIntegral;
   mutable vector<double> fTemp;
   mutable vector<double>::const_iterator fTempIter;
   mutable vector<double> fIntegralValues;

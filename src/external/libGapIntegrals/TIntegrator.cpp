@@ -75,7 +75,7 @@ double TAnSWaveGapIntegralCuhre::IntegrateFunc()
   const double EPSABS (1e-6);
   const unsigned int VERBOSE (0);
   const unsigned int LAST (4);
-  const unsigned int MINEVAL (10000);
+  const unsigned int MINEVAL (1000);
   const unsigned int MAXEVAL (1000000);
 
   const unsigned int KEY (13);
@@ -107,7 +107,7 @@ double TAnSWaveGapIntegralDivonne::IntegrateFunc()
   const double EPSREL (1e-4);
   const double EPSABS (1e-6);
   const unsigned int VERBOSE (0);
-  const unsigned int MINEVAL (10000);
+  const unsigned int MINEVAL (1000);
   const unsigned int MAXEVAL (1000000);
   const unsigned int KEY1 (47);
   const unsigned int KEY2 (1);
@@ -149,7 +149,7 @@ double TAnSWaveGapIntegralSuave::IntegrateFunc()
   const double EPSABS (1e-6);
   const unsigned int VERBOSE (0);
   const unsigned int LAST (4);
-  const unsigned int MINEVAL (10000);
+  const unsigned int MINEVAL (1000);
   const unsigned int MAXEVAL (1000000);
 
   const unsigned int NNEW (1000);
