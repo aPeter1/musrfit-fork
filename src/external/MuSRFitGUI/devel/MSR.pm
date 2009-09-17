@@ -228,7 +228,6 @@ sub CreateMSR {
 	    $RUN_Line = MSR::RUNFileNameAuto($RUN,$YEAR,$BeamLine);
 	}
 
-
 	$Type_Line = "fittype         2";
 	$PLT       = 2;
 	$Hist_Lines =
@@ -236,6 +235,7 @@ sub CreateMSR {
 
 	$Bg_Line = "background";
 	$Data_Line = "data";
+	$T0_Line = "t0";
 	$NHist=1;
 	foreach $Hist (@Hists) {
 	    foreach ("t0","Bg1","Bg2","Data1","Data2") {
@@ -247,11 +247,20 @@ sub CreateMSR {
 	    }
 	    $Bg_Line = $Bg_Line."    ".$All{"Bg1$NHist"}."    ".$All{"Bg2$NHist"};
 	    $Data_Line =$Data_Line."    ".$All{"Data1$NHist"}."    ".$All{"Data2$NHist"};
+	    if ($All{"t0$NHist"} ne "") {
+		$T0_Line=$T0_Line."      ".$All{"Data1$NHist"};  
+	    }
 	    $NHist++;
 	}
 
         $FRANGE_Line = "fit             TINI    TFIN";
         $PAC_Line    = "packing         BINNING";
+
+	
+	if ($T0_Line ne "t0") {
+		print "I am here\n";
+	    $Data_Line= $Data_Line."\n".$T0_Line;
+	}
 
 	$Single_RUN =
 "$RUN_Line\n$Type_Line\n$Alpha_Line$Hist_Lines\n$Bg_Line\n$Data_Line\n$MAP_Line\n$FRANGE_Line\n$PAC_Line\n\n";
@@ -566,9 +575,6 @@ sub CreateMSRSingleHist {
 	    # Also for each histogram in Single Histograms fits
 	    # Also for Imaginaryand and Real for RRF fits
 	    
-
-# This part can be shifted before the RUNS loop
-
 	    $RUN = $RUNS[ $iRun - 1 ];
 
 	    if ($All{"RUNSType"}) {
@@ -577,21 +583,23 @@ sub CreateMSRSingleHist {
 		$RUN_Line = MSR::RUNFileNameAuto($RUN,$YEAR,$BeamLine);
 	    }
 
-	    # What kind of fit? 0 - Single Histogram, 2 - Asymmetry, 4 - RRF
 	    $Type_Line  = "fittype         0";
 	    $PLT        = 0;
 	    $Hist_Lines = "forward         HIST";
 	    $Bg_Line    = $EMPTY;
-	    $Data_Line  = "data            3419    63000";
-	    
-	    # Omit background and data lines for LTG,GPS and Dolly
-	    if ( $BeamLine eq "Dolly" ) {
-		$Bg_Line = "background 50 250 50 250";
-		$Data_Line ="data            297     8000    294     8000";
-	    } elsif ( $BeamLine eq "GPS" ) {
-		$Bg_Line = "background      40      120     40      120";
-		$Data_Line = "data            135     8000    135     8000";    
-#		$Data_Line = "data            135     8000    135     8000";    
+	    $Data_Line  = "data";
+
+	    foreach ("t0","Bg1","Bg2","Data1","Data2") {
+		$Name = "$_$Hist";
+# If empty fill with defaults
+		if ($All{$Name} eq "") {
+		    $All{$Name}=MSR::T0BgData($_,$Hist,$BeamLine);
+		}
+	    }
+	    $Bg_Line = $Bg_Line."    ".$All{"Bg1$Hist"}."    ".$All{"Bg2$Hist"};
+	    $Data_Line =$Data_Line."    ".$All{"Data1$Hist"}."    ".$All{"Data2$Hist"};
+	    if ($All{"t0$Hist"} ne "") {
+		$Data_Line=$Data_Line."\nt0       ".$All{"t0$Hist"};  
 	    }
 	    
 	    #	$MAP_Line = "map             0    0    0    0    0    0    0    0    0    0";
