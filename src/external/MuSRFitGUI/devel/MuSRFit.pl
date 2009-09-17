@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Thu Sep 17 17:13:26 2009
+# Created: Thu Sep 17 23:21:40 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -593,7 +593,7 @@ sub NEW
         setName("MuSRFitform" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
-    setMinimumSize(Qt::Size(21, 251) );
+    setMinimumSize(Qt::Size(23, 246) );
     setIcon($image0 );
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
@@ -1996,7 +1996,7 @@ sub languageChange
     PlotOptions->setTitle( trUtf8("Options") );
     textLabel1_4->setText( trUtf8("X Range") );
     textLabel1_4_2->setText( trUtf8("Y Range") );
-    ltc->setText( trUtf8("Life time cor.") );
+    ltc->setText( trUtf8("Life time correction") );
     go->setText( trUtf8("Fit") );
     PlotMSR->setText( trUtf8("Plot") );
     ErrorCalc->setTitle( trUtf8("Error") );
@@ -2916,6 +2916,8 @@ sub RunSelectionToggle
 sub fileBrowse
 {
 
+    my $RunFiles=RunFiles->text();
+    print "Runs:$RunFiles\n";
     my $files_ref=Qt::FileDialog::getOpenFileNames(
 	    "Data files (*.root *.bin)",
 	    "./",
@@ -2923,7 +2925,13 @@ sub fileBrowse
 	    "open files dialog",
 	    "Select one or more files to fit");
     my @files = @$files_ref;
-    my $RunFiles=join(",",@files);
+    if ($RunFiles eq "") {
+# We started with an empty list	
+	$RunFiles=join(",",@files);
+    } else {
+# Add files to existing list
+	$RunFiles=join(",",$RunFiles,@files);
+    }
     RunFiles->setText($RunFiles);
 
 }

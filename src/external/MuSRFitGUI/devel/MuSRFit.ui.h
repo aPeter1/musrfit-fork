@@ -746,6 +746,8 @@ void MuSRFitform::RunSelectionToggle()
 
 void MuSRFitform::fileBrowse()
 {
+    my $RunFiles=RunFiles->text();
+    print "Runs:$RunFiles\n";
     my $files_ref=Qt::FileDialog::getOpenFileNames(
 	    "Data files (*.root *.bin)",
 	    "./",
@@ -753,7 +755,13 @@ void MuSRFitform::fileBrowse()
 	    "open files dialog",
 	    "Select one or more files to fit");
     my @files = @$files_ref;
-    my $RunFiles=join(",",@files);
+    if ($RunFiles eq "") {
+# We started with an empty list	
+	$RunFiles=join(",",@files);
+    } else {
+# Add files to existing list
+	$RunFiles=join(",",$RunFiles,@files);
+    }
     RunFiles->setText($RunFiles);
 }
 

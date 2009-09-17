@@ -22,8 +22,8 @@
     </property>
     <property name="minimumSize">
         <size>
-            <width>21</width>
-            <height>251</height>
+            <width>23</width>
+            <height>246</height>
         </size>
     </property>
     <property name="caption">
@@ -2247,7 +2247,7 @@
                                 <cstring>ltc</cstring>
                             </property>
                             <property name="text">
-                                <string>Life time cor.</string>
+                                <string>Life time correction</string>
                             </property>
                             <property name="checked">
                                 <bool>true</bool>
