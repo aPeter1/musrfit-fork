@@ -222,6 +222,16 @@ void MuSRFitform::CreateAllInput()
     $All{"BINS"} = BINS->text;
     $All{"FitAsyType"} = FitAsyType->currentText;
     $All{"LRBF"} = LRBF->text;
+    $All{"Xi"}=Xi->text;
+    $All{"Xf"}=Xf->text;
+    $All{"Yi"}=Yi->text;
+    $All{"Yf"}=Yf->text;
+    
+    if (ltc->isChecked()) {
+	$All{"ltc"}="y";
+    } else {
+	$All{"ltc"}="n";
+    }
     
     RunSelectionToggle();
     my @RUNS = ();
