@@ -48,6 +48,9 @@ $fitplot =
 "$MUSRFIT FILENAME.msr > $OUTPUT_REAL/FILENAME.out; $MUSRVIEW FILENAME.msr >> $OUTPUT_REAL/FILENAME.out; convert FILENAME\_0.png -crop 590x460+1+50 $OUTPUT_REAL/FILENAME.png; rm -f FILENAME\_0.png";
 $dumpascii =
 "$DUMPASCII FILENAME.msr > $OUTPUT_REAL/FILENAME_ascii.out; /bin/tar -cvzf $OUTPUT_REAL/FILENAME.tgz FILENAME*.dat >> $OUTPUT_REAL/FILENAME_ascii.out; rm -f FILENAME*.dat";
+# TODO: Replace this with a call to $TABLE=MSR::ExportParams
+$AllParameters{"Header"}=1;
+$TABLE=MSR::ExportParams(\%AllParameters);
 $msr2dat = "$MSR2DAT < FILENAME.msr > $OUTPUT_REAL/FILENAME_par.dat";
 
 # "Smart" default value of the fit parameters.
@@ -103,39 +106,6 @@ my $in = new CGI;
 
 
 
-# See which step or command we are coming from
-# Step Value             Command
-#
-#         -1             CLEAR/START NEW
-#          1             Defin Shared
-#          2             Initialize parameters
-#          3             PLOT
-#          4             MIGRAD
-#          5             MINOS
-#          6             SIMPLEX
-#######################################################################
-$Step        = $in->param("go");
-$FITMINTTYPE = "PLOT";
-if ( $Step eq "PLOT" ) {
-    $Step       = 3;
-    $FITMINTYPE = $EMPTY;
-}
-elsif ( $Step eq "MIGRAD" ) {
-    $Step       = 4;
-    $FITMINTYPE = "MINIMIZE\nMIGRAD\nHESSE";
-}
-elsif ( $Step eq "MINOS" ) {
-    $Step       = 5;
-    $FITMINTYPE = "MIGRAD\nMINOS";
-}
-elsif ( $Step eq "SIMPLEX" ) {
-    $Step       = 6;
-    $FITMINTYPE = "SCAN\nSIMPLEX";
-}
-elsif ( $Step eq "Go Back" ) {
-    $Step = -1;
-}
-
 #######################################################################
 # Common to all steps
 # If you are coming from a previous round pass in various parameters
@@ -157,6 +127,46 @@ while ( $i <= $N ) {
 #    $TC=$TC."$One=".$AllParameters{ $One }."<br>";
     ++$i;
 }
+
+# See which step or command we are coming from
+# Step Value             Command
+#
+#         -1             CLEAR/START NEW
+#          1             Defin Shared
+#          2             Initialize parameters
+#          3             PLOT
+#          4             MIGRAD
+#          5             MINOS
+#          6             SIMPLEX
+#######################################################################
+$Step        = $in->param("go");
+$FITMINTTYPE = "PLOT";
+if ( $Step eq "PLOT" ) {
+    $Step       = 3;
+    $FITMINTYPE = $EMPTY;
+}
+elsif ( $Step eq "MIGRAD" || $Step eq "FIT") {
+    $Step       = 4;
+    $FITMINTYPE = "MINIMIZE\nMIGRAD\nHESSE";
+}
+elsif ( $Step eq "MINOS" ) {
+    $Step       = 5;
+    $FITMINTYPE = "MIGRAD\nMINOS";
+}
+elsif ( $Step eq "SIMPLEX" ) {
+    $Step       = 6;
+    $FITMINTYPE = "SCAN\nSIMPLEX";
+}
+elsif ( $Step eq "Restart" ) {
+    $Step = -1;
+}
+
+
+if ( $All{"Minimization"} ne "" &&  $All{"ErrorCalc"} ne "" && $Step ne "PLOT" ) {
+    $FITMINTYPE = $All{"Minimization"}."\n".$All{"ErrorCalc"};
+}
+
+
 
 #$TC=$TC."OUT:<br>".MSR::Test(\%AllParameters);
 #$tmp="Frq";
@@ -242,20 +252,10 @@ elsif ( $Step <= 6 && $Step >= 3 ) {
     @Paramcomp = @$Paramcomp_ref;
 
     if ( $Step == 3 ) {
-        $ops = "plot";
         $cmd = $plotonly;
     }
-    elsif ( $Step == 4 ) {
+    elsif ( $Step <=6 && $Step >= 4 ) {
         $cmd = $fitplot;
-        $ops = "migrad";
-    }
-    elsif ( $Step == 5 ) {
-        $cmd = $fitplot;
-        $ops = "minos";
-    }
-    elsif ( $Step == 6 ) {
-        $cmd = $fitplot;
-        $ops = "simplex";
     }
 
     # Fit and plot results
@@ -730,27 +730,24 @@ $TITLE
 <tbody>
  <tr>
   <td>
-   <input type=\"submit\" name=\"go\" value=\"MIGRAD\" style=\"width: 80px\">
+   <select name=\"Minimization\" style=\"width: 90px\">
+    <option $MinSel{\"MIGRAD\"} value=\"MIGRAD\">MIGRAD</option>
+    <option $MinSel{\"MINIMIZE\"} value=\"MINIMIZE\">MINIMIZE</option>
+    <option $MinSel{\"SIMPLEX\"} value=\"SIMPLEX\">SIMPLEX</option>
+   </select>
   </td>
  </tr>
  <tr>
   <td>
-   <input type=\"submit\" name=\"go\" value=\"MINOS\" style=\"width: 80px\">
+   <select name=\"ErrorCalc\" style=\"width: 90px\">
+    <option $ErrSel{\"HESSE\"} value=\"HESSE\">HESSE</option>
+    <option $ErrSel{\"MINOS\"} value=\"MINOS\">MINOS</option>
+   </select>
   </td>
  </tr>
  <tr>
   <td>
-   <input type=\"submit\" name=\"go\" value=\"SIMPLEX\" style=\"width: 80px\">
-  </td>
- </tr>
- <tr>
-  <td>
-   <input type=\"submit\" name=\"go\" value=\"PLOT\" style=\"width: 80px\">
-  </td>
- </tr>
- <tr>
-  <td>
-   <input type=\"submit\" name=\"go\" value=\"Go Back\" style=\"width: 80px\">
+   <input type=\"submit\" name=\"go\" value=\"FIT\" style=\"width: 90px\">
   </td>
  </tr>
 </tbody>
@@ -811,6 +808,16 @@ Yi= <input type=\"text\" name=\"Yi\" value=\"$Yi\" size=\"3\"> <br>
 Yf= <input type=\"text\" name=\"Yf\" value=\"$Yf\" size=\"3\"> <br>
 </td>
 </tr>
+ <tr>
+  <td>
+   <input type=\"submit\" name=\"go\" value=\"PLOT\" style=\"width: 90px\">
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <input type=\"submit\" name=\"go\" value=\"Restart\" style=\"width: 90px\">
+  </td>
+ </tr>
 </tbody>
 </table>
 </center>
@@ -958,10 +965,10 @@ PASS_ON_HTML_CODE
 <td>$order</td>
 <td>$PRUN</td>
 <td bgcolor=\"#99CCFF\">$Param</td>
-<td><input type=\"text\" name=\"$Param\" value=\"$value\" size=\"10\"></td>
-<td><input type=\"text\" name=\"$erradd$Param\" value=\"$error\" size=\"10\"></td>
-<td><input type=\"text\" name=\"$Param$minadd\" value=\"$minvalue\" size=\"10\"></td>
-<td><input type=\"text\" name=\"$Param$maxadd\" value=\"$maxvalue\" size=\"10\"></td>
+<td><input type=\"text\" name=\"$Param\" value=\"$value\" size=\"14\"></td>
+<td><input type=\"text\" name=\"$erradd$Param\" value=\"$error\" size=\"14\"></td>
+<td><input type=\"text\" name=\"$Param$minadd\" value=\"$minvalue\" size=\"11\"></td>
+<td><input type=\"text\" name=\"$Param$maxadd\" value=\"$maxvalue\" size=\"11\"></td>
 </tr>
 ";
     }
@@ -1066,6 +1073,22 @@ sub PassIn {
     }
     else {
         %BeamSel = ( "$BeamLine", "selected=\"selected\"" );
+    }
+
+    $Minimization = $in->param("Minimization");
+    if ( $Minimization eq $EMPTY ) {
+	%MinSel = ("MIGRAD", "selected=\"selected\"" );
+    }
+    else {
+	%MinSel = ( "$Minimization", "selected=\"selected\"" );
+    }
+
+    $ErrorCalc = $in->param("ErrorCalc");
+    if ( $ErrorCalc eq $EMPTY ) {
+	%ErrSel = ("HESSE", "selected=\"selected\"" );
+    }
+    else {
+	%ErrSel = ( "$ErrorCalc", "selected=\"selected\"" );
     }
 
     $FitType1 = $in->param("FitType1");
