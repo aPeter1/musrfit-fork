@@ -384,30 +384,12 @@ void MuSRFitform::CreateAllInput()
     }
     
 # Get minimization process
-    my $Min = Minimization->selectedId();
-    if ($Min==0) {
-	$All{"Minimization"}= "MINIMIZE";
-	$All{"go"}="MIGRAD";
-    }
-    elsif ($Min==1) {
-	$All{"Minimization"}= "MIGRAD";
-	$All{"go"}="MIGRAD";
-    }
-    elsif ($Min==2) {
-	$All{"Minimization"}= "SIMPLEX";
-	$All{"go"}="SIMPLAEX";
-    }
+    $All{"Minimization"} = Minimization->currentText();
+    $All{"go"}=$All{"Minimization"};
     
 # Get Error calculation process
-    my $Err = ErrorCalc->selectedId();
-    if ($Err==0) {
-	$All{"ErrorCalc"}= "HESSE";
-#	$All{"go"}="MIGRAD";	
-    }
-    elsif ($Err==1) {
-	$All{"ErrorCalc"}= "MINOS";
-	$All{"go"}="MINOS";
-    }
+    $All{"ErrorCalc"} = ErrorCalc->currentText();
+    $All{"go"}=$All{"ErrorCalc"};
     
 # Return Hash with all important values
     return %All;  

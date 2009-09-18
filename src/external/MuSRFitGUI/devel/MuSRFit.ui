@@ -22,8 +22,8 @@
     </property>
     <property name="minimumSize">
         <size>
-            <width>23</width>
-            <height>246</height>
+            <width>21</width>
+            <height>275</height>
         </size>
     </property>
     <property name="caption">
@@ -1962,359 +1962,139 @@
             <attribute name="title">
                 <string>Fitting</string>
             </attribute>
-            <widget class="QTextEdit">
+            <widget class="QLayoutWidget">
                 <property name="name">
-                    <cstring>FitTextOutput</cstring>
+                    <cstring>layout34</cstring>
                 </property>
                 <property name="geometry">
                     <rect>
                         <x>5</x>
-                        <y>130</y>
+                        <y>10</y>
                         <width>545</width>
-                        <height>230</height>
-                    </rect>
-                </property>
-                <property name="overwriteMode">
-                    <bool>true</bool>
-                </property>
-            </widget>
-            <widget class="QButtonGroup">
-                <property name="name">
-                    <cstring>Minimization</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>7</x>
-                        <y>1</y>
-                        <width>115</width>
-                        <height>128</height>
-                    </rect>
-                </property>
-                <property name="title">
-                    <string>Minimization</string>
-                </property>
-                <property name="exclusive">
-                    <bool>true</bool>
-                </property>
-                <property name="radioButtonExclusive">
-                    <bool>true</bool>
-                </property>
-                <property name="selectedId" stdset="0">
-                    <number>0</number>
-                </property>
-                <widget class="QRadioButton">
-                    <property name="name">
-                        <cstring>MINIMIZE</cstring>
-                    </property>
-                    <property name="geometry">
-                        <rect>
-                            <x>16</x>
-                            <y>30</y>
-                            <width>83</width>
-                            <height>22</height>
-                        </rect>
-                    </property>
-                    <property name="text">
-                        <string>Minimize</string>
-                    </property>
-                    <property name="checked">
-                        <bool>true</bool>
-                    </property>
-                </widget>
-                <widget class="QRadioButton">
-                    <property name="name">
-                        <cstring>MIGRAD</cstring>
-                    </property>
-                    <property name="geometry">
-                        <rect>
-                            <x>16</x>
-                            <y>59</y>
-                            <width>83</width>
-                            <height>22</height>
-                        </rect>
-                    </property>
-                    <property name="text">
-                        <string>Migrad</string>
-                    </property>
-                </widget>
-                <widget class="QRadioButton">
-                    <property name="name">
-                        <cstring>SIMPLEX</cstring>
-                    </property>
-                    <property name="geometry">
-                        <rect>
-                            <x>16</x>
-                            <y>88</y>
-                            <width>83</width>
-                            <height>22</height>
-                        </rect>
-                    </property>
-                    <property name="text">
-                        <string>Simplex</string>
-                    </property>
-                </widget>
-            </widget>
-            <widget class="QButtonGroup">
-                <property name="name">
-                    <cstring>PlotOptions</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>241</x>
-                        <y>1</y>
-                        <width>196</width>
-                        <height>128</height>
-                    </rect>
-                </property>
-                <property name="title">
-                    <string>Options</string>
-                </property>
-                <property name="alignment">
-                    <set>AlignTop</set>
-                </property>
-                <property name="exclusive">
-                    <bool>true</bool>
-                </property>
-                <property name="radioButtonExclusive">
-                    <bool>true</bool>
-                </property>
-                <property name="selectedId" stdset="0">
-                    <number>-1</number>
-                </property>
-                <widget class="QLayoutWidget">
-                    <property name="name">
-                        <cstring>layout27</cstring>
-                    </property>
-                    <property name="geometry">
-                        <rect>
-                            <x>3</x>
-                            <y>18</y>
-                            <width>190</width>
-                            <height>94</height>
-                        </rect>
-                    </property>
-                    <vbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <widget class="QLayoutWidget">
-                            <property name="name">
-                                <cstring>layout25</cstring>
-                            </property>
-                            <hbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <widget class="QLabel">
-                                    <property name="name">
-                                        <cstring>textLabel1_4</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>X Range</string>
-                                    </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Xi</cstring>
-                                    </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Xf</cstring>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget class="QLayoutWidget">
-                            <property name="name">
-                                <cstring>layout26</cstring>
-                            </property>
-                            <hbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <widget class="QLabel">
-                                    <property name="name">
-                                        <cstring>textLabel1_4_2</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>Y Range</string>
-                                    </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Yi</cstring>
-                                    </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Yf</cstring>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget class="QCheckBox">
-                            <property name="name">
-                                <cstring>ltc</cstring>
-                            </property>
-                            <property name="text">
-                                <string>Life time correction</string>
-                            </property>
-                            <property name="checked">
-                                <bool>true</bool>
-                            </property>
-                        </widget>
-                    </vbox>
-                </widget>
-            </widget>
-            <widget class="QLayoutWidget">
-                <property name="name">
-                    <cstring>layout28</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>438</x>
-                        <y>1</y>
-                        <width>115</width>
-                        <height>125</height>
+                        <height>350</height>
                     </rect>
                 </property>
                 <vbox>
                     <property name="name">
                         <cstring>unnamed</cstring>
                     </property>
-                    <widget class="QPushButton">
+                    <widget class="QLayoutWidget">
                         <property name="name">
-                            <cstring>go</cstring>
+                            <cstring>layout33</cstring>
                         </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>7</hsizetype>
-                                <vsizetype>0</vsizetype>
-                                <horstretch>1</horstretch>
-                                <verstretch>0</verstretch>
-                            </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                            <size>
-                                <width>85</width>
-                                <height>30</height>
-                            </size>
-                        </property>
-                        <property name="maximumSize">
-                            <size>
-                                <width>95</width>
-                                <height>30</height>
-                            </size>
-                        </property>
-                        <property name="text">
-                            <string>Fit</string>
-                        </property>
-                        <property name="autoDefault">
-                            <bool>false</bool>
-                        </property>
-                        <property name="default">
-                            <bool>true</bool>
-                        </property>
+                        <grid>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QComboBox" row="0" column="1">
+                                <item>
+                                    <property name="text">
+                                        <string>MINIMIZE</string>
+                                    </property>
+                                </item>
+                                <item>
+                                    <property name="text">
+                                        <string>MIGRAD</string>
+                                    </property>
+                                </item>
+                                <item>
+                                    <property name="text">
+                                        <string>SIMPLEX</string>
+                                    </property>
+                                </item>
+                                <property name="name">
+                                    <cstring>Minimization</cstring>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="0" column="2">
+                                <property name="name">
+                                    <cstring>textLabel1_4</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>X Range</string>
+                                </property>
+                            </widget>
+                            <widget class="QLineEdit" row="1" column="4">
+                                <property name="name">
+                                    <cstring>Yf</cstring>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="1" column="0">
+                                <property name="name">
+                                    <cstring>textLabel1_5_2</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Error estimation</string>
+                                </property>
+                            </widget>
+                            <widget class="QLineEdit" row="0" column="3">
+                                <property name="name">
+                                    <cstring>Xi</cstring>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="1" column="2">
+                                <property name="name">
+                                    <cstring>textLabel1_4_2</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Y Range</string>
+                                </property>
+                            </widget>
+                            <widget class="QComboBox" row="1" column="1">
+                                <item>
+                                    <property name="text">
+                                        <string>HESSE</string>
+                                    </property>
+                                </item>
+                                <item>
+                                    <property name="text">
+                                        <string>MINOS</string>
+                                    </property>
+                                </item>
+                                <property name="name">
+                                    <cstring>ErrorCalc</cstring>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="0" column="0">
+                                <property name="name">
+                                    <cstring>textLabel1_5</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Minimization type</string>
+                                </property>
+                            </widget>
+                            <widget class="QLineEdit" row="1" column="3">
+                                <property name="name">
+                                    <cstring>Yi</cstring>
+                                </property>
+                            </widget>
+                            <widget class="QLineEdit" row="0" column="4">
+                                <property name="name">
+                                    <cstring>Xf</cstring>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox" row="2" column="0" rowspan="1" colspan="2">
+                                <property name="name">
+                                    <cstring>ltc</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Life time correction</string>
+                                </property>
+                                <property name="checked">
+                                    <bool>true</bool>
+                                </property>
+                            </widget>
+                        </grid>
                     </widget>
-                    <widget class="QPushButton">
+                    <widget class="QTextEdit">
                         <property name="name">
-                            <cstring>PlotMSR</cstring>
+                            <cstring>FitTextOutput</cstring>
                         </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>7</hsizetype>
-                                <vsizetype>0</vsizetype>
-                                <horstretch>1</horstretch>
-                                <verstretch>0</verstretch>
-                            </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                            <size>
-                                <width>85</width>
-                                <height>30</height>
-                            </size>
-                        </property>
-                        <property name="maximumSize">
-                            <size>
-                                <width>95</width>
-                                <height>30</height>
-                            </size>
-                        </property>
-                        <property name="text">
-                            <string>Plot</string>
-                        </property>
-                        <property name="autoDefault">
-                            <bool>false</bool>
-                        </property>
-                        <property name="default">
+                        <property name="overwriteMode">
                             <bool>true</bool>
                         </property>
                     </widget>
                 </vbox>
-            </widget>
-            <widget class="QButtonGroup">
-                <property name="name">
-                    <cstring>ErrorCalc</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>128</x>
-                        <y>1</y>
-                        <width>107</width>
-                        <height>128</height>
-                    </rect>
-                </property>
-                <property name="title">
-                    <string>Error</string>
-                </property>
-                <property name="alignment">
-                    <set>AlignTop|AlignLeft</set>
-                </property>
-                <property name="exclusive">
-                    <bool>true</bool>
-                </property>
-                <property name="radioButtonExclusive">
-                    <bool>true</bool>
-                </property>
-                <property name="selectedId" stdset="0">
-                    <number>1</number>
-                </property>
-                <widget class="QRadioButton">
-                    <property name="name">
-                        <cstring>MINOS</cstring>
-                    </property>
-                    <property name="geometry">
-                        <rect>
-                            <x>19</x>
-                            <y>59</y>
-                            <width>69</width>
-                            <height>22</height>
-                        </rect>
-                    </property>
-                    <property name="text">
-                        <string>Minos</string>
-                    </property>
-                </widget>
-                <widget class="QRadioButton">
-                    <property name="name">
-                        <cstring>HESSE</cstring>
-                    </property>
-                    <property name="geometry">
-                        <rect>
-                            <x>19</x>
-                            <y>30</y>
-                            <width>69</width>
-                            <height>22</height>
-                        </rect>
-                    </property>
-                    <property name="text">
-                        <string>Hesse</string>
-                    </property>
-                    <property name="checked">
-                        <bool>true</bool>
-                    </property>
-                </widget>
             </widget>
         </widget>
         <widget class="QWidget">
@@ -3876,40 +3656,6 @@
                     </widget>
                 </hbox>
             </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>ShowT0</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>451</x>
-                        <y>190</y>
-                        <width>95</width>
-                        <height>30</height>
-                    </rect>
-                </property>
-                <property name="minimumSize">
-                    <size>
-                        <width>95</width>
-                        <height>30</height>
-                    </size>
-                </property>
-                <property name="maximumSize">
-                    <size>
-                        <width>95</width>
-                        <height>30</height>
-                    </size>
-                </property>
-                <property name="text">
-                    <string>Show</string>
-                </property>
-                <property name="autoDefault">
-                    <bool>false</bool>
-                </property>
-                <property name="default">
-                    <bool>true</bool>
-                </property>
-            </widget>
         </widget>
         <widget class="QWidget">
             <property name="name">
@@ -4547,11 +4293,16 @@
         <separator/>
         <action name="fileExitAction"/>
     </item>
+    <item text="Actions" name="Actions">
+        <action name="Fit"/>
+        <action name="Plot"/>
+        <action name="T0"/>
+    </item>
     <item text="Parameters" name="Parameters">
         <action name="parametersExport_AsAction"/>
         <action name="parametersAppend_ToAction"/>
     </item>
-    <item text="&amp;Edit" name="editMenu">
+    <item text="Edit" name="Edit">
         <action name="editUndoAction"/>
         <action name="editRedoAction"/>
         <separator/>
@@ -4581,11 +4332,21 @@
         </property>
         <action name="fileOpenAction"/>
         <action name="fileSaveAction"/>
+        <action name="filePrintAction"/>
+        <action name="fileExitAction"/>
+    </toolbar>
+    <toolbar dock="2">
+        <property name="name">
+            <cstring>Toolbar</cstring>
+        </property>
+        <property name="label">
+            <string>Toolbar</string>
+        </property>
         <action name="Fit"/>
         <action name="Plot"/>
         <action name="T0"/>
-        <action name="filePrintAction"/>
-        <action name="fileExitAction"/>
+        <action name="parametersExport_AsAction"/>
+        <action name="parametersAppend_ToAction"/>
     </toolbar>
 </toolbars>
 <actions>
@@ -4933,22 +4694,34 @@
         <property name="name">
             <cstring>parametersExport_AsAction</cstring>
         </property>
+        <property name="iconSet">
+            <iconset>image11</iconset>
+        </property>
         <property name="text">
-            <string>&amp;Export As...</string>
+            <string>Export As...</string>
         </property>
         <property name="menuText">
             <string>&amp;Export As...</string>
+        </property>
+        <property name="accel">
+            <string>Alt+E</string>
         </property>
     </action>
     <action>
         <property name="name">
             <cstring>parametersAppend_ToAction</cstring>
         </property>
+        <property name="iconSet">
+            <iconset>image12</iconset>
+        </property>
         <property name="text">
-            <string>&amp;Append To...</string>
+            <string>Append To...</string>
         </property>
         <property name="menuText">
             <string>&amp;Append To...</string>
+        </property>
+        <property name="accel">
+            <string>Alt+A</string>
         </property>
     </action>
     <action>
@@ -4961,6 +4734,9 @@
         <property name="text">
             <string>Fit and Plot</string>
         </property>
+        <property name="accel">
+            <string>Ctrl+F</string>
+        </property>
     </action>
     <action>
         <property name="name">
@@ -4970,10 +4746,13 @@
             <bool>false</bool>
         </property>
         <property name="iconSet">
-            <iconset>image11</iconset>
+            <iconset>image13</iconset>
         </property>
         <property name="text">
             <string>Plot</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+P</string>
         </property>
     </action>
     <action>
@@ -4981,10 +4760,13 @@
             <cstring>T0</cstring>
         </property>
         <property name="iconSet">
-            <iconset>image12</iconset>
+            <iconset>image14</iconset>
         </property>
         <property name="text">
             <string>Show t0 and Bg Bins</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+T</string>
         </property>
     </action>
 </actions>
@@ -5023,9 +4805,15 @@
         <data format="PNG" length="658">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000025949444154388db59521931b3910469fb7027a98c42c2838cb6cb686031d689685f95d86816b66c385033dcc0305354c62dd6c021c576d2e97f3a672fb21a94bf5f449ad6e2dfabee723f4f02154e0d3db4929654e299173a69a01e04488311263a4699ac51f8373ce737f3ee36360bdfb0c4eaef194185ecfa494d86c36b3f7fe5df045dff7e49ce7979717369f3b365f760098196a8a6154abf4df8e4836b6dbedbb9c3fa8eadc9f7bbaafcfb4db0e33c392a0690963a0f642c98576db41f00cc3f0aeab784829e16364d37500485e525266b2814946c43cd247ac56e2a6654c8952ca7c1f3c4db49b35866105d298487e4443219330293408960d4490e0c839df776caa38ef2856c8cd44594f8813ac188e0878521d51a76020ae619aa6bbe04f00550d11401503304372a4b1404e3dda26c063a50202d755ffed180cccae49b3db181a13f278a6b4198280292660b52022f7c1c107524a985e81560dc3c896b05031c0ca35a65529a51263bc0f8e3192fb0b5a15b37a051443cc43126aadfc3808354f0404e7dc3b1c87b008de33bcbea2802a80923853dc8813a1944a29151b126ddbe28327e73cabea6f9fdd03c06ab5c215a8c7338d298d35f8658344871804035e2f3c3d3df1f8f8b84863e2743ab1dfefc939ff2b7c716b9baa3a0fc3c09812e2049a6b82ac54c4a0eb3a4208b7529e8fc72387c301e71cbbdd8ed56af553a92ffed98f4b2973ce995a2b2282f7fe96ac5ffa434a69fee19aaeeb7edafc17f09f4a55e7d3e9c4e17060b95cf2fcfccc7abd5efc35f8a6cbe532eff77ba66962bbddfebde3b72aa5cc87c30155fd7fc16ff5617fde773b427a020f23b15a0000000049454e44ae426082</data>
     </image>
     <image name="image11">
-        <data format="PNG" length="265">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000d049444154388dcd94d10ac33008458fa33f55ff1ffb59d9c3e6c89c496dd860174a214daf87ab89981900aada00cc4ce8e4ebf1db68bf4bdcf8db12a09dee5a315e2556d5368a01e0b68cd415f0b73f005bdcb83f3f1c139a5e4e1de93f8c578963b1d4f830935db555a84739bf19f766f2c099ceea6562efb8179a4d4089b8378d3f8fcc7d3d924f9b57c97a3415af39ae362b23eee77738c75795c506e1e465397a1c598e336df0884192ea195dd5bc7c09c5a37e76099533bedad8ffbb8fcfb4417ede5d59c3accb395b871f12df0112aeaae89a42dc160000000049454e44ae426082</data>
+        <data format="PNG" length="278">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000dd49444154388dbd55ed0e8430082b892f35de3ff5b1b81f8ac1c93ed4bb6b62dc269452492624d183aa5adc931455357fd7f1240500962cb115dc3af742f1dbd24a7a8b29c51e7347c494e2275d5d14bf253c887fe5b100187afc887834c7198aaaad0301278fbf69cbffe6d89115ac2de85972dbe31284f47c7e3415333fafa9b85416d54445d564cfaf631d161f922009dbd77b8059e8ccd756756b217f6a2a049048269b85c7b9ef23d2a988c5484255bb85b398a1e28cb4b6208bb94c454886b7e84459eb06d8ba5d53c7baaf58f5f4c3321f6f290ef7588b670a1fe923b36c6e54b07f0000000049454e44ae426082</data>
     </image>
     <image name="image12">
+        <data format="PNG" length="297">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000f049444154388dbd926b1283300884978e970af79ff558f487a2481313b52d334e1ec2025f1092383355b5782629aa6abe667f920200532db0e5dcbaf744f1dfd40a7a6a4315bbcf9522862abed3d547c54f0537e15f3116005dc6b7847b735cb3a26a73a78003e36f62f9df1cbbd512660467482e332ea19033ceb7a662e4f19a159784280b155593353efbba59fc4882246cddaf0e66a133df5bead642fcd0540820514c1684dbbd9fa34daaeaf90c100180888724769fbad57c5e8b88998b67e6355147e35d3412efa271cd4c7b5ce39ee43e15aac5c8f930fc51c039ee4c177491b101db1806e876101a33693efc1b7858d21f6a6c70020000000049454e44ae426082</data>
+    </image>
+    <image name="image13">
+        <data format="PNG" length="319">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000010649444154388dad54d10e84200ceb0c3f65ff3ff5b3760f3283133c39af090959a0ebca864942c64a7aec37c92e071e60c90192b7899ea2b4970d304940434e12d3aca88a439163e788f237c92236abfa6245e0576f0180a40f89df9002c042f2547a3e1831031e5720c99668b737a567b54074c143aca48f0404a9a2c296b8cda844301a9ad11d03ce6d2ac9d869ad3690254bb25c4dc9ca7a6a3b89be5af8b3c72411777b36952ec3005b2d19d8ad31d262df83372b54f8a01207e05e17fa0b92f6919664d5d7fc906812b8f6bfe378bce61e6af8b0767aa4efa654d2e177014eaffe6afa827425bdd44cafc739e36fbf5b7eec61bba5a1300096ff838cad99c0a90199c1079e7cbe7ec1d5a3e00000000049454e44ae426082</data>
+    </image>
+    <image name="image14">
         <data format="PNG" length="245">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000bc49444154388dd595c10dc2300c45bf512fdd82392cb14817e90c5da4a3f8ca383d8693d15720366941c03f3572f26cfd38ae5cced7824acbba0900ccd35878dd233133388401bcae63afe8d45bc9ef8155f5c1738e45f1101c41cd4cb2e42978593799a7b1d417e7f04c03839ec15b07bdea56a25d97676692557eb82b5a7e1f0247557ff78170abb5e2bbc091b8b7f9010df1b13eb827003ee4b1aa96b4e2ccdf5abef78fc726b78c7ff7dac01200f761528fc6bd5080fe79efd60d86746ad3b710aeb60000000049454e44ae426082</data>
     </image>
 </images>
@@ -5071,24 +4859,6 @@
         <signal>valueChanged(int,int)</signal>
         <receiver>MuSRFitform</receiver>
         <slot>CallMSRCreate()</slot>
-    </connection>
-    <connection>
-        <sender>PlotMSR</sender>
-        <signal>clicked()</signal>
-        <receiver>MuSRFitform</receiver>
-        <slot>GoPlot()</slot>
-    </connection>
-    <connection>
-        <sender>ShowT0</sender>
-        <signal>clicked()</signal>
-        <receiver>MuSRFitform</receiver>
-        <slot>ShowMuSRT0()</slot>
-    </connection>
-    <connection>
-        <sender>go</sender>
-        <signal>clicked()</signal>
-        <receiver>MuSRFitform</receiver>
-        <slot>GoFit()</slot>
     </connection>
     <connection>
         <sender>musrfit_tabs</sender>
@@ -5180,6 +4950,12 @@
         <receiver>MuSRFitform</receiver>
         <slot>ShowMuSRT0()</slot>
     </connection>
+    <connection>
+        <sender>Plot</sender>
+        <signal>activated()</signal>
+        <receiver>MuSRFitform</receiver>
+        <slot>GoPlot()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>musrfit_tabs</tabstop>
@@ -5196,10 +4972,6 @@
     <tabstop>BINS</tabstop>
     <tabstop>FitAsyType</tabstop>
     <tabstop>LRBF</tabstop>
-    <tabstop>MINIMIZE</tabstop>
-    <tabstop>HESSE</tabstop>
-    <tabstop>go</tabstop>
-    <tabstop>PlotMSR</tabstop>
     <tabstop>FitTextOutput</tabstop>
     <tabstop>ShParam_1_1</tabstop>
     <tabstop>ShParam_1_2</tabstop>
@@ -5257,7 +5029,6 @@
     <tabstop>Bg24</tabstop>
     <tabstop>Data14</tabstop>
     <tabstop>Data24</tabstop>
-    <tabstop>ShowT0</tabstop>
 </tabstops>
 <includes>
     <include location="local" impldecl="in implementation">MuSRFit.ui.h</include>

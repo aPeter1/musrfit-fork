@@ -87,6 +87,11 @@ sub CreateMSR {
 	$FITMINTYPE = "SCAN\nSIMPLEX";
     }
 
+    # Proper way
+    if ( $All{"Minimization"} ne "" &&  $All{"ErrorCalc"} ne "" && $Step ne "PLOT" ) {
+	$FITMINTYPE = $All{"Minimization"}."\n".$All{"ErrorCalc"};
+    }
+
 
     # First create the THEORY Block
     my ($Full_T_Block,$Paramcomp_ref)=MSR::CreateTheory(@FitTypes);
@@ -427,6 +432,12 @@ sub CreateMSRSingleHist {
     } elsif ( $Step eq "SIMPLEX" ) {
 	$FITMINTYPE = "SCAN\nSIMPLEX";
     }
+
+    # Proper way
+    if ( $All{"Minimization"} ne "" &&  $All{"ErrorCalc"} ne "" && $Step ne "PLOT" ) {
+	$FITMINTYPE = $All{"Minimization"}."\n".$All{"ErrorCalc"};
+    }
+
 
     # First create the THEORY Block
     my ($Full_T_Block,$Paramcomp_ref)=MSR::CreateTheory(@FitTypes);

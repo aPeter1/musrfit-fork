@@ -384,30 +384,12 @@ void MuSRFitform::CreateAllInput()
     }
     
 # Get minimization process
-    my $Min = Minimization->selectedId();
-    if ($Min==0) {
-	$All{"Minimization"}= "MINIMIZE";
-	$All{"go"}="MIGRAD";
-    }
-    elsif ($Min==1) {
-	$All{"Minimization"}= "MIGRAD";
-	$All{"go"}="MIGRAD";
-    }
-    elsif ($Min==2) {
-	$All{"Minimization"}= "SIMPLEX";
-	$All{"go"}="SIMPLAEX";
-    }
+    $All{"Minimization"} = Minimization->currentText();
+    $All{"go"}=$All{"Minimization"};
     
 # Get Error calculation process
-    my $Err = ErrorCalc->selectedId();
-    if ($Err==0) {
-	$All{"ErrorCalc"}= "HESSE";
-#	$All{"go"}="MIGRAD";	
-    }
-    elsif ($Err==1) {
-	$All{"ErrorCalc"}= "MINOS";
-	$All{"go"}="MINOS";
-    }
+    $All{"ErrorCalc"} = ErrorCalc->currentText();
+    $All{"go"}=$All{"ErrorCalc"};
     
 # Return Hash with all important values
     return %All;  
@@ -646,8 +628,8 @@ void MuSRFitform::TabChanged()
 void MuSRFitform::GoFit()
 {
     my %All=CreateAllInput();
+    musrfit_tabs->setCurrentPage(1);
     CallMSRCreate();
-#    musrfit_tabs->setCurrentTab(1);
     my $FILENAME=$All{"FILENAME"}.".msr";
     if (-e $FILENAME) {
 	my $cmd="musrfit -t $FILENAME";
@@ -687,6 +669,7 @@ void MuSRFitform::GoPlot()
 void MuSRFitform::ShowMuSRT0()
 {
     my %All=CreateAllInput();
+    musrfit_tabs->setCurrentPage(6);
 # Create MSR file and then run musrt0
     CallMSRCreate();
     my $FILENAME=$All{"FILENAME"}.".msr";
