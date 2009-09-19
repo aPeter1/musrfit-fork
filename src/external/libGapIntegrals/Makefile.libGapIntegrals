@@ -1,41 +1,126 @@
 #---------------------------------------------------
-# get compilation flags from root-config
-
-ROOTCFLAGS    = $(shell $(ROOTSYS)/bin/root-config --cflags)
-# ROOTLIBS    = $(shell $(ROOTSYS)/bin/root-config --libs)
-
+# Makefile.libGapIntegrals
+#
+# Author: Bastian M. Wojek
+# e-mail: bastian.wojek@psi.ch
+#
+# $Id$
+#
 #---------------------------------------------------
 
-OS            = LINUX
+#---------------------------------------------------
+# get compilation and library flags from root-config
+
+ROOTCFLAGS    = $(shell $(ROOTSYS)/bin/root-config --cflags)
+ROOTLIBS      = $(shell $(ROOTSYS)/bin/root-config --libs)
+ROOTGLIBS     = $(shell $(ROOTSYS)/bin/root-config --glibs)
+
+#---------------------------------------------------
+# depending on the architecture, choose the compiler,
+# linker, and the flags to use
+#
+
+ARCH = $(shell $(ROOTSYS)/bin/root-config --arch)
+
+ifeq ($(ARCH),linux)
+OS = LINUX
+endif
+ifeq ($(ARCH),linuxx8664gcc)
+OS = LINUX
+endif
+ifeq ($(ARCH),win32gcc)
+OS = WIN32GCC
+endif
+ifeq ($(ARCH),macosx)
+OS = DARWIN
+endif
+
+# -- Linux
+ifeq ($(OS),LINUX)
 CXX           = g++
 CXXFLAGS      = -O3 -Wall -Wno-trigraphs -fPIC
-MUSRFITINCLUDE = ../../include
-LOCALINCLUDE  = .
-ROOTINCLUDE   = $(ROOTSYS)/include
-INCLUDES      = -I$(LOCALINCLUDE) -I$(MUSRFITINCLUDE) -I$(ROOTINCLUDE)
+PMUSRPATH     = ../../include
+MNPATH        = $(ROOTSYS)/include
+GSLPATH       = /usr/include/gsl
+CUBAPATH      = /usr/local/include
+INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(GSLPATH) -I$(CUBAPATH)
 LD            = g++
 LDFLAGS       = -O
-SOFLAGS       = -shared 
+SOFLAGS       = -shared
+SHLIB         = libGapIntegrals.so
+endif
+
+# -- Windows/Cygwin
+ifeq ($(OS),WIN32GCC)
+CXX           = g++
+CXXFLAGS      = -O3 -Wall -Wno-trigraphs -D_DLL
+PMUSRPATH     = ../../include
+MNPATH        = $(ROOTSYS)/include
+GSLPATH       = /usr/include/gsl
+CUBAPATH      = /usr/local/include
+INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(GSLPATH) -I$(CUBAPATH)
+LD            = g++
+LDFLAGS       = -O -Wl,--enable-auto-import -Wl,--enable-runtime-pseudo-reloc
+SOFLAGS       = -shared -Wl,--export-all-symbols
+SHLIB         = libGapIntegrals.dll
+endif
+
+# -- MacOSX/Darwin
+ifeq ($(OS),DARWIN)
+CXX           = g++
+CXXFLAGS      = -O3 -Wall -Wno-trigraphs -fPIC
+PMUSRPATH     = ../../include
+MNPATH        = $(ROOTSYS)/include
+FINKPATH      = /sw/include
+GSLPATH       = $(FINKPATH)/gsl
+CUBAPATH      = $(FINKPATH)
+INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(GSLPATH) -I$(CUBAPATH)
+LD            = g++
+LDFLAGS       = -O -Xlinker -bind_at_load
+SOFLAGS       = -dynamiclib -flat_namespace -undefined suppress -Wl,-x
+SHLIB         = libGapIntegrals.dylib
+endif
 
 # the output from the root-config script:
 CXXFLAGS      += $(ROOTCFLAGS)
-LDFLAGS       += -L/usr/local/lib -lcuba -lm
+LDFLAGS       +=
+
+# the ROOT libraries (G = graphic)
+LIBS          = $(ROOTLIBS)
+GLIBS         = $(ROOTGLIBS)
+
+# GSL lib
+GSLLIB        = -lgslcblas -lgsl
+# Cuba lib
+CUBALIB       = -L/usr/local/lib -lcuba -lm
+
+ifeq ($(OS),WIN32GCC)
+# GSL lib
+GSLLIB        = -L/usr/lib -lgslcblas -lgsl
+# Cuba lib
+CUBALIB       = -L/usr/local/lib -lcuba -lm
+endif
+
+ifeq ($(OS),DARWIN)
+# GSL lib
+GSLLIB        = -L/sw/lib -lgslcblas -lgsl
+# Cuba lib
+CUBALIB       = -L/sw/lib -lcuba -lm
+endif
 
 # some definitions: headers (used to generate *Dict* stuff), sources, objects,...
 OBJS =
 OBJS += TIntegrator.o
 OBJS += TGapIntegrals.o TGapIntegralsDict.o
 
-SHLIB = libGapIntegrals.so
+# make the shared libs:
 
-# make the shared lib:
-#
 all:  $(SHLIB)
 
 $(SHLIB): $(OBJS)
 	@echo "---> Building shared library $(SHLIB) ..."
 	/bin/rm -f $(SHLIB)
-	$(LD) $(SOFLAGS) -o $(SHLIB) $(OBJS) $(LDFLAGS)
+	$(LD) $(SOFLAGS) -o $(SHLIB) $(OBJS) $(LDFLAGS) $(LIBS) $(GSLLIB) $(CUBALIB)
 	@echo "done"
 
 # clean up: remove all object file (and core files)
@@ -53,7 +138,7 @@ $(OBJS): %.o: %.cpp
 
 TGapIntegralsDict.cpp: ./TIntegrator.h ./TGapIntegrals.h ./TGapIntegralsLinkDef.h
 	@echo "Generating dictionary $@..."
-	rootcint -f $@ -c -p -I$(MUSRFITINCLUDE) $^
+	rootcint -f $@ -c -p -I$(PMUSRPATH) $^
 
 install: all
 	@echo "Installing shared lib: $(SHLIB)"
@@ -61,3 +146,14 @@ ifeq ($(OS),LINUX)
 	cp -pv $(SHLIB) $(ROOTSYS)/lib
 	cp -pv TIntegrator.h TGapIntegrals.h $(ROOTSYS)/include
 endif
+ifeq ($(OS),WIN32GCC)
+	cp -pv $(SHLIB) $(ROOTSYS)/bin
+	ln -sf $(ROOTSYS)/bin/$(SHLIB) $(ROOTSYS)/lib/$(SHLIB)
+	cp -pv TIntegrator.h TGapIntegrals.h $(ROOTSYS)/include
+endif
+ifeq ($(OS),DARWIN)
+	cp -pv $(SHLIB) $(ROOTSYS)/lib
+	cp -pv TIntegrator.h TGapIntegrals.h $(ROOTSYS)/include
+endif
+
+cleaninstall: clean install

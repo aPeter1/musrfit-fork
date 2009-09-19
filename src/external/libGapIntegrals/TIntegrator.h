@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2009/09/07
+  $Id$
 
 ***************************************************************************/
 
@@ -184,6 +184,34 @@ class TAnSWaveGapIntegralSuave {
 
 };
 
+class TNonMonDWave1GapIntegralCuhre {
+  public:
+    TNonMonDWave1GapIntegralCuhre() : fNDim(2) {}
+    ~TNonMonDWave1GapIntegralCuhre() { fPar.clear(); }
+    void SetParameters(const std::vector<double> &par) { fPar=par; }
+    static void Integrand(const int*, const double[], const int*, double[]);
+    double IntegrateFunc();
+
+  protected:
+    static vector<double> fPar;
+    unsigned int fNDim;
+
+};
+
+class TNonMonDWave2GapIntegralCuhre {
+  public:
+    TNonMonDWave2GapIntegralCuhre() : fNDim(2) {}
+    ~TNonMonDWave2GapIntegralCuhre() { fPar.clear(); }
+    void SetParameters(const std::vector<double> &par) { fPar=par; }
+    static void Integrand(const int*, const double[], const int*, double[]);
+    double IntegrateFunc();
+
+  protected:
+    static vector<double> fPar;
+    unsigned int fNDim;
+
+};
+
 // To be integrated: x*y dx dy
 
 class T2DTest : public TMCIntegrator {
@@ -230,7 +258,6 @@ inline double TAnSWaveGapIntegral::FuncAtX(double *x) const // x = {E, phi}, fPa
   return -1.0/(2.0*twokt*TMath::CosH(TMath::Sqrt(x[0]*x[0]+deltasq)/twokt)*TMath::CosH(TMath::Sqrt(x[0]*x[0]+deltasq)/twokt));
 }
 
-
 // To be integrated: Bessel function times Exponential
 
 class TIntBesselJ0Exp : public TIntegrator {
@@ -259,7 +286,7 @@ inline double TIntSinGss::FuncAtX(double x) const
   return TMath::Sin(TMath::TwoPi()*fPar[0]*x) * TMath::Exp(-0.5*fPar[1]*fPar[1]*x*x);
 }
 
-// To be integrated: df/dE * E / sqrt(E^2+ Delta^2)
+// To be integrated: df/dE * E / sqrt(E^2 - Delta^2)
 
 class TGapIntegral : public TIntegrator {
   public:
@@ -271,9 +298,7 @@ class TGapIntegral : public TIntegrator {
 
 inline double TGapIntegral::FuncAtX(double e) const
 {
-  double twokt(2.0*0.08617384436*fPar[0]); // kB in meV/K
-//  return -e/(2.0*twokt*TMath::CosH(e/twokt)*TMath::CosH(e/twokt)*TMath::Sqrt(e*e-fPar[1]*fPar[1]));
-  return -1.0/(2.0*twokt*TMath::CosH(TMath::Sqrt(e*e+fPar[1]*fPar[1])/twokt)*TMath::CosH(TMath::Sqrt(e*e+fPar[1]*fPar[1])/twokt));
+  return 1.0/(TMath::Power(TMath::CosH(TMath::Sqrt(e*e+fPar[1]*fPar[1])/fPar[0]),2.0));
 }
 
 #endif //_TIntegrator_H_

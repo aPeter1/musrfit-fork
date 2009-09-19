@@ -1,6 +1,7 @@
 #---------------------------------------------------------------------
 # INSTALL
-# Bastian M. Wojek, 2009/09/07
+# Bastian M. Wojek
+# $Id$
 #---------------------------------------------------------------------
 
 Installation of the musrfit-plugin "libGapIntegrals.so"
@@ -22,9 +23,15 @@ Installation of the musrfit-plugin "libGapIntegrals.so"
 
 * The plugin classes can now be accessed inside THEORY blocks of musrfit msr-files via:
 
-   userFcn  libGapIntegrals.so TGapSWave 4 5
-   userFcn  libGapIntegrals.so TGapDWave 4 5
-   userFcn  libGapIntegrals.so TGapAnSWave 4 5 6
+   userFcn  libGapIntegrals.so TGapSWave 1 2            (Tc Delta0)
+   userFcn  libGapIntegrals.so TGapDWave 1 2            (Tc Delta0)
+   userFcn  libGapIntegrals.so TGapAnSWave 1 2 3        (Tc Delta0 a)
+   userFcn  libGapIntegrals.so TGapNonMonDWave1 1 2 3   (Tc Delta0 a)
+   userFcn  libGapIntegrals.so TGapNonMonDWave2 1 2 3   (Tc Delta0 a)
+   userFcn  libGapIntegrals.so TGapPowerLaw 1 2         (Tc n)
+
+* For an introductory discussion on which functions are actually calculated, please refer to
+  GapIntegrals.pdf
 
 #---------------------------------------------------------------------
 # this is the end ...

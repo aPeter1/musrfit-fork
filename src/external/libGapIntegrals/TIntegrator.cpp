@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2009/09/07
+  $Id$
 
 ***************************************************************************/
 
@@ -75,7 +75,7 @@ double TAnSWaveGapIntegralCuhre::IntegrateFunc()
   const double EPSABS (1e-6);
   const unsigned int VERBOSE (0);
   const unsigned int LAST (4);
-  const unsigned int MINEVAL (1000);
+  const unsigned int MINEVAL (100);
   const unsigned int MAXEVAL (1000000);
 
   const unsigned int KEY (13);
@@ -170,6 +170,73 @@ void TAnSWaveGapIntegralSuave::Integrand(const int *ndim, const double x[],
                       const int *ncomp, double f[]) // x = {E, phi}, fPar = {twokBT, Delta(T),a, Ec, phic}
 {
   double deltasq(TMath::Power(fPar[1]*(1.0+fPar[2]*TMath::Cos(4.0*x[1]*fPar[4])),2.0));
+  f[0] = 1.0/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[3]*fPar[3]+deltasq)/fPar[0]),2.0);
+  return;
+}
+
+std::vector<double> TNonMonDWave1GapIntegralCuhre::fPar;
+
+double TNonMonDWave1GapIntegralCuhre::IntegrateFunc()
+{
+  const unsigned int NCOMP(1);
+  const double EPSREL (1e-4);
+  const double EPSABS (1e-6);
+  const unsigned int VERBOSE (0);
+  const unsigned int LAST (4);
+  const unsigned int MINEVAL (100);
+  const unsigned int MAXEVAL (1000000);
+
+  const unsigned int KEY (13);
+
+  int nregions, neval, fail;
+  double integral[NCOMP], error[NCOMP], prob[NCOMP];
+
+  Cuhre(fNDim, NCOMP, Integrand,
+    EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
+    KEY,
+    &nregions, &neval, &fail, integral, error, prob);
+
+  return integral[0];
+}
+
+void TNonMonDWave1GapIntegralCuhre::Integrand(const int *ndim, const double x[],
+                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {twokBT, Delta(T),a, Ec, phic}
+{
+  double deltasq(TMath::Power(fPar[1]*(fPar[2]*TMath::Cos(2.0*x[1]*fPar[4])+(1.0-fPar[2])*TMath::Cos(6.0*x[1]*fPar[4])),2.0));
+  f[0] = 1.0/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[3]*fPar[3]+deltasq)/fPar[0]),2.0);
+  return;
+}
+
+std::vector<double> TNonMonDWave2GapIntegralCuhre::fPar;
+
+double TNonMonDWave2GapIntegralCuhre::IntegrateFunc()
+{
+  const unsigned int NCOMP(1);
+  const double EPSREL (1e-4);
+  const double EPSABS (1e-6);
+  const unsigned int VERBOSE (0);
+  const unsigned int LAST (4);
+  const unsigned int MINEVAL (100);
+  const unsigned int MAXEVAL (1000000);
+
+  const unsigned int KEY (13);
+
+  int nregions, neval, fail;
+  double integral[NCOMP], error[NCOMP], prob[NCOMP];
+
+  Cuhre(fNDim, NCOMP, Integrand,
+    EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
+    KEY,
+    &nregions, &neval, &fail, integral, error, prob);
+
+  return integral[0];
+}
+
+void TNonMonDWave2GapIntegralCuhre::Integrand(const int *ndim, const double x[],
+                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {twokBT, Delta(T),a, Ec, phic}
+{
+  double deltasq(4.0*fPar[2]/27.0*TMath::Power(fPar[1]*TMath::Cos(2.0*x[1]*fPar[4]), 2.0) \
+    / TMath::Power(1.0 + fPar[2]*TMath::Cos(2.0*x[1]*fPar[4])*TMath::Cos(2.0*x[1]*fPar[4]), 3.0));
   f[0] = 1.0/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[3]*fPar[3]+deltasq)/fPar[0]),2.0);
   return;
 }

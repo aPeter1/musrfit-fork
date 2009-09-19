@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2009/09/06
+  $Id$
 
 ***************************************************************************/
 
@@ -99,5 +99,60 @@ private:
 
   ClassDef(TGapAnSWave,1)
 };
+
+class TGapNonMonDWave1 : public PUserFcnBase {
+
+public:
+  TGapNonMonDWave1();
+  ~TGapNonMonDWave1();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  TNonMonDWave1GapIntegralCuhre *fGapIntegral;
+  mutable vector<double> fTemp;
+  mutable vector<double>::const_iterator fTempIter;
+  mutable vector<double> fIntegralValues;
+  mutable vector<bool> fCalcNeeded;
+
+  mutable vector<double> fPar;
+
+  ClassDef(TGapNonMonDWave1,1)
+};
+
+class TGapNonMonDWave2 : public PUserFcnBase {
+
+public:
+  TGapNonMonDWave2();
+  ~TGapNonMonDWave2();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  TNonMonDWave2GapIntegralCuhre *fGapIntegral;
+  mutable vector<double> fTemp;
+  mutable vector<double>::const_iterator fTempIter;
+  mutable vector<double> fIntegralValues;
+  mutable vector<bool> fCalcNeeded;
+
+  mutable vector<double> fPar;
+
+  ClassDef(TGapNonMonDWave2,1)
+};
+
+
+class TGapPowerLaw : public PUserFcnBase {
+
+public:
+  TGapPowerLaw() {}
+  ~TGapPowerLaw() {}
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+
+  ClassDef(TGapPowerLaw,1)
+};
+
 
 #endif //_TGapIntegrals_H_

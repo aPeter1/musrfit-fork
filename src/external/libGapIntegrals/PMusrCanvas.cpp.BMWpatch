@@ -1,0 +1,101 @@
+--- PMusrCanvas.cpp.orig	2009-09-18 18:58:50.000000000 +0200
++++ PMusrCanvas.cpp	2009-09-16 21:51:45.000000000 +0200
+@@ -5,7 +5,7 @@
+   Author: Andreas Suter
+   e-mail: andreas.suter@psi.ch
+ 
+-  $Id$
++  $Id: PMusrCanvas.cpp 4106 2009-08-31 11:19:03Z nemu $
+ 
+ ***************************************************************************/
+ 
+@@ -3291,6 +3291,36 @@
+     return;
+   }
+ 
++// BMW: Writing an extra file with the complete theory curve only until the issue of writing only single theory points has been resolved
++
++  // generate output filename
++
++  // in order to handle names with "." correctly this slightly odd data-filename generation
++  tokens = fMsrHandler->GetFileName().Tokenize(".");
++  str = "";
++  for (int i=0; i<tokens->GetEntries()-1; i++) {
++    ostr = dynamic_cast<TObjString*>(tokens->At(i));
++    str += ostr->GetString() + TString(".");
++  }
++  str += "dataTheory";
++
++  if (tokens) {
++    delete tokens;
++    tokens = 0;
++  }
++
++  // open file
++  ofstream foutTheory;
++
++  // open data-file
++  foutTheory.open(str.Data(), iostream::out);
++  if (!fout.is_open()) {
++    cout << endl << ">> PMusrCanvas::SaveDataAscii: **ERROR** couldn't open file " << str.Data() << " for writing." << endl;
++    return;
++  }
++
++// endofBMW
++
+   // extract data
+   Double_t time, xval, yval;
+   Int_t xminBin;
+@@ -3688,11 +3718,39 @@
+             fout << "Data" << fNonMusrData.size()-1 << ", eData" << fNonMusrData.size()-1 << ", Theo" << fNonMusrData.size()-1;
+             fout << endl;
+             // write data
++
++// BMW: Writing an extra file with the complete theory curve only until the issue of writing only single theory points has been resolved
++
++            // get current x-range
++            xminBin = fNonMusrData[0].theory->GetXaxis()->GetFirst(); // first bin of the zoomed range
++            xmaxBin = fNonMusrData[0].theory->GetXaxis()->GetLast();  // last bin of the zoomed range
++            xmin = fNonMusrData[0].theory->GetXaxis()->GetBinCenter(xminBin);
++            xmax = fNonMusrData[0].theory->GetXaxis()->GetBinCenter(xmaxBin);
++
++           // get data
++           for (int i=0; i<fNonMusrData[0].theory->GetN(); i++) {
++              fNonMusrData[0].theory->GetPoint(i,xval,yval); // get values
++              if ((xval < xmin) || (xval > xmax))
++                continue;
++              foutTheory << xval << " ";
++              for (unsigned int j=0; j<fNonMusrData.size()-1; j++) {
++                fNonMusrData[j].theory->GetPoint(i,xval,yval); // get values
++                foutTheory << yval << " ";
++              }
++              // write last data set
++              fNonMusrData[fNonMusrData.size()-1].theory->GetPoint(i,xval,yval); // get values
++              foutTheory << yval << " ";
++              foutTheory << endl;
++            }
++
++// endofBMW
++
+             // get current x-range
+             xminBin = fNonMusrData[0].data->GetXaxis()->GetFirst(); // first bin of the zoomed range
+             xmaxBin = fNonMusrData[0].data->GetXaxis()->GetLast();  // last bin of the zoomed range
+             xmin = fNonMusrData[0].data->GetXaxis()->GetBinCenter(xminBin);
+             xmax = fNonMusrData[0].data->GetXaxis()->GetBinCenter(xmaxBin);
++
+             // get data
+             for (int i=0; i<fNonMusrData[0].data->GetN(); i++) {
+               fNonMusrData[0].data->GetPoint(i,xval,yval); // get values
+@@ -3739,6 +3797,12 @@
+   // close file
+   fout.close();
+ 
++// BMW: Writing an extra file with the complete theory curve only until the issue of writing only single theory points has been resolved
++
++  foutTheory.close();
++
++// endofBMW
++
+   cout << endl << ">> Data windows saved in ascii format ..." << endl;
+ }
+ 

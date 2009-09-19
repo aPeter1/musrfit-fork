@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2009/09/06
+  $Id$
 
 ***************************************************************************/
 
@@ -44,6 +44,9 @@ using namespace std;
 ClassImp(TGapSWave)
 ClassImp(TGapDWave)
 ClassImp(TGapAnSWave)
+ClassImp(TGapNonMonDWave1)
+ClassImp(TGapNonMonDWave2)
+ClassImp(TGapPowerLaw)
 
 // s wave  gap integral
 
@@ -86,6 +89,32 @@ TGapAnSWave::TGapAnSWave() {
   fPar.clear();
 }
 
+TGapNonMonDWave1::TGapNonMonDWave1() {
+  TNonMonDWave1GapIntegralCuhre *gapint = new TNonMonDWave1GapIntegralCuhre();
+  fGapIntegral = gapint;
+  gapint = 0;
+  delete gapint;
+
+  fTemp.clear();
+  fTempIter = fTemp.end();
+  fIntegralValues.clear();
+  fCalcNeeded.clear();
+  fPar.clear();
+}
+
+TGapNonMonDWave2::TGapNonMonDWave2() {
+  TNonMonDWave2GapIntegralCuhre *gapint = new TNonMonDWave2GapIntegralCuhre();
+  fGapIntegral = gapint;
+  gapint = 0;
+  delete gapint;
+
+  fTemp.clear();
+  fTempIter = fTemp.end();
+  fIntegralValues.clear();
+  fCalcNeeded.clear();
+  fPar.clear();
+}
+
 TGapSWave::~TGapSWave() {
   delete fGapIntegral;
   fGapIntegral = 0;
@@ -109,6 +138,28 @@ TGapDWave::~TGapDWave() {
 }
 
 TGapAnSWave::~TGapAnSWave() {
+  delete fGapIntegral;
+  fGapIntegral = 0;
+
+  fTemp.clear();
+  fTempIter = fTemp.end();
+  fIntegralValues.clear();
+  fCalcNeeded.clear();
+  fPar.clear();
+}
+
+TGapNonMonDWave1::~TGapNonMonDWave1() {
+  delete fGapIntegral;
+  fGapIntegral = 0;
+
+  fTemp.clear();
+  fTempIter = fTemp.end();
+  fIntegralValues.clear();
+  fCalcNeeded.clear();
+  fPar.clear();
+}
+
+TGapNonMonDWave2::~TGapNonMonDWave2() {
   delete fGapIntegral;
   fGapIntegral = 0;
 
@@ -165,11 +216,11 @@ double TGapSWave::operator()(double t, const vector<double> &par) const {
     double ds;
 
     vector<double> intPar; // parameters for the integral, T & Delta(T)
-    intPar.push_back(t);
+    intPar.push_back(2.0*0.08617384436*t); // 2 kB T, kB in meV/K
     intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
 
     fGapIntegral->SetParameters(intPar);
-    ds = 1.0+2.0*fGapIntegral->IntegrateFunc(0.0, 2.0*(t+intPar[1]));
+    ds = 1.0-1.0/intPar[0]*fGapIntegral->IntegrateFunc(0.0, 2.0*(t+intPar[1]));
 
     intPar.clear();
 
@@ -325,5 +376,156 @@ double TGapAnSWave::operator()(double t, const vector<double> &par) const {
   }
 
   return fIntegralValues[vectorIndex];
+
+}
+
+double TGapNonMonDWave1::operator()(double t, const vector<double> &par) const {
+
+  assert(par.size() == 3); // two parameters: Tc, Delta(0), a
+
+  if (t<=0.0)
+    return 1.0;
+  else if (t >= par[0])
+    return 0.0;
+
+  bool integralParChanged(false);
+
+  if (fPar.empty()) { // first time calling this routine
+    fPar = par;
+    integralParChanged = true;
+  } else { // check if Tc or Delta0 have changed
+    for (unsigned int i(0); i<par.size(); i++) {
+      if (par[i] != fPar[i]) {
+        fPar[i] = par[i];
+        integralParChanged = true;
+      }
+    }
+  }
+
+  bool newTemp(false);
+  unsigned int vectorIndex;
+
+  if (integralParChanged) {
+    fCalcNeeded.clear();
+    fCalcNeeded.resize(fTemp.size(), true);
+  }
+
+  fTempIter = find(fTemp.begin(), fTemp.end(), t);
+  if(fTempIter == fTemp.end()) {
+    fTemp.push_back(t);
+    vectorIndex = fTemp.size() - 1;
+    fCalcNeeded.push_back(true);
+    newTemp = true;
+  } else {
+    vectorIndex = fTempIter - fTemp.begin();
+  }
+
+  if (fCalcNeeded[vectorIndex]) {
+
+    double ds;
+    vector<double> intPar; // parameters for the integral: 2 k_B T, Delta(T), a, E_c, phi_c
+    intPar.push_back(2.0*0.08617384436*t); // 2 kB T, kB in meV/K
+    intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
+    intPar.push_back(par[2]);
+    intPar.push_back(4.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
+    intPar.push_back(TMath::PiOver2()); // upper limit of phi-integration
+
+    fGapIntegral->SetParameters(intPar);
+
+    ds = 1.0-intPar[3]/intPar[0]*fGapIntegral->IntegrateFunc();
+
+    intPar.clear();
+
+    if (newTemp)
+      fIntegralValues.push_back(ds);
+    else
+      fIntegralValues[vectorIndex] = ds;
+
+    fCalcNeeded[vectorIndex] = false;
+  }
+
+  return fIntegralValues[vectorIndex];
+
+}
+
+double TGapNonMonDWave2::operator()(double t, const vector<double> &par) const {
+
+  assert(par.size() == 3); // two parameters: Tc, Delta(0), a
+
+  if (t<=0.0)
+    return 1.0;
+  else if (t >= par[0])
+    return 0.0;
+
+  bool integralParChanged(false);
+
+  if (fPar.empty()) { // first time calling this routine
+    fPar = par;
+    integralParChanged = true;
+  } else { // check if Tc or Delta0 have changed
+    for (unsigned int i(0); i<par.size(); i++) {
+      if (par[i] != fPar[i]) {
+        fPar[i] = par[i];
+        integralParChanged = true;
+      }
+    }
+  }
+
+  bool newTemp(false);
+  unsigned int vectorIndex;
+
+  if (integralParChanged) {
+    fCalcNeeded.clear();
+    fCalcNeeded.resize(fTemp.size(), true);
+  }
+
+  fTempIter = find(fTemp.begin(), fTemp.end(), t);
+  if(fTempIter == fTemp.end()) {
+    fTemp.push_back(t);
+    vectorIndex = fTemp.size() - 1;
+    fCalcNeeded.push_back(true);
+    newTemp = true;
+  } else {
+    vectorIndex = fTempIter - fTemp.begin();
+  }
+
+  if (fCalcNeeded[vectorIndex]) {
+
+    double ds;
+    vector<double> intPar; // parameters for the integral: 2 k_B T, Delta(T), a, E_c, phi_c
+    intPar.push_back(2.0*0.08617384436*t); // 2 kB T, kB in meV/K
+    intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
+    intPar.push_back(par[2]);
+    intPar.push_back(4.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
+    intPar.push_back(TMath::PiOver2()); // upper limit of phi-integration
+
+    fGapIntegral->SetParameters(intPar);
+
+    ds = 1.0-intPar[3]/intPar[0]*fGapIntegral->IntegrateFunc();
+
+    intPar.clear();
+
+    if (newTemp)
+      fIntegralValues.push_back(ds);
+    else
+      fIntegralValues[vectorIndex] = ds;
+
+    fCalcNeeded[vectorIndex] = false;
+  }
+
+  return fIntegralValues[vectorIndex];
+
+}
+
+double TGapPowerLaw::operator()(double t, const vector<double> &par) const {
+
+  assert(par.size() == 2); // two parameters: Tc, N
+
+  if(t<=0.0)
+    return 1.0;
+  else if (t >= par[0])
+    return 0.0;
+
+  return 1.0 - pow(t/par[0], par[1]);
 
 }

@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2009/09/06
+  $Id$
 
 ***************************************************************************/
 
@@ -40,6 +40,9 @@
 #pragma link C++ class TGapSWave+;
 #pragma link C++ class TGapDWave+;
 #pragma link C++ class TGapAnSWave+;
+#pragma link C++ class TGapNonMonDWave1+;
+#pragma link C++ class TGapNonMonDWave2+;
+#pragma link C++ class TGapPowerLaw+;
 
 #endif //__CINT__
 // root dictionary stuff --------------------------------------------------
