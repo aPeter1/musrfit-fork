@@ -62,14 +62,10 @@ dict_cpp_sources = \
   PStartupHandlerDict.cpp \
   PUserFcnBaseDict.cpp
 
-ext_source_dir = $(top_srcdir)/src/external/MuSR_software/Class_MuSR_PSI
-ext_h_sources = $(ext_source_dir)/MuSR_td_PSI_bin.h $(ext_source_dir)/tydefs.h
-ext_cpp_sources = $(ext_source_dir)/MuSR_td_PSI_bin.cpp 
+include_HEADERS = $(h_sources)
+noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 
-include_HEADERS = $(h_sources) $(ext_source_dir)/MuSR_td_PSI_bin.h
-noinst_HEADERS = $(h_linkdef) $(dict_h_sources) $(ext_source_dir)/tydefs.h
-
-INCLUDES = -I$(top_srcdir)/src/include -I$(ext_source_dir) $(LEM_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(BOOST_CFLAGS) $(ROOT_CFLAGS)
+INCLUDES = -I$(top_srcdir)/src/include $(PSIBIN_CFLAGS) $(LEM_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(BOOST_CFLAGS) $(ROOT_CFLAGS)
 AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources)
@@ -81,8 +77,8 @@ CLEANFILES = *Dict.cpp *Dict.h *~ core
 
 lib_LTLIBRARIES = libPMusr.la
 
-libPMusr_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources) $(ext_h_sources) $(ext_cpp_sources)
-libPMusr_la_LIBADD = $(LEM_LIBS) $(FFTW3_LIBS) $(GSL_LIBS) $(ROOT_LIBS)
+libPMusr_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources)
+libPMusr_la_LIBADD = $(PSIBIN_LIBS) $(LEM_LIBS) $(FFTW3_LIBS) $(GSL_LIBS) $(ROOT_LIBS)
 libPMusr_la_LDFLAGS = -version-info $(MUSR_LIBRARY_VERSION) -release $(MUSR_RELEASE) $(AM_LDFLAGS)
 
 pkgconfigdir = $(libdir)/pkgconfig

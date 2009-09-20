@@ -149,7 +149,7 @@ typedef  unsigned       char    BoolEnum;
 #else /* other operating system */
 
 //#ifdef _WIN32
-#if (defined(_WIN32) || defined(__linux__))
+#if (defined(_WIN32) || defined(__linux__) || defined(_WIN32GCC))
 #define MODEFS_CC_SYS "Compiled for Microsoft Windows 32-bit or Linux operating system"
 
 typedef                 short    Int16;
