@@ -1,1 +1,1 @@
-SUBDIRS = TLemRunHeader
+SUBDIRS = TLemRunHeader MuSR_software

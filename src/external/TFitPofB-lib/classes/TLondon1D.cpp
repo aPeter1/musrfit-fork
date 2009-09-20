@@ -199,12 +199,13 @@ TLondon1DHS::TLondon1DHS() : fCalcNeeded(true), fFirstCall(true) {
 
 double TLondon1DHS::operator()(double t, const vector<double> &par) const {
 
-  assert(par.size() == 5);
+  assert(par.size() == 5 || par.size() == 6);
 
   if(t<0.0)
     return cos(par[0]*0.017453293);
 
   bool dead_layer_changed(false);
+  bool width_changed(false);
 
   // check if the function is called the first time and if yes, read in parameters
 
@@ -221,7 +222,8 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
     }
     fFirstCall = false;
     dead_layer_changed = true;
-//  cout << this << endl;
+    if(par.size() == 6)
+      width_changed = true;
   }
 
   // check if any parameter has changed
@@ -239,6 +241,8 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
         only_phase_changed = false;
         if (i == 3) {
           dead_layer_changed = true;
+        } else if (i == 5) {
+          width_changed = true;
         }
       }
     }
@@ -259,6 +263,10 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
 
       for (unsigned int i(2); i<fPar.size(); i++)
         fParForBofZ[i-2] = par[i];
+
+      if(width_changed) { // Convolution of the implantation profile with Gaussian
+        fImpProfile->ConvolveGss(par[5], par[1]);
+      }
 
       fParForPofB[2] = par[1]; // energy
       fParForPofB[3] = par[2]; // Bkg-Field

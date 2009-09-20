@@ -9,6 +9,7 @@ dnl -----------------------------------------------
 MUSR_PROGRAM_NAME=musrfit
 MUSR_LIBRARY_NAME=PMusr
 LEM_LIBRARY_NAME=TLemRunHeader
+PSIBIN_LIBRARY_NAME=Class_MuSR_PSI
 
 #release versioning
 MUSR_MAJOR_VERSION=0
@@ -20,6 +21,11 @@ LEM_MAJOR_VERSION=1
 LEM_MINOR_VERSION=5
 LEM_MICRO_VERSION=0
 
+#release versioning
+PSIBIN_MAJOR_VERSION=0
+PSIBIN_MINOR_VERSION=0
+PSIBIN_MICRO_VERSION=0
+
 #API version
 MUSR_API_VERSION=MUSR_MAJOR_VERSION.MUSR_MINOR_VERSION
 AC_SUBST(MUSR_API_VERSION)
@@ -27,8 +33,12 @@ AC_SUBST(MUSR_API_VERSION)
 LEM_API_VERSION=LEM_MAJOR_VERSION.LEM_MINOR_VERSION
 AC_SUBST(LEM_API_VERSION)
 
+PSIBIN_API_VERSION=PSIBIN_MAJOR_VERSION.PSIBIN_MINOR_VERSION
+AC_SUBST(PSIBIN_API_VERSION)
+
 #shared library versioning
 LEM_LIBRARY_VERSION=1:5:0
+PSIBIN_LIBRARY_VERSION=0:0:0
 MUSR_LIBRARY_VERSION=0:5:0
 #                    | | |
 #             +------+ | +---+
@@ -44,10 +54,17 @@ MUSR_LIBRARY_VERSION=0:5:0
 
 AC_SUBST(MUSR_LIBRARY_VERSION)
 AC_SUBST(LEM_LIBRARY_VERSION)
+AC_SUBST(PSIBIN_LIBRARY_VERSION)
 
 PACKAGE=$MUSR_PROGRAM_NAME
 AC_SUBST(MUSR_LIBRARY_NAME)
 AC_SUBST(LEM_LIBRARY_NAME)
+AC_SUBST(PSIBIN_LIBRARY_NAME)
+
+PSIBIN_VERSION=$PSIBIN_MAJOR_VERSION.$PSIBIN_MINOR_VERSION.$PSIBIN_MICRO_VERSION
+PSIBIN_RELEASE=$PSIBIN_MAJOR_VERSION.$PSIBIN_MINOR_VERSION
+AC_SUBST(PSIBIN_RELEASE)
+AC_SUBST(PSIBIN_VERSION)
 
 LEM_VERSION=$LEM_MAJOR_VERSION.$LEM_MINOR_VERSION.$LEM_MICRO_VERSION
 LEM_RELEASE=$LEM_MAJOR_VERSION.$LEM_MINOR_VERSION
@@ -70,12 +87,12 @@ AC_CONFIG_HEADER([config.h])
 AC_LANG(C++)
 
 # Checks for programs.
-AC_PROG_AWK
+# AC_PROG_AWK
 AC_PROG_CXX
-AC_PROG_CC
-AC_PROG_LEX
+# AC_PROG_CC
+# AC_PROG_LEX
 AC_PROG_LN_S
-AC_PROG_YACC
+# AC_PROG_YACC
 AC_PROG_INSTALL
 AM_PROG_LIBTOOL
 ROOT_PATH
@@ -224,10 +241,16 @@ AC_CHECK_FILE([${ROOTINCDIR}/../include/Minuit2/MnMinimize.h], AC_MSG_RESULT([Mi
 
 
 dnl -----------------------------------------------
-dnl Set some paths and flags for PMusr and TLemRunHeader
+dnl Set some paths and flags for PMusr and TLemRunHeader and Class_MuSR_PSI
 dnl -----------------------------------------------
 
 SRCDIR="$(pwd)"
+
+PSIBIN_SRCDIR="${SRCDIR}/src/external/MuSR_software/Class_MuSR_PSI"
+PSIBIN_LIBS="-L${PSIBIN_SRCDIR} -l${PSIBIN_LIBRARY_NAME}"
+PSIBIN_CFLAGS="-I${PSIBIN_SRCDIR}"
+AC_SUBST(PSIBIN_LIBS)
+AC_SUBST(PSIBIN_CFLAGS)
 
 LEM_SRCDIR="${SRCDIR}/src/external/TLemRunHeader"
 LEM_LIBS="-L${LEM_SRCDIR} -l${LEM_LIBRARY_NAME}"
@@ -247,6 +270,7 @@ dnl -----------------------------------------------
 
 LOCAL_BIN_CXXFLAGS="-Wall -Wno-trigraphs"
 LOCAL_LIB_CXXFLAGS="${LOCAL_BIN_CXXFLAGS}"
+LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS}"
 LOCAL_BIN_LDFLAGS=
 LOCAL_LIB_LDFLAGS=
 
@@ -254,6 +278,7 @@ case "$host" in
   *-*-cygwin)
     LOCAL_BIN_CXXFLAGS="${LOCAL_BIN_CXXFLAGS}"
     LOCAL_LIB_CXXFLAGS="${LOCAL_BIN_CXXFLAGS} -D_DLL"
+    LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS} -D_WIN32"
     LOCAL_BIN_LDFLAGS="${LOCAL_BIN_LDFLAGS} -Wl,--enable-auto-import -Wl,--enable-runtime-pseudo-reloc"
     LOCAL_LIB_LDFLAGS="-no-undefined ${LOCAL_BIN_LDFLAGS} -Wl,--export-all-symbols"
     ;;
@@ -261,6 +286,7 @@ esac
 
 AC_SUBST(LOCAL_BIN_CXXFLAGS)
 AC_SUBST(LOCAL_LIB_CXXFLAGS)
+AC_SUBST(LOCAL_PSIBIN_LIB_CXXFLAGS)
 AC_SUBST(LOCAL_BIN_LDFLAGS)
 AC_SUBST(LOCAL_LIB_LDFLAGS)
 
@@ -296,5 +322,8 @@ AC_CONFIG_FILES([Makefile \
                  src/classes/PMusr.pc \
                  src/external/Makefile \
                  src/external/TLemRunHeader/Makefile \
-                 src/external/TLemRunHeader/TLemRunHeader.pc])
+                 src/external/TLemRunHeader/TLemRunHeader.pc \
+                 src/external/MuSR_software/Makefile \
+                 src/external/MuSR_software/Class_MuSR_PSI/Makefile \
+                 src/external/MuSR_software/Class_MuSR_PSI/Class_MuSR_PSI.pc])
 AC_OUTPUT

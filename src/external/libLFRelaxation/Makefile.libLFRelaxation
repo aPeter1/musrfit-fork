@@ -7,16 +7,16 @@ ROOTCFLAGS    = $(shell $(ROOTSYS)/bin/root-config --cflags)
 #---------------------------------------------------
 
 OS            = LINUX
-CXX           = g++
-CXXFLAGS      = -g -Wall -Wno-trigraphs -fPIC
+CXX           = g++-4.4.0
+CXXFLAGS      = -O3 -Wall -Wno-trigraphs -fPIC
 MUSRFITINCLUDE = ../../include
 #MUSRFITINCLUDE = /home/l_wojek/rep/analysis/musrfit/src/include
 LOCALINCLUDE  = .
-ROOTINCLUDE   = $(ROOTSYS)/include/root
+ROOTINCLUDE   = $(ROOTSYS)/include
 INCLUDES      = -I$(LOCALINCLUDE) -I$(MUSRFITINCLUDE) -I$(ROOTINCLUDE)
-LD            = g++
-LDFLAGS       = -g
-SOFLAGS       = -O -shared
+LD            = g++-4.4.0
+LDFLAGS       = -O3
+SOFLAGS       = -shared
 
 # the output from the root-config script:
 CXXFLAGS      += $(ROOTCFLAGS)

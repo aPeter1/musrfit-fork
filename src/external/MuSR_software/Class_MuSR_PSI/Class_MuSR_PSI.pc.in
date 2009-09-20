@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: Class_MuSR_PSI
+Description: C++ shared library providing the MuSR_td_PSI_bin class
+Version: @PSIBIN_VERSION@
+Libs: -L${libdir} -l@PSIBIN_LIBRARY_NAME@
+Cflags: -I${includedir}

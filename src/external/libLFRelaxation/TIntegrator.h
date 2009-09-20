@@ -90,4 +90,21 @@ inline double TIntSinGss::FuncAtX(double x) const
   return TMath::Sin(TMath::TwoPi()*fPar[0]*x) * TMath::Exp(-0.5*fPar[1]*fPar[1]*x*x);
 }
 
+// To be integrated: df/dE * E / sqrt(E^2+ Delta^2)
+
+class TGapIntegral : public TIntegrator {
+  public:
+    TGapIntegral() {}
+    ~TGapIntegral() {}
+    double FuncAtX(double) const; // parameter: E
+
+};
+
+inline double TGapIntegral::FuncAtX(double e) const
+{
+  double kt(0.08617384436*fPar[0]); // kB in meV/K
+  double expekt(TMath::Exp(e/kt));
+  return -expekt*e/(kt*(1.0+expekt)*TMath::Sqrt(e*e+fPar[1]*fPar[1]));
+}
+
 #endif //_TIntegrator_H_

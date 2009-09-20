@@ -93,12 +93,16 @@ GLIBS         = $(ROOTGLIBS)
 GSLLIB        = -lgslcblas -lgsl
 # Cuba lib
 CUBALIB       = -L/usr/local/lib -lcuba -lm
+# PMusr lib
+PMUSRLIB      = -L$(ROOTSYS)/lib -lPMusr
 
 ifeq ($(OS),WIN32GCC)
 # GSL lib
 GSLLIB        = -L/usr/lib -lgslcblas -lgsl
 # Cuba lib
 CUBALIB       = -L/usr/local/lib -lcuba -lm
+# PMusr lib
+PMUSRLIB      = -L$(ROOTSYS)/lib -lPMusr -lMathMore
 endif
 
 ifeq ($(OS),DARWIN)
@@ -106,6 +110,8 @@ ifeq ($(OS),DARWIN)
 GSLLIB        = -L/sw/lib -lgslcblas -lgsl
 # Cuba lib
 CUBALIB       = -L/sw/lib -lcuba -lm
+# PMusr lib
+PMUSRLIB      = -L$(ROOTSYS)/lib -lPMusr -lMathMore
 endif
 
 # some definitions: headers (used to generate *Dict* stuff), sources, objects,...
@@ -120,7 +126,7 @@ all:  $(SHLIB)
 $(SHLIB): $(OBJS)
 	@echo "---> Building shared library $(SHLIB) ..."
 	/bin/rm -f $(SHLIB)
-	$(LD) $(SOFLAGS) -o $(SHLIB) $(OBJS) $(LDFLAGS) $(LIBS) $(GSLLIB) $(CUBALIB)
+	$(LD) $(SOFLAGS) $(LDFLAGS) -o $(SHLIB) $(OBJS) $(LIBS) $(PMUSRLIB) $(GSLLIB) $(CUBALIB)
 	@echo "done"
 
 # clean up: remove all object file (and core files)
@@ -138,7 +144,7 @@ $(OBJS): %.o: %.cpp
 
 TGapIntegralsDict.cpp: ./TIntegrator.h ./TGapIntegrals.h ./TGapIntegralsLinkDef.h
 	@echo "Generating dictionary $@..."
-	rootcint -f $@ -c -p -I$(PMUSRPATH) $^
+	rootcint -f $@ -c -p $^
 
 install: all
 	@echo "Installing shared lib: $(SHLIB)"
