@@ -633,8 +633,8 @@ void MuSRFitform::TabChanged()
 void MuSRFitform::GoFit()
 {
     my %All=CreateAllInput();
+    musrfit_tabs->setCurrentPage(1);
     CallMSRCreate();
-#    musrfit_tabs->setCurrentTab(1);
     my $FILENAME=$All{"FILENAME"}.".msr";
     if (-e $FILENAME) {
 	my $cmd="musrfit -t $FILENAME";
@@ -674,6 +674,7 @@ void MuSRFitform::GoPlot()
 void MuSRFitform::ShowMuSRT0()
 {
     my %All=CreateAllInput();
+    musrfit_tabs->setCurrentPage(6);
 # Create MSR file and then run musrt0
     CallMSRCreate();
     my $FILENAME=$All{"FILENAME"}.".msr";

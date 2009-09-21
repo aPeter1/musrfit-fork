@@ -90,7 +90,12 @@ void Form1::filePrint()
 
 void Form1::fileExit()
 {
-    Qt::Application::exit( 0 );
+    my $Ans = Qt::MessageBox::question( this, "Quit?","Are you sure you want to quit?","&Yes","&No","",0,1);
+    if ($Ans==0) {
+# Then quit
+        Qt::Application::exit( 0 );
+    }
+# Otherwize go back
 }
 
 void Form1::parametersExport()

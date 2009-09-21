@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Fri Sep 18 17:04:19 2009
+# Created: Mon Sep 21 18:05:08 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -45,6 +45,15 @@ use Qt::slots
 use Qt::attributes qw(
     musrfit_tabs
     RUNSPage
+    RUNSAuto
+    RunNumbers
+    YEAR
+    YEARLabel
+    BeamLine
+    BeamLineLabel
+    RUNSMan
+    RunFiles
+    Browse
     groupBox7
     FitType2
     TfsLabel
@@ -62,15 +71,6 @@ use Qt::attributes qw(
     FitAsyType
     LRBFLabel
     LRBF
-    RUNSAuto
-    RunNumbers
-    YEAR
-    YEARLabel
-    BeamLine
-    BeamLineLabel
-    RUNSMan
-    RunFiles
-    Browse
     TabPage
     Minimization
     textLabel1_4
@@ -1580,8 +1580,60 @@ sub NEW
 
     RUNSPage = Qt::Widget(musrfit_tabs, "RUNSPage");
 
-    groupBox7 = Qt::GroupBox(RUNSPage, "groupBox7");
-    groupBox7->setGeometry( Qt::Rect(11, 100, 538, 164) );
+    my $LayoutWidget = Qt::Widget(RUNSPage, '$LayoutWidget');
+    $LayoutWidget->setGeometry( Qt::Rect(3, 3, 545, 95) );
+    my $layout43 = Qt::VBoxLayout($LayoutWidget, 5, 6, '$layout43');
+
+    RUNSAuto = Qt::GroupBox($LayoutWidget, "RUNSAuto");
+    RUNSAuto->setSizePolicy( Qt::SizePolicy(5, 7, 0, 0, RUNSAuto->sizePolicy()->hasHeightForWidth()) );
+    RUNSAuto->setMargin( int(5) );
+
+    RunNumbers = Qt::LineEdit(RUNSAuto, "RunNumbers");
+    RunNumbers->setGeometry( Qt::Rect(15, 25, 505, 26) );
+    RunNumbers->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, RunNumbers->sizePolicy()->hasHeightForWidth()) );
+    RunNumbers->setMinimumSize( Qt::Size(0, 23) );
+
+    YEAR = Qt::ComboBox(0, RUNSAuto, "YEAR");
+    YEAR->setGeometry( Qt::Rect(420, 55, 100, 26) );
+    YEAR->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, YEAR->sizePolicy()->hasHeightForWidth()) );
+    YEAR->setMinimumSize( Qt::Size(0, 20) );
+
+    YEARLabel = Qt::Label(RUNSAuto, "YEARLabel");
+    YEARLabel->setGeometry( Qt::Rect(361, 55, 55, 26) );
+    YEARLabel->setMinimumSize( Qt::Size(0, 20) );
+
+    BeamLine = Qt::ComboBox(0, RUNSAuto, "BeamLine");
+    BeamLine->setGeometry( Qt::Rect(232, 55, 100, 26) );
+    BeamLine->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, BeamLine->sizePolicy()->hasHeightForWidth()) );
+    BeamLine->setMinimumSize( Qt::Size(0, 20) );
+
+    BeamLineLabel = Qt::Label(RUNSAuto, "BeamLineLabel");
+    BeamLineLabel->setGeometry( Qt::Rect(127, 55, 99, 26) );
+    BeamLineLabel->setMinimumSize( Qt::Size(0, 20) );
+    $layout43->addWidget(RUNSAuto);
+
+    RUNSMan = Qt::GroupBox($LayoutWidget, "RUNSMan");
+    RUNSMan->setEnabled( 1 );
+    RUNSMan->setMargin( int(5) );
+
+    RunFiles = Qt::LineEdit(RUNSMan, "RunFiles");
+    RunFiles->setEnabled( 1 );
+    RunFiles->setGeometry( Qt::Rect(15, 25, 505, 26) );
+    RunFiles->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, RunFiles->sizePolicy()->hasHeightForWidth()) );
+    RunFiles->setMinimumSize( Qt::Size(0, 23) );
+
+    Browse = Qt::PushButton(RUNSMan, "Browse");
+    Browse->setEnabled( 1 );
+    Browse->setGeometry( Qt::Rect(420, 55, 100, 26) );
+    Browse->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, Browse->sizePolicy()->hasHeightForWidth()) );
+    Browse->setMinimumSize( Qt::Size(0, 20) );
+    $layout43->addWidget(RUNSMan);
+
+    my $LayoutWidget_2 = Qt::Widget(RUNSPage, '$LayoutWidget_2');
+    $LayoutWidget_2->setGeometry( Qt::Rect(3, 100, 545, 203) );
+    my $layout26 = Qt::VBoxLayout($LayoutWidget_2, 5, 6, '$layout26');
+
+    groupBox7 = Qt::GroupBox($LayoutWidget_2, "groupBox7");
     my $pal = Qt::Palette();
     my $cg = Qt::ColorGroup();
     $cg->setColor(&Qt::ColorGroup::Foreground, &black);
@@ -1643,21 +1695,21 @@ sub NEW
     groupBox7->setMargin( int(0) );
     groupBox7->setAlignment( int(&Qt::GroupBox::AlignTop) );
 
-    my $LayoutWidget = Qt::Widget(groupBox7, '$LayoutWidget');
-    $LayoutWidget->setGeometry( Qt::Rect(8, 21, 520, 125) );
-    my $layout42 = Qt::GridLayout($LayoutWidget, 1, 1, 5, 6, '$layout42');
+    my $LayoutWidget_3 = Qt::Widget(groupBox7, '$LayoutWidget_3');
+    $LayoutWidget_3->setGeometry( Qt::Rect(8, 21, 520, 125) );
+    my $layout42 = Qt::GridLayout($LayoutWidget_3, 1, 1, 5, 6, '$layout42');
 
-    FitType2 = Qt::ComboBox(0, $LayoutWidget, "FitType2");
+    FitType2 = Qt::ComboBox(0, $LayoutWidget_3, "FitType2");
     FitType2->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, FitType2->sizePolicy()->hasHeightForWidth()) );
 
     $layout42->addWidget(FitType2, 1, 1);
 
-    TfsLabel = Qt::Label($LayoutWidget, "TfsLabel");
+    TfsLabel = Qt::Label($LayoutWidget_3, "TfsLabel");
     TfsLabel->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, TfsLabel->sizePolicy()->hasHeightForWidth()) );
 
     $layout42->addWidget(TfsLabel, 2, 1);
 
-    FitType1 = Qt::ComboBox(0, $LayoutWidget, "FitType1");
+    FitType1 = Qt::ComboBox(0, $LayoutWidget_3, "FitType1");
     FitType1->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, FitType1->sizePolicy()->hasHeightForWidth()) );
     FitType1->setSizeLimit( int(20) );
     FitType1->setAutoCompletion( 0 );
@@ -1665,12 +1717,12 @@ sub NEW
 
     $layout42->addWidget(FitType1, 1, 0);
 
-    BINS = Qt::LineEdit($LayoutWidget, "BINS");
+    BINS = Qt::LineEdit($LayoutWidget_3, "BINS");
     BINS->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, BINS->sizePolicy()->hasHeightForWidth()) );
 
     $layout42->addWidget(BINS, 3, 2);
 
-    Comp3Label = Qt::Label($LayoutWidget, "Comp3Label");
+    Comp3Label = Qt::Label($LayoutWidget_3, "Comp3Label");
     $cg->setColor(&Qt::ColorGroup::Foreground, &black);
     $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
     $cg->setColor(&Qt::ColorGroup::Light, &white);
@@ -1726,17 +1778,17 @@ sub NEW
 
     $layout42->addWidget(Comp3Label, 0, 2);
 
-    Tis = Qt::LineEdit($LayoutWidget, "Tis");
+    Tis = Qt::LineEdit($LayoutWidget_3, "Tis");
     Tis->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, Tis->sizePolicy()->hasHeightForWidth()) );
 
     $layout42->addWidget(Tis, 3, 0);
 
-    Tfs = Qt::LineEdit($LayoutWidget, "Tfs");
+    Tfs = Qt::LineEdit($LayoutWidget_3, "Tfs");
     Tfs->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, Tfs->sizePolicy()->hasHeightForWidth()) );
 
     $layout42->addWidget(Tfs, 3, 1);
 
-    Comp1Label = Qt::Label($LayoutWidget, "Comp1Label");
+    Comp1Label = Qt::Label($LayoutWidget_3, "Comp1Label");
     $cg->setColor(&Qt::ColorGroup::Foreground, &black);
     $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
     $cg->setColor(&Qt::ColorGroup::Light, &white);
@@ -1792,22 +1844,22 @@ sub NEW
 
     $layout42->addWidget(Comp1Label, 0, 0);
 
-    BINSLabel = Qt::Label($LayoutWidget, "BINSLabel");
+    BINSLabel = Qt::Label($LayoutWidget_3, "BINSLabel");
     BINSLabel->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, BINSLabel->sizePolicy()->hasHeightForWidth()) );
 
     $layout42->addWidget(BINSLabel, 2, 2);
 
-    TisLabel = Qt::Label($LayoutWidget, "TisLabel");
+    TisLabel = Qt::Label($LayoutWidget_3, "TisLabel");
     TisLabel->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, TisLabel->sizePolicy()->hasHeightForWidth()) );
 
     $layout42->addWidget(TisLabel, 2, 0);
 
-    FitType3 = Qt::ComboBox(0, $LayoutWidget, "FitType3");
+    FitType3 = Qt::ComboBox(0, $LayoutWidget_3, "FitType3");
     FitType3->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, FitType3->sizePolicy()->hasHeightForWidth()) );
 
     $layout42->addWidget(FitType3, 1, 2);
 
-    Comp2Label = Qt::Label($LayoutWidget, "Comp2Label");
+    Comp2Label = Qt::Label($LayoutWidget_3, "Comp2Label");
     $cg->setColor(&Qt::ColorGroup::Foreground, &black);
     $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
     $cg->setColor(&Qt::ColorGroup::Light, &white);
@@ -1862,10 +1914,9 @@ sub NEW
     Comp2Label->setPalette( $pal );
 
     $layout42->addWidget(Comp2Label, 0, 1);
+    $layout26->addWidget(groupBox7);
 
-    my $LayoutWidget_2 = Qt::Widget(RUNSPage, '$LayoutWidget_2');
-    $LayoutWidget_2->setGeometry( Qt::Rect(21, 265, 515, 40) );
-    my $layout23 = Qt::HBoxLayout($LayoutWidget_2, 0, 3, '$layout23');
+    my $layout23 = Qt::HBoxLayout(undef, 0, 3, '$layout23');
 
     FitAsyTypeLabel = Qt::Label($LayoutWidget_2, "FitAsyTypeLabel");
     FitAsyTypeLabel->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, FitAsyTypeLabel->sizePolicy()->hasHeightForWidth()) );
@@ -1882,55 +1933,7 @@ sub NEW
     LRBF = Qt::LineEdit($LayoutWidget_2, "LRBF");
     LRBF->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, LRBF->sizePolicy()->hasHeightForWidth()) );
     $layout23->addWidget(LRBF);
-
-    my $LayoutWidget_3 = Qt::Widget(RUNSPage, '$LayoutWidget_3');
-    $LayoutWidget_3->setGeometry( Qt::Rect(4, 3, 545, 95) );
-    my $layout43 = Qt::VBoxLayout($LayoutWidget_3, 5, 6, '$layout43');
-
-    RUNSAuto = Qt::GroupBox($LayoutWidget_3, "RUNSAuto");
-    RUNSAuto->setSizePolicy( Qt::SizePolicy(5, 7, 0, 0, RUNSAuto->sizePolicy()->hasHeightForWidth()) );
-    RUNSAuto->setMargin( int(5) );
-
-    RunNumbers = Qt::LineEdit(RUNSAuto, "RunNumbers");
-    RunNumbers->setGeometry( Qt::Rect(15, 25, 505, 26) );
-    RunNumbers->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, RunNumbers->sizePolicy()->hasHeightForWidth()) );
-    RunNumbers->setMinimumSize( Qt::Size(0, 23) );
-
-    YEAR = Qt::ComboBox(0, RUNSAuto, "YEAR");
-    YEAR->setGeometry( Qt::Rect(420, 55, 100, 26) );
-    YEAR->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, YEAR->sizePolicy()->hasHeightForWidth()) );
-    YEAR->setMinimumSize( Qt::Size(0, 20) );
-
-    YEARLabel = Qt::Label(RUNSAuto, "YEARLabel");
-    YEARLabel->setGeometry( Qt::Rect(361, 55, 55, 26) );
-    YEARLabel->setMinimumSize( Qt::Size(0, 20) );
-
-    BeamLine = Qt::ComboBox(0, RUNSAuto, "BeamLine");
-    BeamLine->setGeometry( Qt::Rect(232, 55, 100, 26) );
-    BeamLine->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, BeamLine->sizePolicy()->hasHeightForWidth()) );
-    BeamLine->setMinimumSize( Qt::Size(0, 20) );
-
-    BeamLineLabel = Qt::Label(RUNSAuto, "BeamLineLabel");
-    BeamLineLabel->setGeometry( Qt::Rect(127, 55, 99, 26) );
-    BeamLineLabel->setMinimumSize( Qt::Size(0, 20) );
-    $layout43->addWidget(RUNSAuto);
-
-    RUNSMan = Qt::GroupBox($LayoutWidget_3, "RUNSMan");
-    RUNSMan->setEnabled( 1 );
-    RUNSMan->setMargin( int(5) );
-
-    RunFiles = Qt::LineEdit(RUNSMan, "RunFiles");
-    RunFiles->setEnabled( 1 );
-    RunFiles->setGeometry( Qt::Rect(15, 25, 505, 26) );
-    RunFiles->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, RunFiles->sizePolicy()->hasHeightForWidth()) );
-    RunFiles->setMinimumSize( Qt::Size(0, 23) );
-
-    Browse = Qt::PushButton(RUNSMan, "Browse");
-    Browse->setEnabled( 1 );
-    Browse->setGeometry( Qt::Rect(420, 55, 100, 26) );
-    Browse->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, Browse->sizePolicy()->hasHeightForWidth()) );
-    Browse->setMinimumSize( Qt::Size(0, 20) );
-    $layout43->addWidget(RUNSMan);
+    $layout26->addLayout($layout23);
     musrfit_tabs->insertTab( RUNSPage, "" );
 
     TabPage = Qt::Widget(musrfit_tabs, "TabPage");
@@ -2234,17 +2237,17 @@ sub NEW
     $LayoutWidget_10->setGeometry( Qt::Rect(5, 5, 545, 94) );
     my $layout33_2 = Qt::HBoxLayout($LayoutWidget_10, 11, 6, '$layout33_2');
 
-    my $layout26 = Qt::VBoxLayout(undef, 0, 6, '$layout26');
+    my $layout26_2 = Qt::VBoxLayout(undef, 0, 6, '$layout26_2');
 
     FUnitsLabel = Qt::Label($LayoutWidget_10, "FUnitsLabel");
-    $layout26->addWidget(FUnitsLabel);
+    $layout26_2->addWidget(FUnitsLabel);
 
     FApodizationLabel = Qt::Label($LayoutWidget_10, "FApodizationLabel");
-    $layout26->addWidget(FApodizationLabel);
+    $layout26_2->addWidget(FApodizationLabel);
 
     FPlotLabel = Qt::Label($LayoutWidget_10, "FPlotLabel");
-    $layout26->addWidget(FPlotLabel);
-    $layout33_2->addLayout($layout26);
+    $layout26_2->addWidget(FPlotLabel);
+    $layout33_2->addLayout($layout26_2);
 
     my $layout27 = Qt::VBoxLayout(undef, 0, 6, '$layout27');
 
@@ -2680,6 +2683,29 @@ sub languageChange
 {
     setCaption(trUtf8("MuSRFit GUI") );
     setIconText(trUtf8("MuSRFitGUI") );
+    RUNSAuto->setTitle( trUtf8("RUN Numbers") );
+    Qt::ToolTip::add(RunNumbers, trUtf8("Numbers of RUNs to fit. Multiple runs are comma separated."));
+    Qt::WhatsThis::add(RunNumbers, trUtf8("Numbers of RUNs to fit. Multiple runs are comma separated."));
+    YEAR->clear();
+    YEAR->insertItem( trUtf8("2009") );
+    YEAR->insertItem( trUtf8("2008") );
+    YEAR->insertItem( trUtf8("2007") );
+    YEAR->insertItem( trUtf8("2006") );
+    YEAR->insertItem( trUtf8("2005") );
+    YEAR->insertItem( trUtf8("2004") );
+    YEARLabel->setText( trUtf8("Year") );
+    BeamLine->clear();
+    BeamLine->insertItem( trUtf8("LEM") );
+    BeamLine->insertItem( trUtf8("GPS") );
+    BeamLine->insertItem( trUtf8("Dolly") );
+    BeamLine->insertItem( trUtf8("LTF") );
+    BeamLineLabel->setText( trUtf8("On beam line") );
+    RUNSMan->setTitle( trUtf8("RUN Files") );
+    Qt::ToolTip::add(RunFiles, trUtf8("Names of data files to be fit. Multiple data files are comma separated."));
+    Qt::WhatsThis::add(RunFiles, trUtf8("Names of data files to be fit. Multiple data files are comma separated."));
+    Browse->setText( trUtf8("Browse") );
+    Qt::ToolTip::add(Browse, trUtf8("Browse to select data files for fitting."));
+    Qt::WhatsThis::add(Browse, trUtf8("Browse to select data files for fitting."));
     groupBox7->setTitle( trUtf8("Theory Function") );
     FitType2->clear();
     FitType2->insertItem( trUtf8("Exponential") );
@@ -2746,29 +2772,6 @@ sub languageChange
     FitAsyType->insertItem( trUtf8("SingleHist") );
     LRBFLabel->setText( trUtf8("Histograms list") );
     LRBF->setText( trUtf8("1,3") );
-    RUNSAuto->setTitle( trUtf8("RUN Numbers") );
-    Qt::ToolTip::add(RunNumbers, trUtf8("Numbers of RUNs to fit. Multiple runs are comma separated."));
-    Qt::WhatsThis::add(RunNumbers, trUtf8("Numbers of RUNs to fit. Multiple runs are comma separated."));
-    YEAR->clear();
-    YEAR->insertItem( trUtf8("2009") );
-    YEAR->insertItem( trUtf8("2008") );
-    YEAR->insertItem( trUtf8("2007") );
-    YEAR->insertItem( trUtf8("2006") );
-    YEAR->insertItem( trUtf8("2005") );
-    YEAR->insertItem( trUtf8("2004") );
-    YEARLabel->setText( trUtf8("Year") );
-    BeamLine->clear();
-    BeamLine->insertItem( trUtf8("LEM") );
-    BeamLine->insertItem( trUtf8("GPS") );
-    BeamLine->insertItem( trUtf8("Dolly") );
-    BeamLine->insertItem( trUtf8("LTF") );
-    BeamLineLabel->setText( trUtf8("On beam line") );
-    RUNSMan->setTitle( trUtf8("RUN Files") );
-    Qt::ToolTip::add(RunFiles, trUtf8("Names of data files to be fit. Multiple data files are comma separated."));
-    Qt::WhatsThis::add(RunFiles, trUtf8("Names of data files to be fit. Multiple data files are comma separated."));
-    Browse->setText( trUtf8("Browse") );
-    Qt::ToolTip::add(Browse, trUtf8("Browse to select data files for fitting."));
-    Qt::WhatsThis::add(Browse, trUtf8("Browse to select data files for fitting."));
     musrfit_tabs->changeTab( RUNSPage, trUtf8("RUNS") );
     Minimization->clear();
     Minimization->insertItem( trUtf8("MINIMIZE") );
@@ -3020,7 +3023,12 @@ sub filePrint
 sub fileExit
 {
 
-    Qt::Application::exit( 0 );
+    my $Ans = Qt::MessageBox::question( this, "Quit?","Are you sure you want to quit?","&Yes","&No","",0,1);
+    if ($Ans==0) {
+# Then quit
+        Qt::Application::exit( 0 );
+    }
+# Otherwize go back
 
 }
 
