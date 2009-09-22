@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Tue Sep 22 10:33:24 2009
+# Created: Tue Sep 22 11:42:50 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -185,8 +185,8 @@ use Qt::attributes qw(
     Edit
     Options
     helpMenu
-    toolBar
-    Toolbar
+    FileToolBar
+    ActionsToolBar
     fileNewAction
     fileOpenAction
     fileSaveAction
@@ -2502,20 +2502,20 @@ sub NEW
     T0->setIconSet( Qt::IconSet($image19) );
 
 
-    toolBar = Qt::ToolBar("", this, &DockTop);
+    FileToolBar = Qt::ToolBar("", this, &DockTop);
 
-    fileOpenAction->addTo(toolBar);
-    fileExitAction->addTo(toolBar);
-    fileChangeDirAction->addTo(toolBar);
-    fileSaveAction->addTo(toolBar);
-    filePrintAction->addTo(toolBar);
-    Toolbar = Qt::ToolBar("", this, &DockTop);
+    fileOpenAction->addTo(FileToolBar);
+    fileExitAction->addTo(FileToolBar);
+    fileChangeDirAction->addTo(FileToolBar);
+    fileSaveAction->addTo(FileToolBar);
+    filePrintAction->addTo(FileToolBar);
+    ActionsToolBar = Qt::ToolBar("", this, &DockTop);
 
-    Fit->addTo(Toolbar);
-    Plot->addTo(Toolbar);
-    T0->addTo(Toolbar);
-    parametersExport_AsAction->addTo(Toolbar);
-    parametersAppend_ToAction->addTo(Toolbar);
+    Fit->addTo(ActionsToolBar);
+    Plot->addTo(ActionsToolBar);
+    T0->addTo(ActionsToolBar);
+    parametersExport_AsAction->addTo(ActionsToolBar);
+    parametersAppend_ToAction->addTo(ActionsToolBar);
 
 
     MenuBar= Qt::MenuBar( this, "MenuBar");
@@ -2945,8 +2945,8 @@ sub languageChange
     Plot->setAccel( Qt::KeySequence( trUtf8("Ctrl+P") ) );
     T0->setText( trUtf8("Show t0 and Bg Bins") );
     T0->setAccel( Qt::KeySequence( trUtf8("Ctrl+T") ) );
-    toolBar->setLabel( trUtf8("Tools") );
-    Toolbar->setLabel( trUtf8("Toolbar") );
+    FileToolBar->setLabel( trUtf8("File Menu") );
+    ActionsToolBar->setLabel( trUtf8("Actions Menu") );
     MenuBar->findItem( 2 )->setText( trUtf8("&File") );
     MenuBar->findItem( 3 )->setText( trUtf8("Actions") );
     MenuBar->findItem( 4 )->setText( trUtf8("Parameters") );

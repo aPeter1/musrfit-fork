@@ -3712,10 +3712,10 @@
 <toolbars>
     <toolbar dock="2">
         <property name="name">
-            <cstring>toolBar</cstring>
+            <cstring>FileToolBar</cstring>
         </property>
         <property name="label">
-            <string>Tools</string>
+            <string>File Menu</string>
         </property>
         <action name="fileOpenAction"/>
         <action name="fileExitAction"/>
@@ -3725,10 +3725,10 @@
     </toolbar>
     <toolbar dock="2">
         <property name="name">
-            <cstring>Toolbar</cstring>
+            <cstring>ActionsToolBar</cstring>
         </property>
         <property name="label">
-            <string>Toolbar</string>
+            <string>Actions Menu</string>
         </property>
         <action name="Fit"/>
         <action name="Plot"/>
