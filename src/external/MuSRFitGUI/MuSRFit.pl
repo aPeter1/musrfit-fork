@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Tue Sep 22 11:42:50 2009
+# Created: Tue Sep 22 16:07:47 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -46,11 +46,11 @@ use Qt::attributes qw(
     musrfit_tabs
     RUNSPage
     RUNSAuto
-    RunNumbers
-    YEAR
     YEARLabel
     BeamLine
     BeamLineLabel
+    YEAR
+    RunNumbers
     RUNSMan
     RunFiles
     Browse
@@ -1588,16 +1588,6 @@ sub NEW
     RUNSAuto->setSizePolicy( Qt::SizePolicy(5, 7, 0, 0, RUNSAuto->sizePolicy()->hasHeightForWidth()) );
     RUNSAuto->setMargin( int(5) );
 
-    RunNumbers = Qt::LineEdit(RUNSAuto, "RunNumbers");
-    RunNumbers->setGeometry( Qt::Rect(15, 25, 505, 26) );
-    RunNumbers->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, RunNumbers->sizePolicy()->hasHeightForWidth()) );
-    RunNumbers->setMinimumSize( Qt::Size(0, 23) );
-
-    YEAR = Qt::ComboBox(0, RUNSAuto, "YEAR");
-    YEAR->setGeometry( Qt::Rect(420, 55, 100, 26) );
-    YEAR->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, YEAR->sizePolicy()->hasHeightForWidth()) );
-    YEAR->setMinimumSize( Qt::Size(0, 20) );
-
     YEARLabel = Qt::Label(RUNSAuto, "YEARLabel");
     YEARLabel->setGeometry( Qt::Rect(361, 55, 55, 26) );
     YEARLabel->setMinimumSize( Qt::Size(0, 20) );
@@ -1610,6 +1600,16 @@ sub NEW
     BeamLineLabel = Qt::Label(RUNSAuto, "BeamLineLabel");
     BeamLineLabel->setGeometry( Qt::Rect(127, 55, 99, 26) );
     BeamLineLabel->setMinimumSize( Qt::Size(0, 20) );
+
+    YEAR = Qt::ComboBox(0, RUNSAuto, "YEAR");
+    YEAR->setGeometry( Qt::Rect(420, 55, 100, 26) );
+    YEAR->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, YEAR->sizePolicy()->hasHeightForWidth()) );
+    YEAR->setMinimumSize( Qt::Size(0, 20) );
+
+    RunNumbers = Qt::LineEdit(RUNSAuto, "RunNumbers");
+    RunNumbers->setGeometry( Qt::Rect(15, 25, 505, 26) );
+    RunNumbers->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, RunNumbers->sizePolicy()->hasHeightForWidth()) );
+    RunNumbers->setMinimumSize( Qt::Size(0, 23) );
     $layout43->addWidget(RUNSAuto);
 
     RUNSMan = Qt::GroupBox($LayoutWidget, "RUNSMan");
@@ -2483,7 +2483,7 @@ sub NEW
     separatorAction= Qt::Action(this, "separatorAction");
     FileExistCheck= Qt::Action(this, "FileExistCheck");
     FileExistCheck->setToggleAction( 1 );
-    FileExistCheck->setOn( 1 );
+    FileExistCheck->setOn( 0 );
     ManualFile= Qt::Action(this, "ManualFile");
     ManualFile->setToggleAction( 1 );
     fileChangeDirAction= Qt::Action(this, "fileChangeDirAction");
@@ -2684,15 +2684,6 @@ sub languageChange
     setCaption(trUtf8("MuSRFit GUI") );
     setIconText(trUtf8("MuSRFitGUI") );
     RUNSAuto->setTitle( trUtf8("RUN Numbers") );
-    Qt::ToolTip::add(RunNumbers, trUtf8("Numbers of RUNs to fit. Multiple runs are comma separated."));
-    Qt::WhatsThis::add(RunNumbers, trUtf8("Numbers of RUNs to fit. Multiple runs are comma separated."));
-    YEAR->clear();
-    YEAR->insertItem( trUtf8("2009") );
-    YEAR->insertItem( trUtf8("2008") );
-    YEAR->insertItem( trUtf8("2007") );
-    YEAR->insertItem( trUtf8("2006") );
-    YEAR->insertItem( trUtf8("2005") );
-    YEAR->insertItem( trUtf8("2004") );
     YEARLabel->setText( trUtf8("Year") );
     BeamLine->clear();
     BeamLine->insertItem( trUtf8("LEM") );
@@ -2700,6 +2691,15 @@ sub languageChange
     BeamLine->insertItem( trUtf8("Dolly") );
     BeamLine->insertItem( trUtf8("LTF") );
     BeamLineLabel->setText( trUtf8("On beam line") );
+    YEAR->clear();
+    YEAR->insertItem( trUtf8("2009") );
+    YEAR->insertItem( trUtf8("2008") );
+    YEAR->insertItem( trUtf8("2007") );
+    YEAR->insertItem( trUtf8("2006") );
+    YEAR->insertItem( trUtf8("2005") );
+    YEAR->insertItem( trUtf8("2004") );
+    Qt::ToolTip::add(RunNumbers, trUtf8("Numbers of RUNs to fit. Multiple runs are comma separated."));
+    Qt::WhatsThis::add(RunNumbers, trUtf8("Numbers of RUNs to fit. Multiple runs are comma separated."));
     RUNSMan->setTitle( trUtf8("RUN Files") );
     Qt::ToolTip::add(RunFiles, trUtf8("Names of data files to be fit. Multiple data files are comma separated."));
     Qt::WhatsThis::add(RunFiles, trUtf8("Names of data files to be fit. Multiple data files are comma separated."));
@@ -3026,7 +3026,7 @@ sub fileExit
     my $Ans = Qt::MessageBox::question( this, "Quit?","Are you sure you want to quit?","&Yes","&No","",0,1);
     if ($Ans==0) {
 # Then quit
-        Qt::Application::exit( 0 );
+	Qt::Application::exit( 0 );
     }
 # Otherwize go back
 
@@ -3145,7 +3145,7 @@ sub helpAbout
 sub CreateAllInput
 {
 
-# TODO: Need to deliver shared parameters also
+# TODO: Need to automatically generage years list depending on beamline
     my %All=();
 # From RUNS Tab    
     $All{"TITLE"}= TITLE->text;
@@ -3172,7 +3172,7 @@ sub CreateAllInput
     elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
 	ltc->setHidden(0);
     }
-
+    
     if (ltc->isChecked()) {
 	$All{"ltc"}="y";
     } else {
@@ -3347,15 +3347,37 @@ sub CallMSRCreate
 
     use MSR;
     my %All=CreateAllInput();
+    
+# Check if the option for checking for existing files is selected    
+    my $FileExistCheck= FileExistCheck->isOn();
+    my $FILENAME=$All{"FILENAME"}.".msr";
+    my $Answer=0;
     if ($All{"RunNumbers"} ne ""  || $All{"RunFiles"} ne "") {
-	if ( $All{"FitAsyType"} eq "Asymmetry" ) {
-	    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
+	if ( $FileExistCheck==1 ) {
+	    if (-e $FILENAME) {
+# Warning: MSR file exists
+#		my $Warning = "Warning: MSR file $FILENAME Already exists!\nIf you continue it will overwriten.";
+		my $Warning = "Warning: MSR file $FILENAME Already exists!\nDo you want to overwrite it?";
+#		my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
+# $Answer =1,0 for yes and no
+		$Answer= Qt::MessageBox::warning( this, "Warning",$Warning, "&No", "&Yes", undef, 1,1);
+	    }
+	} else {
+# Just overwrite file
+	    $Answer=1;
 	}
-	elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
-	    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSRSingleHist(\%All);
+	
+	if ($Answer) {
+	    if ( $All{"FitAsyType"} eq "Asymmetry" ) {
+		my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
+	    }
+	    elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
+		my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSRSingleHist(\%All);
+	    }
+	    UpdateMSRFileInitTable();
 	}
-	UpdateMSRFileInitTable();
     }
+    return $Answer;
 
 }
 
@@ -3534,7 +3556,7 @@ sub InitializeTab
     my $NParam=scalar keys( %PTable );
     if ($NParam>$NRows) {	
 	InitParamTable->setNumRows($NParam);
-  }
+    }
     
 # Fill the table with labels and values of parametr 
     for (my $PCount=0;$PCount<$NParam;$PCount++) {
@@ -3556,23 +3578,7 @@ sub TabChanged
 {
 
 # TODO: First check if there are some runs given, otherwise disbale
-# TODO: Check if the MSR file exists and decide whether to use it or not
     my %All=CreateAllInput();
-    
-    my $SlectedTab = musrfit_tabs->currentPageIndex;
-# Check if the option for checking for existing files is selected    
-    my $FileExistCheck= FileExistCheck->isOn();
-    my $FILENAME=$All{"FILENAME"}.".msr";
-    if ($All{"RunNumbers"} ne "" && $SlectedTab==4 && $FileExistCheck==1) {
-	if (-e $FILENAME) {
-# Warning: MSR file exists
-	    my $Warning = "Warning: MSR file $FILENAME Already exists!\nIf you continue it will overwriten.";
-	    my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
-#	    my $Answer= Qt::MessageBox::warning( this, "Warning",$Warning, "&No", "&Yes", undef, 1,1);
-# $Answer =1,0 for yes and no
-#	    print "Answer=$Answer\n";
-	}
-    }
     
 # First make sure we have sharing initialized    
     ActivateShComp();
@@ -3588,24 +3594,26 @@ sub GoFit
 
     my %All=CreateAllInput();
     musrfit_tabs->setCurrentPage(1);
-    CallMSRCreate();
-    my $FILENAME=$All{"FILENAME"}.".msr";
-    if (-e $FILENAME) {
-	my $cmd="musrfit -t $FILENAME";
-	my $pid = open(FTO,"$cmd 2>&1 |");
-	while (<FTO>) {
-	    FitTextOutput->append("$_");
-#		print "line= ".$_;
+    my $Answer=CallMSRCreate();
+    if ($Answer) {
+	my $FILENAME=$All{"FILENAME"}.".msr";
+	if (-e $FILENAME) {
+	    my $cmd="musrfit -t $FILENAME";
+	    my $pid = open(FTO,"$cmd 2>&1 |");
+	    while (<FTO>) {
+		FitTextOutput->append("$_");
+	    }
+	    close(FTO);
+	    $cmd="musrview $FILENAME &";
+	    $pid = system($cmd);
+	} else {
+	    FitTextOutput->append("Cannot find MSR file!");
 	}
-	close(FTO);
-	$cmd="musrview $FILENAME &";
-	$pid = system($cmd);
-    } else {
-	FitTextOutput->append("Cannot find MSR file!");
-    }
-    FitTextOutput->append("-----------------------------------------------------------------------------------------------------------------------------");
+	FitTextOutput->append("-----------------------------------------------------------------------------------------------------------------------------");
 # update MSR File tab and initialization table
-    UpdateMSRFileInitTable();
+	UpdateMSRFileInitTable();
+    }
+	
     return;
 
 }
@@ -3614,14 +3622,17 @@ sub GoPlot
 {
 
     my %All=CreateAllInput();
-    CallMSRCreate();
+    my $Answer=CallMSRCreate();
     my $FILENAME=$All{"FILENAME"}.".msr";
-    if (-e $FILENAME) {
-	my $cmd="musrview $FILENAME &";
-	my $pid = system($cmd);
-    } else {
-	FitTextOutput->append("Cannot find MSR file!");
-	FitTextOutput->append("-----------------------------------------------------------------------------------------------------------------------------");
+    
+    if ($Answer) {
+	if (-e $FILENAME) {
+	    my $cmd="musrview $FILENAME &";
+	    my $pid = system($cmd);
+	} else {
+	    FitTextOutput->append("Cannot find MSR file!");
+	    FitTextOutput->append("-----------------------------------------------------------------------------------------------------------------------------");
+	}
     }
     return;
 
@@ -3633,13 +3644,16 @@ sub ShowMuSRT0
     my %All=CreateAllInput();
     musrfit_tabs->setCurrentPage(6);
 # Create MSR file and then run musrt0
-    CallMSRCreate();
-    my $FILENAME=$All{"FILENAME"}.".msr";
-    if (-e $FILENAME) {
-	my $cmd="musrt0 $FILENAME &";
-	my $pid = system($cmd);
-    } else {
-	print STDERR "Cannot find MSR file!\n";
+    my $Answer=CallMSRCreate();
+    
+    if ($Answer) {
+	my $FILENAME=$All{"FILENAME"}.".msr";
+	if (-e $FILENAME) {
+	    my $cmd="musrt0 $FILENAME &";
+	    my $pid = system($cmd);
+	} else {
+	    print STDERR "Cannot find MSR file!\n";
+	}
     }
     return;
 

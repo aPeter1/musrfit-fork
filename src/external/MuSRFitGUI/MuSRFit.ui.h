@@ -93,7 +93,7 @@ void Form1::fileExit()
     my $Ans = Qt::MessageBox::question( this, "Quit?","Are you sure you want to quit?","&Yes","&No","",0,1);
     if ($Ans==0) {
 # Then quit
-        Qt::Application::exit( 0 );
+	Qt::Application::exit( 0 );
     }
 # Otherwize go back
 }
@@ -212,7 +212,7 @@ void Form1::helpAbout()
 
 void MuSRFitform::CreateAllInput()
 {
-# TODO: Need to deliver shared parameters also
+# TODO: Need to automatically generage years list depending on beamline
     my %All=();
 # From RUNS Tab    
     $All{"TITLE"}= TITLE->text;
@@ -239,7 +239,7 @@ void MuSRFitform::CreateAllInput()
     elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
 	ltc->setHidden(0);
     }
-
+    
     if (ltc->isChecked()) {
 	$All{"ltc"}="y";
     } else {
@@ -412,15 +412,37 @@ void MuSRFitform::CallMSRCreate()
 {
     use MSR;
     my %All=CreateAllInput();
+    
+# Check if the option for checking for existing files is selected    
+    my $FileExistCheck= FileExistCheck->isOn();
+    my $FILENAME=$All{"FILENAME"}.".msr";
+    my $Answer=0;
     if ($All{"RunNumbers"} ne ""  || $All{"RunFiles"} ne "") {
-	if ( $All{"FitAsyType"} eq "Asymmetry" ) {
-	    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
+	if ( $FileExistCheck==1 ) {
+	    if (-e $FILENAME) {
+# Warning: MSR file exists
+#		my $Warning = "Warning: MSR file $FILENAME Already exists!\nIf you continue it will overwriten.";
+		my $Warning = "Warning: MSR file $FILENAME Already exists!\nDo you want to overwrite it?";
+#		my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
+# $Answer =1,0 for yes and no
+		$Answer= Qt::MessageBox::warning( this, "Warning",$Warning, "&No", "&Yes", undef, 1,1);
+	    }
+	} else {
+# Just overwrite file
+	    $Answer=1;
 	}
-	elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
-	    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSRSingleHist(\%All);
+	
+	if ($Answer) {
+	    if ( $All{"FitAsyType"} eq "Asymmetry" ) {
+		my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
+	    }
+	    elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
+		my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSRSingleHist(\%All);
+	    }
+	    UpdateMSRFileInitTable();
 	}
-	UpdateMSRFileInitTable();
     }
+    return $Answer;
 }
 
 void MuSRFitform::UpdateMSRFileInitTable()
@@ -591,7 +613,7 @@ void MuSRFitform::InitializeTab()
     my $NParam=scalar keys( %PTable );
     if ($NParam>$NRows) {	
 	InitParamTable->setNumRows($NParam);
-  }
+    }
     
 # Fill the table with labels and values of parametr 
     for (my $PCount=0;$PCount<$NParam;$PCount++) {
@@ -611,23 +633,7 @@ void MuSRFitform::InitializeTab()
 void MuSRFitform::TabChanged()
 {
 # TODO: First check if there are some runs given, otherwise disbale
-# TODO: Check if the MSR file exists and decide whether to use it or not
     my %All=CreateAllInput();
-    
-    my $SlectedTab = musrfit_tabs->currentPageIndex;
-# Check if the option for checking for existing files is selected    
-    my $FileExistCheck= FileExistCheck->isOn();
-    my $FILENAME=$All{"FILENAME"}.".msr";
-    if ($All{"RunNumbers"} ne "" && $SlectedTab==4 && $FileExistCheck==1) {
-	if (-e $FILENAME) {
-# Warning: MSR file exists
-	    my $Warning = "Warning: MSR file $FILENAME Already exists!\nIf you continue it will overwriten.";
-	    my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
-#	    my $Answer= Qt::MessageBox::warning( this, "Warning",$Warning, "&No", "&Yes", undef, 1,1);
-# $Answer =1,0 for yes and no
-#	    print "Answer=$Answer\n";
-	}
-    }
     
 # First make sure we have sharing initialized    
     ActivateShComp();
@@ -642,38 +648,43 @@ void MuSRFitform::GoFit()
 {
     my %All=CreateAllInput();
     musrfit_tabs->setCurrentPage(1);
-    CallMSRCreate();
-    my $FILENAME=$All{"FILENAME"}.".msr";
-    if (-e $FILENAME) {
-	my $cmd="musrfit -t $FILENAME";
-	my $pid = open(FTO,"$cmd 2>&1 |");
-	while (<FTO>) {
-	    FitTextOutput->append("$_");
-#		print "line= ".$_;
+    my $Answer=CallMSRCreate();
+    if ($Answer) {
+	my $FILENAME=$All{"FILENAME"}.".msr";
+	if (-e $FILENAME) {
+	    my $cmd="musrfit -t $FILENAME";
+	    my $pid = open(FTO,"$cmd 2>&1 |");
+	    while (<FTO>) {
+		FitTextOutput->append("$_");
+	    }
+	    close(FTO);
+	    $cmd="musrview $FILENAME &";
+	    $pid = system($cmd);
+	} else {
+	    FitTextOutput->append("Cannot find MSR file!");
 	}
-	close(FTO);
-	$cmd="musrview $FILENAME &";
-	$pid = system($cmd);
-    } else {
-	FitTextOutput->append("Cannot find MSR file!");
-    }
-    FitTextOutput->append("-----------------------------------------------------------------------------------------------------------------------------");
+	FitTextOutput->append("-----------------------------------------------------------------------------------------------------------------------------");
 # update MSR File tab and initialization table
-    UpdateMSRFileInitTable();
+	UpdateMSRFileInitTable();
+    }
+	
     return;
 }
 
 void MuSRFitform::GoPlot()
 {
     my %All=CreateAllInput();
-    CallMSRCreate();
+    my $Answer=CallMSRCreate();
     my $FILENAME=$All{"FILENAME"}.".msr";
-    if (-e $FILENAME) {
-	my $cmd="musrview $FILENAME &";
-	my $pid = system($cmd);
-    } else {
-	FitTextOutput->append("Cannot find MSR file!");
-	FitTextOutput->append("-----------------------------------------------------------------------------------------------------------------------------");
+    
+    if ($Answer) {
+	if (-e $FILENAME) {
+	    my $cmd="musrview $FILENAME &";
+	    my $pid = system($cmd);
+	} else {
+	    FitTextOutput->append("Cannot find MSR file!");
+	    FitTextOutput->append("-----------------------------------------------------------------------------------------------------------------------------");
+	}
     }
     return;
 }
@@ -684,13 +695,16 @@ void MuSRFitform::ShowMuSRT0()
     my %All=CreateAllInput();
     musrfit_tabs->setCurrentPage(6);
 # Create MSR file and then run musrt0
-    CallMSRCreate();
-    my $FILENAME=$All{"FILENAME"}.".msr";
-    if (-e $FILENAME) {
-	my $cmd="musrt0 $FILENAME &";
-	my $pid = system($cmd);
-    } else {
-	print STDERR "Cannot find MSR file!\n";
+    my $Answer=CallMSRCreate();
+    
+    if ($Answer) {
+	my $FILENAME=$All{"FILENAME"}.".msr";
+	if (-e $FILENAME) {
+	    my $cmd="musrt0 $FILENAME &";
+	    my $pid = system($cmd);
+	} else {
+	    print STDERR "Cannot find MSR file!\n";
+	}
     }
     return;
 }

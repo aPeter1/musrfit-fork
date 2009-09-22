@@ -114,96 +114,6 @@
                         <property name="title">
                             <string>RUN Numbers</string>
                         </property>
-                        <widget class="QLineEdit">
-                            <property name="name">
-                                <cstring>RunNumbers</cstring>
-                            </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>15</x>
-                                    <y>25</y>
-                                    <width>505</width>
-                                    <height>26</height>
-                                </rect>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>0</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="minimumSize">
-                                <size>
-                                    <width>0</width>
-                                    <height>23</height>
-                                </size>
-                            </property>
-                            <property name="toolTip" stdset="0">
-                                <string>Numbers of RUNs to fit. Multiple runs are comma separated.</string>
-                            </property>
-                            <property name="whatsThis" stdset="0">
-                                <string>Numbers of RUNs to fit. Multiple runs are comma separated.</string>
-                            </property>
-                        </widget>
-                        <widget class="QComboBox">
-                            <item>
-                                <property name="text">
-                                    <string>2009</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>2008</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>2007</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>2006</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>2005</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>2004</string>
-                                </property>
-                            </item>
-                            <property name="name">
-                                <cstring>YEAR</cstring>
-                            </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>420</x>
-                                    <y>55</y>
-                                    <width>100</width>
-                                    <height>26</height>
-                                </rect>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>0</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="minimumSize">
-                                <size>
-                                    <width>0</width>
-                                    <height>20</height>
-                                </size>
-                            </property>
-                        </widget>
                         <widget class="QLabel">
                             <property name="name">
                                 <cstring>YEARLabel</cstring>
@@ -293,6 +203,96 @@
                             </property>
                             <property name="text">
                                 <string>On beam line</string>
+                            </property>
+                        </widget>
+                        <widget class="QComboBox">
+                            <item>
+                                <property name="text">
+                                    <string>2009</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2008</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2007</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2006</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2005</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2004</string>
+                                </property>
+                            </item>
+                            <property name="name">
+                                <cstring>YEAR</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>420</x>
+                                    <y>55</y>
+                                    <width>100</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>RunNumbers</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>15</x>
+                                    <y>25</y>
+                                    <width>505</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>23</height>
+                                </size>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Numbers of RUNs to fit. Multiple runs are comma separated.</string>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>Numbers of RUNs to fit. Multiple runs are comma separated.</string>
                             </property>
                         </widget>
                     </widget>
@@ -4042,7 +4042,7 @@
             <bool>true</bool>
         </property>
         <property name="on">
-            <bool>true</bool>
+            <bool>false</bool>
         </property>
         <property name="text">
             <string>Change name</string>
