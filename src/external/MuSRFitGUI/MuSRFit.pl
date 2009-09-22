@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Mon Sep 21 18:05:08 2009
+# Created: Tue Sep 22 10:33:24 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -3165,6 +3165,14 @@ sub CreateAllInput
     $All{"Yi"}=Yi->text;
     $All{"Yf"}=Yf->text;
     
+# Lifetime corrections in enabled/visible only for SingleHis fits
+    if ( $All{"FitAsyType"} eq "Asymmetry" ) {
+	ltc->setHidden(1);
+    }	
+    elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
+	ltc->setHidden(0);
+    }
+
     if (ltc->isChecked()) {
 	$All{"ltc"}="y";
     } else {

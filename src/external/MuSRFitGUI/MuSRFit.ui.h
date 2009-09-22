@@ -232,6 +232,14 @@ void MuSRFitform::CreateAllInput()
     $All{"Yi"}=Yi->text;
     $All{"Yf"}=Yf->text;
     
+# Lifetime corrections in enabled/visible only for SingleHis fits
+    if ( $All{"FitAsyType"} eq "Asymmetry" ) {
+	ltc->setHidden(1);
+    }	
+    elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
+	ltc->setHidden(0);
+    }
+
     if (ltc->isChecked()) {
 	$All{"ltc"}="y";
     } else {
@@ -747,4 +755,3 @@ void MuSRFitform::fileBrowse()
     }
     RunFiles->setText($RunFiles);
 }
-
