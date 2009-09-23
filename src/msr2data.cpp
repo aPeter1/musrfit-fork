@@ -75,6 +75,7 @@ void msr2data_syntax()
   cout << endl << "       <run>, <run1>, <run2>, ... <runN> : run numbers";
   cout << endl << "       <extension> : msr-file extension, e.g. _tf_h13 for the file name 8472_tf_h13.msr";
   cout << endl << "       -o<outputfile> : specify the name of the DB or column data output file; default: out.db/out.dat";
+  cout << endl << "                        if the option '-o none' is used, no output file will be written.";
   cout << endl << "       data : instead of to a DB file the data are written to a simple column structure";
   cout << endl << "       noheader : no file header is written to the output file";
   cout << endl << "       nosummary : no additional data from the run data file is written to the output file";
