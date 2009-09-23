@@ -214,37 +214,54 @@ void MuSRFitform::CreateAllInput()
 {
 # TODO: Need to automatically generage years list depending on beamline
     my %All=();
-# From RUNS Tab    
-    $All{"TITLE"}= TITLE->text;
-    $All{"FILENAME"}= FILENAME->text;
+    
+# From RUNS Tab
+# Run data file
     $All{"RunNumbers"} = RunNumbers->text;
     $All{"RunFiles"} = RunFiles->text;
     $All{"BeamLine"} = BeamLine->currentText;
     $All{"RUNSType"} = ManualFile->isOn();
+    $All{"optionsFourier"} = optionsFourier->isOn();
+    $All{"optionsT0"} = optionsT0->isOn();
     $All{"YEAR"} =YEAR->currentText;
+# Time range and BINS
     $All{"Tis"} = Tis->text;
     $All{"Tfs"} = Tfs->text;
     $All{"BINS"} = BINS->text;
     $All{"FitAsyType"} = FitAsyType->currentText;
     $All{"LRBF"} = LRBF->text;
+    my @Hists = split(/,/, $All{"LRBF"} );
+# Lifetime corrections in enabled/visible only for SingleHis fits
+    if ( $All{"FitAsyType"} eq "Asymmetry" ) {
+	ltc->setHidden(1);
+    }
+    elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
+	ltc->setHidden(0);
+    }
+   
+# From Fitting Tab
+# Plot range
     $All{"Xi"}=Xi->text;
     $All{"Xf"}=Xf->text;
     $All{"Yi"}=Yi->text;
     $All{"Yf"}=Yf->text;
-    
-# Lifetime corrections in enabled/visible only for SingleHis fits
-    if ( $All{"FitAsyType"} eq "Asymmetry" ) {
-	ltc->setHidden(1);
-    }	
-    elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
-	ltc->setHidden(0);
-    }
-    
+# Life time correction   
     if (ltc->isChecked()) {
 	$All{"ltc"}="y";
     } else {
 	$All{"ltc"}="n";
     }
+# Minuit commands    
+    if ( $All{"go"} eq "" ) {
+	$All{"go"}="PLOT";
+    }   
+# Get minimization process
+    $All{"Minimization"} = Minimization->currentText();
+    $All{"go"}=$All{"Minimization"};
+    
+# Get Error calculation process
+    $All{"ErrorCalc"} = ErrorCalc->currentText();
+    $All{"go"}=$All{"ErrorCalc"};
     
     RunSelectionToggle();
     my @RUNS = ();
@@ -254,13 +271,18 @@ void MuSRFitform::CreateAllInput()
 	$All{"RunNumbers"} =~ s/[\ \.\~\/\&\*\[\;\>\<\^\$\(\)\`\|\]\'\@]/,/g;
 	@RUNS = split( /,/, $All{"RunNumbers"} );	
     }
-    
-    my @Hists = split(/,/, $All{"LRBF"} );
-    
+        
+# From MSR File Tab
+    $All{"TITLE"}= TITLE->text;
+    $All{"FILENAME"}= FILENAME->text;
+
 # From Fourier Tab
     $All{"FUNITS"}= FUnits->currentText;
     $All{"FAPODIZATION"}= FApodization->currentText;
     $All{"FPLOT"}= FPlot->currentText;
+# Fourier range
+    $All{"FrqMin"}=FrqMin->text;
+    $All{"FrqMax"}=FrqMax->text;
     
 # Get values of t0 and Bg/Data bins if given
     my $NHist = 1;
@@ -392,17 +414,7 @@ void MuSRFitform::CreateAllInput()
 	$All{"FILENAME"}="TMP";
     }
     
-    if ( $All{"go"} eq "" ) {
-	$All{"go"}="PLOT";
-    }
     
-# Get minimization process
-    $All{"Minimization"} = Minimization->currentText();
-    $All{"go"}=$All{"Minimization"};
-    
-# Get Error calculation process
-    $All{"ErrorCalc"} = ErrorCalc->currentText();
-    $All{"go"}=$All{"ErrorCalc"};
     
 # Return Hash with all important values
     return %All;  
@@ -667,7 +679,7 @@ void MuSRFitform::GoFit()
 # update MSR File tab and initialization table
 	UpdateMSRFileInitTable();
     }
-	
+    
     return;
 }
 
@@ -746,6 +758,20 @@ void MuSRFitform::RunSelectionToggle()
 	RunFiles->setText("");
 	RUNSAuto->setEnabled(1);
 	RUNSAuto->setHidden(0);
+    }
+    
+# Also use this for other options
+# Fourier toggle
+    my $Fourier=optionsFourier->isOn();
+    if ($Fourier) {
+# Fourier tab visible
+#	musrfit_tabs->addTab(FourierPage,"Fourier");
+#	musrfit_tabs->showPage(FourierPage);
+#	FourierPage->hide();
+    } else {
+# Fourier tab invisible
+#	musrfit_tabs->removePage(FourierPage);
+#	FourierPage->show();
     }
 }
 

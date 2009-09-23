@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Tue Sep 22 16:07:47 2009
+# Created: Wed Sep 23 18:24:32 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -45,15 +45,6 @@ use Qt::slots
 use Qt::attributes qw(
     musrfit_tabs
     RUNSPage
-    RUNSAuto
-    YEARLabel
-    BeamLine
-    BeamLineLabel
-    YEAR
-    RunNumbers
-    RUNSMan
-    RunFiles
-    Browse
     groupBox7
     FitType2
     TfsLabel
@@ -71,7 +62,16 @@ use Qt::attributes qw(
     FitAsyType
     LRBFLabel
     LRBF
-    TabPage
+    RUNSAuto
+    YEARLabel
+    BeamLine
+    BeamLineLabel
+    YEAR
+    RunNumbers
+    RUNSMan
+    RunFiles
+    Browse
+    FittingPage
     Minimization
     textLabel1_4
     Yf
@@ -84,7 +84,7 @@ use Qt::attributes qw(
     Xf
     ltc
     FitTextOutput
-    SharingPahe
+    SharingPage
     buttonGroupSharing
     SharingComp1
     ShParam_1_1
@@ -121,14 +121,14 @@ use Qt::attributes qw(
     ShParam_3_9
     InitializationPage
     InitParamTable
-    FittingPage
+    MSRPage
     groupTitle
     TITLELabel
     TITLE
     FILENAMELabel
     FILENAME
     textMSROutput
-    TabPage_2
+    FourierPage
     FUnitsLabel
     FApodizationLabel
     FPlotLabel
@@ -138,16 +138,16 @@ use Qt::attributes qw(
     textLabel1
     textLabel1_3
     textLabel1_3_5
-    lineEdit28
+    FrqMin
     textLabel1_3_2
     textLabel1_3_6
     textLabel1_2
     textLabel1_3_3
     textLabel1_3_7
-    lineEdit28_2
+    FrqMax
     textLabel1_3_4
     textLabel1_3_8
-    TabPage_3
+    T0Page
     groupHist0
     textLabel2
     textLabel2_2_2_3
@@ -180,9 +180,9 @@ use Qt::attributes qw(
     Data24
     MenuBar
     fileMenu
+    Edit
     Actions
     Parameters
-    Edit
     Options
     helpMenu
     FileToolBar
@@ -212,6 +212,8 @@ use Qt::attributes qw(
     Fit
     Plot
     T0
+    optionsFourier
+    optionsT0
 );
 
 
@@ -1581,59 +1583,10 @@ sub NEW
     RUNSPage = Qt::Widget(musrfit_tabs, "RUNSPage");
 
     my $LayoutWidget = Qt::Widget(RUNSPage, '$LayoutWidget');
-    $LayoutWidget->setGeometry( Qt::Rect(3, 3, 545, 95) );
-    my $layout43 = Qt::VBoxLayout($LayoutWidget, 5, 6, '$layout43');
+    $LayoutWidget->setGeometry( Qt::Rect(3, 100, 545, 203) );
+    my $layout26 = Qt::VBoxLayout($LayoutWidget, 5, 6, '$layout26');
 
-    RUNSAuto = Qt::GroupBox($LayoutWidget, "RUNSAuto");
-    RUNSAuto->setSizePolicy( Qt::SizePolicy(5, 7, 0, 0, RUNSAuto->sizePolicy()->hasHeightForWidth()) );
-    RUNSAuto->setMargin( int(5) );
-
-    YEARLabel = Qt::Label(RUNSAuto, "YEARLabel");
-    YEARLabel->setGeometry( Qt::Rect(361, 55, 55, 26) );
-    YEARLabel->setMinimumSize( Qt::Size(0, 20) );
-
-    BeamLine = Qt::ComboBox(0, RUNSAuto, "BeamLine");
-    BeamLine->setGeometry( Qt::Rect(232, 55, 100, 26) );
-    BeamLine->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, BeamLine->sizePolicy()->hasHeightForWidth()) );
-    BeamLine->setMinimumSize( Qt::Size(0, 20) );
-
-    BeamLineLabel = Qt::Label(RUNSAuto, "BeamLineLabel");
-    BeamLineLabel->setGeometry( Qt::Rect(127, 55, 99, 26) );
-    BeamLineLabel->setMinimumSize( Qt::Size(0, 20) );
-
-    YEAR = Qt::ComboBox(0, RUNSAuto, "YEAR");
-    YEAR->setGeometry( Qt::Rect(420, 55, 100, 26) );
-    YEAR->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, YEAR->sizePolicy()->hasHeightForWidth()) );
-    YEAR->setMinimumSize( Qt::Size(0, 20) );
-
-    RunNumbers = Qt::LineEdit(RUNSAuto, "RunNumbers");
-    RunNumbers->setGeometry( Qt::Rect(15, 25, 505, 26) );
-    RunNumbers->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, RunNumbers->sizePolicy()->hasHeightForWidth()) );
-    RunNumbers->setMinimumSize( Qt::Size(0, 23) );
-    $layout43->addWidget(RUNSAuto);
-
-    RUNSMan = Qt::GroupBox($LayoutWidget, "RUNSMan");
-    RUNSMan->setEnabled( 1 );
-    RUNSMan->setMargin( int(5) );
-
-    RunFiles = Qt::LineEdit(RUNSMan, "RunFiles");
-    RunFiles->setEnabled( 1 );
-    RunFiles->setGeometry( Qt::Rect(15, 25, 505, 26) );
-    RunFiles->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, RunFiles->sizePolicy()->hasHeightForWidth()) );
-    RunFiles->setMinimumSize( Qt::Size(0, 23) );
-
-    Browse = Qt::PushButton(RUNSMan, "Browse");
-    Browse->setEnabled( 1 );
-    Browse->setGeometry( Qt::Rect(420, 55, 100, 26) );
-    Browse->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, Browse->sizePolicy()->hasHeightForWidth()) );
-    Browse->setMinimumSize( Qt::Size(0, 20) );
-    $layout43->addWidget(RUNSMan);
-
-    my $LayoutWidget_2 = Qt::Widget(RUNSPage, '$LayoutWidget_2');
-    $LayoutWidget_2->setGeometry( Qt::Rect(3, 100, 545, 203) );
-    my $layout26 = Qt::VBoxLayout($LayoutWidget_2, 5, 6, '$layout26');
-
-    groupBox7 = Qt::GroupBox($LayoutWidget_2, "groupBox7");
+    groupBox7 = Qt::GroupBox($LayoutWidget, "groupBox7");
     my $pal = Qt::Palette();
     my $cg = Qt::ColorGroup();
     $cg->setColor(&Qt::ColorGroup::Foreground, &black);
@@ -1695,21 +1648,21 @@ sub NEW
     groupBox7->setMargin( int(0) );
     groupBox7->setAlignment( int(&Qt::GroupBox::AlignTop) );
 
-    my $LayoutWidget_3 = Qt::Widget(groupBox7, '$LayoutWidget_3');
-    $LayoutWidget_3->setGeometry( Qt::Rect(8, 21, 520, 125) );
-    my $layout42 = Qt::GridLayout($LayoutWidget_3, 1, 1, 5, 6, '$layout42');
+    my $LayoutWidget_2 = Qt::Widget(groupBox7, '$LayoutWidget_2');
+    $LayoutWidget_2->setGeometry( Qt::Rect(8, 21, 520, 125) );
+    my $layout42 = Qt::GridLayout($LayoutWidget_2, 1, 1, 5, 6, '$layout42');
 
-    FitType2 = Qt::ComboBox(0, $LayoutWidget_3, "FitType2");
+    FitType2 = Qt::ComboBox(0, $LayoutWidget_2, "FitType2");
     FitType2->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, FitType2->sizePolicy()->hasHeightForWidth()) );
 
     $layout42->addWidget(FitType2, 1, 1);
 
-    TfsLabel = Qt::Label($LayoutWidget_3, "TfsLabel");
+    TfsLabel = Qt::Label($LayoutWidget_2, "TfsLabel");
     TfsLabel->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, TfsLabel->sizePolicy()->hasHeightForWidth()) );
 
     $layout42->addWidget(TfsLabel, 2, 1);
 
-    FitType1 = Qt::ComboBox(0, $LayoutWidget_3, "FitType1");
+    FitType1 = Qt::ComboBox(0, $LayoutWidget_2, "FitType1");
     FitType1->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, FitType1->sizePolicy()->hasHeightForWidth()) );
     FitType1->setSizeLimit( int(20) );
     FitType1->setAutoCompletion( 0 );
@@ -1717,12 +1670,12 @@ sub NEW
 
     $layout42->addWidget(FitType1, 1, 0);
 
-    BINS = Qt::LineEdit($LayoutWidget_3, "BINS");
+    BINS = Qt::LineEdit($LayoutWidget_2, "BINS");
     BINS->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, BINS->sizePolicy()->hasHeightForWidth()) );
 
     $layout42->addWidget(BINS, 3, 2);
 
-    Comp3Label = Qt::Label($LayoutWidget_3, "Comp3Label");
+    Comp3Label = Qt::Label($LayoutWidget_2, "Comp3Label");
     $cg->setColor(&Qt::ColorGroup::Foreground, &black);
     $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
     $cg->setColor(&Qt::ColorGroup::Light, &white);
@@ -1778,17 +1731,17 @@ sub NEW
 
     $layout42->addWidget(Comp3Label, 0, 2);
 
-    Tis = Qt::LineEdit($LayoutWidget_3, "Tis");
+    Tis = Qt::LineEdit($LayoutWidget_2, "Tis");
     Tis->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, Tis->sizePolicy()->hasHeightForWidth()) );
 
     $layout42->addWidget(Tis, 3, 0);
 
-    Tfs = Qt::LineEdit($LayoutWidget_3, "Tfs");
+    Tfs = Qt::LineEdit($LayoutWidget_2, "Tfs");
     Tfs->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, Tfs->sizePolicy()->hasHeightForWidth()) );
 
     $layout42->addWidget(Tfs, 3, 1);
 
-    Comp1Label = Qt::Label($LayoutWidget_3, "Comp1Label");
+    Comp1Label = Qt::Label($LayoutWidget_2, "Comp1Label");
     $cg->setColor(&Qt::ColorGroup::Foreground, &black);
     $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
     $cg->setColor(&Qt::ColorGroup::Light, &white);
@@ -1844,22 +1797,22 @@ sub NEW
 
     $layout42->addWidget(Comp1Label, 0, 0);
 
-    BINSLabel = Qt::Label($LayoutWidget_3, "BINSLabel");
+    BINSLabel = Qt::Label($LayoutWidget_2, "BINSLabel");
     BINSLabel->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, BINSLabel->sizePolicy()->hasHeightForWidth()) );
 
     $layout42->addWidget(BINSLabel, 2, 2);
 
-    TisLabel = Qt::Label($LayoutWidget_3, "TisLabel");
+    TisLabel = Qt::Label($LayoutWidget_2, "TisLabel");
     TisLabel->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, TisLabel->sizePolicy()->hasHeightForWidth()) );
 
     $layout42->addWidget(TisLabel, 2, 0);
 
-    FitType3 = Qt::ComboBox(0, $LayoutWidget_3, "FitType3");
+    FitType3 = Qt::ComboBox(0, $LayoutWidget_2, "FitType3");
     FitType3->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, FitType3->sizePolicy()->hasHeightForWidth()) );
 
     $layout42->addWidget(FitType3, 1, 2);
 
-    Comp2Label = Qt::Label($LayoutWidget_3, "Comp2Label");
+    Comp2Label = Qt::Label($LayoutWidget_2, "Comp2Label");
     $cg->setColor(&Qt::ColorGroup::Foreground, &black);
     $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
     $cg->setColor(&Qt::ColorGroup::Light, &white);
@@ -1918,27 +1871,76 @@ sub NEW
 
     my $layout23 = Qt::HBoxLayout(undef, 0, 3, '$layout23');
 
-    FitAsyTypeLabel = Qt::Label($LayoutWidget_2, "FitAsyTypeLabel");
+    FitAsyTypeLabel = Qt::Label($LayoutWidget, "FitAsyTypeLabel");
     FitAsyTypeLabel->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, FitAsyTypeLabel->sizePolicy()->hasHeightForWidth()) );
     $layout23->addWidget(FitAsyTypeLabel);
 
-    FitAsyType = Qt::ComboBox(0, $LayoutWidget_2, "FitAsyType");
+    FitAsyType = Qt::ComboBox(0, $LayoutWidget, "FitAsyType");
     FitAsyType->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, FitAsyType->sizePolicy()->hasHeightForWidth()) );
     $layout23->addWidget(FitAsyType);
 
-    LRBFLabel = Qt::Label($LayoutWidget_2, "LRBFLabel");
+    LRBFLabel = Qt::Label($LayoutWidget, "LRBFLabel");
     LRBFLabel->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, LRBFLabel->sizePolicy()->hasHeightForWidth()) );
     $layout23->addWidget(LRBFLabel);
 
-    LRBF = Qt::LineEdit($LayoutWidget_2, "LRBF");
+    LRBF = Qt::LineEdit($LayoutWidget, "LRBF");
     LRBF->setSizePolicy( Qt::SizePolicy(5, 0, 0, 0, LRBF->sizePolicy()->hasHeightForWidth()) );
     $layout23->addWidget(LRBF);
     $layout26->addLayout($layout23);
+
+    my $LayoutWidget_3 = Qt::Widget(RUNSPage, '$LayoutWidget_3');
+    $LayoutWidget_3->setGeometry( Qt::Rect(3, 3, 545, 95) );
+    my $layout43 = Qt::VBoxLayout($LayoutWidget_3, 5, 6, '$layout43');
+
+    RUNSAuto = Qt::GroupBox($LayoutWidget_3, "RUNSAuto");
+    RUNSAuto->setSizePolicy( Qt::SizePolicy(5, 7, 0, 0, RUNSAuto->sizePolicy()->hasHeightForWidth()) );
+    RUNSAuto->setMargin( int(5) );
+
+    YEARLabel = Qt::Label(RUNSAuto, "YEARLabel");
+    YEARLabel->setGeometry( Qt::Rect(361, 55, 55, 26) );
+    YEARLabel->setMinimumSize( Qt::Size(0, 20) );
+
+    BeamLine = Qt::ComboBox(0, RUNSAuto, "BeamLine");
+    BeamLine->setGeometry( Qt::Rect(232, 55, 100, 26) );
+    BeamLine->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, BeamLine->sizePolicy()->hasHeightForWidth()) );
+    BeamLine->setMinimumSize( Qt::Size(0, 20) );
+
+    BeamLineLabel = Qt::Label(RUNSAuto, "BeamLineLabel");
+    BeamLineLabel->setGeometry( Qt::Rect(127, 55, 99, 26) );
+    BeamLineLabel->setMinimumSize( Qt::Size(0, 20) );
+
+    YEAR = Qt::ComboBox(0, RUNSAuto, "YEAR");
+    YEAR->setGeometry( Qt::Rect(420, 55, 100, 26) );
+    YEAR->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, YEAR->sizePolicy()->hasHeightForWidth()) );
+    YEAR->setMinimumSize( Qt::Size(0, 20) );
+
+    RunNumbers = Qt::LineEdit(RUNSAuto, "RunNumbers");
+    RunNumbers->setGeometry( Qt::Rect(15, 25, 505, 26) );
+    RunNumbers->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, RunNumbers->sizePolicy()->hasHeightForWidth()) );
+    RunNumbers->setMinimumSize( Qt::Size(0, 23) );
+    $layout43->addWidget(RUNSAuto);
+
+    RUNSMan = Qt::GroupBox($LayoutWidget_3, "RUNSMan");
+    RUNSMan->setEnabled( 1 );
+    RUNSMan->setMargin( int(5) );
+
+    RunFiles = Qt::LineEdit(RUNSMan, "RunFiles");
+    RunFiles->setEnabled( 1 );
+    RunFiles->setGeometry( Qt::Rect(15, 25, 505, 26) );
+    RunFiles->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, RunFiles->sizePolicy()->hasHeightForWidth()) );
+    RunFiles->setMinimumSize( Qt::Size(0, 23) );
+
+    Browse = Qt::PushButton(RUNSMan, "Browse");
+    Browse->setEnabled( 1 );
+    Browse->setGeometry( Qt::Rect(420, 55, 100, 26) );
+    Browse->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, Browse->sizePolicy()->hasHeightForWidth()) );
+    Browse->setMinimumSize( Qt::Size(0, 20) );
+    $layout43->addWidget(RUNSMan);
     musrfit_tabs->insertTab( RUNSPage, "" );
 
-    TabPage = Qt::Widget(musrfit_tabs, "TabPage");
+    FittingPage = Qt::Widget(musrfit_tabs, "FittingPage");
 
-    my $LayoutWidget_4 = Qt::Widget(TabPage, '$LayoutWidget_4');
+    my $LayoutWidget_4 = Qt::Widget(FittingPage, '$LayoutWidget_4');
     $LayoutWidget_4->setGeometry( Qt::Rect(5, 10, 545, 350) );
     my $layout34 = Qt::VBoxLayout($LayoutWidget_4, 11, 6, '$layout34');
 
@@ -1993,11 +1995,11 @@ sub NEW
     FitTextOutput = Qt::TextEdit($LayoutWidget_4, "FitTextOutput");
     FitTextOutput->setOverwriteMode( 1 );
     $layout34->addWidget(FitTextOutput);
-    musrfit_tabs->insertTab( TabPage, "" );
+    musrfit_tabs->insertTab( FittingPage, "" );
 
-    SharingPahe = Qt::Widget(musrfit_tabs, "SharingPahe");
+    SharingPage = Qt::Widget(musrfit_tabs, "SharingPage");
 
-    buttonGroupSharing = Qt::ButtonGroup(SharingPahe, "buttonGroupSharing");
+    buttonGroupSharing = Qt::ButtonGroup(SharingPage, "buttonGroupSharing");
     buttonGroupSharing->setGeometry( Qt::Rect(5, 5, 545, 355) );
     buttonGroupSharing->setSizePolicy( Qt::SizePolicy(7, 7, 0, 0, buttonGroupSharing->sizePolicy()->hasHeightForWidth()) );
     buttonGroupSharing->setAlignment( int(&Qt::ButtonGroup::AlignLeft) );
@@ -2163,7 +2165,7 @@ sub NEW
     ShParam_3_9->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_3_9->setTristate( 0 );
     $layout15->addWidget(ShParam_3_9);
-    musrfit_tabs->insertTab( SharingPahe, "" );
+    musrfit_tabs->insertTab( SharingPage, "" );
 
     InitializationPage = Qt::Widget(musrfit_tabs, "InitializationPage");
 
@@ -2194,9 +2196,9 @@ sub NEW
     InitParamTable->setFocusStyle( &Qt::Table::SpreadSheet() );
     musrfit_tabs->insertTab( InitializationPage, "" );
 
-    FittingPage = Qt::Widget(musrfit_tabs, "FittingPage");
+    MSRPage = Qt::Widget(musrfit_tabs, "MSRPage");
 
-    my $LayoutWidget_8 = Qt::Widget(FittingPage, '$LayoutWidget_8');
+    my $LayoutWidget_8 = Qt::Widget(MSRPage, '$LayoutWidget_8');
     $LayoutWidget_8->setGeometry( Qt::Rect(5, 5, 545, 355) );
     my $layout25 = Qt::VBoxLayout($LayoutWidget_8, 0, 6, '$layout25');
 
@@ -2229,11 +2231,11 @@ sub NEW
     textMSROutput = Qt::TextEdit($LayoutWidget_8, "textMSROutput");
     textMSROutput->setOverwriteMode( 1 );
     $layout25->addWidget(textMSROutput);
-    musrfit_tabs->insertTab( FittingPage, "" );
+    musrfit_tabs->insertTab( MSRPage, "" );
 
-    TabPage_2 = Qt::Widget(musrfit_tabs, "TabPage_2");
+    FourierPage = Qt::Widget(musrfit_tabs, "FourierPage");
 
-    my $LayoutWidget_10 = Qt::Widget(TabPage_2, '$LayoutWidget_10');
+    my $LayoutWidget_10 = Qt::Widget(FourierPage, '$LayoutWidget_10');
     $LayoutWidget_10->setGeometry( Qt::Rect(5, 5, 545, 94) );
     my $layout33_2 = Qt::HBoxLayout($LayoutWidget_10, 11, 6, '$layout33_2');
 
@@ -2278,9 +2280,9 @@ sub NEW
 
     my $layout29 = Qt::VBoxLayout(undef, 0, 6, '$layout29');
 
-    lineEdit28 = Qt::LineEdit($LayoutWidget_10, "lineEdit28");
-    lineEdit28->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, lineEdit28->sizePolicy()->hasHeightForWidth()) );
-    $layout29->addWidget(lineEdit28);
+    FrqMin = Qt::LineEdit($LayoutWidget_10, "FrqMin");
+    FrqMin->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FrqMin->sizePolicy()->hasHeightForWidth()) );
+    $layout29->addWidget(FrqMin);
 
     textLabel1_3_2 = Qt::Label($LayoutWidget_10, "textLabel1_3_2");
     $layout29->addWidget(textLabel1_3_2);
@@ -2303,9 +2305,9 @@ sub NEW
 
     my $layout32 = Qt::VBoxLayout(undef, 0, 6, '$layout32');
 
-    lineEdit28_2 = Qt::LineEdit($LayoutWidget_10, "lineEdit28_2");
-    lineEdit28_2->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, lineEdit28_2->sizePolicy()->hasHeightForWidth()) );
-    $layout32->addWidget(lineEdit28_2);
+    FrqMax = Qt::LineEdit($LayoutWidget_10, "FrqMax");
+    FrqMax->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FrqMax->sizePolicy()->hasHeightForWidth()) );
+    $layout32->addWidget(FrqMax);
 
     textLabel1_3_4 = Qt::Label($LayoutWidget_10, "textLabel1_3_4");
     $layout32->addWidget(textLabel1_3_4);
@@ -2313,133 +2315,134 @@ sub NEW
     textLabel1_3_8 = Qt::Label($LayoutWidget_10, "textLabel1_3_8");
     $layout32->addWidget(textLabel1_3_8);
     $layout33_2->addLayout($layout32);
-    musrfit_tabs->insertTab( TabPage_2, "" );
+    musrfit_tabs->insertTab( FourierPage, "" );
 
-    TabPage_3 = Qt::Widget(musrfit_tabs, "TabPage_3");
+    T0Page = Qt::Widget(musrfit_tabs, "T0Page");
+    my $T0PageLayout = Qt::GridLayout(T0Page, 1, 1, 11, 6, '$T0PageLayout');
 
-    my $LayoutWidget_11 = Qt::Widget(TabPage_3, '$LayoutWidget_11');
-    $LayoutWidget_11->setGeometry( Qt::Rect(7, 5, 540, 180) );
-    my $layout27_2 = Qt::HBoxLayout($LayoutWidget_11, 0, 6, '$layout27_2');
+    my $layout27_2 = Qt::HBoxLayout(undef, 0, 6, '$layout27_2');
 
-    groupHist0 = Qt::GroupBox($LayoutWidget_11, "groupHist0");
+    groupHist0 = Qt::GroupBox(T0Page, "groupHist0");
     groupHist0->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, groupHist0->sizePolicy()->hasHeightForWidth()) );
     groupHist0->setMinimumSize( Qt::Size(0, 0) );
 
-    my $LayoutWidget_12 = Qt::Widget(groupHist0, '$LayoutWidget_12');
-    $LayoutWidget_12->setGeometry( Qt::Rect(5, 18, 100, 150) );
-    my $layout16_2 = Qt::VBoxLayout($LayoutWidget_12, 11, 6, '$layout16_2');
+    my $LayoutWidget_11 = Qt::Widget(groupHist0, '$LayoutWidget_11');
+    $LayoutWidget_11->setGeometry( Qt::Rect(5, 18, 100, 150) );
+    my $layout16_2 = Qt::VBoxLayout($LayoutWidget_11, 11, 6, '$layout16_2');
 
-    textLabel2 = Qt::Label($LayoutWidget_12, "textLabel2");
+    textLabel2 = Qt::Label($LayoutWidget_11, "textLabel2");
     $layout16_2->addWidget(textLabel2);
 
-    textLabel2_2_2_3 = Qt::Label($LayoutWidget_12, "textLabel2_2_2_3");
+    textLabel2_2_2_3 = Qt::Label($LayoutWidget_11, "textLabel2_2_2_3");
     $layout16_2->addWidget(textLabel2_2_2_3);
 
-    textLabel2_2_2 = Qt::Label($LayoutWidget_12, "textLabel2_2_2");
+    textLabel2_2_2 = Qt::Label($LayoutWidget_11, "textLabel2_2_2");
     $layout16_2->addWidget(textLabel2_2_2);
 
-    textLabel2_2_2_2 = Qt::Label($LayoutWidget_12, "textLabel2_2_2_2");
+    textLabel2_2_2_2 = Qt::Label($LayoutWidget_11, "textLabel2_2_2_2");
     $layout16_2->addWidget(textLabel2_2_2_2);
 
-    textLabel2_2_2_2_2 = Qt::Label($LayoutWidget_12, "textLabel2_2_2_2_2");
+    textLabel2_2_2_2_2 = Qt::Label($LayoutWidget_11, "textLabel2_2_2_2_2");
     $layout16_2->addWidget(textLabel2_2_2_2_2);
     $layout27_2->addWidget(groupHist0);
 
-    groupHist1 = Qt::GroupBox($LayoutWidget_11, "groupHist1");
+    groupHist1 = Qt::GroupBox(T0Page, "groupHist1");
     groupHist1->setFrameShadow( &Qt::GroupBox::Plain() );
 
-    my $LayoutWidget_13 = Qt::Widget(groupHist1, '$LayoutWidget_13');
-    $LayoutWidget_13->setGeometry( Qt::Rect(8, 17, 75, 150) );
-    my $layout18 = Qt::VBoxLayout($LayoutWidget_13, 0, 0, '$layout18');
+    my $LayoutWidget_12 = Qt::Widget(groupHist1, '$LayoutWidget_12');
+    $LayoutWidget_12->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18 = Qt::VBoxLayout($LayoutWidget_12, 0, 0, '$layout18');
 
-    t01 = Qt::LineEdit($LayoutWidget_13, "t01");
+    t01 = Qt::LineEdit($LayoutWidget_12, "t01");
     $layout18->addWidget(t01);
 
-    Bg11 = Qt::LineEdit($LayoutWidget_13, "Bg11");
+    Bg11 = Qt::LineEdit($LayoutWidget_12, "Bg11");
     $layout18->addWidget(Bg11);
 
-    Bg21 = Qt::LineEdit($LayoutWidget_13, "Bg21");
+    Bg21 = Qt::LineEdit($LayoutWidget_12, "Bg21");
     $layout18->addWidget(Bg21);
 
-    Data11 = Qt::LineEdit($LayoutWidget_13, "Data11");
+    Data11 = Qt::LineEdit($LayoutWidget_12, "Data11");
     $layout18->addWidget(Data11);
 
-    Data21 = Qt::LineEdit($LayoutWidget_13, "Data21");
+    Data21 = Qt::LineEdit($LayoutWidget_12, "Data21");
     $layout18->addWidget(Data21);
     $layout27_2->addWidget(groupHist1);
 
-    groupHist2 = Qt::GroupBox($LayoutWidget_11, "groupHist2");
+    groupHist2 = Qt::GroupBox(T0Page, "groupHist2");
     groupHist2->setEnabled( 1 );
     groupHist2->setFrameShadow( &Qt::GroupBox::Plain() );
 
-    my $LayoutWidget_14 = Qt::Widget(groupHist2, '$LayoutWidget_14');
-    $LayoutWidget_14->setGeometry( Qt::Rect(8, 17, 75, 150) );
-    my $layout18_2 = Qt::VBoxLayout($LayoutWidget_14, 0, 0, '$layout18_2');
+    my $LayoutWidget_13 = Qt::Widget(groupHist2, '$LayoutWidget_13');
+    $LayoutWidget_13->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18_2 = Qt::VBoxLayout($LayoutWidget_13, 0, 0, '$layout18_2');
 
-    t02 = Qt::LineEdit($LayoutWidget_14, "t02");
+    t02 = Qt::LineEdit($LayoutWidget_13, "t02");
     $layout18_2->addWidget(t02);
 
-    Bg12 = Qt::LineEdit($LayoutWidget_14, "Bg12");
+    Bg12 = Qt::LineEdit($LayoutWidget_13, "Bg12");
     $layout18_2->addWidget(Bg12);
 
-    Bg22 = Qt::LineEdit($LayoutWidget_14, "Bg22");
+    Bg22 = Qt::LineEdit($LayoutWidget_13, "Bg22");
     $layout18_2->addWidget(Bg22);
 
-    Data12 = Qt::LineEdit($LayoutWidget_14, "Data12");
+    Data12 = Qt::LineEdit($LayoutWidget_13, "Data12");
     $layout18_2->addWidget(Data12);
 
-    Data22 = Qt::LineEdit($LayoutWidget_14, "Data22");
+    Data22 = Qt::LineEdit($LayoutWidget_13, "Data22");
     $layout18_2->addWidget(Data22);
     $layout27_2->addWidget(groupHist2);
 
-    groupHist3 = Qt::GroupBox($LayoutWidget_11, "groupHist3");
+    groupHist3 = Qt::GroupBox(T0Page, "groupHist3");
     groupHist3->setEnabled( 1 );
     groupHist3->setFrameShadow( &Qt::GroupBox::Plain() );
 
-    my $LayoutWidget_15 = Qt::Widget(groupHist3, '$LayoutWidget_15');
-    $LayoutWidget_15->setGeometry( Qt::Rect(8, 17, 75, 150) );
-    my $layout18_3 = Qt::VBoxLayout($LayoutWidget_15, 0, 0, '$layout18_3');
+    my $LayoutWidget_14 = Qt::Widget(groupHist3, '$LayoutWidget_14');
+    $LayoutWidget_14->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18_3 = Qt::VBoxLayout($LayoutWidget_14, 0, 0, '$layout18_3');
 
-    t03 = Qt::LineEdit($LayoutWidget_15, "t03");
+    t03 = Qt::LineEdit($LayoutWidget_14, "t03");
     $layout18_3->addWidget(t03);
 
-    Bg13 = Qt::LineEdit($LayoutWidget_15, "Bg13");
+    Bg13 = Qt::LineEdit($LayoutWidget_14, "Bg13");
     $layout18_3->addWidget(Bg13);
 
-    Bg23 = Qt::LineEdit($LayoutWidget_15, "Bg23");
+    Bg23 = Qt::LineEdit($LayoutWidget_14, "Bg23");
     $layout18_3->addWidget(Bg23);
 
-    Data13 = Qt::LineEdit($LayoutWidget_15, "Data13");
+    Data13 = Qt::LineEdit($LayoutWidget_14, "Data13");
     $layout18_3->addWidget(Data13);
 
-    Data23 = Qt::LineEdit($LayoutWidget_15, "Data23");
+    Data23 = Qt::LineEdit($LayoutWidget_14, "Data23");
     $layout18_3->addWidget(Data23);
     $layout27_2->addWidget(groupHist3);
 
-    groupHist4 = Qt::GroupBox($LayoutWidget_11, "groupHist4");
+    groupHist4 = Qt::GroupBox(T0Page, "groupHist4");
     groupHist4->setEnabled( 1 );
     groupHist4->setFrameShadow( &Qt::GroupBox::Plain() );
 
-    my $LayoutWidget_16 = Qt::Widget(groupHist4, '$LayoutWidget_16');
-    $LayoutWidget_16->setGeometry( Qt::Rect(8, 17, 75, 150) );
-    my $layout18_4 = Qt::VBoxLayout($LayoutWidget_16, 0, 0, '$layout18_4');
+    my $LayoutWidget_15 = Qt::Widget(groupHist4, '$LayoutWidget_15');
+    $LayoutWidget_15->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18_4 = Qt::VBoxLayout($LayoutWidget_15, 0, 0, '$layout18_4');
 
-    t04 = Qt::LineEdit($LayoutWidget_16, "t04");
+    t04 = Qt::LineEdit($LayoutWidget_15, "t04");
     $layout18_4->addWidget(t04);
 
-    Bg14 = Qt::LineEdit($LayoutWidget_16, "Bg14");
+    Bg14 = Qt::LineEdit($LayoutWidget_15, "Bg14");
     $layout18_4->addWidget(Bg14);
 
-    Bg24 = Qt::LineEdit($LayoutWidget_16, "Bg24");
+    Bg24 = Qt::LineEdit($LayoutWidget_15, "Bg24");
     $layout18_4->addWidget(Bg24);
 
-    Data14 = Qt::LineEdit($LayoutWidget_16, "Data14");
+    Data14 = Qt::LineEdit($LayoutWidget_15, "Data14");
     $layout18_4->addWidget(Data14);
 
-    Data24 = Qt::LineEdit($LayoutWidget_16, "Data24");
+    Data24 = Qt::LineEdit($LayoutWidget_15, "Data24");
     $layout18_4->addWidget(Data24);
     $layout27_2->addWidget(groupHist4);
-    musrfit_tabs->insertTab( TabPage_3, "" );
+
+    $T0PageLayout->addLayout($layout27_2, 0, 0);
+    musrfit_tabs->insertTab( T0Page, "" );
 
     fileNewAction= Qt::Action(this, "fileNewAction");
     fileNewAction->setIconSet( Qt::IconSet($image1) );
@@ -2500,6 +2503,10 @@ sub NEW
     Plot->setIconSet( Qt::IconSet($image18) );
     T0= Qt::Action(this, "T0");
     T0->setIconSet( Qt::IconSet($image19) );
+    optionsFourier= Qt::Action(this, "optionsFourier");
+    optionsFourier->setToggleAction( 1 );
+    optionsT0= Qt::Action(this, "optionsT0");
+    optionsT0->setToggleAction( 1 );
 
 
     FileToolBar = Qt::ToolBar("", this, &DockTop);
@@ -2532,17 +2539,6 @@ sub NEW
     fileExitAction->addTo( fileMenu );
     MenuBar->insertItem( "", fileMenu, 2 );
 
-    Actions = Qt::PopupMenu( this );
-    Fit->addTo( Actions );
-    Plot->addTo( Actions );
-    T0->addTo( Actions );
-    MenuBar->insertItem( "", Actions, 3 );
-
-    Parameters = Qt::PopupMenu( this );
-    parametersExport_AsAction->addTo( Parameters );
-    parametersAppend_ToAction->addTo( Parameters );
-    MenuBar->insertItem( "", Parameters, 4 );
-
     Edit = Qt::PopupMenu( this );
     editUndoAction->addTo( Edit );
     editRedoAction->addTo( Edit );
@@ -2550,11 +2546,24 @@ sub NEW
     editCutAction->addTo( Edit );
     editCopyAction->addTo( Edit );
     editPasteAction->addTo( Edit );
-    MenuBar->insertItem( "", Edit, 5 );
+    MenuBar->insertItem( "", Edit, 3 );
+
+    Actions = Qt::PopupMenu( this );
+    Fit->addTo( Actions );
+    Plot->addTo( Actions );
+    T0->addTo( Actions );
+    MenuBar->insertItem( "", Actions, 4 );
+
+    Parameters = Qt::PopupMenu( this );
+    parametersExport_AsAction->addTo( Parameters );
+    parametersAppend_ToAction->addTo( Parameters );
+    MenuBar->insertItem( "", Parameters, 5 );
 
     Options = Qt::PopupMenu( this );
     FileExistCheck->addTo( Options );
     ManualFile->addTo( Options );
+    optionsFourier->addTo( Options );
+    optionsT0->addTo( Options );
     MenuBar->insertItem( "", Options, 6 );
 
     helpMenu = Qt::PopupMenu( this );
@@ -2577,7 +2586,6 @@ sub NEW
     Qt::Object::connect(parametersExport_AsAction, SIGNAL "activated()", this, SLOT "parametersExport()");
     Qt::Object::connect(BeamLine, SIGNAL "activated(int)", this, SLOT "T0Update()");
     Qt::Object::connect(Browse, SIGNAL "clicked()", this, SLOT "fileBrowse()");
-    Qt::Object::connect(ManualFile, SIGNAL "toggled(bool)", this, SLOT "RunSelectionToggle()");
     Qt::Object::connect(InitParamTable, SIGNAL "valueChanged(int,int)", this, SLOT "CallMSRCreate()");
     Qt::Object::connect(musrfit_tabs, SIGNAL "selected(const QString&)", this, SLOT "TabChanged()");
     Qt::Object::connect(fileChangeDirAction, SIGNAL "activated()", this, SLOT "fileChangeDir()");
@@ -2644,9 +2652,9 @@ sub NEW
     setTabOrder(textMSROutput, FUnits);
     setTabOrder(FUnits, FApodization);
     setTabOrder(FApodization, FPlot);
-    setTabOrder(FPlot, lineEdit28);
-    setTabOrder(lineEdit28, lineEdit28_2);
-    setTabOrder(lineEdit28_2, t01);
+    setTabOrder(FPlot, FrqMin);
+    setTabOrder(FrqMin, FrqMax);
+    setTabOrder(FrqMax, t01);
     setTabOrder(t01, Bg11);
     setTabOrder(Bg11, Bg21);
     setTabOrder(Bg21, Data11);
@@ -2683,29 +2691,6 @@ sub languageChange
 {
     setCaption(trUtf8("MuSRFit GUI") );
     setIconText(trUtf8("MuSRFitGUI") );
-    RUNSAuto->setTitle( trUtf8("RUN Numbers") );
-    YEARLabel->setText( trUtf8("Year") );
-    BeamLine->clear();
-    BeamLine->insertItem( trUtf8("LEM") );
-    BeamLine->insertItem( trUtf8("GPS") );
-    BeamLine->insertItem( trUtf8("Dolly") );
-    BeamLine->insertItem( trUtf8("LTF") );
-    BeamLineLabel->setText( trUtf8("On beam line") );
-    YEAR->clear();
-    YEAR->insertItem( trUtf8("2009") );
-    YEAR->insertItem( trUtf8("2008") );
-    YEAR->insertItem( trUtf8("2007") );
-    YEAR->insertItem( trUtf8("2006") );
-    YEAR->insertItem( trUtf8("2005") );
-    YEAR->insertItem( trUtf8("2004") );
-    Qt::ToolTip::add(RunNumbers, trUtf8("Numbers of RUNs to fit. Multiple runs are comma separated."));
-    Qt::WhatsThis::add(RunNumbers, trUtf8("Numbers of RUNs to fit. Multiple runs are comma separated."));
-    RUNSMan->setTitle( trUtf8("RUN Files") );
-    Qt::ToolTip::add(RunFiles, trUtf8("Names of data files to be fit. Multiple data files are comma separated."));
-    Qt::WhatsThis::add(RunFiles, trUtf8("Names of data files to be fit. Multiple data files are comma separated."));
-    Browse->setText( trUtf8("Browse") );
-    Qt::ToolTip::add(Browse, trUtf8("Browse to select data files for fitting."));
-    Qt::WhatsThis::add(Browse, trUtf8("Browse to select data files for fitting."));
     groupBox7->setTitle( trUtf8("Theory Function") );
     FitType2->clear();
     FitType2->insertItem( trUtf8("Exponential") );
@@ -2772,6 +2757,29 @@ sub languageChange
     FitAsyType->insertItem( trUtf8("SingleHist") );
     LRBFLabel->setText( trUtf8("Histograms list") );
     LRBF->setText( trUtf8("1,3") );
+    RUNSAuto->setTitle( trUtf8("RUN Numbers") );
+    YEARLabel->setText( trUtf8("Year") );
+    BeamLine->clear();
+    BeamLine->insertItem( trUtf8("LEM") );
+    BeamLine->insertItem( trUtf8("GPS") );
+    BeamLine->insertItem( trUtf8("Dolly") );
+    BeamLine->insertItem( trUtf8("LTF") );
+    BeamLineLabel->setText( trUtf8("On beam line") );
+    YEAR->clear();
+    YEAR->insertItem( trUtf8("2009") );
+    YEAR->insertItem( trUtf8("2008") );
+    YEAR->insertItem( trUtf8("2007") );
+    YEAR->insertItem( trUtf8("2006") );
+    YEAR->insertItem( trUtf8("2005") );
+    YEAR->insertItem( trUtf8("2004") );
+    Qt::ToolTip::add(RunNumbers, trUtf8("Numbers of RUNs to fit. Multiple runs are comma separated."));
+    Qt::WhatsThis::add(RunNumbers, trUtf8("Numbers of RUNs to fit. Multiple runs are comma separated."));
+    RUNSMan->setTitle( trUtf8("RUN Files") );
+    Qt::ToolTip::add(RunFiles, trUtf8("Names of data files to be fit. Multiple data files are comma separated."));
+    Qt::WhatsThis::add(RunFiles, trUtf8("Names of data files to be fit. Multiple data files are comma separated."));
+    Browse->setText( trUtf8("Browse") );
+    Qt::ToolTip::add(Browse, trUtf8("Browse to select data files for fitting."));
+    Qt::WhatsThis::add(Browse, trUtf8("Browse to select data files for fitting."));
     musrfit_tabs->changeTab( RUNSPage, trUtf8("RUNS") );
     Minimization->clear();
     Minimization->insertItem( trUtf8("MINIMIZE") );
@@ -2785,7 +2793,7 @@ sub languageChange
     ErrorCalc->insertItem( trUtf8("MINOS") );
     textLabel1_5->setText( trUtf8("Minimization type") );
     ltc->setText( trUtf8("Life time correction") );
-    musrfit_tabs->changeTab( TabPage, trUtf8("Fitting") );
+    musrfit_tabs->changeTab( FittingPage, trUtf8("Fitting") );
     buttonGroupSharing->setTitle( trUtf8("Shared Parameters") );
     SharingComp1->setTitle( trUtf8("1st Component") );
     ShParam_1_1->setText( trUtf8("Param1") );
@@ -2820,7 +2828,7 @@ sub languageChange
     ShParam_3_7->setText( trUtf8("Param7") );
     ShParam_3_8->setText( trUtf8("Param8") );
     ShParam_3_9->setText( trUtf8("Param9") );
-    musrfit_tabs->changeTab( SharingPahe, trUtf8("Sharing") );
+    musrfit_tabs->changeTab( SharingPage, trUtf8("Sharing") );
     InitParamTable->horizontalHeader()->setLabel( 0, trUtf8("Value") );
     InitParamTable->horizontalHeader()->setLabel( 1, trUtf8("Error") );
     InitParamTable->horizontalHeader()->setLabel( 2, trUtf8("Min") );
@@ -2834,7 +2842,7 @@ sub languageChange
     FILENAMELabel->setText( trUtf8("Enter [name] for output [name].msr file (optional)") );
     Qt::ToolTip::add(FILENAME, trUtf8("Name of the produced MSR file (optional)"));
     Qt::WhatsThis::add(FILENAME, trUtf8("Name of the produced MSR file (optional)"));
-    musrfit_tabs->changeTab( FittingPage, trUtf8("MSR File") );
+    musrfit_tabs->changeTab( MSRPage, trUtf8("MSR File") );
     FUnitsLabel->setText( trUtf8("Units") );
     FApodizationLabel->setText( trUtf8("Apodization") );
     FPlotLabel->setText( trUtf8("Plot") );
@@ -2863,7 +2871,7 @@ sub languageChange
     textLabel1_3_7->setText( undef );
     textLabel1_3_4->setText( undef );
     textLabel1_3_8->setText( undef );
-    musrfit_tabs->changeTab( TabPage_2, trUtf8("Fourier") );
+    musrfit_tabs->changeTab( FourierPage, trUtf8("Fourier") );
     groupHist0->setTitle( undef );
     textLabel2->setText( trUtf8("t0") );
     textLabel2_2_2_3->setText( trUtf8("Bg1") );
@@ -2874,7 +2882,7 @@ sub languageChange
     groupHist2->setTitle( trUtf8("Hist2") );
     groupHist3->setTitle( trUtf8("Hist3") );
     groupHist4->setTitle( trUtf8("Hist4") );
-    musrfit_tabs->changeTab( TabPage_3, trUtf8("t0/Bg Bins") );
+    musrfit_tabs->changeTab( T0Page, trUtf8("t0/Bg Bins") );
     fileNewAction->setText( trUtf8("&New") );
     fileNewAction->setMenuText( trUtf8("&New") );
     fileNewAction->setAccel( Qt::KeySequence( trUtf8("Ctrl+N") ) );
@@ -2923,8 +2931,9 @@ sub languageChange
     helpAboutAction->setAccel( Qt::KeySequence( undef ) );
     separatorAction->setText( undef );
     separatorAction->setMenuText( undef );
-    FileExistCheck->setText( trUtf8("Change name") );
-    FileExistCheck->setMenuText( trUtf8("Change name") );
+    FileExistCheck->setText( trUtf8("Overwrite MSR File") );
+    FileExistCheck->setMenuText( trUtf8("Overwrite MSR File") );
+    FileExistCheck->setToolTip( trUtf8("Enable overwriting MSR files") );
     FileExistCheck->setWhatsThis( trUtf8("Enable/Disable checking for MSR files.") );
     ManualFile->setText( trUtf8("Maual file selection") );
     ManualFile->setMenuText( trUtf8("Maual file selection") );
@@ -2945,12 +2954,16 @@ sub languageChange
     Plot->setAccel( Qt::KeySequence( trUtf8("Ctrl+P") ) );
     T0->setText( trUtf8("Show t0 and Bg Bins") );
     T0->setAccel( Qt::KeySequence( trUtf8("Ctrl+T") ) );
+    optionsFourier->setText( trUtf8("Fourier") );
+    optionsFourier->setMenuText( trUtf8("Fourier") );
+    optionsT0->setText( trUtf8("T0 and Bg bins") );
+    optionsT0->setMenuText( trUtf8("T0 and Bg bins") );
     FileToolBar->setLabel( trUtf8("File Menu") );
     ActionsToolBar->setLabel( trUtf8("Actions Menu") );
     MenuBar->findItem( 2 )->setText( trUtf8("&File") );
-    MenuBar->findItem( 3 )->setText( trUtf8("Actions") );
-    MenuBar->findItem( 4 )->setText( trUtf8("Parameters") );
-    MenuBar->findItem( 5 )->setText( trUtf8("Edit") );
+    MenuBar->findItem( 3 )->setText( trUtf8("Edit") );
+    MenuBar->findItem( 4 )->setText( trUtf8("Actions") );
+    MenuBar->findItem( 5 )->setText( trUtf8("Parameters") );
     MenuBar->findItem( 6 )->setText( trUtf8("Options") );
     MenuBar->findItem( 7 )->setText( trUtf8("&Help") );
 }
@@ -3147,37 +3160,54 @@ sub CreateAllInput
 
 # TODO: Need to automatically generage years list depending on beamline
     my %All=();
-# From RUNS Tab    
-    $All{"TITLE"}= TITLE->text;
-    $All{"FILENAME"}= FILENAME->text;
+    
+# From RUNS Tab
+# Run data file
     $All{"RunNumbers"} = RunNumbers->text;
     $All{"RunFiles"} = RunFiles->text;
     $All{"BeamLine"} = BeamLine->currentText;
     $All{"RUNSType"} = ManualFile->isOn();
+    $All{"optionsFourier"} = optionsFourier->isOn();
+    $All{"optionsT0"} = optionsT0->isOn();
     $All{"YEAR"} =YEAR->currentText;
+# Time range and BINS
     $All{"Tis"} = Tis->text;
     $All{"Tfs"} = Tfs->text;
     $All{"BINS"} = BINS->text;
     $All{"FitAsyType"} = FitAsyType->currentText;
     $All{"LRBF"} = LRBF->text;
+    my @Hists = split(/,/, $All{"LRBF"} );
+# Lifetime corrections in enabled/visible only for SingleHis fits
+    if ( $All{"FitAsyType"} eq "Asymmetry" ) {
+	ltc->setHidden(1);
+    }
+    elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
+	ltc->setHidden(0);
+    }
+   
+# From Fitting Tab
+# Plot range
     $All{"Xi"}=Xi->text;
     $All{"Xf"}=Xf->text;
     $All{"Yi"}=Yi->text;
     $All{"Yf"}=Yf->text;
-    
-# Lifetime corrections in enabled/visible only for SingleHis fits
-    if ( $All{"FitAsyType"} eq "Asymmetry" ) {
-	ltc->setHidden(1);
-    }	
-    elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
-	ltc->setHidden(0);
-    }
-    
+# Life time correction   
     if (ltc->isChecked()) {
 	$All{"ltc"}="y";
     } else {
 	$All{"ltc"}="n";
     }
+# Minuit commands    
+    if ( $All{"go"} eq "" ) {
+	$All{"go"}="PLOT";
+    }   
+# Get minimization process
+    $All{"Minimization"} = Minimization->currentText();
+    $All{"go"}=$All{"Minimization"};
+    
+# Get Error calculation process
+    $All{"ErrorCalc"} = ErrorCalc->currentText();
+    $All{"go"}=$All{"ErrorCalc"};
     
     RunSelectionToggle();
     my @RUNS = ();
@@ -3187,13 +3217,18 @@ sub CreateAllInput
 	$All{"RunNumbers"} =~ s/[\ \.\~\/\&\*\[\;\>\<\^\$\(\)\`\|\]\'\@]/,/g;
 	@RUNS = split( /,/, $All{"RunNumbers"} );	
     }
-    
-    my @Hists = split(/,/, $All{"LRBF"} );
-    
+        
+# From MSR File Tab
+    $All{"TITLE"}= TITLE->text;
+    $All{"FILENAME"}= FILENAME->text;
+
 # From Fourier Tab
     $All{"FUNITS"}= FUnits->currentText;
     $All{"FAPODIZATION"}= FApodization->currentText;
     $All{"FPLOT"}= FPlot->currentText;
+# Fourier range
+    $All{"FrqMin"}=FrqMin->text;
+    $All{"FrqMax"}=FrqMax->text;
     
 # Get values of t0 and Bg/Data bins if given
     my $NHist = 1;
@@ -3325,17 +3360,7 @@ sub CreateAllInput
 	$All{"FILENAME"}="TMP";
     }
     
-    if ( $All{"go"} eq "" ) {
-	$All{"go"}="PLOT";
-    }
     
-# Get minimization process
-    $All{"Minimization"} = Minimization->currentText();
-    $All{"go"}=$All{"Minimization"};
-    
-# Get Error calculation process
-    $All{"ErrorCalc"} = ErrorCalc->currentText();
-    $All{"go"}=$All{"ErrorCalc"};
     
 # Return Hash with all important values
     return %All;  
@@ -3613,7 +3638,7 @@ sub GoFit
 # update MSR File tab and initialization table
 	UpdateMSRFileInitTable();
     }
-	
+    
     return;
 
 }
@@ -3697,6 +3722,20 @@ sub RunSelectionToggle
 	RunFiles->setText("");
 	RUNSAuto->setEnabled(1);
 	RUNSAuto->setHidden(0);
+    }
+    
+# Also use this for other options
+# Fourier toggle
+    my $Fourier=optionsFourier->isOn();
+    if ($Fourier) {
+# Fourier tab visible
+#	musrfit_tabs->addTab(FourierPage,"Fourier");
+#	musrfit_tabs->showPage(FourierPage);
+#	FourierPage->hide();
+    } else {
+# Fourier tab invisible
+#	musrfit_tabs->removePage(FourierPage);
+#	FourierPage->show();
     }
 
 }

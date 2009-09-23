@@ -79,316 +79,6 @@
             </attribute>
             <widget class="QLayoutWidget">
                 <property name="name">
-                    <cstring>layout43</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>3</x>
-                        <y>3</y>
-                        <width>545</width>
-                        <height>95</height>
-                    </rect>
-                </property>
-                <vbox>
-                    <property name="name">
-                        <cstring>unnamed</cstring>
-                    </property>
-                    <property name="margin">
-                        <number>5</number>
-                    </property>
-                    <widget class="QGroupBox">
-                        <property name="name">
-                            <cstring>RUNSAuto</cstring>
-                        </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>5</hsizetype>
-                                <vsizetype>7</vsizetype>
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                            </sizepolicy>
-                        </property>
-                        <property name="margin">
-                            <number>5</number>
-                        </property>
-                        <property name="title">
-                            <string>RUN Numbers</string>
-                        </property>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>YEARLabel</cstring>
-                            </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>361</x>
-                                    <y>55</y>
-                                    <width>55</width>
-                                    <height>26</height>
-                                </rect>
-                            </property>
-                            <property name="minimumSize">
-                                <size>
-                                    <width>0</width>
-                                    <height>20</height>
-                                </size>
-                            </property>
-                            <property name="text">
-                                <string>Year</string>
-                            </property>
-                        </widget>
-                        <widget class="QComboBox">
-                            <item>
-                                <property name="text">
-                                    <string>LEM</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>GPS</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>Dolly</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>LTF</string>
-                                </property>
-                            </item>
-                            <property name="name">
-                                <cstring>BeamLine</cstring>
-                            </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>232</x>
-                                    <y>55</y>
-                                    <width>100</width>
-                                    <height>26</height>
-                                </rect>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>0</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="minimumSize">
-                                <size>
-                                    <width>0</width>
-                                    <height>20</height>
-                                </size>
-                            </property>
-                        </widget>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>BeamLineLabel</cstring>
-                            </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>127</x>
-                                    <y>55</y>
-                                    <width>99</width>
-                                    <height>26</height>
-                                </rect>
-                            </property>
-                            <property name="minimumSize">
-                                <size>
-                                    <width>0</width>
-                                    <height>20</height>
-                                </size>
-                            </property>
-                            <property name="text">
-                                <string>On beam line</string>
-                            </property>
-                        </widget>
-                        <widget class="QComboBox">
-                            <item>
-                                <property name="text">
-                                    <string>2009</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>2008</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>2007</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>2006</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>2005</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>2004</string>
-                                </property>
-                            </item>
-                            <property name="name">
-                                <cstring>YEAR</cstring>
-                            </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>420</x>
-                                    <y>55</y>
-                                    <width>100</width>
-                                    <height>26</height>
-                                </rect>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>0</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="minimumSize">
-                                <size>
-                                    <width>0</width>
-                                    <height>20</height>
-                                </size>
-                            </property>
-                        </widget>
-                        <widget class="QLineEdit">
-                            <property name="name">
-                                <cstring>RunNumbers</cstring>
-                            </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>15</x>
-                                    <y>25</y>
-                                    <width>505</width>
-                                    <height>26</height>
-                                </rect>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>0</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="minimumSize">
-                                <size>
-                                    <width>0</width>
-                                    <height>23</height>
-                                </size>
-                            </property>
-                            <property name="toolTip" stdset="0">
-                                <string>Numbers of RUNs to fit. Multiple runs are comma separated.</string>
-                            </property>
-                            <property name="whatsThis" stdset="0">
-                                <string>Numbers of RUNs to fit. Multiple runs are comma separated.</string>
-                            </property>
-                        </widget>
-                    </widget>
-                    <widget class="QGroupBox">
-                        <property name="name">
-                            <cstring>RUNSMan</cstring>
-                        </property>
-                        <property name="enabled">
-                            <bool>true</bool>
-                        </property>
-                        <property name="margin">
-                            <number>5</number>
-                        </property>
-                        <property name="title">
-                            <string>RUN Files</string>
-                        </property>
-                        <widget class="QLineEdit">
-                            <property name="name">
-                                <cstring>RunFiles</cstring>
-                            </property>
-                            <property name="enabled">
-                                <bool>true</bool>
-                            </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>15</x>
-                                    <y>25</y>
-                                    <width>505</width>
-                                    <height>26</height>
-                                </rect>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>0</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="minimumSize">
-                                <size>
-                                    <width>0</width>
-                                    <height>23</height>
-                                </size>
-                            </property>
-                            <property name="toolTip" stdset="0">
-                                <string>Names of data files to be fit. Multiple data files are comma separated.</string>
-                            </property>
-                            <property name="whatsThis" stdset="0">
-                                <string>Names of data files to be fit. Multiple data files are comma separated.</string>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton">
-                            <property name="name">
-                                <cstring>Browse</cstring>
-                            </property>
-                            <property name="enabled">
-                                <bool>true</bool>
-                            </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>420</x>
-                                    <y>55</y>
-                                    <width>100</width>
-                                    <height>26</height>
-                                </rect>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>0</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="minimumSize">
-                                <size>
-                                    <width>0</width>
-                                    <height>20</height>
-                                </size>
-                            </property>
-                            <property name="text">
-                                <string>Browse</string>
-                            </property>
-                            <property name="toolTip" stdset="0">
-                                <string>Browse to select data files for fitting.</string>
-                            </property>
-                            <property name="whatsThis" stdset="0">
-                                <string>Browse to select data files for fitting.</string>
-                            </property>
-                        </widget>
-                    </widget>
-                </vbox>
-            </widget>
-            <widget class="QLayoutWidget">
-                <property name="name">
                     <cstring>layout26</cstring>
                 </property>
                 <property name="geometry">
@@ -1959,10 +1649,320 @@
                     </widget>
                 </vbox>
             </widget>
+            <widget class="QLayoutWidget">
+                <property name="name">
+                    <cstring>layout43</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>3</x>
+                        <y>3</y>
+                        <width>545</width>
+                        <height>95</height>
+                    </rect>
+                </property>
+                <vbox>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <property name="margin">
+                        <number>5</number>
+                    </property>
+                    <widget class="QGroupBox">
+                        <property name="name">
+                            <cstring>RUNSAuto</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>5</hsizetype>
+                                <vsizetype>7</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
+                        <property name="margin">
+                            <number>5</number>
+                        </property>
+                        <property name="title">
+                            <string>RUN Numbers</string>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>YEARLabel</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>361</x>
+                                    <y>55</y>
+                                    <width>55</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                            <property name="text">
+                                <string>Year</string>
+                            </property>
+                        </widget>
+                        <widget class="QComboBox">
+                            <item>
+                                <property name="text">
+                                    <string>LEM</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>GPS</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Dolly</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>LTF</string>
+                                </property>
+                            </item>
+                            <property name="name">
+                                <cstring>BeamLine</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>232</x>
+                                    <y>55</y>
+                                    <width>100</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>BeamLineLabel</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>127</x>
+                                    <y>55</y>
+                                    <width>99</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                            <property name="text">
+                                <string>On beam line</string>
+                            </property>
+                        </widget>
+                        <widget class="QComboBox">
+                            <item>
+                                <property name="text">
+                                    <string>2009</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2008</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2007</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2006</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2005</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2004</string>
+                                </property>
+                            </item>
+                            <property name="name">
+                                <cstring>YEAR</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>420</x>
+                                    <y>55</y>
+                                    <width>100</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>RunNumbers</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>15</x>
+                                    <y>25</y>
+                                    <width>505</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>23</height>
+                                </size>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Numbers of RUNs to fit. Multiple runs are comma separated.</string>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>Numbers of RUNs to fit. Multiple runs are comma separated.</string>
+                            </property>
+                        </widget>
+                    </widget>
+                    <widget class="QGroupBox">
+                        <property name="name">
+                            <cstring>RUNSMan</cstring>
+                        </property>
+                        <property name="enabled">
+                            <bool>true</bool>
+                        </property>
+                        <property name="margin">
+                            <number>5</number>
+                        </property>
+                        <property name="title">
+                            <string>RUN Files</string>
+                        </property>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>RunFiles</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>15</x>
+                                    <y>25</y>
+                                    <width>505</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>23</height>
+                                </size>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Names of data files to be fit. Multiple data files are comma separated.</string>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>Names of data files to be fit. Multiple data files are comma separated.</string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>Browse</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>420</x>
+                                    <y>55</y>
+                                    <width>100</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                            <property name="text">
+                                <string>Browse</string>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Browse to select data files for fitting.</string>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>Browse to select data files for fitting.</string>
+                            </property>
+                        </widget>
+                    </widget>
+                </vbox>
+            </widget>
         </widget>
         <widget class="QWidget">
             <property name="name">
-                <cstring>TabPage</cstring>
+                <cstring>FittingPage</cstring>
             </property>
             <attribute name="title">
                 <string>Fitting</string>
@@ -2104,7 +2104,7 @@
         </widget>
         <widget class="QWidget">
             <property name="name">
-                <cstring>SharingPahe</cstring>
+                <cstring>SharingPage</cstring>
             </property>
             <attribute name="title">
                 <string>Sharing</string>
@@ -2843,7 +2843,7 @@
         </widget>
         <widget class="QWidget">
             <property name="name">
-                <cstring>FittingPage</cstring>
+                <cstring>MSRPage</cstring>
             </property>
             <attribute name="title">
                 <string>MSR File</string>
@@ -2991,7 +2991,7 @@
         </widget>
         <widget class="QWidget">
             <property name="name">
-                <cstring>TabPage</cstring>
+                <cstring>FourierPage</cstring>
             </property>
             <attribute name="title">
                 <string>Fourier</string>
@@ -3199,7 +3199,7 @@
                             </property>
                             <widget class="QLineEdit">
                                 <property name="name">
-                                    <cstring>lineEdit28</cstring>
+                                    <cstring>FrqMin</cstring>
                                 </property>
                                 <property name="sizePolicy">
                                     <sizepolicy>
@@ -3272,7 +3272,7 @@
                             </property>
                             <widget class="QLineEdit">
                                 <property name="name">
-                                    <cstring>lineEdit28_2</cstring>
+                                    <cstring>FrqMax</cstring>
                                 </property>
                                 <property name="sizePolicy">
                                     <sizepolicy>
@@ -3306,361 +3306,358 @@
         </widget>
         <widget class="QWidget">
             <property name="name">
-                <cstring>TabPage</cstring>
+                <cstring>T0Page</cstring>
             </property>
             <attribute name="title">
                 <string>t0/Bg Bins</string>
             </attribute>
-            <widget class="QLayoutWidget">
+            <grid>
                 <property name="name">
-                    <cstring>layout27</cstring>
+                    <cstring>unnamed</cstring>
                 </property>
-                <property name="geometry">
-                    <rect>
-                        <x>7</x>
-                        <y>5</y>
-                        <width>540</width>
-                        <height>180</height>
-                    </rect>
-                </property>
-                <hbox>
+                <widget class="QLayoutWidget" row="0" column="0">
                     <property name="name">
-                        <cstring>unnamed</cstring>
+                        <cstring>layout27</cstring>
                     </property>
-                    <property name="margin">
-                        <number>0</number>
-                    </property>
-                    <widget class="QGroupBox">
+                    <hbox>
                         <property name="name">
-                            <cstring>groupHist0</cstring>
+                            <cstring>unnamed</cstring>
                         </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>5</hsizetype>
-                                <vsizetype>5</vsizetype>
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                            </sizepolicy>
+                        <property name="margin">
+                            <number>0</number>
                         </property>
-                        <property name="minimumSize">
-                            <size>
-                                <width>0</width>
-                                <height>0</height>
-                            </size>
-                        </property>
-                        <property name="title">
-                            <string></string>
-                        </property>
-                        <widget class="QLayoutWidget">
+                        <widget class="QGroupBox">
                             <property name="name">
-                                <cstring>layout16_2</cstring>
+                                <cstring>groupHist0</cstring>
                             </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>5</x>
-                                    <y>18</y>
-                                    <width>100</width>
-                                    <height>150</height>
-                                </rect>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
                             </property>
-                            <vbox>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>0</height>
+                                </size>
+                            </property>
+                            <property name="title">
+                                <string></string>
+                            </property>
+                            <widget class="QLayoutWidget">
                                 <property name="name">
-                                    <cstring>unnamed_2</cstring>
+                                    <cstring>layout16_2</cstring>
                                 </property>
-                                <widget class="QLabel">
+                                <property name="geometry">
+                                    <rect>
+                                        <x>5</x>
+                                        <y>18</y>
+                                        <width>100</width>
+                                        <height>150</height>
+                                    </rect>
+                                </property>
+                                <vbox>
                                     <property name="name">
-                                        <cstring>textLabel2</cstring>
+                                        <cstring>unnamed_2</cstring>
                                     </property>
-                                    <property name="text">
-                                        <string>t0</string>
-                                    </property>
-                                </widget>
-                                <widget class="QLabel">
-                                    <property name="name">
-                                        <cstring>textLabel2_2_2_3</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>Bg1</string>
-                                    </property>
-                                </widget>
-                                <widget class="QLabel">
-                                    <property name="name">
-                                        <cstring>textLabel2_2_2</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>Bg2</string>
-                                    </property>
-                                </widget>
-                                <widget class="QLabel">
-                                    <property name="name">
-                                        <cstring>textLabel2_2_2_2</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>Data 1</string>
-                                    </property>
-                                </widget>
-                                <widget class="QLabel">
-                                    <property name="name">
-                                        <cstring>textLabel2_2_2_2_2</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>Data 2</string>
-                                    </property>
-                                </widget>
-                            </vbox>
+                                    <widget class="QLabel">
+                                        <property name="name">
+                                            <cstring>textLabel2</cstring>
+                                        </property>
+                                        <property name="text">
+                                            <string>t0</string>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLabel">
+                                        <property name="name">
+                                            <cstring>textLabel2_2_2_3</cstring>
+                                        </property>
+                                        <property name="text">
+                                            <string>Bg1</string>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLabel">
+                                        <property name="name">
+                                            <cstring>textLabel2_2_2</cstring>
+                                        </property>
+                                        <property name="text">
+                                            <string>Bg2</string>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLabel">
+                                        <property name="name">
+                                            <cstring>textLabel2_2_2_2</cstring>
+                                        </property>
+                                        <property name="text">
+                                            <string>Data 1</string>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLabel">
+                                        <property name="name">
+                                            <cstring>textLabel2_2_2_2_2</cstring>
+                                        </property>
+                                        <property name="text">
+                                            <string>Data 2</string>
+                                        </property>
+                                    </widget>
+                                </vbox>
+                            </widget>
                         </widget>
-                    </widget>
-                    <widget class="QGroupBox">
-                        <property name="name">
-                            <cstring>groupHist1</cstring>
-                        </property>
-                        <property name="frameShadow">
-                            <enum>Plain</enum>
-                        </property>
-                        <property name="title">
-                            <string>Hist1</string>
-                        </property>
-                        <widget class="QLayoutWidget">
+                        <widget class="QGroupBox">
                             <property name="name">
-                                <cstring>layout18</cstring>
+                                <cstring>groupHist1</cstring>
                             </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>8</x>
-                                    <y>17</y>
-                                    <width>75</width>
-                                    <height>150</height>
-                                </rect>
+                            <property name="frameShadow">
+                                <enum>Plain</enum>
                             </property>
-                            <vbox>
+                            <property name="title">
+                                <string>Hist1</string>
+                            </property>
+                            <widget class="QLayoutWidget">
                                 <property name="name">
-                                    <cstring>unnamed</cstring>
+                                    <cstring>layout18</cstring>
                                 </property>
-                                <property name="margin">
-                                    <number>0</number>
+                                <property name="geometry">
+                                    <rect>
+                                        <x>8</x>
+                                        <y>17</y>
+                                        <width>75</width>
+                                        <height>150</height>
+                                    </rect>
                                 </property>
-                                <property name="spacing">
-                                    <number>0</number>
-                                </property>
-                                <widget class="QLineEdit">
+                                <vbox>
                                     <property name="name">
-                                        <cstring>t01</cstring>
+                                        <cstring>unnamed</cstring>
                                     </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Bg11</cstring>
+                                    <property name="margin">
+                                        <number>0</number>
                                     </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Bg21</cstring>
+                                    <property name="spacing">
+                                        <number>0</number>
                                     </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Data11</cstring>
-                                    </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Data21</cstring>
-                                    </property>
-                                </widget>
-                            </vbox>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>t01</cstring>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>Bg11</cstring>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>Bg21</cstring>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>Data11</cstring>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>Data21</cstring>
+                                        </property>
+                                    </widget>
+                                </vbox>
+                            </widget>
                         </widget>
-                    </widget>
-                    <widget class="QGroupBox">
-                        <property name="name">
-                            <cstring>groupHist2</cstring>
-                        </property>
-                        <property name="enabled">
-                            <bool>true</bool>
-                        </property>
-                        <property name="frameShadow">
-                            <enum>Plain</enum>
-                        </property>
-                        <property name="title">
-                            <string>Hist2</string>
-                        </property>
-                        <widget class="QLayoutWidget">
+                        <widget class="QGroupBox">
                             <property name="name">
-                                <cstring>layout18_2</cstring>
+                                <cstring>groupHist2</cstring>
                             </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>8</x>
-                                    <y>17</y>
-                                    <width>75</width>
-                                    <height>150</height>
-                                </rect>
+                            <property name="enabled">
+                                <bool>true</bool>
                             </property>
-                            <vbox>
+                            <property name="frameShadow">
+                                <enum>Plain</enum>
+                            </property>
+                            <property name="title">
+                                <string>Hist2</string>
+                            </property>
+                            <widget class="QLayoutWidget">
                                 <property name="name">
-                                    <cstring>unnamed_2</cstring>
+                                    <cstring>layout18_2</cstring>
                                 </property>
-                                <property name="margin">
-                                    <number>0</number>
+                                <property name="geometry">
+                                    <rect>
+                                        <x>8</x>
+                                        <y>17</y>
+                                        <width>75</width>
+                                        <height>150</height>
+                                    </rect>
                                 </property>
-                                <property name="spacing">
-                                    <number>0</number>
-                                </property>
-                                <widget class="QLineEdit">
+                                <vbox>
                                     <property name="name">
-                                        <cstring>t02</cstring>
+                                        <cstring>unnamed_2</cstring>
                                     </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Bg12</cstring>
+                                    <property name="margin">
+                                        <number>0</number>
                                     </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Bg22</cstring>
+                                    <property name="spacing">
+                                        <number>0</number>
                                     </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Data12</cstring>
-                                    </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Data22</cstring>
-                                    </property>
-                                </widget>
-                            </vbox>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>t02</cstring>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>Bg12</cstring>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>Bg22</cstring>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>Data12</cstring>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>Data22</cstring>
+                                        </property>
+                                    </widget>
+                                </vbox>
+                            </widget>
                         </widget>
-                    </widget>
-                    <widget class="QGroupBox">
-                        <property name="name">
-                            <cstring>groupHist3</cstring>
-                        </property>
-                        <property name="enabled">
-                            <bool>true</bool>
-                        </property>
-                        <property name="frameShadow">
-                            <enum>Plain</enum>
-                        </property>
-                        <property name="title">
-                            <string>Hist3</string>
-                        </property>
-                        <widget class="QLayoutWidget">
+                        <widget class="QGroupBox">
                             <property name="name">
-                                <cstring>layout18_3</cstring>
+                                <cstring>groupHist3</cstring>
                             </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>8</x>
-                                    <y>17</y>
-                                    <width>75</width>
-                                    <height>150</height>
-                                </rect>
+                            <property name="enabled">
+                                <bool>true</bool>
                             </property>
-                            <vbox>
+                            <property name="frameShadow">
+                                <enum>Plain</enum>
+                            </property>
+                            <property name="title">
+                                <string>Hist3</string>
+                            </property>
+                            <widget class="QLayoutWidget">
                                 <property name="name">
-                                    <cstring>unnamed_2</cstring>
+                                    <cstring>layout18_3</cstring>
                                 </property>
-                                <property name="margin">
-                                    <number>0</number>
+                                <property name="geometry">
+                                    <rect>
+                                        <x>8</x>
+                                        <y>17</y>
+                                        <width>75</width>
+                                        <height>150</height>
+                                    </rect>
                                 </property>
-                                <property name="spacing">
-                                    <number>0</number>
-                                </property>
-                                <widget class="QLineEdit">
+                                <vbox>
                                     <property name="name">
-                                        <cstring>t03</cstring>
+                                        <cstring>unnamed_2</cstring>
                                     </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Bg13</cstring>
+                                    <property name="margin">
+                                        <number>0</number>
                                     </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Bg23</cstring>
+                                    <property name="spacing">
+                                        <number>0</number>
                                     </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Data13</cstring>
-                                    </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Data23</cstring>
-                                    </property>
-                                </widget>
-                            </vbox>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>t03</cstring>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>Bg13</cstring>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>Bg23</cstring>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>Data13</cstring>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>Data23</cstring>
+                                        </property>
+                                    </widget>
+                                </vbox>
+                            </widget>
                         </widget>
-                    </widget>
-                    <widget class="QGroupBox">
-                        <property name="name">
-                            <cstring>groupHist4</cstring>
-                        </property>
-                        <property name="enabled">
-                            <bool>true</bool>
-                        </property>
-                        <property name="frameShadow">
-                            <enum>Plain</enum>
-                        </property>
-                        <property name="title">
-                            <string>Hist4</string>
-                        </property>
-                        <widget class="QLayoutWidget">
+                        <widget class="QGroupBox">
                             <property name="name">
-                                <cstring>layout18_4</cstring>
+                                <cstring>groupHist4</cstring>
                             </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>8</x>
-                                    <y>17</y>
-                                    <width>75</width>
-                                    <height>150</height>
-                                </rect>
+                            <property name="enabled">
+                                <bool>true</bool>
                             </property>
-                            <vbox>
+                            <property name="frameShadow">
+                                <enum>Plain</enum>
+                            </property>
+                            <property name="title">
+                                <string>Hist4</string>
+                            </property>
+                            <widget class="QLayoutWidget">
                                 <property name="name">
-                                    <cstring>unnamed_2</cstring>
+                                    <cstring>layout18_4</cstring>
                                 </property>
-                                <property name="margin">
-                                    <number>0</number>
+                                <property name="geometry">
+                                    <rect>
+                                        <x>8</x>
+                                        <y>17</y>
+                                        <width>75</width>
+                                        <height>150</height>
+                                    </rect>
                                 </property>
-                                <property name="spacing">
-                                    <number>0</number>
-                                </property>
-                                <widget class="QLineEdit">
+                                <vbox>
                                     <property name="name">
-                                        <cstring>t04</cstring>
+                                        <cstring>unnamed_2</cstring>
                                     </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Bg14</cstring>
+                                    <property name="margin">
+                                        <number>0</number>
                                     </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Bg24</cstring>
+                                    <property name="spacing">
+                                        <number>0</number>
                                     </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Data14</cstring>
-                                    </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>Data24</cstring>
-                                    </property>
-                                </widget>
-                            </vbox>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>t04</cstring>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>Bg14</cstring>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>Bg24</cstring>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>Data14</cstring>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>Data24</cstring>
+                                        </property>
+                                    </widget>
+                                </vbox>
+                            </widget>
                         </widget>
-                    </widget>
-                </hbox>
-            </widget>
+                    </hbox>
+                </widget>
+            </grid>
         </widget>
     </widget>
 </widget>
@@ -3680,6 +3677,14 @@
         <separator/>
         <action name="fileExitAction"/>
     </item>
+    <item text="Edit" name="Edit">
+        <action name="editUndoAction"/>
+        <action name="editRedoAction"/>
+        <separator/>
+        <action name="editCutAction"/>
+        <action name="editCopyAction"/>
+        <action name="editPasteAction"/>
+    </item>
     <item text="Actions" name="Actions">
         <action name="Fit"/>
         <action name="Plot"/>
@@ -3689,17 +3694,11 @@
         <action name="parametersExport_AsAction"/>
         <action name="parametersAppend_ToAction"/>
     </item>
-    <item text="Edit" name="Edit">
-        <action name="editUndoAction"/>
-        <action name="editRedoAction"/>
-        <separator/>
-        <action name="editCutAction"/>
-        <action name="editCopyAction"/>
-        <action name="editPasteAction"/>
-    </item>
     <item text="Options" name="Options">
         <action name="FileExistCheck"/>
         <action name="ManualFile"/>
+        <action name="optionsFourier"/>
+        <action name="optionsT0"/>
     </item>
     <item text="&amp;Help" name="helpMenu">
         <action name="helpContentsAction"/>
@@ -4045,10 +4044,13 @@
             <bool>false</bool>
         </property>
         <property name="text">
-            <string>Change name</string>
+            <string>Overwrite MSR File</string>
         </property>
         <property name="menuText">
-            <string>Change name</string>
+            <string>Overwrite MSR File</string>
+        </property>
+        <property name="toolTip">
+            <string>Enable overwriting MSR files</string>
         </property>
         <property name="whatsThis">
             <string>Enable/Disable checking for MSR files.</string>
@@ -4175,6 +4177,34 @@
             <string>Ctrl+T</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>optionsFourier</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="text">
+            <string>Fourier</string>
+        </property>
+        <property name="menuText">
+            <string>Fourier</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>optionsT0</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="text">
+            <string>T0 and Bg bins</string>
+        </property>
+        <property name="menuText">
+            <string>T0 and Bg bins</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -4268,12 +4298,6 @@
         <signal>clicked()</signal>
         <receiver>MuSRFitform</receiver>
         <slot>fileBrowse()</slot>
-    </connection>
-    <connection>
-        <sender>ManualFile</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>MuSRFitform</receiver>
-        <slot>RunSelectionToggle()</slot>
     </connection>
     <connection>
         <sender>InitParamTable</sender>
@@ -4428,8 +4452,8 @@
     <tabstop>FUnits</tabstop>
     <tabstop>FApodization</tabstop>
     <tabstop>FPlot</tabstop>
-    <tabstop>lineEdit28</tabstop>
-    <tabstop>lineEdit28_2</tabstop>
+    <tabstop>FrqMin</tabstop>
+    <tabstop>FrqMax</tabstop>
     <tabstop>t01</tabstop>
     <tabstop>Bg11</tabstop>
     <tabstop>Bg21</tabstop>
