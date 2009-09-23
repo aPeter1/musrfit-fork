@@ -52,13 +52,11 @@ using namespace std;
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> Constructor, reading the data histogramm files.
  *
  */
 PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo) : fMsrInfo(msrInfo)
 {
-//  cout << endl << "in PRunDataHandler::PRunDataHandler()";
-
   // read files
   if (!ReadFile()) // couldn't read file
     fAllDataAvailable = false;
@@ -70,30 +68,24 @@ PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo) : fMsrInfo(msrInfo)
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p> Constructor, reading the data histogramm files, and keeping a copy
+ * of potential search paths.
  */
 PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo, const PStringVector dataPath) : 
       fMsrInfo(msrInfo), fDataPath(dataPath)
 {
-//  cout << endl << "in PRunDataHandler::PRunDataHandler()";
-
   // read files
   if (!ReadFile()) // couldn't read file
     fAllDataAvailable = false;
   else
     fAllDataAvailable = true;
-
-/*for (unsigned int i=0; i<fDataPath.size(); i++)
-  cout << endl << i << ": " << fDataPath[i].Data();
-cout << endl;*/
 }
 
 //--------------------------------------------------------------------------
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> Destructor.
  *
  */
 PRunDataHandler::~PRunDataHandler()
@@ -110,16 +102,18 @@ PRunDataHandler::~PRunDataHandler()
 // GetRunData
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> Checks if runName is found.
  *
- * \param runName
+ * <b>return:</b> if data are found: pointer to the data.
+ * otherwise the null pointer will be returned.
+ *
+ * \param runName run name, e.g. 2009/lem09_his_1234
  */
 PRawRunData* PRunDataHandler::GetRunData(const TString &runName)
 {
   unsigned int i;
 
   for (i=0; i<fData.size(); i++) {
-// cout << endl << ">> run name = " << fData[i].fRunName.Data(); 
     if (!fData[i].fRunName.CompareTo(runName)) // run found
       break;
   }
@@ -134,8 +128,10 @@ PRawRunData* PRunDataHandler::GetRunData(const TString &runName)
 // ReadFile
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> The main read file routine which is filtering what read sub-routine
+ * needs to be called.
  *
+ * <b>return:</b> true if reading was successful, false if reading failed.
  */
 bool PRunDataHandler::ReadFile()
 {
@@ -151,7 +147,6 @@ bool PRunDataHandler::ReadFile()
 
   for (unsigned int i=0; i<runList->size(); i++) {
     for (unsigned int j=0; j<runList->at(i).fRunName.size(); j++) {
-// cout << endl << "run : " << runList->at(i).fRunName[j].Data();
       fRunName = runList->at(i).fRunName[j];
       // check is file is already read
       if (FileAlreadyRead(runList->at(i).fRunName[j]))
@@ -188,8 +183,10 @@ bool PRunDataHandler::ReadFile()
 // FileAlreadyRead
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> Checks if a file has been already read in order to prevent multiple
+ * reading of data files.
  *
+ * <b>return:</b> true if the file has been read before, otherwise false.
  */
 bool PRunDataHandler::FileAlreadyRead(TString runName)
 {
@@ -206,8 +203,12 @@ bool PRunDataHandler::FileAlreadyRead(TString runName)
 // FileExistsCheck
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> Checks if a given data file exists.
  *
+ * \param runInfo reference to the msr-run-structure
+ * \param idx index of the run (needed for ADDRUN feature).
+ *
+ * <b>return:</b> true if data file exists, otherwise false.
  */
 bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const unsigned int idx)
 {
@@ -326,7 +327,6 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const unsigned 
             runInfo.fBeamline[idx] + TString("/") +
             dt + TString("/") +
             runInfo.fRunName[idx] + TString(".") + ext;
-cout << endl << ">> generated path: " << str.Data() << endl;
       if (gSystem->AccessPathName(str.Data())!=true) { // found
         pathName = str;
         break;
@@ -336,12 +336,12 @@ cout << endl << ">> generated path: " << str.Data() << endl;
 
   // no proper path name found
   if (pathName.CompareTo("???") == 0) {
-    cout << endl << "**ERROR** Couldn't find '" << runInfo.fRunName[idx] << "' in any standard path.";
-    cout << endl << "  standard search pathes are:";
-    cout << endl << "  1. the local directory";
-    cout << endl << "  2. the data directory given in the startup XML file";
-    cout << endl << "  3. the directories listed in WKMFULLDATAPATH";
-    cout << endl << "  4. default path construct which is described in the manual"; 
+    cerr << endl << "**ERROR** Couldn't find '" << runInfo.fRunName[idx] << "' in any standard path.";
+    cerr << endl << "  standard search pathes are:";
+    cerr << endl << "  1. the local directory";
+    cerr << endl << "  2. the data directory given in the startup XML file";
+    cerr << endl << "  3. the directories listed in WKMFULLDATAPATH";
+    cerr << endl << "  4. default path construct which is described in the manual";
     return false;
   }
 
@@ -354,18 +354,18 @@ cout << endl << ">> generated path: " << str.Data() << endl;
 // ReadRootFile
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> Reads the LEM-data ROOT-files.
  *
  * \param notPostPileup This flag is used as a switch between "Not Post Pileup Corrected" 
  *                      and "Post Pileup Corrected" histogramms.
+ *
+ * <b>return:</b> true at successful reading, otherwise false.
  */
 bool PRunDataHandler::ReadRootFile(bool notPostPileup)
 {
   PDoubleVector histoData;
   PRawRunData   runData;
 
-//cout << endl << ">> in ReadRootFile() ...";
-//cout << endl << ">> fRunPathName = " << fRunPathName.Data();
   TFile f(fRunPathName.Data());
   if (f.IsZombie()) {
     return false;
@@ -403,7 +403,6 @@ bool PRunDataHandler::ReadRootFile(bool notPostPileup)
 
   // get implantation energy
   runData.fEnergy = runHeader->GetImpEnergy();
-//cout << endl << ">> runData.fEnergy = " << runData.fEnergy;
 
   // get moderator HV
   runData.fTransport = runHeader->GetModeratorHV();
@@ -523,10 +522,6 @@ bool PRunDataHandler::ReadRootFile(bool notPostPileup)
       os = dynamic_cast<TObjString*>(summIter.Next()); // next summary line...
     }
   }
-//   for (unsigned int i(0); i<runData.fRingAnode.size(); i++){
-//     cout << endl << runData.fRingAnode[i];
-//   }
-//   cout << endl;
 
   // read data ---------------------------------------------------------
   // check if histos folder is found
@@ -541,7 +536,6 @@ bool PRunDataHandler::ReadRootFile(bool notPostPileup)
   if (notPostPileup) { // read the data which are NOT post pileup corrected
     for (int i=0; i<noOfHistos; i++) {
       sprintf(histoName, "hDecay%02d", i);
-//cout << endl << ">> histoName = " << histoName;
       TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
       if (!histo) {
         cout << endl << "PRunDataHandler::ReadRootFile: Couldn't get histo " << histoName;
@@ -558,7 +552,6 @@ bool PRunDataHandler::ReadRootFile(bool notPostPileup)
   } else { // read the data which ARE post pileup corrected
     for (int i=0; i<noOfHistos; i++) {
       sprintf(histoName, "hDecay%02d", i+POST_PILEUP_HISTO_OFFSET);
-//cout << endl << ">> histoName = " << histoName;
       TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
       if (!histo) {
         cout << endl << "PRunDataHandler::ReadRootFile: Couldn't get histo " << histoName;
@@ -573,7 +566,6 @@ bool PRunDataHandler::ReadRootFile(bool notPostPileup)
       histoData.clear();
     }
   }
-//cout << endl;
 
   f.Close();
 
@@ -597,8 +589,10 @@ bool PRunDataHandler::ReadRootFile(bool notPostPileup)
 // ReadNexusFile
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> Will read the NeXuS File Format as soon as PSI will have an implementation.
  *
+ *
+ * <b>return:</b> true at successful reading, otherwise false.
  */
 bool PRunDataHandler::ReadNexusFile()
 {
@@ -610,8 +604,10 @@ bool PRunDataHandler::ReadNexusFile()
 // ReadWkmFile
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> Reads, for backwards compatibility, the ascii-wkm-file data format.
+ * The routine is clever enough to distinguish the different wkm-flavours (argh).
  *
+ * <b>return:</b> true at successful reading, otherwise false.
  */
 bool PRunDataHandler::ReadWkmFile()
 {
@@ -761,23 +757,14 @@ bool PRunDataHandler::ReadWkmFile()
   } while (headerInfo && !f.eof());
 
   if ((groups == 0) || (channels == 0) || runData.fTimeResolution == 0.0) {
-    cout << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** essential header informations are missing!";
-    cout << endl << "  >> groups          = " << groups;
-    cout << endl << "  >> channels        = " << channels;
-    cout << endl << "  >> time resolution = " << runData.fTimeResolution;
-    cout << endl;
+    cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** essential header informations are missing!";
+    cerr << endl << "  >> groups          = " << groups;
+    cerr << endl << "  >> channels        = " << channels;
+    cerr << endl << "  >> time resolution = " << runData.fTimeResolution;
+    cerr << endl;
     f.close();
     return false;
   }
-/*
-cout << endl << ">> run title: '" << runData.fRunTitle.Data() << "'";
-cout << endl << ">> setup    : '" << runData.fSetup.Data() << "'";
-cout << endl << ">> field    : " << runData.fField;
-cout << endl << ">> temp     : " << runData.fTemp;
-cout << endl << ">> groups   : " << groups;
-cout << endl << ">> channels : " << channels;
-cout << endl << ">> time resolution : " << runData.fTimeResolution;
-*/
 
   // read data ---------------------------------------------------------
   unsigned int group_counter = 0;
@@ -802,7 +789,7 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
       tokens = line.Tokenize(" ");
 
       if (!tokens) { // no tokens found
-        cout << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: coulnd't tokenize run data.";
+        cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: coulnd't tokenize run data.";
         // clean up
         for (unsigned int i=0; i<group_counter; i++)
           runData.fDataBin[i].clear();
@@ -816,7 +803,7 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
         if (ok) {
           histoData.push_back(val);
         } else {
-          cout << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: data line contains non-integer values.";
+          cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: data line contains non-integer values.";
           // clean up
           for (unsigned int i=0; i<group_counter; i++)
             runData.fDataBin[i].clear();
@@ -842,7 +829,7 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
     line = TString(instr);
     tokens = line.Tokenize(" ");
     if (!tokens) { // no tokens found
-      cout << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: coulnd't tokenize run data.";
+      cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: coulnd't tokenize run data.";
       // clean up
       for (unsigned int i=0; i<group_counter; i++)
         runData.fDataBin[i].clear();
@@ -856,7 +843,7 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
       if (ok) {
         histoData.push_back(val);
       } else {
-        cout << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: data line contains non-integer values.";
+        cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: data line contains non-integer values.";
         // clean up
         for (unsigned int i=0; i<group_counter; i++)
           runData.fDataBin[i].clear();
@@ -883,8 +870,8 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
 
   // check if all groups are found
   if ((int) runData.fDataBin.size() != groups) {
-    cout << endl << "PRunDataHandler::ReadWkmFile(): **ERROR**";
-    cout << endl << "  expected " << groups << " histos, but found " << runData.fDataBin.size();
+    cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR**";
+    cerr << endl << "  expected " << groups << " histos, but found " << runData.fDataBin.size();
     // clean up
     for (unsigned int i=0; i<runData.fDataBin.size(); i++)
       runData.fDataBin[i].clear();
@@ -895,8 +882,8 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
   // check if all groups have enough channels
   for (unsigned int i=0; i<runData.fDataBin.size(); i++) {
     if ((int) runData.fDataBin[i].size() != channels) {
-      cout << endl << "PRunDataHandler::ReadWkmFile(): **ERROR**";
-      cout << endl << "  expected " << channels << " bins in histo " << i << ", but found " << runData.fDataBin[i].size();
+      cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR**";
+      cerr << endl << "  expected " << channels << " bins in histo " << i << ", but found " << runData.fDataBin[i].size();
       // clean up
       for (unsigned int j=0; j<runData.fDataBin.size(); j++)
         runData.fDataBin[j].clear();
@@ -923,8 +910,10 @@ cout << endl << ">> time resolution : " << runData.fTimeResolution;
 // ReadPsiBinFile
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> Reads the old-fashioned PSI-BIN data-files. The MuSR_td_PSI_bin class
+ * of Alex Amato is used. In case of problems, please contact alex.amato@psi.ch.
  *
+ * <b>return:</b> true at successful reading, otherwise false.
  */
 bool PRunDataHandler::ReadPsiBinFile()
 {
@@ -941,23 +930,23 @@ bool PRunDataHandler::ReadPsiBinFile()
       success = true;
       break;
     case 1: // couldn't open file, or failed while reading the header
-      cout << endl << "**ERROR** couldn't open psibin file, or failed while reading the header";
-      cout << endl;
+      cerr << endl << "**ERROR** couldn't open psibin file, or failed while reading the header";
+      cerr << endl;
       success = false;
       break;
     case 2: // unsupported version of the data
-      cout << endl << "**ERROR** psibin file: unsupported version of the data";
-      cout << endl;
+      cerr << endl << "**ERROR** psibin file: unsupported version of the data";
+      cerr << endl;
       success = false;
       break;
     case 3: // error when allocating data buffer
-      cout << endl << "**ERROR** psibin file: error when allocating data buffer";
-      cout << endl;
+      cerr << endl << "**ERROR** psibin file: error when allocating data buffer";
+      cerr << endl;
       success = false;
       break;
     case 4: // number of histograms/record not equals 1
-      cout << endl << "**ERROR** psibin file: number of histograms/record not equals 1";
-      cout << endl;
+      cerr << endl << "**ERROR** psibin file: number of histograms/record not equals 1";
+      cerr << endl;
       success = false;
       break;
     default: // you never should have reached this point
@@ -968,13 +957,6 @@ bool PRunDataHandler::ReadPsiBinFile()
   // if any reading error happend, get out of here
   if (!success)
     return success;
-
-/*
-cout << endl << "> " << psiBin.get_numberHisto_int() << ": ";
-for (int i=0; i<psiBin.get_numberHisto_int(); i++)
-  cout << endl << "> " << psiBin.get_nameHisto(i);
-cout << endl;
-*/
 
   // fill necessary header informations
   PIntVector ivec;
@@ -1020,8 +1002,8 @@ cout << endl;
   // get t0's
   ivec = psiBin.get_t0_vector();
   if (ivec.empty()) {
-    cout << endl << "**ERROR** psibin file: couldn't obtain any t0's";
-    cout << endl;
+    cerr << endl << "**ERROR** psibin file: couldn't obtain any t0's";
+    cerr << endl;
     return false;
   }
   for (unsigned int i=0; i<ivec.size(); i++)
@@ -1049,8 +1031,6 @@ cout << endl;
     runData.fDataBin[i].clear();
   runData.fDataBin.clear();
 
-// cout << endl << "end of ReadPsiBinFile() ..." << endl;
-
   return success;
 }
 
@@ -1058,8 +1038,9 @@ cout << endl;
 // ReadMudFile
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> Reads the triumf mud-file format. <b>Not yet implemented, sorry</b>.
  *
+ * <b>return:</b> true at successful reading, otherwise false.
  */
 bool PRunDataHandler::ReadMudFile()
 {
@@ -1078,6 +1059,7 @@ bool PRunDataHandler::ReadMudFile()
  * The file can start with some header info. The header is optional, as all its tags, but 
  * if present it has the following format:
  *
+ * \verbatim
  * HEADER
  * TITLE:  title
  * X-AXIS-TITLE: x-axis title
@@ -1086,18 +1068,22 @@ bool PRunDataHandler::ReadMudFile()
  * FIELD:  field
  * TEMP:   temperature
  * ENERGY: energy
+ * \endverbatim
  *
  * field is assumed to be given in (G), the temperature in (K), the energy in (keV)
  *
  * The data are read column like and start with the data tag DATA, followed by the
  * data columns, i.e.:
  *
+ * \verbatim
  * DATA
  * x, y [, error y]
+ * \endverbatim
  *
  * where spaces, column, are a tab are possible separations.
  * If no error in y is present, the weighting in the fit will be equal.
  *
+ * <b>return:</b> true at successful reading, otherwise false.
  */
 bool PRunDataHandler::ReadAsciiFile()
 {
@@ -1109,8 +1095,8 @@ bool PRunDataHandler::ReadAsciiFile()
   // open data-file
   f.open(fRunPathName.Data(), ifstream::in);
   if (!f.is_open()) {
-    cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** Couldn't open data file (" << fRunPathName.Data() << ") for reading, sorry ...";
-    cout << endl;
+    cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** Couldn't open data file (" << fRunPathName.Data() << ") for reading, sorry ...";
+    cerr << endl;
     return false;
   }
 
@@ -1170,8 +1156,8 @@ bool PRunDataHandler::ReadAsciiFile()
       } else if (workStr.BeginsWith("field:", TString::kIgnoreCase)) {
         workStr = TString(workStr.Data()+workStr.First(":")+2);
         if (!workStr.IsFloat()) {
-          cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", field is not a number.";
-          cout << endl;
+          cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", field is not a number.";
+          cerr << endl;
           success = false;
           break;
         }
@@ -1183,8 +1169,8 @@ bool PRunDataHandler::ReadAsciiFile()
       } else if (workStr.BeginsWith("temp:", TString::kIgnoreCase)) {
         workStr = TString(workStr.Data()+workStr.First(":")+2);
         if (!workStr.IsFloat()) {
-          cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", temperature is not a number.";
-          cout << endl;
+          cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", temperature is not a number.";
+          cerr << endl;
           success = false;
           break;
         }
@@ -1194,8 +1180,8 @@ bool PRunDataHandler::ReadAsciiFile()
       } else if (workStr.BeginsWith("energy:", TString::kIgnoreCase)) {
         workStr = TString(workStr.Data()+workStr.First(":")+2);
         if (!workStr.IsFloat()) {
-          cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", energy is not a number.";
-          cout << endl;
+          cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", energy is not a number.";
+          cerr << endl;
           success = false;
           break;
         }
@@ -1203,8 +1189,8 @@ bool PRunDataHandler::ReadAsciiFile()
         runData.fTransport = -999.0; // just to initialize the variables to some "meaningful" value
         runData.fRingAnode.clear();
       } else { // error
-        cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", illegal header line.";
-        cout << endl;
+        cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", illegal header line.";
+        cerr << endl;
         success = false;
         break;
       }
@@ -1217,8 +1203,8 @@ bool PRunDataHandler::ReadAsciiFile()
       tokens = line.Tokenize(" ,\t");
       // check if the number of data line entries is 2 or 3
       if ((tokens->GetEntries() != 2) && (tokens->GetEntries() != 3)) {
-        cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** found data line with a structure different than \"x, y [, error y]\", cannot be handled (line no " << lineNo << ")";
-        cout << endl;
+        cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** found data line with a structure different than \"x, y [, error y]\", cannot be handled (line no " << lineNo << ")";
+        cerr << endl;
         success = false;
         break;
       }
@@ -1226,8 +1212,8 @@ bool PRunDataHandler::ReadAsciiFile()
       // get x
       ostr = dynamic_cast<TObjString*>(tokens->At(0));
       if (!ostr->GetString().IsFloat()) {
-        cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ": x = " << ostr->GetString().Data() << " is not a number, sorry.";
-        cout << endl;
+        cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ": x = " << ostr->GetString().Data() << " is not a number, sorry.";
+        cerr << endl;
         success = false;
         break;
       }
@@ -1236,8 +1222,8 @@ bool PRunDataHandler::ReadAsciiFile()
       // get y
       ostr = dynamic_cast<TObjString*>(tokens->At(1));
       if (!ostr->GetString().IsFloat()) {
-        cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ": y = " << ostr->GetString().Data() << " is not a number, sorry.";
-        cout << endl;
+        cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ": y = " << ostr->GetString().Data() << " is not a number, sorry.";
+        cerr << endl;
         success = false;
         break;
       }
@@ -1247,8 +1233,8 @@ bool PRunDataHandler::ReadAsciiFile()
       if (tokens->GetEntries() == 3) {
         ostr = dynamic_cast<TObjString*>(tokens->At(2));
         if (!ostr->GetString().IsFloat()) {
-          cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ": error y = " << ostr->GetString().Data() << " is not a number, sorry.";
-          cout << endl;
+          cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ": error y = " << ostr->GetString().Data() << " is not a number, sorry.";
+          cerr << endl;
           success = false;
           break;
         }
@@ -1268,11 +1254,10 @@ bool PRunDataHandler::ReadAsciiFile()
       exVec.push_back(1.0);
       yVec.push_back(y);
       eyVec.push_back(ey);
-//cout << endl << ">> (x/y/ey) = (" << x << "/" << y << "/" << ey << ")";
 
     } else {
-      cout << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << " neither header nor data line. No idea how to handle it!";
-      cout << endl;
+      cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << " neither header nor data line. No idea how to handle it!";
+      cerr << endl;
       success = false;
       break;
     }
@@ -1295,8 +1280,6 @@ bool PRunDataHandler::ReadAsciiFile()
   eyVec.clear();
   runData.fDataNonMusr.fData.clear();
   runData.fDataNonMusr.fErrData.clear();
-
-//cout << endl << ">> end of ReadAsciiFile()";
 
   return success;
 }
@@ -1420,8 +1403,8 @@ bool PRunDataHandler::ReadDBFile()
   // open db-file
   f.open(fRunPathName.Data(), ifstream::in);
   if (!f.is_open()) {
-    cout << endl << "PRunDataHandler::ReadDBFile **ERROR** Couldn't open data file (" << fRunPathName.Data() << ") for reading, sorry ...";
-    cout << endl;
+    cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** Couldn't open data file (" << fRunPathName.Data() << ") for reading, sorry ...";
+    cerr << endl;
     return false;
   }
 
@@ -1447,7 +1430,6 @@ bool PRunDataHandler::ReadDBFile()
     // get next line from file
     f.getline(instr, sizeof(instr));
     line = TString(instr);
-// cout << endl << instr;
     lineNo++;
 
     // check if comment line
@@ -1462,23 +1444,18 @@ bool PRunDataHandler::ReadDBFile()
     workStr = line;
     workStr.Remove(TString::kLeading, ' '); // remove spaces from the begining
     if (workStr.BeginsWith("title", TString::kIgnoreCase)) {
-// cout << endl << ">> TITLE line found ...";
       dbTag = 0;
       continue;
     } else if (workStr.BeginsWith("abstract", TString::kIgnoreCase)) {
-// cout << endl << ">> ABSTRACT line found ...";
       dbTag = 1;
       continue;
     } else if (workStr.BeginsWith("comments", TString::kIgnoreCase)) {
-// cout << endl << ">> COMMENTS line found ...";
       dbTag = 2;
       continue;
     } else if (workStr.BeginsWith("label", TString::kIgnoreCase)) {
-// cout << endl << ">> LABEL line found ...";
       dbTag = 3;
       continue;
     } else if (workStr.BeginsWith("data", TString::kIgnoreCase)) {
-// cout << endl << ">> DATA line found ...";
       dbTag = 4;
 
       // filter out all data tags
@@ -1486,7 +1463,6 @@ bool PRunDataHandler::ReadDBFile()
       for (int i=1; i<tokens->GetEntries(); i++) {
         ostr = dynamic_cast<TObjString*>(tokens->At(i));
         runData.fDataNonMusr.fDataTags.push_back(ostr->GetString());
-// cout << endl << ">> DATA tag " << i << ": " << ostr->GetString().Data();
       }
 
       // clean up tokens
@@ -1508,7 +1484,6 @@ bool PRunDataHandler::ReadDBFile()
         // nothing to be done for now
         break;
       case 3: // LABEL
-// cout << endl << ">> label: " << workStr.Data();
         runData.fDataNonMusr.fLabels.push_back(workStr);
         break;
       case 4: // DATA
@@ -1517,7 +1492,6 @@ bool PRunDataHandler::ReadDBFile()
             workStr.BeginsWith("\\e", TString::kIgnoreCase)  ||
             workStr.BeginsWith("/-e", TString::kIgnoreCase)  ||
             workStr.BeginsWith("/e", TString::kIgnoreCase)) {
-// cout << endl << ">> \\-e like tag found ...";
           continue;
         }
 
@@ -1528,10 +1502,8 @@ bool PRunDataHandler::ReadDBFile()
           ostr = dynamic_cast<TObjString*>(tokens->At(0));
           if (!ostr->GetString().IsFloat()) {
             labelledFormat = true;
-// cout << endl << ">> data give in labelled format ...";
           } else {
             labelledFormat = false;
-// cout << endl << ">> data give in row format ...";
           }
           // clean up tokens
           if (tokens) {
@@ -1556,9 +1528,9 @@ bool PRunDataHandler::ReadDBFile()
             TString run("run");
             idx = GetDataTagIndex(run, runData.fDataNonMusr.fDataTags);
             if (idx == -1) {
-              cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
-              cout << endl << ">> " << workStr.Data();
-              cout << endl << ">> found potential run data line without run data tag.";
+              cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+              cerr << endl << ">> " << workStr.Data();
+              cerr << endl << ">> found potential run data line without run data tag.";
               return false;
             }
             // split string in tokens
@@ -1566,10 +1538,10 @@ bool PRunDataHandler::ReadDBFile()
             ostr = dynamic_cast<TObjString*>(tokens->At(0));
             tstr = ostr->GetString();
             if (!tstr.IsFloat()) {
-              cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
-              cout << endl << ">> " << workStr.Data();
-              cout << endl << ">> Expected db-data line with structure: runNo,,, runTitle";
-              cout << endl << ">> runNo = " << tstr.Data() << ", seems to be not a number.";
+              cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+              cerr << endl << ">> " << workStr.Data();
+              cerr << endl << ">> Expected db-data line with structure: runNo,,, runTitle";
+              cerr << endl << ">> runNo = " << tstr.Data() << ", seems to be not a number.";
               delete tokens;
               return false;
             }
@@ -1582,20 +1554,19 @@ bool PRunDataHandler::ReadDBFile()
             // split string in tokens
             tokens = workStr.Tokenize("=,"); // line has structure: tag = val,err1,err2,
             if (tokens->GetEntries() < 3) {
-              cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
-              cout << endl << ">> " << workStr.Data();
-              cout << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
+              cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+              cerr << endl << ">> " << workStr.Data();
+              cerr << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
               delete tokens;
               return false;
             }
             ostr = dynamic_cast<TObjString*>(tokens->At(0));
             tstr = ostr->GetString();
             idx = GetDataTagIndex(tstr, runData.fDataNonMusr.fDataTags);
-// cout << endl << "->> " << tstr.Data() << ", " << idx;
             if (idx == -1) {
-              cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
-              cout << endl << ">> " << workStr.Data();
-              cout << endl << ">> data tag error: " << tstr.Data() << " seems not present in the data tag list";
+              cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+              cerr << endl << ">> " << workStr.Data();
+              cerr << endl << ">> data tag error: " << tstr.Data() << " seems not present in the data tag list";
               delete tokens;
               return false;
             }
@@ -1604,21 +1575,17 @@ bool PRunDataHandler::ReadDBFile()
               case 3: // tag = val,,,
                 ostr = dynamic_cast<TObjString*>(tokens->At(1));
                 tstr = ostr->GetString();
-// cout << endl << ">>> " << tstr.Data();
                 if (!tstr.IsFloat()) {
-                  cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
-                  cout << endl << ">> " << workStr.Data();
-                  cout << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
-                  cout << endl << ">> val = " << tstr.Data() << ", seems to be not a number.";
+                  cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+                  cerr << endl << ">> " << workStr.Data();
+                  cerr << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
+                  cerr << endl << ">> val = " << tstr.Data() << ", seems to be not a number.";
                   delete tokens;
                   return false;
                 }
                 val = tstr.Atof();
-// cout << endl << ">>> " << val << ", " << idx << endl;
                 runData.fDataNonMusr.fData[idx].push_back(val);
-// cout << endl << ">>> " << endl;
                 runData.fDataNonMusr.fErrData[idx].push_back(1.0);
-// cout << endl << ">>> done <<<" << endl;
                 break;
               case 4: // tag = val,err,,
               case 5: // tag = val,err1,err2,
@@ -1626,10 +1593,10 @@ bool PRunDataHandler::ReadDBFile()
                 ostr = dynamic_cast<TObjString*>(tokens->At(1));
                 tstr = ostr->GetString();
                 if (!tstr.IsFloat()) {
-                  cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
-                  cout << endl << ">> " << workStr.Data();
-                  cout << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
-                  cout << endl << ">> val = " << tstr.Data() << ", seems to be not a number.";
+                  cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+                  cerr << endl << ">> " << workStr.Data();
+                  cerr << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
+                  cerr << endl << ">> val = " << tstr.Data() << ", seems to be not a number.";
                   delete tokens;
                   return false;
                 }
@@ -1639,10 +1606,10 @@ bool PRunDataHandler::ReadDBFile()
                 ostr = dynamic_cast<TObjString*>(tokens->At(2));
                 tstr = ostr->GetString();
                 if (!tstr.IsFloat()) {
-                  cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
-                  cout << endl << ">> " << workStr.Data();
-                  cout << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
-                  cout << endl << ">> err1 = " << tstr.Data() << ", seems to be not a number.";
+                  cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+                  cerr << endl << ">> " << workStr.Data();
+                  cerr << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
+                  cerr << endl << ">> err1 = " << tstr.Data() << ", seems to be not a number.";
                   delete tokens;
                   return false;
                 }
@@ -1650,9 +1617,9 @@ bool PRunDataHandler::ReadDBFile()
                 runData.fDataNonMusr.fErrData[idx].push_back(val);
                 break;
               default:
-                cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
-                cout << endl << ">> " << workStr.Data();
-                cout << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
+                cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+                cerr << endl << ">> " << workStr.Data();
+                cerr << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
                 delete tokens;
                 return false;
                 break;
@@ -1663,11 +1630,11 @@ bool PRunDataHandler::ReadDBFile()
           // split string in tokens
           tokens = workStr.Tokenize(","); // line has structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle
           if (tokens->GetEntries() != (int)(3*runData.fDataNonMusr.fDataTags.size()+1)) {
-            cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
-            cout << endl << ">> " << workStr.Data();
-            cout << endl << ">> Expected db-data line with structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle";
-            cout << endl << ">> found = " << tokens->GetEntries() << " tokens, however expected " << 3*runData.fDataNonMusr.fDataTags.size()+1;
-            cout << endl << ">> Perhaps there are commas without space inbetween, like 12.3,, 3.2,...";
+            cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+            cerr << endl << ">> " << workStr.Data();
+            cerr << endl << ">> Expected db-data line with structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle";
+            cerr << endl << ">> found = " << tokens->GetEntries() << " tokens, however expected " << 3*runData.fDataNonMusr.fDataTags.size()+1;
+            cerr << endl << ">> Perhaps there are commas without space inbetween, like 12.3,, 3.2,...";
             delete tokens;
             return false;
           }
@@ -1678,10 +1645,10 @@ bool PRunDataHandler::ReadDBFile()
             ostr = dynamic_cast<TObjString*>(tokens->At(i));
             tstr = ostr->GetString();
             if (!tstr.IsFloat()) {
-              cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
-              cout << endl << ">> " << workStr.Data();
-              cout << endl << ">> Expected db-data line with structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle";
-              cout << endl << ">> value=" << tstr.Data() << " seems not to be a number";
+              cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+              cerr << endl << ">> " << workStr.Data();
+              cerr << endl << ">> Expected db-data line with structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle";
+              cerr << endl << ">> value=" << tstr.Data() << " seems not to be a number";
               delete tokens;
               return false;
             }
@@ -1695,10 +1662,10 @@ bool PRunDataHandler::ReadDBFile()
             } else if (tstr.IsFloat()) {
               runData.fDataNonMusr.fErrData[j].push_back(tstr.Atof());
             } else {
-              cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
-              cout << endl << ">> " << workStr.Data();
-              cout << endl << ">> Expected db-data line with structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle";
-              cout << endl << ">> error1=" << tstr.Data() << " seems not to be a number";
+              cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+              cerr << endl << ">> " << workStr.Data();
+              cerr << endl << ">> Expected db-data line with structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle";
+              cerr << endl << ">> error1=" << tstr.Data() << " seems not to be a number";
               delete tokens;
               return false;
             }
@@ -1713,15 +1680,12 @@ bool PRunDataHandler::ReadDBFile()
 
   f.close();
 
-// cout << endl << ">> run title: '" << runData.fRunTitle.Data() << "'";
-// cout << endl;
-
   // check that the number of labels == the number of data tags
   if (runData.fDataNonMusr.fLabels.size() != runData.fDataNonMusr.fDataTags.size()) {
-    cout << endl << "PRunDataHandler::ReadDBFile **ERROR**";
-    cout << endl << ">> number of LABELS found    = " << runData.fDataNonMusr.fLabels.size();
-    cout << endl << ">> number of Data tags found = " << runData.fDataNonMusr.fDataTags.size();
-    cout << endl << ">> They have to be equal!!";
+    cerr << endl << "PRunDataHandler::ReadDBFile **ERROR**";
+    cerr << endl << ">> number of LABELS found    = " << runData.fDataNonMusr.fLabels.size();
+    cerr << endl << ">> number of Data tags found = " << runData.fDataNonMusr.fDataTags.size();
+    cerr << endl << ">> They have to be equal!!";
     if (tokens) {
       delete tokens;
       tokens = 0;
@@ -1732,18 +1696,18 @@ bool PRunDataHandler::ReadDBFile()
   // check if all vectors have the same size
   for (unsigned int i=1; i<runData.fDataNonMusr.fData.size(); i++) {
     if (runData.fDataNonMusr.fData[i].size() != runData.fDataNonMusr.fData[i-1].size()) {
-      cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo;
-      cout << endl << ">> label: " << runData.fDataNonMusr.fDataTags[i-1].Data() << ", number data elements = " << runData.fDataNonMusr.fData[i-1].size();
-      cout << endl << ">> label: " << runData.fDataNonMusr.fDataTags[i].Data() << ", number data elements = " << runData.fDataNonMusr.fData[i].size();
-      cout << endl << ">> They have to be equal!!";
+      cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo;
+      cerr << endl << ">> label: " << runData.fDataNonMusr.fDataTags[i-1].Data() << ", number data elements = " << runData.fDataNonMusr.fData[i-1].size();
+      cerr << endl << ">> label: " << runData.fDataNonMusr.fDataTags[i].Data() << ", number data elements = " << runData.fDataNonMusr.fData[i].size();
+      cerr << endl << ">> They have to be equal!!";
       success = false;
       break;
     }
     if (runData.fDataNonMusr.fErrData[i].size() != runData.fDataNonMusr.fErrData[i-1].size()) {
-      cout << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo;
-      cout << endl << ">> label: " << runData.fDataNonMusr.fDataTags[i-1].Data() << ", number data elements = " << runData.fDataNonMusr.fData[i-1].size();
-      cout << endl << ">> label: " << runData.fDataNonMusr.fDataTags[i].Data() << ", number error data elements = " << runData.fDataNonMusr.fErrData[i].size();
-      cout << endl << ">> They have to be equal!!";
+      cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo;
+      cerr << endl << ">> label: " << runData.fDataNonMusr.fDataTags[i-1].Data() << ", number data elements = " << runData.fDataNonMusr.fData[i-1].size();
+      cerr << endl << ">> label: " << runData.fDataNonMusr.fDataTags[i].Data() << ", number error data elements = " << runData.fDataNonMusr.fErrData[i].size();
+      cerr << endl << ">> They have to be equal!!";
       success = false;
       break;
     }
@@ -1767,9 +1731,12 @@ bool PRunDataHandler::ReadDBFile()
 // StripWhitespace (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> Strip white spaces from a string. The hope is that future TString
+ * implementations of ROOT will make this routine obsolate.
  *
- * \param str
+ * \param str string to be stripped. It will be modified directly on success.
+ *
+ * <b>return:</b> true at success, otherwise false.
  */
 bool PRunDataHandler::StripWhitespace(TString &str)
 {
@@ -1834,9 +1801,12 @@ bool PRunDataHandler::StripWhitespace(TString &str)
 // IsWhitespace (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> Check is a string consists only of white spaces, i.e. spaces and/or
+ * ctrl-characters.
  *
- * \param str
+ * \param str string to be checked
+ *
+ * <b>return:</b> true if string consist only of white spaces, otherwise false.
  */
 bool PRunDataHandler::IsWhitespace(const char *str)
 {
@@ -1858,10 +1828,12 @@ bool PRunDataHandler::IsWhitespace(const char *str)
 // ToDouble (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> Convert a string to a double.
  *
- * \param str
- * \param ok
+ * \param str string to be converted
+ * \param ok true on success, otherwise false.
+ *
+ * <b>return:</b> returns the converted string, or 0.0 in case of ok==false
  */
 double PRunDataHandler::ToDouble(TString &str, bool &ok)
 {
@@ -1904,10 +1876,12 @@ double PRunDataHandler::ToDouble(TString &str, bool &ok)
 // ToInt (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> Convert a string to an int.
  *
- * \param str
- * \param ok
+ * \param str string to be converted
+ * \param ok true on success, otherwise false.
+ *
+ * <b>return:</b> returns the converted string, or 0 in case of ok==false
  */
 int PRunDataHandler::ToInt(TString &str, bool &ok)
 {
@@ -1950,10 +1924,12 @@ int PRunDataHandler::ToInt(TString &str, bool &ok)
 // GetDataTagIndex (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> Checks is str is in a list of data tags
  *
- * \param str
- * \param dataTags
+ * \param str data tag string (see description of nonMusr db-data)
+ * \param dataTags vector of all data tags
+ *
+ * <b>return:</b> if found returns the data tag index (from the dataTags vector), otherwise -1
  */
 int PRunDataHandler::GetDataTagIndex(TString &str, PStringVector &dataTags)
 {
