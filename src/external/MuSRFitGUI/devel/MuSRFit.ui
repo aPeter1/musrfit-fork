@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>678</width>
+            <width>579</width>
             <height>501</height>
         </rect>
     </property>
@@ -46,7 +46,7 @@
             <rect>
                 <x>10</x>
                 <y>10</y>
-                <width>660</width>
+                <width>560</width>
                 <height>400</height>
             </rect>
         </property>
@@ -60,7 +60,7 @@
         </property>
         <property name="minimumSize">
             <size>
-                <width>660</width>
+                <width>560</width>
                 <height>400</height>
             </size>
         </property>
@@ -79,323 +79,13 @@
             </attribute>
             <widget class="QLayoutWidget">
                 <property name="name">
-                    <cstring>layout43</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>3</x>
-                        <y>3</y>
-                        <width>650</width>
-                        <height>95</height>
-                    </rect>
-                </property>
-                <vbox>
-                    <property name="name">
-                        <cstring>unnamed</cstring>
-                    </property>
-                    <property name="margin">
-                        <number>5</number>
-                    </property>
-                    <widget class="QGroupBox">
-                        <property name="name">
-                            <cstring>RUNSAuto</cstring>
-                        </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>5</hsizetype>
-                                <vsizetype>7</vsizetype>
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                            </sizepolicy>
-                        </property>
-                        <property name="margin">
-                            <number>5</number>
-                        </property>
-                        <property name="title">
-                            <string>RUN Numbers</string>
-                        </property>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>YEARLabel</cstring>
-                            </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>361</x>
-                                    <y>55</y>
-                                    <width>55</width>
-                                    <height>26</height>
-                                </rect>
-                            </property>
-                            <property name="minimumSize">
-                                <size>
-                                    <width>0</width>
-                                    <height>20</height>
-                                </size>
-                            </property>
-                            <property name="text">
-                                <string>Year</string>
-                            </property>
-                        </widget>
-                        <widget class="QComboBox">
-                            <item>
-                                <property name="text">
-                                    <string>LEM</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>GPS</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>Dolly</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>LTF</string>
-                                </property>
-                            </item>
-                            <property name="name">
-                                <cstring>BeamLine</cstring>
-                            </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>232</x>
-                                    <y>55</y>
-                                    <width>100</width>
-                                    <height>26</height>
-                                </rect>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>0</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="minimumSize">
-                                <size>
-                                    <width>0</width>
-                                    <height>20</height>
-                                </size>
-                            </property>
-                        </widget>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>BeamLineLabel</cstring>
-                            </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>127</x>
-                                    <y>55</y>
-                                    <width>99</width>
-                                    <height>26</height>
-                                </rect>
-                            </property>
-                            <property name="minimumSize">
-                                <size>
-                                    <width>0</width>
-                                    <height>20</height>
-                                </size>
-                            </property>
-                            <property name="text">
-                                <string>On beam line</string>
-                            </property>
-                        </widget>
-                        <widget class="QComboBox">
-                            <item>
-                                <property name="text">
-                                    <string>2009</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>2008</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>2007</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>2006</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>2005</string>
-                                </property>
-                            </item>
-                            <item>
-                                <property name="text">
-                                    <string>2004</string>
-                                </property>
-                            </item>
-                            <property name="name">
-                                <cstring>YEAR</cstring>
-                            </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>420</x>
-                                    <y>55</y>
-                                    <width>100</width>
-                                    <height>26</height>
-                                </rect>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>0</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="minimumSize">
-                                <size>
-                                    <width>0</width>
-                                    <height>20</height>
-                                </size>
-                            </property>
-                        </widget>
-                        <widget class="QLineEdit">
-                            <property name="name">
-                                <cstring>RunNumbers</cstring>
-                            </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>15</x>
-                                    <y>25</y>
-                                    <width>505</width>
-                                    <height>26</height>
-                                </rect>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>0</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="minimumSize">
-                                <size>
-                                    <width>0</width>
-                                    <height>23</height>
-                                </size>
-                            </property>
-                            <property name="toolTip" stdset="0">
-                                <string>Numbers of RUNs to fit. Multiple runs are comma separated.</string>
-                            </property>
-                            <property name="whatsThis" stdset="0">
-                                <string>Numbers of RUNs to fit. Multiple runs are comma separated.</string>
-                            </property>
-                        </widget>
-                    </widget>
-                    <widget class="QGroupBox">
-                        <property name="name">
-                            <cstring>RUNSMan</cstring>
-                        </property>
-                        <property name="enabled">
-                            <bool>true</bool>
-                        </property>
-                        <property name="margin">
-                            <number>5</number>
-                        </property>
-                        <property name="title">
-                            <string>RUN Files</string>
-                        </property>
-                        <widget class="QLineEdit">
-                            <property name="name">
-                                <cstring>RunFiles</cstring>
-                            </property>
-                            <property name="enabled">
-                                <bool>true</bool>
-                            </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>15</x>
-                                    <y>25</y>
-                                    <width>505</width>
-                                    <height>26</height>
-                                </rect>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>0</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="minimumSize">
-                                <size>
-                                    <width>0</width>
-                                    <height>23</height>
-                                </size>
-                            </property>
-                            <property name="toolTip" stdset="0">
-                                <string>Names of data files to be fit. Multiple data files are comma separated.</string>
-                            </property>
-                            <property name="whatsThis" stdset="0">
-                                <string>Names of data files to be fit. Multiple data files are comma separated.</string>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton">
-                            <property name="name">
-                                <cstring>Browse</cstring>
-                            </property>
-                            <property name="enabled">
-                                <bool>true</bool>
-                            </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>420</x>
-                                    <y>55</y>
-                                    <width>100</width>
-                                    <height>26</height>
-                                </rect>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>0</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="minimumSize">
-                                <size>
-                                    <width>0</width>
-                                    <height>20</height>
-                                </size>
-                            </property>
-                            <property name="text">
-                                <string>Browse</string>
-                            </property>
-                            <property name="toolTip" stdset="0">
-                                <string>Browse to select data files for fitting.</string>
-                            </property>
-                            <property name="whatsThis" stdset="0">
-                                <string>Browse to select data files for fitting.</string>
-                            </property>
-                        </widget>
-                    </widget>
-                </vbox>
-            </widget>
-            <widget class="QLayoutWidget">
-                <property name="name">
                     <cstring>layout26</cstring>
                 </property>
                 <property name="geometry">
                     <rect>
                         <x>3</x>
                         <y>100</y>
-                        <width>650</width>
+                        <width>545</width>
                         <height>203</height>
                     </rect>
                 </property>
@@ -689,7 +379,7 @@
                                 <rect>
                                     <x>8</x>
                                     <y>21</y>
-                                    <width>625</width>
+                                    <width>520</width>
                                     <height>125</height>
                                 </rect>
                             </property>
@@ -1959,6 +1649,316 @@
                     </widget>
                 </vbox>
             </widget>
+            <widget class="QLayoutWidget">
+                <property name="name">
+                    <cstring>layout43</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>3</x>
+                        <y>3</y>
+                        <width>545</width>
+                        <height>95</height>
+                    </rect>
+                </property>
+                <vbox>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <property name="margin">
+                        <number>5</number>
+                    </property>
+                    <widget class="QGroupBox">
+                        <property name="name">
+                            <cstring>RUNSAuto</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>5</hsizetype>
+                                <vsizetype>7</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
+                        <property name="margin">
+                            <number>5</number>
+                        </property>
+                        <property name="title">
+                            <string>RUN Numbers</string>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>YEARLabel</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>361</x>
+                                    <y>55</y>
+                                    <width>55</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                            <property name="text">
+                                <string>Year</string>
+                            </property>
+                        </widget>
+                        <widget class="QComboBox">
+                            <item>
+                                <property name="text">
+                                    <string>LEM</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>GPS</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Dolly</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>LTF</string>
+                                </property>
+                            </item>
+                            <property name="name">
+                                <cstring>BeamLine</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>232</x>
+                                    <y>55</y>
+                                    <width>100</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>BeamLineLabel</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>127</x>
+                                    <y>55</y>
+                                    <width>99</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                            <property name="text">
+                                <string>On beam line</string>
+                            </property>
+                        </widget>
+                        <widget class="QComboBox">
+                            <item>
+                                <property name="text">
+                                    <string>2009</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2008</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2007</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2006</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2005</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>2004</string>
+                                </property>
+                            </item>
+                            <property name="name">
+                                <cstring>YEAR</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>420</x>
+                                    <y>55</y>
+                                    <width>100</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>RunNumbers</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>15</x>
+                                    <y>25</y>
+                                    <width>505</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>23</height>
+                                </size>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Numbers of RUNs to fit. Multiple runs are comma separated.</string>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>Numbers of RUNs to fit. Multiple runs are comma separated.</string>
+                            </property>
+                        </widget>
+                    </widget>
+                    <widget class="QGroupBox">
+                        <property name="name">
+                            <cstring>RUNSMan</cstring>
+                        </property>
+                        <property name="enabled">
+                            <bool>true</bool>
+                        </property>
+                        <property name="margin">
+                            <number>5</number>
+                        </property>
+                        <property name="title">
+                            <string>RUN Files</string>
+                        </property>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>RunFiles</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>15</x>
+                                    <y>25</y>
+                                    <width>505</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>23</height>
+                                </size>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Names of data files to be fit. Multiple data files are comma separated.</string>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>Names of data files to be fit. Multiple data files are comma separated.</string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>Browse</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>420</x>
+                                    <y>55</y>
+                                    <width>100</width>
+                                    <height>26</height>
+                                </rect>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                            <property name="text">
+                                <string>Browse</string>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Browse to select data files for fitting.</string>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>Browse to select data files for fitting.</string>
+                            </property>
+                        </widget>
+                    </widget>
+                </vbox>
+            </widget>
         </widget>
         <widget class="QWidget">
             <property name="name">
@@ -1975,7 +1975,7 @@
                     <rect>
                         <x>5</x>
                         <y>10</y>
-                        <width>645</width>
+                        <width>545</width>
                         <height>350</height>
                     </rect>
                 </property>
@@ -2117,7 +2117,7 @@
                     <rect>
                         <x>5</x>
                         <y>5</y>
-                        <width>645</width>
+                        <width>545</width>
                         <height>355</height>
                     </rect>
                 </property>
@@ -2782,7 +2782,7 @@
                     <rect>
                         <x>5</x>
                         <y>5</y>
-                        <width>645</width>
+                        <width>545</width>
                         <height>355</height>
                     </rect>
                 </property>
@@ -2856,7 +2856,7 @@
                     <rect>
                         <x>5</x>
                         <y>5</y>
-                        <width>645</width>
+                        <width>545</width>
                         <height>355</height>
                     </rect>
                 </property>
@@ -2885,7 +2885,7 @@
                                 <rect>
                                     <x>6</x>
                                     <y>8</y>
-                                    <width>630</width>
+                                    <width>515</width>
                                     <height>100</height>
                                 </rect>
                             </property>
@@ -3004,7 +3004,7 @@
                     <rect>
                         <x>5</x>
                         <y>5</y>
-                        <width>645</width>
+                        <width>545</width>
                         <height>94</height>
                     </rect>
                 </property>
@@ -3674,7 +3674,7 @@
                     <rect>
                         <x>5</x>
                         <y>5</y>
-                        <width>645</width>
+                        <width>545</width>
                         <height>355</height>
                     </rect>
                 </property>
@@ -3684,7 +3684,7 @@
                     </property>
                     <widget class="QLabel">
                         <property name="name">
-                            <cstring>textLabel2_2_5</cstring>
+                            <cstring>textLabel2_2</cstring>
                         </property>
                         <property name="palette">
                             <palette>
@@ -3942,7 +3942,7 @@
                     </widget>
                     <widget class="QTextEdit">
                         <property name="name">
-                            <cstring>TheoryBlock_3</cstring>
+                            <cstring>TheoryBlock</cstring>
                         </property>
                     </widget>
                     <widget class="QLayoutWidget">
@@ -3955,7 +3955,7 @@
                             </property>
                             <widget class="QComboBox">
                                 <property name="name">
-                                    <cstring>CParamsCombo_3</cstring>
+                                    <cstring>CParamsCombo</cstring>
                                 </property>
                                 <property name="sizePolicy">
                                     <sizepolicy>
@@ -3976,7 +3976,7 @@
                             </widget>
                             <widget class="QLineEdit">
                                 <property name="name">
-                                    <cstring>ConstraintLine_3</cstring>
+                                    <cstring>ConstraintLine</cstring>
                                 </property>
                                 <property name="sizePolicy">
                                     <sizepolicy>
@@ -3995,7 +3995,7 @@
                             </widget>
                             <widget class="QPushButton">
                                 <property name="name">
-                                    <cstring>AddConstraint_3</cstring>
+                                    <cstring>AddConstraint</cstring>
                                 </property>
                                 <property name="sizePolicy">
                                     <sizepolicy>
@@ -4271,7 +4271,7 @@
                     </widget>
                     <widget class="QTextEdit">
                         <property name="name">
-                            <cstring>FunctionsBlock_3</cstring>
+                            <cstring>FunctionsBlock</cstring>
                         </property>
                     </widget>
                 </vbox>
