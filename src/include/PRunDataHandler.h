@@ -47,34 +47,34 @@ class PRunDataHandler
     PRunDataHandler(PMsrHandler *msrInfo, const PStringVector dataPath);
     virtual ~PRunDataHandler();
 
-    virtual bool IsAllDataAvailable() const { return fAllDataAvailable; }
+    virtual Bool_t IsAllDataAvailable() const { return fAllDataAvailable; }
     virtual PRawRunData* GetRunData(const TString &runName);
 
   private:
     PMsrHandler   *fMsrInfo;
     PStringVector fDataPath;
 
-    bool fAllDataAvailable; ///< flag indicating if all data sets could be read
+    Bool_t fAllDataAvailable; ///< flag indicating if all data sets could be read
     TString fRunName;       ///< current run name
     TString fRunPathName;   ///< current path file name 
     PRawRunDataList fData;  ///< keeping all the raw data
 
-    virtual bool ReadFile();
-    virtual bool FileAlreadyRead(TString runName);
-    virtual bool FileExistsCheck(PMsrRunStructure &runInfo, const unsigned int idx);
-    virtual bool ReadRootFile(bool notPostPileup);
-    virtual bool ReadNexusFile();
-    virtual bool ReadWkmFile();
-    virtual bool ReadPsiBinFile();
-    virtual bool ReadMudFile();
-    virtual bool ReadAsciiFile();
-    virtual bool ReadDBFile();
+    virtual Bool_t ReadFile();
+    virtual Bool_t FileAlreadyRead(TString runName);
+    virtual Bool_t FileExistsCheck(PMsrRunStructure &runInfo, const UInt_t idx);
+    virtual Bool_t ReadRootFile(Bool_t notPostPileup);
+    virtual Bool_t ReadNexusFile();
+    virtual Bool_t ReadWkmFile();
+    virtual Bool_t ReadPsiBinFile();
+    virtual Bool_t ReadMudFile();
+    virtual Bool_t ReadAsciiFile();
+    virtual Bool_t ReadDBFile();
 
-    virtual bool StripWhitespace(TString &str);
-    virtual bool IsWhitespace(const char *str);
-    virtual double ToDouble(TString &str, bool &ok);
-    virtual int ToInt(TString &str, bool &ok);
-    virtual int GetDataTagIndex(TString &str, PStringVector &fLabels);
+    virtual Bool_t StripWhitespace(TString &str);
+    virtual Bool_t IsWhitespace(const char *str);
+    virtual Double_t ToDouble(TString &str, Bool_t &ok);
+    virtual Int_t ToInt(TString &str, Bool_t &ok);
+    virtual Int_t GetDataTagIndex(TString &str, PStringVector &fLabels);
 };
 
 #endif //  _PRUNDATAHANDLER_H_

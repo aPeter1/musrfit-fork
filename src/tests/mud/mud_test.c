@@ -233,6 +233,7 @@ int main(int argc, char *argv[])
 
   MUD_closeRead( fh );
 
+  free(pData);
 
   return 1;
 }

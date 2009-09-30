@@ -1,5 +1,10 @@
 #ifndef _MUD_H_
 #define _MUD_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * v1.2
  *
@@ -678,6 +683,10 @@ int MUD_setIndVarData _ANSI_ARGS_(( int fd, int num, void* pData ));
 int MUD_setIndVarTimeData _ANSI_ARGS_(( int fd, int num, UINT32* pTimeData ));
 int MUD_setIndVarpData _ANSI_ARGS_(( int fd, int num, void* pData ));
 int MUD_setIndVarpTimeData _ANSI_ARGS_(( int fd, int num, UINT32* pTimeData ));
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  /* _MUD_H_ */
 

@@ -92,9 +92,9 @@ PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo, const PStringVector dataP
  */
 PRunDataHandler::~PRunDataHandler()
 {
-  for (unsigned int i=0; i<fData.size(); i++) {
+  for (UInt_t i=0; i<fData.size(); i++) {
     fData[i].fT0s.clear();
-    for (unsigned int j=0; j<fData[i].fDataBin.size(); j++)
+    for (UInt_t j=0; j<fData[i].fDataBin.size(); j++)
       fData[i].fDataBin[j].clear();
   }
   fData.clear();
@@ -113,7 +113,7 @@ PRunDataHandler::~PRunDataHandler()
  */
 PRawRunData* PRunDataHandler::GetRunData(const TString &runName)
 {
-  unsigned int i;
+  UInt_t i;
 
   for (i=0; i<fData.size(); i++) {
     if (!fData[i].fRunName.CompareTo(runName)) // run found
@@ -135,9 +135,9 @@ PRawRunData* PRunDataHandler::GetRunData(const TString &runName)
  *
  * <b>return:</b> true if reading was successful, false if reading failed.
  */
-bool PRunDataHandler::ReadFile()
+Bool_t PRunDataHandler::ReadFile()
 {
-  bool success = true;
+  Bool_t success = true;
 
   // loop over the full RUN list to see what needs to be read
   PMsrRunList *runList = 0;
@@ -147,8 +147,8 @@ bool PRunDataHandler::ReadFile()
     return false;
   }
 
-  for (unsigned int i=0; i<runList->size(); i++) {
-    for (unsigned int j=0; j<runList->at(i).fRunName.size(); j++) {
+  for (UInt_t i=0; i<runList->size(); i++) {
+    for (UInt_t j=0; j<runList->at(i).fRunName.size(); j++) {
       fRunName = runList->at(i).fRunName[j];
       // check is file is already read
       if (FileAlreadyRead(runList->at(i).fRunName[j]))
@@ -190,9 +190,9 @@ bool PRunDataHandler::ReadFile()
  *
  * <b>return:</b> true if the file has been read before, otherwise false.
  */
-bool PRunDataHandler::FileAlreadyRead(TString runName)
+Bool_t PRunDataHandler::FileAlreadyRead(TString runName)
 {
-  for (unsigned int i=0; i<fData.size(); i++) {
+  for (UInt_t i=0; i<fData.size(); i++) {
     if (!fData[i].fRunName.CompareTo(runName)) { // run alread read
       return true;
     }
@@ -212,9 +212,9 @@ bool PRunDataHandler::FileAlreadyRead(TString runName)
  *
  * <b>return:</b> true if data file exists, otherwise false.
  */
-bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const unsigned int idx)
+Bool_t PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const UInt_t idx)
 {
-  bool success = true;
+  Bool_t success = true;
 
   // local init
   TROOT root("PRunBase", "PRunBase", 0);
@@ -236,7 +236,7 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const unsigned 
   else if (!runInfo.fFileFormat[idx].CompareTo("psi-bin"))
     ext = TString("bin");
   else if (!runInfo.fFileFormat[idx].CompareTo("mud"))
-    ext = TString("mud");
+    ext = TString("msr");
   else if (!runInfo.fFileFormat[idx].CompareTo("wkm")) {
     if (!runInfo.fBeamline[idx].CompareTo("mue4"))
       ext = TString("nemu");
@@ -285,7 +285,7 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const unsigned 
 
   // check if the file is found in the directory given in the startup file
   if (pathName.CompareTo("???") == 0) { // not found in local directory search
-    for (unsigned int i=0; i<fDataPath.size(); i++) {
+    for (UInt_t i=0; i<fDataPath.size(); i++) {
       str = fDataPath[i] + TString("/") + runInfo.fRunName[idx] + TString(".") + ext;
       if (gSystem->AccessPathName(str.Data())!=true) { // found
         pathName = str;
@@ -295,13 +295,13 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const unsigned 
   }
 
   // check if the file is found in the directories given by WKMFULLDATAPATH
-  const char *wkmpath = gSystem->Getenv("WKMFULLDATAPATH");
+  const Char_t *wkmpath = gSystem->Getenv("WKMFULLDATAPATH");
   if (pathName.CompareTo("???") == 0) { // not found in local directory and xml path
     str = TString(wkmpath);
     // WKMFULLDATAPATH has the structure: path_1:path_2:...:path_n
     TObjArray *tokens = str.Tokenize(":");
     TObjString *ostr;
-    for (int i=0; i<tokens->GetEntries(); i++) {
+    for (Int_t i=0; i<tokens->GetEntries(); i++) {
       ostr = dynamic_cast<TObjString*>(tokens->At(i));
       str = ostr->GetString() + TString("/") + runInfo.fRunName[idx] + TString(".") + ext;
       if (gSystem->AccessPathName(str.Data())!=true) { // found
@@ -322,7 +322,7 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const unsigned 
     TDatime datetime;
     TString dt;
     dt += datetime.GetYear();
-    for (int i=0; i<tokens->GetEntries(); i++) {
+    for (Int_t i=0; i<tokens->GetEntries(); i++) {
       ostr = dynamic_cast<TObjString*>(tokens->At(i));
       str = ostr->GetString() + TString("/DATA/") +
             runInfo.fInstitute[idx] + TString("/") +
@@ -363,7 +363,7 @@ bool PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const unsigned 
  *
  * <b>return:</b> true at successful reading, otherwise false.
  */
-bool PRunDataHandler::ReadRootFile(bool notPostPileup)
+Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
 {
   PDoubleVector histoData;
   PRawRunData   runData;
@@ -416,15 +416,15 @@ bool PRunDataHandler::ReadRootFile(bool notPostPileup)
   runData.fTimeResolution = runHeader->GetTimeResolution();
 
   // get number of histogramms
-  int noOfHistos = runHeader->GetNHist();
+  Int_t noOfHistos = runHeader->GetNHist();
 
   // get t0's
   Double_t *t0 = runHeader->GetTimeZero();
   // check if t0's are there
   if (t0[0] != -1) { // ugly, but at the moment there is no other way
     // copy t0's so they are not lost
-    for (int i=0; i<noOfHistos; i++) {
-      runData.fT0s.push_back((int)t0[i]);
+    for (Int_t i=0; i<noOfHistos; i++) {
+      runData.fT0s.push_back((Int_t)t0[i]);
     }
   }
 
@@ -534,9 +534,9 @@ bool PRunDataHandler::ReadRootFile(bool notPostPileup)
     return false;
   }
   // get all the data
-  char histoName[32];
+  Char_t histoName[32];
   if (notPostPileup) { // read the data which are NOT post pileup corrected
-    for (int i=0; i<noOfHistos; i++) {
+    for (Int_t i=0; i<noOfHistos; i++) {
       sprintf(histoName, "hDecay%02d", i);
       TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
       if (!histo) {
@@ -544,7 +544,7 @@ bool PRunDataHandler::ReadRootFile(bool notPostPileup)
         return false;
       }
       // fill data
-      for (int j=1; j<histo->GetNbinsX(); j++)
+      for (Int_t j=1; j<histo->GetNbinsX(); j++)
         histoData.push_back(histo->GetBinContent(j));
       // store them in runData vector
       runData.fDataBin.push_back(histoData);
@@ -552,7 +552,7 @@ bool PRunDataHandler::ReadRootFile(bool notPostPileup)
       histoData.clear();
     }
   } else { // read the data which ARE post pileup corrected
-    for (int i=0; i<noOfHistos; i++) {
+    for (Int_t i=0; i<noOfHistos; i++) {
       sprintf(histoName, "hDecay%02d", i+POST_PILEUP_HISTO_OFFSET);
       TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
       if (!histo) {
@@ -560,7 +560,7 @@ bool PRunDataHandler::ReadRootFile(bool notPostPileup)
         return false;
       }
       // fill data
-      for (int j=1; j<histo->GetNbinsX(); j++)
+      for (Int_t j=1; j<histo->GetNbinsX(); j++)
         histoData.push_back(histo->GetBinContent(j));
       // store them in runData vector
       runData.fDataBin.push_back(histoData);
@@ -578,7 +578,7 @@ bool PRunDataHandler::ReadRootFile(bool notPostPileup)
   fData.push_back(runData);
 
   // clean up
-  for (unsigned int i=0; i<runData.fDataBin.size(); i++)
+  for (UInt_t i=0; i<runData.fDataBin.size(); i++)
     runData.fDataBin[i].clear();
   runData.fDataBin.clear();
 
@@ -596,7 +596,7 @@ bool PRunDataHandler::ReadRootFile(bool notPostPileup)
  *
  * <b>return:</b> true at successful reading, otherwise false.
  */
-bool PRunDataHandler::ReadNexusFile()
+Bool_t PRunDataHandler::ReadNexusFile()
 {
   cout << endl << "PRunDataHandler::ReadNexusFile(): Sorry, not yet implemented, ask Alex Amato ...";
   return false;
@@ -611,7 +611,7 @@ bool PRunDataHandler::ReadNexusFile()
  *
  * <b>return:</b> true at successful reading, otherwise false.
  */
-bool PRunDataHandler::ReadWkmFile()
+Bool_t PRunDataHandler::ReadWkmFile()
 {
   PDoubleVector histoData;
   PRawRunData runData;
@@ -639,13 +639,13 @@ bool PRunDataHandler::ReadWkmFile()
   }
 
   // read header
-  bool    headerInfo = true;
-  char    instr[512];
+  Bool_t    headerInfo = true;
+  Char_t    instr[512];
   TString line, linecp;
-  double  dval;
-  int     ival;
-  bool    ok;
-  int     groups = 0, channels = 0;
+  Double_t  dval;
+  Int_t     ival;
+  Bool_t    ok;
+  Int_t     groups = 0, channels = 0;
 
   // skip leading empty lines
   do {
@@ -769,8 +769,8 @@ bool PRunDataHandler::ReadWkmFile()
   }
 
   // read data ---------------------------------------------------------
-  unsigned int group_counter = 0;
-  int val;
+  UInt_t group_counter = 0;
+  Int_t val;
   TObjArray *tokens;
   TObjString *ostr;
   TString str;
@@ -793,12 +793,12 @@ bool PRunDataHandler::ReadWkmFile()
       if (!tokens) { // no tokens found
         cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: coulnd't tokenize run data.";
         // clean up
-        for (unsigned int i=0; i<group_counter; i++)
+        for (UInt_t i=0; i<group_counter; i++)
           runData.fDataBin[i].clear();
         runData.fDataBin.clear();
         return false;
       }
-      for (int i=0; i<tokens->GetEntries(); i++) {
+      for (Int_t i=0; i<tokens->GetEntries(); i++) {
         ostr = dynamic_cast<TObjString*>(tokens->At(i));
         str = ostr->GetString();
         val = ToInt(str, ok);
@@ -807,7 +807,7 @@ bool PRunDataHandler::ReadWkmFile()
         } else {
           cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: data line contains non-integer values.";
           // clean up
-          for (unsigned int i=0; i<group_counter; i++)
+          for (UInt_t i=0; i<group_counter; i++)
             runData.fDataBin[i].clear();
           runData.fDataBin.clear();
           delete tokens;
@@ -833,12 +833,12 @@ bool PRunDataHandler::ReadWkmFile()
     if (!tokens) { // no tokens found
       cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: coulnd't tokenize run data.";
       // clean up
-      for (unsigned int i=0; i<group_counter; i++)
+      for (UInt_t i=0; i<group_counter; i++)
         runData.fDataBin[i].clear();
       runData.fDataBin.clear();
       return false;
     }
-    for (int i=0; i<tokens->GetEntries(); i++) {
+    for (Int_t i=0; i<tokens->GetEntries(); i++) {
       ostr = dynamic_cast<TObjString*>(tokens->At(i));
       str = ostr->GetString();
       val = ToInt(str, ok);
@@ -847,7 +847,7 @@ bool PRunDataHandler::ReadWkmFile()
       } else {
         cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: data line contains non-integer values.";
         // clean up
-        for (unsigned int i=0; i<group_counter; i++)
+        for (UInt_t i=0; i<group_counter; i++)
           runData.fDataBin[i].clear();
         runData.fDataBin.clear();
         delete tokens;
@@ -871,23 +871,23 @@ bool PRunDataHandler::ReadWkmFile()
   f.close();
 
   // check if all groups are found
-  if ((int) runData.fDataBin.size() != groups) {
+  if ((Int_t) runData.fDataBin.size() != groups) {
     cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR**";
     cerr << endl << "  expected " << groups << " histos, but found " << runData.fDataBin.size();
     // clean up
-    for (unsigned int i=0; i<runData.fDataBin.size(); i++)
+    for (UInt_t i=0; i<runData.fDataBin.size(); i++)
       runData.fDataBin[i].clear();
     runData.fDataBin.clear();
     return false;
   }
 
   // check if all groups have enough channels
-  for (unsigned int i=0; i<runData.fDataBin.size(); i++) {
-    if ((int) runData.fDataBin[i].size() != channels) {
+  for (UInt_t i=0; i<runData.fDataBin.size(); i++) {
+    if ((Int_t) runData.fDataBin[i].size() != channels) {
       cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR**";
       cerr << endl << "  expected " << channels << " bins in histo " << i << ", but found " << runData.fDataBin[i].size();
       // clean up
-      for (unsigned int j=0; j<runData.fDataBin.size(); j++)
+      for (UInt_t j=0; j<runData.fDataBin.size(); j++)
         runData.fDataBin[j].clear();
       runData.fDataBin.clear();
       return false;
@@ -901,7 +901,7 @@ bool PRunDataHandler::ReadWkmFile()
   fData.push_back(runData);
 
   // clean up
-  for (unsigned int i=0; i<runData.fDataBin.size(); i++)
+  for (UInt_t i=0; i<runData.fDataBin.size(); i++)
     runData.fDataBin[i].clear();
   runData.fDataBin.clear();
 
@@ -917,11 +917,11 @@ bool PRunDataHandler::ReadWkmFile()
  *
  * <b>return:</b> true at successful reading, otherwise false.
  */
-bool PRunDataHandler::ReadPsiBinFile()
+Bool_t PRunDataHandler::ReadPsiBinFile()
 {
   MuSR_td_PSI_bin psiBin;
-  int status;
-  bool success;
+  Int_t status;
+  Bool_t success;
 
   // read psi bin file
   status = psiBin.read(fRunPathName.Data());
@@ -961,7 +961,7 @@ bool PRunDataHandler::ReadPsiBinFile()
   // fill necessary header informations
   PIntVector ivec;
   PRawRunData runData;
-  double dval;
+  Double_t dval;
   // keep run name
   runData.fRunName = fRunName;
   // get run title
@@ -983,7 +983,7 @@ bool PRunDataHandler::ReadPsiBinFile()
     runData.fTemp.resize(2);
     // take only the first two values for now...
     //maybe that's not enough - e.g. in older GPD data I saw the "correct values in the second and third entry..."
-    for (unsigned int i(0); i<2; i++){
+    for (UInt_t i(0); i<2; i++){
       runData.fTemp[i].first = tempVec[i];
       runData.fTemp[i].second = tempDevVec[i];
     }
@@ -1006,15 +1006,15 @@ bool PRunDataHandler::ReadPsiBinFile()
     cerr << endl;
     return false;
   }
-  for (unsigned int i=0; i<ivec.size(); i++)
+  for (UInt_t i=0; i<ivec.size(); i++)
     runData.fT0s.push_back(ivec[i]);
 
   // fill raw data
   PDoubleVector histoData;
-  int *histo;
-  for (int i=0; i<psiBin.get_numberHisto_int(); i++) {
+  Int_t *histo;
+  for (Int_t i=0; i<psiBin.get_numberHisto_int(); i++) {
     histo = psiBin.get_histo_array_int(i);
-    for (int j=0; j<psiBin.get_histoLength_bin(); j++) {
+    for (Int_t j=0; j<psiBin.get_histoLength_bin(); j++) {
       histoData.push_back(histo[j]);
     }
     delete histo;
@@ -1027,7 +1027,7 @@ bool PRunDataHandler::ReadPsiBinFile()
 
   // clean up
   runData.fT0s.clear();
-  for (unsigned int i=0; i<runData.fDataBin.size(); i++)
+  for (UInt_t i=0; i<runData.fDataBin.size(); i++)
     runData.fDataBin[i].clear();
   runData.fDataBin.clear();
 
@@ -1042,12 +1042,17 @@ bool PRunDataHandler::ReadPsiBinFile()
  *
  * <b>return:</b> true at successful reading, otherwise false.
  */
-bool PRunDataHandler::ReadMudFile()
+Bool_t PRunDataHandler::ReadMudFile()
 {
-  Int_t  fh;
-  UINT32 type;
+  Int_t    fh;
+  UINT32   type, val;
+  Int_t    success;
+  Char_t   str[1024];
+  Double_t dval;
 
-  fh = MUD_openRead((char *)fRunPathName.Data(), &type);
+  PRawRunData runData;
+
+  fh = MUD_openRead((Char_t *)fRunPathName.Data(), &type);
   if (fh == -1) {
     cerr << endl << "**ERROR** Couldn't open mud-file " << fRunPathName.Data() << ", sorry.";
     cerr << endl;
@@ -1055,12 +1060,240 @@ bool PRunDataHandler::ReadMudFile()
   }
 
   // read necessary header information
-  // STILL MISSING
+
+  // keep run name
+  runData.fRunName = fRunName;
+
+  // get run title
+  success = MUD_getTitle( fh, str, sizeof(str) );
+  if ( !success ) {
+    cerr << endl << "**WARNING** Couldn't obtain the run title of run " << fRunName.Data();
+    cerr << endl;
+  }
+  runData.fRunTitle = TString(str);
+
+  // get setup
+  success = MUD_getLab( fh, str, sizeof(str) );
+  if (success) {
+    runData.fSetup = TString(str) + TString("/");
+  }
+  success = MUD_getArea( fh, str, sizeof(str) );
+  if (success) {
+    runData.fSetup += TString(str) + TString("/");
+  }
+  success = MUD_getApparatus( fh, str, sizeof(str) );
+  if (success) {
+    runData.fSetup += TString(str) + TString("/");
+  }
+  success = MUD_getSample( fh, str, sizeof(str) );
+  if (success) {
+    runData.fSetup += TString(str);
+  }
+
+  // set LEM specific information to default value since it is not in the file and not used...
+  runData.fEnergy = -999.0;
+  runData.fTransport = -999.0;
+  runData.fRingAnode.clear();
+
+  // get field
+  success = MUD_getField( fh, str, sizeof(str) );
+  if (success) {
+    success = sscanf(str, "%lf G", &dval);
+    if (success == 1) {
+      runData.fField = dval;
+    } else {
+      runData.fField = -9.9e99;
+    }
+  } else {
+    runData.fField = -9.9e99;
+  }
+
+  // get temperature
+  success = MUD_getTemperature( fh, str, sizeof(str) );
+  if (success) {
+    runData.fTemp.resize(1);
+    success = sscanf(str, "%lf K", &dval);
+    if (success == 1) {
+      runData.fTemp[0].first = dval;
+      runData.fTemp[0].second = 0.0;
+    } else {
+      runData.fTemp[0].first = -9.9e99;
+      runData.fTemp[0].second = 0.0;
+    }
+  } else {
+    runData.fTemp[0].first = -9.9e99;
+    runData.fTemp[0].second = 0.0;
+  }
+
+  // get number of histogramms
+  success = MUD_getHists(fh, &type, &val);
+  if ( !success ) {
+    cerr << endl << "**ERROR** Couldn't obtain the number of histograms of run " << fRunName.Data();
+    cerr << endl;
+    MUD_closeRead(fh);
+    return false;
+  }
+  Int_t noOfHistos = (Int_t)val;
+
+  // get time resolution (ns)
+  // check that time resolution is identical for all histograms
+  // >> currently it is not forseen to handle histos with different time resolutions <<
+  // >> perhaps this needs to be reconsidered later on                               <<
+  UINT32 fsTimeResolution = 0;
+  for (Int_t i=1; i<=noOfHistos; i++) {
+    success = MUD_getHistFsPerBin( fh, i, &val );
+    if (!success) {
+      cerr << endl << "**ERROR** Couldn't obtain the time resolution of run " << fRunName.Data();
+      cerr << endl << "          which is fatal, sorry.";
+      cerr << endl;
+      MUD_closeRead(fh);
+      return false;
+    }
+    if (i==1) {
+      fsTimeResolution = val;
+    } else {
+      if (val != fsTimeResolution) {
+        cerr << endl << "**ERROR** various time resolutions found in run " << fRunName.Data();
+        cerr << endl << "          this is currently not supported, sorry.";
+        cerr << endl;
+        MUD_closeRead(fh);
+        return false;
+      }
+    }
+  }
+  runData.fTimeResolution = (Double_t)fsTimeResolution / 1.0e6; // fs -> ns
 
   // read histograms
-  // STILL MISSING
+  pair<Int_t, Int_t> valPair;
+  UINT32 *pData; // histo memory
+  pData = NULL;
+  PDoubleVector histoData;
+  UInt_t noOfBins;
+
+  for (Int_t i=1; i<=noOfHistos; i++) {
+
+    // get t0's
+    success = MUD_getHistT0_Bin( fh, i, &val );
+    if ( !success ) {
+      cerr << endl << "**WARNING** Couldn't get t0 of histo " << i << " of run " << fRunName.Data();
+      cerr << endl;
+    }
+    runData.fT0s.push_back((Int_t)val);
+
+    // get bkg bins
+    success = MUD_getHistBkgd1( fh, i, &val );
+    if ( !success ) {
+      cerr << endl << "**WARNING** Couldn't get bkg bin 1 of histo " << i << " of run " << fRunName.Data();
+      cerr << endl;
+      valPair.first = -1;
+    } else {
+      valPair.first = (Int_t)val;
+    }
+
+    success = MUD_getHistBkgd2( fh, i, &val );
+    if ( !success ) {
+      cerr << endl << "**WARNING** Couldn't get bkg bin 2 of histo " << i << " of run " << fRunName.Data();
+      cerr << endl;
+      valPair.second = -1;
+    }
+    valPair.second = (Int_t)val;
+
+    if ((valPair.first != -1) && (valPair.second != -1)) { // bkg bin1 && bkg bin2 found
+      runData.fBkgBin.push_back(valPair);
+    } else {
+      runData.fBkgBin.clear();
+    }
+
+    // get good data bins
+    success = MUD_getHistGoodBin1( fh, i, &val );
+    if ( !success ) {
+      cerr << endl << "**WARNING** Couldn't get good bin 1 of histo " << i << " of run " << fRunName.Data();
+      cerr << endl;
+      valPair.first = -1;
+    } else {
+      valPair.first = (Int_t)val;
+    }
+
+    success = MUD_getHistGoodBin2( fh, i, &val );
+    if ( !success ) {
+      cerr << endl << "**WARNING** Couldn't get good bin 2 of histo " << i << " of run " << fRunName.Data();
+      cerr << endl;
+      valPair.second = -1;
+    }
+    valPair.second = (Int_t)val;
+
+    if ((valPair.first != -1) && (valPair.second != -1)) { // good bin1 && good bin2 found
+      runData.fGoodDataBin.push_back(valPair);
+    } else {
+      runData.fGoodDataBin.clear();
+    }
+
+    // get number of bins
+    success = MUD_getHistNumBins( fh, i, &val );
+    if ( !success ) {
+      cerr << endl << "**ERROR** Couldn't get the number of bins of histo " << i << ".";
+      cerr << endl << "          This is fatal, sorry.";
+      cerr << endl;
+      MUD_closeRead( fh );
+      return false;
+    }
+    noOfBins = (UInt_t)val;
+
+    pData = (UINT32*)malloc(noOfBins*sizeof(pData));
+    if (pData == NULL) {
+      cerr << endl << "**ERROR** Couldn't allocate memory for data.";
+      cerr << endl << "          This is fatal, sorry.";
+      cerr << endl;
+      MUD_closeRead( fh );
+      return false;
+    }
+
+    // get histogram
+    success = MUD_getHistData( fh, i, pData );
+    if ( !success ) {
+      cerr << endl << "**ERROR** Couldn't get histo no " << i << ".";
+      cerr << endl << "          This is fatal, sorry.";
+      cerr << endl;
+      MUD_closeRead( fh );
+      return false;
+    }
+
+    for (UInt_t j=0; j<noOfBins; j++) {
+      histoData.push_back(pData[j]);
+    }
+    runData.fDataBin.push_back(histoData);
+    histoData.clear();
+
+    free(pData);
+  }
 
   MUD_closeRead(fh);
+
+/*
+cout << endl << "fRunName        : " << runData.fRunName.Data();
+cout << endl << "fRunTitle       : " << runData.fRunTitle.Data();
+cout << endl << "fSetup          : " << runData.fSetup.Data();
+cout << endl << "fField          : " << runData.fField;
+cout << endl << "fTemp           : " << runData.fTemp[0].first;
+cout << endl << "noOfHistos      : " << noOfHistos;
+cout << endl << "fTimeResolution : " << runData.fTimeResolution;
+for (Int_t i=0; i<noOfHistos; i++) {
+  cout << endl << "------";
+  cout << endl << i << " : t0        = " << runData.fT0s[i];
+  cout << endl << i << " : bkg bins  = " << runData.fBkgBin[i].first << "..." << runData.fBkgBin[i].second;
+  cout << endl << i << " : good bins = " << runData.fGoodDataBin[i].first << "..." << runData.fGoodDataBin[i].second;
+}
+cout << endl;
+*/
+
+  // add run to the run list
+  fData.push_back(runData);
+
+  // clean up
+  runData.fT0s.clear();
+  for (UInt_t i=0; i<runData.fDataBin.size(); i++)
+    runData.fDataBin[i].clear();
+  runData.fDataBin.clear();
 
   return true;
 }
@@ -1102,9 +1335,9 @@ bool PRunDataHandler::ReadMudFile()
  *
  * <b>return:</b> true at successful reading, otherwise false.
  */
-bool PRunDataHandler::ReadAsciiFile()
+Bool_t PRunDataHandler::ReadAsciiFile()
 {
-  bool success = true;
+  Bool_t success = true;
 
   // open file
   ifstream f;
@@ -1126,12 +1359,12 @@ bool PRunDataHandler::ReadAsciiFile()
 
   runData.fRunName = fRunName; // keep the run name
 
-  int     lineNo = 0;
-  char    instr[512];
+  Int_t     lineNo = 0;
+  Char_t    instr[512];
   TString line, workStr;
-  bool    headerTag = false;
-  bool    dataTag = false;
-  double  x, y, ey;
+  Bool_t    headerTag = false;
+  Bool_t    dataTag = false;
+  Double_t  x, y, ey;
   PDoubleVector xVec, exVec, yVec, eyVec;
 
   while (!f.eof()) {
@@ -1410,9 +1643,9 @@ bool PRunDataHandler::ReadAsciiFile()
  * <p>Some db-files do have a '\-e' or '\e' label just between the DATA tag line and the real data.
  * This tag will just be ignored.
  */
-bool PRunDataHandler::ReadDBFile()
+Bool_t PRunDataHandler::ReadDBFile()
 {
-  bool success = true;
+  Bool_t success = true;
 
   // open file
   ifstream f;
@@ -1429,14 +1662,14 @@ bool PRunDataHandler::ReadDBFile()
 
   runData.fDataNonMusr.fFromAscii = false;
 
-  int     lineNo = 0;
-  int     idx;
-  int     dbTag = -1;
-  char    instr[512];
+  Int_t     lineNo = 0;
+  Int_t     idx;
+  Int_t     dbTag = -1;
+  Char_t    instr[512];
   TString line, workStr;
-  double  val;
-  bool firstData = true; // needed as a switch to check in which format the data are given.
-  bool labelledFormat = true; // flag showing if the data are given in row format, or as labelled format (see description above, default is labelled format)
+  Double_t  val;
+  Bool_t firstData = true; // needed as a switch to check in which format the data are given.
+  Bool_t labelledFormat = true; // flag showing if the data are given in row format, or as labelled format (see description above, default is labelled format)
 
   // variables needed to tokenize strings
   TString tstr;
@@ -1477,7 +1710,7 @@ bool PRunDataHandler::ReadDBFile()
 
       // filter out all data tags
       tokens = workStr.Tokenize(" ,\t");
-      for (int i=1; i<tokens->GetEntries(); i++) {
+      for (Int_t i=1; i<tokens->GetEntries(); i++) {
         ostr = dynamic_cast<TObjString*>(tokens->At(i));
         runData.fDataNonMusr.fDataTags.push_back(ostr->GetString());
       }
@@ -1530,7 +1763,7 @@ bool PRunDataHandler::ReadDBFile()
 
           // prepare data vector for use
           PDoubleVector dummy;
-          for (unsigned int i=0; i<runData.fDataNonMusr.fDataTags.size(); i++) {
+          for (UInt_t i=0; i<runData.fDataNonMusr.fDataTags.size(); i++) {
             runData.fDataNonMusr.fData.push_back(dummy);
             runData.fDataNonMusr.fErrData.push_back(dummy);
           }
@@ -1540,7 +1773,7 @@ bool PRunDataHandler::ReadDBFile()
 
         if (labelledFormat) { // handle labelled formated data
           // check if run line
-          const char *str = workStr.Data();
+          const Char_t *str = workStr.Data();
           if (isdigit(str[0])) { // run line
             TString run("run");
             idx = GetDataTagIndex(run, runData.fDataNonMusr.fDataTags);
@@ -1646,7 +1879,7 @@ bool PRunDataHandler::ReadDBFile()
         } else { // handle row formated data
           // split string in tokens
           tokens = workStr.Tokenize(","); // line has structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle
-          if (tokens->GetEntries() != (int)(3*runData.fDataNonMusr.fDataTags.size()+1)) {
+          if (tokens->GetEntries() != (Int_t)(3*runData.fDataNonMusr.fDataTags.size()+1)) {
             cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
             cerr << endl << ">> " << workStr.Data();
             cerr << endl << ">> Expected db-data line with structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle";
@@ -1656,8 +1889,8 @@ bool PRunDataHandler::ReadDBFile()
             return false;
           }
           // extract data
-          int j=0;
-          for (int i=0; i<tokens->GetEntries()-1; i+=3) {
+          Int_t j=0;
+          for (Int_t i=0; i<tokens->GetEntries()-1; i+=3) {
             // handle value
             ostr = dynamic_cast<TObjString*>(tokens->At(i));
             tstr = ostr->GetString();
@@ -1711,7 +1944,7 @@ bool PRunDataHandler::ReadDBFile()
   }
 
   // check if all vectors have the same size
-  for (unsigned int i=1; i<runData.fDataNonMusr.fData.size(); i++) {
+  for (UInt_t i=1; i<runData.fDataNonMusr.fData.size(); i++) {
     if (runData.fDataNonMusr.fData[i].size() != runData.fDataNonMusr.fData[i-1].size()) {
       cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo;
       cerr << endl << ">> label: " << runData.fDataNonMusr.fDataTags[i-1].Data() << ", number data elements = " << runData.fDataNonMusr.fData[i-1].size();
@@ -1755,22 +1988,22 @@ bool PRunDataHandler::ReadDBFile()
  *
  * <b>return:</b> true at success, otherwise false.
  */
-bool PRunDataHandler::StripWhitespace(TString &str)
+Bool_t PRunDataHandler::StripWhitespace(TString &str)
 {
-  char *s    = 0;
-  char *subs = 0;
-  int i;
-  int start;
-  int end;
-  int size;
+  Char_t *s    = 0;
+  Char_t *subs = 0;
+  Int_t i;
+  Int_t start;
+  Int_t end;
+  Int_t size;
 
-  size = (int)str.Length();
-  s = new char[size+1];
+  size = (Int_t)str.Length();
+  s = new Char_t[size+1];
 
   if (!s)
     return false;
 
-  for (int i=0; i<size+1; i++)
+  for (Int_t i=0; i<size+1; i++)
     s[i] = str[i];
   s[size] = 0;
 
@@ -1792,7 +2025,7 @@ bool PRunDataHandler::StripWhitespace(TString &str)
     return false;
 
   // make substring
-  subs = new char[end-start+2];
+  subs = new Char_t[end-start+2];
   if (!subs)
     return false;
 
@@ -1825,9 +2058,9 @@ bool PRunDataHandler::StripWhitespace(TString &str)
  *
  * <b>return:</b> true if string consist only of white spaces, otherwise false.
  */
-bool PRunDataHandler::IsWhitespace(const char *str)
+Bool_t PRunDataHandler::IsWhitespace(const Char_t *str)
 {
-  unsigned int i=0;
+  UInt_t i=0;
 
   while (isblank(str[i]) || iscntrl(str[i])) {
     if (str[i] == 0)
@@ -1845,23 +2078,23 @@ bool PRunDataHandler::IsWhitespace(const char *str)
 // ToDouble (private)
 //--------------------------------------------------------------------------
 /**
- * <p> Convert a string to a double.
+ * <p> Convert a string to a Double_t.
  *
  * \param str string to be converted
  * \param ok true on success, otherwise false.
  *
  * <b>return:</b> returns the converted string, or 0.0 in case of ok==false
  */
-double PRunDataHandler::ToDouble(TString &str, bool &ok)
+Double_t PRunDataHandler::ToDouble(TString &str, Bool_t &ok)
 {
-  char *s;
-  double value;
-  int size, status;
+  Char_t *s;
+  Double_t value;
+  Int_t size, status;
 
   ok = true;
 
-  size = (int)str.Length();
-  s = new char[size+1];
+  size = (Int_t)str.Length();
+  s = new Char_t[size+1];
 
   if (!s) {
     ok = false;
@@ -1869,7 +2102,7 @@ double PRunDataHandler::ToDouble(TString &str, bool &ok)
   }
 
   // copy string; stupid way but it works
-  for (int i=0; i<size+1; i++)
+  for (Int_t i=0; i<size+1; i++)
     s[i] = str[i];
   s[size] = 0;
 
@@ -1893,23 +2126,23 @@ double PRunDataHandler::ToDouble(TString &str, bool &ok)
 // ToInt (private)
 //--------------------------------------------------------------------------
 /**
- * <p> Convert a string to an int.
+ * <p> Convert a string to an Int_t.
  *
  * \param str string to be converted
  * \param ok true on success, otherwise false.
  *
  * <b>return:</b> returns the converted string, or 0 in case of ok==false
  */
-int PRunDataHandler::ToInt(TString &str, bool &ok)
+Int_t PRunDataHandler::ToInt(TString &str, Bool_t &ok)
 {
-  char *s;
-  int value;
-  int size, status;
+  Char_t *s;
+  Int_t value;
+  Int_t size, status;
 
   ok = true;
 
-  size = (int)str.Length();
-  s = new char[size+1];
+  size = (Int_t)str.Length();
+  s = new Char_t[size+1];
 
   if (!s) {
     ok = false;
@@ -1917,7 +2150,7 @@ int PRunDataHandler::ToInt(TString &str, bool &ok)
   }
 
   // copy string; stupid way but it works
-  for (int i=0; i<size+1; i++)
+  for (Int_t i=0; i<size+1; i++)
     s[i] = str[i];
   s[size] = 0;
 
@@ -1948,12 +2181,12 @@ int PRunDataHandler::ToInt(TString &str, bool &ok)
  *
  * <b>return:</b> if found returns the data tag index (from the dataTags vector), otherwise -1
  */
-int PRunDataHandler::GetDataTagIndex(TString &str, PStringVector &dataTags)
+Int_t PRunDataHandler::GetDataTagIndex(TString &str, PStringVector &dataTags)
 {
-  int result = -1;
+  Int_t result = -1;
 
   // check all the other possible data tags
-  for (unsigned int i=0; i<dataTags.size(); i++) {
+  for (UInt_t i=0; i<dataTags.size(); i++) {
     if (!dataTags[i].CompareTo(str, TString::kIgnoreCase)) {
       result = i;
       break;
