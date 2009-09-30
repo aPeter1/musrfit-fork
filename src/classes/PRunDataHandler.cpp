@@ -46,6 +46,8 @@ using namespace std;
 
 #include "TLemRunHeader.h"
 #include "MuSR_td_PSI_bin.h"
+#include "mud.h"
+
 #include "PRunDataHandler.h"
 
 //--------------------------------------------------------------------------
@@ -917,8 +919,6 @@ bool PRunDataHandler::ReadWkmFile()
  */
 bool PRunDataHandler::ReadPsiBinFile()
 {
-//  cout << endl << "PRunDataHandler::ReadPsiBinFile(): Sorry, not yet implemented ...";
-
   MuSR_td_PSI_bin psiBin;
   int status;
   bool success;
@@ -1044,8 +1044,25 @@ bool PRunDataHandler::ReadPsiBinFile()
  */
 bool PRunDataHandler::ReadMudFile()
 {
-  cout << endl << "PRunDataHandler::ReadMudFile(): Sorry, not yet implemented ...";
-  return false;
+  Int_t  fh;
+  UINT32 type;
+
+  fh = MUD_openRead((char *)fRunPathName.Data(), &type);
+  if (fh == -1) {
+    cerr << endl << "**ERROR** Couldn't open mud-file " << fRunPathName.Data() << ", sorry.";
+    cerr << endl;
+    return false;
+  }
+
+  // read necessary header information
+  // STILL MISSING
+
+  // read histograms
+  // STILL MISSING
+
+  MUD_closeRead(fh);
+
+  return true;
 }
 
 //--------------------------------------------------------------------------
