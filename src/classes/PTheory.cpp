@@ -1497,8 +1497,8 @@ double PTheory::SpinGlass(register double t, const PDoubleVector& paramValues, c
   double lambda_t_2_q = tt*tt*lambda_2*val[2];
   double rate_2       = 4.0*lambda_2*(1.0-val[2])*tt/val[1];
 
-  double rateL = TMath::Sqrt(rate_2);
-  double rateT = TMath::Sqrt(rate_2+lambda_t_2_q);
+  double rateL = TMath::Sqrt(fabs(rate_2));
+  double rateT = TMath::Sqrt(fabs(rate_2)+lambda_t_2_q);
 
   return 0.333333333333333*(TMath::Exp(-rateL) + 2.0*(1.0-lambda_t_2_q/rateT)*TMath::Exp(-rateT));
 }
