@@ -550,6 +550,10 @@ int main(int argc, char *argv[])
   }
 
   // clean up
+  if (saxParser) {
+    delete saxParser;
+    saxParser = 0;
+  }
   if (startupHandler) {
     delete startupHandler;
     startupHandler = 0;
