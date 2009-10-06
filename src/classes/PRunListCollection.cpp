@@ -58,23 +58,31 @@ PRunListCollection::~PRunListCollection()
 {
 //cout << endl << "in ~PRunListCollection() ..." << endl;
 //cout << endl << ">> fRunSingleHistoList.size() = " << fRunSingleHistoList.size();
-  for (unsigned int i=0; i<fRunSingleHistoList.size(); i++)
+  for (unsigned int i=0; i<fRunSingleHistoList.size(); i++) {
     fRunSingleHistoList[i]->CleanUp();
+    fRunSingleHistoList[i]->~PRunSingleHisto();
+  }
   fRunSingleHistoList.clear();
 
 //cout << endl << ">> fRunAsymmetryList.size() = " << fRunAsymmetryList.size();
-  for (unsigned int i=0; i<fRunAsymmetryList.size(); i++)
+  for (unsigned int i=0; i<fRunAsymmetryList.size(); i++) {
     fRunAsymmetryList[i]->CleanUp();
+    fRunAsymmetryList[i]->~PRunAsymmetry();
+  }
   fRunAsymmetryList.clear();
 
 //cout << endl << ">> fRunRRFList.size() = " << fRunRRFList.size();
-  for (unsigned int i=0; i<fRunRRFList.size(); i++)
+  for (unsigned int i=0; i<fRunRRFList.size(); i++) {
     fRunRRFList[i]->CleanUp();
+    fRunRRFList[i]->~PRunRRF();
+  }
   fRunRRFList.clear();
 
 //cout << endl << ">> fRunNonMusrList.size() = " << fRunNonMusrList.size();
-  for (unsigned int i=0; i<fRunNonMusrList.size(); i++)
+  for (unsigned int i=0; i<fRunNonMusrList.size(); i++) {
     fRunNonMusrList[i]->CleanUp();
+    fRunNonMusrList[i]->~PRunNonMusr();
+  }
   fRunNonMusrList.clear();
 }
 
