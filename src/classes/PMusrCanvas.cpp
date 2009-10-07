@@ -1397,35 +1397,35 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   name += (int)runNo;
   name += "_";
   name += fPlotNumber;
-  start = data->fDataTimeStart - data->fDataTimeStep/2.0;
-  end   = start + data->fValue.size()*data->fDataTimeStep;
-  size  = data->fValue.size();
+  start = data->GetDataTimeStart() - data->GetDataTimeStep()/2.0;
+  end   = start + data->GetValue()->size()*data->GetDataTimeStep();
+  size  = data->GetValue()->size();
 
-//cout << endl << ">> PMusrCanvas::HandleDataSet(): data->fDataTimeStart = " << data->fDataTimeStart << ", data->fDataTimeStep = " << data->fDataTimeStep << endl;
+//cout << endl << ">> PMusrCanvas::HandleDataSet(): data->GetDataTimeStart = " << data->GetDataTimeStart << ", data->GetDataTimeStep() = " << data->GetDataTimeStep() << endl;
 
   // check if 'use_fit_range' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
     start = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0]; // needed to estimate size
     end   = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[1]; // needed to estimate size
-    size  = (int) ((end - start) / data->fDataTimeStep) + 1;
-    start = data->fDataTimeStart +
-            (int)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->fDataTimeStart)/data->fDataTimeStep) * data->fDataTimeStep -
-            data->fDataTimeStep/2.0; // closesd start value compatible with the user given
-    end   = start + size * data->fDataTimeStep; // closesd end value compatible with the user given
+    size  = (int) ((end - start) / data->GetDataTimeStep()) + 1;
+    start = data->GetDataTimeStart() +
+            (int)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->GetDataTimeStart())/data->GetDataTimeStep()) * data->GetDataTimeStep() -
+            data->GetDataTimeStep()/2.0; // closesd start value compatible with the user given
+    end   = start + size * data->GetDataTimeStep(); // closesd end value compatible with the user given
   }
 
   // check if 'sub_ranges' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) {    
     start = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo]; // needed to estimate size
     end   = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo]; // needed to estimate size
-    size  = (int) ((end - start) / data->fDataTimeStep) + 1;
-    start = data->fDataTimeStart +
-            (int)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->fDataTimeStart)/data->fDataTimeStep) * data->fDataTimeStep -
-            data->fDataTimeStep/2.0; // closesd start value compatible with the user given
-    end   = start + size * data->fDataTimeStep; // closesd end value compatible with the user given
+    size  = (int) ((end - start) / data->GetDataTimeStep()) + 1;
+    start = data->GetDataTimeStart() +
+            (int)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->GetDataTimeStart())/data->GetDataTimeStep()) * data->GetDataTimeStep() -
+            data->GetDataTimeStep()/2.0; // closesd start value compatible with the user given
+    end   = start + size * data->GetDataTimeStep(); // closesd end value compatible with the user given
   }
 
-//cout << endl << ">> PMusrCanvas::HandleDataSet(): start = " << start << ", end = " << end << ", size = " << size << ", data->fDataTimeStep = " << data->fDataTimeStep << endl;
+//cout << endl << ">> PMusrCanvas::HandleDataSet(): start = " << start << ", end = " << end << ", size = " << size << ", data->GetDataTimeStep() = " << data->GetDataTimeStep() << endl;
 
   // invoke histo
   dataHisto = new TH1F(name, name, size, start, end);
@@ -1433,24 +1433,24 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   // fill histogram
   // 1st calculate the bin-range according to the plot options
   UInt_t startBin = 0;
-  UInt_t endBin   = data->fValue.size();
+  UInt_t endBin   = data->GetValue()->size();
 
   // check if 'use_fit_range' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
-    startBin = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->fDataTimeStart)/data->fDataTimeStep);
-    endBin   = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[1] - data->fDataTimeStart)/data->fDataTimeStep);
+    startBin = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->GetDataTimeStart())/data->GetDataTimeStep());
+    endBin   = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[1] - data->GetDataTimeStart())/data->GetDataTimeStep());
   }
 
   // check if 'sub_ranges' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) {
-    startBin = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->fDataTimeStart)/data->fDataTimeStep);
-    endBin   = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] - data->fDataTimeStart)/data->fDataTimeStep);
+    startBin = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->GetDataTimeStart())/data->GetDataTimeStep());
+    endBin   = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] - data->GetDataTimeStart())/data->GetDataTimeStep());
   }
 //cout << endl << ">> PMusrCanvas::HandleDataSet(): data: startBin = " << startBin << ", endBin = " << endBin << endl;
 
   for (UInt_t i=startBin; i<endBin; i++) {
-    dataHisto->SetBinContent(i-startBin+1, data->fValue[i]);
-    dataHisto->SetBinError(i-startBin+1, data->fError[i]);
+    dataHisto->SetBinContent(i-startBin+1, data->GetValue()->at(i));
+    dataHisto->SetBinError(i-startBin+1, data->GetError()->at(i));
   }
 
   // set marker and line color
@@ -1479,56 +1479,56 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   name += (int)runNo;
   name += "_";
   name += fPlotNumber;
-  start = data->fTheoryTimeStart - data->fTheoryTimeStep/2.0;
-  end   = start + data->fTheory.size()*data->fTheoryTimeStep;
-  size  = data->fTheory.size();
+  start = data->GetTheoryTimeStart() - data->GetTheoryTimeStep()/2.0;
+  end   = start + data->GetTheory()->size()*data->GetTheoryTimeStep();
+  size  = data->GetTheory()->size();
 
   // check if 'use_fit_range' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
     start = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0]; // needed to estimate size
     end   = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[1]; // needed to estimate size
-    size  = (int) ((end - start) / data->fTheoryTimeStep) + 1;
-    start = data->fTheoryTimeStart +
-            (int)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->fTheoryTimeStart)/data->fTheoryTimeStep) * data->fTheoryTimeStep -
-            data->fTheoryTimeStep/2.0; // closesd start value compatible with the user given
-    end   = start + size * data->fTheoryTimeStep; // closesd end value compatible with the user given
+    size  = (int) ((end - start) / data->GetTheoryTimeStep()) + 1;
+    start = data->GetTheoryTimeStart() +
+            (int)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->GetTheoryTimeStart())/data->GetTheoryTimeStep()) * data->GetTheoryTimeStep() -
+            data->GetTheoryTimeStep()/2.0; // closesd start value compatible with the user given
+    end   = start + size * data->GetTheoryTimeStep(); // closesd end value compatible with the user given
   }
 
   // check if 'sub_ranges' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) {
     start = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo]; // needed to estimate size
     end   = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo]; // needed to estimate size
-    size  = (int) ((end - start) / data->fTheoryTimeStep) + 1;
-    start = data->fTheoryTimeStart +
-            (int)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->fTheoryTimeStart)/data->fTheoryTimeStep) * data->fTheoryTimeStep -
-            data->fTheoryTimeStep/2.0; // closesd start value compatible with the user given
-    end   = start + size * data->fTheoryTimeStep; // closesd end value compatible with the user given
+    size  = (int) ((end - start) / data->GetTheoryTimeStep()) + 1;
+    start = data->GetTheoryTimeStart() +
+            (int)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->GetTheoryTimeStart())/data->GetTheoryTimeStep()) * data->GetTheoryTimeStep() -
+            data->GetTheoryTimeStep()/2.0; // closesd start value compatible with the user given
+    end   = start + size * data->GetTheoryTimeStep(); // closesd end value compatible with the user given
 }
 
-//cout << endl << ">> PMusrCanvas::HandleDataSet(): start = " << start << ", end = " << end << ", size = " << size << ", data->fTheoryTimeStep = " << data->fTheoryTimeStep << endl;
+//cout << endl << ">> PMusrCanvas::HandleDataSet(): start = " << start << ", end = " << end << ", size = " << size << ", data->GetTheoryTimeStep() = " << data->GetTheoryTimeStep() << endl;
 
   // invoke histo
   theoHisto = new TH1F(name, name, size, start, end);
 
   // fill histogram
   startBin = 0;
-  endBin   = data->fTheory.size();
+  endBin   = data->GetTheory()->size();
 
   // check if 'use_fit_range' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
-    startBin = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->fDataTimeStart)/data->fTheoryTimeStep);
-    endBin   = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[1] - data->fDataTimeStart)/data->fTheoryTimeStep);
+    startBin = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->GetDataTimeStart())/data->GetTheoryTimeStep());
+    endBin   = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[1] - data->GetDataTimeStart())/data->GetTheoryTimeStep());
   }
 //cout << endl << ">> PMusrCanvas::HandleDataSet(): theory: startBin = " << startBin << ", endBin = " << endBin << endl;
 
   // check if 'sub_ranges' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) {
-    startBin = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] -data->fDataTimeStart)/data->fTheoryTimeStep);
-    endBin   = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] -data->fDataTimeStart)/data->fTheoryTimeStep);
+    startBin = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] -data->GetDataTimeStart())/data->GetTheoryTimeStep());
+    endBin   = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] -data->GetDataTimeStart())/data->GetTheoryTimeStep());
   }
 
   for (UInt_t i=startBin; i<endBin; i++) {
-    theoHisto->SetBinContent(i-startBin+1, data->fTheory[i]);
+    theoHisto->SetBinContent(i-startBin+1, data->GetTheory()->at(i));
   }
 
 //cout << endl << ">> PMusrCanvas::HandleDataSet(): after fill theory histo" << endl;
@@ -1572,12 +1572,12 @@ void PMusrCanvas::HandleNonMusrDataSet(unsigned int plotNo, unsigned int runNo, 
   // dataHisto -------------------------------------------------------------
 
   // invoke graph
-  dataHisto = new TGraphErrors(data->fX.size());
+  dataHisto = new TGraphErrors(data->GetX()->size());
 
   // fill graph
-  for (unsigned int i=0; i<data->fX.size(); i++) {
-    dataHisto->SetPoint(i, data->fX[i], data->fValue[i]);
-    dataHisto->SetPointError(i, 0.0, data->fError[i]);
+  for (unsigned int i=0; i<data->GetX()->size(); i++) {
+    dataHisto->SetPoint(i, data->GetX()->at(i), data->GetValue()->at(i));
+    dataHisto->SetPointError(i, 0.0, data->GetError()->at(i));
   }
 
   // set marker and line color
@@ -1603,11 +1603,11 @@ void PMusrCanvas::HandleNonMusrDataSet(unsigned int plotNo, unsigned int runNo, 
   // theoHisto -------------------------------------------------------------
 
   // invoke graph
-  theoHisto = new TGraphErrors(data->fXTheory.size());
+  theoHisto = new TGraphErrors(data->GetXTheory()->size());
 
   // fill graph
-  for (unsigned int i=0; i<data->fXTheory.size(); i++) {
-    theoHisto->SetPoint(i, data->fXTheory[i], data->fTheory[i]);
+  for (unsigned int i=0; i<data->GetXTheory()->size(); i++) {
+    theoHisto->SetPoint(i, data->GetXTheory()->at(i), data->GetTheory()->at(i));
     theoHisto->SetPointError(i, 0.0, 0.0);
   }
 

@@ -82,7 +82,7 @@ bool musrt0_item(TApplication &app, PMsrHandler *msrHandler, PRawRunData *rawRun
 
   if (musrT0 == 0) {
     cout << endl << "**ERROR** Couldn't invoke musrT0 ...";
-    cout << endl << "          run name " << rawRunData->fRunName.Data();
+    cout << endl << "          run name " << rawRunData->GetRunName()->Data();
     cout << endl << "          histo No " << histoNo;
     cout << endl;
     return false;

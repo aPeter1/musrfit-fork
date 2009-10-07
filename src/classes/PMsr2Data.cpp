@@ -414,51 +414,51 @@ void PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader) con
     PMsrRunList *msrRunList(fMsrHandler->GetMsrRunList());
     PRawRunData *rawRunData(fDataHandler->GetRunData((*msrRunList)[0].fRunName[0]));
 
-    switch (rawRunData->fTemp.size()) {
+    switch (rawRunData->GetNoOfTemperatures()) {
       case 1:
         dataParamNames.push_back("dataT");
         dataParamLabels.push_back("T (K)");
-        dataParam.push_back(rawRunData->fTemp[0].first);
-        dataParamErr.push_back(rawRunData->fTemp[0].second);
+        dataParam.push_back(rawRunData->GetTemperature(0));
+        dataParamErr.push_back(rawRunData->GetTempError(0));
         break;
       default:
         ostringstream oss;
-        for (unsigned int i(0); i<rawRunData->fTemp.size(); i++) {
+        for (unsigned int i(0); i<rawRunData->GetNoOfTemperatures(); i++) {
           oss << "dataT" << i;
           dataParamNames.push_back(oss.str());
           oss.str("");
           oss << "T" << i << " (K)";
           dataParamLabels.push_back(oss.str());
           oss.str("");
-          dataParam.push_back(rawRunData->fTemp[i].first);
-          dataParamErr.push_back(rawRunData->fTemp[i].second);
+          dataParam.push_back(rawRunData->GetTemperature(i));
+          dataParamErr.push_back(rawRunData->GetTempError(i));
         }
         break;
     }
 
     double value;
-    value = rawRunData->fField;
-    if (value != -9.9e99) {
+    value = rawRunData->GetField();
+    if (value != PMUSR_UNDEFINED) {
       dataParamNames.push_back("dataB");
       dataParamLabels.push_back("mu0 H (G)");
       dataParam.push_back(value);
     }
 
-    value = rawRunData->fEnergy;
-    if (value != -999.0) {
+    value = rawRunData->GetEnergy();
+    if (value != PMUSR_UNDEFINED) {
       dataParamNames.push_back("dataE");
       dataParamLabels.push_back("Implantation Energy (keV)");
       dataParam.push_back(value);
     }
 
-    value = rawRunData->fTransport;
-    if (value != -999.0) {
+    value = rawRunData->GetTransport();
+    if (value != PMUSR_UNDEFINED) {
       dataParamNames.push_back("dataTr");
       dataParamLabels.push_back("Transport (kV)");
       dataParam.push_back(value);
     }
 
-    vector<double> ra(rawRunData->fRingAnode);
+    PDoubleVector ra(rawRunData->GetRingAnode());
     if (ra.size() > 1) {
       dataParamNames.push_back("dataRALRAR");
       dataParamLabels.push_back("RAL-RAR (kV)");
@@ -473,7 +473,7 @@ void PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader) con
   }
 
 // get the independent variable values from the runlist file if needed
-  vector<double> indVarValues;
+  PDoubleVector indVarValues;
 
   if (fRunListFile) {
     string line;

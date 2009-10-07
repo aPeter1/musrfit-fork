@@ -11,7 +11,7 @@
 
 /***************************************************************************
  *   Copyright (C) 2007 by Andreas Suter                                   *
- *   andreas.suter@psi.c                                                   *
+ *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -61,6 +61,9 @@ using namespace std;
 
 // used to filter post pileup correct data histos from root files
 #define POST_PILEUP_HISTO_OFFSET 20
+
+// defines a value for 'undefined values'
+#define PMUSR_UNDEFINED -9.9e99
 
 //-------------------------------------------------------------
 // msr block header tags
@@ -123,7 +126,13 @@ typedef vector<Int_t> PIntVector;
 /**
  * <p>
  */
-typedef vector< pair<Int_t, Int_t> > PIntPairVector;
+typedef pair<Int_t, Int_t> PIntPair;
+
+//-------------------------------------------------------------
+/**
+ * <p>
+ */
+typedef vector<PIntPair> PIntPairVector;
 
 //-------------------------------------------------------------
 /**
@@ -157,54 +166,146 @@ enum EPMusrHandleTag { kEmpty, kFit, kView };
 
 //-------------------------------------------------------------
 /**
- * <p> Predominantly used in PRunBase.
+ * <p>Holds the data which will be fitted, i.e. packed, background corrected, ...
  */
-typedef struct {
-  // data related info
-  Double_t fDataTimeStart;
-  Double_t fDataTimeStep;
-  PDoubleVector fX;       // only used for non-muSR
-  PDoubleVector fValue;
-  PDoubleVector fError;
-  // theory related info
-  Double_t fTheoryTimeStart;
-  Double_t fTheoryTimeStep;
-  PDoubleVector fXTheory; // only used for non-muSR
-  PDoubleVector fTheory;
-} PRunData;
+class PRunData {
+  public:
+    PRunData();
+    virtual ~PRunData();
+
+    virtual Double_t GetDataTimeStart() { return fDataTimeStart; }
+    virtual Double_t GetDataTimeStep() { return fDataTimeStep; }
+    virtual Double_t GetTheoryTimeStart() { return fTheoryTimeStart; }
+    virtual Double_t GetTheoryTimeStep() { return fTheoryTimeStep; }
+
+    virtual const PDoubleVector* GetX() { return &fX; }
+    virtual const PDoubleVector* GetValue() { return &fValue; }
+    virtual const PDoubleVector* GetError() { return &fError; }
+    virtual const PDoubleVector* GetXTheory() { return &fXTheory; }
+    virtual const PDoubleVector* GetTheory() { return &fTheory; }
+
+    virtual void SetDataTimeStart(Double_t dval) { fDataTimeStart = dval; }
+    virtual void SetDataTimeStep(Double_t dval) { fDataTimeStep = dval; }
+    virtual void SetTheoryTimeStart(Double_t dval) { fTheoryTimeStart = dval; }
+    virtual void SetTheoryTimeStep(Double_t dval) { fTheoryTimeStep = dval; }
+
+    virtual void AppendXValue(Double_t dval) { fX.push_back(dval); }
+    virtual void AppendValue(Double_t dval) { fValue.push_back(dval); }
+    virtual void AppendErrorValue(Double_t dval) { fError.push_back(dval); }
+    virtual void AppendXTheoryValue(Double_t dval) { fXTheory.push_back(dval); }
+    virtual void AppendTheoryValue(Double_t dval) { fTheory.push_back(dval); }
+
+  private:
+    // data related info
+    Double_t fDataTimeStart;
+    Double_t fDataTimeStep;
+    PDoubleVector fX;       // only used for non-muSR
+    PDoubleVector fValue;
+    PDoubleVector fError;
+    // theory related info
+    Double_t fTheoryTimeStart;
+    Double_t fTheoryTimeStep;
+    PDoubleVector fXTheory; // only used for non-muSR
+    PDoubleVector fTheory;
+  };
 
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>Non-Musr raw data.
  */
-typedef struct {
-  Bool_t fFromAscii;              ///< if true: data file was an ascii input file, otherwise it is a db input file
-  PStringVector fLabels;          ///< vector of all labels (used for x-, y-axis title in view)
-  PStringVector fDataTags;        ///< vector of all data tags
-  vector<PDoubleVector> fData;    ///< vector of all data
-  vector<PDoubleVector> fErrData; ///< vector of all data errors
-} PNonMusrRawRunData;
+class PNonMusrRawRunData {
+  public:
+    PNonMusrRawRunData();
+    virtual ~PNonMusrRawRunData();
+
+    virtual Bool_t FromAscii() { return fFromAscii; }
+    virtual const PStringVector* GetLabels() { return &fLabels; }
+    virtual const PStringVector* GetDataTags() { return &fDataTags; }
+    virtual const vector<PDoubleVector>* GetData() { return &fData; }
+    virtual const vector<PDoubleVector>* GetErrData() { return &fErrData; }
+
+    virtual void SetFromAscii(const Bool_t bval) { fFromAscii = bval; }
+    virtual void AppendLabel(const TString str) { fLabels.push_back(str); }
+    virtual void SetLabel(const UInt_t idx, const TString str);
+    virtual void AppendDataTag(const TString str) { fDataTags.push_back(str); }
+    virtual void AppendData(const PDoubleVector &data) { fData.push_back(data); }
+    virtual void AppendErrData(const PDoubleVector &data) { fErrData.push_back(data); }
+    virtual void AppendSubData(const UInt_t idx, const Double_t dval);
+    virtual void AppendSubErrData(const UInt_t idx, const Double_t dval);
+
+  private:
+    Bool_t fFromAscii;              ///< if true: data file was an ascii input file, otherwise it is a db input file
+    PStringVector fLabels;          ///< vector of all labels (used for x-, y-axis title in view)
+    PStringVector fDataTags;        ///< vector of all data tags
+    vector<PDoubleVector> fData;    ///< vector of all data
+    vector<PDoubleVector> fErrData; ///< vector of all data errors
+};
 
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>Histogram raw muSR data.
  */
-typedef struct {
-  TString fRunName;                ///< name of the run
-  TString fRunTitle;               ///< run title
-  TString fSetup;                  ///< description of the setup of this run
-  Double_t fField;                 ///< magnetic field value
-  PDoublePairVector fTemp;         ///< measured temperatures and standard deviations during the run
-  Double_t fEnergy;                ///< implantation energy of the muon
-  Double_t fTransport;             ///< LEM transport settings (Moderator HV)
-  PDoubleVector fRingAnode;        ///< LEM ring anode HVs (L,R[,T,B])
-  Double_t fTimeResolution;        ///< time resolution of the run
-  PIntVector fT0s;                 ///< vector of t0's of a run
-  PIntPairVector fBkgBin;          ///< background bins (first/last)
-  PIntPairVector fGoodDataBin;     ///< data bins (first/last)
-  vector<PDoubleVector> fDataBin;  ///< vector of all histos of a run
-  PNonMusrRawRunData fDataNonMusr; ///< keeps all ascii- or db-file info in case of nonMusr fit
-} PRawRunData;
+class PRawRunData {
+  public:
+    PRawRunData();
+    virtual ~PRawRunData();
+
+    virtual const TString* GetRunName() { return &fRunName; }
+    virtual const TString* GetRunTitle() { return &fRunTitle; }
+    virtual const TString* GetSetup() { return &fSetup; }
+    virtual const Double_t GetField() { return fField; }
+    virtual const UInt_t GetNoOfTemperatures() { return fTemp.size(); }
+    virtual const PDoublePairVector GetTemperature() { return fTemp; }
+    virtual const Double_t GetTemperature(const UInt_t idx);
+    virtual const Double_t GetTempError(const UInt_t idx);
+    virtual const Double_t GetEnergy() { return fEnergy; }
+    virtual const Double_t GetTransport() { return fTransport; }
+    virtual const PDoubleVector GetRingAnode() { return fRingAnode; }
+    virtual const Double_t GetRingAnode(const UInt_t idx);
+    virtual const Double_t GetTimeResolution() { return fTimeResolution; }
+    virtual const PIntVector GetT0s() { return fT0s; }
+    virtual const Int_t GetT0(const UInt_t idx);
+    virtual const PIntPair GetBkgBin(const UInt_t idx);
+    virtual const PIntPair GetGoodDataBin(const UInt_t idx);
+    virtual const UInt_t GetNoOfHistos() { return fDataBin.size(); }
+    virtual const PDoubleVector* GetDataBin(const UInt_t idx);
+    virtual const PNonMusrRawRunData* GetDataNonMusr() { return &fDataNonMusr; }
+
+    virtual void SetRunName(const TString &str) { fRunName = str; }
+    virtual void SetRunTitle(const TString str) { fRunTitle = str; }
+    virtual void SetSetup(const TString str) { fSetup = str; }
+    virtual void SetField(const Double_t dval) { fField = dval; }
+    virtual void ClearTemperature() { fTemp.clear(); }
+    virtual void SetTemperature(const UInt_t idx, const Double_t temp, const Double_t errTemp);
+    virtual void SetTempError(const UInt_t idx, const Double_t errTemp);
+    virtual void SetEnergy(const Double_t dval) { fEnergy = dval; }
+    virtual void SetTransport(const Double_t dval) { fTransport = dval; }
+    virtual void SetRingAnode(const UInt_t idx, const Double_t dval);
+    virtual void SetTimeResolution(const Double_t dval) { fTimeResolution = dval; }
+    virtual void AppendT0(const Int_t ival) { fT0s.push_back(ival); }
+    virtual void AppendBkgBin(PIntPair pair) { fBkgBin.push_back(pair); }
+    virtual void AppendGoodDataBin(PIntPair pair) { fGoodDataBin.push_back(pair); }
+    virtual void AppendDataBin(PDoubleVector data) { fDataBin.push_back(data); }
+    virtual void SetDataBin(const UInt_t histoNo, const UInt_t bin, const Double_t dval);
+    virtual void AddDataBin(const UInt_t histoNo, const UInt_t bin, const Double_t dval);
+
+    PNonMusrRawRunData fDataNonMusr; ///< keeps all ascii- or db-file info in case of nonMusr fit
+
+  private:
+    TString fRunName;                ///< name of the run
+    TString fRunTitle;               ///< run title
+    TString fSetup;                  ///< description of the setup of this run
+    Double_t fField;                 ///< magnetic field value
+    PDoublePairVector fTemp;         ///< measured temperatures and standard deviations during the run
+    Double_t fEnergy;                ///< implantation energy of the muon
+    Double_t fTransport;             ///< LEM transport settings (Moderator HV)
+    PDoubleVector fRingAnode;        ///< LEM ring anode HVs (L,R[,T,B])
+    Double_t fTimeResolution;        ///< time resolution of the run
+    PIntVector fT0s;                 ///< vector of t0's of a run
+    PIntPairVector fBkgBin;          ///< background bins (first/last)
+    PIntPairVector fGoodDataBin;     ///< data bins (first/last)
+    vector<PDoubleVector> fDataBin;  ///< vector of all histos of a run
+};
 
 //-------------------------------------------------------------
 /**

@@ -110,12 +110,12 @@ void musrfit_write_ascii(TString fln, PRunData *data, int runCounter)
   }
 
   // dump data
-  f << "% number of data values = " << data->fValue.size() << endl;
+  f << "% number of data values = " << data->GetValue()->size() << endl;
   f << "% time (us), value, error, theory" << endl;
   double time;
-  for (unsigned int i=0; i<data->fValue.size(); i++) {
-    time = data->fDataTimeStart + (double)i*data->fDataTimeStep;
-    f << time << ", " << data->fValue[i] << ", " << data->fError[i] << ", " << data->fTheory[i] << endl;
+  for (unsigned int i=0; i<data->GetValue()->size(); i++) {
+    time = data->GetDataTimeStart() + (double)i*data->GetDataTimeStep();
+    f << time << ", " << data->GetValue()->at(i) << ", " << data->GetError()->at(i) << ", " << data->GetTheory()->at(i) << endl;
   }
 
   // close file
@@ -213,17 +213,17 @@ void musrfit_write_root(TFile &f, TString fln, PRunData *data, int runCounter)
   TCanvas *c = new TCanvas(name, title.Data(), 10, 10, 800, 600);
 
   // create histos
-  Double_t diff = data->fDataTimeStep;
+  Double_t diff = data->GetDataTimeStep();
   Double_t start = -diff/2.0;
-  Double_t end = data->fDataTimeStep*data->fValue.size();
-  TH1F *hdata = new TH1F("hdata", "run data", data->fValue.size(), start, end);
-  TH1F *htheo = new TH1F("htheo", "run theory", data->fValue.size(), start, end);
+  Double_t end = data->GetDataTimeStep()*data->GetValue()->size();
+  TH1F *hdata = new TH1F("hdata", "run data", data->GetValue()->size(), start, end);
+  TH1F *htheo = new TH1F("htheo", "run theory", data->GetValue()->size(), start, end);
 
   // fill data
-  for (unsigned int i=0; i<data->fValue.size(); i++) {
-    hdata->SetBinContent(i+1, data->fValue[i]);
-    hdata->SetBinError(i+1, data->fError[i]);
-    htheo->SetBinContent(i+1, data->fTheory[i]);
+  for (unsigned int i=0; i<data->GetValue()->size(); i++) {
+    hdata->SetBinContent(i+1, data->GetValue()->at(i));
+    hdata->SetBinError(i+1, data->GetError()->at(i));
+    htheo->SetBinContent(i+1, data->GetTheory()->at(i));
   }
 
   hdata->SetMarkerStyle(20);
@@ -319,6 +319,8 @@ void musrfit_dump_root(char *fileName, PRunListCollection *runList)
       }
     }
   }
+
+  f.Close("R");
 }
 
 //--------------------------------------------------------------------------
@@ -400,7 +402,6 @@ int main(int argc, char *argv[])
     }
   }
 
-
   // read startup file
   char startup_path_name[128];
   TSAXParser *saxParser = new TSAXParser();
@@ -457,14 +458,14 @@ int main(int argc, char *argv[])
   if (title_from_data_file) {
     PMsrRunList *rl  = msrHandler->GetMsrRunList();
     PRawRunData *rrd = dataHandler->GetRunData(rl->at(0).fRunName[0]);
-    if (rrd->fRunTitle.Length() > 0)
-      msrHandler->SetMsrTitle(rrd->fRunTitle);
+    if (rrd->GetRunTitle()->Length() > 0)
+      msrHandler->SetMsrTitle(*rrd->GetRunTitle());
   }
 
   // generate the necessary fit histogramms for the fit
   PRunListCollection *runListCollection = 0;
   if (success) {
-    // feed all the necessary histogramms for the fit
+    // feed all the necessary histogramms for the fit   
     runListCollection = new PRunListCollection(msrHandler, dataHandler);
     for (unsigned int i=0; i < msrHandler->GetMsrRunList()->size(); i++) {
       success = runListCollection->Add(i, kFit);

@@ -11,7 +11,7 @@
 
 /***************************************************************************
  *   Copyright (C) 2007 by Andreas Suter                                   *
- *   andreas.suter@psi.c                                                   *
+ *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -105,11 +105,11 @@ double PRunNonMusr::CalcChiSquare(const std::vector<double>& par)
 
   // calculate chi square
   double x;
-  for (unsigned int i=0; i<fData.fValue.size(); i++) {
-    x = fData.fX[i];
+  for (unsigned int i=0; i<fData.GetValue()->size(); i++) {
+    x = fData.GetX()->at(i);
     if ((x>=fFitStartTime) && (x<=fFitStopTime)) {
-      diff = fData.fValue[i] - fTheory->Func(x, par, fFuncValues);
-      chisq += diff*diff / (fData.fError[i]*fData.fError[i]);
+      diff = fData.GetValue()->at(i) - fTheory->Func(x, par, fFuncValues);
+      chisq += diff*diff / (fData.GetError()->at(i)*fData.GetError()->at(i));
     }
   }
 
@@ -195,24 +195,24 @@ bool PRunNonMusr::PrepareFitData()
   double value  = 0.0;
   double err = 0.0;
 // cout << endl << ">> fRawRunData->fDataNonMusr.fData[" <<  xIndex << "].size()=" << fRawRunData->fDataNonMusr.fData[xIndex].size();
-  for (unsigned int i=0; i<fRawRunData->fDataNonMusr.fData[xIndex].size(); i++) {
+  for (unsigned int i=0; i<fRawRunData->fDataNonMusr.GetData()->at(xIndex).size(); i++) {
 // cout << endl << ">> i=" << i << ", packing=" << fRunInfo->fPacking;
     if (fRunInfo->fPacking == 1) {
-      fData.fX.push_back(fRawRunData->fDataNonMusr.fData[xIndex][i]);
-      fData.fValue.push_back(fRawRunData->fDataNonMusr.fData[yIndex][i]);
-      fData.fError.push_back(fRawRunData->fDataNonMusr.fErrData[yIndex][i]);
+      fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i));
+      fData.AppendValue(fRawRunData->fDataNonMusr.GetData()->at(yIndex).at(i));
+      fData.AppendErrorValue(fRawRunData->fDataNonMusr.GetErrData()->at(yIndex).at(i));
     } else { // packed data, i.e. fRunInfo->fPacking > 1
       if ((i % fRunInfo->fPacking == 0) && (i != 0)) { // fill data
 // cout << endl << "-> i=" << i;
-        fData.fX.push_back(fRawRunData->fDataNonMusr.fData[xIndex][i]-(fRawRunData->fDataNonMusr.fData[xIndex][i]-fRawRunData->fDataNonMusr.fData[xIndex][i-fRunInfo->fPacking])/2.0);
-        fData.fValue.push_back(value);
-        fData.fError.push_back(TMath::Sqrt(err));
+        fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i-fRunInfo->fPacking))/2.0);
+        fData.AppendValue(value);
+        fData.AppendErrorValue(TMath::Sqrt(err));
         value = 0.0;
         err = 0.0;
       }
       // sum raw data values
-      value += fRawRunData->fDataNonMusr.fData[yIndex][i];
-      err += fRawRunData->fDataNonMusr.fErrData[yIndex][i]*fRawRunData->fDataNonMusr.fErrData[yIndex][i];
+      value += fRawRunData->fDataNonMusr.GetData()->at(yIndex).at(i);
+      err += fRawRunData->fDataNonMusr.GetErrData()->at(yIndex).at(i)*fRawRunData->fDataNonMusr.GetErrData()->at(yIndex).at(i);
     }
   }
 // cout << endl << ">> fData.fValue.size()=" << fData.fValue.size();
@@ -220,8 +220,8 @@ bool PRunNonMusr::PrepareFitData()
   // count the number of bins to be fitted
   fNoOfFitBins=0;
   double x;
-  for (unsigned int i=0; i<fData.fValue.size(); i++) {
-    x = fData.fX[i];
+  for (unsigned int i=0; i<fData.GetValue()->size(); i++) {
+    x = fData.GetX()->at(i);
     if ((x >= fFitStartTime) && (x <= fFitStopTime))
       fNoOfFitBins++;
   }
@@ -253,30 +253,30 @@ bool PRunNonMusr::PrepareViewData()
   double value  = 0.0;
   double err = 0.0;
 // cout << endl << ">> fRawRunData->fDataNonMusr.fData[" << xIndex << "].size()=" << fRawRunData->fDataNonMusr.fData[xIndex].size();
-  for (unsigned int i=0; i<fRawRunData->fDataNonMusr.fData[xIndex].size(); i++) {
+  for (unsigned int i=0; i<fRawRunData->fDataNonMusr.GetData()->at(xIndex).size(); i++) {
 // cout << endl << ">> i=" << i << ", packing=" << fRunInfo->fPacking;
     if (fRunInfo->fPacking == 1) {
-      fData.fX.push_back(fRawRunData->fDataNonMusr.fData[xIndex][i]);
-      fData.fValue.push_back(fRawRunData->fDataNonMusr.fData[yIndex][i]);
-      fData.fError.push_back(fRawRunData->fDataNonMusr.fErrData[yIndex][i]);
+      fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i));
+      fData.AppendValue(fRawRunData->fDataNonMusr.GetData()->at(yIndex).at(i));
+      fData.AppendErrorValue(fRawRunData->fDataNonMusr.GetErrData()->at(yIndex).at(i));
     } else { // packed data, i.e. fRunInfo->fPacking > 1
       if ((i % fRunInfo->fPacking == 0) && (i != 0)) { // fill data
 // cout << endl << "-> i=" << i;
-        fData.fX.push_back(fRawRunData->fDataNonMusr.fData[xIndex][i]-(fRawRunData->fDataNonMusr.fData[xIndex][i]-fRawRunData->fDataNonMusr.fData[xIndex][i-fRunInfo->fPacking])/2.0);
-        fData.fValue.push_back(value);
-        fData.fError.push_back(TMath::Sqrt(err));
+        fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i-fRunInfo->fPacking))/2.0);
+        fData.AppendValue(value);
+        fData.AppendErrorValue(TMath::Sqrt(err));
         value = 0.0;
         err = 0.0;
       }
       // sum raw data values
-      value += fRawRunData->fDataNonMusr.fData[yIndex][i];
-      err += fRawRunData->fDataNonMusr.fErrData[yIndex][i]*fRawRunData->fDataNonMusr.fErrData[yIndex][i];
+      value += fRawRunData->fDataNonMusr.GetData()->at(yIndex).at(i);
+      err += fRawRunData->fDataNonMusr.GetErrData()->at(yIndex).at(i)*fRawRunData->fDataNonMusr.GetErrData()->at(yIndex).at(i);
     }
   }
 // cout << endl << ">> fData.fValue.size()=" << fData.fValue.size();
 
   // count the number of bins to be fitted
-  fNoOfFitBins = fData.fValue.size();
+  fNoOfFitBins = fData.GetValue()->size();
 // cout << endl << ">> fNoOfFitBins=" << fNoOfFitBins;
 
   // fill theory histo
@@ -341,17 +341,17 @@ bool PRunNonMusr::PrepareViewData()
 
   // typically take 1000 points to calculate the theory, except if there are more data points, than take that number
   double xStep;
-  if (fData.fX.size() > 1000.0)
-    xStep = (xMax-xMin)/fData.fX.size();
+  if (fData.GetX()->size() > 1000.0)
+    xStep = (xMax-xMin)/fData.GetX()->size();
   else
     xStep = (xMax-xMin)/1000.0;
 
   double xx = xAbsMin;
   do {
     // fill x-vector
-    fData.fXTheory.push_back(xx);
+    fData.AppendXTheoryValue(xx);
     // fill y-vector
-    fData.fTheory.push_back(fTheory->Func(xx, par, fFuncValues));
+    fData.AppendTheoryValue(fTheory->Func(xx, par, fFuncValues));
     // calculate next xx
     xx += xStep;
   } while (xx < xAbsMax);
@@ -375,7 +375,7 @@ unsigned int PRunNonMusr::GetXIndex()
   bool found = false;
 
 //cout << endl << ">> PRunNonMusr::GetXIndex: fRawRunData->fDataNonMusr.fFromAscii = " << fRawRunData->fDataNonMusr.fFromAscii;
-  if (fRawRunData->fDataNonMusr.fFromAscii) { // ascii-file format
+  if (fRawRunData->fDataNonMusr.FromAscii()) { // ascii-file format
 //cout << endl << ">> PRunNonMusr::GetXIndex: ascii-file format";
     index = 0;
     found = true;
@@ -387,8 +387,8 @@ unsigned int PRunNonMusr::GetXIndex()
       found = true;
     } else { // xy-data data tags which needs to be converted to an index
 //cout << endl << ">> fDataTags.size()=" << fRawRunData->fDataNonMusr.fDataTags.size();
-      for (unsigned int i=0; i<fRawRunData->fDataNonMusr.fDataTags.size(); i++) {
-        if (fRawRunData->fDataNonMusr.fDataTags[i].CompareTo(fRunInfo->fXYDataLabel[0]) == 0) {
+      for (unsigned int i=0; i<fRawRunData->fDataNonMusr.GetDataTags()->size(); i++) {
+        if (fRawRunData->fDataNonMusr.GetDataTags()->at(i).CompareTo(fRunInfo->fXYDataLabel[0]) == 0) {
 //cout << endl << ">> i=" << i << ", fRawRunData->fDataNonMusr.fDataTags[i]=" << fRawRunData->fDataNonMusr.fDataTags[i].Data();
 //cout << endl << ">> fRunInfo->fXYDataLabel[0]=" << fRunInfo->fXYDataLabel[0].Data();
           index = i;
@@ -421,7 +421,7 @@ unsigned int PRunNonMusr::GetYIndex()
   bool found = false;
 
 // cout << endl << ">> PRunNonMusr::GetYIndex:";
-  if (fRawRunData->fDataNonMusr.fFromAscii) { // ascii-file format
+  if (fRawRunData->fDataNonMusr.FromAscii()) { // ascii-file format
     index = 1;
     found = true;
   } else { // db-file format
@@ -429,8 +429,8 @@ unsigned int PRunNonMusr::GetYIndex()
       index = fRunInfo->fXYDataIndex[1]-1; // since xy-data start with 1 ...
       found = true;
     } else { // xy-data data tags which needs to be converted to an index
-      for (unsigned int i=0; i<fRawRunData->fDataNonMusr.fDataTags.size(); i++) {
-        if (fRawRunData->fDataNonMusr.fDataTags[i].CompareTo(fRunInfo->fXYDataLabel[1]) == 0) {
+      for (unsigned int i=0; i<fRawRunData->fDataNonMusr.GetDataTags()->size(); i++) {
+        if (fRawRunData->fDataNonMusr.GetDataTags()->at(i).CompareTo(fRunInfo->fXYDataLabel[1]) == 0) {
 // cout << endl << ">> i=" << i << ", fRawRunData->fDataNonMusr.fDataTags[i]=" << fRawRunData->fDataNonMusr.fDataTags[i].Data();
 // cout << endl << ">> fRunInfo->fXYDataLabel[1]=" << fRunInfo->fXYDataLabel[1].Data();
           index = i;

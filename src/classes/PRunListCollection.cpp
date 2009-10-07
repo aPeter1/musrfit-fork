@@ -441,9 +441,9 @@ PRunData* PRunListCollection::GetNonMusr(unsigned int index, EDataSwitch tag)
  *
  * \param runName
  */
-vector< pair<double, double> > PRunListCollection::GetTemp(const TString &runName) const
+PDoublePairVector PRunListCollection::GetTemp(const TString &runName) const
 {
-  return fData->GetRunData(runName)->fTemp;
+  return fData->GetRunData(runName)->GetTemperature();
 }
 
 //--------------------------------------------------------------------------
@@ -456,7 +456,7 @@ vector< pair<double, double> > PRunListCollection::GetTemp(const TString &runNam
  */
 double PRunListCollection::GetField(const TString &runName) const
 {
-  return fData->GetRunData(runName)->fField;
+  return fData->GetRunData(runName)->GetField();
 }
 
 //--------------------------------------------------------------------------
@@ -469,7 +469,7 @@ double PRunListCollection::GetField(const TString &runName) const
  */
 double PRunListCollection::GetEnergy(const TString &runName) const
 {
-  return fData->GetRunData(runName)->fEnergy;
+  return fData->GetRunData(runName)->GetEnergy();
 }
 
 //--------------------------------------------------------------------------
@@ -482,7 +482,7 @@ double PRunListCollection::GetEnergy(const TString &runName) const
  */
 const char* PRunListCollection::GetSetup(const TString &runName) const
 {
-  return fData->GetRunData(runName)->fSetup.Data();
+  return fData->GetRunData(runName)->GetSetup()->Data();
 }
 
 //--------------------------------------------------------------------------
@@ -504,13 +504,13 @@ const char* PRunListCollection::GetXAxisTitle(const TString &runName, const unsi
 
   const char *result = 0;
 
-  if (runData->fDataNonMusr.fFromAscii) {
-    result = runData->fDataNonMusr.fLabels[0].Data();
+  if (runData->fDataNonMusr.FromAscii()) {
+    result = runData->fDataNonMusr.GetLabels()->at(0).Data();
   } else {
     for (unsigned int i=0; i<fRunNonMusrList.size(); i++) {
       if (fRunNonMusrList[i]->GetRunNo() == idx) {
         int index = fRunNonMusrList[i]->GetXIndex();
-        result = runData->fDataNonMusr.fLabels[index].Data();
+        result = runData->fDataNonMusr.GetLabels()->at(index).Data();
         break;
       }
     }
@@ -537,13 +537,13 @@ const char* PRunListCollection::GetYAxisTitle(const TString &runName, const unsi
 
   const char *result = 0;
 
-  if (runData->fDataNonMusr.fFromAscii) {
-    result = runData->fDataNonMusr.fLabels[1].Data();
+  if (runData->fDataNonMusr.FromAscii()) {
+    result = runData->fDataNonMusr.GetLabels()->at(1).Data();
   } else {
     for (unsigned int i=0; i<fRunNonMusrList.size(); i++) {
       if (fRunNonMusrList[i]->GetRunNo() == idx) {
         int index = fRunNonMusrList[i]->GetYIndex();
-        result = runData->fDataNonMusr.fLabels[index].Data();
+        result = runData->fDataNonMusr.GetLabels()->at(index).Data();
         break;
       }
     }

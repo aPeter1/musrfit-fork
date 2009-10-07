@@ -725,7 +725,7 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
   TString str, tidy;
   char substr[256];
   TObjArray *tokens = 0;
-  TObjString *ostr;
+  TObjString *ostr = 0;
   int idx = THEORY_UNDEFINED;
 
   for (unsigned int i=1; i<fullTheoryBlock->size(); i++) {
@@ -791,13 +791,14 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
     }
     // write tidy string back into theory block
     (*fullTheoryBlock)[i].fLine = tidy;
+
+    // clean up
+    if (tokens) {
+      delete tokens;
+      tokens = 0;
+    }
   }
 
-  // clean up
-  if (tokens) {
-    delete tokens;
-    tokens = 0;
-  }
 }
 
 //--------------------------------------------------------------------------

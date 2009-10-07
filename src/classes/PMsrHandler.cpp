@@ -11,7 +11,7 @@
 
 /***************************************************************************
  *   Copyright (C) 2007 by Andreas Suter                                   *
- *   andreas.suter@psi.c                                                   *
+ *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -326,8 +326,8 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
   int plotNo = -1;
   string line;
   TString str, sstr;
-  TObjArray *tokens;
-  TObjString *ostr;
+  TObjArray *tokens = 0;
+  TObjString *ostr = 0;
   bool found = false;
   bool statisticBlockFound = false;
   bool partialStatisticBlockFound = true;
@@ -468,6 +468,8 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
           } else { // not a parameter, hence just copy it
             fout << str.Data() << endl;
           }
+          // clean up tokens
+          delete tokens;
         }
         break;
       case MSR_TAG_THEORY:
@@ -1177,8 +1179,8 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
 
   PMsrLines::iterator iter;
 
-  TObjArray *tokens;
-  TObjString *ostr;
+  TObjArray *tokens = 0;
+  TObjString *ostr = 0;
   TString str;
 
   // fill param structure
@@ -1420,8 +1422,8 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
   bool error = false;
 
   TString str;
-  TObjString *ostr;
-  TObjArray *tokens;
+  TObjArray *tokens = 0;
+  TObjString *ostr = 0;
 
   // init some stuff
   param.fXYDataIndex[0]  = -1;
@@ -2068,8 +2070,8 @@ bool PMsrHandler::HandleFourierEntry(PMsrLines &lines)
 
   PMsrLines::iterator iter;
 
-  TObjArray *tokens;
-  TObjString *ostr;
+  TObjArray *tokens = 0;
+  TObjString *ostr = 0;
   TString str;
 
   int ival;
@@ -2247,6 +2249,13 @@ bool PMsrHandler::HandleFourierEntry(PMsrLines &lines)
       }
     }
 
+    // clean up
+    if (tokens) {
+      delete tokens;
+      tokens = 0;
+    }
+
+
     ++iter;
   }
 
@@ -2291,9 +2300,9 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
 
   PMsrLines::iterator iter1;
   PMsrLines::iterator iter2;
-  TObjArray *tokens;
-  TObjArray *tokens2;
-  TObjString *ostr;
+  TObjArray *tokens = 0;
+  TObjArray *tokens2 = 0;
+  TObjString *ostr = 0;
   TString str;
   TString str2;
 

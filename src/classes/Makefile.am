@@ -44,6 +44,7 @@ cpp_sources = \
   PMsr2Data.cpp \
   PMsrHandler.cpp \
   PMusrCanvas.cpp \
+  PMusr.cpp \
   PMusrT0.cpp \
   PRunAsymmetry.cpp \
   PRunBase.cpp \

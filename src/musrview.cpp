@@ -152,17 +152,15 @@ int main(int argc, char *argv[])
   if (status) { // error
     cout << endl << "**WARNING** reading/parsing musrfit_startup.xml failed.";
     cout << endl;
-/*
     // clean up
-    if (saxParser) {
-      delete saxParser;
-      saxParser = 0;
-    }
     if (startupHandler) {
       delete startupHandler;
       startupHandler = 0;
     }
-*/
+    if (saxParser) {
+      delete saxParser;
+      saxParser = 0;
+    }
   }
   startupHandler->CheckLists();
 

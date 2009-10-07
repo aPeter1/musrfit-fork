@@ -11,7 +11,7 @@
 
 /***************************************************************************
  *   Copyright (C) 2007 by Andreas Suter                                   *
- *   andreas.suter@psi.c                                                   *
+ *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -110,7 +110,7 @@ PRunAsymmetry::PRunAsymmetry(PMsrHandler *msrInfo, PRunDataHandler *rawData, uns
   else
     fAlphaBetaTag = 4;
 
-//cout << endl << ">> PRunAsymmetry::PRunAsymmetry(): fAlphaBetaTag = " << fAlphaBetaTag;
+//cout << endl << ">> PRunAsymmetry::PRunAsymmetry(): fAlphaBetaTag = " << fAlphaBetaTag << endl;
 
   // calculate fData
   if (!PrepareData())
@@ -154,8 +154,8 @@ double PRunAsymmetry::CalcChiSquare(const std::vector<double>& par)
 
   // calculate chisq
   double time;
-  for (unsigned int i=0; i<fData.fValue.size(); i++) {
-    time = fData.fDataTimeStart + (double)i*fData.fDataTimeStep;
+  for (unsigned int i=0; i<fData.GetValue()->size(); i++) {
+    time = fData.GetDataTimeStart() + (double)i*fData.GetDataTimeStep();
     if ((time>=fFitStartTime) && (time<=fFitStopTime)) {
       switch (fAlphaBetaTag) {
         case 1: // alpha == 1, beta == 1
@@ -181,8 +181,8 @@ double PRunAsymmetry::CalcChiSquare(const std::vector<double>& par)
           break;
       }
 //if (i==0) cout << endl << "A(0) = " << asymFcnValue;
-      diff = fData.fValue[i] - asymFcnValue;
-      chisq += diff*diff / (fData.fError[i]*fData.fError[i]);
+      diff = fData.GetValue()->at(i) - asymFcnValue;
+      chisq += diff*diff / (fData.GetError()->at(i)*fData.GetError()->at(i));
     }
   }
 
@@ -230,8 +230,8 @@ void PRunAsymmetry::CalcTheory()
   double asymFcnValue = 0.0;
   double a, b, f;
   double time;
-  for (unsigned int i=0; i<fData.fValue.size(); i++) {
-    time = fData.fDataTimeStart + (double)i*fData.fDataTimeStep; 
+  for (unsigned int i=0; i<fData.GetValue()->size(); i++) {
+    time = fData.GetDataTimeStart() + (double)i*fData.GetDataTimeStep();
     switch (fAlphaBetaTag) {
       case 1: // alpha == 1, beta == 1
         asymFcnValue = fTheory->Func(time, par, fFuncValues);
@@ -256,7 +256,7 @@ void PRunAsymmetry::CalcTheory()
         asymFcnValue = 0.0;
         break;
     }
-    fData.fTheory.push_back(asymFcnValue);
+    fData.AppendTheoryValue(asymFcnValue);
   }
 
   // clean up
@@ -276,7 +276,7 @@ void PRunAsymmetry::CalcTheory()
  */
 bool PRunAsymmetry::PrepareData()
 {
-//cout << endl << "in PRunAsymmetry::PrepareData(): will feed fData";
+//cout << endl << "in PRunAsymmetry::PrepareData(): will feed fData" << endl;
 
   // get forward/backward histo from PRunDataHandler object ------------------------
   // get the correct run
@@ -287,41 +287,41 @@ bool PRunAsymmetry::PrepareData()
   }
 
   // keep the time resolution in (us)
-  fTimeResolution = runData->fTimeResolution/1.0e3;
+  fTimeResolution = runData->GetTimeResolution()/1.0e3;
 
   // keep start/stop time for fit
   fFitStartTime = fRunInfo->fFitRange[0];
   fFitStopTime  = fRunInfo->fFitRange[1];
-//cout << endl << "start/stop (fit): " << fFitStartTime << ", " << fFitStopTime;
+//cout << endl << "start/stop (fit): " << fFitStartTime << ", " << fFitStopTime << endl;
 
 
   // check if the t0's are given in the msr-file
   if (fRunInfo->fT0.size() == 0) { // t0's are NOT in the msr-file
     // check if the t0's are in the data file
-    if (runData->fT0s.size() != 0) { // t0's in the run data
+    if (runData->GetT0s().size() != 0) { // t0's in the run data
       // keep the proper t0's. For asymmetry runs, forward/backward are holding the histo no
       // fForwardHistoNo starts with 1 not with 0 etc. ;-)
-      fT0s.push_back(runData->fT0s[fRunInfo->fForwardHistoNo-1]);  // forward  t0
-      fT0s.push_back(runData->fT0s[fRunInfo->fBackwardHistoNo-1]); // backward t0
+      fT0s.push_back(runData->GetT0(fRunInfo->fForwardHistoNo-1));  // forward  t0
+      fT0s.push_back(runData->GetT0(fRunInfo->fBackwardHistoNo-1)); // backward t0
     } else { // t0's are neither in the run data nor in the msr-file -> not acceptable!
       cout << endl << "PRunAsymmetry::PrepareData(): NO t0's found, neither in the run data nor in the msr-file!";
       return false;
     }
   } else { // t0's in the msr-file
     // check if t0's are given in the data file
-    if (runData->fT0s.size() != 0) {
+    if (runData->GetT0s().size() != 0) {
       // compare t0's of the msr-file with the one in the data file
-      if (fabs(fRunInfo->fT0[0]-runData->fT0s[fRunInfo->fForwardHistoNo-1])>5.0) { // given in bins!!
+      if (fabs(fRunInfo->fT0[0]-runData->GetT0(fRunInfo->fForwardHistoNo-1))>5.0) { // given in bins!!
         cout << endl << "PRunAsymmetry::PrepareData(): **WARNING**: forward histo";
         cout << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[0];
-        cout << endl << "  t0 from the data file is " << runData->fT0s[fRunInfo->fForwardHistoNo-1];
+        cout << endl << "  t0 from the data file is " << runData->GetT0(fRunInfo->fForwardHistoNo-1);
         cout << endl << "  This is quite a deviation! Is this done intentionally??";
         cout << endl;
       }
-      if (fabs(fRunInfo->fT0[1]-runData->fT0s[fRunInfo->fBackwardHistoNo-1])>5.0) { // given in bins!!
+      if (fabs(fRunInfo->fT0[1]-runData->GetT0(fRunInfo->fBackwardHistoNo-1))>5.0) { // given in bins!!
         cout << endl << "PRunAsymmetry::PrepareData(): **WARNING**: backward histo";
         cout << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[1];
-        cout << endl << "  t0 from the data file is " << runData->fT0s[fRunInfo->fBackwardHistoNo-1];
+        cout << endl << "  t0 from the data file is " << runData->GetT0(fRunInfo->fBackwardHistoNo-1);
         cout << endl << "  This is quite a deviation! Is this done intentionally??";
         cout << endl;
       }
@@ -335,21 +335,21 @@ bool PRunAsymmetry::PrepareData()
   histoNo[0] = fRunInfo->fForwardHistoNo-1;
   histoNo[1] = fRunInfo->fBackwardHistoNo-1;
   // first check if forward/backward given in the msr-file are valid
-  if ((runData->fDataBin.size() < histoNo[0]+1) || (histoNo[0] < 0) ||
-      (runData->fDataBin.size() < histoNo[1]+1) || (histoNo[1] < 0)) {
+  if ((runData->GetNoOfHistos() < histoNo[0]+1) || (histoNo[0] < 0) ||
+      (runData->GetNoOfHistos() < histoNo[1]+1) || (histoNo[1] < 0)) {
     cout << endl << "PRunAsymmetry::PrepareData(): **PANIC ERROR**:";
     cout << endl << "   forward/backward histo no found = " << histoNo[0]+1;
-    cout << ", " << histoNo[1]+1 << ", but there are only " << runData->fDataBin.size() << " histo sets!?!?";
+    cout << ", " << histoNo[1]+1 << ", but there are only " << runData->GetNoOfHistos() << " histo sets!?!?";
     cout << endl << "   Will quit :-(";
     cout << endl;
     return false;
   }
 
   // get raw forward/backward histo data
-  for (unsigned int i=0; i<runData->fDataBin[histoNo[0]].size(); i++) {
-    fForward.push_back(runData->fDataBin[histoNo[0]][i]);
-    fBackward.push_back(runData->fDataBin[histoNo[1]][i]);
-  }
+  fForward.resize(runData->GetDataBin(histoNo[0])->size());
+  fBackward.resize(runData->GetDataBin(histoNo[0])->size());
+  fForward = *runData->GetDataBin(histoNo[0]);
+  fBackward = *runData->GetDataBin(histoNo[1]);
 
   // check if addrun's are present, and if yes add data
   // check if there are runs to be added to the current one
@@ -368,11 +368,11 @@ bool PRunAsymmetry::PrepareData()
       // check if the t0's are given in the msr-file
       if (i >= fRunInfo->fT0.size()) { // t0's are NOT in the msr-file
         // check if the t0's are in the data file
-        if (addRunData->fT0s.size() != 0) { // t0's in the run data
+        if (addRunData->GetT0s().size() != 0) { // t0's in the run data
           // keep the proper t0's. For asymmetry runs, forward/backward are holding the histo no
           // fForwardHistoNo starts with 1 not with 0 etc. ;-)
-          t0Add[0] = addRunData->fT0s[fRunInfo->fForwardHistoNo-1];  // forward  t0
-          t0Add[1] = addRunData->fT0s[fRunInfo->fBackwardHistoNo-1]; // backward t0
+          t0Add[0] = addRunData->GetT0(fRunInfo->fForwardHistoNo-1);  // forward  t0
+          t0Add[1] = addRunData->GetT0(fRunInfo->fBackwardHistoNo-1); // backward t0
         } else { // t0's are neither in the run data nor in the msr-file -> not acceptable!
           cout << endl << "PRunAsymmetry::PrepareData(): NO t0's found, neither in the addrun (" << fRunInfo->fRunName[i].Data() << ") data nor in the msr-file!";
           return false;
@@ -391,20 +391,20 @@ bool PRunAsymmetry::PrepareData()
           t0Add[0] = fRunInfo->fT0[0];
           t0Add[1] = fRunInfo->fT0[1];
         }
-        if (addRunData->fT0s.size() != 0) {
+        if (addRunData->GetT0s().size() != 0) {
           // compare t0's of the msr-file with the one in the data file
-          if (fabs(t0Add[0]-addRunData->fT0s[fRunInfo->fForwardHistoNo-1])>5.0) { // given in bins!!
+          if (fabs(t0Add[0]-addRunData->GetT0(fRunInfo->fForwardHistoNo-1))>5.0) { // given in bins!!
             cout << endl << "PRunAsymmetry::PrepareData(): **WARNING**: forward histo";
             cout << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[2*i];
-            cout << endl << "  t0 from the data file is " << addRunData->fT0s[fRunInfo->fForwardHistoNo-1];
+            cout << endl << "  t0 from the data file is " << addRunData->GetT0(fRunInfo->fForwardHistoNo-1);
             cout << endl << "  This is quite a deviation! Is this done intentionally??";
             cout << endl << "  addrun: " << fRunInfo->fRunName[i].Data();
             cout << endl;
           }
-          if (fabs(t0Add[1]-addRunData->fT0s[fRunInfo->fBackwardHistoNo-1])>5.0) { // given in bins!!
+          if (fabs(t0Add[1]-addRunData->GetT0(fRunInfo->fBackwardHistoNo-1))>5.0) { // given in bins!!
             cout << endl << "PRunAsymmetry::PrepareData(): **WARNING**: backward histo";
             cout << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[2*i+1];
-            cout << endl << "  t0 from the data file is " << addRunData->fT0s[fRunInfo->fBackwardHistoNo-1];
+            cout << endl << "  t0 from the data file is " << addRunData->GetT0(fRunInfo->fBackwardHistoNo-1);
             cout << endl << "  This is quite a deviation! Is this done intentionally??";
             cout << endl << "  addrun: " << fRunInfo->fRunName[i].Data();
             cout << endl;
@@ -413,18 +413,20 @@ bool PRunAsymmetry::PrepareData()
       }
 
       // add forward run
-      for (unsigned int j=0; j<runData->fDataBin[histoNo[0]].size(); j++) {
-        // make sure that the index stays in the proper range        
-        if ((j-t0Add[0]+fT0s[0] >= 0) && (j-t0Add[0]+fT0s[0] < addRunData->fDataBin[histoNo[0]].size())) {
-          fForward[j] += addRunData->fDataBin[histoNo[0]][j-t0Add[0]+fT0s[0]];
+      UInt_t addRunSize = addRunData->GetDataBin(histoNo[0])->size();
+      for (unsigned int j=0; j<runData->GetDataBin(histoNo[0])->size(); j++) {
+        // make sure that the index stays in the proper range
+        if ((j-t0Add[0]+fT0s[0] >= 0) && (j-t0Add[0]+fT0s[0] < addRunSize)) {
+          fForward[j] += addRunData->GetDataBin(histoNo[0])->at(j-t0Add[0]+fT0s[0]);
         }
       }
 
       // add backward run
-      for (unsigned int j=0; j<runData->fDataBin[histoNo[1]].size(); j++) {
+      addRunSize = addRunData->GetDataBin(histoNo[1])->size();
+      for (unsigned int j=0; j<runData->GetDataBin(histoNo[1])->size(); j++) {
         // make sure that the index stays in the proper range
-        if ((j-t0Add[1]+fT0s[1] >= 0) && (j-t0Add[1]+fT0s[1] < addRunData->fDataBin[histoNo[1]].size())) {
-          fBackward[j] += addRunData->fDataBin[histoNo[1]][j-t0Add[1]+fT0s[1]];
+        if ((j-t0Add[1]+fT0s[1] >= 0) && (j-t0Add[1]+fT0s[1] < addRunSize)) {
+          fBackward[j] += addRunData->GetDataBin(histoNo[1])->at(j-t0Add[1]+fT0s[1]);
         }
       }
     }
@@ -619,17 +621,17 @@ bool PRunAsymmetry::PrepareFitData(PRawRunData* runData, unsigned int histoNo[2]
       start[i] = keep;
     }
     // 2nd check if start is within proper bounds
-    if ((start[i] < 0) || (start[i] > (int)runData->fDataBin[histoNo[i]].size())) {
+    if ((start[i] < 0) || (start[i] > (int)runData->GetDataBin(histoNo[i])->size())) {
       cout << endl << "PRunAsymmetry::PrepareFitData(): **ERROR** start data bin doesn't make any sense!";
       return false;
     }
     // 3rd check if end is within proper bounds
-    if ((end[i] < 0) || (end[i] > (int)runData->fDataBin[histoNo[i]].size())) {
+    if ((end[i] < 0) || (end[i] > (int)runData->GetDataBin(histoNo[i])->size())) {
       cout << endl << "PRunAsymmetry::PrepareFitData(): **ERROR** end data bin doesn't make any sense!";
       return false;
     }
     // 4th check if t0 is within proper bounds
-    if ((t0[i] < 0) || (t0[i] > (int)runData->fDataBin[histoNo[i]].size())) {
+    if ((t0[i] < 0) || (t0[i] > (int)runData->GetDataBin(histoNo[i])->size())) {
       cout << endl << "PRunAsymmetry::PrepareFitData(): **ERROR** t0 data bin doesn't make any sense!";
       return false;
     }
@@ -643,18 +645,18 @@ bool PRunAsymmetry::PrepareFitData(PRawRunData* runData, unsigned int histoNo[2]
   // forward
   for (int i=start[0]; i<end[0]; i++) {
     if (fRunInfo->fPacking == 1) {
-      forwardPacked.fValue.push_back(fForward[i]);
-      forwardPacked.fError.push_back(fForwardErr[i]);
+      forwardPacked.AppendValue(fForward[i]);
+      forwardPacked.AppendErrorValue(fForwardErr[i]);
     } else { // packed data, i.e. fRunInfo->fPacking > 1
       if (((i-start[0]) % fRunInfo->fPacking == 0) && (i != start[0])) { // fill data
         // in order that after rebinning the fit does not need to be redone (important for plots)
         // the value is normalize to per bin
         value /= fRunInfo->fPacking;
-        forwardPacked.fValue.push_back(value);
+        forwardPacked.AppendValue(value);
         if (value == 0.0)
-          forwardPacked.fError.push_back(1.0);
+          forwardPacked.AppendErrorValue(1.0);
         else
-          forwardPacked.fError.push_back(TMath::Sqrt(error)/fRunInfo->fPacking);
+          forwardPacked.AppendErrorValue(TMath::Sqrt(error)/fRunInfo->fPacking);
         value = 0.0;
         error = 0.0;
       }
@@ -665,18 +667,18 @@ bool PRunAsymmetry::PrepareFitData(PRawRunData* runData, unsigned int histoNo[2]
   // backward
   for (int i=start[1]; i<end[1]; i++) {
     if (fRunInfo->fPacking == 1) {
-      backwardPacked.fValue.push_back(fBackward[i]);
-      backwardPacked.fError.push_back(fBackwardErr[i]);
+      backwardPacked.AppendValue(fBackward[i]);
+      backwardPacked.AppendErrorValue(fBackwardErr[i]);
     } else { // packed data, i.e. fRunInfo->fPacking > 1
       if (((i-start[1]) % fRunInfo->fPacking == 0) && (i != start[1])) { // fill data
         // in order that after rebinning the fit does not need to be redone (important for plots)
         // the value is normalize to per bin
         value /= fRunInfo->fPacking;
-        backwardPacked.fValue.push_back(value);
+        backwardPacked.AppendValue(value);
         if (value == 0.0)
-          backwardPacked.fError.push_back(1.0);
+          backwardPacked.AppendErrorValue(1.0);
         else
-          backwardPacked.fError.push_back(TMath::Sqrt(error)/fRunInfo->fPacking);
+          backwardPacked.AppendErrorValue(TMath::Sqrt(error)/fRunInfo->fPacking);
         value = 0.0;
         error = 0.0;
       }
@@ -686,10 +688,10 @@ bool PRunAsymmetry::PrepareFitData(PRawRunData* runData, unsigned int histoNo[2]
   }
 
   // check if packed forward and backward hist have the same size, otherwise take the minimum size
-  unsigned int noOfBins = forwardPacked.fValue.size();
-  if (forwardPacked.fValue.size() != backwardPacked.fValue.size()) {
-    if (forwardPacked.fValue.size() > backwardPacked.fValue.size())
-      noOfBins = backwardPacked.fValue.size();
+  unsigned int noOfBins = forwardPacked.GetValue()->size();
+  if (forwardPacked.GetValue()->size() != backwardPacked.GetValue()->size()) {
+    if (forwardPacked.GetValue()->size() > backwardPacked.GetValue()->size())
+      noOfBins = backwardPacked.GetValue()->size();
   }
 
   // form asymmetry including error propagation
@@ -697,42 +699,38 @@ bool PRunAsymmetry::PrepareFitData(PRawRunData* runData, unsigned int histoNo[2]
   double f, b, ef, eb;
   // fill data time start, and step
   // data start at data_start-t0 shifted by (pack-1)/2
-  fData.fDataTimeStart = fTimeResolution*((double)start[0]-t0[0]+(double)(fRunInfo->fPacking-1)/2.0);
-  fData.fDataTimeStep  = fTimeResolution*(double)fRunInfo->fPacking;
+  fData.SetDataTimeStart(fTimeResolution*((double)start[0]-t0[0]+(double)(fRunInfo->fPacking-1)/2.0));
+  fData.SetDataTimeStep(fTimeResolution*(double)fRunInfo->fPacking);
   for (unsigned int i=0; i<noOfBins; i++) {
     // to make the formulae more readable
-    f  = forwardPacked.fValue[i];
-    b  = backwardPacked.fValue[i];
-    ef = forwardPacked.fError[i];
-    eb = backwardPacked.fError[i];
+    f  = forwardPacked.GetValue()->at(i);
+    b  = backwardPacked.GetValue()->at(i);
+    ef = forwardPacked.GetError()->at(i);
+    eb = backwardPacked.GetError()->at(i);
     // check that there are indeed bins
     if (f+b != 0.0)
       asym = (f-b) / (f+b);
     else
       asym = 0.0;
-    fData.fValue.push_back(asym);
+    fData.AppendValue(asym);
     // calculate the error
     if (f+b != 0.0)
       error = 2.0/((f+b)*(f+b))*TMath::Sqrt(b*b*ef*ef+eb*eb*f*f);
     else
       error = 1.0;
-    fData.fError.push_back(error);
+    fData.AppendErrorValue(error);
   }
 
   // count the number of bins to be fitted
   double time;
   fNoOfFitBins=0;
-  for (unsigned int i=0; i<fData.fValue.size(); i++) {
-    time = fData.fDataTimeStart + (double)i * fData.fDataTimeStep;
+  for (unsigned int i=0; i<fData.GetValue()->size(); i++) {
+    time = fData.GetDataTimeStart() + (double)i * fData.GetDataTimeStep();
     if ((time >= fFitStartTime) && (time <= fFitStopTime))
       fNoOfFitBins++;
   }
 
   // clean up
-  forwardPacked.fValue.clear();
-  forwardPacked.fError.clear();
-  backwardPacked.fValue.clear();
-  backwardPacked.fError.clear();
   fForward.clear();
   fForwardErr.clear();
   fBackward.clear();
@@ -782,8 +780,8 @@ cout << endl;
 */
 
   // make sure that there are equal number of rebinned bins in forward and backward
-  unsigned int noOfBins0 = (runData->fDataBin[histoNo[0]].size()-start[0])/packing;
-  unsigned int noOfBins1 = (runData->fDataBin[histoNo[1]].size()-start[1])/packing;
+  unsigned int noOfBins0 = (runData->GetDataBin(histoNo[0])->size()-start[0])/packing;
+  unsigned int noOfBins1 = (runData->GetDataBin(histoNo[1])->size()-start[1])/packing;
   if (noOfBins0 > noOfBins1)
     noOfBins0 = noOfBins1;
   end[0] = start[0] + noOfBins0 * packing;
@@ -798,17 +796,17 @@ cout << endl;
       start[i] = keep;
     }
     // 2nd check if start is within proper bounds
-    if ((start[i] < 0) || (start[i] > (int)runData->fDataBin[histoNo[i]].size())) {
+    if ((start[i] < 0) || (start[i] > (int)runData->GetDataBin(histoNo[i])->size())) {
       cout << endl << "PRunAsymmetry::PrepareViewData(): **ERROR** start data bin doesn't make any sense!";
       return false;
     }
     // 3rd check if end is within proper bounds
-    if ((end[i] < 0) || (end[i] > (int)runData->fDataBin[histoNo[i]].size())) {
+    if ((end[i] < 0) || (end[i] > (int)runData->GetDataBin(histoNo[i])->size())) {
       cout << endl << "PRunAsymmetry::PrepareViewData(): **ERROR** end data bin doesn't make any sense!";
       return false;
     }
     // 4th check if t0 is within proper bounds
-    if ((t0[i] < 0) || (t0[i] > (int)runData->fDataBin[histoNo[i]].size())) {
+    if ((t0[i] < 0) || (t0[i] > (int)runData->GetDataBin(histoNo[i])->size())) {
       cout << endl << "PRunAsymmetry::PrepareViewData(): **ERROR** t0 data bin doesn't make any sense!";
       return false;
     }
@@ -822,18 +820,18 @@ cout << endl;
   // forward
   for (int i=start[0]; i<end[0]; i++) {
     if (packing == 1) {
-      forwardPacked.fValue.push_back(fForward[i]);
-      forwardPacked.fError.push_back(fForwardErr[i]);
+      forwardPacked.AppendValue(fForward[i]);
+      forwardPacked.AppendErrorValue(fForwardErr[i]);
     } else { // packed data, i.e. packing > 1
       if (((i-start[0]) % packing == 0) && (i != start[0])) { // fill data
         // in order that after rebinning the fit does not need to be redone (important for plots)
         // the value is normalize to per bin
         value /= packing;
-        forwardPacked.fValue.push_back(value);
+        forwardPacked.AppendValue(value);
         if (value == 0.0)
-          forwardPacked.fError.push_back(1.0);
+          forwardPacked.AppendErrorValue(1.0);
         else
-          forwardPacked.fError.push_back(TMath::Sqrt(error)/packing);
+          forwardPacked.AppendErrorValue(TMath::Sqrt(error)/packing);
         value = 0.0;
         error = 0.0;
       }
@@ -844,18 +842,18 @@ cout << endl;
   // backward
   for (int i=start[1]; i<end[1]; i++) {
     if (packing == 1) {
-      backwardPacked.fValue.push_back(fBackward[i]);
-      backwardPacked.fError.push_back(fBackwardErr[i]);
+      backwardPacked.AppendValue(fBackward[i]);
+      backwardPacked.AppendErrorValue(fBackwardErr[i]);
     } else { // packed data, i.e. packing > 1
       if (((i-start[1]) % packing == 0) && (i != start[1])) { // fill data
         // in order that after rebinning the fit does not need to be redone (important for plots)
         // the value is normalize to per bin
         value /= packing;
-        backwardPacked.fValue.push_back(value);
+        backwardPacked.AppendValue(value);
         if (value == 0.0)
-          backwardPacked.fError.push_back(1.0);
+          backwardPacked.AppendErrorValue(1.0);
         else
-          backwardPacked.fError.push_back(TMath::Sqrt(error)/packing);
+          backwardPacked.AppendErrorValue(TMath::Sqrt(error)/packing);
         value = 0.0;
         error = 0.0;
       }
@@ -865,10 +863,10 @@ cout << endl;
   }
 
   // check if packed forward and backward hist have the same size, otherwise take the minimum size
-  unsigned int noOfBins = forwardPacked.fValue.size();
-  if (forwardPacked.fValue.size() != backwardPacked.fValue.size()) {
-    if (forwardPacked.fValue.size() > backwardPacked.fValue.size())
-      noOfBins = backwardPacked.fValue.size();
+  unsigned int noOfBins = forwardPacked.GetValue()->size();
+  if (forwardPacked.GetValue()->size() != backwardPacked.GetValue()->size()) {
+    if (forwardPacked.GetValue()->size() > backwardPacked.GetValue()->size())
+      noOfBins = backwardPacked.GetValue()->size();
   }
 
   // form asymmetry including error propagation
@@ -876,11 +874,11 @@ cout << endl;
   double f, b, ef, eb, alpha = 1.0, beta = 1.0;
   // fill data time start, and step
   // data start at data_start-t0
-  fData.fDataTimeStart = fTimeResolution*((double)start[0]-t0[0]+(double)(packing-1)/2.0);
-  fData.fDataTimeStep  = fTimeResolution*(double)packing;
+  fData.SetDataTimeStart(fTimeResolution*((double)start[0]-t0[0]+(double)(packing-1)/2.0));
+  fData.SetDataTimeStep(fTimeResolution*(double)packing);
 
 /*
-cout << endl << ">> start time = " << fData.fDataTimeStart << ", step = " << fData.fDataTimeStep;
+cout << endl << ">> start time = " << fData.GetDataTimeStart() << ", step = " << fData.GetDataTimeStep();
 cout << endl << "--------------------------------" << endl;
 */
 
@@ -907,40 +905,36 @@ cout << endl << "--------------------------------" << endl;
   }
 //cout << endl << ">> alpha = " << alpha << ", beta = " << beta;
 
-  for (unsigned int i=0; i<forwardPacked.fValue.size(); i++) {
+  for (unsigned int i=0; i<forwardPacked.GetValue()->size(); i++) {
     // to make the formulae more readable
-    f  = forwardPacked.fValue[i];
-    b  = backwardPacked.fValue[i];
-    ef = forwardPacked.fError[i];
-    eb = backwardPacked.fError[i];
+    f  = forwardPacked.GetValue()->at(i);
+    b  = backwardPacked.GetValue()->at(i);
+    ef = forwardPacked.GetError()->at(i);
+    eb = backwardPacked.GetError()->at(i);
     // check that there are indeed bins
     if (f+b != 0.0)
       asym = (alpha*f-b) / (alpha*beta*f+b);
     else
       asym = 0.0;
-    fData.fValue.push_back(asym);
+    fData.AppendValue(asym);
     // calculate the error
     if (f+b != 0.0)
       error = 2.0/((f+b)*(f+b))*TMath::Sqrt(b*b*ef*ef+eb*eb*f*f);
     else
       error = 1.0;
-    fData.fError.push_back(error);
+    fData.AppendErrorValue(error);
   }
 
   // count the number of bins to be fitted
   double time;
   fNoOfFitBins=0;
-  for (unsigned int i=0; i<fData.fValue.size(); i++) {
-    time = fData.fDataTimeStart + (double)i * fData.fDataTimeStep;
+  for (unsigned int i=0; i<fData.GetValue()->size(); i++) {
+    time = fData.GetDataTimeStart() + (double)i * fData.GetDataTimeStep();
     if ((time >= fFitStartTime) && (time <= fFitStopTime))
       fNoOfFitBins++;
   }
 
   // clean up
-  forwardPacked.fValue.clear();
-  forwardPacked.fError.clear();
-  backwardPacked.fValue.clear();
-  backwardPacked.fError.clear();
   fForward.clear();
   fForwardErr.clear();
   fBackward.clear();
@@ -953,22 +947,22 @@ cout << endl << "--------------------------------" << endl;
   }
 
   // calculate theory
-  unsigned int size = runData->fDataBin[histoNo[0]].size();
+  unsigned int size = runData->GetDataBin(histoNo[0])->size();
   double factor = 1.0;
-  if (fData.fValue.size() * 10 > runData->fDataBin[histoNo[0]].size()) {
-    size = fData.fValue.size() * 10;
-    factor = (double)runData->fDataBin[histoNo[0]].size() / (double)size;
+  if (fData.GetValue()->size() * 10 > runData->GetDataBin(histoNo[0])->size()) {
+    size = fData.GetValue()->size() * 10;
+    factor = (double)runData->GetDataBin(histoNo[0])->size() / (double)size;
   }
-//cout << endl << ">> runData->fDataBin[histoNo[0]].size() = " << runData->fDataBin[histoNo[0]].size() << ",  fData.fValue.size() * 10 = " << fData.fValue.size() * 10 << ", size = " << size << ", factor = " << factor << endl;
-  fData.fTheoryTimeStart = fData.fDataTimeStart;
-  fData.fTheoryTimeStep  = fTimeResolution*factor;
+//cout << endl << ">> runData->fDataBin[histoNo[0]].size() = " << runData->fDataBin[histoNo[0]].size() << ",  fData.GetValue()->size() * 10 = " << fData.GetValue()->size() * 10 << ", size = " << size << ", factor = " << factor << endl;
+  fData.SetTheoryTimeStart(fData.GetDataTimeStart());
+  fData.SetTheoryTimeStep(fTimeResolution*factor);
   for (unsigned int i=0; i<size; i++) {
-    time = fData.fTheoryTimeStart + (double)i*fTimeResolution*factor;
+    time = fData.GetTheoryTimeStart() + (double)i*fTimeResolution*factor;
     value = fTheory->Func(time, par, fFuncValues);
     if (fabs(value) > 10.0) {  // dirty hack needs to be fixed!!
       value = 0.0;
     }
-    fData.fTheory.push_back(value);
+    fData.AppendTheoryValue(value);
   }
 
   // clean up

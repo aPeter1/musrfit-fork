@@ -11,7 +11,7 @@
 
 /***************************************************************************
  *   Copyright (C) 2007 by Andreas Suter                                   *
- *   andreas.suter@psi.c                                                   *
+ *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -92,11 +92,6 @@ PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo, const PStringVector dataP
  */
 PRunDataHandler::~PRunDataHandler()
 {
-  for (UInt_t i=0; i<fData.size(); i++) {
-    fData[i].fT0s.clear();
-    for (UInt_t j=0; j<fData[i].fDataBin.size(); j++)
-      fData[i].fDataBin[j].clear();
-  }
   fData.clear();
 }
 
@@ -116,7 +111,7 @@ PRawRunData* PRunDataHandler::GetRunData(const TString &runName)
   UInt_t i;
 
   for (i=0; i<fData.size(); i++) {
-    if (!fData[i].fRunName.CompareTo(runName)) // run found
+    if (!fData[i].GetRunName()->CompareTo(runName)) // run found
       break;
   }
 
@@ -193,7 +188,7 @@ Bool_t PRunDataHandler::ReadFile()
 Bool_t PRunDataHandler::FileAlreadyRead(TString runName)
 {
   for (UInt_t i=0; i<fData.size(); i++) {
-    if (!fData[i].fRunName.CompareTo(runName)) { // run alread read
+    if (!fData[i].GetRunName()->CompareTo(runName)) { // run alread read
       return true;
     }
   }
@@ -393,27 +388,26 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
 
   // get run title
   TObjString ostr = runHeader->GetRunTitle();
-  runData.fRunTitle = ostr.GetString();
+  runData.SetRunTitle(ostr.GetString());
 
   // get temperature
-  runData.fTemp.resize(1);
-  runData.fTemp[0].first = runHeader->GetSampleTemperature();
-  runData.fTemp[0].second = runHeader->GetSampleTemperatureError();
+  runData.ClearTemperature();
+  runData.SetTemperature(0, runHeader->GetSampleTemperature(), runHeader->GetSampleTemperatureError());
 
   // get field
-  runData.fField = runHeader->GetSampleBField();
+  runData.SetField(runHeader->GetSampleBField());
 
   // get implantation energy
-  runData.fEnergy = runHeader->GetImpEnergy();
+  runData.SetEnergy(runHeader->GetImpEnergy());
 
   // get moderator HV
-  runData.fTransport = runHeader->GetModeratorHV();
+  runData.SetTransport(runHeader->GetModeratorHV());
 
   // get setup
-  runData.fSetup = runHeader->GetLemSetup().GetString();
+  runData.SetSetup(runHeader->GetLemSetup().GetString());
 
   // get time resolution
-  runData.fTimeResolution = runHeader->GetTimeResolution();
+  runData.SetTimeResolution(runHeader->GetTimeResolution());
 
   // get number of histogramms
   Int_t noOfHistos = runHeader->GetNHist();
@@ -424,7 +418,7 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
   if (t0[0] != -1) { // ugly, but at the moment there is no other way
     // copy t0's so they are not lost
     for (Int_t i=0; i<noOfHistos; i++) {
-      runData.fT0s.push_back((Int_t)t0[i]);
+      runData.AppendT0((Int_t)t0[i]);
     }
   }
 
@@ -433,7 +427,7 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
 
   // check if run summary is valid
   if (!runSummary) {
-    cout << endl << "Couldn't obtain run summary info from ROOT file " << fRunPathName.Data() << endl;
+    cout << endl << "**INFO** Couldn't obtain run summary info from ROOT file " << fRunPathName.Data() << endl;
     // this is not fatal... only RA-HV values are not available
   } else { // it follows a (at least) little bit strange extraction of the RA values from Thomas' TObjArray...
            //streaming of a ASCII-file would be more easy
@@ -442,21 +436,19 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
     TObjString *os(dynamic_cast<TObjString*>(summIter.Next()));
     TObjArray *oa(0);
     TObjString *objTok(0);
-    while(os != 0){
+    while (os != 0) {
       s = os->GetString();
       // will put four parallel if's since it may be that more than one RA-values are on one line
-      if(s.Contains("RA-L")){
-        if(runData.fRingAnode.empty() || runData.fRingAnode.size() == 2)
-          runData.fRingAnode.resize(2);
+      if (s.Contains("RA-L")) {
         oa = s.Tokenize(" ");
         TObjArrayIter lineIter(oa);
         objTok = dynamic_cast<TObjString*>(lineIter.Next());
-        while (objTok != 0){
-          if(!objTok->GetString().CompareTo("RA-L")){
+        while (objTok != 0) {
+          if (!objTok->GetString().CompareTo("RA-L")) {
             objTok = dynamic_cast<TObjString*>(lineIter.Next()); // "="
-            if(objTok != 0 && !objTok->GetString().CompareTo("=")){
+            if (objTok != 0 && !objTok->GetString().CompareTo("=")) {
               objTok = dynamic_cast<TObjString*>(lineIter.Next()); // HV value
-              runData.fRingAnode[0] = objTok->GetString().Atof(); // fill RA-R value into the runData structure
+              runData.SetRingAnode(0, objTok->GetString().Atof()); // fill RA-R value into the runData structure
               break;
             }
           }
@@ -464,18 +456,16 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
         }
       }
 
-      if(s.Contains("RA-R")){
-        if(runData.fRingAnode.empty() || runData.fRingAnode.size() == 2)
-          runData.fRingAnode.resize(2);
+      if (s.Contains("RA-R")) {
         oa = s.Tokenize(" ");
         TObjArrayIter lineIter(oa);
         objTok = dynamic_cast<TObjString*>(lineIter.Next());
         while (objTok != 0){
-          if(!objTok->GetString().CompareTo("RA-R")){
+          if (!objTok->GetString().CompareTo("RA-R")) {
             objTok = dynamic_cast<TObjString*>(lineIter.Next()); // "="
-            if(objTok != 0 && !objTok->GetString().CompareTo("=")){
+            if (objTok != 0 && !objTok->GetString().CompareTo("=")) {
               objTok = dynamic_cast<TObjString*>(lineIter.Next()); // HV value
-              runData.fRingAnode[1] = objTok->GetString().Atof(); // fill RA-R value into the runData structure
+              runData.SetRingAnode(1, objTok->GetString().Atof()); // fill RA-R value into the runData structure
               break;
             }
           }
@@ -483,18 +473,16 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
         }
       }
 
-      if(s.Contains("RA-T")){
-        if(runData.fRingAnode.empty() || runData.fRingAnode.size() == 2)
-          runData.fRingAnode.resize(4);
+      if (s.Contains("RA-T")) {
         oa = s.Tokenize(" ");
         TObjArrayIter lineIter(oa);
         objTok = dynamic_cast<TObjString*>(lineIter.Next());
         while (objTok != 0){
-          if(!objTok->GetString().CompareTo("RA-T")){
+          if (!objTok->GetString().CompareTo("RA-T")) {
             objTok = dynamic_cast<TObjString*>(lineIter.Next()); // "="
-            if(objTok != 0 && !objTok->GetString().CompareTo("=")){
+            if (objTok != 0 && !objTok->GetString().CompareTo("=")) {
               objTok = dynamic_cast<TObjString*>(lineIter.Next()); // HV value
-              runData.fRingAnode[2] = objTok->GetString().Atof(); // fill RA-T value into the runData structure
+              runData.SetRingAnode(2, objTok->GetString().Atof()); // fill RA-T value into the runData structure
               break;
             }
           }
@@ -502,18 +490,16 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
         }
       }
 
-      if(s.Contains("RA-B")){
-        if(runData.fRingAnode.empty() || runData.fRingAnode.size() == 2)
-          runData.fRingAnode.resize(4);
+      if (s.Contains("RA-B")) {
         oa = s.Tokenize(" ");
         TObjArrayIter lineIter(oa);
         objTok = dynamic_cast<TObjString*>(lineIter.Next());
         while (objTok != 0){
-          if(!objTok->GetString().CompareTo("RA-B")){
+          if (!objTok->GetString().CompareTo("RA-B")) {
             objTok = dynamic_cast<TObjString*>(lineIter.Next()); // "="
-            if(objTok != 0 && !objTok->GetString().CompareTo("=")){
+            if (objTok != 0 && !objTok->GetString().CompareTo("=")) {
               objTok = dynamic_cast<TObjString*>(lineIter.Next()); // HV value
-              runData.fRingAnode[3] = objTok->GetString().Atof(); // fill RA-B value into the runData structure
+              runData.SetRingAnode(3, objTok->GetString().Atof()); // fill RA-B value into the runData structure
               break;
             }
           }
@@ -547,7 +533,7 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
       for (Int_t j=1; j<histo->GetNbinsX(); j++)
         histoData.push_back(histo->GetBinContent(j));
       // store them in runData vector
-      runData.fDataBin.push_back(histoData);
+      runData.AppendDataBin(histoData);
       // clear histoData for the next histo
       histoData.clear();
     }
@@ -563,7 +549,7 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
       for (Int_t j=1; j<histo->GetNbinsX(); j++)
         histoData.push_back(histo->GetBinContent(j));
       // store them in runData vector
-      runData.fDataBin.push_back(histoData);
+      runData.AppendDataBin(histoData);
       // clear histoData for the next histo
       histoData.clear();
     }
@@ -572,17 +558,10 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
   f.Close();
 
   // keep run name
-  runData.fRunName = fRunName;
+  runData.SetRunName(fRunName);
 
   // add run to the run list
   fData.push_back(runData);
-
-  // clean up
-  for (UInt_t i=0; i<runData.fDataBin.size(); i++)
-    runData.fDataBin[i].clear();
-  runData.fDataBin.clear();
-
-  runData.fRingAnode.clear();
 
   return true;
 }
@@ -615,17 +594,6 @@ Bool_t PRunDataHandler::ReadWkmFile()
 {
   PDoubleVector histoData;
   PRawRunData runData;
-
-  // init runData header info
-  runData.fRunName        = TString("");
-  runData.fRunTitle       = TString("");
-  runData.fSetup          = TString("");
-  runData.fField          = -9.9e99;
-  runData.fTemp.clear();
-  runData.fEnergy         = -999.0; // standard LEM values...
-  runData.fTransport      = -999.0; // standard LEM values...
-  runData.fRingAnode.clear();
-  runData.fTimeResolution = 0.0;
 
   // open file
   ifstream f;
@@ -666,7 +634,7 @@ Bool_t PRunDataHandler::ReadWkmFile()
         idx = line.Index(":");
         line.Replace(0, idx+1, 0, 0); // remove 'Title:'
         StripWhitespace(line);
-        runData.fRunTitle = line;
+        runData.SetRunTitle(line);
       } else if (line.Contains("Field")) {
         idx = line.Index(":");
         line.Replace(0, idx+1, 0, 0); // remove 'Field:'
@@ -676,12 +644,12 @@ Bool_t PRunDataHandler::ReadWkmFile()
           line.Resize(idx);
         dval = ToDouble(line, ok);
         if (ok)
-          runData.fField = dval;
+          runData.SetField(dval);
       } else if (line.Contains("Setup")) {
         idx = line.Index(":");
         line.Replace(0, idx+1, 0, 0); // remove 'Setup:'
         StripWhitespace(line);
-        runData.fSetup = line;
+        runData.SetSetup(line);
       } else if (line.Contains("Temp:") || line.Contains("Temp(meas1):")) {
         linecp = line;
         idx = line.Index(":");
@@ -694,17 +662,15 @@ Bool_t PRunDataHandler::ReadWkmFile()
         if (idx > 0)
           line.Resize(idx);
         dval = ToDouble(line, ok);
-        if (ok){
-          runData.fTemp.resize(1);
-          runData.fTemp[0].first = dval;
-          runData.fTemp[0].second = 0.0;
+        if (ok) {
+          runData.SetTemperature(0, dval, 0.0);
         }
         idx = linecp.Index("+/-"); // get the error
         linecp.Replace(0, idx+3, 0, 0);
         StripWhitespace(linecp);
         dval = ToDouble(linecp, ok);
-        if (ok && !runData.fTemp.empty()){
-          runData.fTemp[0].second = dval;
+        if (ok) {
+          runData.SetTempError(0, dval);
         }
       } else if (line.Contains("Temp(meas2):")) {
         linecp = line;
@@ -718,17 +684,15 @@ Bool_t PRunDataHandler::ReadWkmFile()
         if (idx > 0)
           line.Resize(idx);
         dval = ToDouble(line, ok);
-        if (ok){
-          runData.fTemp.resize(2);
-          runData.fTemp[1].first = dval;
-          runData.fTemp[1].second = 0.0;
+        if (ok) {
+          runData.SetTemperature(1, dval, 0.0);
         }
         idx = linecp.Index("+/-"); // get the error
         linecp.Replace(0, idx+3, 0, 0);
         StripWhitespace(linecp);
         dval = ToDouble(linecp, ok);
-        if (ok && runData.fTemp.size() > 1){
-          runData.fTemp[1].second = dval;
+        if (ok) {
+          runData.SetTempError(1, dval);
         }
       } else if (line.Contains("Groups")) {
         idx = line.Index(":");
@@ -750,7 +714,7 @@ Bool_t PRunDataHandler::ReadWkmFile()
         StripWhitespace(line);
         dval = ToDouble(line, ok);
         if (ok)
-          runData.fTimeResolution = dval * 1000.0;
+          runData.SetTimeResolution(dval * 1000.0);
       }
     }
 
@@ -758,11 +722,11 @@ Bool_t PRunDataHandler::ReadWkmFile()
       f.getline(instr, sizeof(instr));
   } while (headerInfo && !f.eof());
 
-  if ((groups == 0) || (channels == 0) || runData.fTimeResolution == 0.0) {
+  if ((groups == 0) || (channels == 0) || runData.GetTimeResolution() == 0.0) {
     cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** essential header informations are missing!";
     cerr << endl << "  >> groups          = " << groups;
     cerr << endl << "  >> channels        = " << channels;
-    cerr << endl << "  >> time resolution = " << runData.fTimeResolution;
+    cerr << endl << "  >> time resolution = " << runData.GetTimeResolution();
     cerr << endl;
     f.close();
     return false;
@@ -777,7 +741,7 @@ Bool_t PRunDataHandler::ReadWkmFile()
   do {
     // check if empty line, i.e. new group
     if (IsWhitespace(instr)) {
-      runData.fDataBin.push_back(histoData);
+      runData.AppendDataBin(histoData);
       histoData.clear();
       group_counter++;
     } else {
@@ -792,10 +756,6 @@ Bool_t PRunDataHandler::ReadWkmFile()
 
       if (!tokens) { // no tokens found
         cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: coulnd't tokenize run data.";
-        // clean up
-        for (UInt_t i=0; i<group_counter; i++)
-          runData.fDataBin[i].clear();
-        runData.fDataBin.clear();
         return false;
       }
       for (Int_t i=0; i<tokens->GetEntries(); i++) {
@@ -807,9 +767,6 @@ Bool_t PRunDataHandler::ReadWkmFile()
         } else {
           cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: data line contains non-integer values.";
           // clean up
-          for (UInt_t i=0; i<group_counter; i++)
-            runData.fDataBin[i].clear();
-          runData.fDataBin.clear();
           delete tokens;
           return false;
         }
@@ -832,10 +789,6 @@ Bool_t PRunDataHandler::ReadWkmFile()
     tokens = line.Tokenize(" ");
     if (!tokens) { // no tokens found
       cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: coulnd't tokenize run data.";
-      // clean up
-      for (UInt_t i=0; i<group_counter; i++)
-        runData.fDataBin[i].clear();
-      runData.fDataBin.clear();
       return false;
     }
     for (Int_t i=0; i<tokens->GetEntries(); i++) {
@@ -847,9 +800,6 @@ Bool_t PRunDataHandler::ReadWkmFile()
       } else {
         cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: data line contains non-integer values.";
         // clean up
-        for (UInt_t i=0; i<group_counter; i++)
-          runData.fDataBin[i].clear();
-        runData.fDataBin.clear();
         delete tokens;
         return false;
       }
@@ -863,7 +813,7 @@ Bool_t PRunDataHandler::ReadWkmFile()
 
   // save the last histo if not empty
   if (histoData.size() > 0) {
-    runData.fDataBin.push_back(histoData);
+    runData.AppendDataBin(histoData);
     histoData.clear();
   }
 
@@ -871,39 +821,26 @@ Bool_t PRunDataHandler::ReadWkmFile()
   f.close();
 
   // check if all groups are found
-  if ((Int_t) runData.fDataBin.size() != groups) {
+  if ((Int_t) runData.GetNoOfHistos() != groups) {
     cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR**";
-    cerr << endl << "  expected " << groups << " histos, but found " << runData.fDataBin.size();
-    // clean up
-    for (UInt_t i=0; i<runData.fDataBin.size(); i++)
-      runData.fDataBin[i].clear();
-    runData.fDataBin.clear();
+    cerr << endl << "  expected " << groups << " histos, but found " << runData.GetNoOfHistos();
     return false;
   }
 
   // check if all groups have enough channels
-  for (UInt_t i=0; i<runData.fDataBin.size(); i++) {
-    if ((Int_t) runData.fDataBin[i].size() != channels) {
+  for (UInt_t i=0; i<runData.GetNoOfHistos(); i++) {
+    if ((Int_t) runData.GetDataBin(i)->size() != channels) {
       cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR**";
-      cerr << endl << "  expected " << channels << " bins in histo " << i << ", but found " << runData.fDataBin[i].size();
-      // clean up
-      for (UInt_t j=0; j<runData.fDataBin.size(); j++)
-        runData.fDataBin[j].clear();
-      runData.fDataBin.clear();
+      cerr << endl << "  expected " << channels << " bins in histo " << i << ", but found " << runData.GetDataBin(i)->size();
       return false;
     }
   }
 
   // keep run name
-  runData.fRunName = fRunName;
+  runData.SetRunName(fRunName);
 
   // add run to the run list
   fData.push_back(runData);
-
-  // clean up
-  for (UInt_t i=0; i<runData.fDataBin.size(); i++)
-    runData.fDataBin[i].clear();
-  runData.fDataBin.clear();
 
   return true;
 }
@@ -963,42 +900,37 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   PRawRunData runData;
   Double_t dval;
   // keep run name
-  runData.fRunName = fRunName;
+  runData.SetRunName(fRunName);
   // get run title
-  runData.fRunTitle = TString(psiBin.get_comment().c_str()); // run title
+  runData.SetRunTitle(TString(psiBin.get_comment().c_str())); // run title
   // get setup
-  runData.fSetup = TString(psiBin.get_orient().c_str());
+  runData.SetSetup(TString(psiBin.get_orient().c_str()));
   // set LEM specific information to default value since it is not in the file and not used...
-  runData.fEnergy = -999.0;
-  runData.fTransport = -999.0;
-  runData.fRingAnode.clear();
+  runData.SetEnergy(PMUSR_UNDEFINED);
+  runData.SetTransport(PMUSR_UNDEFINED);
   // get field
   status = sscanf(psiBin.get_field().c_str(), "%lfG", &dval);
   if (status == 1)
-    runData.fField = dval;
+    runData.SetField(dval);
   // get temperature
   PDoubleVector tempVec(psiBin.get_temperatures_vector());
   PDoubleVector tempDevVec(psiBin.get_devTemperatures_vector());
-  if(tempVec.size() > 1 && tempDevVec.size() > 1 && tempVec[0] && tempVec[1]) {
-    runData.fTemp.resize(2);
+  if ((tempVec.size() > 1) && (tempDevVec.size() > 1) && tempVec[0] && tempVec[1]) {
     // take only the first two values for now...
     //maybe that's not enough - e.g. in older GPD data I saw the "correct values in the second and third entry..."
-    for (UInt_t i(0); i<2; i++){
-      runData.fTemp[i].first = tempVec[i];
-      runData.fTemp[i].second = tempDevVec[i];
+    for (UInt_t i(0); i<2; i++) {
+      runData.SetTemperature(i, tempVec[i], tempDevVec[i]);
     }
     tempVec.clear();
     tempDevVec.clear();
   } else {
     status = sscanf(psiBin.get_temp().c_str(), "%lfK", &dval);
     if (status == 1)
-      runData.fTemp.resize(1);
-      runData.fTemp[0].first = dval;
-      runData.fTemp[0].second = 0.0;
+      runData.SetTemperature(0, dval, 0.0);
   }
 
   // get time resolution (ns)
-  runData.fTimeResolution = psiBin.get_binWidth_ns();
+  runData.SetTimeResolution(psiBin.get_binWidth_ns());
   // get t0's
   ivec = psiBin.get_t0_vector();
   if (ivec.empty()) {
@@ -1007,7 +939,7 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
     return false;
   }
   for (UInt_t i=0; i<ivec.size(); i++)
-    runData.fT0s.push_back(ivec[i]);
+    runData.AppendT0(ivec[i]);
 
   // fill raw data
   PDoubleVector histoData;
@@ -1018,18 +950,12 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
       histoData.push_back(histo[j]);
     }
     delete histo;
-    runData.fDataBin.push_back(histoData);
+    runData.AppendDataBin(histoData);
     histoData.clear();
   }
 
   // add run to the run list
   fData.push_back(runData);
-
-  // clean up
-  runData.fT0s.clear();
-  for (UInt_t i=0; i<runData.fDataBin.size(); i++)
-    runData.fDataBin[i].clear();
-  runData.fDataBin.clear();
 
   return success;
 }
@@ -1062,7 +988,7 @@ Bool_t PRunDataHandler::ReadMudFile()
   // read necessary header information
 
   // keep run name
-  runData.fRunName = fRunName;
+  runData.SetRunName(fRunName);
 
   // get run title
   success = MUD_getTitle( fh, str, sizeof(str) );
@@ -1070,59 +996,56 @@ Bool_t PRunDataHandler::ReadMudFile()
     cerr << endl << "**WARNING** Couldn't obtain the run title of run " << fRunName.Data();
     cerr << endl;
   }
-  runData.fRunTitle = TString(str);
+  runData.SetRunTitle(TString(str));
 
   // get setup
+  TString setup;
   success = MUD_getLab( fh, str, sizeof(str) );
   if (success) {
-    runData.fSetup = TString(str) + TString("/");
+    setup = TString(str) + TString("/");
   }
   success = MUD_getArea( fh, str, sizeof(str) );
   if (success) {
-    runData.fSetup += TString(str) + TString("/");
+    setup += TString(str) + TString("/");
   }
   success = MUD_getApparatus( fh, str, sizeof(str) );
   if (success) {
-    runData.fSetup += TString(str) + TString("/");
+    setup += TString(str) + TString("/");
   }
   success = MUD_getSample( fh, str, sizeof(str) );
   if (success) {
-    runData.fSetup += TString(str);
+    setup += TString(str);
   }
+  runData.SetSetup(setup);
 
   // set LEM specific information to default value since it is not in the file and not used...
-  runData.fEnergy = -999.0;
-  runData.fTransport = -999.0;
-  runData.fRingAnode.clear();
+  runData.SetEnergy(PMUSR_UNDEFINED);
+  runData.SetTransport(PMUSR_UNDEFINED);
 
   // get field
   success = MUD_getField( fh, str, sizeof(str) );
   if (success) {
     success = sscanf(str, "%lf G", &dval);
     if (success == 1) {
-      runData.fField = dval;
+      runData.SetField(dval);
     } else {
-      runData.fField = -9.9e99;
+      runData.SetField(PMUSR_UNDEFINED);
     }
   } else {
-    runData.fField = -9.9e99;
+    runData.SetField(PMUSR_UNDEFINED);
   }
 
   // get temperature
   success = MUD_getTemperature( fh, str, sizeof(str) );
   if (success) {
-    runData.fTemp.resize(1);
     success = sscanf(str, "%lf K", &dval);
     if (success == 1) {
-      runData.fTemp[0].first = dval;
-      runData.fTemp[0].second = 0.0;
+      runData.SetTemperature(0, dval, 0.0);
     } else {
-      runData.fTemp[0].first = -9.9e99;
-      runData.fTemp[0].second = 0.0;
+      runData.SetTemperature(0, PMUSR_UNDEFINED, 0.0);
     }
   } else {
-    runData.fTemp[0].first = -9.9e99;
-    runData.fTemp[0].second = 0.0;
+    runData.SetTemperature(0, PMUSR_UNDEFINED, 0.0);
   }
 
   // get number of histogramms
@@ -1161,7 +1084,7 @@ Bool_t PRunDataHandler::ReadMudFile()
       }
     }
   }
-  runData.fTimeResolution = (Double_t)fsTimeResolution / 1.0e6; // fs -> ns
+  runData.SetTimeResolution((Double_t)fsTimeResolution / 1.0e6); // fs -> ns
 
   // read histograms
   pair<Int_t, Int_t> valPair;
@@ -1178,7 +1101,7 @@ Bool_t PRunDataHandler::ReadMudFile()
       cerr << endl << "**WARNING** Couldn't get t0 of histo " << i << " of run " << fRunName.Data();
       cerr << endl;
     }
-    runData.fT0s.push_back((Int_t)val);
+    runData.AppendT0((Int_t)val);
 
     // get bkg bins
     success = MUD_getHistBkgd1( fh, i, &val );
@@ -1199,9 +1122,7 @@ Bool_t PRunDataHandler::ReadMudFile()
     valPair.second = (Int_t)val;
 
     if ((valPair.first != -1) && (valPair.second != -1)) { // bkg bin1 && bkg bin2 found
-      runData.fBkgBin.push_back(valPair);
-    } else {
-      runData.fBkgBin.clear();
+      runData.AppendBkgBin(valPair);
     }
 
     // get good data bins
@@ -1223,9 +1144,7 @@ Bool_t PRunDataHandler::ReadMudFile()
     valPair.second = (Int_t)val;
 
     if ((valPair.first != -1) && (valPair.second != -1)) { // good bin1 && good bin2 found
-      runData.fGoodDataBin.push_back(valPair);
-    } else {
-      runData.fGoodDataBin.clear();
+      runData.AppendGoodDataBin(valPair);
     }
 
     // get number of bins
@@ -1261,7 +1180,7 @@ Bool_t PRunDataHandler::ReadMudFile()
     for (UInt_t j=0; j<noOfBins; j++) {
       histoData.push_back(pData[j]);
     }
-    runData.fDataBin.push_back(histoData);
+    runData.AppendDataBin(histoData);
     histoData.clear();
 
     free(pData);
@@ -1288,12 +1207,6 @@ cout << endl;
 
   // add run to the run list
   fData.push_back(runData);
-
-  // clean up
-  runData.fT0s.clear();
-  for (UInt_t i=0; i<runData.fDataBin.size(); i++)
-    runData.fDataBin[i].clear();
-  runData.fDataBin.clear();
 
   return true;
 }
@@ -1353,11 +1266,11 @@ Bool_t PRunDataHandler::ReadAsciiFile()
   PRawRunData runData;
 
   // init some stuff
-  runData.fDataNonMusr.fFromAscii = true;
-  runData.fDataNonMusr.fLabels.push_back("??"); // x default label
-  runData.fDataNonMusr.fLabels.push_back("??"); // y default label
+  runData.fDataNonMusr.SetFromAscii(true);
+  runData.fDataNonMusr.AppendLabel("??"); // x default label
+  runData.fDataNonMusr.AppendLabel("??"); // y default label
 
-  runData.fRunName = fRunName; // keep the run name
+  runData.SetRunName(fRunName); // keep the run name
 
   Int_t     lineNo = 0;
   Char_t    instr[512];
@@ -1400,9 +1313,9 @@ Bool_t PRunDataHandler::ReadAsciiFile()
       workStr = line;
       workStr.Remove(TString::kLeading, ' '); // remove spaces from the beining
       if (workStr.BeginsWith("title:", TString::kIgnoreCase)) {
-        runData.fRunTitle = TString(workStr.Data()+workStr.First(":")+2);
+        runData.SetRunTitle(TString(workStr.Data()+workStr.First(":")+2));
       } else if (workStr.BeginsWith("setup:", TString::kIgnoreCase)) {
-        runData.fSetup = TString(workStr.Data()+workStr.First(":")+2);
+        runData.SetSetup(TString(workStr.Data()+workStr.First(":")+2));
       } else if (workStr.BeginsWith("field:", TString::kIgnoreCase)) {
         workStr = TString(workStr.Data()+workStr.First(":")+2);
         if (!workStr.IsFloat()) {
@@ -1411,11 +1324,11 @@ Bool_t PRunDataHandler::ReadAsciiFile()
           success = false;
           break;
         }
-        runData.fField = workStr.Atof();
+        runData.SetField(workStr.Atof());
       } else if (workStr.BeginsWith("x-axis-title:", TString::kIgnoreCase)) {
-        runData.fDataNonMusr.fLabels[0] = TString(workStr.Data()+workStr.First(":")+2);
+        runData.fDataNonMusr.SetLabel(0, TString(workStr.Data()+workStr.First(":")+2));
       } else if (workStr.BeginsWith("y-axis-title:", TString::kIgnoreCase)) {
-        runData.fDataNonMusr.fLabels[1] = TString(workStr.Data()+workStr.First(":")+2);
+        runData.fDataNonMusr.SetLabel(1, TString(workStr.Data()+workStr.First(":")+2));
       } else if (workStr.BeginsWith("temp:", TString::kIgnoreCase)) {
         workStr = TString(workStr.Data()+workStr.First(":")+2);
         if (!workStr.IsFloat()) {
@@ -1424,9 +1337,7 @@ Bool_t PRunDataHandler::ReadAsciiFile()
           success = false;
           break;
         }
-        runData.fTemp.resize(1);
-        runData.fTemp[0].first = workStr.Atof();
-        runData.fTemp[0].second = 0.0;
+        runData.SetTemperature(0, workStr.Atof(), 0.0);
       } else if (workStr.BeginsWith("energy:", TString::kIgnoreCase)) {
         workStr = TString(workStr.Data()+workStr.First(":")+2);
         if (!workStr.IsFloat()) {
@@ -1435,9 +1346,8 @@ Bool_t PRunDataHandler::ReadAsciiFile()
           success = false;
           break;
         }
-        runData.fEnergy = workStr.Atof();
-        runData.fTransport = -999.0; // just to initialize the variables to some "meaningful" value
-        runData.fRingAnode.clear();
+        runData.SetEnergy(workStr.Atof());
+        runData.SetTransport(PMUSR_UNDEFINED); // just to initialize the variables to some "meaningful" value
       } else { // error
         cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", illegal header line.";
         cerr << endl;
@@ -1516,10 +1426,10 @@ Bool_t PRunDataHandler::ReadAsciiFile()
   f.close();
 
   // keep values
-  runData.fDataNonMusr.fData.push_back(xVec);
-  runData.fDataNonMusr.fErrData.push_back(exVec);
-  runData.fDataNonMusr.fData.push_back(yVec);
-  runData.fDataNonMusr.fErrData.push_back(eyVec);
+  runData.fDataNonMusr.AppendData(xVec);
+  runData.fDataNonMusr.AppendErrData(exVec);
+  runData.fDataNonMusr.AppendData(yVec);
+  runData.fDataNonMusr.AppendErrData(eyVec);
 
   fData.push_back(runData);
 
@@ -1528,8 +1438,6 @@ Bool_t PRunDataHandler::ReadAsciiFile()
   exVec.clear();
   yVec.clear();
   eyVec.clear();
-  runData.fDataNonMusr.fData.clear();
-  runData.fDataNonMusr.fErrData.clear();
 
   return success;
 }
@@ -1660,7 +1568,7 @@ Bool_t PRunDataHandler::ReadDBFile()
 
   PRawRunData runData;
 
-  runData.fDataNonMusr.fFromAscii = false;
+  runData.fDataNonMusr.SetFromAscii(false);
 
   Int_t     lineNo = 0;
   Int_t     idx;
@@ -1712,7 +1620,7 @@ Bool_t PRunDataHandler::ReadDBFile()
       tokens = workStr.Tokenize(" ,\t");
       for (Int_t i=1; i<tokens->GetEntries(); i++) {
         ostr = dynamic_cast<TObjString*>(tokens->At(i));
-        runData.fDataNonMusr.fDataTags.push_back(ostr->GetString());
+        runData.fDataNonMusr.AppendDataTag(ostr->GetString());
       }
 
       // clean up tokens
@@ -1725,7 +1633,7 @@ Bool_t PRunDataHandler::ReadDBFile()
 
     switch (dbTag) {
       case 0: // TITLE
-        runData.fRunTitle = workStr;
+        runData.SetRunTitle(workStr);
         break;
       case 1: // ABSTRACT
         // nothing to be done for now
@@ -1734,7 +1642,7 @@ Bool_t PRunDataHandler::ReadDBFile()
         // nothing to be done for now
         break;
       case 3: // LABEL
-        runData.fDataNonMusr.fLabels.push_back(workStr);
+        runData.fDataNonMusr.AppendLabel(workStr);
         break;
       case 4: // DATA
         // filter out potential start data tag
@@ -1763,9 +1671,9 @@ Bool_t PRunDataHandler::ReadDBFile()
 
           // prepare data vector for use
           PDoubleVector dummy;
-          for (UInt_t i=0; i<runData.fDataNonMusr.fDataTags.size(); i++) {
-            runData.fDataNonMusr.fData.push_back(dummy);
-            runData.fDataNonMusr.fErrData.push_back(dummy);
+          for (UInt_t i=0; i<runData.fDataNonMusr.GetDataTags()->size(); i++) {
+            runData.fDataNonMusr.AppendData(dummy);
+            runData.fDataNonMusr.AppendErrData(dummy);
           }
 
           firstData = false;
@@ -1776,7 +1684,7 @@ Bool_t PRunDataHandler::ReadDBFile()
           const Char_t *str = workStr.Data();
           if (isdigit(str[0])) { // run line
             TString run("run");
-            idx = GetDataTagIndex(run, runData.fDataNonMusr.fDataTags);
+            idx = GetDataTagIndex(run, runData.fDataNonMusr.GetDataTags());
             if (idx == -1) {
               cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
               cerr << endl << ">> " << workStr.Data();
@@ -1796,8 +1704,8 @@ Bool_t PRunDataHandler::ReadDBFile()
               return false;
             }
             val = tstr.Atof();
-            runData.fDataNonMusr.fData[idx].push_back(val);
-            runData.fDataNonMusr.fErrData[idx].push_back(1.0);
+            runData.fDataNonMusr.AppendSubData(idx, val);
+            runData.fDataNonMusr.AppendSubErrData(idx, 1.0);
           } else { // tag = data line
             // remove all possible spaces
             workStr.ReplaceAll(" ", "");
@@ -1812,7 +1720,7 @@ Bool_t PRunDataHandler::ReadDBFile()
             }
             ostr = dynamic_cast<TObjString*>(tokens->At(0));
             tstr = ostr->GetString();
-            idx = GetDataTagIndex(tstr, runData.fDataNonMusr.fDataTags);
+            idx = GetDataTagIndex(tstr, runData.fDataNonMusr.GetDataTags());
             if (idx == -1) {
               cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
               cerr << endl << ">> " << workStr.Data();
@@ -1834,8 +1742,8 @@ Bool_t PRunDataHandler::ReadDBFile()
                   return false;
                 }
                 val = tstr.Atof();
-                runData.fDataNonMusr.fData[idx].push_back(val);
-                runData.fDataNonMusr.fErrData[idx].push_back(1.0);
+                runData.fDataNonMusr.AppendSubData(idx, val);
+                runData.fDataNonMusr.AppendSubErrData(idx, 1.0);
                 break;
               case 4: // tag = val,err,,
               case 5: // tag = val,err1,err2,
@@ -1851,7 +1759,7 @@ Bool_t PRunDataHandler::ReadDBFile()
                   return false;
                 }
                 val = tstr.Atof();
-                runData.fDataNonMusr.fData[idx].push_back(val);
+                runData.fDataNonMusr.AppendSubData(idx, val);
                 // handle err1 (err2 will be ignored for the time being)
                 ostr = dynamic_cast<TObjString*>(tokens->At(2));
                 tstr = ostr->GetString();
@@ -1864,7 +1772,7 @@ Bool_t PRunDataHandler::ReadDBFile()
                   return false;
                 }
                 val = tstr.Atof();
-                runData.fDataNonMusr.fErrData[idx].push_back(val);
+                runData.fDataNonMusr.AppendSubErrData(idx, val);
                 break;
               default:
                 cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
@@ -1879,11 +1787,11 @@ Bool_t PRunDataHandler::ReadDBFile()
         } else { // handle row formated data
           // split string in tokens
           tokens = workStr.Tokenize(","); // line has structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle
-          if (tokens->GetEntries() != (Int_t)(3*runData.fDataNonMusr.fDataTags.size()+1)) {
+          if (tokens->GetEntries() != (Int_t)(3*runData.fDataNonMusr.GetDataTags()->size()+1)) {
             cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
             cerr << endl << ">> " << workStr.Data();
             cerr << endl << ">> Expected db-data line with structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle";
-            cerr << endl << ">> found = " << tokens->GetEntries() << " tokens, however expected " << 3*runData.fDataNonMusr.fDataTags.size()+1;
+            cerr << endl << ">> found = " << tokens->GetEntries() << " tokens, however expected " << 3*runData.fDataNonMusr.GetDataTags()->size()+1;
             cerr << endl << ">> Perhaps there are commas without space inbetween, like 12.3,, 3.2,...";
             delete tokens;
             return false;
@@ -1902,15 +1810,15 @@ Bool_t PRunDataHandler::ReadDBFile()
               delete tokens;
               return false;
             }
-            runData.fDataNonMusr.fData[j].push_back(tstr.Atof());
+            runData.fDataNonMusr.AppendSubData(j, tstr.Atof());
 
             // handle 1st error if present (2nd will be ignored for now)
             ostr = dynamic_cast<TObjString*>(tokens->At(i+1));
             tstr = ostr->GetString();
             if (tstr.IsWhitespace()) {
-              runData.fDataNonMusr.fErrData[j].push_back(1.0);
+              runData.fDataNonMusr.AppendSubErrData(j, 1.0);
             } else if (tstr.IsFloat()) {
-              runData.fDataNonMusr.fErrData[j].push_back(tstr.Atof());
+              runData.fDataNonMusr.AppendSubErrData(j, tstr.Atof());
             } else {
               cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
               cerr << endl << ">> " << workStr.Data();
@@ -1931,10 +1839,10 @@ Bool_t PRunDataHandler::ReadDBFile()
   f.close();
 
   // check that the number of labels == the number of data tags
-  if (runData.fDataNonMusr.fLabels.size() != runData.fDataNonMusr.fDataTags.size()) {
+  if (runData.fDataNonMusr.GetLabels()->size() != runData.fDataNonMusr.GetDataTags()->size()) {
     cerr << endl << "PRunDataHandler::ReadDBFile **ERROR**";
-    cerr << endl << ">> number of LABELS found    = " << runData.fDataNonMusr.fLabels.size();
-    cerr << endl << ">> number of Data tags found = " << runData.fDataNonMusr.fDataTags.size();
+    cerr << endl << ">> number of LABELS found    = " << runData.fDataNonMusr.GetLabels()->size();
+    cerr << endl << ">> number of Data tags found = " << runData.fDataNonMusr.GetDataTags()->size();
     cerr << endl << ">> They have to be equal!!";
     if (tokens) {
       delete tokens;
@@ -1944,19 +1852,19 @@ Bool_t PRunDataHandler::ReadDBFile()
   }
 
   // check if all vectors have the same size
-  for (UInt_t i=1; i<runData.fDataNonMusr.fData.size(); i++) {
-    if (runData.fDataNonMusr.fData[i].size() != runData.fDataNonMusr.fData[i-1].size()) {
+  for (UInt_t i=1; i<runData.fDataNonMusr.GetData()->size(); i++) {
+    if (runData.fDataNonMusr.GetData()->at(i).size() != runData.fDataNonMusr.GetData()->at(i-1).size()) {
       cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo;
-      cerr << endl << ">> label: " << runData.fDataNonMusr.fDataTags[i-1].Data() << ", number data elements = " << runData.fDataNonMusr.fData[i-1].size();
-      cerr << endl << ">> label: " << runData.fDataNonMusr.fDataTags[i].Data() << ", number data elements = " << runData.fDataNonMusr.fData[i].size();
+      cerr << endl << ">> label: " << runData.fDataNonMusr.GetDataTags()->at(i-1).Data() << ", number data elements = " << runData.fDataNonMusr.GetData()->at(i-1).size();
+      cerr << endl << ">> label: " << runData.fDataNonMusr.GetDataTags()->at(i).Data() << ", number data elements = " << runData.fDataNonMusr.GetData()->at(i).size();
       cerr << endl << ">> They have to be equal!!";
       success = false;
       break;
     }
-    if (runData.fDataNonMusr.fErrData[i].size() != runData.fDataNonMusr.fErrData[i-1].size()) {
+    if (runData.fDataNonMusr.GetErrData()->at(i).size() != runData.fDataNonMusr.GetErrData()->at(i-1).size()) {
       cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo;
-      cerr << endl << ">> label: " << runData.fDataNonMusr.fDataTags[i-1].Data() << ", number data elements = " << runData.fDataNonMusr.fData[i-1].size();
-      cerr << endl << ">> label: " << runData.fDataNonMusr.fDataTags[i].Data() << ", number error data elements = " << runData.fDataNonMusr.fErrData[i].size();
+      cerr << endl << ">> label: " << runData.fDataNonMusr.GetDataTags()->at(i-1).Data() << ", number data elements = " << runData.fDataNonMusr.GetData()->at(i-1).size();
+      cerr << endl << ">> label: " << runData.fDataNonMusr.GetDataTags()->at(i).Data() << ", number error data elements = " << runData.fDataNonMusr.GetErrData()->at(i).size();
       cerr << endl << ">> They have to be equal!!";
       success = false;
       break;
@@ -1970,7 +1878,7 @@ Bool_t PRunDataHandler::ReadDBFile()
   }
 
   // keep run name
-  runData.fRunName = fRunName;
+  runData.SetRunName(fRunName);
 
   fData.push_back(runData);
 
@@ -2181,13 +2089,13 @@ Int_t PRunDataHandler::ToInt(TString &str, Bool_t &ok)
  *
  * <b>return:</b> if found returns the data tag index (from the dataTags vector), otherwise -1
  */
-Int_t PRunDataHandler::GetDataTagIndex(TString &str, PStringVector &dataTags)
+Int_t PRunDataHandler::GetDataTagIndex(TString &str, const PStringVector* dataTags)
 {
   Int_t result = -1;
 
   // check all the other possible data tags
-  for (UInt_t i=0; i<dataTags.size(); i++) {
-    if (!dataTags[i].CompareTo(str, TString::kIgnoreCase)) {
+  for (UInt_t i=0; i<dataTags->size(); i++) {
+    if (!dataTags->at(i).CompareTo(str, TString::kIgnoreCase)) {
       result = i;
       break;
     }

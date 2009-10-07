@@ -11,7 +11,7 @@
 
 /***************************************************************************
  *   Copyright (C) 2007 by Andreas Suter                                   *
- *   andreas.suter@psi.c                                                   *
+ *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -74,7 +74,7 @@ class PRunDataHandler
     virtual Bool_t IsWhitespace(const char *str);
     virtual Double_t ToDouble(TString &str, Bool_t &ok);
     virtual Int_t ToInt(TString &str, Bool_t &ok);
-    virtual Int_t GetDataTagIndex(TString &str, PStringVector &fLabels);
+    virtual Int_t GetDataTagIndex(TString &str, const PStringVector* fLabels);
 };
 
 #endif //  _PRUNDATAHANDLER_H_

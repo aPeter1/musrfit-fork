@@ -11,7 +11,7 @@
 
 /***************************************************************************
  *   Copyright (C) 2007 by Andreas Suter                                   *
- *   andreas.suter@psi.c                                                   *
+ *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -36,7 +36,7 @@
 #include <TString.h>
 #include <TObjArray.h>
 #include <TObjString.h>
-#include <TFile.h>
+//#include <TFile.h>
 #include <TFolder.h>
 
 #include "TLemRunHeader.h"
@@ -126,10 +126,6 @@ PRunBase::~PRunBase()
 {
   fParamNo.clear();
 
-  fData.fValue.clear();
-  fData.fError.clear();
-  fData.fTheory.clear();
-
   fT0s.clear();
 
   fFuncValues.clear();
@@ -144,7 +140,6 @@ PRunBase::~PRunBase()
  */
 void PRunBase::CleanUp()
 {
-//cout << endl << "PRunBase::CleanUp() ..." << endl;
   if (fTheory) {
     delete fTheory;
     fTheory = 0;

@@ -87,19 +87,19 @@ PMusrT0::PMusrT0()
 PMusrT0::PMusrT0(PRawRunData *rawRunData, int runNo, int histoNo, int detectorTag, int addRunNo) :
     fRunNo(runNo), fDetectorTag(detectorTag), fAddRunNo(addRunNo)
 {
-cout << endl << "run Name = " << rawRunData->fRunName.Data() << ", runNo = " << fRunNo << ", histoNo = " << histoNo << endl;
+cout << endl << "run Name = " << rawRunData->GetRunName()->Data() << ", runNo = " << fRunNo << ", histoNo = " << histoNo << endl;
 
   fStatus = 0; // default is quit locally
 
   fAddRunOffset = 0;
 
-  TString str = rawRunData->fRunName + TString(" : ");
+  TString str = *rawRunData->GetRunName() + TString(" : ");
   str += histoNo;
 
   // feed necessary objects
 
   // feed raw data histo
-  Int_t noOfBins = rawRunData->fDataBin[histoNo-1].size();
+  Int_t noOfBins = rawRunData->GetDataBin(histoNo-1)->size();
   Double_t start = -0.5;
   Double_t end   = noOfBins - 0.5; // -0.5 is correct since the data start at 0.0
   fHisto = new TH1F("fHisto", str.Data(), noOfBins, start, end);
@@ -107,8 +107,8 @@ cout << endl << "run Name = " << rawRunData->fRunName.Data() << ", runNo = " << 
   fHisto->SetMarkerSize(0.5);
   fHisto->SetMarkerColor(TColor::GetColor(0,0,0)); // black
 
-  for (unsigned int i=0; i<rawRunData->fDataBin[histoNo-1].size(); i++) {
-    fHisto->SetBinContent(i+1, rawRunData->fDataBin[histoNo-1][i]);
+  for (unsigned int i=0; i<rawRunData->GetDataBin(histoNo-1)->size(); i++) {
+    fHisto->SetBinContent(i+1, rawRunData->GetDataBin(histoNo-1)->at(i));
   }
 
   // generate canvas etc
