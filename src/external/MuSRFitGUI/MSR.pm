@@ -987,7 +987,7 @@ sub CreateTheory {
 ########################
 # ExtractBlks
 ########################
-sub ExtractBlk {
+sub ExtractBlks {
 # This subroutine takes the MSR file as input and extracts the parameters
 # with the corresponding values, errors etc...
 
@@ -1310,7 +1310,7 @@ sub ExportParams {
 #    open (MSRF,q{<},"$FILENAME.msr" );
 #    my @lines = <MSRF>;
 #    close(IFILE);
-#    my $FPBlock_ref=MSR::ExtractBlk(@lines);
+#    my $FPBlock_ref=MSR::ExtractBlks(@lines);
 #    my @FPBloc = @$FPBlock_ref;
 
 # Then loop over expected parameters and extract their values and error bar
