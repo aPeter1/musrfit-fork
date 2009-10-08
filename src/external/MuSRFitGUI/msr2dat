@@ -57,7 +57,7 @@ foreach $Arg (@ARGV) {
 
 # Nice trick, make a hash for unique RUN lines
 # Find spectrum lines
-    @MAPS = grep {/map/} @file;
+    @MAPS = grep {/map /} @file;
     @RUNS = grep {/RUN/} @file;
     $counter=0;
     foreach $key (@RUNS){
@@ -70,10 +70,11 @@ foreach $Arg (@ARGV) {
 
 
 # Number of runs (or independent sets of parameters) in this file
-    $NRUNS=1;
+    $NRuns=1;
     foreach (sort { $RUN{$a} <=> $RUN{$b}} keys %RUN ) {
 	@RunParams=();
 	$NP=0;
+#	print $_."=".$MAP{$_}."\n";
 	@tmp=split(/\s+/,$MAP{$_});
 	# Remove first element (map)
 	shift(@tmp);
@@ -112,14 +113,15 @@ foreach $Arg (@ARGV) {
 
     # For the values from all the files.
     # I am not checking if all the files have the same theory function
-    for ($i=1;$i<=$NRuns;$i++) {
-	    @Pnum=split(/,/,$RUNParams[$i]);
-	    # First go for the shared parameters
-	    foreach (@Pnum,@Shared) {
-		($value,$err)=split(/,/,$P{$_});
-                $DatFile=join("\t",$DatFile,$value,$err);
-	    }
-	    $DatFile=$DatFile."\n";
+    for ($i=1;$i<=$NRuns-1;$i++) {
+#	print "RUN: ".$i." Params:".$RUNParams[$i]."\n";
+	@Pnum=split(/,/,$RUNParams[$i]);
+	# First go for the shared parameters
+	foreach (@Pnum,@Shared) {
+	    ($value,$err)=split(/,/,$P{$_});
+	    $DatFile=join("\t",$DatFile,$value,$err);
+	}
+	$DatFile=$DatFile."\n";
     }
 
     # Go to the next file

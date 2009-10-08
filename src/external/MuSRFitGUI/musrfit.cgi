@@ -726,7 +726,7 @@ $TITLE
 </tr>
 <tr>
 <td colspan=\"1\" valign=\"top\" style=\"width: 90px\">
-<table cellspacing=\"2\" border=\"2\">
+<table cellspacing=\"2\" border=\"2\"  bgcolor=\"#E0E0E0\">
 <tbody>
  <tr>
   <td>
