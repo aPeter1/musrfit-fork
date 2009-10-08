@@ -469,7 +469,7 @@ void MuSRFitform::UpdateMSRFileInitTable()
 	textMSROutput->append("$line");
     }
     
-    my $FPBlock_ref=MSR::ExtractParamBlk(@lines);
+    (my $TBlock_ref, my $FPBlock_ref)=MSR::ExtractBlks(@lines);
     my @FPBloc = @$FPBlock_ref;
     
     my $PCount=0;

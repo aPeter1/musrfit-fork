@@ -985,9 +985,9 @@ sub CreateTheory {
 }    # End CreateTheory
 
 ########################
-# ExtractParamBlk
+# ExtractBlks
 ########################
-sub ExtractParamBlk {
+sub ExtractBlk {
 # This subroutine takes the MSR file as input and extracts the parameters
 # with the corresponding values, errors etc...
 
@@ -1021,7 +1021,7 @@ sub ExtractParamBlk {
 	my @Param=split(/\s+/,$line);
     }
 
-    return(\@FPBlock)
+    return(\@TBlock,\@FPBlock)
 }
 
 
@@ -1310,7 +1310,7 @@ sub ExportParams {
 #    open (MSRF,q{<},"$FILENAME.msr" );
 #    my @lines = <MSRF>;
 #    close(IFILE);
-#    my $FPBlock_ref=MSR::ExtractParamBlk(@lines);
+#    my $FPBlock_ref=MSR::ExtractBlk(@lines);
 #    my @FPBloc = @$FPBlock_ref;
 
 # Then loop over expected parameters and extract their values and error bar
@@ -1420,6 +1420,98 @@ sub ExportParams {
     }
 
     return $TABLE;
+}
+
+########################
+# MSR2Dat
+# Function return a tab separated table of parameters from an MSR file
+# input should be 
+# @msrfile
+########################
+sub MSR2Dat { 
+    # Take the msr file as input array of lines
+    my @file=@_;
+
+    # Extract PRAMETERS and THEORY Blocks
+    (my $TBlock_ref, my $FPBlock_ref)=MSR::ExtractBlks(@file);
+    my @FPBlock = @$FPBlock_ref;
+    my @TBlock = @$TBlock_ref;
+
+# Get shared parameters
+    foreach $TLine (@TBlock) {
+	# Then split it to find numbers of shared parameters
+	@tmp=split(/\s+/,$TLine);
+	foreach (@tmp) {
+	    if ($_ eq $_+0 ) {
+		# This is a number, keep it in the Shared arry
+		@Shared=(@Shared,$_);
+	    }
+	}
+    }
+
+# Nice trick, make a hash for unique RUN lines
+# Find spectrum lines
+    my @MAPS = grep {/map /} @file;
+    my @RUNS = grep {/RUN/} @file;
+    my $counter=0;
+    foreach $key (@RUNS){
+	# This gets rid of duplicates
+	$RUN{$key}=$counter;
+	$MAP{$key}=$MAPS[$counter];
+	$counter++;
+    } 
+
+# Number of runs (or independent sets of parameters) in this file
+    my $NRuns=1;
+    foreach (sort { $RUN{$a} <=> $RUN{$b}} keys %RUN ) {
+	@RunParams=();
+	$NP=0;
+#	print $_."=".$MAP{$_}."\n";
+	@tmp=split(/\s+/,$MAP{$_});
+	# Remove first element (map)
+	shift(@tmp);
+	foreach (@tmp) {
+	    if ($_ ne "" && $_>0 ) {
+		@RunParams=(@RunParams,$_);
+		$NP++;
+	    }
+	}
+	if ($NP>0) {
+	    $orders=join(",",@RunParams);
+	    $RUNParams[$NRuns]=$orders;
+	    $NRuns++;
+	}
+    }
+    
+# Split parameter's line to extract values and errors
+    foreach $line (@FPBlock) {
+	@Param=split(/\s+/,$line);
+	# Create a hash with the parameter order as a key
+	# and the value and error as value
+	$P{$Param[1]}=$Param[3].",".$Param[4];
+	$PName{$Param[1]}=$Param[2];
+    }
+
+# Now we have everything. Lets start ordering
+    # First lines is names
+    @Pnum=split(/,/,$RUNParams[1]);
+    foreach (@Pnum,@Shared) {
+	$DatFile=join("\t",$DatFile,$PName{$_},"d".$PName{$_});
+    }
+    $DatFile=$DatFile."\n";
+    
+    # For the values from all the files.
+    # I am not checking if all the files have the same theory function
+    for ($i=1;$i<=$NRuns-1;$i++) {
+	@Pnum=split(/,/,$RUNParams[$i]);
+	# First go for the shared parameters
+	foreach (@Pnum,@Shared) {
+	    ($value,$err)=split(/,/,$P{$_});
+	    $DatFile=join("\t",$DatFile,$value,$err);
+	}
+	$DatFile=$DatFile."\n";
+    }
+    return $DatFile;
 }
 
 

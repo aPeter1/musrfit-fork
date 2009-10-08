@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Wed Sep 23 18:24:32 2009
+# Created: Thu Oct 8 17:22:34 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -3419,7 +3419,7 @@ sub UpdateMSRFileInitTable
 	textMSROutput->append("$line");
     }
     
-    my $FPBlock_ref=MSR::ExtractParamBlk(@lines);
+    (my $TBlock_ref, my $FPBlock_ref)=MSR::ExtractParamBlk(@lines);
     my @FPBloc = @$FPBlock_ref;
     
     my $PCount=0;
