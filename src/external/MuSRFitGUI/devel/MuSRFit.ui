@@ -22,8 +22,8 @@
     </property>
     <property name="minimumSize">
         <size>
-            <width>21</width>
-            <height>275</height>
+            <width>23</width>
+            <height>270</height>
         </size>
     </property>
     <property name="caption">

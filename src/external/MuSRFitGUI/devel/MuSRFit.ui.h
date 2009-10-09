@@ -806,7 +806,7 @@ void MuSRFitform::fileBrowse()
 
 void MuSRFitform::AppendToFunctions()
 {
-    my $ParName=CParamsCombo->currentItem;
+    my $ParName=CParamsCombo->currentText();
     my $Full_T_Block=TheoryBlock->text;
     my $Constraint=ConstraintLine->text;
 # Then clear the text

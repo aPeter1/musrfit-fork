@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Fri Oct 9 17:49:00 2009
+# Created: Fri Oct 9 23:56:08 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -1578,7 +1578,7 @@ sub NEW
         setName("MuSRFitform" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
-    setMinimumSize(Qt::Size(21, 275) );
+    setMinimumSize(Qt::Size(23, 270) );
     setIcon($image0 );
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
@@ -3932,7 +3932,7 @@ sub fileBrowse
 sub AppendToFunctions
 {
 
-    my $ParName=CParamsCombo->currentItem;
+    my $ParName=CParamsCombo->currentText();
     my $Full_T_Block=TheoryBlock->text;
     my $Constraint=ConstraintLine->text;
 # Then clear the text
@@ -3943,7 +3943,7 @@ sub AppendToFunctions
     my $ConstLine="fun$i = $Constraint\n";
     FunctionsBlock->append($ConstLine);
     
-# Replace parameter in theory block with fun$1
+# Replace parameter in theory block with fun$i
     $Full_T_Block=~ s/$ParName/fun$i/;
     TheoryBlock->setText($Full_T_Block);
 
