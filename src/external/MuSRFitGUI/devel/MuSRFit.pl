@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Thu Sep 24 20:22:29 2009
+# Created: Fri Oct 9 17:49:00 2009
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -41,7 +41,8 @@ use Qt::slots
     ShowMuSRT0 => [],
     T0Update => [],
     RunSelectionToggle => [],
-    fileBrowse => [];
+    fileBrowse => [],
+    AppendToFunctions => [];
 use Qt::attributes qw(
     musrfit_tabs
     RUNSPage
@@ -1577,7 +1578,7 @@ sub NEW
         setName("MuSRFitform" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
-    setMinimumSize(Qt::Size(23, 270) );
+    setMinimumSize(Qt::Size(21, 275) );
     setIcon($image0 );
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
@@ -1588,6 +1589,7 @@ sub NEW
     musrfit_tabs->setSizePolicy( Qt::SizePolicy(7, 7, 1, 1, musrfit_tabs->sizePolicy()->hasHeightForWidth()) );
     musrfit_tabs->setMinimumSize( Qt::Size(560, 400) );
     musrfit_tabs->setMaximumSize( Qt::Size(95, 32767) );
+    musrfit_tabs->setMouseTracking( 0 );
 
     RUNSPage = Qt::Widget(musrfit_tabs, "RUNSPage");
 
@@ -1658,7 +1660,7 @@ sub NEW
     groupBox7->setAlignment( int(&Qt::GroupBox::AlignTop) );
 
     my $LayoutWidget_2 = Qt::Widget(groupBox7, '$LayoutWidget_2');
-    $LayoutWidget_2->setGeometry( Qt::Rect(8, 21, 625, 125) );
+    $LayoutWidget_2->setGeometry( Qt::Rect(8, 21, 520, 125) );
     my $layout42 = Qt::GridLayout($LayoutWidget_2, 1, 1, 5, 6, '$layout42');
 
     FitType2 = Qt::ComboBox(0, $LayoutWidget_2, "FitType2");
@@ -2187,7 +2189,7 @@ sub NEW
     InitParamTable->horizontalHeader()->setLabel(InitParamTable->numCols() - 1, trUtf8("Min"));
     InitParamTable->setNumCols(InitParamTable->numCols() + 1);
     InitParamTable->horizontalHeader()->setLabel(InitParamTable->numCols() - 1, trUtf8("Max"));
-    InitParamTable->setGeometry( Qt::Rect(5, 5, 445, 355) );
+    InitParamTable->setGeometry( Qt::Rect(5, 5, 545, 355) );
     InitParamTable->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, InitParamTable->sizePolicy()->hasHeightForWidth()) );
     InitParamTable->setMaximumSize( Qt::Size(32767, 32767) );
     InitParamTable->setFocusPolicy( &Qt::Table::TabFocus() );
@@ -2215,7 +2217,7 @@ sub NEW
     groupTitle->setMargin( int(5) );
 
     my $LayoutWidget_9 = Qt::Widget(groupTitle, '$LayoutWidget_9');
-    $LayoutWidget_9->setGeometry( Qt::Rect(6, 8, 530, 100) );
+    $LayoutWidget_9->setGeometry( Qt::Rect(6, 8, 515, 100) );
     my $layout25_2 = Qt::VBoxLayout($LayoutWidget_9, 11, 6, '$layout25_2');
 
     TITLELabel = Qt::Label($LayoutWidget_9, "TITLELabel");
@@ -2727,7 +2729,7 @@ sub NEW
     MenuBar->insertSeparator( 8 );
 
     languageChange();
-    my $resize = Qt::Size(576, 497);
+    my $resize = Qt::Size(579, 501);
     $resize = $resize->expandedTo(minimumSizeHint());
     resize( $resize );
     clearWState( &Qt::WState_Polished );
@@ -2754,6 +2756,7 @@ sub NEW
     Qt::Object::connect(helpAboutAction, SIGNAL "activated()", this, SLOT "helpAbout()");
     Qt::Object::connect(T0, SIGNAL "activated()", this, SLOT "ShowMuSRT0()");
     Qt::Object::connect(Plot, SIGNAL "activated()", this, SLOT "GoPlot()");
+    Qt::Object::connect(AddConstraint, SIGNAL "clicked()", this, SLOT "AppendToFunctions()");
 
     setTabOrder(musrfit_tabs, RunNumbers);
     setTabOrder(RunNumbers, BeamLine);
@@ -3575,7 +3578,7 @@ sub UpdateMSRFileInitTable
 	textMSROutput->append("$line");
     }
     
-    my $FPBlock_ref=MSR::ExtractParamBlk(@lines);
+    (my $TBlock_ref, my $FPBlock_ref)=MSR::ExtractBlks(@lines);
     my @FPBloc = @$FPBlock_ref;
     
     my $PCount=0;
@@ -3677,7 +3680,7 @@ sub ActivateShComp
     
     my $Component=1;
     CParamsCombo->clear();
-    TheoryBlock->setText($Full_T_Block);
+    
     foreach my $FitType (@FitTypes) {
 	my $Parameters=$Paramcomp[$Component-1];
 	my @Params = split( /\s+/, $Parameters );
@@ -3706,18 +3709,20 @@ sub ActivateShComp
 	for (my $i=1; $i<=9;$i++) {		
 	    my $ParamChkBx="ShParam_".$Component."_".$i;
 	    my $ChkBx = child($ParamChkBx);
-	    my $CParam = $Params[$i-1]." ".$Component;
-	    if ($Params[$i-1] ne "") {
+	    my $CParam = $Params[$i-1]."_".$Component;
+	    if ($Params[$i-1] ne "" && $Params[$i-1] ne "Alpha" &&  $Params[$i-1] ne "N0" && $Params[$i-1] ne "NBg") {
 		$ChkBx->setHidden(0);
 		$ChkBx->setEnabled(1);
 		$ChkBx ->setText($Params[$i-1]);
 		CParamsCombo->insertItem($CParam,-1);
+		$Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
 	    } else {
 		$ChkBx->setHidden(1);
 	    }
 	}
 	$Component++;
     }  
+    TheoryBlock->setText($Full_T_Block);
 
 }
 
@@ -3921,6 +3926,26 @@ sub fileBrowse
 	$RunFiles=join(",",$RunFiles,@files);
     }
     RunFiles->setText($RunFiles);
+
+}
+
+sub AppendToFunctions
+{
+
+    my $ParName=CParamsCombo->currentItem;
+    my $Full_T_Block=TheoryBlock->text;
+    my $Constraint=ConstraintLine->text;
+# Then clear the text
+    ConstraintLine->setText("");
+    
+# Check how many constraints (lines) in FUNCTIONS Block    
+    my $i=FunctionsBlock->lines();
+    my $ConstLine="fun$i = $Constraint\n";
+    FunctionsBlock->append($ConstLine);
+    
+# Replace parameter in theory block with fun$1
+    $Full_T_Block=~ s/$ParName/fun$i/;
+    TheoryBlock->setText($Full_T_Block);
 
 }
 

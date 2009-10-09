@@ -70,6 +70,9 @@
                 <height>32767</height>
             </size>
         </property>
+        <property name="mouseTracking">
+            <bool>false</bool>
+        </property>
         <widget class="QWidget">
             <property name="name">
                 <cstring>RUNSPage</cstring>
@@ -5019,6 +5022,12 @@
         <receiver>MuSRFitform</receiver>
         <slot>GoPlot()</slot>
     </connection>
+    <connection>
+        <sender>AddConstraint</sender>
+        <signal>clicked()</signal>
+        <receiver>MuSRFitform</receiver>
+        <slot>AppendToFunctions()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>musrfit_tabs</tabstop>
@@ -5125,6 +5134,7 @@
     <slot>T0Update()</slot>
     <slot>RunSelectionToggle()</slot>
     <slot>fileBrowse()</slot>
+    <slot>AppendToFunctions()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

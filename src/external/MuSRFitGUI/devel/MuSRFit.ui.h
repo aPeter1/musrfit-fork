@@ -567,7 +567,7 @@ void MuSRFitform::ActivateShComp()
     
     my $Component=1;
     CParamsCombo->clear();
-    TheoryBlock->setText($Full_T_Block);
+    
     foreach my $FitType (@FitTypes) {
 	my $Parameters=$Paramcomp[$Component-1];
 	my @Params = split( /\s+/, $Parameters );
@@ -596,18 +596,20 @@ void MuSRFitform::ActivateShComp()
 	for (my $i=1; $i<=9;$i++) {		
 	    my $ParamChkBx="ShParam_".$Component."_".$i;
 	    my $ChkBx = child($ParamChkBx);
-	    my $CParam = $Params[$i-1]." ".$Component;
-	    if ($Params[$i-1] ne "") {
+	    my $CParam = $Params[$i-1]."_".$Component;
+	    if ($Params[$i-1] ne "" && $Params[$i-1] ne "Alpha" &&  $Params[$i-1] ne "N0" && $Params[$i-1] ne "NBg") {
 		$ChkBx->setHidden(0);
 		$ChkBx->setEnabled(1);
 		$ChkBx ->setText($Params[$i-1]);
 		CParamsCombo->insertItem($CParam,-1);
+		$Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
 	    } else {
 		$ChkBx->setHidden(1);
 	    }
 	}
 	$Component++;
     }  
+    TheoryBlock->setText($Full_T_Block);
 }
 
 void MuSRFitform::InitializeTab()
@@ -799,4 +801,23 @@ void MuSRFitform::fileBrowse()
 	$RunFiles=join(",",$RunFiles,@files);
     }
     RunFiles->setText($RunFiles);
+}
+
+
+void MuSRFitform::AppendToFunctions()
+{
+    my $ParName=CParamsCombo->currentItem;
+    my $Full_T_Block=TheoryBlock->text;
+    my $Constraint=ConstraintLine->text;
+# Then clear the text
+    ConstraintLine->setText("");
+    
+# Check how many constraints (lines) in FUNCTIONS Block    
+    my $i=FunctionsBlock->lines();
+    my $ConstLine="fun$i = $Constraint\n";
+    FunctionsBlock->append($ConstLine);
+    
+# Replace parameter in theory block with fun$1
+    $Full_T_Block=~ s/$ParName/fun$i/;
+    TheoryBlock->setText($Full_T_Block);
 }
