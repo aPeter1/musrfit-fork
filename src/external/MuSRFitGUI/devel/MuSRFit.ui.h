@@ -817,7 +817,7 @@ void MuSRFitform::AppendToFunctions()
     my $ConstLine="fun$i = $Constraint\n";
     FunctionsBlock->append($ConstLine);
     
-# Replace parameter in theory block with fun$1
+# Replace parameter in theory block with fun$i
     $Full_T_Block=~ s/$ParName/fun$i/;
     TheoryBlock->setText($Full_T_Block);
 }
