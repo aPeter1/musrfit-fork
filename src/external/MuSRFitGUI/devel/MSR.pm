@@ -17,6 +17,29 @@ my %BeamLines = ( "LEM", "MUE4", "GPS", "PIM3", "LTF", "PIM3", "Dolly", "PIE1", 
 my %Def_Format =
   ( "LEM", "ROOT-NPP", "GPS", "PSI-BIN", "LTF", "PSI-BIN", "Dolly", "PSI-BIN" , "GPD", "PSI-BIN");
 
+# Additional information to extract run properties from database
+# For LEM use summary files
+$SUMM_DIR="/afs/psi.ch/project/nemu/data/summ/";
+# For Bulok use list files
+%DBDIR=("LEM","/afs/psi.ch/project/nemu/data/log/",
+	"GPS","/afs/psi.ch/project/bulkmusr/olddata/list/",
+	"Dolly","/afs/psi.ch/project/bulkmusr/olddata/list/",
+	"GPD","/afs/psi.ch/project/bulkmusr/olddata/list/",
+	"ALC","/afs/psi.ch/project/bulkmusr/olddata/list/",
+	"LTF","/afs/psi.ch/project/bulkmusr/olddata/list/");
+
+# Information available since
+%MinYears=("LEM","2001",
+	   "GPS","1993",
+	   "Dolly","1998",
+	   "GPD","1993",
+	   "ALC","1993",
+	   "LTF","1995");
+
+# And to deal with old names of bulk muons
+%AltArea=("GPS","PIM3","LTF","PIM3","ALC","PIE3","Dolly","PIE1","GPD","MUE1");
+
+
 # Additions to paremeters' names
 my $erradd = "d";
 my $minadd = "_min";
@@ -962,9 +985,9 @@ sub CreateTheory {
 }    # End CreateTheory
 
 ########################
-# ExtractParamBlk
+# ExtractBlks
 ########################
-sub ExtractParamBlk {
+sub ExtractBlks {
 # This subroutine takes the MSR file as input and extracts the parameters
 # with the corresponding values, errors etc...
 
@@ -998,7 +1021,7 @@ sub ExtractParamBlk {
 	my @Param=split(/\s+/,$line);
     }
 
-    return(\@FPBlock)
+    return(\@TBlock,\@FPBlock)
 }
 
 
@@ -1287,7 +1310,7 @@ sub ExportParams {
 #    open (MSRF,q{<},"$FILENAME.msr" );
 #    my @lines = <MSRF>;
 #    close(IFILE);
-#    my $FPBlock_ref=MSR::ExtractParamBlk(@lines);
+#    my $FPBlock_ref=MSR::ExtractBlks(@lines);
 #    my @FPBloc = @$FPBlock_ref;
 
 # Then loop over expected parameters and extract their values and error bar
@@ -1399,6 +1422,98 @@ sub ExportParams {
     return $TABLE;
 }
 
+########################
+# MSR2Dat
+# Function return a tab separated table of parameters from an MSR file
+# input should be 
+# @msrfile
+########################
+sub MSR2Dat { 
+    # Take the msr file as input array of lines
+    my @file=@_;
+
+    # Extract PRAMETERS and THEORY Blocks
+    (my $TBlock_ref, my $FPBlock_ref)=MSR::ExtractBlks(@file);
+    my @FPBlock = @$FPBlock_ref;
+    my @TBlock = @$TBlock_ref;
+
+# Get shared parameters
+    foreach $TLine (@TBlock) {
+	# Then split it to find numbers of shared parameters
+	@tmp=split(/\s+/,$TLine);
+	foreach (@tmp) {
+	    if ($_ eq $_+0 ) {
+		# This is a number, keep it in the Shared arry
+		@Shared=(@Shared,$_);
+	    }
+	}
+    }
+
+# Nice trick, make a hash for unique RUN lines
+# Find spectrum lines
+    my @MAPS = grep {/map /} @file;
+    my @RUNS = grep {/RUN/} @file;
+    my $counter=0;
+    foreach $key (@RUNS){
+	# This gets rid of duplicates
+	$RUN{$key}=$counter;
+	$MAP{$key}=$MAPS[$counter];
+	$counter++;
+    } 
+
+# Number of runs (or independent sets of parameters) in this file
+    my $NRuns=1;
+    foreach (sort { $RUN{$a} <=> $RUN{$b}} keys %RUN ) {
+	@RunParams=();
+	$NP=0;
+#	print $_."=".$MAP{$_}."\n";
+	@tmp=split(/\s+/,$MAP{$_});
+	# Remove first element (map)
+	shift(@tmp);
+	foreach (@tmp) {
+	    if ($_ ne "" && $_>0 ) {
+		@RunParams=(@RunParams,$_);
+		$NP++;
+	    }
+	}
+	if ($NP>0) {
+	    $orders=join(",",@RunParams);
+	    $RUNParams[$NRuns]=$orders;
+	    $NRuns++;
+	}
+    }
+    
+# Split parameter's line to extract values and errors
+    foreach $line (@FPBlock) {
+	@Param=split(/\s+/,$line);
+	# Create a hash with the parameter order as a key
+	# and the value and error as value
+	$P{$Param[1]}=$Param[3].",".$Param[4];
+	$PName{$Param[1]}=$Param[2];
+    }
+
+# Now we have everything. Lets start ordering
+    # First lines is names
+    @Pnum=split(/,/,$RUNParams[1]);
+    foreach (@Pnum,@Shared) {
+	$DatFile=join("\t",$DatFile,$PName{$_},"d".$PName{$_});
+    }
+    $DatFile=$DatFile."\n";
+    
+    # For the values from all the files.
+    # I am not checking if all the files have the same theory function
+    for ($i=1;$i<=$NRuns-1;$i++) {
+	@Pnum=split(/,/,$RUNParams[$i]);
+	# First go for the shared parameters
+	foreach (@Pnum,@Shared) {
+	    ($value,$err)=split(/,/,$P{$_});
+	    $DatFile=join("\t",$DatFile,$value,$err);
+	}
+	$DatFile=$DatFile."\n";
+    }
+    return $DatFile;
+}
+
 
 ########################
 # RUNFileNameAuto
@@ -1496,5 +1611,89 @@ sub RUNFileNameMan {
 
     return $RUN_Line;
 }
+
+########################
+# ExtractInfoLEM
+########################
+# Uset to extract information from summary files
+sub ExtractInfoLEM {
+    my ($RUN,$YEAR,$Arg) = @_;
+    my $Summ_File_Name = "lem" . substr( $YEAR, 2 ) . "_" . $RUN . ".summ";
+    my $SummFile = "$SUMM_DIR/$YEAR/$Summ_File_Name";
+
+    open( SFILE,q{<}, "$SummFile" );
+    my @lines = <SFILE>;
+    close(SFILE);
+
+    if ( $Arg eq "TITLE" ) {
+        $RTRN_Val = $lines[3];
+        $RTRN_Val =~ s/\n//g;
+    }
+    elsif ( $Arg eq "Temp" ) {
+        foreach my $line (@lines) {
+            if ( $line =~ /Mean Sample_CF1/ ) {
+                ( my $tmp, my $T )   = split( /=/,  $line );
+                ( $T,   $tmp ) = split( /\(/, $T );
+                $RTRN_Val = $T;
+            }
+        }
+
+    }
+    elsif ( $Arg eq "Field" ) {
+        foreach my $line (@lines) {
+            if ( $line =~ /Mean B field/ ) {
+                ( $tmp, my $B )   = split( /=/,  $line );
+                ( $B,   $tmp ) = split( /\(/, $B );
+                $RTRN_Val = $B;
+            }
+        }
+    }
+    elsif ( $Arg eq "Energy" ) {
+        foreach my $line (@lines) {
+            if ( $line =~ /implantation energy/ ) {
+                ( my $tmp1, my $tmp2, my $E ) = split( /=/, $line );
+                ( $E, $tmp ) = split( /keV/, $E );
+                $RTRN_Val = $E;
+            }
+        }
+
+    }
+    #	$RTRN_Val =~ s/[\.\~\/\&\*\[\;\>\<\^\$\(\)\`\|\]\'\@]//g;
+    return $RTRN_Val;
+}
+
+# Uset to extract information from log files
+sub ExtractInfoBulk {
+    my ($RUN,$AREA,$YEAR,$Arg) = @_;
+    if ($RUN < 10) { $RUN = "000".$RUN; }
+    elsif ($RUN < 100) { $RUN = "00".$RUN; }
+    elsif ($RUN < 1000) { $RUN = "0".$RUN; }
+
+# Information may be found in these file
+    my $DBFILE=$DBDIR{$AREA}.$YEAR."/*.runs";
+    my @Lines =`cat $DBFILE`;
+    
+# Select intries with the right area
+    my $area=lc $AREA;
+    my @Lines1 = grep { /$area/ } @Lines;
+    my @Lines2 = grep { /$AltArea{$AREA}/ } @Lines;
+    @Lines=(@Lines1,@Lines2);
+# Select intries with the right run number
+    @Lines = grep { /$RUN/ } @Lines;
+    @Words=split(/\s+/,$Lines[0]);
+
+    if ( $Arg eq "TITLE" ) {
+        $RTRN_Val = substr($Lines[0],104);
+    }
+    elsif ( $Arg eq "Temp" ) {
+	$RTRN_Val = $Words[6];
+    }
+    elsif ( $Arg eq "Field" ) {
+	$RTRN_Val = $Words[7];
+    }
+    
+    return $RTRN_Val;
+}
+
 
 1;
