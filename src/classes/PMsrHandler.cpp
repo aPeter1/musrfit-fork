@@ -876,7 +876,11 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
              cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
           }
         } else {
-          fout << str.Data() << endl;
+          if (str.Length() > 0)
+            fout << str.Data() << endl;
+          else // only write endl if not eof is reached. This is preventing growing msr-files, i.e. more and more empty lines at the end of the file
+            if (!fin.eof())
+              fout << endl;
         }
         break;
       default:
