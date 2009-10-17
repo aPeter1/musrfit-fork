@@ -14,6 +14,7 @@
 
 #include "TBofZCalc.h"
 #include "TTrimSPDataHandler.h"
+#include "TBulkVortexFieldCalc.h"
 
 #define gBar 0.0135538817
 #define pi 3.14159265358979323846
@@ -25,6 +26,7 @@ public:
   TPofBCalc( const string&, const vector<double>& );
   TPofBCalc( const TBofZCalc&, const TTrimSPData&, const vector<double>&, unsigned int );
   TPofBCalc( const TBofZCalcInverse&, const TTrimSPData&, const vector<double>& );
+  TPofBCalc( const TBulkVortexFieldCalc&, const vector<double>& );
   TPofBCalc( const vector<double>&, const vector<double>& , double dt = 0.01 );
   ~TPofBCalc() {
     fB.clear();

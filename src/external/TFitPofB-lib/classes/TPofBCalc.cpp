@@ -16,6 +16,8 @@
 #include <fstream>
 #include <cassert>
 
+#include <omp.h>
+
 /* USED FOR DEBUGGING-----------------------------------
 #include <cstdio>
 #include <ctime>
@@ -367,6 +369,81 @@ TPofBCalc::TPofBCalc( const TBofZCalc &BofZ, const TTrimSPData &dataTrimSP, cons
     fPB[i] /= pBsum;
 
 }
+
+//-----------
+// Constructor that does the P(B) calculation for a bulk vortex lattice
+// Parameters: dt[us], dB[G] [, Bbg[G], width[us^{-1}], weight[1] ]
+//-----------
+
+TPofBCalc::TPofBCalc( const TBulkVortexFieldCalc &vortexLattice, const vector<double> &para ) : fDT(para[0]), fDB(para[1])
+{
+
+  fBmin = vortexLattice.GetBmin();
+  fBmax = vortexLattice.GetBmax();
+
+  unsigned int a1(static_cast<int>(floor(fBmin/fDB)));
+  unsigned int a2(static_cast<int>(ceil(fBmin/fDB)));
+  unsigned int a3(static_cast<int>(floor(fBmax/fDB)));
+  unsigned int a4(static_cast<int>(ceil(fBmax/fDB)));
+
+  unsigned int firstZerosEnd ((a1 != a2) ? a1 : (a1 - 1));
+  unsigned int lastZerosStart ((a3 != a4) ? a4 : (a4 + 1));
+
+  // fill the B vector
+  unsigned int indexBmaxFFT(static_cast<int>(ceil(1.0/(gBar*fDT*fDB))));
+  fB.resize(indexBmaxFFT, 0.0);
+  fPB.resize(indexBmaxFFT, 0.0);
+
+  int i;
+#pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  for (i = 0; i < static_cast<int>(indexBmaxFFT); i++)
+    fB[i] = fDB*static_cast<double>(i);
+// end pragma omp parallel
+
+  // make sure that we have an even number of elements in p(B) for FFT, so we do not have to care later
+  if (fB.size() % 2) {
+    fB.push_back(*(fB.end()-1)+fDB);
+    fPB.push_back(0.0);
+  }
+
+  vector< vector<double> > vortexFields(vortexLattice.DataB());
+
+  if (vortexFields.empty()) {
+    vortexLattice.CalculateGrid();
+    vortexFields = vortexLattice.DataB();
+  }
+
+  unsigned int numberOfPoints(vortexFields.size());
+
+  for (unsigned int j(0); j < numberOfPoints; j++){
+    for (unsigned int k(0); k < numberOfPoints; k++){
+      fPB[static_cast<int>(ceil(vortexFields[j][k]/fDB))] += 1.0;
+    }
+  }
+
+  double normalizer(static_cast<double>(numberOfPoints*numberOfPoints)*fDB);
+
+#pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  for (i = firstZerosEnd; i <= static_cast<int>(lastZerosStart); i++) {
+    fPB[i] /= normalizer;
+  }
+// end pragma omp parallel
+
+//   // normalize p(B)
+// 
+//   double pBsum = 0.0;
+//   for (unsigned int i(firstZerosEnd); i<lastZerosStart; i++)
+//     pBsum += fPB[i];
+//   pBsum *= fDB;
+//   for (unsigned int i(firstZerosEnd); i<lastZerosStart; i++)
+//     fPB[i] /= pBsum;
+
+  if(para.size() == 5)
+    AddBackground(para[2], para[3], para[4]);
+
+}
+
+
 
 // TPofBCalc::AddBackground, Parameters: field B[G], width s[us], weight w
 

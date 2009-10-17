@@ -5,12 +5,16 @@
         Defines path/prefix and energies (keV, format: %02u_%1u) of TrimSP-rge-files,
         path/name to the FFTW-wisdom-file and time/field binning (us/G)
         N_theory determines the number of points in "real space" where the theory function will be calculated
+        N_VortexGrid determines the number of points in which each axis of the "real space" will be divided when calculating the vortex B(x,y)
+        N_VortexFourier defines the number of Fourier components which should be summed up in order to get B(x,y)
       </comment>
     <data_path>/home/l_wojek/TrimSP/YBCOxtal/YBCOxtal-500000-</data_path>
     <wisdom>/home/l_wojek/analysis/WordsOfWisdom.dat</wisdom>
     <delta_t>0.01</delta_t>
     <delta_B>0.1</delta_B>
     <N_theory>5000</N_theory>
+    <N_VortexGrid>200</N_VortexGrid>
+    <N_VortexFourier>17</N_VortexFourier>
     <energy_list>
         <energy>03_0</energy>
         <energy>03_6</energy>

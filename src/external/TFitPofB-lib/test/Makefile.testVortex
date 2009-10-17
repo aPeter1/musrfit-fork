@@ -1,0 +1,49 @@
+#---------------------------------------------------
+# get compilation and library flags from root-config
+
+ROOTCFLAGS    = $(shell $(ROOTSYS)/bin/root-config --cflags)
+ROOTLIBS      = $(shell $(ROOTSYS)/bin/root-config --libs)
+
+#---------------------------------------------------
+
+CXX           = g++-4.4.0
+CXXFLAGS      = -O3 -Wall
+LOCALINCLUDE  = ../include
+ROOTINCLUDE   = $(ROOTSYS)/include
+INCLUDES      = -I$(LOCALINCLUDE) -I$(ROOTINCLUDE)
+LD            = g++-4.4.0
+LDFLAGS       = -O3 -L../classes -lTFitPofB -lfftw3 -lm -fopenmp -lPMusr
+
+# the output from the root-config script:
+CXXFLAGS      += $(ROOTCFLAGS)
+LDFLAGS       +=
+
+# the ROOT libraries
+LIBS          = $(ROOTLIBS) -lXMLParser -lMathMore
+
+EXEC = testVortex
+
+# some definitions: headers, sources, objects,...
+OBJS =
+OBJS += $(EXEC).o
+
+# make the executable:
+#
+all:  $(EXEC)
+
+$(EXEC): $(OBJS)
+	@echo "---> Building $(EXEC) ..."
+	$(LD) $(LDFLAGS) $(OBJS) -o $(EXEC) $(LIBS)
+	@echo "done"
+
+# clean up: remove all object file (and core files)
+# semicolon needed to tell make there is no source
+# for this target!
+#
+clean:; 	@rm -f $(OBJS)
+	@echo "---> removing $(OBJS)"
+
+#
+$(OBJS): %.o: %.cpp
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
+

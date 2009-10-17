@@ -9,11 +9,31 @@
 
 ***************************************************************************/
 
+/***************************************************************************
+ *   Copyright (C) 2009 by Bastian M. Wojek                                *
+ *   bastian.wojek@psi.ch                                                  *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
 #include <cassert>
 #include <sys/time.h>
 #include <iostream>
 
-#include "TIntegrator.h"
+#include "../BMWIntegrator/BMWIntegrator.h"
 #include "TLFRelaxation.h"
 
 using namespace std;
@@ -26,6 +46,7 @@ ClassImp(TLFStatGssKT)
 ClassImp(TLFStatLorKT)
 ClassImp(TLFDynGssKT)
 ClassImp(TLFDynLorKT)
+ClassImp(TLFSGInterpolation)
 
 
 // LF Static Gaussian KT
@@ -96,7 +117,17 @@ double TLFStatLorKT::operator()(double t, const vector<double> &par) const {
   double coeff2(coeff1*coeff1);
   double coeff3((1.0+coeff2)*par[1]);
 
-  return (1.0-(coeff1*TMath::Exp(-par[1]*t)*TMath::BesselJ1(omegaL*t))-(coeff2*(TMath::BesselJ0(omegaL*t)*TMath::Exp(-par[1]*t)-1.0))-coeff3*fIntBesselJ0Exp->IntegrateFunc(0.,t));
+  double w0t(omegaL*t);
+  double j1, j0;
+  if (fabs(w0t) < 0.001) { // check zero time limits of the spherical bessel functions j0(x) and j1(x)
+    j0 = 1.0;
+    j1 = 0.0;
+  } else {
+    j0 = TMath::Sin(w0t)/w0t;
+    j1 = (TMath::Sin(w0t)-w0t*TMath::Cos(w0t))/(w0t*w0t);
+  }
+
+  return (1.0-(coeff1*TMath::Exp(-par[1]*t)*j1)-(coeff2*(j0*TMath::Exp(-par[1]*t)-1.0))-coeff3*fIntBesselJ0Exp->IntegrateFunc(0.,t));
 }
 
 // LF Dynamic Gaussian KT
@@ -188,7 +219,7 @@ double TLFDynGssKT::operator()(double t, const vector<double> &par) const {
       double sigsqtsq(sigsq*t*t);
       return 0.33333333333333333333+0.66666666666666666667*(1.0-sigsqtsq)*exp(-0.5*sigsqtsq); // ZF static Gauss KT
     }
-    return exp(-2.0*sigsq/nusq*(enut-1.0+nut)); // ZF Abragam Delta^2->2*Delta^2
+//    return exp(-2.0*sigsq/nusq*(enut-1.0+nut)); // ZF Abragam Delta^2->2*Delta^2 (only here for TESTING - DO NOT return this value in an production environment!!!!!!)
   }
 
   if((par[2] >= 5.0*par[1]) || (omegaL >= 10.0*par[1])) {
@@ -272,7 +303,7 @@ double TLFDynGssKT::operator()(double t, const vector<double> &par) const {
 
 // LF Dynamic Lorentz KT
 
-TLFDynLorKT::TLFDynLorKT() : fCalcNeeded(true), fFirstCall(true), fWisdom("/home/l_wojek/analysis/WordsOfWisdom.dat"), fNSteps(524288), fDt(0.000040), fCounter(0), fA(1.0), fL1(0.0), fL2(0.0) {
+TLFDynLorKT::TLFDynLorKT() : fCalcNeeded(true), fFirstCall(true), fWisdom("/home/l_wojek/analysis/WordsOfWisdom.dat"), fNSteps(524288), fDt(0.000040), fCounter(0), fL1(0.0), fL2(0.0) {
   // Calculate d_omega and C for given NFFT and dt
   fDw = TMath::Pi()/fNSteps/fDt;
   fC = 2.0*TMath::Log(double(fNSteps))/(double(fNSteps-1)*fDt);
@@ -283,14 +314,14 @@ TLFDynLorKT::TLFDynLorKT() : fCalcNeeded(true), fFirstCall(true), fWisdom("/home
   FILE *wordsOfWisdomR;
   wordsOfWisdomR = fopen(fWisdom.c_str(), "r");
   if (wordsOfWisdomR == NULL) {
-    cout << "TLFDynLorKT::TLFDynGssKT: Couldn't open wisdom file ..." << endl;
+    cout << "TLFDynLorKT::TLFDynLorKT: Couldn't open wisdom file ..." << endl;
   } else {
     wisdomLoaded = fftw_import_wisdom_from_file(wordsOfWisdomR);
     fclose(wordsOfWisdomR);
   }
 
   if (!wisdomLoaded) {
-    cout << "TLFDynLorKT::TLFDynGssKT: No wisdom is imported..." << endl;
+    cout << "TLFDynLorKT::TLFDynLorKT: No wisdom is imported..." << endl;
   }
   // END of WisdomLoading
 
@@ -307,7 +338,7 @@ TLFDynLorKT::~TLFDynLorKT() {
   FILE *wordsOfWisdomW;
   wordsOfWisdomW = fopen(fWisdom.c_str(), "w");
   if (wordsOfWisdomW == NULL) {
-    cout << "TLFDynGssKT::~TLFDynGssKT: Could not open file ... No wisdom is exported..." << endl;
+    cout << "TLFDynLorKT::~TLFDynLorKT: Could not open file ... No wisdom is exported..." << endl;
   } else {
     fftw_export_wisdom_to_file(wordsOfWisdomW);
     fclose(wordsOfWisdomW);
@@ -321,10 +352,6 @@ TLFDynLorKT::~TLFDynLorKT() {
   fftw_free(fFFTfreq);
   cout << "TLFDynLorKT::~TLFDynLorKT(): " << fCounter << " full FFT cyles needed..." << endl;
 }
-
-const double TLFDynLorKT::fX[16]={1.61849, 1.27059, 0.890315, 6.72608, 0.327258, 0.981975, 1.5964, 2.31023, 2.37689, 5.63945, 0.235734, 1.10617, 1.1664, 0.218402, 0.266562, 0.471331};
-
-const double TLFDynLorKT::fY[20]={1.54699, 0.990321, 0.324923, 0.928399, 2.11155, 0.615106, 1.49907, 0.679423, 6.17621, 1.38907, 0.979608, 0.0593631, 0.806427, 3.33144, 1.05059, 1.29922, 0.254661, 0.284348, 0.991419, 0.375213};
 
 double TLFDynLorKT::operator()(double t, const vector<double> &par) const {
 
@@ -349,6 +376,8 @@ double TLFDynLorKT::operator()(double t, const vector<double> &par) const {
   }
 
   double omegaL(TWOPI*par[0]); // Larmor frequency
+  double a(par[1]);  // static width
+  double nu(par[2]); // hopping rate
 
   if(fabs(par[0])<0.00135538817){ // Zero Field
     if(!par[2]){ // nu=0
@@ -357,37 +386,43 @@ double TLFDynLorKT::operator()(double t, const vector<double> &par) const {
     }
   }
 
-  // semi-analytical approximations for {nu >= 4a} and {omegaL >= 10a}
+  // semi-analytical approximation for {nu >= 5a} and {omegaL >= 30a}
 
-  if(par[2]){ // nu!=0
-    if(par[2] >= 4.0*par[1]){ // nu >= 4a
-      if(fCalcNeeded){
-        double wLnu(omegaL/par[2]); // omegaL/nu
-        double wLnusq(wLnu*wLnu); // (omegaL/nu)^2
-        double anu(par[1]/par[2]); // a/nu
+  // check if hopping > 5 * damping, of Larmor angular frequency is > 30 * damping (BMW limit)
+  if((par[2] > 5.0*par[1]) || (omegaL > 30.0*par[1])){
+    if(fCalcNeeded){
 
-        fA=1.0+wLnu*anu*(-fX[0]/(wLnusq+fX[1])+fX[2]/(wLnusq*wLnu+fX[3])+fX[4]/(wLnusq*wLnusq+fX[5]));
-        fL1=par[1]*(fX[6]/(wLnu+fX[7])+fX[8]/(wLnusq+fX[9])+fX[10]/(wLnusq*wLnusq+fX[11]));
-        fL2=par[2]*(fX[12]*tanh(fX[13]*wLnu)+fX[14]*wLnu+fX[15]);
-
-        fCalcNeeded=false;
+      // 'c' and 'd' are parameters BMW obtained by fitting large parameter space LF-curves to the model below
+      const double c[7] = {1.15331, 1.64826, -0.71763, 3.0, 0.386683, -5.01876, 2.41854};
+      const double d[4] = {2.44056, 2.92063, 1.69581, 0.667277};
+      double w0N[4];
+      double nuN[4];
+      w0N[0] = omegaL;
+      nuN[0] = nu;
+      for (unsigned int i=1; i<4; i++) {
+        w0N[i] = omegaL * w0N[i-1];
+        nuN[i] = nu * nuN[i-1];
       }
-      return fA*exp(-fL1*t)+(1.0-fA)*exp(-fL2*t)*cos(omegaL*t);
-    }
-    if(omegaL >= 10.0*par[1]){ // omegaL >= 10a
-      if(fCalcNeeded){
-        double wLnu(omegaL/par[2]); // omegaL/nu
-        double wLnusq(wLnu*wLnu); // (omegaL/nu)^2
-        double anu(par[1]/par[2]); // a/nu
+      double denom(w0N[3]+d[0]*w0N[2]*nuN[0]+d[1]*w0N[1]*nuN[1]+d[2]*w0N[0]*nuN[2]+d[3]*nuN[3]);
+      fL1 = (c[0]*w0N[2]+c[1]*w0N[1]*nuN[0]+c[2]*w0N[0]*nuN[1])/denom;
+      fL2 = (c[3]*w0N[2]+c[4]*w0N[1]*nuN[0]+c[5]*w0N[0]*nuN[1]+c[6]*nuN[2])/denom;
 
-        fA=1.0-fY[0]*pow(anu,fY[1])/(wLnu+fY[2])+fY[3]*pow(anu,fY[4])/(wLnusq-fY[5])+fY[6]*pow(anu,fY[7])/(wLnusq*wLnu+fY[8]);
-        fL1=par[1]*(fY[9]/(pow(wLnu,fY[10])+fY[11])-fY[12]/(pow(wLnu,fY[13])+fY[14]));
-        fL2=par[2]*(fY[15]*tanh(fY[16]*wLnu)+fY[17]*pow(wLnu,fY[18])+fY[19]);
-
-        fCalcNeeded=false;
-      }
-      return fA*exp(-fL1*t)+(1.0-fA)*exp(-fL2*t)*cos(omegaL*t);
+      fCalcNeeded=false;
     }
+
+    double w0t(omegaL*t);
+    double j1, j0;
+    if (fabs(w0t) < 0.001) { // check zero time limits of the spherical bessel functions j0(x) and j1(x)
+      j0 = 1.0;
+      j1 = 0.0;
+    } else {
+      j0 = TMath::Sin(w0t)/w0t;
+      j1 = (TMath::Sin(w0t)-w0t*TMath::Cos(w0t))/(w0t*w0t);
+    }
+
+    double Gamma_t = -4.0/3.0*a*(fL1*(1.0-j0*TMath::Exp(-nu*t))+fL2*j1*TMath::Exp(-nu*t)+(1.0-fL2*omegaL/3.0-fL1*nu)*t);
+
+    return TMath::Exp(Gamma_t);
   }
 
   // if no approximation can be used -> Laplace transform
@@ -411,15 +446,17 @@ double TLFDynLorKT::operator()(double t, const vector<double> &par) const {
 
       for(unsigned int i(1); i<fNSteps; i++) {
         tt=(double(i)-0.5)*fDt;
-        fFFTtime[i]=TMath::BesselJ0(omegaL*tt)*TMath::Exp(-par[1]*tt)*fDt;
+        fFFTtime[i]=TMath::Sin(omegaL*tt)/(omegaL*tt)*TMath::Exp(-par[1]*tt)*fDt;
       }
 
       double totoIntegrale(0.);
+      double w0t(1.0);
 
       for(unsigned int i(1); i<fNSteps; i++) {
         tt=double(i)*fDt;
         totoIntegrale+=fFFTtime[i];
-        fFFTtime[i]=(1.0-(coeff1*TMath::Exp(-par[1]*tt)*TMath::BesselJ1(omegaL*tt))-(coeff2*(TMath::BesselJ0(omegaL*tt)*TMath::Exp(-par[1]*tt)-1.0))-coeff3*totoIntegrale)*TMath::Exp(-(fC+par[2])*tt)*fDt;
+        w0t = omegaL*tt;
+        fFFTtime[i]=(1.0-(coeff1*TMath::Exp(-par[1]*tt)*(TMath::Sin(w0t)-w0t*TMath::Cos(w0t))/(w0t*w0t))-(coeff2*(TMath::Sin(w0t)/(w0t)*TMath::Exp(-par[1]*tt)-1.0))-coeff3*totoIntegrale)*TMath::Exp(-(fC+par[2])*tt)*fDt;
       }
     }
 
@@ -452,4 +489,43 @@ double TLFDynLorKT::operator()(double t, const vector<double> &par) const {
   }
 //  return fFFTtime[int(t/fDt)];
   return fDw*TMath::Exp(fC*t)/TMath::Pi()*fFFTtime[int(t/fDt)];
+}
+
+
+// De Renzi Spin Glass Interpolation
+
+TLFSGInterpolation::TLFSGInterpolation() {
+  TIntSGInterpolation *integral = new TIntSGInterpolation();
+  fIntegral = integral;
+  integral = 0;
+}
+
+TLFSGInterpolation::~TLFSGInterpolation() {
+    delete fIntegral;
+    fIntegral = 0;
+}
+
+double TLFSGInterpolation::operator()(double t, const vector<double> &par) const {
+
+  assert(par.size() == 4); // two parameters nu=gbar*B [MHz], a [1/us], lambda [1/us], beta [1]
+
+  if((t <= 0.0) || (par[3] <= 0.0))
+    return 1.0;
+
+  double expo(0.5*par[1]*par[1]*t*t/par[3]+par[2]*t);
+
+  if(TMath::Abs(par[0])<0.00135538817){
+    return (0.33333333333333333333*TMath::Exp(-TMath::Power(par[2]*t,par[3])) + \
+      0.66666666666666666667*(1.0-par[1]*par[1]*t*t/TMath::Power(expo,(1.0-par[3])))*TMath::Exp(-TMath::Power(expo,par[3])));
+  }
+
+  vector<double> intpar(par);
+  intpar.push_back(t);
+  fIntegral->SetParameters(intpar);
+
+  double omegaL(TMath::TwoPi()*par[0]);
+
+  return (TMath::Exp(-TMath::Power(par[2]*t,par[3])) + 2.0*par[1]*par[1]/(omegaL*omegaL) * \
+    ((TMath::Cos(omegaL*t)-TMath::Sin(omegaL*t)/(omegaL*t))*TMath::Exp(-TMath::Power(expo,par[3]))/TMath::Power(expo,(1.0-par[3])) + \
+      fIntegral->IntegrateFunc(0.,t)));
 }

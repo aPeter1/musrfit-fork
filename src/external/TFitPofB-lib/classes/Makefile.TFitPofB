@@ -24,10 +24,12 @@ LDFLAGS       +=
 # some definitions: headers (used to generate *Dict* stuff), sources, objects,...
 OBJS =
 OBJS += TTrimSPDataHandler.o
+OBJS += TBulkVortexFieldCalc.o
 OBJS += TBofZCalc.o
 OBJS += TPofBCalc.o
 OBJS += TPofTCalc.o
 OBJS += TFitPofBStartupHandler.o TFitPofBStartupHandlerDict.o
+OBJS += TVortex.o TVortexDict.o
 OBJS += TLondon1D.o TLondon1DDict.o
 OBJS += TSkewedGss.o TSkewedGssDict.o
 
@@ -55,6 +57,10 @@ $(OBJS): %.o: %.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
 
 # Generate the ROOT CINT dictionary
+
+TVortexDict.cpp: ../include/TVortex.h ../include/TVortexLinkDef.h
+	@echo "Generating dictionary $@..."
+	rootcint -f $@ -c -p -I$(MUSRFITINCLUDE) $^
 
 TLondon1DDict.cpp: ../include/TLondon1D.h ../include/TLondon1DLinkDef.h
 	@echo "Generating dictionary $@..."

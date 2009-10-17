@@ -9,6 +9,26 @@
 
 ***************************************************************************/
 
+/***************************************************************************
+ *   Copyright (C) 2009 by Bastian M. Wojek                                *
+ *   bastian.wojek@psi.ch                                                  *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
 #ifndef _TLFRelaxation_H_
 #define _TLFRelaxation_H_
 
@@ -34,7 +54,7 @@ using namespace std;
 //#include "TMath.h"
 #include "PUserFcnBase.h"
 #include "fftw3.h"
-#include "TIntegrator.h"
+#include "../BMWIntegrator/BMWIntegrator.h"
 
 class TLFStatGssKT : public PUserFcnBase {
 
@@ -112,13 +132,24 @@ private:
   double *fFFTtime;
   fftw_complex *fFFTfreq;
   mutable unsigned int fCounter;
-  static const double fX[16];
-  static const double fY[20];
-  mutable double fA;
   mutable double fL1;
   mutable double fL2;
 
   ClassDef(TLFDynLorKT,1)
+};
+
+class TLFSGInterpolation : public PUserFcnBase {
+
+public:
+  TLFSGInterpolation();
+  ~TLFSGInterpolation();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  TIntSGInterpolation *fIntegral;
+
+  ClassDef(TLFSGInterpolation,1)
 };
 
 

@@ -107,8 +107,12 @@ void TFitPofBStartupHandler::OnStartElement(const char *str, const TList *attrib
     fKey = eDeltaB;
   } else if (!strcmp(str, "wisdom")) {
     fKey = eWisdomFile;
-  } if (!strcmp(str, "N_theory")) {
+  } else if (!strcmp(str, "N_theory")) {
     fKey = eNSteps;
+  } else if (!strcmp(str, "N_VortexGrid")) {
+    fKey = eGridSteps;
+  } else if (!strcmp(str, "N_VortexFourier")) {
+    fKey = eVortexFourierComp;
   }
 }
 
@@ -157,8 +161,16 @@ void TFitPofBStartupHandler::OnCharacters(const char *str)
       fWisdomFile = str;
       break;
     case eNSteps:
-      // convert str to int and assign it to the deltat-member
+      // convert str to int and assign it to the NSteps-member
       fNSteps = atoi(str);
+      break;
+    case eGridSteps:
+      // convert str to int and assign it to the GridSteps-member
+      fGridSteps = atoi(str);
+      break;
+     case eVortexFourierComp:
+      // convert str to int and assign it to the VortexFourierComp-member
+      fVortexFourierComp = atoi(str);
       break;
     default:
       break;
@@ -290,6 +302,20 @@ void TFitPofBStartupHandler::CheckLists()
   if (!fNSteps) {
     cout << endl << "TFitPofBStartupHandler::CheckLists: You did not specify the number of steps for the theory. Setting the default." << endl;
     fNSteps = 3000;
+  }
+
+  // check if any number of steps for the theory function is specified
+  cout << endl << "TFitPofBStartupHandler::CheckLists: check number of steps for Vortex grid ..." << endl;
+  if (!fGridSteps) {
+    cout << endl << "TFitPofBStartupHandler::CheckLists: You did not specify the number of steps for the grid. Setting the default." << endl;
+    fGridSteps = 200;
+  }
+
+  // check if any number of steps for the theory function is specified
+  cout << endl << "TFitPofBStartupHandler::CheckLists: check number of steps for Vortex lattice Fourier components ..." << endl;
+  if (!fVortexFourierComp) {
+    cout << endl << "TFitPofBStartupHandler::CheckLists: You did not specify the number of Vortex lattice Fourier components. Setting the default." << endl;
+    fVortexFourierComp = 17;
   }
 
 }
