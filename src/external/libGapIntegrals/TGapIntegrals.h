@@ -38,7 +38,7 @@
 using namespace std;
 
 #include "PUserFcnBase.h"
-#include "TIntegrator.h"
+#include "../BMWIntegrator/BMWIntegrator.h"
 
 class TGapSWave : public PUserFcnBase {
 

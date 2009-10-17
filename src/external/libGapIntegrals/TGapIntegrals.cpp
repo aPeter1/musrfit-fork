@@ -34,7 +34,7 @@
 
 using namespace std;
 
-#include "TIntegrator.h"
+#include "../BMWIntegrator/BMWIntegrator.h"
 #include "TGapIntegrals.h"
 
 #define PI 3.14159265358979323846

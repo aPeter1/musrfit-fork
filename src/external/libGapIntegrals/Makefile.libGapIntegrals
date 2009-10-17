@@ -116,33 +116,37 @@ endif
 
 # some definitions: headers (used to generate *Dict* stuff), sources, objects,...
 OBJS =
-OBJS += TIntegrator.o
 OBJS += TGapIntegrals.o TGapIntegralsDict.o
+
+EXTOBJS = BMWIntegrator.o
 
 # make the shared libs:
 
 all:  $(SHLIB)
 
-$(SHLIB): $(OBJS)
+$(SHLIB): $(EXTOBJS) $(OBJS)
 	@echo "---> Building shared library $(SHLIB) ..."
 	/bin/rm -f $(SHLIB)
-	$(LD) $(SOFLAGS) $(LDFLAGS) -o $(SHLIB) $(OBJS) $(LIBS) $(PMUSRLIB) $(GSLLIB) $(CUBALIB)
+	$(LD) $(SOFLAGS) $(LDFLAGS) -o $(SHLIB) $(EXTOBJS) $(OBJS) $(LIBS) $(PMUSRLIB) $(GSLLIB) $(CUBALIB)
 	@echo "done"
 
 # clean up: remove all object file (and core files)
 # semicolon needed to tell make there is no source
 # for this target!
 #
-clean:; 	@rm -f $(OBJS) $(SHLIB) *Dict* core* *~
-	@echo "---> removing $(OBJS) $(SHLIB)"
+clean:; 	@rm -f $(OBJS) $(EXTOBJS) $(SHLIB) *Dict* core* *~
+	@echo "---> removing $(OBJS) $(EXTOBJS) $(SHLIB)"
 
 #
+BMWIntegrator.o: ../BMWIntegrator/BMWIntegrator.cpp
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
+
 $(OBJS): %.o: %.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
 
 # Generate the ROOT CINT dictionary
 
-TGapIntegralsDict.cpp: ./TIntegrator.h ./TGapIntegrals.h ./TGapIntegralsLinkDef.h
+TGapIntegralsDict.cpp: ../BMWIntegrator/BMWIntegrator.h ./TGapIntegrals.h ./TGapIntegralsLinkDef.h
 	@echo "Generating dictionary $@..."
 	rootcint -f $@ -c -p $^
 
@@ -150,16 +154,16 @@ install: all
 	@echo "Installing shared lib: $(SHLIB)"
 ifeq ($(OS),LINUX)
 	cp -pv $(SHLIB) $(ROOTSYS)/lib
-	cp -pv TIntegrator.h TGapIntegrals.h $(ROOTSYS)/include
+	cp -pv ../BMWIntegrator/BMWIntegrator.h TGapIntegrals.h $(ROOTSYS)/include
 endif
 ifeq ($(OS),WIN32GCC)
 	cp -pv $(SHLIB) $(ROOTSYS)/bin
 	ln -sf $(ROOTSYS)/bin/$(SHLIB) $(ROOTSYS)/lib/$(SHLIB)
-	cp -pv TIntegrator.h TGapIntegrals.h $(ROOTSYS)/include
+	cp -pv ../BMWIntegrator/BMWIntegrator.h TGapIntegrals.h $(ROOTSYS)/include
 endif
 ifeq ($(OS),DARWIN)
 	cp -pv $(SHLIB) $(ROOTSYS)/lib
-	cp -pv TIntegrator.h TGapIntegrals.h $(ROOTSYS)/include
+	cp -pv ../BMWIntegrator/BMWIntegrator.h TGapIntegrals.h $(ROOTSYS)/include
 endif
 
 cleaninstall: clean install
