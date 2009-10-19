@@ -56,14 +56,17 @@ foreach $Arg (@ARGV) {
     }
 
 # Nice trick, make a hash for unique RUN lines
-# Find spectrum lines
+# Problem here if we have the same run fit twice (ranges etc)
     @MAPS = grep {/map /} @file;
     @RUNS = grep {/RUN/} @file;
     $counter=0;
+#    for ($i=0;$i<=$#RUNS;$i++) {
+#	$key=$RUNS[$i].$MAPS[$i];
+#	$key =~ s/\s+//g;
     foreach $key (@RUNS){
 	# This gets rid of duplicates
 	$RUN{$key}=$counter;
-	$MAP{$key}=$MAPS[$counter];
+	$MAP{$key}=$MAP{$key}.$MAPS[$counter];
 	$counter++;
     } 
 
