@@ -366,7 +366,7 @@ bool PRunAsymmetry::PrepareData()
       // get T0's of the to be added run
       int t0Add[2] = {0, 0};
       // check if the t0's are given in the msr-file
-      if (i >= fRunInfo->fT0.size()) { // t0's are NOT in the msr-file
+      if (2*i+1 >= fRunInfo->fT0.size()) { // t0's are NOT in the msr-file
         // check if the t0's are in the data file
         if (addRunData->GetT0s().size() != 0) { // t0's in the run data
           // keep the proper t0's. For asymmetry runs, forward/backward are holding the histo no

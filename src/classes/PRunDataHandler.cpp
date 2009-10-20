@@ -949,7 +949,7 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
     for (Int_t j=0; j<psiBin.get_histoLength_bin(); j++) {
       histoData.push_back(histo[j]);
     }
-    delete histo;
+    delete[] histo;
     runData.AppendDataBin(histoData);
     histoData.clear();
   }
