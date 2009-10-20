@@ -565,7 +565,7 @@ void PMusrCanvas::UpdateInfoPad()
     // field if present
     tstr += TString("B=");
     dval = fRunList->GetField(runs[runNo].fRunName[0]);
-    if (dval == -9.9e99) {
+    if (dval == PMUSR_UNDEFINED) {
       tstr += TString("??,");
     } else {
       sprintf(sval, "%0.2lf", dval);
@@ -575,7 +575,7 @@ void PMusrCanvas::UpdateInfoPad()
     tstr += TString("E=");
     dval = fRunList->GetEnergy(runs[runNo].fRunName[0]);
 //cout << endl << ">> dval = " << dval << " (Engery)";
-    if (dval == -999.0) {
+    if (dval == PMUSR_UNDEFINED) {
       tstr += TString("??,");
     } else {
       sprintf(sval, "%0.2lf", dval);
