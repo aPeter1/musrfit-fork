@@ -37,14 +37,14 @@ endif
 
 # -- Linux
 ifeq ($(OS),LINUX)
-CXX           = g++-4.4.0
+CXX           = g++
 CXXFLAGS      = -O3 -Wall -Wno-trigraphs -fPIC
 PMUSRPATH     = ../../include
 MNPATH        = $(ROOTSYS)/include
 GSLPATH       = /usr/include/gsl
 CUBAPATH      = /usr/local/include
 INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(GSLPATH) -I$(CUBAPATH)
-LD            = g++-4.4.0
+LD            = g++
 LDFLAGS       = -O
 SOFLAGS       = -shared
 SHLIB         = libLFRelaxation.so
