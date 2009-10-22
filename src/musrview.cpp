@@ -309,24 +309,17 @@ cout << endl;
       app.Run(true); // true needed that Run will return after quit so that cleanup works
 
     // clean up
-//cout << endl << "clean up canvas vector ...";
     char canvasName[32];
     for (unsigned int i=0; i<canvasVector.size(); i++) {
       // check if canvas is still there before calling the destructor **TO BE DONE**
       sprintf(canvasName, "fMainCanvas%d", i);
-//cout << endl << ">> canvasName=" << canvasName << ", canvasVector[" << i << "]=" << canvasVector[i];
       if (gROOT->GetListOfCanvases()->FindObject(canvasName) != 0) {
-//cout << endl << ">> canvasName=" << canvasName << ", found ...";
-//cout << endl;
         canvasVector[i]->~PMusrCanvas();
       } else {
-//cout << endl << ">> canvasName=" << canvasName << ", NOT found ...";
-//cout << endl;
       }
     }
     canvasVector.empty();
   }
-//cout << endl;
 
   // clean up
   plotList.clear();
