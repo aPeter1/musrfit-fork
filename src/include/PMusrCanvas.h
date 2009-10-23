@@ -81,7 +81,6 @@
 #define P_MENU_ID_FOURIER_PHASE_MINUS   106
 
 #define P_MENU_ID_SAVE_ASCII    200
-#define P_MENU_ID_SAVE_DB       201
 
 //------------------------------------------------------------------------
 /**
@@ -254,7 +253,6 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void DecrementFourierPhase();
 
     virtual void SaveDataAscii();
-    virtual void SaveDataDb();
 
   ClassDef(PMusrCanvas, 1)
 };
