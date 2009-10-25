@@ -9,6 +9,26 @@
 
 ***************************************************************************/
 
+/***************************************************************************
+ *   Copyright (C) 2009 by Bastian M. Wojek                                *
+ *                                                                         *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
 #include "TLondon1D.h"
 #include <iostream>
 #include <cassert>
@@ -43,6 +63,8 @@ TLondon1DHS::~TLondon1DHS() {
     fParForPofT.clear();
     delete fImpProfile;
     fImpProfile = 0;
+    delete fPofB;
+    fPofB = 0;
     delete fPofT;
     fPofT = 0;
 }
@@ -54,6 +76,8 @@ TLondon1D1L::~TLondon1D1L() {
     fParForPofT.clear();
     delete fImpProfile;
     fImpProfile = 0;
+    delete fPofB;
+    fPofB = 0;
     delete fPofT;
     fPofT = 0;
 }
@@ -65,6 +89,8 @@ TLondon1D2L::~TLondon1D2L() {
     fParForPofT.clear();
     delete fImpProfile;
     fImpProfile = 0;
+    delete fPofB;
+    fPofB = 0;
     delete fPofT;
     fPofT = 0;
 }
@@ -76,6 +102,8 @@ TProximity1D1LHS::~TProximity1D1LHS() {
     fParForPofT.clear();
     delete fImpProfile;
     fImpProfile = 0;
+    delete fPofB;
+    fPofB = 0;
     delete fPofT;
     fPofT = 0;
 }
@@ -87,6 +115,8 @@ TProximity1D1LHSGss::~TProximity1D1LHSGss() {
     fParForPofT.clear();
     delete fImpProfile;
     fImpProfile = 0;
+    delete fPofB;
+    fPofB = 0;
     delete fPofT;
     fPofT = 0;
 }
@@ -98,6 +128,8 @@ TLondon1D3L::~TLondon1D3L() {
     fParForPofT.clear();
     delete fImpProfile;
     fImpProfile = 0;
+    delete fPofB;
+    fPofB = 0;
     delete fPofT;
     fPofT = 0;
 }
@@ -109,6 +141,8 @@ TLondon1D3LS::~TLondon1D3LS() {
     fParForPofT.clear();
     delete fImpProfile;
     fImpProfile = 0;
+    delete fPofB;
+    fPofB = 0;
     delete fPofT;
     fPofT = 0;
 }
@@ -131,6 +165,8 @@ TLondon1D3LSub::~TLondon1D3LSub() {
     fParForPofT.clear();
     delete fImpProfile;
     fImpProfile = 0;
+    delete fPofB;
+    fPofB = 0;
     delete fPofT;
     fPofT = 0;
 }
@@ -159,7 +195,7 @@ TLondon1DHS::TLondon1DHS() : fCalcNeeded(true), fFirstCall(true) {
     string rge_path(startupHandler->GetDataPath());
     vector<string> energy_vec(startupHandler->GetEnergyList());
 
-    fParForPofT.push_back(0.0);
+    fParForPofT.push_back(0.0); // phase
     fParForPofT.push_back(startupHandler->GetDeltat());
     fParForPofT.push_back(startupHandler->GetDeltaB());
 
@@ -173,12 +209,15 @@ TLondon1DHS::TLondon1DHS() : fCalcNeeded(true), fFirstCall(true) {
     TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
     fImpProfile = x;
     x = 0;
-    delete x;
 
-    TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
-    fPofT = y;
+    TPofBCalc *y = new TPofBCalc(fParForPofB);
+    fPofB = y;
     y = 0;
-    delete y;
+
+    TPofTCalc *z = new TPofTCalc(fPofB, fWisdom, fParForPofT);
+    fPofT = z;
+    z = 0;
+
 
     // clean up
     if (saxParser) {
@@ -212,13 +251,8 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
   if(fFirstCall){
     fPar = par;
 
-//    for (unsigned int i(0); i<fPar.size(); i++){
-//      cout << "fPar[" << i << "] = " << fPar[i] << endl;
-//    }
-
     for (unsigned int i(2); i<fPar.size(); i++){
       fParForBofZ.push_back(fPar[i]);
-//      cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << endl;
     }
     fFirstCall = false;
     dead_layer_changed = true;
@@ -280,8 +314,9 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
       }
 
       TLondon1D_HS BofZ(fParForBofZ);
-      TPofBCalc PofB(BofZ, *fImpProfile, fParForPofB);
-      fPofT->DoFFT(PofB);
+      fPofB->UnsetPBExists();
+      fPofB->Calculate(&BofZ, fImpProfile, fParForPofB);
+      fPofT->DoFFT();
 
     }/* else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
@@ -332,12 +367,14 @@ TLondon1D1L::TLondon1D1L() : fCalcNeeded(true), fFirstCall(true), fCallCounter(0
     TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
     fImpProfile = x;
     x = 0;
-    delete x;
 
-    TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
-    fPofT = y;
+    TPofBCalc *y = new TPofBCalc(fParForPofB);
+    fPofB = y;
     y = 0;
-    delete y;
+
+    TPofTCalc *z = new TPofTCalc(fPofB, fWisdom, fParForPofT);
+    fPofT = z;
+    z = 0;
 
     // clean up
     if (saxParser) {
@@ -420,8 +457,9 @@ double TLondon1D1L::operator()(double t, const vector<double> &par) const {
       fParForPofB[2] = par[1]; // energy
 
       TLondon1D_1L BofZ1(fParForBofZ);
-      TPofBCalc PofB1(BofZ1, *fImpProfile, fParForPofB);
-      fPofT->DoFFT(PofB1);
+      fPofB->UnsetPBExists();
+      fPofB->Calculate(&BofZ1, fImpProfile, fParForPofB);
+      fPofT->DoFFT();
 
     }/* else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
@@ -480,12 +518,15 @@ TLondon1D2L::TLondon1D2L() : fCalcNeeded(true), fFirstCall(true), fLastTwoChange
     TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
     fImpProfile = x;
     x = 0;
-    delete x;
 
-    TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
-    fPofT = y;
+    TPofBCalc *y = new TPofBCalc(fParForPofB);
+    fPofB = y;
     y = 0;
-    delete y;
+
+    TPofTCalc *z = new TPofTCalc(fPofB, fWisdom, fParForPofT);
+    fPofT = z;
+    z = 0;
+
 
     // clean up
     if (saxParser) {
@@ -577,8 +618,10 @@ double TLondon1D2L::operator()(double t, const vector<double> &par) const {
       }
 
       TLondon1D_2L BofZ2(fParForBofZ);
-      TPofBCalc PofB2(BofZ2, *fImpProfile, fParForPofB);
-      fPofT->DoFFT(PofB2);
+      fPofB->UnsetPBExists();
+      fPofB->Calculate(&BofZ2, fImpProfile, fParForPofB);
+      fPofT->DoFFT();
+
 
     }/* else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
@@ -633,9 +676,13 @@ TProximity1D1LHS::TProximity1D1LHS() : fCalcNeeded(true), fFirstCall(true) {
     fImpProfile = x;
     x = 0;
 
-    TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
-    fPofT = y;
+    TPofBCalc *y = new TPofBCalc(fParForPofB);
+    fPofB = y;
     y = 0;
+
+    TPofTCalc *z = new TPofTCalc(fPofB, fWisdom, fParForPofT);
+    fPofT = z;
+    z = 0;
 
     // clean up
     if (saxParser) {
@@ -738,8 +785,10 @@ double TProximity1D1LHS::operator()(double t, const vector<double> &par) const {
       }
 
       TProximity1D_1LHS BofZ(fParForBofZ);
-      TPofBCalc PofB(BofZ, *fImpProfile, fParForPofB);
-      fPofT->DoFFT(PofB);
+      fPofB->UnsetPBExists();
+      fPofB->Calculate(&BofZ, fImpProfile, fParForPofB);
+      fPofT->DoFFT();
+
 
     }/* else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
@@ -791,9 +840,13 @@ TProximity1D1LHSGss::TProximity1D1LHSGss() : fCalcNeeded(true), fFirstCall(true)
     fImpProfile = x;
     x = 0;
 
-    TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
-    fPofT = y;
+    TPofBCalc *y = new TPofBCalc(fParForPofB);
+    fPofB = y;
     y = 0;
+
+    TPofTCalc *z = new TPofTCalc(fPofB, fWisdom, fParForPofT);
+    fPofT = z;
+    z = 0;
 
     // clean up
     if (saxParser) {
@@ -872,8 +925,9 @@ double TProximity1D1LHSGss::operator()(double t, const vector<double> &par) cons
       fParForPofB[2] = par[1]; // energy
 
       TProximity1D_1LHSGss BofZ(fParForBofZ);
-      TPofBCalc PofB(BofZ, *fImpProfile, fParForPofB);
-      fPofT->DoFFT(PofB);
+      fPofB->UnsetPBExists();
+      fPofB->Calculate(&BofZ, fImpProfile, fParForPofB);
+      fPofT->DoFFT();
 
     }/* else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
@@ -922,12 +976,15 @@ TLondon1D3L::TLondon1D3L() : fCalcNeeded(true), fFirstCall(true), fLastThreeChan
     TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
     fImpProfile = x;
     x = 0;
-    delete x;
 
-    TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
-    fPofT = y;
+    TPofBCalc *y = new TPofBCalc(fParForPofB);
+    fPofB = y;
     y = 0;
-    delete y;
+
+    TPofTCalc *z = new TPofTCalc(fPofB, fWisdom, fParForPofT);
+    fPofT = z;
+    z = 0;
+
 
     // clean up
     if (saxParser) {
@@ -1034,8 +1091,10 @@ double TLondon1D3L::operator()(double t, const vector<double> &par) const {
       }
 
       TLondon1D_3L BofZ3(fParForBofZ);
-      TPofBCalc PofB3(BofZ3, *fImpProfile, fParForPofB);
-      fPofT->DoFFT(PofB3);
+      fPofB->UnsetPBExists();
+      fPofB->Calculate(&BofZ3, fImpProfile, fParForPofB);
+      fPofT->DoFFT();
+
 
     }/* else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
@@ -1085,12 +1144,14 @@ TLondon1D3LS::TLondon1D3LS() : fCalcNeeded(true), fFirstCall(true), fLastThreeCh
     TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
     fImpProfile = x;
     x = 0;
-    delete x;
 
-    TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
-    fPofT = y;
+    TPofBCalc *y = new TPofBCalc(fParForPofB);
+    fPofB = y;
     y = 0;
-    delete y;
+
+    TPofTCalc *z = new TPofTCalc(fPofB, fWisdom, fParForPofT);
+    fPofT = z;
+    z = 0;
 
     // clean up
     if (saxParser) {
@@ -1183,8 +1244,9 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
       }
 
       TLondon1D_3LS BofZ3S(fParForBofZ);
-      TPofBCalc PofB3S(BofZ3S, *fImpProfile, fParForPofB);
-      fPofT->DoFFT(PofB3S);
+      fPofB->UnsetPBExists();
+      fPofB->Calculate(&BofZ3S, fImpProfile, fParForPofB);
+      fPofT->DoFFT();
 
     }/* else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
@@ -1402,12 +1464,14 @@ TLondon1D3LSub::TLondon1D3LSub() : fCalcNeeded(true), fFirstCall(true), fWeights
     TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
     fImpProfile = x;
     x = 0;
-    delete x;
 
-    TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
-    fPofT = y;
+    TPofBCalc *y = new TPofBCalc(fParForPofB);
+    fPofB = y;
     y = 0;
-    delete y;
+
+    TPofTCalc *z = new TPofTCalc(fPofB, fWisdom, fParForPofT);
+    fPofT = z;
+    z = 0;
 
     // clean up
     if (saxParser) {
@@ -1519,13 +1583,14 @@ double TLondon1D3LSub::operator()(double t, const vector<double> &par) const {
       }
 
       TLondon1D_3L BofZ3(fParForBofZ);
-      TPofBCalc PofB3(BofZ3, *fImpProfile, fParForPofB);
+      fPofB->UnsetPBExists();
+      fPofB->Calculate(&BofZ3, fImpProfile, fParForPofB);
 
       // Add background contribution from the substrate
-      PofB3.AddBackground(par[2], par[14], fImpProfile->LayerFraction(par[1], 4, interfaces));
+      fPofB->AddBackground(par[2], par[14], fImpProfile->LayerFraction(par[1], 4, interfaces));
 
       // FourierTransform of P(B)
-      fPofT->DoFFT(PofB3);
+      fPofT->DoFFT();
 
     }/* else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;

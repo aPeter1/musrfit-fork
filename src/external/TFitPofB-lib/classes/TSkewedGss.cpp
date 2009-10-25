@@ -9,6 +9,26 @@
 
 ***************************************************************************/
 
+/***************************************************************************
+ *   Copyright (C) 2009 by Bastian M. Wojek                                *
+ *                                                                         *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
 #include "TSkewedGss.h"
 #include <iostream>
 #include <cassert>
@@ -27,6 +47,8 @@ TSkewedGss::~TSkewedGss() {
     fPar.clear();
     fParForPofB.clear();
     fParForPofT.clear();
+    delete fPofB;
+    fPofB = 0;
     delete fPofT;
     fPofT = 0;
 }
@@ -61,10 +83,13 @@ TSkewedGss::TSkewedGss() : fCalcNeeded(true), fFirstCall(true) {
     fParForPofB.push_back(0.0); // s-
     fParForPofB.push_back(0.0); // s+
 
-    TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
+    TPofBCalc *x = new TPofBCalc(fParForPofB);
+    fPofB = x;
+    x = 0;
+
+    TPofTCalc *y = new TPofTCalc(fPofB, fWisdom, fParForPofT);
     fPofT = y;
     y = 0;
-    delete y;
 
     // clean up
     if (saxParser) {
@@ -131,8 +156,8 @@ double TSkewedGss::operator()(double t, const vector<double> &par) const {
       fParForPofB[3] = par[2]; // sigma-
       fParForPofB[4] = par[3]; // sigma+
 
-      TPofBCalc PofB("skg", fParForPofB);
-      fPofT->DoFFT(PofB);
+      fPofB->Calculate("skg", fParForPofB);
+      fPofT->DoFFT();
 
     }/* else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;

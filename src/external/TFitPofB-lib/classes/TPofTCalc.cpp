@@ -16,8 +16,8 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2008 by Andreas Suter                                   *
- *   andreas.suter@psi.ch                                                   *
+ *   Copyright (C) 2008-2009 by Bastian M. Wojek, Andreas Suter            *
+ *                                                                         *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -63,7 +63,7 @@
 // Parameters: phase, dt, dB
 //------------------
 
-TPofTCalc::TPofTCalc (const string &wisdom, const vector<double> &par) : fWisdom(wisdom) {
+TPofTCalc::TPofTCalc (const TPofBCalc *PofB, const string &wisdom, const vector<double> &par) : fWisdom(wisdom) {
 
   int init_threads(fftw_init_threads());
   if (!init_threads)
@@ -71,88 +71,95 @@ TPofTCalc::TPofTCalc (const string &wisdom, const vector<double> &par) : fWisdom
   else
     fftw_plan_with_nthreads(2);
 
-  fNFFT = ( int(1.0/gBar/par[1]/par[2]+1.0) % 2 ) ? int(1.0/gBar/par[1]/par[2]+2.0) : int(1.0/gBar/par[1]/par[2]+1.0);
-  fTBin = 1.0/gBar/double(fNFFT-1)/par[2];
+  fNFFT = static_cast<int>(1.0/(gBar*par[1]*par[2]));
+  if (fNFFT % 2) {
+    fNFFT += 1;
+  } else {
+    fNFFT += 2;
+  }
 
-  fT.resize(fNFFT/2+1);
-  fPT.resize(fNFFT/2+1);
+  fTBin = 1.0/(gBar*double(fNFFT-1)*par[2]);
+
+  int NFFT_2p1(fNFFT/2 + 1);
+
+  // allocating memory for the time- and polarisation vectors
+
+  fT = new double[NFFT_2p1]; //static_cast<double *>(malloc(sizeof(double) * NFFT_2p1));
+  fPT = new double[NFFT_2p1]; //static_cast<double *>(malloc(sizeof(double) * NFFT_2p1));
 
   int i;
 
 #pragma omp parallel for default(shared) private(i) schedule(dynamic)
-  for (i=0; i<fNFFT/2+1; i++){
-    fT[i] = double(i)*fTBin;
+  for (i = 0; i < NFFT_2p1; i++) {
+    fT[i] = static_cast<double>(i)*fTBin;
   }
 
-  fFFTin = (double *)malloc(sizeof(double) * fNFFT);
-  fFFTout = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * (fNFFT/2+1));
+  fFFTin = PofB->DataPB();
+  fFFTout = new fftw_complex[NFFT_2p1]; //static_cast<fftw_complex *>(fftw_malloc(sizeof(fftw_complex) * NFFT_2p1));
 
-  cout << "TPofTCalc::TPofTCalc: Check for the FFT plan..." << endl;
+  // Load wisdom from file if it exists and should be used
 
-  // Load wisdom from file
-
+  fUseWisdom = true;
   int wisdomLoaded(0);
 
   FILE *wordsOfWisdomR;
-  wordsOfWisdomR = fopen(fWisdom.c_str(), "r");
+  wordsOfWisdomR = fopen(wisdom.c_str(), "r");
   if (wordsOfWisdomR == NULL) {
-    cout << "TPofTCalc::TPofTCalc: Couldn't open wisdom file ..." << endl;
+    fUseWisdom = false;
   } else {
     wisdomLoaded = fftw_import_wisdom_from_file(wordsOfWisdomR);
     fclose(wordsOfWisdomR);
   }
 
   if (!wisdomLoaded) {
-    cout << "TPofTCalc::TPofTCalc: No wisdom is imported..." << endl;
+    fUseWisdom = false;
   }
 
-  fFFTplan = fftw_plan_dft_r2c_1d(fNFFT, fFFTin, fFFTout, FFTW_EXHAUSTIVE);
+// create the FFT plan
 
-//  cout << &fFFTplan << endl;
+  if (fUseWisdom)
+    fFFTplan = fftw_plan_dft_r2c_1d(fNFFT, fFFTin, fFFTout, FFTW_EXHAUSTIVE);
+  else
+    fFFTplan = fftw_plan_dft_r2c_1d(fNFFT, fFFTin, fFFTout, FFTW_ESTIMATE);
+
+}
+
+//---------------------
+// Destructor of the TPofTCalc class - it saves the FFT plan and cleans up
+//---------------------
+
+TPofTCalc::~TPofTCalc() {
+  // if a wisdom file is used export the wisdom so it has not to be checked for the FFT-plan next time
+  if (fUseWisdom) {
+    FILE *wordsOfWisdomW;
+    wordsOfWisdomW = fopen(fWisdom.c_str(), "w");
+    if (wordsOfWisdomW == NULL) {
+      cout << "TPofTCalc::~TPofTCalc(): Could not open file ... No wisdom is exported..." << endl;
+    } else {
+      fftw_export_wisdom_to_file(wordsOfWisdomW);
+      fclose(wordsOfWisdomW);
+    }
+  }
+
+  // clean up
+
+  fftw_destroy_plan(fFFTplan);
+  delete[] fFFTout; //fftw_free(fFFTout);
+  fFFTout = 0;
+//  fftw_cleanup();
+//  fftw_cleanup_threads();
+
+  delete[] fT;
+  fT = 0;
+  delete[] fPT;
+  fPT = 0;
 }
 
 //--------------
 // Method that does the FFT of a given p(B)
 //--------------
 
-void TPofTCalc::DoFFT(const TPofBCalc &PofB) {
-
-  vector<double> pB(PofB.DataPB());
-
-/* USED FOR DEBUGGING -----------------------
-
-  time_t seconds;
-  seconds = time(NULL);
-
-  vector<double> B(PofB.DataB());
-  double Bmin(PofB.GetBmin());
-
-  char debugfile[50];
-  int n = sprintf (debugfile, "test_PB_%ld_%f.dat", seconds, Bmin);
-
-  if (n > 0) {
-    ofstream of(debugfile);
-
-    for (unsigned int i(0); i<B.size(); i++) {
-      of << B[i] << " " << pB[i] << endl;
-    }
-    of.close();
-  }
-/--------------------------------------------*/
-
-  int i;
-
-#pragma omp parallel for default(shared) private(i) schedule(dynamic)
-  for (i=0; i<fNFFT; i++) {
-    fFFTin[i] = pB[i];
-  }
-
-//  for (unsigned int i(0); i<fNFFT/2+1; i++) {
-//    fFFTout[i][0] = 0.0;
-//    fFFTout[i][1] = 0.0;
-//  }
-
-//  cout << "perform the Fourier transform..." << endl;
+void TPofTCalc::DoFFT() {
 
   fftw_execute(fFFTplan);
 
@@ -170,10 +177,25 @@ void TPofTCalc::CalcPol(const vector<double> &par) {
 
 #pragma omp parallel for default(shared) private(i) schedule(dynamic)
   for (i=0; i<fNFFT/2+1; i++){
-//    fT[i] = double(i)*fTBin;
     fPT[i] = cosph*fFFTout[i][0]*par[2] + sinph*fFFTout[i][1]*par[2];
   }
 }
+
+//---------------------
+// Method for evaluating P(t) at a given t
+//---------------------
+
+double TPofTCalc::Eval(double t) const {
+
+  int i(static_cast<int>(t/fTBin));
+  if (i < fNFFT/2){
+    return fPT[i]+(fPT[i+1]-fPT[i])/(fT[i+1]-fT[i])*(t-fT[i]);
+  }
+  cout << "TPofTCalc::Eval: No data for the time " << t << " us available! Returning -999.0 ..." << endl;
+  return -999.0;
+}
+
+
 
 //---------------------
 // Method for generating fake LEM decay histograms from p(B)
@@ -381,49 +403,5 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
   return;
 }
 
-//---------------------
-// Method for evaluating P(t) at a given t
-//---------------------
 
-double TPofTCalc::Eval(double t) const {
-
-  unsigned int i(int(t/fTBin));
-  if (i<fT.size()-1)
-    return fPT[i]+(fPT[i+1]-fPT[i])/(fT[i+1]-fT[i])*(t-fT[i]);
-
-//  for (unsigned int i(0); i<fT.size()-1; i++) {
-//    if (t < fT[i+1])
-//      return fPT[i]+(fPT[i+1]-fPT[i])/(fT[i+1]-fT[i])*(t-fT[i]);
-//  }
-
-  cout << "TPofTCalc::Eval: No data for the time " << t << " us available! Returning -999.0 ..." << endl;
-  return -999.0;
-}
-
-//---------------------
-// Destructor of the TPofTCalc class - it saves the FFT plan and cleans up
-//---------------------
-
-TPofTCalc::~TPofTCalc() {
-  // export wisdom so it has not to be checked for the FFT-plan next time
-
-  FILE *wordsOfWisdomW;
-  wordsOfWisdomW = fopen(fWisdom.c_str(), "w");
-  if (wordsOfWisdomW == NULL) {
-    cout << "TPofTCalc::~TPofTCalc(): Could not open file ... No wisdom is exported..." << endl;
-  }
-
-  fftw_export_wisdom_to_file(wordsOfWisdomW);
-
-  fclose(wordsOfWisdomW);
-
-  fftw_destroy_plan(fFFTplan);
-  free(fFFTin);
-  fftw_free(fFFTout);
-//  fftw_cleanup();
-//  fftw_cleanup_threads();
-  fT.clear();
-  fPT.clear();
-
-}
 

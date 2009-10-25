@@ -1,6 +1,6 @@
  /***************************************************************************
 
-  TFitPofBStartupHandler.h
+  TFitPofBStartupHandler.cpp
 
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
@@ -14,7 +14,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007 by Andreas Suter, Bastian M. Wojek                 *
+ *   Copyright (C) 2007-2008 by Andreas Suter, Bastian M. Wojek            *
  *                                                                         *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *

@@ -9,6 +9,26 @@
 
 ***************************************************************************/
 
+/***************************************************************************
+ *   Copyright (C) 2009 by Bastian M. Wojek                                *
+ *                                                                         *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
 #include "TVortex.h"
 #include <iostream>
 #include <cassert>
@@ -25,12 +45,16 @@ ClassImp(TBulkTriVortexLondon)
 //------------------
 
 TBulkTriVortexLondon::~TBulkTriVortexLondon() {
+    delete fPofT;
+    fPofT = 0;
+    delete fPofB;
+    fPofT = 0;
+    delete fVortex;
+    fVortex = 0;
     fPar.clear();
     fParForVortex.clear();
     fParForPofB.clear();
     fParForPofT.clear();
-    delete fPofT;
-    fPofT = 0;
 }
 
 //------------------
@@ -54,9 +78,8 @@ TBulkTriVortexLondon::TBulkTriVortexLondon() : fCalcNeeded(true), fFirstCall(tru
 
     fGridSteps = startupHandler->GetGridSteps();
     fWisdom = startupHandler->GetWisdomFile();
-    fVortexFourierComp = startupHandler->GetVortexFourierComp();
 
-    fParForVortex.clear();
+    fParForVortex.resize(3); // field, lambda, xi
 
     fParForPofT.push_back(0.0);
     fParForPofT.push_back(startupHandler->GetDeltat());
@@ -69,9 +92,17 @@ TBulkTriVortexLondon::TBulkTriVortexLondon() : fCalcNeeded(true), fFirstCall(tru
     fParForPofB.push_back(0.005); // Bkg-width
     fParForPofB.push_back(0.0); // Bkg-weight
 
-    TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
-    fPofT = y;
+    TBulkTriVortexLondonFieldCalc *x = new TBulkTriVortexLondonFieldCalc(fWisdom, fGridSteps);
+    fVortex = x;
+    x = 0;
+
+    TPofBCalc *y = new TPofBCalc(fParForPofB);
+    fPofB = y;
     y = 0;
+
+    TPofTCalc *z = new TPofTCalc(fPofB, fWisdom, fParForPofT);
+    fPofT = z;
+    z = 0;
 
     // clean up
     if (saxParser) {
@@ -87,7 +118,7 @@ TBulkTriVortexLondon::TBulkTriVortexLondon() : fCalcNeeded(true), fFirstCall(tru
 //------------------
 // TBulkTriVortexLondon-Method that calls the procedures to create B(x,y), p(B) and P(t)
 // It finally returns P(t) for a given t.
-// Parameters: all the parameters for the function to be fitted through TBulkTriVortexLondon (phase, appl.field, lambda, xi)
+// Parameters: all the parameters for the function to be fitted through TBulkTriVortexLondon (phase, appl.field, lambda, xi, [not implemented: bkg weight])
 //------------------
 
 double TBulkTriVortexLondon::operator()(double t, const vector<double> &par) const {
@@ -102,8 +133,8 @@ double TBulkTriVortexLondon::operator()(double t, const vector<double> &par) con
   if(fFirstCall){
     fPar = par;
 
-    for (unsigned int i(1); i < 4; i++){
-      fParForVortex.push_back(fPar[i]);
+    for (unsigned int i(0); i < 3; i++){
+      fParForVortex[i] = fPar[i+1];
     }
     fFirstCall = false;
   }
@@ -138,16 +169,18 @@ double TBulkTriVortexLondon::operator()(double t, const vector<double> &par) con
 
 //      cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
 
-      fParForVortex[0] = par[2]; // lambda
-      fParForVortex[1] = par[3]; // xi
-      fParForVortex[2] = par[1]; // field
+      for (unsigned int i(0); i < 3; i++) {
+        fParForVortex[i] = par[i+1];
+      }
 
       fParForPofB[2] = par[1]; // Bkg-Field
       //fParForPofB[3] = 0.005; // Bkg-width (in principle zero)
 
-      TBulkTriVortexLondonFieldCalc vortexLattice(fParForVortex, fGridSteps, fVortexFourierComp);
-      TPofBCalc PofB(vortexLattice, fParForPofB);
-      fPofT->DoFFT(PofB);
+      fVortex->SetParameters(fParForVortex);
+      fVortex->CalculateGrid();
+      fPofB->UnsetPBExists();
+      fPofB->Calculate(fVortex, fParForPofB);
+      fPofT->DoFFT();
 
     }/* else {
       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
