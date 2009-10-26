@@ -9,7 +9,7 @@ using namespace std;
 
 int main(){
 
-  unsigned int NFFT(256);
+  unsigned int NFFT(512);
 
   vector<double> parForVortex;
   parForVortex.resize(3);
@@ -20,47 +20,47 @@ int main(){
 
   vector<double> parForPofB;
   parForPofB.push_back(0.01); //dt
-  parForPofB.push_back(0.5); //dB
+  parForPofB.push_back(2.0); //dB
 
   vector<double> parForPofT;
   parForPofT.push_back(0.0); //phase
   parForPofT.push_back(0.01); //dt
-  parForPofT.push_back(0.5); //dB
+  parForPofT.push_back(2.0); //dB
 
   TBulkTriVortexLondonFieldCalc *vortexLattice = new TBulkTriVortexLondonFieldCalc("/home/l_wojek/analysis/WordsOfWisdom.dat", NFFT);
 
-  parForVortex[0] = 500.0; //app.field
-  parForVortex[1] = 300.0; //lambda
-  parForVortex[2] = 3.0; //xi
+  parForVortex[0] = 1000.0; //app.field
+  parForVortex[1] = 1000.0; //lambda
+  parForVortex[2] = 4.0; //xi
 
   vortexLattice->SetParameters(parForVortex);
   vortexLattice->CalculateGrid();
 
-//   ofstream ofy("testVortex-B.dat");
-//   for (unsigned int j(0); j < NFFT * NFFT; j++) {
-//     ofy << vortexLattice->DataB()[j] << " ";
-//     if (!((j+1)%(NFFT)))
-//       ofy << endl;
-//   }
-//   ofy.close();
+  ofstream ofy("testVortex-B.dat");
+  for (unsigned int j(0); j < NFFT * NFFT; j++) {
+    ofy << vortexLattice->DataB()[j] << " ";
+    if (!((j+1)%(NFFT)))
+      ofy << endl;
+  }
+  ofy.close();
 
   TPofBCalc *PofB = new TPofBCalc(parForPofB);
   PofB->Calculate(vortexLattice, parForPofB);
 
-//   const double *b(PofB->DataB());
-//   const double *pb(PofB->DataPB());
-//   unsigned int s(PofB->GetPBSize());
-// 
+  const double *b(PofB->DataB());
+  double *pb(PofB->DataPB());
+  unsigned int s(PofB->GetPBSize());
+
     double test(0.0);
-// 
-//   ofstream ofx("testVortex.dat");
-//   for (unsigned int i(0); i < s; i++) {
-//     ofx << b[i] << " " << pb[i] << endl;
-//     test+=pb[i];
-//   }
-//   ofx.close();
+
+  ofstream ofx("testVortex.dat");
+  for (unsigned int i(0); i < s; i++) {
+    ofx << b[i] << " " << pb[i] << endl;
+    test+=pb[i];
+  }
+  ofx.close();
   
-//  cout << test << endl;
+ cout << test << endl;
 
   TPofTCalc poft(PofB, "/home/l_wojek/analysis/WordsOfWisdom.dat", parForPofT);
   
@@ -69,12 +69,12 @@ int main(){
   
   
 
-//     ofstream of8("testVortex-Pt.dat");
+     ofstream of8("testVortex-Pt.dat");
      for (double i(0.); i<12.0; i+=0.003) {
        test = poft.Eval(i);
-//       of8 << i << " " << poft.Eval(i) << endl;
+       of8 << i << " " << poft.Eval(i) << endl;
      }
-//     of8.close();
+     of8.close();
 
 //   parForVortex[0] = 500.0; //app.field
 //   parForVortex[1] = 100.0; //lambda

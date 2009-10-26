@@ -14,7 +14,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007 by Andreas Suter, Bastian M. Wojek                 *
+ *   Copyright (C) 2007-2008 by Andreas Suter, Bastian M. Wojek            *
  *                                                                         *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -66,13 +66,15 @@ class TFitPofBStartupHandler : public TQObject {
     virtual const string GetWisdomFile() const { return fWisdomFile; }
     virtual const unsigned int GetNSteps() const { return fNSteps; }
     virtual const unsigned int GetGridSteps() const { return fGridSteps; }
-    virtual const unsigned int GetVortexFourierComp() const { return fVortexFourierComp; }
+    virtual const unsigned int GetVortexSymmetry() const { return fVortexSymmetry; }
 
   private:
-    enum EKeyWords {eEmpty, eComment, eDataPath, eEnergy, eEnergyList, eDeltat, eDeltaB, eWisdomFile, eNSteps, eGridSteps, eVortexFourierComp};
+    enum EKeyWords {eEmpty, eComment, eLEM, eVortex, eDataPath, eEnergy, eEnergyList, eDeltat, eDeltaB, eWisdomFile, eNSteps, eGridSteps, eVortexSymmetry};
 
     EKeyWords       fKey;
 
+    bool            fLEM;
+    bool            fVortex;
     string          fDataPath;
     vector<string>  fEnergyList;
     double          fDeltat;
@@ -80,7 +82,7 @@ class TFitPofBStartupHandler : public TQObject {
     string          fWisdomFile;
     unsigned int    fNSteps;
     unsigned int    fGridSteps;
-    unsigned int    fVortexFourierComp;
+    unsigned int    fVortexSymmetry;
 
   ClassDef(TFitPofBStartupHandler, 1)
 };

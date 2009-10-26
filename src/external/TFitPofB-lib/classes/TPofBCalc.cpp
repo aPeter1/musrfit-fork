@@ -391,7 +391,7 @@ void TPofBCalc::Calculate(const TBulkVortexFieldCalc *vortexLattice, const vecto
   if (lastZerosStart >= fPBSize)
     lastZerosStart = fPBSize - 1;
 
-//  cout << endl << fBmin << " " << fBmax << " " << firstZerosEnd << " " << lastZerosStart << " " << numberOfPoints << endl;
+//  cout << endl << fBmin << " " << fBmax << " " << firstZerosEnd << " " << lastZerosStart << " " << numberOfSteps << endl;
 
   if (!vortexLattice->GridExists()) {
     vortexLattice->CalculateGrid();
@@ -401,7 +401,7 @@ void TPofBCalc::Calculate(const TBulkVortexFieldCalc *vortexLattice, const vecto
   unsigned int fill_index, counter(0);
 
   for (unsigned int j(0); j < numberOfStepsSq_2; j++) {
-    fill_index = static_cast<unsigned int>(ceil(abs((vortexFields[j]/fDB))));
+    fill_index = static_cast<unsigned int>(ceil(fabs((vortexFields[j]/fDB))));
     if (fill_index >= fPBSize)
       fPB[fPBSize - 1] += 1.0;
     else

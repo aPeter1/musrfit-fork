@@ -2,39 +2,56 @@
 <TFitPofB>
     <comment>
         TFitPofB_startup.xml 
-        Defines path/prefix and energies (keV, format: %02u_%1u) of TrimSP-rge-files,
-        path/name to the FFTW-wisdom-file and time/field binning (us/G)
-        N_theory determines the number of points in "real space" where the theory function will be calculated
-        N_VortexGrid determines the number of points in which each axis of the "real space" will be divided when calculating the vortex B(x,y)
-        N_VortexFourier defines the number of Fourier components which should be summed up in order to get B(x,y)
-      </comment>
-    <data_path>/home/l_wojek/TrimSP/YBCOxtal/YBCOxtal-500000-</data_path>
+        Here some external parameters used in conjunction with the TFitPofB-library are set.
+        There are different sections:
+        * Common parameters which are used for any kind of function
+        * Parameters for low energy uSR data analysis with given B(z)
+        * Parameters for bulk uSR data analysis (currently only one model to calculate field distributions for a triangular vortex lattice)
+
+        Common parameters:
+        - wisdom : sets the path to an FFTW-wisdom file - if there is no valid wisdom at the given path, wisdom handling will be disabled
+        - delta_t : time resolution of P(t) in microseconds
+        - delta_B : field resolution of P(B) in Gauss
+
+        LEM parameters (if the LEM tag is present it is expected that the data_path tag contains a valid path):
+        - data_path, energy_list : Defines path/prefix and energies (keV, format: %02u_%1u) of TrimSP-rge-files,
+        - N_theory : determines the number of points in "real space" where the theory function B(z) will be calculated (if necessary)
+
+        bulk parameters:
+        - N_VortexGrid : determines the number of points used for the calculation of the vortex lattice field distribution (the grid will be N*N)
+        - VortexSymmetry : specify the vortex lattice symmetry - either "square" or "triangular"
+    </comment>
     <wisdom>/home/l_wojek/analysis/WordsOfWisdom.dat</wisdom>
     <delta_t>0.01</delta_t>
     <delta_B>0.1</delta_B>
-    <N_theory>5000</N_theory>
-    <N_VortexGrid>200</N_VortexGrid>
-    <N_VortexFourier>17</N_VortexFourier>
-    <energy_list>
-        <energy>03_0</energy>
-        <energy>03_6</energy>
-        <energy>05_0</energy>
-        <energy>05_3</energy>
-        <energy>07_0</energy>
-        <energy>07_7</energy>
-        <energy>08_0</energy>
-        <energy>09_0</energy>
-        <energy>10_0</energy>
-        <energy>10_2</energy>
-        <energy>12_0</energy>
-        <energy>14_1</energy>
-        <energy>16_0</energy>
-        <energy>16_4</energy>    
-        <energy>18_0</energy>
-        <energy>19_7</energy>
-        <energy>20_0</energy>
-        <energy>22_0</energy>
-        <energy>24_0</energy>
-        <energy>24_6</energy>
+    <VortexLattice>
+        <N_VortexGrid>256</N_VortexGrid>
+        <VortexSymmetry>triangular</VortexSymmetry>
+    </VortexLattice>
+    <LEM>
+        <data_path>/home/l_wojek/TrimSP/YBCOxtal/YBCOxtal-500000-</data_path>
+        <N_theory>5000</N_theory>
+        <energy_list>
+          <energy>03_0</energy>
+          <energy>03_6</energy>
+          <energy>05_0</energy>
+          <energy>05_3</energy>
+          <energy>07_0</energy>
+          <energy>07_7</energy>
+          <energy>08_0</energy>
+          <energy>09_0</energy>
+          <energy>10_0</energy>
+          <energy>10_2</energy>
+          <energy>12_0</energy>
+          <energy>14_1</energy>
+          <energy>16_0</energy>
+          <energy>16_4</energy>
+          <energy>18_0</energy>
+          <energy>19_7</energy>
+          <energy>20_0</energy>
+          <energy>22_0</energy>
+          <energy>24_0</energy>
+          <energy>24_6</energy>
      </energy_list>
+   </LEM>
 </TFitPofB>

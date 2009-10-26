@@ -6,12 +6,12 @@ ROOTLIBS      = $(shell $(ROOTSYS)/bin/root-config --libs)
 
 #---------------------------------------------------
 
-CXX           = g++-4.4.0
+CXX           = g++-4.4.2
 CXXFLAGS      = -O3 -Wall
 LOCALINCLUDE  = ../include
 ROOTINCLUDE   = $(ROOTSYS)/include
 INCLUDES      = -I$(LOCALINCLUDE) -I$(ROOTINCLUDE)
-LD            = g++-4.4.0
+LD            = g++-4.4.2
 LDFLAGS       = -O3 -L../classes -lTFitPofB -lfftw3_threads -lfftw3 -lm -lpthread -fopenmp -lPMusr
 
 # the output from the root-config script:

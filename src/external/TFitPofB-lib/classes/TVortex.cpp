@@ -133,7 +133,7 @@ double TBulkTriVortexLondon::operator()(double t, const vector<double> &par) con
   if(fFirstCall){
     fPar = par;
 
-    for (unsigned int i(0); i < 3; i++){
+    for (unsigned int i(0); i < 3; i++) {
       fParForVortex[i] = fPar[i+1];
     }
     fFirstCall = false;

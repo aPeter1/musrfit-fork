@@ -80,7 +80,7 @@ TPofTCalc::TPofTCalc (const TPofBCalc *PofB, const string &wisdom, const vector<
 
   fTBin = 1.0/(gBar*double(fNFFT-1)*par[2]);
 
-  int NFFT_2p1(fNFFT/2 + 1);
+  const int NFFT_2p1(fNFFT/2 + 1);
 
   // allocating memory for the time- and polarisation vectors
 

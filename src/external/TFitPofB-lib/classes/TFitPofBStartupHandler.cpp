@@ -97,7 +97,11 @@ void TFitPofBStartupHandler::OnEndDocument()
  */
 void TFitPofBStartupHandler::OnStartElement(const char *str, const TList *attributes)
 {
-  if (!strcmp(str, "data_path")) {
+  if (!strcmp(str, "LEM")) {
+    fKey = eLEM;
+  } else if (!strcmp(str, "VortexLattice")) {
+    fKey = eVortex;
+  } else if (!strcmp(str, "data_path")) {
     fKey = eDataPath;
   } else if (!strcmp(str, "energy")) {
     fKey = eEnergy;
@@ -111,8 +115,8 @@ void TFitPofBStartupHandler::OnStartElement(const char *str, const TList *attrib
     fKey = eNSteps;
   } else if (!strcmp(str, "N_VortexGrid")) {
     fKey = eGridSteps;
-  } else if (!strcmp(str, "N_VortexFourier")) {
-    fKey = eVortexFourierComp;
+  } else if (!strcmp(str, "VortexSymmetry")) {
+    fKey = eVortexSymmetry;
   }
 }
 
@@ -140,6 +144,12 @@ void TFitPofBStartupHandler::OnEndElement(const char *str)
 void TFitPofBStartupHandler::OnCharacters(const char *str)
 {
   switch (fKey) {
+    case eLEM:
+      fLEM = true;
+      break;
+    case eVortex:
+      fVortex = true;
+      break;
     case eDataPath:
       // set the data path to the given path
       fDataPath = str;
@@ -168,9 +178,12 @@ void TFitPofBStartupHandler::OnCharacters(const char *str)
       // convert str to int and assign it to the GridSteps-member
       fGridSteps = atoi(str);
       break;
-     case eVortexFourierComp:
-      // convert str to int and assign it to the VortexFourierComp-member
-      fVortexFourierComp = atoi(str);
+    case eVortexSymmetry:
+      // convert str to int and assign it to the VortexSymmetry-member (square = 0, triangular = 1)
+      if (!strcmp(str, "square"))
+        fVortexSymmetry = 2;
+      else
+        fVortexSymmetry = 1;
       break;
     default:
       break;
@@ -256,68 +269,92 @@ void TFitPofBStartupHandler::CheckLists()
 {
   // check if anything was set, and if not set some default stuff
 
-  // check if any data path is given
-  cout << endl << "TFitPofBStartupHandler::CheckLists: check data path ...";
-  if (!fDataPath.size()) {
-    cout << endl << "TFitPofBStartupHandler::CheckLists: This is not going to work, you have to set a valid data path where to find the rge-files in the xml-file!" << endl;
-    exit(-1);
-  }
-
-  // check if any energies are given
-  cout << endl << "TFitPofBStartupHandler::CheckLists: check energy list ..." << endl;
-  if (!fEnergyList.size()) {
-    cout << endl << "TFitPofBStartupHandler::CheckLists: Energy list empty! Setting the default list." << endl;
-    char eChar[5];
-    for(unsigned int i(0); i<33; i++) {
-      for(unsigned int j(0); j<10; j++) {
-        sprintf(eChar, "%02u_%u", i, j);
-        fEnergyList.push_back(string(eChar));
-      }
-    }
-  }
-
   // check if delta_t is given, if not set default
-  cout << endl << "TFitPofBStartupHandler::CheckLists: check specified time resolution ..." << endl;
+  cout << endl << "TFitPofBStartupHandler::CheckLists: check specified time resolution ... " << endl;
   if(!fDeltat) {
-    cout << endl << "TFitPofBStartupHandler::CheckLists: You did not specify the time resolution. Setting the default." << endl;
+    cout << "TFitPofBStartupHandler::CheckLists: You did not specify the time resolution. Setting the default (10 ns)." << endl;
     fDeltat = 0.01;
+  } else {
+    cout << fDeltat << " us" << endl;
   }
 
   // check if delta_B is given, if not set default
   cout << endl << "TFitPofBStartupHandler::CheckLists: check specified field resolution ..." << endl;
   if(!fDeltaB) {
-    cout << endl << "TFitPofBStartupHandler::CheckLists: You did not specify the field resolution. Setting the default." << endl;
-    fDeltaB = 0.05;
+    cout << "TFitPofBStartupHandler::CheckLists: You did not specify the field resolution. Setting the default (0.1 G)." << endl;
+    fDeltaB = 0.1;
+  } else {
+    cout << fDeltaB << " G" << endl;
   }
 
   // check if any wisdom-file is specified
   cout << endl << "TFitPofBStartupHandler::CheckLists: check wisdom-file ..." << endl;
   if (!fWisdomFile.size()) {
-    cout << endl << "TFitPofBStartupHandler::CheckLists: You did not specify a wisdom file. Setting the default." << endl;
-    fWisdomFile = "WordsOfWisdom.dat";
+    cout << "TFitPofBStartupHandler::CheckLists: You did not specify a wisdom file. No FFTW plans will be loaded or saved." << endl;
+    fWisdomFile = "";
+  } else {
+    cout << fWisdomFile << endl;
   }
 
-  // check if any number of steps for the theory function is specified
-  cout << endl << "TFitPofBStartupHandler::CheckLists: check number of steps for theory ..." << endl;
-  if (!fNSteps) {
-    cout << endl << "TFitPofBStartupHandler::CheckLists: You did not specify the number of steps for the theory. Setting the default." << endl;
-    fNSteps = 3000;
+
+  if (fLEM) {
+
+    // check if any data path is given
+    cout << endl << "TFitPofBStartupHandler::CheckLists: check data path ..." << endl;
+    if (!fDataPath.size()) {
+      cout << "TFitPofBStartupHandler::CheckLists: This is not going to work, you have to set a valid data path where to find the rge-files in the xml-file!" << endl;
+      exit(-1);
+    } else {
+      cout << fDataPath << endl;
+    }
+
+    // check if any energies are given
+    cout << endl << "TFitPofBStartupHandler::CheckLists: check energy list ..." << endl;
+    if (!fEnergyList.size()) {
+      cout << "TFitPofBStartupHandler::CheckLists: Energy list empty! Setting the default list ( 0.0:0.1:32.9 keV)." << endl;
+      char eChar[5];
+      for(unsigned int i(0); i<33; i++) {
+        for(unsigned int j(0); j<10; j++) {
+          sprintf(eChar, "%02u_%u", i, j);
+          fEnergyList.push_back(string(eChar));
+        }
+      }
+    } else {
+      for (unsigned int i (0); i < fEnergyList.size(); i++)
+        cout << fEnergyList[i] << " ";
+      cout << endl;
+    }
+
+    // check if any number of steps for the theory function is specified
+    cout << endl << "TFitPofBStartupHandler::CheckLists: check number of steps for theory ..." << endl;
+    if (!fNSteps) {
+      cout << "TFitPofBStartupHandler::CheckLists: You did not specify the number of steps for the theory. Setting the default (3000)." << endl;
+      fNSteps = 3000;
+    } else {
+      cout << fNSteps << endl;
+    }
   }
 
-  // check if any number of steps for the theory function is specified
-  cout << endl << "TFitPofBStartupHandler::CheckLists: check number of steps for Vortex grid ..." << endl;
-  if (!fGridSteps) {
-    cout << endl << "TFitPofBStartupHandler::CheckLists: You did not specify the number of steps for the grid. Setting the default." << endl;
-    fGridSteps = 200;
-  }
+  if (fVortex) {
 
-  // check if any number of steps for the theory function is specified
-  cout << endl << "TFitPofBStartupHandler::CheckLists: check number of steps for Vortex lattice Fourier components ..." << endl;
-  if (!fVortexFourierComp) {
-    cout << endl << "TFitPofBStartupHandler::CheckLists: You did not specify the number of Vortex lattice Fourier components. Setting the default." << endl;
-    fVortexFourierComp = 17;
-  }
+    // check if any number of steps for the theory function is specified
+    cout << endl << "TFitPofBStartupHandler::CheckLists: check number of steps for Vortex grid ..." << endl;
+    if (!fGridSteps) {
+      cout << "TFitPofBStartupHandler::CheckLists: You did not specify the number of steps for the grid. Setting the default (256)." << endl;
+      fGridSteps = 256;
+    } else {
+      cout << fGridSteps << endl;
+    }
 
+    // check if any number of steps for the theory function is specified
+    cout << endl << "TFitPofBStartupHandler::CheckLists: check symmetry of the Vortex lattice ..." << endl;
+    if (!fVortexSymmetry) {
+      cout << "TFitPofBStartupHandler::CheckLists: You did not specify the symmetry of the vortex lattice. Setting the default (triangular)." << endl;
+      fVortexSymmetry = 1;
+    } else {
+      cout << (fVortexSymmetry == 2 ? "square" : "triangular") << endl;
+    }
+  }
 }
 
 // end ---------------------------------------------------------------------

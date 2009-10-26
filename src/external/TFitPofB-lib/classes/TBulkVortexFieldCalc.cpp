@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2009 by Bastian M. Wojek                                *
+ *   Copyright (C) 2009 by Bastian M. Wojek,  Alexander Maisuradze         *
  *                                                                         *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -41,7 +41,7 @@ using namespace std;
 #define TWOPI 6.28318530717958647692
 
 const double fluxQuantum(2.067833667e7); // 10e14 times CGS units %% in CGS units should be 10^-7
-                                         // in this case this is Gauss per square nm
+                                         // in this case this is Gauss times square nm
 const double sqrt3(sqrt(3.0));
 
 double getXi(const double hc2) { // get xi given Hc2 in Gauss
@@ -82,11 +82,13 @@ TBulkVortexFieldCalc::~TBulkVortexFieldCalc() {
 
 TBulkTriVortexLondonFieldCalc::TBulkTriVortexLondonFieldCalc(const string& wisdom, const unsigned int steps) {
   fWisdom = wisdom;
-  fSteps = steps;
+  if (steps % 2) {
+    fSteps = steps + 1;
+  } else {
+    fSteps = steps;
+  }
   fParam.resize(3);
   fGridExists = false;
-  if (fSteps%2)
-    fSteps++;
 
   int init_threads(fftw_init_threads());
   if (init_threads)
@@ -195,22 +197,21 @@ TBulkTriVortexLondonFieldCalc::TBulkTriVortexLondonFieldCalc(const string& wisdo
 
 void TBulkTriVortexLondonFieldCalc::CalculateGrid() const {
   // SetParameters - method has to be called from the user before the calculation!!
-  double field(abs(fParam[0])), lambda(abs(fParam[1])), xi(abs(fParam[2]));
+  double field(fabs(fParam[0])), lambda(fabs(fParam[1])), xi(fabs(fParam[2]));
   double Hc2(getHc2(xi));
 
-  double latConstTr(sqrt(fluxQuantum/field*sqrt(4.0/3.0)));
+  double latConstTr(2.0*sqrt(fluxQuantum/(field*sqrt3)));
   double xisq_2_scaled(2.0/3.0*pow(xi*PI/latConstTr,2.0)), lambdasq_scaled(4.0/3.0*pow(lambda*PI/latConstTr,2.0));
 
-  int NFFT(fSteps);
-  int NFFT_2(fSteps/2);
-  int NFFTsq(fSteps*fSteps);
+  const int NFFT(fSteps);
+  const int NFFT_2(fSteps/2);
+  const int NFFTsq(fSteps*fSteps);
 
    // fill the field Fourier components in the matrix
 
-  int m;
-
   // ... but first check that the field is not larger than Hc2 and that we are dealing with a type II SC
   if ((field >= Hc2) || (lambda < xi/sqrt(2.0))) {
+  int m;
 #pragma omp parallel for default(shared) private(m) schedule(dynamic)
     for (m = 0; m < NFFTsq; m++) {
       fFFTout[m] = field;
