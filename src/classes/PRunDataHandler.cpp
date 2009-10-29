@@ -164,6 +164,8 @@ Bool_t PRunDataHandler::ReadFile()
         success = ReadMudFile();
       else if (!runList->at(i).fFileFormat[j].CompareTo("wkm"))
         success = ReadWkmFile();
+      else if (!runList->at(i).fFileFormat[j].CompareTo("mdu-ascii"))
+        success = ReadMduAsciiFile();        
       else if (!runList->at(i).fFileFormat[j].CompareTo("ascii"))
         success = ReadAsciiFile();
       else if (!runList->at(i).fFileFormat[j].CompareTo("db"))
@@ -238,6 +240,8 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const UInt_t 
     else
       ext = runInfo.fBeamline[idx];
   }
+  else if (!runInfo.fFileFormat[idx].CompareTo("mdu-ascii"))
+    ext = TString("mdua");
   else if (!runInfo.fFileFormat[idx].CompareTo("ascii"))
     ext = TString("dat");
   else if (!runInfo.fFileFormat[idx].CompareTo("db"))
@@ -251,14 +255,15 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const UInt_t 
     str.ToUpper();
     cout << endl << "File Format '" << str.Data() << "' unsupported.";
     cout << endl << "  support file formats are:";
-    cout << endl << "  ROOT-NPP -> root not post pileup corrected for lem";
-    cout << endl << "  ROOT-PPC -> root post pileup corrected for lem";
-    cout << endl << "  NEXUS    -> nexus file format";
-    cout << endl << "  PSI-BIN  -> psi bin file format";
-    cout << endl << "  MUD      -> triumf mud file format";
-    cout << endl << "  WKM      -> wkm ascii file format";
-    cout << endl << "  ASCII    -> column like file format";
-    cout << endl << "  DB       -> triumf db file \"format\"";
+    cout << endl << "  ROOT-NPP  -> root not post pileup corrected for lem";
+    cout << endl << "  ROOT-PPC  -> root post pileup corrected for lem";
+    cout << endl << "  NEXUS     -> nexus file format";
+    cout << endl << "  PSI-BIN   -> psi bin file format";
+    cout << endl << "  MUD       -> triumf mud file format";
+    cout << endl << "  WKM       -> wkm ascii file format";
+    cout << endl << "  MDU-ASCII -> psi mdu ascii file format";
+    cout << endl << "  ASCII     -> column like file format";
+    cout << endl << "  DB        -> triumf db file \"format\"";
     cout << endl;
     return success;
   }
@@ -1211,6 +1216,291 @@ cout << endl;
   return true;
 }
 
+//--------------------------------------------------------------------------
+// ReadMduAsciiFile
+//--------------------------------------------------------------------------
+/**
+ * <p>Reads the mdu ascii files (PSI). Needed to work around PSI-BIN limitations.
+ *
+ * <p>Lines starting with '#' or '%' are considered as comment lines. The file has 
+ * the following structure:
+ * \verbatim
+ * HEADER
+ * TITLE: title-string
+ * SETUP: setup-string
+ * FIELD: val-string (G) or (T) (e.g. 123456 (G))
+ * TEMP: val-string (K)
+ * GROUPS: # of histograms written
+ * CHANNELS: # of bins per histogram written
+ * RESOLUTION: timeresolution (fs) or (ps) or (ns) or (us)
+ * \endverbatim
+ * followed by the data, which are written in column format, starting with the DATA
+ * tag, i.e.
+ * \verbatim
+ * DATA
+ * 
+ * \endverbatim
+ *
+ */
+Bool_t PRunDataHandler::ReadMduAsciiFile()
+{
+  Bool_t success = true;
+  
+  // open file
+  ifstream f;
+
+  // open data-file
+  f.open(fRunPathName.Data(), ifstream::in);
+  if (!f.is_open()) {
+    cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** Couldn't open data file (" << fRunPathName.Data() << ") for reading, sorry ...";
+    cerr << endl;
+    return false;
+  }
+
+  PRawRunData runData;
+  
+  // keep run name
+  runData.SetRunName(fRunName);
+  
+  Int_t     lineNo = 0;
+  Char_t    instr[512];
+  TString line, workStr;
+  Bool_t    headerTag = false;
+  Bool_t    dataTag = false;
+  Int_t     dataLineCounter = 0;
+  TObjString *ostr;
+  TObjArray *tokens = 0;
+  TString str;
+  Int_t groups = 0;
+  Int_t channels = 0;
+  Double_t dval = 0.0, unitScaling = 0.0;
+  vector<PDoubleVector> data;
+  
+  while (!f.eof()) {
+    f.getline(instr, sizeof(instr));
+    line = TString(instr);
+    lineNo++;
+
+    // ignore comment lines
+    if (line.BeginsWith("#") || line.BeginsWith("%"))
+      continue;
+
+    // ignore empty lines
+    if (line.IsWhitespace())
+      continue;
+        
+    // check if header tag
+    workStr = line;
+    workStr.Remove(TString::kLeading, ' '); // remove spaces from the begining
+    if (workStr.BeginsWith("header", TString::kIgnoreCase)) {
+      headerTag = true;
+      dataTag = false;
+      continue;
+    }
+
+    // check if data tag
+    workStr = line;
+    workStr.Remove(TString::kLeading, ' '); // remove spaces from the beining
+    if (workStr.BeginsWith("data", TString::kIgnoreCase)) {
+      headerTag = false;
+      dataTag = true;
+      continue;
+    }
+    
+    if (headerTag) {
+      workStr = line;
+      workStr.Remove(TString::kLeading, ' '); // remove spaces from the beining
+      if (workStr.BeginsWith("title:", TString::kIgnoreCase)) {
+        runData.SetRunTitle(TString(workStr.Data()+workStr.First(":")+2));
+      } else if (workStr.BeginsWith("field:", TString::kIgnoreCase)) {
+        tokens = workStr.Tokenize(":("); // field: val (units)
+        // check if expected number of tokens present
+        if (tokens->GetEntries() != 3) {
+          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", invalid field entry in header.";
+          cerr << endl << line.Data();
+          cerr << endl;
+          success = false;
+          break;
+        }
+        // check if field value is a number
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        if (ostr->GetString().IsFloat()) {
+          dval = ostr->GetString().Atof();
+        } else {
+          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", field value is not float/doulbe.";
+          cerr << endl << line.Data();
+          cerr << endl;
+          success = false;
+          break;
+        }
+        // check units, accept (G), (T)
+        ostr = dynamic_cast<TObjString*>(tokens->At(2));
+        if (ostr->GetString().Contains("G"))
+          unitScaling = 1.0;
+        else if (ostr->GetString().Contains("T"))
+          unitScaling = 1.0e4;
+        else {
+          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", unkown field units.";
+          cerr << endl << line.Data();
+          cerr << endl;
+          success = false;
+          break;
+        }
+        runData.SetField(dval*unitScaling);  
+        
+        // clean up tokens
+        if (tokens) {
+          delete tokens;
+          tokens = 0;
+        }
+      } else if (workStr.BeginsWith("temp:", TString::kIgnoreCase)) {
+        tokens = workStr.Tokenize(":("); // temp: val (units)
+        // check if expected number of tokens present
+        if (tokens->GetEntries() != 3) {
+          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", invalid temperatue entry in header.";
+          cerr << endl << line.Data();
+          cerr << endl;
+          success = false;
+          break;
+        }
+        // check if field value is a number
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        if (ostr->GetString().IsFloat()) {
+          dval = ostr->GetString().Atof();
+        } else {
+          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", temperature value is not float/doulbe.";
+          cerr << endl << line.Data();
+          cerr << endl;
+          success = false;
+          break;
+        }
+        runData.SetTemperature(0, dval, 0.0);  
+        
+        // clean up tokens
+        if (tokens) {
+          delete tokens;
+          tokens = 0;
+        }
+      } else if (workStr.BeginsWith("setup:", TString::kIgnoreCase)) {
+        runData.SetSetup(TString(workStr.Data()+workStr.First(":")+2));
+      } else if (workStr.BeginsWith("groups:", TString::kIgnoreCase)) {
+        workStr = TString(workStr.Data()+workStr.First(":")+2);
+        groups = workStr.Atoi();      
+        if (groups == 0) {
+          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", groups is not a number or 0.";
+          cerr << endl;
+          success = false;
+          break;
+        }
+        data.resize(groups);
+      } else if (workStr.BeginsWith("channels:", TString::kIgnoreCase)) {
+        workStr = TString(workStr.Data()+workStr.First(":")+2);
+        channels = workStr.Atoi();
+        if (channels == 0) {
+          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", channels is not a number or 0.";
+          cerr << endl;
+          success = false;
+          break;
+        }
+      } else if (workStr.BeginsWith("resolution:", TString::kIgnoreCase)) {
+        tokens = workStr.Tokenize(":("); // resolution: val (units)
+        // check if expected number of tokens present
+        if (tokens->GetEntries() != 3) {
+          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", invalid time resolution entry in header.";
+          cerr << endl << line.Data();
+          cerr << endl;
+          success = false;
+          break;
+        }
+        // check if timeresolution value is a number
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        if (ostr->GetString().IsFloat()) {
+          dval = ostr->GetString().Atof();
+        } else {
+          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", time resolution value is not float/doulbe.";
+          cerr << endl << line.Data();
+          cerr << endl;
+          success = false;
+          break;
+        }
+        // check units, accept (fs), (ps), (ns), (us)
+        ostr = dynamic_cast<TObjString*>(tokens->At(2));
+        if (ostr->GetString().Contains("fs"))
+          unitScaling = 1.0e-6;
+        else if (ostr->GetString().Contains("ps"))
+          unitScaling = 1.0e-3;
+        else if (ostr->GetString().Contains("ns"))
+          unitScaling = 1.0;
+        else if (ostr->GetString().Contains("us"))
+          unitScaling = 1.0e3;
+        else {
+          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", unkown time resolution units.";
+          cerr << endl << line.Data();
+          cerr << endl;
+          success = false;
+          break;
+        }
+        runData.SetTimeResolution(dval*unitScaling);  
+        
+        // clean up tokens
+        if (tokens) {
+          delete tokens;
+          tokens = 0;
+        }
+      } else { // error
+        cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", illegal header line.";
+        cerr << endl;
+        success = false;
+        break;
+      }
+    } else if (dataTag) {
+      dataLineCounter++;
+      tokens = line.Tokenize(" ,\t");
+      // check if the number of data line entries is correct
+      if (tokens->GetEntries() != groups+1) {
+        cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** found data line with a wrong data format, cannot be handled (line no " << lineNo << ")";
+        cerr << endl << "line:";
+        cerr << endl << line.Data();
+        cerr << endl;
+        success = false;
+        break;
+      }
+      
+      for (Int_t i=1; i<tokens->GetEntries(); i++) {
+        ostr = dynamic_cast<TObjString*>(tokens->At(i));
+        data[i-1].push_back(ostr->GetString().Atof());
+      }
+      
+      // clean up tokens
+      if (tokens) {
+        delete tokens;
+        tokens = 0;
+      }
+    }
+  }
+  
+  f.close();
+
+  // keep data
+  for (UInt_t i=0; i<data.size(); i++) {
+    runData.AppendDataBin(data[i]);
+  }
+  
+  // clean up
+  for (UInt_t i=0; i<data.size(); i++) 
+    data[i].clear();
+  data.clear();  
+  
+  if (dataLineCounter != channels) {
+    cerr << endl << "PRunDataHandler::ReadMduAsciiFile **WARNING** found " << dataLineCounter << " data bins,";
+    cerr << endl << "expected " << channels << " according to the header." << endl;
+  }
+
+  fData.push_back(runData);
+  
+  return success;
+}
+ 
 //--------------------------------------------------------------------------
 // ReadAsciiFile
 //--------------------------------------------------------------------------

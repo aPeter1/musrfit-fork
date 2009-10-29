@@ -67,6 +67,7 @@ class PRunDataHandler
     virtual Bool_t ReadWkmFile();
     virtual Bool_t ReadPsiBinFile();
     virtual Bool_t ReadMudFile();
+    virtual Bool_t ReadMduAsciiFile();
     virtual Bool_t ReadAsciiFile();
     virtual Bool_t ReadDBFile();
 
