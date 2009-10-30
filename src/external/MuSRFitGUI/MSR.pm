@@ -286,7 +286,6 @@ sub CreateMSR {
 
 	
 	if ($T0_Line ne "t0") {
-		print "I am here\n";
 	    $Data_Line= $Data_Line."\n".$T0_Line;
 	}
 
@@ -507,6 +506,8 @@ sub CreateMSRSingleHist {
     foreach my $RUN (@RUNS) {
 #######################################################################
 # For a single histogram fit we basically need to repeat this for each hist
+# However, "physical" parameters such as Asymmetry, relaxation etc. should
+# be the same for all histograms
 	foreach my $Hist (@Hists) {
 
 	    # Prepare the Parameters and initial values block
@@ -1103,7 +1104,7 @@ sub PrepParamTable {
     "Del_min",       "0",     "Del_max",       "0",
     "Sgm",           "0.1",   "dSgm",          "0.01",
     "Sgm_min",       "0",     "Sgm_max",       "0",
-    "Aa",            "0.1",   "dAa",           "0.01",
+    "Aa",            "60.",   "dAa",           "0.01",
     "Aa_min",        "0",     "Aa_max",        "0",
     "q",             "0.1",   "dq",            "0.01",
     "q_min",         "0",     "q_max",         "0",
@@ -1466,7 +1467,6 @@ sub MSR2Dat {
     foreach (sort { $RUN{$a} <=> $RUN{$b}} keys %RUN ) {
 	@RunParams=();
 	$NP=0;
-#	print $_."=".$MAP{$_}."\n";
 	@tmp=split(/\s+/,$MAP{$_});
 	# Remove first element (map)
 	shift(@tmp);

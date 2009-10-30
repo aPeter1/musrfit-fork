@@ -337,24 +337,6 @@ void MuSRFitform::CreateAllInput()
     $All{"Paramcomp_ref"}=$Paramcomp_ref;
     my @Paramcomp = @$Paramcomp_ref;
     
-# Read initial values of paramets from tabel
-    my $erradd = "d";
-    my $minadd = "_min";
-    my $maxadd = "_max";
-    my $NRows = InitParamTable->numRows();
-    my $Header=InitParamTable->verticalHeader();
-    if ($NRows > 0) {
-	for (my $i=0;$i<$NRows;$i++) {
-# Take label of row, i.e. name of parameter
-	    my $Param=$Header->label($i);
-# Then take the value, error, max and min (as numbers)
-	    $All{"$Param"}=1.0*InitParamTable->text($i,0);
-	    $All{"$erradd$Param"}=1.0*InitParamTable->text($i,1);
-	    $All{"$Param$minadd"}=1.0*InitParamTable->text($i,2);
-	    $All{"$Param$maxadd"}=1.0*InitParamTable->text($i,3);
-	}
-    }
-    
     
 # Shared settings are detected here
     my $Shared = 0; 
@@ -415,6 +397,30 @@ void MuSRFitform::CreateAllInput()
     }
     
     
+# This has to be at the end of CreateAll    
+    my %PTable=MSR::PrepParamTable(\%All);
+    
+# Setup the table with the right size    
+    my $NParam=scalar keys( %PTable );
+    
+# Read initial values of paramets from tabel
+    my $erradd = "d";
+    my $minadd = "_min";
+    my $maxadd = "_max";
+    my $Header=InitParamTable->verticalHeader();
+# TODO: Should not go over all rows, only on parameters.
+    if ($NParam > 0) {
+	for (my $i=0;$i<$NParam;$i++) {
+# Take label of row, i.e. name of parameter
+	    my $Param=$Header->label($i);
+# Then take the value, error, max and min (as numbers)
+	    $All{"$Param"}=1.0*InitParamTable->text($i,0);
+	    $All{"$erradd$Param"}=1.0*InitParamTable->text($i,1);
+	    $All{"$Param$minadd"}=1.0*InitParamTable->text($i,2);
+	    $All{"$Param$maxadd"}=1.0*InitParamTable->text($i,3);
+	}
+    }
+
     
 # Return Hash with all important values
     return %All;  
@@ -616,6 +622,7 @@ void MuSRFitform::InitializeTab()
 	for (my $i=0;$i<$NRows;$i++) {
 # TODO: Better remove the row rather than hide it.
 	    InitParamTable->hideRow($i);
+#	    InitParamTable->removeRow($i);
 	}
     }
     
