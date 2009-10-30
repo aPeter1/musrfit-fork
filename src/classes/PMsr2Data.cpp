@@ -184,8 +184,8 @@ int PMsr2Data::SetRunNumbers(const string &runListFile)
 
   ifstream in(runListFile.c_str());
   if (!in) {
-    cout << endl;
-    cout << ">> msr2data: **ERROR** The runlist file " << runListFile << " cannot be opened! Please check!" << endl;
+    cerr << endl << ">> msr2data: **ERROR** The runlist file " << runListFile << " cannot be opened! Please check!";
+    cerr << endl;
     return -1;
   }
 
@@ -211,8 +211,8 @@ int PMsr2Data::SetRunNumbers(const string &runListFile)
       strLine.str(splitVec[0]);
       strLine >> indvar; // "RUN"
       if (indvar.compare("RUN")) {
-        cout << endl;
-        cout << ">> msr2data: **ERROR** The format of the runlist file " << runListFile << " is not correct! Please check!" << endl;
+        cerr << endl << ">> msr2data: **ERROR** The format of the runlist file " << runListFile << " is not correct! Please check!";
+        cerr << endl;
       }
       while (strLine >> indvar)
         fIndVar.push_back(indvar);
@@ -251,7 +251,7 @@ int PMsr2Data::ParseXmlStartupFile()
   status = fSaxParser->ParseFile(startup_path_name.c_str());
   // check for parse errors
   if (status) { // error
-    cout << endl << ">> msr2data: **WARNING** reading/parsing musrfit_startup.xml." << endl;
+    cerr << endl << ">> msr2data: **WARNING** reading/parsing musrfit_startup.xml." << endl;
     // clean up
     if (fSaxParser) {
       delete fSaxParser;
@@ -277,13 +277,13 @@ int PMsr2Data::ReadMsrFile(const string &infile)
   if (status != PMUSR_SUCCESS) {
     switch (status) {
       case PMUSR_MSR_FILE_NOT_FOUND:
-        cout << endl << ">> msr2data: **ERROR** Could not find " << infile << endl;
+        cerr << endl << ">> msr2data: **ERROR** Could not find " << infile << endl;
         break;
       case PMUSR_MSR_SYNTAX_ERROR:
-        cout << endl << ">> msr2data: **SYNTAX ERROR** in file " << infile << ", full stop here." << endl;
+        cerr << endl << ">> msr2data: **SYNTAX ERROR** in file " << infile << ", full stop here." << endl;
         break;
       default:
-        cout << endl << ">> msr2data: **UNKOWN ERROR** when trying to read the msr-file" << endl;
+        cerr << endl << ">> msr2data: **UNKOWN ERROR** when trying to read the msr-file" << endl;
         break;
     }
   }
@@ -303,7 +303,7 @@ bool PMsr2Data::ReadRunDataFile()
 
   bool success = fDataHandler->IsAllDataAvailable();
   if (!success) {
-    cout << endl << ">> msr2data: **WARNING** Could not read all data files, will continue without the data file information..." << endl;
+    cerr << endl << ">> msr2data: **WARNING** Could not read all data files, will continue without the data file information..." << endl;
     delete fDataHandler;
     fDataHandler = 0;
   }
@@ -328,16 +328,16 @@ bool PMsr2Data::PrepareNewInputFile(unsigned int tempRun) const
   strInfile << tempRun << fFileExtension << ".msr";
   ifstream in(strInfile.str().c_str());
   if (!in) {
-    cout << endl;
-    cout << ">> msr2data: **ERROR** The template msr-file " << strInfile.str() << " cannot be opened! Please check!" << endl;
+    cerr << endl << ">> msr2data: **ERROR** The template msr-file " << strInfile.str() << " cannot be opened! Please check!";
+    cerr << endl;
     return false;
   }
   ostringstream strOutfile;
   strOutfile << *fRunVectorIter << fFileExtension << ".msr";
   ofstream out(strOutfile.str().c_str());
   if (!out) {
-    cout << endl;
-    cout << ">> msr2data: **ERROR** The new msr file " << strOutfile.str() << " cannot be opened! Please check!" << endl;
+    cerr << endl << ">> msr2data: **ERROR** The new msr file " << strOutfile.str() << " cannot be opened! Please check!";
+    cerr << endl;
     return false;
   }
 
@@ -378,9 +378,9 @@ bool PMsr2Data::PrepareNewInputFile(unsigned int tempRun) const
        if ( loc != string::npos ) {
          line.replace(loc, N, newRunNumber.str());
        } else {
-         cout << endl;
-         cout << ">> msr2data: **WARNING** The template run file number does not match the \"file index\"" << endl;
-         cout << ">> msr2data: **WARNING** Unexpected things will happen... (for sure)" << endl;
+         cerr << endl << ">> msr2data: **WARNING** The template run file number does not match the \"file index\"";
+         cerr << endl << ">> msr2data: **WARNING** Unexpected things will happen... (for sure)";
+         cerr << endl;
        }
     }
     out << line << endl;
@@ -494,9 +494,9 @@ void PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader) con
         strLine.str(splitVec[0]);
         strLine >> runNo;
         if (runNo != *fRunVectorIter) {
-          cout << endl;
-          cout << ">> msr2data: **ERROR** The run number in the runlist file does not match the one which should be processed..." << endl;
-          cout << ">> msr2data: **ERROR** Something is very strange... Please report this bug!" << endl;
+          cerr << endl << ">> msr2data: **ERROR** The run number in the runlist file does not match the one which should be processed...";
+          cerr << endl << ">> msr2data: **ERROR** Something is very strange... Please report this bug!";
+          cerr << endl;
           fRunVectorIter = fRunVector.end();
           return;
         }
@@ -504,9 +504,9 @@ void PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader) con
           indVarValues.push_back(val);
         }
         if (indVarValues.size() != fIndVar.size()) {
-          cout << endl;
-          cout << ">> msr2data: **ERROR** The number of data entries in the runlist file for the run number " << runNo << endl;
-          cout << ">> msr2data: **ERROR** does not match the number of labels given in the RUN-line! Please check the file!" << endl;
+          cerr << endl << ">> msr2data: **ERROR** The number of data entries in the runlist file for the run number " << runNo;
+          cerr << endl << ">> msr2data: **ERROR** does not match the number of labels given in the RUN-line! Please check the file!";
+          cerr << endl;
           fRunVectorIter = fRunVector.end();
           return;
         }
@@ -518,9 +518,9 @@ void PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader) con
 // The RUNLIST file stream and the run vector iterator might get out of synchronization, if the following check is placed before the above block...
   PMsrStatisticStructure *msrStatistic(fMsrHandler->GetMsrStatistic());
   if (!msrStatistic->fValid) {
-    cout << endl;
-    cout << ">> msr2data: **WARNING** The fit of run " << *fRunVectorIter << " has not converged!" << endl;
-    cout << ">> msr2data: **WARNING** Its parameter data have not been appended to the output file " << outfile << endl;
+    cerr << endl << ">> msr2data: **WARNING** The fit of run " << *fRunVectorIter << " has not converged!";
+    cerr << endl << ">> msr2data: **WARNING** Its parameter data have not been appended to the output file " << outfile;
+    cerr << endl;
     fRunVectorIter++;
 
     delete fMsrHandler;
@@ -545,8 +545,8 @@ void PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader) con
 
   ofstream outFile(outfile.c_str(), ios::app);
   if (!outFile) {
-    cout << endl;
-    cout << ">> msr2data: The output file " << outfile << " cannot be opened! Please check!" << endl;
+    cerr << endl << ">> msr2data: **ERROR** The output file " << outfile << " cannot be opened! Please check!";
+    cerr << endl;
     fRunVectorIter = fRunVector.end();
     return;
   }

@@ -52,7 +52,7 @@ using namespace std;
  *
  * \param fileName
  */
-PMsrHandler::PMsrHandler(const char *fileName) : fFileName(fileName)
+PMsrHandler::PMsrHandler(const Char_t *fileName) : fFileName(fileName)
 {
   // init variables
   fMsrBlockCounter = 0;
@@ -90,7 +90,7 @@ PMsrHandler::~PMsrHandler()
   fParam.clear();
   fTheory.clear();
   fFunctions.clear();
-  for (unsigned int i=0; i<fRuns.size(); i++) {
+  for (UInt_t i=0; i<fRuns.size(); i++) {
     fRuns[i].fRunName.clear();
     fRuns[i].fBeamline.clear();
     fRuns[i].fInstitute.clear();
@@ -124,13 +124,13 @@ PMsrHandler::~PMsrHandler()
  * - line number if an error in the MSR file was encountered which cannot be handled.
  *
  */
-int PMsrHandler::ReadMsrFile()
+Int_t PMsrHandler::ReadMsrFile()
 {
   ifstream f;
   string str;
   TString line;
-  int line_no = 0;
-  int result = PMUSR_SUCCESS;
+  Int_t line_no = 0;
+  Int_t result = PMUSR_SUCCESS;
 
   PMsrLineStructure current;
 
@@ -264,10 +264,11 @@ int PMsrHandler::ReadMsrFile()
 
   // check that parameter names are unique
   if (result == PMUSR_SUCCESS) {
-    unsigned int parX, parY;
+    UInt_t parX, parY;
     if (!CheckUniquenessOfParamNames(parX, parY)) {
-      cout << endl << ">> PMsrHandler::ReadMsrFile: **SEVERE ERROR** parameter name " << fParam[parX].fName.Data() << " is identical for parameter no " << fParam[parX].fNo << " and " << fParam[parY].fNo << "!";
-      cout << endl << "Needs to be fixed first!";
+      cerr << endl << ">> PMsrHandler::ReadMsrFile: **SEVERE ERROR** parameter name " << fParam[parX].fName.Data() << " is identical for parameter no " << fParam[parX].fNo << " and " << fParam[parY].fNo << "!";
+      cerr << endl << "Needs to be fixed first!";
+      cerr << endl;
       result = PMUSR_MSR_SYNTAX_ERROR;
     }
   }
@@ -317,20 +318,20 @@ cout << endl;
 /**
  * <p>
  */
-int PMsrHandler::WriteMsrLogFile(const bool messages)
+Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
 {
-  const unsigned int prec = 6; // output precision for float/doubles
+  const UInt_t prec = 6; // output precision for float/doubles
 
-  int tag, lineNo = 0, number;
-  int runNo = -1, addRunNo = 0;
-  int plotNo = -1;
+  Int_t tag, lineNo = 0, number;
+  Int_t runNo = -1, addRunNo = 0;
+  Int_t plotNo = -1;
   string line;
   TString str, sstr;
   TObjArray *tokens = 0;
   TObjString *ostr = 0;
-  bool found = false;
-  bool statisticBlockFound = false;
-  bool partialStatisticBlockFound = true;
+  Bool_t found = false;
+  Bool_t statisticBlockFound = false;
+  Bool_t partialStatisticBlockFound = true;
 
   // construct log file name
   // first find the last '.' in the filename
@@ -418,7 +419,7 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
             number = sstr.Atoi();
             number--;
             // make sure number makes sense
-            assert ((number >= 0) && (number < (int)fParam.size()));
+            assert ((number >= 0) && (number < (Int_t)fParam.size()));
             // parameter no
             fout.width(9);
             fout << right << fParam[number].fNo;
@@ -474,7 +475,7 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
         break;
       case MSR_TAG_THEORY:
         found = false;
-        for (unsigned int i=0; i<fTheory.size(); i++) {
+        for (UInt_t i=0; i<fTheory.size(); i++) {
           if (fTheory[i].fLineNo == lineNo) {
             fout << fTheory[i].fLine.Data() << endl;
             found = true;
@@ -595,13 +596,13 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
           }
         } else if (sstr.BeginsWith("map")) {
           fout << "map         ";
-          for (unsigned int j=0; j<fRuns[runNo].fMap.size(); j++) {
+          for (UInt_t j=0; j<fRuns[runNo].fMap.size(); j++) {
             fout.width(5);
             fout << right << fRuns[runNo].fMap[j];
           }
           // if there are less maps then 10 fill with zeros
           if (fRuns[runNo].fMap.size() < 10) {
-            for (unsigned int j=fRuns[runNo].fMap.size(); j<10; j++)
+            for (UInt_t j=fRuns[runNo].fMap.size(); j<10; j++)
               fout << "    0";
           }
           fout << endl;
@@ -624,7 +625,7 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
         } else if (sstr.BeginsWith("backgr.fix")) {
           fout.width(15);
           fout << left << "backgr.fix";
-          for (unsigned int j=0; j<fRuns[runNo].fBkgFix.size(); j++) {
+          for (UInt_t j=0; j<fRuns[runNo].fBkgFix.size(); j++) {
             fout.precision(prec);
             fout.width(12);
             fout << left << fRuns[runNo].fBkgFix[j];
@@ -633,7 +634,7 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
         } else if (sstr.BeginsWith("background")) {
           fout.width(16);
           fout << left << "background";
-          for (unsigned int j=0; j<fRuns[runNo].fBkgRange.size(); j++) {
+          for (UInt_t j=0; j<fRuns[runNo].fBkgRange.size(); j++) {
             fout.width(8);
             fout << left << fRuns[runNo].fBkgRange[j];
           }
@@ -641,7 +642,7 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
         } else if (sstr.BeginsWith("data")) {
           fout.width(16);
           fout << left << "data";
-          for (unsigned int j=0; j<fRuns[runNo].fDataRange.size(); j++) {
+          for (UInt_t j=0; j<fRuns[runNo].fDataRange.size(); j++) {
             fout.width(8);
             fout << left << fRuns[runNo].fDataRange[j];
           }
@@ -649,7 +650,7 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
         } else if (sstr.BeginsWith("t0")) {
           fout.width(16);
           fout << left << "t0";
-          for (unsigned int j=0; j<fRuns[runNo].fT0.size(); j++) {
+          for (UInt_t j=0; j<fRuns[runNo].fT0.size(); j++) {
             fout.width(8);
             fout << left << fRuns[runNo].fT0[j];
           }
@@ -658,7 +659,7 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
           if (fRuns[runNo].fXYDataIndex[0] != -1) { // indices
             fout.width(16);
             fout << left << "xy-data";
-            for (unsigned int j=0; j<2; j++) {
+            for (UInt_t j=0; j<2; j++) {
               if (fRuns[runNo].fXYDataIndex[j] == -1)
                 break;
               fout.width(8);
@@ -669,7 +670,7 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
           } else if (!fRuns[runNo].fXYDataLabel[0].IsWhitespace()) { // labels
             fout.width(16);
             fout << endl << left << "xy-data";
-            for (unsigned int j=0; j<2; j++) {
+            for (UInt_t j=0; j<2; j++) {
               if (fRuns[runNo].fXYDataLabel[j].IsWhitespace())
                 break;
               fout.width(8);
@@ -682,7 +683,7 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
         } else if (sstr.BeginsWith("fit")) {
           fout.width(16);
           fout << left << "fit";
-          for (unsigned int j=0; j<2; j++) {
+          for (UInt_t j=0; j<2; j++) {
             if (fRuns[runNo].fFitRange[j] == -1)
               break;
             fout.width(8);
@@ -784,7 +785,7 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
         } else if (sstr.BeginsWith("runs")) {
           fout << "runs     ";
           fout.precision(0);
-          for (unsigned int j=0; j<fPlots[plotNo].fRuns.size(); j++) {
+          for (UInt_t j=0; j<fPlots[plotNo].fRuns.size(); j++) {
             if (fPlots[plotNo].fPlotType != MSR_PLOT_ASYM_RRF) { // all but MSR_PLOT_ASYM_RRF
               fout.width(4);
               fout << fPlots[plotNo].fRuns[j].Re();
@@ -891,7 +892,7 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
   // there was no statistic block present in the msr-input-file
   if (!statisticBlockFound) {
     partialStatisticBlockFound = false;
-    cout << endl << "PMsrHandler::WriteMsrLogFile: **WARNING** no STATISTIC block present, will write a default one" << endl;
+    cerr << endl << "PMsrHandler::WriteMsrLogFile: **WARNING** no STATISTIC block present, will write a default one" << endl;
     fout << "###############################################################" << endl;
     TDatime dt;
     fout << "STATISTIC --- " << dt.AsSQLString() << endl;
@@ -926,8 +927,8 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
 
   // there was only a partial statistic block present in the msr-input-file
   if (partialStatisticBlockFound) {
-    cout << endl << "PMsrHandler::WriteMsrLogFile: **WARNING** garbage STATISTIC block present in the msr-input file.";
-    cout << endl << "** WILL ADD SOME SENSIBLE STUFF, BUT YOU HAVE TO CHECK IT SINCE I AM **NOT** REMOVING THE GARBAGE! **" << endl;
+    cerr << endl << "PMsrHandler::WriteMsrLogFile: **WARNING** garbage STATISTIC block present in the msr-input file.";
+    cerr << endl << "** WILL ADD SOME SENSIBLE STUFF, BUT YOU HAVE TO CHECK IT SINCE I AM **NOT** REMOVING THE GARBAGE! **" << endl;
     TDatime dt;
     fout << "STATISTIC --- " << dt.AsSQLString() << endl;
     if (fStatistic.fValid) { // valid fit result
@@ -975,11 +976,11 @@ int PMsrHandler::WriteMsrLogFile(const bool messages)
  * \param i
  * \param value
  */
-bool PMsrHandler::SetMsrParamValue(unsigned int i, double value)
+Bool_t PMsrHandler::SetMsrParamValue(UInt_t i, Double_t value)
 {
   if (i > fParam.size()) {
-    cout << endl << "PMsrHandler::SetMsrParamValue(): i = " << i << " is larger than the number of parameters " << fParam.size();
-    cout << endl;
+    cerr << endl << "PMsrHandler::SetMsrParamValue(): **ERROR** i = " << i << " is larger than the number of parameters " << fParam.size();
+    cerr << endl;
     return false;
   }
 
@@ -997,11 +998,11 @@ bool PMsrHandler::SetMsrParamValue(unsigned int i, double value)
  * \param i
  * \param value
  */
-bool PMsrHandler::SetMsrParamStep(unsigned int i, double value)
+Bool_t PMsrHandler::SetMsrParamStep(UInt_t i, Double_t value)
 {
   if (i > fParam.size()) {
-    cout << endl << "PMsrHandler::SetMsrParamValue(): i = " << i << " is larger than the number of parameters " << fParam.size();
-    cout << endl;
+    cerr << endl << "PMsrHandler::SetMsrParamValue(): **ERROR** i = " << i << " is larger than the number of parameters " << fParam.size();
+    cerr << endl;
     return false;
   }
 
@@ -1019,11 +1020,11 @@ bool PMsrHandler::SetMsrParamStep(unsigned int i, double value)
  * \param i
  * \param value
  */
-bool PMsrHandler::SetMsrParamPosErrorPresent(unsigned int i, bool value)
+Bool_t PMsrHandler::SetMsrParamPosErrorPresent(UInt_t i, Bool_t value)
 {
   if (i > fParam.size()) {
-    cout << endl << "PMsrHandler::SetMsrParamPosErrorPresent(): i = " << i << " is larger than the number of parameters " << fParam.size();
-    cout << endl;
+    cerr << endl << "PMsrHandler::SetMsrParamPosErrorPresent(): **ERROR** i = " << i << " is larger than the number of parameters " << fParam.size();
+    cerr << endl;
     return false;
   }
 
@@ -1041,11 +1042,11 @@ bool PMsrHandler::SetMsrParamPosErrorPresent(unsigned int i, bool value)
  * \param i
  * \param value
  */
-bool PMsrHandler::SetMsrParamPosError(unsigned int i, double value)
+Bool_t PMsrHandler::SetMsrParamPosError(UInt_t i, Double_t value)
 {
   if (i > fParam.size()) {
-    cout << endl << "PMsrHandler::SetMsrParamPosError(): i = " << i << " is larger than the number of parameters " << fParam.size();
-    cout << endl;
+    cerr << endl << "PMsrHandler::SetMsrParamPosError(): **ERROR** i = " << i << " is larger than the number of parameters " << fParam.size();
+    cerr << endl;
     return false;
   }
 
@@ -1065,17 +1066,17 @@ bool PMsrHandler::SetMsrParamPosError(unsigned int i, double value)
  * \param idx
  * \param bin
  */
-void PMsrHandler::SetMsrT0Entry(unsigned int runNo, unsigned int idx, int bin)
+void PMsrHandler::SetMsrT0Entry(UInt_t runNo, UInt_t idx, Int_t bin)
 {
   if ((runNo < 0) || (runNo > fRuns.size())) { // error
-    cout << endl << "**ERROR** in PMsrHandler::SetMsrT0Entry: runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
-    cout << endl;
+    cerr << endl << "PMsrHandler::SetMsrT0Entry: **ERROR** runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
+    cerr << endl;
     return;
   }
 
   if ((idx < 0) || (idx > fRuns[runNo].fT0.size())) { // error
-    cout << endl << "**ERROR** in PMsrHandler::SetMsrT0Entry: idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].fT0.size();
-    cout << endl;
+    cerr << endl << "PMsrHandler::SetMsrT0Entry: **ERROR** idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].fT0.size();
+    cerr << endl;
     return;
   }
 
@@ -1092,17 +1093,17 @@ void PMsrHandler::SetMsrT0Entry(unsigned int runNo, unsigned int idx, int bin)
  * \param idx
  * \param bin
  */
-void PMsrHandler::SetMsrDataRangeEntry(unsigned int runNo, unsigned int idx, int bin)
+void PMsrHandler::SetMsrDataRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
 {
   if ((runNo < 0) || (runNo > fRuns.size())) { // error
-    cout << endl << "**ERROR** in PMsrHandler::SetMsrDataRangeEntry: runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
-    cout << endl;
+    cerr << endl << "PMsrHandler::SetMsrDataRangeEntry: **ERROR** runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
+    cerr << endl;
     return;
   }
 
   if ((idx < 0) || (idx > fRuns[runNo].fDataRange.size())) { // error
-    cout << endl << "**ERROR** in PMsrHandler::SetMsrDataRangeEntry: idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].fDataRange.size();
-    cout << endl;
+    cerr << endl << "PMsrHandler::SetMsrDataRangeEntry: **ERROR** idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].fDataRange.size();
+    cerr << endl;
     return;
   }
 
@@ -1119,17 +1120,17 @@ void PMsrHandler::SetMsrDataRangeEntry(unsigned int runNo, unsigned int idx, int
  * \param idx
  * \param bin
  */
-void PMsrHandler::SetMsrBkgRangeEntry(unsigned int runNo, unsigned int idx, int bin)
+void PMsrHandler::SetMsrBkgRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
 {
   if ((runNo < 0) || (runNo > fRuns.size())) { // error
-    cout << endl << "**ERROR** in PMsrHandler::SetMsrBkgRangeEntry: runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
-    cout << endl;
+    cerr << endl << "PMsrHandler::SetMsrBkgRangeEntry: **ERROR** runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
+    cerr << endl;
     return;
   }
 
   if ((idx < 0) || (idx > fRuns[runNo].fBkgRange.size())) { // error
-    cout << endl << "**ERROR** in PMsrHandler::SetMsrBkgRangeEntry: idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].fBkgRange.size();
-    cout << endl;
+    cerr << endl << "PMsrHandler::SetMsrBkgRangeEntry: idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].fBkgRange.size();
+    cerr << endl;
     return;
   }
 
@@ -1147,7 +1148,7 @@ void PMsrHandler::SetMsrBkgRangeEntry(unsigned int runNo, unsigned int idx, int 
  *
  * \param paramNo
  */
-int PMsrHandler::ParameterInUse(unsigned int paramNo)
+Int_t PMsrHandler::ParameterInUse(UInt_t paramNo)
 {
   // check that paramNo is within acceptable range
   if ((paramNo < 0) || (paramNo > fParam.size()))
@@ -1176,10 +1177,10 @@ int PMsrHandler::ParameterInUse(unsigned int paramNo)
  *
  * \param lines is a list of lines containing the fitparameter block
  */
-bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
+Bool_t PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
 {
   PMsrParamStructure param;
-  bool    error = false;
+  Bool_t    error = false;
 
   PMsrLines::iterator iter;
 
@@ -1206,8 +1207,8 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
 
     tokens = iter->fLine.Tokenize(" \t");
     if (!tokens) {
-      cout << endl << ">> PMsrHandler::HandleFitParameterEntry: **SEVERE ERROR** Couldn't tokenize Parameters in line " << iter->fLineNo;
-      cout << endl << endl;
+      cerr << endl << ">> PMsrHandler::HandleFitParameterEntry: **SEVERE ERROR** Couldn't tokenize Parameters in line " << iter->fLineNo;
+      cerr << endl << endl;
       return false;
     }
 
@@ -1232,7 +1233,7 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
       ostr = dynamic_cast<TObjString*>(tokens->At(2));
       str = ostr->GetString();
       if (str.IsFloat())
-        param.fValue = (double)str.Atof();
+        param.fValue = (Double_t)str.Atof();
       else
         error = true;
 
@@ -1240,7 +1241,7 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
       ostr = dynamic_cast<TObjString*>(tokens->At(3));
       str = ostr->GetString();
       if (str.IsFloat())
-        param.fStep = (double)str.Atof();
+        param.fStep = (Double_t)str.Atof();
       else
         error = true;
 
@@ -1258,7 +1259,7 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
         str = ostr->GetString();
         if (str.IsFloat()) {
           param.fPosErrorPresent = true;
-          param.fPosError = (double)str.Atof();
+          param.fPosError = (Double_t)str.Atof();
         } else {
           str.ToLower();
           if (!str.CompareTo("none", TString::kIgnoreCase))
@@ -1277,7 +1278,7 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
         str = ostr->GetString();
         if (str.IsFloat()) {
           param.fPosErrorPresent = true;
-          param.fPosError = (double)str.Atof();
+          param.fPosError = (Double_t)str.Atof();
         } else {
           str.ToLower();
           if (!str.CompareTo("none", TString::kIgnoreCase))
@@ -1294,7 +1295,7 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
           param.fLowerBoundaryPresent = false;
         } else { // assuming that the lower boundary is a number
           if (str.IsFloat()) {
-            param.fLowerBoundary = (double)str.Atof();
+            param.fLowerBoundary = (Double_t)str.Atof();
             param.fLowerBoundaryPresent = true;
           } else {
             error = true;
@@ -1309,7 +1310,7 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
           param.fUpperBoundaryPresent = false;
         } else { // assuming a number
           if (str.IsFloat()) {
-            param.fUpperBoundary = (double)str.Atof();
+            param.fUpperBoundary = (Double_t)str.Atof();
             param.fUpperBoundaryPresent = true;
           } else {
             error = true;
@@ -1320,28 +1321,28 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
 
     // check if enough elements found
     if (error) {
-      cout << endl;
-      cout << endl << ">> PMsrHandler::HandleFitParameterEntry: **ERROR** in line " << iter->fLineNo << ":";
-      cout << endl << iter->fLine.Data();
-      cout << endl << "A Fit Parameter line needs to have the following form: ";
-      cout << endl;
-      cout << endl << "No Name Value Step/Error [Lower_Boundary Upper_Boundary]";
-      cout << endl;
-      cout << endl << "or";
-      cout << endl;
-      cout << endl << "No Name Value Step/Neg_Error Pos_Error [Lower_Boundary Upper_Boundary]";
-      cout << endl;
-      cout << endl << "No:             the parameter number (an int)";
-      cout << endl << "Name:           the name of the parameter (less than 256 character)";
-      cout << endl << "Value:          the starting value of the parameter (a double)";
-      cout << endl << "Step/Error,";
-      cout << endl << "Step/Neg_Error: the starting step value in a fit  (a double), or";
-      cout << endl << "                the symmetric error (MIGRAD, SIMPLEX), or";
-      cout << endl << "                the negative error (MINOS)";
-      cout << endl << "Pos_Error:      the positive error (MINOS),  (a double or \"none\")";
-      cout << endl << "Lower_Boundary: the lower boundary allowed for the fit parameter  (a double or \"none\")";
-      cout << endl << "Upper_Boundary: the upper boundary allowed for the fit parameter  (a double or \"none\")";
-      cout << endl;
+      cerr << endl;
+      cerr << endl << ">> PMsrHandler::HandleFitParameterEntry: **ERROR** in line " << iter->fLineNo << ":";
+      cerr << endl << iter->fLine.Data();
+      cerr << endl << "A Fit Parameter line needs to have the following form: ";
+      cerr << endl;
+      cerr << endl << "No Name Value Step/Error [Lower_Boundary Upper_Boundary]";
+      cerr << endl;
+      cerr << endl << "or";
+      cerr << endl;
+      cerr << endl << "No Name Value Step/Neg_Error Pos_Error [Lower_Boundary Upper_Boundary]";
+      cerr << endl;
+      cerr << endl << "No:             the parameter number (an Int_t)";
+      cerr << endl << "Name:           the name of the parameter (less than 256 character)";
+      cerr << endl << "Value:          the starting value of the parameter (a Double_t)";
+      cerr << endl << "Step/Error,";
+      cerr << endl << "Step/Neg_Error: the starting step value in a fit  (a Double_t), or";
+      cerr << endl << "                the symmetric error (MIGRAD, SIMPLEX), or";
+      cerr << endl << "                the negative error (MINOS)";
+      cerr << endl << "Pos_Error:      the positive error (MINOS),  (a Double_t or \"none\")";
+      cerr << endl << "Lower_Boundary: the lower boundary allowed for the fit parameter  (a Double_t or \"none\")";
+      cerr << endl << "Upper_Boundary: the upper boundary allowed for the fit parameter  (a Double_t or \"none\")";
+      cerr << endl;
     } else { // everything is OK, therefore add the parameter to the parameter list
       fParam.push_back(param);
     }
@@ -1366,7 +1367,7 @@ bool PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
  *
  * \param lines is a list of lines containing the fitparameter block
  */
-bool PMsrHandler::HandleTheoryEntry(PMsrLines &lines)
+Bool_t PMsrHandler::HandleTheoryEntry(PMsrLines &lines)
 {
   // store the theory lines
   fTheory = lines;
@@ -1382,7 +1383,7 @@ bool PMsrHandler::HandleTheoryEntry(PMsrLines &lines)
  *
  * \param lines is a list of lines containing the fitparameter block
  */
-bool PMsrHandler::HandleFunctionsEntry(PMsrLines &lines)
+Bool_t PMsrHandler::HandleFunctionsEntry(PMsrLines &lines)
 {
   // store the functions lines
   fFunctions = lines;
@@ -1390,7 +1391,7 @@ bool PMsrHandler::HandleFunctionsEntry(PMsrLines &lines)
   // create function handler
   fFuncHandler = new PFunctionHandler(fFunctions);
   if (fFuncHandler == 0) {
-    cout << endl << ">> PMsrHandler::HandleFunctionsEntry: **ERROR** Couldn't invoke PFunctionHandler." << endl;
+    cerr << endl << ">> PMsrHandler::HandleFunctionsEntry: **ERROR** Couldn't invoke PFunctionHandler." << endl;
     return false;
   }
 
@@ -1401,9 +1402,9 @@ bool PMsrHandler::HandleFunctionsEntry(PMsrLines &lines)
 
   // check if an empty FUNCTIONS block is present
   if ((fFuncHandler->GetNoOfFuncs() == 0) && !lines.empty()) {
-    cout << endl << ">> PMsrHandler::HandleFunctionsEntry: **ERROR** empty FUNCTIONS block are not supported!";
-    cout << endl << ">> If you want to keep it, just comment the whole block ;-)";
-    cout << endl;
+    cerr << endl << ">> PMsrHandler::HandleFunctionsEntry: **ERROR** empty FUNCTIONS block are not supported!";
+    cerr << endl << ">> If you want to keep it, just comment the whole block ;-)";
+    cerr << endl;
     return false;
   }
 
@@ -1418,12 +1419,12 @@ bool PMsrHandler::HandleFunctionsEntry(PMsrLines &lines)
  *
  * \param lines is a list of lines containing the fitparameter block
  */
-bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
+Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
 {
   PMsrLines::iterator iter;
   PMsrRunStructure param;
-  bool first = true; // first run line tag
-  bool error = false;
+  Bool_t first = true; // first run line tag
+  Bool_t error = false;
 
   TString str;
   TObjArray *tokens = 0;
@@ -1440,8 +1441,8 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
     // tokenize line
     tokens = iter->fLine.Tokenize(" \t");
     if (!tokens) {
-      cout << endl << ">> PMsrHandler::HandleRunEntry: **SEVERE ERROR** Couldn't tokenize Parameters in line " << iter->fLineNo;
-      cout << endl << endl;
+      cerr << endl << ">> PMsrHandler::HandleRunEntry: **SEVERE ERROR** Couldn't tokenize Parameters in line " << iter->fLineNo;
+      cerr << endl << endl;
       return false;
     }
 
@@ -1504,7 +1505,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (str.IsDigit()) {
-          int fittype = str.Atoi();
+          Int_t fittype = str.Atoi();
           if ((fittype == MSR_FITTYPE_SINGLE_HISTO) ||
               (fittype == MSR_FITTYPE_ASYM) ||
               (fittype == MSR_FITTYPE_ASYM_RRF) ||
@@ -1557,7 +1558,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
         if (str.IsDigit()) {
           param.fNormParamNo = str.Atoi();
         } else if (str.Contains("fun")) {
-          int no;
+          Int_t no;
           if (FilterNumber(str, "fun", MSR_PARAM_FUN_OFFSET, no))
             param.fNormParamNo = no;
           else
@@ -1617,7 +1618,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
 
     // map ------------------------------------------------------
     if (iter->fLine.BeginsWith("map", TString::kIgnoreCase)) {
-      for (int i=1; i<tokens->GetEntries(); i++) {
+      for (Int_t i=1; i<tokens->GetEntries(); i++) {
         ostr = dynamic_cast<TObjString*>(tokens->At(i));
         str = ostr->GetString();
         if (str.IsDigit())
@@ -1626,9 +1627,9 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
           error = true;
       }
       // check map entries, i.e. if the map values are within parameter bounds
-      for (unsigned int i=0; i<param.fMap.size(); i++) {
-        if ((param.fMap[i] < 0) || (param.fMap[i] > (int) fParam.size())) {
-          cout << endl << ">> PMsrHandler::HandleRunEntry: **SEVERE ERROR** map value " << param.fMap[i] << " in line " << iter->fLineNo << " is out of range!";
+      for (UInt_t i=0; i<param.fMap.size(); i++) {
+        if ((param.fMap[i] < 0) || (param.fMap[i] > (Int_t) fParam.size())) {
+          cerr << endl << ">> PMsrHandler::HandleRunEntry: **SEVERE ERROR** map value " << param.fMap[i] << " in line " << iter->fLineNo << " is out of range!";
           error = true;
           break;
         }
@@ -1668,7 +1669,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
-        for (int i=1; i<tokens->GetEntries(); i++) {
+        for (Int_t i=1; i<tokens->GetEntries(); i++) {
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsFloat())
@@ -1684,7 +1685,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
       if ((tokens->GetEntries() < 3) || (tokens->GetEntries() % 2 != 1)) { // odd number (>=3) of entries needed
         error = true;
       } else {
-        for (int i=1; i<tokens->GetEntries(); i++) {
+        for (Int_t i=1; i<tokens->GetEntries(); i++) {
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsDigit())
@@ -1700,7 +1701,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
       if ((tokens->GetEntries() < 3) || (tokens->GetEntries() % 2 != 1)) { // odd number (>=3) of entries needed
         error = true;
       } else {
-        for (int i=1; i<tokens->GetEntries(); i++) {
+        for (Int_t i=1; i<tokens->GetEntries(); i++) {
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsDigit())
@@ -1716,7 +1717,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
-        for (int i=1; i<tokens->GetEntries(); i++) {
+        for (Int_t i=1; i<tokens->GetEntries(); i++) {
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsDigit())
@@ -1732,7 +1733,7 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
       if (tokens->GetEntries() < 3) {
         error = true;
       } else {
-        for (int i=1; i<3; i++) {
+        for (Int_t i=1; i<3; i++) {
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsFloat())
@@ -1876,19 +1877,19 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
 
   if (error) {
     --iter;
-    cout << endl << ">> PMsrHandler::HandleRunEntry: **ERROR** in line " << iter->fLineNo << ":";
-    cout << endl << iter->fLine.Data();
-    cout << endl << "RUN block syntax is too complex to print it here. Please check the manual.";
+    cerr << endl << ">> PMsrHandler::HandleRunEntry: **ERROR** in line " << iter->fLineNo << ":";
+    cerr << endl << iter->fLine.Data();
+    cerr << endl << "RUN block syntax is too complex to print it here. Please check the manual.";
   } else { // save last run found
     fRuns.push_back(param);
   }
 
   // check if for fittypes: single histo, asymmetry, RRF any background info is given
-  for (unsigned int i=0; i<fRuns.size(); i++) {
+  for (UInt_t i=0; i<fRuns.size(); i++) {
     if ((fRuns[i].fFitType == MSR_FITTYPE_SINGLE_HISTO) ||
         (fRuns[i].fFitType == MSR_FITTYPE_ASYM) ||
         (fRuns[i].fFitType == MSR_FITTYPE_ASYM_RRF)) {
-      bool found;
+      Bool_t found;
       if (fRuns[i].fBkgFitParamNo >= 0) { // check if backgr.fit is given
         found = true;
       } else if (fRuns[i].fBkgFix.size() > 0) { // check if backgr.fix is given
@@ -1899,11 +1900,11 @@ bool PMsrHandler::HandleRunEntry(PMsrLines &lines)
         found = false;
       }
       if (!found) {
-        cout << endl << ">> PMsrHandler::HandleRunEntry: **ERROR** for run " << fRuns[i].fRunName[0].Data() << ",  forward " << fRuns[i].fForwardHistoNo;
-        cout << endl << "   no background information found!";
-        cout << endl << "   Either of the tags 'backgr.fit', 'backgr.fix', 'background'";
-        cout << endl << "   with data is needed.";
-        cout << endl;
+        cerr << endl << ">> PMsrHandler::HandleRunEntry: **ERROR** for run " << fRuns[i].fRunName[0].Data() << ",  forward " << fRuns[i].fForwardHistoNo;
+        cerr << endl << "   no background information found!";
+        cerr << endl << "   Either of the tags 'backgr.fit', 'backgr.fix', 'background'";
+        cerr << endl << "   with data is needed.";
+        cerr << endl;
         return false;
       }
     }
@@ -1941,7 +1942,7 @@ void PMsrHandler::InitRunParameterStructure(PMsrRunStructure &param)
   param.fBkgRange.clear();
   param.fDataRange.clear();
   param.fT0.clear();
-  for (int i=0; i<4; i++)
+  for (Int_t i=0; i<4; i++)
     param.fFitRange[i] = -1;
   param.fPacking = 1;
   param.fRRFFreq       = -1.0;
@@ -1950,9 +1951,9 @@ void PMsrHandler::InitRunParameterStructure(PMsrRunStructure &param)
   param.fBeta2ParamNo  = -1;
   param.fRightHistoNo  = -1;
   param.fLeftHistoNo   = -1;
-  for (int i=0; i<2; i++)
+  for (Int_t i=0; i<2; i++)
     param.fXYDataIndex[i] = -1;
-  for (int i=0; i<2; i++)
+  for (Int_t i=0; i<2; i++)
     param.fXYDataLabel[i] = "";
 }
 
@@ -1970,13 +1971,13 @@ void PMsrHandler::InitRunParameterStructure(PMsrRunStructure &param)
  * \param offset it is used to offset to found number, e.g. strX -> no = X+offset
  * \param no filtered number
  */
-bool PMsrHandler::FilterNumber(TString str, const char *filter, int offset, int &no)
+Bool_t PMsrHandler::FilterNumber(TString str, const Char_t *filter, Int_t offset, Int_t &no)
 {
-  int  found, no_found=-1;
+  Int_t  found, no_found=-1;
 
   // copy str to an ordinary c-like string
-  char *cstr, filterStr[32];
-  cstr = new char[str.Sizeof()];
+  Char_t *cstr, filterStr[32];
+  cstr = new Char_t[str.Sizeof()];
   strncpy(cstr, str.Data(), str.Sizeof());
   sprintf(filterStr, "%s%%d", filter);
 
@@ -2007,13 +2008,13 @@ bool PMsrHandler::FilterNumber(TString str, const char *filter, int offset, int 
  *
  * \param lines is a list of lines containing the fitparameter block
  */
-bool PMsrHandler::HandleCommandsEntry(PMsrLines &lines)
+Bool_t PMsrHandler::HandleCommandsEntry(PMsrLines &lines)
 {
   PMsrLines::iterator iter;
 
   if (lines.empty()) {
-    cout << endl << "**WARNING**: There is no COMMANDS block! Do you really want this?";
-    cout << endl;
+    cerr << endl << "**WARNING**: There is no COMMANDS block! Do you really want this?";
+    cerr << endl;
   }
 
   for (iter = lines.begin(); iter != lines.end(); ++iter) {
@@ -2041,7 +2042,7 @@ void PMsrHandler::InitFourierParameterStructure(PMsrFourierStructure &fourier)
   fourier.fPlotTag = FOURIER_PLOT_NOT_GIVEN;      // initial plot tag, default: NOT GIVEN
   fourier.fPhaseParamNo = 0;                      // initial parameter no = 0 means not a parameter
   fourier.fPhase = -999.0;                        // fourier phase: -999 = NOT GIVEN
-  for (unsigned int i=0; i<2; i++) {
+  for (UInt_t i=0; i<2; i++) {
     fourier.fRangeForPhaseCorrection[i] = -1.0;  // frequency range for phase correction, default: {-1, -1} = NOT GIVEN
     fourier.fPlotRange[i] = -1.0;                // fourier plot range, default: {-1, -1} = NOT GIVEN
   }
@@ -2055,11 +2056,11 @@ void PMsrHandler::InitFourierParameterStructure(PMsrFourierStructure &fourier)
  *
  * \param lines is a list of lines containing the fourier parameter block
  */
-bool PMsrHandler::HandleFourierEntry(PMsrLines &lines)
+Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
 {
 //cout << endl << ">> in PMsrHandler::HandleFourierEntry ...";
 
-  bool error = false;
+  Bool_t error = false;
 
   if (lines.empty()) // no fourier block present
     return true;
@@ -2078,15 +2079,15 @@ bool PMsrHandler::HandleFourierEntry(PMsrLines &lines)
   TObjString *ostr = 0;
   TString str;
 
-  int ival;
+  Int_t ival;
 
   iter = lines.begin();
   while ((iter != lines.end()) && !error) {
     // tokenize line
     tokens = iter->fLine.Tokenize(" \t");
     if (!tokens) {
-      cout << endl << ">> PMsrHandler::HandleRunEntry: **SEVERE ERROR** Couldn't tokenize Parameters in line " << iter->fLineNo;
-      cout << endl << endl;
+      cerr << endl << ">> PMsrHandler::HandleRunEntry: **SEVERE ERROR** Couldn't tokenize Parameters in line " << iter->fLineNo;
+      cerr << endl << endl;
       return false;
     }
 
@@ -2191,10 +2192,10 @@ bool PMsrHandler::HandleFourierEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (str.BeginsWith("par", TString::kIgnoreCase)) { // parameter value
-          int no = 0;
+          Int_t no = 0;
           if (FilterNumber(str, "par", 0, no)) {
             // check that the parameter is in range
-            if ((int)fParam.size() < no) {
+            if ((Int_t)fParam.size() < no) {
               error = true;
               continue;
             }
@@ -2221,7 +2222,7 @@ bool PMsrHandler::HandleFourierEntry(PMsrLines &lines)
         error = true;
         continue;
       } else {
-        for (unsigned int i=0; i<2; i++) {
+        for (UInt_t i=0; i<2; i++) {
           ostr = dynamic_cast<TObjString*>(tokens->At(i+1));
           str = ostr->GetString();
           if (str.IsFloat()) {
@@ -2240,7 +2241,7 @@ bool PMsrHandler::HandleFourierEntry(PMsrLines &lines)
         error = true;
         continue;
       } else {
-        for (unsigned int i=0; i<2; i++) {
+        for (UInt_t i=0; i<2; i++) {
           ostr = dynamic_cast<TObjString*>(tokens->At(i+1));
           str = ostr->GetString();
           if (str.IsFloat()) {
@@ -2264,23 +2265,23 @@ bool PMsrHandler::HandleFourierEntry(PMsrLines &lines)
   }
 
   if (error) {
-    cout << endl << ">> PMsrHandler::HandleFourierEntry: **ERROR** in line " << iter->fLineNo << ":";
-    cout << endl;
-    cout << endl << iter->fLine.Data();
-    cout << endl;
-    cout << endl << "FOURIER block syntax, parameters in [] are optinal:";
-    cout << endl;
-    cout << endl << "FOURIER";
-    cout << endl << "[units Gauss | MHz | Mc/s]";
-    cout << endl << "[fourier_power n # n is a number such that zero padding up to 2^n will be used]";
-    cout << endl << "   n=0 means no zero padding";
-    cout << endl << "   0 <= n <= 20 are allowed values";
-    cout << endl << "[apodization none | weak | medium | strong]";
-    cout << endl << "[plot real | imag | real_and_imag | power | phase]";
-    cout << endl << "[phase value]";
-    cout << endl << "[range_for_phase_correction min max]";
-    cout << endl << "[range min max]";
-    cout << endl;
+    cerr << endl << ">> PMsrHandler::HandleFourierEntry: **ERROR** in line " << iter->fLineNo << ":";
+    cerr << endl;
+    cerr << endl << iter->fLine.Data();
+    cerr << endl;
+    cerr << endl << "FOURIER block syntax, parameters in [] are optinal:";
+    cerr << endl;
+    cerr << endl << "FOURIER";
+    cerr << endl << "[units Gauss | MHz | Mc/s]";
+    cerr << endl << "[fourier_power n # n is a number such that zero padding up to 2^n will be used]";
+    cerr << endl << "   n=0 means no zero padding";
+    cerr << endl << "   0 <= n <= 20 are allowed values";
+    cerr << endl << "[apodization none | weak | medium | strong]";
+    cerr << endl << "[plot real | imag | real_and_imag | power | phase]";
+    cerr << endl << "[phase value]";
+    cerr << endl << "[range_for_phase_correction min max]";
+    cerr << endl << "[range min max]";
+    cerr << endl;
   } else { // save last run found
     fFourier = fourier;
   }
@@ -2296,9 +2297,9 @@ bool PMsrHandler::HandleFourierEntry(PMsrLines &lines)
  *
  * \param lines is a list of lines containing the fitparameter block
  */
-bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
+Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
 {
-  bool error = false;
+  Bool_t error = false;
 
   PMsrPlotStructure param;
 
@@ -2311,8 +2312,8 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
   TString str2;
 
   if (lines.empty()) {
-    cout << endl << "**WARNING**: There is no PLOT block! Do you really want this?";
-    cout << endl;
+    cerr << endl << "**WARNING**: There is no PLOT block! Do you really want this?";
+    cerr << endl;
   }
 
   iter1 = lines.begin();
@@ -2339,8 +2340,8 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
       if (iter1->fLine.Contains("PLOT")) { // handle plot header
         tokens = iter1->fLine.Tokenize(" \t");
         if (!tokens) {
-          cout << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
-          cout << endl << endl;
+          cerr << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
+          cerr << endl << endl;
           return false;
         }
         if (tokens->GetEntries() < 2) { // plot type missing
@@ -2369,14 +2370,14 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           case MSR_PLOT_NON_MUSR:
             tokens = iter1->fLine.Tokenize(" \t");
             if (!tokens) {
-              cout << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
-              cout << endl << endl;
+              cerr << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
+              cerr << endl << endl;
               return false;
             }
             if (tokens->GetEntries() < 2) { // runs missing
               error = true;
             } else {
-              for (int i=1; i<tokens->GetEntries(); i++) {
+              for (Int_t i=1; i<tokens->GetEntries(); i++) {
                 ostr = dynamic_cast<TObjString*>(tokens->At(i));
                 str = ostr->GetString();
                 if (str.IsDigit()) {
@@ -2396,14 +2397,14 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           case MSR_PLOT_ASYM_RRF: // like: runs 1,1 1,2
             tokens = iter1->fLine.Tokenize(" \t");
             if (!tokens) {
-              cout << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
-              cout << endl << endl;
+              cerr << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
+              cerr << endl << endl;
               return false;
             }
             if (tokens->GetEntries() < 2) { // runs missing
               error = true;
             } else {
-              for (int i=1; i<tokens->GetEntries(); i++) {
+              for (Int_t i=1; i<tokens->GetEntries(); i++) {
                 ostr = dynamic_cast<TObjString*>(tokens->At(i)); // something like 1,2
                 str = ostr->GetString();
                 tokens2 = str.Tokenize(",");
@@ -2446,8 +2447,8 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
 
         tokens = iter1->fLine.Tokenize(" \t");
         if (!tokens) {
-          cout << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
-          cout << endl << endl;
+          cerr << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
+          cerr << endl << endl;
           return false;
         }
         if ((tokens->GetEntries() != 3) && (tokens->GetEntries() != 5)) {
@@ -2458,7 +2459,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(1));
           str = ostr->GetString();
           if (str.IsFloat())
-            param.fTmin.push_back((double)str.Atof());
+            param.fTmin.push_back((Double_t)str.Atof());
           else
             error = true;
 
@@ -2466,7 +2467,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(2));
           str = ostr->GetString();
           if (str.IsFloat())
-            param.fTmax.push_back((double)str.Atof());
+            param.fTmax.push_back((Double_t)str.Atof());
           else
             error = true;
 
@@ -2476,7 +2477,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
             ostr = dynamic_cast<TObjString*>(tokens->At(3));
             str = ostr->GetString();
             if (str.IsFloat())
-              param.fYmin.push_back((double)str.Atof());
+              param.fYmin.push_back((Double_t)str.Atof());
             else
               error = true;
 
@@ -2484,7 +2485,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
             ostr = dynamic_cast<TObjString*>(tokens->At(4));
             str = ostr->GetString();
             if (str.IsFloat())
-              param.fYmax.push_back((double)str.Atof());
+              param.fYmax.push_back((Double_t)str.Atof());
             else
               error = true;
           }
@@ -2503,21 +2504,21 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
 
         tokens = iter1->fLine.Tokenize(" \t");
         if (!tokens) {
-          cout << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
-          cout << endl << endl;
+          cerr << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
+          cerr << endl << endl;
           return false;
         }
-        if ((tokens->GetEntries() != (int)(2*param.fRuns.size() + 1)) && (tokens->GetEntries() != (int)(2*param.fRuns.size() + 3))) {
+        if ((tokens->GetEntries() != (Int_t)(2*param.fRuns.size() + 1)) && (tokens->GetEntries() != (Int_t)(2*param.fRuns.size() + 3))) {
           error = true;
         } else {
           // get all the times
-          for (unsigned int i=0; i<param.fRuns.size(); i++) {
+          for (UInt_t i=0; i<param.fRuns.size(); i++) {
 
             // handle t_min
             ostr = dynamic_cast<TObjString*>(tokens->At(2*i+1));
             str = ostr->GetString();
             if (str.IsFloat())
-              param.fTmin.push_back((double)str.Atof());
+              param.fTmin.push_back((Double_t)str.Atof());
             else
               error = true;
 
@@ -2525,19 +2526,19 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
             ostr = dynamic_cast<TObjString*>(tokens->At(2*i+2));
             str = ostr->GetString();
             if (str.IsFloat())
-              param.fTmax.push_back((double)str.Atof());
+              param.fTmax.push_back((Double_t)str.Atof());
             else
               error = true;
           }
 
           // get y-range if present
-          if (tokens->GetEntries() == (int)(2*param.fRuns.size() + 3)) {
+          if (tokens->GetEntries() == (Int_t)(2*param.fRuns.size() + 3)) {
 
             // handle y_min
             ostr = dynamic_cast<TObjString*>(tokens->At(2*param.fRuns.size()+1));
             str = ostr->GetString();
             if (str.IsFloat())
-              param.fYmin.push_back((double)str.Atof());
+              param.fYmin.push_back((Double_t)str.Atof());
             else
               error = true;
 
@@ -2545,7 +2546,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
             ostr = dynamic_cast<TObjString*>(tokens->At(2*param.fRuns.size()+2));
             str = ostr->GetString();
             if (str.IsFloat())
-              param.fYmax.push_back((double)str.Atof());
+              param.fYmax.push_back((Double_t)str.Atof());
             else
               error = true;
           }
@@ -2565,8 +2566,8 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
       } else if (iter1->fLine.Contains("view_packing", TString::kIgnoreCase)) {
         tokens = iter1->fLine.Tokenize(" \t");
         if (!tokens) {
-          cout << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
-          cout << endl << endl;
+          cerr << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
+          cerr << endl << endl;
           return false;
         }
         if (tokens->GetEntries() != 2) {
@@ -2575,7 +2576,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(1));
           str = ostr->GetString();
           if (str.IsDigit()) {
-            int val = str.Atoi();
+            Int_t val = str.Atoi();
             if (val > 0)
               param.fViewPacking = val;
             else
@@ -2599,13 +2600,13 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
     }
 
     // analyze if the plot block is valid
-    double keep;
+    Double_t keep;
     if (!error) {
       if (param.fRuns.empty()) { // there was no run tag
         error = true;
       } else { // everything ok
         if ((param.fTmin.size() > 0) || (param.fTmax.size() > 0)) { // if range is given, check that it is ordered properly
-          for (unsigned int i=0; i<param.fTmin.size(); i++) {
+          for (UInt_t i=0; i<param.fTmin.size(); i++) {
             if (param.fTmin[i] > param.fTmax[i]) {
               keep = param.fTmin[i];
               param.fTmin[i] = param.fTmax[i];
@@ -2615,7 +2616,7 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
         }
 
         if ((param.fYmin.size() > 0) || (param.fYmax.size() > 0)) { // if range is given, check that it is ordered properly
-          for (unsigned int i=0; i<param.fYmin.size(); i++) {
+          for (UInt_t i=0; i<param.fYmin.size(); i++) {
             if (param.fYmin[i] > param.fYmax[i]) {
               keep = param.fYmin[i];
               param.fYmin[i] = param.fYmax[i];
@@ -2629,33 +2630,33 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
 
     if (error) { // print error message
       --iter1;
-      cout << endl << ">> PMsrHandler::HandlePlotEntry: **ERROR** in line " << iter1->fLineNo << ": " << iter1->fLine.Data();
-      cout << endl << "A PLOT block needs to have the following structure:";
-      cout << endl;
-      cout << endl << "PLOT <plot_type>";
-      cout << endl << "runs <run_list>";
-      cout << endl << "[range tmin tmax [ymin ymax]]";
-      cout << endl << "[sub_ranges tmin1 tmax1 tmin2 tmax2 ... tminN tmaxN [ymin ymax]";
-      cout << endl << "[logx | logy]";
-      cout << endl << "[use_fit_ranges]";
-      cout << endl << "[view_packing n]";
-      cout << endl;
-      cout << endl << "where <plot_type> is: 0=single histo asym,";
-      cout << endl << "                      2=forward-backward asym,"; 
-      cout << endl << "                      4=RRF asym (not implemented yet),";
-      cout << endl << "                      8=non muSR.";
-      cout << endl << "<run_list> is the list of runs";
-      cout << endl << "   for <plot_type> 0,2,8 it is a list of run numbers, e.g. runs 1 3";
-      cout << endl << "   for <plot_type> 4     it is a list of 'complex' numbers, where";
-      cout << endl << "                         the real part is the run number, and the";
-      cout << endl << "                         imaginary one is 1=real part or 2=imag part, e.g.";
-      cout << endl << "                         runs 1,1 1,2";
-      cout << endl << "range is optional";
-      cout << endl << "sub_ranges (if present) will plot the N given runs each on its own sub-range";
-      cout << endl << "logx, logy (if present) will present the x-, y-axis in log-scale";
-      cout << endl << "use_fit_ranges (if present) will plot each run on its fit-range";
-      cout << endl << "view_packing n (if present) will bin all data by n (> 0) rather than the binning of the fit";
-      cout << endl;
+      cerr << endl << ">> PMsrHandler::HandlePlotEntry: **ERROR** in line " << iter1->fLineNo << ": " << iter1->fLine.Data();
+      cerr << endl << "A PLOT block needs to have the following structure:";
+      cerr << endl;
+      cerr << endl << "PLOT <plot_type>";
+      cerr << endl << "runs <run_list>";
+      cerr << endl << "[range tmin tmax [ymin ymax]]";
+      cerr << endl << "[sub_ranges tmin1 tmax1 tmin2 tmax2 ... tminN tmaxN [ymin ymax]";
+      cerr << endl << "[logx | logy]";
+      cerr << endl << "[use_fit_ranges]";
+      cerr << endl << "[view_packing n]";
+      cerr << endl;
+      cerr << endl << "where <plot_type> is: 0=single histo asym,";
+      cerr << endl << "                      2=forward-backward asym,";
+      cerr << endl << "                      4=RRF asym (not implemented yet),";
+      cerr << endl << "                      8=non muSR.";
+      cerr << endl << "<run_list> is the list of runs";
+      cerr << endl << "   for <plot_type> 0,2,8 it is a list of run numbers, e.g. runs 1 3";
+      cerr << endl << "   for <plot_type> 4     it is a list of 'complex' numbers, where";
+      cerr << endl << "                         the real part is the run number, and the";
+      cerr << endl << "                         imaginary one is 1=real part or 2=imag part, e.g.";
+      cerr << endl << "                         runs 1,1 1,2";
+      cerr << endl << "range is optional";
+      cerr << endl << "sub_ranges (if present) will plot the N given runs each on its own sub-range";
+      cerr << endl << "logx, logy (if present) will present the x-, y-axis in log-scale";
+      cerr << endl << "use_fit_ranges (if present) will plot each run on its fit-range";
+      cerr << endl << "view_packing n (if present) will bin all data by n (> 0) rather than the binning of the fit";
+      cerr << endl;
     }
 
     param.fRuns.clear();
@@ -2673,41 +2674,41 @@ bool PMsrHandler::HandlePlotEntry(PMsrLines &lines)
  *
  * \param lines is a list of lines containing the fitparameter block
  */
-bool PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
+Bool_t PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
 {
   if (lines.empty()) {
-    cout << endl << ">> PMsrHandler::HandleStatisticEntry: **WARNING** There is no STATISTIC block! Do you really want this?";
-    cout << endl;
+    cerr << endl << ">> PMsrHandler::HandleStatisticEntry: **WARNING** There is no STATISTIC block! Do you really want this?";
+    cerr << endl;
     fStatistic.fValid = false;
     return true;
   }
 
   // check if chisq or max.log likelihood
   fStatistic.fChisq = true;
-  for (unsigned int i=0; i<fCommands.size(); i++) {
+  for (UInt_t i=0; i<fCommands.size(); i++) {
     if (fCommands[i].fLine.Contains("MAX_LIKELIHOOD"))
       fStatistic.fChisq = false; // max.log likelihood
   }
 
-  char str[128];
-  char date[128];
-  char time[128];
-  int  status;
-  double dval;
-  unsigned int ival;
+  Char_t str[128];
+  Char_t date[128];
+  Char_t time[128];
+  Int_t  status;
+  Double_t dval;
+  UInt_t ival;
   TString tstr;
-  for (unsigned int i=0; i<lines.size(); i++) {
+  for (UInt_t i=0; i<lines.size(); i++) {
     // check if the statistic block line is illegal
     tstr = lines[i].fLine;
     tstr.Remove(TString::kLeading, ' ');
     if (tstr.Length() > 0) {
       if (!tstr.BeginsWith("#") && !tstr.BeginsWith("STATISTIC") && !tstr.BeginsWith("chisq") &&
           !tstr.BeginsWith("maxLH") && !tstr.BeginsWith("*** FIT DID NOT CONVERGE ***")) {
-        cout << endl << ">> PMsrHandler::HandleStatisticEntry: **SYNTAX ERROR** in line " << lines[i].fLineNo;
-        cout << endl << ">> '" << lines[i].fLine.Data() << "'";
-        cout << endl << ">> not a valid STATISTIC block line";
-        cout << endl << ">> If you do not understand this, just remove the STATISTIC block, musrfit will recreate after fitting";
-        cout << endl << endl;
+        cerr << endl << ">> PMsrHandler::HandleStatisticEntry: **SYNTAX ERROR** in line " << lines[i].fLineNo;
+        cerr << endl << ">> '" << lines[i].fLine.Data() << "'";
+        cerr << endl << ">> not a valid STATISTIC block line";
+        cerr << endl << ">> If you do not understand this, just remove the STATISTIC block, musrfit will recreate after fitting";
+        cerr << endl << endl;
         return false;
       }
     }
@@ -2789,10 +2790,10 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
   TObjArray  *tokens = 0;
   TObjString *ostr = 0;
   TString    str;
-  int        ival, funNo;
+  Int_t        ival, funNo;
 
   // create and initialize fParamInUse vector
-  for (unsigned int i=0; i<fParam.size(); i++)
+  for (UInt_t i=0; i<fParam.size(); i++)
     fParamInUse.push_back(0);
 
   // go through all the theory lines ------------------------------------
@@ -2812,12 +2813,12 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
       continue;
 
     // filter param no, map no, and fun no
-    for (int i=0; i<tokens->GetEntries(); i++) {
+    for (Int_t i=0; i<tokens->GetEntries(); i++) {
       ostr = dynamic_cast<TObjString*>(tokens->At(i));
       str = ostr->GetString();
       if (str.IsDigit()) { // parameter number
         ival = str.Atoi();
-        if ((ival > 0) && (ival < (int)fParam.size()+1)) {
+        if ((ival > 0) && (ival < (Int_t)fParam.size()+1)) {
           fParamInUse[ival-1]++;
 //cout << endl << ">>>> theo: param no : " << ival;
         }
@@ -2866,17 +2867,17 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
     // check if fun number is used, and if yes, filter parameter numbers and maps
     TString sstr;
 //cout << endl << ">> fun.size() = " << fun.size();
-    for (unsigned int i=0; i<fun.size(); i++) {
+    for (UInt_t i=0; i<fun.size(); i++) {
 //cout << endl << ">> funNo: " << fun[i] << ", funNo: " << funNo;
       if (fun[i] == funNo) { // function number found
         // filter for parX
         sstr = iter->fLine;
-        char sval[128];
+        Char_t sval[128];
         while (sstr.Index("par") != -1) {
           memset(sval, 0, sizeof(sval));
           sstr = &sstr[sstr.Index("par")+3]; // trunc sstr
 //cout << endl << ">> par:sstr: " << sstr.Data();
-          for (int j=0; j<sstr.Sizeof(); j++) {
+          for (Int_t j=0; j<sstr.Sizeof(); j++) {
             if (!isdigit(sstr[j]))
               break;
             sval[j] = sstr[j];
@@ -2892,7 +2893,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
           memset(sval, 0, sizeof(sval));
           sstr = &sstr[sstr.Index("map")+3]; // trunc sstr
 //cout << endl << ">> map:sstr: " << sstr.Data();
-          for (int j=0; j<sstr.Sizeof(); j++) {
+          for (Int_t j=0; j<sstr.Sizeof(); j++) {
             if (!isdigit(sstr[j]))
               break;
             sval[j] = sstr[j];
@@ -2901,7 +2902,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 //cout << endl << ">>>> mapX from func 1st, X = " << ival;
           // check if map value already in map, otherwise add it
           if (ival > 0) {
-            unsigned int pos;
+            UInt_t pos;
             for (pos=0; pos<map.size(); pos++) {
               if (ival == map[pos])
                 break;
@@ -2978,7 +2979,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 
       // get the parameter number via map
 //cout << endl << ">> map.size() = " << map.size();
-      for (unsigned int i=0; i<map.size(); i++) {
+      for (UInt_t i=0; i<map.size(); i++) {
         if (map[i] == 0)
           continue;
         if (map[i] < tokens->GetEntries()) {
@@ -3029,16 +3030,16 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 
     // check if fun number is used, and if yes, filter parameter numbers and maps
     TString sstr;
-    for (unsigned int i=0; i<fun.size(); i++) {
+    for (UInt_t i=0; i<fun.size(); i++) {
 //cout << endl << ">> funNo: " << fun[i] << ", funNo: " << funNo;
       if (fun[i] == funNo) { // function number found
         // filter for parX
         sstr = iter->fLine;
-        char sval[128];
+        Char_t sval[128];
         while (sstr.Index("par") != -1) {
           memset(sval, 0, sizeof(sval));
           sstr = &sstr[sstr.Index("par")+3]; // trunc sstr
-          for (int j=0; j<sstr.Sizeof(); j++) {
+          for (Int_t j=0; j<sstr.Sizeof(); j++) {
             if (!isdigit(sstr[j]))
               break;
             sval[j] = sstr[j];
@@ -3053,7 +3054,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
         while (sstr.Index("map") != -1) {
           memset(sval, 0, sizeof(sval));
           sstr = &sstr[sstr.Index("map")+3]; // trunc sstr
-          for (int j=0; j<sstr.Sizeof(); j++) {
+          for (Int_t j=0; j<sstr.Sizeof(); j++) {
             if (!isdigit(sstr[j]))
               break;
             sval[j] = sstr[j];
@@ -3062,12 +3063,12 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 //cout << endl << ">>>> mapX from func 2nd, X = " << ival;
           // check if map value already in map, otherwise add it
           if (ival > 0) {
-            unsigned int pos;
+            UInt_t pos;
             for (pos=0; pos<map.size(); pos++) {
               if (ival == map[pos])
                 break;
             }
-            if ((unsigned int)pos == map.size()) { // new map value
+            if ((UInt_t)pos == map.size()) { // new map value
               map.push_back(ival);
             }
           }
@@ -3103,7 +3104,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 
       // get the parameter number via map
 //cout << endl << ">> map.size() = " << map.size();
-      for (unsigned int i=0; i<map.size(); i++) {
+      for (UInt_t i=0; i<map.size(); i++) {
         if (map[i] == 0)
           continue;
         if (map[i] < tokens->GetEntries()) {
@@ -3128,15 +3129,15 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
   }
 
 // cout << endl << ">> fParamInUse: ";
-// for (unsigned int i=0; i<fParamInUse.size(); i++)
+// for (UInt_t i=0; i<fParamInUse.size(); i++)
 //   cout << endl << i+1 << ", " << fParamInUse[i];
 // cout << endl;
 
   // if unused parameters are present, set the step value to 0.0
-  for (unsigned int i=0; i<fParam.size(); i++) {
+  for (UInt_t i=0; i<fParam.size(); i++) {
     if (!ParameterInUse(i)) {
       if (fParam[i].fStep != 0.0) {
-        cout << endl << "**WARNING** : Parameter No " << i+1 << " is not used at all, will fix it" << endl;
+        cerr << endl << "**WARNING** : Parameter No " << i+1 << " is not used at all, will fix it" << endl;
         fParam[i].fStep = 0.0;
       }
     }
@@ -3156,12 +3157,12 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
  * \param parX
  * \param parY
  */
-bool PMsrHandler::CheckUniquenessOfParamNames(unsigned int &parX, unsigned int &parY)
+Bool_t PMsrHandler::CheckUniquenessOfParamNames(UInt_t &parX, UInt_t &parY)
 {
-  bool unique = true;
+  Bool_t unique = true;
 
-  for (unsigned int i=0; i<fParam.size()-1; i++) {
-    for (unsigned int j=i+1; j<fParam.size(); j++) {
+  for (UInt_t i=0; i<fParam.size()-1; i++) {
+    for (UInt_t j=i+1; j<fParam.size(); j++) {
       if (fParam[i].fName.CompareTo(fParam[j].fName) == 0) { // equal
         unique = false;
         parX = i;
@@ -3181,9 +3182,9 @@ bool PMsrHandler::CheckUniquenessOfParamNames(unsigned int &parX, unsigned int &
  * <p>Checks if map entries found in the theory- or function-block are also
  * present in the run-block, if yes return true otherwise return false.
  */
-bool PMsrHandler::CheckMaps()
+Bool_t PMsrHandler::CheckMaps()
 {
-  bool result = true;
+  Bool_t result = true;
 
   PIntVector mapVec;
   PIntVector mapBlock;
@@ -3193,14 +3194,14 @@ bool PMsrHandler::CheckMaps()
   TObjString *ostr = 0;
   TString    str;
 
-  int no;
+  Int_t no;
 
   // check if map is present in the theory-block
-  for (unsigned int i=0; i<fTheory.size(); i++) {
+  for (UInt_t i=0; i<fTheory.size(); i++) {
     if (fTheory[i].fLine.Contains("map", TString::kIgnoreCase)) {
       // map found hence filter out map number
       tokens = fTheory[i].fLine.Tokenize(" \t");
-      for (int j=0; j<tokens->GetEntries(); j++) {
+      for (Int_t j=0; j<tokens->GetEntries(); j++) {
         ostr = dynamic_cast<TObjString*>(tokens->At(j));
         str = ostr->GetString();
         if (str.Contains("map", TString::kIgnoreCase)) {
@@ -3220,11 +3221,11 @@ bool PMsrHandler::CheckMaps()
   }
 
   // check if map is present in the function-block
-  for (unsigned int i=0; i<fFunctions.size(); i++) {
+  for (UInt_t i=0; i<fFunctions.size(); i++) {
     if (fFunctions[i].fLine.Contains("map", TString::kIgnoreCase)) {
       // map found hence filter out map number
       tokens = fFunctions[i].fLine.Tokenize(" \t");
-      for (int j=0; j<tokens->GetEntries(); j++) {
+      for (Int_t j=0; j<tokens->GetEntries(); j++) {
         ostr = dynamic_cast<TObjString*>(tokens->At(j));
         str = ostr->GetString();
         if (str.Contains("map", TString::kIgnoreCase)) {
@@ -3244,11 +3245,11 @@ bool PMsrHandler::CheckMaps()
   }
 
   // check if present maps are found in the run-block
-  bool found;
-  for (unsigned int i=0; i<mapVec.size(); i++) { // loop over found maps in theory- and function-block
+  Bool_t found;
+  for (UInt_t i=0; i<mapVec.size(); i++) { // loop over found maps in theory- and function-block
     found = false;
-    for (unsigned int j=0; j<fRuns.size(); j++) { // loop over all run-blocks
-      if ((mapVec[i]-MSR_PARAM_MAP_OFFSET-1 < (int)fRuns[j].fMap.size()) &&
+    for (UInt_t j=0; j<fRuns.size(); j++) { // loop over all run-blocks
+      if ((mapVec[i]-MSR_PARAM_MAP_OFFSET-1 < (Int_t)fRuns[j].fMap.size()) &&
           (mapVec[i]-MSR_PARAM_MAP_OFFSET-1 >= 0)) { // map value smaller than run-block map length
         if (fRuns[j].fMap[mapVec[i]-MSR_PARAM_MAP_OFFSET-1] != 0) { // map value in the run-block != 0
           found = true;
@@ -3258,14 +3259,16 @@ bool PMsrHandler::CheckMaps()
     }
     if (!found) { // map not found
       result = false;
-      cout << endl << ">> PMsrHandler::CheckMaps: **ERROR** map" << mapVec[i]-MSR_PARAM_MAP_OFFSET << " found in the ";
+      cerr << endl << ">> PMsrHandler::CheckMaps: **ERROR** map" << mapVec[i]-MSR_PARAM_MAP_OFFSET << " found in the ";
       if (mapBlock[i] == 0)
-        cout << "theory-block ";
+        cerr << "theory-block ";
       else
-        cout << "functions-block ";
-      cout << "in line " << mapLineNo[i] << " is not present in the run-block!";
+        cerr << "functions-block ";
+      cerr << "in line " << mapLineNo[i] << " is not present in the run-block!";
+      cerr << endl;
       if (mapVec[i]-MSR_PARAM_MAP_OFFSET == 0) {
-        cout << endl << ">> by the way: map must be > 0 ...";
+        cerr << endl << ">> by the way: map must be > 0 ...";
+        cerr << endl;
       }
     }
   }
@@ -3285,9 +3288,9 @@ bool PMsrHandler::CheckMaps()
  * <p>Checks if fun entries found in the theory- and run-block are also
  * present in the functions-block, if yes return true otherwise return false.
  */
-bool PMsrHandler::CheckFuncs()
+Bool_t PMsrHandler::CheckFuncs()
 {
-  bool result = true;
+  Bool_t result = true;
 
   PIntVector funVec;
   PIntVector funBlock;
@@ -3297,14 +3300,14 @@ bool PMsrHandler::CheckFuncs()
   TObjString *ostr = 0;
   TString    str;
 
-  int no;
+  Int_t no;
 
   // check if func is present in the theory-block
-  for (unsigned int i=0; i<fTheory.size(); i++) {
+  for (UInt_t i=0; i<fTheory.size(); i++) {
     if (fTheory[i].fLine.Contains("fun", TString::kIgnoreCase)) {
       // func found hence filter out func number
       tokens = fTheory[i].fLine.Tokenize(" \t");
-      for (int j=0; j<tokens->GetEntries(); j++) {
+      for (Int_t j=0; j<tokens->GetEntries(); j++) {
         ostr = dynamic_cast<TObjString*>(tokens->At(j));
         str = ostr->GetString();
         if (str.Contains("fun", TString::kIgnoreCase)) {
@@ -3324,7 +3327,7 @@ bool PMsrHandler::CheckFuncs()
   }
 
   // check if func is present in the run-block
-  for (unsigned int i=0; i<fRuns.size(); i++) {
+  for (UInt_t i=0; i<fRuns.size(); i++) {
     if (fRuns[i].fNormParamNo >= MSR_PARAM_FUN_OFFSET) { // function found
       funVec.push_back(fRuns[i].fNormParamNo);
       funBlock.push_back(1); // 1 = run-block
@@ -3333,11 +3336,11 @@ bool PMsrHandler::CheckFuncs()
   }
 
   // check if present funcs are found in the functions-block
-  bool found;
-  for (unsigned int i=0; i<funVec.size(); i++) { // loop over found funcs in theory- and run-block
+  Bool_t found;
+  for (UInt_t i=0; i<funVec.size(); i++) { // loop over found funcs in theory- and run-block
     found = false;
     // check if function is present in the functions-block
-    for (unsigned int j=0; j<fFunctions.size(); j++) {
+    for (UInt_t j=0; j<fFunctions.size(); j++) {
       if (fFunctions[j].fLine.BeginsWith("#") || fFunctions[j].fLine.IsWhitespace())
         continue;
       str = TString("fun");
@@ -3349,11 +3352,12 @@ bool PMsrHandler::CheckFuncs()
     }
     if (!found) { // func not found
       result = false;
-      cout << endl << ">> PMsrHandler::CheckFuncs: **ERROR** fun" << funVec[i]-MSR_PARAM_FUN_OFFSET << " found in the ";
+      cerr << endl << ">> PMsrHandler::CheckFuncs: **ERROR** fun" << funVec[i]-MSR_PARAM_FUN_OFFSET << " found in the ";
       if (funBlock[i] == 0)
-        cout << "theory-block in line " << funLineBlockNo[i] << " is not present in the functions-block!";
+        cerr << "theory-block in line " << funLineBlockNo[i] << " is not present in the functions-block!";
       else
-        cout << "run-block No " << funLineBlockNo[i] << " (norm) is not present in the functions-block!";
+        cerr << "run-block No " << funLineBlockNo[i] << " (norm) is not present in the functions-block!";
+      cerr << endl;
     }
   }
 

@@ -147,9 +147,9 @@ class PMusrCanvas : public TObject, public TQObject
 {
   public:
     PMusrCanvas();
-    PMusrCanvas(const int number, const char* title, 
+    PMusrCanvas(const Int_t number, const Char_t* title,
                 Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh, const Bool_t batch);
-    PMusrCanvas(const int number, const char* title, 
+    PMusrCanvas(const Int_t number, const Char_t* title,
                 Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
                 PMsrFourierStructure fourierDefault,
                 const PIntVector markerList, const PIntVector colorList, const Bool_t batch);
@@ -171,7 +171,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void HandleMenuPopup(Int_t id); // SLOT
     virtual void LastCanvasClosed(); // SLOT
 
-    virtual void SaveGraphicsAndQuit(char *fileName, char *graphicsFormat);
+    virtual void SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat);
 
   private:
     Bool_t fBatchMode;       /// musrview in ROOT batch mode
@@ -222,27 +222,27 @@ class PMusrCanvas : public TObject, public TQObject
 
     virtual void CreateStyle();
     virtual void InitFourier();
-    virtual void InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh);
+    virtual void InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh);
     virtual void InitDataSet(PMusrCanvasDataSet &dataSet);
     virtual void InitDataSet(PMusrCanvasNonMusrDataSet &dataSet);
     virtual void CleanupDataSet(PMusrCanvasDataSet &dataSet);
     virtual void CleanupDataSet(PMusrCanvasNonMusrDataSet &dataSet);
-    virtual void HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunData *data);
-    virtual void HandleNonMusrDataSet(unsigned int plotNo, unsigned int runNo, PRunData *data);
+    virtual void HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data);
+    virtual void HandleNonMusrDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data);
     virtual void HandleDifference();
     virtual void HandleFourier();
     virtual void HandleFourierDifference();
-    virtual double FindOptimalFourierPhase();
+    virtual Double_t FindOptimalFourierPhase();
     virtual void CleanupDifference();
     virtual void CleanupFourier();
     virtual void CleanupFourierDifference();
 
-    virtual double CalculateDiff(const double x, const double y, TH1F *theo);
-    virtual double CalculateDiff(const double x, const double y, TGraphErrors *theo);
-    virtual Int_t  FindBin(const double x, TGraphErrors *graph);
+    virtual Double_t CalculateDiff(const Double_t x, const Double_t y, TH1F *theo);
+    virtual Double_t CalculateDiff(const Double_t x, const Double_t y, TGraphErrors *theo);
+    virtual Int_t  FindBin(const Double_t x, TGraphErrors *graph);
 
-    virtual double GetGlobalMaximum(TH1F* histo);
-    virtual double GetGlobalMinimum(TH1F* histo);
+    virtual Double_t GetGlobalMaximum(TH1F* histo);
+    virtual Double_t GetGlobalMinimum(TH1F* histo);
 
     virtual void PlotData();
     virtual void PlotDifference();

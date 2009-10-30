@@ -39,29 +39,29 @@ class PRunNonMusr : public PRunBase
 {
   public:
     PRunNonMusr();
-    PRunNonMusr(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo, EPMusrHandleTag tag);
+    PRunNonMusr(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag);
     virtual ~PRunNonMusr();
 
-    virtual double CalcChiSquare(const std::vector<double>& par);
-    virtual double CalcMaxLikelihood(const std::vector<double>& par);
+    virtual Double_t CalcChiSquare(const std::vector<Double_t>& par);
+    virtual Double_t CalcMaxLikelihood(const std::vector<Double_t>& par);
     virtual void CalcTheory();
 
-    virtual unsigned int GetNoOfFitBins() { return fNoOfFitBins; }
+    virtual UInt_t GetNoOfFitBins() { return fNoOfFitBins; }
 
-    virtual unsigned int GetXIndex();
-    virtual unsigned int GetYIndex();
+    virtual UInt_t GetXIndex();
+    virtual UInt_t GetYIndex();
 
   protected:
-    virtual bool PrepareData();
-    virtual bool PrepareFitData();
-    virtual bool PrepareViewData();
+    virtual Bool_t PrepareData();
+    virtual Bool_t PrepareFitData();
+    virtual Bool_t PrepareViewData();
 
   private:
     PRawRunData *fRawRunData;
 
-    double fFitStartTime;
-    double fFitStopTime;
-    unsigned int fNoOfFitBins;
+    Double_t fFitStartTime;
+    Double_t fFitStopTime;
+    UInt_t fNoOfFitBins;
 };
 
 #endif // _PRUNNONMUSR_H_

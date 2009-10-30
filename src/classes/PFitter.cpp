@@ -65,7 +65,7 @@ using namespace std;
  * \param runListCollection
  * \param chisq_only
  */
-PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, bool chisq_only) :
+PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, Bool_t chisq_only) :
   fChisqOnly(chisq_only), fRunInfo(runInfo)
 {
   fConverged = false;
@@ -128,22 +128,22 @@ PFitter::~PFitter()
  * <p>
  *
  */
-bool PFitter::DoFit()
+Bool_t PFitter::DoFit()
 {
   // feed minuit parameters
   SetParameters();
 
   // check if only chisq/maxLH shall be calculated once
   if (fChisqOnly) {
-    std::vector<double> param = fMnUserParams.Params();
-    std::vector<double> error = fMnUserParams.Errors();
-    int usedParams = 0;
-    for (unsigned int i=0; i<error.size(); i++) {
+    std::vector<Double_t> param = fMnUserParams.Params();
+    std::vector<Double_t> error = fMnUserParams.Errors();
+    Int_t usedParams = 0;
+    for (UInt_t i=0; i<error.size(); i++) {
       if (error[i] != 0.0)
         usedParams++;
     }
-    int ndf = fFitterFcn->GetTotalNoOfFittedBins() - usedParams;
-    double val = (*fFitterFcn)(param);
+    Int_t ndf = fFitterFcn->GetTotalNoOfFittedBins() - usedParams;
+    Double_t val = (*fFitterFcn)(param);
     if (fUseChi2) {
       cout << endl << endl << ">> chisq = " << val << ", NDF = " << ndf << ", chisq/NDF = " << val/ndf;
     } else { // max. log likelihood
@@ -159,32 +159,32 @@ bool PFitter::DoFit()
   else
     cout << endl << "Maximum Likelihood fit will be executed" << endl;
 
-  bool status = true;
+  Bool_t status = true;
   // init positive errors to default false, if minos is called, it will be set true there
-  for (unsigned int i=0; i<fParams.size(); i++) {
+  for (UInt_t i=0; i<fParams.size(); i++) {
     fRunInfo->SetMsrParamPosErrorPresent(i, false);
   }
 
-  for (unsigned int i=0; i<fCmdList.size(); i++) {
+  for (UInt_t i=0; i<fCmdList.size(); i++) {
     switch (fCmdList[i]) {
       case PMN_INTERACTIVE:
-        cout << endl << "**WARNING** from PFitter::DoFit() : the command INTERACTIVE is not yet implemented.";
-        cout << endl;
+        cerr << endl << "**WARNING** from PFitter::DoFit() : the command INTERACTIVE is not yet implemented.";
+        cerr << endl;
         break;
       case PMN_CONTOURS:
-        cout << endl << "**WARNING** from PFitter::DoFit() : the command CONTOURS is not yet implemented.";
-        cout << endl;
+        cerr << endl << "**WARNING** from PFitter::DoFit() : the command CONTOURS is not yet implemented.";
+        cerr << endl;
         break;
       case PMN_EIGEN:
-        cout << endl << "**WARNING** from PFitter::DoFit() : the command EIGEN is not yet implemented.";
-        cout << endl;
+        cerr << endl << "**WARNING** from PFitter::DoFit() : the command EIGEN is not yet implemented.";
+        cerr << endl;
         break;
       case PMN_HESSE:
         status = ExecuteHesse();
         break;
       case PMN_MACHINE_PRECISION:
-        cout << endl << "**WARNING** from PFitter::DoFit() : the command MACHINE_PRECISION is not yet implemented.";
-        cout << endl;
+        cerr << endl << "**WARNING** from PFitter::DoFit() : the command MACHINE_PRECISION is not yet implemented.";
+        cerr << endl;
         break;
       case PMN_MIGRAD:
         status = ExecuteMigrad();
@@ -196,14 +196,14 @@ bool PFitter::DoFit()
         status = ExecuteMinos();
         // set positive errors true if minos has been successfull
         if (status) {
-          for (unsigned int i=0; i<fParams.size(); i++) {
+          for (UInt_t i=0; i<fParams.size(); i++) {
             fRunInfo->SetMsrParamPosErrorPresent(i, true);
           }
         }
         break;
       case PMN_PLOT:
-        cout << endl << "**WARNING** from PFitter::DoFit() : the command PLOT is not yet implemented.";
-        cout << endl;
+        cerr << endl << "**WARNING** from PFitter::DoFit() : the command PLOT is not yet implemented.";
+        cerr << endl;
         break;
       case PMN_SAVE:
         status = ExecuteSave();
@@ -214,19 +214,20 @@ bool PFitter::DoFit()
         status = ExecuteSimplex();
         break;
       case PMN_USER_COVARIANCE:
-        cout << endl << "**WARNING** from PFitter::DoFit() : the command USER_COVARIANCE is not yet implemented.";
-        cout << endl;
+        cerr << endl << "**WARNING** from PFitter::DoFit() : the command USER_COVARIANCE is not yet implemented.";
+        cerr << endl;
         break;
       case PMN_USER_PARAM_STATE:
-        cout << endl << "**WARNING** from PFitter::DoFit() : the command USER_PARAM_STATE is not yet implemented.";
-        cout << endl;
+        cerr << endl << "**WARNING** from PFitter::DoFit() : the command USER_PARAM_STATE is not yet implemented.";
+        cerr << endl;
         break;
       case PMN_PRINT:
-        cout << endl << "**WARNING** from PFitter::DoFit() : the command PRINT is not yet implemented.";
-        cout << endl;
+        cerr << endl << "**WARNING** from PFitter::DoFit() : the command PRINT is not yet implemented.";
+        cerr << endl;
         break;
       default:
-        cout << endl << "**PANIC ERROR**: PFitter::DoFit(): You should never have reached this point" << endl;
+        cerr << endl << "**PANIC ERROR**: PFitter::DoFit(): You should never have reached this point";
+        cerr << endl;
         exit(0);
         break;
     }
@@ -252,7 +253,7 @@ bool PFitter::DoFit()
  * <p>
  *
  */
-bool PFitter::CheckCommands()
+Bool_t PFitter::CheckCommands()
 {
   fIsValid = true;
 
@@ -328,11 +329,11 @@ bool PFitter::CheckCommands()
     } else if (it->fLine.Contains("PRINT")) {
       fCmdList.push_back(PMN_PRINT);
     } else { // unkown command
-      cout << endl << "FATAL ERROR:";
-      cout << endl << "PFitter::CheckCommands(): In line " << it->fLineNo << " an unkown command is found:";
-      cout << endl << "    " << it->fLine.Data();
-      cout << endl << "Will stop ...";
-      cout << endl;
+      cerr << endl << "**FATAL ERROR**";
+      cerr << endl << "PFitter::CheckCommands(): In line " << it->fLineNo << " an unkown command is found:";
+      cerr << endl << "    " << it->fLine.Data();
+      cerr << endl << "Will stop ...";
+      cerr << endl;
       fIsValid = false;
     }
   }
@@ -347,9 +348,9 @@ bool PFitter::CheckCommands()
  * <p>
  *
  */
-bool PFitter::SetParameters()
+Bool_t PFitter::SetParameters()
 {
-  for (unsigned int i=0; i<fParams.size(); i++) {
+  for (UInt_t i=0; i<fParams.size(); i++) {
     // check if parameter is fixed
     if (fParams[i].fStep == 0.0) { // add fixed parameter
       fMnUserParams.Add(fParams[i].fName.Data(), fParams[i].fValue);
@@ -380,11 +381,12 @@ bool PFitter::SetParameters()
 //cout << endl;
 
   // check if there is an unused parameter, if so, fix it
-  for (unsigned int i=0; i<fParams.size(); i++) {
+  for (UInt_t i=0; i<fParams.size(); i++) {
     // parameter not used in the whole theory and not already fixed!!
     if ((fRunInfo->ParameterInUse(i) == 0) && (fParams[i].fStep != 0.0)) {
       fMnUserParams.Fix(i); // fix the unused parameter so that minuit will not vary it
-      cout << endl << "**WARNING** : Parameter No " << i+1 << " is not used at all, will fix it" << endl;
+      cerr << endl << "**WARNING** : Parameter No " << i+1 << " is not used at all, will fix it";
+      cerr << endl;
     }
   }
 
@@ -398,7 +400,7 @@ bool PFitter::SetParameters()
  * <p>
  *
  */
-bool PFitter::ExecuteHesse()
+Bool_t PFitter::ExecuteHesse()
 {
   cout << "PFitter::ExecuteHesse(): will call hesse ..." << endl;
 
@@ -410,14 +412,14 @@ bool PFitter::ExecuteHesse()
   ROOT::Minuit2::MnHesse hesse;
 
   // specify maximal number of function calls
-  unsigned int maxfcn = numeric_limits<unsigned int>::max();
+  UInt_t maxfcn = numeric_limits<UInt_t>::max();
 
   // call hesse
   ROOT::Minuit2::MnUserParameterState mnState = hesse((*fFitterFcn), fMnUserParams, maxfcn);
 
   if (!mnState.IsValid()) {
-    cout << endl << "**WARNING** PFitter::ExecuteHesse(): Hesse encountered some problems!";
-    cout << endl;
+    cerr << endl << "**WARNING** PFitter::ExecuteHesse(): Hesse encountered some problems!";
+    cerr << endl;
     return false;
   }
 
@@ -428,7 +430,7 @@ bool PFitter::ExecuteHesse()
   fMnUserParamState = new ROOT::Minuit2::MnUserParameterState(mnState);
 
   // fill parabolic errors
-  for (unsigned int i=0; i<fParams.size(); i++) {
+  for (UInt_t i=0; i<fParams.size(); i++) {
     fRunInfo->SetMsrParamStep(i, mnState.Error(i));
     fRunInfo->SetMsrParamPosErrorPresent(i, false);
   }
@@ -443,7 +445,7 @@ bool PFitter::ExecuteHesse()
  * <p>
  *
  */
-bool PFitter::ExecuteMigrad()
+Bool_t PFitter::ExecuteMigrad()
 {
   cout << "PFitter::ExecuteMigrad(): will call migrad ..." << endl;
 
@@ -457,12 +459,13 @@ bool PFitter::ExecuteMigrad()
 
   // minimize
   // maxfcn is MINUIT2 Default maxfcn
-  unsigned int maxfcn = numeric_limits<unsigned int>::max();
+  UInt_t maxfcn = numeric_limits<UInt_t>::max();
   // tolerance = MINUIT2 Default tolerance
-  double tolerance = 0.1;
+  Double_t tolerance = 0.1;
   ROOT::Minuit2::FunctionMinimum min = migrad(maxfcn, tolerance);
   if (!min.IsValid()) {
-    cout << endl << "**WARNING**: PFitter::ExecuteMigrad(): Fit did not converge, sorry ...";
+    cerr << endl << "**WARNING**: PFitter::ExecuteMigrad(): Fit did not converge, sorry ...";
+    cerr << endl;
     fIsValid = false;
     return false;
   }
@@ -480,17 +483,17 @@ bool PFitter::ExecuteMigrad()
   fMnUserParamState = new ROOT::Minuit2::MnUserParameterState(min.UserState());
 
   // fill run info
-  for (unsigned int i=0; i<fParams.size(); i++) {
+  for (UInt_t i=0; i<fParams.size(); i++) {
     fRunInfo->SetMsrParamValue(i, min.UserState().Value(i));
     fRunInfo->SetMsrParamStep(i, min.UserState().Error(i));
     fRunInfo->SetMsrParamPosErrorPresent(i, false);
   }
 
   // handle statistics
-  double minVal = min.Fval();
-  unsigned int ndf = fFitterFcn->GetTotalNoOfFittedBins();
+  Double_t minVal = min.Fval();
+  UInt_t ndf = fFitterFcn->GetTotalNoOfFittedBins();
   // subtract number of varied parameters from total no of fitted bins -> ndf
-  for (unsigned int i=0; i<fParams.size(); i++) {
+  for (UInt_t i=0; i<fParams.size(); i++) {
     if (min.UserState().Error(i) != 0.0)
       ndf -= 1;
   }
@@ -511,7 +514,7 @@ bool PFitter::ExecuteMigrad()
  * <p>
  *
  */
-bool PFitter::ExecuteMinimize()
+Bool_t PFitter::ExecuteMinimize()
 {
   cout << "PFitter::ExecuteMinimize(): will call minimize ..." << endl;
 
@@ -525,13 +528,14 @@ bool PFitter::ExecuteMinimize()
 
   // minimize
   // maxfcn is MINUIT2 Default maxfcn
-  unsigned int maxfcn = numeric_limits<unsigned int>::max();
+  UInt_t maxfcn = numeric_limits<UInt_t>::max();
 //cout << endl << "maxfcn=" << maxfcn << endl;
   // tolerance = MINUIT2 Default tolerance
-  double tolerance = 0.1;
+  Double_t tolerance = 0.1;
   ROOT::Minuit2::FunctionMinimum min = minimize(maxfcn, tolerance); 
   if (!min.IsValid()) {
-    cout << endl << "**WARNING**: PFitter::ExecuteMinimize(): Fit did not converge, sorry ...";
+    cerr << endl << "**WARNING**: PFitter::ExecuteMinimize(): Fit did not converge, sorry ...";
+    cerr << endl;
     fIsValid = false;
     return false;
   }
@@ -549,17 +553,17 @@ bool PFitter::ExecuteMinimize()
   fMnUserParamState = new ROOT::Minuit2::MnUserParameterState(min.UserState());
 
   // fill run info
-  for (unsigned int i=0; i<fParams.size(); i++) {
+  for (UInt_t i=0; i<fParams.size(); i++) {
     fRunInfo->SetMsrParamValue(i, min.UserState().Value(i));
     fRunInfo->SetMsrParamStep(i, min.UserState().Error(i));
     fRunInfo->SetMsrParamPosErrorPresent(i, false);
   }
 
   // handle statistics
-  double minVal = min.Fval();
-  unsigned int ndf = fFitterFcn->GetTotalNoOfFittedBins();
+  Double_t minVal = min.Fval();
+  UInt_t ndf = fFitterFcn->GetTotalNoOfFittedBins();
   // subtract number of varied parameters from total no of fitted bins -> ndf
-  for (unsigned int i=0; i<fParams.size(); i++) {
+  for (UInt_t i=0; i<fParams.size(); i++) {
     if (min.UserState().Error(i) != 0.0)
       ndf -= 1;
   }
@@ -580,21 +584,21 @@ bool PFitter::ExecuteMinimize()
  * <p>
  *
  */
-bool PFitter::ExecuteMinos()
+Bool_t PFitter::ExecuteMinos()
 {
   cout << "PFitter::ExecuteMinos(): will call minos ..." << endl;
 
   // if already some minimization is done use the minuit2 output as input
   if (!fFcnMin) {
-    cout << endl << "**ERROR**: MINOS musn't be called before any minimization (MINIMIZE/MIGRAD/SIMPLEX) is done!!";
-    cout << endl;
+    cerr << endl << "**ERROR**: MINOS musn't be called before any minimization (MINIMIZE/MIGRAD/SIMPLEX) is done!!";
+    cerr << endl;
     return false;
   }
 
   // check if minimum was valid
   if (!fFcnMin->IsValid()) {
-    cout << endl << "**ERROR**: MINOS cannot started since the previous minimization failed :-(";
-    cout << endl;
+    cerr << endl << "**ERROR**: MINOS cannot started since the previous minimization failed :-(";
+    cerr << endl;
     return false;
   }
 
@@ -603,7 +607,7 @@ bool PFitter::ExecuteMinos()
   // make minos analysis
   ROOT::Minuit2::MnMinos minos((*fFitterFcn), (*fFcnMin));
 
-  for (unsigned int i=0; i<fParams.size(); i++) {
+  for (UInt_t i=0; i<fParams.size(); i++) {
     // only try to call minos if the parameter is not fixed!!
     // the 1st condition is from an user fixed variable,
     // the 2nd condition is from an all together unused variable
@@ -631,7 +635,7 @@ bool PFitter::ExecuteMinos()
  * <p>
  *
  */
-bool PFitter::ExecuteSave()
+Bool_t PFitter::ExecuteSave()
 {
   // if any minimization was done, otherwise get out immediately
   if (!fFcnMin) {
@@ -643,8 +647,8 @@ bool PFitter::ExecuteSave()
 
   // check if the user parameter state is valid
   if (!mnState.IsValid()) {
-    cout << endl << "**WARNING** Minuit2 User Parameter State is not valid, i.e. nothing to be saved";
-    cout << endl;
+    cerr << endl << "**WARNING** Minuit2 User Parameter State is not valid, i.e. nothing to be saved";
+    cerr << endl;
     return false;
   }
 
@@ -655,8 +659,8 @@ bool PFitter::ExecuteSave()
   // open minuit2 output file
   fout.open("MINUIT2.OUTPUT", iostream::out);
   if (!fout.is_open()) {
-    cout << endl << "**ERROR** PFitter::ExecuteSave() couldn't open MINUIT2.OUTPUT file";
-    cout << endl;
+    cerr << endl << "**ERROR** PFitter::ExecuteSave() couldn't open MINUIT2.OUTPUT file";
+    cerr << endl;
     return false;
   }
 
@@ -678,14 +682,14 @@ bool PFitter::ExecuteSave()
   fout << endl << "-------------------------------------------------------------------------";
   fout << endl << "                         Parabolic           Minos";
   fout << endl << " No   Name      Value      Error      Negative    Positive   Limits";
-  for (unsigned int i=0; i<fParams.size(); i++) {
+  for (UInt_t i=0; i<fParams.size(); i++) {
     // write no
     fout.setf(ios::right, ios::adjustfield);
     fout.width(3);
     fout << endl << i+1 << "   ";
     // write name
     fout << fParams[i].fName.Data();
-    for (int j=0; j<10-fParams[i].fName.Length(); j++)
+    for (Int_t j=0; j<10-fParams[i].fName.Length(); j++)
       fout << " ";
     // write value
     fout.setf(ios::left, ios::adjustfield);
@@ -750,9 +754,9 @@ bool PFitter::ExecuteSave()
   if (mnState.HasCovariance()) {
     ROOT::Minuit2::MnUserCovariance cov = mnState.Covariance();
     fout << endl << "from " << cov.Nrow() << " free parameters";
-    for (unsigned int i=0; i<cov.Nrow(); i++) {
+    for (UInt_t i=0; i<cov.Nrow(); i++) {
       fout << endl;
-      for (unsigned int j=0; j<i; j++) {
+      for (UInt_t j=0; j<i; j++) {
         fout.setf(ios::left, ios::adjustfield);
         fout.precision(6);
         if (cov(i,j) > 0.0) {
@@ -778,7 +782,7 @@ bool PFitter::ExecuteSave()
     ROOT::Minuit2::MnUserCovariance cov = mnState.Covariance();
     PIntVector parNo;
     fout << endl << " No   Global       ";
-    for (unsigned int i=0; i<fParams.size(); i++) {
+    for (UInt_t i=0; i<fParams.size(); i++) {
       // only free parameters, i.e. not fixed, and not unsed ones!
       if ((fParams[i].fStep != 0) && fRunInfo->ParameterInUse(i) > 0) {
         fout.setf(ios::left, ios::adjustfield);
@@ -789,8 +793,8 @@ bool PFitter::ExecuteSave()
     }
     // check that there is a correspondens between minuit2 and musrfit book keeping
     if (parNo.size() != cov.Nrow()) {
-      cout << endl << "**SEVERE ERROR** in PFitter::ExecuteSave(): minuit2 and musrfit book keeping to not correspond! Unable to write correlation matrix.";
-      cout << endl;
+      cerr << endl << "**SEVERE ERROR** in PFitter::ExecuteSave(): minuit2 and musrfit book keeping to not correspond! Unable to write correlation matrix.";
+      cerr << endl;
     } else { // book keeping is OK
       TString title("Minuit2 Output Correlation Matrix for ");
       title += fRunInfo->GetFileName();
@@ -798,8 +802,8 @@ bool PFitter::ExecuteSave()
       title += dt.AsSQLString();
       TCanvas *ccorr = new TCanvas("ccorr", "title", 500, 500);
       TH2D *hcorr = new TH2D("hcorr", title, cov.Nrow(), 0.0, cov.Nrow(), cov.Nrow(), 0.0, cov.Nrow());
-      double dval;
-      for (unsigned int i=0; i<cov.Nrow(); i++) {
+      Double_t dval;
+      for (UInt_t i=0; i<cov.Nrow(); i++) {
         // parameter number
         fout << endl << " ";
         fout.setf(ios::left, ios::adjustfield);
@@ -811,27 +815,27 @@ bool PFitter::ExecuteSave()
         fout.width(12);
         fout << corr.GlobalCC()[i];
         // correlations matrix
-        for (unsigned int j=0; j<cov.Nrow(); j++) {
+        for (UInt_t j=0; j<cov.Nrow(); j++) {
           fout.setf(ios::left, ios::adjustfield);
 //          fout.precision(4);
           if (i==j) {
             fout.width(9);
             fout << " 1.0 ";
-            hcorr->Fill((double)i,(double)i,1.0);
+            hcorr->Fill((Double_t)i,(Double_t)i,1.0);
           } else {
             // check that errors are none zero
             if (fMnUserParams.Error(parNo[i]) == 0.0) {
-              cout << endl << "**SEVERE ERROR** in PFitter::ExecuteSave(): parameter no " << parNo[i]+1 << " has an error == 0. Cannot correctly handle the correlation matrix.";
-              cout << endl;
+              cerr << endl << "**SEVERE ERROR** in PFitter::ExecuteSave(): parameter no " << parNo[i]+1 << " has an error == 0. Cannot correctly handle the correlation matrix.";
+              cerr << endl;
               dval = 0.0;
             } else if (fMnUserParams.Error(parNo[j]) == 0.0) {
-              cout << endl << "**SEVERE ERROR** in PFitter::ExecuteSave(): parameter no " << parNo[j]+1 << " has an error == 0. Cannot correctly handle the correlation matrix.";
-              cout << endl;
+              cerr << endl << "**SEVERE ERROR** in PFitter::ExecuteSave(): parameter no " << parNo[j]+1 << " has an error == 0. Cannot correctly handle the correlation matrix.";
+              cerr << endl;
               dval = 0.0;
             } else {
               dval = cov(i,j)/(fMnUserParams.Error(parNo[i])*fMnUserParams.Error(parNo[j]));
             }
-            hcorr->Fill((double)i,(double)j,dval);
+            hcorr->Fill((Double_t)i,(Double_t)j,dval);
             // handle precision, ugly but ...
             if (dval < 1.0e-2) {
               fout.precision(2);
@@ -886,7 +890,7 @@ bool PFitter::ExecuteSave()
  * <p>
  *
  */
-bool PFitter::ExecuteSimplex()
+Bool_t PFitter::ExecuteSimplex()
 {
   cout << "PFitter::ExecuteSimplex(): will call simplex ..." << endl;
 
@@ -900,12 +904,13 @@ bool PFitter::ExecuteSimplex()
 
   // minimize
   // maxfcn is 10*MINUIT2 Default maxfcn
-  unsigned int maxfcn = numeric_limits<unsigned int>::max();
+  UInt_t maxfcn = numeric_limits<UInt_t>::max();
   // tolerance = MINUIT2 Default tolerance
-  double tolerance = 0.1;
+  Double_t tolerance = 0.1;
   ROOT::Minuit2::FunctionMinimum min = simplex(maxfcn, tolerance);
   if (!min.IsValid()) {
-    cout << endl << "**WARNING**: PFitter::ExecuteSimplex(): Fit did not converge, sorry ...";
+    cerr << endl << "**WARNING**: PFitter::ExecuteSimplex(): Fit did not converge, sorry ...";
+    cerr << endl;
     fIsValid = false;
     return false;
   }
@@ -917,17 +922,17 @@ bool PFitter::ExecuteSimplex()
   fFcnMin = new ROOT::Minuit2::FunctionMinimum(min);
 
   // fill run info
-  for (unsigned int i=0; i<fParams.size(); i++) {
+  for (UInt_t i=0; i<fParams.size(); i++) {
     fRunInfo->SetMsrParamValue(i, min.UserState().Value(i));
     fRunInfo->SetMsrParamStep(i, min.UserState().Error(i));
     fRunInfo->SetMsrParamPosErrorPresent(i, false);
   }
 
   // handle statistics
-  double minVal = min.Fval();
-  unsigned int ndf = fFitterFcn->GetTotalNoOfFittedBins();
+  Double_t minVal = min.Fval();
+  UInt_t ndf = fFitterFcn->GetTotalNoOfFittedBins();
   // subtract number of varied parameters from total no of fitted bins -> ndf
-  for (unsigned int i=0; i<fParams.size(); i++) {
+  for (UInt_t i=0; i<fParams.size(); i++) {
     if (min.UserState().Error(i) != 0.0)
       ndf -= 1;
   }

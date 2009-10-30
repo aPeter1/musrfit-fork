@@ -48,17 +48,17 @@ class PFunctionHandler
     PFunctionHandler(PMsrLines lines);
     virtual ~PFunctionHandler();
 
-    virtual bool IsValid() { return fValid; }
-    virtual bool DoParse();
-    virtual bool CheckMapAndParamRange(unsigned int mapSize, unsigned int paramSize);
-    virtual double Eval(int funNo, vector<int> map, vector<double> param);
-    virtual int GetFuncNo(unsigned int idx);
-    virtual int GetFuncIndex(int funcNo);
-    virtual unsigned int GetNoOfFuncs() { return fFuncs.size(); }
-    virtual TString* GetFuncString(unsigned int idx);
+    virtual Bool_t IsValid() { return fValid; }
+    virtual Bool_t DoParse();
+    virtual Bool_t CheckMapAndParamRange(UInt_t mapSize, UInt_t paramSize);
+    virtual double Eval(Int_t funNo, vector<Int_t> map, vector<double> param);
+    virtual Int_t GetFuncNo(UInt_t idx);
+    virtual Int_t GetFuncIndex(Int_t funcNo);
+    virtual UInt_t GetNoOfFuncs() { return fFuncs.size(); }
+    virtual TString* GetFuncString(UInt_t idx);
 
   private:
-    bool fValid;
+    Bool_t fValid;
 
     PMsrLines fLines;
     vector<PFunction> fFuncs;

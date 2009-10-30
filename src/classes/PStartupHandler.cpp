@@ -53,10 +53,10 @@ PStartupHandler::PStartupHandler()
   fStartupFilePath = "";
 
   // get default path (for the moment only linux like)
-  char *pmusrpath;
-  char *home;
-  char musrpath[128];
-  char startup_path_name[128];
+  Char_t *pmusrpath;
+  Char_t *home;
+  Char_t musrpath[128];
+  Char_t startup_path_name[128];
 
   // check if the startup file is found in the current directory
   strcpy(startup_path_name, "./musrfit_startup.xml");
@@ -69,7 +69,7 @@ PStartupHandler::PStartupHandler()
     if (pmusrpath == 0) { // not set, will try default one
       home = getenv("ROOTSYS");
       sprintf(musrpath, "%s/bin", home);
-      cout << endl << "**WARNING** MUSRFITPATH environment variable not set will try " << musrpath << endl;
+      cerr << endl << "**WARNING** MUSRFITPATH environment variable not set will try " << musrpath << endl;
     } else {
       strncpy(musrpath, pmusrpath, sizeof(musrpath));
     }
@@ -140,7 +140,7 @@ void PStartupHandler::OnEndDocument()
  * \param str
  * \param attributes
  */
-void PStartupHandler::OnStartElement(const char *str, const TList *attributes)
+void PStartupHandler::OnStartElement(const Char_t *str, const TList *attributes)
 {
   if (!strcmp(str, "data_path")) {
     fKey = eDataPath;
@@ -171,7 +171,7 @@ void PStartupHandler::OnStartElement(const char *str, const TList *attributes)
  *
  * \param str
  */
-void PStartupHandler::OnEndElement(const char *str)
+void PStartupHandler::OnEndElement(const Char_t *str)
 {
   fKey = eEmpty;
 }
@@ -184,7 +184,7 @@ void PStartupHandler::OnEndElement(const char *str)
  *
  * \param str
  */
-void PStartupHandler::OnCharacters(const char *str)
+void PStartupHandler::OnCharacters(const Char_t *str)
 {
   TObjArray  *tokens;
   TObjString *ostr;
@@ -204,8 +204,8 @@ void PStartupHandler::OnCharacters(const char *str)
         // add converted str to the marker list
         fMarkerList.push_back(tstr.Atoi());
       } else {
-        cout << endl << "PStartupHandler **WARNING** '" << str << "' is not a number, will ignore it";
-        cout << endl;
+        cerr << endl << "PStartupHandler **WARNING** '" << str << "' is not a number, will ignore it";
+        cerr << endl;
       }
       break;
     case eColor:
@@ -214,14 +214,14 @@ void PStartupHandler::OnCharacters(const char *str)
       tokens = tstr.Tokenize(",");
       // check that there any tokens
       if (!tokens) {
-        cout << endl << "PStartupHandler **WARNING** '" << str << "' is not a rbg code, will ignore it";
-        cout << endl;
+        cerr << endl << "PStartupHandler **WARNING** '" << str << "' is not a rbg code, will ignore it";
+        cerr << endl;
         return;
       }
       // check there is the right number of tokens
       if (tokens->GetEntries() != 3) {
-        cout << endl << "PStartupHandler **WARNING** '" << str << "' is not a rbg code, will ignore it";
-        cout << endl;
+        cerr << endl << "PStartupHandler **WARNING** '" << str << "' is not a rbg code, will ignore it";
+        cerr << endl;
         return;
       }
       // get r
@@ -230,8 +230,8 @@ void PStartupHandler::OnCharacters(const char *str)
       if (tstr.IsDigit()) {
         r = tstr.Atoi();
       } else {
-        cout << endl << "PStartupHandler **WARNING** r within the rgb code is not a number, will ignore it";
-        cout << endl;
+        cerr << endl << "PStartupHandler **WARNING** r within the rgb code is not a number, will ignore it";
+        cerr << endl;
         return;
       }
       // get g
@@ -240,8 +240,8 @@ void PStartupHandler::OnCharacters(const char *str)
       if (tstr.IsDigit()) {
         g = tstr.Atoi();
       } else {
-        cout << endl << "PStartupHandler **WARNING** g within the rgb code is not a number, will ignore it";
-        cout << endl;
+        cerr << endl << "PStartupHandler **WARNING** g within the rgb code is not a number, will ignore it";
+        cerr << endl;
         return;
       }
       // get b
@@ -250,8 +250,8 @@ void PStartupHandler::OnCharacters(const char *str)
       if (tstr.IsDigit()) {
         b = tstr.Atoi();
       } else {
-        cout << endl << "PStartupHandler **WARNING** b within the rgb code is not a number, will ignore it";
-        cout << endl;
+        cerr << endl << "PStartupHandler **WARNING** b within the rgb code is not a number, will ignore it";
+        cerr << endl;
         return;
       }
       // clean up tokens
@@ -273,8 +273,8 @@ void PStartupHandler::OnCharacters(const char *str)
       } else if (!tstr.CompareTo("mc/s", TString::kIgnoreCase)) {
         fFourierDefaults.fUnits = FOURIER_UNIT_CYCLES;
       } else {
-        cout << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid unit, will ignore it.";
-        cout << endl;
+        cerr << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid unit, will ignore it.";
+        cerr << endl;
       }
       break;
     case eFourierPower:
@@ -284,12 +284,12 @@ void PStartupHandler::OnCharacters(const char *str)
         if ((ival >= 0) && (ival <= 20)) {
           fFourierDefaults.fFourierPower = ival;
         } else {
-          cout << endl << "PStartupHandler **WARNING** fourier power '" << str << "' is not a valid number (0..20), will ignore it.";
-          cout << endl;
+          cerr << endl << "PStartupHandler **WARNING** fourier power '" << str << "' is not a valid number (0..20), will ignore it.";
+          cerr << endl;
         }
       } else {
-        cout << endl << "PStartupHandler **WARNING** fourier power '" << str << "' is not a valid number (0..20), will ignore it.";
-        cout << endl;
+        cerr << endl << "PStartupHandler **WARNING** fourier power '" << str << "' is not a valid number (0..20), will ignore it.";
+        cerr << endl;
       }
       break;
     case eApodization:
@@ -303,8 +303,8 @@ void PStartupHandler::OnCharacters(const char *str)
       } else if (!tstr.CompareTo("strong", TString::kIgnoreCase)) {
         fFourierDefaults.fApodization = FOURIER_APOD_STRONG;
       } else {
-        cout << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid apodization, will ignore it.";
-        cout << endl;
+        cerr << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid apodization, will ignore it.";
+        cerr << endl;
       }
       break;
     case ePlot:
@@ -320,8 +320,8 @@ void PStartupHandler::OnCharacters(const char *str)
       } else if (!tstr.CompareTo("phase", TString::kIgnoreCase)) {
         fFourierDefaults.fPlotTag = FOURIER_PLOT_PHASE;
       } else {
-        cout << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid plot option, will ignore it.";
-        cout << endl;
+        cerr << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid plot option, will ignore it.";
+        cerr << endl;
       }
       break;
     case ePhase:
@@ -329,8 +329,8 @@ void PStartupHandler::OnCharacters(const char *str)
       if (tstr.IsFloat()) {
         fFourierDefaults.fPhase = tstr.Atof();
       } else {
-        cout << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid phase, will ignore it.";
-        cout << endl;
+        cerr << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid phase, will ignore it.";
+        cerr << endl;
       }
       break;
     case ePhaseIncrement:
@@ -338,8 +338,8 @@ void PStartupHandler::OnCharacters(const char *str)
       if (tstr.IsFloat()) {
         fFourierDefaults.fPhaseIncrement = tstr.Atof();
       } else {
-        cout << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid phase increment, will ignore it.";
-        cout << endl;
+        cerr << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid phase increment, will ignore it.";
+        cerr << endl;
       }
       break;
     default:
@@ -355,7 +355,7 @@ void PStartupHandler::OnCharacters(const char *str)
  *
  * \param str
  */
-void PStartupHandler::OnComment(const char *str)
+void PStartupHandler::OnComment(const Char_t *str)
 {
   // nothing to be done for now
 }
@@ -368,10 +368,10 @@ void PStartupHandler::OnComment(const char *str)
  *
  * \param str
  */
-void PStartupHandler::OnWarning(const char *str)
+void PStartupHandler::OnWarning(const Char_t *str)
 {
-  cout << endl << "PStartupHandler **WARNING** " << str;
-  cout << endl;
+  cerr << endl << "PStartupHandler **WARNING** " << str;
+  cerr << endl;
 }
 
 //--------------------------------------------------------------------------
@@ -382,10 +382,10 @@ void PStartupHandler::OnWarning(const char *str)
  *
  * \param str
  */
-void PStartupHandler::OnError(const char *str)
+void PStartupHandler::OnError(const Char_t *str)
 {
-  cout << endl << "PStartupHandler **ERROR** " << str;
-  cout << endl;
+  cerr << endl << "PStartupHandler **ERROR** " << str;
+  cerr << endl;
 }
 
 //--------------------------------------------------------------------------
@@ -396,10 +396,10 @@ void PStartupHandler::OnError(const char *str)
  *
  * \param str
  */
-void PStartupHandler::OnFatalError(const char *str)
+void PStartupHandler::OnFatalError(const Char_t *str)
 {
-  cout << endl << "PStartupHandler **FATAL ERROR** " << str;
-  cout << endl;
+  cerr << endl << "PStartupHandler **FATAL ERROR** " << str;
+  cerr << endl;
 }
 
 //--------------------------------------------------------------------------
@@ -410,7 +410,7 @@ void PStartupHandler::OnFatalError(const char *str)
  *
  * \param str
  */
-void PStartupHandler::OnCdataBlock(const char *str, Int_t len)
+void PStartupHandler::OnCdataBlock(const Char_t *str, Int_t len)
 {
   // nothing to be done for now
 }
@@ -427,7 +427,7 @@ void PStartupHandler::CheckLists()
   // check if anything was set, and if not set some default stuff
 
   // check if any data path is given
-//cout << endl << ">> check data path list ...";  
+//cout << endl << ">> check data path list ...";
   if (fDataPathList.size() == 0) {
 //cout << endl << ">> data path list empty, will set default ones";  
     fDataPathList.push_back(TString("/mnt/data/nemu/his"));
@@ -478,9 +478,9 @@ void PStartupHandler::CheckLists()
  * <p>
  *
  */
-bool PStartupHandler::StartupFileExists(char *fln)
+Bool_t PStartupHandler::StartupFileExists(Char_t *fln)
 {
-  bool result = false;
+  Bool_t result = false;
 
   ifstream ifile(fln);
 

@@ -43,7 +43,7 @@ using namespace std;
  * \param runList
  * \param fitType
  */
-PFitterFcn::PFitterFcn(PRunListCollection *runList, bool useChi2)
+PFitterFcn::PFitterFcn(PRunListCollection *runList, Bool_t useChi2)
 {
   fUseChi2 = useChi2;
 
@@ -61,9 +61,9 @@ PFitterFcn::PFitterFcn(PRunListCollection *runList, bool useChi2)
     if ((fRunListCollection->GetNoOfAsymmetry() > 0) ||
         (fRunListCollection->GetNoOfRRF() > 0) ||
         (fRunListCollection->GetNoOfNonMusr() > 0)) {
-      cout << endl << "**WARNING**: Maximum Log Likelihood Fit is only implemented for Single Histogram Fit";
-      cout << endl << "             Will fall back to Chi Square Fit.";
-      cout << endl;
+      cerr << endl << "**WARNING**: Maximum Log Likelihood Fit is only implemented for Single Histogram Fit";
+      cerr << endl << "             Will fall back to Chi Square Fit.";
+      cerr << endl;
     }
   }
 }
@@ -84,9 +84,9 @@ PFitterFcn::~PFitterFcn()
  *
  * \param par
  */
-double PFitterFcn::operator()(const std::vector<double>& par) const
+Double_t PFitterFcn::operator()(const std::vector<Double_t>& par) const
 {
-  double value = 0.0;
+  Double_t value = 0.0;
 
   if (fUseChi2) { // chi square
     value += fRunListCollection->GetSingleHistoChisq(par);
@@ -101,7 +101,7 @@ double PFitterFcn::operator()(const std::vector<double>& par) const
   }
 
 // cout << endl;
-// for (unsigned int i=0; i<par.size(); i++) {
+// for (UInt_t i=0; i<par.size(); i++) {
 //   cout << par[i] << ", ";
 // }
 //cout << endl << "chisq = " << value;

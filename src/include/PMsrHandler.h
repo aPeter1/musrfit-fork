@@ -47,11 +47,11 @@
 class PMsrHandler
 {
   public:
-    PMsrHandler(const char *fileName);
+    PMsrHandler(const Char_t *fileName);
     virtual ~PMsrHandler();
 
-    virtual int ReadMsrFile();
-    virtual int WriteMsrLogFile(const bool messages = true);
+    virtual Int_t ReadMsrFile();
+    virtual Int_t WriteMsrLogFile(const Bool_t messages = true);
 
     virtual TString*                GetMsrTitle() { return &fTitle; }
     virtual PMsrParamList*          GetMsrParamList() { return &fParam; }
@@ -65,37 +65,37 @@ class PMsrHandler
 
     virtual TString* GetMsrFileDirectoryPath() { return &fMsrFileDirectoryPath; }
 
-    virtual unsigned int GetNoOfParams() { return fParam.size(); }
+    virtual UInt_t GetNoOfParams() { return fParam.size(); }
     virtual const TString& GetFileName() const { return fFileName; }
 
     virtual void SetMsrTitle(const TString &title) { fTitle = title; }
 
-    virtual bool SetMsrParamValue(unsigned int i, double value);
-    virtual bool SetMsrParamStep(unsigned int i, double value);
-    virtual bool SetMsrParamPosErrorPresent(unsigned int i, bool value);
-    virtual bool SetMsrParamPosError(unsigned int i, double value);
+    virtual Bool_t SetMsrParamValue(UInt_t i, Double_t value);
+    virtual Bool_t SetMsrParamStep(UInt_t i, Double_t value);
+    virtual Bool_t SetMsrParamPosErrorPresent(UInt_t i, Bool_t value);
+    virtual Bool_t SetMsrParamPosError(UInt_t i, Double_t value);
 
-    virtual void SetMsrT0Entry(unsigned int runNo, unsigned int idx, int bin);
-    virtual void SetMsrDataRangeEntry(unsigned int runNo, unsigned int idx, int bin);
-    virtual void SetMsrBkgRangeEntry(unsigned int runNo, unsigned int idx, int bin);
+    virtual void SetMsrT0Entry(UInt_t runNo, UInt_t idx, Int_t bin);
+    virtual void SetMsrDataRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin);
+    virtual void SetMsrBkgRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin);
 
     virtual void CopyMsrStatisticBlock() { fCopyStatisticsBlock = true; }
-    virtual void SetMsrStatisticConverged(bool converged) { fStatistic.fValid = converged; }
-    virtual void SetMsrStatisticMin(double min) { fStatistic.fMin = min; }
-    virtual void SetMsrStatisticNdf(unsigned int ndf) { fStatistic.fNdf = ndf; }
+    virtual void SetMsrStatisticConverged(Bool_t converged) { fStatistic.fValid = converged; }
+    virtual void SetMsrStatisticMin(Double_t min) { fStatistic.fMin = min; }
+    virtual void SetMsrStatisticNdf(UInt_t ndf) { fStatistic.fNdf = ndf; }
 
-    virtual int GetNoOfFuncs() { return fFuncHandler->GetNoOfFuncs(); }
-    virtual unsigned int GetFuncNo(int idx) { return fFuncHandler->GetFuncNo(idx); }
-    virtual unsigned int GetFuncIndex(int funNo) { return fFuncHandler->GetFuncIndex(funNo); }
-    virtual bool CheckMapAndParamRange(unsigned int mapSize, unsigned int paramSize)
+    virtual Int_t GetNoOfFuncs() { return fFuncHandler->GetNoOfFuncs(); }
+    virtual UInt_t GetFuncNo(Int_t idx) { return fFuncHandler->GetFuncNo(idx); }
+    virtual UInt_t GetFuncIndex(Int_t funNo) { return fFuncHandler->GetFuncIndex(funNo); }
+    virtual Bool_t CheckMapAndParamRange(UInt_t mapSize, UInt_t paramSize)
                        { return fFuncHandler->CheckMapAndParamRange(mapSize, paramSize); }
-    virtual double EvalFunc(unsigned int i, vector<int> map, vector<double> param)
+    virtual Double_t EvalFunc(UInt_t i, vector<Int_t> map, vector<Double_t> param)
                        { return fFuncHandler->Eval(i,map,param); }
 
-    virtual int ParameterInUse(unsigned int paramNo);
-    virtual bool CheckUniquenessOfParamNames(unsigned int &parX, unsigned int &parY);
-    virtual bool CheckMaps();
-    virtual bool CheckFuncs();
+    virtual Int_t ParameterInUse(UInt_t paramNo);
+    virtual Bool_t CheckUniquenessOfParamNames(UInt_t &parX, UInt_t &parY);
+    virtual Bool_t CheckMaps();
+    virtual Bool_t CheckFuncs();
 
   private:
     TString                fFileName;  ///< file name of the msr-file
@@ -110,29 +110,29 @@ class PMsrHandler
     PMsrPlotList           fPlots;     ///< holds a list of the plot input parameters
     PMsrStatisticStructure fStatistic; ///< holds the statistic info
 
-    int  fMsrBlockCounter; ///< used to select the proper msr-block
+    Int_t  fMsrBlockCounter; ///< used to select the proper msr-block
 
     PFunctionHandler *fFuncHandler; ///< needed to parse functions
 
     PIntVector fParamInUse; ///< array holding the information if a particular parameter is used at all, i.e. if the theory is using it (perhaps via maps or functions)
 
-    bool fCopyStatisticsBlock; ///< flag, if true: just copy to old statistics block (musrt0), otherwise write a new one (musrfit)
+    Bool_t fCopyStatisticsBlock; ///< flag, if true: just copy to old statistics block (musrt0), otherwise write a new one (musrfit)
 
-    virtual bool HandleFitParameterEntry(PMsrLines &line);
-    virtual bool HandleTheoryEntry(PMsrLines &line);
-    virtual bool HandleFunctionsEntry(PMsrLines &line);
-    virtual bool HandleRunEntry(PMsrLines &line);
-    virtual bool HandleCommandsEntry(PMsrLines &line);
-    virtual bool HandleFourierEntry(PMsrLines &line);
-    virtual bool HandlePlotEntry(PMsrLines &line);
-    virtual bool HandleStatisticEntry(PMsrLines &line);
+    virtual Bool_t HandleFitParameterEntry(PMsrLines &line);
+    virtual Bool_t HandleTheoryEntry(PMsrLines &line);
+    virtual Bool_t HandleFunctionsEntry(PMsrLines &line);
+    virtual Bool_t HandleRunEntry(PMsrLines &line);
+    virtual Bool_t HandleCommandsEntry(PMsrLines &line);
+    virtual Bool_t HandleFourierEntry(PMsrLines &line);
+    virtual Bool_t HandlePlotEntry(PMsrLines &line);
+    virtual Bool_t HandleStatisticEntry(PMsrLines &line);
 
     virtual void FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLines &run);
 
     virtual void InitRunParameterStructure(PMsrRunStructure &param);
     virtual void InitFourierParameterStructure(PMsrFourierStructure &fourier);
 
-    virtual bool FilterNumber(TString str, const char *filter, int offset, int &no);
+    virtual Bool_t FilterNumber(TString str, const Char_t *filter, Int_t offset, Int_t &no);
 };
 
 #endif // _PMSRHANDLER_H_

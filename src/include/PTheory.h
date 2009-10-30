@@ -107,12 +107,12 @@ class PTheory;
  * <p>Structure holding the infos of a the available internally defined functions.
  */
 typedef struct theo_data_base {
-  unsigned int fType;      ///< function tag
-  unsigned int fNoOfParam; ///< number of parameters for this function
-  bool fTable;             ///< table flag, indicating if the function is generate from a table
-  TString fName;           ///< name of the function as written into the msr-file
-  TString fAbbrev;         ///< abbreviation of the function name
-  TString fComment;        ///< comment added in the msr-file theory block to help the used
+  UInt_t fType;      ///< function tag
+  UInt_t fNoOfParam; ///< number of parameters for this function
+  Bool_t fTable;     ///< table flag, indicating if the function is generate from a table
+  TString fName;     ///< name of the function as written into the msr-file
+  TString fAbbrev;   ///< abbreviation of the function name
+  TString fComment;  ///< comment added in the msr-file theory block to help the used
   TString fCommentTimeShift; ///< comment added in the msr-file theory block if there is a time shift
 } PTheoDataBase;
 
@@ -192,52 +192,52 @@ static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
 class PTheory
 {
   public:
-    PTheory(PMsrHandler *msrInfo, unsigned int runNo, const bool hasParent = false);
+    PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent = false);
     virtual ~PTheory();
 
-    virtual bool IsValid();
-    virtual double Func(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Bool_t IsValid();
+    virtual Double_t Func(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
 
   private:
     virtual void CleanUp(PTheory *theo);
-    virtual int SearchDataBase(TString name);
+    virtual Int_t SearchDataBase(TString name);
     virtual void MakeCleanAndTidyTheoryBlock(PMsrLines* fullTheoryBlock);
-    virtual void MakeCleanAndTidyPolynom(unsigned int i, PMsrLines* fullTheoryBlock);
-    virtual void MakeCleanAndTidyUserFcn(unsigned int i, PMsrLines* fullTheoryBlock);
+    virtual void MakeCleanAndTidyPolynom(UInt_t i, PMsrLines* fullTheoryBlock);
+    virtual void MakeCleanAndTidyUserFcn(UInt_t i, PMsrLines* fullTheoryBlock);
 
-    virtual double Asymmetry(const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double SimpleExp(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double GeneralExp(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double SimpleGauss(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double StaticGaussKT(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double StaticGaussKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double DynamicGaussKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double StaticLorentzKT(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double StaticLorentzKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double DynamicLorentzKTLF(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double CombiLGKT(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double SpinGlass(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double RandomAnisotropicHyperfine(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double Abragam(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double InternalField(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double TFCos(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double Bessel(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double InternalBessel(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double SkewedGauss(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double Polynom(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual double UserFcn(register double t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t Asymmetry(const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t SimpleExp(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t GeneralExp(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t SimpleGauss(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t StaticGaussKT(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t StaticGaussKTLF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t DynamicGaussKTLF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t StaticLorentzKT(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t StaticLorentzKTLF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t DynamicLorentzKTLF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t CombiLGKT(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t SpinGlass(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t RandomAnisotropicHyperfine(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t Abragam(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t InternalField(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t TFCos(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t Bessel(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t InternalBessel(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t SkewedGauss(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t Polynom(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t UserFcn(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
 
-    virtual void CalculateGaussLFIntegral(const double *val) const;
-    virtual void CalculateLorentzLFIntegral(const double *val) const;
-    virtual double GetLFIntegralValue(const double t) const;
-    virtual void CalculateDynKTLF(const double *val, int tag) const;
-    virtual double GetDynKTLFValue(const double t) const;
+    virtual void CalculateGaussLFIntegral(const Double_t *val) const;
+    virtual void CalculateLorentzLFIntegral(const Double_t *val) const;
+    virtual Double_t GetLFIntegralValue(const Double_t t) const;
+    virtual void CalculateDynKTLF(const Double_t *val, Int_t tag) const;
+    virtual Double_t GetDynKTLFValue(const Double_t t) const;
 
     // variables
-    bool fValid;
-    unsigned int fType;
-    vector<unsigned int> fParamNo; ///< holds the parameter numbers for the theory (including maps and functions, see constructor desciption)
-    unsigned int fNoOfParam;
+    Bool_t fValid;
+    UInt_t fType;
+    vector<UInt_t> fParamNo; ///< holds the parameter numbers for the theory (including maps and functions, see constructor desciption)
+    UInt_t fNoOfParam;
     PTheory *fAdd, *fMul;
 
     TString fUserFcnClassName; ///< name of the user function class for within root
@@ -247,10 +247,10 @@ class PTheory
 
     PMsrHandler *fMsrInfo;
 
-    mutable double fPrevParam[THEORY_MAX_PARAM]; ///< needed for LF-stuff
-    mutable PDoubleVector fLFIntegral;           ///< needed for LF-stuff. Keeps the non-analytic integral values
-    mutable double fDynLFdt;
-    mutable PDoubleVector fDynLFFuncValue;       ///< needed for LF-stuff. Keeps the dynamic LF KT function values
+    mutable Double_t fPrevParam[THEORY_MAX_PARAM]; ///< needed for LF-stuff
+    mutable PDoubleVector fLFIntegral;             ///< needed for LF-stuff. Keeps the non-analytic integral values
+    mutable Double_t fDynLFdt;
+    mutable PDoubleVector fDynLFFuncValue;         ///< needed for LF-stuff. Keeps the dynamic LF KT function values
 };
 
 #endif //  _PTHEORY_H_

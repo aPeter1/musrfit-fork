@@ -65,11 +65,11 @@ using namespace boost::spirit;
 
 //----------------------------------------------------------------------------
 typedef struct func_tree_node {
-  int    fID; ///< tag showing what tree element this is
-  int    fOperatorTag; ///< tag for '+', '-', '*', '/'
-  int    fFunctionTag; ///< tag got "cos", "sin", ...
-  int    fIvalue; ///< for parameter numbers and maps
-  double fDvalue; ///< for numbers
+  Int_t    fID; ///< tag showing what tree element this is
+  Int_t    fOperatorTag; ///< tag for '+', '-', '*', '/'
+  Int_t    fFunctionTag; ///< tag got "cos", "sin", ...
+  Int_t    fIvalue; ///< for parameter numbers and maps
+  Double_t fDvalue; ///< for numbers
   vector<func_tree_node> children; ///< holding sub-tree
 } PFuncTreeNode;
 
@@ -79,32 +79,32 @@ class PFunction {
     PFunction(tree_parse_info<> info);
     virtual ~PFunction();
 
-    virtual bool IsValid() { return fValid; }
-    virtual int GetFuncNo() { return fFuncNo; }
-    virtual bool CheckMapAndParamRange(unsigned int mapSize, unsigned int paramSize);
-    virtual double Eval(vector<double> param);
-    virtual void SetMap(vector<int> map) { fMap = map; }
+    virtual Bool_t IsValid() { return fValid; }
+    virtual Int_t GetFuncNo() { return fFuncNo; }
+    virtual Bool_t CheckMapAndParamRange(UInt_t mapSize, UInt_t paramSize);
+    virtual Double_t Eval(vector<Double_t> param);
+    virtual void SetMap(vector<Int_t> map) { fMap = map; }
 
     virtual TString* GetFuncString() { return &fFuncString; }
 
   protected:
-    virtual bool SetFuncNo();
+    virtual Bool_t SetFuncNo();
 
-    virtual bool FindAndCheckMapAndParamRange(PFuncTreeNode &node, unsigned int mapSize, unsigned int paramSize);
-    virtual bool GenerateFuncEvalTree();
+    virtual Bool_t FindAndCheckMapAndParamRange(PFuncTreeNode &node, UInt_t mapSize, UInt_t paramSize);
+    virtual Bool_t GenerateFuncEvalTree();
     virtual void FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node);
-    virtual double EvalNode(PFuncTreeNode &node);
+    virtual Double_t EvalNode(PFuncTreeNode &node);
     virtual void CleanupFuncEvalTree();
     virtual void CleanupNode(PFuncTreeNode &node);
 
   private:
     tree_parse_info<> fInfo;
-    vector<double> fParam;
-    vector<int> fMap;
+    vector<Double_t> fParam;
+    vector<Int_t> fMap;
     PFuncTreeNode fFunc;
 
-    bool fValid; ///< flag showing if the function is valid
-    int fFuncNo; ///< function number, i.e. FUNx with x the function number
+    Bool_t fValid; ///< flag showing if the function is valid
+    Int_t fFuncNo; ///< function number, i.e. FUNx with x the function number
 
     virtual void EvalTreeForString(tree_parse_info<> info);
     virtual void EvalTreeForStringExpression(iter_t const& i);

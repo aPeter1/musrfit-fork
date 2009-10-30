@@ -44,42 +44,31 @@ using namespace std;
 
 //------------------------------------------------------------------------------------------
 /**
- * brauche ich eine base class um zwischen den verschiedenen run-modi unterscheiden zu können?
- * Ich meine:
- * - single histogram
- * - asymmetry
- * - RRF
- * - non muSR
- *
- * --> JA
- *
- * PTheory and PFunctions werden direkt für jeden run generiert, da man dann maps und functions
- * direkt für den spezifischen run umsetzen kann (da man eliminiert alle maps und functions). Dies
- * garantiert effiziente theory-Aufrufe da diese in chisq/maxlikelyhood x-fach aufgerufen werden.
+ * <p>
  */
 class PRunBase
 {
   public:
     PRunBase();
-    PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo, EPMusrHandleTag tag);
+    PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag);
     virtual ~PRunBase();
 
-    virtual double CalcChiSquare(const vector<double>& par) = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
-    virtual double CalcMaxLikelihood(const vector<double>& par) = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
+    virtual Double_t CalcChiSquare(const vector<Double_t>& par) = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
+    virtual Double_t CalcMaxLikelihood(const vector<Double_t>& par) = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
 
     virtual void CalcTheory() = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
 
-    virtual unsigned int GetRunNo() { return fRunNo; }
+    virtual UInt_t GetRunNo() { return fRunNo; }
     virtual PRunData* GetData() { return &fData; }
     virtual void CleanUp();
-    virtual bool IsValid() { return fValid; }
+    virtual Bool_t IsValid() { return fValid; }
 
   protected:
-    bool fValid;
+    Bool_t fValid;
 
     EPMusrHandleTag fHandleTag; ///< tag telling whether this is used for fit, view, ...
 
-    int fRunNo;                 ///< number of the run within the msr file
+    Int_t fRunNo;               ///< number of the run within the msr file
     PMsrHandler      *fMsrInfo; ///< msr-file handler
     PMsrRunStructure *fRunInfo; ///< run info used to filter out needed infos for the run
     PRunDataHandler  *fRawData; ///< holds the raw run data
@@ -87,10 +76,10 @@ class PRunBase
     PIntVector fParamNo;        ///< vector of parameter numbers for the specifc run
 
     PRunData fData;             ///< data to be fitted, viewed, i.e. binned data
-    double fTimeResolution;     ///< time resolution in (us)
+    Double_t fTimeResolution;   ///< time resolution in (us)
     PIntVector fT0s;            ///< all t0's of a run! The derived classes will handle it
 
-    virtual bool PrepareData() = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
+    virtual Bool_t PrepareData() = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
 
     PDoubleVector fFuncValues;  ///< is keeping the values of the functions from the FUNCTIONS block
     PTheory *fTheory;           ///< theory needed to calculate chi-square

@@ -58,9 +58,9 @@ PRunRRF::PRunRRF() : PRunBase()
  * \param msrInfo pointer to the msr info structure
  * \param runNo number of the run of the msr-file
  */
-PRunRRF::PRunRRF(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
+PRunRRF::PRunRRF(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
 {
-  bool success;
+  Bool_t success;
 
   // calculate fFitData
   if (success) {
@@ -87,10 +87,10 @@ PRunRRF::~PRunRRF()
  *
  * \param par parameter vector iterated by minuit
  */
-double PRunRRF::CalcChiSquare(const std::vector<double>& par)
+Double_t PRunRRF::CalcChiSquare(const std::vector<Double_t>& par)
 {
-  double chisq = 0.0;
-  double diff = 0.0;
+  Double_t chisq = 0.0;
+  Double_t diff = 0.0;
 
   return chisq;
 }
@@ -103,7 +103,7 @@ double PRunRRF::CalcChiSquare(const std::vector<double>& par)
  *
  * \param par parameter vector iterated by minuit
  */
-double PRunRRF::CalcMaxLikelihood(const std::vector<double>& par)
+Double_t PRunRRF::CalcMaxLikelihood(const std::vector<Double_t>& par)
 {
   cout << endl << "PRunSingleHisto::CalcMaxLikelihood(): not implemented yet ..." << endl;
 
@@ -128,9 +128,9 @@ void PRunRRF::CalcTheory()
  * <p>
  *
  */
-bool PRunRRF::PrepareData()
+Bool_t PRunRRF::PrepareData()
 {
-  bool success = true;
+  Bool_t success = true;
 
   cout << endl << "in PRunRRF::PrepareData(): will feed fData";
 

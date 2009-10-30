@@ -38,34 +38,34 @@ class PRunAsymmetry : public PRunBase
 {
   public:
     PRunAsymmetry();
-    PRunAsymmetry(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo, EPMusrHandleTag tag);
+    PRunAsymmetry(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag);
     virtual ~PRunAsymmetry();
 
-    virtual double CalcChiSquare(const std::vector<double>& par);
-    virtual double CalcMaxLikelihood(const std::vector<double>& par);
+    virtual Double_t CalcChiSquare(const std::vector<Double_t>& par);
+    virtual Double_t CalcMaxLikelihood(const std::vector<Double_t>& par);
     virtual void CalcTheory();
 
-    virtual unsigned int GetNoOfFitBins() { return fNoOfFitBins; }
+    virtual UInt_t GetNoOfFitBins() { return fNoOfFitBins; }
 
   protected:
-    virtual bool PrepareData();
-    virtual bool PrepareFitData(PRawRunData* runData, unsigned int histoNo[2]);
-    virtual bool PrepareViewData(PRawRunData* runData, unsigned int histoNo[2]);
+    virtual Bool_t PrepareData();
+    virtual Bool_t PrepareFitData(PRawRunData* runData, UInt_t histoNo[2]);
+    virtual Bool_t PrepareViewData(PRawRunData* runData, UInt_t histoNo[2]);
 
   private:
-    unsigned int fAlphaBetaTag; ///< 1-> alpha = beta = 1; 2-> alpha != 1, beta = 1; 3-> alpha = 1, beta != 1; 4-> alpha != 1, beta != 1
+    UInt_t fAlphaBetaTag; ///< 1-> alpha = beta = 1; 2-> alpha != 1, beta = 1; 3-> alpha = 1, beta != 1; 4-> alpha != 1, beta != 1
 
-    double fFitStartTime;
-    double fFitStopTime;
-    unsigned int fNoOfFitBins;
+    Double_t fFitStartTime;
+    Double_t fFitStopTime;
+    UInt_t fNoOfFitBins;
 
     PDoubleVector fForward;     ///< forward histo data
     PDoubleVector fForwardErr;  ///< forward histo errors
     PDoubleVector fBackward;    ///< backward histo data
     PDoubleVector fBackwardErr; ///< backward histo errors
 
-    bool SubtractFixBkg();
-    bool SubtractEstimatedBkg();
+    Bool_t SubtractFixBkg();
+    Bool_t SubtractEstimatedBkg();
 };
 
 #endif // _PRUNASYMMETRY_H_

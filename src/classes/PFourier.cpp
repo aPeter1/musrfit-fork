@@ -52,20 +52,20 @@ using namespace std;
  * <p>
  *
  */
-PFourier::PFourier(TH1F *data, int unitTag, double startTime, double endTime, unsigned int zeroPaddingPower) :
+PFourier::PFourier(TH1F *data, Int_t unitTag, Double_t startTime, Double_t endTime, UInt_t zeroPaddingPower) :
                    fData(data), fUnitTag(unitTag), fStartTime(startTime), fEndTime(endTime),
                    fZeroPaddingPower(zeroPaddingPower)
 {
   // some necessary checks and initialization
   if (fData == 0) {
-    cout << endl << "**ERROR** PFourier::PFourier: no valid data" << endl << endl;
+    cerr << endl << "**ERROR** PFourier::PFourier: no valid data" << endl << endl;
     fValid = false;
     return;
   }
 
 //cout << endl << "PFourier::PFourier: fData = " << fData;
 /*
-for (unsigned int i=0; i<10; i++) {
+for (UInt_t i=0; i<10; i++) {
   cout << endl << "PFourier::PFourier: i=" << i << ", t=" << fData->GetBinCenter(i) << ", value=" << fData->GetBinContent(i);
 }
 */
@@ -83,14 +83,14 @@ for (unsigned int i=0; i<10; i++) {
 
   // if endTime == 0 set it to the last time slot
   if (fEndTime == 0.0) {
-    int last = fData->GetNbinsX()-1;
+    Int_t last = fData->GetNbinsX()-1;
     fEndTime = fData->GetBinCenter(last);
 //cout << endl << ">> fEndTime = " << fEndTime;
   }
 
   // swap start and end time if necessary
   if (fStartTime > fEndTime) {
-    double keep = fStartTime;
+    Double_t keep = fStartTime;
     fStartTime = fEndTime;
     fEndTime = keep;
   }
@@ -98,15 +98,15 @@ for (unsigned int i=0; i<10; i++) {
 //cout << endl << "start time = " << fStartTime << endl;
 
   // calculate start and end bin
-  unsigned int start = (unsigned int)(fStartTime/fTimeResolution);
-  unsigned int end = (unsigned int)(fEndTime/fTimeResolution);
+  UInt_t start = (UInt_t)(fStartTime/fTimeResolution);
+  UInt_t end = (UInt_t)(fEndTime/fTimeResolution);
   fNoOfData = end-start;
 
 //cout << endl << ">> fNoOfData = " << fNoOfData;
 
 // check if zero padding is whished
   if (fZeroPaddingPower > 0) {
-    unsigned int noOfBins = static_cast<unsigned int>(pow(2.0, static_cast<double>(fZeroPaddingPower)));
+    UInt_t noOfBins = static_cast<UInt_t>(pow(2.0, static_cast<Double_t>(fZeroPaddingPower)));
     if (noOfBins > fNoOfData)
       fNoOfBins = noOfBins;
     else
@@ -118,7 +118,7 @@ for (unsigned int i=0; i<10; i++) {
 //cout << endl << ">> fNoOfBins = " << fNoOfBins;
 
   // calculate fourier resolution
-  double resolution = 1.0/(fTimeResolution*fNoOfBins); // in MHz
+  Double_t resolution = 1.0/(fTimeResolution*fNoOfBins); // in MHz
   switch (fUnitTag) {
     case FOURIER_UNIT_FIELD:
       fResolution = resolution/F_GAMMA_BAR_MUON;
@@ -186,7 +186,7 @@ PFourier::~PFourier()
  *
  * \param apodizationTag 0=no apod., 1=weak apod., 2=medium apod., 3=strong apod.
  */
-void PFourier::Transform(unsigned int apodizationTag)
+void PFourier::Transform(UInt_t apodizationTag)
 {
   if (!fValid)
     return;
@@ -196,8 +196,8 @@ void PFourier::Transform(unsigned int apodizationTag)
   fftw_execute(fFFTwPlan);
 
   // correct the phase for tstart != 0.0
-  double phase, re, im;
-  for (unsigned int i=0; i<fNoOfBins; i++) {
+  Double_t phase, re, im;
+  for (UInt_t i=0; i<fNoOfBins; i++) {
     phase = 2.0*PI/(fTimeResolution*fNoOfBins) * i * fStartTime;
     re =  fOut[i][0] * cos(phase) + fOut[i][1] * sin(phase);
     im = -fOut[i][0] * sin(phase) + fOut[i][1] * cos(phase);
@@ -214,27 +214,27 @@ void PFourier::Transform(unsigned int apodizationTag)
  *
  * \param scale
  */
-TH1F* PFourier::GetRealFourier(const double scale)
+TH1F* PFourier::GetRealFourier(const Double_t scale)
 {
   // check if valid flag is set
   if (!fValid)
     return 0;
 
   // invoke realFourier
-  char name[256];
-  char title[256];
+  Char_t name[256];
+  Char_t title[256];
   snprintf(name, sizeof(name), "%s_Fourier_Re", fData->GetName());
   snprintf(title, sizeof(title), "%s_Fourier_Re", fData->GetTitle());
 
-  TH1F *realFourier = new TH1F(name, title, fNoOfBins/2, -fResolution/2.0, (double)fNoOfBins/2.0*fResolution+fResolution/2.0);
+  TH1F *realFourier = new TH1F(name, title, fNoOfBins/2, -fResolution/2.0, (Double_t)fNoOfBins/2.0*fResolution+fResolution/2.0);
   if (realFourier == 0) {
     fValid = false;
-    cout << endl << "**SEVERE ERROR** couldn't allocate memory for the real part of the Fourier transform." << endl;
+    cerr << endl << "**SEVERE ERROR** couldn't allocate memory for the real part of the Fourier transform." << endl;
     return 0;
   }
 
   // fill realFourier vector
-  for (unsigned int i=0; i<fNoOfBins/2; i++) {
+  for (UInt_t i=0; i<fNoOfBins/2; i++) {
     realFourier->SetBinContent(i+1, scale*fOut[i][0]);
     realFourier->SetBinError(i+1, 0.0);
   }
@@ -250,27 +250,27 @@ TH1F* PFourier::GetRealFourier(const double scale)
  *
  * \param scale
  */
-TH1F* PFourier::GetImaginaryFourier(const double scale)
+TH1F* PFourier::GetImaginaryFourier(const Double_t scale)
 {
   // check if valid flag is set
   if (!fValid)
     return 0;
 
   // invoke imaginaryFourier
-  char name[256];
-  char title[256];
+  Char_t name[256];
+  Char_t title[256];
   snprintf(name, sizeof(name), "%s_Fourier_Im", fData->GetName());
   snprintf(title, sizeof(title), "%s_Fourier_Im", fData->GetTitle());
 
-  TH1F* imaginaryFourier = new TH1F(name, title, fNoOfBins/2, -fResolution/2.0, (double)fNoOfBins/2.0*fResolution+fResolution/2.0);
+  TH1F* imaginaryFourier = new TH1F(name, title, fNoOfBins/2, -fResolution/2.0, (Double_t)fNoOfBins/2.0*fResolution+fResolution/2.0);
   if (imaginaryFourier == 0) {
     fValid = false;
-    cout << endl << "**SEVERE ERROR** couldn't allocate memory for the imaginary part of the Fourier transform." << endl;
+    cerr << endl << "**SEVERE ERROR** couldn't allocate memory for the imaginary part of the Fourier transform." << endl;
     return 0;
   }
 
   // fill imaginaryFourier vector
-  for (unsigned int i=0; i<fNoOfBins/2; i++) {
+  for (UInt_t i=0; i<fNoOfBins/2; i++) {
     imaginaryFourier->SetBinContent(i+1, scale*fOut[i][1]);
     imaginaryFourier->SetBinError(i+1, 0.0);
   }
@@ -286,27 +286,27 @@ TH1F* PFourier::GetImaginaryFourier(const double scale)
  *
  * \param scale
  */
-TH1F* PFourier::GetPowerFourier(const double scale)
+TH1F* PFourier::GetPowerFourier(const Double_t scale)
 {
   // check if valid flag is set
   if (!fValid)
     return 0;
 
   // invoke powerFourier
-  char name[256];
-  char title[256];
+  Char_t name[256];
+  Char_t title[256];
   snprintf(name, sizeof(name), "%s_Fourier_Pwr", fData->GetName());
   snprintf(title, sizeof(title), "%s_Fourier_Pwr", fData->GetTitle());
 
-  TH1F* pwrFourier = new TH1F(name, title, fNoOfBins/2, -fResolution/2.0, (double)fNoOfBins/2.0*fResolution+fResolution/2.0);
+  TH1F* pwrFourier = new TH1F(name, title, fNoOfBins/2, -fResolution/2.0, (Double_t)fNoOfBins/2.0*fResolution+fResolution/2.0);
   if (pwrFourier == 0) {
     fValid = false;
-    cout << endl << "**SEVERE ERROR** couldn't allocate memory for the power part of the Fourier transform." << endl;
+    cerr << endl << "**SEVERE ERROR** couldn't allocate memory for the power part of the Fourier transform." << endl;
     return 0;
   }
 
   // fill powerFourier vector
-  for (unsigned int i=0; i<fNoOfBins/2; i++) {
+  for (UInt_t i=0; i<fNoOfBins/2; i++) {
     pwrFourier->SetBinContent(i+1, scale*sqrt(fOut[i][0]*fOut[i][0]+fOut[i][1]*fOut[i][1]));
     pwrFourier->SetBinError(i+1, 0.0);
   }
@@ -322,28 +322,28 @@ TH1F* PFourier::GetPowerFourier(const double scale)
  *
  * \param scale
  */
-TH1F* PFourier::GetPhaseFourier(const double scale)
+TH1F* PFourier::GetPhaseFourier(const Double_t scale)
 {
   // check if valid flag is set
   if (!fValid)
     return 0;
 
   // invoke phaseFourier
-  char name[256];
-  char title[256];
+  Char_t name[256];
+  Char_t title[256];
   snprintf(name, sizeof(name), "%s_Fourier_Phase", fData->GetName());
   snprintf(title, sizeof(title), "%s_Fourier_Phase", fData->GetTitle());
 
-  TH1F* phaseFourier = new TH1F(name, title, fNoOfBins/2, -fResolution/2.0, (double)fNoOfBins/2.0*fResolution+fResolution/2.0);
+  TH1F* phaseFourier = new TH1F(name, title, fNoOfBins/2, -fResolution/2.0, (Double_t)fNoOfBins/2.0*fResolution+fResolution/2.0);
   if (phaseFourier == 0) {
     fValid = false;
-    cout << endl << "**SEVERE ERROR** couldn't allocate memory for the phase part of the Fourier transform." << endl;
+    cerr << endl << "**SEVERE ERROR** couldn't allocate memory for the phase part of the Fourier transform." << endl;
     return 0;
   }
 
   // fill phaseFourier vector
-  double value = 0.0;
-  for (unsigned int i=0; i<fNoOfBins/2; i++) {
+  Double_t value = 0.0;
+  for (UInt_t i=0; i<fNoOfBins/2; i++) {
     // calculate the phase
     if (fOut[i][0] == 0) {
       if (fOut[i][1] >= 0.0)
@@ -374,12 +374,12 @@ TH1F* PFourier::GetPhaseFourier(const double scale)
  * <p>
  *
  */
-void PFourier::PrepareFFTwInputData(unsigned int apodizationTag)
+void PFourier::PrepareFFTwInputData(UInt_t apodizationTag)
 {
   // 1st find t==0. fData start at times t<0!!
-  int t0bin = -1;
+  Int_t t0bin = -1;
 //cout << ">> PFourier::PrepareFFTwInputData: fData=" << fData << ", fData->GetNbinsX() = " << fData->GetNbinsX();
-    for (int i=1; i<fData->GetNbinsX(); i++) {
+    for (Int_t i=1; i<fData->GetNbinsX(); i++) {
 //if (i<20) cout << endl << ">> PFourier::PrepareFFTwInputData: i=" << i << ", fData->GetBinCenter(i)=" << fData->GetBinCenter(i);
     if (fData->GetBinCenter(i) >= 0.0) {
       t0bin = i;
@@ -389,13 +389,13 @@ void PFourier::PrepareFFTwInputData(unsigned int apodizationTag)
 //cout << endl << "t0bin = " << t0bin << endl;
 
   // 2nd fill fIn
-  unsigned int start = (unsigned int)(fStartTime/fTimeResolution) + t0bin;
+  UInt_t start = (UInt_t)(fStartTime/fTimeResolution) + t0bin;
 //cout << endl << "start = " << start << endl;
-  for (unsigned int i=0; i<fNoOfData; i++) {
+  for (UInt_t i=0; i<fNoOfData; i++) {
     fIn[i][0] = fData->GetBinContent(i+start);
     fIn[i][1] = 0.0;
   }
-  for (unsigned int i=fNoOfData; i<fNoOfBins; i++) {
+  for (UInt_t i=fNoOfData; i<fNoOfBins; i++) {
     fIn[i][0] = 0.0;
     fIn[i][1] = 0.0;
   }
@@ -406,7 +406,7 @@ void PFourier::PrepareFFTwInputData(unsigned int apodizationTag)
 
 /*
 cout << ">> PFourier::PrepareFFTwInputData: fNoOfData = " << fNoOfData << ", fNoOfBins = " << fNoOfBins << endl;
-for (unsigned int i=0; i<10; i++) {
+for (UInt_t i=0; i<10; i++) {
   cout << endl << ">> PFourier::PrepareFFTwInputData: " << i << ": fIn[i][0] = " << fIn[i][0];
 }
 cout << endl;
@@ -421,14 +421,14 @@ cout << endl;
  *
  * \param apodizationTag
  */
-void PFourier::ApodizeData(int apodizationTag) {
+void PFourier::ApodizeData(Int_t apodizationTag) {
 
-  const double cweak[3]   = { 0.384093, -0.087577, 0.703484 };
-  const double cmedium[3] = { 0.152442, -0.136176, 0.983734 };
-  const double cstrong[3] = { 0.045335,  0.554883, 0.399782 };
+  const Double_t cweak[3]   = { 0.384093, -0.087577, 0.703484 };
+  const Double_t cmedium[3] = { 0.152442, -0.136176, 0.983734 };
+  const Double_t cstrong[3] = { 0.045335,  0.554883, 0.399782 };
 
-  double c[5];
-  for (unsigned int i=0; i<5; i++) {
+  Double_t c[5];
+  for (UInt_t i=0; i<5; i++) {
     c[i] = 0.0;
   }
 
@@ -454,15 +454,15 @@ void PFourier::ApodizeData(int apodizationTag) {
       c[4] = cstrong[2];
       break;
     default:
-      cout << endl << ">> **ERROR** User Apodization tag " << apodizationTag << " unknown, sorry ..." << endl;
+      cerr << endl << ">> **ERROR** User Apodization tag " << apodizationTag << " unknown, sorry ..." << endl;
       break;
   }
 
-  double q;
-  for (unsigned int i=0; i<fNoOfData; i++) {
+  Double_t q;
+  for (UInt_t i=0; i<fNoOfData; i++) {
     q = c[0];
-    for (unsigned int j=1; j<5; j++) {
-      q += c[j] * pow((double)i/(double)fNoOfData, 2.0*(double)j);
+    for (UInt_t j=1; j<5; j++) {
+      q += c[j] * pow((Double_t)i/(Double_t)fNoOfData, 2.0*(Double_t)j);
     }
     fIn[i][0] *= q;
   }

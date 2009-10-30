@@ -101,11 +101,11 @@ PFunction::~PFunction()
  *
  * \param i
  */
-bool PFunction::SetFuncNo()
+Bool_t PFunction::SetFuncNo()
 {
-  int funNo = -1;
-  int status;
-  bool success = true;
+  Int_t funNo = -1;
+  Int_t status;
+  Bool_t success = true;
 
   // get root
   iter_t i = fInfo.trees.begin(); // assignement
@@ -117,7 +117,7 @@ bool PFunction::SetFuncNo()
   // extract function number from string
   status = sscanf(str.c_str(), "FUN%d", &funNo);
 //cout << endl << "SetFuncNo: status = " << status << ", funNo = " << funNo;
-  if (status == 1) { // found 1 int
+  if (status == 1) { // found 1 Int_t
     fFuncNo = funNo;
   } else { // wrong string
     success = false;
@@ -133,7 +133,7 @@ bool PFunction::SetFuncNo()
  * <p>
  *
  */
-bool PFunction::GenerateFuncEvalTree()
+Bool_t PFunction::GenerateFuncEvalTree()
 {
   FillFuncEvalTree(fInfo.trees.begin(), fFunc);
 
@@ -149,15 +149,15 @@ bool PFunction::GenerateFuncEvalTree()
  */
 void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
 {
-  double dvalue;
-  int    ivalue;
-  int    status;
+  Double_t dvalue;
+  Int_t    ivalue;
+  Int_t    status;
   string str;
   PFuncTreeNode child;
 
   if (i->value.id() == PFunctionGrammar::realID) { // handle number
     str = string(i->value.begin(), i->value.end()); // get string
-    status = sscanf(str.c_str(), "%lf", &dvalue); // convert string to double
+    status = sscanf(str.c_str(), "%lf", &dvalue); // convert string to Double_t
     node.fID = PFunctionGrammar::realID; // keep the ID
     node.fDvalue = dvalue; // keep the value
 // cout << endl << ">> realID: value = " << dvalue;
@@ -216,7 +216,8 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     else if (!strcmp(str.c_str(), "EXP"))
       node.fFunctionTag = FUN_EXP;
     else {
-      cout << endl << "**PANIC ERROR**: function " << str << " doesn't exist, but you never should have reached this point!";
+      cerr << endl << "**PANIC ERROR**: function " << str << " doesn't exist, but you never should have reached this point!";
+      cerr << endl;
       assert(0);
     }
     // add node
@@ -286,7 +287,7 @@ else
  * \param mapSize
  * \param paramSize
  */
-bool PFunction::CheckMapAndParamRange(unsigned int mapSize, unsigned int paramSize)
+Bool_t PFunction::CheckMapAndParamRange(UInt_t mapSize, UInt_t paramSize)
 {
   return FindAndCheckMapAndParamRange(fFunc, mapSize, paramSize);
 }
@@ -301,7 +302,7 @@ bool PFunction::CheckMapAndParamRange(unsigned int mapSize, unsigned int paramSi
  * \param mapSize
  * \param paramSize
  */
-bool PFunction::FindAndCheckMapAndParamRange(PFuncTreeNode &node, unsigned int mapSize, unsigned int paramSize)
+Bool_t PFunction::FindAndCheckMapAndParamRange(PFuncTreeNode &node, UInt_t mapSize, UInt_t paramSize)
 {
   if (node.fID == PFunctionGrammar::realID) {
     return true;
@@ -310,12 +311,12 @@ bool PFunction::FindAndCheckMapAndParamRange(PFuncTreeNode &node, unsigned int m
   } else if (node.fID == PFunctionGrammar::constGammaMuID) {
     return true;
   } else if (node.fID == PFunctionGrammar::parameterID) {
-    if (node.fIvalue <= (int) paramSize)
+    if (node.fIvalue <= (Int_t) paramSize)
       return true;
     else
       return false;
   } else if (node.fID == PFunctionGrammar::mapID) {
-    if (node.fIvalue <= (int) mapSize)
+    if (node.fIvalue <= (Int_t) mapSize)
       return true;
     else
       return false;
@@ -334,7 +335,8 @@ bool PFunction::FindAndCheckMapAndParamRange(PFuncTreeNode &node, unsigned int m
     else
       return false;
   } else {
-    cout << endl << "**PANIC ERROR**: PFunction::FindAndCheckMapAndParamRange: you never should have reached this point!" << endl;
+    cerr << endl << "**PANIC ERROR**: PFunction::FindAndCheckMapAndParamRange: you never should have reached this point!";
+    cerr << endl;
     assert(0);
   }
   return true;
@@ -347,7 +349,7 @@ bool PFunction::FindAndCheckMapAndParamRange(PFuncTreeNode &node, unsigned int m
  * <p>
  *
  */
-double PFunction::Eval(vector<double> param)
+Double_t PFunction::Eval(vector<Double_t> param)
 {
   fParam = param;
 
@@ -362,7 +364,7 @@ double PFunction::Eval(vector<double> param)
  *
  * \param node
  */
-double PFunction::EvalNode(PFuncTreeNode &node)
+Double_t PFunction::EvalNode(PFuncTreeNode &node)
 {
   if (node.fID == PFunctionGrammar::realID) {
     return node.fDvalue;
@@ -409,7 +411,8 @@ double PFunction::EvalNode(PFuncTreeNode &node)
     } else if (node.fFunctionTag == FUN_EXP) {
       return exp(EvalNode(node.children[0]));
     } else {
-      cout << endl << "**PANIC ERROR**: PFunction::EvalNode: node.fID == PFunctionGrammar::functionID: you never should have reached this point!" << endl;
+      cerr << endl << "**PANIC ERROR**: PFunction::EvalNode: node.fID == PFunctionGrammar::functionID: you never should have reached this point!";
+      cerr << endl;
       assert(0);
     }
   } else if (node.fID == PFunctionGrammar::factorID) {
@@ -418,9 +421,10 @@ double PFunction::EvalNode(PFuncTreeNode &node)
     if (node.fOperatorTag == OP_MUL) {
       return EvalNode(node.children[0]) * EvalNode(node.children[1]);
     } else {
-      double denominator = EvalNode(node.children[1]);
+      Double_t denominator = EvalNode(node.children[1]);
       if (denominator == 0.0) {
-        cout << endl << "**PANIC ERROR**: PFunction::EvalNode: division by 0.0" << endl;
+        cerr << endl << "**PANIC ERROR**: PFunction::EvalNode: division by 0.0";
+        cerr << endl;
         assert(0);
       }
       return EvalNode(node.children[0]) / denominator;
@@ -432,7 +436,8 @@ double PFunction::EvalNode(PFuncTreeNode &node)
       return EvalNode(node.children[0]) - EvalNode(node.children[1]);
     }
   } else {
-    cout << endl << "**PANIC ERROR**: PFunction::EvalNode: you never should have reached this point!" << endl;
+    cerr << endl << "**PANIC ERROR**: PFunction::EvalNode: you never should have reached this point!";
+    cerr << endl;
     assert(0);
   }
   return 0.0;
@@ -462,7 +467,7 @@ void PFunction::CleanupFuncEvalTree()
 void PFunction::CleanupNode(PFuncTreeNode &node)
 {
   if (node.children.size() != 0) {
-    for (unsigned int i=0; i<node.children.size(); i++) {
+    for (UInt_t i=0; i<node.children.size(); i++) {
       CleanupNode(node.children[i]);
     }
     node.children.clear();
@@ -493,7 +498,7 @@ void PFunction::EvalTreeForString(tree_parse_info<> info)
  */
 void PFunction::EvalTreeForStringExpression(iter_t const& i)
 {
-  static int termOp = 0;
+  static Int_t termOp = 0;
 
   if (i->value.id() == PFunctionGrammar::realID) {
     assert(i->children.size() == 0);

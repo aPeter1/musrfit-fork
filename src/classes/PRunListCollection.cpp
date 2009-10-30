@@ -58,28 +58,28 @@ PRunListCollection::~PRunListCollection()
 {
 //cout << endl << "in ~PRunListCollection() ..." << endl;
 //cout << endl << ">> fRunSingleHistoList.size() = " << fRunSingleHistoList.size();
-  for (unsigned int i=0; i<fRunSingleHistoList.size(); i++) {
+  for (UInt_t i=0; i<fRunSingleHistoList.size(); i++) {
     fRunSingleHistoList[i]->CleanUp();
     fRunSingleHistoList[i]->~PRunSingleHisto();
   }
   fRunSingleHistoList.clear();
 
 //cout << endl << ">> fRunAsymmetryList.size() = " << fRunAsymmetryList.size();
-  for (unsigned int i=0; i<fRunAsymmetryList.size(); i++) {
+  for (UInt_t i=0; i<fRunAsymmetryList.size(); i++) {
     fRunAsymmetryList[i]->CleanUp();
     fRunAsymmetryList[i]->~PRunAsymmetry();
   }
   fRunAsymmetryList.clear();
 
 //cout << endl << ">> fRunRRFList.size() = " << fRunRRFList.size();
-  for (unsigned int i=0; i<fRunRRFList.size(); i++) {
+  for (UInt_t i=0; i<fRunRRFList.size(); i++) {
     fRunRRFList[i]->CleanUp();
     fRunRRFList[i]->~PRunRRF();
   }
   fRunRRFList.clear();
 
 //cout << endl << ">> fRunNonMusrList.size() = " << fRunNonMusrList.size();
-  for (unsigned int i=0; i<fRunNonMusrList.size(); i++) {
+  for (UInt_t i=0; i<fRunNonMusrList.size(); i++) {
     fRunNonMusrList[i]->CleanUp();
     fRunNonMusrList[i]->~PRunNonMusr();
   }
@@ -95,9 +95,9 @@ PRunListCollection::~PRunListCollection()
  * \param runNo
  * \param tag
  */
-bool PRunListCollection::Add(int runNo, EPMusrHandleTag tag)
+Bool_t PRunListCollection::Add(Int_t runNo, EPMusrHandleTag tag)
 {
-  bool success = true;
+  Bool_t success = true;
 
 //  PMsrRunStructure *runList = &(*fMsrInfo->GetMsrRunList())[runNo];
 
@@ -105,7 +105,7 @@ bool PRunListCollection::Add(int runNo, EPMusrHandleTag tag)
 //   cout << ", name = " << runList->fRunName.Data();
 //   cout << ", type = " << runList->fFitType;
 
-  int fitType = (*fMsrInfo->GetMsrRunList())[runNo].fFitType;
+  Int_t fitType = (*fMsrInfo->GetMsrRunList())[runNo].fFitType;
 
   switch (fitType) {
     case PRUN_SINGLE_HISTO:
@@ -142,11 +142,11 @@ bool PRunListCollection::Add(int runNo, EPMusrHandleTag tag)
 /**
  * <p>
  */
-double PRunListCollection::GetSingleHistoChisq(const std::vector<double>& par) const
+Double_t PRunListCollection::GetSingleHistoChisq(const std::vector<Double_t>& par) const
 {
-  double chisq = 0.0;
+  Double_t chisq = 0.0;
 
-  for (unsigned int i=0; i<fRunSingleHistoList.size(); i++)
+  for (UInt_t i=0; i<fRunSingleHistoList.size(); i++)
     chisq += fRunSingleHistoList[i]->CalcChiSquare(par);
 
   return chisq;
@@ -158,11 +158,11 @@ double PRunListCollection::GetSingleHistoChisq(const std::vector<double>& par) c
 /**
  * <p>
  */
-double PRunListCollection::GetAsymmetryChisq(const std::vector<double>& par) const
+Double_t PRunListCollection::GetAsymmetryChisq(const std::vector<Double_t>& par) const
 {
-  double chisq = 0.0;
+  Double_t chisq = 0.0;
 
-  for (unsigned int i=0; i<fRunAsymmetryList.size(); i++)
+  for (UInt_t i=0; i<fRunAsymmetryList.size(); i++)
     chisq += fRunAsymmetryList[i]->CalcChiSquare(par);
 
   return chisq;
@@ -174,11 +174,11 @@ double PRunListCollection::GetAsymmetryChisq(const std::vector<double>& par) con
 /**
  * <p>
  */
-double PRunListCollection::GetRRFChisq(const std::vector<double>& par) const
+Double_t PRunListCollection::GetRRFChisq(const std::vector<Double_t>& par) const
 {
-  double chisq = 0.0;
+  Double_t chisq = 0.0;
 
-  for (unsigned int i=0; i<fRunRRFList.size(); i++)
+  for (UInt_t i=0; i<fRunRRFList.size(); i++)
     chisq += fRunRRFList[i]->CalcChiSquare(par);
 
   return chisq;
@@ -190,11 +190,11 @@ double PRunListCollection::GetRRFChisq(const std::vector<double>& par) const
 /**
  * <p>
  */
-double PRunListCollection::GetNonMusrChisq(const std::vector<double>& par) const
+Double_t PRunListCollection::GetNonMusrChisq(const std::vector<Double_t>& par) const
 {
-  double chisq = 0.0;
+  Double_t chisq = 0.0;
 
-  for (unsigned int i=0; i<fRunNonMusrList.size(); i++)
+  for (UInt_t i=0; i<fRunNonMusrList.size(); i++)
     chisq += fRunNonMusrList[i]->CalcChiSquare(par);
 
   return chisq;
@@ -206,11 +206,11 @@ double PRunListCollection::GetNonMusrChisq(const std::vector<double>& par) const
 /**
  * <p>
  */
-double PRunListCollection::GetSingleHistoMaximumLikelihood(const std::vector<double>& par) const
+Double_t PRunListCollection::GetSingleHistoMaximumLikelihood(const std::vector<Double_t>& par) const
 {
-  double mlh = 0.0;
+  Double_t mlh = 0.0;
 
-  for (unsigned int i=0; i<fRunSingleHistoList.size(); i++)
+  for (UInt_t i=0; i<fRunSingleHistoList.size(); i++)
     mlh += fRunSingleHistoList[i]->CalcMaxLikelihood(par);
 
   return mlh;
@@ -223,11 +223,11 @@ double PRunListCollection::GetSingleHistoMaximumLikelihood(const std::vector<dou
  * <p> Since it is not clear yet how to handle asymmetry fits with max likelihood
  * the chi square will be used!
  */
-double PRunListCollection::GetAsymmetryMaximumLikelihood(const std::vector<double>& par) const
+Double_t PRunListCollection::GetAsymmetryMaximumLikelihood(const std::vector<Double_t>& par) const
 {
-  double mlh = 0.0;
+  Double_t mlh = 0.0;
 
-  for (unsigned int i=0; i<fRunAsymmetryList.size(); i++)
+  for (UInt_t i=0; i<fRunAsymmetryList.size(); i++)
     mlh += fRunAsymmetryList[i]->CalcChiSquare(par);
 
   return mlh;
@@ -240,11 +240,11 @@ double PRunListCollection::GetAsymmetryMaximumLikelihood(const std::vector<doubl
  * <p> Since it is not clear yet how to handle RRF fits with max likelihood
  * the chi square will be used!
  */
-double PRunListCollection::GetRRFMaximumLikelihood(const std::vector<double>& par) const
+Double_t PRunListCollection::GetRRFMaximumLikelihood(const std::vector<Double_t>& par) const
 {
-  double mlh = 0.0;
+  Double_t mlh = 0.0;
 
-  for (unsigned int i=0; i<fRunRRFList.size(); i++)
+  for (UInt_t i=0; i<fRunRRFList.size(); i++)
     mlh += fRunRRFList[i]->CalcChiSquare(par);
 
   return mlh;
@@ -257,11 +257,11 @@ double PRunListCollection::GetRRFMaximumLikelihood(const std::vector<double>& pa
  * <p> Since it is not clear yet how to handle non musr fits with max likelihood
  * the chi square will be used!
  */
-double PRunListCollection::GetNonMusrMaximumLikelihood(const std::vector<double>& par) const
+Double_t PRunListCollection::GetNonMusrMaximumLikelihood(const std::vector<Double_t>& par) const
 {
-  double mlh = 0.0;
+  Double_t mlh = 0.0;
 
-  for (unsigned int i=0; i<fRunNonMusrList.size(); i++)
+  for (UInt_t i=0; i<fRunNonMusrList.size(); i++)
     mlh += fRunNonMusrList[i]->CalcChiSquare(par);
 
   return mlh;
@@ -273,20 +273,20 @@ double PRunListCollection::GetNonMusrMaximumLikelihood(const std::vector<double>
 /**
  * <p>
  */
-unsigned int PRunListCollection::GetTotalNoOfBinsFitted() const
+UInt_t PRunListCollection::GetTotalNoOfBinsFitted() const
 {
-  unsigned int counts = 0;
+  UInt_t counts = 0;
 
-  for (unsigned int i=0; i<fRunSingleHistoList.size(); i++)
+  for (UInt_t i=0; i<fRunSingleHistoList.size(); i++)
     counts += fRunSingleHistoList[i]->GetNoOfFitBins();
 
-  for (unsigned int i=0; i<fRunAsymmetryList.size(); i++)
+  for (UInt_t i=0; i<fRunAsymmetryList.size(); i++)
     counts += fRunAsymmetryList[i]->GetNoOfFitBins();
 
-  for (unsigned int i=0; i<fRunRRFList.size(); i++)
+  for (UInt_t i=0; i<fRunRRFList.size(); i++)
     counts += fRunRRFList[i]->GetNoOfFitBins();
 
-  for (unsigned int i=0; i<fRunNonMusrList.size(); i++)
+  for (UInt_t i=0; i<fRunNonMusrList.size(); i++)
     counts += fRunNonMusrList[i]->GetNoOfFitBins();
 
 // cout << endl << "Total No of Bins Fitted = " << counts;
@@ -302,14 +302,15 @@ unsigned int PRunListCollection::GetTotalNoOfBinsFitted() const
  * \param index
  * \param tag kIndex -> data at index, kRunNo -> data of given run no
  */
-PRunData* PRunListCollection::GetSingleHisto(unsigned int index, EDataSwitch tag)
+PRunData* PRunListCollection::GetSingleHisto(UInt_t index, EDataSwitch tag)
 {
   PRunData *data = 0;
 
   switch (tag) {
     case kIndex:
       if ((index < 0) || (index > fRunSingleHistoList.size())) {
-        cout << endl << "PRunListCollection::GetSingleHisto: index = " << index << " out of bounds";
+        cerr << endl << "PRunListCollection::GetSingleHisto: **ERROR** index = " << index << " out of bounds";
+        cerr << endl;
         return 0;
       }
 
@@ -317,7 +318,7 @@ PRunData* PRunListCollection::GetSingleHisto(unsigned int index, EDataSwitch tag
       data = fRunSingleHistoList[index]->GetData();
       break;
     case kRunNo:
-      for (unsigned int i=0; i<fRunSingleHistoList.size(); i++) {
+      for (UInt_t i=0; i<fRunSingleHistoList.size(); i++) {
         if (fRunSingleHistoList[i]->GetRunNo() == index) {
           data = fRunSingleHistoList[i]->GetData();
           break;
@@ -340,14 +341,15 @@ PRunData* PRunListCollection::GetSingleHisto(unsigned int index, EDataSwitch tag
  * \param index
  * \param tag kIndex -> data at index, kRunNo -> data of given run no
  */
-PRunData* PRunListCollection::GetAsymmetry(unsigned int index, EDataSwitch tag)
+PRunData* PRunListCollection::GetAsymmetry(UInt_t index, EDataSwitch tag)
 {
   PRunData *data = 0;
 
   switch (tag) {
     case kIndex: // called from musrfit when dumping the data
       if ((index < 0) || (index > fRunAsymmetryList.size())) {
-        cout << endl << "PRunListCollection::GetAsymmetry: index = " << index << " out of bounds";
+        cerr << endl << "PRunListCollection::GetAsymmetry: **ERROR** index = " << index << " out of bounds";
+        cerr << endl;
         return 0;
       }
 
@@ -355,7 +357,7 @@ PRunData* PRunListCollection::GetAsymmetry(unsigned int index, EDataSwitch tag)
       data = fRunAsymmetryList[index]->GetData();
       break;
     case kRunNo: // called from PMusrCanvas
-      for (unsigned int i=0; i<fRunAsymmetryList.size(); i++) {
+      for (UInt_t i=0; i<fRunAsymmetryList.size(); i++) {
         if (fRunAsymmetryList[i]->GetRunNo() == index) {
           data = fRunAsymmetryList[i]->GetData();
           break;
@@ -378,14 +380,15 @@ PRunData* PRunListCollection::GetAsymmetry(unsigned int index, EDataSwitch tag)
  * \param index
  * \param tag kIndex -> data at index, kRunNo -> data of given run no
  */
-PRunData* PRunListCollection::GetRRF(unsigned int index, EDataSwitch tag)
+PRunData* PRunListCollection::GetRRF(UInt_t index, EDataSwitch tag)
 {
   PRunData *data = 0;
 
   switch (tag) {
     case kIndex:
       if ((index < 0) || (index > fRunRRFList.size())) {
-        cout << endl << "PRunListCollection::GetRRF: index = " << index << " out of bounds";
+        cerr << endl << "PRunListCollection::GetRRF: **ERROR** index = " << index << " out of bounds";
+        cerr << endl;
         return 0;
       }
       break;
@@ -407,19 +410,20 @@ PRunData* PRunListCollection::GetRRF(unsigned int index, EDataSwitch tag)
  * \param index
  * \param tag kIndex -> data at index, kRunNo -> data of given run no
  */
-PRunData* PRunListCollection::GetNonMusr(unsigned int index, EDataSwitch tag)
+PRunData* PRunListCollection::GetNonMusr(UInt_t index, EDataSwitch tag)
 {
   PRunData *data = 0;
 
   switch (tag) {
     case kIndex:
       if ((index < 0) || (index > fRunNonMusrList.size())) {
-        cout << endl << "PRunListCollection::GetNonMusr: index = " << index << " out of bounds";
+        cerr << endl << "PRunListCollection::GetNonMusr: **ERROR** index = " << index << " out of bounds";
+        cerr << endl;
         return 0;
       }
       break;
     case kRunNo:
-      for (unsigned int i=0; i<fRunNonMusrList.size(); i++) {
+      for (UInt_t i=0; i<fRunNonMusrList.size(); i++) {
         if (fRunNonMusrList[i]->GetRunNo() == index) {
           data = fRunNonMusrList[i]->GetData();
           break;
@@ -454,7 +458,7 @@ PDoublePairVector PRunListCollection::GetTemp(const TString &runName) const
  *
  * \param runName
  */
-double PRunListCollection::GetField(const TString &runName) const
+Double_t PRunListCollection::GetField(const TString &runName) const
 {
   return fData->GetRunData(runName)->GetField();
 }
@@ -467,7 +471,7 @@ double PRunListCollection::GetField(const TString &runName) const
  *
  * \param runName
  */
-double PRunListCollection::GetEnergy(const TString &runName) const
+Double_t PRunListCollection::GetEnergy(const TString &runName) const
 {
   return fData->GetRunData(runName)->GetEnergy();
 }
@@ -480,7 +484,7 @@ double PRunListCollection::GetEnergy(const TString &runName) const
  *
  * \param runName
  */
-const char* PRunListCollection::GetSetup(const TString &runName) const
+const Char_t* PRunListCollection::GetSetup(const TString &runName) const
 {
   return fData->GetRunData(runName)->GetSetup()->Data();
 }
@@ -494,7 +498,7 @@ const char* PRunListCollection::GetSetup(const TString &runName) const
  * \param runName name of the run file
  * \param idx msr-file run index
  */
-const char* PRunListCollection::GetXAxisTitle(const TString &runName, const unsigned int idx) const
+const Char_t* PRunListCollection::GetXAxisTitle(const TString &runName, const UInt_t idx) const
 {
 //cout << endl << ">> PRunListCollection::GetXAxisTitle: runName = " << runName.Data() << ", idx = " << idx;
 //cout << endl << ">> PRunListCollection::GetXAxisTitle: fRunNonMusrList.size() = " << fRunNonMusrList.size();
@@ -502,14 +506,14 @@ const char* PRunListCollection::GetXAxisTitle(const TString &runName, const unsi
 
   PRawRunData *runData = fData->GetRunData(runName);
 
-  const char *result = 0;
+  const Char_t *result = 0;
 
   if (runData->fDataNonMusr.FromAscii()) {
     result = runData->fDataNonMusr.GetLabels()->at(0).Data();
   } else {
-    for (unsigned int i=0; i<fRunNonMusrList.size(); i++) {
+    for (UInt_t i=0; i<fRunNonMusrList.size(); i++) {
       if (fRunNonMusrList[i]->GetRunNo() == idx) {
-        int index = fRunNonMusrList[i]->GetXIndex();
+        Int_t index = fRunNonMusrList[i]->GetXIndex();
         result = runData->fDataNonMusr.GetLabels()->at(index).Data();
         break;
       }
@@ -528,21 +532,21 @@ const char* PRunListCollection::GetXAxisTitle(const TString &runName, const unsi
  * \param runName name of the run file
  * \param idx msr-file run index
  */
-const char* PRunListCollection::GetYAxisTitle(const TString &runName, const unsigned int idx) const
+const Char_t* PRunListCollection::GetYAxisTitle(const TString &runName, const UInt_t idx) const
 {
 //cout << endl << ">> PRunListCollection::GetYAxisTitle: runName = " << runName.Data() << ", idx = " << idx;
 //cout << endl;
 
   PRawRunData *runData = fData->GetRunData(runName);
 
-  const char *result = 0;
+  const Char_t *result = 0;
 
   if (runData->fDataNonMusr.FromAscii()) {
     result = runData->fDataNonMusr.GetLabels()->at(1).Data();
   } else {
-    for (unsigned int i=0; i<fRunNonMusrList.size(); i++) {
+    for (UInt_t i=0; i<fRunNonMusrList.size(); i++) {
       if (fRunNonMusrList[i]->GetRunNo() == idx) {
-        int index = fRunNonMusrList[i]->GetYIndex();
+        Int_t index = fRunNonMusrList[i]->GetYIndex();
         result = runData->fDataNonMusr.GetLabels()->at(index).Data();
         break;
       }

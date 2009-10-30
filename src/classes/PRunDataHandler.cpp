@@ -138,7 +138,8 @@ Bool_t PRunDataHandler::ReadFile()
   PMsrRunList *runList = 0;
   runList = fMsrInfo->GetMsrRunList();
   if (runList == 0) {
-    cout << endl << "PRunDataHandler::ReadFile(): Couldn't obtain run list from PMsrHandler: something VERY fishy";
+    cerr << endl << "PRunDataHandler::ReadFile(): **ERROR** Couldn't obtain run list from PMsrHandler: something VERY fishy";
+    cerr << endl;
     return false;
   }
 
@@ -253,18 +254,18 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const UInt_t 
   if (!success) {
     str = runInfo.fFileFormat[idx];
     str.ToUpper();
-    cout << endl << "File Format '" << str.Data() << "' unsupported.";
-    cout << endl << "  support file formats are:";
-    cout << endl << "  ROOT-NPP  -> root not post pileup corrected for lem";
-    cout << endl << "  ROOT-PPC  -> root post pileup corrected for lem";
-    cout << endl << "  NEXUS     -> nexus file format";
-    cout << endl << "  PSI-BIN   -> psi bin file format";
-    cout << endl << "  MUD       -> triumf mud file format";
-    cout << endl << "  WKM       -> wkm ascii file format";
-    cout << endl << "  MDU-ASCII -> psi mdu ascii file format";
-    cout << endl << "  ASCII     -> column like file format";
-    cout << endl << "  DB        -> triumf db file \"format\"";
-    cout << endl;
+    cerr << endl << "**ERROR** File Format '" << str.Data() << "' unsupported.";
+    cerr << endl << "  support file formats are:";
+    cerr << endl << "  ROOT-NPP  -> root not post pileup corrected for lem";
+    cerr << endl << "  ROOT-PPC  -> root post pileup corrected for lem";
+    cerr << endl << "  NEXUS     -> nexus file format";
+    cerr << endl << "  PSI-BIN   -> psi bin file format";
+    cerr << endl << "  MUD       -> triumf mud file format";
+    cerr << endl << "  WKM       -> wkm ascii file format";
+    cerr << endl << "  MDU-ASCII -> psi mdu ascii file format";
+    cerr << endl << "  ASCII     -> column like file format";
+    cerr << endl << "  DB        -> triumf db file \"format\"";
+    cerr << endl;
     return success;
   }
 
@@ -376,7 +377,7 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
   TFolder *folder;
   f.GetObject("RunInfo", folder);
   if (!folder) {
-    cout << endl << "Couldn't obtain RunInfo from " << fRunPathName.Data() << endl;
+    cerr << endl << "PRunDataHandler::ReadRootFile: **ERROR** Couldn't obtain RunInfo from " << fRunPathName.Data() << endl;
     f.Close();
     return false;
   }
@@ -386,7 +387,7 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
 
   // check if run header is valid
   if (!runHeader) {
-    cout << endl << "Couldn't obtain run header info from ROOT file " << fRunPathName.Data() << endl;
+    cerr << endl << "PRunDataHandler::ReadRootFile: **ERROR** Couldn't obtain run header info from ROOT file " << fRunPathName.Data() << endl;
     f.Close();
     return false;
   }
@@ -520,7 +521,7 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
   // check if histos folder is found
   f.GetObject("histos", folder);
   if (!folder) {
-    cout << endl << "Couldn't obtain histos from " << fRunPathName.Data() << endl;
+    cerr << endl << "PRunDataHandler::ReadRootFile: **ERROR** Couldn't obtain histos from " << fRunPathName.Data() << endl;
     f.Close();
     return false;
   }
@@ -531,7 +532,8 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
       sprintf(histoName, "hDecay%02d", i);
       TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
       if (!histo) {
-        cout << endl << "PRunDataHandler::ReadRootFile: Couldn't get histo " << histoName;
+        cerr << endl << "PRunDataHandler::ReadRootFile: **ERROR** Couldn't get histo " << histoName;
+        cerr << endl;
         return false;
       }
       // fill data
@@ -547,7 +549,8 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
       sprintf(histoName, "hDecay%02d", i+POST_PILEUP_HISTO_OFFSET);
       TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
       if (!histo) {
-        cout << endl << "PRunDataHandler::ReadRootFile: Couldn't get histo " << histoName;
+        cerr << endl << "PRunDataHandler::ReadRootFile: **ERROR** Couldn't get histo " << histoName;
+        cerr << endl;
         return false;
       }
       // fill data
@@ -606,8 +609,8 @@ Bool_t PRunDataHandler::ReadWkmFile()
   // open wkm-file
   f.open(fRunPathName.Data(), ifstream::in);
   if (!f.is_open()) {
-    cout << endl << "Couldn't open run data (" << fRunPathName.Data() << ") file for reading, sorry ...";
-    cout << endl;
+    cerr << endl << "PRunDataHandler::ReadWkmFile: **ERROR** Couldn't open run data (" << fRunPathName.Data() << ") file for reading, sorry ...";
+    cerr << endl;
     return false;
   }
 

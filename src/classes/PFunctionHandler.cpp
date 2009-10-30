@@ -72,16 +72,16 @@ PFunctionHandler::~PFunctionHandler()
  * <p>
  *
  */
-bool PFunctionHandler::DoParse()
+Bool_t PFunctionHandler::DoParse()
 {
 //  cout << endl << "in PFunctionHandler::DoParse() ...";
 
-  bool success = true;
+  Bool_t success = true;
   PFunctionGrammar function;
   TString line;
 
   // feed the function block into the parser. Start with i=1, since i=0 is FUNCTIONS
-  for (unsigned int i=1; i<fLines.size(); i++) {
+  for (UInt_t i=1; i<fLines.size(); i++) {
 // cout << endl << "fLines[" << i << "] = '" << fLines[i].fLine.Data() << "'";
 
     // function line to upper case
@@ -96,7 +96,7 @@ bool PFunctionHandler::DoParse()
       PFunction func(info);
       fFuncs.push_back(func);
     } else {
-      cout << endl << "**ERROR**: FUNCTIONS parse failed in line " << fLines[i].fLineNo << endl;
+      cerr << endl << "**ERROR**: FUNCTIONS parse failed in line " << fLines[i].fLineNo << endl;
       success = false;
       break;
     }
@@ -104,11 +104,12 @@ bool PFunctionHandler::DoParse()
 
   // check that the function numbers are unique
   if (success) {
-    for (unsigned int i=0; i<fFuncs.size(); i++) {
-      for (unsigned int j=i+1; j<fFuncs.size(); j++) {
+    for (UInt_t i=0; i<fFuncs.size(); i++) {
+      for (UInt_t j=i+1; j<fFuncs.size(); j++) {
         if (fFuncs[i].GetFuncNo() == fFuncs[j].GetFuncNo()) {
-          cout << endl << "**ERROR**: function number " << fFuncs[i].GetFuncNo();
-          cout << " is at least twice present! Fix this first.";
+          cerr << endl << "**ERROR**: function number " << fFuncs[i].GetFuncNo();
+          cerr << " is at least twice present! Fix this first.";
+          cerr << endl;
           success = false;
         }
       }
@@ -116,7 +117,7 @@ bool PFunctionHandler::DoParse()
   }
 
 //   if (success) {
-//     for (unsigned int i=0; i<fFuncs.size(); i++)
+//     for (UInt_t i=0; i<fFuncs.size(); i++)
 //       cout << endl << "func number = " << fFuncs[i].GetFuncNo();
 //   }
 
@@ -132,11 +133,11 @@ bool PFunctionHandler::DoParse()
  * \param mapSize
  * \param paramSize
  */
-bool PFunctionHandler::CheckMapAndParamRange(unsigned int mapSize, unsigned int paramSize)
+Bool_t PFunctionHandler::CheckMapAndParamRange(UInt_t mapSize, UInt_t paramSize)
 {
-  bool success = true;
+  Bool_t success = true;
 
-  for (unsigned int i=0; i<fFuncs.size(); i++) {
+  for (UInt_t i=0; i<fFuncs.size(); i++) {
     success = fFuncs[i].CheckMapAndParamRange(mapSize, paramSize);
     if (!success)
       break;
@@ -153,10 +154,11 @@ bool PFunctionHandler::CheckMapAndParamRange(unsigned int mapSize, unsigned int 
  *
  * \param funNo
  */
-double PFunctionHandler::Eval(int funNo, vector<int> map, vector<double> param)
+Double_t PFunctionHandler::Eval(Int_t funNo, vector<Int_t> map, vector<Double_t> param)
 {
   if (GetFuncIndex(funNo) == -1) {
-    cout << endl << "**ERROR**: Couldn't find FUN" << funNo << " for evaluation";
+    cerr << endl << "**ERROR**: Couldn't find FUN" << funNo << " for evaluation";
+    cerr << endl;
     return 0.0;
   }
 
@@ -178,7 +180,7 @@ double PFunctionHandler::Eval(int funNo, vector<int> map, vector<double> param)
  *
  * \param idx
  */
-int PFunctionHandler::GetFuncNo(unsigned int idx)
+Int_t PFunctionHandler::GetFuncNo(UInt_t idx)
 {
   if (idx > fFuncs.size())
     return -1;
@@ -194,11 +196,11 @@ int PFunctionHandler::GetFuncNo(unsigned int idx)
  *
  * \param funcNo
  */
-int PFunctionHandler::GetFuncIndex(int funcNo)
+Int_t PFunctionHandler::GetFuncIndex(Int_t funcNo)
 {
-  int index = -1;
+  Int_t index = -1;
 
-  for (unsigned int i=0; i<fFuncs.size(); i++) {
+  for (UInt_t i=0; i<fFuncs.size(); i++) {
     if (fFuncs[i].GetFuncNo() == funcNo) {
       index = i;
       break;
@@ -216,7 +218,7 @@ int PFunctionHandler::GetFuncIndex(int funcNo)
  *
  * \param idx
  */
-TString* PFunctionHandler::GetFuncString(unsigned int idx)
+TString* PFunctionHandler::GetFuncString(UInt_t idx)
 {
   if (idx > fFuncs.size())
     return 0;

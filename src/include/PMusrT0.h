@@ -55,7 +55,7 @@ class PMusrT0 : public TObject, public TQObject
 {
   public:
     PMusrT0();
-    PMusrT0(PRawRunData *rawRunData, int runNo, int histoNo, int detectorTag, int addRunNo);
+    PMusrT0(PRawRunData *rawRunData, Int_t runNo, Int_t histoNo, Int_t detectorTag, Int_t addRunNo);
 
     virtual ~PMusrT0();
 
@@ -73,12 +73,12 @@ class PMusrT0 : public TObject, public TQObject
     PMsrHandler *fMsrHandler;
 #endif // __MAKECINT__
 
-    int fStatus;
+    Int_t fStatus;
 
-    int fRunNo;
-    int fDetectorTag;
-    int fAddRunNo;
-    int fAddRunOffset;
+    Int_t fRunNo;
+    Int_t fDetectorTag;
+    Int_t fAddRunNo;
+    Int_t fAddRunOffset;
 
     // canvas related variables
     TCanvas   *fMainCanvas;

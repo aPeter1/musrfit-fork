@@ -84,7 +84,7 @@ PMusrT0::PMusrT0()
  * \param rawRunData
  * \param histoNo
  */
-PMusrT0::PMusrT0(PRawRunData *rawRunData, int runNo, int histoNo, int detectorTag, int addRunNo) :
+PMusrT0::PMusrT0(PRawRunData *rawRunData, Int_t runNo, Int_t histoNo, Int_t detectorTag, Int_t addRunNo) :
     fRunNo(runNo), fDetectorTag(detectorTag), fAddRunNo(addRunNo)
 {
 cout << endl << "run Name = " << rawRunData->GetRunName()->Data() << ", runNo = " << fRunNo << ", histoNo = " << histoNo << endl;
@@ -107,7 +107,7 @@ cout << endl << "run Name = " << rawRunData->GetRunName()->Data() << ", runNo = 
   fHisto->SetMarkerSize(0.5);
   fHisto->SetMarkerColor(TColor::GetColor(0,0,0)); // black
 
-  for (unsigned int i=0; i<rawRunData->GetDataBin(histoNo-1)->size(); i++) {
+  for (UInt_t i=0; i<rawRunData->GetDataBin(histoNo-1)->size(); i++) {
     fHisto->SetBinContent(i+1, rawRunData->GetDataBin(histoNo-1)->at(i));
   }
 
@@ -243,7 +243,7 @@ void PMusrT0::SetMsrHandler(PMsrHandler *msrHandler)
 void PMusrT0::InitDataAndBkg()
 {
   // get addRun offset which depends on the fit type
-  int fitType = fMsrHandler->GetMsrRunList()->at(fRunNo).fFitType;
+  Int_t fitType = fMsrHandler->GetMsrRunList()->at(fRunNo).fFitType;
   if (fitType == MSR_FITTYPE_SINGLE_HISTO) {
     fAddRunOffset = 2;
   } else if (fitType == MSR_FITTYPE_ASYM) {
@@ -281,7 +281,7 @@ void PMusrT0::InitDataAndBkg()
   fData->SetMarkerSize(0.5);
   fData->SetMarkerColor(TColor::GetColor(0,0,255)); // blue
 
-  for (int i=0; i<noOfBins; i++) {
+  for (Int_t i=0; i<noOfBins; i++) {
     fData->SetBinContent(i+1, fHisto->GetBinContent(fDataRange[0]+i+1));
   }
   fData->Draw("p0 9 hist same");
@@ -315,7 +315,7 @@ void PMusrT0::InitDataAndBkg()
   fBkg->SetMarkerSize(0.5);
   fBkg->SetMarkerColor(TColor::GetColor(255,0,0)); // red
 
-  for (int i=0; i<noOfBins; i++) {
+  for (Int_t i=0; i<noOfBins; i++) {
     fBkg->SetBinContent(i+1, fHisto->GetBinContent(fBkgRange[0]+i+1));
   }
   fBkg->Draw("p0 9 hist same");
@@ -341,33 +341,33 @@ void PMusrT0::InitDataAndBkg()
       break;
   }
   Double_t max = fHisto->GetMaximum();
-  fT0Line = new TLine((double)t0Bin, 0.0, (double)t0Bin, max);
+  fT0Line = new TLine((Double_t)t0Bin, 0.0, (Double_t)t0Bin, max);
   fT0Line->SetLineStyle(1); // solid
   fT0Line->SetLineColor(TColor::GetColor(0,255,0)); // green
   fT0Line->SetLineWidth(2);
   fT0Line->Draw();
 
   // data lines
-  fFirstDataLine = new TLine((double)fDataRange[0], 0.0, (double)fDataRange[0], max);
+  fFirstDataLine = new TLine((Double_t)fDataRange[0], 0.0, (Double_t)fDataRange[0], max);
   fFirstDataLine->SetLineStyle(3); // doted
   fFirstDataLine->SetLineColor(TColor::GetColor(0,0,255)); // blue
   fFirstDataLine->SetLineWidth(2);
   fFirstDataLine->Draw();
 
-  fLastDataLine = new TLine((double)fDataRange[1], 0.0, (double)fDataRange[1], max);
+  fLastDataLine = new TLine((Double_t)fDataRange[1], 0.0, (Double_t)fDataRange[1], max);
   fLastDataLine->SetLineStyle(3); // doted
   fLastDataLine->SetLineColor(TColor::GetColor(0,0,255)); // blue
   fLastDataLine->SetLineWidth(2);
   fLastDataLine->Draw();
 
   // bkg lines
-  fFirstBkgLine = new TLine((double)fBkgRange[0], 0.0, (double)fBkgRange[0], max);
+  fFirstBkgLine = new TLine((Double_t)fBkgRange[0], 0.0, (Double_t)fBkgRange[0], max);
   fFirstBkgLine->SetLineStyle(6); // _..._...
   fFirstBkgLine->SetLineColor(TColor::GetColor(255,0,0)); // red
   fFirstBkgLine->SetLineWidth(2);
   fFirstBkgLine->Draw();
 
-  fLastBkgLine = new TLine((double)fBkgRange[1], 0.0, (double)fBkgRange[1], max);
+  fLastBkgLine = new TLine((Double_t)fBkgRange[1], 0.0, (Double_t)fBkgRange[1], max);
   fLastBkgLine->SetLineStyle(6); // _..._...
   fLastBkgLine->SetLineColor(TColor::GetColor(255,0,0)); // red
   fLastBkgLine->SetLineWidth(2);
@@ -385,7 +385,7 @@ void PMusrT0::InitDataAndBkg()
  */
 void PMusrT0::SetT0Channel()
 {
-  double x=0, y=0;
+  Double_t x=0, y=0;
   fMainCanvas->AbsPixeltoXY(fPx,fPy,x,y);
 
   // get binx to set t0 corresponding to fPx
@@ -394,7 +394,7 @@ void PMusrT0::SetT0Channel()
 cout << endl << ">> PMusrT0::SetT0Channel(): binx = " << binx << endl;
 
   // set t0 bin in msr-Handler
-  unsigned int idx = 0;
+  UInt_t idx = 0;
   switch(fDetectorTag) {
     case DETECTOR_TAG_FORWARD:
       idx = fAddRunNo * fAddRunOffset / 2;
@@ -430,7 +430,7 @@ cout << endl << ">> PMusrT0::SetT0Channel(): binx = " << binx << endl;
  */
 void PMusrT0::SetDataFirstChannel()
 {
-  double x=0, y=0;
+  Double_t x=0, y=0;
   fMainCanvas->AbsPixeltoXY(fPx,fPy,x,y);
 
   // get binx to set the data first channel corresponding to fPx
@@ -439,7 +439,7 @@ void PMusrT0::SetDataFirstChannel()
 cout << endl << ">> PMusrT0::SetDataFirstChannel(): fDataRange[0] = " << fDataRange[0] << endl;
 
   // set the data first bin in msr-Handler
-  unsigned int idx = 0;
+  UInt_t idx = 0;
   switch(fDetectorTag) {
     case DETECTOR_TAG_FORWARD:
       idx = fAddRunNo * fAddRunOffset;
@@ -474,7 +474,7 @@ cout << endl << ">> PMusrT0::SetDataFirstChannel(): fDataRange[0] = " << fDataRa
   fData->SetMarkerStyle(21);
   fData->SetMarkerSize(0.5);
   fData->SetMarkerColor(TColor::GetColor(0,0,255)); // blue
-  for (int i=0; i<noOfBins; i++) {
+  for (Int_t i=0; i<noOfBins; i++) {
     fData->SetBinContent(i+1, fHisto->GetBinContent(fDataRange[0]+i+1));
   }
   fData->Draw("p0 9 hist same");
@@ -492,7 +492,7 @@ cout << endl << ">> PMusrT0::SetDataFirstChannel(): fDataRange[0] = " << fDataRa
  */
 void PMusrT0::SetDataLastChannel()
 {
-  double x=0, y=0;
+  Double_t x=0, y=0;
   fMainCanvas->AbsPixeltoXY(fPx,fPy,x,y);
 
   // get binx to set the data last channel corresponding to fPx
@@ -501,7 +501,7 @@ void PMusrT0::SetDataLastChannel()
 cout << endl << ">> PMusrT0::SetDataLastChannel(): fDataRange[1] = " << fDataRange[1] << endl;
 
   // set the data first bin in msr-Handler
-  unsigned int idx = 0;
+  UInt_t idx = 0;
   switch(fDetectorTag) {
     case DETECTOR_TAG_FORWARD:
       idx = 1 + fAddRunNo * fAddRunOffset;
@@ -536,7 +536,7 @@ cout << endl << ">> PMusrT0::SetDataLastChannel(): fDataRange[1] = " << fDataRan
   fData->SetMarkerStyle(21);
   fData->SetMarkerSize(0.5);
   fData->SetMarkerColor(TColor::GetColor(0,0,255)); // blue
-  for (int i=0; i<noOfBins; i++) {
+  for (Int_t i=0; i<noOfBins; i++) {
     fData->SetBinContent(i+1, fHisto->GetBinContent(fDataRange[0]+i+1));
   }
   fData->Draw("p0 9 hist same");
@@ -554,7 +554,7 @@ cout << endl << ">> PMusrT0::SetDataLastChannel(): fDataRange[1] = " << fDataRan
  */
 void PMusrT0::SetBkgFirstChannel()
 {
-  double x=0, y=0;
+  Double_t x=0, y=0;
   fMainCanvas->AbsPixeltoXY(fPx,fPy,x,y);
 
   // get binx to set the background first channel corresponding to fPx
@@ -563,7 +563,7 @@ void PMusrT0::SetBkgFirstChannel()
 cout << endl << ">> PMusrT0::SetBkgFirstChannel(): fBkgRange[0] = " << fBkgRange[0] << endl;
 
   // set the background first bin in msr-Handler
-  unsigned int idx = 0;
+  UInt_t idx = 0;
   switch(fDetectorTag) {
     case DETECTOR_TAG_FORWARD:
       idx = fAddRunNo * fAddRunOffset;
@@ -598,7 +598,7 @@ cout << endl << ">> PMusrT0::SetBkgFirstChannel(): fBkgRange[0] = " << fBkgRange
   fBkg->SetMarkerStyle(21);
   fBkg->SetMarkerSize(0.5);
   fBkg->SetMarkerColor(TColor::GetColor(255,0,0)); // red
-  for (int i=0; i<noOfBins; i++) {
+  for (Int_t i=0; i<noOfBins; i++) {
     fBkg->SetBinContent(i+1, fHisto->GetBinContent(fBkgRange[0]+i+1));
   }
   fBkg->Draw("p0 9 hist same");
@@ -616,7 +616,7 @@ cout << endl << ">> PMusrT0::SetBkgFirstChannel(): fBkgRange[0] = " << fBkgRange
  */
 void PMusrT0::SetBkgLastChannel()
 {
-  double x=0, y=0;
+  Double_t x=0, y=0;
   fMainCanvas->AbsPixeltoXY(fPx,fPy,x,y);
 
   // get binx to set the background last channel corresponding to fPx
@@ -625,7 +625,7 @@ void PMusrT0::SetBkgLastChannel()
 cout << endl << ">> PMusrT0::SetBkgLastChannel(): fBkgRange[1] = " << fBkgRange[1] << endl;
 
   // set the background first bin in msr-Handler
-  unsigned int idx = 0;
+  UInt_t idx = 0;
   switch(fDetectorTag) {
     case DETECTOR_TAG_FORWARD:
       idx = 1 + fAddRunNo * fAddRunOffset;
@@ -660,7 +660,7 @@ cout << endl << ">> PMusrT0::SetBkgLastChannel(): fBkgRange[1] = " << fBkgRange[
   fBkg->SetMarkerStyle(21);
   fBkg->SetMarkerSize(0.5);
   fBkg->SetMarkerColor(TColor::GetColor(255,0,0)); // red
-  for (int i=0; i<noOfBins; i++) {
+  for (Int_t i=0; i<noOfBins; i++) {
     fBkg->SetBinContent(i+1, fHisto->GetBinContent(fBkgRange[0]+i+1));
   }
   fBkg->Draw("p0 9 hist same");

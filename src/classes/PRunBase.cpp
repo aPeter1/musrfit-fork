@@ -72,12 +72,12 @@ PRunBase::PRunBase()
  * \param runNo
  * \param tag
  */
-PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo, EPMusrHandleTag tag)
+PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag)
 {
   fValid = true;
   fHandleTag = tag;
 
-  fRunNo = static_cast<int>(runNo);
+  fRunNo = static_cast<Int_t>(runNo);
   if ((runNo < 0) || (runNo > msrInfo->GetMsrRunList()->size())) {
     fRunInfo = 0;
     return;
@@ -91,7 +91,7 @@ PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int 
 
   // check the parameter and map range of the functions
   if (!fMsrInfo->CheckMapAndParamRange(fRunInfo->fMap.size(), fMsrInfo->GetNoOfParams())) {
-    cout << endl << "**SEVERE ERROR** PRunBase::PRunBase: map and/or parameter out of range in FUNCTIONS." << endl;
+    cerr << endl << "**SEVERE ERROR** PRunBase::PRunBase: map and/or parameter out of range in FUNCTIONS." << endl;
     exit(0);
   }
 
@@ -100,17 +100,17 @@ PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int 
 
   // init private variables
   fTimeResolution = -1.0;
-  for (int i=0; i<fMsrInfo->GetNoOfFuncs(); i++)
+  for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++)
     fFuncValues.push_back(0.0);
 
   // generate theory
   fTheory = new PTheory(msrInfo, runNo);
   if (fTheory == 0) {
-    cout << endl << "**SEVERE ERROR** PRunBase::PRunBase: Couldn't create an instance of PTheory :-(, will quit" << endl;
+    cerr << endl << "**SEVERE ERROR** PRunBase::PRunBase: Couldn't create an instance of PTheory :-(, will quit" << endl;
     exit(0);
   }
   if (!fTheory->IsValid()) {
-    cout << endl << "**SEVERE ERROR** PRunBase::PRunBase: Theory is not valid :-(, will quit" << endl;
+    cerr << endl << "**SEVERE ERROR** PRunBase::PRunBase: Theory is not valid :-(, will quit" << endl;
     exit(0);
   }
 }

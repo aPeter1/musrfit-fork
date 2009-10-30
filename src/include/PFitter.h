@@ -63,20 +63,20 @@ Will handle all the possible minuit commands and actually do things ...
 class PFitter
 {
   public:
-    PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, bool chisq_only = false);
+    PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, Bool_t chisq_only = false);
     virtual ~PFitter();
 
-    bool IsValid() { return fIsValid; }
-    bool HasConverged() { return fConverged; }
-    bool DoFit();
+    Bool_t IsValid() { return fIsValid; }
+    Bool_t HasConverged() { return fConverged; }
+    Bool_t DoFit();
 
   private:
-    bool fIsValid;
-    bool fConverged;
-    bool fChisqOnly;
-    bool fUseChi2;
+    Bool_t fIsValid;
+    Bool_t fConverged;
+    Bool_t fChisqOnly;
+    Bool_t fUseChi2;
 
-    unsigned int fStrategy;
+    UInt_t fStrategy;
 
     PMsrHandler *fRunInfo;
 
@@ -90,15 +90,15 @@ class PFitter
     ROOT::Minuit2::FunctionMinimum *fFcnMin;       ///< function minimum object
     ROOT::Minuit2::MnUserParameterState *fMnUserParamState; ///< keeps the current user parameter state
 
-    bool CheckCommands();
-    bool SetParameters();
+    Bool_t CheckCommands();
+    Bool_t SetParameters();
 
-    bool ExecuteHesse();
-    bool ExecuteMigrad();
-    bool ExecuteMinimize();
-    bool ExecuteMinos();
-    bool ExecuteSave();
-    bool ExecuteSimplex();
+    Bool_t ExecuteHesse();
+    Bool_t ExecuteMigrad();
+    Bool_t ExecuteMinimize();
+    Bool_t ExecuteMinos();
+    Bool_t ExecuteSave();
+    Bool_t ExecuteSimplex();
 };
 
 #endif // _PFITTER_H_

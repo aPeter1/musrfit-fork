@@ -89,7 +89,7 @@ PMusrCanvas::PMusrCanvas()
 /**
  *
  */
-PMusrCanvas::PMusrCanvas(const int number, const char* title,
+PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
                          const Bool_t batch) :
                          fBatchMode(batch), fPlotNumber(number)
@@ -113,7 +113,7 @@ PMusrCanvas::PMusrCanvas(const int number, const char* title,
 /**
  *
  */
-PMusrCanvas::PMusrCanvas(const int number, const char* title,
+PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
                          PMsrFourierStructure fourierDefault,
                          const PIntVector markerList, const PIntVector colorList,
@@ -154,12 +154,12 @@ PMusrCanvas::~PMusrCanvas()
     fTitlePad = 0;
   }
   if (fData.size() > 0) {
-    for (unsigned int i=0; i<fData.size(); i++)
+    for (UInt_t i=0; i<fData.size(); i++)
       CleanupDataSet(fData[i]);
     fData.clear();
   }
   if (fNonMusrData.size() > 0) {
-    for (unsigned int i=0; i<fNonMusrData.size(); i++)
+    for (UInt_t i=0; i<fNonMusrData.size(); i++)
       CleanupDataSet(fNonMusrData[i]);
     fNonMusrData.clear();
   }
@@ -258,16 +258,16 @@ void PMusrCanvas::UpdateParamTheoryPad()
     return;
 
   TString  str;
-  char     cnum[128];
-  int      maxLength = 0;
+  Char_t     cnum[128];
+  Int_t      maxLength = 0;
   Double_t ypos = 0.0, yoffset = 0.0;
-  int      idx = -1;
+  Int_t      idx = -1;
 
   // add parameters ------------------------------------------------------------
   PMsrParamList param = *fMsrHandler->GetMsrParamList();
 
   // get maximal parameter name string length
-  for (unsigned int i=0; i<param.size(); i++) {
+  for (UInt_t i=0; i<param.size(); i++) {
     if (param[i].fName.Length() > maxLength)
       maxLength = param[i].fName.Length();
   }
@@ -280,7 +280,7 @@ void PMusrCanvas::UpdateParamTheoryPad()
     yoffset = 0.05;
 
   // add parameters to the pad
-  for (unsigned int i=0; i<param.size(); i++) {
+  for (UInt_t i=0; i<param.size(); i++) {
     str = "";
     // parameter no
     str += param[i].fNo;
@@ -290,7 +290,7 @@ void PMusrCanvas::UpdateParamTheoryPad()
       str += " ";
     // parameter name
     str += param[i].fName;
-    for (int j=0; j<maxLength-param[i].fName.Length(); j++) // fill spaces
+    for (Int_t j=0; j<maxLength-param[i].fName.Length(); j++) // fill spaces
       str += " ";
     // parameter value
     if (round(param[i].fValue)-param[i].fValue==0)
@@ -298,7 +298,7 @@ void PMusrCanvas::UpdateParamTheoryPad()
     else
       sprintf(cnum, "%.6lf", param[i].fValue);
     str += cnum;
-    for (int j=0; j<9-(int)strlen(cnum); j++) // fill spaces
+    for (Int_t j=0; j<9-(Int_t)strlen(cnum); j++) // fill spaces
       str += " ";
     str += " "; // to make sure that at least 1 space is placed
     // parameter error
@@ -337,7 +337,7 @@ void PMusrCanvas::UpdateParamTheoryPad()
     yoffset = 1.0/(theory.size()+1);
   else
     yoffset = 0.05;
-  for (unsigned int i=1; i<theory.size(); i++) {
+  for (UInt_t i=1; i<theory.size(); i++) {
     // remove comment if present
     str = theory[i].fLine;
     idx = str.Index("(");
@@ -352,7 +352,7 @@ void PMusrCanvas::UpdateParamTheoryPad()
   // add functions --------------------------------------------------------
   ypos -= 0.05;
   PMsrLines functions = *fMsrHandler->GetMsrFunctions();
-  for (unsigned int i=1; i<functions.size(); i++) {
+  for (UInt_t i=1; i<functions.size(); i++) {
     ypos -= 0.05;
     fTheoryPad->AddText(0.03, ypos, functions[i].fLine.Data());
   }
@@ -373,36 +373,36 @@ void PMusrCanvas::UpdateParamTheoryPad()
 void PMusrCanvas::UpdateDataTheoryPad()
 {
   // some checks first
-  unsigned int runNo;
+  UInt_t runNo;
   PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
   PMsrRunList runs = *fMsrHandler->GetMsrRunList();
 
   fPlotType = plotInfo.fPlotType;
-  for (unsigned int i=0; i<plotInfo.fRuns.size(); i++) {
+  for (UInt_t i=0; i<plotInfo.fRuns.size(); i++) {
     // first check that plot number is smaller than the maximal number of runs
-    if ((int)plotInfo.fRuns[i].Re() > (int)runs.size()) {
+    if ((Int_t)plotInfo.fRuns[i].Re() > (Int_t)runs.size()) {
       fValid = false;
-      cout << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** run plot number " << (int)plotInfo.fRuns[i].Re() << " is larger than the number of runs " << runs.size();
-      cout << endl;
+      cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** run plot number " << (Int_t)plotInfo.fRuns[i].Re() << " is larger than the number of runs " << runs.size();
+      cerr << endl;
       return;
     }
     // check that the plottype and the fittype do correspond
-    runNo = (unsigned int)plotInfo.fRuns[i].Re()-1;
+    runNo = (UInt_t)plotInfo.fRuns[i].Re()-1;
 //cout << endl << ">> runNo = " << runNo;
 //cout << endl;
     if (fPlotType != runs[runNo].fFitType) {
       fValid = false;
-      cout << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** plottype = " << fPlotType << ", fittype = " << runs[runNo].fFitType << ", however they have to correspond!";
-      cout << endl;
+      cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** plottype = " << fPlotType << ", fittype = " << runs[runNo].fFitType << ", however they have to correspond!";
+      cerr << endl;
       return;
     }
   }
 
   PRunData *data;
-  for (unsigned int i=0; i<plotInfo.fRuns.size(); i++) {
+  for (UInt_t i=0; i<plotInfo.fRuns.size(); i++) {
     // get run data and create a histogram
     data = 0;
-    runNo = (unsigned int)plotInfo.fRuns[i].Re()-1;
+    runNo = (UInt_t)plotInfo.fRuns[i].Re()-1;
     // get data depending on the fittype
     switch (runs[runNo].fFitType) {
       case MSR_FITTYPE_SINGLE_HISTO:
@@ -410,8 +410,8 @@ void PMusrCanvas::UpdateDataTheoryPad()
         if (!data) { // something wrong
           fValid = false;
           // error message
-          cout << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** couldn't obtain run no " << runNo << " for a single histogram plot";
-          cout << endl;
+          cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** couldn't obtain run no " << runNo << " for a single histogram plot";
+          cerr << endl;
           return;
         }
         // handle data
@@ -422,8 +422,8 @@ void PMusrCanvas::UpdateDataTheoryPad()
         if (!data) { // something wrong
           fValid = false;
           // error message
-          cout << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** couldn't obtain run no " << runNo << " for a asymmetry plot";
-          cout << endl;
+          cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** couldn't obtain run no " << runNo << " for a asymmetry plot";
+          cerr << endl;
           return;
         }
         // handle data
@@ -434,8 +434,8 @@ void PMusrCanvas::UpdateDataTheoryPad()
         if (!data) { // something wrong
           fValid = false;
           // error message
-          cout << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** couldn't obtain run no " << runNo << " for a RRF plot";
-          cout << endl;
+          cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** couldn't obtain run no " << runNo << " for a RRF plot";
+          cerr << endl;
           return;
         }
         // handle data
@@ -446,8 +446,8 @@ void PMusrCanvas::UpdateDataTheoryPad()
         if (!data) { // something wrong
           fValid = false;
           // error message
-          cout << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** couldn't obtain run no " << runNo << " for a none musr data plot";
-          cout << endl;
+          cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** couldn't obtain run no " << runNo << " for a none musr data plot";
+          cerr << endl;
           return;
         }
         // handle data
@@ -466,8 +466,8 @@ void PMusrCanvas::UpdateDataTheoryPad()
       default:
         fValid = false;
         // error message
-        cout << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** wrong plottype tag?!";
-        cout << endl;
+        cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** wrong plottype tag?!";
+        cerr << endl;
         return;
         break;
     }
@@ -522,13 +522,13 @@ void PMusrCanvas::UpdateInfoPad()
   // get/set run plot info
   double dval;
   vector< pair<double, double> > ddvec;
-  char   sval[128];
-  unsigned int runNo;
+  Char_t   sval[128];
+  UInt_t runNo;
   PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
   PMsrRunList runs = *fMsrHandler->GetMsrRunList();
-  for (unsigned int i=0; i<fData.size(); i++) {
+  for (UInt_t i=0; i<fData.size(); i++) {
     // run label = run_name/histo/T=0K/B=0G/E=0keV/...
-    runNo = (unsigned int)plotInfo.fRuns[i].Re()-1;
+    runNo = (UInt_t)plotInfo.fRuns[i].Re()-1;
     if (runs[runNo].fRunName.size() > 1)
       tstr  = "++" + runs[runNo].fRunName[0] + TString(","); // run_name
     else
@@ -555,7 +555,7 @@ void PMusrCanvas::UpdateInfoPad()
       sprintf(sval, "%0.2lf", ddvec[0].first);
       tstr += TString(sval) + TString("K,");
     } else {
-      for(unsigned int i(0); i<ddvec.size(); ++i){
+      for(UInt_t i(0); i<ddvec.size(); ++i){
         sprintf(sval, "T%u=", i);
         tstr += TString(sval);
         sprintf(sval, "%0.2lf", ddvec[i].first);
@@ -623,11 +623,11 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
 //   cout << ">fMainCanvas   " << fMainCanvas << endl;
 //   cout << ">selected      " << selected << endl;
 //
-//cout << "x : "  << (char)x << endl;
-//cout << "px: "  << (char)fMainCanvas->GetEventX() << endl;
+//cout << "x : "  << (Char_t)x << endl;
+//cout << "px: "  << (Char_t)fMainCanvas->GetEventX() << endl;
 
   // handle keys and popup menu entries
-  bool relevantKey = false;
+  Bool_t relevantKey = false;
   if (x == 'q') { // quit
     Done(0);
   } else if (x == 'd') { // difference
@@ -937,14 +937,14 @@ void PMusrCanvas::LastCanvasClosed()
  *
  * \param graphicsFormat One of the supported graphics formats.
  */
-void PMusrCanvas::SaveGraphicsAndQuit(char *fileName, char *graphicsFormat)
+void PMusrCanvas::SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat)
 {
   cout << endl << ">> SaveGraphicsAndQuit: will dump the canvas into a graphics output file (" << graphicsFormat << ") ..."<< endl;
 
   TString str(fileName);
   Int_t idx = -1;
   Int_t size = 0;
-  char ext[32];
+  Char_t ext[32];
 
   if (str.Contains(".msr")) {
     idx = str.Index(".msr");
@@ -956,7 +956,7 @@ void PMusrCanvas::SaveGraphicsAndQuit(char *fileName, char *graphicsFormat)
   }
 
   if (idx == -1) {
-    cout << endl << "PMusrCanvas::SaveGraphicsAndQuit **ERROR**: fileName (" << fileName << ") is invalid." << endl;
+    cerr << endl << "PMusrCanvas::SaveGraphicsAndQuit **ERROR**: fileName (" << fileName << ") is invalid." << endl;
     return;
   }
 
@@ -971,7 +971,7 @@ void PMusrCanvas::SaveGraphicsAndQuit(char *fileName, char *graphicsFormat)
 
   fMainCanvas->SaveAs(str.Data());
 
-  if (fPlotNumber == static_cast<int>(fMsrHandler->GetMsrPlotList()->size()) - 1)
+  if (fPlotNumber == static_cast<Int_t>(fMsrHandler->GetMsrPlotList()->size()) - 1)
     Done(0);
 }
 
@@ -1005,7 +1005,7 @@ void PMusrCanvas::InitFourier()
   fFourier.fApodization = FOURIER_APOD_NONE;       // no apodization
   fFourier.fPlotTag = FOURIER_PLOT_REAL_AND_IMAG;  // initial plot tag, plot real and imaginary part
   fFourier.fPhase = 0.0;                           // fourier phase 0°
-  for (unsigned int i=0; i<2; i++) {
+  for (UInt_t i=0; i<2; i++) {
     fFourier.fRangeForPhaseCorrection[i] = -1.0;   // frequency range for phase correction, default: {-1, -1} = NOT GIVEN
     fFourier.fPlotRange[i] = -1.0;                 // fourier plot range, default: {-1, -1} = NOT GIVEN
   }
@@ -1024,7 +1024,7 @@ void PMusrCanvas::InitFourier()
  * \param ww
  * \param wh
  */
-void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh)
+void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh)
 {
   fValid = false;
   fDifferenceView  = false;
@@ -1050,8 +1050,8 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
   canvasName += fPlotNumber;
   fMainCanvas = new TCanvas(canvasName.Data(), title, wtopx, wtopy, ww, wh);
   if (fMainCanvas == 0) {
-    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke " << canvasName.Data();
-    cout << endl;
+    cerr << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke " << canvasName.Data();
+    cerr << endl;
     return;
   }
 
@@ -1096,8 +1096,8 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
   // title pad
   fTitlePad = new TPaveText(0.0, YTITLE, 1.0, 1.0, "NDC");
   if (fTitlePad == 0) {
-    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fTitlePad";
-    cout << endl;
+    cerr << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fTitlePad";
+    cerr << endl;
     return;
   }
   fTitlePad->SetFillColor(TColor::GetColor(255,255,255));
@@ -1108,8 +1108,8 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
   // data/theory pad
   fDataTheoryPad = new TPad("dataTheoryPad", "dataTheoryPad", 0.0, YINFO, XTHEO, YTITLE);
   if (fDataTheoryPad == 0) {
-    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fDataTheoryPad";
-    cout << endl;
+    cerr << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fDataTheoryPad";
+    cerr << endl;
     return;
   }
   fDataTheoryPad->SetFillColor(TColor::GetColor(255,255,255));
@@ -1118,8 +1118,8 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
   // parameter pad
   fParameterPad = new TPaveText(XTHEO, 0.5, 1.0, YTITLE, "NDC");
   if (fParameterPad == 0) {
-    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fParameterPad";
-    cout << endl;
+    cerr << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fParameterPad";
+    cerr << endl;
     return;
   }
   fParameterPad->SetFillColor(TColor::GetColor(255,255,255));
@@ -1129,8 +1129,8 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
   // theory pad
   fTheoryPad = new TPaveText(XTHEO, 0.1, 1.0, 0.5, "NDC");
   if (fTheoryPad == 0) {
-    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fTheoryPad";
-    cout << endl;
+    cerr << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fTheoryPad";
+    cerr << endl;
     return;
   }
   fTheoryPad->SetFillColor(TColor::GetColor(255,255,255));
@@ -1141,8 +1141,8 @@ void PMusrCanvas::InitMusrCanvas(const char* title, Int_t wtopx, Int_t wtopy, In
   // info pad
   fInfoPad = new TLegend(0.0, 0.0, 1.0, YINFO, "NDC");
   if (fInfoPad == 0) {
-    cout << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fInfoPad";
-    cout << endl;
+    cerr << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fInfoPad";
+    cerr << endl;
     return;
   }
   fInfoPad->SetFillColor(TColor::GetColor(255,255,255));
@@ -1373,7 +1373,7 @@ void PMusrCanvas::CleanupDataSet(PMusrCanvasNonMusrDataSet &dataSet)
  * \param runNo is the number of the run
  * \param data
  */
-void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunData *data)
+void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
 {
 //cout << endl << ">> PMusrCanvas::HandleDataSet(): start ...; plotNo = " << plotNo << ", fPlotNumber = " << fPlotNumber << ", runNo = " << runNo << endl;
   PMusrCanvasDataSet dataSet;
@@ -1383,7 +1383,7 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   TString name;
   double start;
   double end;
-  int    size;
+  Int_t    size;
 
   InitDataSet(dataSet);
 //cout << endl << ">> PMusrCanvas::HandleDataSet(): after InitDataSet ..." << endl;
@@ -1391,7 +1391,7 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   // dataHisto -------------------------------------------------------------
   // create histo specific infos
   name  = fMsrHandler->GetMsrRunList()->at(runNo).fRunName[0] + "_DataRunNo";
-  name += (int)runNo;
+  name += (Int_t)runNo;
   name += "_";
   name += fPlotNumber;
   start = data->GetDataTimeStart() - data->GetDataTimeStep()/2.0;
@@ -1404,9 +1404,9 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
     start = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0]; // needed to estimate size
     end   = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[1]; // needed to estimate size
-    size  = (int) ((end - start) / data->GetDataTimeStep()) + 1;
+    size  = (Int_t) ((end - start) / data->GetDataTimeStep()) + 1;
     start = data->GetDataTimeStart() +
-            (int)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->GetDataTimeStart())/data->GetDataTimeStep()) * data->GetDataTimeStep() -
+            (Int_t)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->GetDataTimeStart())/data->GetDataTimeStep()) * data->GetDataTimeStep() -
             data->GetDataTimeStep()/2.0; // closesd start value compatible with the user given
     end   = start + size * data->GetDataTimeStep(); // closesd end value compatible with the user given
   }
@@ -1415,9 +1415,9 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) {    
     start = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo]; // needed to estimate size
     end   = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo]; // needed to estimate size
-    size  = (int) ((end - start) / data->GetDataTimeStep()) + 1;
+    size  = (Int_t) ((end - start) / data->GetDataTimeStep()) + 1;
     start = data->GetDataTimeStart() +
-            (int)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->GetDataTimeStart())/data->GetDataTimeStep()) * data->GetDataTimeStep() -
+            (Int_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->GetDataTimeStart())/data->GetDataTimeStep()) * data->GetDataTimeStep() -
             data->GetDataTimeStep()/2.0; // closesd start value compatible with the user given
     end   = start + size * data->GetDataTimeStep(); // closesd end value compatible with the user given
   }
@@ -1473,7 +1473,7 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   // theoHisto -------------------------------------------------------------
   // create histo specific infos
   name  = fMsrHandler->GetMsrRunList()->at(runNo).fRunName[0] + "_TheoRunNo";
-  name += (int)runNo;
+  name += (Int_t)runNo;
   name += "_";
   name += fPlotNumber;
   start = data->GetTheoryTimeStart() - data->GetTheoryTimeStep()/2.0;
@@ -1484,9 +1484,9 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
     start = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0]; // needed to estimate size
     end   = fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[1]; // needed to estimate size
-    size  = (int) ((end - start) / data->GetTheoryTimeStep()) + 1;
+    size  = (Int_t) ((end - start) / data->GetTheoryTimeStep()) + 1;
     start = data->GetTheoryTimeStart() +
-            (int)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->GetTheoryTimeStart())/data->GetTheoryTimeStep()) * data->GetTheoryTimeStep() -
+            (Int_t)((fMsrHandler->GetMsrRunList()->at(runNo).fFitRange[0] - data->GetTheoryTimeStart())/data->GetTheoryTimeStep()) * data->GetTheoryTimeStep() -
             data->GetTheoryTimeStep()/2.0; // closesd start value compatible with the user given
     end   = start + size * data->GetTheoryTimeStep(); // closesd end value compatible with the user given
   }
@@ -1495,9 +1495,9 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) {
     start = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo]; // needed to estimate size
     end   = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo]; // needed to estimate size
-    size  = (int) ((end - start) / data->GetTheoryTimeStep()) + 1;
+    size  = (Int_t) ((end - start) / data->GetTheoryTimeStep()) + 1;
     start = data->GetTheoryTimeStart() +
-            (int)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->GetTheoryTimeStart())/data->GetTheoryTimeStep()) * data->GetTheoryTimeStep() -
+            (Int_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->GetTheoryTimeStart())/data->GetTheoryTimeStep()) * data->GetTheoryTimeStep() -
             data->GetTheoryTimeStep()/2.0; // closesd start value compatible with the user given
     end   = start + size * data->GetTheoryTimeStep(); // closesd end value compatible with the user given
 }
@@ -1558,7 +1558,7 @@ void PMusrCanvas::HandleDataSet(unsigned int plotNo, unsigned int runNo, PRunDat
  * \param runNo
  * \param data
  */
-void PMusrCanvas::HandleNonMusrDataSet(unsigned int plotNo, unsigned int runNo, PRunData *data)
+void PMusrCanvas::HandleNonMusrDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
 {
   PMusrCanvasNonMusrDataSet dataSet;
   TGraphErrors *dataHisto;
@@ -1572,7 +1572,7 @@ void PMusrCanvas::HandleNonMusrDataSet(unsigned int plotNo, unsigned int runNo, 
   dataHisto = new TGraphErrors(data->GetX()->size());
 
   // fill graph
-  for (unsigned int i=0; i<data->GetX()->size(); i++) {
+  for (UInt_t i=0; i<data->GetX()->size(); i++) {
     dataHisto->SetPoint(i, data->GetX()->at(i), data->GetValue()->at(i));
     dataHisto->SetPointError(i, 0.0, data->GetError()->at(i));
   }
@@ -1603,7 +1603,7 @@ void PMusrCanvas::HandleNonMusrDataSet(unsigned int plotNo, unsigned int runNo, 
   theoHisto = new TGraphErrors(data->GetXTheory()->size());
 
   // fill graph
-  for (unsigned int i=0; i<data->GetXTheory()->size(); i++) {
+  for (UInt_t i=0; i<data->GetXTheory()->size(); i++) {
     theoHisto->SetPoint(i, data->GetXTheory()->at(i), data->GetTheory()->at(i));
     theoHisto->SetPointError(i, 0.0, 0.0);
   }
@@ -1639,7 +1639,7 @@ void PMusrCanvas::HandleDifference()
     TH1F *diffHisto;
     TString name;
     // loop over all histos
-    for (unsigned int i=0; i<fData.size(); i++) {
+    for (UInt_t i=0; i<fData.size(); i++) {
       // create difference histos
       name = TString(fData[i].data->GetTitle()) + "_diff";
 //cout << endl << ">> diff-name = " << name.Data() << endl;
@@ -1659,7 +1659,7 @@ void PMusrCanvas::HandleDifference()
       fData[i].diff = diffHisto;
       // calculate diff histo entry
       double value;
-      for (int j=1; j<fData[i].data->GetNbinsX()-1; j++) {
+      for (Int_t j=1; j<fData[i].data->GetNbinsX()-1; j++) {
         // set diff bin value
         value = CalculateDiff(fData[i].data->GetBinCenter(j),
                               fData[i].data->GetBinContent(j),
@@ -1674,7 +1674,7 @@ void PMusrCanvas::HandleDifference()
     TGraphErrors *diffHisto;
     TString name;
     // loop over all histos
-    for (unsigned int i=0; i<fNonMusrData.size(); i++) {
+    for (UInt_t i=0; i<fNonMusrData.size(); i++) {
       // create difference histos
       diffHisto = new TGraphErrors(fNonMusrData[i].data->GetN());
 
@@ -1696,7 +1696,7 @@ void PMusrCanvas::HandleDifference()
       // calculate diff histo entry
       double value;
       double x, y;
-      for (int j=0; j<fNonMusrData[i].data->GetN(); j++) {
+      for (Int_t j=0; j<fNonMusrData[i].data->GetN(); j++) {
         // set diff bin value
         fNonMusrData[i].data->GetPoint(j, x, y);
         value = CalculateDiff(x, y, fNonMusrData[i].theory);
@@ -1746,7 +1746,7 @@ void PMusrCanvas::HandleFourier()
   if (fData[0].dataFourierRe == 0) {
 //cout << endl << ">> Recalculate Fourier ----------------------------------------";
 //cout << endl << ">> fData[0].data = " << fData[0].data;
-    int bin;
+    Int_t bin;
     bin = fHistoFrame->GetXaxis()->GetFirst();
 //cout << endl << ">> start bin  = " << bin;
     double startTime = fHistoFrame->GetBinCenter(bin);
@@ -1755,11 +1755,11 @@ void PMusrCanvas::HandleFourier()
 //cout << endl << ">> end bin    = " << bin;
     double endTime   = fHistoFrame->GetBinCenter(bin);
 //cout << endl << ">> Fourier: startTime = " << startTime << ", endTime = " << endTime;
-    for (unsigned int i=0; i<fData.size(); i++) {
+    for (UInt_t i=0; i<fData.size(); i++) {
       // calculate fourier transform of the data
       PFourier fourierData(fData[i].data, fFourier.fUnits, startTime, endTime, fFourier.fFourierPower);
       if (!fourierData.IsValid()) {
-        cout << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier data ..." << endl;
+        cerr << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier data ..." << endl;
         return;
       }
       fourierData.Transform(fFourier.fApodization);
@@ -1805,11 +1805,11 @@ cout << endl;
       fData[i].dataFourierPhase->SetMarkerStyle(fData[i].data->GetMarkerStyle());
 
       // calculate fourier transform of the theory
-      int powerPad = (int)round(log((endTime-startTime)/fData[i].theory->GetBinWidth(1))/log(2))+3;
+      Int_t powerPad = (Int_t)round(log((endTime-startTime)/fData[i].theory->GetBinWidth(1))/log(2))+3;
 //cout << endl << ">> powerPad = " << powerPad;
       PFourier fourierTheory(fData[i].theory, fFourier.fUnits, startTime, endTime, powerPad);
       if (!fourierTheory.IsValid()) {
-        cout << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier theory ..." << endl;
+        cerr << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier theory ..." << endl;
         return;
       }
       fourierTheory.Transform(fFourier.fApodization);
@@ -1842,9 +1842,9 @@ cout << endl;
 
       fCurrentFourierPhase = fFourier.fPhase;
 
-      for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
+      for (UInt_t i=0; i<fData.size(); i++) { // loop over all data sets
         if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
-          for (int j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+          for (Int_t j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
             // calculate new fourier data set value
             re = fData[i].dataFourierRe->GetBinContent(j) * cp + fData[i].dataFourierIm->GetBinContent(j) * sp;
             im = fData[i].dataFourierIm->GetBinContent(j) * cp - fData[i].dataFourierRe->GetBinContent(j) * sp;
@@ -1854,7 +1854,7 @@ cout << endl;
           }
         }
         if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
-          for (int j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+          for (Int_t j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
             // calculate new fourier data set value
             re = fData[i].theoryFourierRe->GetBinContent(j) * cp + fData[i].theoryFourierIm->GetBinContent(j) * sp;
             im = fData[i].theoryFourierIm->GetBinContent(j) * cp - fData[i].theoryFourierRe->GetBinContent(j) * sp;
@@ -1876,9 +1876,9 @@ cout << endl;
       const double cp = TMath::Cos(fCurrentFourierPhase/180.0*TMath::Pi());
       const double sp = TMath::Sin(fCurrentFourierPhase/180.0*TMath::Pi());
 
-      for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
+      for (UInt_t i=0; i<fData.size(); i++) { // loop over all data sets
         if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
-          for (int j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+          for (Int_t j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
             // calculate new fourier data set value
             re = fData[i].dataFourierRe->GetBinContent(j) * cp + fData[i].dataFourierIm->GetBinContent(j) * sp;
             im = fData[i].dataFourierIm->GetBinContent(j) * cp - fData[i].dataFourierRe->GetBinContent(j) * sp;
@@ -1888,7 +1888,7 @@ cout << endl;
           }
         }
         if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
-          for (int j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+          for (Int_t j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
             // calculate new fourier data set value
             re = fData[i].theoryFourierRe->GetBinContent(j) * cp + fData[i].theoryFourierIm->GetBinContent(j) * sp;
             im = fData[i].theoryFourierIm->GetBinContent(j) * cp - fData[i].theoryFourierRe->GetBinContent(j) * sp;
@@ -1924,17 +1924,17 @@ void PMusrCanvas::HandleFourierDifference()
     // check if difference has been already calcualted, if not do it
     if (fData[0].diff == 0)
       HandleDifference();
-    int bin;
+    Int_t bin;
     bin = fData[0].diff->GetXaxis()->GetFirst();
     double startTime = fData[0].diff->GetBinCenter(bin);
     bin = fData[0].diff->GetXaxis()->GetLast();
     double endTime   = fData[0].diff->GetBinCenter(bin);
 //cout << endl << ">> startTime = " << startTime << ", endTime = " << endTime << endl;
-    for (unsigned int i=0; i<fData.size(); i++) {
+    for (UInt_t i=0; i<fData.size(); i++) {
       // calculate fourier transform of the data
       PFourier fourierData(fData[i].diff, fFourier.fUnits, startTime, endTime, fFourier.fFourierPower);
       if (!fourierData.IsValid()) {
-        cout << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier diff ..." << endl;
+        cerr << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier diff ..." << endl;
         return;
       }
       fourierData.Transform(fFourier.fApodization);
@@ -1981,9 +1981,9 @@ void PMusrCanvas::HandleFourierDifference()
 
       fCurrentFourierPhase = fFourier.fPhase;
 
-      for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
+      for (UInt_t i=0; i<fData.size(); i++) { // loop over all data sets
         if ((fData[i].diffFourierRe != 0) && (fData[i].diffFourierIm != 0)) {
-          for (int j=0; j<fData[i].diffFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+          for (Int_t j=0; j<fData[i].diffFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
             // calculate new fourier data set value
             re = fData[i].diffFourierRe->GetBinContent(j) * cp + fData[i].diffFourierIm->GetBinContent(j) * sp;
             im = fData[i].diffFourierIm->GetBinContent(j) * cp - fData[i].diffFourierRe->GetBinContent(j) * sp;
@@ -2020,8 +2020,8 @@ double PMusrCanvas::FindOptimalFourierPhase()
   Double_t minIm = 0.0, maxIm = 0.0, asymmetry;
   // get min/max of the imaginary part for phase = 0.0 as a starting point
   minPhase = 0.0;
-  bool first = true;
-  for (int i=0; i<fData[0].dataFourierIm->GetNbinsX(); i++) {
+  Bool_t first = true;
+  for (Int_t i=0; i<fData[0].dataFourierIm->GetNbinsX(); i++) {
     x = fData[0].dataFourierIm->GetBinCenter(i);
     if ((x > fFourier.fRangeForPhaseCorrection[0]) && (x < fFourier.fRangeForPhaseCorrection[1])) {
       valIm = fData[0].dataFourierIm->GetBinContent(i);
@@ -2047,7 +2047,7 @@ double PMusrCanvas::FindOptimalFourierPhase()
     cp = TMath::Cos(phase / 180.0 * TMath::Pi());
     sp = TMath::Sin(phase / 180.0 * TMath::Pi());
     first = true;
-    for (int i=0; i<fData[0].dataFourierIm->GetNbinsX(); i++) {
+    for (Int_t i=0; i<fData[0].dataFourierIm->GetNbinsX(); i++) {
       x = fData[0].dataFourierIm->GetBinCenter(i);
       if ((x > fFourier.fRangeForPhaseCorrection[0]) && (x < fFourier.fRangeForPhaseCorrection[1])) {
         valIm = -sp * fData[0].dataFourierRe->GetBinContent(i) + cp * fData[0].dataFourierIm->GetBinContent(i);
@@ -2085,7 +2085,7 @@ cout << endl << ">> optimal phase = " << minPhase << endl;
  */
 void PMusrCanvas::CleanupDifference()
 {
-  for (unsigned int i=0; i<fData.size(); i++) {
+  for (UInt_t i=0; i<fData.size(); i++) {
     if (fData[i].diff != 0) {
       delete fData[i].diff;
       fData[i].diff = 0;
@@ -2102,7 +2102,7 @@ void PMusrCanvas::CleanupDifference()
  */
 void PMusrCanvas::CleanupFourier()
 {
-  for (unsigned int i=0; i<fData.size(); i++) {
+  for (UInt_t i=0; i<fData.size(); i++) {
     if (fData[i].dataFourierRe != 0) {
       delete fData[i].dataFourierRe;
       fData[i].dataFourierRe = 0;
@@ -2147,7 +2147,7 @@ void PMusrCanvas::CleanupFourier()
  */
 void PMusrCanvas::CleanupFourierDifference()
 {
-  for (unsigned int i=0; i<fData.size(); i++) {
+  for (UInt_t i=0; i<fData.size(); i++) {
     if (fData[i].diffFourierRe != 0) {
       delete fData[i].diffFourierRe;
       fData[i].diffFourierRe = 0;
@@ -2252,7 +2252,7 @@ double PMusrCanvas::GetGlobalMaximum(TH1F* histo)
 
   double max = histo->GetBinContent(1);
   double binContent;
-  for (int i=2; i < histo->GetNbinsX(); i++) {
+  for (Int_t i=2; i < histo->GetNbinsX(); i++) {
     binContent = histo->GetBinContent(i);
     if (max < binContent)
       max = binContent;
@@ -2276,7 +2276,7 @@ double PMusrCanvas::GetGlobalMinimum(TH1F* histo)
 
   double min = histo->GetBinContent(1);
   double binContent;
-  for (int i=2; i < histo->GetNbinsX(); i++) {
+  for (Int_t i=2; i < histo->GetNbinsX(); i++) {
     binContent = histo->GetBinContent(i);
     if (min > binContent)
       min = binContent;
@@ -2317,7 +2317,7 @@ void PMusrCanvas::PlotData()
       Double_t dataXmax = fData[0].data->GetXaxis()->GetXmax();
       Double_t dataYmin = fData[0].data->GetMinimum();
       Double_t dataYmax = fData[0].data->GetMaximum();
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         if (fData[i].data->GetXaxis()->GetXmin() < dataXmin)
           dataXmin = fData[i].data->GetXaxis()->GetXmin();
         if (fData[i].data->GetXaxis()->GetXmax() > dataXmax)
@@ -2338,7 +2338,7 @@ void PMusrCanvas::PlotData()
         fXmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[0];
         fYmin = fData[0].data->GetMinimum();
         fYmax = fData[0].data->GetMaximum();
-        for (unsigned int i=1; i<fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size(); i++) {
+        for (UInt_t i=1; i<fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size(); i++) {
           if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[i] < fXmin)
             fXmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[i];
           if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[i] > fXmax)
@@ -2394,11 +2394,11 @@ void PMusrCanvas::PlotData()
       }
       fHistoFrame->GetYaxis()->SetTitle(yAxisTitle.Data());
       // plot all data
-      for (unsigned int i=0; i<fData.size(); i++) {
+      for (UInt_t i=0; i<fData.size(); i++) {
         fData[i].data->Draw("pesame");
       }
       // plot all the theory
-      for (unsigned int i=0; i<fData.size(); i++) {
+      for (UInt_t i=0; i<fData.size(); i++) {
         fData[i].theory->Draw("lsame");
       }
     }
@@ -2412,7 +2412,7 @@ void PMusrCanvas::PlotData()
 
     PMsrRunList runs = *fMsrHandler->GetMsrRunList();
     PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
-    unsigned int runNo = (unsigned int)plotInfo.fRuns[0].Re()-1;
+    UInt_t runNo = (UInt_t)plotInfo.fRuns[0].Re()-1;
     TString xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName[0], runNo);
     TString yAxisTitle = fRunList->GetYAxisTitle(runs[runNo].fRunName[0], runNo);
 
@@ -2423,7 +2423,7 @@ void PMusrCanvas::PlotData()
         assert(fMultiGraphData != 0);
 
         // add all data to fMultiGraphData
-        for (unsigned int i=0; i<fNonMusrData.size(); i++) {
+        for (UInt_t i=0; i<fNonMusrData.size(); i++) {
           // the next two lines are ugly but needed for the following reasons:
           // TMultiGraph is taking ownership of the TGraphErrors, hence a deep copy is needed.
           // This is not resulting in a memory leak, since the TMultiGraph object will do the cleaing
@@ -2431,7 +2431,7 @@ void PMusrCanvas::PlotData()
           fMultiGraphData->Add(ge, "p");
         }
         // add all the theory to fMultiGraphData
-        for (unsigned int i=0; i<fNonMusrData.size(); i++) {
+        for (UInt_t i=0; i<fNonMusrData.size(); i++) {
           // the next two lines are ugly but needed for the following reasons:
           // TMultiGraph is taking ownership of the TGraphErrors, hence a deep copy is needed.
           // This is not resulting in a memory leak, since the TMultiGraph object will do the cleaing
@@ -2470,13 +2470,13 @@ void PMusrCanvas::PlotData()
         fMultiGraphLegend = new TLegend(0.8, 0.8, 1.0, 1.0);
         assert(fMultiGraphLegend != 0);
         PStringVector legendLabel;
-        for (unsigned int i=0; i<plotInfo.fRuns.size(); i++) {
-           runNo = (unsigned int)plotInfo.fRuns[i].Re()-1;
+        for (UInt_t i=0; i<plotInfo.fRuns.size(); i++) {
+           runNo = (UInt_t)plotInfo.fRuns[i].Re()-1;
            xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName[0], runNo);
            yAxisTitle = fRunList->GetYAxisTitle(runs[runNo].fRunName[0], runNo);
            legendLabel.push_back(xAxisTitle + " vs. " + yAxisTitle);
         }
-        for (unsigned int i=0; i<fNonMusrData.size(); i++) {
+        for (UInt_t i=0; i<fNonMusrData.size(); i++) {
           fMultiGraphLegend->AddEntry(fNonMusrData[i].data, legendLabel[i].Data(), "p");
         }
         legendLabel.clear();
@@ -2517,7 +2517,7 @@ void PMusrCanvas::PlotDifference()
     // set y-axis label
     hframe->GetYaxis()->SetTitle("data-theory");
     // plot all remaining diff data
-    for (unsigned int i=0; i<fData.size(); i++) {
+    for (UInt_t i=0; i<fData.size(); i++) {
       fData[i].diff->Draw("pesame");
     }
   } else { // fPlotType == MSR_PLOT_NON_MUSR
@@ -2530,7 +2530,7 @@ void PMusrCanvas::PlotDifference()
 
     PMsrRunList runs = *fMsrHandler->GetMsrRunList();
     PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
-    unsigned int runNo = (unsigned int)plotInfo.fRuns[0].Re()-1;
+    UInt_t runNo = (UInt_t)plotInfo.fRuns[0].Re()-1;
     TString xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName[0], runNo);
 
     // if fMultiGraphDiff is not present create it and add the diff data
@@ -2539,7 +2539,7 @@ void PMusrCanvas::PlotDifference()
       assert(fMultiGraphDiff != 0);
 
       // add all diff data to fMultiGraphDiff
-      for (unsigned int i=0; i<fNonMusrData.size(); i++) {
+      for (UInt_t i=0; i<fNonMusrData.size(); i++) {
         // the next two lines are ugly but needed for the following reasons:
         // TMultiGraph is taking ownership of the TGraphErrors, hence a deep copy is needed.
         // This is not resulting in a memory leak, since the TMultiGraph object will do the cleaing
@@ -2620,7 +2620,7 @@ void PMusrCanvas::PlotFourier()
       min = GetGlobalMinimum(fData[0].dataFourierRe);
       max = GetGlobalMaximum(fData[0].dataFourierRe);
 //cout << endl << ">> y-range: min, max = " << min << ", " << max;
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         binContent = GetGlobalMinimum(fData[i].dataFourierRe);
         if (binContent < min)
           min = binContent;
@@ -2638,12 +2638,12 @@ void PMusrCanvas::PlotFourier()
       fData[0].dataFourierRe->GetYaxis()->SetTitle("Real Fourier");
 
       // plot all remaining data
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         fData[i].dataFourierRe->Draw("psame");
       }
 
       // plot theories
-      for (unsigned int i=0; i<fData.size(); i++) {
+      for (UInt_t i=0; i<fData.size(); i++) {
         fData[i].theoryFourierRe->Draw("same");
       }
 
@@ -2668,7 +2668,7 @@ void PMusrCanvas::PlotFourier()
       // first find minimum/maximum of all histos
       min = GetGlobalMinimum(fData[0].dataFourierIm);
       max = GetGlobalMaximum(fData[0].dataFourierIm);
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         binContent = GetGlobalMinimum(fData[i].dataFourierIm);
         if (binContent < min)
           min = binContent;
@@ -2685,12 +2685,12 @@ void PMusrCanvas::PlotFourier()
       fData[0].dataFourierIm->GetYaxis()->SetTitle("Imaginary Fourier");
 
       // plot all remaining data
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         fData[i].dataFourierIm->Draw("psame");
       }
 
       // plot theories
-      for (unsigned int i=0; i<fData.size(); i++) {
+      for (UInt_t i=0; i<fData.size(); i++) {
         fData[i].theoryFourierIm->Draw("same");
       }
 
@@ -2716,7 +2716,7 @@ void PMusrCanvas::PlotFourier()
       // real part first
       min = GetGlobalMinimum(fData[0].dataFourierRe);
       max = GetGlobalMaximum(fData[0].dataFourierRe);
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         binContent = GetGlobalMinimum(fData[i].dataFourierRe);
         if (binContent < min)
           min = binContent;
@@ -2725,7 +2725,7 @@ void PMusrCanvas::PlotFourier()
           max = binContent;
       }
       // imag part min/max
-      for (unsigned int i=0; i<fData.size(); i++) {
+      for (UInt_t i=0; i<fData.size(); i++) {
         binContent = GetGlobalMinimum(fData[i].dataFourierIm);
         if (binContent < min)
           min = binContent;
@@ -2743,13 +2743,13 @@ void PMusrCanvas::PlotFourier()
 
       // plot all remaining data
       fData[0].dataFourierIm->Draw("psame");
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         fData[i].dataFourierRe->Draw("psame");
         fData[i].dataFourierIm->Draw("psame");
       }
 
       // plot theories
-      for (unsigned int i=0; i<fData.size(); i++) {
+      for (UInt_t i=0; i<fData.size(); i++) {
         fData[i].theoryFourierRe->Draw("same");
         fData[i].theoryFourierIm->Draw("same");
       }
@@ -2775,7 +2775,7 @@ void PMusrCanvas::PlotFourier()
       // first find minimum/maximum of all histos
       min = GetGlobalMinimum(fData[0].dataFourierPwr);
       max = GetGlobalMaximum(fData[0].dataFourierPwr);
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         binContent = GetGlobalMinimum(fData[i].dataFourierPwr);
         if (binContent < min)
           min = binContent;
@@ -2792,12 +2792,12 @@ void PMusrCanvas::PlotFourier()
       fData[0].dataFourierPwr->GetYaxis()->SetTitle("Power Fourier");
 
       // plot all remaining data
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         fData[i].dataFourierPwr->Draw("psame");
       }
 
       // plot theories
-      for (unsigned int i=0; i<fData.size(); i++) {
+      for (UInt_t i=0; i<fData.size(); i++) {
         fData[i].theoryFourierPwr->Draw("same");
       }
 
@@ -2820,7 +2820,7 @@ void PMusrCanvas::PlotFourier()
       // first find minimum/maximum of all histos
       min = GetGlobalMinimum(fData[0].dataFourierPhase);
       max = GetGlobalMaximum(fData[0].dataFourierPhase);
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         binContent = GetGlobalMinimum(fData[i].dataFourierPhase);
         if (binContent < min)
           min = binContent;
@@ -2837,12 +2837,12 @@ void PMusrCanvas::PlotFourier()
       fData[0].dataFourierPhase->GetYaxis()->SetTitle("Phase Fourier");
 
       // plot all remaining data
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         fData[i].dataFourierPhase->Draw("psame");
       }
 
       // plot theories
-      for (unsigned int i=0; i<fData.size(); i++) {
+      for (UInt_t i=0; i<fData.size(); i++) {
         fData[i].theoryFourierPhase->Draw("same");
       }
 
@@ -2913,7 +2913,7 @@ void PMusrCanvas::PlotFourierDifference()
       min = GetGlobalMinimum(fData[0].diffFourierRe);
       max = GetGlobalMaximum(fData[0].diffFourierRe);
 //cout << endl << ">> y-range: min, max = " << min << ", " << max;
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         binContent = GetGlobalMinimum(fData[i].diffFourierRe);
         if (binContent < min)
           min = binContent;
@@ -2931,7 +2931,7 @@ void PMusrCanvas::PlotFourierDifference()
       fData[0].diffFourierRe->GetYaxis()->SetTitle("Real Fourier");
 
       // plot all remaining data
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         fData[i].diffFourierRe->Draw("plsame");
       }
 
@@ -2956,7 +2956,7 @@ void PMusrCanvas::PlotFourierDifference()
       // first find minimum/maximum of all histos
       min = GetGlobalMinimum(fData[0].diffFourierIm);
       max = GetGlobalMaximum(fData[0].diffFourierIm);
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         binContent = GetGlobalMinimum(fData[i].diffFourierIm);
         if (binContent < min)
           min = binContent;
@@ -2973,7 +2973,7 @@ void PMusrCanvas::PlotFourierDifference()
       fData[0].diffFourierIm->GetYaxis()->SetTitle("Imaginary Fourier");
 
       // plot all remaining data
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         fData[i].diffFourierIm->Draw("plsame");
       }
 
@@ -2998,7 +2998,7 @@ void PMusrCanvas::PlotFourierDifference()
       // first find minimum/maximum of all histos
       min = GetGlobalMinimum(fData[0].diffFourierRe);
       max = GetGlobalMaximum(fData[0].diffFourierRe);
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         binContent = GetGlobalMinimum(fData[i].diffFourierRe);
         if (binContent < min)
           min = binContent;
@@ -3006,7 +3006,7 @@ void PMusrCanvas::PlotFourierDifference()
         if (binContent > max)
           max = binContent;
       }
-      for (unsigned int i=0; i<fData.size(); i++) {
+      for (UInt_t i=0; i<fData.size(); i++) {
         binContent = GetGlobalMinimum(fData[i].diffFourierIm);
         if (binContent < min)
           min = binContent;
@@ -3024,7 +3024,7 @@ void PMusrCanvas::PlotFourierDifference()
 
       // plot all remaining data
       fData[0].diffFourierIm->Draw("plsame");
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         fData[i].diffFourierRe->Draw("plsame");
         fData[i].diffFourierIm->Draw("plsame");
       }
@@ -3050,7 +3050,7 @@ void PMusrCanvas::PlotFourierDifference()
       // first find minimum/maximum of all histos
       min = GetGlobalMinimum(fData[0].diffFourierPwr);
       max = GetGlobalMaximum(fData[0].diffFourierPwr);
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         binContent = GetGlobalMinimum(fData[i].diffFourierPwr);
         if (binContent < min)
           min = binContent;
@@ -3067,7 +3067,7 @@ void PMusrCanvas::PlotFourierDifference()
       fData[0].diffFourierPwr->GetYaxis()->SetTitle("Power Fourier");
 
       // plot all remaining data
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         fData[i].diffFourierPwr->Draw("plsame");
       }
 
@@ -3092,7 +3092,7 @@ void PMusrCanvas::PlotFourierDifference()
       // first find minimum/maximum of all histos
       min = GetGlobalMinimum(fData[0].diffFourierPhase);
       max = GetGlobalMaximum(fData[0].diffFourierPhase);
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         binContent = GetGlobalMinimum(fData[i].diffFourierPhase);
         if (binContent < min)
           min = binContent;
@@ -3109,7 +3109,7 @@ void PMusrCanvas::PlotFourierDifference()
       fData[0].diffFourierPhase->GetYaxis()->SetTitle("Phase Fourier");
 
       // plot all remaining data
-      for (unsigned int i=1; i<fData.size(); i++) {
+      for (UInt_t i=1; i<fData.size(); i++) {
         fData[i].diffFourierPhase->Draw("plsame");
       }
 
@@ -3179,9 +3179,9 @@ void PMusrCanvas::IncrementFourierPhase()
   fCurrentFourierPhase += fFourier.fPhaseIncrement;
   PlotFourierPhaseValue();
 
-  for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
+  for (UInt_t i=0; i<fData.size(); i++) { // loop over all data sets
     if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
-      for (int j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+      for (Int_t j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
         // calculate new fourier data set value
         re = fData[i].dataFourierRe->GetBinContent(j) * cp + fData[i].dataFourierIm->GetBinContent(j) * sp;
         im = fData[i].dataFourierIm->GetBinContent(j) * cp - fData[i].dataFourierRe->GetBinContent(j) * sp;
@@ -3191,7 +3191,7 @@ void PMusrCanvas::IncrementFourierPhase()
       }
     }
     if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
-      for (int j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+      for (Int_t j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
         // calculate new fourier data set value
         re = fData[i].theoryFourierRe->GetBinContent(j) * cp + fData[i].theoryFourierIm->GetBinContent(j) * sp;
         im = fData[i].theoryFourierIm->GetBinContent(j) * cp - fData[i].theoryFourierRe->GetBinContent(j) * sp;
@@ -3201,7 +3201,7 @@ void PMusrCanvas::IncrementFourierPhase()
       }
     }
     if ((fData[i].diffFourierRe != 0) && (fData[i].diffFourierIm != 0)) {
-      for (int j=0; j<fData[i].diffFourierRe->GetNbinsX(); j++) { // loop over a fourier diff data set
+      for (Int_t j=0; j<fData[i].diffFourierRe->GetNbinsX(); j++) { // loop over a fourier diff data set
         // calculate new fourier diff data set value
         re = fData[i].diffFourierRe->GetBinContent(j) * cp + fData[i].diffFourierIm->GetBinContent(j) * sp;
         im = fData[i].diffFourierIm->GetBinContent(j) * cp - fData[i].diffFourierRe->GetBinContent(j) * sp;
@@ -3230,9 +3230,9 @@ void PMusrCanvas::DecrementFourierPhase()
   fCurrentFourierPhase -= fFourier.fPhaseIncrement;
   PlotFourierPhaseValue();
 
-  for (unsigned int i=0; i<fData.size(); i++) { // loop over all data sets
+  for (UInt_t i=0; i<fData.size(); i++) { // loop over all data sets
     if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
-      for (int j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+      for (Int_t j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
         // calculate new fourier data set value
         re = fData[i].dataFourierRe->GetBinContent(j) * cp - fData[i].dataFourierIm->GetBinContent(j) * sp;
         im = fData[i].dataFourierIm->GetBinContent(j) * cp + fData[i].dataFourierRe->GetBinContent(j) * sp;
@@ -3242,7 +3242,7 @@ void PMusrCanvas::DecrementFourierPhase()
       }
     }
     if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
-      for (int j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
+      for (Int_t j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
         // calculate new fourier data set value
         re = fData[i].theoryFourierRe->GetBinContent(j) * cp - fData[i].theoryFourierIm->GetBinContent(j) * sp;
         im = fData[i].theoryFourierIm->GetBinContent(j) * cp + fData[i].theoryFourierRe->GetBinContent(j) * sp;
@@ -3252,7 +3252,7 @@ void PMusrCanvas::DecrementFourierPhase()
       }
     }
     if ((fData[i].diffFourierRe != 0) && (fData[i].diffFourierIm != 0)) {
-      for (int j=0; j<fData[i].diffFourierRe->GetNbinsX(); j++) { // loop over a fourier diff data set
+      for (Int_t j=0; j<fData[i].diffFourierRe->GetNbinsX(); j++) { // loop over a fourier diff data set
         // calculate new fourier diff data set value
         re = fData[i].diffFourierRe->GetBinContent(j) * cp - fData[i].diffFourierIm->GetBinContent(j) * sp;
         im = fData[i].diffFourierIm->GetBinContent(j) * cp + fData[i].diffFourierRe->GetBinContent(j) * sp;
@@ -3281,7 +3281,7 @@ void PMusrCanvas::SaveDataAscii()
   TString str;
   TString flnData = TString("");
   TString flnTheo = TString("");
-  for (int i=0; i<tokens->GetEntries()-1; i++) {
+  for (Int_t i=0; i<tokens->GetEntries()-1; i++) {
     ostr = dynamic_cast<TObjString*>(tokens->At(i));
     flnData += ostr->GetString() + TString(".");
     flnTheo += ostr->GetString() + TString(".");
@@ -3305,7 +3305,7 @@ void PMusrCanvas::SaveDataAscii()
   // open output data-file
   foutData.open(flnData.Data(), iostream::out);
   if (!foutData.is_open()) {
-    cout << endl << ">> PMusrCanvas::SaveDataAscii: **ERROR** couldn't open file " << flnData.Data() << " for writing." << endl;
+    cerr << endl << ">> PMusrCanvas::SaveDataAscii: **ERROR** couldn't open file " << flnData.Data() << " for writing." << endl;
     return;
   }
 
@@ -3313,7 +3313,7 @@ void PMusrCanvas::SaveDataAscii()
     // open output theory-file
     foutTheo.open(flnTheo.Data(), iostream::out);
     if (!foutTheo.is_open()) {
-      cout << endl << ">> PMusrCanvas::SaveDataAscii: **ERROR** couldn't open file " << flnTheo.Data() << " for writing." << endl;
+      cerr << endl << ">> PMusrCanvas::SaveDataAscii: **ERROR** couldn't open file " << flnTheo.Data() << " for writing." << endl;
       return;
     }
   }
@@ -3333,7 +3333,7 @@ void PMusrCanvas::SaveDataAscii()
           case PV_DATA:
             // write header
             foutData << "% time (us)";
-            for (unsigned int j=0; j<fData.size(); j++) {
+            for (UInt_t j=0; j<fData.size(); j++) {
               foutData << ", Diff" << j << ", eDiff" << j;
             }
             foutData << endl;
@@ -3343,12 +3343,12 @@ void PMusrCanvas::SaveDataAscii()
             xmin = fHistoFrame->GetXaxis()->GetBinCenter(xminBin);
             xmax = fHistoFrame->GetXaxis()->GetBinCenter(xmaxBin);
             // get difference data
-            for (int i=1; i<fData[0].diff->GetNbinsX()-1; i++) {
+            for (Int_t i=1; i<fData[0].diff->GetNbinsX()-1; i++) {
               time = fData[0].diff->GetBinCenter(i); // get time
               if ((time < xmin) || (time > xmax))
                 continue;
               foutData << time;
-              for (unsigned int j=0; j<fData.size(); j++) {
+              for (UInt_t j=0; j<fData.size(); j++) {
                 foutData << ", " << fData[j].diff->GetBinContent(i);
                 foutData << ", " << fData[j].diff->GetBinError(i);
               }
@@ -3373,13 +3373,13 @@ void PMusrCanvas::SaveDataAscii()
           case PV_DATA:
             // write header
             foutData << endl << "% timeData (us)";
-            for (unsigned int j=0; j<fData.size(); j++) {
+            for (UInt_t j=0; j<fData.size(); j++) {
               foutData << ", Data" << j << ", eData" << j;
             }
             foutData << endl;
 
             foutTheo << ", timeTheo (us)";
-            for (unsigned int j=0; j<fData.size(); j++) {
+            for (UInt_t j=0; j<fData.size(); j++) {
               foutTheo << ", Theo" << j;
             }
             foutTheo << endl;
@@ -3390,12 +3390,12 @@ void PMusrCanvas::SaveDataAscii()
             xmin = fHistoFrame->GetXaxis()->GetBinCenter(xminBin);
             xmax = fHistoFrame->GetXaxis()->GetBinCenter(xmaxBin);
             // write data
-            for (int i=1; i<fData[0].data->GetNbinsX()-1; i++) {
+            for (Int_t i=1; i<fData[0].data->GetNbinsX()-1; i++) {
               time = fData[0].data->GetBinCenter(i); // get time
               if ((time < xmin) || (time > xmax))
                 continue;
               foutData << time << ", ";
-              for (unsigned int j=0; j<fData.size()-1; j++) {
+              for (UInt_t j=0; j<fData.size()-1; j++) {
                 foutData << fData[j].data->GetBinContent(i) << ", ";
                 foutData << fData[j].data->GetBinError(i) << ", ";
               }
@@ -3406,12 +3406,12 @@ void PMusrCanvas::SaveDataAscii()
             }
 
             // write theory
-            for (int i=1; i<fData[0].theory->GetNbinsX()-1; i++) {
+            for (Int_t i=1; i<fData[0].theory->GetNbinsX()-1; i++) {
               time = fData[0].theory->GetBinCenter(i); // get time
               if ((time < xmin) || (time > xmax))
                 continue;
               foutTheo << time << ", ";
-              for (unsigned int j=0; j<fData.size()-1; j++) {
+              for (UInt_t j=0; j<fData.size()-1; j++) {
                 foutTheo << fData[j].theory->GetBinContent(i) << ", ";
               }
               // write last data set
@@ -3437,13 +3437,13 @@ void PMusrCanvas::SaveDataAscii()
                 break;
             }
             foutData << str.Data();
-            for (unsigned int j=0; j<fData.size(); j++) {
+            for (UInt_t j=0; j<fData.size(); j++) {
               foutData << ", RealFourierData" << j;
             }
             foutData << endl;
 
             foutTheo << str.Data();
-            for (unsigned int j=0; j<fData.size(); j++) {
+            for (UInt_t j=0; j<fData.size(); j++) {
               foutTheo << ", RealFourierTheo" << j;
             }
             foutTheo << endl;
@@ -3455,24 +3455,24 @@ void PMusrCanvas::SaveDataAscii()
             xmax = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xmaxBin);
 
             // write data
-            for (int i=1; i<fData[0].dataFourierRe->GetNbinsX()-1; i++) {
+            for (Int_t i=1; i<fData[0].dataFourierRe->GetNbinsX()-1; i++) {
               xval = fData[0].dataFourierRe->GetBinCenter(i); // get x-unit
               if ((xval < xmin) || (xval > xmax))
                 continue;
               foutData << xval;
-              for (unsigned int j=0; j<fData.size(); j++) {
+              for (UInt_t j=0; j<fData.size(); j++) {
                 foutData << ", " << fData[j].dataFourierRe->GetBinContent(i);
               }
               foutData << endl;
             }
 
             // write theory
-            for (int i=1; i<fData[0].theoryFourierRe->GetNbinsX()-1; i++) {
+            for (Int_t i=1; i<fData[0].theoryFourierRe->GetNbinsX()-1; i++) {
               xval = fData[0].theoryFourierRe->GetBinCenter(i); // get x-unit
               if ((xval < xmin) || (xval > xmax))
                 continue;
               foutTheo << xval;
-              for (unsigned int j=0; j<fData.size(); j++) {
+              for (UInt_t j=0; j<fData.size(); j++) {
                 foutTheo << ", " << fData[j].theoryFourierRe->GetBinContent(i);
               }
               foutTheo << endl;
@@ -3496,13 +3496,13 @@ void PMusrCanvas::SaveDataAscii()
                 break;
             }
             foutData << str.Data();
-            for (unsigned int j=0; j<fData.size(); j++) {
+            for (UInt_t j=0; j<fData.size(); j++) {
               foutData << ", ImagFourierData" << j;
             }
             foutData << endl;
 
             foutTheo << str.Data();
-            for (unsigned int j=0; j<fData.size(); j++) {
+            for (UInt_t j=0; j<fData.size(); j++) {
               foutTheo << ", ImagFourierTheo" << j;
             }
             foutTheo << endl;
@@ -3514,24 +3514,24 @@ void PMusrCanvas::SaveDataAscii()
             xmax = fData[0].dataFourierIm->GetXaxis()->GetBinCenter(xmaxBin);
 
             // write data
-            for (int i=1; i<fData[0].dataFourierIm->GetNbinsX()-1; i++) {
+            for (Int_t i=1; i<fData[0].dataFourierIm->GetNbinsX()-1; i++) {
               xval = fData[0].dataFourierIm->GetBinCenter(i); // get x-unit
               if ((xval < xmin) || (xval > xmax))
                 continue;
               foutData << xval;
-              for (unsigned int j=0; j<fData.size(); j++) {
+              for (UInt_t j=0; j<fData.size(); j++) {
                 foutData << ", " << fData[j].dataFourierIm->GetBinContent(i);
               }
               foutData << endl;
             }
 
             // write theory
-            for (int i=1; i<fData[0].theoryFourierIm->GetNbinsX()-1; i++) {
+            for (Int_t i=1; i<fData[0].theoryFourierIm->GetNbinsX()-1; i++) {
               xval = fData[0].theoryFourierIm->GetBinCenter(i); // get x-unit
               if ((xval < xmin) || (xval > xmax))
                 continue;
               foutTheo << xval;
-              for (unsigned int j=0; j<fData.size(); j++) {
+              for (UInt_t j=0; j<fData.size(); j++) {
                 foutTheo << ", " << fData[j].theoryFourierIm->GetBinContent(i);
               }
               foutTheo << endl;
@@ -3555,13 +3555,13 @@ void PMusrCanvas::SaveDataAscii()
                 break;
             }
             foutData << str.Data();
-            for (unsigned int j=0; j<fData.size(); j++) {
+            for (UInt_t j=0; j<fData.size(); j++) {
               foutData << ", RealFourierData" << j << ", ImagFourierData" << j;
             }
             foutData << endl;
 
             foutTheo << str.Data();
-            for (unsigned int j=0; j<fData.size(); j++) {
+            for (UInt_t j=0; j<fData.size(); j++) {
               foutTheo << ", RealFourierTheo" << j << ", ImagFourierTheo" << j;
             }
             foutTheo << endl;
@@ -3573,12 +3573,12 @@ void PMusrCanvas::SaveDataAscii()
             xmax = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xmaxBin);
 
             // write data
-            for (int i=1; i<fData[0].dataFourierRe->GetNbinsX()-1; i++) {
+            for (Int_t i=1; i<fData[0].dataFourierRe->GetNbinsX()-1; i++) {
               xval = fData[0].dataFourierRe->GetBinCenter(i); // get x-unit
               if ((xval < xmin) || (xval > xmax))
                 continue;
               foutData << xval;
-              for (unsigned int j=0; j<fData.size(); j++) {
+              for (UInt_t j=0; j<fData.size(); j++) {
                 foutData << ", " << fData[j].dataFourierRe->GetBinContent(i);
                 foutData << ", " << fData[j].dataFourierIm->GetBinContent(i);
               }
@@ -3586,12 +3586,12 @@ void PMusrCanvas::SaveDataAscii()
             }
 
             // write theory
-            for (int i=1; i<fData[0].theoryFourierRe->GetNbinsX()-1; i++) {
+            for (Int_t i=1; i<fData[0].theoryFourierRe->GetNbinsX()-1; i++) {
               xval = fData[0].theoryFourierRe->GetBinCenter(i); // get x-unit
               if ((xval < xmin) || (xval > xmax))
                 continue;
               foutTheo << xval;
-              for (unsigned int j=0; j<fData.size(); j++) {
+              for (UInt_t j=0; j<fData.size(); j++) {
                 foutTheo << ", " << fData[j].theoryFourierRe->GetBinContent(i);
                 foutTheo << ", " << fData[j].theoryFourierIm->GetBinContent(i);
               }
@@ -3616,13 +3616,13 @@ void PMusrCanvas::SaveDataAscii()
                 break;
             }
             foutData << str.Data();
-            for (unsigned int j=0; j<fData.size(); j++) {
+            for (UInt_t j=0; j<fData.size(); j++) {
               foutData << ", PwrFourierData" << j;
             }
             foutData << endl;
 
             foutTheo << str.Data();
-            for (unsigned int j=0; j<fData.size(); j++) {
+            for (UInt_t j=0; j<fData.size(); j++) {
               foutTheo << ", PwrFourierTheo" << j;
             }
             foutTheo << endl;
@@ -3634,24 +3634,24 @@ void PMusrCanvas::SaveDataAscii()
             xmax = fData[0].dataFourierPwr->GetXaxis()->GetBinCenter(xmaxBin);
 
             // write data
-            for (int i=1; i<fData[0].dataFourierPwr->GetNbinsX()-1; i++) {
+            for (Int_t i=1; i<fData[0].dataFourierPwr->GetNbinsX()-1; i++) {
               xval = fData[0].dataFourierPwr->GetBinCenter(i); // get x-unit
               if ((xval < xmin) || (xval > xmax))
                 continue;
               foutData << xval;
-              for (unsigned int j=0; j<fData.size(); j++) {
+              for (UInt_t j=0; j<fData.size(); j++) {
                 foutData << ", " << fData[j].dataFourierPwr->GetBinContent(i);
               }
               foutData << endl;
             }
 
             // write theory
-            for (int i=1; i<fData[0].theoryFourierPwr->GetNbinsX()-1; i++) {
+            for (Int_t i=1; i<fData[0].theoryFourierPwr->GetNbinsX()-1; i++) {
               xval = fData[0].theoryFourierPwr->GetBinCenter(i); // get x-unit
               if ((xval < xmin) || (xval > xmax))
                 continue;
               foutTheo << xval;
-              for (unsigned int j=0; j<fData.size(); j++) {
+              for (UInt_t j=0; j<fData.size(); j++) {
                 foutTheo << ", " << fData[j].theoryFourierPwr->GetBinContent(i);
               }
               foutTheo << endl;
@@ -3675,13 +3675,13 @@ void PMusrCanvas::SaveDataAscii()
                 break;
             }
             foutData << str.Data();
-            for (unsigned int j=0; j<fData.size(); j++) {
+            for (UInt_t j=0; j<fData.size(); j++) {
               foutData << ", PhaseFourierData" << j;
             }
             foutData << endl;
 
             foutTheo << str.Data();
-            for (unsigned int j=0; j<fData.size(); j++) {
+            for (UInt_t j=0; j<fData.size(); j++) {
               foutTheo << ", PhaseFourierTheo" << j;
             }
             foutTheo << endl;
@@ -3693,24 +3693,24 @@ void PMusrCanvas::SaveDataAscii()
             xmax = fData[0].dataFourierPhase->GetXaxis()->GetBinCenter(xmaxBin);
 
             // write data
-            for (int i=1; i<fData[0].dataFourierPhase->GetNbinsX()-1; i++) {
+            for (Int_t i=1; i<fData[0].dataFourierPhase->GetNbinsX()-1; i++) {
               xval = fData[0].dataFourierPhase->GetBinCenter(i); // get x-unit
               if ((xval < xmin) || (xval > xmax))
                 continue;
               foutData << xval;
-              for (unsigned int j=0; j<fData.size(); j++) {
+              for (UInt_t j=0; j<fData.size(); j++) {
                 foutData << ", " << fData[j].dataFourierPhase->GetBinContent(i);
               }
               foutData << endl;
             }
 
             // write theory
-            for (int i=1; i<fData[0].theoryFourierPhase->GetNbinsX()-1; i++) {
+            for (Int_t i=1; i<fData[0].theoryFourierPhase->GetNbinsX()-1; i++) {
               xval = fData[0].theoryFourierPhase->GetBinCenter(i); // get x-unit
               if ((xval < xmin) || (xval > xmax))
                 continue;
               foutTheo << xval;
-              for (unsigned int j=0; j<fData.size(); j++) {
+              for (UInt_t j=0; j<fData.size(); j++) {
                 foutTheo << ", " << fData[j].theoryFourierPhase->GetBinContent(i);
               }
               foutTheo << endl;
@@ -3727,7 +3727,7 @@ void PMusrCanvas::SaveDataAscii()
           case PV_DATA:
             // write header
             foutData << "% " << fNonMusrData[0].diff->GetXaxis()->GetTitle() << ", ";
-            for (unsigned int j=0; j<fNonMusrData.size()-1; j++) {
+            for (UInt_t j=0; j<fNonMusrData.size()-1; j++) {
               foutData << "Diff" << j << ", eDiff" << j << ", ";
             }
             foutData << "Diff" << fNonMusrData.size()-1 << ", eDiff" << fNonMusrData.size()-1;
@@ -3740,12 +3740,12 @@ void PMusrCanvas::SaveDataAscii()
             xmax = fMultiGraphDiff->GetXaxis()->GetBinCenter(xmaxBin);
 
             // write data
-            for (int i=0; i<fNonMusrData[0].diff->GetN(); i++) {
+            for (Int_t i=0; i<fNonMusrData[0].diff->GetN(); i++) {
               fNonMusrData[0].diff->GetPoint(i,xval,yval); // get values
               if ((xval < xmin) || (xval > xmax))
                 continue;
               foutData << xval;
-              for (unsigned int j=0; j<fNonMusrData.size(); j++) {
+              for (UInt_t j=0; j<fNonMusrData.size(); j++) {
                 fNonMusrData[j].diff->GetPoint(i,xval,yval); // get values
                 foutData << ", " << yval;
                 foutData << ", " << fNonMusrData[j].diff->GetErrorY(i);
@@ -3771,13 +3771,13 @@ void PMusrCanvas::SaveDataAscii()
           case PV_DATA:
             // write header
             foutData << "% " << fNonMusrData[0].data->GetXaxis()->GetTitle() << ", ";
-            for (unsigned int j=0; j<fNonMusrData.size(); j++) {
+            for (UInt_t j=0; j<fNonMusrData.size(); j++) {
               foutData << ", Data" << j << ", eData" << j;
             }
             foutData << endl;
 
             foutTheo << "% " << fNonMusrData[0].data->GetXaxis()->GetTitle() << ", ";
-            for (unsigned int j=0; j<fNonMusrData.size(); j++) {
+            for (UInt_t j=0; j<fNonMusrData.size(); j++) {
               foutTheo << ", Theo" << j;
             }
             foutTheo << endl;
@@ -3789,12 +3789,12 @@ void PMusrCanvas::SaveDataAscii()
             xmax = fMultiGraphData->GetXaxis()->GetBinCenter(xmaxBin);
 
             // write data
-            for (int i=0; i<fNonMusrData[0].data->GetN(); i++) {
+            for (Int_t i=0; i<fNonMusrData[0].data->GetN(); i++) {
               fNonMusrData[0].data->GetPoint(i,xval,yval); // get values
               if ((xval < xmin) || (xval > xmax))
                 continue;
               foutData << xval;
-              for (unsigned int j=0; j<fNonMusrData.size(); j++) {
+              for (UInt_t j=0; j<fNonMusrData.size(); j++) {
                 fNonMusrData[j].data->GetPoint(i,xval,yval); // get values
                 foutData << ", " << yval;
                 foutData << ", " << fNonMusrData[j].data->GetErrorY(i);
@@ -3803,12 +3803,12 @@ void PMusrCanvas::SaveDataAscii()
             }
 
             // write theory
-            for (int i=0; i<fNonMusrData[0].theory->GetN(); i++) {
+            for (Int_t i=0; i<fNonMusrData[0].theory->GetN(); i++) {
               fNonMusrData[0].theory->GetPoint(i,xval,yval); // get values
               if ((xval < xmin) || (xval > xmax))
                 continue;
               foutTheo << xval;
-              for (unsigned int j=0; j<fNonMusrData.size(); j++) {
+              for (UInt_t j=0; j<fNonMusrData.size(); j++) {
                 fNonMusrData[j].theory->GetPoint(i,xval,yval); // get values
                 foutTheo << ", " << yval;
               }

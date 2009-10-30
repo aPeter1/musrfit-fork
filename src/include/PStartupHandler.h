@@ -47,16 +47,16 @@ class PStartupHandler : public TObject, public TQObject
 
     virtual void OnStartDocument(); // SLOT
     virtual void OnEndDocument(); // SLOT
-    virtual void OnStartElement(const char*, const TList*); // SLOT
-    virtual void OnEndElement(const char*); // SLOT
-    virtual void OnCharacters(const char*); // SLOT
-    virtual void OnComment(const char*); // SLOT
-    virtual void OnWarning(const char*); // SLOT
-    virtual void OnError(const char*); // SLOT
-    virtual void OnFatalError(const char*); // SLOT
-    virtual void OnCdataBlock(const char*, Int_t); // SLOT
+    virtual void OnStartElement(const Char_t*, const TList*); // SLOT
+    virtual void OnEndElement(const Char_t*); // SLOT
+    virtual void OnCharacters(const Char_t*); // SLOT
+    virtual void OnComment(const Char_t*); // SLOT
+    virtual void OnWarning(const Char_t*); // SLOT
+    virtual void OnError(const Char_t*); // SLOT
+    virtual void OnFatalError(const Char_t*); // SLOT
+    virtual void OnCdataBlock(const Char_t*, Int_t); // SLOT
 
-    virtual bool StartupFileFound() { return fStartupFileFound; }
+    virtual Bool_t StartupFileFound() { return fStartupFileFound; }
     virtual TString GetStartupFilePath() { return fStartupFilePath; }
 
     virtual void CheckLists();
@@ -73,14 +73,14 @@ class PStartupHandler : public TObject, public TQObject
                     eColorList, eColor};
     EKeyWords       fKey;
 
-    bool                 fStartupFileFound;
+    Bool_t               fStartupFileFound;
     TString              fStartupFilePath;
     PMsrFourierStructure fFourierDefaults;
     PStringVector        fDataPathList;
     PIntVector           fMarkerList;
     PIntVector           fColorList;
 
-    bool StartupFileExists(char *fln);
+    Bool_t StartupFileExists(Char_t *fln);
 
   ClassDef(PStartupHandler, 1)
 };

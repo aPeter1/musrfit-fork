@@ -38,28 +38,28 @@ class PRunSingleHisto : public PRunBase
 {
   public:
     PRunSingleHisto();
-    PRunSingleHisto(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo, EPMusrHandleTag tag);
+    PRunSingleHisto(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag);
     virtual ~PRunSingleHisto();
 
-    virtual double CalcChiSquare(const std::vector<double>& par);
-    virtual double CalcMaxLikelihood(const std::vector<double>& par);
+    virtual Double_t CalcChiSquare(const std::vector<Double_t>& par);
+    virtual Double_t CalcMaxLikelihood(const std::vector<Double_t>& par);
     virtual void CalcTheory();
 
-    virtual unsigned int GetNoOfFitBins() { return fNoOfFitBins; }
+    virtual UInt_t GetNoOfFitBins() { return fNoOfFitBins; }
 
   protected:
-    virtual bool PrepareData();
-    virtual bool PrepareFitData(PRawRunData* runData, const unsigned int histoNo);
-    virtual bool PrepareRawViewData(PRawRunData* runData, const unsigned int histoNo);
-    virtual bool PrepareViewData(PRawRunData* runData, const unsigned int histoNo);
+    virtual Bool_t PrepareData();
+    virtual Bool_t PrepareFitData(PRawRunData* runData, const UInt_t histoNo);
+    virtual Bool_t PrepareRawViewData(PRawRunData* runData, const UInt_t histoNo);
+    virtual Bool_t PrepareViewData(PRawRunData* runData, const UInt_t histoNo);
 
   private:
-    double fFitStartTime;
-    double fFitStopTime;
-    unsigned int fNoOfFitBins;
-    double fBackground;         ///< needed if background range is given. In units per bin
+    Double_t fFitStartTime;
+    Double_t fFitStopTime;
+    UInt_t fNoOfFitBins;
+    Double_t fBackground;         ///< needed if background range is given. In units per bin
 
-    bool EstimateBkg(unsigned int histoNo);
+    Bool_t EstimateBkg(UInt_t histoNo);
 };
 
 #endif // _PRUNSINGLEHISTO_H_

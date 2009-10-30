@@ -41,17 +41,17 @@
 class PFitterFcn : public ROOT::Minuit2::FCNBase
 {
   public:
-    PFitterFcn(PRunListCollection *runList, bool useChi2);
+    PFitterFcn(PRunListCollection *runList, Bool_t useChi2);
     ~PFitterFcn();
 
-    double Up() const { return fUp; }
-    double operator()(const std::vector<double>&) const;
+    Double_t Up() const { return fUp; }
+    Double_t operator()(const std::vector<Double_t>&) const;
 
-    unsigned int GetTotalNoOfFittedBins() { return fRunListCollection->GetTotalNoOfBinsFitted(); }
+    UInt_t GetTotalNoOfFittedBins() { return fRunListCollection->GetTotalNoOfBinsFitted(); }
 
   private:
-    double fUp;
-    bool fUseChi2;
+    Double_t fUp;
+    Bool_t fUseChi2;
     PRunListCollection *fRunListCollection;
 };
 

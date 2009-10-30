@@ -45,43 +45,43 @@
 class PFourier
 {
   public:
-    PFourier(TH1F *data, int unitTag,
-             double startTime = 0.0, double endTime = 0.0,
-             unsigned int zeroPaddingPower = 0);
+    PFourier(TH1F *data, Int_t unitTag,
+             Double_t startTime = 0.0, Double_t endTime = 0.0,
+             UInt_t zeroPaddingPower = 0);
     virtual ~PFourier();
 
-    virtual void Transform(unsigned int apodizationTag = 0);
+    virtual void Transform(UInt_t apodizationTag = 0);
 
-    virtual double GetResolution() { return fResolution; }
-    virtual TH1F* GetRealFourier(const double scale = 1.0);
-    virtual TH1F* GetImaginaryFourier(const double scale = 1.0);
-    virtual TH1F* GetPowerFourier(const double scale = 1.0);
-    virtual TH1F* GetPhaseFourier(const double scale = 1.0);
+    virtual Double_t GetResolution() { return fResolution; }
+    virtual TH1F* GetRealFourier(const Double_t scale = 1.0);
+    virtual TH1F* GetImaginaryFourier(const Double_t scale = 1.0);
+    virtual TH1F* GetPowerFourier(const Double_t scale = 1.0);
+    virtual TH1F* GetPhaseFourier(const Double_t scale = 1.0);
 
-    virtual bool IsValid() { return fValid; }
+    virtual Bool_t IsValid() { return fValid; }
 
   private:
     TH1F *fData;
 
-    bool fValid;
-    int  fUnitTag; ///< 1=Field Units (G), 2=Frequency Units (MHz), 3=Angular Frequency Units (Mc/s)
+    Bool_t fValid;
+    Int_t  fUnitTag; ///< 1=Field Units (G), 2=Frequency Units (MHz), 3=Angular Frequency Units (Mc/s)
 
-    int fApodization; ///< 0=none, 1=weak, 2=medium, 3=strong
+    Int_t fApodization; ///< 0=none, 1=weak, 2=medium, 3=strong
 
-    double fTimeResolution;
-    double fStartTime;
-    double fEndTime;
-    unsigned int fZeroPaddingPower;
-    double fResolution;
+    Double_t fTimeResolution;
+    Double_t fStartTime;
+    Double_t fEndTime;
+    UInt_t fZeroPaddingPower;
+    Double_t fResolution;
 
-    unsigned int fNoOfData;
-    unsigned int fNoOfBins;
+    UInt_t fNoOfData;
+    UInt_t fNoOfBins;
     fftw_plan fFFTwPlan;
     fftw_complex *fIn;
     fftw_complex *fOut;
 
-    virtual void PrepareFFTwInputData(unsigned int apodizationTag);
-    virtual void ApodizeData(int apodizationTag);
+    virtual void PrepareFFTwInputData(UInt_t apodizationTag);
+    virtual void ApodizeData(Int_t apodizationTag);
 };
 
 #endif // _PFOURIER_H_

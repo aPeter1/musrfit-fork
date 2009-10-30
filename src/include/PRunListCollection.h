@@ -51,36 +51,36 @@ class PRunListCollection
 
     enum EDataSwitch { kIndex, kRunNo };
 
-    virtual bool Add(int runNo, EPMusrHandleTag tag);
+    virtual Bool_t Add(Int_t runNo, EPMusrHandleTag tag);
 
-    virtual double GetSingleHistoChisq(const std::vector<double>& par) const;
-    virtual double GetAsymmetryChisq(const std::vector<double>& par) const;
-    virtual double GetRRFChisq(const std::vector<double>& par) const;
-    virtual double GetNonMusrChisq(const std::vector<double>& par) const;
+    virtual Double_t GetSingleHistoChisq(const std::vector<Double_t>& par) const;
+    virtual Double_t GetAsymmetryChisq(const std::vector<Double_t>& par) const;
+    virtual Double_t GetRRFChisq(const std::vector<Double_t>& par) const;
+    virtual Double_t GetNonMusrChisq(const std::vector<Double_t>& par) const;
 
-    virtual double GetSingleHistoMaximumLikelihood(const std::vector<double>& par) const;
-    virtual double GetAsymmetryMaximumLikelihood(const std::vector<double>& par) const;
-    virtual double GetRRFMaximumLikelihood(const std::vector<double>& par) const;
-    virtual double GetNonMusrMaximumLikelihood(const std::vector<double>& par) const;
+    virtual Double_t GetSingleHistoMaximumLikelihood(const std::vector<Double_t>& par) const;
+    virtual Double_t GetAsymmetryMaximumLikelihood(const std::vector<Double_t>& par) const;
+    virtual Double_t GetRRFMaximumLikelihood(const std::vector<Double_t>& par) const;
+    virtual Double_t GetNonMusrMaximumLikelihood(const std::vector<Double_t>& par) const;
 
-    virtual unsigned int GetTotalNoOfBinsFitted() const;
+    virtual UInt_t GetTotalNoOfBinsFitted() const;
 
-    virtual unsigned int GetNoOfSingleHisto() const { return fRunSingleHistoList.size(); }
-    virtual unsigned int GetNoOfAsymmetry() const   { return fRunAsymmetryList.size(); }
-    virtual unsigned int GetNoOfRRF() const         { return fRunRRFList.size(); }
-    virtual unsigned int GetNoOfNonMusr() const     { return fRunNonMusrList.size(); }
+    virtual UInt_t GetNoOfSingleHisto() const { return fRunSingleHistoList.size(); }
+    virtual UInt_t GetNoOfAsymmetry() const   { return fRunAsymmetryList.size(); }
+    virtual UInt_t GetNoOfRRF() const         { return fRunRRFList.size(); }
+    virtual UInt_t GetNoOfNonMusr() const     { return fRunNonMusrList.size(); }
 
-    virtual PRunData* GetSingleHisto(unsigned int index, EDataSwitch tag=kIndex);
-    virtual PRunData* GetAsymmetry(unsigned int index, EDataSwitch tag=kIndex);
-    virtual PRunData* GetRRF(unsigned int index, EDataSwitch tag=kIndex);
-    virtual PRunData* GetNonMusr(unsigned int index, EDataSwitch tag=kIndex);
+    virtual PRunData* GetSingleHisto(UInt_t index, EDataSwitch tag=kIndex);
+    virtual PRunData* GetAsymmetry(UInt_t index, EDataSwitch tag=kIndex);
+    virtual PRunData* GetRRF(UInt_t index, EDataSwitch tag=kIndex);
+    virtual PRunData* GetNonMusr(UInt_t index, EDataSwitch tag=kIndex);
 
-    virtual vector< pair<double, double> > GetTemp(const TString &runName) const;
-    virtual double GetField(const TString &runName) const;
-    virtual double GetEnergy(const TString &runName) const;
-    virtual const char* GetSetup(const TString &runName) const;
-    virtual const char* GetXAxisTitle(const TString &runName, const unsigned int idx) const;
-    virtual const char* GetYAxisTitle(const TString &runName, const unsigned int idx) const;
+    virtual vector< pair<Double_t, Double_t> > GetTemp(const TString &runName) const;
+    virtual Double_t GetField(const TString &runName) const;
+    virtual Double_t GetEnergy(const TString &runName) const;
+    virtual const Char_t* GetSetup(const TString &runName) const;
+    virtual const Char_t* GetXAxisTitle(const TString &runName, const UInt_t idx) const;
+    virtual const Char_t* GetYAxisTitle(const TString &runName, const UInt_t idx) const;
 
   private:
     PMsrHandler *fMsrInfo;  ///< keeps all msr file info

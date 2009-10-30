@@ -38,22 +38,22 @@ class PRunRRF : public PRunBase
 {
   public:
     PRunRRF();
-    PRunRRF(PMsrHandler *msrInfo, PRunDataHandler *rawData, unsigned int runNo, EPMusrHandleTag tag);
+    PRunRRF(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag);
     virtual ~PRunRRF();
 
-    virtual double CalcChiSquare(const std::vector<double>& par);
-    virtual double CalcMaxLikelihood(const std::vector<double>& par);
+    virtual Double_t CalcChiSquare(const std::vector<Double_t>& par);
+    virtual Double_t CalcMaxLikelihood(const std::vector<Double_t>& par);
     virtual void CalcTheory();
 
-    virtual unsigned int GetNoOfFitBins() { return fNoOfFitBins; }
+    virtual UInt_t GetNoOfFitBins() { return fNoOfFitBins; }
 
   protected:
-    virtual bool PrepareData();
+    virtual Bool_t PrepareData();
 
   private:
-    double fFitStartTime;
-    double fFitStopTime;
-    unsigned int fNoOfFitBins;
+    Double_t fFitStartTime;
+    Double_t fFitStopTime;
+    UInt_t fNoOfFitBins;
 };
 
 #endif // _PRUNRRF_H_
