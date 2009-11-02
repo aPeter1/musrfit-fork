@@ -412,7 +412,7 @@ void PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader) con
 
   if (fDataHandler) {
     PMsrRunList *msrRunList(fMsrHandler->GetMsrRunList());
-    PRawRunData *rawRunData(fDataHandler->GetRunData((*msrRunList)[0].fRunName[0]));
+    PRawRunData *rawRunData(fDataHandler->GetRunData((*msrRunList)[0].GetRunName()->Data()));
 
     switch (rawRunData->GetNoOfTemperatures()) {
       case 1:

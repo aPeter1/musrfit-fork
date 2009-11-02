@@ -457,7 +457,7 @@ int main(int argc, char *argv[])
   // if present, replace the run title of the <msr-file> with the run title of the FIRST run in the run block of the msr-file
   if (title_from_data_file) {
     PMsrRunList *rl  = msrHandler->GetMsrRunList();
-    PRawRunData *rrd = dataHandler->GetRunData(rl->at(0).fRunName[0]);
+    PRawRunData *rrd = dataHandler->GetRunData(*(rl->at(0).GetRunName()));
     if (rrd->GetRunTitle()->Length() > 0)
       msrHandler->SetMsrTitle(*rrd->GetRunTitle());
   }
@@ -471,7 +471,7 @@ int main(int argc, char *argv[])
       success = runListCollection->Add(i, kFit);
       if (!success) {
         cout << endl << "**ERROR** Couldn't handle run no " << i << " ";
-        cout << (*msrHandler->GetMsrRunList())[i].fRunName[0].Data();
+        cout << (*msrHandler->GetMsrRunList())[i].GetRunName()->Data();
         break;
       }
     }

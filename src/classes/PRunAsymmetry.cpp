@@ -283,9 +283,9 @@ Bool_t PRunAsymmetry::PrepareData()
 
   // get forward/backward histo from PRunDataHandler object ------------------------
   // get the correct run
-  PRawRunData *runData = fRawData->GetRunData(fRunInfo->fRunName[0]);
+  PRawRunData *runData = fRawData->GetRunData(*(fRunInfo->GetRunName()));
   if (!runData) { // run not found
-    cerr << endl << "PRunAsymmetry::PrepareData(): **ERROR** Couldn't get run " << fRunInfo->fRunName[0].Data() << "!";
+    cerr << endl << "PRunAsymmetry::PrepareData(): **ERROR** Couldn't get run " << fRunInfo->GetRunName()->Data() << "!";
     cerr << endl;
     return false;
   }
@@ -358,13 +358,13 @@ Bool_t PRunAsymmetry::PrepareData()
 
   // check if addrun's are present, and if yes add data
   // check if there are runs to be added to the current one
-  if (fRunInfo->fRunName.size() > 1) { // runs to be added present
+  if (fRunInfo->GetRunNames().size() > 1) { // runs to be added present
     PRawRunData *addRunData;
-    for (UInt_t i=1; i<fRunInfo->fRunName.size(); i++) {
+    for (UInt_t i=1; i<fRunInfo->GetRunNames().size(); i++) {
       // get run to be added to the main one
-      addRunData = fRawData->GetRunData(fRunInfo->fRunName[i]);
+      addRunData = fRawData->GetRunData(*(fRunInfo->GetRunName(i)));
       if (addRunData == 0) { // couldn't get run
-        cerr << endl << "PRunAsymmetry::PrepareData(): **ERROR** Couldn't get addrun " << fRunInfo->fRunName[i].Data() << "!";
+        cerr << endl << "PRunAsymmetry::PrepareData(): **ERROR** Couldn't get addrun " << fRunInfo->GetRunName(i)->Data() << "!";
         cerr << endl;
         return false;
       }
@@ -380,7 +380,7 @@ Bool_t PRunAsymmetry::PrepareData()
           t0Add[0] = addRunData->GetT0(fRunInfo->fForwardHistoNo-1);  // forward  t0
           t0Add[1] = addRunData->GetT0(fRunInfo->fBackwardHistoNo-1); // backward t0
         } else { // t0's are neither in the run data nor in the msr-file -> not acceptable!
-          cerr << endl << "PRunAsymmetry::PrepareData(): **ERROR** NO t0's found, neither in the addrun (" << fRunInfo->fRunName[i].Data() << ") data nor in the msr-file!";
+          cerr << endl << "PRunAsymmetry::PrepareData(): **ERROR** NO t0's found, neither in the addrun (" << fRunInfo->GetRunName(i)->Data() << ") data nor in the msr-file!";
           cerr << endl;
           return false;
         }
@@ -391,9 +391,9 @@ Bool_t PRunAsymmetry::PrepareData()
           t0Add[1] = fRunInfo->fT0[2*i+1];
         } else {
           cerr << endl << "PRunAsymmetry::PrepareData(): **WARNING** NO t0's found, neither in the addrun data (";
-          cerr << fRunInfo->fRunName[i].Data();
+          cerr << fRunInfo->GetRunName(i)->Data();
           cerr << "), nor in the msr-file! Will try to use the T0 of the run data (";
-          cerr << fRunInfo->fRunName[i].Data();
+          cerr << fRunInfo->GetRunName(i)->Data();
           cerr << ") without any warranty!";
           t0Add[0] = fRunInfo->fT0[0];
           t0Add[1] = fRunInfo->fT0[1];
@@ -405,7 +405,7 @@ Bool_t PRunAsymmetry::PrepareData()
             cerr << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[2*i];
             cerr << endl << "  t0 from the data file is " << addRunData->GetT0(fRunInfo->fForwardHistoNo-1);
             cerr << endl << "  This is quite a deviation! Is this done intentionally??";
-            cerr << endl << "  addrun: " << fRunInfo->fRunName[i].Data();
+            cerr << endl << "  addrun: " << fRunInfo->GetRunName(i)->Data();
             cerr << endl;
           }
           if (fabs(t0Add[1]-addRunData->GetT0(fRunInfo->fBackwardHistoNo-1))>5.0) { // given in bins!!
@@ -413,7 +413,7 @@ Bool_t PRunAsymmetry::PrepareData()
             cerr << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[2*i+1];
             cerr << endl << "  t0 from the data file is " << addRunData->GetT0(fRunInfo->fBackwardHistoNo-1);
             cerr << endl << "  This is quite a deviation! Is this done intentionally??";
-            cerr << endl << "  addrun: " << fRunInfo->fRunName[i].Data();
+            cerr << endl << "  addrun: " << fRunInfo->GetRunName(i)->Data();
             cerr << endl;
           }
         }

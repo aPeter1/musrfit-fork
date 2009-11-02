@@ -144,10 +144,10 @@ Bool_t PRunDataHandler::ReadFile()
   }
 
   for (UInt_t i=0; i<runList->size(); i++) {
-    for (UInt_t j=0; j<runList->at(i).fRunName.size(); j++) {
-      fRunName = runList->at(i).fRunName[j];
+    for (UInt_t j=0; j<runList->at(i).GetRunNames().size(); j++) {
+      fRunName = *(runList->at(i).GetRunName(j));
       // check is file is already read
-      if (FileAlreadyRead(runList->at(i).fRunName[j]))
+      if (FileAlreadyRead(*(runList->at(i).GetRunName(j))))
         continue;
       // check if file actually exists
       if (!FileExistsCheck(runList->at(i), j))
@@ -210,7 +210,7 @@ Bool_t PRunDataHandler::FileAlreadyRead(TString runName)
  *
  * <b>return:</b> true if data file exists, otherwise false.
  */
-Bool_t PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const UInt_t idx)
+Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
 {
   Bool_t success = true;
 
@@ -270,7 +270,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const UInt_t 
   }
 
   // check if the file is in the local directory
-  str = runInfo.fRunName[idx] + TString(".") + ext;
+  str = *(runInfo.GetRunName(idx)) + TString(".") + ext;
   if (gSystem->AccessPathName(str.Data())!=true) { // found in the local dir
     pathName = str;
   }
@@ -278,7 +278,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const UInt_t 
   // check if the file is found in the <msr-file-directory>
   if (pathName.CompareTo("???") == 0) { // not found in local directory search
     str  = *fMsrInfo->GetMsrFileDirectoryPath();
-    str += runInfo.fRunName[idx] + TString(".") + ext;
+    str += *(runInfo.GetRunName(idx)) + TString(".") + ext;
     if (gSystem->AccessPathName(str.Data())!=true) { // found
       pathName = str;
     }
@@ -287,7 +287,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const UInt_t 
   // check if the file is found in the directory given in the startup file
   if (pathName.CompareTo("???") == 0) { // not found in local directory search
     for (UInt_t i=0; i<fDataPath.size(); i++) {
-      str = fDataPath[i] + TString("/") + runInfo.fRunName[idx] + TString(".") + ext;
+      str = fDataPath[i] + TString("/") + *(runInfo.GetRunName(idx)) + TString(".") + ext;
       if (gSystem->AccessPathName(str.Data())!=true) { // found
         pathName = str;
         break;
@@ -304,7 +304,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const UInt_t 
     TObjString *ostr;
     for (Int_t i=0; i<tokens->GetEntries(); i++) {
       ostr = dynamic_cast<TObjString*>(tokens->At(i));
-      str = ostr->GetString() + TString("/") + runInfo.fRunName[idx] + TString(".") + ext;
+      str = ostr->GetString() + TString("/") + *(runInfo.GetRunName(idx)) + TString(".") + ext;
       if (gSystem->AccessPathName(str.Data())!=true) { // found
         pathName = str;
         break;
@@ -329,7 +329,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const UInt_t 
             runInfo.fInstitute[idx] + TString("/") +
             runInfo.fBeamline[idx] + TString("/") +
             dt + TString("/") +
-            runInfo.fRunName[idx] + TString(".") + ext;
+            *(runInfo.GetRunName(idx)) + TString(".") + ext;
       if (gSystem->AccessPathName(str.Data())!=true) { // found
         pathName = str;
         break;
@@ -339,7 +339,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunStructure &runInfo, const UInt_t 
 
   // no proper path name found
   if (pathName.CompareTo("???") == 0) {
-    cerr << endl << "**ERROR** Couldn't find '" << runInfo.fRunName[idx] << "' in any standard path.";
+    cerr << endl << "**ERROR** Couldn't find '" << runInfo.GetRunName(idx)->Data() << "' in any standard path.";
     cerr << endl << "  standard search pathes are:";
     cerr << endl << "  1. the local directory";
     cerr << endl << "  2. the data directory given in the startup XML file";

@@ -451,5 +451,132 @@ void PRawRunData::AddDataBin(const UInt_t histoNo, const UInt_t bin, const Doubl
 
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// implementation PMsrRunStructure
+// implementation PMsrRunBlock
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//--------------------------------------------------------------------------
+// PMsrRunBlock
+//--------------------------------------------------------------------------
+/**
+ * <p> Constructor
+ */
+PMsrRunBlock::PMsrRunBlock()
+{
+  fFitType = -1; // undefined fit type
+  fAlphaParamNo = -1; // undefined alpha parameter number
+  fBetaParamNo = -1; // undefined beta parameter number
+  fNormParamNo = -1; // undefined norm parameter number
+  fBkgFitParamNo = -1; // undefined background parameter number
+  fPhaseParamNo = -1; // undefined phase parameter number
+  fLifetimeParamNo = -1; // undefined lifetime parameter number
+  fLifetimeCorrection = true; // lifetime correction == true by default (used in single histogram musrview)
+  fForwardHistoNo = -1; // undefined forward histogram number
+  fBackwardHistoNo = -1; // undefined backward histogram number
+  fFitRange[0] = PMUSR_UNDEFINED; // undefined start fit range
+  fFitRange[1] = PMUSR_UNDEFINED; // undefined end fit range
+  fPacking = -1; // undefined packing
+  fRRFFreq = PMUSR_UNDEFINED; // undefined RRF frequency
+  fRRFPacking = -1; // undefined RRF packing
+  fAlpha2ParamNo = -1; // undefined alpha2 parameter number
+  fBeta2ParamNo = -1; // undefined beta2 parameter number
+  fRightHistoNo = -1; // undefined right histogram number
+  fLeftHistoNo = -1; // undefined left histogram number
+  fXYDataIndex[0] = -1; // undefined x data index (NonMusr)
+  fXYDataIndex[1] = -1; // undefined y data index (NonMusr)
+  fXYDataLabel[0] = TString("??"); // undefined x data label (NonMusr)
+  fXYDataLabel[1] = TString("??"); // undefined y data label (NonMusr)
+}
+
+//--------------------------------------------------------------------------
+// ~PMsrRunBlock
+//--------------------------------------------------------------------------
+/**
+ * <p> Destructor
+ */
+PMsrRunBlock::~PMsrRunBlock()
+{
+  fRunName.clear();
+  fBeamline.clear();
+  fInstitute.clear();
+  fFileFormat.clear();
+  fMap.clear();
+  fBkgFix.clear();
+  fBkgRange.clear();
+  fDataRange.clear();
+  fT0.clear();
+}
+
+//--------------------------------------------------------------------------
+// CleanUp
+//--------------------------------------------------------------------------
+/**
+ * <p> Clean up data structure.
+ */
+void PMsrRunBlock::CleanUp()
+{
+  fFitType = -1; // undefined fit type
+  fAlphaParamNo = -1; // undefined alpha parameter number
+  fBetaParamNo = -1; // undefined beta parameter number
+  fNormParamNo = -1; // undefined norm parameter number
+  fBkgFitParamNo = -1; // undefined background parameter number
+  fPhaseParamNo = -1; // undefined phase parameter number
+  fLifetimeParamNo = -1; // undefined lifetime parameter number
+  fLifetimeCorrection = true; // lifetime correction == true by default (used in single histogram musrview)
+  fForwardHistoNo = -1; // undefined forward histogram number
+  fBackwardHistoNo = -1; // undefined backward histogram number
+  fFitRange[0] = PMUSR_UNDEFINED; // undefined start fit range
+  fFitRange[1] = PMUSR_UNDEFINED; // undefined end fit range
+  fPacking = -1; // undefined packing
+  fRRFFreq = PMUSR_UNDEFINED; // undefined RRF frequency
+  fRRFPacking = -1; // undefined RRF packing
+  fAlpha2ParamNo = -1; // undefined alpha2 parameter number
+  fBeta2ParamNo = -1; // undefined beta2 parameter number
+  fRightHistoNo = -1; // undefined right histogram number
+  fLeftHistoNo = -1; // undefined left histogram number
+  fXYDataIndex[0] = -1; // undefined x data index (NonMusr)
+  fXYDataIndex[1] = -1; // undefined y data index (NonMusr)
+  fXYDataLabel[0] = TString("??"); // undefined x data label (NonMusr)
+  fXYDataLabel[1] = TString("??"); // undefined y data label (NonMusr)
+
+  fRunName.clear();
+  fBeamline.clear();
+  fInstitute.clear();
+  fFileFormat.clear();
+  fMap.clear();
+  fBkgFix.clear();
+  fBkgRange.clear();
+  fDataRange.clear();
+  fT0.clear();
+}
+
+//--------------------------------------------------------------------------
+// GetRunName
+//--------------------------------------------------------------------------
+/**
+ * <p> get run name at position i
+ *
+ * \param i index of the run name to be returned
+ */
+TString* PMsrRunBlock::GetRunName(UInt_t i)
+{
+  if (i>fRunName.size())
+    return 0;
+
+  return &fRunName[i];
+}
+
+//--------------------------------------------------------------------------
+// SetRunName
+//--------------------------------------------------------------------------
+/**
+ * <p> set run name at position i
+ *
+ * \param i index of the run name to be set
+ */
+void PMsrRunBlock::SetRunName(TString &str, UInt_t i)
+{
+  if (i>fRunName.size())
+    fRunName.resize(i+1);
+
+  fRunName[i] = str;
+}

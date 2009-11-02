@@ -147,16 +147,6 @@ Double_t PRunSingleHisto::CalcChiSquare(const std::vector<Double_t>& par)
     }
   }
 
-/*
-static Int_t firstTime = 0;
-if (firstTime < 4) {
-firstTime++;
-cout << endl << "size=" << fData.GetValue()->size() << ", fDataTimeStart=" << fData.GetDataTimeStart() << ", fDataTimeStep=" << fData.GetDataTimeStep() << ", fFitStartTime=" << fFitStartTime << ", fFitStopTime=" << fFitStopTime;
-cout << endl << "chisq=" << chisq*fRunInfo->fPacking;
-cout << endl << "----";
-}
-*/
-
   return chisq;
 }
 
@@ -309,9 +299,9 @@ Bool_t PRunSingleHisto::PrepareData()
   Bool_t success = true;
 
   // get the proper run
-  PRawRunData* runData = fRawData->GetRunData(fRunInfo->fRunName[0]);
+  PRawRunData* runData = fRawData->GetRunData(*(fRunInfo->GetRunName()));
   if (!runData) { // couldn't get run
-    cerr << endl << "PRunSingleHisto::PrepareData(): **ERROR** Couldn't get run " << fRunInfo->fRunName[0].Data() << "!";
+    cerr << endl << "PRunSingleHisto::PrepareData(): **ERROR** Couldn't get run " << fRunInfo->GetRunName()->Data() << "!";
     cerr << endl;
     return false;
   }
@@ -337,7 +327,7 @@ Bool_t PRunSingleHisto::PrepareData()
       fT0s.push_back(runData->GetT0(fRunInfo->fForwardHistoNo-1));
     } else { // t0's are neither in the run data nor in the msr-file -> not acceptable!
       cerr << endl << "PRunSingleHisto::PrepareData(): **ERROR** NO t0's found, neither in the run data nor in the msr-file!";
-      cerr << endl << " run: " << fRunInfo->fRunName[0].Data();
+      cerr << endl << " run: " << fRunInfo->GetRunName()->Data();
       cerr << endl;
       return false;
     }
@@ -365,14 +355,14 @@ Bool_t PRunSingleHisto::PrepareData()
   }
 
   // check if there are runs to be added to the current one
-  if (fRunInfo->fRunName.size() > 1) { // runs to be added present
+  if (fRunInfo->GetRunNames().size() > 1) { // runs to be added present
     PRawRunData *addRunData;
-    for (UInt_t i=1; i<fRunInfo->fRunName.size(); i++) {
+    for (UInt_t i=1; i<fRunInfo->GetRunNames().size(); i++) {
 
       // get run to be added to the main one
-      addRunData = fRawData->GetRunData(fRunInfo->fRunName[i]);
+      addRunData = fRawData->GetRunData(*(fRunInfo->GetRunName(i)));
       if (addRunData == 0) { // couldn't get run
-        cerr << endl << "PRunSingleHisto::PrepareData(): **ERROR** Couldn't get addrun " << fRunInfo->fRunName[i].Data() << "!";
+        cerr << endl << "PRunSingleHisto::PrepareData(): **ERROR** Couldn't get addrun " << fRunInfo->GetRunName(i)->Data() << "!";
         cerr << endl;
         return false;
       }
@@ -388,7 +378,7 @@ Bool_t PRunSingleHisto::PrepareData()
           t0Add = addRunData->GetT0(fRunInfo->fForwardHistoNo-1);
         } else { // t0's are neither in the run data nor in the msr-file -> not acceptable!
           cerr << endl << "PRunSingleHisto::PrepareData(): **ERROR** NO t0's found, neither in the addrun data nor in the msr-file!";
-          cerr << endl << " addrun: " << fRunInfo->fRunName[i].Data();
+          cerr << endl << " addrun: " << fRunInfo->GetRunName(i)->Data();
           cerr << endl;
           return false;
         }
@@ -401,7 +391,7 @@ Bool_t PRunSingleHisto::PrepareData()
             cerr << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[i];
             cerr << endl << "  t0 from the data file is " << addRunData->GetT0(fRunInfo->fForwardHistoNo-1);
             cerr << endl << "  This is quite a deviation! Is this done intentionally??";
-            cerr << endl << "  addrun: " << fRunInfo->fRunName[i].Data();
+            cerr << endl << "  addrun: " << fRunInfo->GetRunName(i)->Data();
             cerr << endl;
           }
         }
@@ -409,9 +399,9 @@ Bool_t PRunSingleHisto::PrepareData()
           t0Add = fRunInfo->fT0[i];
         } else {
           cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING** NO t0's found, neither in the addrun data (";
-          cerr << fRunInfo->fRunName[i].Data();
+          cerr << fRunInfo->GetRunName(i)->Data();
           cerr << "), nor in the msr-file! Will try to use the T0 of the run data (";
-          cerr << fRunInfo->fRunName[i].Data();
+          cerr << fRunInfo->GetRunName(i)->Data();
           cerr << ") without any warranty!";
           cerr << endl;
           t0Add = fRunInfo->fT0[0];
@@ -910,7 +900,7 @@ Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
   }
 
   // get the proper run
-  PRawRunData* runData = fRawData->GetRunData(fRunInfo->fRunName[0]);
+  PRawRunData* runData = fRawData->GetRunData(*(fRunInfo->GetRunName()));
 
   // check if start is within histogram bounds
   if ((start < 0) || (start >= runData->GetDataBin(histoNo)->size())) {
@@ -941,7 +931,7 @@ Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
 
   fBackground = bkg / (fTimeResolution * 1e3); // keep background (per 1 nsec) for chisq, max.log.likelihood, fTimeResolution us->ns
 
-  cout << endl << ">> fRunInfo->fRunName=" << fRunInfo->fRunName[0].Data() << ", histNo=" << histoNo << ", fBackground=" << fBackground;
+  cout << endl << ">> fRunInfo->fRunName=" << fRunInfo->GetRunName()->Data() << ", histNo=" << histoNo << ", fBackground=" << fBackground;
 
   return true;
 }

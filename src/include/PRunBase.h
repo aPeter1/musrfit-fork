@@ -70,7 +70,7 @@ class PRunBase
 
     Int_t fRunNo;               ///< number of the run within the msr file
     PMsrHandler      *fMsrInfo; ///< msr-file handler
-    PMsrRunStructure *fRunInfo; ///< run info used to filter out needed infos for the run
+    PMsrRunBlock     *fRunInfo; ///< run info used to filter out needed infos for the run
     PRunDataHandler  *fRawData; ///< holds the raw run data
 
     PIntVector fParamNo;        ///< vector of parameter numbers for the specifc run

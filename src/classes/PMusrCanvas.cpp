@@ -529,10 +529,10 @@ void PMusrCanvas::UpdateInfoPad()
   for (UInt_t i=0; i<fData.size(); i++) {
     // run label = run_name/histo/T=0K/B=0G/E=0keV/...
     runNo = (UInt_t)plotInfo.fRuns[i].Re()-1;
-    if (runs[runNo].fRunName.size() > 1)
-      tstr  = "++" + runs[runNo].fRunName[0] + TString(","); // run_name
+    if (runs[runNo].GetRunNames().size() > 1)
+      tstr  = "++" + *(runs[runNo].GetRunName()) + TString(","); // run_name
     else
-      tstr  = runs[runNo].fRunName[0] + TString(","); // run_name
+      tstr  = *(runs[runNo].GetRunName()) + TString(","); // run_name
     // histo info (depending on the fittype
     if (runs[runNo].fFitType == MSR_FITTYPE_SINGLE_HISTO) {
       tstr += TString("h:");
@@ -546,7 +546,7 @@ void PMusrCanvas::UpdateInfoPad()
       tstr += TString(",");
     }
     // temperature if present
-    ddvec = fRunList->GetTemp(runs[runNo].fRunName[0]);
+    ddvec = fRunList->GetTemp(*(runs[runNo].GetRunName()));
     if (ddvec.empty()) {
       tstr += TString("T=");
       tstr += TString("??,");
@@ -564,7 +564,7 @@ void PMusrCanvas::UpdateInfoPad()
     }
     // field if present
     tstr += TString("B=");
-    dval = fRunList->GetField(runs[runNo].fRunName[0]);
+    dval = fRunList->GetField(*(runs[runNo].GetRunName()));
     if (dval == PMUSR_UNDEFINED) {
       tstr += TString("??,");
     } else {
@@ -573,7 +573,7 @@ void PMusrCanvas::UpdateInfoPad()
     }
     // energy if present
     tstr += TString("E=");
-    dval = fRunList->GetEnergy(runs[runNo].fRunName[0]);
+    dval = fRunList->GetEnergy(*(runs[runNo].GetRunName()));
 //cout << endl << ">> dval = " << dval << " (Engery)";
     if (dval == PMUSR_UNDEFINED) {
       tstr += TString("??,");
@@ -582,7 +582,7 @@ void PMusrCanvas::UpdateInfoPad()
       tstr += TString(sval) + TString("keV,");
     }
     // setup if present
-    tstr += fRunList->GetSetup(runs[runNo].fRunName[0]);
+    tstr += fRunList->GetSetup(*(runs[runNo].GetRunName()));
     // add entry
     fInfoPad->AddEntry(fData[i].data, tstr.Data(), "p");
   }
@@ -1390,7 +1390,7 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
 
   // dataHisto -------------------------------------------------------------
   // create histo specific infos
-  name  = fMsrHandler->GetMsrRunList()->at(runNo).fRunName[0] + "_DataRunNo";
+  name  = *(fMsrHandler->GetMsrRunList()->at(runNo).GetRunName()) + "_DataRunNo";
   name += (Int_t)runNo;
   name += "_";
   name += fPlotNumber;
@@ -1472,7 +1472,7 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
 
   // theoHisto -------------------------------------------------------------
   // create histo specific infos
-  name  = fMsrHandler->GetMsrRunList()->at(runNo).fRunName[0] + "_TheoRunNo";
+  name  = *(fMsrHandler->GetMsrRunList()->at(runNo).GetRunName()) + "_TheoRunNo";
   name += (Int_t)runNo;
   name += "_";
   name += fPlotNumber;
@@ -2413,8 +2413,8 @@ void PMusrCanvas::PlotData()
     PMsrRunList runs = *fMsrHandler->GetMsrRunList();
     PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
     UInt_t runNo = (UInt_t)plotInfo.fRuns[0].Re()-1;
-    TString xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName[0], runNo);
-    TString yAxisTitle = fRunList->GetYAxisTitle(runs[runNo].fRunName[0], runNo);
+    TString xAxisTitle = fRunList->GetXAxisTitle(*(runs[runNo].GetRunName()), runNo);
+    TString yAxisTitle = fRunList->GetYAxisTitle(*(runs[runNo].GetRunName()), runNo);
 
     if (fNonMusrData.size() > 0) {
       // check if fMultiGraphData needs to be created, and if yes add all data and theory
@@ -2472,8 +2472,8 @@ void PMusrCanvas::PlotData()
         PStringVector legendLabel;
         for (UInt_t i=0; i<plotInfo.fRuns.size(); i++) {
            runNo = (UInt_t)plotInfo.fRuns[i].Re()-1;
-           xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName[0], runNo);
-           yAxisTitle = fRunList->GetYAxisTitle(runs[runNo].fRunName[0], runNo);
+           xAxisTitle = fRunList->GetXAxisTitle(*(runs[runNo].GetRunName()), runNo);
+           yAxisTitle = fRunList->GetYAxisTitle(*(runs[runNo].GetRunName()), runNo);
            legendLabel.push_back(xAxisTitle + " vs. " + yAxisTitle);
         }
         for (UInt_t i=0; i<fNonMusrData.size(); i++) {
@@ -2531,7 +2531,7 @@ void PMusrCanvas::PlotDifference()
     PMsrRunList runs = *fMsrHandler->GetMsrRunList();
     PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
     UInt_t runNo = (UInt_t)plotInfo.fRuns[0].Re()-1;
-    TString xAxisTitle = fRunList->GetXAxisTitle(runs[runNo].fRunName[0], runNo);
+    TString xAxisTitle = fRunList->GetXAxisTitle(*(runs[runNo].GetRunName()), runNo);
 
     // if fMultiGraphDiff is not present create it and add the diff data
     if (!fMultiGraphDiff) {

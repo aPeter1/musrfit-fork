@@ -239,7 +239,7 @@ cout << endl;
         success = runListCollection->Add(i, kView);
         if (!success) {
           cout << endl << "**ERROR** Couldn't handle run no " << i << " ";
-          cout << (*msrHandler->GetMsrRunList())[i].fRunName[0].Data();
+          cout << (*msrHandler->GetMsrRunList())[i].GetRunName()->Data();
           break;
         }
       }

@@ -90,17 +90,6 @@ PMsrHandler::~PMsrHandler()
   fParam.clear();
   fTheory.clear();
   fFunctions.clear();
-  for (UInt_t i=0; i<fRuns.size(); i++) {
-    fRuns[i].fRunName.clear();
-    fRuns[i].fBeamline.clear();
-    fRuns[i].fInstitute.clear();
-    fRuns[i].fFileFormat.clear();
-    fRuns[i].fMap.clear();
-    fRuns[i].fBkgFix.clear();
-    fRuns[i].fBkgRange.clear();
-    fRuns[i].fDataRange.clear();
-    fRuns[i].fT0.clear();
-  }
   fRuns.clear();
   fCommands.clear();
   fPlots.clear();
@@ -502,7 +491,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         sstr = str;
         sstr.Remove(TString::kLeading, ' ');
         if (sstr.BeginsWith("RUN")) {
-          fout << "RUN " << fRuns[runNo].fRunName[0].Data() << " ";
+          fout << "RUN " << fRuns[runNo].GetRunName()->Data() << " ";
           str = fRuns[runNo].fBeamline[0];
           str.ToUpper();
           fout << str.Data() << " ";
@@ -514,7 +503,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           fout << str.Data() << "   (name beamline institute data-file-format)" << endl;
         } else if (sstr.BeginsWith("ADDRUN")) {
           addRunNo++;
-          fout << "ADDRUN " << fRuns[runNo].fRunName[addRunNo].Data() << " ";
+          fout << "ADDRUN " << fRuns[runNo].GetRunName(addRunNo)->Data() << " ";
           str = fRuns[runNo].fBeamline[addRunNo];
           str.ToUpper();
           fout << str.Data() << " ";
@@ -1422,19 +1411,13 @@ Bool_t PMsrHandler::HandleFunctionsEntry(PMsrLines &lines)
 Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
 {
   PMsrLines::iterator iter;
-  PMsrRunStructure param;
+  PMsrRunBlock param;
   Bool_t first = true; // first run line tag
   Bool_t error = false;
 
   TString str;
   TObjArray *tokens = 0;
   TObjString *ostr = 0;
-
-  // init some stuff
-  param.fXYDataIndex[0]  = -1;
-  param.fXYDataIndex[1]  = -1;
-  param.fXYDataLabel[0]  = TString("");
-  param.fXYDataLabel[1]  = TString("");
 
   iter = lines.begin();
   while ((iter != lines.end()) && !error) {
@@ -1451,11 +1434,10 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
 
       if (!first) { // not the first run in the list
         fRuns.push_back(param);
+        param.CleanUp();
       } else {
         first = false;
       }
-
-      InitRunParameterStructure(param);
 
       // get run name, beamline, institute, and file-format
       if (tokens->GetEntries() < 5) {
@@ -1463,7 +1445,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       } else {
         // run name
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
-        param.fRunName.push_back(ostr->GetString());
+        param.AppendRunName(ostr->GetString());
         // beamline
         ostr = dynamic_cast<TObjString*>(tokens->At(2));
         param.fBeamline.push_back(ostr->GetString());
@@ -1484,7 +1466,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       } else {
         // run name
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
-        param.fRunName.push_back(ostr->GetString());
+        param.AppendRunName(ostr->GetString());
         // beamline
         ostr = dynamic_cast<TObjString*>(tokens->At(2));
         param.fBeamline.push_back(ostr->GetString());
@@ -1882,6 +1864,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     cerr << endl << "RUN block syntax is too complex to print it here. Please check the manual.";
   } else { // save last run found
     fRuns.push_back(param);
+    param.CleanUp();
   }
 
   // check if for fittypes: single histo, asymmetry, RRF any background info is given
@@ -1900,7 +1883,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         found = false;
       }
       if (!found) {
-        cerr << endl << ">> PMsrHandler::HandleRunEntry: **ERROR** for run " << fRuns[i].fRunName[0].Data() << ",  forward " << fRuns[i].fForwardHistoNo;
+        cerr << endl << ">> PMsrHandler::HandleRunEntry: **ERROR** for run " << fRuns[i].GetRunName()->Data() << ",  forward " << fRuns[i].fForwardHistoNo;
         cerr << endl << "   no background information found!";
         cerr << endl << "   Either of the tags 'backgr.fit', 'backgr.fix', 'background'";
         cerr << endl << "   with data is needed.";
@@ -1921,6 +1904,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
  *
  * \param param
  */
+/*
 void PMsrHandler::InitRunParameterStructure(PMsrRunStructure &param)
 {
   param.fRunName.clear();
@@ -1956,6 +1940,7 @@ void PMsrHandler::InitRunParameterStructure(PMsrRunStructure &param)
   for (Int_t i=0; i<2; i++)
     param.fXYDataLabel[i] = "";
 }
+*/
 
 //--------------------------------------------------------------------------
 // FilterNumber (private)

@@ -63,7 +63,7 @@ PRunNonMusr::PRunNonMusr() : PRunBase()
 PRunNonMusr::PRunNonMusr(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
 {
   // get the proper run
-  fRawRunData = fRawData->GetRunData(fRunInfo->fRunName[0]);
+  fRawRunData = fRawData->GetRunData(*(fRunInfo->GetRunName()));
   if (!fRawRunData) { // couldn't get run
     cerr << endl << "PRunNonMusr::PRunNonMusr(): **ERROR** Couldn't get raw run  data!";
     cerr << endl;
@@ -158,7 +158,7 @@ Bool_t PRunNonMusr::PrepareData()
 
 //cout << endl << "in PRunNonMusr::PrepareData(): will feed fFitData";
 
-  if (fRunInfo->fRunName.size() > 1) { // ADDRUN present which is not supported for NonMusr
+  if (fRunInfo->GetRunNames().size() > 1) { // ADDRUN present which is not supported for NonMusr
     cerr << endl << ">> PRunNonMusr::PrepareData(): **WARNING** ADDRUN NOT SUPPORTED FOR THIS FIT TYPE, WILL IGNORE IT." << endl;
   }
 
