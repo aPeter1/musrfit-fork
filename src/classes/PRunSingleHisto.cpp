@@ -101,39 +101,39 @@ Double_t PRunSingleHisto::CalcChiSquare(const std::vector<Double_t>& par)
   Double_t N0;
 
   // check if norm is a parameter or a function
-  if (fRunInfo->fNormParamNo < MSR_PARAM_FUN_OFFSET) { // norm is a parameter
-    N0 = par[fRunInfo->fNormParamNo-1];
+  if (fRunInfo->GetNormParamNo() < MSR_PARAM_FUN_OFFSET) { // norm is a parameter
+    N0 = par[fRunInfo->GetNormParamNo()-1];
   } else { // norm is a function
     // get function number
-    UInt_t funNo = fRunInfo->fNormParamNo-MSR_PARAM_FUN_OFFSET;
+    UInt_t funNo = fRunInfo->GetNormParamNo()-MSR_PARAM_FUN_OFFSET;
     // evaluate function
-    N0 = fMsrInfo->EvalFunc(funNo,fRunInfo->fMap,par);
+    N0 = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
   }
 
   // get tau
   Double_t tau;
-  if (fRunInfo->fLifetimeParamNo != -1)
-    tau = par[fRunInfo->fLifetimeParamNo-1];
+  if (fRunInfo->GetLifetimeParamNo() != -1)
+    tau = par[fRunInfo->GetLifetimeParamNo()-1];
   else
     tau = PMUON_LIFETIME;
 
   // get background
   Double_t bkg;
-  if (fRunInfo->fBkgFitParamNo == -1) { // bkg not fitted
+  if (fRunInfo->GetBkgFitParamNo() == -1) { // bkg not fitted
     if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given (background interval)
       bkg = fBackground;
     } else { // fixed bkg given
       bkg = fRunInfo->fBkgFix[0];
     }
   } else { // bkg fitted
-    bkg = par[fRunInfo->fBkgFitParamNo-1];
+    bkg = par[fRunInfo->GetBkgFitParamNo()-1];
   }
 
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
     Int_t funcNo = fMsrInfo->GetFuncNo(i);
 //cout << ">> i = " << i << ", funcNo = " << funcNo << endl;
-    fFuncValues[i] = fMsrInfo->EvalFunc(funcNo, fRunInfo->fMap, par);
+    fFuncValues[i] = fMsrInfo->EvalFunc(funcNo, *fRunInfo->GetMap(), par);
   }
 
   // calculate chi square
@@ -165,38 +165,38 @@ Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
   Double_t N0;
 
   // check if norm is a parameter or a function
-  if (fRunInfo->fNormParamNo < MSR_PARAM_FUN_OFFSET) { // norm is a parameter
-    N0 = par[fRunInfo->fNormParamNo-1];
+  if (fRunInfo->GetNormParamNo() < MSR_PARAM_FUN_OFFSET) { // norm is a parameter
+    N0 = par[fRunInfo->GetNormParamNo()-1];
   } else { // norm is a function
     // get function number
-    UInt_t funNo = fRunInfo->fNormParamNo-MSR_PARAM_FUN_OFFSET;
+    UInt_t funNo = fRunInfo->GetNormParamNo()-MSR_PARAM_FUN_OFFSET;
     // evaluate function
-    N0 = fMsrInfo->EvalFunc(funNo,fRunInfo->fMap,par);
+    N0 = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
   }
 
   // get tau
   Double_t tau;
-  if (fRunInfo->fLifetimeParamNo != -1)
-    tau = par[fRunInfo->fLifetimeParamNo-1];
+  if (fRunInfo->GetLifetimeParamNo() != -1)
+    tau = par[fRunInfo->GetLifetimeParamNo()-1];
   else
     tau = PMUON_LIFETIME;
 
   // get background
   Double_t bkg;
-  if (fRunInfo->fBkgFitParamNo == -1) { // bkg not fitted
+  if (fRunInfo->GetBkgFitParamNo() == -1) { // bkg not fitted
     if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given (background interval)
       bkg = fBackground;
     } else { // fixed bkg given
       bkg = fRunInfo->fBkgFix[0];
     }
   } else { // bkg fitted
-    bkg = par[fRunInfo->fBkgFitParamNo-1];
+    bkg = par[fRunInfo->GetBkgFitParamNo()-1];
   }
 
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
     Int_t funcNo = fMsrInfo->GetFuncNo(i);
-    fFuncValues[i] = fMsrInfo->EvalFunc(funcNo, fRunInfo->fMap, par);
+    fFuncValues[i] = fMsrInfo->EvalFunc(funcNo, *fRunInfo->GetMap(), par);
   }
 
   // calculate maximum log likelihood
@@ -239,37 +239,37 @@ void PRunSingleHisto::CalcTheory()
   // calculate asymmetry
   Double_t N0;
   // check if norm is a parameter or a function
-  if (fRunInfo->fNormParamNo < MSR_PARAM_FUN_OFFSET) { // norm is a parameter
-    N0 = par[fRunInfo->fNormParamNo-1];
+  if (fRunInfo->GetNormParamNo() < MSR_PARAM_FUN_OFFSET) { // norm is a parameter
+    N0 = par[fRunInfo->GetNormParamNo()-1];
   } else { // norm is a function
     // get function number
-    UInt_t funNo = fRunInfo->fNormParamNo-MSR_PARAM_FUN_OFFSET;
+    UInt_t funNo = fRunInfo->GetNormParamNo()-MSR_PARAM_FUN_OFFSET;
     // evaluate function
-    N0 = fMsrInfo->EvalFunc(funNo,fRunInfo->fMap,par);
+    N0 = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
   }
 
   // get tau
   Double_t tau;
-  if (fRunInfo->fLifetimeParamNo != -1)
-    tau = par[fRunInfo->fLifetimeParamNo-1];
+  if (fRunInfo->GetLifetimeParamNo() != -1)
+    tau = par[fRunInfo->GetLifetimeParamNo()-1];
   else
     tau = PMUON_LIFETIME;
 
   // get background
   Double_t bkg;
-  if (fRunInfo->fBkgFitParamNo == -1) { // bkg not fitted
+  if (fRunInfo->GetBkgFitParamNo() == -1) { // bkg not fitted
     if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given (background interval)
       bkg = fBackground;
     } else { // fixed bkg given
       bkg = fRunInfo->fBkgFix[0];
     }
   } else { // bkg fitted
-    bkg = par[fRunInfo->fBkgFitParamNo-1];
+    bkg = par[fRunInfo->GetBkgFitParamNo()-1];
   }
 
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
-    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), fRunInfo->fMap, par);
+    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), *fRunInfo->GetMap(), par);
   }
 
   // calculate theory
@@ -299,7 +299,7 @@ Bool_t PRunSingleHisto::PrepareData()
   Bool_t success = true;
 
   // get the proper run
-  PRawRunData* runData = fRawData->GetRunData(*(fRunInfo->GetRunName()));
+  PRawRunData* runData = fRawData->GetRunData(*fRunInfo->GetRunName());
   if (!runData) { // couldn't get run
     cerr << endl << "PRunSingleHisto::PrepareData(): **ERROR** Couldn't get run " << fRunInfo->GetRunName()->Data() << "!";
     cerr << endl;
@@ -360,7 +360,7 @@ Bool_t PRunSingleHisto::PrepareData()
     for (UInt_t i=1; i<fRunInfo->GetRunNames().size(); i++) {
 
       // get run to be added to the main one
-      addRunData = fRawData->GetRunData(*(fRunInfo->GetRunName(i)));
+      addRunData = fRawData->GetRunData(*fRunInfo->GetRunName(i));
       if (addRunData == 0) { // couldn't get run
         cerr << endl << "PRunSingleHisto::PrepareData(): **ERROR** Couldn't get addrun " << fRunInfo->GetRunName(i)->Data() << "!";
         cerr << endl;
@@ -423,9 +423,9 @@ Bool_t PRunSingleHisto::PrepareData()
 
   if (fHandleTag == kFit)
     success = PrepareFitData(runData, histoNo);
-  else if ((fHandleTag == kView) && !fRunInfo->fLifetimeCorrection)
+  else if ((fHandleTag == kView) && !fRunInfo->IsLifetimeCorrected())
     success = PrepareRawViewData(runData, histoNo);
-  else if ((fHandleTag == kView) && fRunInfo->fLifetimeCorrection)
+  else if ((fHandleTag == kView) && fRunInfo->IsLifetimeCorrected())
     success = PrepareViewData(runData, histoNo);
   else
     success = false;
@@ -476,7 +476,7 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
   }
 
   // check how the background shall be handled
-  if (fRunInfo->fBkgFitParamNo == -1) { // bkg shall **NOT** be fitted
+  if (fRunInfo->GetBkgFitParamNo() == -1) { // bkg shall **NOT** be fitted
     // subtract background from histogramms ------------------------------------------
     if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given
       if (fRunInfo->fBkgRange.size() != 0) {
@@ -632,25 +632,25 @@ cout << endl << ">> data start time = " << fData.GetDataTimeStart();
   // calculate asymmetry
   Double_t N0;
   // check if norm is a parameter or a function
-  if (fRunInfo->fNormParamNo < MSR_PARAM_FUN_OFFSET) { // norm is a parameter
-    N0 = par[fRunInfo->fNormParamNo-1];
+  if (fRunInfo->GetNormParamNo() < MSR_PARAM_FUN_OFFSET) { // norm is a parameter
+    N0 = par[fRunInfo->GetNormParamNo()-1];
   } else { // norm is a function
     // get function number
-    UInt_t funNo = fRunInfo->fNormParamNo-MSR_PARAM_FUN_OFFSET;
+    UInt_t funNo = fRunInfo->GetNormParamNo()-MSR_PARAM_FUN_OFFSET;
     // evaluate function
-    N0 = fMsrInfo->EvalFunc(funNo,fRunInfo->fMap,par);
+    N0 = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
   }
 
   // get tau
   Double_t tau;
-  if (fRunInfo->fLifetimeParamNo != -1)
-    tau = par[fRunInfo->fLifetimeParamNo-1];
+  if (fRunInfo->GetLifetimeParamNo() != -1)
+    tau = par[fRunInfo->GetLifetimeParamNo()-1];
   else
     tau = PMUON_LIFETIME;
 
   // get background
   Double_t bkg;
-  if (fRunInfo->fBkgFitParamNo == -1) { // bkg not fitted
+  if (fRunInfo->GetBkgFitParamNo() == -1) { // bkg not fitted
     if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given (background interval)
       if (!EstimateBkg(histoNo))
         return false;
@@ -659,12 +659,12 @@ cout << endl << ">> data start time = " << fData.GetDataTimeStart();
       bkg = fRunInfo->fBkgFix[0];
     }
   } else { // bkg fitted
-    bkg = par[fRunInfo->fBkgFitParamNo-1];
+    bkg = par[fRunInfo->GetBkgFitParamNo()-1];
   }
 
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
-    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), fRunInfo->fMap, par);
+    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), *fRunInfo->GetMap(), par);
   }
 
   // calculate theory
@@ -756,26 +756,26 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
   // calculate asymmetry
   Double_t N0;
   // check if norm is a parameter or a function
-  if (fRunInfo->fNormParamNo < MSR_PARAM_FUN_OFFSET) { // norm is a parameter
-    N0 = par[fRunInfo->fNormParamNo-1];
+  if (fRunInfo->GetNormParamNo() < MSR_PARAM_FUN_OFFSET) { // norm is a parameter
+    N0 = par[fRunInfo->GetNormParamNo()-1];
   } else { // norm is a function
     // get function number
-    UInt_t funNo = fRunInfo->fNormParamNo-MSR_PARAM_FUN_OFFSET;
+    UInt_t funNo = fRunInfo->GetNormParamNo()-MSR_PARAM_FUN_OFFSET;
     // evaluate function
-    N0 = fMsrInfo->EvalFunc(funNo,fRunInfo->fMap,par);
+    N0 = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
   }
 
   // get tau
   Double_t tau;
-  if (fRunInfo->fLifetimeParamNo != -1)
-    tau = par[fRunInfo->fLifetimeParamNo-1];
+  if (fRunInfo->GetLifetimeParamNo() != -1)
+    tau = par[fRunInfo->GetLifetimeParamNo()-1];
   else
     tau = PMUON_LIFETIME;
 //cout << endl << ">> tau = " << tau;
 
   // get background
   Double_t bkg;
-  if (fRunInfo->fBkgFitParamNo == -1) { // bkg not fitted
+  if (fRunInfo->GetBkgFitParamNo() == -1) { // bkg not fitted
     if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given (background interval)
       if (!EstimateBkg(histoNo))
         return false;
@@ -784,7 +784,7 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
       bkg = fRunInfo->fBkgFix[0];
     }
   } else { // bkg fitted
-    bkg = par[fRunInfo->fBkgFitParamNo-1];
+    bkg = par[fRunInfo->GetBkgFitParamNo()-1];
   }
 
   Double_t value  = 0.0;
@@ -829,7 +829,7 @@ cout << endl << "--------------------------------" << endl;
 
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
-    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), fRunInfo->fMap, par);
+    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), *fRunInfo->GetMap(), par);
   }
 
   // calculate theory
@@ -870,11 +870,11 @@ Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
   Double_t beamPeriod = 0.0;
 
   // check if data are from PSI, RAL, or TRIUMF
-  if (fRunInfo->fInstitute[0].Contains("psi"))
+  if (fRunInfo->GetInstitute()->Contains("psi"))
     beamPeriod = ACCEL_PERIOD_PSI;
-  else if (fRunInfo->fInstitute[0].Contains("ral"))
+  else if (fRunInfo->GetInstitute()->Contains("ral"))
     beamPeriod = ACCEL_PERIOD_RAL;
-  else if (fRunInfo->fInstitute[0].Contains("triumf"))
+  else if (fRunInfo->GetInstitute()->Contains("triumf"))
     beamPeriod = ACCEL_PERIOD_TRIUMF;
   else
     beamPeriod = 0.0;
@@ -900,7 +900,7 @@ Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
   }
 
   // get the proper run
-  PRawRunData* runData = fRawData->GetRunData(*(fRunInfo->GetRunName()));
+  PRawRunData* runData = fRawData->GetRunData(*fRunInfo->GetRunName());
 
   // check if start is within histogram bounds
   if ((start < 0) || (start >= runData->GetDataBin(histoNo)->size())) {

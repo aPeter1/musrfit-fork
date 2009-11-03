@@ -364,23 +364,43 @@ class PMsrRunBlock {
     virtual void CleanUp();
 
     virtual PStringVector GetRunNames() { return fRunName; }
-    virtual TString* GetRunName(UInt_t i=0);
+    virtual TString *GetRunName(UInt_t i=0);
+    virtual PStringVector GetBeamlines() { return fBeamline; }
+    virtual TString *GetBeamline(UInt_t i=0);
+    virtual PStringVector GetInstitutes() { return fInstitute; }
+    virtual TString *GetInstitute(UInt_t i=0);
+    virtual PStringVector GetFileFormats() { return fFileFormat; }
+    virtual TString *GetFileFormat(UInt_t i=0);
+    virtual Int_t GetFitType() { return fFitType; }
+    virtual Int_t GetAlphaParamNo() { return fAlphaParamNo; }
+    virtual Int_t GetBetaParamNo() { return fBetaParamNo; }
+    virtual Int_t GetNormParamNo() { return fNormParamNo; }
+    virtual Int_t GetBkgFitParamNo() { return fBkgFitParamNo; }
+    virtual Int_t GetPhaseParamNo() { return fPhaseParamNo; }
+    virtual Int_t GetLifetimeParamNo() { return fLifetimeParamNo; }
+    virtual Bool_t IsLifetimeCorrected() { return fLifetimeCorrection; }
+    virtual PIntVector* GetMap() { return &fMap; }
+    virtual Int_t GetMap(UInt_t idx);
 
     virtual void AppendRunName(TString str) { fRunName.push_back(str); }
     virtual void SetRunName(TString &str, UInt_t i);
+    virtual void AppendBeamline(TString str) { fBeamline.push_back(str); }
+    virtual void SetBeamline(TString &str, UInt_t i);
+    virtual void AppendInstitute(TString str) { fInstitute.push_back(str); }
+    virtual void SetInstitute(TString &str, UInt_t i);
+    virtual void AppendFileFormat(TString str) { fFileFormat.push_back(str); }
+    virtual void SetFileFormat(TString &str, UInt_t i);
+    virtual void SetFitType(Int_t ival) { fFitType = ival; }
+    virtual void SetAlphaParamNo(Int_t ival) { fAlphaParamNo = ival; }
+    virtual void SetBetaParamNo(Int_t ival) { fBetaParamNo = ival; }
+    virtual void SetNormParamNo(Int_t ival) { fNormParamNo = ival; }
+    virtual void SetBkgFitParamNo(Int_t ival) { fBkgFitParamNo = ival; }
+    virtual void SetPhaseParamNo(Int_t ival) { fPhaseParamNo = ival; }
+    virtual void SetLifetimeParamNo(Int_t ival) { fLifetimeParamNo = ival; }
+    virtual void SetLifetimeCorrection(Bool_t bval) { fLifetimeCorrection = bval; }
+    virtual void AppendMap(Int_t ival) { fMap.push_back(ival); }
+    virtual void SetMap(Int_t mapVal, UInt_t idx);
 
-    PStringVector fBeamline;      ///< e.g. mue4, mue1, pim3, emu, m15, ... (former: run type)
-    PStringVector fInstitute;     ///< e.g. psi, ral, triumf (former: run format)
-    PStringVector fFileFormat;    ///< e.g. root, nexus, psi-bin, mud, ascii, db
-    Int_t fFitType;               ///< fit type: 0=single histo fit, 2=asymmetry fit, 4=asymmetry in RRF, 8=non muSR
-    Int_t fAlphaParamNo;          ///< alpha parameter number (fit type 2, 4)
-    Int_t fBetaParamNo;           ///< beta parameter number  (fit type 2, 4)
-    Int_t fNormParamNo;           ///< N0 parameter number (fit type 0)
-    Int_t fBkgFitParamNo;         ///< background fit parameter number (fit type 0)
-    Int_t fPhaseParamNo;          ///< ??? NEEDED ??? NEEDS TO BE CHECKED !!!
-    Int_t fLifetimeParamNo;       ///< muon lifetime parameter number (fit type 0)
-    Bool_t fLifetimeCorrection;   ///< lifetime correction flag for viewing (fit type 0)
-    PIntVector fMap;              ///< map vector needed to switch parameters for different runs within a single theory
     Int_t fForwardHistoNo;        ///< forward histogram number (fit type 0, 2, 4)
     Int_t fBackwardHistoNo;       ///< backward histogram number (fit type 2, 4)
     PDoubleVector fBkgFix;        ///< fixed background in (1/ns) (fit type 0, 2, 4)
@@ -400,6 +420,18 @@ class PMsrRunBlock {
 
   private:
     PStringVector fRunName;       ///< name of the run file
+    PStringVector fBeamline;      ///< e.g. mue4, mue1, pim3, emu, m15, ... (former: run type)
+    PStringVector fInstitute;     ///< e.g. psi, ral, triumf (former: run format)
+    PStringVector fFileFormat;    ///< e.g. root, nexus, psi-bin, mud, ascii, db
+    Int_t fFitType;               ///< fit type: 0=single histo fit, 2=asymmetry fit, 4=asymmetry in RRF, 8=non muSR
+    Int_t fAlphaParamNo;          ///< alpha parameter number (fit type 2, 4)
+    Int_t fBetaParamNo;           ///< beta parameter number  (fit type 2, 4)
+    Int_t fNormParamNo;           ///< N0 parameter number (fit type 0)
+    Int_t fBkgFitParamNo;         ///< background fit parameter number (fit type 0)
+    Int_t fPhaseParamNo;          ///< ??? NEEDED ??? NEEDS TO BE CHECKED !!!
+    Int_t fLifetimeParamNo;       ///< muon lifetime parameter number (fit type 0)
+    Bool_t fLifetimeCorrection;   ///< lifetime correction flag for viewing (fit type 0)
+    PIntVector fMap;              ///< map vector needed to switch parameters for different runs within a single theory
 };
 
 //-------------------------------------------------------------

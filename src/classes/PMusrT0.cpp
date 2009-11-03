@@ -243,7 +243,7 @@ void PMusrT0::SetMsrHandler(PMsrHandler *msrHandler)
 void PMusrT0::InitDataAndBkg()
 {
   // get addRun offset which depends on the fit type
-  Int_t fitType = fMsrHandler->GetMsrRunList()->at(fRunNo).fFitType;
+  Int_t fitType = fMsrHandler->GetMsrRunList()->at(fRunNo).GetFitType();
   if (fitType == MSR_FITTYPE_SINGLE_HISTO) {
     fAddRunOffset = 2;
   } else if (fitType == MSR_FITTYPE_ASYM) {

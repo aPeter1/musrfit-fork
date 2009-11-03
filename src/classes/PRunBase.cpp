@@ -90,7 +90,7 @@ PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo,
   fRunInfo = &(*msrInfo->GetMsrRunList())[runNo];
 
   // check the parameter and map range of the functions
-  if (!fMsrInfo->CheckMapAndParamRange(fRunInfo->fMap.size(), fMsrInfo->GetNoOfParams())) {
+  if (!fMsrInfo->CheckMapAndParamRange(fRunInfo->GetMap()->size(), fMsrInfo->GetNoOfParams())) {
     cerr << endl << "**SEVERE ERROR** PRunBase::PRunBase: map and/or parameter out of range in FUNCTIONS." << endl;
     exit(0);
   }

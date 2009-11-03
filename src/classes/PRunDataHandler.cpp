@@ -153,23 +153,23 @@ Bool_t PRunDataHandler::ReadFile()
       if (!FileExistsCheck(runList->at(i), j))
         return false;
       // everything looks fine, hence try to read the data file
-      if (!runList->at(i).fFileFormat[j].CompareTo("root-npp")) // not post pile up corrected histos
+      if (!runList->at(i).GetFileFormat(j)->CompareTo("root-npp")) // not post pile up corrected histos
         success = ReadRootFile(true);
-      else if (!runList->at(i).fFileFormat[j].CompareTo("root-ppc")) // post pile up corrected histos
+      else if (!runList->at(i).GetFileFormat(j)->CompareTo("root-ppc")) // post pile up corrected histos
         success = ReadRootFile(false);
-      else if (!runList->at(i).fFileFormat[j].CompareTo("nexus"))
+      else if (!runList->at(i).GetFileFormat(j)->CompareTo("nexus"))
         success = ReadNexusFile();
-      else if (!runList->at(i).fFileFormat[j].CompareTo("psi-bin"))
+      else if (!runList->at(i).GetFileFormat(j)->CompareTo("psi-bin"))
         success = ReadPsiBinFile();
-      else if (!runList->at(i).fFileFormat[j].CompareTo("mud"))
+      else if (!runList->at(i).GetFileFormat(j)->CompareTo("mud"))
         success = ReadMudFile();
-      else if (!runList->at(i).fFileFormat[j].CompareTo("wkm"))
+      else if (!runList->at(i).GetFileFormat(j)->CompareTo("wkm"))
         success = ReadWkmFile();
-      else if (!runList->at(i).fFileFormat[j].CompareTo("mdu-ascii"))
+      else if (!runList->at(i).GetFileFormat(j)->CompareTo("mdu-ascii"))
         success = ReadMduAsciiFile();        
-      else if (!runList->at(i).fFileFormat[j].CompareTo("ascii"))
+      else if (!runList->at(i).GetFileFormat(j)->CompareTo("ascii"))
         success = ReadAsciiFile();
-      else if (!runList->at(i).fFileFormat[j].CompareTo("db"))
+      else if (!runList->at(i).GetFileFormat(j)->CompareTo("db"))
         success = ReadDBFile();
       else
         success = false;
@@ -217,44 +217,66 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
   // local init
   TROOT root("PRunBase", "PRunBase", 0);
   TString pathName = "???";
-  TString str;
+  TString str, *pstr;
   TString ext;
 
-  runInfo.fBeamline[idx].ToLower();
-  runInfo.fInstitute[idx].ToLower();
-  runInfo.fFileFormat[idx].ToLower();
+  pstr = runInfo.GetBeamline(idx);
+  if (pstr == 0) {
+    cerr << endl << ">> PRunDataHandler::FileExistsCheck: **ERROR** Couldn't obtain beamline data." << endl;
+    assert(0);
+  }
+  pstr->ToLower();
+  runInfo.SetBeamline(*pstr, idx);
+  pstr = runInfo.GetInstitute(idx);
+  if (pstr == 0) {
+    cerr << endl << ">> PRunDataHandler::FileExistsCheck: **ERROR** Couldn't obtain institute data." << endl;
+    assert(0);
+  }
+  pstr->ToLower();
+  runInfo.SetInstitute(*pstr, idx);
+  pstr = runInfo.GetFileFormat(idx);
+  if (pstr == 0) {
+    cerr << endl << ">> PRunDataHandler::FileExistsCheck: **ERROR** Couldn't obtain file format data." << endl;
+    assert(0);
+  }
+  pstr->ToLower();
+  runInfo.SetFileFormat(*pstr, idx);
 
   // file extensions for the various formats
-  if (!runInfo.fFileFormat[idx].CompareTo("root-npp")) // not post pile up corrected histos
+  if (!runInfo.GetFileFormat(idx)->CompareTo("root-npp")) // not post pile up corrected histos
     ext = TString("root");
-  else if (!runInfo.fFileFormat[idx].CompareTo("root-ppc")) // post pile up corrected histos
+  else if (!runInfo.GetFileFormat(idx)->CompareTo("root-ppc")) // post pile up corrected histos
     ext = TString("root");
-  else if (!runInfo.fFileFormat[idx].CompareTo("nexus"))
+  else if (!runInfo.GetFileFormat(idx)->CompareTo("nexus"))
     ext = TString("nexus");
-  else if (!runInfo.fFileFormat[idx].CompareTo("psi-bin"))
+  else if (!runInfo.GetFileFormat(idx)->CompareTo("psi-bin"))
     ext = TString("bin");
-  else if (!runInfo.fFileFormat[idx].CompareTo("mud"))
+  else if (!runInfo.GetFileFormat(idx)->CompareTo("mud"))
     ext = TString("msr");
-  else if (!runInfo.fFileFormat[idx].CompareTo("wkm")) {
-    if (!runInfo.fBeamline[idx].CompareTo("mue4"))
+  else if (!runInfo.GetFileFormat(idx)->CompareTo("wkm")) {
+    if (!runInfo.GetBeamline(idx)->CompareTo("mue4"))
       ext = TString("nemu");
     else
-      ext = runInfo.fBeamline[idx];
+      ext = *runInfo.GetBeamline(idx);
   }
-  else if (!runInfo.fFileFormat[idx].CompareTo("mdu-ascii"))
+  else if (!runInfo.GetFileFormat(idx)->CompareTo("mdu-ascii"))
     ext = TString("mdua");
-  else if (!runInfo.fFileFormat[idx].CompareTo("ascii"))
+  else if (!runInfo.GetFileFormat(idx)->CompareTo("ascii"))
     ext = TString("dat");
-  else if (!runInfo.fFileFormat[idx].CompareTo("db"))
+  else if (!runInfo.GetFileFormat(idx)->CompareTo("db"))
     ext = TString("db");
   else
     success = false;
 
   // unkown file format found
   if (!success) {
-    str = runInfo.fFileFormat[idx];
-    str.ToUpper();
-    cerr << endl << "**ERROR** File Format '" << str.Data() << "' unsupported.";
+    pstr = runInfo.GetFileFormat(idx);
+    if (pstr == 0) {
+      cerr << endl << ">> PRunDataHandler::FileExistsCheck: **ERROR** Couldn't obtain file format data." << endl;
+      assert(0);
+    }
+    pstr->ToUpper();
+    cerr << endl << "**ERROR** File Format '" << pstr->Data() << "' unsupported.";
     cerr << endl << "  support file formats are:";
     cerr << endl << "  ROOT-NPP  -> root not post pileup corrected for lem";
     cerr << endl << "  ROOT-PPC  -> root post pileup corrected for lem";
@@ -270,7 +292,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
   }
 
   // check if the file is in the local directory
-  str = *(runInfo.GetRunName(idx)) + TString(".") + ext;
+  str = *runInfo.GetRunName(idx) + TString(".") + ext;
   if (gSystem->AccessPathName(str.Data())!=true) { // found in the local dir
     pathName = str;
   }
@@ -278,7 +300,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
   // check if the file is found in the <msr-file-directory>
   if (pathName.CompareTo("???") == 0) { // not found in local directory search
     str  = *fMsrInfo->GetMsrFileDirectoryPath();
-    str += *(runInfo.GetRunName(idx)) + TString(".") + ext;
+    str += *runInfo.GetRunName(idx) + TString(".") + ext;
     if (gSystem->AccessPathName(str.Data())!=true) { // found
       pathName = str;
     }
@@ -287,7 +309,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
   // check if the file is found in the directory given in the startup file
   if (pathName.CompareTo("???") == 0) { // not found in local directory search
     for (UInt_t i=0; i<fDataPath.size(); i++) {
-      str = fDataPath[i] + TString("/") + *(runInfo.GetRunName(idx)) + TString(".") + ext;
+      str = fDataPath[i] + TString("/") + *runInfo.GetRunName(idx) + TString(".") + ext;
       if (gSystem->AccessPathName(str.Data())!=true) { // found
         pathName = str;
         break;
@@ -304,7 +326,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
     TObjString *ostr;
     for (Int_t i=0; i<tokens->GetEntries(); i++) {
       ostr = dynamic_cast<TObjString*>(tokens->At(i));
-      str = ostr->GetString() + TString("/") + *(runInfo.GetRunName(idx)) + TString(".") + ext;
+      str = ostr->GetString() + TString("/") + *runInfo.GetRunName(idx) + TString(".") + ext;
       if (gSystem->AccessPathName(str.Data())!=true) { // found
         pathName = str;
         break;
@@ -318,18 +340,30 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
     // WKMFULLDATAPATH has the structure: path_1:path_2:...:path_n
     TObjArray *tokens = str.Tokenize(":");
     TObjString *ostr;
-    runInfo.fInstitute[idx].ToUpper();
-    runInfo.fBeamline[idx].ToUpper();
+    pstr = runInfo.GetInstitute(idx);
+    if (pstr == 0) {
+      cerr << endl << ">> PRunDataHandler::FileExistsCheck: **ERROR** Couldn't obtain institute data." << endl;
+      assert(0);
+    }
+    pstr->ToUpper();
+    runInfo.SetInstitute(*pstr, idx);
+    pstr = runInfo.GetBeamline(idx);
+    if (pstr == 0) {
+      cerr << endl << ">> PRunDataHandler::FileExistsCheck: **ERROR** Couldn't obtain beamline data." << endl;
+      assert(0);
+    }
+    pstr->ToUpper();
+    runInfo.SetBeamline(*pstr, idx);
     TDatime datetime;
     TString dt;
     dt += datetime.GetYear();
     for (Int_t i=0; i<tokens->GetEntries(); i++) {
       ostr = dynamic_cast<TObjString*>(tokens->At(i));
       str = ostr->GetString() + TString("/DATA/") +
-            runInfo.fInstitute[idx] + TString("/") +
-            runInfo.fBeamline[idx] + TString("/") +
+            *runInfo.GetInstitute(idx) + TString("/") +
+            *runInfo.GetBeamline(idx) + TString("/") +
             dt + TString("/") +
-            *(runInfo.GetRunName(idx)) + TString(".") + ext;
+            *runInfo.GetRunName(idx) + TString(".") + ext;
       if (gSystem->AccessPathName(str.Data())!=true) { // found
         pathName = str;
         break;

@@ -66,15 +66,15 @@ PRunAsymmetry::PRunAsymmetry(PMsrHandler *msrInfo, PRunDataHandler *rawData, UIn
   PMsrParamList *param = msrInfo->GetMsrParamList();
 
   // check if alpha is given
-  if (fRunInfo->fAlphaParamNo == -1) { // no alpha given
+  if (fRunInfo->GetAlphaParamNo() == -1) { // no alpha given
     cerr << endl << "PRunAsymmetry::PRunAsymmetry(): **ERROR** no alpha parameter given! This is needed for an asymmetry fit!";
     cerr << endl;
     fValid = false;
     return;
   }
   // check if alpha parameter is within proper bounds
-  if ((fRunInfo->fAlphaParamNo < 0) || (fRunInfo->fAlphaParamNo > (Int_t)param->size())) {
-    cerr << endl << "PRunAsymmetry::PRunAsymmetry(): **ERROR** alpha parameter no = " << fRunInfo->fAlphaParamNo;
+  if ((fRunInfo->GetAlphaParamNo() < 0) || (fRunInfo->GetAlphaParamNo() > (Int_t)param->size())) {
+    cerr << endl << "PRunAsymmetry::PRunAsymmetry(): **ERROR** alpha parameter no = " << fRunInfo->GetAlphaParamNo();
     cerr << endl << "  This is out of bound, since there are only " << param->size() << " parameters.";
     cerr << endl;
     fValid = false;
@@ -82,24 +82,24 @@ PRunAsymmetry::PRunAsymmetry(PMsrHandler *msrInfo, PRunDataHandler *rawData, UIn
   }
   // check if alpha is fixed
   Bool_t alphaFixedToOne = false;
-//cout << endl << ">> alpha = " << (*param)[fRunInfo->fAlphaParamNo-1].fValue << ", " << (*param)[fRunInfo->fAlphaParamNo-1].fStep;
-  if (((*param)[fRunInfo->fAlphaParamNo-1].fStep == 0.0) && 
-      ((*param)[fRunInfo->fAlphaParamNo-1].fValue == 1.0))
+//cout << endl << ">> alpha = " << (*param)[fRunInfo->GetAlphaParamNo()-1].fValue << ", " << (*param)[fRunInfo->GetAlphaParamNo()-1].fStep;
+  if (((*param)[fRunInfo->GetAlphaParamNo()-1].fStep == 0.0) &&
+      ((*param)[fRunInfo->GetAlphaParamNo()-1].fValue == 1.0))
     alphaFixedToOne = true;
 
   // check if beta is given
   Bool_t betaFixedToOne = false;
-  if (fRunInfo->fBetaParamNo == -1) { // no beta given hence assuming beta == 1
+  if (fRunInfo->GetBetaParamNo() == -1) { // no beta given hence assuming beta == 1
     betaFixedToOne = true;
-  } else if ((fRunInfo->fBetaParamNo < 0) || (fRunInfo->fBetaParamNo > (Int_t)param->size())) { // check if beta parameter is within proper bounds
-    cerr << endl << "PRunAsymmetry::PRunAsymmetry(): **ERROR** beta parameter no = " << fRunInfo->fBetaParamNo;
+  } else if ((fRunInfo->GetBetaParamNo() < 0) || (fRunInfo->GetBetaParamNo() > (Int_t)param->size())) { // check if beta parameter is within proper bounds
+    cerr << endl << "PRunAsymmetry::PRunAsymmetry(): **ERROR** beta parameter no = " << fRunInfo->GetBetaParamNo();
     cerr << endl << "  This is out of bound, since there are only " << param->size() << " parameters.";
     cerr << endl;
     fValid = false;
     return;
   } else { // check if beta is fixed
-    if (((*param)[fRunInfo->fBetaParamNo-1].fStep == 0.0) && 
-        ((*param)[fRunInfo->fBetaParamNo-1].fValue == 1.0))
+    if (((*param)[fRunInfo->GetBetaParamNo()-1].fStep == 0.0) &&
+        ((*param)[fRunInfo->GetBetaParamNo()-1].fValue == 1.0))
       betaFixedToOne = true;
   }
 
@@ -152,7 +152,7 @@ Double_t PRunAsymmetry::CalcChiSquare(const std::vector<Double_t>& par)
 
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
-    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), fRunInfo->fMap, par);
+    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), *fRunInfo->GetMap(), par);
   }
 
   // calculate chisq
@@ -165,18 +165,18 @@ Double_t PRunAsymmetry::CalcChiSquare(const std::vector<Double_t>& par)
           asymFcnValue = fTheory->Func(time, par, fFuncValues);
           break;
         case 2: // alpha != 1, beta == 1
-          a = par[fRunInfo->fAlphaParamNo-1];
+          a = par[fRunInfo->GetAlphaParamNo()-1];
           f = fTheory->Func(time, par, fFuncValues);
           asymFcnValue = (f*(a+1.0)-(a-1.0))/((a+1.0)-f*(a-1.0));
           break;
         case 3: // alpha == 1, beta != 1
-          b = par[fRunInfo->fBetaParamNo-1];
+          b = par[fRunInfo->GetBetaParamNo()-1];
           f = fTheory->Func(time, par, fFuncValues);
           asymFcnValue = f*(b+1.0)/(2.0-f*(b-1.0));
           break;
         case 4: // alpha != 1, beta != 1
-          a = par[fRunInfo->fAlphaParamNo-1];
-          b = par[fRunInfo->fBetaParamNo-1];
+          a = par[fRunInfo->GetAlphaParamNo()-1];
+          b = par[fRunInfo->GetBetaParamNo()-1];
           f = fTheory->Func(time, par, fFuncValues);
           asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0));
           break;
@@ -226,7 +226,7 @@ void PRunAsymmetry::CalcTheory()
 
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
-    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), fRunInfo->fMap, par);
+    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), *fRunInfo->GetMap(), par);
   }
 
   // calculate asymmetry
@@ -240,18 +240,18 @@ void PRunAsymmetry::CalcTheory()
         asymFcnValue = fTheory->Func(time, par, fFuncValues);
         break;
       case 2: // alpha != 1, beta == 1
-        a = par[fRunInfo->fAlphaParamNo-1];
+        a = par[fRunInfo->GetAlphaParamNo()-1];
         f = fTheory->Func(time, par, fFuncValues);
         asymFcnValue = (f*(a+1.0)-(a-1.0))/((a+1.0)-f*(a-1.0));
         break;
       case 3: // alpha == 1, beta != 1
-        b = par[fRunInfo->fBetaParamNo-1];
+        b = par[fRunInfo->GetBetaParamNo()-1];
         f = fTheory->Func(time, par, fFuncValues);
         asymFcnValue = f*(b+1.0)/(2.0-f*(b-1.0));
         break;
       case 4: // alpha != 1, beta != 1
-        a = par[fRunInfo->fAlphaParamNo-1];
-        b = par[fRunInfo->fBetaParamNo-1];
+        a = par[fRunInfo->GetAlphaParamNo()-1];
+        b = par[fRunInfo->GetBetaParamNo()-1];
         f = fTheory->Func(time, par, fFuncValues);
         asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0));
         break;
@@ -520,11 +520,11 @@ Bool_t PRunAsymmetry::SubtractEstimatedBkg()
   Double_t beamPeriod = 0.0;
 
   // check if data are from PSI, RAL, or TRIUMF
-  if (fRunInfo->fInstitute[0].Contains("psi"))
+  if (fRunInfo->GetInstitute()->Contains("psi"))
     beamPeriod = ACCEL_PERIOD_PSI;
-  else if (fRunInfo->fInstitute[0].Contains("ral"))
+  else if (fRunInfo->GetInstitute()->Contains("ral"))
     beamPeriod = ACCEL_PERIOD_RAL;
-  else if (fRunInfo->fInstitute[0].Contains("triumf"))
+  else if (fRunInfo->GetInstitute()->Contains("triumf"))
     beamPeriod = ACCEL_PERIOD_TRIUMF;
   else
     beamPeriod = 0.0;
@@ -902,16 +902,16 @@ cout << endl << "--------------------------------" << endl;
       beta  = 1.0;
       break;
     case 2: // alpha != 1, beta == 1
-      alpha = par[fRunInfo->fAlphaParamNo-1];
+      alpha = par[fRunInfo->GetAlphaParamNo()-1];
       beta  = 1.0;
       break;
     case 3: // alpha == 1, beta != 1
       alpha = 1.0;
-      beta  = par[fRunInfo->fBetaParamNo-1];
+      beta  = par[fRunInfo->GetBetaParamNo()-1];
       break;
     case 4: // alpha != 1, beta != 1
-      alpha = par[fRunInfo->fAlphaParamNo-1];
-      beta  = par[fRunInfo->fBetaParamNo-1];
+      alpha = par[fRunInfo->GetAlphaParamNo()-1];
+      beta  = par[fRunInfo->GetBetaParamNo()-1];
       break;
     default:
       break;
@@ -956,7 +956,7 @@ cout << endl << "--------------------------------" << endl;
   // fill theory vector for kView
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
-    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), fRunInfo->fMap, par);
+    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), *fRunInfo->GetMap(), par);
   }
 
   // calculate theory

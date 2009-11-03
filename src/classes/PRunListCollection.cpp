@@ -105,7 +105,7 @@ Bool_t PRunListCollection::Add(Int_t runNo, EPMusrHandleTag tag)
 //   cout << ", name = " << runList->fRunName.Data();
 //   cout << ", type = " << runList->fFitType;
 
-  Int_t fitType = (*fMsrInfo->GetMsrRunList())[runNo].fFitType;
+  Int_t fitType = (*fMsrInfo->GetMsrRunList())[runNo].GetFitType();
 
   switch (fitType) {
     case PRUN_SINGLE_HISTO:

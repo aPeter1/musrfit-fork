@@ -315,7 +315,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
   Int_t runNo = -1, addRunNo = 0;
   Int_t plotNo = -1;
   string line;
-  TString str, sstr;
+  TString str, sstr, *pstr;
   TObjArray *tokens = 0;
   TObjString *ostr = 0;
   Bool_t found = false;
@@ -492,31 +492,55 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         sstr.Remove(TString::kLeading, ' ');
         if (sstr.BeginsWith("RUN")) {
           fout << "RUN " << fRuns[runNo].GetRunName()->Data() << " ";
-          str = fRuns[runNo].fBeamline[0];
-          str.ToUpper();
-          fout << str.Data() << " ";
-          str = fRuns[runNo].fInstitute[0];
-          str.ToUpper();
-          fout << str.Data() << " ";
-          str = fRuns[runNo].fFileFormat[0];
-          str.ToUpper();
-          fout << str.Data() << "   (name beamline institute data-file-format)" << endl;
+          pstr = fRuns[runNo].GetBeamline();
+          if (pstr == 0) {
+            cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **ERROR** Couldn't obtain beamline data." << endl;
+            assert(0);
+          }
+          pstr->ToUpper();
+          fout << pstr->Data() << " ";
+          pstr = fRuns[runNo].GetInstitute();
+          if (pstr == 0) {
+            cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **ERROR** Couldn't obtain institute data." << endl;
+            assert(0);
+          }
+          pstr->ToUpper();
+          fout << pstr->Data() << " ";
+          pstr = fRuns[runNo].GetFileFormat();
+          if (pstr == 0) {
+            cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **ERROR** Couldn't obtain file format data." << endl;
+            assert(0);
+          }
+          pstr->ToUpper();
+          fout << pstr->Data() << "   (name beamline institute data-file-format)" << endl;
         } else if (sstr.BeginsWith("ADDRUN")) {
           addRunNo++;
           fout << "ADDRUN " << fRuns[runNo].GetRunName(addRunNo)->Data() << " ";
-          str = fRuns[runNo].fBeamline[addRunNo];
-          str.ToUpper();
-          fout << str.Data() << " ";
-          str = fRuns[runNo].fInstitute[addRunNo];
-          str.ToUpper();
-          fout << str.Data() << " ";
-          str = fRuns[runNo].fFileFormat[addRunNo];
-          str.ToUpper();
-          fout << str.Data() << "   (name beamline institute data-file-format)" << endl;
+          pstr = fRuns[runNo].GetBeamline(addRunNo);
+          if (pstr == 0) {
+            cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **ERROR** Couldn't obtain beamline data (addrun)." << endl;
+            assert(0);
+          }
+          pstr->ToUpper();
+          fout << pstr->Data() << " ";
+          pstr = fRuns[runNo].GetInstitute(addRunNo);
+          if (pstr == 0) {
+            cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **ERROR** Couldn't obtain institute data (addrun)." << endl;
+            assert(0);
+          }
+          pstr->ToUpper();
+          fout << pstr->Data() << " ";
+          pstr = fRuns[runNo].GetFileFormat(addRunNo);
+          if (pstr == 0) {
+            cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **ERROR** Couldn't obtain file format data (addrun)." << endl;
+            assert(0);
+          }
+          pstr->ToUpper();
+          fout << pstr->Data() << "   (name beamline institute data-file-format)" << endl;
         } else if (sstr.BeginsWith("fittype")) {
           addRunNo = 0;
           fout.width(16);
-          switch (fRuns[runNo].fFitType) {
+          switch (fRuns[runNo].GetFitType()) {
           case MSR_FITTYPE_SINGLE_HISTO:
             fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)" << endl;
             break;
@@ -545,53 +569,53 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         } else if (sstr.BeginsWith("alpha ")) {
           fout.width(16);
           fout << left << "alpha";
-          fout << fRuns[runNo].fAlphaParamNo << endl;
+          fout << fRuns[runNo].GetAlphaParamNo() << endl;
         } else if (sstr.BeginsWith("beta ")) {
           fout.width(16);
           fout << left << "beta";
-          fout << fRuns[runNo].fBetaParamNo  << endl;
+          fout << fRuns[runNo].GetBetaParamNo()  << endl;
         } else if (sstr.BeginsWith("alpha2")) {
           fout.width(16);
           fout << left << "alpha2";
-          fout << fRuns[runNo].fAlphaParamNo << endl;
+          fout << fRuns[runNo].fAlpha2ParamNo << endl;
         } else if (sstr.BeginsWith("beta2")) {
           fout.width(16);
           fout << left << "beta2";
-          fout << fRuns[runNo].fBetaParamNo  << endl;
+          fout << fRuns[runNo].fBeta2ParamNo  << endl;
         } else if (sstr.BeginsWith("norm")) {
           fout.width(16);
           fout << left << "norm";
           // check if norm is give as a function
-          if (fRuns[runNo].fNormParamNo >= MSR_PARAM_FUN_OFFSET)
-            fout << "fun" << fRuns[runNo].fNormParamNo-MSR_PARAM_FUN_OFFSET;
+          if (fRuns[runNo].GetNormParamNo() >= MSR_PARAM_FUN_OFFSET)
+            fout << "fun" << fRuns[runNo].GetNormParamNo()-MSR_PARAM_FUN_OFFSET;
           else
-            fout << fRuns[runNo].fNormParamNo;
+            fout << fRuns[runNo].GetNormParamNo();
           fout << endl;
         } else if (sstr.BeginsWith("backgr.fit")) {
           fout.width(16);
           fout << left << "backgr.fit";
-          fout << fRuns[runNo].fBkgFitParamNo << endl;
+          fout << fRuns[runNo].GetBkgFitParamNo() << endl;
         } else if (sstr.BeginsWith("rphase")) {
           fout.width(16);
           fout << left << "rphase";
-          fout << fRuns[runNo].fPhaseParamNo << endl;
+          fout << fRuns[runNo].GetPhaseParamNo() << endl;
         } else if (sstr.BeginsWith("lifetime ")) {
           fout.width(16);
           fout << left << "lifetime";
-          fout << fRuns[runNo].fLifetimeParamNo << endl;
+          fout << fRuns[runNo].GetLifetimeParamNo() << endl;
         } else if (sstr.BeginsWith("lifetimecorrection")) {
-          if ((fRuns[runNo].fLifetimeCorrection) && (fRuns[runNo].fFitType == MSR_FITTYPE_SINGLE_HISTO)) {
+          if ((fRuns[runNo].IsLifetimeCorrected()) && (fRuns[runNo].GetFitType() == MSR_FITTYPE_SINGLE_HISTO)) {
             fout << "lifetimecorrection" << endl;
           }
         } else if (sstr.BeginsWith("map")) {
           fout << "map         ";
-          for (UInt_t j=0; j<fRuns[runNo].fMap.size(); j++) {
+          for (UInt_t j=0; j<fRuns[runNo].GetMap()->size(); j++) {
             fout.width(5);
-            fout << right << fRuns[runNo].fMap[j];
+            fout << right << fRuns[runNo].GetMap(j);
           }
           // if there are less maps then 10 fill with zeros
-          if (fRuns[runNo].fMap.size() < 10) {
-            for (UInt_t j=fRuns[runNo].fMap.size(); j<10; j++)
+          if (fRuns[runNo].GetMap()->size() < 10) {
+            for (UInt_t j=fRuns[runNo].GetMap()->size(); j<10; j++)
               fout << "    0";
           }
           fout << endl;
@@ -1448,13 +1472,13 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         param.AppendRunName(ostr->GetString());
         // beamline
         ostr = dynamic_cast<TObjString*>(tokens->At(2));
-        param.fBeamline.push_back(ostr->GetString());
+        param.AppendBeamline(ostr->GetString());
         // institute
         ostr = dynamic_cast<TObjString*>(tokens->At(3));
-        param.fInstitute.push_back(ostr->GetString());
+        param.AppendInstitute(ostr->GetString());
         // data file format
         ostr = dynamic_cast<TObjString*>(tokens->At(4));
-        param.fFileFormat.push_back(ostr->GetString());
+        param.AppendFileFormat(ostr->GetString());
       }
     }
 
@@ -1469,13 +1493,13 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         param.AppendRunName(ostr->GetString());
         // beamline
         ostr = dynamic_cast<TObjString*>(tokens->At(2));
-        param.fBeamline.push_back(ostr->GetString());
+        param.AppendBeamline(ostr->GetString());
         // institute
         ostr = dynamic_cast<TObjString*>(tokens->At(3));
-        param.fInstitute.push_back(ostr->GetString());
+        param.AppendInstitute(ostr->GetString());
         // data file format
         ostr = dynamic_cast<TObjString*>(tokens->At(4));
-        param.fFileFormat.push_back(ostr->GetString());
+        param.AppendFileFormat(ostr->GetString());
       }
     }
 
@@ -1492,7 +1516,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
               (fittype == MSR_FITTYPE_ASYM) ||
               (fittype == MSR_FITTYPE_ASYM_RRF) ||
               (fittype == MSR_FITTYPE_NON_MUSR)) {
-            param.fFitType = fittype;
+            param.SetFitType(fittype);
           } else {
             error = true;
           }
@@ -1510,7 +1534,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (str.IsDigit())
-          param.fAlphaParamNo = str.Atoi();
+          param.SetAlphaParamNo(str.Atoi());
         else
           error = true;
       }
@@ -1524,7 +1548,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (str.IsDigit())
-          param.fBetaParamNo = str.Atoi();
+          param.SetBetaParamNo(str.Atoi());
         else
           error = true;
       }
@@ -1538,11 +1562,11 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (str.IsDigit()) {
-          param.fNormParamNo = str.Atoi();
+          param.SetNormParamNo(str.Atoi());
         } else if (str.Contains("fun")) {
           Int_t no;
           if (FilterNumber(str, "fun", MSR_PARAM_FUN_OFFSET, no))
-            param.fNormParamNo = no;
+            param.SetNormParamNo(no);
           else
             error = true;
         } else {
@@ -1559,7 +1583,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (str.IsDigit())
-          param.fBkgFitParamNo = str.Atoi();
+          param.SetBkgFitParamNo(str.Atoi());
         else
           error = true;
       }
@@ -1573,7 +1597,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (str.IsDigit())
-          param.fPhaseParamNo = str.Atoi();
+          param.SetPhaseParamNo(str.Atoi());
         else
           error = true;
       }
@@ -1587,7 +1611,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (str.IsDigit())
-          param.fLifetimeParamNo = str.Atoi();
+          param.SetLifetimeParamNo(str.Atoi());
         else
           error = true;
       }
@@ -1595,7 +1619,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
 
     // lifetimecorrection ---------------------------------------
     if (iter->fLine.BeginsWith("lifetimecorrection", TString::kIgnoreCase)) {
-      param.fLifetimeCorrection = true;
+      param.SetLifetimeCorrection(true);
     }
 
     // map ------------------------------------------------------
@@ -1604,14 +1628,14 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(i));
         str = ostr->GetString();
         if (str.IsDigit())
-          param.fMap.push_back(str.Atoi());
+          param.AppendMap(str.Atoi());
         else
           error = true;
       }
       // check map entries, i.e. if the map values are within parameter bounds
-      for (UInt_t i=0; i<param.fMap.size(); i++) {
-        if ((param.fMap[i] < 0) || (param.fMap[i] > (Int_t) fParam.size())) {
-          cerr << endl << ">> PMsrHandler::HandleRunEntry: **SEVERE ERROR** map value " << param.fMap[i] << " in line " << iter->fLineNo << " is out of range!";
+      for (UInt_t i=0; i<param.GetMap()->size(); i++) {
+        if ((param.GetMap(i) < 0) || (param.GetMap(i) > (Int_t) fParam.size())) {
+          cerr << endl << ">> PMsrHandler::HandleRunEntry: **SEVERE ERROR** map value " << param.GetMap(i) << " in line " << iter->fLineNo << " is out of range!";
           error = true;
           break;
         }
@@ -1869,11 +1893,11 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
 
   // check if for fittypes: single histo, asymmetry, RRF any background info is given
   for (UInt_t i=0; i<fRuns.size(); i++) {
-    if ((fRuns[i].fFitType == MSR_FITTYPE_SINGLE_HISTO) ||
-        (fRuns[i].fFitType == MSR_FITTYPE_ASYM) ||
-        (fRuns[i].fFitType == MSR_FITTYPE_ASYM_RRF)) {
+    if ((fRuns[i].GetFitType() == MSR_FITTYPE_SINGLE_HISTO) ||
+        (fRuns[i].GetFitType() == MSR_FITTYPE_ASYM) ||
+        (fRuns[i].GetFitType() == MSR_FITTYPE_ASYM_RRF)) {
       Bool_t found;
-      if (fRuns[i].fBkgFitParamNo >= 0) { // check if backgr.fit is given
+      if (fRuns[i].GetBkgFitParamNo() >= 0) { // check if backgr.fit is given
         found = true;
       } else if (fRuns[i].fBkgFix.size() > 0) { // check if backgr.fix is given
         found = true;
@@ -3234,9 +3258,9 @@ Bool_t PMsrHandler::CheckMaps()
   for (UInt_t i=0; i<mapVec.size(); i++) { // loop over found maps in theory- and function-block
     found = false;
     for (UInt_t j=0; j<fRuns.size(); j++) { // loop over all run-blocks
-      if ((mapVec[i]-MSR_PARAM_MAP_OFFSET-1 < (Int_t)fRuns[j].fMap.size()) &&
+      if ((mapVec[i]-MSR_PARAM_MAP_OFFSET-1 < (Int_t)fRuns[j].GetMap()->size()) &&
           (mapVec[i]-MSR_PARAM_MAP_OFFSET-1 >= 0)) { // map value smaller than run-block map length
-        if (fRuns[j].fMap[mapVec[i]-MSR_PARAM_MAP_OFFSET-1] != 0) { // map value in the run-block != 0
+        if (fRuns[j].GetMap(mapVec[i]-MSR_PARAM_MAP_OFFSET-1) != 0) { // map value in the run-block != 0
           found = true;
           break;
         }
@@ -3313,8 +3337,8 @@ Bool_t PMsrHandler::CheckFuncs()
 
   // check if func is present in the run-block
   for (UInt_t i=0; i<fRuns.size(); i++) {
-    if (fRuns[i].fNormParamNo >= MSR_PARAM_FUN_OFFSET) { // function found
-      funVec.push_back(fRuns[i].fNormParamNo);
+    if (fRuns[i].GetNormParamNo() >= MSR_PARAM_FUN_OFFSET) { // function found
+      funVec.push_back(fRuns[i].GetNormParamNo());
       funBlock.push_back(1); // 1 = run-block
       funLineBlockNo.push_back(i+1);
     }

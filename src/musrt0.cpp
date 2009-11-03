@@ -215,7 +215,7 @@ int main(int argc, char *argv[])
   // check if the fittype is not NonMusr
   PMsrRunList *runList = msrHandler->GetMsrRunList();
   for (unsigned int i=0; i<runList->size(); i++) {
-    if (runList->at(i).fFitType == MSR_FITTYPE_NON_MUSR) {
+    if (runList->at(i).GetFitType() == MSR_FITTYPE_NON_MUSR) {
       cout << endl << "**ERROR** t0 setting for NonMusr fittype doesn't make any sense, will quit ..." << endl;
       success = false;
       break;
@@ -243,7 +243,7 @@ int main(int argc, char *argv[])
 
     // generate vector of all necessary PMusrT0 objects
     for (unsigned int i=0; i<runList->size(); i++) {
-      switch (runList->at(i).fFitType) {
+      switch (runList->at(i).GetFitType()) {
         case MSR_FITTYPE_SINGLE_HISTO:
           for (unsigned int j=0; j<runList->at(i).GetRunNames().size(); j++) { // necessary in case of ADDRUN
             if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).fForwardHistoNo, 0, j)) {

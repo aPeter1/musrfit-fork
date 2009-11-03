@@ -580,3 +580,131 @@ void PMsrRunBlock::SetRunName(TString &str, UInt_t i)
 
   fRunName[i] = str;
 }
+
+//--------------------------------------------------------------------------
+// GetBeamline
+//--------------------------------------------------------------------------
+/**
+ * <p> get beamline name at position i
+ *
+ * \param i index of the beamline to be returned
+ */
+TString* PMsrRunBlock::GetBeamline(UInt_t i)
+{
+  if (i>fBeamline.size())
+    return 0;
+
+  return &fBeamline[i];
+}
+
+//--------------------------------------------------------------------------
+// SetBeamline
+//--------------------------------------------------------------------------
+/**
+ * <p> set beamline name at position i
+ *
+ * \param i index of the beamline name to be set
+ */
+void PMsrRunBlock::SetBeamline(TString &str, UInt_t i)
+{
+  if (i>fBeamline.size())
+    fBeamline.resize(i+1);
+
+  fBeamline[i] = str;
+}
+
+//--------------------------------------------------------------------------
+// GetInstitute
+//--------------------------------------------------------------------------
+/**
+ * <p> get institute name at position i
+ *
+ * \param i index of the institute to be returned
+ */
+TString* PMsrRunBlock::GetInstitute(UInt_t i)
+{
+  if (i>fInstitute.size())
+    return 0;
+
+  return &fInstitute[i];
+}
+
+//--------------------------------------------------------------------------
+// SetInstitute
+//--------------------------------------------------------------------------
+/**
+ * <p> set institute name at position i
+ *
+ * \param i index of the run name to be set
+ */
+void PMsrRunBlock::SetInstitute(TString &str, UInt_t i)
+{
+  if (i>fInstitute.size())
+    fInstitute.resize(i+1);
+
+  fInstitute[i] = str;
+}
+
+//--------------------------------------------------------------------------
+// GetFileFormat
+//--------------------------------------------------------------------------
+/**
+ * <p> get file format name at position i
+ *
+ * \param i index of the file format to be returned
+ */
+TString* PMsrRunBlock::GetFileFormat(UInt_t i)
+{
+  if (i>fFileFormat.size())
+    return 0;
+
+  return &fFileFormat[i];
+}
+
+//--------------------------------------------------------------------------
+// SetFileFormat
+//--------------------------------------------------------------------------
+/**
+ * <p> set file format name at position i
+ *
+ * \param i index of the file format name to be set
+ */
+void PMsrRunBlock::SetFileFormat(TString &str, UInt_t i)
+{
+  if (i>fFileFormat.size())
+    fFileFormat.resize(i+1);
+
+  fFileFormat[i] = str;
+}
+
+//--------------------------------------------------------------------------
+// GetMap
+//--------------------------------------------------------------------------
+/**
+ * <p> get map value at position i
+ *
+ * \param i index of the map value to be returned
+ */
+Int_t PMsrRunBlock::GetMap(UInt_t i)
+{
+  if (i>fMap.size())
+    return -1;
+
+  return fMap[i];
+}
+
+//--------------------------------------------------------------------------
+// SetMap
+//--------------------------------------------------------------------------
+/**
+ * <p> set file format name at position i
+ *
+ * \param i index of the file format name to be set
+ */
+void PMsrRunBlock::SetMap(Int_t mapVal, UInt_t idx)
+{
+  if (idx>fMap.size())
+    fMap.resize(idx+1);
+
+  fMap[idx] = mapVal;
+}

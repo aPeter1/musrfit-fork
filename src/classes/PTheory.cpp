@@ -190,7 +190,7 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent)
       if (status == 1) { // everthing ok
         ok = true;
         // get parameter from map
-        PIntVector maps = (*msrInfo->GetMsrRunList())[runNo].fMap;
+        PIntVector maps = *(*msrInfo->GetMsrRunList())[runNo].GetMap();
         if ((value <= maps.size()) && (value > 0)) { // everything fine
           fParamNo.push_back(maps[value-1]-1);
         } else { // map index out of range
