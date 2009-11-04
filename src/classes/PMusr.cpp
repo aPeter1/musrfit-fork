@@ -810,3 +810,67 @@ void PMsrRunBlock::SetDataRange(Int_t ival, UInt_t idx)
 
   fDataRange[idx] = ival;
 }
+
+//--------------------------------------------------------------------------
+// GetT0
+//--------------------------------------------------------------------------
+/**
+ * <p> get T0 value at position i
+ *
+ * \param i index of the T0 value to be returned
+ */
+Int_t PMsrRunBlock::GetT0(UInt_t i)
+{
+  if (i>fT0.size())
+    return -1;
+
+  return fT0[i];
+}
+
+//--------------------------------------------------------------------------
+// SetT0
+//--------------------------------------------------------------------------
+/**
+ * <p> set T0 value at position i
+ *
+ * \param i index of the T0 value to be set
+ */
+void PMsrRunBlock::SetT0(Int_t ival, UInt_t idx)
+{
+  if (idx>fT0.size())
+    fT0.resize(idx+1);
+
+  fT0[idx] = ival;
+}
+
+//--------------------------------------------------------------------------
+// GetFitRange
+//--------------------------------------------------------------------------
+/**
+ * <p> get fit range value at position i
+ *
+ * \param i index of the fit range value to be returned
+ */
+Double_t PMsrRunBlock::GetFitRange(UInt_t i)
+{
+  if (i>2)
+    return PMUSR_UNDEFINED;
+
+  return fFitRange[i];
+}
+
+//--------------------------------------------------------------------------
+// SetFitRange
+//--------------------------------------------------------------------------
+/**
+ * <p> set fit range value at position i
+ *
+ * \param i index of the fit range value to be set
+ */
+void PMsrRunBlock::SetFitRange(Double_t dval, UInt_t idx)
+{
+  if (idx>=2)
+    return;
+
+  fFitRange[idx] = dval;
+}

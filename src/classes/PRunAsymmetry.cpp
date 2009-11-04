@@ -294,13 +294,13 @@ Bool_t PRunAsymmetry::PrepareData()
   fTimeResolution = runData->GetTimeResolution()/1.0e3;
 
   // keep start/stop time for fit
-  fFitStartTime = fRunInfo->fFitRange[0];
-  fFitStopTime  = fRunInfo->fFitRange[1];
+  fFitStartTime = fRunInfo->GetFitRange(0);
+  fFitStopTime  = fRunInfo->GetFitRange(1);
 //cout << endl << "start/stop (fit): " << fFitStartTime << ", " << fFitStopTime << endl;
 
 
   // check if the t0's are given in the msr-file
-  if (fRunInfo->fT0.size() == 0) { // t0's are NOT in the msr-file
+  if (fRunInfo->GetT0Size() == 0) { // t0's are NOT in the msr-file
     // check if the t0's are in the data file
     if (runData->GetT0s().size() != 0) { // t0's in the run data
       // keep the proper t0's. For asymmetry runs, forward/backward are holding the histo no
@@ -316,23 +316,23 @@ Bool_t PRunAsymmetry::PrepareData()
     // check if t0's are given in the data file
     if (runData->GetT0s().size() != 0) {
       // compare t0's of the msr-file with the one in the data file
-      if (fabs(fRunInfo->fT0[0]-runData->GetT0(fRunInfo->GetForwardHistoNo()-1))>5.0) { // given in bins!!
+      if (fabs(fRunInfo->GetT0(0)-runData->GetT0(fRunInfo->GetForwardHistoNo()-1))>5.0) { // given in bins!!
         cerr << endl << "PRunAsymmetry::PrepareData(): **WARNING**: forward histo";
-        cerr << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[0];
+        cerr << endl << "  t0 from the msr-file is  " << fRunInfo->GetT0(0);
         cerr << endl << "  t0 from the data file is " << runData->GetT0(fRunInfo->GetForwardHistoNo()-1);
         cerr << endl << "  This is quite a deviation! Is this done intentionally??";
         cerr << endl;
       }
-      if (fabs(fRunInfo->fT0[1]-runData->GetT0(fRunInfo->GetBackwardHistoNo()-1))>5.0) { // given in bins!!
+      if (fabs(fRunInfo->GetT0(1)-runData->GetT0(fRunInfo->GetBackwardHistoNo()-1))>5.0) { // given in bins!!
         cerr << endl << "PRunAsymmetry::PrepareData(): **WARNING**: backward histo";
-        cerr << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[1];
+        cerr << endl << "  t0 from the msr-file is  " << fRunInfo->GetT0(1);
         cerr << endl << "  t0 from the data file is " << runData->GetT0(fRunInfo->GetBackwardHistoNo()-1);
         cerr << endl << "  This is quite a deviation! Is this done intentionally??";
         cerr << endl;
       }
     }
-    fT0s.push_back(fRunInfo->fT0[0]); // forward  t0
-    fT0s.push_back(fRunInfo->fT0[1]); // backward t0
+    fT0s.push_back(fRunInfo->GetT0(0)); // forward  t0
+    fT0s.push_back(fRunInfo->GetT0(1)); // backward t0
   }
 
   // check if post pile up data shall be used
@@ -358,9 +358,9 @@ Bool_t PRunAsymmetry::PrepareData()
 
   // check if addrun's are present, and if yes add data
   // check if there are runs to be added to the current one
-  if (fRunInfo->GetRunNames().size() > 1) { // runs to be added present
+  if (fRunInfo->GetRunNameSize() > 1) { // runs to be added present
     PRawRunData *addRunData;
-    for (UInt_t i=1; i<fRunInfo->GetRunNames().size(); i++) {
+    for (UInt_t i=1; i<fRunInfo->GetRunNameSize(); i++) {
       // get run to be added to the main one
       addRunData = fRawData->GetRunData(*(fRunInfo->GetRunName(i)));
       if (addRunData == 0) { // couldn't get run
@@ -372,7 +372,7 @@ Bool_t PRunAsymmetry::PrepareData()
       // get T0's of the to be added run
       Int_t t0Add[2] = {0, 0};
       // check if the t0's are given in the msr-file
-      if (2*i+1 >= fRunInfo->fT0.size()) { // t0's are NOT in the msr-file
+      if (2*i+1 >= fRunInfo->GetT0Size()) { // t0's are NOT in the msr-file
         // check if the t0's are in the data file
         if (addRunData->GetT0s().size() != 0) { // t0's in the run data
           // keep the proper t0's. For asymmetry runs, forward/backward are holding the histo no
@@ -386,23 +386,23 @@ Bool_t PRunAsymmetry::PrepareData()
         }
       } else { // t0's in the msr-file
         // check if t0's are given in the data file
-        if (2*i+1 < fRunInfo->fT0.size()) {
-          t0Add[0] = fRunInfo->fT0[2*i];
-          t0Add[1] = fRunInfo->fT0[2*i+1];
+        if (2*i+1 < fRunInfo->GetT0Size()) {
+          t0Add[0] = fRunInfo->GetT0(2*i);
+          t0Add[1] = fRunInfo->GetT0(2*i+1);
         } else {
           cerr << endl << "PRunAsymmetry::PrepareData(): **WARNING** NO t0's found, neither in the addrun data (";
           cerr << fRunInfo->GetRunName(i)->Data();
           cerr << "), nor in the msr-file! Will try to use the T0 of the run data (";
           cerr << fRunInfo->GetRunName(i)->Data();
           cerr << ") without any warranty!";
-          t0Add[0] = fRunInfo->fT0[0];
-          t0Add[1] = fRunInfo->fT0[1];
+          t0Add[0] = fRunInfo->GetT0(0);
+          t0Add[1] = fRunInfo->GetT0(1);
         }
         if (addRunData->GetT0s().size() != 0) {
           // compare t0's of the msr-file with the one in the data file
           if (fabs(t0Add[0]-addRunData->GetT0(fRunInfo->GetForwardHistoNo()-1))>5.0) { // given in bins!!
             cerr << endl << "PRunAsymmetry::PrepareData(): **WARNING**: forward histo";
-            cerr << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[2*i];
+            cerr << endl << "  t0 from the msr-file is  " << fRunInfo->GetT0(2*i);
             cerr << endl << "  t0 from the data file is " << addRunData->GetT0(fRunInfo->GetForwardHistoNo()-1);
             cerr << endl << "  This is quite a deviation! Is this done intentionally??";
             cerr << endl << "  addrun: " << fRunInfo->GetRunName(i)->Data();
@@ -410,7 +410,7 @@ Bool_t PRunAsymmetry::PrepareData()
           }
           if (fabs(t0Add[1]-addRunData->GetT0(fRunInfo->GetBackwardHistoNo()-1))>5.0) { // given in bins!!
             cerr << endl << "PRunAsymmetry::PrepareData(): **WARNING**: backward histo";
-            cerr << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[2*i+1];
+            cerr << endl << "  t0 from the msr-file is  " << fRunInfo->GetT0(2*i+1);
             cerr << endl << "  t0 from the data file is " << addRunData->GetT0(fRunInfo->GetBackwardHistoNo()-1);
             cerr << endl << "  This is quite a deviation! Is this done intentionally??";
             cerr << endl << "  addrun: " << fRunInfo->GetRunName(i)->Data();
@@ -440,8 +440,8 @@ Bool_t PRunAsymmetry::PrepareData()
   }
 
   // subtract background from histogramms ------------------------------------------
-  if (fRunInfo->GetBkgsFix().size() == 0) { // no fixed background given
-    if (fRunInfo->GetBkgRanges().size() != 0) {
+  if (fRunInfo->GetBkgFixSize() == 0) { // no fixed background given
+    if (fRunInfo->GetBkgRangeSize() != 0) {
       if (!SubtractEstimatedBkg())
         return false;
     } else { // no background given to do the job

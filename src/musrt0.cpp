@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
     for (unsigned int i=0; i<runList->size(); i++) {
       switch (runList->at(i).GetFitType()) {
         case MSR_FITTYPE_SINGLE_HISTO:
-          for (unsigned int j=0; j<runList->at(i).GetRunNames().size(); j++) { // necessary in case of ADDRUN
+          for (unsigned int j=0; j<runList->at(i).GetRunNameSize(); j++) { // necessary in case of ADDRUN
             if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetForwardHistoNo(), 0, j)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
@@ -253,7 +253,7 @@ int main(int argc, char *argv[])
           }
           break;
         case MSR_FITTYPE_ASYM:
-          for (unsigned int j=0; j<runList->at(i).GetRunNames().size(); j++) { // necessary in case of ADDRUN
+          for (unsigned int j=0; j<runList->at(i).GetRunNameSize(); j++) { // necessary in case of ADDRUN
             if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetForwardHistoNo(), 0, j)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
@@ -265,7 +265,7 @@ int main(int argc, char *argv[])
           }
           break;
         case MSR_FITTYPE_ASYM_RRF:
-          for (unsigned int j=0; j<runList->at(i).GetRunNames().size(); j++) { // necessary in case of ADDRUN
+          for (unsigned int j=0; j<runList->at(i).GetRunNameSize(); j++) { // necessary in case of ADDRUN
             if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetForwardHistoNo(), 0, j)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);

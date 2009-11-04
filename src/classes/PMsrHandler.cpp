@@ -638,7 +638,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         } else if (sstr.BeginsWith("backgr.fix")) {
           fout.width(15);
           fout << left << "backgr.fix";
-          for (UInt_t j=0; j<fRuns[runNo].GetBkgsFix().size(); j++) {
+          for (UInt_t j=0; j<fRuns[runNo].GetBkgFixSize(); j++) {
             fout.precision(prec);
             fout.width(12);
             fout << left << fRuns[runNo].GetBkgFix(j);
@@ -647,7 +647,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         } else if (sstr.BeginsWith("background")) {
           fout.width(16);
           fout << left << "background";
-          for (UInt_t j=0; j<fRuns[runNo].GetBkgRanges().size(); j++) {
+          for (UInt_t j=0; j<fRuns[runNo].GetBkgRangeSize(); j++) {
             fout.width(8);
             fout << left << fRuns[runNo].GetBkgRange(j);
           }
@@ -655,7 +655,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         } else if (sstr.BeginsWith("data")) {
           fout.width(16);
           fout << left << "data";
-          for (UInt_t j=0; j<fRuns[runNo].GetDataRanges().size(); j++) {
+          for (UInt_t j=0; j<fRuns[runNo].GetDataRangeSize(); j++) {
             fout.width(8);
             fout << left << fRuns[runNo].GetDataRange(j);
           }
@@ -663,9 +663,9 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         } else if (sstr.BeginsWith("t0")) {
           fout.width(16);
           fout << left << "t0";
-          for (UInt_t j=0; j<fRuns[runNo].fT0.size(); j++) {
+          for (UInt_t j=0; j<fRuns[runNo].GetT0Size(); j++) {
             fout.width(8);
-            fout << left << fRuns[runNo].fT0[j];
+            fout << left << fRuns[runNo].GetT0(j);
           }
           fout << endl;
         } else if (sstr.BeginsWith("xy-data")) {
@@ -697,11 +697,11 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           fout.width(16);
           fout << left << "fit";
           for (UInt_t j=0; j<2; j++) {
-            if (fRuns[runNo].fFitRange[j] == -1)
+            if (fRuns[runNo].GetFitRange(j) == -1)
               break;
             fout.width(8);
             fout.precision(2);
-            fout << left << fixed << fRuns[runNo].fFitRange[j];
+            fout << left << fixed << fRuns[runNo].GetFitRange(j);
           }
           fout << endl;
         } else if (sstr.BeginsWith("packing")) {
@@ -1087,13 +1087,13 @@ void PMsrHandler::SetMsrT0Entry(UInt_t runNo, UInt_t idx, Int_t bin)
     return;
   }
 
-  if ((idx < 0) || (idx > fRuns[runNo].fT0.size())) { // error
-    cerr << endl << "PMsrHandler::SetMsrT0Entry: **ERROR** idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].fT0.size();
+  if ((idx < 0) || (idx > fRuns[runNo].GetT0Size())) { // error
+    cerr << endl << "PMsrHandler::SetMsrT0Entry: **ERROR** idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].GetT0Size();
     cerr << endl;
     return;
   }
 
-  fRuns[runNo].fT0[idx] = bin;
+  fRuns[runNo].SetT0(bin, idx);
 }
 
 //--------------------------------------------------------------------------
@@ -1114,8 +1114,8 @@ void PMsrHandler::SetMsrDataRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
     return;
   }
 
-  if ((idx < 0) || (idx > fRuns[runNo].GetDataRanges().size())) { // error
-    cerr << endl << "PMsrHandler::SetMsrDataRangeEntry: **ERROR** idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].GetDataRanges().size();
+  if ((idx < 0) || (idx > fRuns[runNo].GetDataRangeSize())) { // error
+    cerr << endl << "PMsrHandler::SetMsrDataRangeEntry: **ERROR** idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].GetDataRangeSize();
     cerr << endl;
     return;
   }
@@ -1141,8 +1141,8 @@ void PMsrHandler::SetMsrBkgRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
     return;
   }
 
-  if ((idx < 0) || (idx > fRuns[runNo].GetBkgRanges().size())) { // error
-    cerr << endl << "PMsrHandler::SetMsrBkgRangeEntry: idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].GetBkgRanges().size();
+  if ((idx < 0) || (idx > fRuns[runNo].GetBkgRangeSize())) { // error
+    cerr << endl << "PMsrHandler::SetMsrBkgRangeEntry: idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].GetBkgRangeSize();
     cerr << endl;
     return;
   }
@@ -1727,7 +1727,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsDigit())
-            param.fT0.push_back(str.Atoi());
+            param.AppendT0(str.Atoi());
           else
             error = true;
         }
@@ -1743,7 +1743,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsFloat())
-            param.fFitRange[i-1] = str.Atof();
+            param.SetFitRange(str.Atof(), i-1);
           else
             error = true;
         }
@@ -1899,9 +1899,9 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       Bool_t found;
       if (fRuns[i].GetBkgFitParamNo() >= 0) { // check if backgr.fit is given
         found = true;
-      } else if (fRuns[i].GetBkgsFix().size() > 0) { // check if backgr.fix is given
+      } else if (fRuns[i].GetBkgFixSize() > 0) { // check if backgr.fix is given
         found = true;
-      } else if (fRuns[i].GetBkgRanges().size() > 0) { // check if background window is given
+      } else if (fRuns[i].GetBkgRangeSize() > 0) { // check if background window is given
         found = true;
       } else {
         found = false;

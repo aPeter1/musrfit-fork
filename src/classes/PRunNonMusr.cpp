@@ -158,7 +158,7 @@ Bool_t PRunNonMusr::PrepareData()
 
 //cout << endl << "in PRunNonMusr::PrepareData(): will feed fFitData";
 
-  if (fRunInfo->GetRunNames().size() > 1) { // ADDRUN present which is not supported for NonMusr
+  if (fRunInfo->GetRunNameSize() > 1) { // ADDRUN present which is not supported for NonMusr
     cerr << endl << ">> PRunNonMusr::PrepareData(): **WARNING** ADDRUN NOT SUPPORTED FOR THIS FIT TYPE, WILL IGNORE IT." << endl;
   }
 
@@ -184,8 +184,8 @@ Bool_t PRunNonMusr::PrepareFitData()
   Bool_t success = true;
 
   // keep start/stop time for fit: here the meaning is of course start x, stop x
-  fFitStartTime = fRunInfo->fFitRange[0];
-  fFitStopTime  = fRunInfo->fFitRange[1];
+  fFitStartTime = fRunInfo->GetFitRange(0);
+  fFitStopTime  = fRunInfo->GetFitRange(1);
 
   // get x-, y-index
   UInt_t xIndex = GetXIndex();

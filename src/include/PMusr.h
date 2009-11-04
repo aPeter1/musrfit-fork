@@ -363,13 +363,13 @@ class PMsrRunBlock {
     virtual ~PMsrRunBlock();
     virtual void CleanUp();
 
-    virtual PStringVector GetRunNames() { return fRunName; }
+    virtual UInt_t GetRunNameSize() { return fRunName.size(); }
     virtual TString *GetRunName(UInt_t i=0);
-    virtual PStringVector GetBeamlines() { return fBeamline; }
+    virtual UInt_t GetBeamlineSize() { return fBeamline.size(); }
     virtual TString *GetBeamline(UInt_t i=0);
-    virtual PStringVector GetInstitutes() { return fInstitute; }
+    virtual UInt_t GetInstituteSize() { return fInstitute.size(); }
     virtual TString *GetInstitute(UInt_t i=0);
-    virtual PStringVector GetFileFormats() { return fFileFormat; }
+    virtual UInt_t GetFileFormatSize() { return fFileFormat.size(); }
     virtual TString *GetFileFormat(UInt_t i=0);
     virtual Int_t GetFitType() { return fFitType; }
     virtual Int_t GetAlphaParamNo() { return fAlphaParamNo; }
@@ -383,15 +383,15 @@ class PMsrRunBlock {
     virtual Int_t GetMap(UInt_t idx);
     virtual Int_t GetForwardHistoNo() { return fForwardHistoNo; }
     virtual Int_t GetBackwardHistoNo() { return fBackwardHistoNo; }
-    virtual PDoubleVector GetBkgsFix() { return fBkgFix; }
+    virtual UInt_t GetBkgFixSize() { return fBkgFix.size(); }
     virtual Double_t GetBkgFix(UInt_t i=0);
-    virtual PIntVector GetBkgRanges() { return fBkgRange; }
+    virtual UInt_t GetBkgRangeSize() { return fBkgRange.size(); }
     virtual Int_t GetBkgRange(UInt_t i=0);
-    virtual PIntVector GetDataRanges() { return fDataRange; }
+    virtual UInt_t GetDataRangeSize() { return fDataRange.size(); }
     virtual Int_t GetDataRange(UInt_t i=0);
-//    virtual Int_t GetT0(UInt_t i=0);
-//    virtual Double_t GetFitRangeFirst() { return fFitRange[0]; }
-//    virtual Double_t GetFitRangeLast() { return fFitRange[1]; }
+    virtual UInt_t GetT0Size() { return fT0.size(); }
+    virtual Int_t GetT0(UInt_t i=0);
+    virtual Double_t GetFitRange(UInt_t i);
 //    virtual Int_t GetPacking() { return fPacking; }
 //    virtual Double_t GetRRFFreq() { return fRRFFreq; }
 //    virtual Int_t GetAlpha2ParamNo() { return fAlpha2ParamNo; }
@@ -429,10 +429,9 @@ class PMsrRunBlock {
     virtual void SetBkgRange(Int_t ival, UInt_t idx);
     virtual void AppendDataRange(Int_t ival) { fDataRange.push_back(ival); }
     virtual void SetDataRange(Int_t ival, UInt_t idx);
-//    virtual void AppendT0(Int_t ival) { fT0.push_back(ival); }
-//    virtual void SetT0(Int_t ival, UInt_t idx);
-//    virtual void SetFitRangeFirst(Double_t dval) { fFitRange[0] = dval; }
-//    virtual void SetFitRangeLast(Double_t dval) { fFitRange[1] = dval; }
+    virtual void AppendT0(Int_t ival) { fT0.push_back(ival); }
+    virtual void SetT0(Int_t ival, UInt_t idx);
+    virtual void SetFitRange(Double_t dval, UInt_t idx);
 //    virtual void SetPacking(Int_t ival) { fPacking = ival; }
 //    virtual void SetRRFFreq(Double_t dval) { fRRFFreq = dval; }
 //    virtual void SetAlpha2ParamNo(Int_t ival) { fAlpha2ParamNo = ival; }
@@ -444,8 +443,6 @@ class PMsrRunBlock {
 //    virtual void SetXDataLabel(TString& str) { fXYDataLabel[0] = str; }
 //    virtual void SetYDataLabel(TString& str) { fXYDataLabel[1] = str; }
 
-    PIntVector fT0;               ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
-    Double_t fFitRange[2];        ///< fit range in (us)
     Int_t fPacking;               ///< packing/rebinning
     Double_t fRRFFreq;            ///< rotating reference frequency (fit type 4)
     Int_t fRRFPacking;            ///< rotating reference packing (fit type 4)
@@ -475,8 +472,17 @@ class PMsrRunBlock {
     PDoubleVector fBkgFix;        ///< fixed background in (1/ns) (fit type 0, 2, 4)
     PIntVector fBkgRange;     ///< background bin range (fit type 0, 2, 4)
     PIntVector fDataRange;        ///< data bin range (fit type 0, 2, 4)
-//    PIntVector fT0;               ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
-//    PDoublePair fFitRange;        ///< fit range in (us)
+    PIntVector fT0;               ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
+    Double_t fFitRange[2];        ///< fit range in (us)
+//    Int_t fPacking;               ///< packing/rebinning
+//    Double_t fRRFFreq;            ///< rotating reference frequency (fit type 4)
+//    Int_t fRRFPacking;            ///< rotating reference packing (fit type 4)
+//    Int_t fAlpha2ParamNo;         ///< rotating reference alpha2 (fit type 4)
+//    Int_t fBeta2ParamNo;          ///< rotating reference beta2 (fit type 4)
+//    Int_t fRightHistoNo;          ///< rotating reference right histogram number (fit type 4)
+//    Int_t fLeftHistoNo;           ///< rotating reference left histogram number (fit type 4)
+//    Int_t fXYDataIndex[2];        ///< used to get the data indices when using db-files (fit type 8)
+//    TString fXYDataLabel[2];      ///< used to get the indices via labels when using db-files  (fit type 8)
 };
 
 //-------------------------------------------------------------

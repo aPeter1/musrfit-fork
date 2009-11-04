@@ -325,10 +325,10 @@ void PMusrT0::InitDataAndBkg()
   Int_t t0Bin = 0;
   switch (fDetectorTag) {
     case DETECTOR_TAG_FORWARD:
-      t0Bin = fMsrHandler->GetMsrRunList()->at(fRunNo).fT0[0 + fAddRunNo * fAddRunOffset/2];
+      t0Bin = fMsrHandler->GetMsrRunList()->at(fRunNo).GetT0(0 + fAddRunNo * fAddRunOffset/2);
       break;
     case DETECTOR_TAG_BACKWARD:
-      t0Bin = fMsrHandler->GetMsrRunList()->at(fRunNo).fT0[1 + fAddRunNo * fAddRunOffset/2];
+      t0Bin = fMsrHandler->GetMsrRunList()->at(fRunNo).GetT0(1 + fAddRunNo * fAddRunOffset/2);
       break;
     case DETECTOR_TAG_RIGHT:
       // not clear yet what to be done

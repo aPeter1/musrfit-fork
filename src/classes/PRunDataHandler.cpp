@@ -144,7 +144,7 @@ Bool_t PRunDataHandler::ReadFile()
   }
 
   for (UInt_t i=0; i<runList->size(); i++) {
-    for (UInt_t j=0; j<runList->at(i).GetRunNames().size(); j++) {
+    for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++) {
       fRunName = *(runList->at(i).GetRunName(j));
       // check is file is already read
       if (FileAlreadyRead(*(runList->at(i).GetRunName(j))))
