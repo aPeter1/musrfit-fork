@@ -536,13 +536,13 @@ void PMusrCanvas::UpdateInfoPad()
     // histo info (depending on the fittype
     if (runs[runNo].GetFitType() == MSR_FITTYPE_SINGLE_HISTO) {
       tstr += TString("h:");
-      tstr += runs[runNo].fForwardHistoNo;
+      tstr += runs[runNo].GetForwardHistoNo();
       tstr += TString(",");
     } else if (runs[runNo].GetFitType() == MSR_FITTYPE_ASYM) {
       tstr += TString("h:");
-      tstr += runs[runNo].fForwardHistoNo;
+      tstr += runs[runNo].GetForwardHistoNo();
       tstr += TString("/");
-      tstr += runs[runNo].fBackwardHistoNo;
+      tstr += runs[runNo].GetBackwardHistoNo();
       tstr += TString(",");
     }
     // temperature if present

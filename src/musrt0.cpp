@@ -246,7 +246,7 @@ int main(int argc, char *argv[])
       switch (runList->at(i).GetFitType()) {
         case MSR_FITTYPE_SINGLE_HISTO:
           for (unsigned int j=0; j<runList->at(i).GetRunNames().size(); j++) { // necessary in case of ADDRUN
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).fForwardHistoNo, 0, j)) {
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetForwardHistoNo(), 0, j)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
             }
@@ -254,11 +254,11 @@ int main(int argc, char *argv[])
           break;
         case MSR_FITTYPE_ASYM:
           for (unsigned int j=0; j<runList->at(i).GetRunNames().size(); j++) { // necessary in case of ADDRUN
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).fForwardHistoNo, 0, j)) {
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetForwardHistoNo(), 0, j)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
             }
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).fBackwardHistoNo, 1, j)) {
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetBackwardHistoNo(), 1, j)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
             }
@@ -266,11 +266,11 @@ int main(int argc, char *argv[])
           break;
         case MSR_FITTYPE_ASYM_RRF:
           for (unsigned int j=0; j<runList->at(i).GetRunNames().size(); j++) { // necessary in case of ADDRUN
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).fForwardHistoNo, 0, j)) {
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetForwardHistoNo(), 0, j)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
             }
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).fBackwardHistoNo, 1, j)) {
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetBackwardHistoNo(), 1, j)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
             }

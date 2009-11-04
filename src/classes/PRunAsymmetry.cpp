@@ -305,8 +305,8 @@ Bool_t PRunAsymmetry::PrepareData()
     if (runData->GetT0s().size() != 0) { // t0's in the run data
       // keep the proper t0's. For asymmetry runs, forward/backward are holding the histo no
       // fForwardHistoNo starts with 1 not with 0 etc. ;-)
-      fT0s.push_back(runData->GetT0(fRunInfo->fForwardHistoNo-1));  // forward  t0
-      fT0s.push_back(runData->GetT0(fRunInfo->fBackwardHistoNo-1)); // backward t0
+      fT0s.push_back(runData->GetT0(fRunInfo->GetForwardHistoNo()-1));  // forward  t0
+      fT0s.push_back(runData->GetT0(fRunInfo->GetBackwardHistoNo()-1)); // backward t0
     } else { // t0's are neither in the run data nor in the msr-file -> not acceptable!
       cerr << endl << "PRunAsymmetry::PrepareData(): **ERROR** NO t0's found, neither in the run data nor in the msr-file!";
       cerr << endl;
@@ -316,17 +316,17 @@ Bool_t PRunAsymmetry::PrepareData()
     // check if t0's are given in the data file
     if (runData->GetT0s().size() != 0) {
       // compare t0's of the msr-file with the one in the data file
-      if (fabs(fRunInfo->fT0[0]-runData->GetT0(fRunInfo->fForwardHistoNo-1))>5.0) { // given in bins!!
+      if (fabs(fRunInfo->fT0[0]-runData->GetT0(fRunInfo->GetForwardHistoNo()-1))>5.0) { // given in bins!!
         cerr << endl << "PRunAsymmetry::PrepareData(): **WARNING**: forward histo";
         cerr << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[0];
-        cerr << endl << "  t0 from the data file is " << runData->GetT0(fRunInfo->fForwardHistoNo-1);
+        cerr << endl << "  t0 from the data file is " << runData->GetT0(fRunInfo->GetForwardHistoNo()-1);
         cerr << endl << "  This is quite a deviation! Is this done intentionally??";
         cerr << endl;
       }
-      if (fabs(fRunInfo->fT0[1]-runData->GetT0(fRunInfo->fBackwardHistoNo-1))>5.0) { // given in bins!!
+      if (fabs(fRunInfo->fT0[1]-runData->GetT0(fRunInfo->GetBackwardHistoNo()-1))>5.0) { // given in bins!!
         cerr << endl << "PRunAsymmetry::PrepareData(): **WARNING**: backward histo";
         cerr << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[1];
-        cerr << endl << "  t0 from the data file is " << runData->GetT0(fRunInfo->fBackwardHistoNo-1);
+        cerr << endl << "  t0 from the data file is " << runData->GetT0(fRunInfo->GetBackwardHistoNo()-1);
         cerr << endl << "  This is quite a deviation! Is this done intentionally??";
         cerr << endl;
       }
@@ -337,8 +337,8 @@ Bool_t PRunAsymmetry::PrepareData()
 
   // check if post pile up data shall be used
   UInt_t histoNo[2]; // forward/backward
-  histoNo[0] = fRunInfo->fForwardHistoNo-1;
-  histoNo[1] = fRunInfo->fBackwardHistoNo-1;
+  histoNo[0] = fRunInfo->GetForwardHistoNo()-1;
+  histoNo[1] = fRunInfo->GetBackwardHistoNo()-1;
   // first check if forward/backward given in the msr-file are valid
   if ((runData->GetNoOfHistos() < histoNo[0]+1) || (histoNo[0] < 0) ||
       (runData->GetNoOfHistos() < histoNo[1]+1) || (histoNo[1] < 0)) {
@@ -377,8 +377,8 @@ Bool_t PRunAsymmetry::PrepareData()
         if (addRunData->GetT0s().size() != 0) { // t0's in the run data
           // keep the proper t0's. For asymmetry runs, forward/backward are holding the histo no
           // fForwardHistoNo starts with 1 not with 0 etc. ;-)
-          t0Add[0] = addRunData->GetT0(fRunInfo->fForwardHistoNo-1);  // forward  t0
-          t0Add[1] = addRunData->GetT0(fRunInfo->fBackwardHistoNo-1); // backward t0
+          t0Add[0] = addRunData->GetT0(fRunInfo->GetForwardHistoNo()-1);  // forward  t0
+          t0Add[1] = addRunData->GetT0(fRunInfo->GetBackwardHistoNo()-1); // backward t0
         } else { // t0's are neither in the run data nor in the msr-file -> not acceptable!
           cerr << endl << "PRunAsymmetry::PrepareData(): **ERROR** NO t0's found, neither in the addrun (" << fRunInfo->GetRunName(i)->Data() << ") data nor in the msr-file!";
           cerr << endl;
@@ -400,18 +400,18 @@ Bool_t PRunAsymmetry::PrepareData()
         }
         if (addRunData->GetT0s().size() != 0) {
           // compare t0's of the msr-file with the one in the data file
-          if (fabs(t0Add[0]-addRunData->GetT0(fRunInfo->fForwardHistoNo-1))>5.0) { // given in bins!!
+          if (fabs(t0Add[0]-addRunData->GetT0(fRunInfo->GetForwardHistoNo()-1))>5.0) { // given in bins!!
             cerr << endl << "PRunAsymmetry::PrepareData(): **WARNING**: forward histo";
             cerr << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[2*i];
-            cerr << endl << "  t0 from the data file is " << addRunData->GetT0(fRunInfo->fForwardHistoNo-1);
+            cerr << endl << "  t0 from the data file is " << addRunData->GetT0(fRunInfo->GetForwardHistoNo()-1);
             cerr << endl << "  This is quite a deviation! Is this done intentionally??";
             cerr << endl << "  addrun: " << fRunInfo->GetRunName(i)->Data();
             cerr << endl;
           }
-          if (fabs(t0Add[1]-addRunData->GetT0(fRunInfo->fBackwardHistoNo-1))>5.0) { // given in bins!!
+          if (fabs(t0Add[1]-addRunData->GetT0(fRunInfo->GetBackwardHistoNo()-1))>5.0) { // given in bins!!
             cerr << endl << "PRunAsymmetry::PrepareData(): **WARNING**: backward histo";
             cerr << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[2*i+1];
-            cerr << endl << "  t0 from the data file is " << addRunData->GetT0(fRunInfo->fBackwardHistoNo-1);
+            cerr << endl << "  t0 from the data file is " << addRunData->GetT0(fRunInfo->GetBackwardHistoNo()-1);
             cerr << endl << "  This is quite a deviation! Is this done intentionally??";
             cerr << endl << "  addrun: " << fRunInfo->GetRunName(i)->Data();
             cerr << endl;
@@ -440,8 +440,8 @@ Bool_t PRunAsymmetry::PrepareData()
   }
 
   // subtract background from histogramms ------------------------------------------
-  if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given
-    if (fRunInfo->fBkgRange.size() != 0) {
+  if (fRunInfo->GetBkgsFix().size() == 0) { // no fixed background given
+    if (fRunInfo->GetBkgRanges().size() != 0) {
       if (!SubtractEstimatedBkg())
         return false;
     } else { // no background given to do the job
@@ -489,10 +489,10 @@ Bool_t PRunAsymmetry::PrepareData()
 Bool_t PRunAsymmetry::SubtractFixBkg()
 {  
   for (UInt_t i=0; i<fForward.size(); i++) {
-    fForwardErr.push_back(TMath::Sqrt(fForward[i]+fRunInfo->fBkgFix[0] * fTimeResolution * 1.0e3));
-    fForward[i] -= fRunInfo->fBkgFix[0] * fTimeResolution * 1.0e3; // bkg per ns -> bkg per bin; 1.0e3: us -> ns
-    fBackwardErr.push_back(TMath::Sqrt(fBackward[i]+fRunInfo->fBkgFix[1] * fTimeResolution * 1.0e3));
-    fBackward[i] -= fRunInfo->fBkgFix[1] * fTimeResolution * 1.0e3; // bkg per ns -> bkg per bin; 1.0e3: us -> ns
+    fForwardErr.push_back(TMath::Sqrt(fForward[i]+fRunInfo->GetBkgFix(0) * fTimeResolution * 1.0e3));
+    fForward[i] -= fRunInfo->GetBkgFix(0) * fTimeResolution * 1.0e3; // bkg per ns -> bkg per bin; 1.0e3: us -> ns
+    fBackwardErr.push_back(TMath::Sqrt(fBackward[i]+fRunInfo->GetBkgFix(1) * fTimeResolution * 1.0e3));
+    fBackward[i] -= fRunInfo->GetBkgFix(1) * fTimeResolution * 1.0e3; // bkg per ns -> bkg per bin; 1.0e3: us -> ns
   }
   
   return true;
@@ -530,8 +530,8 @@ Bool_t PRunAsymmetry::SubtractEstimatedBkg()
     beamPeriod = 0.0;
 
   // check if start and end are in proper order
-  UInt_t start[2] = {fRunInfo->fBkgRange[0], fRunInfo->fBkgRange[2]};
-  UInt_t end[2]   = {fRunInfo->fBkgRange[1], fRunInfo->fBkgRange[3]};
+  UInt_t start[2] = {fRunInfo->GetBkgRange(0), fRunInfo->GetBkgRange(2)};
+  UInt_t end[2]   = {fRunInfo->GetBkgRange(1), fRunInfo->GetBkgRange(3)};
   for (UInt_t i=0; i<2; i++) {
     if (end[i] < start[i]) {
       cout << endl << "PRunAsymmetry::SubtractEstimatedBkg(): end = " << end[i] << " > start = " << start[i] << "! Will swap them!";
@@ -549,7 +549,7 @@ Bool_t PRunAsymmetry::SubtractEstimatedBkg()
       end[i] = start[i] + (UInt_t)round((Double_t)periods*beamPeriodBins);
       cout << "PRunAsymmetry::SubtractEstimatedBkg(): Background " << start[i] << ", " << end[i] << endl;
       if (end[i] == start[i])
-        end[i] = fRunInfo->fBkgRange[2*i+1];
+        end[i] = fRunInfo->GetBkgRange(2*i+1);
     }
   }
 
@@ -616,8 +616,8 @@ Bool_t PRunAsymmetry::PrepareFitData(PRawRunData* runData, UInt_t histoNo[2])
   // transform raw histo data. This is done the following way (for details see the manual):
   // first rebin the data, than calculate the asymmetry
   // first get start data, end data, and t0
-  Int_t start[2] = {fRunInfo->fDataRange[0], fRunInfo->fDataRange[2]};
-  Int_t end[2]   = {fRunInfo->fDataRange[1], fRunInfo->fDataRange[3]};
+  Int_t start[2] = {fRunInfo->GetDataRange(0), fRunInfo->GetDataRange(2)};
+  Int_t end[2]   = {fRunInfo->GetDataRange(1), fRunInfo->GetDataRange(3)};
   Double_t t0[2] = {fT0s[0], fT0s[1]};
   // check if start, end, and t0 make any sense
   // 1st check if start and end are in proper order
@@ -773,13 +773,13 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
   // transform raw histo data. This is done the following way (for details see the manual):
   // first rebin the data, than calculate the asymmetry
   // first get start data, end data, and t0
-  Int_t val = fRunInfo->fDataRange[0]-packing*(fRunInfo->fDataRange[0]/packing);
+  Int_t val = fRunInfo->GetDataRange(0)-packing*(fRunInfo->GetDataRange(0)/packing);
   do {
-    if (fRunInfo->fDataRange[2] - fRunInfo->fDataRange[0] < 0)
+    if (fRunInfo->GetDataRange(2) - fRunInfo->GetDataRange(0) < 0)
       val += packing;
-  } while (val + fRunInfo->fDataRange[2] - fRunInfo->fDataRange[0] < 0);
+  } while (val + fRunInfo->GetDataRange(2) - fRunInfo->GetDataRange(0) < 0);
 
-  Int_t start[2] = {val, val + fRunInfo->fDataRange[2] - fRunInfo->fDataRange[0]};
+  Int_t start[2] = {val, val + fRunInfo->GetDataRange(2) - fRunInfo->GetDataRange(0)};
   Int_t end[2];
   Double_t t0[2] = {fT0s[0], fT0s[1]};
 

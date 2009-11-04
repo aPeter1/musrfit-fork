@@ -255,12 +255,12 @@ void PMusrT0::InitDataAndBkg()
   // feed data range histo
   switch (fDetectorTag) {
     case DETECTOR_TAG_FORWARD:
-      fDataRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[0 + fAddRunNo * fAddRunOffset];
-      fDataRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[1 + fAddRunNo * fAddRunOffset];
+      fDataRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).GetDataRange(0 + fAddRunNo * fAddRunOffset);
+      fDataRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).GetDataRange(1 + fAddRunNo * fAddRunOffset);
       break;
     case DETECTOR_TAG_BACKWARD:
-      fDataRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[2 + fAddRunNo * fAddRunOffset];
-      fDataRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fDataRange[3 + fAddRunNo * fAddRunOffset];
+      fDataRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).GetDataRange(2 + fAddRunNo * fAddRunOffset);
+      fDataRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).GetDataRange(3 + fAddRunNo * fAddRunOffset);
       break;
     case DETECTOR_TAG_RIGHT:
       // not clear yet what to be done
@@ -289,12 +289,12 @@ void PMusrT0::InitDataAndBkg()
   // feed background histo
   switch (fDetectorTag) {
     case DETECTOR_TAG_FORWARD:
-      fBkgRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[0 + fAddRunNo * fAddRunOffset];
-      fBkgRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[1 + fAddRunNo * fAddRunOffset];
+      fBkgRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).GetBkgRange(0 + fAddRunNo * fAddRunOffset);
+      fBkgRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).GetBkgRange(1 + fAddRunNo * fAddRunOffset);
       break;
     case DETECTOR_TAG_BACKWARD:
-      fBkgRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[2 + fAddRunNo * fAddRunOffset];
-      fBkgRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).fBkgRange[3 + fAddRunNo * fAddRunOffset];
+      fBkgRange[0] = fMsrHandler->GetMsrRunList()->at(fRunNo).GetBkgRange(2 + fAddRunNo * fAddRunOffset);
+      fBkgRange[1] = fMsrHandler->GetMsrRunList()->at(fRunNo).GetBkgRange(3 + fAddRunNo * fAddRunOffset);
       break;
     case DETECTOR_TAG_RIGHT:
       // not clear yet what to be done

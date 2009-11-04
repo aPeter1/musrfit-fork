@@ -29,6 +29,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <cassert>
+
 #include <iostream>
 using namespace std;
 
@@ -697,9 +699,9 @@ Int_t PMsrRunBlock::GetMap(UInt_t i)
 // SetMap
 //--------------------------------------------------------------------------
 /**
- * <p> set file format name at position i
+ * <p> set map value at position i
  *
- * \param i index of the file format name to be set
+ * \param i index of the map value to be set
  */
 void PMsrRunBlock::SetMap(Int_t mapVal, UInt_t idx)
 {
@@ -707,4 +709,104 @@ void PMsrRunBlock::SetMap(Int_t mapVal, UInt_t idx)
     fMap.resize(idx+1);
 
   fMap[idx] = mapVal;
+}
+
+//--------------------------------------------------------------------------
+// GetBkgFix
+//--------------------------------------------------------------------------
+/**
+ * <p> get background fixed value at position i
+ *
+ * \param i index of the background fixed value to be returned
+ */
+Double_t PMsrRunBlock::GetBkgFix(UInt_t i)
+{
+  if (i>fBkgFix.size())
+    return PMUSR_UNDEFINED;
+
+  return fBkgFix[i];
+}
+
+//--------------------------------------------------------------------------
+// SetBkgFix
+//--------------------------------------------------------------------------
+/**
+ * <p> set background fixed value at position i
+ *
+ * \param i index of the background fixed value to be set
+ */
+void PMsrRunBlock::SetBkgFix(Double_t dval, UInt_t idx)
+{
+  if (idx>fBkgFix.size())
+    fBkgFix.resize(idx+1);
+
+  fBkgFix[idx] = dval;
+}
+
+//--------------------------------------------------------------------------
+// GetBkgRange
+//--------------------------------------------------------------------------
+/**
+ * <p> get background range at position i
+ *
+ * \param i index of the background range to be returned
+ */
+Int_t PMsrRunBlock::GetBkgRange(UInt_t i)
+{
+  if (i > fBkgRange.size()) {
+    cerr << endl << ">> PMsrRunBlock::GetBkgRange: **ERROR** index i=" << i << " out of range, fatal." << endl;
+    assert(0);
+  }
+
+  return fBkgRange[i];
+}
+
+//--------------------------------------------------------------------------
+// SetBkgRange
+//--------------------------------------------------------------------------
+/**
+ * <p> set background range element at position i
+ *
+ * \param i index of the background range element to be returned
+ */
+void PMsrRunBlock::SetBkgRange(Int_t ival, UInt_t idx)
+{
+  if (idx > fBkgRange.size())
+    fBkgRange.resize(idx+1);
+
+  fBkgRange[idx] = ival;
+}
+
+//--------------------------------------------------------------------------
+// GetDataRange
+//--------------------------------------------------------------------------
+/**
+ * <p> get data range at position i
+ *
+ * \param i index of the data range to be returned
+ */
+Int_t PMsrRunBlock::GetDataRange(UInt_t i)
+{
+  if (i > fDataRange.size()) {
+    cerr << endl << ">> PMsrRunBlock::GetDataRange: **ERROR** index i=" << i << " out of range, fatal." << endl;
+    assert(0);
+  }
+
+  return fDataRange[i];
+}
+
+//--------------------------------------------------------------------------
+// SetDataRange
+//--------------------------------------------------------------------------
+/**
+ * <p> set data range element at position i
+ *
+ * \param i index of the data range element to be returned
+ */
+void PMsrRunBlock::SetDataRange(Int_t ival, UInt_t idx)
+{
+  if (idx > fDataRange.size())
+    fDataRange.resize(idx+1);
+
+  fDataRange[idx] = ival;
 }

@@ -120,10 +120,10 @@ Double_t PRunSingleHisto::CalcChiSquare(const std::vector<Double_t>& par)
   // get background
   Double_t bkg;
   if (fRunInfo->GetBkgFitParamNo() == -1) { // bkg not fitted
-    if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given (background interval)
+    if (fRunInfo->GetBkgsFix().size() == 0) { // no fixed background given (background interval)
       bkg = fBackground;
     } else { // fixed bkg given
-      bkg = fRunInfo->fBkgFix[0];
+      bkg = fRunInfo->GetBkgFix(0);
     }
   } else { // bkg fitted
     bkg = par[fRunInfo->GetBkgFitParamNo()-1];
@@ -184,10 +184,10 @@ Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
   // get background
   Double_t bkg;
   if (fRunInfo->GetBkgFitParamNo() == -1) { // bkg not fitted
-    if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given (background interval)
+    if (fRunInfo->GetBkgsFix().size() == 0) { // no fixed background given (background interval)
       bkg = fBackground;
     } else { // fixed bkg given
-      bkg = fRunInfo->fBkgFix[0];
+      bkg = fRunInfo->GetBkgFix(0);
     }
   } else { // bkg fitted
     bkg = par[fRunInfo->GetBkgFitParamNo()-1];
@@ -258,10 +258,10 @@ void PRunSingleHisto::CalcTheory()
   // get background
   Double_t bkg;
   if (fRunInfo->GetBkgFitParamNo() == -1) { // bkg not fitted
-    if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given (background interval)
+    if (fRunInfo->GetBkgsFix().size() == 0) { // no fixed background given (background interval)
       bkg = fBackground;
     } else { // fixed bkg given
-      bkg = fRunInfo->fBkgFix[0];
+      bkg = fRunInfo->GetBkgFix(0);
     }
   } else { // bkg fitted
     bkg = par[fRunInfo->GetBkgFitParamNo()-1];
@@ -308,7 +308,7 @@ Bool_t PRunSingleHisto::PrepareData()
 
   // check if post pile up data shall be used
   UInt_t histoNo;
-  histoNo = fRunInfo->fForwardHistoNo-1;
+  histoNo = fRunInfo->GetForwardHistoNo()-1;
 
   if ((runData->GetNoOfHistos() < histoNo) || (histoNo < 0)) {
     cerr << endl << "PRunSingleHisto::PrepareData(): **PANIC ERROR**:";
@@ -324,7 +324,7 @@ Bool_t PRunSingleHisto::PrepareData()
     if (runData->GetT0s().size() != 0) { // t0's in the run data
       // keep the proper t0's. For single histo runs, forward is holding the histo no
       // fForwardHistoNo starts with 1 not with 0 ;-)
-      fT0s.push_back(runData->GetT0(fRunInfo->fForwardHistoNo-1));
+      fT0s.push_back(runData->GetT0(fRunInfo->GetForwardHistoNo()-1));
     } else { // t0's are neither in the run data nor in the msr-file -> not acceptable!
       cerr << endl << "PRunSingleHisto::PrepareData(): **ERROR** NO t0's found, neither in the run data nor in the msr-file!";
       cerr << endl << " run: " << fRunInfo->GetRunName()->Data();
@@ -335,10 +335,10 @@ Bool_t PRunSingleHisto::PrepareData()
     // check if t0's are given in the data file
     if (runData->GetT0s().size() != 0) {
       // compare t0's of the msr-file with the one in the data file
-      if (fabs(fRunInfo->fT0[0]-runData->GetT0(fRunInfo->fForwardHistoNo-1))>5.0) { // given in bins!!
+      if (fabs(fRunInfo->fT0[0]-runData->GetT0(fRunInfo->GetForwardHistoNo()-1))>5.0) { // given in bins!!
         cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING**:";
         cerr << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[0];
-        cerr << endl << "  t0 from the data file is " << runData->GetT0(fRunInfo->fForwardHistoNo-1);
+        cerr << endl << "  t0 from the data file is " << runData->GetT0(fRunInfo->GetForwardHistoNo()-1);
         cerr << endl << "  This is quite a deviation! Is this done intentionally??";
         cerr << endl;
       }
@@ -375,7 +375,7 @@ Bool_t PRunSingleHisto::PrepareData()
         if (addRunData->GetT0s().size() != 0) { // t0's in the run data
           // keep the proper t0's. For single histo runs, forward is holding the histo no
           // fForwardHistoNo starts with 1 not with 0 ;-)
-          t0Add = addRunData->GetT0(fRunInfo->fForwardHistoNo-1);
+          t0Add = addRunData->GetT0(fRunInfo->GetForwardHistoNo()-1);
         } else { // t0's are neither in the run data nor in the msr-file -> not acceptable!
           cerr << endl << "PRunSingleHisto::PrepareData(): **ERROR** NO t0's found, neither in the addrun data nor in the msr-file!";
           cerr << endl << " addrun: " << fRunInfo->GetRunName(i)->Data();
@@ -386,10 +386,10 @@ Bool_t PRunSingleHisto::PrepareData()
         // check if t0's are given in the data file
         if (addRunData->GetT0s().size() != 0) {
           // compare t0's of the msr-file with the one in the data file
-          if (fabs(fRunInfo->fT0[i]-addRunData->GetT0(fRunInfo->fForwardHistoNo-1))>5.0) { // given in bins!!
+          if (fabs(fRunInfo->fT0[i]-addRunData->GetT0(fRunInfo->GetForwardHistoNo()-1))>5.0) { // given in bins!!
             cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING**:";
             cerr << endl << "  t0 from the msr-file is  " << fRunInfo->fT0[i];
-            cerr << endl << "  t0 from the data file is " << addRunData->GetT0(fRunInfo->fForwardHistoNo-1);
+            cerr << endl << "  t0 from the data file is " << addRunData->GetT0(fRunInfo->GetForwardHistoNo()-1);
             cerr << endl << "  This is quite a deviation! Is this done intentionally??";
             cerr << endl << "  addrun: " << fRunInfo->GetRunName(i)->Data();
             cerr << endl;
@@ -453,8 +453,8 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
   // first get start data, end data, and t0
   Int_t start;
   Int_t end;
-  start = fRunInfo->fDataRange[0];
-  end   = fRunInfo->fDataRange[1];
+  start = fRunInfo->GetDataRange(0);
+  end   = fRunInfo->GetDataRange(1);
   // check if start, end, and t0 make any sense
   // 1st check if start and end are in proper order
   if (end < start) { // need to swap them
@@ -478,8 +478,8 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
   // check how the background shall be handled
   if (fRunInfo->GetBkgFitParamNo() == -1) { // bkg shall **NOT** be fitted
     // subtract background from histogramms ------------------------------------------
-    if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given
-      if (fRunInfo->fBkgRange.size() != 0) {
+    if (fRunInfo->GetBkgsFix().size() == 0) { // no fixed background given
+      if (fRunInfo->GetBkgRanges().size() != 0) {
         if (!EstimateBkg(histoNo))
           return false;
       } else { // no background given to do the job
@@ -557,7 +557,7 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
 
   // raw data, since PMusrCanvas is doing ranging etc.
   // start = the first bin which is a multiple of packing backward from first good data bin
-  Int_t start = fRunInfo->fDataRange[0] - (fRunInfo->fDataRange[0]/packing)*packing;
+  Int_t start = fRunInfo->GetDataRange(0) - (fRunInfo->GetDataRange(0)/packing)*packing;
   // end = last bin starting from start which is a multipl of packing and still within the data 
   Int_t end   = start + ((runData->GetDataBin(histoNo)->size()-start)/packing)*packing;
   // check if start, end, and t0 make any sense
@@ -651,12 +651,12 @@ cout << endl << ">> data start time = " << fData.GetDataTimeStart();
   // get background
   Double_t bkg;
   if (fRunInfo->GetBkgFitParamNo() == -1) { // bkg not fitted
-    if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given (background interval)
+    if (fRunInfo->GetBkgsFix().size() == 0) { // no fixed background given (background interval)
       if (!EstimateBkg(histoNo))
         return false;
       bkg = fBackground;
     } else { // fixed bkg given
-      bkg = fRunInfo->fBkgFix[0];
+      bkg = fRunInfo->GetBkgFix(0);
     }
   } else { // bkg fitted
     bkg = par[fRunInfo->GetBkgFitParamNo()-1];
@@ -721,7 +721,7 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
   Int_t t0 = fT0s[0];
 
   // start = the first bin which is a multiple of packing backward from first good data bin
-  Int_t start = fRunInfo->fDataRange[0] - (fRunInfo->fDataRange[0]/packing)*packing;
+  Int_t start = fRunInfo->GetDataRange(0) - (fRunInfo->GetDataRange(0)/packing)*packing;
   // end = last bin starting from start which is a multiple of packing and still within the data
   Int_t end   = start + ((runData->GetDataBin(histoNo)->size()-start)/packing)*packing;
 
@@ -776,12 +776,12 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
   // get background
   Double_t bkg;
   if (fRunInfo->GetBkgFitParamNo() == -1) { // bkg not fitted
-    if (fRunInfo->fBkgFix.size() == 0) { // no fixed background given (background interval)
+    if (fRunInfo->GetBkgsFix().size() == 0) { // no fixed background given (background interval)
       if (!EstimateBkg(histoNo))
         return false;
       bkg = fBackground;
     } else { // fixed bkg given
-      bkg = fRunInfo->fBkgFix[0];
+      bkg = fRunInfo->GetBkgFix(0);
     }
   } else { // bkg fitted
     bkg = par[fRunInfo->GetBkgFitParamNo()-1];
@@ -880,8 +880,8 @@ Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
     beamPeriod = 0.0;
 
   // check if start and end are in proper order
-  UInt_t start = fRunInfo->fBkgRange[0];
-  UInt_t end   = fRunInfo->fBkgRange[1];
+  UInt_t start = fRunInfo->GetBkgRange(0);
+  UInt_t end   = fRunInfo->GetBkgRange(1);
   if (end < start) {
     cout << endl << "PRunSingleHisto::EstimatBkg(): end = " << end << " > start = " << start << "! Will swap them!";
     UInt_t keep = end;
@@ -896,7 +896,7 @@ Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
     end = start + (UInt_t)round((Double_t)periods*beamPeriodBins);
     cout << endl << "PRunSingleHisto::EstimatBkg(): Background " << start << ", " << end;
     if (end == start)
-      end = fRunInfo->fBkgRange[1];
+      end = fRunInfo->GetBkgRange(1);
   }
 
   // get the proper run

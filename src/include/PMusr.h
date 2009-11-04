@@ -381,6 +381,27 @@ class PMsrRunBlock {
     virtual Bool_t IsLifetimeCorrected() { return fLifetimeCorrection; }
     virtual PIntVector* GetMap() { return &fMap; }
     virtual Int_t GetMap(UInt_t idx);
+    virtual Int_t GetForwardHistoNo() { return fForwardHistoNo; }
+    virtual Int_t GetBackwardHistoNo() { return fBackwardHistoNo; }
+    virtual PDoubleVector GetBkgsFix() { return fBkgFix; }
+    virtual Double_t GetBkgFix(UInt_t i=0);
+    virtual PIntVector GetBkgRanges() { return fBkgRange; }
+    virtual Int_t GetBkgRange(UInt_t i=0);
+    virtual PIntVector GetDataRanges() { return fDataRange; }
+    virtual Int_t GetDataRange(UInt_t i=0);
+//    virtual Int_t GetT0(UInt_t i=0);
+//    virtual Double_t GetFitRangeFirst() { return fFitRange[0]; }
+//    virtual Double_t GetFitRangeLast() { return fFitRange[1]; }
+//    virtual Int_t GetPacking() { return fPacking; }
+//    virtual Double_t GetRRFFreq() { return fRRFFreq; }
+//    virtual Int_t GetAlpha2ParamNo() { return fAlpha2ParamNo; }
+//    virtual Int_t GetBeta2ParamNo() { return fBeta2ParamNo; }
+//    virtual Int_t GetRightHistoNo() { return fRightHistoNo; }
+//    virtual Int_t GetLeftHistoNo() { return fLeftHistoNo; }
+//    virtual Int_t GetXDataIndex() { return fXYDataIndex[0]; }
+//    virtual Int_t GetYDataIndex() { return fXYDataIndex[1]; }
+//    virtual TString* GetXDataLabel() { return &fXYDataLabel[0]; }
+//    virtual TString* GetYDataLabel() { return &fXYDataLabel[1]; }
 
     virtual void AppendRunName(TString str) { fRunName.push_back(str); }
     virtual void SetRunName(TString &str, UInt_t i);
@@ -400,12 +421,29 @@ class PMsrRunBlock {
     virtual void SetLifetimeCorrection(Bool_t bval) { fLifetimeCorrection = bval; }
     virtual void AppendMap(Int_t ival) { fMap.push_back(ival); }
     virtual void SetMap(Int_t mapVal, UInt_t idx);
+    virtual void SetForwardHistoNo(Int_t ival) { fForwardHistoNo = ival; }
+    virtual void SetBackwardHistoNo(Int_t ival) { fBackwardHistoNo = ival; }
+    virtual void AppendBkgFix(Double_t dval) { fBkgFix.push_back(dval); }
+    virtual void SetBkgFix(Double_t dval, UInt_t idx);
+    virtual void AppendBkgRange(Int_t ival) { fBkgRange.push_back(ival); }
+    virtual void SetBkgRange(Int_t ival, UInt_t idx);
+    virtual void AppendDataRange(Int_t ival) { fDataRange.push_back(ival); }
+    virtual void SetDataRange(Int_t ival, UInt_t idx);
+//    virtual void AppendT0(Int_t ival) { fT0.push_back(ival); }
+//    virtual void SetT0(Int_t ival, UInt_t idx);
+//    virtual void SetFitRangeFirst(Double_t dval) { fFitRange[0] = dval; }
+//    virtual void SetFitRangeLast(Double_t dval) { fFitRange[1] = dval; }
+//    virtual void SetPacking(Int_t ival) { fPacking = ival; }
+//    virtual void SetRRFFreq(Double_t dval) { fRRFFreq = dval; }
+//    virtual void SetAlpha2ParamNo(Int_t ival) { fAlpha2ParamNo = ival; }
+//    virtual void SetBeta2ParamNo(Int_t ival) { fBeta2ParamNo = ival; }
+//    virtual void SetRightHistoNo(Int_t ival) { fRightHistoNo = ival; }
+//    virtual void SetLeftHistoNo(Int_t ival) { fLeftHistoNo = ival; }
+//    virtual void SetXDataIndex(Int_t ival) { fXYDataIndex[0] = ival; }
+//    virtual void SetYDataIndex(Int_t ival) { fXYDataIndex[1] = ival; }
+//    virtual void SetXDataLabel(TString& str) { fXYDataLabel[0] = str; }
+//    virtual void SetYDataLabel(TString& str) { fXYDataLabel[1] = str; }
 
-    Int_t fForwardHistoNo;        ///< forward histogram number (fit type 0, 2, 4)
-    Int_t fBackwardHistoNo;       ///< backward histogram number (fit type 2, 4)
-    PDoubleVector fBkgFix;        ///< fixed background in (1/ns) (fit type 0, 2, 4)
-    PIntVector fBkgRange;         ///< background bin range (fit type 0, 2, 4)
-    PIntVector fDataRange;        ///< data bin range (fit type 0, 2, 4)
     PIntVector fT0;               ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
     Double_t fFitRange[2];        ///< fit range in (us)
     Int_t fPacking;               ///< packing/rebinning
@@ -432,6 +470,13 @@ class PMsrRunBlock {
     Int_t fLifetimeParamNo;       ///< muon lifetime parameter number (fit type 0)
     Bool_t fLifetimeCorrection;   ///< lifetime correction flag for viewing (fit type 0)
     PIntVector fMap;              ///< map vector needed to switch parameters for different runs within a single theory
+    Int_t fForwardHistoNo;        ///< forward histogram number (fit type 0, 2, 4)
+    Int_t fBackwardHistoNo;       ///< backward histogram number (fit type 2, 4)
+    PDoubleVector fBkgFix;        ///< fixed background in (1/ns) (fit type 0, 2, 4)
+    PIntVector fBkgRange;     ///< background bin range (fit type 0, 2, 4)
+    PIntVector fDataRange;        ///< data bin range (fit type 0, 2, 4)
+//    PIntVector fT0;               ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
+//    PDoublePair fFitRange;        ///< fit range in (us)
 };
 
 //-------------------------------------------------------------

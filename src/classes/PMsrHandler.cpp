@@ -622,11 +622,11 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         } else if (sstr.BeginsWith("forward")) {
           fout.width(16);
           fout << left << "forward";
-          fout << fRuns[runNo].fForwardHistoNo << endl;
+          fout << fRuns[runNo].GetForwardHistoNo() << endl;
         } else if (sstr.BeginsWith("backward")) {
           fout.width(16);
           fout << left << "backward";
-          fout << fRuns[runNo].fBackwardHistoNo << endl;
+          fout << fRuns[runNo].GetBackwardHistoNo() << endl;
         } else if (sstr.BeginsWith("right")) {
           fout.width(16);
           fout << left << "right";
@@ -638,26 +638,26 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         } else if (sstr.BeginsWith("backgr.fix")) {
           fout.width(15);
           fout << left << "backgr.fix";
-          for (UInt_t j=0; j<fRuns[runNo].fBkgFix.size(); j++) {
+          for (UInt_t j=0; j<fRuns[runNo].GetBkgsFix().size(); j++) {
             fout.precision(prec);
             fout.width(12);
-            fout << left << fRuns[runNo].fBkgFix[j];
+            fout << left << fRuns[runNo].GetBkgFix(j);
           }
           fout << endl;
         } else if (sstr.BeginsWith("background")) {
           fout.width(16);
           fout << left << "background";
-          for (UInt_t j=0; j<fRuns[runNo].fBkgRange.size(); j++) {
+          for (UInt_t j=0; j<fRuns[runNo].GetBkgRanges().size(); j++) {
             fout.width(8);
-            fout << left << fRuns[runNo].fBkgRange[j];
+            fout << left << fRuns[runNo].GetBkgRange(j);
           }
           fout << endl;
         } else if (sstr.BeginsWith("data")) {
           fout.width(16);
           fout << left << "data";
-          for (UInt_t j=0; j<fRuns[runNo].fDataRange.size(); j++) {
+          for (UInt_t j=0; j<fRuns[runNo].GetDataRanges().size(); j++) {
             fout.width(8);
-            fout << left << fRuns[runNo].fDataRange[j];
+            fout << left << fRuns[runNo].GetDataRange(j);
           }
           fout << endl;
         } else if (sstr.BeginsWith("t0")) {
@@ -1114,13 +1114,13 @@ void PMsrHandler::SetMsrDataRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
     return;
   }
 
-  if ((idx < 0) || (idx > fRuns[runNo].fDataRange.size())) { // error
-    cerr << endl << "PMsrHandler::SetMsrDataRangeEntry: **ERROR** idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].fDataRange.size();
+  if ((idx < 0) || (idx > fRuns[runNo].GetDataRanges().size())) { // error
+    cerr << endl << "PMsrHandler::SetMsrDataRangeEntry: **ERROR** idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].GetDataRanges().size();
     cerr << endl;
     return;
   }
 
-  fRuns[runNo].fDataRange[idx] = bin;
+  fRuns[runNo].SetDataRange(bin, idx);
 }
 
 //--------------------------------------------------------------------------
@@ -1141,13 +1141,13 @@ void PMsrHandler::SetMsrBkgRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
     return;
   }
 
-  if ((idx < 0) || (idx > fRuns[runNo].fBkgRange.size())) { // error
-    cerr << endl << "PMsrHandler::SetMsrBkgRangeEntry: idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].fBkgRange.size();
+  if ((idx < 0) || (idx > fRuns[runNo].GetBkgRanges().size())) { // error
+    cerr << endl << "PMsrHandler::SetMsrBkgRangeEntry: idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].GetBkgRanges().size();
     cerr << endl;
     return;
   }
 
-  fRuns[runNo].fBkgRange[idx] = bin;
+  fRuns[runNo].SetBkgRange(bin, idx);
 }
 
 //--------------------------------------------------------------------------
@@ -1650,7 +1650,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (str.IsDigit())
-          param.fForwardHistoNo = str.Atoi();
+          param.SetForwardHistoNo(str.Atoi());
         else
           error = true;
       }
@@ -1664,7 +1664,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (str.IsDigit())
-          param.fBackwardHistoNo = str.Atoi();
+          param.SetBackwardHistoNo(str.Atoi());
         else
           error = true;
       }
@@ -1679,7 +1679,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsFloat())
-            param.fBkgFix.push_back(str.Atof());
+            param.AppendBkgFix(str.Atof());
           else
             error = true;
         }
@@ -1695,7 +1695,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsDigit())
-            param.fBkgRange.push_back(str.Atoi());
+            param.AppendBkgRange(str.Atoi());
           else
             error = true;
         }
@@ -1711,7 +1711,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsDigit())
-            param.fDataRange.push_back(str.Atoi());
+            param.AppendDataRange(str.Atoi());
           else
             error = true;
         }
@@ -1899,15 +1899,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       Bool_t found;
       if (fRuns[i].GetBkgFitParamNo() >= 0) { // check if backgr.fit is given
         found = true;
-      } else if (fRuns[i].fBkgFix.size() > 0) { // check if backgr.fix is given
+      } else if (fRuns[i].GetBkgsFix().size() > 0) { // check if backgr.fix is given
         found = true;
-      } else if (fRuns[i].fBkgRange.size() > 0) { // check if background window is given
+      } else if (fRuns[i].GetBkgRanges().size() > 0) { // check if background window is given
         found = true;
       } else {
         found = false;
       }
       if (!found) {
-        cerr << endl << ">> PMsrHandler::HandleRunEntry: **ERROR** for run " << fRuns[i].GetRunName()->Data() << ",  forward " << fRuns[i].fForwardHistoNo;
+        cerr << endl << ">> PMsrHandler::HandleRunEntry: **ERROR** for run " << fRuns[i].GetRunName()->Data() << ",  forward " << fRuns[i].GetForwardHistoNo();
         cerr << endl << "   no background information found!";
         cerr << endl << "   Either of the tags 'backgr.fit', 'backgr.fix', 'background'";
         cerr << endl << "   with data is needed.";
