@@ -51,7 +51,7 @@ $dumpascii =
 # TODO: Replace this with a call to $TABLE=MSR::ExportParams
 $AllParameters{"Header"}=1;
 $TABLE=MSR::ExportParams(\%AllParameters);
-$msr2dat = "$MSR2DAT < FILENAME.msr > $OUTPUT_REAL/FILENAME_par.dat";
+$msr2dat = "$MSR2DAT  FILENAME.msr > $OUTPUT_REAL/FILENAME_par.dat";
 
 # "Smart" default value of the fit parameters.
 %Defaults = (
@@ -528,8 +528,8 @@ sub StepShared {
 Choose the shared parameters<br>
 <form enctype=\"multipart/form-data\" action=\"$MAINPAGE\"
  method=\"post\"><br>
-INSERT_PARAMETERS_TABLE_HERE
 PASS_ON_HTML_CODE
+INSERT_PARAMETERS_TABLE_HERE
 <input type=\"hidden\" name=\"go\" value=\"2\"><br>
 <input type=\"reset\" value=\"Reset\">
 <input type=\"submit\" value=\"Next>\">
@@ -1004,8 +1004,7 @@ sub PassOn {
         $One = $All[$i];
         if ( $One ne $EMPTY && $One ne "go" ) {
 
-            #	    if ($Step == 1 && substr($One,0,3) ne "Sh\_") {
-            if ( $$One ne $EMPTY ) {
+	    if ( $$One ne $EMPTY ) {
                 $OneValue = $$One;
             }
             else {
@@ -1015,12 +1014,13 @@ sub PassOn {
 
             # Exclude logx logy ltx
             #		if ($One ne "ltc" && $One ne "logx" && $One ne "logy") {
-            $PassOn = $PassOn
-              . "<input type=\"hidden\" name=\"$One\" value=\"$OneValue\">\n";
-
-            #		}
-            #	    }
-            #	    }
+	    $skip=0;
+	    # Skip Sh_ variables during shared skip
+	    if ($Step == 1 && substr($One,0,3) eq "Sh\_") { $skip=1 }
+	    if ($skip != 1) {
+		$PassOn = $PassOn
+		    . "<input type=\"hidden\" name=\"$One\" value=\"$OneValue\">\n";
+	    }
         }
         ++$i;
     }
