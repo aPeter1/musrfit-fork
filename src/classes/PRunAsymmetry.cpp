@@ -544,7 +544,7 @@ Bool_t PRunAsymmetry::SubtractEstimatedBkg()
   // calculate proper background range
   for (UInt_t i=0; i<2; i++) {
     if (beamPeriod != 0.0) {
-      Double_t beamPeriodBins = beamPeriod/fRunInfo->fPacking;
+      Double_t beamPeriodBins = beamPeriod/fRunInfo->GetPacking();
       UInt_t periods = (UInt_t)((Double_t)(end[i] - start[i] + 1) / beamPeriodBins);
       end[i] = start[i] + (UInt_t)round((Double_t)periods*beamPeriodBins);
       cout << "PRunAsymmetry::SubtractEstimatedBkg(): Background " << start[i] << ", " << end[i] << endl;
@@ -654,19 +654,19 @@ Bool_t PRunAsymmetry::PrepareFitData(PRawRunData* runData, UInt_t histoNo[2])
   Double_t error = 0.0;
   // forward
   for (Int_t i=start[0]; i<end[0]; i++) {
-    if (fRunInfo->fPacking == 1) {
+    if (fRunInfo->GetPacking() == 1) {
       forwardPacked.AppendValue(fForward[i]);
       forwardPacked.AppendErrorValue(fForwardErr[i]);
-    } else { // packed data, i.e. fRunInfo->fPacking > 1
-      if (((i-start[0]) % fRunInfo->fPacking == 0) && (i != start[0])) { // fill data
+    } else { // packed data, i.e. fRunInfo->GetPacking() > 1
+      if (((i-start[0]) % fRunInfo->GetPacking() == 0) && (i != start[0])) { // fill data
         // in order that after rebinning the fit does not need to be redone (important for plots)
         // the value is normalize to per bin
-        value /= fRunInfo->fPacking;
+        value /= fRunInfo->GetPacking();
         forwardPacked.AppendValue(value);
         if (value == 0.0)
           forwardPacked.AppendErrorValue(1.0);
         else
-          forwardPacked.AppendErrorValue(TMath::Sqrt(error)/fRunInfo->fPacking);
+          forwardPacked.AppendErrorValue(TMath::Sqrt(error)/fRunInfo->GetPacking());
         value = 0.0;
         error = 0.0;
       }
@@ -676,19 +676,19 @@ Bool_t PRunAsymmetry::PrepareFitData(PRawRunData* runData, UInt_t histoNo[2])
   }
   // backward
   for (Int_t i=start[1]; i<end[1]; i++) {
-    if (fRunInfo->fPacking == 1) {
+    if (fRunInfo->GetPacking() == 1) {
       backwardPacked.AppendValue(fBackward[i]);
       backwardPacked.AppendErrorValue(fBackwardErr[i]);
-    } else { // packed data, i.e. fRunInfo->fPacking > 1
-      if (((i-start[1]) % fRunInfo->fPacking == 0) && (i != start[1])) { // fill data
+    } else { // packed data, i.e. fRunInfo->GetPacking() > 1
+      if (((i-start[1]) % fRunInfo->GetPacking() == 0) && (i != start[1])) { // fill data
         // in order that after rebinning the fit does not need to be redone (important for plots)
         // the value is normalize to per bin
-        value /= fRunInfo->fPacking;
+        value /= fRunInfo->GetPacking();
         backwardPacked.AppendValue(value);
         if (value == 0.0)
           backwardPacked.AppendErrorValue(1.0);
         else
-          backwardPacked.AppendErrorValue(TMath::Sqrt(error)/fRunInfo->fPacking);
+          backwardPacked.AppendErrorValue(TMath::Sqrt(error)/fRunInfo->GetPacking());
         value = 0.0;
         error = 0.0;
       }
@@ -709,8 +709,8 @@ Bool_t PRunAsymmetry::PrepareFitData(PRawRunData* runData, UInt_t histoNo[2])
   Double_t f, b, ef, eb;
   // fill data time start, and step
   // data start at data_start-t0 shifted by (pack-1)/2
-  fData.SetDataTimeStart(fTimeResolution*((Double_t)start[0]-t0[0]+(Double_t)(fRunInfo->fPacking-1)/2.0));
-  fData.SetDataTimeStep(fTimeResolution*(Double_t)fRunInfo->fPacking);
+  fData.SetDataTimeStart(fTimeResolution*((Double_t)start[0]-t0[0]+(Double_t)(fRunInfo->GetPacking()-1)/2.0));
+  fData.SetDataTimeStep(fTimeResolution*(Double_t)fRunInfo->GetPacking());
   for (UInt_t i=0; i<noOfBins; i++) {
     // to make the formulae more readable
     f  = forwardPacked.GetValue()->at(i);
@@ -759,7 +759,7 @@ Bool_t PRunAsymmetry::PrepareFitData(PRawRunData* runData, UInt_t histoNo[2])
 Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
 {
   // check if view_packing is wished
-  Int_t packing = fRunInfo->fPacking;
+  Int_t packing = fRunInfo->GetPacking();
   if (fMsrInfo->GetMsrPlotList()->at(0).fViewPacking > 0) {
     packing = fMsrInfo->GetMsrPlotList()->at(0).fViewPacking;
   }

@@ -75,7 +75,7 @@ class PRunListCollection
     virtual PRunData* GetRRF(UInt_t index, EDataSwitch tag=kIndex);
     virtual PRunData* GetNonMusr(UInt_t index, EDataSwitch tag=kIndex);
 
-    virtual vector< pair<Double_t, Double_t> > GetTemp(const TString &runName) const;
+    virtual const PDoublePairVector *GetTemp(const TString &runName) const;
     virtual Double_t GetField(const TString &runName) const;
     virtual Double_t GetEnergy(const TString &runName) const;
     virtual const Char_t* GetSetup(const TString &runName) const;

@@ -255,7 +255,7 @@ class PRawRunData {
     virtual const TString* GetSetup() { return &fSetup; }
     virtual const Double_t GetField() { return fField; }
     virtual const UInt_t GetNoOfTemperatures() { return fTemp.size(); }
-    virtual const PDoublePairVector GetTemperature() { return fTemp; }
+    virtual const PDoublePairVector* GetTemperature() const { return &fTemp; }
     virtual const Double_t GetTemperature(const UInt_t idx);
     virtual const Double_t GetTempError(const UInt_t idx);
     virtual const Double_t GetEnergy() { return fEnergy; }
@@ -392,16 +392,17 @@ class PMsrRunBlock {
     virtual UInt_t GetT0Size() { return fT0.size(); }
     virtual Int_t GetT0(UInt_t i=0);
     virtual Double_t GetFitRange(UInt_t i);
-//    virtual Int_t GetPacking() { return fPacking; }
-//    virtual Double_t GetRRFFreq() { return fRRFFreq; }
-//    virtual Int_t GetAlpha2ParamNo() { return fAlpha2ParamNo; }
-//    virtual Int_t GetBeta2ParamNo() { return fBeta2ParamNo; }
-//    virtual Int_t GetRightHistoNo() { return fRightHistoNo; }
-//    virtual Int_t GetLeftHistoNo() { return fLeftHistoNo; }
-//    virtual Int_t GetXDataIndex() { return fXYDataIndex[0]; }
-//    virtual Int_t GetYDataIndex() { return fXYDataIndex[1]; }
-//    virtual TString* GetXDataLabel() { return &fXYDataLabel[0]; }
-//    virtual TString* GetYDataLabel() { return &fXYDataLabel[1]; }
+    virtual Int_t GetPacking() { return fPacking; }
+    virtual Double_t GetRRFFreq() { return fRRFFreq; }
+    virtual Int_t GetRRFPacking() { return fRRFPacking; }
+    virtual Int_t GetAlpha2ParamNo() { return fAlpha2ParamNo; }
+    virtual Int_t GetBeta2ParamNo() { return fBeta2ParamNo; }
+    virtual Int_t GetRightHistoNo() { return fRightHistoNo; }
+    virtual Int_t GetLeftHistoNo() { return fLeftHistoNo; }
+    virtual Int_t GetXDataIndex() { return fXYDataIndex[0]; }
+    virtual Int_t GetYDataIndex() { return fXYDataIndex[1]; }
+    virtual TString* GetXDataLabel() { return &fXYDataLabel[0]; }
+    virtual TString* GetYDataLabel() { return &fXYDataLabel[1]; }
 
     virtual void AppendRunName(TString str) { fRunName.push_back(str); }
     virtual void SetRunName(TString &str, UInt_t i);
@@ -432,26 +433,17 @@ class PMsrRunBlock {
     virtual void AppendT0(Int_t ival) { fT0.push_back(ival); }
     virtual void SetT0(Int_t ival, UInt_t idx);
     virtual void SetFitRange(Double_t dval, UInt_t idx);
-//    virtual void SetPacking(Int_t ival) { fPacking = ival; }
-//    virtual void SetRRFFreq(Double_t dval) { fRRFFreq = dval; }
-//    virtual void SetAlpha2ParamNo(Int_t ival) { fAlpha2ParamNo = ival; }
-//    virtual void SetBeta2ParamNo(Int_t ival) { fBeta2ParamNo = ival; }
-//    virtual void SetRightHistoNo(Int_t ival) { fRightHistoNo = ival; }
-//    virtual void SetLeftHistoNo(Int_t ival) { fLeftHistoNo = ival; }
-//    virtual void SetXDataIndex(Int_t ival) { fXYDataIndex[0] = ival; }
-//    virtual void SetYDataIndex(Int_t ival) { fXYDataIndex[1] = ival; }
-//    virtual void SetXDataLabel(TString& str) { fXYDataLabel[0] = str; }
-//    virtual void SetYDataLabel(TString& str) { fXYDataLabel[1] = str; }
-
-    Int_t fPacking;               ///< packing/rebinning
-    Double_t fRRFFreq;            ///< rotating reference frequency (fit type 4)
-    Int_t fRRFPacking;            ///< rotating reference packing (fit type 4)
-    Int_t fAlpha2ParamNo;         ///< rotating reference alpha2 (fit type 4)
-    Int_t fBeta2ParamNo;          ///< rotating reference beta2 (fit type 4)
-    Int_t fRightHistoNo;          ///< rotating reference right histogram number (fit type 4)
-    Int_t fLeftHistoNo;           ///< rotating reference left histogram number (fit type 4)
-    Int_t fXYDataIndex[2];        ///< used to get the data indices when using db-files (fit type 8)
-    TString fXYDataLabel[2];      ///< used to get the indices via labels when using db-files  (fit type 8)
+    virtual void SetPacking(Int_t ival) { fPacking = ival; }
+    virtual void SetRRFFreq(Double_t dval) { fRRFFreq = dval; }
+    virtual void SetRRFPacking(Int_t ival) { fRRFPacking = ival; }
+    virtual void SetAlpha2ParamNo(Int_t ival) { fAlpha2ParamNo = ival; }
+    virtual void SetBeta2ParamNo(Int_t ival) { fBeta2ParamNo = ival; }
+    virtual void SetRightHistoNo(Int_t ival) { fRightHistoNo = ival; }
+    virtual void SetLeftHistoNo(Int_t ival) { fLeftHistoNo = ival; }
+    virtual void SetXDataIndex(Int_t ival) { fXYDataIndex[0] = ival; }
+    virtual void SetYDataIndex(Int_t ival) { fXYDataIndex[1] = ival; }
+    virtual void SetXDataLabel(TString& str) { fXYDataLabel[0] = str; }
+    virtual void SetYDataLabel(TString& str) { fXYDataLabel[1] = str; }
 
   private:
     PStringVector fRunName;       ///< name of the run file
@@ -470,19 +462,19 @@ class PMsrRunBlock {
     Int_t fForwardHistoNo;        ///< forward histogram number (fit type 0, 2, 4)
     Int_t fBackwardHistoNo;       ///< backward histogram number (fit type 2, 4)
     PDoubleVector fBkgFix;        ///< fixed background in (1/ns) (fit type 0, 2, 4)
-    PIntVector fBkgRange;     ///< background bin range (fit type 0, 2, 4)
+    PIntVector fBkgRange;         ///< background bin range (fit type 0, 2, 4)
     PIntVector fDataRange;        ///< data bin range (fit type 0, 2, 4)
     PIntVector fT0;               ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
     Double_t fFitRange[2];        ///< fit range in (us)
-//    Int_t fPacking;               ///< packing/rebinning
-//    Double_t fRRFFreq;            ///< rotating reference frequency (fit type 4)
-//    Int_t fRRFPacking;            ///< rotating reference packing (fit type 4)
-//    Int_t fAlpha2ParamNo;         ///< rotating reference alpha2 (fit type 4)
-//    Int_t fBeta2ParamNo;          ///< rotating reference beta2 (fit type 4)
-//    Int_t fRightHistoNo;          ///< rotating reference right histogram number (fit type 4)
-//    Int_t fLeftHistoNo;           ///< rotating reference left histogram number (fit type 4)
-//    Int_t fXYDataIndex[2];        ///< used to get the data indices when using db-files (fit type 8)
-//    TString fXYDataLabel[2];      ///< used to get the indices via labels when using db-files  (fit type 8)
+    Int_t fPacking;               ///< packing/rebinning
+    Double_t fRRFFreq;            ///< rotating reference frequency (fit type 4)
+    Int_t fRRFPacking;            ///< rotating reference packing (fit type 4)
+    Int_t fAlpha2ParamNo;         ///< rotating reference alpha2 (fit type 4)
+    Int_t fBeta2ParamNo;          ///< rotating reference beta2 (fit type 4)
+    Int_t fRightHistoNo;          ///< rotating reference right histogram number (fit type 4)
+    Int_t fLeftHistoNo;           ///< rotating reference left histogram number (fit type 4)
+    Int_t fXYDataIndex[2];        ///< used to get the data indices when using db-files (fit type 8)
+    TString fXYDataLabel[2];      ///< used to get the indices via labels when using db-files  (fit type 8)
 };
 
 //-------------------------------------------------------------

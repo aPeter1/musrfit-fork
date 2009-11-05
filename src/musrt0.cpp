@@ -274,11 +274,11 @@ int main(int argc, char *argv[])
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
             }
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).fRightHistoNo, 2, j)) {
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetRightHistoNo(), 2, j)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
             }
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).fLeftHistoNo, 3, j)) {
+            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetLeftHistoNo(), 3, j)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
             }

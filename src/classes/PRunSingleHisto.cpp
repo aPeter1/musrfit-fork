@@ -85,7 +85,7 @@ PRunSingleHisto::~PRunSingleHisto()
 /**
  * <p>
  *
- * The return value is chisq * fRunInfo->fPacking, the reason is:
+ * The return value is chisq * fRunInfo->GetPacking(), the reason is:
  * the data d_i and the theory t_i are scaled by the packing, i.e. d_i -> d_i / packing.
  * Since the error is 1/sqrt(d_i) and hence error^2 = d_i it follows that
  * (d_i - t_i)^2 ~ 1/packing^2 and error^2 ~ 1/packing, and hence the chisq needs
@@ -497,23 +497,23 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
   Double_t normalizer = 1.0;
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.SetDataTimeStart(fTimeResolution*((Double_t)start-(Double_t)t0+(Double_t)(fRunInfo->fPacking-1)/2.0));
-  fData.SetDataTimeStep(fTimeResolution*fRunInfo->fPacking);
+  fData.SetDataTimeStart(fTimeResolution*((Double_t)start-(Double_t)t0+(Double_t)(fRunInfo->GetPacking()-1)/2.0));
+  fData.SetDataTimeStep(fTimeResolution*fRunInfo->GetPacking());
   for (Int_t i=start; i<end; i++) {
-    if (fRunInfo->fPacking == 1) {
+    if (fRunInfo->GetPacking() == 1) {
       value = runData->GetDataBin(histoNo)->at(i);
-      normalizer = fRunInfo->fPacking * (fTimeResolution * 1e3); // fTimeResolution us->ns
+      normalizer = fRunInfo->GetPacking() * (fTimeResolution * 1e3); // fTimeResolution us->ns
       value /= normalizer;
       fData.AppendValue(value);
       if (value == 0.0)
         fData.AppendErrorValue(1.0);
       else
         fData.AppendErrorValue(TMath::Sqrt(value));
-    } else { // packed data, i.e. fRunInfo->fPacking > 1
-      if (((i-start) % fRunInfo->fPacking == 0) && (i != start)) { // fill data
+    } else { // packed data, i.e. fRunInfo->GetPacking() > 1
+      if (((i-start) % fRunInfo->GetPacking() == 0) && (i != start)) { // fill data
         // in order that after rebinning the fit does not need to be redone (important for plots)
         // the value is normalize to per 1 nsec
-        normalizer = fRunInfo->fPacking * (fTimeResolution * 1e3); // fTimeResolution us->ns
+        normalizer = fRunInfo->GetPacking() * (fTimeResolution * 1e3); // fTimeResolution us->ns
         value /= normalizer;
         fData.AppendValue(value);
         if (value == 0.0)
@@ -550,7 +550,7 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
 Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t histoNo)
 {
   // check if view_packing is wished
-  Int_t packing = fRunInfo->fPacking;
+  Int_t packing = fRunInfo->GetPacking();
   if (fMsrInfo->GetMsrPlotList()->at(0).fViewPacking > 0) {
     packing = fMsrInfo->GetMsrPlotList()->at(0).fViewPacking;
   }
@@ -710,7 +710,7 @@ cout << endl << ">> data start time = " << fData.GetDataTimeStart();
 Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histoNo)
 {
   // check if view_packing is wished
-  Int_t packing = fRunInfo->fPacking;
+  Int_t packing = fRunInfo->GetPacking();
   if (fMsrInfo->GetMsrPlotList()->at(0).fViewPacking > 0) {
     packing = fMsrInfo->GetMsrPlotList()->at(0).fViewPacking;
   }
@@ -891,7 +891,7 @@ Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
 
   // calculate proper background range
   if (beamPeriod != 0.0) {
-    Double_t beamPeriodBins = beamPeriod/fRunInfo->fPacking;
+    Double_t beamPeriodBins = beamPeriod/fRunInfo->GetPacking();
     UInt_t periods = (UInt_t)((Double_t)(end - start + 1) / beamPeriodBins);
     end = start + (UInt_t)round((Double_t)periods*beamPeriodBins);
     cout << endl << "PRunSingleHisto::EstimatBkg(): Background " << start << ", " << end;

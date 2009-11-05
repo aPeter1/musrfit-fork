@@ -445,7 +445,7 @@ PRunData* PRunListCollection::GetNonMusr(UInt_t index, EDataSwitch tag)
  *
  * \param runName
  */
-PDoublePairVector PRunListCollection::GetTemp(const TString &runName) const
+const PDoublePairVector* PRunListCollection::GetTemp(const TString &runName) const
 {
   return fData->GetRunData(runName)->GetTemperature();
 }

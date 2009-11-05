@@ -197,15 +197,15 @@ Bool_t PRunNonMusr::PrepareFitData()
   Double_t err = 0.0;
 // cout << endl << ">> fRawRunData->fDataNonMusr.fData[" <<  xIndex << "].size()=" << fRawRunData->fDataNonMusr.fData[xIndex].size();
   for (UInt_t i=0; i<fRawRunData->fDataNonMusr.GetData()->at(xIndex).size(); i++) {
-// cout << endl << ">> i=" << i << ", packing=" << fRunInfo->fPacking;
-    if (fRunInfo->fPacking == 1) {
+// cout << endl << ">> i=" << i << ", packing=" << fRunInfo->GetPacking();
+    if (fRunInfo->GetPacking() == 1) {
       fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i));
       fData.AppendValue(fRawRunData->fDataNonMusr.GetData()->at(yIndex).at(i));
       fData.AppendErrorValue(fRawRunData->fDataNonMusr.GetErrData()->at(yIndex).at(i));
-    } else { // packed data, i.e. fRunInfo->fPacking > 1
-      if ((i % fRunInfo->fPacking == 0) && (i != 0)) { // fill data
+    } else { // packed data, i.e. fRunInfo->GetPacking() > 1
+      if ((i % fRunInfo->GetPacking() == 0) && (i != 0)) { // fill data
 // cout << endl << "-> i=" << i;
-        fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i-fRunInfo->fPacking))/2.0);
+        fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i-fRunInfo->GetPacking()))/2.0);
         fData.AppendValue(value);
         fData.AppendErrorValue(TMath::Sqrt(err));
         value = 0.0;
@@ -255,15 +255,15 @@ Bool_t PRunNonMusr::PrepareViewData()
   Double_t err = 0.0;
 // cout << endl << ">> fRawRunData->fDataNonMusr.fData[" << xIndex << "].size()=" << fRawRunData->fDataNonMusr.fData[xIndex].size();
   for (UInt_t i=0; i<fRawRunData->fDataNonMusr.GetData()->at(xIndex).size(); i++) {
-// cout << endl << ">> i=" << i << ", packing=" << fRunInfo->fPacking;
-    if (fRunInfo->fPacking == 1) {
+// cout << endl << ">> i=" << i << ", packing=" << fRunInfo->GetPacking();
+    if (fRunInfo->GetPacking() == 1) {
       fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i));
       fData.AppendValue(fRawRunData->fDataNonMusr.GetData()->at(yIndex).at(i));
       fData.AppendErrorValue(fRawRunData->fDataNonMusr.GetErrData()->at(yIndex).at(i));
-    } else { // packed data, i.e. fRunInfo->fPacking > 1
-      if ((i % fRunInfo->fPacking == 0) && (i != 0)) { // fill data
+    } else { // packed data, i.e. fRunInfo->GetPacking() > 1
+      if ((i % fRunInfo->GetPacking() == 0) && (i != 0)) { // fill data
 // cout << endl << "-> i=" << i;
-        fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i-fRunInfo->fPacking))/2.0);
+        fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i-fRunInfo->GetPacking()))/2.0);
         fData.AppendValue(value);
         fData.AppendErrorValue(TMath::Sqrt(err));
         value = 0.0;
@@ -382,14 +382,14 @@ UInt_t PRunNonMusr::GetXIndex()
     found = true;
   } else { // db-file format
 //cout << endl << ">> PRunNonMusr::GetXIndex: db-file format";
-    if (fRunInfo->fXYDataIndex[0] > 0) { // xy-data already indices
+    if (fRunInfo->GetXDataIndex() > 0) { // xy-data already indices
 //cout << endl << ">> PRunNonMusr::GetXIndex: xy-data are already indices, i.e. not labels";
-      index = fRunInfo->fXYDataIndex[0]-1; // since xy-data start with 1 ...
+      index = fRunInfo->GetXDataIndex()-1; // since xy-data start with 1 ...
       found = true;
     } else { // xy-data data tags which needs to be converted to an index
 //cout << endl << ">> fDataTags.size()=" << fRawRunData->fDataNonMusr.fDataTags.size();
       for (UInt_t i=0; i<fRawRunData->fDataNonMusr.GetDataTags()->size(); i++) {
-        if (fRawRunData->fDataNonMusr.GetDataTags()->at(i).CompareTo(fRunInfo->fXYDataLabel[0]) == 0) {
+        if (fRawRunData->fDataNonMusr.GetDataTags()->at(i).CompareTo(*fRunInfo->GetXDataLabel()) == 0) {
 //cout << endl << ">> i=" << i << ", fRawRunData->fDataNonMusr.fDataTags[i]=" << fRawRunData->fDataNonMusr.fDataTags[i].Data();
 //cout << endl << ">> fRunInfo->fXYDataLabel[0]=" << fRunInfo->fXYDataLabel[0].Data();
           index = i;
@@ -426,12 +426,12 @@ UInt_t PRunNonMusr::GetYIndex()
     index = 1;
     found = true;
   } else { // db-file format
-    if (fRunInfo->fXYDataIndex[1] > 0) { // xy-data already indices
-      index = fRunInfo->fXYDataIndex[1]-1; // since xy-data start with 1 ...
+    if (fRunInfo->GetYDataIndex() > 0) { // xy-data already indices
+      index = fRunInfo->GetYDataIndex()-1; // since xy-data start with 1 ...
       found = true;
     } else { // xy-data data tags which needs to be converted to an index
       for (UInt_t i=0; i<fRawRunData->fDataNonMusr.GetDataTags()->size(); i++) {
-        if (fRawRunData->fDataNonMusr.GetDataTags()->at(i).CompareTo(fRunInfo->fXYDataLabel[1]) == 0) {
+        if (fRawRunData->fDataNonMusr.GetDataTags()->at(i).CompareTo(*fRunInfo->GetYDataLabel()) == 0) {
 // cout << endl << ">> i=" << i << ", fRawRunData->fDataNonMusr.fDataTags[i]=" << fRawRunData->fDataNonMusr.fDataTags[i].Data();
 // cout << endl << ">> fRunInfo->fXYDataLabel[1]=" << fRunInfo->fXYDataLabel[1].Data();
           index = i;
