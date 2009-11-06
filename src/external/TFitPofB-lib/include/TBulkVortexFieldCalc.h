@@ -53,8 +53,8 @@ public:
   virtual double* DataB() const {return fFFTout;}
   virtual void SetParameters(const vector<double>& par) {fParam = par; fGridExists = false;}
   virtual void CalculateGrid() const = 0;
-  virtual double GetBmin() const = 0;
-  virtual double GetBmax() const = 0;
+  virtual double GetBmin() const;
+  virtual double GetBmax() const;
   virtual bool GridExists() const {return fGridExists;}
   virtual void UnsetGridExists() const {fGridExists = false;}
   virtual unsigned int GetNumberOfSteps() const {return fSteps;}
@@ -82,8 +82,62 @@ public:
   ~TBulkTriVortexLondonFieldCalc() {}
 
   void CalculateGrid() const;
-  double GetBmin() const;
-  double GetBmax() const;
+
+};
+
+//--------------------
+// Class for triangular vortex lattice, Minimisation of the GL free energy à la Brandt
+//--------------------
+
+class TBulkTriVortexNGLFieldCalc : public TBulkVortexFieldCalc {
+
+public:
+
+  TBulkTriVortexNGLFieldCalc(const string&, const unsigned int steps = 256);
+  ~TBulkTriVortexNGLFieldCalc();
+
+  void CalculateGrid() const;
+  fftw_complex* GetRealSpaceMatrix() const {return fRealSpaceMatrix;}
+  fftw_complex* GetAkMatrix() const {return fAkMatrix;}
+  fftw_complex* GetBkMatrix() const {return fBkMatrix;}
+  double* GetOmegaMatrix() const {return fOmegaMatrix;}
+  double* GetBMatrix() const {return fBMatrix;}
+  double* GetOmegaDiffXMatrix() const {return fOmegaDiffXMatrix;}
+  double* GetOmegaDiffYMatrix() const {return fOmegaDiffYMatrix;}
+  double* GetQxMatrix() const {return fQxMatrix;}
+  double* GetQyMatrix() const {return fQyMatrix;}
+
+private:
+
+  void CalculateIntermediateMatrices() const;
+  void ManipulateFourierCoefficients(fftw_complex*, const double&, const double&) const;
+  void ManipulateFourierCoefficientsForQx(fftw_complex*) const;
+  void ManipulateFourierCoefficientsForQy(fftw_complex*) const;
+
+  fftw_complex *fAkMatrix;
+  fftw_complex *fBkMatrix;
+  mutable fftw_complex *fRealSpaceMatrix;
+  mutable double *fBMatrix;
+  mutable double *fOmegaMatrix;
+  mutable double *fOmegaSqMatrix;
+  mutable double *fOmegaDiffXMatrix;
+  mutable double *fOmegaDiffYMatrix;
+  mutable double *fQxMatrix;
+  mutable double *fQyMatrix;
+  mutable double *fQxMatrixA;
+  mutable double *fQyMatrixA;
+  mutable double *fGMatrix;
+
+  mutable double *fCheckAkConvergence;
+  mutable double *fCheckBkConvergence;
+
+  mutable double fLatticeConstant;
+  mutable double fSumAk;
+  mutable double fSumOmegaSq;
+  fftw_plan fFFTplanAkToOmega;
+  fftw_plan fFFTplanBkToBandQ;
+  fftw_plan fFFTplanOmegaToAk;
+  fftw_plan fFFTplanOmegaToBk;
 
 };
 

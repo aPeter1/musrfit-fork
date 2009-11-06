@@ -9,6 +9,7 @@
         * Parameters for bulk uSR data analysis (currently only one model to calculate field distributions for a triangular vortex lattice)
 
         Common parameters:
+        - debug : set it to 1 in order to obtain some information what is read from the xml-file
         - wisdom : sets the path to an FFTW-wisdom file - if there is no valid wisdom at the given path, wisdom handling will be disabled
         - delta_t : time resolution of P(t) in microseconds
         - delta_B : field resolution of P(B) in Gauss
@@ -19,14 +20,13 @@
 
         bulk parameters:
         - N_VortexGrid : determines the number of points used for the calculation of the vortex lattice field distribution (the grid will be N*N)
-        - VortexSymmetry : specify the vortex lattice symmetry - either "square" or "triangular"
     </comment>
+    <debug>0</debug>
     <wisdom>/home/l_wojek/analysis/WordsOfWisdom.dat</wisdom>
     <delta_t>0.01</delta_t>
     <delta_B>0.1</delta_B>
     <VortexLattice>
         <N_VortexGrid>256</N_VortexGrid>
-        <VortexSymmetry>triangular</VortexSymmetry>
     </VortexLattice>
     <LEM>
         <data_path>/home/l_wojek/TrimSP/YBCOxtal/YBCOxtal-500000-</data_path>

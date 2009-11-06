@@ -9,7 +9,7 @@ using namespace std;
 
 int main(){
 
-  unsigned int NFFT(512);
+  unsigned int NFFT(256);
 
   vector<double> parForVortex;
   parForVortex.resize(3);
@@ -20,17 +20,17 @@ int main(){
 
   vector<double> parForPofB;
   parForPofB.push_back(0.01); //dt
-  parForPofB.push_back(2.0); //dB
+  parForPofB.push_back(0.1); //dB
 
   vector<double> parForPofT;
   parForPofT.push_back(0.0); //phase
   parForPofT.push_back(0.01); //dt
-  parForPofT.push_back(2.0); //dB
+  parForPofT.push_back(0.1); //dB
 
   TBulkTriVortexLondonFieldCalc *vortexLattice = new TBulkTriVortexLondonFieldCalc("/home/l_wojek/analysis/WordsOfWisdom.dat", NFFT);
 
-  parForVortex[0] = 1000.0; //app.field
-  parForVortex[1] = 1000.0; //lambda
+  parForVortex[0] = 10.0; //app.field
+  parForVortex[1] = 200.0; //lambda
   parForVortex[2] = 4.0; //xi
 
   vortexLattice->SetParameters(parForVortex);
