@@ -321,19 +321,21 @@ Bool_t PRunSingleHisto::PrepareData()
   // check if the t0's are given in the msr-file
   if (fRunInfo->GetT0Size() == 0) { // t0's are NOT in the msr-file
     // check if the t0's are in the data file
-    if (runData->GetT0s().size() != 0) { // t0's in the run data
+    if (runData->GetT0Size() != 0) { // t0's in the run data
       // keep the proper t0's. For single histo runs, forward is holding the histo no
       // fForwardHistoNo starts with 1 not with 0 ;-)
       fT0s.push_back(runData->GetT0(fRunInfo->GetForwardHistoNo()-1));
-    } else { // t0's are neither in the run data nor in the msr-file -> not acceptable!
-      cerr << endl << "PRunSingleHisto::PrepareData(): **ERROR** NO t0's found, neither in the run data nor in the msr-file!";
+    } else { // t0's are neither in the run data nor in the msr-file -> will try estimated ones!
+      fT0s.push_back(runData->GetT0Estimated(fRunInfo->GetForwardHistoNo()-1));
+      cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING** NO t0's found, neither in the run data nor in the msr-file!";
       cerr << endl << " run: " << fRunInfo->GetRunName()->Data();
+      cerr << endl << " will try the estimated one: t0 = " << runData->GetT0Estimated(fRunInfo->GetForwardHistoNo()-1);
+      cerr << endl << " NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
       cerr << endl;
-      return false;
     }
   } else { // t0's in the msr-file
     // check if t0's are given in the data file
-    if (runData->GetT0s().size() != 0) {
+    if (runData->GetT0Size() != 0) {
       // compare t0's of the msr-file with the one in the data file
       if (fabs(fRunInfo->GetT0(0)-runData->GetT0(fRunInfo->GetForwardHistoNo()-1))>5.0) { // given in bins!!
         cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING**:";
@@ -372,19 +374,21 @@ Bool_t PRunSingleHisto::PrepareData()
       // check if the t0's are given in the msr-file
       if (i >= fRunInfo->GetT0Size()) { // t0's are NOT in the msr-file
         // check if the t0's are in the data file
-        if (addRunData->GetT0s().size() != 0) { // t0's in the run data
+        if (addRunData->GetT0Size() != 0) { // t0's in the run data
           // keep the proper t0's. For single histo runs, forward is holding the histo no
           // fForwardHistoNo starts with 1 not with 0 ;-)
           t0Add = addRunData->GetT0(fRunInfo->GetForwardHistoNo()-1);
-        } else { // t0's are neither in the run data nor in the msr-file -> not acceptable!
-          cerr << endl << "PRunSingleHisto::PrepareData(): **ERROR** NO t0's found, neither in the addrun data nor in the msr-file!";
+        } else { // t0's are neither in the run data nor in the msr-file -> will try estimated ones!
+          t0Add = addRunData->GetT0Estimated(fRunInfo->GetForwardHistoNo()-1);
+          cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING** NO t0's found, neither in the addrun data nor in the msr-file!";
           cerr << endl << " addrun: " << fRunInfo->GetRunName(i)->Data();
+          cerr << endl << " will try the estimated one: t0 = " << addRunData->GetT0Estimated(fRunInfo->GetForwardHistoNo()-1);
+          cerr << endl << " NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
           cerr << endl;
-          return false;
         }
       } else { // t0's in the msr-file
         // check if t0's are given in the data file
-        if (addRunData->GetT0s().size() != 0) {
+        if (addRunData->GetT0Size() != 0) {
           // compare t0's of the msr-file with the one in the data file
           if (fabs(fRunInfo->GetT0(i)-addRunData->GetT0(fRunInfo->GetForwardHistoNo()-1))>5.0) { // given in bins!!
             cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING**:";

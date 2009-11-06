@@ -570,9 +570,12 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
         cerr << endl;
         return false;
       }
+      // keep maximum of histogram as a T0 estimate
+      runData.AppendT0Estimated(histo->GetMaximumBin());
       // fill data
-      for (Int_t j=1; j<histo->GetNbinsX(); j++)
+      for (Int_t j=1; j<histo->GetNbinsX(); j++) {
         histoData.push_back(histo->GetBinContent(j));
+      }
       // store them in runData vector
       runData.AppendDataBin(histoData);
       // clear histoData for the next histo
@@ -587,6 +590,8 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
         cerr << endl;
         return false;
       }
+      // keep maximum of histogram as a T0 estimate
+      runData.AppendT0Estimated(histo->GetMaximumBin());
       // fill data
       for (Int_t j=1; j<histo->GetNbinsX(); j++)
         histoData.push_back(histo->GetBinContent(j));
@@ -784,6 +789,16 @@ Bool_t PRunDataHandler::ReadWkmFile()
     // check if empty line, i.e. new group
     if (IsWhitespace(instr)) {
       runData.AppendDataBin(histoData);
+      // get a T0 estimate
+      Double_t maxVal = 0.0;
+      Int_t maxBin = 0;
+      for (UInt_t i=0; i<histoData.size(); i++) {
+        if (histoData[i] > maxVal) {
+          maxVal = histoData[i];
+          maxBin = i;
+        }
+      }
+      runData.AppendT0Estimated(maxBin);
       histoData.clear();
       group_counter++;
     } else {
@@ -993,6 +1008,16 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
     }
     delete[] histo;
     runData.AppendDataBin(histoData);
+    // estimate T0 from maximum of the data
+    Double_t maxVal = 0.0;
+    Int_t maxBin = 0;
+    for (UInt_t j=0; j<histoData.size(); j++) {
+      if (histoData[j] > maxVal) {
+        maxVal = histoData[j];
+        maxBin = j;
+      }
+    }
+    runData.AppendT0Estimated(maxBin);
     histoData.clear();
   }
 
@@ -1223,6 +1248,16 @@ Bool_t PRunDataHandler::ReadMudFile()
       histoData.push_back(pData[j]);
     }
     runData.AppendDataBin(histoData);
+    // estimate T0 from maximum of the data
+    Double_t maxVal = 0.0;
+    Int_t maxBin = 0;
+    for (UInt_t j=0; j<histoData.size(); j++) {
+      if (histoData[j] > maxVal) {
+        maxVal = histoData[j];
+        maxBin = j;
+      }
+    }
+    runData.AppendT0Estimated(maxBin);
     histoData.clear();
 
     free(pData);
@@ -1523,6 +1558,19 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
     runData.AppendDataBin(data[i]);
   }
   
+  // estimate T0 from maximum of the data
+  for (UInt_t i=0; i<data.size(); i++) {
+    Double_t maxVal = 0.0;
+    Int_t maxBin = 0;
+    for (UInt_t j=0; j<data[i].size(); j++) {
+      if (data[i][j] > maxVal) {
+        maxVal = data[i][j];
+        maxBin = j;
+      }
+    }
+    runData.AppendT0Estimated(maxBin);
+  }
+
   // clean up
   for (UInt_t i=0; i<data.size(); i++) 
     data[i].clear();

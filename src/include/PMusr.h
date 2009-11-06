@@ -263,8 +263,10 @@ class PRawRunData {
     virtual const PDoubleVector GetRingAnode() { return fRingAnode; }
     virtual const Double_t GetRingAnode(const UInt_t idx);
     virtual const Double_t GetTimeResolution() { return fTimeResolution; }
-    virtual const PIntVector GetT0s() { return fT0s; }
+    virtual const UInt_t GetT0Size() { return fT0s.size(); }
     virtual const Int_t GetT0(const UInt_t idx);
+    virtual const UInt_t GetT0EstimatedSize() { return fT0Estimated.size(); }
+    virtual const Int_t GetT0Estimated(const UInt_t idx);
     virtual const PIntPair GetBkgBin(const UInt_t idx);
     virtual const PIntPair GetGoodDataBin(const UInt_t idx);
     virtual const UInt_t GetNoOfHistos() { return fDataBin.size(); }
@@ -283,6 +285,7 @@ class PRawRunData {
     virtual void SetRingAnode(const UInt_t idx, const Double_t dval);
     virtual void SetTimeResolution(const Double_t dval) { fTimeResolution = dval; }
     virtual void AppendT0(const Int_t ival) { fT0s.push_back(ival); }
+    virtual void AppendT0Estimated(const Int_t ival) { fT0Estimated.push_back(ival); }
     virtual void AppendBkgBin(PIntPair pair) { fBkgBin.push_back(pair); }
     virtual void AppendGoodDataBin(PIntPair pair) { fGoodDataBin.push_back(pair); }
     virtual void AppendDataBin(PDoubleVector data) { fDataBin.push_back(data); }
@@ -302,6 +305,7 @@ class PRawRunData {
     PDoubleVector fRingAnode;        ///< LEM ring anode HVs (L,R[,T,B])
     Double_t fTimeResolution;        ///< time resolution of the run
     PIntVector fT0s;                 ///< vector of t0's of a run
+    PIntVector fT0Estimated;         ///< vector of t0's estimated based on the maximum of the histogram
     PIntPairVector fBkgBin;          ///< background bins (first/last)
     PIntPairVector fGoodDataBin;     ///< data bins (first/last)
     vector<PDoubleVector> fDataBin;  ///< vector of all histos of a run

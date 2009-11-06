@@ -302,19 +302,24 @@ Bool_t PRunAsymmetry::PrepareData()
   // check if the t0's are given in the msr-file
   if (fRunInfo->GetT0Size() == 0) { // t0's are NOT in the msr-file
     // check if the t0's are in the data file
-    if (runData->GetT0s().size() != 0) { // t0's in the run data
+    if (runData->GetT0Size() != 0) { // t0's in the run data
       // keep the proper t0's. For asymmetry runs, forward/backward are holding the histo no
       // fForwardHistoNo starts with 1 not with 0 etc. ;-)
       fT0s.push_back(runData->GetT0(fRunInfo->GetForwardHistoNo()-1));  // forward  t0
       fT0s.push_back(runData->GetT0(fRunInfo->GetBackwardHistoNo()-1)); // backward t0
-    } else { // t0's are neither in the run data nor in the msr-file -> not acceptable!
-      cerr << endl << "PRunAsymmetry::PrepareData(): **ERROR** NO t0's found, neither in the run data nor in the msr-file!";
+    } else { // t0's are neither in the run data nor in the msr-file -> will try estimated ones!
+      fT0s.push_back(runData->GetT0Estimated(fRunInfo->GetForwardHistoNo()-1));
+      fT0s.push_back(runData->GetT0Estimated(fRunInfo->GetBackwardHistoNo()-1));
+      cerr << endl << "PRunAsymmetry::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
+      cerr << endl << " run: " << fRunInfo->GetRunName()->Data();
+      cerr << endl << " will try the estimated one: forward t0 = " << runData->GetT0Estimated(fRunInfo->GetForwardHistoNo()-1);
+      cerr << endl << " will try the estimated one: backward t0 = " << runData->GetT0Estimated(fRunInfo->GetBackwardHistoNo()-1);
+      cerr << endl << " NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
       cerr << endl;
-      return false;
     }
   } else { // t0's in the msr-file
     // check if t0's are given in the data file
-    if (runData->GetT0s().size() != 0) {
+    if (runData->GetT0Size() != 0) {
       // compare t0's of the msr-file with the one in the data file
       if (fabs(fRunInfo->GetT0(0)-runData->GetT0(fRunInfo->GetForwardHistoNo()-1))>5.0) { // given in bins!!
         cerr << endl << "PRunAsymmetry::PrepareData(): **WARNING**: forward histo";
@@ -374,15 +379,20 @@ Bool_t PRunAsymmetry::PrepareData()
       // check if the t0's are given in the msr-file
       if (2*i+1 >= fRunInfo->GetT0Size()) { // t0's are NOT in the msr-file
         // check if the t0's are in the data file
-        if (addRunData->GetT0s().size() != 0) { // t0's in the run data
+        if (addRunData->GetT0Size() != 0) { // t0's in the run data
           // keep the proper t0's. For asymmetry runs, forward/backward are holding the histo no
           // fForwardHistoNo starts with 1 not with 0 etc. ;-)
           t0Add[0] = addRunData->GetT0(fRunInfo->GetForwardHistoNo()-1);  // forward  t0
           t0Add[1] = addRunData->GetT0(fRunInfo->GetBackwardHistoNo()-1); // backward t0
-        } else { // t0's are neither in the run data nor in the msr-file -> not acceptable!
-          cerr << endl << "PRunAsymmetry::PrepareData(): **ERROR** NO t0's found, neither in the addrun (" << fRunInfo->GetRunName(i)->Data() << ") data nor in the msr-file!";
+        } else { // t0's are neither in the run data nor in the msr-file -> will try estimated ones!
+          t0Add[0] = addRunData->GetT0Estimated(fRunInfo->GetForwardHistoNo()-1);
+          t0Add[1] = addRunData->GetT0Estimated(fRunInfo->GetBackwardHistoNo()-1);
+          cerr << endl << "PRunAsymmetry::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
+          cerr << endl << " addRun: " << fRunInfo->GetRunName()->Data();
+          cerr << endl << " will try the estimated one: forward t0 = " << addRunData->GetT0Estimated(fRunInfo->GetForwardHistoNo()-1);
+          cerr << endl << " will try the estimated one: backward t0 = " << addRunData->GetT0Estimated(fRunInfo->GetBackwardHistoNo()-1);
+          cerr << endl << " NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
           cerr << endl;
-          return false;
         }
       } else { // t0's in the msr-file
         // check if t0's are given in the data file
@@ -398,7 +408,7 @@ Bool_t PRunAsymmetry::PrepareData()
           t0Add[0] = fRunInfo->GetT0(0);
           t0Add[1] = fRunInfo->GetT0(1);
         }
-        if (addRunData->GetT0s().size() != 0) {
+        if (addRunData->GetT0Size() != 0) {
           // compare t0's of the msr-file with the one in the data file
           if (fabs(t0Add[0]-addRunData->GetT0(fRunInfo->GetForwardHistoNo()-1))>5.0) { // given in bins!!
             cerr << endl << "PRunAsymmetry::PrepareData(): **WARNING**: forward histo";

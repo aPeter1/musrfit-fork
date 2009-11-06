@@ -211,6 +211,7 @@ PRawRunData::~PRawRunData()
   fTemp.clear();
   fRingAnode.clear();
   fT0s.clear();
+  fT0Estimated.clear();
   fBkgBin.clear();
   fGoodDataBin.clear();
   for (UInt_t i=0; i<fDataBin.size(); i++)
@@ -288,6 +289,24 @@ const Int_t PRawRunData::GetT0(const UInt_t idx)
     return -1;
   }
   return fT0s[idx];
+}
+
+//--------------------------------------------------------------------------
+// GetT0Estimated
+//--------------------------------------------------------------------------
+/**
+ * <p> Returns an estimated T0 value.
+ *
+ * \param idx index of the T0 value whished
+ */
+const Int_t PRawRunData::GetT0Estimated(const UInt_t idx)
+{
+  if (idx >= fT0Estimated.size()) {
+    cerr << endl << "**WARNING** PRawRunData::GetT0Estimated: idx=" << idx << " is out of range (0.." << fT0Estimated.size() << ").";
+    cerr << endl;
+    return -1;
+  }
+  return fT0Estimated[idx];
 }
 
 //--------------------------------------------------------------------------
