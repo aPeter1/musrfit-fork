@@ -772,7 +772,7 @@ void PMsrRunBlock::SetBkgFix(Double_t dval, UInt_t idx)
  */
 Int_t PMsrRunBlock::GetBkgRange(UInt_t i)
 {
-  if (i > fBkgRange.size()) {
+  if (i >= fBkgRange.size()) {
     return -1;
   }
 
@@ -805,7 +805,7 @@ void PMsrRunBlock::SetBkgRange(Int_t ival, UInt_t idx)
  */
 Int_t PMsrRunBlock::GetDataRange(UInt_t i)
 {
-  if (i > fDataRange.size()) {
+  if (i >= fDataRange.size()) {
     return -1;
   }
 
