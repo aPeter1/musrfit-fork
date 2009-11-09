@@ -773,8 +773,7 @@ void PMsrRunBlock::SetBkgFix(Double_t dval, UInt_t idx)
 Int_t PMsrRunBlock::GetBkgRange(UInt_t i)
 {
   if (i > fBkgRange.size()) {
-    cerr << endl << ">> PMsrRunBlock::GetBkgRange: **ERROR** index i=" << i << " out of range, fatal." << endl;
-    assert(0);
+    return -1;
   }
 
   return fBkgRange[i];
@@ -807,8 +806,7 @@ void PMsrRunBlock::SetBkgRange(Int_t ival, UInt_t idx)
 Int_t PMsrRunBlock::GetDataRange(UInt_t i)
 {
   if (i > fDataRange.size()) {
-    cerr << endl << ">> PMsrRunBlock::GetDataRange: **ERROR** index i=" << i << " out of range, fatal." << endl;
-    assert(0);
+    return -1;
   }
 
   return fDataRange[i];

@@ -1110,8 +1110,8 @@ void PMsrHandler::SetMsrDataRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
     return;
   }
 
-  if ((idx < 0) || (idx > fRuns[runNo].GetDataRangeSize())) { // error
-    cerr << endl << "PMsrHandler::SetMsrDataRangeEntry: **ERROR** idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].GetDataRangeSize();
+  if (idx < 0) { // error
+    cerr << endl << "PMsrHandler::SetMsrDataRangeEntry: **ERROR** idx = " << idx << ", is out of valid range, i.e. idx >= 0 needed.";
     cerr << endl;
     return;
   }
@@ -1137,8 +1137,8 @@ void PMsrHandler::SetMsrBkgRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
     return;
   }
 
-  if ((idx < 0) || (idx > fRuns[runNo].GetBkgRangeSize())) { // error
-    cerr << endl << "PMsrHandler::SetMsrBkgRangeEntry: idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].GetBkgRangeSize();
+  if (idx < 0) { // error
+    cerr << endl << "PMsrHandler::SetMsrBkgRangeEntry: idx = " << idx << ", is out of valid range, i.e. idx >= 0 needed.";
     cerr << endl;
     return;
   }
