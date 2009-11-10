@@ -596,7 +596,7 @@ TString* PMsrRunBlock::GetRunName(UInt_t i)
  */
 void PMsrRunBlock::SetRunName(TString &str, UInt_t i)
 {
-  if (i>fRunName.size())
+  if (i >= fRunName.size())
     fRunName.resize(i+1);
 
   fRunName[i] = str;
@@ -628,7 +628,7 @@ TString* PMsrRunBlock::GetBeamline(UInt_t i)
  */
 void PMsrRunBlock::SetBeamline(TString &str, UInt_t i)
 {
-  if (i>fBeamline.size())
+  if (i >= fBeamline.size())
     fBeamline.resize(i+1);
 
   fBeamline[i] = str;
@@ -660,7 +660,7 @@ TString* PMsrRunBlock::GetInstitute(UInt_t i)
  */
 void PMsrRunBlock::SetInstitute(TString &str, UInt_t i)
 {
-  if (i>fInstitute.size())
+  if (i >= fInstitute.size())
     fInstitute.resize(i+1);
 
   fInstitute[i] = str;
@@ -692,7 +692,7 @@ TString* PMsrRunBlock::GetFileFormat(UInt_t i)
  */
 void PMsrRunBlock::SetFileFormat(TString &str, UInt_t i)
 {
-  if (i>fFileFormat.size())
+  if (i >= fFileFormat.size())
     fFileFormat.resize(i+1);
 
   fFileFormat[i] = str;
@@ -724,7 +724,7 @@ Int_t PMsrRunBlock::GetMap(UInt_t i)
  */
 void PMsrRunBlock::SetMap(Int_t mapVal, UInt_t idx)
 {
-  if (idx>fMap.size())
+  if (idx >= fMap.size())
     fMap.resize(idx+1);
 
   fMap[idx] = mapVal;
@@ -756,7 +756,7 @@ Double_t PMsrRunBlock::GetBkgFix(UInt_t i)
  */
 void PMsrRunBlock::SetBkgFix(Double_t dval, UInt_t idx)
 {
-  if (idx>fBkgFix.size())
+  if (idx >= fBkgFix.size())
     fBkgFix.resize(idx+1);
 
   fBkgFix[idx] = dval;
@@ -789,7 +789,7 @@ Int_t PMsrRunBlock::GetBkgRange(UInt_t i)
  */
 void PMsrRunBlock::SetBkgRange(Int_t ival, UInt_t idx)
 {
-  if (idx > fBkgRange.size())
+  if (idx >= fBkgRange.size())
     fBkgRange.resize(idx+1);
 
   fBkgRange[idx] = ival;
@@ -822,7 +822,7 @@ Int_t PMsrRunBlock::GetDataRange(UInt_t i)
  */
 void PMsrRunBlock::SetDataRange(Int_t ival, UInt_t idx)
 {
-  if (idx > fDataRange.size())
+  if (idx >= fDataRange.size())
     fDataRange.resize(idx+1);
 
   fDataRange[idx] = ival;
@@ -854,7 +854,7 @@ Int_t PMsrRunBlock::GetT0(UInt_t i)
  */
 void PMsrRunBlock::SetT0(Int_t ival, UInt_t idx)
 {
-  if (idx>fT0.size())
+  if (idx >= fT0.size())
     fT0.resize(idx+1);
 
   fT0[idx] = ival;

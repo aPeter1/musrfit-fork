@@ -6,6 +6,8 @@
     </comment>
     <data_path>/mnt/data/nemu/his</data_path>
     <data_path>/mnt/data/nemu/wkm</data_path>
+    <data_path>/afs/psi.ch/project/nemu/data/his</data_path>
+    <data_path>/afs/psi.ch/project/nemu/data/wkm</data_path>
     <data_path>/afs/psi.ch/project/bulkmusr/data/gps</data_path>
     <data_path>/afs/psi.ch/project/bulkmusr/data/dolly</data_path>
     <data_path>/afs/psi.ch/project/bulkmusr/data/gpd</data_path>

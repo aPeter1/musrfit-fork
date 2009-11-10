@@ -223,7 +223,7 @@ int main(int argc, char *argv[])
   }
 
   // read all the necessary runs (raw data)
-  PRunDataHandler *dataHandler;
+  PRunDataHandler *dataHandler = 0;
   if (success) {
     if (startupHandler)
       dataHandler = new PRunDataHandler(msrHandler, startupHandler->GetDataPathList());
