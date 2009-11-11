@@ -315,12 +315,56 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
   Int_t runNo = -1, addRunNo = 0;
   Int_t plotNo = -1;
   string line;
-  TString str, sstr, *pstr;
+  TString logFileName, str, sstr, *pstr;
   TObjArray *tokens = 0;
   TObjString *ostr = 0;
   Bool_t found = false;
   Bool_t statisticBlockFound = false;
   Bool_t partialStatisticBlockFound = true;
+
+  PBoolVector t0TagMissing; // needed for proper musrt0 handling
+  for (UInt_t i=0; i<fRuns.size(); i++) {
+    t0TagMissing.push_back(true);
+  }
+  PBoolVector backgroundTagMissing; // needed for proper musrt0 handling
+  for (UInt_t i=0; i<fRuns.size(); i++) {
+    backgroundTagMissing.push_back(true);
+  }
+  PBoolVector dataTagMissing; // needed for proper musrt0 handling
+  for (UInt_t i=0; i<fRuns.size(); i++) {
+    dataTagMissing.push_back(true);
+  }
+
+  ifstream fin;
+  ofstream fout;
+
+  // check msr-file for any missing tags first
+  // open msr-file for reading
+  fin.open(fFileName.Data(), iostream::in);
+  if (!fin.is_open()) {
+    return PMUSR_MSR_LOG_FILE_WRITE_ERROR;
+  }
+  while (!fin.eof()) {
+    // read a line
+    getline(fin, line);
+    str = line.c_str();
+
+    if (str.BeginsWith("RUN")) {
+      runNo++;
+      continue;
+    }
+
+    if (runNo == -1)
+      continue;
+
+    if (str.BeginsWith("t0"))
+      t0TagMissing[runNo] = false;
+    else if (str.BeginsWith("background"))
+      backgroundTagMissing[runNo] = false;
+    else if (str.BeginsWith("data"))
+      dataTagMissing[runNo] = false;
+  }
+  fin.close();
 
   // construct log file name
   // first find the last '.' in the filename
@@ -332,12 +376,9 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
     return PMUSR_MSR_SYNTAX_ERROR;
 
   // remove extension
-  str = fFileName;
-  str.Remove(idx+1);
-  str += "mlog";
-
-  ifstream fin;
-  ofstream fout;
+  logFileName = fFileName;
+  logFileName.Remove(idx+1);
+  logFileName += "mlog";
 
   // open msr-file for reading
   fin.open(fFileName.Data(), iostream::in);
@@ -346,12 +387,14 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
   }
 
   // open mlog-file for writing
-  fout.open(str.Data(), iostream::out);
+  fout.open(logFileName.Data(), iostream::out);
   if (!fout.is_open()) {
     return PMUSR_MSR_LOG_FILE_WRITE_ERROR;
   }
 
   tag = MSR_TAG_TITLE;
+  lineNo = 0;
+  runNo = -1;
   // read msr-file
   while (!fin.eof()) {
 
@@ -645,6 +688,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           }
           fout << endl;
         } else if (sstr.BeginsWith("background")) {
+          backgroundTagMissing[runNo] = false;
           fout.width(16);
           fout << left << "background";
           for (UInt_t j=0; j<fRuns[runNo].GetBkgRangeSize(); j++) {
@@ -653,6 +697,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           }
           fout << endl;
         } else if (sstr.BeginsWith("data")) {
+          dataTagMissing[runNo] = false;
           fout.width(16);
           fout << left << "data";
           for (UInt_t j=0; j<fRuns[runNo].GetDataRangeSize(); j++) {
@@ -661,6 +706,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           }
           fout << endl;
         } else if (sstr.BeginsWith("t0")) {
+          t0TagMissing[runNo] = false;
           fout.width(16);
           fout << left << "t0";
           for (UInt_t j=0; j<fRuns[runNo].GetT0Size(); j++) {
@@ -690,6 +736,41 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             fout << endl;
           }
         } else if (sstr.BeginsWith("fit")) {
+          // check if missing t0/background/data tag are present eventhough the values are present, if so write these data values
+          if (t0TagMissing[runNo]) {
+            if (fRuns[runNo].GetT0Size() > 0) {
+              fout.width(16);
+              fout << left << "t0";
+              for (UInt_t j=0; j<fRuns[runNo].GetT0Size(); j++) {
+                fout.width(8);
+                fout << left << fRuns[runNo].GetT0(j);
+              }
+              fout << endl;
+            }
+          }
+          if (backgroundTagMissing[runNo]) {
+            if (fRuns[runNo].GetBkgRangeSize() > 0) {
+              fout.width(16);
+              fout << left << "background";
+              for (UInt_t j=0; j<fRuns[runNo].GetBkgRangeSize(); j++) {
+                fout.width(8);
+                fout << left << fRuns[runNo].GetBkgRange(j);
+              }
+              fout << endl;
+            }
+          }
+          if (dataTagMissing[runNo]) {
+            if (fRuns[runNo].GetDataRangeSize() > 0) {
+              fout.width(16);
+              fout << left << "data";
+              for (UInt_t j=0; j<fRuns[runNo].GetDataRangeSize(); j++) {
+                fout.width(8);
+                fout << left << fRuns[runNo].GetDataRange(j);
+              }
+              fout << endl;
+            }
+          }
+          // write fit range line
           fout.width(16);
           fout << left << "fit";
           for (UInt_t j=0; j<2; j++) {
@@ -972,6 +1053,11 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
   // close files
   fout.close();
   fin.close();
+
+  // clean up
+  t0TagMissing.clear();
+  backgroundTagMissing.clear();
+  dataTagMissing.clear();
 
   return PMUSR_SUCCESS;
 }

@@ -120,6 +120,12 @@ using namespace std;
 /**
  * <p> typedef to make to code more readable.
  */
+typedef vector<Bool_t> PBoolVector;
+
+//-------------------------------------------------------------
+/**
+ * <p> typedef to make to code more readable.
+ */
 typedef vector<Int_t> PIntVector;
 
 //-------------------------------------------------------------

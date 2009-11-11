@@ -129,7 +129,6 @@ class PMsrHandler
 
     virtual void FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLines &run);
 
-//    virtual void InitRunParameterStructure(PMsrRunStructure &param);
     virtual void InitFourierParameterStructure(PMsrFourierStructure &fourier);
 
     virtual Bool_t FilterNumber(TString str, const Char_t *filter, Int_t offset, Int_t &no);
