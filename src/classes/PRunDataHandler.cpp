@@ -161,6 +161,8 @@ Bool_t PRunDataHandler::ReadFile()
         success = ReadNexusFile();
       else if (!runList->at(i).GetFileFormat(j)->CompareTo("psi-bin"))
         success = ReadPsiBinFile();
+      else if (!runList->at(i).GetFileFormat(j)->CompareTo("psi-mdu"))
+        success = ReadPsiBinFile();
       else if (!runList->at(i).GetFileFormat(j)->CompareTo("mud"))
         success = ReadMudFile();
       else if (!runList->at(i).GetFileFormat(j)->CompareTo("wkm"))
@@ -251,6 +253,8 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
     ext = TString("nexus");
   else if (!runInfo.GetFileFormat(idx)->CompareTo("psi-bin"))
     ext = TString("bin");
+  else if (!runInfo.GetFileFormat(idx)->CompareTo("psi-mdu"))
+    ext = TString("mdu");
   else if (!runInfo.GetFileFormat(idx)->CompareTo("mud"))
     ext = TString("msr");
   else if (!runInfo.GetFileFormat(idx)->CompareTo("wkm")) {
@@ -282,6 +286,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
     cerr << endl << "  ROOT-PPC  -> root post pileup corrected for lem";
     cerr << endl << "  NEXUS     -> nexus file format";
     cerr << endl << "  PSI-BIN   -> psi bin file format";
+    cerr << endl << "  PSI-MDU   -> psi mdu file format (see also MDU-ASCII)";
     cerr << endl << "  MUD       -> triumf mud file format";
     cerr << endl << "  WKM       -> wkm ascii file format";
     cerr << endl << "  MDU-ASCII -> psi mdu ascii file format";

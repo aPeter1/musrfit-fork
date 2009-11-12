@@ -4,12 +4,12 @@
 
   declaration file of the class 'MuSR_td_PSI_bin'
 
-  Main class to read td_bin PSI MuSR data.
+  Main class to read mdu and td_bin PSI MuSR data.
 
 ***************************************************************************************
 
     begin                : Alex Amato, October 2005
-    modfied:             :
+    modified             : Andrea Raselli, October 2009
     copyright            : (C) 2005 by
     email                : alex.amato@psi.ch
 
@@ -37,7 +37,15 @@ using namespace std ;
 #include <string>
 #include <vector>
 
-#include "tydefs.h"
+/* ------------------------------------------------------------------ */
+
+const int MAXHISTO     = 32;  // maximum number of histos to process/store
+const int MAXSCALER    = 32;  // maximum number of scalers to proces/store
+const int MAXTEMPER    =  4;  // maximum number of average temperatures
+
+const int MAXLABELSIZE = 12;  // maximum size of labels
+
+/* ------------------------------------------------------------------ */
 
 class MuSR_td_PSI_bin {
 
@@ -47,9 +55,14 @@ class MuSR_td_PSI_bin {
 
   private:
 // ------------------------------------start of the variables
+
+    string   filename;
+    string   readstatus;
+    bool     readingok;
+
     char     format_id[3] ;
 
-    Int16    num_run ;
+    int      num_run ;
 
     char     sample[11] ;
     char     temp[11] ;
@@ -62,50 +75,62 @@ class MuSR_td_PSI_bin {
     char     time_start[9] ;
     char     time_stop[9] ;
 
-    Float32  bin_width ;
-    Int16    tdc_resolution ;
-    Int16    tdc_overflow  ;
+    float    bin_width ;
 
-    Int16    number_histo ;
-    Int16    length_histo ;
-    char     labels_histo[16][5] ;
+    int      number_histo ;
+    int      length_histo ;
+    char     labels_histo[MAXHISTO][MAXLABELSIZE] ;
 
-    Int32    total_events ;
-    Int32    events_per_histo[16] ;
+    int      total_events ;
+    int      events_per_histo[MAXHISTO] ;
 
-    Int16    integer_t0[16] ;
-    Int16    first_good[16] ;
-    Int16    last_good[16] ;
-    Float32  real_t0[17] ;
+    int      default_binning ;
 
-    Int32    scalers[18] ;
-    char     labels_scalers[18][5] ;
+    float    real_t0[MAXHISTO] ;
+    int      integer_t0[MAXHISTO] ;
+    int      first_good[MAXHISTO] ;
+    int      last_good[MAXHISTO] ;
 
-    Float32  temper[4] ;
-    Float32  temp_deviation[4] ;
-    Float32  mon_low[4] ;
-    Float32  mon_high[4] ;
-    Int32    mon_num_events ;
-    char     mon_dev[13] ;
+    int      number_scaler ;
+    int      scalers[MAXSCALER] ;
+    char     labels_scalers[MAXSCALER][MAXLABELSIZE] ;
 
-    Int16    num_data_records_file ;
-    Int16    length_data_records_bins ;
-    Int16    num_data_records_histo ;
+    int      number_temper ;
+    float    temper[MAXTEMPER] ;
+    float    temp_deviation[MAXTEMPER] ;
 
-    Int32    period_save ;
-    Int32    period_mon ;
-    Int32    **histo ;
+    int      **histo ;
 
   public:
 
-    vector< vector<double> >  histos_vector ; /*!< this public variables provides a direct access to the histograms
-                                               */
+/*!< this public variable provides a direct read/write access to the histograms.
+     However all public methods use the protected variable histo.
+     Histogram information returned by ..._vector or ..._array methods return
+     information based on histo bin .
+
+     NOTE: Histogram information returned by pointer_to_array = ..._array() methods
+           should be freed by  delete [] pointer_to_array;
+ */
+    vector< vector<double> >  histos_vector ;
 
 // ------------------------------------end of the variables
 
   public:
 
-    int            read(const char* fileName);
+    int            read(const char* fileName);      // generic read
+
+    int            readbin(const char* fileName);   // read MuSR PSI bin format
+    int            readmdu(const char* fileName);   // read MuSR mdu format
+
+    bool           readingOK()     const;
+    string         ReadStatus()    const;
+    string         Filename()      const;
+
+    int            Show()          const;
+    int            Clear();
+
+    int             get_histo_int(int histo_num, int j);
+    double          get_histo(int histo_num, int j);
 
     int            *get_histo_array_int(int histo_num);
     double         *get_histo_array(int histo_num , int binning) ;
@@ -132,13 +157,13 @@ class MuSR_td_PSI_bin {
 
     vector<double>  get_histo_fromt0_minus_bckgrd_vector(int histo_num ,
                                                           int lower_bckgdr ,
-	                                                      int higher_bckgdr ,
+                                                          int higher_bckgdr ,
                                                           int binning ,
                                                           int offset = 0) ;
 
     double         *get_histo_goodBins_minus_bckgrd_array(int histo_num ,
                                                           int lower_bckgrd ,
-	                                                      int higher_bckgrd ,
+                                                          int higher_bckgrd ,
                                                           int binning) ;
 
    vector<double>   get_histo_goodBins_minus_bckgrd_vector(int histo_num ,
@@ -241,9 +266,11 @@ class MuSR_td_PSI_bin {
 
     long            get_totalEvents_long();
 
+    int             get_numberScaler_int();
     vector<long>    get_scalers_vector() ;
     vector<string>  get_scalersNames_vector() ;
 
+    int             get_default_binning() ;
     int             get_t0_int(int i) ;
     vector<int>     get_t0_vector() ;
     double          get_t0_double(int i) ;
@@ -278,13 +305,17 @@ class MuSR_td_PSI_bin {
     vector<string>  get_timeStart_vector() ;
     vector<string>  get_timeStop_vector() ;
 
-    vector<double>  get_devTemperatures_vector() ;
+    int             get_numberTemperature_int() ;
     vector<double>  get_temperatures_vector() ;
+    vector<double>  get_devTemperatures_vector() ;
 
   private:
 
-	int max(int x, int y) ;
-    int min(int x, int y) ;
+    int tmax(int x, int y) ;
+    int tmin(int x, int y) ;
 
 } ;
 #endif
+/************************************************************************************
+ * EOF MuSR_td_PSI_bin.h                                                         *
+ ************************************************************************************/

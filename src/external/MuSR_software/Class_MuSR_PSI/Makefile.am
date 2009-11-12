@@ -1,10 +1,9 @@
 ## Process this file with automake to create Makefile.in
 
-h_sources = MuSR_td_PSI_bin.h tydefs.h
+h_sources = MuSR_td_PSI_bin.h
 cpp_sources = MuSR_td_PSI_bin.cpp 
 
 include_HEADERS = MuSR_td_PSI_bin.h
-noinst_HEADERS = tydefs.h
 
 INCLUDES = -I.
 AM_CXXFLAGS = $(LOCAL_PSIBIN_LIB_CXXFLAGS)

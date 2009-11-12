@@ -1,5 +1,5 @@
 AC_PREREQ(2.59)
-AC_INIT(musrfit, 0.5.2, andreas.suter@psi.ch)
+AC_INIT(musrfit, 0.6.0, andreas.suter@psi.ch)
 AC_CONFIG_AUX_DIR(admin)
 
 dnl -----------------------------------------------
@@ -14,8 +14,8 @@ MUD_LIBRARY_NAME=mud
 
 #release versioning
 MUSR_MAJOR_VERSION=0
-MUSR_MINOR_VERSION=5
-MUSR_MICRO_VERSION=2
+MUSR_MINOR_VERSION=6
+MUSR_MICRO_VERSION=0
 
 #release versioning
 LEM_MAJOR_VERSION=1
@@ -24,7 +24,7 @@ LEM_MICRO_VERSION=0
 
 #release versioning
 PSIBIN_MAJOR_VERSION=0
-PSIBIN_MINOR_VERSION=0
+PSIBIN_MINOR_VERSION=1
 PSIBIN_MICRO_VERSION=0
 
 #release versioning
