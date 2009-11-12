@@ -79,6 +79,7 @@ class PMusrT0 : public TObject, public TQObject
     Int_t fDetectorTag;
     Int_t fAddRunNo;
     Int_t fAddRunOffset;
+    Int_t fT0Estimated;
 
     // canvas related variables
     TCanvas   *fMainCanvas;
@@ -101,6 +102,7 @@ class PMusrT0 : public TObject, public TQObject
 
     void InitDataAndBkg();
     void SetT0Channel();
+    void SetEstimatedT0Channel();
     void SetDataFirstChannel();
     void SetDataLastChannel();
     void SetBkgFirstChannel();

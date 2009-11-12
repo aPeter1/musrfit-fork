@@ -107,8 +107,14 @@ cout << endl << "run Name = " << rawRunData->GetRunName()->Data() << ", runNo = 
   fHisto->SetMarkerSize(0.5);
   fHisto->SetMarkerColor(TColor::GetColor(0,0,0)); // black
 
+  Double_t maxVal = 0.0;
+  fT0Estimated = 0;
   for (UInt_t i=0; i<rawRunData->GetDataBin(histoNo-1)->size(); i++) {
     fHisto->SetBinContent(i+1, rawRunData->GetDataBin(histoNo-1)->at(i));
+    if (rawRunData->GetDataBin(histoNo-1)->at(i) > maxVal) {
+      maxVal = rawRunData->GetDataBin(histoNo-1)->at(i);
+      fT0Estimated = i;
+    }
   }
 
   // generate canvas etc
@@ -206,6 +212,8 @@ void PMusrT0::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
     Done(0);
   } else if (x == 'u') { // unzoom to the original range
     UnZoom();
+  } else if (x == 'T') { // set estimated t0 channel
+    SetEstimatedT0Channel();
   } else if (x == 't') { // set t0 channel
     SetT0Channel();
   } else if (x == 'b') { // set first background channel
@@ -412,6 +420,45 @@ cout << endl << ">> PMusrT0::SetT0Channel(): binx = " << binx << endl;
       break;
   }
   fMsrHandler->SetMsrT0Entry(fRunNo, idx, binx);
+
+  // shift line to the proper position
+  fT0Line->SetX1(x);
+  fT0Line->SetX2(x);
+
+  fMainCanvas->Modified(); // needed that Update is actually working
+  fMainCanvas->Update();
+}
+
+//--------------------------------------------------------------------------
+// SetEstimatedT0Channel
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+void PMusrT0::SetEstimatedT0Channel()
+{
+  // set t0 bin in msr-Handler
+  UInt_t idx = 0;
+  switch(fDetectorTag) {
+    case DETECTOR_TAG_FORWARD:
+      idx = fAddRunNo * fAddRunOffset / 2;
+      break;
+    case DETECTOR_TAG_BACKWARD:
+      idx = 1 + fAddRunNo * fAddRunOffset / 2;
+      break;
+    case DETECTOR_TAG_LEFT:
+      idx = 2 + fAddRunNo * fAddRunOffset / 2;
+      break;
+    case DETECTOR_TAG_RIGHT:
+      idx = 3 + fAddRunNo * fAddRunOffset / 2;
+      break;
+    default:
+      break;
+  }
+  fMsrHandler->SetMsrT0Entry(fRunNo, idx, fT0Estimated);
+
+  Double_t x = fHisto->GetXaxis()->GetBinCenter(fT0Estimated);
 
   // shift line to the proper position
   fT0Line->SetX1(x);
