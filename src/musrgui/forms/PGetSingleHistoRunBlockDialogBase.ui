@@ -136,59 +136,6 @@
                 <string>e.g. mue4</string>
             </property>
         </widget>
-        <widget class="QComboBox">
-            <item>
-                <property name="text">
-                    <string>NeXuS</string>
-                </property>
-            </item>
-            <item>
-                <property name="text">
-                    <string>ROOT-NPP</string>
-                </property>
-            </item>
-            <item>
-                <property name="text">
-                    <string>ROOT-PPC</string>
-                </property>
-            </item>
-            <item>
-                <property name="text">
-                    <string>PSIBIN</string>
-                </property>
-            </item>
-            <item>
-                <property name="text">
-                    <string>MUD</string>
-                </property>
-            </item>
-            <item>
-                <property name="text">
-                    <string>WKM</string>
-                </property>
-            </item>
-            <item>
-                <property name="text">
-                    <string>ASCII</string>
-                </property>
-            </item>
-            <item>
-                <property name="text">
-                    <string>DB</string>
-                </property>
-            </item>
-            <property name="name">
-                <cstring>fFileFormat_comboBox</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>310</x>
-                    <y>80</y>
-                    <width>99</width>
-                    <height>24</height>
-                </rect>
-            </property>
-        </widget>
         <widget class="QLabel">
             <property name="name">
                 <cstring>fFileFormat_textLabel</cstring>
@@ -219,6 +166,69 @@
             </property>
             <property name="toolTip" stdset="0">
                 <string>e.g. 2007/lem07_his_0147</string>
+            </property>
+        </widget>
+        <widget class="QComboBox">
+            <item>
+                <property name="text">
+                    <string>NeXuS</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>ROOT-NPP</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>ROOT-PPC</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>PSI-BIN</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>PSI-MDU</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>MUD</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>WKM</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>MDU-ASCII</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>ASCII</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>DB</string>
+                </property>
+            </item>
+            <property name="name">
+                <cstring>fFileFormat_comboBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>310</x>
+                    <y>80</y>
+                    <width>99</width>
+                    <height>24</height>
+                </rect>
             </property>
         </widget>
     </widget>
@@ -788,7 +798,7 @@
 </widget>
 <images>
     <image name="image0">
-        <data format="PNG" length="411">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000016249444154388d95544dae86200c9c1a169e471217707e5890d4f3b830e95b687d15e51349889982fd19a6252e0c6c001cb06e2b4637629abde0584b61aacf7bf0b06eebc5e88d5360b74fc18b9ed7f75bd82908210a01e0c204e33c8628029c99e8fd373ca853009023c3a530290d1a619abdf464aa7818dd682b3f232f8569ddd6cb594fa6578eab9f2f0f5105ede57888214ace692f3d33d591951602be719c72a2d18dc839512b93737de0989e74dcc2d3eca557d7371db7b0364daf3a865eceded41142949b8e7b38b32b86288fe7371d77bcb66d1ace4ceadcce9669f6a2f79dcdf0edbb1426752200c874ec8da6c37e6e2e0cfbadb798cd99c18571b11546ca090ed807cf85db23b2da6388a27ab7034a39d54a08403afc383c7514dab8a5e3a530a5431d4b667200e0c37f16e968efa70adede40a7e414bc3875663b4833d44a6adc548f59832dd3ce865fb8a9fbdaf1178e7f656ea724a59cba75fce5fb0774073f42f0dd40cc0000000049454e44ae426082</data>
+        <data format="PNG" length="407">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000015e49444154388dad54318ec4200c1ca31429f38ed06d09ef8792ce7907653aae088e0c1b6ed9d321213490d8e361307162e004b002f9ccd8d60dfbcb16d47124a6fe7c069b7ce666d3aaa0c0b5bf3b5be4bcff7e848913239f19cef94200383169c604a0fc81b991a0a801f299af20359864d85fb6cc30156cb675d395df998fc494cfdc9c6966126c84cdd3cf4d795dd2598d8d77bec418aed223539f596421608aa9601362a06ddd1063a011937b7ca1313df97884f7972db3ee78f3f1088b0567dd616635fbe40ee77c69349ed54c0fef7c793cff0f8dadb3452efea9b72c9ae1a7f550cfbd0020f562df64aafbf7e4c4d06b3f8b9a1c199c18cd5e628418b00057e369b4ad9965df3b7f970dddfd563495108050e32c787a5118e3918f8fc414aa3b8ec8b400d7450889509ff753059fee40bae4ee6c592498be7d612895f478e87b358c2e53f786dff0d0f77de06f34fe8db9ee92146298f6f137eb0f98104228d12bbd020000000049454e44ae426082</data>
     </image>
 </images>
 <connections>

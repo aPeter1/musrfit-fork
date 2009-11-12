@@ -171,36 +171,6 @@
         <widget class="QComboBox">
             <item>
                 <property name="text">
-                    <string>NeXuS</string>
-                </property>
-            </item>
-            <item>
-                <property name="text">
-                    <string>ROOT-NPP</string>
-                </property>
-            </item>
-            <item>
-                <property name="text">
-                    <string>ROOT-PPC</string>
-                </property>
-            </item>
-            <item>
-                <property name="text">
-                    <string>PSIBIN</string>
-                </property>
-            </item>
-            <item>
-                <property name="text">
-                    <string>MUD</string>
-                </property>
-            </item>
-            <item>
-                <property name="text">
-                    <string>WKM</string>
-                </property>
-            </item>
-            <item>
-                <property name="text">
                     <string>ASCII</string>
                 </property>
             </item>
@@ -449,7 +419,7 @@
 </widget>
 <images>
     <image name="image0">
-        <data format="PNG" length="270">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000d549444154388db594510e84200c44a78653d1f34faf853fd66d2a2aa8fb1222697068cb80d0884cadda7c6e46392c1860c9010da2bd8d4629f1670140a3200869d536ad8a2d63cfc805bc7c338ac766b33eb4c279dadb5be1b72c5ab5c5d2f3028fcda6bff042f40dd2f3f119355477c7708fdd15a3eef8ecf0f2868f847bb733332c1c9d43a344f15e9bca51e25a3cde52493736d3e2d85cb27ff36861d0081ad18b15607b783a785cabb67d4da7bf5e890070f34eb5c245cee2c4cfebc533ca593e211ee2652bdef0bfd7ed4bb1e8f5a947688615932a98c849f587290000000049454e44ae426082</data>
+        <data format="PNG" length="411">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000016249444154388d95544dae86200c9c1a169e471217707e5890d4f3b830e95b687d15e51349889982fd19a6252e0c6c001cb06e2b4637629abde0584b61aacf7bf0b06eebc5e88d5360b74fc18b9ed7f75bd82908210a01e0c204e33c8628029c99e8fd373ca853009023c3a530290d1a619abdf464aa7818dd682b3f232f8569ddd6cb594fa6578eab9f2f0f5105ede57888214ace692f3d33d591951602be719c72a2d18dc839512b93737de0989e74dcc2d3eca557d7371db7b0364daf3a865eceded41142949b8e7b38b32b86288fe7371d77bcb66d1ace4ceadcce9669f6a2f79dcdf0edbb1426752200c874ec8da6c37e6e2e0cfbadb798cd99c18571b11546ca090ed807cf85db23b2da6388a27ab7034a39d54a08403afc383c7514dab8a5e3a530a5431d4b667200e0c37f16e968efa70adede40a7e414bc3875663b4833d44a6adc548f59832dd3ce865fb8a9fbdaf1178e7f656ea724a59cba75fce5fb0774073f42f0dd40cc0000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
