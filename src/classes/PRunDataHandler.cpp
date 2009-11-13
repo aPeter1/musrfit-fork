@@ -322,11 +322,11 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
     }
   }
 
-  // check if the file is found in the directories given by WKMFULLDATAPATH
-  const Char_t *wkmpath = gSystem->Getenv("WKMFULLDATAPATH");
+  // check if the file is found in the directories given by MUSRFULLDATAPATH
+  const Char_t *musrpath = gSystem->Getenv("MUSRFULLDATAPATH");
   if (pathName.CompareTo("???") == 0) { // not found in local directory and xml path
-    str = TString(wkmpath);
-    // WKMFULLDATAPATH has the structure: path_1:path_2:...:path_n
+    str = TString(musrpath);
+    // MUSRFULLDATAPATH has the structure: path_1:path_2:...:path_n
     TObjArray *tokens = str.Tokenize(":");
     TObjString *ostr;
     for (Int_t i=0; i<tokens->GetEntries(); i++) {
@@ -337,12 +337,17 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
         break;
       }
     }
+    // cleanup
+    if (tokens) {
+      delete tokens;
+      tokens = 0;
+    }
   }
 
-  // check if the file is found in the WKM generated default path
-  if (pathName.CompareTo("???") == 0) { // not found in WKMFULLDATAPATH search
-    str = TString(wkmpath);
-    // WKMFULLDATAPATH has the structure: path_1:path_2:...:path_n
+  // check if the file is found in the generated default path
+  if (pathName.CompareTo("???") == 0) { // not found in MUSRFULLDATAPATH search
+    str = TString(musrpath);
+    // MUSRFULLDATAPATH has the structure: path_1:path_2:...:path_n
     TObjArray *tokens = str.Tokenize(":");
     TObjString *ostr;
     pstr = runInfo.GetInstitute(idx);
@@ -374,6 +379,11 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
         break;
       }
     }
+    // clean up
+    if (tokens) {
+      delete tokens;
+      tokens = 0;
+    }
   }
 
   // no proper path name found
@@ -382,7 +392,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
     cerr << endl << "  standard search pathes are:";
     cerr << endl << "  1. the local directory";
     cerr << endl << "  2. the data directory given in the startup XML file";
-    cerr << endl << "  3. the directories listed in WKMFULLDATAPATH";
+    cerr << endl << "  3. the directories listed in MUSRFULLDATAPATH";
     cerr << endl << "  4. default path construct which is described in the manual";
     return false;
   }
