@@ -37,16 +37,16 @@ endif
 
 # -- Linux
 ifeq ($(OS),LINUX)
-CXX           = g++-4.4.2
-CXXFLAGS      = -O3 -fopenmp -Wall -Wno-trigraphs -fPIC
+CXX           = g++
+CXXFLAGS      = -O3 -Wall -Wno-trigraphs -fPIC
 PMUSRPATH     = ../../../include
 MNPATH        = $(ROOTSYS)/include
 LOCALPATH     = ../include
 FFTW3PATH     = /usr/include
-INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(LOCALPATH) -I$(FFTW3PATH)
-LD            = g++-4.4.2
+INCLUDES      = -I$(LOCALPATH) -I$(PMUSRPATH) -I$(MNPATH) -I$(FFTW3PATH)
+LD            = g++
 LDFLAGS       = -O
-SOFLAGS       = -shared -fopenmp
+SOFLAGS       = -shared
 SHLIB         = libTFitPofB.so
 endif
 
@@ -58,7 +58,7 @@ PMUSRPATH     = ../../../include
 MNPATH        = $(ROOTSYS)/include
 LOCALPATH     = ../include
 FFTW3PATH     = /usr/include
-INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(LOCALPATH) -I$(FFTW3PATH)
+INCLUDES      = -I$(LOCALPATH) -I$(PMUSRPATH) -I$(MNPATH) -I$(FFTW3PATH)
 LD            = g++
 LDFLAGS       = -O -Wl,--enable-auto-import -Wl,--enable-runtime-pseudo-reloc
 SOFLAGS       = -shared -Wl,--export-all-symbols
@@ -74,7 +74,7 @@ MNPATH        = $(ROOTSYS)/include
 FINKPATH      = /sw/include
 LOCALPATH     = ../include
 FFTW3PATH     = /sw/include
-INCLUDES      = -I$(PMUSRPATH) -I$(MNPATH) -I$(LOCALPATH) -I$(FINKPATH) -I$(FFTW3PATH)
+INCLUDES      = -I$(LOCALPATH) -I$(PMUSRPATH) -I$(MNPATH) -I$(FINKPATH) -I$(FFTW3PATH)
 LD            = g++
 LDFLAGS       = -O -Xlinker -bind_at_load
 SOFLAGS       = -dynamiclib -flat_namespace -undefined suppress -Wl,-x

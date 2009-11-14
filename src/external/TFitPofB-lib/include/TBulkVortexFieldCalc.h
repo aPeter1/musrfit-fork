@@ -101,11 +101,12 @@ public:
   fftw_complex* GetAkMatrix() const {return fAkMatrix;}
   fftw_complex* GetBkMatrix() const {return fBkMatrix;}
   double* GetOmegaMatrix() const {return fOmegaMatrix;}
-  double* GetBMatrix() const {return fBMatrix;}
+  double* GetBMatrix() const {return fFFTout;}
   double* GetOmegaDiffXMatrix() const {return fOmegaDiffXMatrix;}
   double* GetOmegaDiffYMatrix() const {return fOmegaDiffYMatrix;}
   double* GetQxMatrix() const {return fQxMatrix;}
   double* GetQyMatrix() const {return fQyMatrix;}
+  double* GetAbrikosovCheck() const {return fAbrikosovCheck;}
 
 private:
 
@@ -117,11 +118,13 @@ private:
   fftw_complex *fAkMatrix;
   fftw_complex *fBkMatrix;
   mutable fftw_complex *fRealSpaceMatrix;
-  mutable double *fBMatrix;
+  mutable double *fAbrikosovCheck;
   mutable double *fOmegaMatrix;
   mutable double *fOmegaSqMatrix;
   mutable double *fOmegaDiffXMatrix;
   mutable double *fOmegaDiffYMatrix;
+  mutable double *fOmegaDDiffXMatrix;
+  mutable double *fOmegaDDiffYMatrix;
   mutable double *fQxMatrix;
   mutable double *fQyMatrix;
   mutable double *fQxMatrixA;

@@ -358,11 +358,23 @@ void TBulkTriVortexLondonFieldCalc::CalculateGrid() const {
 TBulkTriVortexNGLFieldCalc::TBulkTriVortexNGLFieldCalc(const string& wisdom, const unsigned int steps) : fLatticeConstant(0.0), fSumAk(0.0), fSumOmegaSq(0.0)
 {
   fWisdom = wisdom;
-  if (steps % 2) {
-    fSteps = steps + 1;
-  } else {
-    fSteps = steps;
+  switch (steps % 4) {
+    case 0:
+      fSteps = steps;
+      break;
+    case 1:
+      fSteps = steps + 3;
+      break;
+    case 2:
+      fSteps = steps + 2;
+      break;
+    case 3:
+      fSteps = steps + 1;
+      break;
+    default:
+      break;
   }
+
   fParam.resize(3);
   fGridExists = false;
 
@@ -377,9 +389,10 @@ TBulkTriVortexNGLFieldCalc::TBulkTriVortexNGLFieldCalc(const string& wisdom, con
   fAkMatrix = new fftw_complex[stepsSq];
   fBkMatrix = new fftw_complex[stepsSq];
   fRealSpaceMatrix = new fftw_complex[stepsSq];
-  fBMatrix = new double[stepsSq];
   fOmegaMatrix = new double[stepsSq];
   fOmegaSqMatrix = new double[stepsSq];
+  fOmegaDDiffXMatrix = new double[stepsSq];
+  fOmegaDDiffYMatrix = new double[stepsSq];
   fOmegaDiffXMatrix = new double[stepsSq];
   fOmegaDiffYMatrix = new double[stepsSq];
   fGMatrix = new double[stepsSq];
@@ -387,6 +400,7 @@ TBulkTriVortexNGLFieldCalc::TBulkTriVortexNGLFieldCalc(const string& wisdom, con
   fQyMatrix = new double[stepsSq];
   fQxMatrixA = new double[stepsSq];
   fQyMatrixA = new double[stepsSq];
+  fAbrikosovCheck = new double[stepsSq];
 
   fCheckAkConvergence = new double[fSteps];
   fCheckBkConvergence = new double[fSteps];
@@ -438,11 +452,12 @@ TBulkTriVortexNGLFieldCalc::~TBulkTriVortexNGLFieldCalc() {
   delete[] fAkMatrix; fAkMatrix = 0;
   delete[] fBkMatrix; fBkMatrix = 0;
   delete[] fRealSpaceMatrix; fRealSpaceMatrix = 0;
-  delete[] fBMatrix; fBMatrix = 0;
   delete[] fOmegaMatrix; fOmegaMatrix = 0;
   delete[] fOmegaSqMatrix; fOmegaSqMatrix = 0;
   delete[] fOmegaDiffXMatrix; fOmegaDiffXMatrix = 0;
   delete[] fOmegaDiffYMatrix; fOmegaDiffYMatrix = 0;
+  delete[] fOmegaDDiffXMatrix; fOmegaDiffXMatrix = 0;
+  delete[] fOmegaDDiffYMatrix; fOmegaDiffYMatrix = 0;
   delete[] fGMatrix; fGMatrix = 0;
   delete[] fQxMatrix; fQxMatrix = 0;
   delete[] fQyMatrix; fQyMatrix = 0;
@@ -450,21 +465,38 @@ TBulkTriVortexNGLFieldCalc::~TBulkTriVortexNGLFieldCalc() {
   delete[] fQyMatrixA; fQyMatrixA = 0;
   delete[] fCheckAkConvergence; fCheckAkConvergence = 0;
   delete[] fCheckBkConvergence; fCheckBkConvergence = 0;
+  delete[] fAbrikosovCheck; fAbrikosovCheck = 0;
 }
 
 void TBulkTriVortexNGLFieldCalc::CalculateIntermediateMatrices() const {
   const int NFFT(fSteps);
+  const int NFFT_2(fSteps/2);
   const int NFFTsq(fSteps*fSteps);
 
 // Derivatives of omega
 
-//  const double denomY(2.0*fLatticeConstant/static_cast<double>(NFFT));
-  const double denomY(2.0/static_cast<double>(NFFT));
+  const double denomY(2.0*fLatticeConstant/static_cast<double>(NFFT));
+//  const double denomY(2.0/static_cast<double>(NFFT));
 //  const double denomY(2.0);
+//  const double denomX(2.0);
   const double denomX(denomY*sqrt3);
   const double kappa(fParam[1]/fParam[2]);
   const double fourKappaSq(4.0*kappa*kappa);
+  
+  // Ensure that omega at the vortex-core positions is zero
+  fOmegaMatrix[0] = 0.0;
+  fOmegaMatrix[(NFFT+1)*NFFT_2] = 0.0;
+
   int i;
+
+  // Ensure that omega is NOT negative
+#pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  for (i = 0; i < NFFTsq; i += 1) {
+    if (fOmegaMatrix[i] < 0.0) {
+      cout << "Omega negative for index " << i << endl;
+      fOmegaMatrix[i] = 0.0;
+    }
+  }
 
 #pragma omp parallel for default(shared) private(i) schedule(dynamic)
   for (i = 0; i < NFFTsq; i += 1) {
@@ -490,6 +522,12 @@ void TBulkTriVortexNGLFieldCalc::CalculateIntermediateMatrices() const {
     fOmegaDiffYMatrix[i] = (fOmegaMatrix[i+NFFT]-fOmegaMatrix[i-NFFT])/denomY;
   }
 
+  // Ensure that the derivatives at the vortex-core positions are zero
+  fOmegaDiffXMatrix[0] = 0.0;
+  fOmegaDiffXMatrix[(NFFT+1)*NFFT_2] = 0.0;
+  fOmegaDiffYMatrix[0] = 0.0;
+  fOmegaDiffYMatrix[(NFFT+1)*NFFT_2] = 0.0;
+
 // g-Matrix
 
 #pragma omp parallel for default(shared) private(i) schedule(dynamic)
@@ -499,6 +537,32 @@ void TBulkTriVortexNGLFieldCalc::CalculateIntermediateMatrices() const {
     } else {
       fGMatrix[i] = (fOmegaDiffXMatrix[i]*fOmegaDiffXMatrix[i]+fOmegaDiffYMatrix[i]*fOmegaDiffYMatrix[i])/(fourKappaSq*fOmegaMatrix[i]);
     }
+  }
+
+// Laplacian for Abrikosov check
+
+#pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  for (i = 0; i < NFFTsq; i += 1) {
+    if (!(i % NFFT)) { // first column
+      fOmegaDDiffXMatrix[i] = (fOmegaDiffXMatrix[i+1]-fOmegaDiffXMatrix[i+NFFT-1])/denomX;
+    } else if (!((i + 1) % NFFT)) { // last column
+      fOmegaDDiffXMatrix[i] = (fOmegaDiffXMatrix[i-NFFT+1]-fOmegaDiffXMatrix[i-1])/denomX;
+    } else {
+      fOmegaDDiffXMatrix[i] = (fOmegaDiffXMatrix[i+1]-fOmegaDiffXMatrix[i-1])/denomX;
+    }
+  }
+
+  for (i = 0; i < NFFT; i++) { // first row
+    fOmegaDDiffYMatrix[i] = (fOmegaDiffYMatrix[i+NFFT]-fOmegaDiffYMatrix[NFFTsq-NFFT+i])/denomY;
+  }
+
+  for (i = NFFTsq - NFFT; i < NFFTsq; i++) { // last row
+    fOmegaDDiffYMatrix[i] = (fOmegaDiffYMatrix[i-NFFTsq+NFFT]-fOmegaDiffYMatrix[i-NFFT])/denomY;
+  }
+
+#pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  for (i = NFFT; i < NFFTsq - NFFT; i++) { // the rest
+    fOmegaDDiffYMatrix[i] = (fOmegaDiffYMatrix[i+NFFT]-fOmegaDiffYMatrix[i-NFFT])/denomY;
   }
 
   return;
@@ -779,8 +843,10 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
   }
 
   double field(fabs(fParam[0])), lambda(fabs(fParam[1])), xi(fabs(fParam[2]));
-  double Hc2(getHc2(xi)), kappa(lambda/xi), S(TWOPI/(kappa*field));
-  double scaledB(field/fluxQuantum*2.0*PI*xi*lambda);
+  double Hc2(getHc2(xi)), kappa(lambda/xi), Hc2_kappa(Hc2/kappa);
+  double scaledB(field/Hc2_kappa);
+
+  cout << "4pi/S = " << 2.0*kappa*scaledB << endl;
 
 //  fLatticeConstant = sqrt(2.0*fluxQuantum/(scaledB*sqrt3));
   fLatticeConstant = sqrt(2.0*TWOPI/(kappa*scaledB*sqrt3));
@@ -965,7 +1031,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
 #pragma omp parallel for default(shared) private(l) schedule(dynamic)
   for (l = 0; l < NFFT; l++) {
-    fCheckAkConvergence[l] = fAkMatrix[NFFT_2/2*NFFT + l][0];
+    fCheckAkConvergence[l] = fAkMatrix[l][0];
   }
 
   fSumAk = 0.0;
@@ -984,13 +1050,34 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
     fOmegaMatrix[l] = fSumAk - fRealSpaceMatrix[l][0];
   }
 
+  double sumOmega(0.0);
+  for (l = 0; l < NFFTsq; l++) {
+    sumOmega += fOmegaMatrix[l];
+  }
+  sumOmega /= static_cast<double>(NFFTsq);
+
+  cout << "sumOmega = " << sumOmega << endl;
+
   CalculateIntermediateMatrices();
+
+///////////// Check the Abrikosov solution
+
+  for (l = 0; l < NFFTsq; l++) {
+    if (!fOmegaMatrix[l]) {
+      fAbrikosovCheck[l] = 0.0;
+    } else {
+      fAbrikosovCheck[l] = (fOmegaDiffXMatrix[l]*fOmegaDiffXMatrix[l]+fOmegaDiffYMatrix[l]*fOmegaDiffYMatrix[l])/(fOmegaMatrix[l]*fOmegaMatrix[l]) - (fOmegaDDiffXMatrix[l] + fOmegaDDiffYMatrix[l])/fOmegaMatrix[l];
+    }
+  }
+
+
+  
 
   double denomQA;
 
 #pragma omp parallel for default(shared) private(l,denomQA) schedule(dynamic)
   for (l = 0; l < NFFTsq; l++) {
-    if (!fOmegaMatrix[l]) {
+    if (!fOmegaMatrix[l] || !l || (l == (NFFT+1)*NFFT_2)) {
       fQxMatrixA[l] = 0.0;
       fQyMatrixA[l] = 0.0;
     } else {
@@ -1006,13 +1093,17 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
 #pragma omp parallel for default(shared) private(l) schedule(dynamic)
   for (l = 0; l < NFFTsq; l++) {
-    fBMatrix[l] = scaledB;
+    fFFTout[l] = scaledB;
   }
 
   bool akConverged(false), bkConverged(false), akInitiallyConverged(false), firstBkCalculation(true);
   double coeff1, coeff2;
 
+  int count(0);
+
   while (!akConverged || !bkConverged) {
+
+//  if (count == 3) break;
 
 #pragma omp parallel for default(shared) private(l) schedule(dynamic)
     for (l = 0; l < NFFTsq; l++) {
@@ -1021,7 +1112,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
 #pragma omp parallel for default(shared) private(l) schedule(dynamic)
     for (l = 0; l < NFFTsq; l++) {
-      fRealSpaceMatrix[l][0] = fOmegaSqMatrix[l] + fOmegaMatrix[l]*(fQxMatrix[l]*fQxMatrix[l] + fQyMatrix[l]*fQyMatrix[l] - 2.0) + fGMatrix[l];
+      fRealSpaceMatrix[l][0] = fOmegaMatrix[l]*fOmegaMatrix[l] - 2.0*fOmegaMatrix[l] + fOmegaMatrix[l]*(fQxMatrix[l]*fQxMatrix[l] + fQyMatrix[l]*fQyMatrix[l]) + (!fOmegaMatrix[l] ? 0.0 : (fOmegaDiffXMatrix[l]*fOmegaDiffXMatrix[l]+fOmegaDiffYMatrix[l]*fOmegaDiffYMatrix[l])/(4.0*kappa*kappa*fOmegaMatrix[l]));
       fRealSpaceMatrix[l][1] = 0.0;
     }
 
@@ -1048,7 +1139,15 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
       fOmegaMatrix[l] = fSumAk - fRealSpaceMatrix[l][0];
     }
 
-    CalculateIntermediateMatrices();
+  CalculateIntermediateMatrices();
+
+  sumOmega = 0.0;
+  for (l = 0; l < NFFTsq; l++) {
+    sumOmega += fOmegaMatrix[l];
+  }
+  sumOmega /= static_cast<double>(NFFTsq);
+  cout << "sumOmega = " << sumOmega << endl;
+
 //
 #pragma omp parallel for default(shared) private(l) schedule(dynamic)
     for (l = 0; l < NFFTsq; l++) {
@@ -1062,8 +1161,10 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
     double coeffSum(0.0);
     for (l = 0; l < NFFTsq; l++) {
-      coeffSum += fOmegaMatrix[l]*(1.0 - (fQxMatrix[l]*fQxMatrix[l] + fQyMatrix[l]*fQyMatrix[l])) - fGMatrix[l];
+      coeffSum += fOmegaMatrix[l] - fOmegaMatrix[l]*(fQxMatrix[l]*fQxMatrix[l] + fQyMatrix[l]*fQyMatrix[l]) - (!fOmegaMatrix[l] ? 0.0 : (fOmegaDiffXMatrix[l]*fOmegaDiffXMatrix[l]+fOmegaDiffYMatrix[l]*fOmegaDiffYMatrix[l])/(4.0*kappa*kappa*fOmegaMatrix[l]));
     }
+    
+    cout << "coeffSum = " << coeffSum << ", fSumOmegaSq = " << fSumOmegaSq << endl;
 
     for (l = 0; l < NFFTsq; l++) {
       fAkMatrix[l][0] *= coeffSum/fSumOmegaSq;
@@ -1072,7 +1173,8 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
     akConverged = true;
 
     for (l = 0; l < NFFT; l++) {
-      if (fabs(fCheckAkConvergence[l] - fAkMatrix[NFFT_2/2*NFFT + l][0]) > 1.0E-12) {
+      if ((fabs(fCheckAkConvergence[l] - fAkMatrix[l][0])/fAkMatrix[l][0] > 0.025) && (fabs(fAkMatrix[l][0]) > 1.0E-4)) {
+        cout << "old: " << fCheckAkConvergence[l] << ", new: " << fAkMatrix[l][0] << endl;
         akConverged = false;
         break;
       }
@@ -1081,7 +1183,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
     if (!akConverged) {
 #pragma omp parallel for default(shared) private(l) schedule(dynamic)
       for (l = 0; l < NFFT; l++) {
-        fCheckAkConvergence[l] = fAkMatrix[NFFT_2/2*NFFT + l][0];
+        fCheckAkConvergence[l] = fAkMatrix[l][0];
       }
     } else {
       akInitiallyConverged = true;
@@ -1106,12 +1208,20 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
     }
 
     CalculateIntermediateMatrices();
+    
+  sumOmega = 0.0;
+  for (l = 0; l < NFFTsq; l++) {
+    sumOmega += fOmegaMatrix[l];
+  }
+  sumOmega /= static_cast<double>(NFFTsq);
+   cout << "sumOmega = " << sumOmega << endl;
 
+//break;
   if (akInitiallyConverged) {// break;
 
 #pragma omp parallel for default(shared) private(l) schedule(dynamic)
     for (l = 0; l < NFFTsq; l++) {
-      fRealSpaceMatrix[l][0] = (fOmegaMatrix[l]-fSumAk)*fBMatrix[l] + fSumAk*scaledB - fQxMatrix[l]*fOmegaDiffYMatrix[l] + fQyMatrix[l]*fOmegaDiffXMatrix[l];
+      fRealSpaceMatrix[l][0] = fOmegaMatrix[l]*fFFTout[l] + fSumAk*(scaledB - fFFTout[l]) - fQxMatrix[l]*fOmegaDiffYMatrix[l] + fQyMatrix[l]*fOmegaDiffXMatrix[l];
       fRealSpaceMatrix[l][1] = 0.0;
     }
 
@@ -1120,7 +1230,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
     if (firstBkCalculation) {
 #pragma omp parallel for default(shared) private(l) schedule(dynamic)
       for (l = 0; l < NFFT; l++) {
-        fCheckBkConvergence[l] = fBkMatrix[NFFT_2/2*NFFT + l][0];
+        fCheckBkConvergence[l] = fBkMatrix[l][0];
       }
       firstBkCalculation = false;
       akConverged = false;
@@ -1134,13 +1244,24 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
 #pragma omp parallel for default(shared) private(l) schedule(dynamic)
     for (l = 0; l < NFFTsq; l++) {
-      fBMatrix[l] = scaledB + fRealSpaceMatrix[l][0];
+      fFFTout[l] = scaledB + fRealSpaceMatrix[l][0];
     }
+
+  // Ensure that the field is NOT negative
+#pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  for (l = 0; l < NFFTsq; l++) {
+    if (fFFTout[l] < 0.0)
+      fFFTout[l] = 0.0;
+  }
+//  break;
+
+    
 
     bkConverged = true;
 
     for (l = 0; l < NFFT; l++) {
-      if (fabs(fCheckBkConvergence[l] - fBkMatrix[NFFT_2/2*NFFT + l][0]) > 1.0E-12) {
+      if ((fabs(fCheckBkConvergence[l] - fBkMatrix[l][0])/fBkMatrix[l][0] > 0.025) && (fabs(fBkMatrix[l][0]) > 1.0E-4)) {
+        cout << "old: " << fCheckBkConvergence[l] << ", new: " << fBkMatrix[l][0] << endl;
         bkConverged = false;
         break;
       }
@@ -1151,10 +1272,13 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
     if (!bkConverged) {
 #pragma omp parallel for default(shared) private(l) schedule(dynamic)
       for (l = 0; l < NFFT; l++) {
-        fCheckBkConvergence[l] = fBkMatrix[NFFT_2/2*NFFT + l][0];
+        fCheckBkConvergence[l] = fBkMatrix[l][0];
       }
-    } else if (akConverged) {
+    } else if (count == 1) {
       break;
+    } else {
+      bkConverged = false;
+      count++;
     }
 
 // I need a copy of Bk... store it to Ak since already tooooooooooooooooooo much memory is allocated
@@ -1189,6 +1313,11 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
       fQyMatrix[l] = fQyMatrixA[l] + fRealSpaceMatrix[l][1];
     }
   }
+  }
+
+#pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  for (l = 0; l < NFFTsq; l++) {
+    fFFTout[l] *= Hc2_kappa;
   }
 
   // Set the flag which shows that the calculation has been done
