@@ -37,6 +37,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class TBulkTriVortexLondon+;
+#pragma link C++ class TBulkTriVortexNGL+;
 
 #endif //__CINT__
 // root dictionary stuff --------------------------------------------------
