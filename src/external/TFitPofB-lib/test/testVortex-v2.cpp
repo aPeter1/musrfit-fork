@@ -19,18 +19,18 @@ int main(){
 //  parForVortex[2] = 4.0; //xi
 
   vector<double> parForPofB;
-  parForPofB.push_back(0.01); //dt
-  parForPofB.push_back(0.1); //dB
+  parForPofB.push_back(0.005); //dt
+  parForPofB.push_back(20.0); //dB
 
   vector<double> parForPofT;
   parForPofT.push_back(0.0); //phase
-  parForPofT.push_back(0.01); //dt
-  parForPofT.push_back(0.1); //dB
+  parForPofT.push_back(0.005); //dt
+  parForPofT.push_back(20.0); //dB
 
   TBulkTriVortexLondonFieldCalc *vortexLattice = new TBulkTriVortexLondonFieldCalc("/home/l_wojek/analysis/WordsOfWisdom.dat", NFFT);
 
-  parForVortex[0] = 10.0; //app.field
-  parForVortex[1] = 200.0; //lambda
+  parForVortex[0] = 3000.0; //app.field
+  parForVortex[1] = 100.0; //lambda
   parForVortex[2] = 4.0; //xi
 
   vortexLattice->SetParameters(parForVortex);

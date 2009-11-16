@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  TBulkVortexFieldCalc.h
+  TBulkTriVortexFieldCalc.h
 
   Author: Bastian M. Wojek, Alexander Maisuradze
   e-mail: bastian.wojek@psi.ch
@@ -86,6 +86,36 @@ public:
 };
 
 //--------------------
+// Class for triangular vortex lattice, modified London model
+//--------------------
+
+class TBulkTriVortexMLFieldCalc : public TBulkVortexFieldCalc {
+
+public:
+
+  TBulkTriVortexMLFieldCalc(const string&, const unsigned int steps = 256);
+  ~TBulkTriVortexMLFieldCalc() {}
+
+  void CalculateGrid() const;
+
+};
+
+//--------------------
+// Class for triangular vortex lattice, analytical GL approximation
+//--------------------
+
+class TBulkTriVortexAGLFieldCalc : public TBulkVortexFieldCalc {
+
+public:
+
+  TBulkTriVortexAGLFieldCalc(const string&, const unsigned int steps = 256);
+  ~TBulkTriVortexAGLFieldCalc() {}
+
+  void CalculateGrid() const;
+
+};
+
+//--------------------
 // Class for triangular vortex lattice, Minimisation of the GL free energy à la Brandt
 //--------------------
 
@@ -129,11 +159,10 @@ private:
   mutable double fSumAk;
   mutable double fSumOmegaSq;
   mutable double fSumSum;
-  fftw_plan fFFTplanAkToOmega;
   fftw_plan fFFTplanBkToBandQ;
   fftw_plan fFFTplanOmegaToAk;
   fftw_plan fFFTplanOmegaToBk;
 
 };
 
-#endif // _TBulkVortexFieldCalc_H_
+#endif // _TBulkTriVortexFieldCalc_H_

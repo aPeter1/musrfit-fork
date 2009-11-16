@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  TBulkVortexFieldCalc.cpp
+  TBulkTriVortexFieldCalc.cpp
 
   Author: Bastian M. Wojek, Alexander Maisuradze
   e-mail: bastian.wojek@psi.ch
@@ -29,7 +29,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "TBulkVortexFieldCalc.h"
+#include "TBulkTriVortexFieldCalc.h"
 
 #include <cstdlib>
 #include <cmath>
@@ -37,25 +37,25 @@
 #include <iostream>
 using namespace std;
 
+#include "TMath.h"
+
 #define PI 3.14159265358979323846
 #define TWOPI 6.28318530717958647692
 
 const double fluxQuantum(2.067833667e7); // in this case this is Gauss times square nm
 
 const double sqrt3(sqrt(3.0));
-
-//const double pi_4sqrt3(0.25*PI/sqrt3);
 const double pi_4sqrt3(0.25*PI/sqrt(3.0));
-//const double pi_4sqrt3(PI*sqrt(3.0));
 
-double getXi(const double hc2) { // get xi given Hc2 in Gauss
+
+double getXi(const double &hc2) { // get xi given Hc2 in Gauss
   if (hc2)
     return sqrt(fluxQuantum/(TWOPI*hc2));
   else
     return 0.0;
 }
 
-double getHc2(const double xi) { // get Hc2 given xi in nm
+double getHc2(const double &xi) { // get Hc2 given xi in nm
   if (xi)
     return fluxQuantum/(TWOPI*xi*xi);
   else
@@ -163,78 +163,17 @@ TBulkTriVortexLondonFieldCalc::TBulkTriVortexLondonFieldCalc(const string& wisdo
     fFFTplan = fftw_plan_dft_c2r_2d(fSteps, fSteps, fFFTin, fFFTout, FFTW_ESTIMATE);
 }
 
-// double TBulkTriVortexLondonFieldCalc::GetBatPoint(double relX, double relY) const {
-// 
-//   double field(fParam[0]), lambda(fParam[1]), xi(fParam[2]);
-//   double xisq_2(0.5*xi*xi), lambdasq(lambda*lambda);
-// 
-//   double latConstTr(sqrt(fluxQuantum/field)*sqrt(sqrt(4.0/3.0)));
-//   double Hc2(getHc2(xi));
-// 
-//   double xCoord(latConstTr*relX); // in nanometers
-//   double yCoord(latConstTr*relY);
-// 
-//   if ((field < Hc2) && (lambda > xi/sqrt(2.0))) {
-//     double KLatTr(4.0*PI/(latConstTr*sqrt3));
-//     double fourierSum(1.0), fourierAdd(0.0), expo;
-// 
-//     // k = 0, l = 0 gives 1.0, already in fourierSum
-// 
-//     // l = 0, only integer k
-//     for (double k (1.0); k < static_cast<double>(fNFourierComp); k+=1.0){
-//       expo = 3.0*pow(KLatTr*k, 2.0);
-//       fourierAdd += exp(-xisq_2*expo)/(lambdasq*expo + 1.0)*cos(sqrt3*KLatTr*k*xCoord);
-//     }
-// 
-//     fourierSum += 2.0*fourierAdd;
-//     fourierAdd = 0.0;
-// 
-//     // k = 0, only integer l
-//     for (double l (1.0); l < static_cast<double>(fNFourierComp); l+=1.0){
-//       expo = pow(KLatTr*l, 2.0);
-//       fourierAdd += exp(-xisq_2*expo)/(lambdasq*expo + 1.0)*cos(KLatTr*l*yCoord);
-//     }
-// 
-//     fourierSum += 2.0*fourierAdd;
-//     fourierAdd = 0.0;
-// 
-//     // k != 0, l != 0 both integers
-//     for (double k (1.0); k < static_cast<double>(fNFourierComp); k+=1.0){
-//       for (double l (1.0); l < static_cast<double>(fNFourierComp); l+=1.0){
-//         expo = KLatTr*KLatTr*(3.0*k*k + l*l);
-//         fourierAdd += exp(-xisq_2*expo)/(lambdasq*expo + 1.0)*cos(sqrt3*KLatTr*k*xCoord)*cos(KLatTr*l*yCoord);
-//       }
-//     }
-// 
-//     fourierSum += 4.0*fourierAdd;
-//     fourierAdd = 0.0;
-// 
-//     // k != 0, l != 0 both half-integral numbers
-//     for (double k (0.5); k < static_cast<double>(fNFourierComp); k+=1.0){
-//       for (double l (0.5); l < static_cast<double>(fNFourierComp); l+=1.0){
-//         expo = KLatTr*KLatTr*(3.0*k*k + l*l);
-//         fourierAdd += exp(-xisq_2*expo)/(lambdasq*expo + 1.0)*cos(sqrt3*KLatTr*k*xCoord)*cos(KLatTr*l*yCoord);
-//       }
-//     }
-// 
-//     fourierSum += 4.0*fourierAdd;
-// 
-// //     for(int mm = -fNFourierComp; mm <= static_cast<int>(fNFourierComp); mm++) {
-// //       for(int nn = -fNFourierComp; nn <= static_cast<int>(fNFourierComp); nn++) {
-// //         fourierSum += cos(KLatTr*(xCoord*mm*(0.5*sqrt(3.0)) + yCoord*mm*0.5 + yCoord*nn))*exp(-(0.5*fParam[1]*fParam[1]*KLatTr*KLatTr)*
-// //          (0.75*mm*mm + (nn + 0.5*mm)*(nn + 0.5*mm)))/(1.0+(fParam[0]*KLatTr*fParam[0]*KLatTr)*(0.75*mm*mm + (nn + 0.5*mm)*(nn + 0.5*mm)));
-// //       }
-// //     }
-// //    cout << " " << fourierSum << ", ";
-//     return field*fourierSum;
-//   }
-//   else
-//     return field;
-// 
-// }
-
 void TBulkTriVortexLondonFieldCalc::CalculateGrid() const {
   // SetParameters - method has to be called from the user before the calculation!!
+  if (fParam.size() < 3) {
+    cout << endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << endl;
+    return;
+  }
+  if (!fParam[0] || !fParam[1] || !fParam[2]) {
+    cout << endl << "The field, penetration depth and coherence length have to have finite values in order to calculate B(x,y)!" << endl;
+    return;
+  }
+
   double field(fabs(fParam[0])), lambda(fabs(fParam[1])), xi(fabs(fParam[2]));
   double Hc2(getHc2(xi));
 
@@ -249,8 +188,8 @@ void TBulkTriVortexLondonFieldCalc::CalculateGrid() const {
 
   // ... but first check that the field is not larger than Hc2 and that we are dealing with a type II SC
   if ((field >= Hc2) || (lambda < xi/sqrt(2.0))) {
-  int m;
-#pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    int m;
+    #pragma omp parallel for default(shared) private(m) schedule(dynamic)
     for (m = 0; m < NFFTsq; m++) {
       fFFTout[m] = field;
     }
@@ -260,90 +199,80 @@ void TBulkTriVortexLondonFieldCalc::CalculateGrid() const {
   }
 
   // ... now fill in the Fourier components if everything was okay above
-  double Gsq;
+  double Gsq, ll;
   int k, l, lNFFT_2;
 
-// omp causes problems with the fftw_complex*... comment it out for the moment
-//#pragma omp parallel default(shared) private(l,lNFFT_2,k,Gsq)
-  {
-//  #pragma omp sections nowait
-    {
-//      #pragma omp section
-//      #pragma omp parallel for default(shared) private(l,lNFFT_2,k) schedule(dynamic)
-      for (l = 0; l < NFFT_2; l += 2) {
-        lNFFT_2 = l*(NFFT_2 + 1);
-        for (k = 0; k < NFFT_2; k += 2) {
-          Gsq = 3.0*static_cast<double>(k*k) + static_cast<double>(l*l);
-          fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
-          fFFTin[lNFFT_2 + k][1] = 0.0;
-          fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-          fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-        }
-        k = NFFT_2;
-        Gsq = 3.0*static_cast<double>(k*k) + static_cast<double>(l*l);
-        fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
-        fFFTin[lNFFT_2 + k][1] = 0.0;
-      }
+  for (l = 0; l < NFFT_2; l += 2) {
+    lNFFT_2 = l*(NFFT_2 + 1);
+    ll = 3.0*static_cast<double>(l*l);
+    for (k = 0; k < NFFT_2; k += 2) {
+      Gsq = static_cast<double>(k*k) + ll;
+      fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
+    k = NFFT_2;
+    Gsq = static_cast<double>(k*k) + ll;
+    fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+    fFFTin[lNFFT_2 + k][1] = 0.0;
+  }
 
-//      #pragma omp section
-//      #pragma omp parallel for default(shared) private(l,lNFFT_2,k) schedule(dynamic)
-      for (l = NFFT_2; l < NFFT; l += 2) {
-        lNFFT_2 = l*(NFFT_2 + 1);
-        for (k = 0; k < NFFT_2; k += 2) {
-          Gsq = 3.0*static_cast<double>(k*k) + static_cast<double>((NFFT-l)*(NFFT-l));
-          fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
-          fFFTin[lNFFT_2 + k][1] = 0.0;
-          fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-          fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-        }
-        k = NFFT_2;
-        Gsq = 3.0*static_cast<double>(k*k) + static_cast<double>((NFFT-l)*(NFFT-l));
-        fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
-        fFFTin[lNFFT_2 + k][1] = 0.0;
-      }
 
-      // intermediate rows
-//      #pragma omp section
-//      #pragma omp parallel for default(shared) private(l,lNFFT_2,k) schedule(dynamic)
-      for (l = 1; l < NFFT_2; l += 2) {
-        lNFFT_2 = l*(NFFT_2 + 1);
-        for (k = 0; k < NFFT_2; k += 2) {
-          Gsq = 3.0*static_cast<double>((k + 1)*(k + 1)) + static_cast<double>(l*l);
-          fFFTin[lNFFT_2 + k][0] = 0.0;
-          fFFTin[lNFFT_2 + k][1] = 0.0;
-          fFFTin[lNFFT_2 + k + 1][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
-          fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-        }
-        k = NFFT_2;
-        fFFTin[lNFFT_2 + k][0] = 0.0;
-        fFFTin[lNFFT_2 + k][1] = 0.0;
-      }
+  for (l = NFFT_2; l < NFFT; l += 2) {
+    lNFFT_2 = l*(NFFT_2 + 1);
+    ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
+    for (k = 0; k < NFFT_2; k += 2) {
+      Gsq = static_cast<double>(k*k) + ll;
+      fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
+    k = NFFT_2;
+    Gsq = static_cast<double>(k*k) + ll;
+    fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+    fFFTin[lNFFT_2 + k][1] = 0.0;
+  }
 
-//      #pragma omp section
-//      #pragma omp parallel for default(shared) private(l,lNFFT_2,k) schedule(dynamic)
-      for (l = NFFT_2 + 1; l < NFFT; l += 2) {
-        lNFFT_2 = l*(NFFT_2 + 1);
-        for (k = 0; k < NFFT_2; k += 2) {
-          Gsq = 3.0*static_cast<double>((k+1)*(k+1)) + static_cast<double>((NFFT-l)*(NFFT-l));
-          fFFTin[lNFFT_2 + k][0] = 0.0;
-          fFFTin[lNFFT_2 + k][1] = 0.0;
-          fFFTin[lNFFT_2 + k + 1][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
-          fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-        }
-        k = NFFT_2;
-        fFFTin[lNFFT_2 + k][0] = 0.0;
-        fFFTin[lNFFT_2 + k][1] = 0.0;
-      }
-    }  /* end of sections */
+  // intermediate rows
 
-  }  /* end of parallel section */
+  for (l = 1; l < NFFT_2; l += 2) {
+    lNFFT_2 = l*(NFFT_2 + 1);
+    ll = 3.0*static_cast<double>(l*l);
+    for (k = 0; k < NFFT_2; k += 2) {
+      Gsq = static_cast<double>((k + 1)*(k + 1)) + ll;
+      fFFTin[lNFFT_2 + k][0] = 0.0;
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
+    k = NFFT_2;
+    fFFTin[lNFFT_2 + k][0] = 0.0;
+    fFFTin[lNFFT_2 + k][1] = 0.0;
+  }
+
+  for (l = NFFT_2 + 1; l < NFFT; l += 2) {
+    lNFFT_2 = l*(NFFT_2 + 1);
+    ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
+    for (k = 0; k < NFFT_2; k += 2) {
+      Gsq = static_cast<double>((k+1)*(k+1)) + ll;
+      fFFTin[lNFFT_2 + k][0] = 0.0;
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
+    k = NFFT_2;
+    fFFTin[lNFFT_2 + k][0] = 0.0;
+    fFFTin[lNFFT_2 + k][1] = 0.0;
+  }
 
   // Do the Fourier transform to get B(x,y)
 
   fftw_execute(fFFTplan);
 
   // Multiply by the applied field
-#pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
   for (l = 0; l < NFFTsq; l++) {
     fFFTout[l] *= field;
   }
@@ -354,6 +283,353 @@ void TBulkTriVortexLondonFieldCalc::CalculateGrid() const {
   return;
 
 }
+
+
+TBulkTriVortexMLFieldCalc::TBulkTriVortexMLFieldCalc(const string& wisdom, const unsigned int steps) {
+  fWisdom = wisdom;
+  if (steps % 2) {
+    fSteps = steps + 1;
+  } else {
+    fSteps = steps;
+  }
+  fParam.resize(3);
+  fGridExists = false;
+
+  int init_threads(fftw_init_threads());
+  if (init_threads)
+    fftw_plan_with_nthreads(2);
+
+  fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
+  fFFTout = new double[fSteps*fSteps];
+
+//  cout << "Check for the FFT plan..." << endl;
+
+// Load wisdom from file if it exists and should be used
+
+  fUseWisdom = true;
+  int wisdomLoaded(0);
+
+  FILE *wordsOfWisdomR;
+  wordsOfWisdomR = fopen(fWisdom.c_str(), "r");
+  if (wordsOfWisdomR == NULL) {
+    fUseWisdom = false;
+  } else {
+    wisdomLoaded = fftw_import_wisdom_from_file(wordsOfWisdomR);
+    fclose(wordsOfWisdomR);
+  }
+
+  if (!wisdomLoaded) {
+    fUseWisdom = false;
+  }
+
+// create the FFT plan
+
+  if (fUseWisdom)
+    fFFTplan = fftw_plan_dft_c2r_2d(fSteps, fSteps, fFFTin, fFFTout, FFTW_EXHAUSTIVE);
+  else
+    fFFTplan = fftw_plan_dft_c2r_2d(fSteps, fSteps, fFFTin, fFFTout, FFTW_ESTIMATE);
+}
+
+void TBulkTriVortexMLFieldCalc::CalculateGrid() const {
+  // SetParameters - method has to be called from the user before the calculation!!
+  if (fParam.size() < 3) {
+    cout << endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << endl;
+    return;
+  }
+  if (!fParam[0] || !fParam[1] || !fParam[2]) {
+    cout << endl << "The field, penetration depth and coherence length have to have finite values in order to calculate B(x,y)!" << endl;
+    return;
+  }
+
+  double field(fabs(fParam[0])), lambda(fabs(fParam[1])), xi(fabs(fParam[2]));
+  double Hc2(getHc2(xi));
+
+  const int NFFT(fSteps);
+  const int NFFT_2(fSteps/2);
+  const int NFFTsq(fSteps*fSteps);
+
+   // fill the field Fourier components in the matrix
+
+  // ... but first check that the field is not larger than Hc2 and that we are dealing with a type II SC
+  if ((field >= Hc2) || (lambda < xi/sqrt(2.0))) {
+    int m;
+    #pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    for (m = 0; m < NFFTsq; m++) {
+      fFFTout[m] = field;
+    }
+    // Set the flag which shows that the calculation has been done
+    fGridExists = true;
+    return;
+  }
+
+  double latConstTr(sqrt(2.0*fluxQuantum/(field*sqrt3)));
+  double oneMb(1.0-field/Hc2);
+  double xisq_2_scaled(2.0/(3.0*oneMb)*pow(xi*PI/latConstTr,2.0)), lambdasq_scaled(4.0/(3.0*oneMb)*pow(lambda*PI/latConstTr,2.0));
+
+  // ... now fill in the Fourier components if everything was okay above
+  double Gsq, ll;
+  int k, l, lNFFT_2;
+
+  for (l = 0; l < NFFT_2; l += 2) {
+    lNFFT_2 = l*(NFFT_2 + 1);
+    ll = 3.0*static_cast<double>(l*l);
+    for (k = 0; k < NFFT_2; k += 2) {
+      Gsq = static_cast<double>(k*k) + ll;
+      fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
+    k = NFFT_2;
+    Gsq = static_cast<double>(k*k) + ll;
+    fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+    fFFTin[lNFFT_2 + k][1] = 0.0;
+  }
+
+
+  for (l = NFFT_2; l < NFFT; l += 2) {
+    lNFFT_2 = l*(NFFT_2 + 1);
+    ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
+    for (k = 0; k < NFFT_2; k += 2) {
+      Gsq = static_cast<double>(k*k) + ll;
+      fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
+    k = NFFT_2;
+    Gsq = static_cast<double>(k*k) + ll;
+    fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+    fFFTin[lNFFT_2 + k][1] = 0.0;
+  }
+
+  // intermediate rows
+
+  for (l = 1; l < NFFT_2; l += 2) {
+    lNFFT_2 = l*(NFFT_2 + 1);
+    ll = 3.0*static_cast<double>(l*l);
+    for (k = 0; k < NFFT_2; k += 2) {
+      Gsq = static_cast<double>((k + 1)*(k + 1)) + ll;
+      fFFTin[lNFFT_2 + k][0] = 0.0;
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
+    k = NFFT_2;
+    fFFTin[lNFFT_2 + k][0] = 0.0;
+    fFFTin[lNFFT_2 + k][1] = 0.0;
+  }
+
+  for (l = NFFT_2 + 1; l < NFFT; l += 2) {
+    lNFFT_2 = l*(NFFT_2 + 1);
+    ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
+    for (k = 0; k < NFFT_2; k += 2) {
+      Gsq = static_cast<double>((k+1)*(k+1)) + ll;
+      fFFTin[lNFFT_2 + k][0] = 0.0;
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
+    k = NFFT_2;
+    fFFTin[lNFFT_2 + k][0] = 0.0;
+    fFFTin[lNFFT_2 + k][1] = 0.0;
+  }
+
+  // Do the Fourier transform to get B(x,y)
+
+  fftw_execute(fFFTplan);
+
+  // Multiply by the applied field
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  for (l = 0; l < NFFTsq; l++) {
+    fFFTout[l] *= field;
+  }
+
+  // Set the flag which shows that the calculation has been done
+
+  fGridExists = true;
+  return;
+
+}
+
+
+
+
+TBulkTriVortexAGLFieldCalc::TBulkTriVortexAGLFieldCalc(const string& wisdom, const unsigned int steps) {
+  fWisdom = wisdom;
+  if (steps % 2) {
+    fSteps = steps + 1;
+  } else {
+    fSteps = steps;
+  }
+  fParam.resize(3);
+  fGridExists = false;
+
+  int init_threads(fftw_init_threads());
+  if (init_threads)
+    fftw_plan_with_nthreads(2);
+
+  fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
+  fFFTout = new double[fSteps*fSteps];
+
+//  cout << "Check for the FFT plan..." << endl;
+
+// Load wisdom from file if it exists and should be used
+
+  fUseWisdom = true;
+  int wisdomLoaded(0);
+
+  FILE *wordsOfWisdomR;
+  wordsOfWisdomR = fopen(fWisdom.c_str(), "r");
+  if (wordsOfWisdomR == NULL) {
+    fUseWisdom = false;
+  } else {
+    wisdomLoaded = fftw_import_wisdom_from_file(wordsOfWisdomR);
+    fclose(wordsOfWisdomR);
+  }
+
+  if (!wisdomLoaded) {
+    fUseWisdom = false;
+  }
+
+// create the FFT plan
+
+  if (fUseWisdom)
+    fFFTplan = fftw_plan_dft_c2r_2d(fSteps, fSteps, fFFTin, fFFTout, FFTW_EXHAUSTIVE);
+  else
+    fFFTplan = fftw_plan_dft_c2r_2d(fSteps, fSteps, fFFTin, fFFTout, FFTW_ESTIMATE);
+}
+
+void TBulkTriVortexAGLFieldCalc::CalculateGrid() const {
+  // SetParameters - method has to be called from the user before the calculation!!
+  if (fParam.size() < 3) {
+    cout << endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << endl;
+    return;
+  }
+  if (!fParam[0] || !fParam[1] || !fParam[2]) {
+    cout << endl << "The field, penetration depth and coherence length have to have finite values in order to calculate B(x,y)!" << endl;
+    return;
+  }
+
+  double field(fabs(fParam[0])), lambda(fabs(fParam[1])), xi(fabs(fParam[2]));
+  double Hc2(getHc2(xi));
+
+  const int NFFT(fSteps);
+  const int NFFT_2(fSteps/2);
+  const int NFFTsq(fSteps*fSteps);
+
+   // fill the field Fourier components in the matrix
+
+  // ... but first check that the field is not larger than Hc2 and that we are dealing with a type II SC
+  if ((field >= Hc2) || (lambda < xi/sqrt(2.0))) {
+    int m;
+    #pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    for (m = 0; m < NFFTsq; m++) {
+      fFFTout[m] = field;
+    }
+    // Set the flag which shows that the calculation has been done
+    fGridExists = true;
+    return;
+  }
+
+  double latConstTr(sqrt(2.0*fluxQuantum/(field*sqrt3)));
+  double b(field/Hc2);
+  double xisq_scaled(8.0/3.0*pow(xi*PI/latConstTr,2.0)*(1.0+pow(b,4.0))*(1.0-2.0*b*pow(1.0-b,2.0)));
+  double lambdasq_scaled(4.0/3.0*pow(lambda*PI/latConstTr,2.0));
+
+  // ... now fill in the Fourier components if everything was okay above
+  double Gsq, sqrtXiSqScGsq, ll;
+  int k, l, lNFFT_2;
+
+  for (l = 0; l < NFFT_2; l += 2) {
+    lNFFT_2 = l*(NFFT_2 + 1);
+    ll = 3.0*static_cast<double>(l*l);
+    for (k = 0; k < NFFT_2; k += 2) {
+      Gsq = static_cast<double>(k*k) + ll;
+      sqrtXiSqScGsq = ((k || l) ? sqrt(xisq_scaled*Gsq) : 1.0E-9);
+      fFFTin[lNFFT_2 + k][0] = sqrtXiSqScGsq*TMath::BesselK1(sqrtXiSqScGsq)/(lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
+    k = NFFT_2;
+    Gsq = static_cast<double>(k*k) + ll;
+    sqrtXiSqScGsq = sqrt(xisq_scaled*Gsq);
+    fFFTin[lNFFT_2 + k][0] = sqrtXiSqScGsq*TMath::BesselK1(sqrtXiSqScGsq)/(lambdasq_scaled*Gsq);
+    fFFTin[lNFFT_2 + k][1] = 0.0;
+  }
+
+
+  for (l = NFFT_2; l < NFFT; l += 2) {
+    lNFFT_2 = l*(NFFT_2 + 1);
+    ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
+    for (k = 0; k < NFFT_2; k += 2) {
+      Gsq = static_cast<double>(k*k) + ll;
+      sqrtXiSqScGsq = sqrt(xisq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k][0] = sqrtXiSqScGsq*TMath::BesselK1(sqrtXiSqScGsq)/(lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
+    k = NFFT_2;
+    Gsq = static_cast<double>(k*k) + ll;
+    sqrtXiSqScGsq = sqrt(xisq_scaled*Gsq);
+    fFFTin[lNFFT_2 + k][0] = sqrtXiSqScGsq*TMath::BesselK1(sqrtXiSqScGsq)/(lambdasq_scaled*Gsq);
+    fFFTin[lNFFT_2 + k][1] = 0.0;
+  }
+
+  // intermediate rows
+
+  for (l = 1; l < NFFT_2; l += 2) {
+    lNFFT_2 = l*(NFFT_2 + 1);
+    ll = 3.0*static_cast<double>(l*l);
+    for (k = 0; k < NFFT_2; k += 2) {
+      Gsq = static_cast<double>((k + 1)*(k + 1)) + ll;
+      sqrtXiSqScGsq = sqrt(xisq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k][0] = 0.0;
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] = sqrtXiSqScGsq*TMath::BesselK1(sqrtXiSqScGsq)/(lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
+    k = NFFT_2;
+    fFFTin[lNFFT_2 + k][0] = 0.0;
+    fFFTin[lNFFT_2 + k][1] = 0.0;
+  }
+
+  for (l = NFFT_2 + 1; l < NFFT; l += 2) {
+    lNFFT_2 = l*(NFFT_2 + 1);
+    ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
+    for (k = 0; k < NFFT_2; k += 2) {
+      Gsq = static_cast<double>((k+1)*(k+1)) + ll;
+      sqrtXiSqScGsq = sqrt(xisq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k][0] = 0.0;
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] = sqrtXiSqScGsq*TMath::BesselK1(sqrtXiSqScGsq)/(lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
+    k = NFFT_2;
+    fFFTin[lNFFT_2 + k][0] = 0.0;
+    fFFTin[lNFFT_2 + k][1] = 0.0;
+  }
+
+  // Do the Fourier transform to get B(x,y)
+
+  fftw_execute(fFFTplan);
+
+  // Multiply by the applied field
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  for (l = 0; l < NFFTsq; l++) {
+    fFFTout[l] *= field*(1.0-pow(b,4.0));
+  }
+
+  // Set the flag which shows that the calculation has been done
+
+  fGridExists = true;
+  return;
+
+}
+
+
 
 TBulkTriVortexNGLFieldCalc::TBulkTriVortexNGLFieldCalc(const string& wisdom, const unsigned int steps)
  : fLatticeConstant(0.0), fKappa(0.0), fSumAk(0.0), fSumOmegaSq(0.0), fSumSum(0.0)
@@ -419,13 +695,15 @@ TBulkTriVortexNGLFieldCalc::TBulkTriVortexNGLFieldCalc(const string& wisdom, con
 // create the FFT plans
 
   if (fUseWisdom) {
-    fFFTplanAkToOmega = fftw_plan_dft_c2r_2d(fSteps, fSteps, fFFTin, fOmegaMatrix, FFTW_EXHAUSTIVE);
+    // use the first plan from the base class here - it will be destroyed by the base class destructor
+    fFFTplan = fftw_plan_dft_c2r_2d(fSteps, fSteps, fFFTin, fOmegaMatrix, FFTW_EXHAUSTIVE);
     fFFTplanBkToBandQ = fftw_plan_dft_2d(fSteps, fSteps, fBkMatrix, fBkMatrix, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
     fFFTplanOmegaToAk = fftw_plan_dft_r2c_2d(fSteps, fSteps, fOmegaMatrix, fFFTin, FFTW_EXHAUSTIVE);
     fFFTplanOmegaToBk = fftw_plan_dft_2d(fSteps, fSteps, fBkMatrix, fBkMatrix, FFTW_FORWARD, FFTW_EXHAUSTIVE);
   }
   else {
-    fFFTplanAkToOmega = fftw_plan_dft_c2r_2d(fSteps, fSteps, fFFTin, fOmegaMatrix, FFTW_ESTIMATE);
+    // use the first plan from the base class here - it will be destroyed by the base class destructor
+    fFFTplan = fftw_plan_dft_c2r_2d(fSteps, fSteps, fFFTin, fOmegaMatrix, FFTW_ESTIMATE);
     fFFTplanBkToBandQ = fftw_plan_dft_2d(fSteps, fSteps, fBkMatrix, fBkMatrix, FFTW_BACKWARD, FFTW_ESTIMATE);
     fFFTplanOmegaToAk = fftw_plan_dft_r2c_2d(fSteps, fSteps, fOmegaMatrix, fFFTin, FFTW_ESTIMATE);
     fFFTplanOmegaToBk = fftw_plan_dft_2d(fSteps, fSteps, fBkMatrix, fBkMatrix, FFTW_FORWARD, FFTW_ESTIMATE);
@@ -436,7 +714,6 @@ TBulkTriVortexNGLFieldCalc::~TBulkTriVortexNGLFieldCalc() {
 
   // clean up
 
-  fftw_destroy_plan(fFFTplanAkToOmega);
   fftw_destroy_plan(fFFTplanBkToBandQ);
   fftw_destroy_plan(fFFTplanOmegaToAk);
   fftw_destroy_plan(fFFTplanOmegaToBk);
@@ -973,7 +1250,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
   // Do the Fourier transform to get omega(x,y) - Abrikosov
 
-  fftw_execute(fFFTplanAkToOmega);
+  fftw_execute(fFFTplan);
 
   #pragma omp parallel for default(shared) private(l) schedule(dynamic)
   for (l = 0; l < NFFTsq; l++) {
@@ -1059,7 +1336,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
     // Do the Fourier transform to get omega(x,y)
 
-    fftw_execute(fFFTplanAkToOmega);
+    fftw_execute(fFFTplan);
 
     #pragma omp parallel for default(shared) private(l) schedule(dynamic)
     for (l = 0; l < NFFTsq; l++) {
@@ -1125,7 +1402,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
     // Do the Fourier transform to get omega(x,y)
 
-    fftw_execute(fFFTplanAkToOmega);
+    fftw_execute(fFFTplan);
 
     #pragma omp parallel for default(shared) private(l) schedule(dynamic)
     for (l = 0; l < NFFTsq; l++) {

@@ -38,7 +38,7 @@ endif
 # -- Linux
 ifeq ($(OS),LINUX)
 CXX           = g++
-CXXFLAGS      = -O3 -Wall -Wno-trigraphs -fPIC
+CXXFLAGS      = -g -O3 -Wall -Wno-trigraphs -fPIC
 PMUSRPATH     = ../../../include
 MNPATH        = $(ROOTSYS)/include
 LOCALPATH     = ../include
@@ -109,7 +109,7 @@ endif
 # some definitions: headers (used to generate *Dict* stuff), sources, objects,...
 OBJS =
 OBJS += TTrimSPDataHandler.o
-OBJS += TBulkVortexFieldCalc.o
+OBJS += TBulkTriVortexFieldCalc.o
 OBJS += TBofZCalc.o
 OBJS += TPofBCalc.o
 OBJS += TPofTCalc.o
@@ -120,7 +120,7 @@ OBJS += TSkewedGss.o TSkewedGssDict.o
 
 INST_HEADER =
 INST_HEADER += ../include/TBofZCalc.h
-INST_HEADER += ../include/TBulkVortexFieldCalc.h
+INST_HEADER += ../include/TBulkTriVortexFieldCalc.h
 INST_HEADER += ../include/TFitPofBStartupHandler.h
 INST_HEADER += ../include/TLondon1D.h
 INST_HEADER += ../include/TPofBCalc.h
