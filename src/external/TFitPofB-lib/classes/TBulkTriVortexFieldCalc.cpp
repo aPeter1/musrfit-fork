@@ -533,12 +533,11 @@ void TBulkTriVortexAGLFieldCalc::CalculateGrid() const {
   }
 
   double latConstTr(sqrt(2.0*fluxQuantum/(field*sqrt3)));
-  double b(field/Hc2);
-  double xisq_scaled(8.0/3.0*pow(xi*PI/latConstTr,2.0)*(1.0+pow(b,4.0))*(1.0-2.0*b*pow(1.0-b,2.0)));
+  double b(field/Hc2), fInf(1.0-pow(b,4.0)), xiV(xi*(sqrt(2.0)-0.75*xi/lambda)*sqrt((1.0+pow(b,4.0))*(1.0-2.0*b*pow(1.0-b,2.0))));
   double lambdasq_scaled(4.0/3.0*pow(lambda*PI/latConstTr,2.0));
 
   // ... now fill in the Fourier components if everything was okay above
-  double Gsq, sqrtXiSqScGsq, ll;
+  double Gsq, sqrtfInfSqPlusLsqGsq, ll;
   int k, l, lNFFT_2;
 
   for (l = 0; l < NFFT_2; l += 2) {
@@ -546,16 +545,17 @@ void TBulkTriVortexAGLFieldCalc::CalculateGrid() const {
     ll = 3.0*static_cast<double>(l*l);
     for (k = 0; k < NFFT_2; k += 2) {
       Gsq = static_cast<double>(k*k) + ll;
-      sqrtXiSqScGsq = ((k || l) ? sqrt(xisq_scaled*Gsq) : 1.0E-9);
-      fFFTin[lNFFT_2 + k][0] = sqrtXiSqScGsq*TMath::BesselK1(sqrtXiSqScGsq)/(lambdasq_scaled*Gsq);
+      sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k][0] = ((!k && !l) ? 1.0 : \
+       fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf)));
       fFFTin[lNFFT_2 + k][1] = 0.0;
       fFFTin[lNFFT_2 + k + 1][0] = 0.0;
       fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
     k = NFFT_2;
     Gsq = static_cast<double>(k*k) + ll;
-    sqrtXiSqScGsq = sqrt(xisq_scaled*Gsq);
-    fFFTin[lNFFT_2 + k][0] = sqrtXiSqScGsq*TMath::BesselK1(sqrtXiSqScGsq)/(lambdasq_scaled*Gsq);
+    sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
+    fFFTin[lNFFT_2 + k][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
     fFFTin[lNFFT_2 + k][1] = 0.0;
   }
 
@@ -565,16 +565,16 @@ void TBulkTriVortexAGLFieldCalc::CalculateGrid() const {
     ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
     for (k = 0; k < NFFT_2; k += 2) {
       Gsq = static_cast<double>(k*k) + ll;
-      sqrtXiSqScGsq = sqrt(xisq_scaled*Gsq);
-      fFFTin[lNFFT_2 + k][0] = sqrtXiSqScGsq*TMath::BesselK1(sqrtXiSqScGsq)/(lambdasq_scaled*Gsq);
+      sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
       fFFTin[lNFFT_2 + k][1] = 0.0;
       fFFTin[lNFFT_2 + k + 1][0] = 0.0;
       fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
     k = NFFT_2;
     Gsq = static_cast<double>(k*k) + ll;
-    sqrtXiSqScGsq = sqrt(xisq_scaled*Gsq);
-    fFFTin[lNFFT_2 + k][0] = sqrtXiSqScGsq*TMath::BesselK1(sqrtXiSqScGsq)/(lambdasq_scaled*Gsq);
+    sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
+    fFFTin[lNFFT_2 + k][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
     fFFTin[lNFFT_2 + k][1] = 0.0;
   }
 
@@ -585,10 +585,10 @@ void TBulkTriVortexAGLFieldCalc::CalculateGrid() const {
     ll = 3.0*static_cast<double>(l*l);
     for (k = 0; k < NFFT_2; k += 2) {
       Gsq = static_cast<double>((k + 1)*(k + 1)) + ll;
-      sqrtXiSqScGsq = sqrt(xisq_scaled*Gsq);
+      sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
       fFFTin[lNFFT_2 + k][0] = 0.0;
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = sqrtXiSqScGsq*TMath::BesselK1(sqrtXiSqScGsq)/(lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k + 1][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
       fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
     k = NFFT_2;
@@ -601,10 +601,10 @@ void TBulkTriVortexAGLFieldCalc::CalculateGrid() const {
     ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
     for (k = 0; k < NFFT_2; k += 2) {
       Gsq = static_cast<double>((k+1)*(k+1)) + ll;
-      sqrtXiSqScGsq = sqrt(xisq_scaled*Gsq);
+      sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
       fFFTin[lNFFT_2 + k][0] = 0.0;
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = sqrtXiSqScGsq*TMath::BesselK1(sqrtXiSqScGsq)/(lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k + 1][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
       fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
     k = NFFT_2;
@@ -619,7 +619,7 @@ void TBulkTriVortexAGLFieldCalc::CalculateGrid() const {
   // Multiply by the applied field
   #pragma omp parallel for default(shared) private(l) schedule(dynamic)
   for (l = 0; l < NFFTsq; l++) {
-    fFFTout[l] *= field*(1.0-pow(b,4.0));
+    fFFTout[l] *= field;
   }
 
   // Set the flag which shows that the calculation has been done

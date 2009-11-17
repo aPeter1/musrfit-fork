@@ -58,39 +58,33 @@ using namespace std;
 // Also always use the same format within one energyVec - otherwise sorting of the vector will not work properly!
 //--------------------
 
-TTrimSPData::TTrimSPData(const string &path, vector<string> &energyVec) {
+TTrimSPData::TTrimSPData(const string &path, const vector<string> &energyLabelVec, const vector<double> &energyVec) {
 
   // sort the energies in ascending orders - this might be useful for later applications (energy-interpolations etc.)
-  sort(energyVec.begin(), energyVec.end());
+  // Do not do it at the moment until I find a suitable way to sort energy and energy-labels at once.
+  // sort(energyVec.begin(), energyVec.end());
+
+  if (energyLabelVec.size() != energyVec.size()) {
+    cout << "TTrimSPData::TTrimSPData: The number of energies and labels have to be the same!" << endl;
+    cout << "TTrimSPData::TTrimSPData: Please fix this problem! The programme will be terminated now!" << endl;
+    assert(false);
+  }
 
   double zz(0.0), nzz(0.0);
   vector<double> vzz, vnzz;
   string word, energyStr;
 
-  for(unsigned int i(0); i<energyVec.size(); i++){
+  for(unsigned int i(0); i<energyVec.size(); i++) {
 
-    energyStr = path + energyVec[i] + ".rge";
+    energyStr = path + energyLabelVec[i] + ".rge";
 
     ifstream *rgeFile = new ifstream(energyStr.c_str());
     if(! *rgeFile) {
-      cout << "TTrimSPData::TTrimSPData: rge-file not found! Try next energy..." << endl;
+      cout << "TTrimSPData::TTrimSPData: file " << energyStr << " not found! Try next energy..." << endl;
       delete rgeFile;
       rgeFile = 0;
     } else {
-      if (energyVec[i].length() == 4)
-        fEnergy.push_back(atof(energyVec[i].replace(2,1,".").c_str()));
-      else if (energyVec[i].length() == 3) {
-        energyVec[i].insert(energyVec[i].end()-1, 1, '.');
-        fEnergy.push_back(atof(energyVec[i].c_str()));
-      } else {
-        cout << "TTrimSPData::TTrimSPData: The energy cannot be correctly extracted from the rge-file name!" << endl;
-        cout << "TTrimSPData::TTrimSPData: Please use file names in one of the following formats, e.g. for E=2.1keV use:" << endl;
-        cout << "TTrimSPData::TTrimSPData: <some_path>02_1.rge" << endl;
-        cout << "TTrimSPData::TTrimSPData: <some_path>02-1.rge" << endl;
-        cout << "TTrimSPData::TTrimSPData: <some_path>02.1.rge" << endl;
-        cout << "TTrimSPData::TTrimSPData: <some_path>021.rge" << endl;
-        assert(false);
-      }
+      fEnergy.push_back(energyVec[i]);
 
       while(*rgeFile >> word)
         if(word == "PARTICLES") break;

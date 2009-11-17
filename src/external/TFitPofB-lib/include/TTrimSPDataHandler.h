@@ -40,7 +40,7 @@ class TTrimSPData {
 
 public:
 
-  TTrimSPData(const string&, vector<string>&);
+  TTrimSPData(const string&, const vector<string>&, const vector<double>&);
 
   ~TTrimSPData() {
     fDataZ.clear();

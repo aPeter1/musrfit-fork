@@ -193,7 +193,8 @@ TLondon1DHS::TLondon1DHS() : fCalcNeeded(true), fFirstCall(true) {
     fNSteps = startupHandler->GetNSteps();
     fWisdom = startupHandler->GetWisdomFile();
     string rge_path(startupHandler->GetDataPath());
-    vector<string> energy_vec(startupHandler->GetEnergyList());
+    vector<string> energy_label_vec(startupHandler->GetEnergyLabelList());
+    vector<double> energy_vec(startupHandler->GetEnergyList());
 
     fParForPofT.push_back(0.0); // phase
     fParForPofT.push_back(startupHandler->GetDeltat());
@@ -206,7 +207,7 @@ TLondon1DHS::TLondon1DHS() : fCalcNeeded(true), fFirstCall(true) {
     fParForPofB.push_back(0.005); // Bkg-width
     fParForPofB.push_back(0.0); // Bkg-weight
 
-    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
+    TTrimSPData *x = new TTrimSPData(rge_path, energy_label_vec, energy_vec);
     fImpProfile = x;
     x = 0;
 
@@ -354,7 +355,8 @@ TLondon1D1L::TLondon1D1L() : fCalcNeeded(true), fFirstCall(true), fCallCounter(0
     fNSteps = startupHandler->GetNSteps();
     fWisdom = startupHandler->GetWisdomFile();
     string rge_path(startupHandler->GetDataPath());
-    vector<string> energy_vec(startupHandler->GetEnergyList());
+    vector<string> energy_label_vec(startupHandler->GetEnergyLabelList());
+    vector<double> energy_vec(startupHandler->GetEnergyList());
 
     fParForPofT.push_back(0.0);
     fParForPofT.push_back(startupHandler->GetDeltat());
@@ -364,7 +366,7 @@ TLondon1D1L::TLondon1D1L() : fCalcNeeded(true), fFirstCall(true), fCallCounter(0
     fParForPofB.push_back(startupHandler->GetDeltaB());
     fParForPofB.push_back(0.0);
 
-    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
+    TTrimSPData *x = new TTrimSPData(rge_path, energy_label_vec, energy_vec);
     fImpProfile = x;
     x = 0;
 
@@ -505,7 +507,8 @@ TLondon1D2L::TLondon1D2L() : fCalcNeeded(true), fFirstCall(true), fLastTwoChange
     fNSteps = startupHandler->GetNSteps();
     fWisdom = startupHandler->GetWisdomFile();
     string rge_path(startupHandler->GetDataPath());
-    vector<string> energy_vec(startupHandler->GetEnergyList());
+    vector<string> energy_label_vec(startupHandler->GetEnergyLabelList());
+    vector<double> energy_vec(startupHandler->GetEnergyList());
 
     fParForPofT.push_back(0.0);
     fParForPofT.push_back(startupHandler->GetDeltat());
@@ -515,7 +518,7 @@ TLondon1D2L::TLondon1D2L() : fCalcNeeded(true), fFirstCall(true), fLastTwoChange
     fParForPofB.push_back(startupHandler->GetDeltaB());
     fParForPofB.push_back(0.0);
 
-    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
+    TTrimSPData *x = new TTrimSPData(rge_path, energy_label_vec, energy_vec);
     fImpProfile = x;
     x = 0;
 
@@ -659,7 +662,8 @@ TProximity1D1LHS::TProximity1D1LHS() : fCalcNeeded(true), fFirstCall(true) {
     fNSteps = startupHandler->GetNSteps();
     fWisdom = startupHandler->GetWisdomFile();
     string rge_path(startupHandler->GetDataPath());
-    vector<string> energy_vec(startupHandler->GetEnergyList());
+    vector<string> energy_label_vec(startupHandler->GetEnergyLabelList());
+    vector<double> energy_vec(startupHandler->GetEnergyList());
 
     fParForPofT.push_back(0.0);
     fParForPofT.push_back(startupHandler->GetDeltat());
@@ -672,7 +676,7 @@ TProximity1D1LHS::TProximity1D1LHS() : fCalcNeeded(true), fFirstCall(true) {
     fParForPofB.push_back(0.01); // Bkg-width
     fParForPofB.push_back(0.0); // Bkg-weight
 
-    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
+    TTrimSPData *x = new TTrimSPData(rge_path, energy_label_vec, energy_vec);
     fImpProfile = x;
     x = 0;
 
@@ -825,7 +829,8 @@ TProximity1D1LHSGss::TProximity1D1LHSGss() : fCalcNeeded(true), fFirstCall(true)
     fNSteps = startupHandler->GetNSteps();
     fWisdom = startupHandler->GetWisdomFile();
     string rge_path(startupHandler->GetDataPath());
-    vector<string> energy_vec(startupHandler->GetEnergyList());
+    vector<string> energy_label_vec(startupHandler->GetEnergyLabelList());
+    vector<double> energy_vec(startupHandler->GetEnergyList());
 
     fParForPofT.push_back(0.0);
     fParForPofT.push_back(startupHandler->GetDeltat());
@@ -836,7 +841,7 @@ TProximity1D1LHSGss::TProximity1D1LHSGss() : fCalcNeeded(true), fFirstCall(true)
     fParForPofB.push_back(0.0);
 //    fParForPofB.push_back(0.0);
 
-    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
+    TTrimSPData *x = new TTrimSPData(rge_path, energy_label_vec, energy_vec);
     fImpProfile = x;
     x = 0;
 
@@ -963,7 +968,8 @@ TLondon1D3L::TLondon1D3L() : fCalcNeeded(true), fFirstCall(true), fLastThreeChan
     fNSteps = startupHandler->GetNSteps();
     fWisdom = startupHandler->GetWisdomFile();
     string rge_path(startupHandler->GetDataPath());
-    vector<string> energy_vec(startupHandler->GetEnergyList());
+    vector<string> energy_label_vec(startupHandler->GetEnergyLabelList());
+    vector<double> energy_vec(startupHandler->GetEnergyList());
 
     fParForPofT.push_back(0.0);
     fParForPofT.push_back(startupHandler->GetDeltat());
@@ -973,7 +979,7 @@ TLondon1D3L::TLondon1D3L() : fCalcNeeded(true), fFirstCall(true), fLastThreeChan
     fParForPofB.push_back(startupHandler->GetDeltaB());
     fParForPofB.push_back(0.0);
 
-    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
+    TTrimSPData *x = new TTrimSPData(rge_path, energy_label_vec, energy_vec);
     fImpProfile = x;
     x = 0;
 
@@ -1131,7 +1137,8 @@ TLondon1D3LS::TLondon1D3LS() : fCalcNeeded(true), fFirstCall(true), fLastThreeCh
     fNSteps = startupHandler->GetNSteps();
     fWisdom = startupHandler->GetWisdomFile();
     string rge_path(startupHandler->GetDataPath());
-    vector<string> energy_vec(startupHandler->GetEnergyList());
+    vector<string> energy_label_vec(startupHandler->GetEnergyLabelList());
+    vector<double> energy_vec(startupHandler->GetEnergyList());
 
     fParForPofT.push_back(0.0);
     fParForPofT.push_back(startupHandler->GetDeltat());
@@ -1141,7 +1148,7 @@ TLondon1D3LS::TLondon1D3LS() : fCalcNeeded(true), fFirstCall(true), fLastThreeCh
     fParForPofB.push_back(startupHandler->GetDeltaB());
     fParForPofB.push_back(0.0);
 
-    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
+    TTrimSPData *x = new TTrimSPData(rge_path, energy_label_vec, energy_vec);
     fImpProfile = x;
     x = 0;
 
@@ -1451,7 +1458,8 @@ TLondon1D3LSub::TLondon1D3LSub() : fCalcNeeded(true), fFirstCall(true), fWeights
     fNSteps = startupHandler->GetNSteps();
     fWisdom = startupHandler->GetWisdomFile();
     string rge_path(startupHandler->GetDataPath());
-    vector<string> energy_vec(startupHandler->GetEnergyList());
+    vector<string> energy_label_vec(startupHandler->GetEnergyLabelList());
+    vector<double> energy_vec(startupHandler->GetEnergyList());
 
     fParForPofT.push_back(0.0);
     fParForPofT.push_back(startupHandler->GetDeltat());
@@ -1461,7 +1469,7 @@ TLondon1D3LSub::TLondon1D3LSub() : fCalcNeeded(true), fFirstCall(true), fWeights
     fParForPofB.push_back(startupHandler->GetDeltaB());
     fParForPofB.push_back(0.0);
 
-    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
+    TTrimSPData *x = new TTrimSPData(rge_path, energy_label_vec, energy_vec);
     fImpProfile = x;
     x = 0;
 

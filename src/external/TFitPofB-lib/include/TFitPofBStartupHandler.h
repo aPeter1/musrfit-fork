@@ -60,7 +60,8 @@ class TFitPofBStartupHandler : public TQObject {
     virtual void CheckLists();
 
     virtual const string GetDataPath() const { return fDataPath; }
-    virtual vector<string> GetEnergyList() const { return fEnergyList; }
+    virtual vector<string> GetEnergyLabelList() const { return fEnergyLabelList; }
+    virtual vector<double> GetEnergyList() const { return fEnergyList; }
     virtual const double GetDeltat() const { return fDeltat; }
     virtual const double GetDeltaB() const { return fDeltaB; }
     virtual const string GetWisdomFile() const { return fWisdomFile; }
@@ -68,7 +69,8 @@ class TFitPofBStartupHandler : public TQObject {
     virtual const unsigned int GetGridSteps() const { return fGridSteps; }
 
   private:
-    enum EKeyWords {eEmpty, eComment, eDebug, eLEM, eVortex, eDataPath, eEnergy, eEnergyList, eDeltat, eDeltaB, eWisdomFile, eNSteps, eGridSteps};
+    enum EKeyWords {eEmpty, eComment, eDebug, eLEM, eVortex, eDataPath, eEnergyLabel, \
+                    eEnergy, eEnergyList, eDeltat, eDeltaB, eWisdomFile, eNSteps, eGridSteps};
 
     EKeyWords       fKey;
 
@@ -76,7 +78,8 @@ class TFitPofBStartupHandler : public TQObject {
     bool            fLEM;
     bool            fVortex;
     string          fDataPath;
-    vector<string>  fEnergyList;
+    vector<string>  fEnergyLabelList;
+    vector<double>  fEnergyList;
     double          fDeltat;
     double          fDeltaB;
     string          fWisdomFile;

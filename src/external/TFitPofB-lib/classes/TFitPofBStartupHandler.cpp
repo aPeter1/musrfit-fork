@@ -105,6 +105,8 @@ void TFitPofBStartupHandler::OnStartElement(const char *str, const TList *attrib
     fKey = eVortex;
   } else if (!strcmp(str, "data_path")) {
     fKey = eDataPath;
+  } else if (!strcmp(str, "energy_label")) {
+    fKey = eEnergyLabel;
   } else if (!strcmp(str, "energy")) {
     fKey = eEnergy;
   } else if (!strcmp(str, "delta_t")) {
@@ -160,9 +162,13 @@ void TFitPofBStartupHandler::OnCharacters(const char *str)
       // set the data path to the given path
       fDataPath = str;
       break;
+    case eEnergyLabel:
+      // add str to the energy label list
+      fEnergyLabelList.push_back(str);
+      break;
     case eEnergy:
       // add str to the energy list
-      fEnergyList.push_back(str);
+      fEnergyList.push_back(atof(str));
       break;
     case eDeltat:
       // convert str to double and assign it to the deltat-member
@@ -318,21 +324,35 @@ void TFitPofBStartupHandler::CheckLists()
     // check if any energies are given
     if(fDebug)
       cout << endl << "TFitPofBStartupHandler::CheckLists: check energy list ..." << endl;
-    if (!fEnergyList.size()) {
-      cout << "TFitPofBStartupHandler::CheckLists: Energy list empty! Setting the default list ( 0.0:0.1:32.9 keV)." << endl;
+    if (fEnergyList.size() != fEnergyLabelList.size()) {
+      cout << "TFitPofBStartupHandler::CheckLists: The number of energies and energy labels are different! Please fix it!" << endl;
+    }
+    if (fEnergyList.empty()) {
+      cout << "TFitPofBStartupHandler::CheckLists: Energy list empty!" << endl \
+           << "TFitPofBStartupHandler::CheckLists: Trying to use the standard energies: 0.0 to 35.0 keV in 0.1 keV steps" << endl;
+      for (double x(0.0); x<= 35.0; x+=0.1) {
+        fEnergyList.push_back(x);
+      }
+    }
+    if (fEnergyLabelList.empty()) {
+      cout << "TFitPofBStartupHandler::CheckLists: Energy label list empty!" << endl \
+           << "TFitPofBStartupHandler::CheckLists: Trying to use the specified energies as labels in the format %02.1f..." << endl \
+           << "TFitPofBStartupHandler::CheckLists: Most probably this will go wrong and should therefore be fixed in the xml-file!" << endl;
       char eChar[5];
-      for(unsigned int i(0); i<33; i++) {
-        for(unsigned int j(0); j<10; j++) {
-          sprintf(eChar, "%02u_%u", i, j);
-          fEnergyList.push_back(string(eChar));
-        }
+      for(unsigned int i(0); i<fEnergyList.size(); i++) {
+        sprintf(eChar, "%02.1f", fEnergyList[i]);
+        fEnergyLabelList.push_back(string(eChar));
       }
-    } else {
-      if(fDebug) {
-        for (unsigned int i (0); i < fEnergyList.size(); i++)
-          cout << fEnergyList[i] << " ";
-        cout << endl;
-      }
+    }
+    if(fDebug) {
+      cout << "Energies: ";
+      for (unsigned int i (0); i < fEnergyList.size(); i++)
+        cout << fEnergyList[i] << " ";
+      cout << endl;
+      cout << "Energy Labels: ";
+      for (unsigned int i (0); i < fEnergyLabelList.size(); i++)
+        cout << fEnergyLabelList[i] << " ";
+      cout << endl;
     }
 
     // check if any number of steps for the theory function is specified
