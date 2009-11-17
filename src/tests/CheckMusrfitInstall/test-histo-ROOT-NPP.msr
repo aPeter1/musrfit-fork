@@ -1,0 +1,47 @@
+Test single histogram plot (with life time correction), ROOT-NPP data file
+###############################################################
+FITPARAMETER
+#       No Name        Value     Step        Pos_Error   Boundaries
+        1 phase       15.1906   -1.62455    1.60704     0       100     
+        2 freq        0.373317  -0.00239843 0.00240234  0       300     
+        3 asym        0.119595  -0.00375155 0.00385092  0       0.3     
+        4 rate        0.142345  -0.0168878  0.0175172   0       100     
+        5 Norm_L      432.867   -0.719734   0.721023    
+        6 BG_L        29.3769   -0.102642   0.102594    
+
+###############################################################
+THEORY
+asymmetry      3
+simplExpo      4          (rate)
+TFieldCos      1     2       (phase frequency)
+
+###############################################################
+#FUNCTIONS
+
+###############################################################
+RUN 2008/lem08_his_2279 MUE4 PSI ROOT-NPP   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            5
+backgr.fit      6
+lifetimecorrection
+map             0    0    0    0    0    0    0    0    0    0
+forward         1
+data            3419    66000   
+t0              3419    
+fit             0.10    10.00   
+packing         250
+
+###############################################################
+COMMANDS
+MINIMIZE
+MINOS
+SAVE
+
+###############################################################
+PLOT 0   (single histo plot)
+runs     1   
+range    0.00   8.00   -0.30   0.30
+
+###############################################################
+STATISTIC --- 2009-11-17 21:39:41
+  chisq = 248.83531, NDF = 197, chisq/NDF = 1.2631234

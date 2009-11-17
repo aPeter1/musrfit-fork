@@ -1,0 +1,55 @@
+Test asymmetry plot, MUD data file
+###############################################################
+FITPARAMETER
+#      Nr. Name        Value     Step      Pos_Error  Boundaries
+        1 alpha       1         0           none        0       2       
+        2 asy         0.173454  -0.000796666 0.000816609 0       0.33    
+        3 rate        0.165051  -0.00157302 0.00157174  0       none    
+        4 beta        0.916577  -0.0164947  0.0166072   0.5     2       
+
+###############################################################
+THEORY
+asymmetry      2
+generExpo      3     4       (rate exponent)
+
+###############################################################
+#FUNCTIONS
+
+###############################################################
+RUN 000100 XXXX TRIUMF MUD   (name beamline institute data-file-format)
+fittype         2         (asymmetry fit)
+alpha           1
+map             0    0    0    0    0    0    0    0    0    0    0
+forward         1
+backward        2
+background      79      391     80      409     
+data            438     12785   436     12787   
+t0              432     431     
+fit             0.00    8.00    
+packing         100
+
+###############################################################
+COMMANDS
+MINIMIZE
+MINOS
+#HESSE
+SAVE
+
+###############################################################
+FOURIER
+units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
+fourier_power    12
+apodization      NONE    # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            8.50
+#range_for_phase_correction 50.0 70.0
+range            0.00    200.00
+
+###############################################################
+PLOT 2   (asymmetry plot)
+runs     1   
+range    0.00   8.00   0.00   0.25
+
+###############################################################
+STATISTIC --- 2009-11-17 21:49:30
+  chisq = 54.8034941, NDF = 38, chisq/NDF = 1.44219721
