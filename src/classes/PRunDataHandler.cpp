@@ -1144,9 +1144,10 @@ Bool_t PRunDataHandler::ReadMudFile()
   // check that time resolution is identical for all histograms
   // >> currently it is not forseen to handle histos with different time resolutions <<
   // >> perhaps this needs to be reconsidered later on                               <<
-  UINT32 fsTimeResolution = 0;
+  REAL64 timeResolution = 0.0; // in seconds!!
+  REAL64 lrval = 0.0;
   for (Int_t i=1; i<=noOfHistos; i++) {
-    success = MUD_getHistFsPerBin( fh, i, &val );
+    success = MUD_getHistSecondsPerBin( fh, i, &lrval );
     if (!success) {
       cerr << endl << "**ERROR** Couldn't obtain the time resolution of run " << fRunName.Data();
       cerr << endl << "          which is fatal, sorry.";
@@ -1155,9 +1156,9 @@ Bool_t PRunDataHandler::ReadMudFile()
       return false;
     }
     if (i==1) {
-      fsTimeResolution = val;
+      timeResolution = lrval;
     } else {
-      if (val != fsTimeResolution) {
+      if (lrval != timeResolution) {
         cerr << endl << "**ERROR** various time resolutions found in run " << fRunName.Data();
         cerr << endl << "          this is currently not supported, sorry.";
         cerr << endl;
@@ -1166,7 +1167,8 @@ Bool_t PRunDataHandler::ReadMudFile()
       }
     }
   }
-  runData.SetTimeResolution((Double_t)fsTimeResolution / 1.0e6); // fs -> ns
+
+  runData.SetTimeResolution((Double_t)timeResolution * 1.0e9); // s -> ns
 
   // read histograms
   pair<Int_t, Int_t> valPair;
