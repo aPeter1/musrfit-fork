@@ -3415,7 +3415,7 @@ void PMusrCanvas::SaveDataAscii()
                 foutTheo << fData[j].theory->GetBinContent(i) << ", ";
               }
               // write last data set
-              foutTheo << fData[fData.size()-1].data->GetBinContent(i) << ", ";
+              foutTheo << fData[fData.size()-1].theory->GetBinContent(i) << ", ";
               foutTheo << endl;
             }
             break;
