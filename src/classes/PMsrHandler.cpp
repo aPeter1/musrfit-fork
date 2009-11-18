@@ -1451,6 +1451,21 @@ Bool_t PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
     iter++;
   }
 
+  // check if all parameters have subsequent numbers.
+  for (UInt_t i=0; i<fParam.size(); i++) {
+    if (fParam[i].fNo != (Int_t)i+1) {
+      error = true;
+      cerr << endl << ">> PMsrHandler::HandleFitParameterEntry: **ERROR**";
+      cerr << endl << ">> Sorry, you are assuming to much from this program, it cannot";
+      cerr << endl << ">> handle none subsequent numbered parameters yet or in the near future.";
+      cerr << endl << ">> Found parameter " << fParam[i].fName.Data() << ", with";
+      cerr << endl << ">> parameter number " << fParam[i].fNo << ", at paramter position " << i+1 << ".";
+      cerr << endl << ">> This needs to be fixed first.";
+      cerr << endl;
+      break;
+    }
+  }
+
   return !error;
 }
 
