@@ -37,6 +37,8 @@
 #include <iostream>
 using namespace std;
 
+#include <cassert>
+
 #include "TFitPofBStartupHandler.h"
 
 ClassImpQ(TFitPofBStartupHandler)
@@ -61,6 +63,8 @@ TFitPofBStartupHandler::~TFitPofBStartupHandler()
 {
   // clean up
   fEnergyList.clear();
+  fEnergyLabelList.clear();
+  fEnergies.clear();
 }
 
 //--------------------------------------------------------------------------
@@ -315,7 +319,7 @@ void TFitPofBStartupHandler::CheckLists()
       cout << endl << "TFitPofBStartupHandler::CheckLists: check data path ..." << endl;
     if (!fDataPath.size()) {
       cout << "TFitPofBStartupHandler::CheckLists: This is not going to work, you have to set a valid data path where to find the rge-files in the xml-file!" << endl;
-      exit(-1);
+      assert(fDataPath.size());
     } else {
       if(fDebug)
         cout << fDataPath << endl;
@@ -325,7 +329,9 @@ void TFitPofBStartupHandler::CheckLists()
     if(fDebug)
       cout << endl << "TFitPofBStartupHandler::CheckLists: check energy list ..." << endl;
     if (fEnergyList.size() != fEnergyLabelList.size()) {
-      cout << "TFitPofBStartupHandler::CheckLists: The number of energies and energy labels are different! Please fix it!" << endl;
+      cout << "TFitPofBStartupHandler::CheckLists: The number of energies and energy labels are different! Please fix it!" << endl \
+           << "TFitPofBStartupHandler::CheckLists: The program will be terminated now!" << endl;
+      assert(fEnergyList.size() == fEnergyLabelList.size());
     }
     if (fEnergyList.empty()) {
       cout << "TFitPofBStartupHandler::CheckLists: Energy list empty!" << endl \
@@ -344,15 +350,20 @@ void TFitPofBStartupHandler::CheckLists()
         fEnergyLabelList.push_back(string(eChar));
       }
     }
+
+    // fill the energies and labels in the pair-vector
+    fEnergies.clear();
+    pair<double, string> p;
+    for(unsigned int i(0); i < fEnergyList.size(); i++) {
+      p.first = fEnergyList[i];
+      p.second = fEnergyLabelList[i];
+      fEnergies.push_back(p);
+    }
+
     if(fDebug) {
-      cout << "Energies: ";
-      for (unsigned int i (0); i < fEnergyList.size(); i++)
-        cout << fEnergyList[i] << " ";
-      cout << endl;
-      cout << "Energy Labels: ";
-      for (unsigned int i (0); i < fEnergyLabelList.size(); i++)
-        cout << fEnergyLabelList[i] << " ";
-      cout << endl;
+      cout << "Energies and Labels:";
+      for (unsigned int i (0); i < fEnergies.size(); i++)
+        cout << fEnergies[i].first << " " << fEnergies[i].second << endl;
     }
 
     // check if any number of steps for the theory function is specified

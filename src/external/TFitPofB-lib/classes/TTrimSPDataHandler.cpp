@@ -58,25 +58,18 @@ using namespace std;
 // Also always use the same format within one energyVec - otherwise sorting of the vector will not work properly!
 //--------------------
 
-TTrimSPData::TTrimSPData(const string &path, const vector<string> &energyLabelVec, const vector<double> &energyVec) {
+TTrimSPData::TTrimSPData(const string &path, vector< pair<double, string> > &energies) {
 
-  // sort the energies in ascending orders - this might be useful for later applications (energy-interpolations etc.)
-  // Do not do it at the moment until I find a suitable way to sort energy and energy-labels at once.
-  // sort(energyVec.begin(), energyVec.end());
-
-  if (energyLabelVec.size() != energyVec.size()) {
-    cout << "TTrimSPData::TTrimSPData: The number of energies and labels have to be the same!" << endl;
-    cout << "TTrimSPData::TTrimSPData: Please fix this problem! The programme will be terminated now!" << endl;
-    assert(false);
-  }
+  // sort the energies in ascending order - this might be useful for later applications (energy-interpolations etc.)
+  sort(energies.begin(), energies.end());
 
   double zz(0.0), nzz(0.0);
   vector<double> vzz, vnzz;
   string word, energyStr;
 
-  for(unsigned int i(0); i<energyVec.size(); i++) {
+  for(unsigned int i(0); i<energies.size(); i++) {
 
-    energyStr = path + energyLabelVec[i] + ".rge";
+    energyStr = path + energies[i].second + ".rge";
 
     ifstream *rgeFile = new ifstream(energyStr.c_str());
     if(! *rgeFile) {
@@ -84,7 +77,7 @@ TTrimSPData::TTrimSPData(const string &path, const vector<string> &energyLabelVe
       delete rgeFile;
       rgeFile = 0;
     } else {
-      fEnergy.push_back(energyVec[i]);
+      fEnergy.push_back(energies[i].first);
 
       while(*rgeFile >> word)
         if(word == "PARTICLES") break;
