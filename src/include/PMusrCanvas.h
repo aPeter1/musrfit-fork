@@ -138,6 +138,25 @@ typedef struct {
  */
 typedef vector<PMusrCanvasNonMusrDataSet> PMusrCanvasNonMusrDataList;
 
+//------------------------------------------------------------------------
+/**
+ * <p> data structure needed for ascii dump within musrview.
+ */
+typedef struct {
+  PDoubleVector dataX;
+  PDoubleVector data;
+  PDoubleVector dataErr;
+  PDoubleVector theoryX;
+  PDoubleVector theory;
+} PMusrCanvasAsciiDump;
+
+//------------------------------------------------------------------------
+/**
+ * <p> vectore of the above data structure. Used if there are multiple histogramms
+ * to be dumped.
+ */
+typedef vector<PMusrCanvasAsciiDump> PMusrCanvasAsciiDumpVector;
+
 //--------------------------------------------------------------------------
 /**
  * <p>The preprocessor tag __MAKECINT__ is used to hide away from rootcint
