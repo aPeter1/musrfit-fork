@@ -23,25 +23,32 @@
 PATHTOAUTOCONF=$(which autoconf)
 PATHTOAUTOMAKE=$(which automake)
 PATHTOLIBTOOL=$(which libtoolize)
+PATHTOGLIBTOOL=$(which glibtoolize)
 
-if [ "$PATHTOAUTOCONF" == "" ]; then
+if [ "$PATHTOAUTOCONF" = "" ]; then
   echo
   echo ">> GNU autoconf has not been found!"
   echo ">> Please install it first and then re-run the script!"
   echo
   exit 1
-elif [ "$PATHTOAUTOMAKE" == "" ]; then
+elif [ "$PATHTOAUTOMAKE" = "" ]; then
   echo
   echo ">> GNU automake has not been found!"
   echo ">> Please install it first and then re-run the script!"
   echo
   exit 1
-elif [ "$PATHTOLIBTOOL" == "" ]; then
+elif [ "$PATHTOLIBTOOL" = "" ] && [ "$PATHTOGLIBTOOL" = "" ]; then
   echo
   echo ">> GNU libtool has not been found!"
   echo ">> Please install it first and then re-run the script!"
   echo
   exit 1
+fi
+
+if [ "$PATHTOLIBTOOL" = "" ]; then
+  LIBTOOLIZE="glibtoolize"
+else
+  LIBTOOLIZE="libtoolize"
 fi
 
 dir=`echo "$0" | sed 's,[^/]*$,,'`
@@ -69,7 +76,7 @@ then
     autoreconf                    && exit 0
 else
     echo ">> libtoolize"          && \
-    libtoolize --force            && \
+    $LIBTOOLIZE --force           && \
     echo ">> aclocal"             && \
     aclocal                       && \
     echo ">> autoconf"		  && \

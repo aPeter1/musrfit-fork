@@ -19,7 +19,7 @@ TFieldCos      1     2       (phase frequency)
 #FUNCTIONS
 
 ###############################################################
-RUN 2008/lem08_his_2279 MUE4 PSI ROOT-NPP   (name beamline institute data-file-format)
+RUN lem08_his_2279 MUE4 PSI ROOT-NPP   (name beamline institute data-file-format)
 fittype         0         (single histogram fit)
 norm            5
 backgr.fit      6

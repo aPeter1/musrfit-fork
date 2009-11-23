@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<musrgui_startup xmlns="http://nemu.web.psi.ch/musrgui">
+<musrgui_startup xmlns="https://wiki.intranet.psi.ch/MUSR/MusrGui">
   <comment>
     $Id$
     This is handling default setting parameters for the musrgui.

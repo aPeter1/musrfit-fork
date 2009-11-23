@@ -136,6 +136,9 @@ AC_ARG_WITH([fftw3],
       elif test -r /sw/include/fftw3.h; then
         FFTW3_PREFIX="/sw"
         AC_MSG_RESULT([using ${FFTW3_PREFIX} as prefix of the FFTW3 installation... (ignore the negative check result just above)])
+      elif test -r /opt/local/include/fftw3.h; then
+        FFTW3_PREFIX="/opt/local"
+        AC_MSG_RESULT([using ${FFTW3_PREFIX} as prefix of the FFTW3 installation... (ignore the negative check result just above)])
       else
         AC_MSG_ERROR(
         [FFTW3 not found. Please call configure with the --with-fftw3 option.
@@ -178,6 +181,9 @@ AC_ARG_WITH([gsl],
       elif test -r /sw/include/gsl/gsl_sf_hyperg.h; then
         GSL_PREFIX="/sw"
         AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation... (ignore the negative check result just above)])
+      elif test -r /opt/local/include/gsl/gsl_sf_hyperg.h; then
+        GSL_PREFIX="/opt/local"
+        AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation... (ignore the negative check result just above)])
       else
         AC_MSG_ERROR(
         [GSL not found. Please call configure with the --with-gsl option.
@@ -219,6 +225,9 @@ AC_ARG_WITH([boostinc],
         AC_MSG_RESULT([using ${BOOST_INCLUDE} as include path for the Boost headers... (ignore the negative check result just above)])
       elif test -r /sw/include/boost/spirit.hpp; then
         BOOST_INCLUDE="/sw/include"
+        AC_MSG_RESULT([using ${BOOST_INCLUDE} as include path for the Boost headers... (ignore the negative check result just above)])
+      elif test -r /opt/local/include/boost/spirit.hpp; then
+        BOOST_INCLUDE="/opt/local/include"
         AC_MSG_RESULT([using ${BOOST_INCLUDE} as include path for the Boost headers... (ignore the negative check result just above)])
       else
         AC_MSG_ERROR(

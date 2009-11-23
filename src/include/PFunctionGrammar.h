@@ -37,9 +37,17 @@ using namespace std;
 
 //#define BOOST_SPIRIT_DEBUG
 
-#include <boost/spirit/core.hpp>
-#include <boost/spirit/tree/ast.hpp>
-using namespace boost::spirit;
+#include <boost/version.hpp>
+
+#if BOOST_VERSION >= 103800
+#  include <boost/spirit/include/classic_core.hpp>
+#  include <boost/spirit/include/classic_ast.hpp>
+   using namespace BOOST_SPIRIT_CLASSIC_NS;
+#else
+#  include <boost/spirit/core.hpp>
+#  include <boost/spirit/tree/ast.hpp>
+   using namespace boost::spirit;
+#endif
 
 typedef char const* iterator_t;
 typedef tree_match<iterator_t> parse_tree_match_t;
