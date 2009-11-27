@@ -1,0 +1,146 @@
+#---------------------------------------------------
+# Makefile.libCalcMeanFieldsLEM
+#
+# Author: Bastian M. Wojek
+# e-mail: bastian.wojek@psi.ch
+#
+# $Id$
+#
+#---------------------------------------------------
+
+#---------------------------------------------------
+# get compilation and library flags from root-config
+
+ROOTCFLAGS    = $(shell $(ROOTSYS)/bin/root-config --cflags)
+ROOTLIBS      = $(shell $(ROOTSYS)/bin/root-config --libs)
+ROOTGLIBS     = $(shell $(ROOTSYS)/bin/root-config --glibs)
+
+#---------------------------------------------------
+# depending on the architecture, choose the compiler,
+# linker, and the flags to use
+#
+
+ARCH = $(shell $(ROOTSYS)/bin/root-config --arch)
+
+ifeq ($(ARCH),linux)
+OS = LINUX
+endif
+ifeq ($(ARCH),linuxx8664gcc)
+OS = LINUX
+endif
+ifeq ($(ARCH),win32gcc)
+OS = WIN32GCC
+endif
+ifeq ($(ARCH),macosx)
+OS = DARWIN
+endif
+
+# -- Linux
+ifeq ($(OS),LINUX)
+CXX           = g++
+CXXFLAGS      = -g -O3 -fopenmp -Wall -Wno-trigraphs -fPIC
+PMUSRPATH     = $(ROOTSYS)/include
+LOCALPATH     = .
+INCLUDES      = -I$(LOCALPATH) -I$(PMUSRPATH)
+LD            = g++
+LDFLAGS       = -O -fopenmp
+SOFLAGS       = -shared
+SHLIB         = libCalcMeanFieldsLEM.so
+endif
+
+# -- Windows/Cygwin
+ifeq ($(OS),WIN32GCC)
+CXX           = g++
+CXXFLAGS      = -O3 -Wall -Wno-trigraphs -D_DLL
+PMUSRPATH     = $(ROOTSYS)/include
+LOCALPATH     = .
+INCLUDES      = -I$(LOCALPATH) -I$(PMUSRPATH)
+LD            = g++
+LDFLAGS       = -O -Wl,--enable-auto-import -Wl,--enable-runtime-pseudo-reloc
+SOFLAGS       = -shared -Wl,--export-all-symbols
+SHLIB         = libCalcMeanFieldsLEM.dll
+endif
+
+# -- MacOSX/Darwin
+ifeq ($(OS),DARWIN)
+CXX           = g++
+CXXFLAGS      = -O3 -Wall -Wno-trigraphs -fPIC
+PMUSRPATH     = $(ROOTSYS)/include
+LOCALPATH     = .
+INCLUDES      = -I$(LOCALPATH) -I$(PMUSRPATH)
+LD            = g++
+LDFLAGS       = -O -Xlinker -bind_at_load
+SOFLAGS       = -dynamiclib -flat_namespace -undefined suppress -Wl,-x
+SHLIB         = libCalcMeanFieldsLEM.dylib
+endif
+
+# the output from the root-config script:
+CXXFLAGS      += $(ROOTCFLAGS)
+LDFLAGS       +=
+
+# the ROOT libraries (G = graphic)
+LIBS          = $(ROOTLIBS)
+GLIBS         = $(ROOTGLIBS)
+
+# PMusr libs
+PMUSRLIB      = -L$(ROOTSYS)/lib -lPMusr -lTFitPofB
+
+ifeq ($(OS),WIN32GCC)
+PMUSRLIB      = $(PMUSRLIB) -lMathMore
+endif
+
+ifeq ($(OS),DARWIN)
+PMUSRLIB      = $(PMUSRLIB) -lMathMore
+endif
+
+# some definitions: headers (used to generate *Dict* stuff), sources, objects,...
+OBJS =
+OBJS += TCalcMeanFieldsLEM.o TCalcMeanFieldsLEMDict.o
+
+INST_HEADER =
+INST_HEADER += ./TCalcMeanFieldsLEM.h
+
+# make the shared libs:
+
+all:  $(SHLIB)
+
+$(SHLIB): $(EXTOBJS) $(OBJS)
+	@echo "---> Building shared library $(SHLIB) ..."
+	/bin/rm -f $(SHLIB)
+	$(LD) $(SOFLAGS) $(LDFLAGS) -o $(SHLIB) $(OBJS) $(LIBS) $(PMUSRLIB)
+	@echo "done"
+
+# clean up: remove all object file (and core files)
+# semicolon needed to tell make there is no source
+# for this target!
+#
+clean:; 	@rm -f $(OBJS) $(EXTOBJS) $(SHLIB) *Dict* core* *~
+	@echo "---> removing $(OBJS) $(SHLIB)"
+
+
+$(OBJS): %.o: %.cpp
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
+
+# Generate the ROOT CINT dictionary
+
+TCalcMeanFieldsLEMDict.cpp: ./TCalcMeanFieldsLEM.h ./TCalcMeanFieldsLEMLinkDef.h
+	@echo "Generating dictionary $@..."
+	rootcint -f $@ -c -p -I$(PMUSRPATH) $^
+
+install: all
+	@echo "Installing shared lib: $(SHLIB)"
+ifeq ($(OS),LINUX)
+	cp -pv $(SHLIB) $(ROOTSYS)/lib
+	cp -pv $(INST_HEADER) $(ROOTSYS)/include
+endif
+ifeq ($(OS),WIN32GCC)
+	cp -pv $(SHLIB) $(ROOTSYS)/bin
+	ln -sf $(ROOTSYS)/bin/$(SHLIB) $(ROOTSYS)/lib/$(SHLIB)
+	cp -pv $(INST_HEADER) $(ROOTSYS)/include
+endif
+ifeq ($(OS),DARWIN)
+	cp -pv $(SHLIB) $(ROOTSYS)/lib
+	cp -pv $(INST_HEADER) $(ROOTSYS)/include
+endif
+
+cleaninstall: clean install
