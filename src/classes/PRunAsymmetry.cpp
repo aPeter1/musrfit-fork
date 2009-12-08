@@ -629,6 +629,31 @@ Bool_t PRunAsymmetry::PrepareFitData(PRawRunData* runData, UInt_t histoNo[2])
   Int_t start[2] = {fRunInfo->GetDataRange(0), fRunInfo->GetDataRange(2)};
   Int_t end[2]   = {fRunInfo->GetDataRange(1), fRunInfo->GetDataRange(3)};
   Double_t t0[2] = {fT0s[0], fT0s[1]};
+  // check if data range has been provided, and if not try to estimate them
+  if (start[0] < 0) {
+    start[0] = (Int_t)t0[0]+5;
+    cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING** data range (forward) was not provided, will try data range start = t0+5 = " << start[0] << ".";
+    cerr << endl << "NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl;
+  }
+  if (start[1] < 0) {
+    start[1] = (Int_t)t0[1]+5;
+    cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING** data range (backward) was not provided, will try data range start = t0+5 = " << start[1] << ".";
+    cerr << endl << "NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl;
+  }
+  if (end[0] < 0) {
+    end[0] = runData->GetDataBin(histoNo[0])->size();
+    cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING** data range (forward) was not provided, will try data range end = " << end[0] << ".";
+    cerr << endl << "NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl;
+  }
+  if (end[1] < 0) {
+    end[1] = runData->GetDataBin(histoNo[1])->size();
+    cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING** data range (backward) was not provided, will try data range end = " << end[1] << ".";
+    cerr << endl << "NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl;
+  }
   // check if start, end, and t0 make any sense
   // 1st check if start and end are in proper order
   for (UInt_t i=0; i<2; i++) {
@@ -783,15 +808,30 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
   // transform raw histo data. This is done the following way (for details see the manual):
   // first rebin the data, than calculate the asymmetry
   // first get start data, end data, and t0
-  Int_t val = fRunInfo->GetDataRange(0)-packing*(fRunInfo->GetDataRange(0)/packing);
-  do {
-    if (fRunInfo->GetDataRange(2) - fRunInfo->GetDataRange(0) < 0)
-      val += packing;
-  } while (val + fRunInfo->GetDataRange(2) - fRunInfo->GetDataRange(0) < 0);
-
-  Int_t start[2] = {val, val + fRunInfo->GetDataRange(2) - fRunInfo->GetDataRange(0)};
-  Int_t end[2];
+  Int_t start[2] = {0, 0};
+  Int_t end[2] = {0, 0};
   Double_t t0[2] = {fT0s[0], fT0s[1]};
+  // check if data range has been provided, and if not try to estimate them
+  if (fRunInfo->GetDataRange(0) < 0) {
+    start[0] = ((Int_t)t0[0]+5) - (((Int_t)t0[0]+5)/packing)*packing;
+    cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING** data range (forward) was not provided, will try data range start = " << start[0] << ".";
+    cerr << endl << "NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl;
+  } else if (fRunInfo->GetDataRange(2) < 0) {
+    start[1] = ((Int_t)t0[1]+5) - (((Int_t)t0[1]+5)/packing)*packing;
+    cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING** data range (backward) was not provided, will try data range start = " << start[1] << ".";
+    cerr << endl << "NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl;
+  } else {
+    Int_t val = fRunInfo->GetDataRange(0)-packing*(fRunInfo->GetDataRange(0)/packing);
+    do {
+      if (fRunInfo->GetDataRange(2) - fRunInfo->GetDataRange(0) < 0)
+        val += packing;
+    } while (val + fRunInfo->GetDataRange(2) - fRunInfo->GetDataRange(0) < 0);
+
+    start[0] = val;
+    start[1] = val + fRunInfo->GetDataRange(2) - fRunInfo->GetDataRange(0);
+  }
 
 /*
 cout << endl << ">> start[0]=" << start[0] << ", end[0]=" << end[0];

@@ -459,6 +459,20 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
   Int_t end;
   start = fRunInfo->GetDataRange(0);
   end   = fRunInfo->GetDataRange(1);
+  // check if data range has been provided, and if not try to estimate them
+  if (start < 0) {
+    start = fT0s[0]+5;
+    cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range start = t0+5 = " << start << ".";
+    cerr << endl << "NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl;
+  }
+  if (end < 0) {
+    end = runData->GetDataBin(histoNo)->size();
+    cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range end = " << end << ".";
+    cerr << endl << "NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl;
+  }
+
   // check if start, end, and t0 make any sense
   // 1st check if start and end are in proper order
   if (end < start) { // need to swap them
@@ -564,6 +578,14 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
   Int_t start = fRunInfo->GetDataRange(0) - (fRunInfo->GetDataRange(0)/packing)*packing;
   // end = last bin starting from start which is a multipl of packing and still within the data 
   Int_t end   = start + ((runData->GetDataBin(histoNo)->size()-start)/packing)*packing;
+  // check if data range has been provided, and if not try to estimate them
+  if (start < 0) {
+    start = (fT0s[0]+5) - ((fT0s[0]+5)/packing)*packing;
+    end = start + ((runData->GetDataBin(histoNo)->size()-start)/packing)*packing;
+    cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range start = " << start << ".";
+    cerr << endl << "NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl;
+  }
   // check if start, end, and t0 make any sense
   // 1st check if start and end are in proper order
   if (end < start) { // need to swap them
@@ -728,6 +750,15 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
   Int_t start = fRunInfo->GetDataRange(0) - (fRunInfo->GetDataRange(0)/packing)*packing;
   // end = last bin starting from start which is a multiple of packing and still within the data
   Int_t end   = start + ((runData->GetDataBin(histoNo)->size()-start)/packing)*packing;
+
+  // check if data range has been provided, and if not try to estimate them
+  if (start < 0) {
+    start = (fT0s[0]+5) - ((fT0s[0]+5)/packing)*packing;
+    end = start + ((runData->GetDataBin(histoNo)->size()-start)/packing)*packing;
+    cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range start = " << start << ".";
+    cerr << endl << "NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl;
+  }
 
   // check if start, end, and t0 make any sense
   // 1st check if start and end are in proper order

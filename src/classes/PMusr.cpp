@@ -490,7 +490,7 @@ PMsrRunBlock::PMsrRunBlock()
   fBkgFitParamNo = -1; // undefined background parameter number
   fPhaseParamNo = -1; // undefined phase parameter number
   fLifetimeParamNo = -1; // undefined lifetime parameter number
-  fLifetimeCorrection = true; // lifetime correction == true by default (used in single histogram musrview)
+  fLifetimeCorrection = false; // lifetime correction == false by default (used in single histogram musrview)
   fForwardHistoNo = -1; // undefined forward histogram number
   fBackwardHistoNo = -1; // undefined backward histogram number
   fFitRange[0] = PMUSR_UNDEFINED; // undefined start fit range
