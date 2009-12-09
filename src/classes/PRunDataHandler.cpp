@@ -1970,6 +1970,7 @@ Bool_t PRunDataHandler::ReadDBFile()
   Double_t  val;
   Bool_t firstData = true; // needed as a switch to check in which format the data are given.
   Bool_t labelledFormat = true; // flag showing if the data are given in row format, or as labelled format (see description above, default is labelled format)
+  Bool_t dataTagsRead = false; // flag showing if the data tags are alread read
 
   // variables needed to tokenize strings
   TString tstr;
@@ -2005,7 +2006,8 @@ Bool_t PRunDataHandler::ReadDBFile()
     } else if (workStr.BeginsWith("label", TString::kIgnoreCase)) {
       dbTag = 3;
       continue;
-    } else if (workStr.BeginsWith("data", TString::kIgnoreCase)) {
+    } else if (workStr.BeginsWith("data", TString::kIgnoreCase) && !dataTagsRead) {
+      dataTagsRead = true;
       dbTag = 4;
 
       // filter out all data tags
