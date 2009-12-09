@@ -1988,32 +1988,6 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     param.CleanUp();
   }
 
-  // check if for fittypes: single histo, asymmetry, RRF any background info is given
-  for (UInt_t i=0; i<fRuns.size(); i++) {
-    if ((fRuns[i].GetFitType() == MSR_FITTYPE_SINGLE_HISTO) ||
-        (fRuns[i].GetFitType() == MSR_FITTYPE_ASYM) ||
-        (fRuns[i].GetFitType() == MSR_FITTYPE_ASYM_RRF)) {
-      Bool_t found;
-      if (fRuns[i].GetBkgFitParamNo() >= 0) { // check if backgr.fit is given
-        found = true;
-      } else if (fRuns[i].GetBkgFixSize() > 0) { // check if backgr.fix is given
-        found = true;
-      } else if (fRuns[i].GetBkgRangeSize() > 0) { // check if background window is given
-        found = true;
-      } else {
-        found = false;
-      }
-      if (!found) {
-        cerr << endl << ">> PMsrHandler::HandleRunEntry: **ERROR** for run " << fRuns[i].GetRunName()->Data() << ",  forward " << fRuns[i].GetForwardHistoNo();
-        cerr << endl << "   no background information found!";
-        cerr << endl << "   Either of the tags 'backgr.fit', 'backgr.fix', 'background'";
-        cerr << endl << "   with data is needed.";
-        cerr << endl;
-        return false;
-      }
-    }
-  }
-
   return !error;
 }
 

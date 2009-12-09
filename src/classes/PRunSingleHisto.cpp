@@ -500,11 +500,15 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
       if (fRunInfo->GetBkgRangeSize() != 0) {
         if (!EstimateBkg(histoNo))
           return false;
-      } else { // no background given to do the job
-        cerr << endl << "PRunSingleHisto::PrepareData(): **ERROR** Neither fix background nor background bins are given!";
-        cerr << endl << "One of the two is needed! Will quit ...";
+      } else { // no background given to do the job, try estimate
+        fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[0]*0.1), 0);
+        fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[0]*0.6), 1);
+        cerr << endl << "PRunSingleHisto::PrepareFitData(): **WARNING** Neither fix background nor background bins are given!";
+        cerr << endl << "Will try the following: bkg start = " << fRunInfo->GetBkgRange(0) << ", bkg end = " << fRunInfo->GetBkgRange(1);
+        cerr << endl << "NO WARRANTY THAT THIS MAKES ANY SENSE! Better check ...";
         cerr << endl;
-        return false;
+        if (!EstimateBkg(histoNo))
+          return false;
       }
     }
   }
@@ -678,8 +682,19 @@ cout << endl << ">> data start time = " << fData.GetDataTimeStart();
   Double_t bkg;
   if (fRunInfo->GetBkgFitParamNo() == -1) { // bkg not fitted
     if (fRunInfo->GetBkgFixSize() == 0) { // no fixed background given (background interval)
-      if (!EstimateBkg(histoNo))
-        return false;
+      if (fRunInfo->GetBkgRangeSize() != 0) { // background range given
+        if (!EstimateBkg(histoNo))
+          return false;
+      } else { // no background given to do the job, try estimate
+        fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[0]*0.1), 0);
+        fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[0]*0.6), 1);
+        cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING** Neither fix background nor background bins are given!";
+        cerr << endl << "Will try the following: bkg start = " << fRunInfo->GetBkgRange(0) << ", bkg end = " << fRunInfo->GetBkgRange(1);
+        cerr << endl << "NO WARRANTY THAT THIS MAKES ANY SENSE! Better check ...";
+        cerr << endl;
+        if (!EstimateBkg(histoNo))
+          return false;
+      }
       bkg = fBackground;
     } else { // fixed bkg given
       bkg = fRunInfo->GetBkgFix(0);
@@ -812,8 +827,19 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
   Double_t bkg;
   if (fRunInfo->GetBkgFitParamNo() == -1) { // bkg not fitted
     if (fRunInfo->GetBkgFixSize() == 0) { // no fixed background given (background interval)
-      if (!EstimateBkg(histoNo))
-        return false;
+      if (fRunInfo->GetBkgRangeSize() != 0) { // background range given
+        if (!EstimateBkg(histoNo))
+          return false;
+      } else { // no background given to do the job, try estimate
+        fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[0]*0.1), 0);
+        fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[0]*0.6), 1);
+        cerr << endl << "PRunSingleHisto::PrepareData(): **WARNING** Neither fix background nor background bins are given!";
+        cerr << endl << "Will try the following: bkg start = " << fRunInfo->GetBkgRange(0) << ", bkg end = " << fRunInfo->GetBkgRange(1);
+        cerr << endl << "NO WARRANTY THAT THIS MAKES ANY SENSE! Better check ...";
+        cerr << endl;
+        if (!EstimateBkg(histoNo))
+          return false;
+      }
       bkg = fBackground;
     } else { // fixed bkg given
       bkg = fRunInfo->GetBkgFix(0);

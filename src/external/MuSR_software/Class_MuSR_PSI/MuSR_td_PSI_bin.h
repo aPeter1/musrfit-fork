@@ -108,8 +108,8 @@ class MuSR_td_PSI_bin {
      Histogram information returned by ..._vector or ..._array methods return
      information based on histo bin .
 
-     NOTE: Histogram information returned by pointer_to_array = ..._array() methods
-           should be freed by  delete [] pointer_to_array;
+     NOTE: Histogram information returned by \<pointer_to_array\> = ..._array() methods
+           should be freed by  delete [] \<pointer_to_array\>;
  */
     vector< vector<double> >  histos_vector ;
 

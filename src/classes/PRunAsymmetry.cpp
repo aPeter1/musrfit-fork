@@ -454,10 +454,19 @@ Bool_t PRunAsymmetry::PrepareData()
     if (fRunInfo->GetBkgRangeSize() != 0) {
       if (!SubtractEstimatedBkg())
         return false;
-    } else { // no background given to do the job
-      cerr << endl << "PRunAsymmetry::PrepareData(): **ERROR** Neither fix background nor background bins are given!";
-      cerr << endl << "One of the two is needed! Will quit ...";
-      return false;
+    } else { // no background given to do the job, try to estimate it
+      fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[0]*0.1), 0);
+      fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[0]*0.6), 1);
+      fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[1]*0.1), 2);
+      fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[1]*0.6), 3);
+      cerr << endl << "PRunAsymmetry::PrepareData(): **WARNING** Neither fix background nor background bins are given!";
+      cerr << endl << "Will try the following:";
+      cerr << endl << "forward:  bkg start = " << fRunInfo->GetBkgRange(0) << ", bkg end = " << fRunInfo->GetBkgRange(1);
+      cerr << endl << "backward: bkg start = " << fRunInfo->GetBkgRange(2) << ", bkg end = " << fRunInfo->GetBkgRange(3);
+      cerr << endl << "NO WARRANTY THAT THIS MAKES ANY SENSE! Better check ...";
+      cerr << endl;
+      if (!SubtractEstimatedBkg())
+        return false;
     }
   } else { // fixed background given
     if (!SubtractFixBkg())

@@ -78,7 +78,8 @@ using namespace std ;
  *    - 5 if the number of histograms is less than 1
  *    - 6 if reading data failed
  *
- *  The parameter of the method is a const char * representing the name of the file to be open.
+ *  The parameter of the method is a const char * representing the name of the file to 
+ *  be opened.
  */
 
  int MuSR_td_PSI_bin::read(const char * fileName)
@@ -143,20 +144,6 @@ using namespace std ;
 //Implementation readbin
 //*******************************
 
-/*! \brief Method to read a PSI-bin file
- *
- *  This method gives back:
- *    - 0 for succesful reading
- *    - 1 if the open file action or the reading of the header failed
- *    - 2 for an unsupported version of the data
- *    - 3 for an error when allocating data buffer
- *    - 4 if number of histograms per record not equals 1
- *    - 5 if the number of histograms is less than 1
- *    - 6 if reading data failed
- *
- *  The parameter of the method is a const char * representing the name of the file to be open.
- */
-
 /* -- type definitions taken from tydefs.h -- */
 
 #if ((defined(__DECC) || defined(__VAXC)) && !defined(unix) && !defined(OS_OSF1))
@@ -196,6 +183,21 @@ typedef            long int      Int32;
 typedef                 float   Float32;
 
 /* ----------------------------------------- */
+
+/*! \brief Method to read a PSI-bin file
+ *
+ *  This method gives back:
+ *    - 0 for succesful reading
+ *    - 1 if the open file action or the reading of the header failed
+ *    - 2 for an unsupported version of the data
+ *    - 3 for an error when allocating data buffer
+ *    - 4 if number of histograms per record not equals 1
+ *    - 5 if the number of histograms is less than 1
+ *    - 6 if reading data failed
+ *
+ *  The parameter of the method is a const char * representing the name of the file to 
+ *  be opened.
+ */
 
  int MuSR_td_PSI_bin::readbin(const char * fileName)
   {
@@ -264,7 +266,7 @@ typedef                 float   Float32;
       readstatus  = "ERROR Reading "+filename+" header failed!";
       return 1;                                  // ERROR reading header failed
     }
-                                                 // fill header data into member variables
+                                              // fill header data into member variables
     strncpy(format_id,buffer_file,2);
     format_id[2] = '\0' ;
 
@@ -511,19 +513,6 @@ typedef                 float   Float32;
 //Implementation readmdu
 //*******************************
 
-/*! \brief Method to read a MuSR MDU file
- *
- *  This method gives back:
- *    - 0 for succesful reading
- *    - 1 if the open file action or the reading of the header failed
- *    - 2 for an unsupported version of the data
- *    - 3 for an error when allocating data buffer
- *    - 5 if the number of histograms is less than 1
- *    - 6 if reading data failed
- *
- *  The parameter of the method is a const char * representing the name of the file to be open.
- */
-
 #define DATESTR    12     /* Length of date string 01-NOV-1999 */
 #define TIMESTR     9     /* Length of time string 08:45:30 */
 
@@ -597,14 +586,14 @@ typedef struct _FeFileHeaderRec {
   /* information for automatic data conversion */
   char   RunTitle[TITLESTR+1];
   char   RunSubTitle[SUBTITLESTR+1];
-  char   DataFormat[DATAFORMATSTR];
-  Int32  HistoResolution;   // TDC resolution factor for target format
-                          // or pTA timespan
+  char   DataFormat[DATAFORMATSTR];// data format (automatically converted to)
+  Int32  HistoResolution;          // TDC resolution factor for target format
+                                   // or pTA timespan
   Int32  BinOffset;
   Int32  BinsPerHistogram;
   Int32  NumberOfDetectors;
-  char DetectorNumberList[DETECTLISTSTR];
-
+  char DetectorNumberList[DETECTLISTSTR]; // list of detectors to be converted
+                                          // to the target data format
   /* additional information */
   char MeanTemp[TEMPLISTSTR];
   char TempDev[TEMPLISTSTR];
@@ -769,6 +758,20 @@ typedef struct _pTATDC32StatisticRec {
 
 /* ---------------------------------------------------------------------- */
 
+/*! \brief Method to read a MuSR MDU file
+ *
+ *  This method gives back:
+ *    - 0 for succesful reading
+ *    - 1 if the open file action or the reading of the header failed
+ *    - 2 for an unsupported version of the data
+ *    - 3 for an error when allocating data buffer
+ *    - 5 if the number of histograms is less than 1
+ *    - 6 if reading data failed
+ *
+ *  The parameter of the method is a const char * representing the name of the 
+ *  file to be opened.
+ */
+
  int MuSR_td_PSI_bin::readmdu(const char * fileName)
   {
     ifstream  file_name ;
@@ -778,7 +781,7 @@ typedef struct _pTATDC32StatisticRec {
 
     if (sizeof(Int32) != 4)
     {
-      readstatus  = "ERROR Sizeof Int32 data type is not 4 bytes";
+      readstatus  = "ERROR Sizeof( Int32 ) data type is not 4 bytes";
       return 1;            // ERROR open failed
     }
 
@@ -792,7 +795,7 @@ typedef struct _pTATDC32StatisticRec {
     }
 
     pTAFileHeaderRec      gpTAfhead;
-    FeFileHeaderPtr       gpFehead  = &gpTAfhead.Header;
+    //FeFileHeaderPtr     gpFehead  = &gpTAfhead.Header;
 
     file_name.read((char *)&gpTAfhead, sizeof gpTAfhead) ;    // read header into buffer
     if (file_name.fail())
@@ -801,7 +804,7 @@ typedef struct _pTATDC32StatisticRec {
       readstatus  = "ERROR Reading "+filename+" header failed!";
       return 1;                                  // ERROR reading header failed
     }
-                                                 // fill header data into member variables
+                                               // fill header data into member variables
     format_id[0] = gpTAfhead.Header.FmtId;
     format_id[1] = gpTAfhead.Header.FmtVersion;
     format_id[2] = '\0' ;
@@ -895,12 +898,13 @@ typedef struct _pTATDC32StatisticRec {
 #endif
 
     // process detector list in gpTAfhead.Header.NumberOfDetectors
+    // for pTA only histograms of selected detectors are valid
     bool selected[MAXHISTO];
 
     for (i=0; i < MAXHISTO; i++)
       selected[i] = false;
 
-    for (i=0,j=0; i <= strlen(gpTAfhead.Header.DetectorNumberList); i++) {
+    for (i=0,j=0; i <= (int)strlen(gpTAfhead.Header.DetectorNumberList); i++) {
       if ((gpTAfhead.Header.DetectorNumberList[i] == ' ') ||
           (gpTAfhead.Header.DetectorNumberList[i] == '\0')) {
         int it;
@@ -947,7 +951,7 @@ typedef struct _pTATDC32StatisticRec {
 
       tothist = PTAMAXTAGS;
 
-      file_name.read((char *)&gpTAsetpta, sizeof gpTAsetpta) ; // read settings into buffer
+      file_name.read((char *)&gpTAsetpta, sizeof gpTAsetpta);//read settings into buffer
       if (file_name.fail())
       {
         file_name.close();
@@ -955,7 +959,8 @@ typedef struct _pTATDC32StatisticRec {
         return 1;                                  // ERROR reading settings failed
       }
 
-      file_name.read((char *)&gpTAstattotpta, sizeof gpTAstattotpta) ; // read stat into buffer
+      // read stat into buffer
+      file_name.read((char *)&gpTAstattotpta, sizeof gpTAstattotpta) ; 
       if (file_name.fail())
       {
         file_name.close();
@@ -1033,7 +1038,7 @@ typedef struct _pTATDC32StatisticRec {
           if ((nbins=(gpTAsetpta.tag[i].Histomaxb-gpTAsetpta.tag[i].Histominb + 1))>1)
           {
 
-            // for pTA only take histogram if histogram was selected
+            // for pTA only: read histogram only if histogram was selected
             if (selected[i])
             {
               // first histo -> take histogram length
@@ -1081,7 +1086,7 @@ typedef struct _pTATDC32StatisticRec {
 
       tothist = TDCMAXTAGS16;
 
-      file_name.read((char *)&gpTAsettdc, sizeof gpTAsettdc) ; // read settings into buffer
+      file_name.read((char *)&gpTAsettdc, sizeof gpTAsettdc);//read settings into buffer
       if (file_name.fail())
       {
         file_name.close();
@@ -1174,7 +1179,8 @@ typedef struct _pTATDC32StatisticRec {
 
       tothist = TDCMAXTAGS32;
 
-      file_name.read((char *)&gpTAsettdc32, sizeof gpTAsettdc32) ; // read settings into buffer
+      // read settings into buffer
+      file_name.read((char *)&gpTAsettdc32, sizeof gpTAsettdc32) ; 
       if (file_name.fail())
       {
         file_name.close();
@@ -1182,7 +1188,8 @@ typedef struct _pTATDC32StatisticRec {
         return 1;                                  // ERROR reading settings failed
       }
 
-      file_name.read((char *)&gpTAstattottdc32, sizeof gpTAstattottdc32) ; // read stat into buffer
+      // read stat into buffer
+      file_name.read((char *)&gpTAstattottdc32, sizeof gpTAstattottdc32) ; 
       if (file_name.fail())
       {
         file_name.close();
@@ -1228,7 +1235,7 @@ typedef struct _pTATDC32StatisticRec {
           cout << "Tag[" << i << "] Histomin = " << gpTAsettdc32.tag[i].Histominb
                << " Histomax = " << gpTAsettdc32.tag[i].Histomaxb << endl;
 #endif
-          // is a histogram there
+          // is a histogram there?
           if ((nbins=(gpTAsettdc32.tag[i].Histomaxb-gpTAsettdc32.tag[i].Histominb + 1))
                >1)
           {
@@ -1336,7 +1343,7 @@ typedef struct _pTATDC32StatisticRec {
           cout << "Tag[" << i << "] " << tag.Label << " : Histomin = " << tag.Histominb
                << " Histomax = " << tag.Histomaxb << endl;
 #endif
-          // is a histogram there
+          // is a histogram there?
           if ((nbins=(tag.Histomaxb-tag.Histominb + 1))>1)
           {
             if (thist == NULL) thist = new Int32[nbins];
@@ -1358,7 +1365,7 @@ typedef struct _pTATDC32StatisticRec {
               return 6;                                  // ERROR reading hist failed
             }
 
-            // for pTA only take histogram if histogram was selected
+            // for pTA only: use histogram only, if histogram was selected
             // else take all histos but mark not selected
             if (selected[i] || (strcmp(format_id,"M3") != 0))
             {
@@ -1368,20 +1375,21 @@ typedef struct _pTATDC32StatisticRec {
                 dummy_vector.clear() ;
 
                 strncpy(labels_histo[ihist],tag.Label,MAXLABELSIZE) ;
-                labels_histo[ihist][MAXLABELSIZE] = '\0' ;
+                labels_histo[ihist][MAXLABELSIZE-1] = '\0' ;
 
                 // mark with ** when not selected
                 if (!selected[i] && (strlen(labels_histo[ihist])<MAXLABELSIZE-2))
                   strcat(labels_histo[ihist],"**");
 
-                // calculate t0, fg, lg for "raw" TDC /pTA
-                // taking largest bin value for t0 and fg
+                // calculate t0, fg, lg for "raw" TDC /pTA actually specified for binned
+                // histograms 
+                // taking largest possible bin value for t0 and fg
                 integer_t0[ihist] = (tag.t0b+1)*resolutionfactor -1;
                 first_good[ihist] = (tag.tfb+1)*resolutionfactor -1;
                 last_good[ihist]  =  tag.tlb*resolutionfactor ;
 
                 // store histogram
-                // if non zero offset init
+                // in case of non zero offset init
                 for (j=0; j<tag.Histominb; j++)
                 {
                   histo[ihist][j]= 0;
@@ -1423,7 +1431,7 @@ typedef struct _pTATDC32StatisticRec {
 //Implementation readingOK
 //*******************************
 
-/*! \brief Method to obtain if reading and processing of file was OK
+/*! \brief Method to obtain if reading and processing of the data file was OK.
  *
  *  This method gives back:
  *    - true if reading was OK
@@ -1437,7 +1445,7 @@ bool           MuSR_td_PSI_bin::readingOK() const {
 //Implementation ReadStatus
 //*******************************
 
-/*! \brief Method to obtain error/success information after reading
+/*! \brief Method to obtain error/success information after reading.
  *
  *  This method gives back:
  *    - "SUCCESS"         if reading was OK
@@ -1451,7 +1459,7 @@ string         MuSR_td_PSI_bin::ReadStatus() const {
 //Implementation Filename
 //*******************************
 
-/*! \brief Method to obtain file name
+/*! \brief Method to obtain the file name.
  *
  *  This method gives back:
  *    - <filename>
@@ -1464,7 +1472,7 @@ string         MuSR_td_PSI_bin::Filename() const {
 //Implementation get_histo_int
 //*******************************
 
-/*! \brief Method to value of a single bin
+/*! \brief Method to return the value of a single bin as integer.
  *
  *  This method gives back:
  *    - bin value as int
@@ -1486,7 +1494,7 @@ int     MuSR_td_PSI_bin::get_histo_int(int histo_num, int j) {
 //Implementation get_histo
 //*******************************
 
-/*! \brief Method to value of a single bin
+/*! \brief Method to return the value of a single bin as double.
  *
  *  This method gives back:
  *    - bin value as double
@@ -1508,14 +1516,16 @@ double  MuSR_td_PSI_bin::get_histo(int histo_num, int j) {
 //Implementation get_histo_array
 //*******************************
 
-/*! \brief Method to obtain an array of type double containing the values of the histogram \<histo_num\> with binning \<binning\>
+/*! \brief Method to obtain an array of type double containing the values of the 
+    histogram \<histo_num\> with binning \<binning\>
  *
  *  This method gives back:
  *    - an pointer of a double array
  *    - the NULL pointer if an invalid histogram number or binning is choosen or
  *      allocation failed
  *
- *  The parameters of the method are the integers \<histo_num\> and \<binning\> representing the desired histogram number and binning.
+ *  The parameters of the method are the integers \<histo_num\> and \<binning\> 
+    representing the desired histogram number and binning.
  */
 
  double * MuSR_td_PSI_bin::get_histo_array(int histo_num , int binning)
@@ -1544,13 +1554,15 @@ double  MuSR_td_PSI_bin::get_histo(int histo_num, int j) {
 //Implementation get_histo_vector
 //*******************************
 
-/*! \brief Method to obtain a vector of double containing the values of the histogram \<histo_num\> with binning \<binning\>
+/*! \brief Method to obtain a vector of double containing the values of the histogram 
+      \<histo_num\> with binning \<binning\>
  *
  *  This method gives back:
  *    - a vector of double
  *    - an empty vector of double if an invalid number or binning is choosen
  *
- *  The parameters of the method are the integers \<histo_num\> and \<binning\> representing the desired histogram number and binning.
+ *  The parameters of the method are the integers \<histo_num\> and \<binning\> 
+    representing the desired histogram number and binning.
  */
 
  vector<double> MuSR_td_PSI_bin::get_histo_vector(int histo_num , int binning)
@@ -1579,13 +1591,16 @@ double  MuSR_td_PSI_bin::get_histo(int histo_num, int j) {
 //Implementation get_histo_vector_no0
 //*******************************
 
-/*! \brief Method to obtain a vector of double containing the values of the histogram \<histo_num\> with binning \<binning\> but where the bins with zero counts are replaced by a count 0.1
+/*! \brief Method to obtain a vector of double containing the values of the 
+ *   histogram \<histo_num\> with binning \<binning\> but where the bins with 
+ *   zero counts are replaced by a count 0.1
  *
  *  This method gives back:
  *    - a vector of double
  *    - an empty vector of double if an invalid number or binning is choosen
  *
- *  The parameters of the method are the integers \<histo_num\> and \<binning\> representing the desired histogram number and binning.
+ *  The parameters of the method are the integers \<histo_num\> and \<binning\> 
+ *  representing the desired histogram number and binning.
  */
 
  vector<double> MuSR_td_PSI_bin::get_histo_vector_no0(int histo_num , int binning)
@@ -1619,13 +1634,15 @@ double  MuSR_td_PSI_bin::get_histo(int histo_num, int j) {
 //Implementation get_histo_array_int
 //**********************************
 
-/*! \brief Method to obtain an array of type integer containing the values of the histogram \<histo_num\>
+/*! \brief Method to obtain an array of type integer containing the values of the 
+ *   histogram \<histo_num\>
  *
  *  This method gives back:
- *    - an pointer of a integer array
+ *    - an pointer of an integer array
  *    - the NULL pointer if an invalid histogram number is choosen or allocate failed
  *
- *  The parameter of the method is the integer \<histo_num\> representing the desired histogram number.
+ *  The parameter of the method is the integer \<histo_num\> representing the desired 
+ *  histogram number.
  */
 
   int * MuSR_td_PSI_bin::get_histo_array_int(int histo_num)
@@ -1633,7 +1650,7 @@ double  MuSR_td_PSI_bin::get_histo(int histo_num, int j) {
     if (!readingok) return NULL;
 
     if ( histo_num < 0 || histo_num >= int(number_histo))
-      return NULL ;
+       return NULL ;
 
     int *histo_array = new int[length_histo] ;
 
@@ -1652,14 +1669,17 @@ double  MuSR_td_PSI_bin::get_histo(int histo_num, int j) {
 //Implementation get_histo_fromt0_array
 //*******************************
 
-/*! \brief Method to obtain an array of type double containing the values of the histogram \<histo_num\> with binning \<binning\> from the point t0. An \<offset\> can also be specified (otherwise = 0).
+/*! \brief Method to obtain an array of type double containing the values of the 
+ *   histogram \<histo_num\> with binning \<binning\> from the point t0. An \<offset\>
+ *   can also be specified (otherwise = 0).
  *
  *  This method gives back:
- *    - an pointer of a double array
+ *    - a pointer of a double array
  *    - the NULL pointer if an invalid histogram number or binning is choosen or
  *      allocation failed
  *
- *  The parameters of the method are the integers \<histo_num\> and \<binning\> representing the desired histogram number and binning.
+ *  The parameters of the method are the integers \<histo_num\> and \<binning\> 
+ *  representing the desired histogram number and binning.
  */
 
  double * MuSR_td_PSI_bin::get_histo_fromt0_array(int histo_num , int binning , int offset)
@@ -1669,7 +1689,8 @@ double  MuSR_td_PSI_bin::get_histo(int histo_num, int j) {
     if ( histo_num < 0 || histo_num >= int(number_histo) || binning <= 0 )
       return NULL ;
 
-    double *histo_fromt0_array = new double[int((int(length_histo)-get_t0_int(histo_num)-offset+1)/binning)] ;
+    double *histo_fromt0_array = 
+      new double[int((int(length_histo)-get_t0_int(histo_num)-offset+1)/binning)] ;
 
     if (!histo_fromt0_array) return NULL;
 
@@ -1677,7 +1698,8 @@ double  MuSR_td_PSI_bin::get_histo(int histo_num, int j) {
     {
       histo_fromt0_array[i] = 0 ;
       for (int j = 0 ; j < binning ; j++)
-      histo_fromt0_array[i] += double(histo[histo_num][i*binning+j+get_t0_int(histo_num)+offset]) ;
+      histo_fromt0_array[i] += 
+        double(histo[histo_num][i*binning+j+get_t0_int(histo_num)+offset]) ;
     }
 
     return histo_fromt0_array ;
@@ -1688,13 +1710,16 @@ double  MuSR_td_PSI_bin::get_histo(int histo_num, int j) {
 //Implementation get_histo_fromt0_vector
 //*******************************
 
-/*! \brief Method to obtain a vector of double containing the values of the histogram \<histo_num\> with binning \<binning\> from the point t0.  An \<offset\> can also be specified (otherwise = 0).
+/*! \brief Method to obtain a vector of double containing the values of the histogram 
+ *   \<histo_num\> with binning \<binning\> from the point t0.  An \<offset\> can also 
+ *   be specified (otherwise = 0).
  *
  *  This method gives back:
  *    - a vector of double
  *    - an empty vector of double if an invalid histogram number or binning is choosen
  *
- *  The parameters of the method are the integers \<histo_num\> and \<binning\> representing the desired histogram number and binning.
+ *  The parameters of the method are the integers \<histo_num\> and \<binning\> 
+ *  representing the desired histogram number and binning.
  */
 
  vector<double> MuSR_td_PSI_bin::get_histo_fromt0_vector(int histo_num , int binning , int offset)
@@ -1712,7 +1737,8 @@ double  MuSR_td_PSI_bin::get_histo(int histo_num, int j) {
     for (int i = 0 ; i < int((int(length_histo)-get_t0_int(histo_num)-offset)/binning) ; i++)
     {
       for (int j = 0 ; j < binning ; j++)
-      histo_fromt0_vector[i] += double(histo[histo_num][i*binning+j+get_t0_int(histo_num)+offset]) ;
+      histo_fromt0_vector[i] += 
+        double(histo[histo_num][i*binning+j+get_t0_int(histo_num)+offset]) ;
     }
 
     return histo_fromt0_vector ;
@@ -1723,13 +1749,16 @@ double  MuSR_td_PSI_bin::get_histo(int histo_num, int j) {
 //Implementation get_histo_goodBins_array
 //*******************************
 
-/*! \brief Method to obtain an array of type double containing the values of the histogram \<histo_num\> with binning \<binning\> from the point first_good until last_good
+/*! \brief Method to obtain an array of type double containing the values of the 
+ *   histogram \<histo_num\> with binning \<binning\> from the point first_good until 
+ *   last_good
  *
  *  This method gives back:
  *    - an pointer of a double array
  *    - the NULL pointer if an invalid histogram number or binning is choosen or
  *      allocate failed
- *  The parameters of the method are the integers \<histo_num\> and \<binning\> representing the desired histogram number and binning.
+ *  The parameters of the method are the integers \<histo_num\> and \<binning\> 
+ *  representing the desired histogram number and binning.
  */
 
  double * MuSR_td_PSI_bin::get_histo_goodBins_array(int histo_num , int binning)
@@ -1738,15 +1767,17 @@ double  MuSR_td_PSI_bin::get_histo(int histo_num, int j) {
     if ( histo_num < 0 || histo_num >= int(number_histo) || binning <= 0 )
       return NULL ;
 
-    double *histo_goodBins_array = new double[int((get_lastGood_int(histo_num)-get_firstGood_int(histo_num)+1)/binning)] ;
+    double *histo_goodBins_array = 
+      new double[int((get_lastGood_int(histo_num)-get_firstGood_int(histo_num)+1)/binning)] ;
 
-        if (!histo_goodBins_array) return NULL;
+    if (!histo_goodBins_array) return NULL;
 
     for (int i = 0 ; i < int((get_lastGood_int(histo_num)-get_firstGood_int(histo_num))/binning) ; i++)
     {
       histo_goodBins_array[i] = 0 ;
       for (int j = 0 ; j < binning ; j++)
-      histo_goodBins_array[i] += double(histo[histo_num][i*binning+j+get_firstGood_int(histo_num)]) ;
+      histo_goodBins_array[i] += 
+        double(histo[histo_num][i*binning+j+get_firstGood_int(histo_num)]) ;
     }
 
     return histo_goodBins_array ;
@@ -1757,13 +1788,16 @@ double  MuSR_td_PSI_bin::get_histo(int histo_num, int j) {
 //Implementation get_histo_goodBins_vector
 //*******************************
 
-/*! \brief Method to obtain a vector of double containing the values of the histogram \<histo_num\> with binning \<binning\> from the point first_good until last_good
+/*! \brief Method to obtain a vector of double containing the values of the 
+ *   histogram \<histo_num\> with binning \<binning\> from the point first_good until 
+ *   last_good
  *
  *  This method gives back:
  *    - a vector of double
  *    - an empty vector of double if an invalid histogram number or binning is choosen
  *
- *  The parameters of the method are the integers \<histo_num\> and \<binning\> representing the desired histogram number and binning.
+ *  The parameters of the method are the integers \<histo_num\> and \<binning\> 
+ *  representing the desired histogram number and binning.
  */
 
  vector<double> MuSR_td_PSI_bin::get_histo_goodBins_vector(int histo_num , int binning)
@@ -1781,7 +1815,8 @@ double  MuSR_td_PSI_bin::get_histo(int histo_num, int j) {
     for (int i = 0 ; i < int((get_lastGood_int(histo_num)-get_firstGood_int(histo_num))/binning) ; i++)
     {
       for (int j = 0 ; j < binning ; j++)
-      histo_goodBins_vector[i] += double(histo[histo_num][i*binning+j+get_firstGood_int(histo_num)]) ;
+      histo_goodBins_vector[i] += 
+        double(histo[histo_num][i*binning+j+get_firstGood_int(histo_num)]) ;
     }
 
     return histo_goodBins_vector ;
@@ -1792,9 +1827,12 @@ double  MuSR_td_PSI_bin::get_histo(int histo_num, int j) {
 //Implementation get_histo_fromt0_minus_bckgrd_array
 //*******************************
 
-/*! \brief Method to obtain an array of type double containing the values of the histogram \<histo_num\> with binning \<binning\> from the point t0. A background calculated from the points \<lower_bckgrd\> and \<higher_bckgrd\> is subtracted. An \<offset\> can also be specified (otherwise = 0).
+/*! \brief Method to obtain an array of type double containing the values of the 
+ *   histogram \<histo_num\> with binning \<binning\> from the point t0. A background 
+ *   calculated from the points \<lower_bckgrd\> and \<higher_bckgrd\> is subtracted. 
+ *   An \<offset\> can also be specified (otherwise = 0. 
  *
- *  This method gives back:
+ *  This method gives back: 
  *    - a pointer of a double array
  *    - the NULL pointer if one provides
  *       - an invalid histogram number
@@ -1802,12 +1840,14 @@ double  MuSR_td_PSI_bin::get_histo(int histo_num, int j) {
  *       - invalid background limits
  *       - allocate failed
  *
- *  The first parameters of the method are the integers \<histo_num\> and \<binning\> representing the desired histogram number and binning.
- *  Also the parameters \<lower_bckgrd\> and \<higher_bckgrd\> define the limits between which the background is calculated.
+ *  The first parameters of the method are the integers \<histo_num\> and \<binning\> 
+ *  representing the desired histogram number and binning.
+ *  Also the parameters \<lower_bckgrd\> and \<higher_bckgrd\> define the limits 
+ *  between which the background is calculated.
  */
 
-double * MuSR_td_PSI_bin::get_histo_fromt0_minus_bckgrd_array(int histo_num , int lower_bckgrd ,
-                                                                 int higher_bckgrd , int binning, int offset)
+double * MuSR_td_PSI_bin::get_histo_fromt0_minus_bckgrd_array(int histo_num , 
+                       int lower_bckgrd , int higher_bckgrd , int binning, int offset)
   {
     if (!readingok) return NULL;
 
@@ -1825,7 +1865,8 @@ double * MuSR_td_PSI_bin::get_histo_fromt0_minus_bckgrd_array(int histo_num , in
     }
     bckgrd = bckgrd/(higher_bckgrd-lower_bckgrd+1) ;
 
-    double *histo_fromt0_minus_bckgrd_array = new double[int((int(length_histo)-get_t0_int(histo_num)-offset+1)/binning)] ;
+    double *histo_fromt0_minus_bckgrd_array = 
+      new double[int((int(length_histo)-get_t0_int(histo_num)-offset+1)/binning)] ;
 
     if (!histo_fromt0_minus_bckgrd_array) return NULL;
 
@@ -1843,8 +1884,11 @@ double * MuSR_td_PSI_bin::get_histo_fromt0_minus_bckgrd_array(int histo_num , in
 //*******************************
 //Implementation get_histo_fromt0_minus_bckgrd_vector
 //*******************************
-
-/*! \brief Method to obtain a vector of double containing the values of the histogram \<histo_num\> with binning \<binning\> from the point t0. A background calculated from the points \<lower_bckgrd\> and \<higher_bckgrd\> is subtracted. An \<offset\> can also be specified (otherwise = 0).
+ 
+/*! \brief Method to obtain a vector of double containing the values of the 
+ *   histogram \<histo_num\> with binning \<binning\> from the point t0. A background 
+ *   calculated from the points \<lower_bckgrd\> and \<higher_bckgrd\> is subtracted. 
+ *   An \<offset\> can also be specified (otherwise = 0).
  *
  *  This method gives back:
  *    - a vector of double
@@ -1853,8 +1897,10 @@ double * MuSR_td_PSI_bin::get_histo_fromt0_minus_bckgrd_array(int histo_num , in
  *       - a binning smaller than 1
  *       - invalid background limits
  *
- *  The first parameters of the method are the integers \<histo_num\> and \<binning\> representing the desired histogram number and binning.
- *  Also the parameters \<lower_bckgrd\> and \<higher_bckgrd\> define the limits between which the background is calculated.
+ *  The first parameters of the method are the integers \<histo_num\> and \<binning\> 
+ *  representing the desired histogram number and binning.
+ *  Also the parameters \<lower_bckgrd\> and \<higher_bckgrd\> define the limits 
+ *  between which the background is calculated.
  */
 
  vector<double> MuSR_td_PSI_bin::get_histo_fromt0_minus_bckgrd_vector(int histo_num , int lower_bckgrd ,
@@ -1895,7 +1941,10 @@ double * MuSR_td_PSI_bin::get_histo_fromt0_minus_bckgrd_array(int histo_num , in
 //Implementation get_histo_goodBins_minus_bckgrd_array
 //*******************************
 
-/*! \brief Method to obtain an array of type double containing the values of the histogram \<histo_num\> with binning \<binning\> from the point first_good until the point last_good. A background calculated from the points \<lower_bckgrd\> and \<higher_bckgrd\> is subtracted
+/*! \brief Method to obtain an array of type double containing the values of the 
+ *   histogram \<histo_num\> with binning \<binning\> from the point first_good until 
+ *   the point last_good. A background calculated from the points \<lower_bckgrd\> and 
+ *   \<higher_bckgrd\> is subtracted
  *
  *  This method gives back:
  *    - a pointer of a double array
@@ -1905,8 +1954,10 @@ double * MuSR_td_PSI_bin::get_histo_fromt0_minus_bckgrd_array(int histo_num , in
  *       - invalid background limits
          - allocate failed
  *
- *  The first parameters of the method are the integers \<histo_num\> and \<binning\> representing the desired histogram number and binning.
- *  Also the parameters \<lower_bckgrd\> and \<higher_bckgrd\> define the limits between which the background is calculated.
+ *  The first parameters of the method are the integers \<histo_num\> and \<binning\> 
+ *  representing the desired histogram number and binning.
+ *  Also the parameters \<lower_bckgrd\> and \<higher_bckgrd\> define the limits 
+ *  between which the background is calculated.
  */
 
 double * MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_array(int histo_num , int lower_bckgrd ,
@@ -1927,7 +1978,8 @@ double * MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_array(int histo_num , 
     }
     bckgrd = bckgrd/(higher_bckgrd-lower_bckgrd+1) ;
 
-    double *histo_goodBins_minus_bckgrd_array = new double[int((get_lastGood_int(histo_num)-get_firstGood_int(histo_num)+1)/binning)] ;
+    double *histo_goodBins_minus_bckgrd_array = 
+      new double[int((get_lastGood_int(histo_num)-get_firstGood_int(histo_num)+1)/binning)] ;
 
     if (!histo_goodBins_minus_bckgrd_array) return NULL;
 
@@ -1947,7 +1999,10 @@ double * MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_array(int histo_num , 
 //Implementation get_histo_goodBins_minus_bckgrd_vector
 //*******************************
 
-/*! \brief Method to obtain a vector of double containing the values of the histogram \<histo_num\> with binning \<binning\> from the point first_good until the point last_good. A background calculated from the points \<lower_bckgrd\> and \<higher_bckgrd\> is subtracted
+/*! \brief Method to obtain a vector of double containing the values of the histogram \<histo_num\>
+ *   with binning \<binning\> from the point first_good until the point last_good. 
+ *   A background calculated from the points \<lower_bckgrd\> and \<higher_bckgrd\> 
+ *   is subtracted
  *
  *  This method gives back:
  *    - a vector of double
@@ -1956,8 +2011,10 @@ double * MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_array(int histo_num , 
  *       - a binning smaller than 1
  *       - invalid background limits
  *
- *  The first parameters of the method are the integers \<histo_num\> and \<binning\> representing the desired histogram number and binning.
- *  Also the parameters \<lower_bckgrd\> and \<higher_bckgrd\> define the limits between which the background is calculated.
+ *  The first parameters of the method are the integers \<histo_num\> and \<binning\> 
+ *  representing the desired histogram number and binning.
+ *  Also the parameters \<lower_bckgrd\> and \<higher_bckgrd\> define the limits 
+ *  between which the background is calculated.
  */
 
  vector<double> MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_vector(int histo_num , int lower_bckgrd ,
@@ -2013,8 +2070,10 @@ double * MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_array(int histo_num , 
  *       - invalid background limits
  *       - allocate failed
  *
- *  The first parameters of the method are the integers \<histo_num_plus\> and \<histo_num_minus\>, as well as the double \<alpha_param\>.
- *  Integers for the binning and for the background limits for both histograms.are also required.
+ *  The first parameters of the method are the integers \<histo_num_plus\> and 
+ *  \<histo_num_minus\>, as well as the double \<alpha_param\>.
+ *  Integers for the binning and for the background limits for both histograms.are 
+ *  also required.
  */
 
  double * MuSR_td_PSI_bin::get_asymmetry_array(int histo_num_plus , int histo_num_minus , double alpha_param ,
@@ -2315,7 +2374,8 @@ double * MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_array(int histo_num , 
                                                 int binning , int lower_bckgrd_plus , int higher_bckgrd_plus ,
                                                 int lower_bckgrd_minus , int higher_bckgrd_minus)
   {
-    int hsize = int((tmin(get_lastGood_int(histo_num_plus)-get_firstGood_int(histo_num_plus),get_lastGood_int(histo_num_minus)-get_firstGood_int(histo_num_minus))+1)/binning) ;
+    int hsize = int((tmin(get_lastGood_int(histo_num_plus)-get_firstGood_int(histo_num_plus),
+      get_lastGood_int(histo_num_minus)-get_firstGood_int(histo_num_minus))+1)/binning) ;
 
     if (!readingok) return NULL;
 
@@ -2388,7 +2448,8 @@ double * MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_array(int histo_num , 
                                                  int binning , int lower_bckgrd_plus , int higher_bckgrd_plus ,
                                                  int lower_bckgrd_minus , int higher_bckgrd_minus)
   {
-    int hsize = int((tmin(get_lastGood_int(histo_num_plus)-get_firstGood_int(histo_num_plus),get_lastGood_int(histo_num_minus)-get_firstGood_int(histo_num_minus))+1)/binning) ;
+    int hsize = int((tmin(get_lastGood_int(histo_num_plus)-get_firstGood_int(histo_num_plus),
+      get_lastGood_int(histo_num_minus)-get_firstGood_int(histo_num_minus))+1)/binning) ;
 
     vector<double> asymmetry_goodBins_vector ;
 
@@ -2461,7 +2522,10 @@ double * MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_array(int histo_num , 
                                                  int binning , int lower_bckgrd_plus , int higher_bckgrd_plus ,
                                                  int lower_bckgrd_minus , int higher_bckgrd_minus)
   {
-    int hsize = int((tmin(get_lastGood_int(histo_num_plus)-get_firstGood_int(histo_num_plus),get_lastGood_int(histo_num_minus)-get_firstGood_int(histo_num_minus))+1)/binning) ;
+    int hsize = int((tmin(get_lastGood_int(histo_num_plus)
+                            -get_firstGood_int(histo_num_plus),
+                          get_lastGood_int(histo_num_minus)
+                            -get_firstGood_int(histo_num_minus))+1)/binning) ;
 
     if (!readingok) return NULL;
 
@@ -2477,18 +2541,19 @@ double * MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_array(int histo_num , 
     if ( lower_bckgrd_minus < 0 || higher_bckgrd_minus >= int(length_histo) || lower_bckgrd_minus > higher_bckgrd_minus )
       return NULL ;
 
-    double *dummy_1 = get_histo_fromt0_minus_bckgrd_array(histo_num_plus , lower_bckgrd_plus ,
-                                                          higher_bckgrd_plus , binning) ;
+    double *dummy_1 = get_histo_fromt0_minus_bckgrd_array(histo_num_plus , 
+                                 lower_bckgrd_plus , higher_bckgrd_plus , binning) ;
     if (dummy_1 == NULL) return NULL;
 
-    double *dummy_2 = get_histo_fromt0_minus_bckgrd_array(histo_num_minus , lower_bckgrd_minus ,
-                                                          higher_bckgrd_minus , binning) ;
+    double *dummy_2 = get_histo_fromt0_minus_bckgrd_array(histo_num_minus , 
+                               lower_bckgrd_minus , higher_bckgrd_minus , binning) ;
     if (dummy_2 == NULL)
     {
       delete [] dummy_1;
       return NULL;
     }
-    int hstart = tmax(get_firstGood_int(histo_num_plus)-get_t0_int(histo_num_plus),get_firstGood_int(histo_num_minus)-get_t0_int(histo_num_minus)) ;
+    int hstart = tmax(get_firstGood_int(histo_num_plus)-get_t0_int(histo_num_plus),
+                      get_firstGood_int(histo_num_minus)-get_t0_int(histo_num_minus)) ;
 
     double *error_asymmetry_goodBins_array = new double[hsize] ;
 
@@ -2499,8 +2564,10 @@ double * MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_array(int histo_num , 
       if (dummy_1[i+hstart] < 0.5 || dummy_2[i+hstart] < 0.5 )
         error_asymmetry_goodBins_array[i] = 1.0 ;
       else
-        error_asymmetry_goodBins_array[i] = double(2.) * alpha_param * sqrt(dummy_1[i+hstart]*dummy_2[i+hstart]*(dummy_1[i+hstart]+dummy_2[i+hstart])) /
-                                            pow(dummy_1[i+hstart] + alpha_param * dummy_2[i+hstart],2.) ;
+        error_asymmetry_goodBins_array[i] = 
+          double(2.) * alpha_param * sqrt(dummy_1[i+hstart]*dummy_2[i+hstart]
+                                          *(dummy_1[i+hstart]+dummy_2[i+hstart])) /
+                          pow(dummy_1[i+hstart] + alpha_param * dummy_2[i+hstart],2.) ;
     }
 
     delete [] dummy_1;
@@ -2514,11 +2581,14 @@ double * MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_array(int histo_num , 
 //Implementation get_error_asymmetry_goodBins_vector
 //*******************************
 
-/*! \brief Method to obtain a vector of double containing the values of the error of the asymmetry between 2 histograms.
+/*! \brief Method to obtain a vector of double containing the values of the error of 
+ *   the asymmetry between 2 histograms.
  *
  *  The size is calculated as the asymmetry array.
- *  The error of the asymmetry is calculated with the histograms \<histo_num_plus\> and \<histo_num_minus\> with an alpha parameter
- *  \<alpha_param\>. This method requires also a binning value \<binning\>, as well as the background limits for both histograms.
+ *  The error of the asymmetry is calculated with the histograms \<histo_num_plus\> and 
+ *  \<histo_num_minus\> with an alpha parameter \<alpha_param\>. This method requires 
+ *  also a binning value \<binning\>, as well as the background limits for both 
+ *  histograms.
  *
  *  This method gives back:
  *    - a vector of double
@@ -2527,15 +2597,19 @@ double * MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_array(int histo_num , 
  *       - a binning smaller than 1
  *       - invalid background limits
  *
- *  The first parameters of the method are the integers \<histo_num_plus\> and \<histo_num_minus\>, as well as the double \<alpha_param\>.
+ *  The first parameters of the method are the integers \<histo_num_plus\> and 
+ *  \<histo_num_minus\>, as well as the double \<alpha_param\>.
  *  Integers for the binning and for the background limits for both histograms.are also required.
  */
 
- vector<double> MuSR_td_PSI_bin::get_error_asymmetry_goodBins_vector(int histo_num_plus , int histo_num_minus , double alpha_param ,
-                                                 int binning , int lower_bckgrd_plus , int higher_bckgrd_plus ,
-                                                 int lower_bckgrd_minus , int higher_bckgrd_minus)
+ vector<double> MuSR_td_PSI_bin::get_error_asymmetry_goodBins_vector(int histo_num_plus ,
+                                              int histo_num_minus , double alpha_param ,
+                                              int binning , int lower_bckgrd_plus , 
+                                              int higher_bckgrd_plus ,
+                                              int lower_bckgrd_minus , int higher_bckgrd_minus)
   {
-    int hsize = int((tmin(get_lastGood_int(histo_num_plus)-get_firstGood_int(histo_num_plus),get_lastGood_int(histo_num_minus)-get_firstGood_int(histo_num_minus))+1)/binning) ;
+    int hsize = int((tmin(get_lastGood_int(histo_num_plus)-get_firstGood_int(histo_num_plus),
+      get_lastGood_int(histo_num_minus)-get_firstGood_int(histo_num_minus))+1)/binning) ;
 
     vector<double> error_asymmetry_goodBins_vector ;
 
@@ -2575,8 +2649,9 @@ double * MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_array(int histo_num , 
      if (dummy_1[i+hstart] < 0.5 || dummy_2[i+hstart] < 0.5 )
       error_asymmetry_goodBins_vector[i] = 1.0 ;
      else
-       error_asymmetry_goodBins_vector[i] = double(2.) * alpha_param * sqrt(dummy_1[i+hstart]*dummy_2[i+hstart]*(dummy_1[i+hstart]+dummy_2[i+hstart])) /
-                                            pow(dummy_1[i+hstart] + alpha_param * dummy_2[i+hstart],2.) ;
+       error_asymmetry_goodBins_vector[i] = double(2.) * alpha_param 
+         * sqrt(dummy_1[i+hstart]*dummy_2[i+hstart]*(dummy_1[i+hstart]+dummy_2[i+hstart])) /
+          pow(dummy_1[i+hstart] + alpha_param * dummy_2[i+hstart],2.) ;
     }
 
     delete [] dummy_1;
@@ -3324,7 +3399,8 @@ double * MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_array(int histo_num , 
 //Implementation get_timeStart_vector()
 //*******************************
 
-/*! \brief Method returning a vector of strings containing 1) the date when the run was started and 2) the time when the run was started
+/*! \brief Method returning a vector of strings containing 1) the date when the run was 
+ *   started and 2) the time when the run was started
  */
 
  vector<string> MuSR_td_PSI_bin::get_timeStart_vector()
@@ -3343,7 +3419,8 @@ double * MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_array(int histo_num , 
 //Implementation get_timeStop_vector()
 //*******************************
 
-/*! \brief Method returning a vector of strings containing 1) the date when the run was stopped and 2) the time when the run was stopped
+/*! \brief Method returning a vector of strings containing 1) the date when the run was 
+ *   stopped and 2) the time when the run was stopped
  */
 
  vector<string> MuSR_td_PSI_bin::get_timeStop_vector()
@@ -3416,7 +3493,7 @@ double * MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_array(int histo_num , 
     {
       for (j=0; j < MAXLABELSIZE-1; j++)
         labels_histo[i][j] = ' ';
-      labels_histo[i][MAXLABELSIZE] = '\0';
+      labels_histo[i][MAXLABELSIZE-1] = '\0';
       events_per_histo[i] = 0;
       real_t0[i]    = 0.f;
       integer_t0[i] = 0;
@@ -3429,7 +3506,7 @@ double * MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_array(int histo_num , 
     {
       for (j=0; j < MAXLABELSIZE-1; j++)
         labels_scalers[i][j] = ' ';
-      labels_scalers[i][MAXLABELSIZE] = '\0';
+      labels_scalers[i][MAXLABELSIZE-1] = '\0';
 
       scalers[i] = 0;
     }
