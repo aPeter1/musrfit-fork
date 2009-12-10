@@ -307,13 +307,20 @@ Bool_t PRunSingleHisto::PrepareData()
   }
 
   // check if post pile up data shall be used
-  UInt_t histoNo;
-  histoNo = fRunInfo->GetForwardHistoNo()-1;
-
-  if ((runData->GetNoOfHistos() < histoNo) || (histoNo < 0)) {
+  if (fRunInfo->GetForwardHistoNo() <= 0) {
     cerr << endl << "PRunSingleHisto::PrepareData(): **PANIC ERROR**:";
-    cerr << endl << "   histoNo found = " << histoNo << ", but there are only " << runData->GetNoOfHistos() << " runs!?!?";
-    cerr << endl << "   Will quite :-(";
+    cerr << endl << "   histoNo found = " << fRunInfo->GetForwardHistoNo() << ". Only histoNo > 0 are allowed.";
+    cerr << endl << "   Will quit :-(";
+    cerr << endl;
+    return false;
+  }
+
+  UInt_t histoNo = fRunInfo->GetForwardHistoNo()-1;
+
+  if (runData->GetNoOfHistos() <= histoNo) {
+    cerr << endl << "PRunSingleHisto::PrepareData(): **PANIC ERROR**:";
+    cerr << endl << "   histoNo found = " << histoNo+1 << ", but there are only " << runData->GetNoOfHistos() << " runs!?!?";
+    cerr << endl << "   Will quit :-(";
     cerr << endl;
     return false;
   }

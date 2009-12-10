@@ -340,13 +340,29 @@ Bool_t PRunAsymmetry::PrepareData()
     fT0s.push_back(fRunInfo->GetT0(1)); // backward t0
   }
 
+  // first check if forward/backward given in the msr-file are valid
+  if (fRunInfo->GetForwardHistoNo() <= 0) {
+    cerr << endl << "PRunAsymmetry::PrepareData(): **PANIC ERROR**:";
+    cerr << endl << "   forward histoNo found = " << fRunInfo->GetForwardHistoNo() << ". Only histoNo > 0 are allowed.";
+    cerr << endl << "   Will quit :-(";
+    cerr << endl;
+    return false;
+  }
+  if (fRunInfo->GetBackwardHistoNo() <= 0) {
+    cerr << endl << "PRunAsymmetry::PrepareData(): **PANIC ERROR**:";
+    cerr << endl << "   backward histoNo found = " << fRunInfo->GetBackwardHistoNo() << ". Only histoNo > 0 are allowed.";
+    cerr << endl << "   Will quit :-(";
+    cerr << endl;
+    return false;
+  }
+
   // check if post pile up data shall be used
   UInt_t histoNo[2]; // forward/backward
   histoNo[0] = fRunInfo->GetForwardHistoNo()-1;
   histoNo[1] = fRunInfo->GetBackwardHistoNo()-1;
   // first check if forward/backward given in the msr-file are valid
-  if ((runData->GetNoOfHistos() < histoNo[0]+1) || (histoNo[0] < 0) ||
-      (runData->GetNoOfHistos() < histoNo[1]+1) || (histoNo[1] < 0)) {
+  if ((runData->GetNoOfHistos() < histoNo[0]+1) ||
+      (runData->GetNoOfHistos() < histoNo[1]+1)) {
     cerr << endl << "PRunAsymmetry::PrepareData(): **PANIC ERROR**:";
     cerr << endl << "   forward/backward histo no found = " << histoNo[0]+1;
     cerr << ", " << histoNo[1]+1 << ", but there are only " << runData->GetNoOfHistos() << " histo sets!?!?";
