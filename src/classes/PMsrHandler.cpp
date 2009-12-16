@@ -727,7 +727,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             fout << endl;
           } else if (!fRuns[runNo].GetXDataLabel()->IsWhitespace()) { // labels
             fout.width(16);
-            fout << endl << left << "xy-data";
+            fout << left << "xy-data";
             fout.width(8);
             fout << left << fixed << fRuns[runNo].GetXDataLabel()->Data();
             fout << " ";

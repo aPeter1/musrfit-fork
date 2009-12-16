@@ -627,11 +627,11 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
 //cout << "px: "  << (Char_t)fMainCanvas->GetEventX() << endl;
 
   // handle keys and popup menu entries
-  Bool_t relevantKey = false;
+  enum eKeySwitch {kNotRelevant, kData, kDiffData, kFourier, kDiffFourier, kFourierDiff};
+  eKeySwitch relevantKeySwitch = kNotRelevant;
   if (x == 'q') { // quit
     Done(0);
   } else if (x == 'd') { // difference
-    relevantKey = true;
     // toggle difference tag
     fDifferenceView = !fDifferenceView;
     // set the popup menu entry properly
@@ -640,10 +640,39 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
     } else {
       fPopupMain->UnCheckEntry(P_MENU_ID_DIFFERENCE+P_MENU_PLOT_OFFSET*fPlotNumber);
     }
+    // check which relevantKeySwitch is needed
+    if ((fCurrentPlotView == PV_DATA) && fDifferenceView)
+      relevantKeySwitch = kDiffData;
+    else if ((fCurrentPlotView == PV_DATA) && !fDifferenceView)
+      relevantKeySwitch = kData;
+    else if ((fCurrentPlotView != PV_DATA) && fDifferenceView)
+      relevantKeySwitch = kFourierDiff;
+    else if ((fCurrentPlotView != PV_DATA) && !fDifferenceView)
+      relevantKeySwitch = kFourier;
   } else if (x == 'u') { // unzoom to the original range
-    relevantKey = true;
+    if ((fCurrentPlotView == PV_DATA) && !fDifferenceView) {
+      CleanupDifference();
+      CleanupFourier();
+      PlotData();
+    } else if ((fCurrentPlotView == PV_DATA) && fDifferenceView) {
+      CleanupFourierDifference();
+      HandleDifference();
+    } else if ((fCurrentPlotView != PV_DATA) && !fDifferenceView) {
+      HandleFourier();
+    } else if ((fCurrentPlotView != PV_DATA) && fDifferenceView) {
+      HandleDifferenceFourier();
+    }
   } else if (x == 'f') { // Fourier
-    relevantKey = true;
+    // check which relevantKeySwitch is needed
+    if ((fCurrentPlotView == PV_DATA) && fDifferenceView)
+      relevantKeySwitch = kDiffFourier;
+    else if ((fCurrentPlotView == PV_DATA) && !fDifferenceView)
+      relevantKeySwitch = kFourier;
+    else if ((fCurrentPlotView != PV_DATA) && fDifferenceView)
+      relevantKeySwitch = kDiffData;
+    else if ((fCurrentPlotView != PV_DATA) && !fDifferenceView)
+      relevantKeySwitch = kData;
+
     if (fCurrentPlotView == PV_DATA) { // current view is data view
       // uncheck data popup entry
       fPopupMain->UnCheckEntry(P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
@@ -693,50 +722,37 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   }
 
   // call the apropriate functions if necessary
-  if (relevantKey) {
-    if (fDifferenceView) { // difference view
-      switch (fCurrentPlotView) {
-        case PV_DATA:
-          CleanupFourierDifference();
-          HandleDifference();
-          break;
-        case PV_FOURIER_REAL:
-        case PV_FOURIER_IMAG:
-        case PV_FOURIER_REAL_AND_IMAG:
-        case PV_FOURIER_PWR:
-        case PV_FOURIER_PHASE:
-          HandleFourierDifference();
-          break;
-        default:
-          break;
-        }
-    } else { // not a difference view
-      switch (fCurrentPlotView) {
-        case PV_DATA:
-          CleanupDifference();
-          CleanupFourier();
-          PlotData();
-          break;
-        case PV_FOURIER_REAL:
-        case PV_FOURIER_IMAG:
-        case PV_FOURIER_REAL_AND_IMAG:
-        case PV_FOURIER_PWR:
-        case PV_FOURIER_PHASE:
-          HandleFourier();
-          break;
-        default:
-          break;
-      }
-    }
+  switch (relevantKeySwitch) {
+    case kData: // show data
+      CleanupDifference();
+      CleanupFourier();
+      PlotData();
+      break;
+    case kDiffData: // show difference between data and theory
+      CleanupFourierDifference();
+      HandleDifference();
+      break;
+    case kFourier: // show Fourier transfrom of the data
+      HandleFourier();
+      break;
+    case kDiffFourier: // show Fourier transform of the difference data
+      HandleDifferenceFourier();
+      break;
+    case kFourierDiff: // show difference between the Fourier data and the Fourier theory
+      CleanupFourierDifference();
+      HandleFourierDifference();
+      break;
+    default:
+      break;
+  }
 
-    // check if phase increment/decrement needs to be ghost
-    if (fCurrentPlotView == PV_DATA) {
-      fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
-      fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
-    } else {
-      fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
-      fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
-    }
+  // check if phase increment/decrement needs to be ghost
+  if (fCurrentPlotView == PV_DATA) {
+    fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+    fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+  } else {
+    fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+    fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
   }
 }
 
@@ -751,6 +767,8 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
 {
   if (fBatchMode)
     return;
+
+  static Int_t previousPlotView = PV_DATA;
 
   if (id == P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber) {
     // set appropriate plot view
@@ -782,7 +800,10 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
     if (!fDifferenceView) {
       HandleFourier();
     } else {
-      HandleFourierDifference();
+      if (previousPlotView == PV_DATA)
+        HandleDifferenceFourier();
+      else
+        HandleFourierDifference();
     }
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG) {
     // set appropriate plot view
@@ -799,7 +820,10 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
     if (!fDifferenceView) {
       HandleFourier();
     } else {
-      HandleFourierDifference();
+      if (previousPlotView == PV_DATA)
+        HandleDifferenceFourier();
+      else
+        HandleFourierDifference();
     }
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG) {
     // set appropriate plot view
@@ -816,7 +840,10 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
     if (!fDifferenceView) {
       HandleFourier();
     } else {
-      HandleFourierDifference();
+      if (previousPlotView == PV_DATA)
+        HandleDifferenceFourier();
+      else
+        HandleFourierDifference();
     }
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR) {
     // set appropriate plot view
@@ -833,7 +860,10 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
     if (!fDifferenceView) {
       HandleFourier();
     } else {
-      HandleFourierDifference();
+      if (previousPlotView == PV_DATA)
+        HandleDifferenceFourier();
+      else
+        HandleFourierDifference();
     }
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE) {
     // set appropriate plot view
@@ -850,7 +880,10 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
     if (!fDifferenceView) {
       HandleFourier();
     } else {
-      HandleFourierDifference();
+      if (previousPlotView == PV_DATA)
+        HandleDifferenceFourier();
+      else
+        HandleFourierDifference();
     }
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS) {
     IncrementFourierPhase();
@@ -877,7 +910,13 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
         case PV_FOURIER_REAL_AND_IMAG:
         case PV_FOURIER_PWR:
         case PV_FOURIER_PHASE:
-          HandleFourierDifference();
+          if (fPopupMain->IsEntryChecked(P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber)) {
+            CleanupFourierDifference();
+            HandleDifferenceFourier();
+          } else {
+            CleanupFourierDifference();
+            HandleFourierDifference();
+          }
           break;
         default:
           break;
@@ -912,6 +951,9 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
     fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
     fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
   }
+
+  // keep plot view setting
+  previousPlotView = fCurrentPlotView;
 }
 
 //--------------------------------------------------------------------------
@@ -1905,19 +1947,18 @@ cout << endl;
 }
 
 //--------------------------------------------------------------------------
-// HandleFourierDifference (private)
+// HandleDifferenceFourier (private)
 //--------------------------------------------------------------------------
 /**
  * <p>
  */
-void PMusrCanvas::HandleFourierDifference()
+void PMusrCanvas::HandleDifferenceFourier()
 {
   // check if plot type is appropriate for fourier
   if (fPlotType == MSR_PLOT_NON_MUSR)
     return;
 
-//cout << endl << ">> in HandleFourierDifference ..." << endl;
-
+//cout << endl << ">> in HandleDifferenceFourier ..." << endl;
   // check if fourier needs to be calculated
   if (fData[0].diffFourierRe == 0) {
 //cout << endl << ">> will calculate Fourier diff ..." << endl;
@@ -1999,6 +2040,94 @@ void PMusrCanvas::HandleFourierDifference()
   PlotFourierDifference();
 }
 
+//--------------------------------------------------------------------------
+// HandleFourierDifference (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PMusrCanvas::HandleFourierDifference()
+{
+  // check if plot type is appropriate for fourier
+  if (fPlotType == MSR_PLOT_NON_MUSR)
+    return;
+
+  // check if fourier needs to be calculated
+  if (fData[0].diffFourierRe == 0) {
+    // calculate all the Fourier differences
+    Double_t dval, dvalx;
+    TString name;
+    Int_t theoBin;
+    for (UInt_t i=0; i<fData.size(); i++) {
+      // create difference histos
+      // real part
+      name = TString(fData[i].dataFourierRe->GetTitle()) + "_diff";
+      fData[i].diffFourierRe = new TH1F(name, name, fData[i].dataFourierRe->GetNbinsX(),
+                                        fData[i].dataFourierRe->GetXaxis()->GetXmin(),
+                                        fData[i].dataFourierRe->GetXaxis()->GetXmax());
+      // imaginary part
+      name = TString(fData[i].dataFourierIm->GetTitle()) + "_diff";
+      fData[i].diffFourierIm = new TH1F(name, name, fData[i].dataFourierIm->GetNbinsX(),
+                                        fData[i].dataFourierIm->GetXaxis()->GetXmin(),
+                                        fData[i].dataFourierIm->GetXaxis()->GetXmax());
+      // power part
+      name = TString(fData[i].dataFourierPwr->GetTitle()) + "_diff";
+      fData[i].diffFourierPwr = new TH1F(name, name, fData[i].dataFourierPwr->GetNbinsX(),
+                                         fData[i].dataFourierPwr->GetXaxis()->GetXmin(),
+                                         fData[i].dataFourierPwr->GetXaxis()->GetXmax());
+      // phase part
+      name = TString(fData[i].dataFourierPhase->GetTitle()) + "_diff";
+      fData[i].diffFourierPhase = new TH1F(name, name, fData[i].dataFourierPhase->GetNbinsX(),
+                                         fData[i].dataFourierPhase->GetXaxis()->GetXmin(),
+                                         fData[i].dataFourierPhase->GetXaxis()->GetXmax());
+
+      // calculate difference
+      for (UInt_t j=1; j<fData[i].dataFourierRe->GetEntries(); j++) {
+        dvalx = fData[i].dataFourierRe->GetXaxis()->GetBinCenter(j); // get x-axis value of bin j
+        theoBin = fData[i].theoryFourierRe->FindBin(dvalx); // get the theory x-axis bin
+        dval = fData[i].dataFourierRe->GetBinContent(j) - fData[i].theoryFourierRe->GetBinContent(theoBin);
+        fData[i].diffFourierRe->SetBinContent(j, dval);
+        dvalx = fData[i].dataFourierIm->GetXaxis()->GetBinCenter(j); // get x-axis value of bin j
+        theoBin = fData[i].theoryFourierIm->FindBin(dvalx); // get the theory x-axis bin
+        dval = fData[i].dataFourierIm->GetBinContent(j) - fData[i].theoryFourierIm->GetBinContent(theoBin);
+        fData[i].diffFourierIm->SetBinContent(j, dval);
+        dvalx = fData[i].dataFourierPwr->GetXaxis()->GetBinCenter(j); // get x-axis value of bin j
+        theoBin = fData[i].theoryFourierPwr->FindBin(dvalx); // get the theory x-axis bin
+        dval = fData[i].dataFourierPwr->GetBinContent(j) - fData[i].theoryFourierPwr->GetBinContent(theoBin);
+        fData[i].diffFourierPwr->SetBinContent(j, dval);
+        dvalx = fData[i].dataFourierPhase->GetXaxis()->GetBinCenter(j); // get x-axis value of bin j
+        theoBin = fData[i].theoryFourierPhase->FindBin(dvalx); // get the theory x-axis bin
+        dval = fData[i].dataFourierPhase->GetBinContent(j) - fData[i].theoryFourierPhase->GetBinContent(theoBin);
+        fData[i].diffFourierPhase->SetBinContent(j, dval);
+      }
+    }
+
+    for (UInt_t i=0; i<fData.size(); i++) {
+      // set marker and line color
+      fData[i].diffFourierRe->SetMarkerColor(fData[i].dataFourierRe->GetMarkerColor());
+      fData[i].diffFourierRe->SetLineColor(fData[i].dataFourierRe->GetLineColor());
+      fData[i].diffFourierIm->SetMarkerColor(fData[i].dataFourierIm->GetMarkerColor());
+      fData[i].diffFourierIm->SetLineColor(fData[i].dataFourierIm->GetLineColor());
+      fData[i].diffFourierPwr->SetMarkerColor(fData[i].dataFourierPwr->GetMarkerColor());
+      fData[i].diffFourierPwr->SetLineColor(fData[i].dataFourierPwr->GetLineColor());
+      fData[i].diffFourierPhase->SetMarkerColor(fData[i].dataFourierPhase->GetMarkerColor());
+      fData[i].diffFourierPhase->SetLineColor(fData[i].dataFourierPhase->GetLineColor());
+
+      // set marker size
+      fData[i].diffFourierRe->SetMarkerSize(1);
+      fData[i].diffFourierIm->SetMarkerSize(1);
+      fData[i].diffFourierPwr->SetMarkerSize(1);
+      fData[i].diffFourierPhase->SetMarkerSize(1);
+      // set marker type
+      fData[i].diffFourierRe->SetMarkerStyle(fData[i].dataFourierRe->GetMarkerStyle());
+      fData[i].diffFourierIm->SetMarkerStyle(fData[i].dataFourierIm->GetMarkerStyle());
+      fData[i].diffFourierPwr->SetMarkerStyle(fData[i].dataFourierPwr->GetMarkerStyle());
+      fData[i].diffFourierPhase->SetMarkerStyle(fData[i].dataFourierPhase->GetMarkerStyle());
+    }
+  }
+
+  PlotFourierDifference();
+}
 
 //--------------------------------------------------------------------------
 // FindOptimalFourierPhase (private)

@@ -250,6 +250,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void HandleNonMusrDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data);
     virtual void HandleDifference();
     virtual void HandleFourier();
+    virtual void HandleDifferenceFourier();
     virtual void HandleFourierDifference();
     virtual Double_t FindOptimalFourierPhase();
     virtual void CleanupDifference();
