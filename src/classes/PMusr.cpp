@@ -288,7 +288,7 @@ const Int_t PRawRunData::GetT0(const UInt_t idx)
     cerr << endl;
     return -1;
   }
-  return fT0s[idx];
+  return fT0s[idx]-1; // -1 because the counting of the data vector starts at 0!
 }
 
 //--------------------------------------------------------------------------
@@ -306,7 +306,7 @@ const Int_t PRawRunData::GetT0Estimated(const UInt_t idx)
     cerr << endl;
     return -1;
   }
-  return fT0Estimated[idx];
+  return fT0Estimated[idx]-1; // -1 because the counting of the data vector starts at 0!
 }
 
 //--------------------------------------------------------------------------
@@ -324,7 +324,11 @@ const PIntPair PRawRunData::GetBkgBin(const UInt_t idx)
     cerr << endl;
     return pair;
   }
-  return fBkgBin[idx];
+
+  pair.first  = fBkgBin[idx].first - 1;  // -1 because the counting of the data vector starts at 0!
+  pair.second = fBkgBin[idx].second - 1; // -1 because the counting of the data vector starts at 0!
+
+  return pair;
 }
 
 //--------------------------------------------------------------------------
@@ -342,7 +346,11 @@ const PIntPair PRawRunData::GetGoodDataBin(const UInt_t idx)
     cerr << endl;
     return pair;
   }
-  return fGoodDataBin[idx];
+
+  pair.first  = fGoodDataBin[idx].first - 1;  // -1 because the counting of the data vector starts at 0!
+  pair.second = fGoodDataBin[idx].second - 1; // -1 because the counting of the data vector starts at 0!
+
+  return pair;
 }
 
 //--------------------------------------------------------------------------
@@ -776,7 +784,7 @@ Int_t PMsrRunBlock::GetBkgRange(UInt_t i)
     return -1;
   }
 
-  return fBkgRange[i];
+  return fBkgRange[i]-1; // -1 because the counting of the data vector starts at 0!
 }
 
 //--------------------------------------------------------------------------
@@ -809,7 +817,7 @@ Int_t PMsrRunBlock::GetDataRange(UInt_t i)
     return -1;
   }
 
-  return fDataRange[i];
+  return fDataRange[i]-1; // -1 because the counting of the data vector starts at 0!
 }
 
 //--------------------------------------------------------------------------
@@ -841,7 +849,7 @@ Int_t PMsrRunBlock::GetT0(UInt_t i)
   if (i>fT0.size())
     return -1;
 
-  return fT0[i];
+  return fT0[i]-1; // -1 because the counting of the data vector starts at 0!
 }
 
 //--------------------------------------------------------------------------

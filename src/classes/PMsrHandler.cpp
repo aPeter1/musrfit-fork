@@ -693,7 +693,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           fout << left << "background";
           for (UInt_t j=0; j<fRuns[runNo].GetBkgRangeSize(); j++) {
             fout.width(8);
-            fout << left << fRuns[runNo].GetBkgRange(j);
+            fout << left << fRuns[runNo].GetBkgRange(j)+1; // +1 since internally the data start at 0
           }
           fout << endl;
         } else if (sstr.BeginsWith("data")) {
@@ -702,7 +702,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           fout << left << "data";
           for (UInt_t j=0; j<fRuns[runNo].GetDataRangeSize(); j++) {
             fout.width(8);
-            fout << left << fRuns[runNo].GetDataRange(j);
+            fout << left << fRuns[runNo].GetDataRange(j)+1; // +1 since internally the data start at 0
           }
           fout << endl;
         } else if (sstr.BeginsWith("t0")) {
@@ -711,7 +711,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           fout << left << "t0";
           for (UInt_t j=0; j<fRuns[runNo].GetT0Size(); j++) {
             fout.width(8);
-            fout << left << fRuns[runNo].GetT0(j);
+            fout << left << fRuns[runNo].GetT0(j)+1; // +1 since internally the data start at 0
           }
           fout << endl;
         } else if (sstr.BeginsWith("xy-data")) {
@@ -754,7 +754,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
               fout << left << "background";
               for (UInt_t j=0; j<fRuns[runNo].GetBkgRangeSize(); j++) {
                 fout.width(8);
-                fout << left << fRuns[runNo].GetBkgRange(j);
+                fout << left << fRuns[runNo].GetBkgRange(j)+1; // +1 since internally the data start at 0
               }
               fout << endl;
             }
@@ -765,7 +765,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
               fout << left << "data";
               for (UInt_t j=0; j<fRuns[runNo].GetDataRangeSize(); j++) {
                 fout.width(8);
-                fout << left << fRuns[runNo].GetDataRange(j);
+                fout << left << fRuns[runNo].GetDataRange(j)+1; // +1 since internally the data start at 0
               }
               fout << endl;
             }
@@ -1540,6 +1540,8 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
   TObjArray *tokens = 0;
   TObjString *ostr = 0;
 
+  Int_t dval;
+
   iter = lines.begin();
   while ((iter != lines.end()) && !error) {
     // tokenize line
@@ -1630,10 +1632,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       } else {
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
-        if (str.IsDigit())
-          param.SetAlphaParamNo(str.Atoi());
-        else
+        if (str.IsDigit()) {
+          dval = str.Atoi();
+          if (dval > 0)
+            param.SetAlphaParamNo(dval);
+          else
+            error = true;
+        } else {
           error = true;
+        }
       }
     }
 
@@ -1644,10 +1651,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       } else {
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
-        if (str.IsDigit())
-          param.SetBetaParamNo(str.Atoi());
-        else
+        if (str.IsDigit()) {
+          dval = str.Atoi();
+          if (dval > 0)
+            param.SetBetaParamNo(dval);
+          else
+            error = true;
+        } else {
           error = true;
+        }
       }
     }
 
@@ -1679,10 +1691,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       } else {
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
-        if (str.IsDigit())
-          param.SetBkgFitParamNo(str.Atoi());
-        else
+        if (str.IsDigit()) {
+          dval = str.Atoi();
+          if (dval > 0)
+            param.SetBkgFitParamNo(dval);
+          else
+            error = true;
+        } else {
           error = true;
+        }
       }
     }
 
@@ -1693,10 +1710,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       } else {
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
-        if (str.IsDigit())
-          param.SetPhaseParamNo(str.Atoi());
-        else
+        if (str.IsDigit()) {
+          dval = str.Atoi();
+          if (dval > 0)
+            param.SetPhaseParamNo(dval);
+          else
+            error = true;
+        } else {
           error = true;
+        }
       }
     }
 
@@ -1707,10 +1729,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       } else {
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
-        if (str.IsDigit())
-          param.SetLifetimeParamNo(str.Atoi());
-        else
+        if (str.IsDigit()) {
+          dval = str.Atoi();
+          if (dval > 0)
+            param.SetLifetimeParamNo(dval);
+          else
+            error = true;
+        } else {
           error = true;
+        }
       }
     }
 
@@ -1724,10 +1751,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       for (Int_t i=1; i<tokens->GetEntries(); i++) {
         ostr = dynamic_cast<TObjString*>(tokens->At(i));
         str = ostr->GetString();
-        if (str.IsDigit())
-          param.AppendMap(str.Atoi());
-        else
+        if (str.IsDigit()) {
+          dval = str.Atoi();
+          if (dval >= 0)
+            param.AppendMap(dval);
+          else
+            error = true;
+        } else {
           error = true;
+        }
       }
       // check map entries, i.e. if the map values are within parameter bounds
       for (UInt_t i=0; i<param.GetMap()->size(); i++) {
@@ -1746,10 +1778,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       } else {
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
-        if (str.IsDigit())
-          param.SetForwardHistoNo(str.Atoi());
-        else
+        if (str.IsDigit()) {
+          dval = str.Atoi();
+          if (dval > 0)
+            param.SetForwardHistoNo(dval);
+          else
+            error = true;
+        } else {
           error = true;
+        }
       }
     }
 
@@ -1760,10 +1797,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       } else {
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
-        if (str.IsDigit())
-          param.SetBackwardHistoNo(str.Atoi());
-        else
+        if (str.IsDigit()) {
+          dval = str.Atoi();
+          if (dval > 0)
+            param.SetBackwardHistoNo(dval);
+          else
+            error = true;
+        } else {
           error = true;
+        }
       }
     }
 
@@ -1791,10 +1833,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         for (Int_t i=1; i<tokens->GetEntries(); i++) {
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
-          if (str.IsDigit())
-            param.AppendBkgRange(str.Atoi());
-          else
+          if (str.IsDigit()) {
+            dval = str.Atoi();
+            if (dval > 0)
+              param.AppendBkgRange(dval);
+            else
+              error = true;
+          } else {
             error = true;
+          }
         }
       }
     }
@@ -1807,10 +1854,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         for (Int_t i=1; i<tokens->GetEntries(); i++) {
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
-          if (str.IsDigit())
-            param.AppendDataRange(str.Atoi());
-          else
+          if (str.IsDigit()) {
+            dval = str.Atoi();
+            if (dval > 0)
+              param.AppendDataRange(dval);
+            else
+              error = true;
+          } else {
             error = true;
+          }
         }
       }
     }
@@ -1823,10 +1875,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         for (Int_t i=1; i<tokens->GetEntries(); i++) {
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
-          if (str.IsDigit())
-            param.AppendT0(str.Atoi());
-          else
+          if (str.IsDigit()) {
+            dval = str.Atoi();
+            if (dval > 0)
+              param.AppendT0(dval);
+            else
+              error = true;
+          } else {
             error = true;
+          }
         }
       }
     }
@@ -1854,10 +1911,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       } else {
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
-        if (str.IsDigit())
-          param.SetPacking(str.Atoi());
-        else
+        if (str.IsDigit()) {
+          dval = str.Atoi();
+          if (dval > 0)
+            param.SetPacking(dval);
+          else
+            error = true;
+        } else {
           error = true;
+        }
       }
     }
 
@@ -1882,10 +1944,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       } else {
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
-        if (str.IsDigit())
-          param.SetRRFPacking(str.Atoi());
-        else
+        if (str.IsDigit()) {
+          dval = str.Atoi();
+          if (dval > 0)
+            param.SetRRFPacking(dval);
+          else
+            error = true;
+        } else {
           error = true;
+        }
       }
     }
 
@@ -1896,10 +1963,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       } else {
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
-        if (str.IsDigit())
-          param.SetAlpha2ParamNo(str.Atoi());
-        else
+        if (str.IsDigit()) {
+          dval = str.Atoi();
+          if (dval > 0)
+            param.SetAlpha2ParamNo(dval);
+          else
+            error = true;
+        } else {
           error = true;
+        }
       }
     }
 
@@ -1910,10 +1982,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       } else {
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
-        if (str.IsDigit())
-          param.SetBeta2ParamNo(str.Atoi());
-        else
+        if (str.IsDigit()) {
+          dval = str.Atoi();
+          if (dval > 0)
+            param.SetBeta2ParamNo(dval);
+          else
+            error = true;
+        } else {
           error = true;
+        }
       }
     }
 
@@ -1924,10 +2001,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       } else {
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
-        if (str.IsDigit())
-          param.SetRightHistoNo(str.Atoi());
-        else
+        if (str.IsDigit()) {
+          dval = str.Atoi();
+          if (dval > 0)
+            param.SetRightHistoNo(dval);
+          else
+            error = true;
+        } else {
           error = true;
+        }
       }
     }
 
@@ -1938,10 +2020,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       } else {
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
-        if (str.IsDigit())
-          param.SetLeftHistoNo(str.Atoi());
-        else
+        if (str.IsDigit()) {
+          dval = str.Atoi();
+          if (dval > 0)
+            param.SetLeftHistoNo(str.Atoi());
+          else
+            error = true;
+        } else {
           error = true;
+        }
       }
     }
 
@@ -1956,10 +2043,15 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           param.SetXDataIndex(str.Atoi()); // x-index
           ostr = dynamic_cast<TObjString*>(tokens->At(2));
           str = ostr->GetString();
-          if (str.IsDigit())
-            param.SetYDataIndex(str.Atoi()); // y-index
-          else
+          if (str.IsDigit()) {
+            dval = str.Atoi();
+            if (dval > 0)
+              param.SetYDataIndex(dval); // y-index
+            else
+              error = true;
+          } else {
             error = true;
+          }
         } else { // xy-data labels given
           param.SetXDataLabel(str); // x-label
           ostr = dynamic_cast<TObjString*>(tokens->At(2));
@@ -1990,52 +2082,6 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
 
   return !error;
 }
-
-//--------------------------------------------------------------------------
-// InitRunParameterStructure (private)
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param param
- */
-/*
-void PMsrHandler::InitRunParameterStructure(PMsrRunStructure &param)
-{
-  param.fRunName.clear();
-  param.fBeamline.clear();
-  param.fInstitute.clear();
-  param.fFileFormat.clear();
-  param.fFitType         = -1;
-  param.fAlphaParamNo    = -1;
-  param.fBetaParamNo     = -1;
-  param.fNormParamNo     = -1;
-  param.fBkgFitParamNo   = -1;
-  param.fPhaseParamNo    = -1;
-  param.fLifetimeParamNo = -1;
-  param.fLifetimeCorrection = false;
-  param.fMap.clear(); // empty list
-  param.fForwardHistoNo  = -1;
-  param.fBackwardHistoNo = -1;
-  param.fBkgFix.clear();
-  param.fBkgRange.clear();
-  param.fDataRange.clear();
-  param.fT0.clear();
-  for (Int_t i=0; i<4; i++)
-    param.fFitRange[i] = -1;
-  param.fPacking = 1;
-  param.fRRFFreq       = -1.0;
-  param.fRRFPacking    = -1;
-  param.fAlpha2ParamNo = -1;
-  param.fBeta2ParamNo  = -1;
-  param.fRightHistoNo  = -1;
-  param.fLeftHistoNo   = -1;
-  for (Int_t i=0; i<2; i++)
-    param.fXYDataIndex[i] = -1;
-  for (Int_t i=0; i<2; i++)
-    param.fXYDataLabel[i] = "";
-}
-*/
 
 //--------------------------------------------------------------------------
 // FilterNumber (private)
