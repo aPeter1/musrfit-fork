@@ -93,6 +93,24 @@ PFunction::~PFunction()
   CleanupFuncEvalTree();
 }
 
+//--------------------------------------------------------------------------
+// InitNode (protected)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param node
+ */
+void PFunction::InitNode(PFuncTreeNode &node)
+{
+  node.fID = 0;
+  node.fOperatorTag = 0;
+  node.fFunctionTag = 0;
+  node.fIvalue = 0;
+  node.fSign = false;
+  node.fDvalue = 0.0;
+}
+
 //-------------------------------------------------------------
 // SetFuncNo (protected)
 //-------------------------------------------------------------
@@ -135,6 +153,7 @@ Bool_t PFunction::SetFuncNo()
  */
 Bool_t PFunction::GenerateFuncEvalTree()
 {
+  InitNode(fFunc);
   FillFuncEvalTree(fInfo.trees.begin(), fFunc);
 
   return true;
@@ -155,6 +174,8 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
   string str;
   PFuncTreeNode child;
 
+  InitNode(child);
+
   if (i->value.id() == PFunctionGrammar::realID) { // handle number
     str = string(i->value.begin(), i->value.end()); // get string
     status = sscanf(str.c_str(), "%lf", &dvalue); // convert string to Double_t
@@ -169,7 +190,12 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     node.fDvalue = 0.0135538817; // keep the value
   } else if (i->value.id() == PFunctionGrammar::parameterID) { // handle parameter number
     str = string(i->value.begin(), i->value.end()); // get string
-    status = sscanf(str.c_str(), "PAR%d", &ivalue); // convert string to parameter number
+    if (strstr(str.c_str(), "-")) {
+      node.fSign = true;
+      status = sscanf(str.c_str(), "-PAR%d", &ivalue); // convert string to parameter number
+    } else {
+      status = sscanf(str.c_str(), "PAR%d", &ivalue); // convert string to parameter number
+    }
     node.fID = PFunctionGrammar::parameterID; // keep the ID
     node.fIvalue = ivalue; // keep the value
 // cout << endl << ">> parameterID: value = " << ivalue;
@@ -373,7 +399,12 @@ Double_t PFunction::EvalNode(PFuncTreeNode &node)
   } else if (node.fID == PFunctionGrammar::constGammaMuID) {
     return node.fDvalue;
   } else if (node.fID == PFunctionGrammar::parameterID) {
-    return fParam[node.fIvalue-1];
+    Double_t dval;
+    if (node.fSign)
+      dval = -fParam[node.fIvalue-1];
+    else
+      dval = fParam[node.fIvalue-1];
+    return dval;
   } else if (node.fID == PFunctionGrammar::mapID) {
     if (fMap[node.fIvalue-1] == 0) // map == 0
       return 0.0;

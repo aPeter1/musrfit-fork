@@ -76,6 +76,7 @@ typedef struct func_tree_node {
   Int_t    fOperatorTag; ///< tag for '+', '-', '*', '/'
   Int_t    fFunctionTag; ///< tag got "cos", "sin", ...
   Int_t    fIvalue; ///< for parameter numbers and maps
+  Bool_t fSign; ///< for sign, true means '-', false '+'
   Double_t fDvalue; ///< for numbers
   vector<func_tree_node> children; ///< holding sub-tree
 } PFuncTreeNode;
@@ -95,6 +96,7 @@ class PFunction {
     virtual TString* GetFuncString() { return &fFuncString; }
 
   protected:
+    virtual void InitNode(PFuncTreeNode &node);
     virtual Bool_t SetFuncNo();
 
     virtual Bool_t FindAndCheckMapAndParamRange(PFuncTreeNode &node, UInt_t mapSize, UInt_t paramSize);

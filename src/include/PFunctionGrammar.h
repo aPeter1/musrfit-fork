@@ -85,7 +85,8 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
 
             fun_label      =   leaf_node_d[ ( lexeme_d[ "FUN" >> +digit_p ] ) ];
 
-            parameter      =   leaf_node_d[ ( lexeme_d[ "PAR" >> +digit_p ] ) ];
+            parameter      =   leaf_node_d[ ( lexeme_d[ "PAR" >> +digit_p ] ) |
+                                            ( lexeme_d[ "-PAR" >> +digit_p ] ) ];
 
             map            =   leaf_node_d[ ( lexeme_d[ "MAP" >> +digit_p ] ) ];
 
