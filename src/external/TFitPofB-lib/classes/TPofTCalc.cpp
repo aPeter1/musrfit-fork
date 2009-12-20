@@ -246,18 +246,12 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
     // calculate asymmetry
     CalcPol(param);
 
-//#pragma omp parallel for default(shared) private(j,ttime,k) schedule(dynamic)
-    ofstream of7("asy.dat", ios::app);
-
+#pragma omp parallel for default(shared) private(j,ttime,k) schedule(dynamic)
     for(j=0; j<nChannels; j++) {
       ttime=j*par[2];
       k = static_cast<int>(floor(ttime/fTBin));
       asydata[j]=asy0[i]*(fPT[k]+(fPT[k+1]-fPT[k])/fTBin*(ttime-fT[k]));
-      if (i == 0) {
-        of7 << ttime << " " << fPT[k] << endl;
-      }
     }
-    of7.close();
 // end omp
 
 //       for(unsigned int k(0); k<fT.size()-1; k++){
@@ -324,10 +318,10 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
     histoData.push_back(fakeHisto);
 
     // cleanup
-//    if (theoHisto) {
-//      delete theoHisto;
-//      theoHisto = 0;
-//    }
+   if (theoHisto) {
+     delete theoHisto;
+     theoHisto = 0;
+   }
   }
 
   cout << "TPofTCalc::FakeData: Write histograms and header information to the file ..." << endl;
