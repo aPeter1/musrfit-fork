@@ -176,6 +176,10 @@ void TPofBCalc::Calculate(const TBofZCalcInverse *BofZ, const TTrimSPData *dataT
   unsigned int firstZerosEnd ((a1 < a2) ? a1 : ((a1 > 0) ? (a1 - 1) : 0));
   unsigned int lastZerosStart ((a3 < a4) ? a4 : (a4 + 1));
 
+  if (lastZerosStart >= fPBSize) {
+    lastZerosStart = fPBSize - 1;
+  }
+
   unsigned int i;
 
   // calculate p(B) from the inverse of B(z)
@@ -185,17 +189,20 @@ void TPofBCalc::Calculate(const TBofZCalcInverse *BofZ, const TTrimSPData *dataT
     vector< pair<double, double> > inv;
     inv = BofZ->GetInverseAndDerivative(fB[i]);
 
-    for (unsigned int j(0); j < inv.size(); j++)
+    for (unsigned int j(0); j < inv.size(); j++) {
       fPB[i] += dataTrimSP->GetNofZ(inv[j].first, para[2])*fabs(inv[j].second);
+    }
+//    if (fPB[i])
+//      cout << fB[i] << " " << fPB[i] << endl;
   }
 
   // normalize p(B)
 
   double pBsum = 0.0;
-  for (unsigned int i(firstZerosEnd); i<lastZerosStart; i++)
+  for (i = firstZerosEnd; i<=lastZerosStart; i++)
     pBsum += fPB[i];
   pBsum *= fDB;
-  for (unsigned int i(firstZerosEnd); i<lastZerosStart; i++)
+  for (i = firstZerosEnd; i<=lastZerosStart; i++)
     fPB[i] /= pBsum;
 
   if(para.size() == 6)

@@ -380,7 +380,7 @@ vector< pair<double, double> > TLondon1D_2L::GetInverseAndDerivative(double BB) 
 {
   vector< pair<double, double> > inv;
 
-  if(BB <= fMinB || BB > fParam[0])
+  if(BB <= fMinB || BB >= fParam[0])
     return inv;
 
   double inverse[3];

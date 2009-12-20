@@ -50,7 +50,7 @@ public:
   const double* DataPT() const {return fPT;}
   void DoFFT();
   void CalcPol(const vector<double>&);
-  void FakeData(const string&, const vector<double>&); 
+  void FakeData(const string&, const vector<double>&, const vector<double>*); 
   double Eval(double) const;
 
 private:

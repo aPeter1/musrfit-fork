@@ -53,10 +53,10 @@
 
 #include "TLemRunHeader.h"
 
-/* USED FOR DEBUGGING -----------------------
+/* USED FOR DEBUGGING -----------------------*/
 #include <ctime>
 #include <fstream>
---------------------------------------------*/
+/*--------------------------------------------*/
 
 //------------------
 // Constructor of the TPofTCalc class - it creates the FFT plan
@@ -177,7 +177,7 @@ void TPofTCalc::CalcPol(const vector<double> &par) {
 
 #pragma omp parallel for default(shared) private(i) schedule(dynamic)
   for (i=0; i<fNFFT/2+1; i++){
-    fPT[i] = cosph*fFFTout[i][0]*par[2] + sinph*fFFTout[i][1]*par[2];
+    fPT[i] = (cosph*fFFTout[i][0] + sinph*fFFTout[i][1])*par[2];
   }
 }
 
@@ -199,10 +199,10 @@ double TPofTCalc::Eval(double t) const {
 
 //---------------------
 // Method for generating fake LEM decay histograms from p(B)
-// Parameters: output filename, par(dt, dB, timeres, channels, asyms, phases, t0s, N0s, bgs)
+// Parameters: output filename, par(dt, dB, timeres, channels, asyms, phases, t0s, N0s, bgs) optPar(field, energy)
 //---------------------
 
-void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> &par) {
+void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> &par, const vector<double> *optPar = 0) {
 
   //determine the number of histograms to be built
   unsigned int numHist(0);
@@ -238,7 +238,7 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
 
   vector< vector<double> > asy;
   vector<double> asydata(nChannels);
-  double ttime(0.0);
+  double ttime;
   int j,k;
 
   for(unsigned int i(0); i<numHist; i++) {
@@ -246,12 +246,18 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
     // calculate asymmetry
     CalcPol(param);
 
-#pragma omp parallel for default(shared) private(j,ttime,k) schedule(dynamic)
-    for(j=0; j<nChannels; j++){
+//#pragma omp parallel for default(shared) private(j,ttime,k) schedule(dynamic)
+    ofstream of7("asy.dat", ios::app);
+
+    for(j=0; j<nChannels; j++) {
       ttime=j*par[2];
-      k = floor(ttime/fTBin);
+      k = static_cast<int>(floor(ttime/fTBin));
       asydata[j]=asy0[i]*(fPT[k]+(fPT[k+1]-fPT[k])/fTBin*(ttime-fT[k]));
+      if (i == 0) {
+        of7 << ttime << " " << fPT[k] << endl;
+      }
     }
+    of7.close();
 // end omp
 
 //       for(unsigned int k(0); k<fT.size()-1; k++){
@@ -277,17 +283,17 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
       if (j < t0[i]) // j<t0
         data[j] = bg[i]; // background
       else
-        data[j] = N0[i]*exp(-par[2]*double(j-t0[i])/tauMu)*(1.0+asy[i][j-t0[i]])+bg[i];
+        data[j] = N0[i]*exp(-par[2]*static_cast<double>(j-t0[i])/tauMu)*(1.0+asy[i][j-t0[i]])+bg[i];
     }
 // end omp
 
     histo.push_back(data);
-    cout << "TPofTCalc::FakeData: " << i+1 << "/" << numHist << " done ...";
+    cout << "TPofTCalc::FakeData: " << i+1 << "/" << numHist << " done ..." << endl;
   }
 
   // add Poisson noise to the histograms
 
-  cout << endl << "TPofTCalc::FakeData: Adding Poisson noise ..." << endl;
+  cout << "TPofTCalc::FakeData: Adding Poisson noise ..." << endl;
 
   TH1F* theoHisto;
   TH1F* fakeHisto;
@@ -318,11 +324,13 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
     histoData.push_back(fakeHisto);
 
     // cleanup
-    if (theoHisto) {
-      delete theoHisto;
-      theoHisto = 0;
-    }
+//    if (theoHisto) {
+//      delete theoHisto;
+//      theoHisto = 0;
+//    }
   }
+
+  cout << "TPofTCalc::FakeData: Write histograms and header information to the file ..." << endl;
 
   // save the histograms as root files
   // create run info folder and content
@@ -330,6 +338,10 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
   TLemRunHeader *runHeader = new TLemRunHeader();
   //sprintf(str, "Fake Data generated from %s", pBFileName.Data());
   runHeader->SetRunTitle("Fake Data");
+  if (optPar && (optPar->size() > 1)) { // set energy and field if they were specified
+    runHeader->SetImpEnergy((*optPar)[1]);
+    runHeader->SetSampleBField((*optPar)[0], 0.0f);
+  }
   float fval = par[2]*1000.; //us->ns
   runHeader->SetTimeResolution(fval);
   runHeader->SetNChannels(nChannels);
@@ -339,7 +351,7 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
     t0array[i] = t0[i];
   runHeader->SetTimeZero(t0array);
   if (t0array) {
-    delete t0array;
+    delete[] t0array;
     t0array = 0;
   }
   runInfoFolder->Add(runHeader);
@@ -398,7 +410,7 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
   N0.clear();
   bg.clear();
 
-  cout << endl << "TPofTCalc::FakeData: DONE." << endl;
+  cout << "TPofTCalc::FakeData: DONE." << endl << endl;
 
   return;
 }
