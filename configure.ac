@@ -1,6 +1,8 @@
 AC_PREREQ(2.59)
 AC_INIT(musrfit, 0.6.0, andreas.suter@psi.ch)
 AC_CONFIG_AUX_DIR(admin)
+AC_CANONICAL_HOST
+#AC_MSG_RESULT([${host} ${host_cpu} ${host_vendor} ${host_os}])
 
 dnl -----------------------------------------------
 dnl Package names and version numbers
@@ -11,6 +13,11 @@ MUSR_LIBRARY_NAME=PMusr
 LEM_LIBRARY_NAME=TLemRunHeader
 PSIBIN_LIBRARY_NAME=Class_MuSR_PSI
 MUD_LIBRARY_NAME=mud
+
+dnl -----------------------------------------------
+dnl Optional plug-ins
+dnl -----------------------------------------------
+
 
 #release versioning
 MUSR_MAJOR_VERSION=0
@@ -32,6 +39,11 @@ MUD_MAJOR_VERSION=0
 MUD_MINOR_VERSION=0
 MUD_MICRO_VERSION=0
 
+#release versioning
+PLUGIN_MAJOR_VERSION=0
+PLUGIN_MINOR_VERSION=0
+PLUGIN_MICRO_VERSION=0
+
 #API version
 MUSR_API_VERSION=MUSR_MAJOR_VERSION.MUSR_MINOR_VERSION
 AC_SUBST(MUSR_API_VERSION)
@@ -45,7 +57,11 @@ AC_SUBST(PSIBIN_API_VERSION)
 MUD_API_VERSION=MUD_MAJOR_VERSION.MUD_MINOR_VERSION
 AC_SUBST(MUD_API_VERSION)
 
+PLUGIN_API_VERSION=PLUGIN_MAJOR_VERSION.PLUGIN_MINOR_VERSION
+AC_SUBST(PLUGIN_API_VERSION)
+
 #shared library versioning
+PLUGIN_LIBRARY_VERSION=1:0:0
 LEM_LIBRARY_VERSION=1:5:0
 PSIBIN_LIBRARY_VERSION=0:0:0
 MUD_LIBRARY_VERSION=0:0:0
@@ -66,6 +82,7 @@ AC_SUBST(MUSR_LIBRARY_VERSION)
 AC_SUBST(LEM_LIBRARY_VERSION)
 AC_SUBST(PSIBIN_LIBRARY_VERSION)
 AC_SUBST(MUD_LIBRARY_VERSION)
+AC_SUBST(PLUGIN_LIBRARY_VERSION)
 
 PACKAGE=$MUSR_PROGRAM_NAME
 AC_SUBST(MUSR_LIBRARY_NAME)
@@ -93,6 +110,11 @@ MUSR_RELEASE=$MUSR_MAJOR_VERSION.$MUSR_MINOR_VERSION
 AC_SUBST(MUSR_RELEASE)
 AC_SUBST(MUSR_VERSION)
 
+PLUGIN_VERSION=$PLUGIN_MAJOR_VERSION.$PLUGIN_MINOR_VERSION.$PLUGIN_MICRO_VERSION
+PLUGIN_RELEASE=$PLUGIN_MAJOR_VERSION.$PLUGIN_MINOR_VERSION
+AC_SUBST(PLUGIN_RELEASE)
+AC_SUBST(PLUGIN_VERSION)
+
 VERSION=$MUSR_VERSION
 
 dnl -----------------------------------------------
@@ -106,7 +128,7 @@ AC_LANG(C++)
 # Checks for programs.
 # AC_PROG_AWK
 AC_PROG_CXX
-# AC_PROG_CC
+AC_PROG_CC
 # AC_PROG_LEX
 AC_PROG_LN_S
 # AC_PROG_YACC
@@ -115,7 +137,7 @@ AM_PROG_LIBTOOL
 ROOT_PATH
 
 dnl -----------------------------------------------
-dnl Ask user for path to fftw3 stuff
+dnl Ask user for path to fftw3
 dnl -----------------------------------------------
 
 FFTW3_FOUND=0
@@ -160,7 +182,7 @@ AC_SUBST(FFTW3_CFLAGS)
 
 
 dnl -----------------------------------------------
-dnl Ask user for path to gsl stuff
+dnl Ask user for path to gsl
 dnl -----------------------------------------------
 
 GSL_FOUND=0
@@ -205,7 +227,7 @@ AC_SUBST(GSL_CFLAGS)
 
 
 dnl -----------------------------------------------
-dnl Ask user for path to boost stuff
+dnl Ask user for path to boost
 dnl -----------------------------------------------
 
 BOOST_FOUND=0
@@ -267,34 +289,96 @@ AC_CHECK_FILE([${ROOTINCDIR}/../include/Minuit2/MnMinimize.h], AC_MSG_RESULT([Mi
 
 
 dnl -----------------------------------------------
+dnl Ask user if BMWlibs should be built and where to find the CUBA installation
+dnl -----------------------------------------------
+
+AC_ARG_ENABLE([BMWlibs], [AC_HELP_STRING([--enable-BMWlibs],[build optional BMW plug-ins (default: disabled)])],
+    [CUBA_FOUND=0
+    AC_ARG_WITH([cuba],
+        [AC_HELP_STRING([--with-cuba],[prefix of CUBA installation, e.g. /usr/local or /usr])],
+        [CUBA_PREFIX=$with_cuba
+        if !(test -r ${CUBA_PREFIX}/include/cuba.h); then
+          AC_MSG_ERROR(CUBA cannot be found at the specified path!)
+        fi
+        AC_MSG_RESULT([using ${CUBA_PREFIX} as prefix of the CUBA installation...])],
+        [PKG_CHECK_MODULES(CUBA, cuba >= 1.6, [CUBA_FOUND=1],
+          [if test -r /usr/local/include/cuba.h; then
+            CUBA_PREFIX="/usr/local"
+            AC_MSG_RESULT([using ${CUBA_PREFIX} as prefix of the CUBA installation... (ignore the negative check result just above)])
+          elif test -r /usr/include/cuba.h; then
+            CUBA_PREFIX="/usr"
+            AC_MSG_RESULT([using ${CUBA_PREFIX} as prefix of the CUBA installation... (ignore the negative check result just above)])
+          elif test -r /sw/include/cuba.h; then
+            CUBA_PREFIX="/sw"
+            AC_MSG_RESULT([using ${CUBA_PREFIX} as prefix of the CUBA installation... (ignore the negative check result just above)])
+          elif test -r /opt/local/include/cuba.h; then
+            CUBA_PREFIX="/opt/local"
+            AC_MSG_RESULT([using ${CUBA_PREFIX} as prefix of the CUBA installation... (ignore the negative check result just above)])
+          else
+            AC_MSG_ERROR(
+            [CUBA not found. Please call configure with the --with-cuba option.
+            This tells configure where to find the CUBA C library and header,
+            e.g. --with-cuba=/usr/local or --with-cuba=/usr]
+            )
+          fi
+        ]
+      )
+      ]
+    )
+    AC_SUBST(CUBA_PREFIX)
+    if test "${CUBA_FOUND}" != "1"; then
+      CUBA_LIBS="-L${CUBA_PREFIX}/lib -lcuba -lm"
+      CUBA_CFLAGS="-I${CUBA_PREFIX}/include"
+    fi
+    AC_SUBST(CUBA_LIBS)
+    AC_SUBST(CUBA_CFLAGS)
+    BUILD_BMW_LIBS=1
+    ],
+    [BUILD_BMW_LIBS=0]
+)
+
+dnl -----------------------------------------------
+dnl Ask user if ASlibs should be built
+dnl -----------------------------------------------
+
+AC_ARG_ENABLE([ASlibs], [AC_HELP_STRING([--enable-ASlibs],[build optional AS plug-ins (default: disabled)])],[BUILD_AS_LIBS=1], [BUILD_AS_LIBS=0])
+
+dnl -----------------------------------------------
 dnl Set some paths and flags for PMusr, TLemRunHeader, Class_MuSR_PSI and mud
 dnl -----------------------------------------------
 
-SRCDIR="$(pwd)"
+SRCDIR="$(pwd)/src"
 
-PSIBIN_SRCDIR="${SRCDIR}/src/external/MuSR_software/Class_MuSR_PSI"
-PSIBIN_LIBS="-L${PSIBIN_SRCDIR} -l${PSIBIN_LIBRARY_NAME}"
+PSIBIN_SRCDIR="${SRCDIR}/external/MuSR_software/Class_MuSR_PSI"
+PSIBIN_LIBS="${PSIBIN_SRCDIR}/lib${PSIBIN_LIBRARY_NAME}.la"
 PSIBIN_CFLAGS="-I${PSIBIN_SRCDIR}"
 AC_SUBST(PSIBIN_LIBS)
 AC_SUBST(PSIBIN_CFLAGS)
 
-MUD_SRCDIR="${SRCDIR}/src/external/mud/src"
-MUD_LIBS="-L${MUD_SRCDIR} -l${MUD_LIBRARY_NAME}"
+MUD_SRCDIR="${SRCDIR}/external/mud/src"
+MUD_LIBS="${MUD_SRCDIR}/lib${MUD_LIBRARY_NAME}.la"
 MUD_CFLAGS="-I${MUD_SRCDIR}"
 AC_SUBST(MUD_LIBS)
 AC_SUBST(MUD_CFLAGS)
 
-LEM_SRCDIR="${SRCDIR}/src/external/TLemRunHeader"
-LEM_LIBS="-L${LEM_SRCDIR} -l${LEM_LIBRARY_NAME}"
+LEM_SRCDIR="${SRCDIR}/external/TLemRunHeader"
+LEM_LIBS="${LEM_SRCDIR}/lib${LEM_LIBRARY_NAME}.la"
 LEM_CFLAGS="-I${LEM_SRCDIR}"
 AC_SUBST(LEM_LIBS)
 AC_SUBST(LEM_CFLAGS)
 
-PMUSR_LIBS="-L${SRCDIR}/src/classes -l${MUSR_LIBRARY_NAME}"
-PMUSR_CFLAGS="-I${SRCDIR}/src/include"
+PMUSR_LIBS="${SRCDIR}/classes/lib${MUSR_LIBRARY_NAME}.la"
+PMUSR_CFLAGS="-I${SRCDIR}/include"
 AC_SUBST(PMUSR_LIBS)
 AC_SUBST(PMUSR_CFLAGS)
 
+if test "${BUILD_BMW_LIBS}" -eq 1; then
+  TFITPOFB_SRCDIR="${SRCDIR}/external/TFitPofB-lib"
+  TFITPOFB_LIBS="${TFITPOFB_SRCDIR}/classes/libTFitPofB.la"
+  TFITPOFB_CFLAGS="-I${TFITPOFB_SRCDIR}/include"
+  AC_SUBST(TFITPOFB_LIBS)
+  AC_SUBST(TFITPOFB_CFLAGS)
+fi
 
 dnl -----------------------------------------------
 dnl Set host specific compiler and linker flags
@@ -364,7 +448,20 @@ AC_CONFIG_FILES([Makefile \
                  src/external/MuSR_software/Makefile \
                  src/external/MuSR_software/Class_MuSR_PSI/Makefile \
                  src/external/MuSR_software/Class_MuSR_PSI/Class_MuSR_PSI.pc \
-		 src/external/mud/Makefile \
-		 src/external/mud/src/Makefile \
-		 src/external/mud/src/mud.pc])
+                 src/external/mud/Makefile \
+                 src/external/mud/src/Makefile \
+                 src/external/mud/src/mud.pc])
+
+if test "${BUILD_BMW_LIBS}" -eq 1; then
+  AC_CONFIG_FILES([src/external/TFitPofB-lib/Makefile \
+                 src/external/TFitPofB-lib/classes/Makefile \
+                 src/external/libLFRelaxation/Makefile \
+                 src/external/libGapIntegrals/Makefile \
+                 src/external/libCalcMeanFieldsLEM/Makefile])
+fi
+
+if test "${BUILD_AS_LIBS}" -eq 1; then
+  AC_CONFIG_FILES([src/external/Nonlocal/Makefile])
+fi
+
 AC_OUTPUT

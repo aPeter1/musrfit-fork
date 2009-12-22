@@ -1,1 +1,5 @@
-SUBDIRS = TLemRunHeader MuSR_software mud
+SUBDIRS = TFitPofB-lib \
+          libLFRelaxation \
+          libGapIntegrals \
+          libCalcMeanFieldsLEM \
+          Nonlocal

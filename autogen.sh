@@ -23,7 +23,10 @@
 PATHTOAUTOCONF=$(which autoconf)
 PATHTOAUTOMAKE=$(which automake)
 PATHTOLIBTOOL=$(which libtoolize)
-PATHTOGLIBTOOL=$(which glibtoolize)
+PATHTOGLIBTOOL=
+if [ "$PATHTOLIBTOOL" = "" ]; then
+  PATHTOGLIBTOOL=$(which glibtoolize)
+fi
 
 if [ "$PATHTOAUTOCONF" = "" ]; then
   echo
