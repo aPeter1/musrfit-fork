@@ -79,10 +79,15 @@ class PRunBase
     Double_t fTimeResolution;   ///< time resolution in (us)
     PIntVector fT0s;            ///< all t0's of a run! The derived classes will handle it
 
-    virtual Bool_t PrepareData() = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
-
     PDoubleVector fFuncValues;  ///< is keeping the values of the functions from the FUNCTIONS block
     PTheory *fTheory;           ///< theory needed to calculate chi-square
+
+    PDoubleVector fKaiserFilter;
+
+    virtual Bool_t PrepareData() = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
+
+    virtual void CalculateKaiserFilterCoeff(Double_t wc, Double_t A, Double_t dw);
+    virtual void FilterData();
 };
 
 #endif // _PRUNBASE_H_

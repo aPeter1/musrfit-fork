@@ -117,6 +117,14 @@ using namespace std;
 #define FOURIER_PLOT_PHASE         5
 
 //-------------------------------------------------------------
+// RRF related tags
+#define RRF_UNIT_kHz 0
+#define RRF_UNIT_MHz 1
+#define RRF_UNIT_Mcs 2
+#define RRF_UNIT_G   3
+#define RRF_UNIT_T   4
+
+//-------------------------------------------------------------
 /**
  * <p> typedef to make to code more readable.
  */
@@ -200,6 +208,9 @@ class PRunData {
     virtual void AppendErrorValue(Double_t dval) { fError.push_back(dval); }
     virtual void AppendXTheoryValue(Double_t dval) { fXTheory.push_back(dval); }
     virtual void AppendTheoryValue(Double_t dval) { fTheory.push_back(dval); }
+
+    virtual void SetTheoryValue(UInt_t i, Double_t dval);
+    virtual void ReplaceTheory(const PDoubleVector &theo);
 
   private:
     // data related info
@@ -403,12 +414,6 @@ class PMsrRunBlock {
     virtual Int_t GetT0(UInt_t i=0);
     virtual Double_t GetFitRange(UInt_t i);
     virtual Int_t GetPacking() { return fPacking; }
-    virtual Double_t GetRRFFreq() { return fRRFFreq; }
-    virtual Int_t GetRRFPacking() { return fRRFPacking; }
-    virtual Int_t GetAlpha2ParamNo() { return fAlpha2ParamNo; }
-    virtual Int_t GetBeta2ParamNo() { return fBeta2ParamNo; }
-    virtual Int_t GetRightHistoNo() { return fRightHistoNo; }
-    virtual Int_t GetLeftHistoNo() { return fLeftHistoNo; }
     virtual Int_t GetXDataIndex() { return fXYDataIndex[0]; }
     virtual Int_t GetYDataIndex() { return fXYDataIndex[1]; }
     virtual TString* GetXDataLabel() { return &fXYDataLabel[0]; }
@@ -444,12 +449,6 @@ class PMsrRunBlock {
     virtual void SetT0(Int_t ival, UInt_t idx);
     virtual void SetFitRange(Double_t dval, UInt_t idx);
     virtual void SetPacking(Int_t ival) { fPacking = ival; }
-    virtual void SetRRFFreq(Double_t dval) { fRRFFreq = dval; }
-    virtual void SetRRFPacking(Int_t ival) { fRRFPacking = ival; }
-    virtual void SetAlpha2ParamNo(Int_t ival) { fAlpha2ParamNo = ival; }
-    virtual void SetBeta2ParamNo(Int_t ival) { fBeta2ParamNo = ival; }
-    virtual void SetRightHistoNo(Int_t ival) { fRightHistoNo = ival; }
-    virtual void SetLeftHistoNo(Int_t ival) { fLeftHistoNo = ival; }
     virtual void SetXDataIndex(Int_t ival) { fXYDataIndex[0] = ival; }
     virtual void SetYDataIndex(Int_t ival) { fXYDataIndex[1] = ival; }
     virtual void SetXDataLabel(TString& str) { fXYDataLabel[0] = str; }
@@ -477,12 +476,6 @@ class PMsrRunBlock {
     PIntVector fT0;               ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
     Double_t fFitRange[2];        ///< fit range in (us)
     Int_t fPacking;               ///< packing/rebinning
-    Double_t fRRFFreq;            ///< rotating reference frequency (fit type 4)
-    Int_t fRRFPacking;            ///< rotating reference packing (fit type 4)
-    Int_t fAlpha2ParamNo;         ///< rotating reference alpha2 (fit type 4)
-    Int_t fBeta2ParamNo;          ///< rotating reference beta2 (fit type 4)
-    Int_t fRightHistoNo;          ///< rotating reference right histogram number (fit type 4)
-    Int_t fLeftHistoNo;           ///< rotating reference left histogram number (fit type 4)
     Int_t fXYDataIndex[2];        ///< used to get the data indices when using db-files (fit type 8)
     TString fXYDataLabel[2];      ///< used to get the indices via labels when using db-files  (fit type 8)
 };
@@ -525,6 +518,10 @@ typedef struct {
   PDoubleVector  fTmax;   ///< time maximum
   PDoubleVector  fYmin;   ///< asymmetry/counts minimum
   PDoubleVector  fYmax;   ///< asymmetry/counts maximum
+  UInt_t fRRFPacking;     ///< rotating reference frame (RRF) packing
+  Double_t fRRFFreq;      ///< RRF frequency
+  UInt_t fRRFUnit;        ///< RRF frequency unit. 0=kHz, 1=MHz, 2=Mc/s, 3=Gauss, 4=Tesla
+  Double_t fRRFPhase;     ///< RRF phase
 } PMsrPlotStructure;
 
 //-------------------------------------------------------------

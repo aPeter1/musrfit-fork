@@ -265,6 +265,7 @@ int main(int argc, char *argv[])
           }
           break;
         case MSR_FITTYPE_ASYM_RRF:
+/*
           for (unsigned int j=0; j<runList->at(i).GetRunNameSize(); j++) { // necessary in case of ADDRUN
             if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetForwardHistoNo(), 0, j)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
@@ -283,6 +284,7 @@ int main(int argc, char *argv[])
               exit(0);
             }
           }
+*/
           break;
         default:
           break;

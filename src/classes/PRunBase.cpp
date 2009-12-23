@@ -145,3 +145,88 @@ void PRunBase::CleanUp()
     fTheory = 0;
   }
 }
+
+//--------------------------------------------------------------------------
+// CalculateKaiserFilterCoeff (protected)
+//--------------------------------------------------------------------------
+/**
+ * <p> Calculates the Kaiser filter coefficients for a low pass filter with
+ * a cut off frequency wc.
+ * For details see "Zeitdiskrete Signalverarbeitung", A.V. Oppenheim, R.W. Schafer, J.R. Buck. Pearson 2004.
+ *
+ * \param wc cut off frequency
+ * \param A defined as \f[ A = -\log_{10}(\delta) \f], where \f[\delta\f] is the tolerance band.
+ * \param dw defined as \f[ \Delta\omega = \omega_{\rm S} - \omega_{\rm P} \f], where \f[ \omega_{\rm S} \f] is the
+ * stop band frequency, and \f[ \omega_{\rm P} \f] is the pass band frequency.
+ */
+void PRunBase::CalculateKaiserFilterCoeff(Double_t wc, Double_t A, Double_t dw)
+{
+  Double_t beta;
+  Double_t dt = fData.GetTheoryTimeStep();
+  UInt_t m;
+
+  // estimate beta (see reference above, p.574ff)
+  if (A > 50.0) {
+    beta = 0.1102*(A-8.7);
+  } else if ((A >= 21.0) && (A <= 50.0)) {
+    beta = 0.5842*TMath::Power(A-21.0, 0.4) + 0.07886*(A-21.0);
+  } else {
+    beta = 0.0;
+  }
+
+  m = TMath::FloorNint((A-8.0)/(2.285*dw*TMath::Pi()));
+  // make sure m is odd
+  if (m % 2 == 0)
+    m++;
+
+  Double_t alpha = static_cast<Double_t>(m)/2.0;
+  Double_t dval;
+  Double_t dsum = 0.0;
+  for (UInt_t i=0; i<=m; i++) {
+    dval  = TMath::Sin(wc*(i-alpha)*dt)/(TMath::Pi()*(i-alpha)*dt);
+    dval *= TMath::BesselI0(beta*TMath::Sqrt(1.0-TMath::Power((i-alpha)*dt/alpha, 2.0)))/TMath::BesselI0(beta);
+    dsum += dval;
+    fKaiserFilter.push_back(dval);
+  }  
+  for (UInt_t i=0; i<=m; i++) {
+    fKaiserFilter[i] /= dsum;
+  }
+
+/*
+for (UInt_t i=0; i<=m; i++)
+cout << endl << ">> " << i << ", fKaiserFilter[" << i << "]=" << fKaiserFilter[i];
+cout << endl;
+*/
+}
+
+//--------------------------------------------------------------------------
+// FilterData (protected)
+//--------------------------------------------------------------------------
+/**
+ * <p> Filters the data with a Kaiser FIR filter.
+ */
+void PRunBase::FilterData()
+{
+  PDoubleVector theoFiltered;
+  Double_t dval = 0.0;
+  const PDoubleVector *theo = fData.GetTheory();
+
+  for (UInt_t i=0; i<theo->size(); i++) {
+    for (UInt_t j=0; j<fKaiserFilter.size(); j++) {
+      if (i<j)
+        dval = 0.0;
+      else
+        dval += fKaiserFilter[j]*theo->at(i-j);
+    }
+    theoFiltered.push_back(dval);
+    dval = 0.0;
+  }
+
+  fData.ReplaceTheory(theoFiltered);
+
+  // shift time start by half the filter length
+  dval = fData.GetTheoryTimeStart() - 0.5*static_cast<Double_t>(fKaiserFilter.size())*fData.GetTheoryTimeStep();
+  fData.SetTheoryTimeStart(dval);
+
+  theoFiltered.clear();
+}

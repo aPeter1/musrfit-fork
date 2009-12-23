@@ -599,16 +599,6 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           default:
             break;
           }
-        } else if (sstr.BeginsWith("rrffrequency")) {
-          fout.width(16);
-          fout << left << "rrffrequency";
-          fout.precision(prec);
-          fout << fRuns[runNo].GetRRFFreq() << endl;
-        } else if (sstr.BeginsWith("rrfpacking")) {
-          fout.width(16);
-          fout << left << "rrfpacking";
-          fout.precision(prec);
-          fout << fRuns[runNo].GetRRFPacking() << endl;
         } else if (sstr.BeginsWith("alpha ")) {
           fout.width(16);
           fout << left << "alpha";
@@ -617,14 +607,6 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           fout.width(16);
           fout << left << "beta";
           fout << fRuns[runNo].GetBetaParamNo()  << endl;
-        } else if (sstr.BeginsWith("alpha2")) {
-          fout.width(16);
-          fout << left << "alpha2";
-          fout << fRuns[runNo].GetAlpha2ParamNo() << endl;
-        } else if (sstr.BeginsWith("beta2")) {
-          fout.width(16);
-          fout << left << "beta2";
-          fout << fRuns[runNo].GetBeta2ParamNo()  << endl;
         } else if (sstr.BeginsWith("norm")) {
           fout.width(16);
           fout << left << "norm";
@@ -670,14 +652,6 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           fout.width(16);
           fout << left << "backward";
           fout << fRuns[runNo].GetBackwardHistoNo() << endl;
-        } else if (sstr.BeginsWith("right")) {
-          fout.width(16);
-          fout << left << "right";
-          fout << fRuns[runNo].GetRightHistoNo() << endl;
-        } else if (sstr.BeginsWith("left")) {
-          fout.width(16);
-          fout << left << "left";
-          fout << fRuns[runNo].GetLeftHistoNo() << endl;
         } else if (sstr.BeginsWith("backgr.fix")) {
           fout.width(15);
           fout << left << "backgr.fix";
@@ -1731,28 +1705,6 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       }
     }
 
-    // rphase ------------------------------------------------
-    if (iter->fLine.BeginsWith("rphase", TString::kIgnoreCase)) {
-
-      runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
-
-      if (tokens->GetEntries() < 2) {
-        error = true;
-      } else {
-        ostr = dynamic_cast<TObjString*>(tokens->At(1));
-        str = ostr->GetString();
-        if (str.IsDigit()) {
-          dval = str.Atoi();
-          if (dval > 0)
-            param.SetPhaseParamNo(dval);
-          else
-            error = true;
-        } else {
-          error = true;
-        }
-      }
-    }
-
     // lifetime ------------------------------------------------
     if (iter->fLine.BeginsWith("lifetime ", TString::kIgnoreCase)) {
 
@@ -1979,133 +1931,6 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           dval = str.Atoi();
           if (dval > 0)
             param.SetPacking(dval);
-          else
-            error = true;
-        } else {
-          error = true;
-        }
-      }
-    }
-
-    // rrffrequency --------------------------------------------------
-    if (iter->fLine.BeginsWith("rrffrequency", TString::kIgnoreCase)) {
-
-      runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
-
-      if (tokens->GetEntries() != 2) {
-        error = true;
-      } else {
-        ostr = dynamic_cast<TObjString*>(tokens->At(1));
-        str = ostr->GetString();
-        if (str.IsFloat())
-          param.SetRRFFreq(str.Atof());
-        else
-          error = true;
-      }
-    }
-
-    // rrfpacking --------------------------------------------------
-    if (iter->fLine.BeginsWith("rrfpacking", TString::kIgnoreCase)) {
-
-      runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
-
-      if (tokens->GetEntries() != 2) {
-        error = true;
-      } else {
-        ostr = dynamic_cast<TObjString*>(tokens->At(1));
-        str = ostr->GetString();
-        if (str.IsDigit()) {
-          dval = str.Atoi();
-          if (dval > 0)
-            param.SetRRFPacking(dval);
-          else
-            error = true;
-        } else {
-          error = true;
-        }
-      }
-    }
-
-    // alpha2 --------------------------------------------------
-    if (iter->fLine.BeginsWith("alpha2", TString::kIgnoreCase)) {
-
-      runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
-
-      if (tokens->GetEntries() != 2) {
-        error = true;
-      } else {
-        ostr = dynamic_cast<TObjString*>(tokens->At(1));
-        str = ostr->GetString();
-        if (str.IsDigit()) {
-          dval = str.Atoi();
-          if (dval > 0)
-            param.SetAlpha2ParamNo(dval);
-          else
-            error = true;
-        } else {
-          error = true;
-        }
-      }
-    }
-
-    // beta2 --------------------------------------------------
-    if (iter->fLine.BeginsWith("beta2", TString::kIgnoreCase)) {
-
-      runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
-
-      if (tokens->GetEntries() != 2) {
-        error = true;
-      } else {
-        ostr = dynamic_cast<TObjString*>(tokens->At(1));
-        str = ostr->GetString();
-        if (str.IsDigit()) {
-          dval = str.Atoi();
-          if (dval > 0)
-            param.SetBeta2ParamNo(dval);
-          else
-            error = true;
-        } else {
-          error = true;
-        }
-      }
-    }
-
-    // right --------------------------------------------------
-    if (iter->fLine.BeginsWith("right", TString::kIgnoreCase)) {
-
-      runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
-
-      if (tokens->GetEntries() != 2) {
-        error = true;
-      } else {
-        ostr = dynamic_cast<TObjString*>(tokens->At(1));
-        str = ostr->GetString();
-        if (str.IsDigit()) {
-          dval = str.Atoi();
-          if (dval > 0)
-            param.SetRightHistoNo(dval);
-          else
-            error = true;
-        } else {
-          error = true;
-        }
-      }
-    }
-
-    // left --------------------------------------------------
-    if (iter->fLine.BeginsWith("left", TString::kIgnoreCase)) {
-
-      runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
-
-      if (tokens->GetEntries() != 2) {
-        error = true;
-      } else {
-        ostr = dynamic_cast<TObjString*>(tokens->At(1));
-        str = ostr->GetString();
-        if (str.IsDigit()) {
-          dval = str.Atoi();
-          if (dval > 0)
-            param.SetLeftHistoNo(str.Atoi());
           else
             error = true;
         } else {
@@ -2536,6 +2361,10 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
     param.fLogX = false; // i.e. if not overwritten use linear x-axis
     param.fLogY = false; // i.e. if not overwritten use linear y-axis
     param.fViewPacking = -1; // i.e. if not overwritten use the packing of the run blocks
+    param.fRRFPacking = 0; // i.e. if not overwritten it will not be a valid RRF
+    param.fRRFFreq = 0.0; // i.e. no RRF whished
+    param.fRRFUnit = RRF_UNIT_MHz;
+    param.fRRFPhase = 0.0;
 
     // find next plot if any is present
     iter2 = iter1;
@@ -2777,7 +2606,7 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
       } else if (iter1->fLine.Contains("view_packing", TString::kIgnoreCase)) {
         tokens = iter1->fLine.Tokenize(" \t");
         if (!tokens) {
-          cerr << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
+          cerr << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize view_packing in line " << iter1->fLineNo;
           cerr << endl << endl;
           return false;
         }
@@ -2797,6 +2626,97 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           }
         }
 
+        // clean up
+        if (tokens) {
+          delete tokens;
+          tokens = 0;
+        }
+      } else if (iter1->fLine.Contains("rrf_freq", TString::kIgnoreCase)) {
+        // expected entry: rrf_freq value unit
+        // allowed units: kHz, MHz, Mc/s, G, T
+        tokens = iter1->fLine.Tokenize(" \t");
+        if (!tokens) {
+          cerr << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize rrf_freq in line " << iter1->fLineNo;
+          cerr << endl << endl;
+          return false;
+        }
+        if (tokens->GetEntries() != 3) {
+          error = true;
+        } else {
+          // get rrf frequency
+          ostr = dynamic_cast<TObjString*>(tokens->At(1));
+          str = ostr->GetString();
+          if (str.IsFloat()) {
+            param.fRRFFreq = str.Atof();
+          } else {
+            error = true;
+          }
+          // get unit
+          ostr = dynamic_cast<TObjString*>(tokens->At(2));
+          str = ostr->GetString();
+          if (str.Contains("kHz", TString::kIgnoreCase))
+            param.fRRFUnit = RRF_UNIT_kHz;
+          else if (str.Contains("MHz", TString::kIgnoreCase))
+            param.fRRFUnit = RRF_UNIT_MHz;
+          else if (str.Contains("Mc/s", TString::kIgnoreCase))
+            param.fRRFUnit = RRF_UNIT_Mcs;
+          else if (str.Contains("G", TString::kIgnoreCase))
+            param.fRRFUnit = RRF_UNIT_G;
+          else if (str.Contains("T", TString::kIgnoreCase))
+            param.fRRFUnit = RRF_UNIT_T;
+          else
+            error = true;
+        }
+        // clean up
+        if (tokens) {
+          delete tokens;
+          tokens = 0;
+        }
+      } else if (iter1->fLine.Contains("rrf_phase", TString::kIgnoreCase)) {
+        // expected entry: rrf_phase value. value given in units of degree
+        tokens = iter1->fLine.Tokenize(" \t");
+        if (!tokens) {
+          cerr << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize rrf_phase in line " << iter1->fLineNo;
+          cerr << endl << endl;
+          return false;
+        }
+        if (tokens->GetEntries() != 2) {
+          error = true;
+        } else {
+          // get rrf phase
+          ostr = dynamic_cast<TObjString*>(tokens->At(1));
+          str = ostr->GetString();
+          if (str.IsFloat()) {
+            param.fRRFPhase = str.Atof();
+          } else {
+            error = true;
+          }
+        }
+        // clean up
+        if (tokens) {
+          delete tokens;
+          tokens = 0;
+        }
+      } else if (iter1->fLine.Contains("rrf_packing", TString::kIgnoreCase)) {
+        // expected entry: rrf_phase value. value given in units of degree
+        tokens = iter1->fLine.Tokenize(" \t");
+        if (!tokens) {
+          cerr << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize rrf_packing in line " << iter1->fLineNo;
+          cerr << endl << endl;
+          return false;
+        }
+        if (tokens->GetEntries() != 2) {
+          error = true;
+        } else {
+          // get rrf packing
+          ostr = dynamic_cast<TObjString*>(tokens->At(1));
+          str = ostr->GetString();
+          if (str.IsDigit()) {
+            param.fRRFPacking = str.Atoi();
+          } else {
+            error = true;
+          }
+        }
         // clean up
         if (tokens) {
           delete tokens;
@@ -2835,6 +2755,17 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
             }
           }
         }
+
+        // check RRF entries
+        if (param.fRRFFreq != 0.0) {
+          if (param.fRRFPacking == 0) {
+            cerr << endl << ">> PMsrHandler::HandlePlotEntry(): **ERROR** found RRF frequency but no required RRF packing.";
+            cerr << endl << ">> Will ignore the RRF option.";
+            cerr << endl;
+            param.fRRFFreq = 0.0;
+          }
+        }
+
         fPlots.push_back(param);
       }
     }

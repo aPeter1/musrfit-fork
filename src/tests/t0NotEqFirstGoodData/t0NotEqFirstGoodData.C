@@ -68,17 +68,20 @@ void t0NotEqFirstGoodData()
 
   // create histos
   UInt_t t0[4] = {3419, 3419, 3419, 3419};
-  UInt_t n0[4] = {200.0, 205.0, 203.0, 198.0};
+  UInt_t n0[4] = {2000.0, 2005.0, 2003.0, 1998.0};
   UInt_t bkg[4] = {11.0, 11.0, 5.0, 8.0};
   const Double_t tau = 2197.019; // ns
   // asymmetry related stuff
   const Double_t timeResolution = 0.1953125; // ns
-  Double_t a[4] = {0.16, 0.161, 0.16, 0.159};
-  Double_t phase[4] = {13.0*TMath::Pi()/180.0, 103.0*TMath::Pi()/180.0, 193.0*TMath::Pi()/180.0, 283.0*TMath::Pi()/180.0};
+  Double_t a0[4] = {0.16, 0.16, 0.16, 0.16};
+  Double_t a1[4] = {0.0, 0.0, 0.0, 0.0};
+  Double_t phase[4] = {0.0*TMath::Pi()/180.0, 90.0*TMath::Pi()/180.0, 180.0*TMath::Pi()/180.0, 270.0*TMath::Pi()/180.0};
   const Double_t gamma = 0.00001355; // gamma/(2pi)
-  Double_t bb = 15000.0; // field in Gauss
+  Double_t bb0 = 15000.0; // field in Gauss
+  Double_t bb1 = 15702.0; // field in Gauss
 //  Double_t bb = 100.0; // field in Gauss
-  Double_t sigma = 1.05/1000.0; // Gaussian sigma in 1/ns
+  Double_t sigma0 = 0.05/1000.0; // Gaussian sigma in 1/ns
+  Double_t sigma1 = 0.10/1000.0; // Gaussian sigma in 1/ns
 
   TH1F *histo[8];
   char str[128];
@@ -96,7 +99,8 @@ void t0NotEqFirstGoodData()
         histo[i]->SetBinContent(j, bkg[i]);
       } else {
         time = (Double_t)(j-t0[i])*timeResolution;
-        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a[i]*TMath::Exp(-0.5*TMath::Power(time*sigma,2.0))*TMath::Cos(TMath::TwoPi()*gamma*bb*time+phase[i]))+(Double_t)bkg[i];
+        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a0[i]*TMath::Exp(-0.5*TMath::Power(time*sigma0,2.0))*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i])
+                                                         +a1[i]*TMath::Exp(-0.5*TMath::Power(time*sigma1,2.0))*TMath::Cos(TMath::TwoPi()*gamma*bb1*time+phase[i]))+(Double_t)bkg[i];
         histo[i]->SetBinContent(j, (UInt_t)dval);
       }
     }
@@ -134,7 +138,7 @@ void t0NotEqFirstGoodData()
     decayAnaModule->Add(histo[i]);
 
   // write file
-  TFile *fout = new TFile("010105.root", "RECREATE", "Midas Fake Histograms");
+  TFile *fout = new TFile("010108.root", "RECREATE", "Midas Fake Histograms");
   if (fout == 0) {
     cout << endl << "**ERROR** Couldn't create ROOT file";
     cout << endl << endl;

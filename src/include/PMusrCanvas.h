@@ -204,6 +204,8 @@ class PMusrCanvas : public TObject, public TQObject
 
     Double_t fCurrentFourierPhase;    /// holds the current Fourier phase
     TLatex *fCurrentFourierPhaseText; /// used in Re/Im Fourier to show the current phase in the pad
+    TString *fRRFText;
+    TLatex  *fRRFLatexText; /// used to display RRF info
 
     TStyle    *fStyle;
 

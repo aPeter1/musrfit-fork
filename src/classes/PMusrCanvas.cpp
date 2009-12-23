@@ -81,6 +81,9 @@ PMusrCanvas::PMusrCanvas()
 
   fCurrentFourierPhase = fFourier.fPhaseIncrement;
   fCurrentFourierPhaseText = 0;
+
+  fRRFText = 0;
+  fRRFLatexText = 0;
 }
 
 //--------------------------------------------------------------------------
@@ -105,6 +108,9 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
 
   fCurrentFourierPhase = 0.0;
   fCurrentFourierPhaseText = 0;
+
+  fRRFText = 0;
+  fRRFLatexText = 0;
 }
 
 //--------------------------------------------------------------------------
@@ -132,6 +138,9 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
 
   fCurrentFourierPhase = 0.0;
   fCurrentFourierPhaseText = 0;
+
+  fRRFText = 0;
+  fRRFLatexText = 0;
 }
 
 //--------------------------------------------------------------------------
@@ -144,6 +153,18 @@ PMusrCanvas::~PMusrCanvas()
 {
 //cout << "~PMusrCanvas() called. fMainCanvas name=" << fMainCanvas->GetName() << endl;
   // cleanup
+  if (fCurrentFourierPhaseText) {
+    delete fCurrentFourierPhaseText;
+    fCurrentFourierPhaseText = 0;
+  }
+  if (fRRFLatexText) {
+    delete fRRFLatexText;
+    fRRFLatexText = 0;
+  }
+  if (fRRFText) {
+    delete fRRFText;
+    fRRFText = 0;
+  }
   if (fStyle) {
     delete fStyle;
     fStyle = 0;
@@ -243,6 +264,40 @@ void PMusrCanvas::SetMsrHandler(PMsrHandler *msrHandler)
       fFourier.fPlotRange[0] = fMsrHandler->GetMsrFourierList().fPlotRange[0];
       fFourier.fPlotRange[1] = fMsrHandler->GetMsrFourierList().fPlotRange[1];
     }
+  }
+
+  // check if RRF data are present
+  if ((fMsrHandler->GetMsrPlotList()->at(0).fRRFPacking > 0) &&
+      (fMsrHandler->GetMsrPlotList()->at(0).fRRFFreq != 0.0)) {
+    fRRFLatexText = new TLatex();
+    fRRFLatexText->SetNDC(kTRUE);
+    fRRFLatexText->SetTextFont(62);
+    fRRFLatexText->SetTextSize(0.03);
+
+    fRRFText = new TString("RRF: ");
+    if (fMsrHandler->GetMsrPlotList()->at(0).fRRFUnit == RRF_UNIT_kHz) {
+      *fRRFText += TString("#nu_{RRF} = ");
+      *fRRFText += fMsrHandler->GetMsrPlotList()->at(0).fRRFFreq;
+      *fRRFText += TString(" (kHz)");
+    } else if (fMsrHandler->GetMsrPlotList()->at(0).fRRFUnit == RRF_UNIT_MHz) {
+      *fRRFText += TString("#nu_{RRF} = ");
+      *fRRFText += fMsrHandler->GetMsrPlotList()->at(0).fRRFFreq;
+      *fRRFText += TString(" (MHz)");
+    } else if (fMsrHandler->GetMsrPlotList()->at(0).fRRFUnit == RRF_UNIT_Mcs) {
+      *fRRFText += TString("#omega_{RRF} = ");
+      *fRRFText += fMsrHandler->GetMsrPlotList()->at(0).fRRFFreq;
+      *fRRFText += TString(" (Mc/s)");
+    } else if (fMsrHandler->GetMsrPlotList()->at(0).fRRFUnit == RRF_UNIT_G) {
+      *fRRFText += TString("B_{RRF} = ");
+      *fRRFText += fMsrHandler->GetMsrPlotList()->at(0).fRRFFreq;
+      *fRRFText += TString(" (G)");
+    } else if (fMsrHandler->GetMsrPlotList()->at(0).fRRFUnit == RRF_UNIT_T) {
+      *fRRFText += TString("B_{RRF} = ");
+      *fRRFText += fMsrHandler->GetMsrPlotList()->at(0).fRRFFreq;
+      *fRRFText += TString(" (T)");
+    }
+    *fRRFText += TString(", RRF packing = ");
+    *fRRFText += fMsrHandler->GetMsrPlotList()->at(0).fRRFPacking;
   }
 }
 
@@ -2531,6 +2586,11 @@ void PMusrCanvas::PlotData()
         fData[i].theory->Draw("lsame");
       }
     }
+
+    // check if RRF and if yes show a label
+    if ((fRRFText != 0) && (fRRFLatexText != 0)) {
+      fRRFLatexText->DrawLatex(0.1, 0.92, fRRFText->Data());
+    }
   } else { // fPlotType == MSR_PLOT_NO_MUSR
     // ugly workaround since multigraphs axis are not going away when switching TMultiGraphs
     delete fDataTheoryPad;
@@ -2648,6 +2708,11 @@ void PMusrCanvas::PlotDifference()
     // plot all remaining diff data
     for (UInt_t i=0; i<fData.size(); i++) {
       fData[i].diff->Draw("pesame");
+    }
+
+    // check if RRF and if yes show a label
+    if ((fRRFText != 0) && (fRRFLatexText != 0)) {
+      fRRFLatexText->DrawLatex(0.1, 0.92, fRRFText->Data());
     }
   } else { // fPlotType == MSR_PLOT_NON_MUSR
     // ugly workaround since multigraphs axis are not going away when switching TMultiGraphs
@@ -2980,6 +3045,11 @@ void PMusrCanvas::PlotFourier()
       break;
   }
 
+  // check if RRF and if yes show a label
+  if ((fRRFText != 0) && (fRRFLatexText != 0)) {
+    fRRFLatexText->DrawLatex(0.1, 0.92, fRRFText->Data());
+  }
+
   fDataTheoryPad->Update();
 
   fMainCanvas->cd();
@@ -3248,6 +3318,11 @@ void PMusrCanvas::PlotFourierDifference()
     default:
       break;
    }
+
+  // check if RRF and if yes show a label
+  if ((fRRFText != 0) && (fRRFLatexText != 0)) {
+    fRRFLatexText->DrawLatex(0.1, 0.92, fRRFText->Data());
+  }
 
   fDataTheoryPad->Update();
 

@@ -757,10 +757,14 @@ cout << endl << ">> data start time = " << fData.GetDataTimeStart();
  */
 Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histoNo)
 {
-  // check if view_packing is wished
+  // check if view_packing is wished. This is a global option for all PLOT blocks!
   Int_t packing = fRunInfo->GetPacking();
   if (fMsrInfo->GetMsrPlotList()->at(0).fViewPacking > 0) {
     packing = fMsrInfo->GetMsrPlotList()->at(0).fViewPacking;
+  }
+  // check if rrf_packing is present. This is a global option for all PLOT blocks, since operated on a single set of data.
+  if (fMsrInfo->GetMsrPlotList()->at(0).fRRFPacking > 0) {
+    packing = fMsrInfo->GetMsrPlotList()->at(0).fRRFPacking;
   }
 
   // transform raw histo data. This is done the following way (for details see the manual):
@@ -855,9 +859,10 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
     bkg = par[fRunInfo->GetBkgFitParamNo()-1];
   }
 
-  Double_t value  = 0.0;
-  Double_t expval;
-  Double_t time;
+  Double_t value = 0.0;
+  Double_t expval = 0.0;
+  Double_t rrf_val = 0.0;
+  Double_t time = 0.0;
 
   // data start at data_start-t0 shifted by (pack-1)/2
   fData.SetDataTimeStart(fTimeResolution*((Double_t)start-(Double_t)t0+(Double_t)(packing-1)/2.0));
@@ -870,21 +875,67 @@ cout << endl << "--------------------------------" << endl;
 */
 
   Double_t normalizer = 1.0;
-  for (Int_t i=start; i<end; i++) {
-    if (((i-start) % packing == 0) && (i != start)) { // fill data
-      // in order that after rebinning the fit does not need to be redone (important for plots)
-      // the value is normalize to per 1 nsec
-      normalizer = packing * (fTimeResolution * 1.0e3); // fTimeResolution us->ns
-      value /= normalizer;
-      time = (((Double_t)i-(Double_t)(packing-1)/2.0)-t0)*fTimeResolution;
-      expval = TMath::Exp(+time/tau)/N0;
-      fData.AppendValue(-1.0+expval*(value-bkg));
-//cout << endl << ">> i=" << i << ",t0=" << t0 << ",time=" << time << ",expval=" << expval << ",value=" << value << ",bkg=" << bkg << ",expval*(value-bkg)-1=" << expval*(value-bkg)-1.0;
-      fData.AppendErrorValue(expval*TMath::Sqrt(value/normalizer));
-//cout << endl << ">> " << time << ", " << expval << ", " << -1.0+expval*(value-bkg) << ", " << expval*TMath::Sqrt(value/packing);
-      value = 0.0;
+  Double_t gammaRRF = 0.0, wRRF = 0.0, phaseRRF = 0.0;
+  if (fMsrInfo->GetMsrPlotList()->at(0).fRRFFreq == 0.0) { // normal Data representation
+    for (Int_t i=start; i<end; i++) {
+      if (((i-start) % packing == 0) && (i != start)) { // fill data
+        // in order that after rebinning the fit does not need to be redone (important for plots)
+        // the value is normalize to per 1 nsec
+        normalizer = packing * (fTimeResolution * 1.0e3); // fTimeResolution us->ns
+        value /= normalizer;
+        time = (((Double_t)i-(Double_t)(packing-1)/2.0)-t0)*fTimeResolution;
+        expval = TMath::Exp(+time/tau)/N0;
+        fData.AppendValue(-1.0+expval*(value-bkg));
+        //cout << endl << ">> i=" << i << ",t0=" << t0 << ",time=" << time << ",expval=" << expval << ",value=" << value << ",bkg=" << bkg << ",expval*(value-bkg)-1=" << expval*(value-bkg)-1.0;
+        fData.AppendErrorValue(expval*TMath::Sqrt(value/normalizer));
+        //cout << endl << ">> " << time << ", " << expval << ", " << -1.0+expval*(value-bkg) << ", " << expval*TMath::Sqrt(value/packing);
+        value = 0.0;
+      }
+      value += runData->GetDataBin(histoNo)->at(i);
     }
-    value += runData->GetDataBin(histoNo)->at(i);
+  } else { // RRF representation
+    // check which units shall be used
+    switch (fMsrInfo->GetMsrPlotList()->at(0).fRRFUnit) {
+      case RRF_UNIT_kHz:
+        gammaRRF = TMath::TwoPi()*1.0e-3;
+        break;
+      case RRF_UNIT_MHz:
+        gammaRRF = TMath::TwoPi();
+        break;
+      case RRF_UNIT_Mcs:
+        gammaRRF = 1.0;
+        break;
+      case RRF_UNIT_G:
+        gammaRRF = 0.0135538817*TMath::TwoPi();
+        break;
+      case RRF_UNIT_T:
+        gammaRRF = 0.0135538817*TMath::TwoPi()*1.0e4;
+        break;
+      default:
+        gammaRRF = TMath::TwoPi();
+        break;
+    }
+    wRRF = gammaRRF * fMsrInfo->GetMsrPlotList()->at(0).fRRFFreq;
+    phaseRRF = fMsrInfo->GetMsrPlotList()->at(0).fRRFPhase / 180.0 * TMath::Pi();
+
+    // in order that after rebinning the fit does not need to be redone (important for plots)
+    // the value is normalize to per 1 nsec
+    normalizer = (fTimeResolution * 1.0e3); // fTimeResolution us->ns
+
+    Double_t error = 0.0;
+    for (Int_t i=start; i<end; i++) {
+      if (((i-start) % packing == 0) && (i != start)) { // fill data
+        fData.AppendValue(2.0*value/packing); // factor 2 needed because cos(a)cos(b) = 1/2(cos(a+b)+cos(a-b))
+        fData.AppendErrorValue(expval*TMath::Sqrt(error)/normalizer/packing);
+        value = 0.0;
+        error = 0.0;
+      }
+      time = ((Double_t)i-t0)*fTimeResolution;
+      expval = TMath::Exp(+time/tau)/N0;
+      rrf_val = (-1.0+expval*(runData->GetDataBin(histoNo)->at(i)/normalizer-bkg))*TMath::Cos(wRRF * time + phaseRRF);
+      value += rrf_val;
+      error += runData->GetDataBin(histoNo)->at(i);
+    }
   }
 
   // count the number of bins to be fitted
@@ -904,21 +955,56 @@ cout << endl << "--------------------------------" << endl;
   Double_t theoryValue;
   UInt_t size = runData->GetDataBin(histoNo)->size();
   Double_t factor = 1.0;
-  if (fData.GetValue()->size() * 10 > runData->GetDataBin(histoNo)->size()) {
-    size = fData.GetValue()->size() * 10;
-    factor = (Double_t)runData->GetDataBin(histoNo)->size() / (Double_t)size;
+  UInt_t rebinRRF = 0;
+
+  if (wRRF == 0) { // no RRF
+    // check if a finer binning for the theory is needed
+    if (fData.GetValue()->size() * 10 > runData->GetDataBin(histoNo)->size()) {
+      size = fData.GetValue()->size() * 10;
+      factor = (Double_t)runData->GetDataBin(histoNo)->size() / (Double_t)size;
+    }
+    fData.SetTheoryTimeStart(fData.GetDataTimeStart());
+    fData.SetTheoryTimeStep(fTimeResolution*factor);
+  } else { // RRF
+    rebinRRF = static_cast<UInt_t>((TMath::Pi()/2.0/wRRF)/fTimeResolution); // RRF time resolution / data time resolution
+    fData.SetTheoryTimeStart(fData.GetDataTimeStart());
+    fData.SetTheoryTimeStep(TMath::Pi()/2.0/wRRF/rebinRRF); // = theory time resolution as close as possible to the data time resolution compatible with wRRF
   }
-//cout << endl << ">> runData->GetDataBin(histoNo).size() = " << runData->GetDataBin(histoNo).size() << ",  fData.GetValue()->size() * 10 = " << fData.GetValue()->size() * 10 << ", size = " << size << ", factor = " << factor << endl;
-  fData.SetTheoryTimeStart(fData.GetDataTimeStart());
-  fData.SetTheoryTimeStep(fTimeResolution*factor);
-//cout << endl << ">> size=" << size << ", startTime=" << startTime << ", fTimeResolution=" << fTimeResolution;
+
   for (UInt_t i=0; i<size; i++) {
     time = fData.GetTheoryTimeStart() + (Double_t)i*fData.GetTheoryTimeStep();
     theoryValue = fTheory->Func(time, par, fFuncValues);
+    if (wRRF != 0.0) {
+      theoryValue *= 2.0*TMath::Cos(wRRF * time + phaseRRF);
+    }
     if (fabs(theoryValue) > 10.0) { // dirty hack needs to be fixed!!
       theoryValue = 0.0;
     }
     fData.AppendTheoryValue(theoryValue);
+  }
+
+  // if RRF filter the theory with a FIR Kaiser low pass filter
+  if (wRRF != 0.0) {
+    // rebin theory to the RRF frequency
+    if (rebinRRF != 0) {
+      Double_t dval = 0.0;
+      PDoubleVector theo;
+      for (UInt_t i=0; i<fData.GetTheory()->size(); i++) {
+        if ((i % rebinRRF == 0) && (i != 0)) {
+          theo.push_back(dval/rebinRRF);
+          dval = 0.0;
+        }
+        dval += fData.GetTheory()->at(i);
+      }
+      fData.SetTheoryTimeStart(fData.GetTheoryTimeStart()+static_cast<Double_t>(rebinRRF-1)*fData.GetTheoryTimeStep()/2.0);
+      fData.SetTheoryTimeStep(rebinRRF*fData.GetTheoryTimeStep());
+      fData.ReplaceTheory(theo);
+      theo.clear();
+    }
+
+    // filter data
+    CalculateKaiserFilterCoeff(wRRF, 60.0, 0.2); // w_c = wRRF, A = -20 log_10(delta), Delta w / w_c = (w_s - w_p) / (2 w_c)
+    FilterData();
   }
 
   // clean up

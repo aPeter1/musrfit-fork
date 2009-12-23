@@ -74,6 +74,35 @@ PRunData::~PRunData()
   fTheory.clear();
 }
 
+//--------------------------------------------------------------------------
+// SetTheoryValue
+//--------------------------------------------------------------------------
+/**
+ * <p>Sets a value of the theory vector
+ *
+ * \param i index of the theory vector
+ */
+void PRunData::SetTheoryValue(UInt_t i, Double_t dval)
+{
+  if (i > fTheory.size())
+    fTheory.resize(i+1);
+
+  fTheory[i] = dval;
+}
+
+//--------------------------------------------------------------------------
+// ReplaceTheory
+//--------------------------------------------------------------------------
+/**
+ * <p>Replaces the theory vector.
+ *
+ * \param theo vector which is replacing the current theory vector
+ */
+void PRunData::ReplaceTheory(const PDoubleVector &theo)
+{
+  fTheory = theo;
+}
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implementation PNonMusrRawRunData
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -504,12 +533,6 @@ PMsrRunBlock::PMsrRunBlock()
   fFitRange[0] = PMUSR_UNDEFINED; // undefined start fit range
   fFitRange[1] = PMUSR_UNDEFINED; // undefined end fit range
   fPacking = -1; // undefined packing
-  fRRFFreq = PMUSR_UNDEFINED; // undefined RRF frequency
-  fRRFPacking = -1; // undefined RRF packing
-  fAlpha2ParamNo = -1; // undefined alpha2 parameter number
-  fBeta2ParamNo = -1; // undefined beta2 parameter number
-  fRightHistoNo = -1; // undefined right histogram number
-  fLeftHistoNo = -1; // undefined left histogram number
   fXYDataIndex[0] = -1; // undefined x data index (NonMusr)
   fXYDataIndex[1] = -1; // undefined y data index (NonMusr)
   fXYDataLabel[0] = TString(""); // undefined x data label (NonMusr)
@@ -556,12 +579,6 @@ void PMsrRunBlock::CleanUp()
   fFitRange[0] = PMUSR_UNDEFINED; // undefined start fit range
   fFitRange[1] = PMUSR_UNDEFINED; // undefined end fit range
   fPacking = -1; // undefined packing
-  fRRFFreq = PMUSR_UNDEFINED; // undefined RRF frequency
-  fRRFPacking = -1; // undefined RRF packing
-  fAlpha2ParamNo = -1; // undefined alpha2 parameter number
-  fBeta2ParamNo = -1; // undefined beta2 parameter number
-  fRightHistoNo = -1; // undefined right histogram number
-  fLeftHistoNo = -1; // undefined left histogram number
   fXYDataIndex[0] = -1; // undefined x data index (NonMusr)
   fXYDataIndex[1] = -1; // undefined y data index (NonMusr)
   fXYDataLabel[0] = TString("??"); // undefined x data label (NonMusr)
