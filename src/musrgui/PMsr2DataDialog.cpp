@@ -145,7 +145,8 @@ void PMsr2DataDialog::runFirstEntered(const QString &str)
   if (!fRunListFileName_lineEdit->text().isEmpty())
     fRunListFileName_lineEdit->clear();
 
-  fFirst_lineEdit->setText(str);
+  if (str.length() == 1)
+    fFirst_lineEdit->setText(str);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -161,7 +162,8 @@ void PMsr2DataDialog::runLastEntered(const QString &str)
   if (!fRunListFileName_lineEdit->text().isEmpty())
     fRunListFileName_lineEdit->clear();
 
-  fLast_lineEdit->setText(str);
+  if (str.length() == 1)
+    fLast_lineEdit->setText(str);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -179,7 +181,8 @@ void PMsr2DataDialog::runListEntered(const QString &str)
   if (!fRunListFileName_lineEdit->text().isEmpty())
     fRunListFileName_lineEdit->clear();
 
-  fRunList_lineEdit->setText(str);
+  if (str.length() == 1)
+    fRunList_lineEdit->setText(str);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -197,7 +200,8 @@ void PMsr2DataDialog::runListFileNameEntered(const QString &str)
   if (!fRunList_lineEdit->text().isEmpty())
     fRunList_lineEdit->clear();
 
-  fRunListFileName_lineEdit->setText(str);
+  if (str.length() == 1)
+    fRunListFileName_lineEdit->setText(str);
 }
 
 //----------------------------------------------------------------------------------------------------
