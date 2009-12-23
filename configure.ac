@@ -40,7 +40,7 @@ MUD_MINOR_VERSION=0
 MUD_MICRO_VERSION=0
 
 #release versioning
-PLUGIN_MAJOR_VERSION=0
+PLUGIN_MAJOR_VERSION=1
 PLUGIN_MINOR_VERSION=0
 PLUGIN_MICRO_VERSION=0
 
@@ -179,7 +179,6 @@ if test "${FFTW3_FOUND}" != "1"; then
 fi
 AC_SUBST(FFTW3_LIBS)
 AC_SUBST(FFTW3_CFLAGS)
-
 
 dnl -----------------------------------------------
 dnl Ask user for path to gsl
@@ -332,6 +331,37 @@ AC_ARG_ENABLE([BMWlibs], [AC_HELP_STRING([--enable-BMWlibs],[build optional BMW 
     fi
     AC_SUBST(CUBA_LIBS)
     AC_SUBST(CUBA_CFLAGS)
+
+    # Since it is not clear to me, how to use the AC_SEARCH_LIBS macro correctly, I introduce a primitive file check here...
+    FFTW3_THREADS_LIBS=$(echo ${FFTW3_LIBS} | grep "lfftw3_threads")
+    if test "$FFTW3_THREADS_LIBS" == ""; then
+      if [test -r ${FFTW3_PREFIX}/lib/libfftw3_threads.a || test -r ${FFTW3_PREFIX}/lib/libfftw3_threads.so || \
+          test -r ${FFTW3_PREFIX}/lib/libfftw3_threads.dll.a || test -r ${FFTW3_PREFIX}/lib/libfftw3_threads.dll || \
+          test -r ${FFTW3_PREFIX}/lib/libfftw3_threads.dylib]; then
+        AC_MSG_RESULT([FFTW3 threads library found... OK])
+      elif [test -r /usr/local/lib/libfftw3_threads.a || test -r /usr/local/lib/libfftw3_threads.so || \
+          test -r /usr/local/lib/libfftw3_threads.dll.a || test -r /usr/local/lib/libfftw3_threads.dll || \
+          test -r /usr/local/lib/libfftw3_threads.dylib]; then
+        AC_MSG_RESULT([FFTW3 threads library found... OK])
+      elif [test -r /usr/lib/libfftw3_threads.a || test -r /usr/lib/libfftw3_threads.so || \
+          test -r /usr/lib/libfftw3_threads.dll.a || test -r /usr/lib/libfftw3_threads.dll || \
+          test -r /usr/lib/libfftw3_threads.dylib]; then
+        AC_MSG_RESULT([FFTW3 threads library found... OK])
+      elif [test -r /sw/lib/libfftw3_threads.a || test -r /sw/lib/libfftw3_threads.so || \
+          test -r /sw/lib/libfftw3_threads.dll.a || test -r /sw/lib/libfftw3_threads.dll || \
+          test -r /sw/lib/libfftw3_threads.dylib]; then
+        AC_MSG_RESULT([FFTW3 threads library found... OK])
+      elif [test -r /opt/local/lib/libfftw3_threads.a || test -r /opt/local/lib/libfftw3_threads.so || \
+          test -r /opt/local/lib/libfftw3_threads.dll.a || test -r /opt/local/lib/libfftw3_threads.dll || \
+          test -r /opt/local/lib/libfftw3_threads.dylib]; then
+        AC_MSG_RESULT([FFTW3 threads library found... OK])
+      else
+        AC_MSG_WARN([FFTW3 threads library not found. Please check! The BMWlibs will not run without it at the moment!])
+      fi
+      FFTW3_THREADS_LIBS="${FFTW3_LIBS} -lfftw3_threads -lpthread"
+    fi
+    AC_SUBST(FFTW3_THREADS_LIBS)
+
     BUILD_BMW_LIBS=1
     ],
     [BUILD_BMW_LIBS=0]
