@@ -5,6 +5,12 @@ AC_CANONICAL_HOST
 #AC_MSG_RESULT([${host} ${host_cpu} ${host_vendor} ${host_os}])
 
 dnl -----------------------------------------------
+dnl Check if pkg-config is installed
+dnl -----------------------------------------------
+
+m4_ifdef([PKG_CHECK_MODULES],[],AC_MSG_ERROR([Please install pkg-config before configuring musrfit!]))
+
+dnl -----------------------------------------------
 dnl Package names and version numbers
 dnl -----------------------------------------------
 
@@ -124,17 +130,18 @@ dnl -----------------------------------------------
 AM_INIT_AUTOMAKE(@PACKAGE_NAME@, @PACKAGE_VERSION@)
 AC_CONFIG_HEADER([config.h])
 AC_LANG(C++)
-
-# Checks for programs.
-# AC_PROG_AWK
-AC_PROG_CXX
-AC_PROG_CC
-# AC_PROG_LEX
 AC_PROG_LN_S
-# AC_PROG_YACC
 AC_PROG_INSTALL
-AM_PROG_LIBTOOL
-ROOT_PATH
+
+m4_ifdef([LT_INIT],
+         [LT_INIT([disable-static])
+          LT_LANG([C++])
+          LT_LANG([C])],
+         [m4_defun([_LT_AC_LANG_F77_CONFIG], [:])
+          AM_DISABLE_STATIC
+          AM_PROG_LIBTOOL
+          AC_PROG_CXX
+          AC_PROG_CC])
 
 dnl -----------------------------------------------
 dnl Ask user for path to fftw3
@@ -142,29 +149,33 @@ dnl -----------------------------------------------
 
 FFTW3_FOUND=0
 AC_ARG_WITH([fftw3],
-    [AC_HELP_STRING([--with-fftw3],[prefix of FFTW3 installation. e.g. /usr/local or /usr])],
+    [AC_HELP_STRING([--with-fftw3],[prefix of FFTW3 installation, e.g. /usr/local or /usr])],
     [FFTW3_PREFIX=$with_fftw3
+     AC_MSG_CHECKING([whether FFTW3 can be found at the specified location])
      if !(test -r ${FFTW3_PREFIX}/include/fftw3.h); then
-       AC_MSG_ERROR(FFTW3 cannot be found at the specified path!)
+       AC_MSG_RESULT([no])
+       AC_MSG_ERROR([FFTW3 cannot be found at the specified path!])
      fi
-     AC_MSG_RESULT([using ${FFTW3_PREFIX} as prefix of the FFTW3 installation...])],
+     AC_MSG_RESULT([${FFTW3_PREFIX}])],
     [PKG_CHECK_MODULES(FFTW3, fftw3 >= 3.1.0, [FFTW3_FOUND=1],
-     [if test -r /usr/local/include/fftw3.h; then
+     [AC_MSG_CHECKING([whether FFTW3 is installed in a standard location])
+      if test -r /usr/local/include/fftw3.h; then
         FFTW3_PREFIX="/usr/local"
-        AC_MSG_RESULT([using ${FFTW3_PREFIX} as prefix of the FFTW3 installation... (ignore the negative check result just above)])
+        AC_MSG_RESULT([${FFTW3_PREFIX}])
       elif test -r /usr/include/fftw3.h; then
         FFTW3_PREFIX="/usr"
-        AC_MSG_RESULT([using ${FFTW3_PREFIX} as prefix of the FFTW3 installation... (ignore the negative check result just above)])
+        AC_MSG_RESULT([${FFTW3_PREFIX}])
       elif test -r /sw/include/fftw3.h; then
         FFTW3_PREFIX="/sw"
-        AC_MSG_RESULT([using ${FFTW3_PREFIX} as prefix of the FFTW3 installation... (ignore the negative check result just above)])
+        AC_MSG_RESULT([${FFTW3_PREFIX}])
       elif test -r /opt/local/include/fftw3.h; then
         FFTW3_PREFIX="/opt/local"
-        AC_MSG_RESULT([using ${FFTW3_PREFIX} as prefix of the FFTW3 installation... (ignore the negative check result just above)])
+        AC_MSG_RESULT([${FFTW3_PREFIX}])
       else
+        AC_MSG_RESULT([no])
         AC_MSG_ERROR(
         [FFTW3 not found. Please call configure with the --with-fftw3 option.
-        This tells configure where to find the FFTW3 C libraries and headers.
+        This tells configure where to find the FFTW3 C libraries and headers,
         e.g. --with-fftw3=/usr/local or --with-fftw3=/usr]
         )
       fi
@@ -198,27 +209,31 @@ GSL_FOUND=0
 AC_ARG_WITH([gsl],
     [AC_HELP_STRING([--with-gsl],[prefix of GSL installation. e.g. /usr/local or /usr])],
     [GSL_PREFIX=$with_gsl
+     AC_MSG_CHECKING([whether GSL can be found at the specified location])
      if !(test -r ${GSL_PREFIX}/include/gsl/gsl_sf_hyperg.h); then
-       AC_MSG_ERROR(GSL cannot be found at the specified path!)
+       AC_MSG_RESULT([no])
+       AC_MSG_ERROR([GSL cannot be found at the specified path!])
      fi
-     AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation...])],
+     AC_MSG_RESULT([${GSL_PREFIX}])],
     [PKG_CHECK_MODULES(GSL, gsl >= 1.9, [GSL_FOUND=1],
-     [if test -r /usr/local/include/gsl/gsl_sf_hyperg.h; then
+     [AC_MSG_CHECKING([whether GSL is installed in a standard location])
+      if test -r /usr/local/include/gsl/gsl_sf_hyperg.h; then
         GSL_PREFIX="/usr/local"
-        AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation... (ignore the negative check result just above)])
+        AC_MSG_RESULT([${GSL_PREFIX}])
       elif test -r /usr/include/gsl/gsl_sf_hyperg.h; then
         GSL_PREFIX="/usr"
-        AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation... (ignore the negative check result just above)])
+        AC_MSG_RESULT([${GSL_PREFIX}])
       elif test -r /sw/include/gsl/gsl_sf_hyperg.h; then
         GSL_PREFIX="/sw"
-        AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation... (ignore the negative check result just above)])
+        AC_MSG_RESULT([${GSL_PREFIX}])
       elif test -r /opt/local/include/gsl/gsl_sf_hyperg.h; then
         GSL_PREFIX="/opt/local"
-        AC_MSG_RESULT([using ${GSL_PREFIX} as prefix of the GSL installation... (ignore the negative check result just above)])
+        AC_MSG_RESULT([${GSL_PREFIX}])
       else
+        AC_MSG_RESULT([no])
         AC_MSG_ERROR(
         [GSL not found. Please call configure with the --with-gsl option.
-        This tells configure where to find the GSL C libraries and headers.
+        This tells configure where to find the GSL C libraries and headers,
         e.g. --with-gsl=/usr/local or --with-gsl=/usr]
         )
       fi
@@ -241,29 +256,33 @@ dnl -----------------------------------------------
 
 BOOST_FOUND=0
 AC_ARG_WITH([boostinc],
-    [AC_HELP_STRING([--with-boostinc],[path to the header files of the Boost installation, e.g. /usr/local/include or /usr/include])],
+    [AC_HELP_STRING([--with-boostinc],[path to the header files of the BOOST installation, e.g. /usr/local/include or /usr/include])],
     [BOOST_INCLUDE=$with_boostinc
-     if !(test -r ${BOOST_INCLUDE}/boost/spirit.hpp); then
-       AC_MSG_ERROR(Boost cannot be found at the specified path!)
+     AC_MSG_CHECKING([whether BOOST can be found at the specified location])
+     if !(test -r ${BOOST_INCLUDE}/boost/spirit.hpp) && !(test -r ${BOOST_INCLUDE}/boost/spirit/include/classic_spirit.hpp); then
+       AC_MSG_RESULT([no])
+       AC_MSG_ERROR([BOOST cannot be found at the specified path!])
      fi
-     AC_MSG_RESULT([using ${BOOST_INCLUDE} as include path for the Boost headers...])],
+     AC_MSG_RESULT([${BOOST_INCLUDE}])],
     [PKG_CHECK_MODULES(BOOST, boost >= 1.30, [BOOST_FOUND=1],
-     [if test -r /usr/local/include/boost/spirit.hpp; then
+     [AC_MSG_CHECKING([whether BOOST is installed in a standard location])
+      if test -r /usr/local/include/boost/spirit.hpp || test -r /usr/local/include/boost/spirit/include/classic_spirit.hpp; then
         BOOST_INCLUDE="/usr/local/include"
-        AC_MSG_RESULT([using ${BOOST_INCLUDE} as include path for the Boost headers... (ignore the negative check result just above)])
-      elif test -r /usr/include/boost/spirit.hpp; then
+        AC_MSG_RESULT([${BOOST_INCLUDE}])
+      elif test -r /usr/include/boost/spirit.hpp || test -r /usr/include/boost/spirit/include/classic_spirit.hpp; then
         BOOST_INCLUDE="/usr/include"
-        AC_MSG_RESULT([using ${BOOST_INCLUDE} as include path for the Boost headers... (ignore the negative check result just above)])
-      elif test -r /sw/include/boost/spirit.hpp; then
+        AC_MSG_RESULT([${BOOST_INCLUDE}])
+      elif test -r /sw/include/boost/spirit.hpp || test -r /sw/include/boost/spirit/include/classic_spirit.hpp; then
         BOOST_INCLUDE="/sw/include"
-        AC_MSG_RESULT([using ${BOOST_INCLUDE} as include path for the Boost headers... (ignore the negative check result just above)])
-      elif test -r /opt/local/include/boost/spirit.hpp; then
+        AC_MSG_RESULT([${BOOST_INCLUDE}])
+      elif test -r /opt/local/include/boost/spirit.hpp || test -r /opt/local/include/boost/spirit/include/classic_spirit.hpp; then
         BOOST_INCLUDE="/opt/local/include"
-        AC_MSG_RESULT([using ${BOOST_INCLUDE} as include path for the Boost headers... (ignore the negative check result just above)])
+        AC_MSG_RESULT([${BOOST_INCLUDE}])
       else
+        AC_MSG_RESULT([no])
         AC_MSG_ERROR(
-        [Boost not found. Please call configure with the --with-boostinc option.
-        This tells configure where to find the Boost C++ headers.
+        [BOOST not found. Please call configure with the --with-boostinc option.
+        This tells configure where to find the BOOST C++ headers,
         e.g. --with-boostinc=/usr/local/include or --with-boostinc=/usr/include or --with-boostinc=/usr/include/boost-1_33_0]
         )
       fi
@@ -289,52 +308,51 @@ ROOT_PATH([5.22/00], [], AC_MSG_ERROR([Either ROOT is not installed correctly or
 ROOT_LIBS="-L${ROOTLIBDIR} ${ROOTGLIBS} ${ROOTAUXLIBS} -lMinuit2 -lMathMore -lXMLParser"
 ROOT_CFLAGS="-I${ROOTINCDIR} ${ROOTCFLAGS} ${ROOTAUXCFLAGS}"
 
-## Check for Minuit2-library - not working at the moment, needs some more thoughts
-#SAVED_CXXFLAGS="$CXXFLAGS"
-#CXXFLAGS="$CXXFLAGS -I${ROOTINCDIR}/../include/Minuit2 $ROOT_CFLAGS"
-#SAVED_LIBSS="$LIBS"
-#LIBS="$LIBS $ROOT_LIBS"
-#AC_SEARCH_LIBS([MnMinimize], [Minuit2], [ROOT_LIBS="$ROOT_LIBS -lMinuit2 -lMathMore"],
-#               [AC_MSG_ERROR([Minuit2 library not found... Please check!])], [-lMathMore])
-#CXXFLAGS="$SAVED_CXXFLAGS"
-#LIBS="$SAVED_LIBS"
+# Check if Minuit2 has been enabled during the ROOT configuration
+
+AC_MSG_CHECKING([for Minuit2 in ROOT])
+if [[[ $(${ROOTCONF} --config) == *--enable-minuit2* ]]]; then
+  AC_MSG_RESULT([yes])
+else
+  AC_MSG_RESULT([no])
+  AC_MSG_ERROR([Minuit2 not included in the ROOT installation... Please configure ROOT with the --enable-minuit2 option!])
+fi
 
 AC_SUBST(ROOT_LIBS)
 AC_SUBST(ROOT_CFLAGS)
-
-# It should be checked properly for -lMinuit2 -- at the moment we simply look if a header file is present in the include directory:
-
-AC_CHECK_FILE([${ROOTINCDIR}/../include/Minuit2/MnMinimize.h], AC_MSG_RESULT([Minuit2 headers found... OK]),
-  AC_MSG_WARN([Minuit2 headers not found... Please check!]))
 
 
 dnl -----------------------------------------------
 dnl Ask user if BMWlibs should be built and where to find the CUBA installation
 dnl -----------------------------------------------
 
-AC_ARG_ENABLE([BMWlibs], [AC_HELP_STRING([--enable-BMWlibs],[build optional BMW plug-ins (default: disabled)])],
+AC_ARG_ENABLE([BMWlibs], [AC_HELP_STRING([--enable-BMWlibs],[build optional BMW plug-ins [default=no]])],
     [CUBA_FOUND=0
     AC_ARG_WITH([cuba],
         [AC_HELP_STRING([--with-cuba],[prefix of CUBA installation, e.g. /usr/local or /usr])],
         [CUBA_PREFIX=$with_cuba
+        AC_MSG_CHECKING([whether CUBA can be found at the specified location])
         if !(test -r ${CUBA_PREFIX}/include/cuba.h); then
-          AC_MSG_ERROR(CUBA cannot be found at the specified path!)
+          AC_MSG_RESULT([no])
+          AC_MSG_ERROR([CUBA cannot be found at the specified path!])
         fi
-        AC_MSG_RESULT([using ${CUBA_PREFIX} as prefix of the CUBA installation...])],
+        AC_MSG_RESULT([${CUBA_PREFIX}])],
         [PKG_CHECK_MODULES(CUBA, cuba >= 1.6, [CUBA_FOUND=1],
-          [if test -r /usr/local/include/cuba.h; then
+          [AC_MSG_CHECKING([whether CUBA is installed in a standard location])
+          if test -r /usr/local/include/cuba.h; then
             CUBA_PREFIX="/usr/local"
-            AC_MSG_RESULT([using ${CUBA_PREFIX} as prefix of the CUBA installation... (ignore the negative check result just above)])
+            AC_MSG_RESULT([${CUBA_PREFIX}])
           elif test -r /usr/include/cuba.h; then
             CUBA_PREFIX="/usr"
-            AC_MSG_RESULT([using ${CUBA_PREFIX} as prefix of the CUBA installation... (ignore the negative check result just above)])
+            AC_MSG_RESULT([${CUBA_PREFIX}])
           elif test -r /sw/include/cuba.h; then
             CUBA_PREFIX="/sw"
-            AC_MSG_RESULT([using ${CUBA_PREFIX} as prefix of the CUBA installation... (ignore the negative check result just above)])
+            AC_MSG_RESULT([${CUBA_PREFIX}])
           elif test -r /opt/local/include/cuba.h; then
             CUBA_PREFIX="/opt/local"
-            AC_MSG_RESULT([using ${CUBA_PREFIX} as prefix of the CUBA installation... (ignore the negative check result just above)])
+            AC_MSG_RESULT([${CUBA_PREFIX}])
           else
+            AC_MSG_RESULT([no])
             AC_MSG_ERROR(
             [CUBA not found. Please call configure with the --with-cuba option.
             This tells configure where to find the CUBA C library and header,
@@ -362,7 +380,7 @@ dnl -----------------------------------------------
 dnl Ask user if ASlibs should be built
 dnl -----------------------------------------------
 
-AC_ARG_ENABLE([ASlibs], [AC_HELP_STRING([--enable-ASlibs],[build optional AS plug-ins (default: disabled)])],[BUILD_AS_LIBS=1], [BUILD_AS_LIBS=0])
+AC_ARG_ENABLE([ASlibs], [AC_HELP_STRING([--enable-ASlibs],[build optional AS plug-ins [default=no]])],[BUILD_AS_LIBS=1], [BUILD_AS_LIBS=0])
 
 dnl -----------------------------------------------
 dnl Set some paths and flags for PMusr, TLemRunHeader, Class_MuSR_PSI and mud
@@ -436,23 +454,24 @@ AC_SUBST(LOCAL_LIB_LDFLAGS)
 
 dnl -----------------------------------------------
 dnl Some standard checks for header files and libraries
+dnl Since these checks are not further used at the moment, they are commented
 dnl -----------------------------------------------
 
 # Checks for header files.
-AC_HEADER_STDC
-AC_CHECK_HEADERS([stddef.h stdlib.h string.h sys/time.h unistd.h])
+#AC_HEADER_STDC
+#AC_CHECK_HEADERS([stddef.h stdlib.h string.h sys/time.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
-AC_C_CONST
-AC_C_INLINE
-AC_TYPE_SIZE_T
-AC_HEADER_TIME
+#AC_HEADER_STDBOOL
+#AC_C_CONST
+#AC_C_INLINE
+#AC_TYPE_SIZE_T
+#AC_HEADER_TIME
 
 # Checks for library functions.
-AC_FUNC_MALLOC
-AC_FUNC_STAT
-AC_CHECK_FUNCS([floor gettimeofday memset pow sqrt strstr])
+#AC_FUNC_MALLOC
+#AC_FUNC_STAT
+#AC_CHECK_FUNCS([floor gettimeofday memset pow sqrt strstr])
 
 
 dnl -----------------------------------------------
