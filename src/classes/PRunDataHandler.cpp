@@ -1283,18 +1283,18 @@ Bool_t PRunDataHandler::ReadMudFile()
   MUD_closeRead(fh);
 
 /*
-cout << endl << "fRunName        : " << runData.fRunName.Data();
-cout << endl << "fRunTitle       : " << runData.fRunTitle.Data();
-cout << endl << "fSetup          : " << runData.fSetup.Data();
-cout << endl << "fField          : " << runData.fField;
-cout << endl << "fTemp           : " << runData.fTemp[0].first;
+cout << endl << "fRunName        : " << runData.GetRunName()->Data();
+cout << endl << "fRunTitle       : " << runData.GetRunTitle()->Data();
+cout << endl << "fSetup          : " << runData.GetSetup()->Data();
+cout << endl << "fField          : " << runData.GetField();
+cout << endl << "fTemp           : " << runData.GetTemperature(1);
 cout << endl << "noOfHistos      : " << noOfHistos;
-cout << endl << "fTimeResolution : " << runData.fTimeResolution;
+cout << endl << "fTimeResolution : " << runData.GetTimeResolution();
 for (Int_t i=0; i<noOfHistos; i++) {
   cout << endl << "------";
-  cout << endl << i << " : t0        = " << runData.fT0s[i];
-  cout << endl << i << " : bkg bins  = " << runData.fBkgBin[i].first << "..." << runData.fBkgBin[i].second;
-  cout << endl << i << " : good bins = " << runData.fGoodDataBin[i].first << "..." << runData.fGoodDataBin[i].second;
+  cout << endl << i << " : t0        = " << runData.GetT0(i);
+  cout << endl << i << " : bkg bins  = " << runData.GetBkgBin(i).first << "..." << runData.GetBkgBin(i).second;
+  cout << endl << i << " : good bins = " << runData.GetGoodDataBin(i).first << "..." << runData.GetGoodDataBin(i).second;
 }
 cout << endl;
 */

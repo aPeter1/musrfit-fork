@@ -128,9 +128,11 @@ TBulkTriVortexLondonFieldCalc::TBulkTriVortexLondonFieldCalc(const string& wisdo
   fParam.resize(3);
   fGridExists = false;
 
+#ifdef HAVE_LIBFFTW3_THREADS
   int init_threads(fftw_init_threads());
   if (init_threads)
     fftw_plan_with_nthreads(2);
+#endif /* HAVE_LIBFFTW3_THREADS */
 
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];
@@ -295,9 +297,11 @@ TBulkTriVortexMLFieldCalc::TBulkTriVortexMLFieldCalc(const string& wisdom, const
   fParam.resize(3);
   fGridExists = false;
 
+#ifdef HAVE_LIBFFTW3_THREADS
   int init_threads(fftw_init_threads());
   if (init_threads)
     fftw_plan_with_nthreads(2);
+#endif /* HAVE_LIBFFTW3_THREADS */
 
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];
@@ -465,9 +469,11 @@ TBulkTriVortexAGLFieldCalc::TBulkTriVortexAGLFieldCalc(const string& wisdom, con
   fParam.resize(3);
   fGridExists = false;
 
+#ifdef HAVE_LIBFFTW3_THREADS
   int init_threads(fftw_init_threads());
   if (init_threads)
     fftw_plan_with_nthreads(2);
+#endif /* HAVE_LIBFFTW3_THREADS */
 
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];
@@ -655,9 +661,11 @@ TBulkTriVortexNGLFieldCalc::TBulkTriVortexNGLFieldCalc(const string& wisdom, con
   fParam.resize(3);
   fGridExists = false;
 
+#ifdef HAVE_LIBFFTW3_THREADS
   int init_threads(fftw_init_threads());
   if (init_threads)
     fftw_plan_with_nthreads(2);
+#endif /* HAVE_LIBFFTW3_THREADS */
 
   const unsigned int stepsSq(fSteps*fSteps);
 

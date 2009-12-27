@@ -33,7 +33,7 @@ CLEANFILES = *Dict.cpp *Dict.h *~ core
 lib_LTLIBRARIES = libLFRelaxation.la
 
 libLFRelaxation_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources)
-libLFRelaxation_la_LIBADD = $(PMUSR_LIBS) $(FFTW3_THREADS_LIBS) $(GSL_LIBS) $(ROOT_LIBS) $(CUBA_LIBS)
+libLFRelaxation_la_LIBADD = $(PMUSR_LIBS) $(FFTW3_LIBS) $(GSL_LIBS) $(ROOT_LIBS) $(CUBA_LIBS)
 libLFRelaxation_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(PLUGIN_RELEASE) $(AM_LDFLAGS)
 
 ## For the moment do not build pkgconfig files for musrfit plug-ins...
