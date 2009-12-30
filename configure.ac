@@ -478,6 +478,9 @@ dnl -----------------------------------------------
 dnl Specify the files that are going to be created by configure
 dnl -----------------------------------------------
 
+AM_CONDITIONAL([BMW_OPT], [test "${BUILD_BMW_LIBS}" -eq 1])
+AM_CONDITIONAL([AS_OPT], [test "${BUILD_AS_LIBS}" -eq 1])
+
 AC_CONFIG_FILES([Makefile \
                  src/Makefile \
                  src/classes/Makefile \
@@ -490,18 +493,12 @@ AC_CONFIG_FILES([Makefile \
                  src/external/MuSR_software/Class_MuSR_PSI/Class_MuSR_PSI.pc \
                  src/external/mud/Makefile \
                  src/external/mud/src/Makefile \
-                 src/external/mud/src/mud.pc])
-
-if test "${BUILD_BMW_LIBS}" -eq 1; then
-  AC_CONFIG_FILES([src/external/TFitPofB-lib/Makefile \
+                 src/external/mud/src/mud.pc \
+                 src/external/TFitPofB-lib/Makefile \
                  src/external/TFitPofB-lib/classes/Makefile \
                  src/external/libLFRelaxation/Makefile \
                  src/external/libGapIntegrals/Makefile \
-                 src/external/libCalcMeanFieldsLEM/Makefile])
-fi
-
-if test "${BUILD_AS_LIBS}" -eq 1; then
-  AC_CONFIG_FILES([src/external/Nonlocal/Makefile])
-fi
+                 src/external/libCalcMeanFieldsLEM/Makefile \
+                 src/external/Nonlocal/Makefile])
 
 AC_OUTPUT
