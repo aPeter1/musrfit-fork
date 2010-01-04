@@ -5,7 +5,6 @@ macx:target.path = /Applications
 
 exists( /usr/bin/cygwin1.dll ) {
       QMAKE_LFLAGS_SHAPP = -Wl,--enable-auto-import
-      TARGET = musrgui.exe
 }
 
 INSTALLS += target

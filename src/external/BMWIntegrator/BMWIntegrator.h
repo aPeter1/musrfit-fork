@@ -36,6 +36,7 @@
 #include "Math/GSLMCIntegrator.h"
 #include "TMath.h"
 
+#include <cmath>
 #include <vector>
 
 using namespace std;

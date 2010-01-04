@@ -1,8 +1,8 @@
-if AS_OPT
+if BUILD_ASLIBS
   ASDIRS = Nonlocal
 endif
 
-if BMW_OPT
+if BUILD_BMWLIBS
   BMWDIRS = TFitPofB-lib \
             libLFRelaxation \
             libGapIntegrals \

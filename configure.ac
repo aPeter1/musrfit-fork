@@ -478,8 +478,8 @@ dnl -----------------------------------------------
 dnl Specify the files that are going to be created by configure
 dnl -----------------------------------------------
 
-AM_CONDITIONAL([BMW_OPT], [test "${BUILD_BMW_LIBS}" -eq 1])
-AM_CONDITIONAL([AS_OPT], [test "${BUILD_AS_LIBS}" -eq 1])
+AM_CONDITIONAL([BUILD_BMWLIBS], [test "${BUILD_BMW_LIBS}" -eq 1])
+AM_CONDITIONAL([BUILD_ASLIBS], [test "${BUILD_AS_LIBS}" -eq 1])
 
 AC_CONFIG_FILES([Makefile \
                  src/Makefile \
