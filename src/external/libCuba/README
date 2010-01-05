@@ -1,0 +1,22 @@
+#---------------------------------------------------------------------
+# README
+# Bastian M. Wojek, 2010/01/05
+# $Id:
+#---------------------------------------------------------------------
+
+This directory contains a subset of the code
+- namely the C-routines (of which only a subset is automatically built) -
+included in the Cuba library for multidimensional numerical integration
+written by Thomas Hahn.
+Cuba is an open-source package and free of charge.
+If you want to use Cuba in a commercial application,
+make sure you understand the GNU Lesser General Public License
+under which Cuba is distributed.
+Cuba is being developed at the Max-Planck-Institute for Physics in Munich.
+
+For further information as well as the full package please refer to
+http://www.feynarts.de/cuba
+
+#---------------------------------------------------------------------
+# this is the end ...
+#---------------------------------------------------------------------

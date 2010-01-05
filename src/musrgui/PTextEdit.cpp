@@ -1677,10 +1677,10 @@ void PTextEdit::musrView()
   QString str;
 
   str = fAdmin->getExecPath() + "/musrview";
-  cmd = str + " ";
+  cmd = str + " \"";
 
   str = *fFilenames.find( currentEditor() );
-  cmd += str + " &";
+  cmd += str + "\" &";
 
   system(cmd.latin1());
 }
@@ -1708,10 +1708,10 @@ void PTextEdit::musrT0()
   QString str;
 
   str = fAdmin->getExecPath() + "/musrt0";
-  cmd = str + " ";
+  cmd = str + " \"";
 
   str = *fFilenames.find( currentEditor() );
-  cmd += str + " &";
+  cmd += str + "\" &";
 
   system(cmd.latin1());
 
@@ -1783,13 +1783,13 @@ void PTextEdit::musrSwapMsrMlog()
 
   // swap files
   QString cmd;
-  cmd = QString("cp ") + currentFileName + QString(" ") + tempFileName;
+  cmd = QString("cp \"") + currentFileName + QString("\" \"") + tempFileName + QString("\"");
   system(cmd.latin1());
-  cmd = QString("cp ") + swapFileName + QString(" ") + currentFileName;
+  cmd = QString("cp \"") + swapFileName + QString("\" \"") + currentFileName + QString("\"");
   system(cmd.latin1());
-  cmd = QString("cp ") + tempFileName + QString(" ") + swapFileName;
+  cmd = QString("cp \"") + tempFileName + QString("\" \"") + swapFileName + QString("\"");
   system(cmd.latin1());
-  cmd = QString("rm ") + tempFileName;
+  cmd = QString("rm \"") + tempFileName + QString("\"");
   system(cmd.latin1());
 
   int currentIdx = fTabWidget->currentPageIndex();

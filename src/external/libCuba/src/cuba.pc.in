@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: mud
+Description: C shared library providing the cuba numerical integration routines
+Version: @CUBA_VERSION@
+Libs: -L${libdir} -l@CUBA_LIBRARY_NAME@
+Cflags: -I${includedir}

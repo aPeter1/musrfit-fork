@@ -2,6 +2,10 @@ if BUILD_ASLIBS
   ASDIRS = Nonlocal
 endif
 
+if BUILD_CUBALIB
+  CUBADIRS = libCuba
+endif
+
 if BUILD_BMWLIBS
   BMWDIRS = TFitPofB-lib \
             libLFRelaxation \
@@ -9,4 +13,4 @@ if BUILD_BMWLIBS
             libCalcMeanFieldsLEM 
 endif
 
-SUBDIRS = $(ASDIRS) $(BMWDIRS)
+SUBDIRS = $(ASDIRS) $(CUBADIRS) $(BMWDIRS)

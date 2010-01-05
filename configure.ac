@@ -50,6 +50,11 @@ PLUGIN_MAJOR_VERSION=1
 PLUGIN_MINOR_VERSION=0
 PLUGIN_MICRO_VERSION=0
 
+#release versioning
+CUBA_MAJOR_VERSION=1
+CUBA_MINOR_VERSION=6
+CUBA_MICRO_VERSION=0
+
 #API version
 MUSR_API_VERSION=MUSR_MAJOR_VERSION.MUSR_MINOR_VERSION
 AC_SUBST(MUSR_API_VERSION)
@@ -66,7 +71,11 @@ AC_SUBST(MUD_API_VERSION)
 PLUGIN_API_VERSION=PLUGIN_MAJOR_VERSION.PLUGIN_MINOR_VERSION
 AC_SUBST(PLUGIN_API_VERSION)
 
+CUBA_API_VERSION=CUBA_MAJOR_VERSION.CUBA_MINOR_VERSION
+AC_SUBST(CUBA_API_VERSION)
+
 #shared library versioning
+CUBA_LIBRARY_VERSION=1:6:0
 PLUGIN_LIBRARY_VERSION=1:0:0
 LEM_LIBRARY_VERSION=1:5:0
 PSIBIN_LIBRARY_VERSION=0:0:0
@@ -89,6 +98,7 @@ AC_SUBST(LEM_LIBRARY_VERSION)
 AC_SUBST(PSIBIN_LIBRARY_VERSION)
 AC_SUBST(MUD_LIBRARY_VERSION)
 AC_SUBST(PLUGIN_LIBRARY_VERSION)
+AC_SUBST(CUBA_LIBRARY_VERSION)
 
 PACKAGE=$MUSR_PROGRAM_NAME
 AC_SUBST(MUSR_LIBRARY_NAME)
@@ -121,7 +131,14 @@ PLUGIN_RELEASE=$PLUGIN_MAJOR_VERSION.$PLUGIN_MINOR_VERSION
 AC_SUBST(PLUGIN_RELEASE)
 AC_SUBST(PLUGIN_VERSION)
 
+CUBA_VERSION=$CUBA_MAJOR_VERSION.$CUBA_MINOR_VERSION.$CUBA_MICRO_VERSION
+CUBA_RELEASE=$CUBA_MAJOR_VERSION.$CUBA_MINOR_VERSION
+AC_SUBST(CUBA_RELEASE)
+AC_SUBST(CUBA_VERSION)
+
 VERSION=$MUSR_VERSION
+
+USER_CFLAGS="$CFLAGS"
 
 dnl -----------------------------------------------
 dnl Automake initialization and program checks
@@ -328,6 +345,7 @@ dnl -----------------------------------------------
 
 AC_ARG_ENABLE([BMWlibs], [AC_HELP_STRING([--enable-BMWlibs],[build optional BMW plug-ins [default=no]])],
     [CUBA_FOUND=0
+    BUILD_CUBA=0
     AC_ARG_WITH([cuba],
         [AC_HELP_STRING([--with-cuba],[prefix of CUBA installation, e.g. /usr/local or /usr])],
         [CUBA_PREFIX=$with_cuba
@@ -352,22 +370,66 @@ AC_ARG_ENABLE([BMWlibs], [AC_HELP_STRING([--enable-BMWlibs],[build optional BMW 
             CUBA_PREFIX="/opt/local"
             AC_MSG_RESULT([${CUBA_PREFIX}])
           else
-            AC_MSG_RESULT([no])
-            AC_MSG_ERROR(
-            [CUBA not found. Please call configure with the --with-cuba option.
-            This tells configure where to find the CUBA C library and header,
-            e.g. --with-cuba=/usr/local or --with-cuba=/usr]
-            )
+            BUILD_CUBA=1
+            AC_MSG_RESULT([builtin-cuba])
           fi
         ]
       )
       ]
     )
-    AC_SUBST(CUBA_PREFIX)
-    if test "${CUBA_FOUND}" != "1"; then
-      CUBA_LIBS="-L${CUBA_PREFIX}/lib -lcuba -lm"
-      CUBA_CFLAGS="-I${CUBA_PREFIX}/include"
+
+    if test "${BUILD_CUBA}" -eq 1; then
+      if test "x$GCC" = "xyes" ; then
+        CUBA_BUILD_CFLAGS=${USER_CFLAGS:--O3 -fomit-frame-pointer -ffast-math}
+      else
+        CUBA_BUILD_CFLAGS=${USER_CFLAGS:--O}
+      fi
+
+      AC_C_CONST
+      AC_C_INLINE
+      AC_C_LONG_DOUBLE
+
+      AC_CHECK_FUNCS([powl])
+      AC_CHECK_FUNCS([erf])
+
+      MAXDIM=${MAXDIM:-16}
+      AC_ARG_WITH(maxdim,
+        [AS_HELP_STRING([--with-maxdim=N],
+        [[Cuba option] the maximum dimension for integration,
+          if variable-size array are not supported])],
+        [MAXDIM=$withval])
+
+      MAXCOMP=${MAXCOMP:-4}
+      AC_ARG_WITH(maxcomp,
+        [AS_HELP_STRING([--with-maxcomp=N],
+        [[Cuba option] the maximum number of components of the integrand,
+          if variable-size array are not supported])],
+        [MAXCOMP=$withval])
+
+      AC_MSG_CHECKING([for variable-size arrays])
+      AC_COMPILE_IFELSE([AC_LANG_SOURCE(,[[
+        void test(int n)
+        {
+          char s[n];
+        }
+      ]])],
+      [AC_MSG_RESULT([yes])],
+      [AC_MSG_RESULT([no, using MAXDIM=$MAXDIM and MAXCOMP=$MAXCOMP])
+       AC_DEFINE_UNQUOTED([NDIM], [$MAXDIM], [Maximum number of components])
+       AC_DEFINE_UNQUOTED([NCOMP], [$MAXCOMP], [Maximum number of dimensions])]
+      )
+
+      CUBA_SRCDIR="$(pwd)/src/external/libCuba/src"
+      CUBA_LIBS="${CUBA_SRCDIR}/libcuba.la"
+      CUBA_CFLAGS="-I${CUBA_SRCDIR}"
+    else
+      if test "${CUBA_FOUND}" != "1"; then
+        CUBA_LIBS="-L${CUBA_PREFIX}/lib -lcuba -lm"
+        CUBA_CFLAGS="-I${CUBA_PREFIX}/include"
+      fi
     fi
+
+    AC_SUBST(CUBA_PREFIX)
     AC_SUBST(CUBA_LIBS)
     AC_SUBST(CUBA_CFLAGS)
 
@@ -427,6 +489,7 @@ LOCAL_BIN_CXXFLAGS="-Wall -Wno-trigraphs"
 LOCAL_LIB_CXXFLAGS="${LOCAL_BIN_CXXFLAGS}"
 LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS}"
 LOCAL_MUD_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS}"
+LOCAL_CUBA_LIB_CFLAGS="${LOCAL_LIB_CXXFLAGS} ${CUBA_BUILD_CFLAGS}"
 LOCAL_BIN_LDFLAGS=
 LOCAL_LIB_LDFLAGS=
 
@@ -436,6 +499,7 @@ case "$host" in
     LOCAL_LIB_CXXFLAGS="${LOCAL_BIN_CXXFLAGS} -D_DLL"
     LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS} -D_WIN32GCC"
     LOCAL_MUD_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS}"
+    LOCAL_CUBA_LIB_CFLAGS="${LOCAL_LIB_CXXFLAGS} ${CUBA_BUILD_CFLAGS}"
     LOCAL_BIN_LDFLAGS="${LOCAL_BIN_LDFLAGS} -Wl,--enable-auto-import -Wl,--enable-runtime-pseudo-reloc"
     LOCAL_LIB_LDFLAGS="-no-undefined ${LOCAL_BIN_LDFLAGS} -Wl,--export-all-symbols"
     ;;
@@ -448,6 +512,7 @@ AC_SUBST(LOCAL_BIN_CXXFLAGS)
 AC_SUBST(LOCAL_LIB_CXXFLAGS)
 AC_SUBST(LOCAL_PSIBIN_LIB_CXXFLAGS)
 AC_SUBST(LOCAL_MUD_LIB_CXXFLAGS)
+AC_SUBST(LOCAL_CUBA_LIB_CFLAGS)
 AC_SUBST(LOCAL_BIN_LDFLAGS)
 AC_SUBST(LOCAL_LIB_LDFLAGS)
 
@@ -478,6 +543,7 @@ dnl -----------------------------------------------
 dnl Specify the files that are going to be created by configure
 dnl -----------------------------------------------
 
+AM_CONDITIONAL([BUILD_CUBALIB], [test "${BUILD_CUBA}" -eq 1])
 AM_CONDITIONAL([BUILD_BMWLIBS], [test "${BUILD_BMW_LIBS}" -eq 1])
 AM_CONDITIONAL([BUILD_ASLIBS], [test "${BUILD_AS_LIBS}" -eq 1])
 
@@ -494,6 +560,9 @@ AC_CONFIG_FILES([Makefile \
                  src/external/mud/Makefile \
                  src/external/mud/src/Makefile \
                  src/external/mud/src/mud.pc \
+                 src/external/libCuba/Makefile \
+                 src/external/libCuba/src/Makefile \
+                 src/external/libCuba/src/cuba.pc \
                  src/external/TFitPofB-lib/Makefile \
                  src/external/TFitPofB-lib/classes/Makefile \
                  src/external/libLFRelaxation/Makefile \
