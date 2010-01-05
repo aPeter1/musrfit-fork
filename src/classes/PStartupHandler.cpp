@@ -74,9 +74,9 @@ PStartupHandler::PStartupHandler()
       strncpy(musrpath, pmusrpath, sizeof(musrpath));
     }
     sprintf(startup_path_name, "%s/musrfit_startup.xml", musrpath);
+    fStartupFilePath = TString(startup_path_name);
     if (StartupFileExists(startup_path_name)) {
       fStartupFileFound = true;
-      fStartupFilePath = TString(startup_path_name);
     }
   }
 }

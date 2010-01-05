@@ -145,24 +145,38 @@ int main(int argc, char *argv[])
   char startup_path_name[128];
   TSAXParser *saxParser = new TSAXParser();
   PStartupHandler *startupHandler = new PStartupHandler();
-  saxParser->ConnectToHandler("PStartupHandler", startupHandler);
-  strcpy(startup_path_name, startupHandler->GetStartupFilePath().Data());
-  status = saxParser->ParseFile(startup_path_name);
-  // check for parse errors
-  if (status) { // error
-    cout << endl << "**WARNING** reading/parsing musrfit_startup.xml failed.";
-    cout << endl;
+  if (!startupHandler->StartupFileFound()) {
+    cerr << endl << "**WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
+    cerr << endl;
     // clean up
-    if (startupHandler) {
-      delete startupHandler;
-      startupHandler = 0;
-    }
     if (saxParser) {
       delete saxParser;
       saxParser = 0;
     }
+    if (startupHandler) {
+      delete startupHandler;
+      startupHandler = 0;
+    }
+  } else {
+    strcpy(startup_path_name, startupHandler->GetStartupFilePath().Data());
+    saxParser->ConnectToHandler("PStartupHandler", startupHandler);
+    status = saxParser->ParseFile(startup_path_name);
+    // check for parse errors
+    if (status) { // error
+      cerr << endl << "**WARNING** reading/parsing musrfit_startup.xml.";
+      cerr << endl;
+      // clean up
+      if (saxParser) {
+        delete saxParser;
+        saxParser = 0;
+      }
+      if (startupHandler) {
+        delete startupHandler;
+        startupHandler = 0;
+      }
+    }
+    startupHandler->CheckLists();
   }
-  startupHandler->CheckLists();
 
   // read msr-file
   PMsrHandler *msrHandler = new PMsrHandler(fileName);
