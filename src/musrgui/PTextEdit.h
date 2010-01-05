@@ -117,6 +117,7 @@ private slots:
   void replaceAndClose();
   void replaceAll();
 
+  void applyFontSettings(QWidget*);
   void checkIfModified(QWidget*);
 
 private:
@@ -134,6 +135,7 @@ private:
 
   QComboBox *fComboFont;
   QComboBox *fComboSize;
+  bool fFontChanging; ///< flag needed to prevent some textChanged feature to occure when only the font changed
 
   QTabWidget *fTabWidget;
   QMap<PSubTextEdit*, QString> fFilenames;

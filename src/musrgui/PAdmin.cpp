@@ -69,7 +69,11 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
                                        const QString& qName,
                                        const QXmlAttributes& )
 {
-  if (qName == "exec_path") {
+  if (qName == "font_name") {
+    fKeyWord = eFontName;
+  } else if (qName == "font_size") {
+    fKeyWord = eFontSize;
+  } else if (qName == "exec_path") {
     fKeyWord = eExecPath;
   } else if (qName == "default_save_path") {
     fKeyWord = eDefaultSavePath;
@@ -141,9 +145,18 @@ bool PAdminXMLParser::endElement( const QString&, const QString&, const QString 
 bool PAdminXMLParser::characters(const QString& str)
 {
   QString help;
-  bool flag;
+  bool flag, ok;
+  int  ival;
 
   switch (fKeyWord) {
+    case eFontName:
+      fAdmin->setFontName(QString(str.ascii()).stripWhiteSpace());
+      break;
+    case eFontSize:
+      ival = QString(str.ascii()).stripWhiteSpace().toInt(&ok);
+      if (ok)
+        fAdmin->setFontSize(ival);
+      break;
     case eExecPath:
       fAdmin->setExecPath(QString(str.ascii()).stripWhiteSpace());
       break;
@@ -301,6 +314,9 @@ QString PAdminXMLParser::expandPath(const QString &str)
  */
 PAdmin::PAdmin()
 {
+  fFontName = QString("Courier"); // default font
+  fFontSize = 11; // default font size
+
   fExecPath = QString("");
   fDefaultSavePath = QString("");
   fMsrDefaultFilePath = QString("");

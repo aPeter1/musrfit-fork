@@ -11,6 +11,10 @@
     <title_from_data_file>n</title_from_data_file>
     <enable_musrt0>n</enable_musrt0>
   </general>
+  <font_settings>
+    <font_name>Courier</font_name>
+    <font_size>12</font_size>
+  </font_settings>
   <msr_file_defaults>
     <beamline>mue4</beamline>
     <institute>psi</institute>

@@ -129,8 +129,8 @@ PTextEdit::PTextEdit( QWidget *parent, const char *name )
   fTabWidget = new QTabWidget( this );
   setCentralWidget( fTabWidget );
 
-  textFamily("Courier");
-  textSize("11"); // 11pt
+  textFamily(fAdmin->getFontName());
+  textSize(QString("%1").arg(fAdmin->getFontSize()));
 
   QImage img(musrfit_xpm);
   QPixmap image0 = img;
@@ -144,6 +144,7 @@ PTextEdit::PTextEdit( QWidget *parent, const char *name )
   }
 
   connect( fTabWidget, SIGNAL( currentChanged(QWidget*) ), this, SLOT( checkIfModified(QWidget*) ));
+  connect( fTabWidget, SIGNAL( currentChanged(QWidget*) ), this, SLOT( applyFontSettings(QWidget*) ));
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -308,7 +309,7 @@ void PTextEdit::setupTextActions()
   fComboFont->insertStringList( db.families() );
   connect( fComboFont, SIGNAL( activated( const QString & ) ),
            this, SLOT( textFamily( const QString & ) ) );
-  fComboFont->lineEdit()->setText( "Courier" );
+  fComboFont->lineEdit()->setText( fAdmin->getFontName() );
 
   fComboSize = new QComboBox( TRUE, tb );
   QValueList<int> sizes = db.standardSizes();
@@ -317,7 +318,7 @@ void PTextEdit::setupTextActions()
     fComboSize->insertItem( QString::number( *it ) );
   connect( fComboSize, SIGNAL( activated( const QString & ) ),
            this, SLOT( textSize( const QString & ) ) );
-  fComboSize->lineEdit()->setText( "11" ); // 11pt font size
+  fComboSize->lineEdit()->setText( QString("%1").arg(fAdmin->getFontSize()) );
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -422,9 +423,9 @@ void PTextEdit::load( const QString &f, const int index )
   PSubTextEdit *edit = new PSubTextEdit( fAdmin );
   edit->setLastModified(info.lastModified());
   edit->setTextFormat( PlainText );
-  edit->setFamily("Courier");
-  edit->setPointSize(11); // 11pt
-  edit->setFont(QFont("Courier", 11));
+  edit->setFamily(fAdmin->getFontName());
+  edit->setPointSize(fAdmin->getFontSize());
+  edit->setFont(QFont(fAdmin->getFontName(), fAdmin->getFontSize()));
 
   if (index == -1)
     fTabWidget->addTab( edit, QFileInfo( f ).fileName() );
@@ -513,8 +514,8 @@ void PTextEdit::fileNew()
 {
   PSubTextEdit *edit = new PSubTextEdit( fAdmin );
   edit->setTextFormat( PlainText );
-  edit->setFamily("Courier");
-  edit->setPointSize(11); // 11pt
+  edit->setFamily(fAdmin->getFontName());
+  edit->setPointSize(fAdmin->getFontSize());
   doConnections( edit );
   fTabWidget->addTab( edit, tr( "noname" ) );
   fTabWidget->showPage( edit );
@@ -1093,8 +1094,11 @@ void PTextEdit::editComment()
  */
 void PTextEdit::textFamily( const QString &f )
 {
+  fAdmin->setFontName(f);
+
   if ( !currentEditor() )
     return;
+
   currentEditor()->setFamily( f );
   currentEditor()->viewport()->setFocus();
 }
@@ -1105,9 +1109,12 @@ void PTextEdit::textFamily( const QString &f )
  */
 void PTextEdit::textSize( const QString &p )
 {
+  fAdmin->setFontSize(p.toInt());
+
   if ( !currentEditor() )
     return;
-  currentEditor()->setPointSize( p.toInt() );
+
+  currentEditor()->setPointSize(p.toInt());
   currentEditor()->viewport()->setFocus();
 }
 
@@ -1843,13 +1850,17 @@ void PTextEdit::helpAboutQt()
  */
 void PTextEdit::fontChanged( const QFont &f )
 {
+  fFontChanging = true;
   currentEditor()->selectAll();
   fComboFont->lineEdit()->setText( f.family() );
   fComboSize->lineEdit()->setText( QString::number( f.pointSize() ) );
   currentEditor()->setFamily( f.family() );
+  currentEditor()->setModified(false);
   currentEditor()->setPointSize( f.pointSize() );
+  currentEditor()->setModified(false);
   currentEditor()->viewport()->setFocus();
   currentEditor()->selectAll(false);
+  fFontChanging = false;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1859,6 +1870,9 @@ void PTextEdit::fontChanged( const QFont &f )
 void PTextEdit::textChanged(const bool forced)
 {
   if (!currentEditor())
+    return;
+
+  if (fFontChanging)
     return;
 
   QString tabLabel = fTabWidget->label(fTabWidget->currentPageIndex());
@@ -1941,6 +1955,16 @@ void PTextEdit::replaceAll()
   emit close();
 
   currentEditor()->setCursorPosition(currentPara, currentIndex);
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PTextEdit::applyFontSettings(QWidget*)
+{
+  QFont font(fAdmin->getFontName(), fAdmin->getFontSize());
+  fontChanged(font);
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -57,7 +57,7 @@ class PAdminXMLParser : public QXmlDefaultHandler
     virtual ~PAdminXMLParser() {}
 
   private:
-    enum EAdminKeyWords {eEmpty, eExecPath, eDefaultSavePath, eTitleFromDataFile, eEnableMusrT0,
+    enum EAdminKeyWords {eEmpty, eFontName, eFontSize, eExecPath, eDefaultSavePath, eTitleFromDataFile, eEnableMusrT0,
                          eBeamline, eInstitute, eFileFormat, eLifetimeCorrection, eMsrDefaultFilePath,
                          eHelpMain, eTheoFuncPixmapPath, eFunc, eFuncName, eFuncComment, eFuncLabel,
                          eFuncPixmap, eFuncParams};
@@ -85,6 +85,8 @@ class PAdmin
     PAdmin();
     virtual ~PAdmin() {}
 
+    QString getFontName() { return fFontName; }
+    int     getFontSize() { return fFontSize; }
     QString getExecPath() { return fExecPath; }
     QString getDefaultSavePath() { return fDefaultSavePath; }
     bool    getTitleFromDataFileFlag() { return fTitleFromDataFile; }
@@ -98,6 +100,9 @@ class PAdmin
     QString getTheoFuncPixmapPath() { return fTheoFuncPixmapPath; }
     unsigned int getTheoryCounts() { return fTheory.size(); }
     PTheory* getTheoryItem(const unsigned int idx);
+
+    void setFontName(const QString str) { fFontName = str; }
+    void setFontSize(const int ival) { fFontSize = ival; }
 
   protected:
     void setExecPath(const QString str) { fExecPath = str; }
@@ -115,6 +120,9 @@ class PAdmin
 
   private:
     friend class PAdminXMLParser;
+
+    QString fFontName;
+    int fFontSize;
 
     QString fExecPath;
     QString fDefaultSavePath;
