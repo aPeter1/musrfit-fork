@@ -1002,9 +1002,9 @@ cout << endl << "--------------------------------" << endl;
       theo.clear();
     }
 
-    // filter data
+    // filter theory
     CalculateKaiserFilterCoeff(wRRF, 60.0, 0.2); // w_c = wRRF, A = -20 log_10(delta), Delta w / w_c = (w_s - w_p) / (2 w_c)
-    FilterData();
+    FilterTheo();
   }
 
   // clean up

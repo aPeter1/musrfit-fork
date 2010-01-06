@@ -2673,7 +2673,8 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           tokens = 0;
         }
       } else if (iter1->fLine.Contains("rrf_phase", TString::kIgnoreCase)) {
-        // expected entry: rrf_phase value. value given in units of degree
+        // expected entry: rrf_phase value. value given in units of degree. or
+        //                 rrf_phase parX. where X is the parameter number, e.g. par3
         tokens = iter1->fLine.Tokenize(" \t");
         if (!tokens) {
           cerr << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize rrf_phase in line " << iter1->fLineNo;
@@ -2689,7 +2690,19 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           if (str.IsFloat()) {
             param.fRRFPhase = str.Atof();
           } else {
-            error = true;
+            if (str.BeginsWith("par", TString::kIgnoreCase)) { // parameter value
+              Int_t no = 0;
+              if (FilterNumber(str, "par", 0, no)) {
+                // check that the parameter is in range
+                if ((Int_t)fParam.size() < no) {
+                  error = true;
+                } else {
+                  param.fRRFPhase = fParam[no-1].fValue;
+                }
+              }
+            } else {
+              error = true;
+            }
           }
         }
         // clean up

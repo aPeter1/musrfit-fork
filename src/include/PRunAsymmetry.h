@@ -51,6 +51,7 @@ class PRunAsymmetry : public PRunBase
     virtual Bool_t PrepareData();
     virtual Bool_t PrepareFitData(PRawRunData* runData, UInt_t histoNo[2]);
     virtual Bool_t PrepareViewData(PRawRunData* runData, UInt_t histoNo[2]);
+    virtual Bool_t PrepareRRFViewData(PRawRunData* runData, UInt_t histoNo[2]);
 
   private:
     UInt_t fAlphaBetaTag; ///< 1-> alpha = beta = 1; 2-> alpha != 1, beta = 1; 3-> alpha = 1, beta != 1; 4-> alpha != 1, beta != 1

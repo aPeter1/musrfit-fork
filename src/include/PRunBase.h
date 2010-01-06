@@ -87,7 +87,7 @@ class PRunBase
     virtual Bool_t PrepareData() = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
 
     virtual void CalculateKaiserFilterCoeff(Double_t wc, Double_t A, Double_t dw);
-    virtual void FilterData();
+    virtual void FilterTheo();
 };
 
 #endif // _PRUNBASE_H_

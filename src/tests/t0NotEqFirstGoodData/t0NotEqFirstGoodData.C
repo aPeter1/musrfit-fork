@@ -44,19 +44,24 @@ void t0NotEqFirstGoodData()
   decayAnaModule = histosFolder->AddFolder("DecayAnaModule", "muSR decay histograms");
 
   // feed run info header
+  UInt_t runNo = 10113;
+  TString tstr;
   runInfo = gROOT->GetRootFolder()->AddFolder("RunInfo", "LEM RunInfo");  
   gROOT->GetListOfBrowsables()->Add(runInfo, "RunInfo");
   header = new TLemRunHeader();
-  header->SetRunTitle("010101 - test");
+  tstr  = TString("0");
+  tstr += runNo;
+  tstr += TString(" - test");
+  header->SetRunTitle(tstr.Data());
   header->SetLemSetup("trivial");
-  header->SetRunNumber(10101);
+  header->SetRunNumber(runNo);
   header->SetStartTime(0);
   header->SetStopTime(1);
   header->SetModeratorHV(32.0, 0.01);
   header->SetSampleHV(0.0, 0.01);
   header->SetImpEnergy(31.8);
   header->SetSampleTemperature(0.2, 0.001);
-  header->SetSampleBField(30000, 0.1);
+  header->SetSampleBField(-1.0, 0.1);
   header->SetTimeResolution(0.1953125);
   header->SetNChannels(66601);
   header->SetNHist(4);
@@ -68,20 +73,19 @@ void t0NotEqFirstGoodData()
 
   // create histos
   UInt_t t0[4] = {3419, 3419, 3419, 3419};
-  UInt_t n0[4] = {2000.0, 2005.0, 2003.0, 1998.0};
+  UInt_t n0[4] = {200.0, 205.0, 203.0, 198.0};
   UInt_t bkg[4] = {11.0, 11.0, 5.0, 8.0};
   const Double_t tau = 2197.019; // ns
   // asymmetry related stuff
   const Double_t timeResolution = 0.1953125; // ns
-  Double_t a0[4] = {0.16, 0.16, 0.16, 0.16};
+  Double_t a0[4] = {0.26, 0.26, 0.26, 0.26};
   Double_t a1[4] = {0.0, 0.0, 0.0, 0.0};
   Double_t phase[4] = {0.0*TMath::Pi()/180.0, 90.0*TMath::Pi()/180.0, 180.0*TMath::Pi()/180.0, 270.0*TMath::Pi()/180.0};
   const Double_t gamma = 0.00001355; // gamma/(2pi)
   Double_t bb0 = 15000.0; // field in Gauss
-  Double_t bb1 = 15702.0; // field in Gauss
-//  Double_t bb = 100.0; // field in Gauss
+  Double_t bb1 = 400.0; // field in Gauss
   Double_t sigma0 = 0.05/1000.0; // Gaussian sigma in 1/ns
-  Double_t sigma1 = 0.10/1000.0; // Gaussian sigma in 1/ns
+  Double_t sigma1 = 0.005/1000.0; // Gaussian sigma in 1/ns
 
   TH1F *histo[8];
   char str[128];
@@ -99,7 +103,7 @@ void t0NotEqFirstGoodData()
         histo[i]->SetBinContent(j, bkg[i]);
       } else {
         time = (Double_t)(j-t0[i])*timeResolution;
-        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a0[i]*TMath::Exp(-0.5*TMath::Power(time*sigma0,2.0))*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i])
+        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a0[i]*TMath::Exp(-0.5*TMath::Power(time*sigma0,1.2))*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i])
                                                          +a1[i]*TMath::Exp(-0.5*TMath::Power(time*sigma1,2.0))*TMath::Cos(TMath::TwoPi()*gamma*bb1*time+phase[i]))+(Double_t)bkg[i];
         histo[i]->SetBinContent(j, (UInt_t)dval);
       }
@@ -107,6 +111,7 @@ void t0NotEqFirstGoodData()
   }
 
   // add a promp peak
+/*
   Double_t ampl = 500.0;
   Double_t promptLambda = 500.0/1000.0; // Lorentzain in 1/ns
   for (UInt_t i=0; i<4; i++) {
@@ -118,6 +123,7 @@ void t0NotEqFirstGoodData()
       histo[i+4]->SetBinContent(j, (UInt_t)dval);
     }
   }
+*/
 
   // add Poisson noise
   PAddPoissonNoise *addNoise = new PAddPoissonNoise();
@@ -138,7 +144,10 @@ void t0NotEqFirstGoodData()
     decayAnaModule->Add(histo[i]);
 
   // write file
-  TFile *fout = new TFile("010108.root", "RECREATE", "Midas Fake Histograms");
+  tstr  = TString("0");
+  tstr += runNo;
+  tstr += TString(".root");
+  TFile *fout = new TFile(tstr.Data(), "RECREATE", "Midas Fake Histograms");
   if (fout == 0) {
     cout << endl << "**ERROR** Couldn't create ROOT file";
     cout << endl << endl;

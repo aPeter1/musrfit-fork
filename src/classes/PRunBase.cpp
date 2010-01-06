@@ -200,12 +200,12 @@ cout << endl;
 }
 
 //--------------------------------------------------------------------------
-// FilterData (protected)
+// FilterTheo (protected)
 //--------------------------------------------------------------------------
 /**
- * <p> Filters the data with a Kaiser FIR filter.
+ * <p> Filters the theory with a Kaiser FIR filter.
  */
-void PRunBase::FilterData()
+void PRunBase::FilterTheo()
 {
   PDoubleVector theoFiltered;
   Double_t dval = 0.0;
