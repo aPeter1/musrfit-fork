@@ -146,7 +146,7 @@ dnl -----------------------------------------------
 
 AM_INIT_AUTOMAKE(@PACKAGE_NAME@, @PACKAGE_VERSION@)
 AC_CONFIG_HEADER([config.h])
-AC_LANG(C++)
+AC_LANG([C++])
 AC_PROG_LN_S
 AC_PROG_INSTALL
 
@@ -378,12 +378,14 @@ AC_ARG_ENABLE([BMWlibs], [AC_HELP_STRING([--enable-BMWlibs],[build optional BMW 
       ]
     )
 
-    if test "${BUILD_CUBA}" -eq 1; then
+    if test "${BUILD_CUBA}" = "1"; then
       if test "x$GCC" = "xyes" ; then
         CUBA_BUILD_CFLAGS=${USER_CFLAGS:--O3 -fomit-frame-pointer -ffast-math}
       else
         CUBA_BUILD_CFLAGS=${USER_CFLAGS:--O}
       fi
+
+      AC_LANG_PUSH([C])
 
       AC_C_CONST
       AC_C_INLINE
@@ -418,6 +420,8 @@ AC_ARG_ENABLE([BMWlibs], [AC_HELP_STRING([--enable-BMWlibs],[build optional BMW 
        AC_DEFINE_UNQUOTED([NDIM], [$MAXDIM], [Maximum number of components])
        AC_DEFINE_UNQUOTED([NCOMP], [$MAXCOMP], [Maximum number of dimensions])]
       )
+
+      AC_LANG_POP([C])
 
       CUBA_SRCDIR="$(pwd)/src/external/libCuba/src"
       CUBA_LIBS="${CUBA_SRCDIR}/libcuba.la"
@@ -473,7 +477,7 @@ PMUSR_CFLAGS="-I${SRCDIR}/include"
 AC_SUBST(PMUSR_LIBS)
 AC_SUBST(PMUSR_CFLAGS)
 
-if test "${BUILD_BMW_LIBS}" -eq 1; then
+if test "${BUILD_BMW_LIBS}" = "1"; then
   TFITPOFB_SRCDIR="${SRCDIR}/external/TFitPofB-lib"
   TFITPOFB_LIBS="${TFITPOFB_SRCDIR}/classes/libTFitPofB.la"
   TFITPOFB_CFLAGS="-I${TFITPOFB_SRCDIR}/include"
@@ -543,9 +547,9 @@ dnl -----------------------------------------------
 dnl Specify the files that are going to be created by configure
 dnl -----------------------------------------------
 
-AM_CONDITIONAL([BUILD_CUBALIB], [test "${BUILD_CUBA}" -eq 1])
-AM_CONDITIONAL([BUILD_BMWLIBS], [test "${BUILD_BMW_LIBS}" -eq 1])
-AM_CONDITIONAL([BUILD_ASLIBS], [test "${BUILD_AS_LIBS}" -eq 1])
+AM_CONDITIONAL([BUILD_CUBALIB], [test "${BUILD_CUBA}" = "1"])
+AM_CONDITIONAL([BUILD_BMWLIBS], [test "${BUILD_BMW_LIBS}" = "1"])
+AM_CONDITIONAL([BUILD_ASLIBS], [test "${BUILD_AS_LIBS}" = "1"])
 
 AC_CONFIG_FILES([Makefile \
                  src/Makefile \
