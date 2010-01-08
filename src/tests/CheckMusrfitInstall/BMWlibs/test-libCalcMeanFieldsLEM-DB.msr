@@ -1,0 +1,39 @@
+Test libCalcMeanFieldsLEM (SC film), DB data file
+###############################################################
+FITPARAMETER
+#      Nr. Name        Value     Step      Pos_Error  Bounderies
+        1 B0          95        0           none        
+        2 deadlayer   3.71902   0.6406      none        0       10      
+        3 SCthickness 157.461   2.37222     none        5       200     
+        4 lambda      305.143   5.23303     none        1       none    
+         
+###############################################################
+THEORY
+userFcn  libCalcMeanFieldsLEM.so TMeanFieldsForScSingleLayer 1 2 3 4
+
+###############################################################
+#FUNCTIONS
+
+###############################################################
+RUN data/Meissner-1L_160nm_TF95G_h12 MUE4 PSI DB   (name beamline institute data-file-format)
+fittype         8         (non muSR fit)
+map             0    0    0    0    0    0    0    0    0    0
+xy-data         dataE    field   
+fit             0.00    30.00   
+packing         1
+
+###############################################################
+COMMANDS
+MINIMIZE
+HESSE
+#MINOS
+SAVE
+
+###############################################################
+PLOT 8   (non muSR plot)
+runs     1   
+range    0.00   30.00
+
+###############################################################
+STATISTIC --- 2010-01-08 15:23:52
+  chisq = 3.78008792, NDF = 7, chisq/NDF = 0.540012561

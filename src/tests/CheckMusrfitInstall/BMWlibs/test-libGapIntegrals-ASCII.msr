@@ -1,0 +1,38 @@
+Test libGapIntegrals (arbitrary data), ASCII data file
+###############################################################
+FITPARAMETER
+#      Nr. Name        Value     Step      Pos_Error  Boundaries
+        1 lambdaInvSq0 12.7664   0.40786     none        
+        2 Tc          0.555355  0.0203235   none        0       2       
+        3 Delta0      0.110329  0.00576485  none        
+
+###############################################################
+THEORY
+asymmetry      1
+userFcn  libGapIntegrals.so TGapDWave 2 3
+
+###############################################################
+#FUNCTIONS
+
+###############################################################
+RUN data/libGapIntegrals-test PIM3 PSI ASCII   (name beamline institute data-file-format)
+fittype         8         (non muSR fit)
+map             0    0    0    0    0    0    0    0    0    0
+fit             0.00    10.00   
+packing         1
+
+###############################################################
+COMMANDS
+MINIMIZE
+HESSE
+#MINOS
+SAVE
+
+###############################################################
+PLOT 8   (non muSR plot)
+runs     1   
+range    0.00   1.40
+
+###############################################################
+STATISTIC --- 2010-01-08 13:54:19
+  chisq = 15.4862481, NDF = 8, chisq/NDF = 1.93578101

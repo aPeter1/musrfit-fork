@@ -1,0 +1,26 @@
+# libGapIntegrals-test.dat
+# This is a comment
+% This as well
+header
+TITLE: Test superconductor data
+X-AXIS-TITLE: T (K)
+Y-AXIS-TITLE: #lambda^{-2} (#mum^{-2})
+SETUP: H #parallel c
+FIELD: 100
+TEMP: 0.0
+ENERGY: 4200
+# here the data will follow
+data
+# x, y, error y
+0.02, 12.0, 0.5
+0.1, 11.8, 0.8
+0.2, 9.9, 0.4
+0.33, 7.2, 0.15
+0.41, 3.8, 0.38
+0.5, 2.7, 0.5
+0.64, 1.0, 0.7
+0.7, 0.1, 0.2
+0.8, 0.0, 0.8
+0.9, 0.1, 0.5
+1.2, 0.0, 0.1
+

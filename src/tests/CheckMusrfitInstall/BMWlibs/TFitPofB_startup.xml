@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TFitPofB>
+    <comment>
+        TFitPofB_startup.xml 
+        Here some external parameters used in conjunction with the TFitPofB-library are set.
+        There are different sections:
+        * Common parameters which are used for any kind of function
+        * Parameters for low energy uSR data analysis with given B(z)
+        * Parameters for bulk uSR data analysis (currently only four model to calculate field distributions for a triangular vortex lattice)
+
+        Common parameters:
+        - debug : set it to 1 in order to obtain some information what is read from the xml-file
+        - wisdom : sets the path to an FFTW-wisdom file - if there is no valid wisdom at the given path, wisdom handling will be disabled
+        - delta_t : time resolution of P(t) in microseconds
+        - delta_B : field resolution of P(B) in Gauss
+
+        LEM parameters (if the LEM tag is present it is expected that the data_path tag contains a valid path):
+        - data_path, energy_list : Defines path/prefix, energy-labels and energies (keV) of TrimSP-rge-files
+                                   The expected file-names are then: data_path + energy_label + .rge
+        - N_theory : determines the number of points in "real space" where the theory function B(z) will be calculated (if necessary)
+
+        bulk parameters:
+        - N_VortexGrid : determines the number of points used for the calculation of the vortex lattice field distribution (the grid will be N*N)
+    </comment>
+    <debug>0</debug>
+    <wisdom>none</wisdom>
+    <delta_t>0.01</delta_t>
+    <delta_B>0.5</delta_B>
+    <VortexLattice>
+        <N_VortexGrid>512</N_VortexGrid>
+    </VortexLattice>
+    <LEM>
+        <data_path>profiles/TestProfile-</data_path>
+        <N_theory>5000</N_theory>
+        <energy_list>
+          <energy_label>02_0</energy_label>
+          <energy>2.0</energy>
+          <energy_label>05_0</energy_label>
+          <energy>5.0</energy>
+          <energy_label>07_5</energy_label>
+          <energy>7.5</energy>
+          <energy_label>10_0</energy_label>
+          <energy>10.0</energy>
+          <energy_label>12_0</energy_label>
+          <energy>12.0</energy>
+          <energy_label>16_0</energy_label>
+          <energy>16.0</energy>
+          <energy_label>18_0</energy_label>
+          <energy>18.0</energy>
+          <energy_label>20_0</energy_label>
+          <energy>20.0</energy>
+          <energy_label>22_0</energy_label>
+          <energy>22.0</energy>
+          <energy_label>24_0</energy_label>
+          <energy>24.0</energy>
+     </energy_list>
+   </LEM>
+</TFitPofB>

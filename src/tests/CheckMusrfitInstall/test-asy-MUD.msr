@@ -3,9 +3,9 @@ Test asymmetry plot, MUD data file
 FITPARAMETER
 #      Nr. Name        Value     Step      Pos_Error  Boundaries
         1 alpha       1         0           none        0       2       
-        2 asy         0.173454  -0.000796666 0.000816609 0       0.33    
-        3 rate        0.165051  -0.00157302 0.00157174  0       none    
-        4 beta        0.916577  -0.0164947  0.0166072   0.5     2       
+        2 asy         0.175103  -0.000818844 0.00083464  0       0.33    
+        3 rate        0.165184  -0.0015983  0.00159512  0       none    
+        4 beta        0.888935  -0.0159792  0.0161548   0.5     2       
 
 ###############################################################
 THEORY
@@ -16,7 +16,7 @@ generExpo      3     4       (rate exponent)
 #FUNCTIONS
 
 ###############################################################
-RUN 000100 XXXX TRIUMF MUD   (name beamline institute data-file-format)
+RUN data/000100 XXXX TRIUMF MUD   (name beamline institute data-file-format)
 fittype         2         (asymmetry fit)
 alpha           1
 map             0    0    0    0    0    0    0    0    0    0    0
@@ -51,5 +51,5 @@ runs     1
 range    0.00   8.00   0.00   0.25
 
 ###############################################################
-STATISTIC --- 2009-11-17 21:49:30
-  chisq = 54.8034941, NDF = 38, chisq/NDF = 1.44219721
+STATISTIC --- 2010-01-08 14:45:37
+  chisq = 132.25963, NDF = 99, chisq/NDF = 1.33595586

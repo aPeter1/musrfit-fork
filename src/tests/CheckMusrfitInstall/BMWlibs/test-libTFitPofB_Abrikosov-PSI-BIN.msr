@@ -1,0 +1,90 @@
+Test libTFitPofB SC Abrikosov state, single histogram plot, PSI-BIN data file
+###############################################################
+FITPARAMETER
+#       No Name        Value     Step        Pos_Error   Boundaries
+        1 phase       1.58223   0.000213227 none        
+        2 field       107.087   1.21372     none        
+        3 lambda      180.575   0.00184102  none        1       none    
+        4 xi          4         0           none        0       10      
+        
+        5 asym1       0.210949  1.67583e-05 none        0       0.3     
+        6 rate1       0.533587  0.00012763  none        
+        7 asymBg      0         0           none        0       0.3     
+        8 rateBg      0         0           none        0       none    
+  
+        9 N01         3307.96   0.000213383 none        0       none    
+       10 bg1         69.1907   0.000213247 none        0       none    
+       11 N02         3586.08   0.000213383 none        0       none    
+       12 bg2         69.0577   0.000213254 none        0       none    
+       13 relphase    182.101   0.00487066  none        150     210     
+       14 zero        0         0           none        
+       15 relasy      1.0211    0.000114228 none        
+       16 one         1         0           none        
+
+###############################################################
+THEORY
+asymmetry   fun3
+simpleGss      6          (rate)
+userFcn  libTFitPofB.so TBulkTriVortexML fun2 2 3 4
++
+asymmetry   fun4
+simpleGss      8          (rate)
+TFieldCos   fun2  fun1       (phase frequency)
+
+###############################################################
+FUNCTIONS
+fun1 = par2 * gamma_mu
+fun2 = par1 + map1
+fun3 = par5 * map2
+fun4 = par7 * map2
+
+###############################################################
+RUN data/deltat_pta_gps_3093 PIM3 PSI PSI-BIN   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+map            14   16    0    0    0    0    0    0    0    0
+forward         3
+norm            9
+lifetimecorrection
+backgr.fit      10
+t0              125     
+data            128     8001    
+fit             0.00    8.00    
+packing         30
+
+RUN data/deltat_pta_gps_3093 PIM3 PSI PSI-BIN   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+map            13   15    0    0    0    0    0    0    0    0
+forward         4
+norm            11
+lifetimecorrection
+backgr.fit      12
+t0              124     
+data            127     8000    
+fit             0.00    8.00    
+packing         30
+
+###############################################################
+COMMANDS
+#MINIMIZE
+MIGRAD
+HESSE
+#MINOS
+SAVE
+
+###############################################################
+FOURIER
+units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
+fourier_power    9
+apodization      NONE    # NONE, WEAK, MEDIUM, STRONG
+plot             POWER    # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            par1
+range            0.00    500.00
+
+###############################################################
+PLOT 0   (single histo plot)
+runs     1   2   
+range    0.00   4.00   -0.25   0.25
+
+###############################################################
+STATISTIC --- 2010-01-08 14:34:28
+  chisq = 546.920845, NDF = 415, chisq/NDF = 1.31788155

@@ -1,0 +1,87 @@
+Test libTFitPofB SC Meissner state, single histogram plot, ROOT data file
+###############################################################
+FITPARAMETER
+#       No Name        Value     Step        Pos_Error   Boundaries
+        1 field       94.717    0           none        
+        2 deadlayer   10.5      0           none        
+        3 lambda      115.947   -0.91963    0.884948    
+
+# E = 22keV
+
+        4 phase22     25.4956   0           none        
+        5 asym22      0.104724  -0.00293244 0.00297537  0       0.3     
+        6 rate22      0.558459  -0.0323891  0.0325438   
+        7 NormL22     753.067   -0.86835    0.866368    
+        8 BGL22       51.0796   -0.132894   0.132971    
+        9 NormR22     545.968   -0.762193   0.766843    
+       10 BGR22       38.5992   -0.115679   0.115309    
+       11 relasyR22   1.0697    -0.0377904  0.0388018   0.2     2       
+       12 relphaR22   162.711   -1.53722    1.51998     110     210     
+       13 energy22    22        0           none        
+
+       14 one         1         0           none        
+       15 zero        0         0           none        
+
+###############################################################
+THEORY
+asymmetry   fun1
+simpleGss   map3          (rate)
+userFcn  libTFitPofB.so TLondon1DHS fun2 map6 1 2 3
+
+###############################################################
+FUNCTIONS
+fun1 = map2 * map4
+fun2 = map1 + map5
+fun3 = par1 * gamma_mu
+
+###############################################################
+RUN data/lem09_his_0916 MUE4 PSI ROOT-NPP   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            7
+backgr.fit      8
+lifetimecorrection
+map             4    5    6   14   15   13    0    0    0    0
+forward         1
+background      65000   66500   
+data            3419    63000   
+t0              3419    
+fit             0.15    10.00   
+packing         150
+
+RUN data/lem09_his_0916 MUE4 PSI ROOT-NPP   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            9
+backgr.fit      10
+lifetimecorrection
+map             4    5    6   11   12   13    0    0    0    0
+forward         3
+background      65000   66500   
+data            3419    63000   
+t0              3419    
+fit             0.15    10.00   
+packing         150
+
+###############################################################
+COMMANDS
+MINIMIZE
+#HESSE
+MINOS
+SAVE
+
+###############################################################
+FOURIER
+units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
+fourier_power    10
+apodization      WEAK    # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            par4
+range            0.00    200.00
+
+###############################################################
+PLOT 0   (single histo plot)
+runs     1   2   
+range    0.00   4.00   -0.25   0.25
+
+###############################################################
+STATISTIC --- 2010-01-08 14:15:38
+  chisq = 700.410521, NDF = 663, chisq/NDF = 1.05642612
