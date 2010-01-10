@@ -132,7 +132,7 @@ double TLFStatLorKT::operator()(double t, const vector<double> &par) const {
 
 // LF Dynamic Gaussian KT
 
-TLFDynGssKT::TLFDynGssKT() : fCalcNeeded(true), fFirstCall(true), fWisdom("/home/l_wojek/analysis/WordsOfWisdom.dat"), fNSteps(524288), fDt(0.00004), fCounter(0) {
+TLFDynGssKT::TLFDynGssKT() : fCalcNeeded(true), fFirstCall(true), fWisdom("WordsOfWisdom.dat"), fNSteps(524288), fDt(0.00004), fCounter(0) {
   // Calculate d_omega and C for given NFFT and dt
   fDw = PI/fNSteps/fDt;
   fC = 2.0*gsl_sf_log(double(fNSteps))/(double(fNSteps-1)*fDt);
@@ -228,11 +228,11 @@ double TLFDynGssKT::operator()(double t, const vector<double> &par) const {
 
   if(fCalcNeeded) {
 
-    double t1,t2;
+/*    double t1,t2;
     // get start time
     struct timeval tv_start, tv_stop;
     gettimeofday(&tv_start, 0);
-
+*/
     double tt(0.),sigsqtsq(0.);
 
     if(fabs(par[0])<0.00135538817) {
@@ -262,10 +262,10 @@ double TLFDynGssKT::operator()(double t, const vector<double> &par) const {
         fFFTtime[i]=(1.0-(coeff1*(1.0-exp(-0.5*sigsq*tt*tt)*gsl_sf_cos(omegaL*tt)))+(coeff2*totoIntegrale))*exp(mcplusnu*tt)*fDt;
       }
     }
-
+/*
     gettimeofday(&tv_stop, 0);
     t1 = (tv_stop.tv_sec - tv_start.tv_sec)*1000.0 + (tv_stop.tv_usec - tv_start.tv_usec)/1000.0;
-
+*/
     // Transform to frequency domain
 
     fftw_execute(fFFTplanFORW);
@@ -291,11 +291,11 @@ double TLFDynGssKT::operator()(double t, const vector<double> &par) const {
 //    }
     fCalcNeeded=false;
     fCounter++;
-    
+/*
     gettimeofday(&tv_stop, 0);
     t2 = (tv_stop.tv_sec - tv_start.tv_sec)*1000.0 + (tv_stop.tv_usec - tv_start.tv_usec)/1000.0;
     cout << "# Calculation times: " << t1 << " (ms), " << t2 << " (ms)" << endl;
-    
+*/
   }
 //  return fFFTtime[int(t/fDt)];
   return fDw*exp(fC*t)/PI*fFFTtime[int(t/fDt)];
@@ -303,7 +303,7 @@ double TLFDynGssKT::operator()(double t, const vector<double> &par) const {
 
 // LF Dynamic Lorentz KT
 
-TLFDynLorKT::TLFDynLorKT() : fCalcNeeded(true), fFirstCall(true), fWisdom("/home/l_wojek/analysis/WordsOfWisdom.dat"), fNSteps(524288), fDt(0.000040), fCounter(0), fL1(0.0), fL2(0.0) {
+TLFDynLorKT::TLFDynLorKT() : fCalcNeeded(true), fFirstCall(true), fWisdom("WordsOfWisdom.dat"), fNSteps(524288), fDt(0.000040), fCounter(0), fL1(0.0), fL2(0.0) {
   // Calculate d_omega and C for given NFFT and dt
   fDw = TMath::Pi()/fNSteps/fDt;
   fC = 2.0*TMath::Log(double(fNSteps))/(double(fNSteps-1)*fDt);
@@ -329,8 +329,8 @@ TLFDynLorKT::TLFDynLorKT() : fCalcNeeded(true), fFirstCall(true), fWisdom("/home
 
   fFFTtime = (double *)malloc(sizeof(double) * fNSteps);
   fFFTfreq = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * (fNSteps/2+1));
-  fFFTplanFORW = fftw_plan_dft_r2c_1d(fNSteps, fFFTtime, fFFTfreq, FFTW_EXHAUSTIVE);
-  fFFTplanBACK = fftw_plan_dft_c2r_1d(fNSteps, fFFTfreq, fFFTtime, FFTW_EXHAUSTIVE);
+  fFFTplanFORW = fftw_plan_dft_r2c_1d(fNSteps, fFFTtime, fFFTfreq, FFTW_ESTIMATE);
+  fFFTplanBACK = fftw_plan_dft_c2r_1d(fNSteps, fFFTfreq, fFFTtime, FFTW_ESTIMATE);
 }
 
 TLFDynLorKT::~TLFDynLorKT() {

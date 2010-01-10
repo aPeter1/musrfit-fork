@@ -40,3 +40,19 @@ libGapIntegrals_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(
 ## pkgconfigdir = $(libdir)/pkgconfig
 ## pkgconfig_DATA = GapIntegrals.pc
 
+## However, create some symbolic links to the shared library
+## in order to unify the function call on different operating systems
+
+if IS_DARWIN
+install-exec-hook:
+	$(LN_S) $(libdir)/libGapIntegrals.dylib $(libdir)/libGapIntegrals.so
+uninstall-hook:
+	rm -f $(libdir)/libGapIntegrals.so
+endif
+
+if IS_CYGWIN
+install-exec-hook:
+	$(LN_S) $(libdir)/libGapIntegrals.dll.a $(libdir)/libGapIntegrals.so
+uninstall-hook:
+	rm -f $(libdir)/libGapIntegrals.so
+endif

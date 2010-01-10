@@ -46,3 +46,19 @@ libPNL_PippardFitter_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -relea
 ## pkgconfigdir = $(libdir)/pkgconfig
 ## pkgconfig_DATA = PNL_PippardFitter.pc
 
+## However, create some symbolic links to the shared library
+## in order to unify the function call on different operating systems
+
+if IS_DARWIN
+install-exec-hook:
+	$(LN_S) $(libdir)/libPNL_PippardFitter.dylib $(libdir)/libPNL_PippardFitter.so
+uninstall-hook:
+	rm -f $(libdir)/libPNL_PippardFitter.so
+endif
+
+if IS_CYGWIN
+install-exec-hook:
+	$(LN_S) $(libdir)/libPNL_PippardFitter.dll.a $(libdir)/libPNL_PippardFitter.so
+uninstall-hook:
+	rm -f $(libdir)/libPNL_PippardFitter.so
+endif

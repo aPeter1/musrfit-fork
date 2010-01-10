@@ -33,7 +33,7 @@
 #define _TPofTCalc_H_
 
 #include "TPofBCalc.h"
-#include <fftw3.h>
+#include "fftw3.h"
 #include <string>
 
 #define PI 3.14159265358979323846

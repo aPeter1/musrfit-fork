@@ -36,7 +36,7 @@
 #include <string>
 using namespace std;
 
-#include <fftw3.h>
+#include "fftw3.h"
 
 //--------------------
 // Base class for any kind of vortex symmetry

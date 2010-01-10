@@ -92,15 +92,15 @@ class TMCIntegrator {
     virtual ~TMCIntegrator();
     void SetParameters(const std::vector<double> &par) const { fPar=par; }
     virtual double FuncAtX(double *) const = 0;
-    double IntegrateFunc(unsigned int, double *, double *);
+    double IntegrateFunc(size_t, double *, double *);
 
   protected:
     mutable vector<double> fPar;
 
   private:
-    static double FuncAtXgsl(double *, unsigned int, void *);
+    static double FuncAtXgsl(double *, size_t, void *);
     ROOT::Math::GSLMCIntegrator *fMCIntegrator;
-    mutable double (*fFunc)(double *, unsigned int, void *);
+    mutable double (*fFunc)(double *, size_t, void *);
 };
 
 inline TMCIntegrator::TMCIntegrator() : fFunc(0) {
@@ -116,12 +116,12 @@ inline TMCIntegrator::~TMCIntegrator(){
   fFunc=0;
 }
 
-inline double TMCIntegrator::FuncAtXgsl(double *x, unsigned int dim, void *obj)
+inline double TMCIntegrator::FuncAtXgsl(double *x, size_t dim, void *obj)
 {
   return ((TMCIntegrator*)obj)->FuncAtX(x);
 }
 
-inline double TMCIntegrator::IntegrateFunc(unsigned int dim, double *x1, double *x2)
+inline double TMCIntegrator::IntegrateFunc(size_t dim, double *x1, double *x2)
 {
   fFunc = &TMCIntegrator::FuncAtXgsl;
   return fMCIntegrator->Integral(fFunc, dim, x1, x2, (this));

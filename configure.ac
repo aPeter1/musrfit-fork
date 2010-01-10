@@ -19,6 +19,7 @@ MUSR_LIBRARY_NAME=PMusr
 LEM_LIBRARY_NAME=TLemRunHeader
 PSIBIN_LIBRARY_NAME=Class_MuSR_PSI
 MUD_LIBRARY_NAME=mud
+CUBA_LIBRARY_NAME=cuba
 
 dnl -----------------------------------------------
 dnl Optional plug-ins
@@ -105,6 +106,7 @@ AC_SUBST(MUSR_LIBRARY_NAME)
 AC_SUBST(LEM_LIBRARY_NAME)
 AC_SUBST(PSIBIN_LIBRARY_NAME)
 AC_SUBST(MUD_LIBRARY_NAME)
+AC_SUBST(CUBA_LIBRARY_NAME)
 
 PSIBIN_VERSION=$PSIBIN_MAJOR_VERSION.$PSIBIN_MINOR_VERSION.$PSIBIN_MICRO_VERSION
 PSIBIN_RELEASE=$PSIBIN_MAJOR_VERSION.$PSIBIN_MINOR_VERSION
@@ -499,6 +501,7 @@ LOCAL_LIB_LDFLAGS=
 
 case "$host" in
   *-*-cygwin)
+    ARCH=CYGWIN
     LOCAL_BIN_CXXFLAGS="${LOCAL_BIN_CXXFLAGS}"
     LOCAL_LIB_CXXFLAGS="${LOCAL_BIN_CXXFLAGS} -D_DLL"
     LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS} -D_WIN32GCC"
@@ -507,8 +510,11 @@ case "$host" in
     LOCAL_BIN_LDFLAGS="${LOCAL_BIN_LDFLAGS} -Wl,--enable-auto-import -Wl,--enable-runtime-pseudo-reloc"
     LOCAL_LIB_LDFLAGS="-no-undefined ${LOCAL_BIN_LDFLAGS} -Wl,--export-all-symbols"
     ;;
+  *-*-darwin*)
+    ARCH=DARWIN
+    ;;
   *)
-    LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS} -D__linux__"
+    ARCH=OTHERUNIX
     ;;
 esac
 
@@ -546,6 +552,9 @@ dnl -----------------------------------------------
 dnl -----------------------------------------------
 dnl Specify the files that are going to be created by configure
 dnl -----------------------------------------------
+
+AM_CONDITIONAL([IS_DARWIN], [test "${ARCH}" = "DARWIN"])
+AM_CONDITIONAL([IS_CYGWIN], [test "${ARCH}" = "CYGWIN"])
 
 AM_CONDITIONAL([BUILD_CUBALIB], [test "${BUILD_CUBA}" = "1"])
 AM_CONDITIONAL([BUILD_BMWLIBS], [test "${BUILD_BMW_LIBS}" = "1"])

@@ -63,3 +63,19 @@ libTFitPofB_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(PLUG
 ## pkgconfigdir = $(libdir)/pkgconfig
 ## pkgconfig_DATA = PTFitPofB.pc
 
+## However, create some symbolic links to the shared library
+## in order to unify the function call on different operating systems
+
+if IS_DARWIN
+install-exec-hook:
+	$(LN_S) $(libdir)/libTFitPofB.dylib $(libdir)/libTFitPofB.so
+uninstall-hook:
+	rm -f $(libdir)/libTFitPofB.so
+endif
+
+if IS_CYGWIN
+install-exec-hook:
+	$(LN_S) $(libdir)/libTFitPofB.dll.a $(libdir)/libTFitPofB.so
+uninstall-hook:
+	rm -f $(libdir)/libTFitPofB.so
+endif
