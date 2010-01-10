@@ -50,7 +50,7 @@ endif
 
 if IS_CYGWIN
 install-exec-hook:
-	$(LN_S) $(libdir)/libCalcMeanFieldsLEM.dll.a $(libdir)/libCalcMeanFieldsLEM.so
+	$(LN_S) $(bindir)/cygCalcMeanFieldsLEM-$(PLUGIN_MAJOR_VERSION)-$(PLUGIN_MINOR_VERSION)-$(PLUGIN_MAJOR_VERSION).dll $(libdir)/libCalcMeanFieldsLEM.so
 uninstall-hook:
 	rm -f $(libdir)/libCalcMeanFieldsLEM.so
 endif

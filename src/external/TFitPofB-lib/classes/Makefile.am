@@ -75,7 +75,7 @@ endif
 
 if IS_CYGWIN
 install-exec-hook:
-	$(LN_S) $(libdir)/libTFitPofB.dll.a $(libdir)/libTFitPofB.so
+	$(LN_S) $(bindir)/cygTFitPofB-$(PLUGIN_MAJOR_VERSION)-$(PLUGIN_MINOR_VERSION)-$(PLUGIN_MAJOR_VERSION).dll $(libdir)/libTFitPofB.so
 uninstall-hook:
 	rm -f $(libdir)/libTFitPofB.so
 endif

@@ -52,7 +52,7 @@ endif
 
 if IS_CYGWIN
 install-exec-hook:
-	$(LN_S) $(libdir)/libLFRelaxation.dll.a $(libdir)/libLFRelaxation.so
+	$(LN_S) $(bindir)/cygLFRelaxation-$(PLUGIN_MAJOR_VERSION)-$(PLUGIN_MINOR_VERSION)-$(PLUGIN_MAJOR_VERSION).dll $(libdir)/libLFRelaxation.so
 uninstall-hook:
 	rm -f $(libdir)/libLFRelaxation.so
 endif
