@@ -1270,7 +1270,7 @@ void PTextEdit::musrCalcChisq()
   str = fAdmin->getExecPath() + "/musrfit";
 
   cmd.append(str);
-  cmd.append(*fFilenames.find( currentEditor()) );
+  cmd.append(QFileInfo(*fFilenames.find( currentEditor())).fileName() );
   cmd.append("--chisq-only");
   PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() )).dirPath(), cmd);
   fitOutputHandler.setModal(true);
@@ -1301,7 +1301,7 @@ void PTextEdit::musrFit()
   str = fAdmin->getExecPath() + "/musrfit";
 
   cmd.append(str);
-  cmd.append(*fFilenames.find( currentEditor()));
+  cmd.append(QFileInfo(*fFilenames.find( currentEditor())).fileName());
 
   // check if keep minuit2 output is wished
   if (fKeepMinuit2Output)
