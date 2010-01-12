@@ -435,14 +435,14 @@ void PMusrCanvas::UpdateDataTheoryPad()
   fPlotType = plotInfo.fPlotType;
   for (UInt_t i=0; i<plotInfo.fRuns.size(); i++) {
     // first check that plot number is smaller than the maximal number of runs
-    if ((Int_t)plotInfo.fRuns[i].Re() > (Int_t)runs.size()) {
+    if ((Int_t)plotInfo.fRuns[i] > (Int_t)runs.size()) {
       fValid = false;
-      cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** run plot number " << (Int_t)plotInfo.fRuns[i].Re() << " is larger than the number of runs " << runs.size();
+      cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** run plot number " << (Int_t)plotInfo.fRuns[i] << " is larger than the number of runs " << runs.size();
       cerr << endl;
       return;
     }
     // check that the plottype and the fittype do correspond
-    runNo = (UInt_t)plotInfo.fRuns[i].Re()-1;
+    runNo = (UInt_t)plotInfo.fRuns[i]-1;
 //cout << endl << ">> runNo = " << runNo;
 //cout << endl;
     if (fPlotType != runs[runNo].GetFitType()) {
@@ -457,7 +457,7 @@ void PMusrCanvas::UpdateDataTheoryPad()
   for (UInt_t i=0; i<plotInfo.fRuns.size(); i++) {
     // get run data and create a histogram
     data = 0;
-    runNo = (UInt_t)plotInfo.fRuns[i].Re()-1;
+    runNo = (UInt_t)plotInfo.fRuns[i]-1;
     // get data depending on the fittype
     switch (runs[runNo].GetFitType()) {
       case MSR_FITTYPE_SINGLE_HISTO:
@@ -484,12 +484,12 @@ void PMusrCanvas::UpdateDataTheoryPad()
         // handle data
         HandleDataSet(i, runNo, data);
         break;
-      case MSR_FITTYPE_ASYM_RRF:
-        data = fRunList->GetRRF(runNo, PRunListCollection::kRunNo);
+      case MSR_FITTYPE_MU_MINUS:
+        data = fRunList->GetMuMinus(runNo, PRunListCollection::kRunNo);
         if (!data) { // something wrong
           fValid = false;
           // error message
-          cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** couldn't obtain run no " << runNo << " for a RRF plot";
+          cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** couldn't obtain run no " << runNo << " for a mu minus single histogram plot";
           cerr << endl;
           return;
         }
@@ -583,7 +583,7 @@ void PMusrCanvas::UpdateInfoPad()
   PMsrRunList runs = *fMsrHandler->GetMsrRunList();
   for (UInt_t i=0; i<fData.size(); i++) {
     // run label = run_name/histo/T=0K/B=0G/E=0keV/...
-    runNo = (UInt_t)plotInfo.fRuns[i].Re()-1;
+    runNo = (UInt_t)plotInfo.fRuns[i]-1;
     if (runs[runNo].GetRunNameSize() > 1)
       tstr  = "++" + *runs[runNo].GetRunName() + TString(","); // run_name
     else
@@ -2569,8 +2569,10 @@ void PMusrCanvas::PlotData()
           }
           break;
         case MSR_PLOT_ASYM:
-        case MSR_PLOT_ASYM_RRF:
           yAxisTitle = "asymmetry";
+          break;
+        case MSR_PLOT_MU_MINUS:
+          yAxisTitle = "??";
           break;
         default:
           yAxisTitle = "??";
@@ -2601,7 +2603,7 @@ void PMusrCanvas::PlotData()
 
     PMsrRunList runs = *fMsrHandler->GetMsrRunList();
     PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
-    UInt_t runNo = (UInt_t)plotInfo.fRuns[0].Re()-1;
+    UInt_t runNo = (UInt_t)plotInfo.fRuns[0]-1;
     TString xAxisTitle = fRunList->GetXAxisTitle(*runs[runNo].GetRunName(), runNo);
     TString yAxisTitle = fRunList->GetYAxisTitle(*runs[runNo].GetRunName(), runNo);
 
@@ -2660,7 +2662,7 @@ void PMusrCanvas::PlotData()
         assert(fMultiGraphLegend != 0);
         PStringVector legendLabel;
         for (UInt_t i=0; i<plotInfo.fRuns.size(); i++) {
-           runNo = (UInt_t)plotInfo.fRuns[i].Re()-1;
+           runNo = (UInt_t)plotInfo.fRuns[i]-1;
            xAxisTitle = fRunList->GetXAxisTitle(*runs[runNo].GetRunName(), runNo);
            yAxisTitle = fRunList->GetYAxisTitle(*runs[runNo].GetRunName(), runNo);
            legendLabel.push_back(xAxisTitle + " vs. " + yAxisTitle);
@@ -2724,7 +2726,7 @@ void PMusrCanvas::PlotDifference()
 
     PMsrRunList runs = *fMsrHandler->GetMsrRunList();
     PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
-    UInt_t runNo = (UInt_t)plotInfo.fRuns[0].Re()-1;
+    UInt_t runNo = (UInt_t)plotInfo.fRuns[0]-1;
     TString xAxisTitle = fRunList->GetXAxisTitle(*runs[runNo].GetRunName(), runNo);
 
     // if fMultiGraphDiff is not present create it and add the diff data
@@ -3491,7 +3493,7 @@ void PMusrCanvas::SaveDataAscii()
   switch (fPlotType) {
     case MSR_PLOT_SINGLE_HISTO:
     case MSR_PLOT_ASYM:
-    case MSR_PLOT_ASYM_RRF:
+    case MSR_PLOT_MU_MINUS:
       if (fDifferenceView) { // difference view plot
         switch (fCurrentPlotView) {
           case PV_DATA:

@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  PRunRRF.cpp
+  PRunMuMinus.cpp
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -31,7 +31,7 @@
 
 #include <iostream>
 
-#include "PRunRRF.h"
+#include "PRunMuMinus.h"
 
 //--------------------------------------------------------------------------
 // Constructor
@@ -40,7 +40,7 @@
  * <p>
  *
  */
-PRunRRF::PRunRRF() : PRunBase()
+PRunMuMinus::PRunMuMinus() : PRunBase()
 {
   fFitStartTime = 0.0;
   fFitStopTime  = 0.0;
@@ -58,7 +58,7 @@ PRunRRF::PRunRRF() : PRunBase()
  * \param msrInfo pointer to the msr info structure
  * \param runNo number of the run of the msr-file
  */
-PRunRRF::PRunRRF(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
+PRunMuMinus::PRunMuMinus(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
 {
   Bool_t success;
 
@@ -75,7 +75,7 @@ PRunRRF::PRunRRF(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, E
  * <p>
  *
  */
-PRunRRF::~PRunRRF()
+PRunMuMinus::~PRunMuMinus()
 {
 }
 
@@ -87,7 +87,7 @@ PRunRRF::~PRunRRF()
  *
  * \param par parameter vector iterated by minuit
  */
-Double_t PRunRRF::CalcChiSquare(const std::vector<Double_t>& par)
+Double_t PRunMuMinus::CalcChiSquare(const std::vector<Double_t>& par)
 {
   Double_t chisq = 0.0;
   Double_t diff = 0.0;
@@ -103,7 +103,7 @@ Double_t PRunRRF::CalcChiSquare(const std::vector<Double_t>& par)
  *
  * \param par parameter vector iterated by minuit
  */
-Double_t PRunRRF::CalcMaxLikelihood(const std::vector<Double_t>& par)
+Double_t PRunMuMinus::CalcMaxLikelihood(const std::vector<Double_t>& par)
 {
   cout << endl << "PRunSingleHisto::CalcMaxLikelihood(): not implemented yet ..." << endl;
 
@@ -117,7 +117,7 @@ Double_t PRunRRF::CalcMaxLikelihood(const std::vector<Double_t>& par)
  * <p>
  *
  */
-void PRunRRF::CalcTheory()
+void PRunMuMinus::CalcTheory()
 {
 }
 
@@ -128,11 +128,11 @@ void PRunRRF::CalcTheory()
  * <p>
  *
  */
-Bool_t PRunRRF::PrepareData()
+Bool_t PRunMuMinus::PrepareData()
 {
   Bool_t success = true;
 
-  cout << endl << "in PRunRRF::PrepareData(): will feed fData";
+  cout << endl << "in PRunMuMinus::PrepareData(): will feed fData";
 
   return success;
 }

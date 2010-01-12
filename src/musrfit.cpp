@@ -165,10 +165,10 @@ void musrfit_dump_ascii(char *fileName, PRunListCollection *runList)
   }
 
   // rrf
-  size = runList->GetNoOfRRF();
+  size = runList->GetNoOfMuMinus();
   if (size > 0) {
     for (unsigned int i=0; i<size; i++) {
-      data = runList->GetRRF(i);
+      data = runList->GetMuMinus(i);
       if (data) {
         // dump data
         musrfit_write_ascii(fln, data, runCounter);
@@ -295,10 +295,10 @@ void musrfit_dump_root(char *fileName, PRunListCollection *runList)
   }
 
   // rrf
-  size = runList->GetNoOfRRF();
+  size = runList->GetNoOfMuMinus();
   if (size > 0) {
     for (unsigned int i=0; i<size; i++) {
-      data = runList->GetRRF(i);
+      data = runList->GetMuMinus(i);
       if (data) {
         // dump data
         musrfit_write_root(f, fln, data, runCounter);

@@ -35,7 +35,6 @@
 #include <vector>
 using namespace std;
 
-#include <TComplex.h>
 #include <TString.h>
 
 #define PMUSR_SUCCESS                   0
@@ -48,7 +47,7 @@ using namespace std;
 
 #define PRUN_SINGLE_HISTO 0
 #define PRUN_ASYMMETRY    2
-#define PRUN_RRF          4
+#define PRUN_MU_MINUS     4
 #define PRUN_NON_MUSR     8
 
 // muon life time in (us), see PRL99, 032001 (2007)
@@ -81,14 +80,14 @@ using namespace std;
 // msr fit type tags
 #define MSR_FITTYPE_SINGLE_HISTO 0
 #define MSR_FITTYPE_ASYM         2
-#define MSR_FITTYPE_ASYM_RRF     4
+#define MSR_FITTYPE_MU_MINUS     4
 #define MSR_FITTYPE_NON_MUSR     8
 
 //-------------------------------------------------------------
 // msr plot type tags
 #define MSR_PLOT_SINGLE_HISTO 0
 #define MSR_PLOT_ASYM         2
-#define MSR_PLOT_ASYM_RRF     4
+#define MSR_PLOT_MU_MINUS     4
 #define MSR_PLOT_NON_MUSR     8
 
 //-------------------------------------------------------------
@@ -159,12 +158,6 @@ typedef vector<Double_t> PDoubleVector;
  * <p>
  */
 typedef vector< pair<Double_t, Double_t> > PDoublePairVector;
-
-//-------------------------------------------------------------
-/**
- * <p> typedef to make to code more readable.
- */
-typedef vector<TComplex> PComplexVector;
 
 //-------------------------------------------------------------
 /**
@@ -459,7 +452,7 @@ class PMsrRunBlock {
     PStringVector fBeamline;      ///< e.g. mue4, mue1, pim3, emu, m15, ... (former: run type)
     PStringVector fInstitute;     ///< e.g. psi, ral, triumf (former: run format)
     PStringVector fFileFormat;    ///< e.g. root, nexus, psi-bin, mud, ascii, db
-    Int_t fFitType;               ///< fit type: 0=single histo fit, 2=asymmetry fit, 4=asymmetry in RRF, 8=non muSR
+    Int_t fFitType;               ///< fit type: 0=single histo fit, 2=asymmetry fit, 4=mu^- single histo fit, 8=non muSR fit
     Int_t fAlphaParamNo;          ///< alpha parameter number (fit type 2, 4)
     Int_t fBetaParamNo;           ///< beta parameter number  (fit type 2, 4)
     Int_t fNormParamNo;           ///< N0 parameter number (fit type 0)
@@ -513,7 +506,7 @@ typedef struct {
   Bool_t   fLogX;         ///< yes -> x-axis in log-scale, no (default) -> x-axis in lin-scale
   Bool_t   fLogY;         ///< yes -> y-axis in log-scale, no (default) -> y-axis in lin-scale
   Int_t    fViewPacking;  ///< -1 -> use the run packing to generate the view, otherwise is fViewPacking for the binning of ALL runs.
-  PComplexVector fRuns;   ///< list of runs to be plotted
+  PIntVector fRuns;       ///< list of runs to be plotted
   PDoubleVector  fTmin;   ///< time minimum
   PDoubleVector  fTmax;   ///< time maximum
   PDoubleVector  fYmin;   ///< asymmetry/counts minimum

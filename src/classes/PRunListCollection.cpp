@@ -71,12 +71,12 @@ PRunListCollection::~PRunListCollection()
   }
   fRunAsymmetryList.clear();
 
-//cout << endl << ">> fRunRRFList.size() = " << fRunRRFList.size();
-  for (UInt_t i=0; i<fRunRRFList.size(); i++) {
-    fRunRRFList[i]->CleanUp();
-    fRunRRFList[i]->~PRunRRF();
+//cout << endl << ">> fRunMuMinusList.size() = " << fRunMuMinusList.size();
+  for (UInt_t i=0; i<fRunMuMinusList.size(); i++) {
+    fRunMuMinusList[i]->CleanUp();
+    fRunMuMinusList[i]->~PRunMuMinus();
   }
-  fRunRRFList.clear();
+  fRunMuMinusList.clear();
 
 //cout << endl << ">> fRunNonMusrList.size() = " << fRunNonMusrList.size();
   for (UInt_t i=0; i<fRunNonMusrList.size(); i++) {
@@ -118,9 +118,9 @@ Bool_t PRunListCollection::Add(Int_t runNo, EPMusrHandleTag tag)
       if (!fRunAsymmetryList[fRunAsymmetryList.size()-1]->IsValid())
         success = false;
       break;
-    case PRUN_RRF:
-      fRunRRFList.push_back(new PRunRRF(fMsrInfo, fData, runNo, tag));
-      if (!fRunRRFList[fRunRRFList.size()-1]->IsValid())
+    case PRUN_MU_MINUS:
+      fRunMuMinusList.push_back(new PRunMuMinus(fMsrInfo, fData, runNo, tag));
+      if (!fRunMuMinusList[fRunMuMinusList.size()-1]->IsValid())
         success = false;
       break;
     case PRUN_NON_MUSR:
@@ -169,17 +169,17 @@ Double_t PRunListCollection::GetAsymmetryChisq(const std::vector<Double_t>& par)
 }
 
 //--------------------------------------------------------------------------
-// GetRRFChisq
+// GetMuMinusChisq
 //--------------------------------------------------------------------------
 /**
  * <p>
  */
-Double_t PRunListCollection::GetRRFChisq(const std::vector<Double_t>& par) const
+Double_t PRunListCollection::GetMuMinusChisq(const std::vector<Double_t>& par) const
 {
   Double_t chisq = 0.0;
 
-  for (UInt_t i=0; i<fRunRRFList.size(); i++)
-    chisq += fRunRRFList[i]->CalcChiSquare(par);
+  for (UInt_t i=0; i<fRunMuMinusList.size(); i++)
+    chisq += fRunMuMinusList[i]->CalcChiSquare(par);
 
   return chisq;
 }
@@ -234,18 +234,17 @@ Double_t PRunListCollection::GetAsymmetryMaximumLikelihood(const std::vector<Dou
 }
 
 //--------------------------------------------------------------------------
-// GetRRFMaximumLikelihood
+// GetMuMinusMaximumLikelihood
 //--------------------------------------------------------------------------
 /**
- * <p> Since it is not clear yet how to handle RRF fits with max likelihood
- * the chi square will be used!
+ * <p>
  */
-Double_t PRunListCollection::GetRRFMaximumLikelihood(const std::vector<Double_t>& par) const
+Double_t PRunListCollection::GetMuMinusMaximumLikelihood(const std::vector<Double_t>& par) const
 {
   Double_t mlh = 0.0;
 
-  for (UInt_t i=0; i<fRunRRFList.size(); i++)
-    mlh += fRunRRFList[i]->CalcChiSquare(par);
+  for (UInt_t i=0; i<fRunMuMinusList.size(); i++)
+    mlh += fRunMuMinusList[i]->CalcMaxLikelihood(par);
 
   return mlh;
 }
@@ -283,8 +282,8 @@ UInt_t PRunListCollection::GetTotalNoOfBinsFitted() const
   for (UInt_t i=0; i<fRunAsymmetryList.size(); i++)
     counts += fRunAsymmetryList[i]->GetNoOfFitBins();
 
-  for (UInt_t i=0; i<fRunRRFList.size(); i++)
-    counts += fRunRRFList[i]->GetNoOfFitBins();
+  for (UInt_t i=0; i<fRunMuMinusList.size(); i++)
+    counts += fRunMuMinusList[i]->GetNoOfFitBins();
 
   for (UInt_t i=0; i<fRunNonMusrList.size(); i++)
     counts += fRunNonMusrList[i]->GetNoOfFitBins();
@@ -372,7 +371,7 @@ PRunData* PRunListCollection::GetAsymmetry(UInt_t index, EDataSwitch tag)
 }
 
 //--------------------------------------------------------------------------
-// GetRRF
+// GetMuMinus
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -380,19 +379,25 @@ PRunData* PRunListCollection::GetAsymmetry(UInt_t index, EDataSwitch tag)
  * \param index
  * \param tag kIndex -> data at index, kRunNo -> data of given run no
  */
-PRunData* PRunListCollection::GetRRF(UInt_t index, EDataSwitch tag)
+PRunData* PRunListCollection::GetMuMinus(UInt_t index, EDataSwitch tag)
 {
   PRunData *data = 0;
 
   switch (tag) {
     case kIndex:
-      if ((index < 0) || (index > fRunRRFList.size())) {
-        cerr << endl << "PRunListCollection::GetRRF: **ERROR** index = " << index << " out of bounds";
+      if ((index < 0) || (index > fRunMuMinusList.size())) {
+        cerr << endl << "PRunListCollection::GetMuMinus: **ERROR** index = " << index << " out of bounds";
         cerr << endl;
         return 0;
       }
       break;
     case kRunNo:
+      for (UInt_t i=0; i<fRunMuMinusList.size(); i++) {
+        if (fRunMuMinusList[i]->GetRunNo() == index) {
+          data = fRunMuMinusList[i]->GetData();
+          break;
+        }
+      }
       break;
     default: // error
       break;

@@ -40,7 +40,7 @@ using namespace std;
 #include "PRunDataHandler.h"
 #include "PRunSingleHisto.h"
 #include "PRunAsymmetry.h"
-#include "PRunRRF.h"
+#include "PRunMuMinus.h"
 #include "PRunNonMusr.h"
 
 class PRunListCollection
@@ -55,24 +55,24 @@ class PRunListCollection
 
     virtual Double_t GetSingleHistoChisq(const std::vector<Double_t>& par) const;
     virtual Double_t GetAsymmetryChisq(const std::vector<Double_t>& par) const;
-    virtual Double_t GetRRFChisq(const std::vector<Double_t>& par) const;
+    virtual Double_t GetMuMinusChisq(const std::vector<Double_t>& par) const;
     virtual Double_t GetNonMusrChisq(const std::vector<Double_t>& par) const;
 
     virtual Double_t GetSingleHistoMaximumLikelihood(const std::vector<Double_t>& par) const;
     virtual Double_t GetAsymmetryMaximumLikelihood(const std::vector<Double_t>& par) const;
-    virtual Double_t GetRRFMaximumLikelihood(const std::vector<Double_t>& par) const;
+    virtual Double_t GetMuMinusMaximumLikelihood(const std::vector<Double_t>& par) const;
     virtual Double_t GetNonMusrMaximumLikelihood(const std::vector<Double_t>& par) const;
 
     virtual UInt_t GetTotalNoOfBinsFitted() const;
 
     virtual UInt_t GetNoOfSingleHisto() const { return fRunSingleHistoList.size(); }
-    virtual UInt_t GetNoOfAsymmetry() const   { return fRunAsymmetryList.size(); }
-    virtual UInt_t GetNoOfRRF() const         { return fRunRRFList.size(); }
-    virtual UInt_t GetNoOfNonMusr() const     { return fRunNonMusrList.size(); }
+    virtual UInt_t GetNoOfAsymmetry() const { return fRunAsymmetryList.size(); }
+    virtual UInt_t GetNoOfMuMinus() const { return fRunMuMinusList.size(); }
+    virtual UInt_t GetNoOfNonMusr() const { return fRunNonMusrList.size(); }
 
     virtual PRunData* GetSingleHisto(UInt_t index, EDataSwitch tag=kIndex);
     virtual PRunData* GetAsymmetry(UInt_t index, EDataSwitch tag=kIndex);
-    virtual PRunData* GetRRF(UInt_t index, EDataSwitch tag=kIndex);
+    virtual PRunData* GetMuMinus(UInt_t index, EDataSwitch tag=kIndex);
     virtual PRunData* GetNonMusr(UInt_t index, EDataSwitch tag=kIndex);
 
     virtual const PDoublePairVector *GetTemp(const TString &runName) const;
@@ -88,7 +88,7 @@ class PRunListCollection
 
     vector<PRunSingleHisto*> fRunSingleHistoList;
     vector<PRunAsymmetry*>   fRunAsymmetryList;
-    vector<PRunRRF*>         fRunRRFList;
+    vector<PRunMuMinus*>     fRunMuMinusList;
     vector<PRunNonMusr*>     fRunNonMusrList;
 };
 

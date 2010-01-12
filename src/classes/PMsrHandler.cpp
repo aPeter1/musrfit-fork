@@ -590,8 +590,8 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           case MSR_FITTYPE_ASYM:
             fout << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)" << endl ;
             break;
-          case MSR_FITTYPE_ASYM_RRF:
-            fout << left << "fittype" << MSR_FITTYPE_ASYM_RRF << "         (RRF asymmetry fit)" << endl ;
+          case MSR_FITTYPE_MU_MINUS:
+            fout << left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << endl ;
             break;
           case MSR_FITTYPE_NON_MUSR:
             fout << left << "fittype" << MSR_FITTYPE_NON_MUSR << "         (non muSR fit)" << endl ;
@@ -837,8 +837,8 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           case MSR_PLOT_ASYM:
             fout << "PLOT " << fPlots[plotNo].fPlotType << "   (asymmetry plot)" << endl;
             break;
-          case MSR_PLOT_ASYM_RRF:
-            fout << "PLOT " << fPlots[plotNo].fPlotType << "   (rotating reference frame plot)" << endl;
+          case MSR_PLOT_MU_MINUS:
+            fout << "PLOT " << fPlots[plotNo].fPlotType << "   (mu minus plot)" << endl;
             break;
           case MSR_PLOT_NON_MUSR:
             fout << "PLOT " << fPlots[plotNo].fPlotType << "   (non muSR plot)" << endl;
@@ -850,12 +850,8 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           fout << "runs     ";
           fout.precision(0);
           for (UInt_t j=0; j<fPlots[plotNo].fRuns.size(); j++) {
-            if (fPlots[plotNo].fPlotType != MSR_PLOT_ASYM_RRF) { // all but MSR_PLOT_ASYM_RRF
-              fout.width(4);
-              fout << fPlots[plotNo].fRuns[j].Re();
-            } else { // MSR_PLOT_ASYM_RRF
-              fout << fPlots[plotNo].fRuns[j].Re() << "," << fPlots[plotNo].fRuns[j].Im() << "    ";
-            }
+            fout.width(4);
+            fout << fPlots[plotNo].fRuns[j];
           }
           fout << endl;
         } else if (sstr.BeginsWith("range")) {
@@ -1603,7 +1599,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           Int_t fittype = str.Atoi();
           if ((fittype == MSR_FITTYPE_SINGLE_HISTO) ||
               (fittype == MSR_FITTYPE_ASYM) ||
-              (fittype == MSR_FITTYPE_ASYM_RRF) ||
+              (fittype == MSR_FITTYPE_MU_MINUS) ||
               (fittype == MSR_FITTYPE_NON_MUSR)) {
             param.SetFitType(fittype);
           } else {
@@ -2434,7 +2430,7 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
               tokens = 0;
             }
             break;
-          case MSR_PLOT_ASYM_RRF: // like: runs 1,1 1,2
+          case MSR_PLOT_MU_MINUS: // like: runs 1,1 1,2
             tokens = iter1->fLine.Tokenize(" \t");
             if (!tokens) {
               cerr << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
@@ -2798,14 +2794,9 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
       cerr << endl;
       cerr << endl << "where <plot_type> is: 0=single histo asym,";
       cerr << endl << "                      2=forward-backward asym,";
-      cerr << endl << "                      4=RRF asym (not implemented yet),";
+      cerr << endl << "                      4=mu minus singhle histo (not implemented yet),";
       cerr << endl << "                      8=non muSR.";
-      cerr << endl << "<run_list> is the list of runs";
-      cerr << endl << "   for <plot_type> 0,2,8 it is a list of run numbers, e.g. runs 1 3";
-      cerr << endl << "   for <plot_type> 4     it is a list of 'complex' numbers, where";
-      cerr << endl << "                         the real part is the run number, and the";
-      cerr << endl << "                         imaginary one is 1=real part or 2=imag part, e.g.";
-      cerr << endl << "                         runs 1,1 1,2";
+      cerr << endl << "<run_list> is the list of runs, e.g. runs 1 3";
       cerr << endl << "range is optional";
       cerr << endl << "sub_ranges (if present) will plot the N given runs each on its own sub-range";
       cerr << endl << "logx, logy (if present) will present the x-, y-axis in log-scale";

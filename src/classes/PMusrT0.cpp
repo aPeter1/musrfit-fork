@@ -256,8 +256,8 @@ void PMusrT0::InitDataAndBkg()
     fAddRunOffset = 2;
   } else if (fitType == MSR_FITTYPE_ASYM) {
     fAddRunOffset = 4;
-  } else if (fitType == MSR_FITTYPE_ASYM_RRF) {
-    fAddRunOffset = 8;
+  } else if (fitType == MSR_FITTYPE_MU_MINUS) {
+    fAddRunOffset = 2;
   }
 
   // feed data range histo

@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  PRunRRF.h
+  PRunMuMinus.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -29,17 +29,17 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PRUNRRF_H_
-#define _PRUNRRF_H_
+#ifndef _PRUNMUMINUS_H_
+#define _PRUNMUMINUS_H_
 
 #include "PRunBase.h"
 
-class PRunRRF : public PRunBase
+class PRunMuMinus : public PRunBase
 {
   public:
-    PRunRRF();
-    PRunRRF(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag);
-    virtual ~PRunRRF();
+    PRunMuMinus();
+    PRunMuMinus(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag);
+    virtual ~PRunMuMinus();
 
     virtual Double_t CalcChiSquare(const std::vector<Double_t>& par);
     virtual Double_t CalcMaxLikelihood(const std::vector<Double_t>& par);
@@ -56,4 +56,4 @@ class PRunRRF : public PRunBase
     UInt_t fNoOfFitBins;
 };
 
-#endif // _PRUNRRF_H_
+#endif // _PRUNMUMINUS_H_

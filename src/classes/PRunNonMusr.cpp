@@ -313,9 +313,9 @@ Bool_t PRunNonMusr::PrepareViewData()
     for (UInt_t j=0; j<plotBlock.fRuns.size(); j++) {
 // cout << endl << ">> j=" << j;
 // cout << endl << ">> fRunNo=" << fRunNo;
-// cout << endl << ">> plotBlock.fRuns[j].Re()=" << plotBlock.fRuns[j].Re();
+// cout << endl << ">> plotBlock.fRuns[j]=" << plotBlock.fRuns[j];
 // cout << endl;
-      if (fRunNo == plotBlock.fRuns[j].Re()-1) { // run found
+      if (fRunNo == plotBlock.fRuns[j]-1) { // run found
         if (first) {
           first = false;
           xMin = plotBlock.fTmin[0];

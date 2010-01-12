@@ -275,7 +275,7 @@ int main(int argc, char *argv[])
             }
           }
           break;
-        case MSR_FITTYPE_ASYM_RRF:
+        case MSR_FITTYPE_MU_MINUS:
 /*
           for (unsigned int j=0; j<runList->at(i).GetRunNameSize(); j++) { // necessary in case of ADDRUN
             if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetForwardHistoNo(), 0, j)) {

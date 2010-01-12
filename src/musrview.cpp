@@ -204,13 +204,13 @@ int main(int argc, char *argv[])
       // check that run is not already in the plotList
       runPresent = false;
       for (unsigned int k=0; k<plotList.size(); k++) {
-        if (msrPlotList->at(i).fRuns[j].Re() == static_cast<int>(plotList[k])) {
+        if (msrPlotList->at(i).fRuns[j] == static_cast<int>(plotList[k])) {
           runPresent = true;
           break;
         }
       }
       if (!runPresent) {
-        plotList.push_back(static_cast<int>(msrPlotList->at(i).fRuns[j].Re()));
+        plotList.push_back(static_cast<int>(msrPlotList->at(i).fRuns[j]));
       }
     }
   }
