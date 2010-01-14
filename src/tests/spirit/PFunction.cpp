@@ -34,6 +34,8 @@
 #include <iostream>
 using namespace std;
 
+#include <boost/algorithm/string/trim.hpp>  // for stripping leading whitespace in std::string
+
 #include "PFunction.h"
 
 //--------------------------------------------------------------------------
@@ -111,6 +113,24 @@ PFunction::~PFunction()
   CleanupFuncEvalTree();
 }
 
+//--------------------------------------------------------------------------
+// InitNode (protected)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param node
+ */
+void PFunction::InitNode(PFuncTreeNode &node)
+{
+  node.fID = 0;
+  node.fOperatorTag = 0;
+  node.fFunctionTag = 0;
+  node.fIvalue = 0;
+  node.fSign = false;
+  node.fDvalue = 0.0;
+}
+
 //-------------------------------------------------------------
 // CheckParameterRange (protected)
 //-------------------------------------------------------------
@@ -143,9 +163,18 @@ bool PFunction::CheckParameterAndMapInTree(iter_t const& i)
   } else if (i->value.id() == PFunctionGrammar::parameterID) {
     assert(i->children.size() == 0);
     string str(i->value.begin(), i->value.end());
-    cout << endl << "parameterID: value = " << str << endl;
-    sscanf(str.c_str(), "PAR%d", &value);
-//cout << endl << ">> value = " << value << ", fParam.size() = " << fParam.size();
+    boost::algorithm::trim(str);
+    cout << endl << "parameterID: value = '" << str << "'" << endl;
+
+    bool minus_sign_present = false;
+    if (str[0] == '-')
+      minus_sign_present = true;
+cout << endl << ">> minus_sign_present = " << minus_sign_present;
+    if (minus_sign_present)
+      sscanf(str.c_str(), "-PAR%d", &value);
+    else
+      sscanf(str.c_str(), "PAR%d", &value);
+cout << endl << ">> value = " << value << ", fParam.size() = " << fParam.size() << endl << "----";
     if (value > (int)fParam.size()) { // parameter number found > number of parameters
       cout << endl << "**ERROR**: found parameter " << str << " with only " << fParam.size() << " parameters present?!?";
       fValid = false;
@@ -226,6 +255,7 @@ bool PFunction::SetFuncNo(iter_t const& i)
  */
 bool PFunction::GenerateFuncEvalTree()
 {
+  InitNode(fFunc);
   FillFuncEvalTree(fInfo.trees.begin(), fFunc);
 
   return true;
@@ -246,18 +276,31 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
   string str;
   PFuncTreeNode child;
 
+  InitNode(child);
+
   if (i->value.id() == PFunctionGrammar::realID) { // handle number
     str = string(i->value.begin(), i->value.end()); // get string
     status = sscanf(str.c_str(), "%lf", &dvalue); // convert string to double
     node.fID = PFunctionGrammar::realID; // keep the ID
     node.fDvalue = dvalue; // keep the value
 // cout << endl << ">> realID: value = " << dvalue;
+  } else if (i->value.id() == PFunctionGrammar::constPiID) { // handle constant pi
+    node.fID = PFunctionGrammar::constPiID; // keep the ID
+    node.fDvalue = 3.14159265358979323846; // keep the value
+  } else if (i->value.id() == PFunctionGrammar::constGammaMuID) { // handle constant gamma_mu
+    node.fID = PFunctionGrammar::constGammaMuID; // keep the ID
+    node.fDvalue = 0.0135538817; // keep the value
   } else if (i->value.id() == PFunctionGrammar::parameterID) { // handle parameter number
     str = string(i->value.begin(), i->value.end()); // get string
-    status = sscanf(str.c_str(), "PAR%d", &ivalue); // convert string to parameter number
-    node.fID = PFunctionGrammar::parameterID; // keep the ID
+    if (strstr(str.c_str(), "-")) {
+      node.fSign = true;
+      status = sscanf(str.c_str(), " -PAR%d", &ivalue); // convert string to parameter number
+    } else {
+      status = sscanf(str.c_str(), " PAR%d", &ivalue); // convert string to parameter number
+    }
+    node.fID = PFunctionGrammar::parameterID; // keep the ID    
     node.fIvalue = ivalue; // keep the value
-// cout << endl << ">> parameterID: value = " << ivalue;
+cout << endl << ">> parameterID: value = " << ivalue;
   } else if (i->value.id() == PFunctionGrammar::mapID) { // handle map number
     str = string(i->value.begin(), i->value.end()); // get string
     status = sscanf(str.c_str(), "MAP%d", &ivalue); // convert string to map number
@@ -387,8 +430,17 @@ double PFunction::EvalNode(PFuncTreeNode &node)
 {
   if (node.fID == PFunctionGrammar::realID) {
     return node.fDvalue;
+  } else if (node.fID == PFunctionGrammar::constPiID) {
+    return node.fDvalue;
+  } else if (node.fID == PFunctionGrammar::constGammaMuID) {
+    return node.fDvalue;
   } else if (node.fID == PFunctionGrammar::parameterID) {
-    return fParam[node.fIvalue-1];
+    double dval;
+    if (node.fSign)
+      dval = -fParam[node.fIvalue-1];
+    else
+      dval = fParam[node.fIvalue-1];
+    return dval;
   } else if (node.fID == PFunctionGrammar::mapID) {
     return fParam[fMap[node.fIvalue-1]-1];
   } else if (node.fID == PFunctionGrammar::functionID) {
@@ -513,6 +565,18 @@ long PFunction::EvalTreeExpression(iter_t const& i)
     fFuncString += string(i->value.begin(), i->value.end());
     if (*i->value.begin() == '-')
       fFuncString += ")";
+  } else if (i->value.id() == PFunctionGrammar::constPiID) {
+    assert(i->children.size() == 0);
+    cout << endl << "constPiID: children = " << i->children.size();
+    cout << endl << "constPiID: " << string(i->value.begin(), i->value.end());
+    cout << endl << "-----";
+    fFuncString += string(i->value.begin(), i->value.end());
+  } else if (i->value.id() == PFunctionGrammar::constGammaMuID) {
+    assert(i->children.size() == 0);
+    cout << endl << "constGammaMuID: children = " << i->children.size();
+    cout << endl << "constGammaMuID: " << string(i->value.begin(), i->value.end());
+    cout << endl << "-----";
+    fFuncString += string(i->value.begin(), i->value.end());
   } else if (i->value.id() == PFunctionGrammar::funLabelID) {
     assert(i->children.size() == 0);
     //SetFuncNo(i);

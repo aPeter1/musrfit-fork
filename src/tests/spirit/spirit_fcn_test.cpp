@@ -1,6 +1,8 @@
 #include <iostream>
 using namespace std;
 
+#include <qstring.h>
+
 #include "PFunctionHandler.h"
 
 //-----------------------------------------------------

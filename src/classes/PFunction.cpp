@@ -34,6 +34,8 @@
 #include <iostream>
 using namespace std;
 
+#include <boost/algorithm/string/trim.hpp>  // for stripping leading whitespace in std::string
+
 #include "PFunction.h"
 
 //--------------------------------------------------------------------------
@@ -131,6 +133,7 @@ Bool_t PFunction::SetFuncNo()
 
   // get string from tree
   string str(i->value.begin(), i->value.end());
+  boost::algorithm::trim(str);
 
   // extract function number from string
   status = sscanf(str.c_str(), "FUN%d", &funNo);
@@ -178,6 +181,7 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
 
   if (i->value.id() == PFunctionGrammar::realID) { // handle number
     str = string(i->value.begin(), i->value.end()); // get string
+    boost::algorithm::trim(str);
     status = sscanf(str.c_str(), "%lf", &dvalue); // convert string to Double_t
     node.fID = PFunctionGrammar::realID; // keep the ID
     node.fDvalue = dvalue; // keep the value
@@ -190,6 +194,7 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     node.fDvalue = 0.0135538817; // keep the value
   } else if (i->value.id() == PFunctionGrammar::parameterID) { // handle parameter number
     str = string(i->value.begin(), i->value.end()); // get string
+    boost::algorithm::trim(str);
     if (strstr(str.c_str(), "-")) {
       node.fSign = true;
       status = sscanf(str.c_str(), "-PAR%d", &ivalue); // convert string to parameter number
@@ -201,6 +206,7 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
 // cout << endl << ">> parameterID: value = " << ivalue;
   } else if (i->value.id() == PFunctionGrammar::mapID) { // handle map number
     str = string(i->value.begin(), i->value.end()); // get string
+    boost::algorithm::trim(str);
     status = sscanf(str.c_str(), "MAP%d", &ivalue); // convert string to map number
     node.fID = PFunctionGrammar::mapID; // keep the ID
     node.fIvalue = ivalue; // keep the value

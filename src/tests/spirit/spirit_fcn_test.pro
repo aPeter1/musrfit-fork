@@ -19,6 +19,6 @@ HEADERS = PFunctionGrammar.h \
 SOURCES = spirit_fcn_test.cpp \
           PFunction.cpp \
           PFunctionHandler.cpp
-
+ 
 TARGET=spirit_fcn_test
 
