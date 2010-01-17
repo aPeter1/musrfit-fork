@@ -239,16 +239,25 @@ private:
   double fCoeff[6];
 };
 
-// //--------------------
-// // Class "for Meissner screening" in a thin superconducting film - four layers with four different lambdas
-// //--------------------
-// 
-// class TLondon1D_4L : public TBofZCalc {
-// 
-// public:
-// 
-//   TLondon1D_4L(unsigned int, const vector<double>& );
-// 
-// };
+//--------------------
+// Class "for Meissner screening" in a thin superconducting film - tri-layer with insulating buffer layer, two lambda
+//--------------------
+
+class TLondon1D_3LwInsulator : public TBofZCalc {
+
+public:
+
+  TLondon1D_3LwInsulator(const vector<double>&, unsigned int steps = 3000);
+  double GetBofZ(double) const;
+  double GetBmin() const;
+  double GetBmax() const;
+
+private:
+  void SetBmin();
+
+  double fMinZ;
+  double fMinB;
+  double fCoeff[4];
+};
 
 #endif // _BofZCalc_H_

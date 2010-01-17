@@ -40,6 +40,7 @@
 #pragma link C++ class TMeanFieldsForScSingleLayer+;
 #pragma link C++ class TMeanFieldsForScBilayer+;
 #pragma link C++ class TMeanFieldsForScTrilayer+;
+#pragma link C++ class TMeanFieldsForScTrilayerWithInsulator+;
 
 #endif //__CINT__
 // root dictionary stuff --------------------------------------------------

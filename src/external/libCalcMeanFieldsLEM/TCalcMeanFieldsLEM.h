@@ -98,4 +98,20 @@ private:
   ClassDef(TMeanFieldsForScTrilayer,1)
 };
 
+class TMeanFieldsForScTrilayerWithInsulator : public PUserFcnBase {
+
+public:
+  // default constructor
+  TMeanFieldsForScTrilayerWithInsulator();
+  ~TMeanFieldsForScTrilayerWithInsulator() {delete fImpProfile; fImpProfile = 0;}
+
+  double operator()(double, const vector<double>&) const;
+  double CalcMeanB (double, const vector<double>&, const vector<double>&, const TLondon1D_3LwInsulator&) const;
+
+private:
+  TTrimSPData *fImpProfile;
+
+  ClassDef(TMeanFieldsForScTrilayerWithInsulator,1)
+};
+
 #endif /* _TCalcMeanFieldsLEM_H_ */

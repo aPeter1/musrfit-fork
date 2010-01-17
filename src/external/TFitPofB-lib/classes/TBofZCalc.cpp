@@ -52,7 +52,7 @@ void TBofZCalc::Calculate()
 
 #pragma omp parallel for default(shared) private(j,ZZ) schedule(dynamic)
   for (j=0; j<fSteps; j++) {
-    ZZ = fParam[1] + (double)j*fDZ;
+    ZZ = fParam[1] + static_cast<double>(j)*fDZ;
     fZ[j] = ZZ;
     fBZ[j] = GetBofZ(ZZ);
   }
@@ -227,7 +227,7 @@ void TLondon1D_1L::SetBmin()
   double minZ;
   // check if the minimum is in the first layer
   minZ=-0.5*fParam[3]*log(b_a);
-  if (minZ > fParam[1] && minZ <= fParam[2]) {
+  if (minZ > fParam[1] && minZ <= fParam[1]+fParam[2]) {
     fMinZ = minZ;
     fMinB = GetBofZ(minZ);
     return;
@@ -1087,6 +1087,120 @@ vector< pair<double, double> > TLondon1D_3LS::GetInverseAndDerivative(double BB)
   }
   return inv;
 }
+
+//------------------
+// Constructor of the TLondon1D_3LwInsulator class
+// 1D-London screening in a two thin superconducting layers fully insulated by a buffer layer
+// Parameters: Bext[G], deadlayer[nm], thickness1[nm], thickness2[nm], thickness3[nm], lambda1[nm], lambda2[nm] 
+//------------------
+
+TLondon1D_3LwInsulator::TLondon1D_3LwInsulator(const vector<double> &param, unsigned int steps)
+{
+  fSteps = steps;
+  fDZ = (param[2]+param[3]+param[4])/static_cast<double>(steps);
+  fParam = param;
+  fMinZ = -1.0;
+  fMinB = -1.0;
+
+// thicknesses have to be greater or equal to zero
+  for(unsigned int i(1); i<5; i++) {
+    if(param[i] < 0.){
+      fParam[i] = 0.;
+    }
+  }
+
+// lambdas have to be greater than zero
+  for(unsigned int i(5); i<7; i++) {
+    if(param[i] < 0.1){
+      fParam[i] = 0.1;
+    }
+  }
+
+// Calculate the coefficients of the exponentials
+  double N0(fParam[0]/(1.0+exp(fParam[2]/fParam[5])));
+  double N1(fParam[0]/(1.0+exp(fParam[4]/fParam[6])));
+
+  fCoeff[0]=N0*exp((fParam[1]+fParam[2])/fParam[5]);
+  fCoeff[1]=N0*exp(-fParam[1]/fParam[5]);
+  fCoeff[2]=N1*exp((fParam[1]+fParam[2]+fParam[3]+fParam[4])/fParam[6]);
+  fCoeff[3]=N1*exp(-(fParam[1]+fParam[2]+fParam[3])/fParam[6]);
+
+// none of the coefficients should be zero
+  for(unsigned int i(0); i<4; i++)
+    assert(fCoeff[i]);
+
+  SetBmin();
+}
+
+double TLondon1D_3LwInsulator::GetBofZ(double ZZ) const
+{
+  if(ZZ < 0. || ZZ < fParam[1] || ZZ > fParam[1]+fParam[2]+fParam[3]+fParam[4] || \
+   (ZZ > fParam[1]+fParam[2] && ZZ < fParam[1]+fParam[2]+fParam[3]))
+    return fParam[0];
+
+  if(ZZ <= fParam[1]+fParam[2])
+    return fCoeff[0]*exp(-ZZ/fParam[5])+fCoeff[1]*exp(ZZ/fParam[5]);
+  else
+    return fCoeff[2]*exp(-ZZ/fParam[6])+fCoeff[3]*exp(ZZ/fParam[6]);
+}
+
+double TLondon1D_3LwInsulator::GetBmax() const
+{
+  // return applied field
+  return fParam[0];
+}
+
+double TLondon1D_3LwInsulator::GetBmin() const
+{
+  // return field minimum
+  return fMinB;
+}
+
+void TLondon1D_3LwInsulator::SetBmin()
+{
+  double b_a(fCoeff[1]/fCoeff[0]);
+  double d_c(fCoeff[3]/fCoeff[2]);
+
+  if(b_a<1E-7) {
+    b_a = 1E-7;
+  }
+  if(d_c<1E-7) {
+    d_c = 1E-7;
+  }
+
+  double minZ1, minZ2, temp;
+  // check if the minimum is in the first or third layer
+  minZ1=-0.5*fParam[5]*log(b_a);
+  minZ2=-0.5*fParam[6]*log(d_c);
+
+  if (minZ1 > fParam[1] && minZ1 <= fParam[1]+fParam[2]) {
+    fMinZ = minZ1;
+    fMinB = GetBofZ(minZ1);
+    if (minZ2 > fParam[1]+fParam[2]+fParam[3] && minZ2 <= fParam[1]+fParam[2]+fParam[3]+fParam[4]) {
+      temp = GetBofZ(minZ2);
+      if (temp < fMinB) {
+        fMinZ = minZ2;
+        fMinB = temp;
+      }
+    }
+    return;
+  } else if (minZ2 > fParam[1]+fParam[2]+fParam[3] && minZ2 <= fParam[1]+fParam[2]+fParam[3]+fParam[4]) {
+    fMinZ = minZ2;
+    fMinB = GetBofZ(minZ2);
+    return;
+  }
+
+//  assert(fMinZ > 0. && fMinB > 0.);
+  if(fMinZ <= 0.){
+    fMinZ = 0.;
+  }
+  if(fMinB <= 0.){
+    fMinB = 0.;
+  }
+
+  return;
+}
+
 
 
 // //------------------
