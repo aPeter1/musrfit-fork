@@ -493,7 +493,16 @@ dnl -----------------------------------------------
 dnl Set host specific compiler and linker flags
 dnl -----------------------------------------------
 
-LOCAL_BIN_CXXFLAGS="-Wall -Wno-trigraphs"
+case "${host_cpu}" in
+  x86_64)
+    CPUFLAGS="-m64 -fPIC -DPIC"
+    ;;
+  *)
+    CPUFLAGS=
+    ;;
+esac
+
+LOCAL_BIN_CXXFLAGS="${CPUFLAGS} -Wall -Wno-trigraphs"
 LOCAL_LIB_CXXFLAGS="${LOCAL_BIN_CXXFLAGS}"
 LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS}"
 LOCAL_MUD_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS}"
@@ -521,6 +530,7 @@ case "$host" in
     LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS} -D__linux__"
     ;;
 esac
+
 
 AC_SUBST(LOCAL_BIN_CXXFLAGS)
 AC_SUBST(LOCAL_LIB_CXXFLAGS)

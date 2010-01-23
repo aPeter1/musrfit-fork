@@ -58,7 +58,7 @@ public:
   ~TMeanFieldsForScSingleLayer() {delete fImpProfile; fImpProfile = 0;}
 
   double operator()(double, const vector<double>&) const;
-  double CalcMeanB (double, const TLondon1D_1L&) const;
+  double CalcMeanB (double, const vector<double>&, const vector<double>&, const TLondon1D_1L&) const;
 
 private:
   TTrimSPData *fImpProfile;

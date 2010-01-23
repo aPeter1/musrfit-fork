@@ -170,9 +170,18 @@ TMeanFieldsForScSingleLayer::TMeanFieldsForScSingleLayer() {
 }
 
 // Operator-method that returns the mean field for a given implantation energy
-// Parameters: field, deadlayer, thicknessSC, lambda
+// Parameters: field, deadlayer, thicknessSC, lambda, weight (deadlayer), weight (SC), weight (substrate)
 
 double TMeanFieldsForScSingleLayer::operator()(double E, const vector<double> &par_vec) const{
+
+  vector<double> interfaces;
+  interfaces.push_back(par_vec[1]);
+  interfaces.push_back(par_vec[1]+par_vec[2]);
+
+  vector<double> weights;
+  weights.push_back(par_vec[4]);
+  weights.push_back(par_vec[5]);
+  weights.push_back(par_vec[6]);
 
   // Calculate field profile
   vector<double> parForBofZ(par_vec);
@@ -184,12 +193,12 @@ double TMeanFieldsForScSingleLayer::operator()(double E, const vector<double> &p
   energyIter = find(energies.begin(), energies.end(), E);
 
   if (energyIter != energies.end()) { // implantation profile found - no interpolation needed
-    return CalcMeanB(E, BofZ);
+    return CalcMeanB(E, interfaces, weights, BofZ);
   } else {
     if (E < *energies.begin())
-      return CalcMeanB(*energies.begin(), BofZ);
+      return CalcMeanB(*energies.begin(), interfaces, weights, BofZ);
     if (E > *(energies.end()-1))
-      return CalcMeanB(*(energies.end()-1), BofZ);
+      return CalcMeanB(*(energies.end()-1), interfaces, weights, BofZ);
 
     energyIter = find_if(energies.begin(), energies.end(), bind2nd( greater<double>(), E));
 //    cout << *(energyIter - 1) << " " << *(energyIter) << endl;
@@ -197,16 +206,16 @@ double TMeanFieldsForScSingleLayer::operator()(double E, const vector<double> &p
     double E1(*(energyIter - 1));
     double E2(*(energyIter));
 
-    double B1(CalcMeanB(E1, BofZ));
-    double B2(CalcMeanB(E2, BofZ));
+    double B1(CalcMeanB(E1, interfaces, weights, BofZ));
+    double B2(CalcMeanB(E2, interfaces, weights, BofZ));
 
     return B1 + (B2-B1)/(E2-E1)*(E-E1);
   }
 }
 
-double TMeanFieldsForScSingleLayer::CalcMeanB (double E, const TLondon1D_1L& BofZ) const {
+double TMeanFieldsForScSingleLayer::CalcMeanB (double E, const vector<double>& interfaces, const vector<double>& weights, const TLondon1D_1L& BofZ) const {
     //calcData->UseHighResolution(E);
-
+    fImpProfile->WeightLayers(E, interfaces, weights);
     fImpProfile->Normalize(E);
 
     vector<double> z(fImpProfile->DataZ(E));
@@ -217,7 +226,7 @@ double TMeanFieldsForScSingleLayer::CalcMeanB (double E, const TLondon1D_1L& Bof
     double meanB(0.);
 
     for (unsigned int i(0); i<z.size(); i++) {
-      meanB += (z[1]-z[0])*nz[i]*BofZ.GetBofZ(z[i]/10.);
+      meanB += (z[1]-z[0])*nz[i]*BofZ.GetBofZ(0.1*z[i]);
     }
     return meanB;
 }

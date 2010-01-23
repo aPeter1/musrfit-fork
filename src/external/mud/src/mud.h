@@ -102,13 +102,13 @@ typedef char			INT8;
 typedef unsigned char		UINT8;
 typedef short			INT16;
 typedef unsigned short		UINT16;
-#ifdef __alpha
+#if defined(__alpha) || defined(__x86_64__) || defined(__amd64) || defined(__ia64)
 typedef int			INT32;
 typedef unsigned int		UINT32;
 #else
 typedef long			INT32;
 typedef unsigned long		UINT32;
-#endif /* __alpha */
+#endif /* defined(__alpha) || defined(__x86_64__) || defined(__amd64) || defined(__ia64) */
 typedef float			REAL32;
 typedef double			REAL64;
 typedef UINT32                  TIME;
@@ -146,10 +146,10 @@ typedef char* 			caddr_t;
 /*
  *  c_utils.h,  Defines for C utilities
  */
-#if defined(vms) || defined(__MSDOS__)
+#if defined(vms) || defined(__MSDOS__) || defined(_MSC_VER)
 #define bcopy( b1, b2, len )		memcpy(b2,b1,len)
 #define bzero( b, len )			memset(b,(char)0,len)
-#endif /* vms || __MSDOS__ */
+#endif /* vms || __MSDOS__ || _MSC_VER */
 #ifndef _C_UTILS_H_   /* conflict with c_utils.h */
 #define _max( a, b )			( ( (a) > (b) ) ? (a) : (b) )
 #define _min( a, b )			( ( (a) < (b) ) ? (a) : (b) )
@@ -161,7 +161,7 @@ typedef char* 			caddr_t;
 #define  _roundUp( n, r )		( (r) * (int)( ((n)+(r)-1) / (r) ) )
 
 #define zalloc( n )			memset((void*)malloc(n),0,n)
-#if defined(vms) || (defined(mips)&&!defined(__sgi)) || (defined(__MSDOS__)&&defined(__STDC__))
+#if defined(vms) || (defined(mips)&&!defined(__sgi)) || ((defined(__MSDOS__) || defined(_MSC_VER))&&defined(__STDC__))
 #define strdup( s )			strcpy((char*)malloc(strlen(s)+1),s)
 #endif /* vms || mips&&!sgi */
 /*#endif */
@@ -388,7 +388,8 @@ typedef struct {
 #define MUD_instanceID( pM )	(((MUD_SEC*)pM)->core.instanceID)
 
 
-#if defined(__MSDOS__) || defined(__i386__) || defined(vax) || defined(__alpha) || (defined(__mips)&&!defined(__sgi))
+#if defined(__MSDOS__) || defined(__i386__) || defined(__i586__) || defined(__i686__) || defined(vax) || defined(__alpha) || defined(__x86_64__) || defined(__amd64) \
+                       || (defined(__mips)&&!defined(__sgi))
 #define MUD_LITTLE_ENDIAN 1
 #else
 #define MUD_BIG_ENDIAN 1

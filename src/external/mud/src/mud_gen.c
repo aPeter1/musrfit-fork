@@ -33,6 +33,7 @@ MUD_SEC_GEN_RUN_DESC_proc( op, pBuf, pMUD )
     MUD_SEC_GEN_RUN_DESC* pMUD;
 {
     int size;
+    time_t bintime;
     char tempStr1[32];
     char tempStr2[32];
     int  imin,isec;
@@ -109,9 +110,11 @@ MUD_SEC_GEN_RUN_DESC_proc( op, pBuf, pMUD )
 	case MUD_SHOW:
 	    printf( "  MUD_SEC_GEN_RUN_DESC: expt:[%ld], run:[%ld]\n",
 			pMUD->exptNumber, pMUD->runNumber );
-	    strcpy( tempStr1, ctime( (time_t*)&pMUD->timeBegin ) );
+	    bintime = pMUD->timeBegin;
+	    strncpy( tempStr1, ctime( &bintime ), sizeof(tempStr1) );
 	    tempStr1[strlen(tempStr1)-1] = '\0';
-	    strcpy( tempStr2, ctime( (time_t*)&pMUD->timeEnd ) );
+	    bintime = pMUD->timeEnd;
+	    strncpy( tempStr1, ctime( &bintime ), sizeof(tempStr1) );
 	    tempStr2[strlen(tempStr2)-1] = '\0';
 	    printf( "    timeBegin:[%s] [%ld]\n", tempStr1, pMUD->timeBegin );
 	    printf( "    timeEnd:[%s] [%ld]\n", tempStr2, pMUD->timeEnd );
@@ -139,9 +142,11 @@ MUD_SEC_GEN_RUN_DESC_proc( op, pBuf, pMUD )
 	    if( pMUD->experimenter ) 
 	        printf( "  operator:    %s\n", pMUD->experimenter );
 	    if( pMUD->method ) printf( "  method:      %s\n", pMUD->method );
-	    strcpy( tempStr1, ctime( (time_t*)&pMUD->timeBegin ) );
+	    bintime = pMUD->timeBegin;
+            strncpy( tempStr1, ctime( &bintime ), sizeof(tempStr1) );
 	    tempStr1[strlen(tempStr1)-1] = '\0';
-	    strcpy( tempStr2, ctime( (time_t*)&pMUD->timeEnd ) );
+	    bintime = pMUD->timeEnd;
+            strncpy( tempStr1, ctime( &bintime ), sizeof(tempStr1) );
 	    tempStr2[strlen(tempStr2)-1] = '\0';
 	    printf( "  began:       %s\n  ended:       %s\n",
                     tempStr1, tempStr2 );
