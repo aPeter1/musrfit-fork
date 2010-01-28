@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<musredit_startup xmlns="https://wiki.intranet.psi.ch/MUSR/MusrGui">
+  <comment>
+    $Id$
+    This is handling default setting parameters for the musredit.
+  </comment>
+  <general>
+    <exec_path>$ROOTSYS/bin</exec_path>
+    <default_save_path>./</default_save_path>
+    <msr_default_file_path>$HOME/analysis/musrfit/src/musredit</msr_default_file_path>
+    <title_from_data_file>n</title_from_data_file>
+    <enable_musrt0>n</enable_musrt0>
+  </general>
+  <font_settings>
+    <font_name>Courier</font_name>
+    <font_size>12</font_size>
+  </font_settings>
+  <msr_file_defaults>
+    <beamline>mue4</beamline>
+    <institute>psi</institute>
+    <file_format>root-npp</file_format>
+    <lifetime_correction>y</lifetime_correction>
+  </msr_file_defaults>
+  <help_section>
+    <help_main>
+      For a detailed description of the aim and structure of a msr-file see &lt;b&gt;https://wiki.intranet.psi.ch/MUSR/MusrFit&lt;/b&gt;
+      Starting with &gt;= Qt4.2 this will be linked automatically but until then ...; sorry ;-)
+    </help_main>
+  </help_section>
+  <func_pixmap_path>$HOME/analysis/musrfit/src/musredit/latex_images</func_pixmap_path>
+  <theory_functions>
+    <func>
+      <name>asymmetry</name>
+      <comment></comment>
+      <label>Asymmetry</label>
+      <pixmap>asymmetry.png</pixmap>
+      <params>1</params>
+    </func>
+    <func>
+      <name>simplExpo</name>
+      <comment>(rate)</comment>
+      <label>simple Exp</label>
+      <pixmap>simpleExp.png</pixmap>
+      <params>1</params>
+    </func>
+    <func>
+      <name>generExpo</name>
+      <comment>(rate exponent)</comment>
+      <label>general Exp</label>
+      <pixmap>generalExp.png</pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>simpleGss</name>
+      <comment>(rate)</comment>
+      <label>simple Gauss</label>
+      <pixmap>simpleGauss.png</pixmap>
+      <params>1</params>
+    </func>
+    <func>
+      <name>statGssKT</name>
+      <comment>(rate)</comment>
+      <label>static Gauss KT</label>
+      <pixmap>statGssKT.png</pixmap>
+      <params>1</params>
+    </func>
+    <func>
+      <name>statGssKTLF</name>
+      <comment>(frequency damping)</comment>
+      <label>static Gauss KT LF</label>
+      <pixmap></pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>dynGssKTLF</name>
+      <comment>(frequency damping hopping-rate)</comment>
+      <label>dynamic Gauss KT LF</label>
+      <pixmap></pixmap>
+      <params>3</params>
+    </func>
+    <func>
+      <name>statExpKT</name>
+      <comment>(rate)</comment>
+      <label>static Lorentz KT</label>
+      <pixmap>statExpKT.png</pixmap>
+      <params>1</params>
+    </func>
+    <func>
+      <name>statExpKTLF</name>
+      <comment>(frequency damping)</comment>
+      <label>static Lorentz KT LF</label>
+      <pixmap></pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>dynExpKTLF</name>
+      <comment>(frequency damping hopping-rate)</comment>
+      <label>dynamic Lorentz KT LF</label>
+      <pixmap></pixmap>
+      <params>3</params>
+    </func>
+    <func>
+      <name>combiLGKT</name>
+      <comment>(LorentzRate GaussRate)</comment>
+      <label>combined Lorentz-Gauss KT</label>
+      <pixmap>combiLGKT.png</pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>spinGlass</name>
+      <comment>(rate hopping-rate order)</comment>
+      <label>zero field spin glass function</label>
+      <pixmap></pixmap>
+      <params>3</params>
+    </func>
+    <func>
+      <name>rdAnisoHf</name>
+      <comment>(frequency rate)</comment>
+      <label>random anisotropic hyperfine function</label>
+      <pixmap></pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>abragam</name>
+      <comment>(rate hopping-rate)</comment>
+      <label>Abragam</label>
+      <pixmap>abragam.png</pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>internFld</name>
+      <comment>(fraction phase frequency Trate Lrate)</comment>
+      <label>internal Lorentz field</label>
+      <pixmap>internalField.png</pixmap>
+      <params>5</params>
+    </func>
+    <func>
+      <name>TFieldCos</name>
+      <comment>(phase frequency)</comment>
+      <label>TF cos</label>
+      <pixmap>tfCos.png</pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>bessel</name>
+      <comment>(phase frequency)</comment>
+      <label>spherical Bessel 0th order</label>
+      <pixmap>bessel.png</pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>internBsl</name>
+      <comment>(fraction phase frequency Trate Lrate)</comment>
+      <label>static internal Bessel</label>
+      <pixmap>internalBessel.png</pixmap>
+      <params>5</params>
+    </func>
+    <func>
+      <name>skewedGss</name>
+      <comment>(phase frequency rate_m rate_p)</comment>
+      <label>skewed Gaussian</label>
+      <pixmap></pixmap>
+      <params>4</params>
+    </func>
+    <func>
+      <name>polynom</name>
+      <comment>(tshift p0 p1 ... pn)</comment>
+      <label>polynom</label>
+      <pixmap>polynom.png</pixmap>
+      <params>4</params>
+    </func> 
+    <func>
+      <name>userFcn</name>
+      <comment></comment>
+      <label>user function</label>
+      <pixmap></pixmap>
+      <params>0</params>
+    </func> 
+  </theory_functions>
+</musredit_startup>
+

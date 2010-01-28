@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PFindDialog</class>
+ <widget class="QDialog" name="PFindDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>345</width>
+    <height>237</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Find Text - musredit</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../musredit.qrc">
+    <normaloff>:/images/musrfit.xpm</normaloff>:/images/musrfit.xpm</iconset>
+  </property>
+  <widget class="QGroupBox" name="fFind_groupBox">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>341</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Find</string>
+   </property>
+   <widget class="QLabel" name="fFind_label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>91</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Text to find:</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="fFind_comboBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>321</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="fFind_pushButton">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>210</y>
+     <width>71</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&amp;Find</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="fClose_pushButton">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>210</y>
+     <width>71</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&amp;Close</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="fOptions_groupBox">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>80</y>
+     <width>341</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Options</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+   </property>
+   <widget class="QCheckBox" name="fCaseSensitive_checkBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>141</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>C&amp;ase Sensitive</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="fWholeWordsOnly_checkBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>141</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&amp;Whole words only</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="fFromCursor_checkBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>141</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>From c&amp;ursor</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="fFindBackwards_checkBox">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>30</y>
+      <width>141</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Find &amp;backwards</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="fSelectedText_checkBox">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>60</y>
+      <width>141</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&amp;Selected text</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="Line" name="line">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>200</y>
+     <width>351</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>fFind_comboBox</tabstop>
+  <tabstop>fCaseSensitive_checkBox</tabstop>
+  <tabstop>fWholeWordsOnly_checkBox</tabstop>
+  <tabstop>fFromCursor_checkBox</tabstop>
+  <tabstop>fFindBackwards_checkBox</tabstop>
+  <tabstop>fSelectedText_checkBox</tabstop>
+  <tabstop>fFind_pushButton</tabstop>
+  <tabstop>fClose_pushButton</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../musredit.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>fClose_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PFindDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>287</x>
+     <y>205</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>344</x>
+     <y>228</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fFind_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PFindDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>208</x>
+     <y>211</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>171</x>
+     <y>211</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fFind_comboBox</sender>
+   <signal>editTextChanged(QString)</signal>
+   <receiver>PFindDialog</receiver>
+   <slot>onFindTextAvailable(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>126</x>
+     <y>58</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>105</x>
+     <y>218</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>onFindTextAvailable(QString)</slot>
+ </slots>
+</ui>

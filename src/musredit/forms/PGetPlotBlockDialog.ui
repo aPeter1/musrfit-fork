@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PGetPlotBlockDialog</class>
+ <widget class="QDialog" name="PGetPlotBlockDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>594</width>
+    <height>349</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Get Plot</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>:/musredit/musrfit.xpm</normaloff>:/musredit/musrfit.xpm</iconset>
+  </property>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>310</y>
+     <width>571</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QPushButton" name="fHelp_pushButton">
+      <property name="text">
+       <string>&amp;Help</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>118</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QPushButton" name="fOk_pushButton">
+      <property name="text">
+       <string>&amp;OK</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="fCancel_pushButton">
+      <property name="text">
+       <string>&amp;Cancel</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QPlainTextEdit" name="fPlot_plainTextEdit">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>70</y>
+     <width>571</width>
+     <height>231</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="fType_label">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>15</y>
+     <width>46</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Type</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="fType_comboBox">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>10</y>
+     <width>141</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Single Histo</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Asymmetry</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>MuMinus</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>NonMusr</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="fRunList_label">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>45</y>
+     <width>46</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Run List</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="fRunList_lineEdit">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>40</y>
+     <width>141</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="fXRange_label">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>15</y>
+     <width>91</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Time-/x-Range</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="fXRangeLow_lineEdit">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>10</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="fXRangeUp_lineEdit">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>10</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="fYRange_label">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>45</y>
+     <width>61</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>y-Range</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="fYRangeLow_lineEdit">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>40</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="fYRangeUp_lineEdit">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>40</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="fAdd_pushButton">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>25</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&amp;Add</string>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>fOk_pushButton</tabstop>
+  <tabstop>fCancel_pushButton</tabstop>
+  <tabstop>fHelp_pushButton</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../musredit.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>fCancel_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PGetPlotBlockDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>579</x>
+     <y>311</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>355</x>
+     <y>225</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fOk_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PGetPlotBlockDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>488</x>
+     <y>311</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>243</x>
+     <y>227</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fHelp_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PGetPlotBlockDialog</receiver>
+   <slot>helpContent()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>51</x>
+     <y>311</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>115</x>
+     <y>221</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fAdd_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PGetPlotBlockDialog</receiver>
+   <slot>addPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>536</x>
+     <y>36</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>291</x>
+     <y>316</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>helpContent()</slot>
+  <slot>addPlot()</slot>
+ </slots>
+</ui>

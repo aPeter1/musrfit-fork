@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PGetTheoryBlockDialog</class>
+ <widget class="QDialog" name="PGetTheoryBlockDialog">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>550</width>
+    <height>529</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Get Theory</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../musredit.qrc">
+    <normaloff>:/images/musrfit.xpm</normaloff>:/images/musrfit.xpm</iconset>
+  </property>
+  <widget class="QTextEdit" name="fDescription_textEdit">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>10</y>
+     <width>541</width>
+     <height>211</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="html">
+    <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt;&quot;&gt;Every theory function has to be written on a single line. It starts with the theory function name or its abbreviation followed by the parameters. Consecutive lines of theory functions will be multiplied. If theory functions need to be added, a line with a '+' has to separate them. The parameters are given as the numbers assigned to them in the FITPARAMETER-block.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:9pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt;&quot;&gt;Example:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt;&quot;&gt;asymmetry 2&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt;&quot;&gt;simplExpo 3&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt;&quot;&gt;TFieldCos map1 fun2&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt;&quot;&gt;+&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt;&quot;&gt;asymmetry 6&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:9pt;&quot;&gt;simplExpo 7&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="fTheoryInput_groupBox">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>220</y>
+     <width>541</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Theory Input Line</string>
+   </property>
+   <widget class="QComboBox" name="fTheoryFunction_comboBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>381</width>
+      <height>25</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="fPlus_pushButton">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>30</y>
+      <width>51</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>+</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="fMultiply_pushButton">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>30</y>
+      <width>51</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>*</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPlainTextEdit" name="fTheoryBlock_plainTextEdit">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>290</y>
+     <width>541</width>
+     <height>201</height>
+    </rect>
+   </property>
+   <property name="plainText">
+    <string>#####################################################
+THEORY</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>500</y>
+     <width>541</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QPushButton" name="fHelp_pushButton">
+      <property name="text">
+       <string>&amp;Help</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>178</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QPushButton" name="fOk_pushButton">
+      <property name="text">
+       <string>&amp;OK</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="fCancel_pushButton">
+      <property name="text">
+       <string>&amp;Cancel</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>fTheoryFunction_comboBox</tabstop>
+  <tabstop>fPlus_pushButton</tabstop>
+  <tabstop>fMultiply_pushButton</tabstop>
+  <tabstop>fTheoryBlock_plainTextEdit</tabstop>
+  <tabstop>fOk_pushButton</tabstop>
+  <tabstop>fCancel_pushButton</tabstop>
+  <tabstop>fHelp_pushButton</tabstop>
+  <tabstop>fDescription_textEdit</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../musredit.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>fCancel_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PGetTheoryBlockDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>539</x>
+     <y>502</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>492</x>
+     <y>411</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fOk_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PGetTheoryBlockDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>458</x>
+     <y>502</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>380</x>
+     <y>472</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fHelp_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PGetTheoryBlockDialog</receiver>
+   <slot>helpContent()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>45</x>
+     <y>502</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>90</x>
+     <y>440</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fPlus_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PGetTheoryBlockDialog</receiver>
+   <slot>addPlus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>434</x>
+     <y>257</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>173</x>
+     <y>500</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fMultiply_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PGetTheoryBlockDialog</receiver>
+   <slot>addMultiply()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>500</x>
+     <y>263</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>256</x>
+     <y>504</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>helpContent()</slot>
+  <slot>addPlus()</slot>
+  <slot>addMultiply()</slot>
+ </slots>
+</ui>

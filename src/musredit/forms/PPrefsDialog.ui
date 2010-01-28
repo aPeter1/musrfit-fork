@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PPrefsDialog</class>
+ <widget class="QDialog" name="PPrefsDialog">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>455</width>
+    <height>168</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Preferences</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../musredit.qrc">
+    <normaloff>:/images/musrfit.xpm</normaloff>:/images/musrfit.xpm</iconset>
+  </property>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>5</y>
+     <width>451</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTabWidget" name="fTabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>musrfit</string>
+       </attribute>
+       <widget class="QCheckBox" name="fKeepMn2Output_checkBox">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>161</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>keep minuit2 output</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="fDumpAscii_checkBox">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>35</y>
+          <width>151</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>dump ascii</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="fDumpRoot_checkBox">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>60</y>
+          <width>131</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>dump root</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="fTitleFromData_checkBox">
+        <property name="geometry">
+         <rect>
+          <x>170</x>
+          <y>10</y>
+          <width>171</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>take title from data file</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>musrt0</string>
+       </attribute>
+       <widget class="QCheckBox" name="fEnableMusrT0_checkBox">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>131</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>enable it</string>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="fHelp_pushButton">
+        <property name="text">
+         <string>&amp;Help</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>88</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="fOk_pushButton">
+        <property name="text">
+         <string>&amp;OK</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="fCancel_pushButton">
+        <property name="text">
+         <string>&amp;Cancel</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>fTabWidget</tabstop>
+  <tabstop>fKeepMn2Output_checkBox</tabstop>
+  <tabstop>fDumpAscii_checkBox</tabstop>
+  <tabstop>fDumpRoot_checkBox</tabstop>
+  <tabstop>fTitleFromData_checkBox</tabstop>
+  <tabstop>fOk_pushButton</tabstop>
+  <tabstop>fCancel_pushButton</tabstop>
+  <tabstop>fHelp_pushButton</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../musredit.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>fCancel_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PPrefsDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>391</x>
+     <y>198</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>422</x>
+     <y>142</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fOk_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PPrefsDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>331</x>
+     <y>199</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>293</x>
+     <y>144</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
