@@ -1767,16 +1767,18 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
-        ostr = dynamic_cast<TObjString*>(tokens->At(1));
-        str = ostr->GetString();
-        if (str.IsDigit()) {
-          dval = str.Atoi();
-          if (dval > 0)
-            param.SetForwardHistoNo(dval);
-          else
+        for (Int_t i=1; i<tokens->GetEntries(); i++) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(i));
+          str = ostr->GetString();
+          if (str.IsDigit()) {
+            dval = str.Atoi();
+            if (dval > 0)
+              param.SetForwardHistoNo(dval);
+            else
+              error = true;
+          } else {
             error = true;
-        } else {
-          error = true;
+          }
         }
       }
     }
@@ -1789,16 +1791,18 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
-        ostr = dynamic_cast<TObjString*>(tokens->At(1));
-        str = ostr->GetString();
-        if (str.IsDigit()) {
-          dval = str.Atoi();
-          if (dval > 0)
-            param.SetBackwardHistoNo(dval);
-          else
+        for (Int_t i=1; i<tokens->GetEntries(); i++) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(i));
+          str = ostr->GetString();
+          if (str.IsDigit()) {
+            dval = str.Atoi();
+            if (dval > 0)
+              param.SetBackwardHistoNo(dval);
+            else
+              error = true;
+          } else {
             error = true;
-        } else {
-          error = true;
+          }
         }
       }
     }
@@ -2775,8 +2779,37 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           }
         }
 
-        fPlots.push_back(param);
+        // check if runs listed in the plot block indeed to exist
+        for (UInt_t i=0; i<param.fRuns.size(); i++) {
+          if (param.fRuns[i] > static_cast<Int_t>(fRuns.size())) {
+            cerr << endl << ">> PMsrHandler::HandlePlotEntry(): **WARNING** found plot run number " << param.fRuns[i] << ".";
+            cerr << endl << ">> There are only " << fRuns.size() << " runs present, will ignore this run.";
+            cerr << endl;
+            param.fRuns.erase(param.fRuns.begin()+i);
+            i--;
+          }
+          if (param.fRuns[i] == 0) {
+            cerr << endl << ">> PMsrHandler::HandlePlotEntry(): **WARNING** found plot run number 0.";
+            cerr << endl << ">> Pot number needs to be > 0. Will ignore this entry.";
+            cerr << endl;
+            param.fRuns.erase(param.fRuns.begin()+i);
+            i--;
+          }
+        }
+
+        if (param.fRuns.size() > 0) {
+          fPlots.push_back(param);
+        } else {
+          cerr << endl << ">> PMsrHandler::HandlePlotEntry: **ERROR** no valid PLOT block entries, will ignore the entire PLOT block.";
+          cerr << endl;
+        }
       }
+    }
+
+    if (fPlots.size() == 0) {
+      error = true;
+      cerr << endl << ">> PMsrHandler::HandlePlotEntry: **ERROR** no valid PLOT block at all present. Fix this first!";
+      cerr << endl;
     }
 
     if (error) { // print error message

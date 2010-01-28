@@ -157,7 +157,13 @@ typedef vector<Double_t> PDoubleVector;
 /**
  * <p>
  */
-typedef vector< pair<Double_t, Double_t> > PDoublePairVector;
+typedef pair<Double_t, Double_t> PDoublePair;
+
+//-------------------------------------------------------------
+/**
+ * <p>
+ */
+typedef vector<PDoublePair> PDoublePairVector;
 
 //-------------------------------------------------------------
 /**
@@ -395,8 +401,8 @@ class PMsrRunBlock {
     virtual Bool_t IsLifetimeCorrected() { return fLifetimeCorrection; }
     virtual PIntVector* GetMap() { return &fMap; }
     virtual Int_t GetMap(UInt_t idx);
-    virtual Int_t GetForwardHistoNo() { return fForwardHistoNo; }
-    virtual Int_t GetBackwardHistoNo() { return fBackwardHistoNo; }
+    virtual Int_t GetForwardHistoNo(UInt_t i=0);
+    virtual Int_t GetBackwardHistoNo(UInt_t i=0);
     virtual UInt_t GetBkgFixSize() { return fBkgFix.size(); }
     virtual Double_t GetBkgFix(UInt_t i=0);
     virtual UInt_t GetBkgRangeSize() { return fBkgRange.size(); }
@@ -430,8 +436,8 @@ class PMsrRunBlock {
     virtual void SetLifetimeCorrection(Bool_t bval) { fLifetimeCorrection = bval; }
     virtual void AppendMap(Int_t ival) { fMap.push_back(ival); }
     virtual void SetMap(Int_t mapVal, UInt_t idx);
-    virtual void SetForwardHistoNo(Int_t ival) { fForwardHistoNo = ival; }
-    virtual void SetBackwardHistoNo(Int_t ival) { fBackwardHistoNo = ival; }
+    virtual void SetForwardHistoNo(Int_t histoNo, Int_t idx=-1);
+    virtual void SetBackwardHistoNo(Int_t histoNo, Int_t idx=-1);
     virtual void AppendBkgFix(Double_t dval) { fBkgFix.push_back(dval); }
     virtual void SetBkgFix(Double_t dval, UInt_t idx);
     virtual void AppendBkgRange(Int_t ival) { fBkgRange.push_back(ival); }
@@ -461,8 +467,8 @@ class PMsrRunBlock {
     Int_t fLifetimeParamNo;       ///< muon lifetime parameter number (fit type 0)
     Bool_t fLifetimeCorrection;   ///< lifetime correction flag for viewing (fit type 0)
     PIntVector fMap;              ///< map vector needed to switch parameters for different runs within a single theory
-    Int_t fForwardHistoNo;        ///< forward histogram number (fit type 0, 2, 4)
-    Int_t fBackwardHistoNo;       ///< backward histogram number (fit type 2, 4)
+    PIntVector fForwardHistoNo;   ///< forward histogram number (fit type 0, 2, 4)
+    PIntVector fBackwardHistoNo;  ///< backward histogram number (fit type 2, 4)
     PDoubleVector fBkgFix;        ///< fixed background in (1/ns) (fit type 0, 2, 4)
     PIntVector fBkgRange;         ///< background bin range (fit type 0, 2, 4)
     PIntVector fDataRange;        ///< data bin range (fit type 0, 2, 4)

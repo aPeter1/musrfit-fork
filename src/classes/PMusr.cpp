@@ -528,8 +528,6 @@ PMsrRunBlock::PMsrRunBlock()
   fPhaseParamNo = -1; // undefined phase parameter number
   fLifetimeParamNo = -1; // undefined lifetime parameter number
   fLifetimeCorrection = false; // lifetime correction == false by default (used in single histogram musrview)
-  fForwardHistoNo = -1; // undefined forward histogram number
-  fBackwardHistoNo = -1; // undefined backward histogram number
   fFitRange[0] = PMUSR_UNDEFINED; // undefined start fit range
   fFitRange[1] = PMUSR_UNDEFINED; // undefined end fit range
   fPacking = -1; // undefined packing
@@ -551,6 +549,8 @@ PMsrRunBlock::~PMsrRunBlock()
   fBeamline.clear();
   fInstitute.clear();
   fFileFormat.clear();
+  fForwardHistoNo.clear();
+  fBackwardHistoNo.clear();
   fMap.clear();
   fBkgFix.clear();
   fBkgRange.clear();
@@ -574,8 +574,6 @@ void PMsrRunBlock::CleanUp()
   fPhaseParamNo = -1; // undefined phase parameter number
   fLifetimeParamNo = -1; // undefined lifetime parameter number
   fLifetimeCorrection = true; // lifetime correction == true by default (used in single histogram musrview)
-  fForwardHistoNo = -1; // undefined forward histogram number
-  fBackwardHistoNo = -1; // undefined backward histogram number
   fFitRange[0] = PMUSR_UNDEFINED; // undefined start fit range
   fFitRange[1] = PMUSR_UNDEFINED; // undefined end fit range
   fPacking = -1; // undefined packing
@@ -588,6 +586,8 @@ void PMsrRunBlock::CleanUp()
   fBeamline.clear();
   fInstitute.clear();
   fFileFormat.clear();
+  fForwardHistoNo.clear();
+  fBackwardHistoNo.clear();
   fMap.clear();
   fBkgFix.clear();
   fBkgRange.clear();
@@ -721,6 +721,86 @@ void PMsrRunBlock::SetFileFormat(TString &str, UInt_t i)
     fFileFormat.resize(i+1);
 
   fFileFormat[i] = str;
+}
+
+//--------------------------------------------------------------------------
+// GetForwardHistoNo
+//--------------------------------------------------------------------------
+/**
+ * <p> get forward histogram value at position i
+ *
+ * \param i index of the forward histogram value to be returned
+ */
+Int_t PMsrRunBlock::GetForwardHistoNo(UInt_t i)
+{
+  if (fForwardHistoNo.empty())
+    return -1;
+
+  if (i>fForwardHistoNo.size())
+    return -1;
+
+  return fForwardHistoNo[i];
+}
+
+//--------------------------------------------------------------------------
+// SetForwardHistoNo
+//--------------------------------------------------------------------------
+/**
+ * <p> set forward histogram value at position pos
+ *
+ * \param histoNo histogram value
+ * \param idx index whithin the fForwardHistoNo vector where to set the value.
+ *            If idx == -1, then append the value to the vector.
+ */
+void PMsrRunBlock::SetForwardHistoNo(Int_t histoNo, Int_t idx)
+{
+  if (idx == -1) { // i.e. append forward histo no
+    fForwardHistoNo.push_back(histoNo);
+  } else {
+    if (idx >= static_cast<Int_t>(fForwardHistoNo.size()))
+      fForwardHistoNo.resize(idx+1);
+    fForwardHistoNo[idx] = histoNo;
+  }
+}
+
+//--------------------------------------------------------------------------
+// GetBackwardHistoNo
+//--------------------------------------------------------------------------
+/**
+ * <p> get backward histogram value at position i
+ *
+ * \param i index of the map value to be returned
+ */
+Int_t PMsrRunBlock::GetBackwardHistoNo(UInt_t i)
+{
+  if (fBackwardHistoNo.empty())
+    return -1;
+
+  if (i>fBackwardHistoNo.size())
+    return -1;
+
+  return fBackwardHistoNo[i];
+}
+
+//--------------------------------------------------------------------------
+// SetBackwardHistoNo
+//--------------------------------------------------------------------------
+/**
+ * <p> set backward histogram value at position pos
+ *
+ * \param histoNo histogram value
+ * \param idx index whithin the fBackwardHistoNo vector where to set the value.
+ *            If idx == -1, then append the value to the vector.
+ */
+void PMsrRunBlock::SetBackwardHistoNo(Int_t histoNo, Int_t idx)
+{
+  if (idx == -1) { // i.e. append forward histo no
+    fBackwardHistoNo.push_back(histoNo);
+  } else {
+    if (idx >= static_cast<Int_t>(fBackwardHistoNo.size()))
+      fBackwardHistoNo.resize(idx+1);
+    fBackwardHistoNo[idx] = histoNo;
+  }
 }
 
 //--------------------------------------------------------------------------
