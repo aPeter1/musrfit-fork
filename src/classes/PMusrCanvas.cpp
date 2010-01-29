@@ -4028,7 +4028,7 @@ void PMusrCanvas::SaveDataAscii()
               dump.theory.clear();
 
               // go through all data bins
-              for (Int_t j=1; j<fNonMusrData[i].diff->GetN(); j++) {
+              for (Int_t j=0; j<fNonMusrData[i].diff->GetN(); j++) {
                 // get x and y value
                 fNonMusrData[i].diff->GetPoint(j,xval,yval);
                 // check if time is in the current range
@@ -4077,7 +4077,7 @@ void PMusrCanvas::SaveDataAscii()
               dump.theory.clear();
 
               // go through all data bins
-              for (Int_t j=1; j<fNonMusrData[i].data->GetN(); j++) {
+              for (Int_t j=0; j<fNonMusrData[i].data->GetN(); j++) {
                 // get x and y value
                 fNonMusrData[i].data->GetPoint(j,xval,yval);
                 // check if time is in the current range
@@ -4089,7 +4089,7 @@ void PMusrCanvas::SaveDataAscii()
               }
 
               // go through all theory bins
-              for (Int_t j=1; j<fNonMusrData[i].theory->GetN(); j++) {
+              for (Int_t j=0; j<fNonMusrData[i].theory->GetN(); j++) {
                 // get x and y value
                 fNonMusrData[i].theory->GetPoint(j,xval,yval);
                 // check if time is in the current range
