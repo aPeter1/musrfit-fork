@@ -716,8 +716,8 @@ void PTextEdit::insertCommandBlock()
 }
 
 //----------------------------------------------------------------------------------------------------
-* <p>
 /**
+ * <p>
  */
 void PTextEdit::insertFourierBlock()
 {
