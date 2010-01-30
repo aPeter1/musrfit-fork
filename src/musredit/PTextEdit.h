@@ -36,10 +36,10 @@
 #include <QMap>
 
 #include "musredit.h"
-//#include "PFileWatcher.h"
 
 class PSubTextEdit;
 class PAdmin;
+class QFileSystemWatcher;
 class QAction;
 class QComboBox;
 class QTabWidget;
@@ -130,10 +130,11 @@ private slots:
   void replaceAll();
 
   void applyFontSettings(QWidget*);
-  void checkIfModified(QWidget*);
+  void fileChanged(const QString &fileName);
 
 private:
   PAdmin *fAdmin;
+  QFileSystemWatcher *fFileSystemWatcher;
 
   QAction *fMusrT0Action;
 
@@ -151,8 +152,6 @@ private:
 
   QTabWidget *fTabWidget;
   QMap<PSubTextEdit*, QString> fFilenames;
-
-//  PFileWatcher *fFileWatcher;
 };
 
 

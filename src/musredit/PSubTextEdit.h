@@ -45,8 +45,8 @@ class PSubTextEdit : public QPlainTextEdit
     PSubTextEdit(PAdmin *admin = 0, QWidget *parent = 0);
     virtual ~PSubTextEdit() {}
 
-    void setLastModified(const QDateTime &lastModified) { fLastModified = lastModified; }
-    QDateTime getLastModified() const { return fLastModified; }
+//    void setLastModified(const QDateTime &lastModified) { fLastModified = lastModified; }
+//    QDateTime getLastModified() const { return fLastModified; }
 
   public slots:
     void insertTitle();
@@ -67,7 +67,7 @@ class PSubTextEdit : public QPlainTextEdit
 
   private:
     PAdmin *fAdmin;
-    QDateTime fLastModified;
+//    QDateTime fLastModified;
 };
 
 #endif // _PSUBTEXTEDIT_H_

@@ -52,7 +52,7 @@ PGetTitleBlockDialog::PGetTitleBlockDialog(QWidget *parent, Qt::WindowFlags f) :
 void PGetTitleBlockDialog::helpContent()
 {
   PHelp *help = new PHelp("http://lmu.web.psi.ch/musrfit/title.html");
-  help->show();
+  //help->show();
 }
 
 //---------------------------------------------------------------------------

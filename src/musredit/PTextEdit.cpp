@@ -57,7 +57,6 @@ using namespace std;
 #include <QtDebug>
 
 #include "PTextEdit.h"
-//#include "PFileWatcher.h"
 #include "PSubTextEdit.h"
 #include "PAdmin.h"
 #include "PFindDialog.h"
@@ -77,6 +76,13 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
     : QMainWindow( parent, f )
 {
   fAdmin = new PAdmin();
+
+  fFileSystemWatcher = new QFileSystemWatcher();
+  if (fFileSystemWatcher == 0) {
+    QMessageBox::information(this, "**ERROR**", "Couldn't invoke QFileSystemWatcher!");
+  } else {
+    connect( fFileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(fileChanged(const QString&)));
+  }
 
   fMusrT0Action = 0;
 
@@ -112,7 +118,6 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
     fileNew();
   }
 
-  connect( fTabWidget, SIGNAL( currentChanged(QWidget*) ), this, SLOT( checkIfModified(QWidget*) ));
   connect( fTabWidget, SIGNAL( currentChanged(QWidget*) ), this, SLOT( applyFontSettings(QWidget*) ));
 }
 
@@ -408,7 +413,7 @@ void PTextEdit::setupTextActions()
            this, SLOT( textFamily( const QString & ) ) );
   QLineEdit *edit = fComboFont->lineEdit();
   if (edit == 0) {
-    qDebug() << endl << "**ERROR** PTextEdit::setupTextActions(): cannot edit fComboFont" << endl;
+//    qDebug() << endl << "**ERROR** PTextEdit::setupTextActions(): cannot edit fComboFont" << endl;
     return;
   }
   edit->setText( fAdmin->getFontName() );
@@ -424,7 +429,7 @@ void PTextEdit::setupTextActions()
            this, SLOT( textSize( const QString & ) ) );
   edit = fComboSize->lineEdit();
   if (edit == 0) {
-    qDebug() << endl << "**ERROR** PTextEdit::setupTextActions(): cannot edit fComboSize" << endl;
+//    qDebug() << endl << "**ERROR** PTextEdit::setupTextActions(): cannot edit fComboSize" << endl;
     return;
   }
   edit->setText( QString("%1").arg(fAdmin->getFontSize()) );
@@ -554,10 +559,6 @@ void PTextEdit::load( const QString &f, const int index )
   QFileInfo info(f);
 
   PSubTextEdit *edit = new PSubTextEdit( fAdmin );
-  edit->setLastModified(info.lastModified());
-//  edit->setAcceptRichText( false );
-//  edit->setFontFamily(fAdmin->getFontName());
-//  edit->setFontPointSize(fAdmin->getFontSize());
   edit->setFont(QFont(fAdmin->getFontName(), fAdmin->getFontSize()));
 
   if (index == -1)
@@ -567,6 +568,8 @@ void PTextEdit::load( const QString &f, const int index )
   QFile file( f );
   if ( !file.open( QIODevice::ReadOnly ) )
     return;
+
+  fFileSystemWatcher->addPath(f);
 
   QTextStream ts( &file );
   QString txt = ts.readAll();
@@ -713,8 +716,8 @@ void PTextEdit::insertCommandBlock()
 }
 
 //----------------------------------------------------------------------------------------------------
+* <p>
 /**
- * <p>
  */
 void PTextEdit::insertFourierBlock()
 {
@@ -746,9 +749,6 @@ void PTextEdit::insertStatisticBlock()
 void PTextEdit::fileNew()
 {
   PSubTextEdit *edit = new PSubTextEdit( fAdmin );
-//  edit->setAcceptRichText( false );
-//  edit->setFontFamily(fAdmin->getFontName());
-//  edit->setFontPointSize(fAdmin->getFontSize());
   edit->setFont(QFont(fAdmin->getFontName(), fAdmin->getFontSize()));
   doConnections( edit );
   fTabWidget->addTab( edit, tr( "noname" ) );
@@ -777,7 +777,7 @@ void PTextEdit::fileOpen()
     finfo1.setFile(*it);
     for (int i=0; i<fTabWidget->count(); i++) {
       tabFln = *fFilenames.find( dynamic_cast<PSubTextEdit*>(fTabWidget->widget(i)));
-      qDebug() << endl << "tabFln=" << tabFln;
+ //     qDebug() << endl << "tabFln=" << tabFln;
       finfo2.setFile(tabFln);
       if (finfo1.absoluteFilePath() == finfo2.absoluteFilePath()) {
         alreadyOpen = true;
@@ -809,14 +809,6 @@ void PTextEdit::fileReload()
     fileClose(false);
     load(fln, index);
   }
-
-/*
-  // clean up file watcher object if present
-  if (fFileWatcher) {
-    delete fFileWatcher;
-    fFileWatcher = 0;
-  }
-*/
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -887,7 +879,7 @@ void PTextEdit::filePrint()
     font.setPointSize( 10 ); // we define 10pt to be a nice base size for printing
     p.setFont( font );
 
-    int yPos        = 0;                    // y-position for each line
+    int yPos        = 0;                  // y-position for each line
     QFontMetrics fm = p.fontMetrics();
     int dpiy = printer.logicalDpiY();
     int margin = (int) ( (2/2.54)*dpiy ); // 2 cm margins
@@ -898,7 +890,7 @@ void PTextEdit::filePrint()
       // new page needed?
       if ( margin + yPos > printer.height() - margin ) {
         printer.newPage();             // no more room on this page
-        yPos = 0;                       // back to top of page
+        yPos = 0;                      // back to top of page
       }
 
       // print data
@@ -928,7 +920,11 @@ void PTextEdit::fileClose(const bool check)
       return;
   }
 
+  QString str = *fFilenames.find(currentEditor());
+  fFileSystemWatcher->removePath(str);
+
   delete currentEditor();
+
   if ( currentEditor() )
     currentEditor()->viewport()->setFocus();
 }
@@ -956,8 +952,14 @@ void PTextEdit::fileCloseAll()
   }
 
   // close all editor tabs
+  QString str;
   do {
+    // remove file from file system watcher
+    str = *fFilenames.find(currentEditor());
+    fFileSystemWatcher->removePath(str);
+
     delete currentEditor();
+
     if ( currentEditor() )
       currentEditor()->viewport()->setFocus();
   } while ( currentEditor() );
@@ -994,11 +996,17 @@ void PTextEdit::fileCloseAllOthers()
 
   // close all editor tabs
   int i=0;
+  QString str;
   do {
-    if (fTabWidget->tabText(i) != label)
+    if (fTabWidget->tabText(i) != label) {
+      // remove file from file system watcher
+      str = *fFilenames.find(dynamic_cast<PSubTextEdit*>(fTabWidget->widget(i)));
+      fFileSystemWatcher->removePath(str);
+
       delete fTabWidget->widget(i);
-    else
+    } else {
       i++;
+    }
   } while ( fTabWidget->count() > 1 );
 
   currentEditor()->viewport()->setFocus();
@@ -1963,11 +1971,6 @@ void PTextEdit::musrT0()
   system(cmd.toLatin1());
 
   QString fln = *fFilenames.find( currentEditor() );
-/*
-  fFileWatcher = new PFileWatcher(fln, currentEditor()->getLastModified());
-  fFileWatcher->modified(3600);
-  connect(fFileWatcher, SIGNAL( changed() ), this, SLOT( fileReload() ));
-*/
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -2228,28 +2231,35 @@ void PTextEdit::applyFontSettings(QWidget*)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Called when an open file is changing outside the editor (SLOT).
+ *
+ * \param fileName file name of the changed file.
  */
-void PTextEdit::checkIfModified(QWidget*)
+void PTextEdit::fileChanged(const QString &fileName)
 {
-  /*    
-  if ( fTabWidget->currentWidget() && fTabWidget->currentWidget()->inherits( "PSubTextEdit" ) ) {
-    QString fln = *fFilenames.find( currentEditor() );
-    PFileWatcher fw(fln, currentEditor()->getLastModified());
-    if (fw.isValid()) {
-      if (fw.modified()) {
-        int result = QMessageBox::information( this, "**INFO**",
-                                               "File modified on disk. Do you want to reload it?",
-                                               QMessageBox::Yes,  QMessageBox::No);
-        if (result == QMessageBox::Yes) {
-          fileReload();
-        } else {
-          textChanged(true);
-        }
+  QString str = "File '" + fileName + "' changed on the system.\nDo you want to reload it?";
+  int result = QMessageBox::question(this, "**INFO**", str, QMessageBox::Yes, QMessageBox::No);
+  if (result == QMessageBox::Yes) {
+    // find correct file
+    int idx = -1;
+    for (int i=0; i<fTabWidget->count(); i++) {
+      if (fTabWidget->tabText(i) == QFileInfo(fileName).fileName()) {
+        idx = i;
+        break;
       }
     }
-  } 
-   */
+
+    if (idx == -1)
+      return;
+
+    // remove file from file system watcher
+    fFileSystemWatcher->removePath(fileName);
+
+    // close tab
+    fTabWidget->removeTab(idx);
+    // load it
+    load(fileName, idx);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
