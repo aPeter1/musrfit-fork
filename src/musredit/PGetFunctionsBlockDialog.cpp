@@ -5,7 +5,7 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id: PGetFunctionsBlockDialog.cpp 3865 2009-04-20 07:46:50Z nemu $
+  $Id$
 
 *****************************************************************************/
 

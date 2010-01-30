@@ -5,7 +5,7 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id: PGetPlotBlockDialog.cpp 3930 2009-05-20 12:51:17Z nemu $
+  $Id$
 
 *****************************************************************************/
 

@@ -5,7 +5,7 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id: PGetAsymmetryRunBlockDialog.h 3788 2009-03-19 07:58:16Z nemu $
+  $Id$
 
 *****************************************************************************/
 

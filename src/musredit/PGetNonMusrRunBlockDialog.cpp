@@ -5,7 +5,7 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id: PGetNonMusrRunBlockDialog.cpp 3790 2009-03-19 15:29:21Z nemu $
+  $Id$
 
 *****************************************************************************/
 

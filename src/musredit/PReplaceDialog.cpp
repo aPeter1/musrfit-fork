@@ -5,7 +5,7 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id: PReplaceDialog.cpp 3918 2009-05-14 19:26:30Z nemu $
+  $Id$
 
 *****************************************************************************/
 

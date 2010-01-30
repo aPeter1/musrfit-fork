@@ -5,7 +5,7 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id: PSubTextEdit.h 3936 2009-05-22 11:38:21Z nemu $
+  $Id$
 
 *****************************************************************************/
 

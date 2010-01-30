@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  main.cpp
+  PHelp.cpp
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -29,37 +29,28 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <iostream>
-using namespace std;
+#include <QMessageBox>
 
-#include <QApplication>
+#include "PHelp.h"
 
-#include "PTextEdit.h"
-#include "PFitOutputHandler.h"
-
-int main( int argc, char ** argv ) 
+//---------------------------------------------------------------------------
+/**
+ * <p>
+ */
+PHelp::PHelp(const QString &url)
 {
-  Q_INIT_RESOURCE(musredit);
-
-  if (argc == 2) {
-    if (!strcmp(argv[1], "--help") || !strcmp(argv[1], "-h")) {
-      cout << endl << "usage: musrgui [<msr-files>] | -h, --help | -v, --version";
-      cout << endl << endl;
-      return 0;
-    } else if (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-v")) {
-      cout << endl << "musrgui version: $Id$";
-      cout << endl << endl;
-      return 0;
-    }
-  }
-
-  QApplication a( argc, argv );
-
-  PTextEdit * mw = new PTextEdit();
-  mw->setWindowTitle( "MusrFit Editor" );
-  mw->resize( 800, 800 );
-  mw->show();
-
-  a.connect( &a, SIGNAL( lastWindowClosed() ), &a, SLOT( quit() ) );
-  return a.exec();
+  QString str = "Will eventually show the url:\n" + url;
+  QMessageBox::information(this, "**HELP**", str);
 }
+
+//---------------------------------------------------------------------------
+/**
+ * <p>
+ */
+PHelp::~PHelp()
+{
+}
+
+//---------------------------------------------------------------------------
+// end
+//---------------------------------------------------------------------------

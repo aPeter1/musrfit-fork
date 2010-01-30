@@ -5,7 +5,7 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id: PGetFourierBlockDialog.h 3978 2009-06-09 11:16:39Z nemu $
+  $Id$
 
 *****************************************************************************/
 

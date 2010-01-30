@@ -5,7 +5,7 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id: PMsr2DataDialog.cpp 4328 2010-01-06 06:27:10Z nemu $
+  $Id$
 
 *****************************************************************************/
 

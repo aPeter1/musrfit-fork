@@ -5,7 +5,7 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id: PGetParameterBlockDialog.h 3864 2009-04-20 06:50:06Z nemu $
+  $Id$
 
 *****************************************************************************/
 

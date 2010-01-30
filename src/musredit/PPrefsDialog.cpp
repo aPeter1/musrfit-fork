@@ -5,7 +5,7 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id: PPrefsDialog.cpp 4032 2009-06-26 05:31:33Z nemu $
+  $Id$
 
 *****************************************************************************/
 

@@ -32,6 +32,7 @@
 #include <QMessageBox>
 
 #include "PGetTitleBlockDialog.h"
+#include "PHelp.h"
 
 //---------------------------------------------------------------------------
 /**
@@ -50,7 +51,8 @@ PGetTitleBlockDialog::PGetTitleBlockDialog(QWidget *parent, Qt::WindowFlags f) :
  */
 void PGetTitleBlockDialog::helpContent()
 {
-  QMessageBox::information(this, "**INFO**", "Will eventually show a help window");
+  PHelp *help = new PHelp("http://lmu.web.psi.ch/musrfit/title.html");
+  help->show();
 }
 
 //---------------------------------------------------------------------------

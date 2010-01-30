@@ -26,6 +26,7 @@ CONFIG += qt \
 QT += xml
 
 HEADERS = musredit.h \
+    PHelp.h \
     PTextEdit.h \
     PSubTextEdit.h \
     PAdmin.h \
@@ -47,7 +48,8 @@ HEADERS = musredit.h \
     PMsr2DataDialog.h \
     PMusrEditAbout.h
 
-SOURCES = PTextEdit.cpp \
+SOURCES = PHelp.cpp \ 
+    PTextEdit.cpp \
     PSubTextEdit.cpp \
     PAdmin.cpp \
     PFindDialog.cpp \

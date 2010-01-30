@@ -5,7 +5,7 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id: PFindDialog.cpp 3917 2009-05-13 07:49:49Z nemu $
+  $Id$
 
 *****************************************************************************/
 

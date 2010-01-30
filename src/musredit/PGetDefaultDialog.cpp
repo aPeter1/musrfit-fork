@@ -5,7 +5,7 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id: PGetDefaultDialog.cpp 3807 2009-03-25 09:49:32Z nemu $
+  $Id$
 
 *****************************************************************************/
 

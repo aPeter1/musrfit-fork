@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  main.cpp
+  PHelp.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -29,37 +29,19 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <iostream>
-using namespace std;
+#ifndef _PHELP_H_
+#define _PHELP_H_
 
-#include <QApplication>
+#include <QDialog>
+#include <QString>
 
-#include "PTextEdit.h"
-#include "PFitOutputHandler.h"
-
-int main( int argc, char ** argv ) 
+class PHelp : public QDialog
 {
-  Q_INIT_RESOURCE(musredit);
+  Q_OBJECT
 
-  if (argc == 2) {
-    if (!strcmp(argv[1], "--help") || !strcmp(argv[1], "-h")) {
-      cout << endl << "usage: musrgui [<msr-files>] | -h, --help | -v, --version";
-      cout << endl << endl;
-      return 0;
-    } else if (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-v")) {
-      cout << endl << "musrgui version: $Id$";
-      cout << endl << endl;
-      return 0;
-    }
-  }
+  public:
+    PHelp(const QString &url);
+    virtual ~PHelp();
+};
 
-  QApplication a( argc, argv );
-
-  PTextEdit * mw = new PTextEdit();
-  mw->setWindowTitle( "MusrFit Editor" );
-  mw->resize( 800, 800 );
-  mw->show();
-
-  a.connect( &a, SIGNAL( lastWindowClosed() ), &a, SLOT( quit() ) );
-  return a.exec();
-}
+#endif // _PHELP_H_

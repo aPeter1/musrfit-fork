@@ -5,7 +5,7 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id: PFitOutputHandler.cpp 4148 2009-09-11 12:37:01Z nemu $
+  $Id$
 
 *****************************************************************************/
 

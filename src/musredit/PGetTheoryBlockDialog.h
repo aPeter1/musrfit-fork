@@ -5,7 +5,7 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id: PGetTheoryBlockDialog.h 3799 2009-03-22 15:52:11Z nemu $
+  $Id$
 
 *****************************************************************************/
 
