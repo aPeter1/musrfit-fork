@@ -53,6 +53,8 @@ using namespace std;
 #include <QMessageBox>
 #include <QDialog>
 #include <QPixmap>
+#include <QTextCursor>
+#include <QTextBlock>
 
 #include <QtDebug>
 
@@ -1259,6 +1261,32 @@ void PTextEdit::editComment()
   if ( !currentEditor() )
     return;
 
+  
+  QTextCursor curs = currentEditor()->textCursor();
+  
+  if (curs.hasComplexSelection()) {
+    // multiple selections (STILL MISSING)
+  } else if (curs.hasSelection()) {
+    // simple selection (STILL MISSING)
+  } else { // no selection
+    curs.clearSelection();
+    curs.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor, 1);
+    QString line = curs.block().text();
+    if (line.startsWith("# ")) {
+      line.remove(0, 2);
+      curs.select(QTextCursor::BlockUnderCursor);
+      curs.removeSelectedText();
+      if (currentEditor()->textCursor().columnNumber() == 0)
+        curs.insertText(line);
+      else
+        curs.insertText("\n"+line);
+      curs.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor, 1);
+    } else {
+      curs.insertText("# ");
+    }
+    currentEditor()->moveCursor(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+  }
+  
 // NEEDS TO BE REWORKED. Qt4.6 far too different compared to Qt3.x
 /*
   QString str;
