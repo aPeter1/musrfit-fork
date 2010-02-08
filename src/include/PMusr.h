@@ -133,6 +133,12 @@ typedef vector<Bool_t> PBoolVector;
 /**
  * <p> typedef to make to code more readable.
  */
+typedef vector<UInt_t> PUIntVector;
+
+//-------------------------------------------------------------
+/**
+ * <p> typedef to make to code more readable.
+ */
 typedef vector<Int_t> PIntVector;
 
 //-------------------------------------------------------------
@@ -384,13 +390,13 @@ class PMsrRunBlock {
     virtual void CleanUp();
 
     virtual UInt_t GetRunNameSize() { return fRunName.size(); }
-    virtual TString *GetRunName(UInt_t i=0);
+    virtual TString *GetRunName(UInt_t idx=0);
     virtual UInt_t GetBeamlineSize() { return fBeamline.size(); }
-    virtual TString *GetBeamline(UInt_t i=0);
+    virtual TString *GetBeamline(UInt_t idx=0);
     virtual UInt_t GetInstituteSize() { return fInstitute.size(); }
-    virtual TString *GetInstitute(UInt_t i=0);
+    virtual TString *GetInstitute(UInt_t idx=0);
     virtual UInt_t GetFileFormatSize() { return fFileFormat.size(); }
-    virtual TString *GetFileFormat(UInt_t i=0);
+    virtual TString *GetFileFormat(UInt_t idx=0);
     virtual Int_t GetFitType() { return fFitType; }
     virtual Int_t GetAlphaParamNo() { return fAlphaParamNo; }
     virtual Int_t GetBetaParamNo() { return fBetaParamNo; }
@@ -401,31 +407,35 @@ class PMsrRunBlock {
     virtual Bool_t IsLifetimeCorrected() { return fLifetimeCorrection; }
     virtual PIntVector* GetMap() { return &fMap; }
     virtual Int_t GetMap(UInt_t idx);
-    virtual Int_t GetForwardHistoNo(UInt_t i=0);
-    virtual Int_t GetBackwardHistoNo(UInt_t i=0);
-    virtual UInt_t GetBkgFixSize() { return fBkgFix.size(); }
-    virtual Double_t GetBkgFix(UInt_t i=0);
-    virtual UInt_t GetBkgRangeSize() { return fBkgRange.size(); }
-    virtual Int_t GetBkgRange(UInt_t i=0);
-    virtual UInt_t GetDataRangeSize() { return fDataRange.size(); }
-    virtual Int_t GetDataRange(UInt_t i=0);
+    virtual UInt_t GetForwardHistoNoSize() { return fForwardHistoNo.size(); }
+    virtual Int_t GetForwardHistoNo(UInt_t idx=0);
+    virtual UInt_t GetAddForwardHistoNoEntries() { return fAddForwardHistoNo.size(); }
+    virtual Int_t GetAddForwardHistoNoSize(UInt_t addRunIdx);
+    virtual Int_t GetAddForwardHistoNo(UInt_t addRunIdx, UInt_t histoIdx);
+    virtual UInt_t GetBackwardHistoNoSize() { return fBackwardHistoNo.size(); }
+    virtual Int_t GetBackwardHistoNo(UInt_t idx=0);
+    virtual UInt_t GetAddBackwardHistoNoEntries() { return fAddBackwardHistoNo.size(); }
+    virtual Int_t GetAddBackwardHistoNoSize(UInt_t addRunIdx);
+    virtual Int_t GetAddBackwardHistoNo(UInt_t addRunIdx, UInt_t histoIdx);
+    virtual Double_t GetBkgFix(UInt_t idx);
+    virtual Int_t GetBkgRange(UInt_t idx);
+    virtual Int_t GetDataRange(UInt_t idx);
     virtual UInt_t GetT0Size() { return fT0.size(); }
-    virtual Int_t GetT0(UInt_t i=0);
-    virtual Double_t GetFitRange(UInt_t i);
+    virtual Int_t GetT0(UInt_t idx=0);
+    virtual UInt_t GetAddT0Entries() { return fAddT0.size(); }
+    virtual Int_t GetAddT0Size(UInt_t addRunIdx);
+    virtual Int_t GetAddT0(UInt_t addRunIdx, UInt_t histoIdx);
+    virtual Double_t GetFitRange(UInt_t idx);
     virtual Int_t GetPacking() { return fPacking; }
     virtual Int_t GetXDataIndex() { return fXYDataIndex[0]; }
     virtual Int_t GetYDataIndex() { return fXYDataIndex[1]; }
     virtual TString* GetXDataLabel() { return &fXYDataLabel[0]; }
     virtual TString* GetYDataLabel() { return &fXYDataLabel[1]; }
 
-    virtual void AppendRunName(TString str) { fRunName.push_back(str); }
-    virtual void SetRunName(TString &str, UInt_t i);
-    virtual void AppendBeamline(TString str) { fBeamline.push_back(str); }
-    virtual void SetBeamline(TString &str, UInt_t i);
-    virtual void AppendInstitute(TString str) { fInstitute.push_back(str); }
-    virtual void SetInstitute(TString &str, UInt_t i);
-    virtual void AppendFileFormat(TString str) { fFileFormat.push_back(str); }
-    virtual void SetFileFormat(TString &str, UInt_t i);
+    virtual void SetRunName(TString &str, Int_t idx=-1);
+    virtual void SetBeamline(TString &str, Int_t idx=-1);
+    virtual void SetInstitute(TString &str, Int_t idx=-1);
+    virtual void SetFileFormat(TString &str, Int_t idx=-1);
     virtual void SetFitType(Int_t ival) { fFitType = ival; }
     virtual void SetAlphaParamNo(Int_t ival) { fAlphaParamNo = ival; }
     virtual void SetBetaParamNo(Int_t ival) { fBetaParamNo = ival; }
@@ -434,18 +444,16 @@ class PMsrRunBlock {
     virtual void SetPhaseParamNo(Int_t ival) { fPhaseParamNo = ival; }
     virtual void SetLifetimeParamNo(Int_t ival) { fLifetimeParamNo = ival; }
     virtual void SetLifetimeCorrection(Bool_t bval) { fLifetimeCorrection = bval; }
-    virtual void AppendMap(Int_t ival) { fMap.push_back(ival); }
-    virtual void SetMap(Int_t mapVal, UInt_t idx);
+    virtual void SetMap(Int_t mapVal, Int_t idx=-1);
     virtual void SetForwardHistoNo(Int_t histoNo, Int_t idx=-1);
+    virtual void SetAddForwardHistoNo(Int_t histoNo, UInt_t addRunIdx, UInt_t histoNoIdx);
     virtual void SetBackwardHistoNo(Int_t histoNo, Int_t idx=-1);
-    virtual void AppendBkgFix(Double_t dval) { fBkgFix.push_back(dval); }
-    virtual void SetBkgFix(Double_t dval, UInt_t idx);
-    virtual void AppendBkgRange(Int_t ival) { fBkgRange.push_back(ival); }
-    virtual void SetBkgRange(Int_t ival, UInt_t idx);
-    virtual void AppendDataRange(Int_t ival) { fDataRange.push_back(ival); }
-    virtual void SetDataRange(Int_t ival, UInt_t idx);
-    virtual void AppendT0(Int_t ival) { fT0.push_back(ival); }
-    virtual void SetT0(Int_t ival, UInt_t idx);
+    virtual void SetAddBackwardHistoNo(Int_t histoNo, UInt_t addRunIdx, UInt_t histoNoIdx);
+    virtual void SetBkgFix(Double_t dval, Int_t idx=-1);
+    virtual void SetBkgRange(Int_t ival, Int_t idx);
+    virtual void SetDataRange(Int_t ival, Int_t idx);
+    virtual void SetT0(Int_t ival, Int_t idx=-1);
+    virtual void SetAddT0(Int_t ival, UInt_t addRunIdx, UInt_t histoNoIdx);
     virtual void SetFitRange(Double_t dval, UInt_t idx);
     virtual void SetPacking(Int_t ival) { fPacking = ival; }
     virtual void SetXDataIndex(Int_t ival) { fXYDataIndex[0] = ival; }
@@ -468,11 +476,14 @@ class PMsrRunBlock {
     Bool_t fLifetimeCorrection;   ///< lifetime correction flag for viewing (fit type 0)
     PIntVector fMap;              ///< map vector needed to switch parameters for different runs within a single theory
     PIntVector fForwardHistoNo;   ///< forward histogram number (fit type 0, 2, 4)
+    vector<PIntVector> fAddForwardHistoNo; ///< forward histogram number for addrun's
     PIntVector fBackwardHistoNo;  ///< backward histogram number (fit type 2, 4)
-    PDoubleVector fBkgFix;        ///< fixed background in (1/ns) (fit type 0, 2, 4)
-    PIntVector fBkgRange;         ///< background bin range (fit type 0, 2, 4)
-    PIntVector fDataRange;        ///< data bin range (fit type 0, 2, 4)
+    vector<PIntVector> fAddBackwardHistoNo; ///< backward histogram number for addrun's
+    Double_t fBkgFix[2];          ///< fixed background in (1/ns) (fit type 0, 2, 4)
+    Int_t fBkgRange[4];           ///< background bin range (fit type 0, 2, 4)
+    Int_t fDataRange[4];          ///< data bin range (fit type 0, 2, 4)
     PIntVector fT0;               ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
+    vector<PIntVector> fAddT0;    ///< t0 bins for addrun's
     Double_t fFitRange[2];        ///< fit range in (us)
     Int_t fPacking;               ///< packing/rebinning
     Int_t fXYDataIndex[2];        ///< used to get the data indices when using db-files (fit type 8)

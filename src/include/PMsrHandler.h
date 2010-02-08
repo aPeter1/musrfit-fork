@@ -96,6 +96,8 @@ class PMsrHandler
     virtual Bool_t CheckUniquenessOfParamNames(UInt_t &parX, UInt_t &parY);
     virtual Bool_t CheckMaps();
     virtual Bool_t CheckFuncs();
+    virtual Bool_t CheckHistoGrouping();
+    virtual Bool_t CheckAddRunParameters();
 
   private:
     TString                fFileName;  ///< file name of the msr-file

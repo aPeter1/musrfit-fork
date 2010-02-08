@@ -44,7 +44,7 @@ void t0NotEqFirstGoodData()
   decayAnaModule = histosFolder->AddFolder("DecayAnaModule", "muSR decay histograms");
 
   // feed run info header
-  UInt_t runNo = 10113;
+  UInt_t runNo = 20001;
   TString tstr;
   runInfo = gROOT->GetRootFolder()->AddFolder("RunInfo", "LEM RunInfo");  
   gROOT->GetListOfBrowsables()->Add(runInfo, "RunInfo");
@@ -64,40 +64,41 @@ void t0NotEqFirstGoodData()
   header->SetSampleBField(-1.0, 0.1);
   header->SetTimeResolution(0.1953125);
   header->SetNChannels(66601);
-  header->SetNHist(4);
+  header->SetNHist(8);
   header->SetCuts("none");
   header->SetModerator("none");
-  Double_t tt0[4] = {3419.0, 3419.0, 3419.0, 3419.0};
+  Double_t tt0[8] = {3419.0, 3519.0, 3419.0, 3519.0, 3419.0, 3519.0, 3419.0, 3519.0};
   header->SetTimeZero(tt0);
   runInfo->Add(header); //add header to RunInfo folder
 
   // create histos
-  UInt_t t0[4] = {3419, 3419, 3419, 3419};
-  UInt_t n0[4] = {200.0, 205.0, 203.0, 198.0};
-  UInt_t bkg[4] = {11.0, 11.0, 5.0, 8.0};
+  UInt_t t0[8] = {3419, 3519, 3419, 3519, 3419.0, 3519.0, 3419.0, 3519.0};
+  UInt_t n0[8] = {10000.0, 10000.0, 10000.0, 10000.0, 10000.0, 10000.0, 10000.0, 10000.0};
+  UInt_t bkg[8] = {11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0};
   const Double_t tau = 2197.019; // ns
   // asymmetry related stuff
   const Double_t timeResolution = 0.1953125; // ns
-  Double_t a0[4] = {0.26, 0.26, 0.26, 0.26};
-  Double_t a1[4] = {0.0, 0.0, 0.0, 0.0};
-  Double_t phase[4] = {0.0*TMath::Pi()/180.0, 90.0*TMath::Pi()/180.0, 180.0*TMath::Pi()/180.0, 270.0*TMath::Pi()/180.0};
+  Double_t a0[8] = {0.26, 0.26, 0.26, 0.26, 0.26, 0.26, 0.26, 0.26};
+  Double_t a1[8] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  Double_t phase[8] = {0.0*TMath::Pi()/180.0, 45.0*TMath::Pi()/180.0, 90.0*TMath::Pi()/180.0, 135.0*TMath::Pi()/180.0,
+                       180.0*TMath::Pi()/180.0, 225.0*TMath::Pi()/180.0, 270.0*TMath::Pi()/180.0, 315.0*TMath::Pi()/180.0,};
   const Double_t gamma = 0.00001355; // gamma/(2pi)
-  Double_t bb0 = 15000.0; // field in Gauss
+  Double_t bb0 = 200.0; // field in Gauss
   Double_t bb1 = 400.0; // field in Gauss
   Double_t sigma0 = 0.05/1000.0; // Gaussian sigma in 1/ns
   Double_t sigma1 = 0.005/1000.0; // Gaussian sigma in 1/ns
 
-  TH1F *histo[8];
+  TH1F *histo[16];
   char str[128];
-  for (UInt_t i=0; i<4; i++) {
+  for (UInt_t i=0; i<8; i++) {
     sprintf(str, "hDecay0%d", (Int_t)i);
     histo[i] = new TH1F(str, str, 66601, -0.5, 66600.5);
     sprintf(str, "hDecay2%d", (Int_t)i);
-    histo[i+4] = new TH1F(str, str, 66601, -0.5, 66600.5);
+    histo[i+8] = new TH1F(str, str, 66601, -0.5, 66600.5);
   }
   Double_t time;
   Double_t dval;
-  for (UInt_t i=0; i<4; i++) {
+  for (UInt_t i=0; i<8; i++) {
     for (UInt_t j=1; j<66601; j++) {
       if (j<t0[i]) {
         histo[i]->SetBinContent(j, bkg[i]);
@@ -131,16 +132,16 @@ void t0NotEqFirstGoodData()
     cerr << endl << "**ERROR** while invoking PAddPoissonNoise" << endl;
     return;
   }
-  for (UInt_t i=0; i<4; i++) {
+  for (UInt_t i=0; i<8; i++) {
     addNoise->AddNoise(histo[i]);
   }
-  for (UInt_t i=0; i<4; i++) {
+  for (UInt_t i=0; i<8; i++) {
     for (UInt_t j=1; j<histo[i]->GetEntries(); j++) {
-      histo[i+4]->SetBinContent(j, histo[i]->GetBinContent(j));
+      histo[i+8]->SetBinContent(j, histo[i]->GetBinContent(j));
     }
   }
 
-  for (UInt_t i=0; i<8; i++)
+  for (UInt_t i=0; i<16; i++)
     decayAnaModule->Add(histo[i]);
 
   // write file

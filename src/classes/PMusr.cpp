@@ -80,14 +80,14 @@ PRunData::~PRunData()
 /**
  * <p>Sets a value of the theory vector
  *
- * \param i index of the theory vector
+ * \param idx index of the theory vector
  */
-void PRunData::SetTheoryValue(UInt_t i, Double_t dval)
+void PRunData::SetTheoryValue(UInt_t idx, Double_t dval)
 {
-  if (i > fTheory.size())
-    fTheory.resize(i+1);
+  if (idx > fTheory.size())
+    fTheory.resize(idx+1);
 
-  fTheory[i] = dval;
+  fTheory[idx] = dval;
 }
 
 //--------------------------------------------------------------------------
@@ -528,6 +528,12 @@ PMsrRunBlock::PMsrRunBlock()
   fPhaseParamNo = -1; // undefined phase parameter number
   fLifetimeParamNo = -1; // undefined lifetime parameter number
   fLifetimeCorrection = false; // lifetime correction == false by default (used in single histogram musrview)
+  for (UInt_t i=0; i<2; i++)
+    fBkgFix[i] = PMUSR_UNDEFINED;
+  for (UInt_t i=0; i<4; i++) {
+    fBkgRange[i] = -1; // undefined start background range
+    fDataRange[i] = -1; // undefined start data range
+  }
   fFitRange[0] = PMUSR_UNDEFINED; // undefined start fit range
   fFitRange[1] = PMUSR_UNDEFINED; // undefined end fit range
   fPacking = -1; // undefined packing
@@ -552,9 +558,6 @@ PMsrRunBlock::~PMsrRunBlock()
   fForwardHistoNo.clear();
   fBackwardHistoNo.clear();
   fMap.clear();
-  fBkgFix.clear();
-  fBkgRange.clear();
-  fDataRange.clear();
   fT0.clear();
 }
 
@@ -574,6 +577,12 @@ void PMsrRunBlock::CleanUp()
   fPhaseParamNo = -1; // undefined phase parameter number
   fLifetimeParamNo = -1; // undefined lifetime parameter number
   fLifetimeCorrection = true; // lifetime correction == true by default (used in single histogram musrview)
+  fBkgFix[0] = PMUSR_UNDEFINED; // undefined fixed background for forward
+  fBkgFix[1] = PMUSR_UNDEFINED; // undefined fixed background for backward
+  for (UInt_t i=0; i<4; i++) {
+    fBkgRange[i] = -1; // undefined background range
+    fDataRange[i] = -1; // undefined data range
+  }
   fFitRange[0] = PMUSR_UNDEFINED; // undefined start fit range
   fFitRange[1] = PMUSR_UNDEFINED; // undefined end fit range
   fPacking = -1; // undefined packing
@@ -587,166 +596,196 @@ void PMsrRunBlock::CleanUp()
   fInstitute.clear();
   fFileFormat.clear();
   fForwardHistoNo.clear();
+  for (UInt_t i=0; i<fAddForwardHistoNo.size(); i++)
+    fAddForwardHistoNo[i].clear();
+  fAddForwardHistoNo.clear();
   fBackwardHistoNo.clear();
+  for (UInt_t i=0; i<fAddBackwardHistoNo.size(); i++)
+    fAddBackwardHistoNo[i].clear();
+  fAddBackwardHistoNo.clear();
   fMap.clear();
-  fBkgFix.clear();
-  fBkgRange.clear();
-  fDataRange.clear();
   fT0.clear();
+  for (UInt_t i=0; i<fAddT0.size(); i++)
+    fAddT0[i].clear();
+  fAddT0.clear();
 }
 
 //--------------------------------------------------------------------------
 // GetRunName
 //--------------------------------------------------------------------------
 /**
- * <p> get run name at position i
+ * <p> get run name at position idx
  *
- * \param i index of the run name to be returned
+ * \param idx index of the run name to be returned
  */
-TString* PMsrRunBlock::GetRunName(UInt_t i)
+TString* PMsrRunBlock::GetRunName(UInt_t idx)
 {
-  if (i>fRunName.size())
+  if (idx>fRunName.size())
     return 0;
 
-  return &fRunName[i];
+  return &fRunName[idx];
 }
 
 //--------------------------------------------------------------------------
 // SetRunName
 //--------------------------------------------------------------------------
 /**
- * <p> set run name at position i
+ * <p> set run name at position idx
  *
- * \param i index of the run name to be set
+ * \param str run name string
+ * \param idx index of the run name to be set. If idx == -1 append run name
  */
-void PMsrRunBlock::SetRunName(TString &str, UInt_t i)
+void PMsrRunBlock::SetRunName(TString &str, Int_t idx)
 {
-  if (i >= fRunName.size())
-    fRunName.resize(i+1);
+  if (idx == -1) {
+    fRunName.push_back(str);
+    return;
+  }
 
-  fRunName[i] = str;
+  if (idx >= static_cast<Int_t>(fRunName.size()))
+    fRunName.resize(idx+1);
+
+  fRunName[idx] = str;
 }
 
 //--------------------------------------------------------------------------
 // GetBeamline
 //--------------------------------------------------------------------------
 /**
- * <p> get beamline name at position i
+ * <p> get beamline name at position idx
  *
- * \param i index of the beamline to be returned
+ * \param idx index of the beamline to be returned
  */
-TString* PMsrRunBlock::GetBeamline(UInt_t i)
+TString* PMsrRunBlock::GetBeamline(UInt_t idx)
 {
-  if (i>fBeamline.size())
+  if (idx>fBeamline.size())
     return 0;
 
-  return &fBeamline[i];
+  return &fBeamline[idx];
 }
 
 //--------------------------------------------------------------------------
 // SetBeamline
 //--------------------------------------------------------------------------
 /**
- * <p> set beamline name at position i
+ * <p> set beamline name at position idx
  *
- * \param i index of the beamline name to be set
+ * \param str beamline name string
+ * \param idx index of the beamline name to be set. If idx == -1, append beamline
  */
-void PMsrRunBlock::SetBeamline(TString &str, UInt_t i)
+void PMsrRunBlock::SetBeamline(TString &str, Int_t idx)
 {
-  if (i >= fBeamline.size())
-    fBeamline.resize(i+1);
+  if (idx == -1) {
+    fBeamline.push_back(str);
+    return;
+  }
 
-  fBeamline[i] = str;
+  if (idx >= static_cast<Int_t>(fBeamline.size()))
+    fBeamline.resize(idx+1);
+
+  fBeamline[idx] = str;
 }
 
 //--------------------------------------------------------------------------
 // GetInstitute
 //--------------------------------------------------------------------------
 /**
- * <p> get institute name at position i
+ * <p> get institute name at position idx
  *
- * \param i index of the institute to be returned
+ * \param idx index of the institute to be returned
  */
-TString* PMsrRunBlock::GetInstitute(UInt_t i)
+TString* PMsrRunBlock::GetInstitute(UInt_t idx)
 {
-  if (i>fInstitute.size())
+  if (idx>fInstitute.size())
     return 0;
 
-  return &fInstitute[i];
+  return &fInstitute[idx];
 }
 
 //--------------------------------------------------------------------------
 // SetInstitute
 //--------------------------------------------------------------------------
 /**
- * <p> set institute name at position i
+ * <p> set institute name at position idx
  *
- * \param i index of the run name to be set
+ * \param str institute name string
+ * \param idx index of the run name to be set. If idx == -1, append institute name
  */
-void PMsrRunBlock::SetInstitute(TString &str, UInt_t i)
+void PMsrRunBlock::SetInstitute(TString &str, Int_t idx)
 {
-  if (i >= fInstitute.size())
-    fInstitute.resize(i+1);
+  if (idx == -1) {
+    fInstitute.push_back(str);
+    return;
+  }
 
-  fInstitute[i] = str;
+  if (idx >= static_cast<Int_t>(fInstitute.size()))
+    fInstitute.resize(idx+1);
+
+  fInstitute[idx] = str;
 }
 
 //--------------------------------------------------------------------------
 // GetFileFormat
 //--------------------------------------------------------------------------
 /**
- * <p> get file format name at position i
+ * <p> get file format name at position idx
  *
- * \param i index of the file format to be returned
+ * \param idx index of the file format to be returned
  */
-TString* PMsrRunBlock::GetFileFormat(UInt_t i)
+TString* PMsrRunBlock::GetFileFormat(UInt_t idx)
 {
-  if (i>fFileFormat.size())
+  if (idx>fFileFormat.size())
     return 0;
 
-  return &fFileFormat[i];
+  return &fFileFormat[idx];
 }
 
 //--------------------------------------------------------------------------
 // SetFileFormat
 //--------------------------------------------------------------------------
 /**
- * <p> set file format name at position i
+ * <p> set file format name at position idx
  *
- * \param i index of the file format name to be set
+ * \param str file format string
+ * \param idx index of the file format name to be set. If idx == -1, append file format
  */
-void PMsrRunBlock::SetFileFormat(TString &str, UInt_t i)
+void PMsrRunBlock::SetFileFormat(TString &str, Int_t idx)
 {
-  if (i >= fFileFormat.size())
-    fFileFormat.resize(i+1);
+  if (idx == -1) {
+    fFileFormat.push_back(str);
+    return;
+  }
 
-  fFileFormat[i] = str;
+  if (idx >= static_cast<Int_t>(fFileFormat.size()))
+    fFileFormat.resize(idx+1);
+
+  fFileFormat[idx] = str;
 }
 
 //--------------------------------------------------------------------------
 // GetForwardHistoNo
 //--------------------------------------------------------------------------
 /**
- * <p> get forward histogram value at position i
+ * <p> get forward histogram value at position idx
  *
- * \param i index of the forward histogram value to be returned
+ * \param idx index of the forward histogram value to be returned
  */
-Int_t PMsrRunBlock::GetForwardHistoNo(UInt_t i)
+Int_t PMsrRunBlock::GetForwardHistoNo(UInt_t idx)
 {
   if (fForwardHistoNo.empty())
     return -1;
 
-  if (i>fForwardHistoNo.size())
+  if (idx>fForwardHistoNo.size())
     return -1;
 
-  return fForwardHistoNo[i];
+  return fForwardHistoNo[idx];
 }
 
 //--------------------------------------------------------------------------
 // SetForwardHistoNo
 //--------------------------------------------------------------------------
 /**
- * <p> set forward histogram value at position pos
+ * <p> set forward histogram value at index idx
  *
  * \param histoNo histogram value
  * \param idx index whithin the fForwardHistoNo vector where to set the value.
@@ -764,22 +803,88 @@ void PMsrRunBlock::SetForwardHistoNo(Int_t histoNo, Int_t idx)
 }
 
 //--------------------------------------------------------------------------
+// GetAddForwardHistoNoSize
+//--------------------------------------------------------------------------
+/**
+ * <p> get forward histo number size of the addrun at index addRunIdx
+ *
+ * \param addRunIdx index of the addrun
+ */
+Int_t PMsrRunBlock::GetAddForwardHistoNoSize(UInt_t addRunIdx)
+{
+  if (fAddForwardHistoNo.empty())
+    return -1;
+
+  if (addRunIdx > fAddForwardHistoNo.size())
+    return -1;
+
+  return fAddForwardHistoNo[addRunIdx].size();
+}
+
+//--------------------------------------------------------------------------
+// GetAddForwardHistoNo
+//--------------------------------------------------------------------------
+/**
+ * <p> get forward histo number of the addrun (index addRunIdx) at index histoIdx
+ *
+ * \param addRunIdx index of the addrun
+ * \param histoIdx index of the add forward histo number value
+ */
+Int_t PMsrRunBlock::GetAddForwardHistoNo(UInt_t addRunIdx, UInt_t histoIdx)
+{
+  if (fAddForwardHistoNo.empty())
+    return -1;
+
+  if (addRunIdx > fAddForwardHistoNo.size())
+    return -1;
+
+  if (fAddForwardHistoNo[addRunIdx].empty())
+    return -1;
+
+  if (histoIdx > fAddForwardHistoNo[addRunIdx].size())
+    return -1;
+
+  return fAddForwardHistoNo[addRunIdx][histoIdx];
+}
+
+//--------------------------------------------------------------------------
+// SetAddForwardHistoNo
+//--------------------------------------------------------------------------
+/**
+ * <p> set add forward histogram value at index idx
+ *
+ * \param histoNo histogram value
+ * \param addRunIdx addrun index
+ * \param histoNoIdx index whithin the fAddForwardHistoNo vector where to set the value.
+ */
+void PMsrRunBlock::SetAddForwardHistoNo(Int_t histoNo, UInt_t addRunIdx, UInt_t histoNoIdx)
+{
+  if (addRunIdx >= fAddForwardHistoNo.size())
+    fAddForwardHistoNo.resize(addRunIdx+1);
+
+  if (histoNoIdx >= fAddForwardHistoNo[addRunIdx].size())
+    fAddForwardHistoNo[addRunIdx].resize(histoNoIdx+1);
+
+  fAddForwardHistoNo[addRunIdx][histoNoIdx] = histoNo;
+}
+
+//--------------------------------------------------------------------------
 // GetBackwardHistoNo
 //--------------------------------------------------------------------------
 /**
- * <p> get backward histogram value at position i
+ * <p> get backward histogram value at position idx
  *
- * \param i index of the map value to be returned
+ * \param idx index of the map value to be returned
  */
-Int_t PMsrRunBlock::GetBackwardHistoNo(UInt_t i)
+Int_t PMsrRunBlock::GetBackwardHistoNo(UInt_t idx)
 {
   if (fBackwardHistoNo.empty())
     return -1;
 
-  if (i>fBackwardHistoNo.size())
+  if (idx>fBackwardHistoNo.size())
     return -1;
 
-  return fBackwardHistoNo[i];
+  return fBackwardHistoNo[idx];
 }
 
 //--------------------------------------------------------------------------
@@ -804,32 +909,104 @@ void PMsrRunBlock::SetBackwardHistoNo(Int_t histoNo, Int_t idx)
 }
 
 //--------------------------------------------------------------------------
+// GetAddBackwardHistoNoSize
+//--------------------------------------------------------------------------
+/**
+ * <p> get backward histo number size of the addrun at index addRunIdx
+ *
+ * \param addRunIdx index of the addrun
+ */
+Int_t PMsrRunBlock::GetAddBackwardHistoNoSize(UInt_t addRunIdx)
+{
+  if (fAddBackwardHistoNo.empty())
+    return -1;
+
+  if (addRunIdx > fAddBackwardHistoNo.size())
+    return -1;
+
+  return fAddBackwardHistoNo[addRunIdx].size();
+}
+
+//--------------------------------------------------------------------------
+// GetAddBackwardHistoNo
+//--------------------------------------------------------------------------
+/**
+ * <p> get backward histo number of the addrun (index addRunIdx) at index histoIdx
+ *
+ * \param addRunIdx index of the addrun
+ * \param histoIdx index of the add backward histo number value
+ */
+Int_t PMsrRunBlock::GetAddBackwardHistoNo(UInt_t addRunIdx, UInt_t histoIdx)
+{
+  if (fAddBackwardHistoNo.empty())
+    return -1;
+
+  if (addRunIdx > fAddBackwardHistoNo.size())
+    return -1;
+
+  if (fAddBackwardHistoNo[addRunIdx].empty())
+    return -1;
+
+  if (histoIdx > fAddBackwardHistoNo[addRunIdx].size())
+    return -1;
+
+  return fAddBackwardHistoNo[addRunIdx][histoIdx];
+}
+
+//--------------------------------------------------------------------------
+// SetAddBackwardHistoNo
+//--------------------------------------------------------------------------
+/**
+ * <p> set add backward histogram value of the addrun at index histoNoIdx
+ *
+ * \param histoNo histogram value
+ * \param addRunIdx addrun index
+ * \param histoNoIdx index whithin the fAddBackwardHistoNo vector where to set the value.
+ */
+void PMsrRunBlock::SetAddBackwardHistoNo(Int_t histoNo, UInt_t addRunIdx, UInt_t histoNoIdx)
+{
+  if (addRunIdx >= fAddBackwardHistoNo.size())
+    fAddBackwardHistoNo.resize(addRunIdx+1);
+
+  if (histoNoIdx >= fAddBackwardHistoNo[addRunIdx].size())
+    fAddBackwardHistoNo[addRunIdx].resize(histoNoIdx+1);
+
+  fAddBackwardHistoNo[addRunIdx][histoNoIdx] = histoNo;
+}
+
+//--------------------------------------------------------------------------
 // GetMap
 //--------------------------------------------------------------------------
 /**
- * <p> get map value at position i
+ * <p> get map value at position idx
  *
- * \param i index of the map value to be returned
+ * \param idx index of the map value to be returned
  */
-Int_t PMsrRunBlock::GetMap(UInt_t i)
+Int_t PMsrRunBlock::GetMap(UInt_t idx)
 {
-  if (i>fMap.size())
+  if (idx>fMap.size())
     return -1;
 
-  return fMap[i];
+  return fMap[idx];
 }
 
 //--------------------------------------------------------------------------
 // SetMap
 //--------------------------------------------------------------------------
 /**
- * <p> set map value at position i
+ * <p> set map value at position idx
  *
- * \param i index of the map value to be set
+ * \param mapVal map value
+ * \param idx index of the map value to be set. If idx == -1, append map value.
  */
-void PMsrRunBlock::SetMap(Int_t mapVal, UInt_t idx)
+void PMsrRunBlock::SetMap(Int_t mapVal, Int_t idx)
 {
-  if (idx >= fMap.size())
+  if (idx == -1) {
+    fMap.push_back(mapVal);
+    return;
+  }
+
+  if (idx >= static_cast<Int_t>(fMap.size()))
     fMap.resize(idx+1);
 
   fMap[idx] = mapVal;
@@ -839,30 +1016,34 @@ void PMsrRunBlock::SetMap(Int_t mapVal, UInt_t idx)
 // GetBkgFix
 //--------------------------------------------------------------------------
 /**
- * <p> get background fixed value at position i
+ * <p> get background fixed value at position idx
  *
- * \param i index of the background fixed value to be returned
+ * \param idx index of the background fixed value to be returned
  */
-Double_t PMsrRunBlock::GetBkgFix(UInt_t i)
+Double_t PMsrRunBlock::GetBkgFix(UInt_t idx)
 {
-  if (i>fBkgFix.size())
+  if (idx >= 2)
     return PMUSR_UNDEFINED;
 
-  return fBkgFix[i];
+  return fBkgFix[idx];
 }
 
 //--------------------------------------------------------------------------
 // SetBkgFix
 //--------------------------------------------------------------------------
 /**
- * <p> set background fixed value at position i
+ * <p> set background fixed value at position idx
  *
- * \param i index of the background fixed value to be set
+ * \param dval fixed background value
+ * \param idx index of the background fixed value to be set.
  */
-void PMsrRunBlock::SetBkgFix(Double_t dval, UInt_t idx)
+void PMsrRunBlock::SetBkgFix(Double_t dval, Int_t idx)
 {
-  if (idx >= fBkgFix.size())
-    fBkgFix.resize(idx+1);
+  if (idx >= 2) {
+    cerr << endl << "PMsrRunBlock::SetBkgFix: **WARNING** idx=" << idx << ", only idx=0,1 are sensible.";
+    cerr << endl;
+    return;
+  }
 
   fBkgFix[idx] = dval;
 }
@@ -871,64 +1052,73 @@ void PMsrRunBlock::SetBkgFix(Double_t dval, UInt_t idx)
 // GetBkgRange
 //--------------------------------------------------------------------------
 /**
- * <p> get background range at position i
+ * <p> get background range at position idx
  *
- * \param i index of the background range to be returned
+ * \param idx index of the background range to be returned
  */
-Int_t PMsrRunBlock::GetBkgRange(UInt_t i)
+Int_t PMsrRunBlock::GetBkgRange(UInt_t idx)
 {
-  if (i >= fBkgRange.size()) {
+  if (idx >= 4) {
     return -1;
   }
 
-  return fBkgRange[i]-1; // -1 because the counting of the data vector starts at 0!
+  return fBkgRange[idx]-1; // -1 because the counting of the data vector starts at 0!
 }
 
 //--------------------------------------------------------------------------
 // SetBkgRange
 //--------------------------------------------------------------------------
 /**
- * <p> set background range element at position i
+ * <p> set background range element at position idx
  *
- * \param i index of the background range element to be returned
+ * \param ival background bin value
+ * \param idx index of the background range element to be set. If idx==-1, append value.
  */
-void PMsrRunBlock::SetBkgRange(Int_t ival, UInt_t idx)
+void PMsrRunBlock::SetBkgRange(Int_t ival, Int_t idx)
 {
-  if (idx >= fBkgRange.size())
-    fBkgRange.resize(idx+1);
+  if (idx >= 4) {
+    cerr << endl << "PMsrRunBlock::SetBkgRange: **WARNING** idx=" << idx << ", only idx=0..3 are sensible.";
+    cerr << endl;
+    return;
+  }
 
   fBkgRange[idx] = ival;
 }
+
 
 //--------------------------------------------------------------------------
 // GetDataRange
 //--------------------------------------------------------------------------
 /**
- * <p> get data range at position i
+ * <p> get data range at position idx
  *
- * \param i index of the data range to be returned
+ * \param idx index of the data range to be returned
  */
-Int_t PMsrRunBlock::GetDataRange(UInt_t i)
+Int_t PMsrRunBlock::GetDataRange(UInt_t idx)
 {
-  if (i >= fDataRange.size()) {
+  if (idx >= 4) {
     return -1;
   }
 
-  return fDataRange[i]-1; // -1 because the counting of the data vector starts at 0!
+  return fDataRange[idx]-1; // -1 because the counting of the data vector starts at 0!
 }
 
 //--------------------------------------------------------------------------
 // SetDataRange
 //--------------------------------------------------------------------------
 /**
- * <p> set data range element at position i
+ * <p> set data range element at position idx
  *
- * \param i index of the data range element to be returned
+ * \param ival data range element
+ * \param idx index of the data range element to be set. If idx==-1, append value
  */
-void PMsrRunBlock::SetDataRange(Int_t ival, UInt_t idx)
+void PMsrRunBlock::SetDataRange(Int_t ival, Int_t idx)
 {
-  if (idx >= fDataRange.size())
-    fDataRange.resize(idx+1);
+  if (idx >= 4) {
+    cerr << endl << "PMsrRunBlock::SetDataRange: **WARNING** idx=" << idx << ", only idx=0..3 are sensible.";
+    cerr << endl;
+    return;
+  }
 
   fDataRange[idx] = ival;
 }
@@ -937,61 +1127,134 @@ void PMsrRunBlock::SetDataRange(Int_t ival, UInt_t idx)
 // GetT0
 //--------------------------------------------------------------------------
 /**
- * <p> get T0 value at position i
+ * <p> get T0 value at position idx
  *
- * \param i index of the T0 value to be returned
+ * \param idx index of the T0 value to be returned
  */
-Int_t PMsrRunBlock::GetT0(UInt_t i)
+Int_t PMsrRunBlock::GetT0(UInt_t idx)
 {
-  if (i>fT0.size())
+  if (idx>fT0.size())
     return -1;
 
-  return fT0[i]-1; // -1 because the counting of the data vector starts at 0!
+  return fT0[idx]-1; // -1 because the counting of the data vector starts at 0!
 }
 
 //--------------------------------------------------------------------------
 // SetT0
 //--------------------------------------------------------------------------
 /**
- * <p> set T0 value at position i
+ * <p> set T0 value at position idx
  *
- * \param i index of the T0 value to be set
+ * \param ival t0 value
+ * \param idx index of the T0 value to be set. If idx==-1, append value
  */
-void PMsrRunBlock::SetT0(Int_t ival, UInt_t idx)
+void PMsrRunBlock::SetT0(Int_t ival, Int_t idx)
 {
-  if (idx >= fT0.size())
+  if (idx == -1) {
+    fT0.push_back(ival);
+    return;
+  }
+
+  if (idx >= static_cast<Int_t>(fT0.size()))
     fT0.resize(idx+1);
 
   fT0[idx] = ival;
 }
 
 //--------------------------------------------------------------------------
+// GetAddT0Size
+//--------------------------------------------------------------------------
+/**
+ * <p> get add T0 size of the addrun at index addRunIdx
+ *
+ * \param addRunIdx index of the addrun
+ */
+Int_t PMsrRunBlock::GetAddT0Size(UInt_t addRunIdx)
+{
+  if (fAddT0.empty())
+    return -1;
+
+  if (addRunIdx > fAddT0.size())
+    return -1;
+
+  return fAddT0[addRunIdx].size();
+}
+
+//--------------------------------------------------------------------------
+// GetAddT0
+//--------------------------------------------------------------------------
+/**
+ * <p> get add T0 of the addrun (index addRunIdx) at index histoIdx
+ *
+ * \param addRunIdx index of the addrun
+ * \param histoIdx index of the add backward histo number value
+ */
+Int_t PMsrRunBlock::GetAddT0(UInt_t addRunIdx, UInt_t histoIdx)
+{
+  if (fAddT0.empty())
+    return -1;
+
+  if (addRunIdx > fAddT0.size())
+    return -1;
+
+  if (fAddT0[addRunIdx].empty())
+    return -1;
+
+  if (histoIdx > fAddT0[addRunIdx].size())
+    return -1;
+
+  return fAddT0[addRunIdx][histoIdx]-1; // -1 because the counting of the data vector starts at 0!
+}
+
+//--------------------------------------------------------------------------
+// SetAddT0
+//--------------------------------------------------------------------------
+/**
+ * <p> set add t0 value of the addrun at index histoNoIdx
+ *
+ * \param ival t0 value
+ * \param addRunIdx addrun index
+ * \param histoNoIdx index whithin the fAddT0 vector where to set the value.
+ */
+void PMsrRunBlock::SetAddT0(Int_t ival, UInt_t addRunIdx, UInt_t histoNoIdx)
+{
+  if (addRunIdx >= fAddT0.size())
+    fAddT0.resize(addRunIdx+1);
+
+  if (histoNoIdx >= fAddT0[addRunIdx].size())
+    fAddT0[addRunIdx].resize(histoNoIdx+1);
+
+  fAddT0[addRunIdx][histoNoIdx] = ival;
+
+}
+
+//--------------------------------------------------------------------------
 // GetFitRange
 //--------------------------------------------------------------------------
 /**
- * <p> get fit range value at position i
+ * <p> get fit range value at position idx
  *
- * \param i index of the fit range value to be returned
+ * \param idx index of the fit range value to be returned
  */
-Double_t PMsrRunBlock::GetFitRange(UInt_t i)
+Double_t PMsrRunBlock::GetFitRange(UInt_t idx)
 {
-  if (i>2)
+  if (idx >= 2)
     return PMUSR_UNDEFINED;
 
-  return fFitRange[i];
+  return fFitRange[idx];
 }
 
 //--------------------------------------------------------------------------
 // SetFitRange
 //--------------------------------------------------------------------------
 /**
- * <p> set fit range value at position i
+ * <p> set fit range value at position idx
  *
- * \param i index of the fit range value to be set
+ * \param idx index of the fit range value to be set
  */
 void PMsrRunBlock::SetFitRange(Double_t dval, UInt_t idx)
 {
-  if (idx>=2)
+  if (idx >= 2)
     return;
 
   fFitRange[idx] = dval;

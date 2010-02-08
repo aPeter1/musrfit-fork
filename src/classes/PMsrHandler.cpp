@@ -275,6 +275,17 @@ Int_t PMsrHandler::ReadMsrFile()
     if (!CheckFuncs())
       result = PMUSR_MSR_SYNTAX_ERROR;
 
+  // check that if histogram grouping is present that it makes any sense
+  if (result == PMUSR_SUCCESS)
+    if (!CheckHistoGrouping())
+      result = PMUSR_MSR_SYNTAX_ERROR;
+
+  // check that if addrun is present that the given parameter make any sense
+  if (result == PMUSR_SUCCESS)
+    if (!CheckAddRunParameters())
+      result = PMUSR_MSR_SYNTAX_ERROR;
+
+
   // clean up
   fit_parameter.clear();
   theory.clear();
@@ -284,19 +295,6 @@ Int_t PMsrHandler::ReadMsrFile()
   fourier.clear();
   plot.clear();
   statistic.clear();
-
-/*
-cout << endl << ">> FOURIER Block:";
-cout << endl << ">>   Fourier Block Present       : " << fFourier.fFourierBlockPresent;
-cout << endl << ">>   Fourier Units               : " << fFourier.fUnits;
-cout << endl << ">>   Fourier Power               : " << fFourier.fFourierPower;
-cout << endl << ">>   Apodization                 : " << fFourier.fApodization;
-cout << endl << ">>   Plot Tag                    : " << fFourier.fPlotTag;
-cout << endl << ">>   Phase                       : " << fFourier.fPhase;
-cout << endl << ">>   Range for Freq. Corrections : " << fFourier.fRangeForPhaseCorrection[0] << ", " << fFourier.fRangeForPhaseCorrection[1];
-cout << endl << ">>   Plot Range                  : " << fFourier.fPlotRange[0] << ", " << fFourier.fPlotRange[1];
-cout << endl;
-*/
 
   return result;
 }
@@ -334,6 +332,11 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
   for (UInt_t i=0; i<fRuns.size(); i++) {
     dataTagMissing.push_back(true);
   }
+
+  // add some counters needed in connection to addruns
+  Int_t addForwardHistoNoCounter = 0;
+  Int_t addBackwardHistoNoCounter = 0;
+  Int_t addT0Counter = 0;
 
   ifstream fin;
   ofstream fout;
@@ -417,6 +420,11 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
     } else if (str.BeginsWith("RUN")) {          // RUN block tag
       tag = MSR_TAG_RUN;
       runNo++;
+
+      // reset addrun helper counters
+      addForwardHistoNoCounter = 0;
+      addBackwardHistoNoCounter = 0;
+      addT0Counter = 0;
     } else if (str.BeginsWith("COMMANDS")) {     // COMMANDS block tag
       tag = MSR_TAG_COMMANDS;
       fout << str.Data() << endl;
@@ -620,10 +628,6 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           fout.width(16);
           fout << left << "backgr.fit";
           fout << fRuns[runNo].GetBkgFitParamNo() << endl;
-        } else if (sstr.BeginsWith("rphase")) {
-          fout.width(16);
-          fout << left << "rphase";
-          fout << fRuns[runNo].GetPhaseParamNo() << endl;
         } else if (sstr.BeginsWith("lifetime ")) {
           fout.width(16);
           fout << left << "lifetime";
@@ -645,38 +649,96 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           }
           fout << endl;
         } else if (sstr.BeginsWith("forward")) {
-          fout.width(16);
-          fout << left << "forward";
-          fout << fRuns[runNo].GetForwardHistoNo() << endl;
+          if (fRuns[runNo].GetForwardHistoNoSize() == 0) {
+            cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **WARNING** 'forward' tag without any data found!";
+            cerr << endl << ">> Something is VERY fishy, please check your msr-file carfully." << endl;
+          } else {
+            fout.width(16);
+            fout << left << "forward";
+            for (UInt_t i=0; i<fRuns[runNo].GetForwardHistoNoSize(); i++) {
+              fout.width(8);
+              fout << fRuns[runNo].GetForwardHistoNo(i);
+            }
+            fout << endl;
+          }
+        } else if (sstr.BeginsWith("addforward")) {
+          if (fRuns[runNo].GetAddForwardHistoNoSize(addForwardHistoNoCounter) <= 0) {
+            cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **WARNING** 'addforward' tag without any data found!";
+            cerr << endl << ">> Something is VERY fishy, please check your msr-file carfully." << endl;
+          } else if (addForwardHistoNoCounter >= fRuns[runNo].GetAddForwardHistoNoSize(addForwardHistoNoCounter)) {
+            cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **WARNING** More 'addforward' tags present than addforward data!";
+            cerr << endl << ">> Something is VERY fishy, please check your msr-file carfully." << endl;
+          } else {
+            fout.width(16);
+            fout << left << "addforward";
+            for (Int_t i=0; i<fRuns[runNo].GetAddForwardHistoNoSize(addForwardHistoNoCounter); i++) {
+              fout.width(8);
+              fout << fRuns[runNo].GetAddForwardHistoNo(addForwardHistoNoCounter, i);
+            }
+            fout << endl;
+            addForwardHistoNoCounter++;
+          }
         } else if (sstr.BeginsWith("backward")) {
-          fout.width(16);
-          fout << left << "backward";
-          fout << fRuns[runNo].GetBackwardHistoNo() << endl;
+          if (fRuns[runNo].GetBackwardHistoNoSize() == 0) {
+            cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **WARNING** 'backward' tag without any data found!";
+            cerr << endl << ">> Something is VERY fishy, please check your msr-file carfully." << endl;
+          } else {
+            fout.width(16);
+            fout << left << "backward";
+            for (UInt_t i=0; i<fRuns[runNo].GetBackwardHistoNoSize(); i++) {
+              fout.width(8);
+              fout << fRuns[runNo].GetBackwardHistoNo(i);
+            }
+            fout << endl;
+          }
+        } else if (sstr.BeginsWith("addbackward")) {
+          if (fRuns[runNo].GetAddBackwardHistoNoSize(addBackwardHistoNoCounter) <= 0) {
+            cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **WARNING** 'addbackward' tag without any data found!";
+            cerr << endl << ">> Something is VERY fishy, please check your msr-file carfully." << endl;
+          } else if (addBackwardHistoNoCounter >= fRuns[runNo].GetAddBackwardHistoNoSize(addBackwardHistoNoCounter)) {
+            cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **WARNING** More 'addbackward' tags present than addbackward data!";
+            cerr << endl << ">> Something is VERY fishy, please check your msr-file carfully." << endl;
+          } else {
+            fout.width(16);
+            fout << left << "addbackward";
+            for (Int_t i=0; i<fRuns[runNo].GetAddBackwardHistoNoSize(addBackwardHistoNoCounter); i++) {
+              fout.width(8);
+              fout << fRuns[runNo].GetAddBackwardHistoNo(addBackwardHistoNoCounter, i);
+            }
+            fout << endl;
+            addBackwardHistoNoCounter++;
+          }
         } else if (sstr.BeginsWith("backgr.fix")) {
           fout.width(15);
           fout << left << "backgr.fix";
-          for (UInt_t j=0; j<fRuns[runNo].GetBkgFixSize(); j++) {
-            fout.precision(prec);
-            fout.width(12);
-            fout << left << fRuns[runNo].GetBkgFix(j);
+          for (UInt_t j=0; j<2; j++) {
+            if (fRuns[runNo].GetBkgFix(j) != PMUSR_UNDEFINED) {
+              fout.precision(prec);
+              fout.width(12);
+              fout << left << fRuns[runNo].GetBkgFix(j);
+            }
           }
           fout << endl;
         } else if (sstr.BeginsWith("background")) {
           backgroundTagMissing[runNo] = false;
           fout.width(16);
           fout << left << "background";
-          for (UInt_t j=0; j<fRuns[runNo].GetBkgRangeSize(); j++) {
-            fout.width(8);
-            fout << left << fRuns[runNo].GetBkgRange(j)+1; // +1 since internally the data start at 0
+          for (UInt_t j=0; j<4; j++) {
+            if (fRuns[runNo].GetBkgRange(j) > 0) {
+              fout.width(8);
+              fout << left << fRuns[runNo].GetBkgRange(j)+1; // +1 since internally the data start at 0
+            }
           }
           fout << endl;
         } else if (sstr.BeginsWith("data")) {
           dataTagMissing[runNo] = false;
           fout.width(16);
           fout << left << "data";
-          for (UInt_t j=0; j<fRuns[runNo].GetDataRangeSize(); j++) {
-            fout.width(8);
-            fout << left << fRuns[runNo].GetDataRange(j)+1; // +1 since internally the data start at 0
+          for (UInt_t j=0; j<4; j++) {
+            if (fRuns[runNo].GetDataRange(j) > 0) {
+              fout.width(8);
+              fout << left << fRuns[runNo].GetDataRange(j)+1; // +1 since internally the data start at 0
+            }
           }
           fout << endl;
         } else if (sstr.BeginsWith("t0")) {
@@ -688,6 +750,20 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             fout << left << fRuns[runNo].GetT0(j)+1; // +1 since internally the data start at 0
           }
           fout << endl;
+        } else if (sstr.BeginsWith("addt0")) {
+          if (fRuns[runNo].GetAddT0Size(addT0Counter) <=0) {
+            cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **WARNING** 'addt0' tag without any data found!";
+            cerr << endl << ">> Something is VERY fishy, please check your msr-file carfully." << endl;
+          } else {
+            fout.width(16);
+            fout << left << "addt0";
+            for (Int_t j=0; j<fRuns[runNo].GetAddT0Size(addT0Counter); j++) {
+              fout.width(8);
+              fout << left << fRuns[runNo].GetAddT0(addT0Counter, j)+1; // +1 since internally the data start at 0
+            }
+            fout << endl;
+            addT0Counter++;
+          }
         } else if (sstr.BeginsWith("xy-data")) {
           if (fRuns[runNo].GetXDataIndex() != -1) { // indices
             fout.width(16);
@@ -723,10 +799,10 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             }
           }
           if (backgroundTagMissing[runNo]) {
-            if (fRuns[runNo].GetBkgRangeSize() > 0) {
+            if (fRuns[runNo].GetBkgRange(0) >= 0) {
               fout.width(16);
               fout << left << "background";
-              for (UInt_t j=0; j<fRuns[runNo].GetBkgRangeSize(); j++) {
+              for (UInt_t j=0; j<2; j++) {
                 fout.width(8);
                 fout << left << fRuns[runNo].GetBkgRange(j)+1; // +1 since internally the data start at 0
               }
@@ -734,10 +810,10 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             }
           }
           if (dataTagMissing[runNo]) {
-            if (fRuns[runNo].GetDataRangeSize() > 0) {
+            if (fRuns[runNo].GetDataRange(0) >= 0) {
               fout.width(16);
               fout << left << "data";
-              for (UInt_t j=0; j<fRuns[runNo].GetDataRangeSize(); j++) {
+              for (UInt_t j=0; j<2; j++) {
                 fout.width(8);
                 fout << left << fRuns[runNo].GetDataRange(j)+1; // +1 since internally the data start at 0
               }
@@ -1511,7 +1587,12 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
   TObjArray *tokens = 0;
   TObjString *ostr = 0;
 
-  Int_t dval;
+  // add some counters needed in connection to addruns
+  UInt_t addForwardHistoNoCounter = 0;
+  UInt_t addBackwardHistoNoCounter = 0;
+  UInt_t addT0Counter = 0;
+
+  Int_t ival;
 
   iter = lines.begin();
   while ((iter != lines.end()) && !error) {
@@ -1541,17 +1622,26 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       } else {
         // run name
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
-        param.AppendRunName(ostr->GetString());
+        str = ostr->GetString();
+        param.SetRunName(str);
         // beamline
         ostr = dynamic_cast<TObjString*>(tokens->At(2));
-        param.AppendBeamline(ostr->GetString());
+        str = ostr->GetString();
+        param.SetBeamline(str);
         // institute
         ostr = dynamic_cast<TObjString*>(tokens->At(3));
-        param.AppendInstitute(ostr->GetString());
+        str = ostr->GetString();
+        param.SetInstitute(str);
         // data file format
         ostr = dynamic_cast<TObjString*>(tokens->At(4));
-        param.AppendFileFormat(ostr->GetString());
+        str = ostr->GetString();
+        param.SetFileFormat(str);
       }
+
+      // reset addrun helper counters
+      addForwardHistoNoCounter = 0;
+      addBackwardHistoNoCounter = 0;
+      addT0Counter = 0;
     }
 
     // ADDRUN line ---------------------------------------------
@@ -1572,16 +1662,20 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       } else {
         // run name
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
-        param.AppendRunName(ostr->GetString());
+        str = ostr->GetString();
+        param.SetRunName(str);
         // beamline
         ostr = dynamic_cast<TObjString*>(tokens->At(2));
-        param.AppendBeamline(ostr->GetString());
+        str = ostr->GetString();
+        param.SetBeamline(str);
         // institute
         ostr = dynamic_cast<TObjString*>(tokens->At(3));
-        param.AppendInstitute(ostr->GetString());
+        str = ostr->GetString();
+        param.SetInstitute(str);
         // data file format
         ostr = dynamic_cast<TObjString*>(tokens->At(4));
-        param.AppendFileFormat(ostr->GetString());
+        str = ostr->GetString();
+        param.SetFileFormat(str);
       }
     }
 
@@ -1622,9 +1716,9 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (str.IsDigit()) {
-          dval = str.Atoi();
-          if (dval > 0)
-            param.SetAlphaParamNo(dval);
+          ival = str.Atoi();
+          if (ival > 0)
+            param.SetAlphaParamNo(ival);
           else
             error = true;
         } else {
@@ -1644,9 +1738,9 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (str.IsDigit()) {
-          dval = str.Atoi();
-          if (dval > 0)
-            param.SetBetaParamNo(dval);
+          ival = str.Atoi();
+          if (ival > 0)
+            param.SetBetaParamNo(ival);
           else
             error = true;
         } else {
@@ -1690,9 +1784,9 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (str.IsDigit()) {
-          dval = str.Atoi();
-          if (dval > 0)
-            param.SetBkgFitParamNo(dval);
+          ival = str.Atoi();
+          if (ival > 0)
+            param.SetBkgFitParamNo(ival);
           else
             error = true;
         } else {
@@ -1712,9 +1806,9 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (str.IsDigit()) {
-          dval = str.Atoi();
-          if (dval > 0)
-            param.SetLifetimeParamNo(dval);
+          ival = str.Atoi();
+          if (ival > 0)
+            param.SetLifetimeParamNo(ival);
           else
             error = true;
         } else {
@@ -1740,9 +1834,9 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(i));
         str = ostr->GetString();
         if (str.IsDigit()) {
-          dval = str.Atoi();
-          if (dval >= 0)
-            param.AppendMap(dval);
+          ival = str.Atoi();
+          if (ival >= 0)
+            param.SetMap(ival);
           else
             error = true;
         } else {
@@ -1771,9 +1865,9 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsDigit()) {
-            dval = str.Atoi();
-            if (dval > 0)
-              param.SetForwardHistoNo(dval);
+            ival = str.Atoi();
+            if (ival > 0)
+              param.SetForwardHistoNo(ival);
             else
               error = true;
           } else {
@@ -1781,6 +1875,32 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           }
         }
       }
+    }
+
+    // addforward ---------------------------------------------
+    if (iter->fLine.BeginsWith("addforward", TString::kIgnoreCase)) {
+
+      runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
+
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        for (Int_t i=1; i<tokens->GetEntries(); i++) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(i));
+          str = ostr->GetString();
+          if (str.IsDigit()) {
+            ival = str.Atoi();
+            if (ival > 0)
+              param.SetAddForwardHistoNo(ival, addForwardHistoNoCounter, i-1);
+            else
+              error = true;
+          } else {
+            error = true;
+          }
+        }
+      }
+
+      addForwardHistoNoCounter++;
     }
 
     // backward -----------------------------------------------
@@ -1795,9 +1915,9 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsDigit()) {
-            dval = str.Atoi();
-            if (dval > 0)
-              param.SetBackwardHistoNo(dval);
+            ival = str.Atoi();
+            if (ival > 0)
+              param.SetBackwardHistoNo(ival);
             else
               error = true;
           } else {
@@ -1805,6 +1925,32 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           }
         }
       }
+    }
+
+    // addbackward ---------------------------------------------
+    if (iter->fLine.BeginsWith("addbackward", TString::kIgnoreCase)) {
+
+      runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
+
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        for (Int_t i=1; i<tokens->GetEntries(); i++) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(i));
+          str = ostr->GetString();
+          if (str.IsDigit()) {
+            ival = str.Atoi();
+            if (ival > 0)
+              param.SetAddBackwardHistoNo(ival, addBackwardHistoNoCounter, i-1);
+            else
+              error = true;
+          } else {
+            error = true;
+          }
+        }
+      }
+
+      addBackwardHistoNoCounter++;
     }
 
     // backgr.fix ----------------------------------------------
@@ -1819,7 +1965,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsFloat())
-            param.AppendBkgFix(str.Atof());
+            param.SetBkgFix(str.Atof());
           else
             error = true;
         }
@@ -1838,9 +1984,9 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsDigit()) {
-            dval = str.Atoi();
-            if (dval > 0)
-              param.AppendBkgRange(dval);
+            ival = str.Atoi();
+            if (ival > 0)
+              param.SetBkgRange(ival, i-1);
             else
               error = true;
           } else {
@@ -1862,9 +2008,9 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsDigit()) {
-            dval = str.Atoi();
-            if (dval > 0)
-              param.AppendDataRange(dval);
+            ival = str.Atoi();
+            if (ival > 0)
+              param.SetDataRange(ival, i-1);
             else
               error = true;
           } else {
@@ -1886,9 +2032,9 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsDigit()) {
-            dval = str.Atoi();
-            if (dval > 0)
-              param.AppendT0(dval);
+            ival = str.Atoi();
+            if (ival > 0)
+              param.SetT0(ival);
             else
               error = true;
           } else {
@@ -1896,6 +2042,32 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           }
         }
       }
+    }
+
+    // addt0 -----------------------------------------------------
+    if (iter->fLine.BeginsWith("addt0", TString::kIgnoreCase)) {
+
+      runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
+
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        for (Int_t i=1; i<tokens->GetEntries(); i++) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(i));
+          str = ostr->GetString();
+          if (str.IsDigit()) {
+            ival = str.Atoi();
+            if (ival > 0)
+              param.SetAddT0(ival, addT0Counter, i-1);
+            else
+              error = true;
+          } else {
+            error = true;
+          }
+        }
+      }
+
+      addT0Counter++;
     }
 
     // fit -----------------------------------------------------
@@ -1928,9 +2100,9 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (str.IsDigit()) {
-          dval = str.Atoi();
-          if (dval > 0)
-            param.SetPacking(dval);
+          ival = str.Atoi();
+          if (ival > 0)
+            param.SetPacking(ival);
           else
             error = true;
         } else {
@@ -1954,9 +2126,9 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(2));
           str = ostr->GetString();
           if (str.IsDigit()) {
-            dval = str.Atoi();
-            if (dval > 0)
-              param.SetYDataIndex(dval); // y-index
+            ival = str.Atoi();
+            if (ival > 0)
+              param.SetYDataIndex(ival); // y-index
             else
               error = true;
           } else {
@@ -3117,7 +3289,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
     if (str.Contains("alpha") || str.Contains("beta") ||
         str.Contains("alpha2") || str.Contains("beta2") ||
         str.Contains("norm") || str.Contains("backgr.fit") ||
-        str.Contains("rphase") || str.Contains("lifetime ")) {
+        str.Contains("lifetime ")) {
       // tokenize string
       tokens = str.Tokenize(" \t");
       if (!tokens)
@@ -3544,6 +3716,97 @@ Bool_t PMsrHandler::CheckFuncs()
   funVec.clear();
   funBlock.clear();
   funLineBlockNo.clear();
+
+  return result;
+}
+
+//--------------------------------------------------------------------------
+// CheckHistoGrouping (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Checks if histogram grouping makes any sense.
+ */
+Bool_t PMsrHandler::CheckHistoGrouping()
+{
+  Bool_t result = true;
+
+  for (UInt_t i=0; i<fRuns.size(); i++) {
+    if (fRuns[i].GetFitType() == MSR_FITTYPE_ASYM) {
+      if (fRuns[i].GetForwardHistoNoSize() != fRuns[i].GetBackwardHistoNoSize()) {
+        cerr << endl << ">> PMsrHandler::CheckHistoGrouping: **ERROR** # of forward histos != # of backward histos.";
+        cerr << endl << ">> Run #" << i+1;
+        cerr << endl;
+        result = false;
+        break;
+      }
+    }
+  }
+
+  return result;
+}
+
+//--------------------------------------------------------------------------
+// CheckAddRunParameters (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Check if addrun is present that given parameters make any sense.
+ */
+Bool_t PMsrHandler::CheckAddRunParameters()
+{
+  Bool_t result = true;
+
+  for (UInt_t i=0; i<fRuns.size(); i++) {
+    if (fRuns[i].GetRunNameSize() > 1) {
+      // checks concerning forward <-> backward, addforward <-> addbackward
+      if (fRuns[i].GetAddForwardHistoNoEntries() != 0) { // addforward given, make some consistency checks
+        if (fRuns[i].GetRunNameSize()-1 != fRuns[i].GetAddForwardHistoNoEntries()) {
+          cerr << endl << ">> PMsrHandler::CheckAddRunParameters: **ERROR** # of addruns != # of addforwards found.";
+          cerr << endl << ">> Run #" << i+1;
+          cerr << endl;
+          result = false;
+          break;
+        }
+        if (fRuns[i].GetFitType() == MSR_FITTYPE_ASYM) {
+          if (fRuns[i].GetAddForwardHistoNoEntries() != fRuns[i].GetAddBackwardHistoNoEntries()) {
+            cerr << endl << ">> PMsrHandler::CheckAddRunParameters: **ERROR** # of addforward entries != # of addbackward entries.";
+            cerr << endl << ">> Run #" << i+1;
+            cerr << endl;
+            result = false;
+            break;
+          }
+        }
+        for (UInt_t j=0; j<fRuns[i].GetAddForwardHistoNoEntries(); j++) {
+          if (fRuns[i].GetAddForwardHistoNoSize(j) != static_cast<Int_t>(fRuns[i].GetForwardHistoNoSize())) {
+            cerr << endl << ">> PMsrHandler::CheckAddRunParameters: **ERROR** # of addforward histos != # of forward histos.";
+            cerr << endl << ">> Run #" << i+1;
+            cerr << endl;
+            result = false;
+            break;
+          }
+        }
+      }
+
+      // check concerning the addt0 tags
+      if (fRuns[i].GetAddT0Entries() != 0) {
+        if (fRuns[i].GetAddT0Entries() != fRuns[i].GetRunNameSize()-1) {
+          cerr << endl << ">> PMsrHandler::CheckAddRunParameters: **ERROR** # of addt0 != # of addruns.";
+          cerr << endl << ">> Run #" << i+1;
+          cerr << endl;
+          result = false;
+          break;
+        }
+      }
+    } else { // no addrun present, check if addforward, addbackward, ... is present (which doesn't make any sense)
+      if ((fRuns[i].GetAddForwardHistoNoEntries() != 0) || (fRuns[i].GetAddBackwardHistoNoEntries() != 0) ||
+          (fRuns[i].GetAddT0Entries() != 0)) {
+        cerr << endl << ">> PMsrHandler::CheckAddRunParameters: **WARNING** found one of the following tags in Run #" << i+1 << ":";
+        cerr << endl << ">> addforward, addbackward, or addt0";
+        cerr << endl << ">> this doesn't make any sense if there no addrun present.";
+        cerr << endl << ">> Will ignore these entires for this run!";
+        cerr << endl;
+      }
+    }
+  }
 
   return result;
 }
