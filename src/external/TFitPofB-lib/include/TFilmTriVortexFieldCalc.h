@@ -87,7 +87,9 @@ public:
 
   fftwf_complex* GetAkMatrix() const {return fFFTin;}
   fftwf_complex* GetBkMatrix() const {return fBkMatrix;}
+  fftwf_complex* GetRealSpaceMatrix() const {return fRealSpaceMatrix;}
   float* GetOmegaMatrix() const {return fOmegaMatrix;}
+  float* GetBkSMatrix() const {return fBkS;}
   vector<float*> GetOmegaDiffMatrix() const {return fOmegaDiffMatrix;}
   fftwf_complex* GetQMatrix() const {return fQMatrix;}
   fftwf_complex* GetPMatrix() const {return fPkMatrix;}
@@ -103,16 +105,19 @@ private:
   void ManipulateFourierCoefficientsForQy() const;
   void ManipulateFourierCoefficientsForBperpX() const;
   void ManipulateFourierCoefficientsForBperpY() const;
+  void CalculateGatVortexCore() const;
 
   mutable float *fOmegaMatrix;
   mutable vector<float*> fOmegaDiffMatrix;
+  mutable fftwf_complex *fRealSpaceMatrix;
   mutable fftwf_complex *fBkMatrix;
   mutable fftwf_complex *fPkMatrix;
   mutable fftwf_complex *fQMatrix;
   mutable fftwf_complex *fQMatrixA;
   mutable fftwf_complex *fSumAkFFTin;
-  mutable float *fSumAk;
+  mutable fftwf_complex *fSumAk;
   mutable float *fBkS;
+  mutable float *fGstorage;
 
   mutable float *fCheckAkConvergence;
   mutable float *fCheckBkConvergence;
