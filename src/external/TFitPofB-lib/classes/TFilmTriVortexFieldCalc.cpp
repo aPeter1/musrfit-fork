@@ -230,7 +230,7 @@ TFilmTriVortexNGLFieldCalc::TFilmTriVortexNGLFieldCalc(const string& wisdom, con
     fFFTplanOmegaToAk = fftwf_plan_dft_3d(fSteps, fSteps, fStepsZ, fRealSpaceMatrix, fFFTin, FFTW_FORWARD, FFTW_EXHAUSTIVE);
 //    fFFTplanOmegaToBk = fftwf_plan_dft_3d(fSteps, fSteps, fStepsZ, fBkMatrix, fBkMatrix, FFTW_FORWARD, FFTW_EXHAUSTIVE);
     fFFTplanForSumAk = fftwf_plan_dft_1d(fStepsZ, fSumAkFFTin, fSumAk, FFTW_FORWARD, FFTW_EXHAUSTIVE);
-    fFFTplanForPk1 = fftwf_plan_dft_3d(fSteps, fSteps, fStepsZ, fPkMatrix, fPkMatrix, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
+    fFFTplanForPk1 = fftwf_plan_dft_3d(fSteps, fSteps, fStepsZ, fPkMatrix, fPkMatrix, FFTW_FORWARD, FFTW_EXHAUSTIVE);
     fFFTplanForPk2 = fftwf_plan_dft_3d(fSteps, fSteps, fStepsZ, fQMatrix, fQMatrix, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
   }
   else {
@@ -241,7 +241,7 @@ TFilmTriVortexNGLFieldCalc::TFilmTriVortexNGLFieldCalc(const string& wisdom, con
     fFFTplanOmegaToAk = fftwf_plan_dft_3d(fSteps, fSteps, fStepsZ, fRealSpaceMatrix, fFFTin, FFTW_FORWARD, FFTW_ESTIMATE);
 //    fFFTplanOmegaToBk = fftwf_plan_dft_3d(fSteps, fSteps, fStepsZ, fBkMatrix, fBkMatrix, FFTW_FORWARD, FFTW_ESTIMATE);
     fFFTplanForSumAk = fftwf_plan_dft_1d(fStepsZ, fSumAkFFTin, fSumAk, FFTW_FORWARD, FFTW_ESTIMATE);
-    fFFTplanForPk1 = fftwf_plan_dft_3d(fSteps, fSteps, fStepsZ, fPkMatrix, fPkMatrix, FFTW_BACKWARD, FFTW_ESTIMATE);
+    fFFTplanForPk1 = fftwf_plan_dft_3d(fSteps, fSteps, fStepsZ, fPkMatrix, fPkMatrix, FFTW_FORWARD, FFTW_ESTIMATE);
     fFFTplanForPk2 = fftwf_plan_dft_3d(fSteps, fSteps, fStepsZ, fQMatrix, fQMatrix, FFTW_BACKWARD, FFTW_ESTIMATE);
   }
   cout << "done" << endl;
@@ -600,6 +600,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGradient() const {
   const int NFFT_2(fSteps/2);
   const int NFFTsq(fSteps*fSteps);
   const int NFFTsqStZ(NFFTsq*fStepsZ);
+  const int NFFTsqStZ_2(NFFTsqStZ/2);
   const int NFFTz(fStepsZ);
   const int NFFTz_2(fStepsZ/2);
 
@@ -647,7 +648,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGradient() const {
   // k != 0
 
   if (fFind3dSolution) {
-    for (k = 1; k < NFFTz; ++k) {
+    for (k = 1; k < NFFTz_2; ++k) {
       // even rows
       for (i = 0; i < NFFT; i += 2) {
         // j = 0
@@ -686,6 +687,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGradient() const {
   // First multiply the aK with Ky, then call FFTW
 
   const float coeffKy(TWOPI/fLatticeConstant);
+  float ky;
 
   // k = 0
 
@@ -696,32 +698,36 @@ void TFilmTriVortexNGLFieldCalc::CalculateGradient() const {
   }
   // i != 0
   for (i = 2; i < NFFT_2; i += 2) {
+    ky = coeffKy*static_cast<float>(i);
     for (j = 0; j < NFFT; j += 2) {
-      fFFTin[NFFTz*(j + NFFT*i)][0] *= coeffKy*static_cast<float>(i);
+      fFFTin[NFFTz*(j + NFFT*i)][0] *= ky;
     }
   }
-  for (i = NFFT_2 + 2; i < NFFT; i += 2) {
+  for (i = NFFT_2; i < NFFT; i += 2) {
+    ky = coeffKy*static_cast<float>(i - NFFT);
     for (j = 0; j < NFFT; j += 2) {
-      fFFTin[NFFTz*(j + NFFT*i)][0] *= coeffKy*static_cast<float>(i - NFFT);
+      fFFTin[NFFTz*(j + NFFT*i)][0] *= ky;
     }
   }
 
   // odd rows
   for (i = 1; i < NFFT_2; i += 2) {
+    ky = coeffKy*static_cast<float>(i);
     for (j = 0; j < NFFT; j += 2) {
-      fFFTin[NFFTz*(j + 1 + NFFT*i)][0] *= coeffKy*static_cast<float>(i);
+      fFFTin[NFFTz*(j + 1 + NFFT*i)][0] *= ky;
     }
   }
   for (i = NFFT_2 + 1; i < NFFT; i += 2) {
+    ky = coeffKy*static_cast<float>(i - NFFT);
     for (j = 0; j < NFFT; j += 2) {
-      fFFTin[NFFTz*(j + 1 + NFFT*i)][0] *= coeffKy*static_cast<float>(i - NFFT);
+      fFFTin[NFFTz*(j + 1 + NFFT*i)][0] *= ky;
     }
   }
 
   // k != 0
 
   if (fFind3dSolution) {
-    for (k = 1; k < NFFTz; ++k) {
+    for (k = 1; k < NFFTz_2; ++k) {
       // even rows
       // i = 0
       for (j = 0; j < NFFT; j += 2) {
@@ -729,24 +735,28 @@ void TFilmTriVortexNGLFieldCalc::CalculateGradient() const {
       }
       // i != 0
       for (i = 2; i < NFFT_2; i += 2) {
+        ky = coeffKy*static_cast<float>(i);
         for (j = 0; j < NFFT; j += 2) {
-          fFFTin[k + NFFTz*(j + NFFT*i)][0] *= coeffKy*static_cast<float>(i);
+          fFFTin[k + NFFTz*(j + NFFT*i)][0] *= ky;
         }
       }
-      for (i = NFFT_2 + 2; i < NFFT; i += 2) {
+      for (i = NFFT_2; i < NFFT; i += 2) {
+        ky = coeffKy*static_cast<float>(i - NFFT);
         for (j = 0; j < NFFT; j += 2) {
-          fFFTin[k + NFFTz*(j + NFFT*i)][0] *= coeffKy*static_cast<float>(i - NFFT);
+          fFFTin[k + NFFTz*(j + NFFT*i)][0] *= ky;
         }
       }
       // odd rows
       for (i = 1; i < NFFT_2; i += 2) {
+        ky = coeffKy*static_cast<float>(i);
         for (j = 0; j < NFFT; j += 2) {
-          fFFTin[k + NFFTz*(j + 1 + NFFT*i)][0] *= coeffKy*static_cast<float>(i);
+          fFFTin[k + NFFTz*(j + 1 + NFFT*i)][0] *= ky;
         }
       }
       for (i = NFFT_2 + 1; i < NFFT; i += 2) {
+        ky = coeffKy*static_cast<float>(i - NFFT);
         for (j = 0; j < NFFT; j += 2) {
-          fFFTin[k + NFFTz*(j + 1 + NFFT*i)][0] *= coeffKy*static_cast<float>(i - NFFT);
+          fFFTin[k + NFFTz*(j + 1 + NFFT*i)][0] *= ky;
         }
       }
     }
@@ -784,6 +794,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGradient() const {
         }
       }
     }
+    /* Comment out the negativ k since the coefficients should be all zero'd before
     for (k = NFFTz_2; k < NFFTz; ++k) {
       kz = coeffKz*static_cast<float>(k - NFFTz);
       // even rows
@@ -799,14 +810,13 @@ void TFilmTriVortexNGLFieldCalc::CalculateGradient() const {
         }
       }
     }
+    */
 
     // 1D transform - first sum up the coefficients in the other two dimensions and then call FFTW
-    for (k = 0; k < NFFTz; ++k) {
+    for (k = 0; k < NFFTz_2; ++k) {
       fSumAkFFTin[k][0] = 0.0f;
-      for (j = 0; j < NFFT; ++j) {
-        for (i = 0; i < NFFT; ++i) {
-          fSumAkFFTin[k][0] += fFFTin[k + NFFTz*(j + fSteps*i)][0];
-        }
+      for (index = 0; index < NFFTsq; ++index) {
+        fSumAkFFTin[k][0] += fFFTin[k + NFFTz*index][0];
       }
       fSumAkFFTin[k][1] = 0.0f;
     }
@@ -816,7 +826,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGradient() const {
     // 3D transform
     fftwf_execute(fFFTplan);
 
-    // Copy the results to the gradient matrix - with the 1D-forward-transform we have to _add_ fSumAk
+    // Copy the results to the gradient matrix - with the 1D-FORWARD-transform we have to _add_ fSumAk
     for (k = 0; k < NFFTz; ++k) {
       #pragma omp parallel for default(shared) private(index) schedule(dynamic)
       for (index = 0; index < NFFTsq; ++index) {
@@ -838,7 +848,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGradient() const {
       fBkMatrix[l][1] = 0.0f;
     }
   }
-/*
+  /*
   // Ensure that omega and the gradient at the vortex-core positions are zero
   for (k = 0; k < NFFTz; ++k) {
     fOmegaMatrix[k] = 0.0f;
@@ -864,7 +874,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGradient() const {
     // k = NFFTz_2
     fOmegaDiffMatrix[2][NFFTz_2 + index] = 0.0f;
   }
-*/
+  */
   return;
 
 
@@ -1039,7 +1049,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGradient() const {
 }
 
 void TFilmTriVortexNGLFieldCalc::FillAbrikosovCoefficients(const float reducedField) const {
-  const int NFFT(fSteps), NFFTsq(fSteps*fSteps), NFFT_2(NFFT/2), NFFTz_2(fStepsZ/2);
+  const int NFFT(fSteps), NFFTsq(fSteps*fSteps), NFFT_2(NFFT/2), NFFTz_2(fStepsZ/2), NFFTz(fStepsZ);
 
   float coeff(1.0f-reducedField);
   float Gsq, sign, ii;
@@ -1139,11 +1149,11 @@ void TFilmTriVortexNGLFieldCalc::FillAbrikosovCoefficients(const float reducedFi
 
   fFFTin[0][0] = 0.0f;
 
-  for (k = 1; k < fStepsZ; ++k) {
+  for (k = 1; k < NFFTz; ++k) {
     #pragma omp parallel for default(shared) private(index) schedule(dynamic)
     for (index = 0; index < NFFTsq; ++index) {
-      fFFTin[k + fStepsZ*index][0] = 0.0f;
-      fFFTin[k + fStepsZ*index][1] = 0.0f;
+      fFFTin[k + NFFTz*index][0] = 0.0f;
+      fFFTin[k + NFFTz*index][1] = 0.0f;
     }
   }
 
@@ -1151,18 +1161,18 @@ void TFilmTriVortexNGLFieldCalc::FillAbrikosovCoefficients(const float reducedFi
 }
 
 void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsA() const {
-  const int NFFT(fSteps), NFFT_2(fSteps/2), NFFTz(fStepsZ), NFFTz_2(fStepsZ/2), NFFTsqStZ(fSteps*fSteps*fStepsZ);
+  const int NFFT(fSteps), NFFT_2(fSteps/2), NFFTz(fStepsZ), NFFTz_2(fStepsZ/2), NFFTsqStZ(fSteps*fSteps*fStepsZ), NFFTsq(fSteps*fSteps);
 
-  // Divide Brandt's coefficient no2 by two since we are considering "the full reciprocal lattice", not only the half space!
+  // Divide EHB's coefficient no2 by two since we are considering "the full 2D reciprocal lattice", not only the half space!
   const float symCorr(0.5f);
   const float coeff1(4.0f/3.0f*pow(PI/fLatticeConstant,2.0f));
-  const float coeff3(2.0f*fKappa*fKappa);
+  const float coeff3(4.0f*fKappa*fKappa);
   const float coeff2(symCorr*coeff3/static_cast<float>(NFFTsqStZ));
 
   const float coeff4(4.0f*pow(PI/fThickness,2.0f));
   const float coeff5(2.0f*coeff2);
 
-  int i, j, k, l;
+  int i, j, k, l, index, index2;
   float Gsq, ii, kk;
 
   // k = 0;
@@ -1329,6 +1339,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsA() const {
       }
       fFFTin[k][0] = 0.0f;
     }
+    /* Comment out the negative Kz - setting them to zero instead to stay closer to EHB's solution
     for (k = NFFTz_2; k < fStepsZ; ++k) {
       kk = coeff4*static_cast<float>((k - NFFTz)*(k - NFFTz));
       for (i = 0; i < NFFT_2; i += 2) {
@@ -1410,23 +1421,15 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsA() const {
       }
       fFFTin[k][0] = 0.0f;
     }
-  } // else do nothing since the other coefficients have been zero from the beginning and have not been touched
-/*
-   else { // for 2D solution only
-    for (k = 1; k < fStepsZ; ++k) {
+    */
+    for (k = NFFTz_2; k < NFFTz; ++k) {
       #pragma omp parallel for default(shared) private(index) schedule(dynamic)
       for (index = 0; index < NFFTsq; ++index) {
-        fFFTin[k + fStepsZ*index][0] = 0.0f;
-        fFFTin[k + fStepsZ*index][1] = 0.0f;
+        fFFTin[k + NFFTz*index][0] = 0.0f;
+        fFFTin[k + NFFTz*index][1] = 0.0f;
       }
     }
-  }
-*/
-//   #pragma omp parallel for default(shared) private(l) schedule(dynamic)
-//   for (l = 0; l < NFFTsqStZ; ++l) {
-//     if (fFFTin[l][0] < 0.0f)
-//       fFFTin[l][0] = 0.0f;
-//   }
+  } // else do nothing since the other coefficients have been zero from the beginning and have not been touched
 
   return;
 }
@@ -1434,16 +1437,16 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsA() const {
 void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
   const int NFFT(fSteps), NFFTsq(fSteps*fSteps), NFFT_2(fSteps/2), NFFTz(fStepsZ), NFFTz_2(fStepsZ/2);
 
-  // Divide Brandt's bK by two since we are considering "the full reciprocal lattice", not only the half space!
+  // Divide EHB's bK by two since we are considering "the full 2D reciprocal lattice", not only the half space!
   const float coeffKsq(4.0f/3.0f*pow(PI/fLatticeConstant,2.0f));
   const float coeffKy(TWOPI/fLatticeConstant);
   const float coeffKx(coeffKy/sqrt3);
   const float coeffPk(2.0f/static_cast<float>(fSteps*fSteps*fStepsZ));
   const float coeffBkS(2.0f/fThickness);
   const float coeffKzSq(4.0f*pow(PI/fThickness,2.0f));
-  const float symCorr(0.25f);
+  const float symCorr(0.5f);
 
-  int i, j, k, index;
+  int i, j, k, index, index2;
   float Gsq, ii, kk, kx, ky, sign;
 
   // k = 0;
@@ -1451,55 +1454,59 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
     ky = coeffKy*static_cast<float>(i);
     ii = 3.0f*static_cast<float>(i*i);
     for (j = 0; j < NFFT_2; j += 2) {
+      index = NFFTz*(j + NFFT*i);
+      index2 = index + NFFTz;
       kx = coeffKx*static_cast<float>(j);
       Gsq = coeffKsq*(static_cast<float>(j*j) + ii);
-      fBkMatrix[fStepsZ*(j + NFFT*i)][0] = \
-       symCorr*(coeffPk*(ky*fQMatrix[fStepsZ*(j + NFFT*i)][1] - kx*fPkMatrix[fStepsZ*(j + NFFT*i)][1]) + \
-       1.0f*fSumSum*fBkMatrix[fStepsZ*(j + NFFT*i)][0] - coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i])/(Gsq + fSumSum);
-      fBkMatrix[fStepsZ*(j + NFFT*i)][1] = 0.0f;
-      fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][0] = 0.0f;
-      fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][1] = 0.0f;
-//      cout << "index = " << fStepsZ*(j + NFFT*i) << ", kx = " << kx << ", BkReal = " << fBkMatrix[fStepsZ*(j + NFFT*i)][0] << endl;
+      fBkMatrix[index][0] = \
+       symCorr*(coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
+       1.0f*fSumSum*fBkMatrix[index][0] - coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i])/(Gsq + fSumSum);
+      fBkMatrix[index][1] = 0.0f;
+      fBkMatrix[index2][0] = 0.0f;
+      fBkMatrix[index2][1] = 0.0f;
     }
 
     for (j = NFFT_2; j < NFFT; j += 2) {
+      index = NFFTz*(j + NFFT*i);
+      index2 = index + NFFTz;
       kx = coeffKx*static_cast<float>(j - NFFT);
       Gsq = coeffKsq*(static_cast<float>((j - NFFT)*(j - NFFT)) + ii);
-      fBkMatrix[fStepsZ*(j + NFFT*i)][0] = \
-       symCorr*(coeffPk*(ky*fQMatrix[fStepsZ*(j + NFFT*i)][1] - kx*fPkMatrix[fStepsZ*(j + NFFT*i)][1]) + \
-       1.0f*fSumSum*fBkMatrix[fStepsZ*(j + NFFT*i)][0] - coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i])/(Gsq + fSumSum);
-      fBkMatrix[fStepsZ*(j + NFFT*i)][1] = 0.0f;
-      fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][0] = 0.0f;
-      fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][1] = 0.0f;
- //     cout << "index = " << fStepsZ*(j + NFFT*i) << ", kx = " << kx << ", BkReal = " << fBkMatrix[fStepsZ*(j + NFFT*i)][0] << endl;
+      fBkMatrix[index][0] = \
+       symCorr*(coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
+       1.0f*fSumSum*fBkMatrix[index][0] - coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i])/(Gsq + fSumSum);
+      fBkMatrix[index][1] = 0.0f;
+      fBkMatrix[index2][0] = 0.0f;
+      fBkMatrix[index2][1] = 0.0f;
     }
   }
 
   for (i = NFFT_2; i < NFFT; i += 2) {
     ky = coeffKy*static_cast<float>(i - NFFT);
-    ii = 3.0f*static_cast<float>((i-NFFT)*(i-NFFT));
+    ii = 3.0f*static_cast<float>((i - NFFT)*(i - NFFT));
     for (j = 0; j < NFFT_2; j += 2) {
+      index = NFFTz*(j + NFFT*i);
+      index2 = index + NFFTz;
       kx = coeffKx*static_cast<float>(j);
       Gsq = coeffKsq*(static_cast<float>(j*j) + ii);
-      fBkMatrix[fStepsZ*(j + NFFT*i)][0] = \
-       symCorr*(coeffPk*(ky*fQMatrix[fStepsZ*(j + NFFT*i)][1] - kx*fPkMatrix[fStepsZ*(j + NFFT*i)][1]) + \
-       1.0f*fSumSum*fBkMatrix[fStepsZ*(j + NFFT*i)][0] - coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i])/(Gsq + fSumSum);
-      fBkMatrix[fStepsZ*(j + NFFT*i)][1] = 0.0f;
-      fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][0] = 0.0f;
-      fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][1] = 0.0f;
-  //    cout << "index = " << fStepsZ*(j + NFFT*i) << ", kx = " << kx << ", BkReal = " << fBkMatrix[fStepsZ*(j + NFFT*i)][0] << endl;
+      fBkMatrix[index][0] = \
+       symCorr*(coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
+       1.0f*fSumSum*fBkMatrix[index][0] - coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i])/(Gsq + fSumSum);
+      fBkMatrix[index][1] = 0.0f;
+      fBkMatrix[index2][0] = 0.0f;
+      fBkMatrix[index2][1] = 0.0f;
     }
 
     for (j = NFFT_2; j < NFFT; j += 2) {
+      index = NFFTz*(j + NFFT*i);
+      index2 = index + NFFTz;
       kx = coeffKx*static_cast<float>(j - NFFT);
       Gsq = coeffKsq*(static_cast<float>((j - NFFT)*(j - NFFT)) + ii);
-      fBkMatrix[fStepsZ*(j + NFFT*i)][0] = \
-       symCorr*(coeffPk*(ky*fQMatrix[fStepsZ*(j + NFFT*i)][1] - kx*fPkMatrix[fStepsZ*(j + NFFT*i)][1]) + \
-       1.0f*fSumSum*fBkMatrix[fStepsZ*(j + NFFT*i)][0] - coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i])/(Gsq + fSumSum);
-      fBkMatrix[fStepsZ*(j + NFFT*i)][1] = 0.0f;
-      fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][0] = 0.0f;
-      fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][1] = 0.0f;
-  //    cout << "index = " << fStepsZ*(j + NFFT*i) << ", kx = " << kx << ", BkReal = " << fBkMatrix[fStepsZ*(j + NFFT*i)][0] << endl;
+      fBkMatrix[index][0] = \
+       symCorr*(coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
+       1.0f*fSumSum*fBkMatrix[index][0] - coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i])/(Gsq + fSumSum);
+      fBkMatrix[index][1] = 0.0f;
+      fBkMatrix[index2][0] = 0.0f;
+      fBkMatrix[index2][1] = 0.0f;
     }
   }
 
@@ -1509,55 +1516,59 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
     ky = coeffKy*static_cast<float>(i);
     ii = 3.0f*static_cast<float>(i*i);
     for (j = 0; j < NFFT_2; j += 2) {
+      index = NFFTz*(j + NFFT*i);
+      index2 = index + NFFTz;
       kx = coeffKx*static_cast<float>(j + 1);
-      Gsq = coeffKsq*(static_cast<float>((j+1)*(j+1)) + ii);
-      fBkMatrix[fStepsZ*(j + NFFT*i)][0] = 0.0f;
-      fBkMatrix[fStepsZ*(j + NFFT*i)][1] = 0.0f;
-      fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][0] = \
-       symCorr*(coeffPk*(ky*fQMatrix[fStepsZ*(j + 1 + NFFT*i)][1] - kx*fPkMatrix[fStepsZ*(j + 1 + NFFT*i)][1]) + \
-       1.0f*fSumSum*fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][0] - coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i])/(Gsq + fSumSum);
-      fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][1] = 0.0f;
-    //  cout << "index = " << fStepsZ*(j + 1 + NFFT*i) << ", kx = " << kx << ", BkReal = " << fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][0] << endl;
+      Gsq = coeffKsq*(static_cast<float>((j + 1)*(j + 1)) + ii);
+      fBkMatrix[index][0] = 0.0f;
+      fBkMatrix[index][1] = 0.0f;
+      fBkMatrix[index2][0] = \
+       symCorr*(coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
+       1.0f*fSumSum*fBkMatrix[index2][0] - coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i])/(Gsq + fSumSum);
+      fBkMatrix[index2][1] = 0.0f;
     }
 
     for (j = NFFT_2; j < NFFT; j += 2) {
+      index = NFFTz*(j + NFFT*i);
+      index2 = index + NFFTz;
       kx = coeffKx*static_cast<float>(j + 1 - NFFT);
       Gsq = coeffKsq*(static_cast<float>((j + 1 - NFFT)*(j + 1 - NFFT)) + ii);
-      fBkMatrix[fStepsZ*(j + NFFT*i)][0] = 0.0f;
-      fBkMatrix[fStepsZ*(j + NFFT*i)][1] = 0.0f;
-      fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][0] = \
-       symCorr*(coeffPk*(ky*fQMatrix[fStepsZ*(j + 1 + NFFT*i)][1] - kx*fPkMatrix[fStepsZ*(j + 1 + NFFT*i)][1]) + \
-       1.0f*fSumSum*fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][0] - coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i])/(Gsq + fSumSum);
-      fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][1] = 0.0f;
-  //    cout << "index = " << fStepsZ*(j + 1 + NFFT*i) << ", kx = " << kx << ", BkReal = " << fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][0] << endl;
+      fBkMatrix[index][0] = 0.0f;
+      fBkMatrix[index][1] = 0.0f;
+      fBkMatrix[index2][0] = \
+       symCorr*(coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
+       1.0f*fSumSum*fBkMatrix[index2][0] - coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i])/(Gsq + fSumSum);
+      fBkMatrix[index2][1] = 0.0f;
     }
   }
 
   for (i = NFFT_2 + 1; i < NFFT; i += 2) {
     ky = coeffKy*static_cast<float>(i - NFFT);
-    ii = 3.0f*static_cast<float>((i-NFFT)*(i-NFFT));
+    ii = 3.0f*static_cast<float>((i - NFFT)*(i - NFFT));
     for (j = 0; j < NFFT_2; j += 2) {
+      index = NFFTz*(j + NFFT*i);
+      index2 = index + NFFTz;
       kx = coeffKx*static_cast<float>(j + 1);
-      Gsq = coeffKsq*(static_cast<float>((j+1)*(j+1)) + ii);
-      fBkMatrix[fStepsZ*(j + NFFT*i)][0] = 0.0f;
-      fBkMatrix[fStepsZ*(j + NFFT*i)][1] = 0.0f;
-      fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][0] = \
-       symCorr*(coeffPk*(ky*fQMatrix[fStepsZ*(j + 1 + NFFT*i)][1] - kx*fPkMatrix[fStepsZ*(j + 1 + NFFT*i)][1]) + \
-       1.0f*fSumSum*fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][0] - coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i])/(Gsq + fSumSum);
-      fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][1] = 0.0f;
- //     cout << "index = " << fStepsZ*(j + 1 + NFFT*i) << ", kx = " << kx << ", BkReal = " << fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][0] << endl;
+      Gsq = coeffKsq*(static_cast<float>((j + 1)*(j + 1)) + ii);
+      fBkMatrix[index][0] = 0.0f;
+      fBkMatrix[index][1] = 0.0f;
+      fBkMatrix[index2][0] = \
+       symCorr*(coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
+       1.0f*fSumSum*fBkMatrix[index2][0] - coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i])/(Gsq + fSumSum);
+      fBkMatrix[index2][1] = 0.0f;
     }
 
     for (j = NFFT_2; j < NFFT; j += 2) {
+      index = NFFTz*(j + NFFT*i);
+      index2 = index + NFFTz;
       kx = coeffKx*static_cast<float>(j + 1 - NFFT);
-      Gsq = coeffKsq*(static_cast<float>((j+1-NFFT)*(j+1-NFFT)) + ii);
-      fBkMatrix[fStepsZ*(j + NFFT*i)][0] = 0.0f;
-      fBkMatrix[fStepsZ*(j + NFFT*i)][1] = 0.0f;
-      fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][0] = \
-       symCorr*(coeffPk*(ky*fQMatrix[fStepsZ*(j + 1 + NFFT*i)][1] - kx*fPkMatrix[fStepsZ*(j + 1 + NFFT*i)][1]) + \
-       1.0f*fSumSum*fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][0] - coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i])/(Gsq + fSumSum);
-      fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][1] = 0.0f;
-  //    cout << "index = " << fStepsZ*(j + 1 + NFFT*i) << ", kx = " << kx << ", BkReal = " << fBkMatrix[fStepsZ*(j + 1 + NFFT*i)][0] << endl;
+      Gsq = coeffKsq*(static_cast<float>((j + 1 - NFFT)*(j + 1 - NFFT)) + ii);
+      fBkMatrix[index][0] = 0.0f;
+      fBkMatrix[index][1] = 0.0f;
+      fBkMatrix[index2][0] = \
+       symCorr*(coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
+       1.0f*fSumSum*fBkMatrix[index2][0] - coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i])/(Gsq + fSumSum);
+      fBkMatrix[index2][1] = 0.0f;
     }
   }
 
@@ -1573,51 +1584,59 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
         ky = coeffKy*static_cast<float>(i);
         ii = 3.0f*static_cast<float>(i*i);
         for (j = 0; j < NFFT_2; j += 2) {
+          index = k + NFFTz*(j + NFFT*i);
+          index2 = index + NFFTz;
           kx = coeffKx*static_cast<float>(j);
           Gsq = coeffKsq*(static_cast<float>(j*j) + ii);
-          fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] = \
-           symCorr*(coeffPk*(ky*fQMatrix[k + fStepsZ*(j + NFFT*i)][1] - kx*fPkMatrix[k + fStepsZ*(j + NFFT*i)][1]) + \
-           1.0f*fSumSum*fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i])/(0.5f*(Gsq + kk) + fSumSum);
-          fBkMatrix[k + fStepsZ*(j + NFFT*i)][1] = 0.0f;
-          fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][0] = 0.0f;
-          fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][1] = 0.0f;
+          fBkMatrix[index][0] = \
+           symCorr*(coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
+           1.0f*fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i])/(0.5f*(Gsq + kk) + fSumSum);
+          fBkMatrix[index][1] = 0.0f;
+          fBkMatrix[index2][0] = 0.0f;
+          fBkMatrix[index2][1] = 0.0f;
         }
 
         for (j = NFFT_2; j < NFFT; j += 2) {
+          index = k + NFFTz*(j + NFFT*i);
+          index2 = index + NFFTz;
           kx = coeffKx*static_cast<float>(j - NFFT);
           Gsq = coeffKsq*(static_cast<float>((j - NFFT)*(j - NFFT)) + ii);
-          fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] = \
-           symCorr*(coeffPk*(ky*fQMatrix[k + fStepsZ*(j + NFFT*i)][1] - kx*fPkMatrix[k + fStepsZ*(j + NFFT*i)][1]) + \
-           1.0f*fSumSum*fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i])/(0.5f*(Gsq + kk) + fSumSum);
-          fBkMatrix[k + fStepsZ*(j + NFFT*i)][1] = 0.0f;
-          fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][0] = 0.0f;
-          fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][1] = 0.0f;
+          fBkMatrix[index][0] = \
+           symCorr*(coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
+           1.0f*fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i])/(0.5f*(Gsq + kk) + fSumSum);
+          fBkMatrix[index][1] = 0.0f;
+          fBkMatrix[index2][0] = 0.0f;
+          fBkMatrix[index2][1] = 0.0f;
         }
       }
 
       for (i = NFFT_2; i < NFFT; i += 2) {
         ky = coeffKy*static_cast<float>(i - NFFT);
-        ii = 3.0f*static_cast<float>((i-NFFT)*(i-NFFT));
+        ii = 3.0f*static_cast<float>((i - NFFT)*(i - NFFT));
         for (j = 0; j < NFFT_2; j += 2) {
+          index = k + NFFTz*(j + NFFT*i);
+          index2 = index + NFFTz;
           kx = coeffKx*static_cast<float>(j);
           Gsq = coeffKsq*(static_cast<float>(j*j) + ii);
-          fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] = \
-           symCorr*(coeffPk*(ky*fQMatrix[k + fStepsZ*(j + NFFT*i)][1] - kx*fPkMatrix[k + fStepsZ*(j + NFFT*i)][1]) + \
-           1.0f*fSumSum*fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i])/(0.5f*(Gsq + kk) + fSumSum);
-          fBkMatrix[k + fStepsZ*(j + NFFT*i)][1] = 0.0f;
-          fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][0] = 0.0f;
-          fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][1] = 0.0f;
+          fBkMatrix[index][0] = \
+           symCorr*(coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
+           1.0f*fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i])/(0.5f*(Gsq + kk) + fSumSum);
+          fBkMatrix[index][1] = 0.0f;
+          fBkMatrix[index2][0] = 0.0f;
+          fBkMatrix[index2][1] = 0.0f;
         }
 
         for (j = NFFT_2; j < NFFT; j += 2) {
+          index = k + NFFTz*(j + NFFT*i);
+          index2 = index + NFFTz;
           kx = coeffKx*static_cast<float>(j - NFFT);
           Gsq = coeffKsq*(static_cast<float>((j - NFFT)*(j - NFFT)) + ii);
-          fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] = \
-           symCorr*(coeffPk*(ky*fQMatrix[k + fStepsZ*(j + NFFT*i)][1] - kx*fPkMatrix[k + fStepsZ*(j + NFFT*i)][1]) + \
-           1.0f*fSumSum*fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i])/(0.5f*(Gsq + kk) + fSumSum);
-          fBkMatrix[k + fStepsZ*(j + NFFT*i)][1] = 0.0f;
-          fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][0] = 0.0f;
-          fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][1] = 0.0f;
+          fBkMatrix[index][0] = \
+           symCorr*(coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
+           1.0f*fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i])/(0.5f*(Gsq + kk) + fSumSum);
+          fBkMatrix[index][1] = 0.0f;
+          fBkMatrix[index2][0] = 0.0f;
+          fBkMatrix[index2][1] = 0.0f;
         }
       }
 
@@ -1627,56 +1646,64 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
         ky = coeffKy*static_cast<float>(i);
         ii = 3.0f*static_cast<float>(i*i);
         for (j = 0; j < NFFT_2; j += 2) {
+          index = k + NFFTz*(j + NFFT*i);
+          index2 = index + NFFTz;
           kx = coeffKx*static_cast<float>(j + 1);
-          Gsq = coeffKsq*(static_cast<float>((j+1)*(j+1)) + ii);
-          fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] = 0.0f;
-          fBkMatrix[k + fStepsZ*(j + NFFT*i)][1] = 0.0f;
-          fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][0] = \
-           symCorr*(coeffPk*(ky*fQMatrix[k + fStepsZ*(j + 1 + NFFT*i)][1] - kx*fPkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][1]) + \
-           1.0f*fSumSum*fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i])/(0.5f*(Gsq + kk) + fSumSum);
-          fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][1] = 0.0f;
+          Gsq = coeffKsq*(static_cast<float>((j + 1)*(j + 1)) + ii);
+          fBkMatrix[index][0] = 0.0f;
+          fBkMatrix[index][1] = 0.0f;
+          fBkMatrix[index2][0] = \
+           symCorr*(coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
+           1.0f*fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i])/(0.5f*(Gsq + kk) + fSumSum);
+          fBkMatrix[index2][1] = 0.0f;
         }
 
         for (j = NFFT_2; j < NFFT; j += 2) {
+          index = k + NFFTz*(j + NFFT*i);
+          index2 = index + NFFTz;
           kx = coeffKx*static_cast<float>(j + 1 - NFFT);
           Gsq = coeffKsq*(static_cast<float>((j + 1 - NFFT)*(j + 1 - NFFT)) + ii);
-          fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] = 0.0f;
-          fBkMatrix[k + fStepsZ*(j + NFFT*i)][1] = 0.0f;
-          fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][0] = \
-           symCorr*(coeffPk*(ky*fQMatrix[k + fStepsZ*(j + 1 + NFFT*i)][1] - kx*fPkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][1]) + \
-           1.0f*fSumSum*fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i])/(0.5f*(Gsq + kk) + fSumSum);
-          fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][1] = 0.0f;
+          fBkMatrix[index][0] = 0.0f;
+          fBkMatrix[index][1] = 0.0f;
+          fBkMatrix[index2][0] = \
+           symCorr*(coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
+           1.0f*fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i])/(0.5f*(Gsq + kk) + fSumSum);
+          fBkMatrix[index2][1] = 0.0f;
         }
       }
 
       for (i = NFFT_2 + 1; i < NFFT; i += 2) {
         ky = coeffKy*static_cast<float>(i - NFFT);
-        ii = 3.0f*static_cast<float>((i-NFFT)*(i-NFFT));
+        ii = 3.0f*static_cast<float>((i - NFFT)*(i - NFFT));
         for (j = 0; j < NFFT_2; j += 2) {
+          index = k + NFFTz*(j + NFFT*i);
+          index2 = index + NFFTz;
           kx = coeffKx*static_cast<float>(j + 1);
-          Gsq = coeffKsq*(static_cast<float>((j+1)*(j+1)) + ii);
-          fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] = 0.0f;
-          fBkMatrix[k + fStepsZ*(j + NFFT*i)][1] = 0.0f;
-          fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][0] = \
-           symCorr*(coeffPk*(ky*fQMatrix[k + fStepsZ*(j + 1 + NFFT*i)][1] - kx*fPkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][1]) + \
-           1.0f*fSumSum*fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i])/(0.5f*(Gsq + kk) + fSumSum);
-          fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][1] = 0.0f;
+          Gsq = coeffKsq*(static_cast<float>((j + 1)*(j + 1)) + ii);
+          fBkMatrix[index][0] = 0.0f;
+          fBkMatrix[index][1] = 0.0f;
+          fBkMatrix[index2][0] = \
+           symCorr*(coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
+           1.0f*fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i])/(0.5f*(Gsq + kk) + fSumSum);
+          fBkMatrix[index2][1] = 0.0f;
         }
 
         for (j = NFFT_2; j < NFFT; j += 2) {
+          index = k + NFFTz*(j + NFFT*i);
+          index2 = index + NFFTz;
           kx = coeffKx*static_cast<float>(j + 1 - NFFT);
-          Gsq = coeffKsq*(static_cast<float>((j+1-NFFT)*(j+1-NFFT)) + ii);
-          fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] = 0.0f;
-          fBkMatrix[k + fStepsZ*(j + NFFT*i)][1] = 0.0f;
-          fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][0] = \
-           symCorr*(coeffPk*(ky*fQMatrix[k + fStepsZ*(j + 1 + NFFT*i)][1] - kx*fPkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][1]) + \
-           1.0f*fSumSum*fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i])/(0.5f*(Gsq + kk) + fSumSum);
-          fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][1] = 0.0f;
+          Gsq = coeffKsq*(static_cast<float>((j + 1 - NFFT)*(j + 1 - NFFT)) + ii);
+          fBkMatrix[index][0] = 0.0f;
+          fBkMatrix[index][1] = 0.0f;
+          fBkMatrix[index2][0] = \
+           symCorr*(coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
+           1.0f*fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i])/(0.5f*(Gsq + kk) + fSumSum);
+          fBkMatrix[index2][1] = 0.0f;
         }
       }
       fBkMatrix[k][0] = 0.0f;
     }
-
+    /* Comment out the negative Kz - setting them to zero instead to stay closer to EHB's solution
     for (k = NFFTz_2; k < NFFTz; ++k) {
       sign = +sign;
       kk = coeffKzSq*static_cast<float>((k - NFFTz)*(k - NFFTz));
@@ -1787,12 +1814,20 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
       }
       fBkMatrix[k][0] = 0.0f;
     }
+    */
+    for (k = NFFTz_2; k < NFFTz; ++k) {
+      #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+      for (index = 0; index < NFFTsq; ++index) {
+        fBkMatrix[k + NFFTz*index][0] = 0.0f;
+        fBkMatrix[k + NFFTz*index][1] = 0.0f;
+      }
+    }
   } else { // for 2D solution only
     for (k = 1; k < NFFTz; ++k) {
       #pragma omp parallel for default(shared) private(index) schedule(dynamic)
       for (index = 0; index < NFFTsq; ++index) {
-        fBkMatrix[k + fStepsZ*index][0] = 0.0f;
-        fBkMatrix[k + fStepsZ*index][1] = 0.0f;
+        fBkMatrix[k + NFFTz*index][0] = 0.0f;
+        fBkMatrix[k + NFFTz*index][1] = 0.0f;
       }
     }
   }
@@ -1801,66 +1836,60 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
 }
 
 void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsForQx() const {
-  const int NFFT(fSteps), NFFT_2(fSteps/2), NFFTz(fStepsZ);
-  const float coeffKx(0.5f*sqrt3*fLatticeConstant/PI);
+  const int NFFT(fSteps), NFFT_2(fSteps/2), NFFTz(fStepsZ), NFFTz_2(fStepsZ/2);
   const float coeffKy(1.5f*fLatticeConstant/PI);
 
   int i, j, k;
   float ii;
 
-  for (k = 0; k < NFFTz; ++k) {
-    // i = 0, i = NFFT_2
+  for (k = 0; k < NFFTz_2; ++k) {
+    // i = 0
     for (j = 0; j < NFFT; j += 2) {
-      fBkMatrix[k + fStepsZ*j][0] = 0.0f;
-//      fBkMatrix[k + fStepsZ*(j + NFFT*NFFT_2)][0] = 0.0f;
+      fBkMatrix[k + NFFTz*j][0] = 0.0f;
     }
     for (i = 2; i < NFFT_2; i += 2) {
       ii = 3.0f*static_cast<float>(i*i);
       for (j = 0; j < NFFT_2; j += 2) {
-        fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] *= coeffKy*static_cast<float>(i)/(static_cast<float>(j*j) + ii);
+        fBkMatrix[k + NFFTz*(j + NFFT*i)][0] *= coeffKy*static_cast<float>(i)/(static_cast<float>(j*j) + ii);
       }
 
       for (j = NFFT_2; j < NFFT; j += 2) {
-        fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] *= coeffKy*static_cast<float>(i)/(static_cast<float>((j-NFFT)*(j-NFFT)) + ii);
+        fBkMatrix[k + NFFTz*(j + NFFT*i)][0] *= coeffKy*static_cast<float>(i)/(static_cast<float>((j - NFFT)*(j - NFFT)) + ii);
       }
     }
 
-    for (i = NFFT_2 + 2; i < NFFT; i += 2) {
+    for (i = NFFT_2; i < NFFT; i += 2) {
       ii = 3.0f*static_cast<float>((i-NFFT)*(i-NFFT));
       for (j = 0; j < NFFT_2; j += 2) {
-        fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] *= coeffKy*static_cast<float>(i-NFFT)/(static_cast<float>(j*j) + ii);
+        fBkMatrix[k + NFFTz*(j + NFFT*i)][0] *= coeffKy*static_cast<float>(i-NFFT)/(static_cast<float>(j*j) + ii);
       }
 
       for (j = NFFT_2; j < NFFT; j += 2) {
-        fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] *= coeffKy*static_cast<float>(i-NFFT)/(static_cast<float>((j-NFFT)*(j-NFFT)) + ii);
+        fBkMatrix[k + NFFTz*(j + NFFT*i)][0] *= coeffKy*static_cast<float>(i-NFFT)/(static_cast<float>((j - NFFT)*(j - NFFT)) + ii);
       }
     }
-    // i = NFFT_2, j = 0
-//    fBkMatrix[k + fStepsZ*(NFFT*NFFT_2)][0] = 0.0f;
-    // i = NFFT_2, j = NFFT_2
-//    fBkMatrix[k + fStepsZ*(NFFT_2 + NFFT*NFFT_2)][0] = 0.0f;
 
     //intermediate rows
 
     for (i = 1; i < NFFT_2; i += 2) {
       ii = 3.0f*static_cast<float>(i*i);
       for (j = 0; j < NFFT_2; j += 2) {
-        fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][0] *= coeffKy*static_cast<float>(i)/(static_cast<float>((j+1)*(j+1)) + ii);
+        fBkMatrix[k + NFFTz*(j + 1 + NFFT*i)][0] *= coeffKy*static_cast<float>(i)/(static_cast<float>((j+1)*(j+1)) + ii);
       }
 
       for (j = NFFT_2; j < NFFT; j += 2) {
-        fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][0] *= coeffKy*static_cast<float>(i)/(static_cast<float>((j+1-NFFT)*(j+1-NFFT)) + ii);
+        fBkMatrix[k + NFFTz*(j + 1 + NFFT*i)][0] *= coeffKy*static_cast<float>(i)/(static_cast<float>((j+1-NFFT)*(j+1-NFFT)) + ii);
       }
     }
 
     for (i = NFFT_2 + 1; i < NFFT; i += 2) {
       ii = 3.0f*static_cast<float>((i-NFFT)*(i-NFFT));
       for (j = 0; j < NFFT_2; j += 2) {
-        fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][0] *= coeffKy*static_cast<float>(i-NFFT)/(static_cast<float>((j+1)*(j+1)) + ii);
+        fBkMatrix[k + NFFTz*(j + 1 + NFFT*i)][0] *= coeffKy*static_cast<float>(i-NFFT)/(static_cast<float>((j+1)*(j+1)) + ii);
       }
 
       for (j = NFFT_2; j < NFFT; j += 2) {
-        fBkMatrix[k + fStepsZ*(j + 1 + NFFT*i)][0] *= coeffKy*static_cast<float>(i-NFFT)/(static_cast<float>((j+1-NFFT)*(j+1-NFFT)) + ii);
+        fBkMatrix[k + NFFTz*(j + 1 + NFFT*i)][0] *= coeffKy*static_cast<float>(i-NFFT)/(static_cast<float>((j+1-NFFT)*(j+1-NFFT)) + ii);
       }
     }
     if (!fFind3dSolution) {
@@ -1872,45 +1901,38 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsForQx() const {
 }
 
 void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsForQy() const {
-  const int NFFT(fSteps), NFFT_2(fSteps/2), NFFTz(fStepsZ);
+  const int NFFT(fSteps), NFFT_2(fSteps/2), NFFTz(fStepsZ), NFFTz_2(fStepsZ/2);
   const float coeffKx(0.5f*sqrt3*fLatticeConstant/PI);
-  const float coeffKy(1.5f*fLatticeConstant/PI);
 
   int i, j, k;
   float ii;
 
-  for (k = 0; k < NFFTz; ++k) {
+  for (k = 0; k < NFFTz_2; ++k) {
     for (i = 0; i < NFFT_2; i += 2) {
       ii = 3.0f*static_cast<float>(i*i);
-      // j = 0, j = NFFT_2
+      // j = 0
       fBkMatrix[k + fStepsZ*NFFT*i][0] = 0.0f;
-//      fBkMatrix[k + fStepsZ*(NFFT_2 + NFFT*i)][0] = 0.0f;
       for (j = 2; j < NFFT_2; j += 2) {
         fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] *= coeffKx*static_cast<float>(j)/(static_cast<float>(j*j) + ii);
       }
 
-      for (j = NFFT_2 + 2; j < NFFT; j += 2) {
+      for (j = NFFT_2; j < NFFT; j += 2) {
         fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] *= coeffKx*static_cast<float>(j-NFFT)/(static_cast<float>((j-NFFT)*(j-NFFT)) + ii);
       }
     }
 
     for (i = NFFT_2; i < NFFT; i += 2) {
       ii = 3.0f*static_cast<float>((i-NFFT)*(i-NFFT));
-      // j = 0, j = NFFT_2
+      // j = 0
       fBkMatrix[k + fStepsZ*NFFT*i][0] = 0.0f;
-//      fBkMatrix[k + fStepsZ*(NFFT_2 + NFFT*i)][0] = 0.0f;
       for (j = 2; j < NFFT_2; j += 2) {
         fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] *= coeffKx*static_cast<float>(j)/(static_cast<float>(j*j) + ii);
       }
 
-      for (j = NFFT_2 + 2; j < NFFT; j += 2) {
+      for (j = NFFT_2; j < NFFT; j += 2) {
         fBkMatrix[k + fStepsZ*(j + NFFT*i)][0] *= coeffKx*static_cast<float>(j-NFFT)/(static_cast<float>((j-NFFT)*(j-NFFT)) + ii);
       }
     }
-    // i = 0, j = NFFT_2
-//    fBkMatrix[k + fStepsZ*NFFT_2][0] = 0.0f;
-    // i = NFFT_2, j = NFFT_2
-//    fBkMatrix[k + fStepsZ*(NFFT_2 + NFFT*NFFT_2)][0] = 0.0f;
 
     //intermediate rows
 
@@ -2168,39 +2190,14 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsForBperpY() const 
 }
 
 void TFilmTriVortexNGLFieldCalc::CalculateSumAk() const {
-//  const float PI_n(PI/static_cast<float>(fStepsZ));
-  const int NFFT(fSteps), NFFTz(fStepsZ);
+  const int NFFTsq(fSteps*fSteps), NFFTz(fStepsZ), NFFTz_2(fStepsZ/2);
 
-//  float SumFirstLayer(0.0f);
-  int i,j,k;
-  
+  int k, index;
 
-//   // k = 0
-//   for (j = 0; j < fSteps; ++j) {
-//     for (i = 0; i < fSteps; ++i) {
-//       SumFirstLayer += fFFTin[(fStepsZ/2 + 1)*(j + fSteps*i)][0];
-//     }
-//   }
-// 
-//   cout << "SumFirstLayer = " << SumFirstLayer << endl;
-// 
-//   for (l = 0; l < fStepsZ; ++l) {
-//     fSumAk[l] = 0.0f;
-//     for (k = 1; k < fStepsZ/2; ++k) {
-//       for (j = 0; j < fSteps; ++j) {
-//         for (i = 0; i < fSteps; ++i) {
-//           fSumAk[l] += fFFTin[k + (fStepsZ/2 + 1)*(j + fSteps*i)][0]*cos(PI_n*static_cast<float>(k)*(2.0f*static_cast<float>(l)-fStepsZ));
-//         }
-//       }
-//     }
-//     fSumAk[l] = 2.0f*fSumAk[l] + SumFirstLayer;
-//   }
-  for (k = 0; k < NFFTz; ++k) {
+  for (k = 0; k < NFFTz_2; ++k) {
     fSumAkFFTin[k][0] = 0.0f;
-    for (j = 0; j < NFFT; ++j) {
-      for (i = 0; i < NFFT; ++i) {
-        fSumAkFFTin[k][0] += fFFTin[k + NFFTz*(j + NFFT*i)][0];
-      }
+    for (index = 0; index < NFFTsq; ++index) {
+      fSumAkFFTin[k][0] += fFFTin[k + NFFTz*index][0];
     }
     fSumAkFFTin[k][1] = 0.0f;
   }
@@ -2213,7 +2210,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateSumAk() const {
 void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
   // SetParameters - method has to be called from the user before the calculation!!
   if (fParam.size() < 4) {
-    cout << endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << endl;
+    cout << endl << "The SetParameters-method has to be called before B(x,y,z) can be calculated!" << endl;
     return;
   }
   if (!fParam[0] || !fParam[1] || !fParam[2] || !fParam[3]) {
@@ -2224,9 +2221,9 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
   float field(fabs(fParam[0])), lambda(fabs(fParam[1])), xi(fabs(fParam[2]));
   fKappa = lambda/xi;
   fThickness = fParam[3]/lambda;
-  float Hc2(getHc2(xi)), Hc2_kappa(Hc2/fKappa), scaledB(field/Hc2_kappa);  // field in Brandt's reduced units
+  float Hc2(getHc2(xi)), Hc2_kappa(Hc2/fKappa), scaledB(field/Hc2_kappa);  // field in EHB's reduced units
 
-  fLatticeConstant = sqrt(2.0f*TWOPI/(fKappa*scaledB*sqrt3));  // intervortex spacing in Brandt's reduced units
+  fLatticeConstant = sqrt(2.0f*TWOPI/(fKappa*scaledB*sqrt3));  // intervortex spacing in EHB's reduced units
 
   fC = 3.0f + (0.4f+60.f*scaledB*scaledB)*fKappa*fKappa*fLatticeConstant/fThickness; // some coefficient needed for calculating bKs
 
@@ -2261,6 +2258,8 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
   FillAbrikosovCoefficients(scaledB);
 
+  // save a few coefficients for the convergence check
+
   for (k = 0; k < NFFTz; ++k) {
     #pragma omp parallel for default(shared) private(j,index) schedule(dynamic)
     for (j = 0; j < NFFT; ++j) {
@@ -2269,14 +2268,17 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
     }
   }
 
+  // initialize the SumAk-input with zeros
+  for (k = 0; k < NFFTz; ++k) {
+    fSumAkFFTin[k][0] = 0.0f;
+    fSumAkFFTin[k][1] = 0.0f;
+  }
+
+  // Do the 1D-Fourier part of the omega-calculation
+
   CalculateSumAk();
 
-//   cout << "fSumAk = " << endl;
-//   for (k = 0; k < fStepsZ; ++k){
-//     cout << fSumAk[k] << endl;
-//   }
-
-  // Do the Fourier transform to get omega(x,y) - Abrikosov
+  // Do the 3D-Fourier transform to get omega(x,y) - Abrikosov
 
   fftwf_execute(fFFTplan);
 
@@ -2290,7 +2292,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
     }
   }
 
-  // Calculate the gradient of omega
+  // Calculate the gradient of omega - Abrikosov
 
   CalculateGradient();
 
@@ -2315,6 +2317,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
     }
   }
 
+/* Nice but maybe not needed
   fQMatrixA[(NFFT_4 + NFFT*NFFT_4)][0] = 0.0f;
   fQMatrixA[(NFFT_4 + NFFT*3*NFFT_4)][0] = 0.0f;
   fQMatrixA[(3*NFFT_4 + NFFT*NFFT_4)][0] = 0.0f;
@@ -2323,7 +2326,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
   fQMatrixA[(NFFT_4 + NFFT*3*NFFT_4)][1] = 0.0f;
   fQMatrixA[(3*NFFT_4 + NFFT*NFFT_4)][1] = 0.0f;
   fQMatrixA[(3*NFFT_4 + NFFT*3*NFFT_4)][1] = 0.0f;
-
+*/
   // Initialize the Q-Matrix with Q-Abrikosov
 
   for (k = 0; k < NFFTz; ++k) {
@@ -2338,26 +2341,12 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
     }
   }
 
-  // Avoid some singularities
-/*
-  fQMatrixA[0][0] = fQMatrixA[NFFT][0];
-  fQMatrixA[(NFFT+1)*NFFT_2][0] = fQMatrixA[0][0];
-  fQMatrixA[0][1] = fQMatrixA[NFFT][1];
-  fQMatrixA[(NFFT+1)*NFFT_2][1] = fQMatrixA[0][1];
-
-  #pragma omp parallel for default(shared) private(k) schedule(dynamic)
-  for (k = 0; k < fStepsZ; ++k) {
-    fQMatrix[k][0] = fQMatrixA[0][0];
-    fQMatrix[k + fStepsZ*(NFFT+1)*NFFT_2][0] = fQMatrixA[0][0];
-    fQMatrix[k][1] = fQMatrixA[0][1];
-    fQMatrix[k + fStepsZ*(NFFT+1)*NFFT_2][1] = fQMatrixA[0][1];
-  }
-*/
   // initialize the bK-Matrix
   #pragma omp parallel for default(shared) private(l) schedule(dynamic)
   for (l = 0; l < NFFTsqStZ; ++l) {
     fBkMatrix[l][0] = 0.0f;
-//    fBkMatrix[l][1] = 0.0f; already zero'd by the gradient calculation
+//    fBkMatrix[l][1] = 0.0f;
+//  already zero'd by the gradient calculation
   }
 
   bool akConverged(false), bkConverged(false), akInitiallyConverged(true), firstBkCalculation(true);
@@ -2374,7 +2363,7 @@ break;
     // First iteration steps for aK
     // Keep only terms with Kz = 0
 
-    CalculateGatVortexCore();
+//    CalculateGatVortexCore();
 //     for (k = 0; k < NFFTz; ++k) {
 //       cout << "g[" << k << "] = " << fGstorage[k] << endl;
 //     }
@@ -2392,20 +2381,20 @@ break;
       fRealSpaceMatrix[l][1] = 0.0f;
     }
 
-    // At the two vortex cores g(r) is diverging; since all of this should be a smooth function anyway, I set the value of the next neighbour r
+    // At the two vortex cores g(r) cannot be calculated as above
+    // since all of this should be a smooth function anyway, I set the value of the next neighbour r
     // for the two vortex core positions in my matrix
+    // If this was not enough we can get the g(0)-values by an expensive CalculateGatVortexCore()-invocation
     #pragma omp parallel for default(shared) private(k) schedule(dynamic)
     for (k = 0; k < NFFTz; ++k) {
-//      cout << "fOmegaMatrix[" << k << "] = " << fOmegaMatrix[k] << ", fOmegaMatrix[" << k + fStepsZ*(NFFT+1)*NFFT_2 << "] = " << fOmegaMatrix[k + fStepsZ*(NFFT+1)*NFFT_2] << endl;
-      fRealSpaceMatrix[k][0] = fGstorage[k];//fRealSpaceMatrix[k + fStepsZ*fSteps][0];
-      fRealSpaceMatrix[k + NFFTz*(NFFT+1)*NFFT_2][0] = fGstorage[k];//fRealSpaceMatrix[k][0];
-//      cout << "index where g is set the neighboring value: " << k + fStepsZ*(NFFT+1)*NFFT_2 << endl;
+      fRealSpaceMatrix[k][0] = fRealSpaceMatrix[k + fStepsZ*fSteps][0];//fGstorage[k];
+      fRealSpaceMatrix[k + NFFTz*(NFFT+1)*NFFT_2][0] = fRealSpaceMatrix[k][0];//fGstorage[k];
     }
 
     fftwf_execute(fFFTplanOmegaToAk);
+
 // if(count == toll + 2)
 //  break;
-
 
     ManipulateFourierCoefficientsA();
 
@@ -2419,30 +2408,23 @@ break;
     // Do the Fourier transform to get omega(x,y,z)
 
     fftwf_execute(fFFTplan);
-    
-    
-   
 
 // if(count == toll + 2)
 //  break;
 
-
     for (k = 0; k < NFFTz; ++k) {
-      for (j = 0; j < NFFT; ++j) {
-        #pragma omp parallel for default(shared) private(i,index) schedule(dynamic)
-        for (i = 0; i < NFFT; ++i) {
-          index = k + NFFTz*(j + NFFT*i);
-          fOmegaMatrix[index] = fSumAk[k][0] - fRealSpaceMatrix[index][0];
-        }
+      #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+      for (index = 0; index < NFFTsq; ++index) {
+        fOmegaMatrix[k + NFFTz*index] = fSumAk[k][0] - fRealSpaceMatrix[k + NFFTz*index][0];
       }
     }
 
     CalculateGradient();
 
-// if(count == toll + 2)
+// if(count == toll + 5)
 //  break;
 
-    CalculateGatVortexCore();
+//    CalculateGatVortexCore();
 
     // Get the spacial averages of the second iteration step for aK
 
@@ -2458,15 +2440,14 @@ break;
             (fOmegaDiffMatrix[0][index]*fOmegaDiffMatrix[0][index] + fOmegaDiffMatrix[1][index]*fOmegaDiffMatrix[1][index] + \
               fOmegaDiffMatrix[2][index]*fOmegaDiffMatrix[2][index])/(fourKappaSq*fOmegaMatrix[index]);
           } else {
-            fSumSum -= fGstorage[k];
-/*            index = k + fStepsZ*(j + fSteps*(i + 1));
-            if (i < fSteps - 1 && fOmegaMatrix[index]) {
+    //        fSumSum -= fGstorage[k];
+            index = k + fStepsZ*(j + fSteps*(i + 1));
+            if (i < NFFT - 1 && fOmegaMatrix[index]) {
               fSumSum += fOmegaMatrix[index]*(1.0f - (fQMatrix[index][0]*fQMatrix[index][0] + fQMatrix[index][1]*fQMatrix[index][1])) - \
               (fOmegaDiffMatrix[0][index]*fOmegaDiffMatrix[0][index] + \
                 fOmegaDiffMatrix[1][index]*fOmegaDiffMatrix[1][index] + \
                 fOmegaDiffMatrix[2][index]*fOmegaDiffMatrix[2][index])/(fourKappaSq*fOmegaMatrix[index]);
             }
-*/
           }
         }
       }
@@ -2475,21 +2456,23 @@ break;
     fSumSum /= fSumOmegaSq;
 
     // Multiply the aK with the spacial averages
-    #pragma omp parallel for default(shared) private(l) schedule(dynamic)
-    for (l = 0; l < NFFTsqStZ; ++l) {
-      fFFTin[l][0] = fFFTin[l][0]*fSumSum;
+    for (k = 0; k < NFFTz_2; ++k) {
+      #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+      for (index = 0; index < NFFTsq; ++index) {
+        fFFTin[k + NFFTz*index][0] = fFFTin[k + NFFTz*index][0]*fSumSum;
+      }
     }
 
     // Check if the aK iterations converged
 
     akConverged = true;
 
-    for (k = 0; k < NFFTz; ++k) {
+    for (k = 0; k < NFFTz_2; ++k) {
       for (j = 0; j < NFFT; ++j) {
         index = k + NFFTz*j;
         if (fFFTin[index][0]) {
-          if (((fabs(fFFTin[index][0]) > 4.0E-4f) && (fabs(fCheckAkConvergence[index] - fFFTin[index][0])/fFFTin[index][0] > 4.0E-2f)) || \
-            (fCheckAkConvergence[index]/fFFTin[index][0] < 0.0f)) {
+          if (((fabs(fFFTin[index][0]) > 1.0E-5f) && (fabs(fCheckAkConvergence[index] - fFFTin[index][0])/fFFTin[index][0] > 1.0E-2f)) \
+             || (fCheckAkConvergence[index]/fFFTin[index][0] < 0.0f)) {
             //cout << "old: " << fCheckAkConvergence[index] << ", new: " << fFFTin[index][0] << endl;
             akConverged = false;
             cout << "count = " << count << ", Ak index = " << index << endl;
@@ -2502,7 +2485,7 @@ break;
     }
 
     if (!akConverged) {
-      for (k = 0; k < NFFTz; ++k) {
+      for (k = 0; k < NFFTz_2; ++k) {
         #pragma omp parallel for default(shared) private(j) schedule(dynamic)
         for (j = 0; j < NFFT; ++j) {
           index = k + NFFTz*j;
@@ -2533,21 +2516,16 @@ break;
     fftwf_execute(fFFTplan);
 
     for (k = 0; k < NFFTz; ++k) {
-      for (j = 0; j < NFFT; ++j) {
-        #pragma omp parallel for default(shared) private(i,index) schedule(dynamic)
-        for (i = 0; i < NFFT; ++i) {
-          index = k + NFFTz*(j + NFFT*i);
-          fOmegaMatrix[index] = fSumAk[k][0] - fRealSpaceMatrix[index][0];
-        }
+      #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+      for (index = 0; index < NFFTsq; ++index) {
+        fOmegaMatrix[k + NFFTz*index] = fSumAk[k][0] - fRealSpaceMatrix[k + NFFTz*index][0];
       }
     }
 
-
-
     CalculateGradient();
 
-//if(count == toll + 2)
-//break;
+//  if(count == toll + 2)
+//   break;
 
 // if (count == 50)
 //   break;
@@ -2577,16 +2555,12 @@ break;
       // calculate bKS
       float sign;
 
-      for (j = 0; j < NFFT; ++j) {
-        for (i = 0; i < NFFT; ++i) {
-          index = j + NFFT*i;
-          fBkS[index] = 0.f;
-          sign = -1.f;
-          for (k = 0; k < NFFTz; ++k) {
-            sign = -sign;
-            fBkS[index] += sign*fBkMatrix[k + NFFTz*index][0];
-          }
-          //fBkS[index] *= 2.0f;
+      for (index = 0; index < NFFTsq; ++index) {
+        fBkS[index] = 0.f;
+        sign = -1.f;
+        for (k = 0; k < NFFTz_2; ++k) {
+          sign = -sign;
+          fBkS[index] += sign*fBkMatrix[k + NFFTz*index][0];
         }
       }
 
@@ -2598,9 +2572,9 @@ break;
       for (l = 0; l < NFFTsqStZ; ++l) {
         fSumSum += fOmegaMatrix[l];
       }
-      
+
       cout << "fC = " << fC << ", <w> = " << fSumSum/NFFTsqStZ << endl;
-      
+
       fSumSum *= fC/static_cast<float>(NFFTsqStZ);
 
       // Now since we have all the ingredients for the bK, do the bK-iteration step
@@ -2608,15 +2582,6 @@ break;
 
 // if (count == toll + 2)
 //    break;
-
-//    for (k = 0; k < fStepsZ; ++k) {
-//       for (i = 0; i < NFFT; ++i) {
-//         for (j = 0; j < NFFT; ++j) {
-//           cout << fBkMatrix[fStepsZ*(j + NFFT*i)][0] << " ";
-//         }
-//         cout << endl; 
-//       }
-//    }
 
       // Check the convergence of the bK-iterations
 
@@ -2631,11 +2596,12 @@ break;
 
       bkConverged = true;
 
-      for (k = 0; k < NFFTz; ++k) {
+      for (k = 0; k < NFFTz_2; ++k) {
         for (j = 0; j < NFFT; ++j) {
           index = k + NFFTz*j;
           if (fBkMatrix[index][0]) {
-            if (((fabs(fBkMatrix[index][0]) > 4.0E-4f) && (fabs(fCheckBkConvergence[index] - fBkMatrix[index][0])/fBkMatrix[index][0] > 4.0E-2f)) \
+            if (((fabs(fBkMatrix[index][0]) > 1.0E-5f) && \
+               (fabs(fCheckBkConvergence[index] - fBkMatrix[index][0])/fBkMatrix[index][0] > 1.0E-2f)) \
              || (fCheckBkConvergence[index]/fBkMatrix[index][0] < 0.0f)) {
             // cout << "old: " << fCheckBkConvergence[index] << ", new: " << fBkMatrix[index][0] << endl;
               bkConverged = false;
@@ -2651,7 +2617,7 @@ break;
       // cout << "Bk Convergence: " << bkConverged << endl;
 
       if (!bkConverged) {
-        for (k = 0; k < NFFTz; ++k) {
+        for (k = 0; k < NFFTz_2; ++k) {
           #pragma omp parallel for default(shared) private(j) schedule(dynamic)
           for (j = 0; j < NFFT; ++j) {
             index = k + NFFTz*j;
@@ -2660,7 +2626,7 @@ break;
         }
       }
 
-      // Go on with the calculation of B(x,y) and Q(x,y)
+      // Go on with the calculation of Q(x,y)
 
       // In order to save memory I will not allocate more space for another matrix but save a copy of the bKs in the aK-Matrix
       #pragma omp parallel for default(shared) private(l) schedule(dynamic)
@@ -2668,18 +2634,9 @@ break;
         fFFTin[l][1] = fBkMatrix[l][0];
       }
 
- if (count == toll + 45)
-  break;
-/*
-      // Fourier transform to get B(x,y)
+  if (count == toll + 45)
+   break;
 
-      fftw_execute(fFFTplanBkToBandQ);
-
-      #pragma omp parallel for default(shared) private(l) schedule(dynamic)
-      for (l = 0; l < NFFTsq; l++) {
-        fFFTout[l] = scaledB + fBkMatrix[l][0];
-      }
-*/
 if (count == 5) {
   akConverged = true;
   bkConverged = true;
@@ -2699,16 +2656,7 @@ if (count == 5) {
           break;
         }
       }
-/*
-      // Restore bKs for Qx calculation and Fourier transform to get Qx
-      #pragma omp parallel for default(shared) private(l) schedule(dynamic)
-      for (l = 0; l < NFFTsq; l+=2) {
-        fBkMatrix[l][0] = fFFTin[l/2][0];
-        fBkMatrix[l+1][0] = fFFTin[l/2][1];
-        fBkMatrix[l][1] = 0.0;
-        fBkMatrix[l+1][1] = 0.0;
-      }
-*/
+
 //  if(count == toll + 1)
 // break;
 
@@ -2723,12 +2671,9 @@ if (count == 5) {
 // break;
 
       for (k = 0; k < NFFTz; ++k) {
-        for (j = 0; j < NFFT; ++j) {
-          #pragma omp parallel for default(shared) private(i,index) schedule(dynamic)
-          for (i = 0; i < NFFT; ++i) {
-            index = k + NFFTz*(j + NFFT*i);
-            fQMatrix[index][0] = fQMatrixA[j + NFFT*i][0] - fBkMatrix[index][1];
-          }
+        #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+        for (index = 0; index < NFFTsq; ++index) {
+          fQMatrix[k + NFFTz*index][0] = fQMatrixA[index][0] - fBkMatrix[k + NFFTz*index][1];
         }
       }
 
@@ -2767,12 +2712,9 @@ if (count == 5) {
 // break;
 
       for (k = 0; k < NFFTz; ++k) {
-        for (j = 0; j < NFFT; ++j) {
-          #pragma omp parallel for default(shared) private(i,index) schedule(dynamic)
-          for (i = 0; i < NFFT; ++i) {
-            index = k + NFFTz*(j + NFFT*i);
-            fQMatrix[index][1] = fQMatrixA[j + NFFT*i][1] + fBkMatrix[index][1];
-          }
+        #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+        for (index = 0; index < NFFTsq; ++index) {
+          fQMatrix[k + NFFTz*index][1] = fQMatrixA[index][1] + fBkMatrix[k + NFFTz*index][1];
         }
       }
 

@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  TBulkTriVortexFieldCalc.h
+  TFilmTriVortexFieldCalc.h
 
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
