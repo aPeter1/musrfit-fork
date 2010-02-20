@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2010/10/17
+  2010/02/19
 
 ***************************************************************************/
 
@@ -89,7 +89,7 @@ public:
   fftwf_complex* GetBkMatrix() const {return fBkMatrix;}
   fftwf_complex* GetRealSpaceMatrix() const {return fRealSpaceMatrix;}
   float* GetOmegaMatrix() const {return fOmegaMatrix;}
-  float* GetBkSMatrix() const {return fBkS;}
+  fftwf_complex* GetBkSMatrix() const {return fBkS;}
   vector<float*> GetOmegaDiffMatrix() const {return fOmegaDiffMatrix;}
   fftwf_complex* GetQMatrix() const {return fQMatrix;}
   fftwf_complex* GetPMatrix() const {return fPkMatrix;}
@@ -103,8 +103,12 @@ private:
   void ManipulateFourierCoefficientsB() const;
   void ManipulateFourierCoefficientsForQx() const;
   void ManipulateFourierCoefficientsForQy() const;
-  void ManipulateFourierCoefficientsForBperpX() const;
-  void ManipulateFourierCoefficientsForBperpY() const;
+  void ManipulateFourierCoefficientsForBperpXFirst() const;
+  void ManipulateFourierCoefficientsForBperpXSecond() const;
+  void ManipulateFourierCoefficientsForBperpYFirst() const;
+  void ManipulateFourierCoefficientsForBperpYSecond() const;
+  void ManipulateFourierCoefficientsForBperpXatSurface() const;
+  void ManipulateFourierCoefficientsForBperpYatSurface() const;
   void CalculateGatVortexCore() const;
 
   mutable float *fOmegaMatrix;
@@ -116,7 +120,7 @@ private:
   mutable fftwf_complex *fQMatrixA;
   mutable fftwf_complex *fSumAkFFTin;
   mutable fftwf_complex *fSumAk;
-  mutable float *fBkS;
+  mutable fftwf_complex *fBkS;
   mutable float *fGstorage;
 
   mutable float *fCheckAkConvergence;
@@ -137,7 +141,7 @@ private:
   fftwf_plan fFFTplanForSumAk;
   fftwf_plan fFFTplanForPk1;
   fftwf_plan fFFTplanForPk2;
-  
+  fftwf_plan fFFTplanForBatSurf;
 
 };
 
