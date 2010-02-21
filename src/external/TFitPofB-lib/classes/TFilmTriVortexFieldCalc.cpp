@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2010/02/01
+  2010/02/21
 
 ***************************************************************************/
 
@@ -834,12 +834,18 @@ void TFilmTriVortexNGLFieldCalc::CalculateGradient() const {
       fBkMatrix[l][1] = 0.0;
     }
   }
-/* If the numerics is fine, this part is not needed
+/* If the numerics is fine, this part is not needed */
   // Ensure that omega and the gradient at the vortex-core positions are zero
   for (k = 0; k < NFFTz; ++k) {
     fOmegaMatrix[k] = 0.0;
     fOmegaMatrix[k + NFFTz*(NFFT+1)*NFFT_2] = 0.0;
-
+    fOmegaDiffMatrix[0][k] = 0.0;
+    fOmegaDiffMatrix[0][k + NFFTz*(NFFT+1)*NFFT_2] = 0.0;
+    fOmegaDiffMatrix[1][k] = 0.0;
+    fOmegaDiffMatrix[1][k + NFFTz*(NFFT+1)*NFFT_2] = 0.0;
+    fOmegaDiffMatrix[2][k] = 0.0;
+    fOmegaDiffMatrix[2][k + NFFTz*(NFFT+1)*NFFT_2] = 0.0;
+  }/*
     for (i = 0; i < NFFT; ++i) {
       // j = 0
       fOmegaDiffMatrix[0][k + NFFTz*NFFT*i] = 0.0;
@@ -981,9 +987,10 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsA() const {
   const int NFFT(fSteps), NFFT_2(fSteps/2), NFFTz(fStepsZ), NFFTz_2(fStepsZ/2), NFFTsqStZ(fSteps*fSteps*fStepsZ), NFFTsq(fSteps*fSteps);
 
   // Divide EHB's coefficient no2 by two since we are considering "the full 3D reciprocal lattice", not only the half space!
-  const float symCorr(0.5f);
+  // Additionally treat all K the same (no difference between Kperp and K with Kz != 0)
+  const float symCorr(1.0f);
   const float coeff1(4.0f/3.0f*pow(PI/fLatticeConstant,2.0f));
-  const float coeff3(4.0f*fKappa*fKappa);
+  const float coeff3(2.0f*fKappa*fKappa);
   const float coeff2(symCorr*coeff3/static_cast<float>(NFFTsqStZ));
 
   const float coeff4(4.0f*pow(PI/fThickness,2.0f));
@@ -1156,7 +1163,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsA() const {
       }
       fFFTin[k][0] = 0.0f;
     }
-    /* Comment out the negative Kz - setting them to zero instead to stay closer to EHB's solution */
+
     for (k = NFFTz_2; k < NFFTz; ++k) {
       kk = coeff4*static_cast<float>((k - NFFTz)*(k - NFFTz));
       for (i = 0; i < NFFT_2; i += 2) {
@@ -1255,7 +1262,8 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsA() const {
 void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
   const int NFFT(fSteps), NFFTsq(fSteps*fSteps), NFFT_2(fSteps/2), NFFTz(fStepsZ), NFFTz_2(fStepsZ/2);
 
-  // Divide EHB's PK and c by two since we are considering "the full 3D reciprocal lattice", not only the half space!
+  // Divide EHB's PK by two since we are considering "the full 3D reciprocal lattice", not only the half space!
+  // Additionally treat all K the same (no difference between Kperp and K with Kz != 0)
   const float coeffKsq(4.0f/3.0f*pow(PI/fLatticeConstant,2.0f));
   const float coeffKy(TWOPI/fLatticeConstant);
   const float coeffKx(coeffKy/sqrt3);
@@ -1277,7 +1285,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
       Gsq = coeffKsq*(static_cast<float>(j*j) + ii);
       fBkMatrix[index][0] = \
        (coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
-       fSumSum*fBkMatrix[index][0] - coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(Gsq + fSumSum);
+       1.0f*fSumSum*fBkMatrix[index][0] - coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(Gsq + 1.0f*fSumSum);
       fBkMatrix[index][1] = 0.0;
       fBkMatrix[index2][0] = 0.0;
       fBkMatrix[index2][1] = 0.0;
@@ -1290,7 +1298,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
       Gsq = coeffKsq*(static_cast<float>((j - NFFT)*(j - NFFT)) + ii);
       fBkMatrix[index][0] = \
        (coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
-       fSumSum*fBkMatrix[index][0] - coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(Gsq + fSumSum);
+       1.0f*fSumSum*fBkMatrix[index][0] - coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(Gsq + 1.0f*fSumSum);
       fBkMatrix[index][1] = 0.0;
       fBkMatrix[index2][0] = 0.0;
       fBkMatrix[index2][1] = 0.0;
@@ -1307,7 +1315,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
       Gsq = coeffKsq*(static_cast<float>(j*j) + ii);
       fBkMatrix[index][0] = \
        (coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
-       fSumSum*fBkMatrix[index][0] - coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(Gsq + fSumSum);
+       1.0f*fSumSum*fBkMatrix[index][0] - coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(Gsq + 1.0f*fSumSum);
       fBkMatrix[index][1] = 0.0;
       fBkMatrix[index2][0] = 0.0;
       fBkMatrix[index2][1] = 0.0;
@@ -1320,7 +1328,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
       Gsq = coeffKsq*(static_cast<float>((j - NFFT)*(j - NFFT)) + ii);
       fBkMatrix[index][0] = \
        (coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
-       fSumSum*fBkMatrix[index][0] - coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(Gsq + fSumSum);
+       1.0f*fSumSum*fBkMatrix[index][0] - coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(Gsq + 1.0f*fSumSum);
       fBkMatrix[index][1] = 0.0;
       fBkMatrix[index2][0] = 0.0;
       fBkMatrix[index2][1] = 0.0;
@@ -1341,7 +1349,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
       fBkMatrix[index][1] = 0.0;
       fBkMatrix[index2][0] = \
        (coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
-       fSumSum*fBkMatrix[index2][0] - coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(Gsq + fSumSum);
+       1.0f*fSumSum*fBkMatrix[index2][0] - coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(Gsq + 1.0f*fSumSum);
       fBkMatrix[index2][1] = 0.0;
     }
 
@@ -1354,7 +1362,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
       fBkMatrix[index][1] = 0.0;
       fBkMatrix[index2][0] = \
        (coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
-       fSumSum*fBkMatrix[index2][0] - coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(Gsq + fSumSum);
+       1.0f*fSumSum*fBkMatrix[index2][0] - coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(Gsq + 1.0f*fSumSum);
       fBkMatrix[index2][1] = 0.0;
     }
   }
@@ -1371,7 +1379,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
       fBkMatrix[index][1] = 0.0;
       fBkMatrix[index2][0] = \
        (coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
-       fSumSum*fBkMatrix[index2][0] - coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(Gsq + fSumSum);
+       1.0f*fSumSum*fBkMatrix[index2][0] - coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(Gsq + 1.0f*fSumSum);
       fBkMatrix[index2][1] = 0.0;
     }
 
@@ -1384,7 +1392,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
       fBkMatrix[index][1] = 0.0;
       fBkMatrix[index2][0] = \
        (coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
-       fSumSum*fBkMatrix[index2][0] - coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(Gsq + fSumSum);
+       1.0f*fSumSum*fBkMatrix[index2][0] - coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(Gsq + 1.0f*fSumSum);
       fBkMatrix[index2][1] = 0.0;
     }
   }
@@ -1407,7 +1415,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
           Gsq = coeffKsq*(static_cast<float>(j*j) + ii);
           fBkMatrix[index][0] = \
            (coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
-           fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(1.0*(Gsq + kk) + fSumSum);
+           1.0f*fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(1.0f*(Gsq + kk) + fSumSum);
           fBkMatrix[index][1] = 0.0;
           fBkMatrix[index2][0] = 0.0;
           fBkMatrix[index2][1] = 0.0;
@@ -1420,7 +1428,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
           Gsq = coeffKsq*(static_cast<float>((j - NFFT)*(j - NFFT)) + ii);
           fBkMatrix[index][0] = \
            (coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
-           fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(1.0*(Gsq + kk) + fSumSum);
+           1.0f*fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(1.0f*(Gsq + kk) + fSumSum);
           fBkMatrix[index][1] = 0.0;
           fBkMatrix[index2][0] = 0.0;
           fBkMatrix[index2][1] = 0.0;
@@ -1437,7 +1445,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
           Gsq = coeffKsq*(static_cast<float>(j*j) + ii);
           fBkMatrix[index][0] = \
            (coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
-           fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(1.0*(Gsq + kk) + fSumSum);
+           1.0f*fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(1.0f*(Gsq + kk) + fSumSum);
           fBkMatrix[index][1] = 0.0;
           fBkMatrix[index2][0] = 0.0;
           fBkMatrix[index2][1] = 0.0;
@@ -1450,7 +1458,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
           Gsq = coeffKsq*(static_cast<float>((j - NFFT)*(j - NFFT)) + ii);
           fBkMatrix[index][0] = \
            (coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
-           fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(1.0*(Gsq + kk) + fSumSum);
+           1.0f*fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(1.0f*(Gsq + kk) + fSumSum);
           fBkMatrix[index][1] = 0.0;
           fBkMatrix[index2][0] = 0.0;
           fBkMatrix[index2][1] = 0.0;
@@ -1471,7 +1479,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
           fBkMatrix[index][1] = 0.0;
           fBkMatrix[index2][0] = \
            (coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
-           fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(1.0*(Gsq + kk) + fSumSum);
+           1.0f*fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(1.0f*(Gsq + kk) + fSumSum);
           fBkMatrix[index2][1] = 0.0;
         }
 
@@ -1484,7 +1492,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
           fBkMatrix[index][1] = 0.0;
           fBkMatrix[index2][0] = \
            (coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
-           fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(1.0*(Gsq + kk) + fSumSum);
+           1.0f*fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(1.0f*(Gsq + kk) + fSumSum);
           fBkMatrix[index2][1] = 0.0;
         }
       }
@@ -1501,7 +1509,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
           fBkMatrix[index][1] = 0.0;
           fBkMatrix[index2][0] = \
            (coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
-           fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(1.0*(Gsq + kk) + fSumSum);
+           1.0f*fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(1.0f*(Gsq + kk) + fSumSum);
           fBkMatrix[index2][1] = 0.0;
         }
 
@@ -1514,7 +1522,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
           fBkMatrix[index][1] = 0.0;
           fBkMatrix[index2][0] = \
            (coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
-           fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(1.0*(Gsq + kk) + fSumSum);
+           1.0f*fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(1.0f*(Gsq + kk) + fSumSum);
           fBkMatrix[index2][1] = 0.0;
         }
       }
@@ -1534,7 +1542,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
           Gsq = coeffKsq*(static_cast<float>(j*j) + ii);
           fBkMatrix[index][0] = \
            (coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
-           fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(1.0*(Gsq + kk) + fSumSum);
+           1.0f*fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(1.0f*(Gsq + kk) + fSumSum);
           fBkMatrix[index][1] = 0.0;
           fBkMatrix[index2][0] = 0.0;
           fBkMatrix[index2][1] = 0.0;
@@ -1547,7 +1555,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
           Gsq = coeffKsq*(static_cast<float>((j - NFFT)*(j - NFFT)) + ii);
           fBkMatrix[index][0] = \
            (coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
-           fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(1.0*(Gsq + kk) + fSumSum);
+           1.0f*fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(1.0f*(Gsq + kk) + fSumSum);
           fBkMatrix[index][1] = 0.0;
           fBkMatrix[index2][0] = 0.0;
           fBkMatrix[index2][1] = 0.0;
@@ -1564,7 +1572,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
           Gsq = coeffKsq*(static_cast<float>(j*j) + ii);
           fBkMatrix[index][0] = \
            (coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
-           fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(1.0*(Gsq + kk) + fSumSum);
+           1.0f*fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(1.0f*(Gsq + kk) + fSumSum);
           fBkMatrix[index][1] = 0.0;
           fBkMatrix[index2][0] = 0.0;
           fBkMatrix[index2][1] = 0.0;
@@ -1577,7 +1585,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
           Gsq = coeffKsq*(static_cast<float>((j - NFFT)*(j - NFFT)) + ii);
           fBkMatrix[index][0] = \
            (coeffPk*(ky*fQMatrix[index][1] + kx*fPkMatrix[index][1]) + \
-           fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(1.0*(Gsq + kk) + fSumSum);
+           1.0f*fSumSum*fBkMatrix[index][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + NFFT*i][0])/(1.0f*(Gsq + kk) + fSumSum);
           fBkMatrix[index][1] = 0.0;
           fBkMatrix[index2][0] = 0.0;
           fBkMatrix[index2][1] = 0.0;
@@ -1598,7 +1606,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
           fBkMatrix[index][1] = 0.0;
           fBkMatrix[index2][0] = \
            (coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
-           fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(1.0*(Gsq + kk) + fSumSum);
+           1.0f*fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(1.0f*(Gsq + kk) + fSumSum);
           fBkMatrix[index2][1] = 0.0;
         }
 
@@ -1611,7 +1619,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
           fBkMatrix[index][1] = 0.0;
           fBkMatrix[index2][0] = \
            (coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
-           fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(1.0*(Gsq + kk) + fSumSum);
+           1.0f*fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(1.0f*(Gsq + kk) + fSumSum);
           fBkMatrix[index2][1] = 0.0;
         }
       }
@@ -1628,7 +1636,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
           fBkMatrix[index][1] = 0.0;
           fBkMatrix[index2][0] = \
            (coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
-           fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(1.0*(Gsq + kk) + fSumSum);
+           1.0f*fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(1.0f*(Gsq + kk) + fSumSum);
           fBkMatrix[index2][1] = 0.0;
         }
 
@@ -1641,7 +1649,7 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
           fBkMatrix[index][1] = 0.0;
           fBkMatrix[index2][0] = \
            (coeffPk*(ky*fQMatrix[index2][1] + kx*fPkMatrix[index2][1]) + \
-           fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(1.0*(Gsq + kk) + fSumSum);
+           1.0f*fSumSum*fBkMatrix[index2][0] - sign*coeffBkS*sqrt(Gsq)*fBkS[j + 1 + NFFT*i][0])/(1.0f*(Gsq + kk) + fSumSum);
           fBkMatrix[index2][1] = 0.0;
         }
       }
@@ -2541,24 +2549,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
   // ... now fill in the Fourier components (Abrikosov) if everything was okay above
 
-  FillAbrikosovCoefficients(scaledB);
-
-/* try zeros 
-
-  for (k = 0; k < NFFTz_2; ++k) {
-    for (i = NFFT_2; i < NFFT; ++i) {
-      for (j = 0; j < NFFT; ++j) {
-        index = k + NFFTz*(j + NFFT*i);
-        fFFTin[index][0] = 0.0;
-      }
-    }
-    for (j = NFFT_2; j < NFFT; ++j) {
-      index = k + NFFTz*j;
-      fFFTin[index][0] = 0.0;
-    }
-  }
-
- end zeros */
+  FillAbrikosovCoefficients(0.0);
 
   // save a few coefficients for the convergence check
 
@@ -2597,7 +2588,6 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
   // Calculate the gradient of omega - Abrikosov
 
   CalculateGradient();
-
 
   // Calculate Q-Abrikosov
 
@@ -2688,6 +2678,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
     ManipulateFourierCoefficientsA();
 
+
     // Second iteration step for aK, first recalculate omega and its gradient
 
     CalculateSumAk();
@@ -2706,7 +2697,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
     CalculateGradient();
 
 
-//    CalculateGatVortexCore();
+    //CalculateGatVortexCore();
 
     // Get the spacial averages of the second iteration step for aK
 
@@ -2723,8 +2714,8 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
               fOmegaDiffMatrix[2][index]*fOmegaDiffMatrix[2][index])/(fourKappaSq*fOmegaMatrix[index]);
           } else {
 //            cout << "! fOmegaMatrix at index " << index << endl;
-//            fSumSum -= fGstorage[k];
-            index = k + fStepsZ*(j + fSteps*(i + 1));
+           // fSumSum -= fGstorage[k];
+           index = k + fStepsZ*(j + fSteps*(i + 1));
             if (i < NFFT - 1 && fOmegaMatrix[index]) {
               fSumSum += fOmegaMatrix[index]*(1.0 - (fQMatrix[index][0]*fQMatrix[index][0] + fQMatrix[index][1]*fQMatrix[index][1])) - \
               (fOmegaDiffMatrix[0][index]*fOmegaDiffMatrix[0][index] + \
@@ -2833,7 +2824,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
       fBkS[index][1] = 0.f;
     }
 
-//      cout << "fC = " << fC << ", meanAk = " << meanAk << endl;
+    //  cout << "fC = " << fC << ", meanAk = " << meanAk << endl;
 
     fSumSum = fC*meanAk;
 
@@ -2890,7 +2881,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
     }
 
     if (count == 50) {
-      cout << "3D iterations aborted after 50 steps" << endl;
+      cout << "3D iterations aborted after " << count << " steps" << endl;
       break;
     }
 
@@ -2902,6 +2893,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
     if (bkConverged && akConverged) {
       if (!fFind3dSolution) {
         //cout << "count = " << count << " 2D converged" << endl;
+        //cout << "2D iterations converged after " << count << " steps" << endl;
         //break;
         akConverged = false;
         bkConverged = false;
@@ -3054,17 +3046,10 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
     fBkMatrix[l][1] = 0.0;
   }
 */
-/*
-  // If the iterations have converged, rescale the field from Brandt's units to Gauss
-
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
-  for (l = 0; l < NFFTsq; l++) {
-    fFFTout[l] *= Hc2_kappa;
-  }
 
   // Set the flag which shows that the calculation has been done
 
   fGridExists = true;
   return;
-*/
+
 }

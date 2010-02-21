@@ -673,13 +673,14 @@ TBulkTriVortexNGLFieldCalc::TBulkTriVortexNGLFieldCalc(const string& wisdom, con
   fOmegaMatrix = new double[stepsSq];  // |psi|^2 (x,y)
   fOmegaDiffMatrix = new fftw_complex[stepsSq]; // grad omega
 
-  fFFTin = new fftw_complex[(fSteps/2 + 1)*fSteps]; // aK matrix
+  fFFTin = new fftw_complex[stepsSq]; // aK matrix
   fBkMatrix = new fftw_complex[stepsSq]; // bK matrix
+  fRealSpaceMatrix = new fftw_complex[stepsSq];
 
   fQMatrix = new fftw_complex[stepsSq];
   fQMatrixA = new fftw_complex[stepsSq];
 
-  fCheckAkConvergence = new double[fSteps/2 + 1];
+  fCheckAkConvergence = new double[fSteps];
   fCheckBkConvergence = new double[fSteps];
 
 // Load wisdom from file if it exists and should be used
@@ -704,16 +705,16 @@ TBulkTriVortexNGLFieldCalc::TBulkTriVortexNGLFieldCalc(const string& wisdom, con
 
   if (fUseWisdom) {
     // use the first plan from the base class here - it will be destroyed by the base class destructor
-    fFFTplan = fftw_plan_dft_c2r_2d(fSteps, fSteps, fFFTin, fOmegaMatrix, FFTW_EXHAUSTIVE);
+    fFFTplan = fftw_plan_dft_2d(fSteps, fSteps, fFFTin, fRealSpaceMatrix, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
     fFFTplanBkToBandQ = fftw_plan_dft_2d(fSteps, fSteps, fBkMatrix, fBkMatrix, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
-    fFFTplanOmegaToAk = fftw_plan_dft_r2c_2d(fSteps, fSteps, fOmegaMatrix, fFFTin, FFTW_EXHAUSTIVE);
+    fFFTplanOmegaToAk = fftw_plan_dft_2d(fSteps, fSteps, fRealSpaceMatrix, fFFTin, FFTW_FORWARD, FFTW_EXHAUSTIVE);
     fFFTplanOmegaToBk = fftw_plan_dft_2d(fSteps, fSteps, fBkMatrix, fBkMatrix, FFTW_FORWARD, FFTW_EXHAUSTIVE);
   }
   else {
     // use the first plan from the base class here - it will be destroyed by the base class destructor
-    fFFTplan = fftw_plan_dft_c2r_2d(fSteps, fSteps, fFFTin, fOmegaMatrix, FFTW_ESTIMATE);
+    fFFTplan = fftw_plan_dft_2d(fSteps, fSteps, fFFTin, fRealSpaceMatrix, FFTW_BACKWARD, FFTW_ESTIMATE);
     fFFTplanBkToBandQ = fftw_plan_dft_2d(fSteps, fSteps, fBkMatrix, fBkMatrix, FFTW_BACKWARD, FFTW_ESTIMATE);
-    fFFTplanOmegaToAk = fftw_plan_dft_r2c_2d(fSteps, fSteps, fOmegaMatrix, fFFTin, FFTW_ESTIMATE);
+    fFFTplanOmegaToAk = fftw_plan_dft_2d(fSteps, fSteps, fRealSpaceMatrix, fFFTin, FFTW_FORWARD, FFTW_ESTIMATE);
     fFFTplanOmegaToBk = fftw_plan_dft_2d(fSteps, fSteps, fBkMatrix, fBkMatrix, FFTW_FORWARD, FFTW_ESTIMATE);
   }
 }
@@ -730,6 +731,7 @@ TBulkTriVortexNGLFieldCalc::~TBulkTriVortexNGLFieldCalc() {
   delete[] fOmegaDiffMatrix; fOmegaDiffMatrix = 0;
 
   delete[] fBkMatrix; fBkMatrix = 0;
+  delete[] fRealSpaceMatrix; fRealSpaceMatrix = 0;
   delete[] fQMatrix; fQMatrix = 0;
   delete[] fQMatrixA; fQMatrixA = 0;
 
@@ -741,6 +743,117 @@ void TBulkTriVortexNGLFieldCalc::CalculateGradient() const {
 
   // Calculate the gradient of omega stored in a fftw_complex array (dw/dx, dw/dy)
 
+  const int NFFT(fSteps);
+  const int NFFT_2(fSteps/2);
+  const int NFFTsq(fSteps*fSteps);
+
+  int i, j, l, index;
+
+  // Take the derivative of the Fourier sum of omega
+
+  // First save a copy of the real aK-matrix in the imaginary part of the bK-matrix
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  for (l = 0; l < NFFTsq; ++l) {
+    fBkMatrix[l][1] = fFFTin[l][0];
+  }
+
+  // dw/dx = sum_K aK Kx sin(Kx*x + Ky*y)
+  // First multiply the aK with Kx, then call FFTW
+
+  const double coeffKx(TWOPI/(sqrt3*fLatticeConstant));
+
+  // even rows
+  for (i = 0; i < NFFT; i += 2) {
+    // j = 0
+    fFFTin[NFFT*i][0] = 0.0;
+    // j != 0
+    for (j = 2; j < NFFT_2; j += 2) {
+      fFFTin[(j + NFFT*i)][0] *= coeffKx*static_cast<double>(j);
+    }
+    for (j = NFFT_2; j < NFFT; j += 2) {
+      fFFTin[(j + NFFT*i)][0] *= coeffKx*static_cast<double>(j - NFFT);
+    }
+  }
+
+  // odd rows
+  for (i = 1; i < NFFT; i += 2) {
+    for (j = 0; j < NFFT_2; j += 2) {
+      fFFTin[(j + 1 + NFFT*i)][0] *= coeffKx*static_cast<double>(j + 1);
+    }
+    for (j = NFFT_2; j < NFFT; j += 2) {
+      fFFTin[(j + 1 + NFFT*i)][0] *= coeffKx*static_cast<double>(j + 1 - NFFT);
+    }
+  }
+
+  fftw_execute(fFFTplan);
+
+  // Copy the results to the gradient matrix and restore the original aK-matrix
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  for (l = 0; l < NFFTsq; ++l) {
+    fOmegaDiffMatrix[l][0] = fRealSpaceMatrix[l][1];
+    fFFTin[l][0] = fBkMatrix[l][1];
+  }
+
+  // dw/dy = sum_K aK Ky sin(Kx*x + Ky*y)
+  // First multiply the aK with Ky, then call FFTW
+
+  const double coeffKy(TWOPI/fLatticeConstant);
+  double ky;
+
+  // even rows
+  // i = 0
+  for (j = 0; j < NFFT; j += 2) {
+    fFFTin[j][0] = 0.0;
+  }
+  // i != 0
+  for (i = 2; i < NFFT_2; i += 2) {
+    ky = coeffKy*static_cast<double>(i);
+    for (j = 0; j < NFFT; j += 2) {
+      fFFTin[(j + NFFT*i)][0] *= ky;
+    }
+  }
+  for (i = NFFT_2; i < NFFT; i += 2) {
+    ky = coeffKy*static_cast<double>(i - NFFT);
+    for (j = 0; j < NFFT; j += 2) {
+      fFFTin[(j + NFFT*i)][0] *= ky;
+    }
+  }
+
+  // odd rows
+  for (i = 1; i < NFFT_2; i += 2) {
+    ky = coeffKy*static_cast<double>(i);
+    for (j = 0; j < NFFT; j += 2) {
+      fFFTin[(j + 1 + NFFT*i)][0] *= ky;
+    }
+  }
+  for (i = NFFT_2 + 1; i < NFFT; i += 2) {
+    ky = coeffKy*static_cast<double>(i - NFFT);
+    for (j = 0; j < NFFT; j += 2) {
+      fFFTin[(j + 1 + NFFT*i)][0] *= ky;
+    }
+  }
+
+  fftw_execute(fFFTplan);
+
+  // Copy the results to the gradient matrix and restore the original aK-matrix
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  for (l = 0; l < NFFTsq; ++l) {
+    fOmegaDiffMatrix[l][1] = fRealSpaceMatrix[l][1];
+    fFFTin[l][0] = fBkMatrix[l][1];
+    fBkMatrix[l][1] = 0.0;
+  }
+
+  // Ensure that omega at the vortex-core positions is zero
+  fOmegaMatrix[0] = 0.0;
+  fOmegaMatrix[(NFFT+1)*NFFT_2] = 0.0;
+
+  // Ensure that the derivatives at the vortex-core positions are zero
+  fOmegaDiffMatrix[0][0] = 0.0;
+  fOmegaDiffMatrix[(NFFT+1)*NFFT_2][0] = 0.0;
+  fOmegaDiffMatrix[0][1] = 0.0;
+  fOmegaDiffMatrix[(NFFT+1)*NFFT_2][1] = 0.0;
+
+/*
   const int NFFT(fSteps);
   const int NFFT_2(fSteps/2);
   const int NFFTsq(fSteps*fSteps);
@@ -792,7 +905,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGradient() const {
   fOmegaDiffMatrix[(NFFT+1)*NFFT_2][0] = 0.0;
   fOmegaDiffMatrix[0][1] = 0.0;
   fOmegaDiffMatrix[(NFFT+1)*NFFT_2][1] = 0.0;
-
+*/
   return;
 }
 
@@ -808,9 +921,9 @@ void TBulkTriVortexNGLFieldCalc::FillAbrikosovCoefficients() const {
     } else {
       sign = -1.0;
     }
-    lNFFT_2 = l*(NFFT_2 + 1);
+    lNFFT_2 = l*(NFFT);
     ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
+    for (k = 0; k < NFFT_2; k += 2) {
       sign = -sign;
       Gsq = static_cast<double>(k*k) + ll;
       fFFTin[lNFFT_2 + k][0] = sign*exp(-pi_4sqrt3*Gsq);
@@ -818,11 +931,14 @@ void TBulkTriVortexNGLFieldCalc::FillAbrikosovCoefficients() const {
       fFFTin[lNFFT_2 + k + 1][0] = 0.0;
       fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    sign = -sign;
-    Gsq = static_cast<double>(k*k) + ll;
-    fFFTin[lNFFT_2 + k][0] = sign*exp(-pi_4sqrt3*Gsq);
-    fFFTin[lNFFT_2 + k][1] = 0.0;
+    for (k = NFFT_2; k < NFFT; k += 2) {
+      sign = -sign;
+      Gsq = static_cast<double>((k-NFFT)*(k-NFFT)) + ll;
+      fFFTin[lNFFT_2 + k][0] = sign*exp(-pi_4sqrt3*Gsq);
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
   }
 
   for (l = NFFT_2; l < NFFT; l += 2) {
@@ -831,9 +947,9 @@ void TBulkTriVortexNGLFieldCalc::FillAbrikosovCoefficients() const {
     } else {
       sign = -1.0;
     }
-    lNFFT_2 = l*(NFFT_2 + 1);
+    lNFFT_2 = l*(NFFT);
     ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
+    for (k = 0; k < NFFT_2; k += 2) {
       sign = -sign;
       Gsq = static_cast<double>(k*k) + ll;
       fFFTin[lNFFT_2 + k][0] = sign*exp(-pi_4sqrt3*Gsq);
@@ -841,31 +957,38 @@ void TBulkTriVortexNGLFieldCalc::FillAbrikosovCoefficients() const {
       fFFTin[lNFFT_2 + k + 1][0] = 0.0;
       fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    sign = -sign;
-    Gsq = static_cast<double>(k*k) + ll;
-    fFFTin[lNFFT_2 + k][0] = sign*exp(-pi_4sqrt3*Gsq);
-    fFFTin[lNFFT_2 + k][1] = 0.0;
+    for (k = NFFT_2; k < NFFT_2; k += 2) {
+      sign = -sign;
+      Gsq = static_cast<double>((k-NFFT)*(k-NFFT)) + ll;
+      fFFTin[lNFFT_2 + k][0] = sign*exp(-pi_4sqrt3*Gsq);
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
   }
 
   // intermediate rows
   for (l = 1; l < NFFT_2; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
+    lNFFT_2 = l*(NFFT);
     ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
+    for (k = 0; k < NFFT_2; k += 2) {
       Gsq = static_cast<double>((k + 1)*(k + 1)) + ll;
       fFFTin[lNFFT_2 + k][0] = 0.0;
       fFFTin[lNFFT_2 + k][1] = 0.0;
       fFFTin[lNFFT_2 + k + 1][0] = exp(-pi_4sqrt3*Gsq);
       fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    fFFTin[lNFFT_2 + k][0] = 0.0;
-    fFFTin[lNFFT_2 + k][1] = 0.0;
+    for (k = NFFT_2; k < NFFT; k += 2) {
+      Gsq = static_cast<double>((k + 1 - NFFT)*(k + 1 - NFFT)) + ll;
+      fFFTin[lNFFT_2 + k][0] = 0.0;
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] = exp(-pi_4sqrt3*Gsq);
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
   }
 
   for (l = NFFT_2 + 1; l < NFFT; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
+    lNFFT_2 = l*(NFFT);
     ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
     for (k = 0; k < NFFT_2 - 1; k += 2) {
       Gsq = static_cast<double>((k+1)*(k+1)) + ll;
@@ -874,9 +997,13 @@ void TBulkTriVortexNGLFieldCalc::FillAbrikosovCoefficients() const {
       fFFTin[lNFFT_2 + k + 1][0] = exp(-pi_4sqrt3*Gsq);
       fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    fFFTin[lNFFT_2 + k][0] = 0.0;
-    fFFTin[lNFFT_2 + k][1] = 0.0;
+    for (k = NFFT_2; k < NFFT; k += 2) {
+      Gsq = static_cast<double>((k+1 - NFFT)*(k+1 - NFFT)) + ll;
+      fFFTin[lNFFT_2 + k][0] = 0.0;
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] = exp(-pi_4sqrt3*Gsq);
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
   }
 
   fFFTin[0][0] = 0.0;
@@ -896,23 +1023,26 @@ void TBulkTriVortexNGLFieldCalc::ManipulateFourierCoefficientsA() const {
   double Gsq, ll;
 
   for (l = 0; l < NFFT_2; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
+    lNFFT_2 = l*(NFFT);
     ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
+    for (k = 0; k < NFFT_2; k += 2) {
       Gsq = coeff1*(static_cast<double>(k*k) + ll);
       fFFTin[lNFFT_2 + k][0] *= coeff2/(Gsq+coeff3);
       fFFTin[lNFFT_2 + k][1] = 0.0;
       fFFTin[lNFFT_2 + k + 1][0] = 0.0;
       fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    Gsq = coeff1*(static_cast<double>(k*k) + ll);
-    fFFTin[lNFFT_2 + k][0] *= coeff2/(Gsq+coeff3);
-    fFFTin[lNFFT_2 + k][1] = 0.0;
+    for (k = NFFT_2; k < NFFT; k += 2) {
+      Gsq = coeff1*(static_cast<double>((k - NFFT)*(k - NFFT)) + ll);
+      fFFTin[lNFFT_2 + k][0] *= coeff2/(Gsq+coeff3);
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
   }
 
   for (l = NFFT_2; l < NFFT; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
+    lNFFT_2 = l*(NFFT);
     ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
     for (k = 0; k < NFFT_2 - 1; k += 2) {
       Gsq = coeff1*(static_cast<double>(k*k) + ll);
@@ -921,42 +1051,53 @@ void TBulkTriVortexNGLFieldCalc::ManipulateFourierCoefficientsA() const {
       fFFTin[lNFFT_2 + k + 1][0] = 0.0;
       fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    Gsq = coeff1*(static_cast<double>(k*k) + ll);
-    fFFTin[lNFFT_2 + k][0] *= coeff2/(Gsq+coeff3);
-    fFFTin[lNFFT_2 + k][1] = 0.0;
+    for (k = NFFT_2; k < NFFT; k += 2) {
+      Gsq = coeff1*(static_cast<double>((k-NFFT)*(k-NFFT)) + ll);
+      fFFTin[lNFFT_2 + k][0] *= coeff2/(Gsq+coeff3);
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
   }
 
   //intermediate rows
 
   for (l = 1; l < NFFT_2; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
+    lNFFT_2 = l*(NFFT);
     ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
+    for (k = 0; k < NFFT_2; k += 2) {
       Gsq = coeff1*(static_cast<double>((k+1)*(k+1)) + ll);
       fFFTin[lNFFT_2 + k][0] = 0.0;
       fFFTin[lNFFT_2 + k][1] = 0.0;
       fFFTin[lNFFT_2 + k + 1][0] *= coeff2/(Gsq+coeff3);
       fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    fFFTin[lNFFT_2 + k][0] = 0.0;
-    fFFTin[lNFFT_2 + k][1] = 0.0;
+    for (k = NFFT_2; k < NFFT; k += 2) {
+      Gsq = coeff1*(static_cast<double>((k+1-NFFT)*(k+1-NFFT)) + ll);
+      fFFTin[lNFFT_2 + k][0] = 0.0;
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] *= coeff2/(Gsq+coeff3);
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
   }
 
   for (l = NFFT_2 + 1; l < NFFT; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
+    lNFFT_2 = l*(NFFT);
     ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
+    for (k = 0; k < NFFT_2; k += 2) {
       Gsq = coeff1*(static_cast<double>((k+1)*(k+1)) + ll);
       fFFTin[lNFFT_2 + k][0] = 0.0;
       fFFTin[lNFFT_2 + k][1] = 0.0;
       fFFTin[lNFFT_2 + k + 1][0] *= coeff2/(Gsq+coeff3);
       fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    fFFTin[lNFFT_2 + k][0] = 0.0;
-    fFFTin[lNFFT_2 + k][1] = 0.0;
+    for (k = NFFT_2; k < NFFT; k += 2) {
+      Gsq = coeff1*(static_cast<double>((k+1-NFFT)*(k+1-NFFT)) + ll);
+      fFFTin[lNFFT_2 + k][0] = 0.0;
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+      fFFTin[lNFFT_2 + k + 1][0] *= coeff2/(Gsq+coeff3);
+      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    }
   }
 
   fFFTin[0][0] = 0.0;
@@ -1192,7 +1333,8 @@ void TBulkTriVortexNGLFieldCalc::ManipulateFourierCoefficientsForQy() const {
 void TBulkTriVortexNGLFieldCalc::CalculateSumAk() const {
   const int NFFT_2(fSteps/2);
   const int NFFTsq_2((fSteps/2 + 1)*fSteps);
-
+  const int NFFTsq(fSteps*fSteps);
+/*
   double SumFirstColumn(0.0);
 
   fSumAk = 0.0;
@@ -1203,6 +1345,11 @@ void TBulkTriVortexNGLFieldCalc::CalculateSumAk() const {
       SumFirstColumn += fFFTin[l][0];
   }
   fSumAk = 2.0*fSumAk - SumFirstColumn;
+*/
+  fSumAk = 0.0;
+  for (int l(0); l < NFFTsq; ++l) {
+    fSumAk += fFFTin[l][0];
+  }
 
   return;
 }
@@ -1248,7 +1395,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
   FillAbrikosovCoefficients();
 
   #pragma omp parallel for default(shared) private(l) schedule(dynamic)
-  for (l = 0; l < NFFT_2 + 1; l++) {
+  for (l = 0; l < NFFT; l++) {
     fCheckAkConvergence[l] = fFFTin[l][0];
   }
 
@@ -1262,7 +1409,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
   #pragma omp parallel for default(shared) private(l) schedule(dynamic)
   for (l = 0; l < NFFTsq; l++) {
-    fOmegaMatrix[l] = fSumAk - fOmegaMatrix[l];
+    fOmegaMatrix[l] = fSumAk - fRealSpaceMatrix[l][0];
   }
 
   // Calculate the gradient of omega
@@ -1286,7 +1433,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
     fQMatrix[l][0] = fQMatrixA[l][0];
     fQMatrix[l][1] = fQMatrixA[l][1];
   }
-
+/*
   fQMatrixA[0][0] = fQMatrixA[NFFT][0];
   fQMatrixA[(NFFT+1)*NFFT_2][0] = fQMatrixA[0][0];
   fQMatrix[0][0] = fQMatrixA[0][0];
@@ -1295,7 +1442,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
   fQMatrixA[(NFFT+1)*NFFT_2][1] = fQMatrixA[0][1];
   fQMatrix[0][1] = fQMatrixA[0][1];
   fQMatrix[(NFFT+1)*NFFT_2][1] = fQMatrixA[0][1];
-
+*/
   // initialize B(x,y) with the mean field
 
   #pragma omp parallel for default(shared) private(l) schedule(dynamic)
@@ -1306,6 +1453,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
   bool akConverged(false), bkConverged(false), akInitiallyConverged(false), firstBkCalculation(true);
   double fourKappaSq(4.0*fKappa*fKappa);
 
+
   while (!akConverged || !bkConverged) {
 
     // First iteration step for aK
@@ -1313,17 +1461,18 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
     #pragma omp parallel for default(shared) private(l) schedule(dynamic)
     for (l = 0; l < NFFTsq; l++) {
       if (fOmegaMatrix[l]) {
-        fOmegaMatrix[l] = fOmegaMatrix[l]*(fOmegaMatrix[l] + fQMatrix[l][0]*fQMatrix[l][0] + fQMatrix[l][1]*fQMatrix[l][1] - 2.0) + \
+        fRealSpaceMatrix[l][0] = fOmegaMatrix[l]*(fOmegaMatrix[l] + fQMatrix[l][0]*fQMatrix[l][0] + fQMatrix[l][1]*fQMatrix[l][1] - 2.0) + \
          (fOmegaDiffMatrix[l][0]*fOmegaDiffMatrix[l][0] + fOmegaDiffMatrix[l][1]*fOmegaDiffMatrix[l][1])/(fourKappaSq*fOmegaMatrix[l]);
       } else {
-        fOmegaMatrix[l] = 0.0;
+        fRealSpaceMatrix[l][0] = 0.0;
       }
+      fRealSpaceMatrix[l][1] = 0.0;
     }
 
     // At the two vortex cores g(r) is diverging; since all of this should be a smooth function anyway, I set the value of the next neighbour r
     // for the two vortex core positions in my matrix
-    fOmegaMatrix[0] = fOmegaMatrix[NFFT];
-    fOmegaMatrix[(NFFT+1)*NFFT_2] = fOmegaMatrix[0];
+    fRealSpaceMatrix[0][0] = fRealSpaceMatrix[NFFT][0];
+    fRealSpaceMatrix[(NFFT+1)*NFFT_2][0] = fRealSpaceMatrix[0][0];
 
     fftw_execute(fFFTplanOmegaToAk);
 
@@ -1348,7 +1497,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
     #pragma omp parallel for default(shared) private(l) schedule(dynamic)
     for (l = 0; l < NFFTsq; l++) {
-      fOmegaMatrix[l] = fSumAk - fOmegaMatrix[l];
+      fOmegaMatrix[l] = fSumAk - fRealSpaceMatrix[l][0];
     }
 
     CalculateGradient();
@@ -1382,22 +1531,26 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
     akConverged = true;
 
-    for (l = 0; l < NFFT_2 + 1; l++) {
-      if (((fabs(fFFTin[l][0]) > 1.0E-6) && (fabs(fCheckAkConvergence[l] - fFFTin[l][0])/fFFTin[l][0] > 1.0E-6)) || \
-       (fCheckAkConvergence[l]/fFFTin[l][0] < 0.0)) {
-        // cout << "old: " << fCheckAkConvergence[l] << ", new: " << fFFTin[l][0] << endl;
-        akConverged = false;
-        break;
+    for (l = 0; l < NFFT; l++) {
+      if (fFFTin[l][0]){
+        if (((fabs(fFFTin[l][0]) > 1.0E-6) && (fabs(fCheckAkConvergence[l] - fFFTin[l][0])/fFFTin[l][0] > 1.0E-6)) || \
+        (fCheckAkConvergence[l]/fFFTin[l][0] < 0.0)) {
+          //cout << "old: " << fCheckAkConvergence[l] << ", new: " << fFFTin[l][0] << endl;
+          akConverged = false;
+          //cout << "index = " << l << endl;
+          break;
+        }
       }
     }
 
     if (!akConverged) {
     #pragma omp parallel for default(shared) private(l) schedule(dynamic)
-      for (l = 0; l < NFFT_2 + 1; l++) {
+      for (l = 0; l < NFFT; l++) {
         fCheckAkConvergence[l] = fFFTin[l][0];
       }
     } else {
       akInitiallyConverged = true;
+      //break;
     }
 
     //  cout << "Ak Convergence: " << akConverged << endl;
@@ -1406,7 +1559,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
     CalculateSumAk();
 
-    // cout << "fSumAk = " << fSumAk << endl;
+    // cout << "fSumAk = " << fSumAk << " count = " << count << endl;
 
     // Do the Fourier transform to get omega(x,y)
 
@@ -1414,13 +1567,13 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
     #pragma omp parallel for default(shared) private(l) schedule(dynamic)
     for (l = 0; l < NFFTsq; l++) {
-      fOmegaMatrix[l] = fSumAk - fOmegaMatrix[l];
+      fOmegaMatrix[l] = fSumAk - fRealSpaceMatrix[l][0];
     }
 
     CalculateGradient();
 
     if (akInitiallyConverged) {  // if the aK iterations converged, go on with the bK calculation
-
+      //cout << "converged, count=" << count << endl;
       #pragma omp parallel for default(shared) private(l) schedule(dynamic)
       for (l = 0; l < NFFTsq; l++) {
         fBkMatrix[l][0] = fOmegaMatrix[l]*fFFTout[l] + fSumAk*(scaledB - fFFTout[l]) + \
@@ -1451,11 +1604,13 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
       bkConverged = true;
 
       for (l = 0; l < NFFT; l++) {
-        if (((fabs(fBkMatrix[l][0]) > 1.0E-6) && (fabs(fCheckBkConvergence[l] - fBkMatrix[l][0])/fabs(fBkMatrix[l][0]) > 1.0E-6)) || \
-        (fCheckBkConvergence[l]/fBkMatrix[l][0] < 0.0)) {
-          // cout << "old: " << fCheckBkConvergence[l] << ", new: " << fBkMatrix[l][0] << endl;
-          bkConverged = false;
-          break;
+        if (fBkMatrix[l][0]) {
+          if (((fabs(fBkMatrix[l][0]) > 1.0E-6) && (fabs(fCheckBkConvergence[l] - fBkMatrix[l][0])/fabs(fBkMatrix[l][0]) > 1.0E-6)) || \
+          (fCheckBkConvergence[l]/fBkMatrix[l][0] < 0.0)) {
+            // cout << "old: " << fCheckBkConvergence[l] << ", new: " << fBkMatrix[l][0] << endl;
+            bkConverged = false;
+            break;
+          }
         }
       }
 

@@ -148,6 +148,7 @@ private:
   mutable double *fOmegaMatrix;
   mutable fftw_complex *fOmegaDiffMatrix;
   mutable fftw_complex *fBkMatrix;
+  mutable fftw_complex *fRealSpaceMatrix;
   mutable fftw_complex *fQMatrix;
   mutable fftw_complex *fQMatrixA;
 
