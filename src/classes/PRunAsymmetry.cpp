@@ -354,8 +354,8 @@ Bool_t PRunAsymmetry::PrepareData()
         fT0s.push_back(runData->GetT0Estimated(fRunInfo->GetBackwardHistoNo(i)-1));
         cerr << endl << ">> PRunAsymmetry::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
         cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
-        cerr << endl << ">> will try the estimated one: forward t0 = " << runData->GetT0Estimated(fRunInfo->GetForwardHistoNo(i)-1)+1;
-        cerr << endl << ">> will try the estimated one: backward t0 = " << runData->GetT0Estimated(fRunInfo->GetBackwardHistoNo(i)-1)+1;
+        cerr << endl << ">> will try the estimated one: forward t0 = " << runData->GetT0Estimated(fRunInfo->GetForwardHistoNo(i)-1);
+        cerr << endl << ">> will try the estimated one: backward t0 = " << runData->GetT0Estimated(fRunInfo->GetBackwardHistoNo(i)-1);
         cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
         cerr << endl;
       }
@@ -370,7 +370,7 @@ Bool_t PRunAsymmetry::PrepareData()
           fT0s.push_back(runData->GetT0Estimated(fRunInfo->GetForwardHistoNo(i)-1));
           cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** NO t0's found, neither in the run data nor in the msr-file!";
           cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
-          cerr << endl << ">> will try the estimated one: t0 = " << runData->GetT0Estimated(fRunInfo->GetForwardHistoNo(i)-1)+1;
+          cerr << endl << ">> will try the estimated one: t0 = " << runData->GetT0Estimated(fRunInfo->GetForwardHistoNo(i)-1);
           cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
           cerr << endl;
         }
@@ -380,7 +380,7 @@ Bool_t PRunAsymmetry::PrepareData()
           fT0s.push_back(runData->GetT0Estimated(fRunInfo->GetBackwardHistoNo(i)-1));
           cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** NO t0's found, neither in the run data nor in the msr-file!";
           cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
-          cerr << endl << ">> will try the estimated one: t0 = " << runData->GetT0Estimated(fRunInfo->GetBackwardHistoNo(i)-1)+1;
+          cerr << endl << ">> will try the estimated one: t0 = " << runData->GetT0Estimated(fRunInfo->GetBackwardHistoNo(i)-1);
           cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
           cerr << endl;
         }
@@ -394,14 +394,14 @@ Bool_t PRunAsymmetry::PrepareData()
           if (fabs(fRunInfo->GetT0(2*i)-runData->GetT0(fRunInfo->GetForwardHistoNo(i)-1))>5.0) {
             cerr << endl << ">> PRunAsymmetry::PrepareData(): **WARNING**: forward histo #" << i+1;
             cerr << endl << ">> t0 from the msr-file is  " << fRunInfo->GetT0(2*i)+1;
-            cerr << endl << ">> t0 from the data file is " << runData->GetT0(fRunInfo->GetForwardHistoNo(i)-1)+1;
+            cerr << endl << ">> t0 from the data file is " << runData->GetT0(fRunInfo->GetForwardHistoNo(i)-1);
             cerr << endl << ">> This is quite a deviation! Is this done intentionally??";
             cerr << endl;
           }
           if (fabs(fRunInfo->GetT0(2*i+1)-runData->GetT0(fRunInfo->GetBackwardHistoNo(i)-1))>5.0) { // given in bins!!
             cerr << endl << ">> PRunAsymmetry::PrepareData(): **WARNING**: backward histo #" << i+1;
             cerr << endl << ">> t0 from the msr-file is  " << fRunInfo->GetT0(2*i+1)+1;
-            cerr << endl << ">> t0 from the data file is " << runData->GetT0(fRunInfo->GetBackwardHistoNo(i)-1)+1;
+            cerr << endl << ">> t0 from the data file is " << runData->GetT0(fRunInfo->GetBackwardHistoNo(i)-1);
             cerr << endl << ">> This is quite a deviation! Is this done intentionally??";
             cerr << endl;
           }
@@ -447,8 +447,8 @@ Bool_t PRunAsymmetry::PrepareData()
             t0Add.push_back(addRunData->GetT0Estimated(fRunInfo->GetBackwardHistoNo(j)-1));
             cerr << endl << ">> PRunAsymmetry::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
             cerr << endl << ">> addRun: " << fRunInfo->GetRunName()->Data();
-            cerr << endl << ">> will try the estimated one: forward t0 = " << addRunData->GetT0Estimated(fRunInfo->GetForwardHistoNo(j)-1)+1;
-            cerr << endl << ">> will try the estimated one: backward t0 = " << addRunData->GetT0Estimated(fRunInfo->GetBackwardHistoNo(j)-1)+1;
+            cerr << endl << ">> will try the estimated one: forward t0 = " << addRunData->GetT0Estimated(fRunInfo->GetForwardHistoNo(j)-1);
+            cerr << endl << ">> will try the estimated one: backward t0 = " << addRunData->GetT0Estimated(fRunInfo->GetBackwardHistoNo(j)-1);
             cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
             cerr << endl;
           }
@@ -461,7 +461,7 @@ Bool_t PRunAsymmetry::PrepareData()
             if (fabs(fRunInfo->GetAddT0(i,2*j)-addRunData->GetT0(fRunInfo->GetForwardHistoNo(j)-1))>5.0) { // given in bins!!
               cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING**:";
               cerr << endl << ">> t0 from the msr-file is  " << fRunInfo->GetAddT0(i,2*j)+1; // +1 since vector starts at 0
-              cerr << endl << ">> t0 from the data file is " << addRunData->GetT0(fRunInfo->GetForwardHistoNo(j)-1)+1;  // +1 since vector starts at 0
+              cerr << endl << ">> t0 from the data file is " << addRunData->GetT0(fRunInfo->GetForwardHistoNo(j)-1);
               cerr << endl << ">> This is quite a deviation! Is this done intentionally??";
               cerr << endl << ">> addrun: " << fRunInfo->GetRunName(i)->Data();
               cerr << endl;
@@ -469,7 +469,7 @@ Bool_t PRunAsymmetry::PrepareData()
             if (fabs(fRunInfo->GetAddT0(i,2*j+1)-addRunData->GetT0(fRunInfo->GetBackwardHistoNo(j)-1))>5.0) { // given in bins!!
               cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING**:";
               cerr << endl << ">> t0 from the msr-file is  " << fRunInfo->GetAddT0(i,2*j+1)+1; // +1 since vector starts at 0
-              cerr << endl << ">> t0 from the data file is " << addRunData->GetT0(fRunInfo->GetBackwardHistoNo(j)-1)+1;  // +1 since vector starts at 0
+              cerr << endl << ">> t0 from the data file is " << addRunData->GetT0(fRunInfo->GetBackwardHistoNo(j)-1);
               cerr << endl << ">> This is quite a deviation! Is this done intentionally??";
               cerr << endl << ">> addrun: " << fRunInfo->GetRunName(i)->Data();
               cerr << endl;
@@ -497,8 +497,8 @@ Bool_t PRunAsymmetry::PrepareData()
         addRunSize = addRunData->GetDataBin(forwardHistoNo[k])->size();
         for (UInt_t j=0; j<runData->GetDataBin(forwardHistoNo[k])->size(); j++) {
           // make sure that the index stays in the proper range
-          if ((j-t0Add[2*k]+fT0s[2*k] >= 0) && (j-t0Add[2*k]+fT0s[2*k] < addRunSize)) {
-            fForward[j] += addRunData->GetDataBin(forwardHistoNo[k])->at(j-t0Add[2*k]+fT0s[2*k]);
+          if ((j+t0Add[2*k]-fT0s[2*k] >= 0) && (j+t0Add[2*k]-fT0s[2*k] < addRunSize)) {
+            fForward[j] += addRunData->GetDataBin(forwardHistoNo[k])->at(j+t0Add[2*k]-fT0s[2*k]);
           }
         }
       }
@@ -508,8 +508,8 @@ Bool_t PRunAsymmetry::PrepareData()
         addRunSize = addRunData->GetDataBin(backwardHistoNo[k])->size();
         for (UInt_t j=0; j<runData->GetDataBin(backwardHistoNo[k])->size(); j++) {
           // make sure that the index stays in the proper range
-          if ((j-t0Add[2*k+1]+fT0s[2*k+1] >= 0) && (j-t0Add[2*k+1]+fT0s[2*k+1] < addRunSize)) {
-            fBackward[j] += addRunData->GetDataBin(backwardHistoNo[k])->at(j-t0Add[2*k+1]+fT0s[2*k+1]);
+          if ((j+t0Add[2*k+1]-fT0s[2*k+1] >= 0) && (j+t0Add[2*k+1]-fT0s[2*k+1] < addRunSize)) {
+            fBackward[j] += addRunData->GetDataBin(backwardHistoNo[k])->at(j+t0Add[2*k+1]-fT0s[2*k+1]);
           }
         }
       }
@@ -523,8 +523,8 @@ Bool_t PRunAsymmetry::PrepareData()
   for (UInt_t i=1; i<forwardHistoNo.size(); i++) {
     for (UInt_t j=0; j<runData->GetDataBin(forwardHistoNo[i])->size(); j++) {
       // make sure that the index stays within proper range
-      if ((j-fT0s[0]+fT0s[2*i] >= 0) && (j-fT0s[0]+fT0s[2*i] < runData->GetDataBin(forwardHistoNo[i])->size())) {
-        fForward[j] += runData->GetDataBin(forwardHistoNo[i])->at(j-fT0s[0]+fT0s[2*i]);
+      if ((j+fT0s[2*i]-fT0s[0] >= 0) && (j+fT0s[2*i]-fT0s[0] < runData->GetDataBin(forwardHistoNo[i])->size())) {
+        fForward[j] += runData->GetDataBin(forwardHistoNo[i])->at(j+fT0s[2*i]-fT0s[0]);
       }
     }
   }
@@ -532,8 +532,8 @@ Bool_t PRunAsymmetry::PrepareData()
   for (UInt_t i=1; i<backwardHistoNo.size(); i++) {
     for (UInt_t j=0; j<runData->GetDataBin(backwardHistoNo[i])->size(); j++) {
       // make sure that the index stays within proper range
-      if ((j-fT0s[1]+fT0s[2*i+1] >= 0) && (j-fT0s[1]+fT0s[2*i+1] < runData->GetDataBin(backwardHistoNo[i])->size())) {
-        fBackward[j] += runData->GetDataBin(backwardHistoNo[i])->at(j-fT0s[1]+fT0s[2*i+1]);
+      if ((j+fT0s[2*i+1]-fT0s[1] >= 0) && (j+fT0s[2*i+1]-fT0s[1] < runData->GetDataBin(backwardHistoNo[i])->size())) {
+        fBackward[j] += runData->GetDataBin(backwardHistoNo[i])->at(j+fT0s[2*i+1]-fT0s[1]);
       }
     }
   }
@@ -788,6 +788,24 @@ Bool_t PRunAsymmetry::PrepareFitData(PRawRunData* runData, UInt_t histoNo[2])
     }
   }
 
+  // check that start-t0 is the same for forward as for backward, otherwise take max(start[i]-t0[i])
+  if (fabs(static_cast<Double_t>(start[0])-t0[0]) > fabs(static_cast<Double_t>(start[1])-t0[1])){
+    start[1] = static_cast<Int_t>(t0[1] + static_cast<Double_t>(start[0]) - t0[0]);
+    end[1] = static_cast<Int_t>(t0[1] + static_cast<Double_t>(end[0]) - t0[0]);
+    cerr << endl << ">> PRunAsymmetry::PrepareFitData **WARNING** needed to shift backward data range.";
+    cerr << endl << ">> given: " << fRunInfo->GetDataRange(2) << ", " << fRunInfo->GetDataRange(3);
+    cerr << endl << ">> used : " << start[1] << ", " << end[1];
+    cerr << endl;
+  }
+  if (fabs(static_cast<Double_t>(start[0])-t0[0]) < fabs(static_cast<Double_t>(start[1])-t0[1])){
+    start[0] = static_cast<Int_t>(t0[0] + static_cast<Double_t>(start[1]) - t0[1]);
+    end[0] = static_cast<Int_t>(t0[0] + static_cast<Double_t>(end[1]) - t0[1]);
+    cerr << endl << ">> PRunAsymmetry::PrepareFitData **WARNING** needed to shift forward data range.";
+    cerr << endl << ">> given: " << fRunInfo->GetDataRange(0) << ", " << fRunInfo->GetDataRange(1);
+    cerr << endl << ">> used : " << start[0] << ", " << end[0];
+    cerr << endl;
+  }
+
   // everything looks fine, hence fill packed forward and backward histo
   PRunData forwardPacked;
   PRunData backwardPacked;
@@ -919,24 +937,30 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
   Double_t t0[2] = {fT0s[0], fT0s[1]};
   // check if data range has been provided, and if not try to estimate them
   if (fRunInfo->GetDataRange(0) < 0) {
-    start[0] = ((Int_t)t0[0]+5) - (((Int_t)t0[0]+5)/packing)*packing;
+    start[0] = (static_cast<Int_t>(t0[0])+5) - ((static_cast<Int_t>(t0[0])+5)/packing)*packing;
     cerr << endl << ">> PRunAsymmetry::PrepareViewData(): **WARNING** data range (forward) was not provided, will try data range start = " << start[0] << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   } else if (fRunInfo->GetDataRange(2) < 0) {
-    start[1] = ((Int_t)t0[1]+5) - (((Int_t)t0[1]+5)/packing)*packing;
+    start[1] = (static_cast<Int_t>(t0[1])+5) - ((static_cast<Int_t>(t0[1])+5)/packing)*packing;
     cerr << endl << ">> PRunAsymmetry::PrepareViewData(): **WARNING** data range (backward) was not provided, will try data range start = " << start[1] << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   } else {
-    Int_t val = fRunInfo->GetDataRange(0)-packing*(fRunInfo->GetDataRange(0)/packing);
+    // calculate the max(data range start[i]-t0[i])
+    Int_t diff = fRunInfo->GetDataRange(0)-static_cast<Int_t>(t0[0]);
+    if (abs(diff) < abs(fRunInfo->GetDataRange(2)-static_cast<Int_t>(t0[1])))
+      diff = fRunInfo->GetDataRange(0)-static_cast<Int_t>(t0[0]);
+
+    // calculate start position for plotting
+    Int_t val = static_cast<Int_t>(t0[1])+diff-packing*((static_cast<Int_t>(t0[1])+diff)/packing);
     do {
-      if (fRunInfo->GetDataRange(2) - fRunInfo->GetDataRange(0) < 0)
+      if (static_cast<Double_t>(val)+t0[1]-t0[0] < 0.0)
         val += packing;
-    } while (val + fRunInfo->GetDataRange(2) - fRunInfo->GetDataRange(0) < 0);
+    } while (static_cast<Double_t>(val) + t0[1] - t0[0] < 0.0);
 
     start[0] = val;
-    start[1] = val + fRunInfo->GetDataRange(2) - fRunInfo->GetDataRange(0);
+    start[1] = val + static_cast<Int_t>(t0[1] - t0[0]);
   }
 
   // make sure that there are equal number of rebinned bins in forward and backward
@@ -1002,6 +1026,7 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
       error += fForwardErr[i]*fForwardErr[i];
     }
   }
+
   // backward
   for (Int_t i=start[1]; i<end[1]; i++) {
     if (packing == 1) {

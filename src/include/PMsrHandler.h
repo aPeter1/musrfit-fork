@@ -76,6 +76,7 @@ class PMsrHandler
     virtual Bool_t SetMsrParamPosError(UInt_t i, Double_t value);
 
     virtual void SetMsrT0Entry(UInt_t runNo, UInt_t idx, Int_t bin);
+    virtual void SetMsrAddT0Entry(UInt_t runNo, UInt_t addRunIdx, UInt_t histoIdx, Int_t bin);
     virtual void SetMsrDataRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin);
     virtual void SetMsrBkgRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin);
 

@@ -324,6 +324,14 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
   for (UInt_t i=0; i<fRuns.size(); i++) {
     t0TagMissing.push_back(true);
   }
+  vector<PBoolVector> addt0TagMissing; // needed for proper musrt0 handling
+  PBoolVector bvec;
+  for (UInt_t i=0; i<fRuns.size(); i++) {
+    bvec.clear();
+    for (UInt_t j=0; j<fRuns[i].GetAddT0Entries(); j++)
+      bvec.push_back(true);
+    addt0TagMissing.push_back(bvec);
+  }
   PBoolVector backgroundTagMissing; // needed for proper musrt0 handling
   for (UInt_t i=0; i<fRuns.size(); i++) {
     backgroundTagMissing.push_back(true);
@@ -726,7 +734,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           for (UInt_t j=0; j<4; j++) {
             if (fRuns[runNo].GetBkgRange(j) > 0) {
               fout.width(8);
-              fout << left << fRuns[runNo].GetBkgRange(j)+1; // +1 since internally the data start at 0
+              fout << left << fRuns[runNo].GetBkgRange(j);
             }
           }
           fout << endl;
@@ -737,7 +745,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           for (UInt_t j=0; j<4; j++) {
             if (fRuns[runNo].GetDataRange(j) > 0) {
               fout.width(8);
-              fout << left << fRuns[runNo].GetDataRange(j)+1; // +1 since internally the data start at 0
+              fout << left << fRuns[runNo].GetDataRange(j);
             }
           }
           fout << endl;
@@ -747,10 +755,11 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           fout << left << "t0";
           for (UInt_t j=0; j<fRuns[runNo].GetT0Size(); j++) {
             fout.width(8);
-            fout << left << fRuns[runNo].GetT0(j)+1; // +1 since internally the data start at 0
+            fout << left << fRuns[runNo].GetT0(j);
           }
           fout << endl;
         } else if (sstr.BeginsWith("addt0")) {
+          addt0TagMissing[runNo][addT0Counter] = false;
           if (fRuns[runNo].GetAddT0Size(addT0Counter) <=0) {
             cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **WARNING** 'addt0' tag without any data found!";
             cerr << endl << ">> Something is VERY fishy, please check your msr-file carfully." << endl;
@@ -759,7 +768,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             fout << left << "addt0";
             for (Int_t j=0; j<fRuns[runNo].GetAddT0Size(addT0Counter); j++) {
               fout.width(8);
-              fout << left << fRuns[runNo].GetAddT0(addT0Counter, j)+1; // +1 since internally the data start at 0
+              fout << left << fRuns[runNo].GetAddT0(addT0Counter, j);
             }
             fout << endl;
             addT0Counter++;
@@ -786,7 +795,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             fout << endl;
           }
         } else if (sstr.BeginsWith("fit")) {
-          // check if missing t0/background/data tag are present eventhough the values are present, if so write these data values
+          // check if missing t0/addt0/background/data tag are present eventhough the values are present, if so write these data values
           if (t0TagMissing[runNo]) {
             if (fRuns[runNo].GetT0Size() > 0) {
               fout.width(16);
@@ -798,13 +807,26 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
               fout << endl;
             }
           }
+          for (UInt_t i=0; i<fRuns[runNo].GetAddT0Entries(); i++) {
+            if (addt0TagMissing[runNo][i]) {
+              if (fRuns[runNo].GetAddT0Size(i) > 0) {
+                fout.width(16);
+                fout << left << "addt0";
+                for (Int_t j=0; j<fRuns[runNo].GetAddT0Size(i); j++) {
+                  fout.width(8);
+                  fout << left << fRuns[runNo].GetAddT0(i, j);
+                }
+                fout << endl;
+              }
+            }
+          }
           if (backgroundTagMissing[runNo]) {
             if (fRuns[runNo].GetBkgRange(0) >= 0) {
               fout.width(16);
               fout << left << "background";
               for (UInt_t j=0; j<2; j++) {
                 fout.width(8);
-                fout << left << fRuns[runNo].GetBkgRange(j)+1; // +1 since internally the data start at 0
+                fout << left << fRuns[runNo].GetBkgRange(j);
               }
               fout << endl;
             }
@@ -815,7 +837,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
               fout << left << "data";
               for (UInt_t j=0; j<2; j++) {
                 fout.width(8);
-                fout << left << fRuns[runNo].GetDataRange(j)+1; // +1 since internally the data start at 0
+                fout << left << fRuns[runNo].GetDataRange(j);
               }
               fout << endl;
             }
@@ -1209,19 +1231,53 @@ Bool_t PMsrHandler::SetMsrParamPosError(UInt_t i, Double_t value)
  */
 void PMsrHandler::SetMsrT0Entry(UInt_t runNo, UInt_t idx, Int_t bin)
 {
-  if ((runNo < 0) || (runNo > fRuns.size())) { // error
-    cerr << endl << "PMsrHandler::SetMsrT0Entry: **ERROR** runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
+  if (runNo >= fRuns.size()) { // error
+    cerr << endl << ">> PMsrHandler::SetMsrT0Entry: **ERROR** runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
     cerr << endl;
     return;
   }
 
-  if ((idx < 0) || (idx > fRuns[runNo].GetT0Size())) { // error
-    cerr << endl << "PMsrHandler::SetMsrT0Entry: **ERROR** idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].GetT0Size();
+  if (idx >= fRuns[runNo].GetT0Size()) { // error
+    cerr << endl << ">> PMsrHandler::SetMsrT0Entry: **WARNING** idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].GetT0Size();
+    cerr << endl << ">> Will add it anyway.";
     cerr << endl;
-    return;
   }
 
   fRuns[runNo].SetT0(bin, idx);
+}
+
+//--------------------------------------------------------------------------
+// SetMsrAddT0Entry (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> Sets a t0 value for an addrun entry.
+ *
+ * \param runNo msr-file run number
+ * \param addRunIdx msr-file addrun index, e.g. if 2 addruns are present addRunIdx can take the values 0 or 1.
+ * \param histoIdx msr-file histogram index for an addrun.
+ * \param bin histogram t0 value.
+ */
+void PMsrHandler::SetMsrAddT0Entry(UInt_t runNo, UInt_t addRunIdx, UInt_t histoIdx, Int_t bin)
+{
+  if (runNo >= fRuns.size()) { // error
+    cerr << endl << ">> PMsrHandler::SetMsrAddT0Entry: **ERROR** runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
+    cerr << endl;
+    return;
+  }
+
+  if (addRunIdx >= fRuns[runNo].GetAddT0Entries()) { // error
+    cerr << endl << ">> PMsrHandler::SetMsrAddT0Entry: **WARNING** addRunIdx = " << addRunIdx << ", is out of valid range 0.." << fRuns[runNo].GetAddT0Entries();
+    cerr << endl << ">> Will add it anyway.";
+    cerr << endl;
+  }
+
+  if (histoIdx > fRuns[runNo].GetAddT0Size(addRunIdx)) { // error
+    cerr << endl << ">> PMsrHandler::SetMsrAddT0Entry: **WARNING** histoIdx = " << histoIdx << ", is out of valid range 0.." << fRuns[runNo].GetAddT0Size(addRunIdx);
+    cerr << endl << ">> Will add it anyway.";
+    cerr << endl;
+  }
+
+  fRuns[runNo].SetAddT0(bin, addRunIdx, histoIdx);
 }
 
 //--------------------------------------------------------------------------
@@ -1236,14 +1292,8 @@ void PMsrHandler::SetMsrT0Entry(UInt_t runNo, UInt_t idx, Int_t bin)
  */
 void PMsrHandler::SetMsrDataRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
 {
-  if ((runNo < 0) || (runNo > fRuns.size())) { // error
+  if (runNo > fRuns.size()) { // error
     cerr << endl << "PMsrHandler::SetMsrDataRangeEntry: **ERROR** runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
-    cerr << endl;
-    return;
-  }
-
-  if (idx < 0) { // error
-    cerr << endl << "PMsrHandler::SetMsrDataRangeEntry: **ERROR** idx = " << idx << ", is out of valid range, i.e. idx >= 0 needed.";
     cerr << endl;
     return;
   }
@@ -1263,14 +1313,8 @@ void PMsrHandler::SetMsrDataRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
  */
 void PMsrHandler::SetMsrBkgRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
 {
-  if ((runNo < 0) || (runNo > fRuns.size())) { // error
+  if (runNo > fRuns.size()) { // error
     cerr << endl << "PMsrHandler::SetMsrBkgRangeEntry: **ERROR** runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
-    cerr << endl;
-    return;
-  }
-
-  if (idx < 0) { // error
-    cerr << endl << "PMsrHandler::SetMsrBkgRangeEntry: idx = " << idx << ", is out of valid range, i.e. idx >= 0 needed.";
     cerr << endl;
     return;
   }
@@ -3738,6 +3782,32 @@ Bool_t PMsrHandler::CheckHistoGrouping()
         cerr << endl;
         result = false;
         break;
+      }
+    }
+    // check grouping entries are not identical, e.g. forward 1 1 2
+    if (fRuns[i].GetForwardHistoNoSize() > 1) {
+      for (UInt_t j=0; j<fRuns[i].GetForwardHistoNoSize(); j++) {
+        for (UInt_t k=j+1; k<fRuns[i].GetForwardHistoNoSize(); k++) {
+          if (fRuns[i].GetForwardHistoNo(j) == fRuns[i].GetForwardHistoNo(k)) {
+            cerr << endl << ">> PMsrHandler::CheckHistoGrouping: **WARNING** grouping identical histograms!!";
+            cerr << endl << ">> run no " << i+1 << ", forward histo " << j+1 << " == forward histo " << k+1 << ".";
+            cerr << endl << ">> this really doesn't make any sense, but you are the boss.";
+            cerr << endl;
+          }
+        }
+      }
+    }
+
+    if (fRuns[i].GetBackwardHistoNoSize() > 1) {
+      for (UInt_t j=0; j<fRuns[i].GetBackwardHistoNoSize(); j++) {
+        for (UInt_t k=j+1; k<fRuns[i].GetBackwardHistoNoSize(); k++) {
+          if (fRuns[i].GetBackwardHistoNo(j) == fRuns[i].GetBackwardHistoNo(k)) {
+            cerr << endl << ">> PMsrHandler::CheckHistoGrouping: **WARNING** grouping identical histograms!!";
+            cerr << endl << ">> run no " << i+1 << ", backward histo " << j+1 << " == backward histo " << k+1 << ".";
+            cerr << endl << ">> this really doesn't make any sense, but you are the boss.";
+            cerr << endl;
+          }
+        }
       }
     }
   }

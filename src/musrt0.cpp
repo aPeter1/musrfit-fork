@@ -47,7 +47,6 @@ using namespace std;
 #include "PRunDataHandler.h"
 #include "PMusrT0.h"
 
-
 //--------------------------------------------------------------------------
 /**
  * <p>
@@ -69,35 +68,45 @@ void musrt0_syntax()
  *
  * \param app
  * \param msrHandler
- * \param rawRunData
- * \param runNo
- * \param histoNo
- * \param detectorTag 0=forward, 1=backward, 2=left, 3=right
- * \param addRunNo
+ * \param data
  */
-bool musrt0_item(TApplication &app, PMsrHandler *msrHandler, PRawRunData *rawRunData,
-                 unsigned int runNo, int histoNo, int detectorTag, int addRunNo)
+Bool_t musrt0_item(TApplication &app, PMsrHandler *msrHandler, PMusrT0Data &data, UInt_t idx)
 {
-  PMusrT0 *musrT0 = new PMusrT0(rawRunData, runNo, histoNo, detectorTag, addRunNo);
+//cout << endl << "debug> &app=" << &app << ", msrHandler=" << msrHandler << ", &data=" << &data << endl;
+
+  PMusrT0 *musrT0 = new PMusrT0(data);
 
   if (musrT0 == 0) {
-    cout << endl << "**ERROR** Couldn't invoke musrT0 ...";
-    cout << endl << "          run name " << rawRunData->GetRunName()->Data();
-    cout << endl << "          histo No " << histoNo;
-    cout << endl;
+    cerr << endl << ">> **ERROR** Couldn't invoke musrT0 ...";
+    cerr << endl << ">> run name " << data.GetRawRunData(idx)->GetRunName()->Data();
+    cerr << endl;
+    return false;
+  }
+
+  if (!musrT0->IsValid()) {
+    cerr << endl << ">> **ERROR** invalid item found! (idx=" << idx << ")";
+    cerr << endl;
     return false;
   }
 
   musrT0->SetMsrHandler(msrHandler);
 
+  if (data.GetCmdTag() != PMUSRT0_GET_DATA_AND_BKG_RANGE)
+    musrT0->InitT0();
+
+  if (data.GetCmdTag() != PMUSRT0_GET_T0)
+    musrT0->InitDataAndBkg();
+
   musrT0->Connect("Done(Int_t)", "TApplication", &app, "Terminate(Int_t)");
 
   app.Run(true); // true needed that Run will return after quit
-  bool result = true;
+  Bool_t result = true;
   if (musrT0->GetStatus() == 1)
     result = false;
   else
     result = true;
+
+  musrT0->Disconnect(musrT0);
 
   delete musrT0;
   musrT0 = 0;
@@ -131,12 +140,12 @@ void musrt0_cleanup(TSAXParser *saxParser, PStartupHandler *startupHandler, PMsr
 }
 
 //--------------------------------------------------------------------------
-int main(int argc, char *argv[])
+Int_t main(Int_t argc, Char_t *argv[])
 {
-  bool show_syntax = false;
-  int  status;
-  bool success = true;
-  char filename[1024];
+  Bool_t show_syntax = false;
+  Int_t  status;
+  Bool_t success = true;
+  Char_t filename[1024];
 
   switch (argc) {
     case 1:
@@ -169,7 +178,7 @@ int main(int argc, char *argv[])
   }
 
   // read startup file
-  char startup_path_name[128];
+  Char_t startup_path_name[128];
   TSAXParser *saxParser = new TSAXParser();
   PStartupHandler *startupHandler = new PStartupHandler();
   if (!startupHandler->StartupFileFound()) {
@@ -225,7 +234,7 @@ int main(int argc, char *argv[])
 
   // check if the fittype is not NonMusr
   PMsrRunList *runList = msrHandler->GetMsrRunList();
-  for (unsigned int i=0; i<runList->size(); i++) {
+  for (UInt_t i=0; i<runList->size(); i++) {
     if (runList->at(i).GetFitType() == MSR_FITTYPE_NON_MUSR) {
       cout << endl << "**ERROR** t0 setting for NonMusr fittype doesn't make any sense, will quit ..." << endl;
       success = false;
@@ -248,59 +257,349 @@ int main(int argc, char *argv[])
   }
 
 
+  // set t0's, data-range and bkg-range. There are 4 different cases, namely:
+  // 1. no addruns / no grouping of histos
+  // 2. addruns / no grouping of histos
+  // 3. no addruns / grouping of histos
+  // 4. addruns / grouping of histos
+  // case 1 is different form the others since t0, data-, and bkg-range can be collected for the given histogram
+  // cases 2-4 the procedure will be the following:
+  //   1) set for each given histogram the t0's
+  //   2) build the added up histogram, i.e. add all runs and/or histograms for the msr-run.
+  //   3) set the data-, and bkg-range
   if (success) {
     // generate Root application needed for PMusrCanvas
     TApplication app("App", &argc, argv);
 
+    PMusrT0Data musrT0Data;
+    vector<PRawRunData*> rawRunData;
+    PIntVector forwardHistos;
+    PIntVector backwardHistos;
     // generate vector of all necessary PMusrT0 objects
-    for (unsigned int i=0; i<runList->size(); i++) {
+    for (UInt_t i=0; i<runList->size(); i++) {
       switch (runList->at(i).GetFitType()) {
         case MSR_FITTYPE_SINGLE_HISTO:
-          for (unsigned int j=0; j<runList->at(i).GetRunNameSize(); j++) { // necessary in case of ADDRUN
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetForwardHistoNo(), 0, j)) {
+          if ((runList->at(i).GetRunNameSize() == 1) && (runList->at(i).GetForwardHistoNoSize() == 1)) { // no addruns / no grouping
+            // feed necessary data
+            musrT0Data.InitData();
+            musrT0Data.SetSingleHisto(true);
+            rawRunData.clear();
+            rawRunData.push_back(dataHandler->GetRunData(*(runList->at(i).GetRunName(0))));
+            musrT0Data.SetRawRunData(rawRunData);
+            musrT0Data.SetRunNo(i);
+            musrT0Data.SetAddRunIdx(0); // no addruns
+            musrT0Data.SetHistoNoIdx(0);
+            forwardHistos.clear();
+            forwardHistos.push_back(runList->at(i).GetForwardHistoNo(0));
+            musrT0Data.SetHistoNo(forwardHistos);
+            musrT0Data.SetDetectorTag(PMUSRT0_FORWARD);
+            musrT0Data.SetCmdTag(PMUSRT0_GET_T0_DATA_AND_BKG_RANGE);
+            // execute cmd
+            if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
+              musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
+              exit(0);
+            }
+          } else {
+            // get t0's
+            if ((runList->at(i).GetRunNameSize() > 1) && (runList->at(i).GetForwardHistoNoSize() == 1)) { // addruns / no grouping
+              // feed necessary data
+              musrT0Data.InitData();
+              musrT0Data.SetSingleHisto(true);
+              musrT0Data.SetRunNo(i);
+              musrT0Data.SetHistoNoIdx(0);
+              forwardHistos.clear();
+              forwardHistos.push_back(runList->at(i).GetForwardHistoNo(0));
+              musrT0Data.SetHistoNo(forwardHistos);
+              musrT0Data.SetDetectorTag(PMUSRT0_FORWARD);
+              musrT0Data.SetCmdTag(PMUSRT0_GET_T0);
+              rawRunData.clear();
+              for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++)
+                rawRunData.push_back(dataHandler->GetRunData(*(runList->at(i).GetRunName(j))));
+              musrT0Data.SetRawRunData(rawRunData);
+              for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++) {
+                // feed necessary data
+                musrT0Data.SetAddRunIdx(j); // addruns
+                if (!musrt0_item(app, msrHandler, musrT0Data, j)) {
+                  musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
+                  exit(0);
+                }
+              }
+            } else if ((runList->at(i).GetRunNameSize() == 1) && (runList->at(i).GetForwardHistoNoSize() > 1)) { // no addruns / grouping
+              // feed necessary data
+              musrT0Data.InitData();
+              musrT0Data.SetSingleHisto(true);
+              musrT0Data.SetRunNo(i);
+              forwardHistos.clear();
+              for (UInt_t j=0; j<runList->at(i).GetForwardHistoNoSize(); j++)
+                forwardHistos.push_back(runList->at(i).GetForwardHistoNo(j));
+              musrT0Data.SetHistoNo(forwardHistos);
+              musrT0Data.SetDetectorTag(PMUSRT0_FORWARD);
+              musrT0Data.SetCmdTag(PMUSRT0_GET_T0);
+              rawRunData.clear();
+              rawRunData.push_back(dataHandler->GetRunData(*(runList->at(i).GetRunName(0))));
+              musrT0Data.SetRawRunData(rawRunData);
+              musrT0Data.SetAddRunIdx(0);
+              for (UInt_t j=0; j<runList->at(i).GetForwardHistoNoSize(); j++) {
+                musrT0Data.SetHistoNoIdx(j);
+                if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
+                  musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
+                  exit(0);
+                }
+              }
+            } else { // addruns / grouping
+              // feed necessary data
+              musrT0Data.InitData();
+              musrT0Data.SetSingleHisto(true);
+              musrT0Data.SetRunNo(i);
+              forwardHistos.clear();
+              for (UInt_t j=0; j<runList->at(i).GetForwardHistoNoSize(); j++)
+                forwardHistos.push_back(runList->at(i).GetForwardHistoNo(j));
+              musrT0Data.SetHistoNo(forwardHistos);
+              musrT0Data.SetDetectorTag(PMUSRT0_FORWARD);
+              musrT0Data.SetCmdTag(PMUSRT0_GET_T0);
+              rawRunData.clear();
+              for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++)
+                rawRunData.push_back(dataHandler->GetRunData(*(runList->at(i).GetRunName(j))));
+              musrT0Data.SetRawRunData(rawRunData);
+              for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++) { // addrun / grouping
+                musrT0Data.SetAddRunIdx(j); // addruns
+                for (UInt_t k=0; k<runList->at(i).GetForwardHistoNoSize(); k++) { // forward histo grouping
+                  musrT0Data.SetHistoNoIdx(k);
+                  if (!musrt0_item(app, msrHandler, musrT0Data, j)) {
+                    musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
+                    exit(0);
+                  }
+                }
+              }
+            }
+            // get data- and bkg-range
+            musrT0Data.SetCmdTag(PMUSRT0_GET_DATA_AND_BKG_RANGE);
+            // feed all t0's
+            for (UInt_t j=0; j<runList->at(i).GetT0Size(); j++) {
+              musrT0Data.SetT0(runList->at(i).GetT0(j), j);
+              for (UInt_t k=0; k<runList->at(i).GetAddT0Entries(); k++) {
+                musrT0Data.SetAddT0(runList->at(i).GetAddT0(k, j), k, j);
+              }
+            }
+            if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
             }
           }
           break;
         case MSR_FITTYPE_ASYM:
-          for (unsigned int j=0; j<runList->at(i).GetRunNameSize(); j++) { // necessary in case of ADDRUN
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetForwardHistoNo(), 0, j)) {
+          if ((runList->at(i).GetRunNameSize() == 1) && (runList->at(i).GetForwardHistoNoSize() == 1)) { // no addruns / no grouping
+            // feed necessary data forward
+            musrT0Data.InitData();
+            musrT0Data.SetSingleHisto(false);
+            rawRunData.clear();
+            rawRunData.push_back(dataHandler->GetRunData(*(runList->at(i).GetRunName(0))));
+            musrT0Data.SetRawRunData(rawRunData);
+            musrT0Data.SetRunNo(i);
+            musrT0Data.SetAddRunIdx(0); // no addruns
+            musrT0Data.SetHistoNoIdx(0);
+            forwardHistos.clear();
+            forwardHistos.push_back(runList->at(i).GetForwardHistoNo(0));
+            musrT0Data.SetHistoNo(forwardHistos);
+            musrT0Data.SetDetectorTag(PMUSRT0_FORWARD);
+            musrT0Data.SetCmdTag(PMUSRT0_GET_T0_DATA_AND_BKG_RANGE);
+            // execute cmd
+            if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
             }
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetBackwardHistoNo(), 1, j)) {
+            // feed necessary data backward
+            musrT0Data.InitData();
+            musrT0Data.SetSingleHisto(false);
+            rawRunData.clear();
+            rawRunData.push_back(dataHandler->GetRunData(*(runList->at(i).GetRunName(0))));
+            musrT0Data.SetRawRunData(rawRunData);
+            musrT0Data.SetRunNo(i);
+            musrT0Data.SetAddRunIdx(0); // no addruns
+            musrT0Data.SetHistoNoIdx(0);
+            backwardHistos.clear();
+            backwardHistos.push_back(runList->at(i).GetBackwardHistoNo(0));
+            musrT0Data.SetHistoNo(backwardHistos);
+            musrT0Data.SetDetectorTag(PMUSRT0_BACKWARD);
+            musrT0Data.SetCmdTag(PMUSRT0_GET_T0_DATA_AND_BKG_RANGE);
+            // execute cmd
+            if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
+              musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
+              exit(0);
+            }
+          } else {
+            // get t0's
+            if ((runList->at(i).GetRunNameSize() > 1) && (runList->at(i).GetForwardHistoNoSize() == 1)) { // addruns / no grouping
+              // feed necessary forward data
+              musrT0Data.InitData();
+              musrT0Data.SetSingleHisto(false);
+              musrT0Data.SetRunNo(i);
+              musrT0Data.SetHistoNoIdx(0);
+              forwardHistos.clear();
+              forwardHistos.push_back(runList->at(i).GetForwardHistoNo(0));
+              musrT0Data.SetHistoNo(forwardHistos);
+              musrT0Data.SetDetectorTag(PMUSRT0_FORWARD);
+              musrT0Data.SetCmdTag(PMUSRT0_GET_T0);
+              rawRunData.clear();
+              for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++)
+                rawRunData.push_back(dataHandler->GetRunData(*(runList->at(i).GetRunName(j))));
+              musrT0Data.SetRawRunData(rawRunData);
+              for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++) {
+                // feed necessary data
+                musrT0Data.SetAddRunIdx(j); // addruns
+                if (!musrt0_item(app, msrHandler, musrT0Data, j)) {
+                  musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
+                  exit(0);
+                }
+              }
+              // feed necessary backward data
+              musrT0Data.InitData();
+              musrT0Data.SetSingleHisto(false);
+              musrT0Data.SetRunNo(i);
+              musrT0Data.SetHistoNoIdx(0);
+              backwardHistos.clear();
+              backwardHistos.push_back(runList->at(i).GetBackwardHistoNo(0));
+              musrT0Data.SetHistoNo(backwardHistos);
+              musrT0Data.SetDetectorTag(PMUSRT0_BACKWARD);
+              musrT0Data.SetCmdTag(PMUSRT0_GET_T0);
+              rawRunData.clear();
+              for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++)
+                rawRunData.push_back(dataHandler->GetRunData(*(runList->at(i).GetRunName(j))));
+              musrT0Data.SetRawRunData(rawRunData);
+              for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++) {
+                // feed necessary data
+                musrT0Data.SetAddRunIdx(j); // addruns
+                if (!musrt0_item(app, msrHandler, musrT0Data, j)) {
+                  musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
+                  exit(0);
+                }
+              }
+            } else if ((runList->at(i).GetRunNameSize() == 1) && (runList->at(i).GetForwardHistoNoSize() > 1)) { // no addruns / grouping
+              // feed necessary forward data
+              musrT0Data.InitData();
+              musrT0Data.SetSingleHisto(false);
+              musrT0Data.SetRunNo(i);
+              forwardHistos.clear();
+              for (UInt_t j=0; j<runList->at(i).GetForwardHistoNoSize(); j++)
+                forwardHistos.push_back(runList->at(i).GetForwardHistoNo(j));
+              musrT0Data.SetHistoNo(forwardHistos);
+              musrT0Data.SetDetectorTag(PMUSRT0_FORWARD);
+              musrT0Data.SetCmdTag(PMUSRT0_GET_T0);
+              rawRunData.clear();
+              rawRunData.push_back(dataHandler->GetRunData(*(runList->at(i).GetRunName(0))));
+              musrT0Data.SetRawRunData(rawRunData);
+              musrT0Data.SetAddRunIdx(0);
+              for (UInt_t j=0; j<runList->at(i).GetForwardHistoNoSize(); j++) {
+                musrT0Data.SetHistoNoIdx(j);
+                if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
+                  musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
+                  exit(0);
+                }
+              }
+              // feed necessary backward data
+              musrT0Data.InitData();
+              musrT0Data.SetSingleHisto(false);
+              musrT0Data.SetRunNo(i);
+              backwardHistos.clear();
+              for (UInt_t j=0; j<runList->at(i).GetBackwardHistoNoSize(); j++)
+                backwardHistos.push_back(runList->at(i).GetBackwardHistoNo(j));
+              musrT0Data.SetHistoNo(backwardHistos);
+              musrT0Data.SetDetectorTag(PMUSRT0_BACKWARD);
+              musrT0Data.SetCmdTag(PMUSRT0_GET_T0);
+              rawRunData.clear();
+              rawRunData.push_back(dataHandler->GetRunData(*(runList->at(i).GetRunName(0))));
+              musrT0Data.SetRawRunData(rawRunData);
+              musrT0Data.SetAddRunIdx(0);
+              for (UInt_t j=0; j<runList->at(i).GetBackwardHistoNoSize(); j++) {
+                musrT0Data.SetHistoNoIdx(j);
+                if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
+                  musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
+                  exit(0);
+                }
+              }
+            } else { // addruns / grouping
+              // feed necessary forward data
+              musrT0Data.InitData();
+              musrT0Data.SetSingleHisto(false);
+              musrT0Data.SetRunNo(i);
+              forwardHistos.clear();
+              for (UInt_t j=0; j<runList->at(i).GetForwardHistoNoSize(); j++)
+                forwardHistos.push_back(runList->at(i).GetForwardHistoNo(j));
+              musrT0Data.SetHistoNo(forwardHistos);
+              musrT0Data.SetDetectorTag(PMUSRT0_FORWARD);
+              musrT0Data.SetCmdTag(PMUSRT0_GET_T0);
+              rawRunData.clear();
+              for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++)
+                rawRunData.push_back(dataHandler->GetRunData(*(runList->at(i).GetRunName(j))));
+              musrT0Data.SetRawRunData(rawRunData);
+              for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++) { // addrun / grouping
+                musrT0Data.SetAddRunIdx(j); // addruns
+                for (UInt_t k=0; k<runList->at(i).GetForwardHistoNoSize(); k++) { // forward histo grouping
+                  musrT0Data.SetHistoNoIdx(k);
+                  if (!musrt0_item(app, msrHandler, musrT0Data, j)) {
+                    musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
+                    exit(0);
+                  }
+                }
+              }
+              // feed necessary backward data
+              musrT0Data.InitData();
+              musrT0Data.SetSingleHisto(false);
+              musrT0Data.SetRunNo(i);
+              backwardHistos.clear();
+              for (UInt_t j=0; j<runList->at(i).GetBackwardHistoNoSize(); j++)
+                backwardHistos.push_back(runList->at(i).GetBackwardHistoNo(j));
+              musrT0Data.SetHistoNo(backwardHistos);
+              musrT0Data.SetDetectorTag(PMUSRT0_BACKWARD);
+              musrT0Data.SetCmdTag(PMUSRT0_GET_T0);
+              rawRunData.clear();
+              for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++)
+                rawRunData.push_back(dataHandler->GetRunData(*(runList->at(i).GetRunName(j))));
+              musrT0Data.SetRawRunData(rawRunData);
+              for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++) { // addrun / grouping
+                musrT0Data.SetAddRunIdx(j); // addruns
+                for (UInt_t k=0; k<runList->at(i).GetBackwardHistoNoSize(); k++) { // backward histo grouping
+                  musrT0Data.SetHistoNoIdx(k);
+                  if (!musrt0_item(app, msrHandler, musrT0Data, j)) {
+                    musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
+                    exit(0);
+                  }
+                }
+              }
+            }
+            // get data- and bkg-range
+            musrT0Data.SetCmdTag(PMUSRT0_GET_DATA_AND_BKG_RANGE);
+            // feed all t0's
+            for (UInt_t j=0; j<runList->at(i).GetT0Size(); j++) {
+              musrT0Data.SetT0(runList->at(i).GetT0(j), j);
+              for (UInt_t k=0; k<runList->at(i).GetAddT0Entries(); k++) {
+                musrT0Data.SetAddT0(runList->at(i).GetAddT0(k, j), k, j);
+              }
+            }
+            musrT0Data.SetHistoNo(forwardHistos);
+            musrT0Data.SetDetectorTag(PMUSRT0_FORWARD);
+            if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
+              musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
+              exit(0);
+            }
+            musrT0Data.SetHistoNo(backwardHistos);
+            musrT0Data.SetDetectorTag(PMUSRT0_BACKWARD);
+            if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
             }
           }
           break;
         case MSR_FITTYPE_MU_MINUS:
-/*
-          for (unsigned int j=0; j<runList->at(i).GetRunNameSize(); j++) { // necessary in case of ADDRUN
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetForwardHistoNo(), 0, j)) {
-              musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
-              exit(0);
-            }
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetBackwardHistoNo(), 1, j)) {
-              musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
-              exit(0);
-            }
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetRightHistoNo(), 2, j)) {
-              musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
-              exit(0);
-            }
-            if (!musrt0_item(app, msrHandler, dataHandler->GetRunData(*(runList->at(i).GetRunName(j))), i, runList->at(i).GetLeftHistoNo(), 3, j)) {
-              musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
-              exit(0);
-            }
-          }
-*/
           break;
         default:
           break;
       }
     }
+    // cleanup
+    rawRunData.clear();
+    forwardHistos.clear();
+    backwardHistos.clear();
   }
 
   // write msr-file
@@ -311,7 +610,7 @@ int main(int argc, char *argv[])
   gSystem->CopyFile(filename, "__temp.msr", kTRUE);
   // copy mlog-file -> msr-file
   TString fln = TString(filename);
-  char ext[32];
+  Char_t ext[32];
   strcpy(ext, ".mlog");
   fln.ReplaceAll(".msr", 4, ext, strlen(ext));
   gSystem->CopyFile(fln.Data(), filename, kTRUE);

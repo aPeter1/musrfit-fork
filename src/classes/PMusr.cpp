@@ -317,7 +317,7 @@ const Int_t PRawRunData::GetT0(const UInt_t idx)
     cerr << endl;
     return -1;
   }
-  return fT0s[idx]-1; // -1 because the counting of the data vector starts at 0!
+  return fT0s[idx];
 }
 
 //--------------------------------------------------------------------------
@@ -335,7 +335,7 @@ const Int_t PRawRunData::GetT0Estimated(const UInt_t idx)
     cerr << endl;
     return -1;
   }
-  return fT0Estimated[idx]-1; // -1 because the counting of the data vector starts at 0!
+  return fT0Estimated[idx];
 }
 
 //--------------------------------------------------------------------------
@@ -354,8 +354,8 @@ const PIntPair PRawRunData::GetBkgBin(const UInt_t idx)
     return pair;
   }
 
-  pair.first  = fBkgBin[idx].first - 1;  // -1 because the counting of the data vector starts at 0!
-  pair.second = fBkgBin[idx].second - 1; // -1 because the counting of the data vector starts at 0!
+  pair.first  = fBkgBin[idx].first;
+  pair.second = fBkgBin[idx].second;
 
   return pair;
 }
@@ -376,8 +376,8 @@ const PIntPair PRawRunData::GetGoodDataBin(const UInt_t idx)
     return pair;
   }
 
-  pair.first  = fGoodDataBin[idx].first - 1;  // -1 because the counting of the data vector starts at 0!
-  pair.second = fGoodDataBin[idx].second - 1; // -1 because the counting of the data vector starts at 0!
+  pair.first  = fGoodDataBin[idx].first;
+  pair.second = fGoodDataBin[idx].second;
 
   return pair;
 }
@@ -1062,7 +1062,7 @@ Int_t PMsrRunBlock::GetBkgRange(UInt_t idx)
     return -1;
   }
 
-  return fBkgRange[idx]-1; // -1 because the counting of the data vector starts at 0!
+  return fBkgRange[idx];
 }
 
 //--------------------------------------------------------------------------
@@ -1100,7 +1100,7 @@ Int_t PMsrRunBlock::GetDataRange(UInt_t idx)
     return -1;
   }
 
-  return fDataRange[idx]-1; // -1 because the counting of the data vector starts at 0!
+  return fDataRange[idx];
 }
 
 //--------------------------------------------------------------------------
@@ -1133,10 +1133,10 @@ void PMsrRunBlock::SetDataRange(Int_t ival, Int_t idx)
  */
 Int_t PMsrRunBlock::GetT0(UInt_t idx)
 {
-  if (idx>fT0.size())
+  if (idx >= fT0.size())
     return -1;
 
-  return fT0[idx]-1; // -1 because the counting of the data vector starts at 0!
+  return fT0[idx];
 }
 
 //--------------------------------------------------------------------------
@@ -1174,7 +1174,7 @@ Int_t PMsrRunBlock::GetAddT0Size(UInt_t addRunIdx)
   if (fAddT0.empty())
     return -1;
 
-  if (addRunIdx > fAddT0.size())
+  if (addRunIdx >= fAddT0.size())
     return -1;
 
   return fAddT0[addRunIdx].size();
@@ -1194,16 +1194,16 @@ Int_t PMsrRunBlock::GetAddT0(UInt_t addRunIdx, UInt_t histoIdx)
   if (fAddT0.empty())
     return -1;
 
-  if (addRunIdx > fAddT0.size())
+  if (addRunIdx >= fAddT0.size())
     return -1;
 
   if (fAddT0[addRunIdx].empty())
     return -1;
 
-  if (histoIdx > fAddT0[addRunIdx].size())
+  if (histoIdx >= fAddT0[addRunIdx].size())
     return -1;
 
-  return fAddT0[addRunIdx][histoIdx]-1; // -1 because the counting of the data vector starts at 0!
+  return fAddT0[addRunIdx][histoIdx];
 }
 
 //--------------------------------------------------------------------------

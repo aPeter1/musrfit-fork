@@ -334,7 +334,7 @@ Bool_t PRunSingleHisto::PrepareData()
         fT0s.push_back(runData->GetT0Estimated(fRunInfo->GetForwardHistoNo(i)-1));
         cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** NO t0's found, neither in the run data nor in the msr-file!";
         cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
-        cerr << endl << ">> will try the estimated one: t0 = " << runData->GetT0Estimated(fRunInfo->GetForwardHistoNo(i)-1)+1;
+        cerr << endl << ">> will try the estimated one: t0 = " << runData->GetT0Estimated(fRunInfo->GetForwardHistoNo(i)-1);
         cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
         cerr << endl;
       }
@@ -343,13 +343,13 @@ Bool_t PRunSingleHisto::PrepareData()
     for (UInt_t i=0; i<fRunInfo->GetForwardHistoNoSize(); i++) {
       // check if enough t0's are given in the msr-file, if not try to get the rest from the data file
       if (fRunInfo->GetT0Size() <= i) { // t0 for i not present in the msr-file, i.e. #t0's != #forward histos
-        if (runData->GetT0Size() > fRunInfo->GetForwardHistoNo(i)-1) { // t0 for i present in the data file
+        if (static_cast<Int_t>(runData->GetT0Size()) > fRunInfo->GetForwardHistoNo(i)-1) { // t0 for i present in the data file
           fT0s.push_back(runData->GetT0(fRunInfo->GetForwardHistoNo(i)-1));
         } else { // t0 is neither in the run data nor in the msr-file -> will try estimated ones!
           fT0s.push_back(runData->GetT0Estimated(fRunInfo->GetForwardHistoNo(i)-1));
           cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** NO t0's found, neither in the run data nor in the msr-file!";
           cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
-          cerr << endl << ">> will try the estimated one: t0 = " << runData->GetT0Estimated(fRunInfo->GetForwardHistoNo(i)-1)+1;
+          cerr << endl << ">> will try the estimated one: t0 = " << runData->GetT0Estimated(fRunInfo->GetForwardHistoNo(i)-1);
           cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
           cerr << endl;
         }
@@ -360,8 +360,8 @@ Bool_t PRunSingleHisto::PrepareData()
           // compare t0's of the msr-file with the one in the data file
           if (fabs(fRunInfo->GetT0(i)-runData->GetT0(fRunInfo->GetForwardHistoNo(i)-1))>5.0) { // given in bins!!
             cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING**:";
-            cerr << endl << ">> t0 from the msr-file is  " << fRunInfo->GetT0(i)+1;
-            cerr << endl << ">> t0 from the data file is " << runData->GetT0(fRunInfo->GetForwardHistoNo(i)-1)+1;
+            cerr << endl << ">> t0 from the msr-file is  " << fRunInfo->GetT0(i);
+            cerr << endl << ">> t0 from the data file is " << runData->GetT0(fRunInfo->GetForwardHistoNo(i)-1);
             cerr << endl << ">> This is quite a deviation! Is this done intentionally??";
             cerr << endl;
           }
@@ -407,7 +407,7 @@ Bool_t PRunSingleHisto::PrepareData()
             t0Add.push_back(addRunData->GetT0Estimated(fRunInfo->GetForwardHistoNo(j)-1));
             cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** NO t0's found, neither in the addrun data nor in the msr-file!";
             cerr << endl << ">> addrun: " << fRunInfo->GetRunName(i)->Data();
-            cerr << endl << ">> will try the estimated one: t0 = " << addRunData->GetT0Estimated(fRunInfo->GetForwardHistoNo(j)-1)+1;
+            cerr << endl << ">> will try the estimated one: t0 = " << addRunData->GetT0Estimated(fRunInfo->GetForwardHistoNo(j)-1);
             cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
             cerr << endl;
           }
@@ -419,8 +419,8 @@ Bool_t PRunSingleHisto::PrepareData()
             // compare t0's of the msr-file with the one in the data file
             if (fabs(fRunInfo->GetAddT0(i,j)-addRunData->GetT0(fRunInfo->GetForwardHistoNo(j)-1))>5.0) { // given in bins!!
               cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING**:";
-              cerr << endl << ">> t0 from the msr-file is  " << fRunInfo->GetAddT0(i,j)+1; // +1 since vector starts at 0
-              cerr << endl << ">> t0 from the data file is " << addRunData->GetT0(fRunInfo->GetForwardHistoNo(j)-1)+1;  // +1 since vector starts at 0
+              cerr << endl << ">> t0 from the msr-file is  " << fRunInfo->GetAddT0(i,j);
+              cerr << endl << ">> t0 from the data file is " << addRunData->GetT0(fRunInfo->GetForwardHistoNo(j)-1);
               cerr << endl << ">> This is quite a deviation! Is this done intentionally??";
               cerr << endl << ">> addrun: " << fRunInfo->GetRunName(i)->Data();
               cerr << endl;
@@ -444,8 +444,8 @@ Bool_t PRunSingleHisto::PrepareData()
       for (UInt_t k=0; k<fRunInfo->GetForwardHistoNoSize(); k++) {
         for (UInt_t j=0; j<runData->GetDataBin(histoNo[k])->size(); j++) {
           // make sure that the index stays within proper range
-          if ((j-t0Add[k]+fT0s[k] >= 0) && (j-t0Add[k]+fT0s[k] < addRunData->GetDataBin(histoNo[k])->size())) {
-            runData->AddDataBin(histoNo[k], j, addRunData->GetDataBin(histoNo[k])->at(j-t0Add[k]+fT0s[k]));
+          if ((j+t0Add[k]-fT0s[k] >= 0) && (j+t0Add[k]-fT0s[k] < addRunData->GetDataBin(histoNo[k])->size())) {
+            runData->AddDataBin(histoNo[k], j, addRunData->GetDataBin(histoNo[k])->at(j+t0Add[k]-fT0s[k]));
           }
         }
       }
@@ -459,8 +459,8 @@ Bool_t PRunSingleHisto::PrepareData()
   for (UInt_t i=1; i<fRunInfo->GetForwardHistoNoSize(); i++) {
     for (UInt_t j=0; j<runData->GetDataBin(histoNo[0])->size(); j++) {
       // make sure that the index stays within proper range
-      if ((j-fT0s[0]+fT0s[i] >= 0) && (j-fT0s[0]+fT0s[i] < runData->GetDataBin(histoNo[i])->size())) {
-        runData->AddDataBin(histoNo[0], j, runData->GetDataBin(histoNo[i])->at(j-fT0s[0]+fT0s[i]));
+      if ((j+fT0s[i]-fT0s[0] >= 0) && (j+fT0s[i]-fT0s[0] < runData->GetDataBin(histoNo[i])->size())) {
+        runData->AddDataBin(histoNo[0], j, runData->GetDataBin(histoNo[i])->at(j+fT0s[i]-fT0s[0]));
       }
     }
   }
