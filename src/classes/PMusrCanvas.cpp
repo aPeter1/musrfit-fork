@@ -2665,7 +2665,7 @@ void PMusrCanvas::PlotData()
            runNo = (UInt_t)plotInfo.fRuns[i]-1;
            xAxisTitle = fRunList->GetXAxisTitle(*runs[runNo].GetRunName(), runNo);
            yAxisTitle = fRunList->GetYAxisTitle(*runs[runNo].GetRunName(), runNo);
-           legendLabel.push_back(xAxisTitle + " vs. " + yAxisTitle);
+           legendLabel.push_back(yAxisTitle + " vs. " + xAxisTitle);
         }
         for (UInt_t i=0; i<fNonMusrData.size(); i++) {
           fMultiGraphLegend->AddEntry(fNonMusrData[i].data, legendLabel[i].Data(), "p");
