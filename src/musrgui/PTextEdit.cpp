@@ -244,11 +244,13 @@ void PTextEdit::setupEditActions()
   connect( a, SIGNAL( activated() ), this, SLOT( editUndo() ) );
   a->addTo( tb );
   a->addTo( menu );
+
   a = new QAction( QPixmap::fromMimeSource( "editredo.xpm" ), tr( "&Redo" ), CTRL + Key_Y, this, "editRedo" );
   connect( a, SIGNAL( activated() ), this, SLOT( editRedo() ) );
   a->addTo( tb );
   a->addTo( menu );
   menu->insertSeparator();
+
   a = new QAction( tr( "Select &All" ), CTRL + Key_A, this, "editSelectAll" );
   connect( a, SIGNAL( activated() ), this, SLOT( editSelectAll() ) );
   a->addTo( menu );
@@ -260,10 +262,12 @@ void PTextEdit::setupEditActions()
   connect( a, SIGNAL( activated() ), this, SLOT( editCopy() ) );
   a->addTo( tb );
   a->addTo( menu );
+
   a = new QAction( QPixmap::fromMimeSource( "editcut.xpm" ), tr( "Cu&t" ), CTRL + Key_X, this, "editCut" );
   connect( a, SIGNAL( activated() ), this, SLOT( editCut() ) );
   a->addTo( tb );
   a->addTo( menu );
+
   a = new QAction( QPixmap::fromMimeSource( "editpaste.xpm" ), tr( "&Paste" ), CTRL + Key_V, this, "editPaste" );
   connect( a, SIGNAL( activated() ), this, SLOT( editPaste() ) );
   a->addTo( tb );
@@ -276,21 +280,30 @@ void PTextEdit::setupEditActions()
   connect( a, SIGNAL( activated() ), this, SLOT( editFind() ) );
   a->addTo( tb );
   a->addTo( menu );
+
   a = new QAction( QPixmap::fromMimeSource( "editnext.xpm" ), tr( "Find &Next" ), Key_F3, this, "editFindNext" );
   connect( a, SIGNAL( activated() ), this, SLOT( editFindNext() ) );
   a->addTo( tb );
   a->addTo( menu );
+
   a = new QAction( QPixmap::fromMimeSource( "editprevious.xpm" ), tr( "Find Pre&vious" ), SHIFT + Key_F3, this, "editFindPrevious" );
   connect( a, SIGNAL( activated() ), this, SLOT( editFindPrevious() ) );
   a->addTo( tb );
   a->addTo( menu );
+
   a = new QAction( tr( "Replace..." ), CTRL + Key_R, this, "editReplace" );
   connect( a, SIGNAL( activated() ), this, SLOT( editFindAndReplace() ) );
 //  a->addTo( tb );
   a->addTo( menu );
   menu->insertSeparator();
-  a = new QAction( tr( "(Un)Co&mment" ), CTRL + Key_M, this, "editComment" );
+
+  a = new QAction( tr( "Co&mment" ), CTRL + Key_M, this, "editComment" );
   connect( a, SIGNAL( activated() ), this, SLOT( editComment() ) );
+//  a->addTo( tb );
+  a->addTo( menu );
+
+  a = new QAction( tr( "Unco&mment" ), CTRL + SHIFT + Key_M, this, "editUncomment" );
+  connect( a, SIGNAL( activated() ), this, SLOT( editUncomment() ) );
 //  a->addTo( tb );
   a->addTo( menu );
 }
@@ -1035,6 +1048,63 @@ void PTextEdit::editComment()
     // check line by line if (un)comment is needed
     QStringList strList = QStringList::split("\n", str, TRUE);
     for (QStringList::Iterator it = strList.begin(); it != strList.end(); ++it) {
+      (*it).prepend("# ");
+    }
+    str = strList.join("\n");
+    currentEditor()->insert(str);
+    // set the cursor position
+    currentEditor()->setCursorPosition(++paraTo, 0);
+  } else { // no text selected
+    int para, index;
+    currentEditor()->getCursorPosition(&para, &index);
+    // get current text line
+    str = currentEditor()->text(para);
+    // check if it is a comment line or not
+    str.prepend("# ");
+    // select current line
+    currentEditor()->setSelection(para, 0, para, currentEditor()->text(para).length());
+    // insert altered text
+    currentEditor()->insert(str);
+    // set the cursor position
+    currentEditor()->setCursorPosition(para, 0);
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PTextEdit::editUncomment()
+{
+  if ( !currentEditor() )
+    return;
+
+  QString str;
+  if (currentEditor()->hasSelectedText()) { // selected text present
+    int paraFrom, paraTo;
+    int indexFrom, indexTo;
+    // get selection
+    currentEditor()->getSelection(&paraFrom, &indexFrom, &paraTo, &indexTo);
+    // check that indexFrom == 0, if not change the selection accordingly
+    if (indexFrom != 0) {
+      indexFrom = 0;
+      currentEditor()->setSelection(paraFrom, indexFrom, paraTo, indexTo);
+    }
+    // check that cursor is not in next line without selecting anything
+    if (indexTo == 0) {
+      paraTo--;
+      indexTo++;
+    }
+    // check that indexTo == end of line of paraTo
+    if ((indexTo != (int)currentEditor()->text(paraTo).length()) && (indexTo != 0)) {
+      indexTo = currentEditor()->text(paraTo).length();
+      currentEditor()->setSelection(paraFrom, indexFrom, paraTo, indexTo);
+    }
+    // get selection text
+    str = currentEditor()->selectedText();
+    // check line by line if (un)comment is needed
+    QStringList strList = QStringList::split("\n", str, TRUE);
+    for (QStringList::Iterator it = strList.begin(); it != strList.end(); ++it) {
       str = *it;
       if (str.stripWhiteSpace().startsWith("#")) { // comment -> uncomment it
         int idx = -1;
@@ -1048,8 +1118,6 @@ void PTextEdit::editComment()
         if ((*it)[idx] == ' ') {
           (*it).remove(idx,1);
         }
-      } else { // no comment -> comment it
-        (*it).prepend("# ");
       }
     }
     str = strList.join("\n");
@@ -1075,9 +1143,6 @@ void PTextEdit::editComment()
       if (str[idx] == ' ') {
         str.remove(idx,1);
       }
-    } else { // no comment -> comment it
-      if (!str.isEmpty())
-        str.prepend("# ");
     }
     // select current line
     currentEditor()->setSelection(para, 0, para, currentEditor()->text(para).length());
