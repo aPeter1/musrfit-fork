@@ -576,7 +576,7 @@ void PMsrRunBlock::CleanUp()
   fBkgFitParamNo = -1; // undefined background parameter number
   fPhaseParamNo = -1; // undefined phase parameter number
   fLifetimeParamNo = -1; // undefined lifetime parameter number
-  fLifetimeCorrection = true; // lifetime correction == true by default (used in single histogram musrview)
+  fLifetimeCorrection = false; // lifetime correction == false by default (used in single histogram musrview)
   fBkgFix[0] = PMUSR_UNDEFINED; // undefined fixed background for forward
   fBkgFix[1] = PMUSR_UNDEFINED; // undefined fixed background for backward
   for (UInt_t i=0; i<4; i++) {
