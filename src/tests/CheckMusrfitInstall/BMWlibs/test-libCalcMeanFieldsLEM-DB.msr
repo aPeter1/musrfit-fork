@@ -1,15 +1,16 @@
 Test libCalcMeanFieldsLEM (SC film), DB data file
 ###############################################################
 FITPARAMETER
-#      Nr. Name        Value     Step      Pos_Error  Bounderies
+#      Nr. Name        Value     Step      Pos_Error  Boundaries
         1 B0          95        0           none        
-        2 deadlayer   3.71902   0.6406      none        0       10      
-        3 SCthickness 157.461   2.37222     none        5       200     
-        4 lambda      305.143   5.23303     none        1       none    
+        2 deadlayer   3.71915   0.639931    none        1       10      
+        3 SCthickness 157.461   2.37233     none        5       200     
+        4 lambda      305.142   5.23327     none        1       none    
+        5 weight      1         0           none        0       1       
          
 ###############################################################
 THEORY
-userFcn  libCalcMeanFieldsLEM.so TMeanFieldsForScSingleLayer 1 2 3 4
+userFcn  libCalcMeanFieldsLEM.so TMeanFieldsForScSingleLayer 1 2 3 4 5 5 5
 
 ###############################################################
 #FUNCTIONS
@@ -35,5 +36,5 @@ runs     1
 range    0.00   30.00
 
 ###############################################################
-STATISTIC --- 2010-01-08 15:23:52
-  chisq = 3.78008792, NDF = 7, chisq/NDF = 0.540012561
+STATISTIC --- 2010-02-23 19:51:25
+  chisq = 3.78008788, NDF = 7, chisq/NDF = 0.540012554
