@@ -55,6 +55,8 @@ using namespace std;
 #include <QPixmap>
 #include <QTextCursor>
 #include <QTextBlock>
+#include <QTextDocumentFragment>
+#include <QTextList>
 
 #include <QtDebug>
 
@@ -390,10 +392,16 @@ void PTextEdit::setupEditActions()
   menu->addMenu(addSubMenu);
   menu->addSeparator();
 
-  a = new QAction( tr( "(Un)Co&mment" ), this );
+  a = new QAction( tr( "Co&mment" ), this );
   a->setShortcut( tr("Ctrl+M") );
-  a->setStatusTip( tr("Edit (Un)Comment Selected Lines") );
+  a->setStatusTip( tr("Edit Comment Selected Lines") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editComment() ) );
+  menu->addAction(a);
+
+  a = new QAction( tr( "Unco&mment" ), this );
+  a->setShortcut( tr("Ctrl+Shift+M") );
+  a->setStatusTip( tr("Edit Uncomment Selected Lines") );
+  connect( a, SIGNAL( triggered() ), this, SLOT( editUncomment() ) );
   menu->addAction(a);
 }
 
@@ -1264,109 +1272,80 @@ void PTextEdit::editComment()
   
   QTextCursor curs = currentEditor()->textCursor();
   
+  if (curs.hasComplexSelection()) { // multiple selections
+    // multiple selections (STILL MISSING)
+  } else if (curs.hasSelection()) { // simple selection
+    int pos = curs.position();
+    int secStart = curs.selectionStart(); // keep start position of the selection
+    int secEnd = curs.selectionEnd();     // keep end position of the selection
+    curs.clearSelection();
+    curs.setPosition(secStart);           // set the anchor to the start of the selection
+    curs.movePosition(QTextCursor::StartOfBlock);
+    do {
+      curs.insertText("#");
+    } while (curs.movePosition(QTextCursor::NextBlock) && (curs.position() <= secEnd));
+    curs.setPosition(pos+1);
+  } else { // no selection
+    int pos = curs.position();
+    curs.clearSelection();
+    curs.movePosition(QTextCursor::StartOfLine);
+    curs.insertText("#");
+    curs.setPosition(pos+1);
+  }  
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PTextEdit::editUncomment()
+{
+  if ( !currentEditor() )
+    return;
+
+
+  QTextCursor curs = currentEditor()->textCursor();
+
   if (curs.hasComplexSelection()) {
     // multiple selections (STILL MISSING)
   } else if (curs.hasSelection()) {
-    // simple selection (STILL MISSING)
+    int pos = curs.position();
+    int secStart = curs.selectionStart(); // keep start position of the selection
+    int secEnd = curs.selectionEnd();     // keep end position of the selection
+    curs.clearSelection();
+    curs.setPosition(secStart);           // set the anchor to the start of the selection
+    curs.movePosition(QTextCursor::StartOfBlock);
+    while (curs.position() < secEnd) {
+      QString line = curs.block().text();
+      if (line.startsWith("#")) {
+        line.remove(0, 1);
+        curs.select(QTextCursor::BlockUnderCursor);
+        curs.removeSelectedText();        
+        curs.insertText("\n"+line);
+        pos -= 1;
+      }
+      curs.movePosition(QTextCursor::NextBlock);
+    }
+    curs.setPosition(pos);
+    currentEditor()->setTextCursor(curs); // needed to update document cursor
   } else { // no selection
+    int pos = curs.position();
     curs.clearSelection();
     curs.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor, 1);
     QString line = curs.block().text();
-    if (line.startsWith("# ")) {
-      line.remove(0, 2);
+    if (line.startsWith("#")) {
+      line.remove(0, 1);
       curs.select(QTextCursor::BlockUnderCursor);
       curs.removeSelectedText();
       if (currentEditor()->textCursor().columnNumber() == 0)
         curs.insertText(line);
       else
         curs.insertText("\n"+line);
-      curs.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor, 1);
-    } else {
-      curs.insertText("# ");
+      pos -= 1;
     }
-    currentEditor()->moveCursor(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+    curs.setPosition(pos);
+    currentEditor()->setTextCursor(curs); // needed to update document cursor
   }
-  
-// NEEDS TO BE REWORKED. Qt4.6 far too different compared to Qt3.x
-/*
-  QString str;
-  if (currentEditor()->textCursor().hasSelection()) { // selected text present
-    int paraFrom, paraTo;
-    int indexFrom, indexTo;
-    // get selection
-    currentEditor()->getSelection(&paraFrom, &indexFrom, &paraTo, &indexTo);
-    // check that indexFrom == 0, if not change the selection accordingly
-    if (indexFrom != 0) {
-      indexFrom = 0;
-      currentEditor()->setSelection(paraFrom, indexFrom, paraTo, indexTo);
-    }
-    // check that cursor is not in next line without selecting anything
-    if (indexTo == 0) {
-      paraTo--;
-      indexTo++;
-    }
-    // check that indexTo == end of line of paraTo
-    if ((indexTo != (int)currentEditor()->text(paraTo).length()) && (indexTo != 0)) {
-      indexTo = currentEditor()->text(paraTo).length();
-      currentEditor()->setSelection(paraFrom, indexFrom, paraTo, indexTo);
-    }
-    // get selection text
-    str = currentEditor()->selectedText();
-    // check line by line if (un)comment is needed
-    QStringList strList = QStringList::split("\n", str, TRUE);
-    for (QStringList::Iterator it = strList.begin(); it != strList.end(); ++it) {
-      str = *it;
-      if (str.trimmed().startsWith("#")) { // comment -> uncomment it
-        int idx = -1;
-        for (unsigned int i=0; i<(*it).length(); i++) {
-          if ((*it)[i] == '#') {
-            idx = i;
-            break;
-          }
-        }
-        (*it).remove(idx,1);
-        if ((*it)[idx] == ' ') {
-          (*it).remove(idx,1);
-        }
-      } else { // no comment -> comment it
-        (*it).prepend("# ");
-      }
-    }
-    str = strList.join("\n");
-    currentEditor()->insert(str);
-    // set the cursor position
-    currentEditor()->setCursorPosition(++paraTo, 0);
-  } else { // no text selected
-    int para, index;
-    currentEditor()->getCursorPosition(&para, &index);
-    // get current text line
-    str = currentEditor()->text(para);
-    // check if it is a comment line or not
-    if (str.trimmed().startsWith("#")) { // comment -> uncomment it
-      str = currentEditor()->text(para);
-      int idx = -1;
-      for (unsigned int i=0; i<str.length(); i++) {
-        if (str[i] == '#') {
-          idx = i;
-          break;
-        }
-      }
-      str.remove(idx,1);
-      if (str[idx] == ' ') {
-        str.remove(idx,1);
-      }
-    } else { // no comment -> comment it
-      if (!str.isEmpty())
-        str.prepend("# ");
-    }
-    // select current line
-    currentEditor()->setSelection(para, 0, para, currentEditor()->text(para).length());
-    // insert altered text
-    currentEditor()->insert(str);
-    // set the cursor position
-    currentEditor()->setCursorPosition(para, 0);
-  }
-*/
 }
 
 //----------------------------------------------------------------------------------------------------

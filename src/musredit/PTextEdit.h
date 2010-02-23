@@ -103,6 +103,7 @@ private slots:
   void editFindPrevious();
   void editFindAndReplace();
   void editComment();
+  void editUncomment();
 
   void textFamily( const QString &f );
   void textSize( const QString &p );
