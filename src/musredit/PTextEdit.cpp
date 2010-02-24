@@ -81,6 +81,7 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
 {
   fAdmin = new PAdmin();
 
+  fFileSystemWatcherActive = true;
   fFileSystemWatcher = new QFileSystemWatcher();
   if (fFileSystemWatcher == 0) {
     QMessageBox::information(this, "**ERROR**", "Couldn't invoke QFileSystemWatcher!");
@@ -92,8 +93,6 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
 
   fMsr2DataParam = 0;
   fFindReplaceData = 0,
-
-//  fFileWatcher = 0;
 
   fKeepMinuit2Output = false;
   fTitleFromDataFile = fAdmin->getTitleFromDataFileFlag();
@@ -111,6 +110,7 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
 
   textFamily(fAdmin->getFontName());
   textSize(QString("%1").arg(fAdmin->getFontSize()));
+  fFontChanging = false;
 
   QPixmap image0(":/images/musrfit.xpm");
   setWindowIcon( image0 );
@@ -566,7 +566,7 @@ void PTextEdit::load( const QString &f, const int index )
   if ( !QFile::exists( f ) )
     return;
 
-  QFileInfo info(f);
+//  QFileInfo info(f);
 
   PSubTextEdit *edit = new PSubTextEdit( fAdmin );
   edit->setFont(QFont(fAdmin->getFontName(), fAdmin->getFontSize()));
@@ -598,8 +598,10 @@ void PTextEdit::load( const QString &f, const int index )
  */
 PSubTextEdit *PTextEdit::currentEditor() const
 {
-  if ( fTabWidget->currentWidget() && fTabWidget->currentWidget()->inherits( "PSubTextEdit" ) ) {
-    return (PSubTextEdit*)fTabWidget->currentWidget();
+  if ( fTabWidget->currentWidget() ) {
+    if (fTabWidget->currentWidget()->inherits( "PSubTextEdit" )) {
+      return (PSubTextEdit*)fTabWidget->currentWidget();
+    }
   }
 
   return 0;
@@ -830,6 +832,8 @@ void PTextEdit::fileSave()
   if ( !currentEditor() )
     return;
 
+  fFileSystemWatcherActive = false;
+
   if ( *fFilenames.find( currentEditor() ) == QString("noname") ) {
     fileSaveAs();
   } else {
@@ -843,6 +847,8 @@ void PTextEdit::fileSave()
     QString fln = *fFilenames.find( currentEditor() );
     fTabWidget->setTabText(fTabWidget->indexOf( currentEditor() ), QFileInfo(fln).fileName());
   }
+
+  fileSystemWatcherActivation(); // delayed activation of fFileSystemWatcherActive
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -854,6 +860,8 @@ void PTextEdit::fileSaveAs()
   if ( !currentEditor() )
     return;
 
+  fFileSystemWatcherActive = false;
+
   QString fn = QFileDialog::getSaveFileName( this,
                     tr( "Save msr-/mlog-file As" ), QString::null,
                     tr( "msr-Files (*.msr *.mlog);;All Files (*)" ) );
@@ -863,6 +871,8 @@ void PTextEdit::fileSaveAs()
     fileSave();
     fTabWidget->setTabText(fTabWidget->indexOf( currentEditor() ), QFileInfo(fn).fileName());
   }
+
+  fileSystemWatcherActivation(); // delayed activation of fFileSystemWatcherActive
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1581,6 +1591,7 @@ void PTextEdit::musrFit()
 
   PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath(), cmd);
   fitOutputHandler.setModal(true);
+  fFileSystemWatcherActive = false;
   fitOutputHandler.exec();
 
   // handle the reloading of the files
@@ -1624,6 +1635,8 @@ void PTextEdit::musrFit()
     load(complementFileName, idx);
     fTabWidget->setCurrentIndex(currentIdx);
   }
+
+  fileSystemWatcherActivation();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1632,11 +1645,6 @@ void PTextEdit::musrFit()
  */
 void PTextEdit::musrMsr2Data()
 {
-/*
-  if ( !currentEditor() )
-    return;
-*/
-
   if (fMsr2DataParam == 0) {
     fMsr2DataParam = new PMsr2DataParam();
     // init fMsr2DataParam
@@ -1841,6 +1849,7 @@ cout << endl;
 
     PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath(), cmd);
     fitOutputHandler.setModal(true);
+    fFileSystemWatcherActive = false;
     fitOutputHandler.exec();
 
     // check if it is necessary to load msr-files
@@ -1914,6 +1923,8 @@ cout << endl;
 
   delete dlg;
   dlg = 0;
+
+  fileSystemWatcherActivation();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -2119,6 +2130,10 @@ void PTextEdit::fontChanged( const QFont &f )
   fFontChanging = true;
   fComboFont->lineEdit()->setText( f.family() );
   fComboSize->lineEdit()->setText( QString::number( f.pointSize() ) );
+
+  if (!currentEditor())
+    return;
+
   currentEditor()->setFont(f);
   currentEditor()->setWindowModified(false);
   currentEditor()->viewport()->setFocus();
@@ -2131,6 +2146,7 @@ void PTextEdit::fontChanged( const QFont &f )
  */
 void PTextEdit::textChanged(const bool forced)
 {
+
   if (!currentEditor())
     return;
 
@@ -2142,16 +2158,17 @@ void PTextEdit::textChanged(const bool forced)
   if ((fTabWidget->tabText(fTabWidget->currentIndex()).indexOf("*") > 0) &&
       !currentEditor()->document()->isModified()) {
     tabLabel.truncate(tabLabel.length()-1);
-    fTabWidget->setTabText(fTabWidget->indexOf(fTabWidget), tabLabel);
+    fTabWidget->setTabText(fTabWidget->currentIndex(), tabLabel);
   }
 
   if ((fTabWidget->tabText(fTabWidget->currentIndex()).indexOf("*") < 0) &&
-      currentEditor()->document()->isModified())
-    fTabWidget->setTabText(fTabWidget->indexOf(fTabWidget), tabLabel+"*");
+      currentEditor()->document()->isModified()) {
+    fTabWidget->setTabText(fTabWidget->currentIndex(), tabLabel+"*");
+  }
 
   if ((fTabWidget->tabText(fTabWidget->currentIndex()).indexOf("*") < 0) &&
       forced)
-    fTabWidget->setTabText(fTabWidget->indexOf(fTabWidget), tabLabel+"*");
+    fTabWidget->setTabText(fTabWidget->currentIndex(), tabLabel+"*");
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -2244,6 +2261,9 @@ void PTextEdit::applyFontSettings(QWidget*)
  */
 void PTextEdit::fileChanged(const QString &fileName)
 {
+  if (!fFileSystemWatcherActive)
+    return;
+
   QString str = "File '" + fileName + "' changed on the system.\nDo you want to reload it?";
   int result = QMessageBox::question(this, "**INFO**", str, QMessageBox::Yes, QMessageBox::No);
   if (result == QMessageBox::Yes) {
@@ -2267,6 +2287,29 @@ void PTextEdit::fileChanged(const QString &fileName)
     // load it
     load(fileName, idx);
   }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>.Delayed reactivation of file system watcher, needed when saving files. At the moment the delay
+ * is set to 1000 ms.
+ */
+void PTextEdit::fileSystemWatcherActivation()
+{
+  if (fFileSystemWatcherTimeout.isActive())
+    return;
+
+  fFileSystemWatcherTimeout.singleShot(1000, this, SLOT(setFileSystemWatcherActive()));
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>.slot needed to reactivate the file system watcher. It is called by PTextEdit::fileSystemWatcherActivation()
+ * after some given timeout.
+ */
+void PTextEdit::setFileSystemWatcherActive()
+{
+  fFileSystemWatcherActive = true;
 }
 
 //----------------------------------------------------------------------------------------------------

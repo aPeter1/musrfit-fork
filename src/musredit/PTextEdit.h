@@ -34,6 +34,7 @@
 
 #include <QMainWindow>
 #include <QMap>
+#include <QTimer>
 
 #include "musredit.h"
 
@@ -67,6 +68,7 @@ private:
   PSubTextEdit *currentEditor() const;
   void doConnections( PSubTextEdit *e );
   bool validRunList(const QString runList);
+  void fileSystemWatcherActivation();
 
 private slots:
   void insertTitle();
@@ -132,10 +134,13 @@ private slots:
 
   void applyFontSettings(QWidget*);
   void fileChanged(const QString &fileName);
+  void setFileSystemWatcherActive();
 
 private:
   PAdmin *fAdmin;
   QFileSystemWatcher *fFileSystemWatcher;
+  bool fFileSystemWatcherActive;
+  QTimer fFileSystemWatcherTimeout;
 
   QAction *fMusrT0Action;
 
