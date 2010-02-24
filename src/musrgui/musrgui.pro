@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = musrgui
-unix:target.path = $(ROOTSYS)/bin
+unix:target.path = $$(ROOTSYS)/bin
 macx:target.path = /Applications
 
 exists( /usr/bin/cygwin1.dll ) {
@@ -12,8 +12,8 @@ QMAKE_CC = gcc
 QMAKE_CXX = g++
 
 # install path for the XML configuration file
-unix:xml.path = $(ROOTSYS)/bin/
-macx:xml.path = $(ROOTSYS)/bin/
+unix:xml.path = $$(ROOTSYS)/bin/
+macx:xml.path = $$(ROOTSYS)/bin/
 xml.files = musrgui_startup.xml
 INSTALLS += xml
 

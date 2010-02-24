@@ -1,14 +1,21 @@
 TEMPLATE = app
+
 TARGET = musredit
-unix:target.path = $(ROOTSYS)/bin
+# install path for musredit
+unix:target.path = $$(ROOTSYS)/bin
 macx:target.path = /Applications
 win32:target.path = c:/musrfit/bin
+INSTALLS += target
+
+# This is only needed for SL5.1
+exists ( /opt/fontconfig-2.8.0/lib/libfontconfig.so ) {
+  unix:LIBS += -L/opt/fontconfig-2.8.0/lib/ -lfontconfig
+}
 
 exists( /usr/bin/cygwin1.dll ) {
       QMAKE_LFLAGS_SHAPP = -Wl,--enable-auto-import
 }
 
-INSTALLS += target
 QMAKE_CC = gcc
 QMAKE_CXX = g++
 
@@ -24,11 +31,6 @@ CONFIG += qt \
     debug
 
 QT += xml
-
-# This is only needed for SL5.1
-exists ( /opt/fontconfig-2.8.0/lib/libfontconfig.so ) {
-  unix:LIBS += -L/opt/fontconfig-2.8.0/lib/ -lfontconfig
-}
 
 HEADERS = musredit.h \
     PHelp.h \
