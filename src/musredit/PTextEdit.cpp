@@ -2215,32 +2215,23 @@ void PTextEdit::replaceAndClose()
  */
 void PTextEdit::replaceAll()
 {
-// NEEDS TO BE REWRITTEN SINCE Qt4.6 IS FAR TOO DIFFERENT TO Qt3.x
-/*
-  int currentPara, currentIndex;
-  currentEditor()->getCursorPosition(&currentPara, &currentIndex);
+  // set the cursor to the start of the document
+  currentEditor()->moveCursor(QTextCursor::Start);
 
-  currentEditor()->setCursorPosition(0,0);
+  // construct search flags
+  QTextDocument::FindFlags flags = 0;
+  if (fFindReplaceData->caseSensitive)
+    flags |= QTextDocument::FindCaseSensitively;
+  else if (fFindReplaceData->findBackwards)
+    flags |= QTextDocument::FindBackward;
+  else if (fFindReplaceData->wholeWordsOnly)
+    flags |= QTextDocument::FindWholeWords;
 
-  int para = 1, index = 1;
-  while (currentEditor()->find(fFindReplaceData->findText,
-                               fFindReplaceData->caseSensitive,
-                               fFindReplaceData->wholeWordsOnly,
-                               true,
-                               &para, &index)) {
-    // set cursor to the correct position
-    currentEditor()->setCursorPosition(para, index);
-
-    // replace the text
-    currentEditor()->insert(fFindReplaceData->replaceText);
-
-    index++;
+  while (currentEditor()->find(fFindReplaceData->findText, flags)) {
+    currentEditor()->insertPlainText(fFindReplaceData->replaceText);
   }
 
   emit close();
-
-  currentEditor()->setCursorPosition(currentPara, currentIndex);
-*/
 }
 
 //----------------------------------------------------------------------------------------------------
