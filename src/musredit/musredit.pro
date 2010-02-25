@@ -20,8 +20,8 @@ QMAKE_CC = gcc
 QMAKE_CXX = g++
 
 # install path for the XML configuration file
-unix:xml.path = $(ROOTSYS)/bin/
-macx:xml.path = $(ROOTSYS)/bin/
+unix:xml.path = $$(ROOTSYS)/bin/
+macx:xml.path = $$(ROOTSYS)/bin/
 win32:xml.path = c:/musrfit/bin
 xml.files = musredit_startup.xml
 INSTALLS += xml
