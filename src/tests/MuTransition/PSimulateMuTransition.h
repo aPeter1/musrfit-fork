@@ -47,6 +47,7 @@ class PSimulateMuTransition : public TObject
 
     virtual void PrintSettings() const;
     virtual void SetNmuons(Int_t value)        { fNmuons = value; }            //!< number of muons
+    virtual void SetDebugFlag(Bool_t value)    { fDebugFlag = value; }         //!< debug flag
     virtual void SetBfield(Double_t value)     { fBfield = value; }            //!< sets magnetic field (T)
     virtual void SetMuCoupling(Double_t value) { fMuCoupling = value; }        //!< sets Mu hyperfine coupling (MHz)
     virtual void SetCaptureRate(Double_t value){ fCaptureRate = value; }       //!< sets Mu+ electron capture rate (MHz)
@@ -75,6 +76,7 @@ class PSimulateMuTransition : public TObject
     Double_t  fMuonPhase;       //!< phase of muon spin
     Double_t  fAsymmetry;       //!< muon decay asymmetry
     Int_t     fNmuons;          //!< number of muons to simulate
+    Bool_t    fDebugFlag;       //!< debug flag
 
     virtual Double_t NextEventTime(const Double_t &EventRate);
     virtual Double_t PrecessionPhase(const Double_t &time, const Double_t &frequency);

@@ -43,7 +43,7 @@ void runMuSimulation()
   decayAnaModule = histosFolder->AddFolder("DecayAnaModule", "muSR decay histograms");
 
   // feed run info header
-  UInt_t runNo = 9010;
+  UInt_t runNo = 9015;
   TString tstr;
   runInfo = gROOT->GetRootFolder()->AddFolder("RunInfo", "LEM RunInfo");  
   gROOT->GetListOfBrowsables()->Add(runInfo, "RunInfo");
@@ -86,12 +86,13 @@ void runMuSimulation()
   }
 
   //prepare to run simulation
-  simulateMuTransition->SetMuCoupling(100.);      // MHz
-  simulateMuTransition->SetBfield(0.01);           // Tesla
+  simulateMuTransition->SetMuCoupling(35.);      // MHz
+  simulateMuTransition->SetBfield(0.1);           // Tesla
   simulateMuTransition->SetCaptureRate(1.0);       // MHz
-  simulateMuTransition->SetIonizationRate(500.0);    // MHz
+  simulateMuTransition->SetIonizationRate(250.0);    // MHz
   simulateMuTransition->SetNmuons(1e6);
   simulateMuTransition->SetDecayAsymmetry(0.27);
+  simulateMuTransition->SetDebugFlag(kFALSE); // to print time and phase during charge-changing cycle
 
   simulateMuTransition->PrintSettings();
 

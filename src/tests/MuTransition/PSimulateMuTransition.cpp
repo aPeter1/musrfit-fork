@@ -63,6 +63,7 @@ PSimulateMuTransition::PSimulateMuTransition(UInt_t seed)
   fMuonPhase      = fInitialPhase;
   fMuonDecayTime  = 0.;
   fAsymmetry      = 0.27;
+  fDebugFlag      = kFALSE;
 }
 
 //--------------------------------------------------------------------------
@@ -167,7 +168,6 @@ Double_t PSimulateMuTransition::NextEventTime(const Double_t &EventRate)
  *
  * \param time duration of precession (us);
  * \param frequency muon spin precession frequency (MHz);
- * \param phase initial muon phase (degree);
  */
 Double_t PSimulateMuTransition::PrecessionPhase(const Double_t &time, const Double_t &frequency)
 {
@@ -197,10 +197,12 @@ void PSimulateMuTransition::Event()
   // charge-exchange loop until muon decay
   eventTime     = 0.;
   eventDiffTime = 0.;
+  if (fDebugFlag) cout << "Decay time = " << fMuonDecayTime << endl;
   while (1) {
    // assume Mu+ as initial state; get next electron capture time
    captureTime = NextEventTime(fCaptureRate);
    eventTime += captureTime;
+   if (fDebugFlag) cout << "Capture time = " << captureTime << " Phase = " << fMuonPhase << endl;
    if (eventTime < fMuonDecayTime)
      fMuonPhase += PrecessionPhase(captureTime, muonPrecessionFreq);
    else{ //muon decays; handle precession prior to muon decay
@@ -212,6 +214,7 @@ void PSimulateMuTransition::Event()
    // now, we have Mu0; get next ionization time
    ionizationTime = NextEventTime(fIonizationRate);
    eventTime += ionizationTime;
+   if (fDebugFlag) cout << "Ioniza. time = " << ionizationTime << " Phase = " << fMuonPhase << endl;
    if (eventTime < fMuonDecayTime)
      fMuonPhase += PrecessionPhase(ionizationTime, fMuCoupling);
    else{ //muon decays; handle precession prior to muon decay
@@ -220,6 +223,8 @@ void PSimulateMuTransition::Event()
      break;
    }
   }
+
+  if (fDebugFlag) cout << " Final Phase = " << fMuonPhase << endl;
   //fMuonPhase = TMath::ACos(TMath::Cos(fMuonPhase))*360./TMath::TwoPi(); //transform back to [0, 180] degree interval
   return;
 }
