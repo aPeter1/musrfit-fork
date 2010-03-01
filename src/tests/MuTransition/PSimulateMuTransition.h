@@ -46,20 +46,22 @@ class PSimulateMuTransition : public TObject
     virtual ~PSimulateMuTransition();
 
     virtual void PrintSettings() const;
-    virtual void SetNmuons(Int_t value)        { fNmuons = value; }            //!< number of muons
-    virtual void SetDebugFlag(Bool_t value)    { fDebugFlag = value; }         //!< debug flag
-    virtual void SetBfield(Double_t value)     { fBfield = value; }            //!< sets magnetic field (T)
-    virtual void SetMuCoupling(Double_t value) { fMuCoupling = value; }        //!< sets Mu hyperfine coupling (MHz)
-    virtual void SetCaptureRate(Double_t value){ fCaptureRate = value; }       //!< sets Mu+ electron capture rate (MHz)
+    virtual void SetNmuons(Int_t value)        { fNmuons = value; }       //!< number of muons
+    virtual void SetDebugFlag(Bool_t value)    { fDebugFlag = value; }    //!< debug flag
+    virtual void SetBfield(Double_t value)     { fBfield = value; }       //!< sets magnetic field (T)
+    virtual void SetMuPrecFreq1(Double_t value) { fMuPrecFreq1 = value; } //!< sets Mu hyperfine coupling (MHz)
+    virtual void SetMuPrecFreq2(Double_t value) { fMuPrecFreq2 = value; } //!< sets Mu hyperfine coupling (MHz)
+    virtual void SetCaptureRate(Double_t value){ fCaptureRate = value; }  //!< sets Mu+ electron capture rate (MHz)
     virtual void SetIonizationRate(Double_t value){ fIonizationRate = value; } //!< sets Mu0 ionization rate (MHz)
     virtual void SetDecayAsymmetry(Double_t value){ fAsymmetry = value; }      //!< muon decay asymmetry
     virtual void SetMuFraction(Double_t value){ fMuFraction = value; }         //!< Muonium fraction
+    virtual void SetMuFractionState1(Double_t value){ fMuFractionState1 = value; }  
+    virtual void SetMuFractionState2(Double_t value){ fMuFractionState2 = value; }  
 
     virtual Bool_t IsValid() { return fValid; }
     virtual void   SetSeed(UInt_t seed);
 
     virtual Double_t GetBfield()      { return fBfield; }            //!< returns the magnetic field (T)
-    virtual Double_t GetMuCoupling()  { return fMuCoupling; }        //!< returns the Mu hyperfine coupling (MHz)
     virtual Double_t GetCaptureRate() { return fCaptureRate; }       //!< returns Mu+ electron capture rate (MHz)
     virtual Double_t GetIonizationRate() { return fIonizationRate; } //!< returns Mu0 ionization rate (MHz)
     virtual void     Run(TH1F *histoForward, TH1F *histoBackward);
@@ -69,22 +71,24 @@ class PSimulateMuTransition : public TObject
     TRandom2 *fRandom;
 
     Double_t  fBfield;          //!< magnetic field (T)
-    Double_t  fMuCoupling;      //!< Mu hyperfine coupling constant (MHz)
+    Double_t  fMuPrecFreq1;     //!< Mu precession frequency of state 1 (MHz)
+    Double_t  fMuPrecFreq2;     //!< Mu precession frequency of state 2 (MHz)
     Double_t  fCaptureRate;     //!< Mu+ electron capture rate (MHz)
     Double_t  fIonizationRate;  //!< Mu0 ionization rate (MHz)
     Double_t  fInitialPhase;    //!< initial muon spin phase
     Double_t  fMuonDecayTime;   //!< muon decay time (us)
     Double_t  fMuonPhase;       //!< phase of muon spin
     Double_t  fAsymmetry;       //!< muon decay asymmetry
-    Double_t  fMuFraction;      //!< Mu fraction [0,1]
+    Double_t  fMuFraction;      //!< total Mu fraction [0,1]
+    Double_t  fMuFractionState1; //!< fraction of Mu in state 1
+    Double_t  fMuFractionState2; //!< fraction of Mu in state 2
     Int_t     fNmuons;          //!< number of muons to simulate
     Bool_t    fDebugFlag;       //!< debug flag
 
     virtual Double_t NextEventTime(const Double_t &EventRate);
     virtual Double_t PrecessionPhase(const Double_t &time, const Double_t &frequency);
-    virtual void     MuonEvent();
-    virtual void     MuoniumEvent();
-
+    virtual void     Event(const TString muonString);
+ 
   ClassDef(PSimulateMuTransition, 0)
 };
 
