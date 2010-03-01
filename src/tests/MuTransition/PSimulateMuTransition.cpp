@@ -63,6 +63,7 @@ PSimulateMuTransition::PSimulateMuTransition(UInt_t seed)
   fMuonPhase      = fInitialPhase;
   fMuonDecayTime  = 0.;
   fAsymmetry      = 0.27;
+  fMuFraction     = 0.;
   fDebugFlag      = kFALSE;
 }
 
@@ -92,9 +93,11 @@ void PSimulateMuTransition::PrintSettings() const
   cout << endl << "B field (T)                           = " << fBfield;
   cout << endl << "Mu+ electron capture rate (MHz)       = " << fCaptureRate;
   cout << endl << "Mu ionizatioan rate (MHz)             = " << fIonizationRate;
+  cout << endl << "Decay asymmetry                       = " << fAsymmetry;
+  cout << endl << "Muonium fraction                      = " << fMuFraction;
   cout << endl << "Number of particles to simulate       = " << fNmuons;
   cout << endl << "Initial muon spin phase (degree)      = " << fInitialPhase;
-  cout << endl << "Decay asymmetry                       = " << fAsymmetry;
+  cout << endl << "Debug flag                            = " << fDebugFlag;
   cout << endl << endl;
 }
 
@@ -127,8 +130,14 @@ void PSimulateMuTransition::Run(TH1F *histoForward, TH1F *histoBackward)
     return;
 
   for (i = 0; i<fNmuons; i++){
-    Event();
-    //cout << "Final phase: " << fMuonPhase << endl;
+    fMuonPhase         = TMath::TwoPi() * fInitialPhase/360.; // transform to radians
+    fMuonDecayTime     = NextEventTime(fMuonDecayRate);
+    // initial muon state Mu+ or Mu0?
+    if (fRandom->Rndm() <= 1.-fMuFraction) 
+     MuonEvent();
+    else
+     MuoniumEvent();
+
     // fill 50% in "forward", and 50% in "backward" detector to get independent
     // events in "forward" and "backward" histograms. This allows "normal" uSR
     // analysis of the data
@@ -175,29 +184,25 @@ Double_t PSimulateMuTransition::PrecessionPhase(const Double_t &time, const Doub
 }
 
 //--------------------------------------------------------------------------
-// Event (private)
+// MuonEvent (private)
 //--------------------------------------------------------------------------
 /**
  * <p> Generates "one muon event": simulate muon phase under free precession at
  * external field and Mu precession
  * initial muon state: Mu+
  *
- * \param muonDecayTime muon decay time (us)
- * \param muonPhase muon spin phase in [0,180] degree
  */
-void PSimulateMuTransition::Event()
+void PSimulateMuTransition::MuonEvent()
 {
   Double_t eventTime, eventDiffTime, captureTime, ionizationTime;
   Double_t muonPrecessionFreq; // MHz
 
   muonPrecessionFreq = fMuonGyroRatio * fBfield; 
-  fMuonPhase         = TMath::TwoPi() * fInitialPhase/360.; // transform to radians
-  fMuonDecayTime     = NextEventTime(fMuonDecayRate);
 
   // charge-exchange loop until muon decay
   eventTime     = 0.;
   eventDiffTime = 0.;
-  if (fDebugFlag) cout << "Decay time = " << fMuonDecayTime << endl;
+  if (fDebugFlag) cout << "Muon Event, Decay time = " << fMuonDecayTime << endl;
   while (1) {
    // assume Mu+ as initial state; get next electron capture time
    captureTime = NextEventTime(fCaptureRate);
@@ -220,6 +225,57 @@ void PSimulateMuTransition::Event()
    else{ //muon decays; handle precession prior to muon decay
      eventDiffTime = fMuonDecayTime - (eventTime - ionizationTime);
      fMuonPhase += PrecessionPhase(eventDiffTime, fMuCoupling);
+     break;
+   }
+  }
+
+  if (fDebugFlag) cout << " Final Phase = " << fMuonPhase << endl;
+  //fMuonPhase = TMath::ACos(TMath::Cos(fMuonPhase))*360./TMath::TwoPi(); //transform back to [0, 180] degree interval
+  return;
+}
+
+//--------------------------------------------------------------------------
+// MuoniumEvent (private)
+//--------------------------------------------------------------------------
+/**
+ * <p> Generates "one muonium event": simulate muon spin phase in Mu and as
+ * free muon in external field
+ * initial muon state: Mu0
+ *
+ */
+void PSimulateMuTransition::MuoniumEvent()
+{
+  Double_t eventTime, eventDiffTime, captureTime, ionizationTime;
+  Double_t muonPrecessionFreq; // MHz
+
+  muonPrecessionFreq = fMuonGyroRatio * fBfield; 
+
+  // charge-exchange loop until muon decay
+  eventTime     = 0.;
+  eventDiffTime = 0.;
+  if (fDebugFlag) cout << "Muonium event, Decay time = " << fMuonDecayTime << endl;
+  while (1) {
+   // we have Mu0 as initial state; get next ionization time
+   ionizationTime = NextEventTime(fIonizationRate);
+   eventTime += ionizationTime;
+   if (fDebugFlag) cout << "Ioniza. time = " << ionizationTime << " Phase = " << fMuonPhase << endl;
+   if (eventTime < fMuonDecayTime)
+     fMuonPhase += PrecessionPhase(ionizationTime, fMuCoupling);
+   else{ //muon decays; handle precession prior to muon decay
+     eventDiffTime = fMuonDecayTime - (eventTime - ionizationTime);
+     fMuonPhase += PrecessionPhase(eventDiffTime, fMuCoupling);
+     break;
+   }
+ 
+   // now we have Mu+, get next electron capture time
+   captureTime = NextEventTime(fCaptureRate);
+   eventTime += captureTime;
+   if (fDebugFlag) cout << "Capture time = " << captureTime << " Phase = " << fMuonPhase << endl;
+   if (eventTime < fMuonDecayTime)
+     fMuonPhase += PrecessionPhase(captureTime, muonPrecessionFreq);
+   else{ //muon decays; handle precession prior to muon decay
+     eventDiffTime = fMuonDecayTime - (eventTime - captureTime);
+     fMuonPhase += PrecessionPhase(eventDiffTime, muonPrecessionFreq);
      break;
    }
   }

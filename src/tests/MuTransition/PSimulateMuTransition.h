@@ -53,6 +53,7 @@ class PSimulateMuTransition : public TObject
     virtual void SetCaptureRate(Double_t value){ fCaptureRate = value; }       //!< sets Mu+ electron capture rate (MHz)
     virtual void SetIonizationRate(Double_t value){ fIonizationRate = value; } //!< sets Mu0 ionization rate (MHz)
     virtual void SetDecayAsymmetry(Double_t value){ fAsymmetry = value; }      //!< muon decay asymmetry
+    virtual void SetMuFraction(Double_t value){ fMuFraction = value; }         //!< Muonium fraction
 
     virtual Bool_t IsValid() { return fValid; }
     virtual void   SetSeed(UInt_t seed);
@@ -75,12 +76,14 @@ class PSimulateMuTransition : public TObject
     Double_t  fMuonDecayTime;   //!< muon decay time (us)
     Double_t  fMuonPhase;       //!< phase of muon spin
     Double_t  fAsymmetry;       //!< muon decay asymmetry
+    Double_t  fMuFraction;      //!< Mu fraction [0,1]
     Int_t     fNmuons;          //!< number of muons to simulate
     Bool_t    fDebugFlag;       //!< debug flag
 
     virtual Double_t NextEventTime(const Double_t &EventRate);
     virtual Double_t PrecessionPhase(const Double_t &time, const Double_t &frequency);
-    virtual void     Event();
+    virtual void     MuonEvent();
+    virtual void     MuoniumEvent();
 
   ClassDef(PSimulateMuTransition, 0)
 };
