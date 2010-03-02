@@ -7,6 +7,42 @@
 
   $Id$
 
+  Use root macros runMuSimulation.C and testAnalysis.C to run the simulation
+  and to get a quick look on the data. Data are saved to a root histogram file
+  with a structure similar to LEM histogram files; musrfit can be used to
+  analyze the simulated data.
+
+  Description:
+  Root class to simulate muon spin phase under successive Mu+/Mu0 charge-exchange
+  processes by a Monte-Carlo method. Up to 3 Mu0 states are considered at the moment 
+  (analogous to MuBC in Si, B||(100)), a non-precessing signal, and two precessing 
+  states ("nu_12" and "nu_34").
+  Parameters:
+  1) Precession frequencies of "nu_12" and "nu_34"
+  2) fractions of nu_12, nu_34
+  3) total Mu0 fraction
+  4) electron-capture rate
+  5) Mu ionization rate
+  6) initial muon spin phase
+  7) total muon decay asymmetry
+  8) number of muon decays to be generated.
+  9) debug flag: if TRUE print capture/ionization events on screen
+
+  Output:
+  Two histograms ("forward" and "backward") are written to a root file.
+
+  The muon event simulation with a sequence of charge-changing processes is
+  done in Event():
+  simulate muon spin phase under charge-exchange with "3 Mu states" 
+  (as MuBC in Si, B || (100), for example): a non-precessing,
+  and two precessing signals (nu_12, nu_34). 
+  1) according to Mu+/Mu0 fraction begin either with a Mu+ state or Mu state
+  2) Mu+: determine next electron-capture time t_c. If t_c is larger than decay time t_d
+     calculate muon spin precession for t_d; else calculate spin precession for t_c.
+  3) Determine next ionization time t_i, also determine which Mu0 state has been formed
+     at the capture event. Calculate muon spin precession.
+   4) get the next electron capture time, continue until t_d is reached.
+
 ***************************************************************************/
 
 /***************************************************************************
@@ -193,8 +229,15 @@ Double_t PSimulateMuTransition::PrecessionPhase(const Double_t &time, const Doub
 // Event (private)
 //--------------------------------------------------------------------------
 /**
- * <p> Generates "one muon event": simulate muon phase under free precession at
- * external field and Mu precession
+ * <p> Generates "muon event": simulate muon spin phase under charge-exchange
+ *     with "3 Mu states" (as MuBC in Si, B || (100), for example): a non-precessing,
+ *     and two precessing signals (nu_12, nu_34). 
+ *     1) according to Mu+/Mu0 fraction begin either with a Mu+ state or Mu state
+ *     2) Mu+: determine next electron-capture time t_c. If t_c is larger than decay time t_d
+ *        calculate muon spin precession for t_d; else calculate spin precession for t_c.
+ *     3) Determine next ionization time t_i, also determine which Mu0 state has been formed
+ *        at the capture event. Calculate muon spin precession.
+ *     4) get the next electron capture time, continue until t_d is reached.
  *
  * \param muonString if eq. "Mu+" begin with Mu+ precession
  */
