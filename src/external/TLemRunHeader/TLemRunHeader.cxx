@@ -15,6 +15,7 @@ TLemRunHeader::TLemRunHeader(){
  fLemSetup.SetString("");
  fStartTimeString.SetString("");
  fStopTimeString.SetString("");
+ fOffsetPPCHistograms = 20;
  fRunNumber = 0; // -1 not possible since UInt_t
  fRunNumberString.SetString("");
  fStartTime = 0; // -1 not possible since UInt_t
@@ -39,6 +40,8 @@ TLemRunHeader::TLemRunHeader(){
  fNChannelsString.SetString("");
  fNHist     = -1;
  fNHistString.SetString("");
+ fOffsetPPCHistograms = 20;
+ fOffsetPPCHistogramsString.SetString("");
  fCuts.SetString("");
  fModerator.SetString("");
  for (int i=0; i<NHIST; i++)
@@ -163,23 +166,32 @@ void TLemRunHeader::SetNHist(Int_t value){
  SetNPosDetectors(fNHist);
 }
 //----------------------------------------------------------
+void TLemRunHeader::SetOffsetPPCHistograms(UInt_t value){
+ TString str;
+ char s[80];
+ sprintf(s,"13 Offset PPC Histograms: %6d", value);
+ str = s;
+ fOffsetPPCHistogramsString.SetString(str);
+ fOffsetPPCHistograms = value;
+}
+//----------------------------------------------------------
 void TLemRunHeader::SetCuts(const Char_t *cuts){
  TString str;
- str = "13 Cuts: ";
+ str = "14 Cuts: ";
  str += cuts;
  fCuts.SetString(str);
 }
 //----------------------------------------------------------
 void TLemRunHeader::SetModerator(const Char_t *moderator){
  TString str;
- str = "14 Moderator: ";
+ str = "15 Moderator: ";
  str += moderator;
  fModerator.SetString(str);
 }
 //----------------------------------------------------------
 void TLemRunHeader::SetTimeZero(const Double_t *value){
  TString str;
- str = "15 t0: ";
+ str = "16 t0: ";
  for (Int_t i = 0; i < fNHist; i++){
   //fTimeZero.push_back(value[i]);
   fTimeZero[i] = value[i];
@@ -301,6 +313,7 @@ void TLemRunHeader::DumpHeader() const {
   printf("Time Res.:    %10.7f ns\n",  fTimeResolution);
   printf("N Channels:   %10d\n", fNChannels);
   printf("N Histograms: %10d\n", fNHist);
+  printf("Offset PPC Histograms: %10d\n", fOffsetPPCHistograms);
   printf("Cuts:         %s\n", cuts);
   printf("Moderator:    %s\n", mod);
   printf("t0: ");
@@ -366,6 +379,8 @@ void TLemRunHeader::DrawHeader() const {
  sprintf(str, "N Channels:   %10d", fNChannels);
  text = pt->AddText(str);
  sprintf(str, "N Histograms: %10d", fNHist);
+ text = pt->AddText(str);
+ sprintf(str, "Offset PPC Histograms: %10d", fOffsetPPCHistograms);
  text = pt->AddText(str);
  strcpy(str, "Cuts: ");
  strcat(str, cuts);

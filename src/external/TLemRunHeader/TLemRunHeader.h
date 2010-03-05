@@ -37,6 +37,8 @@ private:
    TObjString fLemSetup; // LEM Setup
    TObjString fStartTimeString; // Run Start time
    TObjString fStopTimeString;  // Run Stop time
+   UInt_t     fOffsetPPCHistograms; // ID offset for post-pileup rejected histograms, default 20
+   TObjString fOffsetPPCHistogramsString;
    UInt_t     fRunNumber;
    TObjString fRunNumberString;
    UInt_t     fStartTime;       // ASCII of start time
@@ -73,6 +75,7 @@ public:
    virtual void SetRunNumber(UInt_t runNo);
    virtual void SetStartTimeString(const Char_t *start);
    virtual void SetStopTimeString(const Char_t *stop);
+   virtual void SetOffsetPPCHistograms(UInt_t value);
    virtual void SetStartTime(UInt_t value) { fStartTime = value; }
    virtual void SetStopTime(UInt_t value)  { fStopTime = value; }
    virtual void SetModeratorHV(Float_t modHV, Float_t error);
@@ -91,6 +94,7 @@ public:
    TObjString      GetRunTitle() const;
    TObjString      GetLemSetup() const;
    virtual UInt_t  GetRunNumber() const { return fRunNumber; }
+   virtual UInt_t  GetOffsetPPCHistograms() const { return fOffsetPPCHistograms; }
    virtual UInt_t  GetStartTime() const { return fStartTime; }
    virtual UInt_t  GetStopTime() const  { return fStopTime; }
    virtual Int_t   GetNChannels() const { return fNChannels; }
@@ -113,7 +117,7 @@ public:
    virtual void DumpHeader() const;
    virtual void DrawHeader() const;
 
-   // 4th version including lemStats
-   ClassDef(TLemRunHeader,4) // LEM Run Header
+   // 5th version including ID offset for PPC histograms
+   ClassDef(TLemRunHeader,5) // LEM Run Header
 };
 #endif
