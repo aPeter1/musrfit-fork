@@ -105,6 +105,7 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
                            |   lexeme_d[ root_node_d[ str_p("LOG")   ] >> ch_p('(') ] >> expression >> ch_p(')')
                            |   lexeme_d[ root_node_d[ str_p("LN")    ] >> ch_p('(') ] >> expression >> ch_p(')')
                            |   lexeme_d[ root_node_d[ str_p("EXP")   ] >> ch_p('(') ] >> expression >> ch_p(')')
+                           |   lexeme_d[ root_node_d[ str_p("SQRT")  ] >> ch_p('(') ] >> expression >> ch_p(')')
                            ;
 
             factor         =   real

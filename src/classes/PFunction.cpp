@@ -247,6 +247,8 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
       node.fFunctionTag = FUN_LN;
     else if (!strcmp(str.c_str(), "EXP"))
       node.fFunctionTag = FUN_EXP;
+    else if (!strcmp(str.c_str(), "SQRT"))
+      node.fFunctionTag = FUN_SQRT;
     else {
       cerr << endl << "**PANIC ERROR**: function " << str << " doesn't exist, but you never should have reached this point!";
       cerr << endl;
@@ -442,11 +444,13 @@ Double_t PFunction::EvalNode(PFuncTreeNode &node)
     } else if (node.fFunctionTag == FUN_ATANH) {
       return atanh(EvalNode(node.children[0]));
     } else if (node.fFunctionTag == FUN_LOG) {
-      return log(EvalNode(node.children[0]))/log(10);
+      return log(EvalNode(node.children[0]))/log(10.0);
     } else if (node.fFunctionTag == FUN_LN) {
       return log(EvalNode(node.children[0]));
     } else if (node.fFunctionTag == FUN_EXP) {
       return exp(EvalNode(node.children[0]));
+    } else if (node.fFunctionTag == FUN_SQRT) {
+      return sqrt(EvalNode(node.children[0]));
     } else {
       cerr << endl << "**PANIC ERROR**: PFunction::EvalNode: node.fID == PFunctionGrammar::functionID: you never should have reached this point!";
       cerr << endl;
