@@ -43,7 +43,7 @@ void runMuSimulation()
   decayAnaModule = histosFolder->AddFolder("DecayAnaModule", "muSR decay histograms");
 
   // feed run info header
-  UInt_t runNo = 9100;
+  UInt_t runNo = 9102;
   TString tstr;
   runInfo = gROOT->GetRootFolder()->AddFolder("RunInfo", "LEM RunInfo");  
   gROOT->GetListOfBrowsables()->Add(runInfo, "RunInfo");
@@ -64,6 +64,7 @@ void runMuSimulation()
   header->SetTimeResolution(1.);
   header->SetNChannels(12001);
   header->SetNHist(2);
+  header->SetOffsetPPCHistograms(20);
   header->SetCuts("none");
   header->SetModerator("none");
   Double_t tt0[2] = {0., 0.};
@@ -86,12 +87,12 @@ void runMuSimulation()
   }
 
   //prepare to run simulation
-  simulateMuTransition->SetMuPrecFreq1(51.);   // MHz
-  simulateMuTransition->SetMuPrecFreq2(-27.);  // MHz
+  simulateMuTransition->SetMuPrecFreq1(41.);   // MHz
+  simulateMuTransition->SetMuPrecFreq2(-35.);  // MHz
   simulateMuTransition->SetMuFraction(0.5);    // initial Mu fraction
-  simulateMuTransition->SetMuFractionState1(1.0);  // 100% of Mu in state 1
-  simulateMuTransition->SetMuFractionState2(0.0);  // 0% of Mu in state 2
-  simulateMuTransition->SetBfield(0.1);           // Tesla
+  simulateMuTransition->SetMuFractionState1(0.42);  // 100% of Mu in state 1
+  simulateMuTransition->SetMuFractionState2(0.32);  // 0% of Mu in state 2
+  simulateMuTransition->SetBfield(0.01);           // Tesla
   simulateMuTransition->SetCaptureRate(1.5);       // MHz
   simulateMuTransition->SetIonizationRate(250.);    // MHz
   simulateMuTransition->SetNmuons(1e7);
