@@ -472,7 +472,14 @@ Double_t PFunction::EvalNode(PFuncTreeNode &node)
     }
   } else if (node.fID == PFunctionGrammar::powerID) {
     if (node.fFunctionTag == FUN_POW) {
-      return pow(EvalNode(node.children[0]), EvalNode(node.children[1]));
+      Double_t base = EvalNode(node.children[0]);
+      Double_t expo = EvalNode(node.children[1]);
+      // check that no complex number will result
+      if (base < 0.0) { // base is negative which might be fatal
+        if (expo-floor(expo) != 0.0) // exponent is not an integer number, hence take -base (positive) to avoid complex numbers, i.e. nan
+          base = -base;
+      }
+      return pow(base, expo);
     } else {
       cerr << endl << "**PANIC ERROR**: PFunction::EvalNode: node.fID == PFunctionGrammar::powerID: you never should have reached this point!";
       cerr << endl;
