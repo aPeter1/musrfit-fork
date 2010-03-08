@@ -1271,7 +1271,7 @@ void PMsrHandler::SetMsrAddT0Entry(UInt_t runNo, UInt_t addRunIdx, UInt_t histoI
     cerr << endl;
   }
 
-  if (histoIdx > fRuns[runNo].GetAddT0Size(addRunIdx)) { // error
+  if (static_cast<Int_t>(histoIdx) > fRuns[runNo].GetAddT0Size(addRunIdx)) { // error
     cerr << endl << ">> PMsrHandler::SetMsrAddT0Entry: **WARNING** histoIdx = " << histoIdx << ", is out of valid range 0.." << fRuns[runNo].GetAddT0Size(addRunIdx);
     cerr << endl << ">> Will add it anyway.";
     cerr << endl;
@@ -2009,7 +2009,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
           if (str.IsFloat())
-            param.SetBkgFix(str.Atof());
+            param.SetBkgFix(str.Atof(), i-1);
           else
             error = true;
         }
