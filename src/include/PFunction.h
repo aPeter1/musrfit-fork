@@ -70,6 +70,7 @@
 #define FUN_LN    13
 #define FUN_EXP   14
 #define FUN_SQRT  15
+#define FUN_POW   16
 
 //----------------------------------------------------------------------------
 typedef struct func_tree_node {

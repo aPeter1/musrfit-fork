@@ -258,6 +258,26 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     node.children.push_back(child);
     // i: '(', 'expression', ')'
     FillFuncEvalTree(i->children.begin()+1, node.children[0]);
+  } else if (i->value.id() == PFunctionGrammar::powerID) {
+    // keep the id
+    node.fID = PFunctionGrammar::powerID;
+    // keep function tag
+    str =  string(i->value.begin(), i->value.end()); // get string
+
+    if (!strcmp(str.c_str(), "POW"))
+      node.fFunctionTag = FUN_POW;
+    else {
+      cerr << endl << "**PANIC ERROR**: function " << str << " doesn't exist, but you never should have reached this point!";
+      cerr << endl;
+      assert(0);
+    }
+    // i: '(', 'expression', ',', expression, ')'
+    // add node
+    node.children.push_back(child);
+    FillFuncEvalTree(i->children.begin()+1, node.children[0]); // base
+    // add node
+    node.children.push_back(child);
+    FillFuncEvalTree(i->children.begin()+3, node.children[1]); // exponent
   } else if (i->value.id() == PFunctionGrammar::factorID) {
 // cout << endl << ">> factorID";
     // keep the id
@@ -273,12 +293,6 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
       node.fOperatorTag = OP_MUL;
     else
       node.fOperatorTag = OP_DIV;
-/*
-if (node.fOperatorTag == OP_MUL)
- cout << endl << ">> termID: value = *";
-else
- cout << endl << ">> termID: value = /";
-*/
     // add child lhs
     node.children.push_back(child);
     FillFuncEvalTree(i->children.begin(), node.children[0]);
@@ -293,12 +307,6 @@ else
       node.fOperatorTag = OP_ADD;
     else
       node.fOperatorTag = OP_SUB;
-/*
-if (node.fOperatorTag == OP_ADD)
- cout << endl << ">> expressionID: value = +";
-else
- cout << endl << ">> expressionID: value = -";
-*/
     // add child lhs
     node.children.push_back(child);
     FillFuncEvalTree(i->children.begin(), node.children[0]);
@@ -356,6 +364,11 @@ Bool_t PFunction::FindAndCheckMapAndParamRange(PFuncTreeNode &node, UInt_t mapSi
       return false;
   } else if (node.fID == PFunctionGrammar::functionID) {
     return FindAndCheckMapAndParamRange(node.children[0], mapSize, paramSize);
+  } else if (node.fID == PFunctionGrammar::powerID) {
+    if (FindAndCheckMapAndParamRange(node.children[0], mapSize, paramSize))
+      return FindAndCheckMapAndParamRange(node.children[1], mapSize, paramSize);
+    else
+      return false;
   } else if (node.fID == PFunctionGrammar::factorID) {
     return FindAndCheckMapAndParamRange(node.children[0], mapSize, paramSize);
   } else if (node.fID == PFunctionGrammar::termID) {
@@ -369,7 +382,8 @@ Bool_t PFunction::FindAndCheckMapAndParamRange(PFuncTreeNode &node, UInt_t mapSi
     else
       return false;
   } else {
-    cerr << endl << "**PANIC ERROR**: PFunction::FindAndCheckMapAndParamRange: you never should have reached this point!";
+    cerr << endl << ">> **PANIC ERROR**: PFunction::FindAndCheckMapAndParamRange: you never should have reached this point!";
+    cerr << endl << ">> node.fID = " << node.fID;
     cerr << endl;
     assert(0);
   }
@@ -453,6 +467,14 @@ Double_t PFunction::EvalNode(PFuncTreeNode &node)
       return sqrt(EvalNode(node.children[0]));
     } else {
       cerr << endl << "**PANIC ERROR**: PFunction::EvalNode: node.fID == PFunctionGrammar::functionID: you never should have reached this point!";
+      cerr << endl;
+      assert(0);
+    }
+  } else if (node.fID == PFunctionGrammar::powerID) {
+    if (node.fFunctionTag == FUN_POW) {
+      return pow(EvalNode(node.children[0]), EvalNode(node.children[1]));
+    } else {
+      cerr << endl << "**PANIC ERROR**: PFunction::EvalNode: node.fID == PFunctionGrammar::powerID: you never should have reached this point!";
       cerr << endl;
       assert(0);
     }
@@ -568,6 +590,15 @@ void PFunction::EvalTreeForStringExpression(iter_t const& i)
     fFuncString += "(";
     // '(', expression, ')'
     EvalTreeForStringExpression(i->children.begin()+1); // the real stuff
+    fFuncString += ")";
+  } else if (i->value.id() == PFunctionGrammar::powerID) {
+    assert(i->children.size() == 5);
+    fFuncString += string(i->value.begin(), i->value.end()).c_str(); // keep function name
+    fFuncString += "(";
+    // '(', expression, ',' expression, ')'
+    EvalTreeForStringExpression(i->children.begin()+1); // base expression
+    fFuncString += ",";
+    EvalTreeForStringExpression(i->children.begin()+3); // exponent expression
     fFuncString += ")";
   } else if (i->value.id() == PFunctionGrammar::factorID) {
     EvalTreeForStringExpression(i->children.begin());

@@ -66,10 +66,11 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
     static const int parameterID    = 5;
     static const int mapID          = 6;
     static const int functionID     = 7;
-    static const int factorID       = 8;
-    static const int termID         = 9;
-    static const int expressionID   = 10;
-    static const int assignmentID   = 11;
+    static const int powerID        = 8;
+    static const int factorID       = 9;
+    static const int termID         = 10;
+    static const int expressionID   = 11;
+    static const int assignmentID   = 12;
 
     template <typename ScannerT>
     struct definition
@@ -108,12 +109,16 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
                            |   lexeme_d[ root_node_d[ str_p("SQRT")  ] >> ch_p('(') ] >> expression >> ch_p(')')
                            ;
 
+            power          =   lexeme_d[ root_node_d[ str_p("POW")   ] >> ch_p('(') ] >> expression >> ch_p(',') >> expression >> ch_p(')')
+                           ;
+
             factor         =   real
                            |   const_pi
                            |   const_gamma_mu
                            |   parameter
                            |   map
                            |   function
+                           |   power
                            |   inner_node_d[ch_p('(') >> expression >> ch_p(')')]
                            ;
 
@@ -138,6 +143,7 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
             BOOST_SPIRIT_DEBUG_RULE(parameter);
             BOOST_SPIRIT_DEBUG_RULE(map);
             BOOST_SPIRIT_DEBUG_RULE(function);
+            BOOST_SPIRIT_DEBUG_RULE(power);
             BOOST_SPIRIT_DEBUG_RULE(factor);
             BOOST_SPIRIT_DEBUG_RULE(term);
             BOOST_SPIRIT_DEBUG_RULE(expression);
@@ -149,6 +155,7 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
         rule<ScannerT, parser_context<>, parser_tag<termID> >         term;
         rule<ScannerT, parser_context<>, parser_tag<factorID> >       factor;
         rule<ScannerT, parser_context<>, parser_tag<functionID> >     function;
+        rule<ScannerT, parser_context<>, parser_tag<powerID> >        power;
         rule<ScannerT, parser_context<>, parser_tag<mapID> >          map;
         rule<ScannerT, parser_context<>, parser_tag<parameterID> >    parameter;
         rule<ScannerT, parser_context<>, parser_tag<funLabelID> >     fun_label;
