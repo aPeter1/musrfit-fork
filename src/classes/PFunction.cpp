@@ -458,13 +458,13 @@ Double_t PFunction::EvalNode(PFuncTreeNode &node)
     } else if (node.fFunctionTag == FUN_ATANH) {
       return atanh(EvalNode(node.children[0]));
     } else if (node.fFunctionTag == FUN_LOG) {
-      return log(EvalNode(node.children[0]))/log(10.0);
+      return log(fabs(EvalNode(node.children[0])))/log(10.0);
     } else if (node.fFunctionTag == FUN_LN) {
-      return log(EvalNode(node.children[0]));
+      return log(fabs(EvalNode(node.children[0])));
     } else if (node.fFunctionTag == FUN_EXP) {
       return exp(EvalNode(node.children[0]));
     } else if (node.fFunctionTag == FUN_SQRT) {
-      return sqrt(EvalNode(node.children[0]));
+      return sqrt(fabs(EvalNode(node.children[0])));
     } else {
       cerr << endl << "**PANIC ERROR**: PFunction::EvalNode: node.fID == PFunctionGrammar::functionID: you never should have reached this point!";
       cerr << endl;
