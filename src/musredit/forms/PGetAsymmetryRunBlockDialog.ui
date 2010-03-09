@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>446</width>
-    <height>503</height>
+    <width>462</width>
+    <height>506</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
   <widget class="QGroupBox" name="fRunHeaderInfo_groupBox">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>10</x>
      <y>0</y>
      <width>441</width>
      <height>121</height>
@@ -193,7 +193,7 @@
   <widget class="QGroupBox" name="fRequiredEntries_groupBox">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>10</x>
      <y>120</y>
      <width>441</width>
      <height>241</height>
@@ -495,7 +495,7 @@
   <widget class="QGroupBox" name="fOptionalEntries_groupBox">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>10</x>
      <y>360</y>
      <width>441</width>
      <height>91</height>
@@ -593,10 +593,10 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>10</x>
      <y>460</y>
      <width>441</width>
-     <height>36</height>
+     <height>39</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">

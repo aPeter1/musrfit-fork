@@ -39,7 +39,7 @@ class PGetParameterBlockDialog : public QDialog, private Ui::PGetParameterBlockD
   Q_OBJECT
 
   public:
-    PGetParameterBlockDialog();
+    PGetParameterBlockDialog(const QString helpUrl);
 
     QString getParams() { return fParam_plainTextEdit->toPlainText(); }
 
@@ -49,6 +49,9 @@ class PGetParameterBlockDialog : public QDialog, private Ui::PGetParameterBlockD
   private slots:
     void paramAdd();
     void helpContent();
+
+  private:
+    QString fHelpUrl;
 };
 
 #endif // _PGETPARAMETERBLOCKDIALOG_H_

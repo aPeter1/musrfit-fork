@@ -31,14 +31,14 @@
 
 #include <QMessageBox>
 
-#include "PGetTitleBlockDialog.h"
 #include "PHelp.h"
+#include "PGetTitleBlockDialog.h"
 
 //---------------------------------------------------------------------------
 /**
  * <p>
  */
-PGetTitleBlockDialog::PGetTitleBlockDialog(QWidget *parent, Qt::WindowFlags f) : QDialog(parent, f)
+PGetTitleBlockDialog::PGetTitleBlockDialog(const QString helpUrl) : fHelpUrl(helpUrl)
 {
   setupUi(this);
 
@@ -51,8 +51,12 @@ PGetTitleBlockDialog::PGetTitleBlockDialog(QWidget *parent, Qt::WindowFlags f) :
  */
 void PGetTitleBlockDialog::helpContent()
 {
-  PHelp *help = new PHelp("http://lmu.web.psi.ch/musrfit/title.html");
-  //help->show();
+  if (fHelpUrl.isEmpty()) {
+    QMessageBox::information(this, "**INFO**", "Will eventually show a help window");
+  } else {
+    PHelp *help = new PHelp(fHelpUrl);
+    help->show();
+  }
 }
 
 //---------------------------------------------------------------------------

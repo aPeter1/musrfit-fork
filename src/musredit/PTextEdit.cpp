@@ -61,6 +61,7 @@ using namespace std;
 #include <QtDebug>
 
 #include "PTextEdit.h"
+#include "PHelp.h"
 #include "PSubTextEdit.h"
 #include "PAdmin.h"
 #include "PFindDialog.h"
@@ -2097,9 +2098,9 @@ void PTextEdit::musrSwapMsrMlog()
  */
 void PTextEdit::helpContents()
 {
-  QMessageBox::information( this, "helpContents",
-                            fAdmin->getHelpMain(),
-                            QMessageBox::Ok );
+  PHelp *help = new PHelp("https://wiki.intranet.psi.ch/MUSR/WebHome");
+
+  help->show();
 }
 
 //----------------------------------------------------------------------------------------------------

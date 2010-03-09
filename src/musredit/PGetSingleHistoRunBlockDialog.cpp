@@ -35,18 +35,15 @@
 #include <QCheckBox>
 #include <QMessageBox>
 
+#include "PHelp.h"
 #include "PGetSingleHistoRunBlockDialog.h"
 
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>
  */
-PGetSingleHistoRunBlockDialog::PGetSingleHistoRunBlockDialog(const QString help,
-                                                             const bool lifetimeCorrection,
-                                                             QWidget * parent,
-                                                             Qt::WindowFlags f) :
-              QDialog(parent, f),
-              fHelp(help)
+PGetSingleHistoRunBlockDialog::PGetSingleHistoRunBlockDialog(const QString helpUrl,
+                                                             const bool lifetimeCorrection) : fHelpUrl(helpUrl)
 {
   setupUi(this);
 
@@ -262,8 +259,12 @@ QString PGetSingleHistoRunBlockDialog::getLifetimeCorrection(bool &present)
  */
 void PGetSingleHistoRunBlockDialog::helpContent()
 {
-  QMessageBox::information(this, "helpContents",
-                            fHelp, QMessageBox::Ok);
+  if (fHelpUrl.isEmpty()) {
+    QMessageBox::information(this, "**INFO**", "Will eventually show a help window");
+  } else {
+    PHelp *help = new PHelp(fHelpUrl);
+    help->show();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

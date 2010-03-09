@@ -36,13 +36,15 @@
 #include <QPushButton>
 #include <QMessageBox>
 
+#include "PHelp.h"
+
 #include "PGetFourierBlockDialog.h"
 
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>
  */
-PGetFourierBlockDialog::PGetFourierBlockDialog()
+PGetFourierBlockDialog::PGetFourierBlockDialog(const QString helpUrl) : fHelpUrl(helpUrl)
 {
   setupUi(this);
 
@@ -127,7 +129,12 @@ void PGetFourierBlockDialog::fillFourierBlock()
  */
 void PGetFourierBlockDialog::helpContent()
 {
-  QMessageBox::information(this, "**HELP**", "Will eventually show a help.");
+  if (fHelpUrl.isEmpty()) {
+    QMessageBox::information(this, "**INFO**", "Will eventually show a help window");
+  } else {
+    PHelp *help = new PHelp(fHelpUrl);
+    help->show();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

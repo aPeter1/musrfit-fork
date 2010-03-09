@@ -37,13 +37,14 @@
 #include <QPushButton>
 #include <QEvent>
 
+#include "PHelp.h"
 #include "PGetParameterBlockDialog.h"
 
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>
  */
-PGetParameterBlockDialog::PGetParameterBlockDialog()
+PGetParameterBlockDialog::PGetParameterBlockDialog(const QString helpUrl) : fHelpUrl(helpUrl)
 {
   setupUi(this);
 
@@ -212,7 +213,12 @@ void PGetParameterBlockDialog::paramAdd()
  */
 void PGetParameterBlockDialog::helpContent()
 {
-  QMessageBox::information(this, "**INFO**", "Will eventually show a help window");
+  if (fHelpUrl.isEmpty()) {
+    QMessageBox::information(this, "**INFO**", "Will eventually show a help window");
+  } else {
+    PHelp *help = new PHelp(fHelpUrl);
+    help->show();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

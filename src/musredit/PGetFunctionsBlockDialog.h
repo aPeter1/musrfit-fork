@@ -39,7 +39,7 @@ class PGetFunctionsBlockDialog : public QDialog, private Ui::PGetFunctionsBlockD
   Q_OBJECT
 
   public:
-    PGetFunctionsBlockDialog(const QString help = "", QWidget * parent = 0, Qt::WindowFlags f = 0);
+    PGetFunctionsBlockDialog(const QString helpUrl = "");
 
     QString getFunctionsBlock() { return fFunctionBlock_plainTextEdit->toPlainText(); }
 
@@ -48,7 +48,7 @@ class PGetFunctionsBlockDialog : public QDialog, private Ui::PGetFunctionsBlockD
     void helpContent();
 
   private:
-    QString fHelp;
+    QString fHelpUrl;
 };
 
 #endif // _PGETFUNCTIONSBLOCKDIALOG_H_

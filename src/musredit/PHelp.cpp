@@ -29,7 +29,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <QMessageBox>
+#include <QtGui>
+#include <QtWebKit>
 
 #include "PHelp.h"
 
@@ -39,8 +40,33 @@
  */
 PHelp::PHelp(const QString &url)
 {
-  QString str = "Will eventually show the url:\n" + url;
-  QMessageBox::information(this, "**HELP**", str);
+  fProgress = 0;
+
+  QNetworkProxyFactory::setUseSystemConfiguration(true);
+
+  fView = new QWebView(this);
+  fView->load(QUrl(url));
+  connect(fView, SIGNAL(loadFinished(bool)), SLOT(adjustLocation()));
+  connect(fView, SIGNAL(titleChanged(QString)), SLOT(adjustTitle()));
+  connect(fView, SIGNAL(loadProgress(int)), SLOT(setProgress(int)));
+  connect(fView, SIGNAL(loadFinished(bool)), SLOT(finishLoading(bool)));
+
+  fLocationEdit = new QLineEdit(this);
+  fLocationEdit->setSizePolicy(QSizePolicy::Expanding, fLocationEdit->sizePolicy().verticalPolicy());
+  connect(fLocationEdit, SIGNAL(returnPressed()), SLOT(changeLocation()));
+
+  QToolBar *toolBar = addToolBar(tr("Navigation"));
+  toolBar->addAction(fView->pageAction(QWebPage::Back));
+  toolBar->addAction(fView->pageAction(QWebPage::Forward));
+  toolBar->addAction(fView->pageAction(QWebPage::Reload));
+  toolBar->addAction(fView->pageAction(QWebPage::Stop));
+  toolBar->addWidget(fLocationEdit);
+
+  QMenu *exitMenu = menuBar()->addMenu(tr("&File"));
+  exitMenu->addAction("&Exit", this, SLOT(done()), QKeySequence(tr("Ctrl+Q")));
+
+  setCentralWidget(fView);
+  setUnifiedTitleAndToolBarOnMac(true);
 }
 
 //---------------------------------------------------------------------------
@@ -49,6 +75,76 @@ PHelp::PHelp(const QString &url)
  */
 PHelp::~PHelp()
 {
+  if (fView) {
+    delete fView;
+    fView = 0;
+  }
+
+  if (fLocationEdit) {
+    delete fLocationEdit;
+    fLocationEdit = 0;
+  }
+}
+
+//---------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PHelp::done()
+{
+  close();
+}
+
+//---------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PHelp::adjustLocation()
+{
+  fLocationEdit->setText(fView->url().toString());
+}
+
+//---------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PHelp::changeLocation()
+{
+  QUrl url = QUrl(fLocationEdit->text());
+  fView->load(url);
+  fView->setFocus();
+}
+
+//---------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PHelp::adjustTitle()
+{
+  if (fProgress <= 0 || fProgress >= 100)
+    setWindowTitle(fView->title());
+  else
+    setWindowTitle(QString("%1 (%2%)").arg(fView->title()).arg(fProgress));
+}
+
+//---------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PHelp::setProgress(int p)
+{
+  fProgress = p;
+  adjustTitle();
+}
+
+//---------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PHelp::finishLoading(bool)
+{
+  fProgress = 100;
+  adjustTitle();
 }
 
 //---------------------------------------------------------------------------

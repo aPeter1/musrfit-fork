@@ -34,15 +34,16 @@
 #include <QComboBox>
 #include <QMessageBox>
 
+#include "PHelp.h"
+
 #include "PGetAsymmetryRunBlockDialog.h"
+
 
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>
  */
-PGetAsymmetryRunBlockDialog::PGetAsymmetryRunBlockDialog(const QString help, QWidget *parent, Qt::WindowFlags f) :
-                                                         QDialog(parent, f),
-                                                         fHelp(help)
+PGetAsymmetryRunBlockDialog::PGetAsymmetryRunBlockDialog(const QString helpUrl) : fHelpUrl(helpUrl)
 {
   setupUi(this);
 
@@ -261,8 +262,12 @@ QString PGetAsymmetryRunBlockDialog::getPacking(bool &present)
  */
 void PGetAsymmetryRunBlockDialog::helpContent()
 {
-  QMessageBox::information(this, "helpContents",
-                            fHelp, QMessageBox::Ok);
+  if (fHelpUrl.isEmpty()) {
+    QMessageBox::information(this, "**INFO**", "Will eventually show a help window");
+  } else {
+    PHelp *help = new PHelp(fHelpUrl);
+    help->show();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

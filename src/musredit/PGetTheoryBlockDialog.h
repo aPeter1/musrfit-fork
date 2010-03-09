@@ -40,7 +40,7 @@ class PGetTheoryBlockDialog : public QDialog, private Ui::PGetTheoryBlockDialog
   Q_OBJECT
 
   public:
-    PGetTheoryBlockDialog(PAdmin *admin = 0, QWidget * parent = 0, Qt::WindowFlags f = 0);
+    PGetTheoryBlockDialog(PAdmin *admin = 0, const QString helpUrl = "");
 
     QString getTheoryBlock() { return fTheoryBlock_plainTextEdit->toPlainText(); }
 
@@ -52,6 +52,7 @@ class PGetTheoryBlockDialog : public QDialog, private Ui::PGetTheoryBlockDialog
 
   private:
     PAdmin *fAdmin;
+    QString fHelpUrl;
 };
 
 #endif // _PGETTHEORYBLOCKDIALOG_H_

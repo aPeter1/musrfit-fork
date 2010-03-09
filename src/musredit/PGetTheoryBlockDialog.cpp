@@ -37,30 +37,32 @@
 
 #include <QtDebug>
 
+#include "PHelp.h"
 #include "PGetTheoryBlockDialog.h"
 
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>
  */
-PGetTheoryBlockDialog::PGetTheoryBlockDialog(PAdmin *admin, QWidget * parent, Qt::WindowFlags f) :
-              QDialog(parent, f),
-              fAdmin(admin)
+PGetTheoryBlockDialog::PGetTheoryBlockDialog(PAdmin *admin, const QString helpUrl) :
+              fAdmin(admin),
+              fHelpUrl(helpUrl)
 {
   setupUi(this);
 
   setModal(true);
 
   // feed theory function combo box
+  fTheoryFunction_comboBox->setIconSize(QSize(250, 20));
   PTheory *theoItem;
-  QIcon icon;
+  QIcon *icon;
   QString iconName;
   for (unsigned int i=0; i<fAdmin->getTheoryCounts();  i++) {
     theoItem = fAdmin->getTheoryItem(i);
     if (theoItem->pixmapName.length() > 0) {
-      iconName = QString(":/latex_images/") + theoItem->pixmapName;
-      icon.addPixmap(QPixmap(iconName));
-      fTheoryFunction_comboBox->insertItem(i, icon, theoItem->label);
+      iconName = QString(":/latex_images/") + theoItem->pixmapName;      
+      icon = new QIcon(QPixmap(iconName));
+      fTheoryFunction_comboBox->insertItem(i, *icon, theoItem->label);
     } else {
       fTheoryFunction_comboBox->insertItem(i, theoItem->label);
     }
@@ -120,8 +122,12 @@ void PGetTheoryBlockDialog::addMultiply()
  */
 void PGetTheoryBlockDialog::helpContent()
 {
-  QMessageBox::information(this, "helpContents",
-                           fAdmin->getHelpMain(), QMessageBox::Ok);
+  if (fHelpUrl.isEmpty()) {
+    QMessageBox::information(this, "**INFO**", "Will eventually show a help window");
+  } else {
+    PHelp *help = new PHelp(fHelpUrl);
+    help->show();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

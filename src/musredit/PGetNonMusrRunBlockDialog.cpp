@@ -34,15 +34,14 @@
 #include <QComboBox>
 #include <QMessageBox>
 
+#include "PHelp.h"
 #include "PGetNonMusrRunBlockDialog.h"
 
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>
  */
-PGetNonMusrRunBlockDialog::PGetNonMusrRunBlockDialog(const QString help, QWidget *parent, Qt::WindowFlags f) :
-                                                     QDialog(parent, f),
-                                                     fHelp(help)
+PGetNonMusrRunBlockDialog::PGetNonMusrRunBlockDialog(const QString helpUrl) : fHelpUrl(helpUrl)
 {
   setupUi(this);
 
@@ -147,8 +146,12 @@ QString PGetNonMusrRunBlockDialog::getFitRange(bool &valid)
  */
 void PGetNonMusrRunBlockDialog::helpContent()
 {
-  QMessageBox::information(this, "helpContent",
-                            fHelp, QMessageBox::Ok);
+  if (fHelpUrl.isEmpty()) {
+    QMessageBox::information(this, "**INFO**", "Will eventually show a help window");
+  } else {
+    PHelp *help = new PHelp(fHelpUrl);
+    help->show();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

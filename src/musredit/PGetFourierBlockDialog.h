@@ -41,7 +41,7 @@ class PGetFourierBlockDialog : public QDialog, private Ui::PGetFourierBlockDialo
   Q_OBJECT
 
   public:
-    PGetFourierBlockDialog();
+    PGetFourierBlockDialog(const QString helpUrl);
 
     QString getFourierBlock() { return fFourierBlock; }
 
@@ -52,6 +52,7 @@ class PGetFourierBlockDialog : public QDialog, private Ui::PGetFourierBlockDialo
 
   private:
     QString fFourierBlock;
+    QString fHelpUrl;
 };
 
 #endif // _PGETFOURIERBLOCKDIALOG_H_

@@ -39,7 +39,7 @@ class PGetNonMusrRunBlockDialog : public QDialog, private Ui::PGetNonMusrRunBloc
   Q_OBJECT
 
   public:
-    PGetNonMusrRunBlockDialog(const QString help = "", QWidget * parent = 0, Qt::WindowFlags f = 0);
+    PGetNonMusrRunBlockDialog(const QString helpUrl = "");
 
     QString getRunHeaderInfo();
     QString getMap(bool &valid);
@@ -50,7 +50,7 @@ class PGetNonMusrRunBlockDialog : public QDialog, private Ui::PGetNonMusrRunBloc
     void helpContent();
 
   private:
-    QString fHelp;
+    QString fHelpUrl;
 };
 
 #endif // _PGETNONMUSRRUNBLOCKDIALOG_H_

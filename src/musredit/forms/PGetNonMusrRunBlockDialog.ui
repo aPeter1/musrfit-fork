@@ -2,12 +2,15 @@
 <ui version="4.0">
  <class>PGetNonMusrRunBlockDialog</class>
  <widget class="QDialog" name="PGetNonMusrRunBlockDialog">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>402</width>
-    <height>300</height>
+    <width>419</width>
+    <height>307</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +23,7 @@
   <widget class="QGroupBox" name="fRunHeaderInfo_groupBox">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>10</x>
      <y>0</y>
      <width>401</width>
      <height>131</height>
@@ -199,7 +202,7 @@
   <widget class="QGroupBox" name="fReqiredEntries_groupBox">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>10</x>
      <y>130</y>
      <width>401</width>
      <height>131</height>
@@ -347,7 +350,7 @@
     <rect>
      <x>10</x>
      <y>270</y>
-     <width>381</width>
+     <width>401</width>
      <height>27</height>
     </rect>
    </property>

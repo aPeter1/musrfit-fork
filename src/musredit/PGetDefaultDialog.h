@@ -44,7 +44,7 @@ class PGetDefaultDialog : public QDialog, private Ui::PGetDefaultDialog
   Q_OBJECT
 
   public:
-    PGetDefaultDialog(QWidget *parent = 0, Qt::WindowFlags f = 0);
+    PGetDefaultDialog();
     virtual ~PGetDefaultDialog() {}
 
     virtual const QString getRunFileName() const { return fRunFileName_lineEdit->text(); }

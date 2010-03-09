@@ -42,8 +42,7 @@ class PGetSingleHistoRunBlockDialog : public QDialog, private Ui::PGetSingleHist
   Q_OBJECT
 
   public:
-    PGetSingleHistoRunBlockDialog(const QString help = "", const bool lifetimeCorrection = true,
-                                  QWidget * parent = 0, Qt::WindowFlags f = 0);
+    PGetSingleHistoRunBlockDialog(const QString helpUrl = "", const bool lifetimeCorrection = true);
 
     QString getRunHeaderInfo();
     QString getMap(bool &valid);
@@ -61,7 +60,7 @@ class PGetSingleHistoRunBlockDialog : public QDialog, private Ui::PGetSingleHist
     void helpContent();
 
   private:
-    QString fHelp;
+    QString fHelpUrl;
 };
 
 #endif // _PGETSINGLEHISTORUNBLOCKDIALOG_H_

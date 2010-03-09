@@ -32,16 +32,33 @@
 #ifndef _PHELP_H_
 #define _PHELP_H_
 
-#include <QDialog>
-#include <QString>
+#include <QtGui>
 
-class PHelp : public QDialog
+class QWebView;
+QT_BEGIN_NAMESPACE
+class QLineEdit;
+QT_END_NAMESPACE
+
+class PHelp : public QMainWindow
 {
   Q_OBJECT
 
   public:
     PHelp(const QString &url);
     virtual ~PHelp();
+
+  protected slots:
+    void done();
+    void adjustLocation();
+    void changeLocation();
+    void adjustTitle();
+    void setProgress(int p);
+    void finishLoading(bool);
+
+  private:
+    QWebView *fView;
+    QLineEdit *fLocationEdit;
+    int fProgress;
 };
 
 #endif // _PHELP_H_

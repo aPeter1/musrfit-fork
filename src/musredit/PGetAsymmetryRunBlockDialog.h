@@ -39,7 +39,7 @@ class PGetAsymmetryRunBlockDialog : public QDialog, private Ui::PGetAsymmetryRun
   Q_OBJECT
 
   public:
-    PGetAsymmetryRunBlockDialog(const QString help = "", QWidget * parent = 0, Qt::WindowFlags f = 0);
+    PGetAsymmetryRunBlockDialog(const QString helpUrl);
 
     QString getRunHeaderInfo();
     QString getAlphaParameter(bool &present);
@@ -53,11 +53,11 @@ class PGetAsymmetryRunBlockDialog : public QDialog, private Ui::PGetAsymmetryRun
     QString getFitRange(bool &valid);
     QString getPacking(bool &present);
 
- private slots:
+  private slots:
     void helpContent();
 
   private:
-    QString fHelp;
+    QString fHelpUrl;
 };
 
 #endif // _PGETASYMMETRYRUNBLOCKDIALOG_H_

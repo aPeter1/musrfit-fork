@@ -40,7 +40,7 @@ class PGetTitleBlockDialog : public QDialog, private Ui::PGetTitleBlockDialog
   Q_OBJECT
 
   public:
-    PGetTitleBlockDialog(QWidget *parent = 0, Qt::WindowFlags f = 0);
+    PGetTitleBlockDialog(const QString helpUrl);
     virtual ~PGetTitleBlockDialog() {}
 
     QString getTitle() { return fTitle_lineEdit->text(); }
@@ -48,6 +48,8 @@ class PGetTitleBlockDialog : public QDialog, private Ui::PGetTitleBlockDialog
   private slots:
     void helpContent();
 
+  private:
+    QString fHelpUrl;
 };
 
 #endif // _PGETTITLEBLOCKDIALOG_H_

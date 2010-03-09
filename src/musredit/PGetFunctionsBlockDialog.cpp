@@ -37,14 +37,15 @@
 
 #include <QtDebug>
 
+#include "PHelp.h"
+
 #include "PGetFunctionsBlockDialog.h"
 
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>
  */
-PGetFunctionsBlockDialog::PGetFunctionsBlockDialog(const QString help, QWidget *parent, Qt::WindowFlags f) :
-                                                   QDialog(parent, f), fHelp(help)
+PGetFunctionsBlockDialog::PGetFunctionsBlockDialog(const QString helpUrl) : fHelpUrl(helpUrl)
 {
   setupUi(this);
 
@@ -103,8 +104,12 @@ void PGetFunctionsBlockDialog::addFunction()
  */
 void PGetFunctionsBlockDialog::helpContent()
 {
-  QMessageBox::information(this, "helpContents",
-                            fHelp, QMessageBox::Ok);
+  if (fHelpUrl.isEmpty()) {
+    QMessageBox::information(this, "**INFO**", "Will eventually show a help window");
+  } else {
+    PHelp *help = new PHelp(fHelpUrl);
+    help->show();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

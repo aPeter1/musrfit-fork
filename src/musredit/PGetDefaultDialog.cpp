@@ -33,6 +33,8 @@
 #include <QComboBox>
 #include <QMessageBox>
 
+#include "PHelp.h"
+
 #include "PGetDefaultDialog.h"
 
 #define INSTITUTE_PSI    0
@@ -54,8 +56,7 @@
 /**
  * <p>
  */
-PGetDefaultDialog::PGetDefaultDialog(QWidget *parent, Qt::WindowFlags f) :
-                      QDialog(parent, f)
+PGetDefaultDialog::PGetDefaultDialog()
 {
   setupUi(this);
 
@@ -100,7 +101,9 @@ void PGetDefaultDialog::setFileFormat(const QString &str)
  */
 void PGetDefaultDialog::helpContent()
 {
-  QMessageBox::information(this, "Help", "will eventually show help information.");
+  PHelp *help = new PHelp("https://wiki.intranet.psi.ch/MUSR/MusrFit#4_5_The_RUN_Block");
+
+  help->show();
 }
 
 //---------------------------------------------------------------------------

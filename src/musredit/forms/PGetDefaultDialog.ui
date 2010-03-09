@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>PGetDefaultDialog</class>
  <widget class="QDialog" name="PGetDefaultDialog">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,7 +26,7 @@
      <x>10</x>
      <y>130</y>
      <width>381</width>
-     <height>25</height>
+     <height>27</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -66,13 +69,13 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>381</width>
-     <height>22</height>
+     <x>12</x>
+     <y>12</y>
+     <width>84</width>
+     <height>111</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QLabel" name="fRunFileName_label">
       <property name="text">
@@ -80,21 +83,6 @@
       </property>
      </widget>
     </item>
-    <item>
-     <widget class="QLineEdit" name="fRunFileName_lineEdit"/>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>40</y>
-     <width>381</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_3">
     <item>
      <widget class="QLabel" name="fBeamline_label">
       <property name="minimumSize">
@@ -109,21 +97,6 @@
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="fBeamline_lineEdit"/>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>70</y>
-     <width>156</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_4">
-    <item>
      <widget class="QLabel" name="fInstitute_label">
       <property name="minimumSize">
        <size>
@@ -135,6 +108,37 @@
        <string>Institute</string>
       </property>
      </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="fFileFormat_label">
+      <property name="minimumSize">
+       <size>
+        <width>68</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>File Format</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>99</x>
+     <y>12</y>
+     <width>291</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="QLineEdit" name="fRunFileName_lineEdit"/>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="fBeamline_lineEdit"/>
     </item>
     <item>
      <widget class="QComboBox" name="fInstitute_comboBox">
@@ -164,31 +168,6 @@
         <string>JPARC</string>
        </property>
       </item>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>100</y>
-     <width>156</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_5">
-    <item>
-     <widget class="QLabel" name="fFileFormat_label">
-      <property name="minimumSize">
-       <size>
-        <width>68</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>File Format</string>
-      </property>
      </widget>
     </item>
     <item>

@@ -31,6 +31,8 @@ CONFIG += qt \
     debug
 
 QT += xml
+QT += webkit 
+QT += network
 
 HEADERS = musredit.h \
     PHelp.h \

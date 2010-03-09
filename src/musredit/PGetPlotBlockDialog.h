@@ -39,7 +39,7 @@ class PGetPlotBlockDialog : public QDialog, private Ui::PGetPlotBlockDialog
   Q_OBJECT
 
   public:
-    PGetPlotBlockDialog();
+    PGetPlotBlockDialog(const QString helpUrl);
 
     QString getPlotBlock() { return fPlot_plainTextEdit->toPlainText(); }
 
@@ -49,6 +49,9 @@ class PGetPlotBlockDialog : public QDialog, private Ui::PGetPlotBlockDialog
 
   protected:
     bool eventFilter( QObject *obj, QEvent *ev );
+
+  private:
+    QString fHelpUrl;
 };
 
 #endif // _PGETPLOTBLOCKDIALOG_H_

@@ -36,13 +36,14 @@
 #include <QTextEdit>
 #include <QComboBox>
 
+#include "PHelp.h"
 #include "PGetPlotBlockDialog.h"
 
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>
  */
-PGetPlotBlockDialog::PGetPlotBlockDialog()
+PGetPlotBlockDialog::PGetPlotBlockDialog(const QString helpUrl) : fHelpUrl(helpUrl)
 {
   setupUi(this);
 
@@ -155,8 +156,12 @@ void PGetPlotBlockDialog::addPlot()
  */
 void PGetPlotBlockDialog::helpContent()
 {
-  QMessageBox::information(this, "helpContents",
-                           "Will eventually show a help", QMessageBox::Ok);
+  if (fHelpUrl.isEmpty()) {
+    QMessageBox::information(this, "**INFO**", "Will eventually show a help window");
+  } else {
+    PHelp *help = new PHelp(fHelpUrl);
+    help->show();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

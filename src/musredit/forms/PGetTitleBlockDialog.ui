@@ -2,12 +2,15 @@
 <ui version="4.0">
  <class>PGetTitleBlockDialog</class>
  <widget class="QDialog" name="PGetTitleBlockDialog">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>555</width>
-    <height>84</height>
+    <width>556</width>
+    <height>90</height>
    </rect>
   </property>
   <property name="windowTitle">
