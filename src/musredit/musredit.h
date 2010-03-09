@@ -34,6 +34,12 @@
 
 #include <QString>
 
+//-------------------------------------------------------------------------------------------------
+/**
+ * <p> This structure is used in conjunction to <code>msr2data</code>. It stores the necessary
+ * parameters to handle <code>msr2data</code>. For a detailed description of the meaning of these
+ * parameters see <code>msr2data --help</code> and the online documentation.
+ */
 typedef struct {
   int firstRun;
   int lastRun;
@@ -54,6 +60,10 @@ typedef struct {
   bool fitOnly;
 } PMsr2DataParam;
 
+//-------------------------------------------------------------------------------------------------
+/**
+ * This structure is used to handle find (and replace) within <code>musredit</code> properly.
+ */
 typedef struct {
   QString findText;
   QString replaceText;

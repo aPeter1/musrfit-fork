@@ -37,17 +37,25 @@ using namespace std;
 #include "PTextEdit.h"
 #include "PFitOutputHandler.h"
 
+/**
+ * <p>musredit is a simple editor based interface to the musrfit programs. It is based on Qt 4.6
+ * of Nokia (<code>http://qt.nokia.com</code>).
+ *
+ * <p>musredit is open source LGPL and GPL (for detail license informations see <code>http://qt.nokia.com/products/licensing</code>).
+ *
+ * <p>The source code can be downloaded from <code>http://savannah.psi.ch/viewcvs/trunk/analysis/musrfit/src/musredit/?root=nemu%2Flem</code>.
+ */
 int main( int argc, char ** argv ) 
 {
   Q_INIT_RESOURCE(musredit);
 
   if (argc == 2) {
     if (!strcmp(argv[1], "--help") || !strcmp(argv[1], "-h")) {
-      cout << endl << "usage: musrgui [<msr-files>] | -h, --help | -v, --version";
+      cout << endl << "usage: musredit [<msr-files>] | -h, --help | -v, --version";
       cout << endl << endl;
       return 0;
     } else if (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-v")) {
-      cout << endl << "musrgui version: $Id$";
+      cout << endl << "musredit version: $Id$";
       cout << endl << endl;
       return 0;
     }
