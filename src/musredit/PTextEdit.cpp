@@ -1397,7 +1397,7 @@ void PTextEdit::musrGetAsymmetryDefault()
 {
   QString runFileName, beamline, institute, fileFormat;
 
-  PGetDefaultDialog *dlg = new PGetDefaultDialog();
+  PGetDefaultDialog *dlg = new PGetDefaultDialog(fAdmin->getHelpUrl("main"));
 
   if (dlg == 0) {
     QMessageBox::critical(this, "**ERROR**", "Couldn't invoke get default dialog, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
@@ -2098,7 +2098,7 @@ void PTextEdit::musrSwapMsrMlog()
  */
 void PTextEdit::helpContents()
 {
-  PHelp *help = new PHelp("https://wiki.intranet.psi.ch/MUSR/WebHome");
+  PHelp *help = new PHelp(fAdmin->getHelpUrl("main"));
 
   help->show();
 }

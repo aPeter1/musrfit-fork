@@ -56,7 +56,7 @@
 /**
  * <p>
  */
-PGetDefaultDialog::PGetDefaultDialog()
+PGetDefaultDialog::PGetDefaultDialog(const QString helpUrl) : fHelpUrl(helpUrl)
 {
   setupUi(this);
 
@@ -101,7 +101,7 @@ void PGetDefaultDialog::setFileFormat(const QString &str)
  */
 void PGetDefaultDialog::helpContent()
 {
-  PHelp *help = new PHelp("https://wiki.intranet.psi.ch/MUSR/MusrFit#4_5_The_RUN_Block");
+  PHelp *help = new PHelp(fHelpUrl);
 
   help->show();
 }

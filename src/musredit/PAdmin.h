@@ -34,6 +34,7 @@
 
 #include <QString>
 #include <QVector>
+#include <QMap>
 #include <QPixmap>
 #include <QtXml>
 
@@ -59,8 +60,9 @@ class PAdminXMLParser : public QXmlDefaultHandler
   private:
     enum EAdminKeyWords {eEmpty, eFontName, eFontSize, eExecPath, eDefaultSavePath, eTitleFromDataFile, eEnableMusrT0,
                          eBeamline, eInstitute, eFileFormat, eLifetimeCorrection, eMsrDefaultFilePath,
-                         eHelpMain, eTheoFuncPixmapPath, eFunc, eFuncName, eFuncComment, eFuncLabel,
-                         eFuncPixmap, eFuncParams};
+                         eTheoFuncPixmapPath, eFunc, eFuncName, eFuncComment, eFuncLabel,
+                         eFuncPixmap, eFuncParams, eHelpMain, eHelpTitle, eHelpParameters, eHelpTheory, eHelpFunctions,
+                         eHelpRun, eHelpCommand, eHelpFourier, eHelpPlot, eHelpStatistic};
 
     bool startDocument();
     bool startElement( const QString&, const QString&, const QString& ,
@@ -96,7 +98,7 @@ class PAdmin
     QString getFileFormat() { return fFileFormat; }
     bool    getLifetimeCorrectionFlag() { return fLifetimeCorrection; }
     QString getMsrDefaultFilePath() { return fMsrDefaultFilePath; }
-    QString getHelpMain() { return fHelpMain; }
+    QString getHelpUrl(QString tag);
     QString getTheoFuncPixmapPath() { return fTheoFuncPixmapPath; }
     unsigned int getTheoryCounts() { return fTheory.size(); }
     PTheory* getTheoryItem(const unsigned int idx);
@@ -114,7 +116,7 @@ class PAdmin
     void setFileFormat(const QString str) { fFileFormat = str; }
     void setLifetimeCorrectionFlag(const bool flag) { fLifetimeCorrection = flag; }
     void setMsrDefaultFilePath(const QString str) { fMsrDefaultFilePath = str; }
-    void setHelpMain(const QString str) { fHelpMain = str; }
+    void setHelpUrl(const QString tag, const QString url);
     void setTheoFuncPixmapPath (const QString str) { fTheoFuncPixmapPath = str; }
     void addTheoryItem(const PTheory theo) { fTheory.push_back(theo); }
 
@@ -137,7 +139,7 @@ class PAdmin
     QString fFileFormat;
     bool fLifetimeCorrection;
 
-    QString fHelpMain;
+    QMap<QString, QString> fHelpUrl; ///< maps tag to help url
 
     QVector<PTheory> fTheory;
 };

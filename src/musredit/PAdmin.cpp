@@ -91,8 +91,26 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eLifetimeCorrection;
   } else if (qName == "msr_default_file_path") {
     fKeyWord = eMsrDefaultFilePath;
-  } else if (qName == "help_main") {
+  } else if (qName == "musr_web_main") {
     fKeyWord = eHelpMain;
+  } else if (qName == "musr_web_title") {
+    fKeyWord = eHelpTitle;
+  } else if (qName == "musr_web_parameters") {
+    fKeyWord = eHelpParameters;
+  } else if (qName == "musr_web_theory") {
+    fKeyWord = eHelpTheory;
+  } else if (qName == "musr_web_functions") {
+    fKeyWord = eHelpFunctions;
+  } else if (qName == "musr_web_run") {
+    fKeyWord = eHelpRun;
+  } else if (qName == "musr_web_command") {
+    fKeyWord = eHelpCommand;
+  } else if (qName == "musr_web_fourier") {
+    fKeyWord = eHelpFourier;
+  } else if (qName == "musr_web_plot") {
+    fKeyWord = eHelpPlot;
+  } else if (qName == "musr_web_statistic") {
+    fKeyWord = eHelpStatistic;
   } else if (qName == "func_pixmap_path") {
     fKeyWord = eTheoFuncPixmapPath;
   } else if (qName == "func") {
@@ -124,6 +142,8 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
 /**
  * <p>Routine called when the end XML tag is found. It is used to
  * put the filtering tag to 'empty'.
+ *
+ * \param qName name of the element.
  */
 bool PAdminXMLParser::endElement( const QString&, const QString&, const QString &qName )
 {
@@ -141,6 +161,8 @@ bool PAdminXMLParser::endElement( const QString&, const QString&, const QString 
 /**
  * <p>This routine delivers the content of an XML tag. It fills the
  * content into the load data structure.
+ *
+ * \param str keeps the content of the XML tag.
  */
 bool PAdminXMLParser::characters(const QString& str)
 {
@@ -197,10 +219,34 @@ bool PAdminXMLParser::characters(const QString& str)
       fAdmin->setMsrDefaultFilePath(QString(str.toLatin1()).trimmed());
       break;
     case eHelpMain:
-      help = str;
-      help.replace("&gt;", ">");
-      help.replace("&lt;", "<");
-      fAdmin->setHelpMain(help);
+      fAdmin->setHelpUrl("main", str);
+      break;
+    case eHelpTitle:
+      fAdmin->setHelpUrl("title", str);
+      break;
+    case eHelpParameters:
+      fAdmin->setHelpUrl("parameters", str);
+      break;
+    case eHelpTheory:
+      fAdmin->setHelpUrl("theory", str);
+      break;
+    case eHelpFunctions:
+      fAdmin->setHelpUrl("functions", str);
+      break;
+    case eHelpRun:
+      fAdmin->setHelpUrl("run", str);
+      break;
+    case eHelpCommand:
+      fAdmin->setHelpUrl("command", str);
+      break;
+    case eHelpFourier:
+      fAdmin->setHelpUrl("fourier", str);
+      break;
+    case eHelpPlot:
+      fAdmin->setHelpUrl("plot", str);
+      break;
+    case eHelpStatistic:
+      fAdmin->setHelpUrl("statistic", str);
       break;
     case eTheoFuncPixmapPath:
       fAdmin->setTheoFuncPixmapPath(QString(str.toLatin1()).trimmed());
@@ -275,7 +321,9 @@ bool PAdminXMLParser::endDocument()
 
 //--------------------------------------------------------------------------
 /**
- * <p>Called at the end of the XML parse process.
+ * <p>Expands system variables to full path, e.g. $HOME -> \home\user
+ *
+ * \param str path string with none expanded system variables.
  */
 QString PAdminXMLParser::expandPath(const QString &str)
 {
@@ -310,7 +358,8 @@ QString PAdminXMLParser::expandPath(const QString &str)
 // implementation of PAdmin class
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Initializes that PAdmin object, and calls the XML parser which feeds
+ * the object variables.
  */
 PAdmin::PAdmin()
 {
@@ -325,8 +374,6 @@ PAdmin::PAdmin()
   fBeamline   = QString("");
   fInstitute  = QString("");
   fFileFormat = QString("");
-
-  fHelpMain   = QString("");
 
   fTitleFromDataFile  = false;
   fEnableMusrT0       = false;
@@ -358,8 +405,24 @@ PAdmin::PAdmin()
 //--------------------------------------------------------------------------
 // implementation of PAdmin class
 //--------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the help url corresponding the the tag.
+ *
+ * \param tag to map the help url. At the moment the following tags should be present:
+ * main, title, parameters, theory, functions, run, command, fourier, plot, statistic
+ */
+QString PAdmin::getHelpUrl(QString tag)
+{
+  return fHelpUrl[tag];
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>returns a theory item from position idx. If idx is out of the range, a null pointer is returned.
+ *
+ * \param idx position of the theory item.
  */
 PTheory* PAdmin::getTheoryItem(const unsigned int idx)
 {
@@ -367,6 +430,19 @@ PTheory* PAdmin::getTheoryItem(const unsigned int idx)
     return 0;
   else
     return &fTheory[idx];
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>set the help url, addressed via a tag. At the moment the following tags should be present:
+ * main, title, parameters, theory, functions, run, command, fourier, plot, statistic
+ *
+ * \param tag to address the help url
+ * \param url help url corresponding to the tag.
+ */
+void PAdmin::setHelpUrl(const QString tag, const QString url)
+{
+  fHelpUrl[tag] = url;
 }
 
 //--------------------------------------------------------------------------

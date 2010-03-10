@@ -44,7 +44,7 @@ class PGetDefaultDialog : public QDialog, private Ui::PGetDefaultDialog
   Q_OBJECT
 
   public:
-    PGetDefaultDialog();
+    PGetDefaultDialog(const QString helpUrl = "");
     virtual ~PGetDefaultDialog() {}
 
     virtual const QString getRunFileName() const { return fRunFileName_lineEdit->text(); }
@@ -58,6 +58,9 @@ class PGetDefaultDialog : public QDialog, private Ui::PGetDefaultDialog
 
   protected slots:
     virtual void helpContent();
+
+  private:
+    QString fHelpUrl;
 };
 
 #endif // _PGETDEFAULTDIALOG_H_

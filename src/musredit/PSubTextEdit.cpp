@@ -151,7 +151,7 @@ QMenu* PSubTextEdit::createPopupMenu(const QPoint &pos)
 void PSubTextEdit::insertTitle()
 {
   // for the time being the url's are hard coded but should be transfered to the XML startup
-  PGetTitleBlockDialog *dlg = new PGetTitleBlockDialog("https://wiki.intranet.psi.ch/MUSR/MusrFit#4_1_The_Title");
+  PGetTitleBlockDialog *dlg = new PGetTitleBlockDialog(fAdmin->getHelpUrl("title"));
 
   if (dlg == 0)
     return;
@@ -171,7 +171,7 @@ void PSubTextEdit::insertTitle()
 void PSubTextEdit::insertParameterBlock()
 {
   // for the time being the url's are hard coded but should be transfered to the XML startup
-  PGetParameterBlockDialog *dlg = new PGetParameterBlockDialog("https://wiki.intranet.psi.ch/MUSR/MusrFit#4_2_The_FITPARAMETER_Block");
+  PGetParameterBlockDialog *dlg = new PGetParameterBlockDialog(fAdmin->getHelpUrl("parameters"));
 
   if (dlg == 0)
     return;
@@ -229,7 +229,7 @@ void PSubTextEdit::insertTheoryFunction(int idx)
 void PSubTextEdit::insertTheoryBlock()
 {
   // for the time being the url's are hard coded but should be transfered to the XML startup
-  PGetTheoryBlockDialog *dlg = new PGetTheoryBlockDialog(fAdmin, "https://wiki.intranet.psi.ch/MUSR/MusrFit#4_3_The_THEORY_Block");
+  PGetTheoryBlockDialog *dlg = new PGetTheoryBlockDialog(fAdmin, fAdmin->getHelpUrl("theory"));
 
   if (dlg == 0)
     return;
@@ -249,7 +249,7 @@ void PSubTextEdit::insertTheoryBlock()
 void PSubTextEdit::insertFunctionBlock()
 {
   // for the time being the url's are hard coded but should be transfered to the XML startup
-  PGetFunctionsBlockDialog *dlg = new PGetFunctionsBlockDialog("https://wiki.intranet.psi.ch/MUSR/MusrFit#4_4_The_FUNCTIONS_Block");
+  PGetFunctionsBlockDialog *dlg = new PGetFunctionsBlockDialog(fAdmin->getHelpUrl("functions"));
 
   if (dlg == 0)
     return;
@@ -269,7 +269,7 @@ void PSubTextEdit::insertFunctionBlock()
 void PSubTextEdit::insertAsymRunBlock()
 {
   // for the time being the url's are hard coded but should be transfered to the XML startup
-  PGetAsymmetryRunBlockDialog *dlg = new PGetAsymmetryRunBlockDialog("https://wiki.intranet.psi.ch/MUSR/MusrFit#4_5_The_RUN_Block");
+  PGetAsymmetryRunBlockDialog *dlg = new PGetAsymmetryRunBlockDialog(fAdmin->getHelpUrl("run"));
 
   if (dlg == 0)
     return;
@@ -376,7 +376,7 @@ void PSubTextEdit::insertAsymRunBlock()
 void PSubTextEdit::insertSingleHistRunBlock()
 {
   // for the time being the url's are hard coded but should be transfered to the XML startup
-  PGetSingleHistoRunBlockDialog *dlg = new PGetSingleHistoRunBlockDialog("https://wiki.intranet.psi.ch/MUSR/MusrFit#4_5_The_RUN_Block");
+  PGetSingleHistoRunBlockDialog *dlg = new PGetSingleHistoRunBlockDialog(fAdmin->getHelpUrl("run"));
 
   if (dlg == 0)
     return;
@@ -482,7 +482,7 @@ void PSubTextEdit::insertSingleHistRunBlock()
  */
 void PSubTextEdit::insertNonMusrRunBlock()
 {
-  PGetNonMusrRunBlockDialog *dlg = new PGetNonMusrRunBlockDialog("https://wiki.intranet.psi.ch/MUSR/MusrFit#4_5_The_RUN_Block");
+  PGetNonMusrRunBlockDialog *dlg = new PGetNonMusrRunBlockDialog(fAdmin->getHelpUrl("run"));
 
   if (dlg == 0)
     return;
@@ -562,7 +562,7 @@ void PSubTextEdit::insertCommandBlock()
 void PSubTextEdit::insertFourierBlock()
 {
   // for the time being the url's are hard coded but should be transfered to the XML startup
-  PGetFourierBlockDialog *dlg = new PGetFourierBlockDialog("https://wiki.intranet.psi.ch/MUSR/MusrFit#4_7_The_FOURIER_Block");
+  PGetFourierBlockDialog *dlg = new PGetFourierBlockDialog(fAdmin->getHelpUrl("fourier"));
 
   if (dlg == 0)
     return;
@@ -581,7 +581,7 @@ void PSubTextEdit::insertFourierBlock()
 void PSubTextEdit::insertPlotBlock()
 {
   // for the time being the url's are hard coded but should be transfered to the XML startup
-  PGetPlotBlockDialog *dlg = new PGetPlotBlockDialog("https://wiki.intranet.psi.ch/MUSR/MusrFit#4_8_The_PLOT_Block");
+  PGetPlotBlockDialog *dlg = new PGetPlotBlockDialog(fAdmin->getHelpUrl("plot"));
 
   if (dlg == 0)
     return;
