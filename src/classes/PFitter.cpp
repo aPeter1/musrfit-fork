@@ -71,6 +71,7 @@ using namespace std;
 PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, Bool_t chisq_only) :
   fChisqOnly(chisq_only), fRunInfo(runInfo)
 {
+  fIsScanOnly = true;
   fConverged = false;
   fUseChi2 = true; // chi^2 is the default
 
@@ -356,14 +357,18 @@ Bool_t PFitter::CheckCommands()
     } else if (it->fLine.Contains("EIGEN")) {
       fCmdList.push_back(PMN_EIGEN);
     } else if (it->fLine.Contains("HESSE")) {
+      fIsScanOnly = false;
       fCmdList.push_back(PMN_HESSE);
     } else if (it->fLine.Contains("MACHINE_PRECISION")) {
       fCmdList.push_back(PMN_MACHINE_PRECISION);
     } else if (it->fLine.Contains("MIGRAD")) {
+      fIsScanOnly = false;
       fCmdList.push_back(PMN_MIGRAD);
     } else if (it->fLine.Contains("MINIMIZE")) {
+      fIsScanOnly = false;
       fCmdList.push_back(PMN_MINIMIZE);
     } else if (it->fLine.Contains("MINOS")) {
+      fIsScanOnly = false;
       fCmdList.push_back(PMN_MINOS);
     } else if (it->fLine.Contains("MNPLOT")) {
       fCmdList.push_back(PMN_PLOT);
@@ -577,6 +582,20 @@ Bool_t PFitter::SetParameters()
 Bool_t PFitter::ExecuteContours()
 {
   cout << ">> PFitter::ExecuteContours() ..." << endl;
+
+  // if already some minimization is done use the minuit2 output as input
+  if (!fFcnMin) {
+    cerr << endl << "**WARNING**: CONTOURS musn't be called before any minimization (MINIMIZE/MIGRAD/SIMPLEX) is done!!";
+    cerr << endl;
+    return false;
+  }
+
+  // check if minimum was valid
+  if (!fFcnMin->IsValid()) {
+    cerr << endl << "**ERROR**: CONTOURS cannot started since the previous minimization failed :-(";
+    cerr << endl;
+    return false;
+  }
 
   ROOT::Minuit2::MnContours contours((*fFitterFcn), *fFcnMin);
 
@@ -856,6 +875,8 @@ Bool_t PFitter::ExecuteScan()
     fScanData = scan.Scan(fScanParameter[0], fScanNoPoints, fScanLow, fScanHigh);
   }
 
+  fConverged = true;
+
   return true;
 }
 
@@ -958,15 +979,15 @@ Bool_t PFitter::ExecuteSave()
       fout.setf(ios::left, ios::adjustfield);
       fout.width(7);
       if (fParams[i].fLowerBoundaryPresent)
-	fout << fParams[i].fLowerBoundary;
+        fout << fParams[i].fLowerBoundary;
       else
-	fout << "---";
+        fout << "---";
       fout.setf(ios::left, ios::adjustfield);
       fout.width(7);
       if (fParams[i].fUpperBoundaryPresent)
-	fout << fParams[i].fUpperBoundary;
+        fout << fParams[i].fUpperBoundary;
       else
-	fout << "---";
+        fout << "---";
     } else {
       fout.setf(ios::left, ios::adjustfield);
       fout.width(7);

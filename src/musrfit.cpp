@@ -497,12 +497,13 @@ int main(int argc, char *argv[])
     fitter = new PFitter(msrHandler, runListCollection, chisq_only);
     if (fitter->IsValid()) {
       fitter->DoFit();
-      msrHandler->SetMsrStatisticConverged(fitter->HasConverged());
+      if (!fitter->IsScanOnly())
+        msrHandler->SetMsrStatisticConverged(fitter->HasConverged());
     }
   }
 
   // write log file
-  if (success && !chisq_only) {
+  if (success && !chisq_only && !fitter->IsScanOnly()) {
     status = msrHandler->WriteMsrLogFile();
     if (status != PMUSR_SUCCESS) {
       switch (status) {
@@ -532,7 +533,7 @@ int main(int argc, char *argv[])
   }
 
   // rename MINUIT2.OUTPUT and MINUIT2.root file if wanted
-  if (keep_mn2_output && !chisq_only) {
+  if (keep_mn2_output && !chisq_only && !fitter->IsScanOnly()) {
     // 1st rename MINUIT2.OUTPUT
     TString fln = TString(filename);
     char ext[32];
@@ -547,7 +548,7 @@ int main(int argc, char *argv[])
     gSystem->CopyFile("MINUIT2.root", fln.Data(), kTRUE);
   }
 
-  if (!chisq_only) {
+  if (!chisq_only && !fitter->IsScanOnly()) {
     // swap msr- and mlog-file
     cout << endl << ">> swapping msr-, mlog-file ..." << endl;
     // copy msr-file -> __temp.msr

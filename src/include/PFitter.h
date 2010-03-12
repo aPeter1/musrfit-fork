@@ -68,11 +68,13 @@ class PFitter
     virtual ~PFitter();
 
     Bool_t IsValid() { return fIsValid; }
+    Bool_t IsScanOnly() { return fIsScanOnly; }
     Bool_t HasConverged() { return fConverged; }
     Bool_t DoFit();
 
   private:
     Bool_t fIsValid;
+    Bool_t fIsScanOnly;
     Bool_t fConverged;
     Bool_t fChisqOnly;
     Bool_t fUseChi2;
