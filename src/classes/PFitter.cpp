@@ -37,10 +37,13 @@ using namespace std;
 #include <math.h>
 
 #include "Minuit2/FunctionMinimum.h"
+#include "Minuit2/MnContours.h"
 #include "Minuit2/MnHesse.h"
 #include "Minuit2/MnMinimize.h"
 #include "Minuit2/MnMigrad.h"
 #include "Minuit2/MnMinos.h"
+#include "Minuit2/MnPlot.h"
+#include "Minuit2/MnScan.h"
 #include "Minuit2/MnSimplex.h"
 #include "Minuit2/MnUserParameterState.h"
 #include "Minuit2/MinosError.h"
@@ -81,6 +84,13 @@ PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, Bo
   fFcnMin = 0;
   fMnUserParamState = 0;
 
+  fScanAll = true;
+  fScanParameter[0] = 0;
+  fScanParameter[1] = 0;
+  fScanNoPoints = 41; // minuit2 default
+  fScanLow  = 0.0; // minuit2 default, i.e. 2 std deviations
+  fScanHigh = 0.0; // minuit2 default, i.e. 2 std deviations
+
   // check msr minuit commands
   if (!CheckCommands()) {
     return;
@@ -104,6 +114,8 @@ PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, Bo
 PFitter::~PFitter()
 {
   fCmdList.clear();
+
+  fScanData.clear();
 
   if (fMnUserParamState) {
     delete fMnUserParamState;
@@ -155,9 +167,9 @@ Bool_t PFitter::DoFit()
 
   // real fit wanted
   if (fUseChi2)
-    cout << endl << "Chi Square fit will be executed" << endl;
+    cout << endl << ">> Chi Square fit will be executed" << endl;
   else
-    cout << endl << "Maximum Likelihood fit will be executed" << endl;
+    cout << endl << ">> Maximum Likelihood fit will be executed" << endl;
 
   Bool_t status = true;
   // init positive errors to default false, if minos is called, it will be set true there
@@ -172,8 +184,7 @@ Bool_t PFitter::DoFit()
         cerr << endl;
         break;
       case PMN_CONTOURS:
-        cerr << endl << "**WARNING** from PFitter::DoFit() : the command CONTOURS is not yet implemented.";
-        cerr << endl;
+        status = ExecuteContours();
         break;
       case PMN_EIGEN:
         cerr << endl << "**WARNING** from PFitter::DoFit() : the command EIGEN is not yet implemented.";
@@ -202,13 +213,13 @@ Bool_t PFitter::DoFit()
         }
         break;
       case PMN_PLOT:
-        cerr << endl << "**WARNING** from PFitter::DoFit() : the command PLOT is not yet implemented.";
-        cerr << endl;
+        status = ExecutePlot();
         break;
       case PMN_SAVE:
         status = ExecuteSave();
         break;
       case PMN_SCAN:
+        status = ExecuteScan();
         break;
       case PMN_SIMPLEX:
         status = ExecuteSimplex();
@@ -274,6 +285,74 @@ Bool_t PFitter::CheckCommands()
       fCmdList.push_back(PMN_INTERACTIVE);
     } else if (it->fLine.Contains("CONTOURS")) {
       fCmdList.push_back(PMN_CONTOURS);
+      // filter out possible parameters for scan
+      TObjArray *tokens = 0;
+      TObjString *ostr;
+      TString str;
+      UInt_t ival;
+
+      tokens = it->fLine.Tokenize(" \t");
+
+      for (Int_t i=0; i<tokens->GetEntries(); i++) {
+        ostr = dynamic_cast<TObjString*>(tokens->At(i));
+        str = ostr->GetString();
+
+        if ((i==1) || (i==2)) { // parX / parY
+          // check that token is a UInt_t
+          if (!str.IsDigit()) {
+            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            cerr << endl << ">> " << it->fLine.Data();
+            cerr << endl << ">> parameter number is not number!";
+            cerr << endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
+            cerr << endl;
+            fIsValid = false;
+            break;
+          }
+          ival = str.Atoi();
+          // check that parameter is within range
+          if ((ival < 1) || (ival > fParams.size())) {
+            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            cerr << endl << ">> " << it->fLine.Data();
+            cerr << endl << ">> parameter number is out of range [1," << fParams.size() << "]!";
+            cerr << endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
+            cerr << endl;
+            fIsValid = false;
+            break;
+          }
+          // keep parameter
+          fScanParameter[i-1] = ival-1; // internally parameter number starts at 0
+          fScanAll = false;
+        }
+
+        if (i==3) {
+          // check that token is a UInt_t
+          if (!str.IsDigit()) {
+            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            cerr << endl << ">> " << it->fLine.Data();
+            cerr << endl << ">> number of points is not number!";
+            cerr << endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
+            cerr << endl;
+            fIsValid = false;
+            break;
+          }
+          ival = str.Atoi();
+          if ((ival < 1) || (ival > 100)) {
+            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            cerr << endl << ">> " << it->fLine.Data();
+            cerr << endl << ">> number of scan points is out of range [1,100]!";
+            cerr << endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
+            cerr << endl;
+            fIsValid = false;
+            break;
+          }
+          fScanNoPoints = ival;
+        }
+      }
+
+      if (tokens) {
+        delete tokens;
+        tokens = 0;
+      }
     } else if (it->fLine.Contains("EIGEN")) {
       fCmdList.push_back(PMN_EIGEN);
     } else if (it->fLine.Contains("HESSE")) {
@@ -286,12 +365,107 @@ Bool_t PFitter::CheckCommands()
       fCmdList.push_back(PMN_MINIMIZE);
     } else if (it->fLine.Contains("MINOS")) {
       fCmdList.push_back(PMN_MINOS);
-    } else if (it->fLine.Contains("PLOT")) {
+    } else if (it->fLine.Contains("MNPLOT")) {
       fCmdList.push_back(PMN_PLOT);
     } else if (it->fLine.Contains("SAVE")) {
       fCmdList.push_back(PMN_SAVE);
     } else if (it->fLine.Contains("SCAN")) {
       fCmdList.push_back(PMN_SCAN);
+      // filter out possible parameters for scan
+      TObjArray *tokens = 0;
+      TObjString *ostr;
+      TString str;
+      UInt_t ival;
+
+      tokens = it->fLine.Tokenize(" \t");
+
+      for (Int_t i=0; i<tokens->GetEntries(); i++) {
+        ostr = dynamic_cast<TObjString*>(tokens->At(i));
+        str = ostr->GetString();
+        if (i==1) { // get parameter number
+          // check that token is a UInt_t
+          if (!str.IsDigit()) {
+            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            cerr << endl << ">> " << it->fLine.Data();
+            cerr << endl << ">> parameter number is not number!";
+            cerr << endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
+            cerr << endl;            
+            fIsValid = false;
+            break;
+          }
+          ival = str.Atoi();
+          // check that parameter is within range
+          if ((ival < 1) || (ival > fParams.size())) {
+            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            cerr << endl << ">> " << it->fLine.Data();
+            cerr << endl << ">> parameter number is out of range [1," << fParams.size() << "]!";
+            cerr << endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
+            cerr << endl;
+            fIsValid = false;
+            break;
+          }
+          // keep parameter
+          fScanParameter[0] = ival-1; // internally parameter number starts at 0
+          fScanAll = false;
+        }
+
+        if (i==2) { // get number of points
+          // check that token is a UInt_t
+          if (!str.IsDigit()) {
+            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            cerr << endl << ">> " << it->fLine.Data();
+            cerr << endl << ">> number of points is not number!";
+            cerr << endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
+            cerr << endl;
+            fIsValid = false;
+            break;
+          }
+          ival = str.Atoi();
+          if ((ival < 1) || (ival > 100)) {
+            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            cerr << endl << ">> " << it->fLine.Data();
+            cerr << endl << ">> number of scan points is out of range [1,100]!";
+            cerr << endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
+            cerr << endl;
+            fIsValid = false;
+            break;
+          }
+          fScanNoPoints = ival;
+        }
+
+        if (i==3) { // get low
+          // check that token is a Double_t
+          if (!str.IsFloat()) {
+            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            cerr << endl << ">> " << it->fLine.Data();
+            cerr << endl << ">> low is not a floating point number!";
+            cerr << endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
+            cerr << endl;
+            fIsValid = false;
+            break;
+          }
+          fScanLow = str.Atof();
+        }
+
+        if (i==4) { // get high
+          // check that token is a Double_t
+          if (!str.IsFloat()) {
+            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            cerr << endl << ">> " << it->fLine.Data();
+            cerr << endl << ">> high is not a floating point number!";
+            cerr << endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
+            cerr << endl;
+            fIsValid = false;
+            break;
+          }
+          fScanHigh = str.Atof();
+        }
+      }
+
+      if (tokens) {
+        delete tokens;
+        tokens = 0;
+      }
     } else if (it->fLine.Contains("SIMPLEX")) {
       fCmdList.push_back(PMN_SIMPLEX);
     } else if (it->fLine.Contains("STRATEGY")) {
@@ -329,10 +503,10 @@ Bool_t PFitter::CheckCommands()
     } else if (it->fLine.Contains("PRINT")) {
       fCmdList.push_back(PMN_PRINT);
     } else { // unkown command
-      cerr << endl << "**FATAL ERROR**";
-      cerr << endl << "PFitter::CheckCommands(): In line " << it->fLineNo << " an unkown command is found:";
-      cerr << endl << "    " << it->fLine.Data();
-      cerr << endl << "Will stop ...";
+      cerr << endl << ">> **FATAL ERROR**";
+      cerr << endl << ">> PFitter::CheckCommands(): In line " << it->fLineNo << " an unkown command is found:";
+      cerr << endl << ">> " << it->fLine.Data();
+      cerr << endl << ">> Will stop ...";
       cerr << endl;
       fIsValid = false;
     }
@@ -394,6 +568,24 @@ Bool_t PFitter::SetParameters()
 }
 
 //--------------------------------------------------------------------------
+// ExecuteContours
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+Bool_t PFitter::ExecuteContours()
+{
+  cout << ">> PFitter::ExecuteContours() ..." << endl;
+
+  ROOT::Minuit2::MnContours contours((*fFitterFcn), *fFcnMin);
+
+  fScanData = contours(fScanParameter[0], fScanParameter[1], fScanNoPoints);
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
 // ExecuteHesse
 //--------------------------------------------------------------------------
 /**
@@ -402,7 +594,7 @@ Bool_t PFitter::SetParameters()
  */
 Bool_t PFitter::ExecuteHesse()
 {
-  cout << "PFitter::ExecuteHesse(): will call hesse ..." << endl;
+  cout << ">> PFitter::ExecuteHesse(): will call hesse ..." << endl;
 
   // if already some minimization is done use the minuit2 output as input
   if (fFcnMin)
@@ -447,7 +639,7 @@ Bool_t PFitter::ExecuteHesse()
  */
 Bool_t PFitter::ExecuteMigrad()
 {
-  cout << "PFitter::ExecuteMigrad(): will call migrad ..." << endl;
+  cout << ">> PFitter::ExecuteMigrad(): will call migrad ..." << endl;
 
   // if already some minimization is done use the minuit2 output as input
   if (fFcnMin)
@@ -516,7 +708,7 @@ Bool_t PFitter::ExecuteMigrad()
  */
 Bool_t PFitter::ExecuteMinimize()
 {
-  cout << "PFitter::ExecuteMinimize(): will call minimize ..." << endl;
+  cout << ">> PFitter::ExecuteMinimize(): will call minimize ..." << endl;
 
   // if already some minimization is done use the minuit2 output as input
   if (fFcnMin)
@@ -586,7 +778,7 @@ Bool_t PFitter::ExecuteMinimize()
  */
 Bool_t PFitter::ExecuteMinos()
 {
-  cout << "PFitter::ExecuteMinos(): will call minos ..." << endl;
+  cout << ">> PFitter::ExecuteMinos(): will call minos ..." << endl;
 
   // if already some minimization is done use the minuit2 output as input
   if (!fFcnMin) {
@@ -629,6 +821,45 @@ Bool_t PFitter::ExecuteMinos()
 }
 
 //--------------------------------------------------------------------------
+// ExecutePlot
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+Bool_t PFitter::ExecutePlot()
+{
+  cout << ">> PFitter::ExecutePlot() ..." << endl;
+
+  ROOT::Minuit2::MnPlot plot;
+  plot(fScanData);
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// ExecuteScan
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ */
+Bool_t PFitter::ExecuteScan()
+{
+  cout << ">> PFitter::ExecuteScan(): will call scan ..." << endl;
+
+  ROOT::Minuit2::MnScan scan((*fFitterFcn), fMnUserParams);
+
+  if (fScanAll) { // not clear at the moment what to be done here
+    // TO BE IMPLEMENTED
+  } else { // single parameter scan
+    fScanData = scan.Scan(fScanParameter[0], fScanNoPoints, fScanLow, fScanHigh);
+  }
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
 // ExecuteSave
 //--------------------------------------------------------------------------
 /**
@@ -639,7 +870,7 @@ Bool_t PFitter::ExecuteSave()
 {
   // if any minimization was done, otherwise get out immediately
   if (!fFcnMin) {
-    cout << endl << "PFitter::ExecuteSave(): nothing to be saved ...";
+    cout << endl << ">> PFitter::ExecuteSave(): nothing to be saved ...";
     return false;
   }
 
@@ -652,7 +883,7 @@ Bool_t PFitter::ExecuteSave()
     return false;
   }
 
-  cout << "PFitter::ExecuteSave(): will write minuit2 output file ..." << endl;
+  cout << ">> PFitter::ExecuteSave(): will write minuit2 output file ..." << endl;
 
   ofstream fout;
 
@@ -892,7 +1123,7 @@ Bool_t PFitter::ExecuteSave()
  */
 Bool_t PFitter::ExecuteSimplex()
 {
-  cout << "PFitter::ExecuteSimplex(): will call simplex ..." << endl;
+  cout << ">> PFitter::ExecuteSimplex(): will call simplex ..." << endl;
 
   // if already some minimization is done use the minuit2 output as input
   if (fFcnMin)

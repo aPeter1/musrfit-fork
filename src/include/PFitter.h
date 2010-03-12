@@ -35,6 +35,7 @@
 #include "Minuit2/MnUserParameters.h"
 #include "Minuit2/FunctionMinimum.h"
 
+#include "PMusr.h"
 #include "PMsrHandler.h"
 #include "PRunListCollection.h"
 #include "PFitterFcn.h"
@@ -90,13 +91,25 @@ class PFitter
     ROOT::Minuit2::FunctionMinimum *fFcnMin;       ///< function minimum object
     ROOT::Minuit2::MnUserParameterState *fMnUserParamState; ///< keeps the current user parameter state
 
+    // minuit2 scan/contours command relate variables (see MnScan/MnContours in the minuit2 user manual)
+    Bool_t fScanAll;
+    UInt_t fScanParameter[2];
+    UInt_t fScanNoPoints;
+    Double_t fScanLow;
+    Double_t fScanHigh;
+    PDoublePairVector fScanData;
+
+    // commands
     Bool_t CheckCommands();
     Bool_t SetParameters();
 
+    Bool_t ExecuteContours();
     Bool_t ExecuteHesse();
     Bool_t ExecuteMigrad();
     Bool_t ExecuteMinimize();
     Bool_t ExecuteMinos();
+    Bool_t ExecutePlot();
+    Bool_t ExecuteScan();
     Bool_t ExecuteSave();
     Bool_t ExecuteSimplex();
 };
