@@ -3224,8 +3224,6 @@ void PMusrCanvas::PlotFourierDifference()
         fData[i].diffFourierPwr->Draw("plsame");
       }
 
-      PlotFourierPhaseValue();
-
       break;
     case PV_FOURIER_PHASE:
       // set x-range
