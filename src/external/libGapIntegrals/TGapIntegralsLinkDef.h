@@ -43,6 +43,19 @@
 #pragma link C++ class TGapNonMonDWave1+;
 #pragma link C++ class TGapNonMonDWave2+;
 #pragma link C++ class TGapPowerLaw+;
+#pragma link C++ class TLambdaSWave+;
+#pragma link C++ class TLambdaDWave+;
+#pragma link C++ class TLambdaAnSWave+;
+#pragma link C++ class TLambdaNonMonDWave1+;
+#pragma link C++ class TLambdaNonMonDWave2+;
+#pragma link C++ class TLambdaPowerLaw+;
+#pragma link C++ class TLambdaInvSWave+;
+#pragma link C++ class TLambdaInvDWave+;
+#pragma link C++ class TLambdaInvAnSWave+;
+#pragma link C++ class TLambdaInvNonMonDWave1+;
+#pragma link C++ class TLambdaInvNonMonDWave2+;
+#pragma link C++ class TLambdaInvPowerLaw+;
+#pragma link C++ class TFilmMagnetizationDWave+;
 
 #endif //__CINT__
 // root dictionary stuff --------------------------------------------------

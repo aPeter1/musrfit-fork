@@ -154,5 +154,189 @@ private:
   ClassDef(TGapPowerLaw,1)
 };
 
+class TLambdaSWave : public PUserFcnBase {
+
+public:
+  TLambdaSWave();
+  ~TLambdaSWave();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  TGapSWave *fLambdaInvSq;
+
+  ClassDef(TLambdaSWave,1)
+};
+
+class TLambdaDWave : public PUserFcnBase {
+
+public:
+  TLambdaDWave();
+  ~TLambdaDWave();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  TGapDWave *fLambdaInvSq;
+
+  ClassDef(TLambdaDWave,1)
+};
+
+class TLambdaAnSWave : public PUserFcnBase {
+
+public:
+  TLambdaAnSWave();
+  ~TLambdaAnSWave();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  TGapAnSWave *fLambdaInvSq;
+
+  ClassDef(TLambdaAnSWave,1)
+};
+
+class TLambdaNonMonDWave1 : public PUserFcnBase {
+
+public:
+  TLambdaNonMonDWave1();
+  ~TLambdaNonMonDWave1();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  TGapNonMonDWave1 *fLambdaInvSq;
+
+  ClassDef(TLambdaNonMonDWave1,1)
+};
+
+class TLambdaNonMonDWave2 : public PUserFcnBase {
+
+public:
+  TLambdaNonMonDWave2();
+  ~TLambdaNonMonDWave2();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  TGapNonMonDWave2 *fLambdaInvSq;
+
+  ClassDef(TLambdaNonMonDWave2,1)
+};
+
+
+class TLambdaPowerLaw : public PUserFcnBase {
+
+public:
+  TLambdaPowerLaw() {}
+  ~TLambdaPowerLaw() {}
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+
+  ClassDef(TLambdaPowerLaw,1)
+};
+
+class TLambdaInvSWave : public PUserFcnBase {
+
+public:
+  TLambdaInvSWave();
+  ~TLambdaInvSWave();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  TGapSWave *fLambdaInvSq;
+
+  ClassDef(TLambdaInvSWave,1)
+};
+
+class TLambdaInvDWave : public PUserFcnBase {
+
+public:
+  TLambdaInvDWave();
+  ~TLambdaInvDWave();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  TGapDWave *fLambdaInvSq;
+
+  ClassDef(TLambdaInvDWave,1)
+};
+
+class TLambdaInvAnSWave : public PUserFcnBase {
+
+public:
+  TLambdaInvAnSWave();
+  ~TLambdaInvAnSWave();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  TGapAnSWave *fLambdaInvSq;
+
+  ClassDef(TLambdaInvAnSWave,1)
+};
+
+class TLambdaInvNonMonDWave1 : public PUserFcnBase {
+
+public:
+  TLambdaInvNonMonDWave1();
+  ~TLambdaInvNonMonDWave1();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  TGapNonMonDWave1 *fLambdaInvSq;
+
+  ClassDef(TLambdaInvNonMonDWave1,1)
+};
+
+class TLambdaInvNonMonDWave2 : public PUserFcnBase {
+
+public:
+  TLambdaInvNonMonDWave2();
+  ~TLambdaInvNonMonDWave2();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  TGapNonMonDWave2 *fLambdaInvSq;
+
+  ClassDef(TLambdaInvNonMonDWave2,1)
+};
+
+
+class TLambdaInvPowerLaw : public PUserFcnBase {
+
+public:
+  TLambdaInvPowerLaw() {}
+  ~TLambdaInvPowerLaw() {}
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+
+  ClassDef(TLambdaInvPowerLaw,1)
+};
+
+class TFilmMagnetizationDWave : public PUserFcnBase {
+
+public:
+  TFilmMagnetizationDWave();
+  ~TFilmMagnetizationDWave();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  TGapDWave *fLambdaInvSq;
+
+  mutable vector<double> fPar;
+
+  ClassDef(TFilmMagnetizationDWave,1)
+};
+
 
 #endif //_TGapIntegrals_H_

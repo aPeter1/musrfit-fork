@@ -48,13 +48,28 @@ ClassImp(TGapNonMonDWave1)
 ClassImp(TGapNonMonDWave2)
 ClassImp(TGapPowerLaw)
 
+ClassImp(TLambdaSWave)
+ClassImp(TLambdaDWave)
+ClassImp(TLambdaAnSWave)
+ClassImp(TLambdaNonMonDWave1)
+ClassImp(TLambdaNonMonDWave2)
+ClassImp(TLambdaPowerLaw)
+
+ClassImp(TLambdaInvSWave)
+ClassImp(TLambdaInvDWave)
+ClassImp(TLambdaInvAnSWave)
+ClassImp(TLambdaInvNonMonDWave1)
+ClassImp(TLambdaInvNonMonDWave2)
+ClassImp(TLambdaInvPowerLaw)
+
+ClassImp(TFilmMagnetizationDWave)
+
 // s wave  gap integral
 
 TGapSWave::TGapSWave() {
   TGapIntegral *gapint = new TGapIntegral();
   fGapIntegral = gapint;
   gapint = 0;
-  delete gapint;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -67,7 +82,6 @@ TGapDWave::TGapDWave() {
   TDWaveGapIntegralCuhre *gapint = new TDWaveGapIntegralCuhre();
   fGapIntegral = gapint;
   gapint = 0;
-  delete gapint;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -80,7 +94,6 @@ TGapAnSWave::TGapAnSWave() {
   TAnSWaveGapIntegralCuhre *gapint = new TAnSWaveGapIntegralCuhre();
   fGapIntegral = gapint;
   gapint = 0;
-  delete gapint;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -93,7 +106,6 @@ TGapNonMonDWave1::TGapNonMonDWave1() {
   TNonMonDWave1GapIntegralCuhre *gapint = new TNonMonDWave1GapIntegralCuhre();
   fGapIntegral = gapint;
   gapint = 0;
-  delete gapint;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -106,7 +118,6 @@ TGapNonMonDWave2::TGapNonMonDWave2() {
   TNonMonDWave2GapIntegralCuhre *gapint = new TNonMonDWave2GapIntegralCuhre();
   fGapIntegral = gapint;
   gapint = 0;
-  delete gapint;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -115,10 +126,50 @@ TGapNonMonDWave2::TGapNonMonDWave2() {
   fPar.clear();
 }
 
+TLambdaSWave::TLambdaSWave() {
+  fLambdaInvSq = new TGapSWave();
+}
+
+TLambdaDWave::TLambdaDWave() {
+  fLambdaInvSq = new TGapDWave();
+}
+
+TLambdaAnSWave::TLambdaAnSWave() {
+  fLambdaInvSq = new TGapAnSWave();
+}
+
+TLambdaNonMonDWave1::TLambdaNonMonDWave1() {
+  fLambdaInvSq = new TGapNonMonDWave1();
+}
+
+TLambdaNonMonDWave2::TLambdaNonMonDWave2() {
+  fLambdaInvSq = new TGapNonMonDWave2();
+}
+
+TLambdaInvSWave::TLambdaInvSWave() {
+  fLambdaInvSq = new TGapSWave();
+}
+
+TLambdaInvDWave::TLambdaInvDWave() {
+  fLambdaInvSq = new TGapDWave();
+}
+
+TLambdaInvAnSWave::TLambdaInvAnSWave() {
+  fLambdaInvSq = new TGapAnSWave();
+}
+
+TLambdaInvNonMonDWave1::TLambdaInvNonMonDWave1() {
+  fLambdaInvSq = new TGapNonMonDWave1();
+}
+
+TLambdaInvNonMonDWave2::TLambdaInvNonMonDWave2() {
+  fLambdaInvSq = new TGapNonMonDWave2();
+}
+
 TGapSWave::~TGapSWave() {
   delete fGapIntegral;
   fGapIntegral = 0;
- 
+
   fTemp.clear();
   fTempIter = fTemp.end();
   fIntegralValues.clear();
@@ -169,6 +220,57 @@ TGapNonMonDWave2::~TGapNonMonDWave2() {
   fCalcNeeded.clear();
   fPar.clear();
 }
+
+TLambdaSWave::~TLambdaSWave() {
+  delete fLambdaInvSq;
+  fLambdaInvSq = 0;
+}
+
+TLambdaDWave::~TLambdaDWave() {
+  delete fLambdaInvSq;
+  fLambdaInvSq = 0;
+}
+
+TLambdaAnSWave::~TLambdaAnSWave() {
+  delete fLambdaInvSq;
+  fLambdaInvSq = 0;
+}
+
+TLambdaNonMonDWave1::~TLambdaNonMonDWave1() {
+  delete fLambdaInvSq;
+  fLambdaInvSq = 0;
+}
+
+TLambdaNonMonDWave2::~TLambdaNonMonDWave2() {
+  delete fLambdaInvSq;
+  fLambdaInvSq = 0;
+}
+
+TLambdaInvSWave::~TLambdaInvSWave() {
+  delete fLambdaInvSq;
+  fLambdaInvSq = 0;
+}
+
+TLambdaInvDWave::~TLambdaInvDWave() {
+  delete fLambdaInvSq;
+  fLambdaInvSq = 0;
+}
+
+TLambdaInvAnSWave::~TLambdaInvAnSWave() {
+  delete fLambdaInvSq;
+  fLambdaInvSq = 0;
+}
+
+TLambdaInvNonMonDWave1::~TLambdaInvNonMonDWave1() {
+  delete fLambdaInvSq;
+  fLambdaInvSq = 0;
+}
+
+TLambdaInvNonMonDWave2::~TLambdaInvNonMonDWave2() {
+  delete fLambdaInvSq;
+  fLambdaInvSq = 0;
+}
+
 
 double TGapSWave::operator()(double t, const vector<double> &par) const {
 
@@ -309,7 +411,7 @@ double TGapDWave::operator()(double t, const vector<double> &par) const {
 
 double TGapAnSWave::operator()(double t, const vector<double> &par) const {
 
-  assert(par.size() == 3); // two parameters: Tc, Delta(0), a
+  assert(par.size() == 3); // three parameters: Tc, Delta(0), a
 
   if (t<=0.0)
     return 1.0;
@@ -529,3 +631,207 @@ double TGapPowerLaw::operator()(double t, const vector<double> &par) const {
   return 1.0 - pow(t/par[0], par[1]);
 
 }
+
+
+double TLambdaSWave::operator()(double t, const vector<double> &par) const
+{
+  assert(par.size() == 2); // two parameters: Tc, Delta0
+
+  if (t >= par[0])
+    return -1.0;
+
+  if (t <= 0.0)
+    return 1.0;
+
+  return 1.0/sqrt((*fLambdaInvSq)(t, par));
+
+}
+
+double TLambdaDWave::operator()(double t, const vector<double> &par) const
+{
+  assert(par.size() == 2); // two parameters: Tc, Delta0
+
+  if (t >= par[0])
+    return -1.0;
+
+  if (t <= 0.0)
+    return 1.0;
+
+  return 1.0/sqrt((*fLambdaInvSq)(t, par));
+
+}
+
+double TLambdaAnSWave::operator()(double t, const vector<double> &par) const
+{
+  assert(par.size() == 3); // three parameters: Tc, Delta0, a
+
+  if (t >= par[0])
+    return -1.0;
+
+  if (t <= 0.0)
+    return 1.0;
+
+  return 1.0/sqrt((*fLambdaInvSq)(t, par));
+
+}
+
+double TLambdaNonMonDWave1::operator()(double t, const vector<double> &par) const
+{
+  assert(par.size() == 3); // three parameters: Tc, Delta0, a
+
+  if (t >= par[0])
+    return -1.0;
+
+  if (t <= 0.0)
+    return 1.0;
+
+  return 1.0/sqrt((*fLambdaInvSq)(t, par));
+
+}
+
+double TLambdaNonMonDWave2::operator()(double t, const vector<double> &par) const
+{
+  assert(par.size() == 3); // three parameters: Tc, Delta0, a
+
+  if (t >= par[0])
+    return -1.0;
+
+  if (t <= 0.0)
+    return 1.0;
+
+  return 1.0/sqrt((*fLambdaInvSq)(t, par));
+
+}
+
+double TLambdaPowerLaw::operator()(double t, const vector<double> &par) const {
+
+  assert(par.size() == 2); // two parameters: Tc, N
+
+  if(t <= 0.0)
+    return 1.0;
+  else if (t >= par[0])
+    return -1.0;
+
+  return 1.0/sqrt(1.0 - pow(t/par[0], par[1]));
+
+}
+
+
+double TLambdaInvSWave::operator()(double t, const vector<double> &par) const
+{
+  assert(par.size() == 2); // two parameters: Tc, Delta0
+
+  if (t >= par[0])
+    return 0.0;
+
+  if (t <= 0.0)
+    return 1.0;
+
+  return sqrt((*fLambdaInvSq)(t, par));
+
+}
+
+double TLambdaInvDWave::operator()(double t, const vector<double> &par) const
+{
+  assert(par.size() == 2); // two parameters: Tc, Delta0
+
+  if (t >= par[0])
+    return 0.0;
+
+  if (t <= 0.0)
+    return 1.0;
+
+  return sqrt((*fLambdaInvSq)(t, par));
+
+}
+
+double TLambdaInvAnSWave::operator()(double t, const vector<double> &par) const
+{
+  assert(par.size() == 3); // three parameters: Tc, Delta0, a
+
+  if (t >= par[0])
+    return 0.0;
+
+  if (t <= 0.0)
+    return 1.0;
+
+  return sqrt((*fLambdaInvSq)(t, par));
+
+}
+
+double TLambdaInvNonMonDWave1::operator()(double t, const vector<double> &par) const
+{
+  assert(par.size() == 3); // three parameters: Tc, Delta0, a
+
+  if (t >= par[0])
+    return 0.0;
+
+  if (t <= 0.0)
+    return 1.0;
+
+  return sqrt((*fLambdaInvSq)(t, par));
+
+}
+
+double TLambdaInvNonMonDWave2::operator()(double t, const vector<double> &par) const
+{
+  assert(par.size() == 3); // three parameters: Tc, Delta0, a
+
+  if (t >= par[0])
+    return 0.0;
+
+  if (t <= 0.0)
+    return 1.0;
+
+  return sqrt((*fLambdaInvSq)(t, par));
+
+}
+
+double TLambdaInvPowerLaw::operator()(double t, const vector<double> &par) const {
+
+  assert(par.size() == 2); // two parameters: Tc, N
+
+  if(t <= 0.0)
+    return 1.0;
+  else if (t >= par[0])
+    return 0.0;
+
+  return sqrt(1.0 - pow(t/par[0], par[1]));
+
+}
+
+TFilmMagnetizationDWave::TFilmMagnetizationDWave()
+{
+  fLambdaInvSq = new TGapDWave();
+  fPar.clear();
+}
+
+TFilmMagnetizationDWave::~TFilmMagnetizationDWave()
+{
+  delete fLambdaInvSq;
+  fLambdaInvSq = 0;
+  fPar.clear();
+}
+
+double TFilmMagnetizationDWave::operator()(double t, const vector<double> &par) const
+{
+  assert(par.size() == 4); // four parameters: Tc, Delta0, lambda0, film-thickness
+
+  fPar = par;
+
+  if (t >= fPar[0])
+    return 0.0;
+
+  vector<double> parForGapIntegral;
+  parForGapIntegral.push_back(fPar[0]);
+  parForGapIntegral.push_back(fPar[1]);
+
+  double d_2l(0.5*fPar[3]/fPar[2]*sqrt((*fLambdaInvSq)(t, parForGapIntegral)));
+
+  parForGapIntegral.clear();
+
+  return tanh(d_2l)/d_2l - 1.0;
+
+}
+
+
