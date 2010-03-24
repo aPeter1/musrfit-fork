@@ -1,6 +1,8 @@
 #use strict;
 package MSR;
 
+# This module provides some tools to create, manipulate and extract information from MSR files
+
 my $EMPTY="";
 my $SPACE=" ";
 
@@ -111,7 +113,7 @@ sub CreateMSR {
     }
 
     # Proper way
-    if ( $All{"Minimization"} ne "" &&  $All{"ErrorCalc"} ne "" && $Step ne "PLOT" ) {
+    if ( $All{"Minimization"} ne $EMPTY &&  $All{"ErrorCalc"} ne $EMPTY && $Step ne "PLOT" ) {
 	$FITMINTYPE = $All{"Minimization"}."\n".$All{"ErrorCalc"};
     }
 
@@ -131,11 +133,11 @@ sub CreateMSR {
     # $RUNSType = 0 (Auto) or 1 (Manual)
     my $RUNSType = 0;
     my @RUNS=();
-    if ($All{"RunNumbers"} ne "") {
+    if ($All{"RunNumbers"} ne $EMPTY) {
 	@RUNS=split( /,/, $All{"RunNumbers"});
 	$RUNSType = 0;
     }
-    elsif ($All{"RunFiles"} ne "") {
+    elsif ($All{"RunFiles"} ne $EMPTY) {
 	@RUNS=split( /,/, $All{"RunFiles"});
 	$RUNSType = 1;
     }
@@ -269,13 +271,13 @@ sub CreateMSR {
 	    foreach ("t0","Bg1","Bg2","Data1","Data2") {
 		$Name = "$_$NHist";
 # If empty fill with defaults
-		if ($All{$Name} eq "") {
+		if ($All{$Name} eq $EMPTY) {
 		    $All{$Name}=MSR::T0BgData($_,$Hist,$BeamLine);
 		}
 	    }
 	    $Bg_Line = $Bg_Line."    ".$All{"Bg1$NHist"}."    ".$All{"Bg2$NHist"};
 	    $Data_Line =$Data_Line."    ".$All{"Data1$NHist"}."    ".$All{"Data2$NHist"};
-	    if ($All{"t0$NHist"} ne "") {
+	    if ($All{"t0$NHist"} ne $EMPTY) {
 		$T0_Line=$T0_Line."      ".$All{"Data1$NHist"};  
 	    }
 	    $NHist++;
@@ -386,9 +388,9 @@ runs     $RUNS_Line
 $PRANGE_Line
 $logxy";
 
-    if ($All{"FUNITS"} eq "") {$All{"FUNITS"}="MHz";}
-    if ($All{"FAPODIZATION"} eq "") {$All{"FAPODIZATION"}="STRONG";}
-    if ($All{"FPLOT"} eq "") {$All{"FPLOT"}="POWER";}
+    if ($All{"FUNITS"} eq $EMPTY) {$All{"FUNITS"}="MHz";}
+    if ($All{"FAPODIZATION"} eq $EMPTY) {$All{"FAPODIZATION"}="STRONG";}
+    if ($All{"FPLOT"} eq $EMPTY) {$All{"FPLOT"}="POWER";}
 
 
     $FOURIER_Block=
@@ -456,7 +458,7 @@ sub CreateMSRSingleHist {
     }
 
     # Proper way
-    if ( $All{"Minimization"} ne "" &&  $All{"ErrorCalc"} ne "" && $Step ne "PLOT" ) {
+    if ( $All{"Minimization"} ne $EMPTY &&  $All{"ErrorCalc"} ne $EMPTY && $Step ne "PLOT" ) {
 	$FITMINTYPE = $All{"Minimization"}."\n".$All{"ErrorCalc"};
     }
 
@@ -475,11 +477,11 @@ sub CreateMSRSingleHist {
     # $RUNSType = 0 (Auto) or 1 (Manual)
     my $RUNSType = 0;
     my @RUNS=();
-    if ($All{"RunNumbers"} ne "") {
+    if ($All{"RunNumbers"} ne $EMPTY) {
 	@RUNS=split( /,/, $All{"RunNumbers"});
 	$RUNSType = 0;
     }
-    elsif ($All{"RunFiles"} ne "") {
+    elsif ($All{"RunFiles"} ne $EMPTY) {
 	@RUNS=split( /,/, $All{"RunFiles"});
 	$RUNSType = 1;
     }
@@ -627,13 +629,13 @@ sub CreateMSRSingleHist {
 	    foreach ("t0","Bg1","Bg2","Data1","Data2") {
 		$Name = "$_$Hist";
 # If empty fill with defaults
-		if ($All{$Name} eq "") {
+		if ($All{$Name} eq $EMPTY) {
 		    $All{$Name}=MSR::T0BgData($_,$Hist,$BeamLine);
 		}
 	    }
 	    $Bg_Line = $Bg_Line."    ".$All{"Bg1$Hist"}."    ".$All{"Bg2$Hist"};
 	    $Data_Line =$Data_Line."    ".$All{"Data1$Hist"}."    ".$All{"Data2$Hist"};
-	    if ($All{"t0$Hist"} ne "") {
+	    if ($All{"t0$Hist"} ne $EMPTY) {
 		$Data_Line=$Data_Line."\nt0       ".$All{"t0$Hist"};  
 	    }
 	    
@@ -740,9 +742,9 @@ runs     $RUNS_Line
 $PRANGE_Line
 $logxy";
 
-    if ($All{"FUNITS"} eq "") {$All{"FUNITS"}="MHz";}
-    if ($All{"FAPODIZATION"} eq "") {$All{"FAPODIZATION"}="STRONG";}
-    if ($All{"FPLOT"} eq "") {$All{"FPLOT"}="POWER";}
+    if ($All{"FUNITS"} eq $EMPTY) {$All{"FUNITS"}="MHz";}
+    if ($All{"FAPODIZATION"} eq $EMPTY) {$All{"FAPODIZATION"}="STRONG";}
+    if ($All{"FPLOT"} eq $EMPTY) {$All{"FPLOT"}="POWER";}
 
 
     $FOURIER_Block=
@@ -1006,7 +1008,7 @@ sub ExtractBlks {
 
 # Identify different blocks
     my $i=0;
-    my $line ="";
+    my $line =$EMPTY;
     foreach $line (@file)
     {
 	if (grep {/FITPARAMETER/} $line) {$NFITPARAMETERS=$i;}
@@ -1181,7 +1183,7 @@ sub PrepParamTable {
 		foreach my $Param (@Params) {
 		    my $Param_ORG = $Param;
 		    if ( $#FitTypes != 0 && ( $Param ne "Alpha" ) ){
-			$Param = join( "", $Param, "_", "$Component" );
+			$Param = join( $EMPTY, $Param, "_", "$Component" );
 		    }
 		    
 		    $Shared = $All{"Sh_$Param"};
@@ -1190,7 +1192,7 @@ sub PrepParamTable {
 			$Param=$Param."_".$iRun;
 # Check if this parameter has been initialized befor. If not take from defaults
 			$value = $All{"$Param"};
-			if ( $value ne "" ) {
+			if ( $value ne $EMPTY ) {
 			    $error    = $All{"$erradd$Param"};
 			    $minvalue = $All{"$Param$minadd"};
 			    $maxvalue = $All{"$Param$maxadd"};
@@ -1198,10 +1200,14 @@ sub PrepParamTable {
 # I need this although it is already in the MSR.pm module, just for this table
 # We can remove it from the MSR module later...
 # Or keep in the MSR as function ??
+
+# We have two options here, either take default values or take values of previous 
+# run if available
+#			    $ParamPrev =~ s/$iRun-1/$iRun/g;
 			    $value = $Defaults{$Param_ORG};
-			    $error = $Defaults{ join( "", $erradd, $Param_ORG ) };
-			    $minvalue = $Defaults{ join("", $Param_ORG, $minadd ) };
-			    $maxvalue = $Defaults{ join("", $Param_ORG, $maxadd ) };
+			    $error = $Defaults{ join( $EMPTY, $erradd, $Param_ORG ) };
+			    $minvalue = $Defaults{ join($EMPTY, $Param_ORG, $minadd ) };
+			    $maxvalue = $Defaults{ join($EMPTY, $Param_ORG, $maxadd ) };
 			}
 			$values=join(",",$Param,$value,$error,$minvalue,$maxvalue,$RUN);
 			$ParTable{$PCount}=$values;
@@ -1231,7 +1237,7 @@ sub PrepParamTable {
 			my $Param_ORG = $Param;
 			$Param=$Param.$Hist;
 			if ( $#FitTypes != 0 && ( $Param_ORG ne "N0" && $Param_ORG ne "NBg" ) ){
-			    $Param = join( "", $Param, "_", "$Component" );
+			    $Param = join( $EMPTY, $Param, "_", "$Component" );
 			}
 			
 			$Shared = $All{"Sh_$Param"};
@@ -1240,7 +1246,7 @@ sub PrepParamTable {
 			    $Param=$Param."_".$iRun;
 # Check if this parameter has been initialized befor. If not take from defaults
 			    $value = $All{"$Param"};
-			    if ( $value ne "" ) {
+			    if ( $value ne $EMPTY ) {
 				$error    = $All{"$erradd$Param"};
 				$minvalue = $All{"$Param$minadd"};
 				$maxvalue = $All{"$Param$maxadd"};
@@ -1249,9 +1255,9 @@ sub PrepParamTable {
 # We can remove it from the MSR module later...
 # Or keep in the MSR as function ??
 				$value = $Defaults{$Param_ORG};
-				$error = $Defaults{ join( "", $erradd, $Param_ORG ) };
-				$minvalue = $Defaults{ join("", $Param_ORG, $minadd ) };
-				$maxvalue = $Defaults{ join("", $Param_ORG, $maxadd ) };
+				$error = $Defaults{ join( $EMPTY, $erradd, $Param_ORG ) };
+				$minvalue = $Defaults{ join($EMPTY, $Param_ORG, $minadd ) };
+				$maxvalue = $Defaults{ join($EMPTY, $Param_ORG, $maxadd ) };
 			    }
 			    $values=join(",",$Param,$value,$error,$minvalue,$maxvalue,$RUN);
 			    $ParTable{$PCount}=$values;
@@ -1283,7 +1289,7 @@ sub ExportParams {
 # First assume nothing is shared
     my $Shared = 0;
 
-    my $TABLE="";
+    my $TABLE=$EMPTY;
     my $HEADER="RUN";
 
     my %All = %{$_[0]};
@@ -1342,7 +1348,7 @@ sub ExportParams {
 		foreach my $Param (@Params) {
 		    my $Param_ORG = $Param;
 		    if ( $#FitTypes != 0 && ( $Param ne "Alpha" ) ){
-			$Param = join( "", $Param, "_", "$Component" );
+			$Param = join( $EMPTY, $Param, "_", "$Component" );
 		    }
 		    # $All{"Header"} - 0/1 for with/without header
 		    if ($All{"Header"} && $iRun == 1) {
@@ -1391,7 +1397,7 @@ sub ExportParams {
 			my $Param_ORG = $Param;
 			$Param=$Param.$Hist;
 			if ( $#FitTypes != 0 && ( $Param_ORG ne "N0" && $Param_ORG ne "NBg" ) ){
-			    $Param = join( "", $Param, "_", "$Component" );
+			    $Param = join( $EMPTY, $Param, "_", "$Component" );
 			}
 			
 			$Shared = $All{"Sh_$Param"};
@@ -1471,7 +1477,7 @@ sub MSR2Dat {
 	# Remove first element (map)
 	shift(@tmp);
 	foreach (@tmp) {
-	    if ($_ ne "" && $_>0 ) {
+	    if ($_ ne $EMPTY && $_>0 ) {
 		@RunParams=(@RunParams,$_);
 		$NP++;
 	    }
