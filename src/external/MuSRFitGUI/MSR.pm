@@ -381,16 +381,27 @@ SAVE
         #	}
     }
 
+    $RRFBlock="";
+    if ($All{"RRFFrq"}!= 0) {
+	if ($All{"RRFPhase"} eq $EMPTY) {$All{"RRFPhase"}=0;}
+	if ($All{"RRFPack"} eq $EMPTY) {$All{"RRFPack"}=1;}
+	$RRFBlock="rrf_freq  ".$All{"RRFFrq"}."  ".$All{"RRFUnits"}."\n";
+	$RRFBlock=$RRFBlock."rrf_phase  ".$All{"RRFPhase"}."\n";
+	$RRFBlock=$RRFBlock."rrf_packing  ".$All{"RRFPack"}."\n";
+    }
+
     $PLOT_Block =
       "###############################################################
 PLOT $PLT
 runs     $RUNS_Line
 $PRANGE_Line
+$RRFBlock
 $logxy";
 
     if ($All{"FUNITS"} eq $EMPTY) {$All{"FUNITS"}="MHz";}
     if ($All{"FAPODIZATION"} eq $EMPTY) {$All{"FAPODIZATION"}="STRONG";}
     if ($All{"FPLOT"} eq $EMPTY) {$All{"FPLOT"}="POWER";}
+    if ($All{"FPHASE"} eq $EMPTY) {$All{"FPHASE"}="8.5";}
 
 
     $FOURIER_Block=
@@ -400,11 +411,13 @@ units            FUNITS    # units either 'Gauss', 'MHz', or 'Mc/s'
 fourier_power    12
 apodization      FAPODIZATION  # NONE, WEAK, MEDIUM, STRONG
 plot             FPLOT   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
-phase            8.50";
+phase            FPHASE
+#range            FRQMIN  FRQMAX";
 
     $FOURIER_Block=~ s/FUNITS/$All{"FUNITS"}/g;
     $FOURIER_Block=~ s/FAPODIZATION/$All{"FAPODIZATION"}/g;
     $FOURIER_Block=~ s/FPLOT/$All{"FPLOT"}/g;
+    $FOURIER_Block=~ s/FPHASE/$All{"FPHASE"}/g;
 
     # Don't know why but it is needed initially
     $STAT_Block =
@@ -735,16 +748,27 @@ SAVE
         #	}
     }
 
+    $RRFBlock="";
+    if ($All{"RRFFrq"}!= 0) {
+	if ($All{"RRFPhase"} eq $EMPTY) {$All{"RRFPhase"}=0;}
+	if ($All{"RRFPack"} eq $EMPTY) {$All{"RRFPack"}=1;}
+	$RRFBlock="rrf_freq  ".$All{"RRFFrq"}."  ".$All{"RRFUnits"}."\n";
+	$RRFBlock=$RRFBlock."rrf_phase  ".$All{"RRFPhase"}."\n";
+	$RRFBlock=$RRFBlock."rrf_packing  ".$All{"RRFPack"}."\n";
+    }
+
     $PLOT_Block =
       "###############################################################
 PLOT $PLT
 runs     $RUNS_Line
 $PRANGE_Line
+$RRFBlock
 $logxy";
 
     if ($All{"FUNITS"} eq $EMPTY) {$All{"FUNITS"}="MHz";}
     if ($All{"FAPODIZATION"} eq $EMPTY) {$All{"FAPODIZATION"}="STRONG";}
     if ($All{"FPLOT"} eq $EMPTY) {$All{"FPLOT"}="POWER";}
+    if ($All{"FPHASE"} eq $EMPTY) {$All{"FPHASE"}="8.5";}
 
 
     $FOURIER_Block=
@@ -754,11 +778,13 @@ units            FUNITS    # units either 'Gauss', 'MHz', or 'Mc/s'
 fourier_power    12
 apodization      FAPODIZATION  # NONE, WEAK, MEDIUM, STRONG
 plot             FPLOT   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
-phase            8.50";
+phase            FPHASE
+#range            FRQMIN  FRQMAX";
 
     $FOURIER_Block=~ s/FUNITS/$All{"FUNITS"}/g;
     $FOURIER_Block=~ s/FAPODIZATION/$All{"FAPODIZATION"}/g;
     $FOURIER_Block=~ s/FPLOT/$All{"FPLOT"}/g;
+    $FOURIER_Block=~ s/FPHASE/$All{"FPHASE"}/g;
 
     # Don't know why but it is needed initially
     $STAT_Block =

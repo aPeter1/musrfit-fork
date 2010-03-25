@@ -280,9 +280,16 @@ void MuSRFitform::CreateAllInput()
     $All{"FUNITS"}= FUnits->currentText;
     $All{"FAPODIZATION"}= FApodization->currentText;
     $All{"FPLOT"}= FPlot->currentText;
+    $All{"FPHASE"}=FPHASE->text;
 # Fourier range
     $All{"FrqMin"}=FrqMin->text;
     $All{"FrqMax"}=FrqMax->text;
+ 
+# Rotating reference frame parameters
+    $All{"RRFFrq"}=RRFFrq->text;
+    $All{"RRFPack"}=RRFPack->text;
+    $All{"RRFPhase"}=RRFPhase->text;
+    $All{"RRFUnits"}=RRFUnits->currentText;
     
 # Get values of t0 and Bg/Data bins if given
     my $NHist = 1;

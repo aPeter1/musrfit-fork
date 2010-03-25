@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Wed Mar 24 10:01:16 2010
+# Created: Thu Mar 25 11:36:15 2010
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -10,7 +10,7 @@ use strict;
 use utf8;
 
 
-package MuSRFitform;
+package MuSRFitformR;
 use Qt;
 use Qt::isa qw(Qt::MainWindow);
 use Qt::slots
@@ -129,35 +129,35 @@ use Qt::attributes qw(
     FILENAME
     textMSROutput
     FourierPage
-    FourierBox
-    FUnitsLabel
-    FApodizationLabel
-    FPlotLabel
-    FUnits
-    FApodization
-    FPlot
-    textLabel1
-    textLabel1_3
-    textLabel1_3_5
-    FrqMin
-    textLabel1_3_2
-    textLabel1_3_6
-    textLabel1_2
-    textLabel1_3_3
-    textLabel1_3_7
-    FrqMax
-    textLabel1_3_4
-    textLabel1_3_8
     RRFBox
-    textLabel1_6
-    textLabel1_6_2
     textLabel1_6_2_2
-    RRF_Freq
-    RRF_Pack
-    RRF_Phase
-    RRF_Units
-    textLabel1_6_2_3
+    textLabel1_6
     textLabel1_6_2_4
+    RRFFrq
+    textLabel1_6_2_3
+    RRFPack
+    textLabel1_6_2
+    RRFUnits
+    RRFPhase
+    FourierBox
+    FrqMin
+    textLabel1_3_4
+    textLabel1_7
+    textLabel1_3_5
+    FUnits
+    textLabel1_3_6
+    FApodization
+    FrqMax
+    FPlot
+    FUnitsLabel
+    textLabel1_3_8
+    textLabel1_3_7
+    FPlotLabel
+    textLabel1_2
+    FApodizationLabel
+    textLabel1_3_3
+    FPHASE
+    textLabel1
     T0Page
     groupHist0
     textLabel2
@@ -1631,7 +1631,7 @@ sub NEW
 
     if ( name() eq "unnamed" )
     {
-        setName("MuSRFitform" );
+        setName("MuSRFitformR" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
     setMinimumSize(Qt::Size(21, 275) );
@@ -2301,263 +2301,260 @@ sub NEW
 
     FourierPage = Qt::Widget(musrfit_tabs, "FourierPage");
 
-    my $LayoutWidget_10 = Qt::Widget(FourierPage, '$LayoutWidget_10');
-    $LayoutWidget_10->setGeometry( Qt::Rect(5, 5, 549, 280) );
-    my $layout30 = Qt::VBoxLayout($LayoutWidget_10, 11, 6, '$layout30');
+    RRFBox = Qt::GroupBox(FourierPage, "RRFBox");
+    RRFBox->setGeometry( Qt::Rect(6, 135, 547, 125) );
 
-    FourierBox = Qt::GroupBox($LayoutWidget_10, "FourierBox");
+    my $LayoutWidget_10 = Qt::Widget(RRFBox, '$LayoutWidget_10');
+    $LayoutWidget_10->setGeometry( Qt::Rect(10, 18, 265, 100) );
+    my $layout35 = Qt::GridLayout($LayoutWidget_10, 1, 1, 5, 5, '$layout35');
+
+    textLabel1_6_2_2 = Qt::Label($LayoutWidget_10, "textLabel1_6_2_2");
+
+    $layout35->addWidget(textLabel1_6_2_2, 2, 0);
+
+    textLabel1_6 = Qt::Label($LayoutWidget_10, "textLabel1_6");
+
+    $layout35->addWidget(textLabel1_6, 0, 0);
+
+    textLabel1_6_2_4 = Qt::Label($LayoutWidget_10, "textLabel1_6_2_4");
+
+    $layout35->addWidget(textLabel1_6_2_4, 2, 2);
+
+    RRFFrq = Qt::LineEdit($LayoutWidget_10, "RRFFrq");
+
+    $layout35->addWidget(RRFFrq, 0, 1);
+
+    textLabel1_6_2_3 = Qt::Label($LayoutWidget_10, "textLabel1_6_2_3");
+
+    $layout35->addWidget(textLabel1_6_2_3, 1, 2);
+
+    RRFPack = Qt::LineEdit($LayoutWidget_10, "RRFPack");
+
+    $layout35->addWidget(RRFPack, 1, 1);
+
+    textLabel1_6_2 = Qt::Label($LayoutWidget_10, "textLabel1_6_2");
+
+    $layout35->addWidget(textLabel1_6_2, 1, 0);
+
+    RRFUnits = Qt::ComboBox(0, $LayoutWidget_10, "RRFUnits");
+
+    $layout35->addWidget(RRFUnits, 0, 2);
+
+    RRFPhase = Qt::LineEdit($LayoutWidget_10, "RRFPhase");
+
+    $layout35->addWidget(RRFPhase, 2, 1);
+
+    FourierBox = Qt::GroupBox(FourierPage, "FourierBox");
+    FourierBox->setGeometry( Qt::Rect(6, 6, 547, 125) );
 
     my $LayoutWidget_11 = Qt::Widget(FourierBox, '$LayoutWidget_11');
-    $LayoutWidget_11->setGeometry( Qt::Rect(6, 22, 535, 94) );
-    my $layout33_2 = Qt::HBoxLayout($LayoutWidget_11, 11, 6, '$layout33_2');
-
-    my $layout26_2 = Qt::VBoxLayout(undef, 0, 6, '$layout26_2');
-
-    FUnitsLabel = Qt::Label($LayoutWidget_11, "FUnitsLabel");
-    $layout26_2->addWidget(FUnitsLabel);
-
-    FApodizationLabel = Qt::Label($LayoutWidget_11, "FApodizationLabel");
-    $layout26_2->addWidget(FApodizationLabel);
-
-    FPlotLabel = Qt::Label($LayoutWidget_11, "FPlotLabel");
-    $layout26_2->addWidget(FPlotLabel);
-    $layout33_2->addLayout($layout26_2);
-
-    my $layout27 = Qt::VBoxLayout(undef, 0, 6, '$layout27');
-
-    FUnits = Qt::ComboBox(0, $LayoutWidget_11, "FUnits");
-    FUnits->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FUnits->sizePolicy()->hasHeightForWidth()) );
-    $layout27->addWidget(FUnits);
-
-    FApodization = Qt::ComboBox(0, $LayoutWidget_11, "FApodization");
-    FApodization->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FApodization->sizePolicy()->hasHeightForWidth()) );
-    $layout27->addWidget(FApodization);
-
-    FPlot = Qt::ComboBox(0, $LayoutWidget_11, "FPlot");
-    FPlot->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FPlot->sizePolicy()->hasHeightForWidth()) );
-    $layout27->addWidget(FPlot);
-    $layout33_2->addLayout($layout27);
-
-    my $layout28 = Qt::VBoxLayout(undef, 0, 6, '$layout28');
-
-    textLabel1 = Qt::Label($LayoutWidget_11, "textLabel1");
-    $layout28->addWidget(textLabel1);
-
-    textLabel1_3 = Qt::Label($LayoutWidget_11, "textLabel1_3");
-    $layout28->addWidget(textLabel1_3);
-
-    textLabel1_3_5 = Qt::Label($LayoutWidget_11, "textLabel1_3_5");
-    $layout28->addWidget(textLabel1_3_5);
-    $layout33_2->addLayout($layout28);
-
-    my $layout29 = Qt::VBoxLayout(undef, 0, 6, '$layout29');
+    $LayoutWidget_11->setGeometry( Qt::Rect(12, 19, 525, 100) );
+    my $layout34_2 = Qt::GridLayout($LayoutWidget_11, 1, 1, 5, 5, '$layout34_2');
 
     FrqMin = Qt::LineEdit($LayoutWidget_11, "FrqMin");
     FrqMin->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FrqMin->sizePolicy()->hasHeightForWidth()) );
-    $layout29->addWidget(FrqMin);
 
-    textLabel1_3_2 = Qt::Label($LayoutWidget_11, "textLabel1_3_2");
-    $layout29->addWidget(textLabel1_3_2);
+    $layout34_2->addWidget(FrqMin, 0, 3);
+
+    textLabel1_3_4 = Qt::Label($LayoutWidget_11, "textLabel1_3_4");
+
+    $layout34_2->addWidget(textLabel1_3_4, 1, 5);
+
+    textLabel1_7 = Qt::Label($LayoutWidget_11, "textLabel1_7");
+
+    $layout34_2->addWidget(textLabel1_7, 1, 2);
+
+    textLabel1_3_5 = Qt::Label($LayoutWidget_11, "textLabel1_3_5");
+
+    $layout34_2->addWidget(textLabel1_3_5, 2, 2);
+
+    FUnits = Qt::ComboBox(0, $LayoutWidget_11, "FUnits");
+    FUnits->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FUnits->sizePolicy()->hasHeightForWidth()) );
+
+    $layout34_2->addWidget(FUnits, 0, 1);
 
     textLabel1_3_6 = Qt::Label($LayoutWidget_11, "textLabel1_3_6");
-    $layout29->addWidget(textLabel1_3_6);
-    $layout33_2->addLayout($layout29);
 
-    my $layout31 = Qt::VBoxLayout(undef, 0, 6, '$layout31');
+    $layout34_2->addWidget(textLabel1_3_6, 2, 3);
 
-    textLabel1_2 = Qt::Label($LayoutWidget_11, "textLabel1_2");
-    $layout31->addWidget(textLabel1_2);
+    FApodization = Qt::ComboBox(0, $LayoutWidget_11, "FApodization");
+    FApodization->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FApodization->sizePolicy()->hasHeightForWidth()) );
 
-    textLabel1_3_3 = Qt::Label($LayoutWidget_11, "textLabel1_3_3");
-    $layout31->addWidget(textLabel1_3_3);
-
-    textLabel1_3_7 = Qt::Label($LayoutWidget_11, "textLabel1_3_7");
-    $layout31->addWidget(textLabel1_3_7);
-    $layout33_2->addLayout($layout31);
-
-    my $layout32 = Qt::VBoxLayout(undef, 0, 6, '$layout32');
+    $layout34_2->addWidget(FApodization, 1, 1);
 
     FrqMax = Qt::LineEdit($LayoutWidget_11, "FrqMax");
     FrqMax->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FrqMax->sizePolicy()->hasHeightForWidth()) );
-    $layout32->addWidget(FrqMax);
 
-    textLabel1_3_4 = Qt::Label($LayoutWidget_11, "textLabel1_3_4");
-    $layout32->addWidget(textLabel1_3_4);
+    $layout34_2->addWidget(FrqMax, 0, 5);
+
+    FPlot = Qt::ComboBox(0, $LayoutWidget_11, "FPlot");
+    FPlot->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FPlot->sizePolicy()->hasHeightForWidth()) );
+
+    $layout34_2->addWidget(FPlot, 2, 1);
+
+    FUnitsLabel = Qt::Label($LayoutWidget_11, "FUnitsLabel");
+
+    $layout34_2->addWidget(FUnitsLabel, 0, 0);
 
     textLabel1_3_8 = Qt::Label($LayoutWidget_11, "textLabel1_3_8");
-    $layout32->addWidget(textLabel1_3_8);
-    $layout33_2->addLayout($layout32);
-    $layout30->addWidget(FourierBox);
 
-    RRFBox = Qt::GroupBox($LayoutWidget_10, "RRFBox");
+    $layout34_2->addWidget(textLabel1_3_8, 2, 5);
 
-    my $LayoutWidget_12 = Qt::Widget(RRFBox, '$LayoutWidget_12');
-    $LayoutWidget_12->setGeometry( Qt::Rect(10, 20, 265, 94) );
-    my $layout29_2 = Qt::HBoxLayout($LayoutWidget_12, 11, 6, '$layout29_2');
+    textLabel1_3_7 = Qt::Label($LayoutWidget_11, "textLabel1_3_7");
 
-    my $layout26_3 = Qt::VBoxLayout(undef, 0, 6, '$layout26_3');
+    $layout34_2->addWidget(textLabel1_3_7, 2, 4);
 
-    textLabel1_6 = Qt::Label($LayoutWidget_12, "textLabel1_6");
-    $layout26_3->addWidget(textLabel1_6);
+    FPlotLabel = Qt::Label($LayoutWidget_11, "FPlotLabel");
 
-    textLabel1_6_2 = Qt::Label($LayoutWidget_12, "textLabel1_6_2");
-    $layout26_3->addWidget(textLabel1_6_2);
+    $layout34_2->addWidget(FPlotLabel, 2, 0);
 
-    textLabel1_6_2_2 = Qt::Label($LayoutWidget_12, "textLabel1_6_2_2");
-    $layout26_3->addWidget(textLabel1_6_2_2);
-    $layout29_2->addLayout($layout26_3);
+    textLabel1_2 = Qt::Label($LayoutWidget_11, "textLabel1_2");
 
-    my $layout27_2 = Qt::VBoxLayout(undef, 0, 6, '$layout27_2');
+    $layout34_2->addWidget(textLabel1_2, 0, 4);
 
-    RRF_Freq = Qt::LineEdit($LayoutWidget_12, "RRF_Freq");
-    $layout27_2->addWidget(RRF_Freq);
+    FApodizationLabel = Qt::Label($LayoutWidget_11, "FApodizationLabel");
 
-    RRF_Pack = Qt::LineEdit($LayoutWidget_12, "RRF_Pack");
-    $layout27_2->addWidget(RRF_Pack);
+    $layout34_2->addWidget(FApodizationLabel, 1, 0);
 
-    RRF_Phase = Qt::LineEdit($LayoutWidget_12, "RRF_Phase");
-    $layout27_2->addWidget(RRF_Phase);
-    $layout29_2->addLayout($layout27_2);
+    textLabel1_3_3 = Qt::Label($LayoutWidget_11, "textLabel1_3_3");
 
-    my $layout28_2 = Qt::VBoxLayout(undef, 0, 6, '$layout28_2');
+    $layout34_2->addWidget(textLabel1_3_3, 1, 4);
 
-    RRF_Units = Qt::ComboBox(0, $LayoutWidget_12, "RRF_Units");
-    $layout28_2->addWidget(RRF_Units);
+    FPHASE = Qt::LineEdit($LayoutWidget_11, "FPHASE");
+    FPHASE->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FPHASE->sizePolicy()->hasHeightForWidth()) );
 
-    textLabel1_6_2_3 = Qt::Label($LayoutWidget_12, "textLabel1_6_2_3");
-    $layout28_2->addWidget(textLabel1_6_2_3);
+    $layout34_2->addWidget(FPHASE, 1, 3);
 
-    textLabel1_6_2_4 = Qt::Label($LayoutWidget_12, "textLabel1_6_2_4");
-    $layout28_2->addWidget(textLabel1_6_2_4);
-    $layout29_2->addLayout($layout28_2);
-    $layout30->addWidget(RRFBox);
+    textLabel1 = Qt::Label($LayoutWidget_11, "textLabel1");
+
+    $layout34_2->addWidget(textLabel1, 0, 2);
     musrfit_tabs->insertTab( FourierPage, "" );
 
     T0Page = Qt::Widget(musrfit_tabs, "T0Page");
     my $T0PageLayout = Qt::GridLayout(T0Page, 1, 1, 11, 6, '$T0PageLayout');
 
-    my $layout27_3 = Qt::HBoxLayout(undef, 0, 6, '$layout27_3');
+    my $layout27 = Qt::HBoxLayout(undef, 0, 6, '$layout27');
 
     groupHist0 = Qt::GroupBox(T0Page, "groupHist0");
     groupHist0->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, groupHist0->sizePolicy()->hasHeightForWidth()) );
     groupHist0->setMinimumSize( Qt::Size(0, 0) );
 
-    my $LayoutWidget_13 = Qt::Widget(groupHist0, '$LayoutWidget_13');
-    $LayoutWidget_13->setGeometry( Qt::Rect(5, 18, 100, 150) );
-    my $layout16_2 = Qt::VBoxLayout($LayoutWidget_13, 11, 6, '$layout16_2');
+    my $LayoutWidget_12 = Qt::Widget(groupHist0, '$LayoutWidget_12');
+    $LayoutWidget_12->setGeometry( Qt::Rect(5, 18, 100, 150) );
+    my $layout16_2 = Qt::VBoxLayout($LayoutWidget_12, 11, 6, '$layout16_2');
 
-    textLabel2 = Qt::Label($LayoutWidget_13, "textLabel2");
+    textLabel2 = Qt::Label($LayoutWidget_12, "textLabel2");
     $layout16_2->addWidget(textLabel2);
 
-    textLabel2_2_2_3 = Qt::Label($LayoutWidget_13, "textLabel2_2_2_3");
+    textLabel2_2_2_3 = Qt::Label($LayoutWidget_12, "textLabel2_2_2_3");
     $layout16_2->addWidget(textLabel2_2_2_3);
 
-    textLabel2_2_2 = Qt::Label($LayoutWidget_13, "textLabel2_2_2");
+    textLabel2_2_2 = Qt::Label($LayoutWidget_12, "textLabel2_2_2");
     $layout16_2->addWidget(textLabel2_2_2);
 
-    textLabel2_2_2_2 = Qt::Label($LayoutWidget_13, "textLabel2_2_2_2");
+    textLabel2_2_2_2 = Qt::Label($LayoutWidget_12, "textLabel2_2_2_2");
     $layout16_2->addWidget(textLabel2_2_2_2);
 
-    textLabel2_2_2_2_2 = Qt::Label($LayoutWidget_13, "textLabel2_2_2_2_2");
+    textLabel2_2_2_2_2 = Qt::Label($LayoutWidget_12, "textLabel2_2_2_2_2");
     $layout16_2->addWidget(textLabel2_2_2_2_2);
-    $layout27_3->addWidget(groupHist0);
+    $layout27->addWidget(groupHist0);
 
     groupHist1 = Qt::GroupBox(T0Page, "groupHist1");
     groupHist1->setFrameShadow( &Qt::GroupBox::Plain() );
 
-    my $LayoutWidget_14 = Qt::Widget(groupHist1, '$LayoutWidget_14');
-    $LayoutWidget_14->setGeometry( Qt::Rect(8, 17, 75, 150) );
-    my $layout18 = Qt::VBoxLayout($LayoutWidget_14, 0, 0, '$layout18');
+    my $LayoutWidget_13 = Qt::Widget(groupHist1, '$LayoutWidget_13');
+    $LayoutWidget_13->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18 = Qt::VBoxLayout($LayoutWidget_13, 0, 0, '$layout18');
 
-    t01 = Qt::LineEdit($LayoutWidget_14, "t01");
+    t01 = Qt::LineEdit($LayoutWidget_13, "t01");
     $layout18->addWidget(t01);
 
-    Bg11 = Qt::LineEdit($LayoutWidget_14, "Bg11");
+    Bg11 = Qt::LineEdit($LayoutWidget_13, "Bg11");
     $layout18->addWidget(Bg11);
 
-    Bg21 = Qt::LineEdit($LayoutWidget_14, "Bg21");
+    Bg21 = Qt::LineEdit($LayoutWidget_13, "Bg21");
     $layout18->addWidget(Bg21);
 
-    Data11 = Qt::LineEdit($LayoutWidget_14, "Data11");
+    Data11 = Qt::LineEdit($LayoutWidget_13, "Data11");
     $layout18->addWidget(Data11);
 
-    Data21 = Qt::LineEdit($LayoutWidget_14, "Data21");
+    Data21 = Qt::LineEdit($LayoutWidget_13, "Data21");
     $layout18->addWidget(Data21);
-    $layout27_3->addWidget(groupHist1);
+    $layout27->addWidget(groupHist1);
 
     groupHist2 = Qt::GroupBox(T0Page, "groupHist2");
     groupHist2->setEnabled( 1 );
     groupHist2->setFrameShadow( &Qt::GroupBox::Plain() );
 
-    my $LayoutWidget_15 = Qt::Widget(groupHist2, '$LayoutWidget_15');
-    $LayoutWidget_15->setGeometry( Qt::Rect(8, 17, 75, 150) );
-    my $layout18_2 = Qt::VBoxLayout($LayoutWidget_15, 0, 0, '$layout18_2');
+    my $LayoutWidget_14 = Qt::Widget(groupHist2, '$LayoutWidget_14');
+    $LayoutWidget_14->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18_2 = Qt::VBoxLayout($LayoutWidget_14, 0, 0, '$layout18_2');
 
-    t02 = Qt::LineEdit($LayoutWidget_15, "t02");
+    t02 = Qt::LineEdit($LayoutWidget_14, "t02");
     $layout18_2->addWidget(t02);
 
-    Bg12 = Qt::LineEdit($LayoutWidget_15, "Bg12");
+    Bg12 = Qt::LineEdit($LayoutWidget_14, "Bg12");
     $layout18_2->addWidget(Bg12);
 
-    Bg22 = Qt::LineEdit($LayoutWidget_15, "Bg22");
+    Bg22 = Qt::LineEdit($LayoutWidget_14, "Bg22");
     $layout18_2->addWidget(Bg22);
 
-    Data12 = Qt::LineEdit($LayoutWidget_15, "Data12");
+    Data12 = Qt::LineEdit($LayoutWidget_14, "Data12");
     $layout18_2->addWidget(Data12);
 
-    Data22 = Qt::LineEdit($LayoutWidget_15, "Data22");
+    Data22 = Qt::LineEdit($LayoutWidget_14, "Data22");
     $layout18_2->addWidget(Data22);
-    $layout27_3->addWidget(groupHist2);
+    $layout27->addWidget(groupHist2);
 
     groupHist3 = Qt::GroupBox(T0Page, "groupHist3");
     groupHist3->setEnabled( 1 );
     groupHist3->setFrameShadow( &Qt::GroupBox::Plain() );
 
-    my $LayoutWidget_16 = Qt::Widget(groupHist3, '$LayoutWidget_16');
-    $LayoutWidget_16->setGeometry( Qt::Rect(8, 17, 75, 150) );
-    my $layout18_3 = Qt::VBoxLayout($LayoutWidget_16, 0, 0, '$layout18_3');
+    my $LayoutWidget_15 = Qt::Widget(groupHist3, '$LayoutWidget_15');
+    $LayoutWidget_15->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18_3 = Qt::VBoxLayout($LayoutWidget_15, 0, 0, '$layout18_3');
 
-    t03 = Qt::LineEdit($LayoutWidget_16, "t03");
+    t03 = Qt::LineEdit($LayoutWidget_15, "t03");
     $layout18_3->addWidget(t03);
 
-    Bg13 = Qt::LineEdit($LayoutWidget_16, "Bg13");
+    Bg13 = Qt::LineEdit($LayoutWidget_15, "Bg13");
     $layout18_3->addWidget(Bg13);
 
-    Bg23 = Qt::LineEdit($LayoutWidget_16, "Bg23");
+    Bg23 = Qt::LineEdit($LayoutWidget_15, "Bg23");
     $layout18_3->addWidget(Bg23);
 
-    Data13 = Qt::LineEdit($LayoutWidget_16, "Data13");
+    Data13 = Qt::LineEdit($LayoutWidget_15, "Data13");
     $layout18_3->addWidget(Data13);
 
-    Data23 = Qt::LineEdit($LayoutWidget_16, "Data23");
+    Data23 = Qt::LineEdit($LayoutWidget_15, "Data23");
     $layout18_3->addWidget(Data23);
-    $layout27_3->addWidget(groupHist3);
+    $layout27->addWidget(groupHist3);
 
     groupHist4 = Qt::GroupBox(T0Page, "groupHist4");
     groupHist4->setEnabled( 1 );
     groupHist4->setFrameShadow( &Qt::GroupBox::Plain() );
 
-    my $LayoutWidget_17 = Qt::Widget(groupHist4, '$LayoutWidget_17');
-    $LayoutWidget_17->setGeometry( Qt::Rect(8, 17, 75, 150) );
-    my $layout18_4 = Qt::VBoxLayout($LayoutWidget_17, 0, 0, '$layout18_4');
+    my $LayoutWidget_16 = Qt::Widget(groupHist4, '$LayoutWidget_16');
+    $LayoutWidget_16->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18_4 = Qt::VBoxLayout($LayoutWidget_16, 0, 0, '$layout18_4');
 
-    t04 = Qt::LineEdit($LayoutWidget_17, "t04");
+    t04 = Qt::LineEdit($LayoutWidget_16, "t04");
     $layout18_4->addWidget(t04);
 
-    Bg14 = Qt::LineEdit($LayoutWidget_17, "Bg14");
+    Bg14 = Qt::LineEdit($LayoutWidget_16, "Bg14");
     $layout18_4->addWidget(Bg14);
 
-    Bg24 = Qt::LineEdit($LayoutWidget_17, "Bg24");
+    Bg24 = Qt::LineEdit($LayoutWidget_16, "Bg24");
     $layout18_4->addWidget(Bg24);
 
-    Data14 = Qt::LineEdit($LayoutWidget_17, "Data14");
+    Data14 = Qt::LineEdit($LayoutWidget_16, "Data14");
     $layout18_4->addWidget(Data14);
 
-    Data24 = Qt::LineEdit($LayoutWidget_17, "Data24");
+    Data24 = Qt::LineEdit($LayoutWidget_16, "Data24");
     $layout18_4->addWidget(Data24);
-    $layout27_3->addWidget(groupHist4);
+    $layout27->addWidget(groupHist4);
 
-    $T0PageLayout->addLayout($layout27_3, 0, 0);
+    $T0PageLayout->addLayout($layout27, 0, 0);
     musrfit_tabs->insertTab( T0Page, "" );
 
     fileNewAction= Qt::Action(this, "fileNewAction");
@@ -2961,14 +2958,28 @@ sub languageChange
     Qt::ToolTip::add(FILENAME, trUtf8("Name of the produced MSR file (optional)"));
     Qt::WhatsThis::add(FILENAME, trUtf8("Name of the produced MSR file (optional)"));
     musrfit_tabs->changeTab( MSRPage, trUtf8("MSR File") );
+    RRFBox->setTitle( trUtf8("RRF") );
+    textLabel1_6_2_2->setText( trUtf8("Phase") );
+    textLabel1_6->setText( trUtf8("Frequency") );
+    textLabel1_6_2_4->setText( undef );
+    RRFFrq->setText( undef );
+    textLabel1_6_2_3->setText( undef );
+    textLabel1_6_2->setText( trUtf8("Packing") );
+    RRFUnits->clear();
+    RRFUnits->insertItem( trUtf8("MHz") );
+    RRFUnits->insertItem( trUtf8("kHz") );
+    RRFUnits->insertItem( trUtf8("Mc/s") );
+    RRFUnits->insertItem( trUtf8("G") );
+    RRFUnits->insertItem( trUtf8("T") );
     FourierBox->setTitle( trUtf8("Fourier") );
-    FUnitsLabel->setText( trUtf8("Units") );
-    FApodizationLabel->setText( trUtf8("Apodization") );
-    FPlotLabel->setText( trUtf8("Plot") );
+    textLabel1_3_4->setText( undef );
+    textLabel1_7->setText( trUtf8("Phase:") );
+    textLabel1_3_5->setText( undef );
     FUnits->clear();
     FUnits->insertItem( trUtf8("MHz") );
     FUnits->insertItem( trUtf8("Gauss") );
     FUnits->insertItem( trUtf8("Mc/s") );
+    textLabel1_3_6->setText( undef );
     FApodization->clear();
     FApodization->insertItem( trUtf8("STRONG") );
     FApodization->insertItem( trUtf8("MEDIUM") );
@@ -2980,30 +2991,15 @@ sub languageChange
     FPlot->insertItem( trUtf8("imag") );
     FPlot->insertItem( trUtf8("real_and_imag") );
     FPlot->insertItem( trUtf8("phase") );
-    textLabel1->setText( trUtf8("Range: from") );
-    textLabel1_3->setText( undef );
-    textLabel1_3_5->setText( undef );
-    textLabel1_3_2->setText( undef );
-    textLabel1_3_6->setText( undef );
-    textLabel1_2->setText( trUtf8("to") );
-    textLabel1_3_3->setText( undef );
-    textLabel1_3_7->setText( undef );
-    textLabel1_3_4->setText( undef );
+    FUnitsLabel->setText( trUtf8("Units") );
     textLabel1_3_8->setText( undef );
-    RRFBox->setTitle( trUtf8("RRF") );
-    textLabel1_6->setText( trUtf8("Frequency") );
-    textLabel1_6_2->setText( trUtf8("Packing") );
-    textLabel1_6_2_2->setText( trUtf8("Phase") );
-    RRF_Freq->setText( undef );
-    RRF_Units->clear();
-    RRF_Units->insertItem( trUtf8("MHz") );
-    RRF_Units->insertItem( trUtf8("kHz") );
-    RRF_Units->insertItem( trUtf8("Mc/s") );
-    RRF_Units->insertItem( trUtf8("G") );
-    RRF_Units->insertItem( trUtf8("T") );
-    textLabel1_6_2_3->setText( undef );
-    textLabel1_6_2_4->setText( undef );
-    musrfit_tabs->changeTab( FourierPage, trUtf8("Fourier/RRF") );
+    textLabel1_3_7->setText( undef );
+    FPlotLabel->setText( trUtf8("Plot") );
+    textLabel1_2->setText( trUtf8("to") );
+    FApodizationLabel->setText( trUtf8("Apodization") );
+    textLabel1_3_3->setText( undef );
+    textLabel1->setText( trUtf8("Range: from") );
+    musrfit_tabs->changeTab( FourierPage, trUtf8("FFT/RRF") );
     groupHist0->setTitle( undef );
     textLabel2->setText( trUtf8("t0") );
     textLabel2_2_2_3->setText( trUtf8("Bg1") );
@@ -3014,7 +3010,7 @@ sub languageChange
     groupHist2->setTitle( trUtf8("Hist2") );
     groupHist3->setTitle( trUtf8("Hist3") );
     groupHist4->setTitle( trUtf8("Hist4") );
-    musrfit_tabs->changeTab( T0Page, trUtf8("t0/Bg Bins") );
+    musrfit_tabs->changeTab( T0Page, trUtf8("t0/Bg") );
     fileNewAction->setText( trUtf8("&New") );
     fileNewAction->setMenuText( trUtf8("&New") );
     fileNewAction->setAccel( Qt::KeySequence( trUtf8("Ctrl+N") ) );
@@ -3162,7 +3158,7 @@ sub fileChangeDir
 
 sub filePrint
 {
-    print "MuSRFitform->filePrint(): Not implemented yet.\n";
+    print "MuSRFitformR->filePrint(): Not implemented yet.\n";
 }
 
 sub fileExit
@@ -3227,37 +3223,37 @@ sub parametersAppend
 
 sub editUndo
 {
-    print "MuSRFitform->editUndo(): Not implemented yet.\n";
+    print "MuSRFitformR->editUndo(): Not implemented yet.\n";
 }
 
 sub editRedo
 {
-    print "MuSRFitform->editRedo(): Not implemented yet.\n";
+    print "MuSRFitformR->editRedo(): Not implemented yet.\n";
 }
 
 sub editCut
 {
-    print "MuSRFitform->editCut(): Not implemented yet.\n";
+    print "MuSRFitformR->editCut(): Not implemented yet.\n";
 }
 
 sub editCopy
 {
-    print "MuSRFitform->editCopy(): Not implemented yet.\n";
+    print "MuSRFitformR->editCopy(): Not implemented yet.\n";
 }
 
 sub editPaste
 {
-    print "MuSRFitform->editPaste(): Not implemented yet.\n";
+    print "MuSRFitformR->editPaste(): Not implemented yet.\n";
 }
 
 sub helpIndex
 {
-    print "MuSRFitform->helpIndex(): Not implemented yet.\n";
+    print "MuSRFitformR->helpIndex(): Not implemented yet.\n";
 }
 
 sub helpContents
 {
-    print "MuSRFitform->helpContents(): Not implemented yet.\n";
+    print "MuSRFitformR->helpContents(): Not implemented yet.\n";
 }
 
 sub helpAbout
@@ -3358,9 +3354,16 @@ sub CreateAllInput
     $All{"FUNITS"}= FUnits->currentText;
     $All{"FAPODIZATION"}= FApodization->currentText;
     $All{"FPLOT"}= FPlot->currentText;
+    $All{"FPHASE"}=FPHASE->text;
 # Fourier range
     $All{"FrqMin"}=FrqMin->text;
     $All{"FrqMax"}=FrqMax->text;
+ 
+# Rotating reference frame parameters
+    $All{"RRFFrq"}=RRFFrq->text;
+    $All{"RRFPack"}=RRFPack->text;
+    $All{"RRFPhase"}=RRFPhase->text;
+    $All{"RRFUnits"}=RRFUnits->currentText;
     
 # Get values of t0 and Bg/Data bins if given
     my $NHist = 1;
@@ -3908,10 +3911,10 @@ sub fileBrowse
 package main;
 
 use Qt;
-use MuSRFitform;
+use MuSRFitformR;
 
 my $a = Qt::Application(\@ARGV);
-my $w = MuSRFitform;
+my $w = MuSRFitformR;
 $a->setMainWidget($w);
 $w->show;
 exit $a->exec;
