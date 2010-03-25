@@ -22,8 +22,8 @@
     </property>
     <property name="minimumSize">
         <size>
-            <width>23</width>
-            <height>270</height>
+            <width>21</width>
+            <height>275</height>
         </size>
     </property>
     <property name="caption">
@@ -3671,19 +3671,19 @@
             </attribute>
             <widget class="QLayoutWidget">
                 <property name="name">
-                    <cstring>layout29_4</cstring>
+                    <cstring>layout31</cstring>
                 </property>
                 <property name="geometry">
                     <rect>
                         <x>5</x>
                         <y>5</y>
                         <width>545</width>
-                        <height>355</height>
+                        <height>350</height>
                     </rect>
                 </property>
                 <vbox>
                     <property name="name">
-                        <cstring>unnamed_2</cstring>
+                        <cstring>unnamed</cstring>
                     </property>
                     <widget class="QLabel">
                         <property name="name">
@@ -4276,6 +4276,52 @@
                         <property name="name">
                             <cstring>FunctionsBlock</cstring>
                         </property>
+                    </widget>
+                    <widget class="QLayoutWidget">
+                        <property name="name">
+                            <cstring>layout30</cstring>
+                        </property>
+                        <hbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QLabel">
+                                <property name="name">
+                                    <cstring>textLabel1_6</cstring>
+                                </property>
+                                <property name="text">
+                                    <string></string>
+                                </property>
+                            </widget>
+                            <widget class="QPushButton">
+                                <property name="name">
+                                    <cstring>ApplyFunc_2</cstring>
+                                </property>
+                                <property name="maximumSize">
+                                    <size>
+                                        <width>100</width>
+                                        <height>32767</height>
+                                    </size>
+                                </property>
+                                <property name="text">
+                                    <string>Apply</string>
+                                </property>
+                            </widget>
+                            <widget class="QPushButton">
+                                <property name="name">
+                                    <cstring>ResetFunc</cstring>
+                                </property>
+                                <property name="maximumSize">
+                                    <size>
+                                        <width>100</width>
+                                        <height>32767</height>
+                                    </size>
+                                </property>
+                                <property name="text">
+                                    <string>Reset</string>
+                                </property>
+                            </widget>
+                        </hbox>
                     </widget>
                 </vbox>
             </widget>
@@ -5028,6 +5074,12 @@
         <receiver>MuSRFitform</receiver>
         <slot>AppendToFunctions()</slot>
     </connection>
+    <connection>
+        <sender>ResetFunc</sender>
+        <signal>clicked()</signal>
+        <receiver>MuSRFitform</receiver>
+        <slot>ResetFunctions()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>musrfit_tabs</tabstop>
@@ -5135,6 +5187,7 @@
     <slot>RunSelectionToggle()</slot>
     <slot>fileBrowse()</slot>
     <slot>AppendToFunctions()</slot>
+    <slot>ResetFunctions()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

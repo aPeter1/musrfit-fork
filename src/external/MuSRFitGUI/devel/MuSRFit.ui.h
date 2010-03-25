@@ -821,3 +821,15 @@ void MuSRFitform::AppendToFunctions()
     $Full_T_Block=~ s/$ParName/fun$i/;
     TheoryBlock->setText($Full_T_Block);
 }
+
+void MuSRFitform::ResetFunctions()
+{
+# Clear drop down parameters menu    
+#   CParamsCombo->clear();
+# Then clear the text
+    ConstraintLine->setText("");
+    FunctionsBlock->setText("");
+#    my $Full_T_Block= $All{"Full_T_Block"};
+    TheoryBlock->setText($Full_T_Block);
+
+}

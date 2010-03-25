@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Fri Oct 9 23:56:08 2009
+# Created: Thu Mar 25 16:29:56 2010
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -42,7 +42,8 @@ use Qt::slots
     T0Update => [],
     RunSelectionToggle => [],
     fileBrowse => [],
-    AppendToFunctions => [];
+    AppendToFunctions => [],
+    ResetFunctions => [];
 use Qt::attributes qw(
     musrfit_tabs
     RUNSPage
@@ -188,6 +189,9 @@ use Qt::attributes qw(
     AddConstraint
     textLabel2_2_3_4
     FunctionsBlock
+    textLabel1_6
+    ApplyFunc_2
+    ResetFunc
     MenuBar
     fileMenu
     Edit
@@ -1578,7 +1582,7 @@ sub NEW
         setName("MuSRFitform" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
-    setMinimumSize(Qt::Size(23, 270) );
+    setMinimumSize(Qt::Size(21, 275) );
     setIcon($image0 );
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
@@ -2458,8 +2462,8 @@ sub NEW
     ConstPage = Qt::Widget(musrfit_tabs, "ConstPage");
 
     my $LayoutWidget_16 = Qt::Widget(ConstPage, '$LayoutWidget_16');
-    $LayoutWidget_16->setGeometry( Qt::Rect(5, 5, 545, 355) );
-    my $layout29_4 = Qt::VBoxLayout($LayoutWidget_16, 11, 6, '$layout29_4');
+    $LayoutWidget_16->setGeometry( Qt::Rect(5, 5, 545, 350) );
+    my $layout31_2 = Qt::VBoxLayout($LayoutWidget_16, 11, 6, '$layout31_2');
 
     textLabel2_2 = Qt::Label($LayoutWidget_16, "textLabel2_2");
     $cg->setColor(&Qt::ColorGroup::Foreground, &black);
@@ -2514,10 +2518,10 @@ sub NEW
     $cg->setColor(&Qt::ColorGroup::LinkVisited, Qt::Color(82,24,139));
     $pal->setDisabled($cg);
     textLabel2_2->setPalette( $pal );
-    $layout29_4->addWidget(textLabel2_2);
+    $layout31_2->addWidget(textLabel2_2);
 
     TheoryBlock = Qt::TextEdit($LayoutWidget_16, "TheoryBlock");
-    $layout29_4->addWidget(TheoryBlock);
+    $layout31_2->addWidget(TheoryBlock);
 
     my $layout25_6 = Qt::HBoxLayout(undef, 0, 6, '$layout25_6');
 
@@ -2536,7 +2540,7 @@ sub NEW
     AddConstraint = Qt::PushButton($LayoutWidget_16, "AddConstraint");
     AddConstraint->setSizePolicy( Qt::SizePolicy(0, 7, 0, 0, AddConstraint->sizePolicy()->hasHeightForWidth()) );
     $layout25_6->addWidget(AddConstraint);
-    $layout29_4->addLayout($layout25_6);
+    $layout31_2->addLayout($layout25_6);
 
     textLabel2_2_3_4 = Qt::Label($LayoutWidget_16, "textLabel2_2_3_4");
     $cg->setColor(&Qt::ColorGroup::Foreground, &black);
@@ -2591,10 +2595,24 @@ sub NEW
     $cg->setColor(&Qt::ColorGroup::LinkVisited, Qt::Color(82,24,139));
     $pal->setDisabled($cg);
     textLabel2_2_3_4->setPalette( $pal );
-    $layout29_4->addWidget(textLabel2_2_3_4);
+    $layout31_2->addWidget(textLabel2_2_3_4);
 
     FunctionsBlock = Qt::TextEdit($LayoutWidget_16, "FunctionsBlock");
-    $layout29_4->addWidget(FunctionsBlock);
+    $layout31_2->addWidget(FunctionsBlock);
+
+    my $layout30 = Qt::HBoxLayout(undef, 0, 6, '$layout30');
+
+    textLabel1_6 = Qt::Label($LayoutWidget_16, "textLabel1_6");
+    $layout30->addWidget(textLabel1_6);
+
+    ApplyFunc_2 = Qt::PushButton($LayoutWidget_16, "ApplyFunc_2");
+    ApplyFunc_2->setMaximumSize( Qt::Size(100, 32767) );
+    $layout30->addWidget(ApplyFunc_2);
+
+    ResetFunc = Qt::PushButton($LayoutWidget_16, "ResetFunc");
+    ResetFunc->setMaximumSize( Qt::Size(100, 32767) );
+    $layout30->addWidget(ResetFunc);
+    $layout31_2->addLayout($layout30);
     musrfit_tabs->insertTab( ConstPage, "" );
 
     fileNewAction= Qt::Action(this, "fileNewAction");
@@ -2757,6 +2775,7 @@ sub NEW
     Qt::Object::connect(T0, SIGNAL "activated()", this, SLOT "ShowMuSRT0()");
     Qt::Object::connect(Plot, SIGNAL "activated()", this, SLOT "GoPlot()");
     Qt::Object::connect(AddConstraint, SIGNAL "clicked()", this, SLOT "AppendToFunctions()");
+    Qt::Object::connect(ResetFunc, SIGNAL "clicked()", this, SLOT "ResetFunctions()");
 
     setTabOrder(musrfit_tabs, RunNumbers);
     setTabOrder(RunNumbers, BeamLine);
@@ -3041,6 +3060,9 @@ sub languageChange
     textLabel1_4_6->setText( trUtf8("=") );
     AddConstraint->setText( trUtf8("Add") );
     textLabel2_2_3_4->setText( trUtf8("FUNCTIONS Block") );
+    textLabel1_6->setText( undef );
+    ApplyFunc_2->setText( trUtf8("Apply") );
+    ResetFunc->setText( trUtf8("Reset") );
     musrfit_tabs->changeTab( ConstPage, trUtf8("Constraints") );
     fileNewAction->setText( trUtf8("&New") );
     fileNewAction->setMenuText( trUtf8("&New") );
@@ -3946,6 +3968,20 @@ sub AppendToFunctions
 # Replace parameter in theory block with fun$i
     $Full_T_Block=~ s/$ParName/fun$i/;
     TheoryBlock->setText($Full_T_Block);
+
+}
+
+sub ResetFunctions
+{
+
+# Clear drop down parameters menu    
+#   CParamsCombo->clear();
+# Then clear the text
+    ConstraintLine->setText("");
+    FunctionsBlock->setText("");
+#    my $Full_T_Block= $All{"Full_T_Block"};
+    TheoryBlock->setText($Full_T_Block);
+
 
 }
 
