@@ -47,6 +47,8 @@ my $erradd = "d";
 my $minadd = "_min";
 my $maxadd = "_max";
 
+
+
 ##########################################################################
 # CreateMSR
 #
@@ -381,15 +383,7 @@ SAVE
         #	}
     }
 
-    $RRFBlock="";
-    if ($All{"RRFFrq"}!= 0) {
-	if ($All{"RRFPhase"} eq $EMPTY) {$All{"RRFPhase"}=0;}
-	if ($All{"RRFPack"} eq $EMPTY) {$All{"RRFPack"}=1;}
-	$RRFBlock="rrf_freq  ".$All{"RRFFrq"}."  ".$All{"RRFUnits"}."\n";
-	$RRFBlock=$RRFBlock."rrf_phase  ".$All{"RRFPhase"}."\n";
-	$RRFBlock=$RRFBlock."rrf_packing  ".$All{"RRFPack"}."\n";
-    }
-
+    my $RRFBlock=MSR::CreateRRFBlock(\%All);
     $PLOT_Block =
       "###############################################################
 PLOT $PLT
@@ -748,15 +742,7 @@ SAVE
         #	}
     }
 
-    $RRFBlock="";
-    if ($All{"RRFFrq"}!= 0) {
-	if ($All{"RRFPhase"} eq $EMPTY) {$All{"RRFPhase"}=0;}
-	if ($All{"RRFPack"} eq $EMPTY) {$All{"RRFPack"}=1;}
-	$RRFBlock="rrf_freq  ".$All{"RRFFrq"}."  ".$All{"RRFUnits"}."\n";
-	$RRFBlock=$RRFBlock."rrf_phase  ".$All{"RRFPhase"}."\n";
-	$RRFBlock=$RRFBlock."rrf_packing  ".$All{"RRFPack"}."\n";
-    }
-
+    my $RRFBlock=MSR::CreateRRFBlock(\%All);
     $PLOT_Block =
       "###############################################################
 PLOT $PLT
@@ -1647,6 +1633,28 @@ sub RUNFileNameMan {
 ########################
 # ExtractInfoLEM
 ########################
+# This creates the RRF related lines, these are the same always
+sub CreateRRFBlock {
+
+    my %All = %{$_[0]};
+
+    $RRFBlock="";
+    if ($All{"RRFFrq"}!= 0) {
+	if ($All{"RRFPhase"} eq $EMPTY) {$All{"RRFPhase"}=0;}
+	if ($All{"RRFPack"} eq $EMPTY) {$All{"RRFPack"}=1;}
+	$RRFBlock="rrf_freq  ".$All{"RRFFrq"}."  ".$All{"RRFUnits"}."\n";
+	$RRFBlock=$RRFBlock."rrf_phase  ".$All{"RRFPhase"}."\n";
+	$RRFBlock=$RRFBlock."rrf_packing  ".$All{"RRFPack"}."\n";
+    }
+    return $RRFBlock;
+}
+
+
+
+
+########################
+# ExtractInfoLEM
+########################
 # Uset to extract information from summary files
 sub ExtractInfoLEM {
     my ($RUN,$YEAR,$Arg) = @_;
@@ -1726,6 +1734,8 @@ sub ExtractInfoBulk {
     
     return $RTRN_Val;
 }
+
+
 
 
 1;
