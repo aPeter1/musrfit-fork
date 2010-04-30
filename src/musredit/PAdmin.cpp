@@ -141,7 +141,8 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
 //--------------------------------------------------------------------------
 /**
  * <p>Routine called when the end XML tag is found. It is used to
- * put the filtering tag to 'empty'.
+ * put the filtering tag to 'empty'. It also resets the fFunc flag in case
+ * the entry was a theory function.
  *
  * \param qName name of the element.
  */
@@ -285,7 +286,8 @@ bool PAdminXMLParser::characters(const QString& str)
 
 //--------------------------------------------------------------------------
 /**
- * <p>Called at the end of the XML parse process.
+ * <p>Called at the end of the XML parse process. It checks if default paths
+ * contain system variables, and if so expand them for the further use.
  */
 bool PAdminXMLParser::endDocument()
 {
@@ -321,7 +323,7 @@ bool PAdminXMLParser::endDocument()
 
 //--------------------------------------------------------------------------
 /**
- * <p>Expands system variables to full path, e.g. $HOME -> \home\user
+ * <p>Expands system variables to full path, e.g. <tt>$HOME -> \home\user</tt>
  *
  * \param str path string with none expanded system variables.
  */

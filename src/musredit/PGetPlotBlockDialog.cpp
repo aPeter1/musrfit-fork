@@ -41,7 +41,9 @@
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
+ *
+ * \param helpUrl help url for the PLOT block.
  */
 PGetPlotBlockDialog::PGetPlotBlockDialog(const QString helpUrl) : fHelpUrl(helpUrl)
 {
@@ -62,7 +64,8 @@ PGetPlotBlockDialog::PGetPlotBlockDialog(const QString helpUrl) : fHelpUrl(helpU
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Extracts the information of the top part of the dialog, constructs a msr-file PLOT block and
+ * writes it into the text edit window.
  */
 void PGetPlotBlockDialog::addPlot()
 {
@@ -152,7 +155,7 @@ void PGetPlotBlockDialog::addPlot()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Generates a help content window showing the description of the PLOT block.
  */
 void PGetPlotBlockDialog::helpContent()
 {
@@ -167,6 +170,9 @@ void PGetPlotBlockDialog::helpContent()
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>This event filter is filtering out the return key, and if present adds the current plot.
+ *
+ * \param obj object which is triggering the event
+ * \param ev the triggered event
  */
 bool PGetPlotBlockDialog::eventFilter( QObject *obj, QEvent *ev )
 {

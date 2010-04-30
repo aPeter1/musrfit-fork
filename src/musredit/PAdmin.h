@@ -41,6 +41,10 @@
 class PAdmin;
 
 //---------------------------------------------------------------------------
+/**
+ * <p>This structure is keeping informations necessary to handle musrfit
+ * theory functions (see also <code>https://intranet.psi.ch/MUSR/MusrFit#4_3_The_THEORY_Block</code>).
+ */
 typedef struct {
   QString name;
   QString comment;
@@ -51,6 +55,12 @@ typedef struct {
 } PTheory;
 
 //---------------------------------------------------------------------------
+/**
+ * PAdminXMLParser is an XML parser class used to handle the musredit startup
+ * XML-file called <tt>musredit_startup.xml</tt>. This startup file contains
+ * necessary informations about executable pathes, online help informations,
+ * default font sizes, etc.
+ */
 class PAdminXMLParser : public QXmlDefaultHandler
 {
   public:
@@ -74,13 +84,20 @@ class PAdminXMLParser : public QXmlDefaultHandler
 
     QString expandPath(const QString&);
 
-    EAdminKeyWords fKeyWord;
-    bool           fFunc;
-    PTheory        fTheoryItem;
-    PAdmin         *fAdmin;
+    EAdminKeyWords fKeyWord;    ///< key word tag to know how to handle the content
+    bool           fFunc;       ///< flag needed to indicate that a new theory function is found
+    PTheory        fTheoryItem; ///< holding the informations necessary for a theory item
+    PAdmin         *fAdmin;     ///< a pointer to the main administration class object
 };
 
 //---------------------------------------------------------------------------
+/**
+ * The PAdmin class is handling the informations contained in the XML startup file,
+ * <tt>musredit_startup.xml</tt>. This startup file contains
+ * necessary informations about executable pathes, online help informations,
+ * default font sizes, etc. The XML parsing is done with the help of the PAdminXMLParser
+ * class.
+ */
 class PAdmin
 {
   public:
@@ -123,25 +140,25 @@ class PAdmin
   private:
     friend class PAdminXMLParser;
 
-    QString fFontName;
-    int fFontSize;
+    QString fFontName;  ///< default font name
+    int fFontSize;      ///< default font size
 
-    QString fExecPath;
-    QString fDefaultSavePath;
-    QString fMsrDefaultFilePath;
-    QString fTheoFuncPixmapPath;
+    QString fExecPath;           ///< system path to the musrfit executables
+    QString fDefaultSavePath;    ///< default path where the msr-file should be saved
+    QString fMsrDefaultFilePath; ///< path where to find musredit source
+    QString fTheoFuncPixmapPath; ///< path where the default pixmaps can be found
 
-    bool fTitleFromDataFile;
-    bool fEnableMusrT0;
+    bool fTitleFromDataFile; ///< flag indicating if the title should be extracted from the data file (default settings).
+    bool fEnableMusrT0;      ///< flag indicating if musrT0 shall be enabled at startup from within musredit (default settings)
 
-    QString fBeamline;
-    QString fInstitute;
-    QString fFileFormat;
-    bool fLifetimeCorrection;
+    QString fBeamline;   ///< name of the beamline. Used to generate default run header lines.
+    QString fInstitute;  ///< name of the institute. Used to generate default run header lines.
+    QString fFileFormat; ///< default file format. Used to generate default run header lines.
+    bool fLifetimeCorrection; ///< flag indicating if by default the lifetime-correction-flag in a single histo file shall be set.
 
     QMap<QString, QString> fHelpUrl; ///< maps tag to help url
 
-    QVector<PTheory> fTheory;
+    QVector<PTheory> fTheory; ///< stores all known theories. Needed when generating theory blocks from within musredit.
 };
 
 #endif // _PADMIN_H_

@@ -39,7 +39,12 @@
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Sets up the find dialog.
+ *
+ * \param data pointer to the find/replace data structure needed to perform the task.
+ * \param selection flag indicating if the find shall be restricted to the selected area
+ * \param parent pointer to the parent object
+ * \param f qt specific window flags
  */
 PFindDialog::PFindDialog(PFindReplaceData *data, const bool selection, QWidget *parent, Qt::WindowFlags f) :
     QDialog(parent, f), fData(data)
@@ -72,7 +77,8 @@ PFindDialog::PFindDialog(PFindReplaceData *data, const bool selection, QWidget *
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Extracts all the necessary informations from the find dialog, feeds it to the find/replace
+ * structure and returns a point to this structure.
  */
 PFindReplaceData* PFindDialog::getData()
 {
@@ -89,7 +95,7 @@ PFindReplaceData* PFindDialog::getData()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Enables the find button only if there is any find text entered.
  */
 void PFindDialog::onFindTextAvailable(const QString&)
 {

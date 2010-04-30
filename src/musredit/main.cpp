@@ -41,7 +41,8 @@ using namespace std;
  * <p>musredit is a simple editor based interface to the musrfit programs. It is based on Qt 4.6
  * of Nokia (<code>http://qt.nokia.com</code>).
  *
- * <p>musredit is open source LGPL and GPL (for detail license informations see <code>http://qt.nokia.com/products/licensing</code>).
+ * <p>musredit is free software liensenced under GPL 2 or later (for detail license informations see
+ * <code>http://www.gnu.org/licenses</code>).
  *
  * <p>The source code can be downloaded from <code>http://savannah.psi.ch/viewcvs/trunk/analysis/musrfit/src/musredit/?root=nemu%2Flem</code>.
  */

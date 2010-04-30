@@ -42,7 +42,9 @@
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor
+ *
+ * \param helpUrl help url address for the Fourier block.
  */
 PGetFourierBlockDialog::PGetFourierBlockDialog(const QString helpUrl) : fHelpUrl(helpUrl)
 {
@@ -62,7 +64,7 @@ PGetFourierBlockDialog::PGetFourierBlockDialog(const QString helpUrl) : fHelpUrl
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Checks if the phase parameter is either a number are has the form parXX, where XX is a number.
  */
 void PGetFourierBlockDialog::checkPhaseParameter()
 {
@@ -99,7 +101,7 @@ void PGetFourierBlockDialog::checkPhaseParameter()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Transfers the data of the dialog into a valid msr-file Fourier block string.
  */
 void PGetFourierBlockDialog::fillFourierBlock()
 {
@@ -125,7 +127,7 @@ void PGetFourierBlockDialog::fillFourierBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Generates a help content window showing the description of the Fourier block.
  */
 void PGetFourierBlockDialog::helpContent()
 {

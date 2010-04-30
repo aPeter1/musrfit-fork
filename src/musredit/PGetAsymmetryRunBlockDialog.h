@@ -34,6 +34,10 @@
 
 #include "ui_PGetAsymmetryRunBlockDialog.h"
 
+//---------------------------------------------------------------------------
+/**
+ * <p>Class handling the content of the menu: Edit/Add Block/Asymmetry Run Block.
+ */
 class PGetAsymmetryRunBlockDialog : public QDialog, private Ui::PGetAsymmetryRunBlockDialog
 {
   Q_OBJECT
@@ -57,7 +61,7 @@ class PGetAsymmetryRunBlockDialog : public QDialog, private Ui::PGetAsymmetryRun
     void helpContent();
 
   private:
-    QString fHelpUrl;
+    QString fHelpUrl; ///< help url for the asymmetry run block
 };
 
 #endif // _PGETASYMMETRYRUNBLOCKDIALOG_H_

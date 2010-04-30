@@ -34,6 +34,10 @@
 
 #include "ui_PGetParameterBlockDialog.h"
 
+//-----------------------------------------------------------------------------------
+/**
+ * <p>Handles the content of the PARAMETER block dialog.
+ */
 class PGetParameterBlockDialog : public QDialog, private Ui::PGetParameterBlockDialog
 {
   Q_OBJECT
@@ -51,7 +55,7 @@ class PGetParameterBlockDialog : public QDialog, private Ui::PGetParameterBlockD
     void helpContent();
 
   private:
-    QString fHelpUrl;
+    QString fHelpUrl; ///< help url of the PARAMETER block description.
 };
 
 #endif // _PGETPARAMETERBLOCKDIALOG_H_

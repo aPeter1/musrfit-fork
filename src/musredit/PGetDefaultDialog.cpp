@@ -54,7 +54,9 @@
 
 //---------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor
+ *
+ * \param helpUrl help url for the default dialog
  */
 PGetDefaultDialog::PGetDefaultDialog(const QString helpUrl) : fHelpUrl(helpUrl)
 {
@@ -66,7 +68,9 @@ PGetDefaultDialog::PGetDefaultDialog(const QString helpUrl) : fHelpUrl(helpUrl)
 
 //---------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Finds the name of the institute in the combo box and selects it.
+ *
+ * \param str name of the institute
  */
 void PGetDefaultDialog::setInstitute(const QString &str) {
 
@@ -81,7 +85,9 @@ void PGetDefaultDialog::setInstitute(const QString &str) {
 
 //---------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Finds the file format in the combo box and selects it.
+ *
+ * \param str file format
  */
 void PGetDefaultDialog::setFileFormat(const QString &str)
 {
@@ -97,7 +103,7 @@ void PGetDefaultDialog::setFileFormat(const QString &str)
 
 //---------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Generates a help content window showing the description fitting the default dialog.
  */
 void PGetDefaultDialog::helpContent()
 {

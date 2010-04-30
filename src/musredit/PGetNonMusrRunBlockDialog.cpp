@@ -39,7 +39,9 @@
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor
+ *
+ * \param helpUrl help url for the NonMusr run block.
  */
 PGetNonMusrRunBlockDialog::PGetNonMusrRunBlockDialog(const QString helpUrl) : fHelpUrl(helpUrl)
 {
@@ -64,7 +66,7 @@ PGetNonMusrRunBlockDialog::PGetNonMusrRunBlockDialog(const QString helpUrl) : fH
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Extracts the run header information from the dialog, and returns it as a string.
  */
 QString PGetNonMusrRunBlockDialog::getRunHeaderInfo()
 {
@@ -80,7 +82,9 @@ QString PGetNonMusrRunBlockDialog::getRunHeaderInfo()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Extracts the map from the dialog, and returns it as a string.
+ *
+ * \param valid flag indicating of the map is potentially being valid.
  */
 QString PGetNonMusrRunBlockDialog::getMap(bool &valid)
 {
@@ -101,7 +105,9 @@ QString PGetNonMusrRunBlockDialog::getMap(bool &valid)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Extracts xy-data from the dialog and returns it as a string.
+ *
+ * \param valid flag showing that x/y-data are present.
  */
 QString PGetNonMusrRunBlockDialog::getXYData(bool &valid)
 {
@@ -121,7 +127,10 @@ QString PGetNonMusrRunBlockDialog::getXYData(bool &valid)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Extracts the fit-range from the dialog and returns it as a string. If not fit-range was given,
+ * a fit-range from 0 to 10 us will be returned and the valid flag will be set to false.
+ *
+ * \param valid flag showing if a fit-range is given.
  */
 QString PGetNonMusrRunBlockDialog::getFitRange(bool &valid)
 {
@@ -142,7 +151,7 @@ QString PGetNonMusrRunBlockDialog::getFitRange(bool &valid)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Generates a help content window showing the description of the NonMusr run block.
  */
 void PGetNonMusrRunBlockDialog::helpContent()
 {

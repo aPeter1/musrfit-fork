@@ -34,6 +34,10 @@
 
 #include "ui_PGetNonMusrRunBlockDialog.h"
 
+//-------------------------------------------------------------------------------------
+/**
+ * <p>Handles the content of the NonMusr run block dialog.
+ */
 class PGetNonMusrRunBlockDialog : public QDialog, private Ui::PGetNonMusrRunBlockDialog
 {
   Q_OBJECT
@@ -50,7 +54,7 @@ class PGetNonMusrRunBlockDialog : public QDialog, private Ui::PGetNonMusrRunBloc
     void helpContent();
 
   private:
-    QString fHelpUrl;
+    QString fHelpUrl; ///< help url address for the NonMusr run block.
 };
 
 #endif // _PGETNONMUSRRUNBLOCKDIALOG_H_

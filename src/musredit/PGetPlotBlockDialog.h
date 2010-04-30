@@ -34,6 +34,10 @@
 
 #include "ui_PGetPlotBlockDialog.h"
 
+//--------------------------------------------------------------------------
+/**
+ * <p>Handels content of the PLOT block dialog.
+ */
 class PGetPlotBlockDialog : public QDialog, private Ui::PGetPlotBlockDialog
 {
   Q_OBJECT
@@ -51,7 +55,7 @@ class PGetPlotBlockDialog : public QDialog, private Ui::PGetPlotBlockDialog
     bool eventFilter( QObject *obj, QEvent *ev );
 
   private:
-    QString fHelpUrl;
+    QString fHelpUrl; ///< help url for the PLOT block
 };
 
 #endif // _PGETPLOTBLOCKDIALOG_H_

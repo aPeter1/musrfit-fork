@@ -34,6 +34,10 @@
 
 #include "ui_PGetFunctionsBlockDialog.h"
 
+//-----------------------------------------------------------------------------------
+/**
+ * <p>Handles the content of the FUNCTIONS block dialog.
+ */
 class PGetFunctionsBlockDialog : public QDialog, private Ui::PGetFunctionsBlockDialog
 {
   Q_OBJECT
@@ -48,7 +52,7 @@ class PGetFunctionsBlockDialog : public QDialog, private Ui::PGetFunctionsBlockD
     void helpContent();
 
   private:
-    QString fHelpUrl;
+    QString fHelpUrl; ///< help url address for the FUNCTIONS block.
 };
 
 #endif // _PGETFUNCTIONSBLOCKDIALOG_H_

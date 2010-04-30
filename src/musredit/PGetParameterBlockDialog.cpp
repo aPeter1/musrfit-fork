@@ -42,7 +42,9 @@
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
+ *
+ * \param helpUrl help url of the PARAMETER block.
  */
 PGetParameterBlockDialog::PGetParameterBlockDialog(const QString helpUrl) : fHelpUrl(helpUrl)
 {
@@ -63,6 +65,9 @@ PGetParameterBlockDialog::PGetParameterBlockDialog(const QString helpUrl) : fHel
 /**
  * <p>This event filter is filtering out the return key, and if present adds the current parameters
  * to the parameter list.
+ *
+ * \param obj object which was generating the event.
+ * \param ev event of the object.
  */
 bool PGetParameterBlockDialog::eventFilter( QObject *obj, QEvent *ev )
 {
@@ -85,7 +90,7 @@ bool PGetParameterBlockDialog::eventFilter( QObject *obj, QEvent *ev )
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Adds a parameter to the text edit window.
  */
 void PGetParameterBlockDialog::paramAdd()
 {
@@ -209,7 +214,7 @@ void PGetParameterBlockDialog::paramAdd()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Generates a help content window showing the description of the FITPARAMETER block.
  */
 void PGetParameterBlockDialog::helpContent()
 {

@@ -43,7 +43,9 @@
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
+ *
+ * \param helpUrl help url for the FUNCTIONS block.
  */
 PGetFunctionsBlockDialog::PGetFunctionsBlockDialog(const QString helpUrl) : fHelpUrl(helpUrl)
 {
@@ -56,7 +58,8 @@ PGetFunctionsBlockDialog::PGetFunctionsBlockDialog(const QString helpUrl) : fHel
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Adds a function to the FUNCTIONS block text edit after carrying out some primitve tests about
+ * the consistency of the function (far from being a syntax/semantic checker!!).
  */
 void PGetFunctionsBlockDialog::addFunction()
 {
@@ -100,7 +103,7 @@ void PGetFunctionsBlockDialog::addFunction()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Generates a help content window showing the description of the FUNCTIONS block.
  */
 void PGetFunctionsBlockDialog::helpContent()
 {

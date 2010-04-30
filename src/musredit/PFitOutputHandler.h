@@ -43,6 +43,12 @@
 
 #include <cstdlib>
 
+//---------------------------------------------------------------------------------------
+/**
+ * <p>This class is the capturing the output of musrfit and displays it in a dialog so
+ * the user has the chance to follow the fitting process, warnings, error messages of
+ * musrfit.
+ */
 class PFitOutputHandler : public QDialog
 {
   Q_OBJECT
@@ -58,11 +64,11 @@ class PFitOutputHandler : public QDialog
     virtual void processDone(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
-    QProcess *fProc;
+    QProcess *fProc; ///< pointer to the musrfit process
 
-    QVBoxLayout *fVbox;
-    QTextEdit *fOutput;
-    QPushButton *fQuitButton;
+    QVBoxLayout *fVbox; ///< pointer to the dialog layout manager
+    QTextEdit *fOutput; ///< the captured musrfit output is written (read only) into this text edit object.
+    QPushButton *fQuitButton; ///< quit button, either to interrupt the fit or to close the dialog at the end of the fit.
 };
 
 #endif // _PFITOUTPUTHANDLER_H_

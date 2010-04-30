@@ -41,7 +41,9 @@
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
+ *
+ * \param helpUrl help url for the asymmetry run block
  */
 PGetAsymmetryRunBlockDialog::PGetAsymmetryRunBlockDialog(const QString helpUrl) : fHelpUrl(helpUrl)
 {
@@ -72,7 +74,7 @@ PGetAsymmetryRunBlockDialog::PGetAsymmetryRunBlockDialog(const QString helpUrl) 
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the run information line of the asymmetry run block.
  */
 QString PGetAsymmetryRunBlockDialog::getRunHeaderInfo()
 {
@@ -88,7 +90,9 @@ QString PGetAsymmetryRunBlockDialog::getRunHeaderInfo()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the alpha parameter for the asymmetry run block.
+ *
+ * \param present flag indicating if the alpha parameter is used, or a default alpha==1 is going to be used.
  */
 QString PGetAsymmetryRunBlockDialog::getAlphaParameter(bool &present)
 {
@@ -104,7 +108,9 @@ QString PGetAsymmetryRunBlockDialog::getAlphaParameter(bool &present)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the beta parameter for the asymmetry run block
+ *
+ * \param present flag indicating if the beta parameter is used, or a default beta==1 is going to be used.
  */
 QString PGetAsymmetryRunBlockDialog::getBetaParameter(bool &present)
 {
@@ -120,7 +126,9 @@ QString PGetAsymmetryRunBlockDialog::getBetaParameter(bool &present)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the map for the asymmetry run block.
+ *
+ * \param valid flag indicating if the map is potentially valid.
  */
 QString PGetAsymmetryRunBlockDialog::getMap(bool &valid)
 {
@@ -141,7 +149,10 @@ QString PGetAsymmetryRunBlockDialog::getMap(bool &valid)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the background information for the asymmetry run block.
+ *
+ * \param valid flag indicating if a valid background (either backgr.fix or background is given, but not both)
+ * is present.
  */
 QString PGetAsymmetryRunBlockDialog::getBackground(bool &valid)
 {
@@ -175,7 +186,9 @@ QString PGetAsymmetryRunBlockDialog::getBackground(bool &valid)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns a data range (in bins) entry for the asymmetry run block.
+ *
+ * \param valid flag indicating if the data entries are valid.
  */
 QString PGetAsymmetryRunBlockDialog::getData(bool &valid)
 {
@@ -198,7 +211,9 @@ QString PGetAsymmetryRunBlockDialog::getData(bool &valid)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns a t0 parameter for the asymmetry run block.
+ *
+ * \param present flag indicating if a t0 parameter is set.
  */
 QString PGetAsymmetryRunBlockDialog::getT0(bool &present)
 {
@@ -218,7 +233,9 @@ QString PGetAsymmetryRunBlockDialog::getT0(bool &present)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns a fit range entry for the asymmetry run block.
+ *
+ * \param valid flag indicating if a fit range was provided.
  */
 QString PGetAsymmetryRunBlockDialog::getFitRange(bool &valid)
 {
@@ -239,7 +256,9 @@ QString PGetAsymmetryRunBlockDialog::getFitRange(bool &valid)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the packing/binning of the asymmetry run block.
+ *
+ * \param present flag indicating if a packing parameter was provided.
  */
 QString PGetAsymmetryRunBlockDialog::getPacking(bool &present)
 {
@@ -258,7 +277,7 @@ QString PGetAsymmetryRunBlockDialog::getPacking(bool &present)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Generates a help content window showing the description of the asymmetry run block.
  */
 void PGetAsymmetryRunBlockDialog::helpContent()
 {

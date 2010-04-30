@@ -39,6 +39,11 @@
 
 #include "ui_PGetDefaultDialog.h"
 
+//---------------------------------------------------------------------------
+/**
+ * <p>Handels the default dialog which is used to generate a default asymmetry or
+ * single histogram msr input file.
+ */
 class PGetDefaultDialog : public QDialog, private Ui::PGetDefaultDialog
 {
   Q_OBJECT
@@ -60,7 +65,7 @@ class PGetDefaultDialog : public QDialog, private Ui::PGetDefaultDialog
     virtual void helpContent();
 
   private:
-    QString fHelpUrl;
+    QString fHelpUrl; ///< help url for the default dialog
 };
 
 #endif // _PGETDEFAULTDIALOG_H_

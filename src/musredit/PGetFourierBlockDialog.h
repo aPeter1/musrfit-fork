@@ -36,6 +36,10 @@
 
 #include "ui_PGetFourierBlockDialog.h"
 
+//-------------------------------------------------------------------------------
+/**
+ * <p>Handles the Fourier dialog.
+ */
 class PGetFourierBlockDialog : public QDialog, private Ui::PGetFourierBlockDialog
 {
   Q_OBJECT
@@ -51,8 +55,8 @@ class PGetFourierBlockDialog : public QDialog, private Ui::PGetFourierBlockDialo
     void helpContent();
 
   private:
-    QString fFourierBlock;
-    QString fHelpUrl;
+    QString fFourierBlock;  ///< keeps the msr Fourier block
+    QString fHelpUrl;       ///< help url for the Fourier block
 };
 
 #endif // _PGETFOURIERBLOCKDIALOG_H_

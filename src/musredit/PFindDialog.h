@@ -35,6 +35,10 @@
 #include "musredit.h"
 #include "ui_PFindDialog.h"
 
+//--------------------------------------------------------------------------------------------------
+/**
+ * <p>PFindDialog is the class handling the find dialog.
+ */
 class PFindDialog : public QDialog, private Ui::PFindDialog
 {
   Q_OBJECT
@@ -49,7 +53,7 @@ class PFindDialog : public QDialog, private Ui::PFindDialog
     virtual void onFindTextAvailable(const QString&);
 
   private:
-    PFindReplaceData *fData;
+    PFindReplaceData *fData; ///< stores the data necessary to perform find/replace.
 };
 
 #endif // _PFINDDIALOG_H_

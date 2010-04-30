@@ -37,7 +37,10 @@
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Sets up the fit output handler GUI and starts the actual fit
+ *
+ * \param workingDirectory string holding the working directory wished. In this directory the mlog-file will be saved.
+ * \param cmd command string vector. From this the actuall fit command will be generated and executed.
  */
 PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QVector<QString> &cmd)
 {
@@ -86,7 +89,7 @@ PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QVector<QString> 
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Destructor. Checks if the a fit is still running and if yes try to kill it.
  */
 PFitOutputHandler::~PFitOutputHandler()
 {
@@ -108,7 +111,7 @@ PFitOutputHandler::~PFitOutputHandler()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Captures the standard output and adds it to the output text edit.
  */
 void PFitOutputHandler::readFromStdOut()
 {
@@ -119,7 +122,7 @@ void PFitOutputHandler::readFromStdOut()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Captures the standard error and adds it to the output text edit.
  */
 void PFitOutputHandler::readFromStdErr()
 {
@@ -130,7 +133,10 @@ void PFitOutputHandler::readFromStdErr()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>If musrfit finishes, crashes, ..., the quit button text will be changed to done.
+ *
+ * \param exitCode exit code of musrfit
+ * \param exitStatus exit status of musrfit
  */
 void PFitOutputHandler::processDone(int exitCode, QProcess::ExitStatus exitStatus)
 {
@@ -141,7 +147,8 @@ void PFitOutputHandler::processDone(int exitCode, QProcess::ExitStatus exitStatu
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>If the quit button is pressed while the fit is still running, try to terminate musrfit, if this
+ * does not work, try to kill musrfit.
  */
 void PFitOutputHandler::quitButtonPressed()
 {
