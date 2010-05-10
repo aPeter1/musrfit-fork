@@ -42,7 +42,10 @@
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
+ *
+ * \param admin pointer to the administration class object needed to extract the default theory set informations.
+ * \param helpUrl help url for the asymmetry run block
  */
 PGetTheoryBlockDialog::PGetTheoryBlockDialog(PAdmin *admin, const QString helpUrl) :
               fAdmin(admin),
@@ -71,7 +74,7 @@ PGetTheoryBlockDialog::PGetTheoryBlockDialog(PAdmin *admin, const QString helpUr
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the theory function string of the currently selected theory function.
  */
 QString PGetTheoryBlockDialog::getTheoFuncString()
 {
@@ -98,7 +101,7 @@ QString PGetTheoryBlockDialog::getTheoFuncString()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>adds the current theory function to the text field and additionally adds a '+'.
  */
 void PGetTheoryBlockDialog::addPlus()
 {
@@ -108,7 +111,7 @@ void PGetTheoryBlockDialog::addPlus()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>adds the current theory function to the text field (newline == '*').
  */
 void PGetTheoryBlockDialog::addMultiply()
 {
@@ -118,7 +121,7 @@ void PGetTheoryBlockDialog::addMultiply()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Generates a help content window showing the description of the theory block.
  */
 void PGetTheoryBlockDialog::helpContent()
 {

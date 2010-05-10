@@ -37,6 +37,10 @@
 
 #include "ui_PGetSingleHistoRunBlockDialog.h"
 
+//--------------------------------------------------------------------------
+/**
+ * <p>Class handling the content of the menu: Edit/Add Block/Single Histo Run Block.
+ */
 class PGetSingleHistoRunBlockDialog : public QDialog, private Ui::PGetSingleHistoRunBlockDialog
 {
   Q_OBJECT
@@ -60,7 +64,7 @@ class PGetSingleHistoRunBlockDialog : public QDialog, private Ui::PGetSingleHist
     void helpContent();
 
   private:
-    QString fHelpUrl;
+    QString fHelpUrl; ///< help url for the asymmetry run block
 };
 
 #endif // _PGETSINGLEHISTORUNBLOCKDIALOG_H_

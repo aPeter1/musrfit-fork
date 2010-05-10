@@ -35,6 +35,10 @@
 #include "PAdmin.h"
 #include "ui_PGetTheoryBlockDialog.h"
 
+//-----------------------------------------------------------------------------
+/**
+ * <p>Class handling the content of the menu: Edit/Add Block/Theory Block.
+ */
 class PGetTheoryBlockDialog : public QDialog, private Ui::PGetTheoryBlockDialog
 {
   Q_OBJECT
@@ -51,8 +55,8 @@ class PGetTheoryBlockDialog : public QDialog, private Ui::PGetTheoryBlockDialog
     void helpContent();
 
   private:
-    PAdmin *fAdmin;
-    QString fHelpUrl;
+    PAdmin *fAdmin;   ///< pointer to the administration class object needed to extract the default theory set informations.
+    QString fHelpUrl; ///< help url for the asymmetry run block
 };
 
 #endif // _PGETTHEORYBLOCKDIALOG_H_

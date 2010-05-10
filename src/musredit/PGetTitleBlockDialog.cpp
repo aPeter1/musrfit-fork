@@ -36,7 +36,9 @@
 
 //---------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
+ *
+ * \param helpUrl help url for the title.
  */
 PGetTitleBlockDialog::PGetTitleBlockDialog(const QString helpUrl) : fHelpUrl(helpUrl)
 {
@@ -47,7 +49,7 @@ PGetTitleBlockDialog::PGetTitleBlockDialog(const QString helpUrl) : fHelpUrl(hel
 
 //---------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Generates a help content window showing the description of title block.
  */
 void PGetTitleBlockDialog::helpContent()
 {

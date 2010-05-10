@@ -40,7 +40,10 @@
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
+ *
+ * \param helpUrl help url for the asymmetry run block
+ * \param lifetimeCorrection flag indicating if lifetime correction shall be enabled.
  */
 PGetSingleHistoRunBlockDialog::PGetSingleHistoRunBlockDialog(const QString helpUrl,
                                                              const bool lifetimeCorrection) : fHelpUrl(helpUrl)
@@ -67,7 +70,7 @@ PGetSingleHistoRunBlockDialog::PGetSingleHistoRunBlockDialog(const QString helpU
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the run information line of the single histogram run block.
  */
 QString PGetSingleHistoRunBlockDialog::getRunHeaderInfo()
 {
@@ -83,7 +86,9 @@ QString PGetSingleHistoRunBlockDialog::getRunHeaderInfo()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the map for the single histogram run block.
+ *
+ * \param valid flag indicating if the map is potentially valid.
  */
 QString PGetSingleHistoRunBlockDialog::getMap(bool &valid)
 {
@@ -104,7 +109,9 @@ QString PGetSingleHistoRunBlockDialog::getMap(bool &valid)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns a data range (in bins) entry for the single histogram run block.
+ *
+ * \param valid flag indicating if the data entries are valid.
  */
 QString PGetSingleHistoRunBlockDialog::getData(bool &valid)
 {
@@ -124,7 +131,10 @@ QString PGetSingleHistoRunBlockDialog::getData(bool &valid)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the background information for the single histogram run block.
+ *
+ * \param valid flag indicating if a valid background (either backgr.fix, background, or backgr.fit is given, but only one)
+ * is present.
  */
 QString PGetSingleHistoRunBlockDialog::getBackground(bool &valid)
 {
@@ -159,7 +169,10 @@ QString PGetSingleHistoRunBlockDialog::getBackground(bool &valid)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns a fit range entry for the single histogram run block. If no fit range has been provided,
+ * a fit range [0,10] will be set and the valid flag will be set to false.
+ *
+ * \param valid flag indicating if a fit range was provided.
  */
 QString PGetSingleHistoRunBlockDialog::getFitRange(bool &valid)
 {
@@ -180,7 +193,10 @@ QString PGetSingleHistoRunBlockDialog::getFitRange(bool &valid)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the packing/binning of the single histogram run block. If no packing has been provided,
+ * a packing of '1' will be set and the present flag will be set to false.
+ *
+ * \param present flag indicating if a packing parameter was provided.
  */
 QString PGetSingleHistoRunBlockDialog::getPacking(bool &present)
 {
@@ -199,7 +215,9 @@ QString PGetSingleHistoRunBlockDialog::getPacking(bool &present)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns a t0 parameter for the single histogram run block.
+ *
+ * \param present flag indicating if a t0 parameter is set.
  */
 QString PGetSingleHistoRunBlockDialog::getT0(bool &present)
 {
@@ -218,7 +236,9 @@ QString PGetSingleHistoRunBlockDialog::getT0(bool &present)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the muon lifetime parameter if present.
+ *
+ * \param present flag indicating if a muon life time parameter has been present.
  */
 QString PGetSingleHistoRunBlockDialog::getMuonLifetimeParam(bool &present)
 {
@@ -237,7 +257,9 @@ QString PGetSingleHistoRunBlockDialog::getMuonLifetimeParam(bool &present)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the lifetime correction flag.
+ *
+ * \param present flag showing if the lifetime correction flag should be set.
  */
 QString PGetSingleHistoRunBlockDialog::getLifetimeCorrection(bool &present)
 {
@@ -255,7 +277,7 @@ QString PGetSingleHistoRunBlockDialog::getLifetimeCorrection(bool &present)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Generates a help content window showing the description of the single histogram run block.
  */
 void PGetSingleHistoRunBlockDialog::helpContent()
 {

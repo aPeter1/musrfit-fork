@@ -35,6 +35,10 @@
 #include "musredit.h"
 #include "ui_PGetTitleBlockDialog.h"
 
+//--------------------------------------------------------------------------
+/**
+ * <p>Class handling the content of the menu: Edit/Add Block/Title Block.
+ */
 class PGetTitleBlockDialog : public QDialog, private Ui::PGetTitleBlockDialog
 {
   Q_OBJECT
@@ -49,7 +53,7 @@ class PGetTitleBlockDialog : public QDialog, private Ui::PGetTitleBlockDialog
     void helpContent();
 
   private:
-    QString fHelpUrl;
+    QString fHelpUrl; ///< help url for the asymmetry run block
 };
 
 #endif // _PGETTITLEBLOCKDIALOG_H_

@@ -39,6 +39,11 @@ QT_BEGIN_NAMESPACE
 class QLineEdit;
 QT_END_NAMESPACE
 
+//-------------------------------------------------------------------------
+/**
+ * <p>Class providing the help interface for the user. It opens the wiki docu
+ * pages such that a user has the chance to read.
+ */
 class PHelp : public QMainWindow
 {
   Q_OBJECT
@@ -56,9 +61,9 @@ class PHelp : public QMainWindow
     void finishLoading(bool);
 
   private:
-    QWebView *fView;
-    QLineEdit *fLocationEdit;
-    int fProgress;
+    QWebView *fView; ///< web viewer
+    QLineEdit *fLocationEdit; ///< url address line edit
+    int fProgress; ///< progress value (0-100) while loading an url
 };
 
 #endif // _PHELP_H_

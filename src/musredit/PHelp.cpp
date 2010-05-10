@@ -32,11 +32,15 @@
 #include <QtGui>
 #include <QtWebKit>
 
+#include <QtDebug>
+
 #include "PHelp.h"
 
 //---------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
+ *
+ * \param url help url
  */
 PHelp::PHelp(const QString &url)
 {
@@ -71,7 +75,7 @@ PHelp::PHelp(const QString &url)
 
 //---------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Destructor
  */
 PHelp::~PHelp()
 {
@@ -88,7 +92,7 @@ PHelp::~PHelp()
 
 //---------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Called on exit (SLOT). Closes the web-browser help GUI.
  */
 void PHelp::done()
 {
@@ -97,7 +101,7 @@ void PHelp::done()
 
 //---------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Called after an url is loaded (SLOT). Adjusts the url address.
  */
 void PHelp::adjustLocation()
 {
@@ -106,7 +110,8 @@ void PHelp::adjustLocation()
 
 //---------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Called when the url address in the line edit changed (SLOT). Will execute
+ * the load of the new url.
  */
 void PHelp::changeLocation()
 {
@@ -117,7 +122,8 @@ void PHelp::changeLocation()
 
 //---------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Called when the title changed (SLOT). Will change the window title according
+ * to the state of the web-browser.
  */
 void PHelp::adjustTitle()
 {
@@ -129,7 +135,7 @@ void PHelp::adjustTitle()
 
 //---------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Adjusts the progess value while loading an url. Also calls adjustTitle().
  */
 void PHelp::setProgress(int p)
 {
@@ -139,7 +145,7 @@ void PHelp::setProgress(int p)
 
 //---------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Ajusts the title when an url has been loaded.
  */
 void PHelp::finishLoading(bool)
 {

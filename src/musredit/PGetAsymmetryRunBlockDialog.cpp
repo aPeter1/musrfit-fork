@@ -233,7 +233,8 @@ QString PGetAsymmetryRunBlockDialog::getT0(bool &present)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>returns a fit range entry for the asymmetry run block.
+ * <p>returns a fit range entry for the asymmetry run block. If no fit range has been provided,
+ * a fit range [0,10] will be set and the valid flag will be set to false.
  *
  * \param valid flag indicating if a fit range was provided.
  */
@@ -256,7 +257,8 @@ QString PGetAsymmetryRunBlockDialog::getFitRange(bool &valid)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>returns the packing/binning of the asymmetry run block.
+ * <p>returns the packing/binning of the asymmetry run block. If no packing has been provided,
+ * a packing of '1' will be set and the present flag will be set to false.
  *
  * \param present flag indicating if a packing parameter was provided.
  */
