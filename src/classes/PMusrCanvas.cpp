@@ -592,12 +592,24 @@ void PMusrCanvas::UpdateInfoPad()
     if (runs[runNo].GetFitType() == MSR_FITTYPE_SINGLE_HISTO) {
       tstr += TString("h:");
       tstr += runs[runNo].GetForwardHistoNo();
+      for (UInt_t j=1; j<runs[runNo].GetForwardHistoNoSize(); j++) {
+        tstr += TString("+");
+        tstr += runs[runNo].GetForwardHistoNo(j);
+      }
       tstr += TString(",");
     } else if (runs[runNo].GetFitType() == MSR_FITTYPE_ASYM) {
       tstr += TString("h:");
       tstr += runs[runNo].GetForwardHistoNo();
+      for (UInt_t j=1; j<runs[runNo].GetForwardHistoNoSize(); j++) {
+        tstr += TString("+");
+        tstr += runs[runNo].GetForwardHistoNo(j);
+      }
       tstr += TString("/");
       tstr += runs[runNo].GetBackwardHistoNo();
+      for (UInt_t j=1; j<runs[runNo].GetBackwardHistoNoSize(); j++) {
+        tstr += TString("+");
+        tstr += runs[runNo].GetBackwardHistoNo(j);
+      }
       tstr += TString(",");
     }
     // temperature if present
