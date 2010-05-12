@@ -342,8 +342,6 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
   }
 
   // add some counters needed in connection to addruns
-  Int_t addForwardHistoNoCounter = 0;
-  Int_t addBackwardHistoNoCounter = 0;
   Int_t addT0Counter = 0;
 
   ifstream fin;
@@ -429,10 +427,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
       tag = MSR_TAG_RUN;
       runNo++;
 
-      // reset addrun helper counters
-      addForwardHistoNoCounter = 0;
-      addBackwardHistoNoCounter = 0;
-      addT0Counter = 0;
+      addT0Counter = 0; // reset counter
     } else if (str.BeginsWith("COMMANDS")) {     // COMMANDS block tag
       tag = MSR_TAG_COMMANDS;
       fout << str.Data() << endl;
@@ -669,23 +664,6 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             }
             fout << endl;
           }
-        } else if (sstr.BeginsWith("addforward")) {
-          if (fRuns[runNo].GetAddForwardHistoNoSize(addForwardHistoNoCounter) <= 0) {
-            cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **WARNING** 'addforward' tag without any data found!";
-            cerr << endl << ">> Something is VERY fishy, please check your msr-file carfully." << endl;
-          } else if (addForwardHistoNoCounter >= fRuns[runNo].GetAddForwardHistoNoSize(addForwardHistoNoCounter)) {
-            cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **WARNING** More 'addforward' tags present than addforward data!";
-            cerr << endl << ">> Something is VERY fishy, please check your msr-file carfully." << endl;
-          } else {
-            fout.width(16);
-            fout << left << "addforward";
-            for (Int_t i=0; i<fRuns[runNo].GetAddForwardHistoNoSize(addForwardHistoNoCounter); i++) {
-              fout.width(8);
-              fout << fRuns[runNo].GetAddForwardHistoNo(addForwardHistoNoCounter, i);
-            }
-            fout << endl;
-            addForwardHistoNoCounter++;
-          }
         } else if (sstr.BeginsWith("backward")) {
           if (fRuns[runNo].GetBackwardHistoNoSize() == 0) {
             cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **WARNING** 'backward' tag without any data found!";
@@ -698,23 +676,6 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
               fout << fRuns[runNo].GetBackwardHistoNo(i);
             }
             fout << endl;
-          }
-        } else if (sstr.BeginsWith("addbackward")) {
-          if (fRuns[runNo].GetAddBackwardHistoNoSize(addBackwardHistoNoCounter) <= 0) {
-            cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **WARNING** 'addbackward' tag without any data found!";
-            cerr << endl << ">> Something is VERY fishy, please check your msr-file carfully." << endl;
-          } else if (addBackwardHistoNoCounter >= fRuns[runNo].GetAddBackwardHistoNoSize(addBackwardHistoNoCounter)) {
-            cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **WARNING** More 'addbackward' tags present than addbackward data!";
-            cerr << endl << ">> Something is VERY fishy, please check your msr-file carfully." << endl;
-          } else {
-            fout.width(16);
-            fout << left << "addbackward";
-            for (Int_t i=0; i<fRuns[runNo].GetAddBackwardHistoNoSize(addBackwardHistoNoCounter); i++) {
-              fout.width(8);
-              fout << fRuns[runNo].GetAddBackwardHistoNo(addBackwardHistoNoCounter, i);
-            }
-            fout << endl;
-            addBackwardHistoNoCounter++;
           }
         } else if (sstr.BeginsWith("backgr.fix")) {
           fout.width(15);
@@ -1631,9 +1592,6 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
   TObjArray *tokens = 0;
   TObjString *ostr = 0;
 
-  // add some counters needed in connection to addruns
-  UInt_t addForwardHistoNoCounter = 0;
-  UInt_t addBackwardHistoNoCounter = 0;
   UInt_t addT0Counter = 0;
 
   Int_t ival;
@@ -1682,10 +1640,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         param.SetFileFormat(str);
       }
 
-      // reset addrun helper counters
-      addForwardHistoNoCounter = 0;
-      addBackwardHistoNoCounter = 0;
-      addT0Counter = 0;
+      addT0Counter = 0; // reset counter
     }
 
     // ADDRUN line ---------------------------------------------
@@ -1921,32 +1876,6 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       }
     }
 
-    // addforward ---------------------------------------------
-    if (iter->fLine.BeginsWith("addforward", TString::kIgnoreCase)) {
-
-      runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
-
-      if (tokens->GetEntries() < 2) {
-        error = true;
-      } else {
-        for (Int_t i=1; i<tokens->GetEntries(); i++) {
-          ostr = dynamic_cast<TObjString*>(tokens->At(i));
-          str = ostr->GetString();
-          if (str.IsDigit()) {
-            ival = str.Atoi();
-            if (ival > 0)
-              param.SetAddForwardHistoNo(ival, addForwardHistoNoCounter, i-1);
-            else
-              error = true;
-          } else {
-            error = true;
-          }
-        }
-      }
-
-      addForwardHistoNoCounter++;
-    }
-
     // backward -----------------------------------------------
     if (iter->fLine.BeginsWith("backward", TString::kIgnoreCase)) {
 
@@ -1969,32 +1898,6 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           }
         }
       }
-    }
-
-    // addbackward ---------------------------------------------
-    if (iter->fLine.BeginsWith("addbackward", TString::kIgnoreCase)) {
-
-      runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
-
-      if (tokens->GetEntries() < 2) {
-        error = true;
-      } else {
-        for (Int_t i=1; i<tokens->GetEntries(); i++) {
-          ostr = dynamic_cast<TObjString*>(tokens->At(i));
-          str = ostr->GetString();
-          if (str.IsDigit()) {
-            ival = str.Atoi();
-            if (ival > 0)
-              param.SetAddBackwardHistoNo(ival, addBackwardHistoNoCounter, i-1);
-            else
-              error = true;
-          } else {
-            error = true;
-          }
-        }
-      }
-
-      addBackwardHistoNoCounter++;
     }
 
     // backgr.fix ----------------------------------------------
@@ -3827,35 +3730,6 @@ Bool_t PMsrHandler::CheckAddRunParameters()
 
   for (UInt_t i=0; i<fRuns.size(); i++) {
     if (fRuns[i].GetRunNameSize() > 1) {
-      // checks concerning forward <-> backward, addforward <-> addbackward
-      if (fRuns[i].GetAddForwardHistoNoEntries() != 0) { // addforward given, make some consistency checks
-        if (fRuns[i].GetRunNameSize()-1 != fRuns[i].GetAddForwardHistoNoEntries()) {
-          cerr << endl << ">> PMsrHandler::CheckAddRunParameters: **ERROR** # of addruns != # of addforwards found.";
-          cerr << endl << ">> Run #" << i+1;
-          cerr << endl;
-          result = false;
-          break;
-        }
-        if (fRuns[i].GetFitType() == MSR_FITTYPE_ASYM) {
-          if (fRuns[i].GetAddForwardHistoNoEntries() != fRuns[i].GetAddBackwardHistoNoEntries()) {
-            cerr << endl << ">> PMsrHandler::CheckAddRunParameters: **ERROR** # of addforward entries != # of addbackward entries.";
-            cerr << endl << ">> Run #" << i+1;
-            cerr << endl;
-            result = false;
-            break;
-          }
-        }
-        for (UInt_t j=0; j<fRuns[i].GetAddForwardHistoNoEntries(); j++) {
-          if (fRuns[i].GetAddForwardHistoNoSize(j) != static_cast<Int_t>(fRuns[i].GetForwardHistoNoSize())) {
-            cerr << endl << ">> PMsrHandler::CheckAddRunParameters: **ERROR** # of addforward histos != # of forward histos.";
-            cerr << endl << ">> Run #" << i+1;
-            cerr << endl;
-            result = false;
-            break;
-          }
-        }
-      }
-
       // check concerning the addt0 tags
       if (fRuns[i].GetAddT0Entries() != 0) {
         if (fRuns[i].GetAddT0Entries() != fRuns[i].GetRunNameSize()-1) {
@@ -3865,15 +3739,6 @@ Bool_t PMsrHandler::CheckAddRunParameters()
           result = false;
           break;
         }
-      }
-    } else { // no addrun present, check if addforward, addbackward, ... is present (which doesn't make any sense)
-      if ((fRuns[i].GetAddForwardHistoNoEntries() != 0) || (fRuns[i].GetAddBackwardHistoNoEntries() != 0) ||
-          (fRuns[i].GetAddT0Entries() != 0)) {
-        cerr << endl << ">> PMsrHandler::CheckAddRunParameters: **WARNING** found one of the following tags in Run #" << i+1 << ":";
-        cerr << endl << ">> addforward, addbackward, or addt0";
-        cerr << endl << ">> this doesn't make any sense if there no addrun present.";
-        cerr << endl << ">> Will ignore these entires for this run!";
-        cerr << endl;
       }
     }
   }

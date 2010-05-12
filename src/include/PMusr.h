@@ -409,14 +409,8 @@ class PMsrRunBlock {
     virtual Int_t GetMap(UInt_t idx);
     virtual UInt_t GetForwardHistoNoSize() { return fForwardHistoNo.size(); }
     virtual Int_t GetForwardHistoNo(UInt_t idx=0);
-    virtual UInt_t GetAddForwardHistoNoEntries() { return fAddForwardHistoNo.size(); }
-    virtual Int_t GetAddForwardHistoNoSize(UInt_t addRunIdx);
-    virtual Int_t GetAddForwardHistoNo(UInt_t addRunIdx, UInt_t histoIdx);
     virtual UInt_t GetBackwardHistoNoSize() { return fBackwardHistoNo.size(); }
     virtual Int_t GetBackwardHistoNo(UInt_t idx=0);
-    virtual UInt_t GetAddBackwardHistoNoEntries() { return fAddBackwardHistoNo.size(); }
-    virtual Int_t GetAddBackwardHistoNoSize(UInt_t addRunIdx);
-    virtual Int_t GetAddBackwardHistoNo(UInt_t addRunIdx, UInt_t histoIdx);
     virtual Double_t GetBkgFix(UInt_t idx);
     virtual Int_t GetBkgRange(UInt_t idx);
     virtual Int_t GetDataRange(UInt_t idx);
@@ -446,9 +440,7 @@ class PMsrRunBlock {
     virtual void SetLifetimeCorrection(Bool_t bval) { fLifetimeCorrection = bval; }
     virtual void SetMap(Int_t mapVal, Int_t idx=-1);
     virtual void SetForwardHistoNo(Int_t histoNo, Int_t idx=-1);
-    virtual void SetAddForwardHistoNo(Int_t histoNo, UInt_t addRunIdx, UInt_t histoNoIdx);
     virtual void SetBackwardHistoNo(Int_t histoNo, Int_t idx=-1);
-    virtual void SetAddBackwardHistoNo(Int_t histoNo, UInt_t addRunIdx, UInt_t histoNoIdx);
     virtual void SetBkgFix(Double_t dval, Int_t idx=-1);
     virtual void SetBkgRange(Int_t ival, Int_t idx);
     virtual void SetDataRange(Int_t ival, Int_t idx);
@@ -476,9 +468,7 @@ class PMsrRunBlock {
     Bool_t fLifetimeCorrection;   ///< lifetime correction flag for viewing (fit type 0)
     PIntVector fMap;              ///< map vector needed to switch parameters for different runs within a single theory
     PIntVector fForwardHistoNo;   ///< forward histogram number (fit type 0, 2, 4)
-    vector<PIntVector> fAddForwardHistoNo; ///< forward histogram number for addrun's
     PIntVector fBackwardHistoNo;  ///< backward histogram number (fit type 2, 4)
-    vector<PIntVector> fAddBackwardHistoNo; ///< backward histogram number for addrun's
     Double_t fBkgFix[2];          ///< fixed background in (1/ns) (fit type 0, 2, 4)
     Int_t fBkgRange[4];           ///< background bin range (fit type 0, 2, 4)
     Int_t fDataRange[4];          ///< data bin range (fit type 0, 2, 4)

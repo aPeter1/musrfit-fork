@@ -596,13 +596,7 @@ void PMsrRunBlock::CleanUp()
   fInstitute.clear();
   fFileFormat.clear();
   fForwardHistoNo.clear();
-  for (UInt_t i=0; i<fAddForwardHistoNo.size(); i++)
-    fAddForwardHistoNo[i].clear();
-  fAddForwardHistoNo.clear();
   fBackwardHistoNo.clear();
-  for (UInt_t i=0; i<fAddBackwardHistoNo.size(); i++)
-    fAddBackwardHistoNo[i].clear();
-  fAddBackwardHistoNo.clear();
   fMap.clear();
   fT0.clear();
   for (UInt_t i=0; i<fAddT0.size(); i++)
@@ -803,72 +797,6 @@ void PMsrRunBlock::SetForwardHistoNo(Int_t histoNo, Int_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetAddForwardHistoNoSize
-//--------------------------------------------------------------------------
-/**
- * <p> get forward histo number size of the addrun at index addRunIdx
- *
- * \param addRunIdx index of the addrun
- */
-Int_t PMsrRunBlock::GetAddForwardHistoNoSize(UInt_t addRunIdx)
-{
-  if (fAddForwardHistoNo.empty())
-    return -1;
-
-  if (addRunIdx > fAddForwardHistoNo.size())
-    return -1;
-
-  return fAddForwardHistoNo[addRunIdx].size();
-}
-
-//--------------------------------------------------------------------------
-// GetAddForwardHistoNo
-//--------------------------------------------------------------------------
-/**
- * <p> get forward histo number of the addrun (index addRunIdx) at index histoIdx
- *
- * \param addRunIdx index of the addrun
- * \param histoIdx index of the add forward histo number value
- */
-Int_t PMsrRunBlock::GetAddForwardHistoNo(UInt_t addRunIdx, UInt_t histoIdx)
-{
-  if (fAddForwardHistoNo.empty())
-    return -1;
-
-  if (addRunIdx > fAddForwardHistoNo.size())
-    return -1;
-
-  if (fAddForwardHistoNo[addRunIdx].empty())
-    return -1;
-
-  if (histoIdx > fAddForwardHistoNo[addRunIdx].size())
-    return -1;
-
-  return fAddForwardHistoNo[addRunIdx][histoIdx];
-}
-
-//--------------------------------------------------------------------------
-// SetAddForwardHistoNo
-//--------------------------------------------------------------------------
-/**
- * <p> set add forward histogram value at index idx
- *
- * \param histoNo histogram value
- * \param addRunIdx addrun index
- * \param histoNoIdx index whithin the fAddForwardHistoNo vector where to set the value.
- */
-void PMsrRunBlock::SetAddForwardHistoNo(Int_t histoNo, UInt_t addRunIdx, UInt_t histoNoIdx)
-{
-  if (addRunIdx >= fAddForwardHistoNo.size())
-    fAddForwardHistoNo.resize(addRunIdx+1);
-
-  if (histoNoIdx >= fAddForwardHistoNo[addRunIdx].size())
-    fAddForwardHistoNo[addRunIdx].resize(histoNoIdx+1);
-
-  fAddForwardHistoNo[addRunIdx][histoNoIdx] = histoNo;
-}
-
-//--------------------------------------------------------------------------
 // GetBackwardHistoNo
 //--------------------------------------------------------------------------
 /**
@@ -906,72 +834,6 @@ void PMsrRunBlock::SetBackwardHistoNo(Int_t histoNo, Int_t idx)
       fBackwardHistoNo.resize(idx+1);
     fBackwardHistoNo[idx] = histoNo;
   }
-}
-
-//--------------------------------------------------------------------------
-// GetAddBackwardHistoNoSize
-//--------------------------------------------------------------------------
-/**
- * <p> get backward histo number size of the addrun at index addRunIdx
- *
- * \param addRunIdx index of the addrun
- */
-Int_t PMsrRunBlock::GetAddBackwardHistoNoSize(UInt_t addRunIdx)
-{
-  if (fAddBackwardHistoNo.empty())
-    return -1;
-
-  if (addRunIdx > fAddBackwardHistoNo.size())
-    return -1;
-
-  return fAddBackwardHistoNo[addRunIdx].size();
-}
-
-//--------------------------------------------------------------------------
-// GetAddBackwardHistoNo
-//--------------------------------------------------------------------------
-/**
- * <p> get backward histo number of the addrun (index addRunIdx) at index histoIdx
- *
- * \param addRunIdx index of the addrun
- * \param histoIdx index of the add backward histo number value
- */
-Int_t PMsrRunBlock::GetAddBackwardHistoNo(UInt_t addRunIdx, UInt_t histoIdx)
-{
-  if (fAddBackwardHistoNo.empty())
-    return -1;
-
-  if (addRunIdx > fAddBackwardHistoNo.size())
-    return -1;
-
-  if (fAddBackwardHistoNo[addRunIdx].empty())
-    return -1;
-
-  if (histoIdx > fAddBackwardHistoNo[addRunIdx].size())
-    return -1;
-
-  return fAddBackwardHistoNo[addRunIdx][histoIdx];
-}
-
-//--------------------------------------------------------------------------
-// SetAddBackwardHistoNo
-//--------------------------------------------------------------------------
-/**
- * <p> set add backward histogram value of the addrun at index histoNoIdx
- *
- * \param histoNo histogram value
- * \param addRunIdx addrun index
- * \param histoNoIdx index whithin the fAddBackwardHistoNo vector where to set the value.
- */
-void PMsrRunBlock::SetAddBackwardHistoNo(Int_t histoNo, UInt_t addRunIdx, UInt_t histoNoIdx)
-{
-  if (addRunIdx >= fAddBackwardHistoNo.size())
-    fAddBackwardHistoNo.resize(addRunIdx+1);
-
-  if (histoNoIdx >= fAddBackwardHistoNo[addRunIdx].size())
-    fAddBackwardHistoNo[addRunIdx].resize(histoNoIdx+1);
-
-  fAddBackwardHistoNo[addRunIdx][histoNoIdx] = histoNo;
 }
 
 //--------------------------------------------------------------------------
