@@ -111,6 +111,8 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eHelpPlot;
   } else if (qName == "musr_web_statistic") {
     fKeyWord = eHelpStatistic;
+  } else if (qName == "musr_web_msr2data") {
+    fKeyWord = eHelpMsr2Data;
   } else if (qName == "func_pixmap_path") {
     fKeyWord = eTheoFuncPixmapPath;
   } else if (qName == "func") {
@@ -248,6 +250,9 @@ bool PAdminXMLParser::characters(const QString& str)
       break;
     case eHelpStatistic:
       fAdmin->setHelpUrl("statistic", str);
+      break;
+    case eHelpMsr2Data:
+      fAdmin->setHelpUrl("msr2data", str);
       break;
     case eTheoFuncPixmapPath:
       fAdmin->setTheoFuncPixmapPath(QString(str.toLatin1()).trimmed());
@@ -437,7 +442,7 @@ PTheory* PAdmin::getTheoryItem(const unsigned int idx)
 //--------------------------------------------------------------------------
 /**
  * <p>set the help url, addressed via a tag. At the moment the following tags should be present:
- * main, title, parameters, theory, functions, run, command, fourier, plot, statistic
+ * main, title, parameters, theory, functions, run, command, fourier, plot, statistic, msr2data
  *
  * \param tag to address the help url
  * \param url help url corresponding to the tag.

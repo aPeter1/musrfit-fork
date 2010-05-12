@@ -72,7 +72,7 @@ class PAdminXMLParser : public QXmlDefaultHandler
                          eBeamline, eInstitute, eFileFormat, eLifetimeCorrection, eMsrDefaultFilePath,
                          eTheoFuncPixmapPath, eFunc, eFuncName, eFuncComment, eFuncLabel,
                          eFuncPixmap, eFuncParams, eHelpMain, eHelpTitle, eHelpParameters, eHelpTheory, eHelpFunctions,
-                         eHelpRun, eHelpCommand, eHelpFourier, eHelpPlot, eHelpStatistic};
+                         eHelpRun, eHelpCommand, eHelpFourier, eHelpPlot, eHelpStatistic, eHelpMsr2Data};
 
     bool startDocument();
     bool startElement( const QString&, const QString&, const QString& ,
