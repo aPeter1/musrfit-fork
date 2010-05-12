@@ -432,7 +432,7 @@ Bool_t PRunAsymmetry::PrepareData()
       // get T0's of the to be added run
       PUIntVector t0Add;
       // check if the t0's are given in the msr-file
-      if (i >= fRunInfo->GetAddT0Entries()) { // t0's are NOT in the msr-file
+      if (i > fRunInfo->GetAddT0Entries()) { // t0's are NOT in the msr-file
         // check if the t0's are in the data file
         if (addRunData->GetT0Size() != 0) { // t0's in the run data
           // keep the proper t0's. For asymmetry runs, forward/backward are holding the histo no
@@ -446,7 +446,7 @@ Bool_t PRunAsymmetry::PrepareData()
             t0Add.push_back(addRunData->GetT0Estimated(fRunInfo->GetForwardHistoNo(j)-1));
             t0Add.push_back(addRunData->GetT0Estimated(fRunInfo->GetBackwardHistoNo(j)-1));
             cerr << endl << ">> PRunAsymmetry::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
-            cerr << endl << ">> addRun: " << fRunInfo->GetRunName()->Data();
+            cerr << endl << ">> addRun: " << fRunInfo->GetRunName(i)->Data();
             cerr << endl << ">> will try the estimated one: forward t0 = " << addRunData->GetT0Estimated(fRunInfo->GetForwardHistoNo(j)-1);
             cerr << endl << ">> will try the estimated one: backward t0 = " << addRunData->GetT0Estimated(fRunInfo->GetBackwardHistoNo(j)-1);
             cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
@@ -458,35 +458,37 @@ Bool_t PRunAsymmetry::PrepareData()
           // check if t0's are given in the data file
           if (addRunData->GetT0Size() != 0) {
             // compare t0's of the msr-file with the one in the data file
-            if (fabs(fRunInfo->GetAddT0(i,2*j)-addRunData->GetT0(fRunInfo->GetForwardHistoNo(j)-1))>5.0) { // given in bins!!
-              cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING**:";
-              cerr << endl << ">> t0 from the msr-file is  " << fRunInfo->GetAddT0(i,2*j)+1; // +1 since vector starts at 0
+            if (fabs(fRunInfo->GetAddT0(i-1,2*j)-addRunData->GetT0(fRunInfo->GetForwardHistoNo(j)-1))>5.0) { // given in bins!!
+              cerr << endl << ">> PRunAsymmetry::PrepareData(): **WARNING**:";
+              cerr << endl << ">> t0 from the msr-file is  " << fRunInfo->GetAddT0(i-1,2*j)+1; // +1 since vector starts at 0
               cerr << endl << ">> t0 from the data file is " << addRunData->GetT0(fRunInfo->GetForwardHistoNo(j)-1);
               cerr << endl << ">> This is quite a deviation! Is this done intentionally??";
               cerr << endl << ">> addrun: " << fRunInfo->GetRunName(i)->Data();
               cerr << endl;
             }
-            if (fabs(fRunInfo->GetAddT0(i,2*j+1)-addRunData->GetT0(fRunInfo->GetBackwardHistoNo(j)-1))>5.0) { // given in bins!!
-              cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING**:";
-              cerr << endl << ">> t0 from the msr-file is  " << fRunInfo->GetAddT0(i,2*j+1)+1; // +1 since vector starts at 0
+            if (fabs(fRunInfo->GetAddT0(i-1,2*j+1)-addRunData->GetT0(fRunInfo->GetBackwardHistoNo(j)-1))>5.0) { // given in bins!!
+              cerr << endl << ">> PRunAsymmetry::PrepareData(): **WARNING**:";
+              cerr << endl << ">> t0 from the msr-file is  " << fRunInfo->GetAddT0(i-1,2*j+1)+1; // +1 since vector starts at 0
               cerr << endl << ">> t0 from the data file is " << addRunData->GetT0(fRunInfo->GetBackwardHistoNo(j)-1);
               cerr << endl << ">> This is quite a deviation! Is this done intentionally??";
               cerr << endl << ">> addrun: " << fRunInfo->GetRunName(i)->Data();
               cerr << endl;
             }
           }
-          if (i < fRunInfo->GetAddT0Entries()) {
-            t0Add.push_back(fRunInfo->GetAddT0(i,2*j));
-            t0Add.push_back(fRunInfo->GetAddT0(i,2*j+1));
-          } else {
-            cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** NO t0's found, neither in the addrun data (";
-            cerr << fRunInfo->GetRunName(i)->Data();
-            cerr << "), nor in the msr-file! Will try to use the T0 of the run data (";
-            cerr << fRunInfo->GetRunName(i)->Data();
-            cerr << ") without any warranty!";
-            cerr << endl;
-            t0Add.push_back(fRunInfo->GetT0(2*j));
-            t0Add.push_back(fRunInfo->GetT0(2*j+1));
+          if (i <= fRunInfo->GetAddT0Entries()) {
+            if (2*j+1 < static_cast<UInt_t>(fRunInfo->GetAddT0Size(i-1))) {
+              t0Add.push_back(fRunInfo->GetAddT0(i-1,2*j));
+              t0Add.push_back(fRunInfo->GetAddT0(i-1,2*j+1));
+            } else {
+              cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** NO t0's found, neither in the addrun data (";
+              cerr << fRunInfo->GetRunName(i)->Data();
+              cerr << "), nor in the msr-file! Will try to use the T0 of the run data (";
+              cerr << fRunInfo->GetRunName(i)->Data();
+              cerr << ") without any warranty!";
+              cerr << endl;
+              t0Add.push_back(fRunInfo->GetT0(2*j));
+              t0Add.push_back(fRunInfo->GetT0(2*j+1));
+            }
           }
         }
       }

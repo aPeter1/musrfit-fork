@@ -395,7 +395,7 @@ Bool_t PRunSingleHisto::PrepareData()
       // get T0's of the to be added run
       PUIntVector t0Add;
       // check if the t0's are given in the msr-file
-      if (i >= fRunInfo->GetAddT0Entries()) { // t0's are NOT in the msr-file
+      if (i > fRunInfo->GetAddT0Entries()) { // t0's are NOT in the msr-file
         // check if the t0's are in the data file
         if (addRunData->GetT0Size() != 0) { // t0's in the run data
           // keep the proper t0's. For single histo runs, forward is holding the histo no
@@ -417,25 +417,27 @@ Bool_t PRunSingleHisto::PrepareData()
           // check if t0's are given in the data file
           if (addRunData->GetT0Size() != 0) {
             // compare t0's of the msr-file with the one in the data file
-            if (fabs(fRunInfo->GetAddT0(i,j)-addRunData->GetT0(fRunInfo->GetForwardHistoNo(j)-1))>5.0) { // given in bins!!
+            if (fabs(fRunInfo->GetAddT0(i-1,j)-addRunData->GetT0(fRunInfo->GetForwardHistoNo(j)-1))>5.0) { // given in bins!!
               cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING**:";
-              cerr << endl << ">> t0 from the msr-file is  " << fRunInfo->GetAddT0(i,j);
+              cerr << endl << ">> t0 from the msr-file is  " << fRunInfo->GetAddT0(i-1,j);
               cerr << endl << ">> t0 from the data file is " << addRunData->GetT0(fRunInfo->GetForwardHistoNo(j)-1);
               cerr << endl << ">> This is quite a deviation! Is this done intentionally??";
               cerr << endl << ">> addrun: " << fRunInfo->GetRunName(i)->Data();
               cerr << endl;
             }
           }
-          if (i < fRunInfo->GetAddT0Entries()) {
-            t0Add.push_back(fRunInfo->GetAddT0(i,j));
-          } else {
-            cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** NO t0's found, neither in the addrun data (";
-            cerr << fRunInfo->GetRunName(i)->Data();
-            cerr << "), nor in the msr-file! Will try to use the T0 of the run data (";
-            cerr << fRunInfo->GetRunName(i)->Data();
-            cerr << ") without any warranty!";
-            cerr << endl;
-            t0Add.push_back(fRunInfo->GetT0(j));
+          if (i <= fRunInfo->GetAddT0Entries()) {
+            if (j < static_cast<UInt_t>(fRunInfo->GetAddT0Size(i-1))) {
+              t0Add.push_back(fRunInfo->GetAddT0(i-1,j));
+            } else {
+              cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** NO t0's found, neither in the addrun data (";
+              cerr << fRunInfo->GetRunName(i)->Data();
+              cerr << "), nor in the msr-file! Will try to use the T0 of the run data (";
+              cerr << fRunInfo->GetRunName(i)->Data();
+              cerr << ") without any warranty!";
+              cerr << endl;
+              t0Add.push_back(fRunInfo->GetT0(j));
+            }
           }
         }
       }
