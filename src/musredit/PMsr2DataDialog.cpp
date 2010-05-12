@@ -35,13 +35,15 @@
 #include <QTextEdit>
 #include <QCheckBox>
 
+#include "PHelp.h"
+
 #include "PMsr2DataDialog.h"
 
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>
  */
-PMsr2DataDialog::PMsr2DataDialog(PMsr2DataParam *msr2DataParam) : fMsr2DataParam(msr2DataParam)
+PMsr2DataDialog::PMsr2DataDialog(PMsr2DataParam *msr2DataParam, const QString helpUrl) : fMsr2DataParam(msr2DataParam), fHelpUrl(helpUrl)
 {
   setupUi(this);
 
@@ -244,6 +246,20 @@ void PMsr2DataDialog::fitOnlyChanged(int buttonState)
     fCreateMsrFileOnly_checkBox->setChecked(false);
     fTemplateRunNumber_lineEdit->clear();
   }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PMsr2DataDialog::helpContent()
+{
+    if (fHelpUrl.isEmpty()) {
+      QMessageBox::information(this, "**INFO**", "Will eventually show a help window");
+    } else {
+      PHelp *help = new PHelp(fHelpUrl);
+      help->show();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------

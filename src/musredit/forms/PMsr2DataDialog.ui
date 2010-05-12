@@ -564,8 +564,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>457</x>
-     <y>488</y>
+     <x>453</x>
+     <y>506</y>
     </hint>
     <hint type="destinationlabel">
      <x>380</x>
@@ -596,8 +596,8 @@
    <slot>fitOnlyChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>363</x>
-     <y>457</y>
+     <x>406</x>
+     <y>460</y>
     </hint>
     <hint type="destinationlabel">
      <x>301</x>
@@ -621,10 +621,95 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>fFirst_lineEdit</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>PMsr2DataDialog</receiver>
+   <slot>runFirstEntered(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>82</x>
+     <y>44</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>113</x>
+     <y>504</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fLast_lineEdit</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>PMsr2DataDialog</receiver>
+   <slot>runLastEntered(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>229</x>
+     <y>44</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>348</x>
+     <y>500</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fRunList_lineEdit</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>PMsr2DataDialog</receiver>
+   <slot>runListEntered(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>151</x>
+     <y>77</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>183</x>
+     <y>515</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fRunListFileName_lineEdit</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>PMsr2DataDialog</receiver>
+   <slot>runListFileNameEntered(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>295</x>
+     <y>115</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>332</x>
+     <y>492</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fTemplateRunNumber_lineEdit</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>PMsr2DataDialog</receiver>
+   <slot>templateRunEntered(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>190</x>
+     <y>245</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>137</x>
+     <y>516</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>helpContent()</slot>
   <slot>fitOnlyChanged(int)</slot>
   <slot>createMsrFileOnlyChanged(int)</slot>
+  <slot>runFirstEntered(QString)</slot>
+  <slot>runLastEntered(QString)</slot>
+  <slot>runListEntered(QString)</slot>
+  <slot>runListFileNameEntered(QString)</slot>
+  <slot>templateRunEntered(QString)</slot>
  </slots>
 </ui>

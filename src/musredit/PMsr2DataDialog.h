@@ -43,7 +43,7 @@ class PMsr2DataDialog : public QDialog, private Ui::PMsr2DataDialog
   Q_OBJECT
 
   public:
-    PMsr2DataDialog(PMsr2DataParam *msr2DataParam);
+    PMsr2DataDialog(PMsr2DataParam *msr2DataParam, const QString helpUrl);
 
     virtual int getRunTag() { return fRunTag; }
     virtual PMsr2DataParam* getMsr2DataParam();
@@ -56,10 +56,12 @@ class PMsr2DataDialog : public QDialog, private Ui::PMsr2DataDialog
     void templateRunEntered(const QString&);
     void createMsrFileOnlyChanged(int);
     void fitOnlyChanged(int);
+    void helpContent();
 
   private:
-    int fRunTag; // -1 = not valid, 0 = first last, 1 = run list, 2 = run list file name
+    int fRunTag; ///< -1 = not valid, 0 = first last, 1 = run list, 2 = run list file name
     PMsr2DataParam *fMsr2DataParam;
+    QString fHelpUrl; ///< help url for the Fourier block
 };
 
 #endif // _PMSR2DATADIALOG_H_

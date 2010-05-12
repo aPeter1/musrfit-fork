@@ -1668,7 +1668,7 @@ void PTextEdit::musrMsr2Data()
     fMsr2DataParam->fitOnly = false;
   }
 
-  PMsr2DataDialog *dlg = new PMsr2DataDialog(fMsr2DataParam);
+  PMsr2DataDialog *dlg = new PMsr2DataDialog(fMsr2DataParam, fAdmin->getHelpUrl("msr2data"));
 
   if (dlg == 0) {
     QMessageBox::critical(this, "**ERROR**", "Couldn't invoke msr2data dialog, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
