@@ -43,10 +43,13 @@ using namespace std;
 
 ClassImp(TGapSWave)
 ClassImp(TGapDWave)
+ClassImp(TGapCosSqDWave)
+ClassImp(TGapSinSqDWave)
 ClassImp(TGapAnSWave)
 ClassImp(TGapNonMonDWave1)
 ClassImp(TGapNonMonDWave2)
 ClassImp(TGapPowerLaw)
+ClassImp(TGapDirtySWave)
 
 ClassImp(TLambdaSWave)
 ClassImp(TLambdaDWave)
@@ -80,6 +83,30 @@ TGapSWave::TGapSWave() {
 
 TGapDWave::TGapDWave() {
   TDWaveGapIntegralCuhre *gapint = new TDWaveGapIntegralCuhre();
+  fGapIntegral = gapint;
+  gapint = 0;
+
+  fTemp.clear();
+  fTempIter = fTemp.end();
+  fIntegralValues.clear();
+  fCalcNeeded.clear();
+  fPar.clear();
+}
+
+TGapCosSqDWave::TGapCosSqDWave() {
+  TCosSqDWaveGapIntegralCuhre *gapint = new TCosSqDWaveGapIntegralCuhre();
+  fGapIntegral = gapint;
+  gapint = 0;
+
+  fTemp.clear();
+  fTempIter = fTemp.end();
+  fIntegralValues.clear();
+  fCalcNeeded.clear();
+  fPar.clear();
+}
+
+TGapSinSqDWave::TGapSinSqDWave() {
+  TSinSqDWaveGapIntegralCuhre *gapint = new TSinSqDWaveGapIntegralCuhre();
   fGapIntegral = gapint;
   gapint = 0;
 
@@ -178,6 +205,28 @@ TGapSWave::~TGapSWave() {
 }
 
 TGapDWave::~TGapDWave() {
+  delete fGapIntegral;
+  fGapIntegral = 0;
+
+  fTemp.clear();
+  fTempIter = fTemp.end();
+  fIntegralValues.clear();
+  fCalcNeeded.clear();
+  fPar.clear();
+}
+
+TGapCosSqDWave::~TGapCosSqDWave() {
+  delete fGapIntegral;
+  fGapIntegral = 0;
+
+  fTemp.clear();
+  fTempIter = fTemp.end();
+  fIntegralValues.clear();
+  fCalcNeeded.clear();
+  fPar.clear();
+}
+
+TGapSinSqDWave::~TGapSinSqDWave() {
   delete fGapIntegral;
   fGapIntegral = 0;
 
@@ -384,7 +433,8 @@ double TGapDWave::operator()(double t, const vector<double> &par) const {
     double ds;
     vector<double> intPar; // parameters for the integral, T & Delta(T)
     intPar.push_back(2.0*0.08617384436*t); // 2 kB T, kB in meV/K
-    intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
+    //intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
+    intPar.push_back(par[1]*tanh(TMath::Pi()*0.08617384436*par[0]/par[1]*sqrt(4.0/3.0*(par[0]/t-1.0))));
     intPar.push_back(4.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
     intPar.push_back(TMath::PiOver2()); // upper limit of phi-integration
 
@@ -394,6 +444,152 @@ double TGapDWave::operator()(double t, const vector<double> &par) const {
     fGapIntegral->SetParameters(intPar);
 //    ds = 1.0+4.0/PI*fGapIntegral->IntegrateFunc(2, xl, xu);
     ds = 1.0-intPar[2]/intPar[0]*fGapIntegral->IntegrateFunc();
+
+    intPar.clear();
+
+    if (newTemp)
+      fIntegralValues.push_back(ds);
+    else
+      fIntegralValues[vectorIndex] = ds;
+
+    fCalcNeeded[vectorIndex] = false;
+  }
+
+  return fIntegralValues[vectorIndex];
+
+}
+
+double TGapCosSqDWave::operator()(double t, const vector<double> &par) const {
+
+  assert(par.size() == 3); // three parameters: Tc, DeltaD(0), DeltaS(0)
+
+  if (t<=0.0)
+    return 1.0;
+  else if (t >= par[0])
+    return 0.0;
+
+  bool integralParChanged(false);
+
+  if (fPar.empty()) { // first time calling this routine
+    fPar = par;
+    integralParChanged = true;
+  } else { // check if Tc or Delta0 have changed
+    for (unsigned int i(0); i<par.size(); i++) {
+      if (par[i] != fPar[i]) {
+        fPar[i] = par[i];
+        integralParChanged = true;
+      }
+    }
+  }
+
+  bool newTemp(false);
+  unsigned int vectorIndex;
+
+  if (integralParChanged) {
+    fCalcNeeded.clear();
+    fCalcNeeded.resize(fTemp.size(), true);
+  }
+
+  fTempIter = find(fTemp.begin(), fTemp.end(), t);
+  if(fTempIter == fTemp.end()) {
+    fTemp.push_back(t);
+    vectorIndex = fTemp.size() - 1;
+    fCalcNeeded.push_back(true);
+    newTemp = true;
+  } else {
+    vectorIndex = fTempIter - fTemp.begin();
+  }
+
+  if (fCalcNeeded[vectorIndex]) {
+
+    double ds;
+    vector<double> intPar; // parameters for the integral, T & Delta(T)
+    intPar.push_back(2.0*0.08617384436*t); // 2 kB T, kB in meV/K
+//    intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
+    intPar.push_back(par[1]*tanh(TMath::Pi()*0.08617384436*par[0]/par[1]*sqrt(4.0/3.0*(par[0]/t-1.0)))); // DeltaD(T)
+    intPar.push_back(1.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
+    intPar.push_back(TMath::Pi()); // upper limit of phi-integration
+    intPar.push_back(par[2]*tanh(TMath::Pi()*0.08617384436*par[0]/par[2]*sqrt((par[0]/t-1.0)))); // DeltaS(T)
+
+//    double xl[] = {0.0, 0.0}; // lower bound E, phi
+//    double xu[] = {4.0*(t+intPar[1]), 0.5*PI}; // upper bound E, phi
+
+    fGapIntegral->SetParameters(intPar);
+//    ds = 1.0+4.0/PI*fGapIntegral->IntegrateFunc(2, xl, xu);
+    ds = 1.0-2.0*intPar[2]/intPar[0]*fGapIntegral->IntegrateFunc();
+
+    intPar.clear();
+
+    if (newTemp)
+      fIntegralValues.push_back(ds);
+    else
+      fIntegralValues[vectorIndex] = ds;
+
+    fCalcNeeded[vectorIndex] = false;
+  }
+
+  return fIntegralValues[vectorIndex];
+
+}
+
+double TGapSinSqDWave::operator()(double t, const vector<double> &par) const {
+
+  assert(par.size() == 3); // two parameters: Tc, Delta(0), s-weight
+
+  if (t<=0.0)
+    return 1.0;
+  else if (t >= par[0])
+    return 0.0;
+
+  bool integralParChanged(false);
+
+  if (fPar.empty()) { // first time calling this routine
+    fPar = par;
+    integralParChanged = true;
+  } else { // check if Tc or Delta0 have changed
+    for (unsigned int i(0); i<par.size(); i++) {
+      if (par[i] != fPar[i]) {
+        fPar[i] = par[i];
+        integralParChanged = true;
+      }
+    }
+  }
+
+  bool newTemp(false);
+  unsigned int vectorIndex;
+
+  if (integralParChanged) {
+    fCalcNeeded.clear();
+    fCalcNeeded.resize(fTemp.size(), true);
+  }
+
+  fTempIter = find(fTemp.begin(), fTemp.end(), t);
+  if(fTempIter == fTemp.end()) {
+    fTemp.push_back(t);
+    vectorIndex = fTemp.size() - 1;
+    fCalcNeeded.push_back(true);
+    newTemp = true;
+  } else {
+    vectorIndex = fTempIter - fTemp.begin();
+  }
+
+  if (fCalcNeeded[vectorIndex]) {
+
+    double ds;
+    vector<double> intPar; // parameters for the integral, T & Delta(T)
+    intPar.push_back(2.0*0.08617384436*t); // 2 kB T, kB in meV/K
+//    intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
+    intPar.push_back(par[1]*tanh(TMath::Pi()*0.08617384436*par[0]/par[1]*sqrt(4.0/3.0*(par[0]/t-1.0))));
+    intPar.push_back(1.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
+    intPar.push_back(TMath::Pi()); // upper limit of phi-integration
+    intPar.push_back(par[2]*tanh(TMath::Pi()*0.08617384436*par[0]/par[2]*sqrt((par[0]/t-1.0)))); // DeltaS(T)
+
+//    double xl[] = {0.0, 0.0}; // lower bound E, phi
+//    double xu[] = {4.0*(t+intPar[1]), 0.5*PI}; // upper bound E, phi
+
+    fGapIntegral->SetParameters(intPar);
+//    ds = 1.0+4.0/PI*fGapIntegral->IntegrateFunc(2, xl, xu);
+    ds = 1.0-2.0*intPar[2]/intPar[0]*fGapIntegral->IntegrateFunc();
 
     intPar.clear();
 
@@ -629,6 +825,22 @@ double TGapPowerLaw::operator()(double t, const vector<double> &par) const {
     return 0.0;
 
   return 1.0 - pow(t/par[0], par[1]);
+
+}
+
+
+double TGapDirtySWave::operator()(double t, const vector<double> &par) const {
+
+  assert(par.size() == 2); // two parameters: Tc, Delta(0)
+
+  if (t<=0.0)
+    return 1.0;
+  else if (t >= par[0])
+    return 0.0;
+
+  double deltaT(tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
+
+  return deltaT*tanh(par[1]*deltaT/(2.0*0.08617384436*t)); // Delta(T)/Delta(0)*tanh(Delta(T)/2 kB T), kB in meV/K
 
 }
 

@@ -66,6 +66,73 @@ void TDWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
   return;
 }
 
+std::vector<double> TCosSqDWaveGapIntegralCuhre::fPar;
+
+double TCosSqDWaveGapIntegralCuhre::IntegrateFunc()
+{
+  const unsigned int NCOMP(1);
+  const double EPSREL (1e-8);
+  const double EPSABS (1e-6);
+  const unsigned int VERBOSE (0);
+  const unsigned int LAST (4);
+  const unsigned int MINEVAL (0);
+  const unsigned int MAXEVAL (500000);
+
+  const unsigned int KEY (13);
+
+  int nregions, neval, fail;
+  double integral[NCOMP], error[NCOMP], prob[NCOMP];
+
+  Cuhre(fNDim, NCOMP, Integrand,
+    EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
+    KEY,
+    &nregions, &neval, &fail, integral, error, prob);
+
+  return integral[0];
+}
+
+void TCosSqDWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
+                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {twokBT, DeltaD(T), Ec, phic, DeltaS(T)}
+{
+  double deltasq(TMath::Power(fPar[1]*TMath::Cos(2.0*x[1]*fPar[3]) + fPar[4], 2.0));
+  f[0] = TMath::Power(TMath::Cos(x[1]*fPar[3])/TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[2]*fPar[2]+deltasq)/fPar[0]),2.0);
+  return;
+}
+
+std::vector<double> TSinSqDWaveGapIntegralCuhre::fPar;
+
+double TSinSqDWaveGapIntegralCuhre::IntegrateFunc()
+{
+  const unsigned int NCOMP(1);
+  const double EPSREL (1e-8);
+  const double EPSABS (1e-10);
+  const unsigned int VERBOSE (0);
+  const unsigned int LAST (4);
+  const unsigned int MINEVAL (0);
+  const unsigned int MAXEVAL (500000);
+
+  const unsigned int KEY (13);
+
+  int nregions, neval, fail;
+  double integral[NCOMP], error[NCOMP], prob[NCOMP];
+
+  Cuhre(fNDim, NCOMP, Integrand,
+    EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
+    KEY,
+    &nregions, &neval, &fail, integral, error, prob);
+
+  return integral[0];
+}
+
+void TSinSqDWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
+                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {twokBT, DeltaD(T), Ec, phic, DeltaS(T)}
+{
+  double deltasq(TMath::Power(fPar[1]*TMath::Cos(2.0*x[1]*fPar[3]) + fPar[4],2.0));
+  f[0] = TMath::Power(TMath::Sin(x[1]*fPar[3]),2.0)/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[2]*fPar[2]+deltasq)/fPar[0]),2.0);
+  return;
+}
+
+
 std::vector<double> TAnSWaveGapIntegralCuhre::fPar;
 
 double TAnSWaveGapIntegralCuhre::IntegrateFunc()

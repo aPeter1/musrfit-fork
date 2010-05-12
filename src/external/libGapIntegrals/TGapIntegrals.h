@@ -80,6 +80,47 @@ private:
   ClassDef(TGapDWave,1)
 };
 
+class TGapCosSqDWave : public PUserFcnBase {
+
+public:
+  TGapCosSqDWave();
+  ~TGapCosSqDWave();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  TCosSqDWaveGapIntegralCuhre *fGapIntegral;
+  mutable vector<double> fTemp;
+  mutable vector<double>::const_iterator fTempIter;
+  mutable vector<double> fIntegralValues;
+  mutable vector<bool> fCalcNeeded;
+
+  mutable vector<double> fPar;
+
+  ClassDef(TGapCosSqDWave,1)
+};
+
+class TGapSinSqDWave : public PUserFcnBase {
+
+public:
+  TGapSinSqDWave();
+  ~TGapSinSqDWave();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  TSinSqDWaveGapIntegralCuhre *fGapIntegral;
+  mutable vector<double> fTemp;
+  mutable vector<double>::const_iterator fTempIter;
+  mutable vector<double> fIntegralValues;
+  mutable vector<bool> fCalcNeeded;
+
+  mutable vector<double> fPar;
+
+  ClassDef(TGapSinSqDWave,1)
+};
+
+
 class TGapAnSWave : public PUserFcnBase {
 
 public:
@@ -153,6 +194,20 @@ private:
 
   ClassDef(TGapPowerLaw,1)
 };
+
+class TGapDirtySWave : public PUserFcnBase {
+
+public:
+  TGapDirtySWave() {}
+  ~TGapDirtySWave() {}
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+
+  ClassDef(TGapDirtySWave,1)
+};
+
 
 class TLambdaSWave : public PUserFcnBase {
 

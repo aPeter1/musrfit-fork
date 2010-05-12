@@ -143,6 +143,34 @@ class TDWaveGapIntegralCuhre {
 
 };
 
+class TCosSqDWaveGapIntegralCuhre {
+  public:
+    TCosSqDWaveGapIntegralCuhre() : fNDim(2) {}
+    ~TCosSqDWaveGapIntegralCuhre() { fPar.clear(); }
+    void SetParameters(const std::vector<double> &par) { fPar=par; }
+    static void Integrand(const int*, const double[], const int*, double[]);
+    double IntegrateFunc();
+
+  protected:
+    static vector<double> fPar;
+    unsigned int fNDim;
+
+};
+
+class TSinSqDWaveGapIntegralCuhre {
+  public:
+    TSinSqDWaveGapIntegralCuhre() : fNDim(2) {}
+    ~TSinSqDWaveGapIntegralCuhre() { fPar.clear(); }
+    void SetParameters(const std::vector<double> &par) { fPar=par; }
+    static void Integrand(const int*, const double[], const int*, double[]);
+    double IntegrateFunc();
+
+  protected:
+    static vector<double> fPar;
+    unsigned int fNDim;
+
+};
+
 class TAnSWaveGapIntegralCuhre {
   public:
     TAnSWaveGapIntegralCuhre() : fNDim(2) {}
