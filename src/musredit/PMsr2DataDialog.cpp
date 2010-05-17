@@ -41,7 +41,10 @@
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
+ *
+ * \param msr2DataParam data structure keeping the necessary information to feed msr2data
+ * \param helpUrl help url for msr2data
  */
 PMsr2DataDialog::PMsr2DataDialog(PMsr2DataParam *msr2DataParam, const QString helpUrl) : fMsr2DataParam(msr2DataParam), fHelpUrl(helpUrl)
 {
@@ -101,7 +104,7 @@ PMsr2DataDialog::PMsr2DataDialog(PMsr2DataParam *msr2DataParam, const QString he
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the msr2data relavant parameters from the GUI.
  */
 PMsr2DataParam* PMsr2DataDialog::getMsr2DataParam()
 {
@@ -140,7 +143,10 @@ PMsr2DataParam* PMsr2DataDialog::getMsr2DataParam()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: called when in the 'Run List Input', the 'First' text field is activated. It clears any
+ * entries in 'Run List' and 'Run List File Name'. It furthermore sets the run tag.
+ *
+ * \param str string content of the QTextEdit field.
  */
 void PMsr2DataDialog::runFirstEntered(const QString &str)
 {
@@ -158,7 +164,10 @@ void PMsr2DataDialog::runFirstEntered(const QString &str)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: called when in the 'Run List Input', the 'Last' text field is activated. It clears any
+ * entries in 'Run List' and 'Run List File Name'. It furthermore sets the run tag.
+ *
+ * \param str string content of the QTextEdit field.
  */
 void PMsr2DataDialog::runLastEntered(const QString &str)
 {
@@ -178,7 +187,10 @@ void PMsr2DataDialog::runLastEntered(const QString &str)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: called when in the 'Run List Input', the 'Run List' text field is activated. It clears any
+ * entries in 'First', 'Last', and 'Run List File Name'. It furthermore sets the run tag.
+ *
+ * \param str string content of the QTextEdit field.
  */
 void PMsr2DataDialog::runListEntered(const QString &str)
 {
@@ -197,7 +209,10 @@ void PMsr2DataDialog::runListEntered(const QString &str)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: called when in the 'Run List Input', the 'Run List File Name' text field is activated. It clears any
+ * entries in 'First', 'Last', and 'Run List'. It furthermore sets the run tag.
+ *
+ * \param str string content of the QTextEdit field.
  */
 void PMsr2DataDialog::runListFileNameEntered(const QString &str)
 {
@@ -216,7 +231,10 @@ void PMsr2DataDialog::runListFileNameEntered(const QString &str)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: called when in 'Template Run Input', the 'Template Run Number' text field is activated.
+ * It set at the same time the fit-only flag to false.
+ *
+ * \param str string content of the QTextEdit field.
  */
 void PMsr2DataDialog::templateRunEntered(const QString &str)
 {
@@ -227,7 +245,10 @@ void PMsr2DataDialog::templateRunEntered(const QString &str)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: called when the 'Create msr-File only' QCheckBox under 'Options' is activated.
+ * Sets at the same time the fit-only flag to false.
+ *
+ * \param buttonState state of the button.
  */
 void PMsr2DataDialog::createMsrFileOnlyChanged(int buttonState)
 {
@@ -238,7 +259,11 @@ void PMsr2DataDialog::createMsrFileOnlyChanged(int buttonState)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: called when the 'Fit Only' QCheckBox under 'Options' is activated.
+ * Sets at the same time the create-msr-file-only flag to false. Clears the 'Template Run Number'
+ * field.
+ *
+ * \param buttonState state of the button.
  */
 void PMsr2DataDialog::fitOnlyChanged(int buttonState)
 {
@@ -250,7 +275,7 @@ void PMsr2DataDialog::fitOnlyChanged(int buttonState)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Generates a help content window showing the description for msr2data.
  */
 void PMsr2DataDialog::helpContent()
 {

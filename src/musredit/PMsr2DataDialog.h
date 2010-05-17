@@ -38,6 +38,10 @@
 #include "musredit.h"
 #include "ui_PMsr2DataDialog.h"
 
+/**
+ * <p>Class handling the content of the MusrFit/Msr2Data GUI. It collects the input
+ * for B.M. Wojek's msr2data program.
+ */
 class PMsr2DataDialog : public QDialog, private Ui::PMsr2DataDialog
 {
   Q_OBJECT
@@ -60,7 +64,7 @@ class PMsr2DataDialog : public QDialog, private Ui::PMsr2DataDialog
 
   private:
     int fRunTag; ///< -1 = not valid, 0 = first last, 1 = run list, 2 = run list file name
-    PMsr2DataParam *fMsr2DataParam;
+    PMsr2DataParam *fMsr2DataParam; ///< data structure used to handle the necessary input for msr2data.
     QString fHelpUrl; ///< help url for the Fourier block
 };
 
