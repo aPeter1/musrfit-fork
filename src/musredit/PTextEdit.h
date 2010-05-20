@@ -47,6 +47,10 @@ class QTabWidget;
 class QTextEdit;
 class QMenu;
 
+//----------------------------------------------------------------------------------------------
+/**
+ * <p>Main class for musredit.
+ */
 class PTextEdit : public QMainWindow
 {
   Q_OBJECT
@@ -74,6 +78,7 @@ private slots:
   void insertTitle();
   void insertParameterBlock();
   void insertTheoryBlock();
+  void insertTheoryFunction(QAction *a);
   void insertFunctionBlock();
   void insertAsymRunBlock();
   void insertSingleHistRunBlock();
@@ -137,27 +142,27 @@ private slots:
   void setFileSystemWatcherActive();
 
 private:
-  PAdmin *fAdmin;
-  QFileSystemWatcher *fFileSystemWatcher;
-  bool fFileSystemWatcherActive;
-  QTimer fFileSystemWatcherTimeout;
+  PAdmin *fAdmin; ///< pointer to the xml-startup file informations. Needed for different purposes like default working- and executable directories etc.
+  QFileSystemWatcher *fFileSystemWatcher; ///< checks if msr-files are changing on the disk while being open in musredit.
+  bool fFileSystemWatcherActive; ///< flag to enable/disable the file system watcher
+  QTimer fFileSystemWatcherTimeout; ///< timer used to re-enable file system watcher. Needed to delay the re-enabling
 
   QAction *fMusrT0Action;
 
-  bool fKeepMinuit2Output;
-  bool fTitleFromDataFile;
-  bool fEnableMusrT0;
-  int  fDump;
+  bool fKeepMinuit2Output; ///< 'global' flag, if set to true, musrfit calls will keep the minuit2 output files.
+  bool fTitleFromDataFile; ///< 'global' flag, if set to true, musrfit will take the title from the data file instead of the msr-file.
+  bool fEnableMusrT0;      ///< 'global' flag, if set to true, musrt0 will be enabled
+  int  fDump;              ///< 'global' tag for musrfit calls: 0 == no dump, 1 == ascii dump, 2 == root dump
 
-  PMsr2DataParam *fMsr2DataParam;
-  PFindReplaceData *fFindReplaceData;
+  PMsr2DataParam *fMsr2DataParam; ///< structure holding the necessary input information for msr2data
+  PFindReplaceData *fFindReplaceData; ///< structure holding the ncessary input for find/replace
 
-  QComboBox *fComboFont;
-  QComboBox *fComboSize;
+  QComboBox *fComboFont; ///< combo box for the font selector
+  QComboBox *fComboSize; ///< combo box for the font size
   bool fFontChanging; ///< flag needed to prevent some textChanged feature to occure when only the font changed
 
-  QTabWidget *fTabWidget;
-  QMap<PSubTextEdit*, QString> fFilenames;
+  QTabWidget *fTabWidget; ///< tab widget in which the text editor(s) are placed
+  QMap<PSubTextEdit*, QString> fFilenames; ///< mapper between tab widget object and filename
 };
 
 

@@ -75,13 +75,18 @@ using namespace std;
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor
+ *
+ * \param parent pointer to the parent object
+ * \param f qt windows flags
  */
 PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
     : QMainWindow( parent, f )
 {
+  // reads and manages the conents of the xml-startup (musredit_startup.xml) file
   fAdmin = new PAdmin();
 
+  // enable file system watcher. Needed to get notification if the msr-file is changed outside of musrfit at runtime
   fFileSystemWatcherActive = true;
   fFileSystemWatcher = new QFileSystemWatcher();
   if (fFileSystemWatcher == 0) {
@@ -90,6 +95,7 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
     connect( fFileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(fileChanged(const QString&)));
   }
 
+  // initialize stuff
   fMusrT0Action = 0;
 
   fMsr2DataParam = 0;
@@ -100,6 +106,7 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
   fEnableMusrT0      = fAdmin->getEnableMusrT0Flag();
   fDump = 0; // 0 = no dump, 1 = ascii dump, 2 = root dump
 
+  // setup menus
   setupFileActions();
   setupEditActions();
   setupTextActions();
@@ -116,6 +123,7 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
   QPixmap image0(":/images/musrfit.xpm");
   setWindowIcon( image0 );
 
+  // if arguments are give, try to load those files, otherwise create an empty new file
   if ( qApp->argc() != 1 ) {
     for ( int i = 1; i < qApp->argc(); ++i )
       load( qApp->argv()[ i ] );
@@ -128,7 +136,7 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Destructor
  */
 PTextEdit::~PTextEdit()
 {
@@ -158,7 +166,7 @@ PTextEdit::~PTextEdit()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Setup the file menu and the necessary actions.
  */
 void PTextEdit::setupFileActions()
 {
@@ -244,7 +252,7 @@ void PTextEdit::setupFileActions()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Setup the edit menu and the necessary actions.
  */
 void PTextEdit::setupEditActions()
 {
@@ -355,6 +363,15 @@ void PTextEdit::setupEditActions()
   connect( a, SIGNAL( triggered() ), this, SLOT( insertFunctionBlock() ));
   addSubMenu->addAction(a);
 
+  // feed the theoryFunctions popup menu
+  QMenu *theoryFunctions = new QMenu( tr("Add Theory Function"), this );  
+  for (unsigned int i=0; i<fAdmin->getTheoryCounts(); i++) {
+    PTheory *theoryItem = fAdmin->getTheoryItem(i);
+    a = new QAction( theoryItem->label, this);
+    theoryFunctions->addAction(a);
+  }
+  connect( theoryFunctions, SIGNAL( triggered(QAction*)), this, SLOT( insertTheoryFunction(QAction*) ) );
+
   a = new QAction( tr("Asymmetry Run Block"), this );
   a->setStatusTip( tr("Invokes MSR Asymmetry Run Block Dialog") );
   connect( a, SIGNAL( triggered() ), this, SLOT( insertAsymRunBlock() ));
@@ -391,6 +408,7 @@ void PTextEdit::setupEditActions()
   addSubMenu->addAction(a);
 
   menu->addMenu(addSubMenu);
+  menu->addMenu(theoryFunctions);
   menu->addSeparator();
 
   a = new QAction( tr( "Co&mment" ), this );
@@ -408,7 +426,7 @@ void PTextEdit::setupEditActions()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Setup the font/font size menu.
  */
 void PTextEdit::setupTextActions()
 {
@@ -449,7 +467,7 @@ void PTextEdit::setupTextActions()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Setup the musrfit menu and the necessary actions.
  */
 void PTextEdit::setupMusrActions()
 {
@@ -534,7 +552,7 @@ void PTextEdit::setupMusrActions()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Setup the help menu and the necessary actions.
  */
 void PTextEdit::setupHelpActions()
 {
@@ -560,18 +578,22 @@ void PTextEdit::setupHelpActions()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>load an msr-file.
+ *
+ * \param f filename
+ * \param index if == -1, add the file as a new tab, otherwise, replace the contents of the tab at index.
  */
 void PTextEdit::load( const QString &f, const int index )
 {
+  // check if the file exists
   if ( !QFile::exists( f ) )
     return;
 
-//  QFileInfo info(f);
-
+  // create a new text edit object
   PSubTextEdit *edit = new PSubTextEdit( fAdmin );
   edit->setFont(QFont(fAdmin->getFontName(), fAdmin->getFontSize()));
 
+  // place the text edit object at the appropriate tab position
   if (index == -1)
     fTabWidget->addTab( edit, QFileInfo( f ).fileName() );
   else
@@ -580,22 +602,27 @@ void PTextEdit::load( const QString &f, const int index )
   if ( !file.open( QIODevice::ReadOnly ) )
     return;
 
+  // add the msr-file to the file system watchersssss
   fFileSystemWatcher->addPath(f);
 
+  // read the file
   QTextStream ts( &file );
   QString txt = ts.readAll();
   edit->setPlainText( txt );
-  doConnections( edit );
+  doConnections( edit ); // add all necessary signal/slot connections
 
+  // set the tab widget to the current tab
   fTabWidget->setCurrentIndex(fTabWidget->indexOf(edit));
   edit->viewport()->setFocus();
+
+  // update the filename mapper
   fFilenames.remove( edit );
   fFilenames.insert( edit, f );
 }
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the currently tab selected textedit object.
  */
 PSubTextEdit *PTextEdit::currentEditor() const
 {
@@ -610,7 +637,9 @@ PSubTextEdit *PTextEdit::currentEditor() const
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Setup the necessray signal/slot connections for the textedit object.
+ *
+ * \param e textedit object
  */
 void PTextEdit::doConnections( PSubTextEdit *e )
 {
@@ -624,7 +653,9 @@ void PTextEdit::doConnections( PSubTextEdit *e )
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Validates a given runlist.
+ *
+ * \param runList run list string which should be a space separated list of run numbers.
  */
 bool PTextEdit::validRunList(const QString runList)
 {
@@ -658,7 +689,7 @@ bool PTextEdit::validRunList(const QString runList)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Start the dialog to enter a msr-file title. See also https://intranet.psi.ch/MUSR/MusrFit#4_1_The_Title
  */
 void PTextEdit::insertTitle()
 {
@@ -667,7 +698,7 @@ void PTextEdit::insertTitle()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Start the dialog to enter a msr-file fit-parameter block. See also https://intranet.psi.ch/MUSR/MusrFit#4_2_The_FITPARAMETER_Block
  */
 void PTextEdit::insertParameterBlock()
 {
@@ -676,7 +707,7 @@ void PTextEdit::insertParameterBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Start the dialog to enter a msr-file theory block. See also https://intranet.psi.ch/MUSR/MusrFit#4_3_The_THEORY_Block
  */
 void PTextEdit::insertTheoryBlock()
 {
@@ -685,7 +716,18 @@ void PTextEdit::insertTheoryBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Insert a selected theory function. See also https://intranet.psi.ch/MUSR/MusrFit#4_3_The_THEORY_Block
+ *
+ * \param a action of the selected theory function
+ */
+void PTextEdit::insertTheoryFunction(QAction *a)
+{
+  currentEditor()->insertTheoryFunction(a->text());
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>Start the dialog to enter a msr-file function block. See also https://intranet.psi.ch/MUSR/MusrFit#4_4_The_FUNCTIONS_Block
  */
 void PTextEdit::insertFunctionBlock()
 {
@@ -694,7 +736,7 @@ void PTextEdit::insertFunctionBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Start the dialog to enter a msr-file asymmetry run block. See also https://intranet.psi.ch/MUSR/MusrFit#4_5_The_RUN_Block
  */
 void PTextEdit::insertAsymRunBlock()
 {
@@ -703,7 +745,7 @@ void PTextEdit::insertAsymRunBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Start the dialog to enter a msr-file single histogram run block. See also https://intranet.psi.ch/MUSR/MusrFit#4_5_The_RUN_Block
  */
 void PTextEdit::insertSingleHistRunBlock()
 {
@@ -712,7 +754,7 @@ void PTextEdit::insertSingleHistRunBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Start the dialog to enter a msr-file nonMusr run block. See also https://intranet.psi.ch/MUSR/MusrFit#4_5_The_RUN_Block
  */
 void PTextEdit::insertNonMusrRunBlock()
 {
@@ -721,7 +763,7 @@ void PTextEdit::insertNonMusrRunBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Inserts a default command block. See also https://intranet.psi.ch/MUSR/MusrFit#4_6_The_COMMANDS_Block
  */
 void PTextEdit::insertCommandBlock()
 {
@@ -730,7 +772,7 @@ void PTextEdit::insertCommandBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Start the dialog to enter a msr-file Fourier block. See also https://intranet.psi.ch/MUSR/MusrFit#4_7_The_FOURIER_Block
  */
 void PTextEdit::insertFourierBlock()
 {
@@ -739,7 +781,7 @@ void PTextEdit::insertFourierBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Start the dialog to enter a msr-file plot block. See also https://intranet.psi.ch/MUSR/MusrFit#4_7_The_PLOT_Block
  */
 void PTextEdit::insertPlotBlock()
 {
@@ -748,7 +790,7 @@ void PTextEdit::insertPlotBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Inserts a default statistics block. See also https://intranet.psi.ch/MUSR/MusrFit#4_9_The_STATISTIC_Block
  */
 void PTextEdit::insertStatisticBlock()
 {
@@ -757,7 +799,7 @@ void PTextEdit::insertStatisticBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: called when File/New is selected. Will generate an empty tab-textedit field in musredit.
  */
 void PTextEdit::fileNew()
 {
@@ -772,7 +814,9 @@ void PTextEdit::fileNew()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: called when File/Open is selected. Will open an msr-/mlog-file. It checks if the file is
+ * already open, and if so will just select the current tab. If you want to reload the file use the
+ * fileReload() slot.
  */
 void PTextEdit::fileOpen()
 {
@@ -810,7 +854,7 @@ void PTextEdit::fileOpen()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Will reload the currently selected msr-file.
  */
 void PTextEdit::fileReload()
 {
@@ -826,7 +870,7 @@ void PTextEdit::fileReload()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Will save the currently selected file.
  */
 void PTextEdit::fileSave()
 {
@@ -854,7 +898,8 @@ void PTextEdit::fileSave()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Will open a file selector dialog to obtain a file name, and then save the file under the newly
+ * selected file name.
  */
 void PTextEdit::fileSaveAs()
 {
@@ -878,7 +923,7 @@ void PTextEdit::fileSaveAs()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Will call a print dialog and print the msr-file.
  */
 void PTextEdit::filePrint()
 {
@@ -927,7 +972,10 @@ void PTextEdit::filePrint()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Will remove a textedit tab from musredit. Depending on check it will done with or without checking
+ * if the file has been saved before.
+ *
+ * \param check if set to true, a warning dialog will popup if the file is not saved yet.
  */
 void PTextEdit::fileClose(const bool check)
 {
@@ -952,7 +1000,8 @@ void PTextEdit::fileClose(const bool check)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Removes all textedit tabs from musredit. It checks if the files haven't been saved, and if so it will
+ * popup a warning dialog.
  */
 void PTextEdit::fileCloseAll()
 {
@@ -988,7 +1037,8 @@ void PTextEdit::fileCloseAll()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Will close all textedit tabs but the selected one. It checks if the files haven't been saved, and if so it will
+ * popup a warning dialog.
  */
 void PTextEdit::fileCloseAllOthers()
 {
@@ -1035,7 +1085,7 @@ void PTextEdit::fileCloseAllOthers()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Will quit musredit.
  */
 void PTextEdit::fileExit()
 {
@@ -1056,7 +1106,7 @@ void PTextEdit::fileExit()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Text undo of the current textedit tab.
  */
 void PTextEdit::editUndo()
 {
@@ -1067,7 +1117,7 @@ void PTextEdit::editUndo()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Text redo of the current textedit tab
  */
 void PTextEdit::editRedo()
 {
@@ -1078,7 +1128,7 @@ void PTextEdit::editRedo()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Select all text of the current textedit tab.
  */
 void PTextEdit::editSelectAll()
 {
@@ -1089,7 +1139,7 @@ void PTextEdit::editSelectAll()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Cut the selection of the current textedit tab.
  */
 void PTextEdit::editCut()
 {
@@ -1100,7 +1150,7 @@ void PTextEdit::editCut()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Copy the selection of the current textedit tab.
  */
 void PTextEdit::editCopy()
 {
@@ -1111,7 +1161,7 @@ void PTextEdit::editCopy()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Paste at the cursor position of the current textedit tab.
  */
 void PTextEdit::editPaste()
 {
@@ -1122,7 +1172,7 @@ void PTextEdit::editPaste()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Starts a find dialog, and searches for a find string.
  */
 void PTextEdit::editFind()
 {
@@ -1182,7 +1232,7 @@ void PTextEdit::editFind()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Searches for a find string in the forward direction.
  */
 void PTextEdit::editFindNext()
 {
@@ -1197,7 +1247,7 @@ void PTextEdit::editFindNext()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Searches for a find string in the backward direction.
  */
 void PTextEdit::editFindPrevious()
 {
@@ -1214,7 +1264,7 @@ void PTextEdit::editFindPrevious()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Starts a find/replace dialog, and searches for a find string and replaces it depending of the replace options.
  */
 void PTextEdit::editFindAndReplace()
 {
@@ -1273,7 +1323,8 @@ void PTextEdit::editFindAndReplace()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Comment a selection, i.e. add a '#' character in front of each line of the selection.
+ * (Multiple selections not yet supported).
  */
 void PTextEdit::editComment()
 {
@@ -1307,7 +1358,8 @@ void PTextEdit::editComment()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Uncomment a selection, i.e. remove a '#' character in front of each line of the selection.
+ * (Multiple selections not yet supported).
  */
 void PTextEdit::editUncomment()
 {
@@ -1361,7 +1413,9 @@ void PTextEdit::editUncomment()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Chances the font.
+ *
+ * \param f font name
  */
 void PTextEdit::textFamily( const QString &f )
 {
@@ -1376,7 +1430,9 @@ void PTextEdit::textFamily( const QString &f )
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Chances the font size.
+ *
+ * \param p font size in points.
  */
 void PTextEdit::textSize( const QString &p )
 {
@@ -1391,7 +1447,7 @@ void PTextEdit::textSize( const QString &p )
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Loads a default asymmetry msr-file.
  */
 void PTextEdit::musrGetAsymmetryDefault()
 {
@@ -1452,7 +1508,7 @@ void PTextEdit::musrGetAsymmetryDefault()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Loads a default single histogram msr-file.
  */
 void PTextEdit::musrGetSingleHistoDefault()
 {
@@ -1513,7 +1569,7 @@ void PTextEdit::musrGetSingleHistoDefault()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>calls musrfit --chisq-only <msr-file>.
  */
 void PTextEdit::musrCalcChisq()
 {
@@ -1544,7 +1600,7 @@ void PTextEdit::musrCalcChisq()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>calls musrfit <options> <msr-file>. <options> can be set in the MusrFit/Preferences.
  */
 void PTextEdit::musrFit()
 {
@@ -1642,7 +1698,7 @@ void PTextEdit::musrFit()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Starts a msr2data input dialog which collects all the necessary data before calling msr2data.
  */
 void PTextEdit::musrMsr2Data()
 {
@@ -1930,7 +1986,7 @@ cout << endl;
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Calls musrview <msr-file>.
  */
 void PTextEdit::musrView()
 {
@@ -1961,7 +2017,7 @@ void PTextEdit::musrView()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Callse musrt0 <msr-file>.
  */
 void PTextEdit::musrT0()
 {
@@ -1994,7 +2050,7 @@ void PTextEdit::musrT0()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Calls the preferences dialog which is used to set some global options.
  */
 void PTextEdit::musrPrefs()
 {
@@ -2018,7 +2074,7 @@ void PTextEdit::musrPrefs()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Swaps the currently open msr-file with its mlog-file (if present) and updates musredit accordingly.
  */
 void PTextEdit::musrSwapMsrMlog()
 {
@@ -2094,7 +2150,7 @@ void PTextEdit::musrSwapMsrMlog()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Starts the help content browser.
  */
 void PTextEdit::helpContents()
 {
@@ -2105,7 +2161,7 @@ void PTextEdit::helpContents()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Starts the help about info box.
  */
 void PTextEdit::helpAbout()
 {
@@ -2115,7 +2171,7 @@ void PTextEdit::helpAbout()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Starts the help about Qt info box.
  */
 void PTextEdit::helpAboutQt()
 {
@@ -2124,7 +2180,9 @@ void PTextEdit::helpAboutQt()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: called when the font shall be changed.
+ *
+ * \param f font object
  */
 void PTextEdit::fontChanged( const QFont &f )
 {
@@ -2144,6 +2202,8 @@ void PTextEdit::fontChanged( const QFont &f )
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>
+ *
+ * \param forced
  */
 void PTextEdit::textChanged(const bool forced)
 {
@@ -2284,14 +2344,14 @@ void PTextEdit::fileChanged(const QString &fileName)
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>.Delayed reactivation of file system watcher, needed when saving files. At the moment the delay
- * is set to 1000 ms.
+ * is set to 2000 ms.
  */
 void PTextEdit::fileSystemWatcherActivation()
 {
   if (fFileSystemWatcherTimeout.isActive())
     return;
 
-  fFileSystemWatcherTimeout.singleShot(1000, this, SLOT(setFileSystemWatcherActive()));
+  fFileSystemWatcherTimeout.singleShot(2000, this, SLOT(setFileSystemWatcherActive()));
 }
 
 //----------------------------------------------------------------------------------------------------

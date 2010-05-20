@@ -36,6 +36,9 @@
 
 #include "ui_PPrefsDialog.h"
 
+/**
+ * <p>Class handling the content of the MusrFit/Preferences.
+ */
 class PPrefsDialog : public QDialog, private Ui::PPrefsDialog
 {
   Q_OBJECT

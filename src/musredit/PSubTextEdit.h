@@ -37,6 +37,10 @@
 
 #include "PAdmin.h"
 
+//------------------------------------------------------------------------------------------
+/**
+ * <p>Class handling a single text edit tab within musredit.
+ */
 class PSubTextEdit : public QPlainTextEdit
 {
     Q_OBJECT
@@ -45,13 +49,10 @@ class PSubTextEdit : public QPlainTextEdit
     PSubTextEdit(PAdmin *admin = 0, QWidget *parent = 0);
     virtual ~PSubTextEdit() {}
 
-//    void setLastModified(const QDateTime &lastModified) { fLastModified = lastModified; }
-//    QDateTime getLastModified() const { return fLastModified; }
-
   public slots:
     void insertTitle();
     void insertParameterBlock();
-    void insertTheoryFunction(int idx);
+    void insertTheoryFunction(QString name);
     void insertTheoryBlock();
     void insertFunctionBlock();
     void insertAsymRunBlock();
@@ -62,12 +63,8 @@ class PSubTextEdit : public QPlainTextEdit
     void insertPlotBlock();
     void insertStatisticBlock();
 
-  protected:
-    virtual QMenu *createPopupMenu( const QPoint &pos);
-
   private:
-    PAdmin *fAdmin;
-//    QDateTime fLastModified;
+    PAdmin *fAdmin;  ///< pointer to the administration object which holds working-, executable-paths etc.
 };
 
 #endif // _PSUBTEXTEDIT_H_

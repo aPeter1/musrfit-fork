@@ -49,7 +49,7 @@ class PReplaceDialog : public QDialog, private Ui::PReplaceDialog
     virtual void onFindTextAvailable(const QString&);
 
   private:
-    PFindReplaceData *fData;
+    PFindReplaceData *fData; ///< pointer to the find/replace data
 };
 
 #endif // _PREPLACEDIALOG_H_

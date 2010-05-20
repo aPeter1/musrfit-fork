@@ -33,7 +33,10 @@
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
+ *
+ * \param parent pointer to the parent object
+ * \param f qt windows flags
  */
 PReplaceConfirmationDialog::PReplaceConfirmationDialog(QWidget *parent, Qt::WindowFlags f) : QDialog(parent, f)
 {

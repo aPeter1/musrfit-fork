@@ -33,7 +33,7 @@
 
 //---------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Handles the musredit about popup.
  */
 PMusrEditAbout::PMusrEditAbout(QWidget *parent, Qt::WindowFlags f) : QDialog(parent, f)
 {

@@ -37,7 +37,12 @@
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
+ *
+ * \param data find/replace data structure
+ * \param selection if true, find/replace only of the selection
+ * \param parent pointer to the parent object
+ * \param f qt windows flag
  */
 PReplaceDialog::PReplaceDialog(PFindReplaceData *data, const bool selection, QWidget *parent, Qt::WindowFlags f) :
     QDialog(parent, f), fData(data)
@@ -72,7 +77,7 @@ PReplaceDialog::PReplaceDialog(PFindReplaceData *data, const bool selection, QWi
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the pointer to the find/replace data structure which is updated from the GUI content.
  */
 PFindReplaceData* PReplaceDialog::getData()
 {
@@ -91,7 +96,7 @@ PFindReplaceData* PReplaceDialog::getData()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: called on find text available.
  */
 void PReplaceDialog::onFindTextAvailable(const QString&)
 {

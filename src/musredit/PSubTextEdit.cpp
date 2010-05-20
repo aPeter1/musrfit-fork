@@ -53,100 +53,20 @@
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
+ *
+ * \param admin pointer to the musredit internal administration object.
+ * \param parent pointer to the parent object.
  */
 PSubTextEdit::PSubTextEdit(PAdmin *admin, QWidget *parent) :
                            QPlainTextEdit(parent),
                            fAdmin(admin)
 {
-//  fLastModified = QDateTime::fromString("1900-01-01 00:00:00");
 }
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
- */
-QMenu* PSubTextEdit::createPopupMenu(const QPoint &pos)
-{
-  QMenu *menu = new QMenu( this );
-  QMenu *theoryFunctions = new QMenu( menu );
-
-  QAction *a;
-  a = new QAction( tr("insert Title"), this);
-  a->setStatusTip( tr("insert a title") );
-  connect(a, SIGNAL( activated() ), this, SLOT( insertTitle() ));
-  menu->addAction(a);
-
-  a = new QAction(tr("insert Parameter Block"), this);
-  a->setStatusTip( tr("insert a parameter block") );
-  connect(a, SIGNAL( activated() ), this, SLOT( insertParameterBlock() ));
-  menu->addAction(a);
-
-  // feed the theoryFunctions popup menu
-  for (unsigned int i=0; i<fAdmin->getTheoryCounts(); i++) {
-    PTheory *theoryItem = fAdmin->getTheoryItem(i);
-    a = new QAction( theoryItem->label, this);
-    theoryFunctions->addAction(a);
-  }
-  theoryFunctions->setTitle( tr("insert theory function") );
-  menu->addMenu(theoryFunctions);
-  connect(theoryFunctions, SIGNAL( activated(int) ), this, SLOT( insertTheoryFunction(int) ));
-
-  a = new QAction(tr("insert Theory Block"), this);
-  a->setStatusTip( tr("insert a theory block") );
-  connect(a, SIGNAL( activated() ), this, SLOT( insertTheoryBlock() ));
-  menu->addAction(a);
-
-  a = new QAction(tr("insert Function Block"), this);
-  a->setStatusTip( tr("insert a function block") );
-  connect(a, SIGNAL( activated() ), this, SLOT( insertFunctionBlock() ));
-  menu->addAction(a);
-
-  menu->addSeparator();
-
-  a = new QAction(tr("insert Asymmetry Run Block"), this);
-  a->setStatusTip( tr("insert an asymmetry run block") );
-  connect(a, SIGNAL( activated() ), this, SLOT( insertAsymRunBlock() ));
-  menu->addAction(a);
-
-  a = new QAction(tr("insert Single Histo Run Block"), this);
-  a->setStatusTip( tr("insert a single histo run block") );
-  connect(a, SIGNAL( activated() ), this, SLOT( insertSingleHistRunBlock() ));
-  menu->addAction(a);
-
-  a = new QAction(tr("insert NonMusr Block"), this);
-  a->setStatusTip( tr("insert a NonMusr run block") );
-  connect(a, SIGNAL( activated() ), this, SLOT( insertNonMusrRunBlock() ));
-  menu->addAction(a);
-
-  menu->addSeparator();
-
-  a = new QAction(tr("insert Command Block"), this);
-  a->setStatusTip( tr("insert a command block") );
-  connect(a, SIGNAL( activated() ), this, SLOT( insertCommandBlock() ));
-  menu->addAction(a);
-
-  a = new QAction(tr("insert Fourier Block"), this);
-  a->setStatusTip( tr("insert a Fourier block") );
-  connect(a, SIGNAL( activated() ), this, SLOT( insertFourierBlock() ));
-  menu->addAction(a);
-
-  a = new QAction(tr("insert Plot Block"), this);
-  a->setStatusTip( tr("insert a plot block") );
-  connect(a, SIGNAL( activated() ), this, SLOT( insertPlotBlock() ));
-  menu->addAction(a);
-
-  a = new QAction(tr("insert Statistic Block"), this);
-  a->setStatusTip( tr("insert a statistic block") );
-  connect(a, SIGNAL( activated() ), this, SLOT( insertStatisticBlock() ));
-  menu->addAction(a);
-
-  return menu;
-}
-
-//----------------------------------------------------------------------------------------------------
-/**
- * <p>
+ * <p>Starts the msr-title input dialog window.
  */
 void PSubTextEdit::insertTitle()
 {
@@ -166,7 +86,7 @@ void PSubTextEdit::insertTitle()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Starts the msr-fit-parameter input dialog window.
  */
 void PSubTextEdit::insertParameterBlock()
 {
@@ -185,20 +105,26 @@ void PSubTextEdit::insertParameterBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Inserts the selected theory item.
+ *
+ * \param name of the theory item to be added.
  */
-void PSubTextEdit::insertTheoryFunction(int idx)
+void PSubTextEdit::insertTheoryFunction(QString name)
 {
-  if (idx < 300)
-    return;
-
-  int index = idx - 300;
-
-  if (index >= (int)fAdmin->getTheoryCounts())
-    return;
-
   QString str = "????";
-  PTheory *theoItem = fAdmin->getTheoryItem(index);
+
+  int idx = -1;
+  for (unsigned int i=0; i<fAdmin->getTheoryCounts(); i++) {
+    if (name == fAdmin->getTheoryItem(i)->label) {
+      idx = i;
+      break;
+    }
+  }
+
+  if (idx == -1)
+    return;
+
+  PTheory *theoItem = fAdmin->getTheoryItem(idx);
   if (theoItem == 0)
     return;
 
@@ -224,7 +150,7 @@ void PSubTextEdit::insertTheoryFunction(int idx)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Starts the msr-theory input dialog window.
  */
 void PSubTextEdit::insertTheoryBlock()
 {
@@ -244,7 +170,7 @@ void PSubTextEdit::insertTheoryBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Starts the msr-functions input dialog window.
  */
 void PSubTextEdit::insertFunctionBlock()
 {
@@ -264,7 +190,7 @@ void PSubTextEdit::insertFunctionBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Starts the msr-asymmetry-run input dialog window.
  */
 void PSubTextEdit::insertAsymRunBlock()
 {
@@ -371,7 +297,7 @@ void PSubTextEdit::insertAsymRunBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Starts the msr-single-historgram-run input dialog window.
  */
 void PSubTextEdit::insertSingleHistRunBlock()
 {
@@ -478,7 +404,7 @@ void PSubTextEdit::insertSingleHistRunBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Starts the msr-nonMusr-run input dialog window.
  */
 void PSubTextEdit::insertNonMusrRunBlock()
 {
@@ -541,7 +467,7 @@ void PSubTextEdit::insertNonMusrRunBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Insert the command block.
  */
 void PSubTextEdit::insertCommandBlock()
 {
@@ -557,7 +483,7 @@ void PSubTextEdit::insertCommandBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Starts the msr-Fourier input dialog window.
  */
 void PSubTextEdit::insertFourierBlock()
 {
@@ -576,7 +502,7 @@ void PSubTextEdit::insertFourierBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Starts the msr-plot input dialog window.
  */
 void PSubTextEdit::insertPlotBlock()
 {
@@ -595,7 +521,7 @@ void PSubTextEdit::insertPlotBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Insert a default msr-statistics block.
  */
 void PSubTextEdit::insertStatisticBlock()
 {

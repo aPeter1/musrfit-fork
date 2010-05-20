@@ -33,7 +33,15 @@
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
+ *
+ * \param keep_mn2_output if true, keep the minuit2 output for each fitted msr-file, i.e.
+ *        MINUIT2.OUTPUT -> <msr-file-name>-mn2.output, and MINUIT2.root -> <msr-file-name>-mn2.root.
+ *        See the '-k' option of musrfit.
+ * \param dump_tag tag telling if dumps ('ascii' == 1, 'root' == 2) are wanted. See '--dump' option of musrfit.
+ * \param title_from_data_file flag telling if musrfit shall, by default, take the title from the data file.
+ *        See the '-t' option of musrfit.
+ * \param enable_musrt0 if true, musrt0 is enabled from within musredit.
  */
 PPrefsDialog::PPrefsDialog(const bool keep_mn2_output, const int dump_tag, const bool title_from_data_file,
                            const bool enable_musrt0)
@@ -64,7 +72,7 @@ PPrefsDialog::PPrefsDialog(const bool keep_mn2_output, const int dump_tag, const
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the dump flag (see the '--dump' option of musrfit). 0 == no dump, 1 == ascii dump, 2 == root dump
  */
 int PPrefsDialog::getDump()
 {
@@ -80,7 +88,8 @@ int PPrefsDialog::getDump()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: called when the QCheckBox 'dump ascii' is selected. Will uncheck 'dump root' since these
+ * two options are mutually exclusive.
  */
 void PPrefsDialog::dumpAscii()
 {
@@ -90,7 +99,8 @@ void PPrefsDialog::dumpAscii()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: called when the QCheckBox 'dump root' is selected. Will uncheck 'dump ascii' since these
+ * two options are mutually exclusive.
  */
 void PPrefsDialog::dumpRoot()
 {
