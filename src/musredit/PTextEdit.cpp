@@ -2201,7 +2201,8 @@ void PTextEdit::fontChanged( const QFont &f )
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: called when the text of the document has changed. It adds a star to the tab label if the
+ * document has been modified.
  *
  * \param forced
  */
@@ -2234,7 +2235,8 @@ void PTextEdit::textChanged(const bool forced)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: called when the cursor position has changed. Updates the status bar with the current
+ * cursor position.
  */
 void PTextEdit::currentCursorPosition()
 {
@@ -2250,7 +2252,7 @@ void PTextEdit::currentCursorPosition()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: handles the replaced command.
  */
 void PTextEdit::replace()
 {
@@ -2261,7 +2263,7 @@ void PTextEdit::replace()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: handles the repalce and close command.
  */
 void PTextEdit::replaceAndClose()
 {
@@ -2272,7 +2274,7 @@ void PTextEdit::replaceAndClose()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: handles the replace all command.
  */
 void PTextEdit::replaceAll()
 {
@@ -2297,7 +2299,7 @@ void PTextEdit::replaceAll()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>SLOT: updates the fonts if the textedit tab has changed.
  */
 void PTextEdit::applyFontSettings(QWidget*)
 {
