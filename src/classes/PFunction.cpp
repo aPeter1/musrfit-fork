@@ -42,29 +42,27 @@ using namespace std;
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
  *
  * info is an abstract syntax tree (AST) generate by the spirit parse library
  * (see http://spirit.sourceforge.net/distrib/spirit_1_8_5/libs/spirit/doc/trees.html).
  * It contains a single parsed msr-function in an ascii representation.
  * Here it takes the from
+ * \verbatim
  *    assignment (root node)
  *     |_ 'FUNx'
  *     |_ '='
  *     |_ expression
  *         |_ ...
+ * \endverbatim
  *
- * Since it would be inefficient to evaluate this AST directly it is transferred to
+ * <p>Since it would be inefficient to evaluate this AST directly it is transferred to
  * a more efficient tree fFuncs here in the constructor.
  *
  * \param info AST parse tree holding a single parsed msr-function in an ascii representation
  */
-PFunction::PFunction(tree_parse_info<> info)
+PFunction::PFunction(tree_parse_info<> info) : fInfo(info)
 {
-//  cout << endl << "in PFunction ...";
-
-  fInfo  = info;
-
   // init class variables
   fValid  = true;
   fFuncNo = -1;
@@ -84,11 +82,10 @@ PFunction::PFunction(tree_parse_info<> info)
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Destructor.
  */
 PFunction::~PFunction()
 {
-//  cout << endl << "in ~PFunction ...";
   fParam.clear();
   fMap.clear();
 
@@ -99,9 +96,9 @@ PFunction::~PFunction()
 // InitNode (protected)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Initializes the node of the evaluation function tree.
  *
- * \param node
+ * \param node to be initialized
  */
 void PFunction::InitNode(PFuncTreeNode &node)
 {
@@ -117,9 +114,9 @@ void PFunction::InitNode(PFuncTreeNode &node)
 // SetFuncNo (protected)
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>Extracts the function number of the AST tree.
  *
- * \param i
+ * <b>return:</b> true if the function number (of FUNx, x being a number) could be extracted, otherwise false.
  */
 Bool_t PFunction::SetFuncNo()
 {
@@ -137,7 +134,6 @@ Bool_t PFunction::SetFuncNo()
 
   // extract function number from string
   status = sscanf(str.c_str(), "FUN%d", &funNo);
-//cout << endl << "SetFuncNo: status = " << status << ", funNo = " << funNo;
   if (status == 1) { // found 1 Int_t
     fFuncNo = funNo;
   } else { // wrong string
@@ -151,8 +147,8 @@ Bool_t PFunction::SetFuncNo()
 // GenerateFuncEvalTree (protected)
 //-------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Stub to generate the function evaluation tree from the AST tree. Needed for an efficient
+ * evaluation.
  */
 Bool_t PFunction::GenerateFuncEvalTree()
 {
@@ -166,8 +162,10 @@ Bool_t PFunction::GenerateFuncEvalTree()
 // FillFuncEvalTree (protected)
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>Recursive generation of the evaluation tree.
  *
+ * \param i iterator of the AST tree
+ * \param node of the evaluation tree
  */
 void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
 {
@@ -185,7 +183,6 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     status = sscanf(str.c_str(), "%lf", &dvalue); // convert string to Double_t
     node.fID = PFunctionGrammar::realID; // keep the ID
     node.fDvalue = dvalue; // keep the value
-// cout << endl << ">> realID: value = " << dvalue;
   } else if (i->value.id() == PFunctionGrammar::constPiID) { // handle constant pi
     node.fID = PFunctionGrammar::constPiID; // keep the ID
     node.fDvalue = 3.14159265358979323846; // keep the value
@@ -203,20 +200,17 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     }
     node.fID = PFunctionGrammar::parameterID; // keep the ID
     node.fIvalue = ivalue; // keep the value
-// cout << endl << ">> parameterID: value = " << ivalue;
   } else if (i->value.id() == PFunctionGrammar::mapID) { // handle map number
     str = string(i->value.begin(), i->value.end()); // get string
     boost::algorithm::trim(str);
     status = sscanf(str.c_str(), "MAP%d", &ivalue); // convert string to map number
     node.fID = PFunctionGrammar::mapID; // keep the ID
     node.fIvalue = ivalue; // keep the value
-// cout << endl << ">> mapID: value = " << ivalue;
   } else if (i->value.id() == PFunctionGrammar::functionID) { // handle function like cos ...
     // keep the id
     node.fID = PFunctionGrammar::functionID;
     // keep function tag
     str =  string(i->value.begin(), i->value.end()); // get string
-// cout << endl << ">> functionID: value = " << str;
     if (!strcmp(str.c_str(), "COS"))
       node.fFunctionTag = FUN_COS;
     else if (!strcmp(str.c_str(), "SIN"))
@@ -279,7 +273,6 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     node.children.push_back(child);
     FillFuncEvalTree(i->children.begin()+3, node.children[1]); // exponent
   } else if (i->value.id() == PFunctionGrammar::factorID) {
-// cout << endl << ">> factorID";
     // keep the id
     node.fID = PFunctionGrammar::factorID;
     // add child lhs
@@ -324,10 +317,10 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
 // CheckMapAndParamRange (public)
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>Stub the check map and fit parameter ranges.
  *
- * \param mapSize
- * \param paramSize
+ * \param mapSize size of the map vector
+ * \param paramSize size of the parameter vector
  */
 Bool_t PFunction::CheckMapAndParamRange(UInt_t mapSize, UInt_t paramSize)
 {
@@ -338,11 +331,11 @@ Bool_t PFunction::CheckMapAndParamRange(UInt_t mapSize, UInt_t paramSize)
 // FindAndCheckMapAndParamRange (protected)
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>Recursive checking of map and fit parameter ranges.
  *
- * \param i
- * \param mapSize
- * \param paramSize
+ * \param node of the evaluation tree
+ * \param mapSize size of the map vector
+ * \param paramSize size of the fit parameter vector
  */
 Bool_t PFunction::FindAndCheckMapAndParamRange(PFuncTreeNode &node, UInt_t mapSize, UInt_t paramSize)
 {
@@ -394,8 +387,11 @@ Bool_t PFunction::FindAndCheckMapAndParamRange(PFuncTreeNode &node, UInt_t mapSi
 // Eval (public)
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>Stub starting the evaluation of the evaluation tree.
  *
+ * <b>return:</b> the value of the function call.
+ *
+ * \param param fit parameter vector
  */
 Double_t PFunction::Eval(vector<Double_t> param)
 {
@@ -408,9 +404,9 @@ Double_t PFunction::Eval(vector<Double_t> param)
 // EvalNode (protected)
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>Recursive evaluation of the evaluation tree.
  *
- * \param node
+ * \param node of the evaluation tree
  */
 Double_t PFunction::EvalNode(PFuncTreeNode &node)
 {
@@ -517,8 +513,7 @@ Double_t PFunction::EvalNode(PFuncTreeNode &node)
 // CleanupFuncEvalTree (protected)
 //-------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Stub to clean up the evaluation tree.
  */
 void PFunction::CleanupFuncEvalTree()
 {
@@ -530,9 +525,9 @@ void PFunction::CleanupFuncEvalTree()
 // CleanupNode (protected)
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>Recursive clean up of the evaluation tree.
  *
- * \param node
+ * \param node of the evaluation tree
  */
 void PFunction::CleanupNode(PFuncTreeNode &node)
 {
@@ -548,9 +543,9 @@ void PFunction::CleanupNode(PFuncTreeNode &node)
 // EvalTreeForString (private)
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>Stub to generate the function string (clean and tidy).
  *
- * \param info
+ * \param info AST tree
  */
 void PFunction::EvalTreeForString(tree_parse_info<> info)
 {
@@ -562,9 +557,9 @@ void PFunction::EvalTreeForString(tree_parse_info<> info)
 // EvalTreeForStringExpression (private)
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>Recursive generation of the function string (clean and tidy).
  *
- * \param i
+ * \param i iterator of the AST tree
  */
 void PFunction::EvalTreeForStringExpression(iter_t const& i)
 {
@@ -612,7 +607,6 @@ void PFunction::EvalTreeForStringExpression(iter_t const& i)
   } else if (i->value.id() == PFunctionGrammar::termID) {
     termOp++;
     if (*i->value.begin() == '*') {
-//cout << endl << ">> i->children.size() = " << i->children.size() << endl;
       assert(i->children.size() == 2);
       EvalTreeForStringExpression(i->children.begin());
       fFuncString += " * ";

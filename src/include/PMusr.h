@@ -125,55 +125,55 @@ using namespace std;
 
 //-------------------------------------------------------------
 /**
- * <p> typedef to make to code more readable.
+ * <p> typedef to make to code more readable. Definition of a bool vector.
  */
 typedef vector<Bool_t> PBoolVector;
 
 //-------------------------------------------------------------
 /**
- * <p> typedef to make to code more readable.
+ * <p> typedef to make to code more readable. Definition of an unsigned int vector
  */
 typedef vector<UInt_t> PUIntVector;
 
 //-------------------------------------------------------------
 /**
- * <p> typedef to make to code more readable.
+ * <p> typedef to make to code more readable. Definition of an int vector
  */
 typedef vector<Int_t> PIntVector;
 
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p> typedef to make to code more readable. Definition of an int pair
  */
 typedef pair<Int_t, Int_t> PIntPair;
 
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p> typedef to make to code more readable. Definition of an int pair vector
  */
 typedef vector<PIntPair> PIntPairVector;
 
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p> typedef to make to code more readable. Definition of a double vector
  */
 typedef vector<Double_t> PDoubleVector;
 
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p> typedef to make to code more readable. Definition of a double pair
  */
 typedef pair<Double_t, Double_t> PDoublePair;
 
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p> typedef to make to code more readable. Definition of a double pair vector
  */
 typedef vector<PDoublePair> PDoublePairVector;
 
 //-------------------------------------------------------------
 /**
- * <p> typedef to make to code more readable.
+ * <p> typedef to make to code more readable. Definition of a string vector
  */
 typedef vector<TString> PStringVector;
 
@@ -219,16 +219,16 @@ class PRunData {
 
   private:
     // data related info
-    Double_t fDataTimeStart;
-    Double_t fDataTimeStep;
-    PDoubleVector fX;       // only used for non-muSR
-    PDoubleVector fValue;
-    PDoubleVector fError;
+    Double_t fDataTimeStart; ///< start time for the data set
+    Double_t fDataTimeStep;  ///< time step for the data set, i.e. the time length of a bin
+    PDoubleVector fX;        ///< x-axis vector. Only used for non-muSR
+    PDoubleVector fValue;    ///< data vector
+    PDoubleVector fError;    ///< data error vector
     // theory related info
-    Double_t fTheoryTimeStart;
-    Double_t fTheoryTimeStep;
-    PDoubleVector fXTheory; // only used for non-muSR
-    PDoubleVector fTheory;
+    Double_t fTheoryTimeStart; ///< start time of the theory
+    Double_t fTheoryTimeStep;  ///< time step of the theory, i.e. the time length of a bin
+    PDoubleVector fXTheory;    ///< x-axis vector. Only used for non-muSR
+    PDoubleVector fTheory;     ///< theory vector
   };
 
 //-------------------------------------------------------------
@@ -335,7 +335,7 @@ class PRawRunData {
 
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p> typedef to make to code more readable. A vector of a raw musr run.
  */
 typedef vector<PRawRunData> PRawRunDataList;
 
@@ -535,8 +535,8 @@ typedef vector<PMsrPlotStructure>  PMsrPlotList;
  * <p>
  */
 typedef struct {
-  Bool_t fValid;
-  PMsrLines fStatLines;
+  Bool_t fValid;     ///< flag showing if the statistics block is valid, i.e. a fit took place which converged
+  PMsrLines fStatLines; ///< statistics block in msr-file clear text
   TString fDate;     ///< string holding fitting date and time
   Bool_t   fChisq;   ///< flag telling if min = chi2 or min = max.likelyhood
   Double_t fMin;     ///< chi2 or max. likelyhood

@@ -55,7 +55,7 @@ typedef parse_tree_match_t::tree_iterator iter_t;
 
 //--------------------------------------------------------------------------
 /**
- *
+ * <p>EBNF like grammar definition of a function entry in the msr-file FUNCTION block.
  */
 struct PFunctionGrammar : public grammar<PFunctionGrammar>
 {

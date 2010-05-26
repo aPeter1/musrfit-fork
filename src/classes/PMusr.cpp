@@ -44,7 +44,7 @@ using namespace std;
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>Holds the data which will be fitted.
+ * <p>Holds the muSR data which will be fitted.
  */
 PRunData::PRunData()
 {
@@ -81,6 +81,7 @@ PRunData::~PRunData()
  * <p>Sets a value of the theory vector
  *
  * \param idx index of the theory vector
+ * \param dval value to be set.
  */
 void PRunData::SetTheoryValue(UInt_t idx, Double_t dval)
 {
@@ -111,7 +112,7 @@ void PRunData::ReplaceTheory(const PDoubleVector &theo)
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Holds non-muSR data raw data.
  */
 PNonMusrRawRunData::PNonMusrRawRunData()
 {
@@ -132,7 +133,7 @@ PNonMusrRawRunData::PNonMusrRawRunData()
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>Cleans up
+ * <p>Destructor. Cleans up
  */
 PNonMusrRawRunData::~PNonMusrRawRunData()
 {
@@ -216,7 +217,7 @@ void PNonMusrRawRunData::AppendSubErrData(const UInt_t idx, const Double_t dval)
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Holds muSR raw run data.
  */
 PRawRunData::PRawRunData()
 {
@@ -233,7 +234,7 @@ PRawRunData::PRawRunData()
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Destructor. Cleans up.
  */
 PRawRunData::~PRawRunData()
 {
@@ -252,7 +253,7 @@ PRawRunData::~PRawRunData()
 // GetTemperature
 //--------------------------------------------------------------------------
 /**
- * <p> Returns a temperature
+ * <p>Returns the temperature of a muSR run.
  *
  * \param idx index of the temperature whished
  */
@@ -270,7 +271,7 @@ const Double_t PRawRunData::GetTemperature(const UInt_t idx)
 // GetTempError
 //--------------------------------------------------------------------------
 /**
- * <p> Returns the error estimate of the temperature.
+ * <p>Returns the error estimate of the temperature of a muSR run.
  *
  * \param idx index of the temperature whished
  */
@@ -324,7 +325,7 @@ const Int_t PRawRunData::GetT0(const UInt_t idx)
 // GetT0Estimated
 //--------------------------------------------------------------------------
 /**
- * <p> Returns an estimated T0 value.
+ * <p>Returns an estimated T0 value.
  *
  * \param idx index of the T0 value whished
  */
@@ -342,7 +343,10 @@ const Int_t PRawRunData::GetT0Estimated(const UInt_t idx)
 // GetBkgBin
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Returns the background bin range (start, stop) from the data file.
+ * Currently only used in mud-files.
+ *
+ * \param idx index of the background range.
  */
 const PIntPair PRawRunData::GetBkgBin(const UInt_t idx)
 {
@@ -364,7 +368,10 @@ const PIntPair PRawRunData::GetBkgBin(const UInt_t idx)
 // GetGoodDataBin
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Returns the data range (first good bin, last good bin) from the data file.
+ * Currently only used in mud-files.
+ *
+ * \param idx index of the data range
  */
 const PIntPair PRawRunData::GetGoodDataBin(const UInt_t idx)
 {
@@ -386,7 +393,9 @@ const PIntPair PRawRunData::GetGoodDataBin(const UInt_t idx)
 // GetDataBin
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Returns a raw muSR run histogram.
+ *
+ * \param idx histo number index
  */
 const PDoubleVector* PRawRunData::GetDataBin(const UInt_t idx)
 {

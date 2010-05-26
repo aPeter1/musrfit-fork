@@ -38,10 +38,10 @@ using namespace std;
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
  *
- * \param runList
- * \param fitType
+ * \param runList run list collection
+ * \param fitType if true, a chisq fit will be performed, otherwise a log max-likelihood fit will be carried out.
  */
 PFitterFcn::PFitterFcn(PRunListCollection *runList, Bool_t useChi2)
 {
@@ -71,7 +71,7 @@ PFitterFcn::PFitterFcn(PRunListCollection *runList, Bool_t useChi2)
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Destructor
  */
 PFitterFcn::~PFitterFcn()
 {
@@ -79,9 +79,9 @@ PFitterFcn::~PFitterFcn()
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Minuit2 interface function call routine. This is the function which should be minimized.
  *
- * \param par
+ * \param par a vector with all the parameters of the function
  */
 Double_t PFitterFcn::operator()(const std::vector<Double_t>& par) const
 {

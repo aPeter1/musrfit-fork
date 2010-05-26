@@ -38,29 +38,23 @@
 // Constructor
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor
  *
- * \param lines
+ * \param lines msr-file FUNCTIONS block in clear text.
  */
-PFunctionHandler::PFunctionHandler(PMsrLines lines)
+PFunctionHandler::PFunctionHandler(PMsrLines lines) : fLines(lines)
 {
   fValid = true;
-  fLines = lines;
-
-//  cout << endl << "in PFunctionHandler(PMsrLines lines)";
 }
 
 //-------------------------------------------------------------
 // Destructor
 //-------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Destructor
  */
 PFunctionHandler::~PFunctionHandler()
 {
-//  cout << endl << "in ~PFunctionHandler()" << endl << endl;
-
   fLines.clear();
   fFuncs.clear();
 }
@@ -69,20 +63,16 @@ PFunctionHandler::~PFunctionHandler()
 // DoParse (public)
 //-------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Calls the function parser.
  */
 Bool_t PFunctionHandler::DoParse()
 {
-//  cout << endl << "in PFunctionHandler::DoParse() ...";
-
   Bool_t success = true;
   PFunctionGrammar function;
   TString line;
 
   // feed the function block into the parser. Start with i=1, since i=0 is FUNCTIONS
   for (UInt_t i=1; i<fLines.size(); i++) {
-// cout << endl << "fLines[" << i << "] = '" << fLines[i].fLine.Data() << "'";
 
     // function line to upper case
     line = fLines[i].fLine;
@@ -91,10 +81,9 @@ Bool_t PFunctionHandler::DoParse()
     // do parsing
     tree_parse_info<> info = ast_parse(line.Data(), function, space_p);
 
-    if (info.full) {
-//      cout << endl << "parse successful ..." << endl;
-      PFunction func(info);
-      fFuncs.push_back(func);
+    if (info.full) { // parsing successfull
+      PFunction func(info); // generate an evaluation function object based on the AST tree
+      fFuncs.push_back(func); // feeds it to the functions vector
     } else {
       cerr << endl << "**ERROR**: FUNCTIONS parse failed in line " << fLines[i].fLineNo << endl;
       success = false;
@@ -116,11 +105,6 @@ Bool_t PFunctionHandler::DoParse()
     }
   }
 
-//   if (success) {
-//     for (UInt_t i=0; i<fFuncs.size(); i++)
-//       cout << endl << "func number = " << fFuncs[i].GetFuncNo();
-//   }
-
   return success;
 }
 
@@ -128,10 +112,12 @@ Bool_t PFunctionHandler::DoParse()
 // CheckMapAndParamRange (public)
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>Check all functions if the map and fit parameters are within valid ranges, i.e. map < mapSize, param < paramSize.
  *
- * \param mapSize
- * \param paramSize
+ * <b>return:</b> true if map and fit parameters are withing valid ranges, otherwise false.
+ *
+ * \param mapSize size of the map vector
+ * \param paramSize size of the fit parameter vector
  */
 Bool_t PFunctionHandler::CheckMapAndParamRange(UInt_t mapSize, UInt_t paramSize)
 {
@@ -150,9 +136,13 @@ Bool_t PFunctionHandler::CheckMapAndParamRange(UInt_t mapSize, UInt_t paramSize)
 // Eval (public)
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>Evaluate function number funNo for given map and param.
  *
- * \param funNo
+ * <b>return:</b> value of the function for given map and param.
+ *
+ * \param funNo function number
+ * \param map map vector
+ * \param param fit parameter vector
  */
 Double_t PFunctionHandler::Eval(Int_t funNo, vector<Int_t> map, vector<Double_t> param)
 {
@@ -161,9 +151,6 @@ Double_t PFunctionHandler::Eval(Int_t funNo, vector<Int_t> map, vector<Double_t>
     cerr << endl;
     return 0.0;
   }
-
-//cout << endl << "PFunctionHandler::Eval: GetFuncIndex("<<funNo<<") = " << GetFuncIndex(funNo);
-//cout << endl;
 
   // set correct map
   fFuncs[GetFuncIndex(funNo)].SetMap(map);
@@ -176,9 +163,9 @@ Double_t PFunctionHandler::Eval(Int_t funNo, vector<Int_t> map, vector<Double_t>
 // GetFuncNo (public)
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the function number
  *
- * \param idx
+ * \param idx index of the function
  */
 Int_t PFunctionHandler::GetFuncNo(UInt_t idx)
 {
@@ -192,9 +179,9 @@ Int_t PFunctionHandler::GetFuncNo(UInt_t idx)
 // GetFuncIndex (public)
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>return function index for a given function number
  *
- * \param funcNo
+ * \param funcNo function number
  */
 Int_t PFunctionHandler::GetFuncIndex(Int_t funcNo)
 {
@@ -214,9 +201,9 @@ Int_t PFunctionHandler::GetFuncIndex(Int_t funcNo)
 // GetFuncString (public)
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>return the (clean and tidy) function string at index idx
  *
- * \param idx
+ * \param idx index of the function
  */
 TString* PFunctionHandler::GetFuncString(UInt_t idx)
 {

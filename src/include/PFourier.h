@@ -42,6 +42,9 @@
 // gamma_muon / (2 pi) = 1.355342e-2 (MHz/G)
 #define F_GAMMA_BAR_MUON  1.355342e-2
 
+/**
+ * muSR Fourier class.
+ */
 class PFourier
 {
   public:
@@ -61,24 +64,24 @@ class PFourier
     virtual Bool_t IsValid() { return fValid; }
 
   private:
-    TH1F *fData;
+    TH1F *fData; ///< data histogram to be Fourier transformed.
 
-    Bool_t fValid;
+    Bool_t fValid; ///< true = all boundary conditions fullfilled and hence a Fourier transform can be performed.
     Int_t  fUnitTag; ///< 1=Field Units (G), 2=Frequency Units (MHz), 3=Angular Frequency Units (Mc/s)
 
     Int_t fApodization; ///< 0=none, 1=weak, 2=medium, 3=strong
 
-    Double_t fTimeResolution;
-    Double_t fStartTime;
-    Double_t fEndTime;
-    UInt_t fZeroPaddingPower;
-    Double_t fResolution;
+    Double_t fTimeResolution; ///< time resolution of the data histogram
+    Double_t fStartTime; ///< start time of the data histogram
+    Double_t fEndTime; ///< end time of the data histogram
+    UInt_t fZeroPaddingPower; ///< power for zero padding, if set < 0 no zero padding will be done
+    Double_t fResolution; ///< Fourier resolution (field, frequency, or angular frequency)
 
-    UInt_t fNoOfData;
-    UInt_t fNoOfBins;
-    fftw_plan fFFTwPlan;
-    fftw_complex *fIn;
-    fftw_complex *fOut;
+    UInt_t fNoOfData; ///< number of bins in the time interval between fStartTime and fStopTime
+    UInt_t fNoOfBins; ///< number of bins to be Fourier transformed. Might be different to fNoOfData due to zero padding
+    fftw_plan fFFTwPlan; ///< fftw plan (see FFTW3 User Manual)
+    fftw_complex *fIn; ///< real part of the Fourier transform
+    fftw_complex *fOut; ///< imaginary part of the Fourier transform
 
     virtual void PrepareFFTwInputData(UInt_t apodizationTag);
     virtual void ApodizeData(Int_t apodizationTag);

@@ -42,6 +42,9 @@ using namespace std;
 #include "PFunctionGrammar.h"
 #include "PFunction.h"
 
+/**
+ * <p>Handler of <em>all</em> functions in a msr-file FUNCTIONS block.
+ */
 class PFunctionHandler
 {
   public:
@@ -58,10 +61,10 @@ class PFunctionHandler
     virtual TString* GetFuncString(UInt_t idx);
 
   private:
-    Bool_t fValid;
+    Bool_t fValid; ///< true = function handler has valid functions
 
-    PMsrLines fLines;
-    vector<PFunction> fFuncs;
+    PMsrLines fLines; ///< stores the msr-file FUNCTIONS block as clear text.
+    vector<PFunction> fFuncs; ///< vector of all evaluatable functions
 };
 
 #endif // _PFUNCTIONHANDLER_H_

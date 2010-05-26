@@ -62,15 +62,16 @@ using namespace std;
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
  *
- * \param runInfo
- * \param runListCollection
- * \param chisq_only
+ * \param runInfo pointer of the msr-file handler
+ * \param runListCollection pointer of the run list collection (pre-processed historgrams)
+ * \param chisq_only flag: true=calculate chisq only (no fitting)
  */
 PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, Bool_t chisq_only) :
   fChisqOnly(chisq_only), fRunInfo(runInfo)
 {
+  // initialize variables
   fIsScanOnly = true;
   fConverged = false;
   fUseChi2 = true; // chi^2 is the default
@@ -109,8 +110,7 @@ PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, Bo
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Destructor.
  */
 PFitter::~PFitter()
 {
@@ -138,8 +138,9 @@ PFitter::~PFitter()
 // DoFit
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Main calling routine to invoke minuit2, i.e. fitting etc.
  *
+ * <b>return:</b> true if all commands could be executed successfully, otherwise returns false.
  */
 Bool_t PFitter::DoFit()
 {
@@ -178,6 +179,7 @@ Bool_t PFitter::DoFit()
     fRunInfo->SetMsrParamPosErrorPresent(i, false);
   }
 
+  // walk through the command list and execute them
   for (UInt_t i=0; i<fCmdList.size(); i++) {
     switch (fCmdList[i]) {
       case PMN_INTERACTIVE:
@@ -262,13 +264,16 @@ Bool_t PFitter::DoFit()
 // CheckCommands
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Check the msr-file COMMAND's, fill the command queue and make sure that given parameters (if present)
+ * do make any sense.
  *
+ * <b>return:</b> true if the commands are valid, otherwise returns false.
  */
 Bool_t PFitter::CheckCommands()
 {
   fIsValid = true;
 
+  // walk through the msr-file COMMAND block
   PMsrLines::iterator it;
   for (it = fCmdLines.begin(); it != fCmdLines.end(); ++it) {
     it->fLine.ToUpper();
@@ -524,8 +529,10 @@ Bool_t PFitter::CheckCommands()
 // SetParameters
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Feeds the internal minuit2 fit parameters. It also makes sure that unused parameters
+ * are fixed.
  *
+ * <b>return:</b> true.
  */
 Bool_t PFitter::SetParameters()
 {
@@ -576,8 +583,9 @@ Bool_t PFitter::SetParameters()
 // ExecuteContours
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Execute the minuit2 contour command. Makes sure that a valid minuit2 minimum is present.
  *
+ * <b>return:</b> true if the contour command could be executed successfully, otherwise returns false.
  */
 Bool_t PFitter::ExecuteContours()
 {
@@ -608,8 +616,9 @@ Bool_t PFitter::ExecuteContours()
 // ExecuteHesse
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Execute the minuit2 hesse command.
  *
+ * <b>return:</b> true if the hesse command could be executed successfully, otherwise returns false.
  */
 Bool_t PFitter::ExecuteHesse()
 {
@@ -653,8 +662,9 @@ Bool_t PFitter::ExecuteHesse()
 // ExecuteMigrad
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Execute the minuit2 migrad command.
  *
+ * <b>return:</b> true if the migrad command could be executed successfully, otherwise returns false.
  */
 Bool_t PFitter::ExecuteMigrad()
 {
@@ -722,8 +732,9 @@ Bool_t PFitter::ExecuteMigrad()
 // ExecuteMinimize
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Execute the minuit2 minimize command.
  *
+ * <b>return:</b> true if the minimize command could be executed successfully, otherwise returns false.
  */
 Bool_t PFitter::ExecuteMinimize()
 {
@@ -792,8 +803,9 @@ Bool_t PFitter::ExecuteMinimize()
 // ExecuteMinos
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Execute the minuit2 minos command.
  *
+ * <b>return:</b> true if the minos command could be executed successfully, otherwise returns false.
  */
 Bool_t PFitter::ExecuteMinos()
 {
@@ -843,8 +855,9 @@ Bool_t PFitter::ExecuteMinos()
 // ExecutePlot
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Execute the minuit2 plot command.
  *
+ * <b>return:</b> true.
  */
 Bool_t PFitter::ExecutePlot()
 {
@@ -860,8 +873,9 @@ Bool_t PFitter::ExecutePlot()
 // ExecuteScan
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Execute the minuit2 scan command.
  *
+ * <b>return:</b> true.
  */
 Bool_t PFitter::ExecuteScan()
 {
@@ -884,8 +898,9 @@ Bool_t PFitter::ExecuteScan()
 // ExecuteSave
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Execute the save command.
  *
+ * <b>return:</b> true if the valid minuit2 state is found, otherwise returns false.
  */
 Bool_t PFitter::ExecuteSave()
 {
@@ -1139,8 +1154,9 @@ Bool_t PFitter::ExecuteSave()
 // ExecuteSimplex
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Execute the minuit2 simplex command.
  *
+ * <b>return:</b> true if the simplex command could be executed successfully, otherwise returns false.
  */
 Bool_t PFitter::ExecuteSimplex()
 {
@@ -1197,3 +1213,7 @@ Bool_t PFitter::ExecuteSimplex()
 
   return true;
 }
+
+//-------------------------------------------------------------------------------------------------
+// end
+//-------------------------------------------------------------------------------------------------

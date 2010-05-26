@@ -49,8 +49,14 @@ using namespace std;
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
  *
+ * \param data data histogram
+ * \param unitTag tag telling in which units the Fourier transform shall be represented. Possible tags are:
+ *                FOURIER_UNIT_FIELD, FOURIER_UNIT_FREQ, FOURIER_UNIT_CYCLES
+ * \param startTime start time of the data time window
+ * \param endTime end time of the data time window
+ * \param zeroPaddingPower if set to values > 0, there will be zero padding up to 2^zeroPaddingPower
  */
 PFourier::PFourier(TH1F *data, Int_t unitTag, Double_t startTime, Double_t endTime, UInt_t zeroPaddingPower) :
                    fData(data), fUnitTag(unitTag), fStartTime(startTime), fEndTime(endTime),
@@ -63,14 +69,6 @@ PFourier::PFourier(TH1F *data, Int_t unitTag, Double_t startTime, Double_t endTi
     return;
   }
 
-//cout << endl << "PFourier::PFourier: fData = " << fData;
-/*
-for (UInt_t i=0; i<10; i++) {
-  cout << endl << "PFourier::PFourier: i=" << i << ", t=" << fData->GetBinCenter(i) << ", value=" << fData->GetBinContent(i);
-}
-*/
-//cout << endl;
-
   fValid = true;
   fIn  = 0;
   fOut = 0;
@@ -79,13 +77,11 @@ for (UInt_t i=0; i<10; i++) {
 
   // calculate time resolution in (us)
   fTimeResolution = fData->GetBinWidth(1);
-//cout << endl << ">> fTimeResolution = " << fTimeResolution;
 
   // if endTime == 0 set it to the last time slot
   if (fEndTime == 0.0) {
     Int_t last = fData->GetNbinsX()-1;
     fEndTime = fData->GetBinCenter(last);
-//cout << endl << ">> fEndTime = " << fEndTime;
   }
 
   // swap start and end time if necessary
@@ -95,16 +91,12 @@ for (UInt_t i=0; i<10; i++) {
     fEndTime = keep;
   }
 
-//cout << endl << "start time = " << fStartTime << endl;
-
   // calculate start and end bin
   UInt_t start = (UInt_t)(fStartTime/fTimeResolution);
   UInt_t end = (UInt_t)(fEndTime/fTimeResolution);
   fNoOfData = end-start;
 
-//cout << endl << ">> fNoOfData = " << fNoOfData;
-
-// check if zero padding is whished
+  // check if zero padding is whished
   if (fZeroPaddingPower > 0) {
     UInt_t noOfBins = static_cast<UInt_t>(pow(2.0, static_cast<Double_t>(fZeroPaddingPower)));
     if (noOfBins > fNoOfData)
@@ -115,9 +107,7 @@ for (UInt_t i=0; i<10; i++) {
     fNoOfBins = fNoOfData;
   }
 
-//cout << endl << ">> fNoOfBins = " << fNoOfBins;
-
-  // calculate fourier resolution
+  // calculate fourier resolution, depending on the units
   Double_t resolution = 1.0/(fTimeResolution*fNoOfBins); // in MHz
   switch (fUnitTag) {
     case FOURIER_UNIT_FIELD:
@@ -135,14 +125,9 @@ for (UInt_t i=0; i<10; i++) {
       break;
   }
 
-//cout << endl << ">> fResolution = " << fResolution;
-
   // allocate necessary memory
   fIn  = (fftw_complex *)fftw_malloc(sizeof(fftw_complex)*fNoOfBins);
   fOut = (fftw_complex *)fftw_malloc(sizeof(fftw_complex)*fNoOfBins);
-
-//cout << endl << ">> fIn  = " << fIn;
-//cout << endl << ">> fOut = " << fOut;
 
   // check if memory allocation has been successful
   if ((fIn == 0) || (fOut == 0)) {
@@ -150,39 +135,37 @@ for (UInt_t i=0; i<10; i++) {
     return;
   }
 
-//cout << endl << "PFourier::PFourier: fNoOfBins=" << fNoOfBins << endl;
+  // get the FFTW3 plan (see FFTW3 manual)
   fFFTwPlan = fftw_plan_dft_1d(fNoOfBins, fIn, fOut, FFTW_FORWARD, FFTW_ESTIMATE);
 
+  // check if a valid plan has been generated
   if (!fFFTwPlan) {
     fValid = false;
   }
-
-//cout << endl;
-
 }
 
 //--------------------------------------------------------------------------
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Destructor
  */
 PFourier::~PFourier()
 {
-//cout << endl << "in ~PFourier() ..." << endl;
-  if (fValid) {
+  if (fFFTwPlan)
     fftw_destroy_plan(fFFTwPlan);
+  if (fIn)
     fftw_free(fIn);
+  if (fOut)
     fftw_free(fOut);
-  }
 }
 
 //--------------------------------------------------------------------------
 // Transform
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Carries out the Fourier transform. It is assumed that fStartTime is the time zero
+ * for the Fourier frame. Hence if fStartTime != 0.0 the phase shift will be corrected.
  *
  * \param apodizationTag 0=no apod., 1=weak apod., 2=medium apod., 3=strong apod.
  */
@@ -210,9 +193,9 @@ void PFourier::Transform(UInt_t apodizationTag)
 // GetRealFourier
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the real part Fourier as a histogram.
  *
- * \param scale
+ * \param scale normalisation factor
  */
 TH1F* PFourier::GetRealFourier(const Double_t scale)
 {
@@ -238,7 +221,6 @@ TH1F* PFourier::GetRealFourier(const Double_t scale)
     realFourier->SetBinContent(i+1, scale*fOut[i][0]);
     realFourier->SetBinError(i+1, 0.0);
   }
-//cout << endl << ">> realFourier = " << realFourier;
   return realFourier;
 }
 
@@ -246,9 +228,9 @@ TH1F* PFourier::GetRealFourier(const Double_t scale)
 // GetImaginaryFourier
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the imaginary part Fourier as a histogram.
  *
- * \param scale
+ * \param scale normalisation factor
  */
 TH1F* PFourier::GetImaginaryFourier(const Double_t scale)
 {
@@ -282,9 +264,9 @@ TH1F* PFourier::GetImaginaryFourier(const Double_t scale)
 // GetPowerFourier
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the Fourier power spectrum as a histogram.
  *
- * \param scale
+ * \param scale normalisation factor
  */
 TH1F* PFourier::GetPowerFourier(const Double_t scale)
 {
@@ -318,9 +300,9 @@ TH1F* PFourier::GetPowerFourier(const Double_t scale)
 // GetPhaseFourier
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>returns the Fourier phase spectrum as a histogram.
  *
- * \param scale
+ * \param scale normalisation factor
  */
 TH1F* PFourier::GetPhaseFourier(const Double_t scale)
 {
@@ -371,26 +353,25 @@ TH1F* PFourier::GetPhaseFourier(const Double_t scale)
 // PrepareFFTwInputData
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Feeds the Fourier data and apply the apodization.
  *
+ * \param apodizationTag apodization tag. Possible are currently: F_APODIZATION_NONE = no apodization,
+ *                       F_APODIZATION_WEAK = weak apodization, F_APODIZATION_MEDIUM = intermediate apodization,
+ *                       F_APODIZATION_STRONG = strong apodization
  */
 void PFourier::PrepareFFTwInputData(UInt_t apodizationTag)
 {
   // 1st find t==0. fData start at times t<0!!
   Int_t t0bin = -1;
-//cout << ">> PFourier::PrepareFFTwInputData: fData=" << fData << ", fData->GetNbinsX() = " << fData->GetNbinsX();
-    for (Int_t i=1; i<fData->GetNbinsX(); i++) {
-//if (i<20) cout << endl << ">> PFourier::PrepareFFTwInputData: i=" << i << ", fData->GetBinCenter(i)=" << fData->GetBinCenter(i);
+  for (Int_t i=1; i<fData->GetNbinsX(); i++) {
     if (fData->GetBinCenter(i) >= 0.0) {
       t0bin = i;
       break;
     }
   }
-//cout << endl << "t0bin = " << t0bin << endl;
 
   // 2nd fill fIn
   UInt_t start = (UInt_t)(fStartTime/fTimeResolution) + t0bin;
-//cout << endl << "start = " << start << endl;
   for (UInt_t i=0; i<fNoOfData; i++) {
     fIn[i][0] = fData->GetBinContent(i+start);
     fIn[i][1] = 0.0;
@@ -400,26 +381,19 @@ void PFourier::PrepareFFTwInputData(UInt_t apodizationTag)
     fIn[i][1] = 0.0;
   }
 
-//cout << ">> PFourier::PrepareFFTwInputData: t0bin = " << t0bin << ", start = " << start << endl;
   // 3rd apodize data (if wished)
   ApodizeData(apodizationTag);
-
-/*
-cout << ">> PFourier::PrepareFFTwInputData: fNoOfData = " << fNoOfData << ", fNoOfBins = " << fNoOfBins << endl;
-for (UInt_t i=0; i<10; i++) {
-  cout << endl << ">> PFourier::PrepareFFTwInputData: " << i << ": fIn[i][0] = " << fIn[i][0];
-}
-cout << endl;
-*/
 }
 
 //--------------------------------------------------------------------------
 // ApodizeData
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Carries out the appodization of the data.
  *
- * \param apodizationTag
+ * \param apodizationTag apodization tag. Possible are currently: F_APODIZATION_NONE = no apodization,
+ *                       F_APODIZATION_WEAK = weak apodization, F_APODIZATION_MEDIUM = intermediate apodization,
+ *                       F_APODIZATION_STRONG = strong apodization
  */
 void PFourier::ApodizeData(Int_t apodizationTag) {
 

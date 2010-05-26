@@ -40,10 +40,6 @@
 #include "PRunListCollection.h"
 #include "PFitterFcn.h"
 
-/*
-Will handle all the possible minuit commands and actually do things ...
-*/
-
 #define PMN_INTERACTIVE       0
 #define PMN_CONTOURS          1
 #define PMN_EIGEN             2
@@ -61,6 +57,9 @@ Will handle all the possible minuit commands and actually do things ...
 #define PMN_USER_PARAM_STATE  15
 #define PMN_PRINT             16
 
+/**
+ * <p>Interface class to minuit2.
+ */
 class PFitter
 {
   public:
@@ -73,33 +72,33 @@ class PFitter
     Bool_t DoFit();
 
   private:
-    Bool_t fIsValid;
-    Bool_t fIsScanOnly;
-    Bool_t fConverged;
-    Bool_t fChisqOnly;
-    Bool_t fUseChi2;
+    Bool_t fIsValid;     ///< flag. true: the fit is valid.
+    Bool_t fIsScanOnly;  ///< flag. true: scan along some parameters (no fitting).
+    Bool_t fConverged;   ///< flag. true: the fit has converged.
+    Bool_t fChisqOnly;   ///< flag. true: calculate chi^2 only (no fitting).
+    Bool_t fUseChi2;     ///< flag. true: chi^2 fit. false: log-max-likelihood
 
-    UInt_t fStrategy;
+    UInt_t fStrategy; ///< fitting strategy (see minuit2 manual).
 
-    PMsrHandler *fRunInfo;
+    PMsrHandler *fRunInfo; ///< pointer to the msr-file handler
 
     PMsrParamList fParams; ///< msr-file parameters
 
     PMsrLines  fCmdLines; ///< all the Minuit commands from the msr-file
     PIntVector fCmdList;  ///< command list
 
-    PFitterFcn *fFitterFcn;
+    PFitterFcn *fFitterFcn; ///< pointer to the fitter function object
     ROOT::Minuit2::MnUserParameters fMnUserParams; ///< minuit2 input parameter list
     ROOT::Minuit2::FunctionMinimum *fFcnMin;       ///< function minimum object
     ROOT::Minuit2::MnUserParameterState *fMnUserParamState; ///< keeps the current user parameter state
 
     // minuit2 scan/contours command relate variables (see MnScan/MnContours in the minuit2 user manual)
-    Bool_t fScanAll;
-    UInt_t fScanParameter[2];
-    UInt_t fScanNoPoints;
-    Double_t fScanLow;
-    Double_t fScanHigh;
-    PDoublePairVector fScanData;
+    Bool_t fScanAll;           ///< flag. false: single parameter scan, true: not implemented yet (see MnScan/MnContours in the minuit2 user manual)
+    UInt_t fScanParameter[2];  ///< scan parameter. idx=0: used for scan and contour, idx=1: used for contour (see MnScan/MnContours in the minuit2 user manual)
+    UInt_t fScanNoPoints;      ///< number of points in a scan/contour (see MnScan/MnContours in the minuit2 user manual)
+    Double_t fScanLow;         ///< scan range low. default=0.0 which means 2 std dev. (see MnScan/MnContours in the minuit2 user manual)
+    Double_t fScanHigh;        ///< scan range high. default=0.0 which means 2 std dev. (see MnScan/MnContours in the minuit2 user manual)
+    PDoublePairVector fScanData; ///< keeps the scan/contour data
 
     // commands
     Bool_t CheckCommands();

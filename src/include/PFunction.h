@@ -73,6 +73,9 @@
 #define FUN_POW   16
 
 //----------------------------------------------------------------------------
+/**
+ * <p>Structure needed to evaluate a function tree (see FUNCTIONS block of an msr-file).
+ */
 typedef struct func_tree_node {
   Int_t    fID; ///< tag showing what tree element this is
   Int_t    fOperatorTag; ///< tag for '+', '-', '*', '/'
@@ -84,6 +87,9 @@ typedef struct func_tree_node {
 } PFuncTreeNode;
 
 //----------------------------------------------------------------------------
+/**
+ * <p>Class handling a function from the msr-file FUNCTIONS block.
+ */
 class PFunction {
   public:
     PFunction(tree_parse_info<> info);
@@ -109,9 +115,9 @@ class PFunction {
     virtual void CleanupNode(PFuncTreeNode &node);
 
   private:
-    tree_parse_info<> fInfo;
-    vector<Double_t> fParam;
-    vector<Int_t> fMap;
+    tree_parse_info<> fInfo; ///< AST parse tree holding a single parsed msr-function in an ascii representation
+    vector<Double_t> fParam; ///< parameter vector (from the msr-file Fit Parameter block)
+    vector<Int_t> fMap;      ///< map vector
     PFuncTreeNode fFunc;
 
     Bool_t fValid; ///< flag showing if the function is valid

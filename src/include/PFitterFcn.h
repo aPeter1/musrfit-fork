@@ -38,6 +38,9 @@
 
 #include "PRunListCollection.h"
 
+/**
+ * <p>This is the minuit2 interface function class porviding the function to be optimized (chisq or log max-likelihood).
+ */
 class PFitterFcn : public ROOT::Minuit2::FCNBase
 {
   public:
@@ -50,9 +53,9 @@ class PFitterFcn : public ROOT::Minuit2::FCNBase
     UInt_t GetTotalNoOfFittedBins() { return fRunListCollection->GetTotalNoOfBinsFitted(); }
 
   private:
-    Double_t fUp;
-    Bool_t fUseChi2;
-    PRunListCollection *fRunListCollection;
+    Double_t fUp;     ///< for chisq == 1.0, i.e. errors are 1 std. deviation errors. for log max-likelihood == 0.5, i.e. errors are 1 std. deviation errors (for details see the minuit2 user manual).
+    Bool_t fUseChi2;  ///< true = chisq fit, false = log max-likelihood fit
+    PRunListCollection *fRunListCollection; ///< pre-processed data to be fitted
 };
 
 #endif // _PFITTERFCN_H_
