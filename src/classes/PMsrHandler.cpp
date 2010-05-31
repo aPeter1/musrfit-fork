@@ -48,9 +48,9 @@ using namespace std;
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor
  *
- * \param fileName
+ * \param fileName name of a msr-file.
  */
 PMsrHandler::PMsrHandler(const Char_t *fileName) : fFileName(fileName)
 {
@@ -67,6 +67,7 @@ PMsrHandler::PMsrHandler(const Char_t *fileName) : fFileName(fileName)
 
   fFuncHandler = 0;
 
+  // check if the file name given is a path-file-name, and if yes, split it into path and file name.
   if (fFileName.Contains("/")) {
     Int_t idx = -1;
     while (fFileName.Index("/", idx+1) != -1) {
@@ -83,7 +84,7 @@ PMsrHandler::PMsrHandler(const Char_t *fileName) : fFileName(fileName)
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Destructor
  */
 PMsrHandler::~PMsrHandler()
 {
@@ -106,12 +107,11 @@ PMsrHandler::~PMsrHandler()
 // ReadMsrFile (public)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Reads and parses a msr-file.
  *
  * <p><b>return:</b>
  * - PMUSR_SUCCESS if everything is OK
  * - line number if an error in the MSR file was encountered which cannot be handled.
- *
  */
 Int_t PMsrHandler::ReadMsrFile()
 {
@@ -303,7 +303,15 @@ Int_t PMsrHandler::ReadMsrFile()
 // WriteMsrLogFile (public)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Writes a mlog-file.
+ *
+ * <p><b>return:</b>
+ * - PMUSR_SUCCESS everything is OK
+ * - PMUSR_MSR_LOG_FILE_WRITE_ERROR msr-/mlog-file couldn't be opened
+ * - PMUSR_MSR_SYNTAX_ERROR a syntax error has been encountered
+ *
+ * \param messages if true some additional messages concerning the statistic block are written.
+ *                 When using musrt0, messages will be set to false.
  */
 Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
 {
@@ -1095,20 +1103,24 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
 // SetMsrParamValue (public)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Sets the fit parameter value at position idx.
  *
- * \param i
- * \param value
+ * <p><b>return:</b>
+ * - true if idx is within range
+ * - false if idx is larger than the fit parameter vector.
+ *
+ * \param idx index of the fit parameter value.
+ * \param value fit parameter value to be set.
  */
-Bool_t PMsrHandler::SetMsrParamValue(UInt_t i, Double_t value)
+Bool_t PMsrHandler::SetMsrParamValue(UInt_t idx, Double_t value)
 {
-  if (i > fParam.size()) {
-    cerr << endl << "PMsrHandler::SetMsrParamValue(): **ERROR** i = " << i << " is larger than the number of parameters " << fParam.size();
+  if (idx >= fParam.size()) {
+    cerr << endl << "PMsrHandler::SetMsrParamValue(): **ERROR** idx = " << idx << " is >= than the number of fit parameters " << fParam.size();
     cerr << endl;
     return false;
   }
 
-  fParam[i].fValue = value;
+  fParam[idx].fValue = value;
 
   return true;
 }
@@ -1117,20 +1129,25 @@ Bool_t PMsrHandler::SetMsrParamValue(UInt_t i, Double_t value)
 // SetMsrParamStep (public)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Sets the fit parameter step value (initial step size for minuit2) at positon idx.
+ * After a successful fit, the negative error will be writen.
  *
- * \param i
- * \param value
+ * <p><b>return:</b>
+ * - true if idx is within range
+ * - false if idx is larger than the fit parameter vector.
+ *
+ * \param idx index fo the fit parameter step value
+ * \param value fit parameter step value to be set.
  */
-Bool_t PMsrHandler::SetMsrParamStep(UInt_t i, Double_t value)
+Bool_t PMsrHandler::SetMsrParamStep(UInt_t idx, Double_t value)
 {
-  if (i > fParam.size()) {
-    cerr << endl << "PMsrHandler::SetMsrParamValue(): **ERROR** i = " << i << " is larger than the number of parameters " << fParam.size();
+  if (idx >= fParam.size()) {
+    cerr << endl << "PMsrHandler::SetMsrParamValue(): **ERROR** idx = " << idx << " is larger than the number of parameters " << fParam.size();
     cerr << endl;
     return false;
   }
 
-  fParam[i].fStep = value;
+  fParam[idx].fStep = value;
 
   return true;
 }
@@ -1139,20 +1156,24 @@ Bool_t PMsrHandler::SetMsrParamStep(UInt_t i, Double_t value)
 // SetMsrParamPosErrorPresent (public)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Sets the flag whether the fit parameter positive error value is persent. This at positon idx.
  *
- * \param i
- * \param value
+ * <p><b>return:</b>
+ * - true if idx is within range
+ * - false if idx is larger than the fit parameter vector.
+ *
+ * \param idx index fo the fit parameter positive error value
+ * \param value fit parameter positive error value present.
  */
-Bool_t PMsrHandler::SetMsrParamPosErrorPresent(UInt_t i, Bool_t value)
+Bool_t PMsrHandler::SetMsrParamPosErrorPresent(UInt_t idx, Bool_t value)
 {
-  if (i > fParam.size()) {
-    cerr << endl << "PMsrHandler::SetMsrParamPosErrorPresent(): **ERROR** i = " << i << " is larger than the number of parameters " << fParam.size();
+  if (idx >= fParam.size()) {
+    cerr << endl << "PMsrHandler::SetMsrParamPosErrorPresent(): **ERROR** idx = " << idx << " is larger than the number of parameters " << fParam.size();
     cerr << endl;
     return false;
   }
 
-  fParam[i].fPosErrorPresent = value;
+  fParam[idx].fPosErrorPresent = value;
 
   return true;
 }
@@ -1161,21 +1182,25 @@ Bool_t PMsrHandler::SetMsrParamPosErrorPresent(UInt_t i, Bool_t value)
 // SetMsrParamPosError (public)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Sets the fit parameter positive error value at positon idx.
  *
- * \param i
- * \param value
+ * <p><b>return:</b>
+ * - true if idx is within range
+ * - false if idx is larger than the fit parameter vector.
+ *
+ * \param idx index fo the fit parameter positive error value
+ * \param value fit parameter positive error value to be set.
  */
-Bool_t PMsrHandler::SetMsrParamPosError(UInt_t i, Double_t value)
+Bool_t PMsrHandler::SetMsrParamPosError(UInt_t idx, Double_t value)
 {
-  if (i > fParam.size()) {
-    cerr << endl << "PMsrHandler::SetMsrParamPosError(): **ERROR** i = " << i << " is larger than the number of parameters " << fParam.size();
+  if (idx >= fParam.size()) {
+    cerr << endl << "PMsrHandler::SetMsrParamPosError(): **ERROR** idx = " << idx << " is larger than the number of parameters " << fParam.size();
     cerr << endl;
     return false;
   }
 
-  fParam[i].fPosErrorPresent = true;
-  fParam[i].fPosError = value;
+  fParam[idx].fPosErrorPresent = true;
+  fParam[idx].fPosError = value;
 
   return true;
 }
@@ -1184,11 +1209,11 @@ Bool_t PMsrHandler::SetMsrParamPosError(UInt_t i, Double_t value)
 // SetMsrT0Entry (public)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Sets the t0 entries for a given runNo and a given histogram index idx.
  *
- * \param runNo
- * \param idx
- * \param bin
+ * \param runNo msr-file run number
+ * \param idx msr-file histogram index
+ * \param bin t0 bin value
  */
 void PMsrHandler::SetMsrT0Entry(UInt_t runNo, UInt_t idx, Int_t bin)
 {
@@ -1216,7 +1241,7 @@ void PMsrHandler::SetMsrT0Entry(UInt_t runNo, UInt_t idx, Int_t bin)
  * \param runNo msr-file run number
  * \param addRunIdx msr-file addrun index, e.g. if 2 addruns are present addRunIdx can take the values 0 or 1.
  * \param histoIdx msr-file histogram index for an addrun.
- * \param bin histogram t0 value.
+ * \param bin t0 bin value.
  */
 void PMsrHandler::SetMsrAddT0Entry(UInt_t runNo, UInt_t addRunIdx, UInt_t histoIdx, Int_t bin)
 {
@@ -1245,15 +1270,15 @@ void PMsrHandler::SetMsrAddT0Entry(UInt_t runNo, UInt_t addRunIdx, UInt_t histoI
 // SetMsrDataRangeEntry (public)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Sets the data range entries for a given runNo and a given histogram index idx.
  *
- * \param runNo
- * \param idx
- * \param bin
+ * \param runNo msr-file run number
+ * \param idx 0=start bin index, 1=end bin index
+ * \param bin data range bin value
  */
 void PMsrHandler::SetMsrDataRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
 {
-  if (runNo > fRuns.size()) { // error
+  if (runNo >= fRuns.size()) { // error
     cerr << endl << "PMsrHandler::SetMsrDataRangeEntry: **ERROR** runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
     cerr << endl;
     return;
@@ -1266,15 +1291,15 @@ void PMsrHandler::SetMsrDataRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
 // SetMsrBkgRangeEntry (public)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Sets the background range entries for a given runNo and a given histogram index idx.
  *
- * \param runNo
- * \param idx
- * \param bin
+ * \param runNo msr-file run number
+ * \param idx 0=start bin index, 1=end bin index
+ * \param bin background range bin value
  */
 void PMsrHandler::SetMsrBkgRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
 {
-  if (runNo > fRuns.size()) { // error
+  if (runNo >= fRuns.size()) { // error
     cerr << endl << "PMsrHandler::SetMsrBkgRangeEntry: **ERROR** runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
     cerr << endl;
     return;
@@ -1292,12 +1317,16 @@ void PMsrHandler::SetMsrBkgRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
  * parameter is <b>NOT</b> used at all. This is stupid! Hence one has to check
  * if the parameter is used at all and if not, it has to be fixed.
  *
- * \param paramNo
+ * <p><b>return:</b>
+ * - 0 if the parameter is <b>not</b> used.
+ * - a value > 0 if the parameter is used.
+ *
+ * \param paramNo parameter number
  */
 Int_t PMsrHandler::ParameterInUse(UInt_t paramNo)
 {
   // check that paramNo is within acceptable range
-  if ((paramNo < 0) || (paramNo > fParam.size()))
+  if ((paramNo < 0) || (paramNo >= fParam.size()))
     return -1;
 
   return fParamInUse[paramNo];
@@ -1320,6 +1349,10 @@ Int_t PMsrHandler::ParameterInUse(UInt_t paramNo)
  *                                                                                     without boundaries, or
  *                                                                                     when starting
  * \endcode
+ *
+ * <b>return:</b>
+ * - true is fit parameter lines are OK.
+ * - false otherwise
  *
  * \param lines is a list of lines containing the fitparameter block
  */
@@ -1524,9 +1557,12 @@ Bool_t PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
 // HandleTheoryEntry (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Just stores the THEORY block lines.
  *
- * \param lines is a list of lines containing the fitparameter block
+ * <b>return:</b>
+ * - true always
+ *
+ * \param lines is a list of lines containing the theory block
  */
 Bool_t PMsrHandler::HandleTheoryEntry(PMsrLines &lines)
 {
@@ -1540,9 +1576,13 @@ Bool_t PMsrHandler::HandleTheoryEntry(PMsrLines &lines)
 // HandleFunctionsEntry (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Parses the FUNCTIONS block of the msr-file.
  *
- * \param lines is a list of lines containing the fitparameter block
+ * <b>return:</b>
+ * - true if the parsing was successful.
+ * - false otherwise
+ *
+ * \param lines is a list of lines containing the functions block
  */
 Bool_t PMsrHandler::HandleFunctionsEntry(PMsrLines &lines)
 {
@@ -1576,9 +1616,13 @@ Bool_t PMsrHandler::HandleFunctionsEntry(PMsrLines &lines)
 // HandleRunEntry (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Parses the RUN blocks of the msr-file.
  *
- * \param lines is a list of lines containing the fitparameter block
+ * <b>return:</b>
+ * - true if successful
+ * - false otherwise
+ *
+ * \param lines is a list of lines containing the run blocks
  */
 Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
 {
@@ -2121,6 +2165,10 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
  * It is used to filter strings like: map1 or fun4. At the moment only
  * the filter strings 'map', 'fun', and 'par' are supported.
  *
+ * <b>return:</b>
+ * - true if successful
+ * - false otherwise
+ *
  * \param str  input string
  * \param filter filter string
  * \param offset it is used to offset to found number, e.g. strX -> no = X+offset
@@ -2158,10 +2206,12 @@ Bool_t PMsrHandler::FilterNumber(TString str, const Char_t *filter, Int_t offset
 // HandleCommandsEntry (private)
 //--------------------------------------------------------------------------
 /**
- * <p> In the command block there shall be a new command which can be used
- * to switch between chi2 and maximum_likelihood!!
+ * <p> Just copies the COMMAND block lines.
  *
- * \param lines is a list of lines containing the fitparameter block
+ * <b>return:</b>
+ * - true
+ *
+ * \param lines is a list of lines containing the command block
  */
 Bool_t PMsrHandler::HandleCommandsEntry(PMsrLines &lines)
 {
@@ -2184,7 +2234,7 @@ Bool_t PMsrHandler::HandleCommandsEntry(PMsrLines &lines)
 // InitFourierParameterStructure (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Initializes the Fourier parameter structure.
  *
  * \param fourier fourier parameters
  */
@@ -2207,7 +2257,11 @@ void PMsrHandler::InitFourierParameterStructure(PMsrFourierStructure &fourier)
 // HandleFourierEntry (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Parses the Fourier block of a msr-file.
+ *
+ * <b>return:</b>
+ * - true if successful
+ * - false otherwise
  *
  * \param lines is a list of lines containing the fourier parameter block
  */
@@ -2448,9 +2502,13 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
 // HandlePlotEntry (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Parses the PLOT block of a msr-file.
  *
- * \param lines is a list of lines containing the fitparameter block
+ * <b>return:</b>
+ * - true if successful
+ * - false otherwise
+ *
+ * \param lines is a list of lines containing the plot block
  */
 Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
 {
@@ -2968,9 +3026,13 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
 // HandleStatisticEntry (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Handles the STATISTIC block of a msr-file.
  *
- * \param lines is a list of lines containing the fitparameter block
+ * <b>return:</b>
+ * - true if successful
+ * - false otherwise
+ *
+ * \param lines is a list of lines containing the statistic block
  */
 Bool_t PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
 {
@@ -3057,16 +3119,6 @@ Bool_t PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
     fStatistic.fStatLines.push_back(lines[i]);
   }
 
-// cout << endl << "Statistic:";
-// cout << endl << " Date & Time: " << fStatistic.fDate.Data();
-// if (fStatistic.fChisq) { // chisq
-//   cout << endl << " chisq = " << fStatistic.fMin;
-//   cout << endl << " NDF   = " << fStatistic.fNdf;
-// } else { // maximum likelihood
-//   cout << endl << " maxLH = " << fStatistic.fMin;
-//   cout << endl << " NDF   = " << fStatistic.fNdf;
-// }
-
   return true;
 }
 
@@ -3074,11 +3126,12 @@ Bool_t PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
 // FillParameterInUse (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Fills the fParamInUse vector. An element of the vector will be 0 if the fit parameter
+ * is <b>not</b> used at all, otherwise it will be > 0.
  *
- * \param theory
- * \param funcs
- * \param run
+ * \param theory msr-file THEROY block lines
+ * \param funcs msr-file FUNCTIONS block lines
+ * \param run msr-file RUN blocks lines
  */
 void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLines &run)
 {
@@ -3095,7 +3148,6 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
     fParamInUse.push_back(0);
 
   // go through all the theory lines ------------------------------------
-//cout << endl << ">> theory block check ...";
   for (iter = theory.begin(); iter != theory.end(); ++iter) {
     // remove potential comments
     str = iter->fLine;
@@ -3118,13 +3170,11 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
         ival = str.Atoi();
         if ((ival > 0) && (ival < (Int_t)fParam.size()+1)) {
           fParamInUse[ival-1]++;
-//cout << endl << ">>>> theo: param no : " << ival;
         }
       } else if (str.Contains("map")) { // map
         if (FilterNumber(str, "map", MSR_PARAM_MAP_OFFSET, ival))
           map.push_back(ival-MSR_PARAM_MAP_OFFSET);
       } else if (str.Contains("fun")) { // fun
-//cout << endl << "theo:fun: " << str.Data();
         if (FilterNumber(str, "fun", MSR_PARAM_FUN_OFFSET, ival))
           fun.push_back(ival-MSR_PARAM_FUN_OFFSET);
       }
@@ -3138,7 +3188,6 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
   }
 
   // go through all the function lines: 1st time -----------------------------
-//cout << endl << ">> function block check (1st time) ...";
   for (iter = funcs.begin(); iter != funcs.end(); ++iter) {
     // remove potential comments
     str = iter->fLine;
@@ -3147,9 +3196,6 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 
     // everything to lower case
     str.ToLower();
-
-// cout << endl << "-----------------------";
-// cout << endl << ">> " << str.Data();
 
     tokens = str.Tokenize(" /t");
     if (!tokens)
@@ -3164,9 +3210,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 
     // check if fun number is used, and if yes, filter parameter numbers and maps
     TString sstr;
-//cout << endl << ">> fun.size() = " << fun.size();
     for (UInt_t i=0; i<fun.size(); i++) {
-//cout << endl << ">> funNo: " << fun[i] << ", funNo: " << funNo;
       if (fun[i] == funNo) { // function number found
         // filter for parX
         sstr = iter->fLine;
@@ -3174,14 +3218,12 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
         while (sstr.Index("par") != -1) {
           memset(sval, 0, sizeof(sval));
           sstr = &sstr[sstr.Index("par")+3]; // trunc sstr
-//cout << endl << ">> par:sstr: " << sstr.Data();
           for (Int_t j=0; j<sstr.Sizeof(); j++) {
             if (!isdigit(sstr[j]))
               break;
             sval[j] = sstr[j];
           }
           sscanf(sval, "%d", &ival);
-//cout << endl << ">>>> parX from func 1st, X = " << ival;
           fParamInUse[ival-1]++;
         }
 
@@ -3190,14 +3232,12 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
         while (sstr.Index("map") != -1) {
           memset(sval, 0, sizeof(sval));
           sstr = &sstr[sstr.Index("map")+3]; // trunc sstr
-//cout << endl << ">> map:sstr: " << sstr.Data();
           for (Int_t j=0; j<sstr.Sizeof(); j++) {
             if (!isdigit(sstr[j]))
               break;
             sval[j] = sstr[j];
           }
           sscanf(sval, "%d", &ival);
-//cout << endl << ">>>> mapX from func 1st, X = " << ival;
           // check if map value already in map, otherwise add it
           if (ival > 0) {
             UInt_t pos;
@@ -3222,7 +3262,6 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
   }
 
   // go through all the run block lines -------------------------------------
-//cout << endl << ">> run block check (1st time) ...";
   for (iter = run.begin(); iter != run.end(); ++iter) {
     // remove potential comments
     str = iter->fLine;
@@ -3250,13 +3289,11 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
       if (str.IsDigit()) {
         ival = str.Atoi();
         fParamInUse[ival-1]++;
-//cout << endl << ">>>> run : parameter no : " << ival;
       }
       // check if fun
       if (str.Contains("fun")) {
         if (FilterNumber(str, "fun", MSR_PARAM_FUN_OFFSET, ival)) {
           fun.push_back(ival-MSR_PARAM_FUN_OFFSET);
-//cout << endl << ">>>> run : fun no : " << ival-MSR_PARAM_FUN_OFFSET;
         }
       }
 
@@ -3269,14 +3306,12 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 
     // handle the maps
     if (str.Contains("map")) {
-//cout << endl << ">> " << str.Data();
       // tokenize string
       tokens = str.Tokenize(" \t");
       if (!tokens)
         continue;
 
       // get the parameter number via map
-//cout << endl << ">> map.size() = " << map.size();
       for (UInt_t i=0; i<map.size(); i++) {
         if (map[i] == 0)
           continue;
@@ -3287,7 +3322,6 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
             ival = str.Atoi();
             if (ival > 0) {
               fParamInUse[ival-1]++; // this is OK since map is ranging from 1 ..
-//cout << endl << ">>>> param no : " << ival << ", via map no : " << map[i];
             }
           }
         }
@@ -3302,7 +3336,6 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
   }
 
   // go through all the function lines: 2nd time -----------------------------
-//cout << endl << ">> function block check (2nd time) ...";
   for (iter = funcs.begin(); iter != funcs.end(); ++iter) {
     // remove potential comments
     str = iter->fLine;
@@ -3311,9 +3344,6 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 
     // everything to lower case
     str.ToLower();
-
-// cout << endl << "===========================";
-// cout << endl << ">> " << str.Data();
 
     tokens = str.Tokenize(" /t");
     if (!tokens)
@@ -3329,7 +3359,6 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
     // check if fun number is used, and if yes, filter parameter numbers and maps
     TString sstr;
     for (UInt_t i=0; i<fun.size(); i++) {
-//cout << endl << ">> funNo: " << fun[i] << ", funNo: " << funNo;
       if (fun[i] == funNo) { // function number found
         // filter for parX
         sstr = iter->fLine;
@@ -3344,7 +3373,6 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
           }
           sscanf(sval, "%d", &ival);
           fParamInUse[ival-1]++;
-//cout << endl << ">>>> parX from func 2nd, X = " << ival;
         }
 
         // filter for mapX
@@ -3358,7 +3386,6 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
             sval[j] = sstr[j];
           }
           sscanf(sval, "%d", &ival);
-//cout << endl << ">>>> mapX from func 2nd, X = " << ival;
           // check if map value already in map, otherwise add it
           if (ival > 0) {
             UInt_t pos;
@@ -3382,7 +3409,6 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
   }
 
   // go through all the run block lines 2nd time to filter remaining maps
-//cout << endl << ">> run block check (2nd time) ...";
   for (iter = run.begin(); iter != run.end(); ++iter) {
     // remove potential comments
     str = iter->fLine;
@@ -3394,14 +3420,12 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 
     // handle the maps
     if (str.Contains("map")) {
-//cout << endl << ">> " << str.Data();
       // tokenize string
       tokens = str.Tokenize(" \t");
       if (!tokens)
         continue;
 
       // get the parameter number via map
-//cout << endl << ">> map.size() = " << map.size();
       for (UInt_t i=0; i<map.size(); i++) {
         if (map[i] == 0)
           continue;
@@ -3412,7 +3436,6 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
             ival = str.Atoi();
             if (ival > 0) {
               fParamInUse[ival-1]++; // this is OK since map is ranging from 1 ..
-//cout << endl << ">>>> param no : " << ival << ", via map no : " << map[i];
             }
           }
         }
@@ -3425,11 +3448,6 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
       }
     }
   }
-
-// cout << endl << ">> fParamInUse: ";
-// for (UInt_t i=0; i<fParamInUse.size(); i++)
-//   cout << endl << i+1 << ", " << fParamInUse[i];
-// cout << endl;
 
   // if unused parameters are present, set the step value to 0.0
   for (UInt_t i=0; i<fParam.size(); i++) {
@@ -3450,10 +3468,15 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 // CheckUniquenessOfParamNames (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Checks if all the fit parameters are unique. If not parX, parY will show
+ * the first occurence of equal fit parameter names.
  *
- * \param parX
- * \param parY
+ * <b>return:</b>
+ * - true if the fit parameter names are unique.
+ * - false otherwise
+ *
+ * \param parX index of the 1st fit parameter name for which there is a counter part.
+ * \param parY index of the counter part fit parameter name.
  */
 Bool_t PMsrHandler::CheckUniquenessOfParamNames(UInt_t &parX, UInt_t &parY)
 {
@@ -3478,7 +3501,11 @@ Bool_t PMsrHandler::CheckUniquenessOfParamNames(UInt_t &parX, UInt_t &parY)
 //--------------------------------------------------------------------------
 /**
  * <p>Checks if map entries found in the theory- or function-block are also
- * present in the run-block, if yes return true otherwise return false.
+ * present in the run-block.
+ *
+ * <b>return:</b>
+ * - true if maps or OK
+ * - false otherwise
  */
 Bool_t PMsrHandler::CheckMaps()
 {
@@ -3584,7 +3611,11 @@ Bool_t PMsrHandler::CheckMaps()
 //--------------------------------------------------------------------------
 /**
  * <p>Checks if fun entries found in the theory- and run-block are also
- * present in the functions-block, if yes return true otherwise return false.
+ * present in the functions-block.
+ *
+ * <b>return:</b>
+ * - true if fun entries or present in the FUNCTIONS block
+ * - false otherwise
  */
 Bool_t PMsrHandler::CheckFuncs()
 {
@@ -3672,6 +3703,10 @@ Bool_t PMsrHandler::CheckFuncs()
 //--------------------------------------------------------------------------
 /**
  * <p>Checks if histogram grouping makes any sense.
+ *
+ * <b>return:</b>
+ * - true if histogram grouping seems OK
+ * - false otherwise
  */
 Bool_t PMsrHandler::CheckHistoGrouping()
 {
@@ -3722,7 +3757,11 @@ Bool_t PMsrHandler::CheckHistoGrouping()
 // CheckAddRunParameters (private)
 //--------------------------------------------------------------------------
 /**
- * <p>Check if addrun is present that given parameters make any sense.
+ * <p>In case addrun is present check that if addt0's are given there are as many addt0's than addrun's.
+ *
+ * <b>return:</b>
+ * - true if either no addt0 present, or # of addrun's == # of addt0's.
+ * - false otherwise
  */
 Bool_t PMsrHandler::CheckAddRunParameters()
 {

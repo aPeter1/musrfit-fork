@@ -40,8 +40,7 @@
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Constructor
  */
 PRunAsymmetry::PRunAsymmetry() : PRunBase()
 {
@@ -54,10 +53,12 @@ PRunAsymmetry::PRunAsymmetry() : PRunBase()
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor
  *
- * \param msrInfo pointer to the msr info structure
- * \param runNo number of the run of the msr-file
+ * \param msrInfo pointer to the msr-file handler
+ * \param rawData raw run data
+ * \param runNo number of the run within the msr-file
+ * \param tag tag showing what shall be done: kFit == fitting, kView == viewing
  */
 PRunAsymmetry::PRunAsymmetry(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
 {
@@ -82,7 +83,6 @@ PRunAsymmetry::PRunAsymmetry(PMsrHandler *msrInfo, PRunDataHandler *rawData, UIn
   }
   // check if alpha is fixed
   Bool_t alphaFixedToOne = false;
-//cout << endl << ">> alpha = " << (*param)[fRunInfo->GetAlphaParamNo()-1].fValue << ", " << (*param)[fRunInfo->GetAlphaParamNo()-1].fStep;
   if (((*param)[fRunInfo->GetAlphaParamNo()-1].fStep == 0.0) &&
       ((*param)[fRunInfo->GetAlphaParamNo()-1].fValue == 1.0))
     alphaFixedToOne = true;
@@ -113,8 +113,6 @@ PRunAsymmetry::PRunAsymmetry(PMsrHandler *msrInfo, PRunDataHandler *rawData, UIn
   else
     fAlphaBetaTag = 4;
 
-//cout << endl << ">> PRunAsymmetry::PRunAsymmetry(): fAlphaBetaTag = " << fAlphaBetaTag << endl;
-
   // calculate fData
   if (!PrepareData())
     fValid = false;
@@ -124,8 +122,7 @@ PRunAsymmetry::PRunAsymmetry(PMsrHandler *msrInfo, PRunDataHandler *rawData, UIn
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Destructor.
  */
 PRunAsymmetry::~PRunAsymmetry()
 {
@@ -139,9 +136,12 @@ PRunAsymmetry::~PRunAsymmetry()
 // CalcChiSquare
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Calculate chi-square.
  *
- * \param par parameter vector iterated by minuit
+ * <b>return:</b>
+ * - chisq value
+ *
+ * \param par parameter vector iterated by minuit2
  */
 Double_t PRunAsymmetry::CalcChiSquare(const std::vector<Double_t>& par)
 {
@@ -183,7 +183,6 @@ Double_t PRunAsymmetry::CalcChiSquare(const std::vector<Double_t>& par)
         default:
           break;
       }
-//if (i==0) cout << endl << "A(0) = " << asymFcnValue;
       diff = fData.GetValue()->at(i) - asymFcnValue;
       chisq += diff*diff / (fData.GetError()->at(i)*fData.GetError()->at(i));
     }
@@ -196,7 +195,7 @@ Double_t PRunAsymmetry::CalcChiSquare(const std::vector<Double_t>& par)
 // CalcMaxLikelihood
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>NOT IMPLEMENTED!!
  *
  * \param par parameter vector iterated by minuit
  */
@@ -211,8 +210,7 @@ Double_t PRunAsymmetry::CalcMaxLikelihood(const std::vector<Double_t>& par)
 // CalcTheory
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Calculate theory for a given set of fit-parameters.
  */
 void PRunAsymmetry::CalcTheory()
 {
@@ -268,17 +266,26 @@ void PRunAsymmetry::CalcTheory()
 // PrepareData
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Prepare data for fitting or viewing. What is already processed at this stage:
+ * - get all needed forward/backward histograms
+ * - get timeresolution
+ * - get start/stop fit time
+ * - get t0's and perform necessary cross checks (e.g. if t0 of msr-file (if present) are consistent with t0 of the data files, etc.)
+ * - add runs (if addruns are present)
+ * - group histograms (if grouping is present)
+ * - subtract background
  *
  * Error propagation for \f$ A_i = (f_i^{\rm c}-b_i^{\rm c})/(f_i^{\rm c}+b_i^{\rm c})\f$:
  * \f[ \Delta A_i = \pm\frac{2}{(f_i^{\rm c}+b_i^{\rm c})^2}\left[
  *     (b_i^{\rm c})^2 (\Delta f_i^{\rm c})^2 + 
  *      (\Delta b_i^{\rm c})^2 (f_i^{\rm c})^2\right]^{1/2}\f]
+ *
+ * <b>return:</b>
+ * - true if everthing went smooth
+ * - false, otherwise.
  */
 Bool_t PRunAsymmetry::PrepareData()
 {
-//cout << endl << "in PRunAsymmetry::PrepareData(): will feed fData" << endl;
-
   // get forward/backward histo from PRunDataHandler object ------------------------
   // get the correct run
   PRawRunData *runData = fRawData->GetRunData(*(fRunInfo->GetRunName()));
@@ -294,7 +301,6 @@ Bool_t PRunAsymmetry::PrepareData()
   // keep start/stop time for fit
   fFitStartTime = fRunInfo->GetFitRange(0);
   fFitStopTime  = fRunInfo->GetFitRange(1);
-//cout << endl << "start/stop (fit): " << fFitStartTime << ", " << fFitStopTime << endl;
 
   // collect histogram numbers
   PUIntVector forwardHistoNo;
@@ -603,6 +609,10 @@ Bool_t PRunAsymmetry::PrepareData()
  *      \pm\left[ f_i + \mathrm{bkg} \right]^{1/2}, \f]
  * where \f$ f_i^{\rm c} \f$ is the background corrected histogram, \f$ f_i \f$ the raw histogram
  * and \f$ \mathrm{bkg} \f$ the fix given background.
+ *
+ * <b>return:</b>
+ * - true
+ *
  */
 Bool_t PRunAsymmetry::SubtractFixBkg()
 {  
@@ -620,7 +630,7 @@ Bool_t PRunAsymmetry::SubtractFixBkg()
 // SubtractEstimatedBkg
 //--------------------------------------------------------------------------
 /**
- * <p>Subtracts the background given ...
+ * <p>Subtracts the background which is estimated from a given interval (typically before t0).
  *
  * The background corrected histogramms are:
  * \f$ f_i^{\rm c} = f_i - \mathrm{bkg} \f$, where \f$ f_i \f$ is the raw data histogram,
@@ -632,6 +642,9 @@ Bool_t PRunAsymmetry::SubtractFixBkg()
  * \f[ \Delta \mathrm{bkg} = \pm\frac{1}{N}\left[\sum_{i=0}^N (\Delta f_i)^2\right]^{1/2} =
  * \pm\frac{1}{N}\left[\sum_{i=0}^N f_i \right]^{1/2},\f]
  * where \f$N\f$ is the number of bins over which the background is formed.
+ *
+ * <b>return:</b>
+ * - true
  */
 Bool_t PRunAsymmetry::SubtractEstimatedBkg()
 {
@@ -698,14 +711,12 @@ Bool_t PRunAsymmetry::SubtractEstimatedBkg()
     bkg[0] += fForward[i];
   errBkg[0] = TMath::Sqrt(bkg[0])/(end[0] - start[0] + 1);
   bkg[0] /= static_cast<Double_t>(end[0] - start[0] + 1);
-//cout << endl << ">> bkg[0] = " << bkg[0];
 
   // backward
   for (UInt_t i=start[1]; i<end[1]; i++)
     bkg[1] += fBackward[i];
   errBkg[1] = TMath::Sqrt(bkg[1])/(end[0] - start[0] + 1);
   bkg[1] /= static_cast<Double_t>(end[1] - start[1] + 1);
-//cout << endl << ">> bkg[1] = " << bkg[1] << endl;
 
   // correct error for forward, backward
   for (UInt_t i=0; i<fForward.size(); i++) {
@@ -726,8 +737,18 @@ Bool_t PRunAsymmetry::SubtractEstimatedBkg()
 // PrepareFitData
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Take the pre-processed data (i.e. grouping and addrun are preformed) and form the asymmetry for fitting.
+ * Before forming the asymmetry, the following checks will be performed:
+ * -# check if data range is given, if not try to estimate one.
+ * -# check that data range is present, that it makes any sense.
+ * -# check that 'first good bin'-'t0' is the same for forward and backward histogram. If not adjust it.
+ * -# pack data (rebin).
+ * -# if packed forward size != backward size, truncate the longer one such that an asymmetry can be formed.
+ * -# calculate the asymmetry: \f$ A_i = (f_i^c-b_i^c)/(f_i^c+b_i^c) \f$
+ * -# calculate the asymmetry errors: \f$ \delta A_i = 2 \sqrt{(b_i^c)^2 (\delta f_i^c)^2 + (\delta b_i^c)^2 (f_i^c)^2}/(f_i^c+b_i^c)^2\f$
  *
+ * \param runData raw run data needed to perform some crosschecks
+ * \param histoNo histogram number (within a run). histoNo[0]: forward histogram number, histNo[1]: backward histogram number
  */
 Bool_t PRunAsymmetry::PrepareFitData(PRawRunData* runData, UInt_t histoNo[2])
 {
@@ -914,8 +935,20 @@ Bool_t PRunAsymmetry::PrepareFitData(PRawRunData* runData, UInt_t histoNo[2])
 // PrepareViewData
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Take the pre-processed data (i.e. grouping and addrun are preformed) and form the asymmetry for view representation.
+ * Before forming the asymmetry, the following checks will be performed:
+ * -# check if view packing is whished.
+ * -# check if data range is given, if not try to estimate one.
+ * -# check that data range is present, that it makes any sense.
+ * -# check that 'first good bin'-'t0' is the same for forward and backward histogram. If not adjust it.
+ * -# pack data (rebin).
+ * -# if packed forward size != backward size, truncate the longer one such that an asymmetry can be formed.
+ * -# calculate the asymmetry: \f$ A_i = (\alpha f_i^c-b_i^c)/(\alpha \beta f_i^c+b_i^c) \f$
+ * -# calculate the asymmetry errors: \f$ \delta A_i = 2 \sqrt{(b_i^c)^2 (\delta f_i^c)^2 + (\delta b_i^c)^2 (f_i^c)^2}/(f_i^c+b_i^c)^2\f$
+ * -# calculate the theory vector.
  *
+ * \param runData raw run data needed to perform some crosschecks
+ * \param histoNo histogram number (within a run). histoNo[0]: forward histogram number, histNo[1]: backward histogram number
  */
 Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
 {
@@ -1067,11 +1100,6 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
   fData.SetDataTimeStart(fTimeResolution*((Double_t)start[0]-t0[0]+(Double_t)(packing-1)/2.0));
   fData.SetDataTimeStep(fTimeResolution*(Double_t)packing);
 
-/*
-cout << endl << ">> start time = " << fData.GetDataTimeStart() << ", step = " << fData.GetDataTimeStep();
-cout << endl << "--------------------------------" << endl;
-*/
-
   // get the proper alpha and beta
   switch (fAlphaBetaTag) {
     case 1: // alpha == 1, beta == 1
@@ -1093,7 +1121,6 @@ cout << endl << "--------------------------------" << endl;
     default:
       break;
   }
-//cout << endl << ">> alpha = " << alpha << ", beta = " << beta;
 
   for (UInt_t i=0; i<forwardPacked.GetValue()->size(); i++) {
     // to make the formulae more readable
@@ -1143,7 +1170,6 @@ cout << endl << "--------------------------------" << endl;
     size = fData.GetValue()->size() * 10;
     factor = (Double_t)runData->GetDataBin(histoNo[0])->size() / (Double_t)size;
   }
-//cout << endl << ">> runData->fDataBin[histoNo[0]].size() = " << runData->fDataBin[histoNo[0]].size() << ",  fData.GetValue()->size() * 10 = " << fData.GetValue()->size() * 10 << ", size = " << size << ", factor = " << factor << endl;
   fData.SetTheoryTimeStart(fData.GetDataTimeStart());
   fData.SetTheoryTimeStep(fTimeResolution*factor);
   for (UInt_t i=0; i<size; i++) {
@@ -1167,14 +1193,14 @@ cout << endl << "--------------------------------" << endl;
 /**
  * <p> Prepares the RRF data set for visual representation. This is done the following way:
  * -# make all necessary checks
- * -# build the asymmetry [ \f[ A(t) \f] ] WITHOUT packing.
- * -# \f[ A_R(t) = A(t) \cdot 2 \cos(\omega_R t + \phi_R) \f]
- * -# do the packing of \f[ A_R(t) \f]
- * -# calculate theory [ \f[ T(t) \f] ] as close as possible to the time resolution [compatible with the RRF frequency]
- * -# \f[ T_R(t) = T(t) \cdot 2 \cos(\omega_R t + \phi_R) \f]
- * -# do the packing of \f[ T_R(t) \f]
+ * -# build the asymmetry, \f$ A(t) \f$, WITHOUT packing.
+ * -# \f$ A_R(t) = A(t) \cdot 2 \cos(\omega_R t + \phi_R) \f$
+ * -# do the packing of \f$ A_R(t) \f$
+ * -# calculate theory, \f$ T(t) \f$, as close as possible to the time resolution [compatible with the RRF frequency]
+ * -# \f$ T_R(t) = T(t) \cdot 2 \cos(\omega_R t + \phi_R) \f$
+ * -# do the packing of \f$ T_R(t) \f$
  * -# calculate the Kaiser FIR filter coefficients
- * -# filter \f[ T_R(t) \f].
+ * -# filter \f$ T_R(t) \f$.
  *
  * \param runData raw run data needed to perform some crosschecks
  * \param histNo array of the histo numbers form which to build the asymmetry

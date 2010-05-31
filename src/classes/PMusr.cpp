@@ -44,7 +44,7 @@ using namespace std;
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>Holds the muSR data which will be fitted.
+ * <p>Constructor
  */
 PRunData::PRunData()
 {
@@ -63,7 +63,7 @@ PRunData::PRunData()
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>Cleans up
+ * <p>Destructor.
  */
 PRunData::~PRunData()
 {
@@ -112,7 +112,7 @@ void PRunData::ReplaceTheory(const PDoubleVector &theo)
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>Holds non-muSR data raw data.
+ * <p>Constructor.
  */
 PNonMusrRawRunData::PNonMusrRawRunData()
 {
@@ -133,7 +133,7 @@ PNonMusrRawRunData::PNonMusrRawRunData()
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>Destructor. Cleans up
+ * <p>Destructor.
  */
 PNonMusrRawRunData::~PNonMusrRawRunData()
 {
@@ -173,7 +173,7 @@ void PNonMusrRawRunData::SetLabel(const UInt_t idx, const TString str)
 // AppendSubData
 //--------------------------------------------------------------------------
 /**
- * <p>Modifies the data set at position idx. In case idx is larges than the number
+ * <p>Modifies the data set at position idx. In case idx is larger than the number
  * of data sets, only a warning will be sent to stderr.
  *
  * \param idx index at which position the label should be set
@@ -193,7 +193,7 @@ void PNonMusrRawRunData::AppendSubData(const UInt_t idx, const Double_t dval)
 // AppendSubErrData
 //--------------------------------------------------------------------------
 /**
- * <p>Modifies the error-data set at position idx. In case idx is larges than the number
+ * <p>Modifies the error-data set at position idx. In case idx is larger than the number
  * of error-data sets, only a warning will be sent to stderr.
  *
  * \param idx index at which position the label should be set
@@ -217,7 +217,7 @@ void PNonMusrRawRunData::AppendSubErrData(const UInt_t idx, const Double_t dval)
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>Holds muSR raw run data.
+ * <p>Constructor
  */
 PRawRunData::PRawRunData()
 {
@@ -234,7 +234,7 @@ PRawRunData::PRawRunData()
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>Destructor. Cleans up.
+ * <p>Destructor.
  */
 PRawRunData::~PRawRunData()
 {
@@ -255,6 +255,10 @@ PRawRunData::~PRawRunData()
 /**
  * <p>Returns the temperature of a muSR run.
  *
+ * <b>return:</b>
+ * - temperature value, if idx is within proper boundaries
+ * - PMUSR_UNDEFINED, otherwise
+ *
  * \param idx index of the temperature whished
  */
 const Double_t PRawRunData::GetTemperature(const UInt_t idx)
@@ -273,7 +277,11 @@ const Double_t PRawRunData::GetTemperature(const UInt_t idx)
 /**
  * <p>Returns the error estimate of the temperature of a muSR run.
  *
- * \param idx index of the temperature whished
+ * <b>return:</b>
+ * - temperature error value, if idx is within proper boundaries
+ * - PMUSR_UNDEFINED, otherwise
+ *
+ * \param idx index of the temperature error whished
  */
 const Double_t PRawRunData::GetTempError(const UInt_t idx)
 {
@@ -290,6 +298,10 @@ const Double_t PRawRunData::GetTempError(const UInt_t idx)
 //--------------------------------------------------------------------------
 /**
  * <p> Returns the value of a ring anode high voltage. (idx = 0: RAL, 1: RAR, 2: RAT, 3: RAB)
+ *
+ * <b>return:</b>
+ * - ring anode HV value, if idx is within proper boundaries
+ * - PMUSR_UNDEFINED, otherwise
  *
  * \param idx index of the ring anode whished
  */
@@ -309,6 +321,10 @@ const Double_t PRawRunData::GetRingAnode(const UInt_t idx)
 /**
  * <p> Returns a T0 value.
  *
+ * <b>return:</b>
+ * - t0 value, if idx is within proper boundaries
+ * - -1, otherwise
+ *
  * \param idx index of the T0 value whished
  */
 const Int_t PRawRunData::GetT0(const UInt_t idx)
@@ -326,6 +342,10 @@ const Int_t PRawRunData::GetT0(const UInt_t idx)
 //--------------------------------------------------------------------------
 /**
  * <p>Returns an estimated T0 value.
+ *
+ * <b>return:</b>
+ * - estimated t0 value, if idx is within proper boundaries
+ * - -1, otherwise
  *
  * \param idx index of the T0 value whished
  */
@@ -345,6 +365,10 @@ const Int_t PRawRunData::GetT0Estimated(const UInt_t idx)
 /**
  * <p>Returns the background bin range (start, stop) from the data file.
  * Currently only used in mud-files.
+ *
+ * <b>return:</b>
+ * - (start, stop) values, if idx is within proper boundaries
+ * - (-1, -1), otherwise
  *
  * \param idx index of the background range.
  */
@@ -371,6 +395,10 @@ const PIntPair PRawRunData::GetBkgBin(const UInt_t idx)
  * <p>Returns the data range (first good bin, last good bin) from the data file.
  * Currently only used in mud-files.
  *
+ * <b>return:</b>
+ * - (first good bin, last good bin) values, if idx is within proper boundaries
+ * - (-1, -1), otherwise
+ *
  * \param idx index of the data range
  */
 const PIntPair PRawRunData::GetGoodDataBin(const UInt_t idx)
@@ -394,6 +422,10 @@ const PIntPair PRawRunData::GetGoodDataBin(const UInt_t idx)
 //--------------------------------------------------------------------------
 /**
  * <p>Returns a raw muSR run histogram.
+ *
+ * <b>return:</b>
+ * - pointer of the data vector, if idx is within proper boundaries
+ * - 0, otherwise
  *
  * \param idx histo number index
  */
@@ -534,7 +566,6 @@ PMsrRunBlock::PMsrRunBlock()
   fBetaParamNo = -1; // undefined beta parameter number
   fNormParamNo = -1; // undefined norm parameter number
   fBkgFitParamNo = -1; // undefined background parameter number
-  fPhaseParamNo = -1; // undefined phase parameter number
   fLifetimeParamNo = -1; // undefined lifetime parameter number
   fLifetimeCorrection = false; // lifetime correction == false by default (used in single histogram musrview)
   for (UInt_t i=0; i<2; i++)
@@ -583,7 +614,6 @@ void PMsrRunBlock::CleanUp()
   fBetaParamNo = -1; // undefined beta parameter number
   fNormParamNo = -1; // undefined norm parameter number
   fBkgFitParamNo = -1; // undefined background parameter number
-  fPhaseParamNo = -1; // undefined phase parameter number
   fLifetimeParamNo = -1; // undefined lifetime parameter number
   fLifetimeCorrection = false; // lifetime correction == false by default (used in single histogram musrview)
   fBkgFix[0] = PMUSR_UNDEFINED; // undefined fixed background for forward
@@ -618,6 +648,10 @@ void PMsrRunBlock::CleanUp()
 //--------------------------------------------------------------------------
 /**
  * <p> get run name at position idx
+ *
+ * <b>return:</b>
+ * - pointer of the run name string, if idx is within proper boundaries
+ * - 0, otherwise
  *
  * \param idx index of the run name to be returned
  */
@@ -657,6 +691,10 @@ void PMsrRunBlock::SetRunName(TString &str, Int_t idx)
 /**
  * <p> get beamline name at position idx
  *
+ * <b>return:</b>
+ * - pointer of the beamline string, if idx is within proper boundaries
+ * - 0, otherwise
+ *
  * \param idx index of the beamline to be returned
  */
 TString* PMsrRunBlock::GetBeamline(UInt_t idx)
@@ -694,6 +732,10 @@ void PMsrRunBlock::SetBeamline(TString &str, Int_t idx)
 //--------------------------------------------------------------------------
 /**
  * <p> get institute name at position idx
+ *
+ * <b>return:</b>
+ * - pointer of the institute string, if idx is within proper boundaries
+ * - 0, otherwise
  *
  * \param idx index of the institute to be returned
  */
@@ -733,6 +775,10 @@ void PMsrRunBlock::SetInstitute(TString &str, Int_t idx)
 /**
  * <p> get file format name at position idx
  *
+ * <b>return:</b>
+ * - pointer of the file format string, if idx is within proper boundaries
+ * - 0, otherwise
+ *
  * \param idx index of the file format to be returned
  */
 TString* PMsrRunBlock::GetFileFormat(UInt_t idx)
@@ -770,6 +816,10 @@ void PMsrRunBlock::SetFileFormat(TString &str, Int_t idx)
 //--------------------------------------------------------------------------
 /**
  * <p> get forward histogram value at position idx
+ *
+ * <b>return:</b>
+ * - forward histogram number, if idx is within proper boundaries
+ * - -1, otherwise
  *
  * \param idx index of the forward histogram value to be returned
  */
@@ -811,6 +861,10 @@ void PMsrRunBlock::SetForwardHistoNo(Int_t histoNo, Int_t idx)
 /**
  * <p> get backward histogram value at position idx
  *
+ * <b>return:</b>
+ * - backward histogram number, if idx is within proper boundaries
+ * - -1, otherwise
+ *
  * \param idx index of the map value to be returned
  */
 Int_t PMsrRunBlock::GetBackwardHistoNo(UInt_t idx)
@@ -851,6 +905,10 @@ void PMsrRunBlock::SetBackwardHistoNo(Int_t histoNo, Int_t idx)
 /**
  * <p> get map value at position idx
  *
+ * <b>return:</b>
+ * - map value, if idx is within proper boundaries
+ * - -1, otherwise
+ *
  * \param idx index of the map value to be returned
  */
 Int_t PMsrRunBlock::GetMap(UInt_t idx)
@@ -889,6 +947,10 @@ void PMsrRunBlock::SetMap(Int_t mapVal, Int_t idx)
 /**
  * <p> get background fixed value at position idx
  *
+ * <b>return:</b>
+ * - fixed background value, if idx is within proper boundaries
+ * - PMUSR_UNDEFINED, otherwise
+ *
  * \param idx index of the background fixed value to be returned
  */
 Double_t PMsrRunBlock::GetBkgFix(UInt_t idx)
@@ -924,6 +986,10 @@ void PMsrRunBlock::SetBkgFix(Double_t dval, Int_t idx)
 //--------------------------------------------------------------------------
 /**
  * <p> get background range at position idx
+ *
+ * <b>return:</b>
+ * - background range value, if idx is within proper boundaries
+ * - -1, otherwise
  *
  * \param idx index of the background range to be returned
  */
@@ -963,6 +1029,10 @@ void PMsrRunBlock::SetBkgRange(Int_t ival, Int_t idx)
 /**
  * <p> get data range at position idx
  *
+ * <b>return:</b>
+ * - data range value, if idx is within proper boundaries
+ * - -1, otherwise
+ *
  * \param idx index of the data range to be returned
  */
 Int_t PMsrRunBlock::GetDataRange(UInt_t idx)
@@ -999,6 +1069,10 @@ void PMsrRunBlock::SetDataRange(Int_t ival, Int_t idx)
 //--------------------------------------------------------------------------
 /**
  * <p> get T0 value at position idx
+ *
+ * <b>return:</b>
+ * - t0 value, if idx is within proper boundaries
+ * - -1, otherwise
  *
  * \param idx index of the T0 value to be returned
  */
@@ -1038,6 +1112,10 @@ void PMsrRunBlock::SetT0(Int_t ival, Int_t idx)
 /**
  * <p> get add T0 size of the addrun at index addRunIdx
  *
+ * <b>return:</b>
+ * - addt0 value, if idx is within proper boundaries
+ * - -1, otherwise
+ *
  * \param addRunIdx index of the addrun
  */
 Int_t PMsrRunBlock::GetAddT0Size(UInt_t addRunIdx)
@@ -1056,6 +1134,10 @@ Int_t PMsrRunBlock::GetAddT0Size(UInt_t addRunIdx)
 //--------------------------------------------------------------------------
 /**
  * <p> get add T0 of the addrun (index addRunIdx) at index histoIdx
+ *
+ * <b>return:</b>
+ * - addt0 value, if indices are within proper boundaries
+ * - -1, otherwise
  *
  * \param addRunIdx index of the addrun
  * \param histoIdx index of the add backward histo number value
@@ -1104,6 +1186,10 @@ void PMsrRunBlock::SetAddT0(Int_t ival, UInt_t addRunIdx, UInt_t histoNoIdx)
 //--------------------------------------------------------------------------
 /**
  * <p> get fit range value at position idx
+ *
+ * <b>return:</b>
+ * - fit range value, if idx is within proper boundaries
+ * - PMUSR_UNDEFINED, otherwise
  *
  * \param idx index of the fit range value to be returned
  */

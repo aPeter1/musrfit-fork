@@ -84,57 +84,59 @@
 
 //------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Structure holding all necessary histograms for a single plot block entry for
+ * fit types: asymmetry fit and single histogram fit.
  */
 typedef struct {
-  TH1F *data;
-  TH1F *dataFourierRe;
-  TH1F *dataFourierIm;
-  TH1F *dataFourierPwr;
-  TH1F *dataFourierPhase;
-  TH1F *theory;
-  TH1F *theoryFourierRe;
-  TH1F *theoryFourierIm;
-  TH1F *theoryFourierPwr;
-  TH1F *theoryFourierPhase;
-  TH1F *diff;
-  TH1F *diffFourierRe;
-  TH1F *diffFourierIm;
-  TH1F *diffFourierPwr;
-  TH1F *diffFourierPhase;
+  TH1F *data;                ///< data histogram
+  TH1F *dataFourierRe;       ///< real part of the Fourier transform of the data histogram
+  TH1F *dataFourierIm;       ///< imaginary part of the Fourier transform of the data histogram
+  TH1F *dataFourierPwr;      ///< power spectrum of the Fourier transform of the data histogram
+  TH1F *dataFourierPhase;    ///< phase spectrum of the Fourier transform of the data histogram
+  TH1F *theory;              ///< theory histogram belonging to the data histogram
+  TH1F *theoryFourierRe;     ///< real part of the Fourier transform of the theory histogram
+  TH1F *theoryFourierIm;     ///< imaginary part of the Fourier transform of the theory histogram
+  TH1F *theoryFourierPwr;    ///< power spectrum of the Fourier transform of the theory histogram
+  TH1F *theoryFourierPhase;  ///< phase spectrum of the Fourier transform of the theory histogram
+  TH1F *diff;                ///< difference histogram, i.e. data-theory
+  TH1F *diffFourierRe;       ///< real part of the Fourier transform of the diff histogram
+  TH1F *diffFourierIm;       ///< imaginary part of the Fourier transform of the diff histogram
+  TH1F *diffFourierPwr;      ///< power spectrum of the Fourier transform of the diff histogram
+  TH1F *diffFourierPhase;    ///< phase spectrum of the Fourier transform of the diff histogram
 } PMusrCanvasDataSet;
 
 //------------------------------------------------------------------------
 /**
- * <p>
+ * <p>typedef to make to code more readable: list of histogram data sets.
  */
 typedef vector<PMusrCanvasDataSet> PMusrCanvasDataList;
 
 //------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Structure holding all necessary error graphs for a single plot block entry for
+ * fit types: non-muSR fit.
  */
 typedef struct {
-  TGraphErrors *data;
-  TGraphErrors *dataFourierRe;
-  TGraphErrors *dataFourierIm;
-  TGraphErrors *dataFourierPwr;
-  TGraphErrors *dataFourierPhase;
-  TGraphErrors *theory;
-  TGraphErrors *theoryFourierRe;
-  TGraphErrors *theoryFourierIm;
-  TGraphErrors *theoryFourierPwr;
-  TGraphErrors *theoryFourierPhase;
-  TGraphErrors *diff;
-  TGraphErrors *diffFourierRe;
-  TGraphErrors *diffFourierIm;
-  TGraphErrors *diffFourierPwr;
-  TGraphErrors *diffFourierPhase;
+  TGraphErrors *data;               ///< data error graph
+  TGraphErrors *dataFourierRe;      ///< real part of the Fourier transform of the data error graph
+  TGraphErrors *dataFourierIm;      ///< imaginary part of the Fourier transform of the data error graph
+  TGraphErrors *dataFourierPwr;     ///< power spectrum of the Fourier transform of the data error graph
+  TGraphErrors *dataFourierPhase;   ///< phase spectrum of the Fourier transform of the data error graph
+  TGraphErrors *theory;             ///< theory histogram belonging to the data error graph
+  TGraphErrors *theoryFourierRe;    ///< real part of the Fourier transform of the theory error graph
+  TGraphErrors *theoryFourierIm;    ///< imaginary part of the Fourier transform of the theory error graph
+  TGraphErrors *theoryFourierPwr;   ///< power spectrum of the Fourier transform of the theory error graph
+  TGraphErrors *theoryFourierPhase; ///< phase spectrum of the Fourier transform of the theory error graph
+  TGraphErrors *diff;               ///< difference error graph, i.e. data-theory
+  TGraphErrors *diffFourierRe;      ///< real part of the Fourier transform of the diff error graph
+  TGraphErrors *diffFourierIm;      ///< imaginary part of the Fourier transform of the diff error graph
+  TGraphErrors *diffFourierPwr;     ///< power spectrum of the Fourier transform of the diff error graph
+  TGraphErrors *diffFourierPhase;   ///< phase spectrum of the Fourier transform of the diff error graph
 } PMusrCanvasNonMusrDataSet;
 
 //------------------------------------------------------------------------
 /**
- * <p>
+ * <p>typedef to make to code more readable: list of error graph data sets.
  */
 typedef vector<PMusrCanvasNonMusrDataSet> PMusrCanvasNonMusrDataList;
 
@@ -143,17 +145,17 @@ typedef vector<PMusrCanvasNonMusrDataSet> PMusrCanvasNonMusrDataList;
  * <p> data structure needed for ascii dump within musrview.
  */
 typedef struct {
-  PDoubleVector dataX;
-  PDoubleVector data;
-  PDoubleVector dataErr;
-  PDoubleVector theoryX;
-  PDoubleVector theory;
+  PDoubleVector dataX;   ///< x-axis data set
+  PDoubleVector data;    ///< y-axis data set
+  PDoubleVector dataErr; ///< error of the y-axis data set
+  PDoubleVector theoryX; ///< x-axis theory set
+  PDoubleVector theory;  ///< y-axis theory set
 } PMusrCanvasAsciiDump;
 
 //------------------------------------------------------------------------
 /**
- * <p> vectore of the above data structure. Used if there are multiple histogramms
- * to be dumped.
+ * <p> typedef to make to code more readable: vector of the above data structure.
+ * Used if there are multiple histogramms to be dumped.
  */
 typedef vector<PMusrCanvasAsciiDump> PMusrCanvasAsciiDumpVector;
 
@@ -193,53 +195,53 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat);
 
   private:
-    Bool_t fBatchMode;       /// musrview in ROOT batch mode
-    Bool_t fValid;
-    Bool_t fDifferenceView;  /// tag showing that the shown data, fourier, are the difference between data and theory
-    Int_t  fCurrentPlotView; /// tag showing what the current plot view is: data, fourier, ...
-    Int_t  fPlotType;
-    Int_t  fPlotNumber;
+    Bool_t fBatchMode;       ///< musrview in ROOT batch mode
+    Bool_t fValid;           ///< if true, everything looks OK
+    Bool_t fDifferenceView;  ///< tag showing that the shown data, fourier, are the difference between data and theory
+    Int_t  fCurrentPlotView; ///< tag showing what the current plot view is: data, fourier, ...
+    Int_t  fPlotType;        ///< plot type tag: -1 == undefined, MSR_PLOT_SINGLE_HISTO == single histogram, MSR_PLOT_ASYM == asymmetry, MSR_PLOT_MU_MINUS == mu minus (not yet implemented), MSR_PLOT_NON_MUSR == non-muSR
+    Int_t  fPlotNumber;      ///< plot number
 
-    Double_t fXmin, fXmax, fYmin, fYmax; /// data/theory frame range
+    Double_t fXmin, fXmax, fYmin, fYmax; ///< data/theory frame range
 
-    Double_t fCurrentFourierPhase;    /// holds the current Fourier phase
-    TLatex *fCurrentFourierPhaseText; /// used in Re/Im Fourier to show the current phase in the pad
-    TString *fRRFText;
-    TLatex  *fRRFLatexText; /// used to display RRF info
+    Double_t fCurrentFourierPhase;    ///< holds the current Fourier phase
+    TLatex *fCurrentFourierPhaseText; ///< used in Re/Im Fourier to show the current phase in the pad
+    TString *fRRFText;      ///< RRF information
+    TLatex  *fRRFLatexText; ///< used to display RRF info
 
-    TStyle    *fStyle;
+    TStyle    *fStyle; ///< A collection of all graphics attributes
 
     // canvas menu related variables
-    TRootCanvas *fImp;
-    TGMenuBar   *fBar;
-    TGPopupMenu *fPopupMain;
-    TGPopupMenu *fPopupSave;
-    TGPopupMenu *fPopupFourier;
+    TRootCanvas *fImp;           ///< ROOT native GUI version of main window with menubar and drawing area
+    TGMenuBar   *fBar;           ///< menu bar
+    TGPopupMenu *fPopupMain;     ///< popup menu Musrfit in the main menu bar
+    TGPopupMenu *fPopupSave;     ///< popup menu of the Musrfit/Save Data sub menu
+    TGPopupMenu *fPopupFourier;  ///< popup menu of the Musrfit/Fourier sub menu
 
     // canvas related variables
-    TCanvas   *fMainCanvas;
-    TPaveText *fTitlePad;
-    TPad      *fDataTheoryPad;
-    TPaveText *fParameterPad;
-    TPaveText *fTheoryPad;
-    TLegend   *fInfoPad;
-    TLegend   *fMultiGraphLegend;
+    TCanvas   *fMainCanvas;        ///< main canvas
+    TPaveText *fTitlePad;          ///< title pad used to display a title
+    TPad      *fDataTheoryPad;     ///< data/theory pad used to display the data/theory
+    TPaveText *fParameterPad;      ///< parameter pad used to display the fitting parameters
+    TPaveText *fTheoryPad;         ///< theory pad used to display the theory and functions
+    TLegend   *fInfoPad;           ///< info pad used to display a legend of the data plotted
+    TLegend   *fMultiGraphLegend;  ///< used for non-muSR plots to display a legend
 
-    TH1F *fHistoFrame;
+    TH1F *fHistoFrame; ///< fHistoFrame is a 'global' frame needed in order to plot histograms with (potentially) different x-frames
 
 #ifndef __MAKECINT__
-    PMsrHandler        *fMsrHandler;
-    PRunListCollection *fRunList;
+    PMsrHandler        *fMsrHandler; ///< msr-file handler
+    PRunListCollection *fRunList;    ///< data handler
 #endif // __MAKECINT__
 
-    PMusrCanvasDataList fData;
-    PMusrCanvasNonMusrDataList fNonMusrData;
-    TMultiGraph *fMultiGraphData;
-    TMultiGraph *fMultiGraphDiff;
+    PMusrCanvasDataList fData; ///< list of all histogram data to be plotted (asymmetry/single histogram)
+    PMusrCanvasNonMusrDataList fNonMusrData; ///< list of all error graphs to be plotted (non-muSR)
+    TMultiGraph *fMultiGraphData; ///< fMultiGraphData is a 'global' graph needed in order to plot error graphs (data) with (potentially) different x-frames
+    TMultiGraph *fMultiGraphDiff; ///< fMultiGraphDiff is a 'global' graph needed in order to plot error graphs (data-theory) with (potentially) different x-frames
 
-    PMsrFourierStructure fFourier;
-    PIntVector fMarkerList;
-    PIntVector fColorList;
+    PMsrFourierStructure fFourier; ///< structure holding all the information necessary to perform the Fourier transform
+    PIntVector fMarkerList; ///< list of markers
+    PIntVector fColorList;  ///< list of colors
 
     virtual void CreateStyle();
     virtual void InitFourier();

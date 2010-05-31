@@ -125,67 +125,68 @@ using namespace std;
 
 //-------------------------------------------------------------
 /**
- * <p> typedef to make to code more readable. Definition of a bool vector.
+ * <p>typedef to make to code more readable. Definition of a bool vector.
  */
 typedef vector<Bool_t> PBoolVector;
 
 //-------------------------------------------------------------
 /**
- * <p> typedef to make to code more readable. Definition of an unsigned int vector
+ * <p>typedef to make to code more readable. Definition of an unsigned int vector
  */
 typedef vector<UInt_t> PUIntVector;
 
 //-------------------------------------------------------------
 /**
- * <p> typedef to make to code more readable. Definition of an int vector
+ * <p>typedef to make to code more readable. Definition of an int vector
  */
 typedef vector<Int_t> PIntVector;
 
 //-------------------------------------------------------------
 /**
- * <p> typedef to make to code more readable. Definition of an int pair
+ * <p>typedef to make to code more readable. Definition of an int pair
  */
 typedef pair<Int_t, Int_t> PIntPair;
 
 //-------------------------------------------------------------
 /**
- * <p> typedef to make to code more readable. Definition of an int pair vector
+ * <p>typedef to make to code more readable. Definition of an int pair vector
  */
 typedef vector<PIntPair> PIntPairVector;
 
 //-------------------------------------------------------------
 /**
- * <p> typedef to make to code more readable. Definition of a double vector
+ * <p>typedef to make to code more readable. Definition of a double vector
  */
 typedef vector<Double_t> PDoubleVector;
 
 //-------------------------------------------------------------
 /**
- * <p> typedef to make to code more readable. Definition of a double pair
+ * <p>typedef to make to code more readable. Definition of a double pair
  */
 typedef pair<Double_t, Double_t> PDoublePair;
 
 //-------------------------------------------------------------
 /**
- * <p> typedef to make to code more readable. Definition of a double pair vector
+ * <p>typedef to make to code more readable. Definition of a double pair vector
  */
 typedef vector<PDoublePair> PDoublePairVector;
 
 //-------------------------------------------------------------
 /**
- * <p> typedef to make to code more readable. Definition of a string vector
+ * <p>typedef to make to code more readable. Definition of a string vector
  */
 typedef vector<TString> PStringVector;
 
 //-------------------------------------------------------------
 /**
- * <p> data handling tag
+ * <p>data handling tag
  */
 enum EPMusrHandleTag { kEmpty, kFit, kView };
 
 //-------------------------------------------------------------
 /**
- * <p>Holds the data which will be fitted, i.e. packed, background corrected, ...
+ * <p>Handles the data which will be fitted, i.e. packed, background corrected, ...
+ * This are <b>not</b> the raw histogram data of a run. This are the pre-processed data.
  */
 class PRunData {
   public:
@@ -233,7 +234,7 @@ class PRunData {
 
 //-------------------------------------------------------------
 /**
- * <p>Non-Musr raw data.
+ * <p>Handles Non-Musr raw data.
  */
 class PNonMusrRawRunData {
   public:
@@ -265,7 +266,7 @@ class PNonMusrRawRunData {
 
 //-------------------------------------------------------------
 /**
- * <p>Histogram raw muSR data.
+ * <p>Handles raw data, both non-muSR data as well muSR histogram data.
  */
 class PRawRunData {
   public:
@@ -335,13 +336,13 @@ class PRawRunData {
 
 //-------------------------------------------------------------
 /**
- * <p> typedef to make to code more readable. A vector of a raw musr run.
+ * <p>typedef to make to code more readable. A vector of a raw musr run.
  */
 typedef vector<PRawRunData> PRawRunDataList;
 
 //-------------------------------------------------------------
 /**
- * <p> Helper structure for parsing. Keeps a msr-file line string and the corresponding line number.
+ * <p>Helper structure for parsing. Keeps a msr-file line string and the corresponding line number.
  */
 typedef struct {
   Int_t   fLineNo; ///< original line number of the msr-file
@@ -350,13 +351,13 @@ typedef struct {
 
 //-------------------------------------------------------------
 /**
- * <p>  typedef to make to code more readable: list of msr-file lines.
+ * <p>typedef to make to code more readable: list of msr-file lines.
  */
 typedef vector<PMsrLineStructure> PMsrLines;
 
 //-------------------------------------------------------------
 /**
- * <p> Holds the information of a parameter.
+ * <p>Handles the information of a parameter.
  */
 typedef struct {
   Int_t fNoOfParams;              ///< how many parameters are given
@@ -374,13 +375,13 @@ typedef struct {
 
 //-------------------------------------------------------------
 /**
- * <p>  typedef to make to code more readable: vector of fit parameters.
+ * <p>typedef to make to code more readable: vector of fit parameters.
  */
 typedef vector<PMsrParamStructure> PMsrParamList;
 
 //-------------------------------------------------------------
 /**
- * <p> Holds the information of a single run block
+ * <p>Handles the information of a single run block
  *
  */
 class PMsrRunBlock {
@@ -402,7 +403,6 @@ class PMsrRunBlock {
     virtual Int_t GetBetaParamNo() { return fBetaParamNo; }
     virtual Int_t GetNormParamNo() { return fNormParamNo; }
     virtual Int_t GetBkgFitParamNo() { return fBkgFitParamNo; }
-    virtual Int_t GetPhaseParamNo() { return fPhaseParamNo; }
     virtual Int_t GetLifetimeParamNo() { return fLifetimeParamNo; }
     virtual Bool_t IsLifetimeCorrected() { return fLifetimeCorrection; }
     virtual PIntVector* GetMap() { return &fMap; }
@@ -435,7 +435,6 @@ class PMsrRunBlock {
     virtual void SetBetaParamNo(Int_t ival) { fBetaParamNo = ival; }
     virtual void SetNormParamNo(Int_t ival) { fNormParamNo = ival; }
     virtual void SetBkgFitParamNo(Int_t ival) { fBkgFitParamNo = ival; }
-    virtual void SetPhaseParamNo(Int_t ival) { fPhaseParamNo = ival; }
     virtual void SetLifetimeParamNo(Int_t ival) { fLifetimeParamNo = ival; }
     virtual void SetLifetimeCorrection(Bool_t bval) { fLifetimeCorrection = bval; }
     virtual void SetMap(Int_t mapVal, Int_t idx=-1);
@@ -463,7 +462,6 @@ class PMsrRunBlock {
     Int_t fBetaParamNo;           ///< beta parameter number  (fit type 2, 4)
     Int_t fNormParamNo;           ///< N0 parameter number (fit type 0)
     Int_t fBkgFitParamNo;         ///< background fit parameter number (fit type 0)
-    Int_t fPhaseParamNo;          ///< ??? NEEDED ??? NEEDS TO BE CHECKED !!!
     Int_t fLifetimeParamNo;       ///< muon lifetime parameter number (fit type 0)
     Bool_t fLifetimeCorrection;   ///< lifetime correction flag for viewing (fit type 0)
     PIntVector fMap;              ///< map vector needed to switch parameters for different runs within a single theory
@@ -482,13 +480,13 @@ class PMsrRunBlock {
 
 //-------------------------------------------------------------
 /**
- * <p>  typedef to make to code more readable: list of runs with its parameters.
+ * <p>typedef to make to code more readable: list of runs with its parameters.
  */
 typedef vector<PMsrRunBlock> PMsrRunList;
 
 //-------------------------------------------------------------
 /**
- * <p> Holds the information of the Fourier block
+ * <p>Holds the information of the Fourier block
  */
 typedef struct {
   Bool_t fFourierBlockPresent; ///< flag indicating if a Fourier block is present in the msr-file
@@ -505,7 +503,7 @@ typedef struct {
 
 //-------------------------------------------------------------
 /**
- * <p> Holds the information of a single plot block
+ * <p>Holds the information of a single plot block
  */
 typedef struct {
   Int_t    fPlotType;     ///< plot type
@@ -526,13 +524,13 @@ typedef struct {
 
 //-------------------------------------------------------------
 /**
- * <p>  typedef to make to code more readable: list of plots.
+ * <p>typedef to make to code more readable: list of plots.
  */
 typedef vector<PMsrPlotStructure>  PMsrPlotList;
 
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>Holds the informations for the statistics block.
  */
 typedef struct {
   Bool_t fValid;     ///< flag showing if the statistics block is valid, i.e. a fit took place which converged

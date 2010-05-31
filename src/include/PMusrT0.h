@@ -54,13 +54,11 @@
 #define PMUSRT0_GET_DATA_AND_BKG_RANGE    1
 #define PMUSRT0_GET_T0_DATA_AND_BKG_RANGE 2
 
-/*
-#define PMUSRT0_NOADDRUN_NOGROUPING 0
-#define PMUSRT0_ADDRUN_NOGROUPING   1
-#define PMUSRT0_NOADDRUN_GROUPING   2
-#define PMUSRT0_ADDRUN_GROUPING     3
-*/
 
+//--------------------------------------------------------------------------
+/**
+ * <p>Handles the raw muSR run data sets.
+ */
 class PMusrT0Data {
   public:
     PMusrT0Data();
@@ -112,6 +110,7 @@ class PMusrT0Data {
 
 //--------------------------------------------------------------------------
 /**
+ * <p>Handles the musrt0 graphical user interface.
  * <p>The preprocessor tag __MAKECINT__ is used to hide away from rootcint
  * the overly complex spirit header files.
  */
@@ -138,39 +137,39 @@ class PMusrT0 : public TObject, public TQObject
 
   private:
 #ifndef __MAKECINT__
-    PMsrHandler *fMsrHandler;
+    PMsrHandler *fMsrHandler; ///< msr-file handler
 #endif // __MAKECINT__
 
-    Bool_t fValid;
+    Bool_t fValid; ///< true if raw data set are available, otherwise false
 
-    Int_t fStatus;
+    Int_t fStatus; ///< 0=quit locally, i.e. only a single musrt0 raw data canvas will terminate but not the application, 1=quit the application
 
-    PMusrT0Data fMusrT0Data;
+    PMusrT0Data fMusrT0Data; ///< raw muSR run data sets.
 
-    Bool_t fDataAndBkgEnabled;
-    Bool_t fT0Enabled;
-    Int_t  fT0Estimated;
+    Bool_t fDataAndBkgEnabled; ///< enable/disable data and background range handling (necessary in connection with grouping and addrun)
+    Bool_t fT0Enabled; ///< enable/disable t0 handling (necessary in connection with grouping and addrun)
+    Int_t  fT0Estimated; ///< estimated t0 value (in bins)
 
     // canvas related variables
-    TCanvas   *fMainCanvas;
+    TCanvas   *fMainCanvas; ///< main canvas for the graphical user interface
 
-    TH1F *fHisto;
-    TH1F *fData;
-    TH1F *fBkg;
+    TH1F *fHisto; ///< full raw data histogram
+    TH1F *fData;  ///< ranged raw data histogram (first good bin, last good bin)
+    TH1F *fBkg;   ///< histogram starting from 'bkg start' up to 'bkg end'
 
-    TLatex *fToDoInfo;
+    TLatex *fToDoInfo; ///< clear text user instruction string
 
-    TLine *fT0Line;
-    TLine *fFirstBkgLine;
-    TLine *fLastBkgLine;
-    TLine *fFirstDataLine;
-    TLine *fLastDataLine;
+    TLine *fT0Line; ///< line showing the position of t0
+    TLine *fFirstBkgLine; ///< line showing the start of the background
+    TLine *fLastBkgLine; ///< line showing the end of the background
+    TLine *fFirstDataLine; ///< line showing the start of the data (first good data bin)
+    TLine *fLastDataLine; ///< line showing the end of the data (last good data bin)
 
-    Int_t fPx;
-    Int_t fPy;
+    Int_t fPx; ///< x-position of the cursor
+    Int_t fPy; ///< y-position of the cursor
 
-    Int_t fDataRange[2];
-    Int_t fBkgRange[2];
+    Int_t fDataRange[2]; ///< data range (first good bin, last good bin)
+    Int_t fBkgRange[2]; ///< background range (first bkg bin, last bkg bin)
 
     void SetT0Channel();
     void SetEstimatedT0Channel();

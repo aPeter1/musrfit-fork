@@ -34,6 +34,10 @@
 
 #include "PRunBase.h"
 
+//---------------------------------------------------------------------------
+/**
+ * <p>Class handling the asymmetry fit.
+ */
 class PRunAsymmetry : public PRunBase
 {
   public:
@@ -45,7 +49,7 @@ class PRunAsymmetry : public PRunBase
     virtual Double_t CalcMaxLikelihood(const std::vector<Double_t>& par);
     virtual void CalcTheory();
 
-    virtual UInt_t GetNoOfFitBins() { return fNoOfFitBins; }
+    virtual UInt_t GetNoOfFitBins() { return fNoOfFitBins; } ///< returns the number of bins to be fitted.
 
   protected:
     virtual Bool_t PrepareData();
@@ -54,11 +58,11 @@ class PRunAsymmetry : public PRunBase
     virtual Bool_t PrepareRRFViewData(PRawRunData* runData, UInt_t histoNo[2]);
 
   private:
-    UInt_t fAlphaBetaTag; ///< 1-> alpha = beta = 1; 2-> alpha != 1, beta = 1; 3-> alpha = 1, beta != 1; 4-> alpha != 1, beta != 1
+    UInt_t fAlphaBetaTag; ///< \f$ 1 \to \alpha = \beta = 1\f$; \f$ 2 \to \alpha \neq 1, \beta = 1\f$; \f$ 3 \to \alpha = 1, \beta \neq 1\f$; \f$ 4 \to \alpha \neq 1, \beta \neq 1\f$.
 
-    Double_t fFitStartTime;
-    Double_t fFitStopTime;
-    UInt_t fNoOfFitBins;
+    Double_t fFitStartTime; ///< fit start time
+    Double_t fFitStopTime;  ///< fit stop time
+    UInt_t fNoOfFitBins;    ///< number of bins to be be fitted
 
     PDoubleVector fForward;     ///< forward histo data
     PDoubleVector fForwardErr;  ///< forward histo errors

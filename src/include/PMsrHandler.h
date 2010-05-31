@@ -42,7 +42,7 @@
 
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>This class provides the routines needed to handle msr-files, i.e. reading, writing, parsing, etc.
  */
 class PMsrHandler
 {

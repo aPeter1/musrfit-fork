@@ -47,7 +47,7 @@ using namespace std;
 // Constructor
 //--------------------------------------------------------------------------
 /**
- *
+ * <p>Constructor.
  */
 PMusrT0Data::PMusrT0Data()
 {
@@ -58,7 +58,7 @@ PMusrT0Data::PMusrT0Data()
 // Destructor
 //--------------------------------------------------------------------------
 /**
- *
+ * <p>Destructor.
  */
 PMusrT0Data::~PMusrT0Data()
 {
@@ -74,7 +74,7 @@ PMusrT0Data::~PMusrT0Data()
 // InitData
 //--------------------------------------------------------------------------
 /**
- *
+ * <p>Initialize the necessary variables.
  */
 void PMusrT0Data::InitData()
 {
@@ -96,7 +96,13 @@ void PMusrT0Data::InitData()
 // GetRawRunData
 //--------------------------------------------------------------------------
 /**
+ * <p>Returns the raw run data set with index idx.
  *
+ * <b>return:</b>
+ * - raw run data set
+ * - 0 pointer, if idx is out of range
+ *
+ * \param idx index of the raw run data
  */
 PRawRunData* PMusrT0Data::GetRawRunData(Int_t idx)
 {
@@ -110,7 +116,13 @@ PRawRunData* PMusrT0Data::GetRawRunData(Int_t idx)
 // GetHistoNo
 //--------------------------------------------------------------------------
 /**
+ * <p>Get histogram number of a run.
  *
+ * <b>return:</b>
+ * - histogram number
+ * - -1 if index is out of range
+ *
+ * \param idx index of the run (msr-file).
  */
 Int_t PMusrT0Data::GetHistoNo(UInt_t idx)
 {
@@ -124,7 +136,13 @@ Int_t PMusrT0Data::GetHistoNo(UInt_t idx)
 // GetT0
 //--------------------------------------------------------------------------
 /**
+ * <p>Get t0 (in bin) of a run.
  *
+ * <b>return:</b>
+ * - t0 bin
+ * - -1 if index is out of range
+ *
+ * \param idx index of the run (msr-file).
  */
 Int_t PMusrT0Data::GetT0(UInt_t idx)
 {
@@ -138,7 +156,13 @@ Int_t PMusrT0Data::GetT0(UInt_t idx)
 // GetAddT0Size
 //--------------------------------------------------------------------------
 /**
+ * <p>Get addt0 size of a run, i.e. the number of addt0's for a given msr-file run.
  *
+ * <b>return:</b>
+ * - number of addt0's
+ * - -1 if index is out of range
+ *
+ * \param idx index of the run (msr-file).
  */
 UInt_t PMusrT0Data::GetAddT0Size(UInt_t idx)
 {
@@ -152,7 +176,14 @@ UInt_t PMusrT0Data::GetAddT0Size(UInt_t idx)
 // GetAddT0
 //--------------------------------------------------------------------------
 /**
+ * <p>Get addt0 (in bin) of a run.
  *
+ * <b>return:</b>
+ * - addt0 bin
+ * - -1 if index is out of range
+ *
+ * \param addRunIdx index of the addrun
+ * \param idx index of the run (msr-file).
  */
 Int_t PMusrT0Data::GetAddT0(UInt_t addRunIdx, UInt_t idx)
 {
@@ -169,13 +200,13 @@ Int_t PMusrT0Data::GetAddT0(UInt_t addRunIdx, UInt_t idx)
 // SetT0
 //--------------------------------------------------------------------------
 /**
+ * <p>Set t0 value.
  *
+ * \param val t0 value to be set
+ * \param idx index at which t0 shall be set.
  */
 void PMusrT0Data::SetT0(UInt_t val, UInt_t idx)
 {
-//cout << endl << "debug+> SetT0: size=" << fT0.size();
-//cout << endl << "debug+> SetT0: val=" << val << ", idx=" << idx << endl;
-
   if (idx >= fT0.size())
     fT0.resize(idx+1);
 
@@ -186,13 +217,14 @@ void PMusrT0Data::SetT0(UInt_t val, UInt_t idx)
 // SetAddT0
 //--------------------------------------------------------------------------
 /**
+ * <p>Set addt0 value.
  *
+ * \param val t0 value to be set
+ * \param addRunIdx addt0 index (for each addrun, there has to be an addt0)
+ * \param idx index at which t0 shall be set.
  */
 void PMusrT0Data::SetAddT0(UInt_t val, UInt_t addRunIdx, UInt_t idx)
 {
-//cout << endl << "debug+> SetAddT0: size=" << fAddT0.size();
-//cout << endl << "debug+> SetAddT0: val=" << val << ", addRunIdx=" << addRunIdx << ", idx=" << idx << endl;
-
   if (addRunIdx >= fAddT0.size())
     fAddT0.resize(addRunIdx+1);
 
@@ -210,7 +242,7 @@ ClassImpQ(PMusrT0)
 // Constructor
 //--------------------------------------------------------------------------
 /**
- *
+ * <p>Constructor.
  */
 PMusrT0::PMusrT0()
 {
@@ -245,9 +277,9 @@ PMusrT0::PMusrT0()
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor
  *
- * \param data
+ * \param data raw run data set
  */
 PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
 {
@@ -316,19 +348,6 @@ PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
       }
     }
   } else {
-/*
-cout << endl << "debug> all t0's:" << endl;
-for (UInt_t i=0; i<fMusrT0Data.GetT0Size(); i++) {
-cout << fMusrT0Data.GetT0(i) << ",";
-}
-cout << endl << "debug> all addt0's:" << endl;
-for (UInt_t j=0; j<fMusrT0Data.GetAddT0Entries(); j++) {
-  cout << "debug> j=" << j << endl;
-  for (UInt_t i=0; i<fMusrT0Data.GetAddT0Size(j); i++)
-    cout << fMusrT0Data.GetAddT0(j,i) << ",";
-}
-cout << endl;
-*/
     str = *fMusrT0Data.GetRawRunData(0)->GetRunName() + TString(" : ");
     if (fMusrT0Data.GetDetectorTag() == PMUSRT0_FORWARD)
       str += " forward grouped and runs added";
@@ -533,7 +552,7 @@ cout << endl;
 // Destructor
 //--------------------------------------------------------------------------
 /**
- *
+ * <p>Destructor.
  */
 PMusrT0::~PMusrT0()
 {
@@ -583,8 +602,7 @@ PMusrT0::~PMusrT0()
 // Done (SIGNAL)
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Signal emitted if the user wants to terminate the application.
  */
 void PMusrT0::Done(Int_t status)
 {
@@ -595,8 +613,23 @@ void PMusrT0::Done(Int_t status)
 // HandleCmdKey (SLOT)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Filters keyboard and mouse events, and if they are a command key (see below) carries out the
+ * necessary actions.
+ * <p>Currently implemented command keys:
+ * - 'q' close the currently shown canvas
+ * - 'Q' quite the application
+ * - 'z' zoom to the region aroung t0
+ * - 'T' set t0 channel to the estimated t0
+ * - 't' set t0 channel to the current cursor position
+ * - 'b' set first background channel
+ * - 'B' set last background channel
+ * - 'd' set first good bin channel
+ * - 'D' set last good bin channel
  *
+ * \param event event type
+ * \param x keyboard event: character key; mouse event: x-position
+ * \param mouse event: y-position
+ * \param selected not used
  */
 void PMusrT0::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
 {
@@ -636,8 +669,9 @@ void PMusrT0::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
 // SetMsrHandler
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Set the msr-file handler
  *
+ * \param msrHandler msr-file handler pointer
  */
 void PMusrT0::SetMsrHandler(PMsrHandler *msrHandler)
 {
@@ -648,8 +682,7 @@ void PMusrT0::SetMsrHandler(PMsrHandler *msrHandler)
 // InitT0
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Initialize t0 data.
  */
 void PMusrT0::InitT0()
 {
@@ -679,8 +712,6 @@ void PMusrT0::InitT0()
   }
   Double_t max = fHisto->GetMaximum();
 
-//cout << "debug-> histoIdx=" << histoIdx << ", addRunIdx=" << addRunIdx << ", t0Bin=" << t0Bin << endl;
-
   fT0Line = new TLine((Double_t)t0Bin, 0.0, (Double_t)t0Bin, max);
   fT0Line->SetLineStyle(1); // solid
   fT0Line->SetLineColor(TColor::GetColor(0,255,0)); // green
@@ -692,8 +723,7 @@ void PMusrT0::InitT0()
 // InitDataAndBkg
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Initialize data and background ranges.
  */
 void PMusrT0::InitDataAndBkg()
 {
@@ -789,8 +819,7 @@ void PMusrT0::InitDataAndBkg()
 // SetT0Channel
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Set the t0 channel to the current cursor position and keep the x-position as new t0 bin.
  */
 void PMusrT0::SetT0Channel()
 {
@@ -817,8 +846,6 @@ void PMusrT0::SetT0Channel()
       idx += 1;
   }
 
-//cout << endl << "debug> SetT0Channel: t0-idx=" << idx << ", t0-value=" << binx;
-
   if (fMusrT0Data.GetAddRunIdx() == 0)
     fMsrHandler->SetMsrT0Entry(fMusrT0Data.GetRunNo(), idx, binx);
   else if (fMusrT0Data.GetAddRunIdx() > 0)
@@ -836,8 +863,7 @@ void PMusrT0::SetT0Channel()
 // SetEstimatedT0Channel
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Set the estimated t0 channel to the current cursor position and keep the x-position as new t0 bin.
  */
 void PMusrT0::SetEstimatedT0Channel()
 {
@@ -877,8 +903,7 @@ void PMusrT0::SetEstimatedT0Channel()
 // SetDataFirstChannel
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Set the first good data channel to the current cursor position and keep the x-position as new first good data bin.
  */
 void PMusrT0::SetDataFirstChannel()
 {
@@ -891,7 +916,7 @@ void PMusrT0::SetDataFirstChannel()
   // get binx to set the data first channel corresponding to fPx
   fDataRange[0] = fHisto->GetXaxis()->FindFixBin(x) - 1;
 
-cout << endl << ">> PMusrT0::SetDataFirstChannel(): fDataRange[0] = " << fDataRange[0] << endl;
+  cout << endl << ">> PMusrT0::SetDataFirstChannel(): fDataRange[0] = " << fDataRange[0] << endl;
 
   // set the data first bin in msr-Handler
   UInt_t idx = 0;
@@ -928,8 +953,7 @@ cout << endl << ">> PMusrT0::SetDataFirstChannel(): fDataRange[0] = " << fDataRa
 // SetDataLastChannel
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Set the last good data channel to the current cursor position and keep the x-position as new last good data bin.
  */
 void PMusrT0::SetDataLastChannel()
 {
@@ -942,7 +966,7 @@ void PMusrT0::SetDataLastChannel()
   // get binx to set the data last channel corresponding to fPx
   fDataRange[1] = fHisto->GetXaxis()->FindFixBin(x) - 1;
 
-cout << endl << ">> PMusrT0::SetDataLastChannel(): fDataRange[1] = " << fDataRange[1] << endl;
+  cout << endl << ">> PMusrT0::SetDataLastChannel(): fDataRange[1] = " << fDataRange[1] << endl;
 
   // set the data first bin in msr-Handler
   UInt_t idx = 1;
@@ -979,8 +1003,7 @@ cout << endl << ">> PMusrT0::SetDataLastChannel(): fDataRange[1] = " << fDataRan
 // SetBkgFirstChannel
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Set the first background channel to the current cursor position and keep the x-position as new first background bin.
  */
 void PMusrT0::SetBkgFirstChannel()
 {
@@ -993,7 +1016,7 @@ void PMusrT0::SetBkgFirstChannel()
   // get binx to set the background first channel corresponding to fPx
   fBkgRange[0] = fHisto->GetXaxis()->FindFixBin(x) - 1;
 
-cout << endl << ">> PMusrT0::SetBkgFirstChannel(): fBkgRange[0] = " << fBkgRange[0] << endl;
+  cout << endl << ">> PMusrT0::SetBkgFirstChannel(): fBkgRange[0] = " << fBkgRange[0] << endl;
 
   // set the background first bin in msr-Handler
   UInt_t idx = 0;
@@ -1030,8 +1053,7 @@ cout << endl << ">> PMusrT0::SetBkgFirstChannel(): fBkgRange[0] = " << fBkgRange
 // SetBkgLastChannel
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Set the last background channel to the current cursor position and keep the x-position as new last background bin.
  */
 void PMusrT0::SetBkgLastChannel()
 {
@@ -1044,7 +1066,7 @@ void PMusrT0::SetBkgLastChannel()
   // get binx to set the background last channel corresponding to fPx
   fBkgRange[1] = fHisto->GetXaxis()->FindFixBin(x) - 1;
 
-cout << endl << ">> PMusrT0::SetBkgLastChannel(): fBkgRange[1] = " << fBkgRange[1] << endl;
+  cout << endl << ">> PMusrT0::SetBkgLastChannel(): fBkgRange[1] = " << fBkgRange[1] << endl;
 
   // set the background first bin in msr-Handler
   UInt_t idx = 1;
@@ -1081,8 +1103,7 @@ cout << endl << ">> PMusrT0::SetBkgLastChannel(): fBkgRange[1] = " << fBkgRange[
 // UnZoom
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Unzoom the current histogram
  */
 void PMusrT0::UnZoom()
 {
@@ -1096,8 +1117,7 @@ void PMusrT0::UnZoom()
 // ZoomT0
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Zoom into the histogram region of the t0, and/or estimated t0 range.
  */
 void PMusrT0::ZoomT0()
 {
@@ -1125,8 +1145,6 @@ void PMusrT0::ZoomT0()
   if (fT0Estimated > max) {
     max = fT0Estimated + range;
   }
-
-//  cout << endl << "debug> ZoomT0: min=" << min << ", max=" << max << endl;
 
   fHisto->GetXaxis()->SetRangeUser(min, max);
 

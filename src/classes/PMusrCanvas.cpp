@@ -47,7 +47,7 @@ ClassImpQ(PMusrCanvas)
 // Constructor
 //--------------------------------------------------------------------------
 /**
- *
+ * <p>Constructor
  */
 PMusrCanvas::PMusrCanvas()
 {
@@ -90,7 +90,16 @@ PMusrCanvas::PMusrCanvas()
 // Constructor
 //--------------------------------------------------------------------------
 /**
+ * <p>Constructor.
  *
+ * \param number The plot number of the msr-file PLOT block
+ * \param title Title to be displayed
+ * \param wtopx top x coordinate (in pixels) to place the canvas.
+ * \param wtopy top y coordinate (in pixels) to place the canvas.
+ * \param ww width (in pixels) of the canvas.
+ * \param wh height (in pixels) of the canvas.
+ * \param batch flag: if set true, the canvas will not be displayed. This is used when just dumping of a
+ *               graphical output file is wished.
  */
 PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
@@ -117,7 +126,19 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
 // Constructor
 //--------------------------------------------------------------------------
 /**
+ * <p>Constructor.
  *
+ * \param number The plot number of the msr-file PLOT block
+ * \param title Title to be displayed
+ * \param wtopx top x coordinate (in pixels) to place the canvas.
+ * \param wtopy top y coordinate (in pixels) to place the canvas.
+ * \param ww width (in pixels) of the canvas.
+ * \param wh height (in pixels) of the canvas.
+ * \param fourierDefault structure holding the pre-defined settings for a Fourier transform
+ * \param markerList pre-defined list of markers
+ * \param colorList pre-defined list of colors
+ * \param batch flag: if set true, the canvas will not be displayed. This is used when just dumping of a
+ *               graphical output file is wished.
  */
 PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
@@ -147,11 +168,10 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
 // Destructor
 //--------------------------------------------------------------------------
 /**
- *
+ * <p>Destructor.
  */
 PMusrCanvas::~PMusrCanvas()
 {
-//cout << "~PMusrCanvas() called. fMainCanvas name=" << fMainCanvas->GetName() << endl;
   // cleanup
   if (fCurrentFourierPhaseText) {
     delete fCurrentFourierPhaseText;
@@ -231,6 +251,8 @@ PMusrCanvas::~PMusrCanvas()
 //--------------------------------------------------------------------------
 /**
  * <p>Keep the msr-handler object pointer and fill the Fourier structure if present.
+ *
+ * \param msrHandler pointer of the msr-file handler.
  */
 void PMusrCanvas::SetMsrHandler(PMsrHandler *msrHandler)
 {
@@ -305,7 +327,7 @@ void PMusrCanvas::SetMsrHandler(PMsrHandler *msrHandler)
 // UpdateParamTheoryPad (public)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Feeds the pad with the fit parameter informations, and refreshes the pad.
  */
 void PMusrCanvas::UpdateParamTheoryPad()
 {
@@ -423,7 +445,7 @@ void PMusrCanvas::UpdateParamTheoryPad()
 // UpdateDataTheoryPad (public)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Feeds the pad with data/theory histograms (error graphs) and refreshes it.
  */
 void PMusrCanvas::UpdateDataTheoryPad()
 {
@@ -443,8 +465,6 @@ void PMusrCanvas::UpdateDataTheoryPad()
     }
     // check that the plottype and the fittype do correspond
     runNo = (UInt_t)plotInfo.fRuns[i]-1;
-//cout << endl << ">> runNo = " << runNo;
-//cout << endl;
     if (fPlotType != runs[runNo].GetFitType()) {
       fValid = false;
       cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** plottype = " << fPlotType << ", fittype = " << runs[runNo].GetFitType() << ", however they have to correspond!";
@@ -536,7 +556,7 @@ void PMusrCanvas::UpdateDataTheoryPad()
 // UpdateInfoPad (public)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Feeds the pad with the statistics block information and the legend and refreshes it.
  */
 void PMusrCanvas::UpdateInfoPad()
 {
@@ -641,7 +661,6 @@ void PMusrCanvas::UpdateInfoPad()
     // energy if present
     tstr += TString("E=");
     dval = fRunList->GetEnergy(*runs[runNo].GetRunName());
-//cout << endl << ">> dval = " << dval << " (Engery)";
     if (dval == PMUSR_UNDEFINED) {
       tstr += TString("??,");
     } else {
@@ -663,8 +682,9 @@ void PMusrCanvas::UpdateInfoPad()
 // Done (SIGNAL)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Signal emitted that the user wants to terminate the application.
  *
+ * \param status Status info
  */
 void PMusrCanvas::Done(Int_t status)
 {
@@ -675,8 +695,20 @@ void PMusrCanvas::Done(Int_t status)
 // HandleCmdKey (SLOT)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Filters keyboard events, and if they are a command key (see below) carries out the
+ * necessary actions.
+ * <p>Currently implemented command keys:
+ * - 'q' quit musrview
+ * - 'd' toggle between difference view and data view
+ * - 'u' unzoom to the original plot range given in the msr-file.
+ * - 'f' Fourier transform data.
+ * - '+' increment the phase (real/imaginary Fourier). The phase step is defined in the musrfit_startup.xml
+ * - '-' decrement the phase (real/imaginary Fourier). The phase step is defined in the musrfit_startup.xml
  *
+ * \param event event type
+ * \param x character key
+ * \param y not used
+ * \param selected not used
  */
 void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
 {
@@ -685,13 +717,6 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
 
   if (fBatchMode)
     return;
-
-//   cout << ">this          " << this << endl;
-//   cout << ">fMainCanvas   " << fMainCanvas << endl;
-//   cout << ">selected      " << selected << endl;
-//
-//cout << "x : "  << (Char_t)x << endl;
-//cout << "px: "  << (Char_t)fMainCanvas->GetEventX() << endl;
 
   // handle keys and popup menu entries
   enum eKeySwitch {kNotRelevant, kData, kDiffData, kFourier, kDiffFourier, kFourierDiff};
@@ -827,8 +852,9 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
 // HandleMenuPopup (SLOT)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Handles the Musrfit menu.
  *
+ * \param id identification key of the selected menu
  */
 void PMusrCanvas::HandleMenuPopup(Int_t id)
 {
@@ -1027,8 +1053,8 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
 // LastCanvasClosed (SLOT)
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Slot called when the last canvas has been closed. Will emit Done(0) which will
+ * terminate the application.
  */
 void PMusrCanvas::LastCanvasClosed()
 {
@@ -1042,8 +1068,9 @@ void PMusrCanvas::LastCanvasClosed()
 // SaveGraphicsAndQuit
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Will save the canvas as graphics output. Needed in the batch mode of musrview.
  *
+ * \param fileName file name under which the canvas shall be saved.
  * \param graphicsFormat One of the supported graphics formats.
  */
 void PMusrCanvas::SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat)
@@ -1125,13 +1152,14 @@ void PMusrCanvas::InitFourier()
 // InitMusrCanvas (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Initialize the class, and sets up the necessary objects.
  *
- * \param title
- * \param wtopx
- * \param wtopy
- * \param ww
- * \param wh
+ * \param number The plot number of the msr-file PLOT block
+ * \param title Title to be displayed
+ * \param wtopx top x coordinate (in pixels) to place the canvas.
+ * \param wtopy top y coordinate (in pixels) to place the canvas.
+ * \param ww width (in pixels) of the canvas.
+ * \param wh height (in pixels) of the canvas.
  */
 void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh)
 {
@@ -1264,23 +1292,15 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
 
   fMainCanvas->Connect("ProcessedEvent(Int_t,Int_t,Int_t,TObject*)", "PMusrCanvas", 
                        this, "HandleCmdKey(Int_t,Int_t,Int_t,TObject*)");
-
-// cout << "this                 " << this << endl;
-// cout << "fMainCanvas          " << fMainCanvas << endl;
-// cout << "fTitlePad            " << fTitlePad << endl;
-// cout << "fDataTheoryPad       " << fDataTheoryPad << endl;
-// cout << "fParameterPad        " << fParameterPad << endl;
-// cout << "fTheoryPad           " << fTheoryPad << endl;
-// cout << "fInfoPad             " << fInfoPad << endl;
 }
 
 //--------------------------------------------------------------------------
 // InitDataSet (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Initializes the data set (histogram representation).
  *
- * \param dataSet
+ * \param dataSet data set to be initialized
  */
 void PMusrCanvas::InitDataSet(PMusrCanvasDataSet &dataSet)
 {
@@ -1305,9 +1325,9 @@ void PMusrCanvas::InitDataSet(PMusrCanvasDataSet &dataSet)
 // InitDataSet (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Initializes the data set (error graph representation).
  *
- * \param dataSet
+ * \param dataSet data set to be initialized
  */
 void PMusrCanvas::InitDataSet(PMusrCanvasNonMusrDataSet &dataSet)
 {
@@ -1332,9 +1352,9 @@ void PMusrCanvas::InitDataSet(PMusrCanvasNonMusrDataSet &dataSet)
 // CleanupDataSet (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Cleans up a data set (histogram representation).
  *
- * \param dataSet
+ * \param dataSet data set to be cleaned up.
  */
 void PMusrCanvas::CleanupDataSet(PMusrCanvasDataSet &dataSet)
 {
@@ -1404,9 +1424,9 @@ void PMusrCanvas::CleanupDataSet(PMusrCanvasDataSet &dataSet)
 // CleanupDataSet (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Cleans up a data set (error graph representation).
  *
- * \param dataSet
+ * \param dataSet data set to be cleaned up.
  */
 void PMusrCanvas::CleanupDataSet(PMusrCanvasNonMusrDataSet &dataSet)
 {
@@ -1476,15 +1496,14 @@ void PMusrCanvas::CleanupDataSet(PMusrCanvasNonMusrDataSet &dataSet)
 // HandleDataSet (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Generates the necessary histograms for plotting, starting from the pre-processed data.
  *
- * \param plotNo is the number of the histo within the run list (fPlotNumber is the number of the plot BLOCK)
- * \param runNo is the number of the run
- * \param data
+ * \param plotNo The number of the histo within the run list (fPlotNumber is the number of the plot BLOCK)
+ * \param runNo The number of the run
+ * \param data pre-processed data
  */
 void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
 {
-//cout << endl << ">> PMusrCanvas::HandleDataSet(): start ...; plotNo = " << plotNo << ", fPlotNumber = " << fPlotNumber << ", runNo = " << runNo << endl;
   PMusrCanvasDataSet dataSet;
   TH1F *dataHisto;
   TH1F *theoHisto;
@@ -1495,7 +1514,6 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
   Int_t    size;
 
   InitDataSet(dataSet);
-//cout << endl << ">> PMusrCanvas::HandleDataSet(): after InitDataSet ..." << endl;
 
   // dataHisto -------------------------------------------------------------
   // create histo specific infos
@@ -1506,8 +1524,6 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
   start = data->GetDataTimeStart() - data->GetDataTimeStep()/2.0;
   end   = start + data->GetValue()->size()*data->GetDataTimeStep();
   size  = data->GetValue()->size();
-
-//cout << endl << ">> PMusrCanvas::HandleDataSet(): data->GetDataTimeStart = " << data->GetDataTimeStart << ", data->GetDataTimeStep() = " << data->GetDataTimeStep() << endl;
 
   // check if 'use_fit_range' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
@@ -1531,8 +1547,6 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     end   = start + size * data->GetDataTimeStep(); // closesd end value compatible with the user given
   }
 
-//cout << endl << ">> PMusrCanvas::HandleDataSet(): start = " << start << ", end = " << end << ", size = " << size << ", data->GetDataTimeStep() = " << data->GetDataTimeStep() << endl;
-
   // invoke histo
   dataHisto = new TH1F(name, name, size, start, end);
 
@@ -1552,7 +1566,6 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     startBin = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->GetDataTimeStart())/data->GetDataTimeStep());
     endBin   = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] - data->GetDataTimeStart())/data->GetDataTimeStep());
   }
-//cout << endl << ">> PMusrCanvas::HandleDataSet(): data: startBin = " << startBin << ", endBin = " << endBin << endl;
 
   for (UInt_t i=startBin; i<endBin; i++) {
     dataHisto->SetBinContent(i-startBin+1, data->GetValue()->at(i));
@@ -1611,8 +1624,6 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     end   = start + size * data->GetTheoryTimeStep(); // closesd end value compatible with the user given
 }
 
-//cout << endl << ">> PMusrCanvas::HandleDataSet(): start = " << start << ", end = " << end << ", size = " << size << ", data->GetTheoryTimeStep() = " << data->GetTheoryTimeStep() << endl;
-
   // invoke histo
   theoHisto = new TH1F(name, name, size, start, end);
 
@@ -1625,7 +1636,6 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     startBin = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(0) - data->GetDataTimeStart())/data->GetTheoryTimeStep());
     endBin   = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(1) - data->GetDataTimeStart())/data->GetTheoryTimeStep());
   }
-//cout << endl << ">> PMusrCanvas::HandleDataSet(): theory: startBin = " << startBin << ", endBin = " << endBin << endl;
 
   // check if 'sub_ranges' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) {
@@ -1636,8 +1646,6 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
   for (UInt_t i=startBin; i<endBin; i++) {
     theoHisto->SetBinContent(i-startBin+1, data->GetTheory()->at(i));
   }
-
-//cout << endl << ">> PMusrCanvas::HandleDataSet(): after fill theory histo" << endl;
 
   // set the line color
   if (plotNo < fColorList.size()) {
@@ -1653,19 +1661,17 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
   dataSet.theory = theoHisto;
 
   fData.push_back(dataSet);
-
-//cout << endl << ">> PMusrCanvas::HandleDataSet(): after data push_back";
-//cout << endl << ">> --------------------------------------- <<" << endl;
 }
 
 //--------------------------------------------------------------------------
 // HandleNonMusrDataSet (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Generates the necessary error graphs for plotting, starting from the pre-processed data.
  *
- * \param runNo
- * \param data
+ * \param plotNo The number of the histo within the run list (fPlotNumber is the number of the plot BLOCK)
+ * \param runNo The number of the run
+ * \param data pre-processed data
  */
 void PMusrCanvas::HandleNonMusrDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
 {
@@ -1737,21 +1743,20 @@ void PMusrCanvas::HandleNonMusrDataSet(UInt_t plotNo, UInt_t runNo, PRunData *da
 // HandleDifference (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Handles the calculation of the difference spectra (i.e. data-theory).
+ * It allocates the necessary objects if they are not already present. At the
+ * end it calls the plotting routine.
  */
 void PMusrCanvas::HandleDifference()
 {
   // check if it is necessary to calculate diff data
   if ((fPlotType != MSR_PLOT_NON_MUSR) && (fData[0].diff == 0)) {
-//cout << endl << ">> calculate diff ..." << endl;
     TH1F *diffHisto;
     TString name;
     // loop over all histos
     for (UInt_t i=0; i<fData.size(); i++) {
       // create difference histos
       name = TString(fData[i].data->GetTitle()) + "_diff";
-//cout << endl << ">> diff-name = " << name.Data() << endl;
       diffHisto = new TH1F(name, name, fData[i].data->GetNbinsX(),
                            fData[i].data->GetXaxis()->GetXmin(),
                            fData[i].data->GetXaxis()->GetXmax());
@@ -1789,7 +1794,6 @@ void PMusrCanvas::HandleDifference()
 
       // create difference histos
       name = TString(fNonMusrData[i].data->GetTitle()) + "_diff";
-//cout << endl << ">> diff-name = " << name.Data() << endl;
       diffHisto->SetNameTitle(name.Data(), name.Data());
 
       // set marker and line color
@@ -1841,15 +1845,15 @@ void PMusrCanvas::HandleDifference()
 // HandleFourier (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Handles the calculation of the Fourier transform.
+ * It allocates the necessary objects if they are not already present. At the
+ * end it calls the plotting routine.
  */
 void PMusrCanvas::HandleFourier()
 {
   // check if plot type is appropriate for fourier
   if (fPlotType == MSR_PLOT_NON_MUSR)
     return;
-
-//cout << endl << ">> in HandleFourier ..." << endl;
 
   // check if fourier needs to be calculated
   if (fData[0].dataFourierRe == 0) {
@@ -1868,23 +1872,14 @@ void PMusrCanvas::HandleFourier()
       fourierData.Transform(fFourier.fApodization);
       double scale;
       scale = sqrt(fData[0].data->GetBinWidth(1)/(endTime-startTime));
-//cout << endl << ">> data scale = " << scale;
       // get real part of the data
       fData[i].dataFourierRe = fourierData.GetRealFourier(scale);
-//cout << endl << ">> i: " << i << ", fData[i].dataFourierRe = " << fData[i].dataFourierRe;
       // get imaginary part of the data
       fData[i].dataFourierIm = fourierData.GetImaginaryFourier(scale);
       // get power part of the data
       fData[i].dataFourierPwr = fourierData.GetPowerFourier(scale);
       // get phase part of the data
       fData[i].dataFourierPhase = fourierData.GetPhaseFourier();
-/*
-cout << endl << ">> Fourier: i=" << i;
-for (unsigned j=0; j<10; j++) {
-  cout << endl << ">> Fourier: " << j << ", data = " << fData[i].data->GetBinContent(j) << ", fourier.power = " << fData[i].dataFourierPwr->GetBinContent(j);
-}
-cout << endl;
-*/
 
       // set marker and line color
       fData[i].dataFourierRe->SetMarkerColor(fData[i].data->GetMarkerColor());
@@ -1909,7 +1904,6 @@ cout << endl;
 
       // calculate fourier transform of the theory
       Int_t powerPad = (Int_t)round(log((endTime-startTime)/fData[i].theory->GetBinWidth(1))/log(2))+3;
-//cout << endl << ">> powerPad = " << powerPad;
       PFourier fourierTheory(fData[i].theory, fFourier.fUnits, startTime, endTime, powerPad);
       if (!fourierTheory.IsValid()) {
         cerr << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier theory ..." << endl;
@@ -1917,10 +1911,8 @@ cout << endl;
       }
       fourierTheory.Transform(fFourier.fApodization);
       scale = sqrt(fData[0].theory->GetBinWidth(1)/(endTime-startTime)*fData[0].theory->GetBinWidth(1)/fData[0].data->GetBinWidth(1));
-//cout << endl << ">> theory scale = " << scale << ", data.res/theory.res = " << fData[0].theory->GetBinWidth(1)/fData[0].data->GetBinWidth(1);
       // get real part of the data
       fData[i].theoryFourierRe = fourierTheory.GetRealFourier(scale);
-//cout << endl << ">> i: " << i << ", fData[i].dataFourierRe = " << fData[i].dataFourierRe;
       // get imaginary part of the data
       fData[i].theoryFourierIm = fourierTheory.GetImaginaryFourier(scale);
       // get power part of the data
@@ -1936,9 +1928,7 @@ cout << endl;
     }
 
     // apply global phase if present
-//cout << endl << ">> fFourier.fPhase = " << fFourier.fPhase << endl;
     if (fFourier.fPhase != 0.0) {
-//cout << endl << ">> apply global phase fFourier.fPhase = " << fFourier.fPhase;
       double re, im;
       const double cp = TMath::Cos(fFourier.fPhase/180.0*TMath::Pi());
       const double sp = TMath::Sin(fFourier.fPhase/180.0*TMath::Pi());
@@ -2011,7 +2001,9 @@ cout << endl;
 // HandleDifferenceFourier (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Handles the calculation of the Fourier transform of the difference spectra (i.e. data-theory).
+ * It allocates the necessary objects if they are not already present. At the
+ * end it calls the plotting routine.
  */
 void PMusrCanvas::HandleDifferenceFourier()
 {
@@ -2019,10 +2011,8 @@ void PMusrCanvas::HandleDifferenceFourier()
   if (fPlotType == MSR_PLOT_NON_MUSR)
     return;
 
-//cout << endl << ">> in HandleDifferenceFourier ..." << endl;
   // check if fourier needs to be calculated
   if (fData[0].diffFourierRe == 0) {
-//cout << endl << ">> will calculate Fourier diff ..." << endl;
     // check if difference has been already calcualted, if not do it
     if (fData[0].diff == 0)
       HandleDifference();
@@ -2031,7 +2021,6 @@ void PMusrCanvas::HandleDifferenceFourier()
     double startTime = fData[0].diff->GetBinCenter(bin);
     bin = fData[0].diff->GetXaxis()->GetLast();
     double endTime   = fData[0].diff->GetBinCenter(bin);
-//cout << endl << ">> startTime = " << startTime << ", endTime = " << endTime << endl;
     for (UInt_t i=0; i<fData.size(); i++) {
       // calculate fourier transform of the data
       PFourier fourierData(fData[i].diff, fFourier.fUnits, startTime, endTime, fFourier.fFourierPower);
@@ -2042,10 +2031,8 @@ void PMusrCanvas::HandleDifferenceFourier()
       fourierData.Transform(fFourier.fApodization);
       double scale;
       scale = sqrt(fData[0].diff->GetBinWidth(1)/(endTime-startTime));
-//cout << endl << ">> data scale = " << scale;
       // get real part of the data
       fData[i].diffFourierRe = fourierData.GetRealFourier(scale);
-//cout << endl << ">> i: " << i << ", fData[i].diffFourierRe = " << fData[i].diffFourierRe;
       // get imaginary part of the data
       fData[i].diffFourierIm = fourierData.GetImaginaryFourier(scale);
       // get power part of the data
@@ -2105,7 +2092,9 @@ void PMusrCanvas::HandleDifferenceFourier()
 // HandleFourierDifference (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Handles the calculation of the difference of the Fourier spectra.
+ * It allocates the necessary objects if they are not already present. At the
+ * end it calls the plotting routine.
  */
 void PMusrCanvas::HandleFourierDifference()
 {
@@ -2200,8 +2189,6 @@ void PMusrCanvas::HandleFourierDifference()
  */
 double PMusrCanvas::FindOptimalFourierPhase()
 {
-//cout << endl << ">> in FindOptimalFourierPhase ... ";
-
   // check that Fourier is really present
   if ((fData[0].dataFourierRe == 0) || (fData[0].dataFourierIm == 0))
     return 0.0;
@@ -2256,12 +2243,10 @@ double PMusrCanvas::FindOptimalFourierPhase()
       }
     }
     if (fabs(asymmetry) > fabs((maxIm+minIm)*(val_xMin-val_xMax))) {
-//cout << endl << ">> phase = " << phase << ", asymmetry = " << asymmetry << ", min/max = " << minIm << "/" << maxIm;
       minPhase = phase;
       asymmetry = (maxIm+minIm)*(val_xMin-val_xMax);
     }
   }
-cout << endl << ">> optimal phase = " << minPhase << endl;
 
   return minPhase;
 }
@@ -2270,8 +2255,7 @@ cout << endl << ">> optimal phase = " << minPhase << endl;
 // CleanupDifference (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Cleans up (deallocate) difference data.
  */
 void PMusrCanvas::CleanupDifference()
 {
@@ -2287,8 +2271,7 @@ void PMusrCanvas::CleanupDifference()
 // CleanupFourier (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Cleans up (deallocate) Fourier transform data.
  */
 void PMusrCanvas::CleanupFourier()
 {
@@ -2332,8 +2315,7 @@ void PMusrCanvas::CleanupFourier()
 // CleanupFourierDifference (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Cleans up (deallocate) Fourier difference spectra.
  */
 void PMusrCanvas::CleanupFourierDifference()
 {
@@ -2361,7 +2343,10 @@ void PMusrCanvas::CleanupFourierDifference()
 // CalculateDiff (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Calculates the difference between data and theory for histograms.
+ *
+ * <b>return:</b>
+ * - (data - theory) value
  *
  * \param x x-value of the data
  * \param y y-value of the data
@@ -2378,11 +2363,14 @@ double PMusrCanvas::CalculateDiff(const double x, const double y, TH1F *theo)
 // CalculateDiff (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Calculates the difference between data and theory for error graphs.
+ *
+ * <b>return:</b>
+ * - (data - theory) value
  *
  * \param x x-value of the data
  * \param y y-value of the data
- * \param theo theory error graph
+ * \param theo theory error graphs
  */
 double PMusrCanvas::CalculateDiff(const double x, const double y, TGraphErrors *theo)
 {
@@ -2393,8 +2381,6 @@ double PMusrCanvas::CalculateDiff(const double x, const double y, TGraphErrors *
 
   theo->GetPoint(bin, xVal, yVal);
 
-//cout << endl << ">> bin=" << bin << ", x=" << xVal << " (xData=" << x << "), y=" << yVal;
-
   return y - yVal;
 }
 
@@ -2404,8 +2390,11 @@ double PMusrCanvas::CalculateDiff(const double x, const double y, TGraphErrors *
 /**
  * <p>Analog to FindBin for histograms (TH1F) but here for TGraphErrors.
  *
+ * <b>return:</b>
+ * - bin closest to a given x value.
+ *
  * \param x x-value of the data
- * \param graph TGraphErrors which should be seaarched
+ * \param graph TGraphErrors which should be searched
  */
 Int_t PMusrCanvas::FindBin(const double x, TGraphErrors *graph)
 {
@@ -2433,7 +2422,10 @@ Int_t PMusrCanvas::FindBin(const double x, TGraphErrors *graph)
 /**
  * <p>returns the global maximum of a histogram
  *
- * \param histo
+ * <b>return:</b>
+ * - global maximum, or 0.0 if the histo pointer is the null pointer.
+ *
+ * \param histo pointer of the histogram
  */
 double PMusrCanvas::GetGlobalMaximum(TH1F* histo)
 {
@@ -2457,7 +2449,10 @@ double PMusrCanvas::GetGlobalMaximum(TH1F* histo)
 /**
  * <p>returns the global minimum of a histogram
  *
- * \param histo
+ * <b>return:</b>
+ * - global minimum, or 0.0 if the histo pointer is the null pointer.
+ *
+ * \param histo pointer of the histogram
  */
 double PMusrCanvas::GetGlobalMinimum(TH1F* histo)
 {
@@ -2479,8 +2474,7 @@ double PMusrCanvas::GetGlobalMinimum(TH1F* histo)
 // PlotData (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Plots the data.
  */
 void PMusrCanvas::PlotData()
 {
@@ -2696,8 +2690,7 @@ void PMusrCanvas::PlotData()
 // PlotDifference (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Plots the difference data, i.e. data-theory
  */
 void PMusrCanvas::PlotDifference()
 {
@@ -2707,7 +2700,6 @@ void PMusrCanvas::PlotDifference()
     return;
 
   if (fPlotType != MSR_PLOT_NON_MUSR) {
-//cout << endl << ">> PlotDifference(): going to plot diff spectra ... (" << fData[0].diff->GetNbinsX() << ")" << endl;
     fHistoFrame = fDataTheoryPad->DrawFrame(fXmin, fYmin, fXmax, fYmax);
     // set x-axis label
     fHistoFrame->GetXaxis()->SetTitle("time (#mus)");
@@ -2770,13 +2762,10 @@ void PMusrCanvas::PlotDifference()
 // PlotFourier (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Plot the Fourier spectra.
  */
 void PMusrCanvas::PlotFourier()
 {
-//cout << endl << ">> in PlotFourier() ..." << endl;
-
   fDataTheoryPad->cd();
 
   if (fPlotType < 0) // plot type not defined
@@ -3047,13 +3036,10 @@ void PMusrCanvas::PlotFourier()
 // PlotFourierDifference (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Plot the Fourier difference, i.e. F(data)-F(theory).
  */
 void PMusrCanvas::PlotFourierDifference()
 {
-//cout << endl << ">> in PlotFourierDifference() ..." << endl;
-
   fDataTheoryPad->cd();
 
   if (fPlotType < 0) // plot type not defined
@@ -3294,8 +3280,7 @@ void PMusrCanvas::PlotFourierDifference()
 // PlotFourierPhaseValue (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Writes the Fourier phase value into the data window.
  */
 void PMusrCanvas::PlotFourierPhaseValue()
 {
@@ -3330,9 +3315,7 @@ void PMusrCanvas::PlotFourierPhaseValue()
 // IncrementFourierPhase (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
- * \param tag
+ * <p>Increments the Fourier phase and recalculate the real/imaginary part of the Fourier transform.
  */
 void PMusrCanvas::IncrementFourierPhase()
 {
@@ -3381,9 +3364,7 @@ void PMusrCanvas::IncrementFourierPhase()
 // DecrementFourierPhase (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
- * \param tag
+ * <p>Decrements the Fourier phase and recalculate the real/imaginary part of the Fourier transform.
  */
 void PMusrCanvas::DecrementFourierPhase()
 {
@@ -3432,8 +3413,7 @@ void PMusrCanvas::DecrementFourierPhase()
 // SaveDataAscii (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Saves the currently seen data (data, difference, Fourier spectra, ...) in ascii column format.
  */
 void PMusrCanvas::SaveDataAscii()
 {
