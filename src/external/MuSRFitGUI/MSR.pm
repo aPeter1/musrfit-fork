@@ -122,7 +122,6 @@ sub CreateMSR {
 
     # First create the THEORY Block
     my ($Full_T_Block,$Paramcomp_ref)=MSR::CreateTheory(@FitTypes);
-
     my @Paramcomp = @$Paramcomp_ref;
 
     # Counter for RUNS
@@ -147,8 +146,7 @@ sub CreateMSR {
     # $shcount is a counter for shared parameters
     if ( $#RUNS == 0 ) {
         my $shcount = 1;
-    }
-    else {
+    } else {
         if ( $All{"Sh_Alpha"} == 1 ) {
             my $shcount = 1;
         } else {
@@ -493,6 +491,7 @@ sub CreateMSRSingleHist {
 	$RUNSType = 1;
     }
 
+    # Until here identical to sub CreateMSR
     # $shcount is a counter for shared parameters
     if ( $#RUNS == 0 && $#Hists == 0) {
         my $shcount = 1;
@@ -517,6 +516,10 @@ sub CreateMSRSingleHist {
 # For a single histogram fit we basically need to repeat this for each hist
 # However, "physical" parameters such as Asymmetry, relaxation etc. should
 # be the same for all histograms
+# We distinguich between sharing among different runs to common parameters
+# for different histograms. The first is done in the usual "Sharing" schame,
+# while the second has to be done in the functions block. This can be done
+# in a consistent, non-confusing algorithm 
 	foreach my $Hist (@Hists) {
 
 	    # Prepare the Parameters and initial values block

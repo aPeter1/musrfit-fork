@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Thu Mar 25 16:29:56 2010
+# Created: Mon May 31 15:10:55 2010
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -3974,12 +3974,13 @@ sub AppendToFunctions
 sub ResetFunctions
 {
 
+    my %All=CreateAllInput();      
 # Clear drop down parameters menu    
 #   CParamsCombo->clear();
 # Then clear the text
     ConstraintLine->setText("");
     FunctionsBlock->setText("");
-#    my $Full_T_Block= $All{"Full_T_Block"};
+    my $Full_T_Block= $All{"Full_T_Block"};
     TheoryBlock->setText($Full_T_Block);
 
 

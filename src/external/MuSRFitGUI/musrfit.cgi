@@ -248,7 +248,12 @@ elsif ( $Step == 2 ) {
 elsif ( $Step <= 6 && $Step >= 3 ) {
 
     # Then create appropriate file
-    ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%AllParameters);
+    if ($All{"FitAsyType"} eq "SingleHist") {
+	($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%AllParameters);
+    } else {
+	($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSRSingleHist(\%AllParameters);
+    }
+
     @Paramcomp = @$Paramcomp_ref;
 
     if ( $Step == 3 ) {
