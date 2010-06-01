@@ -249,9 +249,9 @@ elsif ( $Step <= 6 && $Step >= 3 ) {
 
     # Then create appropriate file
     if ($All{"FitAsyType"} eq "SingleHist") {
-	($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%AllParameters);
-    } else {
 	($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSRSingleHist(\%AllParameters);
+    } else {
+	($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%AllParameters);
     }
 
     @Paramcomp = @$Paramcomp_ref;
