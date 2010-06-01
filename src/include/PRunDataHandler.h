@@ -40,6 +40,9 @@ using namespace std;
 #include "PMusr.h"
 #include "PMsrHandler.h"
 
+/**
+ * <p>Handler class needed to read/handle raw data files.
+ */
 class PRunDataHandler
 {
   public:
@@ -51,8 +54,8 @@ class PRunDataHandler
     virtual PRawRunData* GetRunData(const TString &runName);
 
   private:
-    PMsrHandler   *fMsrInfo;
-    PStringVector fDataPath;
+    PMsrHandler   *fMsrInfo; ///< pointer to the msr-file handler
+    PStringVector fDataPath; ///< vector containing all the search paths where to look for data files
 
     Bool_t fAllDataAvailable; ///< flag indicating if all data sets could be read
     TString fRunName;       ///< current run name

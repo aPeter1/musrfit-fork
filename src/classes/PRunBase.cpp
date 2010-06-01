@@ -47,8 +47,7 @@
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p> needed otherwise vector's cannot be generated ;-)
- *
+ * <p>Constructor. Needed otherwise vector's cannot be generated ;-)
  */
 PRunBase::PRunBase()
 {
@@ -65,29 +64,26 @@ PRunBase::PRunBase()
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
  *
- * \param msrInfo pointer to the msr info structure
- * \param rawData
- * \param runNo
- * \param tag
+ * \param msrInfo pointer to the msr-file handler
+ * \param rawData pointer to the raw-data handler
+ * \param runNo msr-file run number
+ * \param tag tag telling if fit, view, or rrf representation is whished.
  */
-PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag)
+PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) :
+    fHandleTag(tag), fMsrInfo(msrInfo), fRawData(rawData)
 {
   fValid = true;
-  fHandleTag = tag;
 
   fRunNo = static_cast<Int_t>(runNo);
-  if ((runNo < 0) || (runNo > msrInfo->GetMsrRunList()->size())) {
+  if ((runNo < 0) || (runNo > fMsrInfo->GetMsrRunList()->size())) {
     fRunInfo = 0;
     return;
   }
 
-  // keep pointer to the msr-file handler
-  fMsrInfo = msrInfo;
-
   // keep the run header info for this run
-  fRunInfo = &(*msrInfo->GetMsrRunList())[runNo];
+  fRunInfo = &(*fMsrInfo->GetMsrRunList())[runNo];
 
   // check the parameter and map range of the functions
   if (!fMsrInfo->CheckMapAndParamRange(fRunInfo->GetMap()->size(), fMsrInfo->GetNoOfParams())) {
@@ -95,16 +91,13 @@ PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo,
     exit(0);
   }
 
-  // keep the raw data of the runs
-  fRawData = rawData;
-
   // init private variables
   fTimeResolution = -1.0;
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++)
     fFuncValues.push_back(0.0);
 
   // generate theory
-  fTheory = new PTheory(msrInfo, runNo);
+  fTheory = new PTheory(fMsrInfo, runNo);
   if (fTheory == 0) {
     cerr << endl << "**SEVERE ERROR** PRunBase::PRunBase: Couldn't create an instance of PTheory :-(, will quit" << endl;
     exit(0);
@@ -119,8 +112,7 @@ PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo,
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Destructor.
  */
 PRunBase::~PRunBase()
 {
@@ -135,8 +127,7 @@ PRunBase::~PRunBase()
 // CleanUp
 //--------------------------------------------------------------------------
 /**
- * <p> Clean up all localy allocate memory
- *
+ * <p> Clean up all locally allocate memory
  */
 void PRunBase::CleanUp()
 {
@@ -150,14 +141,14 @@ void PRunBase::CleanUp()
 // CalculateKaiserFilterCoeff (protected)
 //--------------------------------------------------------------------------
 /**
- * <p> Calculates the Kaiser filter coefficients for a low pass filter with
+ * <p>Calculates the Kaiser filter coefficients for a low pass filter with
  * a cut off frequency wc.
  * For details see "Zeitdiskrete Signalverarbeitung", A.V. Oppenheim, R.W. Schafer, J.R. Buck. Pearson 2004.
  *
  * \param wc cut off frequency
- * \param A defined as \f[ A = -\log_{10}(\delta) \f], where \f[\delta\f] is the tolerance band.
- * \param dw defined as \f[ \Delta\omega = \omega_{\rm S} - \omega_{\rm P} \f], where \f[ \omega_{\rm S} \f] is the
- * stop band frequency, and \f[ \omega_{\rm P} \f] is the pass band frequency.
+ * \param A defined as \f$ A = -\log_{10}(\delta) \f$, where \f$\delta\f$ is the tolerance band.
+ * \param dw defined as \f$ \Delta\omega = \omega_{\rm S} - \omega_{\rm P} \f$, where \f$ \omega_{\rm S} \f$ is the
+ * stop band frequency, and \f$ \omega_{\rm P} \f$ is the pass band frequency.
  */
 void PRunBase::CalculateKaiserFilterCoeff(Double_t wc, Double_t A, Double_t dw)
 {
@@ -191,19 +182,13 @@ void PRunBase::CalculateKaiserFilterCoeff(Double_t wc, Double_t A, Double_t dw)
   for (UInt_t i=0; i<=m; i++) {
     fKaiserFilter[i] /= dsum;
   }
-
-/*
-for (UInt_t i=0; i<=m; i++)
-cout << endl << ">> " << i << ", fKaiserFilter[" << i << "]=" << fKaiserFilter[i];
-cout << endl;
-*/
 }
 
 //--------------------------------------------------------------------------
 // FilterTheo (protected)
 //--------------------------------------------------------------------------
 /**
- * <p> Filters the theory with a Kaiser FIR filter.
+ * <p>Filters the theory with a Kaiser FIR filter.
  */
 void PRunBase::FilterTheo()
 {

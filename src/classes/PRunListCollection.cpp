@@ -37,13 +37,12 @@
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor.
  *
- * \param msrInfo pointer to the msr info structure
- * \param data
+ * \param msrInfo pointer to the msr-file handler
+ * \param data pointer to the run-data handler
  */
-PRunListCollection::PRunListCollection(PMsrHandler *msrInfo, PRunDataHandler *data) \
- : fMsrInfo(msrInfo), fData(data)
+PRunListCollection::PRunListCollection(PMsrHandler *msrInfo, PRunDataHandler *data) : fMsrInfo(msrInfo), fData(data)
 {
 }
 
@@ -51,34 +50,28 @@ PRunListCollection::PRunListCollection(PMsrHandler *msrInfo, PRunDataHandler *da
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Destructor
  */
 PRunListCollection::~PRunListCollection()
 {
-//cout << endl << "in ~PRunListCollection() ..." << endl;
-//cout << endl << ">> fRunSingleHistoList.size() = " << fRunSingleHistoList.size();
   for (UInt_t i=0; i<fRunSingleHistoList.size(); i++) {
     fRunSingleHistoList[i]->CleanUp();
     fRunSingleHistoList[i]->~PRunSingleHisto();
   }
   fRunSingleHistoList.clear();
 
-//cout << endl << ">> fRunAsymmetryList.size() = " << fRunAsymmetryList.size();
   for (UInt_t i=0; i<fRunAsymmetryList.size(); i++) {
     fRunAsymmetryList[i]->CleanUp();
     fRunAsymmetryList[i]->~PRunAsymmetry();
   }
   fRunAsymmetryList.clear();
 
-//cout << endl << ">> fRunMuMinusList.size() = " << fRunMuMinusList.size();
   for (UInt_t i=0; i<fRunMuMinusList.size(); i++) {
     fRunMuMinusList[i]->CleanUp();
     fRunMuMinusList[i]->~PRunMuMinus();
   }
   fRunMuMinusList.clear();
 
-//cout << endl << ">> fRunNonMusrList.size() = " << fRunNonMusrList.size();
   for (UInt_t i=0; i<fRunNonMusrList.size(); i++) {
     fRunNonMusrList[i]->CleanUp();
     fRunNonMusrList[i]->~PRunNonMusr();
@@ -90,20 +83,18 @@ PRunListCollection::~PRunListCollection()
 // Add
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Adds a processed set of data to the handler.
  *
- * \param runNo
- * \param tag
+ * <b>return:</b>
+ * - true if a processed data set could be added successfully
+ * - false otherwise
+ *
+ * \param runNo msr-file run number
+ * \param tag tag showing what shall be done: kFit == fitting, kView == viewing
  */
 Bool_t PRunListCollection::Add(Int_t runNo, EPMusrHandleTag tag)
 {
   Bool_t success = true;
-
-//  PMsrRunStructure *runList = &(*fMsrInfo->GetMsrRunList())[runNo];
-
-//   cout << endl << "PRunListCollection::Add(): will add run no " << runNo;
-//   cout << ", name = " << runList->fRunName.Data();
-//   cout << ", type = " << runList->fFitType;
 
   Int_t fitType = (*fMsrInfo->GetMsrRunList())[runNo].GetFitType();
 
@@ -140,7 +131,12 @@ Bool_t PRunListCollection::Add(Int_t runNo, EPMusrHandleTag tag)
 // GetSingleHistoChisq
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Calculates chi-square of <em>all</em> single histogram runs of a msr-file.
+ *
+ * <b>return:</b>
+ * - chi-square of all single histogram runs of the msr-file
+ *
+ * \param par fit parameter vector
  */
 Double_t PRunListCollection::GetSingleHistoChisq(const std::vector<Double_t>& par) const
 {
@@ -156,7 +152,12 @@ Double_t PRunListCollection::GetSingleHistoChisq(const std::vector<Double_t>& pa
 // GetAsymmetryChisq
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Calculates chi-square of <em>all</em> asymmetry runs of a msr-file.
+ *
+ * <b>return:</b>
+ * - chi-square of all asymmetry runs of the msr-file
+ *
+ * \param par fit parameter vector
  */
 Double_t PRunListCollection::GetAsymmetryChisq(const std::vector<Double_t>& par) const
 {
@@ -172,7 +173,12 @@ Double_t PRunListCollection::GetAsymmetryChisq(const std::vector<Double_t>& par)
 // GetMuMinusChisq
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Calculates chi-square of <em>all</em> mu minus runs of a msr-file.
+ *
+ * <b>return:</b>
+ * - chi-square of all mu minus runs of the msr-file
+ *
+ * \param par fit parameter vector
  */
 Double_t PRunListCollection::GetMuMinusChisq(const std::vector<Double_t>& par) const
 {
@@ -188,7 +194,12 @@ Double_t PRunListCollection::GetMuMinusChisq(const std::vector<Double_t>& par) c
 // GetNonMusrChisq
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Calculates chi-square of <em>all</em> non-muSR runs of a msr-file.
+ *
+ * <b>return:</b>
+ * - chi-square of all non-muSR runs of the msr-file
+ *
+ * \param par fit parameter vector
  */
 Double_t PRunListCollection::GetNonMusrChisq(const std::vector<Double_t>& par) const
 {
@@ -204,7 +215,12 @@ Double_t PRunListCollection::GetNonMusrChisq(const std::vector<Double_t>& par) c
 // GetSingleHistoMaximumLikelihood
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Calculates log max-likelihood of <em>all</em> single histogram runs of a msr-file.
+ *
+ * <b>return:</b>
+ * - chi-square of all single histogram runs of the msr-file
+ *
+ * \param par fit parameter vector
  */
 Double_t PRunListCollection::GetSingleHistoMaximumLikelihood(const std::vector<Double_t>& par) const
 {
@@ -222,6 +238,11 @@ Double_t PRunListCollection::GetSingleHistoMaximumLikelihood(const std::vector<D
 /**
  * <p> Since it is not clear yet how to handle asymmetry fits with max likelihood
  * the chi square will be used!
+ *
+ * <b>return:</b>
+ * - chi-square of all asymmetry runs of the msr-file
+ *
+ * \param par fit parameter vector
  */
 Double_t PRunListCollection::GetAsymmetryMaximumLikelihood(const std::vector<Double_t>& par) const
 {
@@ -237,7 +258,12 @@ Double_t PRunListCollection::GetAsymmetryMaximumLikelihood(const std::vector<Dou
 // GetMuMinusMaximumLikelihood
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Calculates log max-likelihood of <em>all</em> mu minus runs of a msr-file.
+ *
+ * <b>return:</b>
+ * - chi-square of all mu minus runs of the msr-file
+ *
+ * \param par fit parameter vector
  */
 Double_t PRunListCollection::GetMuMinusMaximumLikelihood(const std::vector<Double_t>& par) const
 {
@@ -255,6 +281,11 @@ Double_t PRunListCollection::GetMuMinusMaximumLikelihood(const std::vector<Doubl
 /**
  * <p> Since it is not clear yet how to handle non musr fits with max likelihood
  * the chi square will be used!
+ *
+ * <b>return:</b>
+ * - chi-square of all asymmetry runs of the msr-file
+ *
+ * \param par fit parameter vector
  */
 Double_t PRunListCollection::GetNonMusrMaximumLikelihood(const std::vector<Double_t>& par) const
 {
@@ -270,7 +301,10 @@ Double_t PRunListCollection::GetNonMusrMaximumLikelihood(const std::vector<Doubl
 // GetTotalNoOfBinsFitted
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Counts the total number of bins to be fitted.
+ *
+ * <b>return:</b>
+ * - total number of bins fitted.
  */
 UInt_t PRunListCollection::GetTotalNoOfBinsFitted() const
 {
@@ -288,7 +322,6 @@ UInt_t PRunListCollection::GetTotalNoOfBinsFitted() const
   for (UInt_t i=0; i<fRunNonMusrList.size(); i++)
     counts += fRunNonMusrList[i]->GetNoOfFitBins();
 
-// cout << endl << "Total No of Bins Fitted = " << counts;
   return counts;
 }
 
@@ -296,9 +329,13 @@ UInt_t PRunListCollection::GetTotalNoOfBinsFitted() const
 // GetSingleHisto
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Get a processed single histogram data set.
  *
- * \param index
+ * <b>return:</b>
+ * - pointer to the run data set (processed data) if data set is found
+ * - null pointer otherwise
+ *
+ * \param index msr-file run index
  * \param tag kIndex -> data at index, kRunNo -> data of given run no
  */
 PRunData* PRunListCollection::GetSingleHisto(UInt_t index, EDataSwitch tag)
@@ -307,7 +344,7 @@ PRunData* PRunListCollection::GetSingleHisto(UInt_t index, EDataSwitch tag)
 
   switch (tag) {
     case kIndex:
-      if ((index < 0) || (index > fRunSingleHistoList.size())) {
+      if ((index < 0) || (index >= fRunSingleHistoList.size())) {
         cerr << endl << "PRunListCollection::GetSingleHisto: **ERROR** index = " << index << " out of bounds";
         cerr << endl;
         return 0;
@@ -335,9 +372,13 @@ PRunData* PRunListCollection::GetSingleHisto(UInt_t index, EDataSwitch tag)
 // GetAsymmetry
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Get a processed asymmetry data set.
  *
- * \param index
+ * <b>return:</b>
+ * - pointer to the run data set (processed data) if data set is found
+ * - null pointer otherwise
+ *
+ * \param index msr-file run index
  * \param tag kIndex -> data at index, kRunNo -> data of given run no
  */
 PRunData* PRunListCollection::GetAsymmetry(UInt_t index, EDataSwitch tag)
@@ -374,9 +415,13 @@ PRunData* PRunListCollection::GetAsymmetry(UInt_t index, EDataSwitch tag)
 // GetMuMinus
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Get a processed mu minus data set.
  *
- * \param index
+ * <b>return:</b>
+ * - pointer to the run data set (processed data) if data set is found
+ * - null pointer otherwise
+ *
+ * \param index msr-file run index
  * \param tag kIndex -> data at index, kRunNo -> data of given run no
  */
 PRunData* PRunListCollection::GetMuMinus(UInt_t index, EDataSwitch tag)
@@ -410,9 +455,13 @@ PRunData* PRunListCollection::GetMuMinus(UInt_t index, EDataSwitch tag)
 // GetNonMusr
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Get a processed non-muSR data set.
  *
- * \param index
+ * <b>return:</b>
+ * - pointer to the run data set (processed data) if data set is found
+ * - null pointer otherwise
+ *
+ * \param index msr-file run index
  * \param tag kIndex -> data at index, kRunNo -> data of given run no
  */
 PRunData* PRunListCollection::GetNonMusr(UInt_t index, EDataSwitch tag)
@@ -446,9 +495,12 @@ PRunData* PRunListCollection::GetNonMusr(UInt_t index, EDataSwitch tag)
 // GetTemp
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Get the temperature from the data set.
  *
- * \param runName
+ * <b>return:</b>
+ * - temperature pair (T, dT) vector from temperatures stored in the data file.
+ *
+ * \param runName name of the run from which to extract the temperature
  */
 const PDoublePairVector* PRunListCollection::GetTemp(const TString &runName) const
 {
@@ -459,9 +511,12 @@ const PDoublePairVector* PRunListCollection::GetTemp(const TString &runName) con
 // GetField
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Get the magnetic field from the data set.
  *
- * \param runName
+ * <b>return:</b>
+ * - magnetic field stored in the data file.
+ *
+ * \param runName name of the run from which to extract the magnetic field
  */
 Double_t PRunListCollection::GetField(const TString &runName) const
 {
@@ -472,9 +527,12 @@ Double_t PRunListCollection::GetField(const TString &runName) const
 // GetEnergy
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Get the muon implantation energy from the data set.
  *
- * \param runName
+ * <b>return:</b>
+ * - muon implantation energy stored in the data file.
+ *
+ * \param runName name of the run from which to extract the muon implantation energy
  */
 Double_t PRunListCollection::GetEnergy(const TString &runName) const
 {
@@ -485,9 +543,12 @@ Double_t PRunListCollection::GetEnergy(const TString &runName) const
 // GetSetup
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Get the setup information from the data set.
  *
- * \param runName
+ * <b>return:</b>
+ * - setup information stored in the data file.
+ *
+ * \param runName name of the run from which to extract the setup information
  */
 const Char_t* PRunListCollection::GetSetup(const TString &runName) const
 {
@@ -498,17 +559,16 @@ const Char_t* PRunListCollection::GetSetup(const TString &runName) const
 // GetXAxisTitle
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Get the x-axis title (used with non-muSR fit).
+ *
+ * <b>return:</b>
+ * - x-axis title
  *
  * \param runName name of the run file
  * \param idx msr-file run index
  */
 const Char_t* PRunListCollection::GetXAxisTitle(const TString &runName, const UInt_t idx) const
 {
-//cout << endl << ">> PRunListCollection::GetXAxisTitle: runName = " << runName.Data() << ", idx = " << idx;
-//cout << endl << ">> PRunListCollection::GetXAxisTitle: fRunNonMusrList.size() = " << fRunNonMusrList.size();
-//cout << endl;
-
   PRawRunData *runData = fData->GetRunData(runName);
 
   const Char_t *result = 0;
@@ -532,16 +592,16 @@ const Char_t* PRunListCollection::GetXAxisTitle(const TString &runName, const UI
 // GetYAxisTitle
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Get the y-axis title (used with non-muSR fit).
+ *
+ * <b>return:</b>
+ * - y-axis title
  *
  * \param runName name of the run file
  * \param idx msr-file run index
  */
 const Char_t* PRunListCollection::GetYAxisTitle(const TString &runName, const UInt_t idx) const
 {
-//cout << endl << ">> PRunListCollection::GetYAxisTitle: runName = " << runName.Data() << ", idx = " << idx;
-//cout << endl;
-
   PRawRunData *runData = fData->GetRunData(runName);
 
   const Char_t *result = 0;

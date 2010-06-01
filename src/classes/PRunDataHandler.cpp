@@ -54,8 +54,9 @@ using namespace std;
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p> Constructor, reading the data histogramm files.
+ * <p>Constructor, reading the data histogramm files.
  *
+ * \param msrInfo pointer to the msr-file handler
  */
 PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo) : fMsrInfo(msrInfo)
 {
@@ -72,6 +73,9 @@ PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo) : fMsrInfo(msrInfo)
 /**
  * <p> Constructor, reading the data histogramm files, and keeping a copy
  * of potential search paths.
+ *
+ * \param msrInfo pointer to the msr-file handler
+ * \param dataPath vector containing search paths where to find raw data files.
  */
 PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo, const PStringVector dataPath) : 
       fMsrInfo(msrInfo), fDataPath(dataPath)
@@ -88,7 +92,6 @@ PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo, const PStringVector dataP
 //--------------------------------------------------------------------------
 /**
  * <p> Destructor.
- *
  */
 PRunDataHandler::~PRunDataHandler()
 {
@@ -99,10 +102,11 @@ PRunDataHandler::~PRunDataHandler()
 // GetRunData
 //--------------------------------------------------------------------------
 /**
- * <p> Checks if runName is found.
+ * <p>Checks if runName is found.
  *
- * <b>return:</b> if data are found: pointer to the data.
- * otherwise the null pointer will be returned.
+ * <b>return:</b>
+ * - if data are found: pointer to the data.
+ * - otherwise the null pointer will be returned.
  *
  * \param runName run name, e.g. 2009/lem09_his_1234
  */
@@ -128,7 +132,9 @@ PRawRunData* PRunDataHandler::GetRunData(const TString &runName)
  * <p> The main read file routine which is filtering what read sub-routine
  * needs to be called.
  *
- * <b>return:</b> true if reading was successful, false if reading failed.
+ * <b>return:</b>
+ * - true if reading was successful,
+ * - false if reading failed.
  */
 Bool_t PRunDataHandler::ReadFile()
 {
@@ -188,7 +194,11 @@ Bool_t PRunDataHandler::ReadFile()
  * <p> Checks if a file has been already read in order to prevent multiple
  * reading of data files.
  *
- * <b>return:</b> true if the file has been read before, otherwise false.
+ * <b>return:</b>
+ * - true if the file has been read before,
+ * - otherwise false.
+ *
+ * \param runName run name to be check if the corresponding file is already read.
  */
 Bool_t PRunDataHandler::FileAlreadyRead(TString runName)
 {
@@ -205,12 +215,14 @@ Bool_t PRunDataHandler::FileAlreadyRead(TString runName)
 // FileExistsCheck
 //--------------------------------------------------------------------------
 /**
- * <p> Checks if a given data file exists.
+ * <p>Checks if a given data file exists.
+ *
+ * <b>return:</b>
+ * - true if data file exists,
+ * - otherwise false.
  *
  * \param runInfo reference to the msr-run-structure
  * \param idx index of the run (needed for ADDRUN feature).
- *
- * <b>return:</b> true if data file exists, otherwise false.
  */
 Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
 {
@@ -408,10 +420,12 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
 /**
  * <p> Reads the LEM-data ROOT-files.
  *
+ * <b>return:</b>
+ * - true at successful reading,
+ * - otherwise false.
+ *
  * \param notPostPileup This flag is used as a switch between "Not Post Pileup Corrected" 
  *                      and "Post Pileup Corrected" histogramms.
- *
- * <b>return:</b> true at successful reading, otherwise false.
  */
 Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
 {
@@ -634,12 +648,13 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
 /**
  * <p> Will read the NeXuS File Format as soon as PSI will have an implementation.
  *
- *
- * <b>return:</b> true at successful reading, otherwise false.
+ * <b>return:</b>
+ * - true at successful reading,
+ * - otherwise false.
  */
 Bool_t PRunDataHandler::ReadNexusFile()
 {
-  cout << endl << "PRunDataHandler::ReadNexusFile(): Sorry, not yet implemented, ask Alex Amato ...";
+  cout << endl << "PRunDataHandler::ReadNexusFile(): Sorry, not yet implemented, ask Alex Amato and Stephen Cottrell ...";
   return false;
 }
 
@@ -650,7 +665,9 @@ Bool_t PRunDataHandler::ReadNexusFile()
  * <p> Reads, for backwards compatibility, the ascii-wkm-file data format.
  * The routine is clever enough to distinguish the different wkm-flavours (argh).
  *
- * <b>return:</b> true at successful reading, otherwise false.
+ * <b>return:</b>
+ * - true at successful reading,
+ * - otherwise false.
  */
 Bool_t PRunDataHandler::ReadWkmFile()
 {
@@ -924,7 +941,9 @@ Bool_t PRunDataHandler::ReadWkmFile()
  * <p> Reads the old-fashioned PSI-BIN data-files. The MuSR_td_PSI_bin class
  * of Alex Amato is used. In case of problems, please contact alex.amato@psi.ch.
  *
- * <b>return:</b> true at successful reading, otherwise false.
+ * <b>return:</b>
+ * - true at successful reading,
+ * - otherwise false.
  */
 Bool_t PRunDataHandler::ReadPsiBinFile()
 {
@@ -1046,9 +1065,11 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
 // ReadMudFile
 //--------------------------------------------------------------------------
 /**
- * <p> Reads the triumf mud-file format. <b>Not yet implemented, sorry</b>.
+ * <p> Reads the triumf mud-file format.
  *
- * <b>return:</b> true at successful reading, otherwise false.
+ * <b>return:</b>
+ * - true at successful reading,
+ * - otherwise false.
  */
 Bool_t PRunDataHandler::ReadMudFile()
 {
@@ -1282,23 +1303,6 @@ Bool_t PRunDataHandler::ReadMudFile()
 
   MUD_closeRead(fh);
 
-/*
-cout << endl << "fRunName        : " << runData.GetRunName()->Data();
-cout << endl << "fRunTitle       : " << runData.GetRunTitle()->Data();
-cout << endl << "fSetup          : " << runData.GetSetup()->Data();
-cout << endl << "fField          : " << runData.GetField();
-cout << endl << "fTemp           : " << runData.GetTemperature(1);
-cout << endl << "noOfHistos      : " << noOfHistos;
-cout << endl << "fTimeResolution : " << runData.GetTimeResolution();
-for (Int_t i=0; i<noOfHistos; i++) {
-  cout << endl << "------";
-  cout << endl << i << " : t0        = " << runData.GetT0(i);
-  cout << endl << i << " : bkg bins  = " << runData.GetBkgBin(i).first << "..." << runData.GetBkgBin(i).second;
-  cout << endl << i << " : good bins = " << runData.GetGoodDataBin(i).first << "..." << runData.GetGoodDataBin(i).second;
-}
-cout << endl;
-*/
-
   // add run to the run list
   fData.push_back(runData);
 
@@ -1330,6 +1334,9 @@ cout << endl;
  * 
  * \endverbatim
  *
+ * <b>return:</b>
+ * - true at successful reading,
+ * - otherwise false.
  */
 Bool_t PRunDataHandler::ReadMduAsciiFile()
 {
@@ -1638,7 +1645,9 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
  * where spaces, column, are a tab are possible separations.
  * If no error in y is present, the weighting in the fit will be equal.
  *
- * <b>return:</b> true at successful reading, otherwise false.
+ * <b>return:</b>
+ * - true at successful reading,
+ * - otherwise false.
  */
 Bool_t PRunDataHandler::ReadAsciiFile()
 {
@@ -1942,6 +1951,10 @@ Bool_t PRunDataHandler::ReadAsciiFile()
  *
  * <p>Some db-files do have a '\-e' or '\e' label just between the DATA tag line and the real data.
  * This tag will just be ignored.
+ *
+ * <b>return:</b>
+ * - true at successful reading,
+ * - otherwise false.
  */
 Bool_t PRunDataHandler::ReadDBFile()
 {
@@ -2288,7 +2301,9 @@ Bool_t PRunDataHandler::ReadDBFile()
  *
  * \param str string to be stripped. It will be modified directly on success.
  *
- * <b>return:</b> true at success, otherwise false.
+ * <b>return:</b>
+ * - true at successful reading,
+ * - otherwise false.
  */
 Bool_t PRunDataHandler::StripWhitespace(TString &str)
 {
@@ -2353,12 +2368,14 @@ Bool_t PRunDataHandler::StripWhitespace(TString &str)
 // IsWhitespace (private)
 //--------------------------------------------------------------------------
 /**
- * <p> Check is a string consists only of white spaces, i.e. spaces and/or
+ * <p> Check if a string consists only of white spaces, i.e. spaces and/or
  * ctrl-characters.
  *
- * \param str string to be checked
+ * <b>return:</b>
+ * - true at successful reading,
+ * - otherwise false.
  *
- * <b>return:</b> true if string consist only of white spaces, otherwise false.
+ * \param str string to be checked
  */
 Bool_t PRunDataHandler::IsWhitespace(const Char_t *str)
 {
@@ -2382,10 +2399,12 @@ Bool_t PRunDataHandler::IsWhitespace(const Char_t *str)
 /**
  * <p> Convert a string to a Double_t.
  *
+ * <b>return:</b>
+ * - returns the converted string
+ * - otherwise 0.0 with ok==false
+ *
  * \param str string to be converted
  * \param ok true on success, otherwise false.
- *
- * <b>return:</b> returns the converted string, or 0.0 in case of ok==false
  */
 Double_t PRunDataHandler::ToDouble(TString &str, Bool_t &ok)
 {
@@ -2430,10 +2449,12 @@ Double_t PRunDataHandler::ToDouble(TString &str, Bool_t &ok)
 /**
  * <p> Convert a string to an Int_t.
  *
+ * <b>return:</b>
+ * - returns the converted string
+ * - otherwise 0.0 with ok==false
+ *
  * \param str string to be converted
  * \param ok true on success, otherwise false.
- *
- * <b>return:</b> returns the converted string, or 0 in case of ok==false
  */
 Int_t PRunDataHandler::ToInt(TString &str, Bool_t &ok)
 {
@@ -2476,12 +2497,14 @@ Int_t PRunDataHandler::ToInt(TString &str, Bool_t &ok)
 // GetDataTagIndex (private)
 //--------------------------------------------------------------------------
 /**
- * <p> Checks is str is in a list of data tags
+ * <p> Checks if str is in a list of data tags
+ *
+ * <b>return:</b>
+ * - if found returns the data tag index (from the dataTags vector),
+ * - otherwise -1
  *
  * \param str data tag string (see description of nonMusr db-data)
  * \param dataTags vector of all data tags
- *
- * <b>return:</b> if found returns the data tag index (from the dataTags vector), otherwise -1
  */
 Int_t PRunDataHandler::GetDataTagIndex(TString &str, const PStringVector* dataTags)
 {

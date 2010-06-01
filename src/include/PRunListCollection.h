@@ -43,6 +43,9 @@ using namespace std;
 #include "PRunMuMinus.h"
 #include "PRunNonMusr.h"
 
+/**
+ * <p>Handler class handling all processed data of an msr-file. All calls of minuit2 are going through this class.
+ */
 class PRunListCollection
 {
   public:
@@ -65,10 +68,10 @@ class PRunListCollection
 
     virtual UInt_t GetTotalNoOfBinsFitted() const;
 
-    virtual UInt_t GetNoOfSingleHisto() const { return fRunSingleHistoList.size(); }
-    virtual UInt_t GetNoOfAsymmetry() const { return fRunAsymmetryList.size(); }
-    virtual UInt_t GetNoOfMuMinus() const { return fRunMuMinusList.size(); }
-    virtual UInt_t GetNoOfNonMusr() const { return fRunNonMusrList.size(); }
+    virtual UInt_t GetNoOfSingleHisto() const { return fRunSingleHistoList.size(); } ///< returns the number of single histogram data sets present in the msr-file
+    virtual UInt_t GetNoOfAsymmetry() const { return fRunAsymmetryList.size(); }     ///< returns the number of asymmetry data sets present in the msr-file
+    virtual UInt_t GetNoOfMuMinus() const { return fRunMuMinusList.size(); }         ///< returns the number of mu minus data sets present in the msr-file
+    virtual UInt_t GetNoOfNonMusr() const { return fRunNonMusrList.size(); }         ///< returns the number of non-muSR data sets present in the msr-file
 
     virtual PRunData* GetSingleHisto(UInt_t index, EDataSwitch tag=kIndex);
     virtual PRunData* GetAsymmetry(UInt_t index, EDataSwitch tag=kIndex);
@@ -83,13 +86,13 @@ class PRunListCollection
     virtual const Char_t* GetYAxisTitle(const TString &runName, const UInt_t idx) const;
 
   private:
-    PMsrHandler *fMsrInfo;  ///< keeps all msr file info
-    PRunDataHandler *fData; ///< handles all raw data
+    PMsrHandler *fMsrInfo;  ///< pointer to the msr-file handler
+    PRunDataHandler *fData; ///< pointer to the run-data handler
 
-    vector<PRunSingleHisto*> fRunSingleHistoList;
-    vector<PRunAsymmetry*>   fRunAsymmetryList;
-    vector<PRunMuMinus*>     fRunMuMinusList;
-    vector<PRunNonMusr*>     fRunNonMusrList;
+    vector<PRunSingleHisto*> fRunSingleHistoList; ///< stores all precessed single histogram data
+    vector<PRunAsymmetry*>   fRunAsymmetryList;   ///< stores all precessed asymmetry data
+    vector<PRunMuMinus*>     fRunMuMinusList;     ///< stores all precessed mu-minus data
+    vector<PRunNonMusr*>     fRunNonMusrList;     ///< stores all precessed non-muSR data
 };
 
 #endif // _PRUNLISTCOLLECTION_H_

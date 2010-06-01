@@ -1,0 +1,92 @@
+/*********************************************************************************************
+
+  name:       musrfit.dox
+
+  created by: Andreas Suter, 2010/05/31
+
+  content:    Description of musrfit framework.
+
+  $Id$
+
+**********************************************************************************************/
+
+/**
+
+\mainpage musrfit - a framework to analyse muSR data.
+
+<p>This pages here are meant to explain the software structure of the musrfit framework. 
+
+<p>People merely intrested in the handling of the programs should check this link:
+\htmlonly
+<a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit user manual</a>
+\endhtmlonly
+\latexonly
+musrfit user manual: \texttt{https://intranet.psi.ch/MUSR/MusrFit}
+\endlatexonly 
+
+<p>People which would like to know how to install the musrfit framework, please check this link:
+\htmlonly
+<a href="https://intranet.psi.ch/MUSR/MusrFitSetup">How to setup musrfit on different platforms</a>
+\endhtmlonly
+\latexonly
+How to setup musrfit on different platforms: \texttt{https://intranet.psi.ch/MUSR/MusrFitSetup}
+\endlatexonly
+
+//****************************************************************************************************
+\section overview Overview
+
+<p>The purpose of the musrfit framework is to provide software to analyze muSR spectra, in a very flexible and sound way. The musrfit framework is free software, published under the General Public License Version 2 or later. It is currently running under Linux, Mac OS X, and (with some more work) under Windows. The musrfit framework heavily relies on the \htmlonly <a href="http://root.cern.ch">ROOT</a>\endhtmlonly \latexonly ROOT: \texttt{http://root.cern.ch}\endlatexonly framework from CERN 
+
+<p>The musrfit framework provies the following programs: 
+- \ref musrfit Carries out fits based on a msr-file.
+- \ref musrview Is used show the data in a graphical representation.
+- \ref musrt0 Is used to set graphically t0's, background and data ranges off raw histogram data.
+- \ref musrparam Can be used to generate ascii output files with extracted fit-parameters (from msr-files) and independent additional variables like temperature, field, ... The ascii output files can than be used to plot parameters, e.g. by gnuplot.
+- \ref msr2data A program (originally written by Bastian M. Wojek). Its purpose is to process/generate multiple musrfit msr-files with the same parameters and summarize the fitting results either in a TRIUMF DB or a column ASCII file.
+- \ref msr2msr Old WKM like msr-files can be transformed into musrfit style msr-files with this little program.
+- \ref musrgui An editor to handle msr-files, calling musrfit, etc. from within the editor, based on Qt3.x. 
+               Only bug fixing will be done on this version, and if you have >= Qt4.6 available you should use musredit instead.
+- \ref musredit An editor to handle msr-files, calling musrfit, etc. from within a simple text editor, based 
+               on >= Qt4.6. 
+- \ref MuSRFit A graphical user interface based on PerlQt (written by Z. Salman) for an easy to use interface to the musrfit framework. Compared to the more general approach of writting msr-files, it has some limitations, though it might be easier for a first user of the musrfit framework.
+
+\section roadmap Roadmap
+
+\section bugs How to report bugs
+
+//****************************************************************************************************
+\page musrfitPage
+\section musrfit musrfit
+
+//****************************************************************************************************
+\page musrviewPage
+\section musrview musrview
+
+//****************************************************************************************************
+\page musrt0Page
+\section musrt0 musrt0
+
+//****************************************************************************************************
+\page musrparamPage
+\section musrparam musrparam
+
+//****************************************************************************************************
+\page msr2dataPage
+\section msr2data msr2data
+
+//****************************************************************************************************
+\page msr2msrPage
+\section msr2msr msr2msr
+
+//****************************************************************************************************
+\page musrguiPage
+\section musrgui musrgui
+
+//****************************************************************************************************
+\page musreditPage
+\section musredit musredit
+
+//****************************************************************************************************
+\page MuSRFitPage
+\section MuSRFit MuSRFit
+*/

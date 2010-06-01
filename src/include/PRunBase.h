@@ -44,7 +44,7 @@ using namespace std;
 
 //------------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>The run base class is enforcing a common interface to all supported fit-types.
  */
 class PRunBase
 {
@@ -53,24 +53,24 @@ class PRunBase
     PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag);
     virtual ~PRunBase();
 
-    virtual Double_t CalcChiSquare(const vector<Double_t>& par) = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
-    virtual Double_t CalcMaxLikelihood(const vector<Double_t>& par) = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
+    virtual Double_t CalcChiSquare(const vector<Double_t>& par) = 0; ///< pure virtual, i.e. needs to be implemented by the deriving class!!
+    virtual Double_t CalcMaxLikelihood(const vector<Double_t>& par) = 0; ///< pure virtual, i.e. needs to be implemented by the deriving class!!
 
-    virtual void CalcTheory() = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
+    virtual void CalcTheory() = 0; ///< pure virtual, i.e. needs to be implemented by the deriving class!!
 
-    virtual UInt_t GetRunNo() { return fRunNo; }
-    virtual PRunData* GetData() { return &fData; }
+    virtual UInt_t GetRunNo() { return fRunNo; } ///< returns the number of runs of the msr-file
+    virtual PRunData* GetData() { return &fData; } ///< returns the data to be fitted
     virtual void CleanUp();
-    virtual Bool_t IsValid() { return fValid; }
+    virtual Bool_t IsValid() { return fValid; } ///< returns if the state is valid
 
   protected:
-    Bool_t fValid;
+    Bool_t fValid; ///< flag showing if the state of the class is valid
 
     EPMusrHandleTag fHandleTag; ///< tag telling whether this is used for fit, view, ...
 
     Int_t fRunNo;               ///< number of the run within the msr file
     PMsrHandler      *fMsrInfo; ///< msr-file handler
-    PMsrRunBlock     *fRunInfo; ///< run info used to filter out needed infos for the run
+    PMsrRunBlock     *fRunInfo; ///< run info used to filter out needed infos of a run
     PRunDataHandler  *fRawData; ///< holds the raw run data
 
     PIntVector fParamNo;        ///< vector of parameter numbers for the specifc run
@@ -82,9 +82,9 @@ class PRunBase
     PDoubleVector fFuncValues;  ///< is keeping the values of the functions from the FUNCTIONS block
     PTheory *fTheory;           ///< theory needed to calculate chi-square
 
-    PDoubleVector fKaiserFilter;
+    PDoubleVector fKaiserFilter; ///< stores the Kaiser filter vector (needed for the RRF).
 
-    virtual Bool_t PrepareData() = 0; // pure virtual, i.e. needs to be implemented by the deriving class!!
+    virtual Bool_t PrepareData() = 0; ///< pure virtual, i.e. needs to be implemented by the deriving class!!
 
     virtual void CalculateKaiserFilterCoeff(Double_t wc, Double_t A, Double_t dw);
     virtual void FilterTheo();
