@@ -39,6 +39,14 @@
 
 #include "PMusr.h"
 
+/**
+ * <p>Handles the XML musrfit startup file (musrfit_startup.xml) in which default settings
+ * are stored:
+ * - list of search paths for the data files
+ * - Fourier transform default settings
+ * - marker list for plotting
+ * - color list for plotting
+ */
 class PStartupHandler : public TObject, public TQObject
 {
   public:
@@ -56,29 +64,29 @@ class PStartupHandler : public TObject, public TQObject
     virtual void OnFatalError(const Char_t*); // SLOT
     virtual void OnCdataBlock(const Char_t*, Int_t); // SLOT
 
-    virtual Bool_t StartupFileFound() { return fStartupFileFound; }
-    virtual TString GetStartupFilePath() { return fStartupFilePath; }
+    virtual Bool_t StartupFileFound() { return fStartupFileFound; } ///< true = musrfit_startup.xml found
+    virtual TString GetStartupFilePath() { return fStartupFilePath; } ///< returns FULLPATH/musrfit_startup.xml, where FULLPATH=path were the musrfit_startup.xml is found
 
     virtual void CheckLists();
 
-    virtual PMsrFourierStructure GetFourierDefaults() { return fFourierDefaults; }
-    virtual const PStringVector  GetDataPathList() const { return fDataPathList; }
-    virtual const PIntVector     GetMarkerList() const { return fMarkerList; }
-    virtual const PIntVector     GetColorList() const { return fColorList; }
+    virtual PMsrFourierStructure GetFourierDefaults() { return fFourierDefaults; } ///< returns the Fourier defaults
+    virtual const PStringVector  GetDataPathList() const { return fDataPathList; } ///< returns the search data path list
+    virtual const PIntVector     GetMarkerList() const { return fMarkerList; }     ///< returns the marker list
+    virtual const PIntVector     GetColorList() const { return fColorList; }       ///< returns the color list
 
   private:
     enum EKeyWords {eEmpty, eComment, eDataPath,
                     eFourierSettings, eUnits, eFourierPower, eApodization, ePlot, ePhase, ePhaseIncrement,
                     eRootSettings, eMarkerList, eMarker, 
                     eColorList, eColor};
-    EKeyWords       fKey;
+    EKeyWords       fKey; ///< xml filter key
 
-    Bool_t               fStartupFileFound;
-    TString              fStartupFilePath;
-    PMsrFourierStructure fFourierDefaults;
-    PStringVector        fDataPathList;
-    PIntVector           fMarkerList;
-    PIntVector           fColorList;
+    Bool_t               fStartupFileFound; ///< startup file found flag
+    TString              fStartupFilePath;  ///< full musrfit_startup.xml startup file paths
+    PMsrFourierStructure fFourierDefaults;  ///< Fourier defaults
+    PStringVector        fDataPathList;     ///< search data path list
+    PIntVector           fMarkerList;       ///< marker list
+    PIntVector           fColorList;        ///< color list
 
     Bool_t StartupFileExists(Char_t *fln);
 

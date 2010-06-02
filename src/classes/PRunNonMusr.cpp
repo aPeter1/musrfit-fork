@@ -37,8 +37,7 @@
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Constructor.
  */
 PRunNonMusr::PRunNonMusr() : PRunBase()
 {
@@ -55,10 +54,12 @@ PRunNonMusr::PRunNonMusr() : PRunBase()
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor
  *
- * \param msrInfo pointer to the msr info structure
- * \param runNo number of the run of the msr-file
+ * \param msrInfo pointer to the msr-file handler
+ * \param rawData raw run data
+ * \param runNo number of the run within the msr-file
+ * \param tag tag showing what shall be done: kFit == fitting, kView == viewing
  */
 PRunNonMusr::PRunNonMusr(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
 {
@@ -79,8 +80,7 @@ PRunNonMusr::PRunNonMusr(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t 
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Destructor
  */
 PRunNonMusr::~PRunNonMusr()
 {
@@ -90,9 +90,12 @@ PRunNonMusr::~PRunNonMusr()
 // CalcChiSquare
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Calculate chi-square.
  *
- * \param par parameter vector iterated by minuit
+ * <b>return:</b>
+ * - chisq value
+ *
+ * \param par parameter vector iterated by minuit2
  */
 Double_t PRunNonMusr::CalcChiSquare(const std::vector<Double_t>& par)
 {
@@ -114,8 +117,6 @@ Double_t PRunNonMusr::CalcChiSquare(const std::vector<Double_t>& par)
     }
   }
 
-//cout << endl << ">> chisq=" << chisq;
-
   return chisq;
 }
 
@@ -123,9 +124,9 @@ Double_t PRunNonMusr::CalcChiSquare(const std::vector<Double_t>& par)
 // CalcMaxLikelihood
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>NOT IMPLEMENTED!!
  *
- * \param par parameter vector iterated by minuit
+ * \param par parameter vector iterated by minuit2
  */
 Double_t PRunNonMusr::CalcMaxLikelihood(const std::vector<Double_t>& par)
 {
@@ -138,8 +139,7 @@ Double_t PRunNonMusr::CalcMaxLikelihood(const std::vector<Double_t>& par)
 // CalcTheory
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Calculate theory for a given set of fit-parameters.
  */
 void PRunNonMusr::CalcTheory()
 {
@@ -149,14 +149,15 @@ void PRunNonMusr::CalcTheory()
 // PrepareData
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Prepare data for fitting or viewing.
  *
+ * <b>return:</b>
+ * - true if everthing went smooth
+ * - false, otherwise.
  */
 Bool_t PRunNonMusr::PrepareData()
 {
   Bool_t success = true;
-
-//cout << endl << "in PRunNonMusr::PrepareData(): will feed fFitData";
 
   if (fRunInfo->GetRunNameSize() > 1) { // ADDRUN present which is not supported for NonMusr
     cerr << endl << ">> PRunNonMusr::PrepareData(): **WARNING** ADDRUN NOT SUPPORTED FOR THIS FIT TYPE, WILL IGNORE IT." << endl;
@@ -176,8 +177,11 @@ Bool_t PRunNonMusr::PrepareData()
 // PrepareFitData
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Prepare data for fitting.
  *
+ * <b>return:</b>
+ * - true if everthing went smooth
+ * - false, otherwise.
  */
 Bool_t PRunNonMusr::PrepareFitData()
 {
@@ -190,21 +194,17 @@ Bool_t PRunNonMusr::PrepareFitData()
   // get x-, y-index
   UInt_t xIndex = GetXIndex();
   UInt_t yIndex = GetYIndex();
-// cout << endl << ">> xIndex=" <<  xIndex << ", yIndex=" << yIndex;
 
   // pack the raw data
   Double_t value  = 0.0;
   Double_t err = 0.0;
-// cout << endl << ">> fRawRunData->fDataNonMusr.fData[" <<  xIndex << "].size()=" << fRawRunData->fDataNonMusr.fData[xIndex].size();
   for (UInt_t i=0; i<fRawRunData->fDataNonMusr.GetData()->at(xIndex).size(); i++) {
-// cout << endl << ">> i=" << i << ", packing=" << fRunInfo->GetPacking();
     if (fRunInfo->GetPacking() == 1) {
       fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i));
       fData.AppendValue(fRawRunData->fDataNonMusr.GetData()->at(yIndex).at(i));
       fData.AppendErrorValue(fRawRunData->fDataNonMusr.GetErrData()->at(yIndex).at(i));
     } else { // packed data, i.e. fRunInfo->GetPacking() > 1
       if ((i % fRunInfo->GetPacking() == 0) && (i != 0)) { // fill data
-// cout << endl << "-> i=" << i;
         fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i-fRunInfo->GetPacking()))/2.0);
         fData.AppendValue(value);
         fData.AppendErrorValue(TMath::Sqrt(err));
@@ -216,7 +216,6 @@ Bool_t PRunNonMusr::PrepareFitData()
       err += fRawRunData->fDataNonMusr.GetErrData()->at(yIndex).at(i)*fRawRunData->fDataNonMusr.GetErrData()->at(yIndex).at(i);
     }
   }
-// cout << endl << ">> fData.fValue.size()=" << fData.fValue.size();
 
   // count the number of bins to be fitted
   fNoOfFitBins=0;
@@ -226,7 +225,6 @@ Bool_t PRunNonMusr::PrepareFitData()
     if ((x >= fFitStartTime) && (x <= fFitStopTime))
       fNoOfFitBins++;
   }
-// cout << endl << ">> fNoOfFitBins=" << fNoOfFitBins;
 
   return success;
 }
@@ -235,34 +233,31 @@ Bool_t PRunNonMusr::PrepareFitData()
 // PrepareViewData
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Prepare data for viewing.
  *
+ * <b>return:</b>
+ * - true if everthing went smooth
+ * - false, otherwise.
  */
 Bool_t PRunNonMusr::PrepareViewData()
 {
   Bool_t success = true;
 
-// cout << endl << ">> fRunInfo->fRunName = " << fRunInfo->fRunName[0].Data();
-
   // get x-, y-index
   UInt_t xIndex = GetXIndex();
   UInt_t yIndex = GetYIndex();
-// cout << endl << "PRunNonMusr::PrepareViewData: xIndex=" << xIndex << ", yIndex=" << yIndex << endl;
 
   // fill data histo
   // pack the raw data
   Double_t value  = 0.0;
   Double_t err = 0.0;
-// cout << endl << ">> fRawRunData->fDataNonMusr.fData[" << xIndex << "].size()=" << fRawRunData->fDataNonMusr.fData[xIndex].size();
   for (UInt_t i=0; i<fRawRunData->fDataNonMusr.GetData()->at(xIndex).size(); i++) {
-// cout << endl << ">> i=" << i << ", packing=" << fRunInfo->GetPacking();
     if (fRunInfo->GetPacking() == 1) {
       fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i));
       fData.AppendValue(fRawRunData->fDataNonMusr.GetData()->at(yIndex).at(i));
       fData.AppendErrorValue(fRawRunData->fDataNonMusr.GetErrData()->at(yIndex).at(i));
     } else { // packed data, i.e. fRunInfo->GetPacking() > 1
       if ((i % fRunInfo->GetPacking() == 0) && (i != 0)) { // fill data
-// cout << endl << "-> i=" << i;
         fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i-fRunInfo->GetPacking()))/2.0);
         fData.AppendValue(value);
         fData.AppendErrorValue(TMath::Sqrt(err));
@@ -274,11 +269,9 @@ Bool_t PRunNonMusr::PrepareViewData()
       err += fRawRunData->fDataNonMusr.GetErrData()->at(yIndex).at(i)*fRawRunData->fDataNonMusr.GetErrData()->at(yIndex).at(i);
     }
   }
-// cout << endl << ">> fData.fValue.size()=" << fData.fValue.size();
 
   // count the number of bins to be fitted
   fNoOfFitBins = fData.GetValue()->size();
-// cout << endl << ">> fNoOfFitBins=" << fNoOfFitBins;
 
   // fill theory histo
   // feed the parameter vector
@@ -291,7 +284,6 @@ Bool_t PRunNonMusr::PrepareViewData()
     fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), *fRunInfo->GetMap(), par);
   }
 
-// cout << endl << ">> after parameter fill" << endl;
   // get plot range
   PMsrPlotList *plotList;
   PMsrPlotStructure plotBlock;
@@ -306,15 +298,9 @@ Bool_t PRunNonMusr::PrepareViewData()
   Double_t xMin = 0.0, xMax = 0.0;
   Double_t xAbsMin = 0.0, xAbsMax = 0.0;
   Bool_t first = true;
-// cout << endl << ">> plotList->size()=" << plotList->size();
   for (UInt_t i=0; i<plotList->size(); i++) {
     plotBlock = plotList->at(i);
-// cout << endl << ">> plotBlock.fRuns.size()=" << plotBlock.fRuns.size() << endl;
     for (UInt_t j=0; j<plotBlock.fRuns.size(); j++) {
-// cout << endl << ">> j=" << j;
-// cout << endl << ">> fRunNo=" << fRunNo;
-// cout << endl << ">> plotBlock.fRuns[j]=" << plotBlock.fRuns[j];
-// cout << endl;
       if (fRunNo == plotBlock.fRuns[j]-1) { // run found
         if (first) {
           first = false;
@@ -322,7 +308,6 @@ Bool_t PRunNonMusr::PrepareViewData()
           xMax = plotBlock.fTmax[0];
           xAbsMin = xMin;
           xAbsMax = xMax;
-// cout << endl << ">> first: xMin=" << xMin << ", xMax=" << xMax << endl;
         } else {
           if (fabs(xMax-xMin) > fabs(plotBlock.fTmax[0]-plotBlock.fTmin[0])) {
             xMin = plotBlock.fTmin[0];
@@ -332,13 +317,10 @@ Bool_t PRunNonMusr::PrepareViewData()
             xAbsMin = xMin;
           if (xMax > xAbsMax)
             xAbsMax = xMax;
-// cout << endl << ">> !first: xMin=" << xMin << ", xMax=" << xMax << endl;
         }
-// cout << endl << ">> xMin=" << xMin << ", xMax=" << xMax << endl;
       }
     }
   }
-// cout << endl << ">> after the xmin/xmax loop." << endl;
 
   // typically take 1000 points to calculate the theory, except if there are more data points, than take that number
   Double_t xStep;
@@ -367,31 +349,26 @@ Bool_t PRunNonMusr::PrepareViewData()
 // GetXIndex
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Returns the x-axis data index.
  *
+ * <b>return:</b>
+ * - x-index
  */
 UInt_t PRunNonMusr::GetXIndex()
 {
   UInt_t index = 0;
   Bool_t found = false;
 
-//cout << endl << ">> PRunNonMusr::GetXIndex: fRawRunData->fDataNonMusr.fFromAscii = " << fRawRunData->fDataNonMusr.fFromAscii;
   if (fRawRunData->fDataNonMusr.FromAscii()) { // ascii-file format
-//cout << endl << ">> PRunNonMusr::GetXIndex: ascii-file format";
     index = 0;
     found = true;
   } else { // db-file format
-//cout << endl << ">> PRunNonMusr::GetXIndex: db-file format";
     if (fRunInfo->GetXDataIndex() > 0) { // xy-data already indices
-//cout << endl << ">> PRunNonMusr::GetXIndex: xy-data are already indices, i.e. not labels";
       index = fRunInfo->GetXDataIndex()-1; // since xy-data start with 1 ...
       found = true;
     } else { // xy-data data tags which needs to be converted to an index
-//cout << endl << ">> fDataTags.size()=" << fRawRunData->fDataNonMusr.fDataTags.size();
       for (UInt_t i=0; i<fRawRunData->fDataNonMusr.GetDataTags()->size(); i++) {
         if (fRawRunData->fDataNonMusr.GetDataTags()->at(i).CompareTo(*fRunInfo->GetXDataLabel()) == 0) {
-//cout << endl << ">> i=" << i << ", fRawRunData->fDataNonMusr.fDataTags[i]=" << fRawRunData->fDataNonMusr.fDataTags[i].Data();
-//cout << endl << ">> fRunInfo->fXYDataLabel[0]=" << fRunInfo->fXYDataLabel[0].Data();
           index = i;
           found = true;
           break;
@@ -413,15 +390,16 @@ UInt_t PRunNonMusr::GetXIndex()
 // GetYIndex
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Returns the y-axis data index.
  *
+ * <b>return:</b>
+ * - y-index
  */
 UInt_t PRunNonMusr::GetYIndex()
 {
   UInt_t index = 0;
   Bool_t found = false;
 
-// cout << endl << ">> PRunNonMusr::GetYIndex:";
   if (fRawRunData->fDataNonMusr.FromAscii()) { // ascii-file format
     index = 1;
     found = true;
@@ -432,8 +410,6 @@ UInt_t PRunNonMusr::GetYIndex()
     } else { // xy-data data tags which needs to be converted to an index
       for (UInt_t i=0; i<fRawRunData->fDataNonMusr.GetDataTags()->size(); i++) {
         if (fRawRunData->fDataNonMusr.GetDataTags()->at(i).CompareTo(*fRunInfo->GetYDataLabel()) == 0) {
-// cout << endl << ">> i=" << i << ", fRawRunData->fDataNonMusr.fDataTags[i]=" << fRawRunData->fDataNonMusr.fDataTags[i].Data();
-// cout << endl << ">> fRunInfo->fXYDataLabel[1]=" << fRunInfo->fXYDataLabel[1].Data();
           index = i;
           found = true;
           break;

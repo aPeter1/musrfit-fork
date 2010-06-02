@@ -46,7 +46,7 @@ ClassImpQ(PStartupHandler)
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor. Check if the musrfit_startup.xml file is found in some standard search paths
  */
 PStartupHandler::PStartupHandler()
 {
@@ -86,7 +86,7 @@ PStartupHandler::PStartupHandler()
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Destructor
  */
 PStartupHandler::~PStartupHandler()
 {
@@ -100,7 +100,7 @@ PStartupHandler::~PStartupHandler()
 // OnStartDocument
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Called on start of the XML file reading. Initializes all necessary variables.
  */
 void PStartupHandler::OnStartDocument()
 {
@@ -124,7 +124,7 @@ void PStartupHandler::OnStartDocument()
 // OnEndDocument
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Called on end of XML file reading.
  */
 void PStartupHandler::OnEndDocument()
 {
@@ -136,10 +136,11 @@ void PStartupHandler::OnEndDocument()
 // OnStartElement
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Called when a XML start element is found. Filters out the needed elements
+ * and sets a proper key.
  *
- * \param str
- * \param attributes
+ * \param str XML element name
+ * \param attributes not used
  */
 void PStartupHandler::OnStartElement(const Char_t *str, const TList *attributes)
 {
@@ -168,9 +169,9 @@ void PStartupHandler::OnStartElement(const Char_t *str, const TList *attributes)
 // OnEndElement
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Called when a XML end element is found. Resets the handler key.
  *
- * \param str
+ * \param str not used
  */
 void PStartupHandler::OnEndElement(const Char_t *str)
 {
@@ -181,9 +182,10 @@ void PStartupHandler::OnEndElement(const Char_t *str)
 // OnCharacters
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Content of a given XML element. Filters out the data and feeds them to
+ * the internal variables.
  *
- * \param str
+ * \param str XML element string
  */
 void PStartupHandler::OnCharacters(const Char_t *str)
 {
@@ -352,9 +354,9 @@ void PStartupHandler::OnCharacters(const Char_t *str)
 // OnComment
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Called when a XML comment is found. Not used.
  *
- * \param str
+ * \param str not used.
  */
 void PStartupHandler::OnComment(const Char_t *str)
 {
@@ -365,9 +367,9 @@ void PStartupHandler::OnComment(const Char_t *str)
 // OnWarning
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Called when the XML parser emits a warning.
  *
- * \param str
+ * \param str warning string
  */
 void PStartupHandler::OnWarning(const Char_t *str)
 {
@@ -379,9 +381,9 @@ void PStartupHandler::OnWarning(const Char_t *str)
 // OnError
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Called when the XML parser emits an error.
  *
- * \param str
+ * \param str error string
  */
 void PStartupHandler::OnError(const Char_t *str)
 {
@@ -393,9 +395,9 @@ void PStartupHandler::OnError(const Char_t *str)
 // OnFatalError
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Called when the XML parser emits a fatal error.
  *
- * \param str
+ * \param str fatal error string
  */
 void PStartupHandler::OnFatalError(const Char_t *str)
 {
@@ -407,9 +409,9 @@ void PStartupHandler::OnFatalError(const Char_t *str)
 // OnCdataBlock
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Not used.
  *
- * \param str
+ * \param str not used
  */
 void PStartupHandler::OnCdataBlock(const Char_t *str, Int_t len)
 {
@@ -420,7 +422,7 @@ void PStartupHandler::OnCdataBlock(const Char_t *str, Int_t len)
 // CheckLists
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Check if the default lists are present and if not, feed them with some default settings
  *
  */
 void PStartupHandler::CheckLists()
@@ -428,17 +430,20 @@ void PStartupHandler::CheckLists()
   // check if anything was set, and if not set some default stuff
 
   // check if any data path is given
-//cout << endl << ">> check data path list ...";
   if (fDataPathList.size() == 0) {
-//cout << endl << ">> data path list empty, will set default ones";  
     fDataPathList.push_back(TString("/mnt/data/nemu/his"));
     fDataPathList.push_back(TString("/mnt/data/nemu/wkm"));
+    fDataPathList.push_back(TString("/afs/psi.ch/project/nemu/data/his"));
+    fDataPathList.push_back(TString("/afs/psi.ch/project/nemu/data/wkm"));
+    fDataPathList.push_back(TString("/afs/psi.ch/project/bulkmusr/data/gps"));
+    fDataPathList.push_back(TString("/afs/psi.ch/project/bulkmusr/data/dolly"));
+    fDataPathList.push_back(TString("/afs/psi.ch/project/bulkmusr/data/gpd"));
+    fDataPathList.push_back(TString("/afs/psi.ch/project/bulkmusr/data/ltf"));
+    fDataPathList.push_back(TString("/afs/psi.ch/project/bulkmusr/data/alc"));
   }
 
   // check if any markers are given
-//cout << endl << ">> check marker list ...";  
   if (fMarkerList.size() == 0) {
-//cout << endl << ">> marker list empty, will set default ones";  
     fMarkerList.push_back(24); // open circle
     fMarkerList.push_back(25); // open square
     fMarkerList.push_back(26); // open triangle
@@ -456,9 +461,7 @@ void PStartupHandler::CheckLists()
   }
 
   // check if any colors are given
-//cout << endl << ">> check color list ...";  
   if (fColorList.size() == 0) {
-//cout << endl << ">> color list empty, will set default ones";  
     fColorList.push_back(TColor::GetColor(0, 0, 0));     // kBlack
     fColorList.push_back(TColor::GetColor(255, 0, 0));   // kRed
     fColorList.push_back(TColor::GetColor(0, 255, 0));   // kGreen
@@ -476,8 +479,13 @@ void PStartupHandler::CheckLists()
 // StartupFileExists
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Checks if a file is present on the disc.
  *
+ * <b>return:</b>
+ * - true, if the file is present
+ * - false, otherwise
+ *
+ * \param fln file name
  */
 Bool_t PStartupHandler::StartupFileExists(Char_t *fln)
 {

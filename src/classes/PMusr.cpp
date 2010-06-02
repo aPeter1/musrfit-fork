@@ -1207,6 +1207,7 @@ Double_t PMsrRunBlock::GetFitRange(UInt_t idx)
 /**
  * <p> set fit range value at position idx
  *
+ * \param dval value to be set
  * \param idx index of the fit range value to be set
  */
 void PMsrRunBlock::SetFitRange(Double_t dval, UInt_t idx)

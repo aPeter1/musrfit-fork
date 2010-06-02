@@ -37,8 +37,7 @@
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Constructor
  */
 PRunMuMinus::PRunMuMinus() : PRunBase()
 {
@@ -53,10 +52,12 @@ PRunMuMinus::PRunMuMinus() : PRunBase()
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor
  *
- * \param msrInfo pointer to the msr info structure
- * \param runNo number of the run of the msr-file
+ * \param msrInfo pointer to the msr-file handler
+ * \param rawData raw run data
+ * \param runNo number of the run within the msr-file
+ * \param tag tag showing what shall be done: kFit == fitting, kView == viewing
  */
 PRunMuMinus::PRunMuMinus(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
 {
@@ -72,8 +73,7 @@ PRunMuMinus::PRunMuMinus(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t 
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Destructor
  */
 PRunMuMinus::~PRunMuMinus()
 {
@@ -83,9 +83,12 @@ PRunMuMinus::~PRunMuMinus()
 // CalcChiSquare
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Calculate chi-square. <b>(Not yet implemented)</b>
  *
- * \param par parameter vector iterated by minuit
+ * <b>return:</b>
+ * - chisq value
+ *
+ * \param par parameter vector iterated by minuit2
  */
 Double_t PRunMuMinus::CalcChiSquare(const std::vector<Double_t>& par)
 {
@@ -99,9 +102,12 @@ Double_t PRunMuMinus::CalcChiSquare(const std::vector<Double_t>& par)
 // CalcMaxLikelihood
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Calculate log max-likelihood. <b>(Not yet implemented)</b>
  *
- * \param par parameter vector iterated by minuit
+ * <b>return:</b>
+ * - log max-likelihood value
+ *
+ * \param par parameter vector iterated by minuit2
  */
 Double_t PRunMuMinus::CalcMaxLikelihood(const std::vector<Double_t>& par)
 {
@@ -114,8 +120,7 @@ Double_t PRunMuMinus::CalcMaxLikelihood(const std::vector<Double_t>& par)
 // CalcTheory
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Calculate theory for a given set of fit-parameters. <b>(Not yet implemented)</b>
  */
 void PRunMuMinus::CalcTheory()
 {
@@ -125,8 +130,11 @@ void PRunMuMinus::CalcTheory()
 // PrepareData
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Prepare data for fitting or viewing. <b>(Not yet implemented)</b>
  *
+ * <b>return:</b>
+ * - true if everthing went smooth
+ * - false, otherwise.
  */
 Bool_t PRunMuMinus::PrepareData()
 {

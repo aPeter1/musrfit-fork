@@ -34,6 +34,9 @@
 
 #include "PRunBase.h"
 
+/**
+ * <p>Will eventually handle the \f$\mu^{-}\f$ fitting etc.
+ */
 class PRunMuMinus : public PRunBase
 {
   public:
@@ -51,9 +54,9 @@ class PRunMuMinus : public PRunBase
     virtual Bool_t PrepareData();
 
   private:
-    Double_t fFitStartTime;
-    Double_t fFitStopTime;
-    UInt_t fNoOfFitBins;
+    Double_t fFitStartTime; ///< fit start time
+    Double_t fFitStopTime;  ///< fit end time
+    UInt_t fNoOfFitBins;    ///< number of bins to be fitted
 };
 
 #endif // _PRUNMUMINUS_H_

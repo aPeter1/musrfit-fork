@@ -117,7 +117,7 @@ typedef struct theo_data_base {
 } PTheoDataBase;
 
 //--------------------------------------------------------------------------------------
-/*!
+/**
  * <p> Holds the functions available for the user.
  */
 static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
@@ -187,7 +187,7 @@ static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
 
 //--------------------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Class handling a theory of a msr-file.
  */
 class PTheory
 {
@@ -234,23 +234,23 @@ class PTheory
     virtual Double_t GetDynKTLFValue(const Double_t t) const;
 
     // variables
-    Bool_t fValid;
-    UInt_t fType;
+    Bool_t fValid; ///< flag to tell if the theory is valid
+    UInt_t fType; ///< function tag
     vector<UInt_t> fParamNo; ///< holds the parameter numbers for the theory (including maps and functions, see constructor desciption)
-    UInt_t fNoOfParam;
-    PTheory *fAdd, *fMul;
+    UInt_t fNoOfParam; ///< number of parameters for the given function
+    PTheory *fAdd, *fMul; ///< pointers to the add-sub-function or the multiply-sub-function
 
     TString fUserFcnClassName; ///< name of the user function class for within root
     TString fUserFcnSharedLibName; ///< name of the shared lib to which the user function belongs
     PUserFcnBase *fUserFcn;    ///< pointer to the user function object
     mutable PDoubleVector fUserParam;  ///< vector holding the resolved user function parameters, i.e. map and function resolved.
 
-    PMsrHandler *fMsrInfo;
+    PMsrHandler *fMsrInfo; ///< pointer to the msr-file handler
 
-    mutable Double_t fPrevParam[THEORY_MAX_PARAM]; ///< needed for LF-stuff
-    mutable PDoubleVector fLFIntegral;             ///< needed for LF-stuff. Keeps the non-analytic integral values
-    mutable Double_t fDynLFdt;
-    mutable PDoubleVector fDynLFFuncValue;         ///< needed for LF-stuff. Keeps the dynamic LF KT function values
+    mutable Double_t fPrevParam[THEORY_MAX_PARAM]; ///< needed for LF. Keeps the previous fitting parameters
+    mutable PDoubleVector fLFIntegral;             ///< needed for LF. Keeps the non-analytic integral values
+    mutable Double_t fDynLFdt;                     ///< needed for LF. Keeps the time step for the dynamic LF calculation, used in the integral equation approach
+    mutable PDoubleVector fDynLFFuncValue;         ///< needed for LF. Keeps the dynamic LF KT function values
 };
 
 #endif //  _PTHEORY_H_

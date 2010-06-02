@@ -52,38 +52,43 @@ using namespace std;
 // Constructor
 //--------------------------------------------------------------------------
 /**
+ * <p> Constructor.
+ *
  * <p> The theory block his parsed and mapped to a tree. Every line (except the '+')
  * is a theory object by itself, i.e. the whole theory is build up recursivly.
  * Example:
- *   Theory block:
- *     a 1
- *     tf 2 3
- *     se 4
- *     +
- *     a 5
- *     tf 6 7
- *     se 8
- *     +
- *     a 9
- *     tf 10 11
+ * \verbatim
+    Theory block:
+      a 1
+      tf 2 3
+      se 4
+      +
+      a 5
+      tf 6 7
+      se 8
+      +
+      a 9
+      tf 10 11
+ \endverbatim
  *
- * This is mapped into the following binary tree:
+ * <p> This is mapped into the following binary tree:
+ * \verbatim
+                 a 1
+               +/   \*
+              a 5   tf 2 3
+            + /  \*    \ *
+            a 9  a 5   se 4
+              \*   \*
+         tf 10 11  tf 6 7
+                    \*
+                    se 8
+ \endverbatim
  *
- *                a 1
- *              +/   \*
- *             a 5   tf 2 3
- *           + /  \*    \ *
- *           a 9  a 5   se 4
- *             \*   \*
- *        tf 10 11  tf 6 7
- *                   \*
- *                   se 8
- *
- * \param msrInfo
- * \param runNo
- * \param parent needed in order to know if PTheory is the root object or a child
- *               false (default) -> this is the root object
- *               true -> this is part of an already existing object tree
+ * \param msrInfo msr-file handler
+ * \param runNo msr-file run number
+ * \param hasParent flag needed in order to know if PTheory is the root object or a child
+ *               false (default) means this is the root object
+ *               true means this is part of an already existing object tree
  */
 PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent)
 {
@@ -174,7 +179,6 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent)
 
     // if userFcn, the first entry is the function name and needs to be handled specially
     if ((fType == THEORY_USER_FCN) && ((i == 1) || (i == 2))) {
-//cout << endl << ">> userFcn: i=" << i << ", str=" << str.Data() << endl;
       if (i == 1) {
         fUserFcnSharedLibName = str;
       }
@@ -275,7 +279,6 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent)
     // invoke user function object
     fUserFcn = 0;
     fUserFcn = (PUserFcnBase*)TClass::GetClass(fUserFcnClassName.Data())->New();
-//cout << endl << ">> fUserFcn = " << fUserFcn << endl;
     if (fUserFcn == 0) {
       cerr << endl << "**ERROR**: PTheory: user function object could not be invoked. See line no " << line->fLineNo;
       cerr << endl;
@@ -296,12 +299,10 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent)
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Destructor
  */
 PTheory::~PTheory()
 {
-//cout << endl << "PTheory::~PTheory() ..." << endl;
-
   fParamNo.clear();
   fUserParam.clear();
 
@@ -321,8 +322,11 @@ PTheory::~PTheory()
 // IsValid
 //--------------------------------------------------------------------------
 /**
- * <p>Checks if the theory tree is valid. Needs to be implemented!!
+ * <p>Checks if the theory tree is valid.
  *
+ * <b>return:</b>
+ * - true if valid
+ * - false otherwise
  */
 Bool_t PTheory::IsValid()
 {
@@ -346,10 +350,14 @@ Bool_t PTheory::IsValid()
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Evaluates the theory tree.
  *
- * \param t
- * \param paramValues
+ * <b>return:</b>
+ * - theory value for the given sets of parameters
+ *
+ * \param t time for single histogram, asymmetry, and mu-minus fits, x-axis value non-muSR fits
+ * \param paramValues vector with the parameters
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -681,7 +689,7 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
  * the COOLEST part is that if right is a non-null pointer,
  * the destructor gets called recursively!
  *
- * \param theo
+ * \param theo pointer to the theory object
  */
 void PTheory::CleanUp(PTheory *theo)
 {
@@ -698,9 +706,13 @@ void PTheory::CleanUp(PTheory *theo)
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Searches the internal look up table for the theory name, and if found
+ * set some internal variables to proper values.
  *
- * \param name
+ * <b>return:</b>
+ * - index of the theory function
+ *
+ * \param name theory name
  */
 Int_t PTheory::SearchDataBase(TString name)
 {
@@ -722,9 +734,10 @@ Int_t PTheory::SearchDataBase(TString name)
 // MakeCleanAndTidyTheoryBlock private
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Takes the theory block form the msr-file, and makes a nicely formated
+ * theory block.
  *
- * \param fullTheoryBlock
+ * \param fullTheoryBlock msr-file text lines of the theory block
  */
 void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
 {
@@ -812,9 +825,10 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
 // MakeCleanAndTidyPolynom private
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Prettifies a polynom theory line.
  *
- * \param fullTheoryBlock
+ * \param i line index of the theory polynom line to be prettified
+ * \param fullTheoryBlock msr-file text lines of the theory block
  */
 void PTheory::MakeCleanAndTidyPolynom(UInt_t i, PMsrLines *fullTheoryBlock)
 {
@@ -823,8 +837,6 @@ void PTheory::MakeCleanAndTidyPolynom(UInt_t i, PMsrLines *fullTheoryBlock)
   TObjArray *tokens = 0;
   TObjString *ostr;
   Char_t substr[256];
-
-//cout << endl << ">> MakeCleanAndTidyPolynom: " << (*fullTheoryBlock)[i].fLine.Data();
 
   // init tidy
   tidy = TString("polynom ");
@@ -870,9 +882,10 @@ void PTheory::MakeCleanAndTidyPolynom(UInt_t i, PMsrLines *fullTheoryBlock)
 // MakeCleanAndTidyUserFcn private
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Prettifies a user function theory line.
  *
- * \param fullTheoryBlock
+ * \param i line index of the user function line to be prettified
+ * \param fullTheoryBlock msr-file text lines of the theory block
  */
 void PTheory::MakeCleanAndTidyUserFcn(UInt_t i, PMsrLines *fullTheoryBlock)
 {
@@ -880,8 +893,6 @@ void PTheory::MakeCleanAndTidyUserFcn(UInt_t i, PMsrLines *fullTheoryBlock)
   TString str, tidy;
   TObjArray *tokens = 0;
   TObjString *ostr;
-
-//cout << endl << ">> MakeCleanAndTidyUserFcn: " << (*fullTheoryBlock)[i].fLine.Data();
 
   // init tidy
   tidy = TString("userFcn ");
@@ -910,10 +921,15 @@ void PTheory::MakeCleanAndTidyUserFcn(UInt_t i, PMsrLines *fullTheoryBlock)
 
 //--------------------------------------------------------------------------
 /**
- * <p> Asymmetry
+ * <p> theory function: Asymmetry
  * \f[ = A \f]
  *
- * \param paramValues
+ * <b>meaning of paramValues:</b> \f$A\f$
+ *
+ * <b>return:</b> function value
+ *
+ * \param paramValues vector with the parameters
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::Asymmetry(const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -933,16 +949,17 @@ Double_t PTheory::Asymmetry(const PDoubleVector& paramValues, const PDoubleVecto
 
 //--------------------------------------------------------------------------
 /**
- * <p> Simple exponential
+ * <p> theory function: simple exponential
  * \f[ = \exp\left(-\lambda t\right) \f] or
- * \f[ = \exp\left(-\lambda (t-t_{\rm shift} \right) \f]
+ * \f[ = \exp\left(-\lambda [t-t_{\rm shift}] \right) \f]
  *
- * <p> For details concerning fParamNo and paramValues see PTheory::Asymmetry and
- * PTheory::PTheory.
+ * <b>meaning of paramValues:</b> \f$\lambda\f$ [, \f$t_{\rm shift}\f$]
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues parameter values: depolarization rate \f$\lambda\f$ 
- *          in \f$(1/\mu\mathrm{s})\f$, optionally \f$t_{\rm shift}\f$
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::SimpleExp(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -972,10 +989,17 @@ Double_t PTheory::SimpleExp(register Double_t t, const PDoubleVector& paramValue
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> theory function: generalized exponential
+ * \f[ = \exp\left(-[\lambda t]^\beta\right) \f] or
+ * \f[ = \exp\left(-[\lambda (t-t_{\rm shift})]^\beta\right) \f]
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues
+ * <b>meaning of paramValues:</b> \f$\lambda\f$, \f$\beta\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::GeneralExp(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -1013,10 +1037,17 @@ Double_t PTheory::GeneralExp(register Double_t t, const PDoubleVector& paramValu
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> theory function: simple Gaussian
+ * \f[ = \exp\left(-1/2 [\sigma t]^2\right) \f] or
+ * \f[ = \exp\left(-1/2 [\sigma (t-t_{\rm shift})]^2\right) \f]
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues
+ * <b>meaning of paramValues:</b> \f$\sigma\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::SimpleGauss(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -1046,10 +1077,17 @@ Double_t PTheory::SimpleGauss(register Double_t t, const PDoubleVector& paramVal
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> theory function: static Gaussian Kubo-Toyabe in zero applied field
+ * \f[ = \frac{1}{3} + \frac{2}{3} \left[1-(\sigma t)^2\right] \exp\left[-1/2 (\sigma t)^2\right] \f] or
+ * \f[ = \frac{1}{3} + \frac{2}{3} \left[1-(\sigma \{t-t_{\rm shift}\})^2\right] \exp\left[-1/2 (\sigma \{t-t_{\rm shift}\})^2\right] \f]
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues
+ * <b>meaning of paramValues:</b> \f$\sigma\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::StaticGaussKT(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -1079,10 +1117,19 @@ Double_t PTheory::StaticGaussKT(register Double_t t, const PDoubleVector& paramV
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> theory function: static Gaussian Kubo-Toyabe in longitudinal applied field
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues
+ * \f[ = 1-\frac{2\sigma^2}{(2\pi\nu)^2}\left[1-\exp\left(-1/2 \{\sigma t\}^2\right)\cos(2\pi\nu t)\right] +
+       \frac{2\sigma^4}{(2\pi\nu)^3}\int^t_0 \exp\left(-1/2 \{\sigma \tau\}^2\right)\sin(2\pi\nu\tau)\mathrm{d}\tau \f]
+ * or the time shifted version of it.
+ *
+ * <b>meaning of paramValues:</b> \f$\sigma\f$, \f$\nu\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::StaticGaussKTLF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -1147,10 +1194,22 @@ Double_t PTheory::StaticGaussKTLF(register Double_t t, const PDoubleVector& para
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> theory function: dynamic Gaussian Kubo-Toyabe in longitudinal applied field
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues
+ * \f[ = \frac{1}{2\pi \imath}\int_{\gamma-\imath\infty}^{\gamma+\imath\infty}
+ *       \frac{f_{\mathrm{G}}(s+\Gamma)}{1-\Gamma f_{\mathrm{G}}(s+\Gamma)} \exp(s t) \mathrm{d}s,
+ *       \mathrm{~where~}\,f_{\mathrm{G}}(s)\equiv \int_0^{\infty}G_{\mathrm{G,LF}}(t)\exp(-s t) \mathrm{d}t\f]
+ * or the time shifted version of it. \f$G_{\mathrm{G,LF}}(t)\f$ is the static Gaussian Kubo-Toyabe in longitudinal applied field.
+ *
+ * <p>The current implementation is not realized via the above formulas, but ...
+ *
+ * <b>meaning of paramValues:</b> \f$\sigma\f$, \f$\nu\f$, \f$\Gamma\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::DynamicGaussKTLF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -1229,10 +1288,18 @@ Double_t PTheory::DynamicGaussKTLF(register Double_t t, const PDoubleVector& par
 
 //--------------------------------------------------------------------------
 /**
- * <p> (see Uemura et al. PRB 31, 546 (85))
+ * <p> theory function: static Lorentzain Kubo-Toyabe in zero applied field (see Uemura et al. PRB 31, 546 (85)).
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues
+ * \f[ = 1/3 + 2/3 [1 - \lambda t] \exp(-\lambda t) \f]
+ * or the time shifted version of it.
+ *
+ * <b>meaning of paramValues:</b> \f$\lambda\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::StaticLorentzKT(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -1262,10 +1329,20 @@ Double_t PTheory::StaticLorentzKT(register Double_t t, const PDoubleVector& para
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> theory function: static Lorentzain Kubo-Toyabe in longitudinal applied field (see Uemura et al. PRB 31, 546 (85)).
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues
+ * \f[ = 1-\frac{a}{2\pi\nu}j_1(2\pi\nu t)\exp\left(-at\right)-
+ *       \left(\frac{a}{2\pi\nu}\right)^2 \left[j_0(2\pi\nu t)\exp\left(-at\right)-1\right]-
+ *       a\left[1+\left(\frac{a}{2\pi\nu}\right)^2\right]\int^t_0 \exp\left(-a\tau\right)j_0(2\pi\nu\tau)\mathrm{d}\tau) \f]
+ * or the time shifted version of it.
+ *
+ * <b>meaning of paramValues:</b> \f$a\f$, \f$\nu\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::StaticLorentzKTLF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -1340,10 +1417,24 @@ Double_t PTheory::StaticLorentzKTLF(register Double_t t, const PDoubleVector& pa
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> theory function: dynamic Lorentzain Kubo-Toyabe in longitudinal applied field
+ * (see R. S. Hayano et al., Phys. Rev. B 20 (1979) 850; P. Dalmas de Reotier and A. Yaouanc,
+ * J. Phys.: Condens. Matter 4 (1992) 4533; A. Keren, Phys. Rev. B 50 (1994) 10039).
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues
+ * \f[ =  \frac{1}{2\pi \imath}\int_{\gamma-\imath\infty}^{\gamma+\imath\infty}
+ * \frac{f_{\mathrm{L}}(s+\Gamma)}{1-\Gamma f_{\mathrm{L}}(s+\Gamma)} \exp(s t) \mathrm{d}s,
+ * \mathrm{~where~}\,f_{\mathrm{L}}(s)\equiv \int_0^{\infty}G_{\mathrm{L,LF}}(t)\exp(-s t) \mathrm{d}t\f]
+ * or the time shifted version of it. \f$G_{\mathrm{L,LF}}(t)\f$ is the static Lorentzain Kubo-Toyabe function in longitudinal field
+ *
+ * <p>The current implementation is not realized via the above formulas, but ...
+ *
+ * <b>meaning of paramValues:</b> \f$a\f$, \f$\nu\f$, \f$\Gamma\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::DynamicLorentzKTLF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -1433,10 +1524,18 @@ Double_t PTheory::DynamicLorentzKTLF(register Double_t t, const PDoubleVector& p
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> theory function: dynamic Lorentzain Kubo-Toyabe in longitudinal applied field
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues
+ * \f[ =  1/3 + 2/3 \left(1-(\sigma t)^2-\lambda t\right) \exp\left(-1/2(\sigma t)^2-\lambda t\right)\f]
+ * or the time shifted version of it.
+ *
+ * <b>meaning of paramValues:</b> \f$\lambda\f$, \f$\sigma\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::CombiLGKT(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -1470,10 +1569,18 @@ Double_t PTheory::CombiLGKT(register Double_t t, const PDoubleVector& paramValue
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> theory function: spin glass function
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues
+ * \f[ = \frac{1}{3}\exp\left(-\sqrt{\frac{4\lambda^2(1-q)t}{\gamma}}\right)+\frac{2}{3}\left(1-\frac{q\lambda^2t^2}{\sqrt{\frac{4\lambda^2(1-q)t}{\gamma}+q\lambda^2t^2}}\right)\exp\left(-\sqrt{\frac{4\lambda^2(1-q)t}{\gamma}+q\lambda^2t^2}\right)\f]
+ * or the time shifted version of it.
+ *
+ * <b>meaning of paramValues:</b> \f$\lambda\f$, \f$\gamma\f$, \f$q\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::SpinGlass(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -1513,10 +1620,18 @@ Double_t PTheory::SpinGlass(register Double_t t, const PDoubleVector& paramValue
 
 //--------------------------------------------------------------------------
 /**
- * <p>Where does this come from ??? please give a reference
+ * <p> theory function: random anisotropic hyperfine function (see  R. E. Turner and D. R. Harshman, Phys. Rev. B 34 (1986) 4467)
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues
+ * \f[ = \frac{1}{6}\left(1-\frac{\nu t}{2}\right)\exp\left(-\frac{\nu t}{2}\right)+\frac{1}{3}\left(1-\frac{\nu t}{4}\right)\exp\left(-\frac{\nu t + 2.44949\lambda t}{4}\right)\f]
+ * or the time shifted version of it.
+ *
+ * <b>meaning of paramValues:</b> \f$\nu\f$, \f$\lambda\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::RandomAnisotropicHyperfine(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -1550,10 +1665,18 @@ Double_t PTheory::RandomAnisotropicHyperfine(register Double_t t, const PDoubleV
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> theory function: Abragam function
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues
+ * \f[ = \exp\left[-\frac{\sigma^2}{\gamma^2}\left(e^{-\gamma t}-1+\gamma t\right)\right] \f]
+ * or the time shifted version of it.
+ *
+ * <b>meaning of paramValues:</b> \f$\sigma\f$, \f$\gamma\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::Abragam(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -1581,15 +1704,23 @@ Double_t PTheory::Abragam(register Double_t t, const PDoubleVector& paramValues,
   Double_t gamma_t = tt*val[1];
 
   return TMath::Exp(-TMath::Power(val[0]/val[1],2.0)*
-                    (TMath::Exp(-gamma_t)-1.0-gamma_t));
+                    (TMath::Exp(-gamma_t)-1.0+gamma_t));
 }
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> theory function: internal field function
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues
+ * \f[ = \alpha\,\cos\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)\exp\left(-\lambda_{\mathrm{T}}t\right)+(1-\alpha)\,\exp\left(-\lambda_{\mathrm{L}}t\right)\f]
+ * or the time shifted version of it.
+ *
+ * <b>meaning of paramValues:</b> \f$\alpha\f$, \f$\varphi\f$, \f$\nu\f$, \f$\lambda_{\rm T}\f$, \f$\lambda_{\rm L}\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::InternalField(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -1620,10 +1751,18 @@ Double_t PTheory::InternalField(register Double_t t, const PDoubleVector& paramV
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> theory function: cosine including phase
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues
+ * \f[ = \cos(2\pi\nu t + \varphi) \f]
+ * or the time shifted version of it.
+ *
+ * <b>meaning of paramValues:</b> \f$\nu\f$, \f$\varphi\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::TFCos(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -1653,10 +1792,18 @@ Double_t PTheory::TFCos(register Double_t t, const PDoubleVector& paramValues, c
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> theory function: spherical bessel function including phase
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues
+ * \f[ = j_0(2\pi\nu t + \varphi) \f]
+ * or the time shifted version of it.
+ *
+ * <b>meaning of paramValues:</b> \f$\nu\f$, \f$\varphi\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::Bessel(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -1686,10 +1833,18 @@ Double_t PTheory::Bessel(register Double_t t, const PDoubleVector& paramValues, 
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> theory function: internal field bessel function
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues
+ * \f[ = \alpha\,j_0\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)\exp\left(-\lambda_{\mathrm{T}}t\right)+(1-\alpha)\,\exp\left(-\lambda_{\mathrm{L}}t\right)\f]
+ * or the time shifted version of it.
+ *
+ * <b>meaning of paramValues:</b> \f$\alpha\f$, \f$\varphi\f$, \f$\nu\f$, \f$\lambda_{\rm T}\f$, \f$\lambda_{\rm L}\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::InternalBessel(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -1721,10 +1876,24 @@ Double_t PTheory::InternalBessel(register Double_t t, const PDoubleVector& param
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> theory function: skewed Gaussian function
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues
+ * \f{eqnarray*}{ &=& \frac{\sigma_{-}}{\sigma_{+}+\sigma_{-}}\exp\left[-\frac{\sigma_{-}^2t^2}{2}\right]
+ * \left\lbrace\cos\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)+
+ * \sin\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)\mathrm{Erfi}\left(\frac{\sigma_{-}t}{\sqrt{2}}\right)\right\rbrace+\\
+ * & & \frac{\sigma_{+}}{\sigma_{+}+\sigma_{-}}
+ * \exp\left[-\frac{\sigma_{+}^2t^2}{2}\right]\left\lbrace\cos\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)-
+ * \sin\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)\mathrm{Erfi}\left(\frac{\sigma_{+}t}{\sqrt{2}}\right)\right\rbrace
+ * \f}
+ * or the time shifted version of it.
+ *
+ * <b>meaning of paramValues:</b> \f$\varphi\f$, \f$\nu\f$, \f$\sigma_{-}\f$, \f$\sigma_{+}\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::SkewedGauss(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -1775,10 +1944,17 @@ Double_t PTheory::SkewedGauss(register Double_t t, const PDoubleVector& paramVal
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> theory function: polynom
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues tshift, p0, p1, ..., pn
+ * \f[ = \sum_{k=0}^n a_k (t-t_{\rm shift})^k \f]
+ *
+ * <b>meaning of paramValues:</b> \f$t_{\rm shift}\f$, \f$a_0\f$, \f$a_1\f$, \f$\ldots\f$, \f$a_n\f$
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::Polynom(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
@@ -1809,24 +1985,16 @@ Double_t PTheory::Polynom(register Double_t t, const PDoubleVector& paramValues,
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p> theory function: user function
  *
- * \param t time in \f$(\mu\mathrm{s})\f$
- * \param paramValues
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
 Double_t PTheory::UserFcn(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-/*
-static Bool_t first = true;
-if (first) {
-  cout << endl << ">> UserFcn: fParamNo.size()=" << fParamNo.size() << ", fUserParam.size()=" << fUserParam.size();
-  for (UInt_t i=0; i<fParamNo.size(); i++) {
-    cout << endl << ">> " << i << ": " << fParamNo[i]+1;
-  }
-  cout << endl;
-}
-*/
-
   // check if FUNCTIONS are used
   for (UInt_t i=0; i<fUserParam.size(); i++) {
     if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
@@ -1836,23 +2004,18 @@ if (first) {
     }
   }
 
-/*
-if (first) {
-  first = false;
-  for (UInt_t i=0; i<fUserParam.size(); i++) {
-    cout << endl << "-> " << i << ": " << fUserParam[i];
-  }
-  cout << endl;
-  cout << endl << ">> t=" << t << ", function value=" << (*fUserFcn)(t, fUserParam);
-  cout << endl;
-}
-*/
   return (*fUserFcn)(t, fUserParam);
 }
 
 //--------------------------------------------------------------------------
 /**
- * <p>The fLFIntegral is given in steps of 1 ns, e.g. index i=100 coresponds to t=100ns
+ * <p>Calculates the non-analytic integral of the static Gaussian Kubo-Toyabe in longitudinal field, i.e.
+ * \f[ G_{\rm G,LF}(t) = \int^t_0 \exp\left[-1/2 (\sigma\tau)^2\right]\sin(2\pi\nu\tau)\mathrm{d}\tau \f]
+ * and stores \f$G_{\rm G,LF}(t)\f$ in a vector, fLFIntegral, from \f$t=0\ldots 20\f$ us with a time resolution of 1 ns.
+ *
+ * The fLFIntegral is given in steps of 1 ns, e.g. index i=100 coresponds to t=100ns
+ *
+ * <b>meaning of val:</b> val[0]=\f$\nu\f$, val[1]=\f$\sigma\f$
  *
  * \param val parameters needed to calculate the non-analytic integral of the static Gauss LF function.
  */
@@ -1887,7 +2050,13 @@ void PTheory::CalculateGaussLFIntegral(const Double_t *val) const
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Calculates the non-analytic integral of the static Lorentzian Kubo-Toyabe in longitudinal field, i.e.
+ * \f[ G_{\rm L,LF}(t) = \int^t_0 \exp\left[-a \tau \right] j_0(2\pi\nu\tau)\mathrm{d}\tau \f]
+ * and stores \f$G_{\rm L,LF}(t)\f$ in a vector, fLFIntegral, from \f$t=0\ldots 20\f$ us with a time resolution of 1 ns.
+ *
+ * The fLFIntegral is given in steps of 1 ns, e.g. index i=100 coresponds to t=100ns
+ *
+ * <b>meaning of val:</b> val[0]=\f$\nu\f$, val[1]=\f$a\f$
  *
  * \param val parameters needed to calculate the non-analytic integral of the static Lorentz LF function.
  */
@@ -1926,7 +2095,9 @@ void PTheory::CalculateLorentzLFIntegral(const Double_t *val) const
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Gets value of the non-analytic static LF integral.
+ *
+ * <b>return:</b> value of the non-analytic static LF integral
  *
  * \param t time in (usec)
  */
@@ -1948,6 +2119,8 @@ Double_t PTheory::GetLFIntegralValue(const Double_t t) const
 
 //--------------------------------------------------------------------------
 /**
+ * <p><b>Docu of this function still missing!!</b>
+ *
  * <p>Number of sampling points is estimated according to w0: w0 T = 2 pi
  * t_sampling = T/16 (i.e. 16 points on 1 period)
  * N = 8/pi w0 Tmax = 16 nu0 Tmax
@@ -2074,7 +2247,9 @@ void PTheory::CalculateDynKTLF(const Double_t *val, Int_t tag) const
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Gets value of the dynamic Kubo-Toyabe LF function.
+ *
+ * <b>return:</b> function value
  *
  * \param t time in (usec)
  */

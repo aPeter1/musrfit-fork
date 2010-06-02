@@ -35,6 +35,9 @@
 #include "PMusr.h"
 #include "PRunBase.h"
 
+/**
+ * <p>Class handling the non-muSR fit type
+ */
 class PRunNonMusr : public PRunBase
 {
   public:
@@ -46,7 +49,7 @@ class PRunNonMusr : public PRunBase
     virtual Double_t CalcMaxLikelihood(const std::vector<Double_t>& par);
     virtual void CalcTheory();
 
-    virtual UInt_t GetNoOfFitBins() { return fNoOfFitBins; }
+    virtual UInt_t GetNoOfFitBins() { return fNoOfFitBins; } ///< returns the number of fitted bins
 
     virtual UInt_t GetXIndex();
     virtual UInt_t GetYIndex();
@@ -57,11 +60,11 @@ class PRunNonMusr : public PRunBase
     virtual Bool_t PrepareViewData();
 
   private:
-    PRawRunData *fRawRunData;
+    PRawRunData *fRawRunData; ///< raw run data handler
 
-    Double_t fFitStartTime;
-    Double_t fFitStopTime;
-    UInt_t fNoOfFitBins;
+    Double_t fFitStartTime; ///< fit start time
+    Double_t fFitStopTime;  ///< fit stop time
+    UInt_t fNoOfFitBins;    ///< number of bins to be be fitted
 };
 
 #endif // _PRUNNONMUSR_H_

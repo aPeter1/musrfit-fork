@@ -197,7 +197,7 @@ Double_t PRunAsymmetry::CalcChiSquare(const std::vector<Double_t>& par)
 /**
  * <p>NOT IMPLEMENTED!!
  *
- * \param par parameter vector iterated by minuit
+ * \param par parameter vector iterated by minuit2
  */
 Double_t PRunAsymmetry::CalcMaxLikelihood(const std::vector<Double_t>& par)
 {
@@ -268,7 +268,7 @@ void PRunAsymmetry::CalcTheory()
 /**
  * <p>Prepare data for fitting or viewing. What is already processed at this stage:
  * - get all needed forward/backward histograms
- * - get timeresolution
+ * - get time resolution
  * - get start/stop fit time
  * - get t0's and perform necessary cross checks (e.g. if t0 of msr-file (if present) are consistent with t0 of the data files, etc.)
  * - add runs (if addruns are present)
@@ -1203,7 +1203,7 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
  * -# filter \f$ T_R(t) \f$.
  *
  * \param runData raw run data needed to perform some crosschecks
- * \param histNo array of the histo numbers form which to build the asymmetry
+ * \param histoNo array of the histo numbers form which to build the asymmetry
  */
 Bool_t PRunAsymmetry::PrepareRRFViewData(PRawRunData* runData, UInt_t histoNo[2])
 {

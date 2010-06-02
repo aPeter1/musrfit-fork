@@ -1949,7 +1949,7 @@ Bool_t PRunDataHandler::ReadAsciiFile()
  *
  * <p>will <b>not</b> work!
  *
- * <p>Some db-files do have a '\-e' or '\e' label just between the DATA tag line and the real data.
+ * <p>Some db-files do have a '\\-e' or '\\e' label just between the DATA tag line and the real data.
  * This tag will just be ignored.
  *
  * <b>return:</b>

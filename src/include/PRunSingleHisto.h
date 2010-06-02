@@ -34,6 +34,9 @@
 
 #include "PRunBase.h"
 
+/**
+ * <p>Class handling single histogram fit type.
+ */
 class PRunSingleHisto : public PRunBase
 {
   public:
@@ -45,7 +48,7 @@ class PRunSingleHisto : public PRunBase
     virtual Double_t CalcMaxLikelihood(const std::vector<Double_t>& par);
     virtual void CalcTheory();
 
-    virtual UInt_t GetNoOfFitBins() { return fNoOfFitBins; }
+    virtual UInt_t GetNoOfFitBins() { return fNoOfFitBins; } ///< returns the number of bins fitted
 
   protected:
     virtual Bool_t PrepareData();
@@ -54,10 +57,10 @@ class PRunSingleHisto : public PRunBase
     virtual Bool_t PrepareViewData(PRawRunData* runData, const UInt_t histoNo);
 
   private:
-    Double_t fFitStartTime;
-    Double_t fFitStopTime;
-    UInt_t fNoOfFitBins;
-    Double_t fBackground;         ///< needed if background range is given. In units per bin
+    Double_t fFitStartTime; ///< fit start time
+    Double_t fFitStopTime;  ///< fit stop time
+    UInt_t fNoOfFitBins;    ///< number of bins to be fitted
+    Double_t fBackground;   ///< needed if background range is given (units: 1/bin)
 
     Bool_t EstimateBkg(UInt_t histoNo);
 };

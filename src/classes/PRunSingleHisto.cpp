@@ -39,8 +39,7 @@
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Constructor
  */
 PRunSingleHisto::PRunSingleHisto() : PRunBase()
 {
@@ -53,10 +52,12 @@ PRunSingleHisto::PRunSingleHisto() : PRunBase()
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Constructor
  *
- * \param msrInfo pointer to the msr info structure
- * \param runNo number of the run of the msr-file
+ * \param msrInfo pointer to the msr-file handler
+ * \param rawData raw run data
+ * \param runNo number of the run within the msr-file
+ * \param tag tag showing what shall be done: kFit == fitting, kView == viewing
  */
 PRunSingleHisto::PRunSingleHisto(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
 {
@@ -72,8 +73,7 @@ PRunSingleHisto::PRunSingleHisto(PMsrHandler *msrInfo, PRunDataHandler *rawData,
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Destructor
  */
 PRunSingleHisto::~PRunSingleHisto()
 {
@@ -83,15 +83,12 @@ PRunSingleHisto::~PRunSingleHisto()
 // CalcChiSquare
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Calculate chi-square.
  *
- * The return value is chisq * fRunInfo->GetPacking(), the reason is:
- * the data d_i and the theory t_i are scaled by the packing, i.e. d_i -> d_i / packing.
- * Since the error is 1/sqrt(d_i) and hence error^2 = d_i it follows that
- * (d_i - t_i)^2 ~ 1/packing^2 and error^2 ~ 1/packing, and hence the chisq needs
- * to be scaled by packing.
+ * <b>return:</b>
+ * - chisq value
  *
- * \param par parameter vector iterated by minuit
+ * \param par parameter vector iterated by minuit2
  */
 Double_t PRunSingleHisto::CalcChiSquare(const std::vector<Double_t>& par)
 {
@@ -132,7 +129,6 @@ Double_t PRunSingleHisto::CalcChiSquare(const std::vector<Double_t>& par)
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
     Int_t funcNo = fMsrInfo->GetFuncNo(i);
-//cout << ">> i = " << i << ", funcNo = " << funcNo << endl;
     fFuncValues[i] = fMsrInfo->EvalFunc(funcNo, *fRunInfo->GetMap(), par);
   }
 
@@ -154,13 +150,16 @@ Double_t PRunSingleHisto::CalcChiSquare(const std::vector<Double_t>& par)
 // CalcMaxLikelihood
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Calculate log maximum-likelihood.
  *
- * \param par parameter vector iterated by minuit
+ * <b>return:</b>
+ * - log maximum-likelihood value
+ *
+ * \param par parameter vector iterated by minuit2
  */
 Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
 {
-  Double_t mllh      = 0.0; // maximum log likelihood assuming poisson distribution for the single bin
+  Double_t mllh = 0.0; // maximum log likelihood assuming poisson distribution for the single bin
 
   Double_t N0;
 
@@ -225,8 +224,7 @@ Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
 // CalcTheory
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Calculate theory for a given set of fit-parameters.
  */
 void PRunSingleHisto::CalcTheory()
 {
@@ -290,12 +288,20 @@ void PRunSingleHisto::CalcTheory()
 // PrepareData
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Prepare data for fitting or viewing. What is already processed at this stage:
+ * -# get proper raw run data
+ * -# get all needed forward histograms
+ * -# get time resolution
+ * -# get t0's and perform necessary cross checks (e.g. if t0 of msr-file (if present) are consistent with t0 of the data files, etc.)
+ * -# add runs (if addruns are present)
+ * -# group histograms (if grouping is present)
  *
+ * <b>return:</b>
+ * - true if everthing went smooth
+ * - false, otherwise.
  */
 Bool_t PRunSingleHisto::PrepareData()
 {
-//  cout << endl << "in PRunSingleHisto::PrepareData(): will feed fData";
   Bool_t success = true;
 
   // get the proper run
@@ -489,15 +495,25 @@ Bool_t PRunSingleHisto::PrepareData()
 // PrepareFitData
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Take the pre-processed data (i.e. grouping and addrun are preformed) and form the histogram for fitting.
+ * The following steps are preformed:
+ * -# get fit start/stop time
+ * -# check that 'first good data bin', 'last good data bin', and 't0' make any sense
+ * -# check how the background shall be handled, i.e. fitted, subtracted from background estimate data range, or subtacted from a given fixed background.
+ * -# packing (i.e rebinning)
  *
+ * <b>return:</b>
+ * - true, if everything went smooth
+ * - false, otherwise
+ *
+ * \param runData raw run data handler
+ * \param histoNo forward histogram number
  */
 Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoNo)
 {
   // keep start/stop time for fit
   fFitStartTime = fRunInfo->GetFitRange(0);
   fFitStopTime  = fRunInfo->GetFitRange(1);
-//cout << endl << "start/stop (fit): " << fFitStartTime << ", " << fFitStopTime;
 
   // transform raw histo data. This is done the following way (for details see the manual):
   // for the single histo fit, just the rebinned raw data are copied
@@ -604,7 +620,6 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
   // count the number of bins to be fitted
   fNoOfFitBins=0;
   Double_t time;
-//cout << endl << ">> size=" << fData.GetValue()->size() << ", fDataTimeStart=" << fData.GetDataTimeStart() << ", fDataTimeStep=" << fData.GetDataTimeStep() << ", fFitStartTime=" << fFitStartTime << ", fFitStopTime=" << fFitStopTime;
   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
     if ((time >= fFitStartTime) && (time <= fFitStopTime))
@@ -618,8 +633,20 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
 // PrepareRawViewData
 //--------------------------------------------------------------------------
 /**
- * <p> Muon raw data
+ * <p>Take the pre-processed data (i.e. grouping and addrun are preformed) and form the histogram for viewing
+ * without any life time correction.
+ * <p>The following steps are preformed:
+ * -# check if view packing is whished.
+ * -# check that 'first good data bin', 'last good data bin', and 't0' makes any sense
+ * -# packing (i.e. rebinnig)
+ * -# calculate theory
  *
+ * <b>return:</b>
+ * - true, if everything went smooth
+ * - false, otherwise.
+ *
+ * \param runData raw run data handler
+ * \param histoNo forward histogram number
  */
 Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t histoNo)
 {
@@ -669,12 +696,6 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
   fData.SetDataTimeStart(fTimeResolution*((Double_t)start-(Double_t)t0+(Double_t)(packing-1)/2.0));
   fData.SetDataTimeStep(fTimeResolution*packing);
-
-/*
-cout << endl << ">> time resolution = " << fTimeResolution;
-cout << endl << ">> start = " << start << ", t0 = " << t0 << ", packing = " << packing;
-cout << endl << ">> data start time = " << fData.GetDataTimeStart();
-*/
 
   Double_t normalizer = 1.0;
   for (Int_t i=start; i<end; i++) {
@@ -767,7 +788,6 @@ cout << endl << ">> data start time = " << fData.GetDataTimeStart();
     size = fData.GetValue()->size() * 10;
     factor = (Double_t)runData->GetDataBin(histoNo)->size() / (Double_t)size;
   }
-//cout << endl << ">> runData->GetDataBin(histoNo).size() = " << runData->GetDataBin(histoNo)->size() << ",  fData.GetValue()->size() * 10 = " << fData.GetValue()->size() * 10 << ", size = " << size << ", factor = " << factor << endl;
   Double_t theoryValue;
   fData.SetTheoryTimeStart(fData.GetDataTimeStart());
   fData.SetTheoryTimeStep(fTimeResolution*factor);
@@ -790,6 +810,14 @@ cout << endl << ">> data start time = " << fData.GetDataTimeStart();
 // PrepareViewData
 //--------------------------------------------------------------------------
 /**
+ * <p>Take the pre-processed data (i.e. grouping and addrun are preformed) and form the histogram for viewing
+ * with life time correction, i.e. the exponential decay is removed.
+ * <p>The following steps are preformed:
+ * -# check if view packing is whished.
+ * -# check that 'first good data bin', 'last good data bin', and 't0' makes any sense
+ * -# transform data sets (see below).
+ * -# calculate theory
+ *
  * <p> Muon life time corrected data: Starting from
  * \f[ N(t) = N_0 e^{-t/\tau} [ 1 + A(t) ] + \mathrm{Bkg} \f]
  * it follows that
@@ -799,6 +827,13 @@ cout << endl << ">> data start time = " << fData.GetDataTimeStart();
  * where \f$ p \f$ is the packing, and \f$ N(t) \f$ are the packed data, i.e.
  * \f[ N(t_i) = \frac{1}{p}\, \sum_{j=i}^{i+p} n_j \f]
  * with \f$ n_j \f$ the raw histogram data bins.
+ *
+ * <b>return:</b>
+ * - true, if everything went smooth
+ * - false, otherwise
+ *
+ * \param runData raw run data handler
+ * \param histoNo forward histogram number
  */
 Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histoNo)
 {
@@ -877,7 +912,6 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
     tau = par[fRunInfo->GetLifetimeParamNo()-1];
   else
     tau = PMUON_LIFETIME;
-//cout << endl << ">> tau = " << tau;
 
   // get background
   Double_t bkg;
@@ -913,12 +947,6 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
   fData.SetDataTimeStart(fTimeResolution*((Double_t)start-(Double_t)t0+(Double_t)(packing-1)/2.0));
   fData.SetDataTimeStep(fTimeResolution*packing);
 
-/*
-cout << endl << ">> start time = " << fData.GetDataTimeStart() << ", step = " << fData.GetDataTimeStep();
-cout << endl << ">> start = " << start << ", end = " << end;
-cout << endl << "--------------------------------" << endl;
-*/
-
   Double_t normalizer = 1.0;
   Double_t gammaRRF = 0.0, wRRF = 0.0, phaseRRF = 0.0;
   if (fMsrInfo->GetMsrPlotList()->at(0).fRRFFreq == 0.0) { // normal Data representation
@@ -931,9 +959,7 @@ cout << endl << "--------------------------------" << endl;
         time = (((Double_t)i-(Double_t)(packing-1)/2.0)-t0)*fTimeResolution;
         expval = TMath::Exp(+time/tau)/N0;
         fData.AppendValue(-1.0+expval*(value-bkg));
-        //cout << endl << ">> i=" << i << ",t0=" << t0 << ",time=" << time << ",expval=" << expval << ",value=" << value << ",bkg=" << bkg << ",expval*(value-bkg)-1=" << expval*(value-bkg)-1.0;
         fData.AppendErrorValue(expval*TMath::Sqrt(value/normalizer));
-        //cout << endl << ">> " << time << ", " << expval << ", " << -1.0+expval*(value-bkg) << ", " << expval*TMath::Sqrt(value/packing);
         value = 0.0;
       }
       value += runData->GetDataBin(histoNo)->at(i);
@@ -1062,7 +1088,13 @@ cout << endl << "--------------------------------" << endl;
 // EstimatBkg
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Estimate the background for a given interval.
+ *
+ * <b>return:</b>
+ * - true, if everything went smooth
+ * - false, otherwise
+ *
+ * \param histoNo forward histogram number of the run
  */
 Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
 {
@@ -1123,7 +1155,6 @@ Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
   Double_t bkg    = 0.0;
 
   // forward
-//cout << endl << ">> bkg start=" << start << ", end=" << end;
   for (UInt_t i=start; i<end; i++)
     bkg += runData->GetDataBin(histoNo)->at(i);
   bkg /= static_cast<Double_t>(end - start + 1);

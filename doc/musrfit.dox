@@ -50,7 +50,26 @@ How to setup musrfit on different platforms: \texttt{https://intranet.psi.ch/MUS
                on >= Qt4.6. 
 - \ref MuSRFit A graphical user interface based on PerlQt (written by Z. Salman) for an easy to use interface to the musrfit framework. Compared to the more general approach of writting msr-files, it has some limitations, though it might be easier for a first user of the musrfit framework.
 
-\section roadmap Roadmap
+\section roadmap Road map and missing features
+
+<p>The following features should eventually be implemented, but are still missing:
+- support for NeXuS files. Reason: As soon as ISIS and PSI will support this file type, musrfit will do as well
+- there are still issues with MUD files on 64bit systems which should eventually be fixed.
+- non-muSR: The plan is to add an option to fit/plot \f$f(x_1,\ldots,x_n)\f$ versus \f$g(x_1,\ldots,x_n)\f$, where \f$x_i\f$ is a given data set element.
+- mu-Minus: The handling for \f$\mu_{-}\f$ fits is still missing and should be implemented.
+- as soon as ROOT will properly support MS Windows platforms, some better support for MS Windows will be added. Currently only the cygwin version will be supported.
+- check if it is possible to add FIR filtering for muSR data
+- add an interface to maxent
+- we will provide rpm's for various linux flavours.
+
+\section shortComings Short comings of the current musrfit design
+
+<p>The musrfit framework has some shortcomings which will shortly discussed here:
+
+-# musrfit is not thread save do to the current implementation of LF in PTheory. Perhaps this part should be redesigned at some point to resolve this problem.
+-# Currently each msr-file run holds its one theory object. This is not very nice for costly user functions which will need to setup internal things for each run, even though resources could be shared.
+
+This two points are somewhat contradictory, and currently it is not clear which way to go. 
 
 \section bugs How to report bugs
 
