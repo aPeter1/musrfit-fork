@@ -56,10 +56,15 @@ PUserFcn::~PUserFcn()
 
 //------------------------------------------------------
 /**
- * <p>
+ * <p> user function example: polynome of 3rd order
  *
- * <b>return:</b>
+ * \f[ = \sum_{k=0}^3 c_k t^k \f]
  *
+ * <b>meaning of paramValues:</b> \f$c_0\f$, \f$c_1\f$, \f$c_2\f$, \f$c_3\f$
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
  * \param param parameter vector
  */
 Double_t PUserFcn::operator()(Double_t t, const std::vector<Double_t> &param) const

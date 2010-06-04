@@ -38,6 +38,10 @@ using namespace std;
 #include <TObjArray.h>
 #include <TObjString.h>
 
+//--------------------------------------------------------------------------
+/**
+ * <p>Sends the usage description to the standard output.
+ */
 void musrparam_syntax()
 {
   cout << endl << "usage: musrparam <input-filename> <output-filename>";
@@ -57,6 +61,18 @@ void musrparam_syntax()
   cout << endl << endl;
 }
 
+//--------------------------------------------------------------------------
+/**
+ * <p>Used to extract fit parameters from msr-files. msr2data is much more flexible and not much effort
+ * will go into supporting musrparam anymore (only bug fixing).
+ *
+ * <b>return:</b>
+ * - 0 if everything went smooth
+ * - negative number otherwise
+ *
+ * \param argc number of arguments
+ * \param argv list of arguments
+ */
 int main(int argc, char *argv[])
 {
   if (argc != 3) {

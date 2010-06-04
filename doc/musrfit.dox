@@ -73,37 +73,55 @@ This two points are somewhat contradictory, and currently it is not clear which 
 
 \section bugs How to report bugs
 
+<p>Bugs, unexpected features, can be reported directly to me: \verbatim andreas.suter@psi.ch, \endverbatim or entered in the bug-tracking tool at PSI \verbatim https://tracker.intranet.psi.ch/ \endverbatim.
+
 //****************************************************************************************************
 \page musrfitPage
 \section musrfit musrfit
+
+<p>Here will eventually follow a more technical description of musrfit. If you looking for a user-manual like description, please check \htmlonly<a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{https://intranet.psi.ch/MUSR/MusrFit} \endlatexonly
 
 //****************************************************************************************************
 \page musrviewPage
 \section musrview musrview
 
+<p>Here will eventually follow a more technical description of musrview. If you looking for a user-manual like description, please check \htmlonly<a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{https://intranet.psi.ch/MUSR/MusrFit} \endlatexonly
+
 //****************************************************************************************************
 \page musrt0Page
 \section musrt0 musrt0
+
+<p>Here will eventually follow a more technical description of musrt0. If you looking for a user-manual like description, please check \htmlonly<a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{https://intranet.psi.ch/MUSR/MusrFit} \endlatexonly
 
 //****************************************************************************************************
 \page musrparamPage
 \section musrparam musrparam
 
+<p>Here will eventually follow a more technical description of musrparam. If you looking for a user-manual like description, please check \htmlonly<a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{https://intranet.psi.ch/MUSR/MusrFit} \endlatexonly
+
 //****************************************************************************************************
 \page msr2dataPage
 \section msr2data msr2data
+
+<p>Here will eventually follow a more technical description of musr2data. If you looking for a user-manual like description, please check \htmlonly<a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{https://intranet.psi.ch/MUSR/MusrFit} \endlatexonly
 
 //****************************************************************************************************
 \page msr2msrPage
 \section msr2msr msr2msr
 
+<p>Here will eventually follow a more technical description of msr2msr. If you looking for a user-manual like description, please check \htmlonly<a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{https://intranet.psi.ch/MUSR/MusrFit} \endlatexonly
+
 //****************************************************************************************************
 \page musrguiPage
 \section musrgui musrgui
 
+<p>Here will eventually follow a more technical description of musrgui. If you looking for a user-manual like description, please check \htmlonly<a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{https://intranet.psi.ch/MUSR/MusrFit} \endlatexonly
+
 //****************************************************************************************************
 \page musreditPage
 \section musredit musredit
+
+<p>Here will eventually follow a more technical description of musredit. If you looking for a user-manual like description, please check \htmlonly<a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{https://intranet.psi.ch/MUSR/MusrFit} \endlatexonly
 
 //****************************************************************************************************
 \page MuSRFitPage

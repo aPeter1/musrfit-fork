@@ -144,7 +144,7 @@ Bool_t PFunctionHandler::CheckMapAndParamRange(UInt_t mapSize, UInt_t paramSize)
  * \param map map vector
  * \param param fit parameter vector
  */
-Double_t PFunctionHandler::Eval(Int_t funNo, vector<Int_t> map, vector<Double_t> param)
+Double_t PFunctionHandler::Eval(Int_t funNo, vector<Int_t> map, vector<double> param)
 {
   if (GetFuncIndex(funNo) == -1) {
     cerr << endl << "**ERROR**: Couldn't find FUN" << funNo << " for evaluation";

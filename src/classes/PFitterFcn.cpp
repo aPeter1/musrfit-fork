@@ -41,7 +41,7 @@ using namespace std;
  * <p>Constructor.
  *
  * \param runList run list collection
- * \param fitType if true, a chisq fit will be performed, otherwise a log max-likelihood fit will be carried out.
+ * \param useChi2 if true, a chisq fit will be performed, otherwise a log max-likelihood fit will be carried out.
  */
 PFitterFcn::PFitterFcn(PRunListCollection *runList, Bool_t useChi2)
 {

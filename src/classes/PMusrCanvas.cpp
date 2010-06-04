@@ -1154,7 +1154,6 @@ void PMusrCanvas::InitFourier()
 /**
  * <p>Initialize the class, and sets up the necessary objects.
  *
- * \param number The plot number of the msr-file PLOT block
  * \param title Title to be displayed
  * \param wtopx top x coordinate (in pixels) to place the canvas.
  * \param wtopy top y coordinate (in pixels) to place the canvas.
@@ -2352,7 +2351,7 @@ void PMusrCanvas::CleanupFourierDifference()
  * \param y y-value of the data
  * \param theo theory histogram
  */
-double PMusrCanvas::CalculateDiff(const double x, const double y, TH1F *theo)
+double PMusrCanvas::CalculateDiff(const Double_t x, const Double_t y, TH1F *theo)
 {
   Int_t bin = theo->FindBin(x);
 
@@ -2372,7 +2371,7 @@ double PMusrCanvas::CalculateDiff(const double x, const double y, TH1F *theo)
  * \param y y-value of the data
  * \param theo theory error graphs
  */
-double PMusrCanvas::CalculateDiff(const double x, const double y, TGraphErrors *theo)
+double PMusrCanvas::CalculateDiff(const Double_t x, const Double_t y, TGraphErrors *theo)
 {
   Int_t bin = 0;
   Double_t xVal, yVal;
@@ -2396,7 +2395,7 @@ double PMusrCanvas::CalculateDiff(const double x, const double y, TGraphErrors *
  * \param x x-value of the data
  * \param graph TGraphErrors which should be searched
  */
-Int_t PMusrCanvas::FindBin(const double x, TGraphErrors *graph)
+Int_t PMusrCanvas::FindBin(const Double_t x, TGraphErrors *graph)
 {
   Int_t i, bin = 0;
   Double_t *xTheo = graph->GetX();

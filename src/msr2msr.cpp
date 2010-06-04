@@ -60,7 +60,7 @@ using namespace std;
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Sends the usage description to the standard output.
  */
 void msr2msr_syntax()
 {
@@ -74,9 +74,13 @@ void msr2msr_syntax()
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>If the msr-file line is the RUN line, change it to the new format.
  *
- * \param str
+ * <b>return:</b>
+ * - true if everything went smooth
+ * - false otherwise
+ *
+ * \param str msr-file line
  */
 bool msr2msr_run(char *str)
 {
@@ -143,11 +147,16 @@ bool msr2msr_run(char *str)
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Changes the fit parameter lines to the new msr-file format. In the new msr-file
+ * format there is an additional column "Pos_Error". Before a fit takes place the value
+ * is set to "none".
  *
- * \param str
+ * <b>return:</b>
+ * - true if everything went smooth
+ * - false otherwise
+ *
+ * \param str msr-file fit parameter line
  */
-//void msr2msr_param(char *str, int &tag)
 bool msr2msr_param(char *str)
 {
   // check for comment header which needs to be replaced
@@ -247,26 +256,21 @@ bool msr2msr_param(char *str)
     tokens = 0;
   }
 
-/*
-  // check if the end of the parameter block is reached
-  unsigned int i;
-  for (i=0; i<strlen(str); i++) {
-    if (!isblank(str[i]) || !iscntrl(str[i]))
-      break;
-  }
-  if (i == strlen(str)) // end reached
-    tag = MSR_TAG_NO_BLOCK;
-*/
   return true;
 }
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>In the theory the table functions needs to be replaced by the numerical ones, and some
+ * functions have new a different parameterization.
  *
- * \param str
- * \param tag
- * \param noOfAddionalParams
+ * <b>return:</b>
+ * - true if everything went smooth
+ * - false otherwise
+ *
+ * \param str msr-file theory line
+ * \param tag if a function has new some additional parameters, this flag will be set, such that these new parameters can be added to the fit parameter block
+ * \param noOfAddionalParams counts the number of additional parameters needed.
  */
 bool msr2msr_theory(char *str, int &tag, int &noOfAddionalParams)
 {
@@ -412,9 +416,13 @@ bool msr2msr_theory(char *str, int &tag, int &noOfAddionalParams)
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Checks if a msr-line is a comment line
  *
- * \param str
+ * <b>return:</b>
+ * - true if line is a comment line
+ * - false otherwise
+ *
+ * \param str msr-file line
  */
 bool msr2msr_is_comment(char *str)
 {
@@ -437,9 +445,13 @@ bool msr2msr_is_comment(char *str)
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Checks if a msr-line consists only out of whitespaces.
  *
- * \param str
+ * <b>return:</b>
+ * - true if line is a whitespace
+ * - false otherwise
+ *
+ * \param str msr-file line
  */
 bool msr2msr_is_whitespace(char *str)
 {
@@ -459,10 +471,10 @@ bool msr2msr_is_whitespace(char *str)
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Replaces temporarily set labels by the proper parameter number.
  *
- * \param str
- * \param paramNo
+ * \param str msr-file line
+ * \param paramNo parameter number
  */
 void msr2msr_replace(char *str, int paramNo)
 {
@@ -491,11 +503,12 @@ void msr2msr_replace(char *str, int paramNo)
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>If a theory function was found which has newly a different number of parameters,
+ * this function will finalize the msr-file, i.e. replacing all temporarily set tags.
  *
- * \param fln in/out file name
- * \param tag
- * \param noOfAddionalParams
+ * \param fln file name
+ * \param theoryTag theory tag if the changed function
+ * \param noOfAddionalParams number of additional fit parameters
  */
 bool msr2msr_finalize_theory(char *fln, int theoryTag, int noOfAddionalParams)
 {  
@@ -574,10 +587,11 @@ bool msr2msr_finalize_theory(char *fln, int theoryTag, int noOfAddionalParams)
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>msr2msr is needed to convert old WKM msr-files to musrfit msr-files. Eventhough the syntax is <b>very</b>
+ * close, there are some shortcomings in the WKM msr-files, which forced me to slightly change the file format.
  *
- * \param argc
- * \param argv
+ * \param argc number of arguments
+ * \param argv list of arguments
  */
 int main(int argc, char *argv[])
 {

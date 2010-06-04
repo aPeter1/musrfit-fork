@@ -628,7 +628,7 @@ void PMusrT0::Done(Int_t status)
  *
  * \param event event type
  * \param x keyboard event: character key; mouse event: x-position
- * \param mouse event: y-position
+ * \param y mouse event: y-position
  * \param selected not used
  */
 void PMusrT0::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)

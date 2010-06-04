@@ -75,7 +75,7 @@ class PRunDataHandler
     virtual Bool_t ReadDBFile();
 
     virtual Bool_t StripWhitespace(TString &str);
-    virtual Bool_t IsWhitespace(const char *str);
+    virtual Bool_t IsWhitespace(const Char_t *str);
     virtual Double_t ToDouble(TString &str, Bool_t &ok);
     virtual Int_t ToInt(TString &str, Bool_t &ok);
     virtual Int_t GetDataTagIndex(TString &str, const PStringVector* fLabels);

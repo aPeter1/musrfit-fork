@@ -412,6 +412,7 @@ void PStartupHandler::OnFatalError(const Char_t *str)
  * <p>Not used.
  *
  * \param str not used
+ * \param len not used
  */
 void PStartupHandler::OnCdataBlock(const Char_t *str, Int_t len)
 {

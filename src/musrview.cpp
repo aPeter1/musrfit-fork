@@ -50,8 +50,7 @@ using namespace std;
 
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Sends the usage description to the standard output.
  */
 void musrview_syntax()
 {
@@ -71,6 +70,23 @@ void musrview_syntax()
 }
 
 //--------------------------------------------------------------------------
+/**
+ * <p>The musrview program is used to show muSR fit results in graphical form.
+ * From it also Fourier transforms, difference between data an theory can be formed.
+ * For a detailed description/usage of the program, please see
+ * \htmlonly <a href="https://intranet.psi.ch/MUSR/MusrFit">musrview online help</a>
+ * \endhtmlonly
+ * \latexonly musrview online help: \texttt{https://intranet.psi.ch/MUSR/MusrFit}
+ * \endlatexonly
+ *
+ * <b>return:</b>
+ * - PMUSR_SUCCESS if everthing went smooth
+ * - PMUSR_WRONG_STARTUP_SYNTAX if syntax error is encountered
+ * - line number if an error in the msr-file was encountered which cannot be handled.
+ *
+ * \param argc number of input arguments
+ * \param argv list of input arguments
+ */
 int main(int argc, char *argv[])
 {
   bool show_syntax = false;
@@ -214,13 +230,6 @@ int main(int argc, char *argv[])
       }
     }
   }
-/*
-cout << endl << ">> plotList:" << endl;
-for(unsigned int i=0; i<plotList.size(); i++){
-  cout << plotList[i] << ", ";
-}
-cout << endl;
-*/
 
   // read all the necessary runs (raw data)
   PRunDataHandler *dataHandler;
@@ -249,7 +258,6 @@ cout << endl;
         }
       }
       if (runPresent) {
-//cout << endl << ">> Will add run " << i << endl;
         success = runListCollection->Add(i, kView);
         if (!success) {
           cout << endl << "**ERROR** Couldn't handle run no " << i << " ";
@@ -358,5 +366,5 @@ cout << endl;
     runListCollection = 0;
   }
 
-  return 0;
+  return PMUSR_SUCCESS;
 }

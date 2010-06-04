@@ -49,8 +49,7 @@ using namespace std;
 
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Sends the usage description to the standard output.
  */
 void musrt0_syntax()
 {
@@ -64,18 +63,23 @@ void musrt0_syntax()
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>This routine sets up a raw single histogram canvas to graphically enter t0, data- and background-range
+ * (depending on some given input flags).
  *
- * \param app
- * \param msrHandler
- * \param data
+ * <b>return:</b>
+ * - true, if everthing went smooth
+ * - false, otherwise
+ *
+ * \param app main root application handler
+ * \param msrHandler msr-file handler
+ * \param data musrT0 data set handler
+ * \param idx index to filter out the proper msr-file run
  */
 Bool_t musrt0_item(TApplication &app, PMsrHandler *msrHandler, PMusrT0Data &data, UInt_t idx)
 {
-//cout << endl << "debug> &app=" << &app << ", msrHandler=" << msrHandler << ", &data=" << &data << endl;
-
   PMusrT0 *musrT0 = new PMusrT0(data);
 
+  // check if the musrT0 object could be invoked
   if (musrT0 == 0) {
     cerr << endl << ">> **ERROR** Couldn't invoke musrT0 ...";
     cerr << endl << ">> run name " << data.GetRawRunData(idx)->GetRunName()->Data();
@@ -83,20 +87,26 @@ Bool_t musrt0_item(TApplication &app, PMsrHandler *msrHandler, PMusrT0Data &data
     return false;
   }
 
+  // check if the musrT0 object is valid
   if (!musrT0->IsValid()) {
     cerr << endl << ">> **ERROR** invalid item found! (idx=" << idx << ")";
     cerr << endl;
     return false;
   }
 
+  // set the msr-file handler. The handler cannot be transfered at construction time since rootcint is not able to handle the PMsrHandler class
   musrT0->SetMsrHandler(msrHandler);
 
+  // check if only t0, data-, and bkg-range is wished, if not, only initialize t0 at this point
   if (data.GetCmdTag() != PMUSRT0_GET_DATA_AND_BKG_RANGE)
     musrT0->InitT0();
 
+  // check if only t0 is wished, if not, initialize data- and bkg-ranges
   if (data.GetCmdTag() != PMUSRT0_GET_T0)
     musrT0->InitDataAndBkg();
 
+  // connect SIGNAL 'Done' of musrT0 with the SLOT 'Terminate' of app. This will terminate the main application if
+  // the local musrT0 object emits 'Done'
   musrT0->Connect("Done(Int_t)", "TApplication", &app, "Terminate(Int_t)");
 
   app.Run(true); // true needed that Run will return after quit
@@ -106,8 +116,10 @@ Bool_t musrt0_item(TApplication &app, PMsrHandler *msrHandler, PMusrT0Data &data
   else
     result = true;
 
+  // disconnect all SIGNALS and SLOTS connected t0 musrT0
   musrT0->Disconnect(musrT0);
 
+  // cleanup
   delete musrT0;
   musrT0 = 0;
 
@@ -116,8 +128,12 @@ Bool_t musrt0_item(TApplication &app, PMsrHandler *msrHandler, PMusrT0Data &data
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>This routine cleans up the handlers.
  *
+ * \param saxParser XML SAX parser
+ * \param startupHandler startup handler
+ * \param msrHandler msr-file handler
+ * \param dataHandler raw run data handler
  */
 void musrt0_cleanup(TSAXParser *saxParser, PStartupHandler *startupHandler, PMsrHandler *msrHandler, PRunDataHandler *dataHandler)
 {
@@ -140,6 +156,22 @@ void musrt0_cleanup(TSAXParser *saxParser, PStartupHandler *startupHandler, PMsr
 }
 
 //--------------------------------------------------------------------------
+/**
+ * <p>The musrt0 program is used to set graphically t0's, data- and background-ranges.
+ * For a detailed description/usage of the program, please see
+ * \htmlonly <a href="https://intranet.psi.ch/MUSR/MusrFit">musrt0 online help</a>
+ * \endhtmlonly
+ * \latexonly musrt0 online help: \texttt{https://intranet.psi.ch/MUSR/MusrFit}
+ * \endlatexonly
+ *
+ * <b>return:</b>
+ * - PMUSR_SUCCESS if everthing went smooth
+ * - PMUSR_WRONG_STARTUP_SYNTAX if syntax error is encountered
+ * - line number if an error in the msr-file was encountered which cannot be handled.
+ *
+ * \param argc number of input arguments
+ * \param argv list of input arguments
+ */
 Int_t main(Int_t argc, Char_t *argv[])
 {
   Bool_t show_syntax = false;
@@ -622,5 +654,5 @@ Int_t main(Int_t argc, Char_t *argv[])
   // clean up
   musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
 
-  return 0;
+  return PMUSR_SUCCESS;
 }

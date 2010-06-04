@@ -52,8 +52,7 @@ using namespace std;
 
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Sends the usage description to the standard output.
  */
 void musrfit_syntax()
 {
@@ -83,21 +82,19 @@ void musrfit_syntax()
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Writes the fitted data- and theory-set in ascii format to disc.
  *
- * \param fln
- * \param data
- * \param runCounter
+ * \param fln output file name
+ * \param data processed-data handler
+ * \param runCounter msr-file run counter needed to form the output file name
  */
 void musrfit_write_ascii(TString fln, PRunData *data, int runCounter)
 {
   // generate dump file name
-  TString fileName = fln.Copy();
   TString count("_");
   count += runCounter;
   Ssiz_t index = fln.Index(".");
   fln.Insert(index, count);
-//cout << endl << "fln = " << fln.Data();
 
   ofstream f;
 
@@ -124,9 +121,12 @@ void musrfit_write_ascii(TString fln, PRunData *data, int runCounter)
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Go through all msr-file runs and write each of them in ascii-format to disc
+ * (used for diagnostics). Be aware that this output is <b>different</b> to what
+ * you will get when using musrview!
  *
- * \param fileName
+ * \param fileName file name
+ * \param runList run list collection handler
  */
 void musrfit_dump_ascii(char *fileName, PRunListCollection *runList)
 {
@@ -193,12 +193,12 @@ void musrfit_dump_ascii(char *fileName, PRunListCollection *runList)
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Writes the fitted data- and theory-set in root format to disc.
  *
- * \param f
- * \param fln
- * \param data
- * \param runCounter
+ * \param f root file object
+ * \param fln file name
+ * \param data processed-data handler
+ * \param runCounter msr-file run counter needed to form the output file name
  */
 void musrfit_write_root(TFile &f, TString fln, PRunData *data, int runCounter)
 {
@@ -252,9 +252,12 @@ void musrfit_write_root(TFile &f, TString fln, PRunData *data, int runCounter)
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Go through all msr-file runs and write each of them in root format to disc
+ * (used for diagnostics). Be aware that this output is <b>different</b> to what
+ * you will get when using musrview!
  *
- * \param fileName
+ * \param fileName file name
+ * \param runList run list connection handler
  */
 void musrfit_dump_root(char *fileName, PRunListCollection *runList)
 {
@@ -324,6 +327,22 @@ void musrfit_dump_root(char *fileName, PRunListCollection *runList)
 }
 
 //--------------------------------------------------------------------------
+/**
+ * <p>The musrfit program is used to fit muSR data.
+ * For a detailed description/usage of the program, please see
+ * \htmlonly <a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit online help</a>
+ * \endhtmlonly
+ * \latexonly musrfit online help: \texttt{https://intranet.psi.ch/MUSR/MusrFit}
+ * \endlatexonly
+ *
+ * <b>return:</b>
+ * - PMUSR_SUCCESS if everthing went smooth
+ * - PMUSR_WRONG_STARTUP_SYNTAX if syntax error is encountered
+ * - line number if an error in the msr-file was encountered which cannot be handled.
+ *
+ * \param argc number of input arguments
+ * \param argv list of input arguments
+ */
 int main(int argc, char *argv[])
 {
   bool show_syntax = false;

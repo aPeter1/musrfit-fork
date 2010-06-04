@@ -41,8 +41,13 @@ using namespace boost::algorithm;
 
 //--------------------------------------------------------------------------
 /**
- * <p>
- * std::string
+ * <p>Checks is a string is a number
+ *
+ * <b>return:</b>
+ * - true if s is a number string
+ * - false otherwise
+ *
+ * \param s
  */
 bool isNumber(const string &s)
 {
@@ -59,7 +64,7 @@ bool isNumber(const string &s)
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Sends the usage description to the standard output.
  */
 void msr2data_syntax()
 {
@@ -97,9 +102,14 @@ void msr2data_syntax()
 
 //--------------------------------------------------------------------------
 /**
- * <p>
- * std::vector of std::string
- * bool (DB file ore not)
+ * <p>filters out the output file name from at argument string
+ *
+ * <b>return:</b>
+ * - output file name is present in the argument list
+ * - otherwise 'out.db' (db==true), 'out.dat' (db==false)
+ *
+ * \param arg argument string list from the msr2data call
+ * \param db true if output file is a db-file
  */
 string msr2data_outputfile(vector<string> &arg, bool db = true)
 {
@@ -140,9 +150,14 @@ string msr2data_outputfile(vector<string> &arg, bool db = true)
 
 //--------------------------------------------------------------------------
 /**
- * <p>
- * std::vector of std::string
- * string
+ * <p>Checks if option string is present in the argument input list
+ *
+ * <b>return:</b>
+ * - true if option is <b>not</b> present
+ * - false otherwise
+ *
+ * \param arg list of arguments
+ * \param s option string
  */
 bool msr2data_useOption(vector<string> &arg, const string &s)
 {
@@ -160,9 +175,16 @@ bool msr2data_useOption(vector<string> &arg, const string &s)
 
 //--------------------------------------------------------------------------
 /**
- * <p>
- * std::vector of std::string
- * bool
+ * <p>Filters out the template run number (if present) and check at the
+ * same time if only already existing msr-files shall be fitted (no template).
+ *
+ * <b>return:</b>
+ * - template runNo if everything is OK
+ * - -1 : tag: fit only, do not prepare input files
+ * - -2 : fatal error - another fit-&lt;temp&gt; option is specified
+ *
+ * \param arg list of arguments
+ * \param chainfit if true
  */
 int msr2data_doFitting(vector<string> &arg, bool &chainfit)
 {
@@ -172,15 +194,15 @@ int msr2data_doFitting(vector<string> &arg, bool &chainfit)
   istringstream iss;
   vector<string>::iterator iter(arg.begin());
   while (iter != arg.end()) {
-    if (!iter->compare("fit")) {
-      if (temp) {
+    if (!iter->compare("fit")) { // fit found
+      if (temp) { // temp already found previously
         return -2; // fatal error - another fit-<temp> option is specified
       }
-      temp = -1;
+      temp = -1; // fit only, do not prepare input files
       chainfit = false;
       iter = arg.erase(iter);
     }
-    else if (!iter->substr(0,4).compare("fit-")) {
+    else if (!iter->substr(0,4).compare("fit-")) { // 'fit-' found
       if (temp) {
         return -2; // fatal error - another fit option is specified
       }
@@ -203,9 +225,14 @@ int msr2data_doFitting(vector<string> &arg, bool &chainfit)
 
 //--------------------------------------------------------------------------
 /**
- * <p>
- * std::vector of std::string
- * bool
+ * <p>Filters out the template run number from which the new msr-files should be created.
+ *
+ * <b>return:</b>
+ * - template run number, or
+ * - 0 if the string after 'msr-' is not a number
+ *
+ * \param arg list of arguments
+ * \param inputOnly flag, if true create msr-files only (no fitting)
  */
 unsigned int msr2data_doInputCreation(vector<string> &arg, bool &inputOnly)
 {
@@ -229,10 +256,15 @@ unsigned int msr2data_doInputCreation(vector<string> &arg, bool &inputOnly)
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>msr2data is used to generate msr-files based on template msr-files, automatically fitting these new msr-files,
+ * collection fitting parameters, etc. For a detailed description see
+ * \htmlonly <a href="https://intranet.psi.ch/MUSR/Msr2Data">musr2data online help</a>
+ * \endhtmlonly
+ * \latexonly msr2data online help: \texttt{https://intranet.psi.ch/MUSR/Msr2Data}
+ * \endlatexonly
  *
- * \param argc
- * \param argv
+ * \param argc number of arguments
+ * \param argv list of arguments
  */
 int main(int argc, char *argv[])
 {
