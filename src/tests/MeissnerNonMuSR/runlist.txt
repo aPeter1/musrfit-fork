@@ -1,0 +1,7 @@
+# YBCO Meissner runlist test
+RUN meanZ
+261 20
+262 50
+263 130.3
+264 227.8
+265 340.1

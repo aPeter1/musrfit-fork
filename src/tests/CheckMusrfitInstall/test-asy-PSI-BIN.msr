@@ -3,10 +3,10 @@ Test asymmetry plot, PSI-BIN data file
 FITPARAMETER
 #      Nr. Name        Value     Step      Pos_Error  Boundaries
         1 alpha       0.954734  0           none        0       2       
-        2 asy         0.262608  0.00143923  none        0       0.33    
-        3 phase       -0.699373 0.328173    none        
-        4 field       97.9126   0.0550285   none        0       none    
-        5 rate        0.316773  0.0044115   none        0       none    
+        2 asy         0.262387  0.00144114  none        0       0.33    
+        3 phase       -0.0892349 0.327999    none        
+        4 field       97.9113   0.0550109   none        0       none    
+        5 rate        0.31646   0.00441463  none        0       none    
  
 ###############################################################
 THEORY
@@ -23,8 +23,8 @@ RUN data/deltat_pta_gpd_0423 PIE1 PSI PSI-BIN   (name beamline institute data-fi
 fittype         2         (asymmetry fit)
 alpha           1
 map             0    0    0    0    0    0    0    0    0    0    0
-forward         2
-backward        1
+forward         2       
+backward        1       
 background      61      184     57      145     
 data            207     7994    167     8009    
 t0              202     162     
@@ -55,5 +55,5 @@ range    0.00   8.00   -0.30   0.30
 view_packing 38
 
 ###############################################################
-STATISTIC --- 2010-01-08 14:45:44
-  chisq = 543.235673, NDF = 351, chisq/NDF = 1.54767998
+STATISTIC --- 2010-05-26 21:27:41
+  chisq = 545.990682, NDF = 351, chisq/NDF = 1.55552901

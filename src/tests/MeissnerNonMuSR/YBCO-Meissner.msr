@@ -1,0 +1,37 @@
+YBCO Meissner
+###############################################################
+FITPARAMETER
+#      Nr. Name        Value     Step      Pos_Error  Boundaries
+         1 field       100.0     1.0       none       0         none      
+         2 thickness   150.0     0.0       none
+         3 deadLayer   15.0       1.0       none       0         none
+         4 lambda      150.0     0.1       none       0         none
+
+###############################################################
+THEORY
+userFcn libPMeissnerNonMuSR.so PMeissnerNonMuSR 1 2 3 4
+
+###############################################################
+RUN YBCO-Meissner MUE4 PSI DB   (name beamline institute data-file-format)
+fittype         8         (non musr fit)
+map             0  0  0  0  0  0  0  0  0  0
+xy-data         meanZ   field
+fit             0   400
+packing         1
+
+###############################################################
+COMMANDS
+STRATEGY 1
+MINIMIZE
+#MINOS
+SAVE
+END RETURN
+
+###############################################################
+PLOT 8   (non muSR plot)
+runs     1
+range    0       400     
+
+###############################################################
+STATISTIC --- 2008-04-04 07:44:31
+  chisq = 569.50931, NDF = 542, chisq/NDF = 1.05075518

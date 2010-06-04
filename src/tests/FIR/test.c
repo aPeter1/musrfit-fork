@@ -26,9 +26,11 @@
  **************************************************************************/
 
 #include "remez.h"
+#include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
-main()
+int main()
 {
    double *weights, *desired, *bands;
    double *h;
@@ -37,40 +39,50 @@ main()
    bands = (double *)malloc(10 * sizeof(double));
    weights = (double *)malloc(5 * sizeof(double));
    desired = (double *)malloc(5 * sizeof(double));
-   h = (double *)malloc(300 * sizeof(double));
+   h = (double *)malloc(600 * sizeof(double));
 
    desired[0] = 0;
-   desired[1] = 1; 
+   desired[1] = 1;
    desired[2] = 0;
-   desired[3] = 1;
-   desired[4] = 0;
+//   desired[3] = 1;
+//   desired[4] = 0;
 
+/*
    weights[0] = 10;
    weights[1] = 1;
    weights[2] = 3;
    weights[3] = 1;
    weights[4] = 20;
+*/
+
+   weights[0] = 1;
+   weights[1] = 1;
+   weights[2] = 1;
+//   weights[3] = 1;
+//   weights[4] = 1;
 
    bands[0] = 0;
-   bands[1] = 0.05;
-   bands[2] = 0.1;
-   bands[3] = 0.15;
-   bands[4] = 0.18;
-   bands[5] = 0.25;
-   bands[6] = 0.3;
-   bands[7] = 0.36;
-   bands[8] = 0.41;
-   bands[9] = 0.5;
+   bands[1] = 0.12;
+   bands[2] = 0.17;
+   bands[3] = 0.28;
+   bands[4] = 0.33;
+   bands[5] = 0.50;
+//   bands[6] = 0.3;
+//   bands[7] = 0.36;
+//   bands[8] = 0.41;
+//   bands[9] = 0.5;
 
-   remez(h, 104, 5, bands, desired, weights, BANDPASS);
-   for (i=0; i<104; i++)
+   remez(h, 102, 2, bands, desired, weights, BANDPASS);
+   for (i=0; i<102; i++)
    {
-       printf("%23.20f\n", h[i]);
+     printf("%3d, %23.20f\n", i, h[i]);
    }
 
    free(bands);
    free(weights);
    free(desired);
    free(h);
+
+   return 1;
 }
 
