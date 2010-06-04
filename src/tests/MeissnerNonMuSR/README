@@ -1,0 +1,25 @@
+$Id$
+
+This is a simple example for a Meissner screening user function for non-muSR input for musrfit.
+
+It is very simple and has the following parameters:
+
+1. field, i.e. external field value
+2. thickness
+3. dead layer thickness
+4. lambda_ab
+
+The following function are needed to geht the needed ROOT shared library:
+
+Makefile.PMeissnerNonMuSR
+PMeissnerNonMuSR.cpp
+PMeissnerNonMuSR.h
+PMeissnerNonMuSRLinkDef.h  <- this header is needed to generate the dictionary stub
+
+The following files are examples how to generate the needed parameter input files, and how
+to analyze it
+
+runlist.txt         <- used together with msr2data to add the zMean data into the db-file
+YBCO-Meissner.db    <- db-file generate with msr2data by using runlist.txt
+YBCO-Meissner.msr   <- msr-file used to fit B versus zMean
+

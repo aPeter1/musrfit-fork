@@ -3,7 +3,7 @@ YBCO Meissner
 FITPARAMETER
 #      Nr. Name        Value     Step      Pos_Error  Boundaries
          1 field       100.0     1.0       none       0         none      
-         2 thickness   150.0     0.0       none
+         2 halfThick   300.0     0.0       none
          3 deadLayer   15.0       1.0       none       0         none
          4 lambda      150.0     0.1       none       0         none
 

@@ -57,10 +57,14 @@ PMeissnerNonMuSR::~PMeissnerNonMuSR()
 
 //------------------------------------------------------
 /**
- * <p>Example  of a user defined function. This example implements a 3rd order polynom
- * \f[ = \sum_{k=0}^3 c_k t^k\f]
+ * <p>Example of a thin film Meissner screening user function (\f$B_{\rm G}\f$ versus \f$\langle z \rangle\f$).
  *
- * <b>meaning of paramValues:</b> \f$c_0\f$, \f$c_1\f$, \f$c_2\f$, \f$c_3\f$
+ * \f[ B_{\rm G}(\langle z \rangle\) = B_0 \cosh((t-d-[z-d])/\lambda_{ab}) / \cos((t-d)/\lambda_{ab}) \f]
+ *
+ * - \f$B_{\rm G}\f$ is the screened field value obtained from a Gaussian fit
+ * - \f$\langle z \rangle\f$ is the mean muon stopping range obtained from trim.sp.
+ *
+ * <b>meaning of param:</b> \f$B_0\f$, \f$2 t\f$ = film thickness, \f$d\f$ = dead layer thickness, \f$\lambda_{ab}\f$
  *
  * <b>return:</b> function value
  *
@@ -69,15 +73,15 @@ PMeissnerNonMuSR::~PMeissnerNonMuSR()
  */
 Double_t PMeissnerNonMuSR::operator()(Double_t z, const std::vector<Double_t> &param) const
 {
-  // expected parameters: Bext, t=thickness/2, deadLayer, lambda_ab
+  // expected parameters: Bext, t=thickness, deadLayer, lambda_ab
 
   assert(param.size() == 4);
 
-  // if z<deadLayer or z>2t-deadLayer
+  // if z<deadLayer or z>2tt-deadLayer
+  Double_t tt = param[1]/2.0;
   Double_t result = param[0];
-  if ((z > param[2]) && (z < 2.0*param[1]-param[2]))
-    result = param[0]*cosh((param[1]-param[2]-(z-param[2]))/param[3])/cosh((param[1]-param[2])/param[3]);
-
+  if ((z > param[2]) && (z < param[1]-param[2]))
+    result = param[0]*cosh((tt-z)/param[3])/cosh((tt-param[2])/param[3]);
 
   return result;
 }
