@@ -36,6 +36,9 @@
 
 #include "PUserFcnBase.h"
 
+/**
+ * <p>User function example class. Polynome of 3rd order.
+ */
 class PUserFcn : public PUserFcnBase
 {
   public:

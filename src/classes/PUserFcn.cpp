@@ -40,7 +40,7 @@ ClassImp(PUserFcn)
 
 //------------------------------------------------------
 /**
- *
+ * <p>Constructor
  */
 PUserFcn::PUserFcn()
 {
@@ -48,7 +48,7 @@ PUserFcn::PUserFcn()
 
 //------------------------------------------------------
 /**
- *
+ * <p>Destructor
  */
 PUserFcn::~PUserFcn()
 {
@@ -56,20 +56,17 @@ PUserFcn::~PUserFcn()
 
 //------------------------------------------------------
 /**
+ * <p>
  *
+ * <b>return:</b>
+ *
+ * \param param parameter vector
  */
 Double_t PUserFcn::operator()(Double_t t, const std::vector<Double_t> &param) const
 {
-/*
-  cout << endl << ">> Eval: t=" << t << ", param=";
-  for (unsigned int i=0; i<param.size(); i++) {
-    cout << param[i];
-    if (i<param.size()-1)
-      cout << ", ";
-  }
-  cout << endl << endl;
-*/
-  assert(param.size() >= 4);
+  // expected parameters: c0, c1, c2, c3
+
+  assert(param.size() == 4);
 
   return param[0] + param[1]*t + param[2]*t*t + param[3]*t*t*t;
 }

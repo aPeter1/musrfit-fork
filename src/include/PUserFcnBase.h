@@ -36,6 +36,9 @@
 
 #include "TObject.h"
 
+/**
+ * <p>Interface class for the user function.
+ */
 class PUserFcnBase : public TObject
 {
   public:

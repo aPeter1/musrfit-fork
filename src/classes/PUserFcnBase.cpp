@@ -37,8 +37,7 @@ ClassImp(PUserFcnBase)
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Constructor
  */
 PUserFcnBase::PUserFcnBase()
 {
@@ -48,8 +47,7 @@ PUserFcnBase::PUserFcnBase()
 // Destructor
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Destructor
  */
 PUserFcnBase::~PUserFcnBase()
 {
