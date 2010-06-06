@@ -1100,6 +1100,670 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
 }
 
 //--------------------------------------------------------------------------
+// WriteMsrFile (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Writes a msr-file from the internal data structures
+ *
+ * <p><b>return:</b>
+ * - PMUSR_SUCCESS everything is OK
+ * - PMUSR_MSR_FILE_WRITE_ERROR msr output file couldn't be opened
+ *
+ * \param filename The name of the output file.
+ */
+Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *commentsPAR, \
+                                                        map<UInt_t, TString> *commentsTHE, \
+                                                        map<UInt_t, TString> *commentsFUN, \
+                                                        map<UInt_t, TString> *commentsRUN)
+{
+  const UInt_t prec = 6; // output precision for float/doubles
+  const TString hline = "###############################################################";
+  UInt_t i = 0;
+  map<UInt_t, TString>::iterator iter;
+  TString str, *pstr;
+
+  // open output file for writing
+  ofstream fout(filename);
+  if (!fout) {
+    return PMUSR_MSR_FILE_WRITE_ERROR;
+  }
+
+  // write TITLE
+  fout << fTitle.Data() << endl;
+  fout << hline.Data() << endl;
+
+  // write FITPARAMETER block
+  fout << "FITPARAMETER" << endl;
+  fout << "#       No Name        Value     Step        Pos_Error   Boundaries" << endl;
+
+  for (i = 0; i < fParam.size(); ++i) {
+    if (commentsPAR) {
+      iter = commentsPAR->find(i+1);
+      if (iter != commentsPAR->end()) {
+        fout << endl;
+        fout << "# " << iter->second.Data() << endl;
+        fout << endl;
+        commentsPAR->erase(iter);
+      }
+    }
+    // parameter no
+    fout.width(9);
+    fout << right << fParam[i].fNo;
+    fout << " ";
+    // parameter name
+    fout.width(11);
+    fout << left << fParam[i].fName.Data();
+    fout << " ";
+    // value of the parameter
+    fout.width(9);
+    fout.precision(prec);
+    fout << left << fParam[i].fValue;
+    fout << " ";
+    // value of step/error/neg.error
+    fout.width(11);
+    fout.precision(prec);
+    fout << left << fParam[i].fStep;
+    fout << " ";
+    fout.width(11);
+    fout.precision(prec);
+    if ((fParam[i].fNoOfParams == 5) || (fParam[i].fNoOfParams == 7)) // pos. error given
+      if (fParam[i].fPosErrorPresent && (fParam[i].fStep != 0)) // pos error is a number
+        fout << left << fParam[i].fPosError;
+    else // pos error is a none
+      fout << left << "none";
+    else // no pos. error
+      fout << left << "none";
+    fout << " ";
+    // boundaries
+    if (fParam[i].fNoOfParams > 5) {
+      fout.width(7);
+      fout.precision(prec);
+      if (fParam[i].fLowerBoundaryPresent)
+        fout << left << fParam[i].fLowerBoundary;
+      else
+        fout << left << "none";
+      fout << " ";
+      fout.width(7);
+      fout.precision(prec);
+      if (fParam[i].fUpperBoundaryPresent)
+        fout << left << fParam[i].fUpperBoundary;
+      else
+        fout << left << "none";
+      fout << " ";
+    }
+    fout << endl;
+  }
+  if (commentsPAR && !commentsPAR->empty()) {
+    fout << endl;
+    for(iter = commentsPAR->begin(); iter != commentsPAR->end(); ++iter) {
+      fout << "# " << iter->second.Data() << endl;
+    }
+    commentsPAR->clear();
+  }
+  fout << endl;
+  fout << hline.Data() << endl;
+
+  // write THEORY block
+  fout << "THEORY" << endl;
+
+  for (i = 1; i < fTheory.size(); ++i) {
+    if (commentsTHE) {
+      iter = commentsTHE->find(i);
+      if (iter != commentsTHE->end()) {
+        fout << endl;
+        fout << "# " << iter->second.Data() << endl;
+        fout << endl;
+        commentsTHE->erase(iter);
+      }
+    }
+    fout << fTheory[i].fLine.Data() << endl;
+  }
+  if (commentsTHE && !commentsTHE->empty()) {
+    fout << endl;
+    for(iter = commentsTHE->begin(); iter != commentsTHE->end(); ++iter) {
+      fout << "# " << iter->second.Data() << endl;
+    }
+    commentsTHE->clear();
+  }
+  fout << endl;
+  fout << hline.Data() << endl;
+
+  // write FUNCTIONS block
+  fout << "FUNCTIONS" << endl;
+
+  for (i = 1; i < fFunctions.size(); ++i) {
+    if (commentsFUN) {
+      iter = commentsFUN->find(i);
+      if (iter != commentsFUN->end()) {
+        fout << endl;
+        fout << "# " << iter->second.Data() << endl;
+        fout << endl;
+        commentsFUN->erase(iter);
+      }
+    }
+    fout << fFunctions[i].fLine.Data() << endl;
+  }
+  if (commentsFUN && !commentsFUN->empty()) {
+    fout << endl;
+    for(iter = commentsFUN->begin(); iter != commentsFUN->end(); ++iter) {
+      fout << "# " << iter->second.Data() << endl;
+    }
+    commentsFUN->clear();
+  }
+  fout << endl;
+  fout << hline.Data() << endl;
+
+  // write RUN blocks
+  for (i = 0; i < fRuns.size(); ++i) {
+    if (commentsRUN) {
+      iter = commentsRUN->find(i + 1);
+      if (iter != commentsRUN->end()) {
+        fout << endl;
+        fout << "# " << iter->second.Data() << endl;
+        fout << endl;
+        commentsRUN->erase(iter);
+      }
+    }
+    fout << "RUN " << fRuns[i].GetRunName()->Data() << " ";
+    pstr = fRuns[i].GetBeamline();
+    if (pstr == 0) {
+      cerr << endl << ">> PMsrHandler::WriteMsrFile: **ERROR** Couldn't obtain beamline data." << endl;
+      assert(0);
+    }
+    pstr->ToUpper();
+    fout << pstr->Data() << " ";
+    pstr = fRuns[i].GetInstitute();
+    if (pstr == 0) {
+      cerr << endl << ">> PMsrHandler::WriteMsrFile: **ERROR** Couldn't obtain institute data." << endl;
+      assert(0);
+    }
+    pstr->ToUpper();
+    fout << pstr->Data() << " ";
+    pstr = fRuns[i].GetFileFormat();
+    if (pstr == 0) {
+      cerr << endl << ">> PMsrHandler::WriteMsrFile: **ERROR** Couldn't obtain file format data." << endl;
+      assert(0);
+    }
+    pstr->ToUpper();
+    fout << pstr->Data() << "   (name beamline institute data-file-format)" << endl;
+
+    // ADDRUN
+    for (UInt_t j = 1; j < fRuns[i].GetRunNameSize(); ++j) {
+      fout << "ADDRUN " << fRuns[i].GetRunName(j)->Data() << " ";
+      pstr = fRuns[i].GetBeamline(j);
+      if (pstr == 0) {
+        cerr << endl << ">> PMsrHandler::WriteMsrFile: **ERROR** Couldn't obtain beamline data (addrun)." << endl;
+        assert(0);
+      }
+      pstr->ToUpper();
+      fout << pstr->Data() << " ";
+      pstr = fRuns[i].GetInstitute(j);
+      if (pstr == 0) {
+        cerr << endl << ">> PMsrHandler::WriteMsrFile: **ERROR** Couldn't obtain institute data (addrun)." << endl;
+        assert(0);
+      }
+      pstr->ToUpper();
+      fout << pstr->Data() << " ";
+      pstr = fRuns[i].GetFileFormat(j);
+      if (pstr == 0) {
+        cerr << endl << ">> PMsrHandler::WriteMsrFile: **ERROR** Couldn't obtain file format data (addrun)." << endl;
+        assert(0);
+      }
+      pstr->ToUpper();
+      fout << pstr->Data() << "   (name beamline institute data-file-format)" << endl;
+    }
+
+    // fittype
+    fout.width(16);
+    switch (fRuns[i].GetFitType()) {
+    case MSR_FITTYPE_SINGLE_HISTO:
+      fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)" << endl;
+      break;
+    case MSR_FITTYPE_ASYM:
+      fout << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)" << endl ;
+      break;
+    case MSR_FITTYPE_MU_MINUS:
+      fout << left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << endl ;
+      break;
+    case MSR_FITTYPE_NON_MUSR:
+      fout << left << "fittype" << MSR_FITTYPE_NON_MUSR << "         (non muSR fit)" << endl ;
+      break;
+    default:
+      break;
+    }
+
+    // alpha
+    if (fRuns[i].GetAlphaParamNo() != -1) {
+      fout.width(16);
+      fout << left << "alpha";
+      fout << fRuns[i].GetAlphaParamNo() << endl;
+    }
+
+    // beta
+    if (fRuns[i].GetBetaParamNo() != -1) {
+      fout.width(16);
+      fout << left << "beta";
+      fout << fRuns[i].GetBetaParamNo()  << endl;
+    }
+
+    // norm
+    if (fRuns[i].GetNormParamNo() != -1) {
+      fout.width(16);
+      fout << left << "norm";
+      // check if norm is give as a function
+      if (fRuns[i].GetNormParamNo() >= MSR_PARAM_FUN_OFFSET)
+        fout << "fun" << fRuns[i].GetNormParamNo()-MSR_PARAM_FUN_OFFSET;
+      else
+        fout << fRuns[i].GetNormParamNo();
+      fout << endl;
+    }
+
+    // backgr.fit
+    if (fRuns[i].GetBkgFitParamNo() != -1) {
+      fout.width(16);
+      fout << left << "backgr.fit";
+      fout << fRuns[i].GetBkgFitParamNo() << endl;
+    }
+
+    // lifetime
+    if (fRuns[i].GetLifetimeParamNo() != -1) {
+      fout.width(16);
+      fout << left << "lifetime";
+      fout << fRuns[i].GetLifetimeParamNo() << endl;
+    }
+
+    // lifetimecorrection
+    if ((fRuns[i].IsLifetimeCorrected()) && (fRuns[i].GetFitType() == MSR_FITTYPE_SINGLE_HISTO)) {
+      fout << "lifetimecorrection" << endl;
+    }
+
+    // map
+    fout << "map         ";
+    for (UInt_t j=0; j<fRuns[i].GetMap()->size(); ++j) {
+      fout.width(5);
+      fout << right << fRuns[i].GetMap(j);
+    }
+    // if there are less maps then 10 fill with zeros
+    if (fRuns[i].GetMap()->size() < 10) {
+      for (UInt_t j=fRuns[i].GetMap()->size(); j<10; ++j)
+        fout << "    0";
+    }
+    fout << endl;
+
+    // forward
+    if (fRuns[i].GetForwardHistoNoSize() == 0) {
+      cerr << endl << ">> PMsrHandler::WriteMsrFile: **WARNING** No 'forward' data found!";
+      cerr << endl << ">> Something is VERY fishy, please check your msr-file carfully." << endl;
+    } else {
+      fout.width(16);
+      fout << left << "forward";
+      for (UInt_t j=0; j<fRuns[i].GetForwardHistoNoSize(); ++j) {
+        fout.width(8);
+        fout << fRuns[i].GetForwardHistoNo(j);
+      }
+      fout << endl;
+    }
+
+    // backward
+    if (fRuns[i].GetBackwardHistoNoSize() > 0) {
+      fout.width(16);
+      fout << left << "backward";
+      for (UInt_t j=0; j<fRuns[i].GetBackwardHistoNoSize(); ++j) {
+        fout.width(8);
+        fout << fRuns[i].GetBackwardHistoNo(j);
+      }
+      fout << endl;
+    }
+
+    // backgr.fix
+    if ((fRuns[i].GetBkgFix(0) != PMUSR_UNDEFINED) || (fRuns[i].GetBkgFix(1) != PMUSR_UNDEFINED)) {
+      fout.width(15);
+      fout << left << "backgr.fix";
+      for (UInt_t j=0; j<2; ++j) {
+        if (fRuns[i].GetBkgFix(j) != PMUSR_UNDEFINED) {
+          fout.precision(prec);
+          fout.width(12);
+          fout << left << fRuns[i].GetBkgFix(j);
+        }
+      }
+      fout << endl;
+    }
+
+    // background
+    if ((fRuns[i].GetBkgRange(0) != -1) || (fRuns[i].GetBkgRange(1) != -1) || (fRuns[i].GetBkgRange(2) != -1) || (fRuns[i].GetBkgRange(3) != -1)) {
+      fout.width(16);
+      fout << left << "background";
+      for (UInt_t j=0; j<4; ++j) {
+        if (fRuns[i].GetBkgRange(j) > 0) {
+          fout.width(8);
+          fout << left << fRuns[i].GetBkgRange(j);
+        }
+      }
+      fout << endl;
+    }
+
+    // data
+    if ((fRuns[i].GetDataRange(0) != -1) || (fRuns[i].GetDataRange(1) != -1) || (fRuns[i].GetDataRange(2) != -1) || (fRuns[i].GetDataRange(3) != -1)) {
+      fout.width(16);
+      fout << left << "data";
+      for (UInt_t j=0; j<4; ++j) {
+        if (fRuns[i].GetDataRange(j) > 0) {
+          fout.width(8);
+          fout << left << fRuns[i].GetDataRange(j);
+        }
+      }
+      fout << endl;
+    }
+
+    // t0
+    if (fRuns[i].GetT0Size() > 0) {
+      fout.width(16);
+      fout << left << "t0";
+      for (UInt_t j=0; j<fRuns[i].GetT0Size(); ++j) {
+        fout.width(8);
+        fout << left << fRuns[i].GetT0(j);
+      }
+      fout << endl;
+    }
+
+    // addt0
+    for (UInt_t j = 0; j < fRuns[i].GetRunNameSize() - 1; ++j) {
+      if (fRuns[i].GetAddT0Size(j) > 0) {
+        fout.width(16);
+        fout << left << "addt0";
+        for (Int_t k=0; k<fRuns[i].GetAddT0Size(j); ++k) {
+          fout.width(8);
+          fout << left << fRuns[i].GetAddT0(j, k);
+        }
+        fout << endl;
+      }
+    }
+
+    // xy-data
+    if (fRuns[i].GetXDataIndex() != -1) { // indices
+      fout.width(16);
+      fout << left << "xy-data";
+      fout.width(8);
+      fout.precision(2);
+      fout << left << fixed << fRuns[i].GetXDataIndex();
+      fout.width(8);
+      fout.precision(2);
+      fout << left << fixed << fRuns[i].GetYDataIndex();
+      fout << endl;
+    } else if (!fRuns[i].GetXDataLabel()->IsWhitespace()) { // labels
+      fout.width(16);
+      fout << left << "xy-data";
+      fout.width(8);
+      fout << left << fixed << fRuns[i].GetXDataLabel()->Data();
+      fout << " ";
+      fout.width(8);
+      fout << left << fixed << fRuns[i].GetYDataLabel()->Data();
+      fout << endl;
+    }
+
+    // fit
+    fout.width(16);
+    fout << left << "fit";
+    for (UInt_t j=0; j<2; j++) {
+      if (fRuns[i].GetFitRange(j) == -1)
+        break;
+      fout.width(8);
+      fout.precision(2);
+      fout << left << fixed << fRuns[i].GetFitRange(j);
+    }
+    fout << endl;
+
+    // packing
+    fout.width(16);
+    fout << left << "packing";
+    fout << fRuns[i].GetPacking() << endl;
+    fout << endl;
+  }
+
+  if (commentsRUN && !commentsRUN->empty()) {
+    for(iter = commentsRUN->begin(); iter != commentsRUN->end(); ++iter) {
+      fout << "# " << iter->second.Data() << endl;
+    }
+    fout << endl;
+    commentsRUN->clear();
+  }
+  fout << hline.Data() << endl;
+
+  // write COMMANDS block
+  fout << "COMMANDS" << endl;
+  for (i = 1; i < fCommands.size(); ++i) {
+    if (fCommands[i].fLine.BeginsWith("SET BATCH") || fCommands[i].fLine.BeginsWith("END RETURN"))
+      continue;
+    else
+      fout << fCommands[i].fLine.Data() << endl;
+  }
+  fout << endl;
+  fout << hline.Data() << endl;
+
+  // write FOURIER block
+  if (fFourier.fFourierBlockPresent) {
+    fout << "FOURIER" << endl;
+
+    // units
+    if (fFourier.fUnits) {
+      fout << "units            ";
+      if (fFourier.fUnits == FOURIER_UNIT_FIELD) {
+        fout << "Gauss";
+      } else if (fFourier.fUnits == FOURIER_UNIT_FREQ) {
+        fout << "MHz ";
+      } else if (fFourier.fUnits == FOURIER_UNIT_CYCLES) {
+        fout << "Mc/s";
+      }
+      fout << "   # units either 'Gauss', 'MHz', or 'Mc/s'";
+      fout << endl;
+    }
+
+    // fourier_power
+    if (fFourier.fFourierPower != -1) {
+      fout << "fourier_power    " << fFourier.fFourierPower << endl;
+    }
+
+    // apodization
+    if (fFourier.fApodization) {
+      fout << "apodization      ";
+      if (fFourier.fApodization == FOURIER_APOD_NONE) {
+        fout << "NONE  ";
+      } else if (fFourier.fApodization == FOURIER_APOD_WEAK) {
+        fout << "WEAK  ";
+      } else if (fFourier.fApodization == FOURIER_APOD_MEDIUM) {
+        fout << "MEDIUM";
+      } else if (fFourier.fApodization == FOURIER_APOD_STRONG) {
+        fout << "STRONG";
+      }
+      fout << "  # NONE, WEAK, MEDIUM, STRONG";
+      fout << endl;
+    }
+
+    // plot
+    if (fFourier.fPlotTag) {
+      fout << "plot             ";
+      if (fFourier.fPlotTag == FOURIER_PLOT_REAL) {
+        fout << "REAL ";
+      } else if (fFourier.fPlotTag == FOURIER_PLOT_IMAG) {
+        fout << "IMAG ";
+      } else if (fFourier.fPlotTag == FOURIER_PLOT_REAL_AND_IMAG) {
+        fout << "REAL_AND_IMAG";
+      } else if (fFourier.fPlotTag == FOURIER_PLOT_POWER) {
+        fout << "POWER";
+      } else if (fFourier.fPlotTag == FOURIER_PLOT_PHASE) {
+        fout << "PHASE";
+      }
+      fout << "   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE";
+      fout << endl;
+    }
+
+    // phase
+    if (fFourier.fPhaseParamNo > 0) {
+      fout << "phase            par" << fFourier.fPhaseParamNo << endl;
+    } else if (fFourier.fPhase != -999.0) {
+      fout << "phase            " << fFourier.fPhase << endl;
+    }
+
+    // range_for_phase_correction
+    if ((fFourier.fRangeForPhaseCorrection[0] != -1.0) || (fFourier.fRangeForPhaseCorrection[1] != -1.0)) {
+      fout << "range_for_phase_correction  " << fFourier.fRangeForPhaseCorrection[0] << "    " << fFourier.fRangeForPhaseCorrection[1] << endl;
+    }
+
+    // range
+    if ((fFourier.fPlotRange[0] != -1.0) || (fFourier.fPlotRange[1] != -1.0)) {
+      fout << "range            " << fFourier.fPlotRange[0] << "    " << fFourier.fPlotRange[1] << endl;
+    }
+
+    // phase_increment -- seems to be not used... write it anyway for completeness
+    if (fFourier.fPhaseIncrement) {
+      fout << "phase_increment  " << fFourier.fPhaseIncrement << endl;
+    }
+
+    fout << endl;
+    fout << hline.Data() << endl;
+  }
+
+  // write PLOT blocks
+  for (i = 0; i < fPlots.size(); ++i) {
+    switch (fPlots[i].fPlotType) {
+      case MSR_PLOT_SINGLE_HISTO:
+        fout << "PLOT " << fPlots[i].fPlotType << "   (single histo plot)" << endl;
+        break;
+      case MSR_PLOT_ASYM:
+        fout << "PLOT " << fPlots[i].fPlotType << "   (asymmetry plot)" << endl;
+        break;
+      case MSR_PLOT_MU_MINUS:
+        fout << "PLOT " << fPlots[i].fPlotType << "   (mu minus plot)" << endl;
+        break;
+      case MSR_PLOT_NON_MUSR:
+        fout << "PLOT " << fPlots[i].fPlotType << "   (non muSR plot)" << endl;
+        break;
+      default:
+        break;
+    }
+
+    // runs
+    fout << "runs     ";
+    fout.precision(0);
+    for (UInt_t j=0; j<fPlots[i].fRuns.size(); ++j) {
+      fout.width(4);
+      fout << fPlots[i].fRuns[j];
+    }
+    fout << endl;
+
+    // range and sub_ranges
+    if ((fPlots[i].fTmin.size() == 1) && (fPlots[i].fTmax.size() == 1)) {
+      fout << "range    ";
+      fout.precision(2);
+      fout << fPlots[i].fTmin[0] << "   " << fPlots[i].fTmax[0];
+    } else if ((fPlots[i].fTmin.size() > 1) && (fPlots[i].fTmax.size() > 1)) {
+      fout << "sub_ranges ";
+      fout.precision(2);
+      for (UInt_t j=0; j < fPlots[i].fTmin.size(); ++j) {
+        fout << "   " << fPlots[i].fTmin[j] << "   " << fPlots[i].fTmax[j];
+      }
+    }
+    if (!fPlots[i].fYmin.empty() && !fPlots[i].fYmax.empty()) {
+      fout << "   " << fPlots[i].fYmin[0] << "   " << fPlots[i].fYmax[0];
+    }
+    fout << endl;
+
+    // use_fit_ranges
+    if (fPlots[i].fUseFitRanges) {
+      fout << "use_fit_ranges" << endl;
+    }
+
+    // view_packing
+    if (fPlots[i].fViewPacking != -1) {
+      fout << "view_packing " << fPlots[i].fViewPacking << endl;
+    }
+
+    // logx
+    if (fPlots[i].fLogX) {
+      fout << "logx" << endl;
+    }
+
+    // logy
+    if (fPlots[i].fLogY) {
+      fout << "logy" << endl;
+    }
+
+    // rrf_packing
+    if (fPlots[i].fRRFPacking) {
+      fout << "rrf_packing " << fPlots[i].fRRFPacking << endl;
+    }
+
+    // rrf_freq
+    if (fPlots[i].fRRFFreq) {
+      fout << "rrf_freq " << fPlots[i].fRRFFreq << " ";
+      switch (fPlots[i].fRRFUnit) {
+        case RRF_UNIT_kHz:
+          fout << "kHz";
+          break;
+        case RRF_UNIT_MHz:
+          fout << "MHz";
+          break;
+        case RRF_UNIT_Mcs:
+          fout << "Mc/s";
+          break;
+        case RRF_UNIT_G:
+          fout << "G";
+          break;
+        case RRF_UNIT_T:
+          fout << "T";
+          break;
+        default:
+          break;
+      }
+      fout << endl;
+    }
+
+    // rrf_phase
+    if (fPlots[i].fRRFPhase) {
+      fout << "rrf_phase  " << fPlots[i].fRRFPhase << endl;
+    }
+
+    fout << endl;
+  }
+  if (!fPlots.empty()) {
+    fout << hline.Data() << endl;
+  }
+
+  // write STATISTIC block
+  TDatime dt;
+  fout << "STATISTIC --- " << dt.AsSQLString() << endl;
+  if (fStatistic.fValid) { // valid fit result
+    if (fStatistic.fChisq) { // chisq
+      str  = "  chisq = ";
+      str += fStatistic.fMin;
+      str += ", NDF = ";
+      str += fStatistic.fNdf;
+      str += ", chisq/NDF = ";
+      str += fStatistic.fMin / fStatistic.fNdf;
+      fout << str.Data() << endl;
+    } else { // max. log. liklihood
+      str  = "  maxLH = ";
+      str += fStatistic.fMin;
+      str += ", NDF = ";
+      str += fStatistic.fNdf;
+      str += ", maxLH/NDF = ";
+      str += fStatistic.fMin / fStatistic.fNdf;
+      fout << str.Data() << endl;
+    }
+  } else {
+    fout << "*** FIT DID NOT CONVERGE ***" << endl;
+  }
+
+  // close file
+  fout.close();
+
+  str.Clear();
+  pstr = 0;
+
+  return PMUSR_SUCCESS;
+}
+
+//--------------------------------------------------------------------------
 // SetMsrParamValue (public)
 //--------------------------------------------------------------------------
 /**

@@ -33,6 +33,7 @@
 #define _PMUSR_H_
 
 #include <vector>
+#include <map>
 using namespace std;
 
 #include <TString.h>
@@ -44,6 +45,7 @@ using namespace std;
 #define PMUSR_MSR_SYNTAX_ERROR         -4
 #define PMUSR_TOKENIZE_ERROR           -5
 #define PMUSR_MSR_LOG_FILE_WRITE_ERROR -6
+#define PMUSR_MSR_FILE_WRITE_ERROR     -7
 
 #define PRUN_SINGLE_HISTO 0
 #define PRUN_ASYMMETRY    2
@@ -371,6 +373,7 @@ typedef struct {
   Double_t fLowerBoundary;        ///< lower boundary for the fit parameter
   Bool_t   fUpperBoundaryPresent; ///< flag showing if an upper boundary is present
   Double_t fUpperBoundary;        ///< upper boundary for the fit parameter
+  Bool_t   fIsGlobal;             ///< flag showing if the parameter is a global one (used for msr2data global)
 } PMsrParamStructure;
 
 //-------------------------------------------------------------

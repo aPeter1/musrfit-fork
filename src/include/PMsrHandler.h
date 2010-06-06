@@ -52,6 +52,8 @@ class PMsrHandler
 
     virtual Int_t ReadMsrFile();
     virtual Int_t WriteMsrLogFile(const Bool_t messages = true);
+    virtual Int_t WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *commentsPAR = 0, map<UInt_t, TString> *commentsTHE = 0, \
+                                                       map<UInt_t, TString> *commentsFUN = 0, map<UInt_t, TString> *commentsRUN = 0);
 
     virtual TString*                GetMsrTitle() { return &fTitle; }
     virtual PMsrParamList*          GetMsrParamList() { return &fParam; }

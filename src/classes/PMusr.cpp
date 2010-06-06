@@ -627,8 +627,8 @@ void PMsrRunBlock::CleanUp()
   fPacking = -1; // undefined packing
   fXYDataIndex[0] = -1; // undefined x data index (NonMusr)
   fXYDataIndex[1] = -1; // undefined y data index (NonMusr)
-  fXYDataLabel[0] = TString("??"); // undefined x data label (NonMusr)
-  fXYDataLabel[1] = TString("??"); // undefined y data label (NonMusr)
+  fXYDataLabel[0] = TString(""); // undefined x data label (NonMusr)
+  fXYDataLabel[1] = TString(""); // undefined y data label (NonMusr)
 
   fRunName.clear();
   fBeamline.clear();
