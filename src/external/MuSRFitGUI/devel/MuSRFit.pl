@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Mon Jun 7 17:42:34 2010
+# Created: Mon Jun 7 18:29:05 2010
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -42,7 +42,8 @@ use Qt::slots
     T0Update => [],
     RunSelectionToggle => [],
     fileBrowse => [],
-    AppendToFunctions => [];
+    AppendToFunctions => [],
+    ResetFunctions => [];
 use Qt::attributes qw(
     musrfit_tabs
     RUNSPage
@@ -2525,7 +2526,7 @@ sub NEW
     $layout33_3->addWidget(TheoryBlock_Label, 0, 0);
 
     TheoryBlock = Qt::TextEdit($LayoutWidget_16, "TheoryBlock");
-    TheoryBlock->setEnabled( 0 );
+    TheoryBlock->setEnabled( 1 );
 
     $layout33_3->addWidget(TheoryBlock, 1, 0);
 
@@ -2586,7 +2587,7 @@ sub NEW
     $layout33_3->addWidget(ParametersList_Label, 0, 1);
 
     ParametersList = Qt::TextEdit($LayoutWidget_16, "ParametersList");
-    ParametersList->setEnabled( 0 );
+    ParametersList->setEnabled( 1 );
 
     $layout33_3->addWidget(ParametersList, 1, 1);
     $layout34_2->addLayout($layout33_3);
@@ -3524,7 +3525,7 @@ sub CreateAllInput
     }
     
 # Also theory block and paramets list
-    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
+    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);    
     $All{"Full_T_Block"}=$Full_T_Block;    
     $All{"Paramcomp_ref"}=$Paramcomp_ref;
     my @Paramcomp = @$Paramcomp_ref;
@@ -3770,7 +3771,6 @@ sub ActivateShComp
     my $Full_T_Block= $All{"Full_T_Block"};
     
     my $Component=1;
-    CParamsCombo->clear();
     
     foreach my $FitType (@FitTypes) {
 	my $Parameters=$Paramcomp[$Component-1];
@@ -3800,24 +3800,19 @@ sub ActivateShComp
 	for (my $i=1; $i<=9;$i++) {		
 	    my $ParamChkBx="ShParam_".$Component."_".$i;
 	    my $ChkBx = child($ParamChkBx);
-	    my $CParam = $Params[$i-1]."_".$Component;
+#	    my $CParam = $Params[$i-1]."_".$Component;
 	    if ($Params[$i-1] ne "" && $Params[$i-1] ne "Alpha" &&  $Params[$i-1] ne "N0" && $Params[$i-1] ne "NBg") {
 		$ChkBx->setHidden(0);
 		$ChkBx->setEnabled(1);
 		$ChkBx ->setText($Params[$i-1]);
-		CParamsCombo->insertItem($CParam,-1);
-		$Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
+#		CParamsCombo->insertItem($CParam,-1);
+#		$Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
 	    } else {
 		$ChkBx->setHidden(1);
 	    }
 	}
 	$Component++;
     }  
-# Set theory block in Constraints    
-    TheoryBlock->setText($Full_T_Block);
-# Then clear the text
-    ConstraintLine->setText("");
-    FunctionsBlock->setText("");
 
 }
 
@@ -3836,10 +3831,6 @@ sub InitializeTab
 	}
     }
     
-# Initialize Parameters List in function block (constraints).    
-    my $ParametersList="";
-    ParametersList->setText("");
-
     my %PTable=MSR::PrepParamTable(\%All);
     
 # Setup the table with the right size    
@@ -3847,9 +3838,6 @@ sub InitializeTab
     if ($NParam>$NRows) {	
 	InitParamTable->setNumRows($NParam);
     }
-    
-# Counter for function block (with out Alpha etc.)
-    my $ParCount=0;
     
 # Fill the table with labels and values of parametr 
     for (my $PCount=0;$PCount<$NParam;$PCount++) {
@@ -3863,15 +3851,6 @@ sub InitializeTab
 	InitParamTable->setText($PCount,1,$error);
 	InitParamTable->setText($PCount,2,$minvalue);
 	InitParamTable->setText($PCount,3,$maxvalue);
-	
-# Also update Parameters List for the Functions block
-	(my $Ptmp,my $tmp)=split(/_/,$Param);
-	if ($Ptmp ne "" && $Ptmp ne "Alpha" &&  $Ptmp ne "N0" && $Ptmp ne "NBg") {
-	    $ParCount++;
-	    $ParametersList=$ParametersList."$Param is par$ParCount\n";
-	    ParametersList->setText($ParametersList);
-	}
-
     }
 
 }
@@ -4057,6 +4036,55 @@ sub AppendToFunctions
 # Replace parameter in theory block with fun$i
     $Full_T_Block=~ s/$ParName/fun$i/;
     TheoryBlock->setText($Full_T_Block);
+
+}
+
+sub ResetFunctions
+{
+
+    my %All=CreateAllInput();
+    my @RUNS = split( /,/, $All{"RunNumbers"} );
+    
+    my @FitTypes =();
+    foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
+	if ( $FitType ne "None" ) {
+	    push( @FitTypes, $FitType );	    
+	}
+    }
+    
+# Get number of parameters to determine the size of the table 
+    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
+# For now the line below does not work. Why?    
+#    my $Paramcomp_ref=$All{"Paramcomp_ref"};
+    my @Paramcomp = @$Paramcomp_ref;
+    my $Full_T_Block= $All{"Full_T_Block"};
+    my $Param="";
+    
+    # Initialize Parameters List in function block (constraints).    
+    my $ParametersList="";
+    ParametersList->setText("");
+
+# Counter for function block (with out Alpha etc.)
+    my $ParCount=0;
+     CParamsCombo->clear();
+     
+#     my $CParam = $Params[$i-1]."_".$Component;
+#		CParamsCombo->insertItem($CParam,-1);
+#		$Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
+
+# Also update Parameters List for the Functions block
+    (my $Ptmp,my $tmp)=split(/_/,$Param);
+    if ($Ptmp ne "" && $Ptmp ne "Alpha" &&  $Ptmp ne "N0" && $Ptmp ne "NBg") {
+	$ParCount++;
+	$ParametersList=$ParametersList."$Param is par$ParCount\n";
+	ParametersList->setText($ParametersList);
+    }
+# Set theory block in Constraints    
+    TheoryBlock->setText($Full_T_Block);
+# Then clear the text
+    ConstraintLine->setText("");
+    FunctionsBlock->setText("");
+
 
 }
 

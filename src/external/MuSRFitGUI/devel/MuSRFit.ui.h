@@ -599,13 +599,13 @@ void MuSRFitform::ActivateShComp()
 	for (my $i=1; $i<=9;$i++) {		
 	    my $ParamChkBx="ShParam_".$Component."_".$i;
 	    my $ChkBx = child($ParamChkBx);
-	    my $CParam = $Params[$i-1]."_".$Component;
+#	    my $CParam = $Params[$i-1]."_".$Component;
 	    if ($Params[$i-1] ne "" && $Params[$i-1] ne "Alpha" &&  $Params[$i-1] ne "N0" && $Params[$i-1] ne "NBg") {
 		$ChkBx->setHidden(0);
 		$ChkBx->setEnabled(1);
 		$ChkBx ->setText($Params[$i-1]);
-		CParamsCombo->insertItem($CParam,-1);
-		$Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
+#		CParamsCombo->insertItem($CParam,-1);
+#		$Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
 	    } else {
 		$ChkBx->setHidden(1);
 	    }
@@ -826,6 +826,24 @@ void MuSRFitform::AppendToFunctions()
 
 void MuSRFitform::ResetFunctions()
 {
+    my %All=CreateAllInput();
+    my @RUNS = split( /,/, $All{"RunNumbers"} );
+    
+    my @FitTypes =();
+    foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
+	if ( $FitType ne "None" ) {
+	    push( @FitTypes, $FitType );	    
+	}
+    }
+    
+# Get number of parameters to determine the size of the table 
+    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
+# For now the line below does not work. Why?    
+#    my $Paramcomp_ref=$All{"Paramcomp_ref"};
+    my @Paramcomp = @$Paramcomp_ref;
+    my $Full_T_Block= $All{"Full_T_Block"};
+    my $Param="";
+    
     # Initialize Parameters List in function block (constraints).    
     my $ParametersList="";
     ParametersList->setText("");
@@ -833,7 +851,11 @@ void MuSRFitform::ResetFunctions()
 # Counter for function block (with out Alpha etc.)
     my $ParCount=0;
      CParamsCombo->clear();
-   
+     
+#     my $CParam = $Params[$i-1]."_".$Component;
+#		CParamsCombo->insertItem($CParam,-1);
+#		$Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
+
 # Also update Parameters List for the Functions block
     (my $Ptmp,my $tmp)=split(/_/,$Param);
     if ($Ptmp ne "" && $Ptmp ne "Alpha" &&  $Ptmp ne "N0" && $Ptmp ne "NBg") {
