@@ -3962,7 +3962,7 @@
                                     <cstring>TheoryBlock</cstring>
                                 </property>
                                 <property name="enabled">
-                                    <bool>false</bool>
+                                    <bool>true</bool>
                                 </property>
                             </widget>
                             <widget class="QLabel" row="0" column="1">
@@ -4228,7 +4228,7 @@
                                     <cstring>ParametersList</cstring>
                                 </property>
                                 <property name="enabled">
-                                    <bool>false</bool>
+                                    <bool>true</bool>
                                 </property>
                             </widget>
                         </grid>
@@ -5458,6 +5458,7 @@
     <slot>RunSelectionToggle()</slot>
     <slot>fileBrowse()</slot>
     <slot>AppendToFunctions()</slot>
+    <slot>ResetFunctions()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

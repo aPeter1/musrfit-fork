@@ -570,7 +570,6 @@ void MuSRFitform::ActivateShComp()
     my $Full_T_Block= $All{"Full_T_Block"};
     
     my $Component=1;
-    CParamsCombo->clear();
     
     foreach my $FitType (@FitTypes) {
 	my $Parameters=$Paramcomp[$Component-1];
@@ -613,11 +612,6 @@ void MuSRFitform::ActivateShComp()
 	}
 	$Component++;
     }  
-# Set theory block in Constraints    
-    TheoryBlock->setText($Full_T_Block);
-# Then clear the text
-    ConstraintLine->setText("");
-    FunctionsBlock->setText("");
 }
 
 void MuSRFitform::InitializeTab()
@@ -634,10 +628,6 @@ void MuSRFitform::InitializeTab()
 	}
     }
     
-# Initialize Parameters List in function block (constraints).    
-    my $ParametersList="";
-    ParametersList->setText("");
-
     my %PTable=MSR::PrepParamTable(\%All);
     
 # Setup the table with the right size    
@@ -645,9 +635,6 @@ void MuSRFitform::InitializeTab()
     if ($NParam>$NRows) {	
 	InitParamTable->setNumRows($NParam);
     }
-    
-# Counter for function block (with out Alpha etc.)
-    my $ParCount=0;
     
 # Fill the table with labels and values of parametr 
     for (my $PCount=0;$PCount<$NParam;$PCount++) {
@@ -661,15 +648,6 @@ void MuSRFitform::InitializeTab()
 	InitParamTable->setText($PCount,1,$error);
 	InitParamTable->setText($PCount,2,$minvalue);
 	InitParamTable->setText($PCount,3,$maxvalue);
-	
-# Also update Parameters List for the Functions block
-	(my $Ptmp,my $tmp)=split(/_/,$Param);
-	if ($Ptmp ne "" && $Ptmp ne "Alpha" &&  $Ptmp ne "N0" && $Ptmp ne "NBg") {
-	    $ParCount++;
-	    $ParametersList=$ParametersList."$Param is par$ParCount\n";
-	    ParametersList->setText($ParametersList);
-	}
-
     }
 }
 
@@ -846,3 +824,27 @@ void MuSRFitform::AppendToFunctions()
     TheoryBlock->setText($Full_T_Block);
 }
 
+void MuSRFitform::ResetFunctions()
+{
+    # Initialize Parameters List in function block (constraints).    
+    my $ParametersList="";
+    ParametersList->setText("");
+
+# Counter for function block (with out Alpha etc.)
+    my $ParCount=0;
+     CParamsCombo->clear();
+   
+# Also update Parameters List for the Functions block
+    (my $Ptmp,my $tmp)=split(/_/,$Param);
+    if ($Ptmp ne "" && $Ptmp ne "Alpha" &&  $Ptmp ne "N0" && $Ptmp ne "NBg") {
+	$ParCount++;
+	$ParametersList=$ParametersList."$Param is par$ParCount\n";
+	ParametersList->setText($ParametersList);
+    }
+# Set theory block in Constraints    
+    TheoryBlock->setText($Full_T_Block);
+# Then clear the text
+    ConstraintLine->setText("");
+    FunctionsBlock->setText("");
+
+}
