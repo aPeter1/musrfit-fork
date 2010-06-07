@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Mon May 31 15:10:55 2010
+# Created: Mon Jun 7 17:42:34 2010
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -42,8 +42,7 @@ use Qt::slots
     T0Update => [],
     RunSelectionToggle => [],
     fileBrowse => [],
-    AppendToFunctions => [],
-    ResetFunctions => [];
+    AppendToFunctions => [];
 use Qt::attributes qw(
     musrfit_tabs
     RUNSPage
@@ -181,8 +180,10 @@ use Qt::attributes qw(
     Data14
     Data24
     ConstPage
-    textLabel2_2
+    TheoryBlock_Label
     TheoryBlock
+    ParametersList_Label
+    ParametersList
     CParamsCombo
     textLabel1_4_6
     ConstraintLine
@@ -190,7 +191,6 @@ use Qt::attributes qw(
     textLabel2_2_3_4
     FunctionsBlock
     textLabel1_6
-    ApplyFunc_2
     ResetFunc
     MenuBar
     fileMenu
@@ -1582,7 +1582,7 @@ sub NEW
         setName("MuSRFitform" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
-    setMinimumSize(Qt::Size(21, 275) );
+    setMinimumSize(Qt::Size(21, 264) );
     setIcon($image0 );
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
@@ -2244,6 +2244,7 @@ sub NEW
     $layout25->addWidget(groupTitle);
 
     textMSROutput = Qt::TextEdit($LayoutWidget_8, "textMSROutput");
+    textMSROutput->setWordWrap( &Qt::TextEdit::WidgetWidth() );
     textMSROutput->setOverwriteMode( 1 );
     $layout25->addWidget(textMSROutput);
     musrfit_tabs->insertTab( MSRPage, "" );
@@ -2462,10 +2463,12 @@ sub NEW
     ConstPage = Qt::Widget(musrfit_tabs, "ConstPage");
 
     my $LayoutWidget_16 = Qt::Widget(ConstPage, '$LayoutWidget_16');
-    $LayoutWidget_16->setGeometry( Qt::Rect(5, 5, 545, 350) );
-    my $layout31_2 = Qt::VBoxLayout($LayoutWidget_16, 11, 6, '$layout31_2');
+    $LayoutWidget_16->setGeometry( Qt::Rect(6, 1, 540, 360) );
+    my $layout34_2 = Qt::VBoxLayout($LayoutWidget_16, 11, 6, '$layout34_2');
 
-    textLabel2_2 = Qt::Label($LayoutWidget_16, "textLabel2_2");
+    my $layout33_3 = Qt::GridLayout(undef, 1, 1, 0, 6, '$layout33_3');
+
+    TheoryBlock_Label = Qt::Label($LayoutWidget_16, "TheoryBlock_Label");
     $cg->setColor(&Qt::ColorGroup::Foreground, &black);
     $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
     $cg->setColor(&Qt::ColorGroup::Light, &white);
@@ -2517,11 +2520,76 @@ sub NEW
     $cg->setColor(&Qt::ColorGroup::Link, Qt::Color(0,0,238));
     $cg->setColor(&Qt::ColorGroup::LinkVisited, Qt::Color(82,24,139));
     $pal->setDisabled($cg);
-    textLabel2_2->setPalette( $pal );
-    $layout31_2->addWidget(textLabel2_2);
+    TheoryBlock_Label->setPalette( $pal );
+
+    $layout33_3->addWidget(TheoryBlock_Label, 0, 0);
 
     TheoryBlock = Qt::TextEdit($LayoutWidget_16, "TheoryBlock");
-    $layout31_2->addWidget(TheoryBlock);
+    TheoryBlock->setEnabled( 0 );
+
+    $layout33_3->addWidget(TheoryBlock, 1, 0);
+
+    ParametersList_Label = Qt::Label($LayoutWidget_16, "ParametersList_Label");
+    $cg->setColor(&Qt::ColorGroup::Foreground, &black);
+    $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
+    $cg->setColor(&Qt::ColorGroup::Light, &white);
+    $cg->setColor(&Qt::ColorGroup::Midlight, Qt::Color(242,247,252));
+    $cg->setColor(&Qt::ColorGroup::Dark, Qt::Color(115,120,124));
+    $cg->setColor(&Qt::ColorGroup::Mid, Qt::Color(154,160,166));
+    $cg->setColor(&Qt::ColorGroup::Text, &black);
+    $cg->setColor(&Qt::ColorGroup::BrightText, &white);
+    $cg->setColor(&Qt::ColorGroup::ButtonText, &black);
+    $cg->setColor(&Qt::ColorGroup::Base, &white);
+    $cg->setColor(&Qt::ColorGroup::Background, Qt::Color(255,255,127));
+    $cg->setColor(&Qt::ColorGroup::Shadow, &black);
+    $cg->setColor(&Qt::ColorGroup::Highlight, Qt::Color(0,0,128));
+    $cg->setColor(&Qt::ColorGroup::HighlightedText, &white);
+    $cg->setColor(&Qt::ColorGroup::Link, &black);
+    $cg->setColor(&Qt::ColorGroup::LinkVisited, &black);
+    $pal->setActive($cg);
+    $cg->setColor(&Qt::ColorGroup::Foreground, &black);
+    $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
+    $cg->setColor(&Qt::ColorGroup::Light, &white);
+    $cg->setColor(&Qt::ColorGroup::Midlight, &white);
+    $cg->setColor(&Qt::ColorGroup::Dark, Qt::Color(115,120,124));
+    $cg->setColor(&Qt::ColorGroup::Mid, Qt::Color(154,160,166));
+    $cg->setColor(&Qt::ColorGroup::Text, &black);
+    $cg->setColor(&Qt::ColorGroup::BrightText, &white);
+    $cg->setColor(&Qt::ColorGroup::ButtonText, &black);
+    $cg->setColor(&Qt::ColorGroup::Base, &white);
+    $cg->setColor(&Qt::ColorGroup::Background, Qt::Color(255,255,127));
+    $cg->setColor(&Qt::ColorGroup::Shadow, &black);
+    $cg->setColor(&Qt::ColorGroup::Highlight, Qt::Color(0,0,128));
+    $cg->setColor(&Qt::ColorGroup::HighlightedText, &white);
+    $cg->setColor(&Qt::ColorGroup::Link, Qt::Color(0,0,238));
+    $cg->setColor(&Qt::ColorGroup::LinkVisited, Qt::Color(82,24,139));
+    $pal->setInactive($cg);
+    $cg->setColor(&Qt::ColorGroup::Foreground, Qt::Color(128,128,128));
+    $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
+    $cg->setColor(&Qt::ColorGroup::Light, &white);
+    $cg->setColor(&Qt::ColorGroup::Midlight, &white);
+    $cg->setColor(&Qt::ColorGroup::Dark, Qt::Color(115,120,124));
+    $cg->setColor(&Qt::ColorGroup::Mid, Qt::Color(154,160,166));
+    $cg->setColor(&Qt::ColorGroup::Text, Qt::Color(128,128,128));
+    $cg->setColor(&Qt::ColorGroup::BrightText, &white);
+    $cg->setColor(&Qt::ColorGroup::ButtonText, Qt::Color(128,128,128));
+    $cg->setColor(&Qt::ColorGroup::Base, &white);
+    $cg->setColor(&Qt::ColorGroup::Background, Qt::Color(255,255,127));
+    $cg->setColor(&Qt::ColorGroup::Shadow, &black);
+    $cg->setColor(&Qt::ColorGroup::Highlight, Qt::Color(0,0,128));
+    $cg->setColor(&Qt::ColorGroup::HighlightedText, &white);
+    $cg->setColor(&Qt::ColorGroup::Link, Qt::Color(0,0,238));
+    $cg->setColor(&Qt::ColorGroup::LinkVisited, Qt::Color(82,24,139));
+    $pal->setDisabled($cg);
+    ParametersList_Label->setPalette( $pal );
+
+    $layout33_3->addWidget(ParametersList_Label, 0, 1);
+
+    ParametersList = Qt::TextEdit($LayoutWidget_16, "ParametersList");
+    ParametersList->setEnabled( 0 );
+
+    $layout33_3->addWidget(ParametersList, 1, 1);
+    $layout34_2->addLayout($layout33_3);
 
     my $layout25_6 = Qt::HBoxLayout(undef, 0, 6, '$layout25_6');
 
@@ -2540,7 +2608,7 @@ sub NEW
     AddConstraint = Qt::PushButton($LayoutWidget_16, "AddConstraint");
     AddConstraint->setSizePolicy( Qt::SizePolicy(0, 7, 0, 0, AddConstraint->sizePolicy()->hasHeightForWidth()) );
     $layout25_6->addWidget(AddConstraint);
-    $layout31_2->addLayout($layout25_6);
+    $layout34_2->addLayout($layout25_6);
 
     textLabel2_2_3_4 = Qt::Label($LayoutWidget_16, "textLabel2_2_3_4");
     $cg->setColor(&Qt::ColorGroup::Foreground, &black);
@@ -2595,24 +2663,20 @@ sub NEW
     $cg->setColor(&Qt::ColorGroup::LinkVisited, Qt::Color(82,24,139));
     $pal->setDisabled($cg);
     textLabel2_2_3_4->setPalette( $pal );
-    $layout31_2->addWidget(textLabel2_2_3_4);
+    $layout34_2->addWidget(textLabel2_2_3_4);
 
     FunctionsBlock = Qt::TextEdit($LayoutWidget_16, "FunctionsBlock");
-    $layout31_2->addWidget(FunctionsBlock);
+    $layout34_2->addWidget(FunctionsBlock);
 
     my $layout30 = Qt::HBoxLayout(undef, 0, 6, '$layout30');
 
     textLabel1_6 = Qt::Label($LayoutWidget_16, "textLabel1_6");
     $layout30->addWidget(textLabel1_6);
 
-    ApplyFunc_2 = Qt::PushButton($LayoutWidget_16, "ApplyFunc_2");
-    ApplyFunc_2->setMaximumSize( Qt::Size(100, 32767) );
-    $layout30->addWidget(ApplyFunc_2);
-
     ResetFunc = Qt::PushButton($LayoutWidget_16, "ResetFunc");
     ResetFunc->setMaximumSize( Qt::Size(100, 32767) );
     $layout30->addWidget(ResetFunc);
-    $layout31_2->addLayout($layout30);
+    $layout34_2->addLayout($layout30);
     musrfit_tabs->insertTab( ConstPage, "" );
 
     fileNewAction= Qt::Action(this, "fileNewAction");
@@ -2775,7 +2839,7 @@ sub NEW
     Qt::Object::connect(T0, SIGNAL "activated()", this, SLOT "ShowMuSRT0()");
     Qt::Object::connect(Plot, SIGNAL "activated()", this, SLOT "GoPlot()");
     Qt::Object::connect(AddConstraint, SIGNAL "clicked()", this, SLOT "AppendToFunctions()");
-    Qt::Object::connect(ResetFunc, SIGNAL "clicked()", this, SLOT "ResetFunctions()");
+    Qt::Object::connect(ResetFunc, SIGNAL "clicked()", this, SLOT "ActivateShComp()");
 
     setTabOrder(musrfit_tabs, RunNumbers);
     setTabOrder(RunNumbers, BeamLine);
@@ -3015,6 +3079,7 @@ sub languageChange
     FILENAMELabel->setText( trUtf8("Enter [name] for output [name].msr file (optional)") );
     Qt::ToolTip::add(FILENAME, trUtf8("Name of the produced MSR file (optional)"));
     Qt::WhatsThis::add(FILENAME, trUtf8("Name of the produced MSR file (optional)"));
+    textMSROutput->setText( undef );
     musrfit_tabs->changeTab( MSRPage, trUtf8("MSR File") );
     FUnitsLabel->setText( trUtf8("Units") );
     FApodizationLabel->setText( trUtf8("Apodization") );
@@ -3056,12 +3121,12 @@ sub languageChange
     groupHist3->setTitle( trUtf8("Hist3") );
     groupHist4->setTitle( trUtf8("Hist4") );
     musrfit_tabs->changeTab( T0Page, trUtf8("t0/Bg Bins") );
-    textLabel2_2->setText( trUtf8("THEORY Block") );
+    TheoryBlock_Label->setText( trUtf8("THEORY Block") );
+    ParametersList_Label->setText( trUtf8("Parameters List") );
     textLabel1_4_6->setText( trUtf8("=") );
     AddConstraint->setText( trUtf8("Add") );
     textLabel2_2_3_4->setText( trUtf8("FUNCTIONS Block") );
     textLabel1_6->setText( undef );
-    ApplyFunc_2->setText( trUtf8("Apply") );
     ResetFunc->setText( trUtf8("Reset") );
     musrfit_tabs->changeTab( ConstPage, trUtf8("Constraints") );
     fileNewAction->setText( trUtf8("&New") );
@@ -3464,6 +3529,9 @@ sub CreateAllInput
     $All{"Paramcomp_ref"}=$Paramcomp_ref;
     my @Paramcomp = @$Paramcomp_ref;
     
+# Functions block 
+    $All{"FunctionsBlock"}=FunctionsBlock->text;
+
 # Read initial values of paramets from tabel
     my $erradd = "d";
     my $minadd = "_min";
@@ -3603,12 +3671,13 @@ sub UpdateMSRFileInitTable
     (my $TBlock_ref, my $FPBlock_ref)=MSR::ExtractBlks(@lines);
     my @FPBloc = @$FPBlock_ref;
     
+# Counter for initialization table (including Alpha, N0 and Bg)    
     my $PCount=0;
     foreach my $line (@FPBloc) {
 	$PCount++;
 	my @Param=split(/\s+/,$line);
 	
-# Depending on home many elements in @Param determine what they mean
+# Depending on how many elements in @Param determine what they mean
 # 0th element is empty (always)
 # 1st element is the order (always)	
 # 2nd element is the name (always)
@@ -3744,7 +3813,11 @@ sub ActivateShComp
 	}
 	$Component++;
     }  
+# Set theory block in Constraints    
     TheoryBlock->setText($Full_T_Block);
+# Then clear the text
+    ConstraintLine->setText("");
+    FunctionsBlock->setText("");
 
 }
 
@@ -3763,6 +3836,10 @@ sub InitializeTab
 	}
     }
     
+# Initialize Parameters List in function block (constraints).    
+    my $ParametersList="";
+    ParametersList->setText("");
+
     my %PTable=MSR::PrepParamTable(\%All);
     
 # Setup the table with the right size    
@@ -3770,6 +3847,9 @@ sub InitializeTab
     if ($NParam>$NRows) {	
 	InitParamTable->setNumRows($NParam);
     }
+    
+# Counter for function block (with out Alpha etc.)
+    my $ParCount=0;
     
 # Fill the table with labels and values of parametr 
     for (my $PCount=0;$PCount<$NParam;$PCount++) {
@@ -3783,6 +3863,15 @@ sub InitializeTab
 	InitParamTable->setText($PCount,1,$error);
 	InitParamTable->setText($PCount,2,$minvalue);
 	InitParamTable->setText($PCount,3,$maxvalue);
+	
+# Also update Parameters List for the Functions block
+	(my $Ptmp,my $tmp)=split(/_/,$Param);
+	if ($Ptmp ne "" && $Ptmp ne "Alpha" &&  $Ptmp ne "N0" && $Ptmp ne "NBg") {
+	    $ParCount++;
+	    $ParametersList=$ParametersList."$Param is par$ParCount\n";
+	    ParametersList->setText($ParametersList);
+	}
+
     }
 
 }
@@ -3968,21 +4057,6 @@ sub AppendToFunctions
 # Replace parameter in theory block with fun$i
     $Full_T_Block=~ s/$ParName/fun$i/;
     TheoryBlock->setText($Full_T_Block);
-
-}
-
-sub ResetFunctions
-{
-
-    my %All=CreateAllInput();      
-# Clear drop down parameters menu    
-#   CParamsCombo->clear();
-# Then clear the text
-    ConstraintLine->setText("");
-    FunctionsBlock->setText("");
-    my $Full_T_Block= $All{"Full_T_Block"};
-    TheoryBlock->setText($Full_T_Block);
-
 
 }
 

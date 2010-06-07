@@ -332,11 +332,14 @@ void MuSRFitform::CreateAllInput()
     }
     
 # Also theory block and paramets list
-    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
+    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);    
     $All{"Full_T_Block"}=$Full_T_Block;    
     $All{"Paramcomp_ref"}=$Paramcomp_ref;
     my @Paramcomp = @$Paramcomp_ref;
     
+# Functions block 
+    $All{"FunctionsBlock"}=FunctionsBlock->text;
+
 # Read initial values of paramets from tabel
     my $erradd = "d";
     my $minadd = "_min";
@@ -472,12 +475,13 @@ void MuSRFitform::UpdateMSRFileInitTable()
     (my $TBlock_ref, my $FPBlock_ref)=MSR::ExtractBlks(@lines);
     my @FPBloc = @$FPBlock_ref;
     
+# Counter for initialization table (including Alpha, N0 and Bg)    
     my $PCount=0;
     foreach my $line (@FPBloc) {
 	$PCount++;
 	my @Param=split(/\s+/,$line);
 	
-# Depending on home many elements in @Param determine what they mean
+# Depending on how many elements in @Param determine what they mean
 # 0th element is empty (always)
 # 1st element is the order (always)	
 # 2nd element is the name (always)
@@ -609,7 +613,11 @@ void MuSRFitform::ActivateShComp()
 	}
 	$Component++;
     }  
+# Set theory block in Constraints    
     TheoryBlock->setText($Full_T_Block);
+# Then clear the text
+    ConstraintLine->setText("");
+    FunctionsBlock->setText("");
 }
 
 void MuSRFitform::InitializeTab()
@@ -626,6 +634,10 @@ void MuSRFitform::InitializeTab()
 	}
     }
     
+# Initialize Parameters List in function block (constraints).    
+    my $ParametersList="";
+    ParametersList->setText("");
+
     my %PTable=MSR::PrepParamTable(\%All);
     
 # Setup the table with the right size    
@@ -633,6 +645,9 @@ void MuSRFitform::InitializeTab()
     if ($NParam>$NRows) {	
 	InitParamTable->setNumRows($NParam);
     }
+    
+# Counter for function block (with out Alpha etc.)
+    my $ParCount=0;
     
 # Fill the table with labels and values of parametr 
     for (my $PCount=0;$PCount<$NParam;$PCount++) {
@@ -646,6 +661,15 @@ void MuSRFitform::InitializeTab()
 	InitParamTable->setText($PCount,1,$error);
 	InitParamTable->setText($PCount,2,$minvalue);
 	InitParamTable->setText($PCount,3,$maxvalue);
+	
+# Also update Parameters List for the Functions block
+	(my $Ptmp,my $tmp)=split(/_/,$Param);
+	if ($Ptmp ne "" && $Ptmp ne "Alpha" &&  $Ptmp ne "N0" && $Ptmp ne "NBg") {
+	    $ParCount++;
+	    $ParametersList=$ParametersList."$Param is par$ParCount\n";
+	    ParametersList->setText($ParametersList);
+	}
+
     }
 }
 
@@ -822,15 +846,3 @@ void MuSRFitform::AppendToFunctions()
     TheoryBlock->setText($Full_T_Block);
 }
 
-void MuSRFitform::ResetFunctions()
-{
-    my %All=CreateAllInput();      
-# Clear drop down parameters menu    
-#   CParamsCombo->clear();
-# Then clear the text
-    ConstraintLine->setText("");
-    FunctionsBlock->setText("");
-    my $Full_T_Block= $All{"Full_T_Block"};
-    TheoryBlock->setText($Full_T_Block);
-
-}

@@ -122,7 +122,6 @@ sub CreateMSR {
 
     # First create the THEORY Block
     my ($Full_T_Block,$Paramcomp_ref)=MSR::CreateTheory(@FitTypes);
-
     my @Paramcomp = @$Paramcomp_ref;
 
     # Counter for RUNS
@@ -147,8 +146,7 @@ sub CreateMSR {
     # $shcount is a counter for shared parameters
     if ( $#RUNS == 0 ) {
         my $shcount = 1;
-    }
-    else {
+    } else {
         if ( $All{"Sh_Alpha"} == 1 ) {
             my $shcount = 1;
         } else {
@@ -354,6 +352,15 @@ THEORY
 $Full_T_Block
 ";
 
+    $FUNCTIONS_Block = $EMPTY;
+    if ($All{"FunctionsBlock"} ne $EMPTY) {
+	$FUNCTIONS_Block = "
+###############################################################
+FUNCTIONS
+###############################################################".
+$All{"FunctionsBlock"}."\n";
+    }
+
     $RUN_Block =
       "###############################################################
 $RUN_Block";
@@ -421,7 +428,7 @@ STATISTIC --- 0000-00-00 00:00:00
 
 
     # Empty line at the end of each block
-    my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$FOURIER_Block\n$STAT_Block\n";
+    my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$FUNCTIONS_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$FOURIER_Block\n$STAT_Block\n";
 
 # Open output file FILENAME.msr
     open( OUTF,q{>},"$FILENAME.msr" );
@@ -493,6 +500,7 @@ sub CreateMSRSingleHist {
 	$RUNSType = 1;
     }
 
+    # Until here identical to sub CreateMSR
     # $shcount is a counter for shared parameters
     if ( $#RUNS == 0 && $#Hists == 0) {
         my $shcount = 1;
@@ -517,6 +525,10 @@ sub CreateMSRSingleHist {
 # For a single histogram fit we basically need to repeat this for each hist
 # However, "physical" parameters such as Asymmetry, relaxation etc. should
 # be the same for all histograms
+# We distinguich between sharing among different runs to common parameters
+# for different histograms. The first is done in the usual "Sharing" schame,
+# while the second has to be done in the functions block. This can be done
+# in a consistent, non-confusing algorithm 
 	foreach my $Hist (@Hists) {
 
 	    # Prepare the Parameters and initial values block
@@ -713,6 +725,16 @@ THEORY
 $Full_T_Block
 ";
 
+    $FUNCTIONS_Block = $EMPTY;
+    if ($All{"FunctionsBlock"} ne $EMPTY) {
+	$FUNCTIONS_Block = "
+###############################################################
+FUNCTIONS
+###############################################################".
+$All{"FunctionsBlock"}."\n";
+    }
+
+
     $RUN_Block =
       "###############################################################
 $RUN_Block";
@@ -780,7 +802,7 @@ STATISTIC --- 0000-00-00 00:00:00
 
 
     # Empty line at the end of each block
-    my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$FOURIER_Block\n$STAT_Block\n";
+    my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$FUNCTIONS_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$FOURIER_Block\n$STAT_Block\n";
 
 # Open output file FILENAME.msr
     open( OUTF,q{>},"$FILENAME.msr" );
@@ -1072,16 +1094,19 @@ sub T0BgData {
     
     my %RV=();
      
+# If multiple histograms (sum or difference) take the first histogram only
+    my @Hists=split(/ /,$Hist);
+
     if ($BeamLine eq "LEM") {
-	my $HistParams=$LEM{$Hist};
+	my $HistParams=$LEM{$Hists[0]};
 	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
     } 
     elsif ($BeamLine eq "Dolly") {
- 	my $HistParams=$Dolly{$Hist};
+ 	my $HistParams=$Dolly{$Hists[0]};
 	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
    }
     elsif ($BeamLine eq "GPS") {
-	my $HistParams=$GPS{$Hist};
+	my $HistParams=$GPS{$Hists[0]};
 	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
     } 
     return $RV{$Name};
@@ -1562,7 +1587,8 @@ sub RUNFileNameAuto {
 	$RUNFILE       = "$DATADIR/$YEAR/$RUN_File_Name";
     }
     elsif ( $BeamLine eq "GPS" ) {
-	$RUN_File_Name = "deltat_pta_gps_" . $RUNtmp;
+#	$RUN_File_Name = "deltat_pta_gps_" . $RUNtmp;
+	$RUN_File_Name = "deltat_tdc_gps_" . $RUNtmp;
 	if ( $YEAR == $current_year ) {
 	    $RUNFILE = "$DATADIR/$RUN_File_Name";
 	}
