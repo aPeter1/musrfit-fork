@@ -1075,16 +1075,19 @@ sub T0BgData {
     
     my %RV=();
      
+# If multiple histograms (sum or difference) take the first histogram only
+    my @Hists=split(/ /,$Hist);
+
     if ($BeamLine eq "LEM") {
-	my $HistParams=$LEM{$Hist};
+	my $HistParams=$LEM{$Hists[0]};
 	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
     } 
     elsif ($BeamLine eq "Dolly") {
- 	my $HistParams=$Dolly{$Hist};
+ 	my $HistParams=$Dolly{$Hists[0]};
 	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
    }
     elsif ($BeamLine eq "GPS") {
-	my $HistParams=$GPS{$Hist};
+	my $HistParams=$GPS{$Hists[0]};
 	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
     } 
     return $RV{$Name};
@@ -1565,7 +1568,8 @@ sub RUNFileNameAuto {
 	$RUNFILE       = "$DATADIR/$YEAR/$RUN_File_Name";
     }
     elsif ( $BeamLine eq "GPS" ) {
-	$RUN_File_Name = "deltat_pta_gps_" . $RUNtmp;
+#	$RUN_File_Name = "deltat_pta_gps_" . $RUNtmp;
+	$RUN_File_Name = "deltat_tdc_gps_" . $RUNtmp;
 	if ( $YEAR == $current_year ) {
 	    $RUNFILE = "$DATADIR/$RUN_File_Name";
 	}
