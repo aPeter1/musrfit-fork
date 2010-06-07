@@ -339,7 +339,12 @@ void MuSRFitform::CreateAllInput()
     
 # Functions block 
     $All{"FunctionsBlock"}=FunctionsBlock->text;
-
+# and the associated theory block
+    $All{"Func_T_Block"}=TheoryBlock->text;
+    if ($All{"Func_T_Block"} eq "") {
+	InitializeFunction();
+    }
+    
 # Read initial values of paramets from tabel
     my $erradd = "d";
     my $minadd = "_min";
@@ -416,8 +421,6 @@ void MuSRFitform::CreateAllInput()
     } else {
 	$All{"FILENAME"}="TMP";
     }
-    
-    
     
 # Return Hash with all important values
     return %All;  
@@ -600,7 +603,7 @@ void MuSRFitform::ActivateShComp()
 	    my $ParamChkBx="ShParam_".$Component."_".$i;
 	    my $ChkBx = child($ParamChkBx);
 #	    my $CParam = $Params[$i-1]."_".$Component;
-	    if ($Params[$i-1] ne "" && $Params[$i-1] ne "Alpha" &&  $Params[$i-1] ne "N0" && $Params[$i-1] ne "NBg") {
+	    if ($Params[$i-1] ne "" ) {
 		$ChkBx->setHidden(0);
 		$ChkBx->setEnabled(1);
 		$ChkBx ->setText($Params[$i-1]);
@@ -869,4 +872,43 @@ void MuSRFitform::ResetFunctions()
     ConstraintLine->setText("");
     FunctionsBlock->setText("");
 
+}
+
+void MuSRFitform::InitializeFunction()
+{
+    my %All=CreateAllInput();
+    my @RUNS = split( /,/, $All{"RunNumbers"} );
+    
+    my @FitTypes =();
+    foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
+	if ( $FitType ne "None" ) {
+	    push( @FitTypes, $FitType );	    
+	}
+    }
+    
+# Get number of parameters to determine the size of the table 
+    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
+    my @Paramcomp = @$Paramcomp_ref;
+    my $Full_T_Block= $All{"Full_T_Block"};
+    
+    my $Component=1;
+    foreach my $FitType (@FitTypes) {
+	my $Parameters=$Paramcomp[$Component-1];
+	my @Params = split( /\s+/, $Parameters );	
+
+# Add list to the constraints drop down menu
+	for (my $i=1; $i<=9;$i++) {		
+	    my $CParam = $Params[$i-1]."_".$Component;
+	    if ($Params[$i-1] ne "" ) {
+		CParamsCombo->insertItem($CParam,-1);
+		$Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
+	    }
+	}
+	$Component++;
+    }  
+# Set theory block in Constraints    
+    TheoryBlock->setText($Full_T_Block);
+# Then clear the text
+    ConstraintLine->setText("");
+    FunctionsBlock->setText("");
 }
