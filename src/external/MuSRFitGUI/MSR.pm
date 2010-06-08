@@ -93,6 +93,14 @@ sub CreateMSR {
     }
 
     my @Hists = split( /,/, $All{"LRBF"} );
+    # TODO
+    # Check the number of histograms
+    # should be 2 or 4 histograms
+    # should be checked in GUI
+    # for 2 simple asymmetry fit
+    # for 4 two run blocks with different geometric parameters:
+    # Alpha, N0, NBg, Phi, Asy
+
     my @TiVals = split( /,/, $All{"Tis"} );
     my @TfVals = split( /,/, $All{"Tfs"} );
     my @BINVals = split( /,/, $All{"BINS"} );
@@ -1282,6 +1290,8 @@ sub PrepParamTable {
 # Change state/label of parameters
 		    foreach my $Param (@Params) {
 			my $Param_ORG = $Param;
+			# If multiple histograms (sum or difference) take the first histogram only
+			($Hist,$tmp) = split(/ /,$Hist);
 			$Param=$Param.$Hist;
 			if ( $#FitTypes != 0 && ( $Param_ORG ne "N0" && $Param_ORG ne "NBg" ) ){
 			    $Param = join( $EMPTY, $Param, "_", "$Component" );
