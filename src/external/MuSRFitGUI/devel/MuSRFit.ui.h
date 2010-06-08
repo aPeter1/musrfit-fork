@@ -280,9 +280,16 @@ void MuSRFitform::CreateAllInput()
     $All{"FUNITS"}= FUnits->currentText;
     $All{"FAPODIZATION"}= FApodization->currentText;
     $All{"FPLOT"}= FPlot->currentText;
+    $All{"FPHASE"}=FPHASE->text;
 # Fourier range
     $All{"FrqMin"}=FrqMin->text;
     $All{"FrqMax"}=FrqMax->text;
+ 
+# Rotating reference frame parameters
+    $All{"RRFFrq"}=RRFFrq->text;
+    $All{"RRFPack"}=RRFPack->text;
+    $All{"RRFPhase"}=RRFPhase->text;
+    $All{"RRFUnits"}=RRFUnits->currentText;
     
 # Get values of t0 and Bg/Data bins if given
     my $NHist = 1;
@@ -332,7 +339,7 @@ void MuSRFitform::CreateAllInput()
     }
     
 # Also theory block and paramets list
-    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);    
+    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
     $All{"Full_T_Block"}=$Full_T_Block;    
     $All{"Paramcomp_ref"}=$Paramcomp_ref;
     my @Paramcomp = @$Paramcomp_ref;
@@ -341,25 +348,6 @@ void MuSRFitform::CreateAllInput()
     $All{"FunctionsBlock"}=FunctionsBlock->text;
 # and the associated theory block
     $All{"Func_T_Block"}=TheoryBlock->text;
-    
-# Read initial values of paramets from tabel
-    my $erradd = "d";
-    my $minadd = "_min";
-    my $maxadd = "_max";
-    my $NRows = InitParamTable->numRows();
-    my $Header=InitParamTable->verticalHeader();
-    if ($NRows > 0) {
-	for (my $i=0;$i<$NRows;$i++) {
-# Take label of row, i.e. name of parameter
-	    my $Param=$Header->label($i);
-# Then take the value, error, max and min (as numbers)
-	    $All{"$Param"}=1.0*InitParamTable->text($i,0);
-	    $All{"$erradd$Param"}=1.0*InitParamTable->text($i,1);
-	    $All{"$Param$minadd"}=1.0*InitParamTable->text($i,2);
-	    $All{"$Param$maxadd"}=1.0*InitParamTable->text($i,3);
-	}
-    }
-    
     
 # Shared settings are detected here
     my $Shared = 0; 
@@ -419,6 +407,32 @@ void MuSRFitform::CreateAllInput()
 	$All{"FILENAME"}="TMP";
     }
     
+    
+# This has to be at the end of CreateAll    
+    my %PTable=MSR::PrepParamTable(\%All);
+    
+# Setup the table with the right size    
+    my $NParam=scalar keys( %PTable );
+    
+# Read initial values of paramets from tabel
+    my $erradd = "d";
+    my $minadd = "_min";
+    my $maxadd = "_max";
+    my $Header=InitParamTable->verticalHeader();
+# TODO: Should not go over all rows, only on parameters.
+    if ($NParam > 0) {
+	for (my $i=0;$i<$NParam;$i++) {
+# Take label of row, i.e. name of parameter
+	    my $Param=$Header->label($i);
+# Then take the value, error, max and min (as numbers)
+	    $All{"$Param"}=1.0*InitParamTable->text($i,0);
+	    $All{"$erradd$Param"}=1.0*InitParamTable->text($i,1);
+	    $All{"$Param$minadd"}=1.0*InitParamTable->text($i,2);
+	    $All{"$Param$maxadd"}=1.0*InitParamTable->text($i,3);
+	}
+    }
+
+    
 # Return Hash with all important values
     return %All;  
 }
@@ -475,7 +489,6 @@ void MuSRFitform::UpdateMSRFileInitTable()
     (my $TBlock_ref, my $FPBlock_ref)=MSR::ExtractBlks(@lines);
     my @FPBloc = @$FPBlock_ref;
     
-# Counter for initialization table (including Alpha, N0 and Bg)    
     my $PCount=0;
     foreach my $line (@FPBloc) {
 	$PCount++;
@@ -570,7 +583,6 @@ void MuSRFitform::ActivateShComp()
     my $Full_T_Block= $All{"Full_T_Block"};
     
     my $Component=1;
-    
     foreach my $FitType (@FitTypes) {
 	my $Parameters=$Paramcomp[$Component-1];
 	my @Params = split( /\s+/, $Parameters );
@@ -595,17 +607,13 @@ void MuSRFitform::ActivateShComp()
 	$CompShL->setText($All{"FitType$Component"});
 	
 # Change state/label of parameters
-# Also add it to the constraints drop down menu
 	for (my $i=1; $i<=9;$i++) {		
 	    my $ParamChkBx="ShParam_".$Component."_".$i;
 	    my $ChkBx = child($ParamChkBx);
-#	    my $CParam = $Params[$i-1]."_".$Component;
-	    if ($Params[$i-1] ne "" ) {
+	    if ($Params[$i-1] ne "") {
 		$ChkBx->setHidden(0);
 		$ChkBx->setEnabled(1);
 		$ChkBx ->setText($Params[$i-1]);
-#		CParamsCombo->insertItem($CParam,-1);
-#		$Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
 	    } else {
 		$ChkBx->setHidden(1);
 	    }
@@ -625,6 +633,7 @@ void MuSRFitform::InitializeTab()
 	for (my $i=0;$i<$NRows;$i++) {
 # TODO: Better remove the row rather than hide it.
 	    InitParamTable->hideRow($i);
+#	    InitParamTable->removeRow($i);
 	}
     }
     
@@ -666,7 +675,7 @@ void MuSRFitform::TabChanged()
 # Initialize FUNCTIONS block only if it has not been initialized yet
     if ($All{"Func_T_Block"} eq "" ) {
 	InitializeFunctions();
-    }
+    }    
 }
 
 
@@ -809,7 +818,6 @@ void MuSRFitform::fileBrowse()
     }
     RunFiles->setText($RunFiles);
 }
-
 
 void MuSRFitform::AppendToFunctions()
 {

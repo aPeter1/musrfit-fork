@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Tue Jun 8 13:35:32 2010
+# Created: Tue Jun 8 13:53:29 2010
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -10,7 +10,7 @@ use strict;
 use utf8;
 
 
-package MuSRFitform;
+package MuSRFitformR;
 use Qt;
 use Qt::isa qw(Qt::MainWindow);
 use Qt::slots
@@ -131,24 +131,35 @@ use Qt::attributes qw(
     FILENAME
     textMSROutput
     FourierPage
-    FUnitsLabel
-    FApodizationLabel
-    FPlotLabel
-    FUnits
-    FApodization
-    FPlot
-    textLabel1
-    textLabel1_3
-    textLabel1_3_5
+    FourierBox
     FrqMin
-    textLabel1_3_2
-    textLabel1_3_6
-    textLabel1_2
-    textLabel1_3_3
-    textLabel1_3_7
-    FrqMax
     textLabel1_3_4
+    textLabel1_7
+    textLabel1_3_5
+    FUnits
+    textLabel1_3_6
+    FApodization
+    FrqMax
+    FPlot
+    FUnitsLabel
     textLabel1_3_8
+    textLabel1_3_7
+    FPlotLabel
+    textLabel1_2
+    FApodizationLabel
+    textLabel1_3_3
+    FPHASE
+    textLabel1
+    RRFBox
+    textLabel1_6_2_2
+    textLabel1_6
+    textLabel1_6_2_4
+    RRFFrq
+    textLabel1_6_2_3
+    RRFPack
+    textLabel1_6_2
+    RRFUnits
+    RRFPhase
     T0Page
     groupHist0
     textLabel2
@@ -180,7 +191,7 @@ use Qt::attributes qw(
     Bg24
     Data14
     Data24
-    ConstPage
+    TabPage
     TheoryBlock_Label
     TheoryBlock
     ParametersList_Label
@@ -191,7 +202,7 @@ use Qt::attributes qw(
     AddConstraint
     textLabel2_2_3_4
     FunctionsBlock
-    textLabel1_6
+    textLabel1_6_3
     ResetFunc
     MenuBar
     fileMenu
@@ -262,6 +273,57 @@ our $image1;
 our $image1_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
+    0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x00,
+    0xce, 0x49, 0x44, 0x41, 0x54, 0x38, 0x8d, 0xd5, 0x53, 0xc9, 0x11, 0xc3,
+    0x20, 0x0c, 0x5c, 0x31, 0xf9, 0xb8, 0x24, 0x28, 0xc5, 0x8d, 0xb8, 0x06,
+    0x37, 0xe2, 0x52, 0xe4, 0x92, 0xfc, 0x54, 0x1e, 0x19, 0x65, 0x98, 0x8d,
+    0x15, 0x98, 0xd8, 0x3c, 0xb2, 0x2f, 0x21, 0xc1, 0x6a, 0xd1, 0x21, 0xaa,
+    0x8a, 0x11, 0x48, 0x6e, 0x2c, 0xf3, 0x64, 0x1c, 0x5c, 0xe6, 0xc9, 0x6a,
+    0x3f, 0xdf, 0xf1, 0xf3, 0x99, 0x3f, 0xb9, 0xb1, 0x6e, 0x87, 0x30, 0xc9,
+    0xba, 0x1d, 0xc2, 0xfe, 0x08, 0x9c, 0x24, 0x39, 0x01, 0x00, 0x44, 0x24,
+    0x67, 0xf1, 0xfa, 0x5d, 0x1d, 0x73, 0x5f, 0x62, 0x12, 0xbe, 0xc8, 0x89,
+    0x98, 0x20, 0xc2, 0xa3, 0x96, 0x1f, 0x29, 0xed, 0x21, 0xaa, 0xef, 0xbf,
+    0x15, 0x7b, 0x2d, 0xeb, 0x40, 0x4f, 0x5d, 0x9b, 0x8a, 0xa3, 0xec, 0x4e,
+    0xde, 0xa3, 0x96, 0x21, 0x43, 0xe7, 0x38, 0x97, 0x62, 0xb9, 0x94, 0x4b,
+    0x5f, 0x67, 0x88, 0x01, 0xb6, 0xab, 0x8a, 0x27, 0x70, 0xfb, 0x32, 0x31,
+    0x97, 0xe2, 0x2e, 0xf2, 0x8f, 0x39, 0xde, 0x55, 0xe5, 0x8e, 0xb2, 0x84,
+    0x0b, 0x32, 0x84, 0xb8, 0x47, 0x75, 0xab, 0xe1, 0x3f, 0x29, 0xf6, 0x3e,
+    0x44, 0x02, 0x72, 0x29, 0x26, 0x00, 0xc2, 0xac, 0x06, 0x80, 0xbb, 0xd8,
+    0xf2, 0x19, 0x5e, 0x3f, 0x6e, 0x2e, 0x48, 0x3d, 0x25, 0xdf, 0x26, 0xc6,
+    0x95, 0x7b, 0xbc, 0x6b, 0xf3, 0xf8, 0x51, 0x0f, 0xc6, 0xae, 0xf4, 0x5f,
+    0x11, 0x3f, 0x01, 0xc3, 0xec, 0xa5, 0x79, 0xcd, 0xbc, 0x94, 0xf7, 0x00,
+    0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82;
+
+our $image2;
+our $image2_data = pack 'C*',
+0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
+    0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
+    0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x00,
+    0xd7, 0x49, 0x44, 0x41, 0x54, 0x38, 0x8d, 0xbd, 0x54, 0xc1, 0x0d, 0x83,
+    0x30, 0x0c, 0x3c, 0x47, 0x7c, 0xba, 0x05, 0x6b, 0xc4, 0x52, 0x3b, 0x08,
+    0x8b, 0x74, 0x06, 0x16, 0x61, 0x14, 0xf3, 0xcc, 0x38, 0x3c, 0xd3, 0x47,
+    0xe5, 0x2a, 0x4a, 0x13, 0x48, 0x2c, 0xe0, 0x3e, 0x90, 0x93, 0x7c, 0x9c,
+    0xcf, 0xc1, 0x24, 0x22, 0xb8, 0x02, 0xf4, 0x1c, 0x43, 0x9c, 0x97, 0x8d,
+    0x94, 0x78, 0x4f, 0x8f, 0x38, 0x2f, 0x1b, 0xe9, 0x53, 0x39, 0x00, 0x50,
+    0x3e, 0x17, 0xc9, 0xf9, 0x79, 0xd9, 0x68, 0x00, 0x00, 0xcf, 0x1c, 0x01,
+    0x60, 0x15, 0xa1, 0xbc, 0x28, 0xff, 0xc0, 0xd1, 0xbb, 0x9e, 0x5d, 0x4d,
+    0xb0, 0x84, 0xb4, 0xf8, 0x08, 0xc3, 0xaf, 0xd5, 0x31, 0x00, 0x13, 0x76,
+    0xdb, 0xec, 0x16, 0xd6, 0x02, 0xcf, 0x1c, 0x5f, 0x63, 0xa8, 0x3a, 0xcd,
+    0x5b, 0xde, 0x83, 0x4b, 0x0f, 0xb5, 0x8c, 0x5b, 0x5d, 0xa6, 0x18, 0x4a,
+    0xa4, 0x67, 0xfe, 0x46, 0x83, 0xb6, 0x28, 0x4a, 0xb7, 0x82, 0x00, 0x44,
+    0xc9, 0x9c, 0x7a, 0xe6, 0xd8, 0x3a, 0xd0, 0x1a, 0x5c, 0x89, 0x5c, 0x45,
+    0x48, 0xaf, 0xe0, 0xa9, 0xc2, 0x67, 0xa0, 0x2a, 0xac, 0xae, 0xad, 0xce,
+    0x77, 0x1d, 0xaf, 0x22, 0x64, 0x8d, 0xa5, 0x29, 0x0a, 0x8b, 0xf8, 0xfd,
+    0x19, 0xdf, 0x26, 0xdc, 0x3b, 0xcc, 0x2e, 0xc7, 0x3d, 0xc3, 0x34, 0x45,
+    0xd1, 0xe2, 0xde, 0x9c, 0xb1, 0xfe, 0xf2, 0x35, 0xf1, 0xe2, 0x12, 0xb2,
+    0x8a, 0xa7, 0xfb, 0x85, 0x80, 0xff, 0xe5, 0x6e, 0x45, 0x2a, 0xf4, 0x01,
+    0x19, 0x04, 0x97, 0x00, 0x1e, 0x10, 0xdf, 0x32, 0x00, 0x00, 0x00, 0x00,
+    0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82;
+
+our $image3;
+our $image3_data = pack 'C*',
+0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
+    0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x02,
     0xc9, 0x49, 0x44, 0x41, 0x54, 0x38, 0x8d, 0xb5, 0x93, 0x4b, 0x48, 0x54,
     0x51, 0x1c, 0xc6, 0x7f, 0xe7, 0xdc, 0x73, 0xc7, 0x99, 0x9c, 0xb4, 0x1a,
@@ -326,8 +388,8 @@ our $image1_data = pack 'C*',
     0x4b, 0x59, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42,
     0x60, 0x82;
 
-our $image2;
-our $image2_data = pack 'C*',
+our $image4;
+our $image4_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x03,
@@ -419,8 +481,8 @@ our $image2_data = pack 'C*',
     0x30, 0x7a, 0xb8, 0xbf, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44,
     0xae, 0x42, 0x60, 0x82;
 
-our $image3;
-our $image3_data = pack 'C*',
+our $image5;
+our $image5_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x02,
@@ -486,8 +548,8 @@ our $image3_data = pack 'C*',
     0x1a, 0xe0, 0xff, 0x0b, 0x36, 0xcf, 0x4c, 0x00, 0x00, 0x00, 0x00, 0x49,
     0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82;
 
-our $image4;
-our $image4_data = pack 'C*',
+our $image6;
+our $image6_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x03,
@@ -579,8 +641,8 @@ our $image4_data = pack 'C*',
     0x8b, 0xbf, 0x01, 0xe8, 0x70, 0xcb, 0xc9, 0xb3, 0x58, 0x58, 0xb9, 0x00,
     0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82;
 
-our $image5;
-our $image5_data = pack 'C*',
+our $image7;
+our $image7_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x03,
@@ -666,8 +728,8 @@ our $image5_data = pack 'C*',
     0xd7, 0x1e, 0x86, 0xe2, 0x2f, 0xe4, 0xea, 0x00, 0x00, 0x00, 0x00, 0x49,
     0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82;
 
-our $image6;
-our $image6_data = pack 'C*',
+our $image8;
+our $image8_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x04,
@@ -767,8 +829,8 @@ our $image6_data = pack 'C*',
     0x06, 0x86, 0x58, 0x55, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44,
     0xae, 0x42, 0x60, 0x82;
 
-our $image7;
-our $image7_data = pack 'C*',
+our $image9;
+our $image9_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x02,
@@ -823,8 +885,8 @@ our $image7_data = pack 'C*',
     0x6d, 0x71, 0x21, 0x14, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44,
     0xae, 0x42, 0x60, 0x82;
 
-our $image8;
-our $image8_data = pack 'C*',
+our $image10;
+our $image10_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x02,
@@ -883,8 +945,8 @@ our $image8_data = pack 'C*',
     0xc1, 0xbf, 0x00, 0x24, 0x91, 0x01, 0xa1, 0xf6, 0x94, 0xe3, 0xca, 0x00,
     0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82;
 
-our $image9;
-our $image9_data = pack 'C*',
+our $image11;
+our $image11_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x03,
@@ -973,8 +1035,8 @@ our $image9_data = pack 'C*',
     0xc4, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60,
     0x82;
 
-our $image10;
-our $image10_data = pack 'C*',
+our $image12;
+our $image12_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x01,
@@ -1015,8 +1077,8 @@ our $image10_data = pack 'C*',
     0x55, 0x03, 0x46, 0xd4, 0xfe, 0x54, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45,
     0x4e, 0x44, 0xae, 0x42, 0x60, 0x82;
 
-our $image11;
-our $image11_data = pack 'C*',
+our $image13;
+our $image13_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x02,
@@ -1080,8 +1142,8 @@ our $image11_data = pack 'C*',
     0x25, 0x79, 0xad, 0xb1, 0x85, 0x0a, 0xbe, 0x46, 0x00, 0x00, 0x00, 0x00,
     0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82;
 
-our $image12;
-our $image12_data = pack 'C*',
+our $image14;
+our $image14_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x04,
@@ -1186,8 +1248,8 @@ our $image12_data = pack 'C*',
     0xb9, 0x61, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42,
     0x60, 0x82;
 
-our $image13;
-our $image13_data = pack 'C*',
+our $image15;
+our $image15_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x04,
@@ -1284,8 +1346,8 @@ our $image13_data = pack 'C*',
     0x9f, 0xd3, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42,
     0x60, 0x82;
 
-our $image14;
-our $image14_data = pack 'C*',
+our $image16;
+our $image16_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x18,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xe0, 0x77, 0x3d, 0xf8, 0x00, 0x00, 0x02,
@@ -1339,8 +1401,8 @@ our $image14_data = pack 'C*',
     0xdd, 0x3e, 0xbd, 0xd4, 0x13, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e,
     0x44, 0xae, 0x42, 0x60, 0x82;
 
-our $image15;
-our $image15_data = pack 'C*',
+our $image17;
+our $image17_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x03,
@@ -1422,8 +1484,8 @@ our $image15_data = pack 'C*',
     0xb8, 0x19, 0xf9, 0xe3, 0xb0, 0xa8, 0x92, 0x00, 0x00, 0x00, 0x00, 0x49,
     0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82;
 
-our $image16;
-our $image16_data = pack 'C*',
+our $image18;
+our $image18_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x00,
@@ -1449,8 +1511,8 @@ our $image16_data = pack 'C*',
     0xb0, 0x7f, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42,
     0x60, 0x82;
 
-our $image17;
-our $image17_data = pack 'C*',
+our $image19;
+our $image19_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x00,
@@ -1477,8 +1539,8 @@ our $image17_data = pack 'C*',
     0x1b, 0x78, 0x58, 0xd2, 0x1f, 0x6a, 0x6c, 0x70, 0x02, 0x00, 0x00, 0x00,
     0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82;
 
-our $image18;
-our $image18_data = pack 'C*',
+our $image20;
+our $image20_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x01,
@@ -1507,8 +1569,8 @@ our $image18_data = pack 'C*',
     0x7c, 0xbe, 0x7e, 0xc1, 0xd5, 0xa3, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x49,
     0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82;
 
-our $image19;
-our $image19_data = pack 'C*',
+our $image21;
+our $image21_data = pack 'C*',
 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
     0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x16,
     0x08, 0x06, 0x00, 0x00, 0x00, 0xc4, 0xb4, 0x6c, 0x3b, 0x00, 0x00, 0x00,
@@ -1577,10 +1639,14 @@ sub NEW
     $image18->loadFromData($image18_data, length ($image18_data), "PNG");
     $image19 = Qt::Pixmap();
     $image19->loadFromData($image19_data, length ($image19_data), "PNG");
+    $image20 = Qt::Pixmap();
+    $image20->loadFromData($image20_data, length ($image20_data), "PNG");
+    $image21 = Qt::Pixmap();
+    $image21->loadFromData($image21_data, length ($image21_data), "PNG");
 
     if ( name() eq "unnamed" )
     {
-        setName("MuSRFitform" );
+        setName("MuSRFitformR" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
     setMinimumSize(Qt::Size(21, 275) );
@@ -2244,231 +2310,277 @@ sub NEW
     $layout25->addWidget(groupTitle);
 
     textMSROutput = Qt::TextEdit($LayoutWidget_8, "textMSROutput");
-    textMSROutput->setWordWrap( &Qt::TextEdit::WidgetWidth() );
     textMSROutput->setOverwriteMode( 1 );
     $layout25->addWidget(textMSROutput);
     musrfit_tabs->insertTab( MSRPage, "" );
 
     FourierPage = Qt::Widget(musrfit_tabs, "FourierPage");
 
-    my $LayoutWidget_10 = Qt::Widget(FourierPage, '$LayoutWidget_10');
-    $LayoutWidget_10->setGeometry( Qt::Rect(5, 5, 545, 94) );
-    my $layout33_2 = Qt::HBoxLayout($LayoutWidget_10, 11, 6, '$layout33_2');
+    FourierBox = Qt::GroupBox(FourierPage, "FourierBox");
+    FourierBox->setGeometry( Qt::Rect(6, 6, 547, 125) );
 
-    my $layout26_2 = Qt::VBoxLayout(undef, 0, 6, '$layout26_2');
-
-    FUnitsLabel = Qt::Label($LayoutWidget_10, "FUnitsLabel");
-    $layout26_2->addWidget(FUnitsLabel);
-
-    FApodizationLabel = Qt::Label($LayoutWidget_10, "FApodizationLabel");
-    $layout26_2->addWidget(FApodizationLabel);
-
-    FPlotLabel = Qt::Label($LayoutWidget_10, "FPlotLabel");
-    $layout26_2->addWidget(FPlotLabel);
-    $layout33_2->addLayout($layout26_2);
-
-    my $layout27 = Qt::VBoxLayout(undef, 0, 6, '$layout27');
-
-    FUnits = Qt::ComboBox(0, $LayoutWidget_10, "FUnits");
-    FUnits->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FUnits->sizePolicy()->hasHeightForWidth()) );
-    $layout27->addWidget(FUnits);
-
-    FApodization = Qt::ComboBox(0, $LayoutWidget_10, "FApodization");
-    FApodization->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FApodization->sizePolicy()->hasHeightForWidth()) );
-    $layout27->addWidget(FApodization);
-
-    FPlot = Qt::ComboBox(0, $LayoutWidget_10, "FPlot");
-    FPlot->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FPlot->sizePolicy()->hasHeightForWidth()) );
-    $layout27->addWidget(FPlot);
-    $layout33_2->addLayout($layout27);
-
-    my $layout28 = Qt::VBoxLayout(undef, 0, 6, '$layout28');
-
-    textLabel1 = Qt::Label($LayoutWidget_10, "textLabel1");
-    $layout28->addWidget(textLabel1);
-
-    textLabel1_3 = Qt::Label($LayoutWidget_10, "textLabel1_3");
-    $layout28->addWidget(textLabel1_3);
-
-    textLabel1_3_5 = Qt::Label($LayoutWidget_10, "textLabel1_3_5");
-    $layout28->addWidget(textLabel1_3_5);
-    $layout33_2->addLayout($layout28);
-
-    my $layout29 = Qt::VBoxLayout(undef, 0, 6, '$layout29');
+    my $LayoutWidget_10 = Qt::Widget(FourierBox, '$LayoutWidget_10');
+    $LayoutWidget_10->setGeometry( Qt::Rect(12, 19, 525, 100) );
+    my $layout34_2 = Qt::GridLayout($LayoutWidget_10, 1, 1, 5, 5, '$layout34_2');
 
     FrqMin = Qt::LineEdit($LayoutWidget_10, "FrqMin");
     FrqMin->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FrqMin->sizePolicy()->hasHeightForWidth()) );
-    $layout29->addWidget(FrqMin);
 
-    textLabel1_3_2 = Qt::Label($LayoutWidget_10, "textLabel1_3_2");
-    $layout29->addWidget(textLabel1_3_2);
+    $layout34_2->addWidget(FrqMin, 0, 3);
+
+    textLabel1_3_4 = Qt::Label($LayoutWidget_10, "textLabel1_3_4");
+
+    $layout34_2->addWidget(textLabel1_3_4, 1, 5);
+
+    textLabel1_7 = Qt::Label($LayoutWidget_10, "textLabel1_7");
+
+    $layout34_2->addWidget(textLabel1_7, 1, 2);
+
+    textLabel1_3_5 = Qt::Label($LayoutWidget_10, "textLabel1_3_5");
+
+    $layout34_2->addWidget(textLabel1_3_5, 2, 2);
+
+    FUnits = Qt::ComboBox(0, $LayoutWidget_10, "FUnits");
+    FUnits->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FUnits->sizePolicy()->hasHeightForWidth()) );
+
+    $layout34_2->addWidget(FUnits, 0, 1);
 
     textLabel1_3_6 = Qt::Label($LayoutWidget_10, "textLabel1_3_6");
-    $layout29->addWidget(textLabel1_3_6);
-    $layout33_2->addLayout($layout29);
 
-    my $layout31 = Qt::VBoxLayout(undef, 0, 6, '$layout31');
+    $layout34_2->addWidget(textLabel1_3_6, 2, 3);
 
-    textLabel1_2 = Qt::Label($LayoutWidget_10, "textLabel1_2");
-    $layout31->addWidget(textLabel1_2);
+    FApodization = Qt::ComboBox(0, $LayoutWidget_10, "FApodization");
+    FApodization->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FApodization->sizePolicy()->hasHeightForWidth()) );
 
-    textLabel1_3_3 = Qt::Label($LayoutWidget_10, "textLabel1_3_3");
-    $layout31->addWidget(textLabel1_3_3);
-
-    textLabel1_3_7 = Qt::Label($LayoutWidget_10, "textLabel1_3_7");
-    $layout31->addWidget(textLabel1_3_7);
-    $layout33_2->addLayout($layout31);
-
-    my $layout32 = Qt::VBoxLayout(undef, 0, 6, '$layout32');
+    $layout34_2->addWidget(FApodization, 1, 1);
 
     FrqMax = Qt::LineEdit($LayoutWidget_10, "FrqMax");
     FrqMax->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FrqMax->sizePolicy()->hasHeightForWidth()) );
-    $layout32->addWidget(FrqMax);
 
-    textLabel1_3_4 = Qt::Label($LayoutWidget_10, "textLabel1_3_4");
-    $layout32->addWidget(textLabel1_3_4);
+    $layout34_2->addWidget(FrqMax, 0, 5);
+
+    FPlot = Qt::ComboBox(0, $LayoutWidget_10, "FPlot");
+    FPlot->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FPlot->sizePolicy()->hasHeightForWidth()) );
+
+    $layout34_2->addWidget(FPlot, 2, 1);
+
+    FUnitsLabel = Qt::Label($LayoutWidget_10, "FUnitsLabel");
+
+    $layout34_2->addWidget(FUnitsLabel, 0, 0);
 
     textLabel1_3_8 = Qt::Label($LayoutWidget_10, "textLabel1_3_8");
-    $layout32->addWidget(textLabel1_3_8);
-    $layout33_2->addLayout($layout32);
+
+    $layout34_2->addWidget(textLabel1_3_8, 2, 5);
+
+    textLabel1_3_7 = Qt::Label($LayoutWidget_10, "textLabel1_3_7");
+
+    $layout34_2->addWidget(textLabel1_3_7, 2, 4);
+
+    FPlotLabel = Qt::Label($LayoutWidget_10, "FPlotLabel");
+
+    $layout34_2->addWidget(FPlotLabel, 2, 0);
+
+    textLabel1_2 = Qt::Label($LayoutWidget_10, "textLabel1_2");
+
+    $layout34_2->addWidget(textLabel1_2, 0, 4);
+
+    FApodizationLabel = Qt::Label($LayoutWidget_10, "FApodizationLabel");
+
+    $layout34_2->addWidget(FApodizationLabel, 1, 0);
+
+    textLabel1_3_3 = Qt::Label($LayoutWidget_10, "textLabel1_3_3");
+
+    $layout34_2->addWidget(textLabel1_3_3, 1, 4);
+
+    FPHASE = Qt::LineEdit($LayoutWidget_10, "FPHASE");
+    FPHASE->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FPHASE->sizePolicy()->hasHeightForWidth()) );
+
+    $layout34_2->addWidget(FPHASE, 1, 3);
+
+    textLabel1 = Qt::Label($LayoutWidget_10, "textLabel1");
+
+    $layout34_2->addWidget(textLabel1, 0, 2);
+
+    RRFBox = Qt::GroupBox(FourierPage, "RRFBox");
+    RRFBox->setGeometry( Qt::Rect(6, 135, 547, 125) );
+
+    my $LayoutWidget_11 = Qt::Widget(RRFBox, '$LayoutWidget_11');
+    $LayoutWidget_11->setGeometry( Qt::Rect(10, 18, 265, 100) );
+    my $layout35 = Qt::GridLayout($LayoutWidget_11, 1, 1, 5, 5, '$layout35');
+
+    textLabel1_6_2_2 = Qt::Label($LayoutWidget_11, "textLabel1_6_2_2");
+
+    $layout35->addWidget(textLabel1_6_2_2, 2, 0);
+
+    textLabel1_6 = Qt::Label($LayoutWidget_11, "textLabel1_6");
+
+    $layout35->addWidget(textLabel1_6, 0, 0);
+
+    textLabel1_6_2_4 = Qt::Label($LayoutWidget_11, "textLabel1_6_2_4");
+
+    $layout35->addWidget(textLabel1_6_2_4, 2, 2);
+
+    RRFFrq = Qt::LineEdit($LayoutWidget_11, "RRFFrq");
+
+    $layout35->addWidget(RRFFrq, 0, 1);
+
+    textLabel1_6_2_3 = Qt::Label($LayoutWidget_11, "textLabel1_6_2_3");
+
+    $layout35->addWidget(textLabel1_6_2_3, 1, 2);
+
+    RRFPack = Qt::LineEdit($LayoutWidget_11, "RRFPack");
+
+    $layout35->addWidget(RRFPack, 1, 1);
+
+    textLabel1_6_2 = Qt::Label($LayoutWidget_11, "textLabel1_6_2");
+
+    $layout35->addWidget(textLabel1_6_2, 1, 0);
+
+    RRFUnits = Qt::ComboBox(0, $LayoutWidget_11, "RRFUnits");
+
+    $layout35->addWidget(RRFUnits, 0, 2);
+
+    RRFPhase = Qt::LineEdit($LayoutWidget_11, "RRFPhase");
+
+    $layout35->addWidget(RRFPhase, 2, 1);
     musrfit_tabs->insertTab( FourierPage, "" );
 
     T0Page = Qt::Widget(musrfit_tabs, "T0Page");
     my $T0PageLayout = Qt::GridLayout(T0Page, 1, 1, 11, 6, '$T0PageLayout');
 
-    my $layout27_2 = Qt::HBoxLayout(undef, 0, 6, '$layout27_2');
+    my $layout27 = Qt::HBoxLayout(undef, 0, 6, '$layout27');
 
     groupHist0 = Qt::GroupBox(T0Page, "groupHist0");
     groupHist0->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, groupHist0->sizePolicy()->hasHeightForWidth()) );
     groupHist0->setMinimumSize( Qt::Size(0, 0) );
 
-    my $LayoutWidget_11 = Qt::Widget(groupHist0, '$LayoutWidget_11');
-    $LayoutWidget_11->setGeometry( Qt::Rect(5, 18, 100, 150) );
-    my $layout16_2 = Qt::VBoxLayout($LayoutWidget_11, 11, 6, '$layout16_2');
+    my $LayoutWidget_12 = Qt::Widget(groupHist0, '$LayoutWidget_12');
+    $LayoutWidget_12->setGeometry( Qt::Rect(5, 18, 100, 150) );
+    my $layout16_2 = Qt::VBoxLayout($LayoutWidget_12, 11, 6, '$layout16_2');
 
-    textLabel2 = Qt::Label($LayoutWidget_11, "textLabel2");
+    textLabel2 = Qt::Label($LayoutWidget_12, "textLabel2");
     $layout16_2->addWidget(textLabel2);
 
-    textLabel2_2_2_3 = Qt::Label($LayoutWidget_11, "textLabel2_2_2_3");
+    textLabel2_2_2_3 = Qt::Label($LayoutWidget_12, "textLabel2_2_2_3");
     $layout16_2->addWidget(textLabel2_2_2_3);
 
-    textLabel2_2_2 = Qt::Label($LayoutWidget_11, "textLabel2_2_2");
+    textLabel2_2_2 = Qt::Label($LayoutWidget_12, "textLabel2_2_2");
     $layout16_2->addWidget(textLabel2_2_2);
 
-    textLabel2_2_2_2 = Qt::Label($LayoutWidget_11, "textLabel2_2_2_2");
+    textLabel2_2_2_2 = Qt::Label($LayoutWidget_12, "textLabel2_2_2_2");
     $layout16_2->addWidget(textLabel2_2_2_2);
 
-    textLabel2_2_2_2_2 = Qt::Label($LayoutWidget_11, "textLabel2_2_2_2_2");
+    textLabel2_2_2_2_2 = Qt::Label($LayoutWidget_12, "textLabel2_2_2_2_2");
     $layout16_2->addWidget(textLabel2_2_2_2_2);
-    $layout27_2->addWidget(groupHist0);
+    $layout27->addWidget(groupHist0);
 
     groupHist1 = Qt::GroupBox(T0Page, "groupHist1");
     groupHist1->setFrameShadow( &Qt::GroupBox::Plain() );
 
-    my $LayoutWidget_12 = Qt::Widget(groupHist1, '$LayoutWidget_12');
-    $LayoutWidget_12->setGeometry( Qt::Rect(8, 17, 75, 150) );
-    my $layout18 = Qt::VBoxLayout($LayoutWidget_12, 0, 0, '$layout18');
+    my $LayoutWidget_13 = Qt::Widget(groupHist1, '$LayoutWidget_13');
+    $LayoutWidget_13->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18 = Qt::VBoxLayout($LayoutWidget_13, 0, 0, '$layout18');
 
-    t01 = Qt::LineEdit($LayoutWidget_12, "t01");
+    t01 = Qt::LineEdit($LayoutWidget_13, "t01");
     $layout18->addWidget(t01);
 
-    Bg11 = Qt::LineEdit($LayoutWidget_12, "Bg11");
+    Bg11 = Qt::LineEdit($LayoutWidget_13, "Bg11");
     $layout18->addWidget(Bg11);
 
-    Bg21 = Qt::LineEdit($LayoutWidget_12, "Bg21");
+    Bg21 = Qt::LineEdit($LayoutWidget_13, "Bg21");
     $layout18->addWidget(Bg21);
 
-    Data11 = Qt::LineEdit($LayoutWidget_12, "Data11");
+    Data11 = Qt::LineEdit($LayoutWidget_13, "Data11");
     $layout18->addWidget(Data11);
 
-    Data21 = Qt::LineEdit($LayoutWidget_12, "Data21");
+    Data21 = Qt::LineEdit($LayoutWidget_13, "Data21");
     $layout18->addWidget(Data21);
-    $layout27_2->addWidget(groupHist1);
+    $layout27->addWidget(groupHist1);
 
     groupHist2 = Qt::GroupBox(T0Page, "groupHist2");
     groupHist2->setEnabled( 1 );
     groupHist2->setFrameShadow( &Qt::GroupBox::Plain() );
 
-    my $LayoutWidget_13 = Qt::Widget(groupHist2, '$LayoutWidget_13');
-    $LayoutWidget_13->setGeometry( Qt::Rect(8, 17, 75, 150) );
-    my $layout18_2 = Qt::VBoxLayout($LayoutWidget_13, 0, 0, '$layout18_2');
+    my $LayoutWidget_14 = Qt::Widget(groupHist2, '$LayoutWidget_14');
+    $LayoutWidget_14->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18_2 = Qt::VBoxLayout($LayoutWidget_14, 0, 0, '$layout18_2');
 
-    t02 = Qt::LineEdit($LayoutWidget_13, "t02");
+    t02 = Qt::LineEdit($LayoutWidget_14, "t02");
     $layout18_2->addWidget(t02);
 
-    Bg12 = Qt::LineEdit($LayoutWidget_13, "Bg12");
+    Bg12 = Qt::LineEdit($LayoutWidget_14, "Bg12");
     $layout18_2->addWidget(Bg12);
 
-    Bg22 = Qt::LineEdit($LayoutWidget_13, "Bg22");
+    Bg22 = Qt::LineEdit($LayoutWidget_14, "Bg22");
     $layout18_2->addWidget(Bg22);
 
-    Data12 = Qt::LineEdit($LayoutWidget_13, "Data12");
+    Data12 = Qt::LineEdit($LayoutWidget_14, "Data12");
     $layout18_2->addWidget(Data12);
 
-    Data22 = Qt::LineEdit($LayoutWidget_13, "Data22");
+    Data22 = Qt::LineEdit($LayoutWidget_14, "Data22");
     $layout18_2->addWidget(Data22);
-    $layout27_2->addWidget(groupHist2);
+    $layout27->addWidget(groupHist2);
 
     groupHist3 = Qt::GroupBox(T0Page, "groupHist3");
     groupHist3->setEnabled( 1 );
     groupHist3->setFrameShadow( &Qt::GroupBox::Plain() );
 
-    my $LayoutWidget_14 = Qt::Widget(groupHist3, '$LayoutWidget_14');
-    $LayoutWidget_14->setGeometry( Qt::Rect(8, 17, 75, 150) );
-    my $layout18_3 = Qt::VBoxLayout($LayoutWidget_14, 0, 0, '$layout18_3');
+    my $LayoutWidget_15 = Qt::Widget(groupHist3, '$LayoutWidget_15');
+    $LayoutWidget_15->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18_3 = Qt::VBoxLayout($LayoutWidget_15, 0, 0, '$layout18_3');
 
-    t03 = Qt::LineEdit($LayoutWidget_14, "t03");
+    t03 = Qt::LineEdit($LayoutWidget_15, "t03");
     $layout18_3->addWidget(t03);
 
-    Bg13 = Qt::LineEdit($LayoutWidget_14, "Bg13");
+    Bg13 = Qt::LineEdit($LayoutWidget_15, "Bg13");
     $layout18_3->addWidget(Bg13);
 
-    Bg23 = Qt::LineEdit($LayoutWidget_14, "Bg23");
+    Bg23 = Qt::LineEdit($LayoutWidget_15, "Bg23");
     $layout18_3->addWidget(Bg23);
 
-    Data13 = Qt::LineEdit($LayoutWidget_14, "Data13");
+    Data13 = Qt::LineEdit($LayoutWidget_15, "Data13");
     $layout18_3->addWidget(Data13);
 
-    Data23 = Qt::LineEdit($LayoutWidget_14, "Data23");
+    Data23 = Qt::LineEdit($LayoutWidget_15, "Data23");
     $layout18_3->addWidget(Data23);
-    $layout27_2->addWidget(groupHist3);
+    $layout27->addWidget(groupHist3);
 
     groupHist4 = Qt::GroupBox(T0Page, "groupHist4");
     groupHist4->setEnabled( 1 );
     groupHist4->setFrameShadow( &Qt::GroupBox::Plain() );
 
-    my $LayoutWidget_15 = Qt::Widget(groupHist4, '$LayoutWidget_15');
-    $LayoutWidget_15->setGeometry( Qt::Rect(8, 17, 75, 150) );
-    my $layout18_4 = Qt::VBoxLayout($LayoutWidget_15, 0, 0, '$layout18_4');
+    my $LayoutWidget_16 = Qt::Widget(groupHist4, '$LayoutWidget_16');
+    $LayoutWidget_16->setGeometry( Qt::Rect(8, 17, 75, 150) );
+    my $layout18_4 = Qt::VBoxLayout($LayoutWidget_16, 0, 0, '$layout18_4');
 
-    t04 = Qt::LineEdit($LayoutWidget_15, "t04");
+    t04 = Qt::LineEdit($LayoutWidget_16, "t04");
     $layout18_4->addWidget(t04);
 
-    Bg14 = Qt::LineEdit($LayoutWidget_15, "Bg14");
+    Bg14 = Qt::LineEdit($LayoutWidget_16, "Bg14");
     $layout18_4->addWidget(Bg14);
 
-    Bg24 = Qt::LineEdit($LayoutWidget_15, "Bg24");
+    Bg24 = Qt::LineEdit($LayoutWidget_16, "Bg24");
     $layout18_4->addWidget(Bg24);
 
-    Data14 = Qt::LineEdit($LayoutWidget_15, "Data14");
+    Data14 = Qt::LineEdit($LayoutWidget_16, "Data14");
     $layout18_4->addWidget(Data14);
 
-    Data24 = Qt::LineEdit($LayoutWidget_15, "Data24");
+    Data24 = Qt::LineEdit($LayoutWidget_16, "Data24");
     $layout18_4->addWidget(Data24);
-    $layout27_2->addWidget(groupHist4);
+    $layout27->addWidget(groupHist4);
 
-    $T0PageLayout->addLayout($layout27_2, 0, 0);
+    $T0PageLayout->addLayout($layout27, 0, 0);
     musrfit_tabs->insertTab( T0Page, "" );
 
-    ConstPage = Qt::Widget(musrfit_tabs, "ConstPage");
+    TabPage = Qt::Widget(musrfit_tabs, "TabPage");
 
-    my $LayoutWidget_16 = Qt::Widget(ConstPage, '$LayoutWidget_16');
-    $LayoutWidget_16->setGeometry( Qt::Rect(6, 1, 540, 360) );
-    my $layout34_2 = Qt::VBoxLayout($LayoutWidget_16, 11, 6, '$layout34_2');
+    my $LayoutWidget_17 = Qt::Widget(TabPage, '$LayoutWidget_17');
+    $LayoutWidget_17->setGeometry( Qt::Rect(11, 6, 540, 360) );
+    my $layout34_2_2 = Qt::VBoxLayout($LayoutWidget_17, 11, 6, '$layout34_2_2');
 
-    my $layout33_3 = Qt::GridLayout(undef, 1, 1, 0, 6, '$layout33_3');
+    my $layout33_2 = Qt::GridLayout(undef, 1, 1, 0, 6, '$layout33_2');
 
-    TheoryBlock_Label = Qt::Label($LayoutWidget_16, "TheoryBlock_Label");
+    TheoryBlock_Label = Qt::Label($LayoutWidget_17, "TheoryBlock_Label");
     $cg->setColor(&Qt::ColorGroup::Foreground, &black);
     $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
     $cg->setColor(&Qt::ColorGroup::Light, &white);
@@ -2522,14 +2634,14 @@ sub NEW
     $pal->setDisabled($cg);
     TheoryBlock_Label->setPalette( $pal );
 
-    $layout33_3->addWidget(TheoryBlock_Label, 0, 0);
+    $layout33_2->addWidget(TheoryBlock_Label, 0, 0);
 
-    TheoryBlock = Qt::TextEdit($LayoutWidget_16, "TheoryBlock");
+    TheoryBlock = Qt::TextEdit($LayoutWidget_17, "TheoryBlock");
     TheoryBlock->setEnabled( 1 );
 
-    $layout33_3->addWidget(TheoryBlock, 1, 0);
+    $layout33_2->addWidget(TheoryBlock, 1, 0);
 
-    ParametersList_Label = Qt::Label($LayoutWidget_16, "ParametersList_Label");
+    ParametersList_Label = Qt::Label($LayoutWidget_17, "ParametersList_Label");
     $cg->setColor(&Qt::ColorGroup::Foreground, &black);
     $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
     $cg->setColor(&Qt::ColorGroup::Light, &white);
@@ -2583,34 +2695,34 @@ sub NEW
     $pal->setDisabled($cg);
     ParametersList_Label->setPalette( $pal );
 
-    $layout33_3->addWidget(ParametersList_Label, 0, 1);
+    $layout33_2->addWidget(ParametersList_Label, 0, 1);
 
-    ParametersList = Qt::TextEdit($LayoutWidget_16, "ParametersList");
+    ParametersList = Qt::TextEdit($LayoutWidget_17, "ParametersList");
     ParametersList->setEnabled( 1 );
 
-    $layout33_3->addWidget(ParametersList, 1, 1);
-    $layout34_2->addLayout($layout33_3);
+    $layout33_2->addWidget(ParametersList, 1, 1);
+    $layout34_2_2->addLayout($layout33_2);
 
     my $layout25_6 = Qt::HBoxLayout(undef, 0, 6, '$layout25_6');
 
-    CParamsCombo = Qt::ComboBox(0, $LayoutWidget_16, "CParamsCombo");
+    CParamsCombo = Qt::ComboBox(0, $LayoutWidget_17, "CParamsCombo");
     CParamsCombo->setSizePolicy( Qt::SizePolicy(0, 7, 0, 0, CParamsCombo->sizePolicy()->hasHeightForWidth()) );
     $layout25_6->addWidget(CParamsCombo);
 
-    textLabel1_4_6 = Qt::Label($LayoutWidget_16, "textLabel1_4_6");
+    textLabel1_4_6 = Qt::Label($LayoutWidget_17, "textLabel1_4_6");
     $layout25_6->addWidget(textLabel1_4_6);
 
-    ConstraintLine = Qt::LineEdit($LayoutWidget_16, "ConstraintLine");
+    ConstraintLine = Qt::LineEdit($LayoutWidget_17, "ConstraintLine");
     ConstraintLine->setSizePolicy( Qt::SizePolicy(7, 7, 0, 0, ConstraintLine->sizePolicy()->hasHeightForWidth()) );
     ConstraintLine->setMinimumSize( Qt::Size(0, 25) );
     $layout25_6->addWidget(ConstraintLine);
 
-    AddConstraint = Qt::PushButton($LayoutWidget_16, "AddConstraint");
+    AddConstraint = Qt::PushButton($LayoutWidget_17, "AddConstraint");
     AddConstraint->setSizePolicy( Qt::SizePolicy(0, 7, 0, 0, AddConstraint->sizePolicy()->hasHeightForWidth()) );
     $layout25_6->addWidget(AddConstraint);
-    $layout34_2->addLayout($layout25_6);
+    $layout34_2_2->addLayout($layout25_6);
 
-    textLabel2_2_3_4 = Qt::Label($LayoutWidget_16, "textLabel2_2_3_4");
+    textLabel2_2_3_4 = Qt::Label($LayoutWidget_17, "textLabel2_2_3_4");
     $cg->setColor(&Qt::ColorGroup::Foreground, &black);
     $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
     $cg->setColor(&Qt::ColorGroup::Light, &white);
@@ -2663,60 +2775,60 @@ sub NEW
     $cg->setColor(&Qt::ColorGroup::LinkVisited, Qt::Color(82,24,139));
     $pal->setDisabled($cg);
     textLabel2_2_3_4->setPalette( $pal );
-    $layout34_2->addWidget(textLabel2_2_3_4);
+    $layout34_2_2->addWidget(textLabel2_2_3_4);
 
-    FunctionsBlock = Qt::TextEdit($LayoutWidget_16, "FunctionsBlock");
-    $layout34_2->addWidget(FunctionsBlock);
+    FunctionsBlock = Qt::TextEdit($LayoutWidget_17, "FunctionsBlock");
+    $layout34_2_2->addWidget(FunctionsBlock);
 
     my $layout30 = Qt::HBoxLayout(undef, 0, 6, '$layout30');
 
-    textLabel1_6 = Qt::Label($LayoutWidget_16, "textLabel1_6");
-    $layout30->addWidget(textLabel1_6);
+    textLabel1_6_3 = Qt::Label($LayoutWidget_17, "textLabel1_6_3");
+    $layout30->addWidget(textLabel1_6_3);
 
-    ResetFunc = Qt::PushButton($LayoutWidget_16, "ResetFunc");
+    ResetFunc = Qt::PushButton($LayoutWidget_17, "ResetFunc");
     ResetFunc->setMaximumSize( Qt::Size(100, 32767) );
     $layout30->addWidget(ResetFunc);
-    $layout34_2->addLayout($layout30);
-    musrfit_tabs->insertTab( ConstPage, "" );
+    $layout34_2_2->addLayout($layout30);
+    musrfit_tabs->insertTab( TabPage, "" );
 
     fileNewAction= Qt::Action(this, "fileNewAction");
-    fileNewAction->setIconSet( Qt::IconSet($image1) );
+    fileNewAction->setIconSet( Qt::IconSet($image3) );
     fileOpenAction= Qt::Action(this, "fileOpenAction");
     fileOpenAction->setEnabled( 0 );
-    fileOpenAction->setIconSet( Qt::IconSet($image2) );
+    fileOpenAction->setIconSet( Qt::IconSet($image4) );
     fileOpenAction->setVisible( 0 );
     fileSaveAction= Qt::Action(this, "fileSaveAction");
-    fileSaveAction->setIconSet( Qt::IconSet($image3) );
+    fileSaveAction->setIconSet( Qt::IconSet($image5) );
     fileSaveAsAction= Qt::Action(this, "fileSaveAsAction");
-    fileSaveAsAction->setIconSet( Qt::IconSet($image4) );
+    fileSaveAsAction->setIconSet( Qt::IconSet($image6) );
     filePrintAction= Qt::Action(this, "filePrintAction");
     filePrintAction->setEnabled( 0 );
-    filePrintAction->setIconSet( Qt::IconSet($image5) );
+    filePrintAction->setIconSet( Qt::IconSet($image7) );
     fileExitAction= Qt::Action(this, "fileExitAction");
-    fileExitAction->setIconSet( Qt::IconSet($image6) );
+    fileExitAction->setIconSet( Qt::IconSet($image8) );
     editUndoAction= Qt::Action(this, "editUndoAction");
     editUndoAction->setEnabled( 0 );
-    editUndoAction->setIconSet( Qt::IconSet($image7) );
+    editUndoAction->setIconSet( Qt::IconSet($image9) );
     editRedoAction= Qt::Action(this, "editRedoAction");
     editRedoAction->setEnabled( 0 );
-    editRedoAction->setIconSet( Qt::IconSet($image8) );
+    editRedoAction->setIconSet( Qt::IconSet($image10) );
     editCutAction= Qt::Action(this, "editCutAction");
     editCutAction->setEnabled( 0 );
-    editCutAction->setIconSet( Qt::IconSet($image9) );
+    editCutAction->setIconSet( Qt::IconSet($image11) );
     editCopyAction= Qt::Action(this, "editCopyAction");
     editCopyAction->setEnabled( 0 );
-    editCopyAction->setIconSet( Qt::IconSet($image10) );
+    editCopyAction->setIconSet( Qt::IconSet($image12) );
     editPasteAction= Qt::Action(this, "editPasteAction");
     editPasteAction->setEnabled( 0 );
-    editPasteAction->setIconSet( Qt::IconSet($image11) );
+    editPasteAction->setIconSet( Qt::IconSet($image13) );
     editFindAction= Qt::Action(this, "editFindAction");
-    editFindAction->setIconSet( Qt::IconSet($image12) );
+    editFindAction->setIconSet( Qt::IconSet($image14) );
     helpContentsAction= Qt::Action(this, "helpContentsAction");
     helpContentsAction->setEnabled( 0 );
-    helpContentsAction->setIconSet( Qt::IconSet($image13) );
+    helpContentsAction->setIconSet( Qt::IconSet($image15) );
     helpIndexAction= Qt::Action(this, "helpIndexAction");
     helpIndexAction->setEnabled( 0 );
-    helpIndexAction->setIconSet( Qt::IconSet($image14) );
+    helpIndexAction->setIconSet( Qt::IconSet($image16) );
     helpAboutAction= Qt::Action(this, "helpAboutAction");
     separatorAction= Qt::Action(this, "separatorAction");
     FileExistCheck= Qt::Action(this, "FileExistCheck");
@@ -2725,19 +2837,19 @@ sub NEW
     ManualFile= Qt::Action(this, "ManualFile");
     ManualFile->setToggleAction( 1 );
     fileChangeDirAction= Qt::Action(this, "fileChangeDirAction");
-    fileChangeDirAction->setIconSet( Qt::IconSet($image15) );
+    fileChangeDirAction->setIconSet( Qt::IconSet($image17) );
     optionsnew_itemAction= Qt::Action(this, "optionsnew_itemAction");
     parametersExport_AsAction= Qt::Action(this, "parametersExport_AsAction");
-    parametersExport_AsAction->setIconSet( Qt::IconSet($image16) );
+    parametersExport_AsAction->setIconSet( Qt::IconSet($image18) );
     parametersAppend_ToAction= Qt::Action(this, "parametersAppend_ToAction");
-    parametersAppend_ToAction->setIconSet( Qt::IconSet($image17) );
+    parametersAppend_ToAction->setIconSet( Qt::IconSet($image19) );
     Fit= Qt::Action(this, "Fit");
     Fit->setIconSet( Qt::IconSet($image0) );
     Plot= Qt::Action(this, "Plot");
     Plot->setToggleAction( 0 );
-    Plot->setIconSet( Qt::IconSet($image18) );
+    Plot->setIconSet( Qt::IconSet($image20) );
     T0= Qt::Action(this, "T0");
-    T0->setIconSet( Qt::IconSet($image19) );
+    T0->setIconSet( Qt::IconSet($image21) );
     optionsFourier= Qt::Action(this, "optionsFourier");
     optionsFourier->setToggleAction( 1 );
     optionsT0= Qt::Action(this, "optionsT0");
@@ -2811,7 +2923,7 @@ sub NEW
     MenuBar->insertSeparator( 8 );
 
     languageChange();
-    my $resize = Qt::Size(579, 501);
+    my $resize = Qt::Size(583, 501);
     $resize = $resize->expandedTo(minimumSizeHint());
     resize( $resize );
     clearWState( &Qt::WState_Polished );
@@ -2838,11 +2950,12 @@ sub NEW
     Qt::Object::connect(helpAboutAction, SIGNAL "activated()", this, SLOT "helpAbout()");
     Qt::Object::connect(T0, SIGNAL "activated()", this, SLOT "ShowMuSRT0()");
     Qt::Object::connect(Plot, SIGNAL "activated()", this, SLOT "GoPlot()");
-    Qt::Object::connect(AddConstraint, SIGNAL "clicked()", this, SLOT "AppendToFunctions()");
+    Qt::Object::connect(ManualFile, SIGNAL "toggled(bool)", this, SLOT "RunSelectionToggle()");
     Qt::Object::connect(ResetFunc, SIGNAL "clicked()", this, SLOT "InitializeFunctions()");
     Qt::Object::connect(FitType1, SIGNAL "activated(const QString&)", this, SLOT "InitializeFunctions()");
-    Qt::Object::connect(FitType2, SIGNAL "activated(int)", this, SLOT "InitializeFunctions()");
-    Qt::Object::connect(FitType3, SIGNAL "activated(int)", this, SLOT "InitializeFunctions()");
+    Qt::Object::connect(FitType2, SIGNAL "activated(const QString&)", this, SLOT "InitializeFunctions()");
+    Qt::Object::connect(FitType3, SIGNAL "activated(const QString&)", this, SLOT "InitializeFunctions()");
+    Qt::Object::connect(AddConstraint, SIGNAL "clicked()", this, SLOT "AppendToFunctions()");
 
     setTabOrder(musrfit_tabs, RunNumbers);
     setTabOrder(RunNumbers, BeamLine);
@@ -2993,8 +3106,8 @@ sub languageChange
     Comp2Label->setText( trUtf8("Second Component") );
     FitAsyTypeLabel->setText( trUtf8("Fit type") );
     FitAsyType->clear();
-    FitAsyType->insertItem( trUtf8("Asymmetry") );
-    FitAsyType->insertItem( trUtf8("SingleHist") );
+    FitAsyType->insertItem( $image1, trUtf8("Asymmetry") );
+    FitAsyType->insertItem( $image2, trUtf8("SingleHist") );
     LRBFLabel->setText( trUtf8("Histograms list") );
     LRBF->setText( trUtf8("1,3") );
     RUNSAuto->setTitle( trUtf8("RUN Numbers") );
@@ -3006,6 +3119,7 @@ sub languageChange
     BeamLine->insertItem( trUtf8("LTF") );
     BeamLineLabel->setText( trUtf8("On beam line") );
     YEAR->clear();
+    YEAR->insertItem( trUtf8("2010") );
     YEAR->insertItem( trUtf8("2009") );
     YEAR->insertItem( trUtf8("2008") );
     YEAR->insertItem( trUtf8("2007") );
@@ -3034,7 +3148,7 @@ sub languageChange
     textLabel1_5->setText( trUtf8("Minimization type") );
     ltc->setText( trUtf8("Life time correction") );
     musrfit_tabs->changeTab( FittingPage, trUtf8("Fitting") );
-    buttonGroupSharing->setTitle( trUtf8("Shared Parameters") );
+    buttonGroupSharing->setTitle( trUtf8("Shared parameters among different runs") );
     SharingComp1->setTitle( trUtf8("1st Component") );
     ShParam_1_1->setText( trUtf8("Param1") );
     ShParam_1_2->setText( trUtf8("Param2") );
@@ -3082,15 +3196,16 @@ sub languageChange
     FILENAMELabel->setText( trUtf8("Enter [name] for output [name].msr file (optional)") );
     Qt::ToolTip::add(FILENAME, trUtf8("Name of the produced MSR file (optional)"));
     Qt::WhatsThis::add(FILENAME, trUtf8("Name of the produced MSR file (optional)"));
-    textMSROutput->setText( undef );
     musrfit_tabs->changeTab( MSRPage, trUtf8("MSR File") );
-    FUnitsLabel->setText( trUtf8("Units") );
-    FApodizationLabel->setText( trUtf8("Apodization") );
-    FPlotLabel->setText( trUtf8("Plot") );
+    FourierBox->setTitle( trUtf8("Fourier transform parameters") );
+    textLabel1_3_4->setText( undef );
+    textLabel1_7->setText( trUtf8("Phase:") );
+    textLabel1_3_5->setText( undef );
     FUnits->clear();
     FUnits->insertItem( trUtf8("MHz") );
     FUnits->insertItem( trUtf8("Gauss") );
     FUnits->insertItem( trUtf8("Mc/s") );
+    textLabel1_3_6->setText( undef );
     FApodization->clear();
     FApodization->insertItem( trUtf8("STRONG") );
     FApodization->insertItem( trUtf8("MEDIUM") );
@@ -3102,17 +3217,28 @@ sub languageChange
     FPlot->insertItem( trUtf8("imag") );
     FPlot->insertItem( trUtf8("real_and_imag") );
     FPlot->insertItem( trUtf8("phase") );
-    textLabel1->setText( trUtf8("Range: from") );
-    textLabel1_3->setText( undef );
-    textLabel1_3_5->setText( undef );
-    textLabel1_3_2->setText( undef );
-    textLabel1_3_6->setText( undef );
-    textLabel1_2->setText( trUtf8("to") );
-    textLabel1_3_3->setText( undef );
-    textLabel1_3_7->setText( undef );
-    textLabel1_3_4->setText( undef );
+    FUnitsLabel->setText( trUtf8("Units") );
     textLabel1_3_8->setText( undef );
-    musrfit_tabs->changeTab( FourierPage, trUtf8("Fourier") );
+    textLabel1_3_7->setText( undef );
+    FPlotLabel->setText( trUtf8("Plot") );
+    textLabel1_2->setText( trUtf8("to") );
+    FApodizationLabel->setText( trUtf8("Apodization") );
+    textLabel1_3_3->setText( undef );
+    textLabel1->setText( trUtf8("Range: from") );
+    RRFBox->setTitle( trUtf8("Rotatting reference frame (RRF) parameters") );
+    textLabel1_6_2_2->setText( trUtf8("Phase") );
+    textLabel1_6->setText( trUtf8("Frequency") );
+    textLabel1_6_2_4->setText( undef );
+    RRFFrq->setText( undef );
+    textLabel1_6_2_3->setText( undef );
+    textLabel1_6_2->setText( trUtf8("Packing") );
+    RRFUnits->clear();
+    RRFUnits->insertItem( trUtf8("MHz") );
+    RRFUnits->insertItem( trUtf8("kHz") );
+    RRFUnits->insertItem( trUtf8("Mc/s") );
+    RRFUnits->insertItem( trUtf8("G") );
+    RRFUnits->insertItem( trUtf8("T") );
+    musrfit_tabs->changeTab( FourierPage, trUtf8("FFT/RRF") );
     groupHist0->setTitle( undef );
     textLabel2->setText( trUtf8("t0") );
     textLabel2_2_2_3->setText( trUtf8("Bg1") );
@@ -3123,15 +3249,15 @@ sub languageChange
     groupHist2->setTitle( trUtf8("Hist2") );
     groupHist3->setTitle( trUtf8("Hist3") );
     groupHist4->setTitle( trUtf8("Hist4") );
-    musrfit_tabs->changeTab( T0Page, trUtf8("t0/Bg Bins") );
+    musrfit_tabs->changeTab( T0Page, trUtf8("t0/Bg") );
     TheoryBlock_Label->setText( trUtf8("THEORY Block") );
     ParametersList_Label->setText( trUtf8("Parameters List") );
     textLabel1_4_6->setText( trUtf8("=") );
     AddConstraint->setText( trUtf8("Add") );
     textLabel2_2_3_4->setText( trUtf8("FUNCTIONS Block") );
-    textLabel1_6->setText( undef );
+    textLabel1_6_3->setText( undef );
     ResetFunc->setText( trUtf8("Reset") );
-    musrfit_tabs->changeTab( ConstPage, trUtf8("Constraints") );
+    musrfit_tabs->changeTab( TabPage, trUtf8("Constraints") );
     fileNewAction->setText( trUtf8("&New") );
     fileNewAction->setMenuText( trUtf8("&New") );
     fileNewAction->setAccel( Qt::KeySequence( trUtf8("Ctrl+N") ) );
@@ -3279,7 +3405,7 @@ sub fileChangeDir
 
 sub filePrint
 {
-    print "MuSRFitform->filePrint(): Not implemented yet.\n";
+    print "MuSRFitformR->filePrint(): Not implemented yet.\n";
 }
 
 sub fileExit
@@ -3344,37 +3470,37 @@ sub parametersAppend
 
 sub editUndo
 {
-    print "MuSRFitform->editUndo(): Not implemented yet.\n";
+    print "MuSRFitformR->editUndo(): Not implemented yet.\n";
 }
 
 sub editRedo
 {
-    print "MuSRFitform->editRedo(): Not implemented yet.\n";
+    print "MuSRFitformR->editRedo(): Not implemented yet.\n";
 }
 
 sub editCut
 {
-    print "MuSRFitform->editCut(): Not implemented yet.\n";
+    print "MuSRFitformR->editCut(): Not implemented yet.\n";
 }
 
 sub editCopy
 {
-    print "MuSRFitform->editCopy(): Not implemented yet.\n";
+    print "MuSRFitformR->editCopy(): Not implemented yet.\n";
 }
 
 sub editPaste
 {
-    print "MuSRFitform->editPaste(): Not implemented yet.\n";
+    print "MuSRFitformR->editPaste(): Not implemented yet.\n";
 }
 
 sub helpIndex
 {
-    print "MuSRFitform->helpIndex(): Not implemented yet.\n";
+    print "MuSRFitformR->helpIndex(): Not implemented yet.\n";
 }
 
 sub helpContents
 {
-    print "MuSRFitform->helpContents(): Not implemented yet.\n";
+    print "MuSRFitformR->helpContents(): Not implemented yet.\n";
 }
 
 sub helpAbout
@@ -3475,9 +3601,16 @@ sub CreateAllInput
     $All{"FUNITS"}= FUnits->currentText;
     $All{"FAPODIZATION"}= FApodization->currentText;
     $All{"FPLOT"}= FPlot->currentText;
+    $All{"FPHASE"}=FPHASE->text;
 # Fourier range
     $All{"FrqMin"}=FrqMin->text;
     $All{"FrqMax"}=FrqMax->text;
+ 
+# Rotating reference frame parameters
+    $All{"RRFFrq"}=RRFFrq->text;
+    $All{"RRFPack"}=RRFPack->text;
+    $All{"RRFPhase"}=RRFPhase->text;
+    $All{"RRFUnits"}=RRFUnits->currentText;
     
 # Get values of t0 and Bg/Data bins if given
     my $NHist = 1;
@@ -3527,7 +3660,7 @@ sub CreateAllInput
     }
     
 # Also theory block and paramets list
-    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);    
+    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
     $All{"Full_T_Block"}=$Full_T_Block;    
     $All{"Paramcomp_ref"}=$Paramcomp_ref;
     my @Paramcomp = @$Paramcomp_ref;
@@ -3536,25 +3669,6 @@ sub CreateAllInput
     $All{"FunctionsBlock"}=FunctionsBlock->text;
 # and the associated theory block
     $All{"Func_T_Block"}=TheoryBlock->text;
-    
-# Read initial values of paramets from tabel
-    my $erradd = "d";
-    my $minadd = "_min";
-    my $maxadd = "_max";
-    my $NRows = InitParamTable->numRows();
-    my $Header=InitParamTable->verticalHeader();
-    if ($NRows > 0) {
-	for (my $i=0;$i<$NRows;$i++) {
-# Take label of row, i.e. name of parameter
-	    my $Param=$Header->label($i);
-# Then take the value, error, max and min (as numbers)
-	    $All{"$Param"}=1.0*InitParamTable->text($i,0);
-	    $All{"$erradd$Param"}=1.0*InitParamTable->text($i,1);
-	    $All{"$Param$minadd"}=1.0*InitParamTable->text($i,2);
-	    $All{"$Param$maxadd"}=1.0*InitParamTable->text($i,3);
-	}
-    }
-    
     
 # Shared settings are detected here
     my $Shared = 0; 
@@ -3613,6 +3727,32 @@ sub CreateAllInput
     } else {
 	$All{"FILENAME"}="TMP";
     }
+    
+    
+# This has to be at the end of CreateAll    
+    my %PTable=MSR::PrepParamTable(\%All);
+    
+# Setup the table with the right size    
+    my $NParam=scalar keys( %PTable );
+    
+# Read initial values of paramets from tabel
+    my $erradd = "d";
+    my $minadd = "_min";
+    my $maxadd = "_max";
+    my $Header=InitParamTable->verticalHeader();
+# TODO: Should not go over all rows, only on parameters.
+    if ($NParam > 0) {
+	for (my $i=0;$i<$NParam;$i++) {
+# Take label of row, i.e. name of parameter
+	    my $Param=$Header->label($i);
+# Then take the value, error, max and min (as numbers)
+	    $All{"$Param"}=1.0*InitParamTable->text($i,0);
+	    $All{"$erradd$Param"}=1.0*InitParamTable->text($i,1);
+	    $All{"$Param$minadd"}=1.0*InitParamTable->text($i,2);
+	    $All{"$Param$maxadd"}=1.0*InitParamTable->text($i,3);
+	}
+    }
+
     
 # Return Hash with all important values
     return %All;  
@@ -3674,7 +3814,6 @@ sub UpdateMSRFileInitTable
     (my $TBlock_ref, my $FPBlock_ref)=MSR::ExtractBlks(@lines);
     my @FPBloc = @$FPBlock_ref;
     
-# Counter for initialization table (including Alpha, N0 and Bg)    
     my $PCount=0;
     foreach my $line (@FPBloc) {
 	$PCount++;
@@ -3773,7 +3912,6 @@ sub ActivateShComp
     my $Full_T_Block= $All{"Full_T_Block"};
     
     my $Component=1;
-    
     foreach my $FitType (@FitTypes) {
 	my $Parameters=$Paramcomp[$Component-1];
 	my @Params = split( /\s+/, $Parameters );
@@ -3798,17 +3936,13 @@ sub ActivateShComp
 	$CompShL->setText($All{"FitType$Component"});
 	
 # Change state/label of parameters
-# Also add it to the constraints drop down menu
 	for (my $i=1; $i<=9;$i++) {		
 	    my $ParamChkBx="ShParam_".$Component."_".$i;
 	    my $ChkBx = child($ParamChkBx);
-#	    my $CParam = $Params[$i-1]."_".$Component;
-	    if ($Params[$i-1] ne "" ) {
+	    if ($Params[$i-1] ne "") {
 		$ChkBx->setHidden(0);
 		$ChkBx->setEnabled(1);
 		$ChkBx ->setText($Params[$i-1]);
-#		CParamsCombo->insertItem($CParam,-1);
-#		$Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
 	    } else {
 		$ChkBx->setHidden(1);
 	    }
@@ -3830,6 +3964,7 @@ sub InitializeTab
 	for (my $i=0;$i<$NRows;$i++) {
 # TODO: Better remove the row rather than hide it.
 	    InitParamTable->hideRow($i);
+#	    InitParamTable->removeRow($i);
 	}
     }
     
@@ -3873,7 +4008,7 @@ sub TabChanged
 # Initialize FUNCTIONS block only if it has not been initialized yet
     if ($All{"Func_T_Block"} eq "" ) {
 	InitializeFunctions();
-    }
+    }    
 
 }
 
@@ -4114,10 +4249,10 @@ sub InitializeFunctions
 package main;
 
 use Qt;
-use MuSRFitform;
+use MuSRFitformR;
 
 my $a = Qt::Application(\@ARGV);
-my $w = MuSRFitform;
+my $w = MuSRFitformR;
 $a->setMainWidget($w);
 $w->show;
 exit $a->exec;
