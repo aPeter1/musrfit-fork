@@ -1258,7 +1258,8 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
     if (commentsRUN) {
       iter = commentsRUN->find(i + 1);
       if (iter != commentsRUN->end()) {
-        fout << endl;
+        if (!i)
+          fout << endl;
         fout << "# " << iter->second.Data() << endl;
         fout << endl;
         commentsRUN->erase(iter);
@@ -1614,10 +1615,10 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
       fout << "range            " << fFourier.fPlotRange[0] << "    " << fFourier.fPlotRange[1] << endl;
     }
 
-    // phase_increment -- seems to be not used... write it anyway for completeness
-    if (fFourier.fPhaseIncrement) {
-      fout << "phase_increment  " << fFourier.fPhaseIncrement << endl;
-    }
+//     // phase_increment -- not used in msr-files at the moment (can only be set through the xml-file)
+//     if (fFourier.fPhaseIncrement) {
+//       fout << "phase_increment  " << fFourier.fPhaseIncrement << endl;
+//     }
 
     fout << endl;
     fout << hline.Data() << endl;
@@ -1719,7 +1720,9 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
     }
 
     // rrf_phase
-    if (fPlots[i].fRRFPhase) {
+    if (fPlots[i].fRRFPhaseParamNo > 0) {
+      fout << "rrf_phase  par" << fPlots[i].fRRFPhaseParamNo << endl;
+    } else if (fPlots[i].fRRFPhase) {
       fout << "rrf_phase  " << fPlots[i].fRRFPhase << endl;
     }
 
@@ -3205,6 +3208,7 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
     param.fRRFPacking = 0; // i.e. if not overwritten it will not be a valid RRF
     param.fRRFFreq = 0.0; // i.e. no RRF whished
     param.fRRFUnit = RRF_UNIT_MHz;
+    param.fRRFPhaseParamNo = 0; // initial parameter no = 0 means not a parameter
     param.fRRFPhase = 0.0;
 
     // find next plot if any is present
@@ -3538,6 +3542,9 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
                 if ((Int_t)fParam.size() < no) {
                   error = true;
                 } else {
+                  // keep the parameter number in case parX was used
+                  param.fRRFPhaseParamNo = no;
+                  // get parameter value
                   param.fRRFPhase = fParam[no-1].fValue;
                 }
               }

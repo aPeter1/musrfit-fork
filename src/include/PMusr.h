@@ -428,6 +428,8 @@ class PMsrRunBlock {
     virtual Int_t GetYDataIndex() { return fXYDataIndex[1]; }
     virtual TString* GetXDataLabel() { return &fXYDataLabel[0]; }
     virtual TString* GetYDataLabel() { return &fXYDataLabel[1]; }
+    virtual map<TString, Int_t> *GetParGlobal() { return &fParGlobal; }
+    virtual PIntVector *GetMapGlobal() { return &fMapGlobal; }
 
     virtual void SetRunName(TString &str, Int_t idx=-1);
     virtual void SetBeamline(TString &str, Int_t idx=-1);
@@ -454,31 +456,44 @@ class PMsrRunBlock {
     virtual void SetYDataIndex(Int_t ival) { fXYDataIndex[1] = ival; }
     virtual void SetXDataLabel(TString& str) { fXYDataLabel[0] = str; }
     virtual void SetYDataLabel(TString& str) { fXYDataLabel[1] = str; }
+    virtual void SetParGlobal(const TString &str, Int_t ival);
+    virtual void SetMapGlobal(UInt_t idx, Int_t ival);
 
   private:
-    PStringVector fRunName;       ///< name of the run file
-    PStringVector fBeamline;      ///< e.g. mue4, mue1, pim3, emu, m15, ... (former: run type)
-    PStringVector fInstitute;     ///< e.g. psi, ral, triumf (former: run format)
-    PStringVector fFileFormat;    ///< e.g. root, nexus, psi-bin, mud, ascii, db
-    Int_t fFitType;               ///< fit type: 0=single histo fit, 2=asymmetry fit, 4=mu^- single histo fit, 8=non muSR fit
-    Int_t fAlphaParamNo;          ///< alpha parameter number (fit type 2, 4)
-    Int_t fBetaParamNo;           ///< beta parameter number  (fit type 2, 4)
-    Int_t fNormParamNo;           ///< N0 parameter number (fit type 0)
-    Int_t fBkgFitParamNo;         ///< background fit parameter number (fit type 0)
-    Int_t fLifetimeParamNo;       ///< muon lifetime parameter number (fit type 0)
-    Bool_t fLifetimeCorrection;   ///< lifetime correction flag for viewing (fit type 0)
-    PIntVector fMap;              ///< map vector needed to switch parameters for different runs within a single theory
-    PIntVector fForwardHistoNo;   ///< forward histogram number (fit type 0, 2, 4)
-    PIntVector fBackwardHistoNo;  ///< backward histogram number (fit type 2, 4)
-    Double_t fBkgFix[2];          ///< fixed background in (1/ns) (fit type 0, 2, 4)
-    Int_t fBkgRange[4];           ///< background bin range (fit type 0, 2, 4)
-    Int_t fDataRange[4];          ///< data bin range (fit type 0, 2, 4)
-    PIntVector fT0;               ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
-    vector<PIntVector> fAddT0;    ///< t0 bins for addrun's
-    Double_t fFitRange[2];        ///< fit range in (us)
-    Int_t fPacking;               ///< packing/rebinning
-    Int_t fXYDataIndex[2];        ///< used to get the data indices when using db-files (fit type 8)
-    TString fXYDataLabel[2];      ///< used to get the indices via labels when using db-files  (fit type 8)
+    PStringVector fRunName;         ///< name of the run file
+    PStringVector fBeamline;        ///< e.g. mue4, mue1, pim3, emu, m15, ... (former: run type)
+    PStringVector fInstitute;       ///< e.g. psi, ral, triumf (former: run format)
+    PStringVector fFileFormat;      ///< e.g. root, nexus, psi-bin, mud, ascii, db
+    Int_t fFitType;                 ///< fit type: 0=single histo fit, 2=asymmetry fit, 4=mu^- single histo fit, 8=non muSR fit
+    Int_t fAlphaParamNo;            ///< alpha parameter number (fit type 2, 4)
+    Int_t fBetaParamNo;             ///< beta parameter number  (fit type 2, 4)
+    Int_t fNormParamNo;             ///< N0 parameter number (fit type 0)
+    Int_t fBkgFitParamNo;           ///< background fit parameter number (fit type 0)
+    Int_t fLifetimeParamNo;         ///< muon lifetime parameter number (fit type 0)
+    Bool_t fLifetimeCorrection;     ///< lifetime correction flag for viewing (fit type 0)
+    PIntVector fMap;                ///< map vector needed to switch parameters for different runs within a single theory
+    PIntVector fForwardHistoNo;     ///< forward histogram number (fit type 0, 2, 4)
+    PIntVector fBackwardHistoNo;    ///< backward histogram number (fit type 2, 4)
+    Double_t fBkgFix[2];            ///< fixed background in (1/ns) (fit type 0, 2, 4)
+    Int_t fBkgRange[4];             ///< background bin range (fit type 0, 2, 4)
+    Int_t fDataRange[4];            ///< data bin range (fit type 0, 2, 4)
+    PIntVector fT0;                 ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
+    vector<PIntVector> fAddT0;      ///< t0 bins for addrun's
+    Double_t fFitRange[2];          ///< fit range in (us)
+    Int_t fPacking;                 ///< packing/rebinning
+    Int_t fXYDataIndex[2];          ///< used to get the data indices when using db-files (fit type 8)
+    TString fXYDataLabel[2];        ///< used to get the indices via labels when using db-files  (fit type 8)
+
+    // Two members used for msr2data in the global mode: fParGlobal and fMapGlobal
+    // These are intended to track global and run specific parameters used in the RUN blocks
+    // Suggested keys for the std::map: (alpha, beta, norm, bkgfit, lifetime)
+    // Suggested values for the std::map: 1 -> parameter is global
+    //                                    0 -> parameter is run specific
+    //                                    -1 -> tag not present in the RUN block
+    // The information about global parameters in the map line is stored in an std::vector which should have the same length as the map-vector
+    // The values in this std::vector can be the same as for the std::map of the other parameters.
+    map<TString, Int_t> fParGlobal; ///< here is stored if the parameters used in the RUN block are global or not
+    PIntVector fMapGlobal;          ///< here is stored if the maps used in the RUN block are global or not
 };
 
 //-------------------------------------------------------------
@@ -509,20 +524,21 @@ typedef struct {
  * <p>Holds the information of a single plot block
  */
 typedef struct {
-  Int_t    fPlotType;     ///< plot type
-  Bool_t   fUseFitRanges; ///< yes -> use the fit ranges to plot the data, no (default) -> use range information if present
-  Bool_t   fLogX;         ///< yes -> x-axis in log-scale, no (default) -> x-axis in lin-scale
-  Bool_t   fLogY;         ///< yes -> y-axis in log-scale, no (default) -> y-axis in lin-scale
-  Int_t    fViewPacking;  ///< -1 -> use the run packing to generate the view, otherwise is fViewPacking for the binning of ALL runs.
-  PIntVector fRuns;       ///< list of runs to be plotted
-  PDoubleVector  fTmin;   ///< time minimum
-  PDoubleVector  fTmax;   ///< time maximum
-  PDoubleVector  fYmin;   ///< asymmetry/counts minimum
-  PDoubleVector  fYmax;   ///< asymmetry/counts maximum
-  UInt_t fRRFPacking;     ///< rotating reference frame (RRF) packing
-  Double_t fRRFFreq;      ///< RRF frequency
-  UInt_t fRRFUnit;        ///< RRF frequency unit. 0=kHz, 1=MHz, 2=Mc/s, 3=Gauss, 4=Tesla
-  Double_t fRRFPhase;     ///< RRF phase
+  Int_t    fPlotType;      ///< plot type
+  Bool_t   fUseFitRanges;  ///< yes -> use the fit ranges to plot the data, no (default) -> use range information if present
+  Bool_t   fLogX;          ///< yes -> x-axis in log-scale, no (default) -> x-axis in lin-scale
+  Bool_t   fLogY;          ///< yes -> y-axis in log-scale, no (default) -> y-axis in lin-scale
+  Int_t    fViewPacking;   ///< -1 -> use the run packing to generate the view, otherwise is fViewPacking for the binning of ALL runs.
+  PIntVector fRuns;        ///< list of runs to be plotted
+  PDoubleVector  fTmin;    ///< time minimum
+  PDoubleVector  fTmax;    ///< time maximum
+  PDoubleVector  fYmin;    ///< asymmetry/counts minimum
+  PDoubleVector  fYmax;    ///< asymmetry/counts maximum
+  UInt_t fRRFPacking;      ///< rotating reference frame (RRF) packing
+  Double_t fRRFFreq;       ///< RRF frequency
+  UInt_t fRRFUnit;         ///< RRF frequency unit. 0=kHz, 1=MHz, 2=Mc/s, 3=Gauss, 4=Tesla
+  Int_t  fRRFPhaseParamNo; ///< parameter number if used instead of a RRF phase value
+  Double_t fRRFPhase;      ///< RRF phase
 } PMsrPlotStructure;
 
 //-------------------------------------------------------------

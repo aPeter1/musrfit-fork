@@ -599,6 +599,8 @@ PMsrRunBlock::~PMsrRunBlock()
   fBackwardHistoNo.clear();
   fMap.clear();
   fT0.clear();
+  fParGlobal.clear();
+  fMapGlobal.clear();
 }
 
 //--------------------------------------------------------------------------
@@ -641,6 +643,9 @@ void PMsrRunBlock::CleanUp()
   for (UInt_t i=0; i<fAddT0.size(); i++)
     fAddT0[i].clear();
   fAddT0.clear();
+
+  fParGlobal.clear();
+  fMapGlobal.clear();
 }
 
 //--------------------------------------------------------------------------
@@ -1216,4 +1221,38 @@ void PMsrRunBlock::SetFitRange(Double_t dval, UInt_t idx)
     return;
 
   fFitRange[idx] = dval;
+}
+
+//--------------------------------------------------------------------------
+// SetParGlobal
+//--------------------------------------------------------------------------
+/**
+ * <p> store the information that a certain parameter used in the block is global
+ *
+ * \param str key (label) telling how the parameter is addressed
+ * \param ival value to be set (global == 1, run specific == 0, tag not present == -1)
+ */
+void PMsrRunBlock::SetParGlobal(const TString &str, Int_t ival)
+{
+  fParGlobal[str] = ival; // will either create a new entry or overwrite an old one if the key "str" is present
+  return;
+}
+
+//--------------------------------------------------------------------------
+// SetMapGlobal
+//--------------------------------------------------------------------------
+/**
+ * <p> store the information that a certain mapped parameter in the block is global
+ *
+ * \param idx map-index (0, 1, 2, 3, ...)
+ * \param ival value to be set (global == 1, run specific == 0, tag not present == -1)
+ */
+void PMsrRunBlock::SetMapGlobal(UInt_t idx, Int_t ival)
+{
+  if (fMapGlobal.empty())
+    fMapGlobal.resize(fMap.size(), -1);
+  if (idx < fMap.size() && fMap[idx] > 0)
+    fMapGlobal[idx] = ival;
+  // else do nothing at the moment
+  return;
 }
