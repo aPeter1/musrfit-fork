@@ -124,6 +124,21 @@ sub CreateMSR {
     my ($Full_T_Block,$Paramcomp_ref)=MSR::CreateTheory(@FitTypes);
     my @Paramcomp = @$Paramcomp_ref;
 
+
+    # If we have a FUNCTIONS Block the Full_T_Block should be 
+    # replaced by Func_T_Block
+    $FUNCTIONS_Block = $EMPTY;
+    if ($All{"FunctionsBlock"} ne $EMPTY) {
+	$FUNCTIONS_Block = "
+###############################################################
+FUNCTIONS
+###############################################################
+".$All{"FunctionsBlock"}."\n";
+	$Full_T_Block=$All{"Func_T_Block"};
+	# remove all _N to end (may fail with large number of parameters)
+	$Full_T_Block =~ s/_\d\b//g;
+    }
+
     # Counter for RUNS
     my $iRun = 1;
 
@@ -344,7 +359,6 @@ FITPARAMETER
       $PCount      $Param    $value     $error    $error    $minvalue    $maxvalue";
     }
 
-
     $Full_T_Block = "
 ###############################################################
 THEORY
@@ -352,14 +366,6 @@ THEORY
 $Full_T_Block
 ";
 
-    $FUNCTIONS_Block = $EMPTY;
-    if ($All{"FunctionsBlock"} ne $EMPTY) {
-	$FUNCTIONS_Block = "
-###############################################################
-FUNCTIONS
-###############################################################".
-$All{"FunctionsBlock"}."\n";
-    }
 
     $RUN_Block =
       "###############################################################
@@ -480,6 +486,20 @@ sub CreateMSRSingleHist {
     # First create the THEORY Block
     my ($Full_T_Block,$Paramcomp_ref)=MSR::CreateTheory(@FitTypes);
     my @Paramcomp = @$Paramcomp_ref;
+
+    # If we have a FUNCTIONS Block the Full_T_Block should be 
+    # replaced by Func_T_Block
+    $FUNCTIONS_Block = $EMPTY;
+    if ($All{"FunctionsBlock"} ne $EMPTY) {
+	$FUNCTIONS_Block = "
+###############################################################
+FUNCTIONS
+###############################################################
+".$All{"FunctionsBlock"}."\n";
+	$Full_T_Block=$All{"Func_T_Block"};
+	# remove all _N to end
+	$Full_T_Block =~ s/_\d\b//g;
+    }
 
     # Counter for RUNS
     my $iRun = 1;
@@ -724,16 +744,6 @@ THEORY
 ###############################################################
 $Full_T_Block
 ";
-
-    $FUNCTIONS_Block = $EMPTY;
-    if ($All{"FunctionsBlock"} ne $EMPTY) {
-	$FUNCTIONS_Block = "
-###############################################################
-FUNCTIONS
-###############################################################".
-$All{"FunctionsBlock"}."\n";
-    }
-
 
     $RUN_Block =
       "###############################################################

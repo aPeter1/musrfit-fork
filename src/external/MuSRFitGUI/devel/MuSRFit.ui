@@ -22,8 +22,8 @@
     </property>
     <property name="minimumSize">
         <size>
-            <width>23</width>
-            <height>270</height>
+            <width>21</width>
+            <height>275</height>
         </size>
     </property>
     <property name="caption">
@@ -5346,7 +5346,25 @@
         <sender>ResetFunc</sender>
         <signal>clicked()</signal>
         <receiver>MuSRFitform</receiver>
-        <slot>ActivateShComp()</slot>
+        <slot>InitializeFunctions()</slot>
+    </connection>
+    <connection>
+        <sender>FitType1</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>MuSRFitform</receiver>
+        <slot>InitializeFunctions()</slot>
+    </connection>
+    <connection>
+        <sender>FitType2</sender>
+        <signal>activated(int)</signal>
+        <receiver>MuSRFitform</receiver>
+        <slot>InitializeFunctions()</slot>
+    </connection>
+    <connection>
+        <sender>FitType3</sender>
+        <signal>activated(int)</signal>
+        <receiver>MuSRFitform</receiver>
+        <slot>InitializeFunctions()</slot>
     </connection>
 </connections>
 <tabstops>
@@ -5455,8 +5473,7 @@
     <slot>RunSelectionToggle()</slot>
     <slot>fileBrowse()</slot>
     <slot>AppendToFunctions()</slot>
-    <slot>ResetFunctions()</slot>
-    <slot>InitializeFunction()</slot>
+    <slot>InitializeFunctions()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

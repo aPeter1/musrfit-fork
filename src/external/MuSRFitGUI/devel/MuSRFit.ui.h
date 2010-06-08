@@ -341,9 +341,6 @@ void MuSRFitform::CreateAllInput()
     $All{"FunctionsBlock"}=FunctionsBlock->text;
 # and the associated theory block
     $All{"Func_T_Block"}=TheoryBlock->text;
-    if ($All{"Func_T_Block"} eq "") {
-	InitializeFunction();
-    }
     
 # Read initial values of paramets from tabel
     my $erradd = "d";
@@ -665,6 +662,11 @@ void MuSRFitform::TabChanged()
     UpdateMSRFileInitTable();
 # And also setup T0 and Bg bins
     ActivateT0Hists();
+    
+# Initialize FUNCTIONS block only if it has not been initialized yet
+    if ($All{"Func_T_Block"} eq "" ) {
+	InitializeFunctions();
+    }
 }
 
 
@@ -827,7 +829,7 @@ void MuSRFitform::AppendToFunctions()
     TheoryBlock->setText($Full_T_Block);
 }
 
-void MuSRFitform::ResetFunctions()
+void MuSRFitform::InitializeFunctions()
 {
     my %All=CreateAllInput();
     my @RUNS = split( /,/, $All{"RunNumbers"} );
@@ -841,67 +843,41 @@ void MuSRFitform::ResetFunctions()
     
 # Get number of parameters to determine the size of the table 
     my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
-# For now the line below does not work. Why?    
-#    my $Paramcomp_ref=$All{"Paramcomp_ref"};
     my @Paramcomp = @$Paramcomp_ref;
     my $Full_T_Block= $All{"Full_T_Block"};
-    my $Param="";
     
-    # Initialize Parameters List in function block (constraints).    
+# Initialize Parameters List in function block (constraints).    
     my $ParametersList="";
     ParametersList->setText("");
-
 # Counter for function block (with out Alpha etc.)
     my $ParCount=0;
-     CParamsCombo->clear();
-     
-#     my $CParam = $Params[$i-1]."_".$Component;
-#		CParamsCombo->insertItem($CParam,-1);
-#		$Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
-
-# Also update Parameters List for the Functions block
-    (my $Ptmp,my $tmp)=split(/_/,$Param);
-    if ($Ptmp ne "" && $Ptmp ne "Alpha" &&  $Ptmp ne "N0" && $Ptmp ne "NBg") {
-	$ParCount++;
-	$ParametersList=$ParametersList."$Param is par$ParCount\n";
-	ParametersList->setText($ParametersList);
-    }
-# Set theory block in Constraints    
-    TheoryBlock->setText($Full_T_Block);
-# Then clear the text
-    ConstraintLine->setText("");
-    FunctionsBlock->setText("");
-
-}
-
-void MuSRFitform::InitializeFunction()
-{
-    my %All=CreateAllInput();
-    my @RUNS = split( /,/, $All{"RunNumbers"} );
-    
-    my @FitTypes =();
-    foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
-	if ( $FitType ne "None" ) {
-	    push( @FitTypes, $FitType );	    
-	}
-    }
-    
-# Get number of parameters to determine the size of the table 
-    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
-    my @Paramcomp = @$Paramcomp_ref;
-    my $Full_T_Block= $All{"Full_T_Block"};
+    CParamsCombo->clear();
     
     my $Component=1;
     foreach my $FitType (@FitTypes) {
 	my $Parameters=$Paramcomp[$Component-1];
 	my @Params = split( /\s+/, $Parameters );	
 
+# Alpha, N0 and NBg are counted in the parameters
+	if ( $Component == 1 && $All{"FitAsyType"} eq "Asymmetry" ) {
+	    unshift( @Params, "Alpha" );
+	}
+	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
+	    unshift( @Params, ( "N0", "NBg" ) );
+	}
+	
 # Add list to the constraints drop down menu
 	for (my $i=1; $i<=9;$i++) {		
 	    my $CParam = $Params[$i-1]."_".$Component;
 	    if ($Params[$i-1] ne "" ) {
-		CParamsCombo->insertItem($CParam,-1);
-		$Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
+		if ($Params[$i-1] ne "Alpha" && $Params[$i-1] ne "N0" && $Params[$i-1] ne "NBg") {
+		    CParamsCombo->insertItem($CParam,-1);
+		    $Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
+		}
+# also enumerate the parameters as should be used in the FUNCTIONS Block
+		$ParCount++;
+		$ParametersList=$ParametersList."$CParam \t is \t par$ParCount\n";
+		ParametersList->setText($ParametersList);
 	    }
 	}
 	$Component++;

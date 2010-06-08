@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Mon Jun 7 18:29:05 2010
+# Created: Tue Jun 8 13:35:32 2010
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -43,7 +43,7 @@ use Qt::slots
     RunSelectionToggle => [],
     fileBrowse => [],
     AppendToFunctions => [],
-    ResetFunctions => [];
+    InitializeFunctions => [];
 use Qt::attributes qw(
     musrfit_tabs
     RUNSPage
@@ -1583,7 +1583,7 @@ sub NEW
         setName("MuSRFitform" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
-    setMinimumSize(Qt::Size(21, 264) );
+    setMinimumSize(Qt::Size(21, 275) );
     setIcon($image0 );
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
@@ -1594,7 +1594,6 @@ sub NEW
     musrfit_tabs->setSizePolicy( Qt::SizePolicy(7, 7, 1, 1, musrfit_tabs->sizePolicy()->hasHeightForWidth()) );
     musrfit_tabs->setMinimumSize( Qt::Size(560, 400) );
     musrfit_tabs->setMaximumSize( Qt::Size(95, 32767) );
-    musrfit_tabs->setMouseTracking( 0 );
 
     RUNSPage = Qt::Widget(musrfit_tabs, "RUNSPage");
 
@@ -2840,7 +2839,10 @@ sub NEW
     Qt::Object::connect(T0, SIGNAL "activated()", this, SLOT "ShowMuSRT0()");
     Qt::Object::connect(Plot, SIGNAL "activated()", this, SLOT "GoPlot()");
     Qt::Object::connect(AddConstraint, SIGNAL "clicked()", this, SLOT "AppendToFunctions()");
-    Qt::Object::connect(ResetFunc, SIGNAL "clicked()", this, SLOT "ActivateShComp()");
+    Qt::Object::connect(ResetFunc, SIGNAL "clicked()", this, SLOT "InitializeFunctions()");
+    Qt::Object::connect(FitType1, SIGNAL "activated(const QString&)", this, SLOT "InitializeFunctions()");
+    Qt::Object::connect(FitType2, SIGNAL "activated(int)", this, SLOT "InitializeFunctions()");
+    Qt::Object::connect(FitType3, SIGNAL "activated(int)", this, SLOT "InitializeFunctions()");
 
     setTabOrder(musrfit_tabs, RunNumbers);
     setTabOrder(RunNumbers, BeamLine);
@@ -3532,7 +3534,9 @@ sub CreateAllInput
     
 # Functions block 
     $All{"FunctionsBlock"}=FunctionsBlock->text;
-
+# and the associated theory block
+    $All{"Func_T_Block"}=TheoryBlock->text;
+    
 # Read initial values of paramets from tabel
     my $erradd = "d";
     my $minadd = "_min";
@@ -3609,8 +3613,6 @@ sub CreateAllInput
     } else {
 	$All{"FILENAME"}="TMP";
     }
-    
-    
     
 # Return Hash with all important values
     return %All;  
@@ -3801,7 +3803,7 @@ sub ActivateShComp
 	    my $ParamChkBx="ShParam_".$Component."_".$i;
 	    my $ChkBx = child($ParamChkBx);
 #	    my $CParam = $Params[$i-1]."_".$Component;
-	    if ($Params[$i-1] ne "" && $Params[$i-1] ne "Alpha" &&  $Params[$i-1] ne "N0" && $Params[$i-1] ne "NBg") {
+	    if ($Params[$i-1] ne "" ) {
 		$ChkBx->setHidden(0);
 		$ChkBx->setEnabled(1);
 		$ChkBx ->setText($Params[$i-1]);
@@ -3867,6 +3869,11 @@ sub TabChanged
     UpdateMSRFileInitTable();
 # And also setup T0 and Bg bins
     ActivateT0Hists();
+    
+# Initialize FUNCTIONS block only if it has not been initialized yet
+    if ($All{"Func_T_Block"} eq "" ) {
+	InitializeFunctions();
+    }
 
 }
 
@@ -4039,7 +4046,7 @@ sub AppendToFunctions
 
 }
 
-sub ResetFunctions
+sub InitializeFunctions
 {
 
     my %All=CreateAllInput();
@@ -4054,37 +4061,50 @@ sub ResetFunctions
     
 # Get number of parameters to determine the size of the table 
     my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
-# For now the line below does not work. Why?    
-#    my $Paramcomp_ref=$All{"Paramcomp_ref"};
     my @Paramcomp = @$Paramcomp_ref;
     my $Full_T_Block= $All{"Full_T_Block"};
-    my $Param="";
     
-    # Initialize Parameters List in function block (constraints).    
+# Initialize Parameters List in function block (constraints).    
     my $ParametersList="";
     ParametersList->setText("");
-
 # Counter for function block (with out Alpha etc.)
     my $ParCount=0;
-     CParamsCombo->clear();
-     
-#     my $CParam = $Params[$i-1]."_".$Component;
-#		CParamsCombo->insertItem($CParam,-1);
-#		$Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
+    CParamsCombo->clear();
+    
+    my $Component=1;
+    foreach my $FitType (@FitTypes) {
+	my $Parameters=$Paramcomp[$Component-1];
+	my @Params = split( /\s+/, $Parameters );	
 
-# Also update Parameters List for the Functions block
-    (my $Ptmp,my $tmp)=split(/_/,$Param);
-    if ($Ptmp ne "" && $Ptmp ne "Alpha" &&  $Ptmp ne "N0" && $Ptmp ne "NBg") {
-	$ParCount++;
-	$ParametersList=$ParametersList."$Param is par$ParCount\n";
-	ParametersList->setText($ParametersList);
-    }
+# Alpha, N0 and NBg are counted in the parameters
+	if ( $Component == 1 && $All{"FitAsyType"} eq "Asymmetry" ) {
+	    unshift( @Params, "Alpha" );
+	}
+	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
+	    unshift( @Params, ( "N0", "NBg" ) );
+	}
+	
+# Add list to the constraints drop down menu
+	for (my $i=1; $i<=9;$i++) {		
+	    my $CParam = $Params[$i-1]."_".$Component;
+	    if ($Params[$i-1] ne "" ) {
+		if ($Params[$i-1] ne "Alpha" && $Params[$i-1] ne "N0" && $Params[$i-1] ne "NBg") {
+		    CParamsCombo->insertItem($CParam,-1);
+		    $Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
+		}
+# also enumerate the parameters as should be used in the FUNCTIONS Block
+		$ParCount++;
+		$ParametersList=$ParametersList."$CParam \t is \t par$ParCount\n";
+		ParametersList->setText($ParametersList);
+	    }
+	}
+	$Component++;
+    }  
 # Set theory block in Constraints    
     TheoryBlock->setText($Full_T_Block);
 # Then clear the text
     ConstraintLine->setText("");
     FunctionsBlock->setText("");
-
 
 }
 
