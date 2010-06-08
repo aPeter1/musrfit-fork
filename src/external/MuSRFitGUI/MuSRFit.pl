@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Thu Mar 25 15:00:34 2010
+# Created: Tue Jun 8 13:53:29 2010
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -41,7 +41,9 @@ use Qt::slots
     ShowMuSRT0 => [],
     T0Update => [],
     RunSelectionToggle => [],
-    fileBrowse => [];
+    fileBrowse => [],
+    AppendToFunctions => [],
+    InitializeFunctions => [];
 use Qt::attributes qw(
     musrfit_tabs
     RUNSPage
@@ -129,16 +131,6 @@ use Qt::attributes qw(
     FILENAME
     textMSROutput
     FourierPage
-    RRFBox
-    textLabel1_6_2_2
-    textLabel1_6
-    textLabel1_6_2_4
-    RRFFrq
-    textLabel1_6_2_3
-    RRFPack
-    textLabel1_6_2
-    RRFUnits
-    RRFPhase
     FourierBox
     FrqMin
     textLabel1_3_4
@@ -158,6 +150,16 @@ use Qt::attributes qw(
     textLabel1_3_3
     FPHASE
     textLabel1
+    RRFBox
+    textLabel1_6_2_2
+    textLabel1_6
+    textLabel1_6_2_4
+    RRFFrq
+    textLabel1_6_2_3
+    RRFPack
+    textLabel1_6_2
+    RRFUnits
+    RRFPhase
     T0Page
     groupHist0
     textLabel2
@@ -189,6 +191,19 @@ use Qt::attributes qw(
     Bg24
     Data14
     Data24
+    TabPage
+    TheoryBlock_Label
+    TheoryBlock
+    ParametersList_Label
+    ParametersList
+    CParamsCombo
+    textLabel1_4_6
+    ConstraintLine
+    AddConstraint
+    textLabel2_2_3_4
+    FunctionsBlock
+    textLabel1_6_3
+    ResetFunc
     MenuBar
     fileMenu
     Edit
@@ -2301,133 +2316,133 @@ sub NEW
 
     FourierPage = Qt::Widget(musrfit_tabs, "FourierPage");
 
-    RRFBox = Qt::GroupBox(FourierPage, "RRFBox");
-    RRFBox->setGeometry( Qt::Rect(6, 135, 547, 125) );
-
-    my $LayoutWidget_10 = Qt::Widget(RRFBox, '$LayoutWidget_10');
-    $LayoutWidget_10->setGeometry( Qt::Rect(10, 18, 265, 100) );
-    my $layout35 = Qt::GridLayout($LayoutWidget_10, 1, 1, 5, 5, '$layout35');
-
-    textLabel1_6_2_2 = Qt::Label($LayoutWidget_10, "textLabel1_6_2_2");
-
-    $layout35->addWidget(textLabel1_6_2_2, 2, 0);
-
-    textLabel1_6 = Qt::Label($LayoutWidget_10, "textLabel1_6");
-
-    $layout35->addWidget(textLabel1_6, 0, 0);
-
-    textLabel1_6_2_4 = Qt::Label($LayoutWidget_10, "textLabel1_6_2_4");
-
-    $layout35->addWidget(textLabel1_6_2_4, 2, 2);
-
-    RRFFrq = Qt::LineEdit($LayoutWidget_10, "RRFFrq");
-
-    $layout35->addWidget(RRFFrq, 0, 1);
-
-    textLabel1_6_2_3 = Qt::Label($LayoutWidget_10, "textLabel1_6_2_3");
-
-    $layout35->addWidget(textLabel1_6_2_3, 1, 2);
-
-    RRFPack = Qt::LineEdit($LayoutWidget_10, "RRFPack");
-
-    $layout35->addWidget(RRFPack, 1, 1);
-
-    textLabel1_6_2 = Qt::Label($LayoutWidget_10, "textLabel1_6_2");
-
-    $layout35->addWidget(textLabel1_6_2, 1, 0);
-
-    RRFUnits = Qt::ComboBox(0, $LayoutWidget_10, "RRFUnits");
-
-    $layout35->addWidget(RRFUnits, 0, 2);
-
-    RRFPhase = Qt::LineEdit($LayoutWidget_10, "RRFPhase");
-
-    $layout35->addWidget(RRFPhase, 2, 1);
-
     FourierBox = Qt::GroupBox(FourierPage, "FourierBox");
     FourierBox->setGeometry( Qt::Rect(6, 6, 547, 125) );
 
-    my $LayoutWidget_11 = Qt::Widget(FourierBox, '$LayoutWidget_11');
-    $LayoutWidget_11->setGeometry( Qt::Rect(12, 19, 525, 100) );
-    my $layout34_2 = Qt::GridLayout($LayoutWidget_11, 1, 1, 5, 5, '$layout34_2');
+    my $LayoutWidget_10 = Qt::Widget(FourierBox, '$LayoutWidget_10');
+    $LayoutWidget_10->setGeometry( Qt::Rect(12, 19, 525, 100) );
+    my $layout34_2 = Qt::GridLayout($LayoutWidget_10, 1, 1, 5, 5, '$layout34_2');
 
-    FrqMin = Qt::LineEdit($LayoutWidget_11, "FrqMin");
+    FrqMin = Qt::LineEdit($LayoutWidget_10, "FrqMin");
     FrqMin->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FrqMin->sizePolicy()->hasHeightForWidth()) );
 
     $layout34_2->addWidget(FrqMin, 0, 3);
 
-    textLabel1_3_4 = Qt::Label($LayoutWidget_11, "textLabel1_3_4");
+    textLabel1_3_4 = Qt::Label($LayoutWidget_10, "textLabel1_3_4");
 
     $layout34_2->addWidget(textLabel1_3_4, 1, 5);
 
-    textLabel1_7 = Qt::Label($LayoutWidget_11, "textLabel1_7");
+    textLabel1_7 = Qt::Label($LayoutWidget_10, "textLabel1_7");
 
     $layout34_2->addWidget(textLabel1_7, 1, 2);
 
-    textLabel1_3_5 = Qt::Label($LayoutWidget_11, "textLabel1_3_5");
+    textLabel1_3_5 = Qt::Label($LayoutWidget_10, "textLabel1_3_5");
 
     $layout34_2->addWidget(textLabel1_3_5, 2, 2);
 
-    FUnits = Qt::ComboBox(0, $LayoutWidget_11, "FUnits");
+    FUnits = Qt::ComboBox(0, $LayoutWidget_10, "FUnits");
     FUnits->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FUnits->sizePolicy()->hasHeightForWidth()) );
 
     $layout34_2->addWidget(FUnits, 0, 1);
 
-    textLabel1_3_6 = Qt::Label($LayoutWidget_11, "textLabel1_3_6");
+    textLabel1_3_6 = Qt::Label($LayoutWidget_10, "textLabel1_3_6");
 
     $layout34_2->addWidget(textLabel1_3_6, 2, 3);
 
-    FApodization = Qt::ComboBox(0, $LayoutWidget_11, "FApodization");
+    FApodization = Qt::ComboBox(0, $LayoutWidget_10, "FApodization");
     FApodization->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FApodization->sizePolicy()->hasHeightForWidth()) );
 
     $layout34_2->addWidget(FApodization, 1, 1);
 
-    FrqMax = Qt::LineEdit($LayoutWidget_11, "FrqMax");
+    FrqMax = Qt::LineEdit($LayoutWidget_10, "FrqMax");
     FrqMax->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FrqMax->sizePolicy()->hasHeightForWidth()) );
 
     $layout34_2->addWidget(FrqMax, 0, 5);
 
-    FPlot = Qt::ComboBox(0, $LayoutWidget_11, "FPlot");
+    FPlot = Qt::ComboBox(0, $LayoutWidget_10, "FPlot");
     FPlot->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FPlot->sizePolicy()->hasHeightForWidth()) );
 
     $layout34_2->addWidget(FPlot, 2, 1);
 
-    FUnitsLabel = Qt::Label($LayoutWidget_11, "FUnitsLabel");
+    FUnitsLabel = Qt::Label($LayoutWidget_10, "FUnitsLabel");
 
     $layout34_2->addWidget(FUnitsLabel, 0, 0);
 
-    textLabel1_3_8 = Qt::Label($LayoutWidget_11, "textLabel1_3_8");
+    textLabel1_3_8 = Qt::Label($LayoutWidget_10, "textLabel1_3_8");
 
     $layout34_2->addWidget(textLabel1_3_8, 2, 5);
 
-    textLabel1_3_7 = Qt::Label($LayoutWidget_11, "textLabel1_3_7");
+    textLabel1_3_7 = Qt::Label($LayoutWidget_10, "textLabel1_3_7");
 
     $layout34_2->addWidget(textLabel1_3_7, 2, 4);
 
-    FPlotLabel = Qt::Label($LayoutWidget_11, "FPlotLabel");
+    FPlotLabel = Qt::Label($LayoutWidget_10, "FPlotLabel");
 
     $layout34_2->addWidget(FPlotLabel, 2, 0);
 
-    textLabel1_2 = Qt::Label($LayoutWidget_11, "textLabel1_2");
+    textLabel1_2 = Qt::Label($LayoutWidget_10, "textLabel1_2");
 
     $layout34_2->addWidget(textLabel1_2, 0, 4);
 
-    FApodizationLabel = Qt::Label($LayoutWidget_11, "FApodizationLabel");
+    FApodizationLabel = Qt::Label($LayoutWidget_10, "FApodizationLabel");
 
     $layout34_2->addWidget(FApodizationLabel, 1, 0);
 
-    textLabel1_3_3 = Qt::Label($LayoutWidget_11, "textLabel1_3_3");
+    textLabel1_3_3 = Qt::Label($LayoutWidget_10, "textLabel1_3_3");
 
     $layout34_2->addWidget(textLabel1_3_3, 1, 4);
 
-    FPHASE = Qt::LineEdit($LayoutWidget_11, "FPHASE");
+    FPHASE = Qt::LineEdit($LayoutWidget_10, "FPHASE");
     FPHASE->setSizePolicy( Qt::SizePolicy(5, 5, 0, 0, FPHASE->sizePolicy()->hasHeightForWidth()) );
 
     $layout34_2->addWidget(FPHASE, 1, 3);
 
-    textLabel1 = Qt::Label($LayoutWidget_11, "textLabel1");
+    textLabel1 = Qt::Label($LayoutWidget_10, "textLabel1");
 
     $layout34_2->addWidget(textLabel1, 0, 2);
+
+    RRFBox = Qt::GroupBox(FourierPage, "RRFBox");
+    RRFBox->setGeometry( Qt::Rect(6, 135, 547, 125) );
+
+    my $LayoutWidget_11 = Qt::Widget(RRFBox, '$LayoutWidget_11');
+    $LayoutWidget_11->setGeometry( Qt::Rect(10, 18, 265, 100) );
+    my $layout35 = Qt::GridLayout($LayoutWidget_11, 1, 1, 5, 5, '$layout35');
+
+    textLabel1_6_2_2 = Qt::Label($LayoutWidget_11, "textLabel1_6_2_2");
+
+    $layout35->addWidget(textLabel1_6_2_2, 2, 0);
+
+    textLabel1_6 = Qt::Label($LayoutWidget_11, "textLabel1_6");
+
+    $layout35->addWidget(textLabel1_6, 0, 0);
+
+    textLabel1_6_2_4 = Qt::Label($LayoutWidget_11, "textLabel1_6_2_4");
+
+    $layout35->addWidget(textLabel1_6_2_4, 2, 2);
+
+    RRFFrq = Qt::LineEdit($LayoutWidget_11, "RRFFrq");
+
+    $layout35->addWidget(RRFFrq, 0, 1);
+
+    textLabel1_6_2_3 = Qt::Label($LayoutWidget_11, "textLabel1_6_2_3");
+
+    $layout35->addWidget(textLabel1_6_2_3, 1, 2);
+
+    RRFPack = Qt::LineEdit($LayoutWidget_11, "RRFPack");
+
+    $layout35->addWidget(RRFPack, 1, 1);
+
+    textLabel1_6_2 = Qt::Label($LayoutWidget_11, "textLabel1_6_2");
+
+    $layout35->addWidget(textLabel1_6_2, 1, 0);
+
+    RRFUnits = Qt::ComboBox(0, $LayoutWidget_11, "RRFUnits");
+
+    $layout35->addWidget(RRFUnits, 0, 2);
+
+    RRFPhase = Qt::LineEdit($LayoutWidget_11, "RRFPhase");
+
+    $layout35->addWidget(RRFPhase, 2, 1);
     musrfit_tabs->insertTab( FourierPage, "" );
 
     T0Page = Qt::Widget(musrfit_tabs, "T0Page");
@@ -2556,6 +2571,225 @@ sub NEW
 
     $T0PageLayout->addLayout($layout27, 0, 0);
     musrfit_tabs->insertTab( T0Page, "" );
+
+    TabPage = Qt::Widget(musrfit_tabs, "TabPage");
+
+    my $LayoutWidget_17 = Qt::Widget(TabPage, '$LayoutWidget_17');
+    $LayoutWidget_17->setGeometry( Qt::Rect(11, 6, 540, 360) );
+    my $layout34_2_2 = Qt::VBoxLayout($LayoutWidget_17, 11, 6, '$layout34_2_2');
+
+    my $layout33_2 = Qt::GridLayout(undef, 1, 1, 0, 6, '$layout33_2');
+
+    TheoryBlock_Label = Qt::Label($LayoutWidget_17, "TheoryBlock_Label");
+    $cg->setColor(&Qt::ColorGroup::Foreground, &black);
+    $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
+    $cg->setColor(&Qt::ColorGroup::Light, &white);
+    $cg->setColor(&Qt::ColorGroup::Midlight, Qt::Color(242,247,252));
+    $cg->setColor(&Qt::ColorGroup::Dark, Qt::Color(115,120,124));
+    $cg->setColor(&Qt::ColorGroup::Mid, Qt::Color(154,160,166));
+    $cg->setColor(&Qt::ColorGroup::Text, &black);
+    $cg->setColor(&Qt::ColorGroup::BrightText, &white);
+    $cg->setColor(&Qt::ColorGroup::ButtonText, &black);
+    $cg->setColor(&Qt::ColorGroup::Base, &white);
+    $cg->setColor(&Qt::ColorGroup::Background, Qt::Color(255,255,127));
+    $cg->setColor(&Qt::ColorGroup::Shadow, &black);
+    $cg->setColor(&Qt::ColorGroup::Highlight, Qt::Color(0,0,128));
+    $cg->setColor(&Qt::ColorGroup::HighlightedText, &white);
+    $cg->setColor(&Qt::ColorGroup::Link, &black);
+    $cg->setColor(&Qt::ColorGroup::LinkVisited, &black);
+    $pal->setActive($cg);
+    $cg->setColor(&Qt::ColorGroup::Foreground, &black);
+    $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
+    $cg->setColor(&Qt::ColorGroup::Light, &white);
+    $cg->setColor(&Qt::ColorGroup::Midlight, &white);
+    $cg->setColor(&Qt::ColorGroup::Dark, Qt::Color(115,120,124));
+    $cg->setColor(&Qt::ColorGroup::Mid, Qt::Color(154,160,166));
+    $cg->setColor(&Qt::ColorGroup::Text, &black);
+    $cg->setColor(&Qt::ColorGroup::BrightText, &white);
+    $cg->setColor(&Qt::ColorGroup::ButtonText, &black);
+    $cg->setColor(&Qt::ColorGroup::Base, &white);
+    $cg->setColor(&Qt::ColorGroup::Background, Qt::Color(255,255,127));
+    $cg->setColor(&Qt::ColorGroup::Shadow, &black);
+    $cg->setColor(&Qt::ColorGroup::Highlight, Qt::Color(0,0,128));
+    $cg->setColor(&Qt::ColorGroup::HighlightedText, &white);
+    $cg->setColor(&Qt::ColorGroup::Link, Qt::Color(0,0,238));
+    $cg->setColor(&Qt::ColorGroup::LinkVisited, Qt::Color(82,24,139));
+    $pal->setInactive($cg);
+    $cg->setColor(&Qt::ColorGroup::Foreground, Qt::Color(128,128,128));
+    $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
+    $cg->setColor(&Qt::ColorGroup::Light, &white);
+    $cg->setColor(&Qt::ColorGroup::Midlight, &white);
+    $cg->setColor(&Qt::ColorGroup::Dark, Qt::Color(115,120,124));
+    $cg->setColor(&Qt::ColorGroup::Mid, Qt::Color(154,160,166));
+    $cg->setColor(&Qt::ColorGroup::Text, Qt::Color(128,128,128));
+    $cg->setColor(&Qt::ColorGroup::BrightText, &white);
+    $cg->setColor(&Qt::ColorGroup::ButtonText, Qt::Color(128,128,128));
+    $cg->setColor(&Qt::ColorGroup::Base, &white);
+    $cg->setColor(&Qt::ColorGroup::Background, Qt::Color(255,255,127));
+    $cg->setColor(&Qt::ColorGroup::Shadow, &black);
+    $cg->setColor(&Qt::ColorGroup::Highlight, Qt::Color(0,0,128));
+    $cg->setColor(&Qt::ColorGroup::HighlightedText, &white);
+    $cg->setColor(&Qt::ColorGroup::Link, Qt::Color(0,0,238));
+    $cg->setColor(&Qt::ColorGroup::LinkVisited, Qt::Color(82,24,139));
+    $pal->setDisabled($cg);
+    TheoryBlock_Label->setPalette( $pal );
+
+    $layout33_2->addWidget(TheoryBlock_Label, 0, 0);
+
+    TheoryBlock = Qt::TextEdit($LayoutWidget_17, "TheoryBlock");
+    TheoryBlock->setEnabled( 1 );
+
+    $layout33_2->addWidget(TheoryBlock, 1, 0);
+
+    ParametersList_Label = Qt::Label($LayoutWidget_17, "ParametersList_Label");
+    $cg->setColor(&Qt::ColorGroup::Foreground, &black);
+    $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
+    $cg->setColor(&Qt::ColorGroup::Light, &white);
+    $cg->setColor(&Qt::ColorGroup::Midlight, Qt::Color(242,247,252));
+    $cg->setColor(&Qt::ColorGroup::Dark, Qt::Color(115,120,124));
+    $cg->setColor(&Qt::ColorGroup::Mid, Qt::Color(154,160,166));
+    $cg->setColor(&Qt::ColorGroup::Text, &black);
+    $cg->setColor(&Qt::ColorGroup::BrightText, &white);
+    $cg->setColor(&Qt::ColorGroup::ButtonText, &black);
+    $cg->setColor(&Qt::ColorGroup::Base, &white);
+    $cg->setColor(&Qt::ColorGroup::Background, Qt::Color(255,255,127));
+    $cg->setColor(&Qt::ColorGroup::Shadow, &black);
+    $cg->setColor(&Qt::ColorGroup::Highlight, Qt::Color(0,0,128));
+    $cg->setColor(&Qt::ColorGroup::HighlightedText, &white);
+    $cg->setColor(&Qt::ColorGroup::Link, &black);
+    $cg->setColor(&Qt::ColorGroup::LinkVisited, &black);
+    $pal->setActive($cg);
+    $cg->setColor(&Qt::ColorGroup::Foreground, &black);
+    $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
+    $cg->setColor(&Qt::ColorGroup::Light, &white);
+    $cg->setColor(&Qt::ColorGroup::Midlight, &white);
+    $cg->setColor(&Qt::ColorGroup::Dark, Qt::Color(115,120,124));
+    $cg->setColor(&Qt::ColorGroup::Mid, Qt::Color(154,160,166));
+    $cg->setColor(&Qt::ColorGroup::Text, &black);
+    $cg->setColor(&Qt::ColorGroup::BrightText, &white);
+    $cg->setColor(&Qt::ColorGroup::ButtonText, &black);
+    $cg->setColor(&Qt::ColorGroup::Base, &white);
+    $cg->setColor(&Qt::ColorGroup::Background, Qt::Color(255,255,127));
+    $cg->setColor(&Qt::ColorGroup::Shadow, &black);
+    $cg->setColor(&Qt::ColorGroup::Highlight, Qt::Color(0,0,128));
+    $cg->setColor(&Qt::ColorGroup::HighlightedText, &white);
+    $cg->setColor(&Qt::ColorGroup::Link, Qt::Color(0,0,238));
+    $cg->setColor(&Qt::ColorGroup::LinkVisited, Qt::Color(82,24,139));
+    $pal->setInactive($cg);
+    $cg->setColor(&Qt::ColorGroup::Foreground, Qt::Color(128,128,128));
+    $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
+    $cg->setColor(&Qt::ColorGroup::Light, &white);
+    $cg->setColor(&Qt::ColorGroup::Midlight, &white);
+    $cg->setColor(&Qt::ColorGroup::Dark, Qt::Color(115,120,124));
+    $cg->setColor(&Qt::ColorGroup::Mid, Qt::Color(154,160,166));
+    $cg->setColor(&Qt::ColorGroup::Text, Qt::Color(128,128,128));
+    $cg->setColor(&Qt::ColorGroup::BrightText, &white);
+    $cg->setColor(&Qt::ColorGroup::ButtonText, Qt::Color(128,128,128));
+    $cg->setColor(&Qt::ColorGroup::Base, &white);
+    $cg->setColor(&Qt::ColorGroup::Background, Qt::Color(255,255,127));
+    $cg->setColor(&Qt::ColorGroup::Shadow, &black);
+    $cg->setColor(&Qt::ColorGroup::Highlight, Qt::Color(0,0,128));
+    $cg->setColor(&Qt::ColorGroup::HighlightedText, &white);
+    $cg->setColor(&Qt::ColorGroup::Link, Qt::Color(0,0,238));
+    $cg->setColor(&Qt::ColorGroup::LinkVisited, Qt::Color(82,24,139));
+    $pal->setDisabled($cg);
+    ParametersList_Label->setPalette( $pal );
+
+    $layout33_2->addWidget(ParametersList_Label, 0, 1);
+
+    ParametersList = Qt::TextEdit($LayoutWidget_17, "ParametersList");
+    ParametersList->setEnabled( 1 );
+
+    $layout33_2->addWidget(ParametersList, 1, 1);
+    $layout34_2_2->addLayout($layout33_2);
+
+    my $layout25_6 = Qt::HBoxLayout(undef, 0, 6, '$layout25_6');
+
+    CParamsCombo = Qt::ComboBox(0, $LayoutWidget_17, "CParamsCombo");
+    CParamsCombo->setSizePolicy( Qt::SizePolicy(0, 7, 0, 0, CParamsCombo->sizePolicy()->hasHeightForWidth()) );
+    $layout25_6->addWidget(CParamsCombo);
+
+    textLabel1_4_6 = Qt::Label($LayoutWidget_17, "textLabel1_4_6");
+    $layout25_6->addWidget(textLabel1_4_6);
+
+    ConstraintLine = Qt::LineEdit($LayoutWidget_17, "ConstraintLine");
+    ConstraintLine->setSizePolicy( Qt::SizePolicy(7, 7, 0, 0, ConstraintLine->sizePolicy()->hasHeightForWidth()) );
+    ConstraintLine->setMinimumSize( Qt::Size(0, 25) );
+    $layout25_6->addWidget(ConstraintLine);
+
+    AddConstraint = Qt::PushButton($LayoutWidget_17, "AddConstraint");
+    AddConstraint->setSizePolicy( Qt::SizePolicy(0, 7, 0, 0, AddConstraint->sizePolicy()->hasHeightForWidth()) );
+    $layout25_6->addWidget(AddConstraint);
+    $layout34_2_2->addLayout($layout25_6);
+
+    textLabel2_2_3_4 = Qt::Label($LayoutWidget_17, "textLabel2_2_3_4");
+    $cg->setColor(&Qt::ColorGroup::Foreground, &black);
+    $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
+    $cg->setColor(&Qt::ColorGroup::Light, &white);
+    $cg->setColor(&Qt::ColorGroup::Midlight, Qt::Color(242,247,252));
+    $cg->setColor(&Qt::ColorGroup::Dark, Qt::Color(115,120,124));
+    $cg->setColor(&Qt::ColorGroup::Mid, Qt::Color(154,160,166));
+    $cg->setColor(&Qt::ColorGroup::Text, &black);
+    $cg->setColor(&Qt::ColorGroup::BrightText, &white);
+    $cg->setColor(&Qt::ColorGroup::ButtonText, &black);
+    $cg->setColor(&Qt::ColorGroup::Base, &white);
+    $cg->setColor(&Qt::ColorGroup::Background, Qt::Color(255,255,127));
+    $cg->setColor(&Qt::ColorGroup::Shadow, &black);
+    $cg->setColor(&Qt::ColorGroup::Highlight, Qt::Color(0,0,128));
+    $cg->setColor(&Qt::ColorGroup::HighlightedText, &white);
+    $cg->setColor(&Qt::ColorGroup::Link, &black);
+    $cg->setColor(&Qt::ColorGroup::LinkVisited, &black);
+    $pal->setActive($cg);
+    $cg->setColor(&Qt::ColorGroup::Foreground, &black);
+    $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
+    $cg->setColor(&Qt::ColorGroup::Light, &white);
+    $cg->setColor(&Qt::ColorGroup::Midlight, &white);
+    $cg->setColor(&Qt::ColorGroup::Dark, Qt::Color(115,120,124));
+    $cg->setColor(&Qt::ColorGroup::Mid, Qt::Color(154,160,166));
+    $cg->setColor(&Qt::ColorGroup::Text, &black);
+    $cg->setColor(&Qt::ColorGroup::BrightText, &white);
+    $cg->setColor(&Qt::ColorGroup::ButtonText, &black);
+    $cg->setColor(&Qt::ColorGroup::Base, &white);
+    $cg->setColor(&Qt::ColorGroup::Background, Qt::Color(255,255,127));
+    $cg->setColor(&Qt::ColorGroup::Shadow, &black);
+    $cg->setColor(&Qt::ColorGroup::Highlight, Qt::Color(0,0,128));
+    $cg->setColor(&Qt::ColorGroup::HighlightedText, &white);
+    $cg->setColor(&Qt::ColorGroup::Link, Qt::Color(0,0,238));
+    $cg->setColor(&Qt::ColorGroup::LinkVisited, Qt::Color(82,24,139));
+    $pal->setInactive($cg);
+    $cg->setColor(&Qt::ColorGroup::Foreground, Qt::Color(128,128,128));
+    $cg->setColor(&Qt::ColorGroup::Button, Qt::Color(230,240,249));
+    $cg->setColor(&Qt::ColorGroup::Light, &white);
+    $cg->setColor(&Qt::ColorGroup::Midlight, &white);
+    $cg->setColor(&Qt::ColorGroup::Dark, Qt::Color(115,120,124));
+    $cg->setColor(&Qt::ColorGroup::Mid, Qt::Color(154,160,166));
+    $cg->setColor(&Qt::ColorGroup::Text, Qt::Color(128,128,128));
+    $cg->setColor(&Qt::ColorGroup::BrightText, &white);
+    $cg->setColor(&Qt::ColorGroup::ButtonText, Qt::Color(128,128,128));
+    $cg->setColor(&Qt::ColorGroup::Base, &white);
+    $cg->setColor(&Qt::ColorGroup::Background, Qt::Color(255,255,127));
+    $cg->setColor(&Qt::ColorGroup::Shadow, &black);
+    $cg->setColor(&Qt::ColorGroup::Highlight, Qt::Color(0,0,128));
+    $cg->setColor(&Qt::ColorGroup::HighlightedText, &white);
+    $cg->setColor(&Qt::ColorGroup::Link, Qt::Color(0,0,238));
+    $cg->setColor(&Qt::ColorGroup::LinkVisited, Qt::Color(82,24,139));
+    $pal->setDisabled($cg);
+    textLabel2_2_3_4->setPalette( $pal );
+    $layout34_2_2->addWidget(textLabel2_2_3_4);
+
+    FunctionsBlock = Qt::TextEdit($LayoutWidget_17, "FunctionsBlock");
+    $layout34_2_2->addWidget(FunctionsBlock);
+
+    my $layout30 = Qt::HBoxLayout(undef, 0, 6, '$layout30');
+
+    textLabel1_6_3 = Qt::Label($LayoutWidget_17, "textLabel1_6_3");
+    $layout30->addWidget(textLabel1_6_3);
+
+    ResetFunc = Qt::PushButton($LayoutWidget_17, "ResetFunc");
+    ResetFunc->setMaximumSize( Qt::Size(100, 32767) );
+    $layout30->addWidget(ResetFunc);
+    $layout34_2_2->addLayout($layout30);
+    musrfit_tabs->insertTab( TabPage, "" );
 
     fileNewAction= Qt::Action(this, "fileNewAction");
     fileNewAction->setIconSet( Qt::IconSet($image3) );
@@ -2717,6 +2951,11 @@ sub NEW
     Qt::Object::connect(T0, SIGNAL "activated()", this, SLOT "ShowMuSRT0()");
     Qt::Object::connect(Plot, SIGNAL "activated()", this, SLOT "GoPlot()");
     Qt::Object::connect(ManualFile, SIGNAL "toggled(bool)", this, SLOT "RunSelectionToggle()");
+    Qt::Object::connect(ResetFunc, SIGNAL "clicked()", this, SLOT "InitializeFunctions()");
+    Qt::Object::connect(FitType1, SIGNAL "activated(const QString&)", this, SLOT "InitializeFunctions()");
+    Qt::Object::connect(FitType2, SIGNAL "activated(const QString&)", this, SLOT "InitializeFunctions()");
+    Qt::Object::connect(FitType3, SIGNAL "activated(const QString&)", this, SLOT "InitializeFunctions()");
+    Qt::Object::connect(AddConstraint, SIGNAL "clicked()", this, SLOT "AppendToFunctions()");
 
     setTabOrder(musrfit_tabs, RunNumbers);
     setTabOrder(RunNumbers, BeamLine);
@@ -2909,7 +3148,7 @@ sub languageChange
     textLabel1_5->setText( trUtf8("Minimization type") );
     ltc->setText( trUtf8("Life time correction") );
     musrfit_tabs->changeTab( FittingPage, trUtf8("Fitting") );
-    buttonGroupSharing->setTitle( trUtf8("Shared Parameters") );
+    buttonGroupSharing->setTitle( trUtf8("Shared parameters among different runs") );
     SharingComp1->setTitle( trUtf8("1st Component") );
     ShParam_1_1->setText( trUtf8("Param1") );
     ShParam_1_2->setText( trUtf8("Param2") );
@@ -2958,20 +3197,7 @@ sub languageChange
     Qt::ToolTip::add(FILENAME, trUtf8("Name of the produced MSR file (optional)"));
     Qt::WhatsThis::add(FILENAME, trUtf8("Name of the produced MSR file (optional)"));
     musrfit_tabs->changeTab( MSRPage, trUtf8("MSR File") );
-    RRFBox->setTitle( trUtf8("RRF") );
-    textLabel1_6_2_2->setText( trUtf8("Phase") );
-    textLabel1_6->setText( trUtf8("Frequency") );
-    textLabel1_6_2_4->setText( undef );
-    RRFFrq->setText( undef );
-    textLabel1_6_2_3->setText( undef );
-    textLabel1_6_2->setText( trUtf8("Packing") );
-    RRFUnits->clear();
-    RRFUnits->insertItem( trUtf8("MHz") );
-    RRFUnits->insertItem( trUtf8("kHz") );
-    RRFUnits->insertItem( trUtf8("Mc/s") );
-    RRFUnits->insertItem( trUtf8("G") );
-    RRFUnits->insertItem( trUtf8("T") );
-    FourierBox->setTitle( trUtf8("Fourier") );
+    FourierBox->setTitle( trUtf8("Fourier transform parameters") );
     textLabel1_3_4->setText( undef );
     textLabel1_7->setText( trUtf8("Phase:") );
     textLabel1_3_5->setText( undef );
@@ -2999,6 +3225,19 @@ sub languageChange
     FApodizationLabel->setText( trUtf8("Apodization") );
     textLabel1_3_3->setText( undef );
     textLabel1->setText( trUtf8("Range: from") );
+    RRFBox->setTitle( trUtf8("Rotatting reference frame (RRF) parameters") );
+    textLabel1_6_2_2->setText( trUtf8("Phase") );
+    textLabel1_6->setText( trUtf8("Frequency") );
+    textLabel1_6_2_4->setText( undef );
+    RRFFrq->setText( undef );
+    textLabel1_6_2_3->setText( undef );
+    textLabel1_6_2->setText( trUtf8("Packing") );
+    RRFUnits->clear();
+    RRFUnits->insertItem( trUtf8("MHz") );
+    RRFUnits->insertItem( trUtf8("kHz") );
+    RRFUnits->insertItem( trUtf8("Mc/s") );
+    RRFUnits->insertItem( trUtf8("G") );
+    RRFUnits->insertItem( trUtf8("T") );
     musrfit_tabs->changeTab( FourierPage, trUtf8("FFT/RRF") );
     groupHist0->setTitle( undef );
     textLabel2->setText( trUtf8("t0") );
@@ -3011,6 +3250,14 @@ sub languageChange
     groupHist3->setTitle( trUtf8("Hist3") );
     groupHist4->setTitle( trUtf8("Hist4") );
     musrfit_tabs->changeTab( T0Page, trUtf8("t0/Bg") );
+    TheoryBlock_Label->setText( trUtf8("THEORY Block") );
+    ParametersList_Label->setText( trUtf8("Parameters List") );
+    textLabel1_4_6->setText( trUtf8("=") );
+    AddConstraint->setText( trUtf8("Add") );
+    textLabel2_2_3_4->setText( trUtf8("FUNCTIONS Block") );
+    textLabel1_6_3->setText( undef );
+    ResetFunc->setText( trUtf8("Reset") );
+    musrfit_tabs->changeTab( TabPage, trUtf8("Constraints") );
     fileNewAction->setText( trUtf8("&New") );
     fileNewAction->setMenuText( trUtf8("&New") );
     fileNewAction->setAccel( Qt::KeySequence( trUtf8("Ctrl+N") ) );
@@ -3418,6 +3665,10 @@ sub CreateAllInput
     $All{"Paramcomp_ref"}=$Paramcomp_ref;
     my @Paramcomp = @$Paramcomp_ref;
     
+# Functions block 
+    $All{"FunctionsBlock"}=FunctionsBlock->text;
+# and the associated theory block
+    $All{"Func_T_Block"}=TheoryBlock->text;
     
 # Shared settings are detected here
     my $Shared = 0; 
@@ -3568,7 +3819,7 @@ sub UpdateMSRFileInitTable
 	$PCount++;
 	my @Param=split(/\s+/,$line);
 	
-# Depending on home many elements in @Param determine what they mean
+# Depending on how many elements in @Param determine what they mean
 # 0th element is empty (always)
 # 1st element is the order (always)	
 # 2nd element is the name (always)
@@ -3753,6 +4004,11 @@ sub TabChanged
     UpdateMSRFileInitTable();
 # And also setup T0 and Bg bins
     ActivateT0Hists();
+    
+# Initialize FUNCTIONS block only if it has not been initialized yet
+    if ($All{"Func_T_Block"} eq "" ) {
+	InitializeFunctions();
+    }    
 
 }
 
@@ -3902,6 +4158,88 @@ sub fileBrowse
 	$RunFiles=join(",",$RunFiles,@files);
     }
     RunFiles->setText($RunFiles);
+
+}
+
+sub AppendToFunctions
+{
+
+    my $ParName=CParamsCombo->currentText();
+    my $Full_T_Block=TheoryBlock->text;
+    my $Constraint=ConstraintLine->text;
+# Then clear the text
+    ConstraintLine->setText("");
+    
+# Check how many constraints (lines) in FUNCTIONS Block    
+    my $i=FunctionsBlock->lines();
+    my $ConstLine="fun$i = $Constraint\n";
+    FunctionsBlock->append($ConstLine);
+    
+# Replace parameter in theory block with fun$i
+    $Full_T_Block=~ s/$ParName/fun$i/;
+    TheoryBlock->setText($Full_T_Block);
+
+}
+
+sub InitializeFunctions
+{
+
+    my %All=CreateAllInput();
+    my @RUNS = split( /,/, $All{"RunNumbers"} );
+    
+    my @FitTypes =();
+    foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
+	if ( $FitType ne "None" ) {
+	    push( @FitTypes, $FitType );	    
+	}
+    }
+    
+# Get number of parameters to determine the size of the table 
+    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
+    my @Paramcomp = @$Paramcomp_ref;
+    my $Full_T_Block= $All{"Full_T_Block"};
+    
+# Initialize Parameters List in function block (constraints).    
+    my $ParametersList="";
+    ParametersList->setText("");
+# Counter for function block (with out Alpha etc.)
+    my $ParCount=0;
+    CParamsCombo->clear();
+    
+    my $Component=1;
+    foreach my $FitType (@FitTypes) {
+	my $Parameters=$Paramcomp[$Component-1];
+	my @Params = split( /\s+/, $Parameters );	
+
+# Alpha, N0 and NBg are counted in the parameters
+	if ( $Component == 1 && $All{"FitAsyType"} eq "Asymmetry" ) {
+	    unshift( @Params, "Alpha" );
+	}
+	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
+	    unshift( @Params, ( "N0", "NBg" ) );
+	}
+	
+# Add list to the constraints drop down menu
+	for (my $i=1; $i<=9;$i++) {		
+	    my $CParam = $Params[$i-1]."_".$Component;
+	    if ($Params[$i-1] ne "" ) {
+		if ($Params[$i-1] ne "Alpha" && $Params[$i-1] ne "N0" && $Params[$i-1] ne "NBg") {
+		    CParamsCombo->insertItem($CParam,-1);
+		    $Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
+		}
+# also enumerate the parameters as should be used in the FUNCTIONS Block
+		$ParCount++;
+		$ParametersList=$ParametersList."$CParam \t is \t par$ParCount\n";
+		ParametersList->setText($ParametersList);
+	    }
+	}
+	$Component++;
+    }  
+# Set theory block in Constraints    
+    TheoryBlock->setText($Full_T_Block);
+# Then clear the text
+    ConstraintLine->setText("");
+    FunctionsBlock->setText("");
 
 }
 

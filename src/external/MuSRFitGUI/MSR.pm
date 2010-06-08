@@ -124,6 +124,21 @@ sub CreateMSR {
     my ($Full_T_Block,$Paramcomp_ref)=MSR::CreateTheory(@FitTypes);
     my @Paramcomp = @$Paramcomp_ref;
 
+
+    # If we have a FUNCTIONS Block the Full_T_Block should be 
+    # replaced by Func_T_Block
+    $FUNCTIONS_Block = $EMPTY;
+    if ($All{"FunctionsBlock"} ne $EMPTY) {
+	$FUNCTIONS_Block = "
+###############################################################
+FUNCTIONS
+###############################################################
+".$All{"FunctionsBlock"}."\n";
+	$Full_T_Block=$All{"Func_T_Block"};
+	# remove all _N to end (may fail with large number of parameters)
+	$Full_T_Block =~ s/_\d\b//g;
+    }
+
     # Counter for RUNS
     my $iRun = 1;
 
@@ -344,13 +359,13 @@ FITPARAMETER
       $PCount      $Param    $value     $error    $error    $minvalue    $maxvalue";
     }
 
-
     $Full_T_Block = "
 ###############################################################
 THEORY
 ###############################################################
 $Full_T_Block
 ";
+
 
     $RUN_Block =
       "###############################################################
@@ -419,7 +434,7 @@ STATISTIC --- 0000-00-00 00:00:00
 
 
     # Empty line at the end of each block
-    my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$FOURIER_Block\n$STAT_Block\n";
+    my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$FUNCTIONS_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$FOURIER_Block\n$STAT_Block\n";
 
 # Open output file FILENAME.msr
     open( OUTF,q{>},"$FILENAME.msr" );
@@ -471,6 +486,20 @@ sub CreateMSRSingleHist {
     # First create the THEORY Block
     my ($Full_T_Block,$Paramcomp_ref)=MSR::CreateTheory(@FitTypes);
     my @Paramcomp = @$Paramcomp_ref;
+
+    # If we have a FUNCTIONS Block the Full_T_Block should be 
+    # replaced by Func_T_Block
+    $FUNCTIONS_Block = $EMPTY;
+    if ($All{"FunctionsBlock"} ne $EMPTY) {
+	$FUNCTIONS_Block = "
+###############################################################
+FUNCTIONS
+###############################################################
+".$All{"FunctionsBlock"}."\n";
+	$Full_T_Block=$All{"Func_T_Block"};
+	# remove all _N to end
+	$Full_T_Block =~ s/_\d\b//g;
+    }
 
     # Counter for RUNS
     my $iRun = 1;
@@ -783,7 +812,7 @@ STATISTIC --- 0000-00-00 00:00:00
 
 
     # Empty line at the end of each block
-    my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$FOURIER_Block\n$STAT_Block\n";
+    my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$FUNCTIONS_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$FOURIER_Block\n$STAT_Block\n";
 
 # Open output file FILENAME.msr
     open( OUTF,q{>},"$FILENAME.msr" );
