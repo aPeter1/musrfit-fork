@@ -1,0 +1,562 @@
+#LyX 1.6.4 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass revtex4
+\begin_preamble
+
+%\documentclass[aps,nofootinbib,superscriptaddress,preprint]{revtex4}
+
+
+\newcommand{\bnmr}{$\beta$-NMR}
+\newcommand{\Li}{$^8$Li}
+\newcommand{\Mn}{Mn$_{12}$}
+\newcommand{\Fe}{Fe$_{4}$}
+\newcommand{\musr}{$\mu$SR}
+\newcommand{\lem}{LE-$\mu$SR}
+\end_preamble
+\options aps,nofootinbib,superscriptaddress
+\use_default_options false
+\language english
+\inputencoding latin1
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize a4paper
+\use_geometry false
+\use_amsmath 0
+\use_esint 0
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\leftmargin 1cm
+\rightmargin 1cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Title
+MuSRFit GUI Documentation
+\end_layout
+
+\begin_layout Author
+Zaher Salman
+\end_layout
+
+\begin_layout Affiliation
+Laboratory for Muon Spin Spectroscopy, Paul Scherrer Institut, CH-5232 Villigen,
+ Switzerland 
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+This document gives a quick guide for using MuSRFit graphical user interface
+ (GUI).
+ The GUI is developed using Perl and PerlQT3, and provides a simple layer
+ that utilises the musrfit package.
+ MuSRFit allows the user to fit musr data without the need for any knowledge
+ about musrfit itself.
+ However, due to its simplicity, it is also limited in its applications.
+ These limitations will be obvious once more complicated functions are required
+ to fit the data, or when the user needs to fit the data to more than 3
+ components.
+ MuSRFit is extremely powerful when it comes to fitting multple data sets
+ with or without shared parameters.
+\end_layout
+
+\begin_layout Section
+Quick start
+\end_layout
+
+\begin_layout Standard
+To star using MuSRFit follow these simple steps
+\end_layout
+
+\begin_layout Itemize
+type in the RUN number in the 
+\begin_inset Quotes eld
+\end_inset
+
+RUN Numbers
+\begin_inset Quotes erd
+\end_inset
+
+ (RN) box (Fig.
+ ).
+\end_layout
+
+\begin_layout Itemize
+select the year and appropriate beamline from the dropdown menus.
+\end_layout
+
+\begin_layout Itemize
+select the function that the data should be fit to.
+ You may fit the data to a sum of up to 3 components, each with a different
+ function.
+\end_layout
+
+\begin_layout Itemize
+type in the 
+\begin_inset Quotes eld
+\end_inset
+
+Initial Time
+\begin_inset Quotes erd
+\end_inset
+
+ (Ti), 
+\begin_inset Quotes eld
+\end_inset
+
+Final Time
+\begin_inset Quotes erd
+\end_inset
+
+ (Tf) and 
+\begin_inset Quotes eld
+\end_inset
+
+Binning Factor
+\begin_inset Quotes erd
+\end_inset
+
+ (NB) in the appropriate boxes.
+ The data will be fit within the range [Ti,Tf] using a binning factor NB,
+ i.e.
+ the data points within this range will represent NB points from the raw
+ histograms.
+ Note that Ti and Tf are in 
+\begin_inset Formula $\mu$
+\end_inset
+
+s units.
+\end_layout
+
+\begin_layout Itemize
+Finally, select the type of fit you want to do, either and 
+\begin_inset Quotes eld
+\end_inset
+
+Asymmetry
+\begin_inset Quotes erd
+\end_inset
+
+ or a 
+\begin_inset Quotes eld
+\end_inset
+
+Single Histogram
+\begin_inset Quotes erd
+\end_inset
+
+ fit.
+ In the first case the user provides two groups of histogram numbers separated
+ by comma, i.e.
+ to fit the asymmetry between histograms (1+5) and (3+7) one types 
+\begin_inset Quotes eld
+\end_inset
+
+1 5,3 7
+\begin_inset Quotes erd
+\end_inset
+
+.
+ In the case of 
+\begin_inset Quotes eld
+\end_inset
+
+Single Histogram
+\begin_inset Quotes erd
+\end_inset
+
+ fits, the histograms are fit individually.
+ A list of histogram numbers separated by commas can be given, e.g.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+1,2,3,4
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Now we are ready to fit, you may click on the 
+\begin_inset Quotes eld
+\end_inset
+
+FIT
+\begin_inset Quotes erd
+\end_inset
+
+ button at the top pannel (or hit Ctrl+F or select 
+\begin_inset Quotes eld
+\end_inset
+
+Fit and Plot
+\begin_inset Quotes erd
+\end_inset
+
+ from the 
+\begin_inset Quotes eld
+\end_inset
+
+Actions
+\begin_inset Quotes erd
+\end_inset
+
+ menu).
+ If you are lucky and that initial default parameters are close enough,
+ Minuit will converge and give you the fit parameters.
+ Other wise you may need to tweek the initial parameters from the 
+\begin_inset Quotes eld
+\end_inset
+
+Initialization
+\begin_inset Quotes erd
+\end_inset
+
+ tab and then try to fit again.
+ Once the fit is done, a Root canvas will pop up with a plot of the data
+ with the fit curve and summary of the fit.
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename RUNS_Tab.png
+	width 10cm
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+A view of the RUNS tab.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Fitting and Minimization
+\end_layout
+
+\begin_layout Standard
+The user can choose the minimization and error estimation type during the
+ fit by selecting the 
+\begin_inset Quotes eld
+\end_inset
+
+Fitting
+\begin_inset Quotes erd
+\end_inset
+
+ tab.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+Minimization type
+\begin_inset Quotes erd
+\end_inset
+
+ can be 
+\begin_inset Quotes eld
+\end_inset
+
+MINIMIZE
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+MIGRAD
+\begin_inset Quotes erd
+\end_inset
+
+ or 
+\begin_inset Quotes eld
+\end_inset
+
+SIMPLEX
+\begin_inset Quotes erd
+\end_inset
+
+, while the 
+\begin_inset Quotes eld
+\end_inset
+
+Error estimation
+\begin_inset Quotes erd
+\end_inset
+
+ can be either 
+\begin_inset Quotes eld
+\end_inset
+
+HESSE
+\begin_inset Quotes erd
+\end_inset
+
+ or 
+\begin_inset Quotes eld
+\end_inset
+
+MINOS
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Details of all these can be found in the MINUIT2 documentation.
+\end_layout
+
+\begin_layout Standard
+In the same 
+\begin_inset Quotes eld
+\end_inset
+
+Fitting
+\begin_inset Quotes erd
+\end_inset
+
+ tab that user can also provide x and y ranges for the plot.
+ The fit will still be done within the range [Ti,Tf].
+ Note that you cannot limit x or y range separately, you must give the limits
+ for both.
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Quotes eld
+\end_inset
+
+Life time correction
+\begin_inset Quotes erd
+\end_inset
+
+ checkbox is only valid for single histogram fits, where the exponential
+ relaxation due to the lifetime of the muon is removed.
+\end_layout
+
+\begin_layout Standard
+The text box at the bottom of this tab provides the output of the msrfit
+ that can be used to diagnose problems or bugs.
+ However, it is essential to check this output to confitm whether or not
+ the fit has converged.
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Fitting_Tab.png
+	width 10cm
+	rotateOrigin center
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+A view of the Fitting tab.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Multiple RUN Fits and Common Parameters
+\end_layout
+
+\begin_layout Standard
+In order to fit multiple data sets to the same theory function, the user
+ should type in the RUN numbers in the RN box.
+ The RUN numbers should be comma separated.
+ MuSRFit will identify whether a multiple or a single RUN are being fit,
+ and enables sharing accordingly.
+ Next, you may click on the 
+\begin_inset Quotes eld
+\end_inset
+
+Sharing
+\begin_inset Quotes erd
+\end_inset
+
+ tab to select shared (common) and individual parameters.
+ This dialogue issues 3 columns of check boxes, each column corresponds
+ to a different theory function component, with a checkbox for each parameter
+ in that component.
+ By checking the box the user demands that the corresponding parameter is
+ common to all data sets.
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Sharing_Tab.png
+	width 10cm
+	rotateOrigin center
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+A view of the Sharing tab.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Initializing and Fixing Parameters
+\end_layout
+
+\begin_layout Standard
+It is highly recommended to initialize the fit parameters before you actually
+ start fitting.
+ MuSRFit will start the fitting procedure with default values for the fit
+ parameters.
+ However, the user can usually provide a much better initial guess for these
+ values.
+ In order to do this, select the 
+\begin_inset Quotes eld
+\end_inset
+
+Initialization
+\begin_inset Quotes erd
+\end_inset
+
+ tab, which will issue a table with 5 columns.
+ These columns are the name of the parameter, its initial value (Value),
+ its initial steps size (Error), its minimum (Min) and maximum (Max) limits,
+ respectively.
+ These values will be updated after a fitting procedure is performed.
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Initialization_Tab.png
+	width 10cm
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+A view of the Initialization tab.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In addition to providing the initial values of the fit parameters, the user
+ can use this table to fix and/or limit the their values following these
+ rules
+\end_layout
+
+\begin_layout Itemize
+the value of the fit parameter will be fixed to the initial value if its
+ Error is set to zero.
+\end_layout
+
+\begin_layout Itemize
+If both Min and Max are set to zero, the corresponding fit parameter can
+ vary from 
+\begin_inset Formula $-\infty$
+\end_inset
+
+ up to 
+\begin_inset Formula $+\infty$
+\end_inset
+
+.
+ However, if either is different than zero, then the Min and Max will be
+ taken as limits for the value of the fit parameter.
+ 
+\end_layout
+
+\end_body
+\end_document
