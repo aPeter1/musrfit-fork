@@ -33,6 +33,7 @@
 #define _PMSR2DATA_H_
 
 #include <string>
+#include <sstream>
 using namespace std;
 
 #include "PRunDataHandler.h"
@@ -57,12 +58,13 @@ class PMsr2Data
     unsigned int GetPresentRun() const;
 
     int ParseXmlStartupFile();
-    int ReadMsrFile(const string&);
+    int ReadMsrFile(const string&) const;
     bool ReadRunDataFile();
 
     bool PrepareNewInputFile(unsigned int) const; // template
+    bool PrepareGlobalInputFile(unsigned int, const string&) const; // generate msr-input file for a global fit
 
-    void WriteOutput(const string&, bool, bool) const;
+    int WriteOutput(const string&, bool, bool, bool global = false, unsigned int counter = 0) const;
 
   private:
     string fFileExtension;
@@ -75,6 +77,9 @@ class PMsr2Data
     PStartupHandler *fStartupHandler;
     mutable PRunDataHandler *fDataHandler;
     mutable PMsrHandler *fMsrHandler;
+    mutable unsigned int fNumGlobalParam;
+    mutable unsigned int fNumSpecParam;
+    mutable unsigned int fNumTempRunBlocks;
 };
 
 

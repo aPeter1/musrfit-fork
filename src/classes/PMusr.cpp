@@ -1249,7 +1249,7 @@ void PMsrRunBlock::SetParGlobal(const TString &str, Int_t ival)
  */
 void PMsrRunBlock::SetMapGlobal(UInt_t idx, Int_t ival)
 {
-  if (fMapGlobal.empty())
+  if (fMapGlobal.size() != fMap.size())
     fMapGlobal.resize(fMap.size(), -1);
   if (idx < fMap.size() && fMap[idx] > 0)
     fMapGlobal[idx] = ival;

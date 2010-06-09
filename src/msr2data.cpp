@@ -36,12 +36,15 @@
 #include <iostream>
 using namespace std;
 
+
 #include <boost/algorithm/string/case_conv.hpp> // for to_lower() in std::string
 using namespace boost::algorithm;
 
+#include <boost/lexical_cast.hpp> // for atoi-replacement
+
 //--------------------------------------------------------------------------
 /**
- * <p>Checks is a string is a number
+ * <p>Checks if a string is an integer
  *
  * <b>return:</b>
  * - true if s is a number string
@@ -49,7 +52,7 @@ using namespace boost::algorithm;
  *
  * \param s
  */
-bool isNumber(const string &s)
+bool isNumber(const string &s) // will be replaced by boost::lexical_cast at some time
 {
   unsigned int number;
   istringstream iss;
@@ -68,13 +71,13 @@ bool isNumber(const string &s)
  */
 void msr2data_syntax()
 {
-  cout << endl << "usage 1: msr2data <run> <extension> [-o<outputfile>] [data] [noheader] [nosummary]";
+  cout << endl << "usage 1: msr2data <run> <extension> [-o<outputfile>] [data] [noheader] [nosummary] [global]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
-  cout << endl << "usage 2: msr2data <run1> <run2> <extension> [-o<outputfile>] [data] [noheader] [nosummary]";
+  cout << endl << "usage 2: msr2data <run1> <run2> <extension> [-o<outputfile>] [data] [noheader] [nosummary] [global]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
-  cout << endl << "usage 3: msr2data \\[<run1> <run2> ... <runN>\\] <extension> [-o<outputfile> ] [data] [noheader] [nosummary]";
+  cout << endl << "usage 3: msr2data \\[<run1> <run2> ... <runN>\\] <extension> [-o<outputfile> ] [data] [noheader] [nosummary] [global]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
-  cout << endl << "usage 4: msr2data <runlist> <extension> [-o<outputfile>] [data] [noheader] [nosummary]";
+  cout << endl << "usage 4: msr2data <runlist> <extension> [-o<outputfile>] [data] [noheader] [nosummary] [global]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
   cout << endl;
   cout << endl << "       <run>, <run1>, <run2>, ... <runN> : run numbers";
@@ -94,6 +97,11 @@ void msr2data_syntax()
   cout << endl << "              In case any fitting-option is present, this option is ignored!";
   cout << endl << "       -k : if fitting is used, pass the option --keep-mn2-output to musrfit";
   cout << endl << "       -t : if fitting is used, pass the option --title-from-data-file to musrfit";
+  cout << endl;
+  cout << endl << "       global : switch on the global-fit mode";
+  cout << endl << "              Within that mode all specified runs will be united in a single msr-file!";
+  cout << endl << "              The fit parameters can be either run specific or common to all runs.";
+  cout << endl << "              For a complete description of this feature please refer to the manual (yet to be written).";
   cout << endl;
   cout << endl << "    For further information please refer to";
   cout << endl << "    https://wiki.intranet.psi.ch/MUSR/Msr2Data";
@@ -126,7 +134,7 @@ string msr2data_outputfile(vector<string> &arg, bool db = true)
       if (!iter->compare("-o")) {
         if ((iterNext != arg.end()) && (iterNext->compare("noheader")) && (iterNext->compare("nosummary")) \
             && (iterNext->substr(0,3).compare("fit")) && (iterNext->compare("-k")) && (iterNext->compare("-t")) \
-            && (iterNext->compare("data")) && (iterNext->substr(0,3).compare("msr")) ) {
+            && (iterNext->compare("data")) && (iterNext->substr(0,3).compare("msr")) && (iterNext->compare("global"))) {
           outputFile = *iterNext;
           arg.erase(iterNext);
           arg.erase(iter);
@@ -181,7 +189,7 @@ bool msr2data_useOption(vector<string> &arg, const string &s)
  * <b>return:</b>
  * - template runNo if everything is OK
  * - -1 : tag: fit only, do not prepare input files
- * - -2 : fatal error - another fit-&lt;temp&gt; option is specified
+ * - -2 : fatal error - more than one fit-&lt;temp&gt; options are specified
  *
  * \param arg list of arguments
  * \param chainfit if true
@@ -316,7 +324,7 @@ int main(int argc, char *argv[])
     }
 
     for (unsigned int i(firstRunNumberInArg); i<=lastRunNumberInArg; ++i)
-      run_vec.push_back(atoi(arg[i].c_str()));
+      run_vec.push_back(boost::lexical_cast<unsigned int>(arg[i]));
 
     msrExtension = arg[rightbracket + 1];
 
@@ -340,8 +348,8 @@ int main(int argc, char *argv[])
         return 0;
       }
 
-      run_vec.push_back(atoi(arg[0].c_str()));
-      run_vec.push_back(atoi(arg[1].c_str()));
+      run_vec.push_back(boost::lexical_cast<unsigned int>(arg[0]));
+      run_vec.push_back(boost::lexical_cast<unsigned int>(arg[1]));
 
       msrExtension = arg[2];
 
@@ -352,7 +360,7 @@ int main(int argc, char *argv[])
       }
     } else if (argOneIsNumber && !argTwoIsNumber) { // only one run number is given
       runTAG = 3;
-      run_vec.push_back(atoi(arg[0].c_str()));
+      run_vec.push_back(boost::lexical_cast<unsigned int>(arg[0]));
       msrExtension = arg[1];
 
       vector<string>::iterator iter(arg.begin());
@@ -457,37 +465,25 @@ int main(int argc, char *argv[])
   bool writeHeader(false), writeSummary(false);
 
   if (realOutput) {
-// check the arguments for the "noheader" option
+    // check the arguments for the "noheader" option
     writeHeader = msr2data_useOption(arg, "noheader");
 
-// check the arguments for the "nosummary" option
+    // check the arguments for the "nosummary" option
     writeSummary = msr2data_useOption(arg, "nosummary");
   }
 
-// read musrfit startup file
-  if (writeSummary) {
-    status = msr2dataHandler.ParseXmlStartupFile();
-  }
+  // check if msr2data should work in the global fit regime
+  bool setNormalMode(msr2data_useOption(arg, "global"));
 
-// Processing the run list, do the fitting and write the data to the DB or data output file
-  bool firstrun(true);
-  unsigned int oldtemp(0); // should be accessed only when updated before...
-
-  while (msr2dataHandler.GetPresentRun()) {
+// GLOBAL MODE
+  if (!setNormalMode) {
     ostringstream strInfile;
-    strInfile << msr2dataHandler.GetPresentRun() << msrExtension << ".msr";
+    strInfile << msr2dataHandler.GetPresentRun() << "+global" << msrExtension << ".msr";
 
     // if fitting should be done, prepare a new input file
     if (temp) {
-      if (temp > 0) {
-        bool success(true);
-        if (firstrun || !chainfit)
-          success = msr2dataHandler.PrepareNewInputFile(temp);
-        else
-          success = msr2dataHandler.PrepareNewInputFile(oldtemp);
-        if (firstrun)
-          firstrun = false;
-        oldtemp = msr2dataHandler.GetPresentRun();
+      if (temp > 0) { // if it is smaller no input file should be generated
+        bool success(msr2dataHandler.PrepareGlobalInputFile(temp, strInfile.str()));
 
         if (!success) {
           cout << endl << ">> msr2data: **ERROR** Input file generation has not been successful! Quitting..." << endl;
@@ -496,7 +492,7 @@ int main(int argc, char *argv[])
         }
       }
 
-    // and do the fitting
+      // and do the fitting
       if (!onlyInputCreation) {
         ostringstream oss;
         oss << "musrfit" << " " << strInfile.str() << " " << musrfitOptions;
@@ -505,22 +501,98 @@ int main(int argc, char *argv[])
       }
     }
 
-  // read msr-file
     if (realOutput) {
+      // read musrfit startup file
+      if (writeSummary) {
+        status = msr2dataHandler.ParseXmlStartupFile();
+      }
+
+      // Read msr file
       status = msr2dataHandler.ReadMsrFile(strInfile.str());
       if (status != PMUSR_SUCCESS) {
         arg.clear();
         return status;
       }
+
+      // read data files
+      if (writeSummary)
+        writeSummary = msr2dataHandler.ReadRunDataFile();
+
+      unsigned int counter(0);
+
+      while (msr2dataHandler.GetPresentRun()) {
+        // write DB or dat file
+        status = msr2dataHandler.WriteOutput(outputFile, db, writeHeader, !setNormalMode, counter);
+        if (status != PMUSR_SUCCESS) {
+          arg.clear();
+          return status;
+        }
+        ++counter;
+      }
+    }
+  } else { // NORMAL MODE - one msr-file for each run
+
+    // read musrfit startup file
+    if (writeSummary) {
+      status = msr2dataHandler.ParseXmlStartupFile();
     }
 
-  // read data files
-    if (writeSummary)
-      writeSummary = msr2dataHandler.ReadRunDataFile();
+    // Processing the run list, do the fitting and write the data to the DB or data output file
+    bool firstrun(true);
+    unsigned int oldtemp(0); // should be accessed only when updated before...
 
-  // write DB or dat file
-    msr2dataHandler.WriteOutput(outputFile, db, writeHeader);
+    while (msr2dataHandler.GetPresentRun()) {
+      ostringstream strInfile;
+      strInfile << msr2dataHandler.GetPresentRun() << msrExtension << ".msr";
 
+      // if fitting should be done, prepare a new input file
+      if (temp) {
+        if (temp > 0) {
+          bool success(true);
+          if (firstrun || !chainfit)
+            success = msr2dataHandler.PrepareNewInputFile(temp);
+          else
+            success = msr2dataHandler.PrepareNewInputFile(oldtemp);
+          if (firstrun)
+            firstrun = false;
+          oldtemp = msr2dataHandler.GetPresentRun();
+
+          if (!success) {
+            cout << endl << ">> msr2data: **ERROR** Input file generation has not been successful! Quitting..." << endl;
+            arg.clear();
+            return -1;
+          }
+        }
+
+      // and do the fitting
+        if (!onlyInputCreation) {
+          ostringstream oss;
+          oss << "musrfit" << " " << strInfile.str() << " " << musrfitOptions;
+          cout << endl << ">> msr2data: **INFO** Calling " << oss.str() << endl;
+          system(oss.str().c_str());
+        }
+      }
+
+    // read msr-file
+      if (realOutput) {
+        status = msr2dataHandler.ReadMsrFile(strInfile.str());
+        if (status != PMUSR_SUCCESS) {
+          arg.clear();
+          return status;
+        }
+      }
+
+    // read data files
+      if (writeSummary)
+        writeSummary = msr2dataHandler.ReadRunDataFile();
+
+    // write DB or dat file
+      status = msr2dataHandler.WriteOutput(outputFile, db, writeHeader);
+      if (status != PMUSR_SUCCESS) {
+        arg.clear();
+        return status;
+      }
+    }
   }
 
   if (!arg.empty()) {

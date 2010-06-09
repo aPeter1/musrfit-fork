@@ -1532,7 +1532,7 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
 
   // write COMMANDS block
   fout << "COMMANDS" << endl;
-  for (i = 1; i < fCommands.size(); ++i) {
+  for (i = 0; i < fCommands.size(); ++i) {
     if (fCommands[i].fLine.BeginsWith("SET BATCH") || fCommands[i].fLine.BeginsWith("END RETURN"))
       continue;
     else
