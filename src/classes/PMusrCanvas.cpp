@@ -259,32 +259,32 @@ void PMusrCanvas::SetMsrHandler(PMsrHandler *msrHandler)
   fMsrHandler = msrHandler;
 
   // check if a fourier block is present in the msr-file, and if yes extract the given values
-  if (fMsrHandler->GetMsrFourierList().fFourierBlockPresent) {
+  if (fMsrHandler->GetMsrFourierList()->fFourierBlockPresent) {
     fFourier.fFourierBlockPresent = true;
-    if (fMsrHandler->GetMsrFourierList().fUnits != FOURIER_UNIT_NOT_GIVEN) {
-      fFourier.fUnits = fMsrHandler->GetMsrFourierList().fUnits;
+    if (fMsrHandler->GetMsrFourierList()->fUnits != FOURIER_UNIT_NOT_GIVEN) {
+      fFourier.fUnits = fMsrHandler->GetMsrFourierList()->fUnits;
     }
-    if (fMsrHandler->GetMsrFourierList().fFourierPower != -1) {
-      fFourier.fFourierPower = fMsrHandler->GetMsrFourierList().fFourierPower;
+    if (fMsrHandler->GetMsrFourierList()->fFourierPower != -1) {
+      fFourier.fFourierPower = fMsrHandler->GetMsrFourierList()->fFourierPower;
     }
-    if (fMsrHandler->GetMsrFourierList().fApodization != FOURIER_APOD_NOT_GIVEN) {
-      fFourier.fApodization = fMsrHandler->GetMsrFourierList().fApodization;
+    if (fMsrHandler->GetMsrFourierList()->fApodization != FOURIER_APOD_NOT_GIVEN) {
+      fFourier.fApodization = fMsrHandler->GetMsrFourierList()->fApodization;
     }
-    if (fMsrHandler->GetMsrFourierList().fPlotTag != FOURIER_PLOT_NOT_GIVEN) {
-      fFourier.fPlotTag = fMsrHandler->GetMsrFourierList().fPlotTag;
+    if (fMsrHandler->GetMsrFourierList()->fPlotTag != FOURIER_PLOT_NOT_GIVEN) {
+      fFourier.fPlotTag = fMsrHandler->GetMsrFourierList()->fPlotTag;
     }
-    if (fMsrHandler->GetMsrFourierList().fPhase != -999.0) {
-      fFourier.fPhase = fMsrHandler->GetMsrFourierList().fPhase;
+    if (fMsrHandler->GetMsrFourierList()->fPhase != -999.0) {
+      fFourier.fPhase = fMsrHandler->GetMsrFourierList()->fPhase;
     }
-    if ((fMsrHandler->GetMsrFourierList().fRangeForPhaseCorrection[0] != -1.0) &&
-        (fMsrHandler->GetMsrFourierList().fRangeForPhaseCorrection[1] != -1.0)) {
-      fFourier.fRangeForPhaseCorrection[0] = fMsrHandler->GetMsrFourierList().fRangeForPhaseCorrection[0];
-      fFourier.fRangeForPhaseCorrection[1] = fMsrHandler->GetMsrFourierList().fRangeForPhaseCorrection[1];
+    if ((fMsrHandler->GetMsrFourierList()->fRangeForPhaseCorrection[0] != -1.0) &&
+        (fMsrHandler->GetMsrFourierList()->fRangeForPhaseCorrection[1] != -1.0)) {
+      fFourier.fRangeForPhaseCorrection[0] = fMsrHandler->GetMsrFourierList()->fRangeForPhaseCorrection[0];
+      fFourier.fRangeForPhaseCorrection[1] = fMsrHandler->GetMsrFourierList()->fRangeForPhaseCorrection[1];
     }
-    if ((fMsrHandler->GetMsrFourierList().fPlotRange[0] != -1.0) &&
-        (fMsrHandler->GetMsrFourierList().fPlotRange[1] != -1.0)) {
-      fFourier.fPlotRange[0] = fMsrHandler->GetMsrFourierList().fPlotRange[0];
-      fFourier.fPlotRange[1] = fMsrHandler->GetMsrFourierList().fPlotRange[1];
+    if ((fMsrHandler->GetMsrFourierList()->fPlotRange[0] != -1.0) &&
+        (fMsrHandler->GetMsrFourierList()->fPlotRange[1] != -1.0)) {
+      fFourier.fPlotRange[0] = fMsrHandler->GetMsrFourierList()->fPlotRange[0];
+      fFourier.fPlotRange[1] = fMsrHandler->GetMsrFourierList()->fPlotRange[1];
     }
   }
 

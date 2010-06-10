@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007 by Andreas Suter                                   *
+ *   Copyright (C) 2007-2010 by Andreas Suter                              *
  *   andreas.suter@psi.c                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -61,7 +61,7 @@ class PMsrHandler
     virtual PMsrLines*              GetMsrFunctions() { return &fFunctions; }
     virtual PMsrRunList*            GetMsrRunList() { return &fRuns; }
     virtual PMsrLines*              GetMsrCommands() { return &fCommands; }
-    virtual PMsrFourierStructure    GetMsrFourierList() { return fFourier; }
+    virtual PMsrFourierStructure*   GetMsrFourierList() { return &fFourier; }
     virtual PMsrPlotList*           GetMsrPlotList() { return &fPlots; }
     virtual PMsrStatisticStructure* GetMsrStatistic() { return &fStatistic; }
 

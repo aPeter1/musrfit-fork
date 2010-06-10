@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2009 by Bastian M. Wojek / Andreas Suter                *
+ *   Copyright (C) 2009-2010 by Bastian M. Wojek / Andreas Suter           *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -28,6 +28,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
+// note: msr2data is on purpose implemented in a way that shows string handling can be done solely
+//       using std::string, boost and related standard C++ features
+//       This implies, however, occasionally strange constructs when interoperating with PMusr-classes
+//       which mostly rely on ROOT's TString.
 
 #include <cctype>
 #include <sstream>
@@ -427,28 +432,18 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
 
   ostringstream strInfile;
   strInfile << tempRun << fFileExtension << ".msr";
-//   ifstream in(strInfile.str().c_str());
-//   if (!in) {
-//     cerr << endl << ">> msr2data: **ERROR** The template msr-file " << strInfile.str() << " cannot be opened! Please check!";
-//     cerr << endl;
-//     return false;
-//   }
-//  ostringstream strOutfile;
-//  strOutfile << tempRun << "+global" << fFileExtension << ".msr";
-//   ofstream out(strOutfile.str().c_str());
-//   if (!out) {
-//     cerr << endl << ">> msr2data: **ERROR** The new msr file " << strOutfile.str() << " cannot be opened! Please check!";
-//     cerr << endl;
-//     return false;
-//   }
 
   // read template msr-file
   int status(ReadMsrFile(strInfile.str()));
   if (status != PMUSR_SUCCESS)
     return false;
 
+  // define two heavily used variables
+  PMsrParamList *msrParamList(fMsrHandler->GetMsrParamList());
+  PMsrRunList *msrRunList(fMsrHandler->GetMsrRunList());
+
   // check how many RUN blocks are in the template msr-file
-  fNumTempRunBlocks = fMsrHandler->GetMsrRunList()->size();
+  fNumTempRunBlocks = msrRunList->size();
 
   // check that the RUN block run numbers match the template run number
   ostringstream tempRunNumber;
@@ -459,7 +454,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
 
   string tempRunName;
   for (unsigned int i(0); i < fNumTempRunBlocks; ++i) {
-    tempRunName = fMsrHandler->GetMsrRunList()->at(i).GetRunName()->Data();
+    tempRunName = msrRunList->at(i).GetRunName()->Data();
     string::size_type loc = tempRunName.rfind(tempRunNumber.str());
     if ( loc == string::npos ) {
       cerr << endl << ">> msr2data: **ERROR** A template run file number does not match the \"file index\"";
@@ -473,229 +468,291 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
 
   // search parameter list for run-specific parameters - the rest is assumed to be global
   string tempParamName;
-  for (unsigned int i(0); i < fMsrHandler->GetMsrParamList()->size(); ++i) {
-    tempParamName = fMsrHandler->GetMsrParamList()->at(i).fName.Data();
+  for (unsigned int i(0); i < msrParamList->size(); ++i) {
+    tempParamName = msrParamList->at(i).fName.Data();
     string::size_type loc = tempParamName.rfind(tempRunNumber.str());
     if ((tempParamName.length() > N) && (loc == tempParamName.length() - N)) {
-      fMsrHandler->GetMsrParamList()->at(i).fIsGlobal = false;
+      msrParamList->at(i).fIsGlobal = false;
       ++fNumSpecParam;
     } else {
-      fMsrHandler->GetMsrParamList()->at(i).fIsGlobal = true;
+      msrParamList->at(i).fIsGlobal = true;
       ++fNumGlobalParam;
     }
-    //cout << fMsrHandler->GetMsrParamList()->at(i).fNo << " is global: " << fMsrHandler->GetMsrParamList()->at(i).fIsGlobal << endl;
+    //cout << msrParamList->at(i).fNo << " is global: " << msrParamList->at(i).fIsGlobal << endl;
   }
 
-  // Sort the parameters: global ones first, then run-specific
-  sort(fMsrHandler->GetMsrParamList()->begin(), fMsrHandler->GetMsrParamList()->end(), compare_parameters);
+  // check if parameters have been sorted correctly from the beginning
+  bool wasSorted(true);
+  for (unsigned int i(0); i < fNumGlobalParam; ++i) {
+    if(!msrParamList->at(i).fIsGlobal) {
+      wasSorted = false;
+      break;
+    }
+  }
 
-  // Change the parameter numbers in all blocks according to the new order
-  PMsrLines *tempLines;
-  vector<string> tempVec;
   int tempPar;
-  string line;
-  // THEORY block
-  tempLines = fMsrHandler->GetMsrTheory();
-  for (unsigned int i(0); i < tempLines->size(); ++i) {
-    line = (*tempLines)[i].fLine.Data();
-    split( tempVec, line, is_any_of(" ") ); // split the theory line at spaces
-    for (unsigned int j(1); j < tempVec.size(); ++j) {
-      try {
-        tempPar = boost::lexical_cast<unsigned int>(tempVec[j]);
-        // go through the whole parameter list and look for the correct parameter - this is stupid, however, I do not know what else to do
-        for (unsigned int k(0); k < fMsrHandler->GetMsrParamList()->size(); ++k) {
-          if (tempPar == fMsrHandler->GetMsrParamList()->at(k).fNo) {
-            tempVec[j] = boost::lexical_cast<string>(k + 1);
-            break;
-          }
-        }
-      }
-      catch(boost::bad_lexical_cast &) {
-        // in case the cast does not work: do nothing - this means the entry is not a simple parameter
-      }
-    }
-    // replace the old theory line by the new one
-    (*tempLines)[i].fLine.Clear();
-    for (unsigned int j(0); j < tempVec.size(); ++j) {
-      (*tempLines)[i].fLine += TString(tempVec[j]) + TString(" ");
-    }
-    tempVec.clear();
-  }
+  vector<int> *tempMap;
 
-  // FUNCTIONS block
-  tempLines = fMsrHandler->GetMsrFunctions();
-  for (unsigned int i(0); i < tempLines->size(); ++i) {
-    line = (*tempLines)[i].fLine.Data();
-    split( tempVec, line, is_any_of(" ") ); // split the function line at spaces
-    for (unsigned int j(2); j < tempVec.size(); ++j) {
-      if (!tempVec[j].substr(0,3).compare("par")) {
+  if (!wasSorted) {
+    // Sort the parameters: global ones first, then run-specific
+    sort(msrParamList->begin(), msrParamList->end(), compare_parameters);
+
+    // Change the parameter numbers in all blocks according to the new order
+    PMsrLines *tempLines;
+    vector<string> tempVec;
+    string line;
+    // THEORY block
+    tempLines = fMsrHandler->GetMsrTheory();
+    for (unsigned int i(0); i < tempLines->size(); ++i) {
+      line = (*tempLines)[i].fLine.Data();
+      split( tempVec, line, is_any_of(" ") ); // split the theory line at spaces
+      for (unsigned int j(1); j < tempVec.size(); ++j) {
         try {
-          tempPar = boost::lexical_cast<unsigned int>(tempVec[j].substr(3));
+          tempPar = boost::lexical_cast<unsigned int>(tempVec[j]);
           // go through the whole parameter list and look for the correct parameter - this is stupid, however, I do not know what else to do
-          for (unsigned int k(0); k < fMsrHandler->GetMsrParamList()->size(); ++k) {
-            if (tempPar == fMsrHandler->GetMsrParamList()->at(k).fNo) {
-              tempVec[j] = "par";
-              tempVec[j].append(boost::lexical_cast<string>(k + 1));
+          for (unsigned int k(0); k < msrParamList->size(); ++k) {
+            if (tempPar == msrParamList->at(k).fNo) {
+              tempVec[j] = boost::lexical_cast<string>(k + 1);
               break;
             }
           }
         }
         catch(boost::bad_lexical_cast &) {
-          cerr << endl << ">> msr2data: **ERROR** Something is wrong with the parameters used in the FUNCTIONS block!";
-          cerr << endl << ">> msr2data: **ERROR** Please report a bug - function parsing should have failed earlier!";
+          // in case the cast does not work: do nothing - this means the entry is not a simple parameter
+        }
+      }
+      // replace the old theory line by the new one
+      (*tempLines)[i].fLine.Clear();
+      for (unsigned int j(0); j < tempVec.size(); ++j) {
+        (*tempLines)[i].fLine += TString(tempVec[j]) + TString(" ");
+      }
+      tempVec.clear();
+    }
+
+    // FUNCTIONS block
+    tempLines = fMsrHandler->GetMsrFunctions();
+    for (unsigned int i(0); i < tempLines->size(); ++i) {
+      line = (*tempLines)[i].fLine.Data();
+      split( tempVec, line, is_any_of(" ") ); // split the function line at spaces
+      for (unsigned int j(2); j < tempVec.size(); ++j) {
+        if (!tempVec[j].substr(0,3).compare("par")) {
+          try {
+            tempPar = boost::lexical_cast<unsigned int>(tempVec[j].substr(3));
+            // go through the whole parameter list and look for the correct parameter - this is stupid, however, I do not know what else to do
+            for (unsigned int k(0); k < msrParamList->size(); ++k) {
+              if (tempPar == msrParamList->at(k).fNo) {
+                tempVec[j] = "par";
+                tempVec[j].append(boost::lexical_cast<string>(k + 1));
+                break;
+              }
+            }
+          }
+          catch(boost::bad_lexical_cast &) {
+            cerr << endl << ">> msr2data: **ERROR** Something is wrong with the parameters used in the FUNCTIONS block!";
+            cerr << endl << ">> msr2data: **ERROR** Please report a bug - function parsing should have failed earlier!";
+            cerr << endl;
+            return false;
+          }
+        }
+      }
+      // replace the old function line by the new one
+      (*tempLines)[i].fLine.Clear();
+      for (unsigned int j(0); j < tempVec.size(); ++j) {
+        (*tempLines)[i].fLine += TString(tempVec[j]) + TString(" ");
+      }
+      tempVec.clear();
+    }
+
+    // RUN blocks
+    // substitute the old parameter numbers by the new ones
+
+    unsigned int l(0);
+
+    // look in the following order through the RUN-blocks: norm, bkg-fit, alpha, beta, lifetime, maps
+    for (unsigned int i(0); i < fNumTempRunBlocks; ++i) {
+      tempPar = msrRunList->at(i).GetNormParamNo();
+      if (tempPar > 0) {
+        // go through the whole parameter list and look for the correct parameter - this is stupid, however, I do not know what else to do
+        for (l = 0; l < msrParamList->size(); ++l) {
+          if (tempPar == msrParamList->at(l).fNo) {
+            msrRunList->at(i).SetNormParamNo(l + 1);
+            break;
+          }
+        }
+        if (l > msrParamList->size()) {
+          cerr << endl << ">> msr2data: **ERROR** The norm parameter specified in RUN block " << i + 1 << " does not exist!";
+          cerr << endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
           cerr << endl;
           return false;
         }
       }
-    }
-    // replace the old function line by the new one
-    (*tempLines)[i].fLine.Clear();
-    for (unsigned int j(0); j < tempVec.size(); ++j) {
-      (*tempLines)[i].fLine += TString(tempVec[j]) + TString(" ");
-    }
-    tempVec.clear();
-  }
-  
-  // RUN blocks
-  // substitute the old parameter numbers by the new ones and also
-  // search the RUN-blocks for run-specific parameters
-
-  vector<vector<pair<int, bool> > > runBlockParamIsGlobal(fNumTempRunBlocks);
-  pair<int, bool> runBlockTempParam;
-  vector<int> *tempMap;
-  unsigned int l(0);
-
-  // look in the following order through the RUN-blocks: norm, bkg-fit, alpha, beta, lifetime, maps
-  for (unsigned int i(0); i < fNumTempRunBlocks; ++i) {
-    tempPar = fMsrHandler->GetMsrRunList()->at(i).GetNormParamNo();
-    if (tempPar > 0) {
-      // go through the whole parameter list and look for the correct parameter - this is stupid, however, I do not know what else to do
-      for (l = 0; l < fMsrHandler->GetMsrParamList()->size(); ++l) {
-        if (tempPar == fMsrHandler->GetMsrParamList()->at(l).fNo) {
-          fMsrHandler->GetMsrRunList()->at(i).SetNormParamNo(l + 1);
-          break;
-        }
-      }
-      if (l > fMsrHandler->GetMsrParamList()->size()) {
-        cerr << endl << ">> msr2data: **ERROR** The norm parameter specified in RUN block " << i + 1 << " does not exist!";
-        cerr << endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
-        cerr << endl;
-        return false;
-      }
-      if (fMsrHandler->GetMsrParamList()->at(l).fIsGlobal) { // norm of RUN block i is global
-        fMsrHandler->GetMsrRunList()->at(i).SetParGlobal(norm, 1);
-      } else {
-        fMsrHandler->GetMsrRunList()->at(i).SetParGlobal(norm, 0);
-      }
-    }
-    tempPar = fMsrHandler->GetMsrRunList()->at(i).GetBkgFitParamNo();
-    if (tempPar > 0) {
-      // go through the whole parameter list and look for the correct parameter - this is stupid, however, I do not know what else to do
-      for (l = 0; l < fMsrHandler->GetMsrParamList()->size(); ++l) {
-        if (tempPar == fMsrHandler->GetMsrParamList()->at(l).fNo) {
-          fMsrHandler->GetMsrRunList()->at(i).SetBkgFitParamNo(l + 1);
-          break;
-        }
-      }
-      if (l > fMsrHandler->GetMsrParamList()->size()) {
-        cerr << endl << ">> msr2data: **ERROR** The backgr.fit parameter specified in RUN block " << i + 1 << " does not exist!";
-        cerr << endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
-        cerr << endl;
-        return false;
-      }
-      if (fMsrHandler->GetMsrParamList()->at(l).fIsGlobal) { // bkg-fit of RUN block i is global
-        fMsrHandler->GetMsrRunList()->at(i).SetParGlobal(bkgfit, 1);
-      } else {
-        fMsrHandler->GetMsrRunList()->at(i).SetParGlobal(bkgfit, 0);
-      }
-    }
-    tempPar = fMsrHandler->GetMsrRunList()->at(i).GetAlphaParamNo();
-    if (tempPar > 0) {
-      // go through the whole parameter list and look for the correct parameter - this is stupid, however, I do not know what else to do
-      for (l = 0; l < fMsrHandler->GetMsrParamList()->size(); ++l) {
-        if (tempPar == fMsrHandler->GetMsrParamList()->at(l).fNo) {
-          fMsrHandler->GetMsrRunList()->at(i).SetAlphaParamNo(l + 1);
-          break;
-        }
-      }
-      if (l > fMsrHandler->GetMsrParamList()->size()) {
-        cerr << endl << ">> msr2data: **ERROR** The alpha parameter specified in RUN block " << i + 1 << " does not exist!";
-        cerr << endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
-        cerr << endl;
-        return false;
-      }
-      if (fMsrHandler->GetMsrParamList()->at(l).fIsGlobal) { // alpha of RUN block i is global
-        fMsrHandler->GetMsrRunList()->at(i).SetParGlobal(alpha, 1);
-      } else {
-        fMsrHandler->GetMsrRunList()->at(i).SetParGlobal(alpha, 0);
-      }
-    }
-    tempPar = fMsrHandler->GetMsrRunList()->at(i).GetBetaParamNo();
-    if (tempPar > 0) {
-      // go through the whole parameter list and look for the correct parameter - this is stupid, however, I do not know what else to do
-      for (l = 0; l < fMsrHandler->GetMsrParamList()->size(); ++l) {
-        if (tempPar == fMsrHandler->GetMsrParamList()->at(l).fNo) {
-          fMsrHandler->GetMsrRunList()->at(i).SetBetaParamNo(l + 1);
-          break;
-        }
-      }
-      if (l > fMsrHandler->GetMsrParamList()->size()) {
-        cerr << endl << ">> msr2data: **ERROR** The beta parameter specified in RUN block " << i + 1 << " does not exist!";
-        cerr << endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
-        cerr << endl;
-        return false;
-      }
-      if (fMsrHandler->GetMsrParamList()->at(l).fIsGlobal) { // beta of RUN block i is global
-        fMsrHandler->GetMsrRunList()->at(i).SetParGlobal(beta, 1);
-      } else {
-        fMsrHandler->GetMsrRunList()->at(i).SetParGlobal(beta, 0);
-      }
-    }
-    tempPar = fMsrHandler->GetMsrRunList()->at(i).GetLifetimeParamNo();
-    if (tempPar > 0) {
-      // go through the whole parameter list and look for the correct parameter - this is stupid, however, I do not know what else to do
-      for (l = 0; l < fMsrHandler->GetMsrParamList()->size(); ++l) {
-        if (tempPar == fMsrHandler->GetMsrParamList()->at(l).fNo) {
-          fMsrHandler->GetMsrRunList()->at(i).SetLifetimeParamNo(l + 1);
-          break;
-        }
-      }
-      if (l > fMsrHandler->GetMsrParamList()->size()) {
-        cerr << endl << ">> msr2data: **ERROR** The lifetime parameter specified in RUN block " << i + 1 << " does not exist!";
-        cerr << endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
-        cerr << endl;
-        return false;
-      }
-      if (fMsrHandler->GetMsrParamList()->at(l).fIsGlobal) { // lifetime of RUN block i is global
-        fMsrHandler->GetMsrRunList()->at(i).SetParGlobal(lifetime, 1);
-      } else {
-        fMsrHandler->GetMsrRunList()->at(i).SetParGlobal(lifetime, 0);
-      }
-    }
-    tempMap = fMsrHandler->GetMsrRunList()->at(i).GetMap();
-    for (unsigned int j(0); j < tempMap->size(); ++j) {
-      tempPar = (*tempMap)[j];
+      tempPar = msrRunList->at(i).GetBkgFitParamNo();
       if (tempPar > 0) {
         // go through the whole parameter list and look for the correct parameter - this is stupid, however, I do not know what else to do
-        for (l = 0; l < fMsrHandler->GetMsrParamList()->size(); ++l) {
-          if (tempPar == fMsrHandler->GetMsrParamList()->at(l).fNo) {
-            fMsrHandler->GetMsrRunList()->at(i).SetMap(l + 1, j);
+        for (l = 0; l < msrParamList->size(); ++l) {
+          if (tempPar == msrParamList->at(l).fNo) {
+            msrRunList->at(i).SetBkgFitParamNo(l + 1);
             break;
           }
         }
-        if (fMsrHandler->GetMsrParamList()->at((*tempMap)[j] - 1).fIsGlobal) { // map j of RUN block i is global
-          fMsrHandler->GetMsrRunList()->at(i).SetMapGlobal(j, 1);
-        } else {
-          fMsrHandler->GetMsrRunList()->at(i).SetMapGlobal(j, 0);
+        if (l > msrParamList->size()) {
+          cerr << endl << ">> msr2data: **ERROR** The backgr.fit parameter specified in RUN block " << i + 1 << " does not exist!";
+          cerr << endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
+          cerr << endl;
+          return false;
+        }
+      }
+      tempPar = msrRunList->at(i).GetAlphaParamNo();
+      if (tempPar > 0) {
+        // go through the whole parameter list and look for the correct parameter - this is stupid, however, I do not know what else to do
+        for (l = 0; l < msrParamList->size(); ++l) {
+          if (tempPar == msrParamList->at(l).fNo) {
+            msrRunList->at(i).SetAlphaParamNo(l + 1);
+            break;
+          }
+        }
+        if (l > msrParamList->size()) {
+          cerr << endl << ">> msr2data: **ERROR** The alpha parameter specified in RUN block " << i + 1 << " does not exist!";
+          cerr << endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
+          cerr << endl;
+          return false;
+        }
+      }
+      tempPar = msrRunList->at(i).GetBetaParamNo();
+      if (tempPar > 0) {
+        // go through the whole parameter list and look for the correct parameter - this is stupid, however, I do not know what else to do
+        for (l = 0; l < msrParamList->size(); ++l) {
+          if (tempPar == msrParamList->at(l).fNo) {
+            msrRunList->at(i).SetBetaParamNo(l + 1);
+            break;
+          }
+        }
+        if (l > msrParamList->size()) {
+          cerr << endl << ">> msr2data: **ERROR** The beta parameter specified in RUN block " << i + 1 << " does not exist!";
+          cerr << endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
+          cerr << endl;
+          return false;
+        }
+      }
+      tempPar = msrRunList->at(i).GetLifetimeParamNo();
+      if (tempPar > 0) {
+        // go through the whole parameter list and look for the correct parameter - this is stupid, however, I do not know what else to do
+        for (l = 0; l < msrParamList->size(); ++l) {
+          if (tempPar == msrParamList->at(l).fNo) {
+            msrRunList->at(i).SetLifetimeParamNo(l + 1);
+            break;
+          }
+        }
+        if (l > msrParamList->size()) {
+          cerr << endl << ">> msr2data: **ERROR** The lifetime parameter specified in RUN block " << i + 1 << " does not exist!";
+          cerr << endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
+          cerr << endl;
+          return false;
+        }
+      }
+      tempMap = msrRunList->at(i).GetMap();
+      for (unsigned int j(0); j < tempMap->size(); ++j) {
+        tempPar = (*tempMap)[j];
+        if (tempPar > 0) {
+          // go through the whole parameter list and look for the correct parameter - this is stupid, however, I do not know what else to do
+          for (l = 0; l < msrParamList->size(); ++l) {
+            if (tempPar == msrParamList->at(l).fNo) {
+              msrRunList->at(i).SetMap(l + 1, j);
+              break;
+            }
+          }
+        }
+      }
+      tempMap = 0;
+    }
+
+    // FOURIER block - in case a parameter is used for the phase
+    tempPar = fMsrHandler->GetMsrFourierList()->fPhaseParamNo;
+    if (tempPar > 0) {
+      // go through the whole parameter list ...
+      for (unsigned int k(0); k < msrParamList->size(); ++k) {
+        if (tempPar == msrParamList->at(k).fNo) {
+          fMsrHandler->GetMsrFourierList()->fPhaseParamNo = k + 1;
+          break;
         }
       }
     }
-  }
-  tempMap = 0;
 
-  // finally fix the PARAMETER block after the reorganization
-  for (l = 0; l < fMsrHandler->GetMsrParamList()->size(); ++l) {
-    fMsrHandler->GetMsrParamList()->at(l).fNo = l + 1;
+    // PLOT block - in case a parameter is used for the RRFphase
+    for (unsigned int i(0); i < fMsrHandler->GetMsrPlotList()->size(); ++i) {
+      tempPar = fMsrHandler->GetMsrPlotList()->at(i).fRRFPhaseParamNo;
+      if (tempPar > 0) {
+        // go through the whole parameter list ...
+        for (unsigned int k(0); k < msrParamList->size(); ++k) {
+          if (tempPar == msrParamList->at(k).fNo) {
+            fMsrHandler->GetMsrPlotList()->at(i).fRRFPhaseParamNo = k + 1;
+            break;
+          }
+        }
+      }
+    }
+
+    // finally fix the PARAMETER block after the reorganization
+    for (l = 0; l < msrParamList->size(); ++l) {
+      msrParamList->at(l).fNo = l + 1;
+    }
+  }
+
+  // go once more trough the template RUN blocks and look for common parameters
+  // look in the following order through the RUN-blocks: norm, bkg-fit, alpha, beta, lifetime, maps
+  for (unsigned int i(0); i < fNumTempRunBlocks; ++i) {
+    tempPar = msrRunList->at(i).GetNormParamNo();
+    if (tempPar > 0) {
+      if (msrParamList->at(tempPar-1).fIsGlobal) { // norm of RUN block i is global
+        msrRunList->at(i).SetParGlobal(norm, 1);
+      } else {
+        msrRunList->at(i).SetParGlobal(norm, 0);
+      }
+    }
+    tempPar = msrRunList->at(i).GetBkgFitParamNo();
+    if (tempPar > 0) {
+      if (msrParamList->at(tempPar-1).fIsGlobal) { // bkg-fit of RUN block i is global
+        msrRunList->at(i).SetParGlobal(bkgfit, 1);
+      } else {
+        msrRunList->at(i).SetParGlobal(bkgfit, 0);
+      }
+    }
+    tempPar = msrRunList->at(i).GetAlphaParamNo();
+    if (tempPar > 0) {
+      if (msrParamList->at(tempPar-1).fIsGlobal) { // alpha of RUN block i is global
+        msrRunList->at(i).SetParGlobal(alpha, 1);
+      } else {
+        msrRunList->at(i).SetParGlobal(alpha, 0);
+      }
+    }
+    tempPar = msrRunList->at(i).GetBetaParamNo();
+    if (tempPar > 0) {
+      if (msrParamList->at(tempPar-1).fIsGlobal) { // beta of RUN block i is global
+        msrRunList->at(i).SetParGlobal(beta, 1);
+      } else {
+        msrRunList->at(i).SetParGlobal(beta, 0);
+      }
+    }
+    tempPar = msrRunList->at(i).GetLifetimeParamNo();
+    if (tempPar > 0) {
+      if (msrParamList->at(tempPar-1).fIsGlobal) { // lifetime of RUN block i is global
+        msrRunList->at(i).SetParGlobal(lifetime, 1);
+      } else {
+        msrRunList->at(i).SetParGlobal(lifetime, 0);
+      }
+    }
+    tempMap = msrRunList->at(i).GetMap();
+    for (unsigned int j(0); j < tempMap->size(); ++j) {
+      tempPar = (*tempMap)[j];
+      if (tempPar > 0) {
+        if (msrParamList->at(tempPar-1).fIsGlobal) { // map j of RUN block i is global
+          msrRunList->at(i).SetMapGlobal(j, 1);
+        } else {
+          msrRunList->at(i).SetMapGlobal(j, 0);
+        }
+      }
+    }
+    tempMap = 0;
   }
 
   // now go through the specified runs and add run-specific parameters and RUN blocks
@@ -712,12 +769,12 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
 
   if (newRunNumber.str().compare(tempRunNumber.str())) { // first run number does not match the template run number
     // substitute the template run-numbers in the parameter names
-    for (l = fNumGlobalParam; l < fMsrHandler->GetMsrParamList()->size(); ++l) {
-      tempParamName = fMsrHandler->GetMsrParamList()->at(l).fName.Data();
+    for (unsigned int l(fNumGlobalParam); l < msrParamList->size(); ++l) {
+      tempParamName = msrParamList->at(l).fName.Data();
       string::size_type loc = tempParamName.rfind(tempRunNumber.str());
       if ( loc != string::npos ) {
         tempParamName.replace(loc, N, newRunNumber.str());
-        fMsrHandler->GetMsrParamList()->at(l).fName = tempParamName;
+        msrParamList->at(l).fName = tempParamName;
       } else {
         cerr << endl << ">> msr2data: **ERROR** The indices of the run specific parameters do not match the template run number!";
         cerr << endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
@@ -726,12 +783,12 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
     }
     // substitute the template run-numbers in the RUN names
     for (unsigned int i(0); i < fNumTempRunBlocks; ++i) {
-      tempRunName = fMsrHandler->GetMsrRunList()->at(i).GetRunName()->Data();
+      tempRunName = msrRunList->at(i).GetRunName()->Data();
       string::size_type loc = tempRunName.rfind(tempRunNumber.str());
       if ( loc != string::npos ) {
         tempRunName.replace(loc, N, newRunNumber.str());
         tempTstr = TString(tempRunName);
-        fMsrHandler->GetMsrRunList()->at(i).SetRunName(tempTstr, 0);
+        msrRunList->at(i).SetRunName(tempTstr, 0);
       } else {
         cerr << endl << ">> msr2data: **ERROR** A template run file number does not match the \"file index\"";
         cerr << endl << ">> msr2data: **ERROR** Please check the template file!";
@@ -745,7 +802,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
 
   // comments for the output-file
   if (fNumGlobalParam) {
-    commentsP[1] = TString("Global parameters for all runs");
+    commentsP[1] = TString("Common parameters for all runs");
   }
   if (fNumSpecParam) {
     tempStrStr.str("");
@@ -777,14 +834,14 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
     newRunNumber << *fRunVectorIter;
 
     // add parameters for each run
-    for (l = 0; l < fNumSpecParam; ++l) {
-      fMsrHandler->GetMsrParamList()->push_back(fMsrHandler->GetMsrParamList()->at(fNumGlobalParam + runcounter*fNumSpecParam + l));
-      tempParamName = fMsrHandler->GetMsrParamList()->back().fName.Data();
+    for (unsigned int l(0); l < fNumSpecParam; ++l) {
+      msrParamList->push_back(msrParamList->at(fNumGlobalParam + runcounter*fNumSpecParam + l));
+      tempParamName = msrParamList->back().fName.Data();
       string::size_type loc = tempParamName.rfind(tempRunNumber.str());
       if ( loc != string::npos ) {
         tempParamName.replace(loc, N, newRunNumber.str());
-        fMsrHandler->GetMsrParamList()->back().fName = tempParamName;
-        fMsrHandler->GetMsrParamList()->back().fNo += fNumSpecParam;
+        msrParamList->back().fName = tempParamName;
+        msrParamList->back().fNo += fNumSpecParam;
       } else {
         cerr << endl << ">> msr2data: **ERROR** Something went wrong when appending new parameters!";
         cerr << endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
@@ -794,13 +851,13 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
 
     // add RUN blocks for each run
     for (unsigned int i(0); i < fNumTempRunBlocks; ++i) {
-      fMsrHandler->GetMsrRunList()->push_back(fMsrHandler->GetMsrRunList()->at(runcounter*fNumTempRunBlocks + i));
-      tempRunName = fMsrHandler->GetMsrRunList()->back().GetRunName()->Data();
+      msrRunList->push_back(msrRunList->at(runcounter*fNumTempRunBlocks + i));
+      tempRunName = msrRunList->back().GetRunName()->Data();
       string::size_type loc = tempRunName.rfind(tempRunNumber.str());
       if ( loc != string::npos ) {
         tempRunName.replace(loc, N, newRunNumber.str());
         tempTstr = TString(tempRunName);
-        fMsrHandler->GetMsrRunList()->back().SetRunName(tempTstr, 0);
+        msrRunList->back().SetRunName(tempTstr, 0);
       } else {
         cerr << endl << ">> msr2data: **ERROR** Something went wrong when appending new RUN blocks!";
         cerr << endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
@@ -808,36 +865,36 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
         return false;
       }
       // change run specific parameter numbers in the new RUN block
-      runParGlobal = fMsrHandler->GetMsrRunList()->back().GetParGlobal();
+      runParGlobal = msrRunList->back().GetParGlobal();
       iter = runParGlobal->find(norm);
       if (iter != runParGlobal->end()) {
         if (!iter->second)
-          fMsrHandler->GetMsrRunList()->back().SetNormParamNo(fMsrHandler->GetMsrRunList()->back().GetNormParamNo() + fNumSpecParam);
+          msrRunList->back().SetNormParamNo(msrRunList->back().GetNormParamNo() + fNumSpecParam);
       }
       iter = runParGlobal->find(bkgfit);
       if (iter != runParGlobal->end()) {
         if (!iter->second)
-          fMsrHandler->GetMsrRunList()->back().SetBkgFitParamNo(fMsrHandler->GetMsrRunList()->back().GetBkgFitParamNo() + fNumSpecParam);
+          msrRunList->back().SetBkgFitParamNo(msrRunList->back().GetBkgFitParamNo() + fNumSpecParam);
       }
       iter = runParGlobal->find(alpha);
       if (iter != runParGlobal->end()) {
         if (!iter->second)
-          fMsrHandler->GetMsrRunList()->back().SetAlphaParamNo(fMsrHandler->GetMsrRunList()->back().GetAlphaParamNo() + fNumSpecParam);
+          msrRunList->back().SetAlphaParamNo(msrRunList->back().GetAlphaParamNo() + fNumSpecParam);
       }
       iter = runParGlobal->find(beta);
       if (iter != runParGlobal->end()) {
         if (!iter->second)
-          fMsrHandler->GetMsrRunList()->back().SetBetaParamNo(fMsrHandler->GetMsrRunList()->back().GetBetaParamNo() + fNumSpecParam);
+          msrRunList->back().SetBetaParamNo(msrRunList->back().GetBetaParamNo() + fNumSpecParam);
       }
       iter = runParGlobal->find(lifetime);
       if (iter != runParGlobal->end()) {
         if (!iter->second)
-          fMsrHandler->GetMsrRunList()->back().SetLifetimeParamNo(fMsrHandler->GetMsrRunList()->back().GetLifetimeParamNo() + fNumSpecParam);
+          msrRunList->back().SetLifetimeParamNo(msrRunList->back().GetLifetimeParamNo() + fNumSpecParam);
       }
-      runMapGlobal = fMsrHandler->GetMsrRunList()->back().GetMapGlobal();
-      for (l = 0; l < runMapGlobal->size(); ++l) {
+      runMapGlobal = msrRunList->back().GetMapGlobal();
+      for (unsigned int l(0); l < runMapGlobal->size(); ++l) {
         if (!(*runMapGlobal)[l])
-           fMsrHandler->GetMsrRunList()->back().SetMap(fMsrHandler->GetMsrRunList()->back().GetMap()->at(l) + fNumSpecParam, l);
+           msrRunList->back().SetMap(msrRunList->back().GetMap()->at(l) + fNumSpecParam, l);
       }
     }
 
@@ -863,11 +920,15 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
    // write the global msr-file
    status = fMsrHandler->WriteMsrFile(msrOutFile.c_str(), &commentsP, 0, 0, &commentsR);
 
+   if (status != PMUSR_SUCCESS) {
+     cerr << endl << ">> msr2data: **ERROR** Writing the new msr-file has not been successful!";
+     cerr << endl;
+     return false;
+   }
+
    // set back the run-iterator to the start
    fRunVectorIter = fRunVector.begin();
 
-//   in.close();
-//   out.close();
    return true;
 }
 

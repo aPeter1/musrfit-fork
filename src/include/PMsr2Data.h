@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2009 by Bastian M. Wojek / Andreas Suter                *
+ *   Copyright (C) 2009-2010 by Bastian M. Wojek / Andreas Suter           *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -28,6 +28,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
+// note: msr2data is on purpose implemented in a way that shows string handling can be done solely
+//       using std::string, boost and related standard C++ features
+//       This implies, however, occasionally strange constructs when interoperating with PMusr-classes
+//       which mostly rely on ROOT's TString.
 
 #ifndef _PMSR2DATA_H_
 #define _PMSR2DATA_H_
