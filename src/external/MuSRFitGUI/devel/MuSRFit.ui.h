@@ -28,7 +28,7 @@
 # Copyright 2009 by Zaher Salman and the LEM Group.
 # <zaher.salman@psi.ch>
 
-void Form1::fileOpen()
+void MuSRFitMenu::fileOpen()
 {
     my $file=Qt::FileDialog::getOpenFileName(
 	    ".",
@@ -45,7 +45,7 @@ void Form1::fileOpen()
 }
 
 
-void Form1::fileSave()
+void MuSRFitMenu::fileSave()
 {
     my %All=CreateAllInput();      
     my $FILENAME=$All{"FILENAME"}.".msr";
@@ -71,7 +71,7 @@ void Form1::fileSave()
     }
 }
 
-void Form1::fileChangeDir()
+void MuSRFitMenu::fileChangeDir()
 {
     my $newdir=Qt::FileDialog::getExistingDirectory(
 	    "",
@@ -82,13 +82,13 @@ void Form1::fileChangeDir()
     chdir ("$newdir");
 }
 
-void Form1::filePrint()
+void MuSRFitMenu::filePrint()
 {
     
 }
 
 
-void Form1::fileExit()
+void MuSRFitMenu::fileExit()
 {
     my $Ans = Qt::MessageBox::question( this, "Quit?","Are you sure you want to quit?","&Yes","&No","",0,1);
     if ($Ans==0) {
@@ -98,7 +98,7 @@ void Form1::fileExit()
 # Otherwize go back
 }
 
-void Form1::parametersExport()
+void MuSRFitMenu::parametersExport()
 {
     my %All=CreateAllInput();      
 # Add also a flag for header
@@ -121,7 +121,7 @@ void Form1::parametersExport()
 }
 
 
-void Form1::parametersAppend()
+void MuSRFitMenu::parametersAppend()
 {
     my %All=CreateAllInput();
 # Add also a flag for header
@@ -144,48 +144,48 @@ void Form1::parametersAppend()
 }
 
 
-void Form1::editUndo()
+void MuSRFitMenu::editUndo()
 {
     
 }
 
 
-void Form1::editRedo()
+void MuSRFitMenu::editRedo()
 {
     
 }
 
 
-void Form1::editCut()
+void MuSRFitMenu::editCut()
 {
     
 }
 
 
-void Form1::editCopy()
+void MuSRFitMenu::editCopy()
 {
     
 }
 
 
-void Form1::editPaste()
+void MuSRFitMenu::editPaste()
 {
     
 }
 
 
-void Form1::helpIndex()
+void MuSRFitMenu::helpIndex()
 {
     
 }
 
 
-void Form1::helpContents()
+void MuSRFitMenu::helpContents()
 {
     
 }
 
-void Form1::helpAbout()
+void MuSRFitMenu::helpAbout()
 {
     my $AboutText="
 		  This is a GUI that uses the musrfit binary, developed by Andreas Suter,
@@ -861,6 +861,8 @@ void MuSRFitform::InitializeFunctions()
     my $ParCount=0;
     CParamsCombo->clear();
     
+# Possibly use the parameters block to axtract names for the dropdown menu
+# this makes sense if we can use fun in map line. Check!
     my $Component=1;
     foreach my $FitType (@FitTypes) {
 	my $Parameters=$Paramcomp[$Component-1];
@@ -895,4 +897,19 @@ void MuSRFitform::InitializeFunctions()
 # Then clear the text
     ConstraintLine->setText("");
     FunctionsBlock->setText("");
+}
+
+
+void MuSRFitform::optionCustromize()
+{
+    use Customize;
+
+    my $Customize = Qt::Dialog(this);
+    my $w = Customize;
+    $w->setModal(1);
+    $w->exec();
+#    $Customize->setMainWidget($w);
+#    $w->show;
+#   exit $Customize->exec;
+
 }

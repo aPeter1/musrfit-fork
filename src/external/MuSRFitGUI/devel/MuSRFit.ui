@@ -1,8 +1,8 @@
 <!DOCTYPE UI><UI version="3.3" stdsetdef="1">
-<class>MuSRFitformR</class>
+<class>MuSRFitform</class>
 <widget class="QMainWindow">
     <property name="name">
-        <cstring>MuSRFitformR</cstring>
+        <cstring>MuSRFitform</cstring>
     </property>
     <property name="geometry">
         <rect>
@@ -4734,6 +4734,7 @@
         <action name="ManualFile"/>
         <action name="optionsFourier"/>
         <action name="optionsT0"/>
+        <action name="optionsCustomise"/>
     </item>
     <item text="&amp;Help" name="helpMenu">
         <action name="helpContentsAction"/>
@@ -5172,7 +5173,7 @@
             <cstring>Fit</cstring>
         </property>
         <property name="iconSet">
-            <iconset>image0</iconset>
+            <iconset>image20</iconset>
         </property>
         <property name="text">
             <string>Fit and Plot</string>
@@ -5189,7 +5190,7 @@
             <bool>false</bool>
         </property>
         <property name="iconSet">
-            <iconset>image20</iconset>
+            <iconset>image21</iconset>
         </property>
         <property name="text">
             <string>Plot</string>
@@ -5203,7 +5204,7 @@
             <cstring>T0</cstring>
         </property>
         <property name="iconSet">
-            <iconset>image21</iconset>
+            <iconset>image22</iconset>
         </property>
         <property name="text">
             <string>Show t0 and Bg Bins</string>
@@ -5240,10 +5241,21 @@
             <string>T0 and Bg bins</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>optionsCustomise</cstring>
+        </property>
+        <property name="text">
+            <string>Customise</string>
+        </property>
+        <property name="menuText">
+            <string>Customise</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
-        <data format="PNG" length="268">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000d349444154388db594510e84200c44a7864bd9fb673c16fe50b7a95501dd97104983435b06842422ab6ab5f946ca6941074b0ca813cd36eaa5f89f050049811352d53aac8a96b165640256fe468ac546b33eb5c298ededa3f05b1655adbef4b8c062a3e92fbc117d83643ebe6275d53dd1dd637345af3b3e3bbcb8e19470763b23ddc2de3924c58b676d2a67897b717f4b25dcd848f5a3b9e4f8c651dd200992c86205680f4f82c555b51e6b92fe5a2502c0cc3bd40a13b98a133faf17cb286639833fc4db56bce17fafdb9762deeb438fd0083bbf3298df1bba5b870000000049454e44ae426082</data>
+        <data format="PNG" length="330">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000011149444154388da554cb12c2200cdce063c6bb073cfaff3fe657b81e5a6858428b9a19a634249bcd030c81d0ed2d3298924c1e1b81b220dfee3c452c0124f6bafb6a7f95a009c0d3ed6f9531012a90d08ad25255f36f94926a4d09c0e2b2136d0b9aff84b19847017002700170def1a9d218095b4df5bdae2949b631fb7db286be7d03b54406f49373186e05ade0001e814d571b2777551426bb93e1d98eeaa523d2a5e367296239734d2bf06403e90347c1e237667d33f832d8727146444d37d16143c0d7dab3d71e781725510e8f4746c43269799b4c2ee015b490d8052e4696b744f8ea874627a203f64da4635474560004dc32592e99f769c51995b59751adc994cf24f020d0b1cf37a0fff87c05fc011aec943b34e289c20000000049454e44ae426082</data>
     </image>
     <image name="image1">
         <data format="PNG" length="263">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000ce49444154388dd553c911c3200c5c31f9b82428c58db80637e252e492fc541e1965988d1598d83cb22f21c16ad121aa8a11486e2cf3641c5ce6c96a3fdff1f3993fb9b16e8730c9ba1dc2fe089c24390100442467f1fa5d1d735f6212bec8899820c2a3961f29ed21aaefbf157b2deb404f5d9b8aa3ec4edea3962143e7389762b9944b5f678801b6ab8a2770fb323197e22ef28f39de55e58eb2840b3284b84775abe13f29f63e440272292600c2ac0680bbd8f2195e3f6e2e483d25df26c6957bbc6bf3f8510fc6aef45f113f01c3eca579cdbc94f70000000049454e44ae426082</data>
@@ -5303,180 +5315,189 @@
         <data format="PNG" length="297">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000f049444154388dbd926b1283300884978e970af79ff558f487a2481313b52d334e1ec2025f1092383355b5782629aa6abe667f920200532db0e5dcbaf744f1dfd40a7a6a4315bbcf9522862abed3d547c54f0537e15f3116005dc6b7847b735cb3a26a73a78003e36f62f9df1cbbd512660467482e332ea19033ceb7a662e4f19a159784280b155593353efbba59fc4882246cddaf0e66a133df5bead642fcd0540820514c1684dbbd9fa34daaeaf90c100180888724769fbad57c5e8b88998b67e6355147e35d3412efa271cd4c7b5ce39ee43e15aac5c8f930fc51c039ee4c177491b101db1806e876101a33693efc1b7858d21f6a6c70020000000049454e44ae426082</data>
     </image>
     <image name="image20">
-        <data format="PNG" length="319">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000010649444154388dad54d10e84200ceb0c3f65ff3ff5b3760f3283133c39af090959a0ebca864942c64a7aec37c92e071e60c90192b7899ea2b4970d304940434e12d3aca88a439163e788f237c92236abfa6245e0576f0180a40f89df9002c042f2547a3e1831031e5720c99668b737a567b54074c143aca48f0404a9a2c296b8cda844301a9ad11d03ce6d2ac9d869ad3690254bb25c4dc9ca7a6a3b89be5af8b3c72411777b36952ec3005b2d19d8ad31d262df83372b54f8a01207e05e17fa0b92f6919664d5d7fc906812b8f6bfe378bce61e6af8b0767aa4efa654d2e177014eaffe6afa827425bdd44cafc739e36fbf5b7eec61bba5a1300096ff838cad99c0a90199c1079e7cbe7ec1d5a3e00000000049454e44ae426082</data>
+        <data format="PNG" length="322">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000010949444154388da554410ec3200cb3d1f6831dd8ff3fb757cc3b8cd034a4946e919020c48e49002231b939b38025abd279d0252300dc6c25ecd415016f6cbe989c0e9209636928057427359fbe4b1b310987b900b93158f3657bd1b55b9784cb2bf152d4c0f709a6dbcd2fc219b3ba2e5be1a6ecf79b95600b00b0ca6a6d32d3124dee65be9534f0992127c48fe8a0117b5f56130b38aa577807e391e9023395abcfb434b29506ca27ce92e57f4cfb33f4220830284b319c6cee04f85a7bf5b1071e1245d8e6ece5a5c62ab16e37535ff24e6a22a6c416c4ba1d44aff1d2c41b3110fb26ba1fcf9ac6fe7505725609558a98bdb9201bb313f59a2c6116890f129d63ae90fe83b944fc0152038ce6e09860ab0000000049454e44ae426082</data>
     </image>
     <image name="image21">
-        <data format="PNG" length="245">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000bc49444154388dd595c10dc2300c45bf512fdd82392cb14817e90c5da4a3f8ca383d8693d15720366941c03f3572f26cfd38ae5cced7824acbba0900ccd35878dd233133388401bcae63afe8d45bc9ef8155f5c1738e45f1101c41cd4cb2e42978593799a7b1d417e7f04c03839ec15b07bdea56a25d97676692557eb82b5a7e1f0247557ff78170abb5e2bbc091b8b7f9010df1b13eb827003ee4b1aa96b4e2ccdf5abef78fc726b78c7ff7dac01200f761528fc6bd5080fe79efd60d86746ad3b710aeb60000000049454e44ae426082</data>
+        <data format="PNG" length="378">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000014149444154388da554414ec4300c9ca958a4151202b1081ff777bc83e7f02aae3d7042e28084341c1ab78e9bb6dbc552d4c471c6338e53a2610a73b6022e325317f07cb472e4dc39ae1a1d80bb449065f3b0024a005d0067c0b91dd626a96429518770400a680d155991e26c046e49bc16b84b5e0238461fd377c56ee2a20266c3b7c37eab2c042897604579cf4830771f515f9adb699ecbe4b51ec04db976bbdb998552c58a11b8b06f514c6c3fb7819d7932f5e412756fee45604ebe616d7a01f006e0b589181435930a78cf0cc6a6363d29f4f4687e1f7954494c007056cf8fd229394fa5324eaacd4609c757986a5efb4df7418d66ea8a5df318be687ac604aaf83a3dd92ab00771fab5523d01e03bc56d377a90e7f27f609a9d4be5014cc7a5520e66ea607a5c0faac0bd734edb674c0f9700afaad80abc14f43f677601ff014483cede45a9c1380000000049454e44ae426082</data>
+    </image>
+    <image name="image22">
+        <data format="PNG" length="404">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000015b49444154388d8d554172c330085c142739f49a837aebff3fd67ca097b6d3edc12023404998d1c8b660592f48020aa30e74b25a7fc51a3a5bf82672e0573901409ee0be37007f319835a8d96991f402e0ac493f9ba3d11c9dc188c764cbbf0be06f00d7b1a611e7e84580e81c22739a865deb9f029a52fff18cbd4998839ddcf3a66350904595c8acf7ead9132d3c3a057d4864524400d35bc2fbe4d700403af795bb92ef65537ce82c3abc53ad14c3c09e683036d68b1e2c196fa5ebfd59ff4f2686eea30c786c9447900264991624a68de05d08503a411728316faec5aefd94acd3b41dc0be2b5cfb258bf549094311e94e37d391217906568b275bf9cdf732ef426bcfb82b7d0f469037e4d30e0e68c7500d3de3584203be69c62f016ea188132bfb0341661c25ea3a5fa0ed3736853bddbc1567486d93864781f6e2e51b66020fb14711bd431cafdc79451c00604b4d9fe21e5bb86d0805ff073e4cd2ff1f380e920000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
     <connection>
         <sender>Fit</sender>
         <signal>activated()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>GoFit()</slot>
     </connection>
     <connection>
         <sender>parametersAppend_ToAction</sender>
         <signal>activated()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>parametersAppend()</slot>
     </connection>
     <connection>
         <sender>parametersExport_AsAction</sender>
         <signal>activated()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>parametersExport()</slot>
     </connection>
     <connection>
         <sender>BeamLine</sender>
         <signal>activated(int)</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>T0Update()</slot>
     </connection>
     <connection>
         <sender>Browse</sender>
         <signal>clicked()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>fileBrowse()</slot>
     </connection>
     <connection>
         <sender>InitParamTable</sender>
         <signal>valueChanged(int,int)</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>CallMSRCreate()</slot>
     </connection>
     <connection>
         <sender>musrfit_tabs</sender>
         <signal>selected(const QString&amp;)</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>TabChanged()</slot>
     </connection>
     <connection>
         <sender>fileChangeDirAction</sender>
         <signal>activated()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>fileChangeDir()</slot>
     </connection>
     <connection>
         <sender>fileOpenAction</sender>
         <signal>activated()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>fileOpen()</slot>
     </connection>
     <connection>
         <sender>fileSaveAction</sender>
         <signal>activated()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>fileSave()</slot>
     </connection>
     <connection>
         <sender>filePrintAction</sender>
         <signal>activated()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>filePrint()</slot>
     </connection>
     <connection>
         <sender>fileExitAction</sender>
         <signal>activated()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>fileExit()</slot>
     </connection>
     <connection>
         <sender>editUndoAction</sender>
         <signal>activated()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>editUndo()</slot>
     </connection>
     <connection>
         <sender>editRedoAction</sender>
         <signal>activated()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>editRedo()</slot>
     </connection>
     <connection>
         <sender>editCutAction</sender>
         <signal>activated()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>editCut()</slot>
     </connection>
     <connection>
         <sender>editCopyAction</sender>
         <signal>activated()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>editCopy()</slot>
     </connection>
     <connection>
         <sender>editPasteAction</sender>
         <signal>activated()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>editPaste()</slot>
     </connection>
     <connection>
         <sender>helpIndexAction</sender>
         <signal>activated()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>helpIndex()</slot>
     </connection>
     <connection>
         <sender>helpContentsAction</sender>
         <signal>activated()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>helpContents()</slot>
     </connection>
     <connection>
         <sender>helpAboutAction</sender>
         <signal>activated()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>helpAbout()</slot>
     </connection>
     <connection>
         <sender>T0</sender>
         <signal>activated()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>ShowMuSRT0()</slot>
     </connection>
     <connection>
         <sender>Plot</sender>
         <signal>activated()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>GoPlot()</slot>
     </connection>
     <connection>
         <sender>ManualFile</sender>
         <signal>toggled(bool)</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>RunSelectionToggle()</slot>
     </connection>
     <connection>
         <sender>ResetFunc</sender>
         <signal>clicked()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>InitializeFunctions()</slot>
     </connection>
     <connection>
         <sender>FitType1</sender>
         <signal>activated(const QString&amp;)</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>InitializeFunctions()</slot>
     </connection>
     <connection>
         <sender>FitType2</sender>
         <signal>activated(const QString&amp;)</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>InitializeFunctions()</slot>
     </connection>
     <connection>
         <sender>FitType3</sender>
         <signal>activated(const QString&amp;)</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>InitializeFunctions()</slot>
     </connection>
     <connection>
         <sender>AddConstraint</sender>
         <signal>clicked()</signal>
-        <receiver>MuSRFitformR</receiver>
+        <receiver>MuSRFitform</receiver>
         <slot>AppendToFunctions()</slot>
+    </connection>
+    <connection>
+        <sender>optionsCustomise</sender>
+        <signal>activated()</signal>
+        <receiver>MuSRFitform</receiver>
+        <slot>optionCustromize()</slot>
     </connection>
 </connections>
 <tabstops>
@@ -5586,6 +5607,7 @@
     <slot>fileBrowse()</slot>
     <slot>AppendToFunctions()</slot>
     <slot>InitializeFunctions()</slot>
+    <slot>optionCustromize()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>
