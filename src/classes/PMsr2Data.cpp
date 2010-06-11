@@ -1208,15 +1208,15 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
     // since the DB-ASCII-output is in principle independent of the original msr-file-generation
     // the number of global and run specific parameters as well as the number of RUN blocks per run number have to be determined again
     // in case no msr-file has been created before.
+    ostringstream tempRunNumber;
+    string tempName;
     if (!fNumGlobalParam && !fNumSpecParam && !fNumTempRunBlocks) { // if not all parameters are zero they have been determined before
-      ostringstream tempRunNumber;
       tempRunNumber.fill('0');
       tempRunNumber.setf(ios::internal, ios::adjustfield);
       tempRunNumber.width(N);
       tempRunNumber << fRunVector.front();
 
       // search parameter list for run-specific parameters
-      string tempName;
       for (unsigned int i(0); i < msrParamList->size(); ++i) {
         tempName = msrParamList->at(i).fName.Data();
         string::size_type loc = tempName.rfind(tempRunNumber.str());
@@ -1239,14 +1239,14 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
           ++fNumTempRunBlocks;
         }
       }
-      cerr << endl << ">> msr2data: **WARNING** At the moment the full integrity of the global msr file cannot be checked!";
-      cerr << endl << ">> msr2data: **WARNING** It should therefore be checked carefully that the run order is consistent";
-      cerr << endl << ">> msr2data: **WARNING** in the specified run list, the parameters and the RUN blocks in the msr file!";
-      cerr << endl << ">> msr2data: **WARNING** A simple check for the first specified run yields:";
-      cerr << endl << ">> msr2data: **WARNING** Number of global parameters: " << fNumGlobalParam;
-      cerr << endl << ">> msr2data: **WARNING** Number of run specific parameters: " << fNumSpecParam;
-      cerr << endl << ">> msr2data: **WARNING** Number of RUN blocks per run number: " << fNumTempRunBlocks;
-      cerr << endl;
+//       cerr << endl << ">> msr2data: **WARNING** At the moment the full integrity of the global msr file cannot be checked!";
+//       cerr << endl << ">> msr2data: **WARNING** It should therefore be checked carefully that the run order is consistent";
+//       cerr << endl << ">> msr2data: **WARNING** in the specified run list, the parameters and the RUN blocks in the msr file!";
+//       cerr << endl << ">> msr2data: **WARNING** A simple check for the first specified run yields:";
+//       cerr << endl << ">> msr2data: **WARNING** Number of global parameters: " << fNumGlobalParam;
+//       cerr << endl << ">> msr2data: **WARNING** Number of run specific parameters: " << fNumSpecParam;
+//       cerr << endl << ">> msr2data: **WARNING** Number of RUN blocks per run number: " << fNumTempRunBlocks;
+//       cerr << endl;
     }
     // Two more simple consistency checks
     bool okP(true), okR(true);
@@ -1257,7 +1257,7 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
     }
 
     if (!okP) {
-      cerr << endl << ">> msr2data: **ERROR** The number of parameters is not consistent with the specified run list!";
+      cerr << endl << ">> msr2data: **ERROR** The number of parameters or their grouping is not consistent with the specified run list!";
       cerr << endl << ">> msr2data: **ERROR** Please check carefully the integrity of the msr file!";
       cerr << endl << ">> msr2data: **ERROR** No output will be written!";
       cerr << endl;
@@ -1271,8 +1271,67 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
     }
 
     if (!okR) {
-      cerr << endl << ">> msr2data: **ERROR** The number of RUN blocks is not consistent with the specified run list!";
+      cerr << endl << ">> msr2data: **ERROR** The number of RUN blocks or their grouping is not consistent with the specified run list!";
       cerr << endl << ">> msr2data: **ERROR** Please check carefully the integrity of the msr file!";
+      cerr << endl << ">> msr2data: **ERROR** No output will be written!";
+      cerr << endl;
+      return -1;
+    }
+
+    // With all the gathered information look once more through the FITPARAMETER and RUN blocks and check them for the correct run numbers
+    for (unsigned int a(0); a < fRunVector.size(); ++a) {
+      tempRunNumber.clear();
+      tempRunNumber.str("");
+      tempRunNumber.fill('0');
+      tempRunNumber.setf(ios::internal, ios::adjustfield);
+      tempRunNumber.width(N);
+      tempRunNumber << fRunVector[a];
+
+      for (unsigned int i(0); i < fNumSpecParam; ++i) {
+        tempName = msrParamList->at(fNumGlobalParam + a*fNumSpecParam + i).fName.Data();
+        string::size_type loc = tempName.rfind(tempRunNumber.str());
+        if (!(tempName.length() > N) || !(loc == tempName.length() - N)) {
+          okP = false;
+          break;
+        }
+      }
+      if (!okP) {
+        break;
+      }
+    }
+
+    if (!okP) {
+      cerr << endl << ">> msr2data: **ERROR** The run specific parameter names are not consistent with the specified run list!";
+      cerr << endl << ">> msr2data: **ERROR** Please check carefully the integrity of the msr file and the run list!";
+      cerr << endl << ">> msr2data: **ERROR** No output will be written!";
+      cerr << endl;
+      return -1;
+    }
+
+    for (unsigned int a(0); a < fRunVector.size(); ++a) {
+      tempRunNumber.clear();
+      tempRunNumber.str("");
+      tempRunNumber.fill('0');
+      tempRunNumber.setf(ios::internal, ios::adjustfield);
+      tempRunNumber.width(N);
+      tempRunNumber << fRunVector[a];
+
+      for (unsigned int i(0); i < fNumTempRunBlocks; ++i) {
+        tempName = msrRunList->at(a*fNumTempRunBlocks + i).GetRunName()->Data();
+        string::size_type loc = tempName.rfind(tempRunNumber.str());
+        if (loc == string::npos) {
+          okR = false;
+          break;
+        }
+      }
+      if (!okR) {
+        break;
+      }
+    }
+
+    if (!okR) {
+      cerr << endl << ">> msr2data: **ERROR** The run names in the RUN blocks are not consistent with the specified run list!";
+      cerr << endl << ">> msr2data: **ERROR** Please check carefully the integrity of the msr file and the run list!";
       cerr << endl << ">> msr2data: **ERROR** No output will be written!";
       cerr << endl;
       return -1;
