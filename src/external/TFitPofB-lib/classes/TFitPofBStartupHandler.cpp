@@ -351,19 +351,16 @@ void TFitPofBStartupHandler::CheckLists()
       }
     }
 
-    // fill the energies and labels in the pair-vector
+    // fill the energies and labels in the map
     fEnergies.clear();
-    pair<double, string> p;
     for(unsigned int i(0); i < fEnergyList.size(); i++) {
-      p.first = fEnergyList[i];
-      p.second = fEnergyLabelList[i];
-      fEnergies.push_back(p);
+      fEnergies[fEnergyList[i]] = fEnergyLabelList[i];
     }
 
     if(fDebug) {
       cout << "Energies and Labels:";
-      for (unsigned int i (0); i < fEnergies.size(); i++)
-        cout << fEnergies[i].first << " " << fEnergies[i].second << endl;
+      for ( map<double, string>::const_iterator iter(fEnergies.begin()); iter != fEnergies.end(); ++iter )
+        cout << iter->first << " " << iter->second << endl;
     }
 
     // check if any number of steps for the theory function is specified

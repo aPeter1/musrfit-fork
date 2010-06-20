@@ -58,18 +58,19 @@ using namespace std;
 // Also always use the same format within one energyVec - otherwise sorting of the vector will not work properly!
 //--------------------
 
-TTrimSPData::TTrimSPData(const string &path, vector< pair<double, string> > &energies) {
+TTrimSPData::TTrimSPData(const string &path, map<double, string> &energies) {
 
   // sort the energies in ascending order - this might be useful for later applications (energy-interpolations etc.)
-  sort(energies.begin(), energies.end());
+  // after the change from the vector to the map this is not necessary any more - since maps are always ordered!
+  // sort(energies.begin(), energies.end());
 
   double zz(0.0), nzz(0.0);
   vector<double> vzz, vnzz;
   string word, energyStr;
 
-  for(unsigned int i(0); i<energies.size(); i++) {
+  for ( map<double, string>::const_iterator iter(energies.begin()); iter != energies.end(); ++iter ) {
 
-    energyStr = path + energies[i].second + ".rge";
+    energyStr = path + iter->second + ".rge";
 
     ifstream *rgeFile = new ifstream(energyStr.c_str());
     if(! *rgeFile) {
@@ -77,7 +78,7 @@ TTrimSPData::TTrimSPData(const string &path, vector< pair<double, string> > &ene
       delete rgeFile;
       rgeFile = 0;
     } else {
-      fEnergy.push_back(energies[i].first);
+      fEnergy.push_back(iter->first);
 
       while(*rgeFile >> word)
         if(word == "PARTICLES") break;

@@ -32,6 +32,7 @@
 #include <cassert>
 #include <sys/time.h>
 #include <iostream>
+#include <cmath>
 
 #include "../BMWIntegrator/BMWIntegrator.h"
 #include "TLFRelaxation.h"
@@ -135,7 +136,7 @@ double TLFStatLorKT::operator()(double t, const vector<double> &par) const {
 TLFDynGssKT::TLFDynGssKT() : fCalcNeeded(true), fFirstCall(true), fWisdom("WordsOfWisdom.dat"), fNSteps(524288), fDt(0.00004), fCounter(0) {
   // Calculate d_omega and C for given NFFT and dt
   fDw = PI/fNSteps/fDt;
-  fC = 2.0*gsl_sf_log(double(fNSteps))/(double(fNSteps-1)*fDt);
+  fC = 2.0*TMath::Log(double(fNSteps))/(double(fNSteps-1)*fDt);
 
   // Load FFTW Wisdom
   int wisdomLoaded(0);
@@ -223,7 +224,7 @@ double TLFDynGssKT::operator()(double t, const vector<double> &par) const {
   }
 
   if((par[2] >= 5.0*par[1]) || (omegaL >= 10.0*par[1])) {
-    return exp(-2.0*sigsq/(omegaLnusqp*omegaLnusqp)*(omegaLnusqp*nut+omegaLnusqm*(1.0-enut*gsl_sf_cos(wt))-2.0*par[2]*omegaL*enut*gsl_sf_sin(wt))); // Keren
+    return exp(-2.0*sigsq/(omegaLnusqp*omegaLnusqp)*(omegaLnusqp*nut+omegaLnusqm*(1.0-enut*cos(wt))-2.0*par[2]*omegaL*enut*sin(wt))); // Keren
   }
 
   if(fCalcNeeded) {
@@ -251,7 +252,7 @@ double TLFDynGssKT::operator()(double t, const vector<double> &par) const {
 
       for(unsigned int i(1); i<fNSteps; i++) {
         tt=(double(i)-0.5)*fDt;
-        fFFTtime[i]=(gsl_sf_sin(omegaL*tt) * exp(-0.5*sigsq*tt*tt))*fDt;
+        fFFTtime[i]=(sin(omegaL*tt) * exp(-0.5*sigsq*tt*tt))*fDt;
       }
 
       double totoIntegrale(0.);
@@ -259,7 +260,7 @@ double TLFDynGssKT::operator()(double t, const vector<double> &par) const {
       for(unsigned int i(1); i<fNSteps; i++) {
         tt=double(i)*fDt;
         totoIntegrale+=fFFTtime[i];
-        fFFTtime[i]=(1.0-(coeff1*(1.0-exp(-0.5*sigsq*tt*tt)*gsl_sf_cos(omegaL*tt)))+(coeff2*totoIntegrale))*exp(mcplusnu*tt)*fDt;
+        fFFTtime[i]=(1.0-(coeff1*(1.0-exp(-0.5*sigsq*tt*tt)*cos(omegaL*tt)))+(coeff2*totoIntegrale))*exp(mcplusnu*tt)*fDt;
       }
     }
 /*

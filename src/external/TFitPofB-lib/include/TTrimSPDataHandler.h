@@ -34,13 +34,14 @@
 
 #include <vector>
 #include <string>
+#include <map>
 using namespace std;
 
 class TTrimSPData {
 
 public:
 
-  TTrimSPData(const string&, vector< pair<double, string> >&);
+  TTrimSPData(const string&, map<double, string>&);
 
   ~TTrimSPData() {
     fDataZ.clear();

@@ -456,7 +456,7 @@ TProximity1D_1LHS::TProximity1D_1LHS(const vector<double> &param, unsigned int s
 
   fParam.resize(param.size());
   fParam[0] = param[0]; // Bext
-  (param[0] != param[1]) ? fParam[1] = param[1] : fParam[1] = param[1]-0.01; // B1
+  (param[0] != param[1]) ? fParam[1] = param[1] : fParam[1] = param[1]-0.001; // B1
   (param[2] >= 0.) ? fParam[2] = param[2] : fParam[2] = 0.; // deadlayer
   (param[3] >= 0.) ? fParam[3] = param[3] : fParam[3] = 0.; // thickness1
   (param[3] >= 1.) ? fParam[4] = param[4] : fParam[4] = 1.; // lambda

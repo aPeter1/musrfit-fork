@@ -64,6 +64,7 @@ public:
   unsigned int GetPBSize() const {return fPBSize;}
   void ConvolveGss(double);
   void AddBackground(double, double, double);
+  double GetFirstMoment() const;
   void UnsetPBExists();
 
 private:

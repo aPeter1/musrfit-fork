@@ -106,10 +106,10 @@ void msr2data_syntax()
   cout << endl << "       global : switch on the global-fit mode";
   cout << endl << "              Within that mode all specified runs will be united in a single msr-file!";
   cout << endl << "              The fit parameters can be either run specific or common to all runs.";
-  cout << endl << "              For a complete description of this feature please refer to the manual (yet to be written).";
+  cout << endl << "              For a complete description of this feature please refer to the manual.";
   cout << endl;
   cout << endl << "    For further information please refer to";
-  cout << endl << "    https://wiki.intranet.psi.ch/MUSR/Msr2Data";
+  cout << endl << "    https://intranet.psi.ch/MUSR/Msr2Data";
   cout << endl << endl;
 }
 

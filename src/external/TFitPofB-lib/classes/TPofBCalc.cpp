@@ -531,3 +531,14 @@ void TPofBCalc::ConvolveGss(double w) {
 
   return;
 }
+
+double TPofBCalc::GetFirstMoment() const {
+
+  double pBsum(0.0);
+  for (unsigned int i(0); i < fPBSize; i++)
+    pBsum += fB[i]*fPB[i];
+  pBsum *= fDB;
+
+  return pBsum;
+
+}

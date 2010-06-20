@@ -127,7 +127,10 @@ TBulkTriVortexLondon::TBulkTriVortexLondon() : fCalcNeeded(true), fFirstCall(tru
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+           << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+           << endl;
+      assert(false);
     }
 
     fGridSteps = startupHandler->GetGridSteps();
@@ -265,7 +268,10 @@ TBulkTriVortexML::TBulkTriVortexML() : fCalcNeeded(true), fFirstCall(true) {
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+           << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+           << endl;
+      assert(false);
     }
 
     fGridSteps = startupHandler->GetGridSteps();
@@ -404,7 +410,10 @@ TBulkTriVortexAGL::TBulkTriVortexAGL() : fCalcNeeded(true), fFirstCall(true) {
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+           << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+           << endl;
+      assert(false);
     }
 
     fGridSteps = startupHandler->GetGridSteps();
@@ -543,7 +552,10 @@ TBulkTriVortexNGL::TBulkTriVortexNGL() : fCalcNeeded(true), fFirstCall(true) {
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+           << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+           << endl;
+      assert(false);
     }
 
     fGridSteps = startupHandler->GetGridSteps();

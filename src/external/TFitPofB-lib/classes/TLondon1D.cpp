@@ -187,13 +187,16 @@ TLondon1DHS::TLondon1DHS() : fCalcNeeded(true), fFirstCall(true) {
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+           << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+           << endl;
+      assert(false);
     }
 
     fNSteps = startupHandler->GetNSteps();
     fWisdom = startupHandler->GetWisdomFile();
     string rge_path(startupHandler->GetDataPath());
-    vector< pair<double, string> > energy_vec(startupHandler->GetEnergies());
+    map<double, string> energy_vec(startupHandler->GetEnergies());
 
     fParForPofT.push_back(0.0); // phase
     fParForPofT.push_back(startupHandler->GetDeltat());
@@ -348,13 +351,16 @@ TLondon1D1L::TLondon1D1L() : fCalcNeeded(true), fFirstCall(true), fCallCounter(0
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+           << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+           << endl;
+      assert(false);
     }
 
     fNSteps = startupHandler->GetNSteps();
     fWisdom = startupHandler->GetWisdomFile();
     string rge_path(startupHandler->GetDataPath());
-    vector< pair<double, string> > energy_vec(startupHandler->GetEnergies());
+    map<double, string> energy_vec(startupHandler->GetEnergies());
 
     fParForPofT.push_back(0.0);
     fParForPofT.push_back(startupHandler->GetDeltat());
@@ -499,13 +505,16 @@ TLondon1D2L::TLondon1D2L() : fCalcNeeded(true), fFirstCall(true), fLastTwoChange
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+           << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+           << endl;
+      assert(false);
     }
 
     fNSteps = startupHandler->GetNSteps();
     fWisdom = startupHandler->GetWisdomFile();
     string rge_path(startupHandler->GetDataPath());
-    vector< pair<double, string> > energy_vec(startupHandler->GetEnergies());
+    map<double, string> energy_vec(startupHandler->GetEnergies());
 
     fParForPofT.push_back(0.0);
     fParForPofT.push_back(startupHandler->GetDeltat());
@@ -653,13 +662,16 @@ TProximity1D1LHS::TProximity1D1LHS() : fCalcNeeded(true), fFirstCall(true) {
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+           << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+           << endl;
+      assert(false);
     }
 
     fNSteps = startupHandler->GetNSteps();
     fWisdom = startupHandler->GetWisdomFile();
     string rge_path(startupHandler->GetDataPath());
-    vector< pair<double, string> > energy_vec(startupHandler->GetEnergies());
+    map<double, string> energy_vec(startupHandler->GetEnergies());
 
     fParForPofT.push_back(0.0);
     fParForPofT.push_back(startupHandler->GetDeltat());
@@ -819,13 +831,16 @@ TProximity1D1LHSGss::TProximity1D1LHSGss() : fCalcNeeded(true), fFirstCall(true)
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+           << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+           << endl;
+      assert(false);
     }
 
     fNSteps = startupHandler->GetNSteps();
     fWisdom = startupHandler->GetWisdomFile();
     string rge_path(startupHandler->GetDataPath());
-    vector< pair<double, string> > energy_vec(startupHandler->GetEnergies());
+    map<double, string> energy_vec(startupHandler->GetEnergies());
 
     fParForPofT.push_back(0.0);
     fParForPofT.push_back(startupHandler->GetDeltat());
@@ -957,13 +972,16 @@ TLondon1D3L::TLondon1D3L() : fCalcNeeded(true), fFirstCall(true), fLastThreeChan
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+           << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+           << endl;
+      assert(false);
     }
 
     fNSteps = startupHandler->GetNSteps();
     fWisdom = startupHandler->GetWisdomFile();
     string rge_path(startupHandler->GetDataPath());
-    vector< pair<double, string> > energy_vec(startupHandler->GetEnergies());
+    map<double, string> energy_vec(startupHandler->GetEnergies());
 
     fParForPofT.push_back(0.0);
     fParForPofT.push_back(startupHandler->GetDeltat());
@@ -1125,13 +1143,16 @@ TLondon1D3LS::TLondon1D3LS() : fCalcNeeded(true), fFirstCall(true), fLastThreeCh
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+           << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+           << endl;
+      assert(false);
     }
 
     fNSteps = startupHandler->GetNSteps();
     fWisdom = startupHandler->GetWisdomFile();
     string rge_path(startupHandler->GetDataPath());
-    vector< pair<double, string> > energy_vec(startupHandler->GetEnergies());
+    map<double, string> energy_vec(startupHandler->GetEnergies());
 
     fParForPofT.push_back(0.0);
     fParForPofT.push_back(startupHandler->GetDeltat());
@@ -1445,13 +1466,16 @@ TLondon1D3LSub::TLondon1D3LSub() : fCalcNeeded(true), fFirstCall(true), fWeights
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+           << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+           << endl;
+      assert(false);
     }
 
     fNSteps = startupHandler->GetNSteps();
     fWisdom = startupHandler->GetWisdomFile();
     string rge_path(startupHandler->GetDataPath());
-    vector< pair<double, string> > energy_vec(startupHandler->GetEnergies());
+    map<double, string> energy_vec(startupHandler->GetEnergies());
 
     fParForPofT.push_back(0.0);
     fParForPofT.push_back(startupHandler->GetDeltat());

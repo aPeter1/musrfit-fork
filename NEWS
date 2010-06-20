@@ -1,8 +1,17 @@
 #---------------------------------------------------------------------
 # NEWS
-# Andreas Suter, 2009/06/21
+# Andreas Suter, 2010/06/15
 # $Id: NEWS 4013 2009-06-21
 #---------------------------------------------------------------------
+
+musrfit 0.6.0
++ Added grouping of histograms
++ Added global mode to msr2data
++
++
++
++
+
 
 musrfit 0.5.0
 

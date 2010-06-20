@@ -29,6 +29,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <cassert>
 #include <algorithm>
 #include <functional>
 #include <string>
@@ -58,11 +59,14 @@ TMeanFieldsForScHalfSpace::TMeanFieldsForScHalfSpace() {
   int status (saxParser->ParseFile(startup_path_name.c_str()));
   // check for parse errors
   if (status) { // error
-    cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+    cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+         << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+         << endl;
+    assert(false);
   }
 
   string rge_path(startupHandler->GetDataPath());
-  vector< pair<double, string> > energy_vec(startupHandler->GetEnergies());
+  map<double, string> energy_vec(startupHandler->GetEnergies());
 
   TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
   fImpProfile = x;
@@ -147,11 +151,14 @@ TMeanFieldsForScSingleLayer::TMeanFieldsForScSingleLayer() {
   int status (saxParser->ParseFile(startup_path_name.c_str()));
   // check for parse errors
   if (status) { // error
-    cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+    cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+         << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+         << endl;
+    assert(false);
   }
 
   string rge_path(startupHandler->GetDataPath());
-  vector< pair<double, string> > energy_vec(startupHandler->GetEnergies());
+  map<double, string> energy_vec(startupHandler->GetEnergies());
 
   TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
   fImpProfile = x;
@@ -244,11 +251,14 @@ TMeanFieldsForScBilayer::TMeanFieldsForScBilayer() {
   int status (saxParser->ParseFile(startup_path_name.c_str()));
   // check for parse errors
   if (status) { // error
-    cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+    cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+         << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+         << endl;
+    assert(false);
   }
 
   string rge_path(startupHandler->GetDataPath());
-  vector< pair<double, string> > energy_vec(startupHandler->GetEnergies());
+  map<double, string> energy_vec(startupHandler->GetEnergies());
 
   TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
   fImpProfile = x;
@@ -345,11 +355,14 @@ TMeanFieldsForScTrilayer::TMeanFieldsForScTrilayer() {
   int status (saxParser->ParseFile(startup_path_name.c_str()));
   // check for parse errors
   if (status) { // error
-    cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+    cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+         << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+         << endl;
+    assert(false);
   }
 
   string rge_path(startupHandler->GetDataPath());
-  vector< pair<double, string> > energy_vec(startupHandler->GetEnergies());
+  map<double, string> energy_vec(startupHandler->GetEnergies());
 
   TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
   fImpProfile = x;
@@ -448,11 +461,14 @@ TMeanFieldsForScTrilayerWithInsulator::TMeanFieldsForScTrilayerWithInsulator() {
   int status (saxParser->ParseFile(startup_path_name.c_str()));
   // check for parse errors
   if (status) { // error
-    cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+    cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+         << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+         << endl;
+    assert(false);
   }
 
   string rge_path(startupHandler->GetDataPath());
-  vector< pair<double, string> > energy_vec(startupHandler->GetEnergies());
+  map<double, string> energy_vec(startupHandler->GetEnergies());
 
   TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
   fImpProfile = x;

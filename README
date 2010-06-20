@@ -1,16 +1,16 @@
 #---------------------------------------------------------------------
 # README
-# Andreas Suter, 2009/06/21
+# Andreas Suter, 2010/06/20
 # $Id: README 4013 2009-06-21
 #---------------------------------------------------------------------
 
 musrfit - muSR data analysis package
 
 Installation instructions can be found in INSTALL and at
-https://wiki.intranet.psi.ch/MUSR/MusrFitSetup
+https://intranet.psi.ch/MUSR/MusrFitSetup
 
 For further documentation, please visit
-https://wiki.intranet.psi.ch/MUSR/MusrFit
+https://intranet.psi.ch/MUSR/MusrFit
 
 #---------------------------------------------------------------------
 # this is the end ...

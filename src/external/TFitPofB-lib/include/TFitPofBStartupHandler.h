@@ -40,6 +40,7 @@
 #include <TQObject.h>
 #include <string>
 #include <vector>
+#include <map>
 
 class TFitPofBStartupHandler : public TQObject {
   public:
@@ -60,7 +61,7 @@ class TFitPofBStartupHandler : public TQObject {
     virtual void CheckLists();
 
     virtual const string GetDataPath() const { return fDataPath; }
-    virtual vector< pair<double, string> > GetEnergies() const { return fEnergies; }
+    virtual map<double, string> GetEnergies() const { return fEnergies; }
     virtual const double GetDeltat() const { return fDeltat; }
     virtual const double GetDeltaB() const { return fDeltaB; }
     virtual const string GetWisdomFile() const { return fWisdomFile; }
@@ -79,7 +80,7 @@ class TFitPofBStartupHandler : public TQObject {
     string          fDataPath;
     vector<string>  fEnergyLabelList;
     vector<double>  fEnergyList;
-    vector< pair<double, string> > fEnergies;
+    map<double, string> fEnergies;
     double          fDeltat;
     double          fDeltaB;
     string          fWisdomFile;
