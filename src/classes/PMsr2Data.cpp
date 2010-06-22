@@ -494,7 +494,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
   vector<int> *tempMap;
   PMsrLines *tempLines;
   vector<string> tempVec;
-  string line;
+  string line, tempString;
 
   if (!wasSorted) {
     // Sort the parameters: global ones first, then run-specific
@@ -507,7 +507,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
     bool mapExists(false);
     for (unsigned int i(0); i < tempLines->size(); ++i) {
       line = (*tempLines)[i].fLine.Data();
-      split( tempVec, line, is_any_of(" ") ); // split the theory line at spaces
+      split( tempVec, line, is_any_of(" \t") ); // split the theory line at spaces
       for (unsigned int j(1); j < tempVec.size(); ++j) {
         try {
           tempPar = boost::lexical_cast<unsigned int>(tempVec[j]);
@@ -577,11 +577,12 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
     }
 
     // FUNCTIONS block
+    string::size_type pos(0);
     tempLines = fMsrHandler->GetMsrFunctions();
     for (unsigned int i(0); i < tempLines->size(); ++i) {
       line = (*tempLines)[i].fLine.Data();
-      split( tempVec, line, is_any_of(" ") ); // split the function line at spaces
-      for (unsigned int j(2); j < tempVec.size(); ++j) {
+      split( tempVec, line, is_any_of(" ()+-*/=\t") ); // split the function line at spaces and some characters that might be juxtaposed to the parameters
+      for (unsigned int j(1); j < tempVec.size(); ++j) {
         if (!tempVec[j].substr(0,3).compare("par")) {
           try {
             tempPar = boost::lexical_cast<unsigned int>(tempVec[j].substr(3));
@@ -589,8 +590,16 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
             for (unsigned int k(0); k < msrParamList->size(); ++k) {
               if (tempPar == msrParamList->at(k).fNo) {
                 if (msrParamList->at(k).fIsGlobal) {
-                  tempVec[j] = "par";
-                  tempVec[j].append(boost::lexical_cast<string>(k + 1));
+                  pos = line.find(tempVec[j], pos);
+                  if ( pos != string::npos ) {
+                    tempString = "par";
+                    tempString.append(boost::lexical_cast<string>(k + 1));
+                    line.replace(pos, tempVec[j].length(), tempString);
+                  } else {
+                    cerr << endl << ">> msr2data: **ERROR** A previously identified parameter in the FUNCTIONS block is not found any more!";
+                    cerr << endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
+                    cerr << endl;
+                  }
                 } else {
                   cerr << endl << ">> msr2data: **WARNING** The parameter " << msrParamList->at(k).fName.Data() \
                                << " is recognized as run specific!";
@@ -618,22 +627,27 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
                     }
                   }
 
-                  if (mapExists) {
-                    tempVec[j] = "map";
-                    tempVec[j].append(boost::lexical_cast<string>(l + 1));
-                    mapExists = false;
-                  } else {
+                  if (!mapExists) {
                     for (l = 0; l < tempMap->size(); ++l) {
                       if (!(*tempMap)[l]) {
                         break;
                       }
                     }
                     for (unsigned int m(0); m < fNumTempRunBlocks; ++m) {
-                      msrRunList->at(m).SetMap(tempPar, l); // write the template parameter to the map - it will be replaced later
+                      msrRunList->at(m).SetMap(tempPar, l);
                     }
-                    tempVec[j] = "map";
-                    tempVec[j].append(boost::lexical_cast<string>(l + 1));
                   }
+                  pos = line.find(tempVec[j], pos);
+                  if ( pos != string::npos ) {
+                    tempString = "map";
+                    tempString.append(boost::lexical_cast<string>(l + 1));
+                    line.replace(pos, tempVec[j].length(), tempString);
+                  } else {
+                    cerr << endl << ">> msr2data: **ERROR** A previously identified parameter in the FUNCTIONS block is not found any more!";
+                    cerr << endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
+                    cerr << endl;
+                  }
+                  mapExists = false;
                 }
                 break;
               }
@@ -646,13 +660,12 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
             return false;
           }
         }
+        ++pos;
       }
       // replace the old function line by the new one
-      (*tempLines)[i].fLine.Clear();
-      for (unsigned int j(0); j < tempVec.size(); ++j) {
-        (*tempLines)[i].fLine += TString(tempVec[j]) + TString(" ");
-      }
+      (*tempLines)[i].fLine = TString(line);
       tempVec.clear();
+      pos = 0;
     }
 
     // RUN blocks
@@ -794,7 +807,8 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
     tempLines = fMsrHandler->GetMsrTheory();
     for (unsigned int i(0); i < tempLines->size(); ++i) {
       line = (*tempLines)[i].fLine.Data();
-      split( tempVec, line, is_any_of(" ") ); // split the theory line at spaces
+      split( tempVec, line, is_any_of(" \t") ); // split the theory line at spaces
+
       for (unsigned int j(1); j < tempVec.size(); ++j) {
         try {
           tempPar = boost::lexical_cast<unsigned int>(tempVec[j]);
@@ -864,10 +878,11 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
 
     // FUNCTIONS block
     tempLines = fMsrHandler->GetMsrFunctions();
+    string::size_type pos(0);
     for (unsigned int i(0); i < tempLines->size(); ++i) {
       line = (*tempLines)[i].fLine.Data();
-      split( tempVec, line, is_any_of(" ") ); // split the function line at spaces
-      for (unsigned int j(2); j < tempVec.size(); ++j) {
+      split( tempVec, line, is_any_of(" ()+-*/=\t") ); // split the function line at spaces and some characters that might be juxtaposed to the parameters
+      for (unsigned int j(1); j < tempVec.size(); ++j) {
         if (!tempVec[j].substr(0,3).compare("par")) {
           try {
             tempPar = boost::lexical_cast<unsigned int>(tempVec[j].substr(3));
@@ -900,12 +915,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
                 }
               }
 
-              if (mapExists) {
-                tempVec[j] = "map";
-                tempVec[j].append(boost::lexical_cast<string>(l + 1));
-                lineChanged = true;
-                mapExists = false;
-              } else {
+              if (!mapExists) {
                 for (l = 0; l < tempMap->size(); ++l) {
                   if (!(*tempMap)[l]) {
                     break;
@@ -914,12 +924,20 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
                 for (unsigned int m(0); m < fNumTempRunBlocks; ++m) {
                   msrRunList->at(m).SetMap(tempPar, l);
                 }
-                tempVec[j] = "map";
-                tempVec[j].append(boost::lexical_cast<string>(l + 1));
-                lineChanged = true;
               }
+              pos = line.find(tempVec[j], pos);
+              if ( pos != string::npos ) {
+                tempString = "map";
+                tempString.append(boost::lexical_cast<string>(l + 1));
+                line.replace(pos, tempVec[j].length(), tempString);
+              } else {
+                cerr << endl << ">> msr2data: **ERROR** A previously identified parameter in the FUNCTIONS block is not found any more!";
+                cerr << endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
+                cerr << endl;
+              }
+              mapExists = false;
+              lineChanged = true;
             }
-            break;
           }
 
           catch(boost::bad_lexical_cast &) {
@@ -929,16 +947,15 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
             return false;
           }
         }
+        ++pos;
       }
       // replace the old function line by the new one
       if (lineChanged) {
-        (*tempLines)[i].fLine.Clear();
-        for (unsigned int j(0); j < tempVec.size(); ++j) {
-          (*tempLines)[i].fLine += TString(tempVec[j]) + TString(" ");
-        }
+        (*tempLines)[i].fLine = TString(line);
         lineChanged = false;
       }
       tempVec.clear();
+      pos = 0;
     }
   }
 
@@ -946,7 +963,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
   // look in the following order through the RUN-blocks: norm, bkg-fit, alpha, beta, lifetime, maps
   for (unsigned int i(0); i < fNumTempRunBlocks; ++i) {
     tempPar = msrRunList->at(i).GetNormParamNo();
-    if (tempPar > 0) {
+    if ((tempPar > 0) && (tempPar < MSR_PARAM_FUN_OFFSET)) { // if the norm-parameter is given by a function we do not have to care about it here!
       if (msrParamList->at(tempPar-1).fIsGlobal) { // norm of RUN block i is global
         msrRunList->at(i).SetParGlobal(norm, 1);
       } else {
