@@ -1722,6 +1722,7 @@ void PTextEdit::musrMsr2Data()
     fMsr2DataParam->titleFromDataFile = fTitleFromDataFile;
     fMsr2DataParam->createMsrFileOnly = false;
     fMsr2DataParam->fitOnly = false;
+    fMsr2DataParam->global = false;
   }
 
   PMsr2DataDialog *dlg = new PMsr2DataDialog(fMsr2DataParam, fAdmin->getHelpUrl("msr2data"));
@@ -1887,22 +1888,22 @@ void PTextEdit::musrMsr2Data()
       cmd.append("data");
     }
 
-    // recreate db file
-    if (fMsr2DataParam->recreateDbFile) {
-      if (!QFile::remove(fMsr2DataParam->dbOutputFileName)) {
-        str = QString("Couldn't delete db-file '%1'. Will **NOT** proceed.").arg(fMsr2DataParam->dbOutputFileName);
-        QMessageBox::critical(this, "**ERROR**", str,
-           QMessageBox::Ok, QMessageBox::NoButton);
-        return;
-      }
+    // global flag check
+    if (fMsr2DataParam->global) {
+      cmd.append("global");
     }
 
-/*
-for (unsigned int i=0; i<cmd.size(); i++) {
-  cout << endl << ">> " << cmd[i].toLatin1();
-}
-cout << endl;
-*/
+    // recreate db file
+    if (fMsr2DataParam->recreateDbFile) {
+      if (QFile::exists(fMsr2DataParam->dbOutputFileName)) {
+        if (!QFile::remove(fMsr2DataParam->dbOutputFileName)) {
+          str = QString("Couldn't delete db-file '%1'. Will **NOT** proceed.").arg(fMsr2DataParam->dbOutputFileName);
+          QMessageBox::critical(this, "**ERROR**", str,
+                                QMessageBox::Ok, QMessageBox::NoButton);
+          return;
+        }
+      }
+    }
 
     PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath(), cmd);
     fitOutputHandler.setModal(true);

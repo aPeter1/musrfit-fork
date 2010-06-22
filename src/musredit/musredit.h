@@ -52,12 +52,13 @@ typedef struct {
   bool summaryFilePresent;     ///< flag indicating if a LEM summary file is present (== !nosummary in msr2data)
   bool keepMinuit2Output;      ///< flag indicating if the minuit2 output shall be kept ('-k' in msr2data)
   bool writeColumnData;        ///< flag indicating if instead of a db-file a column data ascii file shall be written ('data' in msr2data)
-  bool recreateDbFile;         ///< true = recreate db-file, false = append to present db-file
-  bool chainFit;               ///< true = chain fit, i.e. the template for a fit is the preceeding run. false = the template is always the source for the new msr-file
-  bool openFilesAfterFitting;  ///< true = open msr-file after fit in musredit. false = do not open msr-file after fit.
+  bool recreateDbFile;         ///< flag: true = recreate db-file, false = append to present db-file
+  bool chainFit;               ///< flag: true = chain fit, i.e. the template for a fit is the preceeding run. false = the template is always the source for the new msr-file
+  bool openFilesAfterFitting;  ///< flag: true = open msr-file after fit in musredit. false = do not open msr-file after fit.
   bool titleFromDataFile;      ///< flag indicating if the title for the msr-file shall be extracted from the data-file ('-t' in msr2data)
-  bool createMsrFileOnly;      ///< true = just create the msr-files without any fitting ('msr-<template>' in msr2data)
-  bool fitOnly;                ///< true = just perform the fits wihtout generating any msr-files ('fit' in msr2data).
+  bool createMsrFileOnly;      ///< flag: true = just create the msr-files without any fitting ('msr-<template>' in msr2data)
+  bool fitOnly;                ///< flag: true = just perform the fits wihtout generating any msr-files ('fit' in msr2data).
+  bool global;                 ///< flag: true = 'global' option
 } PMsr2DataParam;
 
 //-------------------------------------------------------------------------------------------------

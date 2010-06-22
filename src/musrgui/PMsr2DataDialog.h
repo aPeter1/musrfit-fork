@@ -51,6 +51,7 @@ class PMsr2DataDialog : public PMsr2DataDialogBase
     void templateRunEntered(const QString&);
     void createMsrFileOnlyChanged(int);
     void fitOnlyChanged(int);
+    void globalChanged(int);
 
   private:
     int fRunTag; // -1 = not valid, 0 = first last, 1 = run list, 2 = run list file name

@@ -200,92 +200,6 @@
             </property>
         </widget>
     </widget>
-    <widget class="QLayoutWidget">
-        <property name="name">
-            <cstring>Layout1</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>10</x>
-                <y>530</y>
-                <width>580</width>
-                <height>33</height>
-            </rect>
-        </property>
-        <hbox>
-            <property name="name">
-                <cstring>unnamed</cstring>
-            </property>
-            <property name="margin">
-                <number>0</number>
-            </property>
-            <property name="spacing">
-                <number>6</number>
-            </property>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>fHelp_button</cstring>
-                </property>
-                <property name="text">
-                    <string>&amp;Help</string>
-                </property>
-                <property name="accel">
-                    <string>F1</string>
-                </property>
-                <property name="autoDefault">
-                    <bool>true</bool>
-                </property>
-            </widget>
-            <spacer>
-                <property name="name">
-                    <cstring>Horizontal Spacing2</cstring>
-                </property>
-                <property name="orientation">
-                    <enum>Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                    <enum>Expanding</enum>
-                </property>
-                <property name="sizeHint">
-                    <size>
-                        <width>20</width>
-                        <height>20</height>
-                    </size>
-                </property>
-            </spacer>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>fOk_button</cstring>
-                </property>
-                <property name="text">
-                    <string>&amp;OK</string>
-                </property>
-                <property name="accel">
-                    <string></string>
-                </property>
-                <property name="autoDefault">
-                    <bool>true</bool>
-                </property>
-                <property name="default">
-                    <bool>true</bool>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>fCancel_button</cstring>
-                </property>
-                <property name="text">
-                    <string>&amp;Cancel</string>
-                </property>
-                <property name="accel">
-                    <string></string>
-                </property>
-                <property name="autoDefault">
-                    <bool>true</bool>
-                </property>
-            </widget>
-        </hbox>
-    </widget>
     <widget class="QGroupBox">
         <property name="name">
             <cstring>fExtension_groupBox</cstring>
@@ -458,7 +372,7 @@
                 <x>10</x>
                 <y>400</y>
                 <width>581</width>
-                <height>110</height>
+                <height>120</height>
             </rect>
         </property>
         <property name="title">
@@ -623,6 +537,108 @@
                 <string>Fit Only</string>
             </property>
         </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>fGlobal_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>400</x>
+                    <y>90</y>
+                    <width>106</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Global</string>
+            </property>
+        </widget>
+    </widget>
+    <widget class="QLayoutWidget">
+        <property name="name">
+            <cstring>Layout1</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>530</y>
+                <width>580</width>
+                <height>33</height>
+            </rect>
+        </property>
+        <hbox>
+            <property name="name">
+                <cstring>unnamed</cstring>
+            </property>
+            <property name="margin">
+                <number>0</number>
+            </property>
+            <property name="spacing">
+                <number>6</number>
+            </property>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>fHelp_button</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;Help</string>
+                </property>
+                <property name="accel">
+                    <string>F1</string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+            </widget>
+            <spacer>
+                <property name="name">
+                    <cstring>Horizontal Spacing2</cstring>
+                </property>
+                <property name="orientation">
+                    <enum>Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                    <enum>Expanding</enum>
+                </property>
+                <property name="sizeHint">
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>fOk_button</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;OK</string>
+                </property>
+                <property name="accel">
+                    <string></string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+                <property name="default">
+                    <bool>true</bool>
+                </property>
+            </widget>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>fCancel_button</cstring>
+                </property>
+                <property name="text">
+                    <string>&amp;Cancel</string>
+                </property>
+                <property name="accel">
+                    <string></string>
+                </property>
+                <property name="autoDefault">
+                    <bool>true</bool>
+                </property>
+            </widget>
+        </hbox>
     </widget>
 </widget>
 <images>
@@ -685,6 +701,12 @@
         <receiver>PMsr2DataDialogBase</receiver>
         <slot>templateRunEntered(const QString&amp;)</slot>
     </connection>
+    <connection>
+        <sender>fGlobal_checkBox</sender>
+        <signal>stateChanged(int)</signal>
+        <receiver>PMsr2DataDialogBase</receiver>
+        <slot>globalChanged(int)</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>fFirst_lineEdit</tabstop>
@@ -716,6 +738,7 @@
     <slot>createMsrFileOnlyChanged(int)</slot>
     <slot>fitOnlyChanged(int)</slot>
     <slot>templateRunEntered(const QString&amp;)</slot>
+    <slot>globalChanged(int)</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

@@ -91,6 +91,7 @@ PMsr2DataDialog::PMsr2DataDialog(PMsr2DataParam *msr2DataParam) : fMsr2DataParam
   fTitleFromData_checkBox->setChecked(fMsr2DataParam->titleFromDataFile);
   fCreateMsrFileOnly_checkBox->setChecked(fMsr2DataParam->createMsrFileOnly);
   fFitOnly_checkBox->setChecked(fMsr2DataParam->fitOnly);
+  fGlobal_checkBox->setChecked(fMsr2DataParam->global);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -128,6 +129,7 @@ PMsr2DataParam* PMsr2DataDialog::getMsr2DataParam()
   fMsr2DataParam->titleFromDataFile = fTitleFromData_checkBox->isChecked();
   fMsr2DataParam->createMsrFileOnly = fCreateMsrFileOnly_checkBox->isChecked();
   fMsr2DataParam->fitOnly = fFitOnly_checkBox->isChecked();
+  fMsr2DataParam->global = fGlobal_checkBox->isChecked();
 
   return fMsr2DataParam;
 }
@@ -238,7 +240,19 @@ void PMsr2DataDialog::fitOnlyChanged(int buttonState)
 {
   if (buttonState == QButton::On) {
     fCreateMsrFileOnly_checkBox->setChecked(false);
+    fGlobal_checkBox->setChecked(false);
     fTemplateRunNumber_lineEdit->clear();
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PMsr2DataDialog::globalChanged(int buttonState)
+{
+  if (buttonState == QButton::On) {
+    fFitOnly_checkBox->setChecked(false);
   }
 }
 

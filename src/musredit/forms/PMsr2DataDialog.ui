@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>542</width>
-    <height>522</height>
+    <width>552</width>
+    <height>551</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,7 +22,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>541</width>
+     <width>551</width>
      <height>131</height>
     </rect>
    </property>
@@ -46,8 +46,8 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>511</width>
-      <height>94</height>
+      <width>531</width>
+      <height>97</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -195,7 +195,7 @@
     <rect>
      <x>0</x>
      <y>130</y>
-     <width>541</width>
+     <width>551</width>
      <height>71</height>
     </rect>
    </property>
@@ -207,8 +207,8 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>511</width>
-      <height>28</height>
+      <width>531</width>
+      <height>29</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -256,7 +256,7 @@
     <rect>
      <x>0</x>
      <y>200</y>
-     <width>541</width>
+     <width>551</width>
      <height>80</height>
     </rect>
    </property>
@@ -268,8 +268,8 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>511</width>
-      <height>28</height>
+      <width>531</width>
+      <height>29</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -311,7 +311,7 @@
     <rect>
      <x>0</x>
      <y>280</y>
-     <width>541</width>
+     <width>551</width>
      <height>80</height>
     </rect>
    </property>
@@ -323,8 +323,8 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>511</width>
-      <height>28</height>
+      <width>531</width>
+      <height>29</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -362,20 +362,20 @@
     <rect>
      <x>0</x>
      <y>360</y>
-     <width>541</width>
-     <height>111</height>
+     <width>551</width>
+     <height>141</height>
     </rect>
    </property>
    <property name="title">
     <string>Options</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>30</y>
-      <width>521</width>
-      <height>81</height>
+      <y>31</y>
+      <width>540</width>
+      <height>108</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -452,6 +452,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QCheckBox" name="fGlobal_checkBox">
+         <property name="text">
+          <string>Global</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
     </layout>
@@ -461,8 +468,8 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>470</y>
-     <width>541</width>
+     <y>500</y>
+     <width>551</width>
      <height>51</height>
     </rect>
    </property>
@@ -549,7 +556,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>538</x>
-     <y>488</y>
+     <y>534</y>
     </hint>
     <hint type="destinationlabel">
      <x>508</x>
@@ -564,8 +571,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>453</x>
-     <y>506</y>
+     <x>456</x>
+     <y>541</y>
     </hint>
     <hint type="destinationlabel">
      <x>380</x>
@@ -580,44 +587,12 @@
    <slot>helpContent()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>57</x>
-     <y>488</y>
+     <x>59</x>
+     <y>534</y>
     </hint>
     <hint type="destinationlabel">
      <x>96</x>
      <y>370</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>fFitOnly_checkBox</sender>
-   <signal>stateChanged(int)</signal>
-   <receiver>PMsr2DataDialog</receiver>
-   <slot>fitOnlyChanged(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>406</x>
-     <y>460</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>301</x>
-     <y>484</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>fCreateMsrFileOnly_checkBox</sender>
-   <signal>stateChanged(int)</signal>
-   <receiver>PMsr2DataDialog</receiver>
-   <slot>createMsrFileOnlyChanged(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>377</x>
-     <y>429</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>150</x>
-     <y>487</y>
     </hint>
    </hints>
   </connection>
@@ -701,6 +676,54 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>fFitOnly_checkBox</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>PMsr2DataDialog</receiver>
+   <slot>fitOnlyChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>406</x>
+     <y>460</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>301</x>
+     <y>484</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fCreateMsrFileOnly_checkBox</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>PMsr2DataDialog</receiver>
+   <slot>createMsrFileOnlyChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>547</x>
+     <y>442</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>150</x>
+     <y>487</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fGlobal_checkBox</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>PMsr2DataDialog</receiver>
+   <slot>globalChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>398</x>
+     <y>479</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>372</x>
+     <y>520</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>helpContent()</slot>
@@ -711,5 +734,6 @@
   <slot>runListEntered(QString)</slot>
   <slot>runListFileNameEntered(QString)</slot>
   <slot>templateRunEntered(QString)</slot>
+  <slot>globalChanged(int)</slot>
  </slots>
 </ui>

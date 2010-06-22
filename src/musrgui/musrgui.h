@@ -52,6 +52,7 @@ typedef struct {
   bool titleFromDataFile;
   bool createMsrFileOnly;
   bool fitOnly;
+  bool global;
 } PMsr2DataParam;
 
 typedef struct {

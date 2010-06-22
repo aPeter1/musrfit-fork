@@ -39,6 +39,10 @@
  */
 PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QValueVector<QString> &cmd)
 {
+qDebug("workingDirectory = %s", workingDirectory.latin1());
+for (int i=0; i<cmd.size(); i++)
+  qDebug("%s ", cmd[i].latin1());
+
   if (cmd.empty())
     return;
 

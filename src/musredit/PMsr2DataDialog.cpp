@@ -100,6 +100,7 @@ PMsr2DataDialog::PMsr2DataDialog(PMsr2DataParam *msr2DataParam, const QString he
   fTitleFromData_checkBox->setChecked(fMsr2DataParam->titleFromDataFile);
   fCreateMsrFileOnly_checkBox->setChecked(fMsr2DataParam->createMsrFileOnly);
   fFitOnly_checkBox->setChecked(fMsr2DataParam->fitOnly);
+  fGlobal_checkBox->setChecked(fMsr2DataParam->global);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -137,6 +138,7 @@ PMsr2DataParam* PMsr2DataDialog::getMsr2DataParam()
   fMsr2DataParam->titleFromDataFile = fTitleFromData_checkBox->isChecked();
   fMsr2DataParam->createMsrFileOnly = fCreateMsrFileOnly_checkBox->isChecked();
   fMsr2DataParam->fitOnly = fFitOnly_checkBox->isChecked();
+  fMsr2DataParam->global = fGlobal_checkBox->isChecked();
 
   return fMsr2DataParam;
 }
@@ -260,7 +262,7 @@ void PMsr2DataDialog::createMsrFileOnlyChanged(int buttonState)
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>SLOT: called when the 'Fit Only' QCheckBox under 'Options' is activated.
- * Sets at the same time the create-msr-file-only flag to false. Clears the 'Template Run Number'
+ * Sets at the same time the create-msr-file-only and global flags to false. Clears the 'Template Run Number'
  * field.
  *
  * \param buttonState state of the button.
@@ -269,7 +271,22 @@ void PMsr2DataDialog::fitOnlyChanged(int buttonState)
 {
   if (buttonState == Qt::Checked) {
     fCreateMsrFileOnly_checkBox->setChecked(false);
+    fGlobal_checkBox->setChecked(false);
     fTemplateRunNumber_lineEdit->clear();
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>SLOT: called when the 'Global' QCheckBox under 'Options' is activated.
+ * Sets at the same time the fit-only flag to false.
+ *
+ * \param buttonState state of the button.
+ */
+void PMsr2DataDialog::globalChanged(int buttonState)
+{
+  if (buttonState == Qt::Checked) {
+    fFitOnly_checkBox->setChecked(false);
   }
 }
 
