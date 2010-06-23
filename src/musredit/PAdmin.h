@@ -86,6 +86,10 @@ class PAdminXMLParser : public QXmlDefaultHandler
     bool characters(const QString&);
     bool endDocument();
 
+    bool warning( const QXmlParseException & exception );
+    bool error( const QXmlParseException & exception );
+    bool fatalError( const QXmlParseException & exception );
+
     QString expandPath(const QString&);
 
     EAdminKeyWords fKeyWord;    ///< key word tag to know how to handle the content

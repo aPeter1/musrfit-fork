@@ -46,7 +46,7 @@
     <create_msr_file_only>n</create_msr_file_only>
     <fit_only>n</fit_only>
     <global>n</global>
-  </msr2data_default>
+  </msr2data_defaults>
   <func_pixmap_path>$HOME/analysis/musrfit/src/musredit/latex_images</func_pixmap_path>
   <theory_functions>
     <func>
@@ -198,4 +198,3 @@
     </func> 
   </theory_functions>
 </musredit_startup>
-

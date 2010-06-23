@@ -418,6 +418,66 @@ bool PAdminXMLParser::endDocument()
 
 //--------------------------------------------------------------------------
 /**
+ * <p>
+ *
+ * \param exception
+ */
+bool PAdminXMLParser::warning( const QXmlParseException & exception )
+{
+  QString msg;
+
+  msg  = QString("**WARNING** while parsing musredit_startup.xml in line no %1\n").arg(exception.lineNumber());
+  msg += QString("**WARNING MESSAGE** ") + exception.message();
+
+  qWarning() << endl << msg << endl;
+
+  QMessageBox::warning(0, "WARNING", msg, QMessageBox::Ok, QMessageBox::NoButton);
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param exception
+ */
+bool PAdminXMLParser::error( const QXmlParseException & exception )
+{
+  QString msg;
+
+  msg  = QString("**ERROR** while parsing musredit_startup.xml in line no %1\n").arg(exception.lineNumber());
+  msg += QString("**ERROR MESSAGE** ") + exception.message();
+
+  qWarning() << endl << msg << endl;
+
+  QMessageBox::critical(0, "ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param exception
+ */
+bool PAdminXMLParser::fatalError( const QXmlParseException & exception )
+{
+  QString msg;
+
+  msg  = QString("**FATAL ERROR** while parsing musredit_startup.xml in line no %1\n").arg(exception.lineNumber());
+  msg += QString("**FATAL ERROR MESSAGE** ") + exception.message();
+
+  qWarning() << endl << msg << endl;
+
+  QMessageBox::critical(0, "FATAL ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+/**
  * <p>Expands system variables to full path, e.g. <tt>$HOME -> \home\user</tt>
  *
  * \param str path string with none expanded system variables.
@@ -510,7 +570,12 @@ PAdmin::PAdmin()
     QXmlInputSource source( &xmlFile );
     QXmlSimpleReader reader;
     reader.setContentHandler( &handler );
-    reader.parse( source );
+    reader.setErrorHandler( &handler );
+    if (!reader.parse( source )) {
+      QMessageBox::critical(0, "ERROR",
+                            "Error parsing musredit_startup.xml settings file.\nProbably a few things will not work porperly.\nPlease fix this first.",
+                            QMessageBox::Ok, QMessageBox::NoButton);
+    }
   } else {
     QMessageBox::critical(0, "ERROR",
                           "Couldn't find the musredit_startup.xml settings file.\nProbably a few things will not work porperly.\nPlease fix this first.",
