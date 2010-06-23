@@ -38,6 +38,8 @@
 #include <QPixmap>
 #include <QtXml>
 
+#include <musredit.h>
+
 class PAdmin;
 
 //---------------------------------------------------------------------------
@@ -72,7 +74,9 @@ class PAdminXMLParser : public QXmlDefaultHandler
                          eBeamline, eInstitute, eFileFormat, eLifetimeCorrection, eMsrDefaultFilePath,
                          eTheoFuncPixmapPath, eFunc, eFuncName, eFuncComment, eFuncLabel,
                          eFuncPixmap, eFuncParams, eHelpMain, eHelpTitle, eHelpParameters, eHelpTheory, eHelpFunctions,
-                         eHelpRun, eHelpCommand, eHelpFourier, eHelpPlot, eHelpStatistic, eHelpMsr2Data};
+                         eHelpRun, eHelpCommand, eHelpFourier, eHelpPlot, eHelpStatistic, eHelpMsr2Data,
+                         eChainFit, eWriteDataHeader, eSummaryFilesPresent, eKeepMinuit2Output, eWriteColumnData,
+                         eRecreateDataFile, eOpenFileAfterFitting, eCreateMsrFileOnly, eFitOnly, eGlobal};
 
     bool startDocument();
     bool startElement( const QString&, const QString&, const QString& ,
@@ -119,6 +123,7 @@ class PAdmin
     QString getTheoFuncPixmapPath() { return fTheoFuncPixmapPath; }
     unsigned int getTheoryCounts() { return fTheory.size(); }
     PTheory* getTheoryItem(const unsigned int idx);
+    PMsr2DataParam getMsr2DataParam() { return fMsr2DataParam; }
 
     void setFontName(const QString str) { fFontName = str; }
     void setFontSize(const int ival) { fFontSize = ival; }
@@ -155,6 +160,8 @@ class PAdmin
     QString fInstitute;  ///< name of the institute. Used to generate default run header lines.
     QString fFileFormat; ///< default file format. Used to generate default run header lines.
     bool fLifetimeCorrection; ///< flag indicating if by default the lifetime-correction-flag in a single histo file shall be set.
+
+    mutable PMsr2DataParam fMsr2DataParam; ///< keeps msr2data default parameter flags
 
     QMap<QString, QString> fHelpUrl; ///< maps tag to help url
 

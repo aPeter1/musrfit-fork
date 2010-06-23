@@ -1704,25 +1704,10 @@ void PTextEdit::musrMsr2Data()
 {
   if (fMsr2DataParam == 0) {
     fMsr2DataParam = new PMsr2DataParam();
+    *fMsr2DataParam = fAdmin->getMsr2DataParam();
     // init fMsr2DataParam
-    fMsr2DataParam->firstRun = -1;
-    fMsr2DataParam->lastRun  = -1;
-    fMsr2DataParam->runList = QString("");
-    fMsr2DataParam->runListFileName = QString("");
-    fMsr2DataParam->msrFileExtension = QString("");
-    fMsr2DataParam->templateRunNo = -1;
-    fMsr2DataParam->dbOutputFileName = QString("");
-    fMsr2DataParam->writeDbHeader = false;
-    fMsr2DataParam->summaryFilePresent = false;
     fMsr2DataParam->keepMinuit2Output = fKeepMinuit2Output;
-    fMsr2DataParam->writeColumnData = false;
-    fMsr2DataParam->recreateDbFile = false;
-    fMsr2DataParam->chainFit = true;
-    fMsr2DataParam->openFilesAfterFitting = false;
     fMsr2DataParam->titleFromDataFile = fTitleFromDataFile;
-    fMsr2DataParam->createMsrFileOnly = false;
-    fMsr2DataParam->fitOnly = false;
-    fMsr2DataParam->global = false;
   }
 
   PMsr2DataDialog *dlg = new PMsr2DataDialog(fMsr2DataParam, fAdmin->getHelpUrl("msr2data"));

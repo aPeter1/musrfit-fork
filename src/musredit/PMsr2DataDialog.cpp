@@ -287,6 +287,7 @@ void PMsr2DataDialog::globalChanged(int buttonState)
 {
   if (buttonState == Qt::Checked) {
     fFitOnly_checkBox->setChecked(false);
+    fOpenFilesAfterFitting_checkBox->setChecked(false);
   }
 }
 
