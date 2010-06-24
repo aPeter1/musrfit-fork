@@ -93,6 +93,26 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eMsrDefaultFilePath;
   } else if (qName == "help_main") {
     fKeyWord = eHelpMain;
+  } else if (qName == "chain_fit") {
+    fKeyWord = eChainFit;
+  } else if (qName == "write_data_header") {
+    fKeyWord = eWriteDataHeader;
+  } else if (qName == "summary_files_present") {
+    fKeyWord = eSummaryFilesPresent;
+  } else if (qName == "keep_minuit2_output") {
+    fKeyWord = eKeepMinuit2Output;
+  } else if (qName == "write_column_data") {
+    fKeyWord = eWriteColumnData;
+  } else if (qName == "recreate_data_file") {
+    fKeyWord = eRecreateDataFile;
+  } else if (qName == "open_file_after_fitting") {
+    fKeyWord = eOpenFileAfterFitting;
+  } else if (qName == "create_msr_file_only") {
+    fKeyWord = eCreateMsrFileOnly;
+  } else if (qName == "fit_only") {
+    fKeyWord = eFitOnly;
+  } else if (qName == "global") {
+    fKeyWord = eGlobal;
   } else if (qName == "func_pixmap_path") {
     fKeyWord = eTheoFuncPixmapPath;
   } else if (qName == "func") {
@@ -202,6 +222,76 @@ bool PAdminXMLParser::characters(const QString& str)
       help.replace("&lt;", "<");
       fAdmin->setHelpMain(help);
       break;
+    case eChainFit:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->fMsr2DataParam.chainFit = flag;
+      break;
+    case eWriteDataHeader:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->fMsr2DataParam.writeDbHeader = flag;
+      break;
+    case eSummaryFilesPresent:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->fMsr2DataParam.summaryFilePresent = flag;
+      break;
+    case eKeepMinuit2Output:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->fMsr2DataParam.keepMinuit2Output = flag;
+      break;
+    case eWriteColumnData:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->fMsr2DataParam.writeColumnData = flag;
+      break;
+    case eRecreateDataFile:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->fMsr2DataParam.recreateDbFile = flag;
+      break;
+    case eOpenFileAfterFitting:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->fMsr2DataParam.openFilesAfterFitting = flag;
+      break;
+    case eCreateMsrFileOnly:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->fMsr2DataParam.createMsrFileOnly = flag;
+      break;
+    case eFitOnly:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->fMsr2DataParam.fitOnly = flag;
+      break;
+    case eGlobal:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->fMsr2DataParam.global = flag;
+      break;
     case eTheoFuncPixmapPath:
       fAdmin->setTheoFuncPixmapPath(QString(str.ascii()).stripWhiteSpace());
       break;
@@ -275,6 +365,66 @@ bool PAdminXMLParser::endDocument()
 
 //--------------------------------------------------------------------------
 /**
+ * <p>
+ *
+ * \param exception
+ */
+bool PAdminXMLParser::warning( const QXmlParseException & exception )
+{
+  QString msg;
+
+  msg  = QString("**WARNING** while parsing musredit_startup.xml in line no %1\n").arg(exception.lineNumber());
+  msg += QString("**WARNING MESSAGE** ") + exception.message() + QString("\n");
+
+  qWarning( msg.latin1() );
+
+  QMessageBox::warning(0, "WARNING", msg, QMessageBox::Ok, QMessageBox::NoButton);
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param exception
+ */
+bool PAdminXMLParser::error( const QXmlParseException & exception )
+{
+  QString msg;
+
+  msg  = QString("**ERROR** while parsing musredit_startup.xml in line no %1\n").arg(exception.lineNumber());
+  msg += QString("**ERROR MESSAGE** ") + exception.message() + QString("\n");
+
+  qWarning( msg.latin1() );
+
+  QMessageBox::critical(0, "ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param exception
+ */
+bool PAdminXMLParser::fatalError( const QXmlParseException & exception )
+{
+  QString msg;
+
+  msg  = QString("**FATAL ERROR** while parsing musredit_startup.xml in line no %1\n").arg(exception.lineNumber());
+  msg += QString("**FATAL ERROR MESSAGE** ") + exception.message() + QString("\n");
+
+  qWarning( msg.latin1() );
+
+  QMessageBox::critical(0, "FATAL ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+/**
  * <p>Called at the end of the XML parse process.
  */
 QString PAdminXMLParser::expandPath(const QString &str)
@@ -332,6 +482,25 @@ PAdmin::PAdmin()
   fEnableMusrT0       = false;
   fLifetimeCorrection = true;
 
+  fMsr2DataParam.firstRun = -1;
+  fMsr2DataParam.lastRun  = -1;
+  fMsr2DataParam.runList  = QString("");
+  fMsr2DataParam.runListFileName = QString("");
+  fMsr2DataParam.msrFileExtension = QString("");
+  fMsr2DataParam.templateRunNo = -1;
+  fMsr2DataParam.dbOutputFileName = QString("");
+  fMsr2DataParam.writeDbHeader = true;
+  fMsr2DataParam.summaryFilePresent = true;
+  fMsr2DataParam.keepMinuit2Output = false;
+  fMsr2DataParam.writeColumnData = false;
+  fMsr2DataParam.recreateDbFile = false;
+  fMsr2DataParam.chainFit = true;
+  fMsr2DataParam.openFilesAfterFitting = true;
+  fMsr2DataParam.titleFromDataFile = true;
+  fMsr2DataParam.createMsrFileOnly = false;
+  fMsr2DataParam.fitOnly = false;
+  fMsr2DataParam.global = false;
+
   // XML Parser part
   QString fln = "./musrgui_startup.xml";
   if (!QFile::exists(fln)) {
@@ -347,7 +516,12 @@ PAdmin::PAdmin()
     QXmlInputSource source( &xmlFile );
     QXmlSimpleReader reader;
     reader.setContentHandler( &handler );
-    reader.parse( source );
+    reader.setErrorHandler( &handler );
+    if (!reader.parse( source )) {
+      QMessageBox::critical(0, "ERROR",
+                            "Error parsing musredit_startup.xml settings file.\nProbably a few things will not work porperly.\nPlease fix this first.",
+                            QMessageBox::Ok, QMessageBox::NoButton);
+    }
   } else {
     QMessageBox::critical(0, "ERROR",
                           "Couldn't find the musrgui_startup.xml settings file.\nProbably a few things will not work porperly.\nPlease fix this first.",

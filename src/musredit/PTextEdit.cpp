@@ -1705,10 +1705,11 @@ void PTextEdit::musrMsr2Data()
   if (fMsr2DataParam == 0) {
     fMsr2DataParam = new PMsr2DataParam();
     *fMsr2DataParam = fAdmin->getMsr2DataParam();
-    // init fMsr2DataParam
-    fMsr2DataParam->keepMinuit2Output = fKeepMinuit2Output;
-    fMsr2DataParam->titleFromDataFile = fTitleFromDataFile;
   }
+
+  // init fMsr2DataParam
+  fMsr2DataParam->keepMinuit2Output = fKeepMinuit2Output;
+  fMsr2DataParam->titleFromDataFile = fTitleFromDataFile;
 
   PMsr2DataDialog *dlg = new PMsr2DataDialog(fMsr2DataParam, fAdmin->getHelpUrl("msr2data"));
 
@@ -1726,6 +1727,8 @@ void PTextEdit::musrMsr2Data()
     int i, end;
 
     fMsr2DataParam = dlg->getMsr2DataParam();
+    fKeepMinuit2Output = fMsr2DataParam->keepMinuit2Output;
+    fTitleFromDataFile = fMsr2DataParam->titleFromDataFile;
 
     // analyze parameters
     switch (dlg->getRunTag()) {

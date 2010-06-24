@@ -37,6 +37,8 @@
 #include <qpixmap.h>
 #include <qxml.h>
 
+#include "musrgui.h"
+
 class PAdmin;
 
 //---------------------------------------------------------------------------
@@ -60,7 +62,9 @@ class PAdminXMLParser : public QXmlDefaultHandler
     enum EAdminKeyWords {eEmpty, eFontName, eFontSize, eExecPath, eDefaultSavePath, eTitleFromDataFile, eEnableMusrT0,
                          eBeamline, eInstitute, eFileFormat, eLifetimeCorrection, eMsrDefaultFilePath,
                          eHelpMain, eTheoFuncPixmapPath, eFunc, eFuncName, eFuncComment, eFuncLabel,
-                         eFuncPixmap, eFuncParams};
+                         eFuncPixmap, eFuncParams,
+                         eChainFit, eWriteDataHeader, eSummaryFilesPresent, eKeepMinuit2Output, eWriteColumnData,
+                         eRecreateDataFile, eOpenFileAfterFitting, eCreateMsrFileOnly, eFitOnly, eGlobal};
 
     bool startDocument();
     bool startElement( const QString&, const QString&, const QString& ,
@@ -69,6 +73,10 @@ class PAdminXMLParser : public QXmlDefaultHandler
 
     bool characters(const QString&);
     bool endDocument();
+
+    bool warning( const QXmlParseException & exception );
+    bool error( const QXmlParseException & exception );
+    bool fatalError( const QXmlParseException & exception );
 
     QString expandPath(const QString&);
 
@@ -100,6 +108,7 @@ class PAdmin
     QString getTheoFuncPixmapPath() { return fTheoFuncPixmapPath; }
     unsigned int getTheoryCounts() { return fTheory.size(); }
     PTheory* getTheoryItem(const unsigned int idx);
+    PMsr2DataParam getMsr2DataParam() { return fMsr2DataParam; }
 
     void setFontName(const QString str) { fFontName = str; }
     void setFontSize(const int ival) { fFontSize = ival; }
@@ -136,6 +145,8 @@ class PAdmin
     QString fInstitute;
     QString fFileFormat;
     bool fLifetimeCorrection;
+
+    mutable PMsr2DataParam fMsr2DataParam; ///< keeps msr2data default parameter flags
 
     QString fHelpMain;
 

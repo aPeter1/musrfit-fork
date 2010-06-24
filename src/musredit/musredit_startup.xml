@@ -42,7 +42,6 @@
     <write_column_data>n</write_column_data>
     <recreate_data_file>n</recreate_data_file>
     <open_file_after_fitting>y</open_file_after_fitting>
-    <take_data_file_title>y</take_data_file_title>
     <create_msr_file_only>n</create_msr_file_only>
     <fit_only>n</fit_only>
     <global>n</global>

@@ -418,9 +418,9 @@ bool PAdminXMLParser::endDocument()
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Report XML warnings.
  *
- * \param exception
+ * \param exception holds the information of the XML warning
  */
 bool PAdminXMLParser::warning( const QXmlParseException & exception )
 {
@@ -438,9 +438,9 @@ bool PAdminXMLParser::warning( const QXmlParseException & exception )
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Report recoverable XML errors.
  *
- * \param exception
+ * \param exception holds the information of the XML recoverable errors.
  */
 bool PAdminXMLParser::error( const QXmlParseException & exception )
 {
@@ -458,9 +458,9 @@ bool PAdminXMLParser::error( const QXmlParseException & exception )
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Report fatal XML errors.
  *
- * \param exception
+ * \param exception holds the information of the XML fatal errors.
  */
 bool PAdminXMLParser::fatalError( const QXmlParseException & exception )
 {

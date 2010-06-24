@@ -27,6 +27,18 @@
       Starting with &gt;= Qt4.2 this will be linked automatically but until then ...; sorry ;-)
     </help_main>
   </help_section>
+  <msr2data_defaults>
+    <chain_fit>y</chain_fit>
+    <write_data_header>y</write_data_header>
+    <summary_files_present>y</summary_files_present>
+    <keep_minuit2_output>n</keep_minuit2_output>
+    <write_column_data>n</write_column_data>
+    <recreate_data_file>n</recreate_data_file>
+    <open_file_after_fitting>y</open_file_after_fitting>
+    <create_msr_file_only>n</create_msr_file_only>
+    <fit_only>n</fit_only>
+    <global>n</global>
+  </msr2data_defaults>
   <func_pixmap_path>$HOME/analysis/musrfit/src/musrgui/latex_images</func_pixmap_path>
   <theory_functions>
     <func>
