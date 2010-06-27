@@ -51,11 +51,11 @@ using namespace boost::algorithm;
 /**
  * <p>Checks if a string is an integer
  *
- * <b>return:</b>
+ * <p><b>return:</b>
  * - true if s is a number string
  * - false otherwise
  *
- * \param s
+ * \param s string
  */
 bool isNumber(const string &s) // will be replaced by boost::lexical_cast at some time
 {
@@ -117,8 +117,8 @@ void msr2data_syntax()
 /**
  * <p>filters out the output file name from at argument string
  *
- * <b>return:</b>
- * - output file name is present in the argument list
+ * <p><b>return:</b>
+ * - output file name if present in the argument list
  * - otherwise 'out.db' (db==true), 'out.dat' (db==false)
  *
  * \param arg argument string list from the msr2data call
@@ -165,7 +165,7 @@ string msr2data_outputfile(vector<string> &arg, bool db = true)
 /**
  * <p>Checks if option string is present in the argument input list
  *
- * <b>return:</b>
+ * <p><b>return:</b>
  * - true if option is <b>not</b> present
  * - false otherwise
  *
@@ -191,13 +191,14 @@ bool msr2data_useOption(vector<string> &arg, const string &s)
  * <p>Filters out the template run number (if present) and check at the
  * same time if only already existing msr-files shall be fitted (no template).
  *
- * <b>return:</b>
+ * <p><b>return:</b>
  * - template runNo if everything is OK
  * - -1 : tag: fit only, do not prepare input files
  * - -2 : fatal error - more than one fit-&lt;temp&gt; options are specified
  *
  * \param arg list of arguments
  * \param chainfit if true
+ *
  */
 int msr2data_doFitting(vector<string> &arg, bool &chainfit)
 {
@@ -269,8 +270,8 @@ unsigned int msr2data_doInputCreation(vector<string> &arg, bool &inputOnly)
 
 //--------------------------------------------------------------------------
 /**
- * <p>msr2data is used to generate msr-files based on template msr-files, automatically fitting these new msr-files,
- * collection fitting parameters, etc. For a detailed description see
+ * <p>msr2data is used to generate msr-files based on template msr-files, automatically fit these new msr-files,
+ * collect fitting parameters, etc. For a detailed description see
  * \htmlonly <a href="https://intranet.psi.ch/MUSR/Msr2Data">musr2data online help</a>
  * \endhtmlonly
  * \latexonly msr2data online help: \texttt{https://intranet.psi.ch/MUSR/Msr2Data}

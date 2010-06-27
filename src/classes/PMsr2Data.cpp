@@ -53,6 +53,10 @@ using namespace boost::algorithm;
 //-------------------------------------------------------------
 /**
  * <p> Write formatted output to column-formatted ASCII output file
+ *
+ * \param outFile output file stream to the ASCII file
+ * \param value number to be written to the ASCII file
+ * \param width column width of the ASCII file
  */
 void writeValues(ofstream &outFile, const double &value, const unsigned int &width)
 {
@@ -66,7 +70,9 @@ void writeValues(ofstream &outFile, const double &value, const unsigned int &wid
 
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p> Constructor
+ *
+ * \param ext extension/suffix of the msr-files to be processed
  */
 PMsr2Data::PMsr2Data(const string &ext) : fFileExtension(ext), fRunListFile(false), fNumGlobalParam(0), fNumSpecParam(0), fNumTempRunBlocks(0)
 {
@@ -81,7 +87,7 @@ PMsr2Data::PMsr2Data(const string &ext) : fFileExtension(ext), fRunListFile(fals
 
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p> Destructor
  */
 PMsr2Data::~PMsr2Data()
 {
@@ -114,7 +120,11 @@ PMsr2Data::~PMsr2Data()
 
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p> Determines the current run number
+ *
+ * <p><b>return:</b>
+ * - current run number
+ * - 0 if all runs have been processed already
  */
 unsigned int PMsr2Data::GetPresentRun() const
 {
@@ -126,7 +136,13 @@ unsigned int PMsr2Data::GetPresentRun() const
 
 //-------------------------------------------------------------
 /**
- * <p> 
+ * <p> Initialization of the internal list of runs using a single run number
+ *
+ * <p><b>return:</b>
+ * - 0 if the run number is valid
+ * - 1 otherwise
+ *
+ * \param runNo run number
  */
 int PMsr2Data::SetRunNumbers(unsigned int runNo)
 {
@@ -142,7 +158,14 @@ int PMsr2Data::SetRunNumbers(unsigned int runNo)
 
 //-------------------------------------------------------------
 /**
- * <p> 
+ * <p> Initialization of the internal list of runs using first and last run numbers
+ *
+ * <p><b>return:</b>
+ * - 0 if the run numbers are valid
+ * - 1 otherwise
+ *
+ * \param runNoStart first run number
+ * \param runNoEnd last run number
  */
 int PMsr2Data::SetRunNumbers(unsigned int runNoStart, unsigned int runNoEnd)
 {
@@ -164,7 +187,14 @@ int PMsr2Data::SetRunNumbers(unsigned int runNoStart, unsigned int runNoEnd)
 
 //-------------------------------------------------------------
 /**
- * <p> 
+ * <p> Initialization of the internal list of runs using a explicitly specified run numbers
+ *
+ * <p><b>return:</b>
+ * - -1 if the vector is empty
+ * - 0 if all run numbers are valid
+ * - 1 otherwise
+ *
+ * \param runListVector vector containing the run numbers to be processed
  */
 int PMsr2Data::SetRunNumbers(const vector<unsigned int> &runListVector)
 {
@@ -184,7 +214,14 @@ int PMsr2Data::SetRunNumbers(const vector<unsigned int> &runListVector)
 
 //-------------------------------------------------------------
 /**
- * <p> 
+ * <p> Initialization of the internal list of runs using a run list file
+ *
+ * <p><b>return:</b>
+ * - -1 if the run list file cannot be opened
+ * - 0 if all run numbers are valid
+ * - 1 otherwise
+ *
+ * \param runListFile name of run list file
  */
 int PMsr2Data::SetRunNumbers(const string &runListFile)
 {
@@ -247,7 +284,11 @@ int PMsr2Data::SetRunNumbers(const string &runListFile)
 
 //-------------------------------------------------------------
 /**
- * <p> 
+ * <p> Parse the musrfit startup xml file
+ *
+ * <p><b>return:</b>
+ * - 0 if everything went fine
+ * - return value of the ParseFile-method otherwise
  */
 int PMsr2Data::ParseXmlStartupFile()
 {
@@ -275,7 +316,13 @@ int PMsr2Data::ParseXmlStartupFile()
 
 //-------------------------------------------------------------
 /**
- * <p> 
+ * <p> Read in a msr-file
+ *
+ * <p><b>return:</b>
+ * - PMUSR_SUCCESS if everything is OK
+ * - return value of the ReadMsrFile-method otherwise
+ *
+ * \param infile name of the msr-file to be read
  */
 int PMsr2Data::ReadMsrFile(const string &infile) const
 {
@@ -300,7 +347,11 @@ int PMsr2Data::ReadMsrFile(const string &infile) const
 
 //-------------------------------------------------------------
 /**
- * <p> 
+ * <p> Read in a run data-file
+ *
+ * <p><b>return:</b>
+ * - true if everything is OK
+ * - false otherwise
  */
 bool PMsr2Data::ReadRunDataFile()
 {
@@ -320,7 +371,13 @@ bool PMsr2Data::ReadRunDataFile()
 
 //-------------------------------------------------------------
 /**
- * <p> 
+ * <p> Generate a new single run msr-file from a template
+ *
+ * <p><b>return:</b>
+ * - true if everything is OK
+ * - false otherwise
+ *
+ * \param tempRun template run number
  */
 bool PMsr2Data::PrepareNewInputFile(unsigned int tempRun) const
 {
@@ -401,7 +458,16 @@ bool PMsr2Data::PrepareNewInputFile(unsigned int tempRun) const
 
 //-------------------------------------------------------------
 /**
- * <p> 
+ * <p> Function defining the parameter order for the sort algorithm when a global msr-file is generated
+ *
+ * <p><b>return:</b>
+ * - true if global parameters are listed before run specific ones
+ * - true if within the global parameters par1 appears before par2
+ * - true if within the run specific parameters par1 appears before par2
+ * - false otherwise
+ *
+ * \param par1 fit parameter
+ * \param par2 fit parameter
  */
 bool compare_parameters(const PMsrParamStructure &par1, const PMsrParamStructure &par2)
 {
@@ -423,7 +489,14 @@ bool compare_parameters(const PMsrParamStructure &par1, const PMsrParamStructure
 
 //-------------------------------------------------------------
 /**
- * <p> 
+ * <p> Generate a new global msr-file from a template
+ *
+ * <p><b>return:</b>
+ * - true if everything is OK
+ * - false otherwise
+ *
+ * \param tempRun template run number
+ * \param msrOutFile name of the global msr-file to be written
  */
 bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOutFile) const
 {
@@ -581,7 +654,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
     tempLines = fMsrHandler->GetMsrFunctions();
     for (unsigned int i(0); i < tempLines->size(); ++i) {
       line = (*tempLines)[i].fLine.Data();
-      split( tempVec, line, is_any_of(" ()+-*/=\t") ); // split the function line at spaces and some characters that might be juxtaposed to the parameters
+      split( tempVec, line, is_any_of(" ()+-*/=\t,") ); // split the function line at spaces and some characters that might be juxtaposed to the parameters
       for (unsigned int j(1); j < tempVec.size(); ++j) {
         if (!tempVec[j].substr(0,3).compare("par")) {
           try {
@@ -881,7 +954,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
     string::size_type pos(0);
     for (unsigned int i(0); i < tempLines->size(); ++i) {
       line = (*tempLines)[i].fLine.Data();
-      split( tempVec, line, is_any_of(" ()+-*/=\t") ); // split the function line at spaces and some characters that might be juxtaposed to the parameters
+      split( tempVec, line, is_any_of(" ()+-*/=\t,") ); // split the function line at spaces and some characters that might be juxtaposed to the parameters
       for (unsigned int j(1); j < tempVec.size(); ++j) {
         if (!tempVec[j].substr(0,3).compare("par")) {
           try {
@@ -1198,7 +1271,17 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
 
 //-------------------------------------------------------------
 /**
- * <p> 
+ * <p> Append fit parameters of a msr-file to the DB or ASCII file
+ *
+ * <p><b>return:</b>
+ * - PMUSR_SUCCESS if everything is OK
+ * - -1 in case of an error
+ *
+ * \param outfile name of the DB/ASCII output file
+ * \param db DB or plain ASCII output
+ * \param withHeader write output file header or not
+ * \param global global mode or not
+ * \param counter counter used within the global mode to determine how many runs have been processed already
  */
 int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool global, unsigned int counter) const
 {

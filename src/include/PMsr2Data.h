@@ -48,7 +48,8 @@ using namespace std;
 
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p> Class providing the necessary utilities for msr2data:
+ *     generate new msr-files from a template, collect fit parameters from msr-files and write them to DB or plain ASCII files
  */
 class PMsr2Data
 {
