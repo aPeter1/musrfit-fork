@@ -255,7 +255,7 @@ int PMsr2Data::SetRunNumbers(const string &runListFile)
       strLine.clear();
       strLine.str(splitVec[0]);
       strLine >> indvar; // "RUN"
-      if (indvar.compare("RUN")) {
+      if (to_lower_copy(indvar).compare("run")) {
         cerr << endl << ">> msr2data: **ERROR** The format of the runlist file " << runListFile << " is not correct! Please check!";
         cerr << endl;
       }
@@ -1522,7 +1522,7 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
       trim(line);
       if (line.empty())
         continue;
-      else if (line.at(0) == '#' || !line.substr(0,3).compare("RUN"))
+      else if (line.at(0) == '#' || !to_lower_copy(line.substr(0,3)).compare("run"))
         continue;
       else {
         split( splitVec, line, is_any_of("#") ); // split the string if any comments appear on the line
