@@ -39,10 +39,6 @@
  */
 PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QValueVector<QString> &cmd)
 {
-qDebug("workingDirectory = %s", workingDirectory.latin1());
-for (int i=0; i<cmd.size(); i++)
-  qDebug("%s ", cmd[i].latin1());
-
   if (cmd.empty())
     return;
 
@@ -87,15 +83,8 @@ for (int i=0; i<cmd.size(); i++)
 PFitOutputHandler::~PFitOutputHandler()
 {
   if (fProc->isRunning()) {
-//    qDebug("fProc still running");
     fProc->kill();
   }
-/*
-  if (fProc->isRunning()) {
-    QString msg = "fProc still running ...";
-    qDebug(msg);
-  }
-*/
   if (fProc) {
     delete fProc;
     fProc = 0;
