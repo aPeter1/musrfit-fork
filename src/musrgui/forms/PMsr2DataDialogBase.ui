@@ -701,12 +701,6 @@
         <receiver>PMsr2DataDialogBase</receiver>
         <slot>templateRunEntered(const QString&amp;)</slot>
     </connection>
-    <connection>
-        <sender>fGlobal_checkBox</sender>
-        <signal>stateChanged(int)</signal>
-        <receiver>PMsr2DataDialogBase</receiver>
-        <slot>globalChanged(int)</slot>
-    </connection>
 </connections>
 <tabstops>
     <tabstop>fFirst_lineEdit</tabstop>
@@ -738,7 +732,6 @@
     <slot>createMsrFileOnlyChanged(int)</slot>
     <slot>fitOnlyChanged(int)</slot>
     <slot>templateRunEntered(const QString&amp;)</slot>
-    <slot>globalChanged(int)</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

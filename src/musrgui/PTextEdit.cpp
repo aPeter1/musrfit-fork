@@ -1639,48 +1639,27 @@ void PTextEdit::musrMsr2Data()
       QFile *file;
       QTextStream *stream;
 
-      switch(dlg->getRunTag()) {
-        case 0: // first run / last run list
-          if (fMsr2DataParam->firstRun != -1) {
-            for (int i=fMsr2DataParam->firstRun; i<=fMsr2DataParam->lastRun; i++) {
-              if (fMsr2DataParam->msrFileExtension.isEmpty())
-                fln = QString("%1").arg(i) + ".msr";
-              else
-                fln = QString("%1").arg(i) + fMsr2DataParam->msrFileExtension + ".msr";
+      if (!fMsr2DataParam->global) { // standard fits
+        switch(dlg->getRunTag()) {
+          case 0: // first run / last run list
+            if (fMsr2DataParam->firstRun != -1) {
+              for (int i=fMsr2DataParam->firstRun; i<=fMsr2DataParam->lastRun; i++) {
+                if (fMsr2DataParam->msrFileExtension.isEmpty())
+                  fln = QString("%1").arg(i) + ".msr";
+                else
+                  fln = QString("%1").arg(i) + fMsr2DataParam->msrFileExtension + ".msr";
 
-              load(fln);
+                load(fln);
+              }
             }
-          }
-          break;
-        case 1: // run list
-          end = 0;
-          while (!runList.section(' ', end, end).isEmpty()) {
-            end++;
-          }
-          for (int i=0; i<end; i++) {
-            fln = runList.section(' ', i, i);
-            if (fMsr2DataParam->msrFileExtension.isEmpty())
-              fln += ".msr";
-            else
-              fln += fMsr2DataParam->msrFileExtension + ".msr";
-
-            load(fln);
-          }
-          break;
-        case 2: // run list file
-          file = new QFile(fMsr2DataParam->runListFileName);
-          if (!file->open(IO_ReadOnly)) {
-            str = QString("Couldn't open run list file %1, sorry.").arg(fMsr2DataParam->runListFileName);
-            QMessageBox::critical(this, "**ERROR**", str.latin1(), QMessageBox::Ok, QMessageBox::NoButton);
-            return;
-          }
-
-          stream = new QTextStream(file);
-          while ( !stream->atEnd() ) {
-            str = stream->readLine(); // line of text excluding '\n'
-            str.stripWhiteSpace();
-            if (!str.isEmpty() && !str.startsWith("#")) {
-              fln = str.section(' ', 0, 0);
+            break;
+          case 1: // run list
+            end = 0;
+            while (!runList.section(' ', end, end).isEmpty()) {
+              end++;
+            }
+            for (int i=0; i<end; i++) {
+              fln = runList.section(' ', i, i);
               if (fMsr2DataParam->msrFileExtension.isEmpty())
                 fln += ".msr";
               else
@@ -1688,16 +1667,79 @@ void PTextEdit::musrMsr2Data()
 
               load(fln);
             }
-          }
+            break;
+          case 2: // run list file
+            file = new QFile(fMsr2DataParam->runListFileName);
+            if (!file->open(IO_ReadOnly)) {
+              str = QString("Couldn't open run list file %1, sorry.").arg(fMsr2DataParam->runListFileName);
+              QMessageBox::critical(this, "**ERROR**", str.latin1(), QMessageBox::Ok, QMessageBox::NoButton);
+              return;
+            }
 
-          file->close();
+            stream = new QTextStream(file);
+            while ( !stream->atEnd() ) {
+              str = stream->readLine(); // line of text excluding '\n'
+              str.stripWhiteSpace();
+              if (!str.isEmpty() && !str.startsWith("#") && !str.startsWith("run", false)) {
+                fln = str.section(' ', 0, 0);
+                if (fMsr2DataParam->msrFileExtension.isEmpty())
+                  fln += ".msr";
+                else
+                  fln += fMsr2DataParam->msrFileExtension + ".msr";
 
-          // clean up
-          delete stream;
-          delete file;
-          break;
-        default:
-          break;
+                load(fln);
+              }
+            }
+
+            file->close();
+
+            // clean up
+            delete stream;
+            delete file;
+            break;
+          default:
+            break;
+        }
+      } else { // global tag set
+        fln = QString("");
+        switch(dlg->getRunTag()) {
+          case 0: // first/last run
+            fln = QString("%1").arg(fMsr2DataParam->firstRun) + QString("+global") + fMsr2DataParam->msrFileExtension + QString(".msr");
+            break;
+          case 1: // run list
+            fln = runList.section(" ", 0, 0) + QString("+global") + fMsr2DataParam->msrFileExtension + QString(".msr");
+            break;
+          case 2: // run list file name
+            file = new QFile(fMsr2DataParam->runListFileName);
+            if (!file->open(IO_ReadOnly)) {
+              str = QString("Couldn't open run list file %1, sorry.").arg(fMsr2DataParam->runListFileName);
+              QMessageBox::critical(this, "**ERROR**", str.latin1(), QMessageBox::Ok, QMessageBox::NoButton);
+              return;
+            }
+
+            stream = new QTextStream(file);
+            while ( !stream->atEnd() ) {
+              str = stream->readLine(); // line of text excluding '\n'
+              str.stripWhiteSpace();
+              if (!str.isEmpty() && !str.startsWith("#") && !str.startsWith("run", false)) {
+                fln = str.section(' ', 0, 0);
+                break;
+              }
+            }
+
+            file->close();
+
+            fln += QString("+global") + fMsr2DataParam->msrFileExtension + QString(".msr");
+
+            // clean up
+            delete stream;
+            delete file;
+            break;
+          default:
+            break;
+        }
+
+        load(fln);
       }
     }
   }
