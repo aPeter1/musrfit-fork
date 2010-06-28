@@ -60,7 +60,6 @@ class PMsr2DataDialog : public QDialog, private Ui::PMsr2DataDialog
     void templateRunEntered(const QString&);
     void createMsrFileOnlyChanged(int);
     void fitOnlyChanged(int);
-    void globalChanged(int);
     void helpContent();
 
   private:

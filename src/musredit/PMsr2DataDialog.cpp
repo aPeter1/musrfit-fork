@@ -278,21 +278,6 @@ void PMsr2DataDialog::fitOnlyChanged(int buttonState)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>SLOT: called when the 'Global' QCheckBox under 'Options' is activated.
- * Sets at the same time the fit-only flag to false.
- *
- * \param buttonState state of the button.
- */
-void PMsr2DataDialog::globalChanged(int buttonState)
-{
-  if (buttonState == Qt::Checked) {
-    fFitOnly_checkBox->setChecked(false);
-    fOpenFilesAfterFitting_checkBox->setChecked(false);
-  }
-}
-
-//----------------------------------------------------------------------------------------------------
-/**
  * <p>Generates a help content window showing the description for msr2data.
  */
 void PMsr2DataDialog::helpContent()

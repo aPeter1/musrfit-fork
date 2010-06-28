@@ -369,7 +369,7 @@
    <property name="title">
     <string>Options</string>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -700,27 +700,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>547</x>
-     <y>442</y>
+     <y>440</y>
     </hint>
     <hint type="destinationlabel">
      <x>150</x>
      <y>487</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>fGlobal_checkBox</sender>
-   <signal>stateChanged(int)</signal>
-   <receiver>PMsr2DataDialog</receiver>
-   <slot>globalChanged(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>398</x>
-     <y>479</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>372</x>
-     <y>520</y>
     </hint>
    </hints>
   </connection>
