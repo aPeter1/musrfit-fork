@@ -587,6 +587,46 @@ bool msr2msr_finalize_theory(char *fln, int theoryTag, int noOfAddionalParams)
 
 //--------------------------------------------------------------------------
 /**
+ * <p>Filters out the old chi-square related informations. And sets them according
+ * to the new scheme.
+ *
+ * <b>return:</b>
+ * - true if everything went smooth
+ * - false otherwise
+ *
+ * \param str msr-file statistic block line
+ */
+bool msr2msr_statistic(char *str) {
+  bool success = true;
+
+  char *pstr;
+  int status;
+  double chisq, chisqred;
+  if (strstr(str, "  chi")) {
+    pstr = strstr(str, "abs = ");
+    if (pstr != 0) {
+      status = sscanf(pstr, "abs = %lf", &chisq);
+      if (status != 1) {
+        success = false;
+      }
+    }
+    pstr = strstr(str, "norm = ");
+    if (pstr != 0) {
+      status = sscanf(pstr, "norm = %lf", &chisqred);
+      if (status != 1) {
+        success = false;
+      }
+    }
+    if (success) {
+      sprintf(str, "  chisq = %lf, NDF = %d, chisq/NDF = %lf", chisq, static_cast<int>(chisq/chisqred), chisqred);
+    }
+  }
+
+  return success;
+}
+
+//--------------------------------------------------------------------------
+/**
  * <p>msr2msr is needed to convert old WKM msr-files to musrfit msr-files. Eventhough the syntax is <b>very</b>
  * close, there are some shortcomings in the WKM msr-files, which forced me to slightly change the file format.
  *
@@ -636,6 +676,8 @@ int main(int argc, char *argv[])
       tag = MSR_TAG_RUN;
     } else if (strstr(str, "THEORY")) {
       tag = MSR_TAG_THEORY;
+    } else if (strstr(str, "STATISTIC")) {
+      tag = MSR_TAG_STATISTIC;
     }
 
     switch (tag) {
@@ -647,6 +689,9 @@ int main(int argc, char *argv[])
         break;
       case MSR_TAG_RUN:
         success = msr2msr_run(str);
+        break;
+      case MSR_TAG_STATISTIC:
+        success = msr2msr_statistic(str);
         break;
       default:
         break;
