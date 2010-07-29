@@ -58,6 +58,7 @@ public:
   virtual bool GridExists() const {return fGridExists;}
   virtual void UnsetGridExists() const {fGridExists = false;}
   virtual unsigned int GetNumberOfSteps() const {return fSteps;}
+  virtual bool IsTriangular() const = 0;
 
 protected:
   vector<double> fParam;
@@ -82,6 +83,23 @@ public:
   ~TBulkTriVortexLondonFieldCalc() {}
 
   void CalculateGrid() const;
+  bool IsTriangular() const {return true;}
+
+};
+
+//--------------------
+// Class for square vortex lattice, London model with Gaussian Cutoff
+//--------------------
+
+class TBulkSqVortexLondonFieldCalc : public TBulkVortexFieldCalc {
+
+public:
+
+  TBulkSqVortexLondonFieldCalc(const string&, const unsigned int steps = 256);
+  ~TBulkSqVortexLondonFieldCalc() {}
+
+  void CalculateGrid() const;
+   bool IsTriangular() const {return false;}
 
 };
 
@@ -97,6 +115,7 @@ public:
   ~TBulkTriVortexMLFieldCalc() {}
 
   void CalculateGrid() const;
+  bool IsTriangular() const {return true;}
 
 };
 
@@ -112,6 +131,7 @@ public:
   ~TBulkTriVortexAGLFieldCalc() {}
 
   void CalculateGrid() const;
+  bool IsTriangular() const {return true;}
 
 };
 
@@ -134,6 +154,7 @@ public:
   double* GetBMatrix() const {return fFFTout;}
   fftw_complex* GetOmegaDiffMatrix() const {return fOmegaDiffMatrix;}
   fftw_complex* GetQMatrix() const {return fQMatrix;}
+  bool IsTriangular() const {return true;}
 
 private:
 

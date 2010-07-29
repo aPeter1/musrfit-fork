@@ -286,6 +286,130 @@ void TBulkTriVortexLondonFieldCalc::CalculateGrid() const {
 
 }
 
+TBulkSqVortexLondonFieldCalc::TBulkSqVortexLondonFieldCalc(const string& wisdom, const unsigned int steps) {
+  fWisdom = wisdom;
+  if (steps % 2) {
+    fSteps = steps + 1;
+  } else {
+    fSteps = steps;
+  }
+  fParam.resize(3);
+  fGridExists = false;
+
+#ifdef HAVE_LIBFFTW3_THREADS
+  int init_threads(fftw_init_threads());
+  if (init_threads)
+    fftw_plan_with_nthreads(2);
+#endif /* HAVE_LIBFFTW3_THREADS */
+
+  fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
+  fFFTout = new double[fSteps*fSteps];
+
+//  cout << "Check for the FFT plan..." << endl;
+
+// Load wisdom from file if it exists and should be used
+
+  fUseWisdom = true;
+  int wisdomLoaded(0);
+
+  FILE *wordsOfWisdomR;
+  wordsOfWisdomR = fopen(fWisdom.c_str(), "r");
+  if (wordsOfWisdomR == NULL) {
+    fUseWisdom = false;
+  } else {
+    wisdomLoaded = fftw_import_wisdom_from_file(wordsOfWisdomR);
+    fclose(wordsOfWisdomR);
+  }
+
+  if (!wisdomLoaded) {
+    fUseWisdom = false;
+  }
+
+// create the FFT plan
+
+  if (fUseWisdom)
+    fFFTplan = fftw_plan_dft_c2r_2d(fSteps, fSteps, fFFTin, fFFTout, FFTW_EXHAUSTIVE);
+  else
+    fFFTplan = fftw_plan_dft_c2r_2d(fSteps, fSteps, fFFTin, fFFTout, FFTW_ESTIMATE);
+}
+
+void TBulkSqVortexLondonFieldCalc::CalculateGrid() const {
+  // SetParameters - method has to be called from the user before the calculation!!
+  if (fParam.size() < 3) {
+    cout << endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << endl;
+    return;
+  }
+  if (!fParam[0] || !fParam[1] || !fParam[2]) {
+    cout << endl << "The field, penetration depth and coherence length have to have finite values in order to calculate B(x,y)!" << endl;
+    return;
+  }
+
+  double field(fabs(fParam[0])), lambda(fabs(fParam[1])), xi(fabs(fParam[2]));
+  double Hc2(getHc2(xi));
+
+  double latConstSq(sqrt(fluxQuantum/field));
+  double xisq_2_scaled(2.0*pow(xi*PI/latConstSq,2.0)), lambdasq_scaled(4.0*pow(lambda*PI/latConstSq,2.0));
+
+  const int NFFT(fSteps);
+  const int NFFT_2(fSteps/2);
+  const int NFFTsq(fSteps*fSteps);
+
+   // fill the field Fourier components in the matrix
+
+  // ... but first check that the field is not larger than Hc2 and that we are dealing with a type II SC
+  if ((field >= Hc2) || (lambda < xi/sqrt(2.0))) {
+    int m;
+    #pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    for (m = 0; m < NFFTsq; m++) {
+      fFFTout[m] = field;
+    }
+    // Set the flag which shows that the calculation has been done
+    fGridExists = true;
+    return;
+  }
+
+  // ... now fill in the Fourier components if everything was okay above
+  double Gsq, ll;
+  int k, l, lNFFT_2;
+
+  for (l = 0; l < NFFT_2; ++l) {
+    lNFFT_2 = l*(NFFT_2 + 1);
+    ll = static_cast<double>(l*l);
+    for (k = 0; k <= NFFT_2; ++k) {
+      Gsq = static_cast<double>(k*k) + ll;
+      fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+    }
+  }
+
+  for (l = NFFT_2; l < NFFT; ++l) {
+    lNFFT_2 = l*(NFFT_2 + 1);
+    ll = static_cast<double>((NFFT-l)*(NFFT-l));
+    for (k = 0; k <= NFFT_2; ++k) {
+      Gsq = static_cast<double>(k*k) + ll;
+      fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+    }
+  }
+
+  // Do the Fourier transform to get B(x,y)
+
+  fftw_execute(fFFTplan);
+
+  // Multiply by the applied field
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  for (l = 0; l < NFFTsq; l++) {
+    fFFTout[l] *= field;
+  }
+
+  // Set the flag which shows that the calculation has been done
+
+  fGridExists = true;
+  return;
+
+}
+
+
 
 TBulkTriVortexMLFieldCalc::TBulkTriVortexMLFieldCalc(const string& wisdom, const unsigned int steps) {
   fWisdom = wisdom;

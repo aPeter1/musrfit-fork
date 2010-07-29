@@ -61,10 +61,7 @@ class TIntegrator {
 };
 
 inline TIntegrator::TIntegrator() : fFunc(0) {
-  ROOT::Math::GSLIntegrator *integrator = new ROOT::Math::GSLIntegrator(ROOT::Math::Integration::kADAPTIVE,ROOT::Math::Integration::kGAUSS31);
-  fIntegrator = integrator;
-  integrator = 0;
-  delete integrator;
+  fIntegrator = new ROOT::Math::GSLIntegrator(ROOT::Math::Integration::kADAPTIVE,ROOT::Math::Integration::kGAUSS31);
 }
 
 inline TIntegrator::~TIntegrator(){
@@ -104,10 +101,7 @@ class TMCIntegrator {
 };
 
 inline TMCIntegrator::TMCIntegrator() : fFunc(0) {
-  ROOT::Math::GSLMCIntegrator *integrator = new ROOT::Math::GSLMCIntegrator(ROOT::Math::MCIntegration::kMISER, 1.E-6, 1.E-4, 500000);
-  fMCIntegrator = integrator;
-  integrator = 0;
-  delete integrator;
+  fMCIntegrator = new ROOT::Math::GSLMCIntegrator(ROOT::Math::MCIntegration::kMISER, 1.E-6, 1.E-4, 500000);
 }
 
 inline TMCIntegrator::~TMCIntegrator(){

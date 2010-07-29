@@ -59,6 +59,30 @@ private:
   ClassDef(TBulkTriVortexLondon,1)
 };
 
+class TBulkSqVortexLondon : public PUserFcnBase {
+
+public:
+  TBulkSqVortexLondon();
+  ~TBulkSqVortexLondon();
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  mutable vector<double> fPar;
+  TBulkSqVortexLondonFieldCalc *fVortex;
+  TPofBCalc *fPofB;
+  TPofTCalc *fPofT;
+  mutable bool fCalcNeeded;
+  mutable bool fFirstCall;
+  mutable vector<double> fParForVortex;
+  mutable vector<double> fParForPofB;
+  mutable vector<double> fParForPofT;
+  string fWisdom;
+  unsigned int fGridSteps;
+
+  ClassDef(TBulkSqVortexLondon,1)
+};
+
 class TBulkTriVortexML : public PUserFcnBase {
 
 public:

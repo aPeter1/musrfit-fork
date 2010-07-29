@@ -1128,6 +1128,7 @@ Bool_t PFitter::ExecuteSave()
       else
         hcorr->Draw("COLZ");
       ccorr->Write("ccorr", TObject::kOverwrite, sizeof(ccorr));
+      hcorr->Write("hcorr", TObject::kOverwrite, sizeof(hcorr));
       ff.Close();
       // clean up
       if (ccorr) {

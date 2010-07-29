@@ -388,12 +388,12 @@ void TPofBCalc::Calculate(const TBulkVortexFieldCalc *vortexLattice, const vecto
   int a3(static_cast<int>(floor(fBmax/fDB)));
   int a4(static_cast<int>(ceil(fBmax/fDB)));
 
-  unsigned int firstZerosEnd ((a1 < a2) ? a1 : ((a1 > 0) ? (a1 - 1) : 0));
+  //unsigned int firstZerosEnd ((a1 < a2) ? a1 : ((a1 > 0) ? (a1 - 1) : 0));
   unsigned int lastZerosStart ((a3 < a4) ? a4 : (a4 + 1));
   unsigned int numberOfSteps(vortexLattice->GetNumberOfSteps());
   unsigned int numberOfStepsSq(numberOfSteps*numberOfSteps);
   unsigned int numberOfSteps_2(numberOfSteps/2);
-  unsigned int numberOfStepsSq_2(numberOfStepsSq/2);
+  //unsigned int numberOfStepsSq_2(numberOfStepsSq/2);
 
   if (lastZerosStart >= fPBSize)
     lastZerosStart = fPBSize - 1;
@@ -405,30 +405,76 @@ void TPofBCalc::Calculate(const TBulkVortexFieldCalc *vortexLattice, const vecto
   }
 
   double *vortexFields = vortexLattice->DataB();
-  unsigned int fill_index, counter(0);
+  unsigned int fill_index;
 
-  for (unsigned int j(0); j < numberOfStepsSq_2; j++) {
-    fill_index = static_cast<unsigned int>(ceil(fabs((vortexFields[j]/fDB))));
-    if (fill_index >= fPBSize)
-      fPB[fPBSize - 1] += 1.0;
-    else
-      fPB[fill_index] += 1.0;
-    counter++;
-    if (counter == numberOfSteps_2) { // sum only over the first quadrant of B(x,y)
-      counter = 0;
-      j += numberOfSteps_2;
+  if (para.size() == 7 && para[6] == 1.0 && para[5] != 0.0 && vortexLattice->IsTriangular()) {
+    // weight distribution with Gaussian around vortex-cores
+    double Rsq1, Rsq2, Rsq3, Rsq4, Rsq5, Rsq6, sigmaSq(-0.5*para[5]*para[5]);
+    for (unsigned int j(0); j < numberOfSteps_2; ++j) {
+      for (unsigned int i(0); i < numberOfSteps_2; ++i) {
+        fill_index = static_cast<unsigned int>(ceil(fabs((vortexFields[i + numberOfSteps*j]/fDB))));
+        if (fill_index < fPBSize) {
+          Rsq1 = static_cast<double>(3*i*i + j*j)/static_cast<double>(numberOfStepsSq);
+          Rsq2 = static_cast<double>(3*(numberOfSteps_2 - i)*(numberOfSteps_2 - i) \
+               + (numberOfSteps_2 - j)*(numberOfSteps_2 - j))/static_cast<double>(numberOfStepsSq);
+          Rsq3 = static_cast<double>(3*(numberOfSteps - i)*(numberOfSteps - i) \
+               + j*j)/static_cast<double>(numberOfStepsSq);
+          Rsq4 = static_cast<double>(3*(numberOfSteps_2 - i)*(numberOfSteps_2 - i) \
+               + (numberOfSteps_2 + j)*(numberOfSteps_2 + j))/static_cast<double>(numberOfStepsSq);
+          Rsq5 = static_cast<double>(3*i*i \
+               + (numberOfSteps - j)*(numberOfSteps - j))/static_cast<double>(numberOfStepsSq);
+          Rsq6 = static_cast<double>(3*(numberOfSteps_2 + i)*(numberOfSteps_2 + i) \
+               + (numberOfSteps_2 - j)*(numberOfSteps_2 - j))/static_cast<double>(numberOfStepsSq);
+          fPB[fill_index] += exp(sigmaSq*Rsq1) + exp(sigmaSq*Rsq2) + exp(sigmaSq*Rsq3) \
+                           + exp(sigmaSq*Rsq4) + exp(sigmaSq*Rsq5) + exp(sigmaSq*Rsq6);
+        }
+      }
+    }
+  } else if (para.size() == 7 && para[6] == 2.0 && para[5] != 0.0 && vortexLattice->IsTriangular()) {
+    // weight distribution with Lorentzian around vortex-cores
+    double Rsq1, Rsq2, Rsq3, Rsq4, Rsq5, Rsq6, sigmaSq(para[5]*para[5]);
+    for (unsigned int j(0); j < numberOfSteps_2; ++j) {
+      for (unsigned int i(0); i < numberOfSteps_2; ++i) {
+        fill_index = static_cast<unsigned int>(ceil(fabs((vortexFields[i + numberOfSteps*j]/fDB))));
+        if (fill_index < fPBSize) {
+          Rsq1 = static_cast<double>(3*i*i + j*j)/static_cast<double>(numberOfStepsSq);
+          Rsq2 = static_cast<double>(3*(numberOfSteps_2 - i)*(numberOfSteps_2 - i) \
+               + (numberOfSteps_2 - j)*(numberOfSteps_2 - j))/static_cast<double>(numberOfStepsSq);
+          Rsq3 = static_cast<double>(3*(numberOfSteps - i)*(numberOfSteps - i) \
+               + j*j)/static_cast<double>(numberOfStepsSq);
+          Rsq4 = static_cast<double>(3*(numberOfSteps_2 - i)*(numberOfSteps_2 - i) \
+               + (numberOfSteps_2 + j)*(numberOfSteps_2 + j))/static_cast<double>(numberOfStepsSq);
+          Rsq5 = static_cast<double>(3*i*i \
+               + (numberOfSteps - j)*(numberOfSteps - j))/static_cast<double>(numberOfStepsSq);
+          Rsq6 = static_cast<double>(3*(numberOfSteps_2 + i)*(numberOfSteps_2 + i) \
+               + (numberOfSteps_2 - j)*(numberOfSteps_2 - j))/static_cast<double>(numberOfStepsSq);
+          fPB[fill_index] += 1.0/(1.0+sigmaSq*Rsq1) + 1.0/(1.0+sigmaSq*Rsq2) + 1.0/(1.0+sigmaSq*Rsq3) \
+                           + 1.0/(1.0+sigmaSq*Rsq4) + 1.0/(1.0+sigmaSq*Rsq5) + 1.0/(1.0+sigmaSq*Rsq6);
+        }
+      }
+    }
+  } else {
+    for (unsigned int j(0); j < numberOfSteps_2; ++j) {
+      for (unsigned int i(0); i < numberOfSteps_2; ++i) {
+        fill_index = static_cast<unsigned int>(ceil(fabs((vortexFields[i + numberOfSteps*j]/fDB))));
+        if (fill_index < fPBSize) {
+          fPB[fill_index] += 1.0;
+        }
+      }
     }
   }
 
   vortexFields = 0;
 
-  double normalizer(static_cast<double>(numberOfStepsSq_2/2)*fDB);
-
+  // normalize P(B)
+  double sum(0.0);
+  for (unsigned int i(0); i < fPBSize; ++i)
+    sum += fPB[i];
+  sum *= fDB;
   int i;
 #pragma omp parallel for default(shared) private(i) schedule(dynamic)
-  for (i = firstZerosEnd; i <= static_cast<int>(lastZerosStart); i++) {
-    fPB[i] /= normalizer;
-  }
+  for (i = 0; i < static_cast<int>(fPBSize); ++i)
+    fPB[i] /= sum;
 // end pragma omp parallel
 
   if(para.size() == 5)

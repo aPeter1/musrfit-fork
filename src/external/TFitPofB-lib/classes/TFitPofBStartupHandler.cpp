@@ -49,7 +49,7 @@ ClassImpQ(TFitPofBStartupHandler)
 /**
  * <p>
  */
-TFitPofBStartupHandler::TFitPofBStartupHandler() : fDeltat(0.), fDeltaB(0.), fNSteps(0)
+TFitPofBStartupHandler::TFitPofBStartupHandler() : fDeltat(0.), fDeltaB(0.), fNSteps(0), fGridSteps(0)
 {
 }
 

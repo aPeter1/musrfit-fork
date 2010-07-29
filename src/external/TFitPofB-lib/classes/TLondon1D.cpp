@@ -209,18 +209,11 @@ TLondon1DHS::TLondon1DHS() : fCalcNeeded(true), fFirstCall(true) {
     fParForPofB.push_back(0.005); // Bkg-width
     fParForPofB.push_back(0.0); // Bkg-weight
 
-    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
-    fImpProfile = x;
-    x = 0;
+    fImpProfile = new TTrimSPData(rge_path, energy_vec);
 
-    TPofBCalc *y = new TPofBCalc(fParForPofB);
-    fPofB = y;
-    y = 0;
+    fPofB = new TPofBCalc(fParForPofB);
 
-    TPofTCalc *z = new TPofTCalc(fPofB, fWisdom, fParForPofT);
-    fPofT = z;
-    z = 0;
-
+    fPofT = new TPofTCalc(fPofB, fWisdom, fParForPofT);
 
     // clean up
     if (saxParser) {
@@ -370,17 +363,11 @@ TLondon1D1L::TLondon1D1L() : fCalcNeeded(true), fFirstCall(true), fCallCounter(0
     fParForPofB.push_back(startupHandler->GetDeltaB());
     fParForPofB.push_back(0.0);
 
-    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
-    fImpProfile = x;
-    x = 0;
+    fImpProfile = new TTrimSPData(rge_path, energy_vec);
 
-    TPofBCalc *y = new TPofBCalc(fParForPofB);
-    fPofB = y;
-    y = 0;
+    fPofB = new TPofBCalc(fParForPofB);
 
-    TPofTCalc *z = new TPofTCalc(fPofB, fWisdom, fParForPofT);
-    fPofT = z;
-    z = 0;
+    fPofT = new TPofTCalc(fPofB, fWisdom, fParForPofT);
 
     // clean up
     if (saxParser) {
@@ -524,18 +511,11 @@ TLondon1D2L::TLondon1D2L() : fCalcNeeded(true), fFirstCall(true), fLastTwoChange
     fParForPofB.push_back(startupHandler->GetDeltaB());
     fParForPofB.push_back(0.0);
 
-    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
-    fImpProfile = x;
-    x = 0;
+    fImpProfile = new TTrimSPData(rge_path, energy_vec);
 
-    TPofBCalc *y = new TPofBCalc(fParForPofB);
-    fPofB = y;
-    y = 0;
+    fPofB = new TPofBCalc(fParForPofB);
 
-    TPofTCalc *z = new TPofTCalc(fPofB, fWisdom, fParForPofT);
-    fPofT = z;
-    z = 0;
-
+    fPofT = new TPofTCalc(fPofB, fWisdom, fParForPofT);
 
     // clean up
     if (saxParser) {
@@ -684,17 +664,11 @@ TProximity1D1LHS::TProximity1D1LHS() : fCalcNeeded(true), fFirstCall(true) {
     fParForPofB.push_back(0.01); // Bkg-width
     fParForPofB.push_back(0.0); // Bkg-weight
 
-    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
-    fImpProfile = x;
-    x = 0;
+    fImpProfile = new TTrimSPData(rge_path, energy_vec);
 
-    TPofBCalc *y = new TPofBCalc(fParForPofB);
-    fPofB = y;
-    y = 0;
+    fPofB = new TPofBCalc(fParForPofB);
 
-    TPofTCalc *z = new TPofTCalc(fPofB, fWisdom, fParForPofT);
-    fPofT = z;
-    z = 0;
+    fPofT = new TPofTCalc(fPofB, fWisdom, fParForPofT);
 
     // clean up
     if (saxParser) {
@@ -851,17 +825,11 @@ TProximity1D1LHSGss::TProximity1D1LHSGss() : fCalcNeeded(true), fFirstCall(true)
     fParForPofB.push_back(0.0);
 //    fParForPofB.push_back(0.0);
 
-    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
-    fImpProfile = x;
-    x = 0;
+    fImpProfile = new TTrimSPData(rge_path, energy_vec);
 
-    TPofBCalc *y = new TPofBCalc(fParForPofB);
-    fPofB = y;
-    y = 0;
+    fPofB = new TPofBCalc(fParForPofB);
 
-    TPofTCalc *z = new TPofTCalc(fPofB, fWisdom, fParForPofT);
-    fPofT = z;
-    z = 0;
+    fPofT = new TPofTCalc(fPofB, fWisdom, fParForPofT);
 
     // clean up
     if (saxParser) {
@@ -991,18 +959,11 @@ TLondon1D3L::TLondon1D3L() : fCalcNeeded(true), fFirstCall(true), fLastThreeChan
     fParForPofB.push_back(startupHandler->GetDeltaB());
     fParForPofB.push_back(0.0);
 
-    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
-    fImpProfile = x;
-    x = 0;
+    fImpProfile = new TTrimSPData(rge_path, energy_vec);
 
-    TPofBCalc *y = new TPofBCalc(fParForPofB);
-    fPofB = y;
-    y = 0;
+    fPofB = new TPofBCalc(fParForPofB);
 
-    TPofTCalc *z = new TPofTCalc(fPofB, fWisdom, fParForPofT);
-    fPofT = z;
-    z = 0;
-
+    fPofT = new TPofTCalc(fPofB, fWisdom, fParForPofT);
 
     // clean up
     if (saxParser) {
@@ -1162,17 +1123,11 @@ TLondon1D3LS::TLondon1D3LS() : fCalcNeeded(true), fFirstCall(true), fLastThreeCh
     fParForPofB.push_back(startupHandler->GetDeltaB());
     fParForPofB.push_back(0.0);
 
-    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
-    fImpProfile = x;
-    x = 0;
+    fImpProfile = new TTrimSPData(rge_path, energy_vec);
 
-    TPofBCalc *y = new TPofBCalc(fParForPofB);
-    fPofB = y;
-    y = 0;
+    fPofB = new TPofBCalc(fParForPofB);
 
-    TPofTCalc *z = new TPofTCalc(fPofB, fWisdom, fParForPofT);
-    fPofT = z;
-    z = 0;
+    fPofT = new TPofTCalc(fPofB, fWisdom, fParForPofT);
 
     // clean up
     if (saxParser) {
@@ -1314,15 +1269,9 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
 //     fParForPofB.push_back(startupHandler->GetDeltaB());
 //     fParForPofB.push_back(0.0);
 // 
-//     TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
-//     fImpProfile = x;
-//     x = 0;
-//     delete x;
+//     fImpProfile = new TTrimSPData(rge_path, energy_vec);
 // 
-//     TPofTCalc *y = new TPofTCalc(fWisdom, fParForPofT);
-//     fPofT = y;
-//     y = 0;
-//     delete y;
+//     fPofT = new TPofTCalc(fWisdom, fParForPofT);
 // 
 //     // clean up
 //     if (saxParser) {
@@ -1485,17 +1434,11 @@ TLondon1D3LSub::TLondon1D3LSub() : fCalcNeeded(true), fFirstCall(true), fWeights
     fParForPofB.push_back(startupHandler->GetDeltaB());
     fParForPofB.push_back(0.0);
 
-    TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
-    fImpProfile = x;
-    x = 0;
+    fImpProfile = new TTrimSPData(rge_path, energy_vec);
 
-    TPofBCalc *y = new TPofBCalc(fParForPofB);
-    fPofB = y;
-    y = 0;
+    fPofB = new TPofBCalc(fParForPofB);
 
-    TPofTCalc *z = new TPofTCalc(fPofB, fWisdom, fParForPofT);
-    fPofT = z;
-    z = 0;
+    fPofT = new TPofTCalc(fPofB, fWisdom, fParForPofT);
 
     // clean up
     if (saxParser) {

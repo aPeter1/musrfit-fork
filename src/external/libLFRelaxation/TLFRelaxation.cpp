@@ -53,10 +53,7 @@ ClassImp(TLFSGInterpolation)
 // LF Static Gaussian KT
 
 TLFStatGssKT::TLFStatGssKT() {
-  TIntSinGss *intSinGss = new TIntSinGss();
-  fIntSinGss = intSinGss;
-  intSinGss = 0;
-  delete intSinGss;
+  fIntSinGss = new TIntSinGss();
 }
 
 TLFStatGssKT::~TLFStatGssKT() {
@@ -89,10 +86,7 @@ double TLFStatGssKT::operator()(double t, const vector<double> &par) const {
 // LF Static Lorentzian KT
 
 TLFStatLorKT::TLFStatLorKT() {
-  TIntBesselJ0Exp *intBesselJ0Exp = new TIntBesselJ0Exp();
-  fIntBesselJ0Exp = intBesselJ0Exp;
-  intBesselJ0Exp = 0;
-  delete intBesselJ0Exp;
+  fIntBesselJ0Exp = new TIntBesselJ0Exp();
 }
 
 TLFStatLorKT::~TLFStatLorKT() {
