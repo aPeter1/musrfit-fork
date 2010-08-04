@@ -205,7 +205,7 @@ void TPofBCalc::Calculate(const TBofZCalcInverse *BofZ, const TTrimSPData *dataT
   for (i = firstZerosEnd; i<=lastZerosStart; i++)
     fPB[i] /= pBsum;
 
-  if(para.size() == 6)
+  if(para.size() == 6 && para[5] != 0.0)
     AddBackground(para[3], para[4], para[5]);
 
 }
@@ -433,6 +433,7 @@ void TPofBCalc::Calculate(const TBulkVortexFieldCalc *vortexLattice, const vecto
   } else if (para.size() == 7 && para[6] == 2.0 && para[5] != 0.0 && vortexLattice->IsTriangular()) {
     // weight distribution with Lorentzian around vortex-cores
     double Rsq1, Rsq2, Rsq3, Rsq4, Rsq5, Rsq6, sigmaSq(para[5]*para[5]);
+//    ofstream of("LorentzWeight.dat");
     for (unsigned int j(0); j < numberOfSteps_2; ++j) {
       for (unsigned int i(0); i < numberOfSteps_2; ++i) {
         fill_index = static_cast<unsigned int>(ceil(fabs((vortexFields[i + numberOfSteps*j]/fDB))));
@@ -450,9 +451,14 @@ void TPofBCalc::Calculate(const TBulkVortexFieldCalc *vortexLattice, const vecto
                + (numberOfSteps_2 - j)*(numberOfSteps_2 - j))/static_cast<double>(numberOfStepsSq);
           fPB[fill_index] += 1.0/(1.0+sigmaSq*Rsq1) + 1.0/(1.0+sigmaSq*Rsq2) + 1.0/(1.0+sigmaSq*Rsq3) \
                            + 1.0/(1.0+sigmaSq*Rsq4) + 1.0/(1.0+sigmaSq*Rsq5) + 1.0/(1.0+sigmaSq*Rsq6);
+
+//          of << 1.0/(1.0+sigmaSq*Rsq1) + 1.0/(1.0+sigmaSq*Rsq2) + 1.0/(1.0+sigmaSq*Rsq3) \
+//                           + 1.0/(1.0+sigmaSq*Rsq4) + 1.0/(1.0+sigmaSq*Rsq5) + 1.0/(1.0+sigmaSq*Rsq6) << " ";
         }
       }
+//      of << endl;
     }
+//    of.close();
   } else {
     for (unsigned int j(0); j < numberOfSteps_2; ++j) {
       for (unsigned int i(0); i < numberOfSteps_2; ++i) {

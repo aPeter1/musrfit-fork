@@ -107,7 +107,6 @@ private:
   mutable vector<double> fParForPofB;
   string fWisdom;
   unsigned int fNSteps;
-  mutable bool fLastTwoChanged;
 
   ClassDef(TLondon1D2L,1)
 };
@@ -184,7 +183,6 @@ private:
   mutable vector<double> fParForPofB;
   string fWisdom;
   unsigned int fNSteps;
-  mutable bool fLastThreeChanged;
 
   ClassDef(TLondon1D3L,1)
 };
@@ -211,7 +209,6 @@ private:
   mutable vector<double> fParForPofB;
   string fWisdom;
   unsigned int fNSteps;
-  mutable bool fLastThreeChanged;
 
   ClassDef(TLondon1D3LS,1)
 };
@@ -240,32 +237,6 @@ private:
 // 
 //   ClassDef(TLondon1D4L,1)
 // };
-
-class TLondon1D3LSub : public PUserFcnBase {
-
-public:
-  // default constructor
-  TLondon1D3LSub();
-  ~TLondon1D3LSub();
-
-  double operator()(double, const vector<double>&) const;
-
-private:
-  mutable vector<double> fPar;
-  TTrimSPData *fImpProfile;
-  TPofBCalc *fPofB;
-  TPofTCalc *fPofT;
-  mutable bool fCalcNeeded;
-  mutable bool fFirstCall;
-  mutable vector<double> fParForPofT;
-  mutable vector<double> fParForBofZ;
-  mutable vector<double> fParForPofB;
-  string fWisdom;
-  unsigned int fNSteps;
-  mutable bool fWeightsChanged;
-
-  ClassDef(TLondon1D3LSub,1)
-};
 
 // Class for fitting directly B(z) without any P(B)-calculation
 

@@ -44,7 +44,6 @@
 #pragma link C++ class TLondon1D3L+;
 #pragma link C++ class TLondon1D3LS+;
 //#pragma link C++ class TLondon1D4L+;
-#pragma link C++ class TLondon1D3LSub+;
 
 #pragma link C++ class TLondon1D3Lestimate;
 
