@@ -247,6 +247,7 @@ class PTheory
 
     PMsrHandler *fMsrInfo; ///< pointer to the msr-file handler
 
+    mutable Double_t fSamplingTime;                ///< needed for LF. Keeps the sampling time of the non-analytic integral
     mutable Double_t fPrevParam[THEORY_MAX_PARAM]; ///< needed for LF. Keeps the previous fitting parameters
     mutable PDoubleVector fLFIntegral;             ///< needed for LF. Keeps the non-analytic integral values
     mutable Double_t fDynLFdt;                     ///< needed for LF. Keeps the time step for the dynamic LF calculation, used in the integral equation approach

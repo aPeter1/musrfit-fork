@@ -99,6 +99,7 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent)
   fUserFcnClassName = TString("");
   fUserFcn = 0;
   fDynLFdt = 0.0;
+  fSamplingTime = 0.001; // default = 1ns (units in us)
 
   static UInt_t lineNo = 1; // lineNo
   static UInt_t depth  = 0; // needed to handle '+' properly
@@ -1177,8 +1178,12 @@ Double_t PTheory::StaticGaussKTLF(register Double_t t, const PDoubleVector& para
   if (tt < 0.0) // for times < 0 return a function value of 1.0
     return 1.0;
 
-  if (val[0] < 0.02) { // if smaller 20kHz ~ 0.27G use zero field formula
-    Double_t sigma_t_2 = tt*tt*val[1]*val[1];
+  Double_t sigma_t_2 = 0.0;
+  if (val[0] < 0.02) { // if smaller 20kHz ~ 0.27G use the ZF formula
+    sigma_t_2 = tt*tt*val[1]*val[1];
+    result = 0.333333333333333 * (1.0 + 2.0*(1.0 - sigma_t_2)*TMath::Exp(-0.5*sigma_t_2));
+  } else if (val[1]/val[0] > 79.5775) { // check if Delta/w0 > 500.0, in which case the ZF formula is used
+    sigma_t_2 = tt*tt*val[1]*val[1];
     result = 0.333333333333333 * (1.0 + 2.0*(1.0 - sigma_t_2)*TMath::Exp(-0.5*sigma_t_2));
   } else {
     Double_t delta = val[1];
@@ -1390,7 +1395,10 @@ Double_t PTheory::StaticLorentzKTLF(register Double_t t, const PDoubleVector& pa
   if (tt < 0.0) // for times < 0 return a function value of 1.0
     return 1.0;
 
- if (val[0] < 0.02) { // if smaller 20kHz ~ 0.27G use zero field formula
+ if (val[0] < 0.02) { // if smaller 20kHz ~ 0.27G use the ZF formula
+    Double_t at = tt*val[1];
+    result = 0.333333333333333 * (1.0 + 2.0*(1.0 - at)*TMath::Exp(-at));
+  } else if (val[1]/val[0] > 159.1549) { // check if a/w0 > 1000.0, in which case the ZF formula is used
     Double_t at = tt*val[1];
     result = 0.333333333333333 * (1.0 + 2.0*(1.0 - at)*TMath::Exp(-at));
   } else {
@@ -2011,9 +2019,10 @@ Double_t PTheory::UserFcn(register Double_t t, const PDoubleVector& paramValues,
 /**
  * <p>Calculates the non-analytic integral of the static Gaussian Kubo-Toyabe in longitudinal field, i.e.
  * \f[ G_{\rm G,LF}(t) = \int^t_0 \exp\left[-1/2 (\sigma\tau)^2\right]\sin(2\pi\nu\tau)\mathrm{d}\tau \f]
- * and stores \f$G_{\rm G,LF}(t)\f$ in a vector, fLFIntegral, from \f$t=0\ldots 20\f$ us with a time resolution of 1 ns.
+ * and stores \f$G_{\rm G,LF}(t)\f$ in a vector, fLFIntegral, from \f$t=0\f$ up to 20us, if needed
  *
- * The fLFIntegral is given in steps of 1 ns, e.g. index i=100 coresponds to t=100ns
+ * The fLFIntegral is given in steps of fSamplingTime (default = 1 ns), e.g. for fSamplingTime = 0.001,
+ * index i=100 coresponds to t=100ns
  *
  * <b>meaning of val:</b> val[0]=\f$\nu\f$, val[1]=\f$\sigma\f$
  *
@@ -2023,14 +2032,38 @@ void PTheory::CalculateGaussLFIntegral(const Double_t *val) const
 {
   // val[0] = nu (field), val[1] = Delta
 
-  if (val[0] == 0.0) // field == 0.0, hence nothing to be done
+  if (val[0] == 0.0) { // field == 0.0, hence nothing to be done
     return;
+  } else if (val[1]/val[0] > 79.5775) { // check if a/w0 > 500.0, in which case the ZF formula is used and here nothing has to be done
+    return;
+  }
 
-  const Double_t dt=0.001; // all times in usec
+
+  Double_t dt=0.001; // all times in usec
   Double_t t, ft;
   Double_t w0 = TMath::TwoPi()*val[0];
   Double_t Delta = val[1];
   Double_t preFactor = 2.0*TMath::Power(Delta, 4.0) / TMath::Power(w0, 3.0);
+
+  // check if the time resolution needs to be increased
+  const Int_t samplingPerPeriod = 20;
+  const Int_t samplingOnExp = 3000;
+  if ((Delta <= w0) && (1.0/val[0] < 20.0)) { // makes sure that the frequency sampling is fine enough
+    if (1.0/val[0]/samplingPerPeriod < 0.001) {
+      dt = 1.0/val[0]/samplingPerPeriod;
+    }
+  } else if ((Delta > w0) && (Delta <= 10.0)) {
+    if (Delta/w0 > 10.0) {
+      dt = 0.00005;
+    }
+  } else if ((Delta > w0) && (Delta > 10.0)) { // makes sure there is a fine enough sampling for large Delta's
+    if (1.0/Delta/samplingOnExp < 0.001) {
+      dt = 1.0/Delta/samplingOnExp;
+    }
+  }
+
+  // keep sampling time
+  fSamplingTime = dt;
 
   // clear previously allocated vector
   fLFIntegral.clear();
@@ -2040,21 +2073,24 @@ void PTheory::CalculateGaussLFIntegral(const Double_t *val) const
   fLFIntegral.push_back(0.0); // start value of the integral
 
   ft = 0.0;
-  for (UInt_t i=1; i<2e4; i++) {
+  Double_t step = 0.0;
+  do {
     t  += dt;
-    ft += 0.5*dt*preFactor*(TMath::Exp(-0.5*TMath::Power(Delta * (t-dt), 2.0))*TMath::Sin(w0*(t-dt))+
-                           TMath::Exp(-0.5*TMath::Power(Delta * t, 2.0))*TMath::Sin(w0*t));
+    step = 0.5*dt*preFactor*(exp(-0.5*pow(Delta * (t-dt), 2.0))*sin(w0*(t-dt))+
+                             exp(-0.5*pow(Delta * t, 2.0))*sin(w0*t));
+    ft += step;
     fLFIntegral.push_back(ft);
-  }
+  } while ((t <= 20.0) && (fabs(step) > 1.0e-10));
 }
 
 //--------------------------------------------------------------------------
 /**
  * <p>Calculates the non-analytic integral of the static Lorentzian Kubo-Toyabe in longitudinal field, i.e.
  * \f[ G_{\rm L,LF}(t) = \int^t_0 \exp\left[-a \tau \right] j_0(2\pi\nu\tau)\mathrm{d}\tau \f]
- * and stores \f$G_{\rm L,LF}(t)\f$ in a vector, fLFIntegral, from \f$t=0\ldots 20\f$ us with a time resolution of 1 ns.
+ * and stores \f$G_{\rm L,LF}(t)\f$ in a vector, fLFIntegral, from \f$t=0\f$ up to 20 us, if needed.
  *
- * The fLFIntegral is given in steps of 1 ns, e.g. index i=100 coresponds to t=100ns
+ * The fLFIntegral is given in steps of fSamplingTime (default = 1 ns), e.g. for fSamplingTime = 0.001,
+ * index i=100 coresponds to t=100ns
  *
  * <b>meaning of val:</b> val[0]=\f$\nu\f$, val[1]=\f$a\f$
  *
@@ -2064,14 +2100,38 @@ void PTheory::CalculateLorentzLFIntegral(const Double_t *val) const
 {
   // val[0] = nu, val[1] = a
 
-  if (val[0] == 0.0) // field == 0.0, hence nothing to be done
+  // a few checks if the integral actually needs to be calculated
+  if (val[0] < 0.02) { // if smaller 20kHz ~ 0.27G use the ZF formula and here nothing has to be done
     return;
+  } else if (val[1]/val[0] > 159.1549) { // check if a/w0 > 1000.0, in which case the ZF formula is used and here nothing has to be done
+    return;
+  }
 
-  const Double_t dt=0.001; // all times in usec
+  Double_t dt=0.001; // all times in usec
   Double_t t, ft;
   Double_t w0 = TMath::TwoPi()*val[0];
   Double_t a = val[1];
   Double_t preFactor = a*(1+pow(a/w0,2.0));
+
+  // check if the time resolution needs to be increased
+  const Int_t samplingPerPeriod = 20;
+  const Int_t samplingOnExp = 3000;
+  if ((a <= w0) && (1.0/val[0] < 20.0)) { // makes sure that the frequency sampling is fine enough
+    if (1.0/val[0]/samplingPerPeriod < 0.001) {
+      dt = 1.0/val[0]/samplingPerPeriod;
+    }
+  } else if ((a > w0) && (a <= 10.0)) {
+    if (a/w0 > 10.0) {
+      dt = 0.00005;
+    }
+  } else if ((a > w0) && (a > 10.0)) { // makes sure there is a fine enough sampling for large a's
+    if (1.0/a/samplingOnExp < 0.001) {
+      dt = 1.0/a/samplingOnExp;
+    }
+  }
+
+  // keep sampling time
+  fSamplingTime = dt;
 
   // clear previously allocated vector
   fLFIntegral.clear();
@@ -2086,12 +2146,15 @@ void PTheory::CalculateLorentzLFIntegral(const Double_t *val) const
   ft += 0.5*dt*preFactor*(1.0+sin(w0*t)/(w0*t)*exp(-a*t));
   fLFIntegral.push_back(ft);
   // calculate all the other integral bin values
-  for (UInt_t i=2; i<2e4; i++) {
+  Double_t step = 0.0;
+  do {
     t  += dt;
-    ft += 0.5*dt*preFactor*(sin(w0*(t-dt))/(w0*(t-dt))*exp(-a*(t-dt))+sin(w0*t)/(w0*t)*exp(-a*t));
+    step = 0.5*dt*preFactor*(sin(w0*(t-dt))/(w0*(t-dt))*exp(-a*(t-dt))+sin(w0*t)/(w0*t)*exp(-a*t));
+    ft += step;
     fLFIntegral.push_back(ft);
-  }
+  } while ((t <= 20.0) && (fabs(step) > 1.0e-10));
 }
+
 
 //--------------------------------------------------------------------------
 /**
@@ -2103,16 +2166,16 @@ void PTheory::CalculateLorentzLFIntegral(const Double_t *val) const
  */
 Double_t PTheory::GetLFIntegralValue(const Double_t t) const
 {
-  UInt_t idx = static_cast<UInt_t>(t/0.001); // since LF-integral is calculated in nsec
+  UInt_t idx = static_cast<UInt_t>(t/fSamplingTime);
 
   if (idx < 0)
     return 0.0;
 
-  if (idx > fLFIntegral.size()-1)
+  if (idx > fLFIntegral.size()-2)
     return fLFIntegral[fLFIntegral.size()-1];
 
   // liniarly interpolate between the two relvant function bins
-  Double_t df = (fLFIntegral[idx+1]-fLFIntegral[idx])/0.001*(t-idx*0.001);
+  Double_t df = (fLFIntegral[idx+1]-fLFIntegral[idx])/fSamplingTime*(t-idx*fSamplingTime);
 
   return fLFIntegral[idx]+df;
 }
@@ -2185,6 +2248,9 @@ void PTheory::CalculateDynKTLF(const Double_t *val, Int_t tag) const
         if (val[0] < 0.02) { // if smaller 20kHz ~ 0.27G use zero field formula
           Double_t sigma_t_2 = t*t*val[1]*val[1];
           p0exp[i] = 0.333333333333333 * (1.0 + 2.0*(1.0 - sigma_t_2)*TMath::Exp(-0.5*sigma_t_2));
+        } else if (val[1]/val[0] > 79.5775) { // check if Delta/w0 > 500.0, in which case the ZF formula is used
+          Double_t sigma_t_2 = t*t*val[1]*val[1];
+          p0exp[i] = 0.333333333333333 * (1.0 + 2.0*(1.0 - sigma_t_2)*TMath::Exp(-0.5*sigma_t_2));
         } else {
           Double_t delta = val[1];
           Double_t w0    = TWO_PI*val[0];
@@ -2196,6 +2262,9 @@ void PTheory::CalculateDynKTLF(const Double_t *val, Int_t tag) const
         break;
       case 1: // Lorentz
         if (val[0] < 0.02) { // if smaller 20kHz ~ 0.27G use zero field formula
+          Double_t at = t*val[1];
+          p0exp[i] = 0.333333333333333 * (1.0 + 2.0*(1.0 - at)*TMath::Exp(-at));
+        } else if (val[1]/val[0] > 159.1549) { // check if a/w0 > 1000.0, in which case the ZF formula is used
           Double_t at = t*val[1];
           p0exp[i] = 0.333333333333333 * (1.0 + 2.0*(1.0 - at)*TMath::Exp(-at));
         } else {
@@ -2260,7 +2329,7 @@ Double_t PTheory::GetDynKTLFValue(const Double_t t) const
   if (idx < 0)
     return 0.0;
 
-  if (idx > static_cast<Int_t>(fDynLFFuncValue.size())-1)
+  if (idx > static_cast<Int_t>(fDynLFFuncValue.size())-2)
     return fDynLFFuncValue[fDynLFFuncValue.size()-1];
 
   // liniarly interpolate between the two relvant function bins
