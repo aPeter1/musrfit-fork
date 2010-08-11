@@ -371,7 +371,11 @@ void PFourier::PrepareFFTwInputData(UInt_t apodizationTag)
   }
 
   // 2nd fill fIn
-  UInt_t start = (UInt_t)(fStartTime/fTimeResolution) + t0bin;
+  Int_t val = static_cast<Int_t>(fStartTime/fTimeResolution) + t0bin;
+  UInt_t start = 0;
+  if (val >= 0) {
+    start = static_cast<UInt_t>(static_cast<Int_t>(fStartTime/fTimeResolution) + t0bin);
+  }
   for (UInt_t i=0; i<fNoOfData; i++) {
     fIn[i][0] = fData->GetBinContent(i+start);
     fIn[i][1] = 0.0;

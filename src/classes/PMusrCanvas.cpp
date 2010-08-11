@@ -2015,11 +2015,14 @@ void PMusrCanvas::HandleDifferenceFourier()
     // check if difference has been already calcualted, if not do it
     if (fData[0].diff == 0)
       HandleDifference();
+
+    // get time from the current fHistoFrame
     Int_t bin;
-    bin = fData[0].diff->GetXaxis()->GetFirst();
-    double startTime = fData[0].diff->GetBinCenter(bin);
-    bin = fData[0].diff->GetXaxis()->GetLast();
-    double endTime   = fData[0].diff->GetBinCenter(bin);
+    bin = fHistoFrame->GetXaxis()->GetFirst();
+    double startTime = fHistoFrame->GetBinCenter(bin);
+    bin = fHistoFrame->GetXaxis()->GetLast();
+    double endTime   = fHistoFrame->GetBinCenter(bin);
+
     for (UInt_t i=0; i<fData.size(); i++) {
       // calculate fourier transform of the data
       PFourier fourierData(fData[i].diff, fFourier.fUnits, startTime, endTime, fFourier.fFourierPower);
@@ -2549,6 +2552,12 @@ void PMusrCanvas::PlotData()
         }
       }
 
+      // delete old fHistoFrame if present
+      if (fHistoFrame) {
+        delete fHistoFrame;
+        fHistoFrame = 0;
+      }
+
       // create histo frame in order to plot histograms possibly with different x-frames
       fHistoFrame = fDataTheoryPad->DrawFrame(dataXmin, dataYmin, dataXmax, dataYmax);
       fHistoFrame->GetXaxis()->SetRangeUser(fXmin, fXmax);
@@ -2699,15 +2708,29 @@ void PMusrCanvas::PlotDifference()
     return;
 
   if (fPlotType != MSR_PLOT_NON_MUSR) {
+    // keep the current x-axis range from the data view
+    Double_t xmin, xmax;
+    xmin = fHistoFrame->GetXaxis()->GetBinCenter(fHistoFrame->GetXaxis()->GetFirst());
+    xmax = fHistoFrame->GetXaxis()->GetBinCenter(fHistoFrame->GetXaxis()->GetLast());
+
+    // delete old fHistoFrame if present
+    if (fHistoFrame) {
+      delete fHistoFrame;
+      fHistoFrame = 0;
+    }
+
     fHistoFrame = fDataTheoryPad->DrawFrame(fXmin, fYmin, fXmax, fYmax);
     // set x-axis label
     fHistoFrame->GetXaxis()->SetTitle("time (#mus)");
     // set y-axis label
     fHistoFrame->GetYaxis()->SetTitle("data-theory");
-    // plot all remaining diff data
+    // plot all diff data
     for (UInt_t i=0; i<fData.size(); i++) {
       fData[i].diff->Draw("pesame");
     }
+
+    // set the axis frame to the values of the data frame
+    fHistoFrame->GetXaxis()->SetRangeUser(xmin, xmax);
 
     // check if RRF and if yes show a label
     if ((fRRFText != 0) && (fRRFLatexText != 0)) {
