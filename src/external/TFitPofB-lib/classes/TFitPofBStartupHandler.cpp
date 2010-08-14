@@ -358,7 +358,7 @@ void TFitPofBStartupHandler::CheckLists()
     }
 
     if(fDebug) {
-      cout << "Energies and Labels:";
+      cout << "Energies and Labels:" << endl;
       for ( map<double, string>::const_iterator iter(fEnergies.begin()); iter != fEnergies.end(); ++iter )
         cout << iter->first << " " << iter->second << endl;
     }

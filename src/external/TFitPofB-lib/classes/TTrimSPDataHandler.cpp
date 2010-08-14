@@ -67,6 +67,7 @@ TTrimSPData::TTrimSPData(const string &path, map<double, string> &energies) {
   double zz(0.0), nzz(0.0);
   vector<double> vzz, vnzz;
   string word, energyStr;
+  bool goodFile(false);
 
   for ( map<double, string>::const_iterator iter(energies.begin()); iter != energies.end(); ++iter ) {
 
@@ -78,36 +79,48 @@ TTrimSPData::TTrimSPData(const string &path, map<double, string> &energies) {
       delete rgeFile;
       rgeFile = 0;
     } else {
-      fEnergy.push_back(iter->first);
 
-      while(*rgeFile >> word)
-        if(word == "PARTICLES") break;
-
-      while(!rgeFile->eof()) {
-        *rgeFile >> zz >> nzz;
-        vzz.push_back(zz);
-        vnzz.push_back(nzz);
+      while(*rgeFile >> word) {
+        if(word == "PARTICLES") {
+          goodFile = true;
+          break;
+        }
       }
 
-      fDZ.push_back(vzz[1]-vzz[0]);
+      if (goodFile) {
 
-      while(zz < 2100.0){
-        zz += *(fDZ.end()-1);
-        vzz.push_back(zz);
-        vnzz.push_back(0.0);
+        fEnergy.push_back(iter->first);
+
+        while(!rgeFile->eof()) {
+          *rgeFile >> zz >> nzz;
+          vzz.push_back(zz);
+          vnzz.push_back(nzz);
+        }
+
+        fDZ.push_back(vzz[1]-vzz[0]);
+
+        while(zz < 2100.0){
+          zz += *(fDZ.end()-1);
+          vzz.push_back(zz);
+          vnzz.push_back(0.0);
+        }
+
+        fDataZ.push_back(vzz);
+        fDataNZ.push_back(vnzz);
+
+
+        rgeFile->close();
+        delete rgeFile;
+        rgeFile = 0;
+
+        vzz.clear();
+        vnzz.clear();
+        goodFile = false;
+
+      } else {
+        cerr << "TTrimSPData::TTrimSPData: " << energyStr << " does not seem to be a valid unmodified TRIM.SP output file!" << endl;
+        continue;
       }
-
-      fDataZ.push_back(vzz);
-      fDataNZ.push_back(vnzz);
-
-
-      rgeFile->close();
-      delete rgeFile;
-      rgeFile = 0;
-
-      vzz.clear();
-      vnzz.clear();
-
     }
   }
 
