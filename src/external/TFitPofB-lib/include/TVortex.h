@@ -35,6 +35,11 @@
 #include "PUserFcnBase.h"
 #include "TPofTCalc.h"
 
+/**
+ * <p>Class implementing the musrfit user function interface for calculating muon spin depolarization functions
+ * originating from the spatial field distribution B(x,y) within a 2D triangular vortex lattice
+ * calculated using the London model with a Gaussian cutoff
+ */
 class TBulkTriVortexLondon : public PUserFcnBase {
 
 public:
@@ -44,21 +49,26 @@ public:
   double operator()(double, const vector<double>&) const;
 
 private:
-  mutable vector<double> fPar;
-  TBulkTriVortexLondonFieldCalc *fVortex;
-  TPofBCalc *fPofB;
-  TPofTCalc *fPofT;
-  mutable bool fCalcNeeded;
-  mutable bool fFirstCall;
-  mutable vector<double> fParForVortex;
-  mutable vector<double> fParForPofB;
-  mutable vector<double> fParForPofT;
-  string fWisdom;
-  unsigned int fGridSteps;
+  mutable vector<double> fPar; ///< parameters of the model
+  TBulkTriVortexLondonFieldCalc *fVortex; ///< spatial field distribution B(x,y) within the vortex lattice
+  TPofBCalc *fPofB; ///< static field distribution P(B)
+  TPofTCalc *fPofT; ///< muon spin polarization p(t)
+  mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
+  mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
+  mutable vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
+  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  string fWisdom; ///< file name of the FFTW wisdom file
+  unsigned int fGridSteps; ///< number of points in x- and y-direction for which B(x,y) is calculated
 
   ClassDef(TBulkTriVortexLondon,1)
 };
 
+/**
+ * <p>Class implementing the musrfit user function interface for calculating muon spin depolarization functions
+ * originating from the spatial field distribution B(x,y) within a 2D square vortex lattice
+ * calculated using the London model with a Gaussian cutoff
+ */
 class TBulkSqVortexLondon : public PUserFcnBase {
 
 public:
@@ -68,21 +78,26 @@ public:
   double operator()(double, const vector<double>&) const;
 
 private:
-  mutable vector<double> fPar;
-  TBulkSqVortexLondonFieldCalc *fVortex;
-  TPofBCalc *fPofB;
-  TPofTCalc *fPofT;
-  mutable bool fCalcNeeded;
-  mutable bool fFirstCall;
-  mutable vector<double> fParForVortex;
-  mutable vector<double> fParForPofB;
-  mutable vector<double> fParForPofT;
-  string fWisdom;
-  unsigned int fGridSteps;
+  mutable vector<double> fPar; ///< parameters of the model
+  TBulkSqVortexLondonFieldCalc *fVortex; ///< spatial field distribution B(x,y) within the vortex lattice
+  TPofBCalc *fPofB; ///< static field distribution P(B)
+  TPofTCalc *fPofT; ///< muon spin polarization p(t)
+  mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
+  mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
+  mutable vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
+  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  string fWisdom; ///< file name of the FFTW wisdom file
+  unsigned int fGridSteps; ///< number of points in x- and y-direction for which B(x,y) is calculated
 
   ClassDef(TBulkSqVortexLondon,1)
 };
 
+/**
+ * <p>Class implementing the musrfit user function interface for calculating muon spin depolarization functions
+ * originating from the spatial field distribution B(x,y) within a 2D triangular vortex lattice
+ * calculated using the modified London model with a Gaussian cutoff
+ */
 class TBulkTriVortexML : public PUserFcnBase {
 
 public:
@@ -92,21 +107,26 @@ public:
   double operator()(double, const vector<double>&) const;
 
 private:
-  mutable vector<double> fPar;
-  TBulkTriVortexMLFieldCalc *fVortex;
-  TPofBCalc *fPofB;
-  TPofTCalc *fPofT;
-  mutable bool fCalcNeeded;
-  mutable bool fFirstCall;
-  mutable vector<double> fParForVortex;
-  mutable vector<double> fParForPofB;
-  mutable vector<double> fParForPofT;
-  string fWisdom;
-  unsigned int fGridSteps;
+  mutable vector<double> fPar; ///< parameters of the model
+  TBulkTriVortexMLFieldCalc *fVortex; ///< spatial field distribution B(x,y) within the vortex lattice
+  TPofBCalc *fPofB; ///< static field distribution P(B)
+  TPofTCalc *fPofT; ///< muon spin polarization p(t)
+  mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
+  mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
+  mutable vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
+  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  string fWisdom; ///< file name of the FFTW wisdom file
+  unsigned int fGridSteps; ///< number of points in x- and y-direction for which B(x,y) is calculated
 
   ClassDef(TBulkTriVortexML,1)
 };
 
+/**
+ * <p>Class implementing the musrfit user function interface for calculating muon spin depolarization functions
+ * originating from the spatial field distribution B(x,y) within a 2D triangular vortex lattice
+ * calculated using the analytical Ginzburg-Landau approximation
+ */
 class TBulkTriVortexAGL : public PUserFcnBase {
 
 public:
@@ -116,21 +136,26 @@ public:
   double operator()(double, const vector<double>&) const;
 
 private:
-  mutable vector<double> fPar;
-  TBulkTriVortexAGLFieldCalc *fVortex;
-  TPofBCalc *fPofB;
-  TPofTCalc *fPofT;
-  mutable bool fCalcNeeded;
-  mutable bool fFirstCall;
-  mutable vector<double> fParForVortex;
-  mutable vector<double> fParForPofB;
-  mutable vector<double> fParForPofT;
-  string fWisdom;
-  unsigned int fGridSteps;
+  mutable vector<double> fPar; ///< parameters of the model
+  TBulkTriVortexAGLFieldCalc *fVortex; ///< spatial field distribution B(x,y) within the vortex lattice
+  TPofBCalc *fPofB; ///< static field distribution P(B)
+  TPofTCalc *fPofT; ///< muon spin polarization p(t)
+  mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
+  mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
+  mutable vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
+  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  string fWisdom; ///< file name of the FFTW wisdom file
+  unsigned int fGridSteps; ///< number of points in x- and y-direction for which B(x,y) is calculated
 
   ClassDef(TBulkTriVortexAGL,1)
 };
 
+/**
+ * <p>Class implementing the musrfit user function interface for calculating muon spin depolarization functions
+ * originating from the spatial field distribution B(x,y) within a 2D triangular vortex lattice
+ * calculated using the iterative minimization of the Ginzburg-Landau free energy after E.H. Brandt
+ */
 class TBulkTriVortexNGL : public PUserFcnBase {
 
 public:
@@ -140,17 +165,17 @@ public:
   double operator()(double, const vector<double>&) const;
 
 private:
-  mutable vector<double> fPar;
-  TBulkTriVortexNGLFieldCalc *fVortex;
-  TPofBCalc *fPofB;
-  TPofTCalc *fPofT;
-  mutable bool fCalcNeeded;
-  mutable bool fFirstCall;
-  mutable vector<double> fParForVortex;
-  mutable vector<double> fParForPofB;
-  mutable vector<double> fParForPofT;
-  string fWisdom;
-  unsigned int fGridSteps;
+  mutable vector<double> fPar; ///< parameters of the model
+  TBulkTriVortexNGLFieldCalc *fVortex; ///< spatial field distribution B(x,y) within the vortex lattice
+  TPofBCalc *fPofB; ///< static field distribution P(B)
+  TPofTCalc *fPofT; ///< muon spin polarization p(t)
+  mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
+  mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
+  mutable vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
+  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  string fWisdom; ///< file name of the FFTW wisdom file
+  unsigned int fGridSteps; ///< number of points in x- and y-direction for which B(x,y) is calculated
 
   ClassDef(TBulkTriVortexNGL,1)
 };

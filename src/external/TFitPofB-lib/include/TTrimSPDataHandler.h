@@ -37,6 +37,9 @@
 #include <map>
 using namespace std;
 
+/**
+ * <p>Class used to handle a set of low energy muon implantation profiles
+ */
 class TTrimSPData {
 
 public:
@@ -67,13 +70,13 @@ public:
   double PeakRange(double) const;
 
 private:
-  vector<double> fEnergy;
-  vector<double> fDZ;
-  vector< vector<double> > fDataZ;
-  mutable vector< vector<double> > fDataNZ;
-  vector< vector<double> > fOrigDataNZ;
-  mutable vector<bool> fIsNormalized;
-  mutable vector<double>::const_iterator fEnergyIter;
+  vector<double> fEnergy; ///< vector holding all available muon energies
+  vector<double> fDZ; ///< vector holding the spatial resolution of the TRIM.SP output for all energies
+  vector< vector<double> > fDataZ; ///< discrete points in real space for which n(z) has been calculated for all energies
+  mutable vector< vector<double> > fDataNZ; ///< n(z) for all energies
+  vector< vector<double> > fOrigDataNZ; ///< original (unmodified) implantation profiles for all energies as read in from rge-files
+  mutable vector<bool> fIsNormalized; ///< tag indicating if the implantation profiles are normalized (for each energy separately)
+  mutable vector<double>::const_iterator fEnergyIter; ///< iterator traversing the vector of available energies
 };
 
 #endif // _TTrimSPDataHandler_H_

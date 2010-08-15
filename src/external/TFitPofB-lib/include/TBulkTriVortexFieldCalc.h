@@ -2,7 +2,7 @@
 
   TBulkTriVortexFieldCalc.h
 
-  Author: Bastian M. Wojek, Alexander Maisuradze
+  Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
   2009/10/17
@@ -38,10 +38,9 @@ using namespace std;
 
 #include "fftw3.h"
 
-//--------------------
-// Base class for any kind of vortex symmetry
-//--------------------
-
+/**
+ * <p>Base class for the calculation of the spatial field distribution B(x,y) within a 2D vortex lattice of arbitrary symmetry
+ */
 class TBulkVortexFieldCalc {
 
 public:
@@ -61,20 +60,20 @@ public:
   virtual bool IsTriangular() const = 0;
 
 protected:
-  vector<double> fParam;
-  unsigned int fSteps;  // number of steps, the "unit cell" of the vortex lattice is devided in (in x- and y- direction)
-  mutable fftw_complex *fFFTin; // Fourier components of the field
-  mutable double *fFFTout; // fields in a "unit cell" of the vortex lattice
-  fftw_plan fFFTplan;
-  bool fUseWisdom;
-  string fWisdom;
-  mutable bool fGridExists;
+  vector<double> fParam; ///< parameters used to calculate B(x,y)
+  unsigned int fSteps;  ///< number of steps in which the "unit cell" of the vortex lattice is devided in (in each direction)
+  mutable fftw_complex *fFFTin; ///< Fourier components of the field
+  mutable double *fFFTout; ///< spatial field distribution B(x,y) in a "unit cell" of the vortex lattice
+  fftw_plan fFFTplan; ///< FFTW plan for the 2D-Fourier transform from Fourier space to real space
+  bool fUseWisdom; ///< tag determining if FFTW wisdom is used
+  string fWisdom; ///< file name of the FFTW wisdom-file
+  mutable bool fGridExists; ///< tag determining if B(x,y) has been calculated for the given set of parameters
 };
 
-//--------------------
-// Class for triangular vortex lattice, London model with Gaussian Cutoff
-//--------------------
-
+/**
+ * <p>Class for the calculation of the spatial field distribution B(x,y) within a 2D triangular vortex lattice
+ * using the London model with a Gaussian cutoff
+ */
 class TBulkTriVortexLondonFieldCalc : public TBulkVortexFieldCalc {
 
 public:
@@ -87,10 +86,10 @@ public:
 
 };
 
-//--------------------
-// Class for square vortex lattice, London model with Gaussian Cutoff
-//--------------------
-
+/**
+ * <p>Class for the calculation of the spatial field distribution B(x,y) within a 2D square vortex lattice
+ * using the London model with a Gaussian cutoff
+ */
 class TBulkSqVortexLondonFieldCalc : public TBulkVortexFieldCalc {
 
 public:
@@ -103,10 +102,10 @@ public:
 
 };
 
-//--------------------
-// Class for triangular vortex lattice, modified London model
-//--------------------
-
+/**
+ * <p>Class for the calculation of the spatial field distribution B(x,y) within a 2D triangular vortex lattice
+ * using the modified London model with a Gaussian cutoff
+ */
 class TBulkTriVortexMLFieldCalc : public TBulkVortexFieldCalc {
 
 public:
@@ -119,10 +118,10 @@ public:
 
 };
 
-//--------------------
-// Class for triangular vortex lattice, analytical GL approximation
-//--------------------
-
+/**
+ * <p>Class for the calculation of the spatial field distribution B(x,y) within a 2D triangular vortex lattice
+ * using the analytical Ginzburg-Landau approximation
+ */
 class TBulkTriVortexAGLFieldCalc : public TBulkVortexFieldCalc {
 
 public:
@@ -135,10 +134,10 @@ public:
 
 };
 
-//--------------------
-// Class for triangular vortex lattice, Minimisation of the GL free energy à la Brandt
-//--------------------
-
+/**
+ * <p>Class for the calculation of the spatial field distribution B(x,y) within a 2D triangular vortex lattice
+ * using an iterative minimization of the Ginzburg-Landau free energy after E.H. Brandt
+ */
 class TBulkTriVortexNGLFieldCalc : public TBulkVortexFieldCalc {
 
 public:
@@ -166,24 +165,24 @@ private:
   void ManipulateFourierCoefficientsForQx() const;
   void ManipulateFourierCoefficientsForQy() const;
 
-  mutable double *fOmegaMatrix;
-  mutable fftw_complex *fOmegaDiffMatrix;
-  mutable fftw_complex *fBkMatrix;
-  mutable fftw_complex *fRealSpaceMatrix;
-  mutable fftw_complex *fQMatrix;
-  mutable fftw_complex *fQMatrixA;
+  mutable double *fOmegaMatrix; ///< spatial distribution of the superconducting order parameter omega(x,y)
+  mutable fftw_complex *fOmegaDiffMatrix; ///< complex matrix holding the gradient of omega(x,y): real -> d/dx, imaginary -> d/dy
+  mutable fftw_complex *fBkMatrix; ///< complex matrix holding the Fourier coefficients of the field
+  mutable fftw_complex *fRealSpaceMatrix; ///< complex matrix holding intermediate results of the calculations
+  mutable fftw_complex *fQMatrix; ///< complex matrix holding the two components of the supervelocity
+  mutable fftw_complex *fQMatrixA; ///< complex matrix for the two components of the supervelocity for Abrikosov's vortex lattice
 
-  mutable double *fCheckAkConvergence;
-  mutable double *fCheckBkConvergence;
+  mutable double *fCheckAkConvergence; ///< array used for a convergence check in the calculation of the order parameter
+  mutable double *fCheckBkConvergence; ///< array used for a convergence check in the calculation of the spatial field distribution
 
-  mutable double fLatticeConstant;
-  mutable double fKappa;
-  mutable double fSumAk;
-  mutable double fSumOmegaSq;
-  mutable double fSumSum;
-  fftw_plan fFFTplanBkToBandQ;
-  fftw_plan fFFTplanOmegaToAk;
-  fftw_plan fFFTplanOmegaToBk;
+  mutable double fLatticeConstant; ///< inter-vortex distance
+  mutable double fKappa; ///< Ginzburg-Landau parameter kappa=lambda/xi
+  mutable double fSumAk; ///< sum of the Fourier components of the superconducting order parameter
+  mutable double fSumOmegaSq; ///< average of the square of the superconducting order parameter
+  mutable double fSumSum; ///< variable holding intermediate results
+  fftw_plan fFFTplanBkToBandQ; ///< FFTW plan for the 2D-Fourier transform from Fourier space to real space
+  fftw_plan fFFTplanOmegaToAk; ///< FFTW plan for the 2D-Fourier transform from real space to Fourier space
+  fftw_plan fFFTplanOmegaToBk; ///< FFTW plan for the 2D-Fourier transform from real space to Fourier space
 
 };
 

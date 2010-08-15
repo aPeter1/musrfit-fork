@@ -35,6 +35,10 @@
 #include "PUserFcnBase.h"
 #include "TPofTCalc.h"
 
+/**
+ * <p>Class implementing the musrfit user function interface for calculating low energy muon spin depolarization functions
+ * using the 1D London model for Meissner screening in a superconducting half-space
+ */
 class TLondon1DHS : public PUserFcnBase {
 
 public:
@@ -45,21 +49,25 @@ public:
   double operator()(double, const vector<double>&) const;
 
 private:
-  mutable vector<double> fPar;
-  TTrimSPData *fImpProfile;
-  TPofBCalc *fPofB;
-  TPofTCalc *fPofT;
-  mutable bool fCalcNeeded;
-  mutable bool fFirstCall;
-  mutable vector<double> fParForPofT;
-  mutable vector<double> fParForBofZ;
-  mutable vector<double> fParForPofB;
-  string fWisdom;
-  unsigned int fNSteps;
+  mutable vector<double> fPar; ///< parameters of the model
+  TTrimSPData *fImpProfile; ///< low energy muon implantation profiles
+  TPofBCalc *fPofB; ///< static field distribution P(B)
+  TPofTCalc *fPofT; ///< muon spin polarization p(t)
+  mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
+  mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
+  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  mutable vector<double> fParForBofZ; ///< parameters for the calculation of B(z)
+  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  string fWisdom; ///< file name of the FFTW wisdom file
+  unsigned int fNSteps; ///< number of points for which B(z) is calculated
 
   ClassDef(TLondon1DHS,1)
 };
 
+/**
+ * <p>Class implementing the musrfit user function interface for calculating low energy muon spin depolarization functions
+ * using the 1D London model for Meissner screening in a thin superconducting film
+ */
 class TLondon1D1L : public PUserFcnBase {
 
 public:
@@ -70,22 +78,27 @@ public:
   double operator()(double, const vector<double>&) const;
 
 private:
-  mutable vector<double> fPar;
-  TTrimSPData *fImpProfile;
-  TPofBCalc *fPofB;
-  TPofTCalc *fPofT;
-  mutable bool fCalcNeeded;
-  mutable bool fFirstCall;
-  mutable vector<double> fParForPofT;
-  mutable vector<double> fParForBofZ;
-  mutable vector<double> fParForPofB;
-  string fWisdom;
-  unsigned int fNSteps;
-  mutable unsigned int fCallCounter;
+  mutable vector<double> fPar; ///< parameters of the model
+  TTrimSPData *fImpProfile; ///< low energy muon implantation profiles
+  TPofBCalc *fPofB; ///< static field distribution P(B)
+  TPofTCalc *fPofT; ///< muon spin polarization p(t)
+  mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
+  mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
+  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  mutable vector<double> fParForBofZ; ///< parameters for the calculation of B(z)
+  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  string fWisdom; ///< file name of the FFTW wisdom file
+  unsigned int fNSteps; ///< number of points for which B(z) is calculated
+  //mutable unsigned int fCallCounter;
 
   ClassDef(TLondon1D1L,1)
 };
 
+/**
+ * <p>Class implementing the musrfit user function interface for calculating low energy muon spin depolarization functions
+ * using the 1D London model for Meissner screening in a thin superconducting film
+ * consisting of two layers with different magnetic penetration depths
+ */
 class TLondon1D2L : public PUserFcnBase {
 
 public:
@@ -96,21 +109,26 @@ public:
   double operator()(double, const vector<double>&) const;
 
 private:
-  mutable vector<double> fPar;
-  TTrimSPData *fImpProfile;
-  TPofBCalc *fPofB;
-  TPofTCalc *fPofT;
-  mutable bool fCalcNeeded;
-  mutable bool fFirstCall;
-  mutable vector<double> fParForPofT;
-  mutable vector<double> fParForBofZ;
-  mutable vector<double> fParForPofB;
-  string fWisdom;
-  unsigned int fNSteps;
+  mutable vector<double> fPar; ///< parameters of the model
+  TTrimSPData *fImpProfile; ///< low energy muon implantation profiles
+  TPofBCalc *fPofB; ///< static field distribution P(B)
+  TPofTCalc *fPofT; ///< muon spin polarization p(t)
+  mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
+  mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
+  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  mutable vector<double> fParForBofZ; ///< parameters for the calculation of B(z)
+  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  string fWisdom; ///< file name of the FFTW wisdom file
+  unsigned int fNSteps; ///< number of points for which B(z) is calculated
 
   ClassDef(TLondon1D2L,1)
 };
 
+/**
+ * <p>Class implementing the musrfit user function interface for calculating low energy muon spin depolarization functions
+ * using the model for Meissner screening in a conventionally proximated system
+ * consisting of one metal layer and an underlying (London) superconducting half-space
+ */
 class TProximity1D1LHS : public PUserFcnBase {
 
 public:
@@ -121,47 +139,26 @@ public:
   double operator()(double, const vector<double>&) const;
 
 private:
-  mutable vector<double> fPar;
-  TTrimSPData *fImpProfile;
-  TPofBCalc *fPofB;
-  TPofTCalc *fPofT;
-  mutable bool fCalcNeeded;
-  mutable bool fFirstCall;
-  mutable vector<double> fParForPofT;
-  mutable vector<double> fParForBofZ;
-  mutable vector<double> fParForPofB;
-  string fWisdom;
-  unsigned int fNSteps;
+  mutable vector<double> fPar; ///< parameters of the model
+  TTrimSPData *fImpProfile; ///< low energy muon implantation profiles
+  TPofBCalc *fPofB; ///< static field distribution P(B)
+  TPofTCalc *fPofT; ///< muon spin polarization p(t)
+  mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
+  mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
+  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  mutable vector<double> fParForBofZ; ///< parameters for the calculation of B(z)
+  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  string fWisdom; ///< file name of the FFTW wisdom file
+  unsigned int fNSteps; ///< number of points for which B(z) is calculated
 
   ClassDef(TProximity1D1LHS,1)
 };
 
-class TProximity1D1LHSGss : public PUserFcnBase {
-
-public:
-  // default constructor
-  TProximity1D1LHSGss();
-  ~TProximity1D1LHSGss();
-
-  double operator()(double, const vector<double>&) const;
-
-private:
-  mutable vector<double> fPar;
-  TTrimSPData *fImpProfile;
-  TPofBCalc *fPofB;
-  TPofTCalc *fPofT;
-  mutable bool fCalcNeeded;
-  mutable bool fFirstCall;
-  mutable vector<double> fParForPofT;
-  mutable vector<double> fParForBofZ;
-  mutable vector<double> fParForPofB;
-  string fWisdom;
-  unsigned int fNSteps;
-
-  ClassDef(TProximity1D1LHSGss,1)
-};
-
-
+/**
+ * <p>Class implementing the musrfit user function interface for calculating low energy muon spin depolarization functions
+ * using the 1D London model for Meissner screening in a thin superconducting film
+ * consisting of three layers with different magnetic penetration depths
+ */
 class TLondon1D3L : public PUserFcnBase {
 
 public:
@@ -172,22 +169,26 @@ public:
   double operator()(double, const vector<double>&) const;
 
 private:
-  mutable vector<double> fPar;
-  TTrimSPData *fImpProfile;
-  TPofBCalc *fPofB;
-  TPofTCalc *fPofT;
-  mutable bool fCalcNeeded;
-  mutable bool fFirstCall;
-  mutable vector<double> fParForPofT;
-  mutable vector<double> fParForBofZ;
-  mutable vector<double> fParForPofB;
-  string fWisdom;
-  unsigned int fNSteps;
+  mutable vector<double> fPar; ///< parameters of the model
+  TTrimSPData *fImpProfile; ///< low energy muon implantation profiles
+  TPofBCalc *fPofB; ///< static field distribution P(B)
+  TPofTCalc *fPofT; ///< muon spin polarization p(t)
+  mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
+  mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
+  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  mutable vector<double> fParForBofZ; ///< parameters for the calculation of B(z)
+  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  string fWisdom; ///< file name of the FFTW wisdom file
+  unsigned int fNSteps; ///< number of points for which B(z) is calculated
 
   ClassDef(TLondon1D3L,1)
 };
 
-
+/**
+ * <p>Class implementing the musrfit user function interface for calculating low energy muon spin depolarization functions
+ * using the 1D London model for Meissner screening in a thin superconducting film
+ * consisting of three layers with different magnetic penetration depths (where lambda is the same for the two outer layers)
+ */
 class TLondon1D3LS : public PUserFcnBase {
 
 public:
@@ -198,17 +199,17 @@ public:
   double operator()(double, const vector<double>&) const;
 
 private:
-  mutable vector<double> fPar;
-  TTrimSPData *fImpProfile;
-  TPofBCalc *fPofB;
-  TPofTCalc *fPofT;
-  mutable bool fCalcNeeded;
-  mutable bool fFirstCall;
-  mutable vector<double> fParForPofT;
-  mutable vector<double> fParForBofZ;
-  mutable vector<double> fParForPofB;
-  string fWisdom;
-  unsigned int fNSteps;
+  mutable vector<double> fPar; ///< parameters of the model
+  TTrimSPData *fImpProfile; ///< low energy muon implantation profiles
+  TPofBCalc *fPofB; ///< static field distribution P(B
+  TPofTCalc *fPofT; ///< muon spin polarization p(t)
+  mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
+  mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
+  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  mutable vector<double> fParForBofZ; ///< parameters for the calculation of B(z)
+  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  string fWisdom; ///< file name of the FFTW wisdom file
+  unsigned int fNSteps; ///< number of points for which B(z) is calculated
 
   ClassDef(TLondon1D3LS,1)
 };
@@ -237,19 +238,5 @@ private:
 // 
 //   ClassDef(TLondon1D4L,1)
 // };
-
-// Class for fitting directly B(z) without any P(B)-calculation
-
-class TLondon1D3Lestimate : public PUserFcnBase {
-
-public:
-  // default constructor
-  TLondon1D3Lestimate() {}
-  ~TLondon1D3Lestimate() {}
-
-  double operator()(double, const vector<double>&) const;
-
-  ClassDef(TLondon1D3Lestimate,1)
-};
 
 #endif //_TLondon1D_H_

@@ -35,10 +35,9 @@
 #include <vector>
 using namespace std;
 
-//--------------------
-// Base class for any kind of theory function B(z)
-//--------------------
-
+/**
+ * <p>Base class for any kind of theory function B(z)
+ */
 class TBofZCalc {
 
 public:
@@ -60,17 +59,16 @@ public:
   double GetDZ() const {return fDZ;}
 
 protected:
-  int fSteps;
-  double fDZ;
-  vector<double> fParam;
-  mutable vector<double> fZ;
-  mutable vector<double> fBZ;
+  int fSteps; ///< number of discrete points where B(z) is calculated
+  double fDZ; ///< resolution in z (spacing between two neighboring discrete B(z) points)
+  vector<double> fParam; ///< parameters of the B(z) function
+  mutable vector<double> fZ; ///< vector holding all z-values
+  mutable vector<double> fBZ; ///< vector holding all B(z)-values
 };
 
-//--------------------
-// Base class for any kind of theory function B(z) where the inverse and its derivative are given analytically
-//--------------------
-
+/**
+ * <p>Base class for any kind of theory function B(z) where the inverse and its derivative are given analytically
+ */
 class TBofZCalcInverse : public TBofZCalc {
 
 public:
@@ -81,10 +79,9 @@ public:
   virtual vector< pair<double, double> > GetInverseAndDerivative(double) const = 0;
 };
 
-//--------------------
-// Class "for Meissner screening" in a superconducting half-space
-//--------------------
-
+/**
+ * <p>Class using the 1D London model to calculate Meissner screening in a superconducting half-space
+ */
 class TLondon1D_HS : public TBofZCalcInverse {
 
 public:
@@ -97,10 +94,9 @@ public:
 
 };
 
-//--------------------
-// Class "for Meissner screening" in a thin superconducting film
-//--------------------
-
+/**
+ * <p>Class using the 1D London model to calculate Meissner screening in a thin superconducting film
+ */
 class TLondon1D_1L : public TBofZCalcInverse {
 
 public:
@@ -114,16 +110,16 @@ public:
 private:
   void SetBmin();
 
-  double fMinZ;
-  double fMinB;
-  double fCoeff[2];
+  double fMinZ; ///< position of the minimum of B(z)
+  double fMinB; ///< miniumum value of B(z)
+  double fCoeff[2]; ///< array holding the results of two intermediate steps of the involved calculations
 
 };
 
-//--------------------
-// Class "for Meissner screening" in a thin superconducting film - bilayer with two different lambdas
-//--------------------
-
+/**
+ * <p>Class using the 1D London model to calculate Meissner screening in a thin superconducting film
+ * consisting of two layers with different magnetic penetration depths
+ */
 class TLondon1D_2L : public TBofZCalcInverse {
 
 public:
@@ -137,18 +133,17 @@ public:
 private:
   void SetBmin();
 
-  int fMinTag;
-  double fMinZ;
-  double fMinB;
-  double fInterfaces[3];
-  double fCoeff[4];
+  int fMinTag; ///< tag specifying which layer contains the minimum value of B(z)
+  double fMinZ; ///< position of the minimum of B(z)
+  double fMinB; ///< miniumum value of B(z)
+  double fInterfaces[3]; ///< positions of the interfaces between monotonous parts of B(z) or where the function changes
+  double fCoeff[4]; ///< array holding the results of four intermediate steps of the involved calculations
 };
 
-
-//--------------------
-// Class "for proximity screening" in a thin superconducting film - one layer + superconducting half space
-//--------------------
-
+/**
+ * <p>Class calculating the Meissner screening in a conventionally proximated system
+ * consisting of one metal layer and an underlying (London) superconducting half-space
+ */
 class TProximity1D_1LHS : public TBofZCalcInverse {
 
 public:
@@ -162,39 +157,16 @@ public:
 private:
   void SetBmin();
 
-  int fMinTag;
-  double fMinZ;
-  double fMinB;
-  double fInterfaces[2];
+  int fMinTag; ///< tag specifying which layer contains the minimum value of B(z)
+  double fMinZ; ///< position of the minimum of B(z)
+  double fMinB; ///< miniumum value of B(z)
+  double fInterfaces[2]; ///< positions of the interfaces between a dead layer, the metallic region and the superconducting region
 };
 
-//--------------------
-// Class "for proximity screening" in a thin superconducting film - one layer + superconducting half space
-//--------------------
-
-class TProximity1D_1LHSGss : public TBofZCalcInverse {
-
-public:
-
-  TProximity1D_1LHSGss(const vector<double>&, unsigned int steps = 3000);
-  double GetBofZ(double) const;
-  double GetBmin() const;
-  double GetBmax() const;
-  vector< pair<double, double> > GetInverseAndDerivative(double) const;
-
-private:
-  void SetBmin();
-
-  int fMinTag;
-  double fMinZ;
-  double fMinB;
-  double fInterfaces[2];
-};
-
-//--------------------
-// Class "for Meissner screening" in a thin superconducting film - tri-layer with three different lambdas
-//--------------------
-
+/**
+ * <p>Class using the 1D London model to calculate Meissner screening in a thin superconducting film
+ * consisting of three layers with different magnetic penetration depths
+ */
 class TLondon1D_3L : public TBofZCalcInverse {
 
 public:
@@ -208,17 +180,17 @@ public:
 private:
   void SetBmin();
 
-  int fMinTag;
-  double fMinZ;
-  double fMinB;
-  double fInterfaces[4];
-  double fCoeff[6];
+  int fMinTag; ///< tag specifying which layer contains the minimum value of B(z)
+  double fMinZ; ///< position of the minimum of B(z)
+  double fMinB; ///< miniumum value of B(z)
+  double fInterfaces[4]; ///< positions of the interfaces between monotonous parts of B(z) or where the function changes
+  double fCoeff[6]; ///< array holding the results of six intermediate steps of the involved calculations
 };
 
-//--------------------
-// Class "for Meissner screening" in a thin superconducting film - tri-layer with two different lambdas
-//--------------------
-
+/**
+ * <p>Class using the 1D London model to calculate Meissner screening in a thin superconducting film
+ * consisting of three layers with different magnetic penetration depths (where lambda is the same for the two outer layers)
+ */
 class TLondon1D_3LS : public TBofZCalcInverse {
 
 public:
@@ -232,17 +204,17 @@ public:
 private:
   void SetBmin();
 
-  int fMinTag;
-  double fMinZ;
-  double fMinB;
-  double fInterfaces[4];
-  double fCoeff[6];
+  int fMinTag; ///< tag specifying which layer contains the minimum value of B(z)
+  double fMinZ; ///< position of the minimum of B(z)
+  double fMinB; ///< miniumum value of B(z)
+  double fInterfaces[4]; ///< positions of the interfaces between monotonous parts of B(z) or where the function changes
+  double fCoeff[6]; ///< array holding the results of six intermediate steps of the involved calculations
 };
 
-//--------------------
-// Class "for Meissner screening" in a thin superconducting film - tri-layer with insulating buffer layer, two lambda
-//--------------------
-
+/**
+ * <p>Class using the 1D London model to calculate Meissner screening in a thin superconducting film
+ * consisting of three layers with two different magnetic penetration depths and the central layer being insulating
+ */
 class TLondon1D_3LwInsulator : public TBofZCalc {
 
 public:
@@ -255,9 +227,9 @@ public:
 private:
   void SetBmin();
 
-  double fMinZ;
-  double fMinB;
-  double fCoeff[4];
+  double fMinZ; ///< position of the minimum of B(z)
+  double fMinB; ///< miniumum value of B(z)
+  double fCoeff[4]; ///< array holding the results of four intermediate steps of the involved calculations
 };
 
 #endif // _BofZCalc_H_

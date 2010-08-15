@@ -39,6 +39,9 @@
 #define PI 3.14159265358979323846
 #define tauMu 2.197147
 
+/**
+ * <p>Class used to calculate a muon spin depolarization function from a static magnetic field distribution
+ */
 class TPofTCalc {
 
 public:
@@ -54,15 +57,15 @@ public:
   double Eval(double) const;
 
 private:
-  fftw_plan fFFTplan;
-  double *fFFTin;
-  fftw_complex *fFFTout;
-  double *fT;
-  double *fPT;
-  double fTBin;
-  int fNFFT;
-  const string fWisdom;
-  bool fUseWisdom;
+  fftw_plan fFFTplan; ///< FFTW plan for the 1D Fourier transform from field domain to time domain 
+  double *fFFTin; ///< input array of the Fourier transform in the field domain 
+  fftw_complex *fFFTout; ///< output array of the Fourier transform in the time domain
+  double *fT; ///< array containing the discrete times for which the polarization p(t) is calculated
+  double *fPT; ///< array containing the discrete values of the polarization p(t)
+  double fTBin; ///< time resolution
+  int fNFFT; ///< length of the discrete 1D Fourier transform
+  const string fWisdom; ///< file name of the FFTW wisdom file
+  bool fUseWisdom; ///< tag determining if a FFTW wisdom file is used
 
 };
 

@@ -39,6 +39,9 @@
 #define gBar 0.0135538817
 #define pi 3.14159265358979323846
 
+/**
+ * <p>Class used to calculate static magnetic field distributions
+ */
 class TPofBCalc {
 
 public:
@@ -68,14 +71,14 @@ public:
   void UnsetPBExists();
 
 private:
-  double *fB;
-  mutable double *fPB;
-  double fBmin;
-  double fBmax;
-  double fDT;
-  double fDB;
-  mutable bool fPBExists;
-  unsigned int fPBSize;
+  double *fB; ///< array of discrete points in the field domain
+  mutable double *fPB; ///< array of discrete values of the field distribution P(B)
+  double fBmin; ///< minimum field contributing to the distribution
+  double fBmax; ///< maximum field contributing to the distribution
+  double fDT; ///< time resolution (needed for convolutions)
+  double fDB; ///< field resolution (spacing of neighboring fields for which P(B) is calculated)
+  mutable bool fPBExists; ///< tag indicating if P(B) has been calculated for a set of given parameters
+  unsigned int fPBSize; ///< length of the P(B) array
 };
 
 #endif // _TPofBCalc_H_

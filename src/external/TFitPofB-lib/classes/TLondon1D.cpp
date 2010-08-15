@@ -42,12 +42,9 @@ ClassImp(TLondon1DHS)
 ClassImp(TLondon1D1L)
 ClassImp(TLondon1D2L)
 ClassImp(TProximity1D1LHS)
-ClassImp(TProximity1D1LHSGss)
 ClassImp(TLondon1D3L)
 ClassImp(TLondon1D3LS)
 // ClassImp(TLondon1D4L)
-
-ClassImp(TLondon1D3Lestimate)
 
 
 
@@ -95,19 +92,6 @@ TLondon1D2L::~TLondon1D2L() {
 }
 
 TProximity1D1LHS::~TProximity1D1LHS() {
-    fPar.clear();
-    fParForBofZ.clear();
-    fParForPofB.clear();
-    fParForPofT.clear();
-    delete fImpProfile;
-    fImpProfile = 0;
-    delete fPofB;
-    fPofB = 0;
-    delete fPofT;
-    fPofT = 0;
-}
-
-TProximity1D1LHSGss::~TProximity1D1LHSGss() {
     fPar.clear();
     fParForBofZ.clear();
     fParForPofB.clear();
@@ -310,7 +294,7 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
 // creates (a pointer to) the TPofTCalc object (with the FFT plan)
 //------------------
 
-TLondon1D1L::TLondon1D1L() : fCalcNeeded(true), fFirstCall(true), fCallCounter(0) {
+TLondon1D1L::TLondon1D1L() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
     string startup_path_name("TFitPofB_startup.xml");
@@ -788,154 +772,6 @@ double TProximity1D1LHS::operator()(double t, const vector<double> &par) const {
       }
 
       TProximity1D_1LHS BofZ(fParForBofZ);
-      fPofB->UnsetPBExists();
-      fPofB->Calculate(&BofZ, fImpProfile, fParForPofB);
-      fPofT->DoFFT();
-
-
-    }/* else {
-      cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
-    }*/
-
-    fPofT->CalcPol(fParForPofT);
-
-    fCalcNeeded = false;
-  }
-
-  return fPofT->Eval(t);
-
-}
-
-//------------------
-// Constructor of the TProximity1D1LHSGss class -- reading available implantation profiles and
-// creates (a pointer to) the TPofTCalc object (with the FFT plan)
-//------------------
-
-TProximity1D1LHSGss::TProximity1D1LHSGss() : fCalcNeeded(true), fFirstCall(true) {
-
-    // read startup file
-    string startup_path_name("TFitPofB_startup.xml");
-
-    TSAXParser *saxParser = new TSAXParser();
-    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
-    int status (saxParser->ParseFile(startup_path_name.c_str()));
-    // check for parse errors
-    if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
-           << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
-           << endl;
-      assert(false);
-    }
-
-    fNSteps = startupHandler->GetNSteps();
-    fWisdom = startupHandler->GetWisdomFile();
-    string rge_path(startupHandler->GetDataPath());
-    map<double, string> energy_vec(startupHandler->GetEnergies());
-
-    fParForPofT.push_back(0.0);
-    fParForPofT.push_back(startupHandler->GetDeltat());
-    fParForPofT.push_back(startupHandler->GetDeltaB());
-
-    fParForPofB.push_back(startupHandler->GetDeltat());
-    fParForPofB.push_back(startupHandler->GetDeltaB());
-    fParForPofB.push_back(0.0);
-    fParForPofB.push_back(0.0); // Bkg-Field
-    fParForPofB.push_back(0.01); // Bkg-width
-    fParForPofB.push_back(0.0); // Bkg-weight
-
-    fImpProfile = new TTrimSPData(rge_path, energy_vec);
-
-    fPofB = new TPofBCalc(fParForPofB);
-
-    fPofT = new TPofTCalc(fPofB, fWisdom, fParForPofT);
-
-    // clean up
-    if (saxParser) {
-      delete saxParser;
-      saxParser = 0;
-    }
-    if (startupHandler) {
-      delete startupHandler;
-      startupHandler = 0;
-    }
-}
-
-//------------------
-// TProximity1D1LHS-Method that calls the procedures to create B(z), p(B) and P(t)
-// It finally returns P(t) for a given t.
-// Parameters: all the parameters for the function to be fitted through TProximity1D1LHSGss
-//------------------
-
-double TProximity1D1LHSGss::operator()(double t, const vector<double> &par) const {
-
-  assert(par.size() == 7);
-
-  if(t<0.0)
-    return cos(par[0]*0.017453293);
-
-  // check if the function is called the first time and if yes, read in parameters
-
-  bool dead_layer_changed(false);
-
-  if(fFirstCall){
-    fPar = par;
-
-    for (unsigned int i(2); i<fPar.size(); i++){
-      fParForBofZ.push_back(fPar[i]);
-    }
-    fFirstCall = false;
-    dead_layer_changed = true;
-  }
-
-  // check if any parameter has changed
-
-  bool par_changed(false);
-  bool only_phase_changed(false);
-
-  for (unsigned int i(0); i<fPar.size(); i++) {
-    if( fPar[i]-par[i] ) {
-      fPar[i] = par[i];
-      par_changed = true;
-      if (i == 0) {
-        only_phase_changed = true;
-      } else {
-        only_phase_changed = false;
-        if (i == 4){
-          dead_layer_changed = true;
-        }
-      }
-    }
-  }
-
-  if (par_changed)
-    fCalcNeeded = true;
-
-  // if model parameters have changed, recalculate B(z), P(B) and P(t)
-
-  if (fCalcNeeded) {
-
-    fParForPofT[0] = par[0]; // phase
-
-    if(!only_phase_changed) {
-
-//      cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
-
-      for (unsigned int i(2); i<fPar.size(); i++)
-        fParForBofZ[i-2] = par[i];
-
-      fParForPofB[2] = par[1]; // energy
-      fParForPofB[3] = par[2]; // Bkg-Field
-      //fParForPofB[4] = 0.005; // Bkg-width (in principle zero)
-
-      if(dead_layer_changed){
-        vector<double> interfaces;
-        interfaces.push_back(par[4]);// dead layer
-        fParForPofB[5] = fImpProfile->LayerFraction(par[1], 1, interfaces); // Fraction of muons in the deadlayer
-        interfaces.clear();
-      }
-
-      TProximity1D_1LHSGss BofZ(fParForBofZ);
       fPofB->UnsetPBExists();
       fPofB->Calculate(&BofZ, fImpProfile, fParForPofB);
       fPofT->DoFFT();
@@ -1450,13 +1286,4 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
 // 
 // }
 
-
-
-double TLondon1D3Lestimate::operator()(double z, const vector<double>& par) const {
-
-  TLondon1D_3L BofZ(par);
-
-  return BofZ.GetBofZ(z);
-
-}
 
