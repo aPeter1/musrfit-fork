@@ -32,9 +32,10 @@
 #include <string>
 #include <cassert>
 
-#include <qfile.h>
-#include <qtextstream.h>
-#include <qstring.h>
+#include <fstream>
+using namespace std;
+
+#include <boost/algorithm/string.hpp>
 
 #include "PFunctionHandler.h"
 
@@ -46,13 +47,12 @@
  *
  * \param fln
  */
-PFunctionHandler::PFunctionHandler(char *fln, bool debug) : fDebug(debug)
+PFunctionHandler::PFunctionHandler(char *fln, bool debug) : fDebug(debug), fFileName(fln)
 {
   fValid = true;
-  fFileName = QString(fln);
 
   cout << endl << "in PFunctionHandler(char *fln)";
-  cout << endl << "fFileName = " << fFileName.latin1();
+  cout << endl << "fFileName = " << fFileName;
 
   fValid = ReadFile();
   if (fValid)
@@ -67,12 +67,12 @@ PFunctionHandler::PFunctionHandler(char *fln, bool debug) : fDebug(debug)
  *
  * \param lines
  */
-PFunctionHandler::PFunctionHandler(vector<QString> lines)
+PFunctionHandler::PFunctionHandler(vector<string> lines)
 {
   fValid = true;
   fFileName = "";
 
-  cout << endl << "in PFunctionHandler(vector<QString> lines)";
+  cout << endl << "in PFunctionHandler(vector<string> lines)";
 
   if (lines.size() == 0) {
     fValid = false;
@@ -86,26 +86,31 @@ PFunctionHandler::PFunctionHandler(vector<QString> lines)
   double dval[10];
   bool inFcnBlock = false;
   for (unsigned int i=0; i<lines.size(); i++) {
-    if (lines[i].startsWith("#")) // comment hence ignore
+    if (lines[i].find("#") == 0) // comment hence ignore
       continue;
-    lines[i] = lines[i].upper();
-    if (lines[i].startsWith("PAR")) {
+    boost::to_upper(lines[i]);
+    if (lines[i].find("PAR") == 0) {
       cout << endl << "this is a parameter line ...";
-      status = sscanf(lines[i].latin1(), "PAR %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+      status = sscanf(lines[i].c_str(), "PAR %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
                       &dval[0], &dval[1], &dval[2], &dval[3], &dval[4],
                       &dval[5], &dval[6], &dval[7], &dval[8], &dval[9]);
+      cout << endl << "status=" << status;
       if (status < 0) {
         done = true;
         fValid = false;
         cout << endl << "invalid PAR line, sorry ...";
-      } else { // fill map
+      } else { // fill par
         cout << endl << "PAR line, status = " << status;
         for (int i=0; i<status; i++)
           fParam.push_back(dval[i]);
+        cout << endl << "fParam.size()=" << fParam.size() << endl;
+        for (unsigned int i=0; i<fParam.size(); i++)
+          cout << endl << "Par" << i+1 << " = " << fParam[i];
+        cout << endl;
       }
-    } else if (lines[i].startsWith("MAP")) {
+    } else if (lines[i].find("MAP") == 0) {
       cout << endl << "this is a map line ...";
-      status = sscanf(lines[i].latin1(), "MAP %d %d %d %d %d %d %d %d %d %d",
+      status = sscanf(lines[i].c_str(), "MAP %d %d %d %d %d %d %d %d %d %d",
                       &val[0], &val[1], &val[2], &val[3], &val[4],
                       &val[5], &val[6], &val[7], &val[8], &val[9]);
       if (status < 0) {
@@ -117,10 +122,10 @@ PFunctionHandler::PFunctionHandler(vector<QString> lines)
         for (int i=0; i<status; i++)
           fMap.push_back(val[i]);
       }
-    } else if (lines[i].startsWith("FUNCTIONS")) {
+    } else if (lines[i].find("FUNCTIONS") == 0) {
       cout << endl << "the functions block start ...";
       inFcnBlock = true;
-    } else if (lines[i].startsWith("END")) {
+    } else if (lines[i].find("END") == 0) {
       cout << endl << "end tag found; rest will be ignored";
       done = true;
     } else if (inFcnBlock) {
@@ -144,7 +149,7 @@ PFunctionHandler::PFunctionHandler(vector<QString> lines)
 if (fValid) {
   cout << endl << "Functions: ";
   for (unsigned int i=0; i<fLines.size(); i++)
-    cout << endl << fLines[i].latin1();
+    cout << endl << fLines[i];
 }
 }
 
@@ -180,9 +185,9 @@ bool PFunctionHandler::DoParse()
   PFunctionGrammar function;
 
   for (unsigned int i=0; i<fLines.size(); i++) {
-cout << endl << "fLines[" << i << "] = '" << fLines[i].latin1() << "'";
+    cout << endl << "fLines[" << i << "] = '" << fLines[i] << "'";
 
-    tree_parse_info<> info = ast_parse(fLines[i].latin1(), function, space_p);
+    tree_parse_info<> info = ast_parse(fLines[i].c_str(), function, space_p);
 
     if (info.full) {
       cout << endl << "parse successfull ..." << endl;
@@ -277,41 +282,38 @@ bool PFunctionHandler::ReadFile()
 {
   cout << endl << "in ~PFunctionHandler::ReadFile()";
 
-  if (fFileName.isEmpty()) {
+  if (fFileName.length() == 0) {
     cout << endl << "PFunctionHandler::ReadFile(): **ERROR**";
     cout << endl << "  no file name given :-(. Will quit";
     return false;
   }
 
-  QFile f(fFileName);
-  if (!f.exists()) {
+  ifstream f;
+  f.open(fFileName.c_str(), ifstream::in);
+
+  if (!f.is_open()) {
     cout << endl << "PFunctionHandler::ReadFile(): **ERROR**";
-    cout << endl << "  File '" << fFileName.latin1() << "' does not exist.";
+    cout << endl << "  File '" << fFileName.c_str() << "' couldn't being opened.";
     return false;
   }
 
-  if (!f.open(IO_ReadOnly)) {
-    cout << endl << "PFunctionHandler::ReadFile(): **ERROR**";
-    cout << endl << "  File '" << fFileName.latin1() << "' couldn't being opened.";
-    return false;
-  }
-
-  QTextStream stream(&f);
-  QString line;
+  string line;
+  char c_line[128];
   bool done = false;
   bool success = true;
   int status;
   int val[10];
   double dval[10];
   bool inFcnBlock = false;
-  while ( !stream.atEnd() && !done) {
-    line = stream.readLine(); // line of text excluding '\n'
-    if (line.startsWith("#")) // comment hence ignore
+  while ( !f.eof() && !done) {
+    f.getline(c_line, 128); // line of text excluding '\n'
+    line = c_line;
+    if (line.find("#") == 0) // comment hence ignore
       continue;
-    line = line.upper();
-    if (line.startsWith("PAR")) {
+    boost::to_upper(line);
+    if (line.find("PAR") == 0) {
       cout << endl << "this is a parameter line ...";
-      status = sscanf(line.latin1(), "PAR %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+      status = sscanf(line.c_str(), "PAR %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
                       &dval[0], &dval[1], &dval[2], &dval[3], &dval[4],
                       &dval[5], &dval[6], &dval[7], &dval[8], &dval[9]);
       if (status < 0) {
@@ -322,10 +324,13 @@ bool PFunctionHandler::ReadFile()
         cout << endl << "PAR line, status = " << status;
         for (int i=0; i<status; i++)
           fParam.push_back(dval[i]);
+        for (unsigned int i=0; i<fParam.size(); i++)
+          cout << endl << "Par" << i+1 << " = " << fParam[i];
+        cout << endl;
       }
-    } else if (line.startsWith("MAP")) {
+    } else if (line.find("MAP") == 0) {
       cout << endl << "this is a map line ...";
-      status = sscanf(line.latin1(), "MAP %d %d %d %d %d %d %d %d %d %d",
+      status = sscanf(line.c_str(), "MAP %d %d %d %d %d %d %d %d %d %d",
                       &val[0], &val[1], &val[2], &val[3], &val[4],
                       &val[5], &val[6], &val[7], &val[8], &val[9]);
       if (status < 0) {
@@ -337,10 +342,10 @@ bool PFunctionHandler::ReadFile()
         for (int i=0; i<status; i++)
           fMap.push_back(val[i]);
       }
-    } else if (line.startsWith("FUNCTIONS")) {
+    } else if (line.find("FUNCTIONS") == 0) {
       cout << endl << "the functions block start ...";
       inFcnBlock = true;
-    } else if (line.startsWith("END")) {
+    } else if (line.find("END") == 0) {
       cout << endl << "end tag found; rest will be ignored";
       done = true;
     } else if (inFcnBlock) {
@@ -365,7 +370,7 @@ bool PFunctionHandler::ReadFile()
 if (success) {
   cout << endl << "Functions: ";
   for (unsigned int i=0; i<fLines.size(); i++)
-    cout << endl << fLines[i].latin1();
+    cout << endl << fLines[i];
 }
 
   return success;

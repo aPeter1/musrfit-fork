@@ -1,7 +1,6 @@
 #include <iostream>
+#include <string>
 using namespace std;
-
-#include <qstring.h>
 
 #include "PFunctionHandler.h"
 
@@ -17,7 +16,7 @@ void syntax()
 }
 
 //-----------------------------------------------------
-void handle_input(vector<QString> &lines)
+void handle_input(vector<string> &lines)
 {
   cout << endl << "will handle input ...";
   cout << endl << "you should provide a PAR, a MAP, and a FUNCTION block";
@@ -80,7 +79,7 @@ int main(int argc, char *argv[])
   if (inputFile) {
     fcnHandler = new PFunctionHandler(argv[2], debug);
   } else {
-    vector<QString> lines;
+    vector<string> lines;
     handle_input(lines);
 cout << endl << "lines.size() = " << lines.size();
     fcnHandler = new PFunctionHandler(lines);

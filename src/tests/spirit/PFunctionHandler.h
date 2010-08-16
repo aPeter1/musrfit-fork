@@ -34,9 +34,8 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 using namespace std;
-
-#include <qstring.h>
 
 #include "PFunctionGrammar.h"
 #include "PFunction.h"
@@ -45,7 +44,7 @@ class PFunctionHandler
 {
   public:
     PFunctionHandler(char *fln, bool debug);
-    PFunctionHandler(vector<QString> lines);
+    PFunctionHandler(vector<string> lines);
     virtual ~PFunctionHandler();
 
     virtual bool IsValid() { return fValid; }
@@ -58,11 +57,11 @@ class PFunctionHandler
     bool fDebug;
     bool fValid;
 
-    QString fFileName;
+    string fFileName;
 
     vector<double> fParam;
     vector<int> fMap;
-    vector<QString> fLines;
+    vector<string> fLines;
 
     vector<PFunction> fFuncs;
 

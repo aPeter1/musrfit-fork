@@ -17,13 +17,14 @@
 PAR 1.0 2.1 3.5 -0.87 0.87
 MAP 2 1 4 5
 FUNCTIONS
+fun0 = cos(par1)
 #fun0 = sin(par3/(par1+map2))
 #fun0 = 1.2+pi
 #fun1 = gamma_mu
 #fun2 = -par1*(sin(par2)*cos(par3)+((map1)))
 #fun1 = cos(par1)
 #fun0 = par1 + map3 * cos(cos(par2 - map1))
-fun8 = -par1*log(sin(par1)) + exp(-1.0*map2)
+#fun8 = -par1*log(sin(par1)) + exp(-1.0*map2)
 #fun1 = par1 + map1 * (0.01355+par1*(2.1 - (-2.3 / 3.4)))
 #fun2 = par1 * par2 - map3
 #fun3 = -3.2 + (par2-par1)/(map2+map3)

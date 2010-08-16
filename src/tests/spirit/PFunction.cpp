@@ -36,6 +36,10 @@ using namespace std;
 
 #include <boost/algorithm/string/trim.hpp>  // for stripping leading whitespace in std::string
 
+#include <boost/math/special_functions/acosh.hpp>
+#include <boost/math/special_functions/asinh.hpp>
+#include <boost/math/special_functions/atanh.hpp>
+
 #include "PFunction.h"
 
 //--------------------------------------------------------------------------
@@ -164,7 +168,7 @@ bool PFunction::CheckParameterAndMapInTree(iter_t const& i)
     assert(i->children.size() == 0);
     string str(i->value.begin(), i->value.end());
     boost::algorithm::trim(str);
-    cout << endl << "parameterID: value = '" << str << "'" << endl;
+cout << endl << "parameterID: value = '" << str << "'" << endl;
 
     bool minus_sign_present = false;
     if (str[0] == '-')
@@ -283,7 +287,7 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     status = sscanf(str.c_str(), "%lf", &dvalue); // convert string to double
     node.fID = PFunctionGrammar::realID; // keep the ID
     node.fDvalue = dvalue; // keep the value
-// cout << endl << ">> realID: value = " << dvalue;
+    cout << endl << ">> realID: value = " << dvalue;
   } else if (i->value.id() == PFunctionGrammar::constPiID) { // handle constant pi
     node.fID = PFunctionGrammar::constPiID; // keep the ID
     node.fDvalue = 3.14159265358979323846; // keep the value
@@ -300,7 +304,7 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     }
     node.fID = PFunctionGrammar::parameterID; // keep the ID    
     node.fIvalue = ivalue; // keep the value
-cout << endl << ">> parameterID: value = " << ivalue;
+    cout << endl << ">> parameterID: value = " << ivalue;
   } else if (i->value.id() == PFunctionGrammar::mapID) { // handle map number
     str = string(i->value.begin(), i->value.end()); // get string
     status = sscanf(str.c_str(), "MAP%d", &ivalue); // convert string to map number
@@ -463,13 +467,13 @@ double PFunction::EvalNode(PFuncTreeNode &node)
     } else if (node.fFunctionTag == FUN_ATAN) {
       return atan(EvalNode(node.children[0]));
     } else if (node.fFunctionTag == FUN_ACOSH) {
-      return acosh(EvalNode(node.children[0]));
+      return boost::math::acosh(EvalNode(node.children[0]));
     } else if (node.fFunctionTag == FUN_ASINH) {
-      return asinh(EvalNode(node.children[0]));
+      return boost::math::asinh(EvalNode(node.children[0]));
     } else if (node.fFunctionTag == FUN_ATANH) {
-      return atanh(EvalNode(node.children[0]));
+      return boost::math::atanh(EvalNode(node.children[0]));
     } else if (node.fFunctionTag == FUN_LOG) {
-      return log(EvalNode(node.children[0]))/log(10);
+      return log(EvalNode(node.children[0]))/log(10.0);
     } else if (node.fFunctionTag == FUN_LN) {
       return log(EvalNode(node.children[0]));
     } else if (node.fFunctionTag == FUN_EXP) {
