@@ -395,9 +395,9 @@ void PPippard::SaveField()
   if (fParams.rgeFileName.Length() > 0)
     fprintf(fp, "%%   rge file name : %s\n", fParams.rgeFileName.Data());
   if (fParams.meanB != 0.0) {
-    fprintf(fp, "%%   Mean Distance           = %lf\n", fParams.meanX);
-    fprintf(fp, "%%   Mean Field/Bext         = %lf\n", fParams.meanB);
-    fprintf(fp, "%%   2nd Moment Field/Bext^2 = %lf\n", fParams.secondMomentB);
+    fprintf(fp, "%%   Mean Distance           = %lf (nm)\n", fParams.meanX);
+    fprintf(fp, "%%   Mean Field/Bext         = %lf, Mean Field = %lf (G)\n", fParams.meanB, fParams.meanB * fParams.b_ext);
+    fprintf(fp, "%%   Var Field/Bext^2        = %lf, Var Field  = %lf (G^2)\n", fParams.varB, fParams.varB * fParams.b_ext * fParams.b_ext);
   }
   fprintf(fp, "%%\n");
 
