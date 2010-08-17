@@ -380,16 +380,18 @@ void PPippard::SaveField()
   fprintf(fp, "%% Header ------------------------------------\n");
   fprintf(fp, "%% Parameters:\n");
   fprintf(fp, "%%   Reduced Temperature = %lf\n", fParams.t);
-  fprintf(fp, "%%   LambdaL(0)          = %lf, LambdaL(t) = %lf\n", fParams.lambdaL, LambdaL_T(fParams.t));
+  fprintf(fp, "%%   LambdaL(0)          = %lf (nm), LambdaL(t) = %lf (nm)\n", fParams.lambdaL, LambdaL_T(fParams.t));
   if (fParams.specularIntegral > 0.0)
-    fprintf(fp, "%%   int_x=0^infty B(x) dx / Bext = %lf\n", fParams.specularIntegral);
-  fprintf(fp, "%%   xiP(0)              = %lf, xiP(t)     = %lf\n", fParams.xi0, XiP_T(fParams.t));
-  fprintf(fp, "%%   Mean Free Path      = %lf\n", fParams.meanFreePath);
-  fprintf(fp, "%%   Film Thickness      = %lf\n", fParams.filmThickness);
+    fprintf(fp, "%%   int_x=0^infty B(x) dx / Bext = %lf (nm)\n", fParams.specularIntegral);
+  fprintf(fp, "%%   xiP(0)              = %lf (nm), xiP(t)     = %lf (nm)\n", fParams.xi0, XiP_T(fParams.t));
+  fprintf(fp, "%%   Mean Free Path      = %lf (nm)\n", fParams.meanFreePath);
+  fprintf(fp, "%%   Film Thickness      = %lf (nm)\n", fParams.filmThickness);
   if (fParams.specular)
     fprintf(fp, "%%   Boundary Conditions: Specular\n");
   else
     fprintf(fp, "%%   Boundary Conditions: Diffuse\n");
+  fprintf(fp, "%%   Bext                = %lf (G)\n", fParams.b_ext);
+  fprintf(fp, "%%   deadLayer           = %lf (nm)\n", fParams.deadLayer);
   if (fParams.rgeFileName.Length() > 0)
     fprintf(fp, "%%   rge file name : %s\n", fParams.rgeFileName.Data());
   if (fParams.meanB != 0.0) {

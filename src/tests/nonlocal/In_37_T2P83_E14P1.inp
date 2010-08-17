@@ -16,10 +16,10 @@ reducedTemp = 0.8492
 lambdaL = 30.4
 xi0 = 380.0
 meanFreePath = 12000.0
-filmThickness = 500000.0
+filmThickness = 300000.0
 specular = 1
 Bext = 41.19
 deadLayer = 5.76
-rgeFileName = /afs/psi.ch/project/nemu/analysis/2009/Nonlocal/trimsp/InSne141.rge
+%rgeFileName = /afs/psi.ch/project/nemu/analysis/2009/Nonlocal/trimsp/InSne141.rge
 outputFileName =  In_37_T2P83_E14P1.dat
 

@@ -22,11 +22,11 @@ void syntax()
   cout << endl << "% --------------------------------";
   cout << endl << "% input parameters:";
   cout << endl << "%   reduced temperature";
-  cout << endl << "%   lambda London";
-  cout << endl << "%   xi0";
-  cout << endl << "%   mean free path";
-  cout << endl << "%   film thickness";
-  cout << endl << "%   boundary conditions";
+  cout << endl << "%   lambda London (nm)";
+  cout << endl << "%   xi0 (nm)";
+  cout << endl << "%   mean free path (nm)";
+  cout << endl << "%   film thickness (nm)";
+  cout << endl << "%   specular, 1=specular, 0=diffuse";
   cout << endl << "%   [Bext in (G)], i.e. this is optional";
   cout << endl << "%   [dead layer in (nm)], i.e. this is optional";
   cout << endl << "%   [rge input file name], i.e. this is optional";
