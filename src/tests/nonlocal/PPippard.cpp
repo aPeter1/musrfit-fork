@@ -248,7 +248,7 @@ void PPippard::CalculateFieldSpecular()
     }
   }
 
-cout << endl << "fShift = " << fShift;
+cout << endl << "debug> fShift = " << fShift;
 
   for (Int_t i=0; i<PippardFourierPoints; i++) {
     fFieldB[i][1] /= norm;
@@ -379,24 +379,25 @@ void PPippard::SaveField()
   // write header
   fprintf(fp, "%% Header ------------------------------------\n");
   fprintf(fp, "%% Parameters:\n");
-  fprintf(fp, "%%   Reduced Temperature = %lf\n", fParams.t);
-  fprintf(fp, "%%   LambdaL(0)          = %lf (nm), LambdaL(t) = %lf (nm)\n", fParams.lambdaL, LambdaL_T(fParams.t));
+  fprintf(fp, "%%   Reduced Temperature     = %lf\n", fParams.t);
+  fprintf(fp, "%%   LambdaL(0)              = %lf (nm), LambdaL(t) = %lf (nm)\n", fParams.lambdaL, LambdaL_T(fParams.t));
   if (fParams.specularIntegral > 0.0)
     fprintf(fp, "%%   int_x=0^infty B(x) dx / Bext = %lf (nm)\n", fParams.specularIntegral);
-  fprintf(fp, "%%   xiP(0)              = %lf (nm), xiP(t)     = %lf (nm)\n", fParams.xi0, XiP_T(fParams.t));
-  fprintf(fp, "%%   Mean Free Path      = %lf (nm)\n", fParams.meanFreePath);
-  fprintf(fp, "%%   Film Thickness      = %lf (nm)\n", fParams.filmThickness);
+  fprintf(fp, "%%   xiP(0)                  = %lf (nm), xiP(t)     = %lf (nm)\n", fParams.xi0, XiP_T(fParams.t));
+  fprintf(fp, "%%   Mean Free Path          = %lf (nm)\n", fParams.meanFreePath);
+  fprintf(fp, "%%   Film Thickness          = %lf (nm)\n", fParams.filmThickness);
   if (fParams.specular)
     fprintf(fp, "%%   Boundary Conditions: Specular\n");
   else
     fprintf(fp, "%%   Boundary Conditions: Diffuse\n");
-  fprintf(fp, "%%   Bext                = %lf (G)\n", fParams.b_ext);
-  fprintf(fp, "%%   deadLayer           = %lf (nm)\n", fParams.deadLayer);
+  fprintf(fp, "%%   Bext                    = %lf (G)\n", fParams.b_ext);
+  fprintf(fp, "%%   deadLayer               = %lf (nm)\n", fParams.deadLayer);
   if (fParams.rgeFileName.Length() > 0)
     fprintf(fp, "%%   rge file name : %s\n", fParams.rgeFileName.Data());
   if (fParams.meanB != 0.0) {
-    fprintf(fp, "%%   Mean Distance       = %lf\n", fParams.meanX);
-    fprintf(fp, "%%   Mean Field/Bext     = %lf\n", fParams.meanB);
+    fprintf(fp, "%%   Mean Distance           = %lf\n", fParams.meanX);
+    fprintf(fp, "%%   Mean Field/Bext         = %lf\n", fParams.meanB);
+    fprintf(fp, "%%   2nd Moment Field/Bext^2 = %lf\n", fParams.secondMomentB);
   }
   fprintf(fp, "%%\n");
 

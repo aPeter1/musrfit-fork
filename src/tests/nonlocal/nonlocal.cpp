@@ -365,16 +365,25 @@ int main(int argc, char *argv[])
     meanX *= (x[1]-x[0]);
 
     Double_t meanB = 0.0;
+    Double_t secondMomentB = 0.0;
+    Double_t BB = 0.0;
     for (unsigned int i=0; i<x.size()-1; i++) {
-      if (x[i] <= params.deadLayer)
+      if (x[i] <= params.deadLayer) {
         meanB += 1.0 * n[i];
-      else
-        meanB += pippard->GetMagneticField(x[i]-params.deadLayer) * n[i];
+        secondMomentB += 1.0 * n[i];
+      } else {
+        BB = pippard->GetMagneticField(x[i]-params.deadLayer);
+        meanB += BB * n[i];
+        secondMomentB += BB * BB * n[i];
+      }
     }
     meanB *= (x[1]-x[0]);
+    secondMomentB *= (x[1]-x[0]);
 
-    cout << endl << ">> mean x = " << meanX << ", mean field = " << params.b_ext * meanB;
+    cout << endl << ">> mean x = " << meanX << " (nm), mean field = " << params.b_ext * meanB << " (G)";
+    cout << " 2nd Moment B = " << secondMomentB << " (G^2)";
     pippard->SetMeanX(meanX);
+    pippard->SetSecondMomentB(secondMomentB);
     pippard->SetMeanB(meanB);
   }
 

@@ -32,6 +32,7 @@ typedef struct {
   TString rgeFileName;
   TString outputFileName;
   Double_t meanB;         // int_x=0^infty B(x) n(x) dx / int_x=0^infty n(x) dx / Bext
+  Double_t secondMomentB; // int_x=0^infty B^2(x) n(x) dx / int_x=0^infty n(x) dx / Bext^2
   Double_t meanX;         // int_x=0^infty x n(x) dx / int_x=0^infty n(x) dx
 } PippardParams;
 
@@ -49,6 +50,7 @@ class PPippard
     virtual void SetSpecular(Bool_t specular) { fParams.specular = specular; }
     virtual void SetMeanX(Double_t meanX) { fParams.meanX = meanX; }
     virtual void SetMeanB(Double_t meanB) { fParams.meanB = meanB; }
+    virtual void SetSecondMomentB(Double_t BB) { fParams.secondMomentB = BB; }
 
     virtual void CalculateField();
 
