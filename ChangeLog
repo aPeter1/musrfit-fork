@@ -1,23 +1,91 @@
 #---------------------------------------------------------------------
 # ChangeLog
-# BMW, 2009/08/08
+# BMW, 2010/08/17
 # $Id:
 #---------------------------------------------------------------------
 
-musrfit 0.5.1
-+ Read _measured_ temperature(s) from data files (ROOT, PSIBIN, WKM)
-+ msr2data rewritten in C++ 
-  + Added support for taking parameters like temperatures
-    and the applied field from the data files (PSIBIN, WKM)
-  + For LEM-data RA-HVs are taken from the RunSummary in the 
-    ROOT file (if present) - other data is taken from the TLemRunHeader
+changes since 0.6.0
+===================
+NEW [MUSRGUI/MUSREDIT] msr2data default option flags in musredit_startup.xml
+NEW 'global fit' option for msr2data
+NEW implementation of SCAN/CONTOURS/MNPLOT (MUSR-100)
+NEW possibility to use sqrt() and pow(base, exponent) in the FUNCTIONS block
+NEW grouping of histograms
+NEW [MUSREDIT] port of musrgui (Qt3.x) to musredit (Qt4.6)
+NEW [MUSRGUI] better handling of font changes, and adding the possibility to define default font and font size in musrgui_startup.xml (MUSR-105)
+NEW RRF option for single histograms and asymmetry plot
+NEW integration of a few external musrfit plug-ins into the standard build process (disabled by default, see log of svn rev 4313)
+NEW default estimates for 'data' and 'background' entries in RUN blocks
+NEW directory with some msr- and data-files for quick testing of new musrfit installations
+NEW option to musrt0: the key 'T' will set the t0 cursor to the maximum of the histogram
+FIXED formatting of the ASCII fit output file for long parameter names (MUSR-142)
+FIXED time window frame bug in musrview (MUSR-138)
+FIXED calculation of LF relaxation functions for big static widths (MUSR-139)
+FIXED minor msr2msr issue concerning the statistic block
+FIXED Abragam function
+FIXED removed phase parameter in Fourier power plots (MUSR-116)
+FIXED segmentation fault in musrview when pressing d-f-d (MUSR-115)
+FIXED wrong 'fixed background feeding'
+FIXED [MUSRGUI] system variable access bugs
+FIXED bug in lifetimecorrection-plot (MUSR-123)
+FIXED axis labeling in non-muSR-plot (MUSR-124)
+FIXED non-muSR ascii export first point missing (MUSR-119)
+FIXED handling of wrong run numbers in PLOT block (MUSR-121)
+FIXED reading of MUD data files in 64-bit environments (at least for EM64T)
+FIXED compilation with GCC 4.4/4.5
+FIXED [MUSRGUI] problems if started with an msr-file from the command line which is not in the current directory (MUSR-117)
+FIXED [MUSRGUI] calls to musrview, musrt0 and msr<->mlog when paths contain spaces, etc.
+FIXED usage of signs in the FUNCTIONS block
+FIXED difference of Fourier != Fourier of difference (MUSR-107)
+FIXED handling such that the proper initial phase is fitted
+FIXED segmentation fault if number of histograms is smaller as the specified histogram number (MUSR-110)
+FIXED warning messages
+FIXED db data tag reading error
+FIXED usage of BOOST >= 1.38.0
+FIXED the extraction of the time resolution for the mud data format, since MUD_getHistFsPerBin seems sometimes to return just crap.
+CHANGED write the ROOT histogram of the correlation matrix to the output file as well as not only the graph
+CHANGED allow case insensitive 'run' as first entry in a runlist-file as input to msr2data
+CHANGED [MUSRGUI/MUSREDIT] '(Un)comment' is splitted into 'Comment' and 'Uncomment'
+CHANGED handling for invalid MUSRFITPATH
+CHANGED build process: checks for MINUIT2, disable static libraries, disable F77 checks
+CHANGED stricter handling of ADDRUN (MUSR-106)
+CHANGED ASCII export from musrview
+CHANGED check for subsequent numbered parameters (MUSR-103)
+CHANGED WKMFULLDATAPATH to MUSRFULLDATAPATH
+UPDATED source code documentation
+UPDATED PSIBIN/MDU class from AA/AR
 
+musrfit 0.6.0 - changes since 0.5.2
+===================================
+NEW support for reading PSI MDU-ASCII data files
+NEW estimate of t0 for the case it is not present, neither in the msr-file nor in the data-file (MUSR-73).
+FIXED 0/1 problem in data and background ranges
+FIXED crash of musrfit in case no 'background' line is present in the RUN-block (MUSR-99)
+FIXED bug with t0 handling in case of ADDRUN and missing t0's in the msr-file, but t0's present in the data file (MUSR-94)
+FIXED 'unwanted empty line problem of mlog-files' (MUSR-95)
+FIXED building of PSI-BIN library on MacOSX
+FIXED severe memory leaks
+FIXED bug in the spin glass function for negative times
+CHANGED improved handling for musrt0
+CHANGED musrfit_startup.xml, added ALC and LEM AFS paths to the default paths
+CHANGED ascii export: Produce now two files, one for the data and one for the theory (MUSR-87, MUSR-92)
+CHANGED encapsulation of data structures in classes
+REMOVED 'save db' support from musrview
+
+musrfit 0.5.2 - changes since 0.5.1
+===================================
+NEW initial support for reading TRIUMF MUD data files
+
+musrfit 0.5.1 - changes since 0.5.0
+===================================
+NEW Read _measured_ temperature(s) from data files (ROOT, PSIBIN, WKM)
+NEW msr2data rewritten in C++
+NEW in msr2data added support for taking parameters like temperatures and the applied field from the data files (PSIBIN, WKM)
+NEW in msr2data LEM-data RA-HVs are taken from the RunSummary in the ROOT file (if present) - other data is taken from the TLemRunHeader
 
 musrfit 0.5.0
-
-+ Initial release supporting building by autotools
-  on Linux, MS Windows (Cygwin), Mac OS X
-
+=============
+NEW Initial release supporting building by autotools on Linux, MS Windows (Cygwin), Mac OS X
 
 #---------------------------------------------------------------------
 # this is the end ...
