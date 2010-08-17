@@ -943,12 +943,25 @@ Bool_t PFitter::ExecuteSave()
   fout << endl;
   fout << endl << "*************************************************************************";
 
+  // identifiy the longest variable name for proper formating reasons
+  Int_t maxLength = 10;
+  for (UInt_t i=0; i<fParams.size(); i++) {
+    if (fParams[i].fName.Length() > maxLength)
+      maxLength = fParams[i].fName.Length() + 1;
+  }
+
   // write parameters
   fParams = *(fRunInfo->GetMsrParamList()); // get the update parameters back
   fout << endl << " PARAMETERS";
   fout << endl << "-------------------------------------------------------------------------";
-  fout << endl << "                         Parabolic           Minos";
-  fout << endl << " No   Name      Value      Error      Negative    Positive   Limits";
+  fout << endl << "                         ";
+  for (Int_t j=0; j<=maxLength-4; j++)
+    fout << " ";
+  fout << "Parabolic           Minos";
+  fout << endl << " No   Name";
+  for (Int_t j=0; j<=maxLength-4; j++)
+    fout << " ";
+  fout << "Value      Error      Negative    Positive    Limits";
   for (UInt_t i=0; i<fParams.size(); i++) {
     // write no
     fout.setf(ios::right, ios::adjustfield);
@@ -956,7 +969,7 @@ Bool_t PFitter::ExecuteSave()
     fout << endl << i+1 << "   ";
     // write name
     fout << fParams[i].fName.Data();
-    for (Int_t j=0; j<10-fParams[i].fName.Length(); j++)
+    for (Int_t j=0; j<=maxLength-fParams[i].fName.Length(); j++)
       fout << " ";
     // write value
     fout.setf(ios::left, ios::adjustfield);
