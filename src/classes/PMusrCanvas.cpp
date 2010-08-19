@@ -721,6 +721,18 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   // handle keys and popup menu entries
   enum eKeySwitch {kNotRelevant, kData, kDiffData, kFourier, kDiffFourier, kFourierDiff};
   eKeySwitch relevantKeySwitch = kNotRelevant;
+  static eKeySwitch lastKeySwitch = kNotRelevant;
+
+  if ((lastKeySwitch == kFourierDiff) && (x == 'f')) {
+    cout << "debug> f-d-f doesn't make any sense, will ignore 'f' ..." << endl;
+    return;
+  }
+
+  if ((lastKeySwitch == kDiffFourier) && (x == 'd')) {
+    cout << "debug> d-f-d doesn't make any sense, will ignore 'd' ..." << endl;
+    return;
+  }
+
   if (x == 'q') { // quit
     Done(0);
   } else if (x == 'd') { // difference
@@ -812,6 +824,8 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   } else {
     fMainCanvas->Update();
   }
+
+  lastKeySwitch = relevantKeySwitch;
 
   // call the apropriate functions if necessary
   switch (relevantKeySwitch) {
