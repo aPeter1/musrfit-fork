@@ -39,6 +39,7 @@
 #include <algorithm>
 #include <sstream>
 #include <iostream>
+#include <cstdlib>
 using namespace std;
 
 
@@ -500,8 +501,16 @@ int main(int argc, char *argv[])
 
       // and do the fitting
       if (!onlyInputCreation) {
+        // check if MUSRFITPATH is set, if not issue a warning
+        string path(getenv("MUSRFITPATH"));
+        if (path.empty()) {
+          cerr << endl << ">> msr2data: **WARNING** The MUSRFITPATH environment variable is not set!" << endl;
+          cerr << endl << ">> msr2data: **WARNING** Please set it or at least ensure that musrfit can be found on the PATH!" << endl;
+        } else {
+          path.append("/");
+        }
         ostringstream oss;
-        oss << "musrfit" << " " << strInfile.str() << " " << musrfitOptions;
+        oss << path << "musrfit" << " " << strInfile.str() << " " << musrfitOptions;
         cout << endl << ">> msr2data: **INFO** Calling " << oss.str() << endl;
         system(oss.str().c_str());
       }
@@ -572,8 +581,16 @@ int main(int argc, char *argv[])
 
       // and do the fitting
         if (!onlyInputCreation) {
+          // check if MUSRFITPATH is set, if not issue a warning
+          string path(getenv("MUSRFITPATH"));
+          if (path.empty()) {
+            cerr << endl << ">> msr2data: **WARNING** The MUSRFITPATH environment variable is not set!" << endl;
+            cerr << endl << ">> msr2data: **WARNING** Please set it or at least ensure that musrfit can be found on the PATH!" << endl;
+          } else {
+            path.append("/");
+          }
           ostringstream oss;
-          oss << "musrfit" << " " << strInfile.str() << " " << musrfitOptions;
+          oss << path << "musrfit" << " " << strInfile.str() << " " << musrfitOptions;
           cout << endl << ">> msr2data: **INFO** Calling " << oss.str() << endl;
           system(oss.str().c_str());
         }
