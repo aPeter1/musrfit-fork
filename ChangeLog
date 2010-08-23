@@ -18,7 +18,6 @@ NEW integration of a few external musrfit plug-ins into the standard build proce
 NEW default estimates for 'data' and 'background' entries in RUN blocks
 NEW directory with some msr- and data-files for quick testing of new musrfit installations
 NEW option to musrt0: the key 'T' will set the t0 cursor to the maximum of the histogram
-FIXED next attempt to fix the d-f-d (MUSR-115) issue
 FIXED formatting of the ASCII fit output file for long parameter names (MUSR-142)
 FIXED time window frame bug in musrview (MUSR-138)
 FIXED calculation of LF relaxation functions for big static widths (MUSR-139)
