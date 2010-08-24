@@ -22,8 +22,8 @@
     </property>
     <property name="minimumSize">
         <size>
-            <width>23</width>
-            <height>270</height>
+            <width>21</width>
+            <height>275</height>
         </size>
     </property>
     <property name="caption">
@@ -458,6 +458,11 @@
                                     </item>
                                     <item>
                                         <property name="text">
+                                            <string>MolMag</string>
+                                        </property>
+                                    </item>
+                                    <item>
+                                        <property name="text">
                                             <string>Meissner State Model</string>
                                         </property>
                                     </item>
@@ -478,7 +483,7 @@
                                         </sizepolicy>
                                     </property>
                                     <property name="currentItem">
-                                        <number>14</number>
+                                        <number>15</number>
                                     </property>
                                 </widget>
                                 <widget class="QLabel" row="2" column="1">
@@ -564,6 +569,11 @@
                                     <item>
                                         <property name="text">
                                             <string>Gaussian Kubo-Toyabe LF x Str Exp</string>
+                                        </property>
+                                    </item>
+                                    <item>
+                                        <property name="text">
+                                            <string>MolMag</string>
                                         </property>
                                     </item>
                                     <item>
@@ -1273,6 +1283,11 @@
                                     </item>
                                     <item>
                                         <property name="text">
+                                            <string>MolMag</string>
+                                        </property>
+                                    </item>
+                                    <item>
+                                        <property name="text">
                                             <string>Meissner State Model</string>
                                         </property>
                                     </item>
@@ -1293,7 +1308,7 @@
                                         </sizepolicy>
                                     </property>
                                     <property name="currentItem">
-                                        <number>14</number>
+                                        <number>15</number>
                                     </property>
                                 </widget>
                                 <widget class="QLabel" row="0" column="1">

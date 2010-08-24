@@ -4734,7 +4734,7 @@
         <action name="ManualFile"/>
         <action name="optionsFourier"/>
         <action name="optionsT0"/>
-        <action name="optionsCustomise"/>
+        <action name="optionsConfigure"/>
     </item>
     <item text="&amp;Help" name="helpMenu">
         <action name="helpContentsAction"/>
@@ -5243,13 +5243,13 @@
     </action>
     <action>
         <property name="name">
-            <cstring>optionsCustomise</cstring>
+            <cstring>optionsConfigure</cstring>
         </property>
         <property name="text">
-            <string>Customise</string>
+            <string>Configure</string>
         </property>
         <property name="menuText">
-            <string>Customise</string>
+            <string>Configure</string>
         </property>
     </action>
 </actions>
@@ -5493,12 +5493,6 @@
         <receiver>MuSRFitform</receiver>
         <slot>AppendToFunctions()</slot>
     </connection>
-    <connection>
-        <sender>optionsCustomise</sender>
-        <signal>activated()</signal>
-        <receiver>MuSRFitform</receiver>
-        <slot>optionCustromize()</slot>
-    </connection>
 </connections>
 <tabstops>
     <tabstop>musrfit_tabs</tabstop>
@@ -5607,7 +5601,7 @@
     <slot>fileBrowse()</slot>
     <slot>AppendToFunctions()</slot>
     <slot>InitializeFunctions()</slot>
-    <slot>optionCustromize()</slot>
+    <slot>optionConfigure()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

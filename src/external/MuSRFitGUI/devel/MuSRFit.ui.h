@@ -900,7 +900,7 @@ void MuSRFitform::InitializeFunctions()
 }
 
 
-void MuSRFitform::optionCustromize()
+void MuSRFitform::optionConfigure()
 {
     use Customize;
 

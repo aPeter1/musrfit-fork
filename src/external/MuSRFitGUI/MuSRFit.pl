@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Wed Jun 9 23:34:32 2010
+# Created: Wed Aug 18 12:51:07 2010
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -1704,7 +1704,7 @@ sub NEW
         setName("MuSRFitform" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
-    setMinimumSize(Qt::Size(23, 270) );
+    setMinimumSize(Qt::Size(21, 275) );
     setIcon($image0 );
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
@@ -3114,9 +3114,10 @@ sub languageChange
     FitType2->insertItem( trUtf8("Gaussian Kubo-Toyabe LF x Exp") );
     FitType2->insertItem( trUtf8("Lorentzian Kubo-Toyabe LF x Str Exp") );
     FitType2->insertItem( trUtf8("Gaussian Kubo-Toyabe LF x Str Exp") );
+    FitType2->insertItem( trUtf8("MolMag") );
     FitType2->insertItem( trUtf8("Meissner State Model") );
     FitType2->insertItem( trUtf8("None") );
-    FitType2->setCurrentItem( int(14) );
+    FitType2->setCurrentItem( int(15) );
     TfsLabel->setText( trUtf8("Final Time") );
     FitType1->clear();
     FitType1->insertItem( trUtf8("Exponential") );
@@ -3132,6 +3133,7 @@ sub languageChange
     FitType1->insertItem( trUtf8("Gaussian Kubo-Toyabe LF x Exp") );
     FitType1->insertItem( trUtf8("Lorentzian Kubo-Toyabe LF x Str Exp") );
     FitType1->insertItem( trUtf8("Gaussian Kubo-Toyabe LF x Str Exp") );
+    FitType1->insertItem( trUtf8("MolMag") );
     FitType1->insertItem( trUtf8("Meissner State Model") );
     FitType1->insertItem( trUtf8("None") );
     BINS->setText( trUtf8("100") );
@@ -3155,9 +3157,10 @@ sub languageChange
     FitType3->insertItem( trUtf8("Gaussian Kubo-Toyabe LF x Exp") );
     FitType3->insertItem( trUtf8("Lorentzian Kubo-Toyabe LF x Str Exp") );
     FitType3->insertItem( trUtf8("Gaussian Kubo-Toyabe LF x Str Exp") );
+    FitType3->insertItem( trUtf8("MolMag") );
     FitType3->insertItem( trUtf8("Meissner State Model") );
     FitType3->insertItem( trUtf8("None") );
-    FitType3->setCurrentItem( int(14) );
+    FitType3->setCurrentItem( int(15) );
     Comp2Label->setText( trUtf8("Second Component") );
     FitAsyTypeLabel->setText( trUtf8("Fit type") );
     FitAsyType->clear();
@@ -3696,8 +3699,9 @@ sub CreateAllInput
 	     10,"GLFExp",
 	     11,"LLFSExp",
 	     12,"GLFSExp",
-	     13,"Meissner",
-	     14,"None"
+	     13,"MolMag",
+	     14,"Meissner",
+	     15,"None"
 	     );
     
     my $FT1=FitType1->currentItem;
@@ -3737,7 +3741,7 @@ sub CreateAllInput
 	    unshift( @Params, "Alpha" );
 	}	
 	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
-	    unshift( @Params, ( "N0", "NBg" ) );
+	    unshift( @Params, ( "No", "NBg" ) );
 	}
 	
 # This is the counter for parameters of this component
@@ -3750,7 +3754,7 @@ sub CreateAllInput
 	    if ( $All{"FitAsyType"} eq "SingleHist" ) {
 		$Param=$Param.$Hists[0];	    
 	    }
-	    if ( $#FitTypes != 0 && (   $Param ne "Alpha" && $Param ne "N0" && $Param ne "NBg" ) ){
+	    if ( $#FitTypes != 0 && (   $Param ne "Alpha" && $Param ne "No" && $Param ne "NBg" ) ){
 		$Param = join( "", $Param, "_", $Component);
 	    }
 	    
@@ -3768,6 +3772,7 @@ sub CreateAllInput
 		$Shared = $ChkBx->isChecked();
 	    }
 	    $All{"Sh_$Param"}=$Shared;
+	    print "Sh_$Param=$Shared\n";
 	    $NP++;
 	}
 #Loop on parameters
@@ -3975,7 +3980,7 @@ sub ActivateShComp
 	    unshift( @Params, "Alpha" );
 	}
 	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
-	    unshift( @Params, ( "N0", "NBg" ) );
+	    unshift( @Params, ( "No", "NBg" ) );
 	}
 	
 	
@@ -4261,24 +4266,26 @@ sub InitializeFunctions
     my $ParCount=0;
     CParamsCombo->clear();
     
+# Possibly use the parameters block to axtract names for the dropdown menu
+# this makes sense if we can use fun in map line. Check!
     my $Component=1;
     foreach my $FitType (@FitTypes) {
 	my $Parameters=$Paramcomp[$Component-1];
 	my @Params = split( /\s+/, $Parameters );	
 
-# Alpha, N0 and NBg are counted in the parameters
+# Alpha, No and NBg are counted in the parameters
 	if ( $Component == 1 && $All{"FitAsyType"} eq "Asymmetry" ) {
 	    unshift( @Params, "Alpha" );
 	}
 	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
-	    unshift( @Params, ( "N0", "NBg" ) );
+	    unshift( @Params, ( "No", "NBg" ) );
 	}
 	
 # Add list to the constraints drop down menu
 	for (my $i=1; $i<=9;$i++) {		
 	    my $CParam = $Params[$i-1]."_".$Component;
 	    if ($Params[$i-1] ne "" ) {
-		if ($Params[$i-1] ne "Alpha" && $Params[$i-1] ne "N0" && $Params[$i-1] ne "NBg") {
+		if ($Params[$i-1] ne "Alpha" && $Params[$i-1] ne "No" && $Params[$i-1] ne "NBg") {
 		    CParamsCombo->insertItem($CParam,-1);
 		    $Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
 		}

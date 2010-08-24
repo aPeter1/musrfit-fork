@@ -320,8 +320,9 @@ void MuSRFitform::CreateAllInput()
 	     10,"GLFExp",
 	     11,"LLFSExp",
 	     12,"GLFSExp",
-	     13,"Meissner",
-	     14,"None"
+	     13,"MolMag",
+	     14,"Meissner",
+	     15,"None"
 	     );
     
     my $FT1=FitType1->currentItem;
@@ -361,7 +362,7 @@ void MuSRFitform::CreateAllInput()
 	    unshift( @Params, "Alpha" );
 	}	
 	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
-	    unshift( @Params, ( "N0", "NBg" ) );
+	    unshift( @Params, ( "No", "NBg" ) );
 	}
 	
 # This is the counter for parameters of this component
@@ -374,7 +375,7 @@ void MuSRFitform::CreateAllInput()
 	    if ( $All{"FitAsyType"} eq "SingleHist" ) {
 		$Param=$Param.$Hists[0];	    
 	    }
-	    if ( $#FitTypes != 0 && (   $Param ne "Alpha" && $Param ne "N0" && $Param ne "NBg" ) ){
+	    if ( $#FitTypes != 0 && (   $Param ne "Alpha" && $Param ne "No" && $Param ne "NBg" ) ){
 		$Param = join( "", $Param, "_", $Component);
 	    }
 	    
@@ -591,7 +592,7 @@ void MuSRFitform::ActivateShComp()
 	    unshift( @Params, "Alpha" );
 	}
 	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
-	    unshift( @Params, ( "N0", "NBg" ) );
+	    unshift( @Params, ( "No", "NBg" ) );
 	}
 	
 	
@@ -861,24 +862,26 @@ void MuSRFitform::InitializeFunctions()
     my $ParCount=0;
     CParamsCombo->clear();
     
+# Possibly use the parameters block to axtract names for the dropdown menu
+# this makes sense if we can use fun in map line. Check!
     my $Component=1;
     foreach my $FitType (@FitTypes) {
 	my $Parameters=$Paramcomp[$Component-1];
 	my @Params = split( /\s+/, $Parameters );	
 
-# Alpha, N0 and NBg are counted in the parameters
+# Alpha, No and NBg are counted in the parameters
 	if ( $Component == 1 && $All{"FitAsyType"} eq "Asymmetry" ) {
 	    unshift( @Params, "Alpha" );
 	}
 	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
-	    unshift( @Params, ( "N0", "NBg" ) );
+	    unshift( @Params, ( "No", "NBg" ) );
 	}
 	
 # Add list to the constraints drop down menu
 	for (my $i=1; $i<=9;$i++) {		
 	    my $CParam = $Params[$i-1]."_".$Component;
 	    if ($Params[$i-1] ne "" ) {
-		if ($Params[$i-1] ne "Alpha" && $Params[$i-1] ne "N0" && $Params[$i-1] ne "NBg") {
+		if ($Params[$i-1] ne "Alpha" && $Params[$i-1] ne "No" && $Params[$i-1] ne "NBg") {
 		    CParamsCombo->insertItem($CParam,-1);
 		    $Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
 		}
