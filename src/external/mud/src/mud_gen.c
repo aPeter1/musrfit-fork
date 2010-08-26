@@ -1,6 +1,20 @@
 /*
  *  mud_gen.c -- procedures for MUD_FMT_GEN sections 
  *
+ *   Copyright (C) 1994-2010 TRIUMF (Vancouver, Canada)
+ *
+ *   Authors: T. Whidden, D. Arseneau
+ *   
+ *   Released under the GNU LGPL - see http://www.gnu.org/licenses
+ *
+ *   This program is free software; you can distribute it and/or modify it under 
+ *   the terms of the Lesser GNU General Public License as published by the Free 
+ *   Software Foundation; either version 2 of the License, or any later version. 
+ *   Accordingly, this program is distributed in the hope that it will be useful, 
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *   or FITNESS FOR A PARTICULAR PURPOSE. See the Lesser GNU General Public License 
+ *   for more details.
+ *
  *  Revision history:
  *   v1.0   26-Jan-1994  [T. Whidden] Initial version
  *   v1.0a  15-Feb-1994  [T. Whidden] Split ...GEN_HIST to ...GEN_HIST_HDR
@@ -9,6 +23,7 @@
  *   v1.0c  17-Apr-1994  [T. Whidden] added temperature and field to RUN_DESC
  *   v1.0d  11-Jul-1994  [TW] Fixed "unaligned data access" messages in
  *			 MUD_SEC_GEN_HIST_pack()
+ *          25-Nov-2009  DA  Handle 8-byte time_t
  */
 
 #include <time.h>
@@ -33,10 +48,10 @@ MUD_SEC_GEN_RUN_DESC_proc( op, pBuf, pMUD )
     MUD_SEC_GEN_RUN_DESC* pMUD;
 {
     int size;
-    time_t bintime;
     char tempStr1[32];
     char tempStr2[32];
     int  imin,isec;
+    time_t bintime;
 
     switch( op )
     {
@@ -114,7 +129,7 @@ MUD_SEC_GEN_RUN_DESC_proc( op, pBuf, pMUD )
 	    strncpy( tempStr1, ctime( &bintime ), sizeof(tempStr1) );
 	    tempStr1[strlen(tempStr1)-1] = '\0';
 	    bintime = pMUD->timeEnd;
-	    strncpy( tempStr1, ctime( &bintime ), sizeof(tempStr1) );
+	    strncpy( tempStr2, ctime( &bintime ), sizeof(tempStr2) );
 	    tempStr2[strlen(tempStr2)-1] = '\0';
 	    printf( "    timeBegin:[%s] [%ld]\n", tempStr1, pMUD->timeBegin );
 	    printf( "    timeEnd:[%s] [%ld]\n", tempStr2, pMUD->timeEnd );
@@ -143,10 +158,10 @@ MUD_SEC_GEN_RUN_DESC_proc( op, pBuf, pMUD )
 	        printf( "  operator:    %s\n", pMUD->experimenter );
 	    if( pMUD->method ) printf( "  method:      %s\n", pMUD->method );
 	    bintime = pMUD->timeBegin;
-            strncpy( tempStr1, ctime( &bintime ), sizeof(tempStr1) );
+	    strncpy( tempStr1, ctime( &bintime ), sizeof(tempStr1) );
 	    tempStr1[strlen(tempStr1)-1] = '\0';
 	    bintime = pMUD->timeEnd;
-            strncpy( tempStr1, ctime( &bintime ), sizeof(tempStr1) );
+	    strncpy( tempStr2, ctime( &bintime ), sizeof(tempStr2) );
 	    tempStr2[strlen(tempStr2)-1] = '\0';
 	    printf( "  began:       %s\n  ended:       %s\n",
                     tempStr1, tempStr2 );

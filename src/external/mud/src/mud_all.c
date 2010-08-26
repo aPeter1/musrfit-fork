@@ -1,10 +1,25 @@
 /*
  *  mud_all.c -- procedures for MUD_FMT_ALL sections 
  *
+ *   Copyright (C) 1994-2010 TRIUMF (Vancouver, Canada)
+ *
+ *   Authors: T. Whidden, D. Arseneau, S. Daviel
+ *   
+ *   Released under the GNU LGPL - see http://www.gnu.org/licenses
+ *
+ *   This program is free software; you can distribute it and/or modify it under 
+ *   the terms of the Lesser GNU General Public License as published by the Free 
+ *   Software Foundation; either version 2 of the License, or any later version. 
+ *   Accordingly, this program is distributed in the hope that it will be useful, 
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *   or FITNESS FOR A PARTICULAR PURPOSE. See the Lesser GNU General Public License 
+ *   for more details.
+ *
  *  Revision history:
  *   v1.00  15-Feb-1994  [T. Whidden] Initial version
  *   v1.10  17-Feb-1994  [T. Whidden] Groups with member index
  *   v1.2a  01-Mar-2000  DA  Proc for unknown sections
+ *          25-Nov-2009  DA  Handle 8-byte time_t
  */
 
 #include <time.h>
@@ -169,8 +184,8 @@ MUD_SEC_CMT_proc( op, pBuf, pMUD )
     MUD_SEC_CMT* pMUD;
 {
     int size;
-    time_t bintime;
     char tempStr1[32];
+    time_t bintime;
 
     switch( op )
     {
@@ -209,7 +224,7 @@ MUD_SEC_CMT_proc( op, pBuf, pMUD )
 	    printf( "    number:[%ld],  prevReply:[%ld],  nextReply:[%ld]\n", 
 			pMUD->ID, pMUD->prevReplyID, pMUD->nextReplyID );
 	    bintime = pMUD->time;
-            strncpy( tempStr1, ctime( &bintime ), sizeof(tempStr1) );
+	    strncpy( tempStr1, ctime( &bintime ), sizeof(tempStr1) );
 	    tempStr1[strlen(tempStr1)-1] = '\0';
 	    printf( "    time:[%s]\n", tempStr1 );
 	    if( pMUD->author ) printf( "    author:\"%s\"\n", pMUD->author );
@@ -224,7 +239,7 @@ MUD_SEC_CMT_proc( op, pBuf, pMUD )
               printf("  Next: #%ld.", pMUD->nextReplyID );
             printf( "\n" );
 	    bintime = pMUD->time;
-            strncpy( tempStr1, ctime( &bintime ), sizeof(tempStr1) );
+	    strncpy( tempStr1, ctime( &bintime ), sizeof(tempStr1) );
 	    tempStr1[strlen(tempStr1)-1] = '\0';
 	    if( pMUD->author ) printf( "    author: %s,     time: %s\n", pMUD->author, tempStr1 );
 	    if( pMUD->title ) printf( "    title: %s\n", pMUD->title );

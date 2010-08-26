@@ -3,11 +3,23 @@
  *
  *    A friendly programming interface to the MUD library
  *
- *  Copyright (c) 1996-2000 TRIUMF Cyclotron Facility
+ *  Copyright (c) 1996-2010 TRIUMF Cyclotron Facility
  *
  *  Author: 
- *    Ted Whidden, TRIUMF Data Acquisition Group (whidden@triumf.ca)
+ *    Ted Whidden, TRIUMF Data Acquisition Group
+ *    Donald Arseneau, TRIUMF CMMS
  *    4004 Wesbrook Mall, Vancouver, BC, Canada, V6T 2A3
+ *
+*
+ *   Released under the GNU LGPL - see http://www.gnu.org/licenses
+ *
+ *   This program is free software; you can distribute it and/or modify it under
+ *   the terms of the Lesser GNU General Public License as published by the Free
+ *   Software Foundation; either version 2 of the License, or any later version.
+ *   Accordingly, this program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *   or FITNESS FOR A PARTICULAR PURPOSE. See the Lesser GNU General Public License
+ *   for more details.
  *
  *  Modification history:
  *    26-Feb-1996  v1.0  TW   Created
@@ -18,6 +30,7 @@
  *                            string "get" functions, and use strncpy, but 
  *                            always terminate.
  *    22-Apr-2003  v1.6  DJA  Add mud_openReadWrite
+ *    22-Aug-2010  v1.7  DJA  Add mud_openReadWrite
  *
  *  Description:
  *

@@ -2,12 +2,27 @@
  *  mud.c -- most of the utilities for reading/writing MUD format files
  *	     procedures for MUD_FMT_ALL sections 
  *
+ *   Copyright (C) 1994-2009 TRIUMF (Vancouver, Canada)
+ *
+ *   Authors: T. Whidden, D. Arseneau, S. Daviel
+ *   
+ *   Released under the GNU LGPL - see http://www.gnu.org/licenses
+ *
+ *   This program is free software; you can distribute it and/or modify it under 
+ *   the terms of the Lesser GNU General Public License as published by the Free 
+ *   Software Foundation; either version 2 of the License, or any later version. 
+ *   Accordingly, this program is distributed in the hope that it will be useful, 
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *   or FITNESS FOR A PARTICULAR PURPOSE. See the Lesser GNU General Public License 
+ *   for more details.
+ *
  *  Revision history:
  *   v1.0   26-Jan-1994  [T. Whidden]  Initial version
  *   v1.1   17-Feb-1994  [T. Whidden]  Groups with member index
  *   v1.1a  14-Apr-1994  [T. Whidden]  Fixes to MUD_read, MUD_search
  *   v1.2   08-Oct-2000  [D. Arseneau] Add MUD_setSizes
  *   v1.3   22-Apr-2003  [D. Arseneau] Add MUD_openInOut
+ *          25-Nov-2009  [D. Arseneau] Handle larger size_t
  */
 
 
@@ -428,7 +443,7 @@ MUD_read( fin, io_opt )
     MUD_SEC* pMUD_new;
     MUD_SEC* pMUD_next;
     int i;
-    int size;
+    UINT32 size;
     int pos;
 
 #ifdef DEBUG
@@ -450,8 +465,8 @@ MUD_read( fin, io_opt )
 #endif /* DEBUG */
 
     bzero( &buf, sizeof( BUF ) );
-    buf.buf = (char*)zalloc( size );
-    if( fread( buf.buf, size, 1, fin ) == 0 )
+    buf.buf = (char*)zalloc( (size_t)size );
+    if( fread( buf.buf, (size_t)size, 1, fin ) == 0 )
     {
 	_free( buf.buf );
 	return( NULL );

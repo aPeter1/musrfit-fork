@@ -1,6 +1,6 @@
 #---------------------------------------------------------------------
 # ChangeLog
-# AS, 2010/08/19
+# AS, 2010/08/26
 # $Id$
 #---------------------------------------------------------------------
 
@@ -52,6 +52,7 @@ CHANGED stricter handling of ADDRUN (MUSR-106)
 CHANGED ASCII export from musrview
 CHANGED check for subsequent numbered parameters (MUSR-103)
 CHANGED WKMFULLDATAPATH to MUSRFULLDATAPATH
+UPDATED triumf mud file support. Now the mud source from triumf is officially published under LGPL
 UPDATED source code documentation
 UPDATED PSIBIN/MDU class from AA/AR
 

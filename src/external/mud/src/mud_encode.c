@@ -1,7 +1,24 @@
 /*
- *  mud_encode.c  --  encode/decode
+ *  mud_encode.c  --  encode/decode, 
+ *  Routines for converting encoding and byte order between the MUD standard and the
+ *  local machine standard.
+ *  
+ *   Copyright (C) 1994 TRIUMF (Vancouver, Canada)
  *
- *  Float stuff adapted from Sun RPC xdr_float.c
+ *   Authors: T. Whidden, D. Arseneau, S. Daviel
+ *   
+ *   Released under the GNU LGPL - see http://www.gnu.org/licenses
+ *
+ *   This program is free software; you can distribute it and/or modify it under 
+ *   the terms of the Lesser GNU General Public License as published by the Free 
+ *   Software Foundation; either version 2 of the License, or any later version. 
+ *   Accordingly, this program is distributed in the hope that it will be useful, 
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *   or FITNESS FOR A PARTICULAR PURPOSE. See the Lesser GNU General Public License 
+ *   for more details.
+ *
+ *  Float conversions adapted from Sun RPC xdr_float.c, which is covered by a separate
+ *  license (unrestricted use).
  */
 
 #include <stdio.h>
