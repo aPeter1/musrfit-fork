@@ -251,6 +251,11 @@ Int_t PMsrHandler::ReadMsrFile()
   if (result == PMUSR_SUCCESS)
     FillParameterInUse(theory, functions, run);
 
+  // check that each run fulfills the minimum requirements
+  if (result == PMUSR_SUCCESS)
+    if (!CheckRunBlockIntegrity())
+      result = PMUSR_MSR_SYNTAX_ERROR;
+
   // check that parameter names are unique
   if (result == PMUSR_SUCCESS) {
     UInt_t parX, parY;
@@ -2967,8 +2972,7 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
       return false;
     }
 
-    // units -----------------------------------------------
-    if (iter->fLine.BeginsWith("units", TString::kIgnoreCase)) {
+    if (iter->fLine.BeginsWith("units", TString::kIgnoreCase)) { // units
       if (tokens->GetEntries() < 2) { // units are missing
         error = true;
         continue;
@@ -2986,10 +2990,7 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
           continue;
         }
       }
-    }
-
-    // fourier power (zero padding) ------------------------
-    if (iter->fLine.BeginsWith("fourier_power", TString::kIgnoreCase)) {
+    } else if (iter->fLine.BeginsWith("fourier_power", TString::kIgnoreCase)) { // fourier power (zero padding)
       if (tokens->GetEntries() < 2) { // fourier power exponent is missing
         error = true;
         continue;
@@ -3009,10 +3010,7 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
           continue;
         }
       }
-    }
-
-    // apodization -----------------------------------------
-    if (iter->fLine.BeginsWith("apodization", TString::kIgnoreCase)) {
+    } else if (iter->fLine.BeginsWith("apodization", TString::kIgnoreCase)) { // apodization
       if (tokens->GetEntries() < 2) { // apodization tag is missing
         error = true;
         continue;
@@ -3032,10 +3030,7 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
           continue;
         }
       }
-    }
-
-    // plot tag --------------------------------------------
-    if (iter->fLine.BeginsWith("plot", TString::kIgnoreCase)) {
+    } else if (iter->fLine.BeginsWith("plot", TString::kIgnoreCase)) { // plot tag
       if (tokens->GetEntries() < 2) { // plot tag is missing
         error = true;
         continue;
@@ -3057,10 +3052,7 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
           continue;
         }
       }
-    }
-
-    // phase -----------------------------------------------
-    if (iter->fLine.BeginsWith("phase", TString::kIgnoreCase)) {
+    } else if (iter->fLine.BeginsWith("phase", TString::kIgnoreCase)) { // phase
       if (tokens->GetEntries() < 2) { // phase value is missing
         error = true;
         continue;
@@ -3090,10 +3082,7 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
           continue;
         }
       }
-    }
-
-    // range for automatic phase correction ----------------
-    if (iter->fLine.BeginsWith("range_for_phase_correction", TString::kIgnoreCase)) {
+    } else if (iter->fLine.BeginsWith("range_for_phase_correction", TString::kIgnoreCase)) {
       if (tokens->GetEntries() < 3) { // range values are missing
         error = true;
         continue;
@@ -3109,10 +3098,7 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
           }
         }
       }
-    }
-
-    // fourier plot range ----------------------------------
-    if (iter->fLine.BeginsWith("range", TString::kIgnoreCase)) {
+    } else if (iter->fLine.BeginsWith("range", TString::kIgnoreCase)) { // fourier plot range
       if (tokens->GetEntries() < 3) { // plot range values are missing
         error = true;
         continue;
@@ -3128,6 +3114,10 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
           }
         }
       }
+    } else if (!iter->fLine.BeginsWith("fourier", TString::kIgnoreCase) && !iter->fLine.BeginsWith("#") &&
+               !iter->fLine.IsWhitespace() && (iter->fLine.Length() != 0)) { // make
+      error = true;
+      continue;
     }
 
     // clean up
@@ -3136,8 +3126,13 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
       tokens = 0;
     }
 
-
     ++iter;
+  }
+
+  // clean up after error
+  if (tokens) {
+    delete tokens;
+    tokens = 0;
   }
 
   if (error) {
@@ -4133,6 +4128,148 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
   // clean up
   map.clear();
   fun.clear();
+}
+
+
+//--------------------------------------------------------------------------
+// CheckRunBlockIntegrity (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Checks the consistency of each RUN block, i.e. are the necessary parameters
+ * set and present, etc.
+ *
+ * <b>return:</b>
+ * - true if the RUN blocks fulfill the minimal requirements.
+ * - false otherwise
+ */
+Bool_t PMsrHandler::CheckRunBlockIntegrity()
+{
+  // go through all the present RUN blocks
+  Int_t fitType = 0;
+  for (UInt_t i=0; i<fRuns.size(); i++) {
+    // check if fittype is defined
+    fitType = fRuns[i].GetFitType();
+    if (fitType == -1) {
+      cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** fittype is not defined in RUN block number " << i+1 << endl;
+      return false;
+    }
+
+    // check for the different fittypes differently
+    switch (fitType) {
+      case PRUN_SINGLE_HISTO:
+        // check of norm is present
+        if (fRuns[i].GetNormParamNo() == -1) {
+          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << "  Norm parameter number not defined. Necessary for single histogram fits." << endl;
+          return false;
+        }
+        // check if norm parameter is given that it is either a valid function of a fit parameter present
+        if (fRuns[i].GetNormParamNo() < MSR_PARAM_FUN_OFFSET) { // parameter number
+          // check that norm parameter number is not larger than the number of parameters
+          if (fRuns[i].GetNormParamNo() > static_cast<Int_t>(fParam.size())) {
+            cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+            cerr << endl << "  Norm parameter number " << fRuns[i].GetNormParamNo() << " is larger than the number of fit parameters (" << fParam.size() << ").";
+            cerr << endl << "  Consider to check the manual ;-)" << endl;
+            return false;
+          }
+        } else { // function norm
+          if (fRuns[i].GetNormParamNo()-MSR_PARAM_FUN_OFFSET > GetNoOfFuncs()) {
+            cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+            cerr << endl << "  Norm parameter function number " << fRuns[i].GetNormParamNo()-MSR_PARAM_FUN_OFFSET << " is larger than the number of functions (" << GetNoOfFuncs() << ").";
+            cerr << endl << "  Consider to check the manual ;-)" << endl;
+            return false;
+          }
+        }
+        // check that there is a forward parameter number
+        if (fRuns[i].GetForwardHistoNo() == -1) {
+          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << "  forward parameter number not defined. Necessary for single histogram fits." << endl;
+          return false;
+        }
+        if (fRuns[i].GetForwardHistoNo() > static_cast<Int_t>(fParam.size())) {
+          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << "  forward histogram number " << fRuns[i].GetNormParamNo() << " is larger than the number of fit parameters (" << fParam.size() << ").";
+          cerr << endl << "  Consider to check the manual ;-)" << endl;
+          return false;
+        }
+        // check fit range
+        if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) {
+          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << "  Fit range is not defined. Necessary for single histogram fits." << endl;
+          return false;
+        }
+        // check packing
+        if (fRuns[i].GetPacking() == -1) {
+          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **WARNING** in RUN block number " << i+1;
+          cerr << endl << "  Packing is not defined, will set it to 1." << endl;
+          fRuns[i].SetPacking(1);
+        }
+        break;
+      case PRUN_ASYMMETRY:
+        // check alpha
+        if (fRuns[i].GetAlphaParamNo() == -1) {
+          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << "  alpha parameter number missing which is needed for an asymmetry fit.";
+          cerr << endl << "  Consider to check the manual ;-)" << endl;
+          return false;
+        }
+        // check that there is a forward parameter number
+        if (fRuns[i].GetForwardHistoNo() == -1) {
+          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << "  forward histogram number not defined. Necessary for single histogram fits." << endl;
+          return false;
+        }
+        // check that there is a backward parameter number
+        if (fRuns[i].GetBackwardHistoNo() == -1) {
+          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << "  backward histogram number not defined. Necessary for single histogram fits." << endl;
+          return false;
+        }
+        // check fit range
+        if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) {
+          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << "  Fit range is not defined. Necessary for single histogram fits." << endl;
+          return false;
+        }
+        // check packing
+        if (fRuns[i].GetPacking() == -1) {
+          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **WARNING** in RUN block number " << i+1;
+          cerr << endl << "  Packing is not defined, will set it to 1." << endl;
+          fRuns[i].SetPacking(1);
+        }
+        break;
+      case PRUN_MU_MINUS:
+        // needs eventually to be implemented
+        break;
+      case PRUN_NON_MUSR:
+        // check xy-data
+        if ((fRuns[i].GetXDataIndex() == -1) && (fRuns[i].GetXDataLabel()->Length() == 0)) {
+          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << "  xy-data is missing. Necessary for non muSR fits." << endl;
+          return false;
+        }
+        // check fit range
+        if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) {
+          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << "  Fit range is not defined. Necessary for single histogram fits." << endl;
+          return false;
+        }
+        // check packing
+        if (fRuns[i].GetPacking() == -1) {
+          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **WARNING** in RUN block number " << i+1;
+          cerr << endl << "  Packing is not defined, will set it to 1." << endl;
+          fRuns[i].SetPacking(1);
+        }
+        break;
+      default:
+        cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** fittype " << fitType << " undefined." << endl;
+        return false;
+        break;
+    }
+
+  }
+
+  return true;
 }
 
 //--------------------------------------------------------------------------

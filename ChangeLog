@@ -6,6 +6,7 @@
 
 changes since 0.6.0
 ===================
+NEW implemented more checks on the integrity of the msr-file
 NEW [MUSRGUI/MUSREDIT] msr2data default option flags in musredit_startup.xml
 NEW 'global fit' option for msr2data
 NEW implementation of SCAN/CONTOURS/MNPLOT (MUSR-100)

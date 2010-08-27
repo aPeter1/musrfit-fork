@@ -96,6 +96,7 @@ class PMsrHandler
                        { return fFuncHandler->Eval(i,map,param); }
 
     virtual Int_t ParameterInUse(UInt_t paramNo);
+    virtual Bool_t CheckRunBlockIntegrity();
     virtual Bool_t CheckUniquenessOfParamNames(UInt_t &parX, UInt_t &parY);
     virtual Bool_t CheckMaps();
     virtual Bool_t CheckFuncs();
