@@ -1,0 +1,46 @@
+Title
+###############################################################
+FITPARAMETER
+#      Nr. Name        Value     Step      Pos_Error  Boundaries
+        1 Asy1        0.262789  0.0465582   none        0       none    
+        2 T           4000      0           none        0       none    
+        3 Lam1        0.0233569 0.0094885   none        0       none    
+        4 Bet1        0.399259  0.0353915   none        0       none    
+
+###############################################################
+THEORY
+asymmetry      1
+userFcn  /home/l_salman/LEM/musrfit/src/external/libBNMR/libBNMR.so SExpRlx 2 3 4
+
+###############################################################
+RUN 45377 MUE4 PSI ASCII   (name beamline institute data-file-format)
+fittype         8         (non muSR fit)
+map             0    0    0    0    0    0    0    0    0    0
+xy-data         1       2       
+fit             0.00    8000.00 
+packing         1
+
+###############################################################
+COMMANDS
+STRATEGY 1
+MINIMIZE
+#MINOS
+SAVE
+END RETURN
+
+###############################################################
+PLOT 8   (non muSR plot)
+runs     1   
+range    0.00   8000.00
+
+###############################################################
+FOURIER
+units            MHz    # units either 'Gauss', 'MHz', or 'Mc/s'
+fourier_power    12
+apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            8.50
+#range            FRQMIN  FRQMAX
+###############################################################
+STATISTIC --- 2010-09-02 17:51:10
+  chisq = 93.71265965991455, NDF = 71, chisq/NDF = 1.319896614928374
