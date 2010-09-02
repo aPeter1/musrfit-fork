@@ -1760,6 +1760,10 @@ Bool_t PRunDataHandler::ReadAsciiFile()
         continue;
       TObjString *ostr;
       TObjArray *tokens;
+
+      // Remove trailing end of line
+      line.Remove(TString::kTrailing, '\r'); 
+
       // check if data have x, y [, error y] structure, and that x, y, and error y are numbers
       tokens = line.Tokenize(" ,\t");
       // check if the number of data line entries is 2 or 3
