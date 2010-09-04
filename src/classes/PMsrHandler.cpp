@@ -2169,7 +2169,7 @@ Bool_t PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
         }
 
         // check for lower-/upper-boundaries = none/none
-        if (!param.fLowerBoundary && !param.fUpperBoundary)
+        if (!param.fLowerBoundaryPresent && !param.fUpperBoundaryPresent)
           param.fNoOfParams = 5; // since there are no real boundaries present
       }
     }
