@@ -41,24 +41,9 @@ using namespace std;
 
 //--------------------
 // Constructor of the TrimSPData class -- reading all available trim.SP-rge-files with a given name into std::vectors
-// The rge-file names have to contain the Implantation energy just before the rge-extension in the format %02u_%1u
-// Example: string path("/home/user/TrimSP/SomeSample-");
-//          string energyArr[] = {"02_1", "02_5", "03_5", "05_0", "07_5", "10_0", "12_5"};
-//          vector<string> energyVec(energyArr, energyArr+(sizeof(energyArr)/sizeof(energyArr[0])));
-//
-// This will read the files "/home/user/TrimSP/SomeSample-02_1.rge", "/home/user/TrimSP/SomeSample-02_5.rge" and so on.
-//
-// Alternative supported energy formats in the energyVec are, e.g. for E=2.1keV:
-// <some_path>02-1.rge
-// <some_path>02.1.rge
-// <some_path>021.rge
-//
-// <some_path>21.rge is explicitly not possible since it is not clear, if this denotes 2.1keV or 21.0keV!
-//
-// Also always use the same format within one energyVec - otherwise sorting of the vector will not work properly!
 //--------------------
 
-TTrimSPData::TTrimSPData(const string &path, map<double, string> &energies) {
+TTrimSPData::TTrimSPData(const string &path, map<double, string> &energies, bool debug) {
 
   // sort the energies in ascending order - this might be useful for later applications (energy-interpolations etc.)
   // after the change from the vector to the map this is not necessary any more - since maps are always ordered!
@@ -75,7 +60,7 @@ TTrimSPData::TTrimSPData(const string &path, map<double, string> &energies) {
 
     ifstream *rgeFile = new ifstream(energyStr.c_str());
     if(! *rgeFile) {
-      cout << "TTrimSPData::TTrimSPData: file " << energyStr << " not found! Try next energy..." << endl;
+      cerr << "TTrimSPData::TTrimSPData: file " << energyStr << " not found! Try next energy..." << endl;
       delete rgeFile;
       rgeFile = 0;
     } else {
@@ -97,10 +82,10 @@ TTrimSPData::TTrimSPData(const string &path, map<double, string> &energies) {
           vnzz.push_back(nzz);
         }
 
-        fDZ.push_back(vzz[1]-vzz[0]);
+        fDZ.push_back(0.5*(vzz[2]-vzz[0])); // it happens that TRIM.SP uses different step sizes in one output file, therefore take the average
 
         while(zz < 2100.0){
-          zz += *(fDZ.end()-1);
+          zz += fDZ.back();
           vzz.push_back(zz);
           vnzz.push_back(0.0);
         }
@@ -124,11 +109,12 @@ TTrimSPData::TTrimSPData(const string &path, map<double, string> &energies) {
     }
   }
 
-  cout << "TTrimSPData::TTrimSPData: Read in " << fDataNZ.size() << " implantation profiles in total." << endl;
+  if (debug)
+    cout << "TTrimSPData::TTrimSPData: Read in " << fDataNZ.size() << " implantation profiles in total." << endl;
 
   fOrigDataNZ = fDataNZ;
 
-  for(unsigned int i(0); i<fEnergy.size();i++)
+  for(unsigned int i(0); i<fEnergy.size();++i)
     fIsNormalized.push_back(false);
 
   fEnergyIter = fEnergy.end();

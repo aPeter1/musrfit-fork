@@ -44,7 +44,7 @@ class TTrimSPData {
 
 public:
 
-  TTrimSPData(const string&, map<double, string>&);
+  TTrimSPData(const string&, map<double, string>&, bool debug = false);
 
   ~TTrimSPData() {
     fDataZ.clear();

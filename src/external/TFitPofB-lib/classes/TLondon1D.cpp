@@ -179,7 +179,7 @@ TLondon1DHS::TLondon1DHS() : fCalcNeeded(true), fFirstCall(true) {
     fParForPofB.push_back(0.005); // Bkg-width
     fParForPofB.push_back(0.0); // Bkg-weight
 
-    fImpProfile = new TTrimSPData(rge_path, energy_vec);
+    fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug());
 
     fPofB = new TPofBCalc(fParForPofB);
 
@@ -327,7 +327,7 @@ TLondon1D1L::TLondon1D1L() : fCalcNeeded(true), fFirstCall(true) {
     fParForPofB.push_back(0.005); // Bkg-width
     fParForPofB.push_back(0.0); // Bkg-weight
 
-    fImpProfile = new TTrimSPData(rge_path, energy_vec);
+    fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug());
 
     fPofB = new TPofBCalc(fParForPofB);
 
@@ -510,7 +510,7 @@ TLondon1D2L::TLondon1D2L() : fCalcNeeded(true), fFirstCall(true) {
     fParForPofB.push_back(0.005); // Bkg-width
     fParForPofB.push_back(0.0); // Bkg-weight
 
-    fImpProfile = new TTrimSPData(rge_path, energy_vec);
+    fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug());
 
     fPofB = new TPofBCalc(fParForPofB);
 
@@ -680,7 +680,7 @@ TProximity1D1LHS::TProximity1D1LHS() : fCalcNeeded(true), fFirstCall(true) {
     fParForPofB.push_back(0.01); // Bkg-width
     fParForPofB.push_back(0.0); // Bkg-weight
 
-    fImpProfile = new TTrimSPData(rge_path, energy_vec);
+    fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug());
 
     fPofB = new TPofBCalc(fParForPofB);
 
@@ -827,7 +827,7 @@ TLondon1D3L::TLondon1D3L() : fCalcNeeded(true), fFirstCall(true) {
     fParForPofB.push_back(0.005); // Bkg-width
     fParForPofB.push_back(0.0); // Bkg-weight
 
-    fImpProfile = new TTrimSPData(rge_path, energy_vec);
+    fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug());
 
     fPofB = new TPofBCalc(fParForPofB);
 
@@ -996,7 +996,7 @@ TLondon1D3LS::TLondon1D3LS() : fCalcNeeded(true), fFirstCall(true) {
     fParForPofB.push_back(0.005); // Bkg-width
     fParForPofB.push_back(0.0); // Bkg-weight
 
-    fImpProfile = new TTrimSPData(rge_path, energy_vec);
+    fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug());
 
     fPofB = new TPofBCalc(fParForPofB);
 
@@ -1159,7 +1159,7 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
 //     fParForPofB.push_back(startupHandler->GetDeltaB());
 //     fParForPofB.push_back(0.0);
 // 
-//     fImpProfile = new TTrimSPData(rge_path, energy_vec);
+//     fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug());
 // 
 //     fPofT = new TPofTCalc(fWisdom, fParForPofT);
 // 

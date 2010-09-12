@@ -49,7 +49,8 @@ ClassImpQ(TFitPofBStartupHandler)
 /**
  * <p>
  */
-TFitPofBStartupHandler::TFitPofBStartupHandler() : fDeltat(0.), fDeltaB(0.), fNSteps(0), fGridSteps(0)
+TFitPofBStartupHandler::TFitPofBStartupHandler() :
+ fDebug(false), fLEM(false), fVortex(false), fDataPath(""), fDeltat(0.), fDeltaB(0.), fWisdomFile(""), fNSteps(0), fGridSteps(0)
 {
 }
 
@@ -318,7 +319,7 @@ void TFitPofBStartupHandler::CheckLists()
     if(fDebug)
       cout << endl << "TFitPofBStartupHandler::CheckLists: check data path ..." << endl;
     if (!fDataPath.size()) {
-      cout << "TFitPofBStartupHandler::CheckLists: This is not going to work, you have to set a valid data path where to find the rge-files in the xml-file!" << endl;
+      cerr << "TFitPofBStartupHandler::CheckLists: This is not going to work, you have to set a valid data path where to find the rge-files in the xml-file!" << endl;
       assert(fDataPath.size());
     } else {
       if(fDebug)
@@ -329,19 +330,19 @@ void TFitPofBStartupHandler::CheckLists()
     if(fDebug)
       cout << endl << "TFitPofBStartupHandler::CheckLists: check energy list ..." << endl;
     if (fEnergyList.size() != fEnergyLabelList.size()) {
-      cout << "TFitPofBStartupHandler::CheckLists: The number of energies and energy labels are different! Please fix it!" << endl \
+      cerr << "TFitPofBStartupHandler::CheckLists: The number of energies and energy labels are different! Please fix it!" << endl \
            << "TFitPofBStartupHandler::CheckLists: The program will be terminated now!" << endl;
       assert(fEnergyList.size() == fEnergyLabelList.size());
     }
     if (fEnergyList.empty()) {
-      cout << "TFitPofBStartupHandler::CheckLists: Energy list empty!" << endl \
+      cerr << "TFitPofBStartupHandler::CheckLists: Energy list empty!" << endl \
            << "TFitPofBStartupHandler::CheckLists: Trying to use the standard energies: 0.0 to 35.0 keV in 0.1 keV steps" << endl;
       for (double x(0.0); x<= 35.0; x+=0.1) {
         fEnergyList.push_back(x);
       }
     }
     if (fEnergyLabelList.empty()) {
-      cout << "TFitPofBStartupHandler::CheckLists: Energy label list empty!" << endl \
+      cerr << "TFitPofBStartupHandler::CheckLists: Energy label list empty!" << endl \
            << "TFitPofBStartupHandler::CheckLists: Trying to use the specified energies as labels in the format %02.1f..." << endl \
            << "TFitPofBStartupHandler::CheckLists: Most probably this will go wrong and should therefore be fixed in the xml-file!" << endl;
       char eChar[5];
@@ -376,7 +377,6 @@ void TFitPofBStartupHandler::CheckLists()
   }
 
   if (fVortex) {
-
     // check if any number of steps for the theory function is specified
     if(fDebug)
       cout << endl << "TFitPofBStartupHandler::CheckLists: check number of steps for Vortex grid ..." << endl;

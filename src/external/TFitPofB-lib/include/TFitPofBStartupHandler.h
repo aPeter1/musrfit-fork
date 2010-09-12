@@ -67,6 +67,7 @@ class TFitPofBStartupHandler : public TQObject {
     virtual const string GetWisdomFile() const { return fWisdomFile; }
     virtual const unsigned int GetNSteps() const { return fNSteps; }
     virtual const unsigned int GetGridSteps() const { return fGridSteps; }
+    virtual const bool GetDebug() const { return fDebug; }
 
   private:
     enum EKeyWords {eEmpty, eComment, eDebug, eLEM, eVortex, eDataPath, eEnergyLabel, \
