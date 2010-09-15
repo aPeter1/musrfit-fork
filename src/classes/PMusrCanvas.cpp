@@ -2858,6 +2858,14 @@ void PMusrCanvas::PlotFourier()
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
 
+      // set ranges for Fourier and Fourier theory
+      for (UInt_t i=0; i<fData.size(); i++) {
+        fData[i].dataFourierRe->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].dataFourierRe->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+        fData[i].theoryFourierRe->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].theoryFourierRe->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+      }
+
       // set x-axis title
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
 
@@ -2901,6 +2909,14 @@ void PMusrCanvas::PlotFourier()
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
+
+      // set ranges for Fourier and Fourier theory
+      for (UInt_t i=0; i<fData.size(); i++) {
+        fData[i].dataFourierIm->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].dataFourierIm->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+        fData[i].theoryFourierIm->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].theoryFourierIm->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+      }
 
       // set x-axis title
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
@@ -2956,6 +2972,18 @@ void PMusrCanvas::PlotFourier()
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
 
+      // set ranges for Fourier and Fourier theory
+      for (UInt_t i=0; i<fData.size(); i++) {
+        fData[i].dataFourierRe->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].dataFourierRe->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+        fData[i].theoryFourierRe->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].theoryFourierRe->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+        fData[i].dataFourierIm->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].dataFourierIm->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+        fData[i].theoryFourierIm->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].theoryFourierIm->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+      }
+
       // set x-axis title
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
 
@@ -3002,6 +3030,13 @@ void PMusrCanvas::PlotFourier()
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
 
+      for (UInt_t i=0; i<fData.size(); i++) {
+        fData[i].dataFourierPwr->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].dataFourierPwr->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+        fData[i].theoryFourierPwr->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].theoryFourierPwr->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+      }
+
       // set x-axis title
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
 
@@ -3043,6 +3078,13 @@ void PMusrCanvas::PlotFourier()
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
+
+      for (UInt_t i=0; i<fData.size(); i++) {
+        fData[i].dataFourierPhase->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].dataFourierPhase->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+        fData[i].theoryFourierPhase->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].theoryFourierPhase->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+      }
 
       // set x-axis title
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
