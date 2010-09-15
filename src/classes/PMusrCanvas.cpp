@@ -3030,6 +3030,7 @@ void PMusrCanvas::PlotFourier()
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
 
+      // set ranges for Fourier and Fourier theory
       for (UInt_t i=0; i<fData.size(); i++) {
         fData[i].dataFourierPwr->GetXaxis()->SetRangeUser(xmin, xmax);
         fData[i].dataFourierPwr->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
@@ -3174,6 +3175,12 @@ void PMusrCanvas::PlotFourierDifference()
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
 
+      // set ranges for Fourier difference
+      for (UInt_t i=0; i<fData.size(); i++) {
+        fData[i].diffFourierRe->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].diffFourierRe->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+      }
+
       // set x-axis title
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
 
@@ -3211,6 +3218,12 @@ void PMusrCanvas::PlotFourierDifference()
           ymax = binContent;
       }
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
+
+      // set ranges for Fourier difference
+      for (UInt_t i=0; i<fData.size(); i++) {
+        fData[i].diffFourierIm->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].diffFourierIm->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+      }
 
       // set x-axis title
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
@@ -3258,6 +3271,14 @@ void PMusrCanvas::PlotFourierDifference()
       }
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
 
+      // set ranges for Fourier difference
+      for (UInt_t i=0; i<fData.size(); i++) {
+        fData[i].diffFourierRe->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].diffFourierRe->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+        fData[i].diffFourierIm->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].diffFourierIm->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+      }
+
       // set x-axis title
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
 
@@ -3300,6 +3321,12 @@ void PMusrCanvas::PlotFourierDifference()
       // set x-axis title
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
 
+      // set ranges for Fourier difference
+      for (UInt_t i=0; i<fData.size(); i++) {
+        fData[i].diffFourierPwr->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].diffFourierPwr->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+      }
+
       // set y-axis title
       fHistoFrame->GetYaxis()->SetTitle("Power Fourier");
 
@@ -3332,6 +3359,12 @@ void PMusrCanvas::PlotFourierDifference()
           ymax = binContent;
       }
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
+
+      // set ranges for Fourier difference
+      for (UInt_t i=0; i<fData.size(); i++) {
+        fData[i].diffFourierPhase->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].diffFourierPhase->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+      }
 
       // set x-axis title
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());

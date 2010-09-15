@@ -1108,6 +1108,7 @@ void PMusrT0::SetBkgLastChannel()
 void PMusrT0::UnZoom()
 {
   fHisto->GetXaxis()->UnZoom();
+  fHisto->GetYaxis()->UnZoom();
 
   fMainCanvas->Modified(); // needed that Update is actually working
   fMainCanvas->Update();
