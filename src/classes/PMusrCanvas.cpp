@@ -2577,6 +2577,14 @@ void PMusrCanvas::PlotData()
       fHistoFrame->GetXaxis()->SetRangeUser(fXmin, fXmax);
       fHistoFrame->GetYaxis()->SetRangeUser(fYmin, fYmax);
 
+      // set all histo/theory ranges properly
+      for (UInt_t i=0; i<fData.size(); i++) {
+        fData[i].data->GetXaxis()->SetRangeUser(fXmin, fXmax);
+        fData[i].data->GetYaxis()->SetRangeUser(fYmin, fYmax);
+        fData[i].theory->GetXaxis()->SetRangeUser(fXmin, fXmax);
+        fData[i].theory->GetYaxis()->SetRangeUser(fYmin, fYmax);
+      }
+
       // set x-axis label
       fHistoFrame->GetXaxis()->SetTitle("time (#mus)");
       // set y-axis label
