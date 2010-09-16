@@ -4,8 +4,11 @@
 # $Id: AUTHORS 4013 2009-06-21
 #---------------------------------------------------------------------
 
-Project leader and main developer:
-  Andreas Suter <andreas.suter@psi.ch>
+Andreas Suter <andreas.suter@psi.ch>
+  Project leader and main developer
+
+Bastian M. Wojek
+  msr2data, initial testing, full initial documentation, BMWlibs
 
 
 #---------------------------------------------------------------------

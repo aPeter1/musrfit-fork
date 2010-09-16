@@ -18,6 +18,7 @@ userFcn  libGapIntegrals.so TGapDWave 2 3
 RUN data/libGapIntegrals-test PIM3 PSI ASCII   (name beamline institute data-file-format)
 fittype         8         (non muSR fit)
 map             0    0    0    0    0    0    0    0    0    0
+xy-data         1    2
 fit             0.00    10.00   
 packing         1
 
