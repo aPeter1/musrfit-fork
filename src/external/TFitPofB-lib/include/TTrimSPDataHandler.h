@@ -59,6 +59,7 @@ public:
   vector<double> DataZ(double) const;
   vector<double> DataNZ(double) const;
   vector<double> OrigDataNZ(double) const;
+  double DataDZ(double) const;
   void UseHighResolution(double);
   void WeightLayers(double, const vector<double>&, const vector<double>&) const;
   double LayerFraction(double, unsigned int, const vector<double>&) const;

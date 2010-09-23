@@ -68,9 +68,7 @@ TMeanFieldsForScHalfSpace::TMeanFieldsForScHalfSpace() {
   string rge_path(startupHandler->GetDataPath());
   map<double, string> energy_vec(startupHandler->GetEnergies());
 
-  TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
-  fImpProfile = x;
-  x = 0;
+  fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug());
 
   // clean up
   if (saxParser) {
@@ -101,10 +99,10 @@ double TMeanFieldsForScHalfSpace::operator()(double E, const vector<double> &par
   if (energyIter != energies.end()) { // implantation profile found - no interpolation needed
     return CalcMeanB(E, BofZ);
   } else {
-    if (E < *energies.begin())
-      return CalcMeanB(*energies.begin(), BofZ);
-    if (E > *(energies.end()-1))
-      return CalcMeanB(*(energies.end()-1), BofZ);
+    if (E < energies.front())
+      return CalcMeanB(energies.front(), BofZ);
+    if (E > energies.back())
+      return CalcMeanB(energies.back(), BofZ);
 
     energyIter = find_if(energies.begin(), energies.end(), bind2nd( greater<double>(), E));
 //    cout << *(energyIter - 1) << " " << *(energyIter) << endl;
@@ -127,13 +125,14 @@ double TMeanFieldsForScHalfSpace::CalcMeanB (double E, const TLondon1D_HS& BofZ)
 
     vector<double> z(fImpProfile->DataZ(E));
     vector<double> nz(fImpProfile->DataNZ(E));
+    double dz(fImpProfile->DataDZ(E));
 
     // calculate mean field
 
     double meanB(0.);
 
     for (unsigned int i(0); i<z.size(); i++) {
-      meanB += (z[1]-z[0])*nz[i]*BofZ.GetBofZ(z[i]/10.);
+      meanB += dz*nz[i]*BofZ.GetBofZ(z[i]/10.);
     }
     return meanB;
 }
@@ -160,9 +159,7 @@ TMeanFieldsForScSingleLayer::TMeanFieldsForScSingleLayer() {
   string rge_path(startupHandler->GetDataPath());
   map<double, string> energy_vec(startupHandler->GetEnergies());
 
-  TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
-  fImpProfile = x;
-  x = 0;
+  fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug());
 
   // clean up
   if (saxParser) {
@@ -202,10 +199,10 @@ double TMeanFieldsForScSingleLayer::operator()(double E, const vector<double> &p
   if (energyIter != energies.end()) { // implantation profile found - no interpolation needed
     return CalcMeanB(E, interfaces, weights, BofZ);
   } else {
-    if (E < *energies.begin())
-      return CalcMeanB(*energies.begin(), interfaces, weights, BofZ);
-    if (E > *(energies.end()-1))
-      return CalcMeanB(*(energies.end()-1), interfaces, weights, BofZ);
+    if (E < energies.front())
+      return CalcMeanB(energies.front(), interfaces, weights, BofZ);
+    if (E > energies.back())
+      return CalcMeanB(energies.back(), interfaces, weights, BofZ);
 
     energyIter = find_if(energies.begin(), energies.end(), bind2nd( greater<double>(), E));
 //    cout << *(energyIter - 1) << " " << *(energyIter) << endl;
@@ -227,13 +224,14 @@ double TMeanFieldsForScSingleLayer::CalcMeanB (double E, const vector<double>& i
 
     vector<double> z(fImpProfile->DataZ(E));
     vector<double> nz(fImpProfile->DataNZ(E));
+    double dz(fImpProfile->DataDZ(E));
 
     // calculate mean field
 
     double meanB(0.);
 
     for (unsigned int i(0); i<z.size(); i++) {
-      meanB += (z[1]-z[0])*nz[i]*BofZ.GetBofZ(0.1*z[i]);
+      meanB += dz*nz[i]*BofZ.GetBofZ(0.1*z[i]);
     }
     return meanB;
 }
@@ -260,9 +258,7 @@ TMeanFieldsForScBilayer::TMeanFieldsForScBilayer() {
   string rge_path(startupHandler->GetDataPath());
   map<double, string> energy_vec(startupHandler->GetEnergies());
 
-  TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
-  fImpProfile = x;
-  x = 0;
+  fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug());
 
   // clean up
   if (saxParser) {
@@ -306,10 +302,10 @@ double TMeanFieldsForScBilayer::operator()(double E, const vector<double> &par_v
   if (energyIter != energies.end()) { // implantation profile found - no interpolation needed
     return CalcMeanB(E, interfaces, weights, BofZ);
   } else {
-    if (E < *energies.begin())
-      return CalcMeanB(*energies.begin(), interfaces, weights, BofZ);
-    if (E > *(energies.end()-1))
-      return CalcMeanB(*(energies.end()-1), interfaces, weights, BofZ);
+    if (E < energies.front())
+      return CalcMeanB(energies.front(), interfaces, weights, BofZ);
+    if (E > energies.back())
+      return CalcMeanB(energies.back(), interfaces, weights, BofZ);
 
     energyIter = find_if(energies.begin(), energies.end(), bind2nd( greater<double>(), E));
 //    cout << *(energyIter - 1) << " " << *(energyIter) << endl;
@@ -331,13 +327,14 @@ double TMeanFieldsForScBilayer::CalcMeanB (double E, const vector<double>& inter
 
     vector<double> z(fImpProfile->DataZ(E));
     vector<double> nz(fImpProfile->DataNZ(E));
+    double dz(fImpProfile->DataDZ(E));
 
     // calculate mean field
 
     double meanB(0.);
 
     for (unsigned int i(0); i<z.size(); i++) {
-      meanB += (z[1]-z[0])*nz[i]*BofZ.GetBofZ(z[i]/10.);
+      meanB += dz*nz[i]*BofZ.GetBofZ(z[i]/10.);
     }
     return meanB;
 }
@@ -364,9 +361,7 @@ TMeanFieldsForScTrilayer::TMeanFieldsForScTrilayer() {
   string rge_path(startupHandler->GetDataPath());
   map<double, string> energy_vec(startupHandler->GetEnergies());
 
-  TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
-  fImpProfile = x;
-  x = 0;
+  fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug());
 
   // clean up
   if (saxParser) {
@@ -412,10 +407,10 @@ double TMeanFieldsForScTrilayer::operator()(double E, const vector<double> &par_
   if (energyIter != energies.end()) { // implantation profile found - no interpolation needed
     return CalcMeanB(E, interfaces, weights, BofZ);
   } else {
-    if (E < *energies.begin())
-      return CalcMeanB(*energies.begin(), interfaces, weights, BofZ);
-    if (E > *(energies.end()-1))
-      return CalcMeanB(*(energies.end()-1), interfaces, weights, BofZ);
+    if (E < energies.front())
+      return CalcMeanB(energies.front(), interfaces, weights, BofZ);
+    if (E > energies.back())
+      return CalcMeanB(energies.back(), interfaces, weights, BofZ);
 
     energyIter = find_if(energies.begin(), energies.end(), bind2nd( greater<double>(), E));
 //    cout << *(energyIter - 1) << " " << *(energyIter) << endl;
@@ -437,13 +432,14 @@ double TMeanFieldsForScTrilayer::CalcMeanB (double E, const vector<double>& inte
 
     vector<double> z(fImpProfile->DataZ(E));
     vector<double> nz(fImpProfile->DataNZ(E));
+    double dz(fImpProfile->DataDZ(E));
 
     // calculate mean field
 
     double meanB(0.);
 
     for (unsigned int i(0); i<z.size(); i++) {
-      meanB += (z[1]-z[0])*nz[i]*BofZ.GetBofZ(z[i]/10.);
+      meanB += dz*nz[i]*BofZ.GetBofZ(z[i]/10.);
     }
     return meanB;
 }
@@ -470,9 +466,7 @@ TMeanFieldsForScTrilayerWithInsulator::TMeanFieldsForScTrilayerWithInsulator() {
   string rge_path(startupHandler->GetDataPath());
   map<double, string> energy_vec(startupHandler->GetEnergies());
 
-  TTrimSPData *x = new TTrimSPData(rge_path, energy_vec);
-  fImpProfile = x;
-  x = 0;
+  fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug());
 
   // clean up
   if (saxParser) {
@@ -518,10 +512,10 @@ double TMeanFieldsForScTrilayerWithInsulator::operator()(double E, const vector<
   if (energyIter != energies.end()) { // implantation profile found - no interpolation needed
     return CalcMeanB(E, interfaces, weights, BofZ);
   } else {
-    if (E < *energies.begin())
-      return CalcMeanB(*energies.begin(), interfaces, weights, BofZ);
-    if (E > *(energies.end()-1))
-      return CalcMeanB(*(energies.end()-1), interfaces, weights, BofZ);
+    if (E < energies.front())
+      return CalcMeanB(energies.front(), interfaces, weights, BofZ);
+    if (E > energies.back())
+      return CalcMeanB(energies.back(), interfaces, weights, BofZ);
 
     energyIter = find_if(energies.begin(), energies.end(), bind2nd( greater<double>(), E));
 //    cout << *(energyIter - 1) << " " << *(energyIter) << endl;
@@ -544,13 +538,14 @@ double TMeanFieldsForScTrilayerWithInsulator::CalcMeanB
 
     vector<double> z(fImpProfile->DataZ(E));
     vector<double> nz(fImpProfile->DataNZ(E));
+    double dz(fImpProfile->DataDZ(E));
 
     // calculate mean field
 
     double meanB(0.);
 
     for (unsigned int i(0); i<z.size(); i++) {
-      meanB += (z[1]-z[0])*nz[i]*BofZ.GetBofZ(0.1*z[i]);
+      meanB += dz*nz[i]*BofZ.GetBofZ(0.1*z[i]);
     }
     return meanB;
 }

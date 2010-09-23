@@ -198,6 +198,20 @@ vector<double> TTrimSPData::OrigDataNZ(double e) const {
 
 }
 
+double TTrimSPData::DataDZ(double e) const {
+
+  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+
+  if(fEnergyIter != fEnergy.end()) {
+    unsigned int i(fEnergyIter - fEnergy.begin());
+    return fDZ[i];
+  }
+  // default
+  cout << "TTrimSPData::DataDZ: No implantation profile available for the specified energy... The resolution will be zero!" << endl;
+  return 0.0;
+
+}
+
 //---------------------
 // Method returning fraction of muons implanted in the specified layer for a given energy[keV]
 // Parameters: Energy[keV], LayerNumber[1], Interfaces[nm]
