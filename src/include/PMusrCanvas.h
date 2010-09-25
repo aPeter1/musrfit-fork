@@ -56,6 +56,12 @@
 #define YTITLE 0.95
 #define XTHEO  0.75
 
+// Current Plot Range
+#define PR_NONE      0
+#define PR_RANGE     1
+#define PR_SUB_RANGE 2
+#define PR_FIT_RANGE 3
+
 // Current Plot Views
 #define PV_DATA                  1
 #define PV_FOURIER_REAL          2
@@ -84,6 +90,38 @@
 
 //------------------------------------------------------------------------
 /**
+ * <p>
+ */
+class PMusrCanvasPlotRange : public TObject
+{
+  public:
+    PMusrCanvasPlotRange();
+    virtual ~PMusrCanvasPlotRange() {}
+
+    virtual void SetXRange(Double_t xmin, Double_t xmax);
+    virtual void SetYRange(Double_t ymin, Double_t ymax);
+
+    virtual Bool_t IsXRangePresent() { return fXRangePresent; }
+    virtual Bool_t IsYRangePresent() { return fYRangePresent; }
+
+    virtual Double_t GetXMin() { return fXmin; }
+    virtual Double_t GetXMax() { return fXmax; }
+    virtual Double_t GetYMin() { return fYmin; }
+    virtual Double_t GetYMax() { return fYmax; }
+
+  private:
+    Bool_t fXRangePresent;
+    Bool_t fYRangePresent;
+    Double_t fXmin;
+    Double_t fXmax;
+    Double_t fYmin;
+    Double_t fYmax;
+
+  ClassDef(PMusrCanvasPlotRange, 1)
+};
+
+//------------------------------------------------------------------------
+/**
  * <p>Structure holding all necessary histograms for a single plot block entry for
  * fit types: asymmetry fit and single histogram fit.
  */
@@ -103,6 +141,7 @@ typedef struct {
   TH1F *diffFourierIm;       ///< imaginary part of the Fourier transform of the diff histogram
   TH1F *diffFourierPwr;      ///< power spectrum of the Fourier transform of the diff histogram
   TH1F *diffFourierPhase;    ///< phase spectrum of the Fourier transform of the diff histogram
+  PMusrCanvasPlotRange *dataRange;    ///< keep the msr-file plot data range
 } PMusrCanvasDataSet;
 
 //------------------------------------------------------------------------
@@ -132,6 +171,7 @@ typedef struct {
   TGraphErrors *diffFourierIm;      ///< imaginary part of the Fourier transform of the diff error graph
   TGraphErrors *diffFourierPwr;     ///< power spectrum of the Fourier transform of the diff error graph
   TGraphErrors *diffFourierPhase;   ///< phase spectrum of the Fourier transform of the diff error graph
+  PMusrCanvasPlotRange *dataRange;    ///< keep the msr-file plot data range
 } PMusrCanvasNonMusrDataSet;
 
 //------------------------------------------------------------------------
@@ -195,12 +235,13 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat);
 
   private:
-    Bool_t fBatchMode;       ///< musrview in ROOT batch mode
-    Bool_t fValid;           ///< if true, everything looks OK
-    Bool_t fDifferenceView;  ///< tag showing that the shown data, fourier, are the difference between data and theory
-    Int_t  fCurrentPlotView; ///< tag showing what the current plot view is: data, fourier, ...
-    Int_t  fPlotType;        ///< plot type tag: -1 == undefined, MSR_PLOT_SINGLE_HISTO == single histogram, MSR_PLOT_ASYM == asymmetry, MSR_PLOT_MU_MINUS == mu minus (not yet implemented), MSR_PLOT_NON_MUSR == non-muSR
-    Int_t  fPlotNumber;      ///< plot number
+    Bool_t fBatchMode;        ///< musrview in ROOT batch mode
+    Bool_t fValid;            ///< if true, everything looks OK
+    Bool_t fDifferenceView;   ///< tag showing that the shown data, fourier, are the difference between data and theory
+    Int_t  fCurrentPlotView;  ///< tag showing what the current plot view is: data, fourier, ...
+    Int_t  fPlotType;         ///< plot type tag: -1 == undefined, MSR_PLOT_SINGLE_HISTO == single histogram, MSR_PLOT_ASYM == asymmetry, MSR_PLOT_MU_MINUS == mu minus (not yet implemented), MSR_PLOT_NON_MUSR == non-muSR
+    Int_t  fPlotNumber;       ///< plot number
+    UInt_t fPlotRangeTag;     ///< plot range tag: 0=no range given, 1=range, 2=sub_ranges, 3=use_fit_ranges.
 
     Double_t fXmin, fXmax, fYmin, fYmax; ///< data/theory frame range
 
@@ -252,7 +293,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void CleanupDataSet(PMusrCanvasNonMusrDataSet &dataSet);
     virtual void HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data);
     virtual void HandleNonMusrDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data);
-    virtual void HandleDifference();
+    virtual void HandleDifference(Bool_t unzoom=false);
     virtual void HandleFourier();
     virtual void HandleDifferenceFourier();
     virtual void HandleFourierDifference();

@@ -41,6 +41,70 @@ using namespace std;
 #include "PMusrCanvas.h"
 #include "PFourier.h"
 
+ClassImp(PMusrCanvas)
+
+//--------------------------------------------------------------------------
+// Constructor
+//--------------------------------------------------------------------------
+/**
+ * <p>Constructor
+ */
+PMusrCanvasPlotRange::PMusrCanvasPlotRange()
+{
+  fXRangePresent = false;
+  fYRangePresent = false;
+
+  fXmin = 0.0;
+  fXmax = 0.0;
+  fYmin = 0.0;
+  fYmax = 0.0;
+}
+
+//--------------------------------------------------------------------------
+// SetXRange (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Sets the x-range values.
+ *
+ * \param xmin minimum range value
+ * \param xmax maximum range value
+ */
+void PMusrCanvasPlotRange::SetXRange(Double_t xmin, Double_t xmax)
+{
+  if (xmin > xmax) {
+    cerr << endl << "PMusrCanvasPlotRange::SetXRange: **WARNING** xmin > xmax, will swap them." << endl;
+    fXmin = xmax;
+    fXmax = xmin;
+  } else {
+    fXmin = xmin;
+    fXmax = xmax;
+  }
+  fXRangePresent = true;
+}
+
+//--------------------------------------------------------------------------
+// SetYRange (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Sets the y-range values.
+ *
+ * \param ymin minimum range value
+ * \param ymax maximum range value
+ */
+void PMusrCanvasPlotRange::SetYRange(Double_t ymin, Double_t ymax)
+{
+  if (ymin > ymax) {
+    cerr << endl << "PMusrCanvasPlotRange::SetYRange: **WARNING** ymin > ymax, will swap them." << endl;
+    fYmin = ymax;
+    fYmax = ymin;
+  } else {
+    fYmin = ymin;
+    fYmax = ymax;
+  }
+  fYRangePresent = true;
+}
+
+
 ClassImpQ(PMusrCanvas)
 
 //--------------------------------------------------------------------------
@@ -84,6 +148,11 @@ PMusrCanvas::PMusrCanvas()
 
   fRRFText = 0;
   fRRFLatexText = 0;
+
+  fXmin = 0.0;
+  fXmax = 0.0;
+  fYmin = 0.0;
+  fYmax = 0.0;
 }
 
 //--------------------------------------------------------------------------
@@ -120,6 +189,11 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
 
   fRRFText = 0;
   fRRFLatexText = 0;
+
+  fXmin = 0.0;
+  fXmax = 0.0;
+  fYmin = 0.0;
+  fYmax = 0.0;
 }
 
 //--------------------------------------------------------------------------
@@ -162,6 +236,11 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
 
   fRRFText = 0;
   fRRFLatexText = 0;
+
+  fXmin = 0.0;
+  fXmax = 0.0;
+  fYmin = 0.0;
+  fYmax = 0.0;
 }
 
 //--------------------------------------------------------------------------
@@ -760,7 +839,7 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
       PlotData();
     } else if ((fCurrentPlotView == PV_DATA) && fDifferenceView) {
       CleanupFourierDifference();
-      HandleDifference();
+      HandleDifference(true);
     } else if ((fCurrentPlotView != PV_DATA) && !fDifferenceView) {
       HandleFourier();
     } else if ((fCurrentPlotView != PV_DATA) && fDifferenceView) {
@@ -1332,6 +1411,7 @@ void PMusrCanvas::InitDataSet(PMusrCanvasDataSet &dataSet)
   dataSet.diffFourierIm = 0;
   dataSet.diffFourierPwr = 0;
   dataSet.diffFourierPhase = 0;
+  dataSet.dataRange = 0;
 }
 
 //--------------------------------------------------------------------------
@@ -1359,6 +1439,7 @@ void PMusrCanvas::InitDataSet(PMusrCanvasNonMusrDataSet &dataSet)
   dataSet.diffFourierIm = 0;
   dataSet.diffFourierPwr = 0;
   dataSet.diffFourierPhase = 0;
+  dataSet.dataRange = 0;
 }
 
 //--------------------------------------------------------------------------
@@ -1430,6 +1511,10 @@ void PMusrCanvas::CleanupDataSet(PMusrCanvasDataSet &dataSet)
   if (dataSet.diffFourierPhase) {
     delete dataSet.diffFourierPhase;
     dataSet.diffFourierPhase = 0;
+  }
+  if (dataSet.dataRange) {
+    delete dataSet.dataRange;
+    dataSet.dataRange = 0;
   }
 }
 
@@ -1503,6 +1588,10 @@ void PMusrCanvas::CleanupDataSet(PMusrCanvasNonMusrDataSet &dataSet)
     delete dataSet.diffFourierPhase;
     dataSet.diffFourierPhase = 0;
   }
+  if (dataSet.dataRange) {
+    delete dataSet.dataRange;
+    dataSet.dataRange = 0;
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -1521,12 +1610,16 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
   TH1F *dataHisto;
   TH1F *theoHisto;
 
-  TString name;
-  double start;
-  double end;
+  TString  name;
+  Double_t start;
+  Double_t end;
+  Double_t xmin, xmax, ymin, ymax;
   Int_t    size;
 
   InitDataSet(dataSet);
+
+  // create plot range object for the data set
+  dataSet.dataRange = new PMusrCanvasPlotRange();
 
   // dataHisto -------------------------------------------------------------
   // create histo specific infos
@@ -1537,6 +1630,28 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
   start = data->GetDataTimeStart() - data->GetDataTimeStep()/2.0;
   end   = start + data->GetValue()->size()*data->GetDataTimeStep();
   size  = data->GetValue()->size();
+  dataSet.dataRange->SetXRange(start, end); // full possible range
+  // make sure that for asymmetry the y-range is initialized reasonably
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_ASYM)
+    dataSet.dataRange->SetYRange(-0.4, 0.4);
+  fPlotRangeTag = PR_NONE; // keep the proper plot range tag
+
+  // check if plot range is given in the msr-file, and if yes keep the values
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() != 0) {
+    // keep x-range
+    xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[0];
+    xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[0];
+    dataSet.dataRange->SetXRange(xmin, xmax);
+    // check if y-range is given as well
+    if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin.size() != 0) {
+      ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin[0];
+      ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax[0];
+      dataSet.dataRange->SetYRange(ymin, ymax);
+    }
+
+    // keep the proper plot range tag
+    fPlotRangeTag = PR_RANGE;
+  }
 
   // check if 'use_fit_range' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
@@ -1547,6 +1662,14 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
             (Int_t)((fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(0) - data->GetDataTimeStart())/data->GetDataTimeStep()) * data->GetDataTimeStep() -
             data->GetDataTimeStep()/2.0; // closesd start value compatible with the user given
     end   = start + size * data->GetDataTimeStep(); // closesd end value compatible with the user given
+    dataSet.dataRange->SetXRange(start, end);
+
+    // make sure that for asymmetry the y-range is initialized reasonably
+    if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_ASYM)
+      dataSet.dataRange->SetYRange(-0.4, 0.4);
+
+    // keep the proper plot range tag
+    fPlotRangeTag = PR_FIT_RANGE;
   }
 
   // check if 'sub_ranges' plotting is whished
@@ -1558,6 +1681,17 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
             (Int_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->GetDataTimeStart())/data->GetDataTimeStep()) * data->GetDataTimeStep() -
             data->GetDataTimeStep()/2.0; // closesd start value compatible with the user given
     end   = start + size * data->GetDataTimeStep(); // closesd end value compatible with the user given
+    dataSet.dataRange->SetXRange(start, end);
+
+    // check if y-range is given as well
+    if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin.size() != 0) {
+      ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin[0];
+      ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax[0];
+      dataSet.dataRange->SetYRange(ymin, ymax);
+    }
+
+    // keep the proper plot range tag
+    fPlotRangeTag = PR_SUB_RANGE;
   }
 
   // invoke histo
@@ -1694,6 +1828,9 @@ void PMusrCanvas::HandleNonMusrDataSet(UInt_t plotNo, UInt_t runNo, PRunData *da
 
   InitDataSet(dataSet);
 
+  // create plot range object for the data set and fill it
+  dataSet.dataRange = new PMusrCanvasPlotRange();
+
   // dataHisto -------------------------------------------------------------
 
   // invoke graph
@@ -1749,6 +1886,89 @@ void PMusrCanvas::HandleNonMusrDataSet(UInt_t plotNo, UInt_t runNo, PRunData *da
   dataSet.data   = dataHisto;
   dataSet.theory = theoHisto;
 
+  // check the plot range options
+  Double_t xmin=0.0, xmax=0.0, ymin=0.0, ymax=0.0, x=0.0, y=0.0;
+
+  // initialize the plot range to the maximal possible given the data. This is needed if there is no plot-range style entry present
+  dataSet.data->GetPoint(0, xmin, y); // get xmin
+  dataSet.data->GetPoint(dataSet.data->GetN()-1, xmax, y); // get xmax
+  dataSet.data->GetPoint(0, x, y); // init ymin/ymax
+  ymin = y;
+  ymax = y;
+  for (Int_t i=1; i<dataSet.data->GetN(); i++) {
+    dataSet.data->GetPoint(i, x, y);
+    if (y < ymin)
+      ymin = y;
+    if (y > ymax)
+      ymax = y;
+  }
+  Double_t dx = 0.025*(xmax-xmin);
+  Double_t dy = 0.025*(ymax-ymin);
+  dataSet.dataRange->SetXRange(xmin-dx, xmax+dx);
+  dataSet.dataRange->SetYRange(ymin-dy, ymax+dy);
+  fPlotRangeTag = PR_NONE;
+
+  // check if plot range is given in the msr-file, and if yes keep the values
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() != 0) {
+    // keep x-range
+    xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[0];
+    xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[0];
+    dataSet.dataRange->SetXRange(xmin, xmax);
+    // check if y-range is given as well
+    if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin.size() != 0) {
+      ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin[0];
+      ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax[0];
+      dataSet.dataRange->SetYRange(ymin, ymax);
+    }
+
+    // keep the proper plot range tag
+    fPlotRangeTag = PR_RANGE;
+  }
+
+  // check if 'use_fit_range' plotting is whished
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
+    xmin = fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(0); // needed to estimate size
+    xmax = fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(1); // needed to estimate size
+    dataSet.dataRange->SetXRange(xmin, xmax);
+
+    // keep the proper plot range tag
+    fPlotRangeTag = PR_FIT_RANGE;
+  }
+
+  // check if 'sub_ranges' plotting is whished
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) {
+    xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo]; // needed to estimate size
+    xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo]; // needed to estimate size
+    dataSet.dataRange->SetXRange(xmin, xmax);
+
+    // check if y-range is given as well
+    if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin.size() != 0) {
+      ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin[0];
+      ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax[0];
+      dataSet.dataRange->SetYRange(ymin, ymax);
+    }
+
+    // keep the proper plot range tag
+    fPlotRangeTag = PR_SUB_RANGE;
+  }
+
+  // keep maximal range of all plot present
+  if (plotNo == 0) {
+    fXmin = dataSet.dataRange->GetXMin();
+    fXmax = dataSet.dataRange->GetXMax();
+    fYmin = dataSet.dataRange->GetYMin();
+    fYmax = dataSet.dataRange->GetYMax();
+  } else {
+    if (fXmin > dataSet.dataRange->GetXMin())
+      fXmin = dataSet.dataRange->GetXMin();
+    if (fXmax < dataSet.dataRange->GetXMax())
+      fXmax = dataSet.dataRange->GetXMax();
+    if (fYmin > dataSet.dataRange->GetYMin())
+      fYmin = dataSet.dataRange->GetYMin();
+    if (fYmax < dataSet.dataRange->GetYMax())
+      fYmax = dataSet.dataRange->GetYMax();
+  }
+
   fNonMusrData.push_back(dataSet);
 }
 
@@ -1759,8 +1979,10 @@ void PMusrCanvas::HandleNonMusrDataSet(UInt_t plotNo, UInt_t runNo, PRunData *da
  * <p>Handles the calculation of the difference spectra (i.e. data-theory).
  * It allocates the necessary objects if they are not already present. At the
  * end it calls the plotting routine.
+ *
+ * \param unzoom if set to true, change ranges to the original msr-file values
  */
-void PMusrCanvas::HandleDifference()
+void PMusrCanvas::HandleDifference(Bool_t unzoom)
 {
   // check if it is necessary to calculate diff data
   if ((fPlotType != MSR_PLOT_NON_MUSR) && (fData[0].diff == 0)) {
@@ -1802,6 +2024,9 @@ void PMusrCanvas::HandleDifference()
     TString name;
     // loop over all histos
     for (UInt_t i=0; i<fNonMusrData.size(); i++) {
+      // make sure data exists
+      assert(fNonMusrData[i].data);
+
       // create difference histos
       diffHisto = new TGraphErrors(fNonMusrData[i].data->GetN());
 
@@ -1838,17 +2063,34 @@ void PMusrCanvas::HandleDifference()
   Int_t xminBin, xmaxBin;
   Double_t xmin, xmax;
   if (fPlotType != MSR_PLOT_NON_MUSR) { // muSR Data
-    xminBin = fData[0].data->GetXaxis()->GetFirst(); // first bin of the zoomed range
-    xmaxBin = fData[0].data->GetXaxis()->GetLast();  // last bin of the zoomed range
-    xmin = fData[0].data->GetXaxis()->GetBinCenter(xminBin);
-    xmax = fData[0].data->GetXaxis()->GetBinCenter(xmaxBin);
-    fData[0].diff->GetXaxis()->SetRangeUser(xmin, xmax);
+    if (unzoom) {
+      fHistoFrame->GetXaxis()->SetRangeUser(fXmin, fXmax);
+      for (UInt_t i=0; i<fData.size(); i++)
+        fData[i].diff->GetXaxis()->SetRangeUser(fXmin, fXmax);
+    } else {
+      xminBin = fData[0].data->GetXaxis()->GetFirst(); // first bin of the zoomed range
+      xmaxBin = fData[0].data->GetXaxis()->GetLast();  // last bin of the zoomed range
+      xmin = fData[0].data->GetXaxis()->GetBinCenter(xminBin);
+      xmax = fData[0].data->GetXaxis()->GetBinCenter(xmaxBin);
+      fData[0].diff->GetXaxis()->SetRangeUser(xmin, xmax);
+    }
   } else { // non-muSR Data
-    xminBin = fNonMusrData[0].data->GetXaxis()->GetFirst(); // first bin of the zoomed range
-    xmaxBin = fNonMusrData[0].data->GetXaxis()->GetLast();  // last bin of the zoomed range
-    xmin = fNonMusrData[0].data->GetXaxis()->GetBinCenter(xminBin);
-    xmax = fNonMusrData[0].data->GetXaxis()->GetBinCenter(xmaxBin);
-    fNonMusrData[0].diff->GetXaxis()->SetRangeUser(xmin, xmax);
+    if (unzoom) {
+      for (UInt_t i=0; i<fNonMusrData.size(); i++) {
+        fNonMusrData[0].diff->GetXaxis()->SetRangeUser(fNonMusrData[0].dataRange->GetXMin(),
+                                                       fNonMusrData[0].dataRange->GetXMin());
+        if (fNonMusrData[0].dataRange->IsYRangePresent()) {
+          fNonMusrData[0].diff->GetYaxis()->SetRangeUser(fNonMusrData[0].dataRange->GetYMin(),
+                                                         fNonMusrData[0].dataRange->GetYMax());
+        }
+      }
+    } else {
+      xminBin = fNonMusrData[0].data->GetXaxis()->GetFirst(); // first bin of the zoomed range
+      xmaxBin = fNonMusrData[0].data->GetXaxis()->GetLast();  // last bin of the zoomed range
+      xmin = fNonMusrData[0].data->GetXaxis()->GetBinCenter(xminBin);
+      xmax = fNonMusrData[0].data->GetXaxis()->GetBinCenter(xmaxBin);
+      fNonMusrData[0].diff->GetXaxis()->SetRangeUser(xmin, xmax);
+    }
   }
 
   PlotDifference();
@@ -2443,7 +2685,7 @@ Int_t PMusrCanvas::FindBin(const Double_t x, TGraphErrors *graph)
  *
  * \param histo pointer of the histogram
  */
-double PMusrCanvas::GetGlobalMaximum(TH1F* histo)
+Double_t PMusrCanvas::GetGlobalMaximum(TH1F* histo)
 {
   if (histo == 0)
     return 0.0;
@@ -2470,7 +2712,7 @@ double PMusrCanvas::GetGlobalMaximum(TH1F* histo)
  *
  * \param histo pointer of the histogram
  */
-double PMusrCanvas::GetGlobalMinimum(TH1F* histo)
+Double_t PMusrCanvas::GetGlobalMinimum(TH1F* histo)
 {
   if (histo == 0)
     return 0.0;
@@ -2512,64 +2754,67 @@ void PMusrCanvas::PlotData()
   if (fPlotType != MSR_PLOT_NON_MUSR) {
     if (fData.size() > 0) {
 
-      // data range min/max
+      // delete old fHistoFrame if present
+      if (fHistoFrame) {
+        delete fHistoFrame;
+        fHistoFrame = 0;
+      }
+
+      // get full possible data range min/max
       Double_t dataXmin = fData[0].data->GetXaxis()->GetXmin();
       Double_t dataXmax = fData[0].data->GetXaxis()->GetXmax();
-      Double_t dataYmin = fData[0].data->GetMinimum();
-      Double_t dataYmax = fData[0].data->GetMaximum();
+      Double_t dataYmin = GetGlobalMaximum(fData[0].data); // fData[0].data->GetMinimum();
+      Double_t dataYmax = GetGlobalMinimum(fData[0].data); // fData[0].data->GetMaximum();
       for (UInt_t i=1; i<fData.size(); i++) {
         if (fData[i].data->GetXaxis()->GetXmin() < dataXmin)
           dataXmin = fData[i].data->GetXaxis()->GetXmin();
         if (fData[i].data->GetXaxis()->GetXmax() > dataXmax)
           dataXmax = fData[i].data->GetXaxis()->GetXmax();
-        if (fData[i].data->GetMinimum() < dataYmin)
-          dataYmin = fData[i].data->GetMinimum();
-        if (fData[i].data->GetMaximum() > dataYmax)
-          dataYmax = fData[i].data->GetMaximum();
+        if (GetGlobalMinimum(fData[i].data) < dataYmin)
+          dataYmin = GetGlobalMinimum(fData[i].data);
+        if (GetGlobalMaximum(fData[i].data) > dataYmax)
+          dataYmax = GetGlobalMaximum(fData[i].data);
       }
 
-      if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) { // use fit ranges
-        fXmin = dataXmin;
-        fXmax = dataXmax;
-        fYmin = dataYmin;
-        fYmax = dataYmax;
-      } else if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) { // sub range plot
-        fXmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[0];
-        fXmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[0];
-        fYmin = fData[0].data->GetMinimum();
-        fYmax = fData[0].data->GetMaximum();
-        for (UInt_t i=1; i<fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size(); i++) {
-          if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[i] < fXmin)
-            fXmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[i];
-          if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[i] > fXmax)
-            fXmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[i];
-        }
-        // check if it is necessary to set the y-axis range
-        if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin.size() > 0) {
-          fYmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin[0];
-          fYmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax[0];
-        }
-      } else { // standard range plot
-        // set time range if present
-        fXmin = fData[0].data->GetXaxis()->GetXmin();
-        fXmax = fData[0].data->GetXaxis()->GetXmax();
-        fYmin = fData[0].data->GetMinimum();
-        fYmax = fData[0].data->GetMaximum();
-        if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 0) {
-          fXmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[0];
-          fXmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[0];
-          // check if it is necessary to set the y-axis range
-          if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin.size() > 0) {
-            fYmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin[0];
-            fYmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax[0];
+      fXmin=dataXmin;
+      fXmax=dataXmax;
+      fYmin=dataYmin;
+      fYmax=dataYmax;
+      switch (fPlotRangeTag) {
+        case PR_NONE:
+          // in case of the asymmetry plot some default y-ranges were set, i.e. [-0.4, 0.4]
+          if (fData[0].dataRange->IsYRangePresent()) {
+            fYmin = fData[0].dataRange->GetYMin();
+            fYmax = fData[0].dataRange->GetYMax();
           }
-        }
-      }
-
-      // delete old fHistoFrame if present
-      if (fHistoFrame) {
-        delete fHistoFrame;
-        fHistoFrame = 0;
+          break;
+        case PR_RANGE:
+          fXmin = fData[0].dataRange->GetXMin();
+          fXmax = fData[0].dataRange->GetXMax();
+          if (fData[0].dataRange->IsYRangePresent()) {
+            fYmin = fData[0].dataRange->GetYMin();
+            fYmax = fData[0].dataRange->GetYMax();
+          }
+          break;
+        case PR_FIT_RANGE:
+          fXmin = fData[0].dataRange->GetXMin();
+          fXmax = fData[0].dataRange->GetXMax();
+          // in case of the asymmetry plot some default y-ranges were set, i.e. [-0.4, 0.4]
+          if (fData[0].dataRange->IsYRangePresent()) {
+            fYmin = fData[0].dataRange->GetYMin();
+            fYmax = fData[0].dataRange->GetYMax();
+          }
+          break;
+        case PR_SUB_RANGE:
+          fXmin = fData[0].dataRange->GetXMin();
+          fXmax = fData[0].dataRange->GetXMax();
+          if (fData[0].dataRange->IsYRangePresent()) {
+            fYmin = fData[0].dataRange->GetYMin();
+            fYmax = fData[0].dataRange->GetYMax();
+          }
+          break;
+        default:
+          return;
       }
 
       // create histo frame in order to plot histograms possibly with different x-frames
@@ -2626,6 +2871,7 @@ void PMusrCanvas::PlotData()
   } else { // fPlotType == MSR_PLOT_NO_MUSR
     // ugly workaround since multigraphs axis are not going away when switching TMultiGraphs
     delete fDataTheoryPad;
+    fDataTheoryPad = 0;
     fDataTheoryPad = new TPad("dataTheoryPad", "dataTheoryPad", 0.0, YINFO, XTHEO, YTITLE);
     fDataTheoryPad->SetFillColor(TColor::GetColor(255,255,255));
     fDataTheoryPad->Draw();
@@ -2664,6 +2910,7 @@ void PMusrCanvas::PlotData()
       fMultiGraphData->Draw("a");
 
       // set x-range
+/*
       if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 0) {
         Double_t xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[0];
         Double_t xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[0];
@@ -2677,6 +2924,9 @@ void PMusrCanvas::PlotData()
           fMultiGraphData->GetYaxis()->UnZoom();
         }
       }
+*/
+      fMultiGraphData->GetXaxis()->SetRangeUser(fXmin, fXmax);
+      fMultiGraphData->GetYaxis()->SetRangeUser(fYmin, fYmax);
 
       // set x-, y-axis label only if there is just one data set
       if (fNonMusrData.size() == 1) {
@@ -2741,7 +2991,7 @@ void PMusrCanvas::PlotDifference()
       fHistoFrame = 0;
     }
 
-    fHistoFrame = fDataTheoryPad->DrawFrame(fXmin, fYmin, fXmax, fYmax);
+    fHistoFrame = fDataTheoryPad->DrawFrame(fXmin, fYmin, fXmax, fYmax);    
     // set x-axis label
     fHistoFrame->GetXaxis()->SetTitle("time (#mus)");
     // set y-axis label
@@ -2787,6 +3037,9 @@ void PMusrCanvas::PlotDifference()
     }
 
     fMultiGraphDiff->Draw("a");
+
+    fMultiGraphDiff->GetXaxis()->SetRangeUser(fXmin, fXmax);
+    fMultiGraphDiff->GetYaxis()->SetRangeUser(fYmin, fYmax);
 
     // set x-axis label
     fMultiGraphDiff->GetXaxis()->SetTitle(xAxisTitle.Data());

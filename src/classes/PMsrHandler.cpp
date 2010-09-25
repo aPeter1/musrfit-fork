@@ -3204,6 +3204,11 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
     param.fLogX = false; // i.e. if not overwritten use linear x-axis
     param.fLogY = false; // i.e. if not overwritten use linear y-axis
     param.fViewPacking = -1; // i.e. if not overwritten use the packing of the run blocks
+    param.fRuns.clear();
+    param.fTmin.clear();
+    param.fTmax.clear();
+    param.fYmin.clear();
+    param.fYmax.clear();
     param.fRRFPacking = 0; // i.e. if not overwritten it will not be a valid RRF
     param.fRRFFreq = 0.0; // i.e. no RRF whished
     param.fRRFUnit = RRF_UNIT_MHz;

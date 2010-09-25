@@ -289,35 +289,84 @@ Bool_t PRunNonMusr::PrepareViewData()
   PMsrPlotStructure plotBlock;
   plotList = fMsrInfo->GetMsrPlotList();
   // find the proper plot block
-  // Here a small complication has to be handled: there are potentially multiple
+  // Here a small complication to be handled: there are potentially multiple
   // run blocks and the run might be present in various of these run blocks. In
   // order to get a nice resolution on the theory the following procedure will be
   // followed: the smallest x-interval found will be used to for the fXTheory resolution
   // which is 1000 function points. The function will be calculated from the smallest
   // xmin found up to the largest xmax found.
   Double_t xMin = 0.0, xMax = 0.0;
-  Double_t xAbsMin = 0.0, xAbsMax = 0.0;
-  Bool_t first = true;
-  for (UInt_t i=0; i<plotList->size(); i++) {
+
+  // init xMin/xMax, xAbsMin/xAbsMax
+  plotBlock = plotList->at(0);
+  if (plotBlock.fTmin.size() == 0) { // check if no range information is present
+    PMsrRunList *runList = fMsrInfo->GetMsrRunList();
+    xMin = runList->at(0).GetFitRange(0);
+    xMax = runList->at(0).GetFitRange(1);
+    for (UInt_t i=1; i<runList->size(); i++) {
+      if (runList->at(i).GetFitRange(0) < xMin)
+        xMin = runList->at(i).GetFitRange(0);
+      if (runList->at(i).GetFitRange(1) > xMax)
+        xMax = runList->at(i).GetFitRange(1);
+    }
+  } else if (plotBlock.fTmin.size() == 1) { // check if 'range' information is present
+    xMin = plotBlock.fTmin[0];
+    xMax = plotBlock.fTmax[0];
+  } else if (plotBlock.fTmin.size() > 1) { // check if 'sub_ranges' information is present
+    xMin = plotBlock.fTmin[0];
+    xMax = plotBlock.fTmax[0];
+    for (UInt_t i=1; i<plotBlock.fTmin.size(); i++) {
+      if (plotBlock.fTmin[i] < xMin)
+        xMin = plotBlock.fTmin[i];
+      if (plotBlock.fTmax[i] > xMax)
+        xMax = plotBlock.fTmax[i];
+    }
+  }
+
+  if (plotBlock.fUseFitRanges) { // check if 'use_fit_ranges' information is present
+    PMsrRunList *runList = fMsrInfo->GetMsrRunList();
+    xMin = runList->at(0).GetFitRange(0);
+    xMax = runList->at(0).GetFitRange(1);
+    for (UInt_t i=1; i<runList->size(); i++) {
+      if (runList->at(i).GetFitRange(0) < xMin)
+        xMin = runList->at(i).GetFitRange(0);
+      if (runList->at(i).GetFitRange(1) > xMax)
+        xMax = runList->at(i).GetFitRange(1);
+    }
+  }
+
+  for (UInt_t i=1; i<plotList->size(); i++) { // go through all the plot blocks
     plotBlock = plotList->at(i);
-    for (UInt_t j=0; j<plotBlock.fRuns.size(); j++) {
-      if (fRunNo == plotBlock.fRuns[j]-1) { // run found
-        if (first) {
-          first = false;
-          xMin = plotBlock.fTmin[0];
-          xMax = plotBlock.fTmax[0];
-          xAbsMin = xMin;
-          xAbsMax = xMax;
-        } else {
-          if (fabs(xMax-xMin) > fabs(plotBlock.fTmax[0]-plotBlock.fTmin[0])) {
-            xMin = plotBlock.fTmin[0];
-            xMax = plotBlock.fTmax[0];
-          }
-          if (xMin < xAbsMin)
-            xAbsMin = xMin;
-          if (xMax > xAbsMax)
-            xAbsMax = xMax;
-        }
+
+    if (plotBlock.fTmin.size() == 0) { // check if no range information is present
+      PMsrRunList *runList = fMsrInfo->GetMsrRunList();
+      for (UInt_t i=0; i<runList->size(); i++) {
+        if (runList->at(i).GetFitRange(0) < xMin)
+          xMin = runList->at(i).GetFitRange(0);
+        if (runList->at(i).GetFitRange(1) > xMax)
+          xMax = runList->at(i).GetFitRange(1);
+      }
+    } else if (plotBlock.fTmin.size() == 1) { // check if 'range' information is present
+      if (plotBlock.fTmin[0] < xMin)
+        xMin = plotBlock.fTmin[0];
+      if (plotBlock.fTmax[0] > xMax)
+        xMax = plotBlock.fTmax[0];
+    } else if (plotBlock.fTmin.size() > 1) { // check if 'sub_ranges' information is present
+      for (UInt_t i=0; i<plotBlock.fTmin.size(); i++) {
+        if (plotBlock.fTmin[i] < xMin)
+          xMin = plotBlock.fTmin[i];
+        if (plotBlock.fTmax[i] > xMax)
+          xMax = plotBlock.fTmax[i];
+      }
+    }
+
+    if (plotBlock.fUseFitRanges) { // check if 'use_fit_ranges' information is present
+      PMsrRunList *runList = fMsrInfo->GetMsrRunList();
+      for (UInt_t i=0; i<runList->size(); i++) {
+        if (runList->at(i).GetFitRange(0) < xMin)
+          xMin = runList->at(i).GetFitRange(0);
+        if (runList->at(i).GetFitRange(1) > xMax)
+          xMax = runList->at(i).GetFitRange(1);
       }
     }
   }
@@ -329,7 +378,7 @@ Bool_t PRunNonMusr::PrepareViewData()
   else
     xStep = (xMax-xMin)/1000.0;
 
-  Double_t xx = xAbsMin;
+  Double_t xx = xMin;
   do {
     // fill x-vector
     fData.AppendXTheoryValue(xx);
@@ -337,7 +386,7 @@ Bool_t PRunNonMusr::PrepareViewData()
     fData.AppendTheoryValue(fTheory->Func(xx, par, fFuncValues));
     // calculate next xx
     xx += xStep;
-  } while (xx < xAbsMax);
+  } while (xx < xMax);
 
   // clean up
   par.clear();

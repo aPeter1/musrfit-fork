@@ -1190,7 +1190,7 @@ void PMsrRunBlock::SetAddT0(Int_t ival, UInt_t addRunIdx, UInt_t histoNoIdx)
 // GetFitRange
 //--------------------------------------------------------------------------
 /**
- * <p> get fit range value at position idx
+ * <p> get fit range value at position idx. idx: 0=fit range start, 1=fit range end.
  *
  * <b>return:</b>
  * - fit range value, if idx is within proper boundaries
