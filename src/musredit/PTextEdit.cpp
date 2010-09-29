@@ -114,6 +114,7 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
   setupHelpActions();
 
   fTabWidget = new QTabWidget( this );
+  fTabWidget->setMovable(true); // allows to shuffle around tabs
   setCentralWidget( fTabWidget );
 
   textFamily(fAdmin->getFontName());
