@@ -50,7 +50,9 @@ void TBofZCalc::Calculate()
   fZ.resize(fSteps);
   fBZ.resize(fSteps);
 
+#ifdef HAVE_GOMP
 #pragma omp parallel for default(shared) private(j,ZZ) schedule(dynamic)
+#endif
   for (j=0; j<fSteps; j++) {
     ZZ = fParam[1] + static_cast<double>(j)*fDZ;
     fZ[j] = ZZ;

@@ -130,8 +130,13 @@ TBulkTriVortexLondonFieldCalc::TBulkTriVortexLondonFieldCalc(const string& wisdo
 
 #ifdef HAVE_LIBFFTW3_THREADS
   int init_threads(fftw_init_threads());
-  if (init_threads)
+  if (init_threads) {
+#ifdef HAVE_GOMP
+    fftw_plan_with_nthreads(omp_get_num_procs());
+#else
     fftw_plan_with_nthreads(2);
+#endif /* HAVE_GOMP */
+  }
 #endif /* HAVE_LIBFFTW3_THREADS */
 
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
@@ -191,7 +196,9 @@ void TBulkTriVortexLondonFieldCalc::CalculateGrid() const {
   // ... but first check that the field is not larger than Hc2 and that we are dealing with a type II SC
   if ((field >= Hc2) || (lambda < xi/sqrt(2.0))) {
     int m;
+    #ifdef HAVE_GOMP
     #pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    #endif
     for (m = 0; m < NFFTsq; m++) {
       fFFTout[m] = field;
     }
@@ -274,7 +281,9 @@ void TBulkTriVortexLondonFieldCalc::CalculateGrid() const {
   fftw_execute(fFFTplan);
 
   // Multiply by the applied field
+  #ifdef HAVE_GOMP
   #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #endif
   for (l = 0; l < NFFTsq; l++) {
     fFFTout[l] *= field;
   }
@@ -298,8 +307,13 @@ TBulkSqVortexLondonFieldCalc::TBulkSqVortexLondonFieldCalc(const string& wisdom,
 
 #ifdef HAVE_LIBFFTW3_THREADS
   int init_threads(fftw_init_threads());
-  if (init_threads)
+  if (init_threads) {
+#ifdef HAVE_GOMP
+    fftw_plan_with_nthreads(omp_get_num_procs());
+#else
     fftw_plan_with_nthreads(2);
+#endif /* HAVE_GOMP */
+  }
 #endif /* HAVE_LIBFFTW3_THREADS */
 
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
@@ -359,7 +373,9 @@ void TBulkSqVortexLondonFieldCalc::CalculateGrid() const {
   // ... but first check that the field is not larger than Hc2 and that we are dealing with a type II SC
   if ((field >= Hc2) || (lambda < xi/sqrt(2.0))) {
     int m;
+    #ifdef HAVE_GOMP
     #pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    #endif
     for (m = 0; m < NFFTsq; m++) {
       fFFTout[m] = field;
     }
@@ -397,7 +413,9 @@ void TBulkSqVortexLondonFieldCalc::CalculateGrid() const {
   fftw_execute(fFFTplan);
 
   // Multiply by the applied field
+  #ifdef HAVE_GOMP
   #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #endif
   for (l = 0; l < NFFTsq; l++) {
     fFFTout[l] *= field;
   }
@@ -423,8 +441,13 @@ TBulkTriVortexMLFieldCalc::TBulkTriVortexMLFieldCalc(const string& wisdom, const
 
 #ifdef HAVE_LIBFFTW3_THREADS
   int init_threads(fftw_init_threads());
-  if (init_threads)
+  if (init_threads) {
+#ifdef HAVE_GOMP
+    fftw_plan_with_nthreads(omp_get_num_procs());
+#else
     fftw_plan_with_nthreads(2);
+#endif /* HAVE_GOMP */
+  }
 #endif /* HAVE_LIBFFTW3_THREADS */
 
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
@@ -481,7 +504,9 @@ void TBulkTriVortexMLFieldCalc::CalculateGrid() const {
   // ... but first check that the field is not larger than Hc2 and that we are dealing with a type II SC
   if ((field >= Hc2) || (lambda < xi/sqrt(2.0))) {
     int m;
+    #ifdef HAVE_GOMP
     #pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    #endif
     for (m = 0; m < NFFTsq; m++) {
       fFFTout[m] = field;
     }
@@ -568,7 +593,9 @@ void TBulkTriVortexMLFieldCalc::CalculateGrid() const {
   fftw_execute(fFFTplan);
 
   // Multiply by the applied field
+  #ifdef HAVE_GOMP
   #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #endif
   for (l = 0; l < NFFTsq; l++) {
     fFFTout[l] *= field;
   }
@@ -595,8 +622,13 @@ TBulkTriVortexAGLFieldCalc::TBulkTriVortexAGLFieldCalc(const string& wisdom, con
 
 #ifdef HAVE_LIBFFTW3_THREADS
   int init_threads(fftw_init_threads());
-  if (init_threads)
+  if (init_threads) {
+#ifdef HAVE_GOMP
+    fftw_plan_with_nthreads(omp_get_num_procs());
+#else
     fftw_plan_with_nthreads(2);
+#endif /* HAVE_GOMP */
+  }
 #endif /* HAVE_LIBFFTW3_THREADS */
 
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
@@ -653,7 +685,9 @@ void TBulkTriVortexAGLFieldCalc::CalculateGrid() const {
   // ... but first check that the field is not larger than Hc2 and that we are dealing with a type II SC
   if ((field >= Hc2) || (lambda < xi/sqrt(2.0))) {
     int m;
+    #ifdef HAVE_GOMP
     #pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    #endif
     for (m = 0; m < NFFTsq; m++) {
       fFFTout[m] = field;
     }
@@ -747,7 +781,9 @@ void TBulkTriVortexAGLFieldCalc::CalculateGrid() const {
   fftw_execute(fFFTplan);
 
   // Multiply by the applied field
+  #ifdef HAVE_GOMP
   #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #endif
   for (l = 0; l < NFFTsq; l++) {
     fFFTout[l] *= field;
   }
@@ -787,8 +823,13 @@ TBulkTriVortexNGLFieldCalc::TBulkTriVortexNGLFieldCalc(const string& wisdom, con
 
 #ifdef HAVE_LIBFFTW3_THREADS
   int init_threads(fftw_init_threads());
-  if (init_threads)
+  if (init_threads) {
+#ifdef HAVE_GOMP
+    fftw_plan_with_nthreads(omp_get_num_procs());
+#else
     fftw_plan_with_nthreads(2);
+#endif /* HAVE_GOMP */
+  }
 #endif /* HAVE_LIBFFTW3_THREADS */
 
   const unsigned int stepsSq(fSteps*fSteps);
@@ -876,7 +917,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGradient() const {
   // Take the derivative of the Fourier sum of omega
 
   // First save a copy of the real aK-matrix in the imaginary part of the bK-matrix
+  #ifdef HAVE_GOMP
   #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #endif
   for (l = 0; l < NFFTsq; ++l) {
     fBkMatrix[l][1] = fFFTin[l][0];
   }
@@ -912,7 +955,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGradient() const {
   fftw_execute(fFFTplan);
 
   // Copy the results to the gradient matrix and restore the original aK-matrix
+  #ifdef HAVE_GOMP
   #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #endif
   for (l = 0; l < NFFTsq; ++l) {
     fOmegaDiffMatrix[l][0] = fRealSpaceMatrix[l][1];
     fFFTin[l][0] = fBkMatrix[l][1];
@@ -960,7 +1005,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGradient() const {
   fftw_execute(fFFTplan);
 
   // Copy the results to the gradient matrix and restore the original aK-matrix
+  #ifdef HAVE_GOMP
   #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #endif
   for (l = 0; l < NFFTsq; ++l) {
     fOmegaDiffMatrix[l][1] = fRealSpaceMatrix[l][1];
     fFFTin[l][0] = fBkMatrix[l][1];
@@ -1503,7 +1550,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
   // first check that the field is not larger than Hc2 and that we are dealing with a type II SC ...
   if ((field >= Hc2) || (lambda < xi/sqrt(2.0))) {
     int m;
+    #ifdef HAVE_GOMP
     #pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    #endif
     for (m = 0; m < NFFTsq; m++) {
       fFFTout[m] = field;
     }
@@ -1518,7 +1567,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
   FillAbrikosovCoefficients();
 
+  #ifdef HAVE_GOMP
   #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #endif
   for (l = 0; l < NFFT; l++) {
     fCheckAkConvergence[l] = fFFTin[l][0];
   }
@@ -1531,7 +1582,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
   fftw_execute(fFFTplan);
 
+  #ifdef HAVE_GOMP
   #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #endif
   for (l = 0; l < NFFTsq; l++) {
     fOmegaMatrix[l] = fSumAk - fRealSpaceMatrix[l][0];
   }
@@ -1544,7 +1597,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
   double denomQA;
 
+  #ifdef HAVE_GOMP
   #pragma omp parallel for default(shared) private(l,denomQA) schedule(dynamic)
+  #endif
   for (l = 0; l < NFFTsq; l++) {
     if (!fOmegaMatrix[l] || !l || (l == (NFFT+1)*NFFT_2)) {
       fQMatrixA[l][0] = 0.0;
@@ -1569,7 +1624,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 */
   // initialize B(x,y) with the mean field
 
+  #ifdef HAVE_GOMP
   #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #endif
   for (l = 0; l < NFFTsq; l++) {
     fFFTout[l] = scaledB;
   }
@@ -1581,8 +1638,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
   while (!akConverged || !bkConverged) {
 
     // First iteration step for aK
-
+    #ifdef HAVE_GOMP
     #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+    #endif
     for (l = 0; l < NFFTsq; l++) {
       if (fOmegaMatrix[l]) {
         fRealSpaceMatrix[l][0] = fOmegaMatrix[l]*(fOmegaMatrix[l] + fQMatrix[l][0]*fQMatrix[l][0] + fQMatrix[l][1]*fQMatrix[l][1] - 2.0) + \
@@ -1610,7 +1668,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
     // Need a copy of the aK-matrix since FFTW is manipulating the input in c2r and r2c transforms
     // Store it in the first half of the bK-matrix
+    #ifdef HAVE_GOMP
     #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+    #endif
     for (l = 0; l < NFFTsq_2; l++) {
       fBkMatrix[l][0] = fFFTin[l][0];
     }
@@ -1619,7 +1679,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
     fftw_execute(fFFTplan);
 
+    #ifdef HAVE_GOMP
     #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+    #endif
     for (l = 0; l < NFFTsq; l++) {
       fOmegaMatrix[l] = fSumAk - fRealSpaceMatrix[l][0];
     }
@@ -1645,7 +1707,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
     }
 
     // Restore the aK-matrix from the bK-space and multiply with the spacial averages
+    #ifdef HAVE_GOMP
     #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+    #endif
     for (l = 0; l < NFFTsq_2; l++) {
       fFFTin[l][0] = fBkMatrix[l][0]*fSumSum/fSumOmegaSq;
       fFFTin[l][1] = 0.0;
@@ -1668,7 +1732,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
     }
 
     if (!akConverged) {
+    #ifdef HAVE_GOMP
     #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+    #endif
       for (l = 0; l < NFFT; l++) {
         fCheckAkConvergence[l] = fFFTin[l][0];
       }
@@ -1689,7 +1755,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
     fftw_execute(fFFTplan);
 
+    #ifdef HAVE_GOMP
     #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+    #endif
     for (l = 0; l < NFFTsq; l++) {
       fOmegaMatrix[l] = fSumAk - fRealSpaceMatrix[l][0];
     }
@@ -1698,7 +1766,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
     if (akInitiallyConverged) {  // if the aK iterations converged, go on with the bK calculation
       //cout << "converged, count=" << count << endl;
+      #ifdef HAVE_GOMP
       #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+      #endif
       for (l = 0; l < NFFTsq; l++) {
         fBkMatrix[l][0] = fOmegaMatrix[l]*fFFTout[l] + fSumAk*(scaledB - fFFTout[l]) + \
         fQMatrix[l][1]*fOmegaDiffMatrix[l][0] - fQMatrix[l][0]*fOmegaDiffMatrix[l][1];
@@ -1717,7 +1787,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
       // Check the convergence of the bK-iterations
 
       if (firstBkCalculation) {
+        #ifdef HAVE_GOMP
         #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+        #endif
         for (l = 0; l < NFFT; l++) {
           fCheckBkConvergence[l] = 0.0;
         }
@@ -1741,7 +1813,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
       // cout << "Bk Convergence: " << bkConverged << endl;
 
       if (!bkConverged) {
+        #ifdef HAVE_GOMP
         #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+        #endif
         for (l = 0; l < NFFT; l++) {
           fCheckBkConvergence[l] = fBkMatrix[l][0];
         }
@@ -1751,7 +1825,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
       // In order to save memory I will not allocate more space for another matrix but save a copy of the bKs in the aK-Matrix
       // Since aK is only half the size of bK, store every second entry in the imaginary part of aK
+      #ifdef HAVE_GOMP
       #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+      #endif
       for (l = 0; l < NFFTsq; l+=2) {
         fFFTin[l/2][0] = fBkMatrix[l][0];
         fFFTin[l/2][1] = fBkMatrix[l+1][0];
@@ -1761,7 +1837,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
       fftw_execute(fFFTplanBkToBandQ);
 
+      #ifdef HAVE_GOMP
       #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+      #endif
       for (l = 0; l < NFFTsq; l++) {
         fFFTout[l] = scaledB + fBkMatrix[l][0];
       }
@@ -1770,7 +1848,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
         break;
 
       // Restore bKs for Qx calculation and Fourier transform to get Qx
+      #ifdef HAVE_GOMP
       #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+      #endif
       for (l = 0; l < NFFTsq; l+=2) {
         fBkMatrix[l][0] = fFFTin[l/2][0];
         fBkMatrix[l+1][0] = fFFTin[l/2][1];
@@ -1782,13 +1862,18 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
       fftw_execute(fFFTplanBkToBandQ);
 
+      #ifdef HAVE_GOMP
       #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+      #endif
       for (l = 0; l < NFFTsq; l++) {
         fQMatrix[l][0] = fQMatrixA[l][0] - fBkMatrix[l][1];
       }
 
       // Restore bKs for Qy calculation and Fourier transform to get Qy
+
+      #ifdef HAVE_GOMP
       #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+      #endif
       for (l = 0; l < NFFTsq; l+=2) {
         fBkMatrix[l][0] = fFFTin[l/2][0];
         fBkMatrix[l+1][0] = fFFTin[l/2][1];
@@ -1800,7 +1885,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
       fftw_execute(fFFTplanBkToBandQ);
 
+      #ifdef HAVE_GOMP
       #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+      #endif
       for (l = 0; l < NFFTsq; l++) {
         fQMatrix[l][1] = fQMatrixA[l][1] + fBkMatrix[l][1];
       }
@@ -1809,7 +1896,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
   // If the iterations have converged, rescale the field from Brandt's units to Gauss
 
+  #ifdef HAVE_GOMP
   #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #endif
   for (l = 0; l < NFFTsq; l++) {
     fFFTout[l] *= Hc2_kappa;
   }

@@ -43,6 +43,7 @@
 #include <cstdlib>
 
 #include <omp.h>
+#include <boost/thread.hpp>
 
 #include <TString.h>
 #include <TObjArray.h>
@@ -65,12 +66,18 @@
 
 TPofTCalc::TPofTCalc (const TPofBCalc *PofB, const string &wisdom, const vector<double> &par) : fWisdom(wisdom) {
 
+
 #ifdef HAVE_LIBFFTW3_THREADS
   int init_threads(fftw_init_threads());
   if (!init_threads)
     cout << "TPofTCalc::TPofTCalc: Couldn't initialize multiple FFTW-threads ..." << endl;
-  else
+  else {
+#ifdef HAVE_GOMP
+    fftw_plan_with_nthreads(omp_get_num_procs());
+#else
     fftw_plan_with_nthreads(2);
+#endif /* HAVE_GOMP */
+  }
 #endif /* HAVE_LIBFFTW3_THREADS */
 
   fNFFT = static_cast<int>(1.0/(gBar*par[1]*par[2]));
@@ -91,7 +98,9 @@ TPofTCalc::TPofTCalc (const TPofBCalc *PofB, const string &wisdom, const vector<
 
   int i;
 
+#ifdef HAVE_GOMP
 #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+#endif
   for (i = 0; i < NFFT_2p1; i++) {
     fT[i] = static_cast<double>(i)*fTBin;
   }
@@ -177,7 +186,9 @@ void TPofTCalc::CalcPol(const vector<double> &par) {
   double sinph(sin(par[0]*PI/180.0)), cosph(cos(par[0]*PI/180.0));
   int i;
 
+#ifdef HAVE_GOMP
 #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+#endif
   for (i=0; i<fNFFT/2+1; i++){
     fPT[i] = (cosph*fFFTout[i][0] + sinph*fFFTout[i][1])*par[2];
   }
@@ -248,7 +259,9 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
     // calculate asymmetry
     CalcPol(param);
 
+#ifdef HAVE_GOMP
 #pragma omp parallel for default(shared) private(j,ttime,k) schedule(dynamic)
+#endif
     for(j=0; j<nChannels; j++) {
       ttime=j*par[2];
       k = static_cast<int>(floor(ttime/fTBin));
@@ -274,7 +287,9 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
 
   for (unsigned int i(0); i<numHist; i++) {    // loop over all histos
 
+#ifdef HAVE_GOMP
 #pragma omp parallel for default(shared) private(j) schedule(dynamic)
+#endif
     for (j = 0; j<nChannels; j++) { // loop over time
       if (j < t0[i]) // j<t0
         data[j] = bg[i]; // background
@@ -308,7 +323,9 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
     name  += i;
     fakeHisto = new TH1F(name.Data(), name.Data(), int(par[3]), -par[2]/2.0, (par[3]+0.5)*par[2]);
     // fill theoHisto
+#ifdef HAVE_GOMP
 #pragma omp parallel for default(shared) private(j) schedule(dynamic)
+#endif
     for (j = 0; j<nChannels; j++)
       theoHisto->SetBinContent(j, histo[i][j]);
 // end omp

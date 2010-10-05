@@ -209,18 +209,6 @@ if test "${FFTW3_FOUND}" != "1"; then
   FFTW3_LIBS="-L${FFTW3_PREFIX}/lib -lfftw3 -lm"
   FFTW3_CFLAGS="-I${FFTW3_PREFIX}/include"
 fi
-# Check for fftw3_threads-library. If available musrfit is also linked against it (used in libTFitPofB).
-SAVED_CFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS $FFTW3_CFLAGS"
-SAVED_LIBSS="$LIBS"
-LIBS="$LIBS $FFTW3_LIBS"
-AC_SEARCH_LIBS([fftw_init_threads], [fftw3_threads], [FFTW3_LIBS="$FFTW3_LIBS -lfftw3_threads -lpthread"
-                                                      AC_DEFINE([HAVE_LIBFFTW3_THREADS], [1], [Define to 1 if fftw3_threads are available])], [], [-lpthread])
-CFLAGS="$SAVED_CFLAGS"
-LIBS="$SAVED_LIBS"
-AC_SUBST(FFTW3_LIBS)
-AC_SUBST(FFTW3_CFLAGS)
-
 
 dnl -----------------------------------------------
 dnl Ask user for path to gsl
@@ -487,7 +475,28 @@ if test "${BUILD_BMW_LIBS}" = "1"; then
   TFITPOFB_CFLAGS="-I${TFITPOFB_SRCDIR}/include"
   AC_SUBST(TFITPOFB_LIBS)
   AC_SUBST(TFITPOFB_CFLAGS)
+
+  # Check for fftw3_threads-library. If available musrfit is also linked against it (used in libTFitPofB).
+  SAVED_CFLAGS="$CFLAGS"
+  CFLAGS="$CFLAGS $FFTW3_CFLAGS"
+  SAVED_LIBSS="$LIBS"
+  LIBS="$LIBS $FFTW3_LIBS"
+  AC_SEARCH_LIBS([fftw_init_threads], [fftw3_threads], [FFTW3_LIBS="$FFTW3_LIBS -lfftw3_threads -lpthread"
+                                      AC_DEFINE([HAVE_LIBFFTW3_THREADS], [1], [Define to 1 if fftw3_threads are available])], [], [-lpthread])
+  CFLAGS="$SAVED_CFLAGS"
+  LIBS="$SAVED_LIBS"
+
+  # Check for gomp-library. If available musrfit is also linked against it (used in libTFitPofB).
+  SAVED_CXXFLAGS="$CXXFLAGS"
+  CXXFLAGS="$CXXFLAGS -fopenmp"
+  SAVED_LIBSS="$LIBS"
+  LIBS="$LIBS -fopenmp"
+  AC_SEARCH_LIBS([omp_get_num_procs], [gomp], [AC_DEFINE([HAVE_GOMP], [1], [Define to 1 if gomp is available])],
+                                      [CXXFLAGS="$SAVED_CXXFLAGS" LIBS="$SAVED_LIBS"], [])
 fi
+AC_SUBST(FFTW3_LIBS)
+AC_SUBST(FFTW3_CFLAGS)
+
 
 dnl -----------------------------------------------
 dnl Set host specific compiler and linker flags

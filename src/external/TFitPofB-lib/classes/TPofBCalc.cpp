@@ -108,7 +108,9 @@ TPofBCalc::TPofBCalc(const vector<double>& b, const vector<double>& pb, double d
 
 void TPofBCalc::UnsetPBExists() {
   int i;
+#ifdef HAVE_GOMP
 #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+#endif
   for (i = 0; i < static_cast<int>(fPBSize); i++) {
     fPB[i] = 0.0;
   }
@@ -478,7 +480,9 @@ void TPofBCalc::Calculate(const TBulkVortexFieldCalc *vortexLattice, const vecto
     sum += fPB[i];
   sum *= fDB;
   int i;
+#ifdef HAVE_GOMP
 #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+#endif
   for (i = 0; i < static_cast<int>(fPBSize); ++i)
     fPB[i] /= sum;
 // end pragma omp parallel
