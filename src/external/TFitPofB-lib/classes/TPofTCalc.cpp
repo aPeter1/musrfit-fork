@@ -35,6 +35,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "TPofTCalc.h"
 #include "fftw3.h"
 #include <cmath>
@@ -43,7 +47,6 @@
 #include <cstdlib>
 
 #include <omp.h>
-#include <boost/thread.hpp>
 
 #include <TString.h>
 #include <TObjArray.h>
