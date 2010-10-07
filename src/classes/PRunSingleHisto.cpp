@@ -797,7 +797,7 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
     if (fabs(theoryValue) > 10.0) {  // dirty hack needs to be fixed!!
       theoryValue = 0.0;
     }
-    fData.AppendTheoryValue(N0*TMath::Exp(-time/tau)*(1+theoryValue)+bkg);
+    fData.AppendTheoryValue(N0*TMath::Exp(-time/tau)*(1.0+theoryValue)+bkg);
   }
 
   // clean up

@@ -47,6 +47,9 @@ FIXED warning messages
 FIXED db data tag reading error
 FIXED usage of BOOST >= 1.38.0
 FIXED the extraction of the time resolution for the mud data format, since MUD_getHistFsPerBin seems sometimes to return just crap.
+CHANGED another attempt to get proper zooming/unzooming. This time I tried to disentangle the rather messy PMusrCanvas class.
+        Most of the checks seems to work, though still for non-muSR style, musrview is crashing once in a while which seems to 
+	come from root rather than musrview. I will try to investigate that on root macro level. 
 CHANGED in root-5.27.04 the zooming/unzooming handling was modified which forced me to add some more code for 
         proper zooming/unzooming via 'u' key
 CHANGED write the ROOT histogram of the correlation matrix to the output file as well as not only the graph

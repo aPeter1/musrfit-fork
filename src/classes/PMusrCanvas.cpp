@@ -116,8 +116,9 @@ ClassImpQ(PMusrCanvas)
 PMusrCanvas::PMusrCanvas()
 {
   fValid = false;
-  fDifferenceView  = false;
-  fCurrentPlotView = PV_DATA;
+  fDifferenceView   = false;
+  fCurrentPlotView  = PV_DATA;
+  fPreviousPlotView = PV_DATA;
   fPlotType = -1;
   fPlotNumber = -1;
 
@@ -149,6 +150,8 @@ PMusrCanvas::PMusrCanvas()
   fRRFText = 0;
   fRRFLatexText = 0;
 
+  fXRangePresent = false;
+  fYRangePresent = false;
   fXmin = 0.0;
   fXmax = 0.0;
   fYmin = 0.0;
@@ -190,6 +193,8 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
   fRRFText = 0;
   fRRFLatexText = 0;
 
+  fXRangePresent = false;
+  fYRangePresent = false;
   fXmin = 0.0;
   fXmax = 0.0;
   fYmin = 0.0;
@@ -237,6 +242,8 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
   fRRFText = 0;
   fRRFLatexText = 0;
 
+  fXRangePresent = false;
+  fYRangePresent = false;
   fXmin = 0.0;
   fXmax = 0.0;
   fYmin = 0.0;
@@ -283,6 +290,15 @@ PMusrCanvas::~PMusrCanvas()
       CleanupDataSet(fNonMusrData[i]);
     fNonMusrData.clear();
   }
+  if (fCurrentFourierPhaseText) {
+    delete fCurrentFourierPhaseText;
+    fCurrentFourierPhaseText = 0;
+  }
+  if (fMultiGraphLegend) {
+    fMultiGraphLegend->Clear();
+    delete fMultiGraphLegend;
+    fMultiGraphLegend = 0;
+  }
   if (fMultiGraphData) {
     delete fMultiGraphData;
     fMultiGraphData = 0;
@@ -290,10 +306,6 @@ PMusrCanvas::~PMusrCanvas()
   if (fMultiGraphDiff) {
     delete fMultiGraphDiff;
     fMultiGraphDiff = 0;
-  }
-  if (fCurrentFourierPhaseText) {
-    delete fCurrentFourierPhaseText;
-    fCurrentFourierPhaseText = 0;
   }
   if (fDataTheoryPad) {
     delete fDataTheoryPad;
@@ -313,11 +325,6 @@ PMusrCanvas::~PMusrCanvas()
     fInfoPad->Clear();
     delete fInfoPad;
     fInfoPad = 0;
-  }
-  if (fMultiGraphLegend) {
-    fMultiGraphLegend->Clear();
-    delete fMultiGraphLegend;
-    fMultiGraphLegend = 0;
   }
   if (fMainCanvas) {
     delete fMainCanvas;
@@ -780,7 +787,7 @@ void PMusrCanvas::Done(Int_t status)
  * - 'q' quit musrview
  * - 'd' toggle between difference view and data view
  * - 'u' unzoom to the original plot range given in the msr-file.
- * - 'f' Fourier transform data.
+ * - 'f' Fourier transform data. Twice 'f' will switch back to the time domain view.
  * - '+' increment the phase (real/imaginary Fourier). The phase step is defined in the musrfit_startup.xml
  * - '-' decrement the phase (real/imaginary Fourier). The phase step is defined in the musrfit_startup.xml
  *
@@ -836,14 +843,17 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
     if ((fCurrentPlotView == PV_DATA) && !fDifferenceView) {
       CleanupDifference();
       CleanupFourier();
-      PlotData();
+      PlotData(true);
     } else if ((fCurrentPlotView == PV_DATA) && fDifferenceView) {
       CleanupFourierDifference();
-      HandleDifference(true);
+      HandleDifference();
+      PlotDifference(true);
     } else if ((fCurrentPlotView != PV_DATA) && !fDifferenceView) {
       HandleFourier();
+      PlotFourier(true);
     } else if ((fCurrentPlotView != PV_DATA) && fDifferenceView) {
       HandleDifferenceFourier();
+      PlotFourierDifference(true);
     }
   } else if (x == 'f') { // Fourier
     // check which relevantKeySwitch is needed
@@ -855,6 +865,9 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
       relevantKeySwitch = kDiffData;
     else if ((fCurrentPlotView != PV_DATA) && !fDifferenceView)
       relevantKeySwitch = kData;
+
+    // keep previous plot view
+    fPreviousPlotView = fCurrentPlotView;
 
     if (fCurrentPlotView == PV_DATA) { // current view is data view
       // uncheck data popup entry
@@ -891,8 +904,6 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
       fPopupFourier->UnCheckEntries();
       // check the data entry
       fPopupMain->CheckEntry(P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
-      // set the current view to data
-      fCurrentPlotView = PV_DATA;
     }
   } else if (x == '+') {
     if (fCurrentPlotView != PV_DATA)
@@ -916,16 +927,20 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
     case kDiffData: // show difference between data and theory
       CleanupFourierDifference();
       HandleDifference();
+      PlotDifference();
       break;
     case kFourier: // show Fourier transfrom of the data
       HandleFourier();
+      PlotFourier();
       break;
     case kDiffFourier: // show Fourier transform of the difference data
       HandleDifferenceFourier();
+      PlotFourierDifference();
       break;
     case kFourierDiff: // show difference between the Fourier data and the Fourier theory
       CleanupFourierDifference();
       HandleFourierDifference();
+      PlotFourierDifference();
       break;
     default:
       break;
@@ -970,6 +985,7 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
       PlotData();
     } else {
       HandleDifference();
+      PlotDifference();
     }
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL) {
     // set appropriate plot view
@@ -985,11 +1001,13 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
     // handle fourier real
     if (!fDifferenceView) {
       HandleFourier();
+      PlotFourier();
     } else {
       if (previousPlotView == PV_DATA)
         HandleDifferenceFourier();
       else
         HandleFourierDifference();
+      PlotFourierDifference();
     }
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG) {
     // set appropriate plot view
@@ -1005,11 +1023,13 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
     // handle fourier imag
     if (!fDifferenceView) {
       HandleFourier();
+      PlotFourier();
     } else {
       if (previousPlotView == PV_DATA)
         HandleDifferenceFourier();
       else
         HandleFourierDifference();
+      PlotFourierDifference();
     }
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG) {
     // set appropriate plot view
@@ -1025,11 +1045,13 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
     // handle fourier real and imag
     if (!fDifferenceView) {
       HandleFourier();
+      PlotFourier();
     } else {
       if (previousPlotView == PV_DATA)
         HandleDifferenceFourier();
       else
         HandleFourierDifference();
+      PlotFourierDifference();
     }
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR) {
     // set appropriate plot view
@@ -1045,11 +1067,13 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
     // handle fourier power
     if (!fDifferenceView) {
       HandleFourier();
+      PlotFourier();
     } else {
       if (previousPlotView == PV_DATA)
         HandleDifferenceFourier();
       else
         HandleFourierDifference();
+      PlotFourierDifference();
     }
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE) {
     // set appropriate plot view
@@ -1065,11 +1089,13 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
     // handle fourier phase
     if (!fDifferenceView) {
       HandleFourier();
+      PlotFourier();
     } else {
       if (previousPlotView == PV_DATA)
         HandleDifferenceFourier();
       else
         HandleFourierDifference();
+      PlotFourierDifference();
     }
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS) {
     IncrementFourierPhase();
@@ -1090,6 +1116,7 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
         case PV_DATA:
           CleanupFourierDifference();
           HandleDifference();
+          PlotDifference();
           break;
         case PV_FOURIER_REAL:
         case PV_FOURIER_IMAG:
@@ -1099,9 +1126,11 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
           if (fPopupMain->IsEntryChecked(P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber)) {
             CleanupFourierDifference();
             HandleDifferenceFourier();
+            PlotFourierDifference();
           } else {
             CleanupFourierDifference();
             HandleFourierDifference();
+            PlotFourierDifference();
           }
           break;
         default:
@@ -1120,6 +1149,7 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
         case PV_FOURIER_PWR:
         case PV_FOURIER_PHASE:
           HandleFourier();
+          PlotFourier();
           break;
         default:
           break;
@@ -1256,8 +1286,9 @@ void PMusrCanvas::InitFourier()
 void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh)
 {
   fValid = false;
-  fDifferenceView  = false;
-  fCurrentPlotView = PV_DATA;
+  fDifferenceView   = false;
+  fCurrentPlotView  = PV_DATA;
+  fPreviousPlotView = PV_DATA;
   fPlotType = -1;
 
   fImp   = 0;
@@ -1634,23 +1665,47 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
   // make sure that for asymmetry the y-range is initialized reasonably
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_ASYM)
     dataSet.dataRange->SetYRange(-0.4, 0.4);
-  fPlotRangeTag = PR_NONE; // keep the proper plot range tag
+  // extract necessary range information
+  if ((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() == 0) &&
+      !fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) { // no range information at all
+    if (fXRangePresent) {
+      if (fXmin > start)
+        fXmin = start;
+      if (fXmax < end)
+        fXmax = end;
+    } else {
+      fXRangePresent = true;
+      fXmin = start;
+      fXmax = end;
+    }
+    if ((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_ASYM) ||
+        (fMsrHandler->GetMsrRunList()->at(runNo).IsLifetimeCorrected())) {
+      fYRangePresent = true;
+      fYmin = -0.4;
+      fYmax = 0.4;
+    }
+  }
 
   // check if plot range is given in the msr-file, and if yes keep the values
-  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() != 0) {
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() == 1) {
     // keep x-range
     xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[0];
     xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[0];
     dataSet.dataRange->SetXRange(xmin, xmax);
+    // keep range information
+    fXRangePresent = true;
+    fXmin = xmin;
+    fXmax = xmax;
     // check if y-range is given as well
     if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin.size() != 0) {
       ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin[0];
       ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax[0];
       dataSet.dataRange->SetYRange(ymin, ymax);
+      // keep range information
+      fYRangePresent = true;
+      fYmin = ymin;
+      fYmax = ymax;
     }
-
-    // keep the proper plot range tag
-    fPlotRangeTag = PR_RANGE;
   }
 
   // check if 'use_fit_range' plotting is whished
@@ -1665,11 +1720,27 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     dataSet.dataRange->SetXRange(start, end);
 
     // make sure that for asymmetry the y-range is initialized reasonably
-    if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_ASYM)
+    if ((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_ASYM) ||
+        (fMsrHandler->GetMsrRunList()->at(runNo).IsLifetimeCorrected())) {
       dataSet.dataRange->SetYRange(-0.4, 0.4);
+    }
 
-    // keep the proper plot range tag
-    fPlotRangeTag = PR_FIT_RANGE;
+    // keep range information
+    if (fXRangePresent) {
+      if (fXmin > start)
+        fXmin = start;
+      if (fXmax < end)
+        fXmax = end;
+    } else {
+      fXRangePresent = true;
+      fXmin = start;
+      fXmax = end;
+    }
+    if (!fYRangePresent) {
+      fYRangePresent = true;
+      fYmin = -0.4;
+      fYmax = 0.4;
+    }
   }
 
   // check if 'sub_ranges' plotting is whished
@@ -1682,16 +1753,28 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
             data->GetDataTimeStep()/2.0; // closesd start value compatible with the user given
     end   = start + size * data->GetDataTimeStep(); // closesd end value compatible with the user given
     dataSet.dataRange->SetXRange(start, end);
+    // keep range information
+    if (fXRangePresent) {
+      if (fXmin > start)
+        fXmin = start;
+      if (fXmax < end)
+        fXmax = end;
+    } else {
+      fXRangePresent = true;
+      fXmin = start;
+      fXmax = end;
+    }
 
     // check if y-range is given as well
     if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin.size() != 0) {
       ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin[0];
       ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax[0];
       dataSet.dataRange->SetYRange(ymin, ymax);
+      // keep range information
+      fYRangePresent = true;
+      fYmin = ymin;
+      fYmax = ymax;
     }
-
-    // keep the proper plot range tag
-    fPlotRangeTag = PR_SUB_RANGE;
   }
 
   // invoke histo
@@ -1889,40 +1972,39 @@ void PMusrCanvas::HandleNonMusrDataSet(UInt_t plotNo, UInt_t runNo, PRunData *da
   // check the plot range options
   Double_t xmin=0.0, xmax=0.0, ymin=0.0, ymax=0.0, x=0.0, y=0.0;
 
-  // initialize the plot range to the maximal possible given the data. This is needed if there is no plot-range style entry present
-  dataSet.data->GetPoint(0, xmin, y); // get xmin
-  dataSet.data->GetPoint(dataSet.data->GetN()-1, xmax, y); // get xmax
-  dataSet.data->GetPoint(0, x, y); // init ymin/ymax
-  ymin = y;
-  ymax = y;
-  for (Int_t i=1; i<dataSet.data->GetN(); i++) {
-    dataSet.data->GetPoint(i, x, y);
-    if (y < ymin)
-      ymin = y;
-    if (y > ymax)
-      ymax = y;
+  // if no plot-range entry is present, initialize the plot range to the maximal possible given the data
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() == 0) {
+    dataSet.data->GetPoint(0, xmin, y); // get xmin
+    dataSet.data->GetPoint(dataSet.data->GetN()-1, xmax, y); // get xmax
+    dataSet.data->GetPoint(0, x, y); // init ymin/ymax
+    ymin = y;
+    ymax = y;
+    for (Int_t i=1; i<dataSet.data->GetN(); i++) {
+      dataSet.data->GetPoint(i, x, y);
+      if (y < ymin)
+        ymin = y;
+      if (y > ymax)
+        ymax = y;
+    }
+    Double_t dx = 0.025*(xmax-xmin);
+    Double_t dy = 0.025*(ymax-ymin);
+    dataSet.dataRange->SetXRange(xmin-dx, xmax+dx);
+    dataSet.dataRange->SetYRange(ymin-dy, ymax+dy);
   }
-  Double_t dx = 0.025*(xmax-xmin);
-  Double_t dy = 0.025*(ymax-ymin);
-  dataSet.dataRange->SetXRange(xmin-dx, xmax+dx);
-  dataSet.dataRange->SetYRange(ymin-dy, ymax+dy);
-  fPlotRangeTag = PR_NONE;
 
   // check if plot range is given in the msr-file, and if yes keep the values
-  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() != 0) {
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() == 1) {
     // keep x-range
     xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[0];
     xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[0];
     dataSet.dataRange->SetXRange(xmin, xmax);
+
     // check if y-range is given as well
     if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin.size() != 0) {
       ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin[0];
       ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax[0];
       dataSet.dataRange->SetYRange(ymin, ymax);
     }
-
-    // keep the proper plot range tag
-    fPlotRangeTag = PR_RANGE;
   }
 
   // check if 'use_fit_range' plotting is whished
@@ -1930,9 +2012,6 @@ void PMusrCanvas::HandleNonMusrDataSet(UInt_t plotNo, UInt_t runNo, PRunData *da
     xmin = fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(0); // needed to estimate size
     xmax = fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(1); // needed to estimate size
     dataSet.dataRange->SetXRange(xmin, xmax);
-
-    // keep the proper plot range tag
-    fPlotRangeTag = PR_FIT_RANGE;
   }
 
   // check if 'sub_ranges' plotting is whished
@@ -1947,26 +2026,25 @@ void PMusrCanvas::HandleNonMusrDataSet(UInt_t plotNo, UInt_t runNo, PRunData *da
       ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax[0];
       dataSet.dataRange->SetYRange(ymin, ymax);
     }
-
-    // keep the proper plot range tag
-    fPlotRangeTag = PR_SUB_RANGE;
   }
 
   // keep maximal range of all plot present
+  fXRangePresent = true;
+  fYRangePresent = true;
   if (plotNo == 0) {
-    fXmin = dataSet.dataRange->GetXMin();
-    fXmax = dataSet.dataRange->GetXMax();
-    fYmin = dataSet.dataRange->GetYMin();
-    fYmax = dataSet.dataRange->GetYMax();
+    fXmin = dataSet.dataRange->GetXmin();
+    fXmax = dataSet.dataRange->GetXmax();
+    fYmin = dataSet.dataRange->GetYmin();
+    fYmax = dataSet.dataRange->GetYmax();
   } else {
-    if (fXmin > dataSet.dataRange->GetXMin())
-      fXmin = dataSet.dataRange->GetXMin();
-    if (fXmax < dataSet.dataRange->GetXMax())
-      fXmax = dataSet.dataRange->GetXMax();
-    if (fYmin > dataSet.dataRange->GetYMin())
-      fYmin = dataSet.dataRange->GetYMin();
-    if (fYmax < dataSet.dataRange->GetYMax())
-      fYmax = dataSet.dataRange->GetYMax();
+    if (fXmin > dataSet.dataRange->GetXmin())
+      fXmin = dataSet.dataRange->GetXmin();
+    if (fXmax < dataSet.dataRange->GetXmax())
+      fXmax = dataSet.dataRange->GetXmax();
+    if (fYmin > dataSet.dataRange->GetYmin())
+      fYmin = dataSet.dataRange->GetYmin();
+    if (fYmax < dataSet.dataRange->GetYmax())
+      fYmax = dataSet.dataRange->GetYmax();
   }
 
   fNonMusrData.push_back(dataSet);
@@ -1979,10 +2057,8 @@ void PMusrCanvas::HandleNonMusrDataSet(UInt_t plotNo, UInt_t runNo, PRunData *da
  * <p>Handles the calculation of the difference spectra (i.e. data-theory).
  * It allocates the necessary objects if they are not already present. At the
  * end it calls the plotting routine.
- *
- * \param unzoom if set to true, change ranges to the original msr-file values
  */
-void PMusrCanvas::HandleDifference(Bool_t unzoom)
+void PMusrCanvas::HandleDifference()
 {
   // check if it is necessary to calculate diff data
   if ((fPlotType != MSR_PLOT_NON_MUSR) && (fData[0].diff == 0)) {
@@ -2025,7 +2101,7 @@ void PMusrCanvas::HandleDifference(Bool_t unzoom)
     // loop over all histos
     for (UInt_t i=0; i<fNonMusrData.size(); i++) {
       // make sure data exists
-      assert(fNonMusrData[i].data);
+      assert(fNonMusrData[i].data != 0);
 
       // create difference histos
       diffHisto = new TGraphErrors(fNonMusrData[i].data->GetN());
@@ -2058,42 +2134,6 @@ void PMusrCanvas::HandleDifference(Bool_t unzoom)
       }
     }
   }
-
-  // set x-axis plot range properly
-  Int_t xminBin, xmaxBin;
-  Double_t xmin, xmax;
-  if (fPlotType != MSR_PLOT_NON_MUSR) { // muSR Data
-    if (unzoom) {
-      fHistoFrame->GetXaxis()->SetRangeUser(fXmin, fXmax);
-      for (UInt_t i=0; i<fData.size(); i++)
-        fData[i].diff->GetXaxis()->SetRangeUser(fXmin, fXmax);
-    } else {
-      xminBin = fData[0].data->GetXaxis()->GetFirst(); // first bin of the zoomed range
-      xmaxBin = fData[0].data->GetXaxis()->GetLast();  // last bin of the zoomed range
-      xmin = fData[0].data->GetXaxis()->GetBinCenter(xminBin);
-      xmax = fData[0].data->GetXaxis()->GetBinCenter(xmaxBin);
-      fData[0].diff->GetXaxis()->SetRangeUser(xmin, xmax);
-    }
-  } else { // non-muSR Data
-    if (unzoom) {
-      for (UInt_t i=0; i<fNonMusrData.size(); i++) {
-        fNonMusrData[0].diff->GetXaxis()->SetRangeUser(fNonMusrData[0].dataRange->GetXMin(),
-                                                       fNonMusrData[0].dataRange->GetXMin());
-        if (fNonMusrData[0].dataRange->IsYRangePresent()) {
-          fNonMusrData[0].diff->GetYaxis()->SetRangeUser(fNonMusrData[0].dataRange->GetYMin(),
-                                                         fNonMusrData[0].dataRange->GetYMax());
-        }
-      }
-    } else {
-      xminBin = fNonMusrData[0].data->GetXaxis()->GetFirst(); // first bin of the zoomed range
-      xmaxBin = fNonMusrData[0].data->GetXaxis()->GetLast();  // last bin of the zoomed range
-      xmin = fNonMusrData[0].data->GetXaxis()->GetBinCenter(xminBin);
-      xmax = fNonMusrData[0].data->GetXaxis()->GetBinCenter(xmaxBin);
-      fNonMusrData[0].diff->GetXaxis()->SetRangeUser(xmin, xmax);
-    }
-  }
-
-  PlotDifference();
 }
 
 //--------------------------------------------------------------------------
@@ -2248,8 +2288,6 @@ void PMusrCanvas::HandleFourier()
       }
     }
   }
-
-  PlotFourier();
 }
 
 //--------------------------------------------------------------------------
@@ -2342,8 +2380,6 @@ void PMusrCanvas::HandleDifferenceFourier()
       }
     }
   }
-
-  PlotFourierDifference();
 }
 
 //--------------------------------------------------------------------------
@@ -2433,8 +2469,6 @@ void PMusrCanvas::HandleFourierDifference()
       fData[i].diffFourierPhase->SetMarkerStyle(fData[i].dataFourierPhase->GetMarkerStyle());
     }
   }
-
-  PlotFourierDifference();
 }
 
 //--------------------------------------------------------------------------
@@ -2675,24 +2709,40 @@ Int_t PMusrCanvas::FindBin(const Double_t x, TGraphErrors *graph)
 }
 
 //--------------------------------------------------------------------------
-// GetGlobalMaximum (private)
+// GetMaximum (private)
 //--------------------------------------------------------------------------
 /**
- * <p>returns the global maximum of a histogram
+ * <p>returns the maximum of a histogram in the range [xmin, xmax].
+ * If xmin = xmax = -1.0, the whole histogram range is used.
  *
  * <b>return:</b>
- * - global maximum, or 0.0 if the histo pointer is the null pointer.
+ * - maximum, or 0.0 if the histo pointer is the null pointer.
  *
  * \param histo pointer of the histogram
+ * \param xmin lower edge for the search interval.
+ * \param xmax upper edge for the search interval.
  */
-Double_t PMusrCanvas::GetGlobalMaximum(TH1F* histo)
+Double_t PMusrCanvas::GetMaximum(TH1F* histo, Double_t xmin, Double_t xmax)
 {
   if (histo == 0)
     return 0.0;
 
-  double max = histo->GetBinContent(1);
-  double binContent;
-  for (Int_t i=2; i < histo->GetNbinsX(); i++) {
+  Int_t start=0, end=0;
+  if (xmin == xmax) {
+    start = 1;
+    end = histo->GetNbinsX();
+  } else {
+    start = histo->FindBin(xmin);
+    if ((start==0) || (start==histo->GetNbinsX()+1)) // underflow/overflow
+      start = 1;
+    end = histo->FindBin(xmax);
+    if ((end==0) || (end==histo->GetNbinsX()+1)) // underflow/overflow
+      end = histo->GetNbinsX();
+  }
+
+  Double_t max = histo->GetBinContent(start);
+  Double_t binContent;
+  for (Int_t i=start; i<end; i++) {
     binContent = histo->GetBinContent(i);
     if (max < binContent)
       max = binContent;
@@ -2702,27 +2752,123 @@ Double_t PMusrCanvas::GetGlobalMaximum(TH1F* histo)
 }
 
 //--------------------------------------------------------------------------
-// GetGlobalMinimum (private)
+// GetMinimum (private)
 //--------------------------------------------------------------------------
 /**
- * <p>returns the global minimum of a histogram
+ * <p>returns the minimum of a histogram in the range [xmin, xmax].
+ * If xmin = xmax = -1.0, the whole histogram range is used.
  *
  * <b>return:</b>
- * - global minimum, or 0.0 if the histo pointer is the null pointer.
+ * - minimum, or 0.0 if the histo pointer is the null pointer.
  *
  * \param histo pointer of the histogram
+ * \param xmin lower edge for the search interval.
+ * \param xmax upper edge for the search interval.
  */
-Double_t PMusrCanvas::GetGlobalMinimum(TH1F* histo)
+Double_t PMusrCanvas::GetMinimum(TH1F* histo, Double_t xmin, Double_t xmax)
 {
   if (histo == 0)
     return 0.0;
 
-  double min = histo->GetBinContent(1);
-  double binContent;
-  for (Int_t i=2; i < histo->GetNbinsX(); i++) {
+  Int_t start=0, end=0;
+  if (xmin == xmax) {
+    start = 1;
+    end = histo->GetNbinsX();
+  } else {
+    start = histo->FindBin(xmin);
+    if ((start==0) || (start==histo->GetNbinsX()+1)) // underflow/overflow
+      start = 1;
+    end = histo->FindBin(xmax);
+    if ((end==0) || (end==histo->GetNbinsX()+1)) // underflow/overflow
+      end = histo->GetNbinsX();
+  }
+
+  Double_t min = histo->GetBinContent(start);
+  Double_t binContent;
+  for (Int_t i=start; i<end; i++) {
     binContent = histo->GetBinContent(i);
     if (min > binContent)
       min = binContent;
+  }
+
+  return min;
+}
+
+//--------------------------------------------------------------------------
+// GetMaximum (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>returns the maximum of a TGraphErrors object in the range [xmin, xmax].
+ * If xmin = xmax = -1.0, the whole histogram range is used.
+ *
+ * <b>return:</b>
+ * - maximum, or 0.0 if the histo pointer is the null pointer.
+ *
+ * \param graph pointer of the histogram
+ * \param xmin lower edge for the search interval.
+ * \param xmax upper edge for the search interval.
+ */
+Double_t PMusrCanvas::GetMaximum(TGraphErrors* graph, Double_t xmin, Double_t xmax)
+{
+  if (graph == 0)
+    return 0.0;
+
+  Double_t x, y;
+  if (xmin == xmax) {
+    graph->GetPoint(0, x, y);
+    xmin = x;
+    graph->GetPoint(graph->GetN()-1, x, y);
+    xmax = x;
+  }
+
+  graph->GetPoint(0, x, y);
+  Double_t max = y;
+  for (Int_t i=0; i<graph->GetN(); i++) {
+    graph->GetPoint(i, x, y);
+    if ((x >= xmin) && (x <= xmax)) {
+      if (y > max)
+        max = y;
+    }
+  }
+
+  return max;
+}
+
+//--------------------------------------------------------------------------
+// GetMinimum (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>returns the minimum of a TGraphErrors object in the range [xmin, xmax].
+ * If xmin = xmax = -1.0, the whole histogram range is used.
+ *
+ * <b>return:</b>
+ * - minimum, or 0.0 if the histo pointer is the null pointer.
+ *
+ * \param graph pointer of the histogram
+ * \param xmin lower edge for the search interval.
+ * \param xmax upper edge for the search interval.
+ */
+Double_t PMusrCanvas::GetMinimum(TGraphErrors* graph, Double_t xmin, Double_t xmax)
+{
+  if (graph == 0)
+    return 0.0;
+
+  Double_t x, y;
+  if (xmin == xmax) {
+    graph->GetPoint(0, x, y);
+    xmin = x;
+    graph->GetPoint(graph->GetN()-1, x, y);
+    xmax = x;
+  }
+
+  graph->GetPoint(0, x, y);
+  Double_t min = y;
+  for (Int_t i=0; i<graph->GetN(); i++) {
+    graph->GetPoint(i, x, y);
+    if ((x >= xmin) && (x <= xmax)) {
+      if (y < min)
+        min = y;
+    }
   }
 
   return min;
@@ -2733,8 +2879,10 @@ Double_t PMusrCanvas::GetGlobalMinimum(TH1F* histo)
 //--------------------------------------------------------------------------
 /**
  * <p>Plots the data.
+ *
+ * \param unzoom if true, rescale to the original msr-file ranges
  */
-void PMusrCanvas::PlotData()
+void PMusrCanvas::PlotData(Bool_t unzoom)
 {
   fDataTheoryPad->cd();
 
@@ -2751,8 +2899,18 @@ void PMusrCanvas::PlotData()
   if (fPlotType < 0) // plot type not defined
     return;
 
+  Double_t xmin, xmax;
   if (fPlotType != MSR_PLOT_NON_MUSR) {
     if (fData.size() > 0) {
+
+      // keep the current x-axis range from the data view
+      if (fHistoFrame && (fPreviousPlotView == PV_DATA)) {
+        xmin = fHistoFrame->GetXaxis()->GetBinCenter(fHistoFrame->GetXaxis()->GetFirst());
+        xmax = fHistoFrame->GetXaxis()->GetBinCenter(fHistoFrame->GetXaxis()->GetLast());
+      } else {
+        xmin = fXmin;
+        xmax = fXmax;
+      }
 
       // delete old fHistoFrame if present
       if (fHistoFrame) {
@@ -2760,74 +2918,57 @@ void PMusrCanvas::PlotData()
         fHistoFrame = 0;
       }
 
-      // get full possible data range min/max
-      Double_t dataXmin = fData[0].data->GetXaxis()->GetXmin();
-      Double_t dataXmax = fData[0].data->GetXaxis()->GetXmax();
-      Double_t dataYmin = GetGlobalMaximum(fData[0].data); // fData[0].data->GetMinimum();
-      Double_t dataYmax = GetGlobalMinimum(fData[0].data); // fData[0].data->GetMaximum();
-      for (UInt_t i=1; i<fData.size(); i++) {
-        if (fData[i].data->GetXaxis()->GetXmin() < dataXmin)
-          dataXmin = fData[i].data->GetXaxis()->GetXmin();
-        if (fData[i].data->GetXaxis()->GetXmax() > dataXmax)
-          dataXmax = fData[i].data->GetXaxis()->GetXmax();
-        if (GetGlobalMinimum(fData[i].data) < dataYmin)
-          dataYmin = GetGlobalMinimum(fData[i].data);
-        if (GetGlobalMaximum(fData[i].data) > dataYmax)
-          dataYmax = GetGlobalMaximum(fData[i].data);
-      }
-
-      fXmin=dataXmin;
-      fXmax=dataXmax;
-      fYmin=dataYmin;
-      fYmax=dataYmax;
-      switch (fPlotRangeTag) {
-        case PR_NONE:
-          // in case of the asymmetry plot some default y-ranges were set, i.e. [-0.4, 0.4]
-          if (fData[0].dataRange->IsYRangePresent()) {
-            fYmin = fData[0].dataRange->GetYMin();
-            fYmax = fData[0].dataRange->GetYMax();
+      // get the histo frame x/y range boundaries
+      Double_t dataXmin=0.0, dataXmax=0.0, dataYmin=0.0, dataYmax=0.0;
+      if (unzoom) { // set the x-/y-range back to the original msr-file values
+        dataXmin = fXmin;
+        dataXmax = fXmax;
+        if (fYRangePresent) {
+          dataYmin = fYmin;
+          dataYmax = fYmax;
+        } else {
+          dataYmin = GetMinimum(fData[0].data, dataXmin, dataXmax);
+          dataYmax = GetMaximum(fData[0].data, dataXmin, dataXmax);
+          for (UInt_t i=1; i<fData.size(); i++) {
+            if (GetMinimum(fData[i].data, dataXmin, dataXmax) < dataYmin)
+              dataYmin = GetMinimum(fData[i].data, dataXmin, dataXmax);
+            if (GetMaximum(fData[i].data, dataXmin, dataXmax) > dataYmax)
+              dataYmax = GetMaximum(fData[i].data, dataXmin, dataXmax);
           }
-          break;
-        case PR_RANGE:
-          fXmin = fData[0].dataRange->GetXMin();
-          fXmax = fData[0].dataRange->GetXMax();
-          if (fData[0].dataRange->IsYRangePresent()) {
-            fYmin = fData[0].dataRange->GetYMin();
-            fYmax = fData[0].dataRange->GetYMax();
+          Double_t dd = 0.05*fabs(dataYmax-dataYmin);
+          dataYmin -= dd;
+          dataYmax += dd;
+        }
+      } else { // set the x-/y-range to the previous fHistoFrame range
+        dataXmin = xmin;
+        dataXmax = xmax;
+        if (fYRangePresent) { // explicit y-range present
+          dataYmin = fYmin;
+          dataYmax = fYmax;
+        } else { // extract global min/max in order to have the proper y-range
+          dataYmin = GetMinimum(fData[0].data, dataXmin, dataXmax);
+          dataYmax = GetMaximum(fData[0].data, dataXmin, dataXmax);
+          for (UInt_t i=1; i<fData.size(); i++) {
+            if (GetMinimum(fData[i].data, dataXmin, dataXmax) < dataYmin)
+              dataYmin = GetMinimum(fData[i].data, dataXmin, dataXmax);
+            if (GetMaximum(fData[i].data, dataXmin, dataXmax) > dataYmax)
+              dataYmax = GetMaximum(fData[i].data, dataXmin, dataXmax);
           }
-          break;
-        case PR_FIT_RANGE:
-          fXmin = fData[0].dataRange->GetXMin();
-          fXmax = fData[0].dataRange->GetXMax();
-          // in case of the asymmetry plot some default y-ranges were set, i.e. [-0.4, 0.4]
-          if (fData[0].dataRange->IsYRangePresent()) {
-            fYmin = fData[0].dataRange->GetYMin();
-            fYmax = fData[0].dataRange->GetYMax();
-          }
-          break;
-        case PR_SUB_RANGE:
-          fXmin = fData[0].dataRange->GetXMin();
-          fXmax = fData[0].dataRange->GetXMax();
-          if (fData[0].dataRange->IsYRangePresent()) {
-            fYmin = fData[0].dataRange->GetYMin();
-            fYmax = fData[0].dataRange->GetYMax();
-          }
-          break;
-        default:
-          return;
+          Double_t dd = 0.05*fabs(dataYmax-dataYmin);
+          dataYmin -= dd;
+          dataYmax += dd;
+        }
       }
 
       // create histo frame in order to plot histograms possibly with different x-frames
       fHistoFrame = fDataTheoryPad->DrawFrame(dataXmin, dataYmin, dataXmax, dataYmax);
-      fHistoFrame->GetXaxis()->SetRangeUser(fXmin, fXmax);
-      fHistoFrame->GetYaxis()->SetRangeUser(fYmin, fYmax);
 
       // set all histo/theory ranges properly
       for (UInt_t i=0; i<fData.size(); i++) {
-        fData[i].data->GetXaxis()->SetRangeUser(fXmin, fXmax);
-        fData[i].data->GetYaxis()->SetRangeUser(fYmin, fYmax);
-        fData[i].theory->GetXaxis()->SetRangeUser(fXmin, fXmax);
-        fData[i].theory->GetYaxis()->SetRangeUser(fYmin, fYmax);
+        fData[i].data->GetXaxis()->SetRangeUser(dataXmin, dataXmax);
+        fData[i].data->GetYaxis()->SetRangeUser(dataYmin, dataYmax);
+        fData[i].theory->GetXaxis()->SetRangeUser(dataXmin, dataXmax);
+        fData[i].theory->GetYaxis()->SetRangeUser(dataYmin, dataYmax);
       }
 
       // set x-axis label
@@ -2869,13 +3010,24 @@ void PMusrCanvas::PlotData()
       fRRFLatexText->DrawLatex(0.1, 0.92, fRRFText->Data());
     }
   } else { // fPlotType == MSR_PLOT_NO_MUSR
-    // ugly workaround since multigraphs axis are not going away when switching TMultiGraphs
-    delete fDataTheoryPad;
-    fDataTheoryPad = 0;
-    fDataTheoryPad = new TPad("dataTheoryPad", "dataTheoryPad", 0.0, YINFO, XTHEO, YTITLE);
-    fDataTheoryPad->SetFillColor(TColor::GetColor(255,255,255));
-    fDataTheoryPad->Draw();
-    fDataTheoryPad->cd();
+    // keep the current x-axis range from the data view
+    if (fMultiGraphDiff && (fPreviousPlotView == PV_DATA)) {
+      xmin = fMultiGraphDiff->GetXaxis()->GetBinCenter(fMultiGraphDiff->GetXaxis()->GetFirst());
+      xmax = fMultiGraphDiff->GetXaxis()->GetBinCenter(fMultiGraphDiff->GetXaxis()->GetLast());
+    } else {
+      xmin = fXmin;
+      xmax = fXmax;
+    }
+
+    // cleanup if previous fMultiGraphData is present
+    if (fMultiGraphData) {
+      delete fMultiGraphData;
+      fMultiGraphData = 0;
+    }
+    if (fMultiGraphDiff) {
+      delete fMultiGraphDiff;
+      fMultiGraphDiff = 0;
+    }
 
     PMsrRunList runs = *fMsrHandler->GetMsrRunList();
     PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
@@ -2884,49 +3036,75 @@ void PMusrCanvas::PlotData()
     TString yAxisTitle = fRunList->GetYAxisTitle(*runs[runNo].GetRunName(), runNo);
 
     if (fNonMusrData.size() > 0) {
-      // check if fMultiGraphData needs to be created, and if yes add all data and theory
-      if (!fMultiGraphData) {
-        fMultiGraphData = new TMultiGraph();
-        assert(fMultiGraphData != 0);
 
-        // add all data to fMultiGraphData
-        for (UInt_t i=0; i<fNonMusrData.size(); i++) {
-          // the next two lines are ugly but needed for the following reasons:
-          // TMultiGraph is taking ownership of the TGraphErrors, hence a deep copy is needed.
-          // This is not resulting in a memory leak, since the TMultiGraph object will do the cleaing
-          TGraphErrors *ge = new TGraphErrors(*(fNonMusrData[i].data));
-          fMultiGraphData->Add(ge, "p");
+      // get the histo frame x/y range boundaries
+      Double_t dataXmin=0.0, dataXmax=0.0, dataYmin=0.0, dataYmax=0.0;
+      if (unzoom) { // set the x-/y-range back to the original msr-file values
+        dataXmin = fXmin;
+        dataXmax = fXmax;
+        if (fYRangePresent) {
+          dataYmin = fYmin;
+          dataYmax = fYmax;
+        } else {
+          dataYmin = GetMinimum(fNonMusrData[0].data, dataXmin, dataXmax);
+          dataYmax = GetMaximum(fNonMusrData[0].data, dataXmin, dataXmax);
+          for (UInt_t i=1; i<fNonMusrData.size(); i++) {
+            if (GetMinimum(fNonMusrData[i].data, dataXmin, dataXmax) < dataYmin)
+              dataYmin = GetMinimum(fNonMusrData[i].data, dataXmin, dataXmax);
+            if (GetMaximum(fNonMusrData[i].data, dataXmin, dataXmax) > dataYmax)
+              dataYmax = GetMaximum(fNonMusrData[i].data, dataXmin, dataXmax);
+          }
+          Double_t dd = 0.05*fabs(dataYmax-dataYmin);
+          dataYmin -= dd;
+          dataYmax += dd;
         }
-        // add all the theory to fMultiGraphData
-        for (UInt_t i=0; i<fNonMusrData.size(); i++) {
-          // the next two lines are ugly but needed for the following reasons:
-          // TMultiGraph is taking ownership of the TGraphErrors, hence a deep copy is needed.
-          // This is not resulting in a memory leak, since the TMultiGraph object will do the cleaing
-          TGraphErrors *ge = new TGraphErrors(*(fNonMusrData[i].theory));
-          fMultiGraphData->Add(ge, "l");
+      } else { // set the x-/y-range to the previous fHistoFrame range
+        dataXmin = xmin;
+        dataXmax = xmax;
+        if (fYRangePresent) { // explicit y-range present
+          dataYmin = fYmin;
+          dataYmax = fYmax;
+        } else { // extract global min/max in order to have the proper y-range
+          dataYmin = GetMinimum(fNonMusrData[0].data, dataXmin, dataXmax);
+          dataYmax = GetMaximum(fNonMusrData[0].data, dataXmin, dataXmax);
+          for (UInt_t i=1; i<fNonMusrData.size(); i++) {
+            if (GetMinimum(fNonMusrData[i].data, dataXmin, dataXmax) < dataYmin)
+              dataYmin = GetMinimum(fNonMusrData[i].data, dataXmin, dataXmax);
+            if (GetMaximum(fNonMusrData[i].data, dataXmin, dataXmax) > dataYmax)
+              dataYmax = GetMaximum(fNonMusrData[i].data, dataXmin, dataXmax);
+          }
+          Double_t dd = 0.05*fabs(dataYmax-dataYmin);
+          dataYmin -= dd;
+          dataYmax += dd;
         }
+      }
+
+      // create fMultiGraphData, and add all data and theory
+      fMultiGraphData = new TMultiGraph();
+      assert(fMultiGraphData != 0);
+
+      // add all data to fMultiGraphData
+      for (UInt_t i=0; i<fNonMusrData.size(); i++) {
+        // the next two lines are ugly but needed for the following reasons:
+        // TMultiGraph is taking ownership of the TGraphErrors, hence a deep copy is needed.
+        // This is not resulting in a memory leak, since the TMultiGraph object will do the cleanup
+        TGraphErrors *ge = new TGraphErrors(*(fNonMusrData[i].data));
+        fMultiGraphData->Add(ge, "p");
+      }
+      // add all the theory to fMultiGraphData
+      for (UInt_t i=0; i<fNonMusrData.size(); i++) {
+        // the next two lines are ugly but needed for the following reasons:
+        // TMultiGraph is taking ownership of the TGraphErrors, hence a deep copy is needed.
+        // This is not resulting in a memory leak, since the TMultiGraph object will do the cleanup
+        TGraphErrors *ge = new TGraphErrors(*(fNonMusrData[i].theory));
+        fMultiGraphData->Add(ge, "l");
       }
 
       fMultiGraphData->Draw("a");
 
-      // set x-range
-/*
-      if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 0) {
-        Double_t xmin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[0];
-        Double_t xmax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[0];
-        fMultiGraphData->GetXaxis()->SetRangeUser(xmin, xmax);
-        // check if it is necessary to set the y-axis range
-        if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin.size() > 0) {
-          Double_t ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin[0];
-          Double_t ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax[0];
-          fMultiGraphData->GetYaxis()->SetRangeUser(ymin, ymax);
-        } else {
-          fMultiGraphData->GetYaxis()->UnZoom();
-        }
-      }
-*/
-      fMultiGraphData->GetXaxis()->SetRangeUser(fXmin, fXmax);
-      fMultiGraphData->GetYaxis()->SetRangeUser(fYmin, fYmax);
+      // set x/y-range
+      fMultiGraphData->GetXaxis()->SetRangeUser(dataXmin, dataXmax);
+      fMultiGraphData->GetYaxis()->SetRangeUser(dataYmin, dataYmax);
 
       // set x-, y-axis label only if there is just one data set
       if (fNonMusrData.size() == 1) {
@@ -2971,19 +3149,26 @@ void PMusrCanvas::PlotData()
 //--------------------------------------------------------------------------
 /**
  * <p>Plots the difference data, i.e. data-theory
+ *
+ * \param unzoom if true, rescale to the original msr-file ranges
  */
-void PMusrCanvas::PlotDifference()
+void PMusrCanvas::PlotDifference(Bool_t unzoom)
 {
   fDataTheoryPad->cd();
 
   if (fPlotType < 0) // plot type not defined
     return;
 
+  Double_t xmin, xmax;
   if (fPlotType != MSR_PLOT_NON_MUSR) {
     // keep the current x-axis range from the data view
-    Double_t xmin, xmax;
-    xmin = fHistoFrame->GetXaxis()->GetBinCenter(fHistoFrame->GetXaxis()->GetFirst());
-    xmax = fHistoFrame->GetXaxis()->GetBinCenter(fHistoFrame->GetXaxis()->GetLast());
+    if (fHistoFrame && (fPreviousPlotView == PV_DATA)) {
+      xmin = fHistoFrame->GetXaxis()->GetBinCenter(fHistoFrame->GetXaxis()->GetFirst());
+      xmax = fHistoFrame->GetXaxis()->GetBinCenter(fHistoFrame->GetXaxis()->GetLast());
+    } else {
+      xmin = fXmin;
+      xmax = fXmax;
+    }
 
     // delete old fHistoFrame if present
     if (fHistoFrame) {
@@ -2991,30 +3176,85 @@ void PMusrCanvas::PlotDifference()
       fHistoFrame = 0;
     }
 
-    fHistoFrame = fDataTheoryPad->DrawFrame(fXmin, fYmin, fXmax, fYmax);    
+    Double_t dataXmin=0.0, dataXmax=0.0, dataYmin=0.0, dataYmax=0.0, dd=0.0;
+    if (unzoom) {
+      dataXmin = fXmin;
+      dataXmax = fXmax;
+      dataYmin = GetMinimum(fData[0].diff, dataXmin, dataXmax);
+      dataYmax = GetMaximum(fData[0].diff, dataXmin, dataXmax);
+      for (UInt_t i=1; i<fData.size(); i++) {
+        if (GetMinimum(fData[i].diff, dataXmin, dataXmax) < dataYmin)
+          dataYmin = GetMinimum(fData[i].diff, dataXmin, dataXmax);
+        if (GetMaximum(fData[i].diff, dataXmin, dataXmax) > dataYmax)
+          dataYmax = GetMaximum(fData[i].diff, dataXmin, dataXmax);
+      }
+      // slightly increase y-range
+      dd = 0.05*fabs(dataYmax-dataYmin);
+      dataYmin -= dd;
+      dataYmax += dd;
+    } else {
+      dataXmin = xmin;
+      dataXmax = xmax;
+      dataYmin = GetMinimum(fData[0].diff, dataXmin, dataXmax);
+      dataYmax = GetMaximum(fData[0].diff, dataXmin, dataXmax);
+      for (UInt_t i=1; i<fData.size(); i++) {
+        if (GetMinimum(fData[i].diff, dataXmin, dataXmax) < dataYmin)
+          dataYmin = GetMinimum(fData[i].diff, dataXmin, dataXmax);
+        if (GetMaximum(fData[i].diff, dataXmin, dataXmax) > dataYmax)
+          dataYmax = GetMaximum(fData[i].diff, dataXmin, dataXmax);
+      }
+      // slightly increase y-range
+      dd = 0.05*fabs(dataYmax-dataYmin);
+      dataYmin -= dd;
+      dataYmax += dd;
+    }
+
+    fHistoFrame = fDataTheoryPad->DrawFrame(dataXmin, dataYmin, dataXmax, dataYmax);
+
     // set x-axis label
     fHistoFrame->GetXaxis()->SetTitle("time (#mus)");
     // set y-axis label
     fHistoFrame->GetYaxis()->SetTitle("data-theory");
+
     // plot all diff data
     for (UInt_t i=0; i<fData.size(); i++) {
       fData[i].diff->Draw("pesame");
+      // set all diff ranges properly
+      if (fData[i].dataRange->IsXRangePresent())
+        fData[i].diff->GetXaxis()->SetRangeUser(fData[i].dataRange->GetXmin(), fData[i].dataRange->GetXmax());
+      else
+        fData[i].diff->GetXaxis()->SetRangeUser(dataXmin, dataXmax);
+
+      if (fData[i].dataRange->IsYRangePresent())
+        fData[i].diff->GetYaxis()->SetRangeUser(fData[i].dataRange->GetYmin(), fData[i].dataRange->GetYmax());
+      else
+        fData[i].diff->GetYaxis()->SetRangeUser(dataYmin, dataYmax);
     }
 
-    // set the axis frame to the values of the data frame
-    fHistoFrame->GetXaxis()->SetRangeUser(xmin, xmax);
 
     // check if RRF and if yes show a label
     if ((fRRFText != 0) && (fRRFLatexText != 0)) {
       fRRFLatexText->DrawLatex(0.1, 0.92, fRRFText->Data());
     }
   } else { // fPlotType == MSR_PLOT_NON_MUSR
-    // ugly workaround since multigraphs axis are not going away when switching TMultiGraphs
-    delete fDataTheoryPad;
-    fDataTheoryPad = new TPad("dataTheoryPad", "dataTheoryPad", 0.0, YINFO, XTHEO, YTITLE);
-    fDataTheoryPad->SetFillColor(TColor::GetColor(255,255,255));
-    fDataTheoryPad->Draw();
-    fDataTheoryPad->cd();
+    // keep the current x-axis range from the data view
+    if (fMultiGraphData && (fPreviousPlotView == PV_DATA)) {
+      xmin = fMultiGraphData->GetXaxis()->GetBinCenter(fMultiGraphData->GetXaxis()->GetFirst());
+      xmax = fMultiGraphData->GetXaxis()->GetBinCenter(fMultiGraphData->GetXaxis()->GetLast());
+    } else {
+      xmin = fXmin;
+      xmax = fXmax;
+    }
+
+    // clean up previous fMultiGraphDiff
+    if (fMultiGraphDiff) {
+      delete fMultiGraphDiff;
+      fMultiGraphDiff = 0;
+    }
+    if (fMultiGraphData) {
+      delete fMultiGraphData;
+      fMultiGraphData = 0;
+    }
 
     PMsrRunList runs = *fMsrHandler->GetMsrRunList();
     PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
@@ -3022,24 +3262,55 @@ void PMusrCanvas::PlotDifference()
     TString xAxisTitle = fRunList->GetXAxisTitle(*runs[runNo].GetRunName(), runNo);
 
     // if fMultiGraphDiff is not present create it and add the diff data
-    if (!fMultiGraphDiff) {
-      fMultiGraphDiff = new TMultiGraph();
-      assert(fMultiGraphDiff != 0);
+    fMultiGraphDiff = new TMultiGraph();
+    assert(fMultiGraphDiff != 0);
 
-      // add all diff data to fMultiGraphDiff
-      for (UInt_t i=0; i<fNonMusrData.size(); i++) {
-        // the next two lines are ugly but needed for the following reasons:
-        // TMultiGraph is taking ownership of the TGraphErrors, hence a deep copy is needed.
-        // This is not resulting in a memory leak, since the TMultiGraph object will do the cleaing
-        TGraphErrors *ge = new TGraphErrors(*(fNonMusrData[i].diff));
-        fMultiGraphDiff->Add(ge, "p");
+    // get the histo frame x/y range boundaries
+    Double_t dataXmin=0.0, dataXmax=0.0, dataYmin=0.0, dataYmax=0.0;
+    if (unzoom) { // set the x-/y-range back to the original msr-file values
+      dataXmin = fXmin;
+      dataXmax = fXmax;
+      dataYmin = GetMinimum(fNonMusrData[0].diff, dataXmin, dataXmax);
+      dataYmax = GetMaximum(fNonMusrData[0].diff, dataXmin, dataXmax);
+      for (UInt_t i=1; i<fNonMusrData.size(); i++) {
+        if (GetMinimum(fNonMusrData[i].diff, dataXmin, dataXmax) < dataYmin)
+          dataYmin = GetMinimum(fNonMusrData[i].diff, dataXmin, dataXmax);
+        if (GetMaximum(fNonMusrData[i].diff, dataXmin, dataXmax) > dataYmax)
+          dataYmax = GetMaximum(fNonMusrData[i].diff, dataXmin, dataXmax);
       }
+      Double_t dd = 0.05*fabs(dataYmax-dataYmin);
+      dataYmin -= dd;
+      dataYmax += dd;
+    } else { // set the x-/y-range to the previous fHistoFrame range
+      dataXmin = xmin;
+      dataXmax = xmax;
+      dataYmin = GetMinimum(fNonMusrData[0].diff, dataXmin, dataXmax);
+      dataYmax = GetMaximum(fNonMusrData[0].diff, dataXmin, dataXmax);
+      for (UInt_t i=1; i<fNonMusrData.size(); i++) {
+        if (GetMinimum(fNonMusrData[i].diff, dataXmin, dataXmax) < dataYmin)
+          dataYmin = GetMinimum(fNonMusrData[i].diff, dataXmin, dataXmax);
+        if (GetMaximum(fNonMusrData[i].diff, dataXmin, dataXmax) > dataYmax)
+          dataYmax = GetMaximum(fNonMusrData[i].diff, dataXmin, dataXmax);
+      }
+      Double_t dd = 0.05*fabs(dataYmax-dataYmin);
+      dataYmin -= dd;
+      dataYmax += dd;
+    }
+
+    // add all diff data to fMultiGraphDiff
+    for (UInt_t i=0; i<fNonMusrData.size(); i++) {
+      // the next two lines are ugly but needed for the following reasons:
+      // TMultiGraph is taking ownership of the TGraphErrors, hence a deep copy is needed.
+      // This is not resulting in a memory leak, since the TMultiGraph object will do the cleaing
+      TGraphErrors *ge = new TGraphErrors(*(fNonMusrData[i].diff));
+      fMultiGraphDiff->Add(ge, "p");
     }
 
     fMultiGraphDiff->Draw("a");
 
-    fMultiGraphDiff->GetXaxis()->SetRangeUser(fXmin, fXmax);
-    fMultiGraphDiff->GetYaxis()->SetRangeUser(fYmin, fYmax);
+    // set x-range
+    fMultiGraphDiff->GetXaxis()->SetRangeUser(dataXmin, dataXmax);
+    fMultiGraphDiff->GetYaxis()->SetRangeUser(dataYmin, dataYmax);
 
     // set x-axis label
     fMultiGraphDiff->GetXaxis()->SetTitle(xAxisTitle.Data());
@@ -3047,6 +3318,9 @@ void PMusrCanvas::PlotDifference()
     fMultiGraphDiff->GetYaxis()->SetTitle("data-theory");
 
     fMultiGraphDiff->Draw("a");
+
+    if (fMultiGraphLegend)
+      fMultiGraphLegend->Draw();
   }
 
   fDataTheoryPad->Update();
@@ -3060,8 +3334,10 @@ void PMusrCanvas::PlotDifference()
 //--------------------------------------------------------------------------
 /**
  * <p>Plot the Fourier spectra.
+ *
+ * \param unzoom if true, rescale to the original Fourier range
  */
-void PMusrCanvas::PlotFourier()
+void PMusrCanvas::PlotFourier(Bool_t unzoom)
 {
   fDataTheoryPad->cd();
 
@@ -3098,13 +3374,13 @@ void PMusrCanvas::PlotFourier()
 
       // set y-range
       // first find minimum/maximum of all histos
-      ymin = GetGlobalMinimum(fData[0].dataFourierRe);
-      ymax = GetGlobalMaximum(fData[0].dataFourierRe);
+      ymin = GetMinimum(fData[0].dataFourierRe);
+      ymax = GetMaximum(fData[0].dataFourierRe);
       for (UInt_t i=1; i<fData.size(); i++) {
-        binContent = GetGlobalMinimum(fData[i].dataFourierRe);
+        binContent = GetMinimum(fData[i].dataFourierRe);
         if (binContent < ymin)
           ymin = binContent;
-        binContent = GetGlobalMaximum(fData[i].dataFourierRe);
+        binContent = GetMaximum(fData[i].dataFourierRe);
         if (binContent > ymax)
           ymax = binContent;
       }
@@ -3150,13 +3426,13 @@ void PMusrCanvas::PlotFourier()
 
       // set y-range
       // first find minimum/maximum of all histos
-      ymin = GetGlobalMinimum(fData[0].dataFourierIm);
-      ymax = GetGlobalMaximum(fData[0].dataFourierIm);
+      ymin = GetMinimum(fData[0].dataFourierIm);
+      ymax = GetMaximum(fData[0].dataFourierIm);
       for (UInt_t i=1; i<fData.size(); i++) {
-        binContent = GetGlobalMinimum(fData[i].dataFourierIm);
+        binContent = GetMinimum(fData[i].dataFourierIm);
         if (binContent < ymin)
           ymin = binContent;
-        binContent = GetGlobalMaximum(fData[i].dataFourierIm);
+        binContent = GetMaximum(fData[i].dataFourierIm);
         if (binContent > ymax)
           ymax = binContent;
       }
@@ -3203,22 +3479,22 @@ void PMusrCanvas::PlotFourier()
       // set y-range
       // first find minimum/maximum of all histos
       // real part first
-      ymin = GetGlobalMinimum(fData[0].dataFourierRe);
-      ymax = GetGlobalMaximum(fData[0].dataFourierRe);
+      ymin = GetMinimum(fData[0].dataFourierRe);
+      ymax = GetMaximum(fData[0].dataFourierRe);
       for (UInt_t i=1; i<fData.size(); i++) {
-        binContent = GetGlobalMinimum(fData[i].dataFourierRe);
+        binContent = GetMinimum(fData[i].dataFourierRe);
         if (binContent < ymin)
           ymin = binContent;
-        binContent = GetGlobalMaximum(fData[i].dataFourierRe);
+        binContent = GetMaximum(fData[i].dataFourierRe);
         if (binContent > ymax)
           ymax = binContent;
       }
       // imag part min/max
       for (UInt_t i=0; i<fData.size(); i++) {
-        binContent = GetGlobalMinimum(fData[i].dataFourierIm);
+        binContent = GetMinimum(fData[i].dataFourierIm);
         if (binContent < ymin)
           ymin = binContent;
-        binContent = GetGlobalMaximum(fData[i].dataFourierIm);
+        binContent = GetMaximum(fData[i].dataFourierIm);
         if (binContent > ymax)
           ymax = binContent;
       }
@@ -3270,13 +3546,13 @@ void PMusrCanvas::PlotFourier()
 
       // set y-range
       // first find minimum/maximum of all histos
-      ymin = GetGlobalMinimum(fData[0].dataFourierPwr);
-      ymax = GetGlobalMaximum(fData[0].dataFourierPwr);
+      ymin = GetMinimum(fData[0].dataFourierPwr);
+      ymax = GetMaximum(fData[0].dataFourierPwr);
       for (UInt_t i=1; i<fData.size(); i++) {
-        binContent = GetGlobalMinimum(fData[i].dataFourierPwr);
+        binContent = GetMinimum(fData[i].dataFourierPwr);
         if (binContent < ymin)
           ymin = binContent;
-        binContent = GetGlobalMaximum(fData[i].dataFourierPwr);
+        binContent = GetMaximum(fData[i].dataFourierPwr);
         if (binContent > ymax)
           ymax = binContent;
       }
@@ -3320,13 +3596,13 @@ void PMusrCanvas::PlotFourier()
 
       // set y-range
       // first find minimum/maximum of all histos
-      ymin = GetGlobalMinimum(fData[0].dataFourierPhase);
-      ymax = GetGlobalMaximum(fData[0].dataFourierPhase);
+      ymin = GetMinimum(fData[0].dataFourierPhase);
+      ymax = GetMaximum(fData[0].dataFourierPhase);
       for (UInt_t i=1; i<fData.size(); i++) {
-        binContent = GetGlobalMinimum(fData[i].dataFourierPhase);
+        binContent = GetMinimum(fData[i].dataFourierPhase);
         if (binContent < ymin)
           ymin = binContent;
-        binContent = GetGlobalMaximum(fData[i].dataFourierPhase);
+        binContent = GetMaximum(fData[i].dataFourierPhase);
         if (binContent > ymax)
           ymax = binContent;
       }
@@ -3377,8 +3653,10 @@ void PMusrCanvas::PlotFourier()
 //--------------------------------------------------------------------------
 /**
  * <p>Plot the Fourier difference, i.e. F(data)-F(theory).
+ *
+ * \param unzoom if true, rescale to the original Fourier range
  */
-void PMusrCanvas::PlotFourierDifference()
+void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
 {
   fDataTheoryPad->cd();
 
@@ -3415,13 +3693,13 @@ void PMusrCanvas::PlotFourierDifference()
 
       // set y-range
       // first find minimum/maximum of all histos
-      ymin = GetGlobalMinimum(fData[0].diffFourierRe);
-      ymax = GetGlobalMaximum(fData[0].diffFourierRe);
+      ymin = GetMinimum(fData[0].diffFourierRe);
+      ymax = GetMaximum(fData[0].diffFourierRe);
       for (UInt_t i=1; i<fData.size(); i++) {
-        binContent = GetGlobalMinimum(fData[i].diffFourierRe);
+        binContent = GetMinimum(fData[i].diffFourierRe);
         if (binContent < ymin)
           ymin = binContent;
-        binContent = GetGlobalMaximum(fData[i].diffFourierRe);
+        binContent = GetMaximum(fData[i].diffFourierRe);
         if (binContent > ymax)
           ymax = binContent;
       }
@@ -3460,13 +3738,13 @@ void PMusrCanvas::PlotFourierDifference()
 
       // set y-range
       // first find minimum/maximum of all histos
-      ymin = GetGlobalMinimum(fData[0].diffFourierIm);
-      ymax = GetGlobalMaximum(fData[0].diffFourierIm);
+      ymin = GetMinimum(fData[0].diffFourierIm);
+      ymax = GetMaximum(fData[0].diffFourierIm);
       for (UInt_t i=1; i<fData.size(); i++) {
-        binContent = GetGlobalMinimum(fData[i].diffFourierIm);
+        binContent = GetMinimum(fData[i].diffFourierIm);
         if (binContent < ymin)
           ymin = binContent;
-        binContent = GetGlobalMaximum(fData[i].diffFourierIm);
+        binContent = GetMaximum(fData[i].diffFourierIm);
         if (binContent > ymax)
           ymax = binContent;
       }
@@ -3504,21 +3782,21 @@ void PMusrCanvas::PlotFourierDifference()
 
       // set y-range
       // first find minimum/maximum of all histos
-      ymin = GetGlobalMinimum(fData[0].diffFourierRe);
-      ymax = GetGlobalMaximum(fData[0].diffFourierRe);
+      ymin = GetMinimum(fData[0].diffFourierRe);
+      ymax = GetMaximum(fData[0].diffFourierRe);
       for (UInt_t i=1; i<fData.size(); i++) {
-        binContent = GetGlobalMinimum(fData[i].diffFourierRe);
+        binContent = GetMinimum(fData[i].diffFourierRe);
         if (binContent < ymin)
           ymin = binContent;
-        binContent = GetGlobalMaximum(fData[i].diffFourierRe);
+        binContent = GetMaximum(fData[i].diffFourierRe);
         if (binContent > ymax)
           ymax = binContent;
       }
       for (UInt_t i=0; i<fData.size(); i++) {
-        binContent = GetGlobalMinimum(fData[i].diffFourierIm);
+        binContent = GetMinimum(fData[i].diffFourierIm);
         if (binContent < ymin)
           ymin = binContent;
-        binContent = GetGlobalMaximum(fData[i].diffFourierIm);
+        binContent = GetMaximum(fData[i].diffFourierIm);
         if (binContent > ymax)
           ymax = binContent;
       }
@@ -3559,13 +3837,13 @@ void PMusrCanvas::PlotFourierDifference()
 
       // set y-range
       // first find minimum/maximum of all histos
-      ymin = GetGlobalMinimum(fData[0].diffFourierPwr);
-      ymax = GetGlobalMaximum(fData[0].diffFourierPwr);
+      ymin = GetMinimum(fData[0].diffFourierPwr);
+      ymax = GetMaximum(fData[0].diffFourierPwr);
       for (UInt_t i=1; i<fData.size(); i++) {
-        binContent = GetGlobalMinimum(fData[i].diffFourierPwr);
+        binContent = GetMinimum(fData[i].diffFourierPwr);
         if (binContent < ymin)
           ymin = binContent;
-        binContent = GetGlobalMaximum(fData[i].diffFourierPwr);
+        binContent = GetMaximum(fData[i].diffFourierPwr);
         if (binContent > ymax)
           ymax = binContent;
       }
@@ -3601,13 +3879,13 @@ void PMusrCanvas::PlotFourierDifference()
 
       // set y-range
       // first find minimum/maximum of all histos
-      ymin = GetGlobalMinimum(fData[0].diffFourierPhase);
-      ymax = GetGlobalMaximum(fData[0].diffFourierPhase);
+      ymin = GetMinimum(fData[0].diffFourierPhase);
+      ymax = GetMaximum(fData[0].diffFourierPhase);
       for (UInt_t i=1; i<fData.size(); i++) {
-        binContent = GetGlobalMinimum(fData[i].diffFourierPhase);
+        binContent = GetMinimum(fData[i].diffFourierPhase);
         if (binContent < ymin)
           ymin = binContent;
-        binContent = GetGlobalMaximum(fData[i].diffFourierPhase);
+        binContent = GetMaximum(fData[i].diffFourierPhase);
         if (binContent > ymax)
           ymax = binContent;
       }
@@ -3653,8 +3931,10 @@ void PMusrCanvas::PlotFourierDifference()
 //--------------------------------------------------------------------------
 /**
  * <p>Writes the Fourier phase value into the data window.
+ *
+ * \param unzoom if true, rescale to the original Fourier range
  */
-void PMusrCanvas::PlotFourierPhaseValue()
+void PMusrCanvas::PlotFourierPhaseValue(Bool_t unzoom)
 {
   // check if phase TLatex object is present
   if (fCurrentFourierPhaseText) {

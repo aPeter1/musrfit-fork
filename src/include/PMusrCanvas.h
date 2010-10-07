@@ -56,12 +56,6 @@
 #define YTITLE 0.95
 #define XTHEO  0.75
 
-// Current Plot Range
-#define PR_NONE      0
-#define PR_RANGE     1
-#define PR_SUB_RANGE 2
-#define PR_FIT_RANGE 3
-
 // Current Plot Views
 #define PV_DATA                  1
 #define PV_FOURIER_REAL          2
@@ -104,10 +98,10 @@ class PMusrCanvasPlotRange : public TObject
     virtual Bool_t IsXRangePresent() { return fXRangePresent; }
     virtual Bool_t IsYRangePresent() { return fYRangePresent; }
 
-    virtual Double_t GetXMin() { return fXmin; }
-    virtual Double_t GetXMax() { return fXmax; }
-    virtual Double_t GetYMin() { return fYmin; }
-    virtual Double_t GetYMax() { return fYmax; }
+    virtual Double_t GetXmin() { return fXmin; }
+    virtual Double_t GetXmax() { return fXmax; }
+    virtual Double_t GetYmin() { return fYmin; }
+    virtual Double_t GetYmax() { return fYmax; }
 
   private:
     Bool_t fXRangePresent;
@@ -239,11 +233,12 @@ class PMusrCanvas : public TObject, public TQObject
     Bool_t fValid;            ///< if true, everything looks OK
     Bool_t fDifferenceView;   ///< tag showing that the shown data, fourier, are the difference between data and theory
     Int_t  fCurrentPlotView;  ///< tag showing what the current plot view is: data, fourier, ...
+    Int_t  fPreviousPlotView; ///< tag showing the previous plot view
     Int_t  fPlotType;         ///< plot type tag: -1 == undefined, MSR_PLOT_SINGLE_HISTO == single histogram, MSR_PLOT_ASYM == asymmetry, MSR_PLOT_MU_MINUS == mu minus (not yet implemented), MSR_PLOT_NON_MUSR == non-muSR
     Int_t  fPlotNumber;       ///< plot number
-    UInt_t fPlotRangeTag;     ///< plot range tag: 0=no range given, 1=range, 2=sub_ranges, 3=use_fit_ranges.
 
-    Double_t fXmin, fXmax, fYmin, fYmax; ///< data/theory frame range
+    Bool_t fXRangePresent, fYRangePresent; ///< flag indicating if x-/y-range is present
+    Double_t fXmin, fXmax, fYmin, fYmax;   ///< data/theory frame range
 
     Double_t fCurrentFourierPhase;    ///< holds the current Fourier phase
     TLatex *fCurrentFourierPhaseText; ///< used in Re/Im Fourier to show the current phase in the pad
@@ -293,7 +288,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void CleanupDataSet(PMusrCanvasNonMusrDataSet &dataSet);
     virtual void HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data);
     virtual void HandleNonMusrDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data);
-    virtual void HandleDifference(Bool_t unzoom=false);
+    virtual void HandleDifference();
     virtual void HandleFourier();
     virtual void HandleDifferenceFourier();
     virtual void HandleFourierDifference();
@@ -306,14 +301,16 @@ class PMusrCanvas : public TObject, public TQObject
     virtual Double_t CalculateDiff(const Double_t x, const Double_t y, TGraphErrors *theo);
     virtual Int_t  FindBin(const Double_t x, TGraphErrors *graph);
 
-    virtual Double_t GetGlobalMaximum(TH1F* histo);
-    virtual Double_t GetGlobalMinimum(TH1F* histo);
+    virtual Double_t GetMaximum(TH1F* histo, Double_t xmin=-1.0, Double_t xmax=-1.0);
+    virtual Double_t GetMinimum(TH1F* histo, Double_t xmin=-1.0, Double_t xmax=-1.0);
+    virtual Double_t GetMaximum(TGraphErrors* graph, Double_t xmin=-1.0, Double_t xmax=-1.0);
+    virtual Double_t GetMinimum(TGraphErrors* graph, Double_t xmin=-1.0, Double_t xmax=-1.0);
 
-    virtual void PlotData();
-    virtual void PlotDifference();
-    virtual void PlotFourier();
-    virtual void PlotFourierDifference();
-    virtual void PlotFourierPhaseValue();
+    virtual void PlotData(Bool_t unzoom=false);
+    virtual void PlotDifference(Bool_t unzoom=false);
+    virtual void PlotFourier(Bool_t unzoom=false);
+    virtual void PlotFourierDifference(Bool_t unzoom=false);
+    virtual void PlotFourierPhaseValue(Bool_t unzoom=false);
     virtual void IncrementFourierPhase();
     virtual void DecrementFourierPhase();
 
