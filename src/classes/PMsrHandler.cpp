@@ -247,6 +247,13 @@ Int_t PMsrHandler::ReadMsrFile()
     if (!HandleStatisticEntry(statistic))
       result = PMUSR_MSR_SYNTAX_ERROR;
 
+  // check if chisq or max.log likelihood
+  fStatistic.fChisq = true;
+  for (UInt_t i=0; i<fCommands.size(); i++) {
+    if (fCommands[i].fLine.Contains("MAX_LIKELIHOOD"))
+      fStatistic.fChisq = false; // max.log likelihood
+  }
+
   // fill parameter-in-use vector
   if (result == PMUSR_SUCCESS)
     FillParameterInUse(theory, functions, run);
@@ -945,31 +952,20 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         if (sstr.BeginsWith("STATISTIC")) {
           TDatime dt;
           fout << "STATISTIC --- " << dt.AsSQLString() << endl;
-        } else if (sstr.BeginsWith("chisq")) {
+        } else if (sstr.BeginsWith("chisq") || sstr.BeginsWith("maxLH")) {
           partialStatisticBlockFound = false;
           if (fStatistic.fValid) { // valid fit result
-            str  = "  chisq = ";
+            if (fStatistic.fChisq)
+              str = "  chisq = ";
+            else
+              str = "  maxLH = ";
             str += fStatistic.fMin;
             str += ", NDF = ";
             str += fStatistic.fNdf;
-            str += ", chisq/NDF = ";
-            str += fStatistic.fMin / fStatistic.fNdf;
-            fout << str.Data() << endl;
-            if (messages)
-              cout << endl << str.Data() << endl;
-          } else {
-           fout << "*** FIT DID NOT CONVERGE ***" << endl;
-           if (messages)
-             cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
-          }
-        } else if (sstr.BeginsWith("maxLH")) {
-          partialStatisticBlockFound = false;
-          if (fStatistic.fValid) { // valid fit result
-            str  = "  maxLH = ";
-            str += fStatistic.fMin;
-            str += ", NDF = ";
-            str += fStatistic.fNdf;
-            str += ", maxLH/NDF = ";
+            if (fStatistic.fChisq)
+              str += ", chisq/NDF = ";
+            else
+              str += ", maxLH/NDF = ";
             str += fStatistic.fMin / fStatistic.fNdf;
             fout << str.Data() << endl;
             if (messages)
@@ -3716,13 +3712,6 @@ Bool_t PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
     cerr << endl;
     fStatistic.fValid = false;
     return true;
-  }
-
-  // check if chisq or max.log likelihood
-  fStatistic.fChisq = true;
-  for (UInt_t i=0; i<fCommands.size(); i++) {
-    if (fCommands[i].fLine.Contains("MAX_LIKELIHOOD"))
-      fStatistic.fChisq = false; // max.log likelihood
   }
 
   Char_t str[128];
