@@ -1,0 +1,70 @@
+[nemu@pc8372 eventHandler]$ ./eventHandlerTest
+
+ *** Break *** segmentation violation
+
+
+
+===========================================================
+There was a crash (#7 0x00d6569d in SigHandler () from /apps/cern/root/lib/libCore.so).
+This is the entire stack trace of all threads:
+===========================================================
+#0  0x004b4410 in __kernel_vsyscall ()
+#1  0x03f8c353 in __waitpid_nocancel () from /lib/libc.so.6
+#2  0x03f33bbf in do_system () from /lib/libc.so.6
+#3  0x062031ad in system () from /lib/libpthread.so.0
+#4  0x00d60e1d in TUnixSystem::Exec () from /apps/cern/root/lib/libCore.so
+#5  0x00d6805d in TUnixSystem::StackTrace ()
+   from /apps/cern/root/lib/libCore.so
+#6  0x00d655ce in TUnixSystem::DispatchSignals ()
+   from /apps/cern/root/lib/libCore.so
+#7  0x00d6569d in SigHandler () from /apps/cern/root/lib/libCore.so
+#8  0x00d5e6c4 in sighandler () from /apps/cern/root/lib/libCore.so
+#9  <signal handler called>
+#10 0x08914070 in ?? ()
+#11 0x003ed6fb in TCanvas::EnterLeave () from /apps/cern/root/lib/libGpad.so
+#12 0x003f1ed7 in TCanvas::HandleInput () from /apps/cern/root/lib/libGpad.so
+#13 0x01522c04 in TRootCanvas::HandleContainerMotion ()
+   from /apps/cern/root/lib/libGui.so
+#14 0x0152a0aa in TRootContainer::HandleMotion ()
+   from /apps/cern/root/lib/libGui.so
+#15 0x014525be in TGFrame::HandleEvent () from /apps/cern/root/lib/libGui.so
+#16 0x0141633d in TGClient::HandleEvent () from /apps/cern/root/lib/libGui.so
+#17 0x0141668e in TGClient::ProcessOneEvent ()
+   from /apps/cern/root/lib/libGui.so
+#18 0x014166fd in TGClient::HandleInput () from /apps/cern/root/lib/libGui.so
+#19 0x01416730 in TGInputHandler::Notify () from /apps/cern/root/lib/libGui.so
+#20 0x00d64edd in TUnixSystem::DispatchOneEvent ()
+   from /apps/cern/root/lib/libCore.so
+#21 0x00cd56b1 in TSystem::InnerLoop () from /apps/cern/root/lib/libCore.so
+#22 0x00cd9381 in TSystem::Run () from /apps/cern/root/lib/libCore.so
+#23 0x00c73308 in TApplication::Run () from /apps/cern/root/lib/libCore.so
+#24 0x08051de9 in main (argc=0, argv=0x1c35) at eventHandlerTest.cpp:52
+===========================================================
+
+
+The lines below might hint at the cause of the crash.
+If they do not help you then please submit a bug report at
+http://root.cern.ch/bugs. Please post the ENTIRE stack trace
+from above as an attachment in addition to anything else
+that might help us fixing this issue.
+===========================================================
+#10 0x08914070 in ?? ()
+#11 0x003ed6fb in TCanvas::EnterLeave () from /apps/cern/root/lib/libGpad.so
+#12 0x003f1ed7 in TCanvas::HandleInput () from /apps/cern/root/lib/libGpad.so
+#13 0x01522c04 in TRootCanvas::HandleContainerMotion ()
+   from /apps/cern/root/lib/libGui.so
+#14 0x0152a0aa in TRootContainer::HandleMotion ()
+   from /apps/cern/root/lib/libGui.so
+#15 0x014525be in TGFrame::HandleEvent () from /apps/cern/root/lib/libGui.so
+#16 0x0141633d in TGClient::HandleEvent () from /apps/cern/root/lib/libGui.so
+#17 0x0141668e in TGClient::ProcessOneEvent ()
+   from /apps/cern/root/lib/libGui.so
+#18 0x014166fd in TGClient::HandleInput () from /apps/cern/root/lib/libGui.so
+#19 0x01416730 in TGInputHandler::Notify () from /apps/cern/root/lib/libGui.so
+#20 0x00d64edd in TUnixSystem::DispatchOneEvent ()
+   from /apps/cern/root/lib/libCore.so
+#21 0x00cd56b1 in TSystem::InnerLoop () from /apps/cern/root/lib/libCore.so
+#22 0x00cd9381 in TSystem::Run () from /apps/cern/root/lib/libCore.so
+#23 0x00c73308 in TApplication::Run () from /apps/cern/root/lib/libCore.so
+#24 0x08051de9 in main (argc=0, argv=0x1c35) at eventHandlerTest.cpp:52
+===========================================================
