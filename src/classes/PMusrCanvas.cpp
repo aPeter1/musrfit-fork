@@ -41,7 +41,7 @@ using namespace std;
 #include "PMusrCanvas.h"
 #include "PFourier.h"
 
-ClassImp(PMusrCanvas)
+ClassImp(PMusrCanvasPlotRange)
 
 //--------------------------------------------------------------------------
 // Constructor
@@ -822,6 +822,8 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   if (x == 'q') { // quit
     Done(0);
   } else if (x == 'd') { // difference
+    // update previous plot view
+    fPreviousPlotView = fCurrentPlotView;
     // toggle difference tag
     fDifferenceView = !fDifferenceView;
     // set the popup menu entry properly
@@ -840,6 +842,8 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
     else if ((fCurrentPlotView != PV_DATA) && !fDifferenceView)
       relevantKeySwitch = kFourier;
   } else if (x == 'u') { // unzoom to the original range
+    // update previous plot view
+    fPreviousPlotView = fCurrentPlotView;
     if ((fCurrentPlotView == PV_DATA) && !fDifferenceView) {
       CleanupDifference();
       CleanupFourier();
@@ -866,31 +870,33 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
     else if ((fCurrentPlotView != PV_DATA) && !fDifferenceView)
       relevantKeySwitch = kData;
 
-    // keep previous plot view
-    fPreviousPlotView = fCurrentPlotView;
-
     if (fCurrentPlotView == PV_DATA) { // current view is data view
       // uncheck data popup entry
       fPopupMain->UnCheckEntry(P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
       // get default fourier tag and update fourier popup menu
       switch (fFourier.fPlotTag) {
         case FOURIER_PLOT_REAL:
+          fPreviousPlotView = fCurrentPlotView;
           fCurrentPlotView = PV_FOURIER_REAL;
           fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL);
           break;
         case FOURIER_PLOT_IMAG:
+          fPreviousPlotView = fCurrentPlotView;
           fCurrentPlotView = PV_FOURIER_IMAG;
           fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG);
           break;
         case FOURIER_PLOT_REAL_AND_IMAG:
+          fPreviousPlotView = fCurrentPlotView;
           fCurrentPlotView = PV_FOURIER_REAL_AND_IMAG;
           fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG);
           break;
         case FOURIER_PLOT_POWER:
+          fPreviousPlotView = fCurrentPlotView;
           fCurrentPlotView = PV_FOURIER_PWR;
           fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR);
           break;
         case FOURIER_PLOT_PHASE:
+          fPreviousPlotView = fCurrentPlotView;
           fCurrentPlotView = PV_FOURIER_PHASE;
           fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE);
           break;
@@ -899,6 +905,7 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
       }
     } else { // current view is one of the Fourier views
       // set the current plot view to data
+      fPreviousPlotView = fCurrentPlotView;
       fCurrentPlotView = PV_DATA;
       // uncheck all fourier popup menu items
       fPopupFourier->UnCheckEntries();
@@ -973,6 +980,7 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
 
   if (id == P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber) {
     // set appropriate plot view
+    fPreviousPlotView = fCurrentPlotView;
     fCurrentPlotView = PV_DATA;
     // check data item
     fPopupMain->CheckEntry(id);
@@ -989,6 +997,7 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
     }
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL) {
     // set appropriate plot view
+    fPreviousPlotView = fCurrentPlotView;
     fCurrentPlotView = PV_FOURIER_REAL;
     // uncheck data
     fPopupMain->UnCheckEntry(P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
@@ -1011,6 +1020,7 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
     }
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG) {
     // set appropriate plot view
+    fPreviousPlotView = fCurrentPlotView;
     fCurrentPlotView = PV_FOURIER_IMAG;
     // uncheck data
     fPopupMain->UnCheckEntry(P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
@@ -1033,6 +1043,7 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
     }
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG) {
     // set appropriate plot view
+    fPreviousPlotView = fCurrentPlotView;
     fCurrentPlotView = PV_FOURIER_REAL_AND_IMAG;
     // uncheck data
     fPopupMain->UnCheckEntry(P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
@@ -1055,6 +1066,7 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
     }
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR) {
     // set appropriate plot view
+    fPreviousPlotView = fCurrentPlotView;
     fCurrentPlotView = PV_FOURIER_PWR;
     // uncheck data
     fPopupMain->UnCheckEntry(P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
@@ -1077,6 +1089,7 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
     }
   } else if (id == P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE) {
     // set appropriate plot view
+    fPreviousPlotView = fCurrentPlotView;
     fCurrentPlotView = PV_FOURIER_PHASE;
     // uncheck data
     fPopupMain->UnCheckEntry(P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
