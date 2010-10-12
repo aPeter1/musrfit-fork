@@ -43,19 +43,22 @@
 #define PMN_INTERACTIVE       0
 #define PMN_CONTOURS          1
 #define PMN_EIGEN             2
-#define PMN_HESSE             3
-#define PMN_MACHINE_PRECISION 4
-#define PMN_MIGRAD            5
-#define PMN_MINIMIZE          6
-#define PMN_MINOS             7
-#define PMN_PLOT              8
-#define PMN_SAVE              9
-#define PMN_SCAN              10
-#define PMN_SIMPLEX           12
-#define PMN_STRATEGY          13
-#define PMN_USER_COVARIANCE   14
-#define PMN_USER_PARAM_STATE  15
-#define PMN_PRINT             16
+#define PMN_FIX               3
+#define PMN_HESSE             4
+#define PMN_MACHINE_PRECISION 5
+#define PMN_MIGRAD            6
+#define PMN_MINIMIZE          7
+#define PMN_MINOS             8
+#define PMN_PLOT              9
+#define PMN_RELEASE           10
+#define PMN_RESTORE           11
+#define PMN_SAVE              12
+#define PMN_SCAN              13
+#define PMN_SIMPLEX           14
+#define PMN_STRATEGY          15
+#define PMN_USER_COVARIANCE   16
+#define PMN_USER_PARAM_STATE  17
+#define PMN_PRINT             18
 
 /**
  * <p>Interface class to minuit2.
@@ -84,13 +87,13 @@ class PFitter
 
     PMsrParamList fParams; ///< msr-file parameters
 
-    PMsrLines  fCmdLines; ///< all the Minuit commands from the msr-file
-    PIntVector fCmdList;  ///< command list
+    PMsrLines      fCmdLines; ///< all the Minuit commands from the msr-file
+    PIntPairVector fCmdList;  ///< command list, first=cmd, second=cmd line index
 
     PFitterFcn *fFitterFcn; ///< pointer to the fitter function object
+
     ROOT::Minuit2::MnUserParameters fMnUserParams; ///< minuit2 input parameter list
     ROOT::Minuit2::FunctionMinimum *fFcnMin;       ///< function minimum object
-    ROOT::Minuit2::MnUserParameterState *fMnUserParamState; ///< keeps the current user parameter state
 
     // minuit2 scan/contours command relate variables (see MnScan/MnContours in the minuit2 user manual)
     Bool_t fScanAll;           ///< flag. false: single parameter scan, true: not implemented yet (see MnScan/MnContours in the minuit2 user manual)
@@ -105,11 +108,14 @@ class PFitter
     Bool_t SetParameters();
 
     Bool_t ExecuteContours();
+    Bool_t ExecuteFix(UInt_t lineNo);
     Bool_t ExecuteHesse();
     Bool_t ExecuteMigrad();
     Bool_t ExecuteMinimize();
     Bool_t ExecuteMinos();
     Bool_t ExecutePlot();
+    Bool_t ExecuteRelease(UInt_t lineNo);
+    Bool_t ExecuteRestore();
     Bool_t ExecuteScan();
     Bool_t ExecuteSave();
     Bool_t ExecuteSimplex();

@@ -84,7 +84,6 @@ PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, Bo
   // init class variables
   fFitterFcn = 0;
   fFcnMin = 0;
-  fMnUserParamState = 0;
 
   fScanAll = true;
   fScanParameter[0] = 0;
@@ -117,11 +116,6 @@ PFitter::~PFitter()
   fCmdList.clear();
 
   fScanData.clear();
-
-  if (fMnUserParamState) {
-    delete fMnUserParamState;
-    fMnUserParamState = 0;
-  }
 
   if (fFcnMin) {
     delete fFcnMin;
@@ -181,13 +175,16 @@ Bool_t PFitter::DoFit()
 
   // walk through the command list and execute them
   for (UInt_t i=0; i<fCmdList.size(); i++) {
-    switch (fCmdList[i]) {
+    switch (fCmdList[i].first) {
       case PMN_INTERACTIVE:
         cerr << endl << "**WARNING** from PFitter::DoFit() : the command INTERACTIVE is not yet implemented.";
         cerr << endl;
         break;
       case PMN_CONTOURS:
         status = ExecuteContours();
+        break;
+      case PMN_FIX:
+        status = ExecuteFix(fCmdList[i].second);
         break;
       case PMN_EIGEN:
         cerr << endl << "**WARNING** from PFitter::DoFit() : the command EIGEN is not yet implemented.";
@@ -208,15 +205,15 @@ Bool_t PFitter::DoFit()
         break;
       case PMN_MINOS:
         status = ExecuteMinos();
-        // set positive errors true if minos has been successfull
-        if (status) {
-          for (UInt_t i=0; i<fParams.size(); i++) {
-            fRunInfo->SetMsrParamPosErrorPresent(i, true);
-          }
-        }
         break;
       case PMN_PLOT:
         status = ExecutePlot();
+        break;
+      case PMN_RELEASE:
+        status = ExecuteRelease(fCmdList[i].second);
+        break;
+      case PMN_RESTORE:
+        status = ExecuteRestore();
         break;
       case PMN_SAVE:
         status = ExecuteSave();
@@ -274,30 +271,39 @@ Bool_t PFitter::CheckCommands()
   fIsValid = true;
 
   // walk through the msr-file COMMAND block
+  PIntPair cmd;
   PMsrLines::iterator it;
+  UInt_t cmdLineNo = 0;
   for (it = fCmdLines.begin(); it != fCmdLines.end(); ++it) {
-    it->fLine.ToUpper();
-    if (it->fLine.Contains("COMMANDS")) {
+    if (it == fCmdLines.begin())
+      cmdLineNo = 0;
+    else
+      cmdLineNo++;
+    if (it->fLine.Contains("COMMANDS", TString::kIgnoreCase)) {
       continue;
-    } else if (it->fLine.Contains("SET BATCH")) { // needed for backward compatibility
+    } else if (it->fLine.Contains("SET BATCH", TString::kIgnoreCase)) { // needed for backward compatibility
       continue;
-    } else if (it->fLine.Contains("END RETURN")) {  // needed for backward compatibility
+    } else if (it->fLine.Contains("END RETURN", TString::kIgnoreCase)) {  // needed for backward compatibility
       continue;
-    } else if (it->fLine.Contains("CHI_SQUARE")) {
+    } else if (it->fLine.Contains("CHI_SQUARE", TString::kIgnoreCase)) {
       fUseChi2 = true;
-    } else if (it->fLine.Contains("MAX_LIKELIHOOD")) {
+    } else if (it->fLine.Contains("MAX_LIKELIHOOD", TString::kIgnoreCase)) {
       fUseChi2 = false;
-    } else if (it->fLine.Contains("INTERACTIVE")) {
-      fCmdList.push_back(PMN_INTERACTIVE);
-    } else if (it->fLine.Contains("CONTOURS")) {
-      fCmdList.push_back(PMN_CONTOURS);
+    } else if (it->fLine.Contains("INTERACTIVE", TString::kIgnoreCase)) {
+      cmd.first  = PMN_INTERACTIVE;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
+    } else if (it->fLine.Contains("CONTOURS", TString::kIgnoreCase)) {
+      cmd.first  = PMN_CONTOURS;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
       // filter out possible parameters for scan
       TObjArray *tokens = 0;
       TObjString *ostr;
       TString str;
       UInt_t ival;
 
-      tokens = it->fLine.Tokenize(" \t");
+      tokens = it->fLine.Tokenize(", \t");
 
       for (Int_t i=0; i<tokens->GetEntries(); i++) {
         ostr = dynamic_cast<TObjString*>(tokens->At(i));
@@ -359,35 +365,161 @@ Bool_t PFitter::CheckCommands()
         delete tokens;
         tokens = 0;
       }
-    } else if (it->fLine.Contains("EIGEN")) {
-      fCmdList.push_back(PMN_EIGEN);
-    } else if (it->fLine.Contains("HESSE")) {
+    } else if (it->fLine.Contains("EIGEN", TString::kIgnoreCase)) {
+      cmd.first  = PMN_EIGEN;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
+    } else if (it->fLine.Contains("FIX", TString::kIgnoreCase)) {
+      // check if the given set of parameters (number or names) is present
+      TObjArray *tokens = 0;
+      TObjString *ostr;
+      TString str;
+      UInt_t ival;
+
+      tokens = it->fLine.Tokenize(", \t");
+
+      for (Int_t i=1; i<tokens->GetEntries(); i++) {
+        ostr = dynamic_cast<TObjString*>(tokens->At(i));
+        str = ostr->GetString();
+
+        if (str.IsDigit()) { // token might be a parameter number
+          ival = str.Atoi();
+          // check that ival is in the parameter list
+          if (ival > fParams.size()) {
+            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            cerr << endl << ">> " << it->fLine.Data();
+            cerr << endl << ">> Parameter " << ival << " is out of the Parameter Range [1," << fParams.size() << "]";
+            cerr << endl;
+            fIsValid = false;
+            break;
+          }
+        } else { // token might be a parameter name
+          // check if token is present as parameter name
+          Bool_t found = false;
+          for (UInt_t j=0; j<fParams.size(); j++) {
+            if (fParams[j].fName.CompareTo(str, TString::kIgnoreCase) == 0) { // found
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            cerr << endl << ">> " << it->fLine.Data();
+            cerr << endl << ">> Parameter '" << str.Data() << "' is NOT present as a parameter name";
+            cerr << endl;
+            fIsValid = false;
+            break;
+          }
+        }
+      }
+
+      if (tokens) {
+        delete tokens;
+        tokens = 0;
+      }
+
+      // everything looks fine, feed the command list
+      cmd.first  = PMN_FIX;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
+    } else if (it->fLine.Contains("HESSE", TString::kIgnoreCase)) {
       fIsScanOnly = false;
-      fCmdList.push_back(PMN_HESSE);
-    } else if (it->fLine.Contains("MACHINE_PRECISION")) {
-      fCmdList.push_back(PMN_MACHINE_PRECISION);
-    } else if (it->fLine.Contains("MIGRAD")) {
+      cmd.first  = PMN_HESSE;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
+    } else if (it->fLine.Contains("MACHINE_PRECISION", TString::kIgnoreCase)) {
+      cmd.first  = PMN_MACHINE_PRECISION;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
+    } else if (it->fLine.Contains("MIGRAD", TString::kIgnoreCase)) {
       fIsScanOnly = false;
-      fCmdList.push_back(PMN_MIGRAD);
-    } else if (it->fLine.Contains("MINIMIZE")) {
+      cmd.first  = PMN_MIGRAD;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
+    } else if (it->fLine.Contains("MINIMIZE", TString::kIgnoreCase)) {
       fIsScanOnly = false;
-      fCmdList.push_back(PMN_MINIMIZE);
-    } else if (it->fLine.Contains("MINOS")) {
+      cmd.first  = PMN_MINIMIZE;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
+    } else if (it->fLine.Contains("MINOS", TString::kIgnoreCase)) {
       fIsScanOnly = false;
-      fCmdList.push_back(PMN_MINOS);
-    } else if (it->fLine.Contains("MNPLOT")) {
-      fCmdList.push_back(PMN_PLOT);
-    } else if (it->fLine.Contains("SAVE")) {
-      fCmdList.push_back(PMN_SAVE);
-    } else if (it->fLine.Contains("SCAN")) {
-      fCmdList.push_back(PMN_SCAN);
+      cmd.first  = PMN_MINOS;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
+    } else if (it->fLine.Contains("MNPLOT", TString::kIgnoreCase)) {
+      cmd.first  = PMN_PLOT;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
+    } else if (it->fLine.Contains("RELEASE", TString::kIgnoreCase)) {
+      // check if the given set of parameters (number or names) is present
+      TObjArray *tokens = 0;
+      TObjString *ostr;
+      TString str;
+      UInt_t ival;
+
+      tokens = it->fLine.Tokenize(", \t");
+
+      for (Int_t i=1; i<tokens->GetEntries(); i++) {
+        ostr = dynamic_cast<TObjString*>(tokens->At(i));
+        str = ostr->GetString();
+
+        if (str.IsDigit()) { // token might be a parameter number
+          ival = str.Atoi();
+          // check that ival is in the parameter list
+          if (ival > fParams.size()) {
+            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            cerr << endl << ">> " << it->fLine.Data();
+            cerr << endl << ">> Parameter " << ival << " is out of the Parameter Range [1," << fParams.size() << "]";
+            cerr << endl;
+            fIsValid = false;
+            break;
+          }
+        } else { // token might be a parameter name
+          // check if token is present as parameter name
+          Bool_t found = false;
+          for (UInt_t j=0; j<fParams.size(); j++) {
+            if (fParams[j].fName.CompareTo(str, TString::kIgnoreCase) == 0) { // found
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            cerr << endl << ">> " << it->fLine.Data();
+            cerr << endl << ">> Parameter '" << str.Data() << "' is NOT present as a parameter name";
+            cerr << endl;
+            fIsValid = false;
+            break;
+          }
+        }
+      }
+
+      if (tokens) {
+        delete tokens;
+        tokens = 0;
+      }
+      cmd.first  = PMN_RELEASE;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
+    } else if (it->fLine.Contains("RESTORE", TString::kIgnoreCase)) {
+      cmd.first  = PMN_RESTORE;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
+    } else if (it->fLine.Contains("SAVE", TString::kIgnoreCase)) {
+      cmd.first  = PMN_SAVE;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
+    } else if (it->fLine.Contains("SCAN", TString::kIgnoreCase)) {
+      cmd.first  = PMN_SCAN;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
       // filter out possible parameters for scan
       TObjArray *tokens = 0;
       TObjString *ostr;
       TString str;
       UInt_t ival;
 
-      tokens = it->fLine.Tokenize(" \t");
+      tokens = it->fLine.Tokenize(", \t");
 
       for (Int_t i=0; i<tokens->GetEntries(); i++) {
         ostr = dynamic_cast<TObjString*>(tokens->At(i));
@@ -476,9 +608,11 @@ Bool_t PFitter::CheckCommands()
         delete tokens;
         tokens = 0;
       }
-    } else if (it->fLine.Contains("SIMPLEX")) {
-      fCmdList.push_back(PMN_SIMPLEX);
-    } else if (it->fLine.Contains("STRATEGY")) {
+    } else if (it->fLine.Contains("SIMPLEX", TString::kIgnoreCase)) {
+      cmd.first  = PMN_SIMPLEX;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
+    } else if (it->fLine.Contains("STRATEGY", TString::kIgnoreCase)) {
       TObjArray *tokens = 0;
       TObjString *ostr;
       TString str;
@@ -506,12 +640,18 @@ Bool_t PFitter::CheckCommands()
         delete tokens;
         tokens = 0;
       }
-    } else if (it->fLine.Contains("USER_COVARIANCE")) {
-      fCmdList.push_back(PMN_USER_COVARIANCE);
-    } else if (it->fLine.Contains("USER_PARAM_STATE")) {
-      fCmdList.push_back(PMN_USER_PARAM_STATE);
-    } else if (it->fLine.Contains("PRINT")) {
-      fCmdList.push_back(PMN_PRINT);
+    } else if (it->fLine.Contains("USER_COVARIANCE", TString::kIgnoreCase)) {
+      cmd.first  = PMN_USER_COVARIANCE;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
+    } else if (it->fLine.Contains("USER_PARAM_STATE", TString::kIgnoreCase)) {
+      cmd.first  = PMN_USER_PARAM_STATE;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
+    } else if (it->fLine.Contains("PRINT", TString::kIgnoreCase)) {
+      cmd.first  = PMN_PRINT;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
     } else { // unkown command
       cerr << endl << ">> **FATAL ERROR**";
       cerr << endl << ">> PFitter::CheckCommands(): In line " << it->fLineNo << " an unkown command is found:";
@@ -519,6 +659,35 @@ Bool_t PFitter::CheckCommands()
       cerr << endl << ">> Will stop ...";
       cerr << endl;
       fIsValid = false;
+    }
+  }
+
+  // Check that in case release/restore is present, that it is followed by a minimizer before minos is called.
+  // If this is not the case, place a warning
+  Bool_t fixFlag = false;
+  Bool_t releaseFlag = false;
+  Bool_t minimizerFlag = false;
+  for (it = fCmdLines.begin(); it != fCmdLines.end(); ++it) {
+    if (it->fLine.Contains("FIX", TString::kIgnoreCase))
+      fixFlag = true;
+    else if (it->fLine.Contains("RELEASE", TString::kIgnoreCase) ||
+        it->fLine.Contains("RESTORE", TString::kIgnoreCase))
+      releaseFlag = true;
+    else if (it->fLine.Contains("MINIMIZE", TString::kIgnoreCase) ||
+             it->fLine.Contains("MIGRAD", TString::kIgnoreCase) ||
+             it->fLine.Contains("SIMPLEX", TString::kIgnoreCase)) {
+      if (releaseFlag)
+        minimizerFlag = true;
+    } else if (it->fLine.Contains("MINOS", TString::kIgnoreCase)) {
+      if (fixFlag && releaseFlag && !minimizerFlag) {
+        cerr << endl << ">> PFitter::CheckCommands(): **WARNING** RELEASE/RESTORE command present";
+        cerr << endl << ">> without minimizer command (MINIMIZE/MIGRAD/SIMPLEX) between";
+        cerr << endl << ">> RELEASE/RESTORE and MINOS. Behaviour might be different to the";
+        cerr << endl << ">> expectation of the user ?!?" << endl;
+      }
+      fixFlag = false;
+      releaseFlag = false;
+      minimizerFlag = false;
     }
   }
 
@@ -608,6 +777,54 @@ Bool_t PFitter::ExecuteContours()
 }
 
 //--------------------------------------------------------------------------
+// ExecuteFix
+//--------------------------------------------------------------------------
+/**
+ * <p>Fix parameter list given at lineNo of the command block.
+ *
+ * \param lineNo the line number of the command block
+ *
+ * <b>return:</b> true if done, otherwise returns false.
+ */
+Bool_t PFitter::ExecuteFix(UInt_t lineNo)
+{
+  TObjArray *tokens = 0;
+  TObjString *ostr;
+  TString str;
+
+  tokens = fCmdLines[lineNo].fLine.Tokenize(", \t");
+
+  cout << ">> PFitter::ExecuteFix(): " << fCmdLines[lineNo].fLine.Data() << endl;
+
+  // Check if there is already a function minimum, i.e. migrad, minimization, or simplex has been called previously.
+  // If so, update minuit2 user parameters
+  if (fFcnMin != 0) {
+    if (fFcnMin->IsValid()) {
+      fMnUserParams = fFcnMin->UserParameters();
+    }
+  }
+
+  for (Int_t i=1; i<tokens->GetEntries(); i++) {
+    ostr = dynamic_cast<TObjString*>(tokens->At(i));
+    str = ostr->GetString();
+
+    if (str.IsDigit()) { // token is a parameter number
+      fMnUserParams.Fix(static_cast<UInt_t>(str.Atoi())-1);
+    } else { // token is a parameter name
+      fMnUserParams.Fix(str.Data());
+    }
+  }
+
+  // clean up
+  if (tokens) {
+    delete tokens;
+    tokens = 0;
+  }
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
 // ExecuteHesse
 //--------------------------------------------------------------------------
 /**
@@ -638,12 +855,6 @@ Bool_t PFitter::ExecuteHesse()
     return false;
   }
 
-  // keep the user parameter state
-  if (fMnUserParamState) {
-    delete fMnUserParamState;
-  }
-  fMnUserParamState = new ROOT::Minuit2::MnUserParameterState(mnState);
-
   // fill parabolic errors
   for (UInt_t i=0; i<fParams.size(); i++) {
     fRunInfo->SetMsrParamStep(i, mnState.Error(i));
@@ -665,10 +876,6 @@ Bool_t PFitter::ExecuteMigrad()
 {
   cout << ">> PFitter::ExecuteMigrad(): will call migrad ..." << endl;
 
-  // if already some minimization is done use the minuit2 output as input
-  if (fFcnMin)
-    fMnUserParams = fFcnMin->UserParameters();
-
   // create migrad object
   // strategy is by default = 'default'
   ROOT::Minuit2::MnMigrad migrad((*fFitterFcn), fMnUserParams, fStrategy);
@@ -689,14 +896,13 @@ Bool_t PFitter::ExecuteMigrad()
   // keep FunctionMinimum object
   if (fFcnMin) { // fFcnMin exist hence clean up first
     delete fFcnMin;
+    fFcnMin = 0;
   }
   fFcnMin = new ROOT::Minuit2::FunctionMinimum(min);
 
-  // keep user parameter state
-  if (fMnUserParamState) {
-    delete fMnUserParamState;
-  }
-  fMnUserParamState = new ROOT::Minuit2::MnUserParameterState(min.UserState());
+  // keep user parameters
+  if (fFcnMin)
+    fMnUserParams = fFcnMin->UserParameters();
 
   // fill run info
   for (UInt_t i=0; i<fParams.size(); i++) {
@@ -710,7 +916,7 @@ Bool_t PFitter::ExecuteMigrad()
   UInt_t ndf = fFitterFcn->GetTotalNoOfFittedBins();
   // subtract number of varied parameters from total no of fitted bins -> ndf
   for (UInt_t i=0; i<fParams.size(); i++) {
-    if (min.UserState().Error(i) != 0.0)
+    if ((min.UserState().Error(i) != 0.0) && !fMnUserParams.Parameters().at(i).IsFixed())
       ndf -= 1;
   }
 
@@ -735,10 +941,6 @@ Bool_t PFitter::ExecuteMinimize()
 {
   cout << ">> PFitter::ExecuteMinimize(): will call minimize ..." << endl;
 
-  // if already some minimization is done use the minuit2 output as input
-  if (fFcnMin)
-    fMnUserParams = fFcnMin->UserParameters();
-
   // create minimizer object
   // strategy is by default = 'default'
   ROOT::Minuit2::MnMinimize minimize((*fFitterFcn), fMnUserParams, fStrategy);
@@ -746,10 +948,10 @@ Bool_t PFitter::ExecuteMinimize()
   // minimize
   // maxfcn is MINUIT2 Default maxfcn
   UInt_t maxfcn = numeric_limits<UInt_t>::max();
-//cout << endl << "maxfcn=" << maxfcn << endl;
+
   // tolerance = MINUIT2 Default tolerance
   Double_t tolerance = 0.1;
-  ROOT::Minuit2::FunctionMinimum min = minimize(maxfcn, tolerance); 
+  ROOT::Minuit2::FunctionMinimum min = minimize(maxfcn, tolerance);
   if (!min.IsValid()) {
     cerr << endl << "**WARNING**: PFitter::ExecuteMinimize(): Fit did not converge, sorry ...";
     cerr << endl;
@@ -760,14 +962,13 @@ Bool_t PFitter::ExecuteMinimize()
   // keep FunctionMinimum object
   if (fFcnMin) { // fFcnMin exist hence clean up first
     delete fFcnMin;
+    fFcnMin = 0;
   }
   fFcnMin = new ROOT::Minuit2::FunctionMinimum(min);
 
-  // keep user parameter state
-  if (fMnUserParamState) {
-    delete fMnUserParamState;
-  }
-  fMnUserParamState = new ROOT::Minuit2::MnUserParameterState(min.UserState());
+  // keep user parameters
+  if (fFcnMin)
+    fMnUserParams = fFcnMin->UserParameters();
 
   // fill run info
   for (UInt_t i=0; i<fParams.size(); i++) {
@@ -781,7 +982,7 @@ Bool_t PFitter::ExecuteMinimize()
   UInt_t ndf = fFitterFcn->GetTotalNoOfFittedBins();
   // subtract number of varied parameters from total no of fitted bins -> ndf
   for (UInt_t i=0; i<fParams.size(); i++) {
-    if (min.UserState().Error(i) != 0.0)
+    if ((min.UserState().Error(i) != 0.0) && !fMnUserParams.Parameters().at(i).IsFixed())
       ndf -= 1;
   }
 
@@ -829,7 +1030,8 @@ Bool_t PFitter::ExecuteMinos()
     // only try to call minos if the parameter is not fixed!!
     // the 1st condition is from an user fixed variable,
     // the 2nd condition is from an all together unused variable
-    if ((fMnUserParams.Error(i) != 0) && (fRunInfo->ParameterInUse(i) != 0)) {
+    // the 3rd condition is a variable fixed via the FIX command
+    if ((fMnUserParams.Error(i) != 0) && (fRunInfo->ParameterInUse(i) != 0) && (!fMnUserParams.Parameters().at(i).IsFixed())) {
       // 1-sigma MINOS errors
       ROOT::Minuit2::MinosError err = minos.Minos(i);
 
@@ -837,9 +1039,18 @@ Bool_t PFitter::ExecuteMinos()
         // fill msr-file structure
         fRunInfo->SetMsrParamStep(i, err.Lower());
         fRunInfo->SetMsrParamPosError(i, err.Upper());
+        fRunInfo->SetMsrParamPosErrorPresent(i, true);
       } else {
         fRunInfo->SetMsrParamPosErrorPresent(i, false);
       }
+    }
+
+    if (fMnUserParams.Parameters().at(i).IsFixed()) {
+      cerr << endl << ">> PFitter::ExecuteMinos(): **WARNING** Parameter " << fMnUserParams.Name(i) << " (ParamNo " << i+1 << ") is fixed!";
+      cerr << endl << ">>    Will set STEP to zero, i.e. making it a constant parameter";
+      cerr << endl;
+      fRunInfo->SetMsrParamStep(i, 0.0);
+      fRunInfo->SetMsrParamPosErrorPresent(i, false);
     }
   }
 
@@ -860,6 +1071,66 @@ Bool_t PFitter::ExecutePlot()
 
   ROOT::Minuit2::MnPlot plot;
   plot(fScanData);
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// ExecuteRelease
+//--------------------------------------------------------------------------
+/**
+ * <p>Release parameter list given at lineNo of the command block.
+ *
+ * \param lineNo the line number of the command block
+ *
+ * <b>return:</b> true if done, otherwise returns false.
+ */
+Bool_t PFitter::ExecuteRelease(UInt_t lineNo)
+{
+  TObjArray *tokens = 0;
+  TObjString *ostr;
+  TString str;
+
+  tokens = fCmdLines[lineNo].fLine.Tokenize(", \t");
+
+  cout << ">> PFitter::ExecuteRelease(): " << fCmdLines[lineNo].fLine.Data() << endl;
+
+  for (Int_t i=1; i<tokens->GetEntries(); i++) {
+    ostr = dynamic_cast<TObjString*>(tokens->At(i));
+    str = ostr->GetString();
+
+    if (str.IsDigit()) { // token is a parameter number
+      fMnUserParams.Release(static_cast<UInt_t>(str.Atoi())-1);
+    } else { // token is a parameter name
+      fMnUserParams.Release(str.Data());
+    }
+  }
+
+  // clean up
+  if (tokens) {
+    delete tokens;
+    tokens = 0;
+  }
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// ExecuteRestore
+//--------------------------------------------------------------------------
+/**
+ * <p>Release all fixed parameters
+ *
+ * <b>return:</b> true.
+ */
+Bool_t PFitter::ExecuteRestore()
+{
+  cout << "PFitter::ExecuteRestore(): release all fixed parameters (RESTORE) ..." << endl;
+
+  for (UInt_t i=0; i<fMnUserParams.Parameters().size(); i++) {
+    if (fMnUserParams.Parameters().at(i).IsFixed())
+      fMnUserParams.Release(i);
+  }
 
   return true;
 }
@@ -975,8 +1246,8 @@ Bool_t PFitter::ExecuteSave()
     fout.setf(ios::left, ios::adjustfield);
     fout.precision(6);
     fout.width(10);
-    if (fMnUserParamState)
-      fout << fMnUserParamState->Error(i) << " ";
+    if (fParams[i].fStep != 0.0)
+      fout << fMnUserParams.Error(i) << " ";
     else
       fout << "---";
     // write minos errors
@@ -1059,7 +1330,7 @@ Bool_t PFitter::ExecuteSave()
     fout << endl << " No   Global       ";
     for (UInt_t i=0; i<fParams.size(); i++) {
       // only free parameters, i.e. not fixed, and not unsed ones!
-      if ((fParams[i].fStep != 0) && fRunInfo->ParameterInUse(i) > 0) {
+      if ((fParams[i].fStep != 0) && (fRunInfo->ParameterInUse(i) > 0) && (!fMnUserParams.Parameters().at(i).IsFixed())) {
         fout.setf(ios::left, ios::adjustfield);
         fout.width(9);
         fout << i+1;
@@ -1171,10 +1442,6 @@ Bool_t PFitter::ExecuteSimplex()
 {
   cout << ">> PFitter::ExecuteSimplex(): will call simplex ..." << endl;
 
-  // if already some minimization is done use the minuit2 output as input
-  if (fFcnMin)
-    fMnUserParams = fFcnMin->UserParameters();
-
   // create minimizer object
   // strategy is by default = 'default'
   ROOT::Minuit2::MnSimplex simplex((*fFitterFcn), fMnUserParams, fStrategy);
@@ -1195,8 +1462,13 @@ Bool_t PFitter::ExecuteSimplex()
   // keep FunctionMinimum object
   if (fFcnMin) { // fFcnMin exist hence clean up first
     delete fFcnMin;
+    fFcnMin = 0;
   }
   fFcnMin = new ROOT::Minuit2::FunctionMinimum(min);
+
+  // keep user parameters
+  if (fFcnMin)
+    fMnUserParams = fFcnMin->UserParameters();
 
   // fill run info
   for (UInt_t i=0; i<fParams.size(); i++) {
@@ -1210,7 +1482,7 @@ Bool_t PFitter::ExecuteSimplex()
   UInt_t ndf = fFitterFcn->GetTotalNoOfFittedBins();
   // subtract number of varied parameters from total no of fitted bins -> ndf
   for (UInt_t i=0; i<fParams.size(); i++) {
-    if (min.UserState().Error(i) != 0.0)
+    if ((min.UserState().Error(i) != 0.0) && !fMnUserParams.Parameters().at(i).IsFixed())
       ndf -= 1;
   }
 
