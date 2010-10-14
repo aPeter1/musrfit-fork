@@ -830,7 +830,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             if (fRuns[runNo].GetFitRange(j) == -1)
               break;
             fout.width(8);
-            fout.precision(2);
+            fout.precision(NeededPrecision(fRuns[runNo].GetFitRange(j)));
             fout << left << fixed << fRuns[runNo].GetFitRange(j);
           }
           fout << endl;
@@ -1510,7 +1510,7 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
       if (fRuns[i].GetFitRange(j) == -1)
         break;
       fout.width(8);
-      fout.precision(2);
+      fout.precision(NeededPrecision(fRuns[i].GetFitRange(j)));
       fout << left << fixed << fRuns[i].GetFitRange(j);
     }
     fout << endl;
@@ -4589,6 +4589,41 @@ Bool_t PMsrHandler::CheckAddRunParameters()
   }
 
   return result;
+}
+
+//--------------------------------------------------------------------------
+// NeededPrecision (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculates the needed precision of Double_t values for WriteMsrLogFile and WriteMsrFile of the fit range.
+ * If a precision of > 4 decimal places is needed, a warning is placed and a value of 4 is returned.
+ *
+ * \param dval value for which the precision has to be estimated
+ *
+ * <b>return:</b>
+ * needed precision fo the fit-range
+ */
+UInt_t PMsrHandler::NeededPrecision(Double_t dval)
+{
+   UInt_t prec=0;
+
+   Int_t ival = static_cast<Int_t>(round(dval*1.0e4));
+
+   if ((ival % 10) != 0)
+     prec = 4;
+   else if ((ival % 100) != 0)
+     prec = 3;
+   else if ((ival % 1000) != 0)
+     prec = 2;
+   else if ((ival % 10000) != 0)
+     prec = 1;
+   else if (static_cast<Double_t>(ival)-dval*1.0e4 > 0.1) {
+     prec = 4;
+     cerr << endl << ">> PMsrHandler::NeededPrecision(): **WARNING** fit range value = " << dval << ", is asking for a rediculous resolution.";
+     cerr << endl << ">>   Will limit the precision to 4 decimal places, only." << endl;
+   }
+
+   return prec;
 }
 
 // end ---------------------------------------------------------------------

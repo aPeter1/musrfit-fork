@@ -133,6 +133,8 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
   }
 
   connect( fTabWidget, SIGNAL( currentChanged(QWidget*) ), this, SLOT( applyFontSettings(QWidget*) ));
+
+  fLastDirInUse = fAdmin->getDefaultSavePath();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -822,13 +824,19 @@ void PTextEdit::fileNew()
 void PTextEdit::fileOpen()
 {
   QStringList flns = QFileDialog::getOpenFileNames( this, tr("Open msr-/mlog-File"),
-                        fAdmin->getDefaultSavePath(),
+                        fLastDirInUse,
                         tr( "msr-Files (*.msr);;msr-Files (*.msr *.mlog);;All Files (*)" ));
 
   QStringList::Iterator it = flns.begin();
   QFileInfo finfo1, finfo2;
   QString tabFln;
   bool alreadyOpen = false;
+
+  // if flns are present, keep the corresponding directory
+  if (flns.size() > 0) {
+    finfo1.setFile(flns.at(0));
+    fLastDirInUse = finfo1.absoluteFilePath();
+  }
 
   while( it != flns.end() ) {
     // check if the file is not already open
@@ -2045,6 +2053,8 @@ void PTextEdit::musrView()
 
   str = *fFilenames.find( currentEditor() );
   cmd += str + "\" &";
+
+qDebug() << endl << cmd << endl;
 
   system(cmd.toLatin1());
 }

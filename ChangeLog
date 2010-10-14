@@ -48,6 +48,10 @@ FIXED warning messages
 FIXED db data tag reading error
 FIXED usage of BOOST >= 1.38.0
 FIXED the extraction of the time resolution for the mud data format, since MUD_getHistFsPerBin seems sometimes to return just crap.
+CHANGED fit range decimal precision handling of PMsrHandler improved (MUSR-150 request). It is now
+        handling up to 4 decimal places.
+CHANGED musredit: now it is keeping the directory from which the last msr-file has been loaded. This directory is 
+        used when a new open dialog is called.
 CHANGED another attempt to get proper zooming/unzooming. This time I tried to disentangle the rather messy PMusrCanvas class.
         Most of the checks seems to work, though still for non-muSR style, musrview is crashing once in a while which seems to 
 	come from root rather than musrview. I will try to investigate that on root macro level. 

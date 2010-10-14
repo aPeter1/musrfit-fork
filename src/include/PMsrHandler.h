@@ -138,6 +138,8 @@ class PMsrHandler
     virtual void InitFourierParameterStructure(PMsrFourierStructure &fourier);
 
     virtual Bool_t FilterNumber(TString str, const Char_t *filter, Int_t offset, Int_t &no);
+
+    virtual UInt_t NeededPrecision(Double_t dval);
 };
 
 #endif // _PMSRHANDLER_H_
