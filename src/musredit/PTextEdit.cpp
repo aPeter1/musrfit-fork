@@ -2054,8 +2054,6 @@ void PTextEdit::musrView()
   str = *fFilenames.find( currentEditor() );
   cmd += str + "\" &";
 
-qDebug() << endl << cmd << endl;
-
   system(cmd.toLatin1());
 }
 
