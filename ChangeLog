@@ -48,6 +48,7 @@ FIXED warning messages
 FIXED db data tag reading error
 FIXED usage of BOOST >= 1.38.0
 FIXED the extraction of the time resolution for the mud data format, since MUD_getHistFsPerBin seems sometimes to return just crap.
+CHANGED musredit: improved file system watcher notification mechanism to prevent multiple user notifications.
 CHANGED fit range decimal precision handling of PMsrHandler improved (MUSR-150 request). It is now
         handling up to 4 decimal places.
 CHANGED musredit: now it is keeping the directory from which the last msr-file has been loaded. This directory is 

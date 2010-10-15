@@ -2362,6 +2362,8 @@ void PTextEdit::fileChanged(const QString &fileName)
   if (!fFileSystemWatcherActive)
     return;
 
+  fFileSystemWatcherActive = false;
+
   QString str = "File '" + fileName + "' changed on the system.\nDo you want to reload it?";
   int result = QMessageBox::question(this, "**INFO**", str, QMessageBox::Yes, QMessageBox::No);
   if (result == QMessageBox::Yes) {
@@ -2374,8 +2376,10 @@ void PTextEdit::fileChanged(const QString &fileName)
       }
     }
 
-    if (idx == -1)
+    if (idx == -1) {
+      fileSystemWatcherActivation();
       return;
+    }
 
     // remove file from file system watcher
     fFileSystemWatcher->removePath(fileName);
@@ -2385,6 +2389,8 @@ void PTextEdit::fileChanged(const QString &fileName)
     // load it
     load(fileName, idx);
   }
+
+  fileSystemWatcherActivation();
 }
 
 //----------------------------------------------------------------------------------------------------
