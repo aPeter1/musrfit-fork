@@ -49,7 +49,7 @@ class PRunNonMusr : public PRunBase
     virtual Double_t CalcMaxLikelihood(const std::vector<Double_t>& par);
     virtual void CalcTheory();
 
-    virtual UInt_t GetNoOfFitBins() { return fNoOfFitBins; } ///< returns the number of fitted bins
+    virtual UInt_t GetNoOfFitBins();
 
     virtual UInt_t GetXIndex();
     virtual UInt_t GetYIndex();
@@ -62,8 +62,6 @@ class PRunNonMusr : public PRunBase
   private:
     PRawRunData *fRawRunData; ///< raw run data handler
 
-    Double_t fFitStartTime; ///< fit start time
-    Double_t fFitStopTime;  ///< fit stop time
     UInt_t fNoOfFitBins;    ///< number of bins to be be fitted
 };
 

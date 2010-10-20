@@ -49,7 +49,7 @@ class PRunAsymmetry : public PRunBase
     virtual Double_t CalcMaxLikelihood(const std::vector<Double_t>& par);
     virtual void CalcTheory();
 
-    virtual UInt_t GetNoOfFitBins() { return fNoOfFitBins; } ///< returns the number of bins to be fitted.
+    virtual UInt_t GetNoOfFitBins();
 
   protected:
     virtual Bool_t PrepareData();
@@ -60,8 +60,6 @@ class PRunAsymmetry : public PRunBase
   private:
     UInt_t fAlphaBetaTag; ///< \f$ 1 \to \alpha = \beta = 1\f$; \f$ 2 \to \alpha \neq 1, \beta = 1\f$; \f$ 3 \to \alpha = 1, \beta \neq 1\f$; \f$ 4 \to \alpha \neq 1, \beta \neq 1\f$.
 
-    Double_t fFitStartTime; ///< fit start time
-    Double_t fFitStopTime;  ///< fit stop time
     UInt_t fNoOfFitBins;    ///< number of bins to be be fitted
 
     PDoubleVector fForward;     ///< forward histo data

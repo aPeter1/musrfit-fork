@@ -55,6 +55,7 @@ class PRunBase
 
     virtual Double_t CalcChiSquare(const vector<Double_t>& par) = 0; ///< pure virtual, i.e. needs to be implemented by the deriving class!!
     virtual Double_t CalcMaxLikelihood(const vector<Double_t>& par) = 0; ///< pure virtual, i.e. needs to be implemented by the deriving class!!
+    virtual void SetFitRange(PDoublePairVector fitRange);
 
     virtual void CalcTheory() = 0; ///< pure virtual, i.e. needs to be implemented by the deriving class!!
 
@@ -78,6 +79,9 @@ class PRunBase
     PRunData fData;             ///< data to be fitted, viewed, i.e. binned data
     Double_t fTimeResolution;   ///< time resolution in (us)
     PIntVector fT0s;            ///< all t0's of a run! The derived classes will handle it
+
+    Double_t fFitStartTime; ///< fit start time
+    Double_t fFitEndTime;   ///< fit end time
 
     PDoubleVector fFuncValues;  ///< is keeping the values of the functions from the FUNCTIONS block
     PTheory *fTheory;           ///< theory needed to calculate chi-square

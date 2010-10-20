@@ -41,8 +41,6 @@
  */
 PRunNonMusr::PRunNonMusr() : PRunBase()
 {
-  fFitStartTime = 0.0;
-  fFitStopTime  = 0.0;
   fNoOfFitBins  = 0;
 
   fHandleTag = kEmpty;
@@ -111,7 +109,7 @@ Double_t PRunNonMusr::CalcChiSquare(const std::vector<Double_t>& par)
   Double_t x;
   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
     x = fData.GetX()->at(i);
-    if ((x>=fFitStartTime) && (x<=fFitStopTime)) {
+    if ((x>=fFitStartTime) && (x<=fFitEndTime)) {
       diff = fData.GetValue()->at(i) - fTheory->Func(x, par, fFuncValues);
       chisq += diff*diff / (fData.GetError()->at(i)*fData.GetError()->at(i));
     }
@@ -143,6 +141,27 @@ Double_t PRunNonMusr::CalcMaxLikelihood(const std::vector<Double_t>& par)
  */
 void PRunNonMusr::CalcTheory()
 {
+}
+
+//--------------------------------------------------------------------------
+// GetNoOfFitBins (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculate the number of fitted bins for the current fit range.
+ *
+ * <b>return:</b> number of fitted bins.
+ */
+UInt_t PRunNonMusr::GetNoOfFitBins()
+{
+  fNoOfFitBins=0;
+  Double_t x;
+  for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
+    x = fData.GetX()->at(i);
+    if ((x >= fFitStartTime) && (x <= fFitEndTime))
+      fNoOfFitBins++;
+  }
+
+  return fNoOfFitBins;
 }
 
 //--------------------------------------------------------------------------
@@ -187,10 +206,6 @@ Bool_t PRunNonMusr::PrepareFitData()
 {
   Bool_t success = true;
 
-  // keep start/stop time for fit: here the meaning is of course start x, stop x
-  fFitStartTime = fRunInfo->GetFitRange(0);
-  fFitStopTime  = fRunInfo->GetFitRange(1);
-
   // get x-, y-index
   UInt_t xIndex = GetXIndex();
   UInt_t yIndex = GetYIndex();
@@ -222,7 +237,7 @@ Bool_t PRunNonMusr::PrepareFitData()
   Double_t x;
   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
     x = fData.GetX()->at(i);
-    if ((x >= fFitStartTime) && (x <= fFitStopTime))
+    if ((x >= fFitStartTime) && (x <= fFitEndTime))
       fNoOfFitBins++;
   }
 

@@ -43,22 +43,23 @@
 #define PMN_INTERACTIVE       0
 #define PMN_CONTOURS          1
 #define PMN_EIGEN             2
-#define PMN_FIX               3
-#define PMN_HESSE             4
-#define PMN_MACHINE_PRECISION 5
-#define PMN_MIGRAD            6
-#define PMN_MINIMIZE          7
-#define PMN_MINOS             8
-#define PMN_PLOT              9
-#define PMN_RELEASE           10
-#define PMN_RESTORE           11
-#define PMN_SAVE              12
-#define PMN_SCAN              13
-#define PMN_SIMPLEX           14
-#define PMN_STRATEGY          15
-#define PMN_USER_COVARIANCE   16
-#define PMN_USER_PARAM_STATE  17
-#define PMN_PRINT             18
+#define PMN_FIT_RANGE         3
+#define PMN_FIX               4
+#define PMN_HESSE             5
+#define PMN_MACHINE_PRECISION 6
+#define PMN_MIGRAD            7
+#define PMN_MINIMIZE          8
+#define PMN_MINOS             9
+#define PMN_PLOT              10
+#define PMN_RELEASE           11
+#define PMN_RESTORE           12
+#define PMN_SAVE              13
+#define PMN_SCAN              14
+#define PMN_SIMPLEX           15
+#define PMN_STRATEGY          16
+#define PMN_USER_COVARIANCE   17
+#define PMN_USER_PARAM_STATE  18
+#define PMN_PRINT             19
 
 /**
  * <p>Interface class to minuit2.
@@ -84,6 +85,7 @@ class PFitter
     UInt_t fStrategy; ///< fitting strategy (see minuit2 manual).
 
     PMsrHandler *fRunInfo; ///< pointer to the msr-file handler
+    PRunListCollection *fRunListCollection; ///< pointer to the run list collection
 
     PMsrParamList fParams; ///< msr-file parameters
 
@@ -103,11 +105,14 @@ class PFitter
     Double_t fScanHigh;        ///< scan range high. default=0.0 which means 2 std dev. (see MnScan/MnContours in the minuit2 user manual)
     PDoublePairVector fScanData; ///< keeps the scan/contour data
 
+    PDoublePairVector fOriginalFitRange; ///< keeps the original fit range in case there is a range command in the COMMAND block
+
     // commands
     Bool_t CheckCommands();
     Bool_t SetParameters();
 
     Bool_t ExecuteContours();
+    Bool_t ExecuteFitRange(UInt_t lineNo);
     Bool_t ExecuteFix(UInt_t lineNo);
     Bool_t ExecuteHesse();
     Bool_t ExecuteMigrad();

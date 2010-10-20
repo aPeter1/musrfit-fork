@@ -56,6 +56,8 @@ class PRunListCollection
 
     virtual Bool_t Add(Int_t runNo, EPMusrHandleTag tag);
 
+    virtual void SetFitRange(const PDoublePairVector fitRange);
+
     virtual Double_t GetSingleHistoChisq(const std::vector<Double_t>& par) const;
     virtual Double_t GetAsymmetryChisq(const std::vector<Double_t>& par) const;
     virtual Double_t GetMuMinusChisq(const std::vector<Double_t>& par) const;

@@ -48,14 +48,12 @@ class PRunMuMinus : public PRunBase
     virtual Double_t CalcMaxLikelihood(const std::vector<Double_t>& par);
     virtual void CalcTheory();
 
-    virtual UInt_t GetNoOfFitBins() { return fNoOfFitBins; }
+    virtual UInt_t GetNoOfFitBins();
 
   protected:
     virtual Bool_t PrepareData();
 
   private:
-    Double_t fFitStartTime; ///< fit start time
-    Double_t fFitStopTime;  ///< fit end time
     UInt_t fNoOfFitBins;    ///< number of bins to be fitted
 };
 

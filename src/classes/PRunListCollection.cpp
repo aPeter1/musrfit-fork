@@ -128,6 +128,28 @@ Bool_t PRunListCollection::Add(Int_t runNo, EPMusrHandleTag tag)
 }
 
 //--------------------------------------------------------------------------
+// SetFitRange (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Set the current fit range. If fitRange.size()==1 the given fit range will be used for all the runs,
+ * otherwise fitRange.size()==the number of runs in the msr-file, and for each run there will be an induvidual
+ * fit range.
+ *
+ * \param fitRange vector holding the fit range(s).
+ */
+void PRunListCollection::SetFitRange(const PDoublePairVector fitRange)
+{
+  for (UInt_t i=0; i<fRunSingleHistoList.size(); i++)
+    fRunSingleHistoList[i]->SetFitRange(fitRange);
+  for (UInt_t i=0; i<fRunAsymmetryList.size(); i++)
+    fRunAsymmetryList[i]->SetFitRange(fitRange);
+  for (UInt_t i=0; i<fRunMuMinusList.size(); i++)
+    fRunMuMinusList[i]->SetFitRange(fitRange);
+  for (UInt_t i=0; i<fRunNonMusrList.size(); i++)
+    fRunNonMusrList[i]->SetFitRange(fitRange);
+}
+
+//--------------------------------------------------------------------------
 // GetSingleHistoChisq
 //--------------------------------------------------------------------------
 /**

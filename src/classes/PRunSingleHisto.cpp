@@ -43,8 +43,6 @@
  */
 PRunSingleHisto::PRunSingleHisto() : PRunBase()
 {
-  fFitStartTime = 0.0;
-  fFitStopTime  = 0.0;
   fNoOfFitBins  = 0;
 }
 
@@ -136,7 +134,7 @@ Double_t PRunSingleHisto::CalcChiSquare(const std::vector<Double_t>& par)
   Double_t time;
   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
-    if ((time>=fFitStartTime) && (time<=fFitStopTime)) {
+    if ((time>=fFitStartTime) && (time<=fFitEndTime)) {
       diff = fData.GetValue()->at(i) -
             (N0*TMath::Exp(-time/tau)*(1.0+fTheory->Func(time, par, fFuncValues))+bkg);
       chisq += diff*diff / (fData.GetError()->at(i)*fData.GetError()->at(i));
@@ -204,7 +202,7 @@ Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
   Double_t time;
   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
-    if ((time>=fFitStartTime) && (time<=fFitStopTime)) {
+    if ((time>=fFitStartTime) && (time<=fFitEndTime)) {
       // calculate theory for the given parameter set
       theo = N0*TMath::Exp(-time/tau)*(1+fTheory->Func(time, par, fFuncValues))+bkg;
       // check if data value is not too small
@@ -282,6 +280,27 @@ void PRunSingleHisto::CalcTheory()
 
   // clean up
   par.clear();
+}
+
+//--------------------------------------------------------------------------
+// GetNoOfFitBins (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculate the number of fitted bins for the current fit range.
+ *
+ * <b>return:</b> number of fitted bins.
+ */
+UInt_t PRunSingleHisto::GetNoOfFitBins()
+{
+  fNoOfFitBins=0;
+  Double_t time;
+  for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
+    time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
+    if ((time >= fFitStartTime) && (time <= fFitEndTime))
+      fNoOfFitBins++;
+  }
+
+  return fNoOfFitBins;
 }
 
 //--------------------------------------------------------------------------
@@ -511,10 +530,6 @@ Bool_t PRunSingleHisto::PrepareData()
  */
 Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoNo)
 {
-  // keep start/stop time for fit
-  fFitStartTime = fRunInfo->GetFitRange(0);
-  fFitStopTime  = fRunInfo->GetFitRange(1);
-
   // transform raw histo data. This is done the following way (for details see the manual):
   // for the single histo fit, just the rebinned raw data are copied
 
@@ -622,7 +637,7 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
   Double_t time;
   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
-    if ((time >= fFitStartTime) && (time <= fFitStopTime))
+    if ((time >= fFitStartTime) && (time <= fFitEndTime))
       fNoOfFitBins++;
   }
 
@@ -721,7 +736,7 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
   Double_t time;
   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
-    if ((time >= fFitStartTime) && (time <= fFitStopTime))
+    if ((time >= fFitStartTime) && (time <= fFitEndTime))
       fNoOfFitBins++;
   }
 
@@ -1013,7 +1028,7 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
   fNoOfFitBins=0;
   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
-    if ((time >= fFitStartTime) && (time <= fFitStopTime))
+    if ((time >= fFitStartTime) && (time <= fFitEndTime))
       fNoOfFitBins++;
   }
 

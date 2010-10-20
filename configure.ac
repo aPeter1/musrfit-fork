@@ -1,5 +1,5 @@
 AC_PREREQ(2.59)
-AC_INIT(musrfit, 0.6.0, andreas.suter@psi.ch)
+AC_INIT(musrfit, 0.7.0, andreas.suter@psi.ch)
 AC_CONFIG_AUX_DIR(admin)
 AC_CANONICAL_HOST
 #AC_MSG_RESULT([${host} ${host_cpu} ${host_vendor} ${host_os}])
@@ -28,7 +28,7 @@ dnl -----------------------------------------------
 
 #release versioning
 MUSR_MAJOR_VERSION=0
-MUSR_MINOR_VERSION=6
+MUSR_MINOR_VERSION=7
 MUSR_MICRO_VERSION=0
 
 #release versioning

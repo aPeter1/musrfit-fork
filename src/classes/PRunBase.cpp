@@ -56,6 +56,9 @@ PRunBase::PRunBase()
   fRawData = 0;
   fTimeResolution = -1.0;
 
+  fFitStartTime = 0.0;
+  fFitEndTime   = 0.0;
+
   fValid = true;
   fHandleTag = kEmpty;
 }
@@ -106,6 +109,10 @@ PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo,
     cerr << endl << "**SEVERE ERROR** PRunBase::PRunBase: Theory is not valid :-(, will quit" << endl;
     exit(0);
   }
+
+  // set fit time ranges
+  fFitStartTime = fRunInfo->GetFitRange(0);
+  fFitEndTime   = fRunInfo->GetFitRange(1);
 }
 
 //--------------------------------------------------------------------------
@@ -123,8 +130,50 @@ PRunBase::~PRunBase()
   fFuncValues.clear();
 }
 
+
 //--------------------------------------------------------------------------
-// CleanUp
+// SetFitRange (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> Sets the current fit range, and recalculated the number of fitted bins
+ *
+ * \param fitRange vector with fit ranges
+ */
+void PRunBase::SetFitRange(PDoublePairVector fitRange)
+{
+  Double_t start=0.0, end=0.0;
+
+  assert(fitRange.size()); // make sure fitRange is not empty
+
+  if (fitRange.size()==1) { // one fit range for all
+    start = fitRange[0].first;
+    end   = fitRange[0].second;
+  } else {
+    // check that fRunNo is found within fitRange
+    if (fRunNo < static_cast<Int_t>(fitRange.size())) { // fRunNo present
+      start = fitRange[fRunNo].first;
+      end   = fitRange[fRunNo].second;
+    } else { // fRunNo NOT present
+      cerr << endl << ">> PRunBase::SetFitRange(): **ERROR** msr-file run entry " << fRunNo << " not present in fit range vector.";
+      cerr << endl << ">>    Will not do anything! Please check, this shouldn't happen." << endl;
+      return;
+    }
+  }
+
+  // check that start is before end
+  if (start > end) {
+    cerr << endl << ">> PRunBase::SetFitRange(): **WARNING** start=" << start << " is > as end=" << end;
+    cerr << endl << ">>    Will swap them, since otherwise chisq/logLH == 0.0" << endl;
+    fFitStartTime = end;
+    fFitEndTime   = start;
+  } else {
+    fFitStartTime = start;
+    fFitEndTime   = end;
+  }
+}
+
+//--------------------------------------------------------------------------
+// CleanUp (public)
 //--------------------------------------------------------------------------
 /**
  * <p> Clean up all locally allocate memory

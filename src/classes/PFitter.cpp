@@ -69,7 +69,7 @@ using namespace std;
  * \param chisq_only flag: true=calculate chisq only (no fitting)
  */
 PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, Bool_t chisq_only) :
-  fChisqOnly(chisq_only), fRunInfo(runInfo)
+  fChisqOnly(chisq_only), fRunInfo(runInfo), fRunListCollection(runListCollection)
 {
   // initialize variables
   fIsScanOnly = true;
@@ -91,6 +91,15 @@ PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, Bo
   fScanNoPoints = 41; // minuit2 default
   fScanLow  = 0.0; // minuit2 default, i.e. 2 std deviations
   fScanHigh = 0.0; // minuit2 default, i.e. 2 std deviations
+
+  // keep all the fit ranges in case RANGE command is present
+  PMsrRunList *runs = fRunInfo->GetMsrRunList();
+  PDoublePair range;
+  for (UInt_t i=0; i<runs->size(); i++) {
+    range.first  = (*runs)[i].GetFitRange(0);
+    range.second = (*runs)[i].GetFitRange(1);
+    fOriginalFitRange.push_back(range);
+  }
 
   // check msr minuit commands
   if (!CheckCommands()) {
@@ -182,6 +191,9 @@ Bool_t PFitter::DoFit()
         break;
       case PMN_CONTOURS:
         status = ExecuteContours();
+        break;
+      case PMN_FIT_RANGE:
+        status = ExecuteFitRange(fCmdList[i].second);
         break;
       case PMN_FIX:
         status = ExecuteFix(fCmdList[i].second);
@@ -318,6 +330,10 @@ Bool_t PFitter::CheckCommands()
             cerr << endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
             cerr << endl;
             fIsValid = false;
+            if (tokens) {
+              delete tokens;
+              tokens = 0;
+            }
             break;
           }
           ival = str.Atoi();
@@ -329,6 +345,10 @@ Bool_t PFitter::CheckCommands()
             cerr << endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
             cerr << endl;
             fIsValid = false;
+            if (tokens) {
+              delete tokens;
+              tokens = 0;
+            }
             break;
           }
           // keep parameter
@@ -345,6 +365,10 @@ Bool_t PFitter::CheckCommands()
             cerr << endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
             cerr << endl;
             fIsValid = false;
+            if (tokens) {
+              delete tokens;
+              tokens = 0;
+            }
             break;
           }
           ival = str.Atoi();
@@ -355,6 +379,10 @@ Bool_t PFitter::CheckCommands()
             cerr << endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
             cerr << endl;
             fIsValid = false;
+            if (tokens) {
+              delete tokens;
+              tokens = 0;
+            }
             break;
           }
           fScanNoPoints = ival;
@@ -369,6 +397,90 @@ Bool_t PFitter::CheckCommands()
       cmd.first  = PMN_EIGEN;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
+    } else if (it->fLine.Contains("FIT_RANGE", TString::kIgnoreCase)) {
+      // check the 3 options: FIT_RANGE RESET, FIT_RANGE start end, FIT_RANGE start1 end1 start2 end2 ... startN endN
+      TObjArray *tokens = 0;
+      TObjString *ostr;
+      TString str;
+
+      tokens = it->fLine.Tokenize(", \t");
+
+      if (tokens->GetEntries() == 2) {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.Contains("RESET"), TString::kIgnoreCase) {
+          cmd.first = PMN_FIT_RANGE;
+          cmd.second = cmdLineNo;
+          fCmdList.push_back(cmd);
+        } else {
+          cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+          cerr << endl << ">> " << it->fLine.Data();
+          cerr << endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE start end | FIT_RANGE s1 e1 s2 e2 .. sN eN,";
+          cerr << endl << ">>         with N the number of runs in the msr-file." << endl;
+          cerr << endl << ">>         Found " << str.Data() << ", instead of RESET" << endl;
+          fIsValid = false;
+          if (tokens) {
+            delete tokens;
+            tokens = 0;
+          }
+          break;
+        }
+      } else if ((tokens->GetEntries() > 1) && (static_cast<UInt_t>(tokens->GetEntries()) % 2) == 1) {
+        if ((tokens->GetEntries() > 3) && ((static_cast<UInt_t>(tokens->GetEntries())-1)) != 2*fRunInfo->GetMsrRunList()->size()) {
+          cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+          cerr << endl << ">> " << it->fLine.Data();
+          cerr << endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE start end | FIT_RANGE s1 e1 s2 e2 .. sN eN,";
+          cerr << endl << ">>         with N the number of runs in the msr-file.";
+          cerr << endl << ">>         Found N=" << (tokens->GetEntries()-1)/2 << ", # runs in msr-file=" << fRunInfo->GetMsrRunList()->size() << endl;
+          fIsValid = false;
+          if (tokens) {
+            delete tokens;
+            tokens = 0;
+          }
+          break;
+        } else {
+          // check that all range entries are numbers
+          Int_t n=1;
+          do {
+            ostr = dynamic_cast<TObjString*>(tokens->At(n));
+            str = ostr->GetString();
+          } while ((++n < tokens->GetEntries()) && str.IsFloat());
+
+          if (str.IsFloat()) { // everything is fine, last string was a floating point number
+            cmd.first = PMN_FIT_RANGE;
+            cmd.second = cmdLineNo;
+            fCmdList.push_back(cmd);
+          } else {
+            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            cerr << endl << ">> " << it->fLine.Data();
+            cerr << endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE <start> <end> | FIT_RANGE <s1> <e1> <s2> <e2> .. <sN> <eN>,";
+            cerr << endl << ">>         with N the number of runs in the msr-file.";
+            cerr << endl << ">>         Found token '" << str.Data() << "', which is not a floating point number." << endl;
+            fIsValid = false;
+            if (tokens) {
+              delete tokens;
+              tokens = 0;
+            }
+            break;
+          }
+        }
+      } else {
+        cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+        cerr << endl << ">> " << it->fLine.Data();
+        cerr << endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE start end | FIT_RANGE s1 e1 s2 e2 .. sN eN,";
+        cerr << endl << ">>         with N the number of runs in the msr-file." << endl;
+        fIsValid = false;
+        if (tokens) {
+          delete tokens;
+          tokens = 0;
+        }
+        break;
+      }
+
+      if (tokens) {
+        delete tokens;
+        tokens = 0;
+      }
     } else if (it->fLine.Contains("FIX", TString::kIgnoreCase)) {
       // check if the given set of parameters (number or names) is present
       TObjArray *tokens = 0;
@@ -391,6 +503,10 @@ Bool_t PFitter::CheckCommands()
             cerr << endl << ">> Parameter " << ival << " is out of the Parameter Range [1," << fParams.size() << "]";
             cerr << endl;
             fIsValid = false;
+            if (tokens) {
+              delete tokens;
+              tokens = 0;
+            }
             break;
           }
         } else { // token might be a parameter name
@@ -408,6 +524,10 @@ Bool_t PFitter::CheckCommands()
             cerr << endl << ">> Parameter '" << str.Data() << "' is NOT present as a parameter name";
             cerr << endl;
             fIsValid = false;
+            if (tokens) {
+              delete tokens;
+              tokens = 0;
+            }
             break;
           }
         }
@@ -472,6 +592,10 @@ Bool_t PFitter::CheckCommands()
             cerr << endl << ">> Parameter " << ival << " is out of the Parameter Range [1," << fParams.size() << "]";
             cerr << endl;
             fIsValid = false;
+            if (tokens) {
+              delete tokens;
+              tokens = 0;
+            }
             break;
           }
         } else { // token might be a parameter name
@@ -489,6 +613,10 @@ Bool_t PFitter::CheckCommands()
             cerr << endl << ">> Parameter '" << str.Data() << "' is NOT present as a parameter name";
             cerr << endl;
             fIsValid = false;
+            if (tokens) {
+              delete tokens;
+              tokens = 0;
+            }
             break;
           }
         }
@@ -533,6 +661,10 @@ Bool_t PFitter::CheckCommands()
             cerr << endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
             cerr << endl;            
             fIsValid = false;
+            if (tokens) {
+              delete tokens;
+              tokens = 0;
+            }
             break;
           }
           ival = str.Atoi();
@@ -544,6 +676,10 @@ Bool_t PFitter::CheckCommands()
             cerr << endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
             cerr << endl;
             fIsValid = false;
+            if (tokens) {
+              delete tokens;
+              tokens = 0;
+            }
             break;
           }
           // keep parameter
@@ -560,6 +696,10 @@ Bool_t PFitter::CheckCommands()
             cerr << endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
             cerr << endl;
             fIsValid = false;
+            if (tokens) {
+              delete tokens;
+              tokens = 0;
+            }
             break;
           }
           ival = str.Atoi();
@@ -570,6 +710,10 @@ Bool_t PFitter::CheckCommands()
             cerr << endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
             cerr << endl;
             fIsValid = false;
+            if (tokens) {
+              delete tokens;
+              tokens = 0;
+            }
             break;
           }
           fScanNoPoints = ival;
@@ -584,6 +728,10 @@ Bool_t PFitter::CheckCommands()
             cerr << endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
             cerr << endl;
             fIsValid = false;
+            if (tokens) {
+              delete tokens;
+              tokens = 0;
+            }
             break;
           }
           fScanLow = str.Atof();
@@ -598,6 +746,10 @@ Bool_t PFitter::CheckCommands()
             cerr << endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
             cerr << endl;
             fIsValid = false;
+            if (tokens) {
+              delete tokens;
+              tokens = 0;
+            }
             break;
           }
           fScanHigh = str.Atof();
@@ -659,6 +811,7 @@ Bool_t PFitter::CheckCommands()
       cerr << endl << ">> Will stop ...";
       cerr << endl;
       fIsValid = false;
+      break;
     }
   }
 
@@ -777,6 +930,72 @@ Bool_t PFitter::ExecuteContours()
 }
 
 //--------------------------------------------------------------------------
+// ExecuteFitRange
+//--------------------------------------------------------------------------
+/**
+ * <p>Change the fit range via command block.
+ *
+ * \param lineNo the line number of the command block
+ *
+ * <b>return:</b> true if done, otherwise returns false.
+ */
+Bool_t PFitter::ExecuteFitRange(UInt_t lineNo)
+{
+  cout << ">> PFitter::ExecuteFitRange(): " << fCmdLines[lineNo].fLine.Data() << endl;
+
+  TObjArray *tokens = 0;
+  TObjString *ostr;
+  TString str;
+
+  tokens = fCmdLines[lineNo].fLine.Tokenize(", \t");
+
+  PMsrRunList *runList = fRunInfo->GetMsrRunList();
+
+  // execute command, no error  checking needed since this has been already carried out in CheckCommands()
+  if (tokens->GetEntries() == 2) { // reset command
+    fRunListCollection->SetFitRange(fOriginalFitRange);
+  } else if (tokens->GetEntries() == 3) { // single fit range for all runs
+    Double_t start = 0.0, end = 0.0;
+    PDoublePair fitRange;
+    PDoublePairVector fitRangeVector;
+
+    ostr = dynamic_cast<TObjString*>(tokens->At(1));
+    str = ostr->GetString();
+    start = str.Atof();
+    ostr = dynamic_cast<TObjString*>(tokens->At(2));
+    str = ostr->GetString();
+    end = str.Atof();
+
+    fitRange.first  = start;
+    fitRange.second = end;
+    fitRangeVector.push_back(fitRange);
+    fRunListCollection->SetFitRange(fitRangeVector);
+
+  } else { // individual fit ranges for each run
+    Double_t start = 0.0, end = 0.0;
+    PDoublePair fitRange;
+    PDoublePairVector fitRangeVector;
+
+    for (UInt_t i=0; i<runList->size(); i++) {
+      ostr = dynamic_cast<TObjString*>(tokens->At(2*i+1));
+      str = ostr->GetString();
+      start = str.Atof();
+      ostr = dynamic_cast<TObjString*>(tokens->At(2*i+2));
+      str = ostr->GetString();
+      end = str.Atof();
+
+      fitRange.first  = start;
+      fitRange.second = end;
+      fitRangeVector.push_back(fitRange);
+    }
+
+    fRunListCollection->SetFitRange(fitRangeVector);
+  }
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
 // ExecuteFix
 //--------------------------------------------------------------------------
 /**
@@ -788,13 +1007,13 @@ Bool_t PFitter::ExecuteContours()
  */
 Bool_t PFitter::ExecuteFix(UInt_t lineNo)
 {
+  cout << ">> PFitter::ExecuteFix(): " << fCmdLines[lineNo].fLine.Data() << endl;
+
   TObjArray *tokens = 0;
   TObjString *ostr;
   TString str;
 
   tokens = fCmdLines[lineNo].fLine.Tokenize(", \t");
-
-  cout << ">> PFitter::ExecuteFix(): " << fCmdLines[lineNo].fLine.Data() << endl;
 
   // Check if there is already a function minimum, i.e. migrad, minimization, or simplex has been called previously.
   // If so, update minuit2 user parameters

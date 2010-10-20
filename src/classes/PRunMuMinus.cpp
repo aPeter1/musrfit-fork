@@ -41,8 +41,6 @@
  */
 PRunMuMinus::PRunMuMinus() : PRunBase()
 {
-  fFitStartTime = 0.0;
-  fFitStopTime  = 0.0;
   fNoOfFitBins  = 0;
 
   fHandleTag = kEmpty;
@@ -114,6 +112,19 @@ Double_t PRunMuMinus::CalcMaxLikelihood(const std::vector<Double_t>& par)
   cout << endl << "PRunSingleHisto::CalcMaxLikelihood(): not implemented yet ..." << endl;
 
   return 1.0;
+}
+
+//--------------------------------------------------------------------------
+// GetNoOfFitBins (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculate the number of fitted bins for the current fit range.
+ *
+ * <b>return:</b> number of fitted bins.
+ */
+UInt_t PRunMuMinus::GetNoOfFitBins()
+{
+  return fNoOfFitBins;
 }
 
 //--------------------------------------------------------------------------
