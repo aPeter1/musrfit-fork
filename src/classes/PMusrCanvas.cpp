@@ -1721,7 +1721,7 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     }
   }
 
-  // check if 'use_fit_range' plotting is whished
+  // check if 'use_fit_ranges' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
     start = fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(0); // needed to estimate size
     end   = fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(1); // needed to estimate size
@@ -1749,7 +1749,16 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
       fXmin = start;
       fXmax = end;
     }
-    if (!fYRangePresent) {
+    // check if y-range is given as well
+    if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin.size() != 0) {
+      ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin[0];
+      ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax[0];
+      dataSet.dataRange->SetYRange(ymin, ymax);
+      // keep range information
+      fYRangePresent = true;
+      fYmin = ymin;
+      fYmax = ymax;
+    } else {
       fYRangePresent = true;
       fYmin = -0.4;
       fYmax = 0.4;
@@ -2025,6 +2034,13 @@ void PMusrCanvas::HandleNonMusrDataSet(UInt_t plotNo, UInt_t runNo, PRunData *da
     xmin = fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(0); // needed to estimate size
     xmax = fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(1); // needed to estimate size
     dataSet.dataRange->SetXRange(xmin, xmax);
+
+    // check if y-range is given as well
+    if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin.size() != 0) {
+      ymin = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmin[0];
+      ymax = fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fYmax[0];
+      dataSet.dataRange->SetYRange(ymin, ymax);
+    }
   }
 
   // check if 'sub_ranges' plotting is whished

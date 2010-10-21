@@ -1672,7 +1672,10 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
 
     // use_fit_ranges
     if (fPlots[i].fUseFitRanges) {
-      fout << "use_fit_ranges" << endl;
+      if (!fPlots[i].fYmin.empty() && !fPlots[i].fYmax.empty())
+        fout << "use_fit_ranges " << fPlots[i].fYmin[0] << "  " << fPlots[i].fYmax[0] << endl;
+      else
+        fout << "use_fit_ranges" << endl;
     }
 
     // view_packing
@@ -3444,6 +3447,43 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
         }
       } else if (iter1->fLine.Contains("use_fit_ranges", TString::kIgnoreCase)) {
         param.fUseFitRanges = true;
+        // check if y-ranges are given
+
+        tokens = iter1->fLine.Tokenize(" \t");
+        if (!tokens) {
+          cerr << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
+          cerr << endl << endl;
+          return false;
+        }
+
+        if (tokens->GetEntries() == 3) { // i.e. use_fit_ranges ymin ymax
+          // handle y_min
+          ostr = dynamic_cast<TObjString*>(tokens->At(1));
+          str = ostr->GetString();
+          if (str.IsFloat())
+            param.fYmin.push_back((Double_t)str.Atof());
+          else
+            error = true;
+
+          // handle y_max
+          ostr = dynamic_cast<TObjString*>(tokens->At(2));
+          str = ostr->GetString();
+          if (str.IsFloat())
+            param.fYmax.push_back((Double_t)str.Atof());
+          else
+            error = true;
+        } else {
+          cerr << endl << ">> PMsrHandler::HandlePlotEntry: **WARNING** use_fit_ranges with undefined additional parameters in line " << iter1->fLineNo;
+          cerr << endl << ">>     Will ignore this PLOT block command line, sorry.";
+          cerr << endl << ">>     Proper syntax: use_fit_ranges [ymin ymax]";
+          cerr << endl << ">>     Found: '" << iter1->fLine.Data() << "'" << endl;
+        }
+
+        // clean up
+        if (tokens) {
+          delete tokens;
+          tokens = 0;
+        }
       } else if (iter1->fLine.Contains("logx", TString::kIgnoreCase)) {
         param.fLogX = true;
       } else if (iter1->fLine.Contains("logy", TString::kIgnoreCase)) {
@@ -3670,7 +3710,7 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
       cerr << endl << "[range tmin tmax [ymin ymax]]";
       cerr << endl << "[sub_ranges tmin1 tmax1 tmin2 tmax2 ... tminN tmaxN [ymin ymax]";
       cerr << endl << "[logx | logy]";
-      cerr << endl << "[use_fit_ranges]";
+      cerr << endl << "[use_fit_ranges [ymin ymax]]";
       cerr << endl << "[view_packing n]";
       cerr << endl;
       cerr << endl << "where <plot_type> is: 0=single histo asym,";
