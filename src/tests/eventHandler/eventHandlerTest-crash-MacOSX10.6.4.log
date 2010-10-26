@@ -1,0 +1,68 @@
+INFO:
+System:   MacOS X 10.6.4
+Compiler: gcc/g++ 4.2.1 (build 5664)
+ROOT:     5.27/06 (trunk@35856)
+
+==========================================================
+
+ *** Break *** segmentation violation
+
+
+
+===========================================================
+There was a crash.
+This is the entire stack trace of all threads:
+===========================================================
+
+Thread 2 (process 218):
+#0  0x00007fff8407208a in kevent ()
+#1  0x00007fff84073f5d in _dispatch_mgr_invoke ()
+#2  0x00007fff84073c34 in _dispatch_queue_invoke ()
+#3  0x00007fff8407375e in _dispatch_worker_thread2 ()
+#4  0x00007fff84073088 in _pthread_wqthread ()
+#5  0x00007fff84072f25 in start_wqthread ()
+
+Thread 1 (process 218):
+#0  0x00007fff840d6c90 in wait4 ()
+#1  0x00007fff840eb23e in system ()
+#2  0x0000000100128ab5 in TUnixSystem::StackTrace ()
+#3  0x0000000100126431 in TUnixSystem::DispatchSignals ()
+#4  <signal handler called>
+#5  0x0000000101a576c6 in TCanvas::EnterLeave ()
+#6  0x0000000101a5b1a2 in TCanvas::HandleInput ()
+#7  0x00000001024e955b in TRootCanvas::HandleContainerMotion ()
+#8  0x00000001024ef6e0 in TRootContainer::HandleMotion ()
+#9  0x0000000102443390 in TGFrame::HandleEvent ()
+#10 0x0000000102413570 in TGClient::HandleEvent ()
+#11 0x0000000102413e6b in TGClient::ProcessOneEvent ()
+#12 0x0000000102413ede in TGClient::HandleInput ()
+#13 0x0000000102413efd in TGInputHandler::Notify ()
+#14 0x000000010012655c in TUnixSystem::DispatchOneEvent ()
+#15 0x00000001000bef6d in TSystem::InnerLoop ()
+#16 0x00000001000c1213 in TSystem::Run ()
+#17 0x0000000100080867 in TApplication::Run ()
+#18 0x0000000100001aaf in main ()
+===========================================================
+
+
+The lines below might hint at the cause of the crash.
+If they do not help you then please submit a bug report at
+http://root.cern.ch/bugs. Please post the ENTIRE stack trace
+from above as an attachment in addition to anything else
+that might help us fixing this issue.
+===========================================================
+#5  0x0000000101a576c6 in TCanvas::EnterLeave ()
+#6  0x0000000101a5b1a2 in TCanvas::HandleInput ()
+#7  0x00000001024e955b in TRootCanvas::HandleContainerMotion ()
+#8  0x00000001024ef6e0 in TRootContainer::HandleMotion ()
+#9  0x0000000102443390 in TGFrame::HandleEvent ()
+#10 0x0000000102413570 in TGClient::HandleEvent ()
+#11 0x0000000102413e6b in TGClient::ProcessOneEvent ()
+#12 0x0000000102413ede in TGClient::HandleInput ()
+#13 0x0000000102413efd in TGInputHandler::Notify ()
+#14 0x000000010012655c in TUnixSystem::DispatchOneEvent ()
+#15 0x00000001000bef6d in TSystem::InnerLoop ()
+#16 0x00000001000c1213 in TSystem::Run ()
+#17 0x0000000100080867 in TApplication::Run ()
+#18 0x0000000100001aaf in main ()
+===========================================================
