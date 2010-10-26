@@ -28,7 +28,7 @@ endif
 ifeq ($(OSTYPE),Linux-gnu)
 OS = LINUX
 endif
-ifeq ($(OSTYPE),darwin)
+ifeq ($(OSTYPE),Darwin)
 OS = DARWIN
 endif
 
