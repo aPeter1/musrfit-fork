@@ -1,4 +1,10 @@
-[nemu@pc8372 eventHandler]$ ./eventHandlerTest
+INFO
+System:   Scientific Linux 5.1
+Compiler: gcc/g++ (GCC) 4.1.2 20080704
+ROOT:     ROOT 5.27/07 trunk@36261
+
+===========================================================
+
 
  *** Break *** segmentation violation
 
