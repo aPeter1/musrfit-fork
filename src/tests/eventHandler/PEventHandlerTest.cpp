@@ -120,6 +120,9 @@ void PEventHandlerTest::SwitchGraph()
 {
   Double_t xmin, xmax;
 
+  // tell the canvas that the selected object (the one under the mouse pointer) is not your object, before to actually delete it.
+  fMainCanvas->SetSelected(fMainCanvas->GetPadSave());
+
   if (fSwitched) {
     xmin = fMultiGraph1->GetXaxis()->GetBinCenter(fMultiGraph1->GetXaxis()->GetFirst());
     xmax = fMultiGraph1->GetXaxis()->GetBinCenter(fMultiGraph1->GetXaxis()->GetLast());

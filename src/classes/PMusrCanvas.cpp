@@ -3048,6 +3048,9 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
       xmax = fXmax;
     }
 
+    // tell the canvas that the selected object (the one under the mouse pointer) is not your object, before to actually delete it.
+    fMainCanvas->SetSelected(fMainCanvas->GetPadSave());
+
     // cleanup if previous fMultiGraphData is present
     if (fMultiGraphData) {
       delete fMultiGraphData;
@@ -3274,6 +3277,9 @@ void PMusrCanvas::PlotDifference(Bool_t unzoom)
       xmin = fXmin;
       xmax = fXmax;
     }
+
+    // tell the canvas that the selected object (the one under the mouse pointer) is not your object, before to actually delete it.
+    fMainCanvas->SetSelected(fMainCanvas->GetPadSave());
 
     // clean up previous fMultiGraphDiff
     if (fMultiGraphDiff) {
