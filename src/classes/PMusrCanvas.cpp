@@ -3408,14 +3408,26 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
       }
 
       // set y-range
-      // first find minimum/maximum of all histos
+      // first find minimum/maximum of all histos and theories
       ymin = GetMinimum(fData[0].dataFourierRe);
       ymax = GetMaximum(fData[0].dataFourierRe);
+      binContent = GetMinimum(fData[0].theoryFourierRe);
+      if (binContent < ymin)
+        ymin = binContent;
+      binContent = GetMaximum(fData[0].theoryFourierRe);
+      if (binContent > ymax)
+        ymax = binContent;
       for (UInt_t i=1; i<fData.size(); i++) {
         binContent = GetMinimum(fData[i].dataFourierRe);
         if (binContent < ymin)
           ymin = binContent;
         binContent = GetMaximum(fData[i].dataFourierRe);
+        if (binContent > ymax)
+          ymax = binContent;
+        binContent = GetMinimum(fData[i].theoryFourierRe);
+        if (binContent < ymin)
+          ymin = binContent;
+        binContent = GetMaximum(fData[i].theoryFourierRe);
         if (binContent > ymax)
           ymax = binContent;
       }
@@ -3463,11 +3475,23 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
       // first find minimum/maximum of all histos
       ymin = GetMinimum(fData[0].dataFourierIm);
       ymax = GetMaximum(fData[0].dataFourierIm);
+      binContent = GetMinimum(fData[0].theoryFourierIm);
+      if (binContent < ymin)
+        ymin = binContent;
+      binContent = GetMaximum(fData[0].theoryFourierIm);
+      if (binContent > ymax)
+        ymax = binContent;
       for (UInt_t i=1; i<fData.size(); i++) {
         binContent = GetMinimum(fData[i].dataFourierIm);
         if (binContent < ymin)
           ymin = binContent;
         binContent = GetMaximum(fData[i].dataFourierIm);
+        if (binContent > ymax)
+          ymax = binContent;
+        binContent = GetMinimum(fData[i].theoryFourierIm);
+        if (binContent < ymin)
+          ymin = binContent;
+        binContent = GetMaximum(fData[i].theoryFourierIm);
         if (binContent > ymax)
           ymax = binContent;
       }
@@ -3533,6 +3557,21 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
         if (binContent > ymax)
           ymax = binContent;
       }
+      // theory part min/max
+      for (UInt_t i=0; i<fData.size(); i++) {
+        binContent = GetMinimum(fData[i].theoryFourierRe);
+        if (binContent < ymin)
+          ymin = binContent;
+        binContent = GetMaximum(fData[i].theoryFourierRe);
+        if (binContent > ymax)
+          ymax = binContent;
+        binContent = GetMinimum(fData[i].theoryFourierIm);
+        if (binContent < ymin)
+          ymin = binContent;
+        binContent = GetMaximum(fData[i].theoryFourierIm);
+        if (binContent > ymax)
+          ymax = binContent;
+      }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
 
@@ -3580,14 +3619,26 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
       }
 
       // set y-range
-      // first find minimum/maximum of all histos
+      // first find minimum/maximum of all histos and theory
       ymin = GetMinimum(fData[0].dataFourierPwr);
       ymax = GetMaximum(fData[0].dataFourierPwr);
+      binContent = GetMinimum(fData[0].theoryFourierPwr);
+      if (binContent < ymin)
+        ymin = binContent;
+      binContent = GetMaximum(fData[0].theoryFourierPwr);
+      if (binContent > ymax)
+        ymax = binContent;
       for (UInt_t i=1; i<fData.size(); i++) {
         binContent = GetMinimum(fData[i].dataFourierPwr);
         if (binContent < ymin)
           ymin = binContent;
         binContent = GetMaximum(fData[i].dataFourierPwr);
+        if (binContent > ymax)
+          ymax = binContent;
+        binContent = GetMinimum(fData[i].theoryFourierPwr);
+        if (binContent < ymin)
+          ymin = binContent;
+        binContent = GetMaximum(fData[i].theoryFourierPwr);
         if (binContent > ymax)
           ymax = binContent;
       }
@@ -3633,11 +3684,23 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
       // first find minimum/maximum of all histos
       ymin = GetMinimum(fData[0].dataFourierPhase);
       ymax = GetMaximum(fData[0].dataFourierPhase);
+      binContent = GetMinimum(fData[0].theoryFourierPhase);
+      if (binContent < ymin)
+        ymin = binContent;
+      binContent = GetMaximum(fData[0].theoryFourierPhase);
+      if (binContent > ymax)
+        ymax = binContent;
       for (UInt_t i=1; i<fData.size(); i++) {
         binContent = GetMinimum(fData[i].dataFourierPhase);
         if (binContent < ymin)
           ymin = binContent;
         binContent = GetMaximum(fData[i].dataFourierPhase);
+        if (binContent > ymax)
+          ymax = binContent;
+        binContent = GetMinimum(fData[i].theoryFourierPhase);
+        if (binContent < ymin)
+          ymin = binContent;
+        binContent = GetMaximum(fData[i].theoryFourierPhase);
         if (binContent > ymax)
           ymax = binContent;
       }

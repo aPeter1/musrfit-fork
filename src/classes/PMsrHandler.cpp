@@ -3472,7 +3472,9 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
             param.fYmax.push_back((Double_t)str.Atof());
           else
             error = true;
-        } else {
+        }
+
+        if ((tokens->GetEntries() != 1) && (tokens->GetEntries() != 3)) {
           cerr << endl << ">> PMsrHandler::HandlePlotEntry: **WARNING** use_fit_ranges with undefined additional parameters in line " << iter1->fLineNo;
           cerr << endl << ">>     Will ignore this PLOT block command line, sorry.";
           cerr << endl << ">>     Proper syntax: use_fit_ranges [ymin ymax]";
