@@ -22,6 +22,7 @@ NEW integration of a few external musrfit plug-ins into the standard build proce
 NEW default estimates for 'data' and 'background' entries in RUN blocks
 NEW directory with some msr- and data-files for quick testing of new musrfit installations
 NEW option to musrt0: the key 'T' will set the t0 cursor to the maximum of the histogram
+FIXED hanging musrt0's should be eliminated now (MUSR-153)
 FIXED wrong WARNING message for use_fit_ranges
 FIXED bug in event handling leading to crash for non-muSR when switching between view and difference view
 FIXED chisq/maxLH lables in the statistics block are properly handled now (MUSR-148)

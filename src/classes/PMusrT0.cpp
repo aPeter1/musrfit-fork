@@ -511,6 +511,7 @@ PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
 
   fMainCanvas->Connect("ProcessedEvent(Int_t,Int_t,Int_t,TObject*)", "PMusrT0",
                        this, "HandleCmdKey(Int_t,Int_t,Int_t,TObject*)");
+  fMainCanvas->Connect("Closed()", "PMusrT0", this, "Quit()");
 
   if (fMusrT0Data.GetCmdTag() != PMUSRT0_GET_T0)
     fDataAndBkgEnabled = true;
@@ -592,7 +593,7 @@ PMusrT0::~PMusrT0()
     delete fLastDataLine;
     fLastDataLine = 0;
   }
-  if (fMainCanvas) {
+  if (fMainCanvas && (fStatus != 2)) {
     delete fMainCanvas;
     fMainCanvas = 0;
   }
@@ -663,6 +664,19 @@ void PMusrT0::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   } else if (x == 'D') { // set last data channel
     SetDataLastChannel();
   }
+}
+
+//--------------------------------------------------------------------------
+// Quit (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Slot called when the canvas is closed via the close icon (cross top right corner).
+ * It is emitting a global quit singal.
+ */
+void PMusrT0::Quit()
+{
+  fStatus = 2; // will quit globally
+  Done(0);
 }
 
 //--------------------------------------------------------------------------

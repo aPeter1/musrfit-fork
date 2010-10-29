@@ -111,7 +111,7 @@ Bool_t musrt0_item(TApplication &app, PMsrHandler *msrHandler, PMusrT0Data &data
 
   app.Run(true); // true needed that Run will return after quit
   Bool_t result = true;
-  if (musrT0->GetStatus() == 1)
+  if (musrT0->GetStatus() >= 1)
     result = false;
   else
     result = true;

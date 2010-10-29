@@ -126,6 +126,7 @@ class PMusrT0 : public TObject, public TQObject
 
     virtual void Done(Int_t status=0); // *SIGNAL*
     virtual void HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected); // SLOT
+    virtual void Quit(); // SLOT
 
 #ifndef __MAKECINT__
     virtual void SetMsrHandler(PMsrHandler *msrHandler);
