@@ -37,7 +37,11 @@
 
 #include <cstdlib>
 #include <cmath>
+
+#ifdef HAVE_GOMP
 #include <omp.h>
+#endif
+
 #include <iostream>
 using namespace std;
 

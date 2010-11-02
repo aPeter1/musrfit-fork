@@ -40,7 +40,9 @@
 #include <fstream>
 #include <cassert>
 
+#ifdef HAVE_GOMP
 #include <omp.h>
+#endif
 
 /* USED FOR DEBUGGING-----------------------------------
 #include <cstdio>
@@ -460,6 +462,41 @@ void TPofBCalc::Calculate(const TBulkVortexFieldCalc *vortexLattice, const vecto
 
 //          of << 1.0/(1.0+sigmaSq*Rsq1) + 1.0/(1.0+sigmaSq*Rsq2) + 1.0/(1.0+sigmaSq*Rsq3) \
 //                           + 1.0/(1.0+sigmaSq*Rsq4) + 1.0/(1.0+sigmaSq*Rsq5) + 1.0/(1.0+sigmaSq*Rsq6) << " ";
+        }
+      }
+//      of << endl;
+    }
+//    of.close();
+  } else if (para.size() == 8 && para[6] == 3.0 && para[5] != 0.0 && vortexLattice->IsTriangular()) {
+    // add antiferromagnetic fields in the vortex cores
+    double field, Rsq1, Rsq2, Rsq3, Rsq4, Rsq5, Rsq6, one_xiSq(-1.0/(para[7]*para[7]));
+//    ofstream of("AFfields.dat");
+    for (unsigned int j(0); j < numberOfSteps_2; ++j) {
+      for (unsigned int i(0); i < numberOfSteps_2; ++i) {
+        Rsq1 = static_cast<double>(3*i*i + j*j)/static_cast<double>(numberOfStepsSq);
+        Rsq2 = static_cast<double>(3*(numberOfSteps_2 - i)*(numberOfSteps_2 - i) \
+             + (numberOfSteps_2 - j)*(numberOfSteps_2 - j))/static_cast<double>(numberOfStepsSq);
+        Rsq3 = static_cast<double>(3*(numberOfSteps - i)*(numberOfSteps - i) \
+             + j*j)/static_cast<double>(numberOfStepsSq);
+        Rsq4 = static_cast<double>(3*(numberOfSteps_2 - i)*(numberOfSteps_2 - i) \
+             + (numberOfSteps_2 + j)*(numberOfSteps_2 + j))/static_cast<double>(numberOfStepsSq);
+        Rsq5 = static_cast<double>(3*i*i \
+             + (numberOfSteps - j)*(numberOfSteps - j))/static_cast<double>(numberOfStepsSq);
+        Rsq6 = static_cast<double>(3*(numberOfSteps_2 + i)*(numberOfSteps_2 + i) \
+             + (numberOfSteps_2 - j)*(numberOfSteps_2 - j))/static_cast<double>(numberOfStepsSq);
+
+        field = vortexFields[i + numberOfSteps*j] \
+              + para[5]*(exp(Rsq1*one_xiSq) + exp(Rsq2*one_xiSq) + exp(Rsq3*one_xiSq) \
+                        +exp(Rsq4*one_xiSq) + exp(Rsq5*one_xiSq) + exp(Rsq6*one_xiSq));
+
+//          of << para[5]*(exp(Rsq1*one_xiSq) - exp(Rsq2*one_xiSq) + exp(Rsq3*one_xiSq) \
+//                        -exp(Rsq4*one_xiSq) + exp(Rsq5*one_xiSq) - exp(Rsq6*one_xiSq)) << " ";
+
+        fill_index = static_cast<unsigned int>(ceil(fabs((field/fDB))));
+        if (fill_index < fPBSize) {
+          fPB[fill_index] += 1.0;
+        } else {
+          cout << "Field over the limit..." << endl;
         }
       }
 //      of << endl;

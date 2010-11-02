@@ -81,7 +81,7 @@ PLUGIN_LIBRARY_VERSION=1:0:0
 LEM_LIBRARY_VERSION=1:5:0
 PSIBIN_LIBRARY_VERSION=0:1:0
 MUD_LIBRARY_VERSION=0:0:0
-MUSR_LIBRARY_VERSION=0:6:0
+MUSR_LIBRARY_VERSION=0:7:0
 #                    | | |
 #             +------+ | +---+
 #             |        |     |

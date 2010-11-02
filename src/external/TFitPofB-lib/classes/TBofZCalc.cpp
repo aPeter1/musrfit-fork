@@ -34,7 +34,11 @@
 #endif
 
 #include "TBofZCalc.h"
+
+#ifdef HAVE_GOMP
 #include <omp.h>
+#endif
+
 #include <cmath>
 //#include <iostream>
 //#include <algorithm>

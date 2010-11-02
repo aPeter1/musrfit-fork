@@ -166,8 +166,8 @@ TBulkTriVortexLondon::TBulkTriVortexLondon() : fCalcNeeded(true), fFirstCall(tru
     fParForPofB.push_back(0.0); // Bkg-Field
     fParForPofB.push_back(0.005); // Bkg-width
     fParForPofB.push_back(0.0); // Bkg-weight
-    fParForPofB.push_back(0.0); // vortex-weighting
-    fParForPofB.push_back(0.0); // vortex-weighting: 0.0 homogeneous, 1.0 Gaussian, 2.0 Lorentzian
+    fParForPofB.push_back(0.0); // vortex-weighting || antiferromagnetic field
+    fParForPofB.push_back(0.0); // vortex-weighting: 0.0 homogeneous, 1.0 Gaussian, 2.0 Lorentzian || 3.0 antiferromagnetic vortex-cores
 
     fVortex = new TBulkTriVortexLondonFieldCalc(fWisdom, fGridSteps);
 
@@ -249,7 +249,7 @@ TBulkSqVortexLondon::TBulkSqVortexLondon() : fCalcNeeded(true), fFirstCall(true)
 
 double TBulkTriVortexLondon::operator()(double t, const vector<double> &par) const {
 
-  assert(par.size() == 4 || par.size() == 5 || par.size() == 7); // normal, +BkgWeight, +VortexWeighting
+  assert(par.size() == 4 || par.size() == 5 || par.size() == 7 || par.size() == 8); // normal, +BkgWeight, +VortexWeighting, +AFfield
 
   if(t<0.0)
     return cos(par[0]*0.017453293);
@@ -305,6 +305,12 @@ double TBulkTriVortexLondon::operator()(double t, const vector<double> &par) con
         fParForPofB[5] = par[5];
         assert((par[6] == 0.0) || (par[6] == 1.0) || (par[6] == 2.0));
         fParForPofB[6] = par[6];
+      } else if (par.size() == 8) {
+        fParForPofB[5] = par[5];
+        assert(par[6] == 3.0);
+        fParForPofB[6] = par[6];
+        fParForPofB.resize(8);
+        fParForPofB[7] = par[7]; // AF-width in vortex-lattice-units
       }
 
       fVortex->SetParameters(fParForVortex);

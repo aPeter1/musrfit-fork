@@ -46,7 +46,9 @@
 #include <cstdio>
 #include <cstdlib>
 
+#ifdef HAVE_GOMP
 #include <omp.h>
+#endif
 
 #include <TString.h>
 #include <TObjArray.h>
