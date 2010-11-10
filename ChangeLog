@@ -5,10 +5,12 @@
 #---------------------------------------------------------------------
 
 musrfit 0.8.0 - changes since 0.7.0
+==================================
 NEW added the option to split a user function into a global and run-block related part (see MUSR-134). If the 
     global option is used, this can potentially increase the efficiency up to the number of run-blocks since 
     the time consuming calculations are done only once per changed parameter set. Examples where this approach
     is profitable are: Abrikosov vortex lattice fits, Nonlocal Meissner screening.
+CHANGED maximum possible run number for the use in msr2data to numeric_limits<unsigned int>::max() (MUSR-155)
 
 musrfit 0.7.0 - changes since 0.6.0
 ===================================

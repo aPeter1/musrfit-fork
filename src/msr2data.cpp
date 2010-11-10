@@ -301,92 +301,101 @@ int main(int argc, char *argv[])
   string run_list;
   string msrExtension;
 
-  if (arg[0].at(0) == '[') { // In case a list of runs is given by [...]
-    runTAG = 1;
+  try {
+    if (arg[0].at(0) == '[') { // In case a list of runs is given by [...]
+      runTAG = 1;
 
-    unsigned int firstRunNumberInArg(0), lastRunNumberInArg(0);
-    unsigned int rightbracket(numeric_limits<unsigned int>::max());
+      unsigned int firstRunNumberInArg(0), lastRunNumberInArg(0);
+      unsigned int rightbracket(numeric_limits<unsigned int>::max());
 
-    if (!arg[0].compare("["))
-      firstRunNumberInArg = 1;
-    else
-      arg[0]=arg[0].substr(1);
+      if (!arg[0].compare("["))
+        firstRunNumberInArg = 1;
+      else
+        arg[0]=arg[0].substr(1);
 
-    for (unsigned int i(firstRunNumberInArg); i<arg.size(); i++) {
-      string::size_type loc = arg[i].rfind(']');
-      if ( loc != string::npos ) {
-        rightbracket = i;
-        if (!arg[i].compare("]") && i > 0)
-          lastRunNumberInArg = i-1;
-        else {
-          arg[i]=arg[i].substr(0,loc);
-          lastRunNumberInArg = i;
+      for (unsigned int i(firstRunNumberInArg); i<arg.size(); i++) {
+        string::size_type loc = arg[i].rfind(']');
+        if ( loc != string::npos ) {
+          rightbracket = i;
+          if (!arg[i].compare("]") && i > 0)
+            lastRunNumberInArg = i-1;
+          else {
+            arg[i]=arg[i].substr(0,loc);
+            lastRunNumberInArg = i;
+          }
+          break;
         }
-        break;
       }
-    }
-    if (rightbracket == numeric_limits<unsigned int>::max()) {
-       cout << endl;
-       cout << ">> msr2data: **ERROR** You used the list specification without closing bracket (])! Quitting now." << endl;
-       return 0;
-    }
-
-    for (unsigned int i(firstRunNumberInArg); i<=lastRunNumberInArg; ++i)
-      run_vec.push_back(boost::lexical_cast<unsigned int>(arg[i]));
-
-    msrExtension = arg[rightbracket + 1];
-
-    vector<string>::iterator iter(arg.begin());
-    for (unsigned int i(0); i<rightbracket + 2; i++) {
-      arg.erase(iter);
-      iter = arg.begin();
-    }
-
-  } else {
-    bool argOneIsNumber(isNumber(arg[0])), argTwoIsNumber(isNumber(arg[1]));
-
-    if (argOneIsNumber && argTwoIsNumber) { // the first two arguments are numbers: an interval of numbers is given
-      runTAG = 2;
-
-      if (arg.size() < 3) {
+      if (rightbracket == numeric_limits<unsigned int>::max()) {
         cout << endl;
-        cout << ">> msr2data: **ERROR** No msr-file extension specified! Quitting now..." << endl;
-        run_vec.clear();
-        arg.clear();
+        cout << ">> msr2data: **ERROR** You used the list specification without closing bracket (])! Quitting now." << endl;
         return 0;
       }
 
-      run_vec.push_back(boost::lexical_cast<unsigned int>(arg[0]));
-      run_vec.push_back(boost::lexical_cast<unsigned int>(arg[1]));
+      for (unsigned int i(firstRunNumberInArg); i<=lastRunNumberInArg; ++i)
+        run_vec.push_back(boost::lexical_cast<unsigned int>(arg[i]));
 
-      msrExtension = arg[2];
+      msrExtension = arg[rightbracket + 1];
 
       vector<string>::iterator iter(arg.begin());
-      for (unsigned int i(0); i < 3; i++) {
+      for (unsigned int i(0); i<rightbracket + 2; i++) {
         arg.erase(iter);
         iter = arg.begin();
       }
-    } else if (argOneIsNumber && !argTwoIsNumber) { // only one run number is given
-      runTAG = 3;
-      run_vec.push_back(boost::lexical_cast<unsigned int>(arg[0]));
-      msrExtension = arg[1];
 
-      vector<string>::iterator iter(arg.begin());
-      for (unsigned int i(0); i < 2; i++) {
-        arg.erase(iter);
-        iter = arg.begin();
-      }
-    } else { // assume a runlist-file with "independent variables" is given
-      runTAG = 4;
-      run_list = arg[0];
-      msrExtension = arg[1];
+    } else {
+      bool argOneIsNumber(isNumber(arg[0])), argTwoIsNumber(isNumber(arg[1]));
 
-      vector<string>::iterator iter(arg.begin());
-      for (unsigned int i(0); i < 2; i++) {
-        arg.erase(iter);
-        iter = arg.begin();
+      if (argOneIsNumber && argTwoIsNumber) { // the first two arguments are numbers: an interval of numbers is given
+        runTAG = 2;
+
+        if (arg.size() < 3) {
+          cout << endl;
+          cout << ">> msr2data: **ERROR** No msr-file extension specified! Quitting now..." << endl;
+          run_vec.clear();
+          arg.clear();
+          return 0;
+        }
+
+        run_vec.push_back(boost::lexical_cast<unsigned int>(arg[0]));
+        run_vec.push_back(boost::lexical_cast<unsigned int>(arg[1]));
+
+        msrExtension = arg[2];
+
+        vector<string>::iterator iter(arg.begin());
+        for (unsigned int i(0); i < 3; i++) {
+          arg.erase(iter);
+          iter = arg.begin();
+        }
+      } else if (argOneIsNumber && !argTwoIsNumber) { // only one run number is given
+        runTAG = 3;
+        run_vec.push_back(boost::lexical_cast<unsigned int>(arg[0]));
+        msrExtension = arg[1];
+
+        vector<string>::iterator iter(arg.begin());
+        for (unsigned int i(0); i < 2; i++) {
+          arg.erase(iter);
+          iter = arg.begin();
+        }
+      } else { // assume a runlist-file with "independent variables" is given
+        runTAG = 4;
+        run_list = arg[0];
+        msrExtension = arg[1];
+
+        vector<string>::iterator iter(arg.begin());
+        for (unsigned int i(0); i < 2; i++) {
+          arg.erase(iter);
+          iter = arg.begin();
+        }
       }
     }
+  }
+  catch(boost::bad_lexical_cast &) {
+    cout << endl;
+    cout << ">> msr2data: **ERROR** At least one given run number is out of range! Quitting..." << endl;
+    run_vec.clear();
+    arg.clear();
+    return -1;
   }
 
 // check if the output format is DB or data
