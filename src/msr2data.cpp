@@ -40,6 +40,7 @@
 #include <sstream>
 #include <iostream>
 #include <cstdlib>
+#include <limits>
 using namespace std;
 
 
@@ -289,7 +290,7 @@ int main(int argc, char *argv[])
     return 0;
   }
 
-  // use a string-vector for the arguments to get rid of god damn char* as far as possible...
+  // use a string-vector for the arguments to get rid of char* as far as possible...
   vector<string> arg;
   for (int i(1); i<argc; i++) {
     arg.push_back(argv[i]);
@@ -304,7 +305,7 @@ int main(int argc, char *argv[])
     runTAG = 1;
 
     unsigned int firstRunNumberInArg(0), lastRunNumberInArg(0);
-    unsigned int rightbracket(999);
+    unsigned int rightbracket(numeric_limits<unsigned int>::max());
 
     if (!arg[0].compare("["))
       firstRunNumberInArg = 1;
@@ -324,7 +325,7 @@ int main(int argc, char *argv[])
         break;
       }
     }
-    if (rightbracket == 999) {
+    if (rightbracket == numeric_limits<unsigned int>::max()) {
        cout << endl;
        cout << ">> msr2data: **ERROR** You used the list specification without closing bracket (])! Quitting now." << endl;
        return 0;
@@ -467,6 +468,30 @@ int main(int argc, char *argv[])
       realOutput = false;
       outputFile = "none";
     }
+  }
+
+// At this point it should be clear if any template for input-file generation is given or not.
+// Therefore, the number of digits in the run number format is determined only here.
+  if(temp > 0) {
+    status = msr2dataHandler.DetermineRunNumberDigits(temp);
+  } else {
+    status = msr2dataHandler.DetermineRunNumberDigits(msr2dataHandler.GetPresentRun());
+  }
+
+  if(status) {
+    run_vec.clear();
+    arg.clear();
+    return status;
+  }
+
+// Check if all given run numbers are covered by the formatting of the data file name
+  status = msr2dataHandler.CheckRunNumbersInRange();
+  if(status) {
+    cout << endl;
+    cout << ">> msr2data: **ERROR** At least one given run number is out of range! Quitting..." << endl;
+    run_vec.clear();
+    arg.clear();
+    return status;
   }
 
   bool writeHeader(false), writeSummary(false);

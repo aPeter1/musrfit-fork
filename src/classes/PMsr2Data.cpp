@@ -39,6 +39,7 @@
 #include <fstream>
 #include <iomanip>
 #include <algorithm>
+#include <limits>
 using namespace std;
 
 #include <boost/algorithm/string/trim.hpp>  // for stripping leading whitespace in std::string 
@@ -74,7 +75,7 @@ void writeValues(ofstream &outFile, const double &value, const unsigned int &wid
  *
  * \param ext extension/suffix of the msr-files to be processed
  */
-PMsr2Data::PMsr2Data(const string &ext) : fFileExtension(ext), fRunListFile(false), fNumGlobalParam(0), fNumSpecParam(0), fNumTempRunBlocks(0)
+PMsr2Data::PMsr2Data(const string &ext) : fFileExtension(ext), fRunListFile(false), fNumGlobalParam(0), fNumSpecParam(0), fNumTempRunBlocks(0), fRunNumberDigits(4)
 {
   fRunVector.clear();
   fRunVectorIter = fRunVector.end();
@@ -120,6 +121,96 @@ PMsr2Data::~PMsr2Data()
 
 //-------------------------------------------------------------
 /**
+ * <p> Determines the number of digits used for the run number in the data file name from the first msr-file that is processed
+ *
+ * <p><b>return:</b>
+ * - 0 if the number has been determined and set successfully
+ * - -1 in case the msr-file cannot be read
+ * - -2 if the msr-file-number does not match the data-file-number
+ * - -3 if the msr-file does not contain a RUN block
+ *
+ *  \param runNo run number of an existing msr-file
+ *
+ */
+int PMsr2Data::DetermineRunNumberDigits(unsigned int runNo) const
+{
+  ostringstream strInfile;
+  strInfile << runNo << fFileExtension << ".msr";
+  ifstream in(strInfile.str().c_str());
+  if (!in) {
+    cerr << endl << ">> msr2data: **ERROR** The msr-file " << strInfile.str() << " cannot be opened! Please check!";
+    cerr << endl;
+    return -1;
+  }
+
+  ostringstream tempRunNumber;
+  tempRunNumber.fill('0');
+  tempRunNumber.setf(ios::internal, ios::adjustfield);
+  tempRunNumber.width(fRunNumberDigits);
+  tempRunNumber << runNo;
+
+  string line, firstOnLine;
+  istringstream strLine;
+
+  while (getline(in, line)) {
+    strLine.clear();
+    strLine.str(line);
+    strLine >> firstOnLine;
+    if (!firstOnLine.compare("RUN")) {
+       string::size_type loc = line.rfind(tempRunNumber.str());
+       if ( loc != string::npos ) {
+         while ( --loc >= 0 ) {
+           if(isdigit(line.at(loc))) {
+             ++fRunNumberDigits;
+           } else {
+             in.close();
+             //cout << endl << "Number of digits: " << fRunNumberDigits << endl;
+             return 0;
+           }
+         }
+       } else {
+         cerr << endl << ">> msr2data: **ERROR** The first processed run file number does not match the \"file index\"!";
+         cerr << endl << ">> msr2data: **ERROR** The number of digits to be used for formatting the run numbers cannot be determined!";
+         cerr << endl << ">> msr2data: **ERROR** Please check the first msr-file that should be processed;";
+         cerr << endl << ">> msr2data: **ERROR** this is either some template or the first file from the run list.";
+         cerr << endl;
+         in.close();
+         return -2;
+      }
+    }
+  }
+  cerr << endl << ">> msr2data: **ERROR** Please check the first msr-file that should be processed;";
+  cerr << endl << ">> msr2data: **ERROR** this is either some template or the first file from the run list.";
+  cerr << endl << ">> msr2data: **ERROR** Obviously it contains no RUN block...";
+  cerr << endl;
+  return -3;
+}
+
+//-------------------------------------------------------------
+/**
+ * <p> Checks if all given run numbers are in the range covered by the number of digits used in the data file name
+ *
+ * <p><b>return:</b>
+ * - 0 if everything is fine
+ * - -1 if a given run number is too big
+ */
+int PMsr2Data::CheckRunNumbersInRange() const
+{
+  double max(pow(static_cast<double>(10), static_cast<int>(fRunNumberDigits)) - 1.0);
+  unsigned int max_UInt;
+  max > static_cast<double>(numeric_limits<unsigned int>::max()) ? max_UInt = numeric_limits<unsigned int>::max()
+                                                                 : max_UInt = static_cast<unsigned int>(max);
+
+  for (vector<unsigned int>::const_iterator iter(fRunVector.begin()); iter != fRunVector.end(); ++iter) {
+    if (*iter > max_UInt) {
+      return -1;
+    }
+  }
+  return 0;
+}
+
+//-------------------------------------------------------------
+/**
  * <p> Determines the current run number
  *
  * <p><b>return:</b>
@@ -146,7 +237,7 @@ unsigned int PMsr2Data::GetPresentRun() const
  */
 int PMsr2Data::SetRunNumbers(unsigned int runNo)
 {
-  if (runNo > 9999 || runNo < 1)
+  if (runNo < 1)
     return 1;
 
   fRunVector.clear();
@@ -169,7 +260,7 @@ int PMsr2Data::SetRunNumbers(unsigned int runNo)
  */
 int PMsr2Data::SetRunNumbers(unsigned int runNoStart, unsigned int runNoEnd)
 {
-  if ((runNoStart > 9999) || (runNoEnd > 9999) || (runNoStart < 1) || (runNoEnd < 1))
+  if ((runNoStart < 1) || (runNoEnd < 1))
     return 1;
 
   fRunVector.clear();
@@ -202,7 +293,7 @@ int PMsr2Data::SetRunNumbers(const vector<unsigned int> &runListVector)
     return -1;
 
   for (vector<unsigned int>::const_iterator iter(runListVector.begin()); iter!=runListVector.end(); iter++) {
-    if (*iter > 9999 || *iter < 1)
+    if (*iter < 1)
       return 1;
   }
 
@@ -267,7 +358,7 @@ int PMsr2Data::SetRunNumbers(const string &runListFile)
       strLine.clear();
       strLine.str(splitVec[0]);
       strLine >> runNo;
-      if (runNo > 9999 || runNo < 1)
+      if (runNo < 1)
         return 1;
       fRunVector.push_back(runNo);
     }
@@ -387,8 +478,6 @@ bool PMsr2Data::PrepareNewInputFile(unsigned int tempRun) const
   if (*fRunVectorIter == tempRun)
     return true;
 
-  const unsigned int N(4); // number of digits for the runnumber
-
   ostringstream strInfile;
   strInfile << tempRun << fFileExtension << ".msr";
   ifstream in(strInfile.str().c_str());
@@ -409,13 +498,13 @@ bool PMsr2Data::PrepareNewInputFile(unsigned int tempRun) const
   ostringstream tempRunNumber;
   tempRunNumber.fill('0');
   tempRunNumber.setf(ios::internal, ios::adjustfield);
-  tempRunNumber.width(N);
+  tempRunNumber.width(fRunNumberDigits);
   tempRunNumber << tempRun;
 
   ostringstream newRunNumber;
   newRunNumber.fill('0');
   newRunNumber.setf(ios::internal, ios::adjustfield);
-  newRunNumber.width(N);
+  newRunNumber.width(fRunNumberDigits);
   newRunNumber << *fRunVectorIter;
 
   cout << endl << ">> msr2data: **INFO** Generating new input msr file " << strOutfile.str() << endl;
@@ -441,7 +530,7 @@ bool PMsr2Data::PrepareNewInputFile(unsigned int tempRun) const
     if (!firstOnLine.compare("RUN")) {
        string::size_type loc = line.rfind(tempRunNumber.str());
        if ( loc != string::npos ) {
-         line.replace(loc, N, newRunNumber.str());
+         line.replace(loc, fRunNumberDigits, newRunNumber.str());
        } else {
          cerr << endl << ">> msr2data: **WARNING** The template run file number does not match the \"file index\"";
          cerr << endl << ">> msr2data: **WARNING** Unexpected things will happen... (for sure)";
@@ -500,7 +589,6 @@ bool compare_parameters(const PMsrParamStructure &par1, const PMsrParamStructure
  */
 bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOutFile) const
 {
-  const unsigned int N(4); // number of digits for the runnumber
   const TString alpha("alpha"), beta("beta"), norm("norm"), bkgfit("bkgfit"), lifetime("lifetime");
 
   ostringstream strInfile;
@@ -522,7 +610,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
   ostringstream tempRunNumber;
   tempRunNumber.fill('0');
   tempRunNumber.setf(ios::internal, ios::adjustfield);
-  tempRunNumber.width(N);
+  tempRunNumber.width(fRunNumberDigits);
   tempRunNumber << tempRun;
 
   string tempRunName;
@@ -544,7 +632,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
   for (unsigned int i(0); i < msrParamList->size(); ++i) {
     tempParamName = msrParamList->at(i).fName.Data();
     string::size_type loc = tempParamName.rfind(tempRunNumber.str());
-    if ((tempParamName.length() > N) && (loc == tempParamName.length() - N)) {
+    if ((tempParamName.length() > fRunNumberDigits) && (loc == tempParamName.length() - fRunNumberDigits)) {
       msrParamList->at(i).fIsGlobal = false;
       ++fNumSpecParam;
     } else {
@@ -1096,7 +1184,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
   ostringstream newRunNumber;
   newRunNumber.fill('0');
   newRunNumber.setf(ios::internal, ios::adjustfield);
-  newRunNumber.width(N);
+  newRunNumber.width(fRunNumberDigits);
   newRunNumber << *fRunVectorIter;
 
   //cout << "Number of run specific parameters: " << fNumSpecParam << endl;
@@ -1107,7 +1195,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
       tempParamName = msrParamList->at(l).fName.Data();
       string::size_type loc = tempParamName.rfind(tempRunNumber.str());
       if ( loc != string::npos ) {
-        tempParamName.replace(loc, N, newRunNumber.str());
+        tempParamName.replace(loc, fRunNumberDigits, newRunNumber.str());
         msrParamList->at(l).fName = tempParamName;
       } else {
         cerr << endl << ">> msr2data: **ERROR** The indices of the run specific parameters do not match the template run number!";
@@ -1120,7 +1208,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
       tempRunName = msrRunList->at(i).GetRunName()->Data();
       string::size_type loc = tempRunName.rfind(tempRunNumber.str());
       if ( loc != string::npos ) {
-        tempRunName.replace(loc, N, newRunNumber.str());
+        tempRunName.replace(loc, fRunNumberDigits, newRunNumber.str());
         tempTstr = TString(tempRunName);
         msrRunList->at(i).SetRunName(tempTstr, 0);
       } else {
@@ -1164,7 +1252,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
     newRunNumber.clear();
     newRunNumber.fill('0');
     newRunNumber.setf(ios::internal, ios::adjustfield);
-    newRunNumber.width(N);
+    newRunNumber.width(fRunNumberDigits);
     newRunNumber << *fRunVectorIter;
 
     // add parameters for each run
@@ -1173,7 +1261,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
       tempParamName = msrParamList->back().fName.Data();
       string::size_type loc = tempParamName.rfind(tempRunNumber.str());
       if ( loc != string::npos ) {
-        tempParamName.replace(loc, N, newRunNumber.str());
+        tempParamName.replace(loc, fRunNumberDigits, newRunNumber.str());
         msrParamList->back().fName = tempParamName;
         msrParamList->back().fNo += fNumSpecParam;
       } else {
@@ -1189,7 +1277,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
       tempRunName = msrRunList->back().GetRunName()->Data();
       string::size_type loc = tempRunName.rfind(tempRunNumber.str());
       if ( loc != string::npos ) {
-        tempRunName.replace(loc, N, newRunNumber.str());
+        tempRunName.replace(loc, fRunNumberDigits, newRunNumber.str());
         tempTstr = TString(tempRunName);
         msrRunList->back().SetRunName(tempTstr, 0);
       } else {
@@ -1290,12 +1378,10 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
     return PMUSR_SUCCESS;
   }
 
-  const unsigned int N(4);
-
   ostringstream curRunNumber;
   curRunNumber.fill('0');
   curRunNumber.setf(ios::internal, ios::adjustfield);
-  curRunNumber.width(N);
+  curRunNumber.width(fRunNumberDigits);
   curRunNumber << *fRunVectorIter;
 
   string msrTitle(fMsrHandler->GetMsrTitle()->Data());
@@ -1313,14 +1399,14 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
     if (!fNumGlobalParam && !fNumSpecParam && !fNumTempRunBlocks) { // if not all parameters are zero they have been determined before
       tempRunNumber.fill('0');
       tempRunNumber.setf(ios::internal, ios::adjustfield);
-      tempRunNumber.width(N);
+      tempRunNumber.width(fRunNumberDigits);
       tempRunNumber << fRunVector.front();
 
       // search parameter list for run-specific parameters
       for (unsigned int i(0); i < msrParamList->size(); ++i) {
         tempName = msrParamList->at(i).fName.Data();
         string::size_type loc = tempName.rfind(tempRunNumber.str());
-        if ((tempName.length() > N) && (loc == tempName.length() - N)) {
+        if ((tempName.length() > fRunNumberDigits) && (loc == tempName.length() - fRunNumberDigits)) {
           if (!fNumSpecParam) {
             fNumGlobalParam = i;
           }
@@ -1384,13 +1470,13 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
       tempRunNumber.str("");
       tempRunNumber.fill('0');
       tempRunNumber.setf(ios::internal, ios::adjustfield);
-      tempRunNumber.width(N);
+      tempRunNumber.width(fRunNumberDigits);
       tempRunNumber << fRunVector[a];
 
       for (unsigned int i(0); i < fNumSpecParam; ++i) {
         tempName = msrParamList->at(fNumGlobalParam + a*fNumSpecParam + i).fName.Data();
         string::size_type loc = tempName.rfind(tempRunNumber.str());
-        if (!(tempName.length() > N) || !(loc == tempName.length() - N)) {
+        if (!(tempName.length() > fRunNumberDigits) || !(loc == tempName.length() - fRunNumberDigits)) {
           okP = false;
           break;
         }
@@ -1413,7 +1499,7 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
       tempRunNumber.str("");
       tempRunNumber.fill('0');
       tempRunNumber.setf(ios::internal, ios::adjustfield);
-      tempRunNumber.width(N);
+      tempRunNumber.width(fRunNumberDigits);
       tempRunNumber << fRunVector[a];
 
       for (unsigned int i(0); i < fNumTempRunBlocks; ++i) {
@@ -1617,7 +1703,7 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
         for (unsigned int i(0); i < fNumSpecParam; ++i) {
           tempName = (*msrParamList)[fNumGlobalParam + fNumSpecParam*counter + i].fName.Data();
           string::size_type loc = tempName.rfind(curRunNumber.str());
-          if (loc == tempName.length() - N) {
+          if (loc == tempName.length() - fRunNumberDigits) {
             outFile << tempName.substr(0, loc) << endl;
           } else {
             cerr << endl << ">> msr2data: **ERROR** The run index of some parameter does not match the run number being processed!";
@@ -1668,7 +1754,7 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
         for (unsigned int i(0); i < fNumSpecParam; ++i) {
           tempName = (*msrParamList)[fNumGlobalParam + fNumSpecParam*counter + i].fName.Data();
           string::size_type loc = tempName.rfind(curRunNumber.str());
-          if (loc == tempName.length() - N) {
+          if (loc == tempName.length() - fRunNumberDigits) {
             outFile << " " << tempName.substr(0, loc);
           } else {
             cerr << endl << ">> msr2data: **ERROR** The run index of some parameter does not match the run number being processed!";
@@ -1731,7 +1817,7 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
         idx = fNumGlobalParam + fNumSpecParam*counter + i;
         tempName = (*msrParamList)[idx].fName.Data();
         string::size_type loc = tempName.rfind(curRunNumber.str());
-        if (loc == tempName.length() - N) {
+        if (loc == tempName.length() - fRunNumberDigits) {
           outFile << tempName.substr(0, loc) << " = " << (*msrParamList)[idx].fValue << ", ";
           if ((*msrParamList)[idx].fPosErrorPresent)
             outFile << (*msrParamList)[idx].fPosError << ", ";
@@ -1790,8 +1876,8 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
       for (unsigned int i(0); i < fNumSpecParam; ++i) {
         s = (*msrParamList)[fNumGlobalParam + fNumSpecParam*counter + i].fName.Data();
         string::size_type loc = s.rfind(curRunNumber.str());
-        if (loc == s.length() - N) {
-          length = s.length() - N;
+        if (loc == s.length() - fRunNumberDigits) {
+          length = s.length() - fRunNumberDigits;
           if (length > maxlength)
             maxlength = length;
         } else {
@@ -1842,7 +1928,7 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
         for (unsigned int i(0); i < fNumSpecParam; ++i) {
           s = (*msrParamList)[fNumGlobalParam + fNumSpecParam*counter + i].fName.Data();
           string::size_type loc = s.rfind(curRunNumber.str());
-          if (loc == s.length() - N) {
+          if (loc == s.length() - fRunNumberDigits) {
             s = s.substr(0, loc);
             outFile << setw(maxlength) << left << s \
                     << setw(maxlength + 6) << left << s + "PosErr" \

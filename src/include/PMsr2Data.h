@@ -63,6 +63,9 @@ class PMsr2Data
     int SetRunNumbers(const vector<unsigned int>&); // explicit run list specified using [ ]
     unsigned int GetPresentRun() const;
 
+    int DetermineRunNumberDigits(unsigned int) const;
+    int CheckRunNumbersInRange() const;
+
     int ParseXmlStartupFile();
     int ReadMsrFile(const string&) const;
     bool ReadRunDataFile();
@@ -86,6 +89,7 @@ class PMsr2Data
     mutable unsigned int fNumGlobalParam;
     mutable unsigned int fNumSpecParam;
     mutable unsigned int fNumTempRunBlocks;
+    mutable unsigned int fRunNumberDigits;
 };
 
 
