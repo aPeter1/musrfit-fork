@@ -1,0 +1,85 @@
+YBCO(110)/PrBCO/STO on Ag, T=4.96 K, E=19.12 keV, B=~98(G)/3.04(A), Tr/Sa=15.02/-5.00 kV, RA-LR 0.05 kV, RA-TB 0.14 kV
+###############################################################
+FITPARAMETER
+#       No Name        Value     Step        Pos_Error   Boundaries
+        1 phase       25.1328   -0.979855   0.987925    -180    180     
+        2 field       84.2201   -0.243991   0.264511    0       none    
+        3 asym        0.11616   -0.00735602 0.00786111  0       0.3     
+        4 rate        0.297241  -0.028157   0.0289587   0       2       
+        5 fieldBKG    94.9012   -0.142071   0.143479    0       none    
+        6 asymBKG     0.139904  -0.00933264 0.00905566  0       0.3     
+        7 rateBKG     0.0623834 -0.0189223  0.0188684   0       100     
+        8 Norm_L      272.022   -0.565339   0.566487    0       1000    
+        9 BG_L        25.7891   -0.120907   0.120769    0       100     
+       10 Norm_R      320.245   -0.608216   0.60492     0       1000    
+       11 BG_R        30.7947   -0.130858   0.131547    0       100     
+       12 relasy_R    0.982832  -0.0159124  0.0162089   0       1.2     
+       13 relphase_R  159.584   -0.898672   0.898169    150     210     
+       14 one         1         0           none        
+       15 zero        0         0           none        
+
+###############################################################
+THEORY
+asymmetry   fun1
+userFcn  libPRelax.so PGauss 4 (rate)
+TFieldCos   fun3  fun4       (phase frequency)
++
+asymmetry   fun2
+userFcn  libPRelax.so PExp 7 (rate)
+TFieldCos   fun3  fun5       (phase frequency)
+
+###############################################################
+FUNCTIONS
+fun1 = par3 * map1
+fun2 = par6 * map1
+fun3 = par1 + map2
+fun4 = par2 * gamma_mu
+fun5 = par5 * gamma_mu
+
+###############################################################
+RUN data/lem10_his_1951 MUE4 PSI ROOT-NPP   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            8
+backgr.fit      9
+lifetimecorrection
+map            14   15    0    0    0    0    0    0    0    0
+forward         1       
+background      65000   66500   
+data            3289    63000   
+fit             0.15    8       
+packing         200
+
+RUN data/lem10_his_1951 MUE4 PSI ROOT-NPP   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            10
+backgr.fit      11
+lifetimecorrection
+map            12   13    0    0    0    0    0    0    0    0
+forward         3       
+background      65000   66500   
+data            3289    63000   
+fit             0.15    8       
+packing         200
+
+###############################################################
+COMMANDS
+MINIMIZE
+MINOS
+SAVE
+
+###############################################################
+FOURIER
+units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
+fourier_power    10
+apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+range            0    250
+
+###############################################################
+PLOT 0   (single histo plot)
+runs     1   2   
+range    0.00   8.00   -0.30   0.30
+
+###############################################################
+STATISTIC --- 2010-11-09 20:13:52
+  chisq = 401.71526823978365, NDF = 389, chisq/NDF = 1.0326870648837627

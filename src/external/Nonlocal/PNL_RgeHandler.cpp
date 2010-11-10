@@ -43,11 +43,11 @@ using namespace std;
 /**
  *
  */
-PNL_RgeHandler::PNL_RgeHandler(const PStringVector &rgeDataPathList)
+PNL_RgeHandler::PNL_RgeHandler(const PStringVector &rgeDataPathList, const PDoubleVector &rgeDataEnergyList)
 {
   fIsValid = false;
 
-  fIsValid = LoadRgeData(rgeDataPathList);
+  fIsValid = LoadRgeData(rgeDataPathList, rgeDataEnergyList);
 }
 
 //--------------------------------------------------------------------------
@@ -146,7 +146,7 @@ Double_t PNL_RgeHandler::GetRgeValue(const Double_t energy, const Double_t dist)
 /**
  *
  */
-Bool_t PNL_RgeHandler::LoadRgeData(const PStringVector &rgeDataPathList)
+Bool_t PNL_RgeHandler::LoadRgeData(const PStringVector &rgeDataPathList, const PDoubleVector &rgeDataEnergyList)
 {
   ifstream fin;
   PNL_RgeData data;
@@ -166,17 +166,8 @@ Bool_t PNL_RgeHandler::LoadRgeData(const PStringVector &rgeDataPathList)
       return false;
     }
 
-    // extract energy from rgeDataPathList name
-    dataName = rgeDataPathList[i];
-    // remove rge extension
-    dataName.Remove(dataName.Length()-4, 4);
-    // get energy part
-    dataName.Replace(0, dataName.Length()-3, "");
-    if (!dataName.IsDigit()) {
-      fin.close();
-      return false;
-    }
-    data.energy = dataName.Atof()/10.0;
+    // keep energy (in keV)
+    data.energy = rgeDataEnergyList[i]/1000.0;
 
     // read msr-file
     idx = 0;

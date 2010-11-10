@@ -59,6 +59,7 @@ class PNL_StartupHandler : public TObject
     virtual TString GetStartupFilePath() { return fStartupFilePath; }
     virtual const Int_t GetFourierPoints() const { return fFourierPoints; }
     virtual const PStringVector GetTrimSpDataPathList() const { return fTrimSpDataPathList; }
+    virtual const PDoubleVector GetTrimSpDataVectorList() const { return fTrimSpDataEnergyList; }
 
     virtual bool StartupFileFound() { return fStartupFileFound; }
 
@@ -74,6 +75,7 @@ class PNL_StartupHandler : public TObject
     Int_t fFourierPoints;
     TString fTrimSpDataPath;
     PStringVector fTrimSpDataPathList;
+    PDoubleVector fTrimSpDataEnergyList;
 
     bool StartupFileExists(char *fln);
 

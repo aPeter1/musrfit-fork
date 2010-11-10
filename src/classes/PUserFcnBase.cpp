@@ -29,6 +29,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <vector>
+using namespace std;
+
 #include "PUserFcnBase.h"
 
 ClassImp(PUserFcnBase)
@@ -52,3 +55,6 @@ PUserFcnBase::PUserFcnBase()
 PUserFcnBase::~PUserFcnBase()
 {
 }
+
+// place a void pointer vector for global user function objects which might be needed
+vector<void *> gGlobalUserFcn;

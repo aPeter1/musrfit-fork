@@ -33,9 +33,11 @@
 #define _PUSERFCNBASE_H_
 
 #include <vector>
+using namespace std;
 
 #include "TObject.h"
 
+//--------------------------------------------------------------------------------------------
 /**
  * <p>Interface class for the user function.
  */
@@ -44,6 +46,10 @@ class PUserFcnBase : public TObject
   public:
     PUserFcnBase();
     virtual ~PUserFcnBase();
+
+    virtual Bool_t NeedGlobalPart() const = 0; ///< if a user function needs a global part this function should return true, otherwise false
+    virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) = 0; ///< if a user function is using a global part, this function is used to invoke and retrieve the proper global object
+    virtual Bool_t GlobalPartIsValid() const = 0; ///< if a user function is using a global part, this function returns if the global object part is valid
 
     virtual Double_t operator()(Double_t t, const std::vector<Double_t> &param) const = 0;
 

@@ -38,15 +38,21 @@
 #include "PNL_StartupHandler.h"
 #include "PNL_RgeHandler.h"
 
-class PNL_PippardFitter : public PUserFcnBase
+class PNL_PippardFitterGlobal
 {
   public:
-    PNL_PippardFitter();
-    virtual ~PNL_PippardFitter();
+    PNL_PippardFitterGlobal();
+    virtual ~PNL_PippardFitterGlobal();
 
-    virtual Double_t operator()(Double_t t, const std::vector<Double_t> &param) const;
+    Bool_t IsValid() { return fValid; }
+    virtual void CalculateField(const std::vector<Double_t> &param) const;
+    virtual Int_t GetEnergyIndex(const Double_t energy) { return fRgeHandler->GetRgeEnergyIndex(energy); }
+    virtual Double_t GetMuoneStoppingDensity(const Int_t energyIndex, const Double_t z) const { return fRgeHandler->GetRgeValue(energyIndex, z); }
+    virtual Double_t GetMagneticField(const Double_t z) const;
 
   private:
+    Bool_t fValid;
+
     PNL_StartupHandler *fStartupHandler;
     PNL_RgeHandler *fRgeHandler;
 
@@ -64,13 +70,32 @@ class PNL_PippardFitter : public PUserFcnBase
 
     mutable Int_t fEnergyIndex; // keeps the proper index to select n(z)
 
-    virtual Bool_t NewParameters(const std::vector<Double_t> &param) const;
-    virtual void CalculateField(const std::vector<Double_t> &param) const;
-    virtual Double_t GetMagneticField(const Double_t z) const;
 
     virtual Double_t DeltaBCS(const Double_t t) const;
     virtual Double_t LambdaL_T(const Double_t lambdaL, const Double_t t) const;
     virtual Double_t XiP_T(const Double_t xi0, const Double_t meanFreePath, Double_t t) const;
+
+  ClassDef(PNL_PippardFitterGlobal, 1)
+};
+
+class PNL_PippardFitter : public PUserFcnBase
+{
+  public:
+    PNL_PippardFitter();
+    virtual ~PNL_PippardFitter();
+
+    virtual Bool_t NeedGlobalPart() const { return true; }
+    virtual void SetGlobalPart(vector<void*> &globalPart, UInt_t idx);
+    virtual Bool_t GlobalPartIsValid() const;
+
+    virtual Double_t operator()(Double_t t, const std::vector<Double_t> &param) const;
+
+  private:
+    Bool_t fValid;
+    Bool_t fInvokedGlobal;
+    Int_t fIdxGlobal;
+
+    PNL_PippardFitterGlobal *fPippardFitterGlobal;
 
   ClassDef(PNL_PippardFitter, 1)
 };

@@ -201,6 +201,7 @@ class PTheory
   private:
     virtual void CleanUp(PTheory *theo);
     virtual Int_t SearchDataBase(TString name);
+    virtual Int_t GetUserFcnIdx(UInt_t lineNo) const;
     virtual void MakeCleanAndTidyTheoryBlock(PMsrLines* fullTheoryBlock);
     virtual void MakeCleanAndTidyPolynom(UInt_t i, PMsrLines* fullTheoryBlock);
     virtual void MakeCleanAndTidyUserFcn(UInt_t i, PMsrLines* fullTheoryBlock);
@@ -240,6 +241,7 @@ class PTheory
     UInt_t fNoOfParam; ///< number of parameters for the given function
     PTheory *fAdd, *fMul; ///< pointers to the add-sub-function or the multiply-sub-function
 
+    Int_t fUserFcnIdx; ///< index of the user function within the theory tree
     TString fUserFcnClassName; ///< name of the user function class for within root
     TString fUserFcnSharedLibName; ///< name of the shared lib to which the user function belongs
     PUserFcnBase *fUserFcn;    ///< pointer to the user function object

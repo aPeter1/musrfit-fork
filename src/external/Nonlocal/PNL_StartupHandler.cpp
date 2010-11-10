@@ -64,6 +64,7 @@ PNL_StartupHandler::PNL_StartupHandler()
     fStartupFileFound = true;
     fStartupFilePath = TString(startup_path_name);
   } else { // startup file is not found in the current directory
+    cout << endl << "PNL_StartupHandler(): **WARNING** Couldn't find nonlocal_startup.xml in the current directory, will try default one." << endl;
     strncpy(startup_path_name, "/home/nemu/analysis/musrfit/src/external/Nonlocal/nonlocal_startup.xml", sizeof(startup_path_name));
     if (StartupFileExists(startup_path_name)) {
       fStartupFileFound = true;
@@ -81,6 +82,7 @@ PNL_StartupHandler::PNL_StartupHandler()
 PNL_StartupHandler::~PNL_StartupHandler()
 {
   fTrimSpDataPathList.clear();
+  fTrimSpDataEnergyList.clear();
 }
 
 //--------------------------------------------------------------------------
@@ -154,8 +156,6 @@ void PNL_StartupHandler::OnEndElement(const char *str)
 void PNL_StartupHandler::OnCharacters(const char *str)
 {
   TString tstr;
-  Double_t dval;
-  char sstr[128];
 
   switch (fKey) {
     case eFourierPoints:
@@ -174,18 +174,16 @@ void PNL_StartupHandler::OnCharacters(const char *str)
     case eEnergy:
       tstr = str;
       if (tstr.IsFloat()) {
-        dval = tstr.Atof();
+        fTrimSpDataEnergyList.push_back(tstr.Atof());
+        tstr = fTrimSpDataPath;
+        tstr += str;
+        tstr += ".rge";
+        fTrimSpDataPathList.push_back(tstr);
       } else {
         cout << endl << "PNL_StartupHandler::OnCharacters: **ERROR** when finding energy:";
-        cout << endl << "\"" << str << "\" is not a double.";
+        cout << endl << "\"" << str << "\" is not a floating point number, will ignore it and use the default value.";
         cout << endl;
-        fIsValid = false;
       }
-      tstr = fTrimSpDataPath;
-      sprintf(sstr, "%03d", (int)(round(dval*10.0)));
-      tstr += sstr;
-      tstr += ".rge";      
-      fTrimSpDataPathList.push_back(tstr);
       break;
     default:
       break;

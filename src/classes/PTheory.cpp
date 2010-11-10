@@ -30,6 +30,7 @@
  ***************************************************************************/
 
 #include <iostream>
+#include <vector>
 using namespace std;
 
 #include <TObject.h>
@@ -47,6 +48,8 @@ using namespace std;
 
 #define SQRT_TWO 1.41421356237
 #define SQRT_PI  1.77245385091
+
+extern vector<void*> gGlobalUserFcn;
 
 //--------------------------------------------------------------------------
 // Constructor
@@ -90,7 +93,7 @@ using namespace std;
  *               false (default) means this is the root object
  *               true means this is part of an already existing object tree
  */
-PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent)
+PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent) : fMsrInfo(msrInfo)
 {
   // init stuff
   fValid = true;
@@ -111,6 +114,9 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent)
 
   for (UInt_t i=0; i<THEORY_MAX_PARAM; i++)
     fPrevParam[i] = 0.0;
+
+  // keep the number of user functions found up to this point
+  fUserFcnIdx = GetUserFcnIdx(lineNo);
 
   // get the input to be analyzed from the msr handler
   PMsrLines *fullTheoryBlock = msrInfo->GetMsrTheory();
@@ -139,8 +145,8 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent)
 
   tokens = str.Tokenize(" \t");
   if (!tokens) {
-    cerr << endl << "**SEVERE ERROR**: PTheory(): Couldn't tokenize theory block line " << line->fLineNo << ".";
-    cerr << endl << "  line content: " << line->fLine.Data();
+    cerr << endl << ">> PTheory::PTheory: **SEVERE ERROR** Couldn't tokenize theory block line " << line->fLineNo << ".";
+    cerr << endl << ">>  line content: " << line->fLine.Data();
     cerr << endl;
     exit(0);
   }
@@ -152,8 +158,8 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent)
 
   // function found is not defined
   if (idx == (UInt_t) THEORY_UNDEFINED) {
-    cerr << endl << "**ERROR**: PTheory(): Theory line '" << line->fLine.Data() << "'";
-    cerr << endl << "  in line no " << line->fLineNo << " is undefined!";
+    cerr << endl << ">> PTheory::PTheory: **ERROR** Theory line '" << line->fLine.Data() << "'";
+    cerr << endl << ">>  in line no " << line->fLineNo << " is undefined!";
     cerr << endl;
     fValid = false;
     return;
@@ -162,9 +168,9 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent)
   // line is a valid function, hence analyze parameters
   if (((UInt_t)(tokens->GetEntries()-1) < fNoOfParam) &&
       ((idx != THEORY_USER_FCN) && (idx != THEORY_POLYNOM))) {
-    cerr << endl << "**ERROR**: PTheory():  Theory line '" << line->fLine.Data() << "'";
-    cerr << endl << "  in line no " << line->fLineNo;
-    cerr << endl << "  expecting " << fgTheoDataBase[idx].fNoOfParam << ", but found " << tokens->GetEntries()-1;
+    cerr << endl << ">> PTheory::PTheory: **ERROR** Theory line '" << line->fLine.Data() << "'";
+    cerr << endl << ">>  in line no " << line->fLineNo;
+    cerr << endl << ">>  expecting " << fgTheoDataBase[idx].fNoOfParam << ", but found " << tokens->GetEntries()-1;
     cerr << endl;
     fValid = false;
   }
@@ -199,12 +205,12 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent)
         if ((value <= maps.size()) && (value > 0)) { // everything fine
           fParamNo.push_back(maps[value-1]-1);
         } else { // map index out of range
-          cerr << endl << "**ERROR**: PTheory: map index " << value << " out of range! See line no " << line->fLineNo;
+          cerr << endl << ">> PTheory::PTheory: **ERROR** map index " << value << " out of range! See line no " << line->fLineNo;
           cerr << endl;
           fValid = false;
         }
       } else { // something wrong
-        cerr << endl << "**ERROR**: PTheory: map '" << str.Data() << "' not allowed. See line no " << line->fLineNo;
+        cerr << endl << ">> PTheory::PTheory: **ERROR**: map '" << str.Data() << "' not allowed. See line no " << line->fLineNo;
         cerr << endl;
         fValid = false;
       }
@@ -226,7 +232,7 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent)
       }
       // check if one of the valid entries was found
       if (!ok) {
-        cerr << endl << "**ERROR**: PTheory: '" << str.Data() << "' not allowed. See line no " << line->fLineNo;
+        cerr << endl << ">> PTheory::PTheory: **ERROR** '" << str.Data() << "' not allowed. See line no " << line->fLineNo;
         cerr << endl;
         fValid = false;
       }
@@ -264,9 +270,9 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent)
     cout << endl << ">> user function class name: " << fUserFcnClassName.Data() << endl;
     if (!TClass::GetDict(fUserFcnClassName.Data())) {
       if (gSystem->Load(fUserFcnSharedLibName.Data()) < 0) {
-        cerr << endl << "**ERROR**: PTheory: user function class '" << fUserFcnClassName.Data() << "' not found.";
-        cerr << endl << "           Tried to load " << fUserFcnSharedLibName.Data() << " but failed.";
-        cerr << endl << "           See line no " << line->fLineNo;
+        cerr << endl << ">> PTheory::PTheory: **ERROR** user function class '" << fUserFcnClassName.Data() << "' not found.";
+        cerr << endl << ">>           Tried to load " << fUserFcnSharedLibName.Data() << " but failed.";
+        cerr << endl << ">>           See line no " << line->fLineNo;
         cerr << endl;
         fValid = false;
         // clean up
@@ -277,15 +283,28 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent)
         return;
       }
     }
+
     // invoke user function object
     fUserFcn = 0;
     fUserFcn = (PUserFcnBase*)TClass::GetClass(fUserFcnClassName.Data())->New();
     if (fUserFcn == 0) {
-      cerr << endl << "**ERROR**: PTheory: user function object could not be invoked. See line no " << line->fLineNo;
+      cerr << endl << ">> PTheory::PTheory: **ERROR** user function object could not be invoked. See line no " << line->fLineNo;
       cerr << endl;
       fValid = false;
     } else { // user function valid, hence expand the fUserParam vector to the proper size
-       fUserParam.resize(fParamNo.size());
+      fUserParam.resize(fParamNo.size());
+    }
+
+//cout << endl << "debug> fUserFcn=" << fUserFcn << ", fUserFcn->NeedGlobalPart()=" <<  fUserFcn->NeedGlobalPart() << ", gGlobalUserFcn=" << gGlobalUserFcn << endl;
+
+    // check if the global part of the user function is needed
+    if (fUserFcn->NeedGlobalPart()) {
+      fUserFcn->SetGlobalPart(gGlobalUserFcn, fUserFcnIdx); // invoke or retrieve global user function object
+      if (!fUserFcn->GlobalPartIsValid()) {
+        cerr << endl << ">> PTheory::PTheory: **ERROR** global user function object could not be invoked/retrived. See line no " << line->fLineNo;
+        cerr << endl;
+        fValid = false;
+      }
     }
   }
 
@@ -317,6 +336,8 @@ PTheory::~PTheory()
     delete fUserFcn;
     fUserFcn = 0;
   }
+
+  gGlobalUserFcn.clear();
 }
 
 //--------------------------------------------------------------------------
@@ -451,7 +472,7 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
                  fAdd->Func(t, paramValues, funcValues);
           break;
         default:
-          cerr << endl << "**PANIC ERROR**: PTheory::Func: You never should have reached this line?!?! (" << fType << ")";
+          cerr << endl << ">> PTheory::Func: **PANIC ERROR** You never should have reached this line?!?! (" << fType << ")";
           cerr << endl;
           exit(0);
       }
@@ -521,7 +542,7 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
           return UserFcn(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
         default:
-          cerr << endl << "**PANIC ERROR**: PTheory::Func: You never should have reached this line?!?! (" << fType << ")";
+          cerr << endl << ">> PTheory::Func: **PANIC ERROR** You never should have reached this line?!?! (" << fType << ")";
           cerr << endl;
           exit(0);
       }
@@ -593,7 +614,7 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
           return UserFcn(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
         default:
-          cerr << endl << "**PANIC ERROR**: PTheory::Func: You never should have reached this line?!?! (" << fType << ")";
+          cerr << endl << ">> PTheory::Func: **PANIC ERROR** You never should have reached this line?!?! (" << fType << ")";
           cerr << endl;
           exit(0);
       }
@@ -663,7 +684,7 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
           return UserFcn(t, paramValues, funcValues);
           break;
         default:
-          cerr << endl << "**PANIC ERROR**: PTheory::Func: You never should have reached this line?!?! (" << fType << ")";
+          cerr << endl << ">> PTheory::Func: **PANIC ERROR** You never should have reached this line?!?! (" << fType << ")";
           cerr << endl;
           exit(0);
       }
@@ -729,6 +750,36 @@ Int_t PTheory::SearchDataBase(TString name)
   }
 
   return idx;
+}
+
+//--------------------------------------------------------------------------
+// GetUserFcnIdx (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Counts the number of user functions in the theory block up to lineNo.
+ *
+ * <b>return:</b> to number of user functions found up to lineNo
+ *
+ * \param lineNo current line number in the theory block
+ */
+Int_t PTheory::GetUserFcnIdx(UInt_t lineNo) const
+{
+  Int_t userFcnIdx = -1;
+
+  // retrieve the theory block from the msr-file handler
+  PMsrLines *fullTheoryBlock = fMsrInfo->GetMsrTheory();
+
+  // make sure that lineNo is within proper bounds
+  if (lineNo > fullTheoryBlock->size())
+    return userFcnIdx;
+
+  // count the number of user function present up to the lineNo
+  for (UInt_t i=1; i<=lineNo; i++) {
+    if (fullTheoryBlock->at(i).fLine.Contains("userFcn", TString::kIgnoreCase))
+      userFcnIdx++;
+  }
+
+  return userFcnIdx;
 }
 
 //--------------------------------------------------------------------------
@@ -2232,7 +2283,7 @@ void PTheory::CalculateDynKTLF(const Double_t *val, Int_t tag) const
       CalculateLorentzLFIntegral(val);
       break;
     default:
-      cerr << endl << "**FATAL ERROR** in PTheory::CalculateDynKTLF: You should never have reached this point." << endl;
+      cerr << endl << ">> PTheory::CalculateDynKTLF: **FATAL ERROR** You should never have reached this point." << endl;
       assert(false);
       break;
   }

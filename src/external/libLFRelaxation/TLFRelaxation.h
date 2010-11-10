@@ -56,6 +56,10 @@ public:
   TLFStatGssKT();
   ~TLFStatGssKT();
 
+  Bool_t NeedGlobalPart() const { return false; }
+  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  Bool_t GlobalPartIsValid() const { return true; }
+
   double operator()(double, const vector<double>&) const;
 
 private:
@@ -70,6 +74,10 @@ public:
   TLFStatLorKT();
   ~TLFStatLorKT();
 
+  Bool_t NeedGlobalPart() const { return false; }
+  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  Bool_t GlobalPartIsValid() const { return true; }
+
   double operator()(double, const vector<double>&) const;
 
 private:
@@ -83,6 +91,10 @@ class TLFDynGssKT : public PUserFcnBase {
 public:
   TLFDynGssKT();
   ~TLFDynGssKT();
+
+  Bool_t NeedGlobalPart() const { return false; }
+  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const vector<double>&) const;
 
@@ -109,6 +121,10 @@ class TLFDynLorKT : public PUserFcnBase {
 public:
   TLFDynLorKT();
   ~TLFDynLorKT();
+
+  Bool_t NeedGlobalPart() const { return false; }
+  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const vector<double>&) const;
 
@@ -137,6 +153,10 @@ class TLFSGInterpolation : public PUserFcnBase {
 public:
   TLFSGInterpolation();
   ~TLFSGInterpolation();
+
+  Bool_t NeedGlobalPart() const { return false; }
+  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const vector<double>&) const;
 

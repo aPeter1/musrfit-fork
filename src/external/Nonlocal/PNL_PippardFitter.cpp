@@ -43,7 +43,7 @@ using namespace std;
 #define GAMMA_MU   0.0851615503527
 #define DEGREE2RAD 0.0174532925199
 
-ClassImp(PNL_PippardFitter)
+ClassImp(PNL_PippardFitterGlobal)
 
 //--------------------------------------------------------------------------
 // Constructor
@@ -51,8 +51,12 @@ ClassImp(PNL_PippardFitter)
 /**
  *
  */
-PNL_PippardFitter::PNL_PippardFitter()
+PNL_PippardFitterGlobal::PNL_PippardFitterGlobal()
 {
+  fValid = true;
+  fStartupHandler = 0;
+  fRgeHandler = 0;
+
   // read XML startup file
   char startup_path_name[128];
   TSAXParser *saxParser = new TSAXParser();
@@ -62,18 +66,9 @@ PNL_PippardFitter::PNL_PippardFitter()
   Int_t status = saxParser->ParseFile(startup_path_name);
   // check for parse errors
   if (status) { // error
-    cout << endl << "**WARNING** reading/parsing nonlocal_startup.xml.";
+    cout << endl << ">> PNL_PippardFitterGlobal::PNL_PippardFitterGlobal: **WARNING** reading/parsing nonlocal_startup.xml.";
     cout << endl;
-    // clean up
-    if (saxParser) {
-      delete saxParser;
-      saxParser = 0;
-    }
-    if (fStartupHandler) {
-      delete fStartupHandler;
-      fStartupHandler = 0;
-    }
-    assert(false);
+    fValid = false;
   }
 
   // clean up
@@ -84,21 +79,21 @@ PNL_PippardFitter::PNL_PippardFitter()
 
   // check if everything went fine with the startup handler
   if (!fStartupHandler->IsValid()) {
-    cout << endl << "PNL_PippardFitter::PNL_PippardFitter **PANIC ERROR**";
-    cout << endl << "  startup handler too unhappy. Will terminate unfriendly, sorry.";
+    cout << endl << ">> PNL_PippardFitterGlobal::PNL_PippardFitterGlobal **PANIC ERROR**";
+    cout << endl << ">>   startup handler too unhappy. Will terminate unfriendly, sorry.";
     cout << endl;
-    assert(false);
+    fValid = false;
   }
 
   fFourierPoints = fStartupHandler->GetFourierPoints();
 
   // load all the TRIM.SP rge-files
-  fRgeHandler = new PNL_RgeHandler(fStartupHandler->GetTrimSpDataPathList());
+  fRgeHandler = new PNL_RgeHandler(fStartupHandler->GetTrimSpDataPathList(), fStartupHandler->GetTrimSpDataVectorList());
   if (!fRgeHandler->IsValid()) {
-    cout << endl << "PNL_PippardFitter::PNL_PippardFitter **PANIC ERROR**";
-    cout << endl << "  rge data handler too unhappy. Will terminate unfriendly, sorry.";
+    cout << endl << ">> PNL_PippardFitterGlobal::PNL_PippardFitterGlobal **PANIC ERROR**";
+    cout << endl << ">>  rge data handler too unhappy. Will terminate unfriendly, sorry.";
     cout << endl;
-    assert(false);
+    fValid = false;
   }
 
   fPlanPresent = false;
@@ -115,7 +110,7 @@ PNL_PippardFitter::PNL_PippardFitter()
 /**
  *
  */
-PNL_PippardFitter::~PNL_PippardFitter()
+PNL_PippardFitterGlobal::~PNL_PippardFitterGlobal()
 {
   fPreviousParam.clear();
 
@@ -136,107 +131,45 @@ PNL_PippardFitter::~PNL_PippardFitter()
     delete fRgeHandler;
     fRgeHandler = 0;
   }
-/*
   if (fStartupHandler) {
     delete fStartupHandler;
     fStartupHandler = 0;
   }
-*/
 }
 
 //--------------------------------------------------------------------------
-// operator()
+// CalculateField (public)
 //--------------------------------------------------------------------------
 /**
  *
  */
-Double_t PNL_PippardFitter::operator()(Double_t t, const std::vector<Double_t> &param) const
+void PNL_PippardFitterGlobal::CalculateField(const std::vector<Double_t> &param) const
 {
   // param: [0] energy, [1] temp, [2] thickness, [3] meanFreePath, [4] xi0, [5] lambdaL, [6] Bext, [7] phase, [8] dead-layer
-  assert(param.size() == 9);
 
-  // for negative time return polarization == 1
-  if (t <= 0.0)
-    return 1.0;
-
-  // calculate field if parameter have changed
-  if (NewParameters(param)) { // new parameters, hence B(z), P(t), ..., needs to be calculated
-    // keep parameters
-    for (UInt_t i=0; i<param.size(); i++)
-      fPreviousParam[i] = param[i];
-    fEnergyIndex = fRgeHandler->GetRgeEnergyIndex(param[0]);
-    CalculateField(param);
-  }
-
-  // calcualte polarization
-  Bool_t done = false;
-  Double_t pol = 0.0, dPol = 0.0;
-  Double_t z=0.0;
-  Int_t terminate = 0;
-  Double_t dz = 1.0;
-  do {
-
-    if (z < param[8]) { // z < dead-layer
-      dPol = fRgeHandler->GetRgeValue(fEnergyIndex, z) * cos(GAMMA_MU * param[6] * t + param[7] * DEGREE2RAD);;
-    } else {
-      dPol = fRgeHandler->GetRgeValue(fEnergyIndex, z) * cos(GAMMA_MU * param[6] * GetMagneticField(z-param[8]) * t + param[7] * DEGREE2RAD);
-    }
-    z += dz;
-    pol += dPol;
-
-    // change in polarization is very small hence start termination counting
-    if (fabs(dPol) < 1.0e-7) {
-      terminate++;
-    } else {
-      terminate = 0;
-    }
-
-    if (terminate > 10) // polarization died out hence one can stop
-      done = true;
-  } while (!done);
-
-//  cout << endl << "t = " << t << ", pol = " << pol*dz;
-
-  return pol*dz;
-}
-
-//--------------------------------------------------------------------------
-// NewParameters
-//--------------------------------------------------------------------------
-/**
- *
- */
-Bool_t PNL_PippardFitter::NewParameters(const std::vector<Double_t> &param) const
-{
+  // check that param are new and hence a calculation is needed
+  Bool_t newParams = false;
   if (fPreviousParam.size() == 0) {
     for (UInt_t i=0; i<param.size(); i++)
       fPreviousParam.push_back(param[i]);
-    return true;
-  }
+    newParams = true;
+  } else {
+    assert(param.size() == fPreviousParam.size());
 
-  assert(param.size() == fPreviousParam.size());
-
-  Bool_t result = false;
-
-  for (UInt_t i=0; i<param.size(); i++) {
-    if (param[i] != fPreviousParam[i]) {
-      result = true;
-      break;
+    for (UInt_t i=0; i<param.size(); i++) {
+      if (param[i] != fPreviousParam[i]) {
+        newParams = true;
+        break;
+      }
     }
   }
 
-  return result;
-}
+  if (!newParams)
+    return;
 
-//--------------------------------------------------------------------------
-// CalculateField
-//--------------------------------------------------------------------------
-/**
- *
- */
-void PNL_PippardFitter::CalculateField(const std::vector<Double_t> &param) const
-{
-  // param: [0] energy, [1] temp, [2] thickness, [3] meanFreePath, [4] xi0, [5] lambdaL, [6] Bext, [7] phase, [8] dead-layer
+  // keep parameters
+  for (UInt_t i=0; i<param.size(); i++)
+    fPreviousParam[i] = param[i];
 
 //cout << endl << "in CalculateField ..." << endl;
 //cout << endl << "fFourierPoints = " << fFourierPoints;
@@ -324,7 +257,7 @@ void PNL_PippardFitter::CalculateField(const std::vector<Double_t> &param) const
 /**
  *
  */
-Double_t PNL_PippardFitter::GetMagneticField(const Double_t z) const
+Double_t PNL_PippardFitterGlobal::GetMagneticField(const Double_t z) const
 {
   Double_t result = -1.0;
 
@@ -350,7 +283,7 @@ Double_t PNL_PippardFitter::GetMagneticField(const Double_t z) const
 /**
  *
  */
-Double_t PNL_PippardFitter::DeltaBCS(const Double_t t) const
+Double_t PNL_PippardFitterGlobal::DeltaBCS(const Double_t t) const
 {
   Double_t result = 0.0;
 
@@ -392,7 +325,7 @@ Double_t PNL_PippardFitter::DeltaBCS(const Double_t t) const
 /**
  *
  */
-Double_t PNL_PippardFitter::LambdaL_T(const Double_t lambdaL, const Double_t t) const
+Double_t PNL_PippardFitterGlobal::LambdaL_T(const Double_t lambdaL, const Double_t t) const
 {
   return lambdaL/sqrt(1.0-pow(t,4.0));
 }
@@ -404,7 +337,7 @@ Double_t PNL_PippardFitter::LambdaL_T(const Double_t lambdaL, const Double_t t) 
  * <p> Approximated xi_P(T). The main approximation is that (lamdaL(T)/lambdaL(0))^2 = 1/(1-t^2). This way
  * xi_P(T) is close the the BCS xi_BCS(T).
  */
-Double_t PNL_PippardFitter::XiP_T(const Double_t xi0, const Double_t meanFreePath, Double_t t) const
+Double_t PNL_PippardFitterGlobal::XiP_T(const Double_t xi0, const Double_t meanFreePath, Double_t t) const
 {
   if (t>0.96)
     t=0.96;
@@ -412,4 +345,135 @@ Double_t PNL_PippardFitter::XiP_T(const Double_t xi0, const Double_t meanFreePat
   Double_t J0T = DeltaBCS(t)/(1.0-pow(t,2.0)) * tanh(0.881925 * DeltaBCS(t) / t);
 
   return xi0*meanFreePath/(meanFreePath*J0T+xi0);
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+ClassImp(PNL_PippardFitter)
+
+//--------------------------------------------------------------------------
+// Constructor
+//--------------------------------------------------------------------------
+/**
+ *
+ */
+PNL_PippardFitter::PNL_PippardFitter()
+{
+  fValid = false;
+  fInvokedGlobal = false;
+  fPippardFitterGlobal = 0;
+
+}
+
+//--------------------------------------------------------------------------
+// Destructor
+//--------------------------------------------------------------------------
+/**
+ *
+ */
+PNL_PippardFitter::~PNL_PippardFitter()
+{
+  if ((fPippardFitterGlobal != 0) && fInvokedGlobal) {
+    delete fPippardFitterGlobal;
+    fPippardFitterGlobal = 0;
+//    cout << endl << "debug> in PNL_PippardFitter::~PNL_PippardFitter(), fPippardFitterGlobal deleted." << endl;
+  }
+}
+
+//--------------------------------------------------------------------------
+// SetGlobalPart (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * <b>return:</b>
+ *
+ * \param globalPart
+ * \param idx
+ */
+void PNL_PippardFitter::SetGlobalPart(vector<void*> &globalPart, UInt_t idx)
+{
+  fIdxGlobal = static_cast<Int_t>(idx);
+
+  if ((Int_t)globalPart.size() <= fIdxGlobal) {
+    fPippardFitterGlobal = new PNL_PippardFitterGlobal();
+    if (fPippardFitterGlobal == 0) {
+      fValid = false;
+      cerr << endl << ">> PNL_PippardFitter::SetGlobalPart(): **ERROR** Couldn't invoke global user function object, sorry ..." << endl;
+    } else if (!fPippardFitterGlobal->IsValid()) {
+      fValid = false;
+      cerr << endl << ">> PNL_PippardFitter::SetGlobalPart(): **ERROR** initialization of global user function object failed, sorry ..." << endl;
+    } else {
+      fValid = true;
+      fInvokedGlobal = true;
+      globalPart.resize(fIdxGlobal+1);
+      globalPart[fIdxGlobal] = dynamic_cast<PNL_PippardFitterGlobal*>(fPippardFitterGlobal);
+//      cout << endl << ">> debug> PNL_PippardFitter::SetGlobalPart(): invoked global user function object, fPippardFitterGlobal = " << fPippardFitterGlobal << ", fInvokedGlobal=" << fInvokedGlobal;
+    }
+  } else {
+    fValid = true;
+    fPippardFitterGlobal = (PNL_PippardFitterGlobal*)globalPart[fIdxGlobal];
+  }
+}
+
+//--------------------------------------------------------------------------
+// GlobalPartIsValid (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * <b>return:</b>
+ */
+Bool_t PNL_PippardFitter::GlobalPartIsValid() const
+{
+//  cout << endl << "debug> PNL_PippardFitter::GlobalPartIsValid(): fValid=" << fValid << ", fGlobalUserFcn->IsValid()=" << fPippardFitterGlobal->IsValid() << endl;
+  return (fValid && fPippardFitterGlobal->IsValid());
+}
+
+//--------------------------------------------------------------------------
+// operator()
+//--------------------------------------------------------------------------
+/**
+ *
+ */
+Double_t PNL_PippardFitter::operator()(Double_t t, const std::vector<Double_t> &param) const
+{
+  // param: [0] energy, [1] temp, [2] thickness, [3] meanFreePath, [4] xi0, [5] lambdaL, [6] Bext, [7] phase, [8] dead-layer
+  assert(param.size() == 9);
+
+  // for negative time return polarization == 1
+  if (t <= 0.0)
+    return 1.0;
+
+  // calculate field if parameter have changed
+  fPippardFitterGlobal->CalculateField(param);
+  Int_t energyIndex = fPippardFitterGlobal->GetEnergyIndex(param[0]);
+
+  // calcualte polarization
+  Bool_t done = false;
+  Double_t pol = 0.0, dPol = 0.0;
+  Double_t z=0.0;
+  Int_t terminate = 0;
+  Double_t dz = 1.0;
+  do {
+    if (z < param[8]) { // z < dead-layer
+      dPol = fPippardFitterGlobal->GetMuoneStoppingDensity(energyIndex, z) * cos(GAMMA_MU * param[6] * t + param[7] * DEGREE2RAD);
+    } else {
+      dPol = fPippardFitterGlobal->GetMuoneStoppingDensity(energyIndex, z) * cos(GAMMA_MU * param[6] * fPippardFitterGlobal->GetMagneticField(z-param[8]) * t + param[7] * DEGREE2RAD);
+    }
+    z += dz;
+    pol += dPol;
+
+    // change in polarization is very small hence start termination counting
+    if (fabs(dPol) < 1.0e-9) {
+      terminate++;
+    } else {
+      terminate = 0;
+    }
+
+    if (terminate > 10) // polarization died out hence one can stop
+      done = true;
+  } while (!done);
+
+  return pol*dz;
 }

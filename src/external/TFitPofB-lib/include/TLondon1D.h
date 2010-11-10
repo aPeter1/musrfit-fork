@@ -46,6 +46,10 @@ public:
   TLondon1DHS();
   ~TLondon1DHS();
 
+  virtual Bool_t NeedGlobalPart() const { return false; }
+  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual Bool_t GlobalPartIsValid() const { return true; }
+
   double operator()(double, const vector<double>&) const;
 
 private:
@@ -74,6 +78,10 @@ public:
   // default constructor
   TLondon1D1L();
   ~TLondon1D1L();
+
+  virtual Bool_t NeedGlobalPart() const { return false; }
+  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const vector<double>&) const;
 
@@ -106,6 +114,10 @@ public:
   TLondon1D2L();
   ~TLondon1D2L();
 
+  virtual Bool_t NeedGlobalPart() const { return false; }
+  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual Bool_t GlobalPartIsValid() const { return true; }
+
   double operator()(double, const vector<double>&) const;
 
 private:
@@ -135,6 +147,10 @@ public:
   // default constructor
   TProximity1D1LHS();
   ~TProximity1D1LHS();
+
+  virtual Bool_t NeedGlobalPart() const { return false; }
+  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const vector<double>&) const;
 
@@ -166,6 +182,10 @@ public:
   TLondon1D3L();
   ~TLondon1D3L();
 
+  virtual Bool_t NeedGlobalPart() const { return false; }
+  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual Bool_t GlobalPartIsValid() const { return true; }
+
   double operator()(double, const vector<double>&) const;
 
 private:
@@ -195,6 +215,10 @@ public:
   // default constructor
   TLondon1D3LS();
   ~TLondon1D3LS();
+
+  virtual Bool_t NeedGlobalPart() const { return false; }
+  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const vector<double>&) const;
 

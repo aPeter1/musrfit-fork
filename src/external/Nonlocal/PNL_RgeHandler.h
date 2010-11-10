@@ -37,7 +37,7 @@
 class PNL_RgeHandler
 {
   public:
-    PNL_RgeHandler(const PStringVector &rgeDataPathList);
+    PNL_RgeHandler(const PStringVector &rgeDataPathList, const PDoubleVector &rgeDataEnergyList);
     virtual ~PNL_RgeHandler();
 
     virtual Bool_t IsValid() { return fIsValid; }
@@ -49,7 +49,7 @@ class PNL_RgeHandler
     Bool_t fIsValid;
     PNL_RgeDataList fRgeDataList;
 
-    virtual Bool_t LoadRgeData(const PStringVector &rgeDataPathList);
+    virtual Bool_t LoadRgeData(const PStringVector &rgeDataPathList, const PDoubleVector &rgeDataEnergyList);
 };
 
 #endif // _PNL_RGEHANDLER_H_

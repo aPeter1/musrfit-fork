@@ -46,6 +46,10 @@ public:
   TSkewedGss();
   ~TSkewedGss();
 
+  virtual Bool_t NeedGlobalPart() const { return false; }
+  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual Bool_t GlobalPartIsValid() const { return true; }
+
   double operator()(double, const vector<double>&) const;
 
 private:

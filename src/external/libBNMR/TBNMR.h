@@ -44,6 +44,10 @@ public:
   TBNMR(){}
   ~TBNMR(){}
 
+  Bool_t NeedGlobalPart() const { return false; }
+  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  Bool_t GlobalPartIsValid() const { return true; }
+
   // function operator
   double operator()(double, const vector<double>&) const;
 
@@ -58,6 +62,10 @@ public:
   ExpRlx(){}
   ~ExpRlx(){}
 
+  Bool_t NeedGlobalPart() const { return false; }
+  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  Bool_t GlobalPartIsValid() const { return true; }
+
   // function operator
   double operator()(double, const vector<double>&) const;
 
@@ -71,6 +79,10 @@ public:
   // default constructor and destructor
   SExpRlx(){}
   ~SExpRlx(){}
+
+  Bool_t NeedGlobalPart() const { return false; }
+  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  Bool_t GlobalPartIsValid() const { return true; }
 
   // function operator
   double operator()(double, const vector<double>&) const;
