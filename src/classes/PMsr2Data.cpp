@@ -156,7 +156,7 @@ int PMsr2Data::DetermineRunNumberDigits(unsigned int runNo) const
     strLine.clear();
     strLine.str(line);
     strLine >> firstOnLine;
-    if (!firstOnLine.compare("RUN")) {
+    if (!to_lower_copy(firstOnLine).compare("run")) {
        string::size_type loc = line.rfind(tempRunNumber.str());
        if ( loc != string::npos ) {
          while ( --loc >= 0 ) {
@@ -527,7 +527,7 @@ bool PMsr2Data::PrepareNewInputFile(unsigned int tempRun) const
     strLine.clear();
     strLine.str(line);
     strLine >> firstOnLine;
-    if (!firstOnLine.compare("RUN")) {
+    if (!to_lower_copy(firstOnLine).compare("run")) {
        string::size_type loc = line.rfind(tempRunNumber.str());
        if ( loc != string::npos ) {
          line.replace(loc, fRunNumberDigits, newRunNumber.str());

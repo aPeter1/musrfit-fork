@@ -59,17 +59,16 @@ using namespace boost::algorithm;
  *
  * \param s string
  */
-bool isNumber(const string &s) // will be replaced by boost::lexical_cast at some time
+bool isNumber(const string &s)
 {
   unsigned int number;
-  istringstream iss;
-  ostringstream oss;
-  iss.str(s);
-  iss >> number;
-  oss << number;
-  if (iss.str().compare(oss.str()))
+  try {
+    number = boost::lexical_cast<unsigned int>(s);
+    return true;
+  }
+  catch(boost::bad_lexical_cast &) {
     return false;
-  return true;
+  }
 }
 
 //--------------------------------------------------------------------------
