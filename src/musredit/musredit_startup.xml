@@ -12,17 +12,17 @@
     <enable_musrt0>n</enable_musrt0>
   </general>
   <help_section>
-    <musr_web_main>https://wiki.intranet.psi.ch/MUSR/WebHome</musr_web_main>
-    <musr_web_title>https://wiki.intranet.psi.ch/MUSR/MusrFit#4_1_The_Title</musr_web_title>
-    <musr_web_parameters>https://wiki.intranet.psi.ch/MUSR/MusrFit#4_2_The_FITPARAMETER_Block</musr_web_parameters>
-    <musr_web_theory>https://wiki.intranet.psi.ch/MUSR/MusrFit#4_3_The_THEORY_Block</musr_web_theory>
-    <musr_web_functions>https://wiki.intranet.psi.ch/MUSR/MusrFit#4_4_The_FUNCTIONS_Block</musr_web_functions>
-    <musr_web_run>https://wiki.intranet.psi.ch/MUSR/MusrFit#4_5_The_RUN_Block</musr_web_run>
-    <musr_web_command>https://wiki.intranet.psi.ch/MUSR/MusrFit#4_6_The_COMMANDS_Block</musr_web_command>
-    <musr_web_fourier>https://wiki.intranet.psi.ch/MUSR/MusrFit#4_7_The_FOURIER_Block</musr_web_fourier>
-    <musr_web_plot>https://wiki.intranet.psi.ch/MUSR/MusrFit#4_8_The_PLOT_Block</musr_web_plot>
-    <musr_web_statistic>https://wiki.intranet.psi.ch/MUSR/MusrFit#4_9_The_STATISTIC_Block</musr_web_statistic>
-    <musr_web_msr2data>https://intranet.psi.ch/MUSR/Msr2Data</musr_web_msr2data>
+    <musr_web_main>http://lmu.web.psi.ch/facilities/software/musrfit/user/intranet.psi.ch/MUSR/MusrFit.html</musr_web_main>
+    <musr_web_title>http://lmu.web.psi.ch/facilities/software/musrfit/user/intranet.psi.ch/MUSR/MusrFit.html#4_1_The_Title</musr_web_title>
+    <musr_web_parameters>http://lmu.web.psi.ch/facilities/software/musrfit/user/intranet.psi.ch/MUSR/MusrFit#4_2_The_FITPARAMETER_Block</musr_web_parameters>
+    <musr_web_theory>http://lmu.web.psi.ch/facilities/software/musrfit/user/intranet.psi.ch/MUSR/MusrFit#4_3_The_THEORY_Block</musr_web_theory>
+    <musr_web_functions>http://lmu.web.psi.ch/facilities/software/musrfit/user/intranet.psi.ch/MUSR/MusrFit#4_4_The_FUNCTIONS_Block</musr_web_functions>
+    <musr_web_run>http://lmu.web.psi.ch/facilities/software/musrfit/user/intranet.psi.ch/MUSR/MusrFit#4_5_The_RUN_Block</musr_web_run>
+    <musr_web_command>http://lmu.web.psi.ch/facilities/software/musrfit/user/intranet.psi.ch/MUSR/MusrFit#4_6_The_COMMANDS_Block</musr_web_command>
+    <musr_web_fourier>http://lmu.web.psi.ch/facilities/software/musrfit/user/intranet.psi.ch/MUSR/MusrFit#4_7_The_FOURIER_Block</musr_web_fourier>
+    <musr_web_plot>http://lmu.web.psi.ch/facilities/software/musrfit/user/intranet.psi.ch/MUSR/MusrFit#4_8_The_PLOT_Block</musr_web_plot>
+    <musr_web_statistic>http://lmu.web.psi.ch/facilities/software/musrfit/user/intranet.psi.ch/MUSR/MusrFit#4_9_The_STATISTIC_Block</musr_web_statistic>
+    <musr_web_msr2data>http://lmu.web.psi.ch/facilities/software/musrfit/user/intranet.psi.ch/MUSR/Msr2Data</musr_web_msr2data>
   </help_section>
   <font_settings>
     <font_name>Courier</font_name>
