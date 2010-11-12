@@ -53,18 +53,6 @@ PFitterFcn::PFitterFcn(PRunListCollection *runList, Bool_t useChi2)
     fUp = 0.5;
 
   fRunListCollection = runList;
-
-  // check if max likelihood is used together with asymmetry/nonMusr data.
-  // if yes place a warning since this option is not implemented and a fall back
-  // to chi2 will be used.
-  if (!fUseChi2) {
-    if ((fRunListCollection->GetNoOfAsymmetry() > 0) ||
-        (fRunListCollection->GetNoOfNonMusr() > 0)) {
-      cerr << endl << "**WARNING**: Maximum Log Likelihood Fit is only implemented for Single Histogram Fit";
-      cerr << endl << "             Will fall back to Chi Square Fit.";
-      cerr << endl;
-    }
-  }
 }
 
 //--------------------------------------------------------------------------
@@ -98,13 +86,6 @@ Double_t PFitterFcn::operator()(const std::vector<Double_t>& par) const
     value += fRunListCollection->GetMuMinusMaximumLikelihood(par);
     value += fRunListCollection->GetNonMusrMaximumLikelihood(par);
   }
-
-// cout << endl;
-// for (UInt_t i=0; i<par.size(); i++) {
-//   cout << par[i] << ", ";
-// }
-//cout << endl << "chisq = " << value;
-// cout << endl << "------" << endl;
 
   return value;
 }

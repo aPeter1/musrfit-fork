@@ -102,6 +102,7 @@ class PMsrHandler
     virtual Bool_t CheckFuncs();
     virtual Bool_t CheckHistoGrouping();
     virtual Bool_t CheckAddRunParameters();
+    virtual void CheckMaxLikelihood();
 
   private:
     TString                fFileName;  ///< file name of the msr-file

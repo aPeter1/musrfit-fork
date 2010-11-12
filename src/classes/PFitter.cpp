@@ -282,6 +282,9 @@ Bool_t PFitter::CheckCommands()
 {
   fIsValid = true;
 
+  // check if chisq or log max likelihood fit
+  fUseChi2 = fRunInfo->GetMsrStatistic()->fChisq;
+
   // walk through the msr-file COMMAND block
   PIntPair cmd;
   PMsrLines::iterator it;
@@ -298,9 +301,9 @@ Bool_t PFitter::CheckCommands()
     } else if (it->fLine.Contains("END RETURN", TString::kIgnoreCase)) {  // needed for backward compatibility
       continue;
     } else if (it->fLine.Contains("CHI_SQUARE", TString::kIgnoreCase)) {
-      fUseChi2 = true;
+      continue;
     } else if (it->fLine.Contains("MAX_LIKELIHOOD", TString::kIgnoreCase)) {
-      fUseChi2 = false;
+      continue;
     } else if (it->fLine.Contains("INTERACTIVE", TString::kIgnoreCase)) {
       cmd.first  = PMN_INTERACTIVE;
       cmd.second = cmdLineNo;
@@ -805,8 +808,7 @@ Bool_t PFitter::CheckCommands()
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
     } else { // unkown command
-      cerr << endl << ">> **FATAL ERROR**";
-      cerr << endl << ">> PFitter::CheckCommands(): In line " << it->fLineNo << " an unkown command is found:";
+      cerr << endl << ">> PFitter::CheckCommands(): **FATAL ERROR** in line " << it->fLineNo << " an unkown command is found:";
       cerr << endl << ">> " << it->fLine.Data();
       cerr << endl << ">> Will stop ...";
       cerr << endl;

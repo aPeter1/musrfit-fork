@@ -297,6 +297,10 @@ Int_t PMsrHandler::ReadMsrFile()
     if (!CheckAddRunParameters())
       result = PMUSR_MSR_SYNTAX_ERROR;
 
+  // check if the user wants to use max likelihood with asymmetry/non-muSR fit (which is not implemented)
+  if (result == PMUSR_SUCCESS)
+    CheckMaxLikelihood();
+
 
   // clean up
   fit_parameter.clear();
@@ -4631,6 +4635,29 @@ Bool_t PMsrHandler::CheckAddRunParameters()
   }
 
   return result;
+}
+
+//--------------------------------------------------------------------------
+// CheckMaxLikelihood (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>If log max likelihood is requested, make sure that all run blocks are of single histogram type.
+ * If this is not the case, fall back to chisq, since for asymmetry/non-muSR fit, log max likelihood
+ * is not defined.
+ */
+void PMsrHandler::CheckMaxLikelihood()
+{
+  if (!fStatistic.fChisq) {
+    for (UInt_t i=0; i<fRuns.size(); i++) {
+      if (fRuns[i].GetFitType() != MSR_FITTYPE_SINGLE_HISTO) {
+        cerr << endl << ">> PMsrHandler::CheckMaxLikelihood: **WARNING**: Maximum Log Likelihood Fit is only implemented";
+        cerr << endl << ">>    for Single Histogram Fit. Will fall back to Chi Square Fit.";
+        cerr << endl << endl;
+        fStatistic.fChisq = true;
+        break;
+      }
+    }
+  }
 }
 
 //--------------------------------------------------------------------------
