@@ -3023,6 +3023,7 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
           yAxisTitle = "??";
           break;
       }
+      fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
       fHistoFrame->GetYaxis()->SetTitle(yAxisTitle.Data());
       // plot all data
       for (UInt_t i=0; i<fData.size(); i++) {
@@ -3246,6 +3247,7 @@ void PMusrCanvas::PlotDifference(Bool_t unzoom)
     // set x-axis label
     fHistoFrame->GetXaxis()->SetTitle("time (#mus)");
     // set y-axis label
+    fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
     fHistoFrame->GetYaxis()->SetTitle("data-theory");
 
     // plot all diff data
@@ -3446,6 +3448,7 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
 
       // set y-axis title
+      fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
       fHistoFrame->GetYaxis()->SetTitle("Real Fourier");
 
       // plot data
@@ -3510,6 +3513,7 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
 
       // set y-axis title
+      fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
       fHistoFrame->GetYaxis()->SetTitle("Imaginary Fourier");
 
       // plot data
@@ -3591,6 +3595,7 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
 
       // set y-axis title
+      fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
       fHistoFrame->GetYaxis()->SetTitle("Real/Imag Fourier");
 
       // plot data
@@ -3657,6 +3662,7 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
 
       // set y-axis title
+      fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
       fHistoFrame->GetYaxis()->SetTitle("Power Fourier");
 
       // plot data
@@ -3718,6 +3724,7 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
 
       // set y-axis title
+      fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
       fHistoFrame->GetYaxis()->SetTitle("Phase Fourier");
 
       // plot data
@@ -3814,7 +3821,8 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
 
       // set y-axis title
-      fHistoFrame->GetYaxis()->SetTitle("Real Fourier");
+      fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
+      fHistoFrame->GetYaxis()->SetTitle("Real Fourier (data-theory)");
 
       // plot data
       for (UInt_t i=0; i<fData.size(); i++) {
@@ -3858,7 +3866,8 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
 
       // set y-axis title
-      fHistoFrame->GetYaxis()->SetTitle("Imaginary Fourier");
+      fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
+      fHistoFrame->GetYaxis()->SetTitle("Imaginary Fourier (data-theory)");
 
       // plot data
       for (UInt_t i=0; i<fData.size(); i++) {
@@ -3912,7 +3921,8 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
 
       // set y-axis title
-      fHistoFrame->GetYaxis()->SetTitle("Real+Imag Fourier");
+      fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
+      fHistoFrame->GetYaxis()->SetTitle("Real+Imag Fourier (data-theory)");
 
       // plot data
       for (UInt_t i=0; i<fData.size(); i++) {
@@ -3957,7 +3967,8 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
       }
 
       // set y-axis title
-      fHistoFrame->GetYaxis()->SetTitle("Power Fourier");
+      fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
+      fHistoFrame->GetYaxis()->SetTitle("Power Fourier (data-theory)");
 
       // plot data
       for (UInt_t i=0; i<fData.size(); i++) {
@@ -3999,7 +4010,8 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
 
       // set y-axis title
-      fHistoFrame->GetYaxis()->SetTitle("Phase Fourier");
+      fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
+      fHistoFrame->GetYaxis()->SetTitle("Phase Fourier (data-theory)");
 
       // plot data
       for (UInt_t i=0; i<fData.size(); i++) {

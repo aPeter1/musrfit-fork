@@ -7,6 +7,7 @@
 changes since 0.8.0
 ===================================
 FIXED fixes the inadequate attempt to use log max likelihood fit for asymmetry/non-muSR fit (MUSR-148)
+CHANGED cosmetics in the y-labelling (MUSR-154)
 CHANGED maximum possible run number for the use in msr2data to numeric_limits<unsigned int>::max() (MUSR-155)
 
 musrfit 0.8.0 - changes since 0.7.0
