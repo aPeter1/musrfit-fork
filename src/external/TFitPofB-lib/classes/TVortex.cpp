@@ -894,7 +894,7 @@ TBulkAnisotropicTriVortexLondonGlobal::TBulkAnisotropicTriVortexLondonGlobal() :
     }
 }
 
-void TBulkAnisotropicTriVortexLondonGlobal::CalcPofB(const vector<double> &par) const {
+void TBulkAnisotropicTriVortexLondonGlobal::Calc(const vector<double> &par) const {
 
   assert(par.size() == 6);
 /*
@@ -1053,7 +1053,7 @@ double TBulkAnisotropicTriVortexLondon::operator()(double t, const std::vector<d
     return cos(param[0]*0.017453293);
 
   // call the global user function object
-  fGlobalUserFcn->CalcPofB(param);
+  fGlobalUserFcn->Calc(param);
 
   return fGlobalUserFcn->GetPolarizationPointer()->Eval(t);
 }

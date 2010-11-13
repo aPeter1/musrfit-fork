@@ -217,7 +217,7 @@ public:
 
   // the following function will check if something needs to be calculated, which 
   // is the case if param != fPrevParam
-  void CalcPofB(const vector<double>&) const;
+  void Calc(const vector<double>&) const;
 
   // this routine will return the calculated values, e.g. B(z,E) for TMyFunction::operator()()
   // (...) here sketches only that some parameters are likley to be fed

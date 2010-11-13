@@ -1985,11 +1985,17 @@ void TBulkAnisotropicTriVortexLondonFieldCalc::CalculateGrid() const {
   double field(fabs(fParam[0])), lambdaX(fabs(fParam[1])), lambdaY(fabs(fParam[2])), xiX(fabs(fParam[3])), xiY(fabs(fParam[4]));
   double Hc2(fluxQuantum/(TWOPI*xiX*xiY));
 
-  double latConstTr(sqrt(2.0*fluxQuantum/(field*sqrt3)));
-  double xiXsq_2_scaled(field/fluxQuantum*pow(xiX*PI,2.0)*sqrt3*lambdaY/lambdaX);
-  double xiYsq_2_scaled(field/fluxQuantum*pow(xiY*PI,2.0)*lambdaX/(lambdaY*sqrt3));
-  double lambdaXsq_scaled(2.0*field/fluxQuantum*PI*PI/(sqrt3*lambdaY)*pow(lambdaX,3.0));
-  double lambdaYsq_scaled(2.0*field/fluxQuantum*PI*PI*sqrt3/lambdaX*pow(lambdaY,3.0));
+//  double latConstTr(sqrt(2.0*fluxQuantum/(field*sqrt3)));
+  double xiXsq_2_scaled(field/fluxQuantum*pow(xiX*PI,2.0)/(sqrt3*lambdaY)*lambdaX);
+  double xiYsq_2_scaled(field/fluxQuantum*pow(xiY*PI,2.0)*lambdaY/lambdaX*sqrt3);
+  double lambdaXsq_scaled(2.0*field/fluxQuantum*PI*PI*sqrt3*lambdaY*lambdaX);
+  double lambdaYsq_scaled(2.0*field/fluxQuantum*PI*PI/sqrt3*lambdaX*lambdaY);
+/*
+  double xiXsq_2_scaled(field/fluxQuantum*pow(xiX*PI,2.0)*sqrt3*sqrt(lambdaY/lambdaX));
+  double xiYsq_2_scaled(field/fluxQuantum*pow(xiY*PI,2.0)*sqrt(lambdaX/(lambdaY*3.0)));
+  double lambdaXsq_scaled(2.0*field/fluxQuantum*PI*PI/sqrt3*pow(lambdaX,2.5)/sqrt(lambdaY));
+  double lambdaYsq_scaled(2.0*field/fluxQuantum*PI*PI*sqrt3/sqrt(lambdaX)*pow(lambdaY,2.5));
+*/
 
   const int NFFT(fSteps);
   const int NFFT_2(fSteps/2);
@@ -2020,14 +2026,14 @@ void TBulkAnisotropicTriVortexLondonFieldCalc::CalculateGrid() const {
     ll = static_cast<double>(l*l);
     for (k = 0; k < NFFT_2; k += 2) {
       kk = static_cast<double>(k*k);
-      fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+      fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*ll + xiYsq_2_scaled*kk))/(1.0+lambdaXsq_scaled*kk+lambdaYsq_scaled*ll);
       fFFTin[lNFFT_2 + k][1] = 0.0;
       fFFTin[lNFFT_2 + k + 1][0] = 0.0;
       fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
     k = NFFT_2;
     kk = static_cast<double>(k*k);
-    fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+    fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*ll + xiYsq_2_scaled*kk))/(1.0+lambdaXsq_scaled*kk+lambdaYsq_scaled*ll);
     fFFTin[lNFFT_2 + k][1] = 0.0;
   }
 
@@ -2037,14 +2043,14 @@ void TBulkAnisotropicTriVortexLondonFieldCalc::CalculateGrid() const {
     ll = static_cast<double>((NFFT-l)*(NFFT-l));
     for (k = 0; k < NFFT_2; k += 2) {
       kk = static_cast<double>(k*k);
-      fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+      fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*ll + xiYsq_2_scaled*kk))/(1.0+lambdaXsq_scaled*kk+lambdaYsq_scaled*ll);
       fFFTin[lNFFT_2 + k][1] = 0.0;
       fFFTin[lNFFT_2 + k + 1][0] = 0.0;
       fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
     k = NFFT_2;
     kk = static_cast<double>(k*k);
-    fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+    fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*ll + xiYsq_2_scaled*kk))/(1.0+lambdaXsq_scaled*kk+lambdaYsq_scaled*ll);
     fFFTin[lNFFT_2 + k][1] = 0.0;
   }
 
@@ -2057,7 +2063,7 @@ void TBulkAnisotropicTriVortexLondonFieldCalc::CalculateGrid() const {
       kk = static_cast<double>((k + 1)*(k + 1));
       fFFTin[lNFFT_2 + k][0] = 0.0;
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+      fFFTin[lNFFT_2 + k + 1][0] = exp(-(xiXsq_2_scaled*ll + xiYsq_2_scaled*kk))/(1.0+lambdaXsq_scaled*kk+lambdaYsq_scaled*ll);
       fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
     k = NFFT_2;
@@ -2072,7 +2078,7 @@ void TBulkAnisotropicTriVortexLondonFieldCalc::CalculateGrid() const {
       kk = static_cast<double>((k+1)*(k+1));
       fFFTin[lNFFT_2 + k][0] = 0.0;
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+      fFFTin[lNFFT_2 + k + 1][0] = exp(-(xiXsq_2_scaled*ll + xiYsq_2_scaled*kk))/(1.0+lambdaXsq_scaled*kk+lambdaYsq_scaled*ll);
       fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
     k = NFFT_2;
