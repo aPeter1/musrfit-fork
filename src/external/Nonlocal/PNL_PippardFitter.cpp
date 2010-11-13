@@ -147,7 +147,7 @@ void PNL_PippardFitterGlobal::CalculateField(const std::vector<Double_t> &param)
 {
   // param: [0] energy, [1] temp, [2] thickness, [3] meanFreePath, [4] xi0, [5] lambdaL, [6] Bext, [7] phase, [8] dead-layer
 
-  // check that param are new and hence a calculation is needed
+  // check that param are new and hence a calculation is needed (except the phase, which is not needed here)
   Bool_t newParams = false;
   if (fPreviousParam.size() == 0) {
     for (UInt_t i=0; i<param.size(); i++)
@@ -157,6 +157,8 @@ void PNL_PippardFitterGlobal::CalculateField(const std::vector<Double_t> &param)
     assert(param.size() == fPreviousParam.size());
 
     for (UInt_t i=0; i<param.size(); i++) {
+      if (i == 7) // phase, nothing to be done
+        continue;
       if (param[i] != fPreviousParam[i]) {
         newParams = true;
         break;
