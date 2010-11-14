@@ -43,6 +43,10 @@
 #pragma link C++ class TBulkTriVortexNGL+;
 #pragma link C++ class TBulkAnisotropicTriVortexLondon+;
 #pragma link C++ class TBulkAnisotropicTriVortexLondonGlobal+;
+#pragma link C++ class TBulkAnisotropicTriVortexML+;
+#pragma link C++ class TBulkAnisotropicTriVortexMLGlobal+;
+#pragma link C++ class TBulkAnisotropicTriVortexAGL+;
+#pragma link C++ class TBulkAnisotropicTriVortexAGLGlobal+;
 
 #endif //__CINT__
 // root dictionary stuff --------------------------------------------------

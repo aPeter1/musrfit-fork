@@ -202,7 +202,7 @@ private:
 
 /**
  * <p>Class implementing the global part of the musrfit user function interface for calculating muon spin depolarization functions
- * originating from the spatial field distribution B(x,y) within a 2D "triangular vortex lattice"
+ * originating from the spatial field distribution B(x,y) within a 2D triangular vortex lattice
  * calculated using the London model with a Gaussian cutoff for an anisotropic superconductor with the field applied along
  * one of the principal axes
  */
@@ -215,17 +215,13 @@ public:
 
   bool IsValid() { return fValid; }
 
-  // the following function will check if something needs to be calculated, which 
-  // is the case if param != fPrevParam
   void Calc(const vector<double>&) const;
 
-  // this routine will return the calculated values, e.g. B(z,E) for TMyFunction::operator()()
-  // (...) here sketches only that some parameters are likley to be fed
   const TPofTCalc* GetPolarizationPointer() const { return fPofT; }
 
 private:
-  mutable bool fValid;
-  mutable vector<double> fPar;
+  mutable bool fValid; ///< tag indicating if the global part has been calculated
+  mutable vector<double> fPar; ///< parameter vector
   TBulkAnisotropicTriVortexLondonFieldCalc *fVortex; ///< spatial field distribution B(x,y) within the vortex lattice
   TPofBCalc *fPofB; ///< static field distribution P(B)
   TPofTCalc *fPofT; ///< muon spin polarization p(t)
@@ -266,6 +262,134 @@ private:
   TBulkAnisotropicTriVortexLondonGlobal *fGlobalUserFcn;
 
   ClassDef(TBulkAnisotropicTriVortexLondon,1)
+};
+
+/**
+ * <p>Class implementing the global part of the musrfit user function interface for calculating muon spin depolarization functions
+ * originating from the spatial field distribution B(x,y) within a 2D triangular vortex lattice
+ * calculated using the modified London model with a Gaussian cutoff for an anisotropic superconductor with the field applied along
+ * one of the principal axes
+ */
+class TBulkAnisotropicTriVortexMLGlobal {
+
+public:
+  // default constructor and destructor
+  TBulkAnisotropicTriVortexMLGlobal();
+  ~TBulkAnisotropicTriVortexMLGlobal();
+
+  bool IsValid() { return fValid; }
+
+  void Calc(const vector<double>&) const;
+
+  const TPofTCalc* GetPolarizationPointer() const { return fPofT; }
+
+private:
+  mutable bool fValid; ///< tag indicating if the global part has been calculated
+  mutable vector<double> fPar; ///< parameter vector
+  TBulkAnisotropicTriVortexMLFieldCalc *fVortex; ///< spatial field distribution B(x,y) within the vortex lattice
+  TPofBCalc *fPofB; ///< static field distribution P(B)
+  TPofTCalc *fPofT; ///< muon spin polarization p(t)
+  mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
+  mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
+  mutable vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
+  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  string fWisdom; ///< file name of the FFTW wisdom file
+  unsigned int fGridSteps; ///< number of points in x- and y-direction for which B(x,y) is calculated
+
+  // definition of the class for the ROOT-dictionary
+  ClassDef(TBulkAnisotropicTriVortexMLGlobal,1)
+};
+
+/**
+ * <p>Class implementing the musrfit user function interface for calculating muon spin depolarization functions
+ * originating from the spatial field distribution B(x,y) within a 2D "triangular vortex lattice"
+ * calculated using the modified London model with a Gaussian cutoff for an anisotropic superconductor with the field applied along
+ * one of the principal axes
+ */
+class TBulkAnisotropicTriVortexML : public PUserFcnBase {
+
+public:
+  TBulkAnisotropicTriVortexML();
+  ~TBulkAnisotropicTriVortexML();
+
+  virtual bool NeedGlobalPart() const { return true; }
+  virtual void SetGlobalPart(vector<void *> &globalPart, unsigned int idx);
+  virtual bool GlobalPartIsValid() const;
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  bool fValid;
+  bool fInvokedGlobal;
+  int  fIdxGlobal;
+  TBulkAnisotropicTriVortexMLGlobal *fGlobalUserFcn;
+
+  ClassDef(TBulkAnisotropicTriVortexML,1)
+};
+
+/**
+ * <p>Class implementing the global part of the musrfit user function interface for calculating muon spin depolarization functions
+ * originating from the spatial field distribution B(x,y) within a 2D triangular vortex lattice
+ * calculated using the analytical Ginzburg-Landau model for an anisotropic superconductor with the field applied along
+ * one of the principal axes
+ */
+class TBulkAnisotropicTriVortexAGLGlobal {
+
+public:
+  // default constructor and destructor
+  TBulkAnisotropicTriVortexAGLGlobal();
+  ~TBulkAnisotropicTriVortexAGLGlobal();
+
+  bool IsValid() { return fValid; }
+
+  void Calc(const vector<double>&) const;
+
+  const TPofTCalc* GetPolarizationPointer() const { return fPofT; }
+
+private:
+  mutable bool fValid; ///< tag indicating if the global part has been calculated
+  mutable vector<double> fPar; ///< parameter vector
+  TBulkAnisotropicTriVortexAGLFieldCalc *fVortex; ///< spatial field distribution B(x,y) within the vortex lattice
+  TPofBCalc *fPofB; ///< static field distribution P(B)
+  TPofTCalc *fPofT; ///< muon spin polarization p(t)
+  mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
+  mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
+  mutable vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
+  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  string fWisdom; ///< file name of the FFTW wisdom file
+  unsigned int fGridSteps; ///< number of points in x- and y-direction for which B(x,y) is calculated
+
+  // definition of the class for the ROOT-dictionary
+  ClassDef(TBulkAnisotropicTriVortexAGLGlobal,1)
+};
+
+/**
+ * <p>Class implementing the musrfit user function interface for calculating muon spin depolarization functions
+ * originating from the spatial field distribution B(x,y) within a 2D "triangular vortex lattice"
+ * calculated using the analytical Ginzburg-Landau model for an anisotropic superconductor with the field applied along
+ * one of the principal axes
+ */
+class TBulkAnisotropicTriVortexAGL : public PUserFcnBase {
+
+public:
+  TBulkAnisotropicTriVortexAGL();
+  ~TBulkAnisotropicTriVortexAGL();
+
+  virtual bool NeedGlobalPart() const { return true; }
+  virtual void SetGlobalPart(vector<void *> &globalPart, unsigned int idx);
+  virtual bool GlobalPartIsValid() const;
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  bool fValid;
+  bool fInvokedGlobal;
+  int  fIdxGlobal;
+  TBulkAnisotropicTriVortexAGLGlobal *fGlobalUserFcn;
+
+  ClassDef(TBulkAnisotropicTriVortexAGL,1)
 };
 
 #endif //_TVortex_H_
