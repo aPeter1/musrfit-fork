@@ -136,6 +136,7 @@ typedef struct {
   TH1F *diffFourierPwr;      ///< power spectrum of the Fourier transform of the diff histogram
   TH1F *diffFourierPhase;    ///< phase spectrum of the Fourier transform of the diff histogram
   PMusrCanvasPlotRange *dataRange;    ///< keep the msr-file plot data range
+  UInt_t diffFourierTag; ///< 0=not relevant, 1=d-f (Fourier of difference time spectra), 2=f-d (difference of Fourier spectra)
 } PMusrCanvasDataSet;
 
 //------------------------------------------------------------------------
@@ -166,6 +167,7 @@ typedef struct {
   TGraphErrors *diffFourierPwr;     ///< power spectrum of the Fourier transform of the diff error graph
   TGraphErrors *diffFourierPhase;   ///< phase spectrum of the Fourier transform of the diff error graph
   PMusrCanvasPlotRange *dataRange;    ///< keep the msr-file plot data range
+  UInt_t diffFourierTag; ///< 0=not relevant, 1=d-f (Fourier of difference time spectra), 2=f-d (difference of Fourier spectra)
 } PMusrCanvasNonMusrDataSet;
 
 //------------------------------------------------------------------------

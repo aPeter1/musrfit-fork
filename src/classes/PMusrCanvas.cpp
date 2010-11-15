@@ -1911,6 +1911,7 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
   // fill handler list -----------------------------------------------------
   dataSet.data   = dataHisto;
   dataSet.theory = theoHisto;
+  dataSet.diffFourierTag = 0; // not relevant at this point
 
   fData.push_back(dataSet);
 }
@@ -1990,6 +1991,7 @@ void PMusrCanvas::HandleNonMusrDataSet(UInt_t plotNo, UInt_t runNo, PRunData *da
   // fill handler list -----------------------------------------------------
   dataSet.data   = dataHisto;
   dataSet.theory = theoHisto;
+  dataSet.diffFourierTag = 0; // not relevant at this point
 
   // check the plot range options
   Double_t xmin=0.0, xmax=0.0, ymin=0.0, ymax=0.0, x=0.0, y=0.0;
@@ -2385,6 +2387,9 @@ void PMusrCanvas::HandleDifferenceFourier()
       fData[i].diffFourierIm->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
       fData[i].diffFourierPwr->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
       fData[i].diffFourierPhase->SetMarkerStyle(fData[i].diff->GetMarkerStyle());
+
+      // set diffFourierTag
+      fData[i].diffFourierTag = 1; // d-f
     }
 
     // apply global phase
@@ -2496,6 +2501,9 @@ void PMusrCanvas::HandleFourierDifference()
       fData[i].diffFourierIm->SetMarkerStyle(fData[i].dataFourierIm->GetMarkerStyle());
       fData[i].diffFourierPwr->SetMarkerStyle(fData[i].dataFourierPwr->GetMarkerStyle());
       fData[i].diffFourierPhase->SetMarkerStyle(fData[i].dataFourierPhase->GetMarkerStyle());
+
+      // set diffFourierTag
+      fData[i].diffFourierTag = 2; // f-d
     }
   }
 }
@@ -3822,7 +3830,10 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
 
       // set y-axis title
       fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
-      fHistoFrame->GetYaxis()->SetTitle("Real Fourier (data-theory)");
+      if (fData[0].diffFourierTag == 1)
+        fHistoFrame->GetYaxis()->SetTitle("Real Fourier (d-f: data-theory)");
+      else
+        fHistoFrame->GetYaxis()->SetTitle("Real Fourier (f-d: [(F data)-(F theory)]");
 
       // plot data
       for (UInt_t i=0; i<fData.size(); i++) {
@@ -3867,7 +3878,10 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
 
       // set y-axis title
       fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
-      fHistoFrame->GetYaxis()->SetTitle("Imaginary Fourier (data-theory)");
+      if (fData[0].diffFourierTag == 1)
+        fHistoFrame->GetYaxis()->SetTitle("Imaginary Fourier (d-f: data-theory)");
+      else
+        fHistoFrame->GetYaxis()->SetTitle("Imaginary Fourier (f-d: [(F data)-(F theory)]");
 
       // plot data
       for (UInt_t i=0; i<fData.size(); i++) {
@@ -3922,7 +3936,10 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
 
       // set y-axis title
       fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
-      fHistoFrame->GetYaxis()->SetTitle("Real+Imag Fourier (data-theory)");
+      if (fData[0].diffFourierTag == 1)
+        fHistoFrame->GetYaxis()->SetTitle("Real+Imag Fourier (d-f: data-theory)");
+      else
+        fHistoFrame->GetYaxis()->SetTitle("Real+Imag Fourier (f-d: [(F data)-(F theory)]");
 
       // plot data
       for (UInt_t i=0; i<fData.size(); i++) {
@@ -3968,7 +3985,10 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
 
       // set y-axis title
       fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
-      fHistoFrame->GetYaxis()->SetTitle("Power Fourier (data-theory)");
+      if (fData[0].diffFourierTag == 1)
+        fHistoFrame->GetYaxis()->SetTitle("Power Fourier (d-f: data-theory)");
+      else
+        fHistoFrame->GetYaxis()->SetTitle("Power Fourier (f-d: [(F data)-(F theory)]");
 
       // plot data
       for (UInt_t i=0; i<fData.size(); i++) {
@@ -4011,7 +4031,10 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
 
       // set y-axis title
       fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
-      fHistoFrame->GetYaxis()->SetTitle("Phase Fourier (data-theory)");
+      if (fData[0].diffFourierTag == 1)
+        fHistoFrame->GetYaxis()->SetTitle("Phase Fourier (d-f: data-theory)");
+      else
+        fHistoFrame->GetYaxis()->SetTitle("Phase Fourier [f-d: (F data)-(F theory)]");
 
       // plot data
       for (UInt_t i=0; i<fData.size(); i++) {
@@ -4081,6 +4104,9 @@ void PMusrCanvas::PlotFourierPhaseValue(Bool_t unzoom)
  */
 void PMusrCanvas::IncrementFourierPhase()
 {
+  if (fCurrentPlotView == PV_FOURIER_PWR)
+    return;
+
   double re, im;
   const double cp = TMath::Cos(fFourier.fPhaseIncrement/180.0*TMath::Pi());
   const double sp = TMath::Sin(fFourier.fPhaseIncrement/180.0*TMath::Pi());
@@ -4130,6 +4156,9 @@ void PMusrCanvas::IncrementFourierPhase()
  */
 void PMusrCanvas::DecrementFourierPhase()
 {
+  if (fCurrentPlotView == PV_FOURIER_PWR)
+    return;
+
   double re, im;
   const double cp = TMath::Cos(fFourier.fPhaseIncrement/180.0*TMath::Pi());
   const double sp = TMath::Sin(fFourier.fPhaseIncrement/180.0*TMath::Pi());
