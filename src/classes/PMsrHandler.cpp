@@ -2282,10 +2282,8 @@ Bool_t PMsrHandler::HandleFunctionsEntry(PMsrLines &lines)
 
   // check if an empty FUNCTIONS block is present
   if ((fFuncHandler->GetNoOfFuncs() == 0) && !lines.empty()) {
-    cerr << endl << ">> PMsrHandler::HandleFunctionsEntry: **ERROR** empty FUNCTIONS block are not supported!";
-    cerr << endl << ">> If you want to keep it, just comment the whole block ;-)";
+    cerr << endl << ">> PMsrHandler::HandleFunctionsEntry: **WARNING** empty FUNCTIONS block found!";
     cerr << endl;
-    return false;
   }
 
   return true;
