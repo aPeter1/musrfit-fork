@@ -1234,6 +1234,9 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
   fout << hline.Data() << endl;
 
   // write FUNCTIONS block
+  // or comment it if there is none in the data structures
+  if (fFunctions.size() < 2)
+    fout << "# ";
   fout << "FUNCTIONS" << endl;
 
   for (i = 1; i < fFunctions.size(); ++i) {
