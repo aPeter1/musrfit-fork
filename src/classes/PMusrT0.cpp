@@ -330,6 +330,12 @@ PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
       return;
     }
     Int_t histoNo = fMusrT0Data.GetHistoNo(fMusrT0Data.GetHistoNoIdx())-1;
+    if (histoNo >= (Int_t)rawRunData->GetNoOfHistos()) {
+      cerr << endl << ">> PMusrT0::PMusrT0: **ERROR** found histogram number " << histoNo+1 << ", but only " << rawRunData->GetNoOfHistos() << " are present.";
+      cerr << endl << ">> Please try to fix this first ..." << endl;
+      fValid = false;
+      return;
+    }
     Int_t noOfBins = rawRunData->GetDataBin(histoNo)->size();
     Double_t start = -0.5;
     Double_t end   = noOfBins - 0.5; // -0.5 is correct since the data start at 0.0
