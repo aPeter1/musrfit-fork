@@ -1624,29 +1624,19 @@ sub RUNFileNameAuto {
     }
     elsif ( $BeamLine eq "GPS" ) {
 	$RUN_File_Name = "deltat_tdc_gps_" . $RUNtmp;
-	$RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
+	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
     }
     elsif ( $BeamLine eq "LTF" ) {
-	$RUN_File_Name = "deltat_pta_ltf_" . $RUNtmp;
-	if ( $YEAR == $current_year ) {
-	    $RUNFILE = "$DATADIR/$RUN_File_Name";
-	}
-	else {
-	    $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
-	}
+	$RUN_File_Name = "deltat_tdc_ltf_" . $RUNtmp;
+	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
     }
     elsif ( $BeamLine eq "Dolly" ) {
 	$RUN_File_Name = "deltat_tdc_dolly_" . $RUNtmp;
 	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
     }
     elsif ( $BeamLine eq "GPD" ) {
-	$RUN_File_Name = "deltat_pta_gpd_" . $RUNtmp;
-	if ( $YEAR == $current_year ) {
-	    $RUNFILE = "$DATADIR/$RUN_File_Name";
-	}
-	else {
-	    $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
-	}
+	$RUN_File_Name = "deltat_tdc_gpd_" . $RUNtmp;
+	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
     }
     my $RUN_Line = join( $SPACE,
 			 "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
