@@ -548,6 +548,7 @@ FUNCTIONS
 
     # range order
     my $Range_Order = 1;
+    my $iHist = 0;
     foreach my $RUN (@RUNS) {
 #######################################################################
 # For a single histogram fit we basically need to repeat this for each hist
@@ -577,6 +578,8 @@ FUNCTIONS
 		++$component;
 		my $Parameters = $Paramcomp[ $component - 1 ];
 		my @Params = split( /\s+/, $Parameters );
+		# Only the first histiograms has new physical parameters
+		# the others keep only Phi if they have it
 		
 		# For the first component we need No and NBg for SingleHist fits
 		if ( $component == 1 ) {
@@ -586,7 +589,7 @@ FUNCTIONS
 		foreach $Param (@Params) {
 		    $Param_ORG = $Param;
 		    $Param=$Param.$Hist;
-		    if ( ($#FitTypes != 0) && ( $Param ne "No" && $Param ne "NBg" ) ) {
+		    if ( ($#FitTypes != 0) && !( $Param_ORG =~ m/^(No|NBg)/ ) ) {
 			$Param = join( $EMPTY, $Param, "_", "$component" );
 		    }
 		    
@@ -641,7 +644,7 @@ FUNCTIONS
 		    } else {
 			# Parameter is not shared, use map unless it is a single RUN fit
 			# Skip adding to map line in these cases
-			if ( $Param ne "No" && $Param ne "NBg" && ($#RUNS != 0 || $#Hist != 0)) {
+			if ( !( $Param_ORG =~ m/^(No|NBg)/ ) && ($#RUNS != 0 || $#Hist != 0)) {
 			    ++$nonsh;
 			    $Full_T_Block =~ s/$Param_ORG/map$nonsh/;
 			    $MAP_Line = join( ' ', $MAP_Line, $PCount );
@@ -715,6 +718,7 @@ FUNCTIONS
 		++$k;
 		++$Range_Order;
 	    }
+	    ++$iHist;
 	}
 	++$iRun;
     }
@@ -1619,14 +1623,8 @@ sub RUNFileNameAuto {
 	$RUNFILE       = "$DATADIR/$YEAR/$RUN_File_Name";
     }
     elsif ( $BeamLine eq "GPS" ) {
-#	$RUN_File_Name = "deltat_pta_gps_" . $RUNtmp;
 	$RUN_File_Name = "deltat_tdc_gps_" . $RUNtmp;
-	if ( $YEAR == $current_year ) {
-	    $RUNFILE = "$DATADIR/$RUN_File_Name";
-	}
-	else {
-	    $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
-	}
+	$RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
     }
     elsif ( $BeamLine eq "LTF" ) {
 	$RUN_File_Name = "deltat_pta_ltf_" . $RUNtmp;
@@ -1638,13 +1636,8 @@ sub RUNFileNameAuto {
 	}
     }
     elsif ( $BeamLine eq "Dolly" ) {
-	$RUN_File_Name = "deltat_pta_dolly_" . $RUNtmp;
-	if ( $YEAR == $current_year ) {
-	    $RUNFILE = "$DATADIR/$RUN_File_Name";
-	}
-	else {
-	    $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
-	}
+	$RUN_File_Name = "deltat_tdc_dolly_" . $RUNtmp;
+	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
     }
     elsif ( $BeamLine eq "GPD" ) {
 	$RUN_File_Name = "deltat_pta_gpd_" . $RUNtmp;
