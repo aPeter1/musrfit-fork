@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Wed Aug 18 12:51:07 2010
+# Created: Wed Nov 24 15:21:00 2010
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -1704,7 +1704,7 @@ sub NEW
         setName("MuSRFitform" );
     }
     setSizePolicy(Qt::SizePolicy(3, 3, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
-    setMinimumSize(Qt::Size(21, 275) );
+    setMinimumSize(Qt::Size(21, 264) );
     setIcon($image0 );
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
@@ -2139,7 +2139,8 @@ sub NEW
     buttonGroupSharing->setGeometry( Qt::Rect(5, 5, 545, 355) );
     buttonGroupSharing->setSizePolicy( Qt::SizePolicy(7, 7, 0, 0, buttonGroupSharing->sizePolicy()->hasHeightForWidth()) );
     buttonGroupSharing->setAlignment( int(&Qt::ButtonGroup::AlignLeft) );
-    buttonGroupSharing->setCheckable( 0 );
+    buttonGroupSharing->setCheckable( 1 );
+    buttonGroupSharing->setChecked( 0 );
 
     SharingComp1 = Qt::ButtonGroup(buttonGroupSharing, "SharingComp1");
     SharingComp1->setEnabled( 0 );
@@ -3011,6 +3012,7 @@ sub NEW
     Qt::Object::connect(FitType2, SIGNAL "activated(const QString&)", this, SLOT "InitializeFunctions()");
     Qt::Object::connect(FitType3, SIGNAL "activated(const QString&)", this, SLOT "InitializeFunctions()");
     Qt::Object::connect(AddConstraint, SIGNAL "clicked()", this, SLOT "AppendToFunctions()");
+    Qt::Object::connect(buttonGroupSharing, SIGNAL "toggled(bool)", this, SLOT "ActivateShComp()");
 
     setTabOrder(musrfit_tabs, RunNumbers);
     setTabOrder(RunNumbers, BeamLine);
@@ -3772,7 +3774,6 @@ sub CreateAllInput
 		$Shared = $ChkBx->isChecked();
 	    }
 	    $All{"Sh_$Param"}=$Shared;
-	    print "Sh_$Param=$Shared\n";
 	    $NP++;
 	}
 #Loop on parameters
@@ -3971,44 +3972,48 @@ sub ActivateShComp
     my @Paramcomp = @$Paramcomp_ref;
     my $Full_T_Block= $All{"Full_T_Block"};
     
-    my $Component=1;
-    foreach my $FitType (@FitTypes) {
-	my $Parameters=$Paramcomp[$Component-1];
-	my @Params = split( /\s+/, $Parameters );
+# Possible to chare only if sharing is enabled altogether
+    my $EnableSharing = buttonGroupSharing->isChecked();
+    if ($EnableSharing) {
+	my $Component=1;
+	foreach my $FitType (@FitTypes) {
+	    my $Parameters=$Paramcomp[$Component-1];
+	    my @Params = split( /\s+/, $Parameters );
 	
-	if ( $Component == 1 && $All{"FitAsyType"} eq "Asymmetry" ) {
-	    unshift( @Params, "Alpha" );
-	}
-	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
-	    unshift( @Params, ( "No", "NBg" ) );
-	}
+	    if ( $Component == 1 && $All{"FitAsyType"} eq "Asymmetry" ) {
+		unshift( @Params, "Alpha" );
+	    }
+	    elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
+		unshift( @Params, ( "No", "NBg" ) );
+	    }
 	
 	
 # Make the component appear first (only if we have multiple runs)
-	my $ShCompG="SharingComp".$Component;
-	my $ShCG = child($ShCompG);
-	if ($#RUNS>0) {
-	    $ShCG->setHidden(0);
-	    $ShCG->setEnabled(1);
-	}
-	my $CompShLabel = "Comp".$Component."ShLabel";
-	my $CompShL = child($CompShLabel);
-	$CompShL->setText($All{"FitType$Component"});
+	    my $ShCompG="SharingComp".$Component;
+	    my $ShCG = child($ShCompG);
+	    if ($#RUNS>0) {
+		$ShCG->setHidden(0);
+		$ShCG->setEnabled(1);
+	    }
+	    my $CompShLabel = "Comp".$Component."ShLabel";
+	    my $CompShL = child($CompShLabel);
+	    $CompShL->setText($All{"FitType$Component"});
 	
 # Change state/label of parameters
-	for (my $i=1; $i<=9;$i++) {		
-	    my $ParamChkBx="ShParam_".$Component."_".$i;
-	    my $ChkBx = child($ParamChkBx);
-	    if ($Params[$i-1] ne "") {
-		$ChkBx->setHidden(0);
-		$ChkBx->setEnabled(1);
-		$ChkBx ->setText($Params[$i-1]);
-	    } else {
-		$ChkBx->setHidden(1);
+	    for (my $i=1; $i<=9;$i++) {		
+		my $ParamChkBx="ShParam_".$Component."_".$i;
+		my $ChkBx = child($ParamChkBx);
+		if ($Params[$i-1] ne "") {
+		    $ChkBx->setHidden(0);
+		    $ChkBx->setEnabled(1);
+		    $ChkBx ->setText($Params[$i-1]);
+		} else {
+		    $ChkBx->setHidden(1);
+		}
 	    }
+	    $Component++;
 	}
-	$Component++;
-    }  
+    }
 
 }
 

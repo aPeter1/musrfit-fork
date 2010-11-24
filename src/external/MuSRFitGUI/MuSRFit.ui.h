@@ -583,44 +583,48 @@ void MuSRFitform::ActivateShComp()
     my @Paramcomp = @$Paramcomp_ref;
     my $Full_T_Block= $All{"Full_T_Block"};
     
-    my $Component=1;
-    foreach my $FitType (@FitTypes) {
-	my $Parameters=$Paramcomp[$Component-1];
-	my @Params = split( /\s+/, $Parameters );
+# Possible to chare only if sharing is enabled altogether
+    my $EnableSharing = buttonGroupSharing->isChecked();
+    if ($EnableSharing) {
+	my $Component=1;
+	foreach my $FitType (@FitTypes) {
+	    my $Parameters=$Paramcomp[$Component-1];
+	    my @Params = split( /\s+/, $Parameters );
 	
-	if ( $Component == 1 && $All{"FitAsyType"} eq "Asymmetry" ) {
-	    unshift( @Params, "Alpha" );
-	}
-	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
-	    unshift( @Params, ( "No", "NBg" ) );
-	}
+	    if ( $Component == 1 && $All{"FitAsyType"} eq "Asymmetry" ) {
+		unshift( @Params, "Alpha" );
+	    }
+	    elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
+		unshift( @Params, ( "No", "NBg" ) );
+	    }
 	
 	
 # Make the component appear first (only if we have multiple runs)
-	my $ShCompG="SharingComp".$Component;
-	my $ShCG = child($ShCompG);
-	if ($#RUNS>0) {
-	    $ShCG->setHidden(0);
-	    $ShCG->setEnabled(1);
-	}
-	my $CompShLabel = "Comp".$Component."ShLabel";
-	my $CompShL = child($CompShLabel);
-	$CompShL->setText($All{"FitType$Component"});
+	    my $ShCompG="SharingComp".$Component;
+	    my $ShCG = child($ShCompG);
+	    if ($#RUNS>0) {
+		$ShCG->setHidden(0);
+		$ShCG->setEnabled(1);
+	    }
+	    my $CompShLabel = "Comp".$Component."ShLabel";
+	    my $CompShL = child($CompShLabel);
+	    $CompShL->setText($All{"FitType$Component"});
 	
 # Change state/label of parameters
-	for (my $i=1; $i<=9;$i++) {		
-	    my $ParamChkBx="ShParam_".$Component."_".$i;
-	    my $ChkBx = child($ParamChkBx);
-	    if ($Params[$i-1] ne "") {
-		$ChkBx->setHidden(0);
-		$ChkBx->setEnabled(1);
-		$ChkBx ->setText($Params[$i-1]);
-	    } else {
-		$ChkBx->setHidden(1);
+	    for (my $i=1; $i<=9;$i++) {		
+		my $ParamChkBx="ShParam_".$Component."_".$i;
+		my $ChkBx = child($ParamChkBx);
+		if ($Params[$i-1] ne "") {
+		    $ChkBx->setHidden(0);
+		    $ChkBx->setEnabled(1);
+		    $ChkBx ->setText($Params[$i-1]);
+		} else {
+		    $ChkBx->setHidden(1);
+		}
 	    }
+	    $Component++;
 	}
-	$Component++;
-    }  
+    }
 }
 
 void MuSRFitform::InitializeTab()
@@ -899,3 +903,5 @@ void MuSRFitform::InitializeFunctions()
     ConstraintLine->setText("");
     FunctionsBlock->setText("");
 }
+
+

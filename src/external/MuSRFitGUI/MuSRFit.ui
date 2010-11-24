@@ -23,7 +23,7 @@
     <property name="minimumSize">
         <size>
             <width>21</width>
-            <height>275</height>
+            <height>264</height>
         </size>
     </property>
     <property name="caption">
@@ -2162,6 +2162,9 @@
                     <set>AlignLeft</set>
                 </property>
                 <property name="checkable">
+                    <bool>true</bool>
+                </property>
+                <property name="checked">
                     <bool>false</bool>
                 </property>
                 <widget class="QButtonGroup">
@@ -5495,6 +5498,12 @@
         <signal>clicked()</signal>
         <receiver>MuSRFitform</receiver>
         <slot>AppendToFunctions()</slot>
+    </connection>
+    <connection>
+        <sender>buttonGroupSharing</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>MuSRFitform</receiver>
+        <slot>ActivateShComp()</slot>
     </connection>
 </connections>
 <tabstops>
