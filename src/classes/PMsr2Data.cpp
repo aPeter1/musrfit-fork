@@ -157,9 +157,11 @@ int PMsr2Data::DetermineRunNumberDigits(unsigned int runNo) const
     strLine.str(line);
     strLine >> firstOnLine;
     if (!to_lower_copy(firstOnLine).compare("run")) {
-       string::size_type loc = line.rfind(tempRunNumber.str());
-       if ( loc != string::npos ) {
-         while ( --loc >= 0 ) {
+      firstOnLine.clear();
+      strLine >> firstOnLine;
+      string::size_type loc = firstOnLine.rfind(tempRunNumber.str());
+      if ( loc != string::npos ) {
+        while ( --loc >= 0 ) {
            if(isdigit(line.at(loc))) {
              ++fRunNumberDigits;
            } else {
@@ -528,16 +530,22 @@ bool PMsr2Data::PrepareNewInputFile(unsigned int tempRun) const
     strLine.str(line);
     strLine >> firstOnLine;
     if (!to_lower_copy(firstOnLine).compare("run")) {
-       string::size_type loc = line.rfind(tempRunNumber.str());
-       if ( loc != string::npos ) {
-         line.replace(loc, fRunNumberDigits, newRunNumber.str());
-       } else {
-         cerr << endl << ">> msr2data: **WARNING** The template run file number does not match the \"file index\"";
-         cerr << endl << ">> msr2data: **WARNING** Unexpected things will happen... (for sure)";
-         cerr << endl;
-       }
+      strLine >> firstOnLine;
+      string::size_type loc = firstOnLine.rfind(tempRunNumber.str());
+      if ( loc != string::npos ) {
+        firstOnLine.replace(loc, fRunNumberDigits, newRunNumber.str());
+      } else {
+        cerr << endl << ">> msr2data: **WARNING** The template run file number does not match the \"file index\"";
+        cerr << endl << ">> msr2data: **WARNING** Unexpected things will happen... (for sure)";
+        cerr << endl;
+      }
+      out << "RUN " << firstOnLine;
+      while (strLine >> firstOnLine)
+        out << " " << firstOnLine;
+      out << endl;
+    } else {
+      out << line << endl;
     }
-    out << line << endl;
   }
   in.close();
   out.close();
