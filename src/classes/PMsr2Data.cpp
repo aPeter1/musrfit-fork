@@ -513,6 +513,7 @@ bool PMsr2Data::PrepareNewInputFile(unsigned int tempRun) const
 
   string line, firstOnLine;
   istringstream strLine;
+  unsigned int emptyLineCounter(0);
 
   // write the run number in the TITLE line of the msr-file (is overwritten later by musrfit if called with the -t option)
   getline(in, line);
@@ -520,9 +521,12 @@ bool PMsr2Data::PrepareNewInputFile(unsigned int tempRun) const
 
   while (getline(in, line)) {
     if (line.empty()) {
-      out << endl;
+      if (++emptyLineCounter < 3) // allow only two successive empty lines in the input files (just for convenience)
+        out << endl;
       continue;
-    }
+    } else
+      emptyLineCounter = 0;
+
     if (!line.compare("SET BATCH") || !line.compare("END RETURN"))
       continue;
 
