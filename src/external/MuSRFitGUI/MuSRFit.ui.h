@@ -245,6 +245,7 @@ void MuSRFitform::CreateAllInput()
     $All{"Xf"}=Xf->text;
     $All{"Yi"}=Yi->text;
     $All{"Yf"}=Yf->text;
+    $All{"ViewBin"}=ViewBin->text;
 # Life time correction   
     if (ltc->isChecked()) {
 	$All{"ltc"}="y";
@@ -351,6 +352,8 @@ void MuSRFitform::CreateAllInput()
     $All{"Func_T_Block"}=TheoryBlock->text;
     
 # Shared settings are detected here
+    $All{"EnableSharing"} = buttonGroupSharing->isChecked();
+
     my $Shared = 0; 
     my $PCount =0;
     my $Component=1;
@@ -583,8 +586,8 @@ void MuSRFitform::ActivateShComp()
     my @Paramcomp = @$Paramcomp_ref;
     my $Full_T_Block= $All{"Full_T_Block"};
     
-# Possible to chare only if sharing is enabled altogether
-    my $EnableSharing = buttonGroupSharing->isChecked();
+# Possible to share only if sharing is enabled altogether
+    my $EnableSharing = $All{"EnableSharing"};
     if ($EnableSharing) {
 	my $Component=1;
 	foreach my $FitType (@FitTypes) {
@@ -672,6 +675,7 @@ void MuSRFitform::TabChanged()
     
 # First make sure we have sharing initialized    
     ActivateShComp();
+# Here we need to apply sharing if selected...
     InitializeTab();
     UpdateMSRFileInitTable();
 # And also setup T0 and Bg bins

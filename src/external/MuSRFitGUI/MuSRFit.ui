@@ -1995,14 +1995,14 @@
             </attribute>
             <widget class="QLayoutWidget">
                 <property name="name">
-                    <cstring>layout34</cstring>
+                    <cstring>layout28</cstring>
                 </property>
                 <property name="geometry">
                     <rect>
                         <x>5</x>
-                        <y>10</y>
-                        <width>545</width>
-                        <height>350</height>
+                        <y>4</y>
+                        <width>550</width>
+                        <height>360</height>
                     </rect>
                 </property>
                 <vbox>
@@ -2011,12 +2011,17 @@
                     </property>
                     <widget class="QLayoutWidget">
                         <property name="name">
-                            <cstring>layout33</cstring>
+                            <cstring>layout27</cstring>
                         </property>
                         <grid>
                             <property name="name">
                                 <cstring>unnamed</cstring>
                             </property>
+                            <widget class="QLineEdit" row="1" column="3">
+                                <property name="name">
+                                    <cstring>Yi</cstring>
+                                </property>
+                            </widget>
                             <widget class="QComboBox" row="0" column="1">
                                 <item>
                                     <property name="text">
@@ -2037,30 +2042,30 @@
                                     <cstring>Minimization</cstring>
                                 </property>
                             </widget>
-                            <widget class="QLabel" row="0" column="2">
-                                <property name="name">
-                                    <cstring>textLabel1_4</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>X Range</string>
-                                </property>
-                            </widget>
-                            <widget class="QLineEdit" row="1" column="4">
-                                <property name="name">
-                                    <cstring>Yf</cstring>
-                                </property>
-                            </widget>
-                            <widget class="QLabel" row="1" column="0">
-                                <property name="name">
-                                    <cstring>textLabel1_5_2</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Error estimation</string>
-                                </property>
-                            </widget>
                             <widget class="QLineEdit" row="0" column="3">
                                 <property name="name">
                                     <cstring>Xi</cstring>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="2" column="3">
+                                <property name="name">
+                                    <cstring>textLabel1_4_2_2</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>View Binning</string>
+                                </property>
+                            </widget>
+                            <widget class="QLineEdit" row="0" column="4">
+                                <property name="name">
+                                    <cstring>Xf</cstring>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="0" column="0">
+                                <property name="name">
+                                    <cstring>textLabel1_5</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Minimization type</string>
                                 </property>
                             </widget>
                             <widget class="QLabel" row="1" column="2">
@@ -2069,6 +2074,16 @@
                                 </property>
                                 <property name="text">
                                     <string>Y Range</string>
+                                </property>
+                            </widget>
+                            <widget class="QLineEdit" row="2" column="4">
+                                <property name="name">
+                                    <cstring>ViewBin</cstring>
+                                </property>
+                            </widget>
+                            <widget class="QLineEdit" row="1" column="4">
+                                <property name="name">
+                                    <cstring>Yf</cstring>
                                 </property>
                             </widget>
                             <widget class="QComboBox" row="1" column="1">
@@ -2086,24 +2101,6 @@
                                     <cstring>ErrorCalc</cstring>
                                 </property>
                             </widget>
-                            <widget class="QLabel" row="0" column="0">
-                                <property name="name">
-                                    <cstring>textLabel1_5</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Minimization type</string>
-                                </property>
-                            </widget>
-                            <widget class="QLineEdit" row="1" column="3">
-                                <property name="name">
-                                    <cstring>Yi</cstring>
-                                </property>
-                            </widget>
-                            <widget class="QLineEdit" row="0" column="4">
-                                <property name="name">
-                                    <cstring>Xf</cstring>
-                                </property>
-                            </widget>
                             <widget class="QCheckBox" row="2" column="0" rowspan="1" colspan="2">
                                 <property name="name">
                                     <cstring>ltc</cstring>
@@ -2113,6 +2110,22 @@
                                 </property>
                                 <property name="checked">
                                     <bool>true</bool>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="1" column="0">
+                                <property name="name">
+                                    <cstring>textLabel1_5_2</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Error estimation</string>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="0" column="2">
+                                <property name="name">
+                                    <cstring>textLabel1_4</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>X Range</string>
                                 </property>
                             </widget>
                         </grid>

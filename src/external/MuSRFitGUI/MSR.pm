@@ -167,6 +167,7 @@ FUNCTIONS
     }
 
     # $shcount is a counter for shared parameters
+    # msr2data \[1363 1365 1366\] _Dolly_2010 msr-1363 global
     if ( $#RUNS == 0 ) {
         my $shcount = 1;
     } else {
@@ -404,12 +405,16 @@ SAVE
         #	}
     }
 
+    $VIEWBIN_Line ="";
+    if ( $All{"ViewBin"}!=0 ) { $VIEWBIN_Line = "view_packing ".$All{"ViewBin"};}
+
     my $RRFBlock=MSR::CreateRRFBlock(\%All);
     $PLOT_Block =
       "###############################################################
 PLOT $PLT
 runs     $RUNS_Line
 $PRANGE_Line
+$VIEWBIN_Line
 $RRFBlock
 $logxy";
 
