@@ -276,6 +276,7 @@ class PRawRunData {
     virtual ~PRawRunData();
 
     virtual const TString* GetRunName() { return &fRunName; }
+    virtual const Int_t GetRunNumber() { return fRunNumber; }
     virtual const TString* GetRunTitle() { return &fRunTitle; }
     virtual const TString* GetSetup() { return &fSetup; }
     virtual const Double_t GetField() { return fField; }
@@ -299,6 +300,7 @@ class PRawRunData {
     virtual const PNonMusrRawRunData* GetDataNonMusr() { return &fDataNonMusr; }
 
     virtual void SetRunName(const TString &str) { fRunName = str; }
+    virtual void SetRunNumber(const Int_t &val) { fRunNumber = val; }
     virtual void SetRunTitle(const TString str) { fRunTitle = str; }
     virtual void SetSetup(const TString str) { fSetup = str; }
     virtual void SetField(const Double_t dval) { fField = dval; }
@@ -321,6 +323,7 @@ class PRawRunData {
 
   private:
     TString fRunName;                ///< name of the run
+    Int_t  fRunNumber;               ///< run number
     TString fRunTitle;               ///< run title
     TString fSetup;                  ///< description of the setup of this run
     Double_t fField;                 ///< magnetic field value
@@ -559,5 +562,23 @@ typedef struct {
   Double_t fMin;     ///< chi2 or max. likelyhood
   UInt_t fNdf;       ///< number of degrees of freedom
 } PMsrStatisticStructure;
+
+//-------------------------------------------------------------
+/**
+ * <p>Holds the informations for the any2many converter program
+ */
+typedef struct {
+  Bool_t useStandardOutput; ///< flag showing if the converted shall be sent to the standard output
+  TString inFormat;         ///< holds the information about the input data file format
+  TString outFormat;        ///< holds the information about the output data file format
+  TString inTemplate;       ///< holds the input file template
+  TString outTemplate;      ///< holds the output file template
+  TString year;             ///< holds the information about the year to be used
+  PIntVector runList;       ///< holds the run number list to be converted
+  TString inFileName;       ///< holds the file name of the input data file
+  TString outFileName;      ///< holds the file name of the output data file
+  TString outPath;          ///< holds the output path
+  UInt_t rebin;             ///< holds the number of bins to be packed
+} PAny2ManyInfo;
 
 #endif // _PMUSR_H_

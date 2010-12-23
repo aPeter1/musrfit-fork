@@ -222,6 +222,7 @@ void PNonMusrRawRunData::AppendSubErrData(const UInt_t idx, const Double_t dval)
 PRawRunData::PRawRunData()
 {
   fRunName = TString("");
+  fRunNumber = -1;
   fRunTitle = TString("");
   fSetup = TString("");
   fField = PMUSR_UNDEFINED;

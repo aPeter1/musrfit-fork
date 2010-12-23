@@ -90,6 +90,7 @@ void PMusrT0Data::InitData()
   for (UInt_t i=0; i<fAddT0.size(); i++)
     fAddT0[i].clear();
   fAddT0.clear();
+  fT0Data = -1;
 }
 
 //--------------------------------------------------------------------------
@@ -260,6 +261,7 @@ PMusrT0::PMusrT0()
 
   fDataAndBkgEnabled = false;
   fT0Enabled         = false;
+  fShowT0DataChannel = false;
 
   fDataRange[0] = 0;
   fDataRange[1] = 0;
@@ -267,6 +269,7 @@ PMusrT0::PMusrT0()
   fBkgRange[1]  = 0;
 
   fT0Line        = 0;
+  fT0DataLine    = 0;
   fFirstBkgLine  = 0;
   fLastBkgLine   = 0;
   fFirstDataLine = 0;
@@ -297,6 +300,7 @@ PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
 
   fDataAndBkgEnabled = false;
   fT0Enabled         = false;
+  fShowT0DataChannel = false;
 
   fDataRange[0] = 0;
   fDataRange[1] = 0;
@@ -304,6 +308,7 @@ PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
   fBkgRange[1]  = 0;
 
   fT0Line        = 0;
+  fT0DataLine    = 0;
   fFirstBkgLine  = 0;
   fLastBkgLine   = 0;
   fFirstDataLine = 0;
@@ -583,6 +588,10 @@ PMusrT0::~PMusrT0()
     delete fT0Line;
     fT0Line = 0;
   }
+  if (fT0DataLine) {
+    delete fT0DataLine;
+    fT0DataLine = 0;
+  }
   if (fFirstBkgLine) {
     delete fFirstBkgLine;
     fFirstBkgLine = 0;
@@ -625,7 +634,9 @@ void PMusrT0::Done(Int_t status)
  * <p>Currently implemented command keys:
  * - 'q' close the currently shown canvas
  * - 'Q' quite the application
+ * - 'u' unzoom to the original range
  * - 'z' zoom to the region aroung t0
+ * - 's' show/hide (toggle) the t0 of the data file (if present)
  * - 'T' set t0 channel to the estimated t0
  * - 't' set t0 channel to the current cursor position
  * - 'b' set first background channel
@@ -657,6 +668,12 @@ void PMusrT0::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
     UnZoom();
   } else if (x == 'z') { // zoom to the region around t0, and the estimated t0
     ZoomT0();
+  } else if (x == 's') { // show the t0 of the data file (if present)
+    fShowT0DataChannel = !fShowT0DataChannel;
+    if (fShowT0DataChannel)
+      ShowDataFileT0Channel();
+    else
+      HideDataFileT0Channel();
   } else if (x == 'T') { // set estimated t0 channel
     SetEstimatedT0Channel();
   } else if (x == 't') { // set t0 channel
@@ -832,6 +849,44 @@ void PMusrT0::InitDataAndBkg()
   fLastBkgLine->SetLineWidth(2);
   fLastBkgLine->Draw();
 
+  fMainCanvas->Update();
+}
+
+//--------------------------------------------------------------------------
+// ShowDataFileT0Channel
+//--------------------------------------------------------------------------
+/**
+ * <p>Show the t0 channel from the data file (if present).
+ */
+void PMusrT0::ShowDataFileT0Channel()
+{
+  // t0 line
+  Int_t t0Bin = fMusrT0Data.GetT0Data();
+  Double_t max = fHisto->GetMaximum();
+
+  if (!fT0DataLine) {
+    fT0DataLine = new TLine((Double_t)t0Bin, 0.0, (Double_t)t0Bin, max);
+    fT0DataLine->SetLineStyle(1); // solid
+    fT0DataLine->SetLineColor(kOrange-3);
+    fT0DataLine->SetLineWidth(2);
+    fT0DataLine->Draw();
+  }
+
+  fMainCanvas->Update();
+}
+
+//--------------------------------------------------------------------------
+// HideDataFileT0Channel
+//--------------------------------------------------------------------------
+/**
+ * <p>Hide the t0 channel from the data file (if currently displayed).
+ */
+void PMusrT0::HideDataFileT0Channel()
+{
+  if (fT0DataLine) {
+    delete fT0DataLine;
+    fT0DataLine = 0;
+  }
   fMainCanvas->Update();
 }
 

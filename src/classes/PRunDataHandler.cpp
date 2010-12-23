@@ -29,6 +29,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -50,6 +51,37 @@ using namespace std;
 
 #include "PRunDataHandler.h"
 
+#define ROOT_ALL 0
+#define ROOT_NPP 1
+#define ROOT_PPC 2
+
+#define A2M_UNDEFINED 0
+#define A2M_ROOT      1
+#define A2M_PSIBIN    2
+#define A2M_PSIMDU    3
+#define A2M_MUD       4
+#define A2M_NEXUS     5
+#define A2M_WKM       6
+#define A2M_ASCII     7
+
+//--------------------------------------------------------------------------
+// Constructor
+//--------------------------------------------------------------------------
+/**
+ * <p>Constructor, reading the data histogramm files.
+ *
+ * \param msrInfo pointer to the msr-file handler
+ */
+PRunDataHandler::PRunDataHandler(PAny2ManyInfo *any2ManyInfo, const PStringVector dataPath) :
+    fAny2ManyInfo(any2ManyInfo), fDataPath(dataPath)
+{
+  // read files
+  if (!ReadWriteFilesList()) // couldn't read file
+    fAllDataAvailable = false;
+  else
+    fAllDataAvailable = true;
+}
+
 //--------------------------------------------------------------------------
 // Constructor
 //--------------------------------------------------------------------------
@@ -61,7 +93,7 @@ using namespace std;
 PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo) : fMsrInfo(msrInfo)
 {
   // read files
-  if (!ReadFile()) // couldn't read file
+  if (!ReadFilesMsr()) // couldn't read file
     fAllDataAvailable = false;
   else
     fAllDataAvailable = true;
@@ -81,7 +113,7 @@ PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo, const PStringVector dataP
       fMsrInfo(msrInfo), fDataPath(dataPath)
 {
   // read files
-  if (!ReadFile()) // couldn't read file
+  if (!ReadFilesMsr()) // couldn't read file
     fAllDataAvailable = false;
   else
     fAllDataAvailable = true;
@@ -126,17 +158,17 @@ PRawRunData* PRunDataHandler::GetRunData(const TString &runName)
 }
 
 //--------------------------------------------------------------------------
-// ReadFile
+// ReadFilesMsr
 //--------------------------------------------------------------------------
 /**
  * <p> The main read file routine which is filtering what read sub-routine
- * needs to be called.
+ * needs to be called. Called when the input is a msr-file.
  *
  * <b>return:</b>
  * - true if reading was successful,
  * - false if reading failed.
  */
-Bool_t PRunDataHandler::ReadFile()
+Bool_t PRunDataHandler::ReadFilesMsr()
 {
   Bool_t success = true;
 
@@ -144,7 +176,7 @@ Bool_t PRunDataHandler::ReadFile()
   PMsrRunList *runList = 0;
   runList = fMsrInfo->GetMsrRunList();
   if (runList == 0) {
-    cerr << endl << "PRunDataHandler::ReadFile(): **ERROR** Couldn't obtain run list from PMsrHandler: something VERY fishy";
+    cerr << endl << ">> PRunDataHandler::ReadFilesMsr(): **ERROR** Couldn't obtain run list from PMsrHandler: something VERY fishy";
     cerr << endl;
     return false;
   }
@@ -160,9 +192,9 @@ Bool_t PRunDataHandler::ReadFile()
         return false;
       // everything looks fine, hence try to read the data file
       if (!runList->at(i).GetFileFormat(j)->CompareTo("root-npp")) // not post pile up corrected histos
-        success = ReadRootFile(true);
+        success = ReadRootFile(ROOT_NPP);
       else if (!runList->at(i).GetFileFormat(j)->CompareTo("root-ppc")) // post pile up corrected histos
-        success = ReadRootFile(false);
+        success = ReadRootFile(ROOT_PPC);
       else if (!runList->at(i).GetFileFormat(j)->CompareTo("nexus"))
         success = ReadNexusFile();
       else if (!runList->at(i).GetFileFormat(j)->CompareTo("psi-bin"))
@@ -185,6 +217,230 @@ Bool_t PRunDataHandler::ReadFile()
   }
 
   return success;
+}
+
+//--------------------------------------------------------------------------
+// ReadWriteFilesList
+//--------------------------------------------------------------------------
+/**
+ * <p> The main read file routine which is filtering what read sub-routine
+ * needs to be called. Called when the input is a list of runs. Used with
+ * any2many. If the input data file is successfully read, it will write the
+ * converted data file.
+ *
+ * <b>return:</b>
+ * - true if reading was successful,
+ * - false if reading failed.
+ */
+Bool_t PRunDataHandler::ReadWriteFilesList()
+{
+  if ((fAny2ManyInfo->inFileName.Length() == 0) && (fAny2ManyInfo->runList.size() == 0)) {
+    cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't obtain run list from fAny2ManyInfo: something VERY fishy";
+    cerr << endl;
+    return false;
+  }
+
+  // get input file format tag
+  Int_t inTag = A2M_UNDEFINED;
+  if (!fAny2ManyInfo->inFormat.CompareTo("root", TString::kIgnoreCase))
+    inTag = A2M_ROOT;
+  else if (!fAny2ManyInfo->inFormat.CompareTo("psi-bin", TString::kIgnoreCase))
+    inTag = A2M_PSIBIN;
+  else if (!fAny2ManyInfo->inFormat.CompareTo("psi-mdu", TString::kIgnoreCase))
+    inTag = A2M_PSIMDU;
+  else if (!fAny2ManyInfo->inFormat.CompareTo("mud", TString::kIgnoreCase))
+    inTag = A2M_MUD;
+  else if (!fAny2ManyInfo->inFormat.CompareTo("nexus", TString::kIgnoreCase))
+    inTag = A2M_NEXUS;
+  else if (!fAny2ManyInfo->inFormat.CompareTo("wkm", TString::kIgnoreCase))
+    inTag = A2M_WKM;
+  else
+    inTag = A2M_UNDEFINED;
+
+  if (inTag == A2M_UNDEFINED) {
+    cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** no valid input data file format found: '" << fAny2ManyInfo->inFormat.Data() << "'" << endl;
+    return false;
+  }
+
+  // get output file format tag
+  Int_t outTag = A2M_UNDEFINED;
+  if (!fAny2ManyInfo->outFormat.CompareTo("root", TString::kIgnoreCase))
+    outTag = A2M_ROOT;
+  else if (!fAny2ManyInfo->outFormat.CompareTo("psi-bin", TString::kIgnoreCase))
+    outTag = A2M_PSIBIN;
+  else if (!fAny2ManyInfo->outFormat.CompareTo("psi-mdu", TString::kIgnoreCase))
+    outTag = A2M_PSIMDU;
+  else if (!fAny2ManyInfo->outFormat.CompareTo("nexus", TString::kIgnoreCase))
+    outTag = A2M_NEXUS;
+  else if (!fAny2ManyInfo->outFormat.CompareTo("wkm", TString::kIgnoreCase))
+    outTag = A2M_WKM;
+  else if (!fAny2ManyInfo->outFormat.CompareTo("ascii", TString::kIgnoreCase))
+    outTag = A2M_ASCII;
+  else
+    outTag = A2M_UNDEFINED;
+
+  if (outTag == A2M_UNDEFINED) {
+    cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** no valid output data file format found: '" << fAny2ManyInfo->outFormat.Data() << "'" << endl;
+    return false;
+  }
+
+  if (fAny2ManyInfo->inFileName.Length() != 0) { // single file name given
+    if (!FileExistsCheck(-1)) {
+      cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't find file " << fAny2ManyInfo->inFileName.Data() << endl;
+      return false;
+    }
+
+    // read input file
+    Bool_t success = false;
+    switch (inTag) {
+    case A2M_ROOT:
+      success = ReadRootFile(ROOT_ALL);
+      break;
+    case A2M_PSIBIN:
+      success = ReadPsiBinFile();
+      break;
+    case A2M_PSIMDU:
+      success = ReadPsiBinFile();
+      break;
+    case A2M_NEXUS:
+      success = ReadNexusFile();
+      break;
+    case A2M_MUD:
+      success = ReadMudFile();
+      break;
+    case A2M_WKM:
+      success = ReadWkmFile();
+      break;
+    default:
+      break;
+    }
+
+    if (!success) {
+      cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't read file " << fAny2ManyInfo->inFileName.Data() << endl;
+      return false;
+    }
+
+    // write 'converted' output data file
+    success = false;
+    switch (outTag) {
+    case A2M_ROOT:
+      success = WriteRootFile();
+      break;
+    case A2M_PSIBIN:
+      success = WritePsiBinFile();
+      break;
+    case A2M_PSIMDU:
+      success = WritePsiBinFile();
+      break;
+    case A2M_NEXUS:
+      success = WriteNexusFile();
+      break;
+    case A2M_MUD:
+      success = WriteMudFile();
+      break;
+    case A2M_WKM:
+      success = WriteWkmFile();
+      break;
+    case A2M_ASCII:
+      success = WriteAsciiFile();
+      break;
+    default:
+      break;
+    }
+
+    if (success == false) {
+      cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't write converted output file." << endl;
+      return false;
+    }
+
+  } else { // run list given
+
+    // loop over all runs of the run list
+    for (UInt_t i=0; i<fAny2ManyInfo->runList.size(); i++) {
+      if (!FileExistsCheck(i)) {
+        cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't find run " << fAny2ManyInfo->runList[i] << endl;
+        return false;
+      }
+
+      // read input file
+      Bool_t success = false;
+      switch (inTag) {
+      case A2M_ROOT:
+        success = ReadRootFile(ROOT_ALL);
+        break;
+      case A2M_PSIBIN:
+        success = ReadPsiBinFile();
+        break;
+      case A2M_PSIMDU:
+        success = ReadPsiBinFile();
+        break;
+      case A2M_NEXUS:
+        success = ReadNexusFile();
+        break;
+      case A2M_MUD:
+        success = ReadMudFile();
+        break;
+      case A2M_WKM:
+        success = ReadWkmFile();
+        break;
+      default:
+        break;
+      }
+
+      if (!success) {
+        cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't read file " << fAny2ManyInfo->inFileName.Data() << endl;
+        return false;
+      }
+
+      TString year("");
+      TDatime dt;
+      year += dt.GetYear();
+      if (fAny2ManyInfo->year.Length() > 0)
+        year = fAny2ManyInfo->year;
+      Bool_t ok;
+      TString fln = FileNameFromTemplate(fAny2ManyInfo->outTemplate, fAny2ManyInfo->runList[i], year, ok);
+      if (!ok) {
+        cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't create necessary output file name." << endl;
+        return false;
+      }
+
+      // write 'converted' output data file
+      success = false;
+      switch (outTag) {
+      case A2M_ROOT:
+        success = WriteRootFile(fln);
+        break;
+      case A2M_PSIBIN:
+        success = WritePsiBinFile(fln);
+        break;
+      case A2M_PSIMDU:
+        success = WritePsiBinFile(fln);
+        break;
+      case A2M_NEXUS:
+        success = WriteNexusFile(fln);
+        break;
+      case A2M_MUD:
+        success = WriteMudFile(fln);
+        break;
+      case A2M_WKM:
+        success = WriteWkmFile(fln);
+        break;
+      case A2M_ASCII:
+        success = WriteAsciiFile(fln);
+        break;
+      default:
+        break;
+      }
+
+      if (success == false) {
+        cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't write converted output file." << endl;
+        return false;
+      }
+    }
+
+  }
+
+  return true;
 }
 
 //--------------------------------------------------------------------------
@@ -292,18 +548,18 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
       assert(0);
     }
     pstr->ToUpper();
-    cerr << endl << "**ERROR** File Format '" << pstr->Data() << "' unsupported.";
-    cerr << endl << "  support file formats are:";
-    cerr << endl << "  ROOT-NPP  -> root not post pileup corrected for lem";
-    cerr << endl << "  ROOT-PPC  -> root post pileup corrected for lem";
-    cerr << endl << "  NEXUS     -> nexus file format";
-    cerr << endl << "  PSI-BIN   -> psi bin file format";
-    cerr << endl << "  PSI-MDU   -> psi mdu file format (see also MDU-ASCII)";
-    cerr << endl << "  MUD       -> triumf mud file format";
-    cerr << endl << "  WKM       -> wkm ascii file format";
-    cerr << endl << "  MDU-ASCII -> psi mdu ascii file format";
-    cerr << endl << "  ASCII     -> column like file format";
-    cerr << endl << "  DB        -> triumf db file \"format\"";
+    cerr << endl << ">> **ERROR** File Format '" << pstr->Data() << "' unsupported.";
+    cerr << endl << ">>   support file formats are:";
+    cerr << endl << ">>   ROOT-NPP  -> root not post pileup corrected for lem";
+    cerr << endl << ">>   ROOT-PPC  -> root post pileup corrected for lem";
+    cerr << endl << ">>   NEXUS     -> nexus file format";
+    cerr << endl << ">>   PSI-BIN   -> psi bin file format";
+    cerr << endl << ">>   PSI-MDU   -> psi mdu file format (see also MDU-ASCII)";
+    cerr << endl << ">>   MUD       -> triumf mud file format";
+    cerr << endl << ">>   WKM       -> wkm ascii file format";
+    cerr << endl << ">>   MDU-ASCII -> psi mdu ascii file format";
+    cerr << endl << ">>   ASCII     -> column like file format";
+    cerr << endl << ">>   DB        -> triumf db file \"format\"";
     cerr << endl;
     return success;
   }
@@ -400,16 +656,107 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
 
   // no proper path name found
   if (pathName.CompareTo("???") == 0) {
-    cerr << endl << "**ERROR** Couldn't find '" << runInfo.GetRunName(idx)->Data() << "' in any standard path.";
-    cerr << endl << "  standard search pathes are:";
-    cerr << endl << "  1. the local directory";
-    cerr << endl << "  2. the data directory given in the startup XML file";
-    cerr << endl << "  3. the directories listed in MUSRFULLDATAPATH";
-    cerr << endl << "  4. default path construct which is described in the manual";
+    cerr << endl << ">> PRunDataHandler::FileExistsCheck(): **ERROR** Couldn't find '" << runInfo.GetRunName(idx)->Data() << "' in any standard path.";
+    cerr << endl << ">>  standard search pathes are:";
+    cerr << endl << ">>  1. the local directory";
+    cerr << endl << ">>  2. the data directory given in the startup XML file";
+    cerr << endl << ">>  3. the directories listed in MUSRFULLDATAPATH";
+    cerr << endl << ">>  4. default path construct which is described in the manual";
     return false;
   }
 
   fRunPathName = pathName;
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// FileExistsCheck
+//--------------------------------------------------------------------------
+/**
+ * <p>Checks if a given data file exists. Used for the any2many program.
+ *
+ * <b>return:</b>
+ * - true if data file exists,
+ * - otherwise false.
+ *
+ * \param idx index of the run. idx == -1 means that a single input data file name is given.
+ */
+Bool_t PRunDataHandler::FileExistsCheck(const Int_t idx)
+{
+  TString pathName("???");
+  TString str("");
+  TString fln("");
+
+  if (idx == -1) { // single input file name
+    fln = fAny2ManyInfo->inFileName;
+  } else { // run file list entry shall be handled
+    // check for input/output templates
+    if ((fAny2ManyInfo->inTemplate.Length() == 0) || (fAny2ManyInfo->outTemplate.Length() == 0)) {
+      cerr << endl << ">> PRunDataHandler::FileExistsCheck(): **ERROR** when using run lists, input/ouput templates are needed as well." << endl;
+      return false;
+    }
+    // make the input file name according to the input template
+    TString year("");
+    TDatime dt;
+    year += dt.GetYear();
+    if (fAny2ManyInfo->year.Length() > 0)
+      year = fAny2ManyInfo->year;
+    Bool_t ok;
+    fln = FileNameFromTemplate(fAny2ManyInfo->inTemplate, fAny2ManyInfo->runList[idx], year, ok);
+    if (!ok)
+      return false;
+  }
+
+  // check if the file is in the local directory
+  if (gSystem->AccessPathName(fln) != true) { // found in the local dir
+    pathName = TString("./")+fln;
+  }
+  // check if the file is found in the directory given in the startup file
+  if (pathName.CompareTo("???") == 0) { // not found in local directory search
+    for (UInt_t i=0; i<fDataPath.size(); i++) {
+      str = fDataPath[i] + TString("/") + fln;
+//cout << endl << "debug> XML path: str.Data()=" << str.Data();
+      if (gSystem->AccessPathName(str.Data())!=true) { // found
+        pathName = str;
+        break;
+      }
+    }
+  }
+  // check if the file is found in the directories given by MUSRFULLDATAPATH
+  const Char_t *musrpath = gSystem->Getenv("MUSRFULLDATAPATH");
+  if (pathName.CompareTo("???") == 0) { // not found in local directory and xml path
+    str = TString(musrpath);
+    // MUSRFULLDATAPATH has the structure: path_1:path_2:...:path_n
+    TObjArray *tokens = str.Tokenize(":");
+    TObjString *ostr;
+    for (Int_t i=0; i<tokens->GetEntries(); i++) {
+      ostr = dynamic_cast<TObjString*>(tokens->At(i));
+      str = ostr->GetString() + TString("/") + fln;
+      if (gSystem->AccessPathName(str.Data())!=true) { // found
+        pathName = str;
+        break;
+      }
+    }
+    // cleanup
+    if (tokens) {
+      delete tokens;
+      tokens = 0;
+    }
+  }
+  // no proper path name found
+  if (pathName.CompareTo("???") == 0) {
+    cerr << endl << ">> PRunDataHandler::FileExistsCheck(): **ERROR** Couldn't find '" << fln.Data() << "' in any standard path.";
+    cerr << endl << ">>  standard search pathes are:";
+    cerr << endl << ">>  1. the local directory";
+    cerr << endl << ">>  2. the data directory given in the startup XML file";
+    cerr << endl << ">>  3. the directories listed in MUSRFULLDATAPATH";
+    return false;
+  }
+
+  fRunPathName = pathName;
+
+//cout << endl << "debug> PRunDataHandler::FileExistsCheck: fRunPathName=" << fRunPathName.Data() << endl;
 
   return true;
 }
@@ -424,10 +771,10 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
  * - true at successful reading,
  * - otherwise false.
  *
- * \param notPostPileup This flag is used as a switch between "Not Post Pileup Corrected" 
- *                      and "Post Pileup Corrected" histogramms.
+ * \param tag This tag is used as a switch between "Not Post Pileup Corrected",
+ *            "Post Pileup Corrected", and "Read All" histogramms.
  */
-Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
+Bool_t PRunDataHandler::ReadRootFile(UInt_t tag)
 {
   PDoubleVector histoData;
   PRawRunData   runData;
@@ -440,7 +787,7 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
   TFolder *folder;
   f.GetObject("RunInfo", folder);
   if (!folder) {
-    cerr << endl << "PRunDataHandler::ReadRootFile: **ERROR** Couldn't obtain RunInfo from " << fRunPathName.Data() << endl;
+    cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't obtain RunInfo from " << fRunPathName.Data() << endl;
     f.Close();
     return false;
   }
@@ -450,7 +797,7 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
 
   // check if run header is valid
   if (!runHeader) {
-    cerr << endl << "PRunDataHandler::ReadRootFile: **ERROR** Couldn't obtain run header info from ROOT file " << fRunPathName.Data() << endl;
+    cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't obtain run header info from ROOT file " << fRunPathName.Data() << endl;
     f.Close();
     return false;
   }
@@ -458,6 +805,9 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
   // get run title
   TObjString ostr = runHeader->GetRunTitle();
   runData.SetRunTitle(ostr.GetString());
+
+  // get run number
+  runData.SetRunNumber((Int_t)runHeader->GetRunNumber());
 
   // get temperature
   runData.ClearTemperature();
@@ -584,18 +934,18 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
   // check if histos folder is found
   f.GetObject("histos", folder);
   if (!folder) {
-    cerr << endl << "PRunDataHandler::ReadRootFile: **ERROR** Couldn't obtain histos from " << fRunPathName.Data() << endl;
+    cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't obtain histos from " << fRunPathName.Data() << endl;
     f.Close();
     return false;
   }
   // get all the data
   Char_t histoName[32];
-  if (notPostPileup) { // read the data which are NOT post pileup corrected
+  if (tag == ROOT_NPP) { // read the data which are NOT post pileup corrected
     for (Int_t i=0; i<noOfHistos; i++) {
       sprintf(histoName, "hDecay%02d", i);
       TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
       if (!histo) {
-        cerr << endl << "PRunDataHandler::ReadRootFile: **ERROR** Couldn't get histo " << histoName;
+        cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't get histo " << histoName;
         cerr << endl;
         return false;
       }
@@ -610,12 +960,50 @@ Bool_t PRunDataHandler::ReadRootFile(Bool_t notPostPileup)
       // clear histoData for the next histo
       histoData.clear();
     }
-  } else { // read the data which ARE post pileup corrected
+  } else if (tag == ROOT_PPC) { // read the data which ARE post pileup corrected
     for (Int_t i=0; i<noOfHistos; i++) {
       sprintf(histoName, "hDecay%02d", i+POST_PILEUP_HISTO_OFFSET);
       TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
       if (!histo) {
-        cerr << endl << "PRunDataHandler::ReadRootFile: **ERROR** Couldn't get histo " << histoName;
+        cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't get histo " << histoName;
+        cerr << endl;
+        return false;
+      }
+      // keep maximum of histogram as a T0 estimate
+      runData.AppendT0Estimated(histo->GetMaximumBin());
+      // fill data
+      for (Int_t j=1; j<histo->GetNbinsX(); j++)
+        histoData.push_back(histo->GetBinContent(j));
+      // store them in runData vector
+      runData.AppendDataBin(histoData);
+      // clear histoData for the next histo
+      histoData.clear();
+    }
+  } else { // read PPC and NPP histos
+    for (Int_t i=0; i<noOfHistos; i++) {
+      sprintf(histoName, "hDecay%02d", i);
+      TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
+      if (!histo) {
+        cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't get histo " << histoName;
+        cerr << endl;
+        return false;
+      }
+      // keep maximum of histogram as a T0 estimate
+      runData.AppendT0Estimated(histo->GetMaximumBin());
+      // fill data
+      for (Int_t j=1; j<histo->GetNbinsX(); j++) {
+        histoData.push_back(histo->GetBinContent(j));
+      }
+      // store them in runData vector
+      runData.AppendDataBin(histoData);
+      // clear histoData for the next histo
+      histoData.clear();
+    }
+    for (Int_t i=0; i<noOfHistos; i++) {
+      sprintf(histoName, "hDecay%02d", i+POST_PILEUP_HISTO_OFFSET);
+      TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
+      if (!histo) {
+        cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't get histo " << histoName;
         cerr << endl;
         return false;
       }
@@ -680,7 +1068,7 @@ Bool_t PRunDataHandler::ReadWkmFile()
   // open wkm-file
   f.open(fRunPathName.Data(), ifstream::in);
   if (!f.is_open()) {
-    cerr << endl << "PRunDataHandler::ReadWkmFile: **ERROR** Couldn't open run data (" << fRunPathName.Data() << ") file for reading, sorry ...";
+    cerr << endl << ">> PRunDataHandler::ReadWkmFile: **ERROR** Couldn't open run data (" << fRunPathName.Data() << ") file for reading, sorry ...";
     cerr << endl;
     return false;
   }
@@ -714,6 +1102,13 @@ Bool_t PRunDataHandler::ReadWkmFile()
         line.Replace(0, idx+1, 0, 0); // remove 'Title:'
         StripWhitespace(line);
         runData.SetRunTitle(line);
+      } else if (line.Contains("Run:")) {
+        idx = line.Index(":");
+        line.Replace(0, idx+1, 0, 0); // remove 'Run:'
+        StripWhitespace(line);
+        ival = ToInt(line, ok);
+        if (ok)
+          runData.SetRunNumber(ival);
       } else if (line.Contains("Field")) {
         idx = line.Index(":");
         line.Replace(0, idx+1, 0, 0); // remove 'Field:'
@@ -793,7 +1188,7 @@ Bool_t PRunDataHandler::ReadWkmFile()
         StripWhitespace(line);
         dval = ToDouble(line, ok);
         if (ok)
-          runData.SetTimeResolution(dval * 1000.0);
+          runData.SetTimeResolution(dval);
       }
     }
 
@@ -802,10 +1197,10 @@ Bool_t PRunDataHandler::ReadWkmFile()
   } while (headerInfo && !f.eof());
 
   if ((groups == 0) || (channels == 0) || runData.GetTimeResolution() == 0.0) {
-    cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** essential header informations are missing!";
-    cerr << endl << "  >> groups          = " << groups;
-    cerr << endl << "  >> channels        = " << channels;
-    cerr << endl << "  >> time resolution = " << runData.GetTimeResolution();
+    cerr << endl << ">> PRunDataHandler::ReadWkmFile(): **ERROR** essential header informations are missing!";
+    cerr << endl << ">> groups          = " << groups;
+    cerr << endl << ">> channels        = " << channels;
+    cerr << endl << ">> time resolution = " << runData.GetTimeResolution();
     cerr << endl;
     f.close();
     return false;
@@ -844,7 +1239,7 @@ Bool_t PRunDataHandler::ReadWkmFile()
       tokens = line.Tokenize(" ");
 
       if (!tokens) { // no tokens found
-        cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: coulnd't tokenize run data.";
+        cerr << endl << ">> PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: coulnd't tokenize run data.";
         return false;
       }
       for (Int_t i=0; i<tokens->GetEntries(); i++) {
@@ -854,7 +1249,7 @@ Bool_t PRunDataHandler::ReadWkmFile()
         if (ok) {
           histoData.push_back(val);
         } else {
-          cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: data line contains non-integer values.";
+          cerr << endl << ">> PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: data line contains non-integer values.";
           // clean up
           delete tokens;
           return false;
@@ -877,7 +1272,7 @@ Bool_t PRunDataHandler::ReadWkmFile()
     line = TString(instr);
     tokens = line.Tokenize(" ");
     if (!tokens) { // no tokens found
-      cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: coulnd't tokenize run data.";
+      cerr << endl << ">> PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: coulnd't tokenize run data.";
       return false;
     }
     for (Int_t i=0; i<tokens->GetEntries(); i++) {
@@ -887,7 +1282,7 @@ Bool_t PRunDataHandler::ReadWkmFile()
       if (ok) {
         histoData.push_back(val);
       } else {
-        cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: data line contains non-integer values.";
+        cerr << endl << ">> PRunDataHandler::ReadWkmFile(): **ERROR** while reading data: data line contains non-integer values.";
         // clean up
         delete tokens;
         return false;
@@ -911,16 +1306,16 @@ Bool_t PRunDataHandler::ReadWkmFile()
 
   // check if all groups are found
   if ((Int_t) runData.GetNoOfHistos() != groups) {
-    cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR**";
-    cerr << endl << "  expected " << groups << " histos, but found " << runData.GetNoOfHistos();
+    cerr << endl << ">> PRunDataHandler::ReadWkmFile(): **ERROR**";
+    cerr << endl << ">> expected " << groups << " histos, but found " << runData.GetNoOfHistos();
     return false;
   }
 
   // check if all groups have enough channels
   for (UInt_t i=0; i<runData.GetNoOfHistos(); i++) {
     if ((Int_t) runData.GetDataBin(i)->size() != channels) {
-      cerr << endl << "PRunDataHandler::ReadWkmFile(): **ERROR**";
-      cerr << endl << "  expected " << channels << " bins in histo " << i << ", but found " << runData.GetDataBin(i)->size();
+      cerr << endl << ">> PRunDataHandler::ReadWkmFile(): **ERROR**";
+      cerr << endl << ">> expected " << channels << " bins in histo " << i << ", but found " << runData.GetDataBin(i)->size();
       return false;
     }
   }
@@ -958,22 +1353,22 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
       success = true;
       break;
     case 1: // couldn't open file, or failed while reading the header
-      cerr << endl << "**ERROR** couldn't open psibin file, or failed while reading the header";
+      cerr << endl << ">> **ERROR** couldn't open psi-bin file, or failed while reading the header";
       cerr << endl;
       success = false;
       break;
     case 2: // unsupported version of the data
-      cerr << endl << "**ERROR** psibin file: unsupported version of the data";
+      cerr << endl << ">> **ERROR** psi-bin file: unsupported version of the data";
       cerr << endl;
       success = false;
       break;
     case 3: // error when allocating data buffer
-      cerr << endl << "**ERROR** psibin file: error when allocating data buffer";
+      cerr << endl << ">> **ERROR** psi-bin file: error when allocating data buffer";
       cerr << endl;
       success = false;
       break;
     case 4: // number of histograms/record not equals 1
-      cerr << endl << "**ERROR** psibin file: number of histograms/record not equals 1";
+      cerr << endl << ">> **ERROR** psi-bin file: number of histograms/record not equals 1";
       cerr << endl;
       success = false;
       break;
@@ -994,6 +1389,8 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   runData.SetRunName(fRunName);
   // get run title
   runData.SetRunTitle(TString(psiBin.get_comment().c_str())); // run title
+  // get run number
+  runData.SetRunNumber(psiBin.get_runNumber_int());
   // get setup
   runData.SetSetup(TString(psiBin.get_orient().c_str()));
   // set LEM specific information to default value since it is not in the file and not used...
@@ -1025,7 +1422,7 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   // get t0's
   ivec = psiBin.get_t0_vector();
   if (ivec.empty()) {
-    cerr << endl << "**ERROR** psibin file: couldn't obtain any t0's";
+    cerr << endl << ">> **ERROR** psi-bin file: couldn't obtain any t0's";
     cerr << endl;
     return false;
   }
@@ -1083,7 +1480,7 @@ Bool_t PRunDataHandler::ReadMudFile()
 
   fh = MUD_openRead((Char_t *)fRunPathName.Data(), &type);
   if (fh == -1) {
-    cerr << endl << "**ERROR** Couldn't open mud-file " << fRunPathName.Data() << ", sorry.";
+    cerr << endl << ">> **ERROR** Couldn't open mud-file " << fRunPathName.Data() << ", sorry.";
     cerr << endl;
     return false;
   }
@@ -1096,10 +1493,16 @@ Bool_t PRunDataHandler::ReadMudFile()
   // get run title
   success = MUD_getTitle( fh, str, sizeof(str) );
   if ( !success ) {
-    cerr << endl << "**WARNING** Couldn't obtain the run title of run " << fRunName.Data();
+    cerr << endl << ">> **WARNING** Couldn't obtain the run title of run " << fRunName.Data();
     cerr << endl;
   }
   runData.SetRunTitle(TString(str));
+
+  // get run number
+  success = MUD_getRunNumber( fh, &val );
+  if (success) {
+    runData.SetRunNumber((Int_t)val);
+  }
 
   // get setup
   TString setup;
@@ -1154,7 +1557,7 @@ Bool_t PRunDataHandler::ReadMudFile()
   // get number of histogramms
   success = MUD_getHists(fh, &type, &val);
   if ( !success ) {
-    cerr << endl << "**ERROR** Couldn't obtain the number of histograms of run " << fRunName.Data();
+    cerr << endl << ">> **ERROR** Couldn't obtain the number of histograms of run " << fRunName.Data();
     cerr << endl;
     MUD_closeRead(fh);
     return false;
@@ -1170,8 +1573,8 @@ Bool_t PRunDataHandler::ReadMudFile()
   for (Int_t i=1; i<=noOfHistos; i++) {
     success = MUD_getHistSecondsPerBin( fh, i, &lrval );
     if (!success) {
-      cerr << endl << "**ERROR** Couldn't obtain the time resolution of run " << fRunName.Data();
-      cerr << endl << "          which is fatal, sorry.";
+      cerr << endl << ">> **ERROR** Couldn't obtain the time resolution of run " << fRunName.Data();
+      cerr << endl << ">>           which is fatal, sorry.";
       cerr << endl;
       MUD_closeRead(fh);
       return false;
@@ -1180,8 +1583,8 @@ Bool_t PRunDataHandler::ReadMudFile()
       timeResolution = lrval;
     } else {
       if (lrval != timeResolution) {
-        cerr << endl << "**ERROR** various time resolutions found in run " << fRunName.Data();
-        cerr << endl << "          this is currently not supported, sorry.";
+        cerr << endl << ">> **ERROR** various time resolutions found in run " << fRunName.Data();
+        cerr << endl << ">>           this is currently not supported, sorry.";
         cerr << endl;
         MUD_closeRead(fh);
         return false;
@@ -1203,7 +1606,7 @@ Bool_t PRunDataHandler::ReadMudFile()
     // get t0's
     success = MUD_getHistT0_Bin( fh, i, &val );
     if ( !success ) {
-      cerr << endl << "**WARNING** Couldn't get t0 of histo " << i << " of run " << fRunName.Data();
+      cerr << endl << ">> **WARNING** Couldn't get t0 of histo " << i << " of run " << fRunName.Data();
       cerr << endl;
     }
     runData.AppendT0((Int_t)val);
@@ -1211,7 +1614,7 @@ Bool_t PRunDataHandler::ReadMudFile()
     // get bkg bins
     success = MUD_getHistBkgd1( fh, i, &val );
     if ( !success ) {
-      cerr << endl << "**WARNING** Couldn't get bkg bin 1 of histo " << i << " of run " << fRunName.Data();
+      cerr << endl << ">> **WARNING** Couldn't get bkg bin 1 of histo " << i << " of run " << fRunName.Data();
       cerr << endl;
       valPair.first = -1;
     } else {
@@ -1220,7 +1623,7 @@ Bool_t PRunDataHandler::ReadMudFile()
 
     success = MUD_getHistBkgd2( fh, i, &val );
     if ( !success ) {
-      cerr << endl << "**WARNING** Couldn't get bkg bin 2 of histo " << i << " of run " << fRunName.Data();
+      cerr << endl << ">> **WARNING** Couldn't get bkg bin 2 of histo " << i << " of run " << fRunName.Data();
       cerr << endl;
       valPair.second = -1;
     }
@@ -1233,7 +1636,7 @@ Bool_t PRunDataHandler::ReadMudFile()
     // get good data bins
     success = MUD_getHistGoodBin1( fh, i, &val );
     if ( !success ) {
-      cerr << endl << "**WARNING** Couldn't get good bin 1 of histo " << i << " of run " << fRunName.Data();
+      cerr << endl << ">> **WARNING** Couldn't get good bin 1 of histo " << i << " of run " << fRunName.Data();
       cerr << endl;
       valPair.first = -1;
     } else {
@@ -1242,7 +1645,7 @@ Bool_t PRunDataHandler::ReadMudFile()
 
     success = MUD_getHistGoodBin2( fh, i, &val );
     if ( !success ) {
-      cerr << endl << "**WARNING** Couldn't get good bin 2 of histo " << i << " of run " << fRunName.Data();
+      cerr << endl << ">> **WARNING** Couldn't get good bin 2 of histo " << i << " of run " << fRunName.Data();
       cerr << endl;
       valPair.second = -1;
     }
@@ -1255,8 +1658,8 @@ Bool_t PRunDataHandler::ReadMudFile()
     // get number of bins
     success = MUD_getHistNumBins( fh, i, &val );
     if ( !success ) {
-      cerr << endl << "**ERROR** Couldn't get the number of bins of histo " << i << ".";
-      cerr << endl << "          This is fatal, sorry.";
+      cerr << endl << ">> **ERROR** Couldn't get the number of bins of histo " << i << ".";
+      cerr << endl << ">>           This is fatal, sorry.";
       cerr << endl;
       MUD_closeRead( fh );
       return false;
@@ -1265,8 +1668,8 @@ Bool_t PRunDataHandler::ReadMudFile()
 
     pData = (UINT32*)malloc(noOfBins*sizeof(pData));
     if (pData == NULL) {
-      cerr << endl << "**ERROR** Couldn't allocate memory for data.";
-      cerr << endl << "          This is fatal, sorry.";
+      cerr << endl << ">> **ERROR** Couldn't allocate memory for data.";
+      cerr << endl << ">>           This is fatal, sorry.";
       cerr << endl;
       MUD_closeRead( fh );
       return false;
@@ -1275,8 +1678,8 @@ Bool_t PRunDataHandler::ReadMudFile()
     // get histogram
     success = MUD_getHistData( fh, i, pData );
     if ( !success ) {
-      cerr << endl << "**ERROR** Couldn't get histo no " << i << ".";
-      cerr << endl << "          This is fatal, sorry.";
+      cerr << endl << ">> **ERROR** Couldn't get histo no " << i << ".";
+      cerr << endl << ">>           This is fatal, sorry.";
       cerr << endl;
       MUD_closeRead( fh );
       return false;
@@ -1348,7 +1751,7 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
   // open data-file
   f.open(fRunPathName.Data(), ifstream::in);
   if (!f.is_open()) {
-    cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** Couldn't open data file (" << fRunPathName.Data() << ") for reading, sorry ...";
+    cerr << endl << ">> PRunDataHandler::ReadMduAsciiFile **ERROR** Couldn't open data file (" << fRunPathName.Data() << ") for reading, sorry ...";
     cerr << endl;
     return false;
   }
@@ -1412,8 +1815,8 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
         tokens = workStr.Tokenize(":("); // field: val (units)
         // check if expected number of tokens present
         if (tokens->GetEntries() != 3) {
-          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", invalid field entry in header.";
-          cerr << endl << line.Data();
+          cerr << endl << ">> PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", invalid field entry in header.";
+          cerr << endl << ">> " << line.Data();
           cerr << endl;
           success = false;
           break;
@@ -1423,8 +1826,8 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
         if (ostr->GetString().IsFloat()) {
           dval = ostr->GetString().Atof();
         } else {
-          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", field value is not float/doulbe.";
-          cerr << endl << line.Data();
+          cerr << endl << ">> PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", field value is not float/doulbe.";
+          cerr << endl << ">> " << line.Data();
           cerr << endl;
           success = false;
           break;
@@ -1436,8 +1839,8 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
         else if (ostr->GetString().Contains("T"))
           unitScaling = 1.0e4;
         else {
-          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", unkown field units.";
-          cerr << endl << line.Data();
+          cerr << endl << ">> PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", unkown field units.";
+          cerr << endl << ">> " << line.Data();
           cerr << endl;
           success = false;
           break;
@@ -1453,8 +1856,8 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
         tokens = workStr.Tokenize(":("); // temp: val (units)
         // check if expected number of tokens present
         if (tokens->GetEntries() != 3) {
-          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", invalid temperatue entry in header.";
-          cerr << endl << line.Data();
+          cerr << endl << ">> PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", invalid temperatue entry in header.";
+          cerr << endl << ">> " << line.Data();
           cerr << endl;
           success = false;
           break;
@@ -1464,8 +1867,8 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
         if (ostr->GetString().IsFloat()) {
           dval = ostr->GetString().Atof();
         } else {
-          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", temperature value is not float/doulbe.";
-          cerr << endl << line.Data();
+          cerr << endl << ">> PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", temperature value is not float/doulbe.";
+          cerr << endl << ">> " << line.Data();
           cerr << endl;
           success = false;
           break;
@@ -1483,7 +1886,7 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
         workStr = TString(workStr.Data()+workStr.First(":")+2);
         groups = workStr.Atoi();      
         if (groups == 0) {
-          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", groups is not a number or 0.";
+          cerr << endl << ">> PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", groups is not a number or 0.";
           cerr << endl;
           success = false;
           break;
@@ -1493,7 +1896,7 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
         workStr = TString(workStr.Data()+workStr.First(":")+2);
         channels = workStr.Atoi();
         if (channels == 0) {
-          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", channels is not a number or 0.";
+          cerr << endl << ">> PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", channels is not a number or 0.";
           cerr << endl;
           success = false;
           break;
@@ -1502,7 +1905,7 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
         tokens = workStr.Tokenize(":("); // resolution: val (units)
         // check if expected number of tokens present
         if (tokens->GetEntries() != 3) {
-          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", invalid time resolution entry in header.";
+          cerr << endl << ">> PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", invalid time resolution entry in header.";
           cerr << endl << line.Data();
           cerr << endl;
           success = false;
@@ -1513,8 +1916,8 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
         if (ostr->GetString().IsFloat()) {
           dval = ostr->GetString().Atof();
         } else {
-          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", time resolution value is not float/doulbe.";
-          cerr << endl << line.Data();
+          cerr << endl << ">> PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", time resolution value is not float/doulbe.";
+          cerr << endl << ">> " << line.Data();
           cerr << endl;
           success = false;
           break;
@@ -1530,8 +1933,8 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
         else if (ostr->GetString().Contains("us"))
           unitScaling = 1.0e3;
         else {
-          cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", unkown time resolution units.";
-          cerr << endl << line.Data();
+          cerr << endl << ">> PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", unkown time resolution units.";
+          cerr << endl << ">> " << line.Data();
           cerr << endl;
           success = false;
           break;
@@ -1544,7 +1947,7 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
           tokens = 0;
         }
       } else { // error
-        cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", illegal header line.";
+        cerr << endl << ">> PRunDataHandler::ReadMduAsciiFile **ERROR** line no " << lineNo << ", illegal header line.";
         cerr << endl;
         success = false;
         break;
@@ -1554,9 +1957,9 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
       tokens = line.Tokenize(" ,\t");
       // check if the number of data line entries is correct
       if (tokens->GetEntries() != groups+1) {
-        cerr << endl << "PRunDataHandler::ReadMduAsciiFile **ERROR** found data line with a wrong data format, cannot be handled (line no " << lineNo << ")";
-        cerr << endl << "line:";
-        cerr << endl << line.Data();
+        cerr << endl << ">> PRunDataHandler::ReadMduAsciiFile **ERROR** found data line with a wrong data format, cannot be handled (line no " << lineNo << ")";
+        cerr << endl << ">> line:";
+        cerr << endl << ">> " << line.Data();
         cerr << endl;
         success = false;
         break;
@@ -1601,8 +2004,8 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
   data.clear();  
   
   if (dataLineCounter != channels) {
-    cerr << endl << "PRunDataHandler::ReadMduAsciiFile **WARNING** found " << dataLineCounter << " data bins,";
-    cerr << endl << "expected " << channels << " according to the header." << endl;
+    cerr << endl << ">> PRunDataHandler::ReadMduAsciiFile **WARNING** found " << dataLineCounter << " data bins,";
+    cerr << endl << ">> expected " << channels << " according to the header." << endl;
   }
 
   fData.push_back(runData);
@@ -1659,7 +2062,7 @@ Bool_t PRunDataHandler::ReadAsciiFile()
   // open data-file
   f.open(fRunPathName.Data(), ifstream::in);
   if (!f.is_open()) {
-    cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** Couldn't open data file (" << fRunPathName.Data() << ") for reading, sorry ...";
+    cerr << endl << ">> PRunDataHandler::ReadAsciiFile **ERROR** Couldn't open data file (" << fRunPathName.Data() << ") for reading, sorry ...";
     cerr << endl;
     return false;
   }
@@ -1720,7 +2123,7 @@ Bool_t PRunDataHandler::ReadAsciiFile()
       } else if (workStr.BeginsWith("field:", TString::kIgnoreCase)) {
         workStr = TString(workStr.Data()+workStr.First(":")+2);
         if (!workStr.IsFloat()) {
-          cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", field is not a number.";
+          cerr << endl << ">> PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", field is not a number.";
           cerr << endl;
           success = false;
           break;
@@ -1733,7 +2136,7 @@ Bool_t PRunDataHandler::ReadAsciiFile()
       } else if (workStr.BeginsWith("temp:", TString::kIgnoreCase)) {
         workStr = TString(workStr.Data()+workStr.First(":")+2);
         if (!workStr.IsFloat()) {
-          cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", temperature is not a number.";
+          cerr << endl << ">> PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", temperature is not a number.";
           cerr << endl;
           success = false;
           break;
@@ -1742,7 +2145,7 @@ Bool_t PRunDataHandler::ReadAsciiFile()
       } else if (workStr.BeginsWith("energy:", TString::kIgnoreCase)) {
         workStr = TString(workStr.Data()+workStr.First(":")+2);
         if (!workStr.IsFloat()) {
-          cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", energy is not a number.";
+          cerr << endl << ">> PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", energy is not a number.";
           cerr << endl;
           success = false;
           break;
@@ -1750,7 +2153,7 @@ Bool_t PRunDataHandler::ReadAsciiFile()
         runData.SetEnergy(workStr.Atof());
         runData.SetTransport(PMUSR_UNDEFINED); // just to initialize the variables to some "meaningful" value
       } else { // error
-        cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", illegal header line.";
+        cerr << endl << ">> PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ", illegal header line.";
         cerr << endl;
         success = false;
         break;
@@ -1768,7 +2171,7 @@ Bool_t PRunDataHandler::ReadAsciiFile()
       tokens = line.Tokenize(" ,\t");
       // check if the number of data line entries is 2 or 3
       if ((tokens->GetEntries() != 2) && (tokens->GetEntries() != 3)) {
-        cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** found data line with a structure different than \"x, y [, error y]\", cannot be handled (line no " << lineNo << ")";
+        cerr << endl << ">> PRunDataHandler::ReadAsciiFile **ERROR** found data line with a structure different than \"x, y [, error y]\", cannot be handled (line no " << lineNo << ")";
         cerr << endl;
         success = false;
         break;
@@ -1777,7 +2180,7 @@ Bool_t PRunDataHandler::ReadAsciiFile()
       // get x
       ostr = dynamic_cast<TObjString*>(tokens->At(0));
       if (!ostr->GetString().IsFloat()) {
-        cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ": x = " << ostr->GetString().Data() << " is not a number, sorry.";
+        cerr << endl << ">> PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ": x = " << ostr->GetString().Data() << " is not a number, sorry.";
         cerr << endl;
         success = false;
         break;
@@ -1787,7 +2190,7 @@ Bool_t PRunDataHandler::ReadAsciiFile()
       // get y
       ostr = dynamic_cast<TObjString*>(tokens->At(1));
       if (!ostr->GetString().IsFloat()) {
-        cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ": y = " << ostr->GetString().Data() << " is not a number, sorry.";
+        cerr << endl << ">> PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ": y = " << ostr->GetString().Data() << " is not a number, sorry.";
         cerr << endl;
         success = false;
         break;
@@ -1798,7 +2201,7 @@ Bool_t PRunDataHandler::ReadAsciiFile()
       if (tokens->GetEntries() == 3) {
         ostr = dynamic_cast<TObjString*>(tokens->At(2));
         if (!ostr->GetString().IsFloat()) {
-          cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ": error y = " << ostr->GetString().Data() << " is not a number, sorry.";
+          cerr << endl << ">> PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << ": error y = " << ostr->GetString().Data() << " is not a number, sorry.";
           cerr << endl;
           success = false;
           break;
@@ -1821,7 +2224,7 @@ Bool_t PRunDataHandler::ReadAsciiFile()
       eyVec.push_back(ey);
 
     } else {
-      cerr << endl << "PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << " neither header nor data line. No idea how to handle it!";
+      cerr << endl << ">> PRunDataHandler::ReadAsciiFile **ERROR** line no " << lineNo << " neither header nor data line. No idea how to handle it!";
       cerr << endl;
       success = false;
       break;
@@ -1970,7 +2373,7 @@ Bool_t PRunDataHandler::ReadDBFile()
   // open db-file
   f.open(fRunPathName.Data(), ifstream::in);
   if (!f.is_open()) {
-    cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** Couldn't open data file (" << fRunPathName.Data() << ") for reading, sorry ...";
+    cerr << endl << ">> PRunDataHandler::ReadDBFile **ERROR** Couldn't open data file (" << fRunPathName.Data() << ") for reading, sorry ...";
     cerr << endl;
     return false;
   }
@@ -2097,7 +2500,7 @@ Bool_t PRunDataHandler::ReadDBFile()
             TString run("run");
             idx = GetDataTagIndex(run, runData.fDataNonMusr.GetDataTags());
             if (idx == -1) {
-              cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+              cerr << endl << ">> PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
               cerr << endl << ">> " << workStr.Data();
               cerr << endl << ">> found potential run data line without run data tag.";
               return false;
@@ -2107,7 +2510,7 @@ Bool_t PRunDataHandler::ReadDBFile()
             ostr = dynamic_cast<TObjString*>(tokens->At(0));
             tstr = ostr->GetString();
             if (!tstr.IsFloat()) {
-              cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+              cerr << endl << ">> PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
               cerr << endl << ">> " << workStr.Data();
               cerr << endl << ">> Expected db-data line with structure: runNo,,, runTitle";
               cerr << endl << ">> runNo = " << tstr.Data() << ", seems to be not a number.";
@@ -2123,7 +2526,7 @@ Bool_t PRunDataHandler::ReadDBFile()
             // split string in tokens
             tokens = workStr.Tokenize("=,"); // line has structure: tag = val,err1,err2,
             if (tokens->GetEntries() < 3) {
-              cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+              cerr << endl << ">> PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
               cerr << endl << ">> " << workStr.Data();
               cerr << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
               delete tokens;
@@ -2133,7 +2536,7 @@ Bool_t PRunDataHandler::ReadDBFile()
             tstr = ostr->GetString();
             idx = GetDataTagIndex(tstr, runData.fDataNonMusr.GetDataTags());
             if (idx == -1) {
-              cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+              cerr << endl << ">> PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
               cerr << endl << ">> " << workStr.Data();
               cerr << endl << ">> data tag error: " << tstr.Data() << " seems not present in the data tag list";
               delete tokens;
@@ -2145,7 +2548,7 @@ Bool_t PRunDataHandler::ReadDBFile()
                 ostr = dynamic_cast<TObjString*>(tokens->At(1));
                 tstr = ostr->GetString();
                 if (!tstr.IsFloat()) {
-                  cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+                  cerr << endl << ">> PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
                   cerr << endl << ">> " << workStr.Data();
                   cerr << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
                   cerr << endl << ">> val = " << tstr.Data() << ", seems to be not a number.";
@@ -2162,7 +2565,7 @@ Bool_t PRunDataHandler::ReadDBFile()
                 ostr = dynamic_cast<TObjString*>(tokens->At(1));
                 tstr = ostr->GetString();
                 if (!tstr.IsFloat()) {
-                  cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+                  cerr << endl << ">> PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
                   cerr << endl << ">> " << workStr.Data();
                   cerr << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
                   cerr << endl << ">> val = " << tstr.Data() << ", seems to be not a number.";
@@ -2175,7 +2578,7 @@ Bool_t PRunDataHandler::ReadDBFile()
                 ostr = dynamic_cast<TObjString*>(tokens->At(2));
                 tstr = ostr->GetString();
                 if (!tstr.IsFloat()) {
-                  cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+                  cerr << endl << ">> PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
                   cerr << endl << ">> " << workStr.Data();
                   cerr << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
                   cerr << endl << ">> err1 = " << tstr.Data() << ", seems to be not a number.";
@@ -2186,7 +2589,7 @@ Bool_t PRunDataHandler::ReadDBFile()
                 runData.fDataNonMusr.AppendSubErrData(idx, val);
                 break;
               default:
-                cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+                cerr << endl << ">> PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
                 cerr << endl << ">> " << workStr.Data();
                 cerr << endl << ">> Expected db-data line with structure: tag = val,err1,err2,\\";
                 delete tokens;
@@ -2199,7 +2602,7 @@ Bool_t PRunDataHandler::ReadDBFile()
           // split string in tokens
           tokens = workStr.Tokenize(","); // line has structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle
           if (tokens->GetEntries() != (Int_t)(3*runData.fDataNonMusr.GetDataTags()->size()+1)) {
-            cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+            cerr << endl << ">> PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
             cerr << endl << ">> " << workStr.Data();
             cerr << endl << ">> Expected db-data line with structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle";
             cerr << endl << ">> found = " << tokens->GetEntries() << " tokens, however expected " << 3*runData.fDataNonMusr.GetDataTags()->size()+1;
@@ -2214,7 +2617,7 @@ Bool_t PRunDataHandler::ReadDBFile()
             ostr = dynamic_cast<TObjString*>(tokens->At(i));
             tstr = ostr->GetString();
             if (!tstr.IsFloat()) {
-              cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+              cerr << endl << ">> PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
               cerr << endl << ">> " << workStr.Data();
               cerr << endl << ">> Expected db-data line with structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle";
               cerr << endl << ">> value=" << tstr.Data() << " seems not to be a number";
@@ -2231,7 +2634,7 @@ Bool_t PRunDataHandler::ReadDBFile()
             } else if (tstr.IsFloat()) {
               runData.fDataNonMusr.AppendSubErrData(j, tstr.Atof());
             } else {
-              cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
+              cerr << endl << ">> PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo << ":";
               cerr << endl << ">> " << workStr.Data();
               cerr << endl << ">> Expected db-data line with structure: val1, err11, err12, ..., valn, errn1, errn2, runNo, , , , runTitle";
               cerr << endl << ">> error1=" << tstr.Data() << " seems not to be a number";
@@ -2251,7 +2654,7 @@ Bool_t PRunDataHandler::ReadDBFile()
 
   // check that the number of labels == the number of data tags
   if (runData.fDataNonMusr.GetLabels()->size() != runData.fDataNonMusr.GetDataTags()->size()) {
-    cerr << endl << "PRunDataHandler::ReadDBFile **ERROR**";
+    cerr << endl << ">> PRunDataHandler::ReadDBFile **ERROR**";
     cerr << endl << ">> number of LABELS found    = " << runData.fDataNonMusr.GetLabels()->size();
     cerr << endl << ">> number of Data tags found = " << runData.fDataNonMusr.GetDataTags()->size();
     cerr << endl << ">> They have to be equal!!";
@@ -2265,7 +2668,7 @@ Bool_t PRunDataHandler::ReadDBFile()
   // check if all vectors have the same size
   for (UInt_t i=1; i<runData.fDataNonMusr.GetData()->size(); i++) {
     if (runData.fDataNonMusr.GetData()->at(i).size() != runData.fDataNonMusr.GetData()->at(i-1).size()) {
-      cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo;
+      cerr << endl << ">> PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo;
       cerr << endl << ">> label: " << runData.fDataNonMusr.GetDataTags()->at(i-1).Data() << ", number data elements = " << runData.fDataNonMusr.GetData()->at(i-1).size();
       cerr << endl << ">> label: " << runData.fDataNonMusr.GetDataTags()->at(i).Data() << ", number data elements = " << runData.fDataNonMusr.GetData()->at(i).size();
       cerr << endl << ">> They have to be equal!!";
@@ -2273,7 +2676,7 @@ Bool_t PRunDataHandler::ReadDBFile()
       break;
     }
     if (runData.fDataNonMusr.GetErrData()->at(i).size() != runData.fDataNonMusr.GetErrData()->at(i-1).size()) {
-      cerr << endl << "PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo;
+      cerr << endl << ">> PRunDataHandler::ReadDBFile **ERROR** in line no " << lineNo;
       cerr << endl << ">> label: " << runData.fDataNonMusr.GetDataTags()->at(i-1).Data() << ", number data elements = " << runData.fDataNonMusr.GetData()->at(i-1).size();
       cerr << endl << ">> label: " << runData.fDataNonMusr.GetDataTags()->at(i).Data() << ", number error data elements = " << runData.fDataNonMusr.GetErrData()->at(i).size();
       cerr << endl << ">> They have to be equal!!";
@@ -2295,6 +2698,532 @@ Bool_t PRunDataHandler::ReadDBFile()
 
   return success;
 }
+
+//--------------------------------------------------------------------------
+// WriteRootFile
+//--------------------------------------------------------------------------
+/**
+ * <p> Write the PSI LEM root-file format.
+ *
+ * <b>return:</b>
+ * - true on successful writting,
+ * - otherwise false.
+ *
+ * \param fln file name. If empty, the routine will try to construct one
+ */
+Bool_t PRunDataHandler::WriteRootFile(TString fln)
+{
+  if (!fAny2ManyInfo->useStandardOutput)
+    cout << endl << ">> PRunDataHandler::WriteRootFile(): writing a root data file ... " << endl;
+
+  // generate output file name if needed
+  if (!fAny2ManyInfo->useStandardOutput) {
+    if (fln.Length() == 0) {
+      Int_t start = fRunPathName.Last('/');
+      Int_t end = fRunPathName.Last('.');
+      if ((start == -1) || (end == -1)) {
+        cout << endl << ">> PRunDataHandler::WriteAsciiFile(): **ERROR** couldn't generate the output file name ..." << endl;
+        return false;
+      }
+      // cut out the filename (get rid of the extension, and the path)
+      Char_t str1[1024], str2[1024];
+      strncpy(str1, fRunPathName.Data(), sizeof(str1));
+      for (Int_t i=0; i<end-start-1; i++) {
+        str2[i] = str1[i+start+1];
+      }
+      str2[end-start-1] = 0;
+
+      fln = fAny2ManyInfo->outPath + str2 + ".root";
+    } else {
+      fln.Prepend(fAny2ManyInfo->outPath);
+    }
+  } else {
+    fln = TString("__tmp.root");
+  }
+
+  // generate data file
+  TFolder *histosFolder;
+  TFolder *decayAnaModule;
+  TFolder *runInfo;
+
+  histosFolder = gROOT->GetRootFolder()->AddFolder("histos", "Histograms");
+  gROOT->GetListOfBrowsables()->Add(histosFolder, "histos");
+  decayAnaModule = histosFolder->AddFolder("DecayAnaModule", "muSR decay histograms");
+
+  runInfo = gROOT->GetRootFolder()->AddFolder("RunInfo", "LEM RunInfo");
+  gROOT->GetListOfBrowsables()->Add(runInfo, "RunInfo");
+  TLemRunHeader *header = new TLemRunHeader();
+  gROOT->GetListOfBrowsables()->Add(runInfo, "RunInfo");
+
+  // feed header info
+  header->SetRunTitle(fData[0].GetRunTitle()->Data());
+  header->SetLemSetup(fData[0].GetSetup()->Data());
+  header->SetRunNumber(fData[0].GetRunNumber());
+  header->SetStartTime(0);
+  header->SetStopTime(1);
+  header->SetModeratorHV(-999.9, 0.0);
+  header->SetSampleHV(-999.9, 0.0);
+  header->SetImpEnergy(-999.9);
+  header->SetSampleTemperature(fData[0].GetTemperature(0), fData[0].GetTempError(0));
+  header->SetSampleBField(fData[0].GetField(), 0.0);
+  header->SetTimeResolution(fData[0].GetTimeResolution());
+  header->SetNChannels(static_cast<UInt_t>(fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin));
+  header->SetNHist(fData[0].GetNoOfHistos());
+  header->SetCuts("none");
+  header->SetModerator("none");
+  // feed t0's
+  Double_t *tt0 = new Double_t[fData[0].GetNoOfHistos()];
+  for (UInt_t i=0;  i<fData[0].GetNoOfHistos(); i++)
+    tt0[i] = 0.0;
+  if (fData[0].GetT0Size() > 0) {
+    for (UInt_t i=0; i<fData[0].GetT0Size(); i++) {
+      tt0[i] = fData[0].GetT0(i)/fAny2ManyInfo->rebin;
+    }
+  }
+  header->SetTimeZero(tt0);
+  runInfo->Add(header); //add header to RunInfo folder
+
+  // feed histos
+  vector<TH1F*> histos;
+  TH1F *histo = 0;
+  Char_t str[32];
+
+  if (fAny2ManyInfo->rebin == 1) {
+     for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
+       if (i<10)
+         sprintf(str, "hDecay0%d", (Int_t)i);
+       else
+         sprintf(str, "hDecay%d", (Int_t)i);
+       histo = new TH1F(str, str, static_cast<UInt_t>(fData[0].GetDataBin(0)->size())+1, -0.5, static_cast<UInt_t>(fData[0].GetDataBin(0)->size()+0.5));
+       for (UInt_t j=0; j<fData[0].GetDataBin(i)->size(); j++) {
+         histo->SetBinContent(j+1, fData[0].GetDataBin(i)->at(j));
+       }
+       histos.push_back(histo);
+     }
+  } else { // rebin > 1
+    UInt_t dataRebin = 0;
+    UInt_t dataCount = 0;
+    for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
+      if (i<10)
+        sprintf(str, "hDecay0%d", (Int_t)i);
+      else
+        sprintf(str, "hDecay%d", (Int_t)i);
+      histo = new TH1F(str, str, static_cast<UInt_t>(fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin)+1, -0.5, static_cast<UInt_t>(fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin+0.5));
+      dataCount = 0;
+      for (UInt_t j=0; j<fData[0].GetDataBin(i)->size(); j++) {
+        if ((j > 0) && (j % fAny2ManyInfo->rebin == 0)) {
+          dataCount++;
+          histo->SetBinContent(dataCount, dataRebin);
+          dataRebin = 0;
+        }
+        dataRebin += static_cast<UInt_t>(fData[0].GetDataBin(i)->at(j));
+      }      
+      histos.push_back(histo);
+    }
+  }
+
+  // add histos to the DecayAnaModule folder
+  for (UInt_t i=0; i<histos.size(); i++)
+    decayAnaModule->Add(histos[i]);
+
+  // write file
+  TFile *fout = new TFile(fln, "RECREATE", fln);
+  if (fout == 0) {
+    cout << endl << "PRunDataHandler::WriteRootFile(): **ERROR** Couldn't create ROOT file '" << fln << "'" << endl;
+    return false;
+  }
+
+  fout->cd();
+  runInfo->Write();
+  histosFolder->Write();
+  fout->Close();
+
+  // clean up
+  for (UInt_t i=0; i<histos.size(); i++) {
+    delete histos[i];
+  }
+  histos.clear();
+  delete fout;
+  delete [] tt0;
+  delete header;
+
+  // check if root file shall be streamed to stdout
+  if (fAny2ManyInfo->useStandardOutput) {
+    // stream file to stdout
+    ifstream is;
+    int length=1024;
+    char *buffer;
+
+    is.open(fln.Data(), ios::binary);
+    if (!is.is_open()) {
+      cout << endl << "PRunDataHandler::WriteRootFile(): **ERROR** Couldn't open the root-file for streaming." << endl;
+      remove(fln.Data());
+      return false;
+    }
+
+    // get length of file
+    is.seekg(0, ios::end);
+    length = is.tellg();
+    is.seekg(0, ios::beg);
+
+    if (length == -1) {
+      cout << endl << "PRunDataHandler::WriteRootFile(): **ERROR** Couldn't determine the root-file size." << endl;
+      remove(fln.Data());
+      return false;
+    }
+
+    // allocate memory
+    buffer = new char [length];
+
+    // read data as a block
+    while (!is.eof()) {
+      is.read(buffer, length);
+      cout.write(buffer, length);
+    }
+
+    is.close();
+
+    delete [] buffer;
+
+    // delete temporary root file
+    remove(fln.Data());
+  }
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// WriteNexusFile
+//--------------------------------------------------------------------------
+/**
+ * <p> Write the nexus-file format.
+ *
+ * <b>return:</b>
+ * - true on successful writting,
+ * - otherwise false.
+ *
+ * \param fln file name. If empty, the routine will try to construct one
+ */
+Bool_t PRunDataHandler::WriteNexusFile(TString fln)
+{
+  cout << endl << ">> PRunDataHandler::WriteNexusFile(): will write a nexus data file. Not yet implemented ... " << endl;
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// WriteWkmFile
+//--------------------------------------------------------------------------
+/**
+ * <p> Write the wkm-file format.
+ *
+ * <b>return:</b>
+ * - true on successful writting,
+ * - otherwise false.
+ *
+ * \param fln file name. If empty, the routine will try to construct one
+ */
+Bool_t PRunDataHandler::WriteWkmFile(TString fln)
+{
+  cout << endl << ">> PRunDataHandler::WriteWkmFile(): writing a wkm data file... " << endl;
+
+  // generate output file name
+  if (fln.Length() == 0) {
+    Int_t start = fRunPathName.Last('/');
+    Int_t end = fRunPathName.Last('.');
+    if ((start == -1) || (end == -1)) {
+      cout << endl << ">> PRunDataHandler::WriteWkmFile(): **ERROR** couldn't generate the output file name ..." << endl;
+      return false;
+    }
+    // cut out the filename (get rid of the extension, and the path)
+    Char_t str1[1024], str2[1024];
+    strncpy(str1, fRunPathName.Data(), sizeof(str1));
+    for (Int_t i=0; i<end-start-1; i++) {
+      str2[i] = str1[i+start+1];
+    }
+    str2[end-start-1] = 0;
+
+    fln = fAny2ManyInfo->outPath + str2 + ".wkm";
+  } else {
+    fln.Prepend(fAny2ManyInfo->outPath);
+  }
+
+  // write ascii file
+  ofstream fout;
+  streambuf* strm_buffer = 0;
+
+  if (!fAny2ManyInfo->useStandardOutput) {
+    // open data-file
+    fout.open(fln.Data(), ofstream::out);
+    if (!fout.is_open()) {
+      cerr << endl << ">> PRunDataHandler::WriteWkmFile **ERROR** Couldn't open data file (" << fln.Data() << ") for writing, sorry ...";
+      cerr << endl;
+      return false;
+    }
+
+    // save output buffer of the stream
+    strm_buffer = cout.rdbuf();
+
+    // redirect ouput into the file
+    cout.rdbuf(fout.rdbuf());
+  }
+
+  // write header
+  cout << "- WKM data file converted with any2many";
+  cout << endl << "Run         : " << fData[0].GetRunNumber();
+  if (fData[0].GetRunTitle()->Length() > 0)
+    cout << endl << "Title       : " << fData[0].GetRunTitle()->Data();
+  if (fData[0].GetNoOfTemperatures() == 1) {
+    cout << endl << "Temp        : " << fData[0].GetTemperature(0);
+  } else if (fData[0].GetNoOfTemperatures() > 1) {
+    cout << endl << "Temp(meas1) : " << fData[0].GetTemperature(0) << " +- " << fData[0].GetTempError(0);
+    cout << endl << "Temp(meas2) : " << fData[0].GetTemperature(1) << " +- " << fData[0].GetTempError(1);
+  } else {
+    cout << endl << "Temp        : ??";
+  }
+  if (fData[0].GetField() != PMUSR_UNDEFINED) {
+    cout << endl << "Field       : " << fData[0].GetField();
+  } else {
+    cout << endl << "Field       : ??";
+  }
+  cout << endl << "Date        : ??";
+  cout << endl << "Setup       : " << fData[0].GetSetup()->Data();
+  cout << endl << "Groups      : " << fData[0].GetNoOfHistos();
+  cout << endl << "Channels    : " << static_cast<UInt_t>(fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin);
+  cout << endl << "Resolution  : " << fData[0].GetTimeResolution();
+
+  // write data
+  if (fAny2ManyInfo->rebin == 1) {
+    for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
+      cout << endl << endl;
+      for (UInt_t j=0; j<fData[0].GetDataBin(i)->size(); j++) {
+        if ((j > 0) && (j % 16 == 0))
+          cout << endl;
+        cout << static_cast<Int_t>(fData[0].GetDataBin(i)->at(j)) << " ";
+      }
+    }
+  } else { // rebin > 1
+    Int_t dataRebin = 0;
+    Int_t count = 0;
+    for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
+      cout << endl << endl;
+      count = 0;
+      dataRebin = 0; // reset rebin
+      for (UInt_t j=0; j<fData[0].GetDataBin(i)->size(); j++) {
+        if ((j > 0) && (j % fAny2ManyInfo->rebin == 0)) {
+          cout << dataRebin << " ";
+          count++;
+          dataRebin = 0;
+          if ((count > 0) && (count % 16 == 0))
+            cout << endl;
+        } else {
+          dataRebin += static_cast<Int_t>(fData[0].GetDataBin(i)->at(j));
+        }
+      }
+    }
+  }
+
+  if (!fAny2ManyInfo->useStandardOutput) {
+    // restore old output buffer
+    cout.rdbuf(strm_buffer);
+
+    fout.close();
+  }
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// WritePsiBinFile
+//--------------------------------------------------------------------------
+/**
+ * <p> Write the psi-bin-file format.
+ *
+ * <b>return:</b>
+ * - true on successful writting,
+ * - otherwise false.
+ *
+ * \param fln file name. If empty, the routine will try to construct one
+ */
+Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
+{
+  cout << endl << ">> PRunDataHandler::WritePsiBinFile(): will write a psi-bin data file. Not yet implemented ... " << endl;
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// WritePsiMduFile
+//--------------------------------------------------------------------------
+/**
+ * <p> Write the psi-mdu-file format.
+ *
+ * <b>return:</b>
+ * - true on successful writting,
+ * - otherwise false.
+ *
+ * \param fln file name. If empty, the routine will try to construct one
+ */
+Bool_t PRunDataHandler::WritePsiMduFile(TString fln)
+{
+  cout << endl << ">> PRunDataHandler::WritePsiMduFile(): will write a psi-mdu data file. Not yet implemented ... " << endl;
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// WriteMudFile
+//--------------------------------------------------------------------------
+/**
+ * <p> Write the mud-file format.
+ *
+ * <b>return:</b>
+ * - true on successful writting,
+ * - otherwise false.
+ *
+ * \param fln file name. If empty, the routine will try to construct one
+ */
+Bool_t PRunDataHandler::WriteMudFile(TString fln)
+{
+  cout << endl << ">> PRunDataHandler::WriteMudFile(): will write a mud data file. Not yet implemented ... " << endl;
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// WriteAsciiFile
+//--------------------------------------------------------------------------
+/**
+ * <p> Write the ascii-file format.
+ *
+ * <b>return:</b>
+ * - true on successful writting,
+ * - otherwise false.
+ *
+ * \param fln file name. If empty, the routine will try to construct one
+ */
+Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
+{
+  cout << endl << ">> PRunDataHandler::WriteAsciiFile(): writing an ascii data file... " << endl;
+
+  // generate output file name
+  if (fln.Length() == 0) {
+    Int_t start = fRunPathName.Last('/');
+    Int_t end = fRunPathName.Last('.');
+    if ((start == -1) || (end == -1)) {
+      cout << endl << ">> PRunDataHandler::WriteAsciiFile(): **ERROR** couldn't generate the output file name ..." << endl;
+      return false;
+    }
+    // cut out the filename (get rid of the extension, and the path)
+    Char_t str1[1024], str2[1024];
+    strncpy(str1, fRunPathName.Data(), sizeof(str1));
+    for (Int_t i=0; i<end-start-1; i++) {
+      str2[i] = str1[i+start+1];
+    }
+    str2[end-start-1] = 0;
+
+    fln = fAny2ManyInfo->outPath + str2 + ".ascii";
+  } else {
+    fln.Prepend(fAny2ManyInfo->outPath);
+  }
+
+  // write ascii file
+  ofstream fout;
+  streambuf* strm_buffer = 0;
+
+  if (!fAny2ManyInfo->useStandardOutput) {
+    // open data-file
+    fout.open(fln.Data(), ofstream::out);
+    if (!fout.is_open()) {
+      cerr << endl << ">> PRunDataHandler::WriteAsciiFile **ERROR** Couldn't open data file (" << fln.Data() << ") for writing, sorry ...";
+      cerr << endl;
+      return false;
+    }
+
+    // save output buffer of the stream
+    strm_buffer = cout.rdbuf();
+
+    // redirect ouput into the file
+    cout.rdbuf(fout.rdbuf());
+  }
+
+  // write header
+  cout << "%*************************************************************************";
+  cout << endl << "% file name   : " << fln.Data();
+  if (fData[0].GetRunTitle()->Length() > 0)
+    cout << endl << "% title       : " << fData[0].GetRunTitle()->Data();
+  if (fData[0].GetRunNumber() >= 0)
+    cout << endl << "% run number  : " << fData[0].GetRunNumber();
+  if (fData[0].GetSetup()->Length() > 0)
+    cout << endl << "% setup       : " << fData[0].GetSetup()->Data();
+  cout << endl << "% field       : " << fData[0].GetField() << " (G)";
+  if (fData[0].GetNoOfTemperatures() > 0) {
+    cout << endl << "% temperature : ";
+    for (UInt_t i=0; i<fData[0].GetNoOfTemperatures()-1; i++) {
+      cout << fData[0].GetTemperature(i) << "+-" << fData[0].GetTempError(i) << "(K) , ";
+    }
+    cout << fData[0].GetTemperature(fData[0].GetNoOfTemperatures()-1) << "+-" << fData[0].GetTempError(fData[0].GetNoOfTemperatures()-1) << "(K)";
+  }
+  if (fData[0].GetEnergy() != PMUSR_UNDEFINED)
+    cout << endl << "% energy      : " << fData[0].GetEnergy() << " (keV)";
+  if (fData[0].GetTransport() != PMUSR_UNDEFINED)
+    cout << endl << "% transport   : " << fData[0].GetTransport() << " (kV)";
+  if (fData[0].GetTimeResolution() != PMUSR_UNDEFINED)
+    cout << endl << "% time resolution : " << fData[0].GetTimeResolution() << " (ns)";
+  if (fData[0].GetT0Size() > 0) {
+    cout << endl << "% t0          : ";
+    for (UInt_t i=0; i<fData[0].GetT0Size()-1; i++) {
+      cout << static_cast<UInt_t>(fData[0].GetT0(i)/fAny2ManyInfo->rebin) << ", ";
+    }
+    cout << fData[0].GetT0(fData[0].GetT0Size()-1);
+  }
+  cout << endl << "% # histos    : " << fData[0].GetNoOfHistos();
+  cout << endl << "% # of bins   : " << static_cast<UInt_t>(fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin);
+  cout << endl << "%*************************************************************************";
+
+  // write data
+  if (fAny2ManyInfo->rebin == 1) {
+    UInt_t length = fData[0].GetDataBin(0)->size();
+    for (UInt_t i=1; i<length; i++) {
+      cout << endl;
+      for (UInt_t j=0; j<fData[0].GetNoOfHistos(); j++) {
+        cout.width(8);
+        cout << static_cast<Int_t>(fData[0].GetDataBin(j)->at(i));
+      }
+    }
+  } else {
+    PUIntVector dataRebin(fData[0].GetNoOfHistos());
+    UInt_t length = fData[0].GetDataBin(0)->size();
+
+    // initialize the dataRebin vector
+    for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++)
+      dataRebin[i] = static_cast<UInt_t>(fData[0].GetDataBin(i)->at(0));
+
+    for (UInt_t i=1; i<length; i++) {
+      if ((i % fAny2ManyInfo->rebin) == 0) {
+        cout << endl;
+        for (UInt_t j=0; j<fData[0].GetNoOfHistos(); j++) {
+          cout.width(8);
+          cout << dataRebin[j];
+        }
+        // initialize the dataRebin vector for the next pack
+        for (UInt_t j=0; j<fData[0].GetNoOfHistos(); j++)
+          dataRebin[j] = static_cast<UInt_t>(fData[0].GetDataBin(j)->at(i));
+      } else {
+        for (UInt_t j=0; j<fData[0].GetNoOfHistos(); j++)
+          dataRebin[j] += static_cast<UInt_t>(fData[0].GetDataBin(j)->at(i));
+      }
+    }
+  }
+
+  cout << endl;
+
+  if (!fAny2ManyInfo->useStandardOutput) {
+    // restore old output buffer
+    cout.rdbuf(strm_buffer);
+
+    fout.close();
+  }
+
+  return true;
+}
+
 
 //--------------------------------------------------------------------------
 // StripWhitespace (private)
@@ -2525,3 +3454,100 @@ Int_t PRunDataHandler::GetDataTagIndex(TString &str, const PStringVector* dataTa
   return result;
 }
 
+//--------------------------------------------------------------------------
+// FileNameFromTemplate (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Will, based on the fileNameTemplate construct a file name. The file name template has a run tag
+ * and a year tag. The run tag has the form [rrrr], whereas the number of 'r' defines the length of
+ * this string part. If the run number is shorter, leading zeros will be filled, e.g. [rrrrrr] and run==123
+ * will lead to '000123'. The same is true for the year tag [yy], except that the length must agree.
+ * For example: fileNameTemplate = d[yyyy]/deltat_tdc_gps_[rrrr].bin, run = 123, year = 2009 will result
+ * in 'd2009/deltat_tdc_gps_0123.bin'.
+ *
+ * <b>return:</b>
+ * - constructed file name from template, run number, and year
+ * - empty string
+ *
+ * \param template template string
+ * \param run run number
+ * \param year year
+ * \param ok true if operation went smooth, otherwise false
+ */
+TString PRunDataHandler::FileNameFromTemplate(TString &fileNameTemplate, Int_t run, TString &year, Bool_t &ok)
+{
+  TString result("");
+  TString str = fileNameTemplate;
+
+  Int_t tag = 0;
+  Int_t yearStart = -1;
+  Int_t yearLength = 0;
+  Int_t runStart = -1;
+  Int_t runLength = 0;
+
+  // find position and length of the year tag
+  for (Int_t i=0; i<str.Length(); i++) {
+
+    if (str[i] == '[') {
+      tag = 1;
+      continue;
+    } else if (str[i] == ']') {
+      tag = 0;
+      continue;
+    }
+
+    if (tag == 1) {
+      if (str[i] == 'y') {
+        if (yearStart == -1)
+          yearStart = i-1;
+        yearLength++;
+      }
+    }
+  }
+
+  if ((yearStart != -1) && (yearLength != 0)) {
+    yearLength += 2; // including the []
+    str.Replace(yearStart, yearLength, year);
+    ok = true;
+  }
+
+  if (ok) {
+    // find position and length of the run tag
+    for (Int_t i=0; i<str.Length(); i++) {
+
+      if (str[i] == '[') {
+        tag = 1;
+        continue;
+      } else if (str[i] == ']') {
+        tag = 0;
+        continue;
+      }
+
+      if (tag == 1) {
+        if (str[i] == 'r') {
+          if (runStart == -1)
+            runStart = i-1;
+          runLength++;
+        }
+      }
+    }
+
+    if ((runStart == -1) || (runLength == 0)) {
+      cerr << endl << ">> PRunDataHandler::FileNameFromTemplate(): **ERROR** run template not ok." << endl;
+      ok = false;
+    } else {
+      TString runStr("");
+      char fmt[128];
+      sprintf(fmt , "%%0%dd", runLength);
+      runStr.Form(fmt, run);
+      runLength += 2; // including the []
+      str.Replace(runStart, runLength, runStr);
+      ok = true;
+    }
+  }
+
+  if (ok)
+    result = str;
+
+  return result;
+}

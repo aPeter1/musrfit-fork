@@ -82,6 +82,7 @@ class PMusrT0Data {
     virtual UInt_t GetAddT0Entries() { return fAddT0.size(); }
     virtual UInt_t GetAddT0Size(UInt_t idx);
     virtual Int_t GetAddT0(UInt_t addRunIdx, UInt_t idx);
+    virtual Int_t GetT0Data() { return fT0Data; }
 
     virtual void SetSingleHisto(const Bool_t flag) { fSingleHisto = flag; }
     virtual void SetRawRunData(const vector<PRawRunData*> rawRunData) { fRawRunData = rawRunData; }
@@ -93,6 +94,7 @@ class PMusrT0Data {
     virtual void SetCmdTag(const UInt_t cmdTag) { fCmdTag = cmdTag; }
     virtual void SetT0(UInt_t val, UInt_t idx);
     virtual void SetAddT0(UInt_t val, UInt_t addRunIdx, UInt_t idx);
+    virtual void SetT0Data(UInt_t val) { fT0Data = val; }
 
   private:
     Bool_t fSingleHisto;              ///< true if single histo fit, false for asymmetry fit
@@ -105,6 +107,7 @@ class PMusrT0Data {
     Int_t fCmdTag;                    ///< command tag. 0=get t0, 1=get data-/bkg-range, 2=get t0, and data-/bkg-range
     PIntVector fT0;                   ///< holding the t0's of the run
     vector<PIntVector> fAddT0;        ///< holding the t0's of the addruns
+    Int_t fT0Data;                    ///< holding the t0 found in the current data set
 };
 
 
@@ -150,6 +153,7 @@ class PMusrT0 : public TObject, public TQObject
     Bool_t fDataAndBkgEnabled; ///< enable/disable data and background range handling (necessary in connection with grouping and addrun)
     Bool_t fT0Enabled; ///< enable/disable t0 handling (necessary in connection with grouping and addrun)
     Int_t  fT0Estimated; ///< estimated t0 value (in bins)
+    Bool_t fShowT0DataChannel;
 
     // canvas related variables
     TCanvas   *fMainCanvas; ///< main canvas for the graphical user interface
@@ -161,6 +165,7 @@ class PMusrT0 : public TObject, public TQObject
     TLatex *fToDoInfo; ///< clear text user instruction string
 
     TLine *fT0Line; ///< line showing the position of t0
+    TLine *fT0DataLine; ///< line showing the position of t0 found in the data file
     TLine *fFirstBkgLine; ///< line showing the start of the background
     TLine *fLastBkgLine; ///< line showing the end of the background
     TLine *fFirstDataLine; ///< line showing the start of the data (first good data bin)
@@ -172,6 +177,8 @@ class PMusrT0 : public TObject, public TQObject
     Int_t fDataRange[2]; ///< data range (first good bin, last good bin)
     Int_t fBkgRange[2]; ///< background range (first bkg bin, last bkg bin)
 
+    void ShowDataFileT0Channel();
+    void HideDataFileT0Channel();
     void SetT0Channel();
     void SetEstimatedT0Channel();
     void SetDataFirstChannel();

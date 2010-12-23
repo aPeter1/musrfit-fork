@@ -46,6 +46,7 @@ using namespace std;
 class PRunDataHandler
 {
   public:
+    PRunDataHandler(PAny2ManyInfo *any2ManyInfo, const PStringVector dataPath);
     PRunDataHandler(PMsrHandler *msrInfo);
     PRunDataHandler(PMsrHandler *msrInfo, const PStringVector dataPath);
     virtual ~PRunDataHandler();
@@ -55,6 +56,7 @@ class PRunDataHandler
 
   private:
     PMsrHandler   *fMsrInfo; ///< pointer to the msr-file handler
+    PAny2ManyInfo *fAny2ManyInfo; ///< pointer to the any2many data structure
     PStringVector fDataPath; ///< vector containing all the search paths where to look for data files
 
     Bool_t fAllDataAvailable; ///< flag indicating if all data sets could be read
@@ -62,10 +64,12 @@ class PRunDataHandler
     TString fRunPathName;   ///< current path file name 
     PRawRunDataList fData;  ///< keeping all the raw data
 
-    virtual Bool_t ReadFile();
+    virtual Bool_t ReadFilesMsr();
+    virtual Bool_t ReadWriteFilesList();
     virtual Bool_t FileAlreadyRead(TString runName);
     virtual Bool_t FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx);
-    virtual Bool_t ReadRootFile(Bool_t notPostPileup);
+    virtual Bool_t FileExistsCheck(const Int_t idx);
+    virtual Bool_t ReadRootFile(UInt_t tag);
     virtual Bool_t ReadNexusFile();
     virtual Bool_t ReadWkmFile();
     virtual Bool_t ReadPsiBinFile();
@@ -74,11 +78,21 @@ class PRunDataHandler
     virtual Bool_t ReadAsciiFile();
     virtual Bool_t ReadDBFile();
 
+    virtual Bool_t WriteRootFile(TString fln="");
+    virtual Bool_t WriteNexusFile(TString fln="");
+    virtual Bool_t WriteWkmFile(TString fln="");
+    virtual Bool_t WritePsiBinFile(TString fln="");
+    virtual Bool_t WritePsiMduFile(TString fln="");
+    virtual Bool_t WriteMudFile(TString fln="");
+    virtual Bool_t WriteAsciiFile(TString fln="");
+
     virtual Bool_t StripWhitespace(TString &str);
     virtual Bool_t IsWhitespace(const Char_t *str);
     virtual Double_t ToDouble(TString &str, Bool_t &ok);
     virtual Int_t ToInt(TString &str, Bool_t &ok);
     virtual Int_t GetDataTagIndex(TString &str, const PStringVector* fLabels);
+
+    virtual TString FileNameFromTemplate(TString &fileNameTemplate, Int_t run, TString &year, Bool_t &ok);
 };
 
 #endif //  _PRUNDATAHANDLER_H_

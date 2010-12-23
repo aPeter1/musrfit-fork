@@ -820,9 +820,11 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             if (fRuns[runNo].GetDataRange(0) >= 0) {
               fout.width(16);
               fout << left << "data";
-              for (UInt_t j=0; j<2; j++) {
-                fout.width(8);
-                fout << left << fRuns[runNo].GetDataRange(j);
+              for (UInt_t j=0; j<4; j++) {
+                if (fRuns[runNo].GetDataRange(j) > 0) {
+                  fout.width(8);
+                  fout << left << fRuns[runNo].GetDataRange(j);
+                }
               }
               fout << endl;
             }
