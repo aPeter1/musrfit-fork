@@ -1838,5 +1838,5 @@ MUD_setHistSecondsPerBin( int fd, int num, REAL64 secondsPerBin )
 {
   if( secondsPerBin < 0.0 || secondsPerBin > 4294967295.0e-15 )
     return( 0 );
-  return( MUD_setHistFsPerBin( fd, num, (1.0e15 * (UINT32)secondsPerBin ) ) );
+  return( MUD_setHistFsPerBin( fd, num, (UINT32)(1.0e15 * secondsPerBin ) ) );
 }

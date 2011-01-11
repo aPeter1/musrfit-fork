@@ -270,6 +270,8 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
     outTag = A2M_PSIBIN;
   else if (!fAny2ManyInfo->outFormat.CompareTo("psi-mdu", TString::kIgnoreCase))
     outTag = A2M_PSIMDU;
+  else if (!fAny2ManyInfo->outFormat.CompareTo("mud",TString::kIgnoreCase))
+    outTag = A2M_MUD;
   else if (!fAny2ManyInfo->outFormat.CompareTo("nexus", TString::kIgnoreCase))
     outTag = A2M_NEXUS;
   else if (!fAny2ManyInfo->outFormat.CompareTo("wkm", TString::kIgnoreCase))
@@ -438,6 +440,86 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
       }
     }
 
+  }
+
+  // check if compression is wished
+  if (fAny2ManyInfo->compressionTag > 0) {
+    TString fln = fAny2ManyInfo->compressFileName;
+
+    // currently system call is used, which means this is only running under Linux and Mac OS X but not under Windows
+    char cmd[256];
+    if (fAny2ManyInfo->outFileList.size() == 1) {
+      if (fAny2ManyInfo->compressionTag == 1) // gzip
+        fln += TString(".tar.gz");
+      else // bzip2
+        fln += TString(".tar.bz2");
+      if (fAny2ManyInfo->compressionTag == 1) // gzip
+        sprintf(cmd, "tar -zcf %s %s", fln.Data(), fAny2ManyInfo->outFileList[0].Data());
+      else // bzip2
+        sprintf(cmd, "tar -jcf %s %s", fln.Data(), fAny2ManyInfo->outFileList[0].Data());
+      system(cmd);
+    } else {
+      fln += TString(".tar");
+      for (UInt_t i=0; i<fAny2ManyInfo->outFileList.size(); i++) {
+        if (i==0) {
+          sprintf(cmd, "tar -cf %s %s", fln.Data(), fAny2ManyInfo->outFileList[i].Data());
+        } else {
+          sprintf(cmd, "tar -rf %s %s", fln.Data(), fAny2ManyInfo->outFileList[i].Data());
+        }
+        system(cmd);
+      }
+      if (fAny2ManyInfo->compressionTag == 1) // gzip
+        sprintf(cmd, "gzip %s", fln.Data());
+      else
+        sprintf(cmd, "bzip2 -z %s", fln.Data());
+      system(cmd);
+    }
+
+    // check if the compressed file shall be streamed to the stdout
+    if (fAny2ManyInfo->useStandardOutput) {
+      // stream file to stdout
+      ifstream is;
+      int length=1024;
+      char *buffer;
+
+      is.open(fln.Data(), ios::binary);
+      if (!is.is_open()) {
+        cerr << endl << "PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't open the file for streaming." << endl;
+        remove(fln.Data());
+        return false;
+      }
+
+      // get length of file
+      is.seekg(0, ios::end);
+      length = is.tellg();
+      is.seekg(0, ios::beg);
+
+      if (length == -1) {
+        cerr << endl << "PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't determine the file size." << endl;
+        remove(fln.Data());
+        return false;
+      }
+
+      // allocate memory
+      buffer = new char [length];
+
+      // read data as a block
+      while (!is.eof()) {
+        is.read(buffer, length);
+        cout.write(buffer, length);
+      }
+
+      is.close();
+
+      delete [] buffer;
+
+      // delete temporary root file
+      remove(fln.Data());
+    }
+
+    // remove all the converted files
+    for (UInt_t i=0; i<fAny2ManyInfo->outFileList.size(); i++)
+      remove(fAny2ManyInfo->outFileList[i].Data());
   }
 
   return true;
@@ -690,6 +772,7 @@ Bool_t PRunDataHandler::FileExistsCheck(const Int_t idx)
 
   if (idx == -1) { // single input file name
     fln = fAny2ManyInfo->inFileName;
+cout << endl << "debug> fln=" << fln << endl;
   } else { // run file list entry shall be handled
     // check for input/output templates
     if ((fAny2ManyInfo->inTemplate.Length() == 0) || (fAny2ManyInfo->outTemplate.Length() == 0)) {
@@ -710,7 +793,8 @@ Bool_t PRunDataHandler::FileExistsCheck(const Int_t idx)
 
   // check if the file is in the local directory
   if (gSystem->AccessPathName(fln) != true) { // found in the local dir
-    pathName = TString("./")+fln;
+//    pathName = TString("./")+fln;
+    pathName = fln;
   }
   // check if the file is found in the directory given in the startup file
   if (pathName.CompareTo("???") == 0) { // not found in local directory search
@@ -2717,12 +2801,12 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
     cout << endl << ">> PRunDataHandler::WriteRootFile(): writing a root data file ... " << endl;
 
   // generate output file name if needed
-  if (!fAny2ManyInfo->useStandardOutput) {
+  if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
     if (fln.Length() == 0) {
       Int_t start = fRunPathName.Last('/');
       Int_t end = fRunPathName.Last('.');
-      if ((start == -1) || (end == -1)) {
-        cout << endl << ">> PRunDataHandler::WriteAsciiFile(): **ERROR** couldn't generate the output file name ..." << endl;
+      if (end == -1) {
+        cerr << endl << ">> PRunDataHandler::WriteRootFile(): **ERROR** couldn't generate the output file name ..." << endl;
         return false;
       }
       // cut out the filename (get rid of the extension, and the path)
@@ -2737,6 +2821,8 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
     } else {
       fln.Prepend(fAny2ManyInfo->outPath);
     }
+    // keep the file name if compression is whished
+    fAny2ManyInfo->outFileList.push_back(fln);
   } else {
     fln = TString("__tmp.root");
   }
@@ -2829,7 +2915,7 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
   // write file
   TFile *fout = new TFile(fln, "RECREATE", fln);
   if (fout == 0) {
-    cout << endl << "PRunDataHandler::WriteRootFile(): **ERROR** Couldn't create ROOT file '" << fln << "'" << endl;
+    cerr << endl << "PRunDataHandler::WriteRootFile(): **ERROR** Couldn't create ROOT file '" << fln << "'" << endl;
     return false;
   }
 
@@ -2848,7 +2934,7 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
   delete header;
 
   // check if root file shall be streamed to stdout
-  if (fAny2ManyInfo->useStandardOutput) {
+  if (fAny2ManyInfo->useStandardOutput && (fAny2ManyInfo->compressionTag == 0)) {
     // stream file to stdout
     ifstream is;
     int length=1024;
@@ -2856,7 +2942,7 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
 
     is.open(fln.Data(), ios::binary);
     if (!is.is_open()) {
-      cout << endl << "PRunDataHandler::WriteRootFile(): **ERROR** Couldn't open the root-file for streaming." << endl;
+      cerr << endl << "PRunDataHandler::WriteRootFile(): **ERROR** Couldn't open the root-file for streaming." << endl;
       remove(fln.Data());
       return false;
     }
@@ -2867,7 +2953,7 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
     is.seekg(0, ios::beg);
 
     if (length == -1) {
-      cout << endl << "PRunDataHandler::WriteRootFile(): **ERROR** Couldn't determine the root-file size." << endl;
+      cerr << endl << "PRunDataHandler::WriteRootFile(): **ERROR** Couldn't determine the root-file size." << endl;
       remove(fln.Data());
       return false;
     }
@@ -2930,8 +3016,8 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
   if (fln.Length() == 0) {
     Int_t start = fRunPathName.Last('/');
     Int_t end = fRunPathName.Last('.');
-    if ((start == -1) || (end == -1)) {
-      cout << endl << ">> PRunDataHandler::WriteWkmFile(): **ERROR** couldn't generate the output file name ..." << endl;
+    if (end == -1) {
+      cerr << endl << ">> PRunDataHandler::WriteWkmFile(): **ERROR** couldn't generate the output file name ..." << endl;
       return false;
     }
     // cut out the filename (get rid of the extension, and the path)
@@ -2946,12 +3032,14 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
   } else {
     fln.Prepend(fAny2ManyInfo->outPath);
   }
+  // keep the file name if compression is whished
+  fAny2ManyInfo->outFileList.push_back(fln);
 
   // write ascii file
   ofstream fout;
   streambuf* strm_buffer = 0;
 
-  if (!fAny2ManyInfo->useStandardOutput) {
+  if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
     // open data-file
     fout.open(fln.Data(), ofstream::out);
     if (!fout.is_open()) {
@@ -3022,7 +3110,7 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
     }
   }
 
-  if (!fAny2ManyInfo->useStandardOutput) {
+  if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
     // restore old output buffer
     cout.rdbuf(strm_buffer);
 
@@ -3082,7 +3170,168 @@ Bool_t PRunDataHandler::WritePsiMduFile(TString fln)
  */
 Bool_t PRunDataHandler::WriteMudFile(TString fln)
 {
-  cout << endl << ">> PRunDataHandler::WriteMudFile(): will write a mud data file. Not yet implemented ... " << endl;
+  if (!fAny2ManyInfo->useStandardOutput)
+    cout << endl << ">> PRunDataHandler::WriteMudFile(): writing a mud data file ... " << endl;
+
+  // generate output file name if needed
+  if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
+    if (fln.Length() == 0) {
+      Int_t start = fRunPathName.Last('/');
+      Int_t end = fRunPathName.Last('.');
+      if (end == -1) {
+        cerr << endl << ">> PRunDataHandler::WriteMudFile(): **ERROR** couldn't generate the output file name ..." << endl;
+        return false;
+      }
+      // cut out the filename (get rid of the extension, and the path)
+      Char_t str1[1024], str2[1024];
+      strncpy(str1, fRunPathName.Data(), sizeof(str1));
+      for (Int_t i=0; i<end-start-1; i++) {
+        str2[i] = str1[i+start+1];
+      }
+      str2[end-start-1] = 0;
+
+      fln = fAny2ManyInfo->outPath + str2 + ".msr";
+    } else {
+      fln.Prepend(fAny2ManyInfo->outPath);
+    }
+    // keep the file name if compression is whished
+    fAny2ManyInfo->outFileList.push_back(fln);
+  } else {
+    fln = TString("__tmp.msr");
+  }
+
+  // generate the mud data file
+  int fd = MUD_openWrite((char*)fln.Data(), MUD_FMT_TRI_TD_ID);
+  if (fd == -1) {
+    cerr << endl << ">> PRunDataHandler::WriteMudFile(): **ERROR** couldn't open mud data file for write ..." << endl;
+    return false;
+  }
+
+  // generate header information
+  char dummy[32], info[128];
+  strcpy(dummy, "???");
+  MUD_setRunDesc(fd, MUD_SEC_GEN_RUN_DESC_ID);
+  MUD_setExptNumber(fd, 0);
+  MUD_setRunNumber(fd, fData[0].GetRunNumber());
+  MUD_setElapsedSec(fd, 0);
+  MUD_setTimeBegin(fd, 0);
+  MUD_setTimeEnd(fd, 0);
+  MUD_setTitle(fd, (char *)fData[0].GetRunTitle()->Data());
+  MUD_setLab(fd, dummy);
+  MUD_setArea(fd, dummy);
+  MUD_setMethod(fd, (char *)fData[0].GetSetup()->Data());
+  MUD_setApparatus(fd, dummy);
+  MUD_setInsert(fd, dummy);
+  MUD_setSample(fd, dummy);
+  MUD_setOrient(fd, dummy);
+  MUD_setDas(fd, dummy);
+  MUD_setExperimenter(fd, dummy);
+  sprintf(info, "%lf+-%lf (K)", fData[0].GetTemperature(0), fData[0].GetTempError(0));
+  MUD_setTemperature(fd, info);
+  sprintf(info, "%lf", fData[0].GetField());
+  MUD_setField(fd, info);
+
+  // generate the histograms
+  MUD_setHists(fd, MUD_GRP_TRI_TD_HIST_ID, fData[0].GetNoOfHistos());
+
+  UInt_t *data, dataSize = fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin + 1;
+  data = new UInt_t[dataSize];
+  if (data == 0) {
+    cerr << endl << ">> PRunDataHandler::WriteMudFile(): **ERROR** couldn't allocate memory for the data ..." << endl;
+    MUD_closeWrite(fd);
+    return false;
+  }
+
+  UInt_t noOfEvents = 0, ival = 0, k = 0;
+  for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
+
+    // fill data
+    for (UInt_t j=0; j<dataSize; j++)
+      data[j] = 0;
+    noOfEvents = 0;
+    k = 0;
+    for (UInt_t j=0; j<fData[0].GetDataBin(0)->size(); j++) {
+      if ((j != 0) && (j % fAny2ManyInfo->rebin == 0)) {
+        data[k] = ival;
+        noOfEvents += ival;
+        k++;
+        ival = 0;
+      }
+      ival += static_cast<UInt_t>(fData[0].GetDataBin(i)->at(j));
+    }
+
+    // feed data relevant information
+    // the numbering of the histograms start from '1', hence i+1 needed!!
+    MUD_setHistType(fd, i+1, MUD_GRP_TRI_TD_HIST_ID);
+    MUD_setHistNumBytes(fd, i+1, sizeof(data));
+    MUD_setHistNumBins(fd, i+1, dataSize);
+    MUD_setHistBytesPerBin(fd, i+1, 0);
+    MUD_setHistFsPerBin(fd, i+1, static_cast<UINT32>(1.0e6*fAny2ManyInfo->rebin*fData[0].GetTimeResolution())); // time resolution is given in (ns)
+    if (fData[0].GetT0Size() > i) {
+      MUD_setHistT0_Ps(fd, i+1, static_cast<UINT32>(1.0e3*fData[0].GetTimeResolution()*((fData[0].GetT0(i)+fAny2ManyInfo->rebin/2)/fAny2ManyInfo->rebin)));
+      MUD_setHistT0_Bin(fd, i+1, static_cast<UINT32>(fData[0].GetT0(i)/fAny2ManyInfo->rebin));
+    } else {
+      MUD_setHistT0_Ps(fd, i+1, 0);
+      MUD_setHistT0_Bin(fd, i+1, 0);
+    }
+    MUD_setHistGoodBin1(fd, i+1, 0);
+    MUD_setHistGoodBin2(fd, i+1, 0);
+    MUD_setHistBkgd1(fd, i+1, 0);
+    MUD_setHistBkgd2(fd, i+1, 0);
+    MUD_setHistNumEvents(fd, i+1, (UINT32)noOfEvents);
+    MUD_setHistTitle(fd, i+1, dummy);
+    REAL64 timeResolution = (fAny2ManyInfo->rebin*fData[0].GetTimeResolution())/1.0e9; // ns -> s
+    MUD_setHistSecondsPerBin(fd, i+1, timeResolution);
+
+    MUD_setHistData(fd, i+1, data);
+  }
+
+  MUD_closeWrite(fd);
+
+  delete [] data;
+
+  // check if mud file shall be streamed to stdout
+  if (fAny2ManyInfo->useStandardOutput && (fAny2ManyInfo->compressionTag == 0)) {
+    // stream file to stdout
+    ifstream is;
+    int length=1024;
+    char *buffer;
+
+    is.open(fln.Data(), ios::binary);
+    if (!is.is_open()) {
+      cerr << endl << "PRunDataHandler::WriteMudFile(): **ERROR** Couldn't open the mud-file for streaming." << endl;
+      remove(fln.Data());
+      return false;
+    }
+
+    // get length of file
+    is.seekg(0, ios::end);
+    length = is.tellg();
+    is.seekg(0, ios::beg);
+
+    if (length == -1) {
+      cerr << endl << "PRunDataHandler::WriteMudFile(): **ERROR** Couldn't determine the mud-file size." << endl;
+      remove(fln.Data());
+      return false;
+    }
+
+    // allocate memory
+    buffer = new char [length];
+
+    // read data as a block
+    while (!is.eof()) {
+      is.read(buffer, length);
+      cout.write(buffer, length);
+    }
+
+    is.close();
+
+    delete [] buffer;
+
+    // delete temporary root file
+    remove(fln.Data());
+  }
+
   return true;
 }
 
@@ -3100,14 +3349,15 @@ Bool_t PRunDataHandler::WriteMudFile(TString fln)
  */
 Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
 {
-  cout << endl << ">> PRunDataHandler::WriteAsciiFile(): writing an ascii data file... " << endl;
+  if (!fAny2ManyInfo->useStandardOutput)
+    cout << endl << ">> PRunDataHandler::WriteAsciiFile(): writing an ascii data file... " << endl;
 
   // generate output file name
   if (fln.Length() == 0) {
     Int_t start = fRunPathName.Last('/');
     Int_t end = fRunPathName.Last('.');
-    if ((start == -1) || (end == -1)) {
-      cout << endl << ">> PRunDataHandler::WriteAsciiFile(): **ERROR** couldn't generate the output file name ..." << endl;
+    if (end == -1) {
+      cerr << endl << ">> PRunDataHandler::WriteAsciiFile(): **ERROR** couldn't generate the output file name ..." << endl;
       return false;
     }
     // cut out the filename (get rid of the extension, and the path)
@@ -3122,12 +3372,14 @@ Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
   } else {
     fln.Prepend(fAny2ManyInfo->outPath);
   }
+  // keep the file name if compression is whished
+  fAny2ManyInfo->outFileList.push_back(fln);
 
   // write ascii file
   ofstream fout;
   streambuf* strm_buffer = 0;
 
-  if (!fAny2ManyInfo->useStandardOutput) {
+  if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
     // open data-file
     fout.open(fln.Data(), ofstream::out);
     if (!fout.is_open()) {
@@ -3214,7 +3466,7 @@ Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
 
   cout << endl;
 
-  if (!fAny2ManyInfo->useStandardOutput) {
+  if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
     // restore old output buffer
     cout.rdbuf(strm_buffer);
 
@@ -3486,12 +3738,15 @@ TString PRunDataHandler::FileNameFromTemplate(TString &fileNameTemplate, Int_t r
   Int_t runLength = 0;
 
   // find position and length of the year tag
+  Bool_t foundLeft = false, foundRight = false;
   for (Int_t i=0; i<str.Length(); i++) {
 
     if (str[i] == '[') {
+      foundLeft = true;
       tag = 1;
       continue;
     } else if (str[i] == ']') {
+      foundRight = true;
       tag = 0;
       continue;
     }
@@ -3511,14 +3766,21 @@ TString PRunDataHandler::FileNameFromTemplate(TString &fileNameTemplate, Int_t r
     ok = true;
   }
 
+  if (foundLeft && !foundRight)
+    ok = false;
+  else
+    ok = true;
+
   if (ok) {
     // find position and length of the run tag
+    foundLeft = false, foundRight = false;
     for (Int_t i=0; i<str.Length(); i++) {
-
       if (str[i] == '[') {
+        foundLeft = true;
         tag = 1;
         continue;
       } else if (str[i] == ']') {
+        foundRight = true;
         tag = 0;
         continue;
       }

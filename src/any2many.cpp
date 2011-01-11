@@ -52,47 +52,69 @@ void any2many_syntax()
 {
   cout << endl << "usage: any2many [--help]   : will show this help.";
   cout << endl << "       any2many --version  : will show the svn version.";
-  cout << endl << "       any2many -I <filename> | -i <runList-input> -c <convert-options>  [-p <output-path>] [-o <output>] [-y <year>]";
-  cout << endl << "                 [-t <in-template> <out-template>] [-s] [-rebin <n>]";
-  cout << endl << "          <filename> : a single file name, e.g. 2010/lem10_his_0111.root, but not starting with a '-'";
-  cout << endl << "          <runList-input>  : a list of run numbers separated by ' ' of the form: <run1>  <run2>  <run3> etc.";
-  cout << endl << "                     or a sequence of runs <runStart>-<runEnd>, e.g. 111-222";
-  cout << endl << "          <convert-options> : <inFormat> <outFormat>";
-  cout << endl << "              <inFormat> : input data file format. Supported formats are:";
-  cout << endl << "                           PSI-BIN, ROOT (LEM), MUD, NeXuS, PSI-MDU, WKM";
-  cout << endl << "              <outFormat>: ouput data file format. Supported formats are:";
-  cout << endl << "                           PSI-BIN, ROOT (LEM), MUD, NeXuS, MDU, WKM, ASCII";
-  cout << endl << "          <output-path> : output path for the converted files. If nothing is given, the current directory will be used,";
-  cout << endl << "                     unless the option '-s' is used.";
-  cout << endl << "          <output> : single output file name. If <input> is a list of runs, this option";
-  cout << endl << "                     should be omitted since the file names are generated according to the";
-  cout << endl << "                     run number and the file format, e.g. 111 -> lemyy_his_0111.root, where yy is";
-  cout << endl << "                     the current year.";
-  cout << endl << "          <year>   : if the option -y is used, here a year in the form 'yy' can be given, if this";
-  cout << endl << "                     is the case, any automatic file name generation needs a year, this number will";
-  cout << endl << "                     be used.";
-  cout << endl << "          <in-template>";
-  cout << endl << "          <out-template> : template file name. Needed for run-lists in order to generate the proper file names.";
-  cout << endl << "                     The following template tags can be used: [yy] for year, and [rrrr] for the run number.";
-  cout << endl << "                     If the run number tag is used, the number of 'r' will give the number of digits used";
-  cout << endl << "                     with leading zeros, e.g. [rrrrrr] and run numbe 123 will result in 000123.";
-  cout << endl << "                     The same is true for the year, i.e. [yyyy] will result in something like 1999.";
-  cout << endl << "          -s       : with this option the output data file will be sent to the standard output.";
-  cout << endl << "          <n>      : number of bins to be packed";
+  cout << endl << "       any2many -I <filename> | -i <runList-input> -c <convert-options> ";
+  cout << endl << "                [-p <output-path>] [-o <output>] [-y <year>]";
+  cout << endl << "                [-t <in-template> <out-template>] [-s] [-rebin <n>]";
+  cout << endl << "                [-z <compressed>]";
+  cout << endl << "          -I <filename> : where <filename> is a single file name,";
+  cout << endl << "                 e.g. 2010/lem10_his_0111.root, but not starting with a '-'";
+  cout << endl << "          -i <runList-input> : where <runList-input> is a list of run numbers";
+  cout << endl << "                 separated by spaces ' ' of the form:  <run1>  <run2>  <run3>";
+  cout << endl << "                 etc., or a sequence of runs <runStart>-<runEnd>, e.g. 111-222";
+  cout << endl << "          -c <convert-options> : <inFormat> <outFormat>";
+  cout << endl << "             <inFormat>  : input data file format. Supported formats are:";
+  cout << endl << "                 PSI-BIN, ROOT (LEM), MUD, NeXuS, PSI-MDU, WKM";
+  cout << endl << "             <outFormat> : ouput data file format. Supported formats are:";
+  cout << endl << "                 PSI-BIN, ROOT (LEM), MUD, NeXuS, MDU, WKM, ASCII";
+  cout << endl << "          -p <output-path> : where <output-path> is the output path for the";
+  cout << endl << "                 converted files. If nothing is given, the current directory";
+  cout << endl << "                 will be used, unless the option '-s' is used.";
+  cout << endl << "          -o <output> : where <output> is a single output file name. If <input>";
+  cout << endl << "                 is a list of runs, this option should be omitted since the file";
+  cout << endl << "                 names are generated according to the run number and the file";
+  cout << endl << "                 format, e.g. 111 -> lemyy_his_0111.root, where yy is the";
+  cout << endl << "                 current year.";
+  cout << endl << "          -y <year> : if the option -y is used, here a year in the form 'yy' can";
+  cout << endl << "                 be given, if this is the case, any automatic file name";
+  cout << endl << "                 generation needs a year, this number will be used.";
+  cout << endl << "          -t <in-template> <out-template> : ";
+  cout << endl << "             <in-/out-template> : template file name. Needed for run-lists in";
+  cout << endl << "                 order to generate the proper file names. The following template";
+  cout << endl << "                 tags can be used: [yy] for year, and [rrrr] for the run number.";
+  cout << endl << "                 If the run number tag is used, the number of 'r' will give the";
+  cout << endl << "                 number of digits used with leading zeros, e.g. [rrrrrr] and run";
+  cout << endl << "                 number 123 will result in 000123. The same is true for the";
+  cout << endl << "                 year, i.e. [yyyy] will result in something like 1999.";
+  cout << endl << "          -s : with this option the output data file will be sent to the stdout.";
+  cout << endl << "          -rebin <n> : where <n> is the number of bins to be packed";
+  cout << endl << "          -z [g|b] <compressed> : where <compressed> is the output file name";
+  cout << endl << "                 (without extension) of the compressed data collection, and";
+  cout << endl << "                 'g' will result in .tar.gz, and 'b' in .tar.bz2 files.";
   cout << endl;
-  cout << endl << "          If the output option '-o' is missing, the output file name will be generated according to the";
-  cout << endl << "          input data file name, and the output data format.";
+  cout << endl << "          If the output option '-o' is missing, the output file name will be";
+  cout << endl << "          generated according to the input data file name, and the output data";
+  cout << endl << "          format.";
   cout << endl;
   cout << endl << "examples:" << endl;
   cout << endl << "  any2many -I 2010/lem10_his_0123.root -c ROOT ASCII -rebin 25";
-  cout << endl << "      Will take the LEM ROOT file '2010/lem10_his_0123.root' rebin it with 25 and convert it to ASCII.";
-  cout << endl << "      The output file name will be lem10_his_0123.ascii, and the file will be saved in the current directory.";
-  cout << endl << "  any2many -i 123 137 -c PSI-BIN MUD -t d[yyyy]/deltat_tdc_gps_[rrrr].bin [rrrrrr].msr -y 2001";
-  cout << endl << "      Will take the run 123 and 137, will generate the input file names d2001/deltat_tdc_gps_0123.bin and";
-  cout << endl << "      d2001/deltat_tdc_gps_0137.bin, and output file names 000123.msr and 000137.msr";
-  cout << endl << "  any2many -i 100-117 -c PSI-MDU ASCII -t d[yyyy]/deltat_tdc_alc_[rrrr].mdu [rrr].ascii -y 2011 -s";
-  cout << endl << "      Will take the runs 100 through 117 and convert the PSI-MDU input files to ASCII output and instead of";
-  cout << endl << "      saving them into a file, they will be spit to the standard output.";
+  cout << endl << "      Will take the LEM ROOT file '2010/lem10_his_0123.root' rebin it with 25";
+  cout << endl << "      and convert it to ASCII. The output file name will be";
+  cout << endl << "      lem10_his_0123.ascii, and the file will be saved in the current directory." << endl;
+  cout << endl << "  any2many -i 123 137 -c PSI-BIN MUD -t d[yyyy]/deltat_tdc_gps_[rrrr].bin \\";
+  cout << endl << "      [rrrrrr].msr -y 2001";
+  cout << endl << "      Will take the run 123 and 137, will generate the input file names:";
+  cout << endl << "      d2001/deltat_tdc_gps_0123.bin and d2001/deltat_tdc_gps_0137.bin, and";
+  cout << endl << "      output file names 000123.msr and 000137.msr" << endl;
+  cout << endl << "  any2many -i 100-117 -c PSI-MDU ASCII -t d[yyyy]/deltat_tdc_alc_[rrrr].mdu \\";
+  cout << endl << "      [rrr].ascii -y 2011 -s";
+  cout << endl << "      Will take the runs 100 through 117 and convert the PSI-MDU input files to";
+  cout << endl << "      ASCII output and instead of saving them into a file, they will be spit to";
+  cout << endl << "      the standard output." << endl;
+  cout << endl << "  any2many -i 100-117 -c NEXUS ROOT -t d[yyyy]/psi_gps_[rrrr].nexus \\";
+  cout << endl << "      psi_[yyyy]_gps_[rrrr].root -z b psi_gps_run_100to117";
+  cout << endl << "      Will take the runs 100 through 117 and convert the PSI-NEXUS input files";
+  cout << endl << "      to ROOT output. Afterwards these new files will be collected in a";
+  cout << endl << "      compressed archive psi_gps_run_100to117.tar.bz2." << endl;
   cout << endl << endl;
 }
 
@@ -135,6 +157,7 @@ int main(int argc, char *argv[])
   // init info structure
   info.useStandardOutput = false;
   info.rebin = 1;
+  info.compressionTag = 0; // no compression as default
 
   // call any2many without arguments
   if (argc == 1) {
@@ -339,6 +362,32 @@ int main(int argc, char *argv[])
         break;
       }
     }
+
+    // filter out if compression is whished
+    if (strstr(argv[i], "-z")) {
+      if (i+2 < argc) {
+        if ((argv[i+1][0] == '-') || (argv[i+2][0] == '-')) {
+          cerr << endl << ">> any2many **ERROR** found invalid template in option '-t'" << endl;
+          show_syntax = true;
+          break;
+        }
+        if (argv[i+1][0] == 'g') {
+          info.compressionTag = 1;
+        } else if (argv[i+1][0] == 'b') {
+          info.compressionTag = 2;
+        } else {
+          cerr << endl << ">> any2many **ERROR** found in option '-z' compression tag '" << argv[i+1] << "' which is not supported." << endl;
+          show_syntax = true;
+          break;
+        }
+        info.compressFileName = argv[i+2];
+        i += 2; // shift argument position
+      } else {
+        cerr << endl << ">> any2many **ERROR** found option '-z' with missing arguments" << endl;
+        show_syntax = true;
+        break;
+      }
+    }
   }
 
 /*
@@ -355,6 +404,11 @@ cout << endl << "debug> info.outPath=" << info.outPath;
 cout << endl << "debug> info.rebin=" << info.rebin;
 cout << endl << "debug> info.inTemplate=" << info.inTemplate;
 cout << endl << "debug> info.outTemplate=" << info.outTemplate;
+cout << endl << "debug> info.compressionTag=" << info.compressionTag;
+cout << endl << "debug> info.compressFileName=" << info.compressFileName;
+cout << endl << "debug> info.outFileList=";
+for (unsigned int i=0; i<info.outFileList.size(); i++)
+  cout << info.outFileList[i] << ", ";
 cout << endl;
 */
 

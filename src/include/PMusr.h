@@ -568,17 +568,20 @@ typedef struct {
  * <p>Holds the informations for the any2many converter program
  */
 typedef struct {
-  Bool_t useStandardOutput; ///< flag showing if the converted shall be sent to the standard output
-  TString inFormat;         ///< holds the information about the input data file format
-  TString outFormat;        ///< holds the information about the output data file format
-  TString inTemplate;       ///< holds the input file template
-  TString outTemplate;      ///< holds the output file template
-  TString year;             ///< holds the information about the year to be used
-  PIntVector runList;       ///< holds the run number list to be converted
-  TString inFileName;       ///< holds the file name of the input data file
-  TString outFileName;      ///< holds the file name of the output data file
-  TString outPath;          ///< holds the output path
-  UInt_t rebin;             ///< holds the number of bins to be packed
+  Bool_t useStandardOutput;  ///< flag showing if the converted shall be sent to the standard output
+  TString inFormat;          ///< holds the information about the input data file format
+  TString outFormat;         ///< holds the information about the output data file format
+  TString inTemplate;        ///< holds the input file template
+  TString outTemplate;       ///< holds the output file template
+  TString year;              ///< holds the information about the year to be used
+  PIntVector runList;        ///< holds the run number list to be converted
+  TString inFileName;        ///< holds the file name of the input data file
+  TString outFileName;       ///< holds the file name of the output data file
+  PStringVector outFileList; ///< holds the out path/file name
+  TString outPath;           ///< holds the output path
+  UInt_t rebin;              ///< holds the number of bins to be packed
+  UInt_t compressionTag;     ///< 0=no compression, 1=gzip compression, 2=bzip2 compression
+  TString compressFileName;  ///< holds the name of the outputfile name in case of compression is used
 } PAny2ManyInfo;
 
 #endif // _PMUSR_H_
