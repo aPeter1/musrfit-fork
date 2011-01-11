@@ -2942,8 +2942,8 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
 
       // keep the current x-axis range from the data view
       if (fHistoFrame && (fPreviousPlotView == PV_DATA)) {
-        xmin = fHistoFrame->GetXaxis()->GetBinCenter(fHistoFrame->GetXaxis()->GetFirst());
-        xmax = fHistoFrame->GetXaxis()->GetBinCenter(fHistoFrame->GetXaxis()->GetLast());
+        xmin = fHistoFrame->GetXaxis()->GetBinLowEdge(fHistoFrame->GetXaxis()->GetFirst());
+        xmax = fHistoFrame->GetXaxis()->GetBinLowEdge(fHistoFrame->GetXaxis()->GetLast()) + fHistoFrame->GetXaxis()->GetBinWidth(fHistoFrame->GetXaxis()->GetLast());
       } else {
         xmin = fXmin;
         xmax = fXmax;
@@ -3000,11 +3000,20 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
       // create histo frame in order to plot histograms possibly with different x-frames
       fHistoFrame = fDataTheoryPad->DrawFrame(dataXmin, dataYmin, dataXmax, dataYmax);
 
+      // find the maximal number of points present in the histograms and increase the default number of points of fHistoFrame (1000) to the needed one
+      UInt_t noOfPoints = 1000;
+      for (UInt_t i=0; i<fData.size(); i++) {
+        if (fData[i].data->GetNbinsX() > (Int_t)noOfPoints)
+          noOfPoints = fData[i].data->GetNbinsX();
+      }
+      noOfPoints *= 2;  // make sure that there are enough points
+      fHistoFrame->SetBins(noOfPoints, dataXmin, dataXmax);
+
       // set all histo/theory ranges properly
       for (UInt_t i=0; i<fData.size(); i++) {
-        fData[i].data->GetXaxis()->SetRangeUser(dataXmin, dataXmax);
+        fData[i].data->GetXaxis()->SetRange(fData[i].data->FindBin(dataXmin), fData[i].data->FindBin(dataXmax));
         fData[i].data->GetYaxis()->SetRangeUser(dataYmin, dataYmax);
-        fData[i].theory->GetXaxis()->SetRangeUser(dataXmin, dataXmax);
+        fData[i].theory->GetXaxis()->SetRange(fData[i].theory->FindBin(dataXmin), fData[i].theory->FindBin(dataXmax));
         fData[i].theory->GetYaxis()->SetRangeUser(dataYmin, dataYmax);
       }
 
@@ -3204,8 +3213,8 @@ void PMusrCanvas::PlotDifference(Bool_t unzoom)
   if (fPlotType != MSR_PLOT_NON_MUSR) {
     // keep the current x-axis range from the data view
     if (fHistoFrame && (fPreviousPlotView == PV_DATA)) {
-      xmin = fHistoFrame->GetXaxis()->GetBinCenter(fHistoFrame->GetXaxis()->GetFirst());
-      xmax = fHistoFrame->GetXaxis()->GetBinCenter(fHistoFrame->GetXaxis()->GetLast());
+      xmin = fHistoFrame->GetXaxis()->GetBinLowEdge(fHistoFrame->GetXaxis()->GetFirst());
+      xmax = fHistoFrame->GetXaxis()->GetBinLowEdge(fHistoFrame->GetXaxis()->GetLast()) + fHistoFrame->GetXaxis()->GetBinWidth(fHistoFrame->GetXaxis()->GetLast());
     } else {
       xmin = fXmin;
       xmax = fXmax;
@@ -3252,6 +3261,15 @@ void PMusrCanvas::PlotDifference(Bool_t unzoom)
 
     fHistoFrame = fDataTheoryPad->DrawFrame(dataXmin, dataYmin, dataXmax, dataYmax);
 
+    // find the maximal number of points present in the histograms and increase the default number of points of fHistoFrame (1000) to the needed one
+    UInt_t noOfPoints = 1000;
+    for (UInt_t i=0; i<fData.size(); i++) {
+      if (fData[i].diff->GetNbinsX() > (Int_t)noOfPoints)
+        noOfPoints = fData[i].diff->GetNbinsX();
+    }
+    noOfPoints *= 2; // make sure that there are enough points
+    fHistoFrame->SetBins(noOfPoints, dataXmin, dataXmax);
+
     // set x-axis label
     fHistoFrame->GetXaxis()->SetTitle("time (#mus)");
     // set y-axis label
@@ -3265,7 +3283,7 @@ void PMusrCanvas::PlotDifference(Bool_t unzoom)
       if (fData[i].dataRange->IsXRangePresent())
         fData[i].diff->GetXaxis()->SetRangeUser(fData[i].dataRange->GetXmin(), fData[i].dataRange->GetXmax());
       else
-        fData[i].diff->GetXaxis()->SetRangeUser(dataXmin, dataXmax);
+        fData[i].diff->GetXaxis()->SetRange(fData[i].diff->FindBin(dataXmin), fData[i].diff->FindBin(dataXmax));
 
       if (fData[i].dataRange->IsYRangePresent())
         fData[i].diff->GetYaxis()->SetRangeUser(fData[i].dataRange->GetYmin(), fData[i].dataRange->GetYmax());
@@ -3405,7 +3423,8 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
   }
 
   // plot fourier data
-  double xmin, xmax, ymin, ymax, binContent;
+  Double_t xmin, xmax, ymin, ymax, binContent;
+  UInt_t noOfPoints = 1000;
   switch (fCurrentPlotView) {
     case PV_FOURIER_REAL:
       // set x-range
@@ -3443,6 +3462,15 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
+
+      // find the maximal number of points present in the histograms and increase the default number of points of fHistoFrame (1000) to the needed one
+      noOfPoints = 1000;
+      for (UInt_t i=0; i<fData.size(); i++) {
+        if (fData[i].dataFourierRe->GetNbinsX() > (Int_t)noOfPoints)
+          noOfPoints = fData[i].dataFourierRe->GetNbinsX();
+      }
+      noOfPoints *= 2; // make sure that there are enough points
+      fHistoFrame->SetBins(noOfPoints, xmin, xmax);
 
       // set ranges for Fourier and Fourier theory
       for (UInt_t i=0; i<fData.size(); i++) {
@@ -3508,6 +3536,15 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
+
+      // find the maximal number of points present in the histograms and increase the default number of points of fHistoFrame (1000) to the needed one
+      noOfPoints = 1000;
+      for (UInt_t i=0; i<fData.size(); i++) {
+        if (fData[i].dataFourierIm->GetNbinsX() > (Int_t)noOfPoints)
+          noOfPoints = fData[i].dataFourierIm->GetNbinsX();
+      }
+      noOfPoints *= 2; // make sure that there are enough points
+      fHistoFrame->SetBins(noOfPoints, xmin, xmax);
 
       // set ranges for Fourier and Fourier theory
       for (UInt_t i=0; i<fData.size(); i++) {
@@ -3587,6 +3624,15 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
 
+      // find the maximal number of points present in the histograms and increase the default number of points of fHistoFrame (1000) to the needed one
+      noOfPoints = 1000;
+      for (UInt_t i=0; i<fData.size(); i++) {
+        if (fData[i].dataFourierRe->GetNbinsX() > (Int_t)noOfPoints)
+          noOfPoints = fData[i].dataFourierRe->GetNbinsX();
+      }
+      noOfPoints *= 2; // make sure that there are enough points
+      fHistoFrame->SetBins(noOfPoints, xmin, xmax);
+
       // set ranges for Fourier and Fourier theory
       for (UInt_t i=0; i<fData.size(); i++) {
         fData[i].dataFourierRe->GetXaxis()->SetRangeUser(xmin, xmax);
@@ -3658,6 +3704,15 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
 
+      // find the maximal number of points present in the histograms and increase the default number of points of fHistoFrame (1000) to the needed one
+      noOfPoints = 1000;
+      for (UInt_t i=0; i<fData.size(); i++) {
+        if (fData[i].dataFourierPwr->GetNbinsX() > (Int_t)noOfPoints)
+          noOfPoints = fData[i].dataFourierPwr->GetNbinsX();
+      }
+      noOfPoints *= 2; // make sure that there are enough points
+      fHistoFrame->SetBins(noOfPoints, xmin, xmax);
+
       // set ranges for Fourier and Fourier theory
       for (UInt_t i=0; i<fData.size(); i++) {
         fData[i].dataFourierPwr->GetXaxis()->SetRangeUser(xmin, xmax);
@@ -3720,6 +3775,15 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
+
+      // find the maximal number of points present in the histograms and increase the default number of points of fHistoFrame (1000) to the needed one
+      noOfPoints = 1000;
+      for (UInt_t i=0; i<fData.size(); i++) {
+        if (fData[i].dataFourierPhase->GetNbinsX() > (Int_t)noOfPoints)
+          noOfPoints = fData[i].dataFourierPhase->GetNbinsX();
+      }
+      noOfPoints *= 2; // make sure that there are enough points
+      fHistoFrame->SetBins(noOfPoints, xmin, xmax);
 
       for (UInt_t i=0; i<fData.size(); i++) {
         fData[i].dataFourierPhase->GetXaxis()->SetRangeUser(xmin, xmax);
