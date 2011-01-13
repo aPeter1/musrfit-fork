@@ -234,7 +234,7 @@ Bool_t PRunDataHandler::ReadFilesMsr()
  */
 Bool_t PRunDataHandler::ReadWriteFilesList()
 {
-  if ((fAny2ManyInfo->inFileName.Length() == 0) && (fAny2ManyInfo->runList.size() == 0)) {
+  if ((fAny2ManyInfo->inFileName.size() == 0) && (fAny2ManyInfo->runList.size() == 0)) {
     cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't obtain run list from fAny2ManyInfo: something VERY fishy";
     cerr << endl;
     return false;
@@ -268,8 +268,6 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
     outTag = A2M_ROOT;
   else if (!fAny2ManyInfo->outFormat.CompareTo("psi-bin", TString::kIgnoreCase))
     outTag = A2M_PSIBIN;
-  else if (!fAny2ManyInfo->outFormat.CompareTo("psi-mdu", TString::kIgnoreCase))
-    outTag = A2M_PSIMDU;
   else if (!fAny2ManyInfo->outFormat.CompareTo("mud",TString::kIgnoreCase))
     outTag = A2M_MUD;
   else if (!fAny2ManyInfo->outFormat.CompareTo("nexus", TString::kIgnoreCase))
@@ -286,80 +284,85 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
     return false;
   }
 
-  if (fAny2ManyInfo->inFileName.Length() != 0) { // single file name given
-    if (!FileExistsCheck(-1)) {
-      cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't find file " << fAny2ManyInfo->inFileName.Data() << endl;
-      return false;
-    }
+  if (fAny2ManyInfo->inFileName.size() != 0) { // file name list given
 
-    // read input file
-    Bool_t success = false;
-    switch (inTag) {
-    case A2M_ROOT:
-      success = ReadRootFile(ROOT_ALL);
-      break;
-    case A2M_PSIBIN:
-      success = ReadPsiBinFile();
-      break;
-    case A2M_PSIMDU:
-      success = ReadPsiBinFile();
-      break;
-    case A2M_NEXUS:
-      success = ReadNexusFile();
-      break;
-    case A2M_MUD:
-      success = ReadMudFile();
-      break;
-    case A2M_WKM:
-      success = ReadWkmFile();
-      break;
-    default:
-      break;
-    }
+    // loop over all runs of the run list
+    for (UInt_t i=0; i<fAny2ManyInfo->inFileName.size(); i++) {
+      if (!FileExistsCheck(true, i)) {
+        cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't find file " << fAny2ManyInfo->inFileName[i].Data() << endl;
+        return false;
+      }
 
-    if (!success) {
-      cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't read file " << fAny2ManyInfo->inFileName.Data() << endl;
-      return false;
-    }
+      // read input file
+      Bool_t success = false;
+      switch (inTag) {
+      case A2M_ROOT:
+        success = ReadRootFile(ROOT_ALL);
+        break;
+      case A2M_PSIBIN:
+        success = ReadPsiBinFile();
+        break;
+      case A2M_PSIMDU:
+        success = ReadPsiBinFile();
+        break;
+      case A2M_NEXUS:
+        success = ReadNexusFile();
+        break;
+      case A2M_MUD:
+        success = ReadMudFile();
+        break;
+      case A2M_WKM:
+        success = ReadWkmFile();
+        break;
+      default:
+        break;
+      }
 
-    // write 'converted' output data file
-    success = false;
-    switch (outTag) {
-    case A2M_ROOT:
-      success = WriteRootFile();
-      break;
-    case A2M_PSIBIN:
-      success = WritePsiBinFile();
-      break;
-    case A2M_PSIMDU:
-      success = WritePsiBinFile();
-      break;
-    case A2M_NEXUS:
-      success = WriteNexusFile();
-      break;
-    case A2M_MUD:
-      success = WriteMudFile();
-      break;
-    case A2M_WKM:
-      success = WriteWkmFile();
-      break;
-    case A2M_ASCII:
-      success = WriteAsciiFile();
-      break;
-    default:
-      break;
-    }
+      if (!success) {
+        cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't read file " << fAny2ManyInfo->inFileName[i].Data() << endl;
+        return false;
+      }
 
-    if (success == false) {
-      cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't write converted output file." << endl;
-      return false;
-    }
+      // write 'converted' output data file
+      success = false;
+      switch (outTag) {
+      case A2M_ROOT:
+        success = WriteRootFile();
+        break;
+      case A2M_PSIBIN:
+        success = WritePsiBinFile();
+        break;
+      case A2M_PSIMDU:
+        success = WritePsiBinFile();
+        break;
+      case A2M_NEXUS:
+        success = WriteNexusFile();
+        break;
+      case A2M_MUD:
+        success = WriteMudFile();
+        break;
+      case A2M_WKM:
+        success = WriteWkmFile();
+        break;
+      case A2M_ASCII:
+        success = WriteAsciiFile();
+        break;
+      default:
+        break;
+      }
 
-  } else { // run list given
+      if (success == false) {
+        cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't write converted output file." << endl;
+        return false;
+      }
+    }
+  }
+
+  if (fAny2ManyInfo->runList.size() != 0) { // run list given
 
     // loop over all runs of the run list
     for (UInt_t i=0; i<fAny2ManyInfo->runList.size(); i++) {
-      if (!FileExistsCheck(i)) {
+      if (!FileExistsCheck(false, i)) {
         cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't find run " << fAny2ManyInfo->runList[i] << endl;
         return false;
       }
@@ -390,7 +393,7 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
       }
 
       if (!success) {
-        cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't read file " << fAny2ManyInfo->inFileName.Data() << endl;
+        cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't read file " << fRunPathName.Data() << endl;
         return false;
       }
 
@@ -438,6 +441,9 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
         cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't write converted output file." << endl;
         return false;
       }
+
+      // throw away the current data set
+      fData.clear();
     }
 
   }
@@ -448,23 +454,23 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
 
     // currently system call is used, which means this is only running under Linux and Mac OS X but not under Windows
     char cmd[256];
-    if (fAny2ManyInfo->outFileList.size() == 1) {
+    if (fAny2ManyInfo->outPathFileName.size() == 1) {
       if (fAny2ManyInfo->compressionTag == 1) // gzip
         fln += TString(".tar.gz");
       else // bzip2
         fln += TString(".tar.bz2");
       if (fAny2ManyInfo->compressionTag == 1) // gzip
-        sprintf(cmd, "tar -zcf %s %s", fln.Data(), fAny2ManyInfo->outFileList[0].Data());
+        sprintf(cmd, "tar -zcf %s %s", fln.Data(), fAny2ManyInfo->outPathFileName[0].Data());
       else // bzip2
-        sprintf(cmd, "tar -jcf %s %s", fln.Data(), fAny2ManyInfo->outFileList[0].Data());
+        sprintf(cmd, "tar -jcf %s %s", fln.Data(), fAny2ManyInfo->outPathFileName[0].Data());
       system(cmd);
     } else {
       fln += TString(".tar");
-      for (UInt_t i=0; i<fAny2ManyInfo->outFileList.size(); i++) {
+      for (UInt_t i=0; i<fAny2ManyInfo->outPathFileName.size(); i++) {
         if (i==0) {
-          sprintf(cmd, "tar -cf %s %s", fln.Data(), fAny2ManyInfo->outFileList[i].Data());
+          sprintf(cmd, "tar -cf %s %s", fln.Data(), fAny2ManyInfo->outPathFileName[i].Data());
         } else {
-          sprintf(cmd, "tar -rf %s %s", fln.Data(), fAny2ManyInfo->outFileList[i].Data());
+          sprintf(cmd, "tar -rf %s %s", fln.Data(), fAny2ManyInfo->outPathFileName[i].Data());
         }
         system(cmd);
       }
@@ -518,8 +524,8 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
     }
 
     // remove all the converted files
-    for (UInt_t i=0; i<fAny2ManyInfo->outFileList.size(); i++)
-      remove(fAny2ManyInfo->outFileList[i].Data());
+    for (UInt_t i=0; i<fAny2ManyInfo->outPathFileName.size(); i++)
+      remove(fAny2ManyInfo->outPathFileName[i].Data());
   }
 
   return true;
@@ -762,18 +768,26 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
  * - true if data file exists,
  * - otherwise false.
  *
+ * \param fileName flag showing if a file name shall be handled or a run number
  * \param idx index of the run. idx == -1 means that a single input data file name is given.
  */
-Bool_t PRunDataHandler::FileExistsCheck(const Int_t idx)
+Bool_t PRunDataHandler::FileExistsCheck(const Bool_t fileName, const Int_t idx)
 {
   TString pathName("???");
   TString str("");
   TString fln("");
 
-  if (idx == -1) { // single input file name
-    fln = fAny2ManyInfo->inFileName;
-cout << endl << "debug> fln=" << fln << endl;
+  if (fileName) { // single input file name
+    if (idx >= (Int_t)fAny2ManyInfo->inFileName.size()) {
+      cerr << endl << ">> PRunDataHandler::FileExistsCheck(): **ERROR** idx=" << idx << " out of range. (inFileName.size()==" << fAny2ManyInfo->inFileName.size() << ")" << endl;
+      return false;
+    }
+    fln = fAny2ManyInfo->inFileName[idx];
   } else { // run file list entry shall be handled
+    if (idx >= (Int_t)fAny2ManyInfo->runList.size()) {
+      cerr << endl << ">> PRunDataHandler::FileExistsCheck(): **ERROR** idx=" << idx << " out of range. (inFileName.size()==" << fAny2ManyInfo->runList.size() << ")" << endl;
+      return false;
+    }
     // check for input/output templates
     if ((fAny2ManyInfo->inTemplate.Length() == 0) || (fAny2ManyInfo->outTemplate.Length() == 0)) {
       cerr << endl << ">> PRunDataHandler::FileExistsCheck(): **ERROR** when using run lists, input/ouput templates are needed as well." << endl;
@@ -793,14 +807,12 @@ cout << endl << "debug> fln=" << fln << endl;
 
   // check if the file is in the local directory
   if (gSystem->AccessPathName(fln) != true) { // found in the local dir
-//    pathName = TString("./")+fln;
     pathName = fln;
   }
   // check if the file is found in the directory given in the startup file
   if (pathName.CompareTo("???") == 0) { // not found in local directory search
     for (UInt_t i=0; i<fDataPath.size(); i++) {
       str = fDataPath[i] + TString("/") + fln;
-//cout << endl << "debug> XML path: str.Data()=" << str.Data();
       if (gSystem->AccessPathName(str.Data())!=true) { // found
         pathName = str;
         break;
@@ -839,8 +851,6 @@ cout << endl << "debug> fln=" << fln << endl;
   }
 
   fRunPathName = pathName;
-
-//cout << endl << "debug> PRunDataHandler::FileExistsCheck: fRunPathName=" << fRunPathName.Data() << endl;
 
   return true;
 }
@@ -2822,7 +2832,7 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
       fln.Prepend(fAny2ManyInfo->outPath);
     }
     // keep the file name if compression is whished
-    fAny2ManyInfo->outFileList.push_back(fln);
+    fAny2ManyInfo->outPathFileName.push_back(fln);
   } else {
     fln = TString("__tmp.root");
   }
@@ -3033,7 +3043,7 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
     fln.Prepend(fAny2ManyInfo->outPath);
   }
   // keep the file name if compression is whished
-  fAny2ManyInfo->outFileList.push_back(fln);
+  fAny2ManyInfo->outPathFileName.push_back(fln);
 
   // write ascii file
   ofstream fout;
@@ -3077,7 +3087,7 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
   cout << endl << "Setup       : " << fData[0].GetSetup()->Data();
   cout << endl << "Groups      : " << fData[0].GetNoOfHistos();
   cout << endl << "Channels    : " << static_cast<UInt_t>(fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin);
-  cout << endl << "Resolution  : " << fData[0].GetTimeResolution();
+  cout << endl << "Resolution  : " << fData[0].GetTimeResolution()*fAny2ManyInfo->rebin;
 
   // write data
   if (fAny2ManyInfo->rebin == 1) {
@@ -3195,7 +3205,7 @@ Bool_t PRunDataHandler::WriteMudFile(TString fln)
       fln.Prepend(fAny2ManyInfo->outPath);
     }
     // keep the file name if compression is whished
-    fAny2ManyInfo->outFileList.push_back(fln);
+    fAny2ManyInfo->outPathFileName.push_back(fln);
   } else {
     fln = TString("__tmp.msr");
   }
@@ -3373,7 +3383,7 @@ Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
     fln.Prepend(fAny2ManyInfo->outPath);
   }
   // keep the file name if compression is whished
-  fAny2ManyInfo->outFileList.push_back(fln);
+  fAny2ManyInfo->outPathFileName.push_back(fln);
 
   // write ascii file
   ofstream fout;
@@ -3417,13 +3427,13 @@ Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
   if (fData[0].GetTransport() != PMUSR_UNDEFINED)
     cout << endl << "% transport   : " << fData[0].GetTransport() << " (kV)";
   if (fData[0].GetTimeResolution() != PMUSR_UNDEFINED)
-    cout << endl << "% time resolution : " << fData[0].GetTimeResolution() << " (ns)";
+    cout << endl << "% time resolution : " << fData[0].GetTimeResolution()*fAny2ManyInfo->rebin << " (ns)";
   if (fData[0].GetT0Size() > 0) {
     cout << endl << "% t0          : ";
     for (UInt_t i=0; i<fData[0].GetT0Size()-1; i++) {
       cout << static_cast<UInt_t>(fData[0].GetT0(i)/fAny2ManyInfo->rebin) << ", ";
     }
-    cout << fData[0].GetT0(fData[0].GetT0Size()-1);
+    cout << fData[0].GetT0(fData[0].GetT0Size()-1)/fAny2ManyInfo->rebin;
   }
   cout << endl << "% # histos    : " << fData[0].GetNoOfHistos();
   cout << endl << "% # of bins   : " << static_cast<UInt_t>(fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin);

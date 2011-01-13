@@ -575,9 +575,8 @@ typedef struct {
   TString outTemplate;       ///< holds the output file template
   TString year;              ///< holds the information about the year to be used
   PIntVector runList;        ///< holds the run number list to be converted
-  TString inFileName;        ///< holds the file name of the input data file
-  TString outFileName;       ///< holds the file name of the output data file
-  PStringVector outFileList; ///< holds the out path/file name
+  PStringVector inFileName;  ///< holds the file name of the input data file
+  PStringVector outPathFileName; ///< holds the out path/file name
   TString outPath;           ///< holds the output path
   UInt_t rebin;              ///< holds the number of bins to be packed
   UInt_t compressionTag;     ///< 0=no compression, 1=gzip compression, 2=bzip2 compression
