@@ -297,25 +297,25 @@ int msr2data_doFitting(vector<string> &arg, bool &chainfit)
  *
  * <b>return:</b>
  * - template run number, or
- * - 0 if the string after 'msr-' is not a number
+ * - -3 if the string after 'msr-' is not a number
  *
  * \param arg list of arguments
  * \param inputOnly flag, if true create msr-files only (no fitting)
  */
-unsigned int msr2data_doInputCreation(vector<string> &arg, bool &inputOnly)
+int msr2data_doInputCreation(vector<string> &arg, bool &inputOnly)
 {
-  unsigned int temp(0);
+  int temp(0);
 
   string s;
   for (vector<string>::iterator iter(arg.begin()); iter != arg.end(); ++iter) {
     if (!iter->substr(0,4).compare("msr-")) {
       s = iter->substr(4);
       try {
-        temp = boost::lexical_cast<unsigned int>(s);
+        temp = boost::lexical_cast<int>(s);
         arg.erase(iter);
       }
       catch(boost::bad_lexical_cast &) {
-        temp = 0; // the specified template is no number
+        temp = -3; // the specified template is no number
       }
       inputOnly = true;
       break;
@@ -549,7 +549,7 @@ int main(int argc, char *argv[])
       realOutput = false;
       outputFile = "none";
     }
-    if (!temp) {
+    if (temp == -3) {
       cerr << endl;
       cerr << ">> msr2data: **ERROR** The given template has not a valid run number! Quitting..." << endl;
       run_vec.clear();
