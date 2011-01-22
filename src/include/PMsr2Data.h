@@ -63,19 +63,22 @@ class PMsr2Data
     int SetRunNumbers(const vector<unsigned int>&); // explicit run list specified using [ ]
     unsigned int GetPresentRun() const;
 
-    int DetermineRunNumberDigits(unsigned int) const;
+    int DetermineRunNumberDigits(unsigned int, bool) const;
     int CheckRunNumbersInRange() const;
 
     int ParseXmlStartupFile();
     int ReadMsrFile(const string&) const;
     bool ReadRunDataFile();
 
-    bool PrepareNewInputFile(unsigned int) const; // template
-    bool PrepareGlobalInputFile(unsigned int, const string&) const; // generate msr-input file for a global fit
+    bool PrepareNewInputFile(unsigned int, bool) const; // template
+    bool PrepareGlobalInputFile(unsigned int, const string&, unsigned int) const; // generate msr-input file for a global fit
 
     int WriteOutput(const string&, bool, bool, bool global = false, unsigned int counter = 0) const;
 
   private:
+    bool PrepareNewSortedInputFile(unsigned int) const; // template
+    PMsrHandler* GetSingleRunMsrFile() const;
+
     string fFileExtension;
     vector<unsigned int> fRunVector;
     mutable vector<unsigned int>::const_iterator fRunVectorIter;

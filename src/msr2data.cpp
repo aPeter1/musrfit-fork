@@ -77,13 +77,13 @@ bool isNumber(const string &s)
  */
 void msr2data_syntax()
 {
-  cout << endl << "usage 1: msr2data <run> <extension> [-o<outputfile>] [data] [noheader] [nosummary] [global]";
+  cout << endl << "usage 1: msr2data <run> <extension> [-o<outputfile>] [data] [noheader] [nosummary] [global[+[!]]]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
-  cout << endl << "usage 2: msr2data <run1> <run2> <extension> [-o<outputfile>] [data] [noheader] [nosummary] [global]";
+  cout << endl << "usage 2: msr2data <run1> <run2> <extension> [-o<outputfile>] [data] [noheader] [nosummary] [global[+[!]]]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
-  cout << endl << "usage 3: msr2data \\[<run1> <run2> ... <runN>\\] <extension> [-o<outputfile> ] [data] [noheader] [nosummary] [global]";
+  cout << endl << "usage 3: msr2data \\[<run1> <run2> ... <runN>\\] <extension> [-o<outputfile> ] [data] [noheader] [nosummary] [global[+[!]]]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
-  cout << endl << "usage 4: msr2data <runlist> <extension> [-o<outputfile>] [data] [noheader] [nosummary] [global]";
+  cout << endl << "usage 4: msr2data <runlist> <extension> [-o<outputfile>] [data] [noheader] [nosummary] [global[+[!]]]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
   cout << endl;
   cout << endl << "       <run>, <run1>, <run2>, ... <runN> : run numbers";
@@ -106,11 +106,18 @@ void msr2data_syntax()
   cout << endl;
   cout << endl << "       global : switch on the global-fit mode";
   cout << endl << "              Within that mode all specified runs will be united in a single msr-file!";
-  cout << endl << "              The fit parameters can be either run specific or common to all runs.";
+  cout << endl << "              The fit parameters can be either run-specific or common to all runs.";
   cout << endl << "              For a complete description of this feature please refer to the manual.";
+  cout << endl;
+  cout << endl << "       global+[!] : operate in the global-fit mode, however, in case a global input file is created";
+  cout << endl << "              all specified runs are pre-analyzed first one by one using the given template.";
+  cout << endl << "              For the generation of the global input file, the run-specific parameter values are taken";
+  cout << endl << "              from this pre-analysis for each run - not just copied from the template.";
+  cout << endl << "              The specification of ! determines which fit-mode (see above) is used for this pre-analysis.";
   cout << endl;
   cout << endl << "    For further information please refer to";
   cout << endl << "    https://intranet.psi.ch/MUSR/Msr2Data";
+  cout << endl << "    http://lmu.web.psi.ch/facilities/software/musrfit/user/intranet.psi.ch/MUSR/Msr2Data.html";
   cout << endl << endl;
 }
 
@@ -140,7 +147,8 @@ string msr2data_outputfile(vector<string> &arg, bool db = true)
       if (!iter->compare("-o")) {
         if ((iterNext != arg.end()) && (iterNext->compare("noheader")) && (iterNext->compare("nosummary")) \
             && (iterNext->substr(0,3).compare("fit")) && (iterNext->compare("-k")) && (iterNext->compare("-t")) \
-            && (iterNext->compare("data")) && (iterNext->substr(0,3).compare("msr")) && (iterNext->compare("global"))) {
+            && (iterNext->compare("data")) && (iterNext->substr(0,3).compare("msr")) && (iterNext->compare("global")) \
+            && (iterNext->compare("global+")) && (iterNext->compare("global+!"))) {
           outputFile = *iterNext;
           arg.erase(iterNext);
           arg.erase(iter);
@@ -478,12 +486,24 @@ int main(int argc, char *argv[])
     }
   }
 
+  // check if msr2data should work in the global fit regime
+  bool setNormalMode(msr2data_useOption(arg, "global"));
+  unsigned int globalMode(0);
+
+  if (!msr2data_useOption(arg, "global+!")) {
+    setNormalMode = false;
+    globalMode = 1;
+  } else if (!msr2data_useOption(arg, "global+")) {
+    setNormalMode = false;
+    globalMode = 2;
+  }
+
 // At this point it should be clear if any template for input-file generation is given or not.
 // Therefore, the number of digits in the run number format is determined only here.
   if(temp > 0) {
-    status = msr2dataHandler.DetermineRunNumberDigits(temp);
+    status = msr2dataHandler.DetermineRunNumberDigits(temp, setNormalMode);
   } else {
-    status = msr2dataHandler.DetermineRunNumberDigits(msr2dataHandler.GetPresentRun());
+    status = msr2dataHandler.DetermineRunNumberDigits(msr2dataHandler.GetPresentRun(), setNormalMode);
   }
 
   if(status) {
@@ -512,9 +532,6 @@ int main(int argc, char *argv[])
     writeSummary = msr2data_useOption(arg, "nosummary");
   }
 
-  // check if msr2data should work in the global fit regime
-  bool setNormalMode(msr2data_useOption(arg, "global"));
-
 // GLOBAL MODE
   if (!setNormalMode) {
     ostringstream strInfile;
@@ -523,7 +540,7 @@ int main(int argc, char *argv[])
     // if fitting should be done, prepare a new input file
     if (temp) {
       if (temp > 0) { // if it is smaller no input file should be generated
-        bool success(msr2dataHandler.PrepareGlobalInputFile(temp, strInfile.str()));
+        bool success(msr2dataHandler.PrepareGlobalInputFile(temp, strInfile.str(), globalMode));
 
         if (!success) {
           cout << endl << ">> msr2data: **ERROR** Input file generation has not been successful! Quitting..." << endl;
@@ -601,9 +618,9 @@ int main(int argc, char *argv[])
         if (temp > 0) {
           bool success(true);
           if (firstrun || !chainfit)
-            success = msr2dataHandler.PrepareNewInputFile(temp);
+            success = msr2dataHandler.PrepareNewInputFile(temp, false);
           else
-            success = msr2dataHandler.PrepareNewInputFile(oldtemp);
+            success = msr2dataHandler.PrepareNewInputFile(oldtemp, false);
           if (firstrun)
             firstrun = false;
           oldtemp = msr2dataHandler.GetPresentRun();

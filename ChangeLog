@@ -1,15 +1,17 @@
 #---------------------------------------------------------------------
 # ChangeLog
-# AS, 2010/11/11
+# AS, 2011/01/22
 # $Id$
 #---------------------------------------------------------------------
 
 changes since 0.8.0
 ===================================
+NEW extended global mode in msr2data
 NEW any2many: an attempt to write the universial musr-data-file converter. Just started, needs still some work.
 NEW musrt0: added the possibility to show the t0 saved in the data file 's'. Furthermore added the option
     --getT0FromPromptPeak, -g with <firstGoodBinOffset>: will, in non-interactive mode estimate the t0's from 
     the prompt peak and write it into the msr-file (MUSR-133).
+FIXED a bug in the determination of the length of the run numbers in msr2data
 FIXED 2 little annoying problems: (i) now it is possible to zoom down to the single bin in musrview. 
      (ii) when switching between data- and difference-view, the x-range doesn't change anymore.
 FIXED musrt0 crash for histogram number out of range (MUSR-157)
