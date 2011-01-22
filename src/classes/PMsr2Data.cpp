@@ -703,6 +703,18 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
 
   cout << endl << ">> msr2data: **INFO** Generating new global input msr file " << msrOutFile << endl;
 
+  // set some title for the msr-file
+  ostringstream titleStream;
+  titleStream << "Global msr file for the runs: ";
+  while (fRunVectorIter != fRunVector.end()) {
+    titleStream << *fRunVectorIter << " ";
+    ++fRunVectorIter;
+  }
+  fRunVectorIter = fRunVector.begin();
+  fMsrHandler->SetMsrTitle(TString(titleStream.str()));
+  titleStream.clear();
+  titleStream.str("");
+
   // search parameter list for run-specific parameters - the rest is assumed to be global
   string tempParamName;
   for (unsigned int i(0); i < msrParamList->size(); ++i) {
@@ -1257,7 +1269,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
   // to obtain better starting parameter values for the global file
 
   if (globalPlus) {
-    // for the first file, prepare a sorted input from the internal data-structure
+    // for the first file (or if the !-option is given), prepare a sorted input from the internal data-structure
     // if chain-fitting is used, the successive files are copied from the first
     unsigned int oldTempRun(0);
     bool firstrun(true);
@@ -1319,7 +1331,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
   //cout << "Number of run specific parameters: " << fNumSpecParam << endl;
 
   if (newRunNumber.str().compare(tempRunNumber.str())) { // first run number does not match the template run number
-    // in global+ mode, read in the single run msr-file
+    // in global+ mode, read in the single run msr-file of the corresponding run
     if (globalPlus)
       singleRunMsrFile = GetSingleRunMsrFile();
 

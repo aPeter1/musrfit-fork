@@ -123,6 +123,45 @@ void msr2data_syntax()
 
 //--------------------------------------------------------------------------
 /**
+ * <p>Checks if only valid options appear in the argument list
+ *
+ * <p><b>return:</b>
+ * - empty string if everything is fine
+ * - first found wrong argument in case of an error
+ *
+ * \param arg list of arguments
+ *
+ */
+string msr2data_validArguments(const vector<string> &arg)
+{
+  string word;
+
+  for (vector<string>::const_iterator iter(arg.begin()); iter != arg.end(); ++iter) {
+    if ( (!iter->compare("noheader")) || (!iter->compare("nosummary")) \
+      || (!iter->substr(0,3).compare("fit")) || (!iter->compare("-k")) || (!iter->compare("-t")) \
+      || (!iter->compare("data")) || (!iter->substr(0,4).compare("msr-")) || (!iter->compare("global")) \
+      || (!iter->compare("global+")) || (!iter->compare("global+!")) )
+      word.clear();
+    else if (!iter->substr(0,2).compare("-o")) {
+      word.clear();
+      if (!iter->compare("-o")) {
+        if (++iter == arg.end())
+          break;
+        else
+          continue;
+      }
+    } else {
+      word = *iter;
+      break;
+    }
+  }
+
+  return word;
+
+}
+
+//--------------------------------------------------------------------------
+/**
  * <p>filters out the output file name from at argument string
  *
  * <p><b>return:</b>
@@ -141,7 +180,7 @@ string msr2data_outputfile(vector<string> &arg, bool db = true)
     outputFile = "out.dat";
 
   vector<string>::iterator iterNext(arg.begin());
-  for (vector<string>::iterator iter(arg.begin()); iter != arg.end(); iter++) {
+  for (vector<string>::iterator iter(arg.begin()); iter != arg.end(); ++iter) {
     iterNext = iter + 1;
     if (!iter->substr(0,2).compare("-o")) {
       if (!iter->compare("-o")) {
@@ -204,6 +243,7 @@ bool msr2data_useOption(vector<string> &arg, const string &s)
  * - template runNo if everything is OK
  * - -1 : tag: fit only, do not prepare input files
  * - -2 : fatal error - more than one fit-&lt;temp&gt; options are specified
+ * - -3 : fit-&lt;temp&gt; option found, but &lt;temp&gt; is not a valid number
  *
  * \param arg list of arguments
  * \param chainfit if true
@@ -214,7 +254,6 @@ int msr2data_doFitting(vector<string> &arg, bool &chainfit)
   int temp(0);
 
   string s;
-  istringstream iss;
   vector<string>::iterator iter(arg.begin());
   while (iter != arg.end()) {
     if (!iter->compare("fit")) { // fit found
@@ -231,15 +270,21 @@ int msr2data_doFitting(vector<string> &arg, bool &chainfit)
       }
       s = iter->substr(4);
       string::size_type loc = s.rfind('!');
-      if (loc != string::npos)
+      if (loc != string::npos) {
         chainfit = false;
+        s.erase(loc);
+      }
       else
         chainfit = true;
-      iss.str(s);
-      iss >> temp;
-      iter = arg.erase(iter);
+      try {
+        temp = boost::lexical_cast<int>(s);
+        arg.erase(iter);
+      }
+      catch(boost::bad_lexical_cast &) {
+        return -3; // the specified template is no number
+      }
     } else {
-      iter++;
+      ++iter;
     }
   }
 
@@ -262,13 +307,16 @@ unsigned int msr2data_doInputCreation(vector<string> &arg, bool &inputOnly)
   unsigned int temp(0);
 
   string s;
-  istringstream iss;
-  for (vector<string>::iterator iter(arg.begin()); iter != arg.end(); iter++) {
+  for (vector<string>::iterator iter(arg.begin()); iter != arg.end(); ++iter) {
     if (!iter->substr(0,4).compare("msr-")) {
       s = iter->substr(4);
-      iss.str(s);
-      iss >> temp;
-      arg.erase(iter);
+      try {
+        temp = boost::lexical_cast<unsigned int>(s);
+        arg.erase(iter);
+      }
+      catch(boost::bad_lexical_cast &) {
+        temp = 0; // the specified template is no number
+      }
       inputOnly = true;
       break;
     }
@@ -299,7 +347,7 @@ int main(int argc, char *argv[])
 
   // use a string-vector for the arguments to get rid of char* as far as possible...
   vector<string> arg;
-  for (int i(1); i<argc; i++) {
+  for (int i(1); i<argc; ++i) {
     arg.push_back(argv[i]);
   }
 
@@ -320,7 +368,7 @@ int main(int argc, char *argv[])
       else
         arg[0]=arg[0].substr(1);
 
-      for (unsigned int i(firstRunNumberInArg); i<arg.size(); i++) {
+      for (unsigned int i(firstRunNumberInArg); i<arg.size(); ++i) {
         string::size_type loc = arg[i].rfind(']');
         if ( loc != string::npos ) {
           rightbracket = i;
@@ -334,8 +382,8 @@ int main(int argc, char *argv[])
         }
       }
       if (rightbracket == numeric_limits<unsigned int>::max()) {
-        cout << endl;
-        cout << ">> msr2data: **ERROR** You used the list specification without closing bracket (])! Quitting now." << endl;
+        cerr << endl;
+        cerr << ">> msr2data: **ERROR** You used the list specification without closing bracket (])! Quitting now." << endl;
         return 0;
       }
 
@@ -345,7 +393,7 @@ int main(int argc, char *argv[])
       msrExtension = arg[rightbracket + 1];
 
       vector<string>::iterator iter(arg.begin());
-      for (unsigned int i(0); i<rightbracket + 2; i++) {
+      for (unsigned int i(0); i<rightbracket + 2; ++i) {
         arg.erase(iter);
         iter = arg.begin();
       }
@@ -357,8 +405,8 @@ int main(int argc, char *argv[])
         runTAG = 2;
 
         if (arg.size() < 3) {
-          cout << endl;
-          cout << ">> msr2data: **ERROR** No msr-file extension specified! Quitting now..." << endl;
+          cerr << endl;
+          cerr << ">> msr2data: **ERROR** No msr-file extension specified! Quitting now..." << endl;
           run_vec.clear();
           arg.clear();
           return 0;
@@ -398,8 +446,18 @@ int main(int argc, char *argv[])
     }
   }
   catch(boost::bad_lexical_cast &) {
-    cout << endl;
-    cout << ">> msr2data: **ERROR** At least one given run number is out of range! Quitting..." << endl;
+    cerr << endl;
+    cerr << ">> msr2data: **ERROR** At least one given run number is out of range! Quitting..." << endl;
+    run_vec.clear();
+    arg.clear();
+    return -1;
+  }
+
+// check the validity of the command line given command line arguments
+  string wrongArgument(msr2data_validArguments(arg));
+  if (!wrongArgument.empty()) {
+    cerr << endl;
+    cerr << ">> msr2data: **ERROR** Unknown argument: " << wrongArgument << ". Quitting..." << endl;
     run_vec.clear();
     arg.clear();
     return -1;
@@ -435,16 +493,16 @@ int main(int argc, char *argv[])
       status = msr2dataHandler.SetRunNumbers(run_list);
       break;
     default:
-      cout << endl;
-      cout << ">> msr2data: **ERROR** None of the possible run list specifications has been detected! Quitting now..." << endl;
+      cerr << endl;
+      cerr << ">> msr2data: **ERROR** None of the possible run list specifications has been detected! Quitting now..." << endl;
       run_vec.clear();
       arg.clear();
       return 0;
   }
 
   if (status == 1) {
-    cout << endl;
-    cout << ">> msr2data: **ERROR** The run numbers are out of range! Quitting..." << endl;
+    cerr << endl;
+    cerr << ">> msr2data: **ERROR** The run numbers are out of range! Quitting..." << endl;
     run_vec.clear();
     arg.clear();
     return status;
@@ -460,12 +518,19 @@ int main(int argc, char *argv[])
   temp = msr2data_doFitting(arg, chainfit);
 
   if (temp == -2) {
-    cout << endl;
-    cout << ">> msr2data: **ERROR** More than one fitting options are specified! Quitting..." << endl;
+    cerr << endl;
+    cerr << ">> msr2data: **ERROR** More than one fitting options are specified! Quitting..." << endl;
     run_vec.clear();
     arg.clear();
-    return status;
+    return temp;
+  } else if (temp == -3) {
+    cerr << endl;
+    cerr << ">> msr2data: **ERROR** The given template has not a valid run number! Quitting..." << endl;
+    run_vec.clear();
+    arg.clear();
+    return temp;
   }
+
 
 // check if any options should be passed to musrfit
   if (temp) {
@@ -483,6 +548,13 @@ int main(int argc, char *argv[])
       // if only input files should be created, do not write data to an output file (no matter, what has been determined earlier)
       realOutput = false;
       outputFile = "none";
+    }
+    if (!temp) {
+      cerr << endl;
+      cerr << ">> msr2data: **ERROR** The given template has not a valid run number! Quitting..." << endl;
+      run_vec.clear();
+      arg.clear();
+      return temp;
     }
   }
 
@@ -515,8 +587,8 @@ int main(int argc, char *argv[])
 // Check if all given run numbers are covered by the formatting of the data file name
   status = msr2dataHandler.CheckRunNumbersInRange();
   if(status) {
-    cout << endl;
-    cout << ">> msr2data: **ERROR** At least one given run number is out of range! Quitting..." << endl;
+    cerr << endl;
+    cerr << ">> msr2data: **ERROR** At least one given run number is out of range! Quitting..." << endl;
     run_vec.clear();
     arg.clear();
     return status;
@@ -543,7 +615,7 @@ int main(int argc, char *argv[])
         bool success(msr2dataHandler.PrepareGlobalInputFile(temp, strInfile.str(), globalMode));
 
         if (!success) {
-          cout << endl << ">> msr2data: **ERROR** Input file generation has not been successful! Quitting..." << endl;
+          cerr << endl << ">> msr2data: **ERROR** Input file generation has not been successful! Quitting..." << endl;
           arg.clear();
           return -1;
         }
@@ -626,7 +698,7 @@ int main(int argc, char *argv[])
           oldtemp = msr2dataHandler.GetPresentRun();
 
           if (!success) {
-            cout << endl << ">> msr2data: **ERROR** Input file generation has not been successful! Quitting..." << endl;
+            cerr << endl << ">> msr2data: **ERROR** Input file generation has not been successful! Quitting..." << endl;
             arg.clear();
             return -1;
           }
