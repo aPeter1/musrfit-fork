@@ -490,7 +490,7 @@ if test "${BUILD_BMW_LIBS}" = "1"; then
   SAVED_CXXFLAGS="$CXXFLAGS"
   CXXFLAGS="$CXXFLAGS -fopenmp"
   SAVED_LIBSS="$LIBS"
-  LIBS="$LIBS -fopenmp"
+  LIBS="$LIBS -fopenmp -lgomp"
   AC_SEARCH_LIBS([omp_get_num_procs], [gomp], [AC_DEFINE([HAVE_GOMP], [1], [Define to 1 if gomp is available])],
                                       [CXXFLAGS="$SAVED_CXXFLAGS" LIBS="$SAVED_LIBS"], [])
 fi
