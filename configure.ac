@@ -145,7 +145,16 @@ AC_SUBST(CUBA_VERSION)
 
 VERSION=$MUSR_VERSION
 
+# Wordaround for gcc-bugs causing problems building libCuba
+# which should be change when a real solution appears
+# Set CFLAGS to "" and pass any user-CFLAGS to the mud-building
+# user-CFLAGS will not be passed to the libCuba building process
+# mud and cuba are currently the only C-routines
 USER_CFLAGS="$CFLAGS"
+CFLAGS=
+if test "$USER_CFLAGS" == ""; then
+  USER_CFLAGS="-g -O2"
+fi
 
 dnl -----------------------------------------------
 dnl Automake initialization and program checks
@@ -376,15 +385,15 @@ AC_ARG_ENABLE([BMWlibs], [AC_HELP_STRING([--enable-BMWlibs],[build optional BMW 
     if test "${BUILD_CUBA}" = "1"; then
       AS_IF([test "x$GCC" = "xyes"],
         [case "$($CC --version 2>&1 < /dev/null)" in
-          gcc*4.2* | gcc*4.4.3*)
+          *gcc*4.2* | *gcc*4.4.3*)
             opt=-O0
             ;;
           *)
             opt=-O3
             ;;
         esac
-        CUBA_BUILD_CFLAGS=${USER_CFLAGS:-$opt -fomit-frame-pointer -ffast-math}],
-        [CUBA_BUILD_CFLAGS=${USER_CFLAGS:--O}])
+        CUBA_BUILD_CFLAGS="$opt -fomit-frame-pointer -ffast-math"],
+        [CUBA_BUILD_CFLAGS="-O"])
 
       AC_LANG_PUSH([C])
 
@@ -523,7 +532,7 @@ esac
 LOCAL_BIN_CXXFLAGS="${CPUFLAGS} -Wall -Wno-trigraphs"
 LOCAL_LIB_CXXFLAGS="${LOCAL_BIN_CXXFLAGS}"
 LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS}"
-LOCAL_MUD_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS}"
+LOCAL_MUD_LIB_CFLAGS="${LOCAL_LIB_CXXFLAGS} ${USER_CFLAGS}"
 LOCAL_CUBA_LIB_CFLAGS="${LOCAL_LIB_CXXFLAGS} ${CUBA_BUILD_CFLAGS}"
 LOCAL_BIN_LDFLAGS=
 LOCAL_LIB_LDFLAGS=
@@ -534,7 +543,7 @@ case "$host" in
     LOCAL_BIN_CXXFLAGS="${LOCAL_BIN_CXXFLAGS}"
     LOCAL_LIB_CXXFLAGS="${LOCAL_BIN_CXXFLAGS} -D_DLL"
     LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS} -D_WIN32GCC"
-    LOCAL_MUD_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS}"
+    LOCAL_MUD_LIB_CFLAGS="${LOCAL_LIB_CXXFLAGS} ${USER_CFLAGS}"
     LOCAL_CUBA_LIB_CFLAGS="${LOCAL_LIB_CXXFLAGS} ${CUBA_BUILD_CFLAGS}"
     LOCAL_BIN_LDFLAGS="${LOCAL_BIN_LDFLAGS} -Wl,--enable-auto-import -Wl,--enable-runtime-pseudo-reloc"
     LOCAL_LIB_LDFLAGS="-no-undefined ${LOCAL_BIN_LDFLAGS} -Wl,--export-all-symbols"
@@ -553,7 +562,7 @@ esac
 AC_SUBST(LOCAL_BIN_CXXFLAGS)
 AC_SUBST(LOCAL_LIB_CXXFLAGS)
 AC_SUBST(LOCAL_PSIBIN_LIB_CXXFLAGS)
-AC_SUBST(LOCAL_MUD_LIB_CXXFLAGS)
+AC_SUBST(LOCAL_MUD_LIB_CFLAGS)
 AC_SUBST(LOCAL_CUBA_LIB_CFLAGS)
 AC_SUBST(LOCAL_BIN_LDFLAGS)
 AC_SUBST(LOCAL_LIB_LDFLAGS)
