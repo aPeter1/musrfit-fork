@@ -128,7 +128,7 @@ class TDWaveGapIntegralCuhre {
     TDWaveGapIntegralCuhre() : fNDim(2) {}
     ~TDWaveGapIntegralCuhre() { fPar.clear(); }
     void SetParameters(const std::vector<double> &par) { fPar=par; }
-    static void Integrand(const int*, const double[], const int*, double[]);
+    static int Integrand(const int*, const double[], const int*, double[], void*);
     double IntegrateFunc();
 
   protected:
@@ -142,7 +142,7 @@ class TCosSqDWaveGapIntegralCuhre {
     TCosSqDWaveGapIntegralCuhre() : fNDim(2) {}
     ~TCosSqDWaveGapIntegralCuhre() { fPar.clear(); }
     void SetParameters(const std::vector<double> &par) { fPar=par; }
-    static void Integrand(const int*, const double[], const int*, double[]);
+    static int Integrand(const int*, const double[], const int*, double[], void*);
     double IntegrateFunc();
 
   protected:
@@ -156,7 +156,7 @@ class TSinSqDWaveGapIntegralCuhre {
     TSinSqDWaveGapIntegralCuhre() : fNDim(2) {}
     ~TSinSqDWaveGapIntegralCuhre() { fPar.clear(); }
     void SetParameters(const std::vector<double> &par) { fPar=par; }
-    static void Integrand(const int*, const double[], const int*, double[]);
+    static int Integrand(const int*, const double[], const int*, double[], void*);
     double IntegrateFunc();
 
   protected:
@@ -170,7 +170,7 @@ class TAnSWaveGapIntegralCuhre {
     TAnSWaveGapIntegralCuhre() : fNDim(2) {}
     ~TAnSWaveGapIntegralCuhre() { fPar.clear(); }
     void SetParameters(const std::vector<double> &par) { fPar=par; }
-    static void Integrand(const int*, const double[], const int*, double[]);
+    static int Integrand(const int*, const double[], const int*, double[], void*);
     double IntegrateFunc();
 
   protected:
@@ -184,7 +184,7 @@ class TAnSWaveGapIntegralDivonne {
     TAnSWaveGapIntegralDivonne() : fNDim(2) {}
     ~TAnSWaveGapIntegralDivonne() { fPar.clear(); }
     void SetParameters(const std::vector<double> &par) { fPar=par; }
-    static void Integrand(const int*, const double[], const int*, double[]);
+    static int Integrand(const int*, const double[], const int*, double[], void*);
     double IntegrateFunc();
 
   protected:
@@ -198,7 +198,7 @@ class TAnSWaveGapIntegralSuave {
     TAnSWaveGapIntegralSuave() : fNDim(2) {}
     ~TAnSWaveGapIntegralSuave() { fPar.clear(); }
     void SetParameters(const std::vector<double> &par) { fPar=par; }
-    static void Integrand(const int*, const double[], const int*, double[]);
+    static int Integrand(const int*, const double[], const int*, double[], void*);
     double IntegrateFunc();
 
   protected:
@@ -212,7 +212,7 @@ class TNonMonDWave1GapIntegralCuhre {
     TNonMonDWave1GapIntegralCuhre() : fNDim(2) {}
     ~TNonMonDWave1GapIntegralCuhre() { fPar.clear(); }
     void SetParameters(const std::vector<double> &par) { fPar=par; }
-    static void Integrand(const int*, const double[], const int*, double[]);
+    static int Integrand(const int*, const double[], const int*, double[], void*);
     double IntegrateFunc();
 
   protected:
@@ -226,7 +226,7 @@ class TNonMonDWave2GapIntegralCuhre {
     TNonMonDWave2GapIntegralCuhre() : fNDim(2) {}
     ~TNonMonDWave2GapIntegralCuhre() { fPar.clear(); }
     void SetParameters(const std::vector<double> &par) { fPar=par; }
-    static void Integrand(const int*, const double[], const int*, double[]);
+    static int Integrand(const int*, const double[], const int*, double[], void*);
     double IntegrateFunc();
 
   protected:

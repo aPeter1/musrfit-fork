@@ -1,17 +1,21 @@
 #---------------------------------------------------------------------
 # INSTALL
-# Andreas Suter, 2009/06/21
+# BMW, 2011/01/27
 # $Id: INSTALL 4013 2009-06-21
 #---------------------------------------------------------------------
 
 To get it all build:
 
-   ./autogen.sh
+   sh autogen.sh
    ./configure --prefix=/apps/cern/root      (or whereever musrfit should be installed)
    make
    make install                              (as superuser -- maybe)
    
 In the optimal case, everything is set up ;-)
+
+More information about the software requirements and the installation can be found at:
+https://intranet.psi.ch/MUSR/MusrFitSetup
+http://lmu.web.psi.ch/facilities/software/musrfit/user/intranet.psi.ch/MUSR/MusrFitSetup.html
 
 #---------------------------------------------------------------------
 # this is the end ...

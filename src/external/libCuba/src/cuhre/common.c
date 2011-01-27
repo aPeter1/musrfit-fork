@@ -2,11 +2,11 @@
 	common.c
 		includes most of the modules
 		this file is part of Cuhre
-		last modified 14 Feb 05 th
+		last modified 7 Jun 10 th
 */
 
 /***************************************************************************
- *   Copyright (C) 2004-2009 by Thomas Hahn                                *
+ *   Copyright (C) 2004-2010 by Thomas Hahn                                *
  *   hahn@feynarts.de                                                      *
  *                                                                         *
  *   This library is free software; you can redistribute it and/or         *
@@ -25,25 +25,21 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA          *
  ***************************************************************************/
 
+
 #include "ChiSquare.c"
 #include "Rule.c"
+
+static inline bool BadDimension(cThis *t)
+{
+  if( t->ndim > NDIM ) return true;
+  return t->ndim < 2;
+}
+
+static inline bool BadComponent(cThis *t)
+{
+  if( t->ncomp > NCOMP ) return true;
+  return t->ncomp < 1;
+}
+
 #include "Integrate.c"
-
-
-static inline bool BadDimension(ccount ndim)
-{
-#if NDIM > 0
-  if( ndim > NDIM ) return true;
-#endif
-  return ndim < 2;
-}
-
-
-static inline bool BadComponent(cint ncomp)
-{
-#if NCOMP > 0
-  if( ncomp > NCOMP ) return true;
-#endif
-  return ncomp < 1;
-}
 

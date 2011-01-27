@@ -1,11 +1,11 @@
 /*
 	stddecl.h
 		Type declarations common to all Cuba routines
-		last modified 29 May 09 th
+		last modified 16 Jun 10 th
 */
 
 /***************************************************************************
- *   Copyright (C) 2004-2009 by Thomas Hahn                                *
+ *   Copyright (C) 2004-2010 by Thomas Hahn                                *
  *   hahn@feynarts.de                                                      *
  *                                                                         *
  *   This library is free software; you can redistribute it and/or         *
@@ -24,6 +24,7 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA          *
  ***************************************************************************/
 
+
 #ifndef __stddecl_h__
 #define __stddecl_h__
 
@@ -39,45 +40,47 @@
 #include <limits.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <setjmp.h>
 #include <sys/stat.h>
 
 
 #ifndef NDIM
-#define NDIM ndim_
+#define NDIM t->ndim
 #endif
 #ifndef NCOMP
-#define NCOMP ncomp_
+#define NCOMP t->ncomp
 #endif
 
 
-#define VERBOSE (flags & 3)
-#define LAST (flags & 4)
-#define PSEUDORNG (flags & 8)
-#define SHARPEDGES (flags & 16)
-#define REGIONS (flags & 256)
+#define VERBOSE (t->flags & 3)
+#define LAST (t->flags & 4)
+#define SHARPEDGES (t->flags & 8)
+#define REGIONS (t->flags & 128)
+#define RNG (t->flags >> 8)
 
 #define INFTY DBL_MAX
 
 #define NOTZERO 0x1p-104
 
+#define ABORT -999
 
 #define Elements(x) (sizeof(x)/sizeof(*x))
 
 #define Copy(d, s, n) memcpy(d, s, (n)*sizeof(*(d)))
 
-#define VecCopy(d, s) Copy(d, s, ndim_)
+#define VecCopy(d, s) Copy(d, s, t->ndim)
 
-#define ResCopy(d, s) Copy(d, s, ncomp_)
+#define ResCopy(d, s) Copy(d, s, t->ncomp)
 
 #define Clear(d, n) memset(d, 0, (n)*sizeof(*(d)))
 
-#define VecClear(d) Clear(d, ndim_)
+#define VecClear(d) Clear(d, t->ndim)
 
-#define ResClear(d) Clear(d, ncomp_)
+#define ResClear(d) Clear(d, t->ncomp)
 
 #define Zap(d) memset(d, 0, sizeof(d))
 
-#define MaxErr(avg) Max(epsrel*fabs(avg), epsabs)
+#define MaxErr(avg) Max(t->epsrel*fabs(avg), t->epsabs)
 
 #ifdef __cplusplus
 #define mallocset(p, n) (*(void **)&p = malloc(n))
@@ -103,6 +106,8 @@
 #define Extern extern
 typedef enum { false, true } bool;
 #endif
+
+typedef const char cchar;
 
 typedef const bool cbool;
 
@@ -140,6 +145,40 @@ typedef /*long*/ double real;
 typedef const real creal;
 
 
+struct _this;
+
+typedef unsigned int state_t;
+
+#define SOBOL_MINDIM 1
+#define SOBOL_MAXDIM 40
+
+/* length of state vector */
+#define MERSENNE_N 624
+
+/* period parameter */
+#define MERSENNE_M 397
+
+typedef struct {
+  void (*getrandom)(struct _this *t, real *x);
+  void (*skiprandom)(struct _this *t, cnumber n);
+  union {
+    struct {
+      real norm;
+      number v[SOBOL_MAXDIM][30], prev[SOBOL_MAXDIM];
+      number seq;
+    } sobol;
+    struct {
+      state_t state[MERSENNE_N];
+      count next;
+    } mersenne;
+    struct {
+      count n24, i24, j24, nskip;
+      int carry, state[24];
+    } ranlux;
+  };
+} RNGState;
+
+
 #ifdef UNDERSCORE
 #define SUFFIX(s) s##_
 #else
@@ -174,6 +213,9 @@ static inline real Weight(creal sum, creal sqsum, cnumber n)
 
 /* (a < 0) ? -1 : 0 */
 #define NegQ(a) ((a) >> (sizeof(a)*8 - 1))
+
+/* (a < 0) ? -1 : 1 */
+#define Sign(a) (1 + 2*NegQ(a))
 
 /* (a < 0) ? 0 : a */
 #define IDim(a) ((a) & NegQ(-(a)))

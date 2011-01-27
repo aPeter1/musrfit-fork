@@ -29,9 +29,12 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-# include "BMWIntegrator.h"
+#include "BMWIntegrator.h"
 
-# include "cuba.h"
+#include "cuba.h"
+
+#define USERDATA NULL
+#define SEED 0
 
 std::vector<double> TDWaveGapIntegralCuhre::fPar;
 
@@ -50,7 +53,7 @@ double TDWaveGapIntegralCuhre::IntegrateFunc()
   int nregions, neval, fail;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
 
-  Cuhre(fNDim, NCOMP, Integrand,
+  Cuhre(fNDim, NCOMP, Integrand, USERDATA,
     EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
     KEY,
     &nregions, &neval, &fail, integral, error, prob);
@@ -58,12 +61,12 @@ double TDWaveGapIntegralCuhre::IntegrateFunc()
   return integral[0];
 }
 
-void TDWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
-                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {twokBT, Delta(T), Ec, phic}
+int TDWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
+                      const int *ncomp, double f[], void *userdata) // x = {E, phi}, fPar = {twokBT, Delta(T), Ec, phic}
 {
   double deltasq(TMath::Power(fPar[1]*TMath::Cos(2.0*x[1]*fPar[3]),2.0));
   f[0] = 1.0/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[2]*fPar[2]+deltasq)/fPar[0]),2.0);
-  return;
+  return 0;
 }
 
 std::vector<double> TCosSqDWaveGapIntegralCuhre::fPar;
@@ -83,7 +86,7 @@ double TCosSqDWaveGapIntegralCuhre::IntegrateFunc()
   int nregions, neval, fail;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
 
-  Cuhre(fNDim, NCOMP, Integrand,
+  Cuhre(fNDim, NCOMP, Integrand, USERDATA,
     EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
     KEY,
     &nregions, &neval, &fail, integral, error, prob);
@@ -91,12 +94,12 @@ double TCosSqDWaveGapIntegralCuhre::IntegrateFunc()
   return integral[0];
 }
 
-void TCosSqDWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
-                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {twokBT, DeltaD(T), Ec, phic, DeltaS(T)}
+int TCosSqDWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
+                      const int *ncomp, double f[], void *userdata) // x = {E, phi}, fPar = {twokBT, DeltaD(T), Ec, phic, DeltaS(T)}
 {
   double deltasq(TMath::Power(fPar[1]*TMath::Cos(2.0*x[1]*fPar[3]) + fPar[4], 2.0));
   f[0] = TMath::Power(TMath::Cos(x[1]*fPar[3])/TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[2]*fPar[2]+deltasq)/fPar[0]),2.0);
-  return;
+  return 0;
 }
 
 std::vector<double> TSinSqDWaveGapIntegralCuhre::fPar;
@@ -116,7 +119,7 @@ double TSinSqDWaveGapIntegralCuhre::IntegrateFunc()
   int nregions, neval, fail;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
 
-  Cuhre(fNDim, NCOMP, Integrand,
+  Cuhre(fNDim, NCOMP, Integrand, USERDATA,
     EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
     KEY,
     &nregions, &neval, &fail, integral, error, prob);
@@ -124,12 +127,12 @@ double TSinSqDWaveGapIntegralCuhre::IntegrateFunc()
   return integral[0];
 }
 
-void TSinSqDWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
-                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {twokBT, DeltaD(T), Ec, phic, DeltaS(T)}
+int TSinSqDWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
+                      const int *ncomp, double f[], void *userdata) // x = {E, phi}, fPar = {twokBT, DeltaD(T), Ec, phic, DeltaS(T)}
 {
   double deltasq(TMath::Power(fPar[1]*TMath::Cos(2.0*x[1]*fPar[3]) + fPar[4],2.0));
   f[0] = TMath::Power(TMath::Sin(x[1]*fPar[3]),2.0)/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[2]*fPar[2]+deltasq)/fPar[0]),2.0);
-  return;
+  return 0;
 }
 
 
@@ -150,7 +153,7 @@ double TAnSWaveGapIntegralCuhre::IntegrateFunc()
   int nregions, neval, fail;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
 
-  Cuhre(fNDim, NCOMP, Integrand,
+  Cuhre(fNDim, NCOMP, Integrand, USERDATA,
     EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
     KEY,
     &nregions, &neval, &fail, integral, error, prob);
@@ -158,12 +161,12 @@ double TAnSWaveGapIntegralCuhre::IntegrateFunc()
   return integral[0];
 }
 
-void TAnSWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
-                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {twokBT, Delta(T),a, Ec, phic}
+int TAnSWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
+                      const int *ncomp, double f[], void *userdata) // x = {E, phi}, fPar = {twokBT, Delta(T),a, Ec, phic}
 {
   double deltasq(TMath::Power(fPar[1]*(1.0+fPar[2]*TMath::Cos(4.0*x[1]*fPar[4])),2.0));
   f[0] = 1.0/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[3]*fPar[3]+deltasq)/fPar[0]),2.0);
-  return;
+  return 0;
 }
 
 std::vector<double> TAnSWaveGapIntegralDivonne::fPar;
@@ -190,8 +193,8 @@ double TAnSWaveGapIntegralDivonne::IntegrateFunc()
   int nregions, neval, fail;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
 
-  Divonne(fNDim, NCOMP, Integrand,
-    EPSREL, EPSABS, VERBOSE, MINEVAL, MAXEVAL,
+  Divonne(fNDim, NCOMP, Integrand, USERDATA,
+    EPSREL, EPSABS, VERBOSE, SEED, MINEVAL, MAXEVAL,
     KEY1, KEY2, KEY3, MAXPASS, BORDER, MAXCHISQ, MINDEVIATION,
     NGIVEN, LDXGIVEN, NULL, NEXTRA, NULL,
     &nregions, &neval, &fail, integral, error, prob);
@@ -199,12 +202,12 @@ double TAnSWaveGapIntegralDivonne::IntegrateFunc()
   return integral[0];
 }
 
-void TAnSWaveGapIntegralDivonne::Integrand(const int *ndim, const double x[],
-                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {twokBT, Delta(T),a, Ec, phic}
+int TAnSWaveGapIntegralDivonne::Integrand(const int *ndim, const double x[],
+                      const int *ncomp, double f[], void *userdata) // x = {E, phi}, fPar = {twokBT, Delta(T),a, Ec, phic}
 {
   double deltasq(TMath::Power(fPar[1]*(1.0+fPar[2]*TMath::Cos(4.0*x[1]*fPar[4])),2.0));
   f[0] = 1.0/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[3]*fPar[3]+deltasq)/fPar[0]),2.0);
-  return;
+  return 0;
 }
 
 std::vector<double> TAnSWaveGapIntegralSuave::fPar;
@@ -225,20 +228,20 @@ double TAnSWaveGapIntegralSuave::IntegrateFunc()
   int nregions, neval, fail;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
 
-  Suave(fNDim, NCOMP, Integrand,
-    EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
+  Suave(fNDim, NCOMP, Integrand, USERDATA,
+    EPSREL, EPSABS, VERBOSE | LAST, SEED, MINEVAL, MAXEVAL,
     NNEW, FLATNESS,
     &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];
 }
 
-void TAnSWaveGapIntegralSuave::Integrand(const int *ndim, const double x[],
-                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {twokBT, Delta(T),a, Ec, phic}
+int TAnSWaveGapIntegralSuave::Integrand(const int *ndim, const double x[],
+                      const int *ncomp, double f[], void *userdata) // x = {E, phi}, fPar = {twokBT, Delta(T),a, Ec, phic}
 {
   double deltasq(TMath::Power(fPar[1]*(1.0+fPar[2]*TMath::Cos(4.0*x[1]*fPar[4])),2.0));
   f[0] = 1.0/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[3]*fPar[3]+deltasq)/fPar[0]),2.0);
-  return;
+  return 0;
 }
 
 std::vector<double> TNonMonDWave1GapIntegralCuhre::fPar;
@@ -258,7 +261,7 @@ double TNonMonDWave1GapIntegralCuhre::IntegrateFunc()
   int nregions, neval, fail;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
 
-  Cuhre(fNDim, NCOMP, Integrand,
+  Cuhre(fNDim, NCOMP, Integrand, USERDATA,
     EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
     KEY,
     &nregions, &neval, &fail, integral, error, prob);
@@ -266,12 +269,12 @@ double TNonMonDWave1GapIntegralCuhre::IntegrateFunc()
   return integral[0];
 }
 
-void TNonMonDWave1GapIntegralCuhre::Integrand(const int *ndim, const double x[],
-                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {twokBT, Delta(T),a, Ec, phic}
+int TNonMonDWave1GapIntegralCuhre::Integrand(const int *ndim, const double x[],
+                      const int *ncomp, double f[], void *userdata) // x = {E, phi}, fPar = {twokBT, Delta(T),a, Ec, phic}
 {
   double deltasq(TMath::Power(fPar[1]*(fPar[2]*TMath::Cos(2.0*x[1]*fPar[4])+(1.0-fPar[2])*TMath::Cos(6.0*x[1]*fPar[4])),2.0));
   f[0] = 1.0/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[3]*fPar[3]+deltasq)/fPar[0]),2.0);
-  return;
+  return 0;
 }
 
 std::vector<double> TNonMonDWave2GapIntegralCuhre::fPar;
@@ -291,7 +294,7 @@ double TNonMonDWave2GapIntegralCuhre::IntegrateFunc()
   int nregions, neval, fail;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
 
-  Cuhre(fNDim, NCOMP, Integrand,
+  Cuhre(fNDim, NCOMP, Integrand, USERDATA,
     EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
     KEY,
     &nregions, &neval, &fail, integral, error, prob);
@@ -299,11 +302,11 @@ double TNonMonDWave2GapIntegralCuhre::IntegrateFunc()
   return integral[0];
 }
 
-void TNonMonDWave2GapIntegralCuhre::Integrand(const int *ndim, const double x[],
-                      const int *ncomp, double f[]) // x = {E, phi}, fPar = {twokBT, Delta(T),a, Ec, phic}
+int TNonMonDWave2GapIntegralCuhre::Integrand(const int *ndim, const double x[],
+                      const int *ncomp, double f[], void *userdata) // x = {E, phi}, fPar = {twokBT, Delta(T),a, Ec, phic}
 {
   double deltasq(4.0*fPar[2]/27.0*TMath::Power(fPar[1]*TMath::Cos(2.0*x[1]*fPar[4]), 2.0) \
     / TMath::Power(1.0 + fPar[2]*TMath::Cos(2.0*x[1]*fPar[4])*TMath::Cos(2.0*x[1]*fPar[4]), 3.0));
   f[0] = 1.0/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[3]*fPar[3]+deltasq)/fPar[0]),2.0);
-  return;
+  return 0;
 }

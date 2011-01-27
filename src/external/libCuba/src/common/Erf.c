@@ -8,7 +8,7 @@
 */
 
 /***************************************************************************
- *   Copyright (C) 2004-2009 by Thomas Hahn                                *
+ *   Copyright (C) 2004-2010 by Thomas Hahn                                *
  *   hahn@feynarts.de                                                      *
  *                                                                         *
  *   This library is free software; you can redistribute it and/or         *
@@ -26,6 +26,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA          *
  ***************************************************************************/
+
 
 static real Erfc(creal x)
 {

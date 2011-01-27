@@ -2,11 +2,11 @@
 	common.c
 		includes most of the modules
 		this file is part of Suave
-		last modified 14 Feb 05 th
+		last modified 2 Jun 10 th
 */
 
 /***************************************************************************
- *   Copyright (C) 2004-2009 by Thomas Hahn                                *
+ *   Copyright (C) 2004-2010 by Thomas Hahn                                *
  *   hahn@feynarts.de                                                      *
  *                                                                         *
  *   This library is free software; you can redistribute it and/or         *
@@ -25,28 +25,29 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA          *
  ***************************************************************************/
 
+
+#define RegionAlloc(p, n, nnew) MemAlloc(p, \
+  sizeof(Region) + \
+  (n)*(t->ndim + t->ncomp + 1)*sizeof(real) + \
+  (nnew)*t->ndim*sizeof(bin_t))
+
+static inline bool BadDimension(cThis *t)
+{
+  if( t->ndim > NDIM ) return true;
+  return t->ndim < SOBOL_MINDIM ||
+    (t->seed == 0 && t->ndim > SOBOL_MAXDIM);
+}
+
+static inline bool BadComponent(cThis *t)
+{
+  if( t->ncomp > NCOMP ) return true;
+  return t->ncomp < 1;
+}
+
 #include "Random.c"
 #include "ChiSquare.c"
 #include "Grid.c"
 #include "Sample.c"
 #include "Fluct.c"
 #include "Integrate.c"
-
-
-static inline bool BadDimension(cint ndim, cint flags)
-{
-#if NDIM > 0
-  if( ndim > NDIM ) return true;
-#endif
-  return ndim < SOBOL_MINDIM || (!PSEUDORNG && ndim > SOBOL_MAXDIM);
-}
-
-
-static inline bool BadComponent(cint ncomp)
-{
-#if NCOMP > 0
-  if( ncomp > NCOMP ) return true;
-#endif
-  return ncomp < 1;
-}
 

@@ -1,23 +1,10 @@
 #---------------------------------------------------------------------
 # NEWS
-# Andreas Suter, 2010/06/15
+# BMW, 2011/01/27
 # $Id: NEWS 4013 2009-06-21
 #---------------------------------------------------------------------
 
-musrfit 0.6.0
-+ Added grouping of histograms
-+ Added global mode to msr2data
-+
-+
-+
-+
-
-
-musrfit 0.5.0
-
-+ Initial release supporting building by autotools
-  on Linux, MS Windows (Cygwin), Mac OS X
-
+Please check the ChangeLog to see what is new!
 
 #---------------------------------------------------------------------
 # this is the end ...

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2004-2009 by Thomas Hahn                                *
+ *   Copyright (C) 2004-2010 by Thomas Hahn                                *
  *   hahn@feynarts.de                                                      *
  *                                                                         *
  *   This library is free software; you can redistribute it and/or         *

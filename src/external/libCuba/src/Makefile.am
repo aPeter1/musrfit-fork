@@ -13,7 +13,7 @@ INCLUDES = -I. -Icommon
 AM_CFLAGS = $(LOCAL_CUBA_LIB_CFLAGS)
 
 AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS)
-CLEANFILES = *~ core
+CLEANFILES = common/*~ cuhre/*~ divonne/*~ suave/*~ vegas/*~ *~ core
 
 lib_LTLIBRARIES = libcuba.la
 
