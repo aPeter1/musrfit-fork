@@ -75,7 +75,7 @@ void writeValues(ofstream &outFile, const double &value, const unsigned int &wid
  *
  * \param ext extension/suffix of the msr-files to be processed
  */
-PMsr2Data::PMsr2Data(const string &ext) : fFileExtension(ext), fRunListFile(false), fNumGlobalParam(0), fNumSpecParam(0), fNumTempRunBlocks(0), fRunNumberDigits(4)
+PMsr2Data::PMsr2Data(const string &ext) : fFileExtension(ext), fRunListFile(false), fNumGlobalParam(0), fNumSpecParam(0), fNumTempRunBlocks(0), fRunNumberDigits(4), fHeaderWritten(false)
 {
   fRunVector.clear();
   fRunVectorIter = fRunVector.end();
@@ -122,6 +122,8 @@ PMsr2Data::~PMsr2Data()
 //-------------------------------------------------------------
 /**
  * <p> Determines the number of digits used for the run number in the data file name from the first msr-file that is processed
+ *     If the specified run number is the first one of the list of runs and it cannot be opened, then the rest of the given runs is checked
+ *     until an existing msr-file is found
  *
  * <p><b>return:</b>
  * - 0 if the number has been determined and set successfully
@@ -129,7 +131,7 @@ PMsr2Data::~PMsr2Data()
  * - -2 if the msr-file-number does not match the data-file-number
  * - -3 if the msr-file does not contain a RUN block
  *
- *  \param runNo run number of an existing msr-file
+ *  \param runNo run number of an msr-file
  *  \param normalMode false for global mode
  *
  */
@@ -139,6 +141,7 @@ int PMsr2Data::DetermineRunNumberDigits(unsigned int runNo, bool normalMode) con
   strInfile << runNo << fFileExtension << ".msr";
   ifstream *in = new ifstream(strInfile.str().c_str());
   if (!in->is_open()) {
+    delete in;
     if (!normalMode && (runNo == *fRunVectorIter)) {
       string fileNameCopy(strInfile.str());
       strInfile.clear();
@@ -146,12 +149,21 @@ int PMsr2Data::DetermineRunNumberDigits(unsigned int runNo, bool normalMode) con
       strInfile << runNo << "+global" << fFileExtension << ".msr";
       in = new ifstream(strInfile.str().c_str());
       if (!in->is_open()) {
-        cerr << endl << ">> msr2data: **ERROR** Neither the file " << fileNameCopy << " nor the file " << strInfile.str() << " cannot be opened! Please check!";
+        cerr << endl << ">> msr2data: **ERROR** Neither the file " << fileNameCopy << " nor the file " << strInfile.str() << " can be opened! Please check!";
+        cerr << endl;
+        delete in;
+        return -1;
+      }
+    } else if (runNo == *fRunVectorIter) { // the first run of the runlist was given - if it did not exist, try the rest of the runlist
+      if (++fRunVectorIter != fRunVector.end()) {
+        return DetermineRunNumberDigits(*fRunVectorIter, true);
+      } else {
+        cerr << endl << ">> msr2data: **ERROR** None of the given msr-files can be opened! Please check!";
         cerr << endl;
         return -1;
       }
     } else {
-      cerr << endl << ">> msr2data: **ERROR** The file " << strInfile.str() << " cannot be opened! Please check!";
+      cerr << endl << ">> msr2data: **ERROR** The given template " << strInfile.str() << " cannot be opened! Please check!";
       cerr << endl;
       return -1;
     }
@@ -182,7 +194,7 @@ int PMsr2Data::DetermineRunNumberDigits(unsigned int runNo, bool normalMode) con
              in->close();
              delete in;
              in = 0;
-             //cout << endl << "Number of digits: " << fRunNumberDigits << endl;
+             fRunVectorIter = fRunVector.begin(); // set back the runlist-iterator which might have changed during the search for the correct file
              return 0;
            }
          }
@@ -190,7 +202,7 @@ int PMsr2Data::DetermineRunNumberDigits(unsigned int runNo, bool normalMode) con
          cerr << endl << ">> msr2data: **ERROR** The first processed run file number does not match the \"file index\"!";
          cerr << endl << ">> msr2data: **ERROR** The number of digits to be used for formatting the run numbers cannot be determined!";
          cerr << endl << ">> msr2data: **ERROR** Please check the first msr-file that should be processed;";
-         cerr << endl << ">> msr2data: **ERROR** this is either some template or the first file from the run list.";
+         cerr << endl << ">> msr2data: **ERROR** this is either some template or the first existing file from the run list.";
          cerr << endl;
          in->close();
          delete in;
@@ -1654,7 +1666,7 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
   PMsrParamList *msrParamList(fMsrHandler->GetMsrParamList());
   PMsrRunList *msrRunList(fMsrHandler->GetMsrRunList());
 
-  if (global && fRunVectorIter == fRunVector.begin()) {
+  if (global && (fRunVectorIter == fRunVector.begin())) {
     // since the DB-ASCII-output is in principle independent of the original msr-file-generation
     // the number of global and run specific parameters as well as the number of RUN blocks per run number have to be determined again
     // in case no msr-file has been created before.
@@ -1826,7 +1838,7 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
     value = rawRunData->GetField();
     if (value != PMUSR_UNDEFINED) {
       dataParamNames.push_back("dataB");
-      dataParamLabels.push_back("mu0 H (G)");
+      dataParamLabels.push_back("B (G)");
       dataParam.push_back(value);
     }
 
@@ -1939,7 +1951,7 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
 
   if (db) {
 
-    if (withHeader && (fRunVectorIter == fRunVector.begin())) {
+    if (withHeader && !fHeaderWritten) {
       outFile << "TITLE" << endl;
       outFile << ">>>Put your title here<<<" << endl << endl;
       outFile << "Abstract" << endl;
@@ -2047,6 +2059,8 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
       outFile << " " << "RUN" << endl;
 
       outFile << "\\-e" << endl;
+
+      fHeaderWritten = true;
     }
 
     if (fDataHandler) {
@@ -2163,7 +2177,7 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
     else
       maxlength += 1; // maximum length of parameter names + ' '
 
-    if (withHeader && (fRunVectorIter == fRunVector.begin())) {
+    if (withHeader && !fHeaderWritten) {
 
       if (fDataHandler) {
         for (unsigned int i(0); i < dataParamNames.size(); ++i) {
@@ -2226,6 +2240,8 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
         outFile << setw(maxlength) << left << "maxLHred";
 
       outFile << setw(maxlength) << left << "RUN" << endl;
+
+      fHeaderWritten = true;
     }
 
     if (fDataHandler) {
@@ -2302,8 +2318,6 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
 
   fRunVectorIter++;
 
-  if (fRunVectorIter == fRunVector.end())
-    outFile << endl << endl;
   outFile.close();
 
   if (!global || (fRunVectorIter == fRunVector.end())) {

@@ -93,6 +93,7 @@ class PMsr2Data
     mutable unsigned int fNumSpecParam;
     mutable unsigned int fNumTempRunBlocks;
     mutable unsigned int fRunNumberDigits;
+    mutable bool fHeaderWritten;
 };
 
 

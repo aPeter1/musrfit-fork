@@ -39,6 +39,7 @@
 #include <algorithm>
 #include <sstream>
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
 #include <limits>
 using namespace std;
@@ -48,6 +49,7 @@ using namespace std;
 using namespace boost::algorithm;
 
 #include <boost/lexical_cast.hpp> // for atoi-replacement
+// #include <boost/filesystem.hpp> // for a clean way to check if a file exists
 
 //--------------------------------------------------------------------------
 /**
@@ -680,9 +682,11 @@ int main(int argc, char *argv[])
     // Processing the run list, do the fitting and write the data to the DB or data output file
     bool firstrun(true);
     unsigned int oldtemp(0); // should be accessed only when updated before...
+    ostringstream strInfile;
 
     while (msr2dataHandler.GetPresentRun()) {
-      ostringstream strInfile;
+      strInfile.clear();
+      strInfile.str("");
       strInfile << msr2dataHandler.GetPresentRun() << msrExtension << ".msr";
 
       // if fitting should be done, prepare a new input file
@@ -728,8 +732,14 @@ int main(int argc, char *argv[])
       if (realOutput) {
         status = msr2dataHandler.ReadMsrFile(strInfile.str());
         if (status != PMUSR_SUCCESS) {
-          arg.clear();
-          return status;
+          // if the msr-file cannot be read, write no output but proceed to the next run
+          status = msr2dataHandler.WriteOutput("none", db, writeHeader);
+          if (status != PMUSR_SUCCESS) {
+            arg.clear();
+            return status;
+          } else {
+            continue;
+          }
         }
       }
 
@@ -743,6 +753,29 @@ int main(int argc, char *argv[])
         arg.clear();
         return status;
       }
+    }
+  }
+
+  // Make sure that the empty line at the end of the output file gets written
+  // This is needed to create a "valid db-file", however, we do it for all output files
+  // Unfortunately, this can be done in a coherent way only on that level
+  // Unfortunately, there are also problems with boost::filesystem::exists(outputFile)
+  // Therefore, first try to open the file for reading and if this works, write to it - not clean but it works
+  if(realOutput) {
+    ifstream fileOutputCheck(outputFile.c_str());
+    if (fileOutputCheck.is_open()) {
+      fileOutputCheck.close();
+      ofstream fileOutput(outputFile.c_str(), ios::app);
+      if (fileOutput.is_open()) {
+        fileOutput << endl << endl;
+        fileOutput.close();
+      } else {
+        cerr << endl << ">> msr2data: **ERROR** The output file " << outputFile << " cannot be opened! Please check!";
+        cerr << endl;
+      }
+    } else {
+      cerr << endl << ">> msr2data: **WARNING** No output has been written to the file " << outputFile << "!";
+      cerr << endl << ">> msr2data: **WARNING** Please check the range of runs and the specified options!" << endl;
     }
   }
 
