@@ -17,6 +17,7 @@ FIXED 2 little annoying problems: (i) now it is possible to zoom down to the sin
      (ii) when switching between data- and difference-view, the x-range doesn't change anymore.
 FIXED musrt0 crash for histogram number out of range (MUSR-157)
 FIXED fixes the inadequate attempt to use log max likelihood fit for asymmetry/non-muSR fit (MUSR-148)
+CHANGED the default behavior of msr2data for writing output-file headers (see svn-log 4758)
 CHANGED the behavior of msr2data when non-existing files are encountered---as far as possible they should be ignored now
 CHANGED less strict handling of empty FUNCTION block
 CHANGED cosmetics in the y-labelling (MUSR-154)

@@ -79,13 +79,13 @@ bool isNumber(const string &s)
  */
 void msr2data_syntax()
 {
-  cout << endl << "usage 1: msr2data <run> <extension> [-o<outputfile>] [data] [noheader] [nosummary] [global[+[!]]]";
+  cout << endl << "usage 1: msr2data <run> <extension> [-o<outputfile>] [data] [[no]header] [nosummary] [global[+[!]]]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
-  cout << endl << "usage 2: msr2data <run1> <run2> <extension> [-o<outputfile>] [data] [noheader] [nosummary] [global[+[!]]]";
+  cout << endl << "usage 2: msr2data <run1> <run2> <extension> [-o<outputfile>] [data] [[no]header] [nosummary] [global[+[!]]]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
-  cout << endl << "usage 3: msr2data \\[<run1> <run2> ... <runN>\\] <extension> [-o<outputfile> ] [data] [noheader] [nosummary] [global[+[!]]]";
+  cout << endl << "usage 3: msr2data \\[<run1> <run2> ... <runN>\\] <extension> [-o<outputfile> ] [data] [[no]header] [nosummary] [global[+[!]]]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
-  cout << endl << "usage 4: msr2data <runlist> <extension> [-o<outputfile>] [data] [noheader] [nosummary] [global[+[!]]]";
+  cout << endl << "usage 4: msr2data <runlist> <extension> [-o<outputfile>] [data] [[no]header] [nosummary] [global[+[!]]]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
   cout << endl;
   cout << endl << "       <run>, <run1>, <run2>, ... <runN> : run numbers";
@@ -93,7 +93,10 @@ void msr2data_syntax()
   cout << endl << "       -o<outputfile> : specify the name of the DB or column data output file; default: out.db/out.dat";
   cout << endl << "                        if the option '-o none' is used, no output file will be written.";
   cout << endl << "       data : instead of to a DB file the data are written to a simple column structure";
+  cout << endl << "       header : force writing of the file header to the output file";
   cout << endl << "       noheader : no file header is written to the output file";
+  cout << endl << "              If either none or both of the header options are given, the file header will be written";
+  cout << endl << "              if a new file is created, but not if the output file exists already!";
   cout << endl << "       nosummary : no additional data from the run data file is written to the output file";
   cout << endl << "       fit : invoke musrfit to fit the specified runs";
   cout << endl << "              All msr input files are assumed to be present, none is newly generated!";
@@ -139,7 +142,7 @@ string msr2data_validArguments(const vector<string> &arg)
   string word;
 
   for (vector<string>::const_iterator iter(arg.begin()); iter != arg.end(); ++iter) {
-    if ( (!iter->compare("noheader")) || (!iter->compare("nosummary")) \
+    if ( (!iter->compare("header")) || (!iter->compare("noheader")) || (!iter->compare("nosummary")) \
       || (!iter->substr(0,3).compare("fit")) || (!iter->compare("-k")) || (!iter->compare("-t")) \
       || (!iter->compare("data")) || (!iter->substr(0,4).compare("msr-")) || (!iter->compare("global")) \
       || (!iter->compare("global+")) || (!iter->compare("global+!")) )
@@ -186,7 +189,7 @@ string msr2data_outputfile(vector<string> &arg, bool db = true)
     iterNext = iter + 1;
     if (!iter->substr(0,2).compare("-o")) {
       if (!iter->compare("-o")) {
-        if ((iterNext != arg.end()) && (iterNext->compare("noheader")) && (iterNext->compare("nosummary")) \
+        if ((iterNext != arg.end()) && (iterNext->compare("header")) && (iterNext->compare("noheader")) && (iterNext->compare("nosummary")) \
             && (iterNext->substr(0,3).compare("fit")) && (iterNext->compare("-k")) && (iterNext->compare("-t")) \
             && (iterNext->compare("data")) && (iterNext->substr(0,3).compare("msr")) && (iterNext->compare("global")) \
             && (iterNext->compare("global+")) && (iterNext->compare("global+!"))) {
@@ -596,11 +599,23 @@ int main(int argc, char *argv[])
     return status;
   }
 
-  bool writeHeader(false), writeSummary(false);
+  bool writeSummary(false);
+  unsigned int writeHeader(2);
+  // writeHeader: 0 - no header
+  //              1 - write header explicitly (even if the file is present already)
+  //              2 - write header automatically if a new file is created and do not if the data is appended to an existing file
 
   if (realOutput) {
-    // check the arguments for the "noheader" option
-    writeHeader = msr2data_useOption(arg, "noheader");
+    // check the arguments for the "header" and "noheader" options
+    if (!msr2data_useOption(arg, "header")) {
+      if (!msr2data_useOption(arg, "noheader")) {
+        writeHeader = 2;
+      } else {
+        writeHeader = 1;
+      }
+    } else if (!msr2data_useOption(arg, "noheader")) {
+      writeHeader = 0;
+    }
 
     // check the arguments for the "nosummary" option
     writeSummary = msr2data_useOption(arg, "nosummary");

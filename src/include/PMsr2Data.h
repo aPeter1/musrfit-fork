@@ -73,7 +73,7 @@ class PMsr2Data
     bool PrepareNewInputFile(unsigned int, bool) const; // template
     bool PrepareGlobalInputFile(unsigned int, const string&, unsigned int) const; // generate msr-input file for a global fit
 
-    int WriteOutput(const string&, bool, bool, bool global = false, unsigned int counter = 0) const;
+    int WriteOutput(const string&, bool, unsigned int, bool global = false, unsigned int counter = 0) const;
 
   private:
     bool PrepareNewSortedInputFile(unsigned int) const; // template

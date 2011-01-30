@@ -59,7 +59,7 @@ using namespace boost::algorithm;
  * \param value number to be written to the ASCII file
  * \param width column width of the ASCII file
  */
-void writeValues(ofstream &outFile, const double &value, const unsigned int &width)
+void writeValues(fstream &outFile, const double &value, const unsigned int &width)
 {
   if (fabs(value) >= 1.0e6 || (fabs(value) < 1.0e-4 && fabs(value) > 0.0))
     outFile << scientific << setprecision(width - 8);
@@ -1647,7 +1647,7 @@ bool PMsr2Data::PrepareNewSortedInputFile(unsigned int tempRun) const
  * \param global global mode or not
  * \param counter counter used within the global mode to determine how many runs have been processed already
  */
-int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool global, unsigned int counter) const
+int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHeader, bool global, unsigned int counter) const
 {
   if (!to_lower_copy(outfile).compare("none")) {
     fRunVectorIter++;
@@ -1940,18 +1940,52 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
   }
 
 // open the DB or dat file and write the data
+  fstream outFile;
+  outFile.open(outfile.c_str(), ios::in | ios::out | ios::ate);
+  if (outFile.is_open()) {
+    if (((withHeader == 0) || (withHeader == 1)) && !fHeaderWritten) {
+      // Header should (not) be written explicitly, start writing at the end of the file
+      // This also ensures the backward compatibility to the old "noheader" option
+      outFile.seekp(0, ios::end);
+    } else {
+      if (!fHeaderWritten) { // File already present: assume header is present already and find the last written block
+        fHeaderWritten = true;
+      }
+      int size(outFile.tellg());
+      string s;
 
-  ofstream outFile(outfile.c_str(), ios::app);
-  if (!outFile) {
-    cerr << endl << ">> msr2data: **ERROR** The output file " << outfile << " cannot be opened! Please check!";
-    cerr << endl;
-    fRunVectorIter = fRunVector.end();
-    return -1;
+      for (int i(1); i<=size; ++i) { // find the last non-empty line -- this procedure at the moment probably breaks native Windows support
+        outFile.seekg(-i, ios::end);
+        getline(outFile, s);
+        if (s.empty()) {
+          if (i == size) {
+            outFile.seekp(0);
+            fHeaderWritten = false;  // if the file contained only empty lines, default to writing the header
+            break;
+          } else {
+            continue;
+          }
+        } else {
+          outFile.seekp(0, ios::cur);
+          break;
+        }
+      }
+    }
+  } else {
+    outFile.open(outfile.c_str(), ios::out);
+    if (!outFile.is_open()) {
+      cerr << endl << ">> msr2data: **ERROR** The output file " << outfile << " cannot be opened! Please check!";
+      cerr << endl;
+      fRunVectorIter = fRunVector.end();
+      return -1;
+    }
   }
 
   if (db) {
 
     if (withHeader && !fHeaderWritten) {
+      cout << endl << ">> msr2data: **INFO** Write a new DB file header to " << outfile << endl;
+
       outFile << "TITLE" << endl;
       outFile << ">>>Put your title here<<<" << endl << endl;
       outFile << "Abstract" << endl;
@@ -2178,6 +2212,7 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, bool withHeader, bool
       maxlength += 1; // maximum length of parameter names + ' '
 
     if (withHeader && !fHeaderWritten) {
+      cout << endl << ">> msr2data: **INFO** Write a new simple-ASCII file header to " << outfile << endl;
 
       if (fDataHandler) {
         for (unsigned int i(0); i < dataParamNames.size(); ++i) {
