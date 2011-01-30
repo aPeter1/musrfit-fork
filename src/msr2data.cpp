@@ -79,19 +79,20 @@ bool isNumber(const string &s)
  */
 void msr2data_syntax()
 {
-  cout << endl << "usage 1: msr2data <run> <extension> [-o<outputfile>] [data] [[no]header] [nosummary] [global[+[!]]]";
+  cout << endl << "usage 1: msr2data <run> <extension> [-o<outputfile>] [new] [data] [[no]header] [nosummary] [global[+[!]]]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
-  cout << endl << "usage 2: msr2data <run1> <run2> <extension> [-o<outputfile>] [data] [[no]header] [nosummary] [global[+[!]]]";
+  cout << endl << "usage 2: msr2data <run1> <run2> <extension> [-o<outputfile>] [new] [data] [[no]header] [nosummary] [global[+[!]]]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
-  cout << endl << "usage 3: msr2data \\[<run1> <run2> ... <runN>\\] <extension> [-o<outputfile> ] [data] [[no]header] [nosummary] [global[+[!]]]";
+  cout << endl << "usage 3: msr2data \\[<run1> <run2> ... <runN>\\] <extension> [-o<outputfile> ] [new] [data] [[no]header] [nosummary] [global[+[!]]]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
-  cout << endl << "usage 4: msr2data <runlist> <extension> [-o<outputfile>] [data] [[no]header] [nosummary] [global[+[!]]]";
+  cout << endl << "usage 4: msr2data <runlist> <extension> [-o<outputfile>] [new] [data] [[no]header] [nosummary] [global[+[!]]]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
   cout << endl;
   cout << endl << "       <run>, <run1>, <run2>, ... <runN> : run numbers";
   cout << endl << "       <extension> : msr-file extension, e.g. _tf_h13 for the file name 8472_tf_h13.msr";
   cout << endl << "       -o<outputfile> : specify the name of the DB or column data output file; default: out.db/out.dat";
   cout << endl << "                        if the option '-o none' is used, no output file will be written.";
+  cout << endl << "       new : before writing a new output file, delete the contents of any existing file with the same name";
   cout << endl << "       data : instead of to a DB file the data are written to a simple column structure";
   cout << endl << "       header : force writing of the file header to the output file";
   cout << endl << "       noheader : no file header is written to the output file";
@@ -145,7 +146,7 @@ string msr2data_validArguments(const vector<string> &arg)
     if ( (!iter->compare("header")) || (!iter->compare("noheader")) || (!iter->compare("nosummary")) \
       || (!iter->substr(0,3).compare("fit")) || (!iter->compare("-k")) || (!iter->compare("-t")) \
       || (!iter->compare("data")) || (!iter->substr(0,4).compare("msr-")) || (!iter->compare("global")) \
-      || (!iter->compare("global+")) || (!iter->compare("global+!")) )
+      || (!iter->compare("global+")) || (!iter->compare("global+!")) || (!iter->compare("new")) )
       word.clear();
     else if (!iter->substr(0,2).compare("-o")) {
       word.clear();
@@ -192,7 +193,7 @@ string msr2data_outputfile(vector<string> &arg, bool db = true)
         if ((iterNext != arg.end()) && (iterNext->compare("header")) && (iterNext->compare("noheader")) && (iterNext->compare("nosummary")) \
             && (iterNext->substr(0,3).compare("fit")) && (iterNext->compare("-k")) && (iterNext->compare("-t")) \
             && (iterNext->compare("data")) && (iterNext->substr(0,3).compare("msr")) && (iterNext->compare("global")) \
-            && (iterNext->compare("global+")) && (iterNext->compare("global+!"))) {
+            && (iterNext->compare("global+")) && (iterNext->compare("global+!")) && (iterNext->compare("new"))) {
           outputFile = *iterNext;
           arg.erase(iterNext);
           arg.erase(iter);
@@ -619,6 +620,20 @@ int main(int argc, char *argv[])
 
     // check the arguments for the "nosummary" option
     writeSummary = msr2data_useOption(arg, "nosummary");
+
+    // delete old db/data file if the "new" option is given
+    if (!msr2data_useOption(arg, "new")) {
+      fstream fileOutput;
+      fileOutput.open(outputFile.c_str(), ios::in | ios::out | ios::trunc);
+      if (fileOutput.is_open()) {
+        cout << endl << ">> msr2data: **INFO** Deleting output file " << outputFile << " if it existed" << endl;
+        //fileOutput << endl;
+        fileOutput.close();
+      }
+      if (writeHeader == 2) {
+        writeHeader = 1;
+      }
+    }
   }
 
 // GLOBAL MODE
