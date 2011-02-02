@@ -10,8 +10,8 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2010 by Andreas Suter                              *
- *   andreas.suter@psi.c                                                   *
+ *   Copyright (C) 2007-2011 by Andreas Suter                              *
+ *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -140,7 +140,7 @@ class PMsrHandler
 
     virtual Bool_t FilterNumber(TString str, const Char_t *filter, Int_t offset, Int_t &no);
 
-    virtual UInt_t NeededPrecision(Double_t dval);
+    virtual UInt_t NeededPrecision(Double_t dval, UInt_t precLimit=13);
 };
 
 #endif // _PMSRHANDLER_H_

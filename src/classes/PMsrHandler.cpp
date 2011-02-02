@@ -331,7 +331,9 @@ Int_t PMsrHandler::ReadMsrFile()
  */
 Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
 {
-  const UInt_t prec = 6; // output precision for float/doubles
+  const UInt_t prec = 6; // default output precision for float/doubles
+  UInt_t neededPrec = 0;
+  UInt_t neededWidth = 9;
 
   Int_t tag, lineNo = 0, number;
   Int_t runNo = -1, addRunNo = 0;
@@ -496,17 +498,27 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             fout << left << fParam[number].fName.Data();
             fout << " ";
             // value of the parameter
-            fout.width(9);
-            fout.precision(prec);
+            neededPrec = NeededPrecision(fParam[number].fStep)+1;
+            if (fParam[number].fPosErrorPresent && (NeededPrecision(fParam[number].fPosError)+1 > neededPrec))
+              neededPrec = NeededPrecision(fParam[number].fPosError)+1;
+            if (neededPrec < 6)
+              neededWidth = 9;
+            else
+              neededWidth = neededPrec + 3;
+            fout.width(neededWidth);
+            fout.setf(ios::fixed, ios::floatfield);
+            fout.precision(neededPrec);
             fout << left << fParam[number].fValue;
             fout << " ";
             // value of step/error/neg.error
             fout.width(11);
-            fout.precision(prec);
+            fout.setf(ios::fixed);
+            fout.precision(neededPrec);
             fout << left << fParam[number].fStep;
             fout << " ";
             fout.width(11);
-            fout.precision(prec);
+            fout.setf(ios::fixed);
+            fout.precision(neededPrec);
             if ((fParam[number].fNoOfParams == 5) || (fParam[number].fNoOfParams == 7)) // pos. error given
               if (fParam[number].fPosErrorPresent && (fParam[number].fStep != 0)) // pos error is a number
                 fout << left << fParam[number].fPosError;
@@ -515,6 +527,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             else // no pos. error
               fout << left << "none";
             fout << " ";
+            fout.unsetf(ios::floatfield);
             // boundaries
             if (fParam[number].fNoOfParams > 5) {
               fout.width(7);
@@ -836,7 +849,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             if (fRuns[runNo].GetFitRange(j) == -1)
               break;
             fout.width(8);
-            fout.precision(NeededPrecision(fRuns[runNo].GetFitRange(j)));
+            fout.precision(NeededPrecision(fRuns[runNo].GetFitRange(j), 6));
             fout << left << fixed << fRuns[runNo].GetFitRange(j);
             if (j==0)
               fout << " ";
@@ -943,16 +956,16 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           fout << endl;
         } else if (sstr.BeginsWith("range")) {
           fout << "range    ";
-          fout.precision(NeededPrecision(fPlots[plotNo].fTmin[0]));
+          fout.precision(NeededPrecision(fPlots[plotNo].fTmin[0], 6));
           fout << fPlots[plotNo].fTmin[0];
           fout << "   ";
-          fout.precision(NeededPrecision(fPlots[plotNo].fTmax[0]));
+          fout.precision(NeededPrecision(fPlots[plotNo].fTmax[0], 6));
           fout << fPlots[plotNo].fTmax[0];
           if (fPlots[plotNo].fYmin.size() > 0) {
             fout << "   ";
-            fout.precision(NeededPrecision(fPlots[plotNo].fYmin[0]));
+            fout.precision(NeededPrecision(fPlots[plotNo].fYmin[0], 6));
             fout << fPlots[plotNo].fYmin[0] << "   ";
-            fout.precision(NeededPrecision(fPlots[plotNo].fYmax[0]));
+            fout.precision(NeededPrecision(fPlots[plotNo].fYmax[0], 6));
             fout << fPlots[plotNo].fYmax[0];
           }
           fout << endl;
@@ -1528,7 +1541,7 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
       if (fRuns[i].GetFitRange(j) == -1)
         break;
       fout.width(8);
-      fout.precision(NeededPrecision(fRuns[i].GetFitRange(j)));
+      fout.precision(NeededPrecision(fRuns[i].GetFitRange(j), 6));
       fout << left << fixed << fRuns[i].GetFitRange(j);
     }
     fout << endl;
@@ -4677,35 +4690,30 @@ void PMsrHandler::CheckMaxLikelihood()
 //--------------------------------------------------------------------------
 /**
  * <p>Calculates the needed precision of Double_t values for WriteMsrLogFile and WriteMsrFile of the fit range.
- * If a precision of > 6 decimal places is needed, a warning is placed and a value of 6 is returned.
+ * If a precision of > precLimit decimal places is needed, a warning is placed and a value of precLimit is returned.
  *
  * \param dval value for which the precision has to be estimated
+ * \param precLimit precision limit
  *
  * <b>return:</b>
  * needed precision fo the fit-range
  */
-UInt_t PMsrHandler::NeededPrecision(Double_t dval)
+UInt_t PMsrHandler::NeededPrecision(Double_t dval, UInt_t precLimit)
 {
    UInt_t prec=0;
 
-   Int_t ival = static_cast<Int_t>(round(dval*1.0e6));
+   if (dval == 0.0)
+     return prec;
 
-   if ((ival % 10) != 0)
-     prec = 6;
-   else if ((ival % 100) != 0)
-     prec = 5;
-   else if ((ival % 1000) != 0)
-     prec = 4;
-   else if ((ival % 10000) != 0)
-     prec = 3;
-   else if ((ival % 100000) != 0)
-     prec = 2;
-   else if ((ival % 1000000) != 0)
-     prec = 1;
-   else if (static_cast<Double_t>(ival)-dval*1.0e6 > 0.1) {
-     prec = 4;
-     cerr << endl << ">> PMsrHandler::NeededPrecision(): **WARNING** fit range value = " << dval << ", is asking for a rediculous resolution.";
-     cerr << endl << ">>   Will limit the precision to 6 decimal places, only." << endl;
+   for (UInt_t i=0; i<precLimit; i++) {
+     if ((Int_t)(dval*pow(10.0,(Double_t)i)) != 0) {
+       prec = i;
+       break;
+     }
+   }
+
+   if (prec == precLimit) {
+     cerr << endl << ">> PMsrHandler::NeededPrecision(): **WARNING** precision limit of " << precLimit << ", requested.";
    }
 
    return prec;
