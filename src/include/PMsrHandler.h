@@ -141,6 +141,7 @@ class PMsrHandler
     virtual Bool_t FilterNumber(TString str, const Char_t *filter, Int_t offset, Int_t &no);
 
     virtual UInt_t NeededPrecision(Double_t dval, UInt_t precLimit=13);
+    virtual UInt_t LastSignificant(Double_t dval, UInt_t precLimit=6);
 };
 
 #endif // _PMSRHANDLER_H_

@@ -848,8 +848,10 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           for (UInt_t j=0; j<2; j++) {
             if (fRuns[runNo].GetFitRange(j) == -1)
               break;
-            fout.width(8);
-            fout.precision(NeededPrecision(fRuns[runNo].GetFitRange(j), 6));
+            neededWidth = 7;
+            neededPrec = LastSignificant(fRuns[runNo].GetFitRange(j));
+            fout.width(neededWidth);
+            fout.precision(neededPrec);
             fout << left << fixed << fRuns[runNo].GetFitRange(j);
             if (j==0)
               fout << " ";
@@ -956,16 +958,20 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           fout << endl;
         } else if (sstr.BeginsWith("range")) {
           fout << "range    ";
-          fout.precision(NeededPrecision(fPlots[plotNo].fTmin[0], 6));
+          neededPrec = LastSignificant(fPlots[plotNo].fTmin[0]);
+          fout.precision(neededPrec);
           fout << fPlots[plotNo].fTmin[0];
           fout << "   ";
-          fout.precision(NeededPrecision(fPlots[plotNo].fTmax[0], 6));
+          neededPrec = LastSignificant(fPlots[plotNo].fTmax[0]);
+          fout.precision(neededPrec);
           fout << fPlots[plotNo].fTmax[0];
           if (fPlots[plotNo].fYmin.size() > 0) {
             fout << "   ";
-            fout.precision(NeededPrecision(fPlots[plotNo].fYmin[0], 6));
+            neededPrec = LastSignificant(fPlots[plotNo].fYmin[0]);
+            fout.precision(neededPrec);
             fout << fPlots[plotNo].fYmin[0] << "   ";
-            fout.precision(NeededPrecision(fPlots[plotNo].fYmax[0], 6));
+            neededPrec = LastSignificant(fPlots[plotNo].fYmax[0]);
+            fout.precision(neededPrec);
             fout << fPlots[plotNo].fYmax[0];
           }
           fout << endl;
@@ -1541,7 +1547,9 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
       if (fRuns[i].GetFitRange(j) == -1)
         break;
       fout.width(8);
-      fout.precision(NeededPrecision(fRuns[i].GetFitRange(j), 6));
+      UInt_t neededPrec = 2;
+      neededPrec = LastSignificant(fRuns[i].GetFitRange(j));
+      fout.precision(neededPrec);
       fout << left << fixed << fRuns[i].GetFitRange(j);
     }
     fout << endl;
@@ -4695,8 +4703,7 @@ void PMsrHandler::CheckMaxLikelihood()
  * \param dval value for which the precision has to be estimated
  * \param precLimit precision limit
  *
- * <b>return:</b>
- * needed precision fo the fit-range
+ * <b>return:</b> needed precision
  */
 UInt_t PMsrHandler::NeededPrecision(Double_t dval, UInt_t precLimit)
 {
@@ -4717,6 +4724,48 @@ UInt_t PMsrHandler::NeededPrecision(Double_t dval, UInt_t precLimit)
    }
 
    return prec;
+}
+
+//--------------------------------------------------------------------------
+// LastSignifiant (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Gets the last significant digit down to precLimit.
+ *
+ * \param dval value for which the last signigicant digit shall be found
+ * \param precLimit precision limit
+ *
+ * <b>return:</b> last significant digit down to precLimit
+ */
+UInt_t PMsrHandler::LastSignificant(Double_t dval, UInt_t precLimit)
+{
+  UInt_t lastSignificant = 2;
+  UInt_t decimalPoint = 0;
+
+  char str[128];
+
+  sprintf(str, "%lf", dval);
+
+  // find decimal point
+  for (UInt_t i=0; i<strlen(str); i++) {
+    if (str[i] == '.') {
+      decimalPoint = i;
+      break;
+    }
+  }
+
+  // find last significant digit
+  for (UInt_t i=strlen(str)-1; i>=0; i--) {
+    if (str[i] != '0') {
+      if ((i-decimalPoint) < precLimit)
+        lastSignificant = i-decimalPoint;
+      else
+        lastSignificant = precLimit;
+      break;
+    }
+  }
+
+  return lastSignificant;
 }
 
 // end ---------------------------------------------------------------------
