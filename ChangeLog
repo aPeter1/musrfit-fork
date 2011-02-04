@@ -11,6 +11,7 @@ NEW any2many: an attempt to write the universial musr-data-file converter. Just 
 NEW musrt0: added the possibility to show the t0 saved in the data file 's'. Furthermore added the option
     --getT0FromPromptPeak, -g with <firstGoodBinOffset>: will, in non-interactive mode estimate the t0's from 
     the prompt peak and write it into the msr-file (MUSR-133).
+FIXED background range correction, such that it is a multiple of the proton cycle time
 FIXED linking of BMWlibs on Cygwin
 FIXED various bugs in msr2data
 FIXED 2 little annoying problems: (i) now it is possible to zoom down to the single bin in musrview. 

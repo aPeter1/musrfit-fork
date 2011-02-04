@@ -31,6 +31,7 @@
 
 #include <iostream>
 #include <fstream>
+using namespace std;
 
 #include "PMusr.h"
 #include "PRunSingleHisto.h"
@@ -494,6 +495,8 @@ Bool_t PRunSingleHisto::PrepareData()
 
   // keep the time resolution in (us)
   fTimeResolution = runData->GetTimeResolution()/1.0e3;
+  cout.precision(8);
+  cout << endl << ">> PRunSingleHisto::PrepareData(): time resolution=" << fixed << runData->GetTimeResolution() << "(ns)" << endl;
 
   if (fHandleTag == kFit)
     success = PrepareFitData(runData, histoNo[0]);
@@ -1137,9 +1140,10 @@ Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
 
   // calculate proper background range
   if (beamPeriod != 0.0) {
-    Double_t beamPeriodBins = beamPeriod/fRunInfo->GetPacking();
-    UInt_t periods = (UInt_t)((Double_t)(end - start + 1) / beamPeriodBins);
-    end = start + (UInt_t)round((Double_t)periods*beamPeriodBins);
+    Double_t timeBkg = (Double_t)(end-start)*(fTimeResolution*fRunInfo->GetPacking()); // length of the background intervall in time
+    UInt_t fullCycles = (UInt_t)(timeBkg/beamPeriod); // how many proton beam cylces can be placed within the proposed background intervall
+    // correct the end of the background intervall such that the background is as close as possible to a multiple of the proton cylce
+    end = start + (UInt_t) ((fullCycles*beamPeriod)/(fTimeResolution*fRunInfo->GetPacking()));
     cout << endl << "PRunSingleHisto::EstimatBkg(): Background " << start << ", " << end;
     if (end == start)
       end = fRunInfo->GetBkgRange(1);
