@@ -51,12 +51,6 @@ using namespace boost::algorithm;
 
 #include "PMsr2Data.h"
 
-// determine the length of the linebreak string for different systems ('\r' (old) Macintosh, '\n' Unix, "\r\n" DOS)
-#if defined(__MSDOS__) || defined(_MSC_VER)
-#define INCR 2
-#else
-#define INCR 1
-#endif /* __MSDOS__ || _MSC_VER */
 
 //-------------------------------------------------------------
 /**
@@ -1961,11 +1955,11 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHead
       int size(outFile.tellg());
       string s;
 
-      for (int i(INCR); i<=size; i+=INCR) { // find the last non-empty line
+      for (int i(1); i<=size; ++i) { // find the last non-empty line
         outFile.seekg(-i, ios::end);
         getline(outFile, s);
         trim(s); // remove whitespace
-        if (s.empty()) {
+        if (s.empty() || (s == "\n")) { // (s == "\n") check is for M$-systems using "\r\n" linebreaks
           if (i == size) {
             outFile.seekp(0);
             fHeaderWritten = false;  // if the file contained only empty lines, default to writing the header
