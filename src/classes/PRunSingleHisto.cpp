@@ -142,7 +142,9 @@ Double_t PRunSingleHisto::CalcChiSquare(const std::vector<Double_t>& par)
     }
   }
 
-  return chisq;
+  // the correction factor is need since the data scales like pack*t_res,
+  // whereas the error scales like sqrt(pack*t_res)
+  return chisq * fRunInfo->GetPacking() * (fTimeResolution * 1.0e3);
 }
 
 //--------------------------------------------------------------------------
@@ -201,14 +203,17 @@ Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
   Double_t theo;
   Double_t data;
   Double_t time;
+  // norm is needed since there is no simple scaling like in chisq case to get the correct Max.Log.Likelihood value when normlizing N(t) to 1/ns
+  Double_t normalizer = fRunInfo->GetPacking() * (fTimeResolution * 1.0e3);
   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
     if ((time>=fFitStartTime) && (time<=fFitEndTime)) {
       // calculate theory for the given parameter set
       theo = N0*TMath::Exp(-time/tau)*(1+fTheory->Func(time, par, fFuncValues))+bkg;
+      theo *= normalizer;
       // check if data value is not too small
       if (fData.GetValue()->at(i) > 1.0e-9)
-        data = fData.GetValue()->at(i);
+        data = normalizer*fData.GetValue()->at(i);
       else
         data = 1.0e-9;
       // add maximum log likelihood contribution of bin i
@@ -371,7 +376,7 @@ Bool_t PRunSingleHisto::PrepareData()
       if (fRunInfo->GetT0Size() <= i) { // t0 for i not present in the msr-file, i.e. #t0's != #forward histos
         if (static_cast<Int_t>(runData->GetT0Size()) > fRunInfo->GetForwardHistoNo(i)-1) { // t0 for i present in the data file
           fT0s.push_back(runData->GetT0(fRunInfo->GetForwardHistoNo(i)-1));
-        } else { // t0 is neither in the run data nor in the msr-file -> will try estimated ones!
+        } else { // t0 is neither in the run data nor in the msr-file -> will try estimated one!
           fT0s.push_back(runData->GetT0Estimated(fRunInfo->GetForwardHistoNo(i)-1));
           cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** NO t0's found, neither in the run data nor in the msr-file!";
           cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
@@ -555,7 +560,7 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
     cerr << endl;
   }
 
-  // check if start, end, and t0 make any sense
+  // check if start and end make any sense
   // 1st check if start and end are in proper order
   if (end < start) { // need to swap them
     Int_t keep = end;
@@ -602,7 +607,9 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
   // everything looks fine, hence fill data set
   Int_t t0 = fT0s[0];
   Double_t value = 0.0;
-  Double_t normalizer = 1.0;
+  // in order that after rebinning the fit does not need to be redone (important for plots)
+  // the value is normalize to per 1 nsec
+  Double_t normalizer = fRunInfo->GetPacking() * (fTimeResolution * 1.0e3); // fTimeResolution us->ns
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
   fData.SetDataTimeStart(fTimeResolution*((Double_t)start-(Double_t)t0+(Double_t)(fRunInfo->GetPacking()-1)/2.0));
@@ -610,7 +617,6 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
   for (Int_t i=start; i<end; i++) {
     if (fRunInfo->GetPacking() == 1) {
       value = runData->GetDataBin(histoNo)->at(i);
-      normalizer = fRunInfo->GetPacking() * (fTimeResolution * 1e3); // fTimeResolution us->ns
       value /= normalizer;
       fData.AppendValue(value);
       if (value == 0.0)
@@ -619,15 +625,12 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
         fData.AppendErrorValue(TMath::Sqrt(value));
     } else { // packed data, i.e. fRunInfo->GetPacking() > 1
       if (((i-start) % fRunInfo->GetPacking() == 0) && (i != start)) { // fill data
-        // in order that after rebinning the fit does not need to be redone (important for plots)
-        // the value is normalize to per 1 nsec
-        normalizer = fRunInfo->GetPacking() * (fTimeResolution * 1e3); // fTimeResolution us->ns
         value /= normalizer;
         fData.AppendValue(value);
         if (value == 0.0)
           fData.AppendErrorValue(1.0);
         else
-          fData.AppendErrorValue(TMath::Sqrt(value/normalizer));
+          fData.AppendErrorValue(TMath::Sqrt(value));
         // reset values
         value = 0.0;
       }

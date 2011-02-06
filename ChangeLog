@@ -11,6 +11,9 @@ NEW any2many: an attempt to write the universial musr-data-file converter. Just 
 NEW musrt0: added the possibility to show the t0 saved in the data file 's'. Furthermore added the option
     --getT0FromPromptPeak, -g with <firstGoodBinOffset>: will, in non-interactive mode estimate the t0's from 
     the prompt peak and write it into the msr-file (MUSR-133).
+FIXED for single histogram fits, the chisq given was wrong (not the fit-result though). I missed some needed scaling
+      when normalizing to 1/ns rather than bins. The same is true for log max. likelihood. I am rather depressed that
+      nobody so far found this but only R. Scheuermann pointed out there might be a problem.    
 FIXED background range correction, such that it is a multiple of the proton cycle time
 FIXED linking of BMWlibs on Cygwin
 FIXED various bugs in msr2data

@@ -693,7 +693,7 @@ Bool_t PRunAsymmetry::SubtractEstimatedBkg()
   // calculate proper background range
   for (UInt_t i=0; i<2; i++) {
     if (beamPeriod != 0.0) {
-      Double_t timeBkg = (Double_t)(end-start)*(fTimeResolution*fRunInfo->GetPacking()); // length of the background intervall in time
+      Double_t timeBkg = (Double_t)(end[i]-start[i])*(fTimeResolution*fRunInfo->GetPacking()); // length of the background intervall in time
       UInt_t fullCycles = (UInt_t)(timeBkg/beamPeriod); // how many proton beam cylces can be placed within the proposed background intervall
       // correct the end of the background intervall such that the background is as close as possible to a multiple of the proton cylce
       end[i] = start[i] + (UInt_t) ((fullCycles*beamPeriod)/(fTimeResolution*fRunInfo->GetPacking()));
