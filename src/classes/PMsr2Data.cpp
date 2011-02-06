@@ -1959,7 +1959,7 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHead
         outFile.seekg(-i, ios::end);
         getline(outFile, s);
         trim(s); // remove whitespace
-        if (s.empty() || (s == "\n")) { // (s == "\n") check is for M$-systems using "\r\n" linebreaks
+        if (s.empty()) { // trim cuts off also characters like '\n', therefore this should work also with M$-DOS linebreaks
           if (i == size) {
             outFile.seekp(0);
             fHeaderWritten = false;  // if the file contained only empty lines, default to writing the header

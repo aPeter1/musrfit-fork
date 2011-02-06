@@ -90,7 +90,7 @@ void msr2data_syntax()
   cout << endl;
   cout << endl << "       <run>, <run1>, <run2>, ... <runN> : run numbers";
   cout << endl << "       <extension> : msr-file extension, e.g. _tf_h13 for the file name 8472_tf_h13.msr";
-  cout << endl << "       -o<outputfile> : specify the name of the DB or column data output file; default: out.db/out.dat";
+  cout << endl << "       -o<outputfile> : specify the name of the DB or column-data output file; default: out.db/out.dat";
   cout << endl << "                        if the option '-o none' is used, no output file will be written.";
   cout << endl << "       new : before writing a new output file, delete the contents of any existing file with the same name";
   cout << endl << "       data : instead of to a DB file the data are written to a simple column structure";
@@ -101,25 +101,25 @@ void msr2data_syntax()
   cout << endl << "       nosummary : no additional data from the run data file is written to the output file";
   cout << endl << "       fit : invoke musrfit to fit the specified runs";
   cout << endl << "              All msr input files are assumed to be present, none is newly generated!";
-  cout << endl << "       fit-<template>! : generate msr-files for the runs to be processed from the <template>-run";
+  cout << endl << "       fit-<template>! : generate msr files for the runs to be processed from the <template> run";
   cout << endl << "              and call musrfit for fitting these runs";
-  cout << endl << "       fit-<template> : same as above, but the <template>-run is only used for the first file creation - ";
-  cout << endl << "              the succeding files are generated using the musrfit-output from the preceding runs";
+  cout << endl << "       fit-<template> : same as above, but the <template> run is only used for the first file creation---";
+  cout << endl << "              the successive files are generated using the musrfit output from the preceding runs";
   cout << endl << "       msr-<template> : same as above without calling musrfit";
-  cout << endl << "              In case any fitting-option is present, this option is ignored!";
+  cout << endl << "              In case any fitting option is present, this option is ignored!";
   cout << endl << "       -k : if fitting is used, pass the option --keep-mn2-output to musrfit";
   cout << endl << "       -t : if fitting is used, pass the option --title-from-data-file to musrfit";
   cout << endl;
   cout << endl << "       global : switch on the global-fit mode";
-  cout << endl << "              Within that mode all specified runs will be united in a single msr-file!";
-  cout << endl << "              The fit parameters can be either run-specific or common to all runs.";
+  cout << endl << "              Within that mode all specified runs will be united in a single msr file!";
+  cout << endl << "              The fit parameters can be either run specific or common to all runs.";
   cout << endl << "              For a complete description of this feature please refer to the manual.";
   cout << endl;
   cout << endl << "       global+[!] : operate in the global-fit mode, however, in case a global input file is created";
   cout << endl << "              all specified runs are pre-analyzed first one by one using the given template.";
   cout << endl << "              For the generation of the global input file, the run-specific parameter values are taken";
-  cout << endl << "              from this pre-analysis for each run - not just copied from the template.";
-  cout << endl << "              The specification of ! determines which fit-mode (see above) is used for this pre-analysis.";
+  cout << endl << "              from this pre-analysis for each run---they are not just copied from the template.";
+  cout << endl << "              The specification of '!' determines which fit mode (see above) is used for this pre-analysis.";
   cout << endl;
   cout << endl << "    For further information please refer to";
   cout << endl << "    https://intranet.psi.ch/MUSR/Msr2Data";
@@ -624,11 +624,14 @@ int main(int argc, char *argv[])
     // delete old db/data file if the "new" option is given
     if (!msr2data_useOption(arg, "new")) {
       fstream fileOutput;
-      fileOutput.open(outputFile.c_str(), ios::in | ios::out | ios::trunc);
+      fileOutput.open(outputFile.c_str(), ios::in);
       if (fileOutput.is_open()) {
-        cout << endl << ">> msr2data: **INFO** Deleting output file " << outputFile << " if it existed" << endl;
-        //fileOutput << endl;
+        cout << endl << ">> msr2data: **INFO** Deleting output file " << outputFile << endl;
         fileOutput.close();
+        fileOutput.open(outputFile.c_str(), ios::out | ios::trunc);
+        fileOutput.close();
+      } else {
+        cout << endl << ">> msr2data: **INFO** Ignoring the 'new' option since " << outputFile << " does not exist yet." << endl;
       }
       if (writeHeader == 2) {
         writeHeader = 1;
