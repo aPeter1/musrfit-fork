@@ -498,8 +498,11 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             fout << left << fParam[number].fName.Data();
             fout << " ";
             // value of the parameter
-            neededPrec = NeededPrecision(fParam[number].fStep)+1;
-            if (fParam[number].fPosErrorPresent && (NeededPrecision(fParam[number].fPosError)+1 > neededPrec))
+            if (fParam[number].fStep == 0.0) // if fixed parameter take all significant digits
+              neededPrec = LastSignificant(fParam[number].fValue);
+            else // step/neg.error given hence they will limited the output precission of the value
+              neededPrec = NeededPrecision(fParam[number].fStep)+1;
+            if ((fParam[number].fStep != 0.0) && fParam[number].fPosErrorPresent && (NeededPrecision(fParam[number].fPosError)+1 > neededPrec))
               neededPrec = NeededPrecision(fParam[number].fPosError)+1;
             if (neededPrec < 6)
               neededWidth = 9;
@@ -513,6 +516,8 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             // value of step/error/neg.error
             fout.width(11);
             fout.setf(ios::fixed);
+            if (fParam[number].fStep == 0.0)
+              neededPrec = 0;
             fout.precision(neededPrec);
             fout << left << fParam[number].fStep;
             fout << " ";
