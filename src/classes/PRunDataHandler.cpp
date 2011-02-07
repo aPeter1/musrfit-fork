@@ -1360,7 +1360,7 @@ Bool_t PRunDataHandler::ReadWkmFile()
         StripWhitespace(line);
         dval = ToDouble(line, ok);
         if (ok)
-          runData.SetTimeResolution(dval);
+          runData.SetTimeResolution(dval*1.0e3); // us -> ns
       }
     }
 
@@ -3271,7 +3271,7 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
   cout << endl << "Groups      : " << fData[0].GetNoOfHistos();
   cout << endl << "Channels    : " << static_cast<UInt_t>(fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin);
   cout.precision(10);
-  cout << endl << "Resolution  : " << fData[0].GetTimeResolution()*fAny2ManyInfo->rebin;
+  cout << endl << "Resolution  : " << fData[0].GetTimeResolution()*fAny2ManyInfo->rebin/1.0e3; // ns->us
   cout.setf(ios::fixed,ios::floatfield);   // floatfield set to fixed
 
   // write data
