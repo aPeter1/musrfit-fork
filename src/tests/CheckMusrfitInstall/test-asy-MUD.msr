@@ -1,11 +1,11 @@
-Test asymmetry plot, MUD data file
+MgB12H12 No2 ZF T=150
 ###############################################################
 FITPARAMETER
 #      Nr. Name        Value     Step      Pos_Error  Boundaries
-        1 alpha       1         0           none        0       2       
-        2 asy         0.175103  -0.000818844 0.00083464  0       0.33    
-        3 rate        0.165184  -0.0015983  0.00159512  0       none    
-        4 beta        0.888935  -0.0159792  0.0161548   0.5     2       
+        1 alpha       1.0       0.0         none        0       2       
+        2 asy         0.17503   -0.00081    0.00083     0       0.33    
+        3 rate        0.1649    -0.0016     0.0016      0       none    
+        4 beta        0.892     -0.016      0.016       0.5     2       
 
 ###############################################################
 THEORY
@@ -20,12 +20,12 @@ RUN data/000100 XXXX TRIUMF MUD   (name beamline institute data-file-format)
 fittype         2         (asymmetry fit)
 alpha           1
 map             0    0    0    0    0    0    0    0    0    0    0
-forward         1
-backward        2
+forward         1       
+backward        2       
 background      79      391     80      409     
 data            438     12785   436     12787   
 t0              432     431     
-fit             0.00    8.00    
+fit             0       8      
 packing         100
 
 ###############################################################
@@ -41,15 +41,15 @@ units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
 fourier_power    12
 apodization      NONE    # NONE, WEAK, MEDIUM, STRONG
 plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
-phase            8.50
+phase            8
 #range_for_phase_correction 50.0 70.0
-range            0.00    200.00
+range            0    200
 
 ###############################################################
 PLOT 2   (asymmetry plot)
 runs     1   
-range    0.00   8.00   0.00   0.25
+range    0   8   0   0.25
 
 ###############################################################
-STATISTIC --- 2010-01-08 14:45:37
-  chisq = 132.25963, NDF = 99, chisq/NDF = 1.33595586
+STATISTIC --- 2011-02-06 15:03:19
+  chisq = 133.92904274288378, NDF = 99, chisq/NDF = 1.3528186135644826

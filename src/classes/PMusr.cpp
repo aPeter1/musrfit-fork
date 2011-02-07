@@ -225,6 +225,12 @@ PRawRunData::PRawRunData()
   fRunNumber = -1;
   fRunTitle = TString("");
   fSetup = TString("");
+  fStartTime = TString("");
+  fStartDate = TString("");
+  fStartDateTimeSec = 0;
+  fStopTime = TString("");
+  fStopDate = TString("");
+  fStopDateTimeSec = 0;
   fField = PMUSR_UNDEFINED;
   fEnergy = PMUSR_UNDEFINED;
   fTransport = PMUSR_UNDEFINED;

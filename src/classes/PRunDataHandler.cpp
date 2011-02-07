@@ -30,6 +30,7 @@
  ***************************************************************************/
 
 #include <cstdio>
+#include <ctime>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -474,10 +475,13 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
         }
         system(cmd);
       }
-      if (fAny2ManyInfo->compressionTag == 1) // gzip
+      if (fAny2ManyInfo->compressionTag == 1) { // gzip
         sprintf(cmd, "gzip %s", fln.Data());
-      else
+        fln += ".gz";
+      } else {
         sprintf(cmd, "bzip2 -z %s", fln.Data());
+        fln += ".bz2";
+      }
       system(cmd);
     }
 
@@ -918,6 +922,80 @@ Bool_t PRunDataHandler::ReadRootFile(UInt_t tag)
 
   // get setup
   runData.SetSetup(runHeader->GetLemSetup().GetString());
+
+  // get start time/date
+  // start date
+  time_t idt = (time_t)runHeader->GetStartTime();
+  runData.SetStartDateTime(idt);
+  struct tm *dt = localtime(&idt);
+  TString stime("");
+  Int_t yy = dt->tm_year;
+  if (yy > 100)
+    yy -= 100;
+  if (yy < 10)
+    stime += "0";
+  stime += yy;
+  stime += "-";
+  stime += GetMonth(dt->tm_mon);
+  stime += "-";
+  if (dt->tm_mday < 10)
+    stime += "0";
+  stime += dt->tm_mday;
+  runData.SetStartDate(stime);
+  // start time
+  if (dt->tm_hour == 0)
+    stime = "00";
+  else if (dt->tm_hour < 10)
+    stime = "0";
+  else
+    stime = "";
+  stime  += dt->tm_hour;
+  stime += ":";
+  if (dt->tm_min < 10)
+    stime += "0";
+  stime += dt->tm_min;
+  stime += ":";
+  if (dt->tm_sec < 10)
+    stime += "0";
+  stime += dt->tm_sec;
+  runData.SetStartTime(stime);
+
+  // get stop time/date
+  // stop date
+  idt = (time_t)runHeader->GetStopTime();
+  runData.SetStopDateTime(idt);
+  dt = localtime(&idt);
+  stime = "";
+  yy = dt->tm_year;
+  if (yy > 100)
+    yy -= 100;
+  if (yy < 10)
+    stime += "0";
+  stime += yy;
+  stime += "-";
+  stime += GetMonth(dt->tm_mon);
+  stime += "-";
+  if (dt->tm_mday < 10)
+    stime += "0";
+  stime += dt->tm_mday;
+  runData.SetStopDate(stime);
+  // stop time
+  if (dt->tm_hour == 0)
+    stime = "00";
+  else if (dt->tm_hour < 10)
+    stime = "0";
+  else
+    stime = "";
+  stime  += dt->tm_hour;
+  stime += ":";
+  if (dt->tm_min < 10)
+    stime += "0";
+  stime += dt->tm_min;
+  stime += ":";
+  if (dt->tm_sec < 10)
+    stime += "0";
+  stime += dt->tm_sec;
+  runData.SetStopTime(stime);
 
   // get time resolution
   runData.SetTimeResolution(runHeader->GetTimeResolution());
@@ -1486,7 +1564,11 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   // get run number
   runData.SetRunNumber(psiBin.get_runNumber_int());
   // get setup
-  runData.SetSetup(TString(psiBin.get_orient().c_str()));
+  runData.SetSetup(TString(psiBin.get_comment().c_str()));
+  // get sample
+  runData.SetSample(TString(psiBin.get_sample().c_str()));
+  // get orientation
+  runData.SetOrientation(TString(psiBin.get_orient().c_str()));
   // set LEM specific information to default value since it is not in the file and not used...
   runData.SetEnergy(PMUSR_UNDEFINED);
   runData.SetTransport(PMUSR_UNDEFINED);
@@ -1522,6 +1604,22 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   }
   for (UInt_t i=0; i<ivec.size(); i++)
     runData.AppendT0(ivec[i]);
+
+  // get start/stop time
+  vector<string> sDateTime = psiBin.get_timeStart_vector();
+  if (sDateTime.size() < 2) {
+    cerr << endl << ">> **WARNING** psi-bin file: couldn't obtain run start date/time" << endl;
+  }
+  runData.SetStartDate(sDateTime[0]);
+  runData.SetStartTime(sDateTime[1]);
+  sDateTime.clear();
+
+  sDateTime = psiBin.get_timeStop_vector();
+  if (sDateTime.size() < 2) {
+    cerr << endl << ">> **WARNING** psi-bin file: couldn't obtain run stop date/time" << endl;
+  }
+  runData.SetStopDate(sDateTime[0]);
+  runData.SetStopTime(sDateTime[1]);
 
   // fill raw data
   PDoubleVector histoData;
@@ -1598,6 +1696,84 @@ Bool_t PRunDataHandler::ReadMudFile()
     runData.SetRunNumber((Int_t)val);
   }
 
+  // get start/stop time of the run
+  struct tm *dt;
+  TString stime("");
+  Int_t yy = 0;
+  success = MUD_getTimeBegin( fh, &val );
+  if (success) {
+    runData.SetStartDateTime((const time_t)val);
+    dt = localtime((const time_t*)&val);
+    yy = dt->tm_year;
+    if (yy > 100)
+      yy -= 100;
+    if (yy < 10)
+      stime += "0";
+    stime += yy;
+    stime += "-";
+    stime += GetMonth(dt->tm_mon);
+    stime += "-";
+    if (dt->tm_mday < 10)
+      stime += "0";
+    stime += dt->tm_mday;
+    runData.SetStartDate(stime);
+    // start time
+    if (dt->tm_hour == 0)
+      stime = "00";
+    else if (dt->tm_hour < 10)
+      stime = "0";
+    else
+      stime = "";
+    stime  += dt->tm_hour;
+    stime += ":";
+    if (dt->tm_min < 10)
+      stime += "0";
+    stime += dt->tm_min;
+    stime += ":";
+    if (dt->tm_sec < 10)
+      stime += "0";
+    stime += dt->tm_sec;
+    runData.SetStartTime(stime);
+  }
+
+  stime = TString("");
+  success = MUD_getTimeEnd( fh, &val );
+  if (success) {
+    runData.SetStopDateTime((const time_t)val);
+    dt = localtime((const time_t*)&val);
+    stime = "";
+    yy = dt->tm_year;
+    if (yy > 100)
+      yy -= 100;
+    if (yy < 10)
+      stime += "0";
+    stime += yy;
+    stime += "-";
+    stime += GetMonth(dt->tm_mon);
+    stime += "-";
+    if (dt->tm_mday < 10)
+      stime += "0";
+    stime += dt->tm_mday;
+    runData.SetStopDate(stime);
+    // stop time
+    if (dt->tm_hour == 0)
+      stime = "00";
+    else if (dt->tm_hour < 10)
+      stime = "0";
+    else
+      stime = "";
+    stime  += dt->tm_hour;
+    stime += ":";
+    if (dt->tm_min < 10)
+      stime += "0";
+    stime += dt->tm_min;
+    stime += ":";
+    if (dt->tm_sec < 10)
+      stime += "0";
+    stime += dt->tm_sec;
+    runData.SetStopTime(stime);
+  }
+
   // get setup
   TString setup;
   success = MUD_getLab( fh, str, sizeof(str) );
@@ -1615,6 +1791,7 @@ Bool_t PRunDataHandler::ReadMudFile()
   success = MUD_getSample( fh, str, sizeof(str) );
   if (success) {
     setup += TString(str);
+    runData.SetSample(str);
   }
   runData.SetSetup(setup);
 
@@ -1783,6 +1960,7 @@ Bool_t PRunDataHandler::ReadMudFile()
       histoData.push_back(pData[j]);
     }
     runData.AppendDataBin(histoData);
+
     // estimate T0 from maximum of the data
     Double_t maxVal = 0.0;
     Int_t maxBin = 0;
@@ -2807,9 +2985,6 @@ Bool_t PRunDataHandler::ReadDBFile()
  */
 Bool_t PRunDataHandler::WriteRootFile(TString fln)
 {
-  if (!fAny2ManyInfo->useStandardOutput)
-    cout << endl << ">> PRunDataHandler::WriteRootFile(): writing a root data file ... " << endl;
-
   // generate output file name if needed
   if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
     if (fln.Length() == 0) {
@@ -2834,8 +3009,11 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
     // keep the file name if compression is whished
     fAny2ManyInfo->outPathFileName.push_back(fln);
   } else {
-    fln = TString("__tmp.root");
+    fln = fAny2ManyInfo->outPath + TString("__tmp.root");
   }
+
+  if (!fAny2ManyInfo->useStandardOutput)
+    cout << endl << ">> PRunDataHandler::WriteRootFile(): writing a root data file (" << fln.Data() << ") ... " << endl;
 
   // generate data file
   TFolder *histosFolder;
@@ -2855,8 +3033,12 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
   header->SetRunTitle(fData[0].GetRunTitle()->Data());
   header->SetLemSetup(fData[0].GetSetup()->Data());
   header->SetRunNumber(fData[0].GetRunNumber());
-  header->SetStartTime(0);
-  header->SetStopTime(1);
+  TString dt = *fData[0].GetStartDate() + "/" + *fData[0].GetStartTime();
+  header->SetStartTimeString(dt.Data());
+  dt = *fData[0].GetStopDate() + "/" + *fData[0].GetStopTime();
+  header->SetStopTimeString(dt.Data());
+  header->SetStartTime(fData[0].GetStartDateTime());
+  header->SetStopTime(fData[0].GetStopDateTime());
   header->SetModeratorHV(-999.9, 0.0);
   header->SetSampleHV(-999.9, 0.0);
   header->SetImpEnergy(-999.9);
@@ -3020,8 +3202,6 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
  */
 Bool_t PRunDataHandler::WriteWkmFile(TString fln)
 {
-  cout << endl << ">> PRunDataHandler::WriteWkmFile(): writing a wkm data file... " << endl;
-
   // generate output file name
   if (fln.Length() == 0) {
     Int_t start = fRunPathName.Last('/');
@@ -3044,6 +3224,9 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
   }
   // keep the file name if compression is whished
   fAny2ManyInfo->outPathFileName.push_back(fln);
+
+  if (!fAny2ManyInfo->useStandardOutput)
+    cout << endl << ">> PRunDataHandler::WriteWkmFile(): writing a wkm data file (" << fln.Data() << ") ... " << endl;
 
   // write ascii file
   ofstream fout;
@@ -3087,7 +3270,9 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
   cout << endl << "Setup       : " << fData[0].GetSetup()->Data();
   cout << endl << "Groups      : " << fData[0].GetNoOfHistos();
   cout << endl << "Channels    : " << static_cast<UInt_t>(fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin);
+  cout.precision(10);
   cout << endl << "Resolution  : " << fData[0].GetTimeResolution()*fAny2ManyInfo->rebin;
+  cout.setf(ios::fixed,ios::floatfield);   // floatfield set to fixed
 
   // write data
   if (fAny2ManyInfo->rebin == 1) {
@@ -3145,24 +3330,178 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
 Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
 {
   cout << endl << ">> PRunDataHandler::WritePsiBinFile(): will write a psi-bin data file. Not yet implemented ... " << endl;
-  return true;
-}
 
-//--------------------------------------------------------------------------
-// WritePsiMduFile
-//--------------------------------------------------------------------------
-/**
- * <p> Write the psi-mdu-file format.
- *
- * <b>return:</b>
- * - true on successful writting,
- * - otherwise false.
- *
- * \param fln file name. If empty, the routine will try to construct one
- */
-Bool_t PRunDataHandler::WritePsiMduFile(TString fln)
-{
-  cout << endl << ">> PRunDataHandler::WritePsiMduFile(): will write a psi-mdu data file. Not yet implemented ... " << endl;
+  // generate output file name if needed
+  if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
+    if (fln.Length() == 0) {
+      Int_t start = fRunPathName.Last('/');
+      Int_t end = fRunPathName.Last('.');
+      if (end == -1) {
+        cerr << endl << ">> PRunDataHandler::WritePsiBinFile(): **ERROR** couldn't generate the output file name ..." << endl;
+        return false;
+      }
+      // cut out the filename (get rid of the extension, and the path)
+      Char_t str1[1024], str2[1024];
+      strncpy(str1, fRunPathName.Data(), sizeof(str1));
+      for (Int_t i=0; i<end-start-1; i++) {
+        str2[i] = str1[i+start+1];
+      }
+      str2[end-start-1] = 0;
+
+      fln = fAny2ManyInfo->outPath + str2 + ".bin";
+    } else {
+      fln.Prepend(fAny2ManyInfo->outPath);
+    }
+    // keep the file name if compression is whished
+    fAny2ManyInfo->outPathFileName.push_back(fln);
+  } else {
+    fln = fAny2ManyInfo->outPath + TString("__tmp.bin");
+  }
+
+  if (!fAny2ManyInfo->useStandardOutput)
+    cout << endl << ">> PRunDataHandler::WritePsiBinFile(): writing a psi-bin data file (" << fln.Data() << ") ... " << endl;
+
+  MuSR_td_PSI_bin psibin;
+  int status = 0;
+
+  // fill header information
+  // run number
+  psibin.put_runNumber_int(fData[0].GetRunNumber());
+  // length of histograms
+  psibin.put_histoLength_bin((int)(fData[0].GetDataBin(0)->size()));
+  // number of histograms
+  psibin.put_numberHisto_int((int)fData[0].GetNoOfHistos());
+  // run title = sample (10 char) / temp (10 char) / field (10 char) / orientation (10 char)
+  char cstr[11];
+  // sample
+  if (fData[0].GetSample()->Length() > 0)
+    strncpy(cstr, fData[0].GetSample()->Data(), 10);
+  else
+    strcpy(cstr, "??");
+  cstr[10] = '\0';
+  psibin.put_sample(cstr);
+  // temp
+  if (fData[0].GetNoOfTemperatures() > 0)
+    snprintf(cstr, 10, "%.1f K", fData[0].GetTemperature(0));
+  else
+    strcpy(cstr, "?? K");
+  cstr[10] = '\0';
+  psibin.put_temp(cstr);
+  // field
+  if (fData[0].GetField() > 0)
+    snprintf(cstr, 10, "%.1f G", fData[0].GetField());
+  else
+    strcpy(cstr, "?? G");
+  cstr[10] = '\0';
+  psibin.put_field(cstr);
+  // orientation
+  if (fData[0].GetOrientation()->Length() > 0)
+    strncpy(cstr, fData[0].GetOrientation()->Data(), 10);
+  else
+    strcpy(cstr, "??");
+  cstr[10] = '\0';
+  psibin.put_orient(cstr);
+  // setup
+  if (fData[0].GetSetup()->Length() > 0)
+    strncpy(cstr, fData[0].GetSetup()->Data(), 10);
+  else
+    strcpy(cstr, "??");
+  cstr[10] = '\0';
+  psibin.put_setup(cstr);
+
+  // run start date
+  vector<string> svec;
+  strncpy(cstr, fData[0].GetStartDate()->Data(), 9);
+  cstr[9] = '\0';
+  svec.push_back(cstr);
+  // run start time
+  strncpy(cstr, fData[0].GetStartTime()->Data(), 8);
+  cstr[8] = '\0';
+  svec.push_back(cstr);
+  psibin.put_timeStart_vector(svec);
+  svec.clear();
+
+  // run stop date
+  strncpy(cstr, fData[0].GetStopDate()->Data(), 9);
+  cstr[9] = '\0';
+  svec.push_back(cstr);
+  // run stop time
+  strncpy(cstr, fData[0].GetStopTime()->Data(), 8);
+  cstr[8] = '\0';
+  svec.push_back(cstr);
+  psibin.put_timeStop_vector(svec);
+  svec.clear();
+
+  // t0's
+  for (UInt_t i=0; i<fData[0].GetT0Size(); i++)
+    psibin.put_t0_int(i, fData[0].GetT0(i));
+
+  // first/last good bin
+  for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
+    psibin.put_firstGood_int(i, fData[0].GetGoodDataBin(i).first);
+    psibin.put_lastGood_int(i, fData[0].GetGoodDataBin(i).second);
+  }
+
+  // number of measured temperatures
+  psibin.put_numberTemperature_int(fData[0].GetNoOfTemperatures());
+
+  // mean temperatures
+  vector<double> dvec;
+  for (UInt_t i=0; i<fData[0].GetNoOfTemperatures(); i++)
+    dvec.push_back(fData[0].GetTemperature(i));
+  psibin.put_temperatures_vector(dvec);
+
+  // standard deviation of temperatures
+  dvec.clear();
+  for (UInt_t i=0; i<fData[0].GetNoOfTemperatures(); i++)
+    dvec.push_back(fData[0].GetTempError(i));
+  psibin.put_devTemperatures_vector(dvec);
+
+  // write comment
+  psibin.put_comment(fData[0].GetRunTitle()->Data());
+
+  // write histogram labels
+  vector<string> histoLabel;
+  histoLabel.resize(fData[0].GetNoOfHistos());
+  char hl[32];
+  for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
+    sprintf(hl, "h%d", i);
+    histoLabel[i] = hl;
+  }
+  psibin.put_histoNames_vector(histoLabel);
+
+  // write time resolution
+  psibin.put_binWidth_ns(fData[0].GetTimeResolution());
+
+  // write scaler dummies
+  psibin.put_numberScaler_int(0);
+
+  // fill histograms
+  vector< vector<int> > histo;
+  histo.resize(fData[0].GetNoOfHistos());
+  for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
+    for (UInt_t j=0; j<fData[0].GetDataBin(i)->size(); j++)
+      histo[i].push_back((Int_t)fData[0].GetDataBin(i)->at(j));
+  }
+  status = psibin.put_histo_array_int(histo);
+  if (status != 0) {
+    cerr << endl << ">> PRunDataHandler::WritePsiBinFile(): " << psibin.ConsistencyStatus() << endl;
+    return false;
+  }
+
+  if (!psibin.CheckDataConsistency()) {
+    cerr << endl << ">> PRunDataHandler::WritePsiBinFile(): " << psibin.ConsistencyStatus() << endl;
+    return false;
+  }
+
+  // write data to file
+  status = psibin.write(fln.Data());
+
+  if (status != 0) {
+    cerr << endl << ">> PRunDataHandler::WritePsiBinFile(): " << psibin.WriteStatus() << endl;
+    return false;
+  }
+
   return true;
 }
 
@@ -3180,9 +3519,6 @@ Bool_t PRunDataHandler::WritePsiMduFile(TString fln)
  */
 Bool_t PRunDataHandler::WriteMudFile(TString fln)
 {
-  if (!fAny2ManyInfo->useStandardOutput)
-    cout << endl << ">> PRunDataHandler::WriteMudFile(): writing a mud data file ... " << endl;
-
   // generate output file name if needed
   if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
     if (fln.Length() == 0) {
@@ -3210,6 +3546,9 @@ Bool_t PRunDataHandler::WriteMudFile(TString fln)
     fln = TString("__tmp.msr");
   }
 
+  if (!fAny2ManyInfo->useStandardOutput)
+    cout << endl << ">> PRunDataHandler::WriteMudFile(): writing a mud data file (" << fln.Data() << ") ... " << endl;
+
   // generate the mud data file
   int fd = MUD_openWrite((char*)fln.Data(), MUD_FMT_TRI_TD_ID);
   if (fd == -1) {
@@ -3224,8 +3563,8 @@ Bool_t PRunDataHandler::WriteMudFile(TString fln)
   MUD_setExptNumber(fd, 0);
   MUD_setRunNumber(fd, fData[0].GetRunNumber());
   MUD_setElapsedSec(fd, 0);
-  MUD_setTimeBegin(fd, 0);
-  MUD_setTimeEnd(fd, 0);
+  MUD_setTimeBegin(fd, fData[0].GetStartDateTime());
+  MUD_setTimeEnd(fd, fData[0].GetStopDateTime());
   MUD_setTitle(fd, (char *)fData[0].GetRunTitle()->Data());
   MUD_setLab(fd, dummy);
   MUD_setArea(fd, dummy);
@@ -3359,9 +3698,6 @@ Bool_t PRunDataHandler::WriteMudFile(TString fln)
  */
 Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
 {
-  if (!fAny2ManyInfo->useStandardOutput)
-    cout << endl << ">> PRunDataHandler::WriteAsciiFile(): writing an ascii data file... " << endl;
-
   // generate output file name
   if (fln.Length() == 0) {
     Int_t start = fRunPathName.Last('/');
@@ -3384,6 +3720,9 @@ Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
   }
   // keep the file name if compression is whished
   fAny2ManyInfo->outPathFileName.push_back(fln);
+
+  if (!fAny2ManyInfo->useStandardOutput)
+    cout << endl << ">> PRunDataHandler::WriteAsciiFile(): writing an ascii data file (" << fln.Data() << ") ... " << endl;
 
   // write ascii file
   ofstream fout;
@@ -3426,8 +3765,11 @@ Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
     cout << endl << "% energy      : " << fData[0].GetEnergy() << " (keV)";
   if (fData[0].GetTransport() != PMUSR_UNDEFINED)
     cout << endl << "% transport   : " << fData[0].GetTransport() << " (kV)";
-  if (fData[0].GetTimeResolution() != PMUSR_UNDEFINED)
+  if (fData[0].GetTimeResolution() != PMUSR_UNDEFINED) {
+    cout.precision(10);
     cout << endl << "% time resolution : " << fData[0].GetTimeResolution()*fAny2ManyInfo->rebin << " (ns)";
+    cout.setf(ios::fixed,ios::floatfield);   // floatfield set to fixed
+  }
   if (fData[0].GetT0Size() > 0) {
     cout << endl << "% t0          : ";
     for (UInt_t i=0; i<fData[0].GetT0Size()-1; i++) {
@@ -3822,4 +4164,50 @@ TString PRunDataHandler::FileNameFromTemplate(TString &fileNameTemplate, Int_t r
     result = str;
 
   return result;
+}
+
+//--------------------------------------------------------------------------
+// GetMonth (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Spits out the month as MMM for a given numerical month 0..11
+ *
+ * <b>return:</b>
+ * - constructed file name from template, run number, and year
+ * - empty string
+ *
+ * \param template template string
+ */
+TString PRunDataHandler::GetMonth(Int_t month)
+{
+  TString mm("");
+
+  if (month == 0)
+    mm = "JAN";
+  else if (month == 1)
+    mm = "FEB";
+  else if (month == 2)
+    mm = "MAR";
+  else if (month == 3)
+    mm = "APR";
+  else if (month == 4)
+    mm = "MAY";
+  else if (month == 5)
+    mm = "JUN";
+  else if (month == 6)
+    mm = "JUL";
+  else if (month == 7)
+    mm = "AUG";
+  else if (month == 8)
+    mm = "SEP";
+  else if (month == 9)
+    mm = "OCT";
+  else if (month == 10)
+    mm = "NOV";
+  else if (month == 11)
+    mm = "DEC";
+  else
+    mm = "???";
+
+  return mm;
 }

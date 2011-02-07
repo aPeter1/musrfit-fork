@@ -6,6 +6,7 @@
 
 changes since 0.8.0
 ===================================
+NEW any2many: some more work, including the PSI-BIN write routines which are officially not released yet.
 NEW extended global mode in msr2data
 NEW any2many: an attempt to write the universial musr-data-file converter. Just started, needs still some work.
 NEW musrt0: added the possibility to show the t0 saved in the data file 's'. Furthermore added the option

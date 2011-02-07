@@ -82,7 +82,6 @@ class PRunDataHandler
     virtual Bool_t WriteNexusFile(TString fln="");
     virtual Bool_t WriteWkmFile(TString fln="");
     virtual Bool_t WritePsiBinFile(TString fln="");
-    virtual Bool_t WritePsiMduFile(TString fln="");
     virtual Bool_t WriteMudFile(TString fln="");
     virtual Bool_t WriteAsciiFile(TString fln="");
 
@@ -93,6 +92,7 @@ class PRunDataHandler
     virtual Int_t GetDataTagIndex(TString &str, const PStringVector* fLabels);
 
     virtual TString FileNameFromTemplate(TString &fileNameTemplate, Int_t run, TString &year, Bool_t &ok);
+    virtual TString GetMonth(Int_t month);
 };
 
 #endif //  _PRUNDATAHANDLER_H_

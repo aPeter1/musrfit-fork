@@ -279,6 +279,14 @@ class PRawRunData {
     virtual const Int_t GetRunNumber() { return fRunNumber; }
     virtual const TString* GetRunTitle() { return &fRunTitle; }
     virtual const TString* GetSetup() { return &fSetup; }
+    virtual const TString* GetStartTime() { return &fStartTime; }
+    virtual const TString* GetStartDate() { return &fStartDate; }
+    virtual const time_t GetStartDateTime() { return fStartDateTimeSec; }
+    virtual const TString* GetStopTime() { return &fStopTime; }
+    virtual const TString* GetStopDate() { return &fStopDate; }
+    virtual const time_t GetStopDateTime() { return fStopDateTimeSec; }
+    virtual const TString* GetSample() { return &fSample; }
+    virtual const TString* GetOrientation() { return &fOrientation; }
     virtual const Double_t GetField() { return fField; }
     virtual const UInt_t GetNoOfTemperatures() { return fTemp.size(); }
     virtual const PDoublePairVector* GetTemperature() const { return &fTemp; }
@@ -303,7 +311,15 @@ class PRawRunData {
     virtual void SetRunNumber(const Int_t &val) { fRunNumber = val; }
     virtual void SetRunTitle(const TString str) { fRunTitle = str; }
     virtual void SetSetup(const TString str) { fSetup = str; }
+    virtual void SetStartTime(const TString str) { fStartTime = str; }
+    virtual void SetStartDate(const TString str) { fStartDate = str; }
+    virtual void SetStartDateTime(const time_t val) { fStartDateTimeSec = val; }
+    virtual void SetStopTime(const TString str) { fStopTime = str; }
+    virtual void SetStopDate(const TString str) { fStopDate = str; }
+    virtual void SetStopDateTime(const time_t val) { fStopDateTimeSec = val; }
     virtual void SetField(const Double_t dval) { fField = dval; }
+    virtual void SetSample(const TString str) { fSample = str; }
+    virtual void SetOrientation(const TString str) { fOrientation = str; }
     virtual void ClearTemperature() { fTemp.clear(); }
     virtual void SetTemperature(const UInt_t idx, const Double_t temp, const Double_t errTemp);
     virtual void SetTempError(const UInt_t idx, const Double_t errTemp);
@@ -326,6 +342,14 @@ class PRawRunData {
     Int_t  fRunNumber;               ///< run number
     TString fRunTitle;               ///< run title
     TString fSetup;                  ///< description of the setup of this run
+    TString fStartTime;              ///< start time of the run
+    TString fStartDate;              ///< start date of the run
+    time_t fStartDateTimeSec;        ///< start run given as time_t object
+    TString fStopTime;               ///< stop time of the run
+    TString fStopDate;               ///< stop date of the run
+    time_t fStopDateTimeSec;         ///< stop run given as time_t object
+    TString fSample;                 ///< description of the sample
+    TString fOrientation;            ///< description of the orientation
     Double_t fField;                 ///< magnetic field value
     PDoublePairVector fTemp;         ///< measured temperatures and standard deviations during the run
     Double_t fEnergy;                ///< implantation energy of the muon

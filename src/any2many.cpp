@@ -314,6 +314,8 @@ int main(int argc, char *argv[])
     if (!strcmp(argv[i], "-p")) {
       if (i+1 < argc) {
         info.outPath = argv[i+1];
+        if (!info.outPath.EndsWith("/"))
+          info.outPath += "/";
       } else {
         cerr << endl << ">> any2many **ERROR** found output option '-p' without any argument." << endl;
         show_syntax = true;
@@ -396,7 +398,6 @@ int main(int argc, char *argv[])
     show_syntax = true;
   }
 
-/*
 cout << endl << "debug> info.year='" << info.year << "', info.year.length()=" << info.year.Length();
 cout << endl << "debug> info.useStandardOutput=" << info.useStandardOutput;
 cout << endl << "debug> info.inFormat=" << info.inFormat;
@@ -414,7 +415,6 @@ cout << endl << "debug> info.inFileName=";
 for (unsigned int i=0; i<info.inFileName.size(); i++)
   cout << info.inFileName[i] << ", ";
 cout << endl;
-*/
 
   if (show_syntax) {
     info.runList.clear();

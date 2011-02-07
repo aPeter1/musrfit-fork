@@ -40,10 +40,12 @@ using namespace std ;
 /* ------------------------------------------------------------------ */
 
 const int MAXHISTO     = 32;  // maximum number of histos to process/store
-const int MAXSCALER    = 32;  // maximum number of scalers to proces/store
+const int MAXSCALER    = 32;  // maximum number of scalers to process/store
 const int MAXTEMPER    =  4;  // maximum number of average temperatures
 
 const int MAXLABELSIZE = 12;  // maximum size of labels
+
+const int MAXREC = 4096;      // maximum allowed data record size
 
 /* ------------------------------------------------------------------ */
 
@@ -58,48 +60,53 @@ class MuSR_td_PSI_bin {
 
     string   filename;
     string   readstatus;
+    string   writestatus;
+    string   consistencyStatus;
     bool     readingok;
+    bool     writingok;
+    bool     consistencyOk;
 
-    char     format_id[3] ;
+    char     format_id[3];
 
-    int      num_run ;
+    int      num_run;
 
-    char     sample[11] ;
-    char     temp[11] ;
-    char     field[11] ;
-    char     orient[11] ;
-    char     comment[63] ;
+    char     sample[11];
+    char     temp[11];
+    char     field[11];
+    char     orient[11];
+    char     setup[11];
+    char     comment[63];
 
-    char     date_start[10] ;
-    char     date_stop[10] ;
-    char     time_start[9] ;
-    char     time_stop[9] ;
+    char     date_start[10];
+    char     date_stop[10];
+    char     time_start[9];
+    char     time_stop[9];
 
-    float    bin_width ;
+    float    bin_width;
 
-    int      number_histo ;
-    int      length_histo ;
-    char     labels_histo[MAXHISTO][MAXLABELSIZE] ;
+    int      number_histo;
+    int      length_histo;
+    char     labels_histo[MAXHISTO][MAXLABELSIZE];
 
-    int      total_events ;
-    int      events_per_histo[MAXHISTO] ;
+    int      total_events;
+    int      events_per_histo[MAXHISTO];
 
-    int      default_binning ;
+    int      default_binning;
 
-    float    real_t0[MAXHISTO] ;
-    int      integer_t0[MAXHISTO] ;
-    int      first_good[MAXHISTO] ;
-    int      last_good[MAXHISTO] ;
+    float    real_t0[MAXHISTO];
+    int      integer_t0[MAXHISTO];
+    int      first_good[MAXHISTO];
+    int      last_good[MAXHISTO];
 
-    int      number_scaler ;
-    int      scalers[MAXSCALER] ;
-    char     labels_scalers[MAXSCALER][MAXLABELSIZE] ;
+    int      number_scaler;
+    int      scalers[MAXSCALER];
+    char     labels_scalers[MAXSCALER][MAXLABELSIZE];
 
-    int      number_temper ;
-    float    temper[MAXTEMPER] ;
-    float    temp_deviation[MAXTEMPER] ;
+    int      number_temper;
+    float    temper[MAXTEMPER];
+    float    temp_deviation[MAXTEMPER];
 
-    int      **histo ;
+    int      **histo;
 
   public:
 
@@ -118,12 +125,19 @@ class MuSR_td_PSI_bin {
   public:
 
     int            read(const char* fileName);      // generic read
+    int            write(const char *fileName);     // generic write
 
     int            readbin(const char* fileName);   // read MuSR PSI bin format
+    int            writebin(const char *fileName);  // write MuSR PSI bin format
     int            readmdu(const char* fileName);   // read MuSR mdu format
+    int            writemdu(const char* fileName);  // write MuSR mdu format
 
     bool           readingOK()     const;
+    bool           writingOK()     const;
+    bool           CheckDataConsistency(int tag=0); // tag: 0=reasonable, 1=strict
     string         ReadStatus()    const;
+    string         WriteStatus()   const;
+    string         ConsistencyStatus() const;
     string         Filename()      const;
 
     int            Show()          const;
@@ -133,43 +147,40 @@ class MuSR_td_PSI_bin {
     double          get_histo(int histo_num, int j);
 
     int            *get_histo_array_int(int histo_num);
-    double         *get_histo_array(int histo_num , int binning) ;
-    vector<double>  get_histo_vector(int histo_num , int binning) ;
-    vector<double>  get_histo_vector_no0(int histo_num , int binning) ;
+    double         *get_histo_array(int histo_num, int binning);
+    int             put_histo_array_int(vector< vector<int> > histo, int tag = 0);
+    vector<double>  get_histo_vector(int histo_num, int binning);
+    vector<double>  get_histo_vector_no0(int histo_num, int binning);
 
-    double         *get_histo_fromt0_array(int histo_num ,
-                                           int binning ,
-                                           int offset = 0) ;
+    double         *get_histo_fromt0_array(int histo_num, int binning, int offset = 0);
 
-    vector<double>  get_histo_fromt0_vector(int histo_num ,
-                                            int binning ,
-                                            int offset = 0) ;
+    vector<double>  get_histo_fromt0_vector(int histo_num, int binning, int offset = 0);
 
-    double         *get_histo_goodBins_array(int histo_num , int binning) ;
+    double         *get_histo_goodBins_array(int histo_num, int binning);
 
-    vector<double>  get_histo_goodBins_vector(int histo_num , int binning) ;
+    vector<double>  get_histo_goodBins_vector(int histo_num, int binning);
 
-    double         *get_histo_fromt0_minus_bckgrd_array(int histo_num ,
-                                                         int lower_bckgdr ,
-                                                         int higher_bckgdr ,
-                                                         int binning ,
-                                                         int offset = 0) ;
+    double         *get_histo_fromt0_minus_bckgrd_array(int histo_num,
+                                                         int lower_bckgdr,
+                                                         int higher_bckgdr,
+                                                         int binning,
+                                                         int offset = 0);
 
-    vector<double>  get_histo_fromt0_minus_bckgrd_vector(int histo_num ,
-                                                          int lower_bckgdr ,
-                                                          int higher_bckgdr ,
-                                                          int binning ,
-                                                          int offset = 0) ;
+    vector<double>  get_histo_fromt0_minus_bckgrd_vector(int histo_num,
+                                                          int lower_bckgdr,
+                                                          int higher_bckgdr,
+                                                          int binning,
+                                                          int offset = 0);
 
-    double         *get_histo_goodBins_minus_bckgrd_array(int histo_num ,
-                                                          int lower_bckgrd ,
-                                                          int higher_bckgrd ,
-                                                          int binning) ;
+    double         *get_histo_goodBins_minus_bckgrd_array(int histo_num,
+                                                          int lower_bckgrd,
+                                                          int higher_bckgrd,
+                                                          int binning);
 
-   vector<double>   get_histo_goodBins_minus_bckgrd_vector(int histo_num ,
-                                                           int lower_bckgrd ,
-                                                           int higher_bckgrd ,
-                                                           int binning) ;
+   vector<double>   get_histo_goodBins_minus_bckgrd_vector(int histo_num,
+                                                           int lower_bckgrd,
+                                                           int higher_bckgrd,
+                                                           int binning);
 
     double         *get_asymmetry_array(int histo_num_plus,
                                          int histo_num_minus,
@@ -178,88 +189,95 @@ class MuSR_td_PSI_bin {
                                          int lower_bckgrd_plus,
                                          int higher_bckgrd_plus,
                                          int lower_bckgrd_minus,
-                                         int higher_bckgrd_minus ,
+                                         int higher_bckgrd_minus,
                                          int offset = 0,
-                                         double y_offset = 0.) ;
+                                         double y_offset = 0.);
 
-    vector<double>  get_asymmetry_vector(int histo_num_plus ,
-                                          int histo_num_minus ,
-                                          double alpha_param ,
-                                          int binning ,
-                                          int lower_bckgrd_plus ,
-                                          int higher_bckgrd_plus ,
-                                          int lower_bckgrd_minus ,
-                                          int higher_bckgrd_minus ,
-                                          int offset = 0 ,
-                                          double y_offset = 0.) ;
+    vector<double>  get_asymmetry_vector(int histo_num_plus,
+                                          int histo_num_minus,
+                                          double alpha_param,
+                                          int binning,
+                                          int lower_bckgrd_plus,
+                                          int higher_bckgrd_plus,
+                                          int lower_bckgrd_minus,
+                                          int higher_bckgrd_minus,
+                                          int offset = 0,
+                                          double y_offset = 0.);
 
-    double          *get_error_asymmetry_array(int histo_num_plus ,
-                                                int histo_num_minus ,
-                                                double alpha_param ,
-                                                int binning ,
-                                                int lower_bckgrd_plus ,
-                                                int higher_bckgrd_plus ,
-                                                int lower_bckgrd_minus ,
-                                                int higher_bckgrd_minus ,
-                                                int offset = 0) ;
+    double          *get_error_asymmetry_array(int histo_num_plus,
+                                                int histo_num_minus,
+                                                double alpha_param,
+                                                int binning,
+                                                int lower_bckgrd_plus,
+                                                int higher_bckgrd_plus,
+                                                int lower_bckgrd_minus,
+                                                int higher_bckgrd_minus,
+                                                int offset = 0);
 
-    vector<double>  get_error_asymmetry_vector(int histo_num_plus ,
-                                                int histo_num_minus ,
-                                                double alpha_param ,
-                                                int binning ,
-                                                int lower_bckgrd_plus ,
-                                                int higher_bckgrd_plus ,
-                                                int lower_bckgrd_minus ,
-                                                int higher_bckgrd_minus ,
-                                                int offset = 0) ;
+    vector<double>  get_error_asymmetry_vector(int histo_num_plus,
+                                                int histo_num_minus,
+                                                double alpha_param,
+                                                int binning,
+                                                int lower_bckgrd_plus,
+                                                int higher_bckgrd_plus,
+                                                int lower_bckgrd_minus,
+                                                int higher_bckgrd_minus,
+                                                int offset = 0);
 
-    double         *get_asymmetry_goodBins_array(int histo_num_plus ,
-                                                  int histo_num_minus ,
-                                                  double alpha_param ,
-                                                  int binning ,
-                                                  int lower_bckgrd_plus ,
-                                                  int higher_bckgrd_plus ,
-                                                  int lower_bckgrd_minus ,
-                                                  int higher_bckgrd_minus) ;
+    double         *get_asymmetry_goodBins_array(int histo_num_plus,
+                                                  int histo_num_minus,
+                                                  double alpha_param,
+                                                  int binning,
+                                                  int lower_bckgrd_plus,
+                                                  int higher_bckgrd_plus,
+                                                  int lower_bckgrd_minus,
+                                                  int higher_bckgrd_minus);
 
-    vector<double> get_asymmetry_goodBins_vector(int histo_num_plus ,
-                                                  int histo_num_minus ,
-                                                  double alpha_param ,
-                                                  int binning ,
-                                                  int lower_bckgrd_plus ,
-                                                  int higher_bckgrd_plus ,
-                                                  int lower_bckgrd_minus ,
-                                                  int higher_bckgrd_minus) ;
+    vector<double> get_asymmetry_goodBins_vector(int histo_num_plus,
+                                                  int histo_num_minus,
+                                                  double alpha_param,
+                                                  int binning,
+                                                  int lower_bckgrd_plus,
+                                                  int higher_bckgrd_plus,
+                                                  int lower_bckgrd_minus,
+                                                  int higher_bckgrd_minus);
 
-    double        *get_error_asymmetry_goodBins_array(int histo_num_plus ,
-                                                       int histo_num_minus ,
-                                                       double alpha_param ,
-                                                       int binning ,
-                                                       int lower_bckgrd_plus ,
-                                                       int higher_bckgrd_plus ,
-                                                       int lower_bckgrd_minus ,
-                                                       int higher_bckgrd_minus) ;
+    double        *get_error_asymmetry_goodBins_array(int histo_num_plus,
+                                                       int histo_num_minus,
+                                                       double alpha_param,
+                                                       int binning,
+                                                       int lower_bckgrd_plus,
+                                                       int higher_bckgrd_plus,
+                                                       int lower_bckgrd_minus,
+                                                       int higher_bckgrd_minus);
 
-    vector<double> get_error_asymmetry_goodBins_vector(int histo_num_plus ,
-                                                        int histo_num_minus ,
-                                                        double alpha_param ,
-                                                        int binning ,
-                                                        int lower_bckgrd_plus ,
-                                                        int higher_bckgrd_plus ,
-                                                        int lower_bckgrd_minus ,
-                                                        int higher_bckgrd_minus) ;
+    vector<double> get_error_asymmetry_goodBins_vector(int histo_num_plus,
+                                                        int histo_num_minus,
+                                                        double alpha_param,
+                                                        int binning,
+                                                        int lower_bckgrd_plus,
+                                                        int higher_bckgrd_plus,
+                                                        int lower_bckgrd_minus,
+                                                        int higher_bckgrd_minus);
 
 
     double          get_binWidth_ps();
+    void            put_binWidth_ps(double binWidth);
     double          get_binWidth_ns();
+    void            put_binWidth_ns(double binWidth);
     double          get_binWidth_us();
+    void            put_binWidth_us(double binWidth);
 
     int             get_histoLength_bin();
+    void            put_histoLength_bin(int val) { length_histo = val; }
 
     int             get_numberHisto_int();
+    void            put_numberHisto_int(int val) { number_histo = val; }
 
-    string          get_nameHisto(int i) ;
+    string          get_nameHisto(int i);
+    int             put_nameHisto(string histoName, int i);
     vector<string>  get_histoNames_vector();
+    int             put_histoNames_vector(vector<string> &histoNames);
 
     long            get_eventsHisto_long(int i);
     vector<long>    get_eventsHisto_vector();
@@ -267,52 +285,69 @@ class MuSR_td_PSI_bin {
     long            get_totalEvents_long();
 
     int             get_numberScaler_int();
-    vector<long>    get_scalers_vector() ;
-    vector<string>  get_scalersNames_vector() ;
+    int             put_numberScaler_int(int val);
+    vector<long>    get_scalers_vector();
+    int             put_scalers_vector(vector<int> scalerData);
+    vector<string>  get_scalersNames_vector();
+    int             put_scalersNames_vector(vector<string> scalersName);
 
-    int             get_default_binning() ;
-    int             get_t0_int(int i) ;
-    vector<int>     get_t0_vector() ;
-    double          get_t0_double(int i) ;
+    int             get_default_binning();
+    int             get_t0_int(int i);
+    int             put_t0_int(int histoNo, int t0);
+    vector<int>     get_t0_vector();
+    int             put_t0_vector(vector<int> &t0Data);
+    double          get_t0_double(int i);
 
-    int             get_max_t0_int () ;
-    int             get_max_2_t0_int (int k, int j) ;
-    int             get_min_t0_int () ;
-    int             get_min_2_t0_int (int k, int j) ;
+    int             get_max_t0_int ();
+    int             get_max_2_t0_int (int k, int j);
+    int             get_min_t0_int ();
+    int             get_min_2_t0_int (int k, int j);
 
-    int             get_firstGood_int(int i) ;
-    vector<int>     get_firstGood_vector() ;
-    int             put_firstGood_int(int i, int j) ;
+    int             get_firstGood_int(int i);
+    vector<int>     get_firstGood_vector();
+    int             put_firstGood_int(int i, int j);
 
-    int             get_lastGood_int(int i) ;
-    vector<int>     get_lastGood_vector() ;
-    int             put_lastGood_int(int i, int j) ;
+    int             get_lastGood_int(int i);
+    vector<int>     get_lastGood_vector();
+    int             put_lastGood_int(int i, int j);
 
-    int             get_max_lastGood_int () ;
-    int             get_max_2_lastGood_int (int k, int j) ;
-    int             get_min_lastGood_int () ;
-    int             get_min_2_lastGood_int (int k, int j) ;
+    int             get_max_lastGood_int ();
+    int             get_max_2_lastGood_int (int k, int j);
+    int             get_min_lastGood_int ();
+    int             get_min_2_lastGood_int (int k, int j);
 
-    int             get_runNumber_int() ;
-    int             put_runNumber_int(int i) ;
+    int             get_runNumber_int();
+    int             put_runNumber_int(int i);
 
-    string          get_sample() ;
-    string          get_field() ;
-    string          get_orient() ;
-    string          get_temp() ;
-    string          get_comment() ;
+    string          get_sample();
+    int             put_sample(string sample);
+    string          get_field();
+    int             put_field(string field);
+    string          get_orient();
+    int             put_orient(string orientation);
+    string          get_temp();
+    int             put_temp(string temp);
+    string          get_setup();
+    int             put_setup(string setup);
+    string          get_comment();
+    int             put_comment(string comment);
 
-    vector<string>  get_timeStart_vector() ;
-    vector<string>  get_timeStop_vector() ;
+    vector<string>  get_timeStart_vector();
+    int             put_timeStart_vector(vector<string> timeStart);
+    vector<string>  get_timeStop_vector();
+    int             put_timeStop_vector(vector<string> timeStop);
 
-    int             get_numberTemperature_int() ;
-    vector<double>  get_temperatures_vector() ;
-    vector<double>  get_devTemperatures_vector() ;
+    int             get_numberTemperature_int();
+    int             put_numberTemperature_int(int noOfTemps);
+    vector<double>  get_temperatures_vector();
+    int             put_temperatures_vector(vector<double> &temps);
+    vector<double>  get_devTemperatures_vector();
+    int             put_devTemperatures_vector(vector<double> &devTemps);
 
   private:
 
-    int tmax(int x, int y) ;
-    int tmin(int x, int y) ;
+    int tmax(int x, int y);
+    int tmin(int x, int y);
 
 } ;
 #endif
