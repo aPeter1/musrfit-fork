@@ -129,6 +129,40 @@ void msr2data_syntax()
 
 //--------------------------------------------------------------------------
 /**
+ * <p>Cleaning up some used variables
+ *
+ * \param msr2dataHandler pointer to PMsr2Data object
+ * \param run_vec vector containing the run numbers
+ * \param arg vector containing the command line arguments
+ *
+ */
+void msr2data_cleanup(PMsr2Data *msr2dataHandler, vector<unsigned int> &run_vec, vector<string> &arg)
+{
+  delete msr2dataHandler;
+  msr2dataHandler = 0;
+  run_vec.clear();
+  arg.clear();
+  return;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>Cleaning up some used variables
+ *
+ * \param msr2dataHandler pointer to PMsr2Data object
+ * \param arg vector containing the command line arguments
+ *
+ */
+void msr2data_cleanup(PMsr2Data *msr2dataHandler, vector<string> &arg)
+{
+  delete msr2dataHandler;
+  msr2dataHandler = 0;
+  arg.clear();
+  return;
+}
+
+//--------------------------------------------------------------------------
+/**
  * <p>Checks if only valid options appear in the argument list
  *
  * <p><b>return:</b>
@@ -168,7 +202,7 @@ string msr2data_validArguments(const vector<string> &arg)
 
 //--------------------------------------------------------------------------
 /**
- * <p>filters out the output file name from at argument string
+ * <p>filters out the output file name from the argument string
  *
  * <p><b>return:</b>
  * - output file name if present in the argument list
@@ -481,36 +515,34 @@ int main(int argc, char *argv[])
     realOutput = false;
 
 // create the msr2data-object and set the run numbers according to the runTAG above
-  PMsr2Data msr2dataHandler(msrExtension);
+  PMsr2Data *msr2dataHandler = new PMsr2Data(msrExtension);
 
   int status;
 
   switch(runTAG) {
     case 1:
-      status = msr2dataHandler.SetRunNumbers(run_vec);
+      status = msr2dataHandler->SetRunNumbers(run_vec);
       break;
     case 2:
-      status = msr2dataHandler.SetRunNumbers(run_vec[0], run_vec[1]);
+      status = msr2dataHandler->SetRunNumbers(run_vec[0], run_vec[1]);
       break;
     case 3:
-      status = msr2dataHandler.SetRunNumbers(run_vec[0]);
+      status = msr2dataHandler->SetRunNumbers(run_vec[0]);
       break;
     case 4:
-      status = msr2dataHandler.SetRunNumbers(run_list);
+      status = msr2dataHandler->SetRunNumbers(run_list);
       break;
     default:
       cerr << endl;
       cerr << ">> msr2data: **ERROR** None of the possible run list specifications has been detected! Quitting now..." << endl;
-      run_vec.clear();
-      arg.clear();
+      msr2data_cleanup(msr2dataHandler, run_vec, arg);
       return 0;
   }
 
   if (status == 1) {
     cerr << endl;
     cerr << ">> msr2data: **ERROR** The run numbers are out of range! Quitting..." << endl;
-    run_vec.clear();
-    arg.clear();
+    msr2data_cleanup(msr2dataHandler, run_vec, arg);
     return status;
   }
 
@@ -526,14 +558,12 @@ int main(int argc, char *argv[])
   if (temp == -2) {
     cerr << endl;
     cerr << ">> msr2data: **ERROR** More than one fitting options are specified! Quitting..." << endl;
-    run_vec.clear();
-    arg.clear();
+    msr2data_cleanup(msr2dataHandler, arg);
     return temp;
   } else if (temp == -3) {
     cerr << endl;
     cerr << ">> msr2data: **ERROR** The given template has not a valid run number! Quitting..." << endl;
-    run_vec.clear();
-    arg.clear();
+    msr2data_cleanup(msr2dataHandler, arg);
     return temp;
   }
 
@@ -558,8 +588,7 @@ int main(int argc, char *argv[])
     if (temp == -3) {
       cerr << endl;
       cerr << ">> msr2data: **ERROR** The given template has not a valid run number! Quitting..." << endl;
-      run_vec.clear();
-      arg.clear();
+      msr2data_cleanup(msr2dataHandler, arg);
       return temp;
     }
   }
@@ -579,24 +608,22 @@ int main(int argc, char *argv[])
 // At this point it should be clear if any template for input-file generation is given or not.
 // Therefore, the number of digits in the run number format is determined only here.
   if(temp > 0) {
-    status = msr2dataHandler.DetermineRunNumberDigits(temp, setNormalMode);
+    status = msr2dataHandler->DetermineRunNumberDigits(temp, setNormalMode);
   } else {
-    status = msr2dataHandler.DetermineRunNumberDigits(msr2dataHandler.GetPresentRun(), setNormalMode);
+    status = msr2dataHandler->DetermineRunNumberDigits(msr2dataHandler->GetPresentRun(), setNormalMode);
   }
 
   if(status) {
-    run_vec.clear();
-    arg.clear();
+    msr2data_cleanup(msr2dataHandler, arg);
     return status;
   }
 
 // Check if all given run numbers are covered by the formatting of the data file name
-  status = msr2dataHandler.CheckRunNumbersInRange();
+  status = msr2dataHandler->CheckRunNumbersInRange();
   if(status) {
     cerr << endl;
     cerr << ">> msr2data: **ERROR** At least one given run number is out of range! Quitting..." << endl;
-    run_vec.clear();
-    arg.clear();
+    msr2data_cleanup(msr2dataHandler, arg);
     return status;
   }
 
@@ -606,6 +633,7 @@ int main(int argc, char *argv[])
   //              1 - write header explicitly (even if the file is present already)
   //              2 - write header automatically if a new file is created and do not if the data is appended to an existing file
 
+  fstream *fileOutput = 0;
   if (realOutput) {
     // check the arguments for the "header" and "noheader" options
     if (!msr2data_useOption(arg, "header")) {
@@ -623,16 +651,18 @@ int main(int argc, char *argv[])
 
     // delete old db/data file if the "new" option is given
     if (!msr2data_useOption(arg, "new")) {
-      fstream fileOutput;
-      fileOutput.open(outputFile.c_str(), ios::in);
-      if (fileOutput.is_open()) {
+      fileOutput = new fstream;
+      fileOutput->open(outputFile.c_str(), ios::in);
+      if (fileOutput->is_open()) {
         cout << endl << ">> msr2data: **INFO** Deleting output file " << outputFile << endl;
-        fileOutput.close();
-        fileOutput.open(outputFile.c_str(), ios::out | ios::trunc);
-        fileOutput.close();
+        fileOutput->close();
+        fileOutput->open(outputFile.c_str(), ios::out | ios::trunc);
+        fileOutput->close();
       } else {
         cout << endl << ">> msr2data: **INFO** Ignoring the 'new' option since " << outputFile << " does not exist yet." << endl;
       }
+      delete fileOutput;
+      fileOutput = 0;
       if (writeHeader == 2) {
         writeHeader = 1;
       }
@@ -642,16 +672,16 @@ int main(int argc, char *argv[])
 // GLOBAL MODE
   if (!setNormalMode) {
     ostringstream strInfile;
-    strInfile << msr2dataHandler.GetPresentRun() << "+global" << msrExtension << ".msr";
+    strInfile << msr2dataHandler->GetPresentRun() << "+global" << msrExtension << ".msr";
 
     // if fitting should be done, prepare a new input file
     if (temp) {
       if (temp > 0) { // if it is smaller no input file should be generated
-        bool success(msr2dataHandler.PrepareGlobalInputFile(temp, strInfile.str(), globalMode));
+        bool success(msr2dataHandler->PrepareGlobalInputFile(temp, strInfile.str(), globalMode));
 
         if (!success) {
           cerr << endl << ">> msr2data: **ERROR** Input file generation has not been successful! Quitting..." << endl;
-          arg.clear();
+          msr2data_cleanup(msr2dataHandler, arg);
           return -1;
         }
       }
@@ -679,11 +709,11 @@ int main(int argc, char *argv[])
     if (realOutput) {
       // read musrfit startup file
       if (writeSummary) {
-        status = msr2dataHandler.ParseXmlStartupFile();
+        status = msr2dataHandler->ParseXmlStartupFile();
       }
 
       // Read msr file
-      status = msr2dataHandler.ReadMsrFile(strInfile.str());
+      status = msr2dataHandler->ReadMsrFile(strInfile.str());
       if (status != PMUSR_SUCCESS) {
         arg.clear();
         return status;
@@ -691,15 +721,15 @@ int main(int argc, char *argv[])
 
       // read data files
       if (writeSummary)
-        writeSummary = msr2dataHandler.ReadRunDataFile();
+        writeSummary = msr2dataHandler->ReadRunDataFile();
 
       unsigned int counter(0);
 
-      while (msr2dataHandler.GetPresentRun()) {
+      while (msr2dataHandler->GetPresentRun()) {
         // write DB or dat file
-        status = msr2dataHandler.WriteOutput(outputFile, db, writeHeader, !setNormalMode, counter);
+        status = msr2dataHandler->WriteOutput(outputFile, db, writeHeader, !setNormalMode, counter);
         if (status != PMUSR_SUCCESS) {
-          arg.clear();
+          msr2data_cleanup(msr2dataHandler, arg);
           return status;
         }
         ++counter;
@@ -709,7 +739,7 @@ int main(int argc, char *argv[])
 
     // read musrfit startup file
     if (writeSummary) {
-      status = msr2dataHandler.ParseXmlStartupFile();
+      status = msr2dataHandler->ParseXmlStartupFile();
     }
 
     // Processing the run list, do the fitting and write the data to the DB or data output file
@@ -717,26 +747,26 @@ int main(int argc, char *argv[])
     unsigned int oldtemp(0); // should be accessed only when updated before...
     ostringstream strInfile;
 
-    while (msr2dataHandler.GetPresentRun()) {
+    while (msr2dataHandler->GetPresentRun()) {
       strInfile.clear();
       strInfile.str("");
-      strInfile << msr2dataHandler.GetPresentRun() << msrExtension << ".msr";
+      strInfile << msr2dataHandler->GetPresentRun() << msrExtension << ".msr";
 
       // if fitting should be done, prepare a new input file
       if (temp) {
         if (temp > 0) {
           bool success(true);
           if (firstrun || !chainfit)
-            success = msr2dataHandler.PrepareNewInputFile(temp, false);
+            success = msr2dataHandler->PrepareNewInputFile(temp, false);
           else
-            success = msr2dataHandler.PrepareNewInputFile(oldtemp, false);
+            success = msr2dataHandler->PrepareNewInputFile(oldtemp, false);
           if (firstrun)
             firstrun = false;
-          oldtemp = msr2dataHandler.GetPresentRun();
+          oldtemp = msr2dataHandler->GetPresentRun();
 
           if (!success) {
             cerr << endl << ">> msr2data: **ERROR** Input file generation has not been successful! Quitting..." << endl;
-            arg.clear();
+            msr2data_cleanup(msr2dataHandler, arg);
             return -1;
           }
         }
@@ -763,12 +793,12 @@ int main(int argc, char *argv[])
 
     // read msr-file
       if (realOutput) {
-        status = msr2dataHandler.ReadMsrFile(strInfile.str());
+        status = msr2dataHandler->ReadMsrFile(strInfile.str());
         if (status != PMUSR_SUCCESS) {
           // if the msr-file cannot be read, write no output but proceed to the next run
-          status = msr2dataHandler.WriteOutput("none", db, writeHeader);
+          status = msr2dataHandler->WriteOutput("none", db, writeHeader);
           if (status != PMUSR_SUCCESS) {
-            arg.clear();
+            msr2data_cleanup(msr2dataHandler, arg);
             return status;
           } else {
             continue;
@@ -778,12 +808,12 @@ int main(int argc, char *argv[])
 
     // read data files
       if (writeSummary)
-        writeSummary = msr2dataHandler.ReadRunDataFile();
+        writeSummary = msr2dataHandler->ReadRunDataFile();
 
     // write DB or dat file
-      status = msr2dataHandler.WriteOutput(outputFile, db, writeHeader);
+      status = msr2dataHandler->WriteOutput(outputFile, db, writeHeader);
       if (status != PMUSR_SUCCESS) {
-        arg.clear();
+        msr2data_cleanup(msr2dataHandler, arg);
         return status;
       }
     }
@@ -795,13 +825,14 @@ int main(int argc, char *argv[])
   // Unfortunately, there are also problems with boost::filesystem::exists(outputFile)
   // Therefore, first try to open the file for reading and if this works, write to it - not clean but it works
   if(realOutput) {
-    ifstream fileOutputCheck(outputFile.c_str());
-    if (fileOutputCheck.is_open()) {
-      fileOutputCheck.close();
-      ofstream fileOutput(outputFile.c_str(), ios::app);
-      if (fileOutput.is_open()) {
-        fileOutput << endl << endl;
-        fileOutput.close();
+    fileOutput = new fstream;
+    fileOutput->open(outputFile.c_str(), ios::in);
+    if (fileOutput->is_open()) {
+      fileOutput->close();
+      fileOutput->open(outputFile.c_str(), ios::out | ios::app);
+      if (fileOutput->is_open()) {
+        *fileOutput << endl << endl;
+        fileOutput->close();
       } else {
         cerr << endl << ">> msr2data: **ERROR** The output file " << outputFile << " cannot be opened! Please check!";
         cerr << endl;
@@ -810,16 +841,19 @@ int main(int argc, char *argv[])
       cerr << endl << ">> msr2data: **WARNING** No output has been written to the file " << outputFile << "!";
       cerr << endl << ">> msr2data: **WARNING** Please check the range of runs and the specified options!" << endl;
     }
+    delete fileOutput;
+    fileOutput = 0;
   }
 
   if (!arg.empty()) {
     cout << endl << ">> msr2data: **INFO** The following command line arguments have been specified but not been used: " << endl;
     cout << ">> msr2data: **INFO**";
-    for (unsigned int i(0); i<arg.size(); i++)
+    for (unsigned int i(0); i<arg.size(); ++i)
       cout << " " << arg[i];
     cout << endl;
-    arg.clear();
   }
+
+  msr2data_cleanup(msr2dataHandler, arg);
 
   cout << endl << ">> msr2data: done ..." << endl;
 

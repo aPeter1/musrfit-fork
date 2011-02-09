@@ -408,11 +408,11 @@ int MuSR_td_PSI_bin::readbin(const char * fileName)
   }
 
   dum_Float32 = (Float32 *) &buffer_file[1012];
-  bin_width             = *dum_Float32;
+  bin_width             = static_cast<double>(*dum_Float32);
 
   if (bin_width == 0.)
   {
-    bin_width=(625.E-6)/8.*pow(Float32(2.),Float32(tdc_resolution));
+    bin_width=0.125*(625.E-6)*pow(static_cast<double>(2.0),static_cast<double>(tdc_resolution));
   }
 
   default_binning = 1;
@@ -702,7 +702,7 @@ int MuSR_td_PSI_bin::writebin(const char *fileName)
     strncpy(buffer+948+i*4, labels_histo[i], 4);
   }
   // write TDS time resolution
-  dum_Float32 = (Float32)bin_width;
+  dum_Float32 = static_cast<Float32>(bin_width);
   memcpy(buffer+1012, (const char*)&dum_Float32, 4);
 
   // write header information
@@ -3396,7 +3396,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 
  double MuSR_td_PSI_bin::get_binWidth_ps()
  {
-   return double((double)bin_width*(double)1000000.);
+   return bin_width*1.0e6;
  }
 
  //*******************************
@@ -3410,7 +3410,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 
  void MuSR_td_PSI_bin::put_binWidth_ps(double binWidth)
  {
-   bin_width = (float)(binWidth/1.0e6);
+   bin_width = binWidth*1.0e-6;
  }
 
 //*******************************
@@ -3422,7 +3422,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 
  double MuSR_td_PSI_bin::get_binWidth_ns()
  {
-   return double((double)bin_width*(double)1000.);
+   return bin_width*1.0e3;
  }
 
  //*******************************
@@ -3436,7 +3436,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 
  void MuSR_td_PSI_bin::put_binWidth_ns(double binWidth)
  {
-   bin_width = (float)(binWidth/1.0e3);
+   bin_width = binWidth*1.0e-3;
  }
 
 //*******************************
@@ -3448,7 +3448,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 
  double MuSR_td_PSI_bin::get_binWidth_us()
  {
-   return double(bin_width);
+   return bin_width;
  }
 
  //*******************************
@@ -3462,7 +3462,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 
  void MuSR_td_PSI_bin::put_binWidth_us(double binWidth)
  {
-   bin_width = (float)binWidth;
+   bin_width = binWidth;
  }
 
 //*******************************
@@ -4253,7 +4253,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 
    for (unsigned int i=0; i<scalersName.size(); i++) {
      strncpy(labels_scalers[i], scalersName[i].c_str(), MAXLABELSIZE-1);
-     labels_scalers[i][MAXLABELSIZE] = '\0';
+     labels_scalers[i][MAXLABELSIZE-1] = '\0';
    }
 
    return 0;
@@ -4540,7 +4540,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
    strcpy(date_stop, "         ");
    strcpy(time_stop, "        ");
 
-   bin_width = 0.f;
+   bin_width = 0.;
    number_histo = 0;
    length_histo = 0;
    total_events = 0;

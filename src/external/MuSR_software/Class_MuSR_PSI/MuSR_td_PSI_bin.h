@@ -82,7 +82,7 @@ class MuSR_td_PSI_bin {
     char     time_start[9];
     char     time_stop[9];
 
-    float    bin_width;
+    double   bin_width;
 
     int      number_histo;
     int      length_histo;
