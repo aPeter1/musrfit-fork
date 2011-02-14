@@ -1195,7 +1195,6 @@ Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
   // forward
   for (UInt_t i=start; i<end; i++)
     bkg += runData->GetDataBin(histoNo)->at(i);
-cout << endl << "debug> bkg=" << bkg << ", end=" << end << ", start=" << start;
   bkg /= static_cast<Double_t>(end - start + 1);
 
   if (fScaleN0AndBkg)
