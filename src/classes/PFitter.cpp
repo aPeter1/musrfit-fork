@@ -304,6 +304,8 @@ Bool_t PFitter::CheckCommands()
       continue;
     } else if (it->fLine.Contains("MAX_LIKELIHOOD", TString::kIgnoreCase)) {
       continue;
+    } else if (it->fLine.Contains("SCALE_N0_BKG", TString::kIgnoreCase)) {
+      continue;
     } else if (it->fLine.Contains("INTERACTIVE", TString::kIgnoreCase)) {
       cmd.first  = PMN_INTERACTIVE;
       cmd.second = cmdLineNo;

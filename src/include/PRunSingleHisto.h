@@ -57,10 +57,12 @@ class PRunSingleHisto : public PRunBase
     virtual Bool_t PrepareViewData(PRawRunData* runData, const UInt_t histoNo);
 
   private:
+    Bool_t fScaleN0AndBkg;  ///< true=scale N0 and background to 1/ns, otherwise 1/bin
     UInt_t fNoOfFitBins;    ///< number of bins to be fitted
     Double_t fBackground;   ///< needed if background range is given (units: 1/bin)
 
-    Bool_t EstimateBkg(UInt_t histoNo);
+    virtual Bool_t EstimateBkg(UInt_t histoNo);
+    virtual Bool_t IsScaleN0AndBkg();
 };
 
 #endif // _PRUNSINGLEHISTO_H_

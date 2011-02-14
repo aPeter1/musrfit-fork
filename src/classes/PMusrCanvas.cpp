@@ -115,6 +115,7 @@ ClassImpQ(PMusrCanvas)
  */
 PMusrCanvas::PMusrCanvas()
 {
+  fScaleN0AndBkg = true;
   fValid = false;
   fDifferenceView   = false;
   fCurrentPlotView  = PV_DATA;
@@ -343,6 +344,8 @@ PMusrCanvas::~PMusrCanvas()
 void PMusrCanvas::SetMsrHandler(PMsrHandler *msrHandler)
 {
   fMsrHandler = msrHandler;
+
+  fScaleN0AndBkg = IsScaleN0AndBkg();
 
   // check if a fourier block is present in the msr-file, and if yes extract the given values
   if (fMsrHandler->GetMsrFourierList()->fFourierBlockPresent) {
@@ -1298,6 +1301,7 @@ void PMusrCanvas::InitFourier()
  */
 void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh)
 {
+  fScaleN0AndBkg = true;
   fValid = false;
   fDifferenceView   = false;
   fCurrentPlotView  = PV_DATA;
@@ -3027,7 +3031,10 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
           if (runList->at(0).IsLifetimeCorrected()) { // lifetime correction
             yAxisTitle = "asymmetry";
           } else { // no liftime correction
-            yAxisTitle = "N(t) per nsec";
+            if (fScaleN0AndBkg)
+              yAxisTitle = "N(t) per nsec";
+            else
+              yAxisTitle = "N(t) per bin";
           }
           break;
         case MSR_PLOT_ASYM:
@@ -5164,4 +5171,47 @@ void PMusrCanvas::SaveDataAscii()
   dumpVector.clear();
 
   cout << endl << ">> Data windows saved in ascii format ..." << endl;
+}
+
+//--------------------------------------------------------------------------
+// IsScaleN0AndBkg (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Checks if N0/Bkg normalization to 1/ns is whished. The default is yes, since most of the users want to have it that way.
+ * To overwrite this, one should add the line 'SCALE_N0_BKG FALSE' to the command block of the msr-file.
+ *
+ * <b>return:</b>
+ * - true, if scaling of N0 and Bkg to 1/ns is whished
+ * - false, otherwise
+ *
+ * \param histoNo forward histogram number of the run
+ */
+Bool_t PMusrCanvas::IsScaleN0AndBkg()
+{
+  Bool_t willScale = true;
+
+  PMsrLines *cmd = fMsrHandler->GetMsrCommands();
+  for (UInt_t i=0; i<cmd->size(); i++) {
+    if (cmd->at(i).fLine.Contains("SCALE_N0_BKG", TString::kIgnoreCase)) {
+      TObjArray *tokens = 0;
+      TObjString *ostr = 0;
+      TString str;
+      tokens = cmd->at(i).fLine.Tokenize(" \t");
+      if (tokens->GetEntries() != 2) {
+        cerr << endl << ">> PRunSingleHisto::IsScaleN0AndBkg(): **WARNING** Found uncorrect 'SCALE_N0_BKG' command, will ignore it.";
+        cerr << endl << ">> Allowed commands: SCALE_N0_BKG TRUE | FALSE" << endl;
+        return willScale;
+      }
+      ostr = dynamic_cast<TObjString*>(tokens->At(1));
+      str = ostr->GetString();
+      if (!str.CompareTo("FALSE", TString::kIgnoreCase)) {
+        willScale = false;
+      }
+      // clean up
+      if (tokens)
+        delete tokens;
+    }
+  }
+
+  return willScale;
 }

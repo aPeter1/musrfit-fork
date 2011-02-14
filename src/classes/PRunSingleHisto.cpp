@@ -33,6 +33,10 @@
 #include <fstream>
 using namespace std;
 
+#include <TString.h>
+#include <TObjArray.h>
+#include <TObjString.h>
+
 #include "PMusr.h"
 #include "PRunSingleHisto.h"
 
@@ -44,6 +48,7 @@ using namespace std;
  */
 PRunSingleHisto::PRunSingleHisto() : PRunBase()
 {
+  fScaleN0AndBkg = true;
   fNoOfFitBins  = 0;
 }
 
@@ -60,6 +65,8 @@ PRunSingleHisto::PRunSingleHisto() : PRunBase()
  */
 PRunSingleHisto::PRunSingleHisto(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
 {
+  fScaleN0AndBkg = IsScaleN0AndBkg();
+
   if (!PrepareData()) {
     cerr << endl << ">> PRunSingleHisto::PRunSingleHisto: **SEVERE ERROR**: Couldn't prepare data for fitting!";
     cerr << endl << ">> This is very bad :-(, will quit ...";
@@ -79,7 +86,7 @@ PRunSingleHisto::~PRunSingleHisto()
 }
 
 //--------------------------------------------------------------------------
-// CalcChiSquare
+// CalcChiSquare (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Calculate chi-square.
@@ -94,7 +101,7 @@ Double_t PRunSingleHisto::CalcChiSquare(const std::vector<Double_t>& par)
   Double_t chisq     = 0.0;
   Double_t diff      = 0.0;
 
-  Double_t N0;
+  Double_t N0 = 0.0;
 
   // check if norm is a parameter or a function
   if (fRunInfo->GetNormParamNo() < MSR_PARAM_FUN_OFFSET) { // norm is a parameter
@@ -144,11 +151,14 @@ Double_t PRunSingleHisto::CalcChiSquare(const std::vector<Double_t>& par)
 
   // the correction factor is need since the data scales like pack*t_res,
   // whereas the error scales like sqrt(pack*t_res)
-  return chisq * fRunInfo->GetPacking() * (fTimeResolution * 1.0e3);
+  if (fScaleN0AndBkg)
+    chisq *= fRunInfo->GetPacking() * (fTimeResolution * 1.0e3);
+
+  return chisq;
 }
 
 //--------------------------------------------------------------------------
-// CalcMaxLikelihood
+// CalcMaxLikelihood (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Calculate log maximum-likelihood.
@@ -204,7 +214,9 @@ Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
   Double_t data;
   Double_t time;
   // norm is needed since there is no simple scaling like in chisq case to get the correct Max.Log.Likelihood value when normlizing N(t) to 1/ns
-  Double_t normalizer = fRunInfo->GetPacking() * (fTimeResolution * 1.0e3);
+  Double_t normalizer = 1.0;
+  if (fScaleN0AndBkg)
+    normalizer = fRunInfo->GetPacking() * (fTimeResolution * 1.0e3);
   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
     if ((time>=fFitStartTime) && (time<=fFitEndTime)) {
@@ -225,7 +237,7 @@ Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
 }
 
 //--------------------------------------------------------------------------
-// CalcTheory
+// CalcTheory (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Calculate theory for a given set of fit-parameters.
@@ -275,9 +287,9 @@ void PRunSingleHisto::CalcTheory()
   }
 
   // calculate theory
-  UInt_t size  = fData.GetValue()->size();
-  Double_t start       = fData.GetDataTimeStart();
-  Double_t resolution  = fData.GetDataTimeStep();
+  UInt_t size = fData.GetValue()->size();
+  Double_t start = fData.GetDataTimeStart();
+  Double_t resolution = fData.GetDataTimeStep();
   Double_t time;
   for (UInt_t i=0; i<size; i++) {
     time = start + (Double_t)i*resolution;
@@ -310,7 +322,7 @@ UInt_t PRunSingleHisto::GetNoOfFitBins()
 }
 
 //--------------------------------------------------------------------------
-// PrepareData
+// PrepareData (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Prepare data for fitting or viewing. What is already processed at this stage:
@@ -501,7 +513,7 @@ Bool_t PRunSingleHisto::PrepareData()
   // keep the time resolution in (us)
   fTimeResolution = runData->GetTimeResolution()/1.0e3;
   cout.precision(8);
-  cout << endl << ">> PRunSingleHisto::PrepareData(): time resolution=" << fixed << runData->GetTimeResolution() << "(ns)" << endl;
+  cout << endl << ">> PRunSingleHisto::PrepareData(): time resolution=" << fixed << runData->GetTimeResolution() << "(ns)";
 
   if (fHandleTag == kFit)
     success = PrepareFitData(runData, histoNo[0]);
@@ -519,7 +531,7 @@ Bool_t PRunSingleHisto::PrepareData()
 }
 
 //--------------------------------------------------------------------------
-// PrepareFitData
+// PrepareFitData (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Take the pre-processed data (i.e. grouping and addrun are preformed) and form the histogram for fitting.
@@ -607,9 +619,11 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
   // everything looks fine, hence fill data set
   Int_t t0 = fT0s[0];
   Double_t value = 0.0;
+  Double_t normalizer = 1.0;
   // in order that after rebinning the fit does not need to be redone (important for plots)
-  // the value is normalize to per 1 nsec
-  Double_t normalizer = fRunInfo->GetPacking() * (fTimeResolution * 1.0e3); // fTimeResolution us->ns
+  // the value is normalize to per 1 nsec if scaling is whished
+  if (fScaleN0AndBkg)
+    normalizer = fRunInfo->GetPacking() * (fTimeResolution * 1.0e3); // fTimeResolution us->ns
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
   fData.SetDataTimeStart(fTimeResolution*((Double_t)start-(Double_t)t0+(Double_t)(fRunInfo->GetPacking()-1)/2.0));
@@ -651,7 +665,7 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
 }
 
 //--------------------------------------------------------------------------
-// PrepareRawViewData
+// PrepareRawViewData (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Take the pre-processed data (i.e. grouping and addrun are preformed) and form the histogram for viewing
@@ -723,7 +737,8 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
     if (((i-start) % packing == 0) && (i != start)) { // fill data
       // in order that after rebinning the fit does not need to be redone (important for plots)
       // the value is normalize to per 1 nsec
-      normalizer = packing * (fTimeResolution * 1e3); // fTimeResolution us->ns
+      if (fScaleN0AndBkg)
+        normalizer = packing * (fTimeResolution * 1e3); // fTimeResolution us->ns
       value /= normalizer;
       fData.AppendValue(value);
       if (value == 0.0)
@@ -828,7 +843,7 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
 }
 
 //--------------------------------------------------------------------------
-// PrepareViewData
+// PrepareViewData (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Take the pre-processed data (i.e. grouping and addrun are preformed) and form the histogram for viewing
@@ -975,7 +990,8 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
       if (((i-start) % packing == 0) && (i != start)) { // fill data
         // in order that after rebinning the fit does not need to be redone (important for plots)
         // the value is normalize to per 1 nsec
-        normalizer = packing * (fTimeResolution * 1.0e3); // fTimeResolution us->ns
+        if (fScaleN0AndBkg)
+          normalizer = packing * (fTimeResolution * 1.0e3); // fTimeResolution us->ns
         value /= normalizer;
         time = (((Double_t)i-(Double_t)(packing-1)/2.0)-t0)*fTimeResolution;
         expval = TMath::Exp(+time/tau)/N0;
@@ -1106,7 +1122,7 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
 }
 
 //--------------------------------------------------------------------------
-// EstimatBkg
+// EstimatBkg (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Estimate the background for a given interval.
@@ -1179,11 +1195,58 @@ Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
   // forward
   for (UInt_t i=start; i<end; i++)
     bkg += runData->GetDataBin(histoNo)->at(i);
+cout << endl << "debug> bkg=" << bkg << ", end=" << end << ", start=" << start;
   bkg /= static_cast<Double_t>(end - start + 1);
 
-  fBackground = bkg / (fTimeResolution * 1e3); // keep background (per 1 nsec) for chisq, max.log.likelihood, fTimeResolution us->ns
+  if (fScaleN0AndBkg)
+    fBackground = bkg / (fTimeResolution * 1e3); // keep background (per 1 nsec) for chisq, max.log.likelihood, fTimeResolution us->ns
+  else
+    fBackground = bkg * fRunInfo->GetPacking();  // keep background (per bin)
 
   cout << endl << ">> fRunInfo->fRunName=" << fRunInfo->GetRunName()->Data() << ", histNo=" << histoNo << ", fBackground=" << fBackground;
 
   return true;
+}
+
+//--------------------------------------------------------------------------
+// IsScaleN0AndBkg (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Checks if N0/Bkg normalization to 1/ns is whished. The default is yes, since most of the users want to have it that way.
+ * To overwrite this, one should add the line 'SCALE_N0_BKG FALSE' to the command block of the msr-file.
+ *
+ * <b>return:</b>
+ * - true, if scaling of N0 and Bkg to 1/ns is whished
+ * - false, otherwise
+ *
+ * \param histoNo forward histogram number of the run
+ */
+Bool_t PRunSingleHisto::IsScaleN0AndBkg()
+{
+  Bool_t willScale = true;
+
+  PMsrLines *cmd = fMsrInfo->GetMsrCommands();
+  for (UInt_t i=0; i<cmd->size(); i++) {
+    if (cmd->at(i).fLine.Contains("SCALE_N0_BKG", TString::kIgnoreCase)) {
+      TObjArray *tokens = 0;
+      TObjString *ostr = 0;
+      TString str;
+      tokens = cmd->at(i).fLine.Tokenize(" \t");
+      if (tokens->GetEntries() != 2) {
+        cerr << endl << ">> PRunSingleHisto::IsScaleN0AndBkg(): **WARNING** Found uncorrect 'SCALE_N0_BKG' command, will ignore it.";
+        cerr << endl << ">> Allowed commands: SCALE_N0_BKG TRUE | FALSE" << endl;
+        return willScale;
+      }
+      ostr = dynamic_cast<TObjString*>(tokens->At(1));
+      str = ostr->GetString();
+      if (!str.CompareTo("FALSE", TString::kIgnoreCase)) {
+        willScale = false;
+      }
+      // clean up
+      if (tokens)
+        delete tokens;
+    }
+  }
+
+  return willScale;
 }

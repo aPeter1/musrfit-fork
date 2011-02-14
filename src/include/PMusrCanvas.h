@@ -231,6 +231,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat);
 
   private:
+    Bool_t fScaleN0AndBkg;    ///< true=N0 and background is scaled to (1/ns), otherwise (1/bin) for the single histogram case
     Bool_t fBatchMode;        ///< musrview in ROOT batch mode
     Bool_t fValid;            ///< if true, everything looks OK
     Bool_t fDifferenceView;   ///< tag showing that the shown data, fourier, are the difference between data and theory
@@ -317,6 +318,8 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void DecrementFourierPhase();
 
     virtual void SaveDataAscii();
+
+    virtual Bool_t IsScaleN0AndBkg();
 
   ClassDef(PMusrCanvas, 1)
 };

@@ -6,6 +6,8 @@
 
 changes since 0.8.0
 ===================================
+NEW added the command SCALE_N0_BKG TRUE | FALSE to the command-block. This can be used to force a single histogram fit 
+    to use either 1/ns scaling for N0 and background or 1/bins one. 
 NEW any2many: some more work, including the PSI-BIN write routines which are officially not released yet.
 NEW extended global mode in msr2data
 NEW any2many: an attempt to write the universial musr-data-file converter. Just started, needs still some work.
