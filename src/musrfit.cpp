@@ -42,6 +42,8 @@ using namespace std;
 #include <TFile.h>
 #include <TCanvas.h>
 #include <TH1.h>
+#include <TSystem.h>
+#include <TSystemFile.h>
 
 #include "PMusr.h"
 #include "PStartupHandler.h"
@@ -488,7 +490,7 @@ int main(int argc, char *argv[])
   }
 
   // if present, replace the run title of the <msr-file> with the run title of the FIRST run in the run block of the msr-file
-  if (title_from_data_file) {
+  if (title_from_data_file && success) {
     PMsrRunList *rl  = msrHandler->GetMsrRunList();
     PRawRunData *rrd = dataHandler->GetRunData(*(rl->at(0).GetRunName()));
     if (rrd->GetRunTitle()->Length() > 0)
@@ -522,10 +524,11 @@ int main(int argc, char *argv[])
   }
 
   // write log file
-  if (success && !chisq_only && !fitter->IsScanOnly()) {
-    status = msrHandler->WriteMsrLogFile();
-    if (status != PMUSR_SUCCESS) {
-      switch (status) {
+  if (success && !chisq_only) {
+    if (!fitter->IsScanOnly()) {
+      status = msrHandler->WriteMsrLogFile();
+      if (status != PMUSR_SUCCESS) {
+        switch (status) {
         case PMUSR_MSR_LOG_FILE_WRITE_ERROR:
           cout << endl << "**ERROR** couldn't write mlog-file" << endl << endl;
           break;
@@ -535,6 +538,7 @@ int main(int argc, char *argv[])
         default:
           cout << endl << "**UNKOWN ERROR** when trying to write the mlog-file" << endl << endl;
           break;
+        }
       }
     }
   }
@@ -552,36 +556,41 @@ int main(int argc, char *argv[])
   }
 
   // rename MINUIT2.OUTPUT and MINUIT2.root file if wanted
-  if (keep_mn2_output && !chisq_only && !fitter->IsScanOnly()) {
-    // 1st rename MINUIT2.OUTPUT
-    TString fln = TString(filename);
-    char ext[32];
-    strcpy(ext, "-mn2.output");
-    fln.ReplaceAll(".msr", 4, ext, strlen(ext));
-    gSystem->CopyFile("MINUIT2.OUTPUT", fln.Data(), kTRUE);
+  if (success) {
+    if (keep_mn2_output && !chisq_only && !fitter->IsScanOnly()) {
+      // 1st rename MINUIT2.OUTPUT
+      TString fln = TString(filename);
+      char ext[32];
+      strcpy(ext, "-mn2.output");
+      fln.ReplaceAll(".msr", 4, ext, strlen(ext));
+      gSystem->CopyFile("MINUIT2.OUTPUT", fln.Data(), kTRUE);
 
-    // 2nd rename MINUIT2.ROOT
-    fln = TString(filename);
-    strcpy(ext, "-mn2.root");
-    fln.ReplaceAll(".msr", 4, ext, strlen(ext));
-    gSystem->CopyFile("MINUIT2.root", fln.Data(), kTRUE);
+      // 2nd rename MINUIT2.ROOT
+      fln = TString(filename);
+      strcpy(ext, "-mn2.root");
+      fln.ReplaceAll(".msr", 4, ext, strlen(ext));
+      gSystem->CopyFile("MINUIT2.root", fln.Data(), kTRUE);
+    }
   }
 
-  if (!chisq_only && !fitter->IsScanOnly()) {
-    // swap msr- and mlog-file
-    cout << endl << ">> swapping msr-, mlog-file ..." << endl;
-    // copy msr-file -> __temp.msr
-    gSystem->CopyFile(filename, "__temp.msr", kTRUE);
-    // copy mlog-file -> msr-file
-    TString fln = TString(filename);
-    char ext[32];
-    strcpy(ext, ".mlog");
-    fln.ReplaceAll(".msr", 4, ext, strlen(ext));
-    gSystem->CopyFile(fln.Data(), filename, kTRUE);
-    // copy __temp.msr -> mlog-file
-    gSystem->CopyFile("__temp.msr", fln.Data(), kTRUE);
-    // delete __temp.msr
-    gSystem->Exec("rm __temp.msr");
+  if (success) {
+    if (!chisq_only && !fitter->IsScanOnly()) {
+      // swap msr- and mlog-file
+      cout << endl << ">> swapping msr-, mlog-file ..." << endl;
+      // copy msr-file -> __temp.msr
+      gSystem->CopyFile(filename, "__temp.msr", kTRUE);
+      // copy mlog-file -> msr-file
+      TString fln = TString(filename);
+      char ext[32];
+      strcpy(ext, ".mlog");
+      fln.ReplaceAll(".msr", 4, ext, strlen(ext));
+      gSystem->CopyFile(fln.Data(), filename, kTRUE);
+      // copy __temp.msr -> mlog-file
+      gSystem->CopyFile("__temp.msr", fln.Data(), kTRUE);
+      // delete __temp.msr
+      TSystemFile tmp("__temp.msr", "./");
+      tmp.Delete();
+    }
   }
 
   // clean up
