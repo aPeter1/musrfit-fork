@@ -1304,15 +1304,16 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
 
       // and do the fitting
       // check if MUSRFITPATH is set, if not issue a warning
-      string path;
-      try {
-        path = boost::lexical_cast<string>(getenv("MUSRFITPATH"));
-        path.append("/");
-      }
-      catch(boost::bad_lexical_cast &) {
+      string path("");
+      char *pathPtr(getenv("MUSRFITPATH"));
+      if (pathPtr) {
+        path = boost::lexical_cast<string>(pathPtr);
+        if (!path.empty()) {
+          path.append("/");
+        }
+      } else {
         cerr << endl << ">> msr2data: **WARNING** The MUSRFITPATH environment variable is not set!";
         cerr << endl << ">> msr2data: **WARNING** Please set it or at least ensure that musrfit can be found on the PATH!" << endl;
-        path = "";
       }
       ostringstream oss;
       oss << path << "musrfit" << " " << *fRunVectorIter << "-OneRunFit" << fFileExtension << ".msr";
