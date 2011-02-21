@@ -58,6 +58,7 @@ class PFitOutputHandler : public QDialog
     virtual void processDone();
 
 private:
+    Q_LONG fProcPID;
     QProcess *fProc;
 
     QVBox *fVbox;

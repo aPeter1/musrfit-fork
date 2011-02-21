@@ -64,6 +64,7 @@ class PFitOutputHandler : public QDialog
     virtual void processDone(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
+    Q_PID fProcPID;  ///< keeps the process PID
     QProcess *fProc; ///< pointer to the musrfit process
 
     QVBoxLayout *fVbox; ///< pointer to the dialog layout manager

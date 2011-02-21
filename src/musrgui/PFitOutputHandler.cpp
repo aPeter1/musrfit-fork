@@ -48,6 +48,7 @@ PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QValueVector<QStr
   fOutput = new QTextEdit( fVbox );
   fOutput->setMinimumSize(800, 455);
   fOutput->setReadOnly(true);
+  connect( fOutput, SIGNAL( destroyed() ), this, SLOT(quitButtonPressed() ) );
   fQuitButton = new QPushButton( tr("Fitting..."), fVbox );
   connect( fQuitButton, SIGNAL( clicked() ), this, SLOT( quitButtonPressed() ) );
   resize( 800, 500 );
@@ -74,6 +75,7 @@ PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QValueVector<QStr
                 tr("Quit") );
     done(0);
   }
+  fProcPID = fProc->processIdentifier();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -83,7 +85,13 @@ PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QValueVector<QStr
 PFitOutputHandler::~PFitOutputHandler()
 {
   if (fProc->isRunning()) {
-    fProc->kill();
+    fProc->tryTerminate();
+    QTimer::singleShot( 3000, fProc, SLOT( kill() ) );
+  }
+  if (fProc->isRunning()) { // try low level kill
+    char cmd[128];
+    sprintf(cmd, "kill -9 %ld", fProcPID);
+    system(cmd);
   }
   if (fProc) {
     delete fProc;
@@ -130,11 +138,8 @@ void PFitOutputHandler::quitButtonPressed()
 {
   // if the fitting is still taking place, kill it
   if (fProc->isRunning()) {
-/*
     fProc->tryTerminate();
-    QTimer::singleShot( 100, fProc, SLOT( kill() ) );
-*/
-    fProc->kill();
+    QTimer::singleShot( 1000, fProc, SLOT( kill() ) );
   }
 
   accept();

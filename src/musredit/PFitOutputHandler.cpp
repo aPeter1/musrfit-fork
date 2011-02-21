@@ -54,6 +54,7 @@ PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QVector<QString> 
   fVbox->addWidget(fOutput);
   fOutput->setMinimumSize(800, 455);
   fOutput->setReadOnly(true);
+  connect( fOutput, SIGNAL( destroyed() ), this, SLOT( quitButtonPressed() ) );
   fQuitButton = new QPushButton( tr("Fitting...") );
   fVbox->addWidget(fQuitButton);
   connect( fQuitButton, SIGNAL( clicked() ), this, SLOT( quitButtonPressed() ) );
@@ -85,6 +86,7 @@ PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QVector<QString> 
                 tr("Quit") );
     done(0);
   }
+  fProcPID = fProc->pid();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -94,15 +96,19 @@ PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QVector<QString> 
 PFitOutputHandler::~PFitOutputHandler()
 {
   if (fProc->state() == QProcess::Running) {
-    qDebug() << "fProc still running" << endl;
-    fProc->kill();
+    fProc->terminate();
+    if (!fProc->waitForFinished()) {
+      qDebug() << "fProc still running, will call kill." << endl;
+      fProc->kill();
+    }
+    fProc->waitForFinished();
   }
-/*
-  if (fProc->isRunning()) {
-    QString msg = "fProc still running ...";
-    qDebug(msg);
+  if (fProc->state() == QProcess::Running) {
+    QString cmd = "kill -9 "+ fProcPID;
+    QString msg = "fProc still running even after Qt kill, will try system kill cmd: "+cmd;
+    qDebug() << msg << endl;
+    system(cmd.toLatin1());
   }
-*/
   if (fProc) {
     delete fProc;
     fProc = 0;
