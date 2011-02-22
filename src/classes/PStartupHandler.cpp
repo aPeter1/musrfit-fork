@@ -58,6 +58,7 @@ PStartupHandler::PStartupHandler()
   Char_t *home;
   Char_t musrpath[128];
   Char_t startup_path_name[128];
+  Bool_t pmusrpathfound = false;
 
   // check if the startup file is found in the current directory
   strcpy(startup_path_name, "./musrfit_startup.xml");
@@ -67,7 +68,12 @@ PStartupHandler::PStartupHandler()
   } else { // startup file is not found in the current directory
     // check if the MUSRFITPATH system variable is set
     pmusrpath = getenv("MUSRFITPATH");
-    if (pmusrpath == 0) { // not set, will try default one
+    if (pmusrpath != 0) {
+      if (strcmp(pmusrpath, "")) { // MUSRFITPATH variable set but empty
+        pmusrpathfound = true;
+      }
+    }
+    if (!pmusrpathfound) { // MUSRFITPATH not set or empty, will try default one
       home = getenv("ROOTSYS");
       sprintf(musrpath, "%s/bin", home);
       cerr << endl << "**WARNING** MUSRFITPATH environment variable not set will try " << musrpath << endl;
