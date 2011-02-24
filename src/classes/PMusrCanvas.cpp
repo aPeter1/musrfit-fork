@@ -1762,10 +1762,6 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
       fYRangePresent = true;
       fYmin = ymin;
       fYmax = ymax;
-    } else {
-      fYRangePresent = true;
-      fYmin = -0.4;
-      fYmax = 0.4;
     }
   }
 
