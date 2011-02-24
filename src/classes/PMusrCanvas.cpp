@@ -446,8 +446,12 @@ void PMusrCanvas::UpdateParamTheoryPad()
     yoffset = 0.05;
 
   // add parameters to the pad
+  UInt_t accuracy = 6;
+  Char_t accStr[32];
   for (UInt_t i=0; i<param.size(); i++) {
     str = "";
+    accuracy = GetNeededAccuracy(param[i]);
+    sprintf(accStr, "%%.%dlf", accuracy);
     // parameter no
     str += param[i].fNo;
     if (param[i].fNo<10)
@@ -462,7 +466,7 @@ void PMusrCanvas::UpdateParamTheoryPad()
     if (round(param[i].fValue)-param[i].fValue==0)
       sprintf(cnum, "%.1lf", param[i].fValue);
     else
-      sprintf(cnum, "%.6lf", param[i].fValue);
+      sprintf(cnum, accStr, param[i].fValue);
     str += cnum;
     for (Int_t j=0; j<9-(Int_t)strlen(cnum); j++) // fill spaces
       str += " ";
@@ -470,7 +474,7 @@ void PMusrCanvas::UpdateParamTheoryPad()
     // parameter error
     if (param[i].fPosErrorPresent) { // minos was used
       // calculate the arithmetic average of the pos. and neg. error
-      double err;
+      Double_t err;
       err = (param[i].fPosError - param[i].fStep) / 2.0;
       // check if the pos. and neg. error within 10%
       if ((fabs(fabs(param[i].fStep) - param[i].fPosError) < 0.1*fabs(param[i].fStep)) &&
@@ -478,19 +482,20 @@ void PMusrCanvas::UpdateParamTheoryPad()
         if (round(err)-err==0)
           sprintf(cnum, "%.1lf", err);
         else
-          sprintf(cnum, "%.6lf", err);
+          sprintf(cnum, accStr, err);
       } else {
+        sprintf(accStr, "%%.%dlf!!", accuracy);
         if (round(err)-err==0)
           sprintf(cnum, "%.1lf!!", err);
         else
-          sprintf(cnum, "%.6lf!!", err);
+          sprintf(cnum, accStr, err);
       }
       str += cnum;
     } else { // minos was not used
       if (round(param[i].fStep)-param[i].fStep==0)
         sprintf(cnum, "%.1lf", param[i].fStep);
       else
-        sprintf(cnum, "%.6lf", param[i].fStep);
+        sprintf(cnum, accStr, param[i].fStep);
       str += cnum;
     }
     ypos = 0.98-i*yoffset;
@@ -5210,4 +5215,84 @@ Bool_t PMusrCanvas::IsScaleN0AndBkg()
   }
 
   return willScale;
+}
+
+//--------------------------------------------------------------------------
+// GetNeededAccuracy (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculates the needed accuracy of the parameter value based on the given errors.
+ *
+ * <b>return:</b>
+ * - needed accuracy
+ *
+ * \param param fit parameter with its additional informations, like errors etc.
+ */
+UInt_t PMusrCanvas::GetNeededAccuracy(PMsrParamStructure param)
+{
+  const UInt_t precLimit = 6;
+  UInt_t decimalPoint = 0;
+  UInt_t accuracy = 6;
+
+  if (param.fStep == 0.0) { // check if fit parameter is a constant, i.e. step==0
+    char str[128];
+
+    sprintf(str, "%lf", param.fValue);
+
+    // find decimal point
+    for (UInt_t i=0; i<strlen(str); i++) {
+      if (str[i] == '.') {
+        decimalPoint = i;
+        break;
+      }
+    }
+
+    // find last significant digit
+    for (UInt_t i=strlen(str)-1; i>=0; i--) {
+      if (str[i] != '0') {
+        if ((i-decimalPoint) < precLimit)
+          accuracy = i-decimalPoint;
+        else
+          accuracy = precLimit;
+        break;
+      }
+    }
+
+  } else if ((param.fStep != 0) && !param.fPosErrorPresent) { // check if no positive error is given step!=0 but fPosErrorPresent==false
+
+    for (UInt_t i=0; i<precLimit; i++) {
+      if ((Int_t)(param.fStep*pow(10.0,(Double_t)i)) != 0) {
+        accuracy = i;
+        break;
+      }
+    }
+
+    if (accuracy+1 <= precLimit)
+      accuracy += 1;
+  } else { // positive and negative error present
+
+    // negative error
+    for (UInt_t i=0; i<precLimit; i++) {
+      if ((Int_t)(param.fStep*pow(10.0,(Double_t)i)) != 0) {
+        accuracy = i;
+        break;
+      }
+    }
+    // positive error
+    UInt_t accuracy2 = 6;
+    for (UInt_t i=0; i<precLimit; i++) {
+      if ((Int_t)(param.fStep*pow(10.0,(Double_t)i)) != 0) {
+        accuracy2 = i;
+        break;
+      }
+    }
+
+    if (accuracy2 > accuracy)
+      accuracy = accuracy2;
+
+    if (accuracy+1 <= precLimit)
+      accuracy += 1;
+  }
+
+  return accuracy;
 }

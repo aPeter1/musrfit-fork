@@ -320,6 +320,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void SaveDataAscii();
 
     virtual Bool_t IsScaleN0AndBkg();
+    virtual UInt_t GetNeededAccuracy(PMsrParamStructure param);
 
   ClassDef(PMusrCanvas, 1)
 };
