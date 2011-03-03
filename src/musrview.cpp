@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
       } else {
         // check if filename has extension msr or mlog
         if (!strstr(argv[1], ".msr") && !strstr(argv[1], ".mlog")) {
-          cout << endl << "**ERROR** " << argv[1] << " is not a msr/mlog-file, nor is it a supported graphics extension." << endl;
+          cerr << endl << "**ERROR** " << argv[1] << " is not a msr/mlog-file, nor is it a supported graphics extension." << endl;
           show_syntax = true;
         } else {
           strcpy(fileName, argv[1]);
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
         strcpy(graphicsExtension, argv[1]+2);
         // check if filename has extension msr or mlog
         if (!strstr(argv[2], ".msr") && !strstr(argv[2], ".mlog")) {
-          cout << endl << "**ERROR** " << argv[2] << " is not a msr/mlog-file, nor is it a supported graphics extension." << endl;
+          cerr << endl << "**ERROR** " << argv[2] << " is not a msr/mlog-file, nor is it a supported graphics extension." << endl;
           show_syntax = true;
         } else {
           strcpy(fileName, argv[2]);
@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
         strcpy(graphicsExtension, argv[2]+2);
         // check if filename has extension msr or mlog
         if (!strstr(argv[1], ".msr") && !strstr(argv[1], ".mlog")) {
-          cout << endl << "**ERROR** " << argv[1] << " is not a msr/mlog-file, nor is it a supported graphics extension." << endl;
+          cerr << endl << "**ERROR** " << argv[1] << " is not a msr/mlog-file, nor is it a supported graphics extension." << endl;
           show_syntax = true;
         } else {
           strcpy(fileName, argv[1]);
@@ -200,13 +200,13 @@ int main(int argc, char *argv[])
   if (status != PMUSR_SUCCESS) {
     switch (status) {
       case PMUSR_MSR_FILE_NOT_FOUND:
-        cout << endl << "**ERROR** couldn't find '" << fileName << "'" << endl << endl;
+        cerr << endl << "**ERROR** couldn't find '" << fileName << "'" << endl << endl;
         break;
       case PMUSR_MSR_SYNTAX_ERROR:
-        cout << endl << "**SYNTAX ERROR** in file " << fileName << ", full stop here." << endl << endl;
+        cerr << endl << "**SYNTAX ERROR** in file " << fileName << ", full stop here." << endl << endl;
         break;
       default:
-        cout << endl << "**UNKNOWN ERROR** when trying to read the msr-file" << endl << endl;
+        cerr << endl << "**UNKNOWN ERROR** when trying to read the msr-file" << endl << endl;
         break;
     }
     return status;
@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
 
   success = dataHandler->IsAllDataAvailable();
   if (!success) {
-    cout << endl << "**ERROR** Couldn't read all data files, will quit ..." << endl;
+    cerr << endl << "**ERROR** Couldn't read all data files, will quit ..." << endl;
   }
 
   // generate the necessary histogramms for the view
@@ -260,8 +260,8 @@ int main(int argc, char *argv[])
       if (runPresent) {
         success = runListCollection->Add(i, kView);
         if (!success) {
-          cout << endl << "**ERROR** Couldn't handle run no " << i << " ";
-          cout << (*msrHandler->GetMsrRunList())[i].GetRunName()->Data();
+          cerr << endl << "**ERROR** Couldn't handle run no " << i << " ";
+          cerr << (*msrHandler->GetMsrRunList())[i].GetRunName()->Data();
           break;
         }
       }
@@ -295,8 +295,8 @@ int main(int argc, char *argv[])
                                      10+i*100, 10+i*100, 800, 600, graphicsOutput);
 
       if (!musrCanvas->IsValid()) {
-        cout << endl << "**SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
-        cout << endl;
+        cerr << endl << "**SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
+        cerr << endl;
         ok = false;
         break;
       }

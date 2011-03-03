@@ -513,7 +513,7 @@ Bool_t PRunSingleHisto::PrepareData()
   // keep the time resolution in (us)
   fTimeResolution = runData->GetTimeResolution()/1.0e3;
   cout.precision(8);
-  cout << endl << ">> PRunSingleHisto::PrepareData(): time resolution=" << fixed << runData->GetTimeResolution() << "(ns)";
+  cout << endl << ">> PRunSingleHisto::PrepareData(): time resolution=" << fixed << runData->GetTimeResolution() << "(ns)" << endl;
 
   if (fHandleTag == kFit)
     success = PrepareFitData(runData, histoNo[0]);

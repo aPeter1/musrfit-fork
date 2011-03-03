@@ -151,7 +151,7 @@ Bool_t PRunMuMinus::PrepareData()
 {
   Bool_t success = true;
 
-  cout << endl << "in PRunMuMinus::PrepareData(): will feed fData";
+  cout << endl << "in PRunMuMinus::PrepareData(): will feed fData" << endl;
 
   return success;
 }
