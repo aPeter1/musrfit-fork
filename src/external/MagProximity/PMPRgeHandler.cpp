@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  PNL_RgeHandler.cpp
+  PMPRgeHandler.cpp
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2009 by Andreas Suter                                   *
+ *   Copyright (C) 2011 by Andreas Suter                                   *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -35,7 +35,7 @@
 #include <fstream>
 using namespace std;
 
-#include "PNL_RgeHandler.h"
+#include "PMPRgeHandler.h"
 
 //--------------------------------------------------------------------------
 // Constructor
@@ -43,7 +43,7 @@ using namespace std;
 /**
  *
  */
-PNL_RgeHandler::PNL_RgeHandler(const PStringVector &rgeDataPathList, const PDoubleVector &rgeDataEnergyList)
+PMPRgeHandler::PMPRgeHandler(const PStringVector &rgeDataPathList, const PDoubleVector &rgeDataEnergyList)
 {
   fIsValid = false;
 
@@ -56,7 +56,7 @@ PNL_RgeHandler::PNL_RgeHandler(const PStringVector &rgeDataPathList, const PDoub
 /**
  *
  */
-PNL_RgeHandler::~PNL_RgeHandler()
+PMPRgeHandler::~PMPRgeHandler()
 {
   fRgeDataList.clear();
 }
@@ -66,8 +66,9 @@ PNL_RgeHandler::~PNL_RgeHandler()
 //--------------------------------------------------------------------------
 /**
  *
+ * \param energy in (keV)
  */
-Int_t PNL_RgeHandler::GetRgeEnergyIndex(const Double_t energy)
+Int_t PMPRgeHandler::GetRgeEnergyIndex(const Double_t energy)
 {
   Int_t idx = -1;
 
@@ -86,8 +87,10 @@ Int_t PNL_RgeHandler::GetRgeEnergyIndex(const Double_t energy)
 //--------------------------------------------------------------------------
 /**
  *
+ * \param energy in (keV)
+ * \param dist in (nm)
  */
-Double_t PNL_RgeHandler::GetRgeValue(const Int_t index, const Double_t dist)
+Double_t PMPRgeHandler::GetRgeValue(const Int_t index, const Double_t dist)
 {
   Double_t rgeVal = 0.0;
 
@@ -101,17 +104,6 @@ Double_t PNL_RgeHandler::GetRgeValue(const Int_t index, const Double_t dist)
              (dist-fRgeDataList[index].stoppingDistance[distIdx])/(fRgeDataList[index].stoppingDistance[distIdx+1]-fRgeDataList[index].stoppingDistance[distIdx]);
   }
 
-/*
-cout << endl << "distIdx = " << distIdx << ", fRgeDataList[index].stoppingDistance.size() = " << fRgeDataList[index].stoppingDistance.size();
-cout << endl << "fRgeDataList[index].stoppingAmplitude[distIdx]   = " << fRgeDataList[index].stoppingAmplitude[distIdx];
-cout << endl << "fRgeDataList[index].stoppingAmplitude[distIdx+1] = " << fRgeDataList[index].stoppingAmplitude[distIdx+1];
-cout << endl << "dist = " << dist;
-cout << endl << "fRgeDataList[index].stoppingDistance[distIdx] = " << fRgeDataList[index].stoppingDistance[distIdx];
-cout << endl << "fRgeDataList[index].stoppingDistance[distIdx+1] = " << fRgeDataList[index].stoppingDistance[distIdx+1];
-cout << endl << "rgeVal = " << rgeVal;
-cout << endl << "----" << endl;
-*/
-
   return rgeVal;
 }
 
@@ -120,8 +112,10 @@ cout << endl << "----" << endl;
 //--------------------------------------------------------------------------
 /**
  *
+ * \param energy in (keV)
+ * \param dist in (nm)
  */
-Double_t PNL_RgeHandler::GetRgeValue(const Double_t energy, const Double_t dist)
+Double_t PMPRgeHandler::GetRgeValue(const Double_t energy, const Double_t dist)
 {
   // check if energy is present in rge data list
   Int_t idx = -1;
@@ -146,10 +140,10 @@ Double_t PNL_RgeHandler::GetRgeValue(const Double_t energy, const Double_t dist)
 /**
  *
  */
-Bool_t PNL_RgeHandler::LoadRgeData(const PStringVector &rgeDataPathList, const PDoubleVector &rgeDataEnergyList)
+Bool_t PMPRgeHandler::LoadRgeData(const PStringVector &rgeDataPathList, const PDoubleVector &rgeDataEnergyList)
 {
   ifstream fin;
-  PNL_RgeData data;
+  PMPRgeData data;
   Int_t idx=0;
   TString dataName, tstr;
   char line[512];
@@ -160,7 +154,7 @@ Bool_t PNL_RgeHandler::LoadRgeData(const PStringVector &rgeDataPathList, const P
     // open rge-file for reading
     fin.open(rgeDataPathList[i].Data(), iostream::in);
     if (!fin.is_open()) {
-      cout << endl << "PNL_RgeHandler::LoadRgeData **ERROR**";
+      cout << endl << "PMPRgeHandler::LoadRgeData **ERROR**";
       cout << endl << "  Could not open file " << rgeDataPathList[i].Data();
       cout << endl;
       return false;
@@ -177,7 +171,7 @@ Bool_t PNL_RgeHandler::LoadRgeData(const PStringVector &rgeDataPathList, const P
       idx++;
 
       // ignore first line
-      if (idx == 1)
+      if (idx <= 1)
         continue;
 
       // ignore empty lines
@@ -195,7 +189,7 @@ Bool_t PNL_RgeHandler::LoadRgeData(const PStringVector &rgeDataPathList, const P
       }
 
       // feed fRgeDataList
-      data.stoppingDistance.push_back(dist/10.0);
+      data.stoppingDistance.push_back(dist/10.0); // keep distancies in (nm)
       data.stoppingAmplitude.push_back(val);
     }
 

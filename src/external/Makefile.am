@@ -1,5 +1,6 @@
 if BUILD_ASLIBS
-  ASDIRS = Nonlocal
+  ASDIRS = Nonlocal \
+           MagProximity
 endif
 
 if BUILD_CUBALIB

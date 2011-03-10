@@ -622,6 +622,7 @@ AC_CONFIG_FILES([Makefile \
                  src/external/libLFRelaxation/Makefile \
                  src/external/libGapIntegrals/Makefile \
                  src/external/libCalcMeanFieldsLEM/Makefile \
-                 src/external/Nonlocal/Makefile])
+                 src/external/Nonlocal/Makefile \
+		 src/external/MagProximity/Makefile])
 
 AC_OUTPUT
