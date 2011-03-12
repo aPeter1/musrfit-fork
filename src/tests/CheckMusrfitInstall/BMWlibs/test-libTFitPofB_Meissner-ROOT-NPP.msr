@@ -26,7 +26,7 @@ FITPARAMETER
 THEORY
 asymmetry   fun1
 simpleGss   map3          (rate)
-userFcn  libTFitPofB.so TLondon1DHS fun2 map6 1 2 3
+userFcn  libTFitPofB TLondon1DHS fun2 map6 1 2 3
 
 ###############################################################
 FUNCTIONS

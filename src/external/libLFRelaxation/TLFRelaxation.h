@@ -107,10 +107,10 @@ private:
   double fDt;
   double fDw;
   double fC;
-  fftw_plan fFFTplanFORW;
-  fftw_plan fFFTplanBACK;
-  double *fFFTtime;
-  fftw_complex *fFFTfreq;
+  fftwf_plan fFFTplanFORW;
+  fftwf_plan fFFTplanBACK;
+  float *fFFTtime;
+  fftwf_complex *fFFTfreq;
   mutable unsigned int fCounter;
 
   ClassDef(TLFDynGssKT,1)
@@ -137,15 +137,34 @@ private:
   double fDt;
   double fDw;
   double fC;
-  fftw_plan fFFTplanFORW;
-  fftw_plan fFFTplanBACK;
-  double *fFFTtime;
-  fftw_complex *fFFTfreq;
+  fftwf_plan fFFTplanFORW;
+  fftwf_plan fFFTplanBACK;
+  float *fFFTtime;
+  fftwf_complex *fFFTfreq;
   mutable unsigned int fCounter;
   mutable double fL1;
   mutable double fL2;
 
   ClassDef(TLFDynLorKT,1)
+};
+
+class TLFDynSG : public PUserFcnBase {
+
+public:
+  TLFDynSG();
+  ~TLFDynSG();
+
+  Bool_t NeedGlobalPart() const { return false; }
+  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  Bool_t GlobalPartIsValid() const { return true; }
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  mutable vector<double> fPar;
+  vector<TLFDynGssKT*> fLFDynGssIntegral;
+
+  ClassDef(TLFDynSG,1)
 };
 
 class TLFSGInterpolation : public PUserFcnBase {

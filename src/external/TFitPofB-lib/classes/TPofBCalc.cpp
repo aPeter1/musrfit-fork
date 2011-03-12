@@ -62,7 +62,10 @@ TPofBCalc::TPofBCalc(const vector<double> &para) : fBmin(0.0), fBmax(0.0), fDT(p
 
   int i;
 
-  for (i = 0; i < static_cast<int>(fPBSize); i++) {
+  #ifdef HAVE_GOMP
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  #endif
+  for (i = 0; i < static_cast<int>(fPBSize); ++i) {
     fB[i] = static_cast<double>(i)*fDB;
     fPB[i] = 0.0;
   }
@@ -78,7 +81,12 @@ TPofBCalc::TPofBCalc(const vector<double>& b, const vector<double>& pb, double d
   fB = new double[fPBSize];
   fPB = new double[fPBSize];
 
-  for (unsigned int i(0); i < fPBSize; i++) {
+  int i;
+
+  #ifdef HAVE_GOMP
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  #endif
+  for (i = 0; i < static_cast<int>(fPBSize); ++i) {
     fB[i] = b[i];
     fPB[i] = pb[i];
   }
@@ -86,22 +94,22 @@ TPofBCalc::TPofBCalc(const vector<double>& b, const vector<double>& pb, double d
   vector<double>::const_iterator iter, iterB;
   iterB = b.begin();
 
-  for(iter = pb.begin(); iter != pb.end(); iter++){
+  for(iter = pb.begin(); iter != pb.end(); ++iter){
     if(*iter != 0.0) {
       fBmin = *iterB;
 //      cout << fBmin << endl;
       break;
     }
-    iterB++;
+    ++iterB;
   }
 
-  for( ; iter != b.end(); iter++){
+  for( ; iter != b.end(); ++iter){
     if(*iter == 0.0) {
       fBmax = *(iterB-1);
 //      cout << fBmax << endl;
       break;
     }
-    iterB++;
+    ++iterB;
   }
 
   fDT = dt; // needed if a convolution should be done
@@ -117,10 +125,33 @@ void TPofBCalc::UnsetPBExists() {
 #ifdef HAVE_GOMP
 #pragma omp parallel for default(shared) private(i) schedule(dynamic)
 #endif
-  for (i = 0; i < static_cast<int>(fPBSize); i++) {
+  for (i = 0; i < static_cast<int>(fPBSize); ++i) {
     fPB[i] = 0.0;
   }
   fPBExists = false;
+}
+
+void TPofBCalc::Normalize(unsigned int minFilledIndex = 0, unsigned int maxFilledIndex = 0) const {
+
+    if (!maxFilledIndex)
+      maxFilledIndex = fPBSize - 1;
+
+    int i;
+
+    double pBsum(0.0);
+
+    #ifdef HAVE_GOMP
+    #pragma omp parallel for default(shared) private(i) schedule(dynamic) reduction(+:pBsum)
+    #endif
+    for (i = minFilledIndex; i <= static_cast<int>(maxFilledIndex); ++i)
+      pBsum += fPB[i];
+    pBsum *= fDB;
+
+    #ifdef HAVE_GOMP
+    #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+    #endif
+    for (i = minFilledIndex; i <= static_cast<int>(maxFilledIndex); ++i)
+      fPB[i] /= pBsum;
 }
 
 void TPofBCalc::Calculate(const string &type, const vector<double> &para) {
@@ -133,29 +164,30 @@ void TPofBCalc::Calculate(const string &type, const vector<double> &para) {
     int a3(static_cast<int>(floor(fBmax/fDB)));
     int a4(static_cast<int>(ceil(fBmax/fDB)));
 
-    unsigned int BmaxIndex((a3 < a4) ? a4 : (a4 + 1));
-    unsigned int B0Index(static_cast<int>(ceil(para[2]/(gBar*fDB))));
+    int BmaxIndex((a3 < a4) ? a4 : (a4 + 1));
+    int B0Index(static_cast<int>(ceil(para[2]/(gBar*fDB))));
 
     double expominus(para[3]*para[3]/(2.0*pi*pi*gBar*gBar));
     double expoplus(para[4]*para[4]/(2.0*pi*pi*gBar*gBar));
     double B0(para[2]/(gBar));
 
-    for (unsigned int i(0); i < B0Index; i++) {
+    int i;
+
+    #ifdef HAVE_GOMP
+    #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+    #endif
+    for (i = 0; i < B0Index; ++i) {
       fPB[i] = exp(-(fB[i]-B0)*(fB[i]-B0)/expominus);
     }
 
-    for (unsigned int i(B0Index); i <= BmaxIndex; i++) {
+    #ifdef HAVE_GOMP
+    #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+    #endif
+    for (i = B0Index; i <= BmaxIndex; ++i) {
       fPB[i] = exp(-(fB[i]-B0)*(fB[i]-B0)/expoplus);
     }
 
-    // normalize p(B)
-
-    double pBsum = 0.0;
-    for (unsigned int i(0); i <= BmaxIndex; i++)
-      pBsum += fPB[i];
-    pBsum *= fDB;
-    for (unsigned int i(0); i <= BmaxIndex; i++)
-      fPB[i] /= pBsum;
+    Normalize(0, BmaxIndex);
 
   }
 
@@ -192,12 +224,12 @@ void TPofBCalc::Calculate(const TBofZCalcInverse *BofZ, const TTrimSPData *dataT
 
   // calculate p(B) from the inverse of B(z)
 
-  for (i = firstZerosEnd; i <= lastZerosStart; i++) {
+  for (i = firstZerosEnd; i <= lastZerosStart; ++i) {
 
     vector< pair<double, double> > inv;
     inv = BofZ->GetInverseAndDerivative(fB[i]);
 
-    for (unsigned int j(0); j < inv.size(); j++) {
+    for (unsigned int j(0); j < inv.size(); ++j) {
       fPB[i] += dataTrimSP->GetNofZ(inv[j].first, para[2])*fabs(inv[j].second);
     }
 //    if (fPB[i])
@@ -206,12 +238,7 @@ void TPofBCalc::Calculate(const TBofZCalcInverse *BofZ, const TTrimSPData *dataT
 
   // normalize p(B)
 
-  double pBsum = 0.0;
-  for (i = firstZerosEnd; i<=lastZerosStart; i++)
-    pBsum += fPB[i];
-  pBsum *= fDB;
-  for (i = firstZerosEnd; i<=lastZerosStart; i++)
-    fPB[i] /= pBsum;
+  Normalize(firstZerosEnd, lastZerosStart);
 
   if(para.size() == 6 && para[5] != 0.0)
     AddBackground(para[3], para[4], para[5]);
@@ -366,13 +393,7 @@ void TPofBCalc::Calculate(const TBofZCalc *BofZ, const TTrimSPData *dataTrimSP, 
   bofzBZ = 0;
 
   // normalize p(B)
-
-  double pBsum = 0.0;
-  for (unsigned int i(firstZerosEnd); i<=lastZerosStart; i++)
-    pBsum += fPB[i];
-  pBsum *= fDB;
-  for (unsigned int i(firstZerosEnd); i<=lastZerosStart; i++)
-    fPB[i] /= pBsum;
+  Normalize(firstZerosEnd, lastZerosStart);
 
   fPBExists = true;
   return;
@@ -391,8 +412,8 @@ void TPofBCalc::Calculate(const TBulkVortexFieldCalc *vortexLattice, const vecto
   fBmin = vortexLattice->GetBmin();
   fBmax = vortexLattice->GetBmax();
 
-  int a1(static_cast<int>(floor(fBmin/fDB)));
-  int a2(static_cast<int>(ceil(fBmin/fDB)));
+//  int a1(static_cast<int>(floor(fBmin/fDB)));
+//  int a2(static_cast<int>(ceil(fBmin/fDB)));
   int a3(static_cast<int>(floor(fBmax/fDB)));
   int a4(static_cast<int>(ceil(fBmax/fDB)));
 
@@ -459,9 +480,10 @@ void TPofBCalc::Calculate(const TBulkVortexFieldCalc *vortexLattice, const vecto
                + (numberOfSteps_2 - j)*(numberOfSteps_2 - j))/static_cast<double>(numberOfStepsSq);
           fPB[fill_index] += 1.0/(1.0+sigmaSq*Rsq1) + 1.0/(1.0+sigmaSq*Rsq2) + 1.0/(1.0+sigmaSq*Rsq3) \
                            + 1.0/(1.0+sigmaSq*Rsq4) + 1.0/(1.0+sigmaSq*Rsq5) + 1.0/(1.0+sigmaSq*Rsq6);
-
-//          of << 1.0/(1.0+sigmaSq*Rsq1) + 1.0/(1.0+sigmaSq*Rsq2) + 1.0/(1.0+sigmaSq*Rsq3) \
-//                           + 1.0/(1.0+sigmaSq*Rsq4) + 1.0/(1.0+sigmaSq*Rsq5) + 1.0/(1.0+sigmaSq*Rsq6) << " ";
+/*
+          of << 1.0/(1.0+sigmaSq*Rsq1) + 1.0/(1.0+sigmaSq*Rsq2) + 1.0/(1.0+sigmaSq*Rsq3) \
+                           + 1.0/(1.0+sigmaSq*Rsq4) + 1.0/(1.0+sigmaSq*Rsq5) + 1.0/(1.0+sigmaSq*Rsq6) << " ";
+*/
         }
       }
 //      of << endl;
@@ -488,10 +510,10 @@ void TPofBCalc::Calculate(const TBulkVortexFieldCalc *vortexLattice, const vecto
         field = vortexFields[i + numberOfSteps*j] \
               + para[5]*(exp(Rsq1*one_xiSq) + exp(Rsq2*one_xiSq) + exp(Rsq3*one_xiSq) \
                         +exp(Rsq4*one_xiSq) + exp(Rsq5*one_xiSq) + exp(Rsq6*one_xiSq));
-
-//          of << para[5]*(exp(Rsq1*one_xiSq) - exp(Rsq2*one_xiSq) + exp(Rsq3*one_xiSq) \
-//                        -exp(Rsq4*one_xiSq) + exp(Rsq5*one_xiSq) - exp(Rsq6*one_xiSq)) << " ";
-
+/*
+          of << para[5]*(exp(Rsq1*one_xiSq) - exp(Rsq2*one_xiSq) + exp(Rsq3*one_xiSq) \
+                        -exp(Rsq4*one_xiSq) + exp(Rsq5*one_xiSq) - exp(Rsq6*one_xiSq)) << " ";
+*/
         fill_index = static_cast<unsigned int>(ceil(fabs((field/fDB))));
         if (fill_index < fPBSize) {
           fPB[fill_index] += 1.0;
@@ -503,30 +525,68 @@ void TPofBCalc::Calculate(const TBulkVortexFieldCalc *vortexLattice, const vecto
     }
 //    of.close();
   } else {
-    for (unsigned int j(0); j < numberOfSteps_2; ++j) {
-      for (unsigned int i(0); i < numberOfSteps_2; ++i) {
+    int i,j;
+    #ifdef HAVE_GOMP
+    // cannot use a reduction clause here (like e.g. in Normalize()), since pBvec[] is not a scalar variable
+    // therefore, we need to work on it a bit more
+    int n(omp_get_num_procs()), tid, offset;
+    vector< vector<unsigned int> > pBvec(n, vector<unsigned int>(fPBSize, 0));
+
+    int indexStep(static_cast<int>(floor(static_cast<float>(numberOfSteps_2)/static_cast<float>(n))));
+
+    #pragma omp parallel private(tid, i, j, offset, fill_index) num_threads(n)
+    {
+      tid = omp_get_thread_num();
+      offset = tid*indexStep;
+
+      if (tid == n-1) {
+        for (j = offset; j < static_cast<int>(numberOfSteps_2); ++j) {
+          for (i = 0; i < static_cast<int>(numberOfSteps_2); ++i) {
+            fill_index = static_cast<unsigned int>(ceil(fabs((vortexFields[i + numberOfSteps*j]/fDB))));
+            if (fill_index < fPBSize) {
+              pBvec[tid][fill_index] += 1;
+            }
+          }
+        }
+      } else {
+        for (j = 0; j < indexStep; ++j) {
+          for (i = 0; i < static_cast<int>(numberOfSteps_2); ++i) {
+            fill_index = static_cast<unsigned int>(ceil(fabs((vortexFields[offset + i + numberOfSteps*j]/fDB))));
+            if (fill_index < fPBSize) {
+              pBvec[tid][fill_index] += 1;
+            }
+          }
+        }
+      }
+    }
+
+    for (j = 0; j < n; ++j) {
+      #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+      for (i = 0; i < static_cast<int>(fPBSize); ++i) {
+        fPB[i] += static_cast<double>(pBvec[j][i]);
+      }
+      pBvec[j].clear();
+    }
+    pBvec.clear();
+
+    #else
+
+    for (j = 0; j < static_cast<int>(numberOfSteps_2); ++j) {
+      for (i = 0; i < static_cast<int>(numberOfSteps_2); ++i) {
         fill_index = static_cast<unsigned int>(ceil(fabs((vortexFields[i + numberOfSteps*j]/fDB))));
         if (fill_index < fPBSize) {
           fPB[fill_index] += 1.0;
         }
       }
     }
+
+    #endif
   }
 
   vortexFields = 0;
 
   // normalize P(B)
-  double sum(0.0);
-  for (unsigned int i(0); i < fPBSize; ++i)
-    sum += fPB[i];
-  sum *= fDB;
-  int i;
-#ifdef HAVE_GOMP
-#pragma omp parallel for default(shared) private(i) schedule(dynamic)
-#endif
-  for (i = 0; i < static_cast<int>(fPBSize); ++i)
-    fPB[i] /= sum;
-// end pragma omp parallel
+  Normalize();
 
   if(para.size() == 5)
     AddBackground(para[2], para[3], para[4]);
@@ -542,24 +602,40 @@ void TPofBCalc::AddBackground(double B, double s, double w) {
   if(!s || w<0.0 || w>1.0 || B<0.0)
     return;
 
+  int i;
   double BsSq(s*s/(gBar*gBar*4.0*pi*pi));
 
   // calculate Gaussian background
   double bg[fPBSize];
-  for(unsigned int i(0); i < fPBSize; i++) {
+  #ifdef HAVE_GOMP
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  #endif
+  for(i = 0; i < static_cast<int>(fPBSize); ++i) {
     bg[i] = exp(-(fB[i]-B)*(fB[i]-B)/(2.0*BsSq));
   }
 
   // normalize background
+
   double bgsum(0.0);
-  for (unsigned int i(0); i < fPBSize; i++)
+  #ifdef HAVE_GOMP
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic) reduction(+:bgsum)
+  #endif
+  for (i = 0; i < static_cast<int>(fPBSize); ++i)
     bgsum += bg[i];
+
   bgsum *= fDB;
-  for (unsigned int i(0); i < fPBSize; i++)
+
+  #ifdef HAVE_GOMP
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  #endif
+  for (i = 0; i < static_cast<int>(fPBSize); ++i)
     bg[i] /= bgsum;
 
   // add background to P(B)
-  for (unsigned int i(0); i < fPBSize; i++)
+  #ifdef HAVE_GOMP
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  #endif
+  for (i = 0; i < static_cast<int>(fPBSize); ++i)
     fPB[i] = (1.0 - w)*fPB[i] + w*bg[i];
 
 //   // check if normalization is still valid
@@ -582,7 +658,7 @@ void TPofBCalc::ConvolveGss(double w) {
   fftw_plan FFTplanToFieldDomain;
   fftw_complex *FFTout;
 
-  TBin = 1.0/(gBar*double(NFFT-1)*fDB);
+  TBin = 1.0/(gBar*static_cast<double>(NFFT-1)*fDB);
 
   FFTout = new fftw_complex[NFFT/2 + 1]; //(fftw_complex *)fftw_malloc(sizeof(fftw_complex) * (NFFT/2+1));
 
@@ -597,7 +673,11 @@ void TPofBCalc::ConvolveGss(double w) {
   double GssInTimeDomain;
   double expo(-2.0*PI*PI*gBar*gBar*w*w*TBin*TBin);
 
-  for (unsigned int i(0); i < NFFT/2+1; i++) {
+  int i;
+  #ifdef HAVE_GOMP
+  #pragma omp parallel for default(shared) private(GssInTimeDomain, i) schedule(dynamic)
+  #endif
+  for (i = 0; i < static_cast<int>(NFFT/2+1); ++i) {
     GssInTimeDomain = exp(expo*static_cast<double>(i*i));
     FFTout[i][0] *= GssInTimeDomain;
     FFTout[i][1] *= GssInTimeDomain;
@@ -618,24 +698,57 @@ void TPofBCalc::ConvolveGss(double w) {
 //  fftw_cleanup();
 
   // normalize p(B)
-
-  double pBsum = 0.0;
-  for (unsigned int i(0); i < NFFT; i++)
-    pBsum += fPB[i];
-  pBsum *= fDB;
-  for (unsigned int i(0); i < NFFT; i++)
-    fPB[i] /= pBsum;
+  Normalize();
 
   return;
 }
 
 double TPofBCalc::GetFirstMoment() const {
 
+  int i;
+
   double pBsum(0.0);
-  for (unsigned int i(0); i < fPBSize; i++)
+
+  #ifdef HAVE_GOMP
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic) reduction(+:pBsum)
+  #endif
+  for (i = 0; i < static_cast<int>(fPBSize); ++i)
     pBsum += fB[i]*fPB[i];
+
   pBsum *= fDB;
 
   return pBsum;
+
+}
+
+double TPofBCalc::GetCentralMoment(unsigned int n) const {
+
+  double firstMoment(GetFirstMoment());
+  double diff;
+
+  int i;
+
+  double pBsum(0.0);
+
+  #ifdef HAVE_GOMP
+  #pragma omp parallel for default(shared) private(i, diff) schedule(dynamic) reduction(+:pBsum)
+  #endif
+  for (i = 0; i < static_cast<int>(fPBSize); ++i) {
+    diff = fB[i]-firstMoment;
+    pBsum += pow(diff, static_cast<double>(n))*fPB[i];
+  }
+
+  pBsum *= fDB;
+
+  return pBsum;
+
+}
+
+double TPofBCalc::GetSkewnessAlpha() const {
+
+  double M2(GetCentralMoment(2));
+  double M3(GetCentralMoment(3));
+
+  return M3 > 0.0 ? pow(M3, 1.0/3.0)/pow(M2, 0.5) : -pow(-M3, 1.0/3.0)/pow(M2, 0.5);
 
 }

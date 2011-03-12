@@ -41,7 +41,7 @@ using namespace std;
 
 #define PI 3.14159265358979323846
 #define TWOPI 6.28318530717958647692
-
+#define Nsteps 100
 
 ClassImp(TLFStatGssKT)
 ClassImp(TLFStatLorKT)
@@ -140,7 +140,7 @@ TLFDynGssKT::TLFDynGssKT() : fCalcNeeded(true), fFirstCall(true), fWisdom("Words
   if (wordsOfWisdomR == NULL) {
     cout << "TLFDynGssKT::TLFDynGssKT: Couldn't open wisdom file ..." << endl;
   } else {
-    wisdomLoaded = fftw_import_wisdom_from_file(wordsOfWisdomR);
+    wisdomLoaded = fftwf_import_wisdom_from_file(wordsOfWisdomR);
     fclose(wordsOfWisdomR);
   }
 
@@ -150,11 +150,11 @@ TLFDynGssKT::TLFDynGssKT() : fCalcNeeded(true), fFirstCall(true), fWisdom("Words
   // END of WisdomLoading
 
   // allocating memory for the FFtransform pairs and create the FFT plans
-
-  fFFTtime = (double *)malloc(sizeof(double) * fNSteps);
-  fFFTfreq = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * (fNSteps/2+1));
-  fFFTplanFORW = fftw_plan_dft_r2c_1d(fNSteps, fFFTtime, fFFTfreq, FFTW_ESTIMATE);
-  fFFTplanBACK = fftw_plan_dft_c2r_1d(fNSteps, fFFTfreq, fFFTtime, FFTW_ESTIMATE);
+ 
+  fFFTtime = (float *)malloc(sizeof(float) * fNSteps);
+  fFFTfreq = (fftwf_complex *)fftwf_malloc(sizeof(fftwf_complex) * (fNSteps/2+1));
+  fFFTplanFORW = fftwf_plan_dft_r2c_1d(fNSteps, fFFTtime, fFFTfreq, FFTW_ESTIMATE);
+  fFFTplanBACK = fftwf_plan_dft_c2r_1d(fNSteps, fFFTfreq, fFFTtime, FFTW_ESTIMATE);
 }
 
 TLFDynGssKT::~TLFDynGssKT() {
@@ -164,22 +164,22 @@ TLFDynGssKT::~TLFDynGssKT() {
   if (wordsOfWisdomW == NULL) {
     cout << "TLFDynGssKT::~TLFDynGssKT: Could not open file ... No wisdom is exported..." << endl;
   } else {
-    fftw_export_wisdom_to_file(wordsOfWisdomW);
+    fftwf_export_wisdom_to_file(wordsOfWisdomW);
     fclose(wordsOfWisdomW);
   }
   // END of Wisdom Export
 
   // clean up
-  fftw_destroy_plan(fFFTplanFORW);
-  fftw_destroy_plan(fFFTplanBACK);
+  fftwf_destroy_plan(fFFTplanFORW);
+  fftwf_destroy_plan(fFFTplanBACK);
   free(fFFTtime);
-  fftw_free(fFFTfreq);
+  fftwf_free(fFFTfreq);
   cout << "TLFDynGssKT::~TLFDynGssKT(): " << fCounter << " full FFT cycles needed..." << endl;
 }
 
 double TLFDynGssKT::operator()(double t, const vector<double> &par) const {
 
-  assert(par.size() == 3); // three parameters nuL=gbar*B,sigma,fluct.rate nu
+  assert(par.size() == 3 || par.size() == 4); // three parameters nuL=gbar*B,sigma,fluct.rate nu (fourth parameter: t[us] for SG-function)
 
   if(t<0.0)
     return 1.0;
@@ -192,7 +192,7 @@ double TLFDynGssKT::operator()(double t, const vector<double> &par) const {
     fFirstCall=false;
   }
 
-  for (unsigned int i(0); i<par.size(); i++) {
+  for (unsigned int i(0); i<3; i++) {
     if( fPar[i]-par[i] ) {
       fPar[i] = par[i];
       fCalcNeeded=true;
@@ -263,7 +263,7 @@ double TLFDynGssKT::operator()(double t, const vector<double> &par) const {
 */
     // Transform to frequency domain
 
-    fftw_execute(fFFTplanFORW);
+    fftwf_execute(fFFTplanFORW);
 
     // calculate F(s)
 
@@ -279,7 +279,7 @@ double TLFDynGssKT::operator()(double t, const vector<double> &par) const {
 
     // Transform back to time domain
 
-    fftw_execute(fFFTplanBACK);
+    fftwf_execute(fFFTplanBACK);
 
 //    for (unsigned int i(0); i<fNSteps; i++) {
 //      fFFTtime[i]=(fDw*TMath::Exp(fC*i*fDt)/TMath::Pi()*fFFTtime[i]);
@@ -294,6 +294,57 @@ double TLFDynGssKT::operator()(double t, const vector<double> &par) const {
   }
 //  return fFFTtime[int(t/fDt)];
   return fDw*exp(fC*t)/PI*fFFTtime[int(t/fDt)];
+}
+
+// LF Dynamic Spin Glass Relaxation
+
+TLFDynSG::TLFDynSG() {
+  for(unsigned int i(0); i<Nsteps; ++i)
+    fLFDynGssIntegral.push_back(new TLFDynGssKT());
+  fPar.resize(3, 0.0);
+}
+
+TLFDynSG::~TLFDynSG() {
+  for(unsigned int i(0); i<Nsteps; ++i)
+    delete fLFDynGssIntegral[i];
+  fLFDynGssIntegral.clear();
+  fPar.clear();
+}
+
+double TLFDynSG::operator()(double t, const vector<double> &par) const {
+
+  assert(par.size() == 3); // three parameters nuL=gbar*B, a ,fluct.rate nu
+
+  if(t<0.0)
+    return 1.0;
+
+  if(t>20.0)
+    return 0.0;
+
+  // Parameters for the integration
+  for (unsigned int i(0); i<3; ++i)
+    fPar[i] = par[i];
+
+  double sigma_step((40.0-0.1)*par[1]/static_cast<double>(Nsteps));
+  // at the moment, integrate between 0.1a and 40a (a "real upper limit" would be 10000a)
+  double integral(0.0);
+  double a_sigmaSq(0.0);
+  double rho(0.0);
+  double rhoNormalizer(0.0); // is [1/]sqrt(2./PI) when the integration is done between 0 and infinity
+
+  for (unsigned int i(0); i<Nsteps; ++i) {
+    fPar[1] = 0.1*par[1] + (static_cast<double>(i) + 0.5)*sigma_step;
+    a_sigmaSq = (par[1]/(fPar[1]*fPar[1]));
+    rho = a_sigmaSq*exp(-0.5*par[1]*a_sigmaSq);
+    rhoNormalizer += rho;
+    integral += (*(fLFDynGssIntegral[i]))(t, fPar)*rho;
+  }
+  integral /= rhoNormalizer;
+
+  //cout << "value at " << t << ": " << integral << endl;
+
+  return integral;
+
 }
 
 // LF Dynamic Lorentz KT
@@ -311,7 +362,7 @@ TLFDynLorKT::TLFDynLorKT() : fCalcNeeded(true), fFirstCall(true), fWisdom("Words
   if (wordsOfWisdomR == NULL) {
     cout << "TLFDynLorKT::TLFDynLorKT: Couldn't open wisdom file ..." << endl;
   } else {
-    wisdomLoaded = fftw_import_wisdom_from_file(wordsOfWisdomR);
+    wisdomLoaded = fftwf_import_wisdom_from_file(wordsOfWisdomR);
     fclose(wordsOfWisdomR);
   }
 
@@ -322,10 +373,10 @@ TLFDynLorKT::TLFDynLorKT() : fCalcNeeded(true), fFirstCall(true), fWisdom("Words
 
   // allocating memory for the FFtransform pairs and create the FFT plans
 
-  fFFTtime = (double *)malloc(sizeof(double) * fNSteps);
-  fFFTfreq = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * (fNSteps/2+1));
-  fFFTplanFORW = fftw_plan_dft_r2c_1d(fNSteps, fFFTtime, fFFTfreq, FFTW_ESTIMATE);
-  fFFTplanBACK = fftw_plan_dft_c2r_1d(fNSteps, fFFTfreq, fFFTtime, FFTW_ESTIMATE);
+  fFFTtime = (float *)malloc(sizeof(float) * fNSteps);
+  fFFTfreq = (fftwf_complex *)fftwf_malloc(sizeof(fftwf_complex) * (fNSteps/2+1));
+  fFFTplanFORW = fftwf_plan_dft_r2c_1d(fNSteps, fFFTtime, fFFTfreq, FFTW_ESTIMATE);
+  fFFTplanBACK = fftwf_plan_dft_c2r_1d(fNSteps, fFFTfreq, fFFTtime, FFTW_ESTIMATE);
 }
 
 TLFDynLorKT::~TLFDynLorKT() {
@@ -335,16 +386,16 @@ TLFDynLorKT::~TLFDynLorKT() {
   if (wordsOfWisdomW == NULL) {
     cout << "TLFDynLorKT::~TLFDynLorKT: Could not open file ... No wisdom is exported..." << endl;
   } else {
-    fftw_export_wisdom_to_file(wordsOfWisdomW);
+    fftwf_export_wisdom_to_file(wordsOfWisdomW);
     fclose(wordsOfWisdomW);
   }
   // END of Wisdom Export
 
   // clean up
-  fftw_destroy_plan(fFFTplanFORW);
-  fftw_destroy_plan(fFFTplanBACK);
+  fftwf_destroy_plan(fFFTplanFORW);
+  fftwf_destroy_plan(fFFTplanBACK);
   free(fFFTtime);
-  fftw_free(fFFTfreq);
+  fftwf_free(fFFTfreq);
   cout << "TLFDynLorKT::~TLFDynLorKT(): " << fCounter << " full FFT cyles needed..." << endl;
 }
 
@@ -457,7 +508,7 @@ double TLFDynLorKT::operator()(double t, const vector<double> &par) const {
 
     // Transform to frequency domain
 
-    fftw_execute(fFFTplanFORW);
+    fftwf_execute(fFFTplanFORW);
 
     // calculate F(s)
 
@@ -474,7 +525,7 @@ double TLFDynLorKT::operator()(double t, const vector<double> &par) const {
 
     // Transform back to time domain
 
-    fftw_execute(fFFTplanBACK);
+    fftwf_execute(fFFTplanBACK);
 
 //    for (unsigned int i(0); i<fNSteps; i++) {
 //      fFFTtime[i]=(fDw*TMath::Exp(fC*i*fDt)/TMath::Pi()*fFFTtime[i]);

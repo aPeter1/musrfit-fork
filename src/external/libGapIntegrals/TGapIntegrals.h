@@ -44,7 +44,7 @@ class TGapSWave : public PUserFcnBase {
 
 public:
   TGapSWave();
-  ~TGapSWave();
+  virtual ~TGapSWave();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -68,7 +68,7 @@ class TGapDWave : public PUserFcnBase {
 
 public:
   TGapDWave();
-  ~TGapDWave();
+  virtual ~TGapDWave();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -92,7 +92,7 @@ class TGapCosSqDWave : public PUserFcnBase {
 
 public:
   TGapCosSqDWave();
-  ~TGapCosSqDWave();
+  virtual ~TGapCosSqDWave();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -116,7 +116,7 @@ class TGapSinSqDWave : public PUserFcnBase {
 
 public:
   TGapSinSqDWave();
-  ~TGapSinSqDWave();
+  virtual ~TGapSinSqDWave();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -141,7 +141,7 @@ class TGapAnSWave : public PUserFcnBase {
 
 public:
   TGapAnSWave();
-  ~TGapAnSWave();
+  virtual ~TGapAnSWave();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -165,7 +165,7 @@ class TGapNonMonDWave1 : public PUserFcnBase {
 
 public:
   TGapNonMonDWave1();
-  ~TGapNonMonDWave1();
+  virtual ~TGapNonMonDWave1();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -189,7 +189,7 @@ class TGapNonMonDWave2 : public PUserFcnBase {
 
 public:
   TGapNonMonDWave2();
-  ~TGapNonMonDWave2();
+  virtual ~TGapNonMonDWave2();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -214,7 +214,7 @@ class TGapPowerLaw : public PUserFcnBase {
 
 public:
   TGapPowerLaw() {}
-  ~TGapPowerLaw() {}
+  virtual ~TGapPowerLaw() {}
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -231,7 +231,7 @@ class TGapDirtySWave : public PUserFcnBase {
 
 public:
   TGapDirtySWave() {}
-  ~TGapDirtySWave() {}
+  virtual ~TGapDirtySWave() {}
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -249,7 +249,7 @@ class TLambdaSWave : public PUserFcnBase {
 
 public:
   TLambdaSWave();
-  ~TLambdaSWave();
+  virtual ~TLambdaSWave();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -267,7 +267,7 @@ class TLambdaDWave : public PUserFcnBase {
 
 public:
   TLambdaDWave();
-  ~TLambdaDWave();
+  virtual ~TLambdaDWave();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -285,7 +285,7 @@ class TLambdaAnSWave : public PUserFcnBase {
 
 public:
   TLambdaAnSWave();
-  ~TLambdaAnSWave();
+  virtual ~TLambdaAnSWave();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -303,7 +303,7 @@ class TLambdaNonMonDWave1 : public PUserFcnBase {
 
 public:
   TLambdaNonMonDWave1();
-  ~TLambdaNonMonDWave1();
+  virtual ~TLambdaNonMonDWave1();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -321,7 +321,7 @@ class TLambdaNonMonDWave2 : public PUserFcnBase {
 
 public:
   TLambdaNonMonDWave2();
-  ~TLambdaNonMonDWave2();
+  virtual ~TLambdaNonMonDWave2();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -340,7 +340,7 @@ class TLambdaPowerLaw : public PUserFcnBase {
 
 public:
   TLambdaPowerLaw() {}
-  ~TLambdaPowerLaw() {}
+  virtual ~TLambdaPowerLaw() {}
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -357,7 +357,7 @@ class TLambdaInvSWave : public PUserFcnBase {
 
 public:
   TLambdaInvSWave();
-  ~TLambdaInvSWave();
+  virtual ~TLambdaInvSWave();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -375,7 +375,7 @@ class TLambdaInvDWave : public PUserFcnBase {
 
 public:
   TLambdaInvDWave();
-  ~TLambdaInvDWave();
+  virtual ~TLambdaInvDWave();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -393,7 +393,7 @@ class TLambdaInvAnSWave : public PUserFcnBase {
 
 public:
   TLambdaInvAnSWave();
-  ~TLambdaInvAnSWave();
+  virtual ~TLambdaInvAnSWave();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -411,7 +411,7 @@ class TLambdaInvNonMonDWave1 : public PUserFcnBase {
 
 public:
   TLambdaInvNonMonDWave1();
-  ~TLambdaInvNonMonDWave1();
+  virtual ~TLambdaInvNonMonDWave1();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -429,7 +429,7 @@ class TLambdaInvNonMonDWave2 : public PUserFcnBase {
 
 public:
   TLambdaInvNonMonDWave2();
-  ~TLambdaInvNonMonDWave2();
+  virtual ~TLambdaInvNonMonDWave2();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -448,7 +448,7 @@ class TLambdaInvPowerLaw : public PUserFcnBase {
 
 public:
   TLambdaInvPowerLaw() {}
-  ~TLambdaInvPowerLaw() {}
+  virtual ~TLambdaInvPowerLaw() {}
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -465,7 +465,7 @@ class TFilmMagnetizationDWave : public PUserFcnBase {
 
 public:
   TFilmMagnetizationDWave();
-  ~TFilmMagnetizationDWave();
+  virtual ~TFilmMagnetizationDWave();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
   virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }

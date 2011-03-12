@@ -40,6 +40,7 @@
 #pragma link C++ class TLFStatLorKT+;
 #pragma link C++ class TLFDynGssKT+;
 #pragma link C++ class TLFDynLorKT+;
+#pragma link C++ class TLFDynSG+;
 #pragma link C++ class TLFSGInterpolation+;
 
 #endif //__CINT__

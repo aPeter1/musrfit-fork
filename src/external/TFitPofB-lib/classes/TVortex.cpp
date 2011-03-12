@@ -45,6 +45,10 @@ ClassImp(TBulkTriVortexAGL)
 ClassImp(TBulkTriVortexNGL)
 ClassImp(TBulkAnisotropicTriVortexLondonGlobal)
 ClassImp(TBulkAnisotropicTriVortexLondon)
+ClassImp(TBulkAnisotropicTriVortexMLGlobal)
+ClassImp(TBulkAnisotropicTriVortexML)
+ClassImp(TBulkAnisotropicTriVortexAGLGlobal)
+ClassImp(TBulkAnisotropicTriVortexAGL)
 
 //------------------
 // Destructor of the TBulkTriVortexLondon class -- cleaning up

@@ -24,7 +24,7 @@ FITPARAMETER
 ###############################################################
 THEORY
 asymmetry      3
-userFcn  libPNL_PippardFitter.so PNL_PippardFitter 4 5 6 7 8 9 10 fun2 11
+userFcn  libPNL_PippardFitter PNL_PippardFitter 4 5 6 7 8 9 10 fun2 11
 simpleGss     12          (rate)
 
 ###############################################################

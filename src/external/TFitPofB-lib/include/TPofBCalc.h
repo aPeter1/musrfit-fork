@@ -68,7 +68,10 @@ public:
   void ConvolveGss(double);
   void AddBackground(double, double, double);
   double GetFirstMoment() const;
+  double GetCentralMoment(unsigned int) const;
+  double GetSkewnessAlpha() const;
   void UnsetPBExists();
+  void Normalize(unsigned int, unsigned int) const;
 
 private:
   double *fB; ///< array of discrete points in the field domain

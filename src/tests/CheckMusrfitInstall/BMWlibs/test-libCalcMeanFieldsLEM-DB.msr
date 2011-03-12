@@ -10,7 +10,7 @@ FITPARAMETER
          
 ###############################################################
 THEORY
-userFcn  libCalcMeanFieldsLEM.so TMeanFieldsForScSingleLayer 1 2 3 4 5 5 5
+userFcn  libCalcMeanFieldsLEM TMeanFieldsForScSingleLayer 1 2 3 4 5 5 5
 
 ###############################################################
 #FUNCTIONS

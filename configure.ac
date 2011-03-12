@@ -8,7 +8,9 @@ dnl -----------------------------------------------
 dnl Check if pkg-config is installed
 dnl -----------------------------------------------
 
-m4_ifdef([PKG_CHECK_MODULES],[],AC_MSG_ERROR([Please install pkg-config before configuring musrfit!]))
+PKG_PROG_PKG_CONFIG([0.10])
+#The above macro still needs to be tested under Cygwin without pkg-config---but it is promising to be a better solution than the macro below.
+#m4_ifdef([PKG_CHECK_MODULES],[],AC_MSG_ERROR([Please install pkg-config before configuring musrfit!]))
 
 dnl -----------------------------------------------
 dnl Package names and version numbers
@@ -501,6 +503,9 @@ if test "${BUILD_BMW_LIBS}" = "1"; then
   LIBS="$LIBS $FFTW3_LIBS"
   AC_SEARCH_LIBS([fftw_init_threads], [fftw3_threads], [FFTW3_LIBS="$FFTW3_LIBS -lfftw3_threads -lpthread"
                                       AC_DEFINE([HAVE_LIBFFTW3_THREADS], [1], [Define to 1 if fftw3_threads are available])], [], [-lpthread])
+  # Check for fftw3f library. If it is not available the BMWlibs will not be built!
+  AC_SEARCH_LIBS([fftwf_malloc], [fftw3f], [FFTW3_LIBS="$FFTW3_LIBS -lfftw3f"], [BUILD_BMW_LIBS=0
+                                      AC_MSG_WARN([The float version of FFTW3 is not available. The BMWlibs will not be built!])], [])
   CFLAGS="$SAVED_CFLAGS"
   LIBS="$SAVED_LIBS"
 

@@ -9,7 +9,7 @@ FITPARAMETER
 ###############################################################
 THEORY
 asymmetry      1
-userFcn  libGapIntegrals.so TGapDWave 2 3
+userFcn  libGapIntegrals TGapDWave 2 3
 
 ###############################################################
 #FUNCTIONS

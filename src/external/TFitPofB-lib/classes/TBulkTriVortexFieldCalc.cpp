@@ -1994,6 +1994,7 @@ void TBulkAnisotropicTriVortexLondonFieldCalc::CalculateGrid() const {
   const int NFFT(fSteps);
   const int NFFT_2(fSteps/2);
   const int NFFTsq(fSteps*fSteps);
+  const int NFFTsq_2((fSteps/2 + 1) * fSteps);
 
   // fill the field Fourier components in the matrix
 
@@ -2015,70 +2016,102 @@ void TBulkAnisotropicTriVortexLondonFieldCalc::CalculateGrid() const {
   double kk, ll;
   int k, l, lNFFT_2;
 
-  for (l = 0; l < NFFT_2; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2; k += 2) {
-      kk = static_cast<double>(k*k);
-      fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-    }
-    k = NFFT_2;
-    kk = static_cast<double>(k*k);
-    fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
-    fFFTin[lNFFT_2 + k][1] = 0.0;
+  // zero first everything since the r2c FFT changes the input, too
+  #ifdef HAVE_GOMP
+  #pragma omp parallel for default(shared) private(k) schedule(dynamic)
+  #endif
+  for (k = 0; k < NFFTsq_2; ++k) {
+    fFFTin[k][0] = 0.0;
+    fFFTin[k][1] = 0.0;
   }
 
+  #ifdef HAVE_GOMP
+  #pragma omp parallel private(k, l, lNFFT_2, kk, ll) num_threads(4)
+  {
+    switch(omp_get_thread_num()) {
+      case 0:
+  #endif
+        for (l = 0; l < NFFT_2; l += 2) {
+          lNFFT_2 = l*(NFFT_2 + 1);
+          ll = static_cast<double>(l*l);
+          for (k = 0; k < NFFT_2; k += 2) {
+            kk = static_cast<double>(k*k);
+            fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+//            fFFTin[lNFFT_2 + k][1] = 0.0;
+//            fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+//            fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+          }
 
-  for (l = NFFT_2; l < NFFT; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = static_cast<double>((NFFT-l)*(NFFT-l));
-    for (k = 0; k < NFFT_2; k += 2) {
-      kk = static_cast<double>(k*k);
-      fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+          k = NFFT_2;
+          kk = static_cast<double>(k*k);
+          fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+//          fFFTin[lNFFT_2 + k][1] = 0.0;
+
+        }
+  #ifdef HAVE_GOMP
+      break;
+    case 1:
+  #endif
+        for (l = NFFT_2; l < NFFT; l += 2) {
+          lNFFT_2 = l*(NFFT_2 + 1);
+          ll = static_cast<double>((NFFT-l)*(NFFT-l));
+          for (k = 0; k < NFFT_2; k += 2) {
+            kk = static_cast<double>(k*k);
+            fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+//            fFFTin[lNFFT_2 + k][1] = 0.0;
+//            fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+//            fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+          }
+
+          k = NFFT_2;
+          kk = static_cast<double>(k*k);
+          fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+//          fFFTin[lNFFT_2 + k][1] = 0.0;
+        }
+  #ifdef HAVE_GOMP
+      break;
+    case 2:
+  #endif
+        // intermediate rows
+        for (l = 1; l < NFFT_2; l += 2) {
+          lNFFT_2 = l*(NFFT_2 + 1);
+          ll = static_cast<double>(l*l);
+          for (k = 0; k < NFFT_2; k += 2) {
+            kk = static_cast<double>((k + 1)*(k + 1));
+//            fFFTin[lNFFT_2 + k][0] = 0.0;
+//            fFFTin[lNFFT_2 + k][1] = 0.0;
+            fFFTin[lNFFT_2 + k + 1][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+//            fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+          }
+//          k = NFFT_2;
+//          fFFTin[lNFFT_2 + k][0] = 0.0;
+//          fFFTin[lNFFT_2 + k][1] = 0.0;
+        }
+  #ifdef HAVE_GOMP
+      break;
+    case 3:
+  #endif
+        for (l = NFFT_2 + 1; l < NFFT; l += 2) {
+          lNFFT_2 = l*(NFFT_2 + 1);
+          ll = static_cast<double>((NFFT-l)*(NFFT-l));
+          for (k = 0; k < NFFT_2; k += 2) {
+            kk = static_cast<double>((k+1)*(k+1));
+//            fFFTin[lNFFT_2 + k][0] = 0.0;
+//            fFFTin[lNFFT_2 + k][1] = 0.0;
+            fFFTin[lNFFT_2 + k + 1][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+//           fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+          }
+          k = NFFT_2;
+//          fFFTin[lNFFT_2 + k][0] = 0.0;
+//          fFFTin[lNFFT_2 + k][1] = 0.0;
+        }
+  #ifdef HAVE_GOMP
+      break;
+    default:
+      break;
     }
-    k = NFFT_2;
-    kk = static_cast<double>(k*k);
-    fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
-    fFFTin[lNFFT_2 + k][1] = 0.0;
   }
-
-  // intermediate rows
-
-  for (l = 1; l < NFFT_2; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2; k += 2) {
-      kk = static_cast<double>((k + 1)*(k + 1));
-      fFFTin[lNFFT_2 + k][0] = 0.0;
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-    }
-    k = NFFT_2;
-    fFFTin[lNFFT_2 + k][0] = 0.0;
-    fFFTin[lNFFT_2 + k][1] = 0.0;
-  }
-
-  for (l = NFFT_2 + 1; l < NFFT; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = static_cast<double>((NFFT-l)*(NFFT-l));
-    for (k = 0; k < NFFT_2; k += 2) {
-      kk = static_cast<double>((k+1)*(k+1));
-      fFFTin[lNFFT_2 + k][0] = 0.0;
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-    }
-    k = NFFT_2;
-    fFFTin[lNFFT_2 + k][0] = 0.0;
-    fFFTin[lNFFT_2 + k][1] = 0.0;
-  }
+  #endif
 
   // Do the Fourier transform to get B(x,y)
 
