@@ -17,7 +17,7 @@ asymmetry   fun1
 dynExpKTLF  fun3     4     5    (frequency damping hopping-rate)
 +
 asymmetry   fun2
-userFcn  libLFRelaxation TLFDynLorKT fun3 4 5
+userFcn  libLFRelaxation TLFDynExpKT fun3 4 5
 
 ###############################################################
 FUNCTIONS

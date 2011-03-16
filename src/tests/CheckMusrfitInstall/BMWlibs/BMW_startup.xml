@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<TFitPofB>
+<BMW>
     <comment>
-        TFitPofB_startup.xml 
-        Here some external parameters used in conjunction with the TFitPofB-library are set.
+        BMW_startup.xml 
+        Here some external parameters used in conjunction with the BMWlibs are set.
         There are different sections:
         * Common parameters which are used for any kind of function
         * Parameters for low energy uSR data analysis with given B(z)
         * Parameters for bulk uSR data analysis (currently only four model to calculate field distributions for a triangular vortex lattice)
+        * Parameters for dynamical LF relaxation functions within the BMWlibs (mainly useful for testing purposes)
 
         Common parameters:
         - debug : set it to 1 in order to obtain some information what is read from the xml-file
         - wisdom : sets the path to an FFTW-wisdom file - if there is no valid wisdom at the given path, wisdom handling will be disabled
+        - wisdom_float : sets the path to a float-FFTW-wisdom file - if there is no valid wisdom at the given path, wisdom handling will be disabled
+          (at the moment only used for LF-relaxation functions)
         - delta_t : time resolution of P(t) in microseconds
         - delta_B : field resolution of P(B) in Gauss
+
+        LF-relaxation parameters:
+        - delta_t_LF : time resolution of P(t) in microseconds for the Laplace transforms involved in the dynamical LF-relaxation calculations
+        - N_LF : length of the Laplace transforms involved in the dynamical LF-relaxation calculations
 
         LEM parameters (if the LEM tag is present it is expected that the data_path tag contains a valid path):
         - data_path, energy_list : Defines path/prefix, energy-labels and energies (keV) of TrimSP-rge-files
@@ -24,11 +31,16 @@
     </comment>
     <debug>0</debug>
     <wisdom>none</wisdom>
+    <wisdom_float>none</wisdom_float>
     <delta_t>0.01</delta_t>
     <delta_B>0.5</delta_B>
     <VortexLattice>
         <N_VortexGrid>512</N_VortexGrid>
     </VortexLattice>
+    <LFRelaxation>
+        <delta_t_LF>0.00004</delta_t_LF>
+        <N_LF>524288</N_LF>
+    </LFRelaxation>
     <LEM>
         <data_path>profiles/TestProfile-</data_path>
         <N_theory>5000</N_theory>
@@ -55,4 +67,4 @@
           <energy>24.0</energy>
      </energy_list>
    </LEM>
-</TFitPofB>
+</BMW>

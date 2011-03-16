@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/11/07
+  $Id$
 
 ***************************************************************************/
 
@@ -36,7 +36,7 @@
 using namespace std;
 
 #include <TSAXParser.h>
-#include "TFitPofBStartupHandler.h"
+#include "BMWStartupHandler.h"
 
 ClassImp(TLondon1DHS)
 ClassImp(TLondon1D1L)
@@ -149,15 +149,15 @@ TLondon1D3LS::~TLondon1D3LS() {
 TLondon1DHS::TLondon1DHS() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("TFitPofB_startup.xml");
+    string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
-    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    BMWStartupHandler *startupHandler = new BMWStartupHandler();
+    saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -297,15 +297,15 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
 TLondon1D1L::TLondon1D1L() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("TFitPofB_startup.xml");
+    string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
-    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    BMWStartupHandler *startupHandler = new BMWStartupHandler();
+    saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -480,15 +480,15 @@ double TLondon1D1L::operator()(double t, const vector<double> &par) const {
 
 TLondon1D2L::TLondon1D2L() : fCalcNeeded(true), fFirstCall(true) {
   // read startup file
-    string startup_path_name("TFitPofB_startup.xml");
+    string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
-    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    BMWStartupHandler *startupHandler = new BMWStartupHandler();
+    saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -650,15 +650,15 @@ double TLondon1D2L::operator()(double t, const vector<double> &par) const {
 TProximity1D1LHS::TProximity1D1LHS() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("TFitPofB_startup.xml");
+    string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
-    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    BMWStartupHandler *startupHandler = new BMWStartupHandler();
+    saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -797,15 +797,15 @@ double TProximity1D1LHS::operator()(double t, const vector<double> &par) const {
 
 TLondon1D3L::TLondon1D3L() : fCalcNeeded(true), fFirstCall(true) {
     // read startup file
-    string startup_path_name("TFitPofB_startup.xml");
+    string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
-    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    BMWStartupHandler *startupHandler = new BMWStartupHandler();
+    saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -966,15 +966,15 @@ double TLondon1D3L::operator()(double t, const vector<double> &par) const {
 
 TLondon1D3LS::TLondon1D3LS() : fCalcNeeded(true), fFirstCall(true) {
     // read startup file
-    string startup_path_name("TFitPofB_startup.xml");
+    string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
-    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    BMWStartupHandler *startupHandler = new BMWStartupHandler();
+    saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -1135,15 +1135,15 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
 // 
 // TLondon1D4L::TLondon1D4L() : fCalcNeeded(true), fFirstCall(true), fLastFourChanged(true) {
 //     // read startup file
-//     string startup_path_name("TFitPofB_startup.xml");
+//     string startup_path_name("BMW_startup.xml");
 // 
 //     TSAXParser *saxParser = new TSAXParser();
-//     TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-//     saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+//     BMWStartupHandler *startupHandler = new BMWStartupHandler();
+//     saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
 //     int status (saxParser->ParseFile(startup_path_name.c_str()));
 //     // check for parse errors
 //     if (status) { // error
-//       cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+//       cout << endl << "**WARNING** reading/parsing " << startup_path_name << " failed." << endl;
 //     }
 // 
 //     fNSteps = startupHandler->GetNSteps();

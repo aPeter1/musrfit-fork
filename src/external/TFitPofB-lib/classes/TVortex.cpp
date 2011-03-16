@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2009/10/17
+  $Id$
 
 ***************************************************************************/
 
@@ -36,7 +36,7 @@
 using namespace std;
 
 #include <TSAXParser.h>
-#include "TFitPofBStartupHandler.h"
+#include "BMWStartupHandler.h"
 
 ClassImp(TBulkTriVortexLondon)
 ClassImp(TBulkSqVortexLondon)
@@ -143,15 +143,15 @@ TBulkTriVortexNGL::~TBulkTriVortexNGL() {
 TBulkTriVortexLondon::TBulkTriVortexLondon() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("TFitPofB_startup.xml");
+    string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
-    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    BMWStartupHandler *startupHandler = new BMWStartupHandler();
+    saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -200,15 +200,15 @@ TBulkTriVortexLondon::TBulkTriVortexLondon() : fCalcNeeded(true), fFirstCall(tru
 TBulkSqVortexLondon::TBulkSqVortexLondon() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("TFitPofB_startup.xml");
+    string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
-    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    BMWStartupHandler *startupHandler = new BMWStartupHandler();
+    saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -427,15 +427,15 @@ double TBulkSqVortexLondon::operator()(double t, const vector<double> &par) cons
 TBulkTriVortexML::TBulkTriVortexML() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("TFitPofB_startup.xml");
+    string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
-    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    BMWStartupHandler *startupHandler = new BMWStartupHandler();
+    saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -563,15 +563,15 @@ double TBulkTriVortexML::operator()(double t, const vector<double> &par) const {
 TBulkTriVortexAGL::TBulkTriVortexAGL() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("TFitPofB_startup.xml");
+    string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
-    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    BMWStartupHandler *startupHandler = new BMWStartupHandler();
+    saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -699,15 +699,15 @@ double TBulkTriVortexAGL::operator()(double t, const vector<double> &par) const 
 TBulkTriVortexNGL::TBulkTriVortexNGL() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("TFitPofB_startup.xml");
+    string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
-    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    BMWStartupHandler *startupHandler = new BMWStartupHandler();
+    saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -851,15 +851,15 @@ TBulkAnisotropicTriVortexLondonGlobal::~TBulkAnisotropicTriVortexLondonGlobal() 
 TBulkAnisotropicTriVortexLondonGlobal::TBulkAnisotropicTriVortexLondonGlobal() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("TFitPofB_startup.xml");
+    string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
-    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    BMWStartupHandler *startupHandler = new BMWStartupHandler();
+    saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -1090,15 +1090,15 @@ TBulkAnisotropicTriVortexMLGlobal::~TBulkAnisotropicTriVortexMLGlobal() {
 TBulkAnisotropicTriVortexMLGlobal::TBulkAnisotropicTriVortexMLGlobal() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("TFitPofB_startup.xml");
+    string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
-    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    BMWStartupHandler *startupHandler = new BMWStartupHandler();
+    saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -1329,15 +1329,15 @@ TBulkAnisotropicTriVortexAGLGlobal::~TBulkAnisotropicTriVortexAGLGlobal() {
 TBulkAnisotropicTriVortexAGLGlobal::TBulkAnisotropicTriVortexAGLGlobal() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("TFitPofB_startup.xml");
+    string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
-    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    BMWStartupHandler *startupHandler = new BMWStartupHandler();
+    saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);

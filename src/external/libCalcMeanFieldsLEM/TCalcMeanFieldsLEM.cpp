@@ -37,7 +37,7 @@
 using namespace std;
 
 #include <TSAXParser.h>
-#include "TFitPofBStartupHandler.h"
+#include "BMWStartupHandler.h"
 
 #include "TCalcMeanFieldsLEM.h"
 
@@ -54,8 +54,8 @@ TMeanFieldsForScHalfSpace::TMeanFieldsForScHalfSpace() {
   string startup_path_name("TFitPofB_startup.xml");
 
   TSAXParser *saxParser = new TSAXParser();
-  TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-  saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+  BMWStartupHandler *startupHandler = new BMWStartupHandler();
+  saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
   int status (saxParser->ParseFile(startup_path_name.c_str()));
   // check for parse errors
   if (status) { // error
@@ -145,8 +145,8 @@ TMeanFieldsForScSingleLayer::TMeanFieldsForScSingleLayer() {
   string startup_path_name("TFitPofB_startup.xml");
 
   TSAXParser *saxParser = new TSAXParser();
-  TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-  saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+  BMWStartupHandler *startupHandler = new BMWStartupHandler();
+  saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
   int status (saxParser->ParseFile(startup_path_name.c_str()));
   // check for parse errors
   if (status) { // error
@@ -244,8 +244,8 @@ TMeanFieldsForScBilayer::TMeanFieldsForScBilayer() {
   string startup_path_name("TFitPofB_startup.xml");
 
   TSAXParser *saxParser = new TSAXParser();
-  TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-  saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+  BMWStartupHandler *startupHandler = new BMWStartupHandler();
+  saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
   int status (saxParser->ParseFile(startup_path_name.c_str()));
   // check for parse errors
   if (status) { // error
@@ -347,8 +347,8 @@ TMeanFieldsForScTrilayer::TMeanFieldsForScTrilayer() {
   string startup_path_name("TFitPofB_startup.xml");
 
   TSAXParser *saxParser = new TSAXParser();
-  TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-  saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+  BMWStartupHandler *startupHandler = new BMWStartupHandler();
+  saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
   int status (saxParser->ParseFile(startup_path_name.c_str()));
   // check for parse errors
   if (status) { // error
@@ -452,8 +452,8 @@ TMeanFieldsForScTrilayerWithInsulator::TMeanFieldsForScTrilayerWithInsulator() {
   string startup_path_name("TFitPofB_startup.xml");
 
   TSAXParser *saxParser = new TSAXParser();
-  TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-  saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+  BMWStartupHandler *startupHandler = new BMWStartupHandler();
+  saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
   int status (saxParser->ParseFile(startup_path_name.c_str()));
   // check for parse errors
   if (status) { // error

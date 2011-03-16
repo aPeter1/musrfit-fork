@@ -1,9 +1,11 @@
 ## Process this file with automake to create Makefile.in
 
+startup_path = ../../BMWStartupHandler
+
 h_sources = \
+  $(startup_path)/BMWStartupHandler.h \
   ../include/TBofZCalc.h \
   ../include/TBulkTriVortexFieldCalc.h \
-  ../include/TFitPofBStartupHandler.h \
   ../include/TLondon1D.h \
   ../include/TPofBCalc.h \
   ../include/TPofTCalc.h \
@@ -12,21 +14,21 @@ h_sources = \
   ../include/TVortex.h
 
 h_linkdef = \
-  ../include/TFitPofBStartupHandlerLinkDef.h \
+  $(startup_path)/BMWStartupHandlerLinkDef.h \
   ../include/TLondon1DLinkDef.h \
   ../include/TVortexLinkDef.h \
   ../include/TSkewedGssLinkDef.h
 
 dict_h_sources = \
-  TFitPofBStartupHandlerDict.h \
+  $(startup_path)/BMWStartupHandlerDict.h \
   TLondon1DDict.h \
   TSkewedGssDict.h \
   TVortexDict.h
 
 cpp_sources = \
+  $(startup_path)/BMWStartupHandler.cpp \
   TBulkTriVortexFieldCalc.cpp \
   TBofZCalc.cpp \
-  TFitPofBStartupHandler.cpp \
   TLondon1D.cpp \
   TPofBCalc.cpp \
   TPofTCalc.cpp \
@@ -35,7 +37,7 @@ cpp_sources = \
   TVortex.cpp
 
 dict_cpp_sources = \
-  TFitPofBStartupHandlerDict.cpp \
+  $(startup_path)/BMWStartupHandlerDict.cpp \
   TLondon1DDict.cpp \
   TSkewedGssDict.cpp \
   TVortexDict.cpp
@@ -43,12 +45,16 @@ dict_cpp_sources = \
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 
-INCLUDES = -I$(top_srcdir)/src/include -I../include $(LEM_CFLAGS) $(PMUSR_CFLAGS) $(FFTW3_CFLAGS) $(ROOT_CFLAGS)
+INCLUDES = -I$(top_srcdir)/src/include -I../include -I$(startup_path) $(LEM_CFLAGS) $(PMUSR_CFLAGS) $(FFTW3_CFLAGS) $(ROOT_CFLAGS)
 AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources)
 AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS) -L@ROOTLIBDIR@
-CLEANFILES = *Dict.cpp *Dict.h *~ core
+CLEANFILES = $(startup_path)/*Dict.cpp $(startup_path)/*Dict.h $(startup_path)/*~ \
+             *Dict.cpp *Dict.h *~ core
+
+$(startup_path)/BMWStartupHandlerDict.cpp $(startup_path)/BMWStartupHandlerDict.h: $(startup_path)/BMWStartupHandler.h $(startup_path)/BMWStartupHandlerLinkDef.h
+	@ROOTCINT@ -v -f $(startup_path)/BMWStartupHandlerDict.cpp -c -p $(INCLUDES) $^
 
 %Dict.cpp %Dict.h: ../include/%.h ../include/%LinkDef.h
 	@ROOTCINT@ -v -f $*Dict.cpp -c -p $(INCLUDES) $^

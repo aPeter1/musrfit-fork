@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2009/01/24
+  $Id$
 
 ***************************************************************************/
 
@@ -35,7 +35,7 @@
 using namespace std;
 
 #include <TSAXParser.h>
-#include "TFitPofBStartupHandler.h"
+#include "BMWStartupHandler.h"
 
 ClassImp(TSkewedGss)
 
@@ -60,15 +60,18 @@ TSkewedGss::~TSkewedGss() {
 TSkewedGss::TSkewedGss() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("TFitPofB_startup.xml");
+    string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
-    TFitPofBStartupHandler *startupHandler = new TFitPofBStartupHandler();
-    saxParser->ConnectToHandler("TFitPofBStartupHandler", startupHandler);
+    BMWStartupHandler *startupHandler = new BMWStartupHandler();
+    saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cout << endl << "**WARNING** reading/parsing TFitPofB_startup.xml failed." << endl;
+      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
+           << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+           << endl;
+      assert(false);
     }
 
     fWisdom = startupHandler->GetWisdomFile();
@@ -83,13 +86,9 @@ TSkewedGss::TSkewedGss() : fCalcNeeded(true), fFirstCall(true) {
     fParForPofB.push_back(0.0); // s-
     fParForPofB.push_back(0.0); // s+
 
-    TPofBCalc *x = new TPofBCalc(fParForPofB);
-    fPofB = x;
-    x = 0;
+    fPofB = new TPofBCalc(fParForPofB);
 
-    TPofTCalc *y = new TPofTCalc(fPofB, fWisdom, fParForPofT);
-    fPofT = y;
-    y = 0;
+    fPofT = new TPofTCalc(fPofB, fWisdom, fParForPofT);
 
     // clean up
     if (saxParser) {

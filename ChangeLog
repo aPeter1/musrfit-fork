@@ -31,6 +31,7 @@ FIXED 2 little annoying problems: (i) now it is possible to zoom down to the sin
      (ii) when switching between data- and difference-view, the x-range doesn't change anymore.
 FIXED musrt0 crash for histogram number out of range (MUSR-157)
 FIXED fixes the inadequate attempt to use log max likelihood fit for asymmetry/non-muSR fit (MUSR-148)
+CHANGED the file name of the XML startup file for some of the libraries included in the BMWlibs to "BMW_startup.xml"
 CHANGED added an additional layer for process killing to musrgui/musredit which hopefully should help to reduce the number of 
         musrfit/musrview corpses with high CPU load.
 CHANGED the formating of the parameters such that they show the precision corresponding to the error. At the

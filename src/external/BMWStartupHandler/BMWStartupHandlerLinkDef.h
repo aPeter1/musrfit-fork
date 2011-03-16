@@ -1,11 +1,11 @@
 /***************************************************************************
 
-  TFitPofBStartupHandlerLinkDef.h
+  BMWStartupHandlerLinkDef.h
 
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/05/29
+  $Id$
 
 ***************************************************************************/
 
@@ -36,7 +36,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class TFitPofBStartupHandler+;
+#pragma link C++ class BMWStartupHandler+;
 
 #endif //__CINT__
 // root dictionary stuff --------------------------------------------------

@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2008/12/04
+  $Id$
 
 ***************************************************************************/
 
@@ -35,6 +35,7 @@
 #include<vector>
 #include<cstdio>
 #include<cmath>
+#include<map>
 
 using namespace std;
 
@@ -50,6 +51,15 @@ using namespace std;
 #include "fftw3.h"
 #include "../BMWIntegrator/BMWIntegrator.h"
 
+//-----------------------------------------------------------------------------------------------------------------
+/**
+ * <p>User function for a static Gaussian depolarization in a longitudinal field using direct integration through GSL
+ * See also: R. S. Hayano, Y. J. Uemura, J. Imazato, N. Nishida, T. Yamazaki, and R. Kubo,
+ * \htmlonly Phys. Rev. B <b>20</b>, 850&#150;859 (1979), doi:<a href="http://dx.doi.org/10.1103/PhysRevB.20.850">10.1103/PhysRevB.20.850</a>
+ * \endhtmlonly
+ * \latexonly Phys. Rev. B \textbf{20}, 850--859 (1979), \texttt{http://dx.doi.org/10.1103/PhysRevB.20.850}
+ * \endlatexonly
+ */
 class TLFStatGssKT : public PUserFcnBase {
 
 public:
@@ -63,16 +73,29 @@ public:
   double operator()(double, const vector<double>&) const;
 
 private:
-  TIntSinGss *fIntSinGss;
+  TIntSinGss *fIntSinGss;                  ///< integrator
+  mutable map<double, double> fIntValues;  ///< previously calculated integral values
+  mutable vector<double> fPar;             ///< parameters of the function [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), &#963; (&#956;s<sup>-1</sup>)\endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $\sigma~(\mu\mathrm{s}^{-1})$ \endlatexonly]
+  mutable bool fCalcNeeded;                ///< flag specifying if an integration has to be done
+  mutable double fLastTime;                ///< time of the last calculated function value
 
-  ClassDef(TLFStatGssKT,1)
+  ClassDef(TLFStatGssKT,2)
 };
 
-class TLFStatLorKT : public PUserFcnBase {
+//-----------------------------------------------------------------------------------------------------------------
+/**
+ * <p>User function for a static exponential depolarization in a longitudinal field using direct integration through GSL
+ * See also: Y. J. Uemura, T. Yamazaki, D. R. Harshman, M. Senba, and E. J. Ansaldo,
+ * \htmlonly Phys. Rev. B <b>31</b>, 546&#150;563 (1985), doi:<a href="http://dx.doi.org/10.1103/PhysRevB.31.546">10.1103/PhysRevB.31.546</a>
+ * \endhtmlonly
+ * \latexonly Phys. Rev. B \textbf{31}, 546--563 (1985), \texttt{http://dx.doi.org/10.1103/PhysRevB.31.546}
+ * \endlatexonly
+ */
+class TLFStatExpKT : public PUserFcnBase {
 
 public:
-  TLFStatLorKT();
-  ~TLFStatLorKT();
+  TLFStatExpKT();
+  ~TLFStatExpKT();
 
   Bool_t NeedGlobalPart() const { return false; }
   void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -81,11 +104,31 @@ public:
   double operator()(double, const vector<double>&) const;
 
 private:
-  TIntBesselJ0Exp *fIntBesselJ0Exp;
+  TIntBesselJ0Exp *fIntBesselJ0Exp;         ///< integrator
+  mutable map<double, double> fIntValues;   ///< previously calculated integral values
+  mutable vector<double> fPar;              ///< parameters of the function [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), <i>a</i> (&#956;s<sup>-1</sup>)\endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $a~(\mu\mathrm{s}^{-1})$ \endlatexonly]
+  mutable bool fCalcNeeded;                 ///< flag specifying if an integration has to be done
+  mutable double fLastTime;                 ///< time of the last calculated function value
 
-  ClassDef(TLFStatLorKT,1)
+  ClassDef(TLFStatExpKT,2)
 };
 
+//-----------------------------------------------------------------------------------------------------------------
+/**
+ * <p>User function for a dynamic Gaussian depolarization in a longitudinal field calculated using Laplace transforms
+ * See also: R. S. Hayano, Y. J. Uemura, J. Imazato, N. Nishida, T. Yamazaki, and R. Kubo,
+ * \htmlonly Phys. Rev. B <b>20</b>, 850&#150;859 (1979), doi:<a href="http://dx.doi.org/10.1103/PhysRevB.20.850">10.1103/PhysRevB.20.850</a>
+ * \endhtmlonly
+ * \latexonly Phys. Rev. B \textbf{20}, 850--859 (1979), \texttt{http://dx.doi.org/10.1103/PhysRevB.20.850}
+ * \endlatexonly
+ *
+ * For details regarding the numerical Laplace transform, see e.g.
+ * P. Moreno and A. Ramirez,
+ * \htmlonly IEEE Trans. Power Delivery <b>23</b>, 2599&#150;2609 (2008), doi:<a href="http://dx.doi.org/10.1109/TPWRD.2008.923404">10.1109/TPWRD.2008.923404</a>
+ * \endhtmlonly
+ * \latexonly IEEE Trans. Power Delivery \textbf{23}, 2599--2609 (2008), \texttt{http://dx.doi.org/10.1109/TPWRD.2008.923404}
+ * \endlatexonly
+ */
 class TLFDynGssKT : public PUserFcnBase {
 
 public:
@@ -99,28 +142,51 @@ public:
   double operator()(double, const vector<double>&) const;
 
 private:
-  mutable vector<double> fPar;
-  mutable bool fCalcNeeded;
-  mutable bool fFirstCall;
-  string fWisdom;
-  unsigned int fNSteps;
-  double fDt;
-  double fDw;
-  double fC;
-  fftwf_plan fFFTplanFORW;
-  fftwf_plan fFFTplanBACK;
-  float *fFFTtime;
-  fftwf_complex *fFFTfreq;
-  mutable unsigned int fCounter;
+  mutable vector<double> fPar;        ///< parameters of the function [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), &#963; (&#956;s<sup>-1</sup>), &#957; (MHz)\endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $\sigma~(\mu\mathrm{s}^{-1})$, $\nu~(\mathrm{MHz})$ \endlatexonly]
+  mutable bool fCalcNeeded;           ///< flag indicating if the expensive Laplace transform has to be done (e.g. after parameters have changed)
+  mutable bool fFirstCall;            ///< flag indicating if the function is evaluated for the first time
+  bool fUseWisdom;                    ///< flag showing if a FFTW3-wisdom file is used
+  string fWisdom;                     ///< path to the wisdom file
+  unsigned int fNSteps;               ///< length of the Laplace transform
+  double fDt;                         ///< time resolution
+  double fDw;                         ///< frequency resolution
+  double fC;                          ///< coefficient depending on the length of the Laplace transform and time resolution
+  fftwf_plan fFFTplanFORW;            ///< FFTW3 plan: time domain \htmlonly &#8594; \endhtmlonly \latexonly $\rightarrow$ \endlatexonly frequency domain
+  fftwf_plan fFFTplanBACK;            ///< FFTW3 plan: time domain \htmlonly &#8592; \endhtmlonly \latexonly $\leftarrow$ \endlatexonly frequency domain
+  float *fFFTtime;                    ///< time-domain array
+  fftwf_complex *fFFTfreq;            ///< frequency-domain array
+  mutable unsigned int fCounter;      ///< counter determining how many Laplace transforms are done (mainly for debugging purposes)
 
-  ClassDef(TLFDynGssKT,1)
+  ClassDef(TLFDynGssKT,2)
 };
 
-class TLFDynLorKT : public PUserFcnBase {
+//-----------------------------------------------------------------------------------------------------------------
+/**
+ * <p>User function for a dynamic exponential depolarization in a longitudinal field calculated using Laplace transforms
+ * See also: Y. J. Uemura, T. Yamazaki, D. R. Harshman, M. Senba, and E. J. Ansaldo,
+ * \htmlonly Phys. Rev. B <b>31</b>, 546&#150;563 (1985), doi:<a href="http://dx.doi.org/10.1103/PhysRevB.31.546">10.1103/PhysRevB.31.546</a>
+ * \endhtmlonly
+ * \latexonly Phys. Rev. B \textbf{31}, 546--563 (1985), \texttt{http://dx.doi.org/10.1103/PhysRevB.31.546}
+ * \endlatexonly
+ *
+ * and: R. S. Hayano, Y. J. Uemura, J. Imazato, N. Nishida, T. Yamazaki, and R. Kubo,
+ * \htmlonly Phys. Rev. B <b>20</b>, 850&#150;859 (1979), doi:<a href="http://dx.doi.org/10.1103/PhysRevB.20.850">10.1103/PhysRevB.20.850</a>
+ * \endhtmlonly
+ * \latexonly Phys. Rev. B \textbf{20}, 850--859 (1979), \texttt{http://dx.doi.org/10.1103/PhysRevB.20.850}
+ * \endlatexonly
+ *
+ * For details regarding the numerical Laplace transform, see e.g.
+ * P. Moreno and A. Ramirez,
+ * \htmlonly IEEE Trans. Power Delivery <b>23</b>, 2599&#150;2609 (2008), doi:<a href="http://dx.doi.org/10.1109/TPWRD.2008.923404">10.1109/TPWRD.2008.923404</a>
+ * \endhtmlonly
+ * \latexonly IEEE Trans. Power Delivery \textbf{23}, 2599--2609 (2008), \texttt{http://dx.doi.org/10.1109/TPWRD.2008.923404}
+ * \endlatexonly
+ */
+class TLFDynExpKT : public PUserFcnBase {
 
 public:
-  TLFDynLorKT();
-  ~TLFDynLorKT();
+  TLFDynExpKT();
+  ~TLFDynExpKT();
 
   Bool_t NeedGlobalPart() const { return false; }
   void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
@@ -129,25 +195,48 @@ public:
   double operator()(double, const vector<double>&) const;
 
 private:
-  mutable vector<double> fPar;
-  mutable bool fCalcNeeded;
-  mutable bool fFirstCall;
-  string fWisdom;
-  unsigned int fNSteps;
-  double fDt;
-  double fDw;
-  double fC;
-  fftwf_plan fFFTplanFORW;
-  fftwf_plan fFFTplanBACK;
-  float *fFFTtime;
-  fftwf_complex *fFFTfreq;
-  mutable unsigned int fCounter;
-  mutable double fL1;
-  mutable double fL2;
+  mutable vector<double> fPar;         ///< parameters of the function [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), <i>a</i> (&#956;s<sup>-1</sup>), &#957; (MHz)\endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $a~(\mu\mathrm{s}^{-1})$, $\nu~(\mathrm{MHz})$ \endlatexonly]
+  mutable bool fCalcNeeded;            ///< flag indicating if the expensive Laplace transform has to be done (e.g. after parameters have changed)
+  mutable bool fFirstCall;             ///< flag indicating if the function is evaluated for the first time
+  bool fUseWisdom;                     ///< flag showing if a FFTW3-wisdom file is used
+  string fWisdom;                      ///< path to the wisdom file
+  unsigned int fNSteps;                ///< length of the Laplace transform
+  double fDt;                          ///< time resolution
+  double fDw;                          ///< frequency resolution
+  double fC;                           ///< coefficient depending on the length of the Laplace transform and time resolution
+  fftwf_plan fFFTplanFORW;             ///< FFTW3 plan: time domain \htmlonly &#8594; \endhtmlonly \latexonly $\rightarrow$ \endlatexonly frequency domain
+  fftwf_plan fFFTplanBACK;             ///< FFTW3 plan: time domain \htmlonly &#8592; \endhtmlonly \latexonly $\leftarrow$ \endlatexonly frequency domain
+  float *fFFTtime;                     ///< time-domain array
+  fftwf_complex *fFFTfreq;             ///< frequency-domain array
+  mutable unsigned int fCounter;       ///< counter determining how many Laplace transforms are done (mainly for debugging purposes)
+  mutable double fL1;                  ///< coefficient used for the high-field and high-hopping-rate approximation
+  mutable double fL2;                  ///< coefficient used for the high-field and high-hopping-rate approximation
 
-  ClassDef(TLFDynLorKT,1)
+  ClassDef(TLFDynExpKT,2)
 };
 
+//-----------------------------------------------------------------------------------------------------------------
+/**
+ * <p>User function for a dynamic depolarization in a spin glass in a longitudinal field calculated using Laplace transforms
+ * See also: Y. J. Uemura, T. Yamazaki, D. R. Harshman, M. Senba, and E. J. Ansaldo,
+ * \htmlonly Phys. Rev. B <b>31</b>, 546&#150;563 (1985), doi:<a href="http://dx.doi.org/10.1103/PhysRevB.31.546">10.1103/PhysRevB.31.546</a>
+ * \endhtmlonly
+ * \latexonly Phys. Rev. B \textbf{31}, 546--563 (1985), \texttt{http://dx.doi.org/10.1103/PhysRevB.31.546}
+ * \endlatexonly
+ *
+ * and: R. S. Hayano, Y. J. Uemura, J. Imazato, N. Nishida, T. Yamazaki, and R. Kubo,
+ * \htmlonly Phys. Rev. B <b>20</b>, 850&#150;859 (1979), doi:<a href="http://dx.doi.org/10.1103/PhysRevB.20.850">10.1103/PhysRevB.20.850</a>
+ * \endhtmlonly
+ * \latexonly Phys. Rev. B \textbf{20}, 850--859 (1979), \texttt{http://dx.doi.org/10.1103/PhysRevB.20.850}
+ * \endlatexonly
+ *
+ * For details regarding the numerical Laplace transform, see e.g.
+ * P. Moreno and A. Ramirez,
+ * \htmlonly IEEE Trans. Power Delivery <b>23</b>, 2599&#150;2609 (2008), doi:<a href="http://dx.doi.org/10.1109/TPWRD.2008.923404">10.1109/TPWRD.2008.923404</a>
+ * \endhtmlonly
+ * \latexonly IEEE Trans. Power Delivery \textbf{23}, 2599--2609 (2008), \texttt{http://dx.doi.org/10.1109/TPWRD.2008.923404}
+ * \endlatexonly
+ */
 class TLFDynSG : public PUserFcnBase {
 
 public:
@@ -161,12 +250,21 @@ public:
   double operator()(double, const vector<double>&) const;
 
 private:
-  mutable vector<double> fPar;
-  vector<TLFDynGssKT*> fLFDynGssIntegral;
+  mutable vector<double> fPar;               ///< parameters of the dynamic Gaussian depolarization function [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), &#963; (&#956;s<sup>-1</sup>), &#957; (MHz)\endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $\sigma~(\mu\mathrm{s}^{-1})$, $\nu~(\mathrm{MHz})$ \endlatexonly]
+  vector<TLFDynGssKT*> fLFDynGssIntegral;    ///< vector of dynamic Gaussian depolarization functions for a subset of static widths
 
   ClassDef(TLFDynSG,1)
 };
 
+//-----------------------------------------------------------------------------------------------------------------
+/**
+ * <p>User function for a dynamic depolarization in a spin glass in a longitudinal field
+ * See also: R. De Renzi and S. Fanesi
+ * \htmlonly Physica B <b>289&#150;290</b>, 209&#150;212 (2000), doi:<a href="http://dx.doi.org/10.1016/S0921-4526(00)00368-9">10.1016/S0921-4526(00)00368-9</a>
+ * \endhtmlonly
+ * \latexonly Physica B \textbf{289--290}, 209--212 (2000), \texttt{http://dx.doi.org/10.1016/S0921-4526(00)00368-9}
+ * \endlatexonly
+ */
 class TLFSGInterpolation : public PUserFcnBase {
 
 public:
@@ -180,10 +278,14 @@ public:
   double operator()(double, const vector<double>&) const;
 
 private:
-  TIntSGInterpolation *fIntegral;
+  TIntSGInterpolation *fIntegral;           ///< integrator
+  mutable map<double, double> fIntValues;   ///< previously calculated integral values
+  mutable vector<double> fPar;              ///< parameters of the function [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), <i>a</i> (&#956;s<sup>-1</sup>), &#955; (&#956;s<sup>-1</sup>), &#946; (1) \endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $a~(\mu\mathrm{s}^{-1})$, $\lambda~(\mu\mathrm{s}^{-1})$, $\beta~(1)$ \endlatexonly]
+  mutable bool fCalcNeeded;                 ///< flag specifying if an integration has to be done
+  mutable double fLastTime;                 ///< time of the last calculated function value
 
-  ClassDef(TLFSGInterpolation,1)
+  ClassDef(TLFSGInterpolation,2)
 };
 
 
-#endif //_LFRelaxation_H_
+#endif //_TLFRelaxation_H_
