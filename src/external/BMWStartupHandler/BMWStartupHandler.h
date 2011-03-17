@@ -8,7 +8,7 @@
   $Id$
 
   based upon:
-  $Id$
+  PStartupHandler.h
   by Andreas Suter
 
 ***************************************************************************/

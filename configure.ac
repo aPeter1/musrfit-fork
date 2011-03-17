@@ -8,9 +8,9 @@ dnl -----------------------------------------------
 dnl Check if pkg-config is installed
 dnl -----------------------------------------------
 
-PKG_PROG_PKG_CONFIG([0.10])
-#The above macro still needs to be tested under Cygwin without pkg-config---but it is promising to be a better solution than the macro below.
-#m4_ifdef([PKG_CHECK_MODULES],[],AC_MSG_ERROR([Please install pkg-config before configuring musrfit!]))
+#PKG_PROG_PKG_CONFIG([0.9])
+#The above macro does not work if pkg-config is not installed, therefore, for the moment we stay with the solution below:
+m4_ifdef([PKG_CHECK_MODULES],[],AC_MSG_ERROR([Please install pkg-config before configuring musrfit!]))
 
 dnl -----------------------------------------------
 dnl Package names and version numbers

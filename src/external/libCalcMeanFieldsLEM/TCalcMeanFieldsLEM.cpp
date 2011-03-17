@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  2009/11/27
+  $Id$
 
 ***************************************************************************/
 
@@ -51,7 +51,7 @@ ClassImp(TMeanFieldsForScTrilayer)
 TMeanFieldsForScHalfSpace::TMeanFieldsForScHalfSpace() {
 
   // read startup file
-  string startup_path_name("TFitPofB_startup.xml");
+  string startup_path_name("BMW_startup.xml");
 
   TSAXParser *saxParser = new TSAXParser();
   BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -59,7 +59,7 @@ TMeanFieldsForScHalfSpace::TMeanFieldsForScHalfSpace() {
   int status (saxParser->ParseFile(startup_path_name.c_str()));
   // check for parse errors
   if (status) { // error
-    cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+    cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
          << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
          << endl;
     assert(false);
@@ -142,7 +142,7 @@ double TMeanFieldsForScHalfSpace::CalcMeanB (double E, const TLondon1D_HS& BofZ)
 TMeanFieldsForScSingleLayer::TMeanFieldsForScSingleLayer() {
 
   // read startup file
-  string startup_path_name("TFitPofB_startup.xml");
+  string startup_path_name("BMW_startup.xml");
 
   TSAXParser *saxParser = new TSAXParser();
   BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -150,7 +150,7 @@ TMeanFieldsForScSingleLayer::TMeanFieldsForScSingleLayer() {
   int status (saxParser->ParseFile(startup_path_name.c_str()));
   // check for parse errors
   if (status) { // error
-    cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+    cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
          << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
          << endl;
     assert(false);
@@ -241,7 +241,7 @@ double TMeanFieldsForScSingleLayer::CalcMeanB (double E, const vector<double>& i
 TMeanFieldsForScBilayer::TMeanFieldsForScBilayer() {
 
   // read startup file
-  string startup_path_name("TFitPofB_startup.xml");
+  string startup_path_name("BMW_startup.xml");
 
   TSAXParser *saxParser = new TSAXParser();
   BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -249,7 +249,7 @@ TMeanFieldsForScBilayer::TMeanFieldsForScBilayer() {
   int status (saxParser->ParseFile(startup_path_name.c_str()));
   // check for parse errors
   if (status) { // error
-    cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+    cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
          << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
          << endl;
     assert(false);
@@ -344,7 +344,7 @@ double TMeanFieldsForScBilayer::CalcMeanB (double E, const vector<double>& inter
 TMeanFieldsForScTrilayer::TMeanFieldsForScTrilayer() {
 
   // read startup file
-  string startup_path_name("TFitPofB_startup.xml");
+  string startup_path_name("BMW_startup.xml");
 
   TSAXParser *saxParser = new TSAXParser();
   BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -352,7 +352,7 @@ TMeanFieldsForScTrilayer::TMeanFieldsForScTrilayer() {
   int status (saxParser->ParseFile(startup_path_name.c_str()));
   // check for parse errors
   if (status) { // error
-    cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+    cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
          << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
          << endl;
     assert(false);
@@ -449,7 +449,7 @@ double TMeanFieldsForScTrilayer::CalcMeanB (double E, const vector<double>& inte
 TMeanFieldsForScTrilayerWithInsulator::TMeanFieldsForScTrilayerWithInsulator() {
 
   // read startup file
-  string startup_path_name("TFitPofB_startup.xml");
+  string startup_path_name("BMW_startup.xml");
 
   TSAXParser *saxParser = new TSAXParser();
   BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -457,7 +457,7 @@ TMeanFieldsForScTrilayerWithInsulator::TMeanFieldsForScTrilayerWithInsulator() {
   int status (saxParser->ParseFile(startup_path_name.c_str()));
   // check for parse errors
   if (status) { // error
-    cerr << endl << "**ERROR** reading/parsing TFitPofB_startup.xml failed." \
+    cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
          << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
          << endl;
     assert(false);
