@@ -773,7 +773,7 @@ Int_t main(Int_t argc, Char_t *argv[])
             musrT0Data.SetRawRunData(rawRunData);
             // feed data t0 if present
             if (rawRunData[0]->GetT0Size() > 0) {
-              musrT0Data.SetT0Data(rawRunData[0]->GetT0(runList->at(i).GetForwardHistoNo(0)));
+              musrT0Data.SetT0Data(rawRunData[0]->GetT0(runList->at(i).GetForwardHistoNo(0)-1));
             }
             musrT0Data.SetRunNo(i);
             musrT0Data.SetAddRunIdx(0); // no addruns
@@ -796,7 +796,7 @@ Int_t main(Int_t argc, Char_t *argv[])
             musrT0Data.SetRawRunData(rawRunData);
             // feed data t0 if present
             if (rawRunData[0]->GetT0Size() > 0) {
-              musrT0Data.SetT0Data(rawRunData[0]->GetT0(runList->at(i).GetBackwardHistoNo(0)));
+              musrT0Data.SetT0Data(rawRunData[0]->GetT0(runList->at(i).GetBackwardHistoNo(0)-1));
             }
             musrT0Data.SetRunNo(i);
             musrT0Data.SetAddRunIdx(0); // no addruns
