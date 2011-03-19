@@ -569,7 +569,7 @@ void PFunction::EvalTreeForStringExpression(iter_t const& i)
     assert(i->children.size() == 0);
     if (*i->value.begin() == '-')
       fFuncString += "(";
-    fFuncString += string(i->value.begin(), i->value.end()).c_str();
+    fFuncString += boost::algorithm::trim_copy(string(i->value.begin(), i->value.end())).c_str();
     if (*i->value.begin() == '-')
       fFuncString += ")";
   } else if (i->value.id() == PFunctionGrammar::constPiID) {
@@ -582,10 +582,10 @@ void PFunction::EvalTreeForStringExpression(iter_t const& i)
     fFuncString += string(i->value.begin(), i->value.end()).c_str(); // funx
   } else if (i->value.id() == PFunctionGrammar::parameterID) {
     assert(i->children.size() == 0);
-    fFuncString += string(i->value.begin(), i->value.end()).c_str();
+    fFuncString += boost::algorithm::trim_copy(string(i->value.begin(), i->value.end())).c_str();
   } else if (i->value.id() == PFunctionGrammar::mapID) {
     assert(i->children.size() == 0);
-    fFuncString += string(i->value.begin(), i->value.end()).c_str();
+    fFuncString += boost::algorithm::trim_copy(string(i->value.begin(), i->value.end())).c_str();
   } else if (i->value.id() == PFunctionGrammar::functionID) {
     assert(i->children.size() == 3);
     fFuncString += string(i->value.begin(), i->value.end()).c_str(); // keep function name

@@ -1,6 +1,6 @@
 #---------------------------------------------------------------------
 # ChangeLog
-# AS, 2011/01/29
+#
 # $Id$
 #---------------------------------------------------------------------
 
@@ -15,9 +15,10 @@ NEW any2many: an attempt to write the universial musr-data-file converter. Just 
 NEW musrt0: added the possibility to show the t0 saved in the data file 's'. Furthermore added the option
     --getT0FromPromptPeak, -g with <firstGoodBinOffset>: will, in non-interactive mode estimate the t0's from 
     the prompt peak and write it into the msr-file (MUSR-133).
-FIXED plotting issues described in (MUSR-174).    
+FIXED formatting issues in the FUNCTIONS block (MUSR-171)
+FIXED plotting issues described in MUSR-174.    
 FIXED accidental casting of a NULL pointer in msr2data
-FIXED crash of musrfit if a run-data-files is not found (MUSR-176)
+FIXED crash of musrfit if a run-data-file is not found (MUSR-176)
 FIXED corrected time resolution for WKM from (ns) -> (us)
 FIXED the formating of fixed parameters (step=0) where wrongly formatted (connected to MUSR-167). This
       should be done correctly now.
