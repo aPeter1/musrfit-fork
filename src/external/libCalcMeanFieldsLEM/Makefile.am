@@ -18,7 +18,7 @@ dict_cpp_sources = \
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 
-INCLUDES = -I$(top_srcdir)/src/include -I../BMWStartupHandler $(TFITPOFB_CFLAGS) $(PMUSR_CFLAGS) $(ROOT_CFLAGS) $(FFTW3_CFLAGS)
+INCLUDES = -I$(top_srcdir)/src/include $(BMWSTARTUP_CFLAGS) $(TFITPOFB_CFLAGS) $(PMUSR_CFLAGS) $(ROOT_CFLAGS) $(FFTW3_CFLAGS)
 AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources)
@@ -31,7 +31,7 @@ CLEANFILES = *Dict.cpp *Dict.h *~ core
 lib_LTLIBRARIES = libCalcMeanFieldsLEM.la
 
 libCalcMeanFieldsLEM_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources)
-libCalcMeanFieldsLEM_la_LIBADD = $(TFITPOFB_LIBS) $(PMUSR_LIBS) $(ROOT_LIBS)
+libCalcMeanFieldsLEM_la_LIBADD = $(BMWSTARTUP_LIBS) $(TFITPOFB_LIBS) $(PMUSR_LIBS) $(ROOT_LIBS)
 libCalcMeanFieldsLEM_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(PLUGIN_RELEASE) $(AM_LDFLAGS)
 
 ## For the moment do not build pkgconfig files for musrfit plug-ins...

@@ -490,6 +490,12 @@ AC_SUBST(PMUSR_LIBS)
 AC_SUBST(PMUSR_CFLAGS)
 
 if test "${BUILD_BMW_LIBS}" = "1"; then
+  BMWSTARTUP_SRCDIR="${SRCDIR}/external/BMWStartupHandler"
+  BMWSTARTUP_LIBS="${BMWSTARTUP_SRCDIR}/libBMWstartup.la"
+  BMWSTARTUP_CFLAGS="-I${BMWSTARTUP_SRCDIR}"
+  AC_SUBST(BMWSTARTUP_LIBS)
+  AC_SUBST(BMWSTARTUP_CFLAGS)
+
   TFITPOFB_SRCDIR="${SRCDIR}/external/TFitPofB-lib"
   TFITPOFB_LIBS="${TFITPOFB_SRCDIR}/classes/libTFitPofB.la"
   TFITPOFB_CFLAGS="-I${TFITPOFB_SRCDIR}/include"
@@ -627,6 +633,7 @@ AC_CONFIG_FILES([Makefile \
                  src/external/libCuba/Makefile \
                  src/external/libCuba/src/Makefile \
                  src/external/libCuba/src/cuba.pc \
+                 src/external/BMWStartupHandler/Makefile \
                  src/external/TFitPofB-lib/Makefile \
                  src/external/TFitPofB-lib/classes/Makefile \
                  src/external/libLFRelaxation/Makefile \

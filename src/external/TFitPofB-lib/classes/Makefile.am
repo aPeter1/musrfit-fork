@@ -1,9 +1,6 @@
 ## Process this file with automake to create Makefile.in
 
-startup_path = ../../BMWStartupHandler
-
 h_sources = \
-  $(startup_path)/BMWStartupHandler.h \
   ../include/TBofZCalc.h \
   ../include/TBulkTriVortexFieldCalc.h \
   ../include/TLondon1D.h \
@@ -14,19 +11,16 @@ h_sources = \
   ../include/TVortex.h
 
 h_linkdef = \
-  $(startup_path)/BMWStartupHandlerLinkDef.h \
   ../include/TLondon1DLinkDef.h \
   ../include/TVortexLinkDef.h \
   ../include/TSkewedGssLinkDef.h
 
 dict_h_sources = \
-  $(startup_path)/BMWStartupHandlerDict.h \
   TLondon1DDict.h \
   TSkewedGssDict.h \
   TVortexDict.h
 
 cpp_sources = \
-  $(startup_path)/BMWStartupHandler.cpp \
   TBulkTriVortexFieldCalc.cpp \
   TBofZCalc.cpp \
   TLondon1D.cpp \
@@ -37,7 +31,6 @@ cpp_sources = \
   TVortex.cpp
 
 dict_cpp_sources = \
-  $(startup_path)/BMWStartupHandlerDict.cpp \
   TLondon1DDict.cpp \
   TSkewedGssDict.cpp \
   TVortexDict.cpp
@@ -45,16 +38,12 @@ dict_cpp_sources = \
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 
-INCLUDES = -I$(top_srcdir)/src/include -I../include -I$(startup_path) $(LEM_CFLAGS) $(PMUSR_CFLAGS) $(FFTW3_CFLAGS) $(ROOT_CFLAGS)
+INCLUDES = -I$(top_srcdir)/src/include -I../include $(BMWSTARTUP_CFLAGS) $(LEM_CFLAGS) $(PMUSR_CFLAGS) $(FFTW3_CFLAGS) $(ROOT_CFLAGS)
 AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources)
 AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS) -L@ROOTLIBDIR@
-CLEANFILES = $(startup_path)/*Dict.cpp $(startup_path)/*Dict.h $(startup_path)/*~ \
-             *Dict.cpp *Dict.h *~ core
-
-$(startup_path)/BMWStartupHandlerDict.cpp $(startup_path)/BMWStartupHandlerDict.h: $(startup_path)/BMWStartupHandler.h $(startup_path)/BMWStartupHandlerLinkDef.h
-	@ROOTCINT@ -v -f $(startup_path)/BMWStartupHandlerDict.cpp -c -p $(INCLUDES) $^
+CLEANFILES = *Dict.cpp *Dict.h *~ core
 
 %Dict.cpp %Dict.h: ../include/%.h ../include/%LinkDef.h
 	@ROOTCINT@ -v -f $*Dict.cpp -c -p $(INCLUDES) $^
@@ -62,7 +51,7 @@ $(startup_path)/BMWStartupHandlerDict.cpp $(startup_path)/BMWStartupHandlerDict.
 lib_LTLIBRARIES = libTFitPofB.la
 
 libTFitPofB_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources)
-libTFitPofB_la_LIBADD = $(LEM_LIBS) $(PMUSR_LIBS) $(FFTW3_LIBS) $(ROOT_LIBS)
+libTFitPofB_la_LIBADD = $(BMWSTARTUP_LIBS) $(LEM_LIBS) $(PMUSR_LIBS) $(FFTW3_LIBS) $(ROOT_LIBS)
 libTFitPofB_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(PLUGIN_RELEASE) $(AM_LDFLAGS)
 
 ## For the moment do not build pkgconfig files for musrfit plug-ins...

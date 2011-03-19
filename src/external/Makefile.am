@@ -8,10 +8,11 @@ if BUILD_CUBALIB
 endif
 
 if BUILD_BMWLIBS
-  BMWDIRS = TFitPofB-lib \
+  BMWDIRS = BMWStartupHandler \
+            TFitPofB-lib \
             libLFRelaxation \
             libGapIntegrals \
-            libCalcMeanFieldsLEM 
+            libCalcMeanFieldsLEM
 endif
 
 SUBDIRS = $(ASDIRS) $(CUBADIRS) $(BMWDIRS)

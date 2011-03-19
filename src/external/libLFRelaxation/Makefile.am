@@ -1,40 +1,33 @@
 ## Process this file with automake to create Makefile.in
 
-startup_path = ../BMWStartupHandler
 integrator_path = ../BMWIntegrator
 
 h_sources = \
   TLFRelaxation.h \
-  $(startup_path)/BMWStartupHandler.h \
   $(integrator_path)/BMWIntegrator.h
 
 h_linkdef = \
-  TLFRelaxationLinkDef.h \
-  $(startup_path)/BMWStartupHandlerLinkDef.h
+  TLFRelaxationLinkDef.h
 
 dict_h_sources = \
-  TLFRelaxationDict.h \
-  $(startup_path)/BMWStartupHandlerDict.h
+  TLFRelaxationDict.h
 
 cpp_sources = \
   TLFRelaxation.cpp \
-  $(startup_path)/BMWStartupHandler.cpp \
   $(integrator_path)/BMWIntegrator.cpp
 
 dict_cpp_sources = \
-  TLFRelaxationDict.cpp \
-  $(startup_path)/BMWStartupHandlerDict.cpp
+  TLFRelaxationDict.cpp
 
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 
-INCLUDES = -I$(top_srcdir)/src/include -I$(startup_path) $(PMUSR_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(ROOT_CFLAGS) $(CUBA_CFLAGS)
+INCLUDES = -I$(top_srcdir)/src/include $(BMWSTARTUP_CFLAGS) $(PMUSR_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(ROOT_CFLAGS) $(CUBA_CFLAGS)
 AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources)
 AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS) -L@ROOTLIBDIR@
-CLEANFILES = $(startup_path)/*Dict.cpp $(startup_path)/*Dict.h $(startup_path)/*~ \
-             $(integrator_path)/*~ *Dict.cpp *Dict.h *~ core
+CLEANFILES = $(integrator_path)/*~ *Dict.cpp *Dict.h *~ core
 
 %Dict.cpp %Dict.h: %.h %LinkDef.h
 	@ROOTCINT@ -v -f $*Dict.cpp -c -p $(INCLUDES) $^
@@ -42,7 +35,7 @@ CLEANFILES = $(startup_path)/*Dict.cpp $(startup_path)/*Dict.h $(startup_path)/*
 lib_LTLIBRARIES = libLFRelaxation.la
 
 libLFRelaxation_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources)
-libLFRelaxation_la_LIBADD = $(PMUSR_LIBS) $(FFTW3_LIBS) $(GSL_LIBS) $(ROOT_LIBS) $(CUBA_LIBS)
+libLFRelaxation_la_LIBADD = $(BMWSTARTUP_LIBS) $(PMUSR_LIBS) $(FFTW3_LIBS) $(GSL_LIBS) $(ROOT_LIBS) $(CUBA_LIBS)
 libLFRelaxation_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(PLUGIN_RELEASE) $(AM_LDFLAGS)
 
 ## For the moment do not build pkgconfig files for musrfit plug-ins...
