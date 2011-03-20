@@ -1,7 +1,9 @@
 ## Process this file with automake to create Makefile.in
 
 h_sources = \
-  BMWStartupHandler.h
+  BMWStartupHandler.h \
+  TTrimSPDataHandler.h \
+  BMWIntegrator.h
 
 h_linkdef = \
   BMWStartupHandlerLinkDef.h
@@ -10,7 +12,9 @@ dict_h_sources = \
   BMWStartupHandlerDict.h
 
 cpp_sources = \
-  BMWStartupHandler.cpp
+  BMWStartupHandler.cpp \
+  TTrimSPDataHandler.cpp \
+  BMWIntegrator.cpp
 
 dict_cpp_sources = \
   BMWStartupHandlerDict.cpp
@@ -28,11 +32,11 @@ CLEANFILES = *Dict.cpp *Dict.h *~ core
 %Dict.cpp %Dict.h: %.h %LinkDef.h
 	@ROOTCINT@ -v -f $*Dict.cpp -c -p $(INCLUDES) $^
 
-lib_LTLIBRARIES = libBMWstartup.la
+lib_LTLIBRARIES = libBMWtools.la
 
-libBMWstartup_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources)
-libBMWstartup_la_LIBADD = $(ROOT_LIBS)
-libBMWstartup_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(PLUGIN_RELEASE) $(AM_LDFLAGS)
+libBMWtools_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources)
+libBMWtools_la_LIBADD = $(ROOT_LIBS)
+libBMWtools_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(PLUGIN_RELEASE) $(AM_LDFLAGS)
 
 ## For the moment do not build pkgconfig files for musrfit plug-ins...
 ## pkgconfigdir = $(libdir)/pkgconfig
@@ -43,14 +47,14 @@ libBMWstartup_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(PL
 
 if IS_DARWIN
 install-exec-hook:
-	$(LN_S) $(libdir)/libBMWstartup.dylib $(libdir)/libBMWstartup.so
+	$(LN_S) $(libdir)/libBMWtools.dylib $(libdir)/libBMWtools.so
 uninstall-hook:
-	rm -f $(libdir)/libBMWstartup.so
+	rm -f $(libdir)/libBMWtools.so
 endif
 
 if IS_CYGWIN
 install-exec-hook:
-	$(LN_S) $(bindir)/cygBMWstartup-$(PLUGIN_MAJOR_VERSION)-$(PLUGIN_MINOR_VERSION)-$(PLUGIN_MAJOR_VERSION).dll $(libdir)/libBMWstartup.so
+	$(LN_S) $(bindir)/cygBMWtools-$(PLUGIN_MAJOR_VERSION)-$(PLUGIN_MINOR_VERSION)-$(PLUGIN_MAJOR_VERSION).dll $(libdir)/libBMWtools.so
 uninstall-hook:
-	rm -f $(libdir)/libBMWstartup.so
+	rm -f $(libdir)/libBMWtools.so
 endif

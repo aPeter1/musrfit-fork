@@ -49,7 +49,7 @@ using namespace std;
 //#include "TMath.h"
 #include "PUserFcnBase.h"
 #include "fftw3.h"
-#include "../BMWIntegrator/BMWIntegrator.h"
+#include "BMWIntegrator.h"
 
 //-----------------------------------------------------------------------------------------------------------------
 /**

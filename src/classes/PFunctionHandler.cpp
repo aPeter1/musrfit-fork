@@ -81,7 +81,7 @@ Bool_t PFunctionHandler::DoParse()
     // do parsing
     tree_parse_info<> info = ast_parse(line.Data(), function, space_p);
 
-    if (info.full) { // parsing successfull
+    if (info.full) { // parsing successful
       PFunction func(info); // generate an evaluation function object based on the AST tree
       fFuncs.push_back(func); // feeds it to the functions vector
     } else {

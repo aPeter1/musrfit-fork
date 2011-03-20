@@ -43,7 +43,7 @@
 #endif
 
 #include <TSAXParser.h>
-#include "../BMWIntegrator/BMWIntegrator.h"
+#include "BMWIntegrator.h"
 #include "BMWStartupHandler.h"
 #include "TLFRelaxation.h"
 

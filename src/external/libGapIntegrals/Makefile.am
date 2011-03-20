@@ -1,8 +1,7 @@
 ## Process this file with automake to create Makefile.in
 
 h_sources = \
-  TGapIntegrals.h \
-  ../BMWIntegrator/BMWIntegrator.h
+  TGapIntegrals.h
 
 h_linkdef = \
   TGapIntegralsLinkDef.h
@@ -11,8 +10,7 @@ dict_h_sources = \
   TGapIntegralsDict.h
 
 cpp_sources = \
-  TGapIntegrals.cpp \
-  ../BMWIntegrator/BMWIntegrator.cpp
+  TGapIntegrals.cpp
 
 dict_cpp_sources = \
   TGapIntegralsDict.cpp
@@ -20,7 +18,7 @@ dict_cpp_sources = \
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 
-INCLUDES = -I$(top_srcdir)/src/include $(PMUSR_CFLAGS) $(GSL_CFLAGS) $(ROOT_CFLAGS) $(CUBA_CFLAGS)
+INCLUDES = -I$(top_srcdir)/src/include $(BMWTOOLS_CFLAGS) $(PMUSR_CFLAGS) $(GSL_CFLAGS) $(ROOT_CFLAGS) $(CUBA_CFLAGS)
 AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources)
@@ -33,7 +31,7 @@ CLEANFILES = *Dict.cpp *Dict.h *~ core
 lib_LTLIBRARIES = libGapIntegrals.la
 
 libGapIntegrals_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources)
-libGapIntegrals_la_LIBADD = $(PMUSR_LIBS) $(GSL_LIBS) $(ROOT_LIBS) $(CUBA_LIBS)
+libGapIntegrals_la_LIBADD = $(BMWTOOLS_LIBS) $(PMUSR_LIBS) $(GSL_LIBS) $(ROOT_LIBS) $(CUBA_LIBS)
 libGapIntegrals_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(PLUGIN_RELEASE) $(AM_LDFLAGS)
 
 ## For the moment do not build pkgconfig files for musrfit plug-ins...

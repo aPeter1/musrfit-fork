@@ -5,7 +5,7 @@
   Author: Bastian M. Wojek
   e-mail: bastian.wojek@psi.ch
 
-  $Id$
+  $Id: TSkewedGss.cpp 4800 2011-03-16 16:43:13Z l_wojek $
 
 ***************************************************************************/
 
