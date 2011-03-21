@@ -3,9 +3,8 @@
   TBofZCalc.cpp
 
   Author: Bastian M. Wojek
-  e-mail: bastian.wojek@psi.ch
 
-  2009/04/25
+  $Id$
 
 ***************************************************************************/
 

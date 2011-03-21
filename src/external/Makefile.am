@@ -1,3 +1,5 @@
+## $Id$
+
 if BUILD_ASLIBS
   ASDIRS = Nonlocal \
            MagProximity

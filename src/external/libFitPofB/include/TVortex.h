@@ -3,9 +3,8 @@
   TVortex.h
 
   Author: Bastian M. Wojek
-  e-mail: bastian.wojek@psi.ch
 
-  2009/10/17
+  $Id$
 
 ***************************************************************************/
 

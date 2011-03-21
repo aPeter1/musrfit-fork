@@ -3,9 +3,8 @@
   TLondon1DLinkDef.h
 
   Author: Bastian M. Wojek
-  e-mail: bastian.wojek@psi.ch
 
-  2008/06/30
+  $Id$
 
 ***************************************************************************/
 

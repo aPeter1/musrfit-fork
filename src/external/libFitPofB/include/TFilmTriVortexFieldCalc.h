@@ -3,9 +3,8 @@
   TFilmTriVortexFieldCalc.h
 
   Author: Bastian M. Wojek
-  e-mail: bastian.wojek@psi.ch
 
-  2010/02/19
+  $Id$
 
 ***************************************************************************/
 

@@ -3,7 +3,6 @@
   TLFRelaxation.cpp
 
   Author: Bastian M. Wojek
-  e-mail: bastian.wojek@psi.ch
 
   $Id$
 
@@ -11,7 +10,7 @@
 
 /***************************************************************************
  *   Copyright (C) 2009 by Bastian M. Wojek                                *
- *   bastian.wojek@psi.ch                                                  *
+ *                                                                         *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *

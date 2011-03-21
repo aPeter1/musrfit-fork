@@ -3,9 +3,8 @@
   TPofBCalc.cpp
 
   Author: Bastian M. Wojek
-  e-mail: bastian.wojek@psi.ch
 
-  2008/09/04
+  $Id$
 
 ***************************************************************************/
 

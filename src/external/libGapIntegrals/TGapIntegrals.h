@@ -3,7 +3,6 @@
   TGapIntegrals.h
 
   Author: Bastian M. Wojek
-  e-mail: bastian.wojek@psi.ch
 
   $Id$
 
@@ -29,8 +28,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _TTwoGaps_H_
-#define _TTwoGaps_H_
+#ifndef _TGapIntegrals_H_
+#define _TGapIntegrals_H_
 
 #include<vector>
 #include<cmath>

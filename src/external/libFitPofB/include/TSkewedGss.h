@@ -3,9 +3,8 @@
   TSkewedGss.h
 
   Author: Bastian M. Wojek
-  e-mail: bastian.wojek@psi.ch
 
-  2009/01/24
+  $Id$
 
 ***************************************************************************/
 

@@ -3,9 +3,8 @@
   TLondon1D.cpp
 
   Author: Bastian M. Wojek
-  e-mail: bastian.wojek@psi.ch
 
-  $Id: TLondon1D.cpp 4800 2011-03-16 16:43:13Z l_wojek $
+  $Id$
 
 ***************************************************************************/
 

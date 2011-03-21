@@ -3,7 +3,6 @@
   BMWIntegrator.cpp
 
   Author: Bastian M. Wojek
-  e-mail: bastian.wojek@psi.ch
 
   $Id$
 

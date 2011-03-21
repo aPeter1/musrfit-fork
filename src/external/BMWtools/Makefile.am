@@ -1,4 +1,5 @@
 ## Process this file with automake to create Makefile.in
+## $Id$
 
 h_sources = \
   BMWStartupHandler.h \

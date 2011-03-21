@@ -1,11 +1,12 @@
 ## Process this file with automake to create Makefile.in
+## $Id$
 
 h_sources = cuba.h
 
 c_sources = cuhre/Cuhre.c \
-              divonne/Divonne.c \
-              suave/Suave.c \
-              vegas/Vegas.c
+            divonne/Divonne.c \
+            suave/Suave.c \
+            vegas/Vegas.c
 
 include_HEADERS = cuba.h
 
