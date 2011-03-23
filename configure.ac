@@ -511,7 +511,8 @@ if test "${BUILD_BMW_LIBS}" = "1"; then
                                       AC_DEFINE([HAVE_LIBFFTW3_THREADS], [1], [Define to 1 if fftw3_threads are available])], [], [-lpthread])
   # Check for fftw3f library. If it is not available the BMWlibs will not be built!
   AC_SEARCH_LIBS([fftwf_malloc], [fftw3f], [FFTW3_LIBS="$FFTW3_LIBS -lfftw3f"], [BUILD_BMW_LIBS=0
-                                      AC_MSG_WARN([The float version of FFTW3 is not available. The BMWlibs will not be built!])], [])
+    AC_MSG_ERROR([The float version of FFTW3 is not available. When building FFTW3 from source it should be configured with the options
+                  --enable-shared --enable-float. Without this library the BMWlibs cannot be built!])], [])
   if test "${BUILD_BMW_LIBS}" = "1"; then
     AC_SEARCH_LIBS([fftwf_init_threads], [fftw3f_threads], [FFTW3_LIBS="$FFTW3_LIBS -lfftw3f_threads -lpthread"
                                       AC_DEFINE([HAVE_LIBFFTW3F_THREADS], [1], [Define to 1 if fftw3f_threads are available])], [], [-lpthread])
