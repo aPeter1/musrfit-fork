@@ -66,7 +66,7 @@ dict_cpp_sources = \
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 
-INCLUDES = -I$(top_srcdir)/src/include $(PSIBIN_CFLAGS) $(MUD_CFLAGS) $(LEM_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(BOOST_CFLAGS) $(ROOT_CFLAGS) $(PNEXUS_CXXFLAGS)
+INCLUDES = -I$(top_srcdir)/src/include $(PSIBIN_CFLAGS) $(MUD_CFLAGS) $(LEM_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(BOOST_CFLAGS) $(ROOT_CFLAGS) $(PNEXUS_CXXFLAGS) $(NEXUS_CFLAGS)
 AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources)
