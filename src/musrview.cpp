@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
       } else {
         // check if filename has extension msr or mlog
         if (!strstr(argv[1], ".msr") && !strstr(argv[1], ".mlog")) {
-          cerr << endl << "**ERROR** " << argv[1] << " is not a msr/mlog-file, nor is it a supported graphics extension." << endl;
+          cerr << endl << ">> musrview **ERROR** " << argv[1] << " is not a msr/mlog-file, nor is it a supported graphics extension." << endl;
           show_syntax = true;
         } else {
           strcpy(fileName, argv[1]);
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
         strcpy(graphicsExtension, argv[1]+2);
         // check if filename has extension msr or mlog
         if (!strstr(argv[2], ".msr") && !strstr(argv[2], ".mlog")) {
-          cerr << endl << "**ERROR** " << argv[2] << " is not a msr/mlog-file, nor is it a supported graphics extension." << endl;
+          cerr << endl << ">> musrview **ERROR** " << argv[2] << " is not a msr/mlog-file, nor is it a supported graphics extension." << endl;
           show_syntax = true;
         } else {
           strcpy(fileName, argv[2]);
@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
         strcpy(graphicsExtension, argv[2]+2);
         // check if filename has extension msr or mlog
         if (!strstr(argv[1], ".msr") && !strstr(argv[1], ".mlog")) {
-          cerr << endl << "**ERROR** " << argv[1] << " is not a msr/mlog-file, nor is it a supported graphics extension." << endl;
+          cerr << endl << ">> musrview **ERROR** " << argv[1] << " is not a msr/mlog-file, nor is it a supported graphics extension." << endl;
           show_syntax = true;
         } else {
           strcpy(fileName, argv[1]);
@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
   TSAXParser *saxParser = new TSAXParser();
   PStartupHandler *startupHandler = new PStartupHandler();
   if (!startupHandler->StartupFileFound()) {
-    cerr << endl << "**WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
+    cerr << endl << ">> musrview **WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
     cerr << endl;
     // clean up
     if (saxParser) {
@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
     status = saxParser->ParseFile(startup_path_name);
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**WARNING** reading/parsing musrfit_startup.xml.";
+      cerr << endl << ">> musrview **WARNING** reading/parsing musrfit_startup.xml.";
       cerr << endl;
       // clean up
       if (saxParser) {
@@ -200,13 +200,13 @@ int main(int argc, char *argv[])
   if (status != PMUSR_SUCCESS) {
     switch (status) {
       case PMUSR_MSR_FILE_NOT_FOUND:
-        cerr << endl << "**ERROR** couldn't find '" << fileName << "'" << endl << endl;
+        cerr << endl << ">> musrview **ERROR** couldn't find '" << fileName << "'" << endl << endl;
         break;
       case PMUSR_MSR_SYNTAX_ERROR:
-        cerr << endl << "**SYNTAX ERROR** in file " << fileName << ", full stop here." << endl << endl;
+        cerr << endl << ">> musrview **SYNTAX ERROR** in file " << fileName << ", full stop here." << endl << endl;
         break;
       default:
-        cerr << endl << "**UNKNOWN ERROR** when trying to read the msr-file" << endl << endl;
+        cerr << endl << ">> musrview **UNKNOWN ERROR** when trying to read the msr-file" << endl << endl;
         break;
     }
     return status;
@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
 
   success = dataHandler->IsAllDataAvailable();
   if (!success) {
-    cerr << endl << "**ERROR** Couldn't read all data files, will quit ..." << endl;
+    cerr << endl << ">> musrview **ERROR** Couldn't read all data files, will quit ..." << endl;
   }
 
   // generate the necessary histogramms for the view
@@ -260,7 +260,7 @@ int main(int argc, char *argv[])
       if (runPresent) {
         success = runListCollection->Add(i, kView);
         if (!success) {
-          cerr << endl << "**ERROR** Couldn't handle run no " << i << " ";
+          cerr << endl << ">> musrview **ERROR** Couldn't handle run no " << i << " ";
           cerr << (*msrHandler->GetMsrRunList())[i].GetRunName()->Data();
           break;
         }
@@ -295,7 +295,7 @@ int main(int argc, char *argv[])
                                      10+i*100, 10+i*100, 800, 600, graphicsOutput);
 
       if (!musrCanvas->IsValid()) {
-        cerr << endl << "**SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
+        cerr << endl << ">> musrview **SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
         cerr << endl;
         ok = false;
         break;

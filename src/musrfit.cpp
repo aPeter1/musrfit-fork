@@ -406,7 +406,7 @@ int main(int argc, char *argv[])
   // check if a filename is present
   if (strlen(filename) == 0) {
     show_syntax = true;
-    cout << endl << "**ERROR** no msr-file present!" << endl;
+    cout << endl << ">> musrfit **ERROR** no msr-file present!" << endl;
   }
 
   if (show_syntax) {
@@ -428,7 +428,7 @@ int main(int argc, char *argv[])
   TSAXParser *saxParser = new TSAXParser();
   PStartupHandler *startupHandler = new PStartupHandler();
   if (!startupHandler->StartupFileFound()) {
-    cerr << endl << "**WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
+    cerr << endl << ">> musrfit **WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
     cerr << endl;
     // clean up
     if (saxParser) {
@@ -445,7 +445,7 @@ int main(int argc, char *argv[])
     status = saxParser->ParseFile(startup_path_name);
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**WARNING** reading/parsing musrfit_startup.xml.";
+      cerr << endl << ">> musrfit **WARNING** reading/parsing musrfit_startup.xml.";
       cerr << endl;
       // clean up
       if (saxParser) {
@@ -465,13 +465,13 @@ int main(int argc, char *argv[])
   if (status != PMUSR_SUCCESS) {
     switch (status) {
       case PMUSR_MSR_FILE_NOT_FOUND:
-        cout << endl << "**ERROR** couldn't find " << filename << endl << endl;
+        cout << endl << ">> musrfit **ERROR** couldn't find " << filename << endl << endl;
         break;
       case PMUSR_MSR_SYNTAX_ERROR:
-        cout << endl << "**SYNTAX ERROR** in file " << filename << ", full stop here." << endl << endl;
+        cout << endl << ">> musrfit **SYNTAX ERROR** in file " << filename << ", full stop here." << endl << endl;
         break;
       default:
-        cout << endl << "**UNKOWN ERROR** when trying to read the msr-file" << endl << endl;
+        cout << endl << ">> musrfit **UNKOWN ERROR** when trying to read the msr-file" << endl << endl;
         break;
     }
     return status;
@@ -486,7 +486,7 @@ int main(int argc, char *argv[])
 
   bool success = dataHandler->IsAllDataAvailable();
   if (!success) {
-    cout << endl << "**ERROR** Couldn't read all data files, will quit ..." << endl;
+    cout << endl << ">> musrfit **ERROR** Couldn't read all data files, will quit ..." << endl;
   }
 
   // if present, replace the run title of the <msr-file> with the run title of the FIRST run in the run block of the msr-file
@@ -505,7 +505,7 @@ int main(int argc, char *argv[])
     for (unsigned int i=0; i < msrHandler->GetMsrRunList()->size(); i++) {
       success = runListCollection->Add(i, kFit);
       if (!success) {
-        cout << endl << "**ERROR** Couldn't handle run no " << i << " ";
+        cout << endl << ">> musrfit **ERROR** Couldn't handle run no " << i << " ";
         cout << (*msrHandler->GetMsrRunList())[i].GetRunName()->Data();
         break;
       }
@@ -530,13 +530,13 @@ int main(int argc, char *argv[])
       if (status != PMUSR_SUCCESS) {
         switch (status) {
         case PMUSR_MSR_LOG_FILE_WRITE_ERROR:
-          cout << endl << "**ERROR** couldn't write mlog-file" << endl << endl;
+          cout << endl << ">> musrfit **ERROR** couldn't write mlog-file" << endl << endl;
           break;
         case PMUSR_TOKENIZE_ERROR:
-          cout << endl << "**ERROR** couldn't generate mlog-file name" << endl << endl;
+          cout << endl << ">> musrfit **ERROR** couldn't generate mlog-file name" << endl << endl;
           break;
         default:
-          cout << endl << "**UNKOWN ERROR** when trying to write the mlog-file" << endl << endl;
+          cout << endl << ">> musrfit **UNKOWN ERROR** when trying to write the mlog-file" << endl << endl;
           break;
         }
       }

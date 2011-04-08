@@ -162,7 +162,7 @@ PNonMusrRawRunData::~PNonMusrRawRunData()
 void PNonMusrRawRunData::SetLabel(const UInt_t idx, const TString str)
 {
   if (idx >= fLabels.size()) {
-    cerr << endl << "**WARNING** PNonMusrRawRunData::SetLabel: idx=" << idx << " is out of range [0," << fLabels.size() << "[.";
+    cerr << endl << ">> PNonMusrRawRunData::SetLabel: **WARNING** idx=" << idx << " is out of range [0," << fLabels.size() << "[.";
     cerr << endl;
     return;
   }
@@ -182,7 +182,7 @@ void PNonMusrRawRunData::SetLabel(const UInt_t idx, const TString str)
 void PNonMusrRawRunData::AppendSubData(const UInt_t idx, const Double_t dval)
 {
   if (idx >= fData.size()) {
-    cerr << endl << "**WARNING** PNonMusrRawRunData::AppendSubData: idx=" << idx << " is out of range [0," << fData.size() << "[.";
+    cerr << endl << ">> PNonMusrRawRunData::AppendSubData: **WARNING** idx=" << idx << " is out of range [0," << fData.size() << "[.";
     cerr << endl;
     return;
   }
@@ -202,7 +202,7 @@ void PNonMusrRawRunData::AppendSubData(const UInt_t idx, const Double_t dval)
 void PNonMusrRawRunData::AppendSubErrData(const UInt_t idx, const Double_t dval)
 {
   if (idx >= fErrData.size()) {
-    cerr << endl << "**WARNING** PNonMusrRawRunData::AppendSubErrData: idx=" << idx << " is out of range [0," << fErrData.size() << "[.";
+    cerr << endl << ">> PNonMusrRawRunData::AppendSubErrData: **WARNING** idx=" << idx << " is out of range [0," << fErrData.size() << "[.";
     cerr << endl;
     return;
   }
@@ -221,16 +221,18 @@ void PNonMusrRawRunData::AppendSubErrData(const UInt_t idx, const Double_t dval)
  */
 PRawRunData::PRawRunData()
 {
-  fRunName = TString("");
+  fRunName = TString("n/a");
   fRunNumber = -1;
-  fRunTitle = TString("");
-  fSetup = TString("");
-  fStartTime = TString("");
-  fStartDate = TString("");
+  fRunTitle = TString("n/a");
+  fSetup = TString("n/a");
+  fStartTime = TString("n/a");
+  fStartDate = TString("n/a");
   fStartDateTimeSec = 0;
-  fStopTime = TString("");
-  fStopDate = TString("");
+  fStopTime = TString("n/a");
+  fStopDate = TString("n/a");
   fStopDateTimeSec = 0;
+  fSample = TString("n/a");
+  fOrientation = TString("n/a");
   fField = PMUSR_UNDEFINED;
   fEnergy = PMUSR_UNDEFINED;
   fTransport = PMUSR_UNDEFINED;
@@ -271,7 +273,7 @@ PRawRunData::~PRawRunData()
 const Double_t PRawRunData::GetTemperature(const UInt_t idx)
 {
   if (idx >= fTemp.size()) {
-    cerr << endl << "**WARNING** PRawRunData::GetTemperature: idx=" << idx << " is out of range [0," << fTemp.size() << "[.";
+    cerr << endl << ">> PRawRunData::GetTemperature: **WARNING** idx=" << idx << " is out of range [0," << fTemp.size() << "[.";
     cerr << endl;
     return PMUSR_UNDEFINED;
   }
@@ -293,7 +295,7 @@ const Double_t PRawRunData::GetTemperature(const UInt_t idx)
 const Double_t PRawRunData::GetTempError(const UInt_t idx)
 {
   if (idx >= fTemp.size()) {
-    cerr << endl << "**WARNING** PRawRunData::GetTempError: idx=" << idx << " is out of range [0," << fTemp.size() << "[.";
+    cerr << endl << ">> PRawRunData::GetTempError: **WARNING** idx=" << idx << " is out of range [0," << fTemp.size() << "[.";
     cerr << endl;
     return PMUSR_UNDEFINED;
   }
@@ -315,7 +317,7 @@ const Double_t PRawRunData::GetTempError(const UInt_t idx)
 const Double_t PRawRunData::GetRingAnode(const UInt_t idx)
 {
   if (idx >= fRingAnode.size()) {
-    cerr << endl << "**WARNING** PRawRunData::GetRingAnode: idx=" << idx << " is out of range [0," << fRingAnode.size() << "[.";
+    cerr << endl << ">> PRawRunData::GetRingAnode: **WARNING** idx=" << idx << " is out of range [0," << fRingAnode.size() << "[.";
     cerr << endl;
     return PMUSR_UNDEFINED;
   }
@@ -337,7 +339,7 @@ const Double_t PRawRunData::GetRingAnode(const UInt_t idx)
 const Int_t PRawRunData::GetT0(const UInt_t idx)
 {
   if (idx >= fT0s.size()) {
-    cerr << endl << "**WARNING** PRawRunData::GetT0: idx=" << idx << " is out of range [0," << fT0s.size() << "[.";
+    cerr << endl << ">> PRawRunData::GetT0: **WARNING** idx=" << idx << " is out of range [0," << fT0s.size() << "[.";
     cerr << endl;
     return -1;
   }
@@ -359,7 +361,7 @@ const Int_t PRawRunData::GetT0(const UInt_t idx)
 const Int_t PRawRunData::GetT0Estimated(const UInt_t idx)
 {
   if (idx >= fT0Estimated.size()) {
-    cerr << endl << "**WARNING** PRawRunData::GetT0Estimated: idx=" << idx << " is out of range [0," << fT0Estimated.size() << "[.";
+    cerr << endl << ">> PRawRunData::GetT0Estimated: **WARNING** idx=" << idx << " is out of range [0," << fT0Estimated.size() << "[.";
     cerr << endl;
     return -1;
   }
@@ -384,7 +386,7 @@ const PIntPair PRawRunData::GetBkgBin(const UInt_t idx)
   PIntPair pair(-1, -1);
 
   if (idx >= fBkgBin.size()) {
-    cerr << endl << "**WARNING** PRawRunData::GetBkgBin: idx=" << idx << " is out of range [0," << fBkgBin.size() << "[.";
+    cerr << endl << ">> PRawRunData::GetBkgBin: **WARNING** idx=" << idx << " is out of range [0," << fBkgBin.size() << "[.";
     cerr << endl;
     return pair;
   }
@@ -413,7 +415,7 @@ const PIntPair PRawRunData::GetGoodDataBin(const UInt_t idx)
   PIntPair pair(-1, -1);
 
   if (idx >= fGoodDataBin.size()) {
-    cerr << endl << "**WARNING** PRawRunData::GetGoodDataBin: idx=" << idx << " is out of range [0," << fGoodDataBin.size() << "[.";
+    cerr << endl << ">> PRawRunData::GetGoodDataBin: **WARNING** idx=" << idx << " is out of range [0," << fGoodDataBin.size() << "[.";
     cerr << endl;
     return pair;
   }
@@ -439,7 +441,7 @@ const PIntPair PRawRunData::GetGoodDataBin(const UInt_t idx)
 const PDoubleVector* PRawRunData::GetDataBin(const UInt_t idx)
 {
   if (idx >= fDataBin.size()) {
-    cerr << endl << "**WARNING** PRawRunData::GetDataBin: idx=" << idx << " is out of range [0," << fDataBin.size() << "[.";
+    cerr << endl << ">> PRawRunData::GetDataBin: **WARNING** idx=" << idx << " is out of range [0," << fDataBin.size() << "[.";
     cerr << endl;
     return 0;
   }
@@ -514,13 +516,13 @@ void PRawRunData::SetTempError(const UInt_t idx, const Double_t errTemp)
 void PRawRunData::SetDataBin(const UInt_t histoNo, const UInt_t bin, const Double_t dval)
 {
   if (histoNo > fDataBin.size()) {
-    cerr << endl << "**WARNING** PRawRunData::SetDataBin: histoNo=" << histoNo << " is out of range [0," << fDataBin.size() << "].";
+    cerr << endl << ">> PRawRunData::SetDataBin: **WARNING** histoNo=" << histoNo << " is out of range [0," << fDataBin.size() << "].";
     cerr << endl;
     return;
   }
 
   if (bin > fDataBin[histoNo].size()) {
-    cerr << endl << "**WARNING** PRawRunData::SetDataBin: bin=" << bin << " is out of range [0," << fDataBin[histoNo].size() << "].";
+    cerr << endl << ">> PRawRunData::SetDataBin: **WARNING** bin=" << bin << " is out of range [0," << fDataBin[histoNo].size() << "].";
     cerr << endl;
     return;
   }
@@ -541,13 +543,13 @@ void PRawRunData::SetDataBin(const UInt_t histoNo, const UInt_t bin, const Doubl
 void PRawRunData::AddDataBin(const UInt_t histoNo, const UInt_t bin, const Double_t dval)
 {
   if (histoNo > fDataBin.size()) {
-    cerr << endl << "**WARNING** PRawRunData::AddDataBin: histoNo=" << histoNo << " is out of range [0," << fDataBin.size() << "].";
+    cerr << endl << ">> PRawRunData::AddDataBin: **WARNING** histoNo=" << histoNo << " is out of range [0," << fDataBin.size() << "].";
     cerr << endl;
     return;
   }
 
   if (bin > fDataBin[histoNo].size()) {
-    cerr << endl << "**WARNING** PRawRunData::AddDataBin: bin=" << bin << " is out of range [0," << fDataBin[histoNo].size() << "].";
+    cerr << endl << ">> PRawRunData::AddDataBin: **WARNING** bin=" << bin << " is out of range [0," << fDataBin[histoNo].size() << "].";
     cerr << endl;
     return;
   }
@@ -985,7 +987,7 @@ Double_t PMsrRunBlock::GetBkgFix(UInt_t idx)
 void PMsrRunBlock::SetBkgFix(Double_t dval, Int_t idx)
 {
   if (idx >= 2) {
-    cerr << endl << "PMsrRunBlock::SetBkgFix: **WARNING** idx=" << idx << ", only idx=0,1 are sensible.";
+    cerr << endl << ">> PMsrRunBlock::SetBkgFix: **WARNING** idx=" << idx << ", only idx=0,1 are sensible.";
     cerr << endl;
     return;
   }
@@ -1026,7 +1028,7 @@ Int_t PMsrRunBlock::GetBkgRange(UInt_t idx)
 void PMsrRunBlock::SetBkgRange(Int_t ival, Int_t idx)
 {
   if (idx >= 4) {
-    cerr << endl << "PMsrRunBlock::SetBkgRange: **WARNING** idx=" << idx << ", only idx=0..3 are sensible.";
+    cerr << endl << ">> PMsrRunBlock::SetBkgRange: **WARNING** idx=" << idx << ", only idx=0..3 are sensible.";
     cerr << endl;
     return;
   }
@@ -1068,7 +1070,7 @@ Int_t PMsrRunBlock::GetDataRange(UInt_t idx)
 void PMsrRunBlock::SetDataRange(Int_t ival, Int_t idx)
 {
   if (idx >= 4) {
-    cerr << endl << "PMsrRunBlock::SetDataRange: **WARNING** idx=" << idx << ", only idx=0..3 are sensible.";
+    cerr << endl << ">> PMsrRunBlock::SetDataRange: **WARNING** idx=" << idx << ", only idx=0..3 are sensible.";
     cerr << endl;
     return;
   }

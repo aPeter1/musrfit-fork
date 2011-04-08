@@ -29,6 +29,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <cstdio>
 #include <ctime>
 #include <iostream>
@@ -49,6 +53,10 @@ using namespace std;
 #include "TLemRunHeader.h"
 #include "MuSR_td_PSI_bin.h"
 #include "mud.h"
+
+#ifdef PNEXUS_ENABLED
+#include "PNeXus.h"
+#endif
 
 #include "PRunDataHandler.h"
 
@@ -610,7 +618,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
   else if (!runInfo.GetFileFormat(idx)->CompareTo("root-ppc")) // post pile up corrected histos
     ext = TString("root");
   else if (!runInfo.GetFileFormat(idx)->CompareTo("nexus"))
-    ext = TString("nexus");
+    ext = TString("NXS");
   else if (!runInfo.GetFileFormat(idx)->CompareTo("psi-bin"))
     ext = TString("bin");
   else if (!runInfo.GetFileFormat(idx)->CompareTo("psi-mdu"))
@@ -640,7 +648,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
       assert(0);
     }
     pstr->ToUpper();
-    cerr << endl << ">> **ERROR** File Format '" << pstr->Data() << "' unsupported.";
+    cerr << endl << ">> PRunDataHandler::FileExistsCheck: **ERROR** File Format '" << pstr->Data() << "' unsupported.";
     cerr << endl << ">>   support file formats are:";
     cerr << endl << ">>   ROOT-NPP  -> root not post pileup corrected for lem";
     cerr << endl << ">>   ROOT-PPC  -> root post pileup corrected for lem";
@@ -794,7 +802,7 @@ Bool_t PRunDataHandler::FileExistsCheck(const Bool_t fileName, const Int_t idx)
     }
     // check for input/output templates
     if ((fAny2ManyInfo->inTemplate.Length() == 0) || (fAny2ManyInfo->outTemplate.Length() == 0)) {
-      cerr << endl << ">> PRunDataHandler::FileExistsCheck(): **ERROR** when using run lists, input/ouput templates are needed as well." << endl;
+      cerr << endl << ">> PRunDataHandler::FileExistsCheck(): **ERROR** when using run lists, input/output templates are needed as well." << endl;
       return false;
     }
     // make the input file name according to the input template
@@ -1214,8 +1222,106 @@ Bool_t PRunDataHandler::ReadRootFile(UInt_t tag)
  */
 Bool_t PRunDataHandler::ReadNexusFile()
 {
-  cout << endl << "PRunDataHandler::ReadNexusFile(): Sorry, not yet implemented, ask Alex Amato and Stephen Cottrell ...";
-  return false;
+#ifdef PNEXUS_ENABLED
+  cout << endl << ">> PRunDataHandler::ReadNexusFile(): Will read nexus file " << fRunPathName.Data() << " ...";
+
+  PDoubleVector histoData;
+  PRawRunData   runData;
+  TString str;
+  Double_t dval;
+
+  PNeXus *nxs_file = new PNeXus(fRunPathName.Data());
+  if (!nxs_file->IsValid()) {
+    cerr << endl << ">> PRunDataHandler::ReadNexusFile(): Not a valid NeXus file.";
+    cerr << endl << ">> Error Message: " << nxs_file->GetErrorMsg().data() << endl;
+    return false;
+  }
+
+  // get header information
+
+  // get/set run title
+  str = TString(nxs_file->GetRunTitle());
+  runData.SetRunTitle(str);
+
+  // get/set run number
+  runData.SetRunNumber(nxs_file->GetRunNumber());
+
+  // get/set temperature
+  runData.SetTemperature(0, nxs_file->GetSampleTemperature(), 0.0);
+
+  // get/set field
+  dval = nxs_file->GetMagneticField();
+  str = TString(nxs_file->GetMagneticFieldUnits());
+  // since field has to be given in Gauss, check the units
+  Double_t factor=1.0;
+  if (!str.CompareTo("gauss", TString::kIgnoreCase))
+    factor=1.0;
+  else if (!str.CompareTo("tesla", TString::kIgnoreCase))
+    factor=1.0e4;
+  else
+    factor=1.0;
+  runData.SetField(factor*dval);
+
+  // get/set implantation energy
+  runData.SetEnergy(PMUSR_UNDEFINED);
+
+  // get/set moderator HV
+  runData.SetTransport(PMUSR_UNDEFINED);
+
+  // get/set RA HV's (LEM specific)
+  for (UInt_t i=0; i<4; i++)
+    runData.SetRingAnode(i, PMUSR_UNDEFINED);
+
+  // get/set setup
+  runData.SetSetup(nxs_file->GetRunNotes());
+
+  // get/set sample
+  runData.SetSample(nxs_file->GetSampleName());
+
+  // get/set orientation
+  runData.SetOrientation("??");
+
+  // get/set time resolution (ns)
+  runData.SetTimeResolution(nxs_file->GetTimeResolution());
+
+  // get/set start/stop time
+  runData.SetStartTime(nxs_file->GetStartTime());
+  runData.SetStartDate(nxs_file->GetStartDate());
+  runData.SetStopTime(nxs_file->GetStopTime());
+  runData.SetStopDate(nxs_file->GetStopDate());
+
+  // get t0, firstGoodBin, lastGoodBin, data
+  UInt_t t0=nxs_file->GetT0();
+  PIntPair goodDataBin;
+  goodDataBin.first  = nxs_file->GetFirstGoodBin();
+  goodDataBin.second = nxs_file->GetLastGoodBin();
+  PDoubleVector data;
+  for (Int_t i=0; i<nxs_file->GetNoHistos(); i++) {
+    runData.AppendT0(t0);
+    runData.AppendGoodDataBin(goodDataBin);
+    data.clear();
+    for (UInt_t j=0; j<nxs_file->GetHisto(i)->size(); j++) {
+      data.push_back((Double_t)nxs_file->GetHisto(i)->at(j));
+    }
+    runData.AppendDataBin(data);
+  }
+  data.clear();
+
+  // keep run name from the msr-file
+  runData.SetRunName(fRunName);
+
+  // keep the information
+  fData.push_back(runData);
+
+  // clean up
+  if (nxs_file) {
+    delete nxs_file;
+    nxs_file = 0;
+  }
+#else
+  cout << endl << ">> PRunDataHandler::ReadNexusFile(): Sorry, not enabled at configuration level, i.e. --enable-NeXus when executing configure" << endl << endl;
+#endif
+  return true;
 }
 
 //--------------------------------------------------------------------------
@@ -1620,6 +1726,7 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   }
   runData.SetStopDate(sDateTime[0]);
   runData.SetStopTime(sDateTime[1]);
+  sDateTime.clear();
 
   // fill raw data
   PDoubleVector histoData;
@@ -2988,21 +3095,10 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
   // generate output file name if needed
   if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
     if (fln.Length() == 0) {
-      Int_t start = fRunPathName.Last('/');
-      Int_t end = fRunPathName.Last('.');
-      if (end == -1) {
-        cerr << endl << ">> PRunDataHandler::WriteRootFile(): **ERROR** couldn't generate the output file name ..." << endl;
+      Bool_t ok = false;
+      fln = GetFileName(".root", ok);
+      if (!ok)
         return false;
-      }
-      // cut out the filename (get rid of the extension, and the path)
-      Char_t str1[1024], str2[1024];
-      strncpy(str1, fRunPathName.Data(), sizeof(str1));
-      for (Int_t i=0; i<end-start-1; i++) {
-        str2[i] = str1[i+start+1];
-      }
-      str2[end-start-1] = 0;
-
-      fln = fAny2ManyInfo->outPath + str2 + ".root";
     } else {
       fln.Prepend(fAny2ManyInfo->outPath);
     }
@@ -3183,8 +3279,92 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
  * \param fln file name. If empty, the routine will try to construct one
  */
 Bool_t PRunDataHandler::WriteNexusFile(TString fln)
-{
-  cout << endl << ">> PRunDataHandler::WriteNexusFile(): will write a nexus data file. Not yet implemented ... " << endl;
+{  
+#ifdef PNEXUS_ENABLED
+  // generate output file name
+  if (fln.Length() == 0) {
+    Bool_t ok = false;
+    fln = GetFileName(".nxs", ok);
+    if (!ok)
+      return false;
+  } else {
+    fln.Prepend(fAny2ManyInfo->outPath);
+  }
+  // keep the file name if compression is whished
+  fAny2ManyInfo->outPathFileName.push_back(fln);
+
+  if (!fAny2ManyInfo->useStandardOutput)
+    cout << endl << ">> PRunDataHandler::WriteNexusFile(): writing a NeXus data file (" << fln.Data() << ") ... " << endl;
+
+  // create NeXus object
+  PNeXus *nxs = new PNeXus();
+  if (nxs == 0) {
+    cerr << endl << ">> PRunDataHandler::WriteNexusFile(): **ERROR** couldn't invoke the NeXus object." << endl;
+    return false;
+  }
+
+  // fill necessary data structures
+  nxs->SetFileName(fln.Data());
+  nxs->SetIDFVersion(1);
+  nxs->SetProgramName("any2many");
+  nxs->SetProgramVersion("$Id$");
+  nxs->SetRunNumber(fData[0].GetRunNumber());
+  nxs->SetRunTitle(fData[0].GetRunTitle()->Data());
+  nxs->SetRunNotes("n/a");
+  nxs->SetAnalysisTag("n/a");
+  nxs->SetLab("PSI");
+  nxs->SetBeamline("n/a");
+  nxs->SetStartDate(fData[0].GetStartDate()->Data());
+  nxs->SetStartTime(fData[0].GetStartTime()->Data());
+  nxs->SetStopDate(fData[0].GetStopDate()->Data());
+  nxs->SetStopTime(fData[0].GetStopTime()->Data());
+  nxs->SetSwitchingState(0);
+  nxs->SetUser("n/a");
+  nxs->SetExperimentNumber("n/a");
+  nxs->SetSampleName(fData[0].GetSample()->Data());
+  nxs->SetSampleTemperature(fData[0].GetTemperature(0));
+  nxs->SetSampleTemperatureUints("Kelvin");
+  nxs->SetMagneticField(fData[0].GetField());
+  nxs->SetMagneticFieldUnits("Gauss");
+  nxs->SetSampleEnvironment("n/a");
+  nxs->SetSampleShape("n/a");
+  nxs->SetMagneticFieldVectorAvailable(0);
+  nxs->SetExperimentName("n/a");
+  nxs->SetNoDetectors(fData[0].GetNoOfHistos());
+  nxs->SetCollimatorType("n/a");
+  nxs->SetTimeResolution(fData[0].GetTimeResolution());
+  if (fData[0].GetT0(0) == -1)
+    nxs->SetT0(0);
+  else
+    nxs->SetT0(fData[0].GetT0(0)); // this needs to be changed in the long term, since for continous sources each detector has its one t0!!
+  if (fData[0].GetGoodDataBin(0).first == -1) {
+    nxs->SetFirstGoodBin(0);
+    nxs->SetLastGoodBin(0);
+  } else {
+    nxs->SetFirstGoodBin(fData[0].GetGoodDataBin(0).first);
+    nxs->SetLastGoodBin(fData[0].GetGoodDataBin(0).second);
+  }
+  // feed real histogram data
+  PUIntVector data;
+  for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
+    for (UInt_t j=0; j<fData[0].GetDataBin(i)->size(); j++) {
+      data.push_back((UInt_t)fData[0].GetDataBin(i)->at(j));
+    }
+    nxs->SetHisto(i, data);
+    data.clear();
+  }
+
+  // write file
+  nxs->WriteFile(fln);
+
+  // clean up
+  if (nxs != 0) {
+    delete nxs;
+    nxs = 0;
+  }
+#else
+  cout << endl << ">> PRunDataHandler::WriteNexusFile(): Sorry, not enabled at configuration level, i.e. --enable-NeXus when executing configure" << endl << endl;
+#endif
   return true;
 }
 
@@ -3204,21 +3384,10 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
 {
   // generate output file name
   if (fln.Length() == 0) {
-    Int_t start = fRunPathName.Last('/');
-    Int_t end = fRunPathName.Last('.');
-    if (end == -1) {
-      cerr << endl << ">> PRunDataHandler::WriteWkmFile(): **ERROR** couldn't generate the output file name ..." << endl;
+    Bool_t ok = false;
+    fln = GetFileName(".wkm", ok);
+    if (!ok)
       return false;
-    }
-    // cut out the filename (get rid of the extension, and the path)
-    Char_t str1[1024], str2[1024];
-    strncpy(str1, fRunPathName.Data(), sizeof(str1));
-    for (Int_t i=0; i<end-start-1; i++) {
-      str2[i] = str1[i+start+1];
-    }
-    str2[end-start-1] = 0;
-
-    fln = fAny2ManyInfo->outPath + str2 + ".wkm";
   } else {
     fln.Prepend(fAny2ManyInfo->outPath);
   }
@@ -3244,7 +3413,7 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
     // save output buffer of the stream
     strm_buffer = cout.rdbuf();
 
-    // redirect ouput into the file
+    // redirect output into the file
     cout.rdbuf(fout.rdbuf());
   }
 
@@ -3266,7 +3435,7 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
   } else {
     cout << endl << "Field       : ??";
   }
-  cout << endl << "Date        : ??";
+  cout << endl << "Date        : " << fData[0].GetStartTime()->Data() << " " << fData[0].GetStartDate()->Data() << " / " << fData[0].GetStopTime()->Data() << " " << fData[0].GetStopDate()->Data();
   cout << endl << "Setup       : " << fData[0].GetSetup()->Data();
   cout << endl << "Groups      : " << fData[0].GetNoOfHistos();
   cout << endl << "Channels    : " << static_cast<UInt_t>(fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin);
@@ -3334,21 +3503,10 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
   // generate output file name if needed
   if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
     if (fln.Length() == 0) {
-      Int_t start = fRunPathName.Last('/');
-      Int_t end = fRunPathName.Last('.');
-      if (end == -1) {
-        cerr << endl << ">> PRunDataHandler::WritePsiBinFile(): **ERROR** couldn't generate the output file name ..." << endl;
+      Bool_t ok = false;
+      fln = GetFileName(".bin", ok);
+      if (!ok)
         return false;
-      }
-      // cut out the filename (get rid of the extension, and the path)
-      Char_t str1[1024], str2[1024];
-      strncpy(str1, fRunPathName.Data(), sizeof(str1));
-      for (Int_t i=0; i<end-start-1; i++) {
-        str2[i] = str1[i+start+1];
-      }
-      str2[end-start-1] = 0;
-
-      fln = fAny2ManyInfo->outPath + str2 + ".bin";
     } else {
       fln.Prepend(fAny2ManyInfo->outPath);
     }
@@ -3522,21 +3680,10 @@ Bool_t PRunDataHandler::WriteMudFile(TString fln)
   // generate output file name if needed
   if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
     if (fln.Length() == 0) {
-      Int_t start = fRunPathName.Last('/');
-      Int_t end = fRunPathName.Last('.');
-      if (end == -1) {
-        cerr << endl << ">> PRunDataHandler::WriteMudFile(): **ERROR** couldn't generate the output file name ..." << endl;
+      Bool_t ok = false;
+      fln = GetFileName(".msr", ok);
+      if (!ok)
         return false;
-      }
-      // cut out the filename (get rid of the extension, and the path)
-      Char_t str1[1024], str2[1024];
-      strncpy(str1, fRunPathName.Data(), sizeof(str1));
-      for (Int_t i=0; i<end-start-1; i++) {
-        str2[i] = str1[i+start+1];
-      }
-      str2[end-start-1] = 0;
-
-      fln = fAny2ManyInfo->outPath + str2 + ".msr";
     } else {
       fln.Prepend(fAny2ManyInfo->outPath);
     }
@@ -3700,21 +3847,10 @@ Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
 {
   // generate output file name
   if (fln.Length() == 0) {
-    Int_t start = fRunPathName.Last('/');
-    Int_t end = fRunPathName.Last('.');
-    if (end == -1) {
-      cerr << endl << ">> PRunDataHandler::WriteAsciiFile(): **ERROR** couldn't generate the output file name ..." << endl;
+    Bool_t ok = false;
+    fln = GetFileName(".ascii", ok);
+    if (!ok)
       return false;
-    }
-    // cut out the filename (get rid of the extension, and the path)
-    Char_t str1[1024], str2[1024];
-    strncpy(str1, fRunPathName.Data(), sizeof(str1));
-    for (Int_t i=0; i<end-start-1; i++) {
-      str2[i] = str1[i+start+1];
-    }
-    str2[end-start-1] = 0;
-
-    fln = fAny2ManyInfo->outPath + str2 + ".ascii";
   } else {
     fln.Prepend(fAny2ManyInfo->outPath);
   }
@@ -3740,7 +3876,7 @@ Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
     // save output buffer of the stream
     strm_buffer = cout.rdbuf();
 
-    // redirect ouput into the file
+    // redirect output into the file
     cout.rdbuf(fout.rdbuf());
   }
 
@@ -3754,6 +3890,8 @@ Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
   if (fData[0].GetSetup()->Length() > 0)
     cout << endl << "% setup       : " << fData[0].GetSetup()->Data();
   cout << endl << "% field       : " << fData[0].GetField() << " (G)";
+  if (fData[0].GetStartTime()->Length() > 0)
+    cout << endl << "% date        : " << fData[0].GetStartTime()->Data() << " " << fData[0].GetStartDate()->Data() << " / " << fData[0].GetStopTime()->Data() << " " << fData[0].GetStopDate()->Data();
   if (fData[0].GetNoOfTemperatures() > 0) {
     cout << endl << "% temperature : ";
     for (UInt_t i=0; i<fData[0].GetNoOfTemperatures()-1; i++) {
@@ -4056,6 +4194,51 @@ Int_t PRunDataHandler::GetDataTagIndex(TString &str, const PStringVector* dataTa
   }
 
   return result;
+}
+
+
+//--------------------------------------------------------------------------
+// GetFileName (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Construct the file name based on the any2many request.
+ *
+ * <b>return:</b>
+ * - constructed file name
+ * - empty string
+ *
+ * \param extension if the file name to be constructed
+ * \param ok flag which is 'true' if the file name could be constructed, 'false' otherwise
+ */
+TString PRunDataHandler::GetFileName(const TString extension, Bool_t &ok)
+{
+  TString fileName = "";
+  ok = true;
+
+  Int_t start = fRunPathName.Last('/');
+  Int_t end = fRunPathName.Last('.');
+  if (end == -1) {
+    cerr << endl << ">> PRunDataHandler::GetFileName(): **ERROR** couldn't generate the output file name ..." << endl;
+    ok = false;
+    return fileName;
+  }
+  // cut out the filename (get rid of the extension, and the path)
+  Char_t str1[1024], str2[1024];
+  strncpy(str1, fRunPathName.Data(), sizeof(str1));
+  for (Int_t i=0; i<end-start-1; i++) {
+    str2[i] = str1[i+start+1];
+  }
+  str2[end-start-1] = 0;
+
+  if (fAny2ManyInfo->inFormat == fAny2ManyInfo->outFormat) { // only rebinning
+    TString rebinStr;
+    rebinStr += fAny2ManyInfo->rebin;
+    fileName = fAny2ManyInfo->outPath + str2 + "_rebin" + rebinStr + extension;
+  } else { // real conversion
+    fileName = fAny2ManyInfo->outPath + str2 + extension;
+  }
+
+  return fileName;
 }
 
 //--------------------------------------------------------------------------

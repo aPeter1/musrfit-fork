@@ -222,7 +222,8 @@ class PNeXus {
     virtual void SetIDFVersion(int idfVersion) { fIDFVersion = idfVersion; }
     virtual void SetProgramName(const char* progName) { fProgramName = progName; }
     virtual void SetProgramName(string progName) { fProgramName = progName; }
-    virtual void SetProgramVersion(int progVersion) { fProgramVersion = progVersion; }
+    virtual void SetProgramVersion(const char* progVersion) { fProgramVersion = progVersion; }
+    virtual void SetProgramVersion(string progVersion) { fProgramVersion = progVersion; }
     virtual void SetRunNumber(int runNumber) { fRunNumber = runNumber; }
     virtual void SetRunTitle(const char* runTitle) { fRunTitle = runTitle; }
     virtual void SetRunTitle(string runTitle) { fRunTitle = runTitle; }
@@ -230,8 +231,8 @@ class PNeXus {
     virtual void SetRunNotes(string notes) { fNotes = notes; }
     virtual void SetAnalysisTag(const char* analysisTag) { fAnalysisTag = analysisTag; }
     virtual void SetAnalysisTag(string analysisTag) { fAnalysisTag = analysisTag; }
-    virtual void SetLab(const char *lab) { fLab = fLab; }
-    virtual void SetLab(string lab) { fLab = fLab; }
+    virtual void SetLab(const char *lab) { fLab = lab; }
+    virtual void SetLab(string lab) { fLab = lab; }
     virtual void SetBeamline(const char *beamline) { fBeamLine = beamline; }
     virtual void SetBeamline(string beamline) { fBeamLine = beamline; }
     virtual bool SetStartDate(const char *date);
@@ -261,9 +262,9 @@ class PNeXus {
     virtual void SetNoDetectors(unsigned int no) { fInstrument.detector.number = no; }
     virtual void SetCollimatorType(string type) { fInstrument.collimator.type = type; }
     virtual void SetTimeResolution(double timeResolution) { fData.fTimeResolution = timeResolution; } // given in ns
-    virtual void SetT0(unsigned int t0) { fData.fT0.clear(); fData.fT0.push_back(t0); }
-    virtual void SetFirstGoodBin(unsigned int fgb) { fData.fFirstGoodBin.clear(); fData.fFirstGoodBin.push_back(fgb); }
-    virtual void SetLastGoodBin(unsigned int lgb) { fData.fLastGoodBin.clear(); fData.fLastGoodBin.push_back(lgb); }
+    virtual void SetT0(unsigned int t0, unsigned int idx=0);
+    virtual void SetFirstGoodBin(unsigned int fgb, unsigned int idx=0);
+    virtual void SetLastGoodBin(unsigned int lgb, unsigned int idx=0);
     virtual void SetHisto(unsigned int histoNo, vector<unsigned int> &data);
 
   private:
@@ -305,6 +306,8 @@ class PNeXus {
     virtual NXstatus GetDoubleVectorData(vector<double> &data);
     virtual NXstatus GetIntVectorData(vector<int> &data);
     virtual NXstatus GroupHistoData();
+    virtual string TransformDate(string date, bool &ok);
+    virtual int GetMonth(const string month);
 };
 
 #endif // _PNEXUS_H_

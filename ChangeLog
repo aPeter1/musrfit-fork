@@ -4,8 +4,9 @@
 # $Id$
 #---------------------------------------------------------------------
 
-changes since 0.8.0
+musrfit 0.9.0 - changes since 0.8.0
 ===================================
+NEW added NeXus support. Still a lot of testing will be needed, documentation updated, etc.
 NEW added a magnetic proximity user function to the ASlibs
 NEW added the command SCALE_N0_BKG TRUE | FALSE to the command-block. This can be used to force a single histogram fit 
     to use either 1/ns scaling for N0 and background or 1/bins one. 

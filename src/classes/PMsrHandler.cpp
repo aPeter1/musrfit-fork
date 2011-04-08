@@ -4268,7 +4268,7 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           cerr << endl << "  forward parameter number not defined. Necessary for single histogram fits." << endl;
           return false;
         }
-        if (fRuns[i].GetForwardHistoNo() > static_cast<Int_t>(fParam.size())) {
+        if (fRuns[i].GetNormParamNo() > static_cast<Int_t>(fParam.size())) {
           cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
           cerr << endl << "  forward histogram number " << fRuns[i].GetNormParamNo() << " is larger than the number of fit parameters (" << fParam.size() << ").";
           cerr << endl << "  Consider to check the manual ;-)" << endl;

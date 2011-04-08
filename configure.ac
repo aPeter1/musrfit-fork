@@ -1,5 +1,7 @@
+AC_REVISION($Id$)
+
 AC_PREREQ(2.59)
-AC_INIT(musrfit, 0.8.0, andreas.suter@psi.ch)
+AC_INIT(musrfit, 0.9.0, andreas.suter@psi.ch)
 AC_CONFIG_AUX_DIR(admin)
 AC_CANONICAL_HOST
 #AC_MSG_RESULT([${host} ${host_cpu} ${host_vendor} ${host_os}])
@@ -21,6 +23,7 @@ MUSR_LIBRARY_NAME=PMusr
 LEM_LIBRARY_NAME=TLemRunHeader
 PSIBIN_LIBRARY_NAME=Class_MuSR_PSI
 MUD_LIBRARY_NAME=mud
+PNEXUS_LIBRARY_NAME=PNeXus
 CUBA_LIBRARY_NAME=cuba
 
 dnl -----------------------------------------------
@@ -30,7 +33,7 @@ dnl -----------------------------------------------
 
 #release versioning
 MUSR_MAJOR_VERSION=0
-MUSR_MINOR_VERSION=8
+MUSR_MINOR_VERSION=9
 MUSR_MICRO_VERSION=0
 
 #release versioning
@@ -47,6 +50,11 @@ PSIBIN_MICRO_VERSION=0
 MUD_MAJOR_VERSION=0
 MUD_MINOR_VERSION=0
 MUD_MICRO_VERSION=0
+
+#release versioning
+PNEXUS_MAJOR_VERSION=0
+PNEXUS_MINOR_VERSION=9
+PNEXUS_MICRO_VERSION=0
 
 #release versioning
 PLUGIN_MAJOR_VERSION=1
@@ -71,6 +79,9 @@ AC_SUBST(PSIBIN_API_VERSION)
 MUD_API_VERSION=$MUD_MAJOR_VERSION.$MUD_MINOR_VERSION
 AC_SUBST(MUD_API_VERSION)
 
+PNEXUS_API_VERSION=$PNEXUS_MAJOR_VERSION.$PNEXUS_MINOR_VERSION
+AC_SUBST(PNEXUS_API_VERSION)
+
 PLUGIN_API_VERSION=$PLUGIN_MAJOR_VERSION.$PLUGIN_MINOR_VERSION
 AC_SUBST(PLUGIN_API_VERSION)
 
@@ -83,6 +94,7 @@ PLUGIN_LIBRARY_VERSION=$PLUGIN_MAJOR_VERSION:$PLUGIN_MINOR_VERSION:$PLUGIN_MICRO
 LEM_LIBRARY_VERSION=$LEM_MAJOR_VERSION:$LEM_MINOR_VERSION:$LEM_MICRO_VERSION
 PSIBIN_LIBRARY_VERSION=$PSIBIN_MAJOR_VERSION:$PSIBIN_MINOR_VERSION:$PSIBIN_MICRO_VERSION
 MUD_LIBRARY_VERSION=$MUD_MAJOR_VERSION:$MUD_MINOR_VERSION:$MUD_MICRO_VERSION
+PNEXUS_LIBRARY_VERSION=$PNEXUS_MAJOR_VERSION:$PNEXUS_MINOR_VERSION:$PNEXUS_MICRO_VERSION
 MUSR_LIBRARY_VERSION=$MUSR_MAJOR_VERSION:$MUSR_MINOR_VERSION:$MUSR_MICRO_VERSION
 
 # This is definitely handled wrongly at the moment and needs to be fixed...  
@@ -103,6 +115,7 @@ AC_SUBST(MUSR_LIBRARY_VERSION)
 AC_SUBST(LEM_LIBRARY_VERSION)
 AC_SUBST(PSIBIN_LIBRARY_VERSION)
 AC_SUBST(MUD_LIBRARY_VERSION)
+AC_SUBST(PNEXUS_LIBRARY_VERSION)
 AC_SUBST(PLUGIN_LIBRARY_VERSION)
 AC_SUBST(CUBA_LIBRARY_VERSION)
 
@@ -111,6 +124,7 @@ AC_SUBST(MUSR_LIBRARY_NAME)
 AC_SUBST(LEM_LIBRARY_NAME)
 AC_SUBST(PSIBIN_LIBRARY_NAME)
 AC_SUBST(MUD_LIBRARY_NAME)
+AC_SUBST(PNEXUS_LIBRARY_NAME)
 AC_SUBST(CUBA_LIBRARY_NAME)
 
 PSIBIN_VERSION=$PSIBIN_MAJOR_VERSION.$PSIBIN_MINOR_VERSION.$PSIBIN_MICRO_VERSION
@@ -122,6 +136,11 @@ MUD_VERSION=$MUD_MAJOR_VERSION.$MUD_MINOR_VERSION.$MUD_MICRO_VERSION
 MUD_RELEASE=$MUD_MAJOR_VERSION.$MUD_MINOR_VERSION
 AC_SUBST(MUD_RELEASE)
 AC_SUBST(MUD_VERSION)
+
+PNEXUS_VERSION=$PNEXUS_MAJOR_VERSION.$PNEXUS_MINOR_VERSION.$PNEXUS_MICRO_VERSION
+PNEXUS_RELEASE=$PNEXUS_MAJOR_VERSION.$PNEXUS_MINOR_VERSION
+AC_SUBST(PNEXUS_RELEASE)
+AC_SUBST(PNEXUS_VERSION)
 
 LEM_VERSION=$LEM_MAJOR_VERSION.$LEM_MINOR_VERSION.$LEM_MICRO_VERSION
 LEM_RELEASE=$LEM_MAJOR_VERSION.$LEM_MINOR_VERSION
@@ -344,6 +363,136 @@ fi
 AC_SUBST(ROOT_LIBS)
 AC_SUBST(ROOT_CFLAGS)
 
+dnl -----------------------------------------------
+dnl Check for NeXus, HDF5, etc.
+dnl -----------------------------------------------
+AC_ARG_ENABLE([NeXus], [AC_HELP_STRING([--enable-NeXus], [build optional NeXus support [default=no]])],
+    [
+    # checking for hdf4
+    AC_ARG_WITH([hdf4],
+        [AC_HELP_STRING([--with-hdf4], [prefix of the HDF4 installation (needed for NeXus), e.g. /usr/local/hdf4 or /opt/hdf4])],
+        [HDF4_PREFIX=$with_hdf4
+         AC_MSG_CHECKING([whether HDF4 can be found at the specified location])
+         if !(test -r ${HDF4_PREFIX}/include/hdf.h); then
+           AC_MSG_RESULT([no])
+           AC_MSG_ERROR([HDF4 cannot be found at the specified path!])
+         fi
+         AC_MSG_RESULT([${HDF4_PREFIX}])],
+        [AC_MSG_CHECKING([whether HDF4 is installed in a standard location])
+         if test -r /usr/local/include/hdf.h; then
+            HDF4_PREFIX="/usr/local"
+            AC_MSG_RESULT([${HDF4_PREFIX}])
+         elif test -r /usr/local/hdf4/include/hdf.h; then
+           HDF4_PREFIX="/usr/local/hdf4"
+           AC_MSG_RESULT([${HDF4_PREFIX}])
+         elif test -r /usr/include/hdf.h; then
+           HDF4_PREFIX="/usr"
+           AC_MSG_RESULT([${HDF4_PREFIX}])
+         elif test -r /sw/hdf4/include/hdf.h; then
+           HDF4_PREFIX="/sw/hdf4"
+           AC_MSG_RESULT([${HDF4_PREFIX}])
+         elif test -r /opt/hdf4/include/hdf.h; then
+           HDF4_PREFIX="/opt/hdf4"
+           AC_MSG_RESULT([${HDF4_PREFIX}])
+         else
+           AC_MSG_RESULT([no])
+           AC_MSG_ERROR(
+           [HDF4 not found (needed for NeXus). Please call configure with the --with-hdf4 option.
+           This tells configure where to find the HDF4 C++ headers,
+           e.g. --with-hdf4=/usr/local/hdf4]
+           )
+         fi 
+        ]
+    )
+
+    # checking for hdf5
+    AC_ARG_WITH([hdf5],
+        [AC_HELP_STRING([--with-hdf5], [prefix of the HDF5 installation (needed for NeXus), e.g. /usr/local/hdf5 or /opt/hdf5])],
+        [HDF5_PREFIX=$with_hdf5
+         AC_MSG_CHECKING([whether HDF5 can be found at the specified location])
+         if !(test -r ${HDF5_PREFIX}/include/hdf5.h); then
+           AC_MSG_RESULT([no])
+           AC_MSG_ERROR([HDF5 cannot be found at the specified path!])
+         fi
+         AC_MSG_RESULT([${HDF5_PREFIX}])],
+        [AC_MSG_CHECKING([whether HDF5 is installed in a standard location])
+         if test -r /usr/local/include/hdf5.h; then
+            HDF5_PREFIX="/usr/local"
+            AC_MSG_RESULT([${HDF5_PREFIX}])
+         elif test -r /usr/local/hdf5/include/hdf5.h; then
+           HDF5_PREFIX="/usr/local/hdf5"
+           AC_MSG_RESULT([${HDF5_PREFIX}])
+         elif test -r /usr/include/hdf5.h; then
+           HDF5_PREFIX="/usr"
+           AC_MSG_RESULT([${HDF5_PREFIX}])
+         elif test -r /sw/hdf5/include/hdf5.h; then
+           HDF5_PREFIX="/sw/hdf5"
+           AC_MSG_RESULT([${HDF5_PREFIX}])
+         elif test -r /opt/hdf5/include/hdf5.h; then
+           HDF5_PREFIX="/opt/hdf5"
+           AC_MSG_RESULT([${HDF5_PREFIX}])
+         else
+           AC_MSG_RESULT([no])
+           AC_MSG_ERROR(
+           [HDF5 not found (needed for NeXus). Please call configure with the --with-hdf5 option.
+           This tells configure where to find the HDF5 C++ headers,
+           e.g. --with-hdf5=/usr/local/hdf5]
+           )
+         fi 
+        ]
+    )
+
+    # checking for NeXus
+    NEXUS_FOUND=0
+    AC_ARG_WITH([nexus],
+        [AC_HELP_STRING([--with-nexus], [prefix of the NeXus installation, e.g. /usr/local])],
+        [NEXUS_PREFIX=$with_nexus
+         AC_MSG_CHECKING([whether NeXus can be found at the specified location])
+         if !(test -r ${NEXUS_PREFIX}/include/napi.h); then
+           AC_MSG_RESULT([no])
+           AC_MSG_ERROR([NeXus cannot be found at the specified path!])
+         fi
+         AC_MSG_RESULT([${NEXUS_PREFIX}])],
+        [PKG_CHECK_MODULES(NEXUS, nexus >= 4.1, [NEXUS_FOUND=1],
+         [AC_MSG_CHECKING([whether NeXus is installed in a standard location])
+          if test -r /usr/local/include/napi.h; then
+            NEXUS_PREFIX="/usr/local"
+            AC_MSG_RESULT([${NEXUS_PREFIX}])
+         elif test -r /usr/local/nexus/include/napi.h; then
+           NEXUS_PREFIX="/usr/local/nexus"
+           AC_MSG_RESULT([${NEXUS_PREFIX}])
+         elif test -r /usr/include/napi.h; then
+           NEXUS_PREFIX="/usr"
+           AC_MSG_RESULT([${NEXUS_PREFIX}])
+         elif test -r /sw/nexus/include/napi.h; then
+           NEXUS_PREFIX="/sw/nexus"
+           AC_MSG_RESULT([${NEXUS_PREFIX}])
+         elif test -r /opt/local/nexus/include/napi.h; then
+           NEXUS_PREFIX="/opt/local/nexus"
+           AC_MSG_RESULT([${NEXUS_PREFIX}])
+         else
+           AC_MSG_RESULT([no])
+           AC_MSG_ERROR(
+           [NeXus not found. Please call configure with the --with-nexus option.
+           This tells configure where to find the NeXus headers,
+           e.g. --with-nexus=/usr/local/nexus]
+           )
+         fi
+        ]
+       )]
+    )
+    AC_SUBST(NEXUS_PREFIX)
+    if test "${NEXUS_FOUND}" != "1"; then
+      NEXUS_LIBS="-L${NEXUS_PREFIX}/lib -lNeXus"
+      NEXUS_CFLAGS="-I${NEXUS_PREFIX}/include"
+    fi
+    AC_SUBST(NEXUS_LIBS)
+    AC_SUBST(NEXUS_CFLAGS)
+
+    PNEXUS_ENABLED=1
+    ],
+    [PNEXUS_ENABLED=0]
+)
 
 dnl -----------------------------------------------
 dnl Ask user if BMWlibs should be built and where to find the CUBA installation
@@ -461,7 +610,7 @@ dnl -----------------------------------------------
 AC_ARG_ENABLE([ASlibs], [AC_HELP_STRING([--enable-ASlibs],[build optional AS plug-ins [default=no]])],[BUILD_AS_LIBS=1], [BUILD_AS_LIBS=0])
 
 dnl -----------------------------------------------
-dnl Set some paths and flags for PMusr, TLemRunHeader, Class_MuSR_PSI and mud
+dnl Set some paths and flags for PMusr, TLemRunHeader, Class_MuSR_PSI, mud, NeXus (if enabled), etc.
 dnl -----------------------------------------------
 
 SRCDIR="$(pwd)/src"
@@ -488,6 +637,15 @@ PMUSR_LIBS="${SRCDIR}/classes/lib${MUSR_LIBRARY_NAME}.la"
 PMUSR_CFLAGS="-I${SRCDIR}/include"
 AC_SUBST(PMUSR_LIBS)
 AC_SUBST(PMUSR_CFLAGS)
+
+if test "${PNEXUS_ENABLED}" = "1"; then
+  AC_DEFINE([PNEXUS_ENABLED], [1], [Define to 1 if NeXus is enabled])
+  PNEXUS_SRCDIR="${SRCDIR}/external/nexus"
+  PNEXUS_LIBS="${PNEXUS_SRCDIR}/lib${PNEXUS_LIBRARY_NAME}.la"
+  PNEXUS_CXXFLAGS="-I${PNEXUS_SRCDIR}"
+  AC_SUBST(PNEXUS_LIBS)
+  AC_SUBST(PNEXUS_CXXFLAGS)
+fi
 
 if test "${BUILD_BMW_LIBS}" = "1"; then
   BMWTOOLS_SRCDIR="${SRCDIR}/external/BMWtools"
@@ -550,6 +708,7 @@ LOCAL_BIN_CXXFLAGS="${CPUFLAGS} -Wall -Wno-trigraphs"
 LOCAL_LIB_CXXFLAGS="${LOCAL_BIN_CXXFLAGS}"
 LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS}"
 LOCAL_MUD_LIB_CFLAGS="${LOCAL_LIB_CXXFLAGS} ${USER_CFLAGS}"
+LOCAL_PNEXUS_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS}"
 LOCAL_CUBA_LIB_CFLAGS="${LOCAL_LIB_CXXFLAGS} ${CUBA_BUILD_CFLAGS}"
 LOCAL_BIN_LDFLAGS=
 LOCAL_LIB_LDFLAGS=
@@ -561,6 +720,7 @@ case "$host" in
     LOCAL_LIB_CXXFLAGS="${LOCAL_BIN_CXXFLAGS} -D_DLL"
     LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS} -D_WIN32GCC"
     LOCAL_MUD_LIB_CFLAGS="${LOCAL_LIB_CXXFLAGS} ${USER_CFLAGS}"
+    LOCAL_PNEXUS_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS}"
     LOCAL_CUBA_LIB_CFLAGS="${LOCAL_LIB_CXXFLAGS} ${CUBA_BUILD_CFLAGS}"
     LOCAL_BIN_LDFLAGS="${LOCAL_BIN_LDFLAGS} -Wl,--enable-auto-import -Wl,--enable-runtime-pseudo-reloc"
     LOCAL_LIB_LDFLAGS="-no-undefined ${LOCAL_BIN_LDFLAGS} -Wl,--export-all-symbols"
@@ -580,6 +740,7 @@ AC_SUBST(LOCAL_BIN_CXXFLAGS)
 AC_SUBST(LOCAL_LIB_CXXFLAGS)
 AC_SUBST(LOCAL_PSIBIN_LIB_CXXFLAGS)
 AC_SUBST(LOCAL_MUD_LIB_CFLAGS)
+AC_SUBST(LOCAL_PNEXUS_LIB_CXXFLAGS)
 AC_SUBST(LOCAL_CUBA_LIB_CFLAGS)
 AC_SUBST(LOCAL_BIN_LDFLAGS)
 AC_SUBST(LOCAL_LIB_LDFLAGS)
@@ -614,6 +775,7 @@ dnl -----------------------------------------------
 AM_CONDITIONAL([IS_DARWIN], [test "${ARCH}" = "DARWIN"])
 AM_CONDITIONAL([IS_CYGWIN], [test "${ARCH}" = "CYGWIN"])
 
+AM_CONDITIONAL([PNEXUS_ENABLED], [test "${PNEXUS_ENABLED}" = "1"])
 AM_CONDITIONAL([BUILD_CUBALIB], [test "${BUILD_CUBA}" = "1"])
 AM_CONDITIONAL([BUILD_BMWLIBS], [test "${BUILD_BMW_LIBS}" = "1"])
 AM_CONDITIONAL([BUILD_ASLIBS], [test "${BUILD_AS_LIBS}" = "1"])
@@ -631,6 +793,8 @@ AC_CONFIG_FILES([Makefile \
                  src/external/mud/Makefile \
                  src/external/mud/src/Makefile \
                  src/external/mud/src/mud.pc \
+                 src/external/nexus/Makefile \
+                 src/external/nexus/PNeXus.pc \
                  src/external/libCuba/Makefile \
                  src/external/libCuba/src/Makefile \
                  src/external/libCuba/src/cuba.pc \

@@ -3,6 +3,7 @@
 SUBDIRS = external/TLemRunHeader \
           external/MuSR_software \
           external/mud \
+	  external/nexus \
           classes \
           external
 
@@ -18,10 +19,10 @@ any2many_SOURCES = any2many.cpp
 xmldir = $(bindir)
 xml_DATA = musrfit_startup.xml
 
-LIBADD = $(PMUSR_LIBS) $(LEM_LIBS) $(PSIBIN_LIBS) $(MUD_LIBS)
+LIBADD = $(PMUSR_LIBS) $(LEM_LIBS) $(PSIBIN_LIBS) $(MUD_LIBS) $(PNEXUS_LIBS)
 
 AM_CXXFLAGS = $(LOCAL_BIN_CXXFLAGS)
 AM_LDFLAGS = $(LOCAL_BIN_LDFLAGS)
 INCLUDES = $(PMUSR_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(BOOST_CFLAGS) $(ROOT_CFLAGS)
-LIBS = $(PMUSR_LIBS) $(LEM_LIBS) $(PSIBIN_LIBS) $(MUD_LIBS) $(FFTW3_LIBS) $(GSL_LIBS) $(ROOT_LIBS)
+LIBS = $(PMUSR_LIBS) $(LEM_LIBS) $(PSIBIN_LIBS) $(MUD_LIBS) $(PNEXUS_LIBS) $(FFTW3_LIBS) $(GSL_LIBS) $(ROOT_LIBS)
 

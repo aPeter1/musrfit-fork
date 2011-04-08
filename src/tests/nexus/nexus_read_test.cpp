@@ -86,5 +86,8 @@ int main(int argc, char *argv[])
     }
   }
 
+  if (nxs_file)
+    delete nxs_file;
+
   return 0;
 }

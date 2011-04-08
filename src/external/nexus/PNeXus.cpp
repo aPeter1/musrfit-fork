@@ -670,6 +670,7 @@ int PNeXus::WriteFile(const char *fileName, const char *fileType)
   if (!ErrorHandler(NXputdata(fFileHandle, &idata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'switching_states'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
+
   // make group 'user'
   if (!ErrorHandler(NXmakegroup(fFileHandle, "user", "NXuser"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'user'.")) return NX_ERROR;
   // open group 'user'
@@ -935,19 +936,25 @@ int PNeXus::WriteFile(const char *fileName, const char *fileType)
   // write data 'grouping'
   int *grouping = new int[fData.fHisto.size()];
   vector<int> groupNo; // keep the number of different groupings
-  bool found;
-  groupNo.push_back(fData.fGrouping[0]);
-  for (unsigned int i=0; i<fData.fHisto.size(); i++) {
-    grouping[i] = fData.fGrouping[i];
-    found = false;
-    for (unsigned int j=0; j<groupNo.size(); j++) {
-      if ((int)fData.fGrouping[i] == groupNo[j]) {
-        found = true;
-        break;
+  if (fData.fHisto.size() == fData.fGrouping.size()) { // grouping vector seems to be properly defined
+    bool found;
+    groupNo.push_back(fData.fGrouping[0]);
+    for (unsigned int i=0; i<fData.fHisto.size(); i++) {
+      grouping[i] = fData.fGrouping[i];
+      found = false;
+      for (unsigned int j=0; j<groupNo.size(); j++) {
+        if ((int)fData.fGrouping[i] == groupNo[j]) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        groupNo.push_back(fData.fGrouping[i]);
       }
     }
-    if (!found) {
-      groupNo.push_back(fData.fGrouping[i]);
+  } else { // grouping vector not available
+    for (unsigned int i=0; i<fData.fHisto.size(); i++) {
+      grouping[i] = 0;
     }
   }
   size = fData.fHisto.size();
@@ -1136,19 +1143,13 @@ bool PNeXus::SetStartDate(const char *date)
  */
 bool PNeXus::SetStartDate(string date)
 {
-  if (date.length() != 10) {
-    fErrorCode = PNEXUS_WRONG_DATE_FORMAT;
-    fErrorMsg = "PNeXus::SetStartDate **ERROR** given date="+date+", is not of the required form yyyy-mm-dd!";
-    return false;
-  }
+  bool ok=false;
+  string str = TransformDate(date, ok);
 
-  if ((date[4] != '-') || (date[7] != '-')) {
-    fErrorCode = PNEXUS_WRONG_DATE_FORMAT;
-    fErrorMsg = "PNeXus::SetStartDate **ERROR** given date="+date+", is not of the required form yyyy-mm-dd!";
+  if (!ok)
     return false;
-  }
 
-  fStartDate = date;
+  fStartDate = str;
 
   return true;
 }
@@ -1234,19 +1235,13 @@ bool PNeXus::SetStopDate(const char *date)
  */
 bool PNeXus::SetStopDate(string date)
 {
-  if (date.length() != 10) {
-    fErrorCode = PNEXUS_WRONG_DATE_FORMAT;
-    fErrorMsg = "PNeXus::SetStopDate **ERROR** given date="+date+", is not of the required form yyyy-mm-dd!";
-    return false;
-  }
+  bool ok=false;
+  string str = TransformDate(date, ok);
 
-  if ((date[4] != '-') || (date[7] != '-')) {
-    fErrorCode = PNEXUS_WRONG_DATE_FORMAT;
-    fErrorMsg = "PNeXus::SetStopDate **ERROR** given date="+date+", is not of the required form yyyy-mm-dd!";
+  if (!ok)
     return false;
-  }
 
-  fStopDate = date;
+  fStopDate = str;
 
   return true;
 }
@@ -1331,43 +1326,43 @@ void PNeXus::Init()
 {
   fIsValid = false;
 
-  fFileName    = "";
+  fFileName    = "n/a";
   fFileHandle  = 0;
 
   fErrorMsg    = "No Data available!";
   fErrorCode   = -1;
 
   fIDFVersion  = -1;
-  fProgramName = "";
-  fProgramVersion = "";
+  fProgramName = "n/a";
+  fProgramVersion = "n/a";
 
   fRunNumber   = -1;
-  fRunTitle    = "";
-  fNotes       = "";
-  fAnalysisTag = "";
-  fLab         = "";
-  fBeamLine    = "";
-  fStartDate   = "";
-  fStartTime   = "";
-  fStopDate    = "";
-  fStopTime    = "";
+  fRunTitle    = "n/a";
+  fNotes       = "n/a";
+  fAnalysisTag = "n/a";
+  fLab         = "n/a";
+  fBeamLine    = "n/a";
+  fStartDate   = "n/a";
+  fStartTime   = "n/a";
+  fStopDate    = "n/a";
+  fStopTime    = "n/a";
 
   fSwitchingState = -1;
 
-  fSample.fEnvironment = "";
+  fSample.fEnvironment = "n/a";
   fSample.fMagneticField = 9.9e17;
-  fSample.fMagneticFieldUnit = "";
-  fSample.fMagneticFieldState = "";
-  fSample.fName = "";
-  fSample.fShape = "";
+  fSample.fMagneticFieldUnit = "n/a";
+  fSample.fMagneticFieldState = "n/a";
+  fSample.fName = "n/a";
+  fSample.fShape = "n/a";
   fSample.fTemperature = 9.9e17;
-  fSample.fTemperatureUnit = "";
+  fSample.fTemperatureUnit = "n/a";
 
-  fInstrument.name = "";
+  fInstrument.name = "n/a";
   fInstrument.detector.number = 0;
-  fInstrument.collimator.type = "";
+  fInstrument.collimator.type = "n/a";
   fInstrument.beam.total_counts = 0;
-  fInstrument.beam.total_counts_units = "";
+  fInstrument.beam.total_counts_units = "n/a";
 
   fData.fNumberOfHistos = 0;
   fData.fTimeResolution = 0.0;
@@ -1650,6 +1645,60 @@ NXstatus PNeXus::GetIntVectorData(vector<int> &data)
 }
 
 //-----------------------------------------------------------------------------------------------------
+// SetT0 (public)
+//-----------------------------------------------------------------------------------------------------
+/**
+ * <p>Sets t0. The current muSR NeXus implementation has only a single t0 for all detectors since it was
+ * tailored for pulsed muon sources (ISIS). This eventually needs to be changed.
+ *
+ * \param t0 to be set
+ * \param idx index of t0
+ */
+void PNeXus::SetT0(unsigned int t0, unsigned idx)
+{
+  if (idx >= fData.fT0.size())
+    fData.fT0.resize(idx+1);
+
+  fData.fT0[idx] = t0;
+}
+
+//-----------------------------------------------------------------------------------------------------
+// SetFirstGoodBin (public)
+//-----------------------------------------------------------------------------------------------------
+/**
+ * <p>Sets first good bin. The current muSR NeXus implementation has only a single first good bin for all detectors since it was
+ * tailored for pulsed muon sources (ISIS). This eventually needs to be changed.
+ *
+ * \param fgb first good bin to be set
+ * \param idx index of t0
+ */
+void PNeXus::SetFirstGoodBin(unsigned int fgb, unsigned int idx)
+{
+  if (idx >= fData.fFirstGoodBin.size())
+    fData.fFirstGoodBin.resize(idx+1);
+
+  fData.fFirstGoodBin[idx] = fgb;
+}
+
+//-----------------------------------------------------------------------------------------------------
+// SetLastGoodBin (public)
+//-----------------------------------------------------------------------------------------------------
+/**
+ * <p>Sets last good bin. The current muSR NeXus implementation has only a single last good bin for all detectors since it was
+ * tailored for pulsed muon sources (ISIS). This eventually needs to be changed.
+ *
+ * \param lgb to be set
+ * \param idx index of t0
+ */
+void PNeXus::SetLastGoodBin(unsigned int lgb, unsigned int idx)
+{
+  if (idx >= fData.fLastGoodBin.size())
+    fData.fLastGoodBin.resize(idx+1);
+
+  fData.fLastGoodBin[idx] = lgb;
+}
+
+//-----------------------------------------------------------------------------------------------------
 // SetHisto (public)
 //-----------------------------------------------------------------------------------------------------
 /**
@@ -1660,14 +1709,14 @@ NXstatus PNeXus::GetIntVectorData(vector<int> &data)
  */
 void PNeXus::SetHisto(unsigned int histoNo, vector<unsigned int> &data)
 {
-  if (histoNo > fData.fHisto.size())
+  if (histoNo >= fData.fHisto.size())
     fData.fHisto.resize(histoNo+1);
 
   fData.fHisto[histoNo] = data;
 }
 
 //-----------------------------------------------------------------------------------------------------
-// GroupHistoData (public)
+// GroupHistoData (private)
 //-----------------------------------------------------------------------------------------------------
 /**
  * <p>Feed the grouped histo data, based on the grouping vector and the raw histo data.
@@ -1730,3 +1779,161 @@ NXstatus PNeXus::GroupHistoData()
 
   return NX_OK;
 }
+
+//-----------------------------------------------------------------------------------------------------
+// TransformDate (private)
+//-----------------------------------------------------------------------------------------------------
+/**
+ * <p>Transformed a given date to the form yyyy-mm-dd if possible. Allowed input dates are yyyy-mm-dd,
+ * yy-mm-dd, yyyy-MMM-dd, or yy-MMM-dd, where mm is the month as number and MMM the month as string, e.g. APR
+ *
+ * <p><b>return:</b> transformed date
+ *
+ * \param date
+ * \param ok
+ */
+string PNeXus::TransformDate(string date, bool &ok)
+{
+  string result = date;
+  string str;
+  char cstr[128];
+  int status, yy, mm, dd;
+
+  ok = true;
+
+  switch(date.length()) {
+  case 8: // yy-mm-dd
+    if ((date[2] != '-') || (date[5] != '-')) {
+      ok = false;
+    } else {
+      status = sscanf(date.c_str(), "%d-%d-%d", &yy, &mm, &dd);
+      if (status != 3) {
+        ok = false;
+      } else {
+        if (yy >= 70) // i.e. 1970
+          result = "19"+date;
+        else // i.e. 20YY
+          result = "20"+date;
+      }
+    }
+    break;
+  case 9: // yy-MMM-dd
+    if ((date[2] != '-') || (date[6] != '-')) {
+      ok = false;
+    } else {
+      str = date.substr(0,2); // yy
+      status = sscanf(str.c_str(), "%d", &yy);
+      if (status != 1)
+        ok = false;
+      str = date.substr(3,3); // MMM
+      mm = GetMonth(str);
+      if (mm == 0)
+        ok = false;
+      str = date.substr(7,2); // dd
+      status = sscanf(str.c_str(), "%d", &dd);
+      if (status != 1)
+        ok = false;
+      if (ok) {
+        if (yy >= 70) // i.e. 1970
+          yy += 1900;
+        else
+          yy += 2000;
+        snprintf(cstr, sizeof(cstr), "%04d-%02d-%02d", yy, mm, dd);
+        result = cstr;
+      }
+    }
+    break;
+  case 10: // yyyy-mm-dd
+    if ((date[4] != '-') || (date[7] != '-')) {
+      ok = false;
+    } else {
+      status = sscanf(date.c_str(), "%04d-%02d-%02d", &yy, &mm, &dd);
+      if (status != 3) {
+        ok = false;
+      } else {
+        ok = true;
+      }
+    }
+    break;
+  case 11: // yyyy-MMM-dd
+    if ((date[4] != '-') || (date[8] != '-')) {
+      ok = false;
+    } else {
+      str = date.substr(0,4); // yyyy
+      status = sscanf(str.c_str(), "%d", &yy);
+      if (status != 1)
+        ok = false;
+      str = date.substr(5,3); // MMM
+      mm = GetMonth(str);
+      if (mm == 0)
+        ok = false;
+      str = date.substr(9,2); // dd
+      status = sscanf(str.c_str(), "%d", &dd);
+      if (status != 1)
+        ok = false;
+      if (ok) {
+        snprintf(cstr, sizeof(cstr), "%04d-%02d-%02d", yy, mm, dd);
+        result = cstr;
+      }
+    }
+    break;
+  default:
+    ok = false;
+    break;
+  }
+
+  if (!ok) {
+    fErrorCode = PNEXUS_WRONG_DATE_FORMAT;
+    fErrorMsg = "PNeXus::TransformDate **ERROR** given date="+date+", is not of any of the the required forms!";
+  }
+
+  return result;
+}
+
+//-----------------------------------------------------------------------------------------------------
+// GetMonth (private)
+//-----------------------------------------------------------------------------------------------------
+/**
+ * <p>For a month string MMM (e.g. APR) return the month number
+ *
+ * <p><b>return:</b> month number
+ *
+ * \param month string of the form MMM, e.g. APR
+ */
+int PNeXus::GetMonth(const string month)
+{
+  int result = 0;
+
+  if (!month.compare("jan") || !month.compare("Jan") || !month.compare("JAN"))
+    result = 1;
+  else if (!month.compare("feb") || !month.compare("Feb") || !month.compare("FEB"))
+    result = 2;
+  else if (!month.compare("mar") || !month.compare("Mar") || !month.compare("MAR"))
+    result = 3;
+  else if (!month.compare("apr") || !month.compare("Apr") || !month.compare("APR"))
+    result = 4;
+  else if (!month.compare("may") || !month.compare("May") || !month.compare("MAY"))
+    result = 5;
+  else if (!month.compare("jun") || !month.compare("Jun") || !month.compare("JUN"))
+    result = 6;
+  else if (!month.compare("jul") || !month.compare("Jul") || !month.compare("JUL"))
+    result = 7;
+  else if (!month.compare("aug") || !month.compare("Aug") || !month.compare("AUG"))
+    result = 8;
+  else if (!month.compare("sep") || !month.compare("Sep") || !month.compare("SEP"))
+    result = 9;
+  else if (!month.compare("oct") || !month.compare("Oct") || !month.compare("OCT"))
+    result = 10;
+  else if (!month.compare("nov") || !month.compare("Nov") || !month.compare("NOV"))
+    result = 11;
+  else if (!month.compare("dec") || !month.compare("Dec") || !month.compare("DEC"))
+    result = 12;
+  else
+    result = 0;
+
+  return result;
+}
+
+//-----------------------------------------------------------------------------------------------------
+// end
+//-----------------------------------------------------------------------------------------------------

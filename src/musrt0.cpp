@@ -85,7 +85,7 @@ Bool_t musrt0_item(TApplication &app, PMsrHandler *msrHandler, PMusrT0Data &data
 
   // check if the musrT0 object could be invoked
   if (musrT0 == 0) {
-    cerr << endl << ">> **ERROR** Couldn't invoke musrT0 ...";
+    cerr << endl << ">> musrt0 **ERROR** Couldn't invoke musrT0 ...";
     cerr << endl << ">> run name " << data.GetRawRunData(idx)->GetRunName()->Data();
     cerr << endl;
     return false;
@@ -93,7 +93,7 @@ Bool_t musrt0_item(TApplication &app, PMsrHandler *msrHandler, PMusrT0Data &data
 
   // check if the musrT0 object is valid
   if (!musrT0->IsValid()) {
-    cerr << endl << ">> **ERROR** invalid item found! (idx=" << idx << ")";
+    cerr << endl << ">> musrt0 **ERROR** invalid item found! (idx=" << idx << ")";
     cerr << endl;
     return false;
   }
@@ -214,7 +214,7 @@ Int_t main(Int_t argc, Char_t *argv[])
       break;
     case 2:
       if (strstr(argv[1], "--version")) {
-        cout << endl << "musrt0 version: $Id$";
+        cout << endl << ">> musrt0 version: $Id$";
         cout << endl << endl;
         return PMUSR_SUCCESS;
       } else if (strstr(argv[1], "--help")) {
@@ -222,7 +222,7 @@ Int_t main(Int_t argc, Char_t *argv[])
       } else {
         // check if filename has extension msr or mlog
         if (!strstr(argv[1], ".msr")) {
-          cerr << endl << "**ERROR** " << argv[1] << " is not a msr-file!" << endl;
+          cerr << endl << ">> musrt0 **ERROR** " << argv[1] << " is not a msr-file!" << endl;
           show_syntax = true;
         } else {
           strncpy(filename, argv[1], sizeof(filename));
@@ -232,7 +232,7 @@ Int_t main(Int_t argc, Char_t *argv[])
     case 3:
       // check if filename has extension msr or mlog
       if (!strstr(argv[1], ".msr")) {
-        cerr << endl << "**ERROR** " << argv[1] << " is not a msr-file!" << endl;
+        cerr << endl << ">> musrt0 **ERROR** " << argv[1] << " is not a msr-file!" << endl;
         show_syntax = true;
       } else {
         strncpy(filename, argv[1], sizeof(filename));
@@ -244,7 +244,7 @@ Int_t main(Int_t argc, Char_t *argv[])
     case 4:
       // check if filename has extension msr or mlog
       if (!strstr(argv[1], ".msr")) {
-        cerr << endl << "**ERROR** " << argv[1] << " is not a msr-file!" << endl;
+        cerr << endl << ">> musrt0 **ERROR** " << argv[1] << " is not a msr-file!" << endl;
         show_syntax = true;
       } else {
         strncpy(filename, argv[1], sizeof(filename));
@@ -256,11 +256,11 @@ Int_t main(Int_t argc, Char_t *argv[])
             firstGoodBinOffsetPresent = true;
             firstGoodBinOffset = dval;
           } else { // it is not a number
-            cerr << endl << "**ERROR** first good bin offset option found: '" << argv[3] << "', this is not a number." << endl;
+            cerr << endl << ">> musrt0 **ERROR** first good bin offset option found: '" << argv[3] << "', this is not a number." << endl;
             show_syntax = true;
           }
         } else {
-          cerr << endl << "**ERROR** found 4 input arguments, but missing the 'get prompt T0 from peak' option." << endl;
+          cerr << endl << ">> musrt0 **ERROR** found 4 input arguments, but missing the 'get prompt T0 from peak' option." << endl;
           show_syntax = true;
         }
       }
@@ -279,7 +279,7 @@ Int_t main(Int_t argc, Char_t *argv[])
   TSAXParser *saxParser = new TSAXParser();
   PStartupHandler *startupHandler = new PStartupHandler();
   if (!startupHandler->StartupFileFound()) {
-    cerr << endl << "**WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
+    cerr << endl << ">> musrt0 **WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
     cerr << endl;
     // clean up
     if (saxParser) {
@@ -296,7 +296,7 @@ Int_t main(Int_t argc, Char_t *argv[])
     status = saxParser->ParseFile(startup_path_name);
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**WARNING** reading/parsing musrfit_startup.xml.";
+      cerr << endl << ">> musrt0 **WARNING** reading/parsing musrfit_startup.xml.";
       cerr << endl;
       // clean up
       if (saxParser) {
@@ -316,7 +316,7 @@ Int_t main(Int_t argc, Char_t *argv[])
   if (status != PMUSR_SUCCESS) {
     switch (status) {
       case PMUSR_MSR_FILE_NOT_FOUND:
-        cout << endl << "**ERROR** couldn't find '" << filename << "'" << endl << endl;
+        cout << endl << ">> musrt0 **ERROR** couldn't find '" << filename << "'" << endl << endl;
         break;
       case PMUSR_MSR_SYNTAX_ERROR:
         cout << endl << "**SYNTAX ERROR** in file " << filename << ", full stop here." << endl << endl;
@@ -333,7 +333,7 @@ Int_t main(Int_t argc, Char_t *argv[])
   PMsrRunList *runList = msrHandler->GetMsrRunList();
   for (UInt_t i=0; i<runList->size(); i++) {
     if (runList->at(i).GetFitType() == MSR_FITTYPE_NON_MUSR) {
-      cout << endl << "**ERROR** t0 setting for NonMusr fittype doesn't make any sense, will quit ..." << endl;
+      cout << endl << ">> musrt0 **ERROR** t0 setting for NonMusr fittype doesn't make any sense, will quit ..." << endl;
       success = false;
       break;
     }
@@ -349,12 +349,11 @@ Int_t main(Int_t argc, Char_t *argv[])
 
     success = dataHandler->IsAllDataAvailable();
     if (!success) {
-      cout << endl << "**ERROR** Couldn't read all data files, will quit ..." << endl;
+      cout << endl << ">> musrt0 **ERROR** Couldn't read all data files, will quit ..." << endl;
     }
   }
 
   if (getT0FromPromptPeak) {
-    cout << endl << "debug> in get T0 from peak: firstGoodBinOffset = " << firstGoodBinOffset << endl;
 
     Int_t  histoNo = -1;
     UInt_t t0Bin = 0;

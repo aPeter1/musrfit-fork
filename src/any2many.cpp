@@ -87,7 +87,7 @@ void any2many_syntax()
   cout << endl << "                (without extension) of the compressed data collection, and";
   cout << endl << "                'g' will result in .tar.gz, and 'b' in .tar.bz2 files.";
   cout << endl;
-  cout << endl << "          If the output option '-o' is missing, the output file name will be";
+  cout << endl << "          If the template option '-t' is absent, the output file name will be";
   cout << endl << "          generated according to the input data file name, and the output data";
   cout << endl << "          format.";
   cout << endl;
@@ -106,11 +106,15 @@ void any2many_syntax()
   cout << endl << "      Will take the runs 100 through 117 and convert the PSI-MDU input files to";
   cout << endl << "      ASCII output and instead of saving them into a file, they will be spit to";
   cout << endl << "      the standard output." << endl;
-  cout << endl << "  any2many -r 100-117 -c NEXUS ROOT -t d[yyyy]/psi_gps_[rrrr].nexus \\";
+  cout << endl << "  any2many -r 100-117 -c NEXUS ROOT -t d[yyyy]/psi_gps_[rrrr].NXS \\";
   cout << endl << "      psi_[yyyy]_gps_[rrrr].root -z b psi_gps_run_100to117";
   cout << endl << "      Will take the runs 100 through 117 and convert the PSI-NEXUS input files";
   cout << endl << "      to ROOT output. Afterwards these new files will be collected in a";
   cout << endl << "      compressed archive psi_gps_run_100to117.tar.bz2." << endl;
+  cout << endl << "  any2many -f 2010/lem10_his_0123.root 2010/lem10_his_0012.root -c ROOT ROOT -rebin 25";
+  cout << endl << "      Will read the two files '2010/lem10_his_0123.root' and '2010/lem10_his_0012.root',";
+  cout << endl << "      rebin them with 25 and export them as LEM ROOT files with adding rebin25 to the";
+  cout << endl << "      name, e.g. 2010/lem10_his_0123_rebin25.root";
   cout << endl << endl;
 }
 
@@ -398,33 +402,16 @@ int main(int argc, char *argv[])
     show_syntax = true;
   }
 
-cout << endl << "debug> info.year='" << info.year << "', info.year.length()=" << info.year.Length();
-cout << endl << "debug> info.useStandardOutput=" << info.useStandardOutput;
-cout << endl << "debug> info.inFormat=" << info.inFormat;
-cout << endl << "debug> info.outFormat=" << info.outFormat;
-cout << endl << "debug> info.runList=";
-for (unsigned int i=0; i<info.runList.size(); i++)
-  cout << info.runList[i] << ", ";
-cout << endl << "debug> info.outPath=" << info.outPath;
-cout << endl << "debug> info.rebin=" << info.rebin;
-cout << endl << "debug> info.inTemplate=" << info.inTemplate;
-cout << endl << "debug> info.outTemplate=" << info.outTemplate;
-cout << endl << "debug> info.compressionTag=" << info.compressionTag;
-cout << endl << "debug> info.compressFileName=" << info.compressFileName;
-cout << endl << "debug> info.inFileName=";
-for (unsigned int i=0; i<info.inFileName.size(); i++)
-  cout << info.inFileName[i] << ", ";
-cout << endl;
-
   if (show_syntax) {
     info.runList.clear();
     any2many_syntax();
     return PMUSR_WRONG_STARTUP_SYNTAX;
   }
 
-  if (!info.inFormat.CompareTo(info.outFormat, TString::kIgnoreCase)) {
+  if (!info.inFormat.CompareTo(info.outFormat, TString::kIgnoreCase) && (info.rebin == 1)) {
     info.runList.clear();
-    cout << endl << "**INFO** since input data format == output data format, I will not do anything." << endl;
+    cout << endl << ">> any2many **ERROR** input data format == output data format, only allowed if rebin != 1.";
+    cout << endl << "            will ignore the request." << endl << endl;
     return PMUSR_SUCCESS;
   }
 
@@ -433,7 +420,7 @@ cout << endl;
   TSAXParser *saxParser = new TSAXParser();
   PStartupHandler *startupHandler = new PStartupHandler();
   if (!startupHandler->StartupFileFound()) {
-    cerr << endl << "**WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
+    cerr << endl << ">> any2many **WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
     cerr << endl;
     // clean up
     if (saxParser) {
@@ -450,7 +437,7 @@ cout << endl;
     status = saxParser->ParseFile(startup_path_name);
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**WARNING** reading/parsing musrfit_startup.xml.";
+      cerr << endl << ">> any2many **WARNING** reading/parsing musrfit_startup.xml.";
       cerr << endl;
       // clean up
       if (saxParser) {

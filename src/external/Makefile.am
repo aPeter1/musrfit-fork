@@ -1,5 +1,9 @@
 ## $Id$
 
+if PNEXUS_ENABLED
+  PNEXUSDIRS = nexus
+endif
+
 if BUILD_ASLIBS
   ASDIRS = Nonlocal \
            MagProximity
@@ -17,4 +21,4 @@ if BUILD_BMWLIBS
             libCalcMeanFieldsLEM
 endif
 
-SUBDIRS = $(ASDIRS) $(CUBADIRS) $(BMWDIRS)
+SUBDIRS = $(PNEXUSDIR) $(ASDIRS) $(CUBADIRS) $(BMWDIRS)
