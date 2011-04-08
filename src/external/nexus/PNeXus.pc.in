@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: PNeXus
+Description: C++ shared library as muSR NeXus interface
+Version: @PNEXUS_VERSION@
+Libs: -L${libdir} -l@PNEXUS_LIBRARY_NAME@
+Cflags: -I${includedir}
