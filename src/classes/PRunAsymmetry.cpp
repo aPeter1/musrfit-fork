@@ -554,6 +554,7 @@ Bool_t PRunAsymmetry::PrepareData()
       }
     }
   }
+
   // group histograms, add all the backward histograms to the one with backwardHistoNo[0]
   for (UInt_t i=1; i<backwardHistoNo.size(); i++) {
     for (UInt_t j=0; j<runData->GetDataBin(backwardHistoNo[i])->size(); j++) {
@@ -634,10 +635,19 @@ Bool_t PRunAsymmetry::PrepareData()
  */
 Bool_t PRunAsymmetry::SubtractFixBkg()
 {  
+  Double_t dval;
   for (UInt_t i=0; i<fForward.size(); i++) {
-    fForwardErr.push_back(TMath::Sqrt(fForward[i]+fRunInfo->GetBkgFix(0) * fTimeResolution * 1.0e3));
+    if (fForward[i] != 0.0)
+      dval = TMath::Sqrt(fForward[i]);
+    else
+      dval = 1.0;
+    fForwardErr.push_back(dval);
     fForward[i] -= fRunInfo->GetBkgFix(0) * fTimeResolution * 1.0e3; // bkg per ns -> bkg per bin; 1.0e3: us -> ns
-    fBackwardErr.push_back(TMath::Sqrt(fBackward[i]+fRunInfo->GetBkgFix(1) * fTimeResolution * 1.0e3));
+    if (fBackward[i] != 0.0)
+      dval = TMath::Sqrt(fBackward[i]);
+    else
+      dval = 1.0;
+    fBackwardErr.push_back(dval);
     fBackward[i] -= fRunInfo->GetBkgFix(1) * fTimeResolution * 1.0e3; // bkg per ns -> bkg per bin; 1.0e3: us -> ns
   }
   
