@@ -490,6 +490,7 @@ Double_t PFunction::EvalNode(PFuncTreeNode &node)
       Double_t denominator = EvalNode(node.children[1]);
       if (denominator == 0.0) {
         cerr << endl << "**PANIC ERROR**: PFunction::EvalNode: division by 0.0";
+        cerr << endl << "**PANIC ERROR**: PFunction::EvalNode: requested operation: " << EvalNode(node.children[0]) << "/" << EvalNode(node.children[1]);
         cerr << endl;
         assert(0);
       }

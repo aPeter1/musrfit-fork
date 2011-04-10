@@ -167,6 +167,39 @@ private:
 };
 
 /**
+ * <p>Class implementing the musrfit user function interface for calculating muon-spin depolarization functions
+ * originating from the spatial field distribution B(x,y) within a 2D triangular vortex lattice
+ * calculated using an analytical Ginzburg-Landau approximation for very small applied fields
+ */
+class TBulkTriVortexAGLII : public PUserFcnBase {
+
+public:
+  TBulkTriVortexAGLII();
+  ~TBulkTriVortexAGLII();
+
+  virtual Bool_t NeedGlobalPart() const { return false; }
+  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual Bool_t GlobalPartIsValid() const { return true; }
+
+  double operator()(double, const vector<double>&) const;
+
+private:
+  mutable vector<double> fPar; ///< parameters of the model
+  TBulkTriVortexAGLIIFieldCalc *fVortex; ///< spatial field distribution B(x,y) within the vortex lattice
+  TPofBCalc *fPofB; ///< static field distribution P(B)
+  TPofTCalc *fPofT; ///< muon spin polarization p(t)
+  mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
+  mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
+  mutable vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
+  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  string fWisdom; ///< file name of the FFTW wisdom file
+  unsigned int fGridSteps; ///< number of points in x- and y-direction for which B(x,y) is calculated
+
+  ClassDef(TBulkTriVortexAGLII,1)
+};
+
+/**
  * <p>Class implementing the musrfit user function interface for calculating muon spin depolarization functions
  * originating from the spatial field distribution B(x,y) within a 2D triangular vortex lattice
  * calculated using the iterative minimization of the Ginzburg-Landau free energy after E.H. Brandt

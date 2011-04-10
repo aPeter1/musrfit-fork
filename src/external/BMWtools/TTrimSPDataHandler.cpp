@@ -119,9 +119,22 @@ TTrimSPData::TTrimSPData(const string &path, map<double, string> &energies, bool
   fEnergyIter = fEnergy.end();
 }
 
+// Method checking if an implantation profile is available for a given energy
+// The behavior is the similar to the find-algorithm but more robust (tiny deviations in the energies are allowed).
+// If the given energy is found the methods sets the internal energy iterator to the element of the energy vector.
+// If it is not found the energy iterator will point to the end() of the energy vector.
+
+void TTrimSPData::FindEnergy(double e) const {
+  for(fEnergyIter = fEnergy.begin(); fEnergyIter != fEnergy.end(); ++fEnergyIter) {
+    if(fabs(*fEnergyIter - e) < 0.05)
+      return;
+  }
+  return;
+}
+
 void TTrimSPData::UseHighResolution(double e) {
 
-  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+  FindEnergy(e);
 
   if(fEnergyIter != fEnergy.end()) {
     unsigned int i(fEnergyIter - fEnergy.begin());
@@ -149,7 +162,7 @@ void TTrimSPData::UseHighResolution(double e) {
 
 vector<double> TTrimSPData::DataZ(double e) const {
 
-  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+  FindEnergy(e);
 
   if(fEnergyIter != fEnergy.end()) {
     unsigned int i(fEnergyIter - fEnergy.begin());
@@ -167,7 +180,7 @@ vector<double> TTrimSPData::DataZ(double e) const {
 
 vector<double> TTrimSPData::DataNZ(double e) const {
 
-  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+  FindEnergy(e);
 
   if(fEnergyIter != fEnergy.end()) {
     unsigned int i(fEnergyIter - fEnergy.begin());
@@ -185,7 +198,7 @@ vector<double> TTrimSPData::DataNZ(double e) const {
 
 vector<double> TTrimSPData::OrigDataNZ(double e) const {
 
-  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+  FindEnergy(e);
 
   if(fEnergyIter != fEnergy.end()) {
     unsigned int i(fEnergyIter - fEnergy.begin());
@@ -199,7 +212,7 @@ vector<double> TTrimSPData::OrigDataNZ(double e) const {
 
 double TTrimSPData::DataDZ(double e) const {
 
-  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+  FindEnergy(e);
 
   if(fEnergyIter != fEnergy.end()) {
     unsigned int i(fEnergyIter - fEnergy.begin());
@@ -223,9 +236,9 @@ double TTrimSPData::LayerFraction(double e, unsigned int layno, const vector<dou
     return 0.0;
   }
 
-  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+  FindEnergy(e);
 
-  if(fEnergyIter != fEnergy.end()) {
+  if (fEnergyIter != fEnergy.end()) {
     unsigned int i(fEnergyIter - fEnergy.begin());
     // Because we do not know if the implantation profile is normalized or not, do not care about this and calculate the fraction from the beginning
     // Total "number of muons"
@@ -253,7 +266,7 @@ double TTrimSPData::LayerFraction(double e, unsigned int layno, const vector<dou
   }
 
   // default
-  cout << "TTrimSPData::LayerFraction: No implantation profile available for the specified energy... Returning 0.0" << endl;
+  cout << "TTrimSPData::LayerFraction: No implantation profile available for the specified energy " << e << " keV... Returning 0.0" << endl;
   return 0.0;
 
 }
@@ -294,7 +307,7 @@ void TTrimSPData::WeightLayers(double e, const vector<double>& interface, const 
     }
   }
 
-  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+  FindEnergy(e);
 
   // If all weights are equal to one, use the original n(z) vector
   for(unsigned int i(0); i<weight.size(); i++) {
@@ -341,14 +354,14 @@ double TTrimSPData::GetNofZ(double zz, double e) const {
 
   vector<double> z, nz;
 
-  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+  FindEnergy(e);
 
   if(fEnergyIter != fEnergy.end()) {
     unsigned int i(fEnergyIter - fEnergy.begin());
     z = fDataZ[i];
     nz = fDataNZ[i];
   } else {
-      cout << "TTrimSPData::GetNofZ: No implantation profile available for the specified energy... Quitting!" << endl;
+      cout << "TTrimSPData::GetNofZ: No implantation profile available for the specified energy " << e << " keV... Quitting!" << endl;
       exit(-1);
   }
 
@@ -379,7 +392,7 @@ double TTrimSPData::GetNofZ(double zz, double e) const {
 
 void TTrimSPData::Normalize(double e) const {
 
-  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+  FindEnergy(e);
 
   if(fEnergyIter != fEnergy.end()) {
     unsigned int i(fEnergyIter - fEnergy.begin());
@@ -404,7 +417,7 @@ void TTrimSPData::Normalize(double e) const {
 //---------------------
 
 bool TTrimSPData::IsNormalized(double e) const {
-  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+  FindEnergy(e);
 
   if(fEnergyIter != fEnergy.end()) {
     unsigned int i(fEnergyIter - fEnergy.begin());
@@ -420,7 +433,7 @@ bool TTrimSPData::IsNormalized(double e) const {
 //---------------------
 
 double TTrimSPData::MeanRange(double e) const {
-  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+  FindEnergy(e);
 
   if(fEnergyIter != fEnergy.end()) {
     unsigned int i(fEnergyIter - fEnergy.begin());
@@ -444,7 +457,7 @@ double TTrimSPData::MeanRange(double e) const {
 
 double TTrimSPData::PeakRange(double e) const {
 
-  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+  FindEnergy(e);
 
   if(fEnergyIter != fEnergy.end()) {
     unsigned int i(fEnergyIter - fEnergy.begin());
@@ -476,7 +489,7 @@ void TTrimSPData::ConvolveGss(double w, double e) const {
   vector<double> z, nz, gss;
   double nn;
 
-  fEnergyIter = find(fEnergy.begin(), fEnergy.end(), e);
+  FindEnergy(e);
 
   if(fEnergyIter != fEnergy.end()) {
     unsigned int i(fEnergyIter - fEnergy.begin());

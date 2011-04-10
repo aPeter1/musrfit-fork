@@ -168,6 +168,22 @@ public:
 
 /**
  * <p>Class for the calculation of the spatial field distribution B(x,y) within a 2D triangular vortex lattice
+ * using an analytical Ginzburg-Landau approximation for tiny applied fields
+ */
+class TBulkTriVortexAGLIIFieldCalc : public TBulkVortexFieldCalc {
+
+public:
+
+  TBulkTriVortexAGLIIFieldCalc(const string&, const unsigned int steps = 256);
+  ~TBulkTriVortexAGLIIFieldCalc() {}
+
+  void CalculateGrid() const;
+  bool IsTriangular() const {return true;}
+
+};
+
+/**
+ * <p>Class for the calculation of the spatial field distribution B(x,y) within a 2D triangular vortex lattice
  * using the analytical Ginzburg-Landau approximation for an anisotropic superconductor with the field applied 
  * along one of the principal axes
  */

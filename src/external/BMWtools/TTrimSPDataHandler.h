@@ -70,6 +70,8 @@ public:
   double PeakRange(double) const;
 
 private:
+  void FindEnergy(double) const;
+
   vector<double> fEnergy; ///< vector holding all available muon energies
   vector<double> fDZ; ///< vector holding the spatial resolution of the TRIM.SP output for all energies
   vector< vector<double> > fDataZ; ///< discrete points in real space for which n(z) has been calculated for all energies

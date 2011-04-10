@@ -415,9 +415,12 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
   histoDataPPC.clear();
   fakeHisto = 0;
 
+  histoFolder->Clear();
   delete histoFolder; histoFolder = 0;
+  decayAnaModule->Clear();
   delete decayAnaModule; decayAnaModule = 0;
 
+  runInfoFolder->Clear();
   delete runInfoFolder; runInfoFolder = 0;
   delete runHeader; runHeader = 0;
 

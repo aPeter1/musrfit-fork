@@ -1433,6 +1433,7 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
   fValid = true;
 
   fMainCanvas->cd();
+
   fMainCanvas->Show();
 
   fMainCanvas->Connect("ProcessedEvent(Int_t,Int_t,Int_t,TObject*)", "PMusrCanvas", 
@@ -4437,10 +4438,10 @@ void PMusrCanvas::SaveDataAscii()
             break;
           case PV_FOURIER_PWR:
             // get current x-range
-            xminBin = fData[0].dataFourierPwr->GetXaxis()->GetFirst(); // first bin of the zoomed range
-            xmaxBin = fData[0].dataFourierPwr->GetXaxis()->GetLast();  // last bin of the zoomed range
-            xmin = fData[0].dataFourierPwr->GetXaxis()->GetBinCenter(xminBin);
-            xmax = fData[0].dataFourierPwr->GetXaxis()->GetBinCenter(xmaxBin);
+            xminBin = fData[0].diffFourierPwr->GetXaxis()->GetFirst(); // first bin of the zoomed range
+            xmaxBin = fData[0].diffFourierPwr->GetXaxis()->GetLast();  // last bin of the zoomed range
+            xmin = fData[0].diffFourierPwr->GetXaxis()->GetBinCenter(xminBin);
+            xmax = fData[0].diffFourierPwr->GetXaxis()->GetBinCenter(xmaxBin);
 
             // fill ascii dump data
             for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
@@ -4452,13 +4453,13 @@ void PMusrCanvas::SaveDataAscii()
               dump.theory.clear();
 
               // go through all data bins
-              for (Int_t j=1; j<fData[i].dataFourierPwr->GetNbinsX(); j++) {
+              for (Int_t j=1; j<fData[i].diffFourierPwr->GetNbinsX(); j++) {
                 // get frequency
-                freq = fData[i].dataFourierPwr->GetBinCenter(j);
+                freq = fData[i].diffFourierPwr->GetBinCenter(j);
                 // check if time is in the current range
                 if ((freq >= xmin) && (freq <= xmax)) {
                   dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].dataFourierPwr->GetBinContent(j));
+                  dump.data.push_back(fData[i].diffFourierPwr->GetBinContent(j));
                 }
               }
 
@@ -4469,10 +4470,10 @@ void PMusrCanvas::SaveDataAscii()
             break;
           case PV_FOURIER_PHASE:
             // get current x-range
-            xminBin = fData[0].dataFourierPhase->GetXaxis()->GetFirst(); // first bin of the zoomed range
-            xmaxBin = fData[0].dataFourierPhase->GetXaxis()->GetLast();  // last bin of the zoomed range
-            xmin = fData[0].dataFourierPhase->GetXaxis()->GetBinCenter(xminBin);
-            xmax = fData[0].dataFourierPhase->GetXaxis()->GetBinCenter(xmaxBin);
+            xminBin = fData[0].diffFourierPhase->GetXaxis()->GetFirst(); // first bin of the zoomed range
+            xmaxBin = fData[0].diffFourierPhase->GetXaxis()->GetLast();  // last bin of the zoomed range
+            xmin = fData[0].diffFourierPhase->GetXaxis()->GetBinCenter(xminBin);
+            xmax = fData[0].diffFourierPhase->GetXaxis()->GetBinCenter(xmaxBin);
 
             // fill ascii dump data
             for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
@@ -4484,13 +4485,13 @@ void PMusrCanvas::SaveDataAscii()
               dump.theory.clear();
 
               // go through all data bins
-              for (Int_t j=1; j<fData[i].dataFourierPhase->GetNbinsX(); j++) {
+              for (Int_t j=1; j<fData[i].diffFourierPhase->GetNbinsX(); j++) {
                 // get frequency
-                freq = fData[i].dataFourierPhase->GetBinCenter(j);
+                freq = fData[i].diffFourierPhase->GetBinCenter(j);
                 // check if time is in the current range
                 if ((freq >= xmin) && (freq <= xmax)) {
                   dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].dataFourierPhase->GetBinContent(j));
+                  dump.data.push_back(fData[i].diffFourierPhase->GetBinContent(j));
                 }
               }
 
@@ -5005,8 +5006,18 @@ void PMusrCanvas::SaveDataAscii()
         fout << "freq" << dumpVector.size()/2-1 << ", F_diffIm" << dumpVector.size()/2-1 << endl;
         break;
       case PV_FOURIER_PWR:
+        fout << "% ";
+        for (UInt_t i=0; i<dumpVector.size()-1; i++) {
+          fout << "freq" << i << ", F_diffPwr" << i << ", ";
+        }
+        fout << "freq" << dumpVector.size()-1 << ", F_diffPwr" << dumpVector.size()-1 << endl;
         break;
       case PV_FOURIER_PHASE:
+        fout << "% ";
+        for (UInt_t i=0; i<dumpVector.size()-1; i++) {
+          fout << "freq" << i << ", F_diffPhase" << i << ", ";
+        }
+        fout << "freq" << dumpVector.size()-1 << ", F_diffPhase" << dumpVector.size()-1 << endl;
         break;
       default:
         break;

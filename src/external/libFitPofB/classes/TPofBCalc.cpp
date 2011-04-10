@@ -153,6 +153,23 @@ void TPofBCalc::Normalize(unsigned int minFilledIndex = 0, unsigned int maxFille
       fPB[i] /= pBsum;
 }
 
+// Do not actually calculate P(B) but take it from a B and a P(B) vector of the same size
+
+void TPofBCalc::SetPB(const vector<double> &pb) const {
+  assert(fPBSize == pb.size());
+
+  int i;
+  #ifdef HAVE_GOMP
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  #endif
+  for (i = 0; i < static_cast<int>(fPBSize); ++i) {
+    fPB[i] = pb[i];
+  }
+
+  fPBExists = true;
+  return;
+}
+
 void TPofBCalc::Calculate(const string &type, const vector<double> &para) {
 
   if (type == "skg"){ // skewed Gaussian
@@ -659,7 +676,7 @@ void TPofBCalc::ConvolveGss(double w) {
 
   TBin = 1.0/(gBar*static_cast<double>(NFFT-1)*fDB);
 
-  FFTout = new fftw_complex[NFFT/2 + 1]; //(fftw_complex *)fftw_malloc(sizeof(fftw_complex) * (NFFT/2+1));
+  FFTout = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * (NFFT/2+1));//new fftw_complex[NFFT/2 + 1];
 
   // do the FFT to time domain
 
@@ -674,10 +691,10 @@ void TPofBCalc::ConvolveGss(double w) {
 
   int i;
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(GssInTimeDomain, i) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(i, GssInTimeDomain) schedule(dynamic)
   #endif
   for (i = 0; i < static_cast<int>(NFFT/2+1); ++i) {
-    GssInTimeDomain = exp(expo*static_cast<double>(i*i));
+    GssInTimeDomain = exp(expo*static_cast<double>(i)*static_cast<double>(i));
     FFTout[i][0] *= GssInTimeDomain;
     FFTout[i][1] *= GssInTimeDomain;
   }
@@ -692,8 +709,7 @@ void TPofBCalc::ConvolveGss(double w) {
 
   fftw_destroy_plan(FFTplanToTimeDomain);
   fftw_destroy_plan(FFTplanToFieldDomain);
-  delete[] FFTout; //  fftw_free(FFTout);
-  FFTout = 0;
+  fftw_free(FFTout);//delete[] FFTout; FFTout = 0;
 //  fftw_cleanup();
 
   // normalize p(B)

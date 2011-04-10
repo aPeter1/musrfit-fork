@@ -39,6 +39,7 @@
 #pragma link C++ class TBulkSqVortexLondon+;
 #pragma link C++ class TBulkTriVortexML+;
 #pragma link C++ class TBulkTriVortexAGL+;
+#pragma link C++ class TBulkTriVortexAGLII+;
 #pragma link C++ class TBulkTriVortexNGL+;
 #pragma link C++ class TBulkAnisotropicTriVortexLondon+;
 #pragma link C++ class TBulkAnisotropicTriVortexLondonGlobal+;

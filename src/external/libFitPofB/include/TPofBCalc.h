@@ -64,6 +64,7 @@ public:
   double GetBmin() const {return fBmin;}
   double GetBmax() const {return fBmax;}
   unsigned int GetPBSize() const {return fPBSize;}
+  void SetPB(const vector<double>&) const;
   void ConvolveGss(double);
   void AddBackground(double, double, double);
   double GetFirstMoment() const;
