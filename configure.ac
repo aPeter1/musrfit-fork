@@ -382,24 +382,27 @@ AC_ARG_ENABLE([NeXus], [AC_HELP_STRING([--enable-NeXus], [build optional NeXus s
          if test -r /usr/local/include/hdf.h; then
             HDF4_PREFIX="/usr/local"
             AC_MSG_RESULT([${HDF4_PREFIX}])
-         elif test -r /usr/local/hdf4/include/hdf.h; then
-           HDF4_PREFIX="/usr/local/hdf4"
+         elif test -r /usr/local/hdf/include/hdf.h; then
+           HDF4_PREFIX="/usr/local/hdf"
            AC_MSG_RESULT([${HDF4_PREFIX}])
          elif test -r /usr/include/hdf.h; then
            HDF4_PREFIX="/usr"
            AC_MSG_RESULT([${HDF4_PREFIX}])
-         elif test -r /sw/hdf4/include/hdf.h; then
-           HDF4_PREFIX="/sw/hdf4"
+         elif test -r /usr/include/hdf/hdf.h; then
+           HDF4_PREFIX="/usr/include/"
            AC_MSG_RESULT([${HDF4_PREFIX}])
-         elif test -r /opt/hdf4/include/hdf.h; then
-           HDF4_PREFIX="/opt/hdf4"
+         elif test -r /sw/hdf/include/hdf.h; then
+           HDF4_PREFIX="/sw/hdf"
+           AC_MSG_RESULT([${HDF4_PREFIX}])
+         elif test -r /opt/hdf/include/hdf.h; then
+           HDF4_PREFIX="/opt/hdf"
            AC_MSG_RESULT([${HDF4_PREFIX}])
          else
            AC_MSG_RESULT([no])
            AC_MSG_ERROR(
            [HDF4 not found (needed for NeXus). Please call configure with the --with-hdf4 option.
            This tells configure where to find the HDF4 C++ headers,
-           e.g. --with-hdf4=/usr/local/hdf4]
+           e.g. --with-hdf4=/usr/local/hdf]
            )
          fi 
         ]
