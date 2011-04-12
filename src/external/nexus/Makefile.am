@@ -17,7 +17,7 @@ CLEANFILES = *~ core
 
 lib_LTLIBRARIES = libPNeXus.la
 
-libPNeXus_la_SOURCES = $(h_sources) $(cpp_sources) 
+libPNeXus_la_SOURCES = $(h_sources) $(cpp_sources)
 libPNeXus_la_LIBADD = $(NEXUS_LIBS)
 libPNeXus_la_LDFLAGS = -version-info $(PNEXUS_LIBRARY_VERSION) -release $(PNEXUS_RELEASE) $(AM_LDFLAGS)
 

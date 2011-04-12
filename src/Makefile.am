@@ -1,9 +1,13 @@
 ## Process this file with automake to create Makefile.in
 
+if PNEXUS_ENABLED
+  PNEXUSDIRS = external/nexus
+endif
+
 SUBDIRS = external/TLemRunHeader \
           external/MuSR_software \
           external/mud \
-	  external/nexus \
+          $(PNEXUSDIRS) \
           classes \
           external
 
