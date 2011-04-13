@@ -39,7 +39,7 @@ CLEANFILES = *Dict.cpp *Dict.h *~ core
 lib_LTLIBRARIES = libPMagProximityFitter.la
 
 libPMagProximityFitter_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources)
-libPMagProximityFitter_la_LIBADD = $(PMUSR_LIBS) $(FFTW3_LIBS) $(ROOT_LIBS)
+libPMagProximityFitter_la_LIBADD = $(FFTW3_LIBS) $(ROOT_LIBS)
 libPMagProximityFitter_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(PLUGIN_RELEASE) $(AM_LDFLAGS)
 
 ## For the moment do not build pkgconfig files for musrfit plug-ins...

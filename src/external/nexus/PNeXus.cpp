@@ -290,7 +290,7 @@ int PNeXus::ReadFile(const char *fileName)
   // read 'magnetic_field_vector' and 'coordinate_system' attribute
   if (!ErrorHandler(NXopendata(fFileHandle, "magnetic_field_vector"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'magnetic_field_vector' data in sample group!")) return NX_ERROR;
   int attLen = SIZE_INT32, attType = NX_INT32;
-  if (!ErrorHandler(NXgetattr(fFileHandle, "available", &fSample.fMagneticFieldVectorAvailable, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'magnetic_field_vector available' data in sample group!")) return NX_ERROR;
+  if (!ErrorHandler(NXgetattr(fFileHandle, const_cast<char*>("available"), &fSample.fMagneticFieldVectorAvailable, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'magnetic_field_vector available' data in sample group!")) return NX_ERROR;
   if (fSample.fMagneticFieldVectorAvailable) {
     if (!ErrorHandler(GetDoubleVectorData(fSample.fMagneticFieldVector), PNEXUS_GET_DATA_ERROR, "couldn't get 'magnetic_field_vector' data!")) return NX_ERROR;
   }
@@ -375,29 +375,29 @@ int PNeXus::ReadFile(const char *fileName)
   // get number of histos
   attLen = SIZE_INT32;
   attType = NX_INT32;
-  if (!ErrorHandler(NXgetattr(fFileHandle, "number", &fData.fNumberOfHistos, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'number' data in histogram_data_1 group!")) return NX_ERROR;
+  if (!ErrorHandler(NXgetattr(fFileHandle, const_cast<char*>("number"), &fData.fNumberOfHistos, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'number' data in histogram_data_1 group!")) return NX_ERROR;
 
   // get histo length
   attLen = SIZE_INT32;
   attType = NX_INT32;
-  if (!ErrorHandler(NXgetattr(fFileHandle, "length", &histoLength, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'number' data in histogram_data_1 group!")) return NX_ERROR;
+  if (!ErrorHandler(NXgetattr(fFileHandle, const_cast<char*>("length"), &histoLength, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'number' data in histogram_data_1 group!")) return NX_ERROR;
 
   // get t0
   attLen = SIZE_INT32;
   attType = NX_INT32;
-  if (!ErrorHandler(NXgetattr(fFileHandle, "t0_bin", &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 't0_bin' data in histogram_data_1 group!")) return NX_ERROR;
+  if (!ErrorHandler(NXgetattr(fFileHandle, const_cast<char*>("t0_bin"), &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 't0_bin' data in histogram_data_1 group!")) return NX_ERROR;
   fData.fT0.push_back(ival);
 
   // get first good bin
   attLen = SIZE_INT32;
   attType = NX_INT32;
-  if (!ErrorHandler(NXgetattr(fFileHandle, "first_good_bin", &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'first_good_bin' data in histogram_data_1 group!")) return NX_ERROR;
+  if (!ErrorHandler(NXgetattr(fFileHandle, const_cast<char*>("first_good_bin"), &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'first_good_bin' data in histogram_data_1 group!")) return NX_ERROR;
   fData.fFirstGoodBin.push_back(ival);
 
   // get last good bin
   attLen = SIZE_INT32;
   attType = NX_INT32;
-  if (!ErrorHandler(NXgetattr(fFileHandle, "last_good_bin", &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'last_good_bin' data in histogram_data_1 group!")) return NX_ERROR;
+  if (!ErrorHandler(NXgetattr(fFileHandle, const_cast<char*>("last_good_bin"), &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'last_good_bin' data in histogram_data_1 group!")) return NX_ERROR;
   fData.fLastGoodBin.push_back(ival);
 
   // get data
@@ -460,7 +460,7 @@ int PNeXus::ReadFile(const char *fileName)
   if (!ErrorHandler(NXopendata(fFileHandle, "grouping"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'grouping' data in histogram_data_1 group!")) return NX_ERROR;
   attLen = SIZE_INT32;
   attType = NX_INT32;
-  if (!ErrorHandler(NXgetattr(fFileHandle, "available", &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'grouping available' data in histogram_data_1 group!")) return NX_ERROR;
+  if (!ErrorHandler(NXgetattr(fFileHandle, const_cast<char*>("available"), &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'grouping available' data in histogram_data_1 group!")) return NX_ERROR;
   if (ival) {
     vector<int> grouping;
     if (!ErrorHandler(GetIntVectorData(grouping), PNEXUS_GET_DATA_ERROR, "couldn't read 'grouping' data in histogram_data_1 group!")) return NX_ERROR;
@@ -474,7 +474,7 @@ int PNeXus::ReadFile(const char *fileName)
   if (!ErrorHandler(NXopendata(fFileHandle, "alpha"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'alpha' data in histogram_data_1 group!")) return NX_ERROR;
   attLen = SIZE_INT32;
   attType = NX_INT32;
-  if (!ErrorHandler(NXgetattr(fFileHandle, "available", &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'alpha available' data in histogram_data_1 group!")) return NX_ERROR;
+  if (!ErrorHandler(NXgetattr(fFileHandle, const_cast<char*>("available"), &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'alpha available' data in histogram_data_1 group!")) return NX_ERROR;
   if (ival) {
     if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get alpha info!")) return NX_ERROR;
     // calculate the needed size
@@ -1388,7 +1388,7 @@ void PNeXus::Init()
  * \param errCode will set the fErrorCode of the class
  * \param errMsg will set the fErrorMsg of the class
  */
-bool PNeXus::ErrorHandler(NXstatus status, int errCode, string errMsg)
+bool PNeXus::ErrorHandler(NXstatus status, int errCode, const string &errMsg)
 {
   if (status != NX_OK) {
     fErrorCode = errCode;

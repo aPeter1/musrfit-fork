@@ -39,7 +39,7 @@ CLEANFILES = *Dict.cpp *Dict.h *~ core
 lib_LTLIBRARIES = libPNL_PippardFitter.la
 
 libPNL_PippardFitter_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources)
-libPNL_PippardFitter_la_LIBADD = $(PMUSR_LIBS) $(FFTW3_LIBS) $(ROOT_LIBS)
+libPNL_PippardFitter_la_LIBADD = $(FFTW3_LIBS) $(ROOT_LIBS)
 libPNL_PippardFitter_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(PLUGIN_RELEASE) $(AM_LDFLAGS)
 
 ## For the moment do not build pkgconfig files for musrfit plug-ins...

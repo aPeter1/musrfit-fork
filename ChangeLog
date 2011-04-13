@@ -9,6 +9,7 @@ changes since 0.9.0
 FIXED Makefiles so that the NeXus support will not be built if it has not been enabled during the configure stage
 FIXED ASCII export from musrview in case of a Fourier-Power- or Fourier-Phase-difference plot
 FIXED bug in asymmetry fit with fixed background
+REMOVED the user-function dependency on libPMusr
 
 musrfit 0.9.0 - changes since 0.8.0
 ===================================

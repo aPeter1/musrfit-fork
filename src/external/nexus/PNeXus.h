@@ -299,7 +299,7 @@ class PNeXus {
 
     virtual void Init();
     virtual void CleanUp();
-    virtual bool ErrorHandler(NXstatus status, int errCode, string errMsg);
+    virtual bool ErrorHandler(NXstatus status, int errCode, const string &errMsg);
     virtual NXstatus GetStringData(string &str);
     virtual NXstatus GetStringAttr(string attr, string &str);
     virtual int GetDataSize(int type);

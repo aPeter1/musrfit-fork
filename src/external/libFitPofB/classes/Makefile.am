@@ -50,7 +50,7 @@ CLEANFILES = *Dict.cpp *Dict.h *~ ../include/*~ core
 lib_LTLIBRARIES = libFitPofB.la
 
 libFitPofB_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources)
-libFitPofB_la_LIBADD = $(BMWTOOLS_LIBS) $(LEM_LIBS) $(PMUSR_LIBS) $(FFTW3_LIBS) $(ROOT_LIBS)
+libFitPofB_la_LIBADD = $(BMWTOOLS_LIBS) $(LEM_LIBS) $(FFTW3_LIBS) $(ROOT_LIBS)
 libFitPofB_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(PLUGIN_RELEASE) $(AM_LDFLAGS)
 
 ## For the moment do not build pkgconfig files for musrfit plug-ins...

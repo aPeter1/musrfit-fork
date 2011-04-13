@@ -32,7 +32,7 @@ CLEANFILES = *Dict.cpp *Dict.h *~ core
 lib_LTLIBRARIES = libGapIntegrals.la
 
 libGapIntegrals_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources)
-libGapIntegrals_la_LIBADD = $(BMWTOOLS_LIBS) $(PMUSR_LIBS) $(GSL_LIBS) $(ROOT_LIBS) $(CUBA_LIBS)
+libGapIntegrals_la_LIBADD = $(BMWTOOLS_LIBS) $(GSL_LIBS) $(ROOT_LIBS) $(CUBA_LIBS)
 libGapIntegrals_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(PLUGIN_RELEASE) $(AM_LDFLAGS)
 
 ## For the moment do not build pkgconfig files for musrfit plug-ins...
