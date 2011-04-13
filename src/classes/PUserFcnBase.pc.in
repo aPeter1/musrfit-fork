@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: PUserFcnBase
+Description: C++ shared library providing the user-function interface for musrfit
+Version: @MUSR_VERSION@
+Libs: -L${libdir} -l@USERFCN_LIBRARY_NAME@
+Cflags: -I${includedir}

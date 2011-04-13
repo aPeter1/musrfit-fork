@@ -20,6 +20,7 @@ dnl -----------------------------------------------
 
 MUSR_PROGRAM_NAME=musrfit
 MUSR_LIBRARY_NAME=PMusr
+USERFCN_LIBRARY_NAME=PUserFcnBase
 LEM_LIBRARY_NAME=TLemRunHeader
 PSIBIN_LIBRARY_NAME=Class_MuSR_PSI
 MUD_LIBRARY_NAME=mud
@@ -121,6 +122,7 @@ AC_SUBST(CUBA_LIBRARY_VERSION)
 
 PACKAGE=$MUSR_PROGRAM_NAME
 AC_SUBST(MUSR_LIBRARY_NAME)
+AC_SUBST(USERFCN_LIBRARY_NAME)
 AC_SUBST(LEM_LIBRARY_NAME)
 AC_SUBST(PSIBIN_LIBRARY_NAME)
 AC_SUBST(MUD_LIBRARY_NAME)
@@ -641,6 +643,9 @@ PMUSR_CFLAGS="-I${SRCDIR}/include"
 AC_SUBST(PMUSR_LIBS)
 AC_SUBST(PMUSR_CFLAGS)
 
+USERFCN_LIBS="${SRCDIR}/classes/lib${USERFCN_LIBRARY_NAME}.la"
+AC_SUBST(USERFCN_LIBS)
+
 if test "${PNEXUS_ENABLED}" = "1"; then
   AC_DEFINE([PNEXUS_ENABLED], [1], [Define to 1 if NeXus is enabled])
   PNEXUS_SRCDIR="${SRCDIR}/external/nexus"
@@ -787,6 +792,7 @@ AC_CONFIG_FILES([Makefile \
                  src/Makefile \
                  src/classes/Makefile \
                  src/classes/PMusr.pc \
+                 src/classes/PUserFcnBase.pc \
                  src/external/Makefile \
                  src/external/TLemRunHeader/Makefile \
                  src/external/TLemRunHeader/TLemRunHeader.pc \
