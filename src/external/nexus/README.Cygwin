@@ -1,0 +1,69 @@
+2011/04/13 -- BMW
+
+Under Cygwin of all the required libraries for NeXus only HDF5 is available.
+The packages <hdf5> and <libhdf5-devel> can be installed through the Cygwin setup.
+One should also make sure that <bison>, <flex> and a package containing "/usr/lib/librpc.a" (e.g. <sunrpc> = 4.0-3) are installed.
+
+All other libraries have to be built from the sources:
+
+* JPEG-6b
+  URL: http://www.hdfgroup.org/ftp/lib-external/jpeg/src/jpegsrc.v6b.tar.gz
+  Configure options: --prefix=/usr/local --enable-static
+
+* MXML 2.5
+  URL: http://ftp.easysw.com/pub/mxml/2.5/mxml-2.5.tar.gz
+  Configure options: --prefix=/usr/local --enable-static
+
+* HDF 4.2.5
+  URL: http://www.hdfgroup.org/ftp/HDF/HDF_Current/src/hdf-4.2.5.tar.gz 
+  Configure options: --prefix=/usr/local --enable-static --disable-fortran --with-jpeg=/usr/local
+
+* NeXus 4.2.1
+  URL: http://download.nexusformat.org/kits/nexus-4.2.1.tar.gz
+  Configure options: --prefix=/usr/local --with-hdf4=/usr/local --with-hdf5=/usr --with-xml=/usr/local
+
+The version numbers and source-code locations might of course change with time but should be easily adjustable.
+
+If one is confident enough that all requirements to build the above packages are fullfilled, one could also try to run the following lines as a script.
+However, there is absolutely no warranty that it works.
+
+---
+
+#!/bin/sh
+
+cd
+mkdir nexus
+cd nexus
+curl http://www.hdfgroup.org/ftp/lib-external/jpeg/src/jpegsrc.v6b.tar.gz -G | tar xz
+cd jpeg-6b
+./configure --prefix=/usr/local --enable-static
+make
+make install
+cd ..
+curl http://ftp.easysw.com/pub/mxml/2.5/mxml-2.5.tar.gz -G | tar xz
+cd mxml-2.5
+./configure --prefix=/usr/local --enable-static
+make
+make install
+cd ..
+curl http://www.hdfgroup.org/ftp/HDF/HDF_Current/src/hdf-4.2.5.tar.gz -G | tar xz
+cd hdf-4.2.5
+./configure --prefix=/usr/local --enable-static --disable-fortran --with-jpeg=/usr/local
+make
+make install
+cd ..
+curl http://download.nexusformat.org/kits/nexus-4.2.1.tar.gz -G | tar xz
+./configure --prefix=/usr/local --with-hdf4=/usr/local --with-hdf5=/usr --with-xml=/usr/local
+make
+make install
+
+---
+
+In order to obtain NeXus support in musrfit after installing the above libraries, musrfit has to be configured with the options
+"--enable-static --enable-NeXus"
+
+Further information on how to set up musrfit under Cygwin can be found here:
+https://intranet.psi.ch/MUSR/MusrFitSetup#A_4_MS_Windows
+http://lmu.web.psi.ch/facilities/software/musrfit/user/intranet.psi.ch/MUSR/MusrFitSetup.html#A_4_MS_Windows
+
+EOF
