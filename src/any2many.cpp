@@ -64,9 +64,9 @@ void any2many_syntax()
   cout << endl << "                etc., or a sequence of runs <runStart>-<runEnd>, e.g. 111-222";
   cout << endl << "          -c <convert-options> : <inFormat> <outFormat>";
   cout << endl << "             <inFormat>  : input data file format. Supported formats are:";
-  cout << endl << "                PSI-BIN, ROOT (LEM), MUD, NeXuS, PSI-MDU, WKM";
+  cout << endl << "                PSI-BIN, ROOT (LEM), MUD, NeXus, PSI-MDU, WKM";
   cout << endl << "             <outFormat> : ouput data file format. Supported formats are:";
-  cout << endl << "                PSI-BIN, ROOT (LEM), MUD, NeXuS, WKM, ASCII";
+  cout << endl << "                PSI-BIN, ROOT (LEM), MUD, NeXus-HDF4, NeXus-HDF5, NeXus-XML, WKM, ASCII";
   cout << endl << "          -p <output-path> : where <output-path> is the output path for the";
   cout << endl << "               converted files. If nothing is given, the current directory";
   cout << endl << "               will be used, unless the option '-s' is used.";
@@ -149,7 +149,9 @@ int main(int argc, char *argv[])
   outputFormat.push_back("psi-bin");
   outputFormat.push_back("root");
   outputFormat.push_back("mud");
-  outputFormat.push_back("nexus");
+  outputFormat.push_back("nexus-hdf4");
+  outputFormat.push_back("nexus-hdf5");
+  outputFormat.push_back("nexus-xml");
   outputFormat.push_back("wkm");
   outputFormat.push_back("ascii");
 

@@ -4269,10 +4269,13 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           return false;
         }
         if (fRuns[i].GetNormParamNo() > static_cast<Int_t>(fParam.size())) {
-          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          cerr << endl << "  forward histogram number " << fRuns[i].GetNormParamNo() << " is larger than the number of fit parameters (" << fParam.size() << ").";
-          cerr << endl << "  Consider to check the manual ;-)" << endl;
-          return false;
+          // check if forward histogram number is a function
+          if (fRuns[i].GetNormParamNo() - MSR_PARAM_FUN_OFFSET > static_cast<Int_t>(fParam.size())) {
+            cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+            cerr << endl << "  forward histogram number " << fRuns[i].GetNormParamNo() << " is larger than the number of fit parameters (" << fParam.size() << ").";
+            cerr << endl << "  Consider to check the manual ;-)" << endl;
+            return false;
+          }
         }
         // check fit range
         if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) {

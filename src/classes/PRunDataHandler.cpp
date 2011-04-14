@@ -64,14 +64,14 @@ using namespace std;
 #define ROOT_NPP 1
 #define ROOT_PPC 2
 
-#define A2M_UNDEFINED 0
-#define A2M_ROOT      1
-#define A2M_PSIBIN    2
-#define A2M_PSIMDU    3
-#define A2M_MUD       4
-#define A2M_NEXUS     5
-#define A2M_WKM       6
-#define A2M_ASCII     7
+#define A2M_UNDEFINED  0
+#define A2M_ROOT       1
+#define A2M_PSIBIN     2
+#define A2M_PSIMDU     3
+#define A2M_MUD        4
+#define A2M_NEXUS      5
+#define A2M_WKM        6
+#define A2M_ASCII      7
 
 //--------------------------------------------------------------------------
 // Constructor
@@ -279,7 +279,7 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
     outTag = A2M_PSIBIN;
   else if (!fAny2ManyInfo->outFormat.CompareTo("mud",TString::kIgnoreCase))
     outTag = A2M_MUD;
-  else if (!fAny2ManyInfo->outFormat.CompareTo("nexus", TString::kIgnoreCase))
+  else if (fAny2ManyInfo->outFormat.BeginsWith("nexus", TString::kIgnoreCase))
     outTag = A2M_NEXUS;
   else if (!fAny2ManyInfo->outFormat.CompareTo("wkm", TString::kIgnoreCase))
     outTag = A2M_WKM;
@@ -617,7 +617,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
     ext = TString("root");
   else if (!runInfo.GetFileFormat(idx)->CompareTo("root-ppc")) // post pile up corrected histos
     ext = TString("root");
-  else if (!runInfo.GetFileFormat(idx)->CompareTo("nexus"))
+  else if ((!runInfo.GetFileFormat(idx)->CompareTo("nexus-hdf4")) || (!runInfo.GetFileFormat(idx)->CompareTo("nexus-hdf5")) || (!runInfo.GetFileFormat(idx)->CompareTo("nexus-xml")))
     ext = TString("NXS");
   else if (!runInfo.GetFileFormat(idx)->CompareTo("psi-bin"))
     ext = TString("bin");
@@ -650,16 +650,16 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
     pstr->ToUpper();
     cerr << endl << ">> PRunDataHandler::FileExistsCheck: **ERROR** File Format '" << pstr->Data() << "' unsupported.";
     cerr << endl << ">>   support file formats are:";
-    cerr << endl << ">>   ROOT-NPP  -> root not post pileup corrected for lem";
-    cerr << endl << ">>   ROOT-PPC  -> root post pileup corrected for lem";
-    cerr << endl << ">>   NEXUS     -> nexus file format";
-    cerr << endl << ">>   PSI-BIN   -> psi bin file format";
-    cerr << endl << ">>   PSI-MDU   -> psi mdu file format (see also MDU-ASCII)";
-    cerr << endl << ">>   MUD       -> triumf mud file format";
-    cerr << endl << ">>   WKM       -> wkm ascii file format";
-    cerr << endl << ">>   MDU-ASCII -> psi mdu ascii file format";
-    cerr << endl << ">>   ASCII     -> column like file format";
-    cerr << endl << ">>   DB        -> triumf db file \"format\"";
+    cerr << endl << ">>   ROOT-NPP   -> root not post pileup corrected for lem";
+    cerr << endl << ">>   ROOT-PPC   -> root post pileup corrected for lem";
+    cerr << endl << ">>   NEXUS      -> nexus file format, HDF4, HDF5, or XML";
+    cerr << endl << ">>   PSI-BIN    -> psi bin file format";
+    cerr << endl << ">>   PSI-MDU    -> psi mdu file format (see also MDU-ASCII)";
+    cerr << endl << ">>   MUD        -> triumf mud file format";
+    cerr << endl << ">>   WKM        -> wkm ascii file format";
+    cerr << endl << ">>   MDU-ASCII  -> psi mdu ascii file format";
+    cerr << endl << ">>   ASCII      -> column like file format";
+    cerr << endl << ">>   DB         -> triumf db file \"format\"";
     cerr << endl;
     return success;
   }
@@ -3354,8 +3354,27 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
     data.clear();
   }
 
+  // filter out the proper file type, i.e. HDF4, HDF5, or XML
+  char fileType[32];
+  memset(fileType, '\0', 32);
+  if (!fAny2ManyInfo->outFormat.CompareTo("nexus-hdf4", TString::kIgnoreCase))
+    strncpy(fileType, "hdf4", sizeof(fileType));
+  else if (!fAny2ManyInfo->outFormat.CompareTo("nexus-hdf5", TString::kIgnoreCase))
+    strncpy(fileType, "hdf5", sizeof(fileType));
+  else if (!fAny2ManyInfo->outFormat.CompareTo("nexus-xml", TString::kIgnoreCase))
+    strncpy(fileType, "xml", sizeof(fileType));
+  else {
+    cerr << endl << ">> PRunDataHandler::WriteNexusFile(): **ERROR** undefined output NeXus format " << fAny2ManyInfo->outFormat.Data() << " found.";
+    cerr << endl << ">>   Allowed are: hdf4, hdf5, xml" << endl;
+    if (nxs != 0) {
+      delete nxs;
+      nxs = 0;
+    }
+    return false;
+  }
+
   // write file
-  nxs->WriteFile(fln);
+  nxs->WriteFile(fln, fileType);
 
   // clean up
   if (nxs != 0) {
@@ -4022,7 +4041,7 @@ Bool_t PRunDataHandler::StripWhitespace(TString &str)
     return false;
 
   strncpy(subs, s+start, end-start+1);
-  subs[end-start+1] = 0;
+  subs[end-start+1] = '\0';
 
   str = TString(subs);
 
