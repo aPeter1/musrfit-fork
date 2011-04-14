@@ -617,7 +617,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
     ext = TString("root");
   else if (!runInfo.GetFileFormat(idx)->CompareTo("root-ppc")) // post pile up corrected histos
     ext = TString("root");
-  else if ((!runInfo.GetFileFormat(idx)->CompareTo("nexus-hdf4")) || (!runInfo.GetFileFormat(idx)->CompareTo("nexus-hdf5")) || (!runInfo.GetFileFormat(idx)->CompareTo("nexus-xml")))
+  else if (!runInfo.GetFileFormat(idx)->CompareTo("nexus"))
     ext = TString("NXS");
   else if (!runInfo.GetFileFormat(idx)->CompareTo("psi-bin"))
     ext = TString("bin");
