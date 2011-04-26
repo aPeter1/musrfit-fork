@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Tue Dec 14 15:53:57 2010
+# Created: Tue Apr 26 12:46:56 2011
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -68,11 +68,11 @@ use Qt::attributes qw(
     YEARLabel
     BeamLine
     BeamLineLabel
-    YEAR
     RunNumbers
+    YEAR
     RUNSMan
-    RunFiles
     Browse
+    RunFiles
     FittingPage
     Yi
     Minimization
@@ -2047,32 +2047,37 @@ sub NEW
     BeamLineLabel->setGeometry( Qt::Rect(127, 55, 99, 26) );
     BeamLineLabel->setMinimumSize( Qt::Size(0, 20) );
 
-    YEAR = Qt::ComboBox(0, RUNSAuto, "YEAR");
-    YEAR->setGeometry( Qt::Rect(420, 55, 100, 26) );
-    YEAR->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, YEAR->sizePolicy()->hasHeightForWidth()) );
-    YEAR->setMinimumSize( Qt::Size(0, 20) );
-
     RunNumbers = Qt::LineEdit(RUNSAuto, "RunNumbers");
     RunNumbers->setGeometry( Qt::Rect(15, 25, 505, 26) );
     RunNumbers->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, RunNumbers->sizePolicy()->hasHeightForWidth()) );
     RunNumbers->setMinimumSize( Qt::Size(0, 23) );
+
+    YEAR = Qt::ComboBox(0, RUNSAuto, "YEAR");
+    YEAR->setGeometry( Qt::Rect(420, 55, 100, 25) );
+    YEAR->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, YEAR->sizePolicy()->hasHeightForWidth()) );
+    YEAR->setMinimumSize( Qt::Size(0, 20) );
+    YEAR->setEditable( 0 );
+    YEAR->setSizeLimit( int(16) );
+    YEAR->setInsertionPolicy( &Qt::ComboBox::AtTop() );
+    YEAR->setAutoCompletion( 1 );
+    YEAR->setDuplicatesEnabled( 0 );
     $layout43->addWidget(RUNSAuto);
 
     RUNSMan = Qt::GroupBox($LayoutWidget_3, "RUNSMan");
     RUNSMan->setEnabled( 1 );
     RUNSMan->setMargin( int(5) );
 
-    RunFiles = Qt::LineEdit(RUNSMan, "RunFiles");
-    RunFiles->setEnabled( 1 );
-    RunFiles->setGeometry( Qt::Rect(15, 25, 505, 26) );
-    RunFiles->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, RunFiles->sizePolicy()->hasHeightForWidth()) );
-    RunFiles->setMinimumSize( Qt::Size(0, 23) );
-
     Browse = Qt::PushButton(RUNSMan, "Browse");
     Browse->setEnabled( 1 );
     Browse->setGeometry( Qt::Rect(420, 55, 100, 26) );
     Browse->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, Browse->sizePolicy()->hasHeightForWidth()) );
     Browse->setMinimumSize( Qt::Size(0, 20) );
+
+    RunFiles = Qt::LineEdit(RUNSMan, "RunFiles");
+    RunFiles->setEnabled( 1 );
+    RunFiles->setGeometry( Qt::Rect(15, 25, 505, 26) );
+    RunFiles->setSizePolicy( Qt::SizePolicy(0, 0, 0, 0, RunFiles->sizePolicy()->hasHeightForWidth()) );
+    RunFiles->setMinimumSize( Qt::Size(0, 23) );
     $layout43->addWidget(RUNSMan);
     musrfit_tabs->insertTab( RUNSPage, "" );
 
@@ -3188,22 +3193,14 @@ sub languageChange
     BeamLine->insertItem( trUtf8("Dolly") );
     BeamLine->insertItem( trUtf8("LTF") );
     BeamLineLabel->setText( trUtf8("On beam line") );
-    YEAR->clear();
-    YEAR->insertItem( trUtf8("2010") );
-    YEAR->insertItem( trUtf8("2009") );
-    YEAR->insertItem( trUtf8("2008") );
-    YEAR->insertItem( trUtf8("2007") );
-    YEAR->insertItem( trUtf8("2006") );
-    YEAR->insertItem( trUtf8("2005") );
-    YEAR->insertItem( trUtf8("2004") );
     Qt::ToolTip::add(RunNumbers, trUtf8("Numbers of RUNs to fit. Multiple runs are comma separated."));
     Qt::WhatsThis::add(RunNumbers, trUtf8("Numbers of RUNs to fit. Multiple runs are comma separated."));
     RUNSMan->setTitle( trUtf8("RUN Files") );
-    Qt::ToolTip::add(RunFiles, trUtf8("Names of data files to be fit. Multiple data files are comma separated."));
-    Qt::WhatsThis::add(RunFiles, trUtf8("Names of data files to be fit. Multiple data files are comma separated."));
     Browse->setText( trUtf8("Browse") );
     Qt::ToolTip::add(Browse, trUtf8("Browse to select data files for fitting."));
     Qt::WhatsThis::add(Browse, trUtf8("Browse to select data files for fitting."));
+    Qt::ToolTip::add(RunFiles, trUtf8("Names of data files to be fit. Multiple data files are comma separated."));
+    Qt::WhatsThis::add(RunFiles, trUtf8("Names of data files to be fit. Multiple data files are comma separated."));
     musrfit_tabs->changeTab( RUNSPage, trUtf8("RUNS") );
     Minimization->clear();
     Minimization->insertItem( trUtf8("MINIMIZE") );
@@ -3604,7 +3601,6 @@ sub helpAbout
 sub CreateAllInput
 {
 
-# TODO: Need to automatically generage years list depending on beamline
     my %All=();
     
 # From RUNS Tab
@@ -3616,6 +3612,14 @@ sub CreateAllInput
     $All{"optionsFourier"} = optionsFourier->isOn();
     $All{"optionsT0"} = optionsT0->isOn();
     $All{"YEAR"} =YEAR->currentText;
+    if ($All{"YEAR"} eq "") {
+# If year combobox is empty fill it up from 2004 up to current year
+	    my ($second, $minute, $hour, $dayOfMonth, $month, $yearOffset, $dayOfWeek, $dayOfYear, $daylightSavings) = localtime();
+	    my $current_year = 1900 + $yearOffset;
+	    for (my $i=$current_year;$i>=2004;$i--) {
+		YEAR->insertItem($i,-1);
+	    }
+    }
 # Time range and BINS
     $All{"Tis"} = Tis->text;
     $All{"Tfs"} = Tfs->text;
@@ -4058,6 +4062,8 @@ sub InitializeTab
 # Fill the table with labels and values of parametr 
     for (my $PCount=0;$PCount<$NParam;$PCount++) {
 	my ($Param,$value,$error,$minvalue,$maxvalue,$RUN) = split(/,/,$PTable{$PCount});
+# Now make sure we have no nans
+	if ($error eq "nan") { $error=0.1;}
 # If you use this then reading the parameters from the table is a problem
 # You need to extract the correct parameter name from the row label
 #	InitParamTable->verticalHeader()->setLabel( $PCount,"$RUN: $Param");

@@ -212,7 +212,6 @@ void MuSRFitMenu::helpAbout()
 
 void MuSRFitform::CreateAllInput()
 {
-# TODO: Need to automatically generage years list depending on beamline
     my %All=();
     
 # From RUNS Tab
@@ -224,6 +223,14 @@ void MuSRFitform::CreateAllInput()
     $All{"optionsFourier"} = optionsFourier->isOn();
     $All{"optionsT0"} = optionsT0->isOn();
     $All{"YEAR"} =YEAR->currentText;
+    if ($All{"YEAR"} eq "") {
+# If year combobox is empty fill it up from 2004 up to current year
+	    my ($second, $minute, $hour, $dayOfMonth, $month, $yearOffset, $dayOfWeek, $dayOfYear, $daylightSavings) = localtime();
+	    my $current_year = 1900 + $yearOffset;
+	    for (my $i=$current_year;$i>=2004;$i--) {
+		YEAR->insertItem($i,-1);
+	    }
+    }
 # Time range and BINS
     $All{"Tis"} = Tis->text;
     $All{"Tfs"} = Tfs->text;
@@ -656,6 +663,8 @@ void MuSRFitform::InitializeTab()
 # Fill the table with labels and values of parametr 
     for (my $PCount=0;$PCount<$NParam;$PCount++) {
 	my ($Param,$value,$error,$minvalue,$maxvalue,$RUN) = split(/,/,$PTable{$PCount});
+# Now make sure we have no nans
+	if ($error eq "nan") { $error=0.1;}
 # If you use this then reading the parameters from the table is a problem
 # You need to extract the correct parameter name from the row label
 #	InitParamTable->verticalHeader()->setLabel( $PCount,"$RUN: $Param");
