@@ -755,6 +755,7 @@ void MuSRFitform::ShowMuSRT0()
 	if (-e $FILENAME) {
 	    my $cmd="musrt0 $FILENAME &";
 	    my $pid = system($cmd);
+	    t0Update->setEnabled(1)
 	} else {
 	    print STDERR "Cannot find MSR file!\n";
 	}
@@ -918,3 +919,22 @@ void MuSRFitform::InitializeFunctions()
 }
 
 
+
+
+void MuSRFitform::t0UpdateClicked()
+{
+# Read MSR file and get new values of t0,Bg and Data
+    my %All=CreateAllInput();      
+    my $FILENAME=$All{"FILENAME"};
+    open (MSRF,q{<},"$FILENAME.msr" );
+    my @lines = <MSRF>;
+    close(IFILE);
+    
+#    (my $TBlock_ref, my $FPBlock_ref)=MSR::ExtractBlks(@lines);
+#    my @FPBloc = @$FPBlock_ref;
+
+    
+    
+# Finally, disable the update button
+    t0Update->setEnabled(0)
+}

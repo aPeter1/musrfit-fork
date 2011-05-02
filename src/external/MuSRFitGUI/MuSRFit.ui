@@ -23,7 +23,7 @@
     <property name="minimumSize">
         <size>
             <width>21</width>
-            <height>264</height>
+            <height>271</height>
         </size>
     </property>
     <property name="caption">
@@ -3428,353 +3428,372 @@
             <attribute name="title">
                 <string>t0/Bg</string>
             </attribute>
-            <grid>
+            <widget class="QLayoutWidget">
                 <property name="name">
-                    <cstring>unnamed</cstring>
+                    <cstring>layout25</cstring>
                 </property>
-                <widget class="QLayoutWidget" row="0" column="0">
+                <property name="geometry">
+                    <rect>
+                        <x>12</x>
+                        <y>12</y>
+                        <width>536</width>
+                        <height>200</height>
+                    </rect>
+                </property>
+                <hbox>
                     <property name="name">
-                        <cstring>layout27</cstring>
+                        <cstring>unnamed</cstring>
                     </property>
-                    <hbox>
+                    <widget class="QGroupBox">
                         <property name="name">
-                            <cstring>unnamed</cstring>
+                            <cstring>groupHist0</cstring>
                         </property>
-                        <property name="margin">
-                            <number>0</number>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>5</hsizetype>
+                                <vsizetype>5</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
                         </property>
-                        <widget class="QGroupBox">
+                        <property name="minimumSize">
+                            <size>
+                                <width>0</width>
+                                <height>0</height>
+                            </size>
+                        </property>
+                        <property name="title">
+                            <string></string>
+                        </property>
+                        <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>groupHist0</cstring>
+                                <cstring>layout16_2</cstring>
                             </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>5</hsizetype>
-                                    <vsizetype>5</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
+                            <property name="geometry">
+                                <rect>
+                                    <x>5</x>
+                                    <y>18</y>
+                                    <width>100</width>
+                                    <height>150</height>
+                                </rect>
                             </property>
-                            <property name="minimumSize">
-                                <size>
-                                    <width>0</width>
-                                    <height>0</height>
-                                </size>
-                            </property>
-                            <property name="title">
-                                <string></string>
-                            </property>
-                            <widget class="QLayoutWidget">
+                            <vbox>
                                 <property name="name">
-                                    <cstring>layout16_2</cstring>
+                                    <cstring>unnamed_2</cstring>
                                 </property>
-                                <property name="geometry">
-                                    <rect>
-                                        <x>5</x>
-                                        <y>18</y>
-                                        <width>100</width>
-                                        <height>150</height>
-                                    </rect>
-                                </property>
-                                <vbox>
+                                <widget class="QLabel">
                                     <property name="name">
-                                        <cstring>unnamed_2</cstring>
+                                        <cstring>textLabel2</cstring>
                                     </property>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>textLabel2</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>t0</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>textLabel2_2_2_3</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Bg1</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>textLabel2_2_2</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Bg2</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>textLabel2_2_2_2</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Data 1</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>textLabel2_2_2_2_2</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Data 2</string>
-                                        </property>
-                                    </widget>
-                                </vbox>
-                            </widget>
+                                    <property name="text">
+                                        <string>t0</string>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>textLabel2_2_2_3</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Bg1</string>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>textLabel2_2_2</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Bg2</string>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>textLabel2_2_2_2</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Data 1</string>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>textLabel2_2_2_2_2</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Data 2</string>
+                                    </property>
+                                </widget>
+                            </vbox>
                         </widget>
-                        <widget class="QGroupBox">
+                    </widget>
+                    <widget class="QGroupBox">
+                        <property name="name">
+                            <cstring>groupHist1</cstring>
+                        </property>
+                        <property name="frameShadow">
+                            <enum>Plain</enum>
+                        </property>
+                        <property name="title">
+                            <string>Hist1</string>
+                        </property>
+                        <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>groupHist1</cstring>
+                                <cstring>layout18</cstring>
                             </property>
-                            <property name="frameShadow">
-                                <enum>Plain</enum>
+                            <property name="geometry">
+                                <rect>
+                                    <x>8</x>
+                                    <y>17</y>
+                                    <width>75</width>
+                                    <height>150</height>
+                                </rect>
                             </property>
-                            <property name="title">
-                                <string>Hist1</string>
-                            </property>
-                            <widget class="QLayoutWidget">
+                            <vbox>
                                 <property name="name">
-                                    <cstring>layout18</cstring>
+                                    <cstring>unnamed</cstring>
                                 </property>
-                                <property name="geometry">
-                                    <rect>
-                                        <x>8</x>
-                                        <y>17</y>
-                                        <width>75</width>
-                                        <height>150</height>
-                                    </rect>
+                                <property name="margin">
+                                    <number>0</number>
                                 </property>
-                                <vbox>
+                                <property name="spacing">
+                                    <number>0</number>
+                                </property>
+                                <widget class="QLineEdit">
                                     <property name="name">
-                                        <cstring>unnamed</cstring>
+                                        <cstring>t01</cstring>
                                     </property>
-                                    <property name="margin">
-                                        <number>0</number>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>Bg11</cstring>
                                     </property>
-                                    <property name="spacing">
-                                        <number>0</number>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>Bg21</cstring>
                                     </property>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>t01</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>Bg11</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>Bg21</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>Data11</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>Data21</cstring>
-                                        </property>
-                                    </widget>
-                                </vbox>
-                            </widget>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>Data11</cstring>
+                                    </property>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>Data21</cstring>
+                                    </property>
+                                </widget>
+                            </vbox>
                         </widget>
-                        <widget class="QGroupBox">
+                    </widget>
+                    <widget class="QGroupBox">
+                        <property name="name">
+                            <cstring>groupHist2</cstring>
+                        </property>
+                        <property name="enabled">
+                            <bool>true</bool>
+                        </property>
+                        <property name="frameShadow">
+                            <enum>Plain</enum>
+                        </property>
+                        <property name="title">
+                            <string>Hist2</string>
+                        </property>
+                        <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>groupHist2</cstring>
+                                <cstring>layout18_2</cstring>
                             </property>
-                            <property name="enabled">
-                                <bool>true</bool>
+                            <property name="geometry">
+                                <rect>
+                                    <x>8</x>
+                                    <y>17</y>
+                                    <width>75</width>
+                                    <height>150</height>
+                                </rect>
                             </property>
-                            <property name="frameShadow">
-                                <enum>Plain</enum>
-                            </property>
-                            <property name="title">
-                                <string>Hist2</string>
-                            </property>
-                            <widget class="QLayoutWidget">
+                            <vbox>
                                 <property name="name">
-                                    <cstring>layout18_2</cstring>
+                                    <cstring>unnamed_2</cstring>
                                 </property>
-                                <property name="geometry">
-                                    <rect>
-                                        <x>8</x>
-                                        <y>17</y>
-                                        <width>75</width>
-                                        <height>150</height>
-                                    </rect>
+                                <property name="margin">
+                                    <number>0</number>
                                 </property>
-                                <vbox>
+                                <property name="spacing">
+                                    <number>0</number>
+                                </property>
+                                <widget class="QLineEdit">
                                     <property name="name">
-                                        <cstring>unnamed_2</cstring>
+                                        <cstring>t02</cstring>
                                     </property>
-                                    <property name="margin">
-                                        <number>0</number>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>Bg12</cstring>
                                     </property>
-                                    <property name="spacing">
-                                        <number>0</number>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>Bg22</cstring>
                                     </property>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>t02</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>Bg12</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>Bg22</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>Data12</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>Data22</cstring>
-                                        </property>
-                                    </widget>
-                                </vbox>
-                            </widget>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>Data12</cstring>
+                                    </property>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>Data22</cstring>
+                                    </property>
+                                </widget>
+                            </vbox>
                         </widget>
-                        <widget class="QGroupBox">
+                    </widget>
+                    <widget class="QGroupBox">
+                        <property name="name">
+                            <cstring>groupHist3</cstring>
+                        </property>
+                        <property name="enabled">
+                            <bool>true</bool>
+                        </property>
+                        <property name="frameShadow">
+                            <enum>Plain</enum>
+                        </property>
+                        <property name="title">
+                            <string>Hist3</string>
+                        </property>
+                        <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>groupHist3</cstring>
+                                <cstring>layout18_3</cstring>
                             </property>
-                            <property name="enabled">
-                                <bool>true</bool>
+                            <property name="geometry">
+                                <rect>
+                                    <x>8</x>
+                                    <y>17</y>
+                                    <width>75</width>
+                                    <height>150</height>
+                                </rect>
                             </property>
-                            <property name="frameShadow">
-                                <enum>Plain</enum>
-                            </property>
-                            <property name="title">
-                                <string>Hist3</string>
-                            </property>
-                            <widget class="QLayoutWidget">
+                            <vbox>
                                 <property name="name">
-                                    <cstring>layout18_3</cstring>
+                                    <cstring>unnamed_2</cstring>
                                 </property>
-                                <property name="geometry">
-                                    <rect>
-                                        <x>8</x>
-                                        <y>17</y>
-                                        <width>75</width>
-                                        <height>150</height>
-                                    </rect>
+                                <property name="margin">
+                                    <number>0</number>
                                 </property>
-                                <vbox>
+                                <property name="spacing">
+                                    <number>0</number>
+                                </property>
+                                <widget class="QLineEdit">
                                     <property name="name">
-                                        <cstring>unnamed_2</cstring>
+                                        <cstring>t03</cstring>
                                     </property>
-                                    <property name="margin">
-                                        <number>0</number>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>Bg13</cstring>
                                     </property>
-                                    <property name="spacing">
-                                        <number>0</number>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>Bg23</cstring>
                                     </property>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>t03</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>Bg13</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>Bg23</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>Data13</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>Data23</cstring>
-                                        </property>
-                                    </widget>
-                                </vbox>
-                            </widget>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>Data13</cstring>
+                                    </property>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>Data23</cstring>
+                                    </property>
+                                </widget>
+                            </vbox>
                         </widget>
-                        <widget class="QGroupBox">
+                    </widget>
+                    <widget class="QGroupBox">
+                        <property name="name">
+                            <cstring>groupHist4</cstring>
+                        </property>
+                        <property name="enabled">
+                            <bool>true</bool>
+                        </property>
+                        <property name="frameShadow">
+                            <enum>Plain</enum>
+                        </property>
+                        <property name="title">
+                            <string>Hist4</string>
+                        </property>
+                        <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>groupHist4</cstring>
+                                <cstring>layout18_4</cstring>
                             </property>
-                            <property name="enabled">
-                                <bool>true</bool>
+                            <property name="geometry">
+                                <rect>
+                                    <x>8</x>
+                                    <y>17</y>
+                                    <width>75</width>
+                                    <height>150</height>
+                                </rect>
                             </property>
-                            <property name="frameShadow">
-                                <enum>Plain</enum>
-                            </property>
-                            <property name="title">
-                                <string>Hist4</string>
-                            </property>
-                            <widget class="QLayoutWidget">
+                            <vbox>
                                 <property name="name">
-                                    <cstring>layout18_4</cstring>
+                                    <cstring>unnamed_2</cstring>
                                 </property>
-                                <property name="geometry">
-                                    <rect>
-                                        <x>8</x>
-                                        <y>17</y>
-                                        <width>75</width>
-                                        <height>150</height>
-                                    </rect>
+                                <property name="margin">
+                                    <number>0</number>
                                 </property>
-                                <vbox>
+                                <property name="spacing">
+                                    <number>0</number>
+                                </property>
+                                <widget class="QLineEdit">
                                     <property name="name">
-                                        <cstring>unnamed_2</cstring>
+                                        <cstring>t04</cstring>
                                     </property>
-                                    <property name="margin">
-                                        <number>0</number>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>Bg14</cstring>
                                     </property>
-                                    <property name="spacing">
-                                        <number>0</number>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>Bg24</cstring>
                                     </property>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>t04</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>Bg14</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>Bg24</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>Data14</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>Data24</cstring>
-                                        </property>
-                                    </widget>
-                                </vbox>
-                            </widget>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>Data14</cstring>
+                                    </property>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>Data24</cstring>
+                                    </property>
+                                </widget>
+                            </vbox>
                         </widget>
-                    </hbox>
-                </widget>
-            </grid>
+                    </widget>
+                </hbox>
+            </widget>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>t0Update</cstring>
+                </property>
+                <property name="enabled">
+                    <bool>false</bool>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>450</x>
+                        <y>220</y>
+                        <width>94</width>
+                        <height>27</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>Update</string>
+                </property>
+            </widget>
         </widget>
         <widget class="QWidget">
             <property name="name">
@@ -5498,6 +5517,12 @@
         <receiver>MuSRFitform</receiver>
         <slot>ActivateShComp()</slot>
     </connection>
+    <connection>
+        <sender>t0Update</sender>
+        <signal>clicked()</signal>
+        <receiver>MuSRFitform</receiver>
+        <slot>t0UpdateClicked()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>musrfit_tabs</tabstop>
@@ -5606,6 +5631,7 @@
     <slot>fileBrowse()</slot>
     <slot>AppendToFunctions()</slot>
     <slot>InitializeFunctions()</slot>
+    <slot>t0UpdateClicked()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>
