@@ -295,28 +295,40 @@ FUNCTIONS
 	    foreach ("t0","Bg1","Bg2","Data1","Data2") {
 		$Name = "$_$NHist";
 # If empty fill with defaults
-		if ($All{$Name} eq $EMPTY) {
-		    $All{$Name}=MSR::T0BgData($_,$Hist,$BeamLine);
-		}
+#		if ($All{$Name} eq $EMPTY) {
+#		    $All{$Name}=MSR::T0BgData($_,$Hist,$BeamLine);
+#		}
 	    }
-	    $Bg_Line = $Bg_Line."    ".$All{"Bg1$NHist"}."    ".$All{"Bg2$NHist"};
-	    $Data_Line =$Data_Line."    ".$All{"Data1$NHist"}."    ".$All{"Data2$NHist"};
+# If empty skip lines
+	    if ($All{"Bg1$NHist"} ne $EMPTY && $All{"Bg2$NHist"} ne $EMPTY) {
+		$Bg_Line = $Bg_Line."    ".$All{"Bg1$NHist"}."    ".$All{"Bg2$NHist"};
+	    }
+	    if ($All{"Data1$NHist"} ne $EMPTY && $All{"Data2$NHist"} ne $EMPTY) {
+		$Data_Line =$Data_Line."    ".$All{"Data1$NHist"}."    ".$All{"Data2$NHist"};
+	    }
 	    if ($All{"t0$NHist"} ne $EMPTY) {
 		$T0_Line=$T0_Line."      ".$All{"Data1$NHist"};  
 	    }
 	    $NHist++;
 	}
 
+# Put T0_Line Bg_Line and Data_Line together if not empty
+	my $T0DataBg=$EMPTY;
+	if ($T0_Line ne "t0") {
+	    $T0DataBg = $T0DataBg."\n".$T0_Line;
+	}
+	if ($Bg_Line ne "background") {
+	    $T0DataBg = $T0DataBg."\n".$Bg_Line;
+	}
+	if ($Data_Line ne "data") {
+	    $T0DataBg = $T0DataBg."\n".$Data_Line;
+	}
+
         $FRANGE_Line = "fit             TINI    TFIN";
         $PAC_Line    = "packing         BINNING";
 
-	
-	if ($T0_Line ne "t0") {
-	    $Data_Line= $Data_Line."\n".$T0_Line;
-	}
-
 	$Single_RUN =
-"$RUN_Line\n$Type_Line\n$Alpha_Line$Hist_Lines\n$Bg_Line\n$Data_Line\n$MAP_Line\n$FRANGE_Line\n$PAC_Line\n\n";
+"$RUN_Line\n$Type_Line\n$Alpha_Line$Hist_Lines\n$T0DataBg\n$MAP_Line\n$FRANGE_Line\n$PAC_Line\n\n";
         
         # Now add the appropriate values of fit range and packing
         my $Range_Min = 8;

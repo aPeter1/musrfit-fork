@@ -23,7 +23,7 @@
     <property name="minimumSize">
         <size>
             <width>21</width>
-            <height>271</height>
+            <height>264</height>
         </size>
     </property>
     <property name="caption">
@@ -3428,6 +3428,25 @@
             <attribute name="title">
                 <string>t0/Bg</string>
             </attribute>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>t0Update</cstring>
+                </property>
+                <property name="enabled">
+                    <bool>false</bool>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>450</x>
+                        <y>220</y>
+                        <width>94</width>
+                        <height>27</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>Update</string>
+                </property>
+            </widget>
             <widget class="QLayoutWidget">
                 <property name="name">
                     <cstring>layout25</cstring>
@@ -3774,25 +3793,6 @@
                         </widget>
                     </widget>
                 </hbox>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>t0Update</cstring>
-                </property>
-                <property name="enabled">
-                    <bool>false</bool>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>450</x>
-                        <y>220</y>
-                        <width>94</width>
-                        <height>27</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Update</string>
-                </property>
             </widget>
         </widget>
         <widget class="QWidget">
