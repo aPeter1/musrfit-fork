@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Wed May 4 16:19:39 2011
+# Created: Wed May 4 16:26:42 2011
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -91,17 +91,6 @@ use Qt::attributes qw(
     FitTextOutput
     SharingPage
     buttonGroupSharing
-    SharingComp1
-    ShParam_1_1
-    ShParam_1_2
-    ShParam_1_3
-    ShParam_1_4
-    ShParam_1_5
-    ShParam_1_6
-    ShParam_1_7
-    ShParam_1_8
-    ShParam_1_9
-    Comp1ShLabel
     SharingComp2
     Comp2ShLabel
     ShParam_2_1
@@ -124,6 +113,17 @@ use Qt::attributes qw(
     ShParam_3_7
     ShParam_3_8
     ShParam_3_9
+    SharingComp1
+    ShParam_1_1
+    ShParam_1_2
+    ShParam_1_3
+    ShParam_1_4
+    ShParam_1_5
+    ShParam_1_6
+    ShParam_1_7
+    ShParam_1_8
+    ShParam_1_9
+    Comp1ShLabel
     InitializationPage
     InitParamTable
     MSRPage
@@ -2197,62 +2197,6 @@ sub NEW
     buttonGroupSharing->setCheckable( 1 );
     buttonGroupSharing->setChecked( 0 );
 
-    SharingComp1 = Qt::ButtonGroup(buttonGroupSharing, "SharingComp1");
-    SharingComp1->setEnabled( 0 );
-    SharingComp1->setGeometry( Qt::Rect(31, 20, 162, 330) );
-    SharingComp1->setSizePolicy( Qt::SizePolicy(5, 3, 0, 0, SharingComp1->sizePolicy()->hasHeightForWidth()) );
-    SharingComp1->setAlignment( int(&Qt::ButtonGroup::AlignLeft) );
-
-    my $LayoutWidget = Qt::Widget(SharingComp1, '$LayoutWidget');
-    $LayoutWidget->setGeometry( Qt::Rect(40, 60, 81, 266) );
-    my $layout14 = Qt::VBoxLayout($LayoutWidget, 0, 0, '$layout14');
-
-    ShParam_1_1 = Qt::CheckBox($LayoutWidget, "ShParam_1_1");
-    $layout14->addWidget(ShParam_1_1);
-
-    ShParam_1_2 = Qt::CheckBox($LayoutWidget, "ShParam_1_2");
-    $layout14->addWidget(ShParam_1_2);
-
-    ShParam_1_3 = Qt::CheckBox($LayoutWidget, "ShParam_1_3");
-    $layout14->addWidget(ShParam_1_3);
-
-    ShParam_1_4 = Qt::CheckBox($LayoutWidget, "ShParam_1_4");
-    $layout14->addWidget(ShParam_1_4);
-
-    ShParam_1_5 = Qt::CheckBox($LayoutWidget, "ShParam_1_5");
-    ShParam_1_5->setEnabled( 0 );
-    ShParam_1_5->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
-    ShParam_1_5->setTristate( 0 );
-    $layout14->addWidget(ShParam_1_5);
-
-    ShParam_1_6 = Qt::CheckBox($LayoutWidget, "ShParam_1_6");
-    ShParam_1_6->setEnabled( 0 );
-    ShParam_1_6->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
-    ShParam_1_6->setTristate( 0 );
-    $layout14->addWidget(ShParam_1_6);
-
-    ShParam_1_7 = Qt::CheckBox($LayoutWidget, "ShParam_1_7");
-    ShParam_1_7->setEnabled( 0 );
-    ShParam_1_7->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
-    ShParam_1_7->setTristate( 0 );
-    $layout14->addWidget(ShParam_1_7);
-
-    ShParam_1_8 = Qt::CheckBox($LayoutWidget, "ShParam_1_8");
-    ShParam_1_8->setEnabled( 0 );
-    ShParam_1_8->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
-    ShParam_1_8->setTristate( 0 );
-    $layout14->addWidget(ShParam_1_8);
-
-    ShParam_1_9 = Qt::CheckBox($LayoutWidget, "ShParam_1_9");
-    ShParam_1_9->setEnabled( 0 );
-    ShParam_1_9->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
-    ShParam_1_9->setTristate( 0 );
-    $layout14->addWidget(ShParam_1_9);
-
-    Comp1ShLabel = Qt::Label(SharingComp1, "Comp1ShLabel");
-    Comp1ShLabel->setGeometry( Qt::Rect(2, 30, 185, 20) );
-    Comp1ShLabel->setPaletteBackgroundColor( Qt::Color(255, 255, 127) );
-
     SharingComp2 = Qt::ButtonGroup(buttonGroupSharing, "SharingComp2");
     SharingComp2->setEnabled( 0 );
     SharingComp2->setGeometry( Qt::Rect(199, 20, 162, 330) );
@@ -2262,44 +2206,44 @@ sub NEW
     Comp2ShLabel->setGeometry( Qt::Rect(2, 30, 185, 20) );
     Comp2ShLabel->setPaletteBackgroundColor( Qt::Color(255, 255, 127) );
 
-    my $LayoutWidget_2 = Qt::Widget(SharingComp2, '$LayoutWidget_2');
-    $LayoutWidget_2->setGeometry( Qt::Rect(40, 60, 81, 266) );
-    my $layout13 = Qt::VBoxLayout($LayoutWidget_2, 0, 0, '$layout13');
+    my $LayoutWidget = Qt::Widget(SharingComp2, '$LayoutWidget');
+    $LayoutWidget->setGeometry( Qt::Rect(40, 60, 81, 266) );
+    my $layout13 = Qt::VBoxLayout($LayoutWidget, 0, 0, '$layout13');
 
-    ShParam_2_1 = Qt::CheckBox($LayoutWidget_2, "ShParam_2_1");
+    ShParam_2_1 = Qt::CheckBox($LayoutWidget, "ShParam_2_1");
     $layout13->addWidget(ShParam_2_1);
 
-    ShParam_2_2 = Qt::CheckBox($LayoutWidget_2, "ShParam_2_2");
+    ShParam_2_2 = Qt::CheckBox($LayoutWidget, "ShParam_2_2");
     $layout13->addWidget(ShParam_2_2);
 
-    ShParam_2_3 = Qt::CheckBox($LayoutWidget_2, "ShParam_2_3");
+    ShParam_2_3 = Qt::CheckBox($LayoutWidget, "ShParam_2_3");
     $layout13->addWidget(ShParam_2_3);
 
-    ShParam_2_4 = Qt::CheckBox($LayoutWidget_2, "ShParam_2_4");
+    ShParam_2_4 = Qt::CheckBox($LayoutWidget, "ShParam_2_4");
     $layout13->addWidget(ShParam_2_4);
 
-    ShParam_2_5 = Qt::CheckBox($LayoutWidget_2, "ShParam_2_5");
+    ShParam_2_5 = Qt::CheckBox($LayoutWidget, "ShParam_2_5");
     $layout13->addWidget(ShParam_2_5);
 
-    ShParam_2_6 = Qt::CheckBox($LayoutWidget_2, "ShParam_2_6");
+    ShParam_2_6 = Qt::CheckBox($LayoutWidget, "ShParam_2_6");
     ShParam_2_6->setEnabled( 0 );
     ShParam_2_6->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_2_6->setTristate( 0 );
     $layout13->addWidget(ShParam_2_6);
 
-    ShParam_2_7 = Qt::CheckBox($LayoutWidget_2, "ShParam_2_7");
+    ShParam_2_7 = Qt::CheckBox($LayoutWidget, "ShParam_2_7");
     ShParam_2_7->setEnabled( 0 );
     ShParam_2_7->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_2_7->setTristate( 0 );
     $layout13->addWidget(ShParam_2_7);
 
-    ShParam_2_8 = Qt::CheckBox($LayoutWidget_2, "ShParam_2_8");
+    ShParam_2_8 = Qt::CheckBox($LayoutWidget, "ShParam_2_8");
     ShParam_2_8->setEnabled( 0 );
     ShParam_2_8->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_2_8->setTristate( 0 );
     $layout13->addWidget(ShParam_2_8);
 
-    ShParam_2_9 = Qt::CheckBox($LayoutWidget_2, "ShParam_2_9");
+    ShParam_2_9 = Qt::CheckBox($LayoutWidget, "ShParam_2_9");
     ShParam_2_9->setEnabled( 0 );
     ShParam_2_9->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_2_9->setTristate( 0 );
@@ -2315,48 +2259,104 @@ sub NEW
     Comp3ShLabel->setGeometry( Qt::Rect(2, 30, 185, 20) );
     Comp3ShLabel->setPaletteBackgroundColor( Qt::Color(255, 255, 127) );
 
-    my $LayoutWidget_3 = Qt::Widget(SharingComp3, '$LayoutWidget_3');
-    $LayoutWidget_3->setGeometry( Qt::Rect(41, 58, 81, 266) );
-    my $layout15 = Qt::VBoxLayout($LayoutWidget_3, 11, 6, '$layout15');
+    my $LayoutWidget_2 = Qt::Widget(SharingComp3, '$LayoutWidget_2');
+    $LayoutWidget_2->setGeometry( Qt::Rect(41, 58, 81, 266) );
+    my $layout15 = Qt::VBoxLayout($LayoutWidget_2, 11, 6, '$layout15');
 
-    ShParam_3_1 = Qt::CheckBox($LayoutWidget_3, "ShParam_3_1");
+    ShParam_3_1 = Qt::CheckBox($LayoutWidget_2, "ShParam_3_1");
     $layout15->addWidget(ShParam_3_1);
 
-    ShParam_3_2 = Qt::CheckBox($LayoutWidget_3, "ShParam_3_2");
+    ShParam_3_2 = Qt::CheckBox($LayoutWidget_2, "ShParam_3_2");
     $layout15->addWidget(ShParam_3_2);
 
-    ShParam_3_3 = Qt::CheckBox($LayoutWidget_3, "ShParam_3_3");
+    ShParam_3_3 = Qt::CheckBox($LayoutWidget_2, "ShParam_3_3");
     $layout15->addWidget(ShParam_3_3);
 
-    ShParam_3_4 = Qt::CheckBox($LayoutWidget_3, "ShParam_3_4");
+    ShParam_3_4 = Qt::CheckBox($LayoutWidget_2, "ShParam_3_4");
     $layout15->addWidget(ShParam_3_4);
 
-    ShParam_3_5 = Qt::CheckBox($LayoutWidget_3, "ShParam_3_5");
+    ShParam_3_5 = Qt::CheckBox($LayoutWidget_2, "ShParam_3_5");
     $layout15->addWidget(ShParam_3_5);
 
-    ShParam_3_6 = Qt::CheckBox($LayoutWidget_3, "ShParam_3_6");
+    ShParam_3_6 = Qt::CheckBox($LayoutWidget_2, "ShParam_3_6");
     ShParam_3_6->setEnabled( 0 );
     ShParam_3_6->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_3_6->setTristate( 0 );
     $layout15->addWidget(ShParam_3_6);
 
-    ShParam_3_7 = Qt::CheckBox($LayoutWidget_3, "ShParam_3_7");
+    ShParam_3_7 = Qt::CheckBox($LayoutWidget_2, "ShParam_3_7");
     ShParam_3_7->setEnabled( 0 );
     ShParam_3_7->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_3_7->setTristate( 0 );
     $layout15->addWidget(ShParam_3_7);
 
-    ShParam_3_8 = Qt::CheckBox($LayoutWidget_3, "ShParam_3_8");
+    ShParam_3_8 = Qt::CheckBox($LayoutWidget_2, "ShParam_3_8");
     ShParam_3_8->setEnabled( 0 );
     ShParam_3_8->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_3_8->setTristate( 0 );
     $layout15->addWidget(ShParam_3_8);
 
-    ShParam_3_9 = Qt::CheckBox($LayoutWidget_3, "ShParam_3_9");
+    ShParam_3_9 = Qt::CheckBox($LayoutWidget_2, "ShParam_3_9");
     ShParam_3_9->setEnabled( 0 );
     ShParam_3_9->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
     ShParam_3_9->setTristate( 0 );
     $layout15->addWidget(ShParam_3_9);
+
+    SharingComp1 = Qt::ButtonGroup(buttonGroupSharing, "SharingComp1");
+    SharingComp1->setEnabled( 0 );
+    SharingComp1->setGeometry( Qt::Rect(31, 20, 162, 330) );
+    SharingComp1->setSizePolicy( Qt::SizePolicy(5, 3, 0, 0, SharingComp1->sizePolicy()->hasHeightForWidth()) );
+    SharingComp1->setAlignment( int(&Qt::ButtonGroup::AlignLeft) );
+
+    my $LayoutWidget_3 = Qt::Widget(SharingComp1, '$LayoutWidget_3');
+    $LayoutWidget_3->setGeometry( Qt::Rect(40, 60, 81, 266) );
+    my $layout14 = Qt::VBoxLayout($LayoutWidget_3, 0, 0, '$layout14');
+
+    ShParam_1_1 = Qt::CheckBox($LayoutWidget_3, "ShParam_1_1");
+    $layout14->addWidget(ShParam_1_1);
+
+    ShParam_1_2 = Qt::CheckBox($LayoutWidget_3, "ShParam_1_2");
+    $layout14->addWidget(ShParam_1_2);
+
+    ShParam_1_3 = Qt::CheckBox($LayoutWidget_3, "ShParam_1_3");
+    $layout14->addWidget(ShParam_1_3);
+
+    ShParam_1_4 = Qt::CheckBox($LayoutWidget_3, "ShParam_1_4");
+    $layout14->addWidget(ShParam_1_4);
+
+    ShParam_1_5 = Qt::CheckBox($LayoutWidget_3, "ShParam_1_5");
+    ShParam_1_5->setEnabled( 0 );
+    ShParam_1_5->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    ShParam_1_5->setTristate( 0 );
+    $layout14->addWidget(ShParam_1_5);
+
+    ShParam_1_6 = Qt::CheckBox($LayoutWidget_3, "ShParam_1_6");
+    ShParam_1_6->setEnabled( 0 );
+    ShParam_1_6->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    ShParam_1_6->setTristate( 0 );
+    $layout14->addWidget(ShParam_1_6);
+
+    ShParam_1_7 = Qt::CheckBox($LayoutWidget_3, "ShParam_1_7");
+    ShParam_1_7->setEnabled( 0 );
+    ShParam_1_7->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    ShParam_1_7->setTristate( 0 );
+    $layout14->addWidget(ShParam_1_7);
+
+    ShParam_1_8 = Qt::CheckBox($LayoutWidget_3, "ShParam_1_8");
+    ShParam_1_8->setEnabled( 0 );
+    ShParam_1_8->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    ShParam_1_8->setTristate( 0 );
+    $layout14->addWidget(ShParam_1_8);
+
+    ShParam_1_9 = Qt::CheckBox($LayoutWidget_3, "ShParam_1_9");
+    ShParam_1_9->setEnabled( 0 );
+    ShParam_1_9->setPaletteBackgroundColor( Qt::Color(234, 233, 232) );
+    ShParam_1_9->setTristate( 0 );
+    $layout14->addWidget(ShParam_1_9);
+
+    Comp1ShLabel = Qt::Label(SharingComp1, "Comp1ShLabel");
+    Comp1ShLabel->setGeometry( Qt::Rect(2, 30, 185, 20) );
+    Comp1ShLabel->setPaletteBackgroundColor( Qt::Color(255, 255, 127) );
 
     $SharingPageLayout->addWidget(buttonGroupSharing, 0, 0);
     musrfit_tabs->insertTab( SharingPage, "" );
@@ -3103,6 +3103,7 @@ sub NEW
     Qt::Object::connect(FitType2, SIGNAL "activated(const QString&)", this, SLOT "InitializeFunctions()");
     Qt::Object::connect(musrfit_tabs, SIGNAL "selected(const QString&)", this, SLOT "TabChanged()");
     Qt::Object::connect(t0Update, SIGNAL "clicked()", this, SLOT "t0UpdateClicked()");
+    Qt::Object::connect(buttonGroupSharing, SIGNAL "toggled(bool)", this, SLOT "ActivateShComp()");
 
     setTabOrder(musrfit_tabs, RunNumbers);
     setTabOrder(RunNumbers, BeamLine);
@@ -3291,17 +3292,6 @@ sub languageChange
     textLabel1_4->setText( trUtf8("X Range") );
     musrfit_tabs->changeTab( FittingPage, trUtf8("Fitting") );
     buttonGroupSharing->setTitle( trUtf8("Shared parameters among different runs") );
-    SharingComp1->setTitle( trUtf8("1st Component") );
-    ShParam_1_1->setText( trUtf8("Param1") );
-    ShParam_1_2->setText( trUtf8("Param2") );
-    ShParam_1_3->setText( trUtf8("Param3") );
-    ShParam_1_4->setText( trUtf8("Param4") );
-    ShParam_1_5->setText( trUtf8("Param5") );
-    ShParam_1_6->setText( trUtf8("Param6") );
-    ShParam_1_7->setText( trUtf8("Param7") );
-    ShParam_1_8->setText( trUtf8("Param8") );
-    ShParam_1_9->setText( trUtf8("Param9") );
-    Comp1ShLabel->setText( trUtf8("FitType1") );
     SharingComp2->setTitle( trUtf8("2nd Component") );
     Comp2ShLabel->setText( trUtf8("FitType2") );
     ShParam_2_1->setText( trUtf8("Param1") );
@@ -3324,6 +3314,17 @@ sub languageChange
     ShParam_3_7->setText( trUtf8("Param7") );
     ShParam_3_8->setText( trUtf8("Param8") );
     ShParam_3_9->setText( trUtf8("Param9") );
+    SharingComp1->setTitle( trUtf8("1st Component") );
+    ShParam_1_1->setText( trUtf8("Param1") );
+    ShParam_1_2->setText( trUtf8("Param2") );
+    ShParam_1_3->setText( trUtf8("Param3") );
+    ShParam_1_4->setText( trUtf8("Param4") );
+    ShParam_1_5->setText( trUtf8("Param5") );
+    ShParam_1_6->setText( trUtf8("Param6") );
+    ShParam_1_7->setText( trUtf8("Param7") );
+    ShParam_1_8->setText( trUtf8("Param8") );
+    ShParam_1_9->setText( trUtf8("Param9") );
+    Comp1ShLabel->setText( trUtf8("FitType1") );
     musrfit_tabs->changeTab( SharingPage, trUtf8("Sharing") );
     InitParamTable->horizontalHeader()->setLabel( 0, trUtf8("Value") );
     InitParamTable->horizontalHeader()->setLabel( 1, trUtf8("Error") );
