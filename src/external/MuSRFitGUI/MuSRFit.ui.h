@@ -220,8 +220,6 @@ void MuSRFitform::CreateAllInput()
     $All{"RunFiles"} = RunFiles->text;
     $All{"BeamLine"} = BeamLine->currentText;
     $All{"RUNSType"} = ManualFile->isOn();
-    $All{"optionsFourier"} = optionsFourier->isOn();
-    $All{"optionsT0"} = optionsT0->isOn();
     $All{"YEAR"} =YEAR->currentText;
     if ($All{"YEAR"} eq "") {
 # If year combobox is empty fill it up from 2004 up to current year
@@ -802,19 +800,6 @@ void MuSRFitform::RunSelectionToggle()
 	RUNSAuto->setHidden(0);
     }
     
-# Also use this for other options
-# Fourier toggle
-    my $Fourier=optionsFourier->isOn();
-    if ($Fourier) {
-# Fourier tab visible
-#	musrfit_tabs->addTab(FourierPage,"Fourier");
-#	musrfit_tabs->showPage(FourierPage);
-#	FourierPage->hide();
-    } else {
-# Fourier tab invisible
-#	musrfit_tabs->removePage(FourierPage);
-#	FourierPage->show();
-    }
 }
 
 void MuSRFitform::fileBrowse()
@@ -930,11 +915,31 @@ void MuSRFitform::t0UpdateClicked()
     my @lines = <MSRF>;
     close(IFILE);
     
-#    (my $TBlock_ref, my $FPBlock_ref)=MSR::ExtractBlks(@lines);
-#    my @FPBloc = @$FPBlock_ref;
+    my @T0s = grep {/t0 /} @lines;
+    my @Bgs = grep {/background /} @lines;
+    my @Datas = grep {/data /} @lines;
 
+    my @Hists = split(/,/, $All{"LRBF"} );
+    my $NHist = $#Hists+1;
+    print "Histograms: $NHist\n";
     
+    my $FinHist = 1;
+# First T0s
+    while ($FinHist) {
+	my $counter=0;
+#	(my $tmp,my @SplitT0) = split( /\s+/, $T0s[$counter]);
+	(my $tmp,my @SplitBg) = split( /\s+/, $Bgs[$counter]);
+#	(my $tmp,my @SplitData) = split( /\s+/, $Datas[$counter]);
+	if ($#SplitBg>0) {
+	    foreach (@SplitBg) {
+		print $_."\n";
+	    }
+	}
+	$counter++;
+	if ($counter>=$#Bgs) {$FinHist=0;}
+    }	
     
 # Finally, disable the update button
-    t0Update->setEnabled(0)
+    t0Update->setEnabled(0);
+#    t0Update->setText("musrt0")
 }

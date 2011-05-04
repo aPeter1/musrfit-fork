@@ -1109,7 +1109,7 @@ sub ExtractBlks {
 	my @Param=split(/\s+/,$line);
     }
 
-    return(\@TBlock,\@FPBlock)
+    return(\@TBlock,\@FPBlock);
 }
 
 
@@ -1288,6 +1288,7 @@ sub PrepParamTable {
 # I need this although it is already in the MSR.pm module, just for this table
 # We can remove it from the MSR module later...
 # Or keep in the MSR as function ??
+
 
 # We have two options here, either take default values or take values of previous 
 # run if available
