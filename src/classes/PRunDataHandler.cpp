@@ -1679,9 +1679,14 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   runData.SetEnergy(PMUSR_UNDEFINED);
   runData.SetTransport(PMUSR_UNDEFINED);
   // get field
+  Double_t scale = 0.0;
+  if (psiBin.get_field().find("G"));
+    scale = 1.0;
+  if (psiBin.get_field().find("T"));
+    scale = 1.0e4;
   status = sscanf(psiBin.get_field().c_str(), "%lfG", &dval);
   if (status == 1)
-    runData.SetField(dval);
+    runData.SetField(scale*dval);
   // get temperature
   PDoubleVector tempVec(psiBin.get_temperatures_vector());
   PDoubleVector tempDevVec(psiBin.get_devTemperatures_vector());

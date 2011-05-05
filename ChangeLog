@@ -12,6 +12,7 @@ FIXED bug reported in MUSR-183: missing background for 2nd histo in asymmetry fi
 FIXED Makefiles so that the NeXus support will not be built if it has not been enabled during the configure stage
 FIXED ASCII export from musrview in case of a Fourier-Power- or Fourier-Phase-difference plot
 FIXED bug in asymmetry fit with fixed background
+CHANGED cosmetics in the musrview legend concerning the units
 CHANGED the user-function dependency from libPMusr to libPUserFcnBase
 
 musrfit 0.9.0 - changes since 0.8.0

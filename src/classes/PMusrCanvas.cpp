@@ -749,8 +749,13 @@ void PMusrCanvas::UpdateInfoPad()
     if (dval == PMUSR_UNDEFINED) {
       tstr += TString("??,");
     } else {
-      sprintf(sval, "%0.2lf", dval);
-      tstr += TString(sval) + TString("G,");
+      if (dval < 1.0e4) { // Gauss makes sense as a unit
+        sprintf(sval, "%0.2lf", dval);
+        tstr += TString(sval) + TString("G,");
+      } else { // Tesla makes sense as a unit
+        sprintf(sval, "%0.2lf", dval/1.0e4);
+        tstr += TString(sval) + TString("T,");
+      }
     }
     // energy if present
     tstr += TString("E=");
@@ -758,8 +763,13 @@ void PMusrCanvas::UpdateInfoPad()
     if (dval == PMUSR_UNDEFINED) {
       tstr += TString("??,");
     } else {
-      sprintf(sval, "%0.2lf", dval);
-      tstr += TString(sval) + TString("keV,");
+      if (dval < 1.0e3) { // keV makes sense as a unit
+        sprintf(sval, "%0.2lf", dval);
+        tstr += TString(sval) + TString("keV,");
+      } else { // MeV makes sense as a unit
+        sprintf(sval, "%0.2lf", dval/1.0e3);
+        tstr += TString(sval) + TString("MeV,");
+      }
     }
     // setup if present
     tstr += fRunList->GetSetup(*runs[runNo].GetRunName());
