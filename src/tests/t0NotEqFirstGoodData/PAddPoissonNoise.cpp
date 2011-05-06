@@ -119,7 +119,7 @@ void PAddPoissonNoise::AddNoise(TH1F *histo)
     return;
 
   Double_t dval;
-  for (UInt_t i=1; i<histo->GetEntries(); i++) {
+  for (UInt_t i=1; i<(UInt_t)histo->GetNbinsX(); i++) {
     dval = histo->GetBinContent(i);
     histo->SetBinContent(i, PoiDev(dval));
   }
