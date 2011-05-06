@@ -317,7 +317,7 @@ Bool_t PRunAsymmetry::PrepareData()
 
   // keep the time resolution in (us)
   fTimeResolution = runData->GetTimeResolution()/1.0e3;
-  cout.precision(8);
+  cout.precision(10);
   cout << endl << ">> PRunSingleHisto::PrepareData(): time resolution=" << fixed << runData->GetTimeResolution() << "(ns)" << endl;
 
   // collect histogram numbers
