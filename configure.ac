@@ -393,11 +393,11 @@ AC_ARG_ENABLE([NeXus], [AC_HELP_STRING([--enable-NeXus], [build optional NeXus s
          elif test -r /usr/include/hdf/hdf.h; then
            HDF4_PREFIX="/usr/include/"
            AC_MSG_RESULT([${HDF4_PREFIX}])
-         elif test -r /sw/hdf/include/hdf.h; then
-           HDF4_PREFIX="/sw/hdf"
+         elif test -r /sw/include/hdf.h; then
+           HDF4_PREFIX="/sw"
            AC_MSG_RESULT([${HDF4_PREFIX}])
-         elif test -r /opt/hdf/include/hdf.h; then
-           HDF4_PREFIX="/opt/hdf"
+         elif test -r /opt/local/include/hdf.h; then
+           HDF4_PREFIX="/opt/local"
            AC_MSG_RESULT([${HDF4_PREFIX}])
          else
            AC_MSG_RESULT([no])
@@ -430,11 +430,11 @@ AC_ARG_ENABLE([NeXus], [AC_HELP_STRING([--enable-NeXus], [build optional NeXus s
          elif test -r /usr/include/hdf5.h; then
            HDF5_PREFIX="/usr"
            AC_MSG_RESULT([${HDF5_PREFIX}])
-         elif test -r /sw/hdf5/include/hdf5.h; then
-           HDF5_PREFIX="/sw/hdf5"
+         elif test -r /sw/include/hdf5.h; then
+           HDF5_PREFIX="/sw"
            AC_MSG_RESULT([${HDF5_PREFIX}])
-         elif test -r /opt/hdf5/include/hdf5.h; then
-           HDF5_PREFIX="/opt/hdf5"
+         elif test -r /opt/local/include/hdf5.h; then
+           HDF5_PREFIX="/opt/local"
            AC_MSG_RESULT([${HDF5_PREFIX}])
          else
            AC_MSG_RESULT([no])
@@ -469,11 +469,11 @@ AC_ARG_ENABLE([NeXus], [AC_HELP_STRING([--enable-NeXus], [build optional NeXus s
          elif test -r /usr/include/napi.h; then
            NEXUS_PREFIX="/usr"
            AC_MSG_RESULT([${NEXUS_PREFIX}])
-         elif test -r /sw/nexus/include/napi.h; then
-           NEXUS_PREFIX="/sw/nexus"
+         elif test -r /sw/include/napi.h; then
+           NEXUS_PREFIX="/sw"
            AC_MSG_RESULT([${NEXUS_PREFIX}])
-         elif test -r /opt/local/nexus/include/napi.h; then
-           NEXUS_PREFIX="/opt/local/nexus"
+         elif test -r /opt/local/include/napi.h; then
+           NEXUS_PREFIX="/opt/local"
            AC_MSG_RESULT([${NEXUS_PREFIX}])
          else
            AC_MSG_RESULT([no])
