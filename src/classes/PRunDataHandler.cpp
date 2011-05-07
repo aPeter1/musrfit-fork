@@ -1809,13 +1809,15 @@ Bool_t PRunDataHandler::ReadMudFile()
   }
 
   // get start/stop time of the run
+  time_t tval;
   struct tm *dt;
   TString stime("");
   Int_t yy = 0;
-  success = MUD_getTimeBegin( fh, &val );
+  success = MUD_getTimeBegin( fh, (UINT32*)&tval );
   if (success) {
-    runData.SetStartDateTime((const time_t)val);
-    dt = localtime((const time_t*)&val);
+    runData.SetStartDateTime((const time_t)tval);
+    dt = localtime((const time_t*)&tval);
+    assert(dt);
     yy = dt->tm_year;
     if (yy > 100)
       yy -= 100;
@@ -1849,10 +1851,11 @@ Bool_t PRunDataHandler::ReadMudFile()
   }
 
   stime = TString("");
-  success = MUD_getTimeEnd( fh, &val );
+  success = MUD_getTimeEnd( fh, (UINT32*)&tval );
   if (success) {
-    runData.SetStopDateTime((const time_t)val);
-    dt = localtime((const time_t*)&val);
+    runData.SetStopDateTime((const time_t)tval);
+    dt = localtime((const time_t*)&tval);
+    assert(dt);
     stime = "";
     yy = dt->tm_year;
     if (yy > 100)
