@@ -1680,11 +1680,11 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   runData.SetTransport(PMUSR_UNDEFINED);
   // get field
   Double_t scale = 0.0;
-  if (psiBin.get_field().find("G"));
+  if (psiBin.get_field().rfind("G") != string::npos)
     scale = 1.0;
-  if (psiBin.get_field().find("T"));
+  if (psiBin.get_field().rfind("T") != string::npos)
     scale = 1.0e4;
-  status = sscanf(psiBin.get_field().c_str(), "%lfG", &dval);
+  status = sscanf(psiBin.get_field().c_str(), "%lf", &dval);
   if (status == 1)
     runData.SetField(scale*dval);
   // get temperature
