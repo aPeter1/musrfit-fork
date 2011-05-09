@@ -13,6 +13,7 @@ if BUILD_BMWLIBS
   BMWDIRS = BMWtools \
             libFitPofB \
             libLFRelaxation \
+            libZFRelaxation \
             libGapIntegrals \
             libCalcMeanFieldsLEM
 endif

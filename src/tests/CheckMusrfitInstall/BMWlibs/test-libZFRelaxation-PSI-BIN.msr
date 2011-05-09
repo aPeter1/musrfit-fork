@@ -1,0 +1,57 @@
+Test libZFRelaxation random fields Lorentzian broadened, asymmetry plot, PSI-BIN data file
+###############################################################
+FITPARAMETER
+#       No Name        Value     Step        Pos_Error   Boundaries
+        1 precFrac    0.666667  0           none        0       1       
+        2 field       171.20    0.55        none        0       none    
+        3 lambdaT     1.303     0.061       none        0       none    
+        4 lambdaL     0.099     0.012       none        0       none    
+
+        5 asymmetry   0.1429    0.0039      none        0       0.3     
+        6 alpha       0.8209    0.0027      none        
+
+###############################################################
+THEORY
+asymmetry      5
+userFcn  libZFRelaxation ZFMagExp 1 fun1 3 4
+
+###############################################################
+FUNCTIONS
+fun1 = par2 * gamma_mu
+
+###############################################################
+RUN data/deltat_pta_gps_4255 PIM3 PSI PSI-BIN   (name beamline institute data-file-format)
+fittype         2         (asymmetry fit)
+alpha           6
+map             0    0    0    0    0    0    0    0    0    0
+forward         2       
+backward        1       
+t0              125     128     
+data            128     8097    131     8112    
+background      45      113     40      117     
+fit             0       8      
+packing         30
+
+###############################################################
+COMMANDS
+MINIMIZE
+HESSE
+SAVE
+
+###############################################################
+FOURIER
+units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
+fourier_power    8
+apodization      NONE    # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            0
+range            0    500
+
+###############################################################
+PLOT 2   (asymmetry plot)
+runs     1   
+range    0   4   -0.25   0.25
+
+###############################################################
+STATISTIC --- 2011-05-09 14:56:44
+  chisq = 470.01394974044985, NDF = 208, chisq/NDF = 2.2596824506752395

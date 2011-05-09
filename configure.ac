@@ -811,6 +811,7 @@ AC_CONFIG_FILES([Makefile \
                  src/external/libFitPofB/Makefile \
                  src/external/libFitPofB/classes/Makefile \
                  src/external/libLFRelaxation/Makefile \
+                 src/external/libZFRelaxation/Makefile \
                  src/external/libGapIntegrals/Makefile \
                  src/external/libCalcMeanFieldsLEM/Makefile \
                  src/external/Nonlocal/Makefile \
