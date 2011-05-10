@@ -307,7 +307,7 @@ FUNCTIONS
 		$Data_Line =$Data_Line."    ".$All{"Data1$NHist"}."    ".$All{"Data2$NHist"};
 	    }
 	    if ($All{"t0$NHist"} ne $EMPTY) {
-		$T0_Line=$T0_Line."      ".$All{"Data1$NHist"};  
+		$T0_Line=$T0_Line."      ".$All{"t0$NHist"};  
 	    }
 	    $NHist++;
 	}

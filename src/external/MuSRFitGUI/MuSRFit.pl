@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Wed May 4 16:26:42 2011
+# Created: Wed May 4 16:51:35 2011
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -3068,7 +3068,7 @@ sub NEW
     MenuBar->insertSeparator( 8 );
 
     languageChange();
-    my $resize = Qt::Size(582, 546);
+    my $resize = Qt::Size(582, 502);
     $resize = $resize->expandedTo(minimumSizeHint());
     resize( $resize );
     clearWState( &Qt::WState_Polished );

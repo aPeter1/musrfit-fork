@@ -927,9 +927,9 @@ void MuSRFitform::t0UpdateClicked()
 # First T0s
     while ($FinHist) {
 	my $counter=0;
-#	(my $tmp,my @SplitT0) = split( /\s+/, $T0s[$counter]);
+	(my $tmp,my @SplitT0) = split( /\s+/, $T0s[$counter]);
 	(my $tmp,my @SplitBg) = split( /\s+/, $Bgs[$counter]);
-#	(my $tmp,my @SplitData) = split( /\s+/, $Datas[$counter]);
+	(my $tmp,my @SplitData) = split( /\s+/, $Datas[$counter]);
 	if ($#SplitBg>0) {
 	    foreach (@SplitBg) {
 		print $_."\n";
