@@ -813,6 +813,12 @@ Yi= <input type=\"text\" name=\"Yi\" value=\"$Yi\" size=\"3\"> <br>
 Yf= <input type=\"text\" name=\"Yf\" value=\"$Yf\" size=\"3\"> <br>
 </td>
 </tr>
+<tr>
+<td>
+View Bin<br>
+<input type=\"text\" name=\"ViewBin\" value=\"$ViewBin\" size=\"8\"> <br>
+</td>
+</tr>
  <tr>
   <td>
    <input type=\"submit\" name=\"go\" value=\"PLOT\" style=\"width: 90px\">
@@ -1129,6 +1135,8 @@ sub PassIn {
     $Xf = $in->param("Xf");
     $Yi = $in->param("Yi");
     $Yf = $in->param("Yf");
+
+    $ViewBin = $in->param("ViewBin");
 
     # Initail value if empty
     if ( $BINS eq $EMPTY ) { $BINS = 100; }
