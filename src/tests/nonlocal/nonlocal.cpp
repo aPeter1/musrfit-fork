@@ -21,16 +21,16 @@ void syntax()
   cout << endl << "% input file for nonlocal";
   cout << endl << "% --------------------------------";
   cout << endl << "% input parameters:";
-  cout << endl << "%   reduced temperature";
-  cout << endl << "%   lambda London (nm)";
-  cout << endl << "%   xi0 (nm)";
-  cout << endl << "%   mean free path (nm)";
-  cout << endl << "%   film thickness (nm)";
-  cout << endl << "%   specular, 1=specular, 0=diffuse";
-  cout << endl << "%   [Bext in (G)], i.e. this is optional";
-  cout << endl << "%   [dead layer in (nm)], i.e. this is optional";
-  cout << endl << "%   [rge input file name], i.e. this is optional";
-  cout << endl << "%   [output file name], i.e. this is optional";
+  cout << endl << "%   reducedTemp      : reduced temperature";
+  cout << endl << "%   lambdaL          : lambda London (nm)";
+  cout << endl << "%   xi0              : coherence length (nm)";
+  cout << endl << "%   meanFreePath     : mean free path (nm)";
+  cout << endl << "%   filmThickness    : film thickness (nm)";
+  cout << endl << "%   specular         : 1=specular, 0=diffuse";
+  cout << endl << "%   [Bext]           : external magnetic field (G), i.e. this is optional";
+  cout << endl << "%   [deadLayer]      : dead layer (nm), i.e. this is optional";
+  cout << endl << "%   [rgeFileName]    : rge input file name, i.e. this is optional";
+  cout << endl << "%   [outputFileName] : output file name, i.e. this is optional";
   cout << endl;
   cout << endl << "reducedTemp = 0.8287";
   cout << endl << "lambdaL = 30.0";
@@ -223,17 +223,21 @@ int readRgeFile(const char *fln, vector<Double_t> &x, vector<Double_t> &n)
   int lineNo = 1;
   int result;
   double valX, valN;
-  // read first line and ignore it since it is the header line
-  fgets(line, sizeof(line), fp);
+  int headerCount = 0;
   while (!feof(fp)) {
     fgets(line, sizeof(line), fp);
     result = sscanf(line, "%lf %lf", &valX, &valN);
     if (result != 2) {
-      cout << endl << "**ERROR** in line no " << lineNo;
-      cout << endl << "Couldn't extract x and n(x), will quit.";
-      cout << endl << endl;
-      fclose(fp);
-      return 0;
+      if (headerCount >= 2) {
+        cout << endl << "**ERROR** in line no " << lineNo;
+        cout << endl << "Couldn't extract x and n(x), will quit.";
+        cout << endl << endl;
+        fclose(fp);
+        return 0;
+      } else {
+        headerCount++;
+        continue;
+      }
     }
     x.push_back(valX/10.0); // x in nm
     n.push_back(valN);
@@ -250,10 +254,12 @@ int readRgeFile(const char *fln, vector<Double_t> &x, vector<Double_t> &n)
   }
 
 /*
+Double_t xx=0.0;
 for (unsigned int i=0; i<x.size(); i++) {
-  cout << endl << i << ": " << x[i] << ", " << n[i];
+  xx += n[i];
 }
-cout << endl;
+xx *= (x[1]-x[0]);
+cout << "debug> xx=" << xx << endl;
 */
 
   fclose(fp);
@@ -370,6 +376,8 @@ int main(int argc, char *argv[])
     for (unsigned int i=0; i<x.size()-1; i++) {
       if (x[i] <= params.deadLayer) {
         meanB += 1.0 * n[i];
+      } else if (x[i] > params.deadLayer+params.filmThickness) {
+        meanB += 1.0 * n[i];
       } else {
         BB = pippard->GetMagneticField(x[i]-params.deadLayer);
         meanB += BB * n[i];
@@ -394,8 +402,7 @@ int main(int argc, char *argv[])
   if (params.outputFileName.Length() > 0)
     pippard->SaveField();
 
-  cout << endl << ">> magnetic field = " << pippard->GetMagneticField(0.0);
-  cout << endl;
+  cout << endl << endl;
 
   if (pippard) {
     delete pippard;

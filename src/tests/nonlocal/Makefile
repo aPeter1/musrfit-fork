@@ -58,7 +58,7 @@ LIBS          = $(ROOTLIBS) -lXMLParser
 GLIBS         = $(ROOTGLIBS) -lXMLParser
 
 # PSI libs
-PSILIBS       = -L$(ROOTSYS)/lib -lTLemRunHeader -lPMusr
+PSILIBS       = -L$(ROOTSYS)/lib -lTLemRunHeader -lPMusr -lPUserFcnBase
 # Minuit2 lib
 MNLIB         = -L$(ROOTSYS)/lib -lMinuit2
 # MathMore lib
