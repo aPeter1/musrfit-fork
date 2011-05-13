@@ -212,7 +212,6 @@ void MuSRFitMenu::helpAbout()
 
 void MuSRFitform::CreateAllInput()
 {
-# TODO: Need to automatically generage years list depending on beamline
     my %All=();
     
 # From RUNS Tab
@@ -224,6 +223,14 @@ void MuSRFitform::CreateAllInput()
     $All{"optionsFourier"} = optionsFourier->isOn();
     $All{"optionsT0"} = optionsT0->isOn();
     $All{"YEAR"} =YEAR->currentText;
+    if ($All{"YEAR"} eq "") {
+# If year combobox is empty fill it up from 2004 up to current year
+	    my ($second, $minute, $hour, $dayOfMonth, $month, $yearOffset, $dayOfWeek, $dayOfYear, $daylightSavings) = localtime();
+	    my $current_year = 1900 + $yearOffset;
+	    for (my $i=$current_year;$i>=2004;$i--) {
+		YEAR->insertItem($i,-1);
+	    }
+    }
 # Time range and BINS
     $All{"Tis"} = Tis->text;
     $All{"Tfs"} = Tfs->text;
@@ -245,6 +252,7 @@ void MuSRFitform::CreateAllInput()
     $All{"Xf"}=Xf->text;
     $All{"Yi"}=Yi->text;
     $All{"Yf"}=Yf->text;
+    $All{"ViewBin"}=ViewBin->text;
 # Life time correction   
     if (ltc->isChecked()) {
 	$All{"ltc"}="y";
@@ -320,8 +328,9 @@ void MuSRFitform::CreateAllInput()
 	     10,"GLFExp",
 	     11,"LLFSExp",
 	     12,"GLFSExp",
-	     13,"Meissner",
-	     14,"None"
+	     13,"MolMag",
+	     14,"Meissner",
+	     15,"None"
 	     );
     
     my $FT1=FitType1->currentItem;
@@ -350,6 +359,8 @@ void MuSRFitform::CreateAllInput()
     $All{"Func_T_Block"}=TheoryBlock->text;
     
 # Shared settings are detected here
+    $All{"EnableSharing"} = buttonGroupSharing->isChecked();
+
     my $Shared = 0; 
     my $PCount =0;
     my $Component=1;
@@ -361,7 +372,7 @@ void MuSRFitform::CreateAllInput()
 	    unshift( @Params, "Alpha" );
 	}	
 	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
-	    unshift( @Params, ( "N0", "NBg" ) );
+	    unshift( @Params, ( "No", "NBg" ) );
 	}
 	
 # This is the counter for parameters of this component
@@ -374,7 +385,7 @@ void MuSRFitform::CreateAllInput()
 	    if ( $All{"FitAsyType"} eq "SingleHist" ) {
 		$Param=$Param.$Hists[0];	    
 	    }
-	    if ( $#FitTypes != 0 && (   $Param ne "Alpha" && $Param ne "N0" && $Param ne "NBg" ) ){
+	    if ( $#FitTypes != 0 && (   $Param ne "Alpha" && $Param ne "No" && $Param ne "NBg" ) ){
 		$Param = join( "", $Param, "_", $Component);
 	    }
 	    
@@ -582,44 +593,48 @@ void MuSRFitform::ActivateShComp()
     my @Paramcomp = @$Paramcomp_ref;
     my $Full_T_Block= $All{"Full_T_Block"};
     
-    my $Component=1;
-    foreach my $FitType (@FitTypes) {
-	my $Parameters=$Paramcomp[$Component-1];
-	my @Params = split( /\s+/, $Parameters );
+# Possible to share only if sharing is enabled altogether
+    my $EnableSharing = $All{"EnableSharing"};
+    if ($EnableSharing) {
+	my $Component=1;
+	foreach my $FitType (@FitTypes) {
+	    my $Parameters=$Paramcomp[$Component-1];
+	    my @Params = split( /\s+/, $Parameters );
 	
-	if ( $Component == 1 && $All{"FitAsyType"} eq "Asymmetry" ) {
-	    unshift( @Params, "Alpha" );
-	}
-	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
-	    unshift( @Params, ( "N0", "NBg" ) );
-	}
+	    if ( $Component == 1 && $All{"FitAsyType"} eq "Asymmetry" ) {
+		unshift( @Params, "Alpha" );
+	    }
+	    elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
+		unshift( @Params, ( "No", "NBg" ) );
+	    }
 	
 	
 # Make the component appear first (only if we have multiple runs)
-	my $ShCompG="SharingComp".$Component;
-	my $ShCG = child($ShCompG);
-	if ($#RUNS>0) {
-	    $ShCG->setHidden(0);
-	    $ShCG->setEnabled(1);
-	}
-	my $CompShLabel = "Comp".$Component."ShLabel";
-	my $CompShL = child($CompShLabel);
-	$CompShL->setText($All{"FitType$Component"});
+	    my $ShCompG="SharingComp".$Component;
+	    my $ShCG = child($ShCompG);
+	    if ($#RUNS>0) {
+		$ShCG->setHidden(0);
+		$ShCG->setEnabled(1);
+	    }
+	    my $CompShLabel = "Comp".$Component."ShLabel";
+	    my $CompShL = child($CompShLabel);
+	    $CompShL->setText($All{"FitType$Component"});
 	
 # Change state/label of parameters
-	for (my $i=1; $i<=9;$i++) {		
-	    my $ParamChkBx="ShParam_".$Component."_".$i;
-	    my $ChkBx = child($ParamChkBx);
-	    if ($Params[$i-1] ne "") {
-		$ChkBx->setHidden(0);
-		$ChkBx->setEnabled(1);
-		$ChkBx ->setText($Params[$i-1]);
-	    } else {
-		$ChkBx->setHidden(1);
+	    for (my $i=1; $i<=9;$i++) {		
+		my $ParamChkBx="ShParam_".$Component."_".$i;
+		my $ChkBx = child($ParamChkBx);
+		if ($Params[$i-1] ne "") {
+		    $ChkBx->setHidden(0);
+		    $ChkBx->setEnabled(1);
+		    $ChkBx ->setText($Params[$i-1]);
+		} else {
+		    $ChkBx->setHidden(1);
+		}
 	    }
+	    $Component++;
 	}
-	$Component++;
-    }  
+    }
 }
 
 void MuSRFitform::InitializeTab()
@@ -648,6 +663,8 @@ void MuSRFitform::InitializeTab()
 # Fill the table with labels and values of parametr 
     for (my $PCount=0;$PCount<$NParam;$PCount++) {
 	my ($Param,$value,$error,$minvalue,$maxvalue,$RUN) = split(/,/,$PTable{$PCount});
+# Now make sure we have no nans
+	if ($error eq "nan") { $error=0.1;}
 # If you use this then reading the parameters from the table is a problem
 # You need to extract the correct parameter name from the row label
 #	InitParamTable->verticalHeader()->setLabel( $PCount,"$RUN: $Param");
@@ -667,6 +684,7 @@ void MuSRFitform::TabChanged()
     
 # First make sure we have sharing initialized    
     ActivateShComp();
+# Here we need to apply sharing if selected...
     InitializeTab();
     UpdateMSRFileInitTable();
 # And also setup T0 and Bg bins
@@ -737,6 +755,7 @@ void MuSRFitform::ShowMuSRT0()
 	if (-e $FILENAME) {
 	    my $cmd="musrt0 $FILENAME &";
 	    my $pid = system($cmd);
+	    t0Update->setEnabled(1)
 	} else {
 	    print STDERR "Cannot find MSR file!\n";
 	}
@@ -868,19 +887,19 @@ void MuSRFitform::InitializeFunctions()
 	my $Parameters=$Paramcomp[$Component-1];
 	my @Params = split( /\s+/, $Parameters );	
 
-# Alpha, N0 and NBg are counted in the parameters
+# Alpha, No and NBg are counted in the parameters
 	if ( $Component == 1 && $All{"FitAsyType"} eq "Asymmetry" ) {
 	    unshift( @Params, "Alpha" );
 	}
 	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
-	    unshift( @Params, ( "N0", "NBg" ) );
+	    unshift( @Params, ( "No", "NBg" ) );
 	}
 	
 # Add list to the constraints drop down menu
 	for (my $i=1; $i<=9;$i++) {		
 	    my $CParam = $Params[$i-1]."_".$Component;
 	    if ($Params[$i-1] ne "" ) {
-		if ($Params[$i-1] ne "Alpha" && $Params[$i-1] ne "N0" && $Params[$i-1] ne "NBg") {
+		if ($Params[$i-1] ne "Alpha" && $Params[$i-1] ne "No" && $Params[$i-1] ne "NBg") {
 		    CParamsCombo->insertItem($CParam,-1);
 		    $Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
 		}
@@ -903,7 +922,7 @@ void MuSRFitform::InitializeFunctions()
 void MuSRFitform::optionConfigure()
 {
     use Customize;
-
+    
     my $Customize = Qt::Dialog(this);
     my $w = Customize;
     $w->setModal(1);
@@ -911,5 +930,43 @@ void MuSRFitform::optionConfigure()
 #    $Customize->setMainWidget($w);
 #    $w->show;
 #   exit $Customize->exec;
+    
+}
 
+void MuSRFitform::t0UpdateClicked()
+{
+# Read MSR file and get new values of t0,Bg and Data
+    my %All=CreateAllInput();      
+    my $FILENAME=$All{"FILENAME"};
+    open (MSRF,q{<},"$FILENAME.msr" );
+    my @lines = <MSRF>;
+    close(IFILE);
+    
+    my @T0s = grep {/t0 /} @lines;
+    my @Bgs = grep {/background /} @lines;
+    my @Datas = grep {/data /} @lines;
+
+    my @Hists = split(/,/, $All{"LRBF"} );
+    my $NHist = $#Hists+1;
+    print "Histograms: $NHist\n";
+    
+    my $FinHist = 1;
+# First T0s
+    while ($FinHist) {
+	my $counter=0;
+	(my $tmp,my @SplitT0) = split( /\s+/, $T0s[$counter]);
+	(my $tmp,my @SplitBg) = split( /\s+/, $Bgs[$counter]);
+	(my $tmp,my @SplitData) = split( /\s+/, $Datas[$counter]);
+	if ($#SplitBg>0) {
+	    foreach (@SplitBg) {
+		print $_."\n";
+	    }
+	}
+	$counter++;
+	if ($counter>=$#Bgs) {$FinHist=0;}
+    }	
+    
+# Finally, disable the update button
+    t0Update->setEnabled(0);
+#    t0Update->setText("musrt0")
 }

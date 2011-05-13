@@ -93,6 +93,14 @@ sub CreateMSR {
     }
 
     my @Hists = split( /,/, $All{"LRBF"} );
+    # TODO
+    # Check the number of histograms
+    # should be 2 or 4 histograms
+    # should be checked in GUI
+    # for 2 simple asymmetry fit
+    # for 4 two run blocks with different geometric parameters:
+    # Alpha, No, NBg, Phi, Asy
+
     my @TiVals = split( /,/, $All{"Tis"} );
     my @TfVals = split( /,/, $All{"Tfs"} );
     my @BINVals = split( /,/, $All{"BINS"} );
@@ -159,6 +167,7 @@ FUNCTIONS
     }
 
     # $shcount is a counter for shared parameters
+    # msr2data \[1363 1365 1366\] _Dolly_2010 msr-1363 global
     if ( $#RUNS == 0 ) {
         my $shcount = 1;
     } else {
@@ -286,28 +295,40 @@ FUNCTIONS
 	    foreach ("t0","Bg1","Bg2","Data1","Data2") {
 		$Name = "$_$NHist";
 # If empty fill with defaults
-		if ($All{$Name} eq $EMPTY) {
-		    $All{$Name}=MSR::T0BgData($_,$Hist,$BeamLine);
-		}
+#		if ($All{$Name} eq $EMPTY) {
+#		    $All{$Name}=MSR::T0BgData($_,$Hist,$BeamLine);
+#		}
 	    }
-	    $Bg_Line = $Bg_Line."    ".$All{"Bg1$NHist"}."    ".$All{"Bg2$NHist"};
-	    $Data_Line =$Data_Line."    ".$All{"Data1$NHist"}."    ".$All{"Data2$NHist"};
+# If empty skip lines
+	    if ($All{"Bg1$NHist"} ne $EMPTY && $All{"Bg2$NHist"} ne $EMPTY) {
+		$Bg_Line = $Bg_Line."    ".$All{"Bg1$NHist"}."    ".$All{"Bg2$NHist"};
+	    }
+	    if ($All{"Data1$NHist"} ne $EMPTY && $All{"Data2$NHist"} ne $EMPTY) {
+		$Data_Line =$Data_Line."    ".$All{"Data1$NHist"}."    ".$All{"Data2$NHist"};
+	    }
 	    if ($All{"t0$NHist"} ne $EMPTY) {
-		$T0_Line=$T0_Line."      ".$All{"Data1$NHist"};  
+		$T0_Line=$T0_Line."      ".$All{"t0$NHist"};  
 	    }
 	    $NHist++;
+	}
+
+# Put T0_Line Bg_Line and Data_Line together if not empty
+	my $T0DataBg=$EMPTY;
+	if ($T0_Line ne "t0") {
+	    $T0DataBg = $T0DataBg."\n".$T0_Line;
+	}
+	if ($Bg_Line ne "background") {
+	    $T0DataBg = $T0DataBg."\n".$Bg_Line;
+	}
+	if ($Data_Line ne "data") {
+	    $T0DataBg = $T0DataBg."\n".$Data_Line;
 	}
 
         $FRANGE_Line = "fit             TINI    TFIN";
         $PAC_Line    = "packing         BINNING";
 
-	
-	if ($T0_Line ne "t0") {
-	    $Data_Line= $Data_Line."\n".$T0_Line;
-	}
-
 	$Single_RUN =
-"$RUN_Line\n$Type_Line\n$Alpha_Line$Hist_Lines\n$Bg_Line\n$Data_Line\n$MAP_Line\n$FRANGE_Line\n$PAC_Line\n\n";
+"$RUN_Line\n$Type_Line\n$Alpha_Line$Hist_Lines\n$T0DataBg\n$MAP_Line\n$FRANGE_Line\n$PAC_Line\n\n";
         
         # Now add the appropriate values of fit range and packing
         my $Range_Min = 8;
@@ -396,12 +417,16 @@ SAVE
         #	}
     }
 
+    $VIEWBIN_Line ="";
+    if ( $All{"ViewBin"}!=0 ) { $VIEWBIN_Line = "view_packing ".$All{"ViewBin"};}
+
     my $RRFBlock=MSR::CreateRRFBlock(\%All);
     $PLOT_Block =
       "###############################################################
 PLOT $PLT
 runs     $RUNS_Line
 $PRANGE_Line
+$VIEWBIN_Line
 $RRFBlock
 $logxy";
 
@@ -443,9 +468,9 @@ STATISTIC --- 0000-00-00 00:00:00
     return($Full_T_Block,\@Paramcomp);
 }
 
-########################
+##########################################################################
 # CreateMSRSingleHist
-########################
+##########################################################################
 sub CreateMSRSingleHist {
     my %All = %{$_[0]};
 
@@ -525,7 +550,7 @@ FUNCTIONS
     if ( $#RUNS == 0 && $#Hists == 0) {
         my $shcount = 1;
     } else {
-        if ( $All{"Sh_N0"} == 1 ) {
+        if ( $All{"Sh_No"} == 1 ) {
             my $shcount = 1;
         } elsif ( $All{"Sh_NBg"} == 1 ) {
             my $shcount = 1;
@@ -540,6 +565,7 @@ FUNCTIONS
 
     # range order
     my $Range_Order = 1;
+    my $iHist = 0;
     foreach my $RUN (@RUNS) {
 #######################################################################
 # For a single histogram fit we basically need to repeat this for each hist
@@ -561,24 +587,26 @@ FUNCTIONS
 	    # How many non-shared parameter for this RUN?
 	    my $nonsh = 0;
 	    
-	    # Prepeare N0/NBg line for the RUN block. Empty initially.
-	    my $N0Bg_Line = $EMPTY;
+	    # Prepeare No/NBg line for the RUN block. Empty initially.
+	    my $NoBg_Line = $EMPTY;
 	    
 	    # Loop over all components in the fit
 	    foreach my $FitType (@FitTypes) {
 		++$component;
 		my $Parameters = $Paramcomp[ $component - 1 ];
 		my @Params = split( /\s+/, $Parameters );
+		# Only the first histiograms has new physical parameters
+		# the others keep only Phi if they have it
 		
-		# For the first component we need N0 and NBg for SingleHist fits
-		if ( $component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
-		    unshift( @Params, ( "N0", "NBg" ) );
+		# For the first component we need No and NBg for SingleHist fits
+		if ( $component == 1 ) {
+		    unshift( @Params, ( "No", "NBg" ) );
 		}
 
 		foreach $Param (@Params) {
 		    $Param_ORG = $Param;
 		    $Param=$Param.$Hist;
-		    if ( ($#FitTypes != 0) && ( $Param ne "N0" && $Param ne "NBg" ) ) {
+		    if ( ($#FitTypes != 0) && !( $Param_ORG =~ m/^(No|NBg)/ ) ) {
 			$Param = join( $EMPTY, $Param, "_", "$component" );
 		    }
 		    
@@ -591,35 +619,35 @@ FUNCTIONS
 			$Shared = $All{"Sh_$Param"};
 		    }
 		    
-		    # N0 and NBg Lines
+		    # No and NBg Lines
 		    #
-		    # If you encounter N0 in the parameters list make sure
+		    # If you encounter No in the parameters list make sure
 		    # to fill this line for the RUN block.
-		    if ( $Param_ORG eq "N0" ) {
+		    if ( $Param_ORG eq "No" ) {
 			if ($Shared) {
-			    $N0Bg_Line = "norm            1\n";
+			    $NoBg_Line = "norm            1\n";
 			}
 			else {
-			    $N0Bg_Line = "norm            $PCount\n";
+			    $NoBg_Line = "norm            $PCount\n";
 			}
 			
 			# Optional - add lifetime correction for SingleHist fits
 			if ( $All{"ltc"} eq "y" ) {
-			    $N0Bg_Line = $N0Bg_Line . "lifetimecorrection\n";
+			    $NoBg_Line = $NoBg_Line . "lifetimecorrection\n";
 			}
 		    }
 		    # If you encounter NBg in the parameters list make sure
 		    # to fill this line for the RUN block.
 		    elsif ( $Param_ORG eq "NBg" ) {
 			if ($Shared) {
-			    $N0Bg_Line = $N0Bg_Line . "backgr.fit      2\n";
+			    $NoBg_Line = $NoBg_Line . "backgr.fit      2\n";
 			}
 			else {
-			    $N0Bg_Line = $N0Bg_Line . "backgr.fit      $PCount\n";
+			    $NoBg_Line = $NoBg_Line . "backgr.fit      $PCount\n";
 			}
 		    }
 
-		    # End of N0 and NBg Lines
+		    # End of No and NBg Lines
 ####################################################################################################
 		    
 		    # Start preparing the parameters block
@@ -633,7 +661,7 @@ FUNCTIONS
 		    } else {
 			# Parameter is not shared, use map unless it is a single RUN fit
 			# Skip adding to map line in these cases
-			if ( $Param ne "N0" && $Param ne "NBg" && ($#RUNS != 0 || $#Hist != 0)) {
+			if ( !( $Param_ORG =~ m/^(No|NBg)/ ) && ($#RUNS != 0 || $#Hist != 0)) {
 			    ++$nonsh;
 			    $Full_T_Block =~ s/$Param_ORG/map$nonsh/;
 			    $MAP_Line = join( ' ', $MAP_Line, $PCount );
@@ -649,7 +677,7 @@ FUNCTIONS
 
 	    # For each defined range we need a block in the RUN-Block
 	    # Also for each histogram in Single Histograms fits
-	    # Also for Imaginaryand and Real for RRF fits
+	    # Also for Imaginary and and Real for RRF fits
 	    
 	    $RUN = $RUNS[ $iRun - 1 ];
 
@@ -686,7 +714,7 @@ FUNCTIONS
 	    $Tmp_Hist_Line = $Hist_Lines;
 	    $Tmp_Hist_Line =~ s/HIST/$Hist/g;
 	    $Single_RUN = $Single_RUN
-		. "$RUN_Line\n$Type_Line\n$N0Bg_Line$Tmp_Hist_Line\n$Data_Line\n$MAP_Line\n$FRANGE_Line\n$PAC_Line\n\n";
+		. "$RUN_Line\n$Type_Line\n$NoBg_Line$Tmp_Hist_Line\n$Data_Line\n$MAP_Line\n$FRANGE_Line\n$PAC_Line\n\n";
 	    
 	    # Now add the appropriate values of fit range and packing
 	    my $Range_Min = 8;
@@ -707,6 +735,7 @@ FUNCTIONS
 		++$k;
 		++$Range_Order;
 	    }
+	    ++$iHist;
 	}
 	++$iRun;
     }
@@ -843,8 +872,8 @@ sub CreateTheory {
 		  "generExpo",   "Lam Bet",
 		  "simpleGss",   "Sgm",
 		  "statGssKT",   "Sgm",
-		  "statGssKTLF", "Frq Sgm",
-		  "dynGssKTLF",  "Frq Sgm Lam",
+		  "statGssKTLF", "Frqg Sgm",
+		  "dynGssKTLF",  "Frql Sgm Lam",
 		  "statExpKT",   "Lam",
 		  "statExpKTLF", "Frq Aa",
 		  "dynExpKTLF",  "Frq Aa Lam",
@@ -1011,6 +1040,18 @@ sub CreateTheory {
 	    $Parameters = join( $SPACE, $Parameters, $THEORY{'statGssKTLF'} );
 	}
 	
+	# Lorentzian or Gaussian KT LF multiplied by stretched exponential
+	elsif ( $FitType eq "MolMag" ) {
+	    $T_Block = $T_Block . "\n" . "generExpo " . $THEORY{'generExpo'};
+	    $Parameters = join( $SPACE, $Parameters, $THEORY{'generExpo'} );
+	    $T_Block =
+		$T_Block . "\n" . "statExpKTLF " . $THEORY{'statExpKTLF'};
+	    $Parameters = join( $SPACE, $Parameters, $THEORY{'statExpKTLF'} );
+	    $T_Block =
+		$T_Block . "\n" . "statGssKTLF " . $THEORY{'statGssKTLF'};
+	    $Parameters = join( $SPACE, $Parameters, $THEORY{'statGssKTLF'} );
+	}
+
 	# Meissner state model
 	elsif ( $FitType eq "Meissner" ) {
 	    $T_Block = $T_Block . "\n" . "simpleGss " . $THEORY{'simpleGss'};
@@ -1068,7 +1109,7 @@ sub ExtractBlks {
 	my @Param=split(/\s+/,$line);
     }
 
-    return(\@TBlock,\@FPBlock)
+    return(\@TBlock,\@FPBlock);
 }
 
 
@@ -1092,15 +1133,15 @@ sub T0BgData {
 	     "3",",66000,66500,3419,63000",
 	     "4",",66000,66500,3419,63000");
     
-    my %GPS=("1",",40,120,135,8000",
-	     "2",",40,120,135,8000",
-	     "3",",40,120,135,8000",
-	     "4",",40,120,135,8000");
+#    my %GPS=("1",",40,120,135,8000",
+#	     "2",",40,120,135,8000",
+#	     "3",",40,120,135,8000",
+#	     "4",",40,120,135,8000");
     
-    my %Dolly=("1",",50,250,297,8000",
-	     "2",",50,250,297,8000",
-	     "3",",50,250,297,8000",
-	     "4",",50,250,297,8000");
+#    my %Dolly=("1",",50,250,297,8000",
+#	     "2",",50,250,297,8000",
+#	     "3",",50,250,297,8000",
+#	     "4",",50,250,297,8000");
     
     my %RV=();
      
@@ -1137,8 +1178,8 @@ sub PrepParamTable {
     "Asy_min",       "0",     "Asy_max",       "0",
     "Alpha",         "1.0",   "dAlpha",        "0.01",
     "Alpha_min",     "0",     "Alpha_max",     "0",
-    "N0",            "300.0", "dN0",           "0.01",
-    "N0_min",        "0",     "N0_max",        "0",
+    "No",            "300.0", "dNo",           "0.01",
+    "No_min",        "0",     "No_max",        "0",
     "NBg",           "30.0",  "dNBg",          "0.01",
     "NBg_min",       "0",     "NBg_max",       "0",
     "Lam",           "1.0",   "dLam",          "0.01",
@@ -1248,6 +1289,7 @@ sub PrepParamTable {
 # We can remove it from the MSR module later...
 # Or keep in the MSR as function ??
 
+
 # We have two options here, either take default values or take values of previous 
 # run if available
 #			    $ParamPrev =~ s/$iRun-1/$iRun/g;
@@ -1273,7 +1315,7 @@ sub PrepParamTable {
 		    my $Parameters=$Paramcomp[$Component-1];
 		    my @Params = split( /\s+/, $Parameters );		
 		    if ( $Component == 1 ) {
-			unshift( @Params, ( "N0", "NBg" ) );
+			unshift( @Params, ( "No", "NBg" ) );
 		    }
 		
 # This is the counter for parameters of this component
@@ -1282,8 +1324,10 @@ sub PrepParamTable {
 # Change state/label of parameters
 		    foreach my $Param (@Params) {
 			my $Param_ORG = $Param;
+			# If multiple histograms (sum or difference) take the first histogram only
+			($Hist,$tmp) = split(/ /,$Hist);
 			$Param=$Param.$Hist;
-			if ( $#FitTypes != 0 && ( $Param_ORG ne "N0" && $Param_ORG ne "NBg" ) ){
+			if ( $#FitTypes != 0 && ( $Param_ORG ne "No" && $Param_ORG ne "NBg" ) ){
 			    $Param = join( $EMPTY, $Param, "_", "$Component" );
 			}
 			
@@ -1433,7 +1477,7 @@ sub ExportParams {
 		    my $Parameters=$Paramcomp[$Component-1];
 		    my @Params = split( /\s+/, $Parameters );		
 		    if ( $Component == 1 ) {
-			unshift( @Params, ( "N0", "NBg" ) );
+			unshift( @Params, ( "No", "NBg" ) );
 		    }
 		
 # This is the counter for parameters of this component
@@ -1443,7 +1487,7 @@ sub ExportParams {
 		    foreach my $Param (@Params) {
 			my $Param_ORG = $Param;
 			$Param=$Param.$Hist;
-			if ( $#FitTypes != 0 && ( $Param_ORG ne "N0" && $Param_ORG ne "NBg" ) ){
+			if ( $#FitTypes != 0 && ( $Param_ORG ne "No" && $Param_ORG ne "NBg" ) ){
 			    $Param = join( $EMPTY, $Param, "_", "$Component" );
 			}
 			
@@ -1597,41 +1641,20 @@ sub RUNFileNameAuto {
 	$RUNFILE       = "$DATADIR/$YEAR/$RUN_File_Name";
     }
     elsif ( $BeamLine eq "GPS" ) {
-#	$RUN_File_Name = "deltat_pta_gps_" . $RUNtmp;
 	$RUN_File_Name = "deltat_tdc_gps_" . $RUNtmp;
-	if ( $YEAR == $current_year ) {
-	    $RUNFILE = "$DATADIR/$RUN_File_Name";
-	}
-	else {
-	    $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
-	}
+	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
     }
     elsif ( $BeamLine eq "LTF" ) {
-	$RUN_File_Name = "deltat_pta_ltf_" . $RUNtmp;
-	if ( $YEAR == $current_year ) {
-	    $RUNFILE = "$DATADIR/$RUN_File_Name";
-	}
-	else {
-	    $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
-	}
+	$RUN_File_Name = "deltat_tdc_ltf_" . $RUNtmp;
+	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
     }
     elsif ( $BeamLine eq "Dolly" ) {
-	$RUN_File_Name = "deltat_pta_dolly_" . $RUNtmp;
-	if ( $YEAR == $current_year ) {
-	    $RUNFILE = "$DATADIR/$RUN_File_Name";
-	}
-	else {
-	    $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
-	}
+	$RUN_File_Name = "deltat_tdc_dolly_" . $RUNtmp;
+	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
     }
     elsif ( $BeamLine eq "GPD" ) {
-	$RUN_File_Name = "deltat_pta_gpd_" . $RUNtmp;
-	if ( $YEAR == $current_year ) {
-	    $RUNFILE = "$DATADIR/$RUN_File_Name";
-	}
-	else {
-	    $RUNFILE = "$DATADIR/d$YEAR/pta/$RUN_File_Name";
-	}
+	$RUN_File_Name = "deltat_tdc_gpd_" . $RUNtmp;
+	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
     }
     my $RUN_Line = join( $SPACE,
 			 "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
