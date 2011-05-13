@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<musrgui_startup xmlns="https://wiki.intranet.psi.ch/MUSR/MusrGui">
+<musrgui_startup xmlns="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrGui.html">
   <comment>
     $Id$
     This is handling default setting parameters for the musrgui.
@@ -23,8 +23,8 @@
   </msr_file_defaults>
   <help_section>
     <help_main>
-      For a detailed description of the aim and structure of a msr-file see &lt;b&gt;https://wiki.intranet.psi.ch/MUSR/MusrFit&lt;/b&gt;
-      Starting with &gt;= Qt4.2 this will be linked automatically but until then ...; sorry ;-)
+      For a detailed description of the aim and structure of a msr file see &lt;b&gt;http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html&lt;/b&gt;
+      Starting with &ge; Qt 4.2 this will be linked automatically but until then ...; sorry ;-)
     </help_main>
   </help_section>
   <msr2data_defaults>
