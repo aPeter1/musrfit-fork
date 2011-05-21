@@ -668,7 +668,7 @@ if test "${BUILD_BMW_LIBS}" = "1"; then
   AC_SUBST(FITPOFB_LIBS)
   AC_SUBST(FITPOFB_CFLAGS)
 
-  # Check for fftw3_threads-library. If available musrfit is also linked against it (used in libTFitPofB).
+  # Check for fftw3_threads-library. If available musrfit is also linked against it (used in libFitPofB).
   SAVED_CFLAGS="$CFLAGS"
   CFLAGS="$CFLAGS $FFTW3_CFLAGS"
   SAVED_LIBSS="$LIBS"
@@ -686,18 +686,18 @@ if test "${BUILD_BMW_LIBS}" = "1"; then
 
   CFLAGS="$SAVED_CFLAGS"
   LIBS="$SAVED_LIBS"
-
-  # Check for gomp-library. If available musrfit is also linked against it (used in libTFitPofB).
-  SAVED_CXXFLAGS="$CXXFLAGS"
-  CXXFLAGS="$CXXFLAGS -fopenmp"
-  SAVED_LIBSS="$LIBS"
-  LIBS="$LIBS -fopenmp -lgomp"
-  AC_SEARCH_LIBS([omp_get_num_procs], [gomp], [AC_DEFINE([HAVE_GOMP], [1], [Define to 1 if gomp is available])],
-                                      [CXXFLAGS="$SAVED_CXXFLAGS" LIBS="$SAVED_LIBS"], [])
 fi
+
 AC_SUBST(FFTW3_LIBS)
 AC_SUBST(FFTW3_CFLAGS)
 
+# Check for gomp library. If available musrfit is also linked against it (used for parallel chisq calculation and in libFitPofB).
+SAVED_CXXFLAGS="$CXXFLAGS"
+CXXFLAGS="$CXXFLAGS -fopenmp"
+SAVED_LIBSS="$LIBS"
+LIBS="$LIBS -fopenmp -lgomp"
+AC_SEARCH_LIBS([omp_get_num_procs], [gomp], [AC_DEFINE([HAVE_GOMP], [1], [Define to 1 if gomp is available])],
+                                    [CXXFLAGS="$SAVED_CXXFLAGS" LIBS="$SAVED_LIBS"], [])
 
 dnl -----------------------------------------------
 dnl Set host specific compiler and linker flags

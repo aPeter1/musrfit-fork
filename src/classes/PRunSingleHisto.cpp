@@ -29,6 +29,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef HAVE_GOMP
+#include <omp.h>
+#endif
+
 #include <iostream>
 #include <fstream>
 using namespace std;
@@ -139,8 +147,19 @@ Double_t PRunSingleHisto::CalcChiSquare(const std::vector<Double_t>& par)
   }
 
   // calculate chi square
-  Double_t time;
-  for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
+  Double_t time(1.0);
+  Int_t i, N(static_cast<Int_t>(fData.GetValue()->size()));
+
+  // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
+  // This is needed for the LF and user functions where some non-thread-save calculations only need to be calculated once
+  // for a given set of parameters---which should be done outside of the parallelized loop.
+  // For all other functions it means a tiny and acceptable overhead.
+  time = fTheory->Func(time, par, fFuncValues);
+
+  #ifdef HAVE_GOMP
+  #pragma omp parallel for default(shared) private(i,time,diff) schedule(dynamic,N/(2*omp_get_num_procs())) reduction(+:chisq)
+  #endif
+  for (i=0; i < N; ++i) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
     if ((time>=fFitStartTime) && (time<=fFitEndTime)) {
       diff = fData.GetValue()->at(i) -
@@ -212,12 +231,25 @@ Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
   // calculate maximum log likelihood
   Double_t theo;
   Double_t data;
-  Double_t time;
+  Double_t time(1.0);
+  Int_t i, N(static_cast<Int_t>(fData.GetValue()->size()));
+
   // norm is needed since there is no simple scaling like in chisq case to get the correct Max.Log.Likelihood value when normlizing N(t) to 1/ns
   Double_t normalizer = 1.0;
+
   if (fScaleN0AndBkg)
     normalizer = fRunInfo->GetPacking() * (fTimeResolution * 1.0e3);
-  for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
+
+  // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
+  // This is needed for the LF and user functions where some non-thread-save calculations only need to be calculated once
+  // for a given set of parameters---which should be done outside of the parallelized loop.
+  // For all other functions it means a tiny and acceptable overhead.
+  time = fTheory->Func(time, par, fFuncValues);
+
+  #ifdef HAVE_GOMP
+  #pragma omp parallel for default(shared) private(i,time,theo,data) schedule(dynamic,N/(2*omp_get_num_procs())) reduction(-:mllh)
+  #endif
+  for (i=0; i < N; ++i) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
     if ((time>=fFitStartTime) && (time<=fFitEndTime)) {
       // calculate theory for the given parameter set

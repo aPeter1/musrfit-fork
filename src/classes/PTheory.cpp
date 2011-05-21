@@ -29,6 +29,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef HAVE_GOMP
+#include <omp.h>
+#endif
+
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -1185,6 +1193,7 @@ Double_t PTheory::StaticGaussKT(register Double_t t, const PDoubleVector& paramV
  */
 Double_t PTheory::StaticGaussKTLF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
+
   // expected parameters: frequency damping [tshift]
 
   Double_t val[3];
@@ -1206,8 +1215,9 @@ Double_t PTheory::StaticGaussKTLF(register Double_t t, const PDoubleVector& para
     return 1.0;
 
   // check if the parameter values have changed, and if yes recalculate the non-analytic integral
+  // check only the first two parameters since the tshift is irrelevant for the LF-integral calculation!!
   Bool_t newParam = false;
-  for (UInt_t i=0; i<3; i++) {
+  for (UInt_t i=0; i<2; i++) {
     if (val[i] != fPrevParam[i]) {
       newParam = true;
       break;
@@ -1215,9 +1225,11 @@ Double_t PTheory::StaticGaussKTLF(register Double_t t, const PDoubleVector& para
   }
 
   if (newParam) { // new parameters found
-    for (UInt_t i=0; i<3; i++)
-      fPrevParam[i] = val[i];
-    CalculateGaussLFIntegral(val);
+    {
+      for (UInt_t i=0; i<2; i++)
+        fPrevParam[i] = val[i];
+      CalculateGaussLFIntegral(val);
+    }
   }
 
   Double_t tt;
@@ -1246,6 +1258,7 @@ Double_t PTheory::StaticGaussKTLF(register Double_t t, const PDoubleVector& para
   }
 
   return result;
+
 }
 
 //--------------------------------------------------------------------------
@@ -1301,8 +1314,9 @@ Double_t PTheory::DynamicGaussKTLF(register Double_t t, const PDoubleVector& par
 
   if (!useKeren) {
     // check if the parameter values have changed, and if yes recalculate the non-analytic integral
+    // check only the first three parameters since the tshift is irrelevant for the LF-integral calculation!!
     Bool_t newParam = false;
-    for (UInt_t i=0; i<4; i++) {
+    for (UInt_t i=0; i<3; i++) {
       if (val[i] != fPrevParam[i]) {
         newParam = true;
         break;
@@ -1310,7 +1324,7 @@ Double_t PTheory::DynamicGaussKTLF(register Double_t t, const PDoubleVector& par
     }
 
     if (newParam) { // new parameters found
-      for (UInt_t i=0; i<4; i++)
+      for (UInt_t i=0; i<3; i++)
         fPrevParam[i] = val[i];
       CalculateDynKTLF(val, 0); // 0 means Gauss
     }
@@ -1340,6 +1354,7 @@ Double_t PTheory::DynamicGaussKTLF(register Double_t t, const PDoubleVector& par
   }
 
   return result;
+
 }
 
 //--------------------------------------------------------------------------
@@ -1423,8 +1438,9 @@ Double_t PTheory::StaticLorentzKTLF(register Double_t t, const PDoubleVector& pa
     return 1.0;
 
   // check if the parameter values have changed, and if yes recalculate the non-analytic integral
+  // check only the first two parameters since the tshift is irrelevant for the LF-integral calculation!!
   Bool_t newParam = false;
-  for (UInt_t i=0; i<3; i++) {
+  for (UInt_t i=0; i<2; i++) {
     if (val[i] != fPrevParam[i]) {
       newParam = true;
       break;
@@ -1432,7 +1448,7 @@ Double_t PTheory::StaticLorentzKTLF(register Double_t t, const PDoubleVector& pa
   }
 
   if (newParam) { // new parameters found
-    for (UInt_t i=0; i<3; i++)
+    for (UInt_t i=0; i<2; i++)
       fPrevParam[i] = val[i];
     CalculateLorentzLFIntegral(val);
   }
@@ -1472,6 +1488,7 @@ Double_t PTheory::StaticLorentzKTLF(register Double_t t, const PDoubleVector& pa
   }
 
   return result;
+
 }
 
 //--------------------------------------------------------------------------
@@ -1562,8 +1579,9 @@ Double_t PTheory::DynamicLorentzKTLF(register Double_t t, const PDoubleVector& p
   }
 
   // check if the parameter values have changed, and if yes recalculate the non-analytic integral
+  // check only the first three parameters since the tshift is irrelevant for the LF-integral calculation!!
   Bool_t newParam = false;
-  for (UInt_t i=0; i<4; i++) {
+  for (UInt_t i=0; i<3; i++) {
     if (val[i] != fPrevParam[i]) {
       newParam = true;
       break;
@@ -1571,14 +1589,15 @@ Double_t PTheory::DynamicLorentzKTLF(register Double_t t, const PDoubleVector& p
   }
 
   if (newParam) { // new parameters found
-    for (UInt_t i=0; i<4; i++)
+    for (UInt_t i=0; i<3; i++)
       fPrevParam[i] = val[i];
-    CalculateDynKTLF(val, 1); // 0 means Lorentz
+    CalculateDynKTLF(val, 1); // 1 means Lorentz
   }
 
   result = GetDynKTLFValue(tt);
 
   return result;
+
 }
 
 //--------------------------------------------------------------------------
