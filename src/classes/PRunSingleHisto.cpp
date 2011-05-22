@@ -150,6 +150,14 @@ Double_t PRunSingleHisto::CalcChiSquare(const std::vector<Double_t>& par)
   Double_t time(1.0);
   Int_t i, N(static_cast<Int_t>(fData.GetValue()->size()));
 
+  // In order not to have an IF in the next loop, determine the start and end bins for the fit range now
+  Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
+  if (startTimeBin < 0)
+    startTimeBin = 0;
+  Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
+  if (endTimeBin >= N)
+    endTimeBin = N;
+
   // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
   // This is needed for the LF and user functions where some non-thread-save calculations only need to be calculated once
   // for a given set of parameters---which should be done outside of the parallelized loop.
@@ -157,15 +165,16 @@ Double_t PRunSingleHisto::CalcChiSquare(const std::vector<Double_t>& par)
   time = fTheory->Func(time, par, fFuncValues);
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(i,time,diff) schedule(dynamic,N/(2*omp_get_num_procs())) reduction(+:chisq)
+  Int_t chunk = (endTimeBin - startTimeBin)/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(i,time,diff) schedule(dynamic,chunk) reduction(+:chisq)
   #endif
-  for (i=0; i < N; ++i) {
+  for (i=startTimeBin; i < endTimeBin; ++i) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
-    if ((time>=fFitStartTime) && (time<=fFitEndTime)) {
-      diff = fData.GetValue()->at(i) -
-            (N0*TMath::Exp(-time/tau)*(1.0+fTheory->Func(time, par, fFuncValues))+bkg);
-      chisq += diff*diff / (fData.GetError()->at(i)*fData.GetError()->at(i));
-    }
+    diff = fData.GetValue()->at(i) -
+          (N0*TMath::Exp(-time/tau)*(1.0+fTheory->Func(time, par, fFuncValues))+bkg);
+    chisq += diff*diff / (fData.GetError()->at(i)*fData.GetError()->at(i));
   }
 
   // the correction factor is need since the data scales like pack*t_res,
@@ -240,6 +249,14 @@ Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
   if (fScaleN0AndBkg)
     normalizer = fRunInfo->GetPacking() * (fTimeResolution * 1.0e3);
 
+  // In order not to have an IF in the next loop, determine the start and end bins for the fit range now
+  Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
+  if (startTimeBin < 0)
+    startTimeBin = 0;
+  Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
+  if (endTimeBin >= N)
+    endTimeBin = N;
+
   // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
   // This is needed for the LF and user functions where some non-thread-save calculations only need to be calculated once
   // for a given set of parameters---which should be done outside of the parallelized loop.
@@ -247,22 +264,23 @@ Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
   time = fTheory->Func(time, par, fFuncValues);
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(i,time,theo,data) schedule(dynamic,N/(2*omp_get_num_procs())) reduction(-:mllh)
+  Int_t chunk = (endTimeBin - startTimeBin)/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(i,time,theo,data) schedule(dynamic,chunk) reduction(-:mllh)
   #endif
-  for (i=0; i < N; ++i) {
+  for (i=startTimeBin; i < endTimeBin; ++i) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
-    if ((time>=fFitStartTime) && (time<=fFitEndTime)) {
-      // calculate theory for the given parameter set
-      theo = N0*TMath::Exp(-time/tau)*(1+fTheory->Func(time, par, fFuncValues))+bkg;
-      theo *= normalizer;
-      // check if data value is not too small
-      if (fData.GetValue()->at(i) > 1.0e-9)
-        data = normalizer*fData.GetValue()->at(i);
-      else
-        data = 1.0e-9;
-      // add maximum log likelihood contribution of bin i
-      mllh -= data*TMath::Log(theo) - theo - TMath::LnGamma(data+1);
-    }
+    // calculate theory for the given parameter set
+    theo = N0*TMath::Exp(-time/tau)*(1+fTheory->Func(time, par, fFuncValues))+bkg;
+    theo *= normalizer;
+    // check if data value is not too small
+    if (fData.GetValue()->at(i) > 1.0e-9)
+      data = normalizer*fData.GetValue()->at(i);
+    else
+      data = 1.0e-9;
+    // add maximum log likelihood contribution of bin i
+    mllh -= data*TMath::Log(theo) - theo - TMath::LnGamma(data+1);
   }
 
   return mllh;

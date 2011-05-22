@@ -166,6 +166,14 @@ Double_t PRunAsymmetry::CalcChiSquare(const std::vector<Double_t>& par)
   Double_t time(1.0);
   Int_t i, N(static_cast<Int_t>(fData.GetValue()->size()));
 
+  // In order not to have an IF in the next loop, determine the start and end bins for the fit range now
+  Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
+  if (startTimeBin < 0)
+    startTimeBin = 0;
+  Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
+  if (endTimeBin >= N)
+    endTimeBin = N;
+
   // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
   // This is needed for the LF and user functions where some non-thread-save calculations only need to be calculated once
   // for a given set of parameters---which should be done outside of the parallelized loop.
@@ -173,37 +181,38 @@ Double_t PRunAsymmetry::CalcChiSquare(const std::vector<Double_t>& par)
   asymFcnValue = fTheory->Func(time, par, fFuncValues);
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(i,time,diff,asymFcnValue) schedule(dynamic,N/(2*omp_get_num_procs())) reduction(+:chisq)
+  Int_t chunk = (endTimeBin - startTimeBin)/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(i,time,diff,asymFcnValue,a,b,f) schedule(dynamic,chunk) reduction(+:chisq)
   #endif
-  for (i=0; i < N; ++i) {
+  for (i=startTimeBin; i < endTimeBin; ++i) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
-    if ((time>=fFitStartTime) && (time<=fFitEndTime)) {
-      switch (fAlphaBetaTag) {
-        case 1: // alpha == 1, beta == 1
-          asymFcnValue = fTheory->Func(time, par, fFuncValues);
-          break;
-        case 2: // alpha != 1, beta == 1
-          a = par[fRunInfo->GetAlphaParamNo()-1];
-          f = fTheory->Func(time, par, fFuncValues);
-          asymFcnValue = (f*(a+1.0)-(a-1.0))/((a+1.0)-f*(a-1.0));
-          break;
-        case 3: // alpha == 1, beta != 1
-          b = par[fRunInfo->GetBetaParamNo()-1];
-          f = fTheory->Func(time, par, fFuncValues);
-          asymFcnValue = f*(b+1.0)/(2.0-f*(b-1.0));
-          break;
-        case 4: // alpha != 1, beta != 1
-          a = par[fRunInfo->GetAlphaParamNo()-1];
-          b = par[fRunInfo->GetBetaParamNo()-1];
-          f = fTheory->Func(time, par, fFuncValues);
-          asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0));
-          break;
-        default:
-          break;
-      }
-      diff = fData.GetValue()->at(i) - asymFcnValue;
-      chisq += diff*diff / (fData.GetError()->at(i)*fData.GetError()->at(i));
+    switch (fAlphaBetaTag) {
+      case 1: // alpha == 1, beta == 1
+        asymFcnValue = fTheory->Func(time, par, fFuncValues);
+        break;
+      case 2: // alpha != 1, beta == 1
+        a = par[fRunInfo->GetAlphaParamNo()-1];
+        f = fTheory->Func(time, par, fFuncValues);
+        asymFcnValue = (f*(a+1.0)-(a-1.0))/((a+1.0)-f*(a-1.0));
+        break;
+      case 3: // alpha == 1, beta != 1
+        b = par[fRunInfo->GetBetaParamNo()-1];
+        f = fTheory->Func(time, par, fFuncValues);
+        asymFcnValue = f*(b+1.0)/(2.0-f*(b-1.0));
+        break;
+      case 4: // alpha != 1, beta != 1
+        a = par[fRunInfo->GetAlphaParamNo()-1];
+        b = par[fRunInfo->GetBetaParamNo()-1];
+        f = fTheory->Func(time, par, fFuncValues);
+        asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0));
+        break;
+      default:
+        break;
     }
+    diff = fData.GetValue()->at(i) - asymFcnValue;
+    chisq += diff*diff / (fData.GetError()->at(i)*fData.GetError()->at(i));
   }
 
   return chisq;
