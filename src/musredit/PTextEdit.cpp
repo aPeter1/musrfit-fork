@@ -540,7 +540,7 @@ void PTextEdit::setupMusrActions()
   menu->addAction(a);
 
   fMusrT0Action = new QAction( QIcon( QPixmap( ":/images/musrt0.xpm" ) ), tr( "&T0" ), this );
-  a->setStatusTip( tr("Start musrt0") );
+  fMusrT0Action->setStatusTip( tr("Start musrt0") );
   connect( fMusrT0Action, SIGNAL( triggered() ), this, SLOT( musrT0() ) );
   tb->addAction(fMusrT0Action);
   menu->addAction(fMusrT0Action);
