@@ -171,7 +171,7 @@ Double_t PRunAsymmetry::CalcChiSquare(const std::vector<Double_t>& par)
   if (startTimeBin < 0)
     startTimeBin = 0;
   Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
-  if (endTimeBin >= N)
+  if (endTimeBin > N)
     endTimeBin = N;
 
   // Calculate the theory function once to ensure one function evaluation for the current set of parameters.

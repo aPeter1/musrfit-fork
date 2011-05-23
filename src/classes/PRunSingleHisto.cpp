@@ -155,7 +155,7 @@ Double_t PRunSingleHisto::CalcChiSquare(const std::vector<Double_t>& par)
   if (startTimeBin < 0)
     startTimeBin = 0;
   Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
-  if (endTimeBin >= N)
+  if (endTimeBin > N)
     endTimeBin = N;
 
   // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
@@ -254,7 +254,7 @@ Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
   if (startTimeBin < 0)
     startTimeBin = 0;
   Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
-  if (endTimeBin >= N)
+  if (endTimeBin > N)
     endTimeBin = N;
 
   // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
@@ -343,7 +343,7 @@ void PRunSingleHisto::CalcTheory()
   Double_t time;
   for (UInt_t i=0; i<size; i++) {
     time = start + (Double_t)i*resolution;
-    fData.AppendTheoryValue(N0*TMath::Exp(-time/tau)*(1+fTheory->Func(time, par, fFuncValues))+bkg);
+    fData.AppendTheoryValue(N0*TMath::Exp(-time/tau)*(1.0+fTheory->Func(time, par, fFuncValues))+bkg);
   }
 
   // clean up

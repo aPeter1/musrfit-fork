@@ -2228,16 +2228,16 @@ void PTheory::CalculateLorentzLFIntegral(const Double_t *val) const
  */
 Double_t PTheory::GetLFIntegralValue(const Double_t t) const
 {
-  UInt_t idx = static_cast<UInt_t>(t/fSamplingTime);
-
-  if (idx < 0)
+  if (t < 0.0)
     return 0.0;
 
-  if (idx > fLFIntegral.size()-2)
-    return fLFIntegral[fLFIntegral.size()-1];
+  UInt_t idx = static_cast<UInt_t>(t/fSamplingTime);
 
-  // liniarly interpolate between the two relvant function bins
-  Double_t df = (fLFIntegral[idx+1]-fLFIntegral[idx])/fSamplingTime*(t-idx*fSamplingTime);
+  if (idx + 2 > fLFIntegral.size())
+    return fLFIntegral.back();
+
+  // linearly interpolate between the two relvant function bins
+  Double_t df = (fLFIntegral[idx+1]-fLFIntegral[idx])*(t/fSamplingTime-static_cast<Double_t>(idx));
 
   return fLFIntegral[idx]+df;
 }
@@ -2278,7 +2278,7 @@ void PTheory::CalculateDynKTLF(const Double_t *val, Int_t tag) const
     }
   }
 
-  if (N < 300) // if too view points, i.e. nu0 very small, take 300 points
+  if (N < 300) // if too few points, i.e. nu0 very small, take 300 points
     N = 300;
 
   // allocate memory for dyn KT LF function vector
@@ -2386,16 +2386,16 @@ void PTheory::CalculateDynKTLF(const Double_t *val, Int_t tag) const
  */
 Double_t PTheory::GetDynKTLFValue(const Double_t t) const
 {
-  Int_t idx = static_cast<Int_t>(t/fDynLFdt);
-
-  if (idx < 0)
+  if (t < 0.0)
     return 0.0;
 
-  if (idx > static_cast<Int_t>(fDynLFFuncValue.size())-2)
-    return fDynLFFuncValue[fDynLFFuncValue.size()-1];
+  UInt_t idx = static_cast<UInt_t>(t/fDynLFdt);
 
-  // liniarly interpolate between the two relvant function bins
-  Double_t df = (fDynLFFuncValue[idx+1]-fDynLFFuncValue[idx])*(t-idx*fDynLFdt)/fDynLFdt;
+  if (idx + 2 > fDynLFFuncValue.size())
+    return fDynLFFuncValue.back();
+
+  // linearly interpolate between the two relvant function bins
+  Double_t df = (fDynLFFuncValue[idx+1]-fDynLFFuncValue[idx])*(t/fDynLFdt-static_cast<Double_t>(idx));
 
   return fDynLFFuncValue[idx]+df;
 }
