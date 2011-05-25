@@ -51,6 +51,7 @@ class PRunSingleHisto : public PRunBase
     virtual UInt_t GetNoOfFitBins();
 
   protected:
+    virtual void CalcNoOfFitBins();
     virtual Bool_t PrepareData();
     virtual Bool_t PrepareFitData(PRawRunData* runData, const UInt_t histoNo);
     virtual Bool_t PrepareRawViewData(PRawRunData* runData, const UInt_t histoNo);

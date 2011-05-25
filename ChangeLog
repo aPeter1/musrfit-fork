@@ -8,6 +8,7 @@ changes since 0.9.0
 ===================================
 NEW the chi^2 calculation in single-histogram and asymmetry fits is parallelized
     if musrfit is built using a compiler supporting OpenMP (e.g. GCC >= 4.2)
+    Using --disable-omp this feature can be disabled on the configure level.
 NEW any2many: force the user to define the exact NeXus ouput format (HDF4,HDF5,XML)
 FIXED the evaluation of the LF depolarization functions (before numerous unnecessary calculations were performed)
 FIXED casting problem between uint32 and time_t for some compilers (MUSR-185)

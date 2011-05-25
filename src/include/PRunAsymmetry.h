@@ -52,6 +52,7 @@ class PRunAsymmetry : public PRunBase
     virtual UInt_t GetNoOfFitBins();
 
   protected:
+    virtual void CalcNoOfFitBins();
     virtual Bool_t PrepareData();
     virtual Bool_t PrepareFitData(PRawRunData* runData, UInt_t histoNo[2]);
     virtual Bool_t PrepareViewData(PRawRunData* runData, UInt_t histoNo[2]);

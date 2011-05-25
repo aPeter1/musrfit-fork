@@ -360,15 +360,39 @@ void PRunSingleHisto::CalcTheory()
  */
 UInt_t PRunSingleHisto::GetNoOfFitBins()
 {
-  fNoOfFitBins=0;
-  Double_t time;
-  for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
-    time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
-    if ((time >= fFitStartTime) && (time <= fFitEndTime))
-      fNoOfFitBins++;
-  }
+//   fNoOfFitBins=0;
+//
+//   Double_t time;
+//   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
+//     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
+//     if ((time >= fFitStartTime) && (time <= fFitEndTime))
+//       fNoOfFitBins++;
+//   }
+  CalcNoOfFitBins();
 
   return fNoOfFitBins;
+}
+
+//--------------------------------------------------------------------------
+// CalcNoOfFitBins (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculate the number of fitted bins for the current fit range.
+ */
+void PRunSingleHisto::CalcNoOfFitBins()
+{
+  // In order not having to loop over all bins and to stay consistent with the chisq method, calculate the start and end bins explicitly
+  Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
+  if (startTimeBin < 0)
+    startTimeBin = 0;
+  Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
+  if (endTimeBin > static_cast<Int_t>(fData.GetValue()->size()))
+    endTimeBin = fData.GetValue()->size();
+
+  if (endTimeBin > startTimeBin)
+    fNoOfFitBins = endTimeBin - startTimeBin;
+  else
+    fNoOfFitBins = 0;
 }
 
 //--------------------------------------------------------------------------
@@ -702,14 +726,15 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
     }
   }
 
-  // count the number of bins to be fitted
-  fNoOfFitBins=0;
-  Double_t time;
-  for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
-    time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
-    if ((time >= fFitStartTime) && (time <= fFitEndTime))
-      fNoOfFitBins++;
-  }
+//   // count the number of bins to be fitted
+//   fNoOfFitBins=0;
+//   Double_t time;
+//   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
+//     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
+//     if ((time >= fFitStartTime) && (time <= fFitEndTime))
+//       fNoOfFitBins++;
+//   }
+  CalcNoOfFitBins();
 
   return true;
 }
@@ -801,15 +826,16 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
     value += runData->GetDataBin(histoNo)->at(i);
   }
 
-  // count the number of bins
-  fNoOfFitBins=0;
-
-  Double_t time;
-  for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
-    time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
-    if ((time >= fFitStartTime) && (time <= fFitEndTime))
-      fNoOfFitBins++;
-  }
+//   // count the number of bins
+//   fNoOfFitBins=0;
+//
+//   Double_t time;
+//   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
+//     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
+//     if ((time >= fFitStartTime) && (time <= fFitEndTime))
+//       fNoOfFitBins++;
+//   }
+  CalcNoOfFitBins();
 
   // fill theory vector for kView
   // feed the parameter vector
@@ -874,6 +900,7 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
     size = fData.GetValue()->size() * 10;
     factor = (Double_t)runData->GetDataBin(histoNo)->size() / (Double_t)size;
   }
+  Double_t time;
   Double_t theoryValue;
   fData.SetTheoryTimeStart(fData.GetDataTimeStart());
   fData.SetTheoryTimeStep(fTimeResolution*factor);
@@ -1096,13 +1123,14 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
     }
   }
 
-  // count the number of bins to be fitted
-  fNoOfFitBins=0;
-  for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
-    time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
-    if ((time >= fFitStartTime) && (time <= fFitEndTime))
-      fNoOfFitBins++;
-  }
+//   // count the number of bins to be fitted
+//   fNoOfFitBins=0;
+//   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
+//     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
+//     if ((time >= fFitStartTime) && (time <= fFitEndTime))
+//       fNoOfFitBins++;
+//   }
+  CalcNoOfFitBins();
 
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {

@@ -691,13 +691,20 @@ fi
 AC_SUBST(FFTW3_LIBS)
 AC_SUBST(FFTW3_CFLAGS)
 
-# Check for gomp library. If available musrfit is also linked against it (used for parallel chisq calculation and in libFitPofB).
-SAVED_CXXFLAGS="$CXXFLAGS"
-CXXFLAGS="$CXXFLAGS -fopenmp"
-SAVED_LIBSS="$LIBS"
-LIBS="$LIBS -fopenmp -lgomp"
-AC_SEARCH_LIBS([omp_get_num_procs], [gomp], [AC_DEFINE([HAVE_GOMP], [1], [Define to 1 if gomp is available])],
-                                    [CXXFLAGS="$SAVED_CXXFLAGS" LIBS="$SAVED_LIBS"], [])
+dnl -----------------------------------------------
+dnl Ask user if OpenMP support should be disabled (used for parallel chisq calculation and in libFitPofB)
+dnl -----------------------------------------------
+
+AC_ARG_ENABLE([omp], [AC_HELP_STRING([--enable-omp],[build musrfit with OpenMP support [default=yes]])])
+
+if test x"$enable_omp" != xno; then
+  SAVED_CXXFLAGS="$CXXFLAGS"
+  CXXFLAGS="$CXXFLAGS -fopenmp"
+  SAVED_LIBSS="$LIBS"
+  LIBS="$LIBS -fopenmp -lgomp"
+  AC_SEARCH_LIBS([omp_get_num_procs], [gomp], [AC_DEFINE([HAVE_GOMP], [1], [Define to 1 if gomp is available])],
+                                      [CXXFLAGS="$SAVED_CXXFLAGS" LIBS="$SAVED_LIBS"], [])
+fi
 
 dnl -----------------------------------------------
 dnl Set host specific compiler and linker flags

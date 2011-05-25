@@ -209,6 +209,7 @@ Double_t PRunAsymmetry::CalcChiSquare(const std::vector<Double_t>& par)
         asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0));
         break;
       default:
+        asymFcnValue = 0.0;
         break;
     }
     diff = fData.GetValue()->at(i) - asymFcnValue;
@@ -243,15 +244,38 @@ Double_t PRunAsymmetry::CalcMaxLikelihood(const std::vector<Double_t>& par)
  */
 UInt_t PRunAsymmetry::GetNoOfFitBins()
 {
-  Double_t time;
-  fNoOfFitBins=0;
-  for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
-    time = fData.GetDataTimeStart() + (Double_t)i * fData.GetDataTimeStep();
-    if ((time >= fFitStartTime) && (time <= fFitEndTime))
-      fNoOfFitBins++;
-  }
+//   Double_t time;
+//   fNoOfFitBins=0;
+//   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
+//     time = fData.GetDataTimeStart() + (Double_t)i * fData.GetDataTimeStep();
+//     if ((time >= fFitStartTime) && (time <= fFitEndTime))
+//       fNoOfFitBins++;
+//   }
+  CalcNoOfFitBins();
 
   return fNoOfFitBins;
+}
+
+//--------------------------------------------------------------------------
+// CalcNoOfFitBins (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculate the number of fitted bins for the current fit range.
+ */
+void PRunAsymmetry::CalcNoOfFitBins()
+{
+  // In order not having to loop over all bins and to stay consistent with the chisq method, calculate the start and end bins explicitly
+  Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
+  if (startTimeBin < 0)
+    startTimeBin = 0;
+  Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
+  if (endTimeBin > static_cast<Int_t>(fData.GetValue()->size()))
+    endTimeBin = fData.GetValue()->size();
+
+  if (endTimeBin > startTimeBin)
+    fNoOfFitBins = endTimeBin - startTimeBin;
+  else
+    fNoOfFitBins = 0;
 }
 
 //--------------------------------------------------------------------------
@@ -662,7 +686,7 @@ Bool_t PRunAsymmetry::PrepareData()
  *
  */
 Bool_t PRunAsymmetry::SubtractFixBkg()
-{  
+{
   Double_t dval;
   for (UInt_t i=0; i<fForward.size(); i++) {
     if (fForward[i] != 0.0)
@@ -678,7 +702,7 @@ Bool_t PRunAsymmetry::SubtractFixBkg()
     fBackwardErr.push_back(dval);
     fBackward[i] -= fRunInfo->GetBkgFix(1) * fTimeResolution * 1.0e3; // bkg per ns -> bkg per bin; 1.0e3: us -> ns
   }
-  
+
   return true;
 }
 
@@ -970,14 +994,15 @@ Bool_t PRunAsymmetry::PrepareFitData(PRawRunData* runData, UInt_t histoNo[2])
     fData.AppendErrorValue(error);
   }
 
-  // count the number of bins to be fitted
-  Double_t time;
-  fNoOfFitBins=0;
-  for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
-    time = fData.GetDataTimeStart() + (Double_t)i * fData.GetDataTimeStep();
-    if ((time >= fFitStartTime) && (time <= fFitEndTime))
-      fNoOfFitBins++;
-  }
+//   // count the number of bins to be fitted
+//   Double_t time;
+//   fNoOfFitBins=0;
+//   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
+//     time = fData.GetDataTimeStart() + (Double_t)i * fData.GetDataTimeStep();
+//     if ((time >= fFitStartTime) && (time <= fFitEndTime))
+//       fNoOfFitBins++;
+//   }
+  CalcNoOfFitBins();
 
   // clean up
   fForward.clear();
@@ -1199,14 +1224,15 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
     fData.AppendErrorValue(error);
   }
 
-  // count the number of bins to be fitted
-  Double_t time;
-  fNoOfFitBins=0;
-  for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
-    time = fData.GetDataTimeStart() + (Double_t)i * fData.GetDataTimeStep();
-    if ((time >= fFitStartTime) && (time <= fFitEndTime))
-      fNoOfFitBins++;
-  }
+//   // count the number of bins to be fitted
+//   Double_t time;
+//   fNoOfFitBins=0;
+//   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
+//     time = fData.GetDataTimeStart() + (Double_t)i * fData.GetDataTimeStep();
+//     if ((time >= fFitStartTime) && (time <= fFitEndTime))
+//       fNoOfFitBins++;
+//   }
+  CalcNoOfFitBins();
 
   // clean up
   fForward.clear();
@@ -1221,6 +1247,7 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
   }
 
   // calculate theory
+  Double_t time;
   UInt_t size = runData->GetDataBin(histoNo[0])->size();
   Double_t factor = 1.0;
   if (fData.GetValue()->size() * 10 > runData->GetDataBin(histoNo[0])->size()) {
