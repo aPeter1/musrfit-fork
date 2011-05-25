@@ -708,7 +708,7 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
       value /= normalizer;
       fData.AppendValue(value);
       if (value == 0.0)
-        fData.AppendErrorValue(1.0);
+        fData.AppendErrorValue(1.0/normalizer);
       else
         fData.AppendErrorValue(TMath::Sqrt(value));
     } else { // packed data, i.e. fRunInfo->GetPacking() > 1
@@ -716,7 +716,7 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
         value /= normalizer;
         fData.AppendValue(value);
         if (value == 0.0)
-          fData.AppendErrorValue(1.0);
+          fData.AppendErrorValue(1.0/normalizer);
         else
           fData.AppendErrorValue(TMath::Sqrt(value));
         // reset values
