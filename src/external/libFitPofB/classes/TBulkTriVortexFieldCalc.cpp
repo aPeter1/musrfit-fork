@@ -1924,7 +1924,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateSumAk() const {
   #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk) reduction(+:sumAk)
   #endif
   for (l=0; l < NFFTsq; ++l) {
-    fSumAk += fFFTin[l][0];
+    sumAk += fFFTin[l][0];
   }
 
   fSumAk = sumAk;
@@ -2159,9 +2159,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
       if (fFFTin[l][0]){
         if (((fabs(fFFTin[l][0]) > 1.0E-6) && (fabs(fCheckAkConvergence[l] - fFFTin[l][0])/fFFTin[l][0] > 1.0E-3)) || \
         (fCheckAkConvergence[l]/fFFTin[l][0] < 0.0)) {
-          cout << "old: " << fCheckAkConvergence[l] << ", new: " << fFFTin[l][0] << endl;
+          //cout << "old: " << fCheckAkConvergence[l] << ", new: " << fFFTin[l][0] << endl;
           akConverged = false;
-          cout << "index = " << l << endl;
+          //cout << "index = " << l << endl;
           break;
         }
       }
