@@ -62,7 +62,10 @@ TPofBCalc::TPofBCalc(const vector<double> &para) : fBmin(0.0), fBmax(0.0), fDT(p
   int i;
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  int chunk = fPBSize/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic,chunk)
   #endif
   for (i = 0; i < static_cast<int>(fPBSize); ++i) {
     fB[i] = static_cast<double>(i)*fDB;
@@ -83,7 +86,10 @@ TPofBCalc::TPofBCalc(const vector<double>& b, const vector<double>& pb, double d
   int i;
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  int chunk = fPBSize/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic,chunk)
   #endif
   for (i = 0; i < static_cast<int>(fPBSize); ++i) {
     fB[i] = b[i];
@@ -121,9 +127,12 @@ TPofBCalc::TPofBCalc(const vector<double>& b, const vector<double>& pb, double d
 
 void TPofBCalc::UnsetPBExists() {
   int i;
-#ifdef HAVE_GOMP
-#pragma omp parallel for default(shared) private(i) schedule(dynamic)
-#endif
+  #ifdef HAVE_GOMP
+  int chunk = fPBSize/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic,chunk)
+  #endif
   for (i = 0; i < static_cast<int>(fPBSize); ++i) {
     fPB[i] = 0.0;
   }
@@ -140,14 +149,17 @@ void TPofBCalc::Normalize(unsigned int minFilledIndex = 0, unsigned int maxFille
     double pBsum(0.0);
 
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(i) schedule(dynamic) reduction(+:pBsum)
+    int chunk = (maxFilledIndex-minFilledIndex)/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(i) schedule(dynamic,chunk) reduction(+:pBsum)
     #endif
     for (i = minFilledIndex; i <= static_cast<int>(maxFilledIndex); ++i)
       pBsum += fPB[i];
     pBsum *= fDB;
 
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+    #pragma omp parallel for default(shared) private(i) schedule(dynamic,chunk)
     #endif
     for (i = minFilledIndex; i <= static_cast<int>(maxFilledIndex); ++i)
       fPB[i] /= pBsum;
@@ -160,7 +172,10 @@ void TPofBCalc::SetPB(const vector<double> &pb) const {
 
   int i;
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  int chunk = fPBSize/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic,chunk)
   #endif
   for (i = 0; i < static_cast<int>(fPBSize); ++i) {
     fPB[i] = pb[i];
@@ -190,14 +205,20 @@ void TPofBCalc::Calculate(const string &type, const vector<double> &para) {
     int i;
 
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+    int chunk = B0Index/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(i) schedule(dynamic,chunk)
     #endif
     for (i = 0; i < B0Index; ++i) {
       fPB[i] = exp(-(fB[i]-B0)*(fB[i]-B0)/expominus);
     }
 
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+    chunk = (BmaxIndex-B0Index)/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(i) schedule(dynamic,chunk)
     #endif
     for (i = B0Index; i <= BmaxIndex; ++i) {
       fPB[i] = exp(-(fB[i]-B0)*(fB[i]-B0)/expoplus);
@@ -546,6 +567,10 @@ void TPofBCalc::Calculate(const TBulkVortexFieldCalc *vortexLattice, const vecto
     // cannot use a reduction clause here (like e.g. in Normalize()), since pBvec[] is not a scalar variable
     // therefore, we need to work on it a bit more
     int n(omp_get_num_procs()), tid, offset;
+    int chunk = fPBSize/n;
+    if (chunk < 10)
+      chunk = 10;
+
     vector< vector<unsigned int> > pBvec(n, vector<unsigned int>(fPBSize, 0));
 
     int indexStep(static_cast<int>(floor(static_cast<float>(numberOfSteps_2)/static_cast<float>(n))));
@@ -577,7 +602,7 @@ void TPofBCalc::Calculate(const TBulkVortexFieldCalc *vortexLattice, const vecto
     }
 
     for (j = 0; j < n; ++j) {
-      #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(i) schedule(dynamic,chunk)
       for (i = 0; i < static_cast<int>(fPBSize); ++i) {
         fPB[i] += static_cast<double>(pBvec[j][i]);
       }
@@ -624,7 +649,10 @@ void TPofBCalc::AddBackground(double B, double s, double w) {
   // calculate Gaussian background
   double bg[fPBSize];
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  int chunk = fPBSize/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic,chunk)
   #endif
   for(i = 0; i < static_cast<int>(fPBSize); ++i) {
     bg[i] = exp(-(fB[i]-B)*(fB[i]-B)/(2.0*BsSq));
@@ -634,7 +662,7 @@ void TPofBCalc::AddBackground(double B, double s, double w) {
 
   double bgsum(0.0);
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(i) schedule(dynamic) reduction(+:bgsum)
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic,chunk) reduction(+:bgsum)
   #endif
   for (i = 0; i < static_cast<int>(fPBSize); ++i)
     bgsum += bg[i];
@@ -642,14 +670,14 @@ void TPofBCalc::AddBackground(double B, double s, double w) {
   bgsum *= fDB;
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic,chunk)
   #endif
   for (i = 0; i < static_cast<int>(fPBSize); ++i)
     bg[i] /= bgsum;
 
   // add background to P(B)
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(i) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic,chunk)
   #endif
   for (i = 0; i < static_cast<int>(fPBSize); ++i)
     fPB[i] = (1.0 - w)*fPB[i] + w*bg[i];
@@ -691,7 +719,10 @@ void TPofBCalc::ConvolveGss(double w) {
 
   int i;
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(i, GssInTimeDomain) schedule(dynamic)
+  int chunk = (NFFT/2+1)/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(i, GssInTimeDomain) schedule(dynamic,chunk)
   #endif
   for (i = 0; i < static_cast<int>(NFFT/2+1); ++i) {
     GssInTimeDomain = exp(expo*static_cast<double>(i)*static_cast<double>(i));
@@ -725,7 +756,10 @@ double TPofBCalc::GetFirstMoment() const {
   double pBsum(0.0);
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(i) schedule(dynamic) reduction(+:pBsum)
+  int chunk = fPBSize/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic,chunk) reduction(+:pBsum)
   #endif
   for (i = 0; i < static_cast<int>(fPBSize); ++i)
     pBsum += fB[i]*fPB[i];
@@ -746,7 +780,10 @@ double TPofBCalc::GetCentralMoment(unsigned int n) const {
   double pBsum(0.0);
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(i, diff) schedule(dynamic) reduction(+:pBsum)
+  int chunk = fPBSize/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(i, diff) schedule(dynamic,chunk) reduction(+:pBsum)
   #endif
   for (i = 0; i < static_cast<int>(fPBSize); ++i) {
     diff = fB[i]-firstMoment;

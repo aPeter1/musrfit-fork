@@ -102,10 +102,13 @@ TPofTCalc::TPofTCalc (const TPofBCalc *PofB, const string &wisdom, const vector<
 
   int i;
 
-#ifdef HAVE_GOMP
-#pragma omp parallel for default(shared) private(i) schedule(dynamic)
-#endif
-  for (i = 0; i < NFFT_2p1; i++) {
+  #ifdef HAVE_GOMP
+  int chunk = NFFT_2p1/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic,chunk)
+  #endif
+  for (i = 0; i < NFFT_2p1; ++i) {
     fT[i] = static_cast<double>(i)*fTBin;
   }
 
@@ -190,10 +193,13 @@ void TPofTCalc::CalcPol(const vector<double> &par) {
   double sinph(sin(par[0]*PI/180.0)), cosph(cos(par[0]*PI/180.0));
   int i;
 
-#ifdef HAVE_GOMP
-#pragma omp parallel for default(shared) private(i) schedule(dynamic)
-#endif
-  for (i=0; i<fNFFT/2+1; i++){
+  #ifdef HAVE_GOMP
+  int chunk = (fNFFT/2+1)/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(i) schedule(dynamic,chunk)
+  #endif
+  for (i=0; i<fNFFT/2+1; ++i) {
     fPT[i] = (cosph*fFFTout[i][0] + sinph*fFFTout[i][1])*par[2];
   }
 }
@@ -240,7 +246,7 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
   vector<double> N0;
   vector<double> bg;
 
-  for(unsigned int i(0); i<numHist; i++) {
+  for(unsigned int i(0); i<numHist; ++i) {
     t0.push_back(int(par[i+4+numHist*2]));
     asy0.push_back(par[i+4]);
     phase0.push_back(par[i+4+numHist]);
@@ -258,15 +264,21 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
   double ttime;
   int j,k;
 
-  for(unsigned int i(0); i<numHist; i++) {
+  #ifdef HAVE_GOMP
+  int chunk = nChannels/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #endif
+
+  for(unsigned int i(0); i<numHist; ++i) {
     param[0]=phase0[i];
     // calculate asymmetry
     CalcPol(param);
 
-#ifdef HAVE_GOMP
-#pragma omp parallel for default(shared) private(j,ttime,k) schedule(dynamic)
-#endif
-    for(j=0; j<nChannels; j++) {
+    #ifdef HAVE_GOMP
+    #pragma omp parallel for default(shared) private(j,ttime,k) schedule(dynamic,chunk)
+    #endif
+    for(j=0; j<nChannels; ++j) {
       ttime=j*par[2];
       k = static_cast<int>(floor(ttime/fTBin));
       asydata[j]=asy0[i]*(fPT[k]+(fPT[k+1]-fPT[k])/fTBin*(ttime-fT[k]));
@@ -289,12 +301,12 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
   vector< vector<double> > histo;
   vector<double> data(nChannels);
 
-  for (unsigned int i(0); i<numHist; i++) {    // loop over all histos
+  for (unsigned int i(0); i<numHist; ++i) {    // loop over all histos
 
-#ifdef HAVE_GOMP
-#pragma omp parallel for default(shared) private(j) schedule(dynamic)
-#endif
-    for (j = 0; j<nChannels; j++) { // loop over time
+    #ifdef HAVE_GOMP
+    #pragma omp parallel for default(shared) private(j) schedule(dynamic,chunk)
+    #endif
+    for (j = 0; j<nChannels; ++j) { // loop over time
       if (j < t0[i]) // j<t0
         data[j] = bg[i]; // background
       else
@@ -315,7 +327,7 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
   vector<TH1F*> histoData;
 
   TString name;
-  for (unsigned int i(0); i<numHist; i++) { // loop over all histos
+  for (unsigned int i(0); i<numHist; ++i) { // loop over all histos
     // create histos
     name   = "theoHisto";
     name  += i;
@@ -327,10 +339,10 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
     name  += i;
     fakeHisto = new TH1F(name.Data(), name.Data(), int(par[3]), -par[2]/2.0, (par[3]+0.5)*par[2]);
     // fill theoHisto
-#ifdef HAVE_GOMP
-#pragma omp parallel for default(shared) private(j) schedule(dynamic)
-#endif
-    for (j = 0; j<nChannels; j++)
+    #ifdef HAVE_GOMP
+    #pragma omp parallel for default(shared) private(j) schedule(dynamic,chunk)
+    #endif
+    for (j = 0; j<nChannels; ++j)
       theoHisto->SetBinContent(j, histo[i][j]);
 // end omp
 

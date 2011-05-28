@@ -57,10 +57,13 @@ void TBofZCalc::Calculate()
   fZ.resize(fSteps);
   fBZ.resize(fSteps);
 
-#ifdef HAVE_GOMP
-#pragma omp parallel for default(shared) private(j,ZZ) schedule(dynamic)
-#endif
-  for (j=0; j<fSteps; j++) {
+  #ifdef HAVE_GOMP
+  int chunk = fSteps/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(j,ZZ) schedule(dynamic,chunk)
+  #endif
+  for (j=0; j<fSteps; ++j) {
     ZZ = fParam[1] + static_cast<double>(j)*fDZ;
     fZ[j] = ZZ;
     fBZ[j] = GetBofZ(ZZ);

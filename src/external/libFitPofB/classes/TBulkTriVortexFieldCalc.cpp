@@ -198,15 +198,21 @@ void TBulkTriVortexLondonFieldCalc::CalculateGrid() const {
   const int NFFT_2(fSteps/2);
   const int NFFTsq(fSteps*fSteps);
 
+  #ifdef HAVE_GOMP
+  int chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #endif
+
    // fill the field Fourier components in the matrix
 
   // ... but first check that the field is not larger than Hc2 and that we are dealing with a type II SC
   if ((field >= Hc2) || (lambda < xi/sqrt(2.0))) {
     int m;
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    #pragma omp parallel for default(shared) private(m) schedule(dynamic,chunk)
     #endif
-    for (m = 0; m < NFFTsq; m++) {
+    for (m = 0; m < NFFTsq; ++m) {
       fFFTout[m] = field;
     }
     // Set the flag which shows that the calculation has been done
@@ -289,7 +295,7 @@ void TBulkTriVortexLondonFieldCalc::CalculateGrid() const {
 
   // Multiply by the applied field
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsq; l++) {
     fFFTout[l] *= field;
@@ -375,13 +381,19 @@ void TBulkSqVortexLondonFieldCalc::CalculateGrid() const {
   const int NFFT_2(fSteps/2);
   const int NFFTsq(fSteps*fSteps);
 
-   // fill the field Fourier components in the matrix
+  #ifdef HAVE_GOMP
+  int chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #endif
+
+  // fill the field Fourier components in the matrix
 
   // ... but first check that the field is not larger than Hc2 and that we are dealing with a type II SC
   if ((field >= Hc2) || (lambda < xi/sqrt(2.0))) {
     int m;
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    #pragma omp parallel for default(shared) private(m) schedule(dynamic,chunk)
     #endif
     for (m = 0; m < NFFTsq; m++) {
       fFFTout[m] = field;
@@ -395,25 +407,36 @@ void TBulkSqVortexLondonFieldCalc::CalculateGrid() const {
   double Gsq, ll;
   int k, l, lNFFT_2;
 
-  for (l = 0; l < NFFT_2; ++l) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = static_cast<double>(l*l);
-    for (k = 0; k <= NFFT_2; ++k) {
-      Gsq = static_cast<double>(k*k) + ll;
-      fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
-      fFFTin[lNFFT_2 + k][1] = 0.0;
+  #ifdef HAVE_GOMP
+  #pragma omp parallel sections default(shared) private(l,k,lNFFT_2,ll,Gsq)
+  {
+    #pragma omp section
+  #endif
+    for (l = 0; l < NFFT_2; ++l) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = static_cast<double>(l*l);
+      for (k = 0; k <= NFFT_2; ++k) {
+        Gsq = static_cast<double>(k*k) + ll;
+        fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+      }
     }
-  }
 
-  for (l = NFFT_2; l < NFFT; ++l) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = static_cast<double>((NFFT-l)*(NFFT-l));
-    for (k = 0; k <= NFFT_2; ++k) {
-      Gsq = static_cast<double>(k*k) + ll;
-      fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
-      fFFTin[lNFFT_2 + k][1] = 0.0;
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2; l < NFFT; ++l) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = static_cast<double>((NFFT-l)*(NFFT-l));
+      for (k = 0; k <= NFFT_2; ++k) {
+        Gsq = static_cast<double>(k*k) + ll;
+        fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+      }
     }
+  #ifdef HAVE_GOMP
   }
+  #endif
 
   // Do the Fourier transform to get B(x,y)
 
@@ -421,9 +444,9 @@ void TBulkSqVortexLondonFieldCalc::CalculateGrid() const {
 
   // Multiply by the applied field
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
-  for (l = 0; l < NFFTsq; l++) {
+  for (l = 0; l < NFFTsq; ++l) {
     fFFTout[l] *= field;
   }
 
@@ -506,15 +529,21 @@ void TBulkTriVortexMLFieldCalc::CalculateGrid() const {
   const int NFFT_2(fSteps/2);
   const int NFFTsq(fSteps*fSteps);
 
-   // fill the field Fourier components in the matrix
+  #ifdef HAVE_GOMP
+  int chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #endif
+
+  // fill the field Fourier components in the matrix
 
   // ... but first check that the field is not larger than Hc2 and that we are dealing with a type II SC
   if ((field >= Hc2) || (lambda < xi/sqrt(2.0))) {
     int m;
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    #pragma omp parallel for default(shared) private(m) schedule(dynamic,chunk)
     #endif
-    for (m = 0; m < NFFTsq; m++) {
+    for (m = 0; m < NFFTsq; ++m) {
       fFFTout[m] = field;
     }
     // Set the flag which shows that the calculation has been done
@@ -530,70 +559,85 @@ void TBulkTriVortexMLFieldCalc::CalculateGrid() const {
   double Gsq, ll;
   int k, l, lNFFT_2;
 
-  for (l = 0; l < NFFT_2; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2; k += 2) {
+  #ifdef HAVE_GOMP
+  #pragma omp parallel sections default(shared) private(l,k,lNFFT_2,ll,Gsq)
+  {
+    #pragma omp section
+  #endif
+    for (l = 0; l < NFFT_2; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = 3.0*static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2; k += 2) {
+        Gsq = static_cast<double>(k*k) + ll;
+        fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
       Gsq = static_cast<double>(k*k) + ll;
       fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    Gsq = static_cast<double>(k*k) + ll;
-    fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
-    fFFTin[lNFFT_2 + k][1] = 0.0;
-  }
 
-
-  for (l = NFFT_2; l < NFFT; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
-    for (k = 0; k < NFFT_2; k += 2) {
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2; l < NFFT; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
+      for (k = 0; k < NFFT_2; k += 2) {
+        Gsq = static_cast<double>(k*k) + ll;
+        fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
       Gsq = static_cast<double>(k*k) + ll;
       fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    Gsq = static_cast<double>(k*k) + ll;
-    fFFTin[lNFFT_2 + k][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
-    fFFTin[lNFFT_2 + k][1] = 0.0;
-  }
 
-  // intermediate rows
-
-  for (l = 1; l < NFFT_2; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2; k += 2) {
-      Gsq = static_cast<double>((k + 1)*(k + 1)) + ll;
+    // intermediate rows
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = 1; l < NFFT_2; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = 3.0*static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2; k += 2) {
+        Gsq = static_cast<double>((k + 1)*(k + 1)) + ll;
+        fFFTin[lNFFT_2 + k][0] = 0.0;
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
       fFFTin[lNFFT_2 + k][0] = 0.0;
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    fFFTin[lNFFT_2 + k][0] = 0.0;
-    fFFTin[lNFFT_2 + k][1] = 0.0;
-  }
 
-  for (l = NFFT_2 + 1; l < NFFT; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
-    for (k = 0; k < NFFT_2; k += 2) {
-      Gsq = static_cast<double>((k+1)*(k+1)) + ll;
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2 + 1; l < NFFT; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
+      for (k = 0; k < NFFT_2; k += 2) {
+        Gsq = static_cast<double>((k+1)*(k+1)) + ll;
+        fFFTin[lNFFT_2 + k][0] = 0.0;
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
       fFFTin[lNFFT_2 + k][0] = 0.0;
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = exp(-xisq_2_scaled*Gsq)/(1.0+lambdasq_scaled*Gsq);
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    fFFTin[lNFFT_2 + k][0] = 0.0;
-    fFFTin[lNFFT_2 + k][1] = 0.0;
+  #ifdef HAVE_GOMP
   }
+  #endif
 
   // Do the Fourier transform to get B(x,y)
 
@@ -601,9 +645,9 @@ void TBulkTriVortexMLFieldCalc::CalculateGrid() const {
 
   // Multiply by the applied field
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
-  for (l = 0; l < NFFTsq; l++) {
+  for (l = 0; l < NFFTsq; ++l) {
     fFFTout[l] *= field;
   }
 
@@ -613,8 +657,6 @@ void TBulkTriVortexMLFieldCalc::CalculateGrid() const {
   return;
 
 }
-
-
 
 
 TBulkTriVortexAGLFieldCalc::TBulkTriVortexAGLFieldCalc(const string& wisdom, const unsigned int steps) {
@@ -687,15 +729,21 @@ void TBulkTriVortexAGLFieldCalc::CalculateGrid() const {
   const int NFFT_2(fSteps/2);
   const int NFFTsq(fSteps*fSteps);
 
-   // fill the field Fourier components in the matrix
+  #ifdef HAVE_GOMP
+  int chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #endif
+
+  // fill the field Fourier components in the matrix
 
   // ... but first check that the field is not larger than Hc2 and that we are dealing with a type II SC
   if ((field >= Hc2) || (lambda < xi/sqrt(2.0))) {
     int m;
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    #pragma omp parallel for default(shared) private(m) schedule(dynamic,chunk)
     #endif
-    for (m = 0; m < NFFTsq; m++) {
+    for (m = 0; m < NFFTsq; ++m) {
       fFFTout[m] = field;
     }
     // Set the flag which shows that the calculation has been done
@@ -711,77 +759,93 @@ void TBulkTriVortexAGLFieldCalc::CalculateGrid() const {
   double Gsq, sqrtfInfSqPlusLsqGsq, ll;
   int k, l, lNFFT_2;
 
-  for (l = 0; l < NFFT_2; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2; k += 2) {
-      Gsq = static_cast<double>(k*k) + ll;
-      sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
-      fFFTin[lNFFT_2 + k][0] = ((!k && !l) ? 1.0 : \
-       fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf)));
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-    }
-    k = NFFT_2;
-    Gsq = static_cast<double>(k*k) + ll;
-    sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
-    fFFTin[lNFFT_2 + k][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
-    fFFTin[lNFFT_2 + k][1] = 0.0;
-  }
-
-
-  for (l = NFFT_2; l < NFFT; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
-    for (k = 0; k < NFFT_2; k += 2) {
+  #ifdef HAVE_GOMP
+  #pragma omp parallel sections default(shared) private(l,k,lNFFT_2,ll,Gsq,sqrtfInfSqPlusLsqGsq)
+  {
+    #pragma omp section
+  #endif
+    for (l = 0; l < NFFT_2; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = 3.0*static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2; k += 2) {
+        Gsq = static_cast<double>(k*k) + ll;
+        sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
+        fFFTin[lNFFT_2 + k][0] = ((!k && !l) ? 1.0 : \
+        fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf)));
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
       Gsq = static_cast<double>(k*k) + ll;
       sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
       fFFTin[lNFFT_2 + k][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    Gsq = static_cast<double>(k*k) + ll;
-    sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
-    fFFTin[lNFFT_2 + k][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
-    fFFTin[lNFFT_2 + k][1] = 0.0;
-  }
 
-  // intermediate rows
-
-  for (l = 1; l < NFFT_2; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2; k += 2) {
-      Gsq = static_cast<double>((k + 1)*(k + 1)) + ll;
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2; l < NFFT; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
+      for (k = 0; k < NFFT_2; k += 2) {
+        Gsq = static_cast<double>(k*k) + ll;
+        sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
+        fFFTin[lNFFT_2 + k][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
+      Gsq = static_cast<double>(k*k) + ll;
       sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+    }
+
+    // intermediate rows
+
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = 1; l < NFFT_2; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = 3.0*static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2; k += 2) {
+        Gsq = static_cast<double>((k + 1)*(k + 1)) + ll;
+        sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
+        fFFTin[lNFFT_2 + k][0] = 0.0;
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
       fFFTin[lNFFT_2 + k][0] = 0.0;
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    fFFTin[lNFFT_2 + k][0] = 0.0;
-    fFFTin[lNFFT_2 + k][1] = 0.0;
-  }
 
-  for (l = NFFT_2 + 1; l < NFFT; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
-    for (k = 0; k < NFFT_2; k += 2) {
-      Gsq = static_cast<double>((k+1)*(k+1)) + ll;
-      sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2 + 1; l < NFFT; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
+      for (k = 0; k < NFFT_2; k += 2) {
+        Gsq = static_cast<double>((k+1)*(k+1)) + ll;
+        sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
+        fFFTin[lNFFT_2 + k][0] = 0.0;
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
       fFFTin[lNFFT_2 + k][0] = 0.0;
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    fFFTin[lNFFT_2 + k][0] = 0.0;
-    fFFTin[lNFFT_2 + k][1] = 0.0;
+  #ifdef HAVE_GOMP
   }
+  #endif
 
   // Do the Fourier transform to get B(x,y)
 
@@ -789,9 +853,9 @@ void TBulkTriVortexAGLFieldCalc::CalculateGrid() const {
 
   // Multiply by the applied field
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
-  for (l = 0; l < NFFTsq; l++) {
+  for (l = 0; l < NFFTsq; ++l) {
     fFFTout[l] *= field;
   }
 
@@ -874,13 +938,19 @@ void TBulkTriVortexAGLIIFieldCalc::CalculateGrid() const {
   const int NFFT_2(fSteps/2);
   const int NFFTsq(fSteps*fSteps);
 
-   // fill the field Fourier components in the matrix
+  #ifdef HAVE_GOMP
+  int chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #endif
+
+ // fill the field Fourier components in the matrix
 
   // ... but first check that the field is not larger than Hc2 and that we are dealing with a type II SC
   if ((field >= Hc2) || (lambda < xiV/sqrt(2.0))) {
     int m;
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    #pragma omp parallel for default(shared) private(m) schedule(dynamic,chunk)
     #endif
     for (m = 0; m < NFFTsq; ++m) {
       fFFTout[m] = field;
@@ -899,77 +969,92 @@ void TBulkTriVortexAGLIIFieldCalc::CalculateGrid() const {
   double Gsq, sqrtfInfSqPlusLsqGsq, ll;
   int k, l, lNFFT_2;
 
-  for (l = 0; l < NFFT_2; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2; k += 2) {
-      Gsq = static_cast<double>(k*k) + ll;
-      sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
-      fFFTin[lNFFT_2 + k][0] = ((!k && !l) ? 1.0 : \
-       fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf)));
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-    }
-    k = NFFT_2;
-    Gsq = static_cast<double>(k*k) + ll;
-    sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
-    fFFTin[lNFFT_2 + k][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
-    fFFTin[lNFFT_2 + k][1] = 0.0;
-  }
-
-
-  for (l = NFFT_2; l < NFFT; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
-    for (k = 0; k < NFFT_2; k += 2) {
+  #ifdef HAVE_GOMP
+  #pragma omp parallel sections default(shared) private(l,k,lNFFT_2,ll,Gsq,sqrtfInfSqPlusLsqGsq)
+  {
+    #pragma omp section
+  #endif
+    for (l = 0; l < NFFT_2; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = 3.0*static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2; k += 2) {
+        Gsq = static_cast<double>(k*k) + ll;
+        sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
+        fFFTin[lNFFT_2 + k][0] = ((!k && !l) ? 1.0 : \
+        fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf)));
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
       Gsq = static_cast<double>(k*k) + ll;
       sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
       fFFTin[lNFFT_2 + k][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    Gsq = static_cast<double>(k*k) + ll;
-    sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
-    fFFTin[lNFFT_2 + k][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
-    fFFTin[lNFFT_2 + k][1] = 0.0;
-  }
 
-  // intermediate rows
-
-  for (l = 1; l < NFFT_2; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2; k += 2) {
-      Gsq = static_cast<double>((k + 1)*(k + 1)) + ll;
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2; l < NFFT; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
+      for (k = 0; k < NFFT_2; k += 2) {
+        Gsq = static_cast<double>(k*k) + ll;
+        sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
+        fFFTin[lNFFT_2 + k][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
+      Gsq = static_cast<double>(k*k) + ll;
       sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
+      fFFTin[lNFFT_2 + k][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+    }
+
+    // intermediate rows
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = 1; l < NFFT_2; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = 3.0*static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2; k += 2) {
+        Gsq = static_cast<double>((k + 1)*(k + 1)) + ll;
+        sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
+        fFFTin[lNFFT_2 + k][0] = 0.0;
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
       fFFTin[lNFFT_2 + k][0] = 0.0;
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    fFFTin[lNFFT_2 + k][0] = 0.0;
-    fFFTin[lNFFT_2 + k][1] = 0.0;
-  }
 
-  for (l = NFFT_2 + 1; l < NFFT; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
-    for (k = 0; k < NFFT_2; k += 2) {
-      Gsq = static_cast<double>((k+1)*(k+1)) + ll;
-      sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2 + 1; l < NFFT; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = 3.0*static_cast<double>((NFFT-l)*(NFFT-l));
+      for (k = 0; k < NFFT_2; k += 2) {
+        Gsq = static_cast<double>((k+1)*(k+1)) + ll;
+        sqrtfInfSqPlusLsqGsq = sqrt(fInf*fInf + lambdasq_scaled*Gsq);
+        fFFTin[lNFFT_2 + k][0] = 0.0;
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
       fFFTin[lNFFT_2 + k][0] = 0.0;
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = fInf*TMath::BesselK1(xiV/lambda*sqrtfInfSqPlusLsqGsq)/(sqrtfInfSqPlusLsqGsq*TMath::BesselK1(xiV/lambda*fInf));
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    fFFTin[lNFFT_2 + k][0] = 0.0;
-    fFFTin[lNFFT_2 + k][1] = 0.0;
+  #ifdef HAVE_GOMP
   }
+  #endif
 
   // Do the Fourier transform to get B(x,y)
 
@@ -977,7 +1062,7 @@ void TBulkTriVortexAGLIIFieldCalc::CalculateGrid() const {
 
   // Multiply by the applied field
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsq; ++l) {
     fFFTout[l] *= field;
@@ -989,8 +1074,6 @@ void TBulkTriVortexAGLIIFieldCalc::CalculateGrid() const {
   return;
 
 }
-
-
 
 
 TBulkTriVortexNGLFieldCalc::TBulkTriVortexNGLFieldCalc(const string& wisdom, const unsigned int steps)
@@ -1108,13 +1191,19 @@ void TBulkTriVortexNGLFieldCalc::CalculateGradient() const {
   const int NFFT_2(fSteps/2);
   const int NFFTsq(fSteps*fSteps);
 
-  int i, j, l, index;
+  int i, j, l;
+
+  #ifdef HAVE_GOMP
+  int chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #endif
 
   // Take the derivative of the Fourier sum of omega
 
   // First save a copy of the real aK-matrix in the imaginary part of the bK-matrix
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsq; ++l) {
     fBkMatrix[l][1] = fFFTin[l][0];
@@ -1125,34 +1214,45 @@ void TBulkTriVortexNGLFieldCalc::CalculateGradient() const {
 
   const double coeffKx(TWOPI/(sqrt3*fLatticeConstant));
 
-  // even rows
-  for (i = 0; i < NFFT; i += 2) {
-    // j = 0
-    fFFTin[NFFT*i][0] = 0.0;
-    // j != 0
-    for (j = 2; j < NFFT_2; j += 2) {
-      fFFTin[(j + NFFT*i)][0] *= coeffKx*static_cast<double>(j);
+  #ifdef HAVE_GOMP
+  #pragma omp parallel sections default(shared) private(i,j)
+  {
+    // even rows
+    #pragma omp section
+  #endif
+    for (i = 0; i < NFFT; i += 2) {
+      // j = 0
+      fFFTin[NFFT*i][0] = 0.0;
+      // j != 0
+      for (j = 2; j < NFFT_2; j += 2) {
+        fFFTin[(j + NFFT*i)][0] *= coeffKx*static_cast<double>(j);
+      }
+      for (j = NFFT_2; j < NFFT; j += 2) {
+        fFFTin[(j + NFFT*i)][0] *= coeffKx*static_cast<double>(j - NFFT);
+      }
     }
-    for (j = NFFT_2; j < NFFT; j += 2) {
-      fFFTin[(j + NFFT*i)][0] *= coeffKx*static_cast<double>(j - NFFT);
-    }
-  }
 
-  // odd rows
-  for (i = 1; i < NFFT; i += 2) {
-    for (j = 0; j < NFFT_2; j += 2) {
-      fFFTin[(j + 1 + NFFT*i)][0] *= coeffKx*static_cast<double>(j + 1);
+    // odd rows
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (i = 1; i < NFFT; i += 2) {
+      for (j = 0; j < NFFT_2; j += 2) {
+        fFFTin[(j + 1 + NFFT*i)][0] *= coeffKx*static_cast<double>(j + 1);
+      }
+      for (j = NFFT_2; j < NFFT; j += 2) {
+        fFFTin[(j + 1 + NFFT*i)][0] *= coeffKx*static_cast<double>(j + 1 - NFFT);
+      }
     }
-    for (j = NFFT_2; j < NFFT; j += 2) {
-      fFFTin[(j + 1 + NFFT*i)][0] *= coeffKx*static_cast<double>(j + 1 - NFFT);
-    }
+  #ifdef HAVE_GOMP
   }
+  #endif
 
   fftw_execute(fFFTplan);
 
   // Copy the results to the gradient matrix and restore the original aK-matrix
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsq; ++l) {
     fOmegaDiffMatrix[l][0] = fRealSpaceMatrix[l][1];
@@ -1165,44 +1265,64 @@ void TBulkTriVortexNGLFieldCalc::CalculateGradient() const {
   const double coeffKy(TWOPI/fLatticeConstant);
   double ky;
 
-  // even rows
-  // i = 0
-  for (j = 0; j < NFFT; j += 2) {
-    fFFTin[j][0] = 0.0;
-  }
-  // i != 0
-  for (i = 2; i < NFFT_2; i += 2) {
-    ky = coeffKy*static_cast<double>(i);
+  #ifdef HAVE_GOMP
+  #pragma omp parallel sections default(shared) private(i,j,ky)
+  {
+    // even rows
+    // i = 0
+    #pragma omp section
+  #endif
     for (j = 0; j < NFFT; j += 2) {
-      fFFTin[(j + NFFT*i)][0] *= ky;
+      fFFTin[j][0] = 0.0;
     }
-  }
-  for (i = NFFT_2; i < NFFT; i += 2) {
-    ky = coeffKy*static_cast<double>(i - NFFT);
-    for (j = 0; j < NFFT; j += 2) {
-      fFFTin[(j + NFFT*i)][0] *= ky;
+    // i != 0
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (i = 2; i < NFFT_2; i += 2) {
+      ky = coeffKy*static_cast<double>(i);
+      for (j = 0; j < NFFT; j += 2) {
+        fFFTin[(j + NFFT*i)][0] *= ky;
+      }
     }
-  }
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (i = NFFT_2; i < NFFT; i += 2) {
+      ky = coeffKy*static_cast<double>(i - NFFT);
+      for (j = 0; j < NFFT; j += 2) {
+        fFFTin[(j + NFFT*i)][0] *= ky;
+      }
+    }
 
-  // odd rows
-  for (i = 1; i < NFFT_2; i += 2) {
-    ky = coeffKy*static_cast<double>(i);
-    for (j = 0; j < NFFT; j += 2) {
-      fFFTin[(j + 1 + NFFT*i)][0] *= ky;
+    // odd rows
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (i = 1; i < NFFT_2; i += 2) {
+      ky = coeffKy*static_cast<double>(i);
+      for (j = 0; j < NFFT; j += 2) {
+        fFFTin[(j + 1 + NFFT*i)][0] *= ky;
+      }
     }
-  }
-  for (i = NFFT_2 + 1; i < NFFT; i += 2) {
-    ky = coeffKy*static_cast<double>(i - NFFT);
-    for (j = 0; j < NFFT; j += 2) {
-      fFFTin[(j + 1 + NFFT*i)][0] *= ky;
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (i = NFFT_2 + 1; i < NFFT; i += 2) {
+      ky = coeffKy*static_cast<double>(i - NFFT);
+      for (j = 0; j < NFFT; j += 2) {
+        fFFTin[(j + 1 + NFFT*i)][0] *= ky;
+      }
     }
+  #ifdef HAVE_GOMP
   }
+  #endif
 
   fftw_execute(fFFTplan);
 
   // Copy the results to the gradient matrix and restore the original aK-matrix
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsq; ++l) {
     fOmegaDiffMatrix[l][1] = fRealSpaceMatrix[l][1];
@@ -1282,96 +1402,113 @@ void TBulkTriVortexNGLFieldCalc::FillAbrikosovCoefficients() const {
   double Gsq, sign, ll;
   int k, l, lNFFT_2;
 
-  for (l = 0; l < NFFT_2; l += 2) {
-    if (!(l % 4)) {
-      sign = 1.0;
-    } else {
-      sign = -1.0;
+  #ifdef HAVE_GOMP
+  #pragma omp parallel sections default(shared) private(k,l,lNFFT_2,Gsq,sign,ll)
+  {
+    #pragma omp section
+  #endif
+    for (l = 0; l < NFFT_2; l += 2) {
+      if (!(l % 4)) {
+        sign = 1.0;
+      } else {
+        sign = -1.0;
+      }
+      lNFFT_2 = l*(NFFT);
+      ll = 3.0*static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2; k += 2) {
+        sign = -sign;
+        Gsq = static_cast<double>(k*k) + ll;
+        fFFTin[lNFFT_2 + k][0] = sign*exp(-pi_4sqrt3*Gsq);
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      for (k = NFFT_2; k < NFFT; k += 2) {
+        sign = -sign;
+        Gsq = static_cast<double>((k-NFFT)*(k-NFFT)) + ll;
+        fFFTin[lNFFT_2 + k][0] = sign*exp(-pi_4sqrt3*Gsq);
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
     }
-    lNFFT_2 = l*(NFFT);
-    ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2; k += 2) {
-      sign = -sign;
-      Gsq = static_cast<double>(k*k) + ll;
-      fFFTin[lNFFT_2 + k][0] = sign*exp(-pi_4sqrt3*Gsq);
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-    }
-    for (k = NFFT_2; k < NFFT; k += 2) {
-      sign = -sign;
-      Gsq = static_cast<double>((k-NFFT)*(k-NFFT)) + ll;
-      fFFTin[lNFFT_2 + k][0] = sign*exp(-pi_4sqrt3*Gsq);
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-    }
-  }
 
-  for (l = NFFT_2; l < NFFT; l += 2) {
-    if (!(l % 4)) {
-      sign = 1.0;
-    } else {
-      sign = -1.0;
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2; l < NFFT; l += 2) {
+      if (!(l % 4)) {
+        sign = 1.0;
+      } else {
+        sign = -1.0;
+      }
+      lNFFT_2 = l*(NFFT);
+      ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
+      for (k = 0; k < NFFT_2; k += 2) {
+        sign = -sign;
+        Gsq = static_cast<double>(k*k) + ll;
+        fFFTin[lNFFT_2 + k][0] = sign*exp(-pi_4sqrt3*Gsq);
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      for (k = NFFT_2; k < NFFT_2; k += 2) {
+        sign = -sign;
+        Gsq = static_cast<double>((k-NFFT)*(k-NFFT)) + ll;
+        fFFTin[lNFFT_2 + k][0] = sign*exp(-pi_4sqrt3*Gsq);
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
     }
-    lNFFT_2 = l*(NFFT);
-    ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
-    for (k = 0; k < NFFT_2; k += 2) {
-      sign = -sign;
-      Gsq = static_cast<double>(k*k) + ll;
-      fFFTin[lNFFT_2 + k][0] = sign*exp(-pi_4sqrt3*Gsq);
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-    }
-    for (k = NFFT_2; k < NFFT_2; k += 2) {
-      sign = -sign;
-      Gsq = static_cast<double>((k-NFFT)*(k-NFFT)) + ll;
-      fFFTin[lNFFT_2 + k][0] = sign*exp(-pi_4sqrt3*Gsq);
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-    }
-  }
 
-  // intermediate rows
-  for (l = 1; l < NFFT_2; l += 2) {
-    lNFFT_2 = l*(NFFT);
-    ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2; k += 2) {
-      Gsq = static_cast<double>((k + 1)*(k + 1)) + ll;
-      fFFTin[lNFFT_2 + k][0] = 0.0;
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = exp(-pi_4sqrt3*Gsq);
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    // intermediate rows
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = 1; l < NFFT_2; l += 2) {
+      lNFFT_2 = l*(NFFT);
+      ll = 3.0*static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2; k += 2) {
+        Gsq = static_cast<double>((k + 1)*(k + 1)) + ll;
+        fFFTin[lNFFT_2 + k][0] = 0.0;
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = exp(-pi_4sqrt3*Gsq);
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      for (k = NFFT_2; k < NFFT; k += 2) {
+        Gsq = static_cast<double>((k + 1 - NFFT)*(k + 1 - NFFT)) + ll;
+        fFFTin[lNFFT_2 + k][0] = 0.0;
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = exp(-pi_4sqrt3*Gsq);
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
     }
-    for (k = NFFT_2; k < NFFT; k += 2) {
-      Gsq = static_cast<double>((k + 1 - NFFT)*(k + 1 - NFFT)) + ll;
-      fFFTin[lNFFT_2 + k][0] = 0.0;
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = exp(-pi_4sqrt3*Gsq);
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-    }
-  }
 
-  for (l = NFFT_2 + 1; l < NFFT; l += 2) {
-    lNFFT_2 = l*(NFFT);
-    ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
-      Gsq = static_cast<double>((k+1)*(k+1)) + ll;
-      fFFTin[lNFFT_2 + k][0] = 0.0;
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = exp(-pi_4sqrt3*Gsq);
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2 + 1; l < NFFT; l += 2) {
+      lNFFT_2 = l*(NFFT);
+      ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
+      for (k = 0; k < NFFT_2 - 1; k += 2) {
+        Gsq = static_cast<double>((k+1)*(k+1)) + ll;
+        fFFTin[lNFFT_2 + k][0] = 0.0;
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = exp(-pi_4sqrt3*Gsq);
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      for (k = NFFT_2; k < NFFT; k += 2) {
+        Gsq = static_cast<double>((k+1 - NFFT)*(k+1 - NFFT)) + ll;
+        fFFTin[lNFFT_2 + k][0] = 0.0;
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = exp(-pi_4sqrt3*Gsq);
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
     }
-    for (k = NFFT_2; k < NFFT; k += 2) {
-      Gsq = static_cast<double>((k+1 - NFFT)*(k+1 - NFFT)) + ll;
-      fFFTin[lNFFT_2 + k][0] = 0.0;
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = exp(-pi_4sqrt3*Gsq);
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-    }
+  #ifdef HAVE_GOMP
   }
+  #endif
 
   fFFTin[0][0] = 0.0;
 
@@ -1389,83 +1526,99 @@ void TBulkTriVortexNGLFieldCalc::ManipulateFourierCoefficientsA() const {
   int lNFFT_2, l, k;
   double Gsq, ll;
 
-  for (l = 0; l < NFFT_2; l += 2) {
-    lNFFT_2 = l*(NFFT);
-    ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2; k += 2) {
-      Gsq = coeff1*(static_cast<double>(k*k) + ll);
-      fFFTin[lNFFT_2 + k][0] *= coeff2/(Gsq+coeff3);
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+  #ifdef HAVE_GOMP
+  #pragma omp parallel sections default(shared) private(k,l,lNFFT_2,Gsq,ll)
+  {
+    #pragma omp section
+  #endif
+    for (l = 0; l < NFFT_2; l += 2) {
+      lNFFT_2 = l*(NFFT);
+      ll = 3.0*static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2; k += 2) {
+        Gsq = coeff1*(static_cast<double>(k*k) + ll);
+        fFFTin[lNFFT_2 + k][0] *= coeff2/(Gsq+coeff3);
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      for (k = NFFT_2; k < NFFT; k += 2) {
+        Gsq = coeff1*(static_cast<double>((k - NFFT)*(k - NFFT)) + ll);
+        fFFTin[lNFFT_2 + k][0] *= coeff2/(Gsq+coeff3);
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
     }
-    for (k = NFFT_2; k < NFFT; k += 2) {
-      Gsq = coeff1*(static_cast<double>((k - NFFT)*(k - NFFT)) + ll);
-      fFFTin[lNFFT_2 + k][0] *= coeff2/(Gsq+coeff3);
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-    }
-  }
 
-  for (l = NFFT_2; l < NFFT; l += 2) {
-    lNFFT_2 = l*(NFFT);
-    ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
-      Gsq = coeff1*(static_cast<double>(k*k) + ll);
-      fFFTin[lNFFT_2 + k][0] *= coeff2/(Gsq+coeff3);
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2; l < NFFT; l += 2) {
+      lNFFT_2 = l*(NFFT);
+      ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
+      for (k = 0; k < NFFT_2 - 1; k += 2) {
+        Gsq = coeff1*(static_cast<double>(k*k) + ll);
+        fFFTin[lNFFT_2 + k][0] *= coeff2/(Gsq+coeff3);
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      for (k = NFFT_2; k < NFFT; k += 2) {
+        Gsq = coeff1*(static_cast<double>((k-NFFT)*(k-NFFT)) + ll);
+        fFFTin[lNFFT_2 + k][0] *= coeff2/(Gsq+coeff3);
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
     }
-    for (k = NFFT_2; k < NFFT; k += 2) {
-      Gsq = coeff1*(static_cast<double>((k-NFFT)*(k-NFFT)) + ll);
-      fFFTin[lNFFT_2 + k][0] *= coeff2/(Gsq+coeff3);
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-    }
-  }
 
-  //intermediate rows
+    //intermediate rows
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = 1; l < NFFT_2; l += 2) {
+      lNFFT_2 = l*(NFFT);
+      ll = 3.0*static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2; k += 2) {
+        Gsq = coeff1*(static_cast<double>((k+1)*(k+1)) + ll);
+        fFFTin[lNFFT_2 + k][0] = 0.0;
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] *= coeff2/(Gsq+coeff3);
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      for (k = NFFT_2; k < NFFT; k += 2) {
+        Gsq = coeff1*(static_cast<double>((k+1-NFFT)*(k+1-NFFT)) + ll);
+        fFFTin[lNFFT_2 + k][0] = 0.0;
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] *= coeff2/(Gsq+coeff3);
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+    }
 
-  for (l = 1; l < NFFT_2; l += 2) {
-    lNFFT_2 = l*(NFFT);
-    ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2; k += 2) {
-      Gsq = coeff1*(static_cast<double>((k+1)*(k+1)) + ll);
-      fFFTin[lNFFT_2 + k][0] = 0.0;
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] *= coeff2/(Gsq+coeff3);
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2 + 1; l < NFFT; l += 2) {
+      lNFFT_2 = l*(NFFT);
+      ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
+      for (k = 0; k < NFFT_2; k += 2) {
+        Gsq = coeff1*(static_cast<double>((k+1)*(k+1)) + ll);
+        fFFTin[lNFFT_2 + k][0] = 0.0;
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] *= coeff2/(Gsq+coeff3);
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      for (k = NFFT_2; k < NFFT; k += 2) {
+        Gsq = coeff1*(static_cast<double>((k+1-NFFT)*(k+1-NFFT)) + ll);
+        fFFTin[lNFFT_2 + k][0] = 0.0;
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] *= coeff2/(Gsq+coeff3);
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
     }
-    for (k = NFFT_2; k < NFFT; k += 2) {
-      Gsq = coeff1*(static_cast<double>((k+1-NFFT)*(k+1-NFFT)) + ll);
-      fFFTin[lNFFT_2 + k][0] = 0.0;
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] *= coeff2/(Gsq+coeff3);
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-    }
+  #ifdef HAVE_GOMP
   }
-
-  for (l = NFFT_2 + 1; l < NFFT; l += 2) {
-    lNFFT_2 = l*(NFFT);
-    ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
-    for (k = 0; k < NFFT_2; k += 2) {
-      Gsq = coeff1*(static_cast<double>((k+1)*(k+1)) + ll);
-      fFFTin[lNFFT_2 + k][0] = 0.0;
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] *= coeff2/(Gsq+coeff3);
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-    }
-    for (k = NFFT_2; k < NFFT; k += 2) {
-      Gsq = coeff1*(static_cast<double>((k+1-NFFT)*(k+1-NFFT)) + ll);
-      fFFTin[lNFFT_2 + k][0] = 0.0;
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] *= coeff2/(Gsq+coeff3);
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-    }
-  }
+  #endif
 
   fFFTin[0][0] = 0.0;
 
@@ -1483,87 +1636,103 @@ void TBulkTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
   int lNFFT, l, k;
   double Gsq, ll;
 
-  for (l = 0; l < NFFT_2; l += 2) {
-    lNFFT = l*NFFT;
-    ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
-      Gsq = coeff1*(static_cast<double>(k*k) + ll);
-      fBkMatrix[lNFFT + k][0] *= coeff2/(Gsq+coeff3);
-      fBkMatrix[lNFFT + k][1] = 0.0;
-      fBkMatrix[lNFFT + k + 1][0] = 0.0;
-      fBkMatrix[lNFFT + k + 1][1] = 0.0;
+  #ifdef HAVE_GOMP
+  #pragma omp parallel sections default(shared) private(k,l,lNFFT,Gsq,ll)
+  {
+    #pragma omp section
+  #endif
+    for (l = 0; l < NFFT_2; l += 2) {
+      lNFFT = l*NFFT;
+      ll = 3.0*static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2 - 1; k += 2) {
+        Gsq = coeff1*(static_cast<double>(k*k) + ll);
+        fBkMatrix[lNFFT + k][0] *= coeff2/(Gsq+coeff3);
+        fBkMatrix[lNFFT + k][1] = 0.0;
+        fBkMatrix[lNFFT + k + 1][0] = 0.0;
+        fBkMatrix[lNFFT + k + 1][1] = 0.0;
+      }
+
+      for (k = NFFT_2; k < NFFT - 1; k += 2) {
+        Gsq = coeff1*(static_cast<double>((k-NFFT)*(k-NFFT)) + ll);
+        fBkMatrix[lNFFT + k][0] *= coeff2/(Gsq+coeff3);
+        fBkMatrix[lNFFT + k][1] = 0.0;
+        fBkMatrix[lNFFT + k + 1][0] = 0.0;
+        fBkMatrix[lNFFT + k + 1][1] = 0.0;
+      }
     }
 
-    for (k = NFFT_2; k < NFFT - 1; k += 2) {
-      Gsq = coeff1*(static_cast<double>((k-NFFT)*(k-NFFT)) + ll);
-      fBkMatrix[lNFFT + k][0] *= coeff2/(Gsq+coeff3);
-      fBkMatrix[lNFFT + k][1] = 0.0;
-      fBkMatrix[lNFFT + k + 1][0] = 0.0;
-      fBkMatrix[lNFFT + k + 1][1] = 0.0;
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2; l < NFFT; l += 2) {
+      lNFFT = l*NFFT;
+      ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
+      for (k = 0; k < NFFT_2 - 1; k += 2) {
+        Gsq = coeff1*(static_cast<double>(k*k) + ll);
+        fBkMatrix[lNFFT + k][0] *= coeff2/(Gsq+coeff3);
+        fBkMatrix[lNFFT + k][1] = 0.0;
+        fBkMatrix[lNFFT + k + 1][0] = 0.0;
+        fBkMatrix[lNFFT + k + 1][1] = 0.0;
+      }
+
+      for (k = NFFT_2; k < NFFT - 1; k += 2) {
+        Gsq = coeff1*(static_cast<double>((k-NFFT)*(k-NFFT)) + ll);
+        fBkMatrix[lNFFT + k][0] *= coeff2/(Gsq+coeff3);
+        fBkMatrix[lNFFT + k][1] = 0.0;
+        fBkMatrix[lNFFT + k + 1][0] = 0.0;
+        fBkMatrix[lNFFT + k + 1][1] = 0.0;
+      }
     }
+
+    //intermediate rows
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = 1; l < NFFT_2; l += 2) {
+      lNFFT = l*NFFT;
+      ll = 3.0*static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2 - 1; k += 2) {
+        Gsq = coeff1*(static_cast<double>((k+1)*(k+1)) + ll);
+        fBkMatrix[lNFFT + k][0] = 0.0;
+        fBkMatrix[lNFFT + k][1] = 0.0;
+        fBkMatrix[lNFFT + k + 1][0] *= coeff2/(Gsq+coeff3);
+        fBkMatrix[lNFFT + k + 1][1] = 0.0;
+      }
+
+      for (k = NFFT_2; k < NFFT - 1; k += 2) {
+        Gsq = coeff1*(static_cast<double>((k+1-NFFT)*(k+1-NFFT)) + ll);
+        fBkMatrix[lNFFT + k][0] = 0.0;
+        fBkMatrix[lNFFT + k][1] = 0.0;
+        fBkMatrix[lNFFT + k + 1][0] *= coeff2/(Gsq+coeff3);
+        fBkMatrix[lNFFT + k + 1][1] = 0.0;
+      }
+    }
+
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2 + 1; l < NFFT; l += 2) {
+      lNFFT = l*NFFT;
+      ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
+      for (k = 0; k < NFFT_2 - 1; k += 2) {
+        Gsq = coeff1*(static_cast<double>((k+1)*(k+1)) + ll);
+        fBkMatrix[lNFFT + k][0] = 0.0;
+        fBkMatrix[lNFFT + k][1] = 0.0;
+        fBkMatrix[lNFFT + k + 1][0] *= coeff2/(Gsq+coeff3);
+        fBkMatrix[lNFFT + k + 1][1] = 0.0;
+      }
+
+      for (k = NFFT_2; k < NFFT - 1; k += 2) {
+        Gsq = coeff1*(static_cast<double>((k+1-NFFT)*(k+1-NFFT)) + ll);
+        fBkMatrix[lNFFT + k][0] = 0.0;
+        fBkMatrix[lNFFT + k][1] = 0.0;
+        fBkMatrix[lNFFT + k + 1][0] *= coeff2/(Gsq+coeff3);
+        fBkMatrix[lNFFT + k + 1][1] = 0.0;
+      }
+    }
+  #ifdef HAVE_GOMP
   }
-
-  for (l = NFFT_2; l < NFFT; l += 2) {
-    lNFFT = l*NFFT;
-    ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
-      Gsq = coeff1*(static_cast<double>(k*k) + ll);
-      fBkMatrix[lNFFT + k][0] *= coeff2/(Gsq+coeff3);
-      fBkMatrix[lNFFT + k][1] = 0.0;
-      fBkMatrix[lNFFT + k + 1][0] = 0.0;
-      fBkMatrix[lNFFT + k + 1][1] = 0.0;
-    }
-
-    for (k = NFFT_2; k < NFFT - 1; k += 2) {
-      Gsq = coeff1*(static_cast<double>((k-NFFT)*(k-NFFT)) + ll);
-      fBkMatrix[lNFFT + k][0] *= coeff2/(Gsq+coeff3);
-      fBkMatrix[lNFFT + k][1] = 0.0;
-      fBkMatrix[lNFFT + k + 1][0] = 0.0;
-      fBkMatrix[lNFFT + k + 1][1] = 0.0;
-    }
-  }
-
-  //intermediate rows
-
-  for (l = 1; l < NFFT_2; l += 2) {
-    lNFFT = l*NFFT;
-    ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
-      Gsq = coeff1*(static_cast<double>((k+1)*(k+1)) + ll);
-      fBkMatrix[lNFFT + k][0] = 0.0;
-      fBkMatrix[lNFFT + k][1] = 0.0;
-      fBkMatrix[lNFFT + k + 1][0] *= coeff2/(Gsq+coeff3);
-      fBkMatrix[lNFFT + k + 1][1] = 0.0;
-    }
-
-    for (k = NFFT_2; k < NFFT - 1; k += 2) {
-      Gsq = coeff1*(static_cast<double>((k+1-NFFT)*(k+1-NFFT)) + ll);
-      fBkMatrix[lNFFT + k][0] = 0.0;
-      fBkMatrix[lNFFT + k][1] = 0.0;
-      fBkMatrix[lNFFT + k + 1][0] *= coeff2/(Gsq+coeff3);
-      fBkMatrix[lNFFT + k + 1][1] = 0.0;
-    }
-  }
-
-  for (l = NFFT_2 + 1; l < NFFT; l += 2) {
-    lNFFT = l*NFFT;
-    ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
-      Gsq = coeff1*(static_cast<double>((k+1)*(k+1)) + ll);
-      fBkMatrix[lNFFT + k][0] = 0.0;
-      fBkMatrix[lNFFT + k][1] = 0.0;
-      fBkMatrix[lNFFT + k + 1][0] *= coeff2/(Gsq+coeff3);
-      fBkMatrix[lNFFT + k + 1][1] = 0.0;
-    }
-
-    for (k = NFFT_2; k < NFFT - 1; k += 2) {
-      Gsq = coeff1*(static_cast<double>((k+1-NFFT)*(k+1-NFFT)) + ll);
-      fBkMatrix[lNFFT + k][0] = 0.0;
-      fBkMatrix[lNFFT + k][1] = 0.0;
-      fBkMatrix[lNFFT + k + 1][0] *= coeff2/(Gsq+coeff3);
-      fBkMatrix[lNFFT + k + 1][1] = 0.0;
-    }
-  }
+  #endif
 
   fBkMatrix[0][0] = 0.0;
 
@@ -1578,58 +1747,74 @@ void TBulkTriVortexNGLFieldCalc::ManipulateFourierCoefficientsForQx() const {
   int lNFFT, l, k;
   double ll;
 
-  for (l = 0; l < NFFT_2; l += 2) {
-    lNFFT = l*NFFT;
-    ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
-      if (!k && !l)
-        fBkMatrix[0][0] = 0.0;
-      else
-        fBkMatrix[lNFFT + k][0] *= coeff1*static_cast<double>(l)/(static_cast<double>(k*k) + ll);
+  #ifdef HAVE_GOMP
+  #pragma omp parallel sections default(shared) private(k,l,lNFFT,ll)
+  {
+    #pragma omp section
+  #endif
+    for (l = 0; l < NFFT_2; l += 2) {
+      lNFFT = l*NFFT;
+      ll = 3.0*static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2 - 1; k += 2) {
+        if (!k && !l)
+          fBkMatrix[0][0] = 0.0;
+        else
+          fBkMatrix[lNFFT + k][0] *= coeff1*static_cast<double>(l)/(static_cast<double>(k*k) + ll);
+      }
+
+      for (k = NFFT_2; k < NFFT - 1; k += 2) {
+        fBkMatrix[lNFFT + k][0] *= coeff1*static_cast<double>(l)/(static_cast<double>((k-NFFT)*(k-NFFT)) + ll);
+      }
     }
 
-    for (k = NFFT_2; k < NFFT - 1; k += 2) {
-      fBkMatrix[lNFFT + k][0] *= coeff1*static_cast<double>(l)/(static_cast<double>((k-NFFT)*(k-NFFT)) + ll);
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2; l < NFFT; l += 2) {
+      lNFFT = l*NFFT;
+      ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
+      for (k = 0; k < NFFT_2 - 1; k += 2) {
+        fBkMatrix[lNFFT + k][0] *= coeff1*static_cast<double>(l-NFFT)/(static_cast<double>(k*k) + ll);
+      }
+
+      for (k = NFFT_2; k < NFFT - 1; k += 2) {
+        fBkMatrix[lNFFT + k][0] *= coeff1*static_cast<double>(l-NFFT)/(static_cast<double>((k-NFFT)*(k-NFFT)) + ll);
+      }
     }
+
+    //intermediate rows
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = 1; l < NFFT_2; l += 2) {
+      lNFFT = l*NFFT;
+      ll = 3.0*static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2 - 1; k += 2) {
+        fBkMatrix[lNFFT + k + 1][0] *= coeff1*static_cast<double>(l)/(static_cast<double>((k+1)*(k+1)) + ll);
+      }
+
+      for (k = NFFT_2; k < NFFT - 1; k += 2) {
+        fBkMatrix[lNFFT + k + 1][0] *= coeff1*static_cast<double>(l)/(static_cast<double>((k+1-NFFT)*(k+1-NFFT)) + ll);
+      }
+    }
+
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2 + 1; l < NFFT; l += 2) {
+      lNFFT = l*NFFT;
+      ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
+      for (k = 0; k < NFFT_2 - 1; k += 2) {
+        fBkMatrix[lNFFT + k + 1][0] *= coeff1*static_cast<double>(l-NFFT)/(static_cast<double>((k+1)*(k+1)) + ll);
+      }
+
+      for (k = NFFT_2; k < NFFT - 1; k += 2) {
+        fBkMatrix[lNFFT + k + 1][0] *= coeff1*static_cast<double>(l-NFFT)/(static_cast<double>((k+1-NFFT)*(k+1-NFFT)) + ll);
+      }
+    }
+  #ifdef HAVE_GOMP
   }
-
-  for (l = NFFT_2; l < NFFT; l += 2) {
-    lNFFT = l*NFFT;
-    ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
-      fBkMatrix[lNFFT + k][0] *= coeff1*static_cast<double>(l-NFFT)/(static_cast<double>(k*k) + ll);
-    }
-
-    for (k = NFFT_2; k < NFFT - 1; k += 2) {
-      fBkMatrix[lNFFT + k][0] *= coeff1*static_cast<double>(l-NFFT)/(static_cast<double>((k-NFFT)*(k-NFFT)) + ll);
-    }
-  }
-
-  //intermediate rows
-
-  for (l = 1; l < NFFT_2; l += 2) {
-    lNFFT = l*NFFT;
-    ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
-      fBkMatrix[lNFFT + k + 1][0] *= coeff1*static_cast<double>(l)/(static_cast<double>((k+1)*(k+1)) + ll);
-    }
-
-    for (k = NFFT_2; k < NFFT - 1; k += 2) {
-      fBkMatrix[lNFFT + k + 1][0] *= coeff1*static_cast<double>(l)/(static_cast<double>((k+1-NFFT)*(k+1-NFFT)) + ll);
-    }
-  }
-
-  for (l = NFFT_2 + 1; l < NFFT; l += 2) {
-    lNFFT = l*NFFT;
-    ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
-      fBkMatrix[lNFFT + k + 1][0] *= coeff1*static_cast<double>(l-NFFT)/(static_cast<double>((k+1)*(k+1)) + ll);
-    }
-
-    for (k = NFFT_2; k < NFFT - 1; k += 2) {
-      fBkMatrix[lNFFT + k + 1][0] *= coeff1*static_cast<double>(l-NFFT)/(static_cast<double>((k+1-NFFT)*(k+1-NFFT)) + ll);
-    }
-  }
+  #endif
 
   return;
 }
@@ -1641,65 +1826,81 @@ void TBulkTriVortexNGLFieldCalc::ManipulateFourierCoefficientsForQy() const {
   int lNFFT, l, k;
   double ll;
 
-  for (l = 0; l < NFFT_2; l += 2) {
-    lNFFT = l*NFFT;
-    ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
-      if (!k && !l)
-        fBkMatrix[0][0] = 0.0;
-      else
+  #ifdef HAVE_GOMP
+  #pragma omp parallel sections default(shared) private(k,l,lNFFT,ll)
+  {
+    #pragma omp section
+  #endif
+    for (l = 0; l < NFFT_2; l += 2) {
+      lNFFT = l*NFFT;
+      ll = 3.0*static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2 - 1; k += 2) {
+        if (!k && !l)
+          fBkMatrix[0][0] = 0.0;
+        else
+          fBkMatrix[lNFFT + k][0] *= coeff1*static_cast<double>(k)/(static_cast<double>(k*k) + ll);
+      }
+
+      for (k = NFFT_2; k < NFFT - 1; k += 2) {
+        fBkMatrix[lNFFT + k][0] *= coeff1*static_cast<double>(k-NFFT)/(static_cast<double>((k-NFFT)*(k-NFFT)) + ll);
+      }
+    }
+
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2; l < NFFT; l += 2) {
+      lNFFT = l*NFFT;
+      ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
+      for (k = 0; k < NFFT_2 - 1; k += 2) {
         fBkMatrix[lNFFT + k][0] *= coeff1*static_cast<double>(k)/(static_cast<double>(k*k) + ll);
+      }
+
+      for (k = NFFT_2; k < NFFT - 1; k += 2) {
+        fBkMatrix[lNFFT + k][0] *= coeff1*static_cast<double>(k-NFFT)/(static_cast<double>((k-NFFT)*(k-NFFT)) + ll);
+      }
     }
 
-    for (k = NFFT_2; k < NFFT - 1; k += 2) {
-      fBkMatrix[lNFFT + k][0] *= coeff1*static_cast<double>(k-NFFT)/(static_cast<double>((k-NFFT)*(k-NFFT)) + ll);
+    //intermediate rows
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = 1; l < NFFT_2; l += 2) {
+      lNFFT = l*NFFT;
+      ll = 3.0*static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2 - 1; k += 2) {
+        fBkMatrix[lNFFT + k + 1][0] *= coeff1*static_cast<double>(k+1)/(static_cast<double>((k+1)*(k+1)) + ll);
+      }
+
+      for (k = NFFT_2; k < NFFT - 1; k += 2) {
+        fBkMatrix[lNFFT + k + 1][0] *= coeff1*static_cast<double>(k+1-NFFT)/(static_cast<double>((k+1-NFFT)*(k+1-NFFT)) + ll);
+      }
     }
+
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2 + 1; l < NFFT; l += 2) {
+      lNFFT = l*NFFT;
+      ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
+      for (k = 0; k < NFFT_2 - 1; k += 2) {
+        fBkMatrix[lNFFT + k + 1][0] *= coeff1*static_cast<double>(k+1)/(static_cast<double>((k+1)*(k+1)) + ll);
+      }
+
+      for (k = NFFT_2; k < NFFT - 1; k += 2) {
+        fBkMatrix[lNFFT + k + 1][0] *= coeff1*static_cast<double>(k+1-NFFT)/(static_cast<double>((k+1-NFFT)*(k+1-NFFT)) + ll);
+      }
+    }
+  #ifdef HAVE_GOMP
   }
-
-  for (l = NFFT_2; l < NFFT; l += 2) {
-    lNFFT = l*NFFT;
-    ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
-      fBkMatrix[lNFFT + k][0] *= coeff1*static_cast<double>(k)/(static_cast<double>(k*k) + ll);
-    }
-
-    for (k = NFFT_2; k < NFFT - 1; k += 2) {
-      fBkMatrix[lNFFT + k][0] *= coeff1*static_cast<double>(k-NFFT)/(static_cast<double>((k-NFFT)*(k-NFFT)) + ll);
-    }
-  }
-
-  //intermediate rows
-
-  for (l = 1; l < NFFT_2; l += 2) {
-    lNFFT = l*NFFT;
-    ll = 3.0*static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
-      fBkMatrix[lNFFT + k + 1][0] *= coeff1*static_cast<double>(k+1)/(static_cast<double>((k+1)*(k+1)) + ll);
-    }
-
-    for (k = NFFT_2; k < NFFT - 1; k += 2) {
-      fBkMatrix[lNFFT + k + 1][0] *= coeff1*static_cast<double>(k+1-NFFT)/(static_cast<double>((k+1-NFFT)*(k+1-NFFT)) + ll);
-    }
-  }
-
-  for (l = NFFT_2 + 1; l < NFFT; l += 2) {
-    lNFFT = l*NFFT;
-    ll = 3.0*static_cast<double>((l-NFFT)*(l-NFFT));
-    for (k = 0; k < NFFT_2 - 1; k += 2) {
-      fBkMatrix[lNFFT + k + 1][0] *= coeff1*static_cast<double>(k+1)/(static_cast<double>((k+1)*(k+1)) + ll);
-    }
-
-    for (k = NFFT_2; k < NFFT - 1; k += 2) {
-      fBkMatrix[lNFFT + k + 1][0] *= coeff1*static_cast<double>(k+1-NFFT)/(static_cast<double>((k+1-NFFT)*(k+1-NFFT)) + ll);
-    }
-  }
+  #endif
 
   return;
 }
 
 void TBulkTriVortexNGLFieldCalc::CalculateSumAk() const {
-  const int NFFT_2(fSteps/2);
-  const int NFFTsq_2((fSteps/2 + 1)*fSteps);
+//  const int NFFT_2(fSteps/2);
+//  const int NFFTsq_2((fSteps/2 + 1)*fSteps);
   const int NFFTsq(fSteps*fSteps);
 /*
   double SumFirstColumn(0.0);
@@ -1713,10 +1914,20 @@ void TBulkTriVortexNGLFieldCalc::CalculateSumAk() const {
   }
   fSumAk = 2.0*fSumAk - SumFirstColumn;
 */
-  fSumAk = 0.0;
-  for (int l(0); l < NFFTsq; ++l) {
+  double sumAk(0.0);
+  int l;
+
+  #ifdef HAVE_GOMP
+  int chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk) reduction(+:sumAk)
+  #endif
+  for (l=0; l < NFFTsq; ++l) {
     fSumAk += fFFTin[l][0];
   }
+
+  fSumAk = sumAk;
 
   return;
 }
@@ -1743,13 +1954,20 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
   const int NFFTsq(fSteps*fSteps);
   const int NFFTsq_2((fSteps/2 + 1)*fSteps);
 
+  #ifdef HAVE_GOMP
+  int chunk;
+  #endif
+
   // first check that the field is not larger than Hc2 and that we are dealing with a type II SC ...
   if ((field >= Hc2) || (lambda < xi/sqrt(2.0))) {
     int m;
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    chunk = NFFTsq/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(m) schedule(dynamic,chunk)
     #endif
-    for (m = 0; m < NFFTsq; m++) {
+    for (m = 0; m < NFFTsq; ++m) {
       fFFTout[m] = field;
     }
     // Set the flag which shows that the calculation has been done
@@ -1764,9 +1982,12 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
   FillAbrikosovCoefficients();
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  chunk = NFFT/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
-  for (l = 0; l < NFFT; l++) {
+  for (l = 0; l < NFFT; ++l) {
     fCheckAkConvergence[l] = fFFTin[l][0];
   }
 
@@ -1779,9 +2000,12 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
   fftw_execute(fFFTplan);
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
-  for (l = 0; l < NFFTsq; l++) {
+  for (l = 0; l < NFFTsq; ++l) {
     fOmegaMatrix[l] = fSumAk - fRealSpaceMatrix[l][0];
   }
 
@@ -1794,9 +2018,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
   double denomQA;
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l,denomQA) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l,denomQA) schedule(dynamic,chunk)
   #endif
-  for (l = 0; l < NFFTsq; l++) {
+  for (l = 0; l < NFFTsq; ++l) {
     if (!fOmegaMatrix[l] || !l || (l == (NFFT+1)*NFFT_2)) {
       fQMatrixA[l][0] = 0.0;
       fQMatrixA[l][1] = 0.0;
@@ -1821,23 +2045,25 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
   // initialize B(x,y) with the mean field
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
-  for (l = 0; l < NFFTsq; l++) {
+  for (l = 0; l < NFFTsq; ++l) {
     fFFTout[l] = scaledB;
   }
 
   bool akConverged(false), bkConverged(false), akInitiallyConverged(false), firstBkCalculation(true);
-  double fourKappaSq(4.0*fKappa*fKappa);
-
+  double fourKappaSq(4.0*fKappa*fKappa), sumSum, sumOmegaSq;
 
   while (!akConverged || !bkConverged) {
 
     // First iteration step for aK
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+    chunk = NFFTsq/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
     #endif
-    for (l = 0; l < NFFTsq; l++) {
+    for (l = 0; l < NFFTsq; ++l) {
       if (fOmegaMatrix[l]) {
         fRealSpaceMatrix[l][0] = fOmegaMatrix[l]*(fOmegaMatrix[l] + fQMatrix[l][0]*fQMatrix[l][0] + fQMatrix[l][1]*fQMatrix[l][1] - 2.0) + \
          (fOmegaDiffMatrix[l][0]*fOmegaDiffMatrix[l][0] + fOmegaDiffMatrix[l][1]*fOmegaDiffMatrix[l][1])/(fourKappaSq*fOmegaMatrix[l]);
@@ -1865,9 +2091,12 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
     // Need a copy of the aK-matrix since FFTW is manipulating the input in c2r and r2c transforms
     // Store it in the first half of the bK-matrix
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+    chunk = NFFTsq_2/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
     #endif
-    for (l = 0; l < NFFTsq_2; l++) {
+    for (l = 0; l < NFFTsq_2; ++l) {
       fBkMatrix[l][0] = fFFTin[l][0];
     }
 
@@ -1876,9 +2105,12 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
     fftw_execute(fFFTplan);
 
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+    chunk = NFFTsq/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
     #endif
-    for (l = 0; l < NFFTsq; l++) {
+    for (l = 0; l < NFFTsq; ++l) {
       fOmegaMatrix[l] = fSumAk - fRealSpaceMatrix[l][0];
     }
 
@@ -1886,27 +2118,35 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
     // Get the spacial averages of the second iteration step for aK
 
-    fSumSum = 0.0;
-    fSumOmegaSq = 0.0;
-    for (l = 0; l < NFFTsq; l++) {
-      fSumOmegaSq += fOmegaMatrix[l]*fOmegaMatrix[l];
+    sumSum = 0.0;
+    sumOmegaSq = 0.0;
+    #ifdef HAVE_GOMP
+    #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk) reduction(+:sumSum,sumOmegaSq)
+    #endif
+    for (l = 0; l < NFFTsq; ++l) {
+      sumOmegaSq += fOmegaMatrix[l]*fOmegaMatrix[l];
       if(fOmegaMatrix[l]){
-        fSumSum += fOmegaMatrix[l]*(1.0 - (fQMatrix[l][0]*fQMatrix[l][0] + fQMatrix[l][1]*fQMatrix[l][1])) - \
+        sumSum += fOmegaMatrix[l]*(1.0 - (fQMatrix[l][0]*fQMatrix[l][0] + fQMatrix[l][1]*fQMatrix[l][1])) - \
          (fOmegaDiffMatrix[l][0]*fOmegaDiffMatrix[l][0] + fOmegaDiffMatrix[l][1]*fOmegaDiffMatrix[l][1])/(fourKappaSq*fOmegaMatrix[l]);
       } else {
         if (l < NFFTsq - NFFT && fOmegaMatrix[l+NFFT]) {
-          fSumSum += fOmegaMatrix[l+NFFT]*(1.0 - (fQMatrix[l+NFFT][0]*fQMatrix[l+NFFT][0] + fQMatrix[l+NFFT][1]*fQMatrix[l+NFFT][1])) - \
+          sumSum += fOmegaMatrix[l+NFFT]*(1.0 - (fQMatrix[l+NFFT][0]*fQMatrix[l+NFFT][0] + fQMatrix[l+NFFT][1]*fQMatrix[l+NFFT][1])) - \
            (fOmegaDiffMatrix[l+NFFT][0]*fOmegaDiffMatrix[l+NFFT][0] + \
             fOmegaDiffMatrix[l+NFFT][1]*fOmegaDiffMatrix[l+NFFT][1])/(fourKappaSq*fOmegaMatrix[l+NFFT]);
         }
       }
     }
+    fSumSum = sumSum;
+    fSumOmegaSq = sumOmegaSq; // reduction clauses do not work with class members that have been declared elsewhere
 
     // Restore the aK-matrix from the bK-space and multiply with the spacial averages
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+    chunk = NFFTsq_2/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
     #endif
-    for (l = 0; l < NFFTsq_2; l++) {
+    for (l = 0; l < NFFTsq_2; ++l) {
       fFFTin[l][0] = fBkMatrix[l][0]*fSumSum/fSumOmegaSq;
       fFFTin[l][1] = 0.0;
     }
@@ -1915,7 +2155,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
     akConverged = true;
 
-    for (l = 0; l < NFFT; l++) {
+    for (l = 0; l < NFFT; ++l) {
       if (fFFTin[l][0]){
         if (((fabs(fFFTin[l][0]) > 1.0E-6) && (fabs(fCheckAkConvergence[l] - fFFTin[l][0])/fFFTin[l][0] > 1.0E-3)) || \
         (fCheckAkConvergence[l]/fFFTin[l][0] < 0.0)) {
@@ -1928,10 +2168,13 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
     }
 
     if (!akConverged) {
-    #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(l) schedule(dynamic)
-    #endif
-      for (l = 0; l < NFFT; l++) {
+      #ifdef HAVE_GOMP
+      chunk = NFFT/omp_get_num_procs();
+      if (chunk < 10)
+        chunk = 10;
+      #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
+      #endif
+      for (l = 0; l < NFFT; ++l) {
         fCheckAkConvergence[l] = fFFTin[l][0];
       }
     } else {
@@ -1952,9 +2195,12 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
     fftw_execute(fFFTplan);
 
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+    chunk = NFFTsq/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
     #endif
-    for (l = 0; l < NFFTsq; l++) {
+    for (l = 0; l < NFFTsq; ++l) {
       fOmegaMatrix[l] = fSumAk - fRealSpaceMatrix[l][0];
     }
 
@@ -1963,9 +2209,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
     if (akInitiallyConverged) {  // if the aK iterations converged, go on with the bK calculation
       //cout << "converged, count=" << count << endl;
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
       #endif
-      for (l = 0; l < NFFTsq; l++) {
+      for (l = 0; l < NFFTsq; ++l) {
         fBkMatrix[l][0] = fOmegaMatrix[l]*fFFTout[l] + fSumAk*(scaledB - fFFTout[l]) + \
         fQMatrix[l][1]*fOmegaDiffMatrix[l][0] - fQMatrix[l][0]*fOmegaDiffMatrix[l][1];
         fBkMatrix[l][1] = 0.0;
@@ -1984,9 +2230,12 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
       if (firstBkCalculation) {
         #ifdef HAVE_GOMP
-        #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+        chunk = NFFT/omp_get_num_procs();
+        if (chunk < 10)
+          chunk = 10;
+        #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
         #endif
-        for (l = 0; l < NFFT; l++) {
+        for (l = 0; l < NFFT; ++l) {
           fCheckBkConvergence[l] = 0.0;
         }
         firstBkCalculation = false;
@@ -1995,7 +2244,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
       bkConverged = true;
 
-      for (l = 0; l < NFFT; l++) {
+      for (l = 0; l < NFFT; ++l) {
         if (fBkMatrix[l][0]) {
           if (((fabs(fBkMatrix[l][0]) > 1.0E-6) && (fabs(fCheckBkConvergence[l] - fBkMatrix[l][0])/fabs(fBkMatrix[l][0]) > 1.0E-3)) || \
           (fCheckBkConvergence[l]/fBkMatrix[l][0] < 0.0)) {
@@ -2010,9 +2259,12 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
       if (!bkConverged) {
         #ifdef HAVE_GOMP
-        #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+        chunk = NFFT/omp_get_num_procs();
+        if (chunk < 10)
+          chunk = 10;
+        #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
         #endif
-        for (l = 0; l < NFFT; l++) {
+        for (l = 0; l < NFFT; ++l) {
           fCheckBkConvergence[l] = fBkMatrix[l][0];
         }
       }
@@ -2022,7 +2274,10 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
       // In order to save memory I will not allocate more space for another matrix but save a copy of the bKs in the aK-Matrix
       // Since aK is only half the size of bK, store every second entry in the imaginary part of aK
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+      chunk = NFFTsq/omp_get_num_procs();
+      if (chunk < 10)
+        chunk = 10;
+      #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
       #endif
       for (l = 0; l < NFFTsq; l+=2) {
         fFFTin[l/2][0] = fBkMatrix[l][0];
@@ -2034,9 +2289,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
       fftw_execute(fFFTplanBkToBandQ);
 
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
       #endif
-      for (l = 0; l < NFFTsq; l++) {
+      for (l = 0; l < NFFTsq; ++l) {
         fFFTout[l] = scaledB + fBkMatrix[l][0];
       }
 
@@ -2045,7 +2300,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
       // Restore bKs for Qx calculation and Fourier transform to get Qx
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
       #endif
       for (l = 0; l < NFFTsq; l+=2) {
         fBkMatrix[l][0] = fFFTin[l/2][0];
@@ -2059,16 +2314,16 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
       fftw_execute(fFFTplanBkToBandQ);
 
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
       #endif
-      for (l = 0; l < NFFTsq; l++) {
+      for (l = 0; l < NFFTsq; ++l) {
         fQMatrix[l][0] = fQMatrixA[l][0] - fBkMatrix[l][1];
       }
 
       // Restore bKs for Qy calculation and Fourier transform to get Qy
 
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
       #endif
       for (l = 0; l < NFFTsq; l+=2) {
         fBkMatrix[l][0] = fFFTin[l/2][0];
@@ -2082,9 +2337,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
       fftw_execute(fFFTplanBkToBandQ);
 
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
       #endif
-      for (l = 0; l < NFFTsq; l++) {
+      for (l = 0; l < NFFTsq; ++l) {
         fQMatrix[l][1] = fQMatrixA[l][1] + fBkMatrix[l][1];
       }
     } // end if (akInitiallyConverged)
@@ -2093,9 +2348,12 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
   // If the iterations have converged, rescale the field from Brandt's units to Gauss
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
-  for (l = 0; l < NFFTsq; l++) {
+  for (l = 0; l < NFFTsq; ++l) {
     fFFTout[l] *= Hc2_kappa;
   }
 
@@ -2184,13 +2442,20 @@ void TBulkAnisotropicTriVortexLondonFieldCalc::CalculateGrid() const {
   const int NFFTsq(fSteps*fSteps);
   const int NFFTsq_2((fSteps/2 + 1) * fSteps);
 
+  #ifdef HAVE_GOMP
+  int chunk;
+  #endif
+
   // fill the field Fourier components in the matrix
 
   // ... but first check that the field is not larger than Hc2 and that we are dealing with a type II SC
   if ((field >= Hc2) || (sqrt(lambdaX*lambdaY) < sqrt(xiX*xiY)/sqrt(2.0))) {
     int m;
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    chunk = NFFTsq/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(m) schedule(dynamic,chunk)
     #endif
     for (m = 0; m < NFFTsq; ++m) {
       fFFTout[m] = field;
@@ -2206,7 +2471,10 @@ void TBulkAnisotropicTriVortexLondonFieldCalc::CalculateGrid() const {
 
   // zero first everything since the r2c FFT changes the input, too
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(k) schedule(dynamic)
+  chunk = NFFTsq_2/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(k) schedule(dynamic,chunk)
   #endif
   for (k = 0; k < NFFTsq_2; ++k) {
     fFFTin[k][0] = 0.0;
@@ -2214,90 +2482,84 @@ void TBulkAnisotropicTriVortexLondonFieldCalc::CalculateGrid() const {
   }
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel private(k, l, lNFFT_2, kk, ll) num_threads(4)
+  #pragma omp parallel sections default(shared) private(k, l, lNFFT_2, kk, ll)
   {
-    switch(omp_get_thread_num()) {
-      case 0:
+    #pragma omp section
   #endif
-        for (l = 0; l < NFFT_2; l += 2) {
-          lNFFT_2 = l*(NFFT_2 + 1);
-          ll = static_cast<double>(l*l);
-          for (k = 0; k < NFFT_2; k += 2) {
-            kk = static_cast<double>(k*k);
-            fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+    for (l = 0; l < NFFT_2; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2; k += 2) {
+        kk = static_cast<double>(k*k);
+        fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+//        fFFTin[lNFFT_2 + k][1] = 0.0;
+//        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+//        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+
+      k = NFFT_2;
+      kk = static_cast<double>(k*k);
+      fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+//      fFFTin[lNFFT_2 + k][1] = 0.0;
+    }
+
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2; l < NFFT; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = static_cast<double>((NFFT-l)*(NFFT-l));
+      for (k = 0; k < NFFT_2; k += 2) {
+        kk = static_cast<double>(k*k);
+        fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
 //            fFFTin[lNFFT_2 + k][1] = 0.0;
 //            fFFTin[lNFFT_2 + k + 1][0] = 0.0;
 //            fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-          }
+      }
 
-          k = NFFT_2;
-          kk = static_cast<double>(k*k);
-          fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+      k = NFFT_2;
+      kk = static_cast<double>(k*k);
+      fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
 //          fFFTin[lNFFT_2 + k][1] = 0.0;
+    }
 
-        }
-  #ifdef HAVE_GOMP
-      break;
-    case 1:
-  #endif
-        for (l = NFFT_2; l < NFFT; l += 2) {
-          lNFFT_2 = l*(NFFT_2 + 1);
-          ll = static_cast<double>((NFFT-l)*(NFFT-l));
-          for (k = 0; k < NFFT_2; k += 2) {
-            kk = static_cast<double>(k*k);
-            fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
-//            fFFTin[lNFFT_2 + k][1] = 0.0;
-//            fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-//            fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-          }
-
-          k = NFFT_2;
-          kk = static_cast<double>(k*k);
-          fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
-//          fFFTin[lNFFT_2 + k][1] = 0.0;
-        }
-  #ifdef HAVE_GOMP
-      break;
-    case 2:
-  #endif
-        // intermediate rows
-        for (l = 1; l < NFFT_2; l += 2) {
-          lNFFT_2 = l*(NFFT_2 + 1);
-          ll = static_cast<double>(l*l);
-          for (k = 0; k < NFFT_2; k += 2) {
-            kk = static_cast<double>((k + 1)*(k + 1));
+    // intermediate rows
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = 1; l < NFFT_2; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2; k += 2) {
+        kk = static_cast<double>((k + 1)*(k + 1));
 //            fFFTin[lNFFT_2 + k][0] = 0.0;
 //            fFFTin[lNFFT_2 + k][1] = 0.0;
-            fFFTin[lNFFT_2 + k + 1][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+        fFFTin[lNFFT_2 + k + 1][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
 //            fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-          }
+      }
 //          k = NFFT_2;
 //          fFFTin[lNFFT_2 + k][0] = 0.0;
 //          fFFTin[lNFFT_2 + k][1] = 0.0;
-        }
-  #ifdef HAVE_GOMP
-      break;
-    case 3:
-  #endif
-        for (l = NFFT_2 + 1; l < NFFT; l += 2) {
-          lNFFT_2 = l*(NFFT_2 + 1);
-          ll = static_cast<double>((NFFT-l)*(NFFT-l));
-          for (k = 0; k < NFFT_2; k += 2) {
-            kk = static_cast<double>((k+1)*(k+1));
+    }
+
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2 + 1; l < NFFT; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = static_cast<double>((NFFT-l)*(NFFT-l));
+      for (k = 0; k < NFFT_2; k += 2) {
+        kk = static_cast<double>((k+1)*(k+1));
 //            fFFTin[lNFFT_2 + k][0] = 0.0;
 //            fFFTin[lNFFT_2 + k][1] = 0.0;
-            fFFTin[lNFFT_2 + k + 1][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+        fFFTin[lNFFT_2 + k + 1][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
 //           fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-          }
-          k = NFFT_2;
+      }
+      k = NFFT_2;
 //          fFFTin[lNFFT_2 + k][0] = 0.0;
 //          fFFTin[lNFFT_2 + k][1] = 0.0;
-        }
-  #ifdef HAVE_GOMP
-      break;
-    default:
-      break;
     }
+  #ifdef HAVE_GOMP
   }
   #endif
 
@@ -2307,7 +2569,10 @@ void TBulkAnisotropicTriVortexLondonFieldCalc::CalculateGrid() const {
 
   // Multiply by the applied field
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsq; ++l) {
     fFFTout[l] *= field;
@@ -2398,13 +2663,19 @@ void TBulkAnisotropicTriVortexMLFieldCalc::CalculateGrid() const {
   const int NFFT_2(fSteps/2);
   const int NFFTsq(fSteps*fSteps);
 
+  #ifdef HAVE_GOMP
+  int chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #endif
+
   // fill the field Fourier components in the matrix
 
   // ... but first check that the field is not larger than Hc2 and that we are dealing with a type II SC
   if ((field >= Hc2) || (sqrt(lambdaX*lambdaY) < sqrt(xiX*xiY)/sqrt(2.0))) {
     int m;
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    #pragma omp parallel for default(shared) private(m) schedule(dynamic,chunk)
     #endif
     for (m = 0; m < NFFTsq; ++m) {
       fFFTout[m] = field;
@@ -2418,70 +2689,85 @@ void TBulkAnisotropicTriVortexMLFieldCalc::CalculateGrid() const {
   double kk, ll;
   int k, l, lNFFT_2;
 
-  for (l = 0; l < NFFT_2; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2; k += 2) {
+  #ifdef HAVE_GOMP
+  #pragma omp parallel sections default(shared) private(k, l, lNFFT_2, kk, ll)
+  {
+    #pragma omp section
+  #endif
+    for (l = 0; l < NFFT_2; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2; k += 2) {
+        kk = static_cast<double>(k*k);
+        fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
       kk = static_cast<double>(k*k);
       fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    kk = static_cast<double>(k*k);
-    fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
-    fFFTin[lNFFT_2 + k][1] = 0.0;
-  }
 
-
-  for (l = NFFT_2; l < NFFT; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = static_cast<double>((NFFT-l)*(NFFT-l));
-    for (k = 0; k < NFFT_2; k += 2) {
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2; l < NFFT; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = static_cast<double>((NFFT-l)*(NFFT-l));
+      for (k = 0; k < NFFT_2; k += 2) {
+        kk = static_cast<double>(k*k);
+        fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
       kk = static_cast<double>(k*k);
       fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    kk = static_cast<double>(k*k);
-    fFFTin[lNFFT_2 + k][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
-    fFFTin[lNFFT_2 + k][1] = 0.0;
-  }
 
-  // intermediate rows
-
-  for (l = 1; l < NFFT_2; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2; k += 2) {
-      kk = static_cast<double>((k + 1)*(k + 1));
+    // intermediate rows
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = 1; l < NFFT_2; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2; k += 2) {
+        kk = static_cast<double>((k + 1)*(k + 1));
+        fFFTin[lNFFT_2 + k][0] = 0.0;
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
       fFFTin[lNFFT_2 + k][0] = 0.0;
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    fFFTin[lNFFT_2 + k][0] = 0.0;
-    fFFTin[lNFFT_2 + k][1] = 0.0;
-  }
 
-  for (l = NFFT_2 + 1; l < NFFT; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = static_cast<double>((NFFT-l)*(NFFT-l));
-    for (k = 0; k < NFFT_2; k += 2) {
-      kk = static_cast<double>((k+1)*(k+1));
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2 + 1; l < NFFT; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = static_cast<double>((NFFT-l)*(NFFT-l));
+      for (k = 0; k < NFFT_2; k += 2) {
+        kk = static_cast<double>((k+1)*(k+1));
+        fFFTin[lNFFT_2 + k][0] = 0.0;
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
       fFFTin[lNFFT_2 + k][0] = 0.0;
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = exp(-(xiXsq_2_scaled*kk + xiYsq_2_scaled*ll))/(1.0+lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    fFFTin[lNFFT_2 + k][0] = 0.0;
-    fFFTin[lNFFT_2 + k][1] = 0.0;
+  #ifdef HAVE_GOMP
   }
+  #endif
 
   // Do the Fourier transform to get B(x,y)
 
@@ -2489,7 +2775,7 @@ void TBulkAnisotropicTriVortexMLFieldCalc::CalculateGrid() const {
 
   // Multiply by the applied field
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsq; ++l) {
     fFFTout[l] *= field;
@@ -2583,13 +2869,19 @@ void TBulkAnisotropicTriVortexAGLFieldCalc::CalculateGrid() const {
   const int NFFT_2(fSteps/2);
   const int NFFTsq(fSteps*fSteps);
 
+  #ifdef HAVE_GOMP
+  int chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #endif
+
   // fill the field Fourier components in the matrix
 
   // ... but first check that the field is not larger than Hc2 and that we are dealing with a type II SC
   if ((field >= Hc2) || (sqrt(lambdaX*lambdaY) < sqrt(xiX*xiY)/sqrt(2.0))) {
     int m;
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    #pragma omp parallel for default(shared) private(m) schedule(dynamic,chunk)
     #endif
     for (m = 0; m < NFFTsq; ++m) {
       fFFTout[m] = field;
@@ -2603,76 +2895,91 @@ void TBulkAnisotropicTriVortexAGLFieldCalc::CalculateGrid() const {
   double kk, ll, u;
   int k, l, lNFFT_2;
 
-  for (l = 0; l < NFFT_2; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2; k += 2) {
-      kk = static_cast<double>(k*k);
-      u = sqrt(xiXsq_scaled*kk + xiYsq_scaled*ll);
-      fFFTin[lNFFT_2 + k][0] = ((!k && !l) ? 1.0 : coeff1*u*TMath::BesselK1(u)/(lambdaXsq_scaled*ll+lambdaYsq_scaled*kk));
-      fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
-    }
-    k = NFFT_2;
-    kk = static_cast<double>(k*k);
-    u = sqrt(xiXsq_scaled*kk + xiYsq_scaled*ll);
-    fFFTin[lNFFT_2 + k][0] = coeff1*u*TMath::BesselK1(u)/(lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
-    fFFTin[lNFFT_2 + k][1] = 0.0;
-  }
-
-
-  for (l = NFFT_2; l < NFFT; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = static_cast<double>((NFFT-l)*(NFFT-l));
-    for (k = 0; k < NFFT_2; k += 2) {
+  #ifdef HAVE_GOMP
+  #pragma omp parallel sections default(shared) private(k, l, lNFFT_2, kk, ll, u)
+  {
+    #pragma omp section
+  #endif
+    for (l = 0; l < NFFT_2; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2; k += 2) {
+        kk = static_cast<double>(k*k);
+        u = sqrt(xiXsq_scaled*kk + xiYsq_scaled*ll);
+        fFFTin[lNFFT_2 + k][0] = ((!k && !l) ? 1.0 : coeff1*u*TMath::BesselK1(u)/(lambdaXsq_scaled*ll+lambdaYsq_scaled*kk));
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
       kk = static_cast<double>(k*k);
       u = sqrt(xiXsq_scaled*kk + xiYsq_scaled*ll);
       fFFTin[lNFFT_2 + k][0] = coeff1*u*TMath::BesselK1(u)/(lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    kk = static_cast<double>(k*k);
-    u = sqrt(xiXsq_scaled*kk + xiYsq_scaled*ll);
-    fFFTin[lNFFT_2 + k][0] = coeff1*u*TMath::BesselK1(u)/(lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
-    fFFTin[lNFFT_2 + k][1] = 0.0;
-  }
 
-  // intermediate rows
-
-  for (l = 1; l < NFFT_2; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = static_cast<double>(l*l);
-    for (k = 0; k < NFFT_2; k += 2) {
-      kk = static_cast<double>((k + 1)*(k + 1));
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2; l < NFFT; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = static_cast<double>((NFFT-l)*(NFFT-l));
+      for (k = 0; k < NFFT_2; k += 2) {
+        kk = static_cast<double>(k*k);
+        u = sqrt(xiXsq_scaled*kk + xiYsq_scaled*ll);
+        fFFTin[lNFFT_2 + k][0] = coeff1*u*TMath::BesselK1(u)/(lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
+      kk = static_cast<double>(k*k);
       u = sqrt(xiXsq_scaled*kk + xiYsq_scaled*ll);
+      fFFTin[lNFFT_2 + k][0] = coeff1*u*TMath::BesselK1(u)/(lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+      fFFTin[lNFFT_2 + k][1] = 0.0;
+    }
+
+    // intermediate rows
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = 1; l < NFFT_2; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = static_cast<double>(l*l);
+      for (k = 0; k < NFFT_2; k += 2) {
+        kk = static_cast<double>((k + 1)*(k + 1));
+        u = sqrt(xiXsq_scaled*kk + xiYsq_scaled*ll);
+        fFFTin[lNFFT_2 + k][0] = 0.0;
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = coeff1*u*TMath::BesselK1(u)/(lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
       fFFTin[lNFFT_2 + k][0] = 0.0;
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = coeff1*u*TMath::BesselK1(u)/(lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    fFFTin[lNFFT_2 + k][0] = 0.0;
-    fFFTin[lNFFT_2 + k][1] = 0.0;
-  }
 
-  for (l = NFFT_2 + 1; l < NFFT; l += 2) {
-    lNFFT_2 = l*(NFFT_2 + 1);
-    ll = static_cast<double>((NFFT-l)*(NFFT-l));
-    for (k = 0; k < NFFT_2; k += 2) {
-      kk = static_cast<double>((k+1)*(k+1));
-      u = sqrt(xiXsq_scaled*kk + xiYsq_scaled*ll);
+    #ifdef HAVE_GOMP
+    #pragma omp section
+    #endif
+    for (l = NFFT_2 + 1; l < NFFT; l += 2) {
+      lNFFT_2 = l*(NFFT_2 + 1);
+      ll = static_cast<double>((NFFT-l)*(NFFT-l));
+      for (k = 0; k < NFFT_2; k += 2) {
+        kk = static_cast<double>((k+1)*(k+1));
+        u = sqrt(xiXsq_scaled*kk + xiYsq_scaled*ll);
+        fFFTin[lNFFT_2 + k][0] = 0.0;
+        fFFTin[lNFFT_2 + k][1] = 0.0;
+        fFFTin[lNFFT_2 + k + 1][0] = coeff1*u*TMath::BesselK1(u)/(lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
+        fFFTin[lNFFT_2 + k + 1][1] = 0.0;
+      }
+      k = NFFT_2;
       fFFTin[lNFFT_2 + k][0] = 0.0;
       fFFTin[lNFFT_2 + k][1] = 0.0;
-      fFFTin[lNFFT_2 + k + 1][0] = coeff1*u*TMath::BesselK1(u)/(lambdaXsq_scaled*ll+lambdaYsq_scaled*kk);
-      fFFTin[lNFFT_2 + k + 1][1] = 0.0;
     }
-    k = NFFT_2;
-    fFFTin[lNFFT_2 + k][0] = 0.0;
-    fFFTin[lNFFT_2 + k][1] = 0.0;
+  #ifdef HAVE_GOMP
   }
+  #endif
 
   // Do the Fourier transform to get B(x,y)
 
@@ -2680,7 +2987,7 @@ void TBulkAnisotropicTriVortexAGLFieldCalc::CalculateGrid() const {
 
   // Multiply by the applied field
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsq; ++l) {
     fFFTout[l] *= field;

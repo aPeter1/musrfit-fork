@@ -290,7 +290,10 @@ void TFilmTriVortexNGLFieldCalc::CalculateGatVortexCore() const {
 
   // First save a copy of the real aK-matrix in the imaginary part of the bK-matrix
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  int chunk = NFFTsqStZ/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsqStZ; ++l) {
     fBkMatrix[l][1] = fFFTin[l][0];
@@ -299,61 +302,86 @@ void TFilmTriVortexNGLFieldCalc::CalculateGatVortexCore() const {
   // sum_K aK Kx^2 cos(Kx*x + Ky*y) cos(Kz*z)
   // First multiply the aK with Kx^2, then call FFTW
 
-  float coeffKx(4.0/3.0*pow(PI/fLatticeConstant, 2.0f));;
+  float coeffKx(4.0/3.0*pow(PI/fLatticeConstant, 2.0f));
 
   // k = 0
-
-  // even rows
-  for (i = 0; i < NFFT; i += 2) {
-    // j = 0
-    fFFTin[fStepsZ*NFFT*i][0] = 0.0f;
-    // j != 0
-    for (j = 2; j < NFFT_2; j += 2) {
-      fFFTin[fStepsZ*(j + NFFT*i)][0] *= coeffKx*static_cast<float>(j*j);
-    }
-    for (j = NFFT_2; j < NFFT; j += 2) {
-      fFFTin[fStepsZ*(j + NFFT*i)][0] *= coeffKx*static_cast<float>((j - NFFT)*(j - NFFT));
-    }
-  }
-
-  // odd rows
-  for (i = 1; i < NFFT; i += 2) {
-    for (j = 0; j < NFFT_2; j += 2) {
-      fFFTin[fStepsZ*(j + 1 + NFFT*i)][0] *= coeffKx*static_cast<float>((j + 1)*(j + 1));
-    }
-    for (j = NFFT_2; j < NFFT; j += 2) {
-      fFFTin[fStepsZ*(j + 1 + NFFT*i)][0] *= coeffKx*static_cast<float>((j + 1 - NFFT)*(j + 1 - NFFT));
-    }
-  }
-
-  // k != 0
-
-  if (fFind3dSolution) {
-    for (k = 1; k < NFFTz; ++k) {
+  #ifdef HAVE_GOMP
+  #pragma omp parallel default(shared) private(i,j)
+  {
+    #pragma omp sections
+    {
       // even rows
+      #pragma omp section
+  #endif
       for (i = 0; i < NFFT; i += 2) {
         // j = 0
-        fFFTin[k + NFFTz*NFFT*i][0] = 0.0f;
+        fFFTin[fStepsZ*NFFT*i][0] = 0.0f;
         // j != 0
         for (j = 2; j < NFFT_2; j += 2) {
-          fFFTin[k + NFFTz*(j + NFFT*i)][0] *= coeffKx*static_cast<float>(j*j);
+          fFFTin[fStepsZ*(j + NFFT*i)][0] *= coeffKx*static_cast<float>(j*j);
         }
         for (j = NFFT_2; j < NFFT; j += 2) {
-          fFFTin[k + NFFTz*(j + NFFT*i)][0] *= coeffKx*static_cast<float>((j - NFFT)*(j - NFFT));
+          fFFTin[fStepsZ*(j + NFFT*i)][0] *= coeffKx*static_cast<float>((j - NFFT)*(j - NFFT));
         }
       }
 
       // odd rows
+      #ifdef HAVE_GOMP
+      #pragma omp section
+      #endif
       for (i = 1; i < NFFT; i += 2) {
         for (j = 0; j < NFFT_2; j += 2) {
-          fFFTin[k + NFFTz*(j + 1 + NFFT*i)][0] *= coeffKx*static_cast<float>((j + 1)*(j + 1));
+          fFFTin[fStepsZ*(j + 1 + NFFT*i)][0] *= coeffKx*static_cast<float>((j + 1)*(j + 1));
         }
         for (j = NFFT_2; j < NFFT; j += 2) {
-          fFFTin[k + NFFTz*(j + 1 + NFFT*i)][0] *= coeffKx*static_cast<float>((j + 1 - NFFT)*(j + 1 - NFFT));
+          fFFTin[fStepsZ*(j + 1 + NFFT*i)][0] *= coeffKx*static_cast<float>((j + 1 - NFFT)*(j + 1 - NFFT));
         }
       }
-    }
-  } // else do nothing since the other aK are already zero since the former aK manipulation
+    #ifdef HAVE_GOMP
+    } // end omp sections
+    #endif
+
+    // k != 0
+    if (fFind3dSolution) {
+      for (k = 1; k < NFFTz; ++k) {
+        #ifdef HAVE_GOMP
+        #pragma omp sections
+        {
+          // even rows
+          #pragma omp section
+        #endif
+          for (i = 0; i < NFFT; i += 2) {
+            // j = 0
+            fFFTin[k + NFFTz*NFFT*i][0] = 0.0f;
+            // j != 0
+            for (j = 2; j < NFFT_2; j += 2) {
+              fFFTin[k + NFFTz*(j + NFFT*i)][0] *= coeffKx*static_cast<float>(j*j);
+            }
+            for (j = NFFT_2; j < NFFT; j += 2) {
+              fFFTin[k + NFFTz*(j + NFFT*i)][0] *= coeffKx*static_cast<float>((j - NFFT)*(j - NFFT));
+            }
+          }
+
+          // odd rows
+          #ifdef HAVE_GOMP
+          #pragma omp section
+          #endif
+          for (i = 1; i < NFFT; i += 2) {
+            for (j = 0; j < NFFT_2; j += 2) {
+              fFFTin[k + NFFTz*(j + 1 + NFFT*i)][0] *= coeffKx*static_cast<float>((j + 1)*(j + 1));
+            }
+            for (j = NFFT_2; j < NFFT; j += 2) {
+              fFFTin[k + NFFTz*(j + 1 + NFFT*i)][0] *= coeffKx*static_cast<float>((j + 1 - NFFT)*(j + 1 - NFFT));
+            }
+          }
+        #ifdef HAVE_GOMP
+        }
+        #endif
+      }
+    } // else do nothing since the other aK are already zero since the former aK manipulation
+  #ifdef HAVE_GOMP
+  } // end omp parallel
+  #endif
 
   fftwf_execute(fFFTplan);
 
@@ -363,7 +391,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGatVortexCore() const {
     fGstorage[k] = fRealSpaceMatrix[k][0]*fRealSpaceMatrix[k][0];
   }
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsqStZ; ++l) {
     fFFTin[l][0] = fBkMatrix[l][1];
@@ -473,7 +501,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGatVortexCore() const {
     fGstorage[k] += fRealSpaceMatrix[k][0]*fRealSpaceMatrix[k][0];
   }
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsqStZ; ++l) {
     fFFTin[l][0] = fBkMatrix[l][1];
@@ -583,7 +611,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGatVortexCore() const {
     fGstorage[k] += fRealSpaceMatrix[k][1]*fRealSpaceMatrix[k][1];
   }
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsqStZ; ++l) {
     fFFTin[l][0] = fBkMatrix[l][1];
@@ -612,13 +640,18 @@ void TFilmTriVortexNGLFieldCalc::CalculateGradient() const {
   const int NFFTz_2(fStepsZ/2);
 
   int i, j, k, l, index;
+  #ifdef HAVE_GOMP
+  int chunk = NFFTsqStZ/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #endif
 
   // Take the derivative of the Fourier sum of omega
   // This is going to be a bit lengthy...
 
   // First save a copy of the real aK-matrix in the imaginary part of the bK-matrix
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsqStZ; ++l) {
     fBkMatrix[l][1] = fFFTin[l][0];
@@ -687,7 +720,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGradient() const {
 
   // Copy the results to the gradient matrix and restore the original aK-matrix
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsqStZ; ++l) {
     fOmegaDiffMatrix[0][l] = fRealSpaceMatrix[l][1];
@@ -777,7 +810,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGradient() const {
 
   // Copy the results to the gradient matrix and restore the original aK-matrix
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsqStZ; ++l) {
     fOmegaDiffMatrix[1][l] = fRealSpaceMatrix[l][1];
@@ -838,10 +871,16 @@ void TFilmTriVortexNGLFieldCalc::CalculateGradient() const {
     // 3D transform
     fftwf_execute(fFFTplan);
 
+    #ifdef HAVE_GOMP
+    chunk = NFFTsq/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #endif
+
     // Copy the results to the gradient matrix - with the 1D-FORWARD-transform we have to _add_ fSumAk
     for (k = 0; k < NFFTz; ++k) {
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(index) schedule(dynamic,chunk)
       #endif
       for (index = 0; index < NFFTsq; ++index) {
         fOmegaDiffMatrix[2][k + NFFTz*index] = fRealSpaceMatrix[k + NFFTz*index][1] + fSumAk[k][1];
@@ -850,7 +889,10 @@ void TFilmTriVortexNGLFieldCalc::CalculateGradient() const {
 
     // Restore the original aK-matrix
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+    chunk = NFFTsqStZ/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
     #endif
     for (l = 0; l < NFFTsqStZ; ++l) {
       fFFTin[l][0] = fBkMatrix[l][1];
@@ -859,7 +901,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGradient() const {
   } else {
     // For the 2D solution, dw/dz = 0
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+    #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
     #endif
     for (l = 0; l < NFFTsqStZ; ++l) {
       fOmegaDiffMatrix[2][l] = 0.0;
@@ -1004,9 +1046,15 @@ void TFilmTriVortexNGLFieldCalc::FillAbrikosovCoefficients(const float reducedFi
 
   fFFTin[0][0] = 0.0;
 
+  #ifdef HAVE_GOMP
+  int chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #endif
+
   for (k = 1; k < NFFTz; ++k) {
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+    #pragma omp parallel for default(shared) private(index) schedule(dynamic,chunk)
     #endif
     for (index = 0; index < NFFTsq; ++index) {
       fFFTin[k + NFFTz*index][0] = 0.0;
@@ -1699,9 +1747,16 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsB() const {
     }
 */
   } else { // for 2D solution only
+
+    #ifdef HAVE_GOMP
+    int chunk = NFFTsq/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #endif
+
     for (k = 1; k < NFFTz; ++k) {
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(index) schedule(dynamic,chunk)
       #endif
       for (index = 0; index < NFFTsq; ++index) {
         fBkMatrix[k + NFFTz*index][0] = 0.0;
@@ -1971,10 +2026,15 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsForBperpXFirst() c
 
   int i, j, k, kx, ky, kz, index;
   float ii;
+  #ifdef HAVE_GOMP
+  int chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #endif
 
   // k = 0
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(index) schedule(dynamic,chunk)
   #endif
   for (index = 0; index < NFFTsq; ++index) {
     fBkMatrix[NFFTz*index][0] = 0.0f;
@@ -2116,10 +2176,15 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsForBperpXSecond() 
 
   int i, j, k, kx, ky, kz, index;
   float ii;
+  #ifdef HAVE_GOMP
+  int chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #endif
 
   // k = 0
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(index) schedule(dynamic,chunk)
   #endif
   for (index = 0; index < NFFTsq; ++index) {
     fBkMatrix[NFFTz*index][0] = 0.0f;
@@ -2260,7 +2325,10 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsForBperpYFirst() c
 
   // k = 0
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+  int chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(index) schedule(dynamic,chunk)
   #endif
   for (index = 0; index < NFFTsq; ++index) {
     fBkMatrix[NFFTz*index][0] = 0.0f;
@@ -2397,7 +2465,10 @@ void TFilmTriVortexNGLFieldCalc::ManipulateFourierCoefficientsForBperpYSecond() 
 
   // k = 0
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+  int chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(index) schedule(dynamic,chunk)
   #endif
   for (index = 0; index < NFFTsq; ++index) {
     fBkMatrix[NFFTz*index][0] = 0.0f;
@@ -2575,11 +2646,18 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
   const int NFFTz_2(fStepsZ/2);
   const int NFFTsqStZ_2(NFFTsq*(fStepsZ/2 + 1));
 
+  #ifdef HAVE_GOMP
+  int chunk;
+  #endif
+
   // first check that the field is not larger than Hc2 and that we are dealing with a type II SC ...
   if ((field >= Hc2) || (lambda < xi/sqrt(2.0))) {
     int m;
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(m) schedule(dynamic)
+    chunk = NFFTsqStZ/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(m) schedule(dynamic,chunk)
     #endif
     for (m = 0; m < NFFTsqStZ; ++m) {
       fBout[0][m] = 0.0f;
@@ -2601,7 +2679,10 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
   for (k = 0; k < NFFTz; ++k) {
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(j,index) schedule(dynamic)
+    chunk = NFFT/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(j,index) schedule(dynamic,chunk)
     #endif
     for (j = 0; j < NFFT; ++j) {
       index = k + NFFTz*j;
@@ -2626,7 +2707,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
   for (k = 0; k < NFFTz; ++k) {
     for (j = 0; j < NFFT; ++j) {
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(i,index) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(i,index) schedule(dynamic,chunk)
       #endif
       for (i = 0; i < NFFT; ++i) {
         index = k + NFFTz*(j + NFFT*i);
@@ -2645,7 +2726,10 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
   int indexQA;
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(index,denomQAInv) schedule(dynamic)
+  chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(index,denomQAInv) schedule(dynamic,chunk)
   #endif
   for (index = 0; index < NFFTsq; ++index) {
     if (!fOmegaMatrix[NFFTz*index] || !index || (index == (NFFT+1)*NFFT_2)) {
@@ -2672,7 +2756,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
   for (k = 0; k < NFFTz; ++k) {
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+    #pragma omp parallel for default(shared) private(index) schedule(dynamic,chunk)
     #endif
     for (index = 0; index < NFFTsq; ++index) {
       fQMatrix[k + NFFTz*index][0] = fQMatrixA[index][0];
@@ -2682,7 +2766,10 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
   // initialize the bK-Matrix
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  chunk = NFFTsqStZ/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsqStZ; ++l) {
     fBkMatrix[l][0] = 0.0;
@@ -2708,7 +2795,10 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 //       }
 
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+    chunk = NFFTsqStZ/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
     #endif
     for (l = 0; l < NFFTsqStZ; l++) {
       if (fOmegaMatrix[l]) {
@@ -2726,9 +2816,6 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
     // since all of this should be a smooth function anyway, I set the value of the next neighbour r
     // for the two vortex core positions in my matrix
     // If this was not enough we can get the g(0)-values by an expensive CalculateGatVortexCore()-invocation (not working at the moment)
-    #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(k) schedule(dynamic)
-    #endif
     for (k = 0; k < NFFTz; ++k) {
       fRealSpaceMatrix[k][0] = fRealSpaceMatrix[k + fStepsZ*fSteps][0];//fGstorage[k];
       fRealSpaceMatrix[k + NFFTz*(NFFT+1)*NFFT_2][0] = fRealSpaceMatrix[k][0];//fGstorage[k];
@@ -2747,9 +2834,15 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
     fftwf_execute(fFFTplan);
 
+    #ifdef HAVE_GOMP
+    chunk = NFFTsq/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #endif
+
     for (k = 0; k < NFFTz; ++k) {
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(index) schedule(dynamic,chunk)
       #endif
       for (index = 0; index < NFFTsq; ++index) {
         fOmegaMatrix[k + NFFTz*index] = fSumAk[k][0] - fRealSpaceMatrix[k + NFFTz*index][0];
@@ -2794,7 +2887,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
     // Multiply the aK with the spacial averages
     for (k = 0; k < NFFTz; ++k) {
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(index) schedule(dynamic,chunk)
       #endif
       for (index = 0; index < NFFTsq; ++index) {
         fFFTin[k + NFFTz*index][0] = fFFTin[k + NFFTz*index][0]*fSumSum;
@@ -2823,9 +2916,14 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
     }
 
     if (!akConverged) {
+      #ifdef HAVE_GOMP
+      chunk = NFFT/omp_get_num_procs();
+      if (chunk < 10)
+        chunk = 10;
+      #endif
       for (k = 0; k < NFFTz; ++k) {
         #ifdef HAVE_GOMP
-        #pragma omp parallel for default(shared) private(j, index) schedule(dynamic)
+        #pragma omp parallel for default(shared) private(j, index) schedule(dynamic,chunk)
         #endif
         for (j = 0; j < NFFT; ++j) {
           index = k + NFFTz*j;
@@ -2856,9 +2954,15 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
     fftwf_execute(fFFTplan);
 
+    #ifdef HAVE_GOMP
+    chunk = NFFTsq/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #endif
+
     for (k = 0; k < NFFTz; ++k) {
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(index) schedule(dynamic,chunk)
       #endif
       for (index = 0; index < NFFTsq; ++index) {
         fOmegaMatrix[k + NFFTz*index] = fSumAk[k][0] - fRealSpaceMatrix[k + NFFTz*index][0];
@@ -2869,6 +2973,9 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
     // first calculate PK (use the Q-Matrix memory for the second part)
     #ifdef HAVE_GOMP
+    chunk = NFFTsqStZ/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
     #pragma omp parallel for default(shared) private(l) schedule(dynamic)
     #endif
     for (l = 0; l < NFFTsqStZ; ++l) {
@@ -2905,7 +3012,10 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
     if (firstBkCalculation) {
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+      chunk = NFFTStZ/omp_get_num_procs();
+      if (chunk < 10)
+        chunk = 10;
+      #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
       #endif
       for (l = 0; l < NFFTStZ; ++l) {
         fCheckBkConvergence[l] = 0.0f;
@@ -2937,9 +3047,14 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
     // cout << "Bk Convergence: " << bkConverged << endl;
 
     if (!bkConverged) {
+      #ifdef HAVE_GOMP
+      chunk = NFFT/omp_get_num_procs();
+      if (chunk < 10)
+        chunk = 10;
+      #endif
       for (k = 0; k < NFFTz; ++k) {
         #ifdef HAVE_GOMP
-        #pragma omp parallel for default(shared) private(j) schedule(dynamic)
+        #pragma omp parallel for default(shared) private(j) schedule(dynamic,chunk)
         #endif
         for (j = 0; j < NFFT; ++j) {
           index = k + NFFTz*j;
@@ -2950,7 +3065,10 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
     // In order to save memory I will not allocate more space for another matrix but save a copy of the bKs in the aK-Matrix
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+    chunk = NFFTsqStZ/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
     #endif
     for (l = 0; l < NFFTsqStZ; ++l) {
       fFFTin[l][1] = fBkMatrix[l][0];
@@ -2986,9 +3104,15 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
     fftwf_execute(fFFTplanBkToBandQ);
 
+    #ifdef HAVE_GOMP
+    chunk = NFFTsq/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #endif
+
     for (k = 0; k < NFFTz; ++k) {
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(index) schedule(dynamic,chunk)
       #endif
       for (index = 0; index < NFFTsq; ++index) {
         fQMatrix[k + NFFTz*index][0] = fQMatrixA[index][0] - fBkMatrix[k + NFFTz*index][1];
@@ -2997,7 +3121,10 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
     // Restore bKs for Qy calculation and Fourier transform to get Qy
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+    chunk = NFFTsqStZ/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
     #endif
     for (l = 0; l < NFFTsqStZ; ++l) {
       fBkMatrix[l][0] = fFFTin[l][1];
@@ -3008,9 +3135,15 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
     fftwf_execute(fFFTplanBkToBandQ);
 
+    #ifdef HAVE_GOMP
+    chunk = NFFTsq/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #endif
+
     for (k = 0; k < NFFTz; ++k) {
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(index) schedule(dynamic,chunk)
       #endif
       for (index = 0; index < NFFTsq; ++index) {
         fQMatrix[k + NFFTz*index][1] = fQMatrixA[index][1] + fBkMatrix[k + NFFTz*index][1];
@@ -3019,7 +3152,10 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
     // Restore bKs for the next iteration
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+    chunk = NFFTsqStZ/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
     #endif
     for (l = 0; l < NFFTsqStZ; ++l) {
       fBkMatrix[l][0] = fFFTin[l][1];
@@ -3035,7 +3171,10 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
   // Fill in the B-Matrix and restore the bKs for the second part of the Bx-calculation
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  chunk = NFFTsqStZ/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsqStZ; ++l) {
     fBout[0][l] = fBkMatrix[l][0];
@@ -3050,7 +3189,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
   // Fill in the B-Matrix and restore the bKs for the By-calculation
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsqStZ; ++l) {
     fBout[0][l] = 0.5f*(fBkMatrix[l][0] - fBout[0][l])*Hc2_kappa;
@@ -3064,7 +3203,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
   // Fill in the B-Matrix and restore the bKs for the second part of the By-calculation
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsqStZ; ++l) {
     fBout[1][l] = fBkMatrix[l][0];
@@ -3078,7 +3217,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
   // Fill in the B-Matrix and restore the bKs for the second part of the By-calculation
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsqStZ; ++l) {
     fBout[1][l] = 0.5f*(fBkMatrix[l][0] - fBout[1][l])*Hc2_kappa;
@@ -3089,7 +3228,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
   fftwf_execute(fFFTplanBkToBandQ);
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(l) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(l) schedule(dynamic,chunk)
   #endif
   for (l = 0; l < NFFTsqStZ; ++l) {
     fBout[2][l] = (scaledB + fBkMatrix[l][0])*Hc2_kappa;
@@ -3099,7 +3238,10 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
   // Save a copy of the BkS - where does not matter since this is the very end of the calculation...
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+  chunk = NFFTsq/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(index) schedule(dynamic,chunk)
   #endif
   for (index = 0; index < NFFTsq; ++index) {
     fFFTin[index][1] = fBkS[index][0];
@@ -3112,7 +3254,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
   // Write the surface fields to the field-Matrix and restore the BkS for the By-calculation
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(index) schedule(dynamic,chunk)
   #endif
   for (index = 0; index < NFFTsq; ++index) {
     fBout[0][NFFTz/2 + NFFTz*index] = fBkS[index][1]*Hc2_kappa;
@@ -3127,7 +3269,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
   // Write the surface fields to the field-Matrix
 
   #ifdef HAVE_GOMP
-  #pragma omp parallel for default(shared) private(index) schedule(dynamic)
+  #pragma omp parallel for default(shared) private(index) schedule(dynamic,chunk)
   #endif
   for (index = 0; index < NFFTsq; ++index) {
     fBout[1][NFFTz/2 + NFFTz*index] = fBkS[index][1]*Hc2_kappa;
