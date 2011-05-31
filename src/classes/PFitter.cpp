@@ -29,6 +29,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef HAVE_GOMP
+#include <omp.h>
+#endif
+
 #include <iostream>
 #include <fstream>
 #include <limits>
@@ -169,6 +177,11 @@ Bool_t PFitter::DoFit()
     cout << endl << endl;
     return true;
   }
+
+  // debugging information
+  #ifdef HAVE_GOMP
+  cout << endl << ">> Number of available threads for the function optimization: " << omp_get_num_procs() << endl;
+  #endif
 
   // real fit wanted
   if (fUseChi2)
