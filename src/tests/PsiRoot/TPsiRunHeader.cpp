@@ -150,7 +150,16 @@ TPsiRunHeader::~TPsiRunHeader()
   */
 TString TPsiRunHeader::GetVersion() const
 {
-  return GetInfoString(fVersion);
+  TString str("??");
+
+  Int_t idx = fVersion.GetString().First(":");
+  if ((idx < 0) || (idx+2 > fVersion.GetString().Length()))
+    return str;
+
+  str = fVersion.GetString();
+  str.Replace(0, idx+2, 0, 0);
+
+  return str;
 }
 
 //--------------------------------------------------------------------------
