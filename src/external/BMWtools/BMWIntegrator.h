@@ -49,32 +49,14 @@ using namespace std;
  */
 class T2Integrator {
   public:
-    T2Integrator();
-    virtual ~T2Integrator();
-    virtual double FuncAtX(double, const std::vector<double> &par) const = 0;
+    T2Integrator() {}; ///< default constructor
+    virtual ~T2Integrator() {}; ///< default destructor
     virtual double IntegrateFunc(double, double, const std::vector<double> &par);
 
   private:
+    virtual double FuncAtX(double, const std::vector<double> &par) const = 0;
     static double FuncAtXgsl(double, void *);
-    ROOT::Math::GSLIntegrator *fIntegrator; ///< pointer to the GSL integrator
 };
-
-/**
- * <p>Constructor of the alternative base class for 1D integrations
- *    Allocation of memory for an integration using the adaptive 31 point Gauss-Kronrod rule
- */
-inline T2Integrator::T2Integrator() {
-  fIntegrator = new ROOT::Math::GSLIntegrator(ROOT::Math::Integration::kADAPTIVE,ROOT::Math::Integration::kGAUSS31);
-}
-
-/**
- * <p>Destructor of the alternative base class for 1D integrations
- *    Clean up.
- */
-inline T2Integrator::~T2Integrator(){
-  delete fIntegrator;
-  fIntegrator=0;
-}
 
 /**
  * <p>Method for passing the integrand function value to the integrator.
@@ -106,10 +88,14 @@ inline double T2Integrator::IntegrateFunc(double x1, double x2, const std::vecto
   pair<T2Integrator*, const vector<double>*> ptrPair;
   ptrPair.first = (this);
   ptrPair.second = &par;
-  return fIntegrator->Integral(&T2Integrator::FuncAtXgsl, static_cast<void*>(&ptrPair), x1, x2);
+
+  ROOT::Math::GSLIntegrator *integrator = new ROOT::Math::GSLIntegrator(ROOT::Math::Integration::kADAPTIVE,ROOT::Math::Integration::kGAUSS31);
+  double value(integrator->Integral(&T2Integrator::FuncAtXgsl, static_cast<void*>(&ptrPair), x1, x2));
+  delete integrator;
+  integrator = 0;
+
+  return value;
 }
-
-
 
 
 
