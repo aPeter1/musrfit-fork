@@ -41,6 +41,91 @@
 using namespace std;
 
 /**
+ * <p>Alternative base class for 1D integrations using the GNU Scientific Library integrator.
+ *    The difference to the other class is that here the integration parameters have to be supplied directly to the IntegrateFunc method.
+ *    Therefore, integrals with different parameters can be calculated in parallel (at least I hope so).
+ *    The function which should be integrated has to be implemented in a derived class.
+ *    Note: The purpose of this is to offer an easy-to-use interface---not the most efficient integration routine.
+ */
+class T2Integrator {
+  public:
+    T2Integrator();
+    virtual ~T2Integrator();
+    virtual double FuncAtX(double, const std::vector<double> &par) const = 0;
+    virtual double IntegrateFunc(double, double, const std::vector<double> &par);
+
+  private:
+    static double FuncAtXgsl(double, void *);
+    ROOT::Math::GSLIntegrator *fIntegrator; ///< pointer to the GSL integrator
+};
+
+/**
+ * <p>Constructor of the alternative base class for 1D integrations
+ *    Allocation of memory for an integration using the adaptive 31 point Gauss-Kronrod rule
+ */
+inline T2Integrator::T2Integrator() {
+  fIntegrator = new ROOT::Math::GSLIntegrator(ROOT::Math::Integration::kADAPTIVE,ROOT::Math::Integration::kGAUSS31);
+}
+
+/**
+ * <p>Destructor of the alternative base class for 1D integrations
+ *    Clean up.
+ */
+inline T2Integrator::~T2Integrator(){
+  delete fIntegrator;
+  fIntegrator=0;
+}
+
+/**
+ * <p>Method for passing the integrand function value to the integrator.
+ *
+ * <p><b>return:</b>
+ * - function value of the integrand
+ *
+ * \param x point at which the function value is calculated
+ * \param ptrPair pointers to the function object and the parameters for the integration
+ */
+inline double T2Integrator::FuncAtXgsl(double x, void *ptrPair)
+{
+  pair<T2Integrator*, const vector<double>*> *pairOfPointers = static_cast<pair<T2Integrator*, const vector<double>*>*>(ptrPair);
+  return pairOfPointers->first->FuncAtX(x, *(pairOfPointers->second));
+}
+
+/**
+ * <p>Calculate the integral of the function between the given boundaries
+ *
+ * <p><b>return:</b>
+ * - value of the integral
+ *
+ * \param x1 lower boundary
+ * \param x2 upper boundary
+ * \param par additional parameters for the integration
+ */
+inline double T2Integrator::IntegrateFunc(double x1, double x2, const std::vector<double> &par)
+{
+  pair<T2Integrator*, const vector<double>*> ptrPair;
+  ptrPair.first = (this);
+  ptrPair.second = &par;
+  return fIntegrator->Integral(&T2Integrator::FuncAtXgsl, static_cast<void*>(&ptrPair), x1, x2);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
  * <p>Base class for 1D integrations using the GNU Scientific Library integrator.
  *    The function which should be integrated has to be implemented in a derived class.
  *    Note: The purpose of this is to offer an easy-to-use interface---not the most efficient integration routine.
@@ -513,6 +598,62 @@ class TGapIntegral : public TIntegrator {
 inline double TGapIntegral::FuncAtX(double e) const
 {
   return 1.0/(TMath::Power(TMath::CosH(TMath::Sqrt(e*e+fPar[1]*fPar[1])/fPar[0]),2.0));
+}
+
+/**
+ * <p>Class for the 1D integration for the calculation of the uniaxial static Gauss-Kubo-Toyabe function
+ *    The integration uses the GSL integration routines.
+ */
+class TFirstUniaxialGssKTIntegral : public T2Integrator {
+  public:
+    TFirstUniaxialGssKTIntegral() {}
+    ~TFirstUniaxialGssKTIntegral() {}
+    double FuncAtX(double, const vector<double>&) const; // variable: x
+};
+
+/**
+ * <p>Calculate the function value---actual implementation of the integrand in Eq. (7) of Solt's article
+ *
+ * <p><b>return:</b>
+ * - function value
+ *
+ * \param x point where the function should be evaluated
+ */
+inline double TFirstUniaxialGssKTIntegral::FuncAtX(double x, const vector<double> &par) const
+{
+  double eps(par[0]*par[0]/(par[1]*par[1]) - 1.0);
+  double p(1.0 + eps*x*x);
+  double SsqTsq(par[0]*par[0]*par[2]*par[2]);
+
+  return (1.0 - x*x)*(p - SsqTsq)/TMath::Power(p, 2.5)*TMath::Exp(-0.5*SsqTsq/p);
+}
+
+/**
+ * <p>Class for the 1D integration for the calculation of the uniaxial static Gauss-Kubo-Toyabe function
+ *    The integration uses the GSL integration routines.
+ */
+class TSecondUniaxialGssKTIntegral : public T2Integrator {
+  public:
+    TSecondUniaxialGssKTIntegral() {}
+    ~TSecondUniaxialGssKTIntegral() {}
+    double FuncAtX(double, const vector<double>&) const; // variable: x
+};
+
+/**
+ * <p>Calculate the function value---actual implementation of the integrand in Eq. (7) of Solt's article
+ *
+ * <p><b>return:</b>
+ * - function value
+ *
+ * \param x point where the function should be evaluated
+ */
+inline double TSecondUniaxialGssKTIntegral::FuncAtX(double x, const vector<double> &par) const
+{
+  double eps(par[0]*par[0]/(par[1]*par[1]) - 1.0);
+  double p(1.0 + eps*x*x);
+  double SsqTsq(par[0]*par[0]*par[2]*par[2]);
+
+  return (p - SsqTsq)/TMath::Power(p, 2.5)*TMath::Exp(-0.5*SsqTsq/p);
 }
 
 #endif //_TIntegrator_H_

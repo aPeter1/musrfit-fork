@@ -19,7 +19,7 @@ dict_cpp_sources = \
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 
-INCLUDES = -I$(top_srcdir)/src/include $(PMUSR_CFLAGS) $(ROOT_CFLAGS)
+INCLUDES = -I$(top_srcdir)/src/include $(BMWTOOLS_CFLAGS) $(PMUSR_CFLAGS) $(ROOT_CFLAGS)
 AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources)
@@ -32,7 +32,7 @@ CLEANFILES = *Dict.cpp *Dict.h *~ core
 lib_LTLIBRARIES = libZFRelaxation.la
 
 libZFRelaxation_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources)
-libZFRelaxation_la_LIBADD = $(USERFCN_LIBS) $(ROOT_LIBS)
+libZFRelaxation_la_LIBADD = $(BMWTOOLS_LIBS) $(USERFCN_LIBS) $(GSL_LIBS) $(ROOT_LIBS)
 libZFRelaxation_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(PLUGIN_RELEASE) $(AM_LDFLAGS)
 
 ## For the moment do not build pkgconfig files for musrfit plug-ins...

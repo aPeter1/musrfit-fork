@@ -38,14 +38,6 @@
 
 using namespace std;
 
-//#include "gsl/gsl_math.h"
-//#include "gsl/gsl_sf_exp.h"
-//#include "gsl/gsl_sf_log.h"
-//#include "gsl/gsl_sf_trig.h"
-//#include "gsl/gsl_sf_bessel.h"
-
-
-//#include "TMath.h"
 #include "PUserFcnBase.h"
 #include "fftw3.h"
 #include "BMWIntegrator.h"

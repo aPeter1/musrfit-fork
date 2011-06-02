@@ -37,6 +37,7 @@
 
 #pragma link C++ class ZFMagGss+;
 #pragma link C++ class ZFMagExp+;
+#pragma link C++ class UniaxialStatGssKT+;
 
 #endif //__CINT__
 // root dictionary stuff --------------------------------------------------
