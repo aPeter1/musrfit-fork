@@ -65,12 +65,8 @@ public:
 
 private:
   TIntSinGss *fIntSinGss;                  ///< integrator
-  mutable map<double, double> fIntValues;  ///< previously calculated integral values
-  mutable vector<double> fPar;             ///< parameters of the function [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), &#963; (&#956;s<sup>-1</sup>)\endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $\sigma~(\mu\mathrm{s}^{-1})$ \endlatexonly]
-  mutable bool fCalcNeeded;                ///< flag specifying if an integration has to be done
-  mutable double fLastTime;                ///< time of the last calculated function value
 
-  ClassDef(TLFStatGssKT,2)
+  ClassDef(TLFStatGssKT,3)
 };
 
 //-----------------------------------------------------------------------------------------------------------------
@@ -96,12 +92,8 @@ public:
 
 private:
   TIntBesselJ0Exp *fIntBesselJ0Exp;         ///< integrator
-  mutable map<double, double> fIntValues;   ///< previously calculated integral values
-  mutable vector<double> fPar;              ///< parameters of the function [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), <i>a</i> (&#956;s<sup>-1</sup>)\endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $a~(\mu\mathrm{s}^{-1})$ \endlatexonly]
-  mutable bool fCalcNeeded;                 ///< flag specifying if an integration has to be done
-  mutable double fLastTime;                 ///< time of the last calculated function value
 
-  ClassDef(TLFStatExpKT,2)
+  ClassDef(TLFStatExpKT,3)
 };
 
 //-----------------------------------------------------------------------------------------------------------------
@@ -270,12 +262,8 @@ public:
 
 private:
   TIntSGInterpolation *fIntegral;           ///< integrator
-  mutable map<double, double> fIntValues;   ///< previously calculated integral values
-  mutable vector<double> fPar;              ///< parameters of the function [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), <i>a</i> (&#956;s<sup>-1</sup>), &#955; (&#956;s<sup>-1</sup>), &#946; (1) \endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $a~(\mu\mathrm{s}^{-1})$, $\lambda~(\mu\mathrm{s}^{-1})$, $\beta~(1)$ \endlatexonly]
-  mutable bool fCalcNeeded;                 ///< flag specifying if an integration has to be done
-  mutable double fLastTime;                 ///< time of the last calculated function value
 
-  ClassDef(TLFSGInterpolation,2)
+  ClassDef(TLFSGInterpolation,3)
 };
 
 

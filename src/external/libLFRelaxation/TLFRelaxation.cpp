@@ -66,9 +66,8 @@ ClassImp(TLFSGInterpolation)
 /**
  * <p>Constructor: Initialize variables and allocate memory for the integrator.
  */
-TLFStatGssKT::TLFStatGssKT() : fCalcNeeded(true), fLastTime(0.) {
+TLFStatGssKT::TLFStatGssKT() {
   fIntSinGss = new TIntSinGss();
-  fPar.resize(2, 0.);
 }
 
 //--------------------------------------------------------------------------
@@ -80,8 +79,6 @@ TLFStatGssKT::TLFStatGssKT() : fCalcNeeded(true), fLastTime(0.) {
 TLFStatGssKT::~TLFStatGssKT() {
   delete fIntSinGss;
   fIntSinGss = 0;
-  fIntValues.clear();
-  fPar.clear();
 }
 
 //--------------------------------------------------------------------------
@@ -103,39 +100,17 @@ double TLFStatGssKT::operator()(double t, const vector<double> &par) const {
   double sigsq(par[1]*par[1]);
   double sigsqtt(sigsq*t*t);
 
-  if(TMath::Abs(par[0])<0.00135538817){
+  if(TMath::Abs(par[0])<0.00135538817) {
     return (0.33333333333333333333+0.66666666666666666667*(1.0-sigsqtt)*TMath::Exp(-0.5*sigsqtt));
-  }
-
-  for (unsigned int i(0); i<2; ++i) {
-    if( fPar[i]-par[i] ) {
-      fPar[i] = par[i];
-      fCalcNeeded = true;
-    }
-  }
-
-  if (fCalcNeeded) {
-    fIntValues.clear();
-    fIntValues[0.] = 0.;
-    fLastTime = 0.;
-  } else {
-    if (t > fIntValues.rbegin()->first) {
-      fCalcNeeded = true;
-      fLastTime = fIntValues.rbegin()->first;
-    }
   }
 
   double omegaL(TMath::TwoPi()*par[0]);
   double coeff1(2.0*sigsq/(omegaL*omegaL));
   double coeff2(coeff1*sigsq/omegaL);
 
-  if (fCalcNeeded) {
-    fIntSinGss->SetParameters(par);
-    fIntValues[t] = fIntValues[fLastTime] + fIntSinGss->IntegrateFunc(fLastTime,t);
-    fCalcNeeded = false;
-  }
+  double intValue = fIntSinGss->IntegrateFunc(0.0, t, par);
 
-  return (1.0-(coeff1*(1.0-TMath::Exp(-0.5*sigsqtt)*TMath::Cos(omegaL*t)))+(coeff2*fIntValues[t]));
+  return (1.0-(coeff1*(1.0-TMath::Exp(-0.5*sigsqtt)*TMath::Cos(omegaL*t)))+(coeff2*intValue));
 }
 
 //--------------------------------------------------------------------------
@@ -144,9 +119,8 @@ double TLFStatGssKT::operator()(double t, const vector<double> &par) const {
 /**
  * <p>Constructor: Initialize variables and allocate memory for the integrator.
  */
-TLFStatExpKT::TLFStatExpKT() : fCalcNeeded(true), fLastTime(0.) {
+TLFStatExpKT::TLFStatExpKT() {
   fIntBesselJ0Exp = new TIntBesselJ0Exp();
-  fPar.resize(2, 0.);
 }
 
 //--------------------------------------------------------------------------
@@ -158,8 +132,6 @@ TLFStatExpKT::TLFStatExpKT() : fCalcNeeded(true), fLastTime(0.) {
 TLFStatExpKT::~TLFStatExpKT() {
   delete fIntBesselJ0Exp;
   fIntBesselJ0Exp = 0;
-  fIntValues.clear();
-  fPar.clear();
 }
 
 //--------------------------------------------------------------------------
@@ -178,26 +150,8 @@ double TLFStatExpKT::operator()(double t, const vector<double> &par) const {
   if(t<0.0)
     return 1.0;
 
-  if(TMath::Abs(par[0])<0.00135538817){
+  if(TMath::Abs(par[0])<0.00135538817) {
     return (0.33333333333333333333+0.66666666666666666667*(1.0-par[1]*t)*TMath::Exp(-par[1]*t));
-  }
-
-  for (unsigned int i(0); i<2; ++i) {
-    if( fPar[i]-par[i] ) {
-      fPar[i] = par[i];
-      fCalcNeeded = true;
-    }
-  }
-
-  if (fCalcNeeded) {
-    fIntValues.clear();
-    fIntValues[0.] = 0.;
-    fLastTime = 0.;
-  } else {
-    if (t > fIntValues.rbegin()->first) {
-      fCalcNeeded = true;
-      fLastTime = fIntValues.rbegin()->first;
-    }
   }
 
   double omegaL(TMath::TwoPi()*par[0]);
@@ -215,13 +169,9 @@ double TLFStatExpKT::operator()(double t, const vector<double> &par) const {
     j1 = (TMath::Sin(w0t)-w0t*TMath::Cos(w0t))/(w0t*w0t);
   }
 
-  if (fCalcNeeded) {
-    fIntBesselJ0Exp->SetParameters(par);
-    fIntValues[t] = fIntValues[fLastTime] + fIntBesselJ0Exp->IntegrateFunc(fLastTime,t);
-    fCalcNeeded = false;
-  }
+  double intValue = fIntBesselJ0Exp->IntegrateFunc(0.0, t, par);
 
-  return (1.0-(coeff1*TMath::Exp(-par[1]*t)*j1)-(coeff2*(j0*TMath::Exp(-par[1]*t)-1.0))-coeff3*fIntValues[t]);
+  return (1.0-(coeff1*TMath::Exp(-par[1]*t)*j1)-(coeff2*(j0*TMath::Exp(-par[1]*t)-1.0))-coeff3*intValue);
 }
 
 //--------------------------------------------------------------------------
@@ -245,7 +195,7 @@ TLFDynGssKT::TLFDynGssKT() : fCalcNeeded(true), fFirstCall(true), fCounter(0) {
 #ifdef HAVE_GOMP
     fftwf_plan_with_nthreads(omp_get_num_procs());
 #else
-    fftwf_plan_with_nthreads(2);
+    fftwf_plan_with_nthreads(1);
 #endif /* HAVE_GOMP */
   }
 #endif /* HAVE_LIBFFTW3F_THREADS */
@@ -395,11 +345,16 @@ double TLFDynGssKT::operator()(double t, const vector<double> &par) const {
 */
     double tt(0.), sigsqtsq(0.);
     int i;
+    #ifdef HAVE_GOMP
+    int chunk = fNSteps/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #endif
 
     if(fabs(par[0])<0.00135538817) {
       double mcplusnu(-(fC+par[2]));
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(i,tt) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(i,tt) schedule(dynamic, chunk)
       #endif
       for(i = 0; i < static_cast<int>(fNSteps); ++i) {
         tt=static_cast<double>(i)*fDt;
@@ -414,7 +369,7 @@ double TLFDynGssKT::operator()(double t, const vector<double> &par) const {
       fFFTtime[0] = fDt;
 
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(i,tt) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(i,tt) schedule(dynamic, chunk)
       #endif
       for(i = 1; i < static_cast<int>(fNSteps); ++i) {
         tt=(static_cast<double>(i)-0.5)*fDt;
@@ -442,7 +397,10 @@ double TLFDynGssKT::operator()(double t, const vector<double> &par) const {
     double denom(1.0), imagsq(0.0), oneMINrealnu(1.0);
 
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(i, imagsq, oneMINrealnu, denom) schedule(dynamic)
+    chunk = (fNSteps/2+1)/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(i, imagsq, oneMINrealnu, denom) schedule(dynamic, chunk)
     #endif
     for (i = 0; i < static_cast<int>(fNSteps)/2+1; ++i) {
       imagsq=fFFTfreq[i][1]*fFFTfreq[i][1];
@@ -564,7 +522,7 @@ TLFDynExpKT::TLFDynExpKT() : fCalcNeeded(true), fFirstCall(true), fCounter(0), f
 #ifdef HAVE_GOMP
     fftwf_plan_with_nthreads(omp_get_num_procs());
 #else
-    fftwf_plan_with_nthreads(2);
+    fftwf_plan_with_nthreads(1);
 #endif /* HAVE_GOMP */
   }
 #endif /* HAVE_LIBFFTW3F_THREADS */
@@ -739,10 +697,15 @@ double TLFDynExpKT::operator()(double t, const vector<double> &par) const {
 
     double tt(0.);
     int i;
+    #ifdef HAVE_GOMP
+    int chunk = fNSteps/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #endif
 
     if(TMath::Abs(par[0])<0.00135538817){
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(i, tt) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(i, tt) schedule(dynamic, chunk)
       #endif
       for(i = 0; i < static_cast<int>(fNSteps); ++i) {
         tt=static_cast<double>(i)*fDt;
@@ -757,7 +720,7 @@ double TLFDynExpKT::operator()(double t, const vector<double> &par) const {
       fFFTtime[0] = 1.0*fDt;
 
       #ifdef HAVE_GOMP
-      #pragma omp parallel for default(shared) private(i, tt) schedule(dynamic)
+      #pragma omp parallel for default(shared) private(i, tt) schedule(dynamic, chunk)
       #endif
       for(i = 1; i < static_cast<int>(fNSteps); ++i) {
         tt=(double(i)-0.5)*fDt;
@@ -785,7 +748,10 @@ double TLFDynExpKT::operator()(double t, const vector<double> &par) const {
     double denom(1.0), imagsq(0.0), oneMINrealnu(1.0);
 
     #ifdef HAVE_GOMP
-    #pragma omp parallel for default(shared) private(i, imagsq, oneMINrealnu, denom) schedule(dynamic)
+    chunk = (fNSteps/2+1)/omp_get_num_procs();
+    if (chunk < 10)
+      chunk = 10;
+    #pragma omp parallel for default(shared) private(i, imagsq, oneMINrealnu, denom) schedule(dynamic, chunk)
     #endif
     for (i = 0; i < static_cast<int>(fNSteps)/2+1; ++i) {
       imagsq=fFFTfreq[i][1]*fFFTfreq[i][1];
@@ -815,9 +781,8 @@ double TLFDynExpKT::operator()(double t, const vector<double> &par) const {
 /**
  * <p>Constructor: Initialize variables and allocate memory for the integrator.
  */
-TLFSGInterpolation::TLFSGInterpolation() : fCalcNeeded(true), fLastTime(0.) {
+TLFSGInterpolation::TLFSGInterpolation() {
   fIntegral = new TIntSGInterpolation();
-  fPar.resize(4, 0.);
 }
 
 //--------------------------------------------------------------------------
@@ -829,8 +794,6 @@ TLFSGInterpolation::TLFSGInterpolation() : fCalcNeeded(true), fLastTime(0.) {
 TLFSGInterpolation::~TLFSGInterpolation() {
   delete fIntegral;
   fIntegral = 0;
-  fPar.clear();
-  fIntValues.clear();
 }
 
 //--------------------------------------------------------------------------
@@ -856,35 +819,14 @@ double TLFSGInterpolation::operator()(double t, const vector<double> &par) const
       0.66666666666666666667*(1.0-par[1]*par[1]*t*t/TMath::Power(expo,(1.0-par[3])))*TMath::Exp(-TMath::Power(expo,par[3])));
   }
 
-  for (unsigned int i(0); i<4; ++i) {
-    if( fPar[i]-par[i] ) {
-      fPar[i] = par[i];
-      fCalcNeeded = true;
-    }
-  }
-
-  if (fCalcNeeded) {
-    fIntValues.clear();
-    fIntValues[0.] = 0.;
-    fLastTime = 0.;
-  } else {
-    if (t > fIntValues.rbegin()->first) {
-      fCalcNeeded = true;
-      fLastTime = fIntValues.rbegin()->first;
-    }
-  }
-
   double omegaL(TMath::TwoPi()*par[0]);
 
-  if (fCalcNeeded) {
-    vector<double> intpar(par);
-    intpar.push_back(t);
-    fIntegral->SetParameters(intpar);
-    fIntValues[t] = fIntValues[fLastTime] + fIntegral->IntegrateFunc(fLastTime,t);
-    intpar.clear();
-  }
+  vector<double> intpar(par);
+  intpar.push_back(t);
+  double intValue = fIntegral->IntegrateFunc(0.0, t, intpar);
+  intpar.clear();
 
   return (TMath::Exp(-TMath::Power(par[2]*t,par[3])) + 2.0*par[1]*par[1]/(omegaL*omegaL) * \
     ((TMath::Cos(omegaL*t)-TMath::Sin(omegaL*t)/(omegaL*t))*TMath::Exp(-TMath::Power(expo,par[3]))/TMath::Power(expo,(1.0-par[3])) + \
-      fIntValues[t]));
+      intValue));
 }

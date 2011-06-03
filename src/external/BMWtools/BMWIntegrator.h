@@ -481,11 +481,13 @@ inline double TAnSWaveGapIntegral::FuncAtX(double *x) const // x = {E, phi}, fPa
  * <p>Class for the 1D integration of j0(a*x)*exp(-b*x)
  *    The integration uses the GSL integration routines.
  */
-class TIntBesselJ0Exp : public TIntegrator {
+class TIntBesselJ0Exp : public T2Integrator {
   public:
     TIntBesselJ0Exp() {}
     ~TIntBesselJ0Exp() {}
-    double FuncAtX(double) const;
+
+  private:
+    double FuncAtX(double, const vector<double>&) const;
 };
 
 /**
@@ -496,27 +498,29 @@ class TIntBesselJ0Exp : public TIntegrator {
  *
  * \param x point where the function should be evaluated
  */
-inline double TIntBesselJ0Exp::FuncAtX(double x) const
+inline double TIntBesselJ0Exp::FuncAtX(double x, const vector<double> &par) const
 {
-  double w0t(TMath::TwoPi()*fPar[0]*x);
+  double w0t(TMath::TwoPi()*par[0]*x);
   double j0;
   if (fabs(w0t) < 0.001) { // check zero time limits of the spherical bessel functions j0(x) and j1(x)
     j0 = 1.0;
   } else {
     j0 = TMath::Sin(w0t)/w0t;
   }
-  return j0 * TMath::Exp(-fPar[1]*x);
+  return j0 * TMath::Exp(-par[1]*x);
 }
 
 /**
  * <p>Class for the 1D integration of sin(a*x)*exp(-b*x*x)
  *    The integration uses the GSL integration routines.
  */
-class TIntSinGss : public TIntegrator {
+class TIntSinGss : public T2Integrator {
   public:
     TIntSinGss() {}
     ~TIntSinGss() {}
-    double FuncAtX(double) const;
+
+  private:
+    double FuncAtX(double, const vector<double>&) const;
 };
 
 /**
@@ -527,9 +531,9 @@ class TIntSinGss : public TIntegrator {
  *
  * \param x point where the function should be evaluated
  */
-inline double TIntSinGss::FuncAtX(double x) const
+inline double TIntSinGss::FuncAtX(double x, const vector<double> &par) const
 {
-  return TMath::Sin(TMath::TwoPi()*fPar[0]*x) * TMath::Exp(-0.5*fPar[1]*fPar[1]*x*x);
+  return TMath::Sin(TMath::TwoPi()*par[0]*x) * TMath::Exp(-0.5*par[1]*par[1]*x*x);
 }
 
 /**
@@ -538,11 +542,13 @@ inline double TIntSinGss::FuncAtX(double x) const
  *    doi:10.1016/S0921-4526(00)00368-9
  *    The integration uses the GSL integration routines.
  */
-class TIntSGInterpolation : public TIntegrator {
+class TIntSGInterpolation : public T2Integrator {
   public:
     TIntSGInterpolation() {}
     ~TIntSGInterpolation() {}
-    double FuncAtX(double) const;
+
+  private:
+    double FuncAtX(double, const vector<double>&) const;
 };
 
 /**
@@ -553,12 +559,12 @@ class TIntSGInterpolation : public TIntegrator {
  *
  * \param x point where the function should be evaluated
  */
-inline double TIntSGInterpolation::FuncAtX(double x) const
+inline double TIntSGInterpolation::FuncAtX(double x, const vector<double> &par) const
 {
   // Parameters: nu_L [MHz], a [1/us], lambda [1/us], beta [1], t [us]
-  double wt(TMath::TwoPi()*fPar[0]*x);
-  double expo(0.5*fPar[1]*fPar[1]*x*x/fPar[3]+fPar[2]*fPar[4]);
-  return (wt*TMath::Cos(wt)-TMath::Sin(wt))/(wt*wt)*TMath::Exp(-TMath::Power(expo,fPar[3]))/TMath::Power(expo,(1.0-fPar[3]));
+  double wt(TMath::TwoPi()*par[0]*x);
+  double expo(0.5*par[1]*par[1]*x*x/par[3]+par[2]*par[4]);
+  return (wt*TMath::Cos(wt)-TMath::Sin(wt))/(wt*wt)*TMath::Exp(-TMath::Power(expo,par[3]))/TMath::Power(expo,(1.0-par[3]));
 }
 
 /**
@@ -593,8 +599,10 @@ inline double TGapIntegral::FuncAtX(double e) const
 class TFirstUniaxialGssKTIntegral : public T2Integrator {
   public:
     TFirstUniaxialGssKTIntegral() {}
-    ~TFirstUniaxialGssKTIntegral() {}
-    double FuncAtX(double, const vector<double>&) const; // variable: x
+    virtual ~TFirstUniaxialGssKTIntegral() {}
+
+  private:
+    virtual double FuncAtX(double, const vector<double>&) const; // variable: x
 };
 
 /**
@@ -621,8 +629,10 @@ inline double TFirstUniaxialGssKTIntegral::FuncAtX(double x, const vector<double
 class TSecondUniaxialGssKTIntegral : public T2Integrator {
   public:
     TSecondUniaxialGssKTIntegral() {}
-    ~TSecondUniaxialGssKTIntegral() {}
-    double FuncAtX(double, const vector<double>&) const; // variable: x
+    virtual ~TSecondUniaxialGssKTIntegral() {}
+
+  private:
+    virtual double FuncAtX(double, const vector<double>&) const; // variable: x
 };
 
 /**
