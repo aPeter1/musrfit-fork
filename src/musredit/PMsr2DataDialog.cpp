@@ -285,8 +285,12 @@ void PMsr2DataDialog::helpContent()
     if (fHelpUrl.isEmpty()) {
       QMessageBox::information(this, "**INFO**", "Will eventually show a help window");
     } else {
+      #ifdef _WIN32GCC
+      QMessageBox::information(this, "**INFO**", "If a newer Qt version was available, a help window would be shown!");
+      #else
       PHelp *help = new PHelp(fHelpUrl);
       help->show();
+      #endif // _WIN32GCC
     }
 }
 

@@ -135,16 +135,12 @@ TBulkTriVortexLondonFieldCalc::TBulkTriVortexLondonFieldCalc(const string& wisdo
   fParam.resize(3);
   fGridExists = false;
 
-#ifdef HAVE_LIBFFTW3_THREADS
+#if !defined(_WIN32GCC) && defined(HAVE_LIBFFTW3_THREADS) && defined(HAVE_GOMP)
   int init_threads(fftw_init_threads());
   if (init_threads) {
-#ifdef HAVE_GOMP
     fftw_plan_with_nthreads(omp_get_num_procs());
-#else
-    fftw_plan_with_nthreads(2);
-#endif /* HAVE_GOMP */
   }
-#endif /* HAVE_LIBFFTW3_THREADS */
+#endif
 
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];
@@ -318,16 +314,12 @@ TBulkSqVortexLondonFieldCalc::TBulkSqVortexLondonFieldCalc(const string& wisdom,
   fParam.resize(3);
   fGridExists = false;
 
-#ifdef HAVE_LIBFFTW3_THREADS
+#if !defined(_WIN32GCC) && defined(HAVE_LIBFFTW3_THREADS) && defined(HAVE_GOMP)
   int init_threads(fftw_init_threads());
   if (init_threads) {
-#ifdef HAVE_GOMP
     fftw_plan_with_nthreads(omp_get_num_procs());
-#else
-    fftw_plan_with_nthreads(2);
-#endif /* HAVE_GOMP */
   }
-#endif /* HAVE_LIBFFTW3_THREADS */
+#endif
 
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];
@@ -469,16 +461,12 @@ TBulkTriVortexMLFieldCalc::TBulkTriVortexMLFieldCalc(const string& wisdom, const
   fParam.resize(3);
   fGridExists = false;
 
-#ifdef HAVE_LIBFFTW3_THREADS
+#if !defined(_WIN32GCC) && defined(HAVE_LIBFFTW3_THREADS) && defined(HAVE_GOMP)
   int init_threads(fftw_init_threads());
   if (init_threads) {
-#ifdef HAVE_GOMP
     fftw_plan_with_nthreads(omp_get_num_procs());
-#else
-    fftw_plan_with_nthreads(2);
-#endif /* HAVE_GOMP */
   }
-#endif /* HAVE_LIBFFTW3_THREADS */
+#endif
 
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];
@@ -669,16 +657,12 @@ TBulkTriVortexAGLFieldCalc::TBulkTriVortexAGLFieldCalc(const string& wisdom, con
   fParam.resize(3);
   fGridExists = false;
 
-#ifdef HAVE_LIBFFTW3_THREADS
+#if !defined(_WIN32GCC) && defined(HAVE_LIBFFTW3_THREADS) && defined(HAVE_GOMP)
   int init_threads(fftw_init_threads());
   if (init_threads) {
-#ifdef HAVE_GOMP
     fftw_plan_with_nthreads(omp_get_num_procs());
-#else
-    fftw_plan_with_nthreads(2);
-#endif /* HAVE_GOMP */
   }
-#endif /* HAVE_LIBFFTW3_THREADS */
+#endif
 
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];
@@ -878,16 +862,12 @@ TBulkTriVortexAGLIIFieldCalc::TBulkTriVortexAGLIIFieldCalc(const string& wisdom,
   fParam.resize(3);
   fGridExists = false;
 
-#ifdef HAVE_LIBFFTW3_THREADS
+#if !defined(_WIN32GCC) && defined(HAVE_LIBFFTW3_THREADS) && defined(HAVE_GOMP)
   int init_threads(fftw_init_threads());
   if (init_threads) {
-#ifdef HAVE_GOMP
     fftw_plan_with_nthreads(omp_get_num_procs());
-#else
-    fftw_plan_with_nthreads(2);
-#endif /* HAVE_GOMP */
   }
-#endif /* HAVE_LIBFFTW3_THREADS */
+#endif
 
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];
@@ -1100,16 +1080,12 @@ TBulkTriVortexNGLFieldCalc::TBulkTriVortexNGLFieldCalc(const string& wisdom, con
   fParam.resize(3);
   fGridExists = false;
 
-#ifdef HAVE_LIBFFTW3_THREADS
+#if !defined(_WIN32GCC) && defined(HAVE_LIBFFTW3_THREADS) && defined(HAVE_GOMP)
   int init_threads(fftw_init_threads());
   if (init_threads) {
-#ifdef HAVE_GOMP
     fftw_plan_with_nthreads(omp_get_num_procs());
-#else
-    fftw_plan_with_nthreads(2);
-#endif /* HAVE_GOMP */
   }
-#endif /* HAVE_LIBFFTW3_THREADS */
+#endif
 
   const unsigned int stepsSq(fSteps*fSteps);
 
@@ -2374,16 +2350,12 @@ TBulkAnisotropicTriVortexLondonFieldCalc::TBulkAnisotropicTriVortexLondonFieldCa
   fParam.resize(3);
   fGridExists = false;
 
-#ifdef HAVE_LIBFFTW3_THREADS
+#if !defined(_WIN32GCC) && defined(HAVE_LIBFFTW3_THREADS) && defined(HAVE_GOMP)
   int init_threads(fftw_init_threads());
   if (init_threads) {
-#ifdef HAVE_GOMP
     fftw_plan_with_nthreads(omp_get_num_procs());
-#else
-    fftw_plan_with_nthreads(2);
-#endif /* HAVE_GOMP */
   }
-#endif /* HAVE_LIBFFTW3_THREADS */
+#endif
 
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];
@@ -2595,16 +2567,12 @@ TBulkAnisotropicTriVortexMLFieldCalc::TBulkAnisotropicTriVortexMLFieldCalc(const
   fParam.resize(3);
   fGridExists = false;
 
-#ifdef HAVE_LIBFFTW3_THREADS
+#if !defined(_WIN32GCC) && defined(HAVE_LIBFFTW3_THREADS) && defined(HAVE_GOMP)
   int init_threads(fftw_init_threads());
   if (init_threads) {
-#ifdef HAVE_GOMP
     fftw_plan_with_nthreads(omp_get_num_procs());
-#else
-    fftw_plan_with_nthreads(2);
-#endif /* HAVE_GOMP */
   }
-#endif /* HAVE_LIBFFTW3_THREADS */
+#endif
 
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];
@@ -2798,16 +2766,12 @@ TBulkAnisotropicTriVortexAGLFieldCalc::TBulkAnisotropicTriVortexAGLFieldCalc(con
   fParam.resize(3);
   fGridExists = false;
 
-#ifdef HAVE_LIBFFTW3_THREADS
+#if !defined(_WIN32GCC) && defined(HAVE_LIBFFTW3_THREADS) && defined(HAVE_GOMP)
   int init_threads(fftw_init_threads());
   if (init_threads) {
-#ifdef HAVE_GOMP
     fftw_plan_with_nthreads(omp_get_num_procs());
-#else
-    fftw_plan_with_nthreads(2);
-#endif /* HAVE_GOMP */
   }
-#endif /* HAVE_LIBFFTW3_THREADS */
+#endif
 
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];

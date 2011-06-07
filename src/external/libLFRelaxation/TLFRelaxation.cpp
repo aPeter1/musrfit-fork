@@ -187,18 +187,13 @@ double TLFStatExpKT::operator()(double t, const vector<double> &par) const {
  */
 TLFDynGssKT::TLFDynGssKT() : fCalcNeeded(true), fFirstCall(true), fCounter(0) {
 
-#ifdef HAVE_LIBFFTW3F_THREADS
+#if !defined(_WIN32GCC) && defined(HAVE_LIBFFTW3F_THREADS) && defined(HAVE_GOMP)
   int init_threads(fftwf_init_threads());
   if (!init_threads)
     cout << "TLFDynGssKT::TLFDynGssKT: Couldn't initialize multiple FFTW-threads ..." << endl;
-  else {
-#ifdef HAVE_GOMP
+  else
     fftwf_plan_with_nthreads(omp_get_num_procs());
-#else
-    fftwf_plan_with_nthreads(1);
-#endif /* HAVE_GOMP */
-  }
-#endif /* HAVE_LIBFFTW3F_THREADS */
+#endif
 
   // read startup file
   string startup_path_name("BMW_startup.xml");
@@ -514,18 +509,13 @@ double TLFDynSG::operator()(double t, const vector<double> &par) const {
  */
 TLFDynExpKT::TLFDynExpKT() : fCalcNeeded(true), fFirstCall(true), fCounter(0), fL1(0.0), fL2(0.0) {
 
-#ifdef HAVE_LIBFFTW3F_THREADS
+#if !defined(_WIN32GCC) && defined(HAVE_LIBFFTW3F_THREADS) && defined(HAVE_GOMP)
   int init_threads(fftwf_init_threads());
   if (!init_threads)
     cout << "TLFDynExpKT::TLFDynExpKT: Couldn't initialize multiple FFTW-threads ..." << endl;
-  else {
-#ifdef HAVE_GOMP
+  else
     fftwf_plan_with_nthreads(omp_get_num_procs());
-#else
-    fftwf_plan_with_nthreads(1);
-#endif /* HAVE_GOMP */
-  }
-#endif /* HAVE_LIBFFTW3F_THREADS */
+#endif
 
   // read startup file
   string startup_path_name("BMW_startup.xml");

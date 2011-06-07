@@ -70,19 +70,13 @@
 
 TPofTCalc::TPofTCalc (const TPofBCalc *PofB, const string &wisdom, const vector<double> &par) : fWisdom(wisdom) {
 
-
-#ifdef HAVE_LIBFFTW3_THREADS
+#if !defined(_WIN32GCC) && defined(HAVE_LIBFFTW3_THREADS) && defined(HAVE_GOMP)
   int init_threads(fftw_init_threads());
   if (!init_threads)
     cout << "TPofTCalc::TPofTCalc: Couldn't initialize multiple FFTW-threads ..." << endl;
-  else {
-#ifdef HAVE_GOMP
+  else
     fftw_plan_with_nthreads(omp_get_num_procs());
-#else
-    fftw_plan_with_nthreads(2);
-#endif /* HAVE_GOMP */
-  }
-#endif /* HAVE_LIBFFTW3_THREADS */
+#endif
 
   fNFFT = static_cast<int>(1.0/(gBar*par[1]*par[2]));
   if (fNFFT % 2) {

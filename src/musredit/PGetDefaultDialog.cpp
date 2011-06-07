@@ -107,9 +107,12 @@ void PGetDefaultDialog::setFileFormat(const QString &str)
  */
 void PGetDefaultDialog::helpContent()
 {
+  #ifdef _WIN32GCC
+  QMessageBox::information(this, "**INFO**", "If a newer Qt version was available, a help window would be shown!");
+  #else
   PHelp *help = new PHelp(fHelpUrl);
-
   help->show();
+  #endif // _WIN32GCC
 }
 
 //---------------------------------------------------------------------------

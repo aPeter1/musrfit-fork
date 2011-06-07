@@ -13,6 +13,7 @@ exists ( /opt/fontconfig-2.8.0/lib/libfontconfig.so ) {
 }
 
 exists( /usr/bin/cygwin1.dll ) {
+      QMAKE_CXXFLAGS += -D_WIN32GCC
       QMAKE_LFLAGS_SHAPP = -Wl,--enable-auto-import
 }
 

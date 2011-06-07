@@ -155,16 +155,12 @@ TFilmTriVortexNGLFieldCalc::TFilmTriVortexNGLFieldCalc(const string& wisdom, con
   fParam.resize(3);
   fGridExists = false;
 
-#ifdef HAVE_LIBFFTW3_THREADS
+#if !defined(_WIN32GCC) && defined(HAVE_LIBFFTW3F_THREADS) && defined(HAVE_GOMP)
   int init_threads(fftwf_init_threads());
   if (init_threads) {
-#ifdef HAVE_GOMP
     fftwf_plan_with_nthreads(omp_get_num_procs());
-#else
-    fftwf_plan_with_nthreads(2);
-#endif /* HAVE_GOMP */
   }
-#endif /* HAVE_LIBFFTW3_THREADS */
+#endif
 
   const unsigned int stepsSqStZ(fSteps*fSteps*fStepsZ);
 

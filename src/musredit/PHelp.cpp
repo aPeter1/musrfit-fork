@@ -44,6 +44,7 @@
  */
 PHelp::PHelp(const QString &url)
 {
+  #ifndef _WIN32GCC
   fProgress = 0;
 
   QNetworkProxyFactory::setUseSystemConfiguration(true);
@@ -71,6 +72,7 @@ PHelp::PHelp(const QString &url)
 
   setCentralWidget(fView);
   setUnifiedTitleAndToolBarOnMac(true);
+  #endif // _WIN32GCC
 }
 
 //---------------------------------------------------------------------------
