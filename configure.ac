@@ -355,11 +355,19 @@ ROOT_CFLAGS="-I${ROOTINCDIR} ${ROOTCFLAGS} ${ROOTAUXCFLAGS}"
 # Check if Minuit2 has been enabled during the ROOT configuration
 
 AC_MSG_CHECKING([for Minuit2 in ROOT])
-if [[[ $(${ROOTCONF} --config) == *--enable-minuit2* ]]]; then
+if test "x$(${ROOTCONF} --has-minuit2)" == "xyes"; then
   AC_MSG_RESULT([yes])
 else
   AC_MSG_RESULT([no])
-  AC_MSG_ERROR([Minuit2 not included in the ROOT installation... Please configure ROOT with the --enable-minuit2 option!])
+  AC_MSG_ERROR([Minuit2 is not included in the ROOT installation... Please configure ROOT with the --enable-minuit2 option!])
+fi
+
+AC_MSG_CHECKING([for MathMore in ROOT])
+if test "x$(${ROOTCONF} --has-mathmore)" == "xyes"; then
+  AC_MSG_RESULT([yes])
+else
+  AC_MSG_RESULT([no])
+  AC_MSG_ERROR([MathMore is not included in the ROOT installation... Please configure ROOT with the --enable-mathmore option and check that the feature is actually built!])
 fi
 
 AC_SUBST(ROOT_LIBS)
