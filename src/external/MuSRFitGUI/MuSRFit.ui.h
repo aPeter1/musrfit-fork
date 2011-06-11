@@ -412,6 +412,9 @@ void MuSRFitform::CreateAllInput()
 # Construct a default filename if empty
     if ( $All{"FILENAME"} eq ""  && !$All{"RUNSType"}) {
 	$All{"FILENAME"}=$RUNS[0]."_".$All{"BeamLine"}."_".$All{"YEAR"};
+	if ($All{"BeamLine"} eq "LEM (PPC)") {
+	    $All{"FILENAME"}=$RUNS[0]."_LEM_".$All{"YEAR"};
+	}
     } else {
 	$All{"FILENAME"}="TMP";
     }

@@ -14,10 +14,10 @@ my %DATADIRS = (
 		"GPD", "/afs/psi.ch/project/bulkmusr/data/gpd"
 		);
 
-my %BeamLines = ( "LEM", "MUE4", "GPS", "PIM3", "LTF", "PIM3", "Dolly", "PIE1", "GPD", "PIE1" );
+my %BeamLines = ( "LEM", "MUE4", "LEM (PPC)", "MUE4", "GPS", "PIM3", "LTF", "PIM3", "Dolly", "PIE1", "GPD", "PIE1" );
 
 my %Def_Format =
-  ( "LEM", "ROOT-NPP", "GPS", "PSI-BIN", "LTF", "PSI-BIN", "Dolly", "PSI-BIN" , "GPD", "PSI-BIN");
+  ( "LEM", "ROOT-NPP", "LEM (PPC)", "ROOT-PPC", "GPS", "PSI-BIN", "LTF", "PSI-BIN", "Dolly", "PSI-BIN" , "GPD", "PSI-BIN");
 
 # Additional information to extract run properties from database
 # For LEM use summary files
@@ -1636,7 +1636,7 @@ sub RUNFileNameAuto {
 	localtime( time() );
     my $current_year = $year + 1900;
     
-    if ( $BeamLine eq "LEM" ) {
+    if ( $BeamLine eq "LEM" || $BeamLine eq "LEM (PPC)") {
 	$RUN_File_Name = "lem" . substr( $YEAR, 2 ) . "_his_" . $RUNtmp;
 	$RUNFILE       = "$DATADIR/$YEAR/$RUN_File_Name";
     }
@@ -1659,7 +1659,6 @@ sub RUNFileNameAuto {
     my $RUN_Line = join( $SPACE,
 			 "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
 			 $Def_Format{$BeamLine} );
-
     return $RUN_Line;
 }
 

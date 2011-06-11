@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Wed May 4 16:51:35 2011
+# Created: Wed May 25 16:46:00 2011
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -3200,6 +3200,7 @@ sub languageChange
     BeamLine->insertItem( trUtf8("GPS") );
     BeamLine->insertItem( trUtf8("Dolly") );
     BeamLine->insertItem( trUtf8("LTF") );
+    BeamLine->insertItem( trUtf8("LEM (PPC)") );
     BeamLineLabel->setText( trUtf8("On beam line") );
     YEARLabel->setText( trUtf8("Year") );
     RUNSMan->setTitle( trUtf8("RUN Files") );
@@ -3878,6 +3879,9 @@ sub CreateAllInput
 # Construct a default filename if empty
     if ( $All{"FILENAME"} eq ""  && !$All{"RUNSType"}) {
 	$All{"FILENAME"}=$RUNS[0]."_".$All{"BeamLine"}."_".$All{"YEAR"};
+	if ($All{"BeamLine"} eq "LEM (PPC)") {
+	    $All{"FILENAME"}=$RUNS[0]."_LEM_".$All{"YEAR"};
+	}
     } else {
 	$All{"FILENAME"}="TMP";
     }
@@ -4416,9 +4420,9 @@ sub t0UpdateClicked
 # First T0s
     while ($FinHist) {
 	my $counter=0;
-#	(my $tmp,my @SplitT0) = split( /\s+/, $T0s[$counter]);
+	(my $tmp,my @SplitT0) = split( /\s+/, $T0s[$counter]);
 	(my $tmp,my @SplitBg) = split( /\s+/, $Bgs[$counter]);
-#	(my $tmp,my @SplitData) = split( /\s+/, $Datas[$counter]);
+	(my $tmp,my @SplitData) = split( /\s+/, $Datas[$counter]);
 	if ($#SplitBg>0) {
 	    foreach (@SplitBg) {
 		print $_."\n";
