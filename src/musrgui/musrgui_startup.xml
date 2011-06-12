@@ -24,7 +24,7 @@
   <help_section>
     <help_main>
       For a detailed description of the aim and structure of a msr file see &lt;b&gt;http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html&lt;/b&gt;
-      Starting with &ge; Qt 4.2 this will be linked automatically but until then ...; sorry ;-)
+      Starting with &ge; Qt 4.6 this will be linked automatically but until then ...; sorry ;-)
     </help_main>
   </help_section>
   <msr2data_defaults>
