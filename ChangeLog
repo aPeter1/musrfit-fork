@@ -17,6 +17,9 @@ FIXED bug reported in MUSR-183: missing background for 2nd histo in asymmetry fi
 FIXED Makefiles so that the NeXus support will not be built if it has not been enabled during the configure stage
 FIXED ASCII export from musrview in case of a Fourier-Power- or Fourier-Phase-difference plot
 FIXED bug in asymmetry fit with fixed background
+CHANGED the data-file-name handling (MUSR-195).
+        It is now possible to specify the full file name in the RUN block (including the extension).
+        The data files that are looked for have to have either full lower-case (e.g. .nxs) or full upper-case (e.g. .NXS) extensions.
 CHANGED cosmetics in the musrview legend concerning the units
 CHANGED the user-function dependency from libPMusr to libPUserFcnBase
 

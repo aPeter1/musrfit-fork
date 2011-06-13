@@ -568,6 +568,62 @@ Bool_t PRunDataHandler::FileAlreadyRead(TString runName)
 }
 
 //--------------------------------------------------------------------------
+// TestFileName -- private
+//--------------------------------------------------------------------------
+/**
+ * <p> Tests if a file exists (with or without given extension).
+ *     The given file-name string will be modified to show the found file name or an empty string if no file is found.
+ *
+ * \param runName run name to be checked
+ * \param ext extension to be checked
+ */
+void PRunDataHandler::TestFileName(TString &runName, TString &ext)
+{
+  TString tmpStr(runName);
+  // check first if the file exists with a lower-case extension
+  ext.ToLower();
+  runName += TString(".") + ext;
+  if (gSystem->AccessPathName(runName.Data())!=true) { // found
+    return;
+  } else {
+    runName = tmpStr;
+    if (tmpStr.EndsWith(ext.Data())) { // assume the lower-case extension is already part of the file name, therefore, do not append it
+      if (gSystem->AccessPathName(runName.Data())!=true) { // found
+        return;
+      } else { // assume a lower-case extension is part of the given file name but the real data file ends with an upper-case extension
+        ext.ToUpper();
+        runName = runName.Replace(static_cast<Ssiz_t>(runName.Length()-ext.Length()), ext.Length(), ext);
+        if (gSystem->AccessPathName(runName.Data()) != true) {
+          return;
+        }
+      }
+    } else {
+      ext.ToUpper();
+      if (tmpStr.EndsWith(ext.Data())) { // assume the upper-case extension is already part of the file name, therefore, do not append it
+        if (gSystem->AccessPathName(runName.Data())!=true) { // found
+          return;
+        } else { // assume an upper-case extension is part of the given file name but the real data file ends with a lower-case extension
+          ext.ToLower();
+          runName = runName.Replace(static_cast<Ssiz_t>(runName.Length()-ext.Length()), ext.Length(), ext);
+          if (gSystem->AccessPathName(runName.Data()) != true) {
+            return;
+          }
+        }
+      } else {
+        runName += TString(".") + ext; // test if the extension is given in upper-case letters and is not included in the file name
+        if (gSystem->AccessPathName(runName.Data())!=true) { // found
+          return;
+        }
+      }
+    }
+  }
+
+  // if the file has not been found, set the run name to be empty
+  runName = "";
+  return;
+}
+
+//--------------------------------------------------------------------------
 // FileExistsCheck
 //--------------------------------------------------------------------------
 /**
@@ -665,25 +721,27 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
   }
 
   // check if the file is in the local directory
-  str = *runInfo.GetRunName(idx) + TString(".") + ext;
-  if (gSystem->AccessPathName(str.Data())!=true) { // found in the local dir
+  str = *runInfo.GetRunName(idx);
+  TestFileName(str, ext);
+  if (!str.IsNull()) {
     pathName = str;
   }
 
   // check if the file is found in the <msr-file-directory>
   if (pathName.CompareTo("???") == 0) { // not found in local directory search
-    str  = *fMsrInfo->GetMsrFileDirectoryPath();
-    str += *runInfo.GetRunName(idx) + TString(".") + ext;
-    if (gSystem->AccessPathName(str.Data())!=true) { // found
+    str = *fMsrInfo->GetMsrFileDirectoryPath() + *runInfo.GetRunName(idx);
+    TestFileName(str, ext);
+    if (!str.IsNull()) {
       pathName = str;
     }
   }
 
   // check if the file is found in the directory given in the startup file
-  if (pathName.CompareTo("???") == 0) { // not found in local directory search
+  if (pathName.CompareTo("???") == 0) { // not found in local directory search and not found in the <msr-file-directory> search
     for (UInt_t i=0; i<fDataPath.size(); i++) {
-      str = fDataPath[i] + TString("/") + *runInfo.GetRunName(idx) + TString(".") + ext;
-      if (gSystem->AccessPathName(str.Data())!=true) { // found
+      str = fDataPath[i] + TString("/") + *runInfo.GetRunName(idx);
+      TestFileName(str, ext);
+      if (!str.IsNull()) {
         pathName = str;
         break;
       }
@@ -699,8 +757,9 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
     TObjString *ostr;
     for (Int_t i=0; i<tokens->GetEntries(); i++) {
       ostr = dynamic_cast<TObjString*>(tokens->At(i));
-      str = ostr->GetString() + TString("/") + *runInfo.GetRunName(idx) + TString(".") + ext;
-      if (gSystem->AccessPathName(str.Data())!=true) { // found
+      str = ostr->GetString() + TString("/") + *runInfo.GetRunName(idx);
+      TestFileName(str, ext);
+      if (!str.IsNull()) {
         pathName = str;
         break;
       }
@@ -741,8 +800,9 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
             *runInfo.GetInstitute(idx) + TString("/") +
             *runInfo.GetBeamline(idx) + TString("/") +
             dt + TString("/") +
-            *runInfo.GetRunName(idx) + TString(".") + ext;
-      if (gSystem->AccessPathName(str.Data())!=true) { // found
+            *runInfo.GetRunName(idx);
+      TestFileName(str, ext);
+      if (!str.IsNull()) { // found
         pathName = str;
         break;
       }
