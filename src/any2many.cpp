@@ -439,7 +439,7 @@ int main(int argc, char *argv[])
     status = saxParser->ParseFile(startup_path_name);
     // check for parse errors
     if (status) { // error
-      cerr << endl << ">> any2many **WARNING** reading/parsing musrfit_startup.xml.";
+      cerr << endl << ">> any2many **WARNING** Reading/parsing musrfit_startup.xml failed.";
       cerr << endl;
       // clean up
       if (saxParser) {
@@ -454,7 +454,11 @@ int main(int argc, char *argv[])
   }
 
   // read all the necessary runs (raw data)
-  PRunDataHandler *dataHandler = new PRunDataHandler(&info, startupHandler->GetDataPathList());
+  PRunDataHandler *dataHandler;
+  if (startupHandler)
+    dataHandler = new PRunDataHandler(&info, startupHandler->GetDataPathList());
+  else
+    dataHandler = new PRunDataHandler(&info);
 
   bool success = dataHandler->IsAllDataAvailable();
   if (!success) {

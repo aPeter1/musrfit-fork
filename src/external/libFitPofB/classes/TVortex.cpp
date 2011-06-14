@@ -168,7 +168,7 @@ TBulkTriVortexLondon::TBulkTriVortexLondon() : fCalcNeeded(true), fFirstCall(tru
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
+      cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -225,7 +225,7 @@ TBulkSqVortexLondon::TBulkSqVortexLondon() : fCalcNeeded(true), fFirstCall(true)
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
+      cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -452,7 +452,7 @@ TBulkTriVortexML::TBulkTriVortexML() : fCalcNeeded(true), fFirstCall(true) {
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
+      cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -588,7 +588,7 @@ TBulkTriVortexAGL::TBulkTriVortexAGL() : fCalcNeeded(true), fFirstCall(true) {
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
+      cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -723,7 +723,7 @@ TBulkTriVortexAGLII::TBulkTriVortexAGLII() : fCalcNeeded(true), fFirstCall(true)
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
+      cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -871,7 +871,7 @@ TBulkTriVortexNGL::TBulkTriVortexNGL() : fCalcNeeded(true), fFirstCall(true) {
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
+      cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -1023,7 +1023,7 @@ TBulkAnisotropicTriVortexLondonGlobal::TBulkAnisotropicTriVortexLondonGlobal() :
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
+      cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -1262,7 +1262,7 @@ TBulkAnisotropicTriVortexMLGlobal::TBulkAnisotropicTriVortexMLGlobal() : fCalcNe
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
+      cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -1501,7 +1501,7 @@ TBulkAnisotropicTriVortexAGLGlobal::TBulkAnisotropicTriVortexAGLGlobal() : fCalc
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
+      cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);

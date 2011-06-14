@@ -46,6 +46,7 @@ using namespace std;
 class PRunDataHandler
 {
   public:
+    PRunDataHandler(PAny2ManyInfo *any2ManyInfo);
     PRunDataHandler(PAny2ManyInfo *any2ManyInfo, const PStringVector dataPath);
     PRunDataHandler(PMsrHandler *msrInfo);
     PRunDataHandler(PMsrHandler *msrInfo, const PStringVector dataPath);

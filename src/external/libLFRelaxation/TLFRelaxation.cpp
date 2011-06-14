@@ -204,7 +204,7 @@ TLFDynGssKT::TLFDynGssKT() : fCalcNeeded(true), fFirstCall(true), fCounter(0) {
   int status (saxParser->ParseFile(startup_path_name.c_str()));
   // check for parse errors
   if (status) { // error
-    cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
+    cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
          << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
          << endl;
     assert(false);
@@ -526,7 +526,7 @@ TLFDynExpKT::TLFDynExpKT() : fCalcNeeded(true), fFirstCall(true), fCounter(0), f
   int status (saxParser->ParseFile(startup_path_name.c_str()));
   // check for parse errors
   if (status) { // error
-    cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
+    cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
          << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
          << endl;
     assert(false);

@@ -179,7 +179,8 @@ int main(int argc, char *argv[])
     status = saxParser->ParseFile(startup_path_name);
     // check for parse errors
     if (status) { // error
-      cerr << endl << ">> musrview **WARNING** reading/parsing musrfit_startup.xml.";
+      cerr << endl << ">> musrview **WARNING** Reading/parsing musrfit_startup.xml failed.";
+      cerr << endl << ">>                      Any graph will appear with random symbols and colors!";
       cerr << endl;
       // clean up
       if (saxParser) {
@@ -190,8 +191,9 @@ int main(int argc, char *argv[])
         delete startupHandler;
         startupHandler = 0;
       }
+    } else {
+      startupHandler->CheckLists();
     }
-    startupHandler->CheckLists();
   }
 
   // read msr-file

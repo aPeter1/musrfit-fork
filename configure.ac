@@ -370,6 +370,22 @@ else
   AC_MSG_ERROR([MathMore is not included in the ROOT installation... Please configure ROOT with the --enable-mathmore option and check that the feature is actually built!])
 fi
 
+AC_MSG_CHECKING([for XML support in ROOT])
+if test "x$(${ROOTCONF} --has-xml)" == "xyes"; then
+  AC_MSG_RESULT([yes])
+else
+  AC_MSG_RESULT([no])
+  AC_MSG_ERROR([XML support is not included in the ROOT installation... Please configure ROOT with the --enable-xml option and check that the feature is actually built!])
+fi
+
+AC_MSG_CHECKING([for image processing support in ROOT])
+if test "x$(${ROOTCONF} --has-asimage)" == "xyes"; then
+  AC_MSG_RESULT([yes])
+else
+  AC_MSG_RESULT([no])
+  AC_MSG_ERROR([image processing support is not included in the ROOT installation... Please configure ROOT with the --enable-asimage option and check that the feature is actually built!])
+fi
+
 AC_SUBST(ROOT_LIBS)
 AC_SUBST(ROOT_CFLAGS)
 

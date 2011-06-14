@@ -156,7 +156,7 @@ TLondon1DHS::TLondon1DHS() : fCalcNeeded(true), fFirstCall(true) {
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
+      cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -304,7 +304,7 @@ TLondon1D1L::TLondon1D1L() : fCalcNeeded(true), fFirstCall(true) {
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
+      cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -487,7 +487,7 @@ TLondon1D2L::TLondon1D2L() : fCalcNeeded(true), fFirstCall(true) {
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
+      cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -657,7 +657,7 @@ TProximity1D1LHS::TProximity1D1LHS() : fCalcNeeded(true), fFirstCall(true) {
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
+      cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -804,7 +804,7 @@ TLondon1D3L::TLondon1D3L() : fCalcNeeded(true), fFirstCall(true) {
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
+      cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -973,7 +973,7 @@ TLondon1D3LS::TLondon1D3LS() : fCalcNeeded(true), fFirstCall(true) {
     int status (saxParser->ParseFile(startup_path_name.c_str()));
     // check for parse errors
     if (status) { // error
-      cerr << endl << "**ERROR** reading/parsing " << startup_path_name << " failed." \
+      cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
            << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
            << endl;
       assert(false);
@@ -1142,7 +1142,7 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
 //     int status (saxParser->ParseFile(startup_path_name.c_str()));
 //     // check for parse errors
 //     if (status) { // error
-//       cout << endl << "**WARNING** reading/parsing " << startup_path_name << " failed." << endl;
+//       cout << endl << "**WARNING** Reading/parsing " << startup_path_name << " failed." << endl;
 //     }
 // 
 //     fNSteps = startupHandler->GetNSteps();

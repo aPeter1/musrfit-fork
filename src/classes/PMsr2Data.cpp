@@ -427,7 +427,7 @@ int PMsr2Data::ParseXmlStartupFile()
   status = fSaxParser->ParseFile(startup_path_name.c_str());
   // check for parse errors
   if (status) { // error
-    cerr << endl << ">> msr2data: **WARNING** reading/parsing musrfit_startup.xml." << endl;
+    cerr << endl << ">> msr2data: **WARNING** Reading/parsing musrfit_startup.xml failed." << endl;
     // clean up
     if (fSaxParser) {
       delete fSaxParser;

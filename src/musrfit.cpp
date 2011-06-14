@@ -445,7 +445,7 @@ int main(int argc, char *argv[])
     status = saxParser->ParseFile(startup_path_name);
     // check for parse errors
     if (status) { // error
-      cerr << endl << ">> musrfit **WARNING** reading/parsing musrfit_startup.xml.";
+      cerr << endl << ">> musrfit **WARNING** Reading/parsing musrfit_startup.xml failed.";
       cerr << endl;
       // clean up
       if (saxParser) {

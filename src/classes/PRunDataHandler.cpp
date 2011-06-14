@@ -81,6 +81,24 @@ using namespace std;
  *
  * \param msrInfo pointer to the msr-file handler
  */
+PRunDataHandler::PRunDataHandler(PAny2ManyInfo *any2ManyInfo) : fAny2ManyInfo(any2ManyInfo)
+{
+  fDataPath.clear();
+  // read files
+  if (!ReadWriteFilesList()) // couldn't read file
+    fAllDataAvailable = false;
+  else
+    fAllDataAvailable = true;
+}
+
+//--------------------------------------------------------------------------
+// Constructor
+//--------------------------------------------------------------------------
+/**
+ * <p>Constructor, reading the data histogramm files.
+ *
+ * \param msrInfo pointer to the msr-file handler
+ */
 PRunDataHandler::PRunDataHandler(PAny2ManyInfo *any2ManyInfo, const PStringVector dataPath) :
     fAny2ManyInfo(any2ManyInfo), fDataPath(dataPath)
 {
