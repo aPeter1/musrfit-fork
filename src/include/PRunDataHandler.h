@@ -67,7 +67,7 @@ class PRunDataHandler
     virtual Bool_t ReadFilesMsr();
     virtual Bool_t ReadWriteFilesList();
     virtual Bool_t FileAlreadyRead(TString runName);
-    virtual void TestFileName(TString &runName, TString &ext);
+    virtual void TestFileName(TString &runName, const TString &ext);
     virtual Bool_t FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx);
     virtual Bool_t FileExistsCheck(const Bool_t fileName, const Int_t idx);
     virtual Bool_t ReadRootFile(UInt_t tag);

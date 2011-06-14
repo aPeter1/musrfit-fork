@@ -574,47 +574,78 @@ Bool_t PRunDataHandler::FileAlreadyRead(TString runName)
  * <p> Tests if a file exists (with or without given extension).
  *     The given file-name string will be modified to show the found file name or an empty string if no file is found.
  *
- * \param runName run name to be checked
+ * \param runName run name with full path to be checked
  * \param ext extension to be checked
  */
-void PRunDataHandler::TestFileName(TString &runName, TString &ext)
+void PRunDataHandler::TestFileName(TString &runName, const TString &ext)
 {
-  TString tmpStr(runName);
-  // check first if the file exists with a lower-case extension
-  ext.ToLower();
+  TString tmpStr(runName), tmpExt(ext);
+
+  // check first if the file exists with the default extension which is not given with the run name
   runName += TString(".") + ext;
-  if (gSystem->AccessPathName(runName.Data())!=true) { // found
+  if (gSystem->AccessPathName(runName.Data()) != true) { // found
     return;
-  } else {
-    runName = tmpStr;
-    if (tmpStr.EndsWith(ext.Data())) { // assume the lower-case extension is already part of the file name, therefore, do not append it
-      if (gSystem->AccessPathName(runName.Data())!=true) { // found
-        return;
-      } else { // assume a lower-case extension is part of the given file name but the real data file ends with an upper-case extension
-        ext.ToUpper();
-        runName = runName.Replace(static_cast<Ssiz_t>(runName.Length()-ext.Length()), ext.Length(), ext);
-        if (gSystem->AccessPathName(runName.Data()) != true) {
-          return;
-        }
-      }
-    } else {
-      ext.ToUpper();
-      if (tmpStr.EndsWith(ext.Data())) { // assume the upper-case extension is already part of the file name, therefore, do not append it
-        if (gSystem->AccessPathName(runName.Data())!=true) { // found
-          return;
-        } else { // assume an upper-case extension is part of the given file name but the real data file ends with a lower-case extension
-          ext.ToLower();
-          runName = runName.Replace(static_cast<Ssiz_t>(runName.Length()-ext.Length()), ext.Length(), ext);
-          if (gSystem->AccessPathName(runName.Data()) != true) {
-            return;
-          }
-        }
-      } else {
-        runName += TString(".") + ext; // test if the extension is given in upper-case letters and is not included in the file name
-        if (gSystem->AccessPathName(runName.Data())!=true) { // found
-          return;
-        }
-      }
+  }
+
+  // test if the file exists with only upper-case letters
+  runName.ToUpper();
+  if (gSystem->AccessPathName(runName.Data()) != true) { // found
+    return;
+  }
+
+  // test if the file exists with only lower-case letters
+  runName.ToLower();
+  if (gSystem->AccessPathName(runName.Data()) != true) { // found
+    return;
+  }
+
+  // test if the file exists with the given run name but an only upper-case extension which is not included in the file name
+  runName = tmpStr;
+  tmpExt.ToUpper();
+  runName += TString(".") + tmpExt;
+  if (gSystem->AccessPathName(runName.Data()) != true) { // found
+    return;
+  }
+
+  // test if the file exists with the given run name but an only lower-case extension which is not included in the file name
+  tmpExt.ToLower();
+  runName = runName.Replace(static_cast<Ssiz_t>(runName.Length()-tmpExt.Length()), tmpExt.Length(), tmpExt);
+  if (gSystem->AccessPathName(runName.Data()) != true) { // found
+    return;
+  }
+
+  runName = tmpStr;
+
+  // the extension is already part of the file name, therefore, do not append it
+  if (runName.EndsWith(ext.Data(), TString::kIgnoreCase)) {
+    if (gSystem->AccessPathName(runName.Data()) != true) { // found
+      return;
+    }
+
+    // assume some extension is part of the given file name but the real data file ends with an lower-case extension
+    tmpExt.ToLower();
+    runName = runName.Replace(static_cast<Ssiz_t>(runName.Length()-tmpExt.Length()), tmpExt.Length(), tmpExt);
+    if (gSystem->AccessPathName(runName.Data()) != true) { // found
+      return;
+    }
+
+    // assume some extension is part of the given file name but the real data file ends with an upper-case extension
+    tmpExt.ToUpper();
+    runName = runName.Replace(static_cast<Ssiz_t>(runName.Length()-tmpExt.Length()), tmpExt.Length(), tmpExt);
+    if (gSystem->AccessPathName(runName.Data()) != true) { // found
+      return;
+    }
+
+    // test if the file exists with only lower-case letters and the extension already included in the file name
+    runName.ToLower();
+    if (gSystem->AccessPathName(runName.Data()) != true) { // found
+      return;
+    }
+
+    // test if the file exists with only upper-case letters and the extension already included in the file name
+    runName.ToUpper();
+    if (gSystem->AccessPathName(runName.Data()) != true) { // found
+      return;
     }
   }
 
