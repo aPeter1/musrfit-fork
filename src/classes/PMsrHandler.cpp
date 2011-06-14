@@ -1176,7 +1176,7 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
 
   // write FITPARAMETER block
   fout << "FITPARAMETER" << endl;
-  fout << "#       No Name        Value     Step        Pos_Error   Boundaries" << endl;
+  fout << "#      No Name        Value     Step        Pos_Error   Boundaries" << endl;
 
   for (i = 0; i < fParam.size(); ++i) {
     if (commentsPAR) {

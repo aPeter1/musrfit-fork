@@ -281,6 +281,18 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent) : f
           tokens = 0;
         }
         return;
+      } else if (!TClass::GetDict(fUserFcnClassName.Data())) {
+        cerr << endl << ">> PTheory::PTheory: **ERROR** user function class '" << fUserFcnClassName.Data() << "' not found.";
+        cerr << endl << ">>           " << fUserFcnSharedLibName.Data() << " loaded successfully, but no dictionary present.";
+        cerr << endl << ">>           See line no " << line->fLineNo;
+        cerr << endl;
+        fValid = false;
+        // clean up
+        if (tokens) {
+          delete tokens;
+          tokens = 0;
+        }
+        return;
       }
     }
 
