@@ -1,9 +1,33 @@
 TEMPLATE = app
-
 TARGET = musredit
+
 # install path for musredit
-unix:target.path = $$(ROOTSYS)/bin
+count( PREFIX, 1 ) {
+    MUSREDIT_INSTALL_PATH = $${PREFIX}/bin
+}
+isEmpty( MUSREDIT_INSTALL_PATH ) {
+    MUSR_FIT_PATH = $$(MUSRFITPATH)
+    count( MUSR_FIT_PATH, 1 ) {
+        MUSREDIT_INSTALL_PATH = $$(MUSRFITPATH)
+    }
+}
+isEmpty( MUSREDIT_INSTALL_PATH ) {
+    ROOT_SYS_PATH = $$(ROOTSYS)
+    count( ROOT_SYS_PATH, 1 ) {
+        MUSREDIT_INSTALL_PATH = $$(ROOTSYS)/bin
+    }
+}
+isEmpty( MUSREDIT_INSTALL_PATH ) {
+    MUSREDIT_INSTALL_PATH = /usr/local/bin
+}
+
+unix {
+    message( "Determined installation path: $${MUSREDIT_INSTALL_PATH}" )
+}
+
+unix:target.path = $${MUSREDIT_INSTALL_PATH}
 macx:target.path = /Applications
+
 win32:target.path = c:/musrfit/bin
 INSTALLS += target
 
@@ -21,8 +45,8 @@ QMAKE_CC = gcc
 QMAKE_CXX = g++
 
 # install path for the XML configuration file
-unix:xml.path = $$(ROOTSYS)/bin/
-macx:xml.path = $$(ROOTSYS)/bin/
+unix:xml.path = $${MUSREDIT_INSTALL_PATH}
+macx:xml.path = $${MUSREDIT_INSTALL_PATH}
 win32:xml.path = c:/musrfit/bin
 xml.files = musredit_startup.xml
 INSTALLS += xml
@@ -32,7 +56,7 @@ CONFIG += qt \
     debug
 
 QT += xml
-QT += webkit 
+QT += webkit
 QT += network
 
 HEADERS = musredit.h \
