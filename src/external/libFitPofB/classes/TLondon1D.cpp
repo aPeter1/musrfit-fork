@@ -30,6 +30,7 @@
 
 #include "TLondon1D.h"
 #include <iostream>
+#include <fstream>
 #include <cassert>
 #include <cmath>
 using namespace std;
@@ -153,7 +154,27 @@ TLondon1DHS::TLondon1DHS() : fCalcNeeded(true), fFirstCall(true) {
     TSAXParser *saxParser = new TSAXParser();
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
     saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
-    int status (saxParser->ParseFile(startup_path_name.c_str()));
+    //int status (saxParser->ParseFile(startup_path_name.c_str()));
+    // parsing the file as above seems to lead to problems in certain environments; try working around through a buffer as follows
+    fstream xmlFile;
+    unsigned int xmlSize = 0;
+    char *xmlBuffer = 0;
+    xmlFile.open(startup_path_name.c_str(), ios::in | ios::ate); // open file for reading and go to the end of the file
+    if (xmlFile.is_open()) { // check if file has been opened successfully
+      xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
+      xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
+      xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
+      xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
+      xmlFile.close(); // close the XML file
+    }
+    int status;
+    if (!xmlBuffer) { // file has not been read into the buffer
+      status = 1;
+    } else {
+      status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
+      delete[] xmlBuffer; // free the buffer memory
+      xmlBuffer = 0;
+    }
     // check for parse errors
     if (status) { // error
       cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
@@ -301,7 +322,27 @@ TLondon1D1L::TLondon1D1L() : fCalcNeeded(true), fFirstCall(true) {
     TSAXParser *saxParser = new TSAXParser();
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
     saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
-    int status (saxParser->ParseFile(startup_path_name.c_str()));
+    //int status (saxParser->ParseFile(startup_path_name.c_str()));
+    // parsing the file as above seems to lead to problems in certain environments; try working around through a buffer as follows
+    fstream xmlFile;
+    unsigned int xmlSize = 0;
+    char *xmlBuffer = 0;
+    xmlFile.open(startup_path_name.c_str(), ios::in | ios::ate); // open file for reading and go to the end of the file
+    if (xmlFile.is_open()) { // check if file has been opened successfully
+      xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
+      xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
+      xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
+      xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
+      xmlFile.close(); // close the XML file
+    }
+    int status;
+    if (!xmlBuffer) { // file has not been read into the buffer
+      status = 1;
+    } else {
+      status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
+      delete[] xmlBuffer; // free the buffer memory
+      xmlBuffer = 0;
+    }
     // check for parse errors
     if (status) { // error
       cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
@@ -484,7 +525,27 @@ TLondon1D2L::TLondon1D2L() : fCalcNeeded(true), fFirstCall(true) {
     TSAXParser *saxParser = new TSAXParser();
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
     saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
-    int status (saxParser->ParseFile(startup_path_name.c_str()));
+    //int status (saxParser->ParseFile(startup_path_name.c_str()));
+    // parsing the file as above seems to lead to problems in certain environments; try working around through a buffer as follows
+    fstream xmlFile;
+    unsigned int xmlSize = 0;
+    char *xmlBuffer = 0;
+    xmlFile.open(startup_path_name.c_str(), ios::in | ios::ate); // open file for reading and go to the end of the file
+    if (xmlFile.is_open()) { // check if file has been opened successfully
+      xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
+      xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
+      xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
+      xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
+      xmlFile.close(); // close the XML file
+    }
+    int status;
+    if (!xmlBuffer) { // file has not been read into the buffer
+      status = 1;
+    } else {
+      status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
+      delete[] xmlBuffer; // free the buffer memory
+      xmlBuffer = 0;
+    }
     // check for parse errors
     if (status) { // error
       cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
@@ -654,7 +715,27 @@ TProximity1D1LHS::TProximity1D1LHS() : fCalcNeeded(true), fFirstCall(true) {
     TSAXParser *saxParser = new TSAXParser();
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
     saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
-    int status (saxParser->ParseFile(startup_path_name.c_str()));
+    //int status (saxParser->ParseFile(startup_path_name.c_str()));
+    // parsing the file as above seems to lead to problems in certain environments; try working around through a buffer as follows
+    fstream xmlFile;
+    unsigned int xmlSize = 0;
+    char *xmlBuffer = 0;
+    xmlFile.open(startup_path_name.c_str(), ios::in | ios::ate); // open file for reading and go to the end of the file
+    if (xmlFile.is_open()) { // check if file has been opened successfully
+      xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
+      xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
+      xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
+      xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
+      xmlFile.close(); // close the XML file
+    }
+    int status;
+    if (!xmlBuffer) { // file has not been read into the buffer
+      status = 1;
+    } else {
+      status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
+      delete[] xmlBuffer; // free the buffer memory
+      xmlBuffer = 0;
+    }
     // check for parse errors
     if (status) { // error
       cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
@@ -801,7 +882,27 @@ TLondon1D3L::TLondon1D3L() : fCalcNeeded(true), fFirstCall(true) {
     TSAXParser *saxParser = new TSAXParser();
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
     saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
-    int status (saxParser->ParseFile(startup_path_name.c_str()));
+    //int status (saxParser->ParseFile(startup_path_name.c_str()));
+    // parsing the file as above seems to lead to problems in certain environments; try working around through a buffer as follows
+    fstream xmlFile;
+    unsigned int xmlSize = 0;
+    char *xmlBuffer = 0;
+    xmlFile.open(startup_path_name.c_str(), ios::in | ios::ate); // open file for reading and go to the end of the file
+    if (xmlFile.is_open()) { // check if file has been opened successfully
+      xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
+      xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
+      xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
+      xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
+      xmlFile.close(); // close the XML file
+    }
+    int status;
+    if (!xmlBuffer) { // file has not been read into the buffer
+      status = 1;
+    } else {
+      status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
+      delete[] xmlBuffer; // free the buffer memory
+      xmlBuffer = 0;
+    }
     // check for parse errors
     if (status) { // error
       cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
@@ -970,7 +1071,27 @@ TLondon1D3LS::TLondon1D3LS() : fCalcNeeded(true), fFirstCall(true) {
     TSAXParser *saxParser = new TSAXParser();
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
     saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
-    int status (saxParser->ParseFile(startup_path_name.c_str()));
+    //int status (saxParser->ParseFile(startup_path_name.c_str()));
+    // parsing the file as above seems to lead to problems in certain environments; try working around through a buffer as follows
+    fstream xmlFile;
+    unsigned int xmlSize = 0;
+    char *xmlBuffer = 0;
+    xmlFile.open(startup_path_name.c_str(), ios::in | ios::ate); // open file for reading and go to the end of the file
+    if (xmlFile.is_open()) { // check if file has been opened successfully
+      xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
+      xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
+      xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
+      xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
+      xmlFile.close(); // close the XML file
+    }
+    int status;
+    if (!xmlBuffer) { // file has not been read into the buffer
+      status = 1;
+    } else {
+      status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
+      delete[] xmlBuffer; // free the buffer memory
+      xmlBuffer = 0;
+    }
     // check for parse errors
     if (status) { // error
       cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
@@ -1139,7 +1260,27 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
 //     TSAXParser *saxParser = new TSAXParser();
 //     BMWStartupHandler *startupHandler = new BMWStartupHandler();
 //     saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
-//     int status (saxParser->ParseFile(startup_path_name.c_str()));
+//     //int status (saxParser->ParseFile(startup_path_name.c_str()));
+//     // parsing the file as above seems to lead to problems in certain environments; try working around through a buffer as follows
+//     fstream xmlFile;
+//     unsigned int xmlSize = 0;
+//     char *xmlBuffer = 0;
+//     xmlFile.open(startup_path_name.c_str(), ios::in | ios::ate); // open file for reading and go to the end of the file
+//     if (xmlFile.is_open()) { // check if file has been opened successfully
+//       xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
+//       xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
+//       xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
+//       xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
+//       xmlFile.close(); // close the XML file
+//     }
+//     int status;
+//     if (!xmlBuffer) { // file has not been read into the buffer
+//       status = 1;
+//     } else {
+//       status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
+//       delete[] xmlBuffer; // free the buffer memory
+//       xmlBuffer = 0;
+//     }
 //     // check for parse errors
 //     if (status) { // error
 //       cout << endl << "**WARNING** Reading/parsing " << startup_path_name << " failed." << endl;

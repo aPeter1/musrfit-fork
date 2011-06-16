@@ -419,12 +419,31 @@ int PMsr2Data::SetRunNumbers(const string &runListFile)
  */
 int PMsr2Data::ParseXmlStartupFile()
 {
+  fstream xmlFile;
+  unsigned int xmlSize = 0;
+  char *xmlBuffer = 0;
   int status;
   fSaxParser = new TSAXParser();
   fStartupHandler = new PStartupHandler();
   string startup_path_name(fStartupHandler->GetStartupFilePath().Data());
   fSaxParser->ConnectToHandler("PStartupHandler", fStartupHandler);
-  status = fSaxParser->ParseFile(startup_path_name.c_str());
+  //status = fSaxParser->ParseFile(startup_path_name.c_str());
+  // parsing the file as above seems to lead to problems in certain environments; try working around through a buffer as follows
+  xmlFile.open(startup_path_name.c_str(), ios::in | ios::ate); // open file for reading and go to the end of the file
+  if (xmlFile.is_open()) { // check if file has been opened successfully
+    xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
+    xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
+    xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
+    xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
+    xmlFile.close(); // close the XML file
+  }
+  if (!xmlBuffer) { // file has not been read into the buffer
+    status = 1;
+  } else {
+    status = fSaxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
+    delete[] xmlBuffer; // free the buffer memory
+    xmlBuffer = 0;
+  }
   // check for parse errors
   if (status) { // error
     cerr << endl << ">> msr2data: **WARNING** Reading/parsing musrfit_startup.xml failed." << endl;

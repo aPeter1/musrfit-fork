@@ -33,6 +33,7 @@
 #include <cmath>
 
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 #include <TSAXParser.h>
@@ -64,10 +65,30 @@ PMagProximityFitterGlobal::PMagProximityFitterGlobal()
   PMPStartupHandler *fStartupHandler = new PMPStartupHandler();
   strcpy(startup_path_name, fStartupHandler->GetStartupFilePath().Data());
   saxParser->ConnectToHandler("PMPStartupHandler", fStartupHandler);
-  Int_t status = saxParser->ParseFile(startup_path_name);
+  //Int_t status = saxParser->ParseFile(startup_path_name);
+  // parsing the file as above seems to lead to problems in certain environments; try working around through a buffer as follows
+  fstream xmlFile;
+  unsigned int xmlSize = 0;
+  char *xmlBuffer = 0;
+  xmlFile.open(startup_path_name, ios::in | ios::ate); // open file for reading and go to the end of the file
+  if (xmlFile.is_open()) { // check if file has been opened successfully
+    xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
+    xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
+    xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
+    xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
+    xmlFile.close(); // close the XML file
+  }
+  Int_t status;
+  if (!xmlBuffer) { // file has not been read into the buffer
+    status = 1;
+  } else {
+    status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
+    delete[] xmlBuffer; // free the buffer memory
+    xmlBuffer = 0;
+  }
   // check for parse errors
   if (status) { // error
-    cout << endl << ">> PMagProximityFitterGlobal::PMagProximityFitterGlobal: **WARNING** reading/parsing mag_proximity_startup.xml.";
+    cout << endl << ">> PMagProximityFitterGlobal::PMagProximityFitterGlobal: **WARNING** Reading/parsing mag_proximity_startup.xml failed.";
     cout << endl;
     fValid = false;
   }

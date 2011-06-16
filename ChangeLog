@@ -10,6 +10,8 @@ NEW the chi^2 calculation in single-histogram and asymmetry fits is parallelized
     if musrfit is built using a compiler supporting OpenMP (e.g. GCC >= 4.2)
     Using --disable-omp this feature can be disabled on the configure level.
 NEW any2many: force the user to define the exact NeXus ouput format (HDF4,HDF5,XML)
+FIXED a linking problem when only shared libraries are built on Cygwin
+FIXED the problem that in certain environments XML files could not be parsed (MUSR-122)
 FIXED crash of musrview in case the XML startup file is present but cannot be parsed correctly
 FIXED crash in case a non-existing userFcn is called from an existing library (MUSR-159)
 FIXED slightly wrong chisq since the 0-bin entries were treated wrongly for scaled N0/Bkg data (MUSR-193)
