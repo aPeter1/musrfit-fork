@@ -9,7 +9,7 @@
     <default_save_path>./</default_save_path>
     <msr_default_file_path>$HOME/analysis/musrfit/src/musredit</msr_default_file_path>
     <title_from_data_file>y</title_from_data_file>
-    <enable_musrt0>n</enable_musrt0>
+    <enable_musrt0>y</enable_musrt0>
   </general>
   <help_section>
     <musr_web_main>http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html</musr_web_main>

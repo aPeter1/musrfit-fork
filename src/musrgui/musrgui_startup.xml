@@ -9,7 +9,7 @@
     <default_save_path>./</default_save_path>
     <msr_default_file_path>$HOME/analysis/musrfit/src/musrgui</msr_default_file_path>
     <title_from_data_file>n</title_from_data_file>
-    <enable_musrt0>n</enable_musrt0>
+    <enable_musrt0>y</enable_musrt0>
   </general>
   <font_settings>
     <font_name>Courier</font_name>

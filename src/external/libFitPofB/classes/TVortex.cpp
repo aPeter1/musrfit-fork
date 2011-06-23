@@ -30,7 +30,6 @@
 
 #include "TVortex.h"
 #include <iostream>
-#include <fstream>
 #include <cassert>
 #include <cmath>
 using namespace std;
@@ -167,26 +166,9 @@ TBulkTriVortexLondon::TBulkTriVortexLondon() : fCalcNeeded(true), fFirstCall(tru
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
     saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     //int status (saxParser->ParseFile(startup_path_name.c_str()));
-    // parsing the file as above seems to lead to problems in certain environments; try working around through a buffer as follows
-    fstream xmlFile;
-    unsigned int xmlSize = 0;
-    char *xmlBuffer = 0;
-    xmlFile.open(startup_path_name.c_str(), ios::in | ios::ate); // open file for reading and go to the end of the file
-    if (xmlFile.is_open()) { // check if file has been opened successfully
-      xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
-      xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
-      xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
-      xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
-      xmlFile.close(); // close the XML file
-    }
-    int status;
-    if (!xmlBuffer) { // file has not been read into the buffer
-      status = 1;
-    } else {
-      status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
-      delete[] xmlBuffer; // free the buffer memory
-      xmlBuffer = 0;
-    }
+    // parsing the file as above seems to lead to problems in certain environments;
+    // use the parseXmlFile function instead (see PUserFcnBase.cpp for the definition)
+    int status = parseXmlFile(saxParser, startup_path_name.c_str());
     // check for parse errors
     if (status) { // error
       cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
@@ -244,26 +226,9 @@ TBulkSqVortexLondon::TBulkSqVortexLondon() : fCalcNeeded(true), fFirstCall(true)
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
     saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     //int status (saxParser->ParseFile(startup_path_name.c_str()));
-    // parsing the file as above seems to lead to problems in certain environments; try working around through a buffer as follows
-    fstream xmlFile;
-    unsigned int xmlSize = 0;
-    char *xmlBuffer = 0;
-    xmlFile.open(startup_path_name.c_str(), ios::in | ios::ate); // open file for reading and go to the end of the file
-    if (xmlFile.is_open()) { // check if file has been opened successfully
-      xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
-      xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
-      xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
-      xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
-      xmlFile.close(); // close the XML file
-    }
-    int status;
-    if (!xmlBuffer) { // file has not been read into the buffer
-      status = 1;
-    } else {
-      status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
-      delete[] xmlBuffer; // free the buffer memory
-      xmlBuffer = 0;
-    }
+    // parsing the file as above seems to lead to problems in certain environments;
+    // use the parseXmlFile function instead (see PUserFcnBase.cpp for the definition)
+    int status = parseXmlFile(saxParser, startup_path_name.c_str());
     // check for parse errors
     if (status) { // error
       cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
@@ -491,26 +456,9 @@ TBulkTriVortexML::TBulkTriVortexML() : fCalcNeeded(true), fFirstCall(true) {
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
     saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     //int status (saxParser->ParseFile(startup_path_name.c_str()));
-    // parsing the file as above seems to lead to problems in certain environments; try working around through a buffer as follows
-    fstream xmlFile;
-    unsigned int xmlSize = 0;
-    char *xmlBuffer = 0;
-    xmlFile.open(startup_path_name.c_str(), ios::in | ios::ate); // open file for reading and go to the end of the file
-    if (xmlFile.is_open()) { // check if file has been opened successfully
-      xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
-      xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
-      xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
-      xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
-      xmlFile.close(); // close the XML file
-    }
-    int status;
-    if (!xmlBuffer) { // file has not been read into the buffer
-      status = 1;
-    } else {
-      status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
-      delete[] xmlBuffer; // free the buffer memory
-      xmlBuffer = 0;
-    }
+    // parsing the file as above seems to lead to problems in certain environments;
+    // use the parseXmlFile function instead (see PUserFcnBase.cpp for the definition)
+    int status = parseXmlFile(saxParser, startup_path_name.c_str());
     // check for parse errors
     if (status) { // error
       cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
@@ -647,26 +595,9 @@ TBulkTriVortexAGL::TBulkTriVortexAGL() : fCalcNeeded(true), fFirstCall(true) {
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
     saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     //int status (saxParser->ParseFile(startup_path_name.c_str()));
-    // parsing the file as above seems to lead to problems in certain environments; try working around through a buffer as follows
-    fstream xmlFile;
-    unsigned int xmlSize = 0;
-    char *xmlBuffer = 0;
-    xmlFile.open(startup_path_name.c_str(), ios::in | ios::ate); // open file for reading and go to the end of the file
-    if (xmlFile.is_open()) { // check if file has been opened successfully
-      xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
-      xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
-      xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
-      xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
-      xmlFile.close(); // close the XML file
-    }
-    int status;
-    if (!xmlBuffer) { // file has not been read into the buffer
-      status = 1;
-    } else {
-      status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
-      delete[] xmlBuffer; // free the buffer memory
-      xmlBuffer = 0;
-    }
+    // parsing the file as above seems to lead to problems in certain environments;
+    // use the parseXmlFile function instead (see PUserFcnBase.cpp for the definition)
+    int status = parseXmlFile(saxParser, startup_path_name.c_str());
     // check for parse errors
     if (status) { // error
       cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
@@ -802,26 +733,9 @@ TBulkTriVortexAGLII::TBulkTriVortexAGLII() : fCalcNeeded(true), fFirstCall(true)
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
     saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     //int status (saxParser->ParseFile(startup_path_name.c_str()));
-    // parsing the file as above seems to lead to problems in certain environments; try working around through a buffer as follows
-    fstream xmlFile;
-    unsigned int xmlSize = 0;
-    char *xmlBuffer = 0;
-    xmlFile.open(startup_path_name.c_str(), ios::in | ios::ate); // open file for reading and go to the end of the file
-    if (xmlFile.is_open()) { // check if file has been opened successfully
-      xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
-      xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
-      xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
-      xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
-      xmlFile.close(); // close the XML file
-    }
-    int status;
-    if (!xmlBuffer) { // file has not been read into the buffer
-      status = 1;
-    } else {
-      status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
-      delete[] xmlBuffer; // free the buffer memory
-      xmlBuffer = 0;
-    }
+    // parsing the file as above seems to lead to problems in certain environments;
+    // use the parseXmlFile function instead (see PUserFcnBase.cpp for the definition)
+    int status = parseXmlFile(saxParser, startup_path_name.c_str());
     // check for parse errors
     if (status) { // error
       cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
@@ -970,26 +884,9 @@ TBulkTriVortexNGL::TBulkTriVortexNGL() : fCalcNeeded(true), fFirstCall(true) {
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
     saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     //int status (saxParser->ParseFile(startup_path_name.c_str()));
-    // parsing the file as above seems to lead to problems in certain environments; try working around through a buffer as follows
-    fstream xmlFile;
-    unsigned int xmlSize = 0;
-    char *xmlBuffer = 0;
-    xmlFile.open(startup_path_name.c_str(), ios::in | ios::ate); // open file for reading and go to the end of the file
-    if (xmlFile.is_open()) { // check if file has been opened successfully
-      xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
-      xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
-      xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
-      xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
-      xmlFile.close(); // close the XML file
-    }
-    int status;
-    if (!xmlBuffer) { // file has not been read into the buffer
-      status = 1;
-    } else {
-      status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
-      delete[] xmlBuffer; // free the buffer memory
-      xmlBuffer = 0;
-    }
+    // parsing the file as above seems to lead to problems in certain environments;
+    // use the parseXmlFile function instead (see PUserFcnBase.cpp for the definition)
+    int status = parseXmlFile(saxParser, startup_path_name.c_str());
     // check for parse errors
     if (status) { // error
       cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
@@ -1142,26 +1039,9 @@ TBulkAnisotropicTriVortexLondonGlobal::TBulkAnisotropicTriVortexLondonGlobal() :
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
     saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     //int status (saxParser->ParseFile(startup_path_name.c_str()));
-    // parsing the file as above seems to lead to problems in certain environments; try working around through a buffer as follows
-    fstream xmlFile;
-    unsigned int xmlSize = 0;
-    char *xmlBuffer = 0;
-    xmlFile.open(startup_path_name.c_str(), ios::in | ios::ate); // open file for reading and go to the end of the file
-    if (xmlFile.is_open()) { // check if file has been opened successfully
-      xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
-      xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
-      xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
-      xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
-      xmlFile.close(); // close the XML file
-    }
-    int status;
-    if (!xmlBuffer) { // file has not been read into the buffer
-      status = 1;
-    } else {
-      status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
-      delete[] xmlBuffer; // free the buffer memory
-      xmlBuffer = 0;
-    }
+    // parsing the file as above seems to lead to problems in certain environments;
+    // use the parseXmlFile function instead (see PUserFcnBase.cpp for the definition)
+    int status = parseXmlFile(saxParser, startup_path_name.c_str());
     // check for parse errors
     if (status) { // error
       cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
@@ -1401,26 +1281,9 @@ TBulkAnisotropicTriVortexMLGlobal::TBulkAnisotropicTriVortexMLGlobal() : fCalcNe
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
     saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     //int status (saxParser->ParseFile(startup_path_name.c_str()));
-    // parsing the file as above seems to lead to problems in certain environments; try working around through a buffer as follows
-    fstream xmlFile;
-    unsigned int xmlSize = 0;
-    char *xmlBuffer = 0;
-    xmlFile.open(startup_path_name.c_str(), ios::in | ios::ate); // open file for reading and go to the end of the file
-    if (xmlFile.is_open()) { // check if file has been opened successfully
-      xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
-      xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
-      xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
-      xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
-      xmlFile.close(); // close the XML file
-    }
-    int status;
-    if (!xmlBuffer) { // file has not been read into the buffer
-      status = 1;
-    } else {
-      status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
-      delete[] xmlBuffer; // free the buffer memory
-      xmlBuffer = 0;
-    }
+    // parsing the file as above seems to lead to problems in certain environments;
+    // use the parseXmlFile function instead (see PUserFcnBase.cpp for the definition)
+    int status = parseXmlFile(saxParser, startup_path_name.c_str());
     // check for parse errors
     if (status) { // error
       cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
@@ -1660,26 +1523,9 @@ TBulkAnisotropicTriVortexAGLGlobal::TBulkAnisotropicTriVortexAGLGlobal() : fCalc
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
     saxParser->ConnectToHandler("BMWStartupHandler", startupHandler);
     //int status (saxParser->ParseFile(startup_path_name.c_str()));
-    // parsing the file as above seems to lead to problems in certain environments; try working around through a buffer as follows
-    fstream xmlFile;
-    unsigned int xmlSize = 0;
-    char *xmlBuffer = 0;
-    xmlFile.open(startup_path_name.c_str(), ios::in | ios::ate); // open file for reading and go to the end of the file
-    if (xmlFile.is_open()) { // check if file has been opened successfully
-      xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
-      xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
-      xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
-      xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
-      xmlFile.close(); // close the XML file
-    }
-    int status;
-    if (!xmlBuffer) { // file has not been read into the buffer
-      status = 1;
-    } else {
-      status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
-      delete[] xmlBuffer; // free the buffer memory
-      xmlBuffer = 0;
-    }
+    // parsing the file as above seems to lead to problems in certain environments;
+    // use the parseXmlFile function instead (see PUserFcnBase.cpp for the definition)
+    int status = parseXmlFile(saxParser, startup_path_name.c_str());
     // check for parse errors
     if (status) { // error
       cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \

@@ -36,6 +36,7 @@
 using namespace std;
 
 #include "TObject.h"
+#include "TSAXParser.h"
 
 //--------------------------------------------------------------------------------------------
 /**
@@ -55,5 +56,10 @@ class PUserFcnBase : public TObject
 
   ClassDef(PUserFcnBase, 1)
 };
+
+//--------------------------------------------------------------------------
+// This function is a replacement for the ParseFile method of TSAXParser.
+//--------------------------------------------------------------------------
+Int_t parseXmlFile(TSAXParser*, const Char_t*);
 
 #endif // _PUSERFCNBASE_H_

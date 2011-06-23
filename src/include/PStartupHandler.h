@@ -36,8 +36,14 @@
 #include <TQObject.h>
 #include <TList.h>
 #include <TString.h>
+#include <TSAXParser.h>
 
 #include "PMusr.h"
+
+//--------------------------------------------------------------------------
+// This function is a replacement for the ParseFile method of TSAXParser.
+//--------------------------------------------------------------------------
+int parseXmlFile(TSAXParser*, const char*);
 
 /**
  * <p>Handles the XML musrfit startup file (musrfit_startup.xml) in which default settings
