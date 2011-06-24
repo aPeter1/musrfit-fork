@@ -86,16 +86,16 @@ CLEANFILES = *Dict.cpp *Dict.h *~ core
 %Dict.cpp %Dict.h: ../include/%.h ../include/%LinkDef.h
 	@ROOTCINT@ -v -f $*Dict.cpp -c -p $(INCLUDES) $^
 
-lib_LTLIBRARIES = libPMusr.la libPUserFcnBase.la
-
-libPMusr_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources)
-libPMusr_la_LIBADD = libPUserFcnBase.la $(LEM_LIBS) $(PSIBIN_LIBS) $(MUD_LIBS) $(PNEXUS_LIBS) $(FFTW3_LIBS) $(GSL_LIBS) $(ROOT_LIBS)
-libPMusr_la_LDFLAGS = -version-info $(MUSR_LIBRARY_VERSION) -release $(MUSR_RELEASE) $(AM_LDFLAGS)
+lib_LTLIBRARIES = libPUserFcnBase.la libPMusr.la
 
 libPUserFcnBase_la_SOURCES = $(h_sources_userFcn) $(cpp_sources_userFcn) $(dict_h_sources_userFcn) $(dict_cpp_sources_userFcn)
 libPUserFcnBase_la_LIBADD = $(ROOT_LIBS)
 libPUserFcnBase_la_LDFLAGS = -version-info $(MUSR_LIBRARY_VERSION) -release $(MUSR_RELEASE) $(AM_LDFLAGS)
 
+libPMusr_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources)
+libPMusr_la_LIBADD = libPUserFcnBase.la $(LEM_LIBS) $(PSIBIN_LIBS) $(MUD_LIBS) $(PNEXUS_LIBS) $(FFTW3_LIBS) $(GSL_LIBS) $(ROOT_LIBS)
+libPMusr_la_LDFLAGS = -version-info $(MUSR_LIBRARY_VERSION) -release $(MUSR_RELEASE) $(AM_LDFLAGS)
+
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = PMusr.pc PUserFcnBase.pc
+pkgconfig_DATA = PUserFcnBase.pc PMusr.pc
 
