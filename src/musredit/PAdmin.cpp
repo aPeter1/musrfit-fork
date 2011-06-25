@@ -556,7 +556,15 @@ PAdmin::PAdmin()
   fMsr2DataParam.global = false;
 
   // XML Parser part
-  QString fln = "./musredit_startup.xml";
+  QString fln = "musredit_startup.xml";
+  // check if it is a MacOSX
+#ifdef Q_WS_MAC
+  fln = "./musredit_startup.xml";
+  if (!QFile::exists(fln)) {
+    fln = "/Applications/musredit.app/Contents/Resources/musredit_startup.xml";
+  }
+#else
+  fln = "./musredit_startup.xml";
   if (!QFile::exists(fln)) {
     QString path = std::getenv("MUSRFITPATH");
     QString rootsys = std::getenv("ROOTSYS");
@@ -564,6 +572,7 @@ PAdmin::PAdmin()
       path = rootsys + "/bin";
     fln = path + "/musredit_startup.xml";
   }
+#endif
   if (QFile::exists(fln)) { // administration file present
     PAdminXMLParser handler(this);
     QFile xmlFile(fln);

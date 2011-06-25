@@ -46,14 +46,14 @@ QMAKE_CXX = g++
 
 # install path for the XML configuration file
 unix:xml.path = $${MUSREDIT_INSTALL_PATH}
-macx:xml.path = $${MUSREDIT_INSTALL_PATH}
+macx:xml.path = /Applications/musredit.app/Contents/Resources
 win32:xml.path = c:/musrfit/bin
 xml.files = musredit_startup.xml
 INSTALLS += xml
 
 CONFIG += qt \
     warn_on \
-    debug
+    release
 
 QT += xml
 QT += webkit
