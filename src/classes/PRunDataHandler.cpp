@@ -36,6 +36,7 @@
 #include <cstdio>
 #include <ctime>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <string>
 using namespace std;
@@ -1139,7 +1140,7 @@ Bool_t PRunDataHandler::ReadRootFile(UInt_t tag)
     // this is not fatal... only RA-HV values are not available
   } else { // it follows a (at least) little bit strange extraction of the RA values from Thomas' TObjArray...
            //streaming of a ASCII-file would be more easy
-    TString s, tok;
+    TString s;
     TObjArrayIter summIter(runSummary);
     TObjString *os(dynamic_cast<TObjString*>(summIter.Next()));
     TObjArray *oa(0);
@@ -1241,7 +1242,7 @@ Bool_t PRunDataHandler::ReadRootFile(UInt_t tag)
       // keep maximum of histogram as a T0 estimate
       runData.AppendT0Estimated(histo->GetMaximumBin());
       // fill data
-      for (Int_t j=1; j<histo->GetNbinsX(); j++) {
+      for (Int_t j=1; j<=histo->GetNbinsX(); j++) {
         histoData.push_back(histo->GetBinContent(j));
       }
       // store them in runData vector
@@ -1261,7 +1262,7 @@ Bool_t PRunDataHandler::ReadRootFile(UInt_t tag)
       // keep maximum of histogram as a T0 estimate
       runData.AppendT0Estimated(histo->GetMaximumBin());
       // fill data
-      for (Int_t j=1; j<histo->GetNbinsX(); j++)
+      for (Int_t j=1; j<=histo->GetNbinsX(); j++)
         histoData.push_back(histo->GetBinContent(j));
       // store them in runData vector
       runData.AppendDataBin(histoData);
@@ -1280,7 +1281,7 @@ Bool_t PRunDataHandler::ReadRootFile(UInt_t tag)
       // keep maximum of histogram as a T0 estimate
       runData.AppendT0Estimated(histo->GetMaximumBin());
       // fill data
-      for (Int_t j=1; j<histo->GetNbinsX(); j++) {
+      for (Int_t j=1; j<=histo->GetNbinsX(); j++) {
         histoData.push_back(histo->GetBinContent(j));
       }
       // store them in runData vector
@@ -1299,7 +1300,7 @@ Bool_t PRunDataHandler::ReadRootFile(UInt_t tag)
       // keep maximum of histogram as a T0 estimate
       runData.AppendT0Estimated(histo->GetMaximumBin());
       // fill data
-      for (Int_t j=1; j<histo->GetNbinsX(); j++)
+      for (Int_t j=1; j<=histo->GetNbinsX(); j++)
         histoData.push_back(histo->GetBinContent(j));
       // store them in runData vector
       runData.AppendDataBin(histoData);
@@ -3518,12 +3519,22 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
  */
 Bool_t PRunDataHandler::WriteWkmFile(TString fln)
 {
+  // check if a LEM nemu file needs to be written
+  bool lem_wkm_style = false;
+  if (!fAny2ManyInfo->inFormat.CompareTo("ROOT"))
+    lem_wkm_style = true;
+
   // generate output file name
+  TString fileName("");
   if (fln.Length() == 0) {
     Bool_t ok = false;
-    fln = GetFileName(".wkm", ok);
+    if (lem_wkm_style)
+      fln = GetFileName(".nemu", ok);
+    else
+      fln = GetFileName(".wkm", ok);
     if (!ok)
       return false;
+    fileName = fln;
   } else {
     fln.Prepend(fAny2ManyInfo->outPath);
   }
@@ -3555,53 +3566,69 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
 
   // write header
   cout << "- WKM data file converted with any2many";
-  cout << endl << "Run         : " << fData[0].GetRunNumber();
+  if (lem_wkm_style) {
+    cout << endl << "NEMU_Run:            " << fData[0].GetRunNumber();
+    cout << endl << "nemu_Run:            " << fileName.Data();
+  } else {
+    cout << endl << "Run:                 " << fData[0].GetRunNumber();
+  }
+  cout << endl << "Date:                " << fData[0].GetStartTime()->Data() << " " << fData[0].GetStartDate()->Data() << " / " << fData[0].GetStopTime()->Data() << " " << fData[0].GetStopDate()->Data();
   if (fData[0].GetRunTitle()->Length() > 0)
-    cout << endl << "Title       : " << fData[0].GetRunTitle()->Data();
-  if (fData[0].GetNoOfTemperatures() == 1) {
-    cout << endl << "Temp        : " << fData[0].GetTemperature(0);
-  } else if (fData[0].GetNoOfTemperatures() > 1) {
-    cout << endl << "Temp(meas1) : " << fData[0].GetTemperature(0) << " +- " << fData[0].GetTempError(0);
-    cout << endl << "Temp(meas2) : " << fData[0].GetTemperature(1) << " +- " << fData[0].GetTempError(1);
-  } else {
-    cout << endl << "Temp        : ??";
-  }
+    cout << endl << "Title:               " << fData[0].GetRunTitle()->Data();
   if (fData[0].GetField() != PMUSR_UNDEFINED) {
-    cout << endl << "Field       : " << fData[0].GetField();
+    cout << endl << "Field:               " << fData[0].GetField();
   } else {
-    cout << endl << "Field       : ??";
+    cout << endl << "Field:               ??";
   }
-  cout << endl << "Date        : " << fData[0].GetStartTime()->Data() << " " << fData[0].GetStartDate()->Data() << " / " << fData[0].GetStopTime()->Data() << " " << fData[0].GetStopDate()->Data();
-  cout << endl << "Setup       : " << fData[0].GetSetup()->Data();
-  cout << endl << "Groups      : " << fData[0].GetNoOfHistos();
-  cout << endl << "Channels    : " << static_cast<UInt_t>(fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin);
+  cout << endl << "Setup:               " << fData[0].GetSetup()->Data();
+  if (fData[0].GetNoOfTemperatures() == 1) {
+    cout << endl << "Temp:                " << fData[0].GetTemperature(0);
+  } else if (fData[0].GetNoOfTemperatures() > 1) {
+    cout << endl << "Temp(meas1):         " << fData[0].GetTemperature(0) << " +- " << fData[0].GetTempError(0);
+    cout << endl << "Temp(meas2):         " << fData[0].GetTemperature(1) << " +- " << fData[0].GetTempError(1);
+  } else {
+    cout << endl << "Temp:                ??";
+  }
+  if (lem_wkm_style)
+    cout << endl << "TOF(M3S1):           nocut";
+  cout << endl << "Groups:              " << fData[0].GetNoOfHistos();
+  cout << endl << "Channels:            " << static_cast<UInt_t>(fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin);
   cout.precision(10);
-  cout << endl << "Resolution  : " << fData[0].GetTimeResolution()*fAny2ManyInfo->rebin/1.0e3; // ns->us
+  cout << endl << "Resolution:          " << fData[0].GetTimeResolution()*fAny2ManyInfo->rebin/1.0e3; // ns->us
   cout.setf(ios::fixed,ios::floatfield);   // floatfield set to fixed
 
   // write data
+  UInt_t no_of_bins_per_line = 16;
+  if (lem_wkm_style)
+    no_of_bins_per_line = 10;
   if (fAny2ManyInfo->rebin == 1) {
     for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
       cout << endl << endl;
       for (UInt_t j=0; j<fData[0].GetDataBin(i)->size(); j++) {
-        if ((j > 0) && (j % 16 == 0))
+        if ((j > 0) && (j % no_of_bins_per_line == 0))
           cout << endl;
-        cout << static_cast<Int_t>(fData[0].GetDataBin(i)->at(j)) << " ";
+        if (lem_wkm_style)
+          cout << setw(8) << static_cast<Int_t>(fData[0].GetDataBin(i)->at(j));
+        else
+          cout << static_cast<Int_t>(fData[0].GetDataBin(i)->at(j)) << " ";
       }
     }
   } else { // rebin > 1
     Int_t dataRebin = 0;
-    Int_t count = 0;
+    UInt_t count = 0;
     for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
       cout << endl << endl;
       count = 0;
       dataRebin = 0; // reset rebin
       for (UInt_t j=0; j<fData[0].GetDataBin(i)->size(); j++) {
         if ((j > 0) && (j % fAny2ManyInfo->rebin == 0)) {
-          cout << dataRebin << " ";
+          if (lem_wkm_style)
+            cout << setw(8) << dataRebin;
+          else
+            cout << dataRebin << " ";
           count++;
           dataRebin = 0;
-          if ((count > 0) && (count % 16 == 0))
+          if ((count > 0) && (count % no_of_bins_per_line == 0))
             cout << endl;
         } else {
           dataRebin += static_cast<Int_t>(fData[0].GetDataBin(i)->at(j));
@@ -3982,11 +4009,13 @@ Bool_t PRunDataHandler::WriteMudFile(TString fln)
 Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
 {
   // generate output file name
+  TString fileName("");
   if (fln.Length() == 0) {
     Bool_t ok = false;
     fln = GetFileName(".ascii", ok);
     if (!ok)
       return false;
+    fileName = fln;
   } else {
     fln.Prepend(fAny2ManyInfo->outPath);
   }
@@ -4018,7 +4047,7 @@ Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
 
   // write header
   cout << "%*************************************************************************";
-  cout << endl << "% file name   : " << fln.Data();
+  cout << endl << "% file name   : " << fileName.Data();
   if (fData[0].GetRunTitle()->Length() > 0)
     cout << endl << "% title       : " << fData[0].GetRunTitle()->Data();
   if (fData[0].GetRunNumber() >= 0)
@@ -4058,7 +4087,7 @@ Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
   // write data
   if (fAny2ManyInfo->rebin == 1) {
     UInt_t length = fData[0].GetDataBin(0)->size();
-    for (UInt_t i=1; i<length; i++) {
+    for (UInt_t i=0; i<length; i++) {
       cout << endl;
       for (UInt_t j=0; j<fData[0].GetNoOfHistos(); j++) {
         cout.width(8);
@@ -4073,7 +4102,7 @@ Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
     for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++)
       dataRebin[i] = static_cast<UInt_t>(fData[0].GetDataBin(i)->at(0));
 
-    for (UInt_t i=1; i<length; i++) {
+    for (UInt_t i=0; i<length; i++) {
       if ((i % fAny2ManyInfo->rebin) == 0) {
         cout << endl;
         for (UInt_t j=0; j<fData[0].GetNoOfHistos(); j++) {
