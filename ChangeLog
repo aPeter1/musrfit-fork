@@ -21,6 +21,7 @@ FIXED bug reported in MUSR-183: missing background for 2nd histo in asymmetry fi
 FIXED Makefiles so that the NeXus support will not be built if it has not been enabled during the configure stage
 FIXED ASCII export from musrview in case of a Fourier-Power- or Fourier-Phase-difference plot
 FIXED bug in asymmetry fit with fixed background
+CHANGED improved handling of 'old' ROOT LEM data files (2006 and earlier) for any2many (MUSR-178)
 CHANGED improved handling of WKM/ASCII in PRunDataHandler for any2many (MUSR-172)
 CHANGED the data-file-name handling (MUSR-195).
         It is now possible to specify the full file name in the RUN block (including the extension).

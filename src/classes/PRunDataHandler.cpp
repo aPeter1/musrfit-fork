@@ -1289,23 +1289,31 @@ Bool_t PRunDataHandler::ReadRootFile(UInt_t tag)
       // clear histoData for the next histo
       histoData.clear();
     }
-    for (Int_t i=0; i<noOfHistos; i++) {
-      sprintf(histoName, "hDecay%02d", i+POST_PILEUP_HISTO_OFFSET);
-      TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
-      if (!histo) {
-        cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't get histo " << histoName;
-        cerr << endl;
-        return false;
+    // check if any post pileup histos are present at all (this is not the case for LEM data 2006 and earlier)
+    sprintf(histoName, "hDecay%02d", POST_PILEUP_HISTO_OFFSET);
+    if (!folder->FindObjectAny(histoName)) {
+      cerr << endl << ">> PRunDataHandler::ReadRootFile: **WARNING** Couldn't get histo " << histoName;
+      cerr << endl << ">>   most probably this is an old (2006 or earlier) LEM file without post pileup histos.";
+      cerr << endl;
+    } else {
+      for (Int_t i=0; i<noOfHistos; i++) {
+        sprintf(histoName, "hDecay%02d", i+POST_PILEUP_HISTO_OFFSET);
+        TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
+        if (!histo) {
+          cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't get histo " << histoName;
+          cerr << endl;
+          return false;
+        }
+        // keep maximum of histogram as a T0 estimate
+        runData.AppendT0Estimated(histo->GetMaximumBin());
+        // fill data
+        for (Int_t j=1; j<=histo->GetNbinsX(); j++)
+          histoData.push_back(histo->GetBinContent(j));
+        // store them in runData vector
+        runData.AppendDataBin(histoData);
+        // clear histoData for the next histo
+        histoData.clear();
       }
-      // keep maximum of histogram as a T0 estimate
-      runData.AppendT0Estimated(histo->GetMaximumBin());
-      // fill data
-      for (Int_t j=1; j<=histo->GetNbinsX(); j++)
-        histoData.push_back(histo->GetBinContent(j));
-      // store them in runData vector
-      runData.AppendDataBin(histoData);
-      // clear histoData for the next histo
-      histoData.clear();
     }
   }
 
