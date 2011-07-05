@@ -40,29 +40,26 @@ class TPsiRunProperty : public TObject
 {
 public:
   TPsiRunProperty();
-  TPsiRunProperty(TObjString &name, Double_t value, Double_t error, TObjString &unit);
   TPsiRunProperty(TString &name, Double_t value, Double_t error, TString &unit);
   virtual ~TPsiRunProperty();
 
-  virtual TObjString GetName() { return fName; }
-  virtual Double_t   GetValue() { return fValue; }
-  virtual Double_t   GetError() { return fError; }
-  virtual TObjString GetUnit() { return fUnit; }
+  virtual TString GetLabel() const { return fLabel; }
+  virtual Double_t GetValue() const { return fValue; }
+  virtual Double_t GetError() const { return fError; }
+  virtual TString  GetUnit() const { return fUnit; }
 
-  virtual void SetName(TObjString &name) { fName = name; }
-  virtual void SetName(TString &name) { fName = name.Data(); }
-  virtual void SetName(const char *name) { fName = name; }
+  virtual void SetLabel(TString &label) { fLabel = label; }
+  virtual void SetLabel(const char *label) { fLabel = label; }
   virtual void SetValue(Double_t val) { fValue = val; }
   virtual void SetError(Double_t err) { fError = err; }
-  virtual void SetUnit(TObjString &unit) { fUnit = unit; }
   virtual void SetUnit(TString &unit) { fUnit = unit.Data(); }
   virtual void SetUnit(const char *unit) { fUnit = unit; }
 
 private:
-  TObjString fName;
-  Double_t   fValue;
-  Double_t   fError;
-  TObjString fUnit;
+  TString  fLabel;
+  Double_t fValue;
+  Double_t fError;
+  TString  fUnit;
 
   ClassDef(TPsiRunProperty, 1)
 };
@@ -73,42 +70,46 @@ public:
   TPsiRunHeader();
   virtual ~TPsiRunHeader();
 
-  virtual TString GetVersion() const;
-  virtual TString GetRunTitle() const;
-  virtual Int_t GetRunNumber() const;
-  virtual TString GetLab() const;
-  virtual TString GetInstrument() const;
-  virtual TString GetSetup() const;
-  virtual TString GetSample() const;
-  virtual TString GetOrientation() const;
-  virtual TObjArray *GetProperties() { return &fProperties; }
+  virtual TString GetVersion() const { return fVersion; }
+  virtual TString GetRunTitle() const { return fRunTitle; }
+  virtual Int_t GetRunNumber() const { return fRunNumber; }
+  virtual TString GetLab() const { return fLaboratory; }
+  virtual TString GetInstrument() const { return fInstrument; }
+  virtual TString GetSetup() const { return fSetup; }
+  virtual TString GetSample() const { return fSample; }
+  virtual TString GetOrientation() const { return fOrientation; }
+  virtual vector<TPsiRunProperty> *GetProperties() { return &fProperties; }
 
-  virtual void SetRunTitle(TString runTitle);
-  virtual void SetRunNumber(Int_t runNumber);
-  virtual void SetLab(TString lab);
-  virtual void SetInstrument(TString insturment);
-  virtual void SetSetup(TString setup);
-  virtual void SetSample(TString sample);
-  virtual void SetOrientation(TString setup);
+  virtual TObjArray *GetHeader();
+
+  virtual void SetRunTitle(TString runTitle) { fRunTitle = runTitle; }
+  virtual void SetRunNumber(Int_t runNumber) { fRunNumber = runNumber; }
+  virtual void SetLab(TString lab) { fLaboratory = lab; }
+  virtual void SetInstrument(TString insturment) { fInstrument = insturment; }
+  virtual void SetSetup(TString setup) { fSetup = setup; }
+  virtual void SetSample(TString sample) { fSample = sample; }
+  virtual void SetOrientation(TString orientation) { fOrientation = orientation; }
   virtual void AddProperty(TPsiRunProperty &property);
   virtual void AddProperty(TString name, Double_t value, Double_t error, TString unit);
+
 
   virtual void DumpHeader() const;
   virtual void DrawHeader() const;
 
 private:
-  TObjString fVersion;     /// SVN version of the TPsiRunHeader
-  TObjString fRunTitle;    /// run title
-  TObjString fRunNumber;   /// run number
-  TObjString fLaboratory;  /// laboratory: PSI
-  TObjString fInstrument;  /// instrument name like: GPS, LEM, ....
-  TObjString fSetup;       /// setup
-  TObjString fSample;      /// sample name
-  TObjString fOrientation; /// sample orientation
-  TObjArray  fPropertiesList;
-  TObjArray  fProperties;
+  TString fVersion;     /// SVN version of the TPsiRunHeader
+  TString fRunTitle;    /// run title
+  Int_t   fRunNumber;   /// run number
+  TString fLaboratory;  /// laboratory: PSI
+  TString fInstrument;  /// instrument name like: GPS, LEM, ....
+  TString fSetup;       /// setup
+  TString fSample;      /// sample name
+  TString fOrientation; /// sample orientation
+  vector<TPsiRunProperty> fProperties;
 
-  virtual TString GetInfoString(const TObjString &tostr) const;
+  TObjArray fHeader; /// header as TObjString array for dumping into a ROOT file
+
+  UInt_t GetDecimalPlace(Double_t val);
 
   ClassDef(TPsiRunHeader, 1)
 };

@@ -52,21 +52,10 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  TFile *f = new TFile(argv[1], "RECREATE", "psi_runHeader_test");
-  if (f->IsZombie()) {
-    delete f;
-    return -1;
-  }
-
-  // root file header related things
-  TFolder *runInfo = gROOT->GetRootFolder()->AddFolder("RunInfo", "PSI RunInfo");
-  gROOT->GetListOfBrowsables()->Add(runInfo, "RunInfo");
-
+  // PSI Run Header object
   TPsiRunHeader *header = new TPsiRunHeader();
 
-  runInfo->Add(header); // add header to RunInfo folder
-
-  header->SetRunTitle("This is a run title");  
+  header->SetRunTitle("This is a run title");
   header->SetRunNumber(12345);
   header->SetLab("PSI");
   header->SetInstrument("LEM");
@@ -76,12 +65,21 @@ int main(int argc, char *argv[])
 
   header->AddProperty("T0", 30.01, 0.05, "K");
   header->AddProperty("T1", 30.03, 0.03, "K");
-  header->AddProperty("Field", 3.03, 0.03, "T");
+  header->AddProperty("Field", 3.00003, 0.0003, "T");
+  header->AddProperty("BigError", 13.2, 1.2, "Something");
   header->AddProperty("ThisIsAVeryLongPropertyName", 3.03, 0.03, "SI-Unit");
 
   header->DumpHeader();
 
-  runInfo->Write();
+  TFile *f = new TFile(argv[1], "RECREATE", "psi_runHeader_test");
+  if (f->IsZombie()) {
+    delete f;
+    return -1;
+  }
+
+  f->mkdir("RunHeader");
+  f->cd("RunHeader");
+  header->GetHeader()->Write();
 
   f->Close();
 
