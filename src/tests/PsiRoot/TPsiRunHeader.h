@@ -81,6 +81,7 @@ public:
   virtual vector<TPsiRunProperty> *GetProperties() { return &fProperties; }
 
   virtual TObjArray *GetHeader();
+  virtual Bool_t ExtractHeaderInformation(TObjArray *runHeader);
 
   virtual void SetRunTitle(TString runTitle) { fRunTitle = runTitle; }
   virtual void SetRunNumber(Int_t runNumber) { fRunNumber = runNumber; }

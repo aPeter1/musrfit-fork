@@ -137,6 +137,7 @@ TPsiRunHeader::~TPsiRunHeader()
 TObjArray* TPsiRunHeader::GetHeader()
 {
   // make sure that previous header is removed
+  fHeader.Delete();
   fHeader.Expand(0);
 
   char str[1024], fmt[1024];
@@ -200,6 +201,20 @@ TObjArray* TPsiRunHeader::GetHeader()
   fHeader.SetName("RunHeader");
 
   return &fHeader;
+}
+
+//--------------------------------------------------------------------------
+// ExtractHeaderInformation (public)
+//--------------------------------------------------------------------------
+/**
+  * <p> Extracts from an array of TObjStrings containing the header information
+  * all the necessary parameters.
+  *
+  * \param runHeader an array of TObjStrings containing the header information
+  */
+Bool_t TPsiRunHeader::ExtractHeaderInformation(TObjArray *runHeader)
+{
+  return true;
 }
 
 //--------------------------------------------------------------------------

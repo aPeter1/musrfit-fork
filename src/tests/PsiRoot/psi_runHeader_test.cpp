@@ -77,8 +77,16 @@ int main(int argc, char *argv[])
     return -1;
   }
 
-  f->mkdir("RunHeader");
-  f->cd("RunHeader");
+  // root file header related things
+/*
+  TFolder *runInfo = gROOT->GetRootFolder()->AddFolder("RunInfo", "PSI RunInfo");
+  gROOT->GetListOfBrowsables()->Add(runInfo, "RunInfo");
+  runInfo->Add(header->GetHeader());
+  runInfo->Write();
+*/
+
+  f->mkdir("RunInfo");
+  f->cd("RunInfo");
   header->GetHeader()->Write();
 
   f->Close();
