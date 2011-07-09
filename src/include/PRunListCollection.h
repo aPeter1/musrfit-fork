@@ -59,6 +59,7 @@ class PRunListCollection
     virtual void SetFitRange(const PDoublePairVector fitRange);
 
     virtual Double_t GetSingleHistoChisq(const std::vector<Double_t>& par) const;
+    virtual Double_t GetSingleHistoChisqExpected(const std::vector<Double_t>& par, const UInt_t idx) const;
     virtual Double_t GetAsymmetryChisq(const std::vector<Double_t>& par) const;
     virtual Double_t GetMuMinusChisq(const std::vector<Double_t>& par) const;
     virtual Double_t GetNonMusrChisq(const std::vector<Double_t>& par) const;
@@ -68,6 +69,7 @@ class PRunListCollection
     virtual Double_t GetMuMinusMaximumLikelihood(const std::vector<Double_t>& par) const;
     virtual Double_t GetNonMusrMaximumLikelihood(const std::vector<Double_t>& par) const;
 
+    virtual UInt_t GetNoOfBinsFitted(const UInt_t idx) const;
     virtual UInt_t GetTotalNoOfBinsFitted() const;
 
     virtual UInt_t GetNoOfSingleHisto() const { return fRunSingleHistoList.size(); } ///< returns the number of single histogram data sets present in the msr-file
@@ -91,10 +93,10 @@ class PRunListCollection
     PMsrHandler *fMsrInfo;  ///< pointer to the msr-file handler
     PRunDataHandler *fData; ///< pointer to the run-data handler
 
-    vector<PRunSingleHisto*> fRunSingleHistoList; ///< stores all precessed single histogram data
-    vector<PRunAsymmetry*>   fRunAsymmetryList;   ///< stores all precessed asymmetry data
-    vector<PRunMuMinus*>     fRunMuMinusList;     ///< stores all precessed mu-minus data
-    vector<PRunNonMusr*>     fRunNonMusrList;     ///< stores all precessed non-muSR data
+    vector<PRunSingleHisto*> fRunSingleHistoList; ///< stores all processed single histogram data
+    vector<PRunAsymmetry*>   fRunAsymmetryList;   ///< stores all processed asymmetry data
+    vector<PRunMuMinus*>     fRunMuMinusList;     ///< stores all processed mu-minus data
+    vector<PRunNonMusr*>     fRunNonMusrList;     ///< stores all processed non-muSR data
 };
 
 #endif // _PRUNLISTCOLLECTION_H_

@@ -74,8 +74,6 @@ class PRunBase
     PMsrRunBlock     *fRunInfo; ///< run info used to filter out needed infos of a run
     PRunDataHandler  *fRawData; ///< holds the raw run data
 
-    PIntVector fParamNo;        ///< vector of parameter numbers for the specifc run
-
     PRunData fData;             ///< data to be fitted, viewed, i.e. binned data
     Double_t fTimeResolution;   ///< time resolution in (us)
     PIntVector fT0s;            ///< all t0's of a run! The derived classes will handle it

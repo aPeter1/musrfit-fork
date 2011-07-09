@@ -171,6 +171,28 @@ Double_t PRunListCollection::GetSingleHistoChisq(const std::vector<Double_t>& pa
 }
 
 //--------------------------------------------------------------------------
+// GetSingleHistoChisqExpected
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculates expected chi-square of the single histogram with run block index idx of a msr-file.
+ *
+ * <b>return:</b>
+ * - expected chi-square of for a single histogram
+ *
+ * \param par fit parameter vector
+ * \param idx run block index
+ */
+Double_t PRunListCollection::GetSingleHistoChisqExpected(const std::vector<Double_t>& par, const UInt_t idx) const
+{
+  Double_t expectedChisq = 0.0;
+
+  if (idx < fRunSingleHistoList.size())
+    expectedChisq = fRunSingleHistoList[idx]->CalcChiSquareExpected(par);
+
+  return expectedChisq;
+}
+
+//--------------------------------------------------------------------------
 // GetAsymmetryChisq
 //--------------------------------------------------------------------------
 /**
@@ -318,6 +340,29 @@ Double_t PRunListCollection::GetNonMusrMaximumLikelihood(const std::vector<Doubl
 
   return mlh;
 }
+
+//--------------------------------------------------------------------------
+// GetNoOfBinsFitted
+//--------------------------------------------------------------------------
+/**
+ * <p>Number of bins in run block idx to be fitted. Only used for single histogram
+ * fitting together with the expected chisq.
+ *
+ * <b>return:</b>
+ * - number of bins fitted.
+ *
+ * \param idx run block index
+ */
+UInt_t PRunListCollection::GetNoOfBinsFitted(const UInt_t idx) const
+{
+  UInt_t result = 0;
+
+  if (idx < fRunSingleHistoList.size())
+    result = fRunSingleHistoList[idx]->GetNoOfFitBins();
+
+  return result;
+}
+
 
 //--------------------------------------------------------------------------
 // GetTotalNoOfBinsFitted

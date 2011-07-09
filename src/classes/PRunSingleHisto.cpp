@@ -186,6 +186,99 @@ Double_t PRunSingleHisto::CalcChiSquare(const std::vector<Double_t>& par)
 }
 
 //--------------------------------------------------------------------------
+// CalcChiSquareExpected (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculate expected chi-square.
+ *
+ * <b>return:</b>
+ * - chisq value
+ *
+ * \param par parameter vector iterated by minuit2
+ */
+Double_t PRunSingleHisto::CalcChiSquareExpected(const std::vector<Double_t>& par)
+{
+  Double_t chisq = 0.0;
+  Double_t diff  = 0.0;
+  Double_t theo  = 0.0;
+
+  Double_t N0 = 0.0;
+
+  // check if norm is a parameter or a function
+  if (fRunInfo->GetNormParamNo() < MSR_PARAM_FUN_OFFSET) { // norm is a parameter
+    N0 = par[fRunInfo->GetNormParamNo()-1];
+  } else { // norm is a function
+    // get function number
+    UInt_t funNo = fRunInfo->GetNormParamNo()-MSR_PARAM_FUN_OFFSET;
+    // evaluate function
+    N0 = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
+  }
+
+  // get tau
+  Double_t tau;
+  if (fRunInfo->GetLifetimeParamNo() != -1)
+    tau = par[fRunInfo->GetLifetimeParamNo()-1];
+  else
+    tau = PMUON_LIFETIME;
+
+  // get background
+  Double_t bkg;
+  if (fRunInfo->GetBkgFitParamNo() == -1) { // bkg not fitted
+    if (fRunInfo->GetBkgFix(0) == PMUSR_UNDEFINED) { // no fixed background given (background interval)
+      bkg = fBackground;
+    } else { // fixed bkg given
+      bkg = fRunInfo->GetBkgFix(0);
+    }
+  } else { // bkg fitted
+    bkg = par[fRunInfo->GetBkgFitParamNo()-1];
+  }
+
+  // calculate functions
+  for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
+    Int_t funcNo = fMsrInfo->GetFuncNo(i);
+    fFuncValues[i] = fMsrInfo->EvalFunc(funcNo, *fRunInfo->GetMap(), par);
+  }
+
+  // calculate chi square
+  Double_t time(1.0);
+  Int_t i, N(static_cast<Int_t>(fData.GetValue()->size()));
+
+  // In order not to have an IF in the next loop, determine the start and end bins for the fit range now
+  Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
+  if (startTimeBin < 0)
+    startTimeBin = 0;
+  Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
+  if (endTimeBin > N)
+    endTimeBin = N;
+
+  // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
+  // This is needed for the LF and user functions where some non-thread-save calculations only need to be calculated once
+  // for a given set of parameters---which should be done outside of the parallelized loop.
+  // For all other functions it means a tiny and acceptable overhead.
+  time = fTheory->Func(time, par, fFuncValues);
+
+  #ifdef HAVE_GOMP
+  Int_t chunk = (endTimeBin - startTimeBin)/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(i,time,diff) schedule(dynamic,chunk) reduction(+:chisq)
+  #endif
+  for (i=startTimeBin; i < endTimeBin; ++i) {
+    time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
+    theo = N0*TMath::Exp(-time/tau)*(1.0+fTheory->Func(time, par, fFuncValues))+bkg;
+    diff = fData.GetValue()->at(i) - theo;
+    chisq += diff*diff / theo;
+  }
+
+  // the correction factor is need since the data scales like pack*t_res,
+  // whereas the error scales like sqrt(pack*t_res)
+  if (fScaleN0AndBkg)
+    chisq *= fRunInfo->GetPacking() * (fTimeResolution * 1.0e3);
+
+  return chisq;
+}
+
+//--------------------------------------------------------------------------
 // CalcMaxLikelihood (public)
 //--------------------------------------------------------------------------
 /**
@@ -360,14 +453,6 @@ void PRunSingleHisto::CalcTheory()
  */
 UInt_t PRunSingleHisto::GetNoOfFitBins()
 {
-//   fNoOfFitBins=0;
-//
-//   Double_t time;
-//   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
-//     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
-//     if ((time >= fFitStartTime) && (time <= fFitEndTime))
-//       fNoOfFitBins++;
-//   }
   CalcNoOfFitBins();
 
   return fNoOfFitBins;

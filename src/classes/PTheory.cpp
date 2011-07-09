@@ -307,8 +307,6 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent) : f
       fUserParam.resize(fParamNo.size());
     }
 
-//cout << endl << "debug> fUserFcn=" << fUserFcn << ", fUserFcn->NeedGlobalPart()=" <<  fUserFcn->NeedGlobalPart() << ", gGlobalUserFcn=" << gGlobalUserFcn << endl;
-
     // check if the global part of the user function is needed
     if (fUserFcn->NeedGlobalPart()) {
       fUserFcn->SetGlobalPart(gGlobalUserFcn, fUserFcnIdx); // invoke or retrieve global user function object

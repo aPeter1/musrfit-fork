@@ -75,13 +75,14 @@ class PStartupHandler : public TObject, public TQObject
 
     virtual void CheckLists();
 
+    virtual const Bool_t         GetWriteExpectedChisq() { return fWriteExpectedChisq; } ///< returns the write_expected_chisq flag
     virtual PMsrFourierStructure GetFourierDefaults() { return fFourierDefaults; } ///< returns the Fourier defaults
     virtual const PStringVector  GetDataPathList() const { return fDataPathList; } ///< returns the search data path list
     virtual const PIntVector     GetMarkerList() const { return fMarkerList; }     ///< returns the marker list
     virtual const PIntVector     GetColorList() const { return fColorList; }       ///< returns the color list
 
   private:
-    enum EKeyWords {eEmpty, eComment, eDataPath,
+    enum EKeyWords {eEmpty, eComment, eDataPath, eWriteExpectedChisq,
                     eFourierSettings, eUnits, eFourierPower, eApodization, ePlot, ePhase, ePhaseIncrement,
                     eRootSettings, eMarkerList, eMarker, 
                     eColorList, eColor};
@@ -89,6 +90,7 @@ class PStartupHandler : public TObject, public TQObject
 
     Bool_t               fStartupFileFound; ///< startup file found flag
     TString              fStartupFilePath;  ///< full musrfit_startup.xml startup file paths
+    Bool_t               fWriteExpectedChisq; ///< flag showing if the expected chisq shall be written to the msr-file
     PMsrFourierStructure fFourierDefaults;  ///< Fourier defaults
     PStringVector        fDataPathList;     ///< search data path list
     PIntVector           fMarkerList;       ///< marker list

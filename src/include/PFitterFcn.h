@@ -48,9 +48,11 @@ class PFitterFcn : public ROOT::Minuit2::FCNBase
     ~PFitterFcn();
 
     Double_t Up() const { return fUp; }
-    Double_t operator()(const std::vector<Double_t>&) const;
+    Double_t operator()(const std::vector<Double_t> &par) const;
 
     UInt_t GetTotalNoOfFittedBins() { return fRunListCollection->GetTotalNoOfBinsFitted(); }
+    UInt_t GetNoOfFittedBins(const UInt_t idx);
+    void CalcExpectedChiSquare(const std::vector<Double_t> &par, Double_t &totalExpectedChisq, std::vector<Double_t> &expectedChisqPerRun);
 
   private:
     Double_t fUp;     ///< for chisq == 1.0, i.e. errors are 1 std. deviation errors. for log max-likelihood == 0.5, i.e. errors are 1 std. deviation errors (for details see the minuit2 user manual).

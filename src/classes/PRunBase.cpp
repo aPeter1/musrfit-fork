@@ -123,8 +123,6 @@ PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo,
  */
 PRunBase::~PRunBase()
 {
-  fParamNo.clear();
-
   fT0s.clear();
 
   fFuncValues.clear();

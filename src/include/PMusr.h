@@ -582,9 +582,12 @@ typedef struct {
   Bool_t fValid;     ///< flag showing if the statistics block is valid, i.e. a fit took place which converged
   PMsrLines fStatLines; ///< statistics block in msr-file clear text
   TString fDate;     ///< string holding fitting date and time
-  Bool_t   fChisq;   ///< flag telling if min = chi2 or min = max.likelyhood
-  Double_t fMin;     ///< chi2 or max. likelyhood
+  Bool_t   fChisq;   ///< flag telling if min = chi2 or min = max.likelihood
+  Double_t fMin;     ///< chi2 or max. likelihood
   UInt_t fNdf;       ///< number of degrees of freedom
+  Double_t fMinExpected; ///< expected total chi2 or max. likelihood
+  PDoubleVector fMinExpectedPerHisto; ///< expected pre histo chi2 or max. likelihood
+  PUIntVector fNdfPerHisto; ///< number of degrees of freedom per histo
 } PMsrStatisticStructure;
 
 //-------------------------------------------------------------

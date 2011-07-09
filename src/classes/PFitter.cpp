@@ -170,7 +170,27 @@ Bool_t PFitter::DoFit()
     Int_t ndf = fFitterFcn->GetTotalNoOfFittedBins() - usedParams;
     Double_t val = (*fFitterFcn)(param);
     if (fUseChi2) {
+      // calculate expected chisq
+      Double_t totalExpectedChisq = 0.0;
+      std::vector<Double_t> expectedChisqPerHisto;
+      fFitterFcn->CalcExpectedChiSquare(param, totalExpectedChisq, expectedChisqPerHisto);
+
       cout << endl << endl << ">> chisq = " << val << ", NDF = " << ndf << ", chisq/NDF = " << val/ndf;
+
+      if (totalExpectedChisq != 0.0) {
+        cout << endl << ">> expected chisq = " << totalExpectedChisq << ", NDF = " << ndf << ", expected chisq/NDF = " << totalExpectedChisq/ndf;
+        UInt_t ndf_histo = 0;
+        for (UInt_t i=0; i<expectedChisqPerHisto.size(); i++) {
+          ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+          if (ndf_histo > 0)
+            cout << endl << ">> run block " << i+1 << ": expected chisq = " << expectedChisqPerHisto[i] << ", ndf = " << ndf_histo << ", expected chisq/NDF = " << expectedChisqPerHisto[i]/ndf_histo;
+          else
+            cout << endl << ">> run block " << i+1 << ": expected chisq = " << expectedChisqPerHisto[i];
+        }
+
+        // clean up
+        expectedChisqPerHisto.clear();
+      }
     } else { // max. log likelihood
       cout << endl << endl << ">> maxLH = " << val << ", NDF = " << ndf << ", maxLH/NDF = " << val/ndf;
     }
@@ -1419,6 +1439,39 @@ Bool_t PFitter::ExecuteSave()
     cerr << endl << "**WARNING** Minuit2 User Parameter State is not valid, i.e. nothing to be saved";
     cerr << endl;
     return false;
+  }
+
+  // handle expected chisq if applicable
+  if (fUseChi2) {
+    fParams = *(fRunInfo->GetMsrParamList()); // get the update parameters back
+
+    // calculate expected chisq
+    std::vector<Double_t> param;
+    Double_t totalExpectedChisq = 0.0;
+    std::vector<Double_t> expectedChisqPerHisto;
+    std::vector<UInt_t> ndfPerHisto;
+
+    for (UInt_t i=0; i<fParams.size(); i++)
+      param.push_back(fParams[i].fValue);
+
+    fFitterFcn->CalcExpectedChiSquare(param, totalExpectedChisq, expectedChisqPerHisto);
+
+    if (totalExpectedChisq != 0.0) { // i.e. applicable for single histogram fits only
+      // get the ndf's of the histos
+      UInt_t ndf_histo;
+      for (UInt_t i=0; i<expectedChisqPerHisto.size(); i++) {
+        ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+        ndfPerHisto.push_back(ndf_histo);
+      }
+
+      // feed the msr-file handler
+      PMsrStatisticStructure *statistics = fRunInfo->GetMsrStatistic();
+      if (statistics) {
+        statistics->fMinExpected = totalExpectedChisq;
+        statistics->fMinExpectedPerHisto = expectedChisqPerHisto;
+        statistics->fNdfPerHisto = ndfPerHisto;
+      }
+    }
   }
 
   cout << ">> PFitter::ExecuteSave(): will write minuit2 output file ..." << endl;

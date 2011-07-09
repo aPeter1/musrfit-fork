@@ -47,7 +47,7 @@
 class PMsrHandler
 {
   public:
-    PMsrHandler(const Char_t *fileName);
+    PMsrHandler(const Char_t *fileName, const Bool_t writeExpectedChisq=false);
     virtual ~PMsrHandler();
 
     virtual Int_t ReadMsrFile();
@@ -95,6 +95,7 @@ class PMsrHandler
     virtual Double_t EvalFunc(UInt_t i, vector<Int_t> map, vector<Double_t> param)
                        { return fFuncHandler->Eval(i,map,param); }
 
+    virtual UInt_t GetNoOfFitParameters(UInt_t idx);
     virtual Int_t ParameterInUse(UInt_t paramNo);
     virtual Bool_t CheckRunBlockIntegrity();
     virtual Bool_t CheckUniquenessOfParamNames(UInt_t &parX, UInt_t &parY);
@@ -105,6 +106,8 @@ class PMsrHandler
     virtual void CheckMaxLikelihood();
 
   private:
+    Bool_t                 fWriteExpectedChisq; ///< flag shows if expected chisq shall be written to the msr-file
+
     TString                fFileName;  ///< file name of the msr-file
     TString                fMsrFileDirectoryPath; ///< msr-file directory path
     TString                fTitle;     ///< holds the title string of the msr-file

@@ -52,7 +52,8 @@ using namespace std;
  *
  * \param fileName name of a msr-file.
  */
-PMsrHandler::PMsrHandler(const Char_t *fileName) : fFileName(fileName)
+PMsrHandler::PMsrHandler(const Char_t *fileName, const Bool_t writeExpectedChisq) :
+    fWriteExpectedChisq(writeExpectedChisq), fFileName(fileName)
 {
   // init variables
   fMsrBlockCounter = 0;
@@ -64,6 +65,9 @@ PMsrHandler::PMsrHandler(const Char_t *fileName) : fFileName(fileName)
   fStatistic.fChisq = true;
   fStatistic.fMin   = -1.0;
   fStatistic.fNdf   = 0;
+  fStatistic.fMinExpected = 0.0;
+  fStatistic.fMinExpectedPerHisto.clear();
+  fStatistic.fNdfPerHisto.clear();
 
   fFuncHandler = 0;
 
@@ -95,6 +99,8 @@ PMsrHandler::~PMsrHandler()
   fCommands.clear();
   fPlots.clear();
   fStatistic.fStatLines.clear();
+  fStatistic.fMinExpectedPerHisto.clear();
+  fStatistic.fNdfPerHisto.clear();
   fParamInUse.clear();
 
   if (fFuncHandler) {
@@ -996,21 +1002,46 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         } else if (sstr.BeginsWith("chisq") || sstr.BeginsWith("maxLH")) {
           partialStatisticBlockFound = false;
           if (fStatistic.fValid) { // valid fit result
-            if (fStatistic.fChisq)
-              str = "  chisq = ";
-            else
-              str = "  maxLH = ";
-            str += fStatistic.fMin;
-            str += ", NDF = ";
-            str += fStatistic.fNdf;
-            if (fStatistic.fChisq)
-              str += ", chisq/NDF = ";
-            else
-              str += ", maxLH/NDF = ";
-            str += fStatistic.fMin / fStatistic.fNdf;
-            fout << str.Data() << endl;
-            if (messages)
-              cout << endl << str.Data() << endl;
+            if (fStatistic.fChisq) {
+              str.Form("  chisq = %.1lf, NDF = %d, chisq/NDF = %lf", fStatistic.fMin, fStatistic.fNdf, fStatistic.fMin / fStatistic.fNdf);
+              fout << str.Data() << endl;
+              if (messages)
+                cout << endl << str.Data() << endl;
+
+              // check if expected chisq needs to be written
+              if (fStatistic.fMinExpected != 0.0) {
+                str.Form("  expected chisq = %.1lf, NDF = %d, expected chisq/NDF = %lf",
+                         fStatistic.fMinExpected, fStatistic.fNdf, fStatistic.fMinExpected/fStatistic.fNdf);
+                if (fWriteExpectedChisq)
+                  fout << str.Data() << endl;
+                if (messages)
+                  cout << endl << str.Data() << endl;
+
+                for (UInt_t i=0; i<fStatistic.fMinExpectedPerHisto.size(); i++) {
+                  if (fStatistic.fNdfPerHisto[i] > 0) {
+                    str.Form("  run block %d: expected chisq=%.1lf, NDF=%d, expected chisq/NDF=%lf",
+                             i+1, fStatistic.fMinExpectedPerHisto[i], fStatistic.fNdfPerHisto[i], fStatistic.fMinExpectedPerHisto[i] /fStatistic.fNdfPerHisto[i]);
+                    if (fWriteExpectedChisq)
+                      fout << str.Data() << endl;
+
+                    if (messages)
+                      cout << str.Data() << endl;
+                  } else {
+                    str.Form("  run block %d: expected chisq=%.1lf", i+1, fStatistic.fMinExpectedPerHisto[i]);
+                    if (fWriteExpectedChisq)
+                      fout << str.Data() << endl;
+
+                    if (messages)
+                      cout << str.Data() << endl;
+                  }
+                }
+              }
+            } else { // maxLH
+              str.Form("  maxLH = %.1lf, NDF = %d, maxLH/NDF = %lf", fStatistic.fMin, fStatistic.fNdf, fStatistic.fMin / fStatistic.fNdf);
+              fout << str.Data() << endl;
+              if (messages)
+                cout << endl << str.Data() << endl;
+            }
           } else {
            fout << "*** FIT DID NOT CONVERGE ***" << endl;
            if (messages)
@@ -1020,22 +1051,41 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           partialStatisticBlockFound = false;
           if (fStatistic.fValid) { // valid fit result
             if (fStatistic.fChisq) { // chisq
-              str  = "  chisq = ";
-              str += fStatistic.fMin;
-              str += ", NDF = ";
-              str += fStatistic.fNdf;
-              str += ", chisq/NDF = ";
-              str += fStatistic.fMin / fStatistic.fNdf;
+              str.Form("  chisq = %.1lf, NDF = %d, chisq/NDF = %lf", fStatistic.fMin, fStatistic.fNdf, fStatistic.fMin / fStatistic.fNdf);
               fout << str.Data() << endl;
               if (messages)
                 cout << endl << str.Data() << endl;
+
+              // check if expected chisq needs to be written
+              if (fStatistic.fMinExpected != 0.0) {
+                str.Form("  expected chisq = %.1lf, NDF = %d, expected chisq/NDF = %lf",
+                         fStatistic.fMinExpected, fStatistic.fNdf, fStatistic.fMinExpected/fStatistic.fNdf);
+                if (fWriteExpectedChisq)
+                  fout << str.Data() << endl;
+                if (messages)
+                  cout << str.Data() << endl;
+
+                for (UInt_t i=0; i<fStatistic.fMinExpectedPerHisto.size(); i++) {
+                  if (fStatistic.fNdfPerHisto[i] > 0) {
+                    str.Form("  run block %d: expected chisq=%.1lf, NDF=%d, expected chisq/NDF=%lf",
+                             i+1, fStatistic.fMinExpectedPerHisto[i], fStatistic.fNdfPerHisto[i], fStatistic.fMinExpectedPerHisto[i] /fStatistic.fNdfPerHisto[i]);
+                    if (fWriteExpectedChisq)
+                      fout << str.Data() << endl;
+
+                    if (messages)
+                      cout << str.Data() << endl;
+                  } else {
+                    str.Form("  run block %d: expected chisq=%.1lf", i+1, fStatistic.fMinExpectedPerHisto[i]);
+                    if (fWriteExpectedChisq)
+                      fout << str.Data() << endl;
+
+                    if (messages)
+                      cout << str.Data() << endl;
+                  }
+                }
+              }
             } else { // max. log. liklihood
-              str  = "  maxLH = ";
-              str += fStatistic.fMin;
-              str += ", NDF = ";
-              str += fStatistic.fNdf;
-              str += ", maxLH/NDF = ";
-              str += fStatistic.fMin / fStatistic.fNdf;
+              str.Form("  maxLH = %.1lf, NDF = %d, maxLH/NDF = %lf", fStatistic.fMin, fStatistic.fNdf, fStatistic.fMin / fStatistic.fNdf);
               fout << str.Data() << endl;
               if (messages)
                 cout << endl << str.Data() << endl;
@@ -1046,11 +1096,15 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
              cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
           }
         } else {
-          if (str.Length() > 0)
-            fout << str.Data() << endl;
-          else // only write endl if not eof is reached. This is preventing growing msr-files, i.e. more and more empty lines at the end of the file
+          if (str.Length() > 0) {
+            sstr = str;
+            sstr.Remove(TString::kLeading, ' ');
+            if (!sstr.BeginsWith("expected chisq") && !sstr.BeginsWith("run block"))
+              fout << str.Data() << endl;
+          } else { // only write endl if not eof is reached. This is preventing growing msr-files, i.e. more and more empty lines at the end of the file
             if (!fin.eof())
               fout << endl;
+          }
         }
         break;
       default:
@@ -1066,28 +1120,47 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
     TDatime dt;
     fout << "STATISTIC --- " << dt.AsSQLString() << endl;
     if (fStatistic.fValid) { // valid fit result
-      if (fStatistic.fChisq) { // chisq
-        str  = "  chisq = ";
-        str += fStatistic.fMin;
-        str += ", NDF = ";
-        str += fStatistic.fNdf;
-        str += ", chisq/NDF = ";
-        str += fStatistic.fMin / fStatistic.fNdf;
+      if (fStatistic.fChisq) {
+        str.Form("  chisq = %.1lf, NDF = %d, chisq/NDF = %lf", fStatistic.fMin, fStatistic.fNdf, fStatistic.fMin / fStatistic.fNdf);
         fout << str.Data() << endl;
         if (messages)
           cout << endl << str.Data() << endl;
-      } else { // max. log. liklihood
-        str  = "  maxLH = ";
-        str += fStatistic.fMin;
-        str += ", NDF = ";
-        str += fStatistic.fNdf;
-        str += ", maxLH/NDF = ";
-        str += fStatistic.fMin / fStatistic.fNdf;
+
+        // check if expected chisq needs to be written
+        if (fStatistic.fMinExpected != 0.0) {
+          str.Form("  expected chisq = %.1lf, NDF = %d, expected chisq/NDF = %lf",
+                   fStatistic.fMinExpected, fStatistic.fNdf, fStatistic.fMinExpected/fStatistic.fNdf);
+          if (fWriteExpectedChisq)
+            fout << str.Data() << endl;
+          if (messages)
+            cout << str.Data() << endl;
+
+          for (UInt_t i=0; i<fStatistic.fMinExpectedPerHisto.size(); i++) {
+            if (fStatistic.fNdfPerHisto[i] > 0) {
+              str.Form("  run block %d: expected chisq=%.1lf, NDF=%d, expected chisq/NDF=%lf",
+                       i+1, fStatistic.fMinExpectedPerHisto[i], fStatistic.fNdfPerHisto[i], fStatistic.fMinExpectedPerHisto[i] /fStatistic.fNdfPerHisto[i]);
+              if (fWriteExpectedChisq)
+                fout << str.Data() << endl;
+
+              if (messages)
+                cout << str.Data() << endl;
+            } else {
+              str.Form("  run block %d: expected chisq=%.1lf", i+1, fStatistic.fMinExpectedPerHisto[i]);
+              if (fWriteExpectedChisq)
+                fout << str.Data() << endl;
+
+              if (messages)
+                cout << str.Data() << endl;
+            }
+          }
+        }
+      } else { // maxLH
+        str.Form("  maxLH = %.1lf, NDF = %d, maxLH/NDF = %lf", fStatistic.fMin, fStatistic.fNdf, fStatistic.fMin / fStatistic.fNdf);
         fout << str.Data() << endl;
         if (messages)
           cout << endl << str.Data() << endl;
       }
-    } else {
+    }  else {
       fout << "*** FIT DID NOT CONVERGE ***" << endl;
       if (messages)
         cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
@@ -1102,28 +1175,47 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
     fout << "STATISTIC --- " << dt.AsSQLString() << endl;
     if (fStatistic.fValid) { // valid fit result
       if (fStatistic.fChisq) { // chisq
-        str  = "  chisq = ";
-        str += fStatistic.fMin;
-        str += ", NDF = ";
-        str += fStatistic.fNdf;
-        str += ", chisq/NDF = ";
-        str += fStatistic.fMin / fStatistic.fNdf;
+        str.Form("  chisq = %.1lf, NDF = %d, chisq/NDF = %lf", fStatistic.fMin, fStatistic.fNdf, fStatistic.fMin / fStatistic.fNdf);
         fout << str.Data() << endl;
         if (messages)
           cout << endl << str.Data() << endl;
+
+        // check if expected chisq needs to be written
+        if (fStatistic.fMinExpected != 0.0) {
+          str.Form("  expected chisq = %.1lf, NDF = %d, expected chisq/NDF = %lf",
+                   fStatistic.fMinExpected, fStatistic.fNdf, fStatistic.fMinExpected/fStatistic.fNdf);
+          if (fWriteExpectedChisq)
+            fout << str.Data() << endl;
+          if (messages)
+            cout << str.Data() << endl;
+
+          for (UInt_t i=0; i<fStatistic.fMinExpectedPerHisto.size(); i++) {
+            if (fStatistic.fNdfPerHisto[i] > 0) {
+              str.Form("  run block %d: expected chisq=%.1lf, NDF=%d, expected chisq/NDF=%lf",
+                       i+1, fStatistic.fMinExpectedPerHisto[i], fStatistic.fNdfPerHisto[i], fStatistic.fMinExpectedPerHisto[i] /fStatistic.fNdfPerHisto[i]);
+              if (fWriteExpectedChisq)
+                fout << str.Data() << endl;
+
+              if (messages)
+                cout << str.Data() << endl;
+            } else {
+              str.Form("  run block %d: expected chisq=%.1lf", i+1, fStatistic.fMinExpectedPerHisto[i]);
+              if (fWriteExpectedChisq)
+                fout << str.Data() << endl;
+
+              if (messages)
+                cout << str.Data() << endl;
+            }
+          }
+        }
       } else { // max. log. liklihood
-        str  = "  maxLH = ";
-        str += fStatistic.fMin;
-        str += ", NDF = ";
-        str += fStatistic.fNdf;
-        str += ", maxLH/NDF = ";
-        str += fStatistic.fMin / fStatistic.fNdf;
+        str.Form("  maxLH = %.1lf, NDF = %d, maxLH/NDF = %lf", fStatistic.fMin, fStatistic.fNdf, fStatistic.fMin / fStatistic.fNdf);
         fout << str.Data() << endl;
         if (messages)
           cout << endl << str.Data() << endl;
       }
     } else {
-      fout << "*** FIT DID NOT CONVERGE ***" << endl;
+      fout << "*** FIT DID NOT CONVERGE (4) ***" << endl;
       if (messages)
         cout << endl << "*** FIT DID NOT CONVERGE ***" << endl;
     }
@@ -3813,7 +3905,8 @@ Bool_t PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
     tstr.Remove(TString::kLeading, ' ');
     if (tstr.Length() > 0) {
       if (!tstr.BeginsWith("#") && !tstr.BeginsWith("STATISTIC") && !tstr.BeginsWith("chisq") &&
-          !tstr.BeginsWith("maxLH") && !tstr.BeginsWith("*** FIT DID NOT CONVERGE ***")) {
+          !tstr.BeginsWith("maxLH") && !tstr.BeginsWith("*** FIT DID NOT CONVERGE ***") &&
+          !tstr.BeginsWith("expected chisq") && !tstr.BeginsWith("run block")) {
         cerr << endl << ">> PMsrHandler::HandleStatisticEntry: **SYNTAX ERROR** in line " << lines[i].fLineNo;
         cerr << endl << ">> '" << lines[i].fLine.Data() << "'";
         cerr << endl << ">> not a valid STATISTIC block line";
@@ -3870,6 +3963,185 @@ Bool_t PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
   }
 
   return true;
+}
+
+
+//--------------------------------------------------------------------------
+// GetNoOfFitParameters (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculate the number of fit parameters for single histo fits.
+ *
+ * \param idx run block index
+ */
+UInt_t PMsrHandler::GetNoOfFitParameters(UInt_t idx)
+{
+  UInt_t noOfFitParameters = 0;
+  PUIntVector paramVector;
+  PUIntVector funVector;
+  PUIntVector mapVector;
+  TObjArray  *tokens = 0;
+  TObjString *ostr = 0;
+  TString     str;
+  UInt_t      k, dval;
+  Int_t       status, pos;
+
+  // check that idx is valid
+  if (idx >= fRuns.size()) {
+    cerr << endl << ">> PMsrHandler::GetNoOfFitParameters() **ERROR** idx=" << idx << ", out of range fRuns.size()=" << fRuns.size();
+    cerr << endl;
+    return 0;
+  }
+
+  // get N0 parameter, possible parameter number or function
+  if (fRuns[idx].GetNormParamNo() != -1) {
+    if (fRuns[idx].GetNormParamNo() < MSR_PARAM_FUN_OFFSET) // parameter
+      paramVector.push_back(fRuns[idx].GetNormParamNo());
+    else // function
+      funVector.push_back(fRuns[idx].GetNormParamNo() - MSR_PARAM_FUN_OFFSET);
+  }
+
+  // get background parameter, for the case the background is fitted.
+  if (fRuns[idx].GetBkgFitParamNo() != -1)
+    paramVector.push_back(fRuns[idx].GetBkgFitParamNo());
+
+  // go through the theory block and collect parameters
+  // possible entries: number -> parameter, fun<number> -> function, map<number> -> maps
+  for (UInt_t i=0; i<fTheory.size(); i++) {
+    // remove potential comments
+    str = fTheory[i].fLine;
+    pos = str.Index('#');
+    if (pos >= 0)
+      str.Resize(pos);
+    // tokenize
+    tokens = str.Tokenize(" \t");
+    if (!tokens) {
+      mapVector.clear();
+      funVector.clear();
+      paramVector.clear();
+      return 0;
+    }
+
+    for (Int_t j=0; j<tokens->GetEntries(); j++) {
+      ostr = dynamic_cast<TObjString*>(tokens->At(j));
+      str = ostr->GetString();
+      // check for parameter number
+      if (str.IsDigit()) {
+        dval = str.Atoi();
+        paramVector.push_back(dval);
+      }
+
+      // check for map
+      if (str.Contains("map")) {
+        status = sscanf(str.Data(), "map%d", &dval);
+        if (status == 1) {
+          mapVector.push_back(dval);
+        }
+      }
+
+      // check for function
+      if (str.Contains("fun")) {
+        status = sscanf(str.Data(), "fun%d", &dval);
+        if (status == 1) {
+          funVector.push_back(dval);
+        }
+      }
+    }
+
+    delete tokens;
+    tokens = 0;
+  }
+
+  // go through the function block and collect parameters
+  for (UInt_t i=0; i<funVector.size(); i++) {
+    // find the proper function in the function block
+    for (k=0; k<fFunctions.size(); k++) {
+      status = sscanf(fFunctions[k].fLine.Data(), "fun%d", &dval);
+      if (status == 1) {
+        if (dval == funVector[i])
+          break;
+      }
+    }
+
+    // check if everything has been found at all
+    if (k == fFunctions.size()) {
+      cerr << endl << ">> PMsrHandler::GetNoOfFitParameters() **ERROR** couldn't find fun" << funVector[i];
+      cerr << endl << endl;
+
+      // clean up
+      mapVector.clear();
+      funVector.clear();
+      paramVector.clear();
+
+      return 0;
+    }
+
+    // remove potential comments
+    str = fFunctions[k].fLine;
+    pos = str.Index('#');
+    if (pos >= 0)
+      str.Resize(pos);
+
+    // tokenize
+    tokens = str.Tokenize(" \t");
+    if (!tokens) {
+      mapVector.clear();
+      funVector.clear();
+      paramVector.clear();
+      return 0;
+    }
+
+    // filter out parameters and maps
+    for (Int_t j=0; j<tokens->GetEntries(); j++) {
+      ostr = dynamic_cast<TObjString*>(tokens->At(j));
+      str = ostr->GetString();
+
+      // check for parameter
+      if (str.BeginsWith("par")) {
+        status = sscanf(str.Data(), "par%d", &dval);
+        if (status == 1)
+          paramVector.push_back(dval);
+      }
+
+      // check for map
+      if (str.BeginsWith("map")) {
+        status = sscanf(str.Data(), "map%d", &dval);
+        if (status == 1)
+          mapVector.push_back(dval);
+      }
+    }
+  }
+
+  // go through the map and collect parameters
+  for (UInt_t i=0; i<mapVector.size(); i++) {
+    paramVector.push_back(fRuns[idx].GetMap(mapVector[i]-1));
+  }
+
+  // eliminated multiple identical entries in paramVector
+  PUIntVector param;
+  param.push_back(paramVector[0]);
+  for (UInt_t i=0; i<paramVector.size(); i++) {
+    for (k=0; k<param.size(); k++) {
+      if (param[k] == paramVector[i])
+        break;
+    }
+    if (k == param.size())
+      param.push_back(paramVector[i]);
+  }
+
+  // calculate the number of fit parameters with step != 0
+  for (UInt_t i=0; i<param.size(); i++) {
+    if (fParam[param[i]-1].fStep != 0.0)
+      noOfFitParameters++;
+  }
+
+  // cleanup
+  param.clear();
+  mapVector.clear();
+  funVector.clear();
+  paramVector.clear();
+
+  return noOfFitParameters;
 }
 
 //--------------------------------------------------------------------------

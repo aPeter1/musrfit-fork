@@ -165,6 +165,8 @@ void PStartupHandler::OnStartDocument()
   fFourierDefaults.fPlotRange[0] = -1.0;
   fFourierDefaults.fPlotRange[1] = -1.0;
   fFourierDefaults.fPhaseIncrement = 1.0;
+
+  fWriteExpectedChisq = false;
 }
 
 //--------------------------------------------------------------------------
@@ -193,6 +195,8 @@ void PStartupHandler::OnStartElement(const Char_t *str, const TList *attributes)
 {
   if (!strcmp(str, "data_path")) {
     fKey = eDataPath;
+  } else if (!strcmp(str, "write_expected_chisq")) {
+    fKey = eWriteExpectedChisq;
   } else if (!strcmp(str, "marker")) {
     fKey = eMarker;
   } else if (!strcmp(str, "color")) {
@@ -246,6 +250,11 @@ void PStartupHandler::OnCharacters(const Char_t *str)
       // check that str is a valid path
       // add str to the path list
       fDataPathList.push_back(str);
+      break;
+    case eWriteExpectedChisq:
+      tstr = TString(str);
+      if (tstr.BeginsWith("y") || tstr.BeginsWith("Y"))
+        fWriteExpectedChisq = true;
       break;
     case eMarker:
       // check that str is a number
