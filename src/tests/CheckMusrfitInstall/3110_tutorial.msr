@@ -1,0 +1,103 @@
+sample XYZ                                        
+###############################################################
+FITPARAMETER
+#       No Name        Value     Step        Pos_Error   Boundaries
+        1 NormUp      4500      5           none        0       none    
+        2 BgUp        200       1           none        0       none    
+        3 PhaseUp     15        1           none        
+
+        4 NormDown    4500      5           none        0       none    
+        5 BgDown      200       1           none        0       none    
+        6 PhaseDown   195       1           none        
+
+        7 NormRight   600       5           none        0       none    
+        8 BgRight     40        1           none        0       none    
+        9 PhaseRight  285       1           none         
+
+       10 AsymSig1    0.17      0.01        none        0       0.33    
+       11 RateSig1    2.5       0.1         none        0       none
+       12 FieldSig1   100       1           none       
+
+       13 AsymSig2    0.02      0.01        none        0       0.33    
+       14 RateSig2    0.5       0.1         none       
+       15 FieldSig2   150       1           none        
+
+###############################################################
+THEORY
+asymmetry     10
+simplExpo     11          (rate)
+TFieldCos   map1  fun1       (phase frequency)
++
+asymmetry     13
+simpleGss     14          (rate)
+TFieldCos   map1  fun2       (phase frequency)
+
+###############################################################
+FUNCTIONS
+fun1 = gamma_mu * par12
+fun2 = gamma_mu * par15
+
+###############################################################
+RUN data/deltat_pta_gps_3110 PIM3 PSI PSI-BIN   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            1
+backgr.fit      2
+lifetimecorrection
+map             3    0    0    0    0    0    0    0    0    0
+forward         3       
+data            1000     8000    
+t0              800     
+fit             0       4.9    
+packing         20
+
+RUN data/deltat_pta_gps_3110 PIM3 PSI PSI-BIN   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            4
+backgr.fit      5
+lifetimecorrection
+map             6    0    0    0    0    0    0    0    0    0
+forward         4       
+data            1000     7999    
+t0              800     
+fit             0       4.9    
+packing         20
+
+RUN data/deltat_pta_gps_3110 PIM3 PSI PSI-BIN   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            7
+backgr.fit      8
+#lifetimecorrection
+map             9    0    0    0    0    0    0    0    0    0
+forward         5       
+data            1000     8003    
+t0              800     
+fit             0       4.9    
+packing         20
+
+###############################################################
+COMMANDS
+MINIMIZE
+MINOS
+SAVE
+
+###############################################################
+FOURIER
+units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
+fourier_power    10
+apodization      WEAK    # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            par3
+range            0.0    600.0
+
+###############################################################
+PLOT 0   (single histo plot)
+runs     1   2   
+range    0   4 -0.2 0.2
+
+PLOT 0   (single histo plot)
+runs     3   
+use_fit_ranges
+
+###############################################################
+STATISTIC --- 2011-07-09 10:58:44
+  chisq = 1348.1764586409397, NDF = 1146, chisq/NDF = 1.1764192483777833
