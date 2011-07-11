@@ -719,8 +719,9 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
   end   = fRunInfo->GetDataRange(1);
   // check if data range has been provided, and if not try to estimate them
   if (start < 0) {
-    start = fT0s[0]+5;
-    cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range start = t0+5 = " << start << ".";
+    Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
+    start = fT0s[0]+offset;
+    cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   }
@@ -858,7 +859,8 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
   Int_t end   = start + ((runData->GetDataBin(histoNo)->size()-start)/packing)*packing;
   // check if data range has been provided, and if not try to estimate them
   if (start < 0) {
-    start = (fT0s[0]+5) - ((fT0s[0]+5)/packing)*packing;
+    Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
+    start = (fT0s[0]+offset) - ((fT0s[0]+offset)/packing)*packing;
     end = start + ((runData->GetDataBin(histoNo)->size()-start)/packing)*packing;
     cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range start = " << start << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
@@ -1057,7 +1059,8 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
 
   // check if data range has been provided, and if not try to estimate them
   if (start < 0) {
-    start = (fT0s[0]+5) - ((fT0s[0]+5)/packing)*packing;
+    Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
+    start = (fT0s[0]+offset) - ((fT0s[0]+offset)/packing)*packing;
     end = start + ((runData->GetDataBin(histoNo)->size()-start)/packing)*packing;
     cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range start = " << start << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";

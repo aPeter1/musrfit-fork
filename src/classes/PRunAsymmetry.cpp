@@ -839,16 +839,18 @@ Bool_t PRunAsymmetry::PrepareFitData(PRawRunData* runData, UInt_t histoNo[2])
   Int_t start[2] = {fRunInfo->GetDataRange(0), fRunInfo->GetDataRange(2)};
   Int_t end[2]   = {fRunInfo->GetDataRange(1), fRunInfo->GetDataRange(3)};
   Double_t t0[2] = {fT0s[0], fT0s[1]};
+  Int_t offset = (Int_t)(10.0e-3/fTimeResolution); // needed in case first good bin is not given, default = 10ns
+
   // check if data range has been provided, and if not try to estimate them
   if (start[0] < 0) {
-    start[0] = (Int_t)t0[0]+5;
-    cerr << endl << ">> PRunAsymmetry::PrepareData(): **WARNING** data range (forward) was not provided, will try data range start = t0+5 = " << start[0] << ".";
+    start[0] = (Int_t)t0[0]+offset;
+    cerr << endl << ">> PRunAsymmetry::PrepareData(): **WARNING** data range (forward) was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start[0] << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   }
   if (start[1] < 0) {
-    start[1] = (Int_t)t0[1]+5;
-    cerr << endl << ">> PRunAsymmetry::PrepareData(): **WARNING** data range (backward) was not provided, will try data range start = t0+5 = " << start[1] << ".";
+    start[1] = (Int_t)t0[1]+offset;
+    cerr << endl << ">> PRunAsymmetry::PrepareData(): **WARNING** data range (backward) was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start[1] << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   }
@@ -1052,14 +1054,15 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
   Int_t start[2] = {0, 0};
   Int_t end[2] = {0, 0};
   Double_t t0[2] = {fT0s[0], fT0s[1]};
+  Int_t offset = (Int_t)(10.0e-3/fTimeResolution); // needed in case first good bin is not given, default = 10ns
   // check if data range has been provided, and if not try to estimate them
   if (fRunInfo->GetDataRange(0) < 0) {
-    start[0] = (static_cast<Int_t>(t0[0])+5) - ((static_cast<Int_t>(t0[0])+5)/packing)*packing;
+    start[0] = (static_cast<Int_t>(t0[0])+offset) - ((static_cast<Int_t>(t0[0])+offset)/packing)*packing;
     cerr << endl << ">> PRunAsymmetry::PrepareViewData(): **WARNING** data range (forward) was not provided, will try data range start = " << start[0] << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   } else if (fRunInfo->GetDataRange(2) < 0) {
-    start[1] = (static_cast<Int_t>(t0[1])+5) - ((static_cast<Int_t>(t0[1])+5)/packing)*packing;
+    start[1] = (static_cast<Int_t>(t0[1])+offset) - ((static_cast<Int_t>(t0[1])+offset)/packing)*packing;
     cerr << endl << ">> PRunAsymmetry::PrepareViewData(): **WARNING** data range (backward) was not provided, will try data range start = " << start[1] << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
@@ -1306,14 +1309,15 @@ Bool_t PRunAsymmetry::PrepareRRFViewData(PRawRunData* runData, UInt_t histoNo[2]
   Int_t end[2] = {0, 0};
   Double_t t0[2] = {fT0s[0], fT0s[1]};
   UInt_t packing = fMsrInfo->GetMsrPlotList()->at(0).fRRFPacking;
+  Int_t offset = (Int_t)(10.0e-3/fTimeResolution); // needed in case first good bin is not given, default = 10ns
   // check if data range has been provided, and if not try to estimate them
   if (fRunInfo->GetDataRange(0) < 0) {
-    start[0] = static_cast<Int_t>(t0[0])+5;
+    start[0] = static_cast<Int_t>(t0[0])+offset;
     cerr << endl << ">> PRunAsymmetry::PrepareRRFViewData(): **WARNING** data range (forward) was not provided, will try data range start = " << start[0] << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   } else if (fRunInfo->GetDataRange(2) < 0) {
-    start[1] = static_cast<Int_t>(t0[1])+5;
+    start[1] = static_cast<Int_t>(t0[1])+offset;
     cerr << endl << ">> PRunAsymmetry::PrepareRRFViewData(): **WARNING** data range (backward) was not provided, will try data range start = " << start[1] << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
