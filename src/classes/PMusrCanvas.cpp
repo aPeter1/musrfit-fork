@@ -1825,14 +1825,56 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
 
   // check if 'use_fit_range' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
-    startBin = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(0) - data->GetDataTimeStart())/data->GetDataTimeStep());
-    endBin   = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(1) - data->GetDataTimeStart())/data->GetDataTimeStep());
+    Double_t dval = (fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(0) - data->GetDataTimeStart())/data->GetDataTimeStep();
+    if (dval < 0.0) { // make sure that startBin >= 0
+      startBin = 0;
+      cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found startBin data < 0 for 'use_fit_range', will set it to 0" << endl << endl;
+    } else if (dval >= (Double_t)data->GetValue()->size()) { // make sure that startBin <= length of data vector
+      cerr << endl << ">> PMusrCanvas::HandleDataSet() **WARNING** found startBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'use_fit_range',";
+      cerr << endl << ">> will set it to data vector size" << endl << endl;
+      startBin = data->GetValue()->size();
+    } else {
+      startBin = (UInt_t)dval;
+    }
+
+    dval = (fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(1) - data->GetDataTimeStart())/data->GetDataTimeStep();
+    if (dval < 0.0) { // make sure that endBin >= 0
+      endBin = 0;
+      cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found endBin data < 0 for 'use_fit_range', will set it to 0" << endl << endl;
+    } else if (dval >= (Double_t)data->GetValue()->size()) { // make sure that endBin <= length of data vector
+      cerr << endl << ">> PMusrCanvas::HandleDataSet() **WARNING** found endBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'use_fit_range',";
+      cerr << endl << ">> will set it to data vector size" << endl << endl;
+      endBin = data->GetValue()->size();
+    } else {
+      endBin   = (UInt_t)dval;
+    }
   }
 
   // check if 'sub_ranges' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) {
-    startBin = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->GetDataTimeStart())/data->GetDataTimeStep());
-    endBin   = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] - data->GetDataTimeStart())/data->GetDataTimeStep());
+    Double_t dval = (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->GetDataTimeStart())/data->GetDataTimeStep();
+    if (dval < 0.0) { // make sure that startBin >= 0
+      startBin = 0;
+      cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found startBin data < 0 for 'sub_ranges', will set it to 0" << endl << endl;
+    } else if (dval >= (Double_t)data->GetValue()->size()) { // make sure that startBin <= length of data vector
+      cerr << endl << ">> PMusrCanvas::HandleDataSet() **WARNING** found startBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'sub_ranges',";
+      cerr << endl << ">> will set it to data vector size" << endl << endl;
+      startBin = data->GetValue()->size();
+    } else {
+      startBin = (UInt_t)dval;
+    }
+
+    dval = (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] - data->GetDataTimeStart())/data->GetDataTimeStep();
+    if (dval < 0.0) { // make sure that endBin >= 0
+      endBin = 0;
+      cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found endBin data < 0 for 'sub_ranges', will set it to 0" << endl << endl;
+    } else if (dval >= (Double_t)data->GetValue()->size()) { // make sure that endtBin <= length of data vector
+      cerr << endl << ">> PMusrCanvas::HandleDataSet() **WARNING** found endBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'sub_ranges',";
+      cerr << endl << ">> will set it to data vector size" << endl << endl;
+      endBin = data->GetValue()->size();
+    } else {
+      endBin   = (UInt_t)dval;
+    }
   }
 
   for (UInt_t i=startBin; i<endBin; i++) {
@@ -1901,14 +1943,59 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
 
   // check if 'use_fit_range' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
-    startBin = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(0) - data->GetDataTimeStart())/data->GetTheoryTimeStep());
-    endBin   = (UInt_t)((fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(1) - data->GetDataTimeStart())/data->GetTheoryTimeStep());
+    Double_t dval = (fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(0) - data->GetDataTimeStart())/data->GetTheoryTimeStep();
+    if (dval < 0.0) { // make sure that startBin >= 0
+      startBin = 0;
+      cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found startBin theory < 0 for 'use_fit_range', will set it to 0" << endl << endl;
+    } else if (dval >= (Double_t)data->GetTheory()->size()) { // make sure that startBin <= length of theory vector
+      cerr << endl << ">> PMusrCanvas::HandleDataSet() **WARNING** found startBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'use_fit_range',";
+      cerr << endl << ">> will set it to theory vector size" << endl << endl;
+      startBin = data->GetTheory()->size();
+    } else {
+      startBin = (UInt_t)dval;
+    }
+
+    dval = (fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(1) - data->GetDataTimeStart())/data->GetTheoryTimeStep();
+    if (dval < 0.0) { // make sure that endBin >= 0
+      endBin = 0;
+      cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found endBin theory < 0 for 'use_fit_range', will set it to 0" << endl << endl;
+    } else if (dval >= (Double_t)data->GetTheory()->size()) { // make sure that endBin <= length of theory vector
+      cerr << endl << ">> PMusrCanvas::HandleDataSet() **WARNING** found endBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'use_fit_range',";
+      cerr << endl << ">> will set it to theory vector size" << endl << endl;
+      endBin = data->GetTheory()->size();
+    } else {
+      endBin   = (UInt_t)dval;
+    }
   }
 
   // check if 'sub_ranges' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() > 1) {
     startBin = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] -data->GetDataTimeStart())/data->GetTheoryTimeStep());
     endBin   = (UInt_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] -data->GetDataTimeStart())/data->GetTheoryTimeStep());
+
+    Double_t dval = (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] -data->GetDataTimeStart())/data->GetTheoryTimeStep();
+    if (dval < 0.0) { // make sure that startBin >= 0
+      startBin = 0;
+      cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found startBin theory < 0 for 'sub_ranges', will set it to 0" << endl << endl;
+    } else if (dval >= (Double_t)data->GetTheory()->size()) { // make sure that startBin <= length of theory vector
+      cerr << endl << ">> PMusrCanvas::HandleDataSet() **WARNING** found startBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'sub_ranges',";
+      cerr << endl << ">> will set it to theory vector size" << endl << endl;
+      startBin = data->GetTheory()->size();
+    } else {
+      startBin = (UInt_t)dval;
+    }
+
+    dval = (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] -data->GetDataTimeStart())/data->GetTheoryTimeStep();
+    if (dval < 0.0) { // make sure that endBin >= 0
+      endBin = 0;
+      cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found endBin theory < 0 for 'sub_ranges', will set it to 0" << endl << endl;
+    } else if (dval >= (Double_t)data->GetTheory()->size()) { // make sure that endtBin <= length of theory vector
+      cerr << endl << ">> PMusrCanvas::HandleDataSet() **WARNING** found endBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'sub_ranges',";
+      cerr << endl << ">> will set it to theory vector size" << endl << endl;
+      endBin = data->GetTheory()->size();
+    } else {
+      endBin   = (UInt_t)dval;
+    }
   }
 
   for (UInt_t i=startBin; i<endBin; i++) {
