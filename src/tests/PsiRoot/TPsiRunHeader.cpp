@@ -37,6 +37,9 @@ using namespace std;
 
 #include <TPaveText.h>
 #include <TCanvas.h>
+#include <TObjArray.h>
+#include <TObjString.h>
+#include <TString.h>
 
 #define TPRH_VERSION_IDX     0
 #define TPRH_RUN_TITLE_IDX   1
@@ -48,6 +51,8 @@ using namespace std;
 #define TPRH_ORIENTATION_IDX 7
 
 #define TPRH_OFFSET          9
+
+#define TPRH_MIN_NO_REQUIRED_ENTRIES 10
 
 ClassImp(TPsiRunProperty)
 
@@ -188,10 +193,10 @@ TObjArray* TPsiRunHeader::GetHeader()
   for (UInt_t i=0; i<fProperties.size(); i++) {
     digit = GetDecimalPlace(fProperties[i].GetError());
     if (fProperties[i].GetUnit().CompareTo("n/a", TString::kIgnoreCase)) {
-      sprintf(fmt, "%%02d - %%s: %%.%dlf +- (%%.%dlf) %%s", digit, digit);
+      sprintf(fmt, "%%02d - %%s: %%.%dlf +- %%.%dlf %%s", digit, digit);
       sprintf(str, fmt, TPRH_OFFSET+i, fProperties[i].GetLabel().Data(), fProperties[i].GetValue(), fProperties[i].GetError(), fProperties[i].GetUnit().Data());
     } else {
-      sprintf(fmt, "%%02d - %%s: %%.%dlf +- (%%.%dlf)", digit, digit);
+      sprintf(fmt, "%%02d - %%s: %%.%dlf +- %%.%dlf", digit, digit);
       sprintf(str, fmt, TPRH_OFFSET+i, fProperties[i].GetLabel().Data(), fProperties[i].GetValue(), fProperties[i].GetError());
     }
     tostr = new TObjString(str);
@@ -214,6 +219,119 @@ TObjArray* TPsiRunHeader::GetHeader()
   */
 Bool_t TPsiRunHeader::ExtractHeaderInformation(TObjArray *runHeader)
 {
+  // check if there is an object pointer is present
+  if (runHeader == 0) {
+    cerr << endl << ">> TPsiRunHeader::ExtractHeaderInformation(..) **ERROR** runHeader object pointer is 0" << endl << endl;
+    return false;
+  }
+
+  // check if the minimum of required entries is present
+  if (runHeader->GetEntries() < TPRH_MIN_NO_REQUIRED_ENTRIES) {
+    cerr << endl << ">> TPsiRunHeader::ExtractHeaderInformation(..) **ERROR** runHeader object has " << runHeader->GetEntries() << " entries.";
+    cerr << endl << ">> minimum number of required entries = " << TPRH_MIN_NO_REQUIRED_ENTRIES << "!" << endl << endl;
+    return false;
+  }
+
+  // start extracting entries
+  TObjString *ostr;
+  TString str("");
+  Int_t idx, status, ival;
+
+  // not TPsiRunProperty header variables
+  for (Int_t i=0; i<TPRH_OFFSET-1; i++) {
+    ostr = dynamic_cast<TObjString*>(runHeader->At(i));
+    str = ostr->GetString();
+
+    if (str.BeginsWith("01 - Version: ")) {
+      idx = str.Index(":");
+      str.Remove(0, idx+2);
+      fVersion = str;
+    } else if (str.BeginsWith("02 - Run Title: ")) {
+      idx = str.Index(":");
+      str.Remove(0, idx+2);
+      fRunTitle = str;
+    } else if (str.BeginsWith("03 - Run Number: ")) {
+      status = sscanf(str.Data(), "03 - Run Number: %d", &ival);
+      if (status != 1) {
+        cerr << endl << ">> TPsiRunHeader::ExtractHeaderInformation(..) **ERROR** " << str.Data() << " doesn't contain a valid run number" << endl << endl;
+        return false;
+      }
+      fRunNumber = ival;
+    } else if (str.BeginsWith("04 - Laboratory: ")) {
+      idx = str.Index(":");
+      str.Remove(0, idx+2);
+      fLaboratory = str;
+    } else if (str.BeginsWith("05 - Instrument: ")) {
+      idx = str.Index(":");
+      str.Remove(0, idx+2);
+      fInstrument = str;
+    } else if (str.BeginsWith("06 - Setup: ")) {
+      idx = str.Index(":");
+      str.Remove(0, idx+2);
+      fSetup = str;
+    } else if (str.BeginsWith("07 - Sample: ")) {
+      idx = str.Index(":");
+      str.Remove(0, idx+2);
+      fSample = str;
+    } else if (str.BeginsWith("08 - Orientation: ")) {
+      idx = str.Index(":");
+      str.Remove(0, idx+2);
+      fOrientation = str;
+    }
+  }
+
+  // TPsiRunProperty header variables
+
+  // remove potential left over properties
+  fProperties.clear();
+
+  Double_t dval, derr;
+  TString name(""), unit("");
+  char cstr[128];
+  for (Int_t i=TPRH_OFFSET-1; i<runHeader->GetEntries(); i++) {
+    ostr = dynamic_cast<TObjString*>(runHeader->At(i));
+    str = ostr->GetString();
+
+    name = TString("");
+    unit = TString("");
+
+    // 1st get the name
+    idx  = str.Index("-");
+    str.Remove(0, idx+2);
+    idx  = str.Index(":");
+    str.Remove(idx, str.Length());
+    name = str;
+
+    // 2nd get the value
+    str = ostr->GetString();
+    idx  = str.Index(":");
+    str.Remove(0, idx+2);
+    idx  = str.Index("+-");
+    str.Remove(idx, str.Length());
+    if (!str.IsFloat()) {
+      cerr << endl << ">> TPsiRunHeader::ExtractHeaderInformation(..) **ERROR** in TPsiRunProperty:";
+      cerr << endl << ">> found " << ostr->GetString().Data() << ", which has an invalid format." << endl << endl;
+      return false;
+    }
+    dval = str.Atof();
+
+    // 3rd get the error, and unit
+    str = ostr->GetString();
+    idx  = str.Index("+-");
+    str.Remove(0, idx+3);
+    memset(cstr, 0, sizeof(cstr));
+    status = sscanf(str.Data(), "%lf %s", &derr, cstr);
+    if (status < 2) {
+      cerr << endl << ">> TPsiRunHeader::ExtractHeaderInformation(..) **ERROR** in TPsiRunProperty:";
+      cerr << endl << ">> found " << ostr->GetString().Data() << ", which has an invalid format." << endl << endl;
+      return false;
+    }
+    if (strlen(cstr) > 0)
+      unit = TString(cstr);
+
+    AddProperty(name, dval, derr, unit);
+  }
+
   return true;
 }
 

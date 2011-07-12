@@ -68,8 +68,7 @@ int main(int argc, char *argv[])
   header->AddProperty("Field", 3.00003, 0.0003, "T");
   header->AddProperty("BigError", 13.2, 1.2, "Something");
   header->AddProperty("ThisIsAVeryLongPropertyName", 3.03, 0.03, "SI-Unit");
-
-  header->DumpHeader();
+  header->AddProperty("This Is A Property With Spaces", 3.03, 0.03, "SI-Unit");
 
   TFile *f = new TFile(argv[1], "RECREATE", "psi_runHeader_test");
   if (f->IsZombie()) {
@@ -92,6 +91,11 @@ int main(int argc, char *argv[])
   f->Close();
 
   delete f;
+
+  header->ExtractHeaderInformation(header->GetHeader());
+  header->DumpHeader();
+
+  delete header;
 
   return 0;
 }
