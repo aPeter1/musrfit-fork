@@ -79,11 +79,11 @@ then
     autoreconf                    && exit 0
 else
     echo ""                       && \
-    echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" && \
-    echo "+ This script prepares the building environment for the configuration of musrfit. +" && \
-    echo "+ During this process some informative messages might appear which can safely be  +" && \
-    echo "+ ignored as long as they are not tagged as errors.                               +" && \
-    echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" && \
+    echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" && \
+    echo "+ This script prepares the building environment for the configuration of    +" && \
+    echo "+ musrfit. During this process some informative messages might appear which +" && \
+    echo "+ can safely be ignored as long as they are not tagged as errors.           +" && \
+    echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" && \
     echo ""                       && \
     echo ">> libtoolize"          && \
     $LIBTOOLIZE --force           && \

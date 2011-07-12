@@ -45,8 +45,8 @@ backgr.fit      2
 lifetimecorrection
 map             3    0    0    0    0    0    0    0    0    0
 forward         3       
-data            1000     8000    
-t0              800     
+data            1     8000    
+t0              1     
 fit             0       4.9    
 packing         20
 
@@ -57,8 +57,8 @@ backgr.fit      5
 lifetimecorrection
 map             6    0    0    0    0    0    0    0    0    0
 forward         4       
-data            1000     7999    
-t0              800     
+data            1     7999    
+t0              1     
 fit             0       4.9    
 packing         20
 
@@ -69,8 +69,8 @@ backgr.fit      8
 #lifetimecorrection
 map             9    0    0    0    0    0    0    0    0    0
 forward         5       
-data            1000     8003    
-t0              800     
+data            1     8003    
+t0              1     
 fit             0       4.9    
 packing         20
 
