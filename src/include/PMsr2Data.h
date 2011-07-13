@@ -68,7 +68,7 @@ class PMsr2Data
 
     int ParseXmlStartupFile();
     int ReadMsrFile(const string&) const;
-    bool ReadRunDataFile();
+    int ReadRunDataFile();
 
     bool PrepareNewInputFile(unsigned int, bool) const; // template
     bool PrepareGlobalInputFile(unsigned int, const string&, unsigned int) const; // generate msr-input file for a global fit

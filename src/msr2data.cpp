@@ -725,14 +725,14 @@ int main(int argc, char *argv[])
 
       // read data files
       if (writeSummary)
-        writeSummary = msr2dataHandler->ReadRunDataFile();
+        status = msr2dataHandler->ReadRunDataFile();
 
       unsigned int counter(0);
 
       while (msr2dataHandler->GetPresentRun()) {
         // write DB or dat file
         status = msr2dataHandler->WriteOutput(outputFile, db, writeHeader, !setNormalMode, counter);
-        if (status != PMUSR_SUCCESS) {
+        if (status == -1) {
           msr2data_cleanup(msr2dataHandler, arg);
           return status;
         }
@@ -805,7 +805,7 @@ int main(int argc, char *argv[])
         if (status != PMUSR_SUCCESS) {
           // if the msr-file cannot be read, write no output but proceed to the next run
           status = msr2dataHandler->WriteOutput("none", db, writeHeader);
-          if (status != PMUSR_SUCCESS) {
+          if (status == -1) {
             msr2data_cleanup(msr2dataHandler, arg);
             return status;
           } else {
@@ -816,11 +816,11 @@ int main(int argc, char *argv[])
 
     // read data files
       if (writeSummary)
-        writeSummary = msr2dataHandler->ReadRunDataFile();
+        status = msr2dataHandler->ReadRunDataFile();
 
     // write DB or dat file
       status = msr2dataHandler->WriteOutput(outputFile, db, writeHeader);
-      if (status != PMUSR_SUCCESS) {
+      if (status == -1) {
         msr2data_cleanup(msr2dataHandler, arg);
         return status;
       }

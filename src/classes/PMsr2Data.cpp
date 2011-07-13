@@ -513,10 +513,10 @@ PMsrHandler* PMsr2Data::GetSingleRunMsrFile() const
  * <p> Read in a run data-file
  *
  * <p><b>return:</b>
- * - true if everything is OK
- * - false otherwise
+ * - 0 if everything is OK
+ * - 1 otherwise
  */
-bool PMsr2Data::ReadRunDataFile()
+int PMsr2Data::ReadRunDataFile()
 {
   if (fStartupHandler)
     fDataHandler = new PRunDataHandler(fMsrHandler, fStartupHandler->GetDataPathList());
@@ -528,13 +528,14 @@ bool PMsr2Data::ReadRunDataFile()
     cerr << endl << ">> msr2data: **WARNING** Could not read all data files, will continue without the data file information..." << endl;
     delete fDataHandler;
     fDataHandler = 0;
+    return 1;
   }
-  return success;
+  return 0;
 }
 
 //-------------------------------------------------------------
 /**
- * <p> Generate a new single run msr-file from a template
+ * <p> Generate a new single-run msr file from a template
  *
  * <p><b>return:</b>
  * - true if everything is OK
@@ -623,6 +624,9 @@ bool PMsr2Data::PrepareNewInputFile(unsigned int tempRun, bool calledFromGlobalM
       while (strLine >> firstOnLine)
         out << " " << firstOnLine;
       out << endl;
+    } else if (!to_lower_copy(firstOnLine).compare("chisq") || !to_lower_copy(firstOnLine).compare("maxlh")) {
+      out << "*** FIT DID NOT CONVERGE ***" << endl;
+      break;
     } else {
       out << line << endl;
     }
@@ -1525,6 +1529,9 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
     ++fRunVectorIter;
   }
 
+   // set the convergence flag to false because no fit has been performed using the newly generated file
+   fMsrHandler->GetMsrStatistic()->fValid = false;
+
    // write the global msr-file
    status = fMsrHandler->WriteMsrFile(msrOutFile.c_str(), &commentsP, 0, 0, &commentsR);
 
@@ -1619,6 +1626,9 @@ bool PMsr2Data::PrepareNewSortedInputFile(unsigned int tempRun) const
     }
   }
 
+  // set the convergence flag to false because no fit has been performed using the newly generated file
+  fMsrHandler->GetMsrStatistic()->fValid = false;
+
   // write the msr-file
   int status = fMsrHandler->WriteMsrFile(msrOutFile.str().c_str());
 
@@ -1632,7 +1642,7 @@ bool PMsr2Data::PrepareNewSortedInputFile(unsigned int tempRun) const
   titleCopy.Clear();
 
   if (status != PMUSR_SUCCESS) {
-    cerr << endl << ">> msr2data: **ERROR** Writing the new msr-file has not been successful!";
+    cerr << endl << ">> msr2data: **ERROR** Writing the new msr file has not been successful!";
     cerr << endl;
     return false;
   }
@@ -1643,11 +1653,12 @@ bool PMsr2Data::PrepareNewSortedInputFile(unsigned int tempRun) const
 
 //-------------------------------------------------------------
 /**
- * <p> Append fit parameters of a msr-file to the DB or ASCII file
+ * <p> Append fit parameters of a msr file to the DB or ASCII file
  *
  * <p><b>return:</b>
  * - PMUSR_SUCCESS if everything is OK
- * - -1 in case of an error
+ * - -1 in case of a fatal error
+ * - -2 if a fit has not converged (and the data is not appended to the output file)
  *
  * \param outfile name of the DB/ASCII output file
  * \param db DB or plain ASCII output
@@ -1944,7 +1955,7 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHead
     dataParamErr.clear();
     indVarValues.clear();
 
-    return -1;
+    return -2;
   }
 
 // open the DB or dat file and write the data
