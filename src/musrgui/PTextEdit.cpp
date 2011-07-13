@@ -499,7 +499,7 @@ bool PTextEdit::validRunList(const QString runList)
   int val;
   bool ok;
   while (!done) {
-    subStr = runList.section(' ', i, i);
+    subStr = runList.section(' ', i, i, QString::SectionSkipEmpty);
     if (subStr.isEmpty()) {
       done = true;
       continue;
@@ -1525,7 +1525,7 @@ void PTextEdit::musrMsr2Data()
         break;
       case 1:
         end = 0;
-        while (!runList.section(' ', end, end).isEmpty()) {
+        while (!runList.section(' ', end, end, QString::SectionSkipEmpty).isEmpty()) {
           end++;
         }
         // first element
@@ -1533,14 +1533,14 @@ void PTextEdit::musrMsr2Data()
           str = "[" + runList + "]";
           cmd.append(str);
         } else {
-          str = "[" + runList.section(' ', 0, 0);
+          str = "[" + runList.section(' ', 0, 0, QString::SectionSkipEmpty);
           cmd.append(str);
           // middle elements
           for (i=1; i<end-1; i++) {
-            cmd.append(runList.section(' ', i, i));
+            cmd.append(runList.section(' ', i, i, QString::SectionSkipEmpty));
           }
           // last element
-          str = runList.section(' ', end-1, end-1) + "]";
+          str = runList.section(' ', end-1, end-1, QString::SectionSkipEmpty) + "]";
           cmd.append(str);
         }
         break;
@@ -1655,11 +1655,11 @@ void PTextEdit::musrMsr2Data()
             break;
           case 1: // run list
             end = 0;
-            while (!runList.section(' ', end, end).isEmpty()) {
+            while (!runList.section(' ', end, end, QString::SectionSkipEmpty).isEmpty()) {
               end++;
             }
             for (int i=0; i<end; i++) {
-              fln = runList.section(' ', i, i);
+              fln = runList.section(' ', i, i, QString::SectionSkipEmpty);
               if (fMsr2DataParam->msrFileExtension.isEmpty())
                 fln += ".msr";
               else
@@ -1681,7 +1681,7 @@ void PTextEdit::musrMsr2Data()
               str = stream->readLine(); // line of text excluding '\n'
               str.stripWhiteSpace();
               if (!str.isEmpty() && !str.startsWith("#") && !str.startsWith("run", false)) {
-                fln = str.section(' ', 0, 0);
+                fln = str.section(' ', 0, 0, QString::SectionSkipEmpty);
                 if (fMsr2DataParam->msrFileExtension.isEmpty())
                   fln += ".msr";
                 else
@@ -1707,7 +1707,7 @@ void PTextEdit::musrMsr2Data()
             fln = QString("%1").arg(fMsr2DataParam->firstRun) + QString("+global") + fMsr2DataParam->msrFileExtension + QString(".msr");
             break;
           case 1: // run list
-            fln = runList.section(" ", 0, 0) + QString("+global") + fMsr2DataParam->msrFileExtension + QString(".msr");
+            fln = runList.section(" ", 0, 0, QString::SectionSkipEmpty) + QString("+global") + fMsr2DataParam->msrFileExtension + QString(".msr");
             break;
           case 2: // run list file name
             file = new QFile(fMsr2DataParam->runListFileName);
@@ -1722,7 +1722,7 @@ void PTextEdit::musrMsr2Data()
               str = stream->readLine(); // line of text excluding '\n'
               str.stripWhiteSpace();
               if (!str.isEmpty() && !str.startsWith("#") && !str.startsWith("run", false)) {
-                fln = str.section(' ', 0, 0);
+                fln = str.section(' ', 0, 0, QString::SectionSkipEmpty);
                 break;
               }
             }
