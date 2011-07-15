@@ -43,7 +43,7 @@ typedef struct {
   int templateRunNo;
   QString dbOutputFileName;
   bool writeDbHeader;
-  bool summaryFilePresent;
+  bool ignoreDataHeaderInfo;
   bool keepMinuit2Output;
   bool writeColumnData;
   bool recreateDbFile;
@@ -53,6 +53,7 @@ typedef struct {
   bool createMsrFileOnly;
   bool fitOnly;
   bool global;
+  bool globalPlus;             ///< flag: true = 'global+' option
 } PMsr2DataParam;
 
 typedef struct {

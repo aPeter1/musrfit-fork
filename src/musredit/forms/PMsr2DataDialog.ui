@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>PMsr2DataDialog</class>
  <widget class="QDialog" name="PMsr2DataDialog">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -372,13 +375,13 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>31</y>
-      <width>540</width>
-      <height>108</height>
+      <x>6</x>
+      <y>20</y>
+      <width>541</width>
+      <height>116</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_8">
+    <layout class="QHBoxLayout" name="horizontalLayout_9">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
@@ -389,9 +392,9 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="fSummaryPresent_checkBox">
+        <widget class="QCheckBox" name="fIgnoreDataHeaderInfo_checkBox">
          <property name="text">
-          <string>Summary Files Present</string>
+          <string>Ignore Data Header Info</string>
          </property>
         </widget>
        </item>
@@ -453,11 +456,22 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="fGlobal_checkBox">
-         <property name="text">
-          <string>Global</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item>
+          <widget class="QCheckBox" name="fGlobal_checkBox">
+           <property name="text">
+            <string>Global</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="fGlobalPlus_checkBox">
+           <property name="text">
+            <string>Global+</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -467,9 +481,9 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>5</x>
      <y>500</y>
-     <width>551</width>
+     <width>541</width>
      <height>51</height>
     </rect>
    </property>
@@ -532,7 +546,7 @@
   <tabstop>fChainFit_checkBox</tabstop>
   <tabstop>fDataOutputFileName_lineEdit</tabstop>
   <tabstop>fWriteDataHeader_checkBox</tabstop>
-  <tabstop>fSummaryPresent_checkBox</tabstop>
+  <tabstop>fIgnoreDataHeaderInfo_checkBox</tabstop>
   <tabstop>fKeepMinuit2Output_checkBox</tabstop>
   <tabstop>fWriteColumnData_checkBox</tabstop>
   <tabstop>fRecreateDataFile_checkBox</tabstop>
@@ -540,6 +554,8 @@
   <tabstop>fTitleFromData_checkBox</tabstop>
   <tabstop>fCreateMsrFileOnly_checkBox</tabstop>
   <tabstop>fFitOnly_checkBox</tabstop>
+  <tabstop>fGlobal_checkBox</tabstop>
+  <tabstop>fGlobalPlus_checkBox</tabstop>
   <tabstop>fOk_pushButton</tabstop>
   <tabstop>fCancel_pushButton</tabstop>
   <tabstop>fHelp_pushButton</tabstop>
@@ -683,8 +699,8 @@
    <slot>fitOnlyChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>406</x>
-     <y>460</y>
+     <x>544</x>
+     <y>445</y>
     </hint>
     <hint type="destinationlabel">
      <x>301</x>
@@ -699,8 +715,8 @@
    <slot>createMsrFileOnlyChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>547</x>
-     <y>440</y>
+     <x>544</x>
+     <y>423</y>
     </hint>
     <hint type="destinationlabel">
      <x>150</x>

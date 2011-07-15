@@ -1837,8 +1837,8 @@ void PTextEdit::musrMsr2Data()
     if (!fMsr2DataParam->writeDbHeader)
       cmd.append("noheader");
 
-    // no summary flag?
-    if (!fMsr2DataParam->summaryFilePresent)
+    // ignore data header info flag present?
+    if (fMsr2DataParam->ignoreDataHeaderInfo)
       cmd.append("nosummary");
 
     // template run no fitting but: (i) no fit only flag, (ii) no create msr-file only flag
@@ -1869,8 +1869,8 @@ void PTextEdit::musrMsr2Data()
       cmd.append("-k");
     }
 
-    // replace msr-file title by data file title
-    if (fMsr2DataParam->titleFromDataFile) {
+    // replace msr-file title by data file title. Add flag only if a fit is done
+    if (fMsr2DataParam->titleFromDataFile && (fMsr2DataParam->fitOnly || fMsr2DataParam->templateRunNo != -1)) {
       cmd.append("-t");
     }
 
@@ -1890,17 +1890,21 @@ void PTextEdit::musrMsr2Data()
       cmd.append("global");
     }
 
-    // recreate db file
-    if (fMsr2DataParam->recreateDbFile) {
-      if (QFile::exists(fMsr2DataParam->dbOutputFileName)) {
-        if (!QFile::remove(fMsr2DataParam->dbOutputFileName)) {
-          str = QString("Couldn't delete db-file '%1'. Will **NOT** proceed.").arg(fMsr2DataParam->dbOutputFileName);
-          QMessageBox::critical(this, "**ERROR**", str,
-                                QMessageBox::Ok, QMessageBox::NoButton);
-          return;
-        }
+    // global+ flag check
+    if (fMsr2DataParam->globalPlus) {
+      if (fMsr2DataParam->chainFit) {
+        cmd.append("global+");
+      } else {
+        cmd.append("global+!");
       }
     }
+
+    // recreate db file
+    if (fMsr2DataParam->recreateDbFile) {
+      cmd.append("new");
+    }
+
+// qDebug() << ">> " << cmd << endl;
 
     PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath(), cmd);
     fitOutputHandler.setModal(true);

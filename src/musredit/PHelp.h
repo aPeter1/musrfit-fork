@@ -64,7 +64,6 @@ class PHelp : public QMainWindow
     QWebView *fView; ///< web viewer
     QLineEdit *fLocationEdit; ///< url address line edit
     int fProgress; ///< progress value (0-100) while loading an url
-
 };
 
 #endif // _PHELP_H_

@@ -75,8 +75,8 @@ class PAdminXMLParser : public QXmlDefaultHandler
                          eTheoFuncPixmapPath, eFunc, eFuncName, eFuncComment, eFuncLabel,
                          eFuncPixmap, eFuncParams, eHelpMain, eHelpTitle, eHelpParameters, eHelpTheory, eHelpFunctions,
                          eHelpRun, eHelpCommand, eHelpFourier, eHelpPlot, eHelpStatistic, eHelpMsr2Data,
-                         eChainFit, eWriteDataHeader, eSummaryFilesPresent, eKeepMinuit2Output, eWriteColumnData,
-                         eRecreateDataFile, eOpenFileAfterFitting, eCreateMsrFileOnly, eFitOnly, eGlobal};
+                         eChainFit, eWriteDataHeader, eIgnoreDataHeaderInfo, eKeepMinuit2Output, eWriteColumnData,
+                         eRecreateDataFile, eOpenFileAfterFitting, eCreateMsrFileOnly, eFitOnly, eGlobal, eGlobalPlus};
 
     bool startDocument();
     bool startElement( const QString&, const QString&, const QString& ,

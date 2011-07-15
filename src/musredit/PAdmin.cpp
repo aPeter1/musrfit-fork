@@ -117,8 +117,8 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eChainFit;
   } else if (qName == "write_data_header") {
     fKeyWord = eWriteDataHeader;
-  } else if (qName == "summary_files_present") {
-    fKeyWord = eSummaryFilesPresent;
+  } else if (qName == "ignore_data_header_info") {
+    fKeyWord = eIgnoreDataHeaderInfo;
   } else if (qName == "keep_minuit2_output") {
     fKeyWord = eKeepMinuit2Output;
   } else if (qName == "write_column_data") {
@@ -133,6 +133,8 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eFitOnly;
   } else if (qName == "global") {
     fKeyWord = eGlobal;
+  } else if (qName == "global_plus") {
+    fKeyWord = eGlobalPlus;
   } else if (qName == "func_pixmap_path") {
     fKeyWord = eTheoFuncPixmapPath;
   } else if (qName == "func") {
@@ -288,12 +290,12 @@ bool PAdminXMLParser::characters(const QString& str)
         flag = false;
       fAdmin->fMsr2DataParam.writeDbHeader = flag;
       break;
-    case eSummaryFilesPresent:
+    case eIgnoreDataHeaderInfo:
       if (str == "y")
         flag = true;
       else
         flag = false;
-      fAdmin->fMsr2DataParam.summaryFilePresent = flag;
+      fAdmin->fMsr2DataParam.ignoreDataHeaderInfo = flag;
       break;
     case eKeepMinuit2Output:
       if (str == "y")
@@ -343,6 +345,13 @@ bool PAdminXMLParser::characters(const QString& str)
       else
         flag = false;
       fAdmin->fMsr2DataParam.global = flag;
+      break;
+    case eGlobalPlus:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->fMsr2DataParam.globalPlus = flag;
       break;
     case eTheoFuncPixmapPath:
       fAdmin->setTheoFuncPixmapPath(QString(str.toLatin1()).trimmed());
@@ -544,7 +553,7 @@ PAdmin::PAdmin()
   fMsr2DataParam.templateRunNo = -1;
   fMsr2DataParam.dbOutputFileName = QString("");
   fMsr2DataParam.writeDbHeader = true;
-  fMsr2DataParam.summaryFilePresent = true;
+  fMsr2DataParam.ignoreDataHeaderInfo = false;
   fMsr2DataParam.keepMinuit2Output = false;
   fMsr2DataParam.writeColumnData = false;
   fMsr2DataParam.recreateDbFile = false;
@@ -554,6 +563,7 @@ PAdmin::PAdmin()
   fMsr2DataParam.createMsrFileOnly = false;
   fMsr2DataParam.fitOnly = false;
   fMsr2DataParam.global = false;
+  fMsr2DataParam.globalPlus = false;
 
   // XML Parser part
   QString fln = "musredit_startup.xml";

@@ -399,25 +399,6 @@
         </widget>
         <widget class="QCheckBox">
             <property name="name">
-                <cstring>fSummaryPresent_checkBox</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>20</x>
-                    <y>50</y>
-                    <width>180</width>
-                    <height>22</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Summary Files Present</string>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>will try to extract information from the summary file (LEM)</string>
-            </property>
-        </widget>
-        <widget class="QCheckBox">
-            <property name="name">
                 <cstring>fWriteDbHeader_checkBox</cstring>
             </property>
             <property name="geometry">
@@ -539,18 +520,53 @@
         </widget>
         <widget class="QCheckBox">
             <property name="name">
+                <cstring>fGlobalPlus_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>480</x>
+                    <y>90</y>
+                    <width>80</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Global+</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox">
+            <property name="name">
                 <cstring>fGlobal_checkBox</cstring>
             </property>
             <property name="geometry">
                 <rect>
                     <x>400</x>
                     <y>90</y>
-                    <width>106</width>
+                    <width>70</width>
                     <height>22</height>
                 </rect>
             </property>
             <property name="text">
                 <string>Global</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>fIgnoreDataHeaderInfo_checkBox</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>20</x>
+                    <y>50</y>
+                    <width>180</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Ignore Data Header Info</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>will try to extract information from the summary file (LEM)</string>
             </property>
         </widget>
     </widget>
@@ -643,7 +659,7 @@
 </widget>
 <images>
     <image name="image0">
-        <data format="PNG" length="340">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000011b49444154388db594c16ec4200c44c71207bea791f600df1f0e91d8efe180440fad776dea0089b6b9a021100f8f89291f19a8001c506a81775ee918628378f291697b6c8d47744f3e32a102ae7fb9a79dbcf3ef22bf8b59975a00fc14e5f91862ebf739b9c9740eadb9d848975ad61c330e36218b59fae5d8722a37e59449bd07d01757da62fce722a08b5e72fc1f8c09c090f1dd916639b6f4d7636bcfc94915e33eaf67a3c574cab8bf5d4b5b4ca7391eb10e21b6947662c7ac3fc23888dec11fb5d6df4ac5c8a972bc9a862b7ac9b175fcd1fc52afe014706e4388ed9932c979542084ad49e6662acefaaf771e29edc41f51bf3bb49969af18f606e085839d5fcab17426b564dbffe6a78ccffaef9b31d4491496d51cdf49c53749ce1f9de06199f60000000049454e44ae426082</data>
+        <data format="PNG" length="342">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000011d49444154388db594b192c3200c445733295cf21de72e257cbf29dd91efa0a4e38a4489c4c9803d3937cc62b096c75a94f60414000b904b865b9cd2c1870af1a43dd17a5f2b8f689eb42742016eedcb2d6ee416f729f25acc3a970ce05994e7830fb5dd77939b4ce7d09a8bf5742e79ce31e36013b298a5df8e2da772538a89d47b006d71a52dc67f2e02bae829c7ffc1980074195f1d6994634bffdcd7fa189c54316ef37a345a4c878cdbdbb5b4c57498e31e6bef438d712376ccfa2b8cbde81dfc516bfda554f49c2ac7b36938a3a71c5bc7efcd4ff50a4e01e7d6fb501f31919c4701bc5fab646ea6e2a8ffbac521c68df823ea77873633ec15ddde00bc71b0f3533996cea4966cdbdffc90f151fffd30863a89c2329be32ba9f8057c4e21e9a95dc13d0000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -712,7 +728,7 @@
     <tabstop>fChainFit_checkBox</tabstop>
     <tabstop>fDbOutputFileName_lineEdit</tabstop>
     <tabstop>fWriteDbHeader_checkBox</tabstop>
-    <tabstop>fSummaryPresent_checkBox</tabstop>
+    <tabstop>fIgnoreDataHeaderInfo_checkBox</tabstop>
     <tabstop>fKeepMinuit2Output_checkBox</tabstop>
     <tabstop>fWriteColumnData_checkBox</tabstop>
     <tabstop>fRecreateDbFile_checkBox</tabstop>
@@ -720,6 +736,8 @@
     <tabstop>fTitleFromData_checkBox</tabstop>
     <tabstop>fCreateMsrFileOnly_checkBox</tabstop>
     <tabstop>fFitOnly_checkBox</tabstop>
+    <tabstop>fGlobal_checkBox</tabstop>
+    <tabstop>fGlobalPlus_checkBox</tabstop>
     <tabstop>fOk_button</tabstop>
     <tabstop>fCancel_button</tabstop>
     <tabstop>fHelp_button</tabstop>
@@ -732,6 +750,8 @@
     <slot>createMsrFileOnlyChanged(int)</slot>
     <slot>fitOnlyChanged(int)</slot>
     <slot>templateRunEntered(const QString&amp;)</slot>
+    <slot access="private">globalOptionSet(bool checked)</slot>
+    <slot access="private">globalPlusOptionSet(bool checked)</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

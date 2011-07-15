@@ -49,7 +49,7 @@ typedef struct {
   int templateRunNo;           ///< fit template run number
   QString dbOutputFileName;    ///< output file name for the generated (trumf-like) db-file.
   bool writeDbHeader;          ///< flag indicating if a db header shall be generated (== !noheader in msr2data)
-  bool summaryFilePresent;     ///< flag indicating if a LEM summary file is present (== !nosummary in msr2data)
+  bool ignoreDataHeaderInfo;   ///< flag indicating if data header info (like temp.) shall be ignored (== nosummary in msr2data)
   bool keepMinuit2Output;      ///< flag indicating if the minuit2 output shall be kept ('-k' in msr2data)
   bool writeColumnData;        ///< flag indicating if instead of a db-file a column data ascii file shall be written ('data' in msr2data)
   bool recreateDbFile;         ///< flag: true = recreate db-file, false = append to present db-file
@@ -59,6 +59,7 @@ typedef struct {
   bool createMsrFileOnly;      ///< flag: true = just create the msr-files without any fitting ('msr-<template>' in msr2data)
   bool fitOnly;                ///< flag: true = just perform the fits wihtout generating any msr-files ('fit' in msr2data).
   bool global;                 ///< flag: true = 'global' option
+  bool globalPlus;             ///< flag: true = 'global+' option
 } PMsr2DataParam;
 
 //-------------------------------------------------------------------------------------------------

@@ -82,7 +82,7 @@ PMsr2DataDialog::PMsr2DataDialog(PMsr2DataParam *msr2DataParam) : fMsr2DataParam
   }
 
   fWriteDbHeader_checkBox->setChecked(fMsr2DataParam->writeDbHeader);
-  fSummaryPresent_checkBox->setChecked(fMsr2DataParam->summaryFilePresent);
+  fIgnoreDataHeaderInfo_checkBox->setChecked(fMsr2DataParam->ignoreDataHeaderInfo);
   fKeepMinuit2Output_checkBox->setChecked(fMsr2DataParam->keepMinuit2Output);
   fWriteColumnData_checkBox->setChecked(fMsr2DataParam->writeColumnData);
   fRecreateDbFile_checkBox->setChecked(fMsr2DataParam->recreateDbFile);
@@ -92,6 +92,10 @@ PMsr2DataDialog::PMsr2DataDialog(PMsr2DataParam *msr2DataParam) : fMsr2DataParam
   fCreateMsrFileOnly_checkBox->setChecked(fMsr2DataParam->createMsrFileOnly);
   fFitOnly_checkBox->setChecked(fMsr2DataParam->fitOnly);
   fGlobal_checkBox->setChecked(fMsr2DataParam->global);
+  fGlobalPlus_checkBox->setChecked(fMsr2DataParam->globalPlus);
+
+  connect(fGlobal_checkBox, SIGNAL(toggled(bool)), this, SLOT(globalOptionSet(bool)));
+  connect(fGlobalPlus_checkBox, SIGNAL(toggled(bool)), this, SLOT(globalPlusOptionSet(bool)));
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -120,7 +124,7 @@ PMsr2DataParam* PMsr2DataDialog::getMsr2DataParam()
   }
   fMsr2DataParam->dbOutputFileName = fDbOutputFileName_lineEdit->text();
   fMsr2DataParam->writeDbHeader = fWriteDbHeader_checkBox->isChecked();
-  fMsr2DataParam->summaryFilePresent = fSummaryPresent_checkBox->isChecked();
+  fMsr2DataParam->ignoreDataHeaderInfo = fIgnoreDataHeaderInfo_checkBox->isChecked();
   fMsr2DataParam->keepMinuit2Output = fKeepMinuit2Output_checkBox->isChecked();
   fMsr2DataParam->writeColumnData = fWriteColumnData_checkBox->isChecked();
   fMsr2DataParam->recreateDbFile = fRecreateDbFile_checkBox->isChecked();
@@ -240,8 +244,35 @@ void PMsr2DataDialog::fitOnlyChanged(int buttonState)
 {
   if (buttonState == QButton::On) {
     fCreateMsrFileOnly_checkBox->setChecked(false);
-    fGlobal_checkBox->setChecked(false);
     fTemplateRunNumber_lineEdit->clear();
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>Unchecks global+ if global is checked since global/global+ are excluding options
+ *
+ * \param checked true, if the check-box is checked
+ */
+void PMsr2DataDialog::globalOptionSet(bool checked)
+{
+  if (checked) {
+    if (fGlobalPlus_checkBox->isChecked())
+      fGlobalPlus_checkBox->setChecked(false);
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>Unchecks global if global+ is checked  since global/global+ are excluding options
+ *
+ * \param checked true, if the check-box is checked
+ */
+void PMsr2DataDialog::globalPlusOptionSet(bool checked)
+{
+  if (checked) {
+    if (fGlobal_checkBox->isChecked())
+      fGlobal_checkBox->setChecked(false);
   }
 }
 
