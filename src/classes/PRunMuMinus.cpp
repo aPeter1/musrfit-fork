@@ -97,6 +97,22 @@ Double_t PRunMuMinus::CalcChiSquare(const std::vector<Double_t>& par)
 }
 
 //--------------------------------------------------------------------------
+// CalcChiSquareExpected (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculate expected chi-square. Currently not implemented.
+ *
+ * <b>return:</b>
+ * - chisq value == 0.0
+ *
+ * \param par parameter vector iterated by minuit2
+ */
+Double_t PRunMuMinus::CalcChiSquareExpected(const std::vector<Double_t>& par)
+{
+  return 0.0;
+}
+
+//--------------------------------------------------------------------------
 // CalcMaxLikelihood
 //--------------------------------------------------------------------------
 /**

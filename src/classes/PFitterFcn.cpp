@@ -92,30 +92,11 @@ Double_t PFitterFcn::operator()(const std::vector<Double_t>& par) const
   return value;
 }
 
-
-//--------------------------------------------------------------------------
-// GetNoOfFittedBins()
-//--------------------------------------------------------------------------
-/**
- * <p>Get the number of fitted bins of the run block idx.
- *
- * \param idx index of the run block
- */
-UInt_t PFitterFcn::GetNoOfFittedBins(const UInt_t idx)
-{
-  UInt_t result = 0;
-
-  if (idx < fRunListCollection->GetNoOfSingleHisto())
-    result = fRunListCollection->GetNoOfBinsFitted(idx);
-
-  return result;
-}
-
 //--------------------------------------------------------------------------
 // CalcExpectedChiSquare()
 //--------------------------------------------------------------------------
 /**
- * <p>Calculates the expected chisq, if applicable.
+ * <p>Calculates the expected chisq, expected chisq per run, and chisq per run, if applicable.
  *
  * \param par
  * \param totalExpectedChisq expected chisq for all run blocks
@@ -130,6 +111,8 @@ void PFitterFcn::CalcExpectedChiSquare(const std::vector<Double_t> &par, Double_
   // only do something for chisq
   if (fUseChi2) {
     Double_t value = 0.0;
+
+    // single histo
     for (UInt_t i=0; i<fRunListCollection->GetNoOfSingleHisto(); i++) {
       value = fRunListCollection->GetSingleHistoChisqExpected(par, i); // calculate the expected chisq for single histo run block 'i'
       expectedChisqPerRun.push_back(value);

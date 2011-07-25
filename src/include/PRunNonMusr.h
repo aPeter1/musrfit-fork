@@ -46,6 +46,7 @@ class PRunNonMusr : public PRunBase
     virtual ~PRunNonMusr();
 
     virtual Double_t CalcChiSquare(const std::vector<Double_t>& par);
+    virtual Double_t CalcChiSquareExpected(const std::vector<Double_t>& par);
     virtual Double_t CalcMaxLikelihood(const std::vector<Double_t>& par);
     virtual void CalcTheory();
 

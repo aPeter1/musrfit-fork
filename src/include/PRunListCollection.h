@@ -59,10 +59,12 @@ class PRunListCollection
     virtual void SetFitRange(const PDoublePairVector fitRange);
 
     virtual Double_t GetSingleHistoChisq(const std::vector<Double_t>& par) const;
-    virtual Double_t GetSingleHistoChisqExpected(const std::vector<Double_t>& par, const UInt_t idx) const;
     virtual Double_t GetAsymmetryChisq(const std::vector<Double_t>& par) const;
     virtual Double_t GetMuMinusChisq(const std::vector<Double_t>& par) const;
     virtual Double_t GetNonMusrChisq(const std::vector<Double_t>& par) const;
+
+    virtual Double_t GetSingleHistoChisqExpected(const std::vector<Double_t>& par, const UInt_t idx) const;
+    virtual Double_t GetSingleRunChisq(const std::vector<Double_t>& par, const UInt_t idx) const;
 
     virtual Double_t GetSingleHistoMaximumLikelihood(const std::vector<Double_t>& par) const;
     virtual Double_t GetAsymmetryMaximumLikelihood(const std::vector<Double_t>& par) const;

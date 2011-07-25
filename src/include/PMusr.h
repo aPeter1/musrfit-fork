@@ -583,7 +583,8 @@ typedef struct {
   PMsrLines fStatLines; ///< statistics block in msr-file clear text
   TString fDate;     ///< string holding fitting date and time
   Bool_t   fChisq;   ///< flag telling if min = chi2 or min = max.likelihood
-  Double_t fMin;     ///< chi2 or max. likelihood
+  Double_t fMin;     ///< chisq or max. likelihood
+  PDoubleVector fMinPerHisto; ///< chisq or max. likelihood per histo
   UInt_t fNdf;       ///< number of degrees of freedom
   Double_t fMinExpected; ///< expected total chi2 or max. likelihood
   PDoubleVector fMinExpectedPerHisto; ///< expected pre histo chi2 or max. likelihood

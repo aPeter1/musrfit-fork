@@ -1019,21 +1019,24 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
 
                 for (UInt_t i=0; i<fStatistic.fMinExpectedPerHisto.size(); i++) {
                   if (fStatistic.fNdfPerHisto[i] > 0) {
-                    str.Form("  run block %d: expected chisq=%.1lf, NDF=%d, expected chisq/NDF=%lf",
-                             i+1, fStatistic.fMinExpectedPerHisto[i], fStatistic.fNdfPerHisto[i], fStatistic.fMinExpectedPerHisto[i] /fStatistic.fNdfPerHisto[i]);
-                    if (fWriteExpectedChisq)
-                      fout << str.Data() << endl;
-
-                    if (messages)
-                      cout << str.Data() << endl;
-                  } else {
-                    str.Form("  run block %d: expected chisq=%.1lf", i+1, fStatistic.fMinExpectedPerHisto[i]);
+                    str.Form("  run block %d: (NDF/red.chisq/red.chisq_e) = (%d/%lf/%lf)",
+                             i+1, fStatistic.fNdfPerHisto[i], fStatistic.fMinPerHisto[i]/fStatistic.fNdfPerHisto[i], fStatistic.fMinExpectedPerHisto[i]/fStatistic.fNdfPerHisto[i]);
                     if (fWriteExpectedChisq)
                       fout << str.Data() << endl;
 
                     if (messages)
                       cout << str.Data() << endl;
                   }
+                }
+              } else if (fStatistic.fNdfPerHisto.size() > 1) { // check if per run chisq needs to be written
+                for (UInt_t i=0; i<fStatistic.fNdfPerHisto.size(); i++) {
+                  str.Form("  run block %d: (NDF/red.chisq) = (%d/%lf)",
+                           i+1, fStatistic.fNdfPerHisto[i], fStatistic.fMinPerHisto[i]/fStatistic.fNdfPerHisto[i]);
+                  if (fWriteExpectedChisq)
+                    fout << str.Data() << endl;
+
+                  if (messages)
+                    cout << str.Data() << endl;
                 }
               }
             } else { // maxLH
@@ -1067,21 +1070,24 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
 
                 for (UInt_t i=0; i<fStatistic.fMinExpectedPerHisto.size(); i++) {
                   if (fStatistic.fNdfPerHisto[i] > 0) {
-                    str.Form("  run block %d: expected chisq=%.1lf, NDF=%d, expected chisq/NDF=%lf",
-                             i+1, fStatistic.fMinExpectedPerHisto[i], fStatistic.fNdfPerHisto[i], fStatistic.fMinExpectedPerHisto[i] /fStatistic.fNdfPerHisto[i]);
-                    if (fWriteExpectedChisq)
-                      fout << str.Data() << endl;
-
-                    if (messages)
-                      cout << str.Data() << endl;
-                  } else {
-                    str.Form("  run block %d: expected chisq=%.1lf", i+1, fStatistic.fMinExpectedPerHisto[i]);
+                    str.Form("  run block %d: (NDF/red.chisq/red.chisq_e) = (%d/%lf/%lf)",
+                             i+1, fStatistic.fNdfPerHisto[i], fStatistic.fMinPerHisto[i]/fStatistic.fNdfPerHisto[i], fStatistic.fMinExpectedPerHisto[i]/fStatistic.fNdfPerHisto[i]);
                     if (fWriteExpectedChisq)
                       fout << str.Data() << endl;
 
                     if (messages)
                       cout << str.Data() << endl;
                   }
+                }
+              } else if (fStatistic.fNdfPerHisto.size() > 1) { // check if per run chisq needs to be written
+                for (UInt_t i=0; i<fStatistic.fNdfPerHisto.size(); i++) {
+                  str.Form("  run block %d: (NDF/red.chisq) = (%d/%lf)",
+                           i+1, fStatistic.fNdfPerHisto[i], fStatistic.fMinPerHisto[i]/fStatistic.fNdfPerHisto[i]);
+                  if (fWriteExpectedChisq)
+                    fout << str.Data() << endl;
+
+                  if (messages)
+                    cout << str.Data() << endl;
                 }
               }
             } else { // max. log. liklihood
@@ -1137,21 +1143,24 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
 
           for (UInt_t i=0; i<fStatistic.fMinExpectedPerHisto.size(); i++) {
             if (fStatistic.fNdfPerHisto[i] > 0) {
-              str.Form("  run block %d: expected chisq=%.1lf, NDF=%d, expected chisq/NDF=%lf",
-                       i+1, fStatistic.fMinExpectedPerHisto[i], fStatistic.fNdfPerHisto[i], fStatistic.fMinExpectedPerHisto[i] /fStatistic.fNdfPerHisto[i]);
-              if (fWriteExpectedChisq)
-                fout << str.Data() << endl;
-
-              if (messages)
-                cout << str.Data() << endl;
-            } else {
-              str.Form("  run block %d: expected chisq=%.1lf", i+1, fStatistic.fMinExpectedPerHisto[i]);
+              str.Form("  run block %d: (NDF/red.chisq/red.chisq_e) = (%d/%lf/%lf)",
+                       i+1, fStatistic.fNdfPerHisto[i], fStatistic.fMinPerHisto[i]/fStatistic.fNdfPerHisto[i], fStatistic.fMinExpectedPerHisto[i]/fStatistic.fNdfPerHisto[i]);
               if (fWriteExpectedChisq)
                 fout << str.Data() << endl;
 
               if (messages)
                 cout << str.Data() << endl;
             }
+          }
+        } else if (fStatistic.fNdfPerHisto.size() > 1) { // check if per run chisq needs to be written
+          for (UInt_t i=0; i<fStatistic.fNdfPerHisto.size(); i++) {
+            str.Form("  run block %d: (NDF/red.chisq) = (%d/%lf)",
+                     i+1, fStatistic.fNdfPerHisto[i], fStatistic.fMinPerHisto[i]/fStatistic.fNdfPerHisto[i]);
+            if (fWriteExpectedChisq)
+              fout << str.Data() << endl;
+
+            if (messages)
+              cout << str.Data() << endl;
           }
         }
       } else { // maxLH
@@ -1191,21 +1200,24 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
 
           for (UInt_t i=0; i<fStatistic.fMinExpectedPerHisto.size(); i++) {
             if (fStatistic.fNdfPerHisto[i] > 0) {
-              str.Form("  run block %d: expected chisq=%.1lf, NDF=%d, expected chisq/NDF=%lf",
-                       i+1, fStatistic.fMinExpectedPerHisto[i], fStatistic.fNdfPerHisto[i], fStatistic.fMinExpectedPerHisto[i] /fStatistic.fNdfPerHisto[i]);
-              if (fWriteExpectedChisq)
-                fout << str.Data() << endl;
-
-              if (messages)
-                cout << str.Data() << endl;
-            } else {
-              str.Form("  run block %d: expected chisq=%.1lf", i+1, fStatistic.fMinExpectedPerHisto[i]);
+              str.Form("  run block %d: (NDF/red.chisq/red.chisq_e) =(%d/%lf/%lf)",
+                       i+1, fStatistic.fNdfPerHisto[i], fStatistic.fMinExpectedPerHisto[i]/fStatistic.fNdfPerHisto[i], fStatistic.fMinExpectedPerHisto[i]/fStatistic.fNdfPerHisto[i]);
               if (fWriteExpectedChisq)
                 fout << str.Data() << endl;
 
               if (messages)
                 cout << str.Data() << endl;
             }
+          }
+        } else if (fStatistic.fNdfPerHisto.size() > 1) { // check if per run chisq needs to be written
+          for (UInt_t i=0; i<fStatistic.fNdfPerHisto.size(); i++) {
+            str.Form("  run block %d: (NDF/red.chisq) = (%d/%lf)",
+                     i+1, fStatistic.fNdfPerHisto[i], fStatistic.fMinPerHisto[i]/fStatistic.fNdfPerHisto[i]);
+            if (fWriteExpectedChisq)
+              fout << str.Data() << endl;
+
+            if (messages)
+              cout << str.Data() << endl;
           }
         }
       } else { // max. log. liklihood
@@ -3970,7 +3982,7 @@ Bool_t PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
 // GetNoOfFitParameters (public)
 //--------------------------------------------------------------------------
 /**
- * <p>Calculate the number of fit parameters for single histo fits.
+ * <p>Calculate the number of fit parameters.
  *
  * \param idx run block index
  */
@@ -3993,7 +4005,7 @@ UInt_t PMsrHandler::GetNoOfFitParameters(UInt_t idx)
     return 0;
   }
 
-  // get N0 parameter, possible parameter number or function
+  // get N0 parameter, possible parameter number or function (single histo fit)
   if (fRuns[idx].GetNormParamNo() != -1) {
     if (fRuns[idx].GetNormParamNo() < MSR_PARAM_FUN_OFFSET) // parameter
       paramVector.push_back(fRuns[idx].GetNormParamNo());
@@ -4001,9 +4013,17 @@ UInt_t PMsrHandler::GetNoOfFitParameters(UInt_t idx)
       funVector.push_back(fRuns[idx].GetNormParamNo() - MSR_PARAM_FUN_OFFSET);
   }
 
-  // get background parameter, for the case the background is fitted.
+  // get background parameter, for the case the background is fitted (single histo fit)
   if (fRuns[idx].GetBkgFitParamNo() != -1)
     paramVector.push_back(fRuns[idx].GetBkgFitParamNo());
+
+  // get alpha parameter if present (asymmetry fit)
+  if (fRuns[idx].GetAlphaParamNo() != -1)
+    paramVector.push_back(fRuns[idx].GetAlphaParamNo());
+
+  // get beta parameter if present (asymmetry fit)
+  if (fRuns[idx].GetBetaParamNo() != -1)
+    paramVector.push_back(fRuns[idx].GetBetaParamNo());
 
   // go through the theory block and collect parameters
   // possible entries: number -> parameter, fun<number> -> function, map<number> -> maps

@@ -80,7 +80,7 @@ PRunListCollection::~PRunListCollection()
 }
 
 //--------------------------------------------------------------------------
-// Add
+// Add (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Adds a processed set of data to the handler.
@@ -150,7 +150,7 @@ void PRunListCollection::SetFitRange(const PDoublePairVector fitRange)
 }
 
 //--------------------------------------------------------------------------
-// GetSingleHistoChisq
+// GetSingleHistoChisq (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Calculates chi-square of <em>all</em> single histogram runs of a msr-file.
@@ -171,29 +171,7 @@ Double_t PRunListCollection::GetSingleHistoChisq(const std::vector<Double_t>& pa
 }
 
 //--------------------------------------------------------------------------
-// GetSingleHistoChisqExpected
-//--------------------------------------------------------------------------
-/**
- * <p>Calculates expected chi-square of the single histogram with run block index idx of a msr-file.
- *
- * <b>return:</b>
- * - expected chi-square of for a single histogram
- *
- * \param par fit parameter vector
- * \param idx run block index
- */
-Double_t PRunListCollection::GetSingleHistoChisqExpected(const std::vector<Double_t>& par, const UInt_t idx) const
-{
-  Double_t expectedChisq = 0.0;
-
-  if (idx < fRunSingleHistoList.size())
-    expectedChisq = fRunSingleHistoList[idx]->CalcChiSquareExpected(par);
-
-  return expectedChisq;
-}
-
-//--------------------------------------------------------------------------
-// GetAsymmetryChisq
+// GetAsymmetryChisq (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Calculates chi-square of <em>all</em> asymmetry runs of a msr-file.
@@ -214,7 +192,7 @@ Double_t PRunListCollection::GetAsymmetryChisq(const std::vector<Double_t>& par)
 }
 
 //--------------------------------------------------------------------------
-// GetMuMinusChisq
+// GetMuMinusChisq (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Calculates chi-square of <em>all</em> mu minus runs of a msr-file.
@@ -235,7 +213,7 @@ Double_t PRunListCollection::GetMuMinusChisq(const std::vector<Double_t>& par) c
 }
 
 //--------------------------------------------------------------------------
-// GetNonMusrChisq
+// GetNonMusrChisq (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Calculates chi-square of <em>all</em> non-muSR runs of a msr-file.
@@ -256,7 +234,109 @@ Double_t PRunListCollection::GetNonMusrChisq(const std::vector<Double_t>& par) c
 }
 
 //--------------------------------------------------------------------------
-// GetSingleHistoMaximumLikelihood
+// GetSingleHistoChisqExpected (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculates expected chi-square of the single histogram with run block index idx of a msr-file.
+ *
+ * <b>return:</b>
+ * - expected chi-square of for a single histogram
+ *
+ * \param par fit parameter vector
+ * \param idx run block index
+ */
+Double_t PRunListCollection::GetSingleHistoChisqExpected(const std::vector<Double_t>& par, const UInt_t idx) const
+{
+  Double_t expectedChisq = 0.0;
+
+  if (idx > fMsrInfo->GetMsrRunList()->size()) {
+    cerr << ">> PRunListCollection::GetSingleHistoChisqExpected() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << endl << endl;
+    return expectedChisq;
+  }
+
+  Int_t type = fMsrInfo->GetMsrRunList()->at(idx).GetFitType();
+
+  // count how many entries of this fit-type are present up to idx
+  UInt_t subIdx = 0;
+  for (UInt_t i=0; i<idx; i++) {
+    if (fMsrInfo->GetMsrRunList()->at(i).GetFitType() == type)
+      subIdx++;
+  }
+
+  // return the chisq of the single run
+  switch (type) {
+  case PRUN_SINGLE_HISTO:
+    expectedChisq = fRunSingleHistoList[subIdx]->CalcChiSquareExpected(par);
+    break;
+  case PRUN_ASYMMETRY:
+    expectedChisq = fRunAsymmetryList[subIdx]->CalcChiSquareExpected(par);
+    break;
+  case PRUN_MU_MINUS:
+    expectedChisq = fRunMuMinusList[subIdx]->CalcChiSquareExpected(par);
+    break;
+  case PRUN_NON_MUSR:
+    expectedChisq = fRunNonMusrList[subIdx]->CalcChiSquareExpected(par);
+    break;
+  default:
+    break;
+  }
+
+  return expectedChisq;
+}
+
+//--------------------------------------------------------------------------
+// GetSingleRunChisq (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculates chi-square of a single run-block entry of the msr-file.
+ *
+ * <b>return:</b>
+ * - chi-square of single run-block entry with index idx
+ *
+ * \param par fit parameter vector
+ * \param idx run block index
+ */
+Double_t PRunListCollection::GetSingleRunChisq(const std::vector<Double_t>& par, const UInt_t idx) const
+{
+  Double_t chisq = 0.0;
+
+  if (idx > fMsrInfo->GetMsrRunList()->size()) {
+    cerr << ">> PRunListCollection::GetSingleRunChisq() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << endl << endl;
+    return chisq;
+  }
+
+  Int_t type = fMsrInfo->GetMsrRunList()->at(idx).GetFitType();
+
+  // count how many entries of this fit-type are present up to idx
+  UInt_t subIdx = 0;
+  for (UInt_t i=0; i<idx; i++) {
+    if (fMsrInfo->GetMsrRunList()->at(i).GetFitType() == type)
+      subIdx++;
+  }
+
+  // return the chisq of the single run
+  switch (type) {
+  case PRUN_SINGLE_HISTO:
+    chisq = fRunSingleHistoList[subIdx]->CalcChiSquare(par);
+    break;
+  case PRUN_ASYMMETRY:
+    chisq = fRunAsymmetryList[subIdx]->CalcChiSquare(par);
+    break;
+  case PRUN_MU_MINUS:
+    chisq = fRunMuMinusList[subIdx]->CalcChiSquare(par);
+    break;
+  case PRUN_NON_MUSR:
+    chisq = fRunNonMusrList[subIdx]->CalcChiSquare(par);
+    break;
+  default:
+    break;
+  }
+
+  return chisq;
+}
+
+//--------------------------------------------------------------------------
+// GetSingleHistoMaximumLikelihood (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Calculates log max-likelihood of <em>all</em> single histogram runs of a msr-file.
@@ -277,7 +357,7 @@ Double_t PRunListCollection::GetSingleHistoMaximumLikelihood(const std::vector<D
 }
 
 //--------------------------------------------------------------------------
-// GetAsymmetryMaximumLikelihood
+// GetAsymmetryMaximumLikelihood (public)
 //--------------------------------------------------------------------------
 /**
  * <p> Since it is not clear yet how to handle asymmetry fits with max likelihood
@@ -299,7 +379,7 @@ Double_t PRunListCollection::GetAsymmetryMaximumLikelihood(const std::vector<Dou
 }
 
 //--------------------------------------------------------------------------
-// GetMuMinusMaximumLikelihood
+// GetMuMinusMaximumLikelihood (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Calculates log max-likelihood of <em>all</em> mu minus runs of a msr-file.
@@ -320,7 +400,7 @@ Double_t PRunListCollection::GetMuMinusMaximumLikelihood(const std::vector<Doubl
 }
 
 //--------------------------------------------------------------------------
-// GetNonMusrMaximumLikelihood
+// GetNonMusrMaximumLikelihood (public)
 //--------------------------------------------------------------------------
 /**
  * <p> Since it is not clear yet how to handle non musr fits with max likelihood
@@ -342,7 +422,7 @@ Double_t PRunListCollection::GetNonMusrMaximumLikelihood(const std::vector<Doubl
 }
 
 //--------------------------------------------------------------------------
-// GetNoOfBinsFitted
+// GetNoOfBinsFitted (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Number of bins in run block idx to be fitted. Only used for single histogram
@@ -357,15 +437,44 @@ UInt_t PRunListCollection::GetNoOfBinsFitted(const UInt_t idx) const
 {
   UInt_t result = 0;
 
-  if (idx < fRunSingleHistoList.size())
-    result = fRunSingleHistoList[idx]->GetNoOfFitBins();
+  if (idx > fMsrInfo->GetMsrRunList()->size()) {
+    cerr << ">> PRunListCollection::GetNoOfBinsFitted() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << endl << endl;
+    return result;
+  }
+
+  Int_t type = fMsrInfo->GetMsrRunList()->at(idx).GetFitType();
+
+  // count how many entries of this fit-type are present up to idx
+  UInt_t subIdx = 0;
+  for (UInt_t i=0; i<idx; i++) {
+    if (fMsrInfo->GetMsrRunList()->at(i).GetFitType() == type)
+      subIdx++;
+  }
+
+  // return the chisq of the single run
+  switch (type) {
+  case PRUN_SINGLE_HISTO:
+    result = fRunSingleHistoList[subIdx]->GetNoOfFitBins();
+    break;
+  case PRUN_ASYMMETRY:
+    result = fRunAsymmetryList[subIdx]->GetNoOfFitBins();
+    break;
+  case PRUN_MU_MINUS:
+    result = fRunMuMinusList[subIdx]->GetNoOfFitBins();
+    break;
+  case PRUN_NON_MUSR:
+    result = fRunNonMusrList[subIdx]->GetNoOfFitBins();
+    break;
+  default:
+    break;
+  }
 
   return result;
 }
 
 
 //--------------------------------------------------------------------------
-// GetTotalNoOfBinsFitted
+// GetTotalNoOfBinsFitted (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Counts the total number of bins to be fitted.
@@ -393,7 +502,7 @@ UInt_t PRunListCollection::GetTotalNoOfBinsFitted() const
 }
 
 //--------------------------------------------------------------------------
-// GetSingleHisto
+// GetSingleHisto (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Get a processed single histogram data set.
@@ -436,7 +545,7 @@ PRunData* PRunListCollection::GetSingleHisto(UInt_t index, EDataSwitch tag)
 }
 
 //--------------------------------------------------------------------------
-// GetAsymmetry
+// GetAsymmetry (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Get a processed asymmetry data set.
@@ -479,7 +588,7 @@ PRunData* PRunListCollection::GetAsymmetry(UInt_t index, EDataSwitch tag)
 }
 
 //--------------------------------------------------------------------------
-// GetMuMinus
+// GetMuMinus (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Get a processed mu minus data set.
@@ -519,7 +628,7 @@ PRunData* PRunListCollection::GetMuMinus(UInt_t index, EDataSwitch tag)
 }
 
 //--------------------------------------------------------------------------
-// GetNonMusr
+// GetNonMusr (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Get a processed non-muSR data set.
@@ -559,7 +668,7 @@ PRunData* PRunListCollection::GetNonMusr(UInt_t index, EDataSwitch tag)
 }
 
 //--------------------------------------------------------------------------
-// GetTemp
+// GetTemp (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Get the temperature from the data set.
@@ -575,7 +684,7 @@ const PDoublePairVector* PRunListCollection::GetTemp(const TString &runName) con
 }
 
 //--------------------------------------------------------------------------
-// GetField
+// GetField (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Get the magnetic field from the data set.
@@ -591,7 +700,7 @@ Double_t PRunListCollection::GetField(const TString &runName) const
 }
 
 //--------------------------------------------------------------------------
-// GetEnergy
+// GetEnergy (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Get the muon implantation energy from the data set.
@@ -607,7 +716,7 @@ Double_t PRunListCollection::GetEnergy(const TString &runName) const
 }
 
 //--------------------------------------------------------------------------
-// GetSetup
+// GetSetup (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Get the setup information from the data set.
@@ -623,7 +732,7 @@ const Char_t* PRunListCollection::GetSetup(const TString &runName) const
 }
 
 //--------------------------------------------------------------------------
-// GetXAxisTitle
+// GetXAxisTitle (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Get the x-axis title (used with non-muSR fit).
@@ -656,7 +765,7 @@ const Char_t* PRunListCollection::GetXAxisTitle(const TString &runName, const UI
 }
 
 //--------------------------------------------------------------------------
-// GetYAxisTitle
+// GetYAxisTitle (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Get the y-axis title (used with non-muSR fit).

@@ -463,7 +463,7 @@ int main(int argc, char *argv[])
   }
 
   // read msr-file
-  PMsrHandler *msrHandler = new PMsrHandler(filename, startupHandler->GetWriteExpectedChisq());
+  PMsrHandler *msrHandler = new PMsrHandler(filename, startupHandler->GetWritePerRunBlockChisq());
   status = msrHandler->ReadMsrFile();
   if (status != PMUSR_SUCCESS) {
     switch (status) {

@@ -51,7 +51,7 @@ class PFitterFcn : public ROOT::Minuit2::FCNBase
     Double_t operator()(const std::vector<Double_t> &par) const;
 
     UInt_t GetTotalNoOfFittedBins() { return fRunListCollection->GetTotalNoOfBinsFitted(); }
-    UInt_t GetNoOfFittedBins(const UInt_t idx);
+    UInt_t GetNoOfFittedBins(const UInt_t idx) { return fRunListCollection->GetNoOfBinsFitted(idx); }
     void CalcExpectedChiSquare(const std::vector<Double_t> &par, Double_t &totalExpectedChisq, std::vector<Double_t> &expectedChisqPerRun);
 
   private:

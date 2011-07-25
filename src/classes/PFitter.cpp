@@ -174,6 +174,11 @@ Bool_t PFitter::DoFit()
       Double_t totalExpectedChisq = 0.0;
       std::vector<Double_t> expectedChisqPerHisto;
       fFitterFcn->CalcExpectedChiSquare(param, totalExpectedChisq, expectedChisqPerHisto);
+      // calculate chisq per run
+      std::vector<Double_t> chisqPerHisto;
+      for (UInt_t i=0; i<fRunInfo->GetMsrRunList()->size(); i++) {
+        chisqPerHisto.push_back(fRunListCollection->GetSingleRunChisq(param, i));
+      }
 
       cout << endl << endl << ">> chisq = " << val << ", NDF = " << ndf << ", chisq/NDF = " << val/ndf;
 
@@ -183,14 +188,20 @@ Bool_t PFitter::DoFit()
         for (UInt_t i=0; i<expectedChisqPerHisto.size(); i++) {
           ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
           if (ndf_histo > 0)
-            cout << endl << ">> run block " << i+1 << ": expected chisq = " << expectedChisqPerHisto[i] << ", ndf = " << ndf_histo << ", expected chisq/NDF = " << expectedChisqPerHisto[i]/ndf_histo;
-          else
-            cout << endl << ">> run block " << i+1 << ": expected chisq = " << expectedChisqPerHisto[i];
+            cout << endl << ">> run block " << i+1 << ": (NDF/red.chisq/red.chisq_e) = (" << ndf_histo << "/" << chisqPerHisto[i]/ndf_histo << "/" << expectedChisqPerHisto[i]/ndf_histo << ")";
         }
-
-        // clean up
-        expectedChisqPerHisto.clear();
+      } else if (chisqPerHisto.size() > 0) { // in case expected chisq is not applicable like for asymmetry fits
+        UInt_t ndf_histo = 0;
+        for (UInt_t i=0; i<chisqPerHisto.size(); i++) {
+          ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+          if (ndf_histo > 0)
+            cout << endl << ">> run block " << i+1 << ": (NDF/red.chisq) = (" << ndf_histo << "/" << chisqPerHisto[i]/ndf_histo << ")";
+        }
       }
+
+      // clean up
+      chisqPerHisto.clear();
+      expectedChisqPerHisto.clear();
     } else { // max. log likelihood
       cout << endl << endl << ">> maxLH = " << val << ", NDF = " << ndf << ", maxLH/NDF = " << val/ndf;
     }
@@ -1456,6 +1467,12 @@ Bool_t PFitter::ExecuteSave()
 
     fFitterFcn->CalcExpectedChiSquare(param, totalExpectedChisq, expectedChisqPerHisto);
 
+    // calculate chisq per run
+    std::vector<Double_t> chisqPerHisto;
+    for (UInt_t i=0; i<fRunInfo->GetMsrRunList()->size(); i++) {
+      chisqPerHisto.push_back(fRunListCollection->GetSingleRunChisq(param, i));
+    }
+
     if (totalExpectedChisq != 0.0) { // i.e. applicable for single histogram fits only
       // get the ndf's of the histos
       UInt_t ndf_histo;
@@ -1467,11 +1484,31 @@ Bool_t PFitter::ExecuteSave()
       // feed the msr-file handler
       PMsrStatisticStructure *statistics = fRunInfo->GetMsrStatistic();
       if (statistics) {
+        statistics->fMinPerHisto = chisqPerHisto;
         statistics->fMinExpected = totalExpectedChisq;
         statistics->fMinExpectedPerHisto = expectedChisqPerHisto;
         statistics->fNdfPerHisto = ndfPerHisto;
       }
+    } else if (chisqPerHisto.size() > 1) { // in case expected chisq is not applicable like for asymmetry fits
+      UInt_t ndf_histo = 0;
+      for (UInt_t i=0; i<chisqPerHisto.size(); i++) {
+        ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+        ndfPerHisto.push_back(ndf_histo);
+      }
+
+      // feed the msr-file handler
+      PMsrStatisticStructure *statistics = fRunInfo->GetMsrStatistic();
+      if (statistics) {
+        statistics->fMinPerHisto = chisqPerHisto;
+        statistics->fNdfPerHisto = ndfPerHisto;
+      }
     }
+
+    // clean up
+    param.clear();
+    expectedChisqPerHisto.clear();
+    ndfPerHisto.clear();
+    chisqPerHisto.clear();
   }
 
   cout << ">> PFitter::ExecuteSave(): will write minuit2 output file ..." << endl;

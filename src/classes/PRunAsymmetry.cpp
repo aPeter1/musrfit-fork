@@ -220,6 +220,22 @@ Double_t PRunAsymmetry::CalcChiSquare(const std::vector<Double_t>& par)
 }
 
 //--------------------------------------------------------------------------
+// CalcChiSquareExpected (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculate expected chi-square. Currently not implemented since not clear what to be done.
+ *
+ * <b>return:</b>
+ * - chisq value == 0.0
+ *
+ * \param par parameter vector iterated by minuit2
+ */
+Double_t PRunAsymmetry::CalcChiSquareExpected(const std::vector<Double_t>& par)
+{
+  return 0.0;
+}
+
+//--------------------------------------------------------------------------
 // CalcMaxLikelihood
 //--------------------------------------------------------------------------
 /**
@@ -244,13 +260,6 @@ Double_t PRunAsymmetry::CalcMaxLikelihood(const std::vector<Double_t>& par)
  */
 UInt_t PRunAsymmetry::GetNoOfFitBins()
 {
-//   Double_t time;
-//   fNoOfFitBins=0;
-//   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
-//     time = fData.GetDataTimeStart() + (Double_t)i * fData.GetDataTimeStep();
-//     if ((time >= fFitStartTime) && (time <= fFitEndTime))
-//       fNoOfFitBins++;
-//   }
   CalcNoOfFitBins();
 
   return fNoOfFitBins;
