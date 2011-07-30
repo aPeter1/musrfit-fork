@@ -2052,7 +2052,7 @@ void PTextEdit::musrView()
   QString cmd;
   QString str;
 
-  str = "cd " + QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "; ";
+  str = "cd \"" + QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "\"; ";
 
   str += fAdmin->getExecPath() + "/musrview";
   cmd = str + " \"";
