@@ -176,6 +176,8 @@ int PMsr2Data::DetermineRunNumberDigits(unsigned int runNo, bool normalMode) con
   tempRunNumber.width(fRunNumberDigits);
   tempRunNumber << runNo;
 
+  fRunNumberDigits = tempRunNumber.str().length();
+
   string line, firstOnLine;
   istringstream strLine;
 
@@ -188,18 +190,19 @@ int PMsr2Data::DetermineRunNumberDigits(unsigned int runNo, bool normalMode) con
       strLine >> firstOnLine;
       string::size_type loc = firstOnLine.rfind(tempRunNumber.str());
       if ( loc != string::npos ) {
-        while ( --loc >= 0 ) {
-           if(isdigit(line.at(loc))) {
-             ++fRunNumberDigits;
-           } else {
-             in->close();
-             delete in;
-             in = 0;
-             fRunVectorIter = fRunVector.begin(); // set back the runlist-iterator which might have changed during the search for the correct file
-             return 0;
-           }
-         }
-       } else {
+        while ( loc > 0 ) {
+          if(isdigit(firstOnLine.at(--loc))) {
+            ++fRunNumberDigits;
+          } else {
+            break;
+          }
+        }
+        in->close();
+        delete in;
+        in = 0;
+        fRunVectorIter = fRunVector.begin(); // set back the runlist-iterator which might have changed during the search for the correct file
+        return 0;
+      } else {
          cerr << endl << ">> msr2data: **ERROR** The first processed run file number does not match the \"file index\"!";
          cerr << endl << ">> msr2data: **ERROR** The number of digits to be used for formatting the run numbers cannot be determined!";
          cerr << endl << ">> msr2data: **ERROR** Please check the first msr-file that should be processed;";
