@@ -544,6 +544,9 @@ int main(int argc, char *argv[])
     cerr << ">> msr2data: **ERROR** The run numbers are out of range! Quitting..." << endl;
     msr2data_cleanup(msr2dataHandler, run_vec, arg);
     return status;
+  } else if (status == -1) {
+    msr2data_cleanup(msr2dataHandler, run_vec, arg);
+    return status;
   }
 
   run_vec.clear();
