@@ -1495,7 +1495,7 @@ void PTextEdit::musrMsr2Data()
         break;
       case 2:  // run list file name
         runListFileName = fMsr2DataParam->runListFileName;
-        fi = runListFileName;
+        fi.setFile(runListFileName);
         if (!fi.exists()) {
           str = QString("Run List File '%1' doesn't exist.").arg(runListFileName);
           QMessageBox::critical(this, "**ERROR**",

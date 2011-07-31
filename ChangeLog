@@ -14,6 +14,7 @@ NEW the chi^2 calculation in single-histogram and asymmetry fits is parallelized
     if musrfit is built using a compiler supporting OpenMP (e.g. GCC >= 4.2)
     Using --disable-omp this feature can be disabled on the configure level.
 NEW any2many: force the user to define the exact NeXus ouput format (HDF4,HDF5,XML)
+FIXED broken run-list interface to msr2data in musredit/musrgui (MUSR-202)
 FIXED some severe issues in the run-number-digit determination of msr2data introduced in late 2010
 FIXED a musrview exception error when starting with t0's very much off to the positive side in the msr-file (MUSR-199)
 FIXED a linking problem when only shared libraries are built on Cygwin
