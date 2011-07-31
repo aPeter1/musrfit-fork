@@ -1880,14 +1880,18 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHead
 
     PDoubleVector ra(rawRunData->GetRingAnode());
     if (ra.size() > 1) {
-      dataParamNames.push_back("dataRALRAR");
-      dataParamLabels.push_back("RAL-RAR (kV)");
-      dataParam.push_back(ra[0]-ra[1]);
+      if ((ra[0] != PMUSR_UNDEFINED) && (ra[1] != PMUSR_UNDEFINED)) {
+        dataParamNames.push_back("dataRALRAR");
+        dataParamLabels.push_back("RAL-RAR (kV)");
+        dataParam.push_back(ra[0]-ra[1]);
+      }
     }
     if (ra.size() == 4) {
-      dataParamNames.push_back("dataRATRAB");
-      dataParamLabels.push_back("RAT-RAB (kV)");
-      dataParam.push_back(ra[2]-ra[3]);
+      if ((ra[2] != PMUSR_UNDEFINED) && (ra[3] != PMUSR_UNDEFINED)) {
+        dataParamNames.push_back("dataRATRAB");
+        dataParamLabels.push_back("RAT-RAB (kV)");
+        dataParam.push_back(ra[2]-ra[3]);
+      }
     }
     rawRunData = 0;
   }
