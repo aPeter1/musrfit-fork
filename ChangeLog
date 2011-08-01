@@ -6,6 +6,7 @@
 
 changes since 0.9.0
 ===================================
+NEW Added the online documentation to the repository. It can be found under "doc/html".
 NEW added chisq per run block information (all fit types). The same output rules as for the expected chisq are in place.
 NEW calculate expected chisq (Pearson's chisq) for single histogram fits. It always will send this information to the stdout
     but only writes it to the msr-file if a corresponding flag in the musrfit_startup.xml is enabling it. The following

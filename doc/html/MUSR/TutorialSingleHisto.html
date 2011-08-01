@@ -1,0 +1,305 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en_US">
+
+<!-- Mirrored from intranet.psi.ch/MUSR/TutorialSingleHisto?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Mon, 01 Aug 2011 13:15:33 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
+<head>
+<link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
+	<title> MUSR :: TutorialSingleHisto</title>
+		  
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /> <meta name="robots" content="noindex" /> <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="WebRsshtml.html" />
+	 <meta name="scripturl" content="https://intranet.psi.ch/wiki/bin" />
+	 <meta name="scriptsuffix" content="" />
+
+<meta name="WEBTOPIC" content="TutorialSingleHisto" />
+<meta name="WEB" content="MUSR" />
+<meta name="SCRIPTURLPATH" content="/wiki/bin" />
+<meta name="SCRIPTSUFFIX" content="" />
+<meta name="TEXT_JUMP" content="Jump" />
+<meta name="TEXT_SEARCH" content="Search" />
+<meta name="TEXT_NUM_TOPICS" content="Number of topics:" />
+<meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
+
+	<link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" /> <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
+	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/TutorialSingleHisto?t=1312204523" type="application/x-wiki" title="edit TutorialSingleHisto" />
+	<meta name="description" content="TutorialSingleHisto" />
+  <base  /><!--[if IE]></base><![endif]-->
+	
+	<style type="text/css" media="all">
+@import url('../pub/System/SkinTemplates/base.css');
+</style>
+<style type="text/css" media="all">
+@import url('../pub/System/PatternSkinTheme2009/layout.css');
+@import url('../pub/System/PatternSkinTheme2009/style.css');
+@import url('../pub/System/PatternSkinTheme2009/colors.css');
+</style>
+<style type="text/css" media="all">
+@import url('../pub/System/PatternSkinTheme2009/column_left.css');
+@import url('../pub/System/PatternSkinTheme2009/variant_twiki.css');
+</style><style type="text/css" media="all">
+	/* Styles that are set using variables */
+	.patternBookView .foswikiTopRow,
+	.patternWebIndicator a img,
+	.patternWebIndicator a:hover img {
+		background-color:#D0D0D0;
+	}
+	#patternTopBarContents { background-image:url(../pub/System/PatternSkin/header5.gif); background-repeat:repeat-x;}
+#patternTopBarContents { background-color:#ffffff;}
+.patternBookView {
+	border-color:#D0D0D0;
+}
+.patternPreviewPage #patternMain {
+	/* uncomment to set the preview image */
+	/*background-image:url("/pub/System/PreviewBackground/preview2bg.gif");*/
+}
+</style>
+<style type="text/css" media="all">
+	@import url("../pub/System/PsiSkin/psicolors.css");
+	@import url("../pub/System/PsiSkin/psistyle.css");	
+.foswikiTopic {overflow: hidden;}
+</style>
+	
+
+
+<style type="text/css" media="all">
+	@import url("../pub/System/PatternSkin/print.css");
+		  .foswikiAttachments, #patternInfo, #patternBottomBar {display: none;}
+		  .patternContent {overflow: visible}
+</style>
+<!--[if IE]><style type="text/css" media="screen">
+pre {
+	height:1%;
+	overflow-x:auto;
+}
+.foswikiAttachments,
+.foswikiForm,
+.foswikiHelp,
+.foswikiPreviewArea,
+.patternPreviewPage .foswikiForm,
+.patternSigLine,
+.patternToolBar,
+.patternTop,
+.patternTopicAction,
+#patternSideBarContents .patternLeftBarPersonal,
+#patternSideBarContents h2,
+#patternSideBarContents li,
+#patternTopBarButtons ul {
+	height:1%;
+}
+#patternSideBarContents .patternLeftBarPersonal {
+	width:100%;
+}
+.foswikiFormStep {
+	height:100%;
+}
+#foswikiLogin,
+.patternShadow {
+	border:10px solid #fff;
+	margin-top:10px;
+	margin-bottom:10px;
+	border:2px solid #ccc;
+}
+</style><![endif]-->
+<!--[if gt IE 8 ]><style type="text/css" media="screen">
+#foswikiLogin,
+.patternShadow {
+	border:10px solid #fff;
+	margin-top:10px;
+	margin-bottom:10px;
+	box-shadow: 0 0 10px #ccc;
+}
+</style><![endif]-->
+
+	
+<script src="https://intranet.psi.ch/pub/System/ChecklistPlugin/itemstatechange.js" language="javascript" type="text/javascript"></script><script src="https://intranet.psi.ch/pub/System/TimeTablePlugin/timetabletooltips.js" language="javascript" type="text/javascript"></script></head>
+<body class="patternViewPage patternPrintPage" id="BodyTop">
+<a name="PageTop"></a><div class="foswikiPage"><div id="patternScreen">
+<div id="patternPageShadow">
+<div id="patternPage">
+<div id="patternOuter">
+<div id="patternFloatWrap">
+<div id="patternMain">
+<div id="patternMainContents">
+<div class="patternContent"><div class="foswikiTopic"><h1><a name="A_61_61musrfit_61_61_Single_45Histogram_45Fit_Tutorial"></a>  <code><b>musrfit</b></code> Single-Histogram-Fit Tutorial </h1>
+<p></p>
+The &mu;SR-data-analysis process using <code>musrfit</code> is based on so-called <code>msr</code> files. These files contain all information needed for the analysis such as names of the data files, a theory function, fit and plot parameters, and so on. It is the idea of this page to explain the basic use of an <code>msr</code> file and the different programs of the <code>musrfit</code> suite using the example of a single-histogram fit to time-differential transverse-field &mu;SR data. For a complete description of all options please refer to the <a href="MusrFit.html">manual</a>.
+<p></p>
+The example deals with a diamagnetic sample that has been measured in an applied field of approximately 150 G in the <a href="http://lmu.web.psi.ch/facilities/gps/gps.html" target="_top">GPS spectrometer</a> at <a href="http://www.psi.ch/" target="_top">PSI</a> using the "transverse geometry". In this geometry the muon spin is rotated about 50&#176; up and the field is applied parallel to the muon momentum. Hence, the relevant positron counters (to detect the spin precession) are placed above (histogram 3), below (histogram 4) and right of (histogram 5) the sample. The run numbers start from 3110.
+<p></p>
+To analyze these data (in a simple way) one starts out from the <code>msr</code> file <strong>3110_tutorial.msr</strong> provided together with the source-code distribution in the sub-directory <strong>src/tests/CheckMusrfitInstall/</strong>. This ASCII file can be edited using any text editor. For convenience the editors <code>musredit</code>/<code>musrgui</code> are provided which offer some <code>msr</code>-file-specific functionalities and additionally serve as front ends to the underlying programs. In the following it is assumed that the file is open within <code>musredit</code>.
+<p></p>
+<h1><a name="A_1_The_61msr_61_file"></a> 1  The <code>msr</code> file </h1>
+<p></p>
+The <code>msr</code> file itself is divided into different blocks&mdash;a full description of the format can be found <a href="MusrFit.html#DescriptionOfTheMsrFileFormat">here</a>.
+In the file <strong>3110_tutorial.msr</strong> these blocks are successively: <ul>
+<li> <a href="MusrFit.html#TheTitle">the title</a>:<pre>
+sample XYZ
+</pre> A descriptive title of the file.
+</li> <li> <a href="MusrFit.html#TheFitparameterBlock">the FITPARAMETER block</a>:<pre>
+FITPARAMETER
+#       No Name        Value     Step        Pos&#95;Error   Boundaries
+        1 NormUp      4500      5           none        0       none    
+        2 BgUp        200       1           none        0       none    
+        3 PhaseUp     15        1           none        
+
+        4 NormDown    4500      5           none        0       none    
+        5 BgDown      200       1           none        0       none    
+        6 PhaseDown   195       1           none        
+
+        7 NormRight   600       5           none        0       none    
+        8 BgRight     40        1           none        0       none    
+        9 PhaseRight  285       1           none         
+
+       10 AsymSig1    0.17      0.01        none        0       0.33    
+       11 RateSig1    2.5       0.1         none        0       none
+       12 FieldSig1   100       1           none       
+
+       13 AsymSig2    0.02      0.01        none        0       0.33    
+       14 RateSig2    0.5       0.1         none       
+       15 FieldSig2   150       1           none
+</pre> The list of parameters used in the theory function to describe the set of data. Each parameter has a number, a name, an initial value and an initial step (for the fitting process). If a parameter should be fixed, the initial step is set to 0. After a fit (see below), this block contains the determined parameter values and uncertainties (in the <strong>Step</strong> column). If asymmetric errors are determined, these will be listed in the <strong>Step</strong> column (negative) and the <strong>Pos_Error</strong> column (positive). Optionally, lower and upper boundaries for the parameters can be specified as shown above.<br> The meaning of the parameters above is explained in the following:<br> Since a <a href="MusrFit.html#SingleHistogramFit">single-histogram fit</a> should be done, some histogram-specific parameters are needed. These are a normalization constant (parameter 1), a parameter describing the background of uncorrelated events (parameter 2) and the initial phase of the spin precession with respect to the detector (parameter 3). As stated above, there are three histograms containing useful information ("Up", "Down", "Right"); hence, this set of parameters has to be present for each of them (parameters 1&ndash;9).<br> The remaining parameters are used to model the decay asymmetry which is assumed to be equal for all histograms. In this example one has two signals (e.g. from the sample and the sample holder), each with an amplitude (parameters 10 and 13), a depolarization rate (parameters 11 and 14) and a mean field (here given in Gauss, parameters 12 and 15).
+</li> <li> <a href="MusrFit.html#TheTheoryBlock">the THEORY block</a>:<pre>
+THEORY
+asymmetry     10
+simplExpo     11          (rate)
+TFieldCos   map1  fun1       (phase frequency)
++
+asymmetry     13
+simpleGss     14          (rate)
+TFieldCos   map1  fun2       (phase frequency)
+</pre> The THEORY block is used to define a fit-parameter-dependent theory function used to model the decay asymmetry. Different <a href="MusrFit.html#TheoryTable">predefined</a> and <a href="MusrFit.html#UserFunctions">user-defined</a> functions can be combined here. Theory lines following each other are multiplied and the <strong>+</strong> sign is used to add different (here: two) signal contributions. The numbers are the parameter numbers according to the FITPARAMETER block. <strong>map</strong> and <strong>fun</strong> are used to refer to histogram-dependent parameters and to interrelate fit parameters, respectively (see below).
+</li> <li> <a href="MusrFit.html#TheFunctionsBlock">the FUNCTIONS block</a>:<pre>
+FUNCTIONS
+fun1 &#61; gamma&#95;mu &#42; par12
+fun2 &#61; gamma&#95;mu &#42; par15
+</pre> <a href="MusrFit.html#TheFunctionsBlock">Here</a> functions interrelating different fit parameters and predefined constants can be defined for the use in the THEORY block. In the example, the functions are used to calculate the muon-spin-precession frequencies for the given fields (&nu; = &gamma;<sub>&mu;</sub><i>B</i>/2&pi;). One function is used for each signal. Altogether, the theory function defined above is <i>A</i>(<i>t</i>) = <i>p</i><sub>10</sub> e<sup>-<i>p</i><sub>11</sub>t</sup> cos(&phi;<sub><i>i</i></sub>&pi;/180 + &gamma;<sub>&mu;</sub> <i>p</i><sub>12</sub> <i>t</i>) + <i>p</i><sub>13</sub> e<sup>-(<i>p</i><sub>14</sub><i>t</i>)<sup>2</sup>/2</sup> cos(&phi;<sub><i>i</i></sub>&pi;/180 + &gamma;<sub>&mu;</sub> <i>p</i><sub>15</sub><i>t</i>), where the <i>p</i> are the parameters in the FITPARAMETER block and &phi;<sub><i>i</i></sub> = <i>p</i><sub>3</sub>, <i>p</i><sub>6</sub>, <i>p</i><sub>9</sub> depending on the histogram as shall be seen later.
+</li> <li> <a href="MusrFit.html#TheRunBlock">the RUN block</a>:<pre>
+RUN data/deltat&#95;pta&#95;gps&#95;3110 PIM3 PSI PSI-BIN   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            1
+backgr.fit      2
+lifetimecorrection
+map             3    0    0    0    0    0    0    0    0    0
+forward         3       
+data            1       8000    
+t0              1     
+fit             0       4.9    
+packing         20
+</pre> The RUN blocks are used to collect information on the data to be analyzed. Specifically, these are: <ul>
+<li> <pre>RUN data/deltat&#95;pta&#95;gps&#95;3110 PIM3 PSI PSI-BIN   (name beamline institute data-file-format)</pre> <a href="MusrFit.html#PathToDataFiles">the path to the data file</a> and the file format (NEXUS, ROOT-NPP, ROOT-PPC, PSI-BIN, PSI-MDU, WKM, MUD, MDU-ASCII)
+</li> <li> <pre>fittype         0         (single histogram fit)</pre> the fit type (0 = single-histogram fit)
+</li> <li> <pre>norm            1</pre> the number of the fit parameter representing the normalization constant
+</li> <li> <pre>backgr.fit      2</pre> the number of the fit parameter representing the background
+</li> <li> <pre>lifetimecorrection</pre> a <a href="MusrFit.html#LifeTimeCorrection">tag</a> that specifies whether the histogram is plotted (line is not present) or the asymmetry (line is present)
+</li> <li> <pre>map             3    0    0    0    0    0    0    0    0    0</pre> the definition of the <strong>maps</strong> used in the THEORY block&mdash;RUN-block-specific parameters are given here; in this example, <strong>map1</strong> is substituted by parameter <strong>3</strong> in the THEORY block for this RUN block and <strong>map2</strong>, <strong>map3</strong>, and so on are undefined.
+</li> <li> <pre>forward         3</pre> the histogram number; in this example 3 corresponds to the histogram of the "Up" positron counter
+</li> <li> <pre>data            1        8000</pre> start and end bins of the range containing useful data in the histogram (to be adjusted, e.g. by using <code>musrt0</code>, see below)
+</li> <li> <pre>t0              1</pre> histogram bin corresponding to the time zero (muon implantation time) (to be adjusted, e.g. by <code>musrt0</code>, see below)
+</li> <li> <pre>fit             0       4.9</pre> start and end times (in &mu;s) defining the fit range
+</li> <li> <pre>packing         20</pre> the packing of the histograms (in histogram bins)<br><br>Since the data of three histograms is to be analyzed, the file contains not only one but three RUN blocks&mdash;each defining the histogram-specific information following the example given above.
+</li></ul> 
+</li> <li> <a href="MusrFit.html#TheCommandsBlock">the COMMANDS block</a>:<pre>
+COMMANDS
+MINIMIZE
+MINOS
+SAVE
+</pre> In the COMMANDS block, a sequence of operations that should be performed is defined. Here, the requested operations are the minimization of &chi;<sup>2</sup> (MINIMIZE), the calculation of asymmetric errors (MINOS) as well as saving the found parameter values and uncertainties to the <code>msr</code> file (SAVE). A full description of the possible commands can be found <a href="MusrFit.html#TheCommandsBlock">here</a>.
+</li> <li> <a href="MusrFit.html#TheFourierBlock">the FOURIER block</a>:<pre>
+FOURIER
+units            Gauss   # units either &#39;Gauss&#39;, &#39;MHz&#39;, or &#39;Mc/s&#39;
+fourier&#95;power    10
+apodization      WEAK    # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL&#95;AND&#95;IMAG, POWER, PHASE
+phase            par3
+range            0.0    600.0
+</pre> The FOURIER block is used to define basic settings for the Fourier transform available in <code>musrview</code>. These are: <ul>
+<li> <pre>units            Gauss   # units either &#39;Gauss&#39;, &#39;MHz&#39;, or &#39;Mc/s&#39;</pre> the units of the Fourier domain
+</li> <li> <pre>fourier&#95;power    10</pre> the number of data points used for the discrete transform, here 2<sup><b>10</b></sup>=1024
+</li> <li> <pre>apodization      WEAK    # NONE, WEAK, MEDIUM, STRONG</pre> the <a href="MusrFit.html#TheFourierBlock">apodization</a> to be used
+</li> <li> <pre>plot             POWER   # REAL, IMAG, REAL&#95;AND&#95;IMAG, POWER, PHASE</pre> what should be plotted (real part, imaginary part, and so on)
+</li> <li> <pre>phase            par3</pre> the initial phase of the input data is given here in degrees. Optionally, a phase parameter from the FITPARAMETER block can be given, here <strong>par3</strong> takes the value of parameter <strong>3</strong>.
+</li> <li> <pre>range            0.0    600.0</pre> the start and end points of the range of the Fourier transform in the units specified above
+</li></ul> 
+</li> <li> <a href="MusrFit.html#ThePlotBlock">the PLOT block</a>:<pre>
+PLOT 0   (single histo plot)
+runs     1   2   
+range    0   4 -0.2 0.2
+</pre> The PLOT block defines which data (corresponding to the given RUN blocks) is plotted when <code>musrview</code> is called. In the given example, a canvas would be drawn containing the (life-time-corrected) data of the first two RUN blocks ("Up" and "Down" positron counters). The abscissa would range from 0 to 4 &mu;s, the axis of ordinates from -0.2 to 0.2.<br>   It is possible to define more than one PLOT block. Each PLOT block corresponds to a separate canvas. Therefore, the second PLOT block in the file<pre>
+PLOT 0   (single histo plot)
+runs     3   
+use&#95;fit&#95;ranges
+</pre> produces an additional window containing the (<i>not</i> life-time-corrected) data of the third RUN block ("Right" positron counter). The abscissa ranges from 0 to 4.9 &mu;s (according to the fit range given in the RUN block).
+</li> <li> <a href="MusrFit.html#TheStatisticBlock">the STATISTIC block</a>:<pre>
+STATISTIC --- 2011-07-09 10:58:44
+  chisq &#61; 1348.1764586409397, NDF &#61; 1146, chisq/NDF &#61; 1.1764192483777833
+</pre> This block is the last block of a <code>msr</code> file. It contains some information on the fit: the date and time as well as the absolute and normalized values of &#967;<sup>2</sup> and the number of degrees of freedom in the fit.<br>   These information only have a meaning if the fitting procedure has been executed at least once and the fit has converged!
+</li></ul> 
+<p></p>
+<h1><a name="A_2_Determine_t0_and_the_data_range_using_61musrt0_61"></a> 2  Determine <i>t</i><sub>0</sub> and the data range using <code>musrt0</code> </h1>
+Before the given model can be fitted to the data, the data ranges and time zeros of the different RUN blocks have to be set correctly. This can be achieved using <code><a href="MusrFit.html#MusrT0">musrt0</a></code>. Starting this program by selecting the <img alt="musrt0.png" src="../pub/MUSR/MusrGui/musrt0.png" /> button in <code>musredit</code> or calling from a terminal <pre>musrt0 3110&#95;tutorial.msr</pre> opens an interactive window plotting the data of the first RUN block:<br />
+<img src="../pub/MUSR/TutorialSingleHisto/musrt0-1.png" alt="musrt0-1" align="center" /><br />
+The green line (at bin 1) represents time zero, the blue lines the start (at bin 1) and end (at bin 8000) of the data range and the optional red lines give the limits of the background range (if the background shall not be determined by the fit). All lines can be either dragged to reasonable locations or set by pressing the corresponding keyboard shortcuts. In the example the time zero can be set by pressing <strong>T</strong> (which moves the green line to the bin containing the maximum number of counts), the start of the data range should be set to about five bins later by zooming into the graph around bin 250 and pressing <strong>d</strong> when the cursor is found at a suitable location:<br />
+<img src="../pub/MUSR/TutorialSingleHisto/musrt0-2.png" alt="musrt0-2" width='708' height='529' align="center" /><br />
+After all lines have been adjusted for the first histogram, one can go on to the second by pressing <strong>q</strong>. This procedure is repeated until all ranges have been set correctly. When finished with the last histogram the new <i>t</i><sub>0</sub> and data-range values will be written to the <code>msr</code> file.
+A full description of <code>musrt0</code> can be found <a href="MusrFit.html#MusrT0">here</a>.
+<p></p>
+<h1><a name="A_3_Fit_the_model_to_the_data_using_61musrfit_61"></a> 3  Fit the model to the data using <code>musrfit</code> </h1>
+Now that the basics of the <code>msr</code> file have been introduced and the necessary adjustments have been done one can proceed with fitting the specified model to the data. This is done by selecting the <img alt="musrfit.png" src="../pub/MUSR/MusrGui/musrfit.png" /> button in <code>musredit</code> or calling from a terminal <pre>musrfit 3110&#95;tutorial.msr</pre>
+<p></p>
+After the fitting procedure has finished the <code>msr</code> file is updated and contains the newly determined values of the fit parameters.
+<p></p>
+<h1><a name="A_4_View_the_data_and_the_fit_using_61musrview_61"></a> 4  View the data and the fit using <code>musrview</code> </h1>
+The data and the corresponding fit can be visualized by choosing <img alt="musrview.png" src="../pub/MUSR/MusrGui/musrview.png" /> in <code>musredit</code> or calling from a terminal <pre>musrview 3110&#95;tutorial.msr</pre> This creates the windows according to the given PLOT blocks in the <code>msr</code> file:<br />
+<img src="../pub/MUSR/TutorialSingleHisto/musrview-1.png" alt="musrview-1" align="center" /><br />
+<img src="../pub/MUSR/TutorialSingleHisto/musrview-2.png" alt="musrview-2" align="center" /><br />
+The basic features of <code>musrview</code> can be found in the Musrfit menu. They include: <ul>
+<li> export the shown data and the model to an ASCII file with comma-separated values   
+</li> <li> presenting the difference between the shown data and the model (keyboard shortcut: <strong>d</strong>)
+</li> <li> calculate and show the Fourier transform of the shown data (keyboard shortcut: <strong>f</strong>), e.g. for the asymmetry of the "Up" and "Down" detectors:<br />   <img src="../pub/MUSR/TutorialSingleHisto/musrview-3.png" alt="musrview-3" align="center" /><br />
+</li></ul> 
+<p></p>
+<h1><a name="A_5_Process_multiple_61msr_61_files_using_61msr2data_61"></a> 5  Process multiple <code>msr</code> files using <code>msr2data</code> </h1>
+This short introduction is concluded by calling attention to the program <code><a href="Msr2Data.html">msr2data</a></code>. As the name indicates the main purpose of this program is to extract the FITPARAMETER-block information from multiple <code>msr</code> files with the same structure and to summarize them in a single ASCII file (either in TRIUMF DB format or simple columns). However, as described in detail in the <code><a href="Msr2Data.html">manual</a></code>, it is not only possible to collect data from <code>msr</code> files but also to create new <code>msr</code> files from a template and to process these files using <code>musrfit</code> on the fly.<br>
+Assuming the successive runs <strong>3111</strong> through <strong>3114</strong> can be analyzed using the same model introduced above for run <strong>3110</strong> (e.g. in the case one has done measurements at different temperatures) one can use the file <strong>3110_tutorial.msr</strong> as template, generate the files <strong>3111_tutorial.msr</strong> through <strong>3114_tutorial.msr</strong> with the corresponding updates in the RUN blocks, call for each one <code>musrfit</code> and finally summarize the FITPARAMETER-block information of all processed files in an ASCII output file <strong>tutorial-T-dependence.dat</strong> (simple columns). If further information on the temperature or the applied field is available in the data files these will be included as well in the resulting ASCII file.<br>
+From the terminal this would be done as follows:<pre>
+msr2data 3110 3114 &#95;tutorial fit-3110 -o tutorial-T-dependence.dat data
+</pre>
+To achieve the same in <code>musredit</code> one selects <img alt="musrmsr2data.png" src="../pub/MUSR/MusrGui/musrmsr2data.png" /> and fills the form accordingly:<br />
+<img src="../pub/MUSR/TutorialSingleHisto/msr2data.png" alt="msr2data" align="center" />
+<p></p>
+<h1><a name="A_6_Further_reading"></a> 6  Further reading </h1>
+This page only summarizes the very basic features and options of the programs contained in the <code>musrfit</code> suite. For a complete description please refer to the manuals of <ul>
+<li> <code><a href="MusrFit.html">musrfit</a></code> (including <code><a href="MusrFit.html#MusrFit">musrfit</a></code>, <code><a href="MusrFit.html#MusrView">musrview</a></code>, <code><a href="MusrFit.html#MusrT0">musrt0</a></code> and the full description of the <a href="MusrFit.html#DescriptionOfTheMsrFileFormat"><code>msr</code>-file format</a>)
+</li> <li> <code><a href="MusrGui.html">musredit</a></code>
+</li> <li> <code><a href="Msr2Data.html">msr2data</a></code>.
+</li></ul> 
+<p></p>
+-- <a href="http://www.fsf.org/register_form?referrer=8369" target="_top">BMW</a> &amp; <a href="http://lmu.web.psi.ch/lem/group.html" target="_top">AS</a> </div><!-- /foswikiTopic-->
+<p></p>
+</div><!-- /patternContent-->
+<hr />
+This topic: MUSR<span class='foswikiSeparator'>&nbsp;&gt;&nbsp;</span>TutorialSingleHisto <br />
+Topic revision: r7 - 27 Jul 2011 - 19:45:59 - <a href="https://intranet.psi.ch/Main/BastianWojek">BastianWojek</a>
+</div>
+</div>
+</div>
+<div class="clear">&nbsp;</div>
+</div><div id="patternBottomBar"><div id="patternBottomBarContents"><div id="patternWebBottomBar">Ideas, requests, problems regarding <a href="https://intranet.psi.ch/Main/WebHome">PSI Wiki</a>? <a href="mailto:psi.intranet@psi.ch?subject=Foswiki%20Feedback%20on%20MUSR.TutorialSingleHisto">Send feedback</a></div></div></div>
+</div>
+</div>
+</div>
+</div></div><!-- /endWrap -->
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+</body>
+
+<!-- Mirrored from intranet.psi.ch/MUSR/TutorialSingleHisto?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Mon, 01 Aug 2011 13:15:36 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
+</html>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
