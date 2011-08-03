@@ -1768,7 +1768,7 @@ void PTextEdit::musrMsr2Data()
         break;
       case 2:  // run list file name
         runListFileName = fMsr2DataParam->runListFileName;
-        fi.setFile(runListFileName);
+        fi.setFile(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "/" + runListFileName);
         if (!fi.exists()) {
           str = QString("Run List File '%1' doesn't exist.").arg(runListFileName);
           QMessageBox::critical(this, "**ERROR**",
@@ -1904,7 +1904,7 @@ void PTextEdit::musrMsr2Data()
       cmd.append("new");
     }
 
-// qDebug() << ">> " << cmd << endl;
+//   qDebug() << endl << ">> " << cmd << endl;
 
     PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath(), cmd);
     fitOutputHandler.setModal(true);
@@ -1928,7 +1928,7 @@ void PTextEdit::musrMsr2Data()
                 else
                   fln = QString("%1").arg(i) + fMsr2DataParam->msrFileExtension + ".msr";
 
-                load(fln);
+                load(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "/" + fln);
               }
             }
             break;
@@ -1944,11 +1944,11 @@ void PTextEdit::musrMsr2Data()
               else
                 fln += fMsr2DataParam->msrFileExtension + ".msr";
 
-              load(fln);
+              load(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "/" + fln);
             }
             break;
           case 2: // run list file
-            file = new QFile(fMsr2DataParam->runListFileName);
+            file = new QFile(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "/" + fMsr2DataParam->runListFileName);
             if (!file->open(QIODevice::ReadOnly)) {
               str = QString("Couldn't open run list file %1, sorry.").arg(fMsr2DataParam->runListFileName);
               QMessageBox::critical(this, "**ERROR**", str.toLatin1(), QMessageBox::Ok, QMessageBox::NoButton);
@@ -1966,7 +1966,7 @@ void PTextEdit::musrMsr2Data()
                 else
                   fln += fMsr2DataParam->msrFileExtension + ".msr";
 
-                load(fln);
+                load(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "/" + fln);
               }
             }
 
@@ -1990,7 +1990,7 @@ void PTextEdit::musrMsr2Data()
             fln = runList.section(" ", 0, 0, QString::SectionSkipEmpty) + QString("+global") + fMsr2DataParam->msrFileExtension + QString(".msr");
             break;
           case 2: // run list file name
-            file = new QFile(fMsr2DataParam->runListFileName);
+            file = new QFile(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "/" + fMsr2DataParam->runListFileName);
             if (!file->open(QIODevice::ReadOnly)) {
               str = QString("Couldn't open run list file %1, sorry.").arg(fMsr2DataParam->runListFileName);
               QMessageBox::critical(this, "**ERROR**", str.toLatin1(), QMessageBox::Ok, QMessageBox::NoButton);
@@ -2019,7 +2019,7 @@ void PTextEdit::musrMsr2Data()
             break;
         }
 
-        load(fln);
+        load(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "/" + fln);
       }
     }
   }
