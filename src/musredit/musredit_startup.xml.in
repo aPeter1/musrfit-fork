@@ -1,16 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<musrgui_startup xmlns="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrGui.html">
+<musredit_startup xmlns="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrGui.html">
   <comment>
-    $Id$
-    This is handling default setting parameters for the musrgui.
+    $Id: musredit_startup.xml 4949 2011-07-15 05:43:41Z nemu $
+    This is handling default setting parameters for the musredit.
   </comment>
   <general>
-    <exec_path>$ROOTSYS/bin</exec_path>
+    <exec_path>@prefix@/bin</exec_path>
     <default_save_path>./</default_save_path>
-    <msr_default_file_path>$HOME/analysis/musrfit/src/musrgui</msr_default_file_path>
-    <title_from_data_file>n</title_from_data_file>
+    <msr_default_file_path>@DOCDIR@/templates</msr_default_file_path>
+    <title_from_data_file>y</title_from_data_file>
     <enable_musrt0>y</enable_musrt0>
   </general>
+  <help_section>
+    <musr_web_main>file://@DOCDIR@/html/user/MUSR/MusrFit.html</musr_web_main>
+    <musr_web_title>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheTitle</musr_web_title>
+    <musr_web_parameters>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheFitparameterBlock</musr_web_parameters>
+    <musr_web_theory>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheTheoryBlock</musr_web_theory>
+    <musr_web_functions>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheFunctionsBlock</musr_web_functions>
+    <musr_web_run>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheRunBlock</musr_web_run>
+    <musr_web_command>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheCommandsBlock</musr_web_command>
+    <musr_web_fourier>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheFourierBlock</musr_web_fourier>
+    <musr_web_plot>file://@DOCDIR@/html/user/MUSR/MusrFit.html#ThePlotBlock</musr_web_plot>
+    <musr_web_statistic>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheStatisticBlock</musr_web_statistic>
+    <musr_web_msr2data>file://@DOCDIR@/html/user/MUSR/Msr2Data.html</musr_web_msr2data>
+  </help_section>
   <font_settings>
     <font_name>Courier</font_name>
     <font_size>12</font_size>
@@ -21,12 +34,6 @@
     <file_format>root-npp</file_format>
     <lifetime_correction>y</lifetime_correction>
   </msr_file_defaults>
-  <help_section>
-    <help_main>
-      For a detailed description of the aim and structure of a msr file see &lt;b&gt;http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html&lt;/b&gt;
-      Starting with &ge; Qt 4.6 this will be linked automatically but until then ...; sorry ;-)
-    </help_main>
-  </help_section>
   <msr2data_defaults>
     <chain_fit>y</chain_fit>
     <write_data_header>y</write_data_header>
@@ -40,7 +47,7 @@
     <global>n</global>
     <global_plus>n</global_plus>
   </msr2data_defaults>
-  <func_pixmap_path>$HOME/analysis/musrfit/src/musrgui/latex_images</func_pixmap_path>
+  <func_pixmap_path>@DOCDIR@/latex_images</func_pixmap_path>
   <theory_functions>
     <func>
       <name>asymmetry</name>
@@ -190,5 +197,4 @@
       <params>0</params>
     </func> 
   </theory_functions>
-</musrgui_startup>
-
+</musredit_startup>

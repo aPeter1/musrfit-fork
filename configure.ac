@@ -189,6 +189,11 @@ AC_LANG([C++])
 AC_PROG_LN_S
 AC_PROG_INSTALL
 
+m4_ifdef([AC_PROG_MKDIR_P],
+         [AC_PROG_MKDIR_P],
+         [MKDIR_P="mkdir -p"
+          AC_SUBST(MKDIR_P)])
+
 m4_ifdef([LT_INIT],
          [LT_INIT([disable-static])
           LT_LANG([C++])
@@ -721,7 +726,7 @@ dnl -----------------------------------------------
 
 AC_ARG_ENABLE([omp], [AC_HELP_STRING([--enable-omp],[build musrfit with OpenMP support [default=yes]])])
 
-if test x"$enable_omp" != xno; then
+if test "x$enable_omp" != "xno"; then
   SAVED_CXXFLAGS="$CXXFLAGS"
   CXXFLAGS="$CXXFLAGS -fopenmp"
   SAVED_LIBSS="$LIBS"
@@ -807,6 +812,25 @@ dnl -----------------------------------------------
 #AC_FUNC_STAT
 #AC_CHECK_FUNCS([floor gettimeofday memset pow sqrt strstr])
 
+dnl -----------------------------------------------
+dnl Determine the installation directory for the documentation
+dnl -----------------------------------------------
+
+if test "x${prefix}" = "xNONE"
+then
+  INSTALLDIR="/usr/local"
+else
+  INSTALLDIR="${prefix}"
+fi
+
+if test -d "${INSTALLDIR}/doc"
+then
+  DOCDIR="${INSTALLDIR}/doc/musrfit"
+else
+  DOCDIR="${INSTALLDIR}/share/doc/musrfit"
+fi
+
+AC_SUBST(DOCDIR)
 
 dnl -----------------------------------------------
 dnl Specify the files that are going to be created by configure
@@ -847,6 +871,8 @@ AC_CONFIG_FILES([Makefile \
                  src/external/libGapIntegrals/Makefile \
                  src/external/libCalcMeanFieldsLEM/Makefile \
                  src/external/Nonlocal/Makefile \
-                 src/external/MagProximity/Makefile])
+                 src/external/MagProximity/Makefile \
+                 src/musredit/musredit_startup.xml \
+                 src/musrgui/musrgui_startup.xml])
 
 AC_OUTPUT
