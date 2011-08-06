@@ -33,6 +33,7 @@
 #include <functional>
 #include <string>
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 #include <TSAXParser.h>
@@ -257,7 +258,7 @@ TMeanFieldsForScBilayer::TMeanFieldsForScBilayer() {
   string rge_path(startupHandler->GetDataPath());
   map<double, string> energy_vec(startupHandler->GetEnergies());
 
-  fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug());
+  fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug(), 1);
 
   // clean up
   if (saxParser) {
@@ -272,10 +273,16 @@ TMeanFieldsForScBilayer::TMeanFieldsForScBilayer() {
 }
 
 // Operator-method that returns the mean field for a given implantation energy
-// Parameters: field, deadlayer, layer1, layer2, lambda1, lambda2, weight1 (deadlayer), weight2, weight3, weight4 (substrate)
+// Parameters: field, deadlayer, layer1, layer2, lambda1, lambda2, weight1 (deadlayer), weight2, weight3, weight4 (substrate),
+//             [Gss width for profile convolution]
 
 double TMeanFieldsForScBilayer::operator()(double E, const vector<double> &par_vec) const{
-  
+
+  double width(0.0);
+  if (par_vec.size() == 11) {
+    width = par_vec[10];
+  }
+
   vector<double> interfaces;
   interfaces.push_back(par_vec[1]);
   interfaces.push_back(par_vec[1]+par_vec[2]);
@@ -299,12 +306,12 @@ double TMeanFieldsForScBilayer::operator()(double E, const vector<double> &par_v
   energyIter = find(energies.begin(), energies.end(), E);
 
   if (energyIter != energies.end()) { // implantation profile found - no interpolation needed
-    return CalcMeanB(E, interfaces, weights, BofZ);
+    return CalcMeanB(E, interfaces, weights, BofZ, width);
   } else {
     if (E < energies.front())
-      return CalcMeanB(energies.front(), interfaces, weights, BofZ);
+      return CalcMeanB(energies.front(), interfaces, weights, BofZ, width);
     if (E > energies.back())
-      return CalcMeanB(energies.back(), interfaces, weights, BofZ);
+      return CalcMeanB(energies.back(), interfaces, weights, BofZ, width);
 
     energyIter = find_if(energies.begin(), energies.end(), bind2nd( greater<double>(), E));
 //    cout << *(energyIter - 1) << " " << *(energyIter) << endl;
@@ -312,22 +319,32 @@ double TMeanFieldsForScBilayer::operator()(double E, const vector<double> &par_v
     double E1(*(energyIter - 1));
     double E2(*(energyIter));
 
-    double B1(CalcMeanB(E1, interfaces, weights, BofZ));
-    double B2(CalcMeanB(E2, interfaces, weights, BofZ));
+    double B1(CalcMeanB(E1, interfaces, weights, BofZ, width));
+    double B2(CalcMeanB(E2, interfaces, weights, BofZ, width));
 
     return B1 + (B2-B1)/(E2-E1)*(E-E1);
   }
 }
 
-double TMeanFieldsForScBilayer::CalcMeanB (double E, const vector<double>& interfaces, const vector<double>& weights, const TLondon1D_2L& BofZ) const {
-  //calcData->UseHighResolution(E);
+double TMeanFieldsForScBilayer::CalcMeanB (double E, const vector<double>& interfaces, const vector<double>& weights, const TLondon1D_2L& BofZ, double width=0.0) const {
+    //fImpProfile->UseHighResolution(E);
+    //fImpProfile->ConvolveGss(width, E);
+    //fImpProfile->SetOriginal();
     fImpProfile->WeightLayers(E, interfaces, weights);
+    fImpProfile->ConvolveGss(width, E);
     fImpProfile->Normalize(E);
 
     vector<double> z(fImpProfile->DataZ(E));
     vector<double> nz(fImpProfile->DataNZ(E));
     double dz(fImpProfile->DataDZ(E));
 
+  if (E==20.0){
+  ofstream of("Implantation-profile-normal.dat");
+  for (unsigned int i(0); i<z.size(); i++) {
+    of << z[i] << " " << nz[i] << endl;
+  }
+  of.close();
+ }
     // calculate mean field
 
     double meanB(0.);

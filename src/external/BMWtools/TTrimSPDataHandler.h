@@ -43,7 +43,7 @@ class TTrimSPData {
 
 public:
 
-  TTrimSPData(const string&, map<double, string>&, bool debug = false);
+  TTrimSPData(const string&, map<double, string>&, bool debug = false, unsigned int highRes = 0);
 
   ~TTrimSPData() {
     fDataZ.clear();
@@ -60,6 +60,7 @@ public:
   vector<double> OrigDataNZ(double) const;
   double DataDZ(double) const;
   void UseHighResolution(double);
+  void SetOriginal() {fOrigDataNZ = fDataNZ;}
   void WeightLayers(double, const vector<double>&, const vector<double>&) const;
   double LayerFraction(double, unsigned int, const vector<double>&) const;
   double GetNofZ(double, double) const;

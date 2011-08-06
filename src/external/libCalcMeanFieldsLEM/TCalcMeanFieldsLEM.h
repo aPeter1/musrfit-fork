@@ -85,7 +85,7 @@ public:
   virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const vector<double>&) const;
-  double CalcMeanB (double, const vector<double>&, const vector<double>&, const TLondon1D_2L&) const;
+  double CalcMeanB (double, const vector<double>&, const vector<double>&, const TLondon1D_2L&, double) const;
 
 private:
   TTrimSPData *fImpProfile;

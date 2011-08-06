@@ -42,7 +42,7 @@ using namespace std;
 // Constructor of the TrimSPData class -- reading all available trim.SP-rge-files with a given name into std::vectors
 //--------------------
 
-TTrimSPData::TTrimSPData(const string &path, map<double, string> &energies, bool debug) {
+TTrimSPData::TTrimSPData(const string &path, map<double, string> &energies, bool debug, unsigned int highRes) {
 
   // sort the energies in ascending order - this might be useful for later applications (energy-interpolations etc.)
   // after the change from the vector to the map this is not necessary any more - since maps are always ordered!
@@ -101,6 +101,12 @@ TTrimSPData::TTrimSPData(const string &path, map<double, string> &energies, bool
         vnzz.clear();
         goodFile = false;
 
+        fIsNormalized.push_back(false);
+
+        if (highRes) {
+          UseHighResolution(iter->first);
+        }
+
       } else {
         cerr << "TTrimSPData::TTrimSPData: " << energyStr << " does not seem to be a valid unmodified TRIM.SP output file!" << endl;
         continue;
@@ -112,9 +118,6 @@ TTrimSPData::TTrimSPData(const string &path, map<double, string> &energies, bool
     cout << "TTrimSPData::TTrimSPData: Read in " << fDataNZ.size() << " implantation profiles in total." << endl;
 
   fOrigDataNZ = fDataNZ;
-
-  for(unsigned int i(0); i<fEnergy.size();++i)
-    fIsNormalized.push_back(false);
 
   fEnergyIter = fEnergy.end();
 }
@@ -146,7 +149,7 @@ void TTrimSPData::UseHighResolution(double e) {
     }
     fDataZ[i] = vecZ;
     fDataNZ[i] = vecNZ;
-    fOrigDataNZ[i] = vecNZ;
+    //fOrigDataNZ[i] = vecNZ;
     fDZ[i] = 1.;
     fIsNormalized[i] = false;
     return;
@@ -494,7 +497,7 @@ void TTrimSPData::ConvolveGss(double w, double e) const {
   if(fEnergyIter != fEnergy.end()) {
     unsigned int i(fEnergyIter - fEnergy.begin());
     z = fDataZ[i];
-    nz = fOrigDataNZ[i];
+    nz = fDataNZ[i];
 
     for(unsigned int k(0); k<z.size(); k++) {
       gss.push_back(exp(-z[k]*z[k]/200.0/w/w));
