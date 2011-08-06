@@ -1,6 +1,10 @@
 TEMPLATE = app
 TARGET = musrgui
 
+!exists( musrgui_startup.xml ) {
+    error( "Configuration file musrgui_startup.xml not found! Please configure musrfit first, before trying to install musrgui!" )
+}
+
 # install path for musrgui
 count( PREFIX, 1 ) {
     MUSRGUI_INSTALL_PATH = $${PREFIX}/bin

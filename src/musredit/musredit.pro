@@ -1,6 +1,10 @@
 TEMPLATE = app
 TARGET = musredit
 
+!exists( musredit_startup.xml ) {
+    error( "Configuration file musredit_startup.xml not found! Please configure musrfit first, before trying to install musredit!" )
+}
+
 # install path for musredit
 count( PREFIX, 1 ) {
     MUSREDIT_INSTALL_PATH = $${PREFIX}/bin
