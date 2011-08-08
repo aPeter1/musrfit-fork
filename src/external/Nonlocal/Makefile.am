@@ -51,7 +51,7 @@ libPNL_PippardFitter_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -relea
 
 if IS_DARWIN
 install-exec-hook:
-	$(LN_S) $(libdir)/libPNL_PippardFitter.dylib $(libdir)/libPNL_PippardFitter.so
+	$(LN_S) -f $(libdir)/libPNL_PippardFitter.dylib $(libdir)/libPNL_PippardFitter.so
 uninstall-hook:
 	rm -f $(libdir)/libPNL_PippardFitter.so
 endif

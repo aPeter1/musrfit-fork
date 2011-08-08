@@ -44,7 +44,7 @@ libGapIntegrals_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(
 
 if IS_DARWIN
 install-exec-hook:
-	$(LN_S) $(libdir)/libGapIntegrals.dylib $(libdir)/libGapIntegrals.so
+	$(LN_S) -f $(libdir)/libGapIntegrals.dylib $(libdir)/libGapIntegrals.so
 uninstall-hook:
 	rm -f $(libdir)/libGapIntegrals.so
 endif

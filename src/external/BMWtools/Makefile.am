@@ -48,7 +48,7 @@ libBMWtools_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(PLUG
 
 if IS_DARWIN
 install-exec-hook:
-	$(LN_S) $(libdir)/libBMWtools.dylib $(libdir)/libBMWtools.so
+	$(LN_S) -f $(libdir)/libBMWtools.dylib $(libdir)/libBMWtools.so
 uninstall-hook:
 	rm -f $(libdir)/libBMWtools.so
 endif

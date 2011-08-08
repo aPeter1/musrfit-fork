@@ -62,7 +62,7 @@ libFitPofB_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(PLUGI
 
 if IS_DARWIN
 install-exec-hook:
-	$(LN_S) $(libdir)/libFitPofB.dylib $(libdir)/libFitPofB.so
+	$(LN_S) -f $(libdir)/libFitPofB.dylib $(libdir)/libFitPofB.so
 uninstall-hook:
 	rm -f $(libdir)/libFitPofB.so
 endif

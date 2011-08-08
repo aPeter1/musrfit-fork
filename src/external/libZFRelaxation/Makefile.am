@@ -44,7 +44,7 @@ libZFRelaxation_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(
 
 if IS_DARWIN
 install-exec-hook:
-	$(LN_S) $(libdir)/libZFRelaxation.dylib $(libdir)/libZFRelaxation.so
+	$(LN_S) -f $(libdir)/libZFRelaxation.dylib $(libdir)/libZFRelaxation.so
 uninstall-hook:
 	rm -f $(libdir)/libZFRelaxation.so
 endif

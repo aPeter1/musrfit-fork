@@ -44,7 +44,7 @@ libLFRelaxation_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -release $(
 
 if IS_DARWIN
 install-exec-hook:
-	$(LN_S) $(libdir)/libLFRelaxation.dylib $(libdir)/libLFRelaxation.so
+	$(LN_S) -f $(libdir)/libLFRelaxation.dylib $(libdir)/libLFRelaxation.so
 uninstall-hook:
 	rm -f $(libdir)/libLFRelaxation.so
 endif

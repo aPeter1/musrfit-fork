@@ -44,7 +44,7 @@ libCalcMeanFieldsLEM_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -relea
 
 if IS_DARWIN
 install-exec-hook:
-	$(LN_S) $(libdir)/libCalcMeanFieldsLEM.dylib $(libdir)/libCalcMeanFieldsLEM.so
+	$(LN_S) -f $(libdir)/libCalcMeanFieldsLEM.dylib $(libdir)/libCalcMeanFieldsLEM.so
 uninstall-hook:
 	rm -f $(libdir)/libCalcMeanFieldsLEM.so
 endif

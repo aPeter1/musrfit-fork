@@ -51,7 +51,7 @@ libPMagProximityFitter_la_LDFLAGS = -version-info $(PLUGIN_LIBRARY_VERSION) -rel
 
 if IS_DARWIN
 install-exec-hook:
-	$(LN_S) $(libdir)/libPMagProximityFitter.dylib $(libdir)/libPMagProximityFitter.so
+	$(LN_S) -f $(libdir)/libPMagProximityFitter.dylib $(libdir)/libPMagProximityFitter.so
 uninstall-hook:
 	rm -f $(libdir)/libPMagProximityFitter.so
 endif
