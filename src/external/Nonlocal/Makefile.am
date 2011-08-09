@@ -58,7 +58,7 @@ endif
 
 if IS_CYGWIN
 install-exec-hook:
-	$(LN_S) $(bindir)/cygPNL_PippardFitter-$(PLUGIN_MAJOR_VERSION)-$(PLUGIN_MINOR_VERSION)-$(PLUGIN_MAJOR_VERSION).dll $(libdir)/libPNL_PippardFitter.so
+	$(LN_S) -f $(bindir)/cygPNL_PippardFitter-$(PLUGIN_MAJOR_VERSION)-$(PLUGIN_MINOR_VERSION)-$(PLUGIN_MAJOR_VERSION).dll $(libdir)/libPNL_PippardFitter.so
 uninstall-hook:
 	rm -f $(libdir)/libPNL_PippardFitter.so
 endif

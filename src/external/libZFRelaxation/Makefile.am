@@ -51,7 +51,7 @@ endif
 
 if IS_CYGWIN
 install-exec-hook:
-	$(LN_S) $(bindir)/cygZFRelaxation-$(PLUGIN_MAJOR_VERSION)-$(PLUGIN_MINOR_VERSION)-$(PLUGIN_MAJOR_VERSION).dll $(libdir)/libZFRelaxation.so
+	$(LN_S) -f $(bindir)/cygZFRelaxation-$(PLUGIN_MAJOR_VERSION)-$(PLUGIN_MINOR_VERSION)-$(PLUGIN_MAJOR_VERSION).dll $(libdir)/libZFRelaxation.so
 uninstall-hook:
 	rm -f $(libdir)/libZFRelaxation.so
 endif

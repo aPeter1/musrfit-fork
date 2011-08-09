@@ -69,7 +69,7 @@ endif
 
 if IS_CYGWIN
 install-exec-hook:
-	$(LN_S) $(bindir)/cygFitPofB-$(PLUGIN_MAJOR_VERSION)-$(PLUGIN_MINOR_VERSION)-$(PLUGIN_MAJOR_VERSION).dll $(libdir)/libFitPofB.so
+	$(LN_S) -f $(bindir)/cygFitPofB-$(PLUGIN_MAJOR_VERSION)-$(PLUGIN_MINOR_VERSION)-$(PLUGIN_MAJOR_VERSION).dll $(libdir)/libFitPofB.so
 uninstall-hook:
 	rm -f $(libdir)/libFitPofB.so
 endif

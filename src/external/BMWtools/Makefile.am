@@ -55,7 +55,7 @@ endif
 
 if IS_CYGWIN
 install-exec-hook:
-	$(LN_S) $(bindir)/cygBMWtools-$(PLUGIN_MAJOR_VERSION)-$(PLUGIN_MINOR_VERSION)-$(PLUGIN_MAJOR_VERSION).dll $(libdir)/libBMWtools.so
+	$(LN_S) -f $(bindir)/cygBMWtools-$(PLUGIN_MAJOR_VERSION)-$(PLUGIN_MINOR_VERSION)-$(PLUGIN_MAJOR_VERSION).dll $(libdir)/libBMWtools.so
 uninstall-hook:
 	rm -f $(libdir)/libBMWtools.so
 endif

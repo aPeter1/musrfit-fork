@@ -51,7 +51,7 @@ endif
 
 if IS_CYGWIN
 install-exec-hook:
-	$(LN_S) $(bindir)/cygGapIntegrals-$(PLUGIN_MAJOR_VERSION)-$(PLUGIN_MINOR_VERSION)-$(PLUGIN_MAJOR_VERSION).dll $(libdir)/libGapIntegrals.so
+	$(LN_S) -f $(bindir)/cygGapIntegrals-$(PLUGIN_MAJOR_VERSION)-$(PLUGIN_MINOR_VERSION)-$(PLUGIN_MAJOR_VERSION).dll $(libdir)/libGapIntegrals.so
 uninstall-hook:
 	rm -f $(libdir)/libGapIntegrals.so
 endif
