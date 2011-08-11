@@ -3832,7 +3832,7 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
 
       // set y-axis title
       fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
-      fHistoFrame->GetYaxis()->SetTitle("Power Fourier");
+      fHistoFrame->GetYaxis()->SetTitle("Ampl. Fourier");
 
       // plot data
       for (UInt_t i=0; i<fData.size(); i++) {
@@ -4156,9 +4156,9 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
       // set y-axis title
       fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
       if (fData[0].diffFourierTag == 1)
-        fHistoFrame->GetYaxis()->SetTitle("Power Fourier (d-f: data-theory)");
+        fHistoFrame->GetYaxis()->SetTitle("Ampl. Fourier (d-f: data-theory)");
       else
-        fHistoFrame->GetYaxis()->SetTitle("Power Fourier (f-d: [(F data)-(F theory)]");
+        fHistoFrame->GetYaxis()->SetTitle("Ampl. Fourier (f-d: [(F data)-(F theory)]");
 
       // plot data
       for (UInt_t i=0; i<fData.size(); i++) {
