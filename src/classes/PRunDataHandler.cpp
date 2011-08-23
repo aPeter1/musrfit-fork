@@ -1346,7 +1346,9 @@ Bool_t PRunDataHandler::ReadNexusFile()
   PDoubleVector histoData;
   PRawRunData   runData;
   TString str;
+  string sstr;
   Double_t dval;
+  bool ok;
 
   PNeXus *nxs_file = new PNeXus(fRunPathName.Data());
   if (!nxs_file->IsValid()) {
@@ -1355,81 +1357,265 @@ Bool_t PRunDataHandler::ReadNexusFile()
     return false;
   }
 
-  // get header information
-
-  // get/set run title
-  str = TString(nxs_file->GetRunTitle());
-  runData.SetRunTitle(str);
-
-  // get/set run number
-  runData.SetRunNumber(nxs_file->GetRunNumber());
-
-  // get/set temperature
-  runData.SetTemperature(0, nxs_file->GetSampleTemperature(), 0.0);
-
-  // get/set field
-  dval = nxs_file->GetMagneticField();
-  str = TString(nxs_file->GetMagneticFieldUnits());
-  // since field has to be given in Gauss, check the units
-  Double_t factor=1.0;
-  if (!str.CompareTo("gauss", TString::kIgnoreCase))
-    factor=1.0;
-  else if (!str.CompareTo("tesla", TString::kIgnoreCase))
-    factor=1.0e4;
-  else
-    factor=1.0;
-  runData.SetField(factor*dval);
-
-  // get/set implantation energy
-  runData.SetEnergy(PMUSR_UNDEFINED);
-
-  // get/set moderator HV
-  runData.SetTransport(PMUSR_UNDEFINED);
-
-  // get/set RA HV's (LEM specific)
-  for (UInt_t i=0; i<4; i++)
-    runData.SetRingAnode(i, PMUSR_UNDEFINED);
-
-  // get/set setup
-  runData.SetSetup(nxs_file->GetRunNotes());
-
-  // get/set sample
-  runData.SetSample(nxs_file->GetSampleName());
-
-  // get/set orientation
-  runData.SetOrientation("??");
-
-  // get/set time resolution (ns)
-  runData.SetTimeResolution(nxs_file->GetTimeResolution());
-
-  // get/set start/stop time
-  runData.SetStartTime(nxs_file->GetStartTime());
-  runData.SetStartDate(nxs_file->GetStartDate());
-  runData.SetStopTime(nxs_file->GetStopTime());
-  runData.SetStopDate(nxs_file->GetStopDate());
-
-  // get t0, firstGoodBin, lastGoodBin, data
-  UInt_t t0=nxs_file->GetT0();
-  PIntPair goodDataBin;
-  goodDataBin.first  = nxs_file->GetFirstGoodBin();
-  goodDataBin.second = nxs_file->GetLastGoodBin();
-  PDoubleVector data;
-  for (Int_t i=0; i<nxs_file->GetNoHistos(); i++) {
-    runData.AppendT0(t0);
-    runData.AppendGoodDataBin(goodDataBin);
-    data.clear();
-    for (UInt_t j=0; j<nxs_file->GetHisto(i)->size(); j++) {
-      data.push_back((Double_t)nxs_file->GetHisto(i)->at(j));
+  if (nxs_file->GetIdfVersion() == 1) {
+    if (!nxs_file->IsValid()) {
+      cout << endl << "**ERROR** invalid NeXus IDF 2 version file found." << endl;
+      return false;
     }
-    runData.AppendDataBin(data);
+
+    // get header information
+
+    // get/set run title
+    str = TString(nxs_file->GetEntryIdf1()->GetTitle());
+    runData.SetRunTitle(str);
+
+    // get/set run number
+    runData.SetRunNumber(nxs_file->GetEntryIdf1()->GetRunNumber());
+
+    // get/set temperature
+    dval = nxs_file->GetEntryIdf1()->GetSample()->GetPhysPropValue("temperature", ok);
+    if (ok)
+      runData.SetTemperature(0, dval, 0.0);
+
+    // get/set field
+    dval = nxs_file->GetEntryIdf1()->GetSample()->GetPhysPropValue("magnetic_field", ok);
+    nxs_file->GetEntryIdf1()->GetSample()->GetPhysPropUnit("magnetic_field", sstr, ok);
+    str = sstr;
+    // since field has to be given in Gauss, check the units
+    Double_t factor=1.0;
+    if (!str.CompareTo("gauss", TString::kIgnoreCase))
+      factor=1.0;
+    else if (!str.CompareTo("tesla", TString::kIgnoreCase))
+      factor=1.0e4;
+    else
+      factor=1.0;
+    runData.SetField(factor*dval);
+
+    // get/set implantation energy
+    runData.SetEnergy(PMUSR_UNDEFINED);
+
+    // get/set moderator HV
+    runData.SetTransport(PMUSR_UNDEFINED);
+
+    // get/set RA HV's (LEM specific)
+    for (UInt_t i=0; i<4; i++)
+      runData.SetRingAnode(i, PMUSR_UNDEFINED);
+
+    // get/set setup
+    runData.SetSetup(nxs_file->GetEntryIdf1()->GetNotes());
+
+    // get/set sample
+    runData.SetSample(nxs_file->GetEntryIdf1()->GetSample()->GetName());
+
+    // get/set orientation
+    runData.SetOrientation("??");
+
+    // get/set time resolution (ns)
+    runData.SetTimeResolution(nxs_file->GetEntryIdf1()->GetData()->GetTimeResolution("ns"));
+
+    // get/set start/stop time
+    sstr = nxs_file->GetEntryIdf1()->GetStartTime();
+    str = sstr;
+    TString date, time;
+    SplitTimeDate(str, time, date, ok);
+    if (ok) {
+      runData.SetStartTime(time);
+      runData.SetStartDate(date);
+    }
+
+    sstr = nxs_file->GetEntryIdf1()->GetStopTime();
+    str = sstr;
+    SplitTimeDate(str, time, date, ok);
+    if (ok) {
+      runData.SetStopTime(time);
+      runData.SetStopDate(date);
+    }
+
+    // get/set t0, firstGoodBin, lastGoodBin
+    vector<unsigned int> *t0  = nxs_file->GetEntryIdf1()->GetData()->GetT0s();
+    vector<unsigned int> *fgb = nxs_file->GetEntryIdf1()->GetData()->GetFirstGoodBins();
+    vector<unsigned int> *lgb = nxs_file->GetEntryIdf1()->GetData()->GetLastGoodBins();
+    PIntPair goodDataBin;
+    for (UInt_t i=0; i<nxs_file->GetEntryIdf1()->GetData()->GetNoOfHistos(); i++) {
+      if (i<t0->size()) {
+        runData.AppendT0(t0->at(i));
+      } else {
+        runData.AppendT0(t0->at(0));
+      }
+      if (i<fgb->size()) {
+        goodDataBin.first = fgb->at(i);
+        goodDataBin.second = lgb->at(i);
+      } else {
+        goodDataBin.first = fgb->at(0);
+        goodDataBin.second = lgb->at(0);
+      }
+      runData.AppendGoodDataBin(goodDataBin);
+    }
+
+    // get/set data
+    vector<unsigned int> *pdata;
+    PDoubleVector data;
+    for (UInt_t i=0; i<nxs_file->GetEntryIdf1()->GetData()->GetNoOfHistos(); i++) {
+      pdata = nxs_file->GetEntryIdf1()->GetData()->GetHisto(i);
+      for (UInt_t j=0; j<pdata->size(); j++)
+        data.push_back(pdata->at(j));
+      runData.AppendDataBin(data);
+      data.clear();
+    }
+
+    // keep run name from the msr-file
+    runData.SetRunName(fRunName);
+
+    // keep the information
+    fData.push_back(runData);
+  } else if (nxs_file->GetIdfVersion() == 2) {
+    if (!nxs_file->IsValid()) {
+      cout << endl << "**ERROR** invalid NeXus IDF 2 version file found." << endl;
+      return false;
+    }
+    // get header information
+
+    // get/set run title
+    str = TString(nxs_file->GetEntryIdf2()->GetTitle());
+    runData.SetRunTitle(str);
+
+    // get/set run number
+    runData.SetRunNumber(nxs_file->GetEntryIdf2()->GetRunNumber());
+
+    // get/set temperature
+    dval = nxs_file->GetEntryIdf2()->GetSample()->GetPhysPropValue("temperature", ok);
+    if (ok)
+      runData.SetTemperature(0, dval, 0.0);
+
+    // get/set field
+    dval = nxs_file->GetEntryIdf2()->GetSample()->GetPhysPropValue("magnetic_field", ok);
+    nxs_file->GetEntryIdf2()->GetSample()->GetPhysPropUnit("magnetic_field", sstr, ok);
+    str = sstr;
+    // since field has to be given in Gauss, check the units
+    Double_t factor=1.0;
+    if (!str.CompareTo("gauss", TString::kIgnoreCase))
+      factor=1.0;
+    else if (!str.CompareTo("tesla", TString::kIgnoreCase))
+      factor=1.0e4;
+    else
+      factor=1.0;
+    runData.SetField(factor*dval);
+
+    // get/set implantation energy
+    runData.SetEnergy(PMUSR_UNDEFINED);
+
+    // get/set moderator HV
+    runData.SetTransport(PMUSR_UNDEFINED);
+
+    // get/set RA HV's (LEM specific)
+    for (UInt_t i=0; i<4; i++)
+      runData.SetRingAnode(i, PMUSR_UNDEFINED);
+
+    // get/set setup take NXsample/temperature_1_env and NXsample/magnetic_field_1_env
+    sstr  = nxs_file->GetEntryIdf2()->GetSample()->GetEnvironmentTemp() + string("/");
+    sstr += nxs_file->GetEntryIdf2()->GetSample()->GetEnvironmentField();
+    str = sstr;
+    runData.SetSetup(str);
+
+    // get/set sample
+    runData.SetSample(nxs_file->GetEntryIdf2()->GetSample()->GetName());
+
+    // get/set orientation
+    runData.SetOrientation("??");
+
+    // get/set time resolution (ns)
+    runData.SetTimeResolution(nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetTimeResolution("ns"));
+
+    // get/set start/stop time
+    sstr = nxs_file->GetEntryIdf2()->GetStartTime();
+    str = sstr;
+    TString date, time;
+    SplitTimeDate(str, time, date, ok);
+    if (ok) {
+      runData.SetStartTime(time);
+      runData.SetStartDate(date);
+    }
+
+    sstr = nxs_file->GetEntryIdf2()->GetStopTime();
+    str = sstr;
+    SplitTimeDate(str, time, date, ok);
+    if (ok) {
+      runData.SetStopTime(time);
+      runData.SetStopDate(date);
+    }
+
+    // get/set t0, firstGoodBin, lastGoodBin
+    int *t0  = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetT0s();
+    int *fgb = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetFirstGoodBins();
+    int *lgb = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetLastGoodBins();
+    PIntPair goodDataBin;
+
+    if (nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetT0Tag() == 2) { // t0, fgb, lgb: [][]
+      for (int i=0; i<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfPeriods(); i++) {
+        for (int j=0; j<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra(); j++) {
+          if (fgb && lgb) {
+            goodDataBin.first = *(fgb+i*nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra()+j);
+            goodDataBin.second = *(lgb+i*nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra()+j);
+          }
+          runData.AppendT0(*(t0+i*nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra()+j));
+          if (fgb && lgb) {
+            runData.AppendGoodDataBin(goodDataBin);
+          }
+        }
+      }
+    } else { // t0, fgb, lgb: single numbers
+      if (fgb && lgb) {
+        goodDataBin.first = *fgb;
+        goodDataBin.second = *lgb;
+      }
+      for (int i=0; i<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfPeriods(); i++) {
+        for (int j=0; j<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra(); j++) {
+          runData.AppendT0(*t0);
+          if (fgb && lgb)
+            runData.AppendGoodDataBin(goodDataBin);
+        }
+      }
+    }
+
+    // get/set data
+    PDoubleVector data;
+    int *histos = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetHistos();
+    if (nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfPeriods() > 0) { // counts[][][]
+      for (int i=0; i<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfPeriods(); i++) {
+        for (int j=0; j<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra(); j++) {
+          for (int k=0; k<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfBins(); k++) {
+            data.push_back(*(histos+i*nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra()+j*nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfBins()+k));
+          }
+          runData.AppendDataBin(data);
+          data.clear();
+        }
+      }
+    } else {
+      if (nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra() > 0) { // counts[][]
+        for (int i=0; i<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra(); i++) {
+          for (int j=0; j<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfBins(); j++) {
+            data.push_back(*(histos+i*nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfBins()+j));
+          }
+          runData.AppendDataBin(data);
+          data.clear();
+        }
+      } else { // counts[]
+        for (int i=0; i<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfBins(); i++) {
+          data.push_back(*(histos+i));
+        }
+        runData.AppendDataBin(data);
+        data.clear();
+      }
+    }
+
+    // keep run name from the msr-file
+    runData.SetRunName(fRunName);
+
+    // keep the information
+    fData.push_back(runData);
+  } else {
+    cout << endl << ">> PRunDataHandler::ReadNexusFile(): IDF version " << nxs_file->GetIdfVersion() << ", not implemented." << endl;
   }
-  data.clear();
-
-  // keep run name from the msr-file
-  runData.SetRunName(fRunName);
-
-  // keep the information
-  fData.push_back(runData);
 
   // clean up
   if (nxs_file) {
@@ -3405,8 +3591,11 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
  * \param fln file name. If empty, the routine will try to construct one
  */
 Bool_t PRunDataHandler::WriteNexusFile(TString fln)
-{  
+{
+
 #ifdef PNEXUS_ENABLED
+  int *t0=0, *fgb=0, *lgb=0, *histo=0;
+
   // generate output file name
   if (fln.Length() == 0) {
     Bool_t ok = false;
@@ -3429,65 +3618,151 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
     return false;
   }
 
-  // fill necessary data structures
-  nxs->SetFileName(fln.Data());
-  nxs->SetIDFVersion(1);
-  nxs->SetProgramName("any2many");
-  nxs->SetProgramVersion("$Id$");
-  nxs->SetRunNumber(fData[0].GetRunNumber());
-  nxs->SetRunTitle(fData[0].GetRunTitle()->Data());
-  nxs->SetRunNotes("n/a");
-  nxs->SetAnalysisTag("n/a");
-  nxs->SetLab("PSI");
-  nxs->SetBeamline("n/a");
-  nxs->SetStartDate(fData[0].GetStartDate()->Data());
-  nxs->SetStartTime(fData[0].GetStartTime()->Data());
-  nxs->SetStopDate(fData[0].GetStopDate()->Data());
-  nxs->SetStopTime(fData[0].GetStopTime()->Data());
-  nxs->SetSwitchingState(0);
-  nxs->SetUser("n/a");
-  nxs->SetExperimentNumber("n/a");
-  nxs->SetSampleName(fData[0].GetSample()->Data());
-  nxs->SetSampleTemperature(fData[0].GetTemperature(0));
-  nxs->SetSampleTemperatureUints("Kelvin");
-  nxs->SetMagneticField(fData[0].GetField());
-  nxs->SetMagneticFieldUnits("Gauss");
-  nxs->SetSampleEnvironment("n/a");
-  nxs->SetSampleShape("n/a");
-  nxs->SetMagneticFieldVectorAvailable(0);
-  nxs->SetExperimentName("n/a");
-  nxs->SetNoDetectors(fData[0].GetNoOfHistos());
-  nxs->SetCollimatorType("n/a");
-  nxs->SetTimeResolution(fData[0].GetTimeResolution());
-  if (fData[0].GetT0(0) == -1)
-    nxs->SetT0(0);
-  else
-    nxs->SetT0(fData[0].GetT0(0)); // this needs to be changed in the long term, since for continous sources each detector has its one t0!!
-  if (fData[0].GetGoodDataBin(0).first == -1) {
-    nxs->SetFirstGoodBin(0);
-    nxs->SetLastGoodBin(0);
-  } else {
-    nxs->SetFirstGoodBin(fData[0].GetGoodDataBin(0).first);
-    nxs->SetLastGoodBin(fData[0].GetGoodDataBin(0).second);
-  }
-  // feed real histogram data
-  PUIntVector data;
-  for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
-    for (UInt_t j=0; j<fData[0].GetDataBin(i)->size(); j++) {
-      data.push_back((UInt_t)fData[0].GetDataBin(i)->at(j));
+  // set IDF version
+  nxs->SetIdfVersion(fAny2ManyInfo->idf);
+
+  if (fAny2ManyInfo->idf == 1) {
+    // fill necessary data structures
+    nxs->SetFileName(fln.Data());
+
+    // set file creating time
+    time_t now;
+    struct tm *tm;
+    time(&now);
+    tm = localtime(&now);
+    string str("");
+    char cstr[128];
+    sprintf(cstr, "%04d-%02d-%02d %02d:%02d:%02d", 1900+tm->tm_year, tm->tm_mon, tm->tm_mday, tm->tm_hour, tm->tm_hour, tm->tm_sec);
+    str = string(cstr);
+    nxs->SetFileTime(str);
+
+    nxs->GetEntryIdf1()->SetProgramName("any2many");
+    nxs->GetEntryIdf1()->SetProgramVersion("$Id$");
+    nxs->GetEntryIdf1()->SetRunNumber(fData[0].GetRunNumber());
+    nxs->GetEntryIdf1()->SetTitle(fData[0].GetRunTitle()->Data());
+    nxs->GetEntryIdf1()->SetNotes("n/a");
+    nxs->GetEntryIdf1()->SetAnalysis("n/a");
+    nxs->GetEntryIdf1()->SetLaboratory("PSI");
+    nxs->GetEntryIdf1()->SetBeamline("n/a");
+    str = string(fData[0].GetStartDate()->Data()) + string(" ") + string(fData[0].GetStartTime()->Data());
+    nxs->GetEntryIdf1()->SetStartTime(str);
+    str = string(fData[0].GetStopDate()->Data()) + string(" ") + string(fData[0].GetStopTime()->Data());
+    nxs->GetEntryIdf1()->SetStopTime(str);
+    nxs->GetEntryIdf1()->SetSwitchingState(0);
+    nxs->GetEntryIdf1()->GetUser()->SetName("n/a");
+    nxs->GetEntryIdf1()->GetUser()->SetExperimentNumber("n/a");
+    nxs->GetEntryIdf1()->GetSample()->SetName(fData[0].GetSample()->Data());
+    nxs->GetEntryIdf1()->GetSample()->SetPhysProp("temperature", fData[0].GetTemperature(0), "Kelvin");
+    nxs->GetEntryIdf1()->GetSample()->SetPhysProp("magnetic_field", fData[0].GetField(), "Gauss");
+    nxs->GetEntryIdf1()->GetSample()->SetEnvironment("n/a");
+    nxs->GetEntryIdf1()->GetSample()->SetShape("n/a");
+    nxs->GetEntryIdf1()->GetSample()->SetMagneticFieldVectorAvailable(0);
+    nxs->GetEntryIdf1()->GetInstrument()->SetName("n/a");
+    nxs->GetEntryIdf1()->GetInstrument()->GetDetector()->SetNumber(fData[0].GetNoOfHistos());
+    nxs->GetEntryIdf1()->GetInstrument()->GetCollimator()->SetType("n/a");
+    nxs->GetEntryIdf1()->GetData()->SetTimeResolution(fData[0].GetTimeResolution(), "ns");
+    if (fData[0].GetT0(0) == -1)
+      nxs->GetEntryIdf1()->GetData()->SetT0(0);
+    else
+      nxs->GetEntryIdf1()->GetData()->SetT0(fData[0].GetT0(0)); // this needs to be changed in the long term, since for continous sources each detector has its one t0!!
+    if (fData[0].GetGoodDataBin(0).first == -1) {
+      nxs->GetEntryIdf1()->GetData()->SetFirstGoodBin(0);
+      nxs->GetEntryIdf1()->GetData()->SetLastGoodBin(0);
+    } else {
+      nxs->GetEntryIdf1()->GetData()->SetFirstGoodBin(fData[0].GetGoodDataBin(0).first);
+      nxs->GetEntryIdf1()->GetData()->SetLastGoodBin(fData[0].GetGoodDataBin(0).second);
     }
-    nxs->SetHisto(i, data);
-    data.clear();
+    // feed real histogram data
+    PUIntVector data;
+    for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
+      for (UInt_t j=0; j<fData[0].GetDataBin(i)->size(); j++) {
+        data.push_back((UInt_t)fData[0].GetDataBin(i)->at(j));
+      }
+      nxs->GetEntryIdf1()->GetData()->SetHisto(data, i);
+      data.clear();
+    }
+  } else if (fAny2ManyInfo->idf == 2) {
+    // fill necessary data structures
+    nxs->SetFileName(fln.Data());
+
+    // set file creating time
+    time_t now;
+    struct tm *tm;
+    time(&now);
+    tm = localtime(&now);
+    string str("");
+    char cstr[128];
+    sprintf(cstr, "%04d-%02d-%02d %02d:%02d:%02d", 1900+tm->tm_year, tm->tm_mon, tm->tm_mday, tm->tm_hour, tm->tm_hour, tm->tm_sec);
+    str = string(cstr);
+    nxs->SetFileTime(str);
+
+    nxs->SetCreator("PSI - any2many");
+
+    nxs->GetEntryIdf2()->SetDefinition("pulsedTD");
+    nxs->GetEntryIdf2()->SetRunNumber(fData[0].GetRunNumber());
+    nxs->GetEntryIdf2()->SetTitle(fData[0].GetRunTitle()->Data());
+    str = string(fData[0].GetStartDate()->Data()) + string(" ") + string(fData[0].GetStartTime()->Data());
+    nxs->GetEntryIdf2()->SetStartTime(str);
+    str = string(fData[0].GetStopDate()->Data()) + string(" ") + string(fData[0].GetStopTime()->Data());
+    nxs->GetEntryIdf2()->SetStopTime(str);
+
+    nxs->GetEntryIdf2()->SetExperimentIdentifier("n/a");
+
+    nxs->GetEntryIdf2()->GetUser()->SetName("n/a");
+
+    nxs->GetEntryIdf2()->GetSample()->SetName(fData[0].GetSample()->Data());
+    nxs->GetEntryIdf2()->GetSample()->SetDescription("n/a");
+    nxs->GetEntryIdf2()->GetSample()->SetPhysProp("temperature_1", fData[0].GetTemperature(0), "Kelvin");
+    nxs->GetEntryIdf2()->GetSample()->SetPhysProp("magnetic_field_1", fData[0].GetField(), "Gauss");
+    nxs->GetEntryIdf2()->GetSample()->SetEnvironmentTemp("n/a");
+    nxs->GetEntryIdf2()->GetSample()->SetEnvironmentField("n/a");
+
+    // here would be the information for NXinstrument. Currently there are not enough information to feed this
+
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetDescription("n/a");
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetNoOfPeriods(1); // currently red/green is not distinguished
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetNoOfSpectra(fData[0].GetNoOfHistos());
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetNoOfBins(fData[0].GetDataBin(0)->size());
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetTimeResolution(fData[0].GetTimeResolution(), "ns");
+    histo = new int[fData[0].GetNoOfHistos()*fData[0].GetDataBin(0)->size()];
+    for (int i=0; i<nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra(); i++) {
+      for (unsigned int j=0; j<fData[0].GetDataBin(0)->size(); j++) {
+        *(histo+i*fData[0].GetDataBin(0)->size()+j) = (int) fData[0].GetDataBin(i)->at(j);
+      }
+    }
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetHisto(histo);
+    for (int i=0; i<nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra(); i++)
+      nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetSpectrumIndex(i+1);
+
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetT0Tag(2);
+    int *t0 = new int[fData[0].GetT0Size()];
+    for (unsigned int i=0; i<fData[0].GetNoOfHistos(); i++) {
+      if (i<fData[0].GetT0Size())
+        *(t0+i) = fData[0].GetT0(i);
+      else
+        *(t0+i) = fData[0].GetT0(0);
+    }
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetT0(t0);
+
+    // first_good_bin - still missing
+    // last_good_bin - still missing
+  } else {
+    // clean up
+    if (nxs != 0) {
+      delete nxs;
+      nxs = 0;
+    }
+    return false;
   }
 
   // filter out the proper file type, i.e. HDF4, HDF5, or XML
   char fileType[32];
   memset(fileType, '\0', 32);
-  if (!fAny2ManyInfo->outFormat.CompareTo("nexus-hdf4", TString::kIgnoreCase))
+  if (!fAny2ManyInfo->outFormat.CompareTo("nexus1-hdf4", TString::kIgnoreCase) || !fAny2ManyInfo->outFormat.CompareTo("nexus2-hdf4", TString::kIgnoreCase))
     strncpy(fileType, "hdf4", sizeof(fileType));
-  else if (!fAny2ManyInfo->outFormat.CompareTo("nexus-hdf5", TString::kIgnoreCase))
+  else if (!fAny2ManyInfo->outFormat.CompareTo("nexus1-hdf5", TString::kIgnoreCase) || !fAny2ManyInfo->outFormat.CompareTo("nexus2-hdf5", TString::kIgnoreCase))
     strncpy(fileType, "hdf5", sizeof(fileType));
-  else if (!fAny2ManyInfo->outFormat.CompareTo("nexus-xml", TString::kIgnoreCase))
+  else if (!fAny2ManyInfo->outFormat.CompareTo("nexus1-xml", TString::kIgnoreCase) || !fAny2ManyInfo->outFormat.CompareTo("nexus2-xml", TString::kIgnoreCase))
     strncpy(fileType, "xml", sizeof(fileType));
   else {
     cerr << endl << ">> PRunDataHandler::WriteNexusFile(): **ERROR** undefined output NeXus format " << fAny2ManyInfo->outFormat.Data() << " found.";
@@ -3500,9 +3775,25 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
   }
 
   // write file
-  nxs->WriteFile(fln, fileType);
+  nxs->WriteFile(fln, fileType, fAny2ManyInfo->idf);
 
   // clean up
+  if (t0) {
+    delete [] t0;
+    t0 = 0;
+  }
+  if (fgb) {
+    delete [] fgb;
+    fgb = 0;
+  }
+  if (lgb) {
+    delete [] lgb;
+    lgb = 0;
+  }
+  if (histo) {
+    delete [] histo;
+    histo = 0;
+  }
   if (nxs != 0) {
     delete nxs;
     nxs = 0;
@@ -3510,6 +3801,7 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
 #else
   cout << endl << ">> PRunDataHandler::WriteNexusFile(): Sorry, not enabled at configuration level, i.e. --enable-NeXus when executing configure" << endl << endl;
 #endif
+
   return true;
 }
 
@@ -4566,4 +4858,33 @@ TString PRunDataHandler::GetMonth(Int_t month)
     mm = "???";
 
   return mm;
+}
+
+//--------------------------------------------------------------------------
+// SplitTimeData (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>splits an ISO 8601 timeDate into seperate time and data. The flag ok
+ * shows if it was successfull.
+ *
+ * \param timeData ISO 8601 timeData
+ * \param time part of timeData
+ * \param date part of timeData
+ * \param ok flag showing if the splitting was successfull
+ */
+void PRunDataHandler::SplitTimeDate(TString timeData, TString &time, TString &date, Bool_t &ok)
+{
+  struct tm tm;
+  memset(&tm, 0, sizeof(tm));
+  strptime(timeData.Data(), "%Y-%m-%d %H:%M:S", &tm);
+  if (tm.tm_year == 0)
+    strptime(timeData.Data(), "%Y-%m-%dT%H:%M:S", &tm);
+
+  if (tm.tm_year == 0) {
+    ok = false;
+    return;
+  }
+
+  time = TString::Format("%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
+  date = TString::Format("%04d-%02d-%02d", tm.tm_year+1900, tm.tm_mon, tm.tm_mday);
 }

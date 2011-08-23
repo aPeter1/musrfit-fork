@@ -609,6 +609,7 @@ typedef struct {
   UInt_t rebin;              ///< holds the number of bins to be packed
   UInt_t compressionTag;     ///< 0=no compression, 1=gzip compression, 2=bzip2 compression
   TString compressFileName;  ///< holds the name of the outputfile name in case of compression is used
+  UInt_t idf;                ///< IDF version for NeXus files.
 } PAny2ManyInfo;
 
 #endif // _PMUSR_H_

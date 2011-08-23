@@ -5,7 +5,7 @@ h_sources = \
   PNeXus.h
 
 cpp_sources = \
-  PNeXus.cpp
+  PNeXus.cpp 
 
 include_HEADERS = $(h_sources)
 

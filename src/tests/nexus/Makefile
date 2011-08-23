@@ -11,7 +11,7 @@ LD       = g++
 LDFLAGS  = -g
 
 LIBS     = -L /usr/local/lib -lNeXus
-LIBS    += -L /opt/hdf5/lib -lhdf5
+LIBS    += -L /usr/lib -lhdf5
 
 EXEC = nexus_read_test
 

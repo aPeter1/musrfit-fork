@@ -96,6 +96,7 @@ class PRunDataHandler
     virtual TString GetFileName(const TString extension, Bool_t &ok);
     virtual TString FileNameFromTemplate(TString &fileNameTemplate, Int_t run, TString &year, Bool_t &ok);
     virtual TString GetMonth(Int_t month);
+    virtual void SplitTimeDate(TString timeDate, TString &time, TString &date, Bool_t &ok);
 };
 
 #endif //  _PRUNDATAHANDLER_H_

@@ -64,9 +64,10 @@ void any2many_syntax()
   cout << endl << "                etc., or a sequence of runs <runStart>-<runEnd>, e.g. 111-222";
   cout << endl << "          -c <convert-options> : <inFormat> <outFormat>";
   cout << endl << "             <inFormat>  : input data file format. Supported formats are:";
-  cout << endl << "                PSI-BIN, ROOT (LEM), MUD, NeXus, PSI-MDU, WKM";
+  cout << endl << "                PSI-BIN, ROOT (LEM), MUD, NeXus1, NeXus2, PSI-MDU, WKM";
   cout << endl << "             <outFormat> : ouput data file format. Supported formats are:";
-  cout << endl << "                PSI-BIN, ROOT (LEM), MUD, NeXus-HDF4, NeXus-HDF5, NeXus-XML, WKM, ASCII";
+  cout << endl << "                PSI-BIN, ROOT (LEM), MUD, NeXus1-HDF4, NeXus1-HDF5, NeXus1-XML,";
+  cout << endl << "                NeXus2-HDF4, NeXus2-HDF5, NeXus2-XML, WKM, ASCII";
   cout << endl << "          -p <output-path> : where <output-path> is the output path for the";
   cout << endl << "               converted files. If nothing is given, the current directory";
   cout << endl << "               will be used, unless the option '-s' is used.";
@@ -149,9 +150,12 @@ int main(int argc, char *argv[])
   outputFormat.push_back("psi-bin");
   outputFormat.push_back("root");
   outputFormat.push_back("mud");
-  outputFormat.push_back("nexus-hdf4");
-  outputFormat.push_back("nexus-hdf5");
-  outputFormat.push_back("nexus-xml");
+  outputFormat.push_back("nexus1-hdf4");
+  outputFormat.push_back("nexus1-hdf5");
+  outputFormat.push_back("nexus1-xml");
+  outputFormat.push_back("nexus2-hdf4");
+  outputFormat.push_back("nexus2-hdf5");
+  outputFormat.push_back("nexus2-xml");
   outputFormat.push_back("wkm");
   outputFormat.push_back("ascii");
 
@@ -159,6 +163,7 @@ int main(int argc, char *argv[])
   info.useStandardOutput = false;
   info.rebin = 1;
   info.compressionTag = 0; // no compression as default
+  info.idf = 0; // undefined
 
   // call any2many without arguments
   if (argc == 1) {
@@ -403,6 +408,12 @@ int main(int argc, char *argv[])
     cerr << endl << ">> any2many **ERROR** conversion information is missing." << endl;
     show_syntax = true;
   }
+
+  // check if the output format is nexus
+  if (info.outFormat.Contains("nexus1", TString::kIgnoreCase))
+    info.idf = 1;
+  if (info.outFormat.Contains("nexus2", TString::kIgnoreCase))
+    info.idf = 2;
 
   if (show_syntax) {
     info.runList.clear();
