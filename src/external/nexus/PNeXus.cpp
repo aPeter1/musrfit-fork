@@ -1546,6 +1546,10 @@ PNeXus::~PNeXus()
     delete fNxEntry1;
     fNxEntry1 = 0;
   }
+  if (fNxEntry2) {
+    delete fNxEntry2;
+    fNxEntry2 = 0;
+  }
 
   for (unsigned int i=0; i<fGroupedHisto.size(); i++) {
     fGroupedHisto[i].clear();
