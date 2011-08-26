@@ -40,26 +40,33 @@ class TPsiRunProperty : public TObject
 {
 public:
   TPsiRunProperty();
-  TPsiRunProperty(TString &name, Double_t value, Double_t error, TString &unit);
+  TPsiRunProperty(TString &name, Double_t demand, Double_t value, Double_t error, TString &unit, TString &description);
   virtual ~TPsiRunProperty();
 
   virtual TString GetLabel() const { return fLabel; }
+  virtual Double_t GetDemand() const { return fDemand; }
   virtual Double_t GetValue() const { return fValue; }
   virtual Double_t GetError() const { return fError; }
   virtual TString  GetUnit() const { return fUnit; }
+  virtual TString  GetDescription() const { return fDescription; }
 
   virtual void SetLabel(TString &label) { fLabel = label; }
   virtual void SetLabel(const char *label) { fLabel = label; }
+  virtual void SetDemand(Double_t val) { fDemand = val; }
   virtual void SetValue(Double_t val) { fValue = val; }
   virtual void SetError(Double_t err) { fError = err; }
   virtual void SetUnit(TString &unit) { fUnit = unit.Data(); }
   virtual void SetUnit(const char *unit) { fUnit = unit; }
+  virtual void SetDescription(TString &str) { fDescription = str.Data(); }
+  virtual void SetDescription(const char *str) { fDescription = str; }
 
 private:
-  TString  fLabel;
-  Double_t fValue;
-  Double_t fError;
-  TString  fUnit;
+  TString  fLabel; ///<  property label, like ’Sample Temperature’ etc.
+  Double_t fDemand; ///< demand value of the property, e.g. temperature setpoint
+  Double_t fValue; ///<  measured value of the property
+  Double_t fError; ///<  estimated error (standard deviation) of the measured property value
+  TString  fUnit;   ///< unit of the property
+  TString  fDescription; ///< a more detailed description of the property
 
   ClassDef(TPsiRunProperty, 1)
 };
@@ -78,6 +85,7 @@ public:
   virtual TString GetSetup() const { return fSetup; }
   virtual TString GetSample() const { return fSample; }
   virtual TString GetOrientation() const { return fOrientation; }
+  virtual TPsiRunProperty* GetProperty(TString name);
   virtual vector<TPsiRunProperty> *GetProperties() { return &fProperties; }
 
   virtual TObjArray *GetHeader();
@@ -91,7 +99,7 @@ public:
   virtual void SetSample(TString sample) { fSample = sample; }
   virtual void SetOrientation(TString orientation) { fOrientation = orientation; }
   virtual void AddProperty(TPsiRunProperty &property);
-  virtual void AddProperty(TString name, Double_t value, Double_t error, TString unit);
+  virtual void AddProperty(TString name, Double_t demand, Double_t value, Double_t error, TString unit, TString desciption=TString(""));
 
 
   virtual void DumpHeader() const;
@@ -110,7 +118,10 @@ private:
 
   TObjArray fHeader; /// header as TObjString array for dumping into a ROOT file
 
-  UInt_t GetDecimalPlace(Double_t val);
+  virtual Bool_t DecodePhyscialPorperty(TObjString *ostr, TPsiRunProperty &prop);
+
+  virtual UInt_t GetDecimalPlace(Double_t val);
+  virtual UInt_t GetLeastSignificantDigit(Double_t val) const;
 
   ClassDef(TPsiRunHeader, 1)
 };

@@ -63,12 +63,12 @@ int main(int argc, char *argv[])
   header->SetSample("Eu2CuO4 MOD thin film");
   header->SetOrientation("c-axis perp to spin");
 
-  header->AddProperty("T0", 30.01, 0.05, "K");
-  header->AddProperty("T1", 30.03, 0.03, "K");
-  header->AddProperty("Field", 3.00003, 0.0003, "T");
-  header->AddProperty("BigError", 13.2, 1.2, "Something");
-  header->AddProperty("ThisIsAVeryLongPropertyName", 3.03, 0.03, "SI-Unit");
-  header->AddProperty("This Is A Property With Spaces", 3.03, 0.03, "SI-Unit");
+  header->AddProperty("Sample Temperature", 30.0, 30.01, 0.05, "K");
+  header->AddProperty("T1", 30.0, 30.003, 0.003, "K", "sample stick temperature");
+  header->AddProperty("Field", 3.0, 3.0003, 0.000025, "T");
+  header->AddProperty("BigError", 12.5, 13.2, 1.2, "Something", "Explain it");
+  header->AddProperty("ThisIsAVeryLongPropertyName", 3.001, 3.03, 0.03, "SI-Unit", "another interesting property");
+  header->AddProperty("This Is A Property With Spaces", 3.0, 3.03, 0.03, "SI-Unit", "yet another interesting property");
 
   TFile *f = new TFile(argv[1], "RECREATE", "psi_runHeader_test");
   if (f->IsZombie()) {
@@ -77,16 +77,16 @@ int main(int argc, char *argv[])
   }
 
   // root file header related things
-/*
   TFolder *runInfo = gROOT->GetRootFolder()->AddFolder("RunInfo", "PSI RunInfo");
   gROOT->GetListOfBrowsables()->Add(runInfo, "RunInfo");
   runInfo->Add(header->GetHeader());
   runInfo->Write();
-*/
 
+/*
   f->mkdir("RunInfo");
   f->cd("RunInfo");
   header->GetHeader()->Write();
+*/
 
   f->Close();
 

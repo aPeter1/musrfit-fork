@@ -65,9 +65,11 @@ ClassImp(TPsiRunProperty)
 TPsiRunProperty::TPsiRunProperty()
 {
   fLabel = "n/a";
+  fDemand = 0.0;
   fValue = 0.0;
   fError = 0.0;
   fUnit  = "n/a";
+  fDescription = "n/a";
 }
 
 //--------------------------------------------------------------------------
@@ -81,9 +83,13 @@ TPsiRunProperty::TPsiRunProperty()
  * \param error
  * \param unit
  */
-TPsiRunProperty::TPsiRunProperty(TString &label, Double_t value, Double_t error, TString &unit) :
-    fLabel(label), fValue(value), fError(error), fUnit(unit)
+TPsiRunProperty::TPsiRunProperty(TString &label, Double_t demand, Double_t value, Double_t error, TString &unit, TString &description) :
+    fLabel(label), fDemand(demand), fValue(value), fError(error), fUnit(unit)
 {
+  if (description.IsWhitespace())
+    fDescription = "n/a";
+  else
+    fDescription = description;
 }
 
 //--------------------------------------------------------------------------
@@ -130,6 +136,30 @@ TPsiRunHeader::~TPsiRunHeader()
 {
   fProperties.clear();
   fHeader.Delete();
+}
+
+//--------------------------------------------------------------------------
+// GetProperty
+//--------------------------------------------------------------------------
+/**
+ * <p>Searches the property given by 'name'. If it is found, this property is
+ * returned, otherwise 0 is returned.
+ *
+ * \param name property name to look for.
+ */
+TPsiRunProperty* TPsiRunHeader::GetProperty(TString name)
+{
+  UInt_t i=0;
+
+  for (i=0; i<fProperties.size(); i++) {
+    if (!fProperties[i].GetLabel().CompareTo(name, TString::kIgnoreCase))
+      break;
+  }
+
+  if (i<fProperties.size())
+    return &fProperties[i];
+  else
+    return 0;
 }
 
 //--------------------------------------------------------------------------
@@ -189,15 +219,18 @@ TObjArray* TPsiRunHeader::GetHeader()
   fHeader.AddLast(tostr);
 
   // add properties
-  UInt_t digit=0;
+  UInt_t digit=0, digit_d=0;
   for (UInt_t i=0; i<fProperties.size(); i++) {
     digit = GetDecimalPlace(fProperties[i].GetError());
-    if (fProperties[i].GetUnit().CompareTo("n/a", TString::kIgnoreCase)) {
-      sprintf(fmt, "%%02d - %%s: %%.%dlf +- %%.%dlf %%s", digit, digit);
-      sprintf(str, fmt, TPRH_OFFSET+i, fProperties[i].GetLabel().Data(), fProperties[i].GetValue(), fProperties[i].GetError(), fProperties[i].GetUnit().Data());
+    digit_d = GetLeastSignificantDigit(fProperties[i].GetDemand());
+    if (fProperties[i].GetDescription().CompareTo("n/a")) {
+      sprintf(fmt, "%%02d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
+      sprintf(str, fmt, TPRH_OFFSET+i, fProperties[i].GetLabel().Data(), fProperties[i].GetValue(), fProperties[i].GetError(),
+              fProperties[i].GetUnit().Data(), fProperties[i].GetDemand(), fProperties[i].GetDescription().Data());
     } else {
-      sprintf(fmt, "%%02d - %%s: %%.%dlf +- %%.%dlf", digit, digit);
-      sprintf(str, fmt, TPRH_OFFSET+i, fProperties[i].GetLabel().Data(), fProperties[i].GetValue(), fProperties[i].GetError());
+      sprintf(fmt, "%%02d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
+      sprintf(str, fmt, TPRH_OFFSET+i, fProperties[i].GetLabel().Data(), fProperties[i].GetValue(), fProperties[i].GetError(),
+              fProperties[i].GetUnit().Data(), fProperties[i].GetDemand());
     }
     tostr = new TObjString(str);
     fHeader.AddLast(tostr);
@@ -285,51 +318,13 @@ Bool_t TPsiRunHeader::ExtractHeaderInformation(TObjArray *runHeader)
   // remove potential left over properties
   fProperties.clear();
 
-  Double_t dval, derr;
-  TString name(""), unit("");
-  char cstr[128];
+  TPsiRunProperty prop;
   for (Int_t i=TPRH_OFFSET-1; i<runHeader->GetEntries(); i++) {
-    ostr = dynamic_cast<TObjString*>(runHeader->At(i));
-    str = ostr->GetString();
-
-    name = TString("");
-    unit = TString("");
-
-    // 1st get the name
-    idx  = str.Index("-");
-    str.Remove(0, idx+2);
-    idx  = str.Index(":");
-    str.Remove(idx, str.Length());
-    name = str;
-
-    // 2nd get the value
-    str = ostr->GetString();
-    idx  = str.Index(":");
-    str.Remove(0, idx+2);
-    idx  = str.Index("+-");
-    str.Remove(idx, str.Length());
-    if (!str.IsFloat()) {
-      cerr << endl << ">> TPsiRunHeader::ExtractHeaderInformation(..) **ERROR** in TPsiRunProperty:";
-      cerr << endl << ">> found " << ostr->GetString().Data() << ", which has an invalid format." << endl << endl;
+    if (DecodePhyscialPorperty(dynamic_cast<TObjString*>(runHeader->At(i)), prop)) {
+      AddProperty(prop);
+    } else {
       return false;
     }
-    dval = str.Atof();
-
-    // 3rd get the error, and unit
-    str = ostr->GetString();
-    idx  = str.Index("+-");
-    str.Remove(0, idx+3);
-    memset(cstr, 0, sizeof(cstr));
-    status = sscanf(str.Data(), "%lf %s", &derr, cstr);
-    if (status < 2) {
-      cerr << endl << ">> TPsiRunHeader::ExtractHeaderInformation(..) **ERROR** in TPsiRunProperty:";
-      cerr << endl << ">> found " << ostr->GetString().Data() << ", which has an invalid format." << endl << endl;
-      return false;
-    }
-    if (strlen(cstr) > 0)
-      unit = TString(cstr);
-
-    AddProperty(name, dval, derr, unit);
   }
 
   return true;
@@ -359,9 +354,9 @@ void TPsiRunHeader::AddProperty(TPsiRunProperty &property)
   * \param error
   * \param unit
   */
-void TPsiRunHeader::AddProperty(TString name, Double_t value, Double_t error, TString unit)
+void TPsiRunHeader::AddProperty(TString name, Double_t demand, Double_t value, Double_t error, TString unit, TString description)
 {
-  TPsiRunProperty property(name, value, error, unit);
+  TPsiRunProperty property(name, demand, value, error, unit, description);
   fProperties.push_back(property);
 }
 
@@ -408,9 +403,15 @@ void TPsiRunHeader::DumpHeader() const
   cout << endl << setw(name_width) << left << "Orientation" << setw(old_width) << ": " << GetOrientation().Data();
 
   for (UInt_t i=0; i<fProperties.size(); i++) {
-    cout << endl << setw(name_width) << left << fProperties[i].GetLabel().Data() << setw(old_width) << ": " << fProperties[i].GetValue() << " +- " << fProperties[i].GetError();
-    if (fProperties[i].GetUnit().CompareTo("n/a", TString::kIgnoreCase)) {
-      cout << " " << fProperties[i].GetUnit().Data();
+    cout << endl << setw(name_width) << left << fProperties[i].GetLabel().Data() << setw(old_width) << ": ";
+/*
+    cout.precision(GetLeastSignificantDigit(fProperties[i].GetValue()));
+    cout.setf(ios::fixed,ios::floatfield);
+*/
+    cout << fProperties[i].GetValue() << " +- " << fProperties[i].GetError() << " " << fProperties[i].GetUnit().Data();    
+    cout << "; SP: " << fProperties[i].GetDemand();
+    if (fProperties[i].GetDescription().CompareTo("n/a", TString::kIgnoreCase)) {
+      cout << "; " << fProperties[i].GetDescription().Data();
     }
   }
   cout << endl << endl;
@@ -440,6 +441,141 @@ void TPsiRunHeader::DrawHeader() const
 }
 
 //--------------------------------------------------------------------------
+// DecodePhyscialPorperty (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param ostr
+ * \param prop
+ */
+Bool_t TPsiRunHeader::DecodePhyscialPorperty(TObjString *oprop, TPsiRunProperty &prop)
+{
+  TObjArray *tokens = oprop->GetString().Tokenize("-:");
+  TObjArray *tokens1 = 0;
+  TObjString *ostr = 0;
+  TString str("");
+
+  if (tokens == 0) {
+    cerr << endl << ">> **ERROR** Couldn't tokenize physical property string '" << ostr->GetString().Data() << "' (1)." << endl;
+    return false;
+  }
+
+  // get property name
+  ostr = dynamic_cast<TObjString*>(tokens->At(1));
+  str = ostr->GetString();
+  str.Remove(TString::kLeading, ' ');
+  prop.SetLabel(str);
+
+  if (tokens) {
+    delete tokens;
+    tokens = 0;
+  }
+
+  // get measured value
+  tokens = oprop->GetString().Tokenize(":");
+  if (tokens == 0) {
+    cerr << endl << ">> **ERROR** Couldn't tokenize physical property string '" << ostr->GetString().Data() << "' (2)." << endl;
+    return false;
+  }
+  ostr = dynamic_cast<TObjString*>(tokens->At(1));
+  str = ostr->GetString();
+  tokens1 = str.Tokenize(" ;");
+  if (tokens1 == 0) {
+    cerr << endl << ">> **ERROR** Couldn't tokenize physical property string '" << ostr->GetString().Data() << "' (3)." << endl;
+    if (tokens) {
+      delete tokens;
+      tokens = 0;
+    }
+    return false;
+  }
+  if (tokens1->GetEntries() < 4) {
+    cerr << endl << ">> **ERROR** not enough tokens from physical property string '" << ostr->GetString().Data() << "' (4)." << endl;
+    if (tokens) {
+      delete tokens;
+      tokens = 0;
+    }
+    return false;
+  }
+
+  // get measured value
+  ostr = dynamic_cast<TObjString*>(tokens1->At(0));
+  if (ostr->GetString().IsFloat()) {
+    prop.SetValue(ostr->GetString().Atof());
+  } else {
+    cerr << endl << ">> **ERROR** unexpected measured value. Found " << ostr->GetString().Data() << ", expected float." << endl;
+    if (tokens) {
+      delete tokens;
+    }
+    return false;
+  }
+
+  // get estimated err
+  ostr = dynamic_cast<TObjString*>(tokens1->At(2));
+  if (ostr->GetString().IsFloat()) {
+    prop.SetError(ostr->GetString().Atof());
+  } else {
+    cerr << endl << ">> **ERROR** unexpected estimated error. Found " << ostr->GetString().Data() << ", expected float." << endl;
+    if (tokens) {
+      delete tokens;
+    }
+    return false;
+  }
+
+  // get unit
+  ostr = dynamic_cast<TObjString*>(tokens1->At(3));
+  str = ostr->GetString();
+  str.Remove(TString::kLeading, ' ');
+  prop.SetUnit(str);
+
+  if (tokens1) {
+    delete tokens1;
+    tokens1 = 0;
+  }
+
+  ostr = dynamic_cast<TObjString*>(tokens->At(2));
+  str = ostr->GetString();
+  tokens1 = str.Tokenize(";");
+  if (tokens1 == 0) {
+    cerr << endl << ">> **ERROR** Couldn't tokenize physical property string '" << ostr->GetString().Data() << "' (4)." << endl;
+    if (tokens) {
+      delete tokens;
+      tokens = 0;
+    }
+    return false;
+  }
+
+  // get demand value
+  ostr = dynamic_cast<TObjString*>(tokens1->At(0));
+  if (ostr->GetString().IsFloat()) {
+    prop.SetDemand(ostr->GetString().Atof());
+  } else {
+    cerr << endl << ">> **ERROR** unexpected demand value. Found " << ostr->GetString().Data() << ", expected float." << endl;
+    if (tokens) {
+      delete tokens;
+    }
+    return false;
+  }
+
+  if (tokens1->GetEntries() > 1) { // with description
+    ostr = dynamic_cast<TObjString*>(tokens1->At(1));
+    str = ostr->GetString();
+    str.Remove(TString::kLeading, ' ');
+    prop.SetDescription(str);
+  }
+
+
+  if (tokens1) {
+    delete tokens1;
+  }
+  if (tokens) {
+    delete tokens;
+  }
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
 // GetDecimalPlace (private)
 //--------------------------------------------------------------------------
 /**
@@ -463,4 +599,33 @@ UInt_t TPsiRunHeader::GetDecimalPlace(Double_t val)
   }
 
   return digit;
+}
+
+//--------------------------------------------------------------------------
+// GetLeastSignificantDigit (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>returns the number of significant digits
+ *
+ * \param val value from which the lowest significant digit shall be determined
+ */
+UInt_t TPsiRunHeader::GetLeastSignificantDigit(Double_t val) const
+{
+  char cstr[1024];
+  sprintf(cstr, "%lf", val);
+
+  int i=0, j=0;
+  for (i=strlen(cstr)-1; i>=0; i--) {
+    if (cstr[i] != '0')
+      break;
+  }
+
+  for (j=strlen(cstr)-1; j>=0; j--) {
+    if (cstr[j] == '.')
+      break;
+  }
+  if (j==0) // no decimal point present, e.g. 321
+    j=i;
+
+  return i-j;
 }
