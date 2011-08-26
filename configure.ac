@@ -1,4 +1,4 @@
-AC_REVISION($Id$)
+AC_REVISION([$Id$])
 
 AC_PREREQ(2.59)
 AC_INIT(musrfit, 0.9.0, andreas.suter@psi.ch)
@@ -297,7 +297,6 @@ if test "${GSL_FOUND}" != "1"; then
 fi
 AC_SUBST(GSL_LIBS)
 AC_SUBST(GSL_CFLAGS)
-
 
 dnl -----------------------------------------------
 dnl Ask user for path to boost
@@ -736,6 +735,106 @@ if test "x$enable_omp" != "xno"; then
 fi
 
 dnl -----------------------------------------------
+dnl Ask user if the building of musredit/musrgui should be disabled
+dnl -----------------------------------------------
+
+AC_ARG_ENABLE([editor], [AC_HELP_STRING([--enable-editor],[check for Qt and build musredit or musrgui [default=yes]])])
+
+if test "x$enable_editor" != "xno"; then
+
+  echo "Additional checks for musredit/musrgui ..."
+
+  case "$host" in
+    *-*-cygwin)
+      QT4MINVER=4.5
+      ;;
+    *)
+      QT4MINVER=4.6
+      ;;
+  esac
+
+  QT3_FOUND=no
+  QT3MT_FOUND=no
+  QT4_FOUND=no
+  QMAKEBIN=""
+  QTEDITOR=none
+
+  AC_ARG_WITH([qt3],
+        [AC_HELP_STRING([--with-qt3],[prefix of the Qt3 installation, e.g. /usr/lib/qt-3.3])],
+        [QT3_PREFIX=$with_qt3
+        AC_MSG_CHECKING([whether qmake for Qt3 can be found at the specified location])
+        if !(test -x "${QT3_PREFIX}/bin/qmake"); then
+          AC_MSG_RESULT([no])
+          AC_MSG_ERROR([qmake cannot be found at ${QT3_PREFIX}/bin/qmake!])
+        fi
+        QTEDITOR=musrgui
+        QMAKEBIN="${QT3_PREFIX}/bin/qmake"
+        QT3PRESENT=yes
+        AC_MSG_RESULT([${QMAKEBIN}])]
+  )
+
+  AC_ARG_WITH([qt4],
+        [AC_HELP_STRING([--with-qt4],[prefix of the Qt4 installation, e.g. /opt/qt-4.7])],
+        [QT4_PREFIX=$with_qt4
+        AC_MSG_CHECKING([whether qmake for Qt4 can be found at the specified location])
+        if !(test -x "${QT4_PREFIX}/bin/qmake"); then
+          AC_MSG_RESULT([no])
+          AC_MSG_ERROR([qmake cannot be found at ${QT4_PREFIX}/bin/qmake!])
+        fi
+        QTEDITOR=musredit
+        QMAKEBIN="${QT4_PREFIX}/bin/qmake"
+        AC_MSG_RESULT([${QMAKEBIN}])
+        if test "x${QT3PRESENT}" = "xyes"; then
+          AC_MSG_WARN([Qt3 and Qt4 directories have been given -- only the Qt4 information will be used and only musredit will be built!])
+        fi],
+        [if test "x${QMAKEBIN}" = "x"; then
+          PKG_CHECK_MODULES(QT4, QtWebKit >= $QT4MINVER QtXml >= $QT4MINVER, [QT4_FOUND=yes],
+            [PKG_CHECK_MODULES(QT3, qt >= 3.3.0 qt < 4.0, [QT3_FOUND=yes],
+              [PKG_CHECK_MODULES(QT3MT, qt-mt >= 3.3.0 qt-mt < 4.0, [QT3MT_FOUND=yes])]
+            )]
+          )
+        fi]
+  )
+
+  if test "x${QMAKEBIN}" = "x"; then
+    if test "x${QT3_FOUND}" = "xno" && test "x${QT3MT_FOUND}" = "xno" && test "x${QT4_FOUND}" = "xno"; then
+      AC_MSG_WARN([No suitable version of either Qt4 or Qt3 has been found! musredit/musrgui will not be built in this stage!])
+    else
+      # Check for qmake on the basis of the pkg-config information
+      QTPATH=none
+
+      if test "x$QT4_FOUND" = "xyes"; then
+        QTPATH=${QT4_LIBS%% *}
+        QTEDITOR=musredit
+      elif test "x$QT3_FOUND" = "xyes"; then
+        QTPATH=${QT3_LIBS%% *}
+        QTEDITOR=musrgui
+      elif test "x$QT3MT_FOUND" = "xyes"; then
+        QTPATH=${QT3MT_LIBS%% *}
+        QTEDITOR=musrgui
+      fi
+
+      AC_MSG_CHECKING([for qmake])
+      if test "x$QTPATH" != "xnone"; then
+        if test -x "${QTPATH:2}/bin/qmake"; then
+          QMAKEBIN="${QTPATH:2}/bin/qmake"
+          AC_MSG_RESULT([${QMAKEBIN}])
+        elif test -x "${QTPATH:2}/../bin/qmake"; then
+          QMAKEBIN="${QTPATH:2}/../bin/qmake"
+          AC_MSG_RESULT([${QMAKEBIN}])
+        else
+          AC_MSG_RESULT([no])
+          AC_MSG_WARN([If Qt4 or Qt3 are present but have not been detected, try using the with-qt4 or with-qt3 options!])
+        fi
+      fi
+    fi
+  fi
+fi
+
+AM_CONDITIONAL([BUILD_MUSREDIT], [test "x$enable_editor" != "xno" && test "x${QMAKEBIN}" != "x" && test "x${QTEDITOR}" = "xmusredit"])
+AM_CONDITIONAL([BUILD_MUSRGUI], [test "x$enable_editor" != "xno" && test "x${QMAKEBIN}" != "x" && test "x${QTEDITOR}" = "xmusrgui"])
+
+dnl -----------------------------------------------
 dnl Set host specific compiler and linker flags
 dnl -----------------------------------------------
 
@@ -876,3 +975,14 @@ AC_CONFIG_FILES([Makefile \
                  src/musrgui/musrgui_startup.xml])
 
 AC_OUTPUT
+
+if test "x$enable_editor" != "xno" && test "x$QMAKEBIN" != "x"; then
+
+  echo "Configuring ${QTEDITOR} ..."
+
+  echo "Calling ${QMAKEBIN} ${QTEDITOR}.pro within the directory src/${QTEDITOR}"
+  cd src/${QTEDITOR}
+  ${QMAKEBIN} ${QTEDITOR}.pro
+  cd ../..
+
+fi

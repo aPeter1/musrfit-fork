@@ -4,12 +4,23 @@ if PNEXUS_ENABLED
   PNEXUSDIRS = external/nexus
 endif
 
+if BUILD_MUSRGUI
+  EDITORDIR = musrgui
+endif
+
+if BUILD_MUSREDIT
+  EDITORDIR = musredit
+endif
+
 SUBDIRS = external/TLemRunHeader \
           external/MuSR_software \
           external/mud \
           $(PNEXUSDIRS) \
           classes \
-          external
+          external \
+          $(EDITORDIR)
+
+EXTRA_DIST = $(EDITORDIR)/Makefile
 
 bin_PROGRAMS = musrfit musrview musrt0 musrparam msr2msr msr2data any2many
 musrfit_SOURCES = musrfit.cpp
