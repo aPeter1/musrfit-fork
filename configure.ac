@@ -1038,9 +1038,9 @@ if test "x$enable_editor" != "xno" && test "x$QMAKEBIN" != "x"; then
 
   echo "Configuring ${QTEDITOR} ..."
 
-  echo "Calling ${QMAKEBIN} ${QTEDITOR}.pro within the directory src/${QTEDITOR}"
+  echo "Calling ${QMAKEBIN} PREFIX=${INSTALLDIR} ${QTEDITOR}.pro within the directory src/${QTEDITOR}"
   cd src/${QTEDITOR}
-  ${QMAKEBIN} ${QTEDITOR}.pro
+  ${QMAKEBIN} PREFIX=${INSTALLDIR} ${QTEDITOR}.pro
   cd ../..
 
 fi
