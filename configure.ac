@@ -175,7 +175,7 @@ VERSION=$MUSR_VERSION
 # mud and cuba are currently the only C-routines
 USER_CFLAGS="$CFLAGS"
 CFLAGS=
-if test "$USER_CFLAGS" == ""; then
+if test "$USER_CFLAGS" = ""; then
   USER_CFLAGS="-g -O2"
 fi
 
@@ -359,7 +359,7 @@ ROOT_CFLAGS="-I${ROOTINCDIR} ${ROOTCFLAGS} ${ROOTAUXCFLAGS}"
 # Check if Minuit2 has been enabled during the ROOT configuration
 
 AC_MSG_CHECKING([for Minuit2 in ROOT])
-if test "x$(${ROOTCONF} --has-minuit2)" == "xyes"; then
+if test "x$(${ROOTCONF} --has-minuit2)" = "xyes"; then
   AC_MSG_RESULT([yes])
 else
   AC_MSG_RESULT([no])
@@ -367,7 +367,7 @@ else
 fi
 
 AC_MSG_CHECKING([for MathMore in ROOT])
-if test "x$(${ROOTCONF} --has-mathmore)" == "xyes"; then
+if test "x$(${ROOTCONF} --has-mathmore)" = "xyes"; then
   AC_MSG_RESULT([yes])
 else
   AC_MSG_RESULT([no])
@@ -375,7 +375,7 @@ else
 fi
 
 AC_MSG_CHECKING([for XML support in ROOT])
-if test "x$(${ROOTCONF} --has-xml)" == "xyes"; then
+if test "x$(${ROOTCONF} --has-xml)" = "xyes"; then
   AC_MSG_RESULT([yes])
 else
   AC_MSG_RESULT([no])
@@ -383,7 +383,7 @@ else
 fi
 
 AC_MSG_CHECKING([for image processing support in ROOT])
-if test "x$(${ROOTCONF} --has-asimage)" == "xyes"; then
+if test "x$(${ROOTCONF} --has-asimage)" = "xyes"; then
   AC_MSG_RESULT([yes])
 else
   AC_MSG_RESULT([no])
@@ -763,27 +763,46 @@ if test "x$enable_editor" != "xno"; then
         [AC_HELP_STRING([--with-qt3],[prefix of the Qt3 installation, e.g. /usr/lib/qt-3.3])],
         [QT3_PREFIX=$with_qt3
         AC_MSG_CHECKING([whether qmake for Qt3 can be found at the specified location])
-        if !(test -x "${QT3_PREFIX}/bin/qmake"); then
-          AC_MSG_RESULT([no])
-          AC_MSG_ERROR([qmake cannot be found at ${QT3_PREFIX}/bin/qmake!])
+        if test -x "${QT3_PREFIX}/bin/qmake"; then
+          QMAKEVERSIONSTRING="$(${QT3_PREFIX}/bin/qmake -v 2>&1)"
+          for a in $QMAKEVERSIONSTRING
+          do
+            if test "$(expr match "$a" '\(..\)')" = "3."; then
+              QMAKEBIN="${QT3_PREFIX}/bin/qmake"
+              QTEDITOR=musrgui
+              QT3PRESENT=yes
+              AC_MSG_RESULT([${QMAKEBIN}])
+              break
+            fi
+          done
         fi
-        QTEDITOR=musrgui
-        QMAKEBIN="${QT3_PREFIX}/bin/qmake"
-        QT3PRESENT=yes
-        AC_MSG_RESULT([${QMAKEBIN}])]
+        if test -x "x${QMAKEBIN}" = "x"; then
+          AC_MSG_RESULT([no])
+          AC_MSG_ERROR([qmake for Qt3 cannot be found at ${QT3_PREFIX}/bin/qmake!])
+        fi]
   )
 
   AC_ARG_WITH([qt4],
         [AC_HELP_STRING([--with-qt4],[prefix of the Qt4 installation, e.g. /opt/qt-4.7])],
         [QT4_PREFIX=$with_qt4
         AC_MSG_CHECKING([whether qmake for Qt4 can be found at the specified location])
-        if !(test -x "${QT4_PREFIX}/bin/qmake"); then
-          AC_MSG_RESULT([no])
-          AC_MSG_ERROR([qmake cannot be found at ${QT4_PREFIX}/bin/qmake!])
+        if test -x "${QT4_PREFIX}/bin/qmake"; then
+          QMAKEVERSIONSTRING="$(${QT4_PREFIX}/bin/qmake -v 2>&1)"
+          for a in $QMAKEVERSIONSTRING
+          do
+            if test "$(expr match "$a" '\(..\)')" = "4."; then
+              QMAKEBIN="${QT4_PREFIX}/bin/qmake"
+              QTEDITOR=musredit
+              AC_MSG_RESULT([${QMAKEBIN}])
+              break
+            fi
+          done
         fi
-        QTEDITOR=musredit
-        QMAKEBIN="${QT4_PREFIX}/bin/qmake"
-        AC_MSG_RESULT([${QMAKEBIN}])
+        if test -x "x${QMAKEBIN}" = "x"; then
+          AC_MSG_RESULT([no])
+          AC_MSG_ERROR([qmake for Qt4 cannot be found at ${QT4_PREFIX}/bin/qmake!])
+        fi
+
         if test "x${QT3PRESENT}" = "xyes"; then
           AC_MSG_WARN([Qt3 and Qt4 directories have been given -- only the Qt4 information will be used and only musredit will be built!])
         fi],
@@ -804,27 +823,66 @@ if test "x$enable_editor" != "xno"; then
       QTPATH=none
 
       if test "x$QT4_FOUND" = "xyes"; then
-        QTPATH=${QT4_LIBS%% *}
+        QTPATH=$(pkg-config --variable=prefix QtWebKit)
         QTEDITOR=musredit
       elif test "x$QT3_FOUND" = "xyes"; then
-        QTPATH=${QT3_LIBS%% *}
+        QTPATH=$(pkg-config --variable=prefix qt)
         QTEDITOR=musrgui
       elif test "x$QT3MT_FOUND" = "xyes"; then
-        QTPATH=${QT3MT_LIBS%% *}
+        QTPATH=$(pkg-config --variable=prefix qt-mt)
         QTEDITOR=musrgui
       fi
 
       AC_MSG_CHECKING([for qmake])
-      if test "x$QTPATH" != "xnone"; then
-        if test -x "${QTPATH:2}/bin/qmake"; then
-          QMAKEBIN="${QTPATH:2}/bin/qmake"
-          AC_MSG_RESULT([${QMAKEBIN}])
-        elif test -x "${QTPATH:2}/../bin/qmake"; then
-          QMAKEBIN="${QTPATH:2}/../bin/qmake"
-          AC_MSG_RESULT([${QMAKEBIN}])
-        else
+      if test "x${QTPATH}" != "xnone"; then
+        if test "x$QTEDITOR" = "xmusredit"; then
+          for QMAKE in qmake-qt4 qmake-qt46 qmake-qt47 qmake-qt48
+          do
+            if test -x "${QTPATH}/bin/${QMAKE}"; then
+              QMAKEBIN="${QTPATH}/bin/${QMAKE}"
+              AC_MSG_RESULT([${QMAKEBIN}])
+              break
+            fi
+          done
+          if test "x${QMAKEBIN}" = "x"; then
+            if test -x "${QTPATH}/bin/qmake"; then
+              QMAKEVERSIONSTRING="$(${QTPATH}/bin/qmake -v 2>&1)"
+              for a in $QMAKEVERSIONSTRING
+              do
+                if test "$(expr match "$a" '\(..\)')" = "4."; then
+                  QMAKEBIN="${QTPATH}/bin/qmake"
+                  AC_MSG_RESULT([${QMAKEBIN}])
+                  break
+                fi
+              done
+            fi
+          fi
+        elif test "x$QTEDITOR" = "xmusrgui"; then
+          for QMAKE in qmake-qt3 qmake-qt33
+          do
+            if test -x "${QTPATH}/bin/${QMAKE}"; then
+              QMAKEBIN="${QTPATH}/bin/${QMAKE}"
+              AC_MSG_RESULT([${QMAKEBIN}])
+              break
+            fi
+          done
+          if test "x${QMAKEBIN}" = "x"; then
+            if test -x "${QTPATH}/bin/qmake"; then
+              QMAKEVERSIONSTRING="$(${QTPATH}/bin/qmake -v 2>&1)"
+              for a in $QMAKEVERSIONSTRING
+              do
+                if test "$(expr match "$a" '\(..\)')" = "3."; then
+                  QMAKEBIN="${QTPATH}/bin/qmake"
+                  AC_MSG_RESULT([${QMAKEBIN}])
+                  break
+                fi
+              done
+            fi
+          fi
+        fi
+        if test "x${QMAKEBIN}" = "x"; then
           AC_MSG_RESULT([no])
-          AC_MSG_WARN([If Qt4 or Qt3 are present but have not been detected, try using the with-qt4 or with-qt3 options!])
+          AC_MSG_WARN([If Qt4 or Qt3 are present but have not been detected, try using the --with-qt4 or --with-qt3 options!])
         fi
       fi
     fi
@@ -986,3 +1044,123 @@ if test "x$enable_editor" != "xno" && test "x$QMAKEBIN" != "x"; then
   cd ../..
 
 fi
+
+echo ""
+echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+                                                                           +"
+echo "+                                  Summary                                  +"
+echo "+                                                                           +"
+echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo ""
+
+echo "   System:"
+echo "   -------"
+echo "   $host"
+echo ""
+echo ""
+echo "   Requirements:"
+echo "   -------------"
+echo ""
+if test "${FFTW3_FOUND}" = "1"; then
+  echo "   FFTW3 found in $(pkg-config --variable=prefix fftw3)"
+else
+  echo "   FFTW3 found in ${FFTW3_PREFIX}"
+fi
+if test "${GSL_FOUND}" = "1"; then
+  echo "   GSL found in $(pkg-config --variable=prefix gsl)"
+else
+  echo "   GSL found in ${GSL_PREFIX}"
+fi
+if test "${BOOST_FOUND}" = "1"; then
+  echo "   BOOST header files found in $(pkg-config --variable=prefix boost)"
+else
+  echo "   BOOST header files found in ${BOOST_INCLUDE}"
+fi
+echo "   ROOT found in ${ROOTLIBDIR:0:${#ROOTLIBDIR}-4}"
+echo ""
+if test "${PNEXUS_ENABLED}" -eq 1; then
+  echo "   HDF4 found in ${HDF4_PREFIX}"
+  echo "   HDF5 found in ${HDF5_PREFIX}"
+  if test "${NEXUS_FOUND}" = "1"; then
+    echo "   NeXus found in $(pkg-config --variable=prefix nexus)"
+  else
+    echo "   NeXus found in ${NEXUS_PREFIX}"
+  fi
+else
+  echo "   HDF4 not needed (NeXus support disabled)"
+  echo "   HDF5 not needed (NeXus support disabled)"
+  echo "   NeXus not needed (NeXus support disabled)"
+fi
+echo ""
+if test "${BUILD_CUBA}" = "1"; then
+  echo "   CUBA will be built"
+elif test "${BUILD_CUBA}" != "1" && test "${BUILD_BMW_LIBS}" -eq 1; then
+  if test "${CUBA_FOUND}" = "1"; then
+    echo "   CUBA found in $(pkg-config --variable=prefix cuba)"
+  else
+    echo "   CUBA found in ${CUBA_PREFIX}"
+  fi
+else
+  echo "   CUBA not needed (BMWlibs disabled)"
+fi
+echo ""
+if test "${enable_editor}" != "xno"; then
+  if test "x${QMAKEBIN}" != "x"; then
+    echo "   Qt qmake found at ${QMAKEBIN}"
+  else
+    echo "   Qt qmake not found"
+  fi
+else
+  echo "   Qt not needed (Qt editors disabled)"
+fi
+echo ""
+echo ""
+echo "   Features:"
+echo "   ---------"
+echo ""
+echo "   musrfit (including musrfit, musrview, musrt0, musrparam,"
+echo "            msr2msr, msr2data, any2many): yes"
+echo ""
+echo "   Supported muSR file formats:"
+echo "     MUD:                                 yes"
+echo "     PSI-BIN:                             yes"
+echo "     PSI-MDU:                             yes"
+echo "     WKM:                                 yes"
+echo "     ROOT (LEM):                          yes"
+if test "${PNEXUS_ENABLED}" -eq 1; then
+  echo "     NeXus:                               yes"
+else
+  echo "     NeXus:                               no"
+fi
+echo ""
+echo "   External user-function libraries:"
+if test "${BUILD_AS_LIBS}" -eq 1; then
+  echo "     ASlibs:                              yes"
+else
+  echo "     ASlibs:                              no"
+fi
+if test "${BUILD_BMW_LIBS}" -eq 1; then
+  echo "     BMWlibs:                             yes"
+else
+  echo "     BMWlibs:                             no"
+fi
+echo ""
+echo "   Qt musrfit editors:"
+if test "x$enable_editor" != "xno" && test "x${QMAKEBIN}" != "x" && test "x${QTEDITOR}" = "xmusredit"; then
+  echo "     musredit (Qt4):                      yes"
+else
+  echo "     musredit (Qt4):                      no"
+fi
+if test "x$enable_editor" != "xno" && test "x${QMAKEBIN}" != "x" && test "x${QTEDITOR}" = "xmusrgui"; then
+  echo "     musrgui (Qt3):                       yes"
+else
+  echo "     musrgui (Qt3):                       no"
+fi
+echo ""
+echo ""
+echo "   Installation directories:"
+echo "   -------------------------"
+echo ""
+echo "   Programs and XML configuration files:  ${INSTALLDIR}/bin"
+echo "   Documentation:                         ${DOCDIR}"
+echo ""
