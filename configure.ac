@@ -1076,7 +1076,7 @@ if test "${BOOST_FOUND}" = "1"; then
 else
   echo "   BOOST header files found in ${BOOST_INCLUDE}"
 fi
-echo "   ROOT found in ${ROOTLIBDIR:0:${#ROOTLIBDIR}-4}"
+echo "   ROOT found in ${ROOTLIBDIR%/lib}"
 echo ""
 if test "${PNEXUS_ENABLED}" -eq 1; then
   echo "   HDF4 found in ${HDF4_PREFIX}"
