@@ -1648,7 +1648,7 @@ vector<unsigned int>* PNeXus::GetGroupedHisto(unsigned int idx)
  * <p>Read the NeXus file 'fileName'.
  *
  * <b>return:</b>
- * - NX_OK on successfull reading
+ * - NX_OK on successful reading
  * - NX_ERROR on error. The error code/message will give the details.
  *
  * \param fileName file name of the nexus file to be read
@@ -2555,7 +2555,7 @@ int PNeXus::ReadFileIdf1()
 
     attlen = VGNAMELENMAX - 1;
     atttype = NX_CHAR;
-    status = NXgetattr(fFileHandle, "units", data_value, &attlen, &atttype);
+    status = NXgetattr(fFileHandle, const_cast<char*>("units"), data_value, &attlen, &atttype);
     if (status == NX_OK) {
       for (i = 0; i < attlen; i++)
         cstr[i] = *(data_value + i);

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en_US">
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Sun, 07 Aug 2011 15:05:23 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Sun, 28 Aug 2011 09:56:42 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 <head>
 <link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
@@ -21,7 +21,7 @@
 <meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
 
 	<link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" /> <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
-	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFitSetup?t=1312729509" type="application/x-wiki" title="edit MusrFitSetup" />
+	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFitSetup?t=1314525387" type="application/x-wiki" title="edit MusrFitSetup" />
 	<meta name="description" content="MusrFitSetup" />
   <base  /><!--[if IE]></base><![endif]-->
 	
@@ -190,7 +190,7 @@ Additionally, <font color="#ff0000">only if</font> <code>musrfit</code> should s
 </dd></dl> 
 <p></p>
 If optionally the editor and graphical user interface <code><a href="MusrGui.html">musrgui</a></code> / <code><a href="MusrGui.html">musredit</a></code> is going to be installed there is one further requirement: <dl>
-<dt> <a href="http://www.qtsoftware.com/" target="_top">Qt</a> </dt><dd> A cross-platform application and user interface framework. <em>Required version &#8805; 3.3 &#38; &#8810; 4.0 (<code>musrgui</code>) <strong>OR</strong> &#8805; 4.6 (<code>musredit</code>)</em> 
+<dt> <a href="http://qt.nokia.com/" target="_top">Qt</a> </dt><dd> A cross-platform application and user interface framework. <em>Required version &#8805; 3.3 &#38; &#8810; 4.0 (<code>musrgui</code>) <strong>OR</strong> &#8805; 4.6 (<code>musredit</code>)</em> 
 </dd></dl> 
 <p></p>
 Each of the following sections focusing on the installation of <code>musrfit</code> on the different operating systems will also give a brief introduction on the installation of the requirements before the actual <code>musrfit</code> installation is described.
@@ -234,7 +234,7 @@ Even though there might exist binary packages for the <code>NeXus</code> library
 The <code>ROOT</code> system may or may not be part of the GNU/Linux distribution. If it is, it should be checked that the provided binaries are of a recent version and then these in principle can be installed using a package manager as described above. <br>
 In case the distribution provides no or only outdated binary packages there are the following possibilities: <ul>
 <li> Visit the <code>ROOT</code> <a href="http://root.cern.ch/drupal/content/downloading-root" target="_top">web page</a> and download the packed precompiled binary version matching best the GNU/Linux distribution. Then unpack the bundle to its final destination.
-</li> <li> If there is no precompiled binary version of <code>ROOT</code> available for your system or e.g. <code>ROOT</code> should be compiled with another version of <code>GCC</code> visit the <a href="http://root.cern.ch/drupal/content/downloading-root" target="_top">web page</a> and download the 'complete source tree for all systems'. Then unpack this source tree to its destination (e.g. /opt/root-system)<a name="FootNote1text"></a><span class="FootNoteTextLink" title="In case only a single user is working at the machine it might be considerable to change the ownership of the &#61;ROOT&#61; folder so that the user has easy write access to this directory&#58; &#60;&#33;&#45;&#45;&#0;verbatim3506&#0;&#45;&#45;&#62;"><a href="#FootNote1note" class="foswikiCurrentTopicLink">(1)</a></span>, configure<a name="FootNote2text"></a><span class="FootNoteTextLink" title=" When using &#61;GCC&#61; &#38;&#35;8805&#59; 4&#46;2 please make sure that the environment variables &#42;USE_PARALLEL_MINUIT2&#42; and &#42;USE_OPENMP&#42; are <em>not</em> set&#33; Otherwise &#61;MINUIT2&#61; will be compiled with parallelization support and cannot be used together with &#61;musrfit&#61; afterwards since the &#61;musrfit&#61; code is <em>not</em> fully thread&#45;safe&#33; When compiled with &#61;GCC&#61; &#38;&#35;8805&#59; 4&#46;2 &#61;musrfit&#61; itself will parallelize the &#38;chi&#59;&#60;sup&#62;2&#60;&#47;sup&#62; calculation&#46;"><a href="#FootNote2note" class="foswikiCurrentTopicLink">(2)</a></span> it (here using the minimal set of options) and compile it as follows right below: <pre class="bash">
+</li> <li> If there is no precompiled binary version of <code>ROOT</code> available for your system or e.g. <code>ROOT</code> should be compiled with another version of <code>GCC</code> visit the <a href="http://root.cern.ch/drupal/content/downloading-root" target="_top">web page</a> and download the 'complete source tree for all systems'. Then unpack this source tree to its destination (e.g. /opt/root-system)<a name="FootNote1text"></a><span class="FootNoteTextLink" title="In case only a single user is working at the machine it might be considerable to change the ownership of the &#61;ROOT&#61; folder so that the user has easy write access to this directory&#58; &#60;&#33;&#45;&#45;&#0;verbatim3192&#0;&#45;&#45;&#62;"><a href="#FootNote1note" class="foswikiCurrentTopicLink">(1)</a></span>, configure<a name="FootNote2text"></a><span class="FootNoteTextLink" title=" When using &#61;GCC&#61; &#38;&#35;8805&#59; 4&#46;2 please make sure that the environment variables &#42;USE_PARALLEL_MINUIT2&#42; and &#42;USE_OPENMP&#42; are <em>not</em> set&#33; Otherwise &#61;MINUIT2&#61; will be compiled with parallelization support and cannot be used together with &#61;musrfit&#61; afterwards since the &#61;musrfit&#61; code is <em>not</em> fully thread&#45;safe&#33; When compiled with &#61;GCC&#61; &#38;&#35;8805&#59; 4&#46;2 &#61;musrfit&#61; itself will parallelize the &#38;chi&#59;&#60;sup&#62;2&#60;&#47;sup&#62; calculation&#46;"><a href="#FootNote2note" class="foswikiCurrentTopicLink">(2)</a></span> it (here using the minimal set of options) and compile it as follows right below: <pre class="bash">
 cd /opt/root-system
 ./configure linux --gminimal --enable-asimage --enable-mathmore --enable-minuit2 --enable-xml
             (or in case of a 64 bit installation: ./configure linuxx8664gcc --gminimal --enable-asimage --enable-mathmore --enable-minuit2 --enable-xml)
@@ -283,6 +283,10 @@ After the source-code extraction the <strong>autogen.sh</strong> script is calle
 </dd> <dt> --with-hdf4 </dt><dd> Set the prefix of the <code>HDF4</code> installation, e.g. /usr/local (<em>only useful in conjunction with the <code>NeXus</code> support</em>)
 </dd> <dt> --with-hdf5 </dt><dd> Set the prefix of the <code>HDF5</code> installation, e.g. /usr (<em>only useful in conjunction with the <code>NeXus</code> support</em>)
 </dd> <dt> --with-nexus </dt><dd> Set the prefix of the <code>NeXus</code> installation, e.g. /usr/local (<em>only useful in conjunction with the <code>NeXus</code> support</em>)
+</dd> <dt> --with-qt3 </dt><dd> Set the prefix of the <code>Qt3</code> installation, e.g. /usr/lib/qt-3.3 (<em>only useful in conjunction with building <code>musrgui</code></em>)
+</dd> <dt> --with-qt4 </dt><dd> Set the prefix of the <code>Qt4</code> installation, e.g. /usr/lib/qt47 (<em>only useful in conjunction with building <code>musredit</code></em>)
+</dd> <dt> --enable-NeXus </dt><dd> Enable the support of <code>NeXus</code> data files (<em>requires the <code>HDF4</code>, <code>HDF5</code> and <code>NeXus</code> libraries to be installed</em>).
+</dd> <dt> --disable-editor </dt><dd> Disable the integrated building of <code>musredit</code>/<code>musrgui</code>.
 </dd> <dt> --disable-omp </dt><dd> Switches off the <a href="http://en.wikipedia.org/wiki/OpenMP" target="_top">OpenMP</a> features of <code>musrfit</code> (parallelization of the &chi;<sup>2</sup> calculation when compiled with GCC &ge; 4.2)
 </dd></dl> 
 <p></p>
@@ -305,7 +309,7 @@ export MUSRFITPATH&#61;/opt/root-system/bin
 <p></p>
 <a name="MusrGuiInstallLinux"></a>
 <h2><a name="A_3.3_61_61musredit_61_61"></a> 3.3  <code><b>musredit</b></code> </h2>
-If <code>Qt4.6</code> or higher is set up on the machine the installation of the <code>musrfit</code> editor is also straight forward:
+<font color="#0000ff">In the latest version of <code>musrfit</code> the configure script tries to determine automatically if <code>Qt4.6</code> or higher is set up on the machine. In case this is found, the editor <code>musredit</code> is built already together with <code>musrfit</code>. <em>If not</em>, one can either try to call the configure script with the "--with-qt4" option or install this editor separately:</font>
 <pre class="bash">
 cd src/musredit
 qmake musredit.pro
@@ -454,6 +458,10 @@ After the source-code extraction the <strong>autogen.sh</strong> script is calle
 </dd> <dt> --with-hdf4 </dt><dd> Set the prefix of the <code>HDF4</code> installation, e.g. /usr/local (<em>only useful in conjunction with the <code>NeXus</code> support</em>)
 </dd> <dt> --with-hdf5 </dt><dd> Set the prefix of the <code>HDF5</code> installation, e.g. /usr (<em>only useful in conjunction with the <code>NeXus</code> support</em>)
 </dd> <dt> --with-nexus </dt><dd> Set the prefix of the <code>NeXus</code> installation, e.g. /usr/local (<em>only useful in conjunction with the <code>NeXus</code> support</em>)
+</dd> <dt> --with-qt3 </dt><dd> Set the prefix of the <code>Qt3</code> installation, e.g. /usr/lib/qt-3.3 (<em>only useful in conjunction with building <code>musrgui</code></em>)
+</dd> <dt> --with-qt4 </dt><dd> Set the prefix of the <code>Qt4</code> installation, e.g. /usr/lib/qt47 (<em>only useful in conjunction with building <code>musredit</code></em>)
+</dd> <dt> --enable-NeXus </dt><dd> Enable the support of <code>NeXus</code> data files (<em>requires the <code>HDF4</code>, <code>HDF5</code> and <code>NeXus</code> libraries to be installed</em>).
+</dd> <dt> --disable-editor </dt><dd> Disable the integrated building of <code>musredit</code>/<code>musrgui</code>.
 </dd> <dt> --disable-omp </dt><dd> Switches off the <a href="http://en.wikipedia.org/wiki/OpenMP" target="_top">OpenMP</a> features of <code>musrfit</code> (parallelization of the &chi;<sup>2</sup> calculation when compiled with GCC &ge; 4.2)
 </dd></dl> 
 <p></p>
@@ -470,7 +478,7 @@ In order to finish the installation of <code>musrfit</code> the paths where <cod
 <p></p>
 <a name="MusrEditInstallCygwin"></a>
 <h2><a name="A_4.3_61_61musredit_61_61"></a> 4.3  <code><b>musredit</b></code> </h2>
-If <code>Qt4.5</code> is set up on the machine the installation of the <code>musrfit</code> editor is also straight forward:
+<font color="#0000ff">In the latest version of <code>musrfit</code> the configure script tries to determine automatically if <code>Qt4.5</code> or higher is set up on the machine. In case this is found, the editor <code>musredit</code> is built already together with <code>musrfit</code>. <em>If not</em>, one can either try to call the configure script with the "--with-qt4" option or install this editor separately:</font>
 <pre class="bash">
 cd src/musredit
 qmake-qt4 musredit.pro
@@ -725,6 +733,10 @@ After the source-code extraction the <strong>autogen.sh</strong> script is calle
 </dd> <dt> --with-hdf4 </dt><dd> Set the prefix of the <code>HDF4</code> installation, e.g. /sw (<em>only useful in conjunction with the <code>NeXus</code> support</em>)
 </dd> <dt> --with-hdf5 </dt><dd> Set the prefix of the <code>HDF5</code> installation, e.g. /sw (<em>only useful in conjunction with the <code>NeXus</code> support</em>)
 </dd> <dt> --with-nexus </dt><dd> Set the prefix of the <code>NeXus</code> installation, e.g. /usr/local (<em>only useful in conjunction with the <code>NeXus</code> support</em>)
+</dd> <dt> --with-qt3 </dt><dd> Set the prefix of the <code>Qt3</code> installation, e.g. /opt/local/lib/qt-3.3 (<em>only useful in conjunction with building <code>musrgui</code></em>)
+</dd> <dt> --with-qt4 </dt><dd> Set the prefix of the <code>Qt4</code> installation, e.g. /opt/local/lib/qt-4.7 (<em>only useful in conjunction with building <code>musredit</code></em>)
+</dd> <dt> --enable-NeXus </dt><dd> Enable the support of <code>NeXus</code> data files (<em>requires the <code>HDF4</code>, <code>HDF5</code> and <code>NeXus</code> libraries to be installed</em>).
+</dd> <dt> --disable-editor </dt><dd> Disable the integrated building of <code>musredit</code>/<code>musrgui</code>.
 </dd> <dt> --disable-omp </dt><dd> Switches off the <a href="http://en.wikipedia.org/wiki/OpenMP" target="_top">OpenMP</a> features of <code>musrfit</code> (parallelization of the &chi;<sup>2</sup> calculation when compiled with GCC &ge; 4.2)
 </dd></dl> 
 <p></p>
@@ -741,7 +753,7 @@ In order to finish the installation of <code>musrfit</code> the paths where <cod
 <p></p>
 <a name="MusrGuiInstall"></a>
 <h2><a name="A_5.4_61_61musredit_61_61"></a> 5.4  <code><b>musredit</b></code> </h2>
-If <code>Qt4.6</code> or higher is set up on the machine the installation of the <code>musrfit</code> editor is also straight forward:
+<font color="#0000ff">In the latest version of <code>musrfit</code> the configure script tries to determine automatically if <code>Qt4.5</code> or higher is set up on the machine. In case this is found, the editor <code>musredit</code> is built already together with <code>musrfit</code>. <em>If not</em>, one can either try to call the configure script with the "--with-qt4" option or install this editor separately:</font>
 <pre class="bash">
 cd src/musredit
 qmake musredit.pro
@@ -794,7 +806,7 @@ musrview test-histo-ROOT-NPP.msr
 </div><!-- /patternContent-->
 <hr />
 This topic: MUSR<span class='foswikiSeparator'>&nbsp;&gt;&nbsp;</span><a href="WebHome.html" class="foswikiCurrentWebHomeLink">WebHome</a> &gt; <a href="MusrFit.html">MusrFit</a><span class='foswikiSeparator'>&nbsp;&gt;&nbsp;</span>MusrFitSetup <br />
-Topic revision: r47 - 07 Aug 2011 - 16:10:00 - <a href="https://intranet.psi.ch/Main/BastianWojek">BastianWojek</a>
+Topic revision: r50 - 28 Aug 2011 - 11:56:04 - <a href="https://intranet.psi.ch/Main/BastianWojek">BastianWojek</a>
 </div>
 </div>
 </div>
@@ -810,6 +822,6 @@ Topic revision: r47 - 07 Aug 2011 - 16:10:00 - <a href="https://intranet.psi.ch/
 <p></p>
 </body>
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Sun, 07 Aug 2011 15:05:23 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Sun, 28 Aug 2011 09:56:42 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 </html>
