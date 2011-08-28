@@ -15,6 +15,11 @@ dnl -----------------------------------------------
 m4_ifdef([PKG_CHECK_MODULES],[],AC_MSG_ERROR([Please install pkg-config before configuring musrfit!]))
 
 dnl -----------------------------------------------
+dnl Save the configure command
+dnl -----------------------------------------------
+CONFIGCOMMAND="$0 $@"
+
+dnl -----------------------------------------------
 dnl Package names and version numbers
 dnl -----------------------------------------------
 
@@ -776,7 +781,7 @@ if test "x$enable_editor" != "xno"; then
             fi
           done
         fi
-        if test -x "x${QMAKEBIN}" = "x"; then
+        if test "x${QMAKEBIN}" = "x"; then
           AC_MSG_RESULT([no])
           AC_MSG_ERROR([qmake for Qt3 cannot be found at ${QT3_PREFIX}/bin/qmake!])
         fi]
@@ -798,7 +803,7 @@ if test "x$enable_editor" != "xno"; then
             fi
           done
         fi
-        if test -x "x${QMAKEBIN}" = "x"; then
+        if test "x${QMAKEBIN}" = "x"; then
           AC_MSG_RESULT([no])
           AC_MSG_ERROR([qmake for Qt4 cannot be found at ${QT4_PREFIX}/bin/qmake!])
         fi
@@ -1053,8 +1058,16 @@ echo "+                                                                         
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 echo ""
 
+echo "   Invocation command line:"
+echo "   ------------------------"
+echo ""
+echo "   $ ${CONFIGCOMMAND}"
+echo ""
+echo ""
+
 echo "   System:"
 echo "   -------"
+echo ""
 echo "   $host"
 echo ""
 echo ""
