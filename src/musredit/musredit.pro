@@ -45,8 +45,17 @@ exists( /usr/bin/cygwin1.dll ) {
       QMAKE_LFLAGS_SHAPP = -Wl,--enable-auto-import
 }
 
-QMAKE_CC = gcc
-QMAKE_CXX = g++
+isEmpty( CC ) {
+    CC = gcc
+}
+
+isEmpty( CXX ) {
+    CXX = g++
+}
+
+QMAKE_CC = $${CC}
+QMAKE_CXX = $${CXX}
+QMAKE_LINK = $${CXX}
 
 # install path for the XML configuration file
 unix:xml.path = $${MUSREDIT_INSTALL_PATH}
