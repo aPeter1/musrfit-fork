@@ -161,6 +161,11 @@
                                                         <string>LTF</string>
                                                     </property>
                                                 </item>
+                                                <item>
+                                                    <property name="text">
+                                                        <string>LEM (PPC)</string>
+                                                    </property>
+                                                </item>
                                                 <property name="name">
                                                     <cstring>BeamLine</cstring>
                                                 </property>

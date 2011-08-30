@@ -14,10 +14,10 @@ my %DATADIRS = (
 		"GPD", "/afs/psi.ch/project/bulkmusr/data/gpd"
 		);
 
-my %BeamLines = ( "LEM", "MUE4", "GPS", "PIM3", "LTF", "PIM3", "Dolly", "PIE1", "GPD", "PIE1" );
+my %BeamLines = ( "LEM", "MUE4", "LEM (PPC)", "MUE4", "GPS", "PIM3", "LTF", "PIM3", "Dolly", "PIE1", "GPD", "PIE1" );
 
 my %Def_Format =
-  ( "LEM", "ROOT-NPP", "GPS", "PSI-BIN", "LTF", "PSI-BIN", "Dolly", "PSI-BIN" , "GPD", "PSI-BIN");
+  ( "LEM", "ROOT-NPP", "LEM (PPC)", "ROOT-PPC", "GPS", "PSI-BIN", "LTF", "PSI-BIN", "Dolly", "PSI-BIN" , "GPD", "PSI-BIN");
 
 # Additional information to extract run properties from database
 # For LEM use summary files
@@ -358,7 +358,7 @@ FUNCTIONS
 
 # Start constructing all blocks
     my $TitleLine = $All{"TITLE"}."\n# Run Numbers: ".$All{"RunNumbers"};
-    $TitleLine =~ s/,/:/g;
+#    $TitleLine =~ s/,/:/g;
 
     # Get parameter block from MSR::PrepParamTable(\%All);
     my $FitParaBlk = "
@@ -850,6 +850,41 @@ STATISTIC --- 0000-00-00 00:00:00
     return($Full_T_Block,\@Paramcomp);
 }
 
+##########################################################################
+# CreateMSRGLB
+#
+# Uses CreateMSR to produce a template and then msr2data to globalize it
+#
+# Input in %All
+#
+# Output
+#  $Full_T_Block - Full theory block
+#  @Paramcomp    - Space separated list of parameters for each component
+#  FILENAME.msr  - MSR file saved
+#
+##########################################################################
+sub CreateMSRGLB {
+    my %All = %{$_[0]};
+
+    my @RUNS = ();
+    if ($All{"RUNSType"}) {
+# Make sure this globalization is disabled if RunFiles are used
+	@RUNS = split( /,/, $All{"RunFiles"} );
+    } else {
+	@RUNS = split( /,/, $All{"RunNumbers"} );
+    }
+
+# Make example from first run
+    $All{"RunNumbers"}=$RUNS[0];
+    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
+
+# TODO: create global file from example file
+
+
+# Return as usual
+    my @Paramcomp = @$Paramcomp_ref;
+    return($Full_T_Block,\@Paramcomp);
+}
 
 ########################
 # Createheory
@@ -1277,7 +1312,8 @@ sub PrepParamTable {
 		    $Shared = $All{"Sh_$Param"};
 		    if ( $Shared!=1 || $iRun == 1 ) {
 # It there are multiple runs index the parameters accordingly
-			$Param=$Param."_".$iRun;
+			my $RUNtmp=sprintf("%04d",$RUN);
+			if ($Shared!=1) {$Param=$Param."_".$RUNtmp;}
 # Check if this parameter has been initialized befor. If not take from defaults
 			$value = $All{"$Param"};
 			if ( $value ne $EMPTY ) {
@@ -1334,7 +1370,8 @@ sub PrepParamTable {
 			$Shared = $All{"Sh_$Param"};
 			if ( $Shared!=1 || $iRun == 1 ) {
 # It there are multiple runs index the parameters accordingly
-			    $Param=$Param."_".$iRun;
+			    my $RUNtmp=sprintf("%04d",$RUN);
+			    if ($Shared!=1) {$Param=$Param."_".$RUNtmp;}
 # Check if this parameter has been initialized befor. If not take from defaults
 			    $value = $All{"$Param"};
 			    if ( $value ne $EMPTY ) {
@@ -1448,8 +1485,9 @@ sub ExportParams {
 		    
 		    $Shared = $All{"Sh_$Param"};
 		    if ( $Shared!=1 || $iRun == 1 ) {
-# It there are multiple runs index the parameters accordingly
-			$Param=$Param."_".$iRun;
+# If there are multiple runs index the parameters accordingly
+			my $RUNtmp=sprintf("%04d",$RUN);
+			if ($Shared!=1) {$Param=$Param."_".$RUNtmp;}
 # Check if this parameter has been initialized befor. (should be)
 			$value = $All{"$Param"};
 			$error    = $All{"$erradd$Param"};
@@ -1493,8 +1531,9 @@ sub ExportParams {
 			
 			$Shared = $All{"Sh_$Param"};
 			if ( $Shared!=1 || $iRun == 1 ) {
-# It there are multiple runs index the parameters accordingly
-			    $Param=$Param."_".$iRun;
+# If there are multiple runs index the parameters accordingly
+			    my $RUNtmp=sprintf("%04d",$RUN);
+			    if ($Shared!=1) {$Param=$Param."_".$RUNtmp;}
 # Check if this parameter has been initialized befor. (should be)
 			    $value = $All{"$Param"};
 			    $error    = $All{"$erradd$Param"};
@@ -1625,18 +1664,14 @@ sub RUNFileNameAuto {
     (my $RUN, my $YEAR, my $BeamLine) = @_;
 
     my $DATADIR = $DATADIRS{$BeamLine};
-    my $RUNtmp = $EMPTY;
-    if    ( $RUN < 10 )   { $RUNtmp = "000" . $RUN; }
-    elsif ( $RUN < 100 )  { $RUNtmp = "00" . $RUN; }
-    elsif ( $RUN < 1000 ) { $RUNtmp = "0" . $RUN; }
-    else { $RUNtmp=$RUN; }
+    my $RUNtmp=sprintf("%04d",$RUN);
 	    
     # Get current year
     my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
 	localtime( time() );
     my $current_year = $year + 1900;
     
-    if ( $BeamLine eq "LEM" ) {
+    if ( $BeamLine eq "LEM" || $BeamLine eq "LEM (PPC)") {
 	$RUN_File_Name = "lem" . substr( $YEAR, 2 ) . "_his_" . $RUNtmp;
 	$RUNFILE       = "$DATADIR/$YEAR/$RUN_File_Name";
     }
@@ -1659,7 +1694,6 @@ sub RUNFileNameAuto {
     my $RUN_Line = join( $SPACE,
 			 "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
 			 $Def_Format{$BeamLine} );
-
     return $RUN_Line;
 }
 
@@ -1764,9 +1798,8 @@ sub ExtractInfoLEM {
 # Uset to extract information from log files
 sub ExtractInfoBulk {
     my ($RUN,$AREA,$YEAR,$Arg) = @_;
-    if ($RUN < 10) { $RUN = "000".$RUN; }
-    elsif ($RUN < 100) { $RUN = "00".$RUN; }
-    elsif ($RUN < 1000) { $RUN = "0".$RUN; }
+    my $RUNtmp=sprintf("%04d",$RUN);
+    $RUN=$RUNtmp;
 
 # Information may be found in these file
     my $DBFILE=$DBDIR{$AREA}.$YEAR."/*.runs";

@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Fri May 13 14:43:52 2011
+# Created: Mon Aug 29 15:52:41 2011
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -3206,6 +3206,7 @@ sub languageChange
     BeamLine->insertItem( trUtf8("GPS") );
     BeamLine->insertItem( trUtf8("Dolly") );
     BeamLine->insertItem( trUtf8("LTF") );
+    BeamLine->insertItem( trUtf8("LEM (PPC)") );
     BeamLineLabel->setText( trUtf8("On beam line") );
     YEARLabel->setText( trUtf8("Year") );
     RUNSMan->setTitle( trUtf8("RUN Files") );
@@ -3888,6 +3889,9 @@ sub CreateAllInput
 # Construct a default filename if empty
     if ( $All{"FILENAME"} eq ""  && !$All{"RUNSType"}) {
 	$All{"FILENAME"}=$RUNS[0]."_".$All{"BeamLine"}."_".$All{"YEAR"};
+	if ($All{"BeamLine"} eq "LEM (PPC)") {
+	    $All{"FILENAME"}=$RUNS[0]."_LEM_".$All{"YEAR"};
+	}
     } else {
 	$All{"FILENAME"}="TMP";
     }
@@ -4421,7 +4425,7 @@ sub optionConfigure
 {
 
     use Customize;
-    
+
     my $Customize = Qt::Dialog(this);
     my $w = Customize;
     $w->setModal(1);

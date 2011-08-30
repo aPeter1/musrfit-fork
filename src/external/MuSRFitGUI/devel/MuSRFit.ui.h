@@ -414,6 +414,9 @@ void MuSRFitform::CreateAllInput()
 # Construct a default filename if empty
     if ( $All{"FILENAME"} eq ""  && !$All{"RUNSType"}) {
 	$All{"FILENAME"}=$RUNS[0]."_".$All{"BeamLine"}."_".$All{"YEAR"};
+	if ($All{"BeamLine"} eq "LEM (PPC)") {
+	    $All{"FILENAME"}=$RUNS[0]."_LEM_".$All{"YEAR"};
+	}
     } else {
 	$All{"FILENAME"}="TMP";
     }
@@ -922,7 +925,7 @@ void MuSRFitform::InitializeFunctions()
 void MuSRFitform::optionConfigure()
 {
     use Customize;
-    
+
     my $Customize = Qt::Dialog(this);
     my $w = Customize;
     $w->setModal(1);
