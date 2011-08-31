@@ -189,6 +189,8 @@ dnl Automake initialization and program checks
 dnl -----------------------------------------------
 
 AM_INIT_AUTOMAKE(@PACKAGE_NAME@, @PACKAGE_VERSION@)
+m4_ifdef([AM_SILENT_RULES],
+         [AM_SILENT_RULES([yes])])
 AC_CONFIG_HEADER([config.h])
 AC_LANG([C++])
 AC_PROG_LN_S
@@ -768,22 +770,28 @@ if test "x$enable_editor" != "xno"; then
         [AC_HELP_STRING([--with-qt3],[prefix of the Qt3 installation, e.g. /usr/lib/qt-3.3])],
         [QT3_PREFIX=$with_qt3
         AC_MSG_CHECKING([whether qmake for Qt3 can be found at the specified location])
-        if test -x "${QT3_PREFIX}/bin/qmake"; then
-          QMAKEVERSIONSTRING="$(${QT3_PREFIX}/bin/qmake -v 2>&1)"
-          for a in $QMAKEVERSIONSTRING
-          do
-            if test "$(expr match "$a" '\(..\)')" = "3."; then
-              QMAKEBIN="${QT3_PREFIX}/bin/qmake"
-              QTEDITOR=musrgui
-              QT3PRESENT=yes
-              AC_MSG_RESULT([${QMAKEBIN}])
+        for QMAKE in qmake qmake-qt3
+        do
+          if test -x "${QT3_PREFIX}/bin/${QMAKE}"; then
+            QMAKEVERSIONSTRING="$(${QT3_PREFIX}/bin/${QMAKE} -v 2>&1)"
+            for a in $QMAKEVERSIONSTRING
+            do
+              if test "$(expr match "$a" '\(..\)')" = "3."; then
+                QMAKEBIN="${QT3_PREFIX}/bin/${QMAKE}"
+                QTEDITOR=musrgui
+                AC_MSG_RESULT([${QMAKEBIN}])
+                break
+              fi
+            done
+            if test "x${QMAKEBIN}" != "x"; then
               break
             fi
-          done
-        fi
+          fi
+        done
+
         if test "x${QMAKEBIN}" = "x"; then
           AC_MSG_RESULT([no])
-          AC_MSG_ERROR([qmake for Qt3 cannot be found at ${QT3_PREFIX}/bin/qmake!])
+          AC_MSG_ERROR([qmake for Qt3 cannot be found in ${QT3_PREFIX}/bin!])
         fi]
   )
 
@@ -791,21 +799,28 @@ if test "x$enable_editor" != "xno"; then
         [AC_HELP_STRING([--with-qt4],[prefix of the Qt4 installation, e.g. /opt/qt-4.7])],
         [QT4_PREFIX=$with_qt4
         AC_MSG_CHECKING([whether qmake for Qt4 can be found at the specified location])
-        if test -x "${QT4_PREFIX}/bin/qmake"; then
-          QMAKEVERSIONSTRING="$(${QT4_PREFIX}/bin/qmake -v 2>&1)"
-          for a in $QMAKEVERSIONSTRING
-          do
-            if test "$(expr match "$a" '\(..\)')" = "4."; then
-              QMAKEBIN="${QT4_PREFIX}/bin/qmake"
-              QTEDITOR=musredit
-              AC_MSG_RESULT([${QMAKEBIN}])
+        for QMAKE in qmake qmake-qt4
+        do
+          if test -x "${QT4_PREFIX}/bin/${QMAKE}"; then
+            QMAKEVERSIONSTRING="$(${QT4_PREFIX}/bin/${QMAKE} -v 2>&1)"
+            for a in $QMAKEVERSIONSTRING
+            do
+              if test "$(expr match "$a" '\(..\)')" = "4."; then
+                QMAKEBIN="${QT4_PREFIX}/bin/${QMAKE}"
+                QTEDITOR=musredit
+                AC_MSG_RESULT([${QMAKEBIN}])
+                break
+              fi
+            done
+            if test "x${QMAKEBIN}" != "x"; then
               break
             fi
-          done
-        fi
+          fi
+        done
+
         if test "x${QMAKEBIN}" = "x"; then
           AC_MSG_RESULT([no])
-          AC_MSG_ERROR([qmake for Qt4 cannot be found at ${QT4_PREFIX}/bin/qmake!])
+          AC_MSG_ERROR([qmake for Qt4 cannot be found in ${QT4_PREFIX}/bin!])
         fi
 
         if test "x${QT3PRESENT}" = "xyes"; then
@@ -814,7 +829,7 @@ if test "x$enable_editor" != "xno"; then
         [if test "x${QMAKEBIN}" = "x"; then
           PKG_CHECK_MODULES(QT4, QtWebKit >= $QT4MINVER QtXml >= $QT4MINVER, [QT4_FOUND=yes],
             [PKG_CHECK_MODULES(QT3, qt >= 3.3.0 qt < 4.0, [QT3_FOUND=yes],
-              [PKG_CHECK_MODULES(QT3MT, qt-mt >= 3.3.0 qt-mt < 4.0, [QT3MT_FOUND=yes])]
+              [PKG_CHECK_MODULES(QT3MT, qt-mt >= 3.3.0 qt-mt < 4.0, [QT3MT_FOUND=yes], [QT3MT_FOUND=no])]
             )]
           )
         fi]
@@ -1178,3 +1193,4 @@ echo ""
 echo "   Programs and XML configuration files:  ${INSTALLDIR}/bin"
 echo "   Documentation:                         ${DOCDIR}"
 echo ""
+

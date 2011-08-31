@@ -41,3 +41,19 @@ AM_LDFLAGS = $(LOCAL_BIN_LDFLAGS)
 INCLUDES = $(PMUSR_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(BOOST_CFLAGS) $(ROOT_CFLAGS)
 LIBS = $(PMUSR_LIBS) $(USERFCN_LIBS) $(LEM_LIBS) $(PSIBIN_LIBS) $(MUD_LIBS) $(PNEXUS_LIBS) $(FFTW3_LIBS) $(GSL_LIBS) $(ROOT_LIBS)
 
+install-xmlDATA: $(xml_DATA)
+	test -z "$(xmldir)" || $(mkdir_p) "$(DESTDIR)$(xmldir)"
+	@if test -e "$(DESTDIR)$(xmldir)/$(xml_DATA)"; then \
+	  DIFF="$$(diff "$(DESTDIR)$(xmldir)/$(xml_DATA)" "$(xml_DATA)" 2>&1)"; \
+	  if test "x$$DIFF" != "x"; then \
+	    echo "   " && \
+	    echo "   musrfit_startup.xml in $(bindir)" && \
+	    echo "   is different from the distribution's version." && \
+	    echo "   Do you want to overwrite it? [y/N]" && \
+	    read OVERWRITE && \
+	    if test "$$OVERWRITE" = "y" || test "$$OVERWRITE" = "Y"; then \
+	      echo "$(INSTALL_DATA) '$(xml_DATA)' '$(DESTDIR)$(xmldir)'" && \
+	      $(INSTALL_DATA) '$(xml_DATA)' '$(DESTDIR)$(xmldir)'; \
+	    fi; \
+	  fi; \
+	fi
