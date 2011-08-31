@@ -67,6 +67,7 @@ int main(int argc, char *argv[])
   header->AddProperty("Muon Beam Momentum", 28.0, 28.0, 0.7, "MeV/c");
   header->SetMuonSpecies("positive Muon");
   header->SetSetup("Konti-4, WEW");
+  header->SetComment("This is a comment");
   header->SetSample("Eu2CuO4 MOD thin film");
   header->AddProperty("Sample Temperature", 30.0, 30.01, 0.05, "K");
   header->AddProperty("Sample Magnetic Field", 3.0, 3.0003, 0.000025, "T");

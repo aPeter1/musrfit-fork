@@ -98,6 +98,7 @@ public:
   virtual TString GetInstrument() const { return fInstrument; }
   virtual TString GetMuonSpecies() const { return fMuonSpecies; }
   virtual TString GetSetup() const { return fSetup; }
+  virtual TString GetComment() const { return fComment; }
   virtual TString GetSample() const { return fSample; }
   virtual TString GetOrientation() const { return fOrientation; }
   virtual TString GetSampleCryo() const { return fSampleCryo; }
@@ -143,6 +144,7 @@ public:
   virtual void SetInstrument(TString insturment) { fInstrument = insturment; }
   virtual void SetMuonSpecies(TString muonSpecies) { fMuonSpecies = muonSpecies; }
   virtual void SetSetup(TString setup) { fSetup = setup; }
+  virtual void SetComment(TString comment) { fComment = comment; }
   virtual void SetSample(TString sample) { fSample = sample; }
   virtual void SetOrientation(TString orientation) { fOrientation = orientation; }
   virtual void SetSampleCryo(TString cryoName) { fSampleCryo = cryoName; }
@@ -183,6 +185,7 @@ private:
   TString  fInstrument;  ///< instrument name like: GPS, LEM, ....
   TString  fMuonSpecies; ///< postive muon or negative muon
   TString  fSetup;       ///< setup
+  TString  fComment;     ///< additional comment
   TString  fSample;      ///< sample name
   TString  fOrientation; ///< sample orientation
   TString  fSampleCryo;  ///< sample cryo

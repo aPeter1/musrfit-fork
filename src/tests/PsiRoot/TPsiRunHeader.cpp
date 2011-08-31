@@ -109,6 +109,7 @@ TPsiRunHeader::TPsiRunHeader()
   fInstrument  = TString("n/a");
   fMuonSpecies = TString("n/a");
   fSetup       = TString("n/a");
+  fComment     = TString("n/a");
   fSample      = TString("n/a");
   fOrientation = TString("n/a");
   fSampleCryo  = TString("n/a");
@@ -198,6 +199,9 @@ Bool_t TPsiRunHeader::IsValid(Bool_t strict)
       return false;
     } else if (!fSetup.CompareTo("n/a", TString::kIgnoreCase)) {
       cerr << endl << ">> **ERROR** TPsiRunHeader::IsValid(): 'Setup' not set." << endl;
+      return false;
+    } else if (!fComment.CompareTo("n/a", TString::kIgnoreCase)) {
+      cerr << endl << ">> **ERROR** TPsiRunHeader::IsValid(): 'Comment' not set." << endl;
       return false;
     } else if (!fSample.CompareTo("n/a", TString::kIgnoreCase)) {
       cerr << endl << ">> **ERROR** TPsiRunHeader::IsValid(): 'Sample' not set." << endl;
@@ -306,6 +310,9 @@ Bool_t TPsiRunHeader::IsValid(Bool_t strict)
     }
     if (!fSetup.CompareTo("n/a", TString::kIgnoreCase)) {
       cerr << endl << ">> **WARNING** TPsiRunHeader::IsValid(): 'Setup' not set." << endl;
+    }
+    if (!fComment.CompareTo("n/a", TString::kIgnoreCase)) {
+      cerr << endl << ">> **WARNING** TPsiRunHeader::IsValid(): 'Comment' not set." << endl;
     }
     if (!fSample.CompareTo("n/a", TString::kIgnoreCase)) {
       cerr << endl << ">> **WARNING** TPsiRunHeader::IsValid(): 'Sample' not set." << endl;
@@ -587,66 +594,66 @@ TObjArray* TPsiRunHeader::GetHeader(UInt_t &count)
   UInt_t digit=0, digit_d=0;
 
   // add version
-  str.Form("%02d - Version: %s", count++, fVersion.Data());
+  str.Form("%03d - Version: %s", count++, fVersion.Data());
   tostr = new TObjString(str);
   fHeader.AddLast(tostr);
 
   // add generator
-  str.Form("%02d - Generator: %s", count++, fGenerator.Data());
+  str.Form("%03d - Generator: %s", count++, fGenerator.Data());
   tostr = new TObjString(str);
   fHeader.AddLast(tostr);
 
   // add file name
-  str.Form("%02d - File Name: %s", count++, fFileName.Data());
+  str.Form("%03d - File Name: %s", count++, fFileName.Data());
   tostr = new TObjString(str);
   fHeader.AddLast(tostr);
 
   // add run title
-  str.Form("%02d - Run Title: %s", count++, fRunTitle.Data());
+  str.Form("%03d - Run Title: %s", count++, fRunTitle.Data());
   tostr = new TObjString(str);
   fHeader.AddLast(tostr);
 
   // add run number
-  str.Form("%02d - Run Number: %d", count++, fRunNumber);
+  str.Form("%03d - Run Number: %d", count++, fRunNumber);
   tostr = new TObjString(str);
   fHeader.AddLast(tostr);
 
   // add run start time
-  str.Form("%02d - Run Start Time: %s", count++, fStartTime.AsSQLString());
+  str.Form("%03d - Run Start Time: %s", count++, fStartTime.AsSQLString());
   tostr = new TObjString(str);
   fHeader.AddLast(tostr);
 
   // add run stop time
-  str.Form("%02d - Run Stop Time: %s", count++, fStopTime.AsSQLString());
+  str.Form("%03d - Run Stop Time: %s", count++, fStopTime.AsSQLString());
   tostr = new TObjString(str);
   fHeader.AddLast(tostr);
 
   // add laboratory
-  str.Form("%02d - Laboratory: %s", count++, fLaboratory.Data());
+  str.Form("%03d - Laboratory: %s", count++, fLaboratory.Data());
   tostr = new TObjString(str);
   fHeader.AddLast(tostr);
 
   // add area
-  str.Form("%02d - Area: %s", count++, fArea.Data());
+  str.Form("%03d - Area: %s", count++, fArea.Data());
   tostr = new TObjString(str);
   fHeader.AddLast(tostr);
 
   // add instrument
-  str.Form("%02d - Instrument: %s", count++, fInstrument.Data());
+  str.Form("%03d - Instrument: %s", count++, fInstrument.Data());
   tostr = new TObjString(str);
   fHeader.AddLast(tostr);
 
   // add muon momentum
-  prop = GetProperty("Muon Momentum");
+  prop = GetProperty("Muon Beam Momentum");
   if (prop) {
     digit = GetDecimalPlace(prop->GetError());
     digit_d = GetLeastSignificantDigit(prop->GetDemand());
     if (prop->GetDescription().CompareTo("n/a")) {
-      fmt.Form("%%02d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
+      fmt.Form("%%03d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
       str.Form(fmt.Data(), count++, prop->GetLabel().Data(), prop->GetValue(), prop->GetError(),
                prop->GetUnit().Data(), prop->GetDemand(), prop->GetDescription().Data());
     } else {
-      fmt.Form("%%02d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
+      fmt.Form("%%03d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
       str.Form(fmt.Data(), count++, prop->GetLabel().Data(), prop->GetValue(), prop->GetError(),
                prop->GetUnit().Data(), prop->GetDemand());
     }
@@ -655,18 +662,23 @@ TObjArray* TPsiRunHeader::GetHeader(UInt_t &count)
   }
 
   // add muon species
-  str.Form("%02d - Muon Species: %s", count++, fMuonSpecies.Data());
+  str.Form("%03d - Muon Species: %s", count++, fMuonSpecies.Data());
   tostr = new TObjString(str);
   fHeader.AddLast(tostr);
 
 
   // add setup
-  str.Form("%02d - Setup: %s", count++, fSetup.Data());
+  str.Form("%03d - Setup: %s", count++, fSetup.Data());
+  tostr = new TObjString(str);
+  fHeader.AddLast(tostr);
+
+  // add comment
+  str.Form("%03d - Comment: %s", count++, fComment.Data());
   tostr = new TObjString(str);
   fHeader.AddLast(tostr);
 
   // add sample
-  str.Form("%02d - Sample: %s", count++, fSample.Data());
+  str.Form("%03d - Sample: %s", count++, fSample.Data());
   tostr = new TObjString(str);
   fHeader.AddLast(tostr);
 
@@ -676,11 +688,11 @@ TObjArray* TPsiRunHeader::GetHeader(UInt_t &count)
     digit = GetDecimalPlace(prop->GetError());
     digit_d = GetLeastSignificantDigit(prop->GetDemand());
     if (prop->GetDescription().CompareTo("n/a")) {
-      fmt.Form("%%02d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
+      fmt.Form("%%03d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
       str.Form(fmt.Data(), count++, prop->GetLabel().Data(), prop->GetValue(), prop->GetError(),
                prop->GetUnit().Data(), prop->GetDemand(), prop->GetDescription().Data());
     } else {
-      fmt.Form("%%02d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
+      fmt.Form("%%03d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
       str.Form(fmt.Data(), count++, prop->GetLabel().Data(), prop->GetValue(), prop->GetError(),
                prop->GetUnit().Data(), prop->GetDemand());
     }
@@ -694,11 +706,11 @@ TObjArray* TPsiRunHeader::GetHeader(UInt_t &count)
     digit = GetDecimalPlace(prop->GetError());
     digit_d = GetLeastSignificantDigit(prop->GetDemand());
     if (prop->GetDescription().CompareTo("n/a")) {
-      fmt.Form("%%02d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
+      fmt.Form("%%03d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
       str.Form(fmt.Data(), count++, prop->GetLabel().Data(), prop->GetValue(), prop->GetError(),
                prop->GetUnit().Data(), prop->GetDemand(), prop->GetDescription().Data());
     } else {
-      fmt.Form("%%02d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
+      fmt.Form("%%03d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
       str.Form(fmt.Data(), count++, prop->GetLabel().Data(), prop->GetValue(), prop->GetError(),
                prop->GetUnit().Data(), prop->GetDemand());
     }
@@ -707,12 +719,12 @@ TObjArray* TPsiRunHeader::GetHeader(UInt_t &count)
   }
 
   // add number of histograms
-  str.Form("%02d - No of Histos: %d", count++, fNoOfHistos);
+  str.Form("%03d - No of Histos: %d", count++, fNoOfHistos);
   tostr = new TObjString(str);
   fHeader.AddLast(tostr);
 
   // add histogram names
-  str.Form("%02d - Histo Names: ", count++);
+  str.Form("%03d - Histo Names: ", count++);
   for (UInt_t i=0; i<fHistoName.size()-1; i++)
     str += fHistoName[i] + TString("; ");
   str += fHistoName[fHistoName.size()-1];
@@ -720,19 +732,19 @@ TObjArray* TPsiRunHeader::GetHeader(UInt_t &count)
   fHeader.AddLast(tostr);
 
   // add histogram length
-  str.Form("%02d - Histo Length: %d", count++, fHistoLength);
+  str.Form("%03d - Histo Length: %d", count++, fHistoLength);
   tostr = new TObjString(str);
   fHeader.AddLast(tostr);
 
   // add time resolution
   digit_d = GetLeastSignificantDigit(GetTimeResolution("ns"));
-  fmt.Form("%%02d - Time Resolution: %%.%dlf ns", digit_d);
+  fmt.Form("%%03d - Time Resolution: %%.%dlf ns", digit_d);
   str.Form(fmt, count++, GetTimeResolution("ns"));
   tostr = new TObjString(str);
   fHeader.AddLast(tostr);
 
   // add time zero bins
-  str.Form("%02d - Time Zero Bin: ", count++);
+  str.Form("%03d - Time Zero Bin: ", count++);
   for (UInt_t i=0; i<fTimeZeroBin.size()-1; i++) {
     str += fTimeZeroBin[i];
     str += TString("; ");
@@ -742,7 +754,7 @@ TObjArray* TPsiRunHeader::GetHeader(UInt_t &count)
   fHeader.AddLast(tostr);
 
   // add first good bins
-  str.Form("%02d - First Good Bin: ", count++);
+  str.Form("%03d - First Good Bin: ", count++);
   for (UInt_t i=0; i<fFirstGoodBin.size()-1; i++) {
     str += fFirstGoodBin[i];
     str += TString("; ");
@@ -752,7 +764,7 @@ TObjArray* TPsiRunHeader::GetHeader(UInt_t &count)
   fHeader.AddLast(tostr);
 
   // add last good bins
-  str.Form("%02d - Last Good Bin: ", count++);
+  str.Form("%03d - Last Good Bin: ", count++);
   for (UInt_t i=0; i<fLastGoodBin.size()-1; i++) {
     str += fLastGoodBin[i];
     str += TString("; ");
@@ -763,7 +775,7 @@ TObjArray* TPsiRunHeader::GetHeader(UInt_t &count)
 
   // add red/green mode histogram offsets if present
   if (fRedGreenOffset.size() > 0) {
-    str.Form("%02d - Red/Green offsets: ", count++);
+    str.Form("%03d - Red/Green offsets: ", count++);
     for (UInt_t i=0; i<fRedGreenOffset.size()-1; i++) {
       str += fRedGreenOffset[i];
       str += TString("; ");
@@ -775,7 +787,7 @@ TObjArray* TPsiRunHeader::GetHeader(UInt_t &count)
 
   // add red/green mode descriptions if present
   if (fRedGreenDescription.size() > 0) {
-    str.Form("%02d - Red/Green description: ", count++);
+    str.Form("%03d - Red/Green description: ", count++);
     for (UInt_t i=0; i<fRedGreenDescription.size()-1; i++) {
       str += fRedGreenDescription[i] + TString("; ");
     }
@@ -807,17 +819,17 @@ TObjArray* TPsiRunHeader::GetSampleEnv(UInt_t &count)
   UInt_t digit=0, digit_d=0;
 
   // add cryo
-  str.Form("%02d - Cryo: %s", count++, fSampleCryo.Data());
+  str.Form("%03d - Cryo: %s", count++, fSampleCryo.Data());
   tostr = new TObjString(str);
   fSampleEnv.AddLast(tostr);
 
   // add insert
-  str.Form("%02d - Insert: %s", count++, fSampleCryoInsert.Data());
+  str.Form("%03d - Insert: %s", count++, fSampleCryoInsert.Data());
   tostr = new TObjString(str);
   fSampleEnv.AddLast(tostr);
 
   // add orientation
-  str.Form("%02d - Orientation: %s", count++, fOrientation.Data());
+  str.Form("%03d - Orientation: %s", count++, fOrientation.Data());
   tostr = new TObjString(str);
   fSampleEnv.AddLast(tostr);
 
@@ -827,11 +839,11 @@ TObjArray* TPsiRunHeader::GetSampleEnv(UInt_t &count)
       digit = GetDecimalPlace(fProperties[i].GetError());
       digit_d = GetLeastSignificantDigit(fProperties[i].GetDemand());
       if (fProperties[i].GetDescription().CompareTo("n/a")) {
-        fmt.Form("%%02d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
+        fmt.Form("%%03d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
         str.Form(fmt.Data(), count++, fProperties[i].GetLabel().Data(), fProperties[i].GetValue(), fProperties[i].GetError(),
                  fProperties[i].GetUnit().Data(), fProperties[i].GetDemand(), fProperties[i].GetDescription().Data());
       } else {
-        fmt.Form("%%02d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
+        fmt.Form("%%03d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
         str.Form(fmt.Data(), count++, fProperties[i].GetLabel().Data(), fProperties[i].GetValue(), fProperties[i].GetError(),
                  fProperties[i].GetUnit().Data(), fProperties[i].GetDemand());
       }
@@ -863,7 +875,7 @@ TObjArray* TPsiRunHeader::GetMagFieldEnv(UInt_t &count)
   UInt_t digit=0, digit_d=0;
 
   // add version
-  str.Form("%02d - Magnet Name: %s", count++, fMagnetName.Data());
+  str.Form("%03d - Magnet Name: %s", count++, fMagnetName.Data());
   tostr = new TObjString(str);
   fMagFieldEnv.AddLast(tostr);
 
@@ -873,11 +885,11 @@ TObjArray* TPsiRunHeader::GetMagFieldEnv(UInt_t &count)
       digit = GetDecimalPlace(fProperties[i].GetError());
       digit_d = GetLeastSignificantDigit(fProperties[i].GetDemand());
       if (fProperties[i].GetDescription().CompareTo("n/a")) {
-        fmt.Form("%%02d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
+        fmt.Form("%%03d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
         str.Form(fmt.Data(), count++, fProperties[i].GetLabel().Data(), fProperties[i].GetValue(), fProperties[i].GetError(),
                  fProperties[i].GetUnit().Data(), fProperties[i].GetDemand(), fProperties[i].GetDescription().Data());
       } else {
-        fmt.Form("%%02d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
+        fmt.Form("%%03d - %%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
         str.Form(fmt.Data(), count++, fProperties[i].GetLabel().Data(), fProperties[i].GetValue(), fProperties[i].GetError(),
                  fProperties[i].GetUnit().Data(), fProperties[i].GetDemand());
       }
@@ -908,7 +920,7 @@ TObjArray* TPsiRunHeader::GetBeamline(UInt_t &count)
   TObjString *tostr;
 
   // add version
-  str.Form("%02d - To Be Defined Yet.", count++);
+  str.Form("%03d - To Be Defined Yet.", count++);
   tostr = new TObjString(str);
   fBeamline.AddLast(tostr);
 
@@ -934,7 +946,7 @@ TObjArray* TPsiRunHeader::GetScaler(UInt_t &count)
   TObjString *tostr;
 
   // add version
-  str.Form("%02d - To Be Defined Yet.", count++);
+  str.Form("%03d - To Be Defined Yet.", count++);
   tostr = new TObjString(str);
   fScalers.AddLast(tostr);
 
@@ -1031,6 +1043,10 @@ Bool_t TPsiRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString pa
       idx = str.Index(":");
       str.Remove(0, idx+2);
       fSetup = str;
+    } else if (str.Contains("- Comment: ")) {
+      idx = str.Index(":");
+      str.Remove(0, idx+2);
+      fComment = str;
     } else if (str.Contains("- Sample: ")) {
       idx = str.Index(":");
       str.Remove(0, idx+2);
@@ -1521,11 +1537,24 @@ void TPsiRunHeader::DumpHeader() const
   // write instrument
   cout << endl << setw(name_width) << left << "Instrument" << setw(old_width) << ": " << GetInstrument().Data();
 
+  // write muon momentum
+  prop = GetProperty("Muon Beam Momentum");
+  if (prop != 0) {
+    cout << endl << setw(name_width) << left << prop->GetLabel().Data() << setw(old_width) << ": " << prop->GetValue() << " +- " << prop->GetError() << " " << prop->GetUnit().Data();
+    cout << "; SP: " << prop->GetDemand();
+    if (prop->GetDescription().CompareTo("n/a", TString::kIgnoreCase)) {
+      cout << "; " << prop->GetDescription().Data();
+    }
+  }
+
   // write muon species
   cout << endl << setw(name_width) << left << "Muon Species" << setw(old_width) << ": " << GetMuonSpecies().Data();
 
   // write setup
   cout << endl << setw(name_width) << left << "Setup" << setw(old_width) << ": " << GetSetup().Data();
+
+  // write comment
+  cout << endl << setw(name_width) << left << "Comment" << setw(old_width) << ": " << GetComment().Data();
 
   // write sample
   cout << endl << setw(name_width) << left << "Sample" << setw(old_width) << ": " << GetSample().Data();
