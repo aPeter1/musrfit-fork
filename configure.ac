@@ -15,11 +15,6 @@ dnl -----------------------------------------------
 m4_ifdef([PKG_CHECK_MODULES],[],AC_MSG_ERROR([Please install pkg-config before configuring musrfit!]))
 
 dnl -----------------------------------------------
-dnl Save the configure command
-dnl -----------------------------------------------
-CONFIGCOMMAND="$0 $@"
-
-dnl -----------------------------------------------
 dnl Package names and version numbers
 dnl -----------------------------------------------
 
@@ -828,7 +823,8 @@ if test "x$enable_editor" != "xno"; then
         fi],
         [if test "x${QMAKEBIN}" = "x"; then
           PKG_CHECK_MODULES(QT4, QtWebKit >= $QT4MINVER QtXml >= $QT4MINVER, [QT4_FOUND=yes],
-            [PKG_CHECK_MODULES(QT3, qt >= 3.3.0 qt < 4.0, [QT3_FOUND=yes],
+            [AC_MSG_NOTICE([Qt4 (including QtWebKit and QtXml) not found!])
+             PKG_CHECK_MODULES(QT3, qt >= 3.3.0 qt < 4.0, [QT3_FOUND=yes],
               [PKG_CHECK_MODULES(QT3MT, qt-mt >= 3.3.0 qt-mt < 4.0, [QT3MT_FOUND=yes], [QT3MT_FOUND=no])]
             )]
           )
@@ -1072,13 +1068,6 @@ echo "+                                                                         
 echo "+                                  Summary                                  +"
 echo "+                                                                           +"
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-echo ""
-
-echo "   Invocation command line:"
-echo "   ------------------------"
-echo ""
-echo "   $ ${CONFIGCOMMAND}"
-echo ""
 echo ""
 
 echo "   System:"
