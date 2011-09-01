@@ -56,4 +56,28 @@ install-xmlDATA: $(xml_DATA)
 	      $(INSTALL_DATA) '$(xml_DATA)' '$(DESTDIR)$(xmldir)'; \
 	    fi; \
 	  fi; \
+	else \
+	  echo "$(INSTALL_DATA) '$(xml_DATA)' '$(DESTDIR)$(xmldir)'" && \
+	  $(INSTALL_DATA) '$(xml_DATA)' '$(DESTDIR)$(xmldir)'; \
+	fi
+
+uninstall-xmlDATA:
+	@if test -e "$(DESTDIR)$(xmldir)/$(xml_DATA)"; then \
+	  DIFF="$$(diff "$(DESTDIR)$(xmldir)/$(xml_DATA)" "$(xml_DATA)" 2>&1)"; \
+	  if test "x$$DIFF" != "x"; then \
+	    echo "   " && \
+	    echo "   musrfit_startup.xml in $(bindir)" && \
+	    echo "   is different from the distribution's version." && \
+	    echo "   Do you want to remove it? [y/N]" && \
+	    read REMOVE && \
+	    if test "$$REMOVE" = "y" || test "$$REMOVE" = "Y"; then \
+	      echo "$(RM) '$(DESTDIR)$(xmldir)/$(xml_DATA)'" && \
+	      $(RM) "$(DESTDIR)$(xmldir)/$(xml_DATA)" && \
+	      rmdir "$(DESTDIR)$(xmldir)"; \
+	    fi; \
+	  else \
+	    echo "$(RM) '$(DESTDIR)$(xmldir)/$(xml_DATA)'" && \
+	    $(RM) "$(DESTDIR)$(xmldir)/$(xml_DATA)" && \
+	    rmdir "$(DESTDIR)$(xmldir)"; \
+	  fi; \
 	fi
