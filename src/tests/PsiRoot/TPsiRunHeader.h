@@ -93,6 +93,7 @@ public:
   virtual const char* GetStartTimeString() const { return fStartTime.AsSQLString(); }
   virtual TDatime GetStopTime() const { return fStopTime; }
   virtual const char* GetStopTimeString() const { return fStopTime.AsSQLString(); }
+  virtual Int_t GetRunDuration() const;
   virtual TString GetLaboratory() const { return fLaboratory; }
   virtual TString GetArea() const { return fArea; }
   virtual TString GetInstrument() const { return fInstrument; }

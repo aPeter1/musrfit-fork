@@ -397,6 +397,18 @@ Bool_t TPsiRunHeader::IsValid(Bool_t strict)
   return true;
 }
 
+
+//--------------------------------------------------------------------------
+// GetHistoName (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>returns the run duration, i.e. run stop - run start time in seconds.
+ */
+Int_t TPsiRunHeader::GetRunDuration() const
+{
+  return fStopTime.Convert() - fStartTime.Convert();
+}
+
 //--------------------------------------------------------------------------
 // GetHistoName (public)
 //--------------------------------------------------------------------------
@@ -625,6 +637,11 @@ TObjArray* TPsiRunHeader::GetHeader(UInt_t &count)
 
   // add run stop time
   str.Form("%03d - Run Stop Time: %s", count++, fStopTime.AsSQLString());
+  tostr = new TObjString(str);
+  fHeader.AddLast(tostr);
+
+  // add run duration
+  str.Form("%03d - Run Duration: %d", count++, GetRunDuration());
   tostr = new TObjString(str);
   fHeader.AddLast(tostr);
 
@@ -1063,6 +1080,10 @@ Bool_t TPsiRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString pa
       idx = str.Index(":");
       str.Remove(0, idx+2);
       fSampleCryoInsert = str;
+    } else if (str.Contains("- Magnet Name: ")) {
+      idx = str.Index(":");
+      str.Remove(0, idx+2);
+      fMagnetName = str;
     } else if (str.Contains("- No of Histos: ")) {
       tokens = str.Tokenize(":");
       if (tokens->GetEntries() < 2) {
@@ -1527,6 +1548,9 @@ void TPsiRunHeader::DumpHeader() const
 
   // write stop time
   cout << endl << setw(name_width) << left << "Run Stop Time" << setw(old_width) << ": " << GetStopTimeString();
+
+  // write run duration
+  cout << endl << setw(name_width) << left << "Run Duration" << setw(old_width) << ": " << GetRunDuration();
 
   // write laboratory
   cout << endl << setw(name_width) << left << "Laboratory" << setw(old_width) << ": " << GetLaboratory().Data();
