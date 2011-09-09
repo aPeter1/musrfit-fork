@@ -1,12 +1,12 @@
-Test asymmetry plot, PSI-BIN data file
+FeSe 9p4 TF100 p107apr09_sample*1p02                          
 ###############################################################
 FITPARAMETER
 #      Nr. Name        Value     Step      Pos_Error  Boundaries
         1 alpha       0.954734  0           none        0       2       
-        2 asy         0.262387  0.00144114  none        0       0.33    
-        3 phase       -0.0892349 0.327999    none        
-        4 field       97.9113   0.0550109   none        0       none    
-        5 rate        0.31646   0.00441463  none        0       none    
+        2 asy         0.2624    0.0014      none        0       0.33    
+        3 phase       -0.10     0.33        none        
+        4 field       97.912    0.055       none        0       none    
+        5 rate        0.3164    0.0044      none        0       none    
  
 ###############################################################
 THEORY
@@ -23,12 +23,12 @@ RUN data/deltat_pta_gpd_0423 PIE1 PSI PSI-BIN   (name beamline institute data-fi
 fittype         2         (asymmetry fit)
 alpha           1
 map             0    0    0    0    0    0    0    0    0    0    0
-forward         2       
-backward        1       
+forward         2 
+backward        1 
 background      61      184     57      145     
 data            207     7994    167     8009    
 t0              202     162     
-fit             0.00    8.00    
+fit             0       8      
 packing         18
 
 ###############################################################
@@ -44,16 +44,16 @@ units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
 fourier_power    12
 apodization      NONE    # NONE, WEAK, MEDIUM, STRONG
 plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
-phase            8.50
+phase            8
 #range_for_phase_correction 50.0 70.0
-range            0.00    200.00
+range            0    200
 
 ###############################################################
 PLOT 2   (asymmetry plot)
 runs     1   
-range    0.00   8.00   -0.30   0.30
+range    0   8   -0.3   0.3
 view_packing 38
 
 ###############################################################
-STATISTIC --- 2010-05-26 21:27:41
-  chisq = 545.990682, NDF = 351, chisq/NDF = 1.55552901
+STATISTIC --- 2011-09-09 13:26:03
+  chisq = 554.2, NDF = 351, chisq/NDF = 1.578917

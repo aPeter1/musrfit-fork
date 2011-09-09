@@ -1,0 +1,57 @@
+nc-ZnO T=80 F=69
+###############################################################
+FITPARAMETER
+#       No Name        Value     Step        Pos_Error   Boundaries
+        1 alpha       0.88008   -0.00063    0.00063     
+        2 asym        0.1708    -0.0017     0.0017      0       0.3     
+        3 phase       3.90      -0.38       0.38        0       100     
+        4 field       71.003    -0.036      0.036       0       none    
+        5 rate        0.1526    -0.0024     0.0024      0       100     
+        6 beta        1.231     -0.046      0.047       
+
+###############################################################
+THEORY
+asymmetry      2
+TFieldCos      3  fun1       (phase frequency)
+generExpo      5     6       (rate exponent)
+
+###############################################################
+FUNCTIONS
+fun1 = gamma_mu * par4
+
+###############################################################
+RUN data/emu00005989_v2 EMU ISIS NEXUS   (name beamline institute data-file-format)
+fittype         2         (asymmetry fit)
+alpha           1
+map             0    0    0    0    0    0    0    0    0    0
+forward         1-16 
+backward        17-32 
+backgr.fix      0           0           
+data            40      1500    40      1500    
+fit             0.2     14     
+packing         1
+
+###############################################################
+COMMANDS
+MINIMIZE
+MINOS
+SAVE
+
+###############################################################
+FOURIER
+units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
+fourier_power    10
+apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+plot             REAL    # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+range            0    100
+phase            par2
+
+###############################################################
+PLOT 2   (asymmetry plot)
+runs     1   
+range    0   14   -0.22   0.22
+view_packing 5
+
+###############################################################
+STATISTIC --- 2011-09-09 13:24:40
+  chisq = 796.7, NDF = 846, chisq/NDF = 0.941749

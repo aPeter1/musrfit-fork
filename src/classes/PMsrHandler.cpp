@@ -704,29 +704,29 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **WARNING** 'forward' tag without any data found!";
             cerr << endl << ">> Something is VERY fishy, please check your msr-file carfully." << endl;
           } else {
-            fout.width(16);
-            fout << left << "forward";
-            for (UInt_t i=0; i<fRuns[runNo].GetForwardHistoNoSize(); i++) {
-              fout.width(8);
-              fout << fRuns[runNo].GetForwardHistoNo(i);
-            }
-            fout << endl;
+            TString result("");
+            PIntVector forward;
+            for (UInt_t i=0; i<fRuns[runNo].GetForwardHistoNoSize(); i++)
+              forward.push_back(fRuns[runNo].GetForwardHistoNo(i));
+            MakeDetectorGroupingString("forward", forward, result);
+            forward.clear();
+            fout << result.Data() << endl;
           }
         } else if (sstr.BeginsWith("backward")) {
           if (fRuns[runNo].GetBackwardHistoNoSize() == 0) {
             cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **WARNING** 'backward' tag without any data found!";
             cerr << endl << ">> Something is VERY fishy, please check your msr-file carfully." << endl;
           } else {
-            fout.width(16);
-            fout << left << "backward";
-            for (UInt_t i=0; i<fRuns[runNo].GetBackwardHistoNoSize(); i++) {
-              fout.width(8);
-              fout << fRuns[runNo].GetBackwardHistoNo(i);
-            }
-            fout << endl;
+            TString result("");
+            PIntVector backward;
+            for (UInt_t i=0; i<fRuns[runNo].GetBackwardHistoNoSize(); i++)
+              backward.push_back(fRuns[runNo].GetBackwardHistoNo(i));
+            MakeDetectorGroupingString("backward", backward, result);
+            backward.clear();
+            fout << result.Data() << endl;
           }
         } else if (sstr.BeginsWith("backgr.fix")) {
-          fout.width(15);
+          fout.width(16);
           fout << left << "backgr.fix";
           for (UInt_t j=0; j<2; j++) {
             if (fRuns[runNo].GetBkgFix(j) != PMUSR_UNDEFINED) {
@@ -2727,19 +2727,16 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
-        for (Int_t i=1; i<tokens->GetEntries(); i++) {
-          ostr = dynamic_cast<TObjString*>(tokens->At(i));
-          str = ostr->GetString();
-          if (str.IsDigit()) {
-            ival = str.Atoi();
-            if (ival > 0)
-              param.SetForwardHistoNo(ival);
-            else
-              error = true;
-          } else {
-            error = true;
+        PIntVector group;
+        str = iter->fLine;
+        if (ParseDetectorGrouping(str, group)) {
+          for (UInt_t i=0; i<group.size(); i++) {
+            param.SetForwardHistoNo(group[i]);
           }
+        } else {
+          error = true;
         }
+        group.clear();
       }
     }
 
@@ -2751,19 +2748,16 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
-        for (Int_t i=1; i<tokens->GetEntries(); i++) {
-          ostr = dynamic_cast<TObjString*>(tokens->At(i));
-          str = ostr->GetString();
-          if (str.IsDigit()) {
-            ival = str.Atoi();
-            if (ival > 0)
-              param.SetBackwardHistoNo(ival);
-            else
-              error = true;
-          } else {
-            error = true;
+        PIntVector group;
+        str = iter->fLine;
+        if (ParseDetectorGrouping(str, group)) {
+          for (UInt_t i=0; i<group.size(); i++) {
+            param.SetBackwardHistoNo(group[i]);
           }
+        } else {
+          error = true;
         }
+        group.clear();
       }
     }
 
@@ -5068,6 +5062,124 @@ UInt_t PMsrHandler::LastSignificant(Double_t dval, UInt_t precLimit)
   }
 
   return lastSignificant;
+}
+
+//--------------------------------------------------------------------------
+// ParseDetectorGrouping (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param str forward/backward string to be decoded
+ * \param group decoded detector grouping vector
+ *
+ * <b>return:</b> true if parsing was successful, false otherwise.
+ */
+Bool_t PMsrHandler::ParseDetectorGrouping(TString str, PIntVector &group)
+{
+  TObjArray *tok=0, *tok1=0;
+  TObjString *ostr=0;
+  Int_t first=0, last=0;
+
+  // change cn - cm to cn-cm. Will *NOT* handle cn  - cm etc
+  str = str.ReplaceAll(" - ", "-");
+
+  group.clear();
+  tok = str.Tokenize(" \t");
+
+  // check that there are indeed enough tokens
+  if (tok->GetEntries() < 2) {
+    delete tok;
+    return false;
+  }
+
+  for (Int_t i=1; i<tok->GetEntries(); i++) {
+    ostr = dynamic_cast<TObjString*>(tok->At(i));
+    if (ostr->GetString().Contains("-")) { // hopefully a cn-cm token
+      tok1 = ostr->GetString().Tokenize("-");
+      if (tok1->GetEntries() == 2) {
+        ostr = dynamic_cast<TObjString*>(tok1->At(0));
+        if (ostr->GetString().IsDigit()) {
+          first = ostr->GetString().Atoi();
+        } else {
+          if (tok) delete tok;
+          if (tok1) delete tok1;
+          return false;
+        }
+        ostr = dynamic_cast<TObjString*>(tok1->At(1));
+        if (ostr->GetString().IsDigit()) {
+          last = ostr->GetString().Atoi();
+        } else {
+          if (tok) delete tok;
+          if (tok1) delete tok1;
+          return false;
+        }
+
+        if (last < first) {
+          if (tok) delete tok;
+          return false;
+        }
+
+        for (Int_t i=first; i<=last; i++)
+          group.push_back(i);
+      } else {
+        if (tok) delete tok;
+        if (tok1) delete tok1;
+        return false;
+      }
+    } else { // hopefully a number
+      if (ostr->GetString().IsDigit()) {
+        group.push_back(ostr->GetString().Atoi());
+      } else {
+        if (tok) delete tok;
+        return false;
+      }
+    }
+  }
+
+  // clean up
+  if (tok) delete tok;
+  if (tok1) delete tok1;
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// MakeDetectorGroupingString (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>encodes the detector grouping vector.
+ *
+ * \param str 'forward' or 'backward'
+ * \param group detector grouping vector to be encoded
+ * \param result encoded dtector grouping string
+ */
+void PMsrHandler::MakeDetectorGroupingString(TString str, PIntVector &group, TString &result)
+{
+  result = str + TString("        ");
+  if (str == TString("forward"))
+    result += " ";
+
+  UInt_t i=0, j=0;
+  do {
+    j = i;
+    while (group[j]+1 == group[j+1]) {
+      j++;
+      if (j == group.size()-1)
+        break;
+    }
+
+    if (j >= i+2) {
+      result += group[i];
+      result += "-";
+      result += group[j];
+      i = j+1;
+    } else {
+      result += group[i];
+      i++;
+    }
+    result += " ";
+  } while (i<group.size());
 }
 
 // end ---------------------------------------------------------------------
