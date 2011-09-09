@@ -1066,13 +1066,19 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
   Int_t offset = (Int_t)(10.0e-3/fTimeResolution); // needed in case first good bin is not given, default = 10ns
   // check if data range has been provided, and if not try to estimate them
   if (fRunInfo->GetDataRange(0) < 0) {
-    start[0] = (static_cast<Int_t>(t0[0])+offset) - ((static_cast<Int_t>(t0[0])+offset)/packing)*packing;
-    cerr << endl << ">> PRunAsymmetry::PrepareViewData(): **WARNING** data range (forward) was not provided, will try data range start = " << start[0] << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
-    cerr << endl;
-  } else if (fRunInfo->GetDataRange(2) < 0) {
-    start[1] = (static_cast<Int_t>(t0[1])+offset) - ((static_cast<Int_t>(t0[1])+offset)/packing)*packing;
-    cerr << endl << ">> PRunAsymmetry::PrepareViewData(): **WARNING** data range (backward) was not provided, will try data range start = " << start[1] << ".";
+    Int_t diff = offset;
+
+    // calculate start position for plotting
+    Int_t val = static_cast<Int_t>(t0[1])+diff-packing*((static_cast<Int_t>(t0[1])+diff)/packing);
+    do {
+      if (static_cast<Double_t>(val)+t0[1]-t0[0] < 0.0)
+        val += packing;
+    } while (static_cast<Double_t>(val) + t0[1] - t0[0] < 0.0);
+
+    start[0] = val;
+    start[1] = val + static_cast<Int_t>(t0[1] - t0[0]);
+
+    cerr << endl << ">> PRunAsymmetry::PrepareViewData(): **WARNING** data range (forward/backward) not provided, will try data range start = t0_f/b+10ns.";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   } else {

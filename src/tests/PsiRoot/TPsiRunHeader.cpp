@@ -641,7 +641,7 @@ TObjArray* TPsiRunHeader::GetHeader(UInt_t &count)
   fHeader.AddLast(tostr);
 
   // add run duration
-  str.Form("%03d - Run Duration: %d", count++, GetRunDuration());
+  str.Form("%03d - Run Duration: %d sec", count++, GetRunDuration());
   tostr = new TObjString(str);
   fHeader.AddLast(tostr);
 
@@ -1021,12 +1021,12 @@ Bool_t TPsiRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString pa
     } else if (str.Contains("- Run Number: ")) {
       tokens = str.Tokenize(":");
       if (tokens->GetEntries() < 2) {
-        cerr << endl << ">> TPsiRunHeader::ExtractHeaderInformation(..) **ERROR** " << str.Data() << " couldn't tokenize it." << endl << endl;
+        cerr << endl << ">> TPsiRunHeader::ExtractHeaderInformation(..) **ERROR** '" << str.Data() << "' couldn't tokenize it." << endl << endl;
         return false;
       }
       ostr = dynamic_cast<TObjString*>(tokens->At(1));
       if (!ostr->GetString().IsDigit()) {
-        cerr << endl << ">> TPsiRunHeader::ExtractHeaderInformation(..) **ERROR** " << str.Data() << " doesn't contain a valid run number" << endl << endl;
+        cerr << endl << ">> TPsiRunHeader::ExtractHeaderInformation(..) **ERROR** '" << str.Data() << "' doesn't contain a valid run number" << endl << endl;
         return false;
       }
       fRunNumber = ostr->GetString().Atoi();
@@ -1550,7 +1550,7 @@ void TPsiRunHeader::DumpHeader() const
   cout << endl << setw(name_width) << left << "Run Stop Time" << setw(old_width) << ": " << GetStopTimeString();
 
   // write run duration
-  cout << endl << setw(name_width) << left << "Run Duration" << setw(old_width) << ": " << GetRunDuration();
+  cout << endl << setw(name_width) << left << "Run Duration" << setw(old_width) << ": " << GetRunDuration() << " sec";
 
   // write laboratory
   cout << endl << setw(name_width) << left << "Laboratory" << setw(old_width) << ": " << GetLaboratory().Data();
