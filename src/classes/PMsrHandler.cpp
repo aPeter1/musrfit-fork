@@ -4502,7 +4502,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
 
 
 //--------------------------------------------------------------------------
-// CheckRunBlockIntegrity (private)
+// CheckRunBlockIntegrity (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Checks the consistency of each RUN block, i.e. are the necessary parameters
@@ -4646,7 +4646,7 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
 }
 
 //--------------------------------------------------------------------------
-// CheckUniquenessOfParamNames (private)
+// CheckUniquenessOfParamNames (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Checks if all the fit parameters are unique. If not parX, parY will show
@@ -4678,7 +4678,7 @@ Bool_t PMsrHandler::CheckUniquenessOfParamNames(UInt_t &parX, UInt_t &parY)
 }
 
 //--------------------------------------------------------------------------
-// CheckMaps (private)
+// CheckMaps (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Checks if map entries found in the theory- or function-block are also
@@ -4788,7 +4788,7 @@ Bool_t PMsrHandler::CheckMaps()
 }
 
 //--------------------------------------------------------------------------
-// CheckFuncs (private)
+// CheckFuncs (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Checks if fun entries found in the theory- and run-block are also
@@ -4880,7 +4880,7 @@ Bool_t PMsrHandler::CheckFuncs()
 }
 
 //--------------------------------------------------------------------------
-// CheckHistoGrouping (private)
+// CheckHistoGrouping (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Checks if histogram grouping makes any sense.
@@ -4935,7 +4935,7 @@ Bool_t PMsrHandler::CheckHistoGrouping()
 }
 
 //--------------------------------------------------------------------------
-// CheckAddRunParameters (private)
+// CheckAddRunParameters (public)
 //--------------------------------------------------------------------------
 /**
  * <p>In case addrun is present check that if addt0's are given there are as many addt0's than addrun's.
@@ -4967,7 +4967,7 @@ Bool_t PMsrHandler::CheckAddRunParameters()
 }
 
 //--------------------------------------------------------------------------
-// CheckMaxLikelihood (private)
+// CheckMaxLikelihood (public)
 //--------------------------------------------------------------------------
 /**
  * <p>If log max likelihood is requested, make sure that all run blocks are of single histogram type.
@@ -4987,6 +4987,36 @@ void PMsrHandler::CheckMaxLikelihood()
       }
     }
   }
+}
+
+//--------------------------------------------------------------------------
+// GetGroupingString (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>returns the forward/backward grouping string.
+ *
+ * \param runNo msr-file run block number
+ * \param detector tag telling which set to be used. Possible are: 'forward' and 'backward'
+ * \param groupingStr compressed grouping information.
+ */
+void PMsrHandler::GetGroupingString(Int_t runNo, TString detector, TString &groupingStr)
+{
+  PIntVector grouping;
+
+  if (!detector.CompareTo("forward", TString::kIgnoreCase)) {
+    for (UInt_t i=0; i<fRuns[runNo].GetForwardHistoNoSize(); i++)
+      grouping.push_back(fRuns[runNo].GetForwardHistoNo(i));
+    MakeDetectorGroupingString("forward", grouping, groupingStr, false);
+  } else if (!detector.CompareTo("backward", TString::kIgnoreCase)) {
+    for (UInt_t i=0; i<fRuns[runNo].GetBackwardHistoNoSize(); i++)
+      grouping.push_back(fRuns[runNo].GetBackwardHistoNo(i));
+    MakeDetectorGroupingString("backward", grouping, groupingStr, false);
+  } else {
+    groupingStr = "**ERROR** unkown detector. Allow forward/backward.";
+  }
+
+  // clean up
+  grouping.clear();
 }
 
 //--------------------------------------------------------------------------
@@ -5152,13 +5182,18 @@ Bool_t PMsrHandler::ParseDetectorGrouping(TString str, PIntVector &group)
  *
  * \param str 'forward' or 'backward'
  * \param group detector grouping vector to be encoded
- * \param result encoded dtector grouping string
+ * \param result encoded detector grouping string
+ * \param includeDetector if true, the detector information is included
  */
-void PMsrHandler::MakeDetectorGroupingString(TString str, PIntVector &group, TString &result)
+void PMsrHandler::MakeDetectorGroupingString(TString str, PIntVector &group, TString &result, Bool_t includeDetector)
 {
-  result = str + TString("        ");
-  if (str == TString("forward"))
-    result += " ";
+  if (includeDetector) {
+    result = str + TString("        ");
+    if (str == TString("forward"))
+      result += " ";
+  } else {
+    str = "";
+  }
 
   UInt_t i=0, j=0;
   do {

@@ -705,25 +705,19 @@ void PMusrCanvas::UpdateInfoPad()
     // histo info (depending on the fittype
     if (runs[runNo].GetFitType() == MSR_FITTYPE_SINGLE_HISTO) {
       tstr += TString("h:");
-      tstr += runs[runNo].GetForwardHistoNo();
-      for (UInt_t j=1; j<runs[runNo].GetForwardHistoNoSize(); j++) {
-        tstr += TString("+");
-        tstr += runs[runNo].GetForwardHistoNo(j);
-      }
+      TString grouping;
+      fMsrHandler->GetGroupingString(runNo, "forward", grouping);
+      tstr += grouping;
       tstr += TString(",");
     } else if (runs[runNo].GetFitType() == MSR_FITTYPE_ASYM) {
       tstr += TString("h:");
-      tstr += runs[runNo].GetForwardHistoNo();
-      for (UInt_t j=1; j<runs[runNo].GetForwardHistoNoSize(); j++) {
-        tstr += TString("+");
-        tstr += runs[runNo].GetForwardHistoNo(j);
-      }
+      TString grouping;
+      fMsrHandler->GetGroupingString(runNo, "forward", grouping);
+      tstr += grouping;
       tstr += TString("/");
-      tstr += runs[runNo].GetBackwardHistoNo();
-      for (UInt_t j=1; j<runs[runNo].GetBackwardHistoNoSize(); j++) {
-        tstr += TString("+");
-        tstr += runs[runNo].GetBackwardHistoNo(j);
-      }
+      grouping = "";
+      fMsrHandler->GetGroupingString(runNo, "backward", grouping);
+      tstr += grouping;
       tstr += TString(",");
     }
     // temperature if present

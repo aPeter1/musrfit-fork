@@ -105,6 +105,8 @@ class PMsrHandler
     virtual Bool_t CheckAddRunParameters();
     virtual void CheckMaxLikelihood();
 
+    virtual void GetGroupingString(Int_t runNo, TString detector, TString &groupingStr);
+
   private:
     Bool_t                 fWriteExpectedChisq; ///< flag shows if expected chisq shall be written to the msr-file
 
@@ -147,7 +149,7 @@ class PMsrHandler
     virtual UInt_t LastSignificant(Double_t dval, UInt_t precLimit=6);
 
     virtual Bool_t ParseDetectorGrouping(TString str, PIntVector &group);
-    virtual void MakeDetectorGroupingString(TString str, PIntVector &group, TString &result);
+    virtual void MakeDetectorGroupingString(TString str, PIntVector &group, TString &result, Bool_t includeDetector = true);
 };
 
 #endif // _PMSRHANDLER_H_
