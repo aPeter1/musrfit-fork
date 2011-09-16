@@ -89,6 +89,10 @@ ifeq ($(ARCH),linux)
 		cp -pv $(MYLIBS)/$(TLRHSO) $(ROOTSYS)/lib
 		cp -pv $(MYINCLUDES)/$(TNAME).h $(ROOTSYS)/include
 endif
+ifeq ($(ARCH),linuxx8664gcc)
+		cp -pv $(MYLIBS)/$(TLRHSO) $(ROOTSYS)/lib
+		cp -pv $(MYINCLUDES)/$(TNAME).h $(ROOTSYS)/include
+endif
 ifeq ($(ARCH),win32gcc)
 		cp -pv $(MYLIBS)/$(TLRHSO) $(ROOTSYS)/bin
 		ln -sf $(ROOTSYS)/bin/$(TLRHSO) $(ROOTSYS)/lib/$(TLRHSO)
@@ -97,6 +101,10 @@ endif
 
 uninstall:
 ifeq ($(ARCH),linux)
+		rm $(ROOTSYS)/lib/$(TLRHSO)
+		rm $(ROOTSYS)/include/$(TNAME).h
+endif
+ifeq ($(ARCH),linuxx8664gcc)
 		rm $(ROOTSYS)/lib/$(TLRHSO)
 		rm $(ROOTSYS)/include/$(TNAME).h
 endif

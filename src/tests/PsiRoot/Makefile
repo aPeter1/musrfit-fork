@@ -75,8 +75,7 @@ all:  $(EXEC)
 
 $(EXEC): $(OBJS)
 	@echo "---> Building $(EXEC) ..."
-	/bin/rm -f $(SHLIB)
-	$(LD) $(OBJS) -o $(EXEC) $(PSILIBS) $(GLIBS) 
+	$(LD) $(OBJS) -o $(EXEC) $(GLIBS) $(PSILIBS)  
 	@echo "done"
 
 # clean up: remove all object file (and core files)

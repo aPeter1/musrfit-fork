@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  TPsiRunHeaderLinkDef.h
+  TPsiRunHeader2LinkDef.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -36,6 +36,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class TPsiRunProperty+;
+#pragma link C++ class TPsiStartupHandler+;
 #pragma link C++ class TPsiRunHeader+;
 
 #endif

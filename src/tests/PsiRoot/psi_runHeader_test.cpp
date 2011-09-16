@@ -54,57 +54,74 @@ int main(int argc, char *argv[])
 
   // PSI Run Header object
   TPsiRunHeader *header = new TPsiRunHeader();
+  TPsiRunProperty *prop;
 
-  header->SetGenerator("psi_runHeader_test");
-  header->SetFileName(argv[1]);
-  header->SetRunTitle("This is a run title");
-  header->SetRunNumber(12345);
-  header->SetStartTime("2011-08-31 08:03:23");
-  header->SetStopTime("2011-08-31 10:46:48");
-  header->SetLaboratory("PSI");
-  header->SetInstrument("LEM");
-  header->SetArea("muE4");
-  header->AddProperty("Muon Beam Momentum", 28.0, 28.0, 0.7, "MeV/c");
-  header->SetMuonSpecies("positive Muon");
-  header->SetSetup("Konti-4, WEW");
-  header->SetComment("This is a comment");
-  header->SetSample("Eu2CuO4 MOD thin film");
-  header->AddProperty("Sample Temperature", 30.0, 30.01, 0.05, "K");
-  header->AddProperty("Sample Magnetic Field", 3.0, 3.0003, 0.000025, "T");
-  header->SetOrientation("c-axis perp to spin");
-  header->AddProperty("T1", 30.0, 30.003, 0.003, "K", "sample stick temperature", "/SampleEnv/");
-  header->SetSampleCryo("Konti-4");
-  header->SetSampleCryoInsert("n/a");
-  header->SetSampleMagnetName("Bpar");
-  header->AddProperty("Current", 1.54, 1.54, 0.003, "A", "Danfysik", "/MagFieldEnv/");
+  // run info
+  header->Set("RunInfo/Version", "TString", "$Id$");
+  header->Set("RunInfo/Generator", "TString", "any2many");
+  header->Set("RunInfo/File Name", "TString", "thisIsAFileName");
+  header->Set("RunInfo/Run Title", "TString", "here comes the run title");
+  header->Set("RunInfo/Run Number", "Int_t", 576);
+  header->Set("RunInfo/Run Number", "Int_t", 577);
+  header->Set("RunInfo/Run Start Time", "TString", "2011-04-19 14:25:22");
+  header->Set("RunInfo/Run Stop Time", "TString", "2011-04-19 19:13:47");
 
-  header->SetNoOfHistos(8);
-  header->SetHistoName("left/forward");
-  header->SetHistoName("top/forward");
-  header->SetHistoName("right/forward");
-  header->SetHistoName("bottom/forward");
-  header->SetHistoName("left/backward");
-  header->SetHistoName("top/backward");
-  header->SetHistoName("right/backward");
-  header->SetHistoName("bottom/backward");
-  header->SetHistoLength(66601);
-  header->SetTimeResolution(0.1953125, "ns");
+  prop = new TPsiRunProperty("Time Resolution", 0.193525, "ns");
+  header->Set("RunInfo/Time Resolution", "TPsiRunProperty", *prop);
 
-  for (Int_t i=0; i<header->GetNoOfHistos(); i++) {
-    header->SetTimeZeroBin(3419);
-    header->SetFirstGoodBin(3419);
-    header->SetLastGoodBin(65000);
-  }
+  prop = new TPsiRunProperty("Sample Temperature", 3.2, 3.20, 0.05, "K", "CF1");
+  header->Set("RunInfo/Sample Temperature", "TPsiRunProperty", *prop);
 
-  header->SetRedGreenHistogramOffset(0);
-  header->SetRedGreenHistogramOffset(20);
-  header->SetRedGreenDescription("NPP");
-  header->SetRedGreenDescription("PPC");
+  prop = new TPsiRunProperty("Muon Beam Momentum", PRH_UNDEFINED, 28.1, PRH_UNDEFINED, "MeV/c");
+  header->Set("RunInfo/Muon Beam Momentum", "TPsiRunProperty", *prop);
+
+  TStringVector detectorName;
+  detectorName.push_back("left_down");
+  detectorName.push_back("left_up");
+  detectorName.push_back("top_down");
+  detectorName.push_back("top_up");
+  detectorName.push_back("right_down");
+  detectorName.push_back("right_up");
+  detectorName.push_back("bottom_down");
+  detectorName.push_back("bottom_up");
+  header->Set("RunInfo/Histo Names", "TStringVector", detectorName);
+
+  TIntVector t0;
+  for (UInt_t i=0; i<8; i++) t0.push_back(3419);
+  header->Set("RunInfo/Time Zero Bin", "TIntVector", t0);
+
+  TStringVector dummyTest;
+  dummyTest.push_back("dummy1");
+  dummyTest.push_back("dummy2");
+  dummyTest.push_back("dummy3");
+  header->Set("RunInfo/Dummy Test", "TStringVector", dummyTest);
+
+  // sample environment
+  header->Set("SampleEnv/Cryo", "TString", "Konti-1");
+  prop = new TPsiRunProperty("CF2", 3.2, 3.22, 0.04, "A");
+  header->Set("SampleEnv/CF2", "TPsiRunProperty", *prop);
+
+  prop = new TPsiRunProperty("Dummy Prop", -2.0, -2.001, 0.002, "SI unit");
+  header->Set("SampleEnv/Dummy Prop", "TPsiRunProperty", *prop);
+
+  // magnetic field environment
+  header->Set("MagFieldEnv/Name", "TString", "Bpar");
+  prop = new TPsiRunProperty("Current", 1.34, "A");
+  header->Set("MagFieldEnv/Current", "TPsiRunProperty", *prop);
+
+  // beamline
+  header->Set("Beamline/WSX61a", "TString", "DAC = 3289, ADC = 0.800");
+
+  TIntVector dummyInt;
+  for (UInt_t i=0; i<3; i++) dummyInt.push_back(i+1000);
+  header->Set("Beamline/Dummy Int", "TIntVector", dummyInt);
+
+
+  // scaler
+  header->Set("Scaler/Ip", "Int_t", 12332123);
 
   if (!header->IsValid()) {
-    cerr << endl << ">> **ERROR** PSI-ROOT run header is not valid/complete." << endl;
-    delete header;
-    return -1;
+    cerr << endl << ">> **ERROR** run header validation failed." << endl;
   }
 
   TFile *f = new TFile(argv[1], "RECREATE", "psi_runHeader_test");
@@ -114,15 +131,30 @@ int main(int argc, char *argv[])
   }
 
   // root file header related things
-  UInt_t count = 1;
-  TFolder *runInfo = gROOT->GetRootFolder()->AddFolder("RunInfo", "PSI RunInfo");
-  gROOT->GetListOfBrowsables()->Add(runInfo, "RunInfo");
-  runInfo->Add(header->GetHeader(count));
-  runInfo->Add(header->GetSampleEnv(count));
-  runInfo->Add(header->GetMagFieldEnv(count));
-  runInfo->Add(header->GetBeamline(count));
-  runInfo->Add(header->GetScaler(count));
-  runInfo->Write();
+  TFolder *runHeader = gROOT->GetRootFolder()->AddFolder("RunHeaderInfo", "PSI Run Header Info");
+  gROOT->GetListOfBrowsables()->Add(runHeader, "RunHeaderInfo");
+
+  TObjArray runInfo;
+  header->Get("RunInfo", runInfo);
+  runHeader->Add(&runInfo);
+
+  TObjArray sampleEnv;
+  header->Get("SampleEnv", sampleEnv);
+  runHeader->Add(&sampleEnv);
+
+  TObjArray magFieldEnv;
+  header->Get("MagFieldEnv", magFieldEnv);
+  runHeader->Add(&magFieldEnv);
+
+  TObjArray beamline;
+  header->Get("Beamline", beamline);
+  runHeader->Add(&beamline);
+
+  TObjArray scaler;
+  header->Get("Scaler", scaler);
+  runHeader->Add(&scaler);
+
+  runHeader->Write();
 
   f->Close();
 
@@ -134,7 +166,9 @@ int main(int argc, char *argv[])
   delete header;
   header = 0;
 
-  cout << endl << ">> read back " << argv[1] << endl;
+  cout << endl << "++++++++++++++++++++++++++++";
+  cout << endl << ">> read back " << argv[1];
+  cout << endl << "++++++++++++++++++++++++++++" << endl;
 
   // read the file back and extract the header info
   f = new TFile(argv[1], "READ", "psi_runHeader_test");
@@ -144,9 +178,9 @@ int main(int argc, char *argv[])
   }
 
   runInfo = 0;
-  f->GetObject("RunInfo", runInfo);
-  if (runInfo == 0) {
-    cerr << endl << ">> **ERROR** Couldn't get top folder RunInfo";
+  f->GetObject("RunHeaderInfo", runHeader);
+  if (runHeader == 0) {
+    cerr << endl << ">> **ERROR** Couldn't get top folder RunHeaderInfo";
     f->Close();
     return -1;
   }
@@ -155,39 +189,39 @@ int main(int argc, char *argv[])
   header = new TPsiRunHeader();
 
   // get RunHeader
-  oarray = (TObjArray*) runInfo->FindObjectAny("RunHeader");
+  oarray = (TObjArray*) runHeader->FindObjectAny("RunInfo");
   if (oarray == 0) {
     cerr << endl << ">> **ERROR** Couldn't get RunHeader" << endl;
   }
-  header->ExtractHeaderInformation(oarray);
+  header->ExtractHeaderInformation(oarray, "RunInfo");
 
   // get SampleEnv
-  oarray = (TObjArray*) runInfo->FindObjectAny("SampleEnv");
+  oarray = (TObjArray*) runHeader->FindObjectAny("SampleEnv");
   if (oarray == 0) {
     cerr << endl << ">> **ERROR** Couldn't get SampleEnv" << endl;
   }
-  header->ExtractHeaderInformation(oarray, "/SampleEnv/");
+  header->ExtractHeaderInformation(oarray, "SampleEnv");
 
   // get MagFieldEnv
-  oarray = (TObjArray*) runInfo->FindObjectAny("MagFieldEnv");
+  oarray = (TObjArray*) runHeader->FindObjectAny("MagFieldEnv");
   if (oarray == 0) {
     cerr << endl << ">> **ERROR** Couldn't get MagFieldEnv" << endl;
   }
-  header->ExtractHeaderInformation(oarray, "/MagFieldEnv/");
+  header->ExtractHeaderInformation(oarray, "MagFieldEnv");
 
   // get Beamline
-  oarray = (TObjArray*) runInfo->FindObjectAny("Beamline");
+  oarray = (TObjArray*) runHeader->FindObjectAny("Beamline");
   if (oarray == 0) {
     cerr << endl << ">> **ERROR** Couldn't get Beamline" << endl;
   }
-  header->ExtractHeaderInformation(oarray, "/Beamline/");
+  header->ExtractHeaderInformation(oarray, "Beamline");
 
   // get Scaler
-  oarray = (TObjArray*) runInfo->FindObjectAny("Scalers");
+  oarray = (TObjArray*) runHeader->FindObjectAny("Scaler");
   if (oarray == 0) {
-    cerr << endl << ">> **ERROR** Couldn't get Scalers" << endl;
+    cerr << endl << ">> **ERROR** Couldn't get Scaler" << endl;
   }
-  header->ExtractHeaderInformation(oarray, "/Scalers/");
+  header->ExtractHeaderInformation(oarray, "Scaler");
 
   header->DumpHeader();
 

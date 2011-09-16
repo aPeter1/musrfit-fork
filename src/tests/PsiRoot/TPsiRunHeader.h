@@ -34,14 +34,45 @@
 
 #include <TDatime.h>
 #include <TObject.h>
+#include <TQObject.h>
 #include <TObjString.h>
 #include <TObjArray.h>
+#include <TSAXParser.h>
 
+#define PRH_UNDEFINED -9.99e99
+
+typedef vector<Int_t> TIntVector;
+typedef vector<TString> TStringVector;
+
+//-------------------------------------------------------------------------
+template <class T> class TPsiRunObject : public TObject
+{
+public:
+  TPsiRunObject() { fPathName = "n/a"; fType = "n/a"; }
+  TPsiRunObject(TString pathName, TString type, T value) : fPathName(pathName), fType(type), fValue(value) {}
+  virtual ~TPsiRunObject() {}
+
+  virtual TString GetPathName() { return fPathName; }
+  virtual TString GetType() { return fType; }
+  virtual T GetValue() { return fValue; }
+
+  virtual void SetPathName(TString pathName) { fPathName = pathName; }
+  virtual void SetType(TString type) { fType = type; }
+  virtual void SetValue(T value) { fValue = value; }
+
+private:
+  TString fPathName; ///< path name of the variable, e.g. 'RunInfo/Run Number'
+  TString fType;     ///< type of value, e.g. TString, or Int_t, etc.
+  T fValue;          ///< value itself
+};
+
+//-------------------------------------------------------------------------
 class TPsiRunProperty : public TObject
 {
 public:
   TPsiRunProperty();
-  TPsiRunProperty(TString &name, Double_t demand, Double_t value, Double_t error, TString &unit, TString &description, TString &path);
+  TPsiRunProperty(TString name, Double_t demand, Double_t value, Double_t error, TString unit, TString description = TString("n/a"));
+  TPsiRunProperty(TString name, Double_t value, TString unit);
   virtual ~TPsiRunProperty() {}
 
   virtual TString  GetLabel() const { return fLabel; }
@@ -50,7 +81,6 @@ public:
   virtual Double_t GetError() const { return fError; }
   virtual TString  GetUnit() const { return fUnit; }
   virtual TString  GetDescription() const { return fDescription; }
-  virtual TString  GetPath() const { return fPath; }
 
   virtual void SetLabel(TString &label) { fLabel = label; }
   virtual void SetLabel(const char *label) { fLabel = label; }
@@ -61,8 +91,6 @@ public:
   virtual void SetUnit(const char *unit) { fUnit = unit; }
   virtual void SetDescription(TString &str) { fDescription = str; }
   virtual void SetDescription(const char *str) { fDescription = str; }
-  virtual void SetPath(TString &str) { fPath = str; }
-  virtual void SetPath(const char *str) { fPath = str; }
 
 private:
   TString  fLabel; ///<  property label, like ’Sample Temperature’ etc.
@@ -71,11 +99,62 @@ private:
   Double_t fError; ///<  estimated error (standard deviation) of the measured property value
   TString  fUnit;   ///< unit of the property
   TString  fDescription; ///< a more detailed description of the property
-  TString  fPath; ///< ROOT file path where to place the physical property
 
   ClassDef(TPsiRunProperty, 1)
 };
 
+//-------------------------------------------------------------------------
+class TPsiEntry
+{
+public:
+  TPsiEntry() { fPathName = "n/a"; fType = "n/a"; }
+  TPsiEntry(TString pathName, TString type) : fPathName(pathName), fType(type) {}
+  virtual ~TPsiEntry() {}
+
+  virtual TString GetPathName() { return fPathName; }
+  virtual TString GetType() { return fType; }
+
+  virtual void SetPathName(TString pathName) { fPathName = pathName; }
+  virtual void SetType(TString type) { fType = type; }
+
+private:
+  TString fPathName;
+  TString fType;
+};
+
+//-------------------------------------------------------------------------
+class TPsiStartupHandler : public TObject, public TQObject
+{
+public:
+  TPsiStartupHandler();
+  virtual ~TPsiStartupHandler();
+
+  virtual void OnStartDocument(); // SLOT
+  virtual void OnEndDocument(); // SLOT
+  virtual void OnStartElement(const Char_t*, const TList*); // SLOT
+  virtual void OnEndElement(const Char_t*); // SLOT
+  virtual void OnCharacters(const Char_t*); // SLOT
+  virtual void OnComment(const Char_t*); // SLOT
+  virtual void OnWarning(const Char_t*); // SLOT
+  virtual void OnError(const Char_t*); // SLOT
+  virtual void OnFatalError(const Char_t*); // SLOT
+  virtual void OnCdataBlock(const Char_t*, Int_t); // SLOT
+
+  virtual TStringVector GetFolders() { return fFolder; }
+  virtual vector<TPsiEntry> GetEntries() { return fEntry; }
+
+private:
+  enum EKeyWords {eEmpty, eFolder, eEntry, eName, eType};
+
+  EKeyWords fKey, fGroupKey; ///< xml filter key
+
+  TStringVector fFolder;
+  vector<TPsiEntry> fEntry;
+
+  ClassDef(TPsiStartupHandler, 1)      
+};
+
+//-------------------------------------------------------------------------
 class TPsiRunHeader : public TObject
 {
 public:
@@ -84,137 +163,32 @@ public:
 
   virtual Bool_t IsValid(Bool_t strict = false);
 
-  virtual TString GetVersion() const { return fVersion; }
-  virtual TString GetGenerator() const { return fGenerator; }
-  virtual TString GetFileName() const { return fFileName; }
-  virtual TString GetRunTitle() const { return fRunTitle; }
-  virtual Int_t GetRunNumber() const { return fRunNumber; }
-  virtual TDatime GetStartTime() const { return fStartTime; }
-  virtual const char* GetStartTimeString() const { return fStartTime.AsSQLString(); }
-  virtual TDatime GetStopTime() const { return fStopTime; }
-  virtual const char* GetStopTimeString() const { return fStopTime.AsSQLString(); }
-  virtual Int_t GetRunDuration() const;
-  virtual TString GetLaboratory() const { return fLaboratory; }
-  virtual TString GetArea() const { return fArea; }
-  virtual TString GetInstrument() const { return fInstrument; }
-  virtual TString GetMuonSpecies() const { return fMuonSpecies; }
-  virtual TString GetSetup() const { return fSetup; }
-  virtual TString GetComment() const { return fComment; }
-  virtual TString GetSample() const { return fSample; }
-  virtual TString GetOrientation() const { return fOrientation; }
-  virtual TString GetSampleCryo() const { return fSampleCryo; }
-  virtual TString GetSampleCryoInsert() const { return fSampleCryoInsert; }
-  virtual TString GetSampleMagnetName() const { return fMagnetName; }
-  virtual Int_t GetNoOfHistos() const { return fNoOfHistos; }
-  virtual UInt_t GetNoOfHistoNames() const { return fHistoName.size(); }
-  virtual const vector<TString>* GetHistoNames() const { return &fHistoName; }
-  virtual TString GetHistoName(UInt_t idx, Bool_t &ok) const;
-  virtual Int_t GetHistoLength() const { return fHistoLength; }
-  virtual Double_t GetTimeResolution(const char *units) const;
-  virtual UInt_t GetNoOfTimeZeroBins() const { return fTimeZeroBin.size(); }
-  virtual const vector<UInt_t>* GetTimeZeroBins() const { return &fTimeZeroBin; }
-  virtual UInt_t GetTimeZeroBin(UInt_t idx, Bool_t &ok) const;
-  virtual const vector<UInt_t>* GetFirstGoodBins() const { return &fFirstGoodBin;}
-  virtual UInt_t GetFirstGoodBin(UInt_t idx, Bool_t &ok) const;
-  virtual const vector<UInt_t>* GetLastGoodBins() const { return &fLastGoodBin;}
-  virtual UInt_t GetLastGoodBin(UInt_t idx, Bool_t &ok) const;
-  virtual UInt_t GetNoOfRedGreenHistoOffsets() const { return fRedGreenOffset.size(); }
-  virtual const vector<UInt_t>* GetRedGreenHistoOffsets() const { return &fRedGreenOffset; }
-  virtual UInt_t GetRedGreenHistoOffset(UInt_t idx, Bool_t &ok) const;
-  virtual const vector<TString>* GetRedGreenHistoDescriptions() const { return &fRedGreenDescription; }
-  virtual TString GetRedGreenHistoDescription(UInt_t idx, Bool_t &ok) const;
-  virtual const TPsiRunProperty* GetProperty(TString name) const;
-  virtual const vector<TPsiRunProperty> *GetProperties() const { return &fProperties; }
+  virtual void Get(TString path, TObjArray &content);
 
-  virtual TObjArray *GetHeader(UInt_t &count);
-  virtual TObjArray *GetSampleEnv(UInt_t &count);
-  virtual TObjArray *GetMagFieldEnv(UInt_t &count);
-  virtual TObjArray *GetBeamline(UInt_t &count);
-  virtual TObjArray *GetScaler(UInt_t &count);
+  virtual void Set(TString pathName, TString type, TString value);
+  virtual void Set(TString pathName, TString type, Int_t value);
+  virtual void Set(TString pathName, TString type, TPsiRunProperty value);
+  virtual void Set(TString pathName, TString type, TStringVector value);
+  virtual void Set(TString pathName, TString type, TIntVector value);
 
-  virtual Bool_t ExtractHeaderInformation(TObjArray *headerInfo, TString path="/");
+  virtual Bool_t ExtractHeaderInformation(TObjArray *headerInfo, TString path) { return true; }
 
-  virtual void SetGenerator(TString generator) { fGenerator = generator; }
-  virtual void SetFileName(TString fileName) { fFileName = fileName; }
-  virtual void SetRunTitle(TString runTitle) { fRunTitle = runTitle; }
-  virtual void SetRunNumber(Int_t runNumber) { fRunNumber = runNumber; }
-  virtual void SetStartTime(TString startTime);
-  virtual void SetStopTime(TString stopTime);
-  virtual void SetLaboratory(TString lab) { fLaboratory = lab; }
-  virtual void SetArea(TString area) { fArea = area;}
-  virtual void SetInstrument(TString insturment) { fInstrument = insturment; }
-  virtual void SetMuonSpecies(TString muonSpecies) { fMuonSpecies = muonSpecies; }
-  virtual void SetSetup(TString setup) { fSetup = setup; }
-  virtual void SetComment(TString comment) { fComment = comment; }
-  virtual void SetSample(TString sample) { fSample = sample; }
-  virtual void SetOrientation(TString orientation) { fOrientation = orientation; }
-  virtual void SetSampleCryo(TString cryoName) { fSampleCryo = cryoName; }
-  virtual void SetSampleCryoInsert(TString cryoInsert) { fSampleCryoInsert = cryoInsert; }
-  virtual void SetSampleMagnetName(TString name) { fMagnetName = name; }
-  virtual void SetNoOfHistos(UInt_t noHistos) { fNoOfHistos = noHistos; }
-  virtual void SetHistoNames(vector<TString> names) { fHistoName = names; }
-  virtual void SetHistoName(TString name, Int_t idx=-1);
-  virtual void SetHistoLength(UInt_t length) { fHistoLength = (Int_t)length; }
-  virtual void SetTimeResolution(Double_t value, TString units);
-  virtual void SetTimeZeroBins(vector<UInt_t> timeZeroBins) { fTimeZeroBin = timeZeroBins; }
-  virtual void SetTimeZeroBin(UInt_t timeZeroBin, Int_t idx=-1);
-  virtual void SetFirstGoodBins(vector<UInt_t> fgb) { fFirstGoodBin = fgb; }
-  virtual void SetFirstGoodBin(UInt_t fgb, Int_t idx=-1);
-  virtual void SetLastGoodBins(vector<UInt_t> lgb) { fLastGoodBin = lgb; }
-  virtual void SetLastGoodBin(UInt_t lgb, Int_t idx=-1);
-  virtual void SetRedGreenHistogramOffsets(vector<UInt_t> offsets) { fRedGreenOffset = offsets; }
-  virtual void SetRedGreenHistogramOffset(UInt_t offset, Int_t idx=-1);
-  virtual void SetRedGreenDescriptions(vector<TString> description) { fRedGreenDescription = description; }
-  virtual void SetRedGreenDescription(TString description, Int_t idx=-1);
-  virtual void AddProperty(TPsiRunProperty &property);
-  virtual void AddProperty(TString name, Double_t demand, Double_t value, Double_t error, TString unit, TString desciption=TString(""), TString path=TString("/"));
-
-
-  virtual void DumpHeader() const;
-  virtual void DrawHeader() const;
+  virtual void DumpHeader();
+  virtual void DrawHeader();
 
 private:
-  TString  fVersion;     ///< SVN version of the TPsiRunHeader
-  TString  fGenerator;   ///< program which generated the PSI-ROOT file
-  TString  fFileName;    ///< file name of the PSI-ROOT file
-  TString  fRunTitle;    ///< run title
-  Int_t    fRunNumber;   ///< run number
-  TDatime  fStartTime;   ///< run start time
-  TDatime  fStopTime;    ///< run stop time
-  TString  fLaboratory;  ///< laboratory: PSI
-  TString  fArea;        ///< secondary beamline label, e.g. piM3.2
-  TString  fInstrument;  ///< instrument name like: GPS, LEM, ....
-  TString  fMuonSpecies; ///< postive muon or negative muon
-  TString  fSetup;       ///< setup
-  TString  fComment;     ///< additional comment
-  TString  fSample;      ///< sample name
-  TString  fOrientation; ///< sample orientation
-  TString  fSampleCryo;  ///< sample cryo
-  TString  fSampleCryoInsert; ///< sample cryo insert
-  TString  fMagnetName;  ///< name of the magnet used
-  Int_t    fNoOfHistos;  ///< number of histos
-  vector<TString> fHistoName; ///< names of the individual histograms
-  Int_t    fHistoLength; ///< length of the histograms in bins
-  Double_t fTimeResolution; ///< time resolution in ps
-  vector<UInt_t> fTimeZeroBin; ///< time zero bins
-  vector<UInt_t> fFirstGoodBin; ///< first good bins
-  vector<UInt_t> fLastGoodBin; ///< last good bins
-  vector<UInt_t> fRedGreenOffset; ///< red/green mode histogram offsets
-  vector<TString> fRedGreenDescription; ///< red/green mode description
-  vector<TPsiRunProperty> fProperties;
+  vector< TPsiRunObject<TString> > fStringObj;
+  vector< TPsiRunObject<Int_t> >   fIntObj;
+  vector< TPsiRunObject<TPsiRunProperty> > fPsiRunPropertyObj;
+  vector< TPsiRunObject<TStringVector> > fStringVectorObj;
+  vector< TPsiRunObject<TIntVector> > fIntVectorObj;
 
-  TObjArray fHeader;      ///< header as TObjString array for dumping into a ROOT file
-  TObjArray fSampleEnv;   ///< sample environment as TObjString array for dumping into a ROOT file
-  TObjArray fMagFieldEnv; ///< sample magnetic field environment as TObjString array for dumping into a ROOT file
-  TObjArray fBeamline;    ///< beamline info as TObjString array for dumping into a ROOT file
-  TObjArray fScalers;     ///< scaler info as TObjString array for dumping into a ROOT file
-
-  virtual Bool_t DecodePhyscialPorperty(TObjString *ostr, TPsiRunProperty &prop, TString &path);
+  TStringVector fFolder;
+  vector<TPsiEntry> fEntry;
 
   virtual UInt_t GetDecimalPlace(Double_t val);
   virtual UInt_t GetLeastSignificantDigit(Double_t val) const;
-
-  virtual void CleanUp(TObject *obj);
+  virtual void SplitPathName(TString pathName, TString &path, TString &name);
 
   ClassDef(TPsiRunHeader, 1)
 };

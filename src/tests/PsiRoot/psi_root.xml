@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<psi_root xmlns="http://lmu.web.psi.ch/facilities/software/psi-root.html">
+  <commet>
+      This is the generic PSI-ROOT header definition. 
+      $Id$
+  </commet>
+
+  <folder_structure>
+     <folder>
+       <name>RunInfo</name>
+     </folder> 
+     <folder>
+       <name>SampleEnv</name>
+     </folder> 
+     <folder>
+       <name>MagFieldEnv</name>
+     </folder> 
+     <folder>
+       <name>Beamline</name>
+     </folder>
+     <folder>
+       <name>Scaler</name>
+     </folder> 
+  </folder_structure>
+
+  <header_info>
+    <entry>
+      <name>RunInfo/Version</name>
+      <type>TString</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Generator</name>
+      <type>TString</type>
+    </entry>
+    <entry>
+      <name>RunInfo/File Name</name>
+      <type>TString</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Run Title</name>
+      <type>TString</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Run Number</name>
+      <type>Int_t</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Sample Temperature</name>
+      <type>TPsiRunProperty</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Time Resolution</name>
+      <type>TPsiRunProperty</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Muon Beam Momentum</name>
+      <type>TPsiRunProperty</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Histo Names</name>
+      <type>TStringVector</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Time Zero Bin</name>
+      <type>TIntVector</type>
+    </entry>
+    <entry>
+      <name>SampleEnv/Cryo</name>
+      <type>TString</type>
+    </entry>
+    <entry>
+      <name>SampleEnv/CF2</name>
+      <type>TPsiRunProperty</type>
+    </entry>
+    <entry>
+      <name>MagFieldEnv/Name</name>
+      <type>TString</type>
+    </entry>
+    <entry>
+      <name>MagFieldEnv/Current</name>
+      <type>TPsiRunProperty</type>
+    </entry>
+  </header_info>
+</psi_root>
+
