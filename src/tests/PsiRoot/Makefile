@@ -63,19 +63,34 @@ GLIBS         = $(ROOTGLIBS) -lXMLParser
 # PSI libs
 PSILIBS       = -lTPsiRunHeader
 
-EXEC = psi_runHeader_test
+EXEC  = 
+EXEC += psi_runHeader_test
+EXEC += write_psi_runHeader
+EXEC += read_psi_runHeader
 
 # some definitions: headers (used to generate *Dict* stuff), sources, objects,...
 OBJS =
-OBJS += $(EXEC).o
+OBJS += psi_runHeader_test.o
+OBJS += write_psi_runHeader.o
+OBJS += read_psi_runHeader.o
 
 # make the executable:
 #
 all:  $(EXEC)
 
-$(EXEC): $(OBJS)
-	@echo "---> Building $(EXEC) ..."
-	$(LD) $(OBJS) -o $(EXEC) $(GLIBS) $(PSILIBS)  
+psi_runHeader_test: psi_runHeader_test.o
+	@echo "---> Building psi_runHeader_test ..."
+	$(LD) psi_runHeader_test.o -o psi_runHeader_test $(GLIBS) $(PSILIBS)  
+	@echo "done"
+
+write_psi_runHeader: write_psi_runHeader.o
+	@echo "---> Building write_psi_runHeader ..."
+	$(LD) write_psi_runHeader.o -o write_psi_runHeader $(GLIBS) $(PSILIBS)  
+	@echo "done"
+
+read_psi_runHeader: read_psi_runHeader.o
+	@echo "---> Building read_psi_runHeader ..."
+	$(LD) read_psi_runHeader.o -o read_psi_runHeader $(GLIBS) $(PSILIBS)  
 	@echo "done"
 
 # clean up: remove all object file (and core files)

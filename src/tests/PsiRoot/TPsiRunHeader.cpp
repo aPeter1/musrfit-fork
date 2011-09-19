@@ -70,12 +70,12 @@ TPsiRunProperty::TPsiRunProperty()
 /**
  * <p>Constructor.
  *
- * \param name
- * \param demand
- * \param value
- * \param error
- * \param unit
- * \param description
+ * \param label of the physical property, e.g. 'Sample Temperature'
+ * \param demand value of the physical property
+ * \param value measured value of the physical property
+ * \param error estimated error of the physical property
+ * \param unit of the physical property, e.g. 'K'.
+ * \param description additional more detailed description of the physical property
  */
 TPsiRunProperty::TPsiRunProperty(TString label, Double_t demand, Double_t value, Double_t error, TString unit, TString description) :
     fLabel(label), fDemand(demand), fValue(value), fError(error), fUnit(unit)
@@ -92,16 +92,117 @@ TPsiRunProperty::TPsiRunProperty(TString label, Double_t demand, Double_t value,
 /**
  * <p>Constructor.
  *
- * \param name
- * \param value
- * \param unit
+ * \param label of the physical property, e.g. 'Sample Temperature'
+ * \param demand value of the physical property
+ * \param value measured value of the physical property
+ * \param unit of the physical property, e.g. 'K'.
+ * \param description additional more detailed description of the physical property
  */
-TPsiRunProperty::TPsiRunProperty(TString label, Double_t value, TString unit) :
+TPsiRunProperty::TPsiRunProperty(TString label, Double_t demand, Double_t value, TString unit, TString description) :
+    fLabel(label), fDemand(demand), fValue(value), fUnit(unit)
+{
+  fError = PRH_UNDEFINED;
+  if (description.IsWhitespace())
+    fDescription = "n/a";
+  else
+    fDescription = description;
+}
+
+//--------------------------------------------------------------------------
+// Constructor
+//--------------------------------------------------------------------------
+/**
+ * <p>Constructor.
+ *
+ * \param label of the physical property, e.g. 'Sample Temperature'
+ * \param value measured value of the physical property
+ * \param unit of the physical property, e.g. 'K'.
+ * \param description additional more detailed description of the physical property
+ */
+TPsiRunProperty::TPsiRunProperty(TString label, Double_t value, TString unit, TString description) :
     fLabel(label), fValue(value), fUnit(unit)
 {
   fDemand = PRH_UNDEFINED;
   fError  = PRH_UNDEFINED;
-  fDescription = "n/a";
+  if (description.IsWhitespace())
+    fDescription = "n/a";
+  else
+    fDescription = description;
+}
+
+//--------------------------------------------------------------------------
+// Set (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>set a physical property.
+ *
+ * \param label of the physical property, e.g. 'Sample Temperature'
+ * \param demand value of the physical property
+ * \param value measured value of the physical property
+ * \param error estimated error of the physical property
+ * \param unit of the physical property, e.g. 'K'.
+ * \param description additional more detailed description of the physical property
+ */
+void TPsiRunProperty::Set(TString label, Double_t demand, Double_t value, Double_t error, TString unit, TString description)
+{
+  fLabel = label;
+  fDemand = demand;
+  fValue = value;
+  fError = error;
+  fUnit = unit;
+  if (description.IsWhitespace())
+    fDescription = "n/a";
+  else
+    fDescription = description;
+}
+
+//--------------------------------------------------------------------------
+// Set (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>set a physical property.
+ *
+ * \param label of the physical property, e.g. 'Sample Temperature'
+ * \param demand value of the physical property
+ * \param value measured value of the physical property
+ * \param unit of the physical property, e.g. 'K'.
+ * \param description additional more detailed description of the physical property
+ */
+void TPsiRunProperty::Set(TString label, Double_t demand, Double_t value, TString unit, TString description)
+{
+  fLabel = label;
+  fDemand = demand;
+  fValue = value;
+  fError = PRH_UNDEFINED;
+  fUnit = unit;
+  if (description.IsWhitespace())
+    fDescription = "n/a";
+  else
+    fDescription = description;
+}
+
+//--------------------------------------------------------------------------
+// Set (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>set a physical property.
+ *
+ * \param label of the physical property, e.g. 'Sample Temperature'
+ * \param value measured value of the physical property
+ * \param unit of the physical property, e.g. 'K'.
+ * \param description additional more detailed description of the physical property
+ */
+void TPsiRunProperty::Set(TString label, Double_t value, TString unit, TString description)
+{
+  fLabel = label;
+  fDemand = PRH_UNDEFINED;
+  fValue = value;
+  fError = PRH_UNDEFINED;
+  fUnit = unit;
+  if (description.IsWhitespace())
+    fDescription = "n/a";
+  else
+    fDescription = description;
 }
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -319,13 +420,13 @@ ClassImp(TPsiRunHeader)
 /**
   * <p>Constructor.
   */
-TPsiRunHeader::TPsiRunHeader()
+TPsiRunHeader::TPsiRunHeader(const char *headerDefinition) : fHeaderDefinition(headerDefinition)
 {
   TSAXParser *saxParser = new TSAXParser();
   TPsiStartupHandler *startupHandler = new TPsiStartupHandler();
 
   saxParser->ConnectToHandler("TPsiStartupHandler", startupHandler);
-  Int_t status = saxParser->ParseFile("./psi_root.xml");
+  Int_t status = saxParser->ParseFile(headerDefinition);
 
   if (status) { // error
     // not clear what to do yet ...
@@ -379,16 +480,23 @@ TPsiRunHeader::~TPsiRunHeader()
 Bool_t TPsiRunHeader::IsValid(Bool_t strict)
 {
   Bool_t result = true;
+  TIntVector found;
   Int_t  count = 0;
+
+  found.resize(fEntry.size());
+  for (UInt_t i=0; i<found.size(); i++) {
+    found[i] = 0;
+  }
 
   for (UInt_t i=0; i<fEntry.size(); i++) {
     for (UInt_t j=0; j<fStringObj.size(); j++) {
       if (!fEntry[i].GetPathName().CompareTo(fStringObj[j].GetPathName())) {
         if (!fEntry[i].GetType().CompareTo("TString")) {
+          found[i] = 1;
           count++;
           break;
         } else {
-          cerr << endl << ">> **ERROR** found entry: " << fEntry[i].GetPathName() << " should be a 'TString' but is defined as " << fEntry[i].GetType().Data() << endl;
+          cerr << endl << ">> **ERROR** found entry: " << fEntry[i].GetPathName() << " is 'TString' (according to header/root-file) but is defined as '" << fEntry[i].GetType().Data() << "' (XML)" << endl;
           return false;
         }
       }
@@ -396,10 +504,11 @@ Bool_t TPsiRunHeader::IsValid(Bool_t strict)
     for (UInt_t j=0; j<fIntObj.size(); j++) {
       if (!fEntry[i].GetPathName().CompareTo(fIntObj[j].GetPathName())) {
         if (!fEntry[i].GetType().CompareTo("Int_t")) {
+          found[i] = 1;
           count++;
           break;
         } else {
-          cerr << endl << ">> **ERROR** found entry: " << fEntry[i].GetPathName() << " should be a 'Int_t' but is defined as " << fEntry[i].GetType().Data() << endl;
+          cerr << endl << ">> **ERROR** found entry: " << fEntry[i].GetPathName() << " is 'Int_t' (according to header/root-file) but is defined as '" << fEntry[i].GetType().Data() << "' (XML)" << endl;
           return false;
         }
       }
@@ -407,10 +516,11 @@ Bool_t TPsiRunHeader::IsValid(Bool_t strict)
     for (UInt_t j=0; j<fPsiRunPropertyObj.size(); j++) {
       if (!fEntry[i].GetPathName().CompareTo(fPsiRunPropertyObj[j].GetPathName())) {
         if (!fEntry[i].GetType().CompareTo("TPsiRunProperty")) {
+          found[i] = 1;
           count++;
           break;
         } else {
-          cerr << endl << ">> **ERROR** found entry: " << fEntry[i].GetPathName() << " should be a 'TPsiRunProperty' but is defined as " << fEntry[i].GetType().Data() << endl;
+          cerr << endl << ">> **ERROR** found entry: " << fEntry[i].GetPathName() << " is 'TPsiRunProperty' (according to header/root-file) but is defined as '" << fEntry[i].GetType().Data() << "' (XML)" << endl;
           return false;
         }
       }
@@ -418,10 +528,11 @@ Bool_t TPsiRunHeader::IsValid(Bool_t strict)
     for (UInt_t j=0; j<fStringVectorObj.size(); j++) {
       if (!fEntry[i].GetPathName().CompareTo(fStringVectorObj[j].GetPathName())) {
         if (!fEntry[i].GetType().CompareTo("TStringVector")) {
+          found[i] = 1;
           count++;
           break;
         } else {
-          cerr << endl << ">> **ERROR** found entry: " << fEntry[i].GetPathName() << " should be a 'TStringVector' but is defined as " << fEntry[i].GetType().Data() << endl;
+          cerr << endl << ">> **ERROR** found entry: " << fEntry[i].GetPathName() << " is 'TStringVector' (according to header/root-file) but is defined as '" << fEntry[i].GetType().Data() << "' (XML)" << endl;
           return false;
         }
       }
@@ -429,10 +540,11 @@ Bool_t TPsiRunHeader::IsValid(Bool_t strict)
     for (UInt_t j=0; j<fIntVectorObj.size(); j++) {
       if (!fEntry[i].GetPathName().CompareTo(fIntVectorObj[j].GetPathName())) {
         if (!fEntry[i].GetType().CompareTo("TIntVector")) {
+          found[i] = 1;
           count++;
           break;
         } else {
-          cerr << endl << ">> **ERROR** found entry: " << fEntry[i].GetPathName() << " should be a 'TIntVector' but is defined as " << fEntry[i].GetType().Data() << endl;
+          cerr << endl << ">> **ERROR** found entry: " << fEntry[i].GetPathName() << " is 'TIntVector' (according to header/root-file) but is defined as '" << fEntry[i].GetType().Data() << "' (XML)" << endl;
           return false;
         }
       }
@@ -441,17 +553,30 @@ Bool_t TPsiRunHeader::IsValid(Bool_t strict)
   if (count != (Int_t)fEntry.size()) {
     if (strict) {
       result = false;
-      cerr << endl << ">> **ERROR** only found " << count << " entries. " << fEntry.size() << " are required!" << endl;
+      cerr << endl << ">> **ERROR** in validation: only found " << count << " entries. " << fEntry.size() << " are required!" << endl;
     } else {
-      cerr << endl << ">> **WARNING** only found " << count << " entries. " << fEntry.size() << " are required!" << endl;
+      cerr << endl << ">> **WARNING** in validation: only found " << count << " entries. " << fEntry.size() << " are required!" << endl;
     }
   }
+
+  for (UInt_t i=0; i<found.size(); i++) {
+    if (!found[i]) {
+      if (strict) {
+        cerr << endl << ">> **ERROR** ";
+      } else {
+        cerr << endl << ">> **WARNING** ";
+      }
+      cerr << "Missing required entry: " << fEntry[i].GetPathName().Data() << ", type=" << fEntry[i].GetType().Data();
+    }
+  }
+
+  found.clear();
 
   return result;
 }
 
 //--------------------------------------------------------------------------
-// Get (public)
+// GetHeaderInfo (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Get PSI-ROOT header information of 'path'.
@@ -459,7 +584,7 @@ Bool_t TPsiRunHeader::IsValid(Bool_t strict)
  * \param requestedPath of the PSI-ROOT header, e.g. RunInfo
  * \param content of the requested PSI-ROOT header.
  */
-void TPsiRunHeader::Get(TString requestedPath, TObjArray &content)
+void TPsiRunHeader::GetHeaderInfo(TString requestedPath, TObjArray &content)
 {
   // make sure content is initialized
   content.Delete();
@@ -494,29 +619,49 @@ void TPsiRunHeader::Get(TString requestedPath, TObjArray &content)
           prop = fPsiRunPropertyObj[j].GetValue();
           Int_t digit, digit_d;
           if ((prop.GetDemand() != PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() != PRH_UNDEFINED) &&
-              (prop.GetUnit() != "n/a") && (prop.GetDescription() != "n/a")) {
+              (prop.GetUnit() != "n/a")) { // <value> +- <error> <unit>; SP: <demand> [; <description>]
             digit = GetDecimalPlace(prop.GetError());
             digit_d = GetLeastSignificantDigit(prop.GetDemand());
-            fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
-            tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(),
-                      prop.GetDemand(), prop.GetDescription().Data());
-          } else if ((prop.GetDemand() != PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() != PRH_UNDEFINED) &&
-                     (prop.GetUnit() != "n/a") && (prop.GetDescription() == "n/a")) {
-            digit = GetDecimalPlace(prop.GetError());
-            digit_d = GetLeastSignificantDigit(prop.GetDemand());
-            fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
-            tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(),
-                      prop.GetDemand());
+            if (prop.GetDescription() != "n/a") {
+              fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
+              tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(),
+                        prop.GetDemand(), prop.GetDescription().Data());
+            } else {
+              fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
+              tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(),
+                        prop.GetDemand());
+            }
           } else if ((prop.GetDemand() == PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() != PRH_UNDEFINED) &&
-                     (prop.GetUnit() != "n/a") && (prop.GetDescription() == "n/a")) {
+                     (prop.GetUnit() != "n/a")) { // <value> +- <error> <unit>; [; <description>]
             digit = GetDecimalPlace(prop.GetError());
-            fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s", digit, digit);
-            tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data());
+            if (prop.GetDescription() != "n/a") {
+              fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; %%s", digit, digit);
+              tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(), prop.GetDescription().Data());
+            } else {
+              fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s", digit, digit);
+              tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data());
+            }
           } else if ((prop.GetDemand() == PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() == PRH_UNDEFINED) &&
-                     (prop.GetUnit() != "n/a") && (prop.GetDescription() == "n/a")) {
+                     (prop.GetUnit() != "n/a")) { // <value> <unit> [; <description>]
             digit = GetLeastSignificantDigit(prop.GetValue());
-            fmt.Form("%%s: %%.%dlf %%s", digit);
-            tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data());
+            if (prop.GetDescription() != "n/a") {
+              fmt.Form("%%s: %%.%dlf %%s; %%s", digit);
+              tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data(), prop.GetDescription().Data());
+            } else {
+              fmt.Form("%%s: %%.%dlf %%s", digit);
+              tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data());
+            }
+          } else if ((prop.GetDemand() != PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() == PRH_UNDEFINED) &&
+                     (prop.GetUnit() != "n/a")) { // <value> <unit>; SP: <demand> [; <description>]
+            digit = GetLeastSignificantDigit(prop.GetValue());
+            digit_d = GetLeastSignificantDigit(prop.GetDemand());
+            if (prop.GetDescription() != "n/a") {
+              fmt.Form("%%s: %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit_d);
+              tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data(), prop.GetDemand(), prop.GetDescription().Data());
+            } else {
+              fmt.Form("%%s: %%.%dlf %%s; SP: %%.%dlf", digit, digit_d);
+              tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data(), prop.GetDemand());
+            }
           }
           str.Form("%03d - %s", count++, tstr.Data());
           tostr = new TObjString(str);
@@ -598,29 +743,47 @@ void TPsiRunHeader::Get(TString requestedPath, TObjArray &content)
         prop = fPsiRunPropertyObj[i].GetValue();
         Int_t digit, digit_d;
         if ((prop.GetDemand() != PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() != PRH_UNDEFINED) &&
-            (prop.GetUnit() != "n/a") && (prop.GetDescription() != "n/a")) {
+            (prop.GetUnit() != "n/a")) { // <value> +- <error> <unit>; SP: <demand> [; <description>]
           digit = GetDecimalPlace(prop.GetError());
           digit_d = GetLeastSignificantDigit(prop.GetDemand());
-          fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
-          tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(),
-                    prop.GetDemand(), prop.GetDescription().Data());
-        } else if ((prop.GetDemand() != PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() != PRH_UNDEFINED) &&
-                   (prop.GetUnit() != "n/a") && (prop.GetDescription() == "n/a")) {
-          digit = GetDecimalPlace(prop.GetError());
-          digit_d = GetLeastSignificantDigit(prop.GetDemand());
-          fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
-          tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(),
-                    prop.GetDemand());
+          if (prop.GetDescription() != "n/a") {
+            fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
+            tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(), prop.GetDemand(), prop.GetDescription().Data());
+          } else {
+            fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
+            tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(), prop.GetDemand());
+          }
         } else if ((prop.GetDemand() == PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() != PRH_UNDEFINED) &&
-                   (prop.GetUnit() != "n/a") && (prop.GetDescription() == "n/a")) {
+                   (prop.GetUnit() != "n/a")) { // <value> +- <error> <unit> [; <description>]
           digit = GetDecimalPlace(prop.GetError());
-          fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s", digit, digit);
-          tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data());
+          if (prop.GetDescription() != "n/a") {
+            fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; %%s", digit, digit);
+            tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(), prop.GetDescription().Data());
+          } else {
+            fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s", digit, digit);
+            tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data());
+          }
         } else if ((prop.GetDemand() == PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() == PRH_UNDEFINED) &&
-                   (prop.GetUnit() != "n/a") && (prop.GetDescription() == "n/a")) {
+                   (prop.GetUnit() != "n/a") && (prop.GetDescription() == "n/a")) { // <value> <unit> [; <description>]
           digit = GetLeastSignificantDigit(prop.GetValue());
-          fmt.Form("%%s: %%.%dlf %%s", digit);
-          tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data());
+          if (prop.GetDescription() != "n/a") {
+            fmt.Form("%%s: %%.%dlf %%s; %%s", digit);
+            tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data(), prop.GetDescription().Data());
+          } else {
+            fmt.Form("%%s: %%.%dlf %%s", digit);
+            tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data());
+          }
+        } else if ((prop.GetDemand() != PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() == PRH_UNDEFINED) &&
+                   (prop.GetUnit() != "n/a")) { // <value> <unit>; SP: <demand> [; <description>]
+          digit = GetLeastSignificantDigit(prop.GetValue());
+          digit_d = GetLeastSignificantDigit(prop.GetDemand());
+          if (prop.GetDescription() != "n/a") {
+            fmt.Form("%%s: %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit_d);
+            tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data(), prop.GetDemand(), prop.GetDescription().Data());
+          } else {
+            fmt.Form("%%s: %%.%dlf %%s; SP: %%.%dlf", digit, digit_d);
+            tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data(), prop.GetDemand());
+          }
         }
         str.Form("%03d - %s", count++, tstr.Data());
         tostr = new TObjString(str);
@@ -675,23 +838,132 @@ void TPsiRunHeader::Get(TString requestedPath, TObjArray &content)
 }
 
 //--------------------------------------------------------------------------
+// GetValue (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get TString 'value'.
+ *
+ * \param pathName path/name within the header, e.g. RunInfo/Run Title
+ * \param value TString return value
+ * \param ok flag telling if the TString value was found
+ */
+void TPsiRunHeader::GetValue(TString pathName, TString &value, Bool_t &ok)
+{
+  ok = false;
+
+  for (UInt_t i=0; i<fStringObj.size(); i++) {
+    if (fStringObj[i].GetPathName() == pathName) {
+      value = fStringObj[i].GetValue();
+      ok = true;
+    }
+  }
+}
+
+//--------------------------------------------------------------------------
+// GetValue (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get Int_t 'value'.
+ *
+ * \param pathName path/name within the header, e.g. RunInfo/Run Title
+ * \param value Int_t return value
+ * \param ok flag telling if the Int_t value was found
+ */
+void TPsiRunHeader::GetValue(TString pathName, Int_t &value, Bool_t &ok)
+{
+  ok = false;
+
+  for (UInt_t i=0; i<fIntObj.size(); i++) {
+    if (fIntObj[i].GetPathName() == pathName) {
+      value = fIntObj[i].GetValue();
+      ok = true;
+    }
+  }
+}
+
+//--------------------------------------------------------------------------
+// GetValue (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get TPsiRunProperty 'value'.
+ *
+ * \param pathName path/name within the header, e.g. RunInfo/Run Title
+ * \param value TPsiRunProperty return value
+ * \param ok flag telling if the TPsiRunProperty value was found
+ */
+void TPsiRunHeader::GetValue(TString pathName, TPsiRunProperty &value, Bool_t &ok)
+{
+  ok = false;
+
+  for (UInt_t i=0; i<fPsiRunPropertyObj.size(); i++) {
+    if (fPsiRunPropertyObj[i].GetPathName() == pathName) {
+      value = fPsiRunPropertyObj[i].GetValue();
+      ok = true;
+    }
+  }
+}
+
+//--------------------------------------------------------------------------
+// GetValue (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get TStringVector 'value'.
+ *
+ * \param pathName path/name within the header, e.g. RunInfo/Run Title
+ * \param value TStringVector return value
+ * \param ok flag telling if the TStringVector value was found
+ */
+void TPsiRunHeader::GetValue(TString pathName, TStringVector &value, Bool_t &ok)
+{
+  ok = false;
+
+  for (UInt_t i=0; i<fStringVectorObj.size(); i++) {
+    if (fStringVectorObj[i].GetPathName() == pathName) {
+      value = fStringVectorObj[i].GetValue();
+      ok = true;
+    }
+  }
+}
+
+//--------------------------------------------------------------------------
+// GetValue (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get TIntVector 'value'.
+ *
+ * \param pathName path/name within the header, e.g. RunInfo/Run Title
+ * \param value TIntVector return value
+ * \param ok flag telling if the TIntVector value was found
+ */
+void TPsiRunHeader::GetValue(TString pathName, TIntVector &value, Bool_t &ok)
+{
+  ok = false;
+
+  for (UInt_t i=0; i<fIntVectorObj.size(); i++) {
+    if (fIntVectorObj[i].GetPathName() == pathName) {
+      value = fIntVectorObj[i].GetValue();
+      ok = true;
+    }
+  }
+}
+
+//--------------------------------------------------------------------------
 // Set (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Set TString 'value'.
  *
  * \param pathName path/name within the header, e.g. RunInfo/Run Title
- * \param type of the object
  * \param value of the entry
  */
-void TPsiRunHeader::Set(TString pathName, TString type, TString value)
+void TPsiRunHeader::Set(TString pathName, TString value)
 {
   // check if pathName is already set, and if not add it as a new entry
   UInt_t i=0;
   for (i=0; i<fStringObj.size(); i++) {
     if (!fStringObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
       cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
-      fStringObj[i].SetType(type);
+      fStringObj[i].SetType("TString");
       fStringObj[i].SetValue(value);
       break;
     }
@@ -699,7 +971,7 @@ void TPsiRunHeader::Set(TString pathName, TString type, TString value)
 
   // if not found in the previous loop, it is a new object
   if (i == fStringObj.size()) {
-    TPsiRunObject<TString> obj(pathName, type, value);
+    TPsiRunObject<TString> obj(pathName, "TString", value);
     fStringObj.push_back(obj);
   }
 }
@@ -711,17 +983,16 @@ void TPsiRunHeader::Set(TString pathName, TString type, TString value)
  * <p>Set Int_t 'value'.
  *
  * \param pathName path/name within the header, e.g. RunInfo/Run number
- * \param type of the object
  * \param value of the entry
  */
-void TPsiRunHeader::Set(TString pathName, TString type, Int_t value)
+void TPsiRunHeader::Set(TString pathName, Int_t value)
 {
   // check if pathName is already set, and if not add it as a new entry
   UInt_t i=0;
   for (i=0; i<fIntObj.size(); i++) {
     if (!fIntObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
       cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
-      fIntObj[i].SetType(type);
+      fIntObj[i].SetType("Int_t");
       fIntObj[i].SetValue(value);
       break;
     }
@@ -729,7 +1000,7 @@ void TPsiRunHeader::Set(TString pathName, TString type, Int_t value)
 
   // if not found in the previous loop, it is a new object
   if (i == fIntObj.size()) {
-    TPsiRunObject<Int_t> obj(pathName, type, value);
+    TPsiRunObject<Int_t> obj(pathName, "Int_t", value);
     fIntObj.push_back(obj);
   }
 }
@@ -741,17 +1012,16 @@ void TPsiRunHeader::Set(TString pathName, TString type, Int_t value)
  * <p>Set TPsiRunProperty 'value'.
  *
  * \param pathName path/name within the header, e.g. RunInfo/Muon Beam Momentum
- * \param type of the object
  * \param value of the entry
  */
-void TPsiRunHeader::Set(TString pathName, TString type, TPsiRunProperty value)
+void TPsiRunHeader::Set(TString pathName, TPsiRunProperty value)
 {
   // check if pathName is already set, and if not add it as a new entry
   UInt_t i=0;
   for (i=0; i<fPsiRunPropertyObj.size(); i++) {
     if (!fPsiRunPropertyObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
       cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
-      fPsiRunPropertyObj[i].SetType(type);
+      fPsiRunPropertyObj[i].SetType("TPsiRunProperty");
       fPsiRunPropertyObj[i].SetValue(value);
       break;
     }
@@ -759,7 +1029,7 @@ void TPsiRunHeader::Set(TString pathName, TString type, TPsiRunProperty value)
 
   // if not found in the previous loop, it is a new object
   if (i == fPsiRunPropertyObj.size()) {
-    TPsiRunObject<TPsiRunProperty> obj(pathName, type, value);
+    TPsiRunObject<TPsiRunProperty> obj(pathName, "TPsiRunProperty", value);
     fPsiRunPropertyObj.push_back(obj);
   }
 }
@@ -771,17 +1041,16 @@ void TPsiRunHeader::Set(TString pathName, TString type, TPsiRunProperty value)
  * <p>Set TStringVector 'value'.
  *
  * \param pathName path/name within the header, e.g. RunInfo/Histo names
- * \param type of the object
  * \param value of the entry
  */
-void TPsiRunHeader::Set(TString pathName, TString type, TStringVector value)
+void TPsiRunHeader::Set(TString pathName, TStringVector value)
 {
   // check if pathName is already set, and if not add it as a new entry
   UInt_t i=0;
   for (i=0; i<fStringVectorObj.size(); i++) {
     if (!fStringVectorObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
       cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
-      fStringVectorObj[i].SetType(type);
+      fStringVectorObj[i].SetType("TStringVector");
       fStringVectorObj[i].SetValue(value);
       break;
     }
@@ -789,7 +1058,7 @@ void TPsiRunHeader::Set(TString pathName, TString type, TStringVector value)
 
   // if not found in the previous loop, it is a new object
   if (i == fStringVectorObj.size()) {
-    TPsiRunObject<TStringVector> obj(pathName, type, value);
+    TPsiRunObject<TStringVector> obj(pathName, "TStringVector", value);
     fStringVectorObj.push_back(obj);
   }
 }
@@ -801,17 +1070,16 @@ void TPsiRunHeader::Set(TString pathName, TString type, TStringVector value)
  * <p>Set TIntVector 'value'.
  *
  * \param pathName path/name within the header, e.g. RunInfo/Time Zero Bin
- * \param type of the object
  * \param value of the entry
  */
-void TPsiRunHeader::Set(TString pathName, TString type, TIntVector value)
+void TPsiRunHeader::Set(TString pathName, TIntVector value)
 {
   // check if pathName is already set, and if not add it as a new entry
   UInt_t i=0;
   for (i=0; i<fIntVectorObj.size(); i++) {
     if (!fIntVectorObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
       cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
-      fIntVectorObj[i].SetType(type);
+      fIntVectorObj[i].SetType("TIntVector");
       fIntVectorObj[i].SetValue(value);
       break;
     }
@@ -819,9 +1087,243 @@ void TPsiRunHeader::Set(TString pathName, TString type, TIntVector value)
 
   // if not found in the previous loop, it is a new object
   if (i == fIntVectorObj.size()) {
-    TPsiRunObject<TIntVector> obj(pathName, type, value);
+    TPsiRunObject<TIntVector> obj(pathName, "TIntVector", value);
     fIntVectorObj.push_back(obj);
   }
+}
+
+//--------------------------------------------------------------------------
+// ExtractHeaderInformation (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param headerInfo
+ * \param requestedPath
+ */
+Bool_t TPsiRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString requestedPath)
+{
+  TString name(""), path(""), pathName(""), str(""), strValue("");
+  TObjString *ostr = 0;
+  TObjArray *tokens = 0;
+  Bool_t required=false;
+  UInt_t idx;
+  Int_t  intValue;
+
+  // go through all entries of this header information from the PSI-ROOT file
+  for (Int_t i=0; i<headerInfo->GetEntries(); i++) {
+    required=false;
+    ostr = dynamic_cast<TObjString*>(headerInfo->At(i));
+    str = ostr->GetString();
+    // handle required entry
+    for (UInt_t j=0; j<fEntry.size(); j++) {
+      // check if the XML entry has the right requested path
+      if (fEntry[j].GetPathName().Contains(requestedPath)) {
+        SplitPathName(fEntry[j].GetPathName(), path, name);
+        if (str.Contains(name)) {
+          required=true;
+          idx = j;
+          break;
+        }
+      }
+    }
+    if (required) { // handle required entry
+      // get the name
+      Ssiz_t idx1, idx2;
+      idx1 = str.First('-');
+      idx2 = str.First(':');
+      name = TString("");
+      for (Int_t i=idx1+2; i<idx2; i++)
+        name += str[i];
+      // get the 'value'
+      strValue = TString("");
+      for (Int_t i=idx2+2; i<str.Length(); i++)
+        strValue += str[i];
+      pathName = requestedPath + TString("/") + name;
+
+      if (fEntry[idx].GetType() == "TString") {
+        Set(pathName, strValue);
+      } else if (fEntry[idx].GetType() == "Int_t") {
+        intValue = strValue.Atoi();
+        Set(pathName, intValue);
+      } else if (fEntry[idx].GetType() == "TPsiRunProperty") {
+        TPsiRunProperty prop;
+        prop.SetLabel(name);
+
+        // 1st get the description if present
+        tokens = strValue.Tokenize(";");
+        if (tokens == 0) {
+          cerr << endl << ">> **ERROR** Couldn't tokenize entry in Bool_t TPsiRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString requestedPath)" << endl;
+          return false;
+        }
+
+        switch (tokens->GetEntries()) {
+        case 2:
+          ostr = dynamic_cast<TObjString*>(tokens->At(1));
+          str = ostr->GetString();
+          if (!str.Contains("SP:")) { // make sure that it is not a demand value token
+            prop.SetDescription(str);
+          }
+          break;
+        case 3:
+          ostr = dynamic_cast<TObjString*>(tokens->At(2));
+          str = ostr->GetString();
+          break;
+        default:
+          break;
+        }
+
+        if (tokens) {
+          delete tokens;
+          tokens = 0;
+        }
+
+        // 2nd collect all the other properties, this is easier when first a potential description is removed
+        idx1 = strValue.Last(';');
+        if (idx1 > 0) {
+          TString last("");
+          for (Int_t i=idx1+2; i<strValue.Length(); i++)
+            last += strValue[i];
+          // check if last is <description> or SP: <demand>
+          if (!last.Contains("SP:")) {
+            str = "";
+            for (Int_t i=0; i<idx1; i++)
+              str += strValue[i];
+            strValue = str;
+          }
+        }
+
+        tokens = strValue.Tokenize(" +;");
+        if (tokens == 0) {
+          cerr << endl << ">> **ERROR** Couldn't tokenize entry in Bool_t TPsiRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString requestedPath)" << endl;
+          return false;
+        }
+
+        switch (tokens->GetEntries()) {
+        case 2: // <val> <unit>
+          ostr = dynamic_cast<TObjString*>(tokens->At(0));
+          str = ostr->GetString();
+          prop.SetValue(str.Atof());
+          ostr = dynamic_cast<TObjString*>(tokens->At(1));
+          str = ostr->GetString();
+          prop.SetUnit(str);
+          break;
+        case 4: // <val> +- <err> <unit>, or <val> <unit>; SP: <demand>
+          ostr = dynamic_cast<TObjString*>(tokens->At(0));
+          str = ostr->GetString();
+          prop.SetValue(str.Atof());
+          ostr = dynamic_cast<TObjString*>(tokens->At(1));
+          str = ostr->GetString();
+          if (str == "-") { // <val> +- <err> <unit>
+            ostr = dynamic_cast<TObjString*>(tokens->At(2));
+            str = ostr->GetString();
+            prop.SetError(str.Atof());
+            ostr = dynamic_cast<TObjString*>(tokens->At(3));
+            str = ostr->GetString();
+            prop.SetUnit(str);
+          } else { // <val> <unit>; SP: <demand>
+            prop.SetUnit(str);
+            ostr = dynamic_cast<TObjString*>(tokens->At(3));
+            str = ostr->GetString();
+            prop.SetDemand(str.Atof());
+          }
+          break;
+        case 6: // <val> +- <err> <unit>; SP: <demand>
+          ostr = dynamic_cast<TObjString*>(tokens->At(0));
+          str = ostr->GetString();
+          prop.SetValue(str.Atof());
+          ostr = dynamic_cast<TObjString*>(tokens->At(2));
+          str = ostr->GetString();
+          prop.SetError(str.Atof());
+          ostr = dynamic_cast<TObjString*>(tokens->At(3));
+          str = ostr->GetString();
+          prop.SetUnit(str);
+          ostr = dynamic_cast<TObjString*>(tokens->At(5));
+          str = ostr->GetString();
+          prop.SetDemand(str.Atof());
+          break;
+        default:
+          break;
+        }
+
+        if (tokens) {
+          delete tokens;
+          tokens = 0;
+        }
+
+        Set(pathName, prop);
+      } else if (fEntry[idx].GetType() == "TStringVector") {
+        TStringVector svec;
+        tokens = strValue.Tokenize(";");
+        if (tokens == 0) {
+          cerr << endl << ">> **ERROR** Couldn't tokenize entry in Bool_t TPsiRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString requestedPath)" << endl;
+          return false;
+        }
+        for (Int_t i=0; i<tokens->GetEntries(); i++) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(i));
+          str = ostr->GetString();
+          str.Remove(TString::kBoth, ' ');
+          svec.push_back(str);
+        }
+        if (tokens) {
+          delete tokens;
+          tokens = 0;
+        }
+        Set(pathName, svec);
+      } else if (fEntry[idx].GetType() == "TIntVector") {
+        TIntVector ivec;
+        tokens = strValue.Tokenize(";");
+        if (tokens == 0) {
+          cerr << endl << ">> **ERROR** Couldn't tokenize entry in Bool_t TPsiRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString requestedPath)" << endl;
+          return false;
+        }
+        for (Int_t i=0; i<tokens->GetEntries(); i++) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(i));
+          ivec.push_back(ostr->GetString().Atoi());
+        }
+        if (tokens) {
+          delete tokens;
+          tokens = 0;
+        }
+        Set(pathName, ivec);
+      }
+    }
+  }
+
+  // go through all entries of this header information from the PSI-ROOT file
+  for (Int_t i=0; i<headerInfo->GetEntries(); i++) {
+    required=false;
+    ostr = dynamic_cast<TObjString*>(headerInfo->At(i));
+    str = ostr->GetString();
+    // handle additional entries, i.e. not required entries
+    for (UInt_t j=0; j<fEntry.size(); j++) {
+      // check if the XML entry has the right requested path
+      if (fEntry[j].GetPathName().Contains(requestedPath)) {
+        SplitPathName(fEntry[j].GetPathName(), path, name);
+        if (str.Contains(name)) {
+          required=true;
+          break;
+        }
+      }
+    }
+    if (!required) { // handle not required but fitting the requested path
+      // get the name
+      Ssiz_t idx1, idx2;
+      idx1 = str.First('-');
+      idx2 = str.First(':');
+      name = TString("");
+      for (Int_t i=idx1+2; i<idx2; i++)
+        name += str[i];
+      // get the 'value'
+      strValue = TString("");
+      for (Int_t i=idx2+2; i<str.Length(); i++)
+        strValue += str[i];
+      pathName = requestedPath + TString("/") + name;
+      Set(pathName, strValue);
+    }
+  }
+
+  return true;
 }
 
 //--------------------------------------------------------------------------
@@ -832,10 +1334,17 @@ void TPsiRunHeader::Set(TString pathName, TString type, TIntVector value)
  */
 void TPsiRunHeader::DumpHeader()
 {
+  cout << endl << "***************************************";
+  cout << endl << "used header definition: " << fHeaderDefinition.Data();
+  cout << endl << "***************************************";
+
   TString tstr(""), tstr1(""), fmt(""), path(""), name("");
   TPsiRunProperty prop;
 
   // go first through all objects defined in psi_root.xml
+  cout << endl << endl << "---------------";
+  cout << endl << "Entries which are **PRESENT** in psi_root.xml";
+  cout << endl << "---------------" << endl;
   for (UInt_t i=0; i<fFolder.size(); i++) {
     cout << endl << fFolder[i].Data() << ":";
     for (UInt_t j=0; j<fEntry.size(); j++) {
@@ -869,29 +1378,47 @@ void TPsiRunHeader::DumpHeader()
               prop = fPsiRunPropertyObj[k].GetValue();
               Int_t digit, digit_d;
               if ((prop.GetDemand() != PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() != PRH_UNDEFINED) &&
-                  (prop.GetUnit() != "n/a") && (prop.GetDescription() != "n/a")) {
+                  (prop.GetUnit() != "n/a")) {
                 digit = GetDecimalPlace(prop.GetError());
                 digit_d = GetLeastSignificantDigit(prop.GetDemand());
-                fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
-                tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(),
-                           prop.GetDemand(), prop.GetDescription().Data());
-              } else if ((prop.GetDemand() != PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() != PRH_UNDEFINED) &&
-                         (prop.GetUnit() != "n/a") && (prop.GetDescription() == "n/a")) {
-                digit = GetDecimalPlace(prop.GetError());
-                digit_d = GetLeastSignificantDigit(prop.GetDemand());
-                fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
-                tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(),
-                           prop.GetDemand());
+                if (prop.GetDescription() != "n/a") {
+                  fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
+                  tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(), prop.GetDemand(), prop.GetDescription().Data());
+                } else {
+                  fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
+                  tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(), prop.GetDemand());
+                }
               } else if ((prop.GetDemand() == PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() != PRH_UNDEFINED) &&
-                         (prop.GetUnit() != "n/a") && (prop.GetDescription() == "n/a")) {
+                         (prop.GetUnit() != "n/a")) {
                 digit = GetDecimalPlace(prop.GetError());
-                fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s", digit, digit);
-                tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data());
+                if (prop.GetDescription() != "n/a") {
+                  fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; %%s", digit, digit);
+                  tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(), prop.GetDescription().Data());
+                } else {
+                  fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s", digit, digit);
+                  tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data());
+                }
               } else if ((prop.GetDemand() == PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() == PRH_UNDEFINED) &&
-                         (prop.GetUnit() != "n/a") && (prop.GetDescription() == "n/a")) {
+                         (prop.GetUnit() != "n/a")) {
                 digit = GetLeastSignificantDigit(prop.GetValue());
-                fmt.Form("%%s: %%.%dlf %%s", digit);
-                tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data());
+                if (prop.GetDescription() != "n/a") {
+                  fmt.Form("%%s: %%.%dlf %%s; %%s", digit);
+                  tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data(), prop.GetDescription().Data());
+                } else {
+                  fmt.Form("%%s: %%.%dlf %%s", digit);
+                  tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data());
+                }
+              } else if ((prop.GetDemand() != PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() == PRH_UNDEFINED) &&
+                         (prop.GetUnit() != "n/a")) {
+                digit = GetLeastSignificantDigit(prop.GetValue());
+                digit_d = GetLeastSignificantDigit(prop.GetDemand());
+                if (prop.GetDescription() != "n/a") {
+                  fmt.Form("%%s: %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit_d);
+                  tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data(), prop.GetDemand(), prop.GetDescription().Data());
+                } else {
+                  fmt.Form("%%s: %%.%dlf %%s; SP: %%.%dlf", digit, digit_d);
+                  tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data(), prop.GetDemand());
+                }
               }
               cout << endl << tstr.Data() << tstr1.Data();
               break;
@@ -932,8 +1459,9 @@ void TPsiRunHeader::DumpHeader()
 
   // go through all objects **NOT** defined in psi_root.xml
   // this is needed if a less strict validation is wanted
-  cout << endl << endl << "---------------" << endl;
+  cout << endl << endl << "---------------";
   cout << endl << "Entries which are **NOT** present in psi_root.xml";
+  cout << endl << "---------------" << endl;
   Int_t count = fEntry.size()+1;
   for (UInt_t i=0; i<fFolder.size(); i++) {
     cout << endl << fFolder[i].Data() << ":";
@@ -975,29 +1503,47 @@ void TPsiRunHeader::DumpHeader()
         prop = fPsiRunPropertyObj[j].GetValue();
         Int_t digit, digit_d;
         if ((prop.GetDemand() != PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() != PRH_UNDEFINED) &&
-            (prop.GetUnit() != "n/a") && (prop.GetDescription() != "n/a")) {
+            (prop.GetUnit() != "n/a")) {
           digit = GetDecimalPlace(prop.GetError());
           digit_d = GetLeastSignificantDigit(prop.GetDemand());
-          fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
-          tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(),
-                     prop.GetDemand(), prop.GetDescription().Data());
-        } else if ((prop.GetDemand() != PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() != PRH_UNDEFINED) &&
-                   (prop.GetUnit() != "n/a") && (prop.GetDescription() == "n/a")) {
-          digit = GetDecimalPlace(prop.GetError());
-          digit_d = GetLeastSignificantDigit(prop.GetDemand());
-          fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
-          tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(),
-                     prop.GetDemand());
+          if (prop.GetDescription() != "n/a") {
+            fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
+            tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(), prop.GetDemand(), prop.GetDescription().Data());
+          } else {
+            fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
+            tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(), prop.GetDemand());
+          }
         } else if ((prop.GetDemand() == PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() != PRH_UNDEFINED) &&
-                   (prop.GetUnit() != "n/a") && (prop.GetDescription() == "n/a")) {
+                   (prop.GetUnit() != "n/a")) {
           digit = GetDecimalPlace(prop.GetError());
-          fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s", digit, digit);
-          tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data());
+          if (prop.GetDescription() != "n/a") {
+            fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; %%s", digit, digit);
+            tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(), prop.GetDescription().Data());
+          } else {
+            fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s", digit, digit);
+            tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data());
+          }
         } else if ((prop.GetDemand() == PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() == PRH_UNDEFINED) &&
-                   (prop.GetUnit() != "n/a") && (prop.GetDescription() == "n/a")) {
+                   (prop.GetUnit() != "n/a")) {
           digit = GetLeastSignificantDigit(prop.GetValue());
-          fmt.Form("%%s: %%.%dlf %%s", digit);
-          tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data());
+          if (prop.GetDescription() != "n/a") {
+            fmt.Form("%%s: %%.%dlf %%s; %%s", digit);
+            tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data(), prop.GetDescription().Data());
+          } else {
+            fmt.Form("%%s: %%.%dlf %%s", digit);
+            tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data());
+          }
+        } else if ((prop.GetDemand() != PRH_UNDEFINED) && (prop.GetValue() != PRH_UNDEFINED) && (prop.GetError() == PRH_UNDEFINED) &&
+                   (prop.GetUnit() != "n/a")) {
+          digit = GetLeastSignificantDigit(prop.GetValue());
+          digit_d = GetLeastSignificantDigit(prop.GetDemand());
+          if (prop.GetDescription() != "n/a") {
+            fmt.Form("%%s: %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit_d);
+            tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data(), prop.GetDemand(), prop.GetDescription().Data());
+          } else {
+            fmt.Form("%%s: %%.%dlf %%s; SP: %%.%dlf", digit, digit_d);
+            tstr1.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data(), prop.GetDemand());
+          }
         }
         tstr.Form("  %03d - ", count++);
         cout << endl << tstr.Data() << tstr1.Data();
@@ -1138,11 +1684,9 @@ void TPsiRunHeader::SplitPathName(TString pathName, TString &path, TString &name
 
   for (Int_t i=0; i<idx; i++)
     path += pathName[i];
-  path += '\0';
 
   for (Int_t i=idx+1; i<pathName.Length(); i++)
     name += pathName[i];
-  name += '\0';
 }
 
 // end ---------------------------------------------------------------------

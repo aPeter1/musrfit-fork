@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  psi_runHeader_test.cpp
+  write_runHeader.cpp
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -29,6 +29,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <cstdlib>
+#include <ctime>
+#include <cstring>
+
 #include <iostream>
 using namespace std;
 
@@ -38,9 +42,9 @@ using namespace std;
 
 #include "TPsiRunHeader.h"
 
-void psi_runHeader_test_syntax()
+void write_psi_runHeader_syntax()
 {
-  cout << endl << "usage: psi_runHeader_test <fileName> <headerDefinition> [<strict>]";
+  cout << endl << "usage: write_psi_runHeader <fileName> <headerDefinition> [<strict>]";
   cout << endl << "       <fileName> is the file name including the extention root, e.g. test.root";
   cout << endl << "       <headerDefinition> is the header definition XML-file.";
   cout << endl << "       <strict> 'strict'=strict validation; otherwise=less strict validation.";
@@ -50,7 +54,7 @@ void psi_runHeader_test_syntax()
 int main(int argc, char *argv[])
 {
   if ((argc != 3) && (argc != 4)) {
-    psi_runHeader_test_syntax();
+    write_psi_runHeader_syntax();
     return 1;
   }
 
@@ -68,35 +72,75 @@ int main(int argc, char *argv[])
   header->Set("RunInfo/Version", "$Id$");
   header->Set("RunInfo/Generator", "any2many");
   header->Set("RunInfo/File Name", "thisIsAFileName");
-//  header->Set("RunInfo/Run Title", "here comes the run title");
-  header->Set("RunInfo/Run Number", 576);
+  header->Set("RunInfo/Run Title", "here comes the run title");
   header->Set("RunInfo/Run Number", 577);
-  header->Set("RunInfo/Run Start Time", "2011-04-19 14:25:22");
-  header->Set("RunInfo/Run Stop Time", "2011-04-19 19:13:47");
 
-  prop.Set("Time Resolution", 0.193525, "ns", "TDC 9999");
-  header->Set("RunInfo/Time Resolution", prop);
+  // run info - start/stop time and duration
+  TString startTime("2011-04-19 14:25:22"), stopTime("2011-04-19 19:13:47");
+  struct tm tm_start, tm_stop;
+  header->Set("RunInfo/Run Start Time", startTime);
+  header->Set("RunInfo/Run Stop Time", stopTime);
+  // calculate run duration
+  memset(&tm_start, 0, sizeof(tm_start));
+  strptime(startTime.Data(), "%Y-%m-%d %H:%M:%S", &tm_start);
+  memset(&tm_stop, 0, sizeof(tm_stop));
+  strptime(stopTime.Data(), "%Y-%m-%d %H:%M:%S", &tm_stop);
+  Double_t duration = difftime(mktime(&tm_stop), mktime(&tm_start));
+  header->Set("RunInfo/Run Duration", (Int_t)duration);
+
+  header->Set("RunInfo/Laboratory", "PSI");
+  header->Set("RunInfo/Area", "piM3.2");
+  header->Set("RunInfo/Instrument", "GPS");
+
+  prop.Set("Muon Beam Momentum", 28.1, "MeV/c");
+  header->Set("RunInfo/Muon Beam Momentum", prop);
+
+  header->Set("RunInfo/Muon Species", "positive muon");
+  header->Set("RunInfo/Setup", "a very special setup");
+  header->Set("RunInfo/Comment", "nothing more to be said");
+  header->Set("RunInfo/Sample Name", "the best ever");
 
   prop.Set("Sample Temperature", 3.2, 3.21, 0.05, "K", "CF1");
   header->Set("RunInfo/Sample Temperature", prop);
 
-  prop.Set("Muon Beam Momentum", PRH_UNDEFINED, 28.1, PRH_UNDEFINED, "MeV/c");
-  header->Set("RunInfo/Muon Beam Momentum", prop);
+  prop.Set("Sample Magnetic Field", 350.0, 350.002, 0.005, "G", "WXY");
+  header->Set("RunInfo/Sample Magnetic Field", prop);
+
+  header->Set("RunInfo/No of Histos", 4);
 
   TStringVector detectorName;
-  detectorName.push_back("left_down");
-  detectorName.push_back("left_up");
-  detectorName.push_back("top_down");
-  detectorName.push_back("top_up");
-  detectorName.push_back("right_down");
-  detectorName.push_back("right_up");
-  detectorName.push_back("bottom_down");
-  detectorName.push_back("bottom_up");
+  detectorName.push_back("forward");
+  detectorName.push_back("top");
+  detectorName.push_back("backward");
+  detectorName.push_back("bottom");
   header->Set("RunInfo/Histo Names", detectorName);
 
+  header->Set("RunInfo/Histo Length", 8192);
+
+  prop.Set("Time Resolution", 0.193525, "ns", "TDC 9999");
+  header->Set("RunInfo/Time Resolution", prop);
+
   TIntVector t0;
-  for (UInt_t i=0; i<8; i++) t0.push_back(3419);
+  for (UInt_t i=0; i<4; i++) t0.push_back(215+(Int_t)(5.0*(Double_t)rand()/(Double_t)RAND_MAX));
   header->Set("RunInfo/Time Zero Bin", t0);
+  for (UInt_t i=0; i<4; i++) t0[i] += 12;
+  header->Set("RunInfo/First Good Bin", t0);
+  for (UInt_t i=0; i<4; i++) t0[i] = 8191;
+  header->Set("RunInfo/Last Good Bin", t0);
+
+  TIntVector readGreenOffset;
+  readGreenOffset.push_back(0);
+  readGreenOffset.push_back(10);
+  readGreenOffset.push_back(20);
+  readGreenOffset.push_back(30);
+  header->Set("RunInfo/Red-Green Offsets", readGreenOffset);
+
+  TStringVector redGreenDescription;
+  redGreenDescription.push_back("E-field/light off/off");
+  redGreenDescription.push_back("E-field/light on/off");
+  redGreenDescription.push_back("E-field/light off/on");
+  redGreenDescription.push_back("E-field/light on/on");
+  header->Set("RunInfo/Red-Green Description", redGreenDescription);
 
   TStringVector dummyTest;
   dummyTest.push_back("dummy1");
@@ -106,6 +150,8 @@ int main(int argc, char *argv[])
 
   // sample environment
   header->Set("SampleEnv/Cryo", "Konti-1");
+  header->Set("SampleEnv/Insert", "X123");
+  header->Set("SampleEnv/Orientation", "c-axis perp spin, perp field. spin perp field");
 
   prop.Set("CF2", 3.2, 3.22, 0.04, "K");
   header->Set("SampleEnv/CF2", prop);
@@ -182,136 +228,6 @@ int main(int argc, char *argv[])
 
   delete f;
   f = 0;
-
-  header->DumpHeader();
-
-  delete header;
-  header = 0;
-
-  cout << endl << "++++++++++++++++++++++++++++";
-  cout << endl << ">> read back " << argv[1];
-  cout << endl << "++++++++++++++++++++++++++++" << endl;
-
-  // read the file back and extract the header info
-  f = new TFile(argv[1], "READ", "psi_runHeader_test");
-  if (f->IsZombie()) {
-    delete f;
-    return -1;
-  }
-
-  runHeader = 0;
-  f->GetObject("RunHeaderInfo", runHeader);
-  if (runHeader == 0) {
-    cerr << endl << ">> **ERROR** Couldn't get top folder RunHeaderInfo";
-    f->Close();
-    return -1;
-  }
-
-  TObjArray *oarray = 0;
-  header = new TPsiRunHeader(argv[2]);
-
-  // get RunHeader
-  oarray = (TObjArray*) runHeader->FindObjectAny("RunInfo");
-  if (oarray == 0) {
-    cerr << endl << ">> **ERROR** Couldn't get RunHeader" << endl;
-  }
-  header->ExtractHeaderInformation(oarray, "RunInfo");
-
-  // get SampleEnv
-  oarray = (TObjArray*) runHeader->FindObjectAny("SampleEnv");
-  if (oarray == 0) {
-    cerr << endl << ">> **ERROR** Couldn't get SampleEnv" << endl;
-  }
-  header->ExtractHeaderInformation(oarray, "SampleEnv");
-
-  // get MagFieldEnv
-  oarray = (TObjArray*) runHeader->FindObjectAny("MagFieldEnv");
-  if (oarray == 0) {
-    cerr << endl << ">> **ERROR** Couldn't get MagFieldEnv" << endl;
-  }
-  header->ExtractHeaderInformation(oarray, "MagFieldEnv");
-
-  // get Beamline
-  oarray = (TObjArray*) runHeader->FindObjectAny("Beamline");
-  if (oarray == 0) {
-    cerr << endl << ">> **ERROR** Couldn't get Beamline" << endl;
-  }
-  header->ExtractHeaderInformation(oarray, "Beamline");
-
-  // get Scaler
-  oarray = (TObjArray*) runHeader->FindObjectAny("Scaler");
-  if (oarray == 0) {
-    cerr << endl << ">> **ERROR** Couldn't get Scaler" << endl;
-  }
-  header->ExtractHeaderInformation(oarray, "Scaler");
-
-  f->Close();
-  delete f;
-
-  if (!header->IsValid(strict)) {
-    cerr << endl << ">> **ERROR** run header validation failed." << endl;
-    if (strict) { // clean up and quit
-      delete header;
-      return -1;
-    }
-  }
-
-  header->DumpHeader();
-
-  // get some information from the read file
-  cout << endl << "++++++++++++++++++++++++++++";
-  cout << endl << ">> get header infos " << argv[1];
-  cout << endl << "++++++++++++++++++++++++++++" << endl;
-
-  TString str("");
-  TStringVector strVec;
-  Int_t ival;
-  TIntVector ivec;
-  TPsiRunProperty prop1;
-  Bool_t ok;
-
-  header->GetValue("RunInfo/Run Title", str, ok);
-  if (ok)
-    cout << endl << "Run Title: " << str.Data();
-  else
-    cout << endl << "**ERROR** Couldn't obtain the 'Run Title'.";
-
-  header->GetValue("RunInfo/Run Number", ival, ok);
-  if (ok)
-    cout << endl << "Run Number: " << ival;
-  else
-    cout << endl << "**ERROR** Couldn't obtain the 'Run Number'.";
-
-  header->GetValue("RunInfo/Histo Names", strVec, ok);
-  if (ok) {
-    cout << endl << "Histo Names: ";
-    for (UInt_t i=0; i<strVec.size()-1; i++) {
-      cout << strVec[i].Data() << ", ";
-    }
-    cout << strVec[strVec.size()-1].Data();
-  } else {
-    cout << endl << "**ERROR** Couldn't obtain the 'Histo Names'.";
-  }
-
-  header->GetValue("RunInfo/Time Zero Bin", ivec, ok);
-  if (ok) {
-    cout << endl << "Time Zero Bin: ";
-    for (UInt_t i=0; i<ivec.size()-1; i++) {
-      cout << ivec[i] << ", ";
-    }
-    cout << ivec[ivec.size()-1];
-  } else {
-    cout << endl << "**ERROR** Couldn't obtain the 'Time Zero Bin'.";
-  }
-
-  header->GetValue("RunInfo/Sample Temperature", prop1, ok);
-  if (ok) {
-    cout << endl << "Sample Temperature: " << prop1.GetValue() << " +- " << prop1.GetError() << " " << prop1.GetUnit().Data() << "; SP: " << prop1.GetDemand() << "; " << prop1.GetDescription().Data();
-  } else {
-    cout << endl << "**ERROR** Couldn't obtain the 'Sample Temperature'.";
-  }
-
-  cout << endl << endl;
 
   return 0;
 }

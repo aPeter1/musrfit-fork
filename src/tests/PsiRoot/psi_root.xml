@@ -45,32 +45,104 @@
       <type>Int_t</type>
     </entry>
     <entry>
-      <name>RunInfo/Sample Temperature</name>
-      <type>TPsiRunProperty</type>
+      <name>RunInfo/Run Start Time</name>
+      <type>TString</type>
     </entry>
     <entry>
-      <name>RunInfo/Time Resolution</name>
-      <type>TPsiRunProperty</type>
+      <name>RunInfo/Run Stop Time</name>
+      <type>TString</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Run Duration</name>
+      <type>Int_t</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Laboratory</name>
+      <type>TString</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Area</name>
+      <type>TString</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Instrument</name>
+      <type>TString</type>
     </entry>
     <entry>
       <name>RunInfo/Muon Beam Momentum</name>
       <type>TPsiRunProperty</type>
     </entry>
     <entry>
+      <name>RunInfo/Muon Species</name>
+      <type>TString</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Setup</name>
+      <type>TString</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Comment</name>
+      <type>TString</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Sample Name</name>
+      <type>TString</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Sample Temperature</name>
+      <type>TPsiRunProperty</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Sample Magnetic Field</name>
+      <type>TPsiRunProperty</type>
+    </entry>
+    <entry>
+      <name>RunInfo/No of Histos</name>
+      <type>Int_t</type>
+    </entry>
+    <entry>
       <name>RunInfo/Histo Names</name>
       <type>TStringVector</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Histo Length</name>
+      <type>Int_t</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Time Resolution</name>
+      <type>TPsiRunProperty</type>
     </entry>
     <entry>
       <name>RunInfo/Time Zero Bin</name>
       <type>TIntVector</type>
     </entry>
     <entry>
+      <name>RunInfo/First Good Bin</name>
+      <type>TIntVector</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Last Good Bin</name>
+      <type>TIntVector</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Red-Green Offsets</name>
+      <type>TIntVector</type>
+    </entry>
+    <entry>
+      <name>RunInfo/Red-Green Description</name>
+      <type>TStringVector</type>
+    </entry>
+    <entry>
       <name>SampleEnv/Cryo</name>
       <type>TString</type>
     </entry>
     <entry>
-      <name>SampleEnv/CF2</name>
-      <type>TPsiRunProperty</type>
+      <name>SampleEnv/Insert</name>
+      <type>TString</type>
+    </entry>
+    <entry>
+      <name>SampleEnv/Orientation</name>
+      <type>TString</type>
     </entry>
     <entry>
       <name>MagFieldEnv/Name</name>
@@ -79,6 +151,10 @@
     <entry>
       <name>MagFieldEnv/Current</name>
       <type>TPsiRunProperty</type>
+    </entry>
+    <entry>
+      <name>Scaler/Ip</name>
+      <type>Int_t</type>
     </entry>
   </header_info>
 </psi_root>

@@ -71,8 +71,9 @@ class TPsiRunProperty : public TObject
 {
 public:
   TPsiRunProperty();
-  TPsiRunProperty(TString name, Double_t demand, Double_t value, Double_t error, TString unit, TString description = TString("n/a"));
-  TPsiRunProperty(TString name, Double_t value, TString unit);
+  TPsiRunProperty(TString label, Double_t demand, Double_t value, Double_t error, TString unit, TString description = TString("n/a"));
+  TPsiRunProperty(TString label, Double_t demand, Double_t value, TString unit, TString description = TString("n/a"));
+  TPsiRunProperty(TString label, Double_t value, TString unit, TString description = TString("n/a"));
   virtual ~TPsiRunProperty() {}
 
   virtual TString  GetLabel() const { return fLabel; }
@@ -82,6 +83,9 @@ public:
   virtual TString  GetUnit() const { return fUnit; }
   virtual TString  GetDescription() const { return fDescription; }
 
+  virtual void Set(TString label, Double_t demand, Double_t value, Double_t error, TString unit, TString description = TString("n/a"));
+  virtual void Set(TString label, Double_t demand, Double_t value, TString unit, TString description = TString("n/a"));
+  virtual void Set(TString label, Double_t value, TString unit, TString description = TString("n/a"));
   virtual void SetLabel(TString &label) { fLabel = label; }
   virtual void SetLabel(const char *label) { fLabel = label; }
   virtual void SetDemand(Double_t val) { fDemand = val; }
@@ -158,25 +162,33 @@ private:
 class TPsiRunHeader : public TObject
 {
 public:
-  TPsiRunHeader();
+  TPsiRunHeader(const char *headerDefinition);
   virtual ~TPsiRunHeader();
 
   virtual Bool_t IsValid(Bool_t strict = false);
 
-  virtual void Get(TString path, TObjArray &content);
+  virtual void GetHeaderInfo(TString path, TObjArray &content);
 
-  virtual void Set(TString pathName, TString type, TString value);
-  virtual void Set(TString pathName, TString type, Int_t value);
-  virtual void Set(TString pathName, TString type, TPsiRunProperty value);
-  virtual void Set(TString pathName, TString type, TStringVector value);
-  virtual void Set(TString pathName, TString type, TIntVector value);
+  virtual void GetValue(TString pathName, TString &value, Bool_t &ok);
+  virtual void GetValue(TString pathName, Int_t &value, Bool_t &ok);
+  virtual void GetValue(TString pathName, TPsiRunProperty &value, Bool_t &ok);
+  virtual void GetValue(TString pathName, TStringVector &value, Bool_t &ok);
+  virtual void GetValue(TString pathName, TIntVector &value, Bool_t &ok);
 
-  virtual Bool_t ExtractHeaderInformation(TObjArray *headerInfo, TString path) { return true; }
+  virtual void Set(TString pathName, TString value);
+  virtual void Set(TString pathName, Int_t value);
+  virtual void Set(TString pathName, TPsiRunProperty value);
+  virtual void Set(TString pathName, TStringVector value);
+  virtual void Set(TString pathName, TIntVector value);
+
+  virtual Bool_t ExtractHeaderInformation(TObjArray *headerInfo, TString path);
 
   virtual void DumpHeader();
   virtual void DrawHeader();
 
 private:
+  TString fHeaderDefinition;
+
   vector< TPsiRunObject<TString> > fStringObj;
   vector< TPsiRunObject<Int_t> >   fIntObj;
   vector< TPsiRunObject<TPsiRunProperty> > fPsiRunPropertyObj;
