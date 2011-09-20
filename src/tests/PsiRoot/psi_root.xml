@@ -133,6 +133,10 @@
       <type>TStringVector</type>
     </entry>
     <entry>
+      <name>RunInfo/Slow Control Histo Names</name>
+      <type>TStringVector</type>
+    </entry>
+    <entry>
       <name>SampleEnv/Cryo</name>
       <type>TString</type>
     </entry>

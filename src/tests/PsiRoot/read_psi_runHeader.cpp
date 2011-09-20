@@ -68,9 +68,9 @@ int main(int argc, char *argv[])
   }
 
   TFolder *runHeader = 0;
-  f->GetObject("RunHeaderInfo", runHeader);
+  f->GetObject("RunHeader", runHeader);
   if (runHeader == 0) {
-    cerr << endl << ">> **ERROR** Couldn't get top folder RunHeaderInfo";
+    cerr << endl << ">> **ERROR** Couldn't get top folder RunHeader";
     f->Close();
     return -1;
   }

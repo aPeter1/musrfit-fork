@@ -1103,11 +1103,12 @@ void TPsiRunHeader::Set(TString pathName, TIntVector value)
  */
 Bool_t TPsiRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString requestedPath)
 {
-  TString name(""), path(""), pathName(""), str(""), strValue("");
+  TString headerName(""), name(""), path(""), pathName(""), str(""), strValue("");
   TObjString *ostr = 0;
   TObjArray *tokens = 0;
   Bool_t required=false;
   UInt_t idx;
+  Ssiz_t idx1, idx2;
   Int_t  intValue;
 
   // go through all entries of this header information from the PSI-ROOT file
@@ -1115,12 +1116,19 @@ Bool_t TPsiRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString re
     required=false;
     ostr = dynamic_cast<TObjString*>(headerInfo->At(i));
     str = ostr->GetString();
+    // get header name
+    idx1 = str.First('-');
+    idx2 = str.First(':');
+    headerName = TString("");
+    for (Int_t j=idx1+2; j<idx2; j++)
+      headerName += str[j];
+
     // handle required entry
     for (UInt_t j=0; j<fEntry.size(); j++) {
       // check if the XML entry has the right requested path
       if (fEntry[j].GetPathName().Contains(requestedPath)) {
         SplitPathName(fEntry[j].GetPathName(), path, name);
-        if (str.Contains(name)) {
+        if (!headerName.CompareTo(name)) {
           required=true;
           idx = j;
           break;
@@ -1129,7 +1137,6 @@ Bool_t TPsiRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString re
     }
     if (required) { // handle required entry
       // get the name
-      Ssiz_t idx1, idx2;
       idx1 = str.First('-');
       idx2 = str.First(':');
       name = TString("");
@@ -1295,12 +1302,19 @@ Bool_t TPsiRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString re
     required=false;
     ostr = dynamic_cast<TObjString*>(headerInfo->At(i));
     str = ostr->GetString();
+    // get header name
+    idx1 = str.First('-');
+    idx2 = str.First(':');
+    headerName = TString("");
+    for (Int_t j=idx1+2; j<idx2; j++)
+      headerName += str[j];
+
     // handle additional entries, i.e. not required entries
     for (UInt_t j=0; j<fEntry.size(); j++) {
       // check if the XML entry has the right requested path
       if (fEntry[j].GetPathName().Contains(requestedPath)) {
         SplitPathName(fEntry[j].GetPathName(), path, name);
-        if (str.Contains(name)) {
+        if (!headerName.CompareTo(name)) {
           required=true;
           break;
         }
@@ -1308,7 +1322,6 @@ Bool_t TPsiRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString re
     }
     if (!required) { // handle not required but fitting the requested path
       // get the name
-      Ssiz_t idx1, idx2;
       idx1 = str.First('-');
       idx2 = str.First(':');
       name = TString("");

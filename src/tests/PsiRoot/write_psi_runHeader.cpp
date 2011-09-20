@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
 
   header->Set("RunInfo/Histo Length", 8192);
 
-  prop.Set("Time Resolution", 0.193525, "ns", "TDC 9999");
+  prop.Set("Time Resolution", 0.1953125, "ns", "TDC 9999");
   header->Set("RunInfo/Time Resolution", prop);
 
   TIntVector t0;
@@ -141,6 +141,11 @@ int main(int argc, char *argv[])
   redGreenDescription.push_back("E-field/light off/on");
   redGreenDescription.push_back("E-field/light on/on");
   header->Set("RunInfo/Red-Green Description", redGreenDescription);
+
+  TStringVector scHistoNames;
+  scHistoNames.push_back("Sample Temperature");
+  scHistoNames.push_back("Sample Magnetic Field");
+  header->Set("RunInfo/Slow Control Histo Names", scHistoNames);
 
   TStringVector dummyTest;
   dummyTest.push_back("dummy1");
@@ -199,8 +204,8 @@ int main(int argc, char *argv[])
   }
 
   // root file header related things
-  TFolder *runHeader = gROOT->GetRootFolder()->AddFolder("RunHeaderInfo", "PSI Run Header Info");
-  gROOT->GetListOfBrowsables()->Add(runHeader, "RunHeaderInfo");
+  TFolder *runHeader = gROOT->GetRootFolder()->AddFolder("RunHeader", "PSI Run Header Info");
+  gROOT->GetListOfBrowsables()->Add(runHeader, "RunHeader");
 
   TObjArray runInfo;
   header->GetHeaderInfo("RunInfo", runInfo);

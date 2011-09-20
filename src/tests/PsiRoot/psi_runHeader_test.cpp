@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
   header->Set("RunInfo/Run Start Time", "2011-04-19 14:25:22");
   header->Set("RunInfo/Run Stop Time", "2011-04-19 19:13:47");
 
-  prop.Set("Time Resolution", 0.193525, "ns", "TDC 9999");
+  prop.Set("Time Resolution", 0.1953125, "ns", "TDC 9999");
   header->Set("RunInfo/Time Resolution", prop);
 
   prop.Set("Sample Temperature", 3.2, 3.21, 0.05, "K", "CF1");
@@ -153,8 +153,8 @@ int main(int argc, char *argv[])
   }
 
   // root file header related things
-  TFolder *runHeader = gROOT->GetRootFolder()->AddFolder("RunHeaderInfo", "PSI Run Header Info");
-  gROOT->GetListOfBrowsables()->Add(runHeader, "RunHeaderInfo");
+  TFolder *runHeader = gROOT->GetRootFolder()->AddFolder("RunHeader", "PSI Run Header Info");
+  gROOT->GetListOfBrowsables()->Add(runHeader, "RunHeader");
 
   TObjArray runInfo;
   header->GetHeaderInfo("RunInfo", runInfo);
@@ -200,9 +200,9 @@ int main(int argc, char *argv[])
   }
 
   runHeader = 0;
-  f->GetObject("RunHeaderInfo", runHeader);
+  f->GetObject("RunHeader", runHeader);
   if (runHeader == 0) {
-    cerr << endl << ">> **ERROR** Couldn't get top folder RunHeaderInfo";
+    cerr << endl << ">> **ERROR** Couldn't get top folder RunHeader";
     f->Close();
     return -1;
   }
@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
   // get RunHeader
   oarray = (TObjArray*) runHeader->FindObjectAny("RunInfo");
   if (oarray == 0) {
-    cerr << endl << ">> **ERROR** Couldn't get RunHeader" << endl;
+    cerr << endl << ">> **ERROR** Couldn't get RunInfo" << endl;
   }
   header->ExtractHeaderInformation(oarray, "RunInfo");
 
