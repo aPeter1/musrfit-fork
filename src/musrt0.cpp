@@ -356,7 +356,7 @@ Int_t main(Int_t argc, Char_t *argv[])
     }
   }
 
-  if (getT0FromPromptPeak) {
+  if (getT0FromPromptPeak && success) {
 
     Int_t  histoNo = -1;
     UInt_t t0Bin = 0;
