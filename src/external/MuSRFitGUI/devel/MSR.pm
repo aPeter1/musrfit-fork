@@ -1490,16 +1490,16 @@ sub ExportParams {
 			if ($Shared!=1) {$Param=$Param."_".$RUNtmp;}
 # Check if this parameter has been initialized befor. (should be)
 			$value = $All{"$Param"};
-			$error    = $All{"$erradd$Param"};
+			$error = $All{"$erradd$Param"};
 
 			$line=join("\t",$line,$value,$error);
 			$PCount++;
 		    }
 		    elsif ($Shared==1) {
 # The parameter is shared, take the value from the first run
-			$Param=$Param."_1";
+			$Param=$Param;
 			$value = $All{"$Param"};
-			$error    = $All{"$erradd$Param"};
+			$error = $All{"$erradd$Param"};
 			$line=join("\t",$line,$value,$error);
 		    }
 		    $NP++;
