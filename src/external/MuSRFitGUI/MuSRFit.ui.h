@@ -6,7 +6,7 @@
 **
 ** You should not define a constructor or destructor in this file.
 ** Instead, write your code in functions called init() and destroy().
-** These will automatically be called by the form's constructor and
+** These will automatically be called by theform's constructor and
 ** destructor.
 *****************************************************************************/
 
@@ -701,43 +701,59 @@ void MuSRFitform::TabChanged()
 void MuSRFitform::GoFit()
 {
     my %All=CreateAllInput();
-    musrfit_tabs->setCurrentPage(1);
-    my $Answer=CallMSRCreate();
-    if ($Answer) {
-	my $FILENAME=$All{"FILENAME"}.".msr";
-	if (-e $FILENAME) {
-	    my $cmd="musrfit -t $FILENAME";
-	    my $pid = open(FTO,"$cmd 2>&1 |");
-	    while (<FTO>) {
-		FitTextOutput->append("$_");
+# Check here is the number of histograms makes sense
+# other wise give error.
+    my @Hists = split( /,/, $All{"LRBF"} );
+    if ($All{"FitAsyType"} eq "Asymmetry" && $#Hists != 1) {
+# we have a problem here send error message
+	my $Warning = "Error: The number of histograms should be 2 for an asymmetry fit!";
+	my $WarningWindow = Qt::MessageBox::information( this, "Error",$Warning);
+    } else {
+	musrfit_tabs->setCurrentPage(1);
+	my $Answer=CallMSRCreate();
+	if ($Answer) {
+	    my $FILENAME=$All{"FILENAME"}.".msr";
+	    if (-e $FILENAME) {
+		my $cmd="musrfit -t $FILENAME";
+		my $pid = open(FTO,"$cmd 2>&1 |");
+		while (<FTO>) {
+		    FitTextOutput->append("$_");
+		}
+		close(FTO);
+		$cmd="musrview $FILENAME &";
+		$pid = system($cmd);
+	    } else {
+		FitTextOutput->append("Cannot find MSR file!");
 	    }
-	    close(FTO);
-	    $cmd="musrview $FILENAME &";
-	    $pid = system($cmd);
-	} else {
-	    FitTextOutput->append("Cannot find MSR file!");
-	}
-	FitTextOutput->append("-----------------------------------------------------------------------------------------------------------------------------");
+	    FitTextOutput->append("-----------------------------------------------------------------------------------------------------------------------------");
 # update MSR File tab and initialization table
-	UpdateMSRFileInitTable();
+	    UpdateMSRFileInitTable();
+	}
     }
-    
     return;
 }
 
 void MuSRFitform::GoPlot()
 {
     my %All=CreateAllInput();
-    my $Answer=CallMSRCreate();
-    my $FILENAME=$All{"FILENAME"}.".msr";
-    
-    if ($Answer) {
-	if (-e $FILENAME) {
-	    my $cmd="musrview $FILENAME &";
-	    my $pid = system($cmd);
-	} else {
-	    FitTextOutput->append("Cannot find MSR file!");
-	    FitTextOutput->append("-----------------------------------------------------------------------------------------------------------------------------");
+# Check here is the number of histograms makes sense
+# other wise give error.
+    my @Hists = split( /,/, $All{"LRBF"} );
+    if ($All{"FitAsyType"} eq "Asymmetry" && $#Hists != 1) {
+# we have a problem here send error message
+	my $Warning = "Error: The number of histograms should be 2 for an asymmetry fit!";
+	my $WarningWindow = Qt::MessageBox::information( this, "Error",$Warning);
+    } else {
+	my $Answer=CallMSRCreate();
+	my $FILENAME=$All{"FILENAME"}.".msr";
+	if ($Answer) {
+	    if (-e $FILENAME) {
+		my $cmd="musrview $FILENAME &";
+		my $pid = system($cmd);
+	    } else {
+		FitTextOutput->append("Cannot find MSR file!");
+		FitTextOutput->append("-----------------------------------------------------------------------------------------------------------------------------");
+	    }
 	}
     }
     return;
