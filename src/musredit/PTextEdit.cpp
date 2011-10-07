@@ -918,7 +918,7 @@ void PTextEdit::fileSaveAs()
   fFileSystemWatcherActive = false;
 
   QString fn = QFileDialog::getSaveFileName( this,
-                    tr( "Save msr-/mlog-file As" ), QString::null,
+                    tr( "Save msr-/mlog-file As" ), *fFilenames.find( currentEditor() ),
                     tr( "msr-Files (*.msr *.mlog);;All Files (*)" ) );
   if ( !fn.isEmpty() ) {
     fFilenames.remove( currentEditor() );
