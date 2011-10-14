@@ -852,6 +852,14 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
     packing = fMsrInfo->GetMsrPlotList()->at(0).fViewPacking;
   }
 
+  // calculate necessary norms
+  Double_t dataNorm = 1.0, theoryNorm = 1.0;
+  if (fScaleN0AndBkg) {
+    dataNorm = 1.0/ (packing * (fTimeResolution * 1.0e3)); // fTimeResolution us->ns
+  } else if (!fScaleN0AndBkg && (fMsrInfo->GetMsrPlotList()->at(0).fViewPacking > 0)) {
+    theoryNorm = (Double_t)fMsrInfo->GetMsrPlotList()->at(0).fViewPacking/(Double_t)fRunInfo->GetPacking();
+  }
+
   // raw data, since PMusrCanvas is doing ranging etc.
   // start = the first bin which is a multiple of packing backward from first good data bin
   Int_t start = fRunInfo->GetDataRange(0) - (fRunInfo->GetDataRange(0)/packing)*packing;
@@ -897,31 +905,18 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
   Double_t normalizer = 1.0;
   for (Int_t i=start; i<end; i++) {
     if (((i-start) % packing == 0) && (i != start)) { // fill data
-      // in order that after rebinning the fit does not need to be redone (important for plots)
-      // the value is normalize to per 1 nsec
-      if (fScaleN0AndBkg)
-        normalizer = packing * (fTimeResolution * 1e3); // fTimeResolution us->ns
-      value /= normalizer;
+      value *= dataNorm;
       fData.AppendValue(value);
       if (value == 0.0)
         fData.AppendErrorValue(1.0);
       else
-        fData.AppendErrorValue(TMath::Sqrt(value/normalizer));
+        fData.AppendErrorValue(TMath::Sqrt(value*dataNorm));
       // reset values
       value = 0.0;
     }
     value += runData->GetDataBin(histoNo)->at(i);
   }
 
-//   // count the number of bins
-//   fNoOfFitBins=0;
-//
-//   Double_t time;
-//   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
-//     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
-//     if ((time >= fFitStartTime) && (time <= fFitEndTime))
-//       fNoOfFitBins++;
-//   }
   CalcNoOfFitBins();
 
   // fill theory vector for kView
@@ -942,6 +937,7 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
     // evaluate function
     N0 = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
   }
+  N0 *= theoryNorm;
 
   // get tau
   Double_t tau;
@@ -974,6 +970,7 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
   } else { // bkg fitted
     bkg = par[fRunInfo->GetBkgFitParamNo()-1];
   }
+  bkg *= theoryNorm;
 
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
