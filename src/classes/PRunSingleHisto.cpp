@@ -1047,6 +1047,14 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
     packing = fMsrInfo->GetMsrPlotList()->at(0).fRRFPacking;
   }
 
+  // calculate necessary norms
+  Double_t dataNorm = 1.0, theoryNorm = 1.0;
+  if (fScaleN0AndBkg) {
+    dataNorm = 1.0/ (packing * (fTimeResolution * 1.0e3)); // fTimeResolution us->ns
+  } else if (!fScaleN0AndBkg && (fMsrInfo->GetMsrPlotList()->at(0).fViewPacking > 0)) {
+    theoryNorm = (Double_t)fMsrInfo->GetMsrPlotList()->at(0).fViewPacking/(Double_t)fRunInfo->GetPacking();
+  }
+
   // transform raw histo data. This is done the following way (for details see the manual):
   // for the single histo fit, just the rebinned raw data are copied
   // first get start data, end data, and t0
@@ -1106,6 +1114,7 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
     // evaluate function
     N0 = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
   }
+  N0 *= theoryNorm;
 
   // get tau
   Double_t tau;
@@ -1138,6 +1147,7 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
   } else { // bkg fitted
     bkg = par[fRunInfo->GetBkgFitParamNo()-1];
   }
+  bkg *= theoryNorm;
 
   Double_t value = 0.0;
   Double_t expval = 0.0;
@@ -1148,20 +1158,15 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
   fData.SetDataTimeStart(fTimeResolution*((Double_t)start-(Double_t)t0+(Double_t)(packing-1)/2.0));
   fData.SetDataTimeStep(fTimeResolution*packing);
 
-  Double_t normalizer = 1.0;
   Double_t gammaRRF = 0.0, wRRF = 0.0, phaseRRF = 0.0;
   if (fMsrInfo->GetMsrPlotList()->at(0).fRRFFreq == 0.0) { // normal Data representation
     for (Int_t i=start; i<end; i++) {
       if (((i-start) % packing == 0) && (i != start)) { // fill data
-        // in order that after rebinning the fit does not need to be redone (important for plots)
-        // the value is normalize to per 1 nsec
-        if (fScaleN0AndBkg)
-          normalizer = packing * (fTimeResolution * 1.0e3); // fTimeResolution us->ns
-        value /= normalizer;
+        value *= dataNorm;
         time = (((Double_t)i-(Double_t)(packing-1)/2.0)-t0)*fTimeResolution;
         expval = TMath::Exp(+time/tau)/N0;
         fData.AppendValue(-1.0+expval*(value-bkg));
-        fData.AppendErrorValue(expval*TMath::Sqrt(value/normalizer));
+        fData.AppendErrorValue(expval*TMath::Sqrt(value*dataNorm));
         value = 0.0;
       }
       value += runData->GetDataBin(histoNo)->at(i);
@@ -1191,33 +1196,22 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
     wRRF = gammaRRF * fMsrInfo->GetMsrPlotList()->at(0).fRRFFreq;
     phaseRRF = fMsrInfo->GetMsrPlotList()->at(0).fRRFPhase / 180.0 * TMath::Pi();
 
-    // in order that after rebinning the fit does not need to be redone (important for plots)
-    // the value is normalize to per 1 nsec
-    normalizer = (fTimeResolution * 1.0e3); // fTimeResolution us->ns
-
     Double_t error = 0.0;
     for (Int_t i=start; i<end; i++) {
       if (((i-start) % packing == 0) && (i != start)) { // fill data
         fData.AppendValue(2.0*value/packing); // factor 2 needed because cos(a)cos(b) = 1/2(cos(a+b)+cos(a-b))
-        fData.AppendErrorValue(expval*TMath::Sqrt(error)/normalizer/packing);
+        fData.AppendErrorValue(expval*TMath::Sqrt(error/packing));
         value = 0.0;
         error = 0.0;
       }
       time = ((Double_t)i-t0)*fTimeResolution;
       expval = TMath::Exp(+time/tau)/N0;
-      rrf_val = (-1.0+expval*(runData->GetDataBin(histoNo)->at(i)/normalizer-bkg))*TMath::Cos(wRRF * time + phaseRRF);
+      rrf_val = (-1.0+expval*(runData->GetDataBin(histoNo)->at(i)*dataNorm-bkg))*TMath::Cos(wRRF * time + phaseRRF);
       value += rrf_val;
-      error += runData->GetDataBin(histoNo)->at(i);
+      error += runData->GetDataBin(histoNo)->at(i)*dataNorm;
     }
   }
 
-//   // count the number of bins to be fitted
-//   fNoOfFitBins=0;
-//   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
-//     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
-//     if ((time >= fFitStartTime) && (time <= fFitEndTime))
-//       fNoOfFitBins++;
-//   }
   CalcNoOfFitBins();
 
   // calculate functions
