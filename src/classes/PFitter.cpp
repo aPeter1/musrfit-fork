@@ -1063,14 +1063,6 @@ Bool_t PFitter::ExecuteFix(UInt_t lineNo)
 
   tokens = fCmdLines[lineNo].fLine.Tokenize(", \t");
 
-  // Check if there is already a function minimum, i.e. migrad, minimization, or simplex has been called previously.
-  // If so, update minuit2 user parameters
-  if (fFcnMin != 0) {
-    if (fFcnMin->IsValid()) {
-      fMnUserParams = fFcnMin->UserParameters();
-    }
-  }
-
   for (Int_t i=1; i<tokens->GetEntries(); i++) {
     ostr = dynamic_cast<TObjString*>(tokens->At(i));
     str = ostr->GetString();
@@ -1102,10 +1094,6 @@ Bool_t PFitter::ExecuteFix(UInt_t lineNo)
 Bool_t PFitter::ExecuteHesse()
 {
   cout << ">> PFitter::ExecuteHesse(): will call hesse ..." << endl;
-
-  // if already some minimization is done use the minuit2 output as input
-  if (fFcnMin)
-    fMnUserParams = fFcnMin->UserParameters();
 
   // create the hesse object
   ROOT::Minuit2::MnHesse hesse;
@@ -1288,8 +1276,6 @@ Bool_t PFitter::ExecuteMinos()
     return false;
   }
 
-  fMnUserParams = fFcnMin->UserParameters();
-
   // make minos analysis
   ROOT::Minuit2::MnMinos minos((*fFitterFcn), (*fFcnMin));
 
@@ -1298,7 +1284,7 @@ Bool_t PFitter::ExecuteMinos()
     // the 1st condition is from an user fixed variable,
     // the 2nd condition is from an all together unused variable
     // the 3rd condition is a variable fixed via the FIX command
-    if ((fMnUserParams.Error(i) != 0) && (fRunInfo->ParameterInUse(i) != 0) && (!fMnUserParams.Parameters().at(i).IsFixed())) {
+    if ((fMnUserParams.Error(i) != 0.0) && (fRunInfo->ParameterInUse(i) != 0) && (!fMnUserParams.Parameters().at(i).IsFixed())) {
       // 1-sigma MINOS errors
       ROOT::Minuit2::MinosError err = minos.Minos(i);
 
@@ -1368,8 +1354,12 @@ Bool_t PFitter::ExecuteRelease(UInt_t lineNo)
 
     if (str.IsDigit()) { // token is a parameter number
       fMnUserParams.Release(static_cast<UInt_t>(str.Atoi())-1);
+      // set the error to 2% of the value when releasing
+      fMnUserParams.SetError(static_cast<UInt_t>(str.Atoi())-1, 0.02*fMnUserParams.Value(static_cast<UInt_t>(str.Atoi())-1));
     } else { // token is a parameter name
       fMnUserParams.Release(str.Data());
+      // set the error to 2% of the value when releasing
+      fMnUserParams.SetError(str.Data(), 0.02*fMnUserParams.Value(str.Data()));
     }
   }
 
@@ -1395,8 +1385,10 @@ Bool_t PFitter::ExecuteRestore()
   cout << "PFitter::ExecuteRestore(): release all fixed parameters (RESTORE) ..." << endl;
 
   for (UInt_t i=0; i<fMnUserParams.Parameters().size(); i++) {
-    if (fMnUserParams.Parameters().at(i).IsFixed())
+    if (fMnUserParams.Parameters().at(i).IsFixed()) {
       fMnUserParams.Release(i);
+      fMnUserParams.SetError(i, 0.02*fMnUserParams.Value(i));
+    }
   }
 
   return true;

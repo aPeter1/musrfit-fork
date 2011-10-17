@@ -902,7 +902,6 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
   fData.SetDataTimeStart(fTimeResolution*((Double_t)start-(Double_t)t0+(Double_t)(packing-1)/2.0));
   fData.SetDataTimeStep(fTimeResolution*packing);
 
-  Double_t normalizer = 1.0;
   for (Int_t i=start; i<end; i++) {
     if (((i-start) % packing == 0) && (i != start)) { // fill data
       value *= dataNorm;
