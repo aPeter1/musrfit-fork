@@ -6,13 +6,15 @@
 #ifndef _PPIPPARD_H_
 #define _PPIPPARD_H_
 
+#include <vector>
+using namespace std;
+
 #include <fftw3.h>
 
 #include <Rtypes.h>
 #include <TString.h>
 
-#include <Eigen/Core>
-#include <Eigen/LU>
+#include <Eigen/Dense>
 using namespace Eigen;
 
 const Int_t PippardFourierPoints = 200000;
@@ -29,11 +31,14 @@ typedef struct {
   Double_t specularIntegral; // int_x=0^infty B(x) dx / Bext
   Double_t b_ext;         // external field in (G)
   Double_t deadLayer;     // dead layer in (nm)
-  TString rgeFileName;
+  TString inputFileName;
+  vector<TString> rgeFileName;
   TString outputFileName;
-  Double_t meanB;         // int_x=0^infty B(x) n(x) dx / int_x=0^infty n(x) dx / Bext
-  Double_t varB;          // int_x=0^infty (B(x)-<B>)^2 n(x) dx / int_x=0^infty n(x) dx / Bext^2
-  Double_t meanX;         // int_x=0^infty x n(x) dx / int_x=0^infty n(x) dx
+  TString outputFileNameBmean;
+  vector<Double_t> energy;
+  vector<Double_t> meanB;         // int_x=0^infty B(x) n(x) dx / int_x=0^infty n(x) dx / Bext
+  vector<Double_t> varB;          // int_x=0^infty (B(x)-<B>)^2 n(x) dx / int_x=0^infty n(x) dx / Bext^2
+  vector<Double_t> meanX;         // int_x=0^infty x n(x) dx / int_x=0^infty n(x) dx
 } PippardParams;
 
 class PPippard
@@ -42,15 +47,18 @@ class PPippard
     PPippard(const PippardParams &params);
     virtual ~PPippard();
 
+    virtual void DumpParams();
+
     virtual void SetTemp(Double_t temp) { fParams.t = temp; }
     virtual void SetLambdaL(Double_t lambdaL) { fParams.lambdaL = lambdaL; }
     virtual void SetXi0(Double_t xi0) { fParams.xi0 = xi0; }
     virtual void SetMeanFreePath(Double_t meanFreePath) { fParams.meanFreePath = meanFreePath; }
     virtual void SetFilmThickness(Double_t thickness) { fParams.filmThickness = thickness; }
     virtual void SetSpecular(Bool_t specular) { fParams.specular = specular; }
-    virtual void SetMeanX(Double_t meanX) { fParams.meanX = meanX; }
-    virtual void SetMeanB(Double_t meanB) { fParams.meanB = meanB; }
-    virtual void SetVarB(Double_t BB) { fParams.varB = BB; }
+    virtual void SetEnergy(Double_t energy) { fParams.energy.push_back(energy); }
+    virtual void SetMeanX(Double_t meanX) { fParams.meanX.push_back(meanX); }
+    virtual void SetMeanB(Double_t meanB) { fParams.meanB.push_back(meanB); }
+    virtual void SetVarB(Double_t BB) { fParams.varB.push_back(BB); }
 
     virtual void CalculateField();
 
@@ -58,6 +66,7 @@ class PPippard
     virtual Double_t GetMagneticField(const Double_t x) const;
 
     virtual void SaveField();
+    virtual void SaveBmean();
 
   private:
     PippardParams fParams;
@@ -72,9 +81,6 @@ class PPippard
 
     Int_t fShift; // shift needed to pick up fFieldB at the maximum for B->0
 
-    MatrixXd *fSecondDerivativeMatrix; // 2nd derivative matrix
-    MatrixXd *fKernelMatrix;           // kernel matrix
-    VectorXd *fBoundaryCondition;      // boundary condition vector
     VectorXd *fFieldDiffuse;           // resulting B(z)/B(0) field
 
     virtual Double_t DeltaBCS(const Double_t t) const;

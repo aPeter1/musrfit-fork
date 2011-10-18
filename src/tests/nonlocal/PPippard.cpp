@@ -3,6 +3,7 @@
 // $Id$
 // -----------------------------------------------------------------------
 
+#include <cassert>
 #include <cstdio>
 #include <cmath>
 
@@ -25,9 +26,6 @@ PPippard::PPippard(const PippardParams &params) : fParams(params)
   fFieldq = 0;
   fFieldB = 0;
 
-  fSecondDerivativeMatrix = 0;
-  fKernelMatrix = 0;
-  fBoundaryCondition = 0;
   fFieldDiffuse = 0;
 
   f_dx = 0.02;
@@ -48,27 +46,46 @@ PPippard::~PPippard()
     fftw_free(fFieldq);
     fFieldq = 0;
   }
-
   if (fFieldB) {
     fftw_free(fFieldq);
     fFieldB = 0;
-  }
-  if (fSecondDerivativeMatrix) {
-    delete fSecondDerivativeMatrix;
-    fSecondDerivativeMatrix = 0;
-  }
-  if (fKernelMatrix) {
-    delete fKernelMatrix;
-    fKernelMatrix = 0;
-  }
-  if (fBoundaryCondition) {
-    delete fBoundaryCondition;
-    fBoundaryCondition = 0;
   }
   if (fFieldDiffuse) {
     delete fFieldDiffuse;
     fFieldDiffuse = 0;
   }
+}
+
+//-----------------------------------------------------------------------------------------------------------
+/**
+ *
+ */
+void PPippard::DumpParams()
+{
+  cout << endl << ">> Parameters: ";
+  cout << endl << ">> reduced temperature: " << fParams.t;
+  cout << endl << ">> lambdaL            : " << fParams.lambdaL << " (nm)";
+  cout << endl << ">> xi0                : " << fParams.xi0 << " (nm)";
+  cout << endl << ">> mean free path     : " << fParams.meanFreePath << " (nm)";
+  cout << endl << ">> film thickness     : " << fParams.filmThickness << " (nm)";
+  if (fParams.specular)
+    cout << endl << ">> specular scattering boundary conditions";
+  else
+    cout << endl << ">> diffuse scattering boundary conditions";
+  cout << endl << ">> Bext               : " << fParams.b_ext << " (G)";
+  cout << endl << ">> dead layer         : " << fParams.deadLayer << " (nm)";
+  for (UInt_t i=0; i<fParams.rgeFileName.size(); i++)
+    cout << endl << ">> rge-file-name      : " << fParams.rgeFileName[i].Data();
+  if (fParams.outputFileName.Length() > 0)
+    cout << endl << ">> output file name   : " << fParams.outputFileName.Data();
+  else
+    cout << endl << ">> output file name   : n/a";
+  if (fParams.outputFileNameBmean.Length() > 0)
+    cout << endl << ">> output file name Bmean : " << fParams.outputFileNameBmean.Data();
+  else
+    cout << endl << ">> output file name Bmean : n/a";
+  cout << endl << ">> input file name    : " << fParams.inputFileName.Data();
+  cout << endl << endl;
 }
 
 //-----------------------------------------------------------------------------------------------------------
@@ -248,8 +265,6 @@ void PPippard::CalculateFieldSpecular()
     }
   }
 
-cout << endl << "debug> fShift = " << fShift;
-
   for (Int_t i=0; i<PippardFourierPoints; i++) {
     fFieldB[i][1] /= norm;
   }
@@ -282,75 +297,72 @@ cout << endl << "debug> fShift = " << fShift;
  */
 void PPippard::CalculateFieldDiffuse()
 {
+  MatrixXd fSecondDerivativeMatrix(PippardDiffusePoints+1, PippardDiffusePoints+1); // 2nd derivative matrix
+  MatrixXd fKernelMatrix(PippardDiffusePoints+1, PippardDiffusePoints+1);           // kernel matrix
+  VectorXd fBoundaryCondition(PippardDiffusePoints+1);                              // boundary condition vector
+
   f_dz = 5.0/XiP_T(fParams.t);
 
   Double_t invL = 1/f_dz;
   Double_t ampl = 1.0/pow(f_dz,2.0)/(3.0/4.0*pow(XiP_T(fParams.t),3.0)/(fParams.xi0*pow(LambdaL_T(fParams.t),2.0)));
 
-cout << endl << ">> 1/alpha = " << 1.0/(3.0/4.0*pow(XiP_T(fParams.t),3.0)/(fParams.xi0*pow(LambdaL_T(fParams.t),2.0)));
-cout << endl << ">> 1/l^2   = " << 1.0/pow(f_dz,2.0);
-cout << endl << ">> ampl    = " << ampl << endl;
+  cout << endl << ">> f_dz    = " << f_dz << ", invL = " << invL;
+  cout << endl << ">> 1/alpha = " << 1.0/(3.0/4.0*pow(XiP_T(fParams.t),3.0)/(fParams.xi0*pow(LambdaL_T(fParams.t),2.0)));
+  cout << endl << ">> 1/l^2   = " << 1.0/pow(f_dz,2.0);
+  cout << endl << ">> ampl    = " << ampl << endl;
 
   // 2nd derivative matrix
-  if (fSecondDerivativeMatrix == 0) { // first time call, hence generate the 2nd derivative matrix
-    fSecondDerivativeMatrix = new MatrixXd(PippardDiffusePoints+1, PippardDiffusePoints+1);
-    fSecondDerivativeMatrix->setZero(PippardDiffusePoints+1, PippardDiffusePoints+1);
-    for (Int_t i=1; i<PippardDiffusePoints; i++) {
-      (*fSecondDerivativeMatrix)(i,i-1) = ampl;
-      (*fSecondDerivativeMatrix)(i,i) = -2.0*ampl;
-      (*fSecondDerivativeMatrix)(i,i+1) = ampl;
-    }
+  fSecondDerivativeMatrix.setZero();
+  for (Int_t i=1; i<PippardDiffusePoints; i++) {
+    fSecondDerivativeMatrix(i,i-1) = ampl;
+    fSecondDerivativeMatrix(i,i) = -2.0*ampl;
+    fSecondDerivativeMatrix(i,i+1) = ampl;
   }
-
-//cout << endl << "fSecondDerivativeMatrix = \n" << *fSecondDerivativeMatrix << endl;
 
   // kernel matrix
-  if (fKernelMatrix == 0) { // first time call, hence generate the kernel matrix
-    fKernelMatrix = new MatrixXd(PippardDiffusePoints+1, PippardDiffusePoints+1);
-    fKernelMatrix->setZero(PippardDiffusePoints+1, PippardDiffusePoints+1);
-    // 1st line (dealing with boundary conditions)
-    (*fKernelMatrix)(0,0) = -1.5*invL;
-    (*fKernelMatrix)(0,1) =  2.0*invL;
-    (*fKernelMatrix)(0,2) = -0.5*invL;
-    // Nth line (dealing with boundary conditions)
-    (*fKernelMatrix)(PippardDiffusePoints,PippardDiffusePoints-2) =  0.5*invL;
-    (*fKernelMatrix)(PippardDiffusePoints,PippardDiffusePoints-1) = -2.0*invL;
-    (*fKernelMatrix)(PippardDiffusePoints,PippardDiffusePoints)   =  1.5*invL;
-    // the real kernel
-    for (Int_t i=1; i<PippardDiffusePoints; i++) {
-      (*fKernelMatrix)(i,0)=Calc_a(i);
-      (*fKernelMatrix)(i,PippardDiffusePoints)=Calc_b(i);
-      for (Int_t j=1; j<PippardDiffusePoints; j++) {
-        (*fKernelMatrix)(i,j) = Calc_c(i,j);
-      }
+  fKernelMatrix.setZero();
+
+  // 1st line (dealing with boundary conditions)
+  fKernelMatrix(0,0) = -1.5*invL;
+  fKernelMatrix(0,1) =  2.0*invL;
+  fKernelMatrix(0,2) = -0.5*invL;
+
+  // Nth line (dealing with boundary conditions)
+  fKernelMatrix(PippardDiffusePoints,PippardDiffusePoints-2) =  0.5*invL;
+  fKernelMatrix(PippardDiffusePoints,PippardDiffusePoints-1) = -2.0*invL;
+  fKernelMatrix(PippardDiffusePoints,PippardDiffusePoints)   =  1.5*invL;
+
+  // the real kernel
+  for (Int_t i=1; i<PippardDiffusePoints; i++) {
+    fKernelMatrix(i,0)=Calc_a(i);
+    fKernelMatrix(i,PippardDiffusePoints)=Calc_b(i);
+    for (Int_t j=1; j<PippardDiffusePoints; j++) {
+      fKernelMatrix(i,j) = Calc_c(i,j);
     }
   }
 
-//cout << endl << "fKernelMatrix = \n" << *fKernelMatrix << endl;
-
   // boundary condition vector
-  if (fBoundaryCondition == 0) {
-    fBoundaryCondition = new VectorXd(PippardDiffusePoints+1);
-    fBoundaryCondition->setZero(PippardDiffusePoints+1);
-    (*fBoundaryCondition)(0) = 1.0;
-  }
+  fBoundaryCondition.setZero();
+  fBoundaryCondition(0) = 1.0;
 
-//cout << endl << "fBoundaryCondition = " << *fBoundaryCondition << endl;
-
-  if (fFieldDiffuse == 0) {
-    fFieldDiffuse = new VectorXd(PippardDiffusePoints+1);
-    fFieldDiffuse->setZero(PippardDiffusePoints+1);
+  if (fFieldDiffuse != 0) {
+    delete fFieldDiffuse;
+    fFieldDiffuse = 0;
   }
+  fFieldDiffuse = new VectorXd(PippardDiffusePoints+1);
+  fFieldDiffuse->setZero();
 
   // solve equation
-  *fSecondDerivativeMatrix = (*fSecondDerivativeMatrix)-(*fKernelMatrix);
-  fSecondDerivativeMatrix->lu().solve(*fBoundaryCondition, fFieldDiffuse);
+  fSecondDerivativeMatrix = fSecondDerivativeMatrix-fKernelMatrix;
+  *fFieldDiffuse = fSecondDerivativeMatrix.colPivHouseholderQr().solve(fBoundaryCondition);
 
   // normalize field
   Double_t norm = 0.0;
   for (Int_t i=0; i<PippardDiffusePoints+1; i++)
     if (norm < (*fFieldDiffuse)(i))
       norm = (*fFieldDiffuse)(i);
+
+  assert(norm != 0);
 
   for (Int_t i=0; i<PippardDiffusePoints+1; i++)
     (*fFieldDiffuse)(i) /= norm;
@@ -392,12 +404,15 @@ void PPippard::SaveField()
     fprintf(fp, "%%   Boundary Conditions: Diffuse\n");
   fprintf(fp, "%%   Bext                    = %lf (G)\n", fParams.b_ext);
   fprintf(fp, "%%   deadLayer               = %lf (nm)\n", fParams.deadLayer);
-  if (fParams.rgeFileName.Length() > 0)
-    fprintf(fp, "%%   rge file name : %s\n", fParams.rgeFileName.Data());
-  if (fParams.meanB != 0.0) {
-    fprintf(fp, "%%   Mean Distance           = %lf (nm)\n", fParams.meanX);
-    fprintf(fp, "%%   Mean Field/Bext         = %lf, Mean Field = %lf (G)\n", fParams.meanB, fParams.meanB * fParams.b_ext);
-    fprintf(fp, "%%   Var Field/Bext^2        = %lf, Var Field  = %lf (G^2)\n", fParams.varB, fParams.varB * fParams.b_ext * fParams.b_ext);
+  for (UInt_t i=0; i<fParams.rgeFileName.size(); i++) {
+    fprintf(fp, "%%   rge file name : %s\n", fParams.rgeFileName[i].Data());
+  }
+  for (UInt_t i=0; i<fParams.energy.size(); i++) {
+    fprintf(fp, "%%------------------------------------------\n");
+    fprintf(fp, "%%   Implantation Energy     = %lf (eV)\n", fParams.energy[i]);
+    fprintf(fp, "%%   Mean Distance           = %lf (nm)\n", fParams.meanX[i]);
+    fprintf(fp, "%%   Mean Field/Bext         = %lf, Mean Field = %lf (G)\n", fParams.meanB[i], fParams.meanB[i] * fParams.b_ext);
+    fprintf(fp, "%%   Var Field/Bext^2        = %lf, Var Field  = %lf (G^2)\n", fParams.varB[i], fParams.varB[i] * fParams.b_ext * fParams.b_ext);
   }
   fprintf(fp, "%%\n");
 
@@ -412,6 +427,38 @@ void PPippard::SaveField()
     for (Int_t i=0; i<PippardDiffusePoints; i++) {
       fprintf(fp, "%lf, %lf\n", f_dz * XiP_T(fParams.t) * (Double_t)i, (*fFieldDiffuse)(i));
     }
+  }
+
+  fclose(fp);
+}
+
+//-----------------------------------------------------------------------------------------------------------
+/**
+ *
+ */
+void PPippard::SaveBmean()
+{
+  FILE *fp;
+
+  fp = fopen(fParams.outputFileNameBmean.Data(), "w");
+  if (fp == NULL) {
+    cout << endl << "Coudln't open " << fParams.outputFileNameBmean.Data() << " for writting, sorry ...";
+    cout << endl << endl;
+    return;
+  }
+
+  // write header
+  fprintf(fp, "%% Header -----------------------\n");
+  fprintf(fp, "%% generated from input file: %s\n", fParams.inputFileName.Data());
+  fprintf(fp, "%%\n");
+  fprintf(fp, "%% Data -------------------------\n");
+  fprintf(fp, "%% energy (eV), meanZ (nm), meanB/Bext, meanB (G), varB/Bext^2, varB (G^2)\n");
+
+  // write data
+  for (UInt_t i=0; i<fParams.energy.size(); i++) {
+    fprintf(fp, "%lf, %lf, %lf, %lf, %lf, %lf\n", fParams.energy[i], fParams.meanX[i],
+            fParams.meanB[i], fParams.b_ext*fParams.meanB[i],
+            fParams.varB[i], (fParams.b_ext*fParams.b_ext)*fParams.varB[i]);
   }
 
   fclose(fp);

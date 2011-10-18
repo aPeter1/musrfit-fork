@@ -10,6 +10,12 @@ using namespace std;
 
 #include "PPippard.h"
 
+typedef struct {
+  Double_t energy;
+  vector<Double_t> x;
+  vector<Double_t> n;
+} Pnofx;
+
 //-----------------------------------------------------------------------------------------
 /**
  *
@@ -29,8 +35,9 @@ void syntax()
   cout << endl << "%   specular         : 1=specular, 0=diffuse";
   cout << endl << "%   [Bext]           : external magnetic field (G), i.e. this is optional";
   cout << endl << "%   [deadLayer]      : dead layer (nm), i.e. this is optional";
-  cout << endl << "%   [rgeFileName]    : rge input file name, i.e. this is optional";
+  cout << endl << "%   [rgeFileName]    : rge input file name, i.e. this is optional. Multiple rge-files possible";
   cout << endl << "%   [outputFileName] : output file name, i.e. this is optional";
+  cout << endl << "%   [outputFileNameBmean] : output file name for <B> data";
   cout << endl;
   cout << endl << "reducedTemp = 0.8287";
   cout << endl << "lambdaL = 30.0";
@@ -40,8 +47,10 @@ void syntax()
   cout << endl << "specular = 1";
   cout << endl << "Bext = 47.14";
   cout << endl << "deadLayer = 0.4";
-  cout << endl << "rgeFileName = /afs/psi.ch/project/nemu/analysis/2009/Nonlocal/trimsp/InSne060.rge";
+  cout << endl << "rgeFileName = /afs/psi.ch/project/nemu/analysis/2009/Nonlocal/trimsp/InSn_E6000.rge";
+  cout << endl << "rgeFileName = /afs/psi.ch/project/nemu/analysis/2009/Nonlocal/trimsp/InSn_E14100.rge";
   cout << endl << "outputFileName = In_37_T2P83.dat";
+  cout << endl << "outputFileNameBmean = In_37_T2P83_Bmean.dat";
   cout << endl << endl;
   cout << endl << "lines starting with a '%' or a '#' are comment lines.";
   cout << endl << "empty lines are ignored.";
@@ -183,7 +192,7 @@ int readInputFile(char *fln, PippardParams &param)
         param.valid = false;
         break;
       }
-      param.rgeFileName = TString(str);
+      param.rgeFileName.push_back(TString(str));
     }
 
     if (tstr.BeginsWith("outputFileName =")) {
@@ -197,6 +206,18 @@ int readInputFile(char *fln, PippardParams &param)
       }
       param.outputFileName = TString(str);
     }
+
+    if (tstr.BeginsWith("outputFileNameBmean =")) {
+      result = sscanf(line, "outputFileNameBmean = %s", str);
+      if (result != 1) {
+        cout << endl << "**ERROR** while trying to extracted the Bmean output file name";
+        cout << endl << "line = " << line;
+        cout << endl;
+        param.valid = false;
+        break;
+      }
+      param.outputFileNameBmean = TString(str);
+    }
   }
 
   fclose(fp);
@@ -208,9 +229,27 @@ int readInputFile(char *fln, PippardParams &param)
 /**
  *
  */
-int readRgeFile(const char *fln, vector<Double_t> &x, vector<Double_t> &n)
+int readRgeFile(const char *fln, vector<Double_t> &x, vector<Double_t> &n, Double_t &energy)
 {
   FILE *fp;
+
+  x.clear();
+  n.clear();
+
+  TString str = TString(fln);
+  str.Remove(0, str.Index("_E")+2);
+  str.Remove(str.Index(".rge"));
+  if (str.Length() > 0) {
+    if (str.IsFloat()) {
+      energy = str.Atof();
+    } else {
+      cerr << endl << "**ERROR** couldn't extract energy from the file name '" << fln << "', will quit." << endl << endl;
+      return 0;
+    }
+  } else {
+    cerr << endl << "**ERROR** couldn't extract energy from the file name '" << fln << "', will quit." << endl << endl;
+    return 0;
+  }
 
   fp = fopen(fln, "r");
   if (fp == NULL) {
@@ -253,15 +292,6 @@ int readRgeFile(const char *fln, vector<Double_t> &x, vector<Double_t> &n)
     n[i] /= norm * (x[1]-x[0]);
   }
 
-/*
-Double_t xx=0.0;
-for (unsigned int i=0; i<x.size(); i++) {
-  xx += n[i];
-}
-xx *= (x[1]-x[0]);
-cout << "debug> xx=" << xx << endl;
-*/
-
   fclose(fp);
 
   return 1;
@@ -291,10 +321,12 @@ int main(int argc, char *argv[])
   params.specularIntegral = -1.0;
   params.b_ext = -1.0;
   params.deadLayer = -1.0;
-  params.rgeFileName = "";
+  params.rgeFileName.clear();
+  params.inputFileName = TString(argv[1]);
   params.outputFileName = "";
-  params.meanX = 0.0;
-  params.meanB = 0.0;
+  params.outputFileNameBmean = "";
+  params.meanX.clear();
+  params.meanB.clear();
 
   if (!readInputFile(argv[1], params)) {
     cout << endl << "**ERROR** Couldn't open the input file " << argv[1] << ". Will quit.";
@@ -335,12 +367,34 @@ int main(int argc, char *argv[])
   }
 
   int result;
+  Pnofx rgeSet;
+  vector<Pnofx> nOfx;
+  double energy;
   vector<Double_t> x, n;
-  if (params.rgeFileName.Length() > 0) {
-    result = readRgeFile(params.rgeFileName.Data(), x, n);
-    if (result == 0)
-      params.rgeFileName = "";
+  for (UInt_t i=0; i<params.rgeFileName.size(); i++) {
+    x.clear();
+    n.clear();
+    energy = 0.0;
+    rgeSet.energy = 0.0;
+    rgeSet.x.clear();
+    rgeSet.n.clear();
+
+    result = readRgeFile(params.rgeFileName[i].Data(), x, n, energy);
+    if (result == 0) {
+      cerr << endl << "**ERROR** Couldn't read rge-file " << params.rgeFileName[i].Data() << ", will quit." << endl << endl;
+      return 0;
+    } else {
+      cout << endl << ">> read rge-file '" << params.rgeFileName[i].Data() << "'";
+    }
+
+    cout << endl << ">> energy        = " << energy << " eV";
+    rgeSet.energy = energy;
+    rgeSet.x = x;
+    rgeSet.n = n;
+    nOfx.push_back(rgeSet);
   }
+  cout << endl << ">> found " << nOfx.size() << " rge-files.";
+
 
   cout << endl << ">> temp          = " << params.t;
   cout << endl << ">> lambdaL       = " << params.lambdaL;
@@ -348,59 +402,74 @@ int main(int argc, char *argv[])
   cout << endl << ">> meanFreePath  = " << params.meanFreePath;
   cout << endl << ">> filmThickness = " << params.filmThickness;
   if (params.specular)
-    cout << endl << ">> specular     = true";
+    cout << endl << ">> specular      = true";
   else
-    cout << endl << ">> specular     = false";
+    cout << endl << ">> specular      = false";
   cout << endl;
 
   PPippard *pippard = new PPippard(params);
 
+//  pippard->DumpParams();
+
   pippard->CalculateField();
 
   // check if it is necessary to calculate the <B(x)> and <[B(x)-<B(x)>]^2>
-  if (x.size() > 0) {
+  if (nOfx.size() > 0) {
     if ((params.b_ext == -1.0) || (params.deadLayer == -1.0)) {
       cout << endl << "**ERROR** Bext or deadLayer missing :-(" << endl;
       return 0;
     }
 
     Double_t meanX = 0.0;
-    for (unsigned int i=0; i<x.size(); i++) {
-      meanX += x[i]*n[i];
-    }
-    meanX *= (x[1]-x[0]);
-
     Double_t meanB = 0.0;
     Double_t varB = 0.0;
     Double_t BB = 0.0;
-    for (unsigned int i=0; i<x.size()-1; i++) {
-      if (x[i] <= params.deadLayer) {
-        meanB += 1.0 * n[i];
-      } else if (x[i] > params.deadLayer+params.filmThickness) {
-        meanB += 1.0 * n[i];
-      } else {
-        BB = pippard->GetMagneticField(x[i]-params.deadLayer);
-        meanB += BB * n[i];
+    for (UInt_t i=0; i<nOfx.size(); i++) {
+      meanX = 0.0;
+      for (unsigned int j=0; j<nOfx[i].x.size(); j++) {
+        meanX += nOfx[i].x[j]*nOfx[i].n[j];
       }
-    }
-    meanB *= (x[1]-x[0]);
-    for (unsigned int i=0; i<x.size()-1; i++) {
-      if (x[i] > params.deadLayer) {
-        BB = pippard->GetMagneticField(x[i]-params.deadLayer);
-        varB += (BB-meanB) * (BB-meanB) * n[i];
-      }
-    }
-    varB *= (x[1]-x[0]);
+      meanX *= (nOfx[i].x[1]-nOfx[i].x[0]);
 
-    cout << endl << ">> mean x = " << meanX << " (nm), mean field = " << params.b_ext * meanB << " (G)";
-    cout << " <(B-<B>)^2> = " << varB * params.b_ext * params.b_ext << " (G^2)";
-    pippard->SetMeanX(meanX);
-    pippard->SetVarB(varB);
-    pippard->SetMeanB(meanB);
+      meanB = 0.0;
+      varB = 0.0;
+      BB = 0.0;
+      for (unsigned int j=0; j<nOfx[i].x.size()-1; j++) {
+        if (nOfx[i].x[j] <= params.deadLayer) {
+          meanB += 1.0 * nOfx[i].n[j];
+        } else if (nOfx[i].x[j] > params.deadLayer+params.filmThickness) {
+          meanB += 1.0 * nOfx[i].n[j];
+        } else {
+          BB = pippard->GetMagneticField(nOfx[i].x[j]-params.deadLayer);
+          meanB += BB * nOfx[i].n[j];
+        }
+      }
+      meanB *= (nOfx[i].x[1]-nOfx[i].x[0]);
+      for (unsigned int j=0; j<nOfx[i].x.size()-1; j++) {
+        if (nOfx[i].x[j] > params.deadLayer) {
+          BB = pippard->GetMagneticField(nOfx[i].x[j]-params.deadLayer);
+          varB += (BB-meanB) * (BB-meanB) * nOfx[i].n[j];
+        }
+      }
+      varB *= (nOfx[i].x[1]-nOfx[i].x[0]);
+
+      cout << endl << "----------------------------------------";
+      cout << endl << ">> energy = " << nOfx[i].energy << "eV";
+      cout << endl << ">> mean x = " << meanX << " (nm), mean field = " << params.b_ext * meanB << " (G),";
+      cout << " <(B-<B>)^2> = " << varB * params.b_ext * params.b_ext << " (G^2)";
+
+      pippard->SetEnergy(nOfx[i].energy);
+      pippard->SetMeanX(meanX);
+      pippard->SetVarB(varB);
+      pippard->SetMeanB(meanB);
+    }
   }
 
   if (params.outputFileName.Length() > 0)
     pippard->SaveField();
+
+  if (params.outputFileNameBmean.Length() > 0)
+    pippard->SaveBmean();
 
   cout << endl << endl;
 

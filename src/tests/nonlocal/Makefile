@@ -87,6 +87,9 @@ nonlocal$(SUFFIX): $(OBJS)
 #
 clean:; 	@rm -f $(OBJS)
 	@echo "---> removing $(OBJS)"
+	
+install:
+	cp nonlocal $(HOME)/bin
 
 #
 $(OBJS): %.o: %.cpp
