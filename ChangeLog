@@ -36,6 +36,7 @@ FIXED bug reported in MUSR-183: missing background for 2nd histo in asymmetry fi
 FIXED Makefiles so that the NeXus support will not be built if it has not been enabled during the configure stage
 FIXED ASCII export from musrview in case of a Fourier-Power- or Fourier-Phase-difference plot
 FIXED bug in asymmetry fit with fixed background
+CHANGED Nonlocal: optimized the number of calculations of B(z)
 CHANGED Integrated building and installing the Qt editor into the musrfit installation.
 CHANGED musredit/musrgui msr2data interface such that it is hopefully closer to the command line (MUSR-162, MUSR-173)
 CHANGED the behavior of msr2data so that

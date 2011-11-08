@@ -150,7 +150,7 @@ void PNL_PippardFitterGlobal::CalculateField(const std::vector<Double_t> &param)
 {
   // param: [0] energy, [1] temp, [2] thickness, [3] meanFreePath, [4] xi0, [5] lambdaL, [6] Bext, [7] phase, [8] dead-layer
 
-  // check that param are new and hence a calculation is needed (except the phase, which is not needed here)
+  // check that param are new and hence a calculation is needed (except the energy and phase, which is not needed here)
   Bool_t newParams = false;
   if (fPreviousParam.size() == 0) {
     for (UInt_t i=0; i<param.size(); i++)
@@ -160,7 +160,7 @@ void PNL_PippardFitterGlobal::CalculateField(const std::vector<Double_t> &param)
     assert(param.size() == fPreviousParam.size());
 
     for (UInt_t i=0; i<param.size(); i++) {
-      if (i == 7) // phase, nothing to be done
+      if ((i == 0) || (i >= 6)) // for energy, Bext, phase, and dead-layer, nothing to be done here
         continue;
       if (param[i] != fPreviousParam[i]) {
         newParams = true;
@@ -176,12 +176,7 @@ void PNL_PippardFitterGlobal::CalculateField(const std::vector<Double_t> &param)
   for (UInt_t i=0; i<param.size(); i++)
     fPreviousParam[i] = param[i];
 
-//cout << endl << "in CalculateField ..." << endl;
-//cout << endl << "fFourierPoints = " << fFourierPoints;
-
-
   f_dz = XiP_T(param[4], param[3], param[1])*TMath::TwoPi()/fFourierPoints/f_dx; // see lab-book p.137, used for specular reflection boundary conditions (default)
-//cout << endl << "f_dz = " << f_dz;
 
   // check if it is necessary to allocate memory
   if (fFieldq == 0) {
@@ -219,7 +214,6 @@ void PNL_PippardFitterGlobal::CalculateField(const std::vector<Double_t> &param)
 
   // Fourier transform
   if (!fPlanPresent) {
-//    fPlan = fftw_plan_dft_1d(fFourierPoints, fFieldq, fFieldB, FFTW_FORWARD, FFTW_EXHAUSTIVE);
     fPlan = fftw_plan_dft_1d(fFourierPoints, fFieldq, fFieldB, FFTW_FORWARD, FFTW_ESTIMATE);
     fPlanPresent = true;
   }
@@ -367,7 +361,6 @@ PNL_PippardFitter::PNL_PippardFitter()
   fValid = false;
   fInvokedGlobal = false;
   fPippardFitterGlobal = 0;
-
 }
 
 //--------------------------------------------------------------------------
@@ -381,7 +374,6 @@ PNL_PippardFitter::~PNL_PippardFitter()
   if ((fPippardFitterGlobal != 0) && fInvokedGlobal) {
     delete fPippardFitterGlobal;
     fPippardFitterGlobal = 0;
-//    cout << endl << "debug> in PNL_PippardFitter::~PNL_PippardFitter(), fPippardFitterGlobal deleted." << endl;
   }
 }
 
@@ -413,7 +405,6 @@ void PNL_PippardFitter::SetGlobalPart(vector<void*> &globalPart, UInt_t idx)
       fInvokedGlobal = true;
       globalPart.resize(fIdxGlobal+1);
       globalPart[fIdxGlobal] = dynamic_cast<PNL_PippardFitterGlobal*>(fPippardFitterGlobal);
-//      cout << endl << ">> debug> PNL_PippardFitter::SetGlobalPart(): invoked global user function object, fPippardFitterGlobal = " << fPippardFitterGlobal << ", fInvokedGlobal=" << fInvokedGlobal;
     }
   } else {
     fValid = true;
@@ -431,7 +422,6 @@ void PNL_PippardFitter::SetGlobalPart(vector<void*> &globalPart, UInt_t idx)
  */
 Bool_t PNL_PippardFitter::GlobalPartIsValid() const
 {
-//  cout << endl << "debug> PNL_PippardFitter::GlobalPartIsValid(): fValid=" << fValid << ", fGlobalUserFcn->IsValid()=" << fPippardFitterGlobal->IsValid() << endl;
   return (fValid && fPippardFitterGlobal->IsValid());
 }
 
