@@ -36,6 +36,7 @@ using namespace std;
 
 #include "TH1F.h"
 #include "TF1.h"
+#include "TAxis.h"
 
 //#include "TFile.h"
 
@@ -179,9 +180,18 @@ void PFourier::Transform(UInt_t apodizationTag)
   fftw_execute(fFFTwPlan);
 
   // correct the phase for tstart != 0.0
+  // find the first bin >= fStartTime
+  Double_t shiftTime = 0.0;
+  for (Int_t i=1; i<fData->GetXaxis()->GetNbins(); i++) {
+    if (fData->GetXaxis()->GetBinCenter(i) >= fStartTime) {
+      shiftTime = fData->GetXaxis()->GetBinCenter(i);
+      break;
+    }
+  }
+
   Double_t phase, re, im;
   for (UInt_t i=0; i<fNoOfBins; i++) {
-    phase = 2.0*PI/(fTimeResolution*fNoOfBins) * i * fStartTime;
+    phase = 2.0*PI/(fTimeResolution*fNoOfBins) * i * shiftTime;
     re =  fOut[i][0] * cos(phase) + fOut[i][1] * sin(phase);
     im = -fOut[i][0] * sin(phase) + fOut[i][1] * cos(phase);
     fOut[i][0] = re;

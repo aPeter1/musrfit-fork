@@ -17,6 +17,7 @@ NEW the chi^2 calculation in single-histogram and asymmetry fits is parallelized
     if musrfit is built using a compiler supporting OpenMP (e.g. GCC >= 4.2)
     Using --disable-omp this feature can be disabled on the configure level.
 NEW any2many: force the user to define the exact NeXus ouput format (HDF4,HDF5,XML)
+FIXED proper phase correction for Re/Im Fourier transform (MUSR-206)
 FIXED when release or restore is called (command block commands), the
 corresponding parameter error is set to 2% of its parameter value (MUSR-188).
 FIXED the wrong normalization when using "SCALE_N0_BKG FALSE" together with view_packing (MUSR-184)
