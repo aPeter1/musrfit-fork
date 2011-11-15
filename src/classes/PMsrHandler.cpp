@@ -746,6 +746,21 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
               fout << left << fRuns[runNo].GetBkgRange(j);
             }
           }
+          if (fRuns[runNo].GetBkgEstimated(0) != PMUSR_UNDEFINED) {
+            Int_t precision=4;
+            if ((Int_t)log10(fRuns[runNo].GetBkgEstimated(0))+1 >= 4)
+              precision = 2;
+            fout << "   # estimated bkg: ";
+            fout << fixed;
+            fout.precision(precision);
+            fout << fRuns[runNo].GetBkgEstimated(0);
+            if (fRuns[runNo].GetBkgEstimated(1) != PMUSR_UNDEFINED) {
+              fout << " / ";
+              fout << fixed;
+              fout.precision(precision);
+              fout << fRuns[runNo].GetBkgEstimated(1);
+            }
+          }
           fout << endl;
         } else if (sstr.BeginsWith("data")) {
           dataTagMissing[runNo] = false;
@@ -2465,8 +2480,14 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
 
   iter = lines.begin();
   while ((iter != lines.end()) && !error) {
+    // remove potential comment at the end of lines
+    str = iter->fLine;
+    Ssiz_t idx = str.Index("#");
+    if (idx != -1)
+      str.Remove(idx);
+
     // tokenize line
-    tokens = iter->fLine.Tokenize(" \t");
+    tokens = str.Tokenize(" \t");
     if (!tokens) {
       cerr << endl << ">> PMsrHandler::HandleRunEntry: **SEVERE ERROR** Couldn't tokenize Parameters in line " << iter->fLineNo;
       cerr << endl << endl;

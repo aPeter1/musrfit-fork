@@ -577,8 +577,10 @@ PMsrRunBlock::PMsrRunBlock()
   fBkgFitParamNo = -1; // undefined background parameter number
   fLifetimeParamNo = -1; // undefined lifetime parameter number
   fLifetimeCorrection = false; // lifetime correction == false by default (used in single histogram musrview)
-  for (UInt_t i=0; i<2; i++)
+  for (UInt_t i=0; i<2; i++) {
+    fBkgEstimated[i] = PMUSR_UNDEFINED;
     fBkgFix[i] = PMUSR_UNDEFINED;
+  }
   for (UInt_t i=0; i<4; i++) {
     fBkgRange[i] = -1; // undefined start background range
     fDataRange[i] = -1; // undefined start data range
@@ -953,6 +955,48 @@ void PMsrRunBlock::SetMap(Int_t mapVal, Int_t idx)
     fMap.resize(idx+1);
 
   fMap[idx] = mapVal;
+}
+
+//--------------------------------------------------------------------------
+// GetBkgEstimated
+//--------------------------------------------------------------------------
+/**
+ * <p> get estimated background value at position idx. If not present,
+ * PMUSR_UNDEFINED is returned.
+ *
+ * <b>return:</b>
+ * - estimated background value, if idx is within proper boundaries
+ * - PMUSR_UNDEFINED, otherwise
+ *
+ * \param idx index of the estimated background value to be returned
+ */
+Double_t PMsrRunBlock::GetBkgEstimated(UInt_t idx)
+{
+  if (idx >= 2)
+    return PMUSR_UNDEFINED;
+
+  return fBkgEstimated[idx];
+}
+
+
+//--------------------------------------------------------------------------
+// SetBkgEstimated
+//--------------------------------------------------------------------------
+/**
+ * <p> set estimated background value at position idx
+ *
+ * \param dval estimated background value
+ * \param idx index of the estimated background value to be set.
+ */
+void PMsrRunBlock::SetBkgEstimated(Double_t dval, Int_t idx)
+{
+  if (idx >= 2) {
+    cerr << endl << ">> PMsrRunBlock::SetBkgEstimated: **WARNING** idx=" << idx << ", only idx=0,1 are sensible.";
+    cerr << endl;
+    return;
+  }
+
+  fBkgEstimated[idx] = dval;
 }
 
 //--------------------------------------------------------------------------

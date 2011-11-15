@@ -1358,7 +1358,7 @@ Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
   else
     fBackground = bkg * fRunInfo->GetPacking();  // keep background (per bin)
 
-  cout << endl << ">> fRunInfo->fRunName=" << fRunInfo->GetRunName()->Data() << ", histNo=" << histoNo << ", fBackground=" << fBackground;
+  fRunInfo->SetBkgEstimated(fBackground, 0);
 
   return true;
 }

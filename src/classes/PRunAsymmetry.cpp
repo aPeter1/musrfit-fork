@@ -820,6 +820,9 @@ Bool_t PRunAsymmetry::SubtractEstimatedBkg()
     fBackward[i] -= bkg[1];
   }
 
+  fRunInfo->SetBkgEstimated(bkg[0], 0);
+  fRunInfo->SetBkgEstimated(bkg[1], 1);
+
   return true;
 }
 
