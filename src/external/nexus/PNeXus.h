@@ -256,6 +256,7 @@ class PNeXusData1 {
     virtual vector<string> *GetHistoNames() { return &fHistoName; }
     virtual void GetHistoName(unsigned int idx, string &name, bool &ok);
     virtual unsigned int GetNoOfHistos() { return fHisto.size(); }
+    virtual unsigned int GetHistoLength(unsigned int histoNo=0);
     virtual vector<unsigned int> *GetHisto(unsigned int histoNo);
     virtual vector<int> *GetGrouping() { return &fGrouping; }
     virtual vector<PNeXusAlpha1> *GetAlpha() { return &fAlpha; }
@@ -378,9 +379,10 @@ class PNeXusBeamline2 {
 class PNeXusDetector2 {
   public:
     PNeXusDetector2();
-    virtual ~PNeXusDetector2();
+    virtual ~PNeXusDetector2();    
 
     virtual bool IsValid(bool strict);
+    virtual string GetErrorMsg() { return fErrorMsg; }
 
     virtual string GetDescription() { return fDescription; }
     virtual double GetTimeResolution(string units);
@@ -406,19 +408,20 @@ class PNeXusDetector2 {
     virtual void SetDescription(string description) { fDescription = description; }
     virtual void SetTimeResolution(double val, string units);
     virtual void SetT0Tag(int tag) { fT0Tag = tag; }
-    virtual void SetT0(int *t0) { fT0 = t0; }
-    virtual void SetFirstGoodBin(int *fgb) { fFirstGoodBin = fgb; }
-    virtual void SetLastGoodBin(int *lgb) { fLastGoodBin = lgb; }
+    virtual int  SetT0(int *t0);
+    virtual int  SetFirstGoodBin(int *fgb);
+    virtual int  SetLastGoodBin(int *lgb);
     virtual void SetNoOfPeriods(int val) { fNoOfPeriods = val; }
     virtual void SetNoOfSpectra(int val) { fNoOfSpectra = val; }
     virtual void SetNoOfBins(int val) { fNoOfBins = val; }
-    virtual void SetHisto(int *histo) { fHisto = histo; }
+    virtual int  SetHistos(int *histo);
     virtual void SetSpectrumIndex(vector<int> spectIdx) { fSpectrumIndex = spectIdx; }
     virtual void SetSpectrumIndex(int spectIdx, int idx=-1);
 
   private:
-    string fDescription; ///< description of the detector
-    double fTimeResolution; ///< keeps the time resolution in (ps)
+    string fErrorMsg;           ///< internal error message
+    string fDescription;        ///< description of the detector
+    double fTimeResolution;     ///< keeps the time resolution in (ps)
     vector<int> fSpectrumIndex; ///< list of global spectra
 
     int fNoOfPeriods; ///< number of periods or -1 if not defined
@@ -509,6 +512,7 @@ class PNeXusEntry2 {
 
     virtual bool IsValid(bool strict);
 
+    virtual string GetErrorMsg() { return fErrorMsg; }
     virtual string GetDefinition() { return fDefinition; }
     virtual string GetProgramName() { return fProgramName; }
     virtual string GetProgramVersion() { return fProgramVersion; }
@@ -534,6 +538,7 @@ class PNeXusEntry2 {
     virtual void SetInstrument(PNeXusInstrument2 &instrument) { fInstrument = instrument; }
 
   private:
+    string fErrorMsg;         ///< internal error message
     string fDefinition;       ///< the template (DTD name) on which the entry was based, e.g. 'pulsedTD'
     string fProgramName;      ///< name of the creating program
     string fProgramVersion;   ///< version of the creating program

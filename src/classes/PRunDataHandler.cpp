@@ -3730,7 +3730,7 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
         *(histo+i*fData[0].GetDataBin(0)->size()+j) = (int) fData[0].GetDataBin(i)->at(j);
       }
     }
-    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetHisto(histo);
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetHistos(histo);
     for (int i=0; i<nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra(); i++)
       nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetSpectrumIndex(i+1);
 

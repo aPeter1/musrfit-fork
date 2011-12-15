@@ -622,6 +622,22 @@ void PNeXusData1::GetHistoName(unsigned int idx, string &name, bool &ok)
 }
 
 //------------------------------------------------------------------------------------------
+// GetHistoLength (public)
+//------------------------------------------------------------------------------------------
+/**
+ * <p>Returns the length of histogram histoNo, or 0 if histoNo is out of bound.
+ *
+ * \param histoNo index of the histogram for which the size needs to be determined.
+ */
+unsigned int PNeXusData1::GetHistoLength(unsigned int histoNo)
+{
+  if (histoNo >= fHisto.size())
+    return 0;
+
+  return fHisto[histoNo].size();
+}
+
+//------------------------------------------------------------------------------------------
 // GetHisto (public)
 //------------------------------------------------------------------------------------------
 /**
@@ -795,6 +811,8 @@ bool PNeXusBeamline2::IsValid(bool strict)
  */
 PNeXusDetector2::PNeXusDetector2()
 {
+  fErrorMsg = "";
+
   fDescription = "n/a";
   fTimeResolution = 0;
   fNoOfPeriods = -1;
@@ -913,6 +931,76 @@ int PNeXusDetector2::GetT0(int idxp, int idxs)
 }
 
 //------------------------------------------------------------------------------------------
+// SetT0 (public)
+//------------------------------------------------------------------------------------------
+/**
+ * <p>Set T0s.
+ *
+ * <p><b>return:</b>
+ * -1 of everything is OK,
+ * -0 if there was an error, in which case GetErrorMsg() will give the internal error message.
+ *
+ * \param t0 pointer to t0's.
+ */
+int PNeXusDetector2::SetT0(int *t0)
+{
+  if (t0 == 0) {
+    fErrorMsg = "PNeXusDetector2::SetT0(int *t0): t0 pointer is null.";
+    return 0;
+  }
+
+  int result = 1;
+  unsigned int size=0;
+  stringstream ss;
+
+  switch (fT0Tag) {
+    case -1:
+      ss << "PNeXusDetector2::SetT0(int *t0): unkown fT0tag: " << fT0Tag << "!";
+      fErrorMsg = ss.str();
+      result = 0;
+      break;
+    case 1:
+      size = 1;
+      break;
+    case 2:
+      if ((fNoOfPeriods <= 0) || (fNoOfSpectra <= 0)) {
+        fErrorMsg = "PNeXusDetector2::SetT0(int *t0): ask for t0 vector (np, ns), but either np or ns <= 0!";
+        result = 0;
+      } else {
+        size = fNoOfPeriods * fNoOfSpectra;
+      }
+      break;
+    default:
+      ss << "PNeXusDetector2::SetT0(int *t0): unkown fT0tag: " << fT0Tag << "!";
+      fErrorMsg = ss.str();
+      result = 0;
+      break;
+  }
+
+  // check for error
+  if (!result)
+    return result;
+
+  // make sure fT0 memory is cleaned up before filled
+  if (fT0) {
+    delete [] fT0;
+    fT0 = 0;
+  }
+
+  // allocate memory
+  fT0 = new int[size];
+  if (fT0 == 0) {
+    fErrorMsg = "PNeXusDetector2::SetT0(int *t0): couldn't allocate necessary memory.";
+    result = 0;
+  } else {
+    for (unsigned int i=0; i<size; i++)
+      *(fT0+i) = *(t0+i);
+  }
+
+  return result;
+}
+
+//------------------------------------------------------------------------------------------
 // GetFirstGoodBin (public)
 //------------------------------------------------------------------------------------------
 /**
@@ -939,6 +1027,76 @@ int PNeXusDetector2::GetFirstGoodBin(int idxp, int idxs)
 }
 
 //------------------------------------------------------------------------------------------
+// SetFirstGoodBin (public)
+//------------------------------------------------------------------------------------------
+/**
+ * <p>Set first good bins.
+ *
+ * <p><b>return:</b>
+ * -1 of everything is OK,
+ * -0 if there was an error, in which case GetErrorMsg() will give the internal error message.
+ *
+ * \param fgb is the pointer to the first good bin array.
+ */
+int PNeXusDetector2::SetFirstGoodBin(int *fgb)
+{
+  if (fgb == 0) {
+    fErrorMsg = "PNeXusDetector2::SetFirstGoodBin(int *fgb): fgb pointer is null.";
+    return 0;
+  }
+
+  int result = 1;
+  unsigned int size=0;
+  stringstream ss;
+
+  switch (fT0Tag) {
+    case -1:
+      ss << "PNeXusDetector2::SetFirstGoodBin(int *fgb): unkown fT0tag: " << fT0Tag << "!";
+      fErrorMsg = ss.str();
+      result = 0;
+      break;
+    case 1:
+      size = 1;
+      break;
+    case 2:
+      if ((fNoOfPeriods <= 0) || (fNoOfSpectra <= 0)) {
+        fErrorMsg = "PNeXusDetector2::SetFirstGoodBin(int *fgb): ask for fgb vector (np, ns), but either np or ns <= 0!";
+        result = 0;
+      } else {
+        size = fNoOfPeriods * fNoOfSpectra;
+      }
+      break;
+    default:
+      ss << "PNeXusDetector2::SetFirstGoodBin(int *fgb): unkown fT0tag: " << fT0Tag << "!";
+      fErrorMsg = ss.str();
+      result = 0;
+      break;
+  }
+
+  // check for error
+  if (!result)
+    return result;
+
+  // make sure fFirstGoodBin memory is cleaned up before filled
+  if (fFirstGoodBin) {
+    delete [] fFirstGoodBin;
+    fFirstGoodBin = 0;
+  }
+
+  // allocate memory
+  fFirstGoodBin = new int[size];
+  if (fFirstGoodBin == 0) {
+    fErrorMsg = "PNeXusDetector2::SetFirstGoodBin(int *fgb): couldn't allocate necessary memory.";
+    result = 0;
+  } else {
+    for (unsigned int i=0; i<size; i++)
+      *(fFirstGoodBin+i) = *(fgb+i);
+  }
+
+  return result;
+}
+
+//------------------------------------------------------------------------------------------
 // GetLastGoodBin (public)
 //------------------------------------------------------------------------------------------
 /**
@@ -959,6 +1117,76 @@ int PNeXusDetector2::GetLastGoodBin(int idxp, int idxs)
     if ((idxp < fNoOfPeriods) || (idxs < fNoOfSpectra)) {
       result = *(fLastGoodBin+idxp*fNoOfSpectra+idxs);
     }
+  }
+
+  return result;
+}
+
+//------------------------------------------------------------------------------------------
+// SetLastGoodBin (public)
+//------------------------------------------------------------------------------------------
+/**
+ * <p>Set last good bins.
+ *
+ * <p><b>return:</b>
+ * -1 of everything is OK,
+ * -0 if there was an error, in which case GetErrorMsg() will give the internal error message.
+ *
+ * \param lgb is the pointer to the first good bin array.
+ */
+int PNeXusDetector2::SetLastGoodBin(int *lgb)
+{
+  if (lgb == 0) {
+    fErrorMsg = "PNeXusDetector2::SetLastGoodBin(int *lgb): fgb pointer is null.";
+    return 0;
+  }
+
+  int result = 1;
+  unsigned int size=0;
+  stringstream ss;
+
+  switch (fT0Tag) {
+    case -1:
+      ss << "PNeXusDetector2::SetLastGoodBin(int *lgb): unkown fT0tag: " << fT0Tag << "!";
+      fErrorMsg = ss.str();
+      result = 0;
+      break;
+    case 1:
+      size = 1;
+      break;
+    case 2:
+      if ((fNoOfPeriods <= 0) || (fNoOfSpectra <= 0)) {
+        fErrorMsg = "PNeXusDetector2::SetLastGoodBin(int *lgb): ask for lgb vector (np, ns), but either np or ns <= 0!";
+        result = 0;
+      } else {
+        size = fNoOfPeriods * fNoOfSpectra;
+      }
+      break;
+    default:
+      ss << "PNeXusDetector2::SetLastGoodBin(int *lgb): unkown fT0tag: " << fT0Tag << "!";
+      fErrorMsg = ss.str();
+      result = 0;
+      break;
+  }
+
+  // check for error
+  if (!result)
+    return result;
+
+  // make sure fLastGoodBin memory is cleaned up before filled
+  if (fLastGoodBin) {
+    delete [] fLastGoodBin;
+    fLastGoodBin = 0;
+  }
+
+  // allocate memory
+  fLastGoodBin = new int[size];
+  if (fLastGoodBin == 0) {
+    fErrorMsg = "PNeXusDetector2::SetLastGoodBin(int *lgb): couldn't allocate necessary memory.";
+    result = 0;
+  } else {
+    for (unsigned int i=0; i<size; i++)
+      *(fLastGoodBin+i) = *(lgb+i);
   }
 
   return result;
@@ -1006,6 +1234,63 @@ int PNeXusDetector2::GetHistoValue(int idx_p, int idx_s, int idx_b)
   }
 
   return value;
+}
+
+//------------------------------------------------------------------------------------------
+// SetHistos (public)
+//------------------------------------------------------------------------------------------
+/**
+ * <p>Set values of all histograms.
+ *
+ * <p><b>return:</b>
+ * - 1 if everything is OK.
+ * - 0 something is wrong, check the internal error message via GetErrorMsg().
+ *
+ * \param histo pointer to the data.
+ */
+int PNeXusDetector2::SetHistos(int *histo)
+{
+  // make sure that histos are cleaned up before filled
+  if (fHisto) {
+    delete [] fHisto;
+    fHisto = 0;
+  }
+
+  // check needed size and its consistency
+  unsigned int size = 0;
+  if (fNoOfPeriods > 0) { // (np, ns, nb)
+    if ((fNoOfSpectra <= 0) || (fNoOfBins <= 0)) { // error
+      fErrorMsg = "PNeXusDetector2::SetHistos(int *histo): claims format (np, ns, nb), but ns or nb < 0.";
+      return 0;
+    }
+    size = fNoOfPeriods * fNoOfSpectra * fNoOfBins;
+  } else { // (ns, nb) or (nb)
+    if (fNoOfSpectra > 0) { // (ns, nb)
+      if (fNoOfBins <= 0) { // error
+        fErrorMsg = "PNeXusDetector2::SetHistos(int *histo): claims format (ns, nb), but nb < 0.";
+        return 0;
+      }
+      size = fNoOfSpectra * fNoOfBins;
+    } else { // (nb)
+      if (fNoOfBins <= 0) {
+        fErrorMsg = "PNeXusDetector2::SetHistos(int *histo): claims format (nb), but nb < 0.";
+        return 0;
+      }
+      size = fNoOfBins;
+    }
+  }
+
+  // allocate memory for fHisto
+  fHisto = new int[size];
+  if (fHisto == 0) {
+    fErrorMsg = "PNeXusDetector2::SetHistos(int *histo): couldn't allocate necessary memory for fHisto.";
+    return 0;
+  }
+
+  for (unsigned int i=0; i<size; i++)
+    *(fHisto+i) = *(histo+i);
+
+  return 1;
 }
 
 //------------------------------------------------------------------------------------------
@@ -1360,6 +1645,7 @@ void PNeXusSample2::SetPhysProp(string name, double value, string unit, int idx)
  */
 PNeXusEntry2::PNeXusEntry2()
 {
+  fErrorMsg = "";
   fDefinition = "n/a";
   fProgramName = "n/a";
   fProgramVersion = "n/a";
@@ -1471,8 +1757,10 @@ int PNeXusEntry2::SetStartTime(string time)
   strptime(time.c_str(), "%Y-%m-%d %H:%M:S", &tm);
   if (tm.tm_year == 0)
     strptime(time.c_str(), "%Y-%m-%dT%H:%M:S", &tm);
-  if (tm.tm_year == 0)
+  if (tm.tm_year == 0) {
+    fErrorMsg = "PNeXusEntry2::SetStartTime(): get year zero!";
     return NX_ERROR;
+  }
 
   fStartTime = time;
 
@@ -1494,8 +1782,10 @@ int PNeXusEntry2::SetStopTime(string time)
   strptime(time.c_str(), "%Y-%m-%d %H:%M:S", &tm);
   if (tm.tm_year == 0)
     strptime(time.c_str(), "%Y-%m-%dT%H:%M:S", &tm);
-  if (tm.tm_year == 0)
+  if (tm.tm_year == 0) {
+    fErrorMsg = "PNeXusEntry2::SetStopTime(): get year zero!";
     return NX_ERROR;
+  }
 
   fStopTime = time;
 
@@ -1712,7 +2002,7 @@ int PNeXus::ReadFile(const char *fileName)
   case 2:
     status = ReadFileIdf2();
     if (status != NX_OK) {
-      fErrorCode = PNEXUS_VAILD_READ_IDF1_FILE;
+      fErrorCode = PNEXUS_VAILD_READ_IDF2_FILE;
       fErrorMsg = ">> **ERROR** coudn't read IDF Version 2 file '" + fFileName + "'.";
     }
     break;
@@ -2112,16 +2402,19 @@ bool PNeXus::ErrorHandler(NXstatus status, int errCode, const string &errMsg)
 NXstatus PNeXus::GetStringData(string &str)
 {
   int i, status, rank, type, dims[32];
-  char cstr[VGNAMELENMAX];
+  char cstr[1024];
   NXname data_value;
 
   status = NXgetinfo(fFileHandle, &rank, dims, &type);
   if (status != NX_OK) {
+    cerr << endl << ">> **ERROR** in NXgetinfo: couldn't get meta info!" << endl;
     fErrorCode = PNEXUS_GET_META_INFO_ERROR;
-    fErrorMsg = "PNeXus::GetStringData() **ERROR** couldn't get meta info!";
+    fErrorMsg = "PNeXus::GetStringData() **ERROR** couldn't get meta info!";    
     return NX_ERROR;
   }
-  if ((type != NX_CHAR) || (rank > 1) || (dims[0] >= VGNAMELENMAX)) {
+
+  if ((type != NX_CHAR) || (rank > 1) || (dims[0] >= (int)sizeof(cstr))) {
+    cerr << endl << ">> **ERROR** in NXgetinfo: found wrong meta info!" << endl;
     fErrorCode = PNEXUS_WRONG_META_INFO;
     fErrorMsg = "PNeXus::GetStringData() **ERROR** found wrong meta info!";
     return NX_ERROR;
@@ -2352,6 +2645,8 @@ NXstatus PNeXus::GetIntVectorData(vector<int> &data)
  */
 int PNeXus::ReadFileIdf1()
 {
+  cout << endl << ">> reading NeXus Version 1 file ..." << endl;
+
   // create first the necessary NXentry object for IDF Version 1
   fNxEntry1 = new PNeXusEntry1();
   if (fNxEntry1 == 0) {
@@ -2499,7 +2794,10 @@ int PNeXus::ReadFileIdf1()
   NXclosegroup(fFileHandle);
 
   // open group NXsample
-  if (!ErrorHandler(NXopengroup(fFileHandle, "sample", "NXSample"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open NeXus subgroup sample!")) return NX_ERROR;
+  if (NXopengroup(fFileHandle, "sample", "NXsample") == NX_ERROR) {
+    cout << endl << ">> **WARNING** unable to open subgroup NXsample, will try NXSample." << endl;
+    if (!ErrorHandler(NXopengroup(fFileHandle, "sample", "NXSample"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open NeXus subgroup sample!")) return NX_ERROR;
+  }
 
   // read sample name
   if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'name' data in sample group!")) return NX_ERROR;
@@ -2637,8 +2935,10 @@ int PNeXus::ReadFileIdf1()
   if (!ErrorHandler(NXgetdata(fFileHandle, &ival), PNEXUS_GET_DATA_ERROR, "couldn't read 'resolution' data in histogram_data_1 group!")) return NX_ERROR;
   if (!ErrorHandler(GetStringAttr("units", str), PNEXUS_GET_ATTR_ERROR, "couldn't read 'resolution'' units!")) return NX_ERROR;
   if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'resolution' data in histogram_data_1 group")) return NX_ERROR;
-  if (!strcmp(str.data(), "picoseconds")) {
+  if (!strcmp(str.c_str(), "picoseconds")) {
     fNxEntry1->GetData()->SetTimeResolution((double)ival, "ps");
+  } else if (!strcmp(str.c_str(), "femtoseconds")) {
+    fNxEntry1->GetData()->SetTimeResolution((double)ival, "fs");
   }
 
   // get data, t0, first good bin, last good bin, data
@@ -2658,14 +2958,19 @@ int PNeXus::ReadFileIdf1()
   attType = NX_INT32;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, "length", sizeof(cstr));
-  if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &histoLength, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'number' data in histogram_data_1 group!")) return NX_ERROR;
+  if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &histoLength, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'length' data in histogram_data_1 group!")) return NX_ERROR;
 
   // get t0
   attLen = 1;
   attType = NX_INT32;
   memset(cstr, '\0', sizeof(cstr));
-  strncpy(cstr, "t0_bin", sizeof(cstr));
-  if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 't0_bin' data in histogram_data_1 group!")) return NX_ERROR;
+  strncpy(cstr, "T0_bin", sizeof(cstr));
+  if (NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType) == NX_ERROR) {
+    cout << endl << ">> **WARNING** didn't find attribute 'T0_bin' in NXdata/counts, will try 't0_bin'." << endl;
+    memset(cstr, '\0', sizeof(cstr));
+    strncpy(cstr, "t0_bin", sizeof(cstr));
+    if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 't0_bin' data in histogram_data_1 group!")) return NX_ERROR;
+  }
   fNxEntry1->GetData()->SetT0(ival);
 
   // get first good bin
@@ -2753,22 +3058,26 @@ int PNeXus::ReadFileIdf1()
     grouping.clear();
   }
   if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'grouping' data in histogram_data_1 group")) return NX_ERROR;
-  // check grouping vector for consistency
-  if (fNxEntry1->GetData()->GetGrouping()->size() != fNxEntry1->GetData()->GetNoOfHistos()) {
-    fNxEntry1->GetData()->FlushGrouping();
-    cerr << endl << ">> **WARNING** grouping vector size != no of histograms which doesn't make sence, hence grouping will be ignored." << endl;
-  }
-  // check that the grouping values do make sense, i.e. allowed range is grouping value > 0 and grouping value <= # of histos
+
+  // if grouping has been available check for consistency
   bool ok=true;
-  for (unsigned int i=0; i<fNxEntry1->GetData()->GetGrouping()->size(); i++) {
-    if ((fNxEntry1->GetData()->GetGrouping()->at(i) == 0) || (fNxEntry1->GetData()->GetGrouping()->at(i) > (int)fNxEntry1->GetData()->GetNoOfHistos())) {
-      cerr << endl << ">> **WARNING** found grouping entry '" << fNxEntry1->GetData()->GetGrouping()->at(i) << "' which doesn't make sense, hence grouping will be ignored." << endl;
-      ok = false;
-      break;
+  if (ival) { // i.e. grouping is available (see a few lines further up)
+    // check grouping vector for consistency
+    if (fNxEntry1->GetData()->GetGrouping()->size() != fNxEntry1->GetData()->GetNoOfHistos()) {
+      fNxEntry1->GetData()->FlushGrouping();
+      cerr << endl << ">> **WARNING** grouping vector size (" << fNxEntry1->GetData()->GetGrouping()->size()<< ") != no of histograms (" << fNxEntry1->GetData()->GetNoOfHistos() << ") which doesn't make sence, hence grouping will be ignored." << endl;
     }
+    // check that the grouping values do make sense, i.e. allowed range is grouping value > 0 and grouping value <= # of histos
+    for (unsigned int i=0; i<fNxEntry1->GetData()->GetGrouping()->size(); i++) {
+      if ((fNxEntry1->GetData()->GetGrouping()->at(i) == 0) || (fNxEntry1->GetData()->GetGrouping()->at(i) > (int)fNxEntry1->GetData()->GetNoOfHistos())) {
+        cerr << endl << ">> **WARNING** found grouping entry '" << fNxEntry1->GetData()->GetGrouping()->at(i) << "' which doesn't make sense, hence grouping will be ignored." << endl;
+        ok = false;
+        break;
+      }
+    }
+    if (!ok)
+      fNxEntry1->GetData()->FlushGrouping();
   }
-  if (!ok)
-    fNxEntry1->GetData()->FlushGrouping();
 
   // get alpha
   if (!ErrorHandler(NXopendata(fFileHandle, "alpha"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'alpha' data in histogram_data_1 group!")) return NX_ERROR;
@@ -2857,6 +3166,8 @@ int PNeXus::ReadFileIdf1()
  */
 int PNeXus::ReadFileIdf2()
 {
+  cout << endl << ">> reading NeXus Version 2 file ..." << endl;
+
   // create first the necessary NXentry object for IDF Version 1
   fNxEntry2 = new PNeXusEntry2();
   if (fNxEntry2 == 0) {
@@ -3168,8 +3479,6 @@ int PNeXus::ReadFileIdf2()
     return NX_ERROR;
   }
 
-  fNxEntry2->GetInstrument()->GetDetector()->SetHisto(i_data_ptr);
-
   if (rank == 3) { // i.e. np, ns, ntc
     fNxEntry2->GetInstrument()->GetDetector()->SetNoOfPeriods(dims[0]);
     fNxEntry2->GetInstrument()->GetDetector()->SetNoOfSpectra(dims[1]);
@@ -3188,6 +3497,17 @@ int PNeXus::ReadFileIdf2()
     fNxEntry2->GetInstrument()->GetDetector()->SetNoOfBins(-1);
     cerr << endl << ">> **ERROR** found rank=" << rank << " for NXinstrument:NXdetector:counts! Allowed ranks are 1, 2, or 3." << endl;
     return NX_ERROR;
+  }
+
+  if (!fNxEntry2->GetInstrument()->GetDetector()->SetHistos(i_data_ptr)) {
+    cerr << endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << endl;
+    return NX_ERROR;
+  }
+
+  // clean up
+  if (data_ptr) {
+    delete [] data_ptr;
+    data_ptr = 0;
   }
 
   if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'counts' data in NXdetector!")) return NX_ERROR;
@@ -3260,7 +3580,16 @@ int PNeXus::ReadFileIdf2()
       return NX_ERROR;
     }
 
-    fNxEntry2->GetInstrument()->GetDetector()->SetT0(i_data_ptr);
+    if (!fNxEntry2->GetInstrument()->GetDetector()->SetT0(i_data_ptr)) {
+      cerr << endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << endl;
+      return NX_ERROR;
+    }
+
+    // clean up
+    if (data_ptr) {
+      delete [] data_ptr;
+      data_ptr = 0;
+    }
 
     if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'time_zero_bin' data in NXdetector!")) return NX_ERROR;
   } else if (SearchInGroup("time_zero", "name", nxname, nxclass, dataType)) { // check for 'time_zero'
@@ -3314,11 +3643,16 @@ int PNeXus::ReadFileIdf2()
         *(pt0+i) = (int)(*(f_data_ptr+i) / (float)fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str));
       }
     }
-    fNxEntry2->GetInstrument()->GetDetector()->SetT0(pt0);
+
+    if (!fNxEntry2->GetInstrument()->GetDetector()->SetT0(pt0)) {
+      cerr << endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << endl;
+      return NX_ERROR;
+    }
 
     // clean up
     if (data_ptr) {
       delete [] data_ptr;
+      data_ptr = 0;
     }
 
     cerr << endl << ">> **WARNING** found only 'time_zero' will convert it to 'time_zero_bin' values" << endl;
@@ -3364,7 +3698,15 @@ int PNeXus::ReadFileIdf2()
       return NX_ERROR;
     }
 
-    fNxEntry2->GetInstrument()->GetDetector()->SetFirstGoodBin(i_data_ptr);
+    if (!fNxEntry2->GetInstrument()->GetDetector()->SetFirstGoodBin(i_data_ptr)) {
+      cerr << endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << endl;
+      return NX_ERROR;
+    }
+
+    if (data_ptr) {
+      delete [] data_ptr;
+      data_ptr = 0;
+    }
 
     if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'first_good_bin' data in NXdetector!")) return NX_ERROR;
   } else if (SearchInGroup("first_good_time", "name", nxname, nxclass, dataType)) {
@@ -3415,8 +3757,16 @@ int PNeXus::ReadFileIdf2()
       }
     }
 
-    fNxEntry2->GetInstrument()->GetDetector()->SetFirstGoodBin(p_fgb);
+    if (!fNxEntry2->GetInstrument()->GetDetector()->SetFirstGoodBin(p_fgb)) {
+      cerr << endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << endl;
+      return NX_ERROR;
+    }
 
+    // clean up
+    if (p_fgb) {
+      delete [] p_fgb;
+      p_fgb = 0;
+    }
     if (data_ptr) {
       delete [] data_ptr;
       data_ptr = 0;
@@ -3464,7 +3814,16 @@ int PNeXus::ReadFileIdf2()
       return NX_ERROR;
     }
 
-    fNxEntry2->GetInstrument()->GetDetector()->SetLastGoodBin(i_data_ptr);
+    if (!fNxEntry2->GetInstrument()->GetDetector()->SetLastGoodBin(i_data_ptr)) {
+      cerr << endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << endl;
+      return NX_ERROR;
+    }
+
+    // clean up
+    if (data_ptr) {
+      delete [] data_ptr;
+      data_ptr = 0;
+    }
 
     if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'last_good_bin' data in NXdetector!")) return NX_ERROR;
   } else if (SearchInGroup("last_good_time", "name", nxname, nxclass, dataType)) {
@@ -3515,8 +3874,16 @@ int PNeXus::ReadFileIdf2()
       }
     }
 
-    fNxEntry2->GetInstrument()->GetDetector()->SetFirstGoodBin(p_lgb);
+    if (fNxEntry2->GetInstrument()->GetDetector()->SetFirstGoodBin(p_lgb)) {
+      cerr << endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << endl;
+      return NX_ERROR;
+    }
 
+    // clean up
+    if (p_lgb) {
+      delete [] p_lgb;
+      p_lgb = 0;
+    }
     if (data_ptr) {
       delete [] data_ptr;
       data_ptr = 0;
@@ -3783,9 +4150,9 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
   NXclosegroup(fFileHandle);
 
   // make group 'sample'
-  if (!ErrorHandler(NXmakegroup(fFileHandle, "sample", "NXuser"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'sample'.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakegroup(fFileHandle, "sample", "NXsample"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'sample'.")) return NX_ERROR;
   // open group 'sample'
-  if (!ErrorHandler(NXopengroup(fFileHandle, "sample", "NXuser"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'sample' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXopengroup(fFileHandle, "sample", "NXsample"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'sample' for writting.")) return NX_ERROR;
 
   // write sample 'name'
   size = fNxEntry1->GetSample()->GetName().length();
@@ -3975,7 +4342,7 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
     histo_size[1] = histoLength;
   }
 
-  if (!ErrorHandler(NXmakedata(fFileHandle, "counts", NX_INT32, 2, histo_size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'counts'.")) return NX_ERROR;
+  if (!ErrorHandler(NXcompmakedata(fFileHandle, "counts", NX_INT32, 2, histo_size, NX_COMP_LZW, histo_size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'counts'.")) return NX_ERROR;
   if (!ErrorHandler(NXopendata(fFileHandle, "counts"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'counts' for writting.")) return NX_ERROR;
   if (!ErrorHandler(NXputdata(fFileHandle, (void*)histo_data), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'counts'.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
@@ -3985,6 +4352,8 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
   if (!ErrorHandler(NXputattr(fFileHandle, "signal", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'signal' for 'counts'")) return NX_ERROR;
   idata = fNxEntry1->GetData()->GetNoOfHistos();
   if (!ErrorHandler(NXputattr(fFileHandle, "number", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'number' for 'counts'")) return NX_ERROR;
+  idata = fNxEntry1->GetData()->GetHistoLength();
+  if (!ErrorHandler(NXputattr(fFileHandle, "length", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'length' for 'counts'")) return NX_ERROR;
   idata = fNxEntry1->GetData()->GetT0(0);
   if (!ErrorHandler(NXputattr(fFileHandle, "T0_bin", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'T0_bin' for 'counts'")) return NX_ERROR;
   idata = fNxEntry1->GetData()->GetFirstGoodBin(0);
@@ -3993,22 +4362,26 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
   if (!ErrorHandler(NXputattr(fFileHandle, "last_good_bin", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'last_good_bin' for 'counts'")) return NX_ERROR;
   fdata = (float)fNxEntry1->GetData()->GetTimeResolution("ps")/2.0;
   if (!ErrorHandler(NXputattr(fFileHandle, "offset", &fdata, 1, NX_FLOAT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'offset' for 'counts'")) return NX_ERROR;
+  NXclosedata(fFileHandle);
 
   if (histo_data) {
     delete [] histo_data;
   }
 
-  // write data 'histogram_resolution'
-  if (!ErrorHandler(NXmakedata(fFileHandle, "histogram_resolution", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'histogram_resolution'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "histogram_resolution"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'histogram_resolution' for writting.")) return NX_ERROR;
-  fdata = fNxEntry1->GetData()->GetTimeResolution("ps");
-  if (!ErrorHandler(NXputdata(fFileHandle, &fdata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'histogram_resolution'.")) return NX_ERROR;
+  // write data 'resolution'
+  size = 1;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "resolution", NX_INT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'resolution'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "resolution"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'resolution' for writting.")) return NX_ERROR;
+  fdata = fNxEntry1->GetData()->GetTimeResolution("fs");
+  idata = (int)fdata;
+  if (!ErrorHandler(NXputdata(fFileHandle, &idata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'resolution'.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
-  strncpy(cstr, "picoseconds", sizeof(cstr));
-  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'histogram_resolution'")) return NX_ERROR;
+  strncpy(cstr, "femtoseconds", sizeof(cstr));
+  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'resolution'")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // write data 'time_zero' always set to 0 since the T0_bin attribute of counts is relevant only
+  size = 1;
   if (!ErrorHandler(NXmakedata(fFileHandle, "time_zero", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'time_zero'.")) return NX_ERROR;
   if (!ErrorHandler(NXopendata(fFileHandle, "time_zero"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'time_zero' for writting.")) return NX_ERROR;
   fdata = 0.0;
@@ -4454,15 +4827,15 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
     dims[0] = fNxEntry2->GetInstrument()->GetDetector()->GetNoOfPeriods();
     dims[1] = fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra();
     dims[2] = fNxEntry2->GetInstrument()->GetDetector()->GetNoOfBins();
-    if (!ErrorHandler(NXmakedata(fFileHandle, "counts", NX_INT32, 3, dims), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'counts' in NXdetector.")) return NX_ERROR;
+    if (!ErrorHandler(NXcompmakedata(fFileHandle, "counts", NX_INT32, 3, dims, NX_COMP_LZW, dims), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'counts' in NXdetector.")) return NX_ERROR;
   } else {
     if (fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra() > 0) { // counts[][]
       dims[0] = fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra();
       dims[1] = fNxEntry2->GetInstrument()->GetDetector()->GetNoOfBins();
-      if (!ErrorHandler(NXmakedata(fFileHandle, "counts", NX_INT32, 2, dims), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'counts' in NXdetector.")) return NX_ERROR;
+      if (!ErrorHandler(NXcompmakedata(fFileHandle, "counts", NX_INT32, 2, dims, NX_COMP_LZW, dims), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'counts' in NXdetector.")) return NX_ERROR;
     } else { // counts[]
       dims[0] = fNxEntry2->GetInstrument()->GetDetector()->GetNoOfBins();
-      if (!ErrorHandler(NXmakedata(fFileHandle, "counts", NX_INT32, 1, dims), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'counts' in NXdetector.")) return NX_ERROR;
+      if (!ErrorHandler(NXcompmakedata(fFileHandle, "counts", NX_INT32, 1, dims, NX_COMP_LZW, dims), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'counts' in NXdetector.")) return NX_ERROR;
     }
   }
   if (!ErrorHandler(NXopendata(fFileHandle, "counts"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'counts' in NXdetector for writting.")) return NX_ERROR;
