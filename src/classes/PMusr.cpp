@@ -221,6 +221,9 @@ void PNonMusrRawRunData::AppendSubErrData(const UInt_t idx, const Double_t dval)
  */
 PRawRunData::PRawRunData()
 {
+  fLaboratory = TString("n/a");
+  fBeamline = TString("n/a");
+  fInstrument = TString("n/a");
   fRunName = TString("n/a");
   fRunNumber = -1;
   fRunTitle = TString("n/a");

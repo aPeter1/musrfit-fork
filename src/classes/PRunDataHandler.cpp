@@ -355,25 +355,46 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
       success = false;
       switch (outTag) {
       case A2M_ROOT:
-        success = WriteRootFile();
+        if (fAny2ManyInfo->outFileName.Length() == 0)
+          success = WriteRootFile();
+        else
+          success = WriteRootFile(fAny2ManyInfo->outFileName);
         break;
       case A2M_PSIBIN:
-        success = WritePsiBinFile();
+        if (fAny2ManyInfo->outFileName.Length() == 0)
+          success = WritePsiBinFile();
+        else
+          success = WritePsiBinFile(fAny2ManyInfo->outFileName);
         break;
       case A2M_PSIMDU:
-        success = WritePsiBinFile();
+        if (fAny2ManyInfo->outFileName.Length() == 0)
+          success = WritePsiBinFile();
+        else
+          success = WritePsiBinFile(fAny2ManyInfo->outFileName);
         break;
       case A2M_NEXUS:
-        success = WriteNexusFile();
+        if (fAny2ManyInfo->outFileName.Length() == 0)
+          success = WriteNexusFile();
+        else
+          success = WriteNexusFile(fAny2ManyInfo->outFileName);
         break;
       case A2M_MUD:
-        success = WriteMudFile();
+        if (fAny2ManyInfo->outFileName.Length() == 0)
+          success = WriteMudFile();
+        else
+          success = WriteMudFile(fAny2ManyInfo->outFileName);
         break;
       case A2M_WKM:
-        success = WriteWkmFile();
+        if (fAny2ManyInfo->outFileName.Length() == 0)
+          success = WriteWkmFile();
+        else
+          success = WriteWkmFile(fAny2ManyInfo->outFileName);
         break;
       case A2M_ASCII:
-        success = WriteAsciiFile();
+        if (fAny2ManyInfo->outFileName.Length() == 0)
+          success = WriteAsciiFile();
+        else
+          success = WriteAsciiFile(fAny2ManyInfo->outFileName);
         break;
       default:
         break;
@@ -1018,6 +1039,11 @@ Bool_t PRunDataHandler::ReadRootFile(UInt_t tag)
     return false;
   }
 
+  // set laboratory / beamline / instrument
+  runData.SetLaboratory("PSI");
+  runData.SetBeamline("muE4");
+  runData.SetInstrument("LEM");
+
   // get run title
   TObjString ostr = runHeader->GetRunTitle();
   runData.SetRunTitle(ostr.GetString());
@@ -1364,6 +1390,18 @@ Bool_t PRunDataHandler::ReadNexusFile()
     }
 
     // get header information
+
+    // get/set laboratory
+    str = TString(nxs_file->GetEntryIdf1()->GetLaboratory());
+    runData.SetLaboratory(str);
+
+    // get/set beamline
+    str = TString(nxs_file->GetEntryIdf1()->GetBeamline());
+    runData.SetBeamline(str);
+
+    // get/set instrument
+    str = TString(nxs_file->GetEntryIdf1()->GetInstrument()->GetName());
+    runData.SetInstrument(str);
 
     // get/set run title
     str = TString(nxs_file->GetEntryIdf1()->GetTitle());
@@ -1967,6 +2005,34 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   PIntVector ivec;
   PRawRunData runData;
   Double_t dval;
+
+  // set laboratory
+  runData.SetLaboratory("PSI");
+
+  // filter from the file name the instrument
+  TString instrument("n/a"), beamline("n/a");
+  if (fRunPathName.Contains("_gps_", TString::kIgnoreCase)) {
+    instrument = "GPS";
+    beamline = "piM3.2";
+  } else if (fRunPathName.Contains("_ltf_", TString::kIgnoreCase)) {
+    instrument = "LTF";
+    beamline = "piM3.3";
+  } else if (fRunPathName.Contains("_gpd_", TString::kIgnoreCase)) {
+    instrument = "GPD";
+    beamline = "muE1";
+  } else if (fRunPathName.Contains("_dolly_", TString::kIgnoreCase)) {
+    instrument = "DOLLY";
+    beamline = "piE1";
+  } else if (fRunPathName.Contains("_alc_", TString::kIgnoreCase)) {
+    instrument = "ALC";
+    beamline = "piE3";
+  } else if (fRunPathName.Contains("_hifi_", TString::kIgnoreCase)) {
+    instrument = "HIFI";
+    beamline = "piE3";
+  }
+  runData.SetInstrument(instrument);
+  runData.SetBeamline(beamline);
+
   // keep run name
   runData.SetRunName(fRunName);
   // get run title
@@ -2097,6 +2163,33 @@ Bool_t PRunDataHandler::ReadMudFile()
 
   // keep run name
   runData.SetRunName(fRunName);
+
+  // get/set the lab
+  success = MUD_getLab( fh, str, sizeof(str) );
+  if ( !success ) {
+    cerr << endl << ">> **WARNING** Couldn't obtain the laboratory name of run " << fRunName.Data();
+    cerr << endl;
+    strcpy(str, "n/a");
+  }
+  runData.SetLaboratory(TString(str));
+
+  // get/set the beamline
+  success = MUD_getArea( fh, str, sizeof(str) );
+  if ( !success ) {
+    cerr << endl << ">> **WARNING** Couldn't obtain the beamline of run " << fRunName.Data();
+    cerr << endl;
+    strcpy(str, "n/a");
+  }
+  runData.SetBeamline(TString(str));
+
+  // get/set the instrument
+  success = MUD_getApparatus( fh, str, sizeof(str) );
+  if ( !success ) {
+    cerr << endl << ">> **WARNING** Couldn't obtain the instrument name of run " << fRunName.Data();
+    cerr << endl;
+    strcpy(str, "n/a");
+  }
+  runData.SetInstrument(TString(str));
 
   // get run title
   success = MUD_getTitle( fh, str, sizeof(str) );
@@ -3641,14 +3734,16 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
     nxs->GetEntryIdf1()->SetRunNumber(fData[0].GetRunNumber());
     nxs->GetEntryIdf1()->SetTitle(fData[0].GetRunTitle()->Data());
     nxs->GetEntryIdf1()->SetNotes("n/a");
-    nxs->GetEntryIdf1()->SetAnalysis("n/a");
-    nxs->GetEntryIdf1()->SetLaboratory("PSI");
-    nxs->GetEntryIdf1()->SetBeamline("n/a");
+    nxs->GetEntryIdf1()->SetAnalysis("muonTD");
+    if (*fData[0].GetLaboratory() != "n/a")
+      nxs->GetEntryIdf1()->SetLaboratory(fData[0].GetLaboratory()->Data());
+    if (*fData[0].GetBeamline() != "n/a")
+      nxs->GetEntryIdf1()->SetBeamline(fData[0].GetBeamline()->Data());
     str = string(fData[0].GetStartDate()->Data()) + string(" ") + string(fData[0].GetStartTime()->Data());
     nxs->GetEntryIdf1()->SetStartTime(str);
     str = string(fData[0].GetStopDate()->Data()) + string(" ") + string(fData[0].GetStopTime()->Data());
     nxs->GetEntryIdf1()->SetStopTime(str);
-    nxs->GetEntryIdf1()->SetSwitchingState(0);
+    nxs->GetEntryIdf1()->SetSwitchingState(1);
     nxs->GetEntryIdf1()->GetUser()->SetName("n/a");
     nxs->GetEntryIdf1()->GetUser()->SetExperimentNumber("n/a");
     nxs->GetEntryIdf1()->GetSample()->SetName(fData[0].GetSample()->Data());
@@ -3657,17 +3752,22 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
     nxs->GetEntryIdf1()->GetSample()->SetEnvironment("n/a");
     nxs->GetEntryIdf1()->GetSample()->SetShape("n/a");
     nxs->GetEntryIdf1()->GetSample()->SetMagneticFieldVectorAvailable(0);
-    nxs->GetEntryIdf1()->GetInstrument()->SetName("n/a");
+    if (*fData[0].GetInstrument() != "n/a")
+      nxs->GetEntryIdf1()->GetInstrument()->SetName(fData[0].GetInstrument()->Data());
     nxs->GetEntryIdf1()->GetInstrument()->GetDetector()->SetNumber(fData[0].GetNoOfHistos());
     nxs->GetEntryIdf1()->GetInstrument()->GetCollimator()->SetType("n/a");
     nxs->GetEntryIdf1()->GetData()->SetTimeResolution(fData[0].GetTimeResolution(), "ns");
-    if (fData[0].GetT0(0) == -1)
-      nxs->GetEntryIdf1()->GetData()->SetT0(0);
+
+    // t0
+    if (fData[0].GetT0(0) == -1) // t0 not povided in the raw data file header
+      nxs->GetEntryIdf1()->GetData()->SetT0(fData[0].GetT0Estimated(0)); // take the estimated t0 value
     else
       nxs->GetEntryIdf1()->GetData()->SetT0(fData[0].GetT0(0)); // this needs to be changed in the long term, since for continous sources each detector has its one t0!!
+
+    int time_bin_offset = (int)(10.0 / fData[0].GetTimeResolution()); // 10ns time offset for fgb if not given
     if (fData[0].GetGoodDataBin(0).first == -1) {
-      nxs->GetEntryIdf1()->GetData()->SetFirstGoodBin(0);
-      nxs->GetEntryIdf1()->GetData()->SetLastGoodBin(0);
+      nxs->GetEntryIdf1()->GetData()->SetFirstGoodBin(nxs->GetEntryIdf1()->GetData()->GetT0(0)+time_bin_offset);
+      nxs->GetEntryIdf1()->GetData()->SetLastGoodBin(fData[0].GetDataBin(0)->size()-1);
     } else {
       nxs->GetEntryIdf1()->GetData()->SetFirstGoodBin(fData[0].GetGoodDataBin(0).first);
       nxs->GetEntryIdf1()->GetData()->SetLastGoodBin(fData[0].GetGoodDataBin(0).second);

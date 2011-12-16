@@ -2927,14 +2927,30 @@ int PNeXus::ReadFileIdf1()
   // close subgroup NXinstrument
   NXclosegroup(fFileHandle);
 
+  // find the first occuring NXdata class
+  found = false;
+  do {
+    status = NXgetnextentry(fFileHandle, nxname, nxclass, &dataType);
+    if (strstr(nxclass, "NXdata") != NULL)
+      found = true;
+  } while (!found || (status == NX_EOD));
+  // make sure any NXentry has been found
+  if (!found) {
+    fErrorCode = PNEXUS_GROUP_OPEN_ERROR;
+    fErrorMsg  = ">> **ERROR** Couldn't find any NXdata!";
+    return NX_ERROR;
+  }
+
   // open subgroup NXdata (this is for Version 1, only and is subject to change in the near future!)
-  if (!ErrorHandler(NXopengroup(fFileHandle, "histogram_data_1", "NXdata"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open NeXus subgroup histogram_data_1!")) return NX_ERROR;
+  memset(cstr, '\0', sizeof(cstr));
+  snprintf(cstr, sizeof(cstr), "couldn't open NeXus subgroup %s!", nxname);
+  if (!ErrorHandler(NXopengroup(fFileHandle, nxname, "NXdata"), PNEXUS_GROUP_OPEN_ERROR, cstr)) return NX_ERROR;
 
   // get time resolution
-  if (!ErrorHandler(NXopendata(fFileHandle, "resolution"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'resolution' data in histogram_data_1 group!")) return NX_ERROR;
-  if (!ErrorHandler(NXgetdata(fFileHandle, &ival), PNEXUS_GET_DATA_ERROR, "couldn't read 'resolution' data in histogram_data_1 group!")) return NX_ERROR;
-  if (!ErrorHandler(GetStringAttr("units", str), PNEXUS_GET_ATTR_ERROR, "couldn't read 'resolution'' units!")) return NX_ERROR;
-  if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'resolution' data in histogram_data_1 group")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "resolution"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'resolution' data in NXdata group!")) return NX_ERROR;
+  if (!ErrorHandler(NXgetdata(fFileHandle, &ival), PNEXUS_GET_DATA_ERROR, "couldn't read 'resolution' data in NXdata group!")) return NX_ERROR;
+  if (!ErrorHandler(GetStringAttr("units", str), PNEXUS_GET_ATTR_ERROR, "couldn't read 'resolution' units!")) return NX_ERROR;
+  if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'resolution' data in NXdata group")) return NX_ERROR;
   if (!strcmp(str.c_str(), "picoseconds")) {
     fNxEntry1->GetData()->SetTimeResolution((double)ival, "ps");
   } else if (!strcmp(str.c_str(), "femtoseconds")) {
@@ -2942,7 +2958,7 @@ int PNeXus::ReadFileIdf1()
   }
 
   // get data, t0, first good bin, last good bin, data
-  if (!ErrorHandler(NXopendata(fFileHandle, "counts"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'counts' data in histogram_data_1 group!")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "counts"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'counts' data in NXdata group!")) return NX_ERROR;
   int histoLength=0;
   int noOfHistos=0;
 
@@ -2951,14 +2967,14 @@ int PNeXus::ReadFileIdf1()
   attType = NX_INT32;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, "number", sizeof(cstr));
-  if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &noOfHistos, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'number' data in histogram_data_1 group!")) return NX_ERROR;
+  if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &noOfHistos, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'number' data in NXdata group!")) return NX_ERROR;
 
   // get histo length
   attLen = 1;
   attType = NX_INT32;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, "length", sizeof(cstr));
-  if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &histoLength, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'length' data in histogram_data_1 group!")) return NX_ERROR;
+  if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &histoLength, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'length' data in NXdata group!")) return NX_ERROR;
 
   // get t0
   attLen = 1;
@@ -2969,7 +2985,7 @@ int PNeXus::ReadFileIdf1()
     cout << endl << ">> **WARNING** didn't find attribute 'T0_bin' in NXdata/counts, will try 't0_bin'." << endl;
     memset(cstr, '\0', sizeof(cstr));
     strncpy(cstr, "t0_bin", sizeof(cstr));
-    if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 't0_bin' data in histogram_data_1 group!")) return NX_ERROR;
+    if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 't0_bin' data in NXdata group!")) return NX_ERROR;
   }
   fNxEntry1->GetData()->SetT0(ival);
 
@@ -2978,7 +2994,7 @@ int PNeXus::ReadFileIdf1()
   attType = NX_INT32;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, "first_good_bin", sizeof(cstr));
-  if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'first_good_bin' data in histogram_data_1 group!")) return NX_ERROR;
+  if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'first_good_bin' data in NXdata group!")) return NX_ERROR;
   fNxEntry1->GetData()->SetFirstGoodBin(ival);
 
   // get last good bin
@@ -2986,7 +3002,7 @@ int PNeXus::ReadFileIdf1()
   attType = NX_INT32;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, "last_good_bin", sizeof(cstr));
-  if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'last_good_bin' data in histogram_data_1 group!")) return NX_ERROR;
+  if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'last_good_bin' data in NXdata group!")) return NX_ERROR;
   fNxEntry1->GetData()->SetLastGoodBin(ival);
 
   // get data
@@ -3042,22 +3058,22 @@ int PNeXus::ReadFileIdf1()
     delete [] data_ptr;
   }
 
-  if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'counts' data in histogram_data_1 group")) return NX_ERROR;
+  if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'counts' data in NXdata group")) return NX_ERROR;
 
   // get grouping
-  if (!ErrorHandler(NXopendata(fFileHandle, "grouping"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'grouping' data in histogram_data_1 group!")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "grouping"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'grouping' data in NXdata group!")) return NX_ERROR;
   attLen = 1;
   attType = NX_INT32;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, "available", sizeof(cstr));
-  if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'grouping available' data in histogram_data_1 group!")) return NX_ERROR;
+  if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'grouping available' data in NXdata group!")) return NX_ERROR;
   if (ival) {
     vector<int> grouping;
-    if (!ErrorHandler(GetIntVectorData(grouping), PNEXUS_GET_DATA_ERROR, "couldn't read 'grouping' data in histogram_data_1 group!")) return NX_ERROR;
+    if (!ErrorHandler(GetIntVectorData(grouping), PNEXUS_GET_DATA_ERROR, "couldn't read 'grouping' data in NXdata group!")) return NX_ERROR;
     fNxEntry1->GetData()->SetGrouping(grouping);
     grouping.clear();
   }
-  if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'grouping' data in histogram_data_1 group")) return NX_ERROR;
+  if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'grouping' data in NXdata group")) return NX_ERROR;
 
   // if grouping has been available check for consistency
   bool ok=true;
@@ -3080,12 +3096,12 @@ int PNeXus::ReadFileIdf1()
   }
 
   // get alpha
-  if (!ErrorHandler(NXopendata(fFileHandle, "alpha"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'alpha' data in histogram_data_1 group!")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "alpha"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'alpha' data in NXdata group!")) return NX_ERROR;
   attLen = 1;
   attType = NX_INT32;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, "available", sizeof(cstr));
-  if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'alpha available' data in histogram_data_1 group!")) return NX_ERROR;
+  if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'alpha available' data in NXdata group!")) return NX_ERROR;
   if (ival) {
     if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get alpha info!")) return NX_ERROR;
     // calculate the needed size
@@ -3136,7 +3152,7 @@ int PNeXus::ReadFileIdf1()
       delete [] data_ptr;
     }
   }
-  if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'alpha' data in histogram_data_1 group")) return NX_ERROR;
+  if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'alpha' data in NXdata group")) return NX_ERROR;
 
   // close subgroup NXdata
   NXclosegroup(fFileHandle);
@@ -4020,191 +4036,191 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
   if (!ErrorHandler(NXputattr(fFileHandle, "user", cstr, strlen(cstr), NX_CHAR), PNEXUS_SET_ATTR_ERROR, "couldn't set NXfile attributes")) return NX_ERROR;
 
   // make group 'run'
-  if (!ErrorHandler(NXmakegroup(fFileHandle, "run", "NXentry"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'run'.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakegroup(fFileHandle, "run", "NXentry"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'NXfile/run'.")) return NX_ERROR;
   // open group 'run'
-  if (!ErrorHandler(NXopengroup(fFileHandle, "run", "NXentry"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'run' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXopengroup(fFileHandle, "run", "NXentry"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'NXfile/run' for writting.")) return NX_ERROR;
 
   // write IDF_version
   size = 1;
-  if (!ErrorHandler(NXmakedata(fFileHandle, "IDF_version", NX_INT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'IDF_version'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "IDF_version"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'IDF_version' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "IDF_version", NX_INT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXentry/IDF_version'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "IDF_version"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXentry/IDF_version' for writting.")) return NX_ERROR;
   idata = fIdfVersion;
-  if (!ErrorHandler(NXputdata(fFileHandle, &idata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'IDF_version'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, &idata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXentry/IDF_version'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // write program_name, and attribute version
   size = fNxEntry1->GetProgramName().length();
-  if (!ErrorHandler(NXmakedata(fFileHandle, "program_name", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'program_name'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "program_name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'program_name' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "program_name", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXentry/program_name'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "program_name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXentry/program_name' for writting.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetProgramName().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'program_name'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXentry/program_name'.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetProgramVersion().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputattr(fFileHandle, "version", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'version' for 'program_name'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "version", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'version' for 'NXentry/program_name'")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // write run 'number'
   size = 1;
-  if (!ErrorHandler(NXmakedata(fFileHandle, "number", NX_INT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'number'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "number"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'number' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "number", NX_INT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXentry/number'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "number"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXentry/number' for writting.")) return NX_ERROR;
   idata = fNxEntry1->GetRunNumber();
-  if (!ErrorHandler(NXputdata(fFileHandle, &idata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'number'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, &idata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXentry/number'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // write run 'title'
   size = fNxEntry1->GetTitle().length();
-  if (!ErrorHandler(NXmakedata(fFileHandle, "title", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'title'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "title"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'title' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "title", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXentry/title'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "title"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXentry/title' for writting.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetTitle().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'title'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXentry/title'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // write run 'notes'
   size = fNxEntry1->GetNotes().length();
-  if (!ErrorHandler(NXmakedata(fFileHandle, "notes", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'notes'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "notes"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'notes' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "notes", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXentry/notes'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "notes"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXentry/notes' for writting.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetNotes().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'notes'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXentry/notes'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // write run 'analysis'
   size = fNxEntry1->GetAnalysis().length();
-  if (!ErrorHandler(NXmakedata(fFileHandle, "analysis", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'analysis'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "analysis"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'analysis' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "analysis", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXentry/analysis'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "analysis"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXentry/analysis' for writting.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetAnalysis().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'analysis'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXentry/analysis'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // write run 'lab'
   size = fNxEntry1->GetLaboratory().length();
-  if (!ErrorHandler(NXmakedata(fFileHandle, "lab", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'lab'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "lab"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'lab' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "lab", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXentry/lab'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "lab"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXentry/lab' for writting.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetLaboratory().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'lab'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXentry/lab'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // write run 'beamline'
   size = fNxEntry1->GetBeamline().length();
-  if (!ErrorHandler(NXmakedata(fFileHandle, "beamline", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'beamline'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "beamline"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'beamline' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "beamline", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXentry/beamline'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "beamline"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXentry/beamline' for writting.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetBeamline().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'beamline'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXentry/beamline'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // write run 'start_time'
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetStartTime().c_str(), sizeof(cstr));
   size = strlen(cstr);
-  if (!ErrorHandler(NXmakedata(fFileHandle, "start_time", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'start_time'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "start_time"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'start_time' for writting.")) return NX_ERROR;
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'start_time'.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "start_time", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXentry/start_time'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "start_time"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXentry/start_time' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXentry/start_time'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // write run 'stop_time'
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetStopTime().c_str(), sizeof(cstr));
   size = strlen(cstr);
-  if (!ErrorHandler(NXmakedata(fFileHandle, "stop_time", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'stop_time'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "stop_time"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'stop_time' for writting.")) return NX_ERROR;
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'stop_time'.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "stop_time", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXentry/stop_time'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "stop_time"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXentry/stop_time' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXentry/stop_time'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // write run 'switching_states'
   size = 1;
-  if (!ErrorHandler(NXmakedata(fFileHandle, "switching_states", NX_INT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'switching_states'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "switching_states"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'switching_states' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "switching_states", NX_INT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXentry/switching_states'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "switching_states"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXentry/switching_states' for writting.")) return NX_ERROR;
   idata = fNxEntry1->GetSwitchingState();
-  if (!ErrorHandler(NXputdata(fFileHandle, &idata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'switching_states'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, &idata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXentry/switching_states'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // make group 'user'
-  if (!ErrorHandler(NXmakegroup(fFileHandle, "user", "NXuser"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'user'.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakegroup(fFileHandle, "user", "NXuser"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'NXuser/user'.")) return NX_ERROR;
   // open group 'user'
-  if (!ErrorHandler(NXopengroup(fFileHandle, "user", "NXuser"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'user' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXopengroup(fFileHandle, "user", "NXuser"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'NXuser/user' for writting.")) return NX_ERROR;
 
   // write user 'name'
   size = fNxEntry1->GetUser()->GetName().length();
-  if (!ErrorHandler(NXmakedata(fFileHandle, "name", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'name'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'name' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "name", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXuser/name'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXuser/name' for writting.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetUser()->GetName().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'name'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXuser/name'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // write user 'experiment_number'
   size = fNxEntry1->GetUser()->GetExperimentNumber().length();
-  if (!ErrorHandler(NXmakedata(fFileHandle, "experiment_number", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'experiment_number'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "experiment_number"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'experiment_number' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "experiment_number", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXuser/experiment_number'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "experiment_number"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXuser/experiment_number' for writting.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetUser()->GetExperimentNumber().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'experiment_number'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXuser/experiment_number'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // close group 'user'
   NXclosegroup(fFileHandle);
 
   // make group 'sample'
-  if (!ErrorHandler(NXmakegroup(fFileHandle, "sample", "NXsample"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'sample'.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakegroup(fFileHandle, "sample", "NXsample"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'NXsample/sample'.")) return NX_ERROR;
   // open group 'sample'
-  if (!ErrorHandler(NXopengroup(fFileHandle, "sample", "NXsample"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'sample' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXopengroup(fFileHandle, "sample", "NXsample"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'NXsample/sample' for writting.")) return NX_ERROR;
 
   // write sample 'name'
   size = fNxEntry1->GetSample()->GetName().length();
-  if (!ErrorHandler(NXmakedata(fFileHandle, "name", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'name'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'name' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "name", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXsample/name'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXsample/name' for writting.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetSample()->GetName().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'name'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXsample/name'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // write sample 'temperature'
   size = 1;
-  if (!ErrorHandler(NXmakedata(fFileHandle, "temperature", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'temperature'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "temperature"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'temperature' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "temperature", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXsample/temperature'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "temperature"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXsample/temperature' for writting.")) return NX_ERROR;
   fdata = (float)fNxEntry1->GetSample()->GetPhysPropValue(string("temperature"), ok);
-  if (!ErrorHandler(NXputdata(fFileHandle, &fdata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'temperature'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, &fdata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXsample/temperature'.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   str = string("n/a");
   fNxEntry1->GetSample()->GetPhysPropUnit(string("temperature"), str, ok);
   strncpy(cstr, str.c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'temperature'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'NXsample/temperature'")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // write sample 'magnetic_field'
   size = 1;
-  if (!ErrorHandler(NXmakedata(fFileHandle, "magnetic_field", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'magnetic_field'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "magnetic_field"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'magnetic_field' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "magnetic_field", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXsample/magnetic_field'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "magnetic_field"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXsample/magnetic_field' for writting.")) return NX_ERROR;
   fdata = (float)fNxEntry1->GetSample()->GetPhysPropValue(string("magnetic_field"), ok);
-  if (!ErrorHandler(NXputdata(fFileHandle, &fdata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'magnetic_field'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, &fdata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXsample/magnetic_field'.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   str = string("n/a");
   fNxEntry1->GetSample()->GetPhysPropUnit(string("magnetic_field"), str, ok);
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, str.c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'magnetic_field'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'NXsample/magnetic_field'")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // write sample 'shape'
   size = fNxEntry1->GetSample()->GetShape().length();
-  if (!ErrorHandler(NXmakedata(fFileHandle, "shape", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'shape'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "shape"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'shape' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "shape", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXsample/shape'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "shape"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXsample/shape' for writting.")) return NX_ERROR;
   strncpy(cstr, fNxEntry1->GetSample()->GetShape().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'shape'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXsample/shape'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // write sample 'magnetic_field_state'
   size = fNxEntry1->GetSample()->GetMagneticFieldState().length();
-  if (!ErrorHandler(NXmakedata(fFileHandle, "magnetic_field_state", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'magnetic_field_state'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "magnetic_field_state"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'magnetic_field_state' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "magnetic_field_state", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXsample/magnetic_field_state'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "magnetic_field_state"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXsample/magnetic_field_state' for writting.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetSample()->GetMagneticFieldState().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'magnetic_field_state'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXsample/magnetic_field_state'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // write sample 'magnetic_field_vector'
@@ -4222,16 +4238,16 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
     for (int i=0; i<size; i++)
       magFieldVec[i] = 0.0;
   }
-  if (!ErrorHandler(NXmakedata(fFileHandle, "magnetic_field_vector", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'magnetic_field_vector'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "magnetic_field_vector"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'magnetic_field_vector' for writting.")) return NX_ERROR;
-  if (!ErrorHandler(NXputdata(fFileHandle, magFieldVec), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'magnetic_field_vector'.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "magnetic_field_vector", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXsample/magnetic_field_vector'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "magnetic_field_vector"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXsample/magnetic_field_vector' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, magFieldVec), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXsample/magnetic_field_vector'.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetSample()->GetMagneticFieldVectorCoordinateSystem().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputattr(fFileHandle, "coordinate_system", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'coordinate_system' for 'magnetic_field_vector'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "coordinate_system", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'coordinate_system' for 'NXsample/magnetic_field_vector'")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetSample()->GetMagneticFieldVectorUnits().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'magnetic_field_vector'")) return NX_ERROR;
-  if (!ErrorHandler(NXputattr(fFileHandle, "available", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'available' for 'magnetic_field_vector'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'NXsample/magnetic_field_vector'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "available", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'available' for 'NXsample/magnetic_field_vector'")) return NX_ERROR;
   NXclosedata(fFileHandle);
   if (magFieldVec) {
     delete [] magFieldVec;
@@ -4240,76 +4256,76 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
 
   // write sample 'environment'
   size = fNxEntry1->GetSample()->GetEnvironment().length();
-  if (!ErrorHandler(NXmakedata(fFileHandle, "environment", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'environment'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "environment"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'environment' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "environment", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXsample/environment'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "environment"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXsample/environment' for writting.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetSample()->GetEnvironment().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'environment'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXsample/environment'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // close group 'sample'
   NXclosegroup(fFileHandle);
 
   // make group 'instrument'
-  if (!ErrorHandler(NXmakegroup(fFileHandle, "instrument", "NXinstrument"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'instrument'.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakegroup(fFileHandle, "instrument", "NXinstrument"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'NXinstrument/instrument'.")) return NX_ERROR;
   // open group 'instrument'
-  if (!ErrorHandler(NXopengroup(fFileHandle, "instrument", "NXinstrument"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'instrument' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXopengroup(fFileHandle, "instrument", "NXinstrument"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'NXinstrument/instrument' for writting.")) return NX_ERROR;
 
   // write instrument 'name'
   size = fNxEntry1->GetInstrument()->GetName().length();
-  if (!ErrorHandler(NXmakedata(fFileHandle, "name", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'name'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'name' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "name", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXinstrument/name'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXinstrument/name' for writting.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetInstrument()->GetName().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'name'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXinstrument/name'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // make group 'detector'
-  if (!ErrorHandler(NXmakegroup(fFileHandle, "detector", "NXdetector"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'detector'.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakegroup(fFileHandle, "detector", "NXdetector"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'NXdetector/detector'.")) return NX_ERROR;
   // open group 'detector'
-  if (!ErrorHandler(NXopengroup(fFileHandle, "detector", "NXdetector"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'detector' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXopengroup(fFileHandle, "detector", "NXdetector"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'NXdetector/detector' for writting.")) return NX_ERROR;
 
   // write detector 'number'
   size = 1;
-  if (!ErrorHandler(NXmakedata(fFileHandle, "number", NX_INT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'number'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "number"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'number' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "number", NX_INT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXdetector/number'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "number"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXdetector/number' for writting.")) return NX_ERROR;
   idata = fNxEntry1->GetInstrument()->GetDetector()->GetNumber();
-  if (!ErrorHandler(NXputdata(fFileHandle, &idata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'number'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, &idata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXdetector/number'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // close group 'detector'
   NXclosegroup(fFileHandle);
 
   // make group 'collimator'
-  if (!ErrorHandler(NXmakegroup(fFileHandle, "collimator", "NXcollimator"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'collimator'.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakegroup(fFileHandle, "collimator", "NXcollimator"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'NXcollimator/collimator'.")) return NX_ERROR;
   // open group 'collimator'
-  if (!ErrorHandler(NXopengroup(fFileHandle, "collimator", "NXcollimator"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'collimator' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXopengroup(fFileHandle, "collimator", "NXcollimator"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'NXcollimator/collimator' for writting.")) return NX_ERROR;
 
   // write collimator 'type'
   size = fNxEntry1->GetInstrument()->GetCollimator()->GetType().length();
-  if (!ErrorHandler(NXmakedata(fFileHandle, "type", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'type'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "type"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'type' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "type", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXcollimator/type'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "type"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXcollimator/type' for writting.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetInstrument()->GetCollimator()->GetType().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'type'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXcollimator/type'.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // close group 'collimator'
   NXclosegroup(fFileHandle);
 
   // make group 'beam'
-  if (!ErrorHandler(NXmakegroup(fFileHandle, "beam", "NXbeam"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'beam'.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakegroup(fFileHandle, "beam", "NXbeam"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'NXbeam/beam'.")) return NX_ERROR;
   // open group 'beam'
-  if (!ErrorHandler(NXopengroup(fFileHandle, "beam", "NXbeam"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'beam' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXopengroup(fFileHandle, "beam", "NXbeam"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'NXbeam/beam' for writting.")) return NX_ERROR;
 
   size = 1;
-  if (!ErrorHandler(NXmakedata(fFileHandle, "total_counts", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'total_counts'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "total_counts"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'total_counts' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "total_counts", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXbeam/total_counts'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "total_counts"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXbeam/total_counts' for writting.")) return NX_ERROR;
   fdata = (float)fNxEntry1->GetInstrument()->GetBeam()->GetTotalCounts();
-  if (!ErrorHandler(NXputdata(fFileHandle, &fdata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'total_counts'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, &fdata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXbeam/total_counts'.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry1->GetInstrument()->GetBeam()->GetUnits().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'total_counts'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'NXbeam/total_counts'")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // close group 'beam'
@@ -4319,9 +4335,9 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
   NXclosegroup(fFileHandle);
 
   // make group 'histogram_data_1'
-  if (!ErrorHandler(NXmakegroup(fFileHandle, "histogram_data_1", "NXdata"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'histogram_data_1'.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakegroup(fFileHandle, "histogram_data_1", "NXdata"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'NXdata/histogram_data_1'.")) return NX_ERROR;
   // open group 'histogram_data_1'
-  if (!ErrorHandler(NXopengroup(fFileHandle, "histogram_data_1", "NXdata"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'histogram_data_1' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXopengroup(fFileHandle, "histogram_data_1", "NXdata"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'NXdata/histogram_data_1' for writting.")) return NX_ERROR;
 
   // write data 'counts'
   int *histo_data=0;
@@ -4342,26 +4358,26 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
     histo_size[1] = histoLength;
   }
 
-  if (!ErrorHandler(NXcompmakedata(fFileHandle, "counts", NX_INT32, 2, histo_size, NX_COMP_LZW, histo_size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'counts'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "counts"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'counts' for writting.")) return NX_ERROR;
-  if (!ErrorHandler(NXputdata(fFileHandle, (void*)histo_data), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'counts'.")) return NX_ERROR;
+  if (!ErrorHandler(NXcompmakedata(fFileHandle, "counts", NX_INT32, 2, histo_size, NX_COMP_LZW, histo_size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXdata/counts'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "counts"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXdata/counts' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, (void*)histo_data), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXdata/counts'.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, "counts", sizeof(cstr));
-  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'counts'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'NXdata/counts'")) return NX_ERROR;
   idata = 1;
-  if (!ErrorHandler(NXputattr(fFileHandle, "signal", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'signal' for 'counts'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "signal", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'signal' for 'NXdata/counts'")) return NX_ERROR;
   idata = fNxEntry1->GetData()->GetNoOfHistos();
-  if (!ErrorHandler(NXputattr(fFileHandle, "number", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'number' for 'counts'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "number", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'number' for 'NXdata/counts'")) return NX_ERROR;
   idata = fNxEntry1->GetData()->GetHistoLength();
-  if (!ErrorHandler(NXputattr(fFileHandle, "length", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'length' for 'counts'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "length", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'length' for 'NXdata/counts'")) return NX_ERROR;
   idata = fNxEntry1->GetData()->GetT0(0);
-  if (!ErrorHandler(NXputattr(fFileHandle, "T0_bin", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'T0_bin' for 'counts'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "t0_bin", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'T0_bin' for 'NXdata/counts'")) return NX_ERROR;
   idata = fNxEntry1->GetData()->GetFirstGoodBin(0);
-  if (!ErrorHandler(NXputattr(fFileHandle, "first_good_bin", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'first_good_bin' for 'counts'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "first_good_bin", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'first_good_bin' for 'NXdata/counts'")) return NX_ERROR;
   idata = fNxEntry1->GetData()->GetLastGoodBin(0);
-  if (!ErrorHandler(NXputattr(fFileHandle, "last_good_bin", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'last_good_bin' for 'counts'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "last_good_bin", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'last_good_bin' for 'NXdata/counts'")) return NX_ERROR;
   fdata = (float)fNxEntry1->GetData()->GetTimeResolution("ps")/2.0;
-  if (!ErrorHandler(NXputattr(fFileHandle, "offset", &fdata, 1, NX_FLOAT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'offset' for 'counts'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "offset", &fdata, 1, NX_FLOAT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'offset' for 'NXdata/counts'")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   if (histo_data) {
@@ -4370,27 +4386,27 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
 
   // write data 'resolution'
   size = 1;
-  if (!ErrorHandler(NXmakedata(fFileHandle, "resolution", NX_INT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'resolution'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "resolution"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'resolution' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "resolution", NX_INT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXdata/resolution'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "resolution"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXdata/resolution' for writting.")) return NX_ERROR;
   fdata = fNxEntry1->GetData()->GetTimeResolution("fs");
   idata = (int)fdata;
-  if (!ErrorHandler(NXputdata(fFileHandle, &idata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'resolution'.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, &idata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXdata/resolution'.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, "femtoseconds", sizeof(cstr));
-  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'resolution'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'NXdata/resolution'")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
-  // write data 'time_zero' always set to 0 since the T0_bin attribute of counts is relevant only
+  // write data 'time_zero' based on t0_bin which is the master!
   size = 1;
-  if (!ErrorHandler(NXmakedata(fFileHandle, "time_zero", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'time_zero'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "time_zero"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'time_zero' for writting.")) return NX_ERROR;
-  fdata = 0.0;
-  if (!ErrorHandler(NXputdata(fFileHandle, &fdata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'time_zero'.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "time_zero", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXdata/time_zero'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "time_zero"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXdata/time_zero' for writting.")) return NX_ERROR;
+  fdata = (float)fNxEntry1->GetData()->GetT0(0) * (float)fNxEntry1->GetData()->GetTimeResolution("us");
+  if (!ErrorHandler(NXputdata(fFileHandle, &fdata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXdata/time_zero'.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, "microseconds", sizeof(cstr));
-  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'time_zero'")) return NX_ERROR;
-  idata = 0;
-  if (!ErrorHandler(NXputattr(fFileHandle, "available", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'available' for 'time_zero'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'NXdata/time_zero'")) return NX_ERROR;
+  idata = 1;
+  if (!ErrorHandler(NXputattr(fFileHandle, "available", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'available' for 'NXdata/time_zero'")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // write data 'raw_time'
@@ -4406,16 +4422,16 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
     raw_time[i] = (float)fNxEntry1->GetData()->GetTimeResolution("us") * (float)i; // raw time in (us)
   }
   size = histoLength;
-  if (!ErrorHandler(NXmakedata(fFileHandle, "raw_time", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'raw_time'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "raw_time"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'raw_time' for writting.")) return NX_ERROR;
-  if (!ErrorHandler(NXputdata(fFileHandle, raw_time), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'raw_time'.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "raw_time", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXdata/raw_time'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "raw_time"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXdata/raw_time' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, raw_time), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXdata/raw_time'.")) return NX_ERROR;
   idata = 1;
-  if (!ErrorHandler(NXputattr(fFileHandle, "axis", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'axis' for 'raw_time'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "axis", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'axis' for 'NXdata/raw_time'")) return NX_ERROR;
   idata = 1;
-  if (!ErrorHandler(NXputattr(fFileHandle, "primary", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'primary' for 'raw_time'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "primary", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'primary' for 'NXdata/raw_time'")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, "microseconds", sizeof(cstr));
-  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'raw_time'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'NXdata/raw_time'")) return NX_ERROR;
   NXclosedata(fFileHandle);
   if (raw_time) {
     delete [] raw_time;
@@ -4428,14 +4444,14 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
     corrected_time[i] = (float)fNxEntry1->GetData()->GetTimeResolution("us") * (float)((int)i-(int)fNxEntry1->GetData()->GetT0(0)+1); // raw time in (us)
   }
   size = histoLength;
-  if (!ErrorHandler(NXmakedata(fFileHandle, "corrected_time", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'corrected_time'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "corrected_time"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'corrected_time' for writting.")) return NX_ERROR;
-  if (!ErrorHandler(NXputdata(fFileHandle, corrected_time), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'corrected_time'.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "corrected_time", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXdata/corrected_time'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "corrected_time"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXdata/corrected_time' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, corrected_time), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXdata/corrected_time'.")) return NX_ERROR;
   idata = 1;
-  if (!ErrorHandler(NXputattr(fFileHandle, "axis", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'axis' for 'corrected_time'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "axis", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'axis' for 'NXdata/corrected_time'")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, "microseconds", sizeof(cstr));
-  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'corrected_time'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'NXdata/corrected_time'")) return NX_ERROR;
   NXclosedata(fFileHandle);
   if (corrected_time) {
     delete [] corrected_time;
@@ -4467,11 +4483,11 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
     }
   }
   size = noOfHistos;
-  if (!ErrorHandler(NXmakedata(fFileHandle, "grouping", NX_INT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'grouping'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "grouping"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'grouping' for writting.")) return NX_ERROR;
-  if (!ErrorHandler(NXputdata(fFileHandle, grouping), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'grouping'.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "grouping", NX_INT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXdata/grouping'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "grouping"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXdata/grouping' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, grouping), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXdata/grouping'.")) return NX_ERROR;
   idata = groupNo.size();
-  if (!ErrorHandler(NXputattr(fFileHandle, "available", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'available' for 'grouping'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "available", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'available' for 'NXdata/grouping'")) return NX_ERROR;
   NXclosedata(fFileHandle);
   if (grouping) {
     delete [] grouping;
@@ -4499,11 +4515,11 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
     array_size[0] = fNxEntry1->GetData()->GetAlpha()->size();
     array_size[1] = 3;
   }
-  if (!ErrorHandler(NXmakedata(fFileHandle, "alpha", NX_FLOAT32, 2, array_size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'alpha'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "alpha"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'alpha' for writting.")) return NX_ERROR;
-  if (!ErrorHandler(NXputdata(fFileHandle, (void*)alpha), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'alpha'.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "alpha", NX_FLOAT32, 2, array_size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXdata/alpha'.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "alpha"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXdata/alpha' for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, (void*)alpha), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXdata/alpha'.")) return NX_ERROR;
   idata = fNxEntry1->GetData()->GetAlpha()->size();
-  if (!ErrorHandler(NXputattr(fFileHandle, "available", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'available' for 'alpha'")) return NX_ERROR;
+  if (!ErrorHandler(NXputattr(fFileHandle, "available", &idata, 1, NX_INT32), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'available' for 'NXdata/alpha'")) return NX_ERROR;
   if (alpha) {
     delete [] alpha;
   }

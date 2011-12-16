@@ -59,9 +59,19 @@ void any2many_syntax()
   cout << endl << "          -f <filenameList-input> : where <filenameList-input> is space";
   cout << endl << "                separeted a list of file names (not starting with a '-'),";
   cout << endl << "                e.g. 2010/lem10_his_0111.root 2010/lem10_his_0112.root";
+  cout << endl << "          -o <outputFileName> : this option only makes sense, if <filenameList-input>";
+  cout << endl << "                is a single input file name!";
   cout << endl << "          -r <runList-input> : where <runList-input> is a list of run numbers";
   cout << endl << "                separated by spaces ' ' of the form:  <run1>  <run2>  <run3>";
   cout << endl << "                etc., or a sequence of runs <runStart>-<runEnd>, e.g. 111-222";
+  cout << endl << "          -t <in-template> <out-template> : ";
+  cout << endl << "             <in-/out-template> : template file name. Needed for run-lists in";
+  cout << endl << "                order to generate the proper file names. The following template";
+  cout << endl << "                tags can be used: [yy] for year, and [rrrr] for the run number.";
+  cout << endl << "                If the run number tag is used, the number of 'r' will give the";
+  cout << endl << "                number of digits used with leading zeros, e.g. [rrrrrr] and run";
+  cout << endl << "                number 123 will result in 000123. The same is true for the";
+  cout << endl << "                year, i.e. [yyyy] will result in something like 1999.";
   cout << endl << "          -c <convert-options> : <inFormat> <outFormat>";
   cout << endl << "             <inFormat>  : input data file format. Supported formats are:";
   cout << endl << "                PSI-BIN, ROOT (LEM), MUD, NeXus1, NeXus2, PSI-MDU, WKM";
@@ -74,14 +84,6 @@ void any2many_syntax()
   cout << endl << "          -y <year> : if the option -y is used, here a year in the form 'yy' can";
   cout << endl << "                be given, if this is the case, any automatic file name";
   cout << endl << "                generation needs a year, this number will be used.";
-  cout << endl << "          -t <in-template> <out-template> : ";
-  cout << endl << "             <in-/out-template> : template file name. Needed for run-lists in";
-  cout << endl << "                order to generate the proper file names. The following template";
-  cout << endl << "                tags can be used: [yy] for year, and [rrrr] for the run number.";
-  cout << endl << "                If the run number tag is used, the number of 'r' will give the";
-  cout << endl << "                number of digits used with leading zeros, e.g. [rrrrrr] and run";
-  cout << endl << "                number 123 will result in 000123. The same is true for the";
-  cout << endl << "                year, i.e. [yyyy] will result in something like 1999.";
   cout << endl << "          -s : with this option the output data file will be sent to the stdout.";
   cout << endl << "          -rebin <n> : where <n> is the number of bins to be packed";
   cout << endl << "          -z [g|b] <compressed> : where <compressed> is the output file name";
@@ -97,6 +99,10 @@ void any2many_syntax()
   cout << endl << "      Will take the LEM ROOT file '2010/lem10_his_0123.root' rebin it with 25";
   cout << endl << "      and convert it to ASCII. The output file name will be";
   cout << endl << "      lem10_his_0123.ascii, and the file will be saved in the current directory." << endl;
+  cout << endl << "  any2many -f 2010/lem10_his_0123.root -c ROOT NEXUS2-HDF5 -o 2010/lem10_his_0123_v2.nxs";
+  cout << endl << "      Will take the LEM ROOT file '2010/lem10_his_0123.root' ";
+  cout << endl << "      and convert it to NeXus IDF V2. The output file name will be";
+  cout << endl << "      lem10_his_0123_v2.nxs, and the file will be saved in the current directory." << endl;
   cout << endl << "  any2many -r 123 137 -c PSI-BIN MUD -t d[yyyy]/deltat_tdc_gps_[rrrr].bin \\";
   cout << endl << "      [rrrrrr].msr -y 2001";
   cout << endl << "      Will take the run 123 and 137, will generate the input file names:";
@@ -137,6 +143,7 @@ int main(int argc, char *argv[])
   PAny2ManyInfo info;
   PStringVector inputFormat;
   PStringVector outputFormat;
+  TString outputFileName = TString("");
 
   // init inputFormat
   inputFormat.push_back("psi-bin");
@@ -164,6 +171,9 @@ int main(int argc, char *argv[])
   info.rebin = 1;
   info.compressionTag = 0; // no compression as default
   info.idf = 0; // undefined
+  info.inTemplate = TString("");
+  info.outTemplate = TString("");
+  info.outFileName = TString("");
 
   // call any2many without arguments
   if (argc == 1) {
@@ -231,6 +241,18 @@ int main(int argc, char *argv[])
           break;
       } else {
         cerr << endl << ">> any2many **ERROR** found input option '-f' without any arguments" << endl;
+        show_syntax = true;
+        break;
+      }
+    }
+
+    // handle output file name option '-o'
+    if (!strcmp(argv[i], "-o")) {
+      if (i+1 < argc) {
+        outputFileName = argv[i+1];
+        i++;
+      } else {
+        cerr << endl << ">> any2many **ERROR** found output file name option '-o' without any arguments" << endl;
         show_syntax = true;
         break;
       }
@@ -327,6 +349,7 @@ int main(int argc, char *argv[])
         info.outPath = argv[i+1];
         if (!info.outPath.EndsWith("/"))
           info.outPath += "/";
+        i++;
       } else {
         cerr << endl << ">> any2many **ERROR** found output option '-p' without any argument." << endl;
         show_syntax = true;
@@ -414,6 +437,22 @@ int main(int argc, char *argv[])
     info.idf = 1;
   if (info.outFormat.Contains("nexus2", TString::kIgnoreCase))
     info.idf = 2;
+
+  // in case the '-o' is present, make sure that inFileName is only a single file name
+  if (outputFileName.Length() > 0) {
+    if (info.inFileName.size() == 1) {
+      // make sure there is not in addition the template option given
+      if ((info.inTemplate.Length() == 0) && (info.outTemplate.Length() == 0)) {
+        info.outFileName = outputFileName;
+      } else {
+        cerr << endl << ">> any2many **ERROR** found option '-o' cannot be combined with option '-t'." << endl;
+        show_syntax = true;
+      }
+    } else {
+      cerr << endl << ">> any2many **ERROR** found option '-o' with multiple input file names, which doesn't make any sense." << endl;
+      show_syntax = true;
+    }
+  }
 
   if (show_syntax) {
     info.runList.clear();

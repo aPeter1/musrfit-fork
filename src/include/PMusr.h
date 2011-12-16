@@ -275,6 +275,9 @@ class PRawRunData {
     PRawRunData();
     virtual ~PRawRunData();
 
+    virtual const TString* GetLaboratory() { return &fLaboratory; }
+    virtual const TString* GetBeamline() { return &fBeamline; }
+    virtual const TString* GetInstrument() { return &fInstrument; }
     virtual const TString* GetRunName() { return &fRunName; }
     virtual const Int_t GetRunNumber() { return fRunNumber; }
     virtual const TString* GetRunTitle() { return &fRunTitle; }
@@ -307,6 +310,9 @@ class PRawRunData {
     virtual const PDoubleVector* GetDataBin(const UInt_t idx);
     virtual const PNonMusrRawRunData* GetDataNonMusr() { return &fDataNonMusr; }
 
+    virtual void SetLaboratory(const TString &str) { fLaboratory = str; }
+    virtual void SetBeamline(const TString &str) { fBeamline = str; }
+    virtual void SetInstrument(const TString &str) { fInstrument = str; }
     virtual void SetRunName(const TString &str) { fRunName = str; }
     virtual void SetRunNumber(const Int_t &val) { fRunNumber = val; }
     virtual void SetRunTitle(const TString str) { fRunTitle = str; }
@@ -338,6 +344,9 @@ class PRawRunData {
     PNonMusrRawRunData fDataNonMusr; ///< keeps all ascii- or db-file info in case of nonMusr fit
 
   private:
+    TString fLaboratory;             ///< keeps the name of the laboratory, e.g. PSI, ISIS, TRIUMF, JPARC
+    TString fBeamline;               ///< keeps the name of the be beamline, e.g. muE4, piM3.1, ...
+    TString fInstrument;             ///< keeps the name of the instrument, e.g. LEM, GPS, MUSR, EMU, ...
     TString fRunName;                ///< name of the run
     Int_t  fRunNumber;               ///< run number
     TString fRunTitle;               ///< run title
@@ -355,7 +364,7 @@ class PRawRunData {
     Double_t fEnergy;                ///< implantation energy of the muon
     Double_t fTransport;             ///< LEM transport settings (Moderator HV)
     PDoubleVector fRingAnode;        ///< LEM ring anode HVs (L,R[,T,B])
-    Double_t fTimeResolution;        ///< time resolution of the run
+    Double_t fTimeResolution;        ///< time resolution of the run in (ns)
     PIntVector fT0s;                 ///< vector of t0's of a run
     PIntVector fT0Estimated;         ///< vector of t0's estimated based on the maximum of the histogram
     PIntPairVector fBkgBin;          ///< background bins (first/last)
@@ -607,6 +616,7 @@ typedef struct {
   TString year;              ///< holds the information about the year to be used
   PIntVector runList;        ///< holds the run number list to be converted
   PStringVector inFileName;  ///< holds the file name of the input data file
+  TString outFileName;       ///< holds the output file name
   PStringVector outPathFileName; ///< holds the out path/file name
   TString outPath;           ///< holds the output path
   UInt_t rebin;              ///< holds the number of bins to be packed
