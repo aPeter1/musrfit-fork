@@ -6,12 +6,12 @@ NEXUS_CLASS_DIR = ../../external/nexus
 
 CXX      = g++
 CXXFLAGS = -g -Wall -fPIC
-INCLUDES = -I /usr/local/include -I $(NEXUS_CLASS_DIR)
+INCLUDES = -I /opt/nexus/include -I $(NEXUS_CLASS_DIR)
 LD       = g++
 LDFLAGS  = -g
 
-LIBS     = -L /usr/local/lib -lNeXus
-LIBS    += -L /usr/lib -lhdf5
+LIBS     = -L /opt/nexus/lib -lNeXus
+LIBS    += -L /opt/hdf/lib -lhdf5
 
 EXEC = nexus_read_test
 

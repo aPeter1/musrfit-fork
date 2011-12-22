@@ -386,6 +386,9 @@ class PNeXusDetector2 {
 
     virtual string GetDescription() { return fDescription; }
     virtual double GetTimeResolution(string units);
+    virtual vector<double> *GetRawTime() { return &fRawTime; }
+    virtual string GetRawTimeName() { return fRawTimeName; }
+    virtual string GetRawTimeUnit() { return fRawTimeUnit; }
     virtual bool IsT0Present() { return (fT0 == 0) ? false : true; }
     virtual int GetT0Tag() { return fT0Tag; }
     virtual int GetT0(int idxp=-1, int idxs=-1);
@@ -393,7 +396,7 @@ class PNeXusDetector2 {
     virtual bool IsFirstGoodBinPresent() { return (fFirstGoodBin == 0) ? false : true; }
     virtual int GetFirstGoodBin(int idxp=-1, int idxs=-1);
     virtual int* GetFirstGoodBins() { return fFirstGoodBin; }
-    virtual bool IsLastGoodBinPresent() { return (fFirstGoodBin == 0) ? false : true; }
+    virtual bool IsLastGoodBinPresent() { return (fLastGoodBin == 0) ? false : true; }
     virtual int GetLastGoodBin(int idxp=-1, int idxs=-1);
     virtual int* GetLastGoodBins() { return fLastGoodBin; }
     virtual int GetNoOfPeriods() { return fNoOfPeriods; }
@@ -407,6 +410,9 @@ class PNeXusDetector2 {
 
     virtual void SetDescription(string description) { fDescription = description; }
     virtual void SetTimeResolution(double val, string units);
+    virtual void SetRawTime(vector<double> &rawTime);
+    virtual void SetRawTimeName(string rawTimeName) { fRawTimeName = rawTimeName; }
+    virtual void SetRawTimeUnit(string rawTimeUnit) { fRawTimeUnit = rawTimeUnit; }
     virtual void SetT0Tag(int tag) { fT0Tag = tag; }
     virtual int  SetT0(int *t0);
     virtual int  SetFirstGoodBin(int *fgb);
@@ -423,12 +429,15 @@ class PNeXusDetector2 {
     string fDescription;        ///< description of the detector
     double fTimeResolution;     ///< keeps the time resolution in (ps)
     vector<int> fSpectrumIndex; ///< list of global spectra
+    vector<double> fRawTime;    ///< keeps a raw time vector
+    string fRawTimeName;        ///< name of the raw time vector
+    string fRawTimeUnit;        ///< unit of the raw time vector
 
     int fNoOfPeriods; ///< number of periods or -1 if not defined
     int fNoOfSpectra; ///< number of spectra or -1 if not defined
     int fNoOfBins;    ///< number of bins of a spectrum or -1 if not defined
 
-    int fT0Tag; ///< tag for t0, fgb, lgb structure. -1==not present, 1==NX_INT, 2=NX_INT[np][ns]
+    int fT0Tag; ///< tag for t0, fgb, lgb structure. -1==not present, 1==NX_INT, 2==NX_INT[ns], 3==NX_INT[np][ns]
     int *fT0;
     int *fFirstGoodBin;
     int *fLastGoodBin;

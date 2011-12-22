@@ -39,6 +39,7 @@
 #include <iomanip>
 #include <fstream>
 #include <string>
+#include <sstream>
 using namespace std;
 
 #include <TROOT.h>
@@ -584,7 +585,7 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
 }
 
 //--------------------------------------------------------------------------
-// FileAlreadyRead
+// FileAlreadyRead (private)
 //--------------------------------------------------------------------------
 /**
  * <p> Checks if a file has been already read in order to prevent multiple
@@ -608,7 +609,7 @@ Bool_t PRunDataHandler::FileAlreadyRead(TString runName)
 }
 
 //--------------------------------------------------------------------------
-// TestFileName -- private
+// TestFileName (private)
 //--------------------------------------------------------------------------
 /**
  * <p> Tests if a file exists (with or without given extension).
@@ -622,75 +623,91 @@ void PRunDataHandler::TestFileName(TString &runName, const TString &ext)
   TString tmpStr(runName), tmpExt(ext);
 
   // check first if the file exists with the default extension which is not given with the run name
-  runName += TString(".") + ext;
-  if (gSystem->AccessPathName(runName.Data()) != true) { // found
-    return;
-  }
-
-  // test if the file exists with only upper-case letters
-  runName.ToUpper();
-  if (gSystem->AccessPathName(runName.Data()) != true) { // found
-    return;
-  }
-
-  // test if the file exists with only lower-case letters
-  runName.ToLower();
-  if (gSystem->AccessPathName(runName.Data()) != true) { // found
+  tmpStr += TString(".") + ext;
+  if (gSystem->AccessPathName(tmpStr.Data()) != true) { // found
+    runName = tmpStr;
     return;
   }
 
   // test if the file exists with the given run name but an only upper-case extension which is not included in the file name
-  runName = tmpStr;
+  tmpStr = runName;
   tmpExt.ToUpper();
-  runName += TString(".") + tmpExt;
-  if (gSystem->AccessPathName(runName.Data()) != true) { // found
+  tmpStr += TString(".") + tmpExt;
+  if (gSystem->AccessPathName(tmpStr.Data()) != true) { // found
+    runName = tmpStr;
     return;
   }
 
   // test if the file exists with the given run name but an only lower-case extension which is not included in the file name
+  tmpStr = runName;
   tmpExt.ToLower();
-  runName = runName.Replace(static_cast<Ssiz_t>(runName.Length()-tmpExt.Length()), tmpExt.Length(), tmpExt);
-  if (gSystem->AccessPathName(runName.Data()) != true) { // found
+  tmpStr += TString(".") + tmpExt;
+  if (gSystem->AccessPathName(tmpStr.Data()) != true) { // found
+    runName = tmpStr;
     return;
   }
 
-  runName = tmpStr;
+  // test if the file exists with only upper-case letters
+  tmpStr = runName + TString(".") + tmpExt;
+  tmpStr.ToUpper();
+  if (gSystem->AccessPathName(tmpStr.Data()) != true) { // found
+    runName = tmpStr;
+    return;
+  }
+
+  // test if the file exists with only lower-case letters
+  tmpStr.ToLower();
+  if (gSystem->AccessPathName(tmpStr.Data()) != true) { // found
+    runName = tmpStr;
+    return;
+  }
+
+  tmpStr = runName;
 
   // the extension is already part of the file name, therefore, do not append it
-  if (runName.EndsWith(ext.Data(), TString::kIgnoreCase)) {
-    if (gSystem->AccessPathName(runName.Data()) != true) { // found
+  if (tmpStr.EndsWith(ext.Data(), TString::kIgnoreCase)) {
+    if (gSystem->AccessPathName(tmpStr.Data()) != true) { // found
+      runName = tmpStr;
       return;
     }
 
     // assume some extension is part of the given file name but the real data file ends with an lower-case extension
     tmpExt.ToLower();
-    runName = runName.Replace(static_cast<Ssiz_t>(runName.Length()-tmpExt.Length()), tmpExt.Length(), tmpExt);
-    if (gSystem->AccessPathName(runName.Data()) != true) { // found
+    tmpStr = tmpStr.Replace(static_cast<Ssiz_t>(tmpStr.Length()-tmpExt.Length()), tmpExt.Length(), tmpExt);
+    if (gSystem->AccessPathName(tmpStr.Data()) != true) { // found
+      runName = tmpStr;
       return;
     }
 
     // assume some extension is part of the given file name but the real data file ends with an upper-case extension
     tmpExt.ToUpper();
-    runName = runName.Replace(static_cast<Ssiz_t>(runName.Length()-tmpExt.Length()), tmpExt.Length(), tmpExt);
-    if (gSystem->AccessPathName(runName.Data()) != true) { // found
+    tmpStr = runName;
+    tmpStr = tmpStr.Replace(static_cast<Ssiz_t>(tmpStr.Length()-tmpExt.Length()), tmpExt.Length(), tmpExt);
+    if (gSystem->AccessPathName(tmpStr.Data()) != true) { // found
+      runName = tmpStr;
       return;
     }
 
     // test if the file exists with only lower-case letters and the extension already included in the file name
-    runName.ToLower();
-    if (gSystem->AccessPathName(runName.Data()) != true) { // found
+    tmpStr = runName;
+    tmpStr.ToLower();
+    if (gSystem->AccessPathName(tmpStr.Data()) != true) { // found
+      runName = tmpStr;
       return;
     }
 
     // test if the file exists with only upper-case letters and the extension already included in the file name
-    runName.ToUpper();
-    if (gSystem->AccessPathName(runName.Data()) != true) { // found
+    tmpStr = runName;
+    tmpStr.ToUpper();
+    if (gSystem->AccessPathName(tmpStr.Data()) != true) { // found
+      runName = tmpStr;
       return;
     }
   }
 
   // if the file has not been found, set the run name to be empty
   runName = "";
+
   return;
 }
 
@@ -1043,6 +1060,8 @@ Bool_t PRunDataHandler::ReadRootFile(UInt_t tag)
   runData.SetLaboratory("PSI");
   runData.SetBeamline("muE4");
   runData.SetInstrument("LEM");
+  runData.SetMuonSource("low energy muon source");
+  runData.SetMuonSpecies("positive muons");
 
   // get run title
   TObjString ostr = runHeader->GetRunTitle();
@@ -1072,36 +1091,14 @@ Bool_t PRunDataHandler::ReadRootFile(UInt_t tag)
   time_t idt = (time_t)runHeader->GetStartTime();
   runData.SetStartDateTime(idt);
   struct tm *dt = localtime(&idt);
-  TString stime("");
-  Int_t yy = dt->tm_year;
-  if (yy > 100)
-    yy -= 100;
-  if (yy < 10)
-    stime += "0";
-  stime += yy;
-  stime += "-";
-  stime += GetMonth(dt->tm_mon);
-  stime += "-";
-  if (dt->tm_mday < 10)
-    stime += "0";
-  stime += dt->tm_mday;
+  char str[128];
+  strftime(str, sizeof(str), "%F", dt);
+  TString stime(str);
   runData.SetStartDate(stime);
   // start time
-  if (dt->tm_hour == 0)
-    stime = "00";
-  else if (dt->tm_hour < 10)
-    stime = "0";
-  else
-    stime = "";
-  stime  += dt->tm_hour;
-  stime += ":";
-  if (dt->tm_min < 10)
-    stime += "0";
-  stime += dt->tm_min;
-  stime += ":";
-  if (dt->tm_sec < 10)
-    stime += "0";
-  stime += dt->tm_sec;
+  memset(str, 0, sizeof(str));
+  strftime(str, sizeof(str), "%T", dt);
+  stime = str;
   runData.SetStartTime(stime);
 
   // get stop time/date
@@ -1109,43 +1106,21 @@ Bool_t PRunDataHandler::ReadRootFile(UInt_t tag)
   idt = (time_t)runHeader->GetStopTime();
   runData.SetStopDateTime(idt);
   dt = localtime(&idt);
-  stime = "";
-  yy = dt->tm_year;
-  if (yy > 100)
-    yy -= 100;
-  if (yy < 10)
-    stime += "0";
-  stime += yy;
-  stime += "-";
-  stime += GetMonth(dt->tm_mon);
-  stime += "-";
-  if (dt->tm_mday < 10)
-    stime += "0";
-  stime += dt->tm_mday;
+  memset(str, 0, sizeof(str));
+  strftime(str, sizeof(str), "%F", dt);
+  stime = str;
   runData.SetStopDate(stime);
   // stop time
-  if (dt->tm_hour == 0)
-    stime = "00";
-  else if (dt->tm_hour < 10)
-    stime = "0";
-  else
-    stime = "";
-  stime  += dt->tm_hour;
-  stime += ":";
-  if (dt->tm_min < 10)
-    stime += "0";
-  stime += dt->tm_min;
-  stime += ":";
-  if (dt->tm_sec < 10)
-    stime += "0";
-  stime += dt->tm_sec;
+  memset(str, 0, sizeof(str));
+  strftime(str, sizeof(str), "%T", dt);
+  stime = str;
   runData.SetStopTime(stime);
 
   // get time resolution
   runData.SetTimeResolution(runHeader->GetTimeResolution());
 
   // get number of histogramms
-  Int_t noOfHistos = runHeader->GetNHist();
+  Int_t noOfHistos = runHeader->GetNHist();  
 
   // get t0's
   Double_t *t0 = runHeader->GetTimeZero();
@@ -1154,6 +1129,11 @@ Bool_t PRunDataHandler::ReadRootFile(UInt_t tag)
     // copy t0's so they are not lost
     for (Int_t i=0; i<noOfHistos; i++) {
       runData.AppendT0((Int_t)t0[i]);
+    }
+    if (tag == ROOT_ALL) { // since NPP and PPC the t0's needs to be doubled
+      for (Int_t i=0; i<noOfHistos; i++) {
+        runData.AppendT0((Int_t)t0[i]);
+      }
     }
   }
 
@@ -1513,6 +1493,26 @@ Bool_t PRunDataHandler::ReadNexusFile()
     }
     // get header information
 
+    // get/set laboratory
+    str = TString(nxs_file->GetEntryIdf2()->GetInstrument()->GetSource()->GetName());
+    runData.SetLaboratory(str);
+
+    // get/set beamline
+    str = TString(nxs_file->GetEntryIdf2()->GetInstrument()->GetName());
+    runData.SetBeamline(str);
+
+    // get/set instrument
+    str = TString(nxs_file->GetEntryIdf2()->GetInstrument()->GetName());
+    runData.SetInstrument(str);
+
+    // get/set muon source
+    str = TString(nxs_file->GetEntryIdf2()->GetInstrument()->GetSource()->GetType());
+    runData.SetMuonSource(str);
+
+    // get/set muon species
+    str = TString(nxs_file->GetEntryIdf2()->GetInstrument()->GetSource()->GetProbe());
+    runData.SetMuonSpecies(str);
+
     // get/set run title
     str = TString(nxs_file->GetEntryIdf2()->GetTitle());
     runData.SetRunTitle(str);
@@ -1588,7 +1588,7 @@ Bool_t PRunDataHandler::ReadNexusFile()
     int *lgb = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetLastGoodBins();
     PIntPair goodDataBin;
 
-    if (nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetT0Tag() == 2) { // t0, fgb, lgb: [][]
+    if (nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetT0Tag() == 3) { // t0, fgb, lgb: [][]
       for (int i=0; i<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfPeriods(); i++) {
         for (int j=0; j<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra(); j++) {
           if (fgb && lgb) {
@@ -1599,6 +1599,17 @@ Bool_t PRunDataHandler::ReadNexusFile()
           if (fgb && lgb) {
             runData.AppendGoodDataBin(goodDataBin);
           }
+        }
+      }
+    } else if (nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetT0Tag() == 2) { // t0, fgb, lgb: []
+      for (int i=0; i<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra(); i++) {
+        if (fgb && lgb) {
+          goodDataBin.first = *(fgb+i);
+          goodDataBin.second = *(lgb+i);
+        }
+        runData.AppendT0(*(t0+i));
+        if (fgb && lgb) {
+          runData.AppendGoodDataBin(goodDataBin);
         }
       }
     } else { // t0, fgb, lgb: single numbers
@@ -2011,27 +2022,42 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
 
   // filter from the file name the instrument
   TString instrument("n/a"), beamline("n/a");
+  TString muonSource("n/a"), muonSpecies("n/a");
   if (fRunPathName.Contains("_gps_", TString::kIgnoreCase)) {
     instrument = "GPS";
     beamline = "piM3.2";
+    muonSource = "continuous surface muon source";
+    muonSpecies = "positive muons";
   } else if (fRunPathName.Contains("_ltf_", TString::kIgnoreCase)) {
     instrument = "LTF";
     beamline = "piM3.3";
+    muonSource = "continuous surface muon source";
+    muonSpecies = "positive muons";
   } else if (fRunPathName.Contains("_gpd_", TString::kIgnoreCase)) {
     instrument = "GPD";
     beamline = "muE1";
+    muonSource = "continuous decay channel muon source";
+    muonSpecies = "positive muons";
   } else if (fRunPathName.Contains("_dolly_", TString::kIgnoreCase)) {
     instrument = "DOLLY";
     beamline = "piE1";
+    muonSource = "continuous surface muon source";
+    muonSpecies = "positive muons";
   } else if (fRunPathName.Contains("_alc_", TString::kIgnoreCase)) {
     instrument = "ALC";
     beamline = "piE3";
+    muonSource = "continuous surface muon source";
+    muonSpecies = "positive muons";
   } else if (fRunPathName.Contains("_hifi_", TString::kIgnoreCase)) {
     instrument = "HIFI";
     beamline = "piE3";
+    muonSource = "continuous surface muon source";
+    muonSpecies = "positive muons";
   }
   runData.SetInstrument(instrument);
   runData.SetBeamline(beamline);
+  runData.SetMuonSource(muonSource);
+  runData.SetMuonSpecies(muonSpecies);
 
   // keep run name
   runData.SetRunName(fRunName);
@@ -2091,7 +2117,13 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   if (sDateTime.size() < 2) {
     cerr << endl << ">> **WARNING** psi-bin file: couldn't obtain run start date/time" << endl;
   }
-  runData.SetStartDate(sDateTime[0]);
+  string date("");
+  if (DateToISO8601(sDateTime[0], date)) {
+    runData.SetStartDate(date);
+  } else {
+    cerr << endl << ">> **WARNING** failed to convert start date: " << sDateTime[0] << " into ISO 8601 date." << endl;
+    runData.SetStartDate(sDateTime[0]);
+  }
   runData.SetStartTime(sDateTime[1]);
   sDateTime.clear();
 
@@ -2099,7 +2131,13 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   if (sDateTime.size() < 2) {
     cerr << endl << ">> **WARNING** psi-bin file: couldn't obtain run stop date/time" << endl;
   }
-  runData.SetStopDate(sDateTime[0]);
+  date = string("");
+  if (DateToISO8601(sDateTime[0], date)) {
+    runData.SetStopDate(date);
+  } else {
+    cerr << endl << ">> **WARNING** failed to convert stop date: " << sDateTime[0] << " into ISO 8601 date." << endl;
+    runData.SetStopDate(sDateTime[0]);
+  }
   runData.SetStopTime(sDateTime[1]);
   sDateTime.clear();
 
@@ -2209,41 +2247,20 @@ Bool_t PRunDataHandler::ReadMudFile()
   time_t tval;
   struct tm *dt;
   TString stime("");
-  Int_t yy = 0;
   success = MUD_getTimeBegin( fh, (UINT32*)&tval );
   if (success) {
     runData.SetStartDateTime((const time_t)tval);
     dt = localtime((const time_t*)&tval);
     assert(dt);
-    yy = dt->tm_year;
-    if (yy > 100)
-      yy -= 100;
-    if (yy < 10)
-      stime += "0";
-    stime += yy;
-    stime += "-";
-    stime += GetMonth(dt->tm_mon);
-    stime += "-";
-    if (dt->tm_mday < 10)
-      stime += "0";
-    stime += dt->tm_mday;
+
+    // start date
+    strftime(str, sizeof(str), "%F", dt);
+    stime = str;
     runData.SetStartDate(stime);
     // start time
-    if (dt->tm_hour == 0)
-      stime = "00";
-    else if (dt->tm_hour < 10)
-      stime = "0";
-    else
-      stime = "";
-    stime  += dt->tm_hour;
-    stime += ":";
-    if (dt->tm_min < 10)
-      stime += "0";
-    stime += dt->tm_min;
-    stime += ":";
-    if (dt->tm_sec < 10)
-      stime += "0";
-    stime += dt->tm_sec;
+    memset(str, 0, sizeof(str));
+    strftime(str, sizeof(str), "%T", dt);
+    stime = str;
     runData.SetStartTime(stime);
   }
 
@@ -2253,36 +2270,15 @@ Bool_t PRunDataHandler::ReadMudFile()
     runData.SetStopDateTime((const time_t)tval);
     dt = localtime((const time_t*)&tval);
     assert(dt);
-    stime = "";
-    yy = dt->tm_year;
-    if (yy > 100)
-      yy -= 100;
-    if (yy < 10)
-      stime += "0";
-    stime += yy;
-    stime += "-";
-    stime += GetMonth(dt->tm_mon);
-    stime += "-";
-    if (dt->tm_mday < 10)
-      stime += "0";
-    stime += dt->tm_mday;
+
+    // stop date
+    strftime(str, sizeof(str), "%F", dt);
+    stime = str;
     runData.SetStopDate(stime);
     // stop time
-    if (dt->tm_hour == 0)
-      stime = "00";
-    else if (dt->tm_hour < 10)
-      stime = "0";
-    else
-      stime = "";
-    stime  += dt->tm_hour;
-    stime += ":";
-    if (dt->tm_min < 10)
-      stime += "0";
-    stime += dt->tm_min;
-    stime += ":";
-    if (dt->tm_sec < 10)
-      stime += "0";
-    stime += dt->tm_sec;
+    memset(str, 0, sizeof(str));
+    strftime(str, sizeof(str), "%T", dt);
+    stime = str;
     runData.SetStopTime(stime);
   }
 
@@ -3687,8 +3683,6 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
 {
 
 #ifdef PNEXUS_ENABLED
-  int *t0=0, *fgb=0, *lgb=0, *histo=0;
-
   // generate output file name
   if (fln.Length() == 0) {
     Bool_t ok = false;
@@ -3725,7 +3719,7 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
     tm = localtime(&now);
     string str("");
     char cstr[128];
-    sprintf(cstr, "%04d-%02d-%02d %02d:%02d:%02d", 1900+tm->tm_year, tm->tm_mon, tm->tm_mday, tm->tm_hour, tm->tm_hour, tm->tm_sec);
+    strftime(cstr, sizeof(cstr), "%FT%T", tm);
     str = string(cstr);
     nxs->SetFileTime(str);
 
@@ -3739,9 +3733,9 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
       nxs->GetEntryIdf1()->SetLaboratory(fData[0].GetLaboratory()->Data());
     if (*fData[0].GetBeamline() != "n/a")
       nxs->GetEntryIdf1()->SetBeamline(fData[0].GetBeamline()->Data());
-    str = string(fData[0].GetStartDate()->Data()) + string(" ") + string(fData[0].GetStartTime()->Data());
+    str = string(fData[0].GetStartDate()->Data()) + string("T") + string(fData[0].GetStartTime()->Data());
     nxs->GetEntryIdf1()->SetStartTime(str);
-    str = string(fData[0].GetStopDate()->Data()) + string(" ") + string(fData[0].GetStopTime()->Data());
+    str = string(fData[0].GetStopDate()->Data()) + string("T") + string(fData[0].GetStopTime()->Data());
     nxs->GetEntryIdf1()->SetStopTime(str);
     nxs->GetEntryIdf1()->SetSwitchingState(1);
     nxs->GetEntryIdf1()->GetUser()->SetName("n/a");
@@ -3749,13 +3743,23 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
     nxs->GetEntryIdf1()->GetSample()->SetName(fData[0].GetSample()->Data());
     nxs->GetEntryIdf1()->GetSample()->SetPhysProp("temperature", fData[0].GetTemperature(0), "Kelvin");
     nxs->GetEntryIdf1()->GetSample()->SetPhysProp("magnetic_field", fData[0].GetField(), "Gauss");
-    nxs->GetEntryIdf1()->GetSample()->SetEnvironment("n/a");
+    nxs->GetEntryIdf1()->GetSample()->SetEnvironment(fData[0].GetSetup()->Data());
     nxs->GetEntryIdf1()->GetSample()->SetShape("n/a");
     nxs->GetEntryIdf1()->GetSample()->SetMagneticFieldVectorAvailable(0);
     if (*fData[0].GetInstrument() != "n/a")
       nxs->GetEntryIdf1()->GetInstrument()->SetName(fData[0].GetInstrument()->Data());
     nxs->GetEntryIdf1()->GetInstrument()->GetDetector()->SetNumber(fData[0].GetNoOfHistos());
     nxs->GetEntryIdf1()->GetInstrument()->GetCollimator()->SetType("n/a");
+    // calculate the total number of counts
+    int total_counts = 0;
+    for (unsigned int i=0; i<fData[0].GetNoOfHistos(); i++) {
+      for (unsigned int j=0; j<fData[0].GetDataBin(i)->size(); j++)
+        total_counts += fData[0].GetDataBin(i)->at(j);
+    }
+    double total_counts_mev = (double) total_counts / 1.0e6;
+    nxs->GetEntryIdf1()->GetInstrument()->GetBeam()->SetTotalCounts(total_counts_mev);
+    nxs->GetEntryIdf1()->GetInstrument()->GetBeam()->SetUnits("Mev");
+
     nxs->GetEntryIdf1()->GetData()->SetTimeResolution(fData[0].GetTimeResolution(), "ns");
 
     // t0
@@ -3792,60 +3796,149 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
     tm = localtime(&now);
     string str("");
     char cstr[128];
-    sprintf(cstr, "%04d-%02d-%02d %02d:%02d:%02d", 1900+tm->tm_year, tm->tm_mon, tm->tm_mday, tm->tm_hour, tm->tm_hour, tm->tm_sec);
+    strftime(cstr, sizeof(cstr), "%FT%T", tm);
     str = string(cstr);
     nxs->SetFileTime(str);
 
-    nxs->SetCreator("PSI - any2many");
+    // NXroot info
+    nxs->SetCreator("PSI: any2many");
 
-    nxs->GetEntryIdf2()->SetDefinition("pulsedTD");
+    // NXentry info
+    nxs->GetEntryIdf2()->SetDefinition("muonTD");
+    nxs->GetEntryIdf2()->SetProgramName("any2many");
+    nxs->GetEntryIdf2()->SetProgramVersion("$Id$");
     nxs->GetEntryIdf2()->SetRunNumber(fData[0].GetRunNumber());
     nxs->GetEntryIdf2()->SetTitle(fData[0].GetRunTitle()->Data());
-    str = string(fData[0].GetStartDate()->Data()) + string(" ") + string(fData[0].GetStartTime()->Data());
+    str = string(fData[0].GetStartDate()->Data()) + string("T") + string(fData[0].GetStartTime()->Data());
     nxs->GetEntryIdf2()->SetStartTime(str);
-    str = string(fData[0].GetStopDate()->Data()) + string(" ") + string(fData[0].GetStopTime()->Data());
+    str = string(fData[0].GetStopDate()->Data()) + string("T") + string(fData[0].GetStopTime()->Data());
     nxs->GetEntryIdf2()->SetStopTime(str);
 
     nxs->GetEntryIdf2()->SetExperimentIdentifier("n/a");
 
+    // NXuser info
     nxs->GetEntryIdf2()->GetUser()->SetName("n/a");
 
+    // NXsample info
     nxs->GetEntryIdf2()->GetSample()->SetName(fData[0].GetSample()->Data());
     nxs->GetEntryIdf2()->GetSample()->SetDescription("n/a");
     nxs->GetEntryIdf2()->GetSample()->SetPhysProp("temperature_1", fData[0].GetTemperature(0), "Kelvin");
     nxs->GetEntryIdf2()->GetSample()->SetPhysProp("magnetic_field_1", fData[0].GetField(), "Gauss");
-    nxs->GetEntryIdf2()->GetSample()->SetEnvironmentTemp("n/a");
+    nxs->GetEntryIdf2()->GetSample()->SetEnvironmentTemp(fData[0].GetSetup()->Data());
     nxs->GetEntryIdf2()->GetSample()->SetEnvironmentField("n/a");
 
-    // here would be the information for NXinstrument. Currently there are not enough information to feed this
+    // here would be the information for NXinstrument. Currently there are not much information to feed this
+    nxs->GetEntryIdf2()->GetInstrument()->SetName(fData[0].GetInstrument()->Data());
 
-    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetDescription("n/a");
-    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetNoOfPeriods(1); // currently red/green is not distinguished
+    // NXinstrument/NXsource
+    nxs->GetEntryIdf2()->GetInstrument()->GetSource()->SetName(fData[0].GetLaboratory()->Data());
+    nxs->GetEntryIdf2()->GetInstrument()->GetSource()->SetType(fData[0].GetMuonSource()->Data());
+    nxs->GetEntryIdf2()->GetInstrument()->GetSource()->SetProbe(fData[0].GetMuonSpecies()->Data());
+
+    // NXinstrument/NXbeamline
+    nxs->GetEntryIdf2()->GetInstrument()->GetBeamline()->SetName(fData[0].GetBeamline()->Data());
+
+    // NXinstrument/NXdetector
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetDescription(fData[0].GetInstrument()->Data()); // assume that this should be the instrument name
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetNoOfPeriods(0); // currently red/green is not distinguished
     nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetNoOfSpectra(fData[0].GetNoOfHistos());
     nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetNoOfBins(fData[0].GetDataBin(0)->size());
     nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetTimeResolution(fData[0].GetTimeResolution(), "ns");
-    histo = new int[fData[0].GetNoOfHistos()*fData[0].GetDataBin(0)->size()];
+    int *histo = new int[fData[0].GetNoOfHistos()*fData[0].GetDataBin(0)->size()];
     for (int i=0; i<nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra(); i++) {
       for (unsigned int j=0; j<fData[0].GetDataBin(0)->size(); j++) {
         *(histo+i*fData[0].GetDataBin(0)->size()+j) = (int) fData[0].GetDataBin(i)->at(j);
       }
     }
     nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetHistos(histo);
+    // clean up
+    if (histo) {
+      delete [] histo;
+      histo = 0;
+    }
+
+    // handle spectrum index
     for (int i=0; i<nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra(); i++)
       nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetSpectrumIndex(i+1);
 
-    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetT0Tag(2);
-    int *t0 = new int[fData[0].GetT0Size()];
+    // handle histogram resolution
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetTimeResolution(fData[0].GetTimeResolution(), "ns");
+
+    // handle raw time
+    vector<double> raw_time;
+    for (unsigned int i=0; i<fData[0].GetDataBin(0)->size(); i++) {
+      raw_time.push_back((double)i * fData[0].GetTimeResolution() * 1.0e-3); // since time resolution is given in ns, the factor 1.0e-3 is needed to convert to us
+    }
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetRawTime(raw_time);
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetRawTimeUnit("micro.second");
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetRawTimeName("time");
+    raw_time.clear();
+
+    // handle t0
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetT0Tag(2); // i.e. t0[#histo] format
+    int *t0 = new int[fData[0].GetNoOfHistos()];
     for (unsigned int i=0; i<fData[0].GetNoOfHistos(); i++) {
-      if (i<fData[0].GetT0Size())
-        *(t0+i) = fData[0].GetT0(i);
-      else
-        *(t0+i) = fData[0].GetT0(0);
+      if (fData[0].GetT0Size() == 0) { // NO t0's present, hence take the estimated ones
+        if (i == 0) { // place a warning in case NO t0's were present
+          cerr << endl << ">> **WARNING** NO t0's are present in the original file, will use the estimated once, no waranty this is correct!!" << endl;
+        }
+        if (i<fData[0].GetT0Size())
+          t0[i] = fData[0].GetT0Estimated(i);
+        else
+          t0[i] = fData[0].GetT0Estimated(0);
+      } else { // t0's are given
+        if (i<fData[0].GetT0Size())
+          t0[i] = fData[0].GetT0(i);
+        else
+          t0[i] = fData[0].GetT0(0);
+      }
     }
     nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetT0(t0);
 
-    // first_good_bin - still missing
-    // last_good_bin - still missing
+    // handle first_good_bin
+    int *fgb = new int[fData[0].GetNoOfHistos()];
+    for (unsigned int i=0; i<fData[0].GetNoOfHistos(); i++) {
+      if (fData[0].GetGoodDataBinSize() == 0) { // first good bin NOT present, hence fgb = t0 + 10ns
+        fgb[i] = t0[i] + (int)(10.0/fData[0].GetTimeResolution()); // t0 + 10ns
+      } else { // first good bin present
+        if (i < fData[0].GetGoodDataBinSize())
+          fgb[i] = fData[0].GetGoodDataBin(i).first;
+        else
+          fgb[i] = fData[0].GetGoodDataBin(0).first;
+      }
+    }
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetFirstGoodBin(fgb);
+    // clean up
+    if (fgb) {
+      delete [] fgb;
+      fgb = 0;
+    }
+
+    // handle last_good_bin
+    int *lgb = new int[fData[0].GetNoOfHistos()];
+    for (unsigned int i=0; i<fData[0].GetNoOfHistos(); i++) {
+      if (fData[0].GetGoodDataBinSize() == 0) { // last good bin NOT present, hence lgb = length of histo - 1
+        lgb[i] = fData[0].GetDataBin(i)->size() - 1;
+      } else { // first good bin present
+        if (i < fData[0].GetGoodDataBinSize())
+          lgb[i] = fData[0].GetGoodDataBin(i).second;
+        else
+          lgb[i] = fData[0].GetGoodDataBin(0).second;
+      }
+    }
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetLastGoodBin(lgb);
+    // clean up
+    if (lgb) {
+      delete [] lgb;
+      lgb = 0;
+    }
+
+    // clean up
+    if (t0) {
+      delete [] t0;
+      t0 = 0;
+    }
+
   } else {
     // clean up
     if (nxs != 0) {
@@ -3877,23 +3970,6 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
   // write file
   nxs->WriteFile(fln, fileType, fAny2ManyInfo->idf);
 
-  // clean up
-  if (t0) {
-    delete [] t0;
-    t0 = 0;
-  }
-  if (fgb) {
-    delete [] fgb;
-    fgb = 0;
-  }
-  if (lgb) {
-    delete [] lgb;
-    lgb = 0;
-  }
-  if (histo) {
-    delete [] histo;
-    histo = 0;
-  }
   if (nxs != 0) {
     delete nxs;
     nxs = 0;
@@ -4915,49 +4991,32 @@ TString PRunDataHandler::FileNameFromTemplate(TString &fileNameTemplate, Int_t r
 }
 
 //--------------------------------------------------------------------------
-// GetMonth (private)
+// DateToISO8601 (private)
 //--------------------------------------------------------------------------
 /**
- * <p>Spits out the month as MMM for a given numerical month 0..11
+ * <p>If possible converts a inDate, into a ISO8601 standard date.
  *
- * <b>return:</b>
- * - constructed file name from template, run number, and year
- * - empty string
+ * <p><b>return:</b> true if conversion was successfull otherwise false.
  *
- * \param template template string
+ * \param inDate input date which should be converted to an ISO 8601 date.
+ * \param iso8601Date on success the converted iso8601Date, otherwise an empty string
  */
-TString PRunDataHandler::GetMonth(Int_t month)
+bool PRunDataHandler::DateToISO8601(string inDate, string &iso8601Date)
 {
-  TString mm("");
+  iso8601Date = string("");
 
-  if (month == 0)
-    mm = "JAN";
-  else if (month == 1)
-    mm = "FEB";
-  else if (month == 2)
-    mm = "MAR";
-  else if (month == 3)
-    mm = "APR";
-  else if (month == 4)
-    mm = "MAY";
-  else if (month == 5)
-    mm = "JUN";
-  else if (month == 6)
-    mm = "JUL";
-  else if (month == 7)
-    mm = "AUG";
-  else if (month == 8)
-    mm = "SEP";
-  else if (month == 9)
-    mm = "OCT";
-  else if (month == 10)
-    mm = "NOV";
-  else if (month == 11)
-    mm = "DEC";
-  else
-    mm = "???";
+  struct tm tm;
 
-  return mm;
+  // currently only dates like dd-mmm-yy are handled, where dd day of the month, mmm month as abbrivation, e.g. JAN, and yy as the year
+  if (!strptime(inDate.c_str(), "%d-%b-%y", &tm)) // failed
+    return false;
+
+  TString str("");
+  str.Form("%04d-%02d-%02d", 1900+tm.tm_year, tm.tm_mon, tm.tm_mday);
+
+  iso8601Date = str.Data();
+
+  return true;
 }
 
 //--------------------------------------------------------------------------

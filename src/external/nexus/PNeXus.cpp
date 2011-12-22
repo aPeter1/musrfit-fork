@@ -32,6 +32,7 @@
 #include<cstdio>
 #include<cstring>
 #include<ctime>
+#include<cassert>
 
 #include <iostream>
 #include <sstream>
@@ -835,6 +836,7 @@ PNeXusDetector2::PNeXusDetector2()
 PNeXusDetector2::~PNeXusDetector2()
 {
   fSpectrumIndex.clear();
+  fRawTime.clear();
 
   if (fT0) {
     delete [] fT0;
@@ -891,8 +893,13 @@ bool PNeXusDetector2::IsValid(bool strict)
     return false;
   }
 
-  if ((fT0 == 0) || (fHisto == 0)) {
-    cerr << ">> **ERROR** IDF2 NXdetector problem with t0/counts settings (data)." << endl;
+  if (fT0 == 0) {
+    cerr << ">> **ERROR** IDF2 NXdetector t0 settings pointer is null." << endl;
+    return false;
+  }
+
+  if (fHisto == 0) {
+    cerr << ">> **ERROR** IDF2 NXdetector counts settings pointer is null." << endl;
     return false;
   }
 
@@ -917,14 +924,20 @@ int PNeXusDetector2::GetT0(int idxp, int idxs)
 {
   int result = -1;
 
-  if ((idxp < 0) || (idxs < 0)) { // assumption: there is only ONE t0 for all spectra
+  if ((idxp < 0) && (idxs < 0)) { // assumption: there is only ONE t0 for all spectra
     if (fT0 != 0) {
       result = *fT0;
     }
-  } else { // assumption: t0's are represented as t0[np][ns]
+  } else if ((idxp < 0) && (idxs >= 0)) { // assumption: t0's are represented as t0[ns]
+    if (idxs < fNoOfSpectra) {
+      result = *(fT0+idxs);
+    }
+  } else if ((idxp >= 0) && (idxs >= 0)) { // assumption: t0's are represented as t0[np][ns]
     if ((idxp < fNoOfPeriods) || (idxs < fNoOfSpectra)) {
       result = *(fT0+idxp*fNoOfSpectra+idxs);
     }
+  } else {
+    result = -1;
   }
 
   return result;
@@ -959,10 +972,18 @@ int PNeXusDetector2::SetT0(int *t0)
       fErrorMsg = ss.str();
       result = 0;
       break;
-    case 1:
+    case 1: // just one single t0
       size = 1;
       break;
-    case 2:
+    case 2: // t0[#histos]
+      if (fNoOfSpectra <= 0) {
+        fErrorMsg = "PNeXusDetector2::SetT0(int *t0): ask for t0 vector (ns), but ns <= 0!";
+        result = 0;
+      } else {
+        size = fNoOfSpectra;
+      }
+      break;
+    case 3: // t0[np][#histos]
       if ((fNoOfPeriods <= 0) || (fNoOfSpectra <= 0)) {
         fErrorMsg = "PNeXusDetector2::SetT0(int *t0): ask for t0 vector (np, ns), but either np or ns <= 0!";
         result = 0;
@@ -1013,14 +1034,20 @@ int PNeXusDetector2::GetFirstGoodBin(int idxp, int idxs)
 {
   int result = -1;
 
-  if ((idxp < 0) || (idxs < 0)) { // assumption: there is only ONE t0 for all spectra
+  if ((idxp < 0) && (idxs < 0)) { // assumption: there is only ONE t0 for all spectra
     if (fFirstGoodBin != 0) {
       result = *fFirstGoodBin;
     }
-  } else { // assumption: fgb's are represented as fgb[np][ns]
+  } else if ((idxp < 0) && (idxs >= 0)) { // assumptions: fgb's are represented as fgb[ns]
+    if (idxs < fNoOfSpectra) {
+      result = *(fFirstGoodBin+idxs);
+    }
+  } else if ((idxp >= 0) && (idxs >= 0)) { // assumption: fgb's are represented as fgb[np][ns]
     if ((idxp < fNoOfPeriods) || (idxs < fNoOfSpectra)) {
       result = *(fFirstGoodBin+idxp*fNoOfSpectra+idxs);
     }
+  } else {
+    result = -1;
   }
 
   return result;
@@ -1055,10 +1082,18 @@ int PNeXusDetector2::SetFirstGoodBin(int *fgb)
       fErrorMsg = ss.str();
       result = 0;
       break;
-    case 1:
+    case 1: // single fgb
       size = 1;
       break;
-    case 2:
+    case 2: // fgb[#histos]
+      if (fNoOfSpectra <= 0) {
+        fErrorMsg = "PNeXusDetector2::SetFirstGoodBin(int *fgb): ask for fgb vector (ns), but ns <= 0!";
+        result = 0;
+      } else {
+        size = fNoOfSpectra;
+      }
+      break;
+    case 3: // fgb[np][#histos]
       if ((fNoOfPeriods <= 0) || (fNoOfSpectra <= 0)) {
         fErrorMsg = "PNeXusDetector2::SetFirstGoodBin(int *fgb): ask for fgb vector (np, ns), but either np or ns <= 0!";
         result = 0;
@@ -1109,14 +1144,20 @@ int PNeXusDetector2::GetLastGoodBin(int idxp, int idxs)
 {
   int result = -1;
 
-  if ((idxp < 0) || (idxs < 0)) { // assumption: there is only ONE t0 for all spectra
+  if ((idxp < 0) && (idxs < 0)) { // assumption: there is only ONE t0 for all spectra
     if (fLastGoodBin != 0) {
       result = *fLastGoodBin;
     }
-  } else { // assumption: lgb's are represented as lgb[np][ns]
+  } else if ((idxp < 0) && (idxs >= 0)) { // assumption: lgb's are represented as lgb[ns]
+    if (idxs < fNoOfSpectra) {
+      result = *(fLastGoodBin+idxs);
+    }
+  } else if ((idxp >= 0) && (idxs >= 0)) { // assumption: lgb's are represented as lgb[np][ns]
     if ((idxp < fNoOfPeriods) || (idxs < fNoOfSpectra)) {
       result = *(fLastGoodBin+idxp*fNoOfSpectra+idxs);
     }
+  } else {
+    result = -1;
   }
 
   return result;
@@ -1151,10 +1192,18 @@ int PNeXusDetector2::SetLastGoodBin(int *lgb)
       fErrorMsg = ss.str();
       result = 0;
       break;
-    case 1:
+    case 1: // single lgb only
       size = 1;
       break;
-    case 2:
+    case 2: // lgb[#histos]
+      if (fNoOfSpectra <= 0) {
+        fErrorMsg = "PNeXusDetector2::SetLastGoodBin(int *lgb): ask for lgb vector (ns), but ns <= 0!";
+        result = 0;
+      } else {
+        size = fNoOfSpectra;
+      }
+      break;
+    case 3: // lgb[np][#histos]
       if ((fNoOfPeriods <= 0) || (fNoOfSpectra <= 0)) {
         fErrorMsg = "PNeXusDetector2::SetLastGoodBin(int *lgb): ask for lgb vector (np, ns), but either np or ns <= 0!";
         result = 0;
@@ -1344,6 +1393,20 @@ void PNeXusDetector2::SetTimeResolution(double val, string units)
 }
 
 //------------------------------------------------------------------------------------------
+// SetRawTime (public)
+//------------------------------------------------------------------------------------------
+/**
+ * <p>sets the raw time (deep copy).
+ *
+ * \param rawTime raw time vector.
+ */
+void PNeXusDetector2::SetRawTime(vector<double> &rawTime)
+{
+  for (unsigned int i=0; i<rawTime.size(); i++)
+    fRawTime.push_back(rawTime[i]);
+}
+
+//------------------------------------------------------------------------------------------
 // GetSpectrumIndex (public)
 //------------------------------------------------------------------------------------------
 /**
@@ -1517,13 +1580,7 @@ bool PNeXusSample2::IsValid(bool strict)
   string msg("");
 
   if (!fName.compare("n/a")) {
-    msg = "IDF2 NXsample 'name' not set.";
-    if (strict) {
-      cerr << ">> **ERROR** " << msg << endl;
-      return false;
-    } else {
-      cerr << ">> **WARNING** " << msg << endl;
-    }
+    cerr << ">> **WARNING** IDF2 NXsample 'name' not set." << msg << endl;
   }
 
   if (!fDescription.compare("n/a")) {
@@ -1996,14 +2053,14 @@ int PNeXus::ReadFile(const char *fileName)
     status = ReadFileIdf1();
     if (status != NX_OK) {
       fErrorCode = PNEXUS_VAILD_READ_IDF1_FILE;
-      fErrorMsg = ">> **ERROR** coudn't read IDF Version 1 file '" + fFileName + "'.";
+      fErrorMsg = ">> **ERROR** while reading IDF Version 1 file '" + fFileName + "'.";
     }
     break;
   case 2:
     status = ReadFileIdf2();
     if (status != NX_OK) {
       fErrorCode = PNEXUS_VAILD_READ_IDF2_FILE;
-      fErrorMsg = ">> **ERROR** coudn't read IDF Version 2 file '" + fFileName + "'.";
+      fErrorMsg = ">> **ERROR** while reading IDF Version 2 file '" + fFileName + "'.";
     }
     break;
   default:
@@ -2082,9 +2139,12 @@ void PNeXus::Dump()
     cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
     cout << endl << "NXfile:";
     cout << endl << "  NeXus_version  : " << fNeXusVersion;
-    cout << endl << "  user: ...";
+    cout << endl << "  file format ver: " << fFileFormatVersion;
+    cout << endl << "  file name      : " << fFileName;
+    cout << endl << "  file time      : " << fFileTime;
+    cout << endl << "  user           : " << fCreator;
     cout << endl << "NXentry:";
-    cout << endl << "  IDF version    : " << fIdfVersion;
+    cout << endl << "  idf version    : " << fIdfVersion;
     cout << endl << "  program name   : " << fNxEntry1->GetProgramName() << ", version: " << fNxEntry1->GetProgramVersion();
     cout << endl << "  run number     : " << fNxEntry1->GetRunNumber();
     cout << endl << "  title          : " << fNxEntry1->GetTitle();
@@ -2197,6 +2257,8 @@ void PNeXus::Dump()
         cout << "...";
       }
     }
+    cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
+    cout << endl << "that's all!";
     cout << endl << endl;
   } else if (fIdfVersion == 2) {
     cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
@@ -2207,9 +2269,10 @@ void PNeXus::Dump()
     cout << endl << "  file format version : " << fFileFormatVersion;
     cout << endl << "  creator             : " << fCreator;
     cout << endl << "NXentry:";
-    cout << endl << "  IDF version         : " << fIdfVersion;
+    cout << endl << "  idf version         : " << fIdfVersion;
     cout << endl << "  definition          : " << fNxEntry2->GetDefinition();
-    cout << endl << "  program name        : " << fNxEntry2->GetProgramName() << ", version: " << fNxEntry2->GetProgramVersion();
+    if (!fNxEntry2->GetProgramName().empty())
+      cout << endl << "  program name        : " << fNxEntry2->GetProgramName() << ", version: " << fNxEntry2->GetProgramVersion();
     cout << endl << "  run_number          : " << fNxEntry2->GetRunNumber();
     cout << endl << "  run_title           : " << fNxEntry2->GetTitle();
     cout << endl << "  start_time          : " << fNxEntry2->GetStartTime();
@@ -2221,17 +2284,17 @@ void PNeXus::Dump()
     cout << endl << "    name              : " << fNxEntry2->GetSample()->GetName();
     cout << endl << "    description       : " << fNxEntry2->GetSample()->GetDescription();
     cout << endl << "    mag.field state   : " << fNxEntry2->GetSample()->GetMagneticFieldState();
-    dval = fNxEntry2->GetSample()->GetPhysPropValue("temperature", ok);
+    dval = fNxEntry2->GetSample()->GetPhysPropValue("temperature_1", ok);
     if (ok)
       cout << endl << "    temperature       : " << dval;
-    fNxEntry2->GetSample()->GetPhysPropUnit("temperature", str, ok);
+    fNxEntry2->GetSample()->GetPhysPropUnit("temperature_1", str, ok);
     if (ok)
       cout << " (" << str << ")";
     cout << endl << "    temp.environment  : " << fNxEntry2->GetSample()->GetEnvironmentTemp();
-    dval = fNxEntry2->GetSample()->GetPhysPropValue("magnetic_field", ok);
+    dval = fNxEntry2->GetSample()->GetPhysPropValue("magnetic_field_1", ok);
     if (ok)
       cout << endl << "    magnetic_field    : " << dval;
-    fNxEntry2->GetSample()->GetPhysPropUnit("magnetic_field", str, ok);
+    fNxEntry2->GetSample()->GetPhysPropUnit("magnetic_field_1", str, ok);
     if (ok)
       cout << " (" << str << ")";
     cout << endl << "    mag. field env.   : " << fNxEntry2->GetSample()->GetEnvironmentField();
@@ -2249,11 +2312,16 @@ void PNeXus::Dump()
     if (fNxEntry2->GetInstrument()->GetDetector()->IsT0Present()) {
       if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 1) { // only one t0 for all histograms
         cout << endl << "      t0              : " << fNxEntry2->GetInstrument()->GetDetector()->GetT0();
+      } else if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 2) { // t0[ns]
+        cout << endl << "      t0 (idx_s/t0)   : ";
+        for (int i=0; i<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra(); i++) {
+          cout << "(" << i+1 << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetT0(-1, i) << "), ";
+        }
       } else { // t0 vector of the form t0[np][ns]
         cout << endl << "      t0 (idx_p/idx_s/t0): ";
         for (int i=0; i<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfPeriods(); i++) {
           for (int j=0; j<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra(); j++) {
-            cout << "(" << i << "/" << j << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetT0(i,j);
+            cout << "(" << i+1 << "/" << j+1 << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetT0(i,j) << "), ";
           }
         }
       }
@@ -2261,27 +2329,37 @@ void PNeXus::Dump()
       cout << endl << "      t0              : n/a";
     }
     if (fNxEntry2->GetInstrument()->GetDetector()->IsFirstGoodBinPresent()) {
-      if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 1) { // only one t0/fgb/lgb for all histograms
+      if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 1) { // only one fgb for all histograms
         cout << endl << "      first good bin  : " << fNxEntry2->GetInstrument()->GetDetector()->GetFirstGoodBin();
+      } else if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 2) { // fgb[ns]
+        cout << endl << "      fgb (idx_s/fgb) : ";
+        for (int i=0; i<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra(); i++) {
+          cout << "(" << i+1 << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetFirstGoodBin(-1,i) << ") , ";
+        }
       } else { // fgb vector of the form fgb[np][ns]
         cout << endl << "      fgb (idx_p/idx_s/fgb): ";
         for (int i=0; i<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfPeriods(); i++) {
           for (int j=0; j<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra(); j++) {
-            cout << "(" << i << "/" << j << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetFirstGoodBin(i,j);
+            cout << "(" << i+1 << "/" << j+1 << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetFirstGoodBin(i,j);
           }
         }
       }
     } else {
       cout << endl << "      first good bin  : n/a";
     }
-    if (fNxEntry2->GetInstrument()->GetDetector()->IsFirstGoodBinPresent()) {
-      if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 1) { // only one t0/fgb/lgb for all histograms
-        cout << endl << "      last good bin  : " << fNxEntry2->GetInstrument()->GetDetector()->GetLastGoodBin();
+    if (fNxEntry2->GetInstrument()->GetDetector()->IsLastGoodBinPresent()) {
+      if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 1) { // only one lgb for all histograms
+        cout << endl << "      last good bin   : " << fNxEntry2->GetInstrument()->GetDetector()->GetLastGoodBin();
+      } else if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 2) { // lgb[ns]
+        cout << endl << "      lgb (idx_s/lgb) : ";
+        for (int i=0; i<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra(); i++) {
+          cout << "(" << i+1 << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetLastGoodBin(-1,i) << "), ";
+        }
       } else { // lgb vector of the form lgb[np][ns]
         cout << endl << "      lgb (idx_p/idx_s/lgb): ";
         for (int i=0; i<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfPeriods(); i++) {
           for (int j=0; j<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra(); j++) {
-            cout << "(" << i << "/" << j << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetLastGoodBin(i,j);
+            cout << "(" << i+1 << "/" << j+1 << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetLastGoodBin(i,j) << "), ";
           }
         }
       }
@@ -2294,7 +2372,7 @@ void PNeXus::Dump()
 
     // dump data
     int maxDump = 15;
-    cout << endl << "      counts     : ";
+    cout << endl << "      counts    : ";
     if (fNxEntry2->GetInstrument()->GetDetector()->GetNoOfPeriods() > 0) { // counts[np][ns][ntc]
       for (int i=0; i<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfPeriods(); i++) {
         cout << endl << "       period    : " << i+1;
@@ -2332,6 +2410,7 @@ void PNeXus::Dump()
         cout << "...";
       }
     }
+    cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
     cout << endl << "that's all!";
     cout << endl << endl;
   }
@@ -2645,7 +2724,7 @@ NXstatus PNeXus::GetIntVectorData(vector<int> &data)
  */
 int PNeXus::ReadFileIdf1()
 {
-  cout << endl << ">> reading NeXus Version 1 file ..." << endl;
+  cout << endl << ">> reading NeXus IDF Version 1 file ..." << endl;
 
   // create first the necessary NXentry object for IDF Version 1
   fNxEntry1 = new PNeXusEntry1();
@@ -2659,6 +2738,8 @@ int PNeXus::ReadFileIdf1()
   char cstr[128];
   int ival;
   float fval;
+  int attlen, atttype;
+  NXname data_value, nxAttrName;
 
   // open file
   NXstatus status;
@@ -2668,6 +2749,44 @@ int PNeXus::ReadFileIdf1()
     fErrorMsg  = "PNeXus::ReadFile() **ERROR** Couldn't open file '"+fFileName+"' !";
     return NX_ERROR;
   }
+
+  // collect the NXroot attribute information
+  do {
+    status = NXgetnextattr(fFileHandle, nxAttrName, &attlen, &atttype);
+    if (status == NX_OK) {
+      if (!strcmp(nxAttrName, "HDF_version")) {
+        attlen = VGNAMELENMAX - 1;
+        atttype = NX_CHAR;
+        status = NXgetattr(fFileHandle, nxAttrName, data_value, &attlen, &atttype);
+        if (status == NX_OK) {
+          fFileFormatVersion = string(data_value);
+        }
+      } else if (!strcmp(nxAttrName, "HDF5_Version")) {
+        attlen = VGNAMELENMAX - 1;
+        atttype = NX_CHAR;
+        status = NXgetattr(fFileHandle, nxAttrName, data_value, &attlen, &atttype);
+        if (status == NX_OK) {
+          fFileFormatVersion = string("HDF5: ")+string(data_value);
+        }
+      } else if (!strcmp(nxAttrName, "XML_version")) {
+        attlen = VGNAMELENMAX - 1;
+        atttype = NX_CHAR;
+        status = NXgetattr(fFileHandle, nxAttrName, data_value, &attlen, &atttype);
+        if (status == NX_OK) {
+          fFileFormatVersion = string(data_value);
+        }
+      } else if (!strcmp(nxAttrName, "file_name")) {
+        if (!ErrorHandler(GetStringAttr("file_name", str), PNEXUS_GET_ATTR_ERROR, "couldn't read NXroot 'file_name' attribute!")) return NX_ERROR;
+        fFileName = str;
+      } else if (!strcmp(nxAttrName, "file_time")) {
+        if (!ErrorHandler(GetStringAttr("file_time", str), PNEXUS_GET_ATTR_ERROR, "couldn't read NXroot 'file_time' attribute!")) return NX_ERROR;
+        fFileTime = str;
+      } else if (!strcmp(nxAttrName, "user")) {
+        if (!ErrorHandler(GetStringAttr("user", str), PNEXUS_GET_ATTR_ERROR, "couldn't read NXroot 'user' attribute!")) return NX_ERROR;
+        fCreator = str;
+      }
+    }
+  } while (status == NX_OK);
 
   // look for the first occurring NXentry
   bool found = false;
@@ -2819,11 +2938,12 @@ int PNeXus::ReadFileIdf1()
   if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'magnetic_field' data in sample group")) return NX_ERROR;
   fNxEntry1->GetSample()->SetPhysProp("magnetic_field", (double)fval, str);
 
-  // read sample shape, e.g. powder, single crystal, etc.
-  if (!ErrorHandler(NXopendata(fFileHandle, "shape"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'shape' data in sample group!")) return NX_ERROR;
-  if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'shape' data in sample group!")) return NX_ERROR;
-  if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'shape' data in sample group")) return NX_ERROR;
-  fNxEntry1->GetSample()->SetShape(str);
+  // read sample shape, e.g. powder, single crystal, etc (THIS IS AN OPTIONAL ENTRY)
+  if (NXopendata(fFileHandle, "shape") == NX_OK) {
+    if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'shape' data in sample group!")) return NX_ERROR;
+    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'shape' data in sample group")) return NX_ERROR;
+    fNxEntry1->GetSample()->SetShape(str);
+  }
 
   // read magnetic field state, e.g. TF, LF, ZF
   if (!ErrorHandler(NXopendata(fFileHandle, "magnetic_field_state"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'magnetic_field_state' data in sample group!")) return NX_ERROR;
@@ -3182,7 +3302,7 @@ int PNeXus::ReadFileIdf1()
  */
 int PNeXus::ReadFileIdf2()
 {
-  cout << endl << ">> reading NeXus Version 2 file ..." << endl;
+  cout << endl << ">> reading NeXus IDF Version 2 file ..." << endl;
 
   // create first the necessary NXentry object for IDF Version 1
   fNxEntry2 = new PNeXusEntry2();
@@ -3195,7 +3315,7 @@ int PNeXus::ReadFileIdf2()
   string str;
   int ival, attlen, atttype;
   float fval;
-  NXname data_value;
+  NXname data_value, nxAttrName;
   int rank, type, dims[32], size, noOfElements;
 
   // open file
@@ -3203,55 +3323,68 @@ int PNeXus::ReadFileIdf2()
   status = NXopen(fFileName.c_str(), NXACC_READ, &fFileHandle);
   if (status != NX_OK) {
     fErrorCode = PNEXUS_FILE_OPEN_ERROR;
-    fErrorMsg  = "PNeXus::ReadFile() **ERROR** Couldn't open file '"+fFileName+"' !";
+    fErrorMsg  = "PNeXus::ReadFileIdf2() **ERROR** Couldn't open file '"+fFileName+"' !";
     return NX_ERROR;
   }
 
   // collect the NXroot attribute information
-  if (!ErrorHandler(GetStringAttr("file_name", str), PNEXUS_GET_ATTR_ERROR, "couldn't read NXroot 'file_name' attribute!")) return NX_ERROR;
-  fFileName = str;
-  if (!ErrorHandler(GetStringAttr("file_time", str), PNEXUS_GET_ATTR_ERROR, "couldn't read NXroot 'file_time' attribute!")) return NX_ERROR;
-  fFileTime = str;
-  if (!ErrorHandler(GetStringAttr("creator", str), PNEXUS_GET_ATTR_ERROR, "couldn't read NXroot 'creator' attribute!")) return NX_ERROR;
-  fCreator = str;
-
-  attlen = VGNAMELENMAX - 1;
-  atttype = NX_CHAR;
-  str = string("HDF_version");
-  status = NXgetattr(fFileHandle, (char *)str.c_str(), data_value, &attlen, &atttype);
-  if (status == NX_OK) {
-    fFileFormatVersion = string(data_value);
-  }
-
-  if (!fFileFormatVersion.compare("n/a")) {
-    attlen = VGNAMELENMAX - 1;
-    atttype = NX_CHAR;
-    str = string("HDF5_version");
-    status = NXgetattr(fFileHandle, (char *)str.c_str(), data_value, &attlen, &atttype);
+  do {
+    status = NXgetnextattr(fFileHandle, nxAttrName, &attlen, &atttype);
     if (status == NX_OK) {
-      fFileFormatVersion = string(data_value);
+      if (!strcmp(nxAttrName, "HDF_version")) {
+        attlen = VGNAMELENMAX - 1;
+        atttype = NX_CHAR;
+        status = NXgetattr(fFileHandle, nxAttrName, data_value, &attlen, &atttype);
+        if (status == NX_OK) {
+          fFileFormatVersion = string(data_value);
+        }
+      } else if (!strcmp(nxAttrName, "HDF5_Version")) {
+        attlen = VGNAMELENMAX - 1;
+        atttype = NX_CHAR;
+        status = NXgetattr(fFileHandle, nxAttrName, data_value, &attlen, &atttype);
+        if (status == NX_OK) {
+          fFileFormatVersion = string("HDF5: ")+string(data_value);
+        }
+      } else if (!strcmp(nxAttrName, "XML_version")) {
+        attlen = VGNAMELENMAX - 1;
+        atttype = NX_CHAR;
+        status = NXgetattr(fFileHandle, nxAttrName, data_value, &attlen, &atttype);
+        if (status == NX_OK) {
+          fFileFormatVersion = string(data_value);
+        }
+      } else if (!strcmp(nxAttrName, "file_name")) {
+        if (!ErrorHandler(GetStringAttr("file_name", str), PNEXUS_GET_ATTR_ERROR, "couldn't read NXroot 'file_name' attribute!")) return NX_ERROR;
+        fFileName = str;
+      } else if (!strcmp(nxAttrName, "file_time")) {
+        if (!ErrorHandler(GetStringAttr("file_time", str), PNEXUS_GET_ATTR_ERROR, "couldn't read NXroot 'file_time' attribute!")) return NX_ERROR;
+        fFileTime = str;
+      } else if (!strcmp(nxAttrName, "creator")) {
+        if (!ErrorHandler(GetStringAttr("creator", str), PNEXUS_GET_ATTR_ERROR, "couldn't read NXroot 'creator' attribute!")) return NX_ERROR;
+        fCreator = str;
+      }
     }
-  }
+  } while (status == NX_OK);
 
-  if (!fFileFormatVersion.compare("n/a")) {
-    attlen = VGNAMELENMAX - 1;
-    atttype = NX_CHAR;
-    str = string("XML_version");
-    status = NXgetattr(fFileHandle, (char *)str.c_str(), data_value, &attlen, &atttype);
-    if (status == NX_OK) {
-      fFileFormatVersion = string(data_value);
-    }
-  }
-
-  // look for the first occurring NXentry
+  // look for the first occurring NXentry which name ends on "_1"
   NXname nxname, nxclass;
   int dataType;
-  // make sure any NXentry has been found
-  if (!SearchInGroup("NXentry", "class", nxname, nxclass, dataType)) {
+  bool found = false;
+  size_t pos;
+  do {
+    status = NXgetnextentry(fFileHandle, nxname, nxclass, &dataType);
+    if (!strcmp(nxclass, "NXentry")) {
+      str = nxname;
+      pos = str.find_last_of("_1");
+      if (pos != str.npos)
+        found = true;
+    }
+  } while (!found && (status == NX_OK));
+  if (!found) {
     fErrorCode = PNEXUS_NXENTRY_NOT_FOUND;
-    fErrorMsg  = ">> **ERROR** Couldn't find any NXentry!";
+    fErrorMsg  = ">> **ERROR** Couldn't find any NXentry on NXroot level!";
     return NX_ERROR;
   }
+
   // open the NXentry group to obtain the necessary stuff
   status = NXopengroup(fFileHandle, nxname, "NXentry");
   if (status != NX_OK) {
@@ -3267,7 +3400,8 @@ int PNeXus::ReadFileIdf2()
   fNxEntry2->SetDefinition(str);
 
   // program_name and version
-  if (NXopendata(fFileHandle, "program_name") == NX_OK) {
+  if (SearchInGroup("program_name", "name", nxname, nxclass, dataType)) {
+    if (!ErrorHandler(NXopendata(fFileHandle, "program_name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'program_name' data in NXentry!")) return NX_ERROR;
     if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'program_name' data in NXentry!")) return NX_ERROR;
     fNxEntry2->SetProgramName(str);
     if (!ErrorHandler(GetStringAttr("version", str), PNEXUS_GET_ATTR_ERROR, "couldn't read 'program_name' attribute in NXentry!")) return NX_ERROR;
@@ -3312,91 +3446,97 @@ int PNeXus::ReadFileIdf2()
   fNxEntry2->SetExperimentIdentifier(str);
 
   // find entry for NXuser
-  if (!SearchInGroup("NXuser", "class", nxname, nxclass, dataType)) {
-    fErrorCode = PNEXUS_NXUSER_NOT_FOUND;
-    fErrorMsg  = ">> **ERROR** Couldn't find any NXuser int NXentry!";
-    return NX_ERROR;
-  }
-  // open the NXuser
-  status = NXopengroup(fFileHandle, nxname, "NXuser");
-  if (status != NX_OK) {
-    fErrorCode = PNEXUS_GROUP_OPEN_ERROR;
-    fErrorMsg  = "PNeXus::ReadFileIdf2() **ERROR** Couldn't open NXuser '" + string(nxname) + "' in NXentry!";
-    return NX_ERROR;
-  }
+  if (SearchInGroup("NXuser", "class", nxname, nxclass, dataType)) {
+    // open the NXuser
+    status = NXopengroup(fFileHandle, nxname, "NXuser");
+    if (status != NX_OK) {
+      fErrorCode = PNEXUS_GROUP_OPEN_ERROR;
+      fErrorMsg  = "PNeXus::ReadFileIdf2() **ERROR** Couldn't open NXuser '" + string(nxname) + "' in NXentry!";
+      return NX_ERROR;
+    }
 
-  // user name
-  if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'name' data in NXuser!")) return NX_ERROR;
-  if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'name' data in NXuser!")) return NX_ERROR;
-  if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'name' data in NXuser!")) return NX_ERROR;
-  fNxEntry2->GetUser()->SetName(str);
-
-  // close group NXuser
-  NXclosegroup(fFileHandle);
-
-  // open group NXsample
-  if (!ErrorHandler(NXopengroup(fFileHandle, "sample", "NXsample"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open NeXus subgroup sample!")) return NX_ERROR;
-
-  // sample name
-  if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'name' data in NXsample!")) return NX_ERROR;
-  if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'name' data in NXsample!")) return NX_ERROR;
-  if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'name' data in NXsample!")) return NX_ERROR;
-  fNxEntry2->GetSample()->SetName(str);
-
-  // sample description
-  if (NXopendata(fFileHandle, "description") == NX_OK) {
-    if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'description' data in NXsample!")) return NX_ERROR;
-    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'description' data in NXsample!")) return NX_ERROR;
-    fNxEntry2->GetSample()->SetDescription(str);
-  }
-
-  // temperature
-  if (NXopendata(fFileHandle, "temperature_1") == NX_OK) {
-    if (!ErrorHandler(NXgetdata(fFileHandle, &fval), PNEXUS_GET_DATA_ERROR, "couldn't read 'temperature_1' data in NXsample!")) return NX_ERROR;
-    if (!ErrorHandler(GetStringAttr("units", str), PNEXUS_GET_ATTR_ERROR, "couldn't read temperature units in NXsample!")) return NX_ERROR;
-    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'temperature_1' data in NXsample!")) return NX_ERROR;
-    fNxEntry2->GetSample()->SetPhysProp("temperature_1", fval, str);
-  }
-
-  // temperature environment
-  if (NXopengroup(fFileHandle, "temperature_1_env", "NXenvironment") == NX_OK) {
     // user name
-    if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'name' data in NXenvironment!")) return NX_ERROR;
-    if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'name' data in NXenvironment!")) return NX_ERROR;
-    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'name' data in NXenvironment!")) return NX_ERROR;
-    fNxEntry2->GetSample()->SetEnvironmentTemp(str);
-    // close group NXenvironment
+    if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'name' data in NXuser!")) return NX_ERROR;
+    if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'name' data in NXuser!")) return NX_ERROR;
+    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'name' data in NXuser!")) return NX_ERROR;
+    fNxEntry2->GetUser()->SetName(str);
+
+    // close group NXuser
     NXclosegroup(fFileHandle);
   }
 
-  // magnetic_field
-  if (NXopendata(fFileHandle, "magnetic_field_1") == NX_OK) {
-    if (!ErrorHandler(NXgetdata(fFileHandle, &fval), PNEXUS_GET_DATA_ERROR, "couldn't read 'magnetic_field_1' data in NXsample!")) return NX_ERROR;
-    if (!ErrorHandler(GetStringAttr("units", str), PNEXUS_GET_ATTR_ERROR, "couldn't read magnetic field units in NXsample!")) return NX_ERROR;
-    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'magnetic_field_1' data in NXsample!")) return NX_ERROR;
-    fNxEntry2->GetSample()->SetPhysProp("magnetic_field_1", fval, str);
-  }
+  // find entry for NXsample
+  if (SearchInGroup("NXsample", "class", nxname, nxclass, dataType)) {
+    // open group NXsample
+    if (!ErrorHandler(NXopengroup(fFileHandle, "sample", "NXsample"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open NeXus subgroup sample!")) return NX_ERROR;
 
-  // magnetic field state
-  if (NXopendata(fFileHandle, "magnetic_field_state") == NX_OK) {
-    if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'magnetic_field_state' data in NXsample!")) return NX_ERROR;
-    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'magnetic_field_state' data in NXsample!")) return NX_ERROR;
-    fNxEntry2->GetSample()->SetMagneticFieldState(str);
-  }
+    // sample name
+    if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'name' data in NXsample!")) return NX_ERROR;
+    if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'name' data in NXsample!")) return NX_ERROR;
+    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'name' data in NXsample!")) return NX_ERROR;
+    fNxEntry2->GetSample()->SetName(str);
 
-  // magnetic field environment
-  if (NXopengroup(fFileHandle, "magnetic_field_1_env", "NXenvironment") == NX_OK) {
-    // user name
-    if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'name' data in NXenvironment!")) return NX_ERROR;
-    if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'name' data in NXenvironment!")) return NX_ERROR;
-    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'name' data in NXenvironment!")) return NX_ERROR;
-    fNxEntry2->GetSample()->SetEnvironmentField(str);
-    // close group NXenvironment
+    // sample description
+    if (SearchInGroup("description", "name", nxname, nxclass, dataType)) {
+      if (!ErrorHandler(NXopendata(fFileHandle, "description"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'description' data in NXsample!")) return NX_ERROR;
+      if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'description' data in NXsample!")) return NX_ERROR;
+      if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'description' data in NXsample!")) return NX_ERROR;
+      fNxEntry2->GetSample()->SetDescription(str);
+    }
+
+    // temperature
+    if (SearchInGroup("temperature_1", "name", nxname, nxclass, dataType)) {
+      if (!ErrorHandler(NXopendata(fFileHandle, "temperature_1"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'temperature_1' data in NXsample!")) return NX_ERROR;
+      if (!ErrorHandler(NXgetdata(fFileHandle, &fval), PNEXUS_GET_DATA_ERROR, "couldn't read 'temperature_1' data in NXsample!")) return NX_ERROR;
+      if (!ErrorHandler(GetStringAttr("units", str), PNEXUS_GET_ATTR_ERROR, "couldn't read temperature units in NXsample!")) return NX_ERROR;
+      if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'temperature_1' data in NXsample!")) return NX_ERROR;
+      fNxEntry2->GetSample()->SetPhysProp("temperature_1", fval, str);
+    }
+
+    // temperature environment
+    if (SearchInGroup("temperature_1_env", "name", nxname, nxclass, dataType)) {
+      if (!ErrorHandler(NXopengroup(fFileHandle, "temperature_1_env", "NXenvironment"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open NeXus subgroup NXenvironment!")) return NX_ERROR;
+      // temperature environment name
+      if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'name' data in NXenvironment!")) return NX_ERROR;
+      if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'name' data in NXenvironment!")) return NX_ERROR;
+      if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'name' data in NXenvironment!")) return NX_ERROR;
+      fNxEntry2->GetSample()->SetEnvironmentTemp(str);
+      // close group NXenvironment
+      NXclosegroup(fFileHandle);
+    }
+
+    // magnetic_field
+    if (SearchInGroup("magnetic_field_1", "name", nxname, nxclass, dataType)) {
+      if (!ErrorHandler(NXopendata(fFileHandle, "magnetic_field_1"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'magnetic_field_1' data in NXsample!")) return NX_ERROR;
+      if (!ErrorHandler(NXgetdata(fFileHandle, &fval), PNEXUS_GET_DATA_ERROR, "couldn't read 'magnetic_field_1' data in NXsample!")) return NX_ERROR;
+      if (!ErrorHandler(GetStringAttr("units", str), PNEXUS_GET_ATTR_ERROR, "couldn't read magnetic field units in NXsample!")) return NX_ERROR;
+      if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'magnetic_field_1' data in NXsample!")) return NX_ERROR;
+      fNxEntry2->GetSample()->SetPhysProp("magnetic_field_1", fval, str);
+    }
+
+    // magnetic field state
+    if (SearchInGroup("magnetic_field_state", "name", nxname, nxclass, dataType)) {
+      if (!ErrorHandler(NXopendata(fFileHandle, "magnetic_field_state"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'magnetic_field_state' data in NXsample!")) return NX_ERROR;
+      if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'magnetic_field_state' data in NXsample!")) return NX_ERROR;
+      if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'magnetic_field_state' data in NXsample!")) return NX_ERROR;
+      fNxEntry2->GetSample()->SetMagneticFieldState(str);
+    }
+
+    // magnetic field environment
+    if (SearchInGroup("magnetic_field_1_env", "name", nxname, nxclass, dataType)) {
+      if (!ErrorHandler(NXopengroup(fFileHandle, "magnetic_field_1_env", "NXenvironment"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open NeXus subgroup NXenvironment!")) return NX_ERROR;
+      // magnetic field environment name
+      if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'name' data in NXenvironment!")) return NX_ERROR;
+      if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'name' data in NXenvironment!")) return NX_ERROR;
+      if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'name' data in NXenvironment!")) return NX_ERROR;
+      fNxEntry2->GetSample()->SetEnvironmentField(str);
+      // close group NXenvironment
+      NXclosegroup(fFileHandle);
+    }
+
+    // close group NXsample
     NXclosegroup(fFileHandle);
   }
-
-  // close group NXsample
-  NXclosegroup(fFileHandle);
 
   // open group NXinstrument
   if (!ErrorHandler(NXopengroup(fFileHandle, "instrument", "NXinstrument"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open NeXus subgroup instrument in NXentry!")) return NX_ERROR;
@@ -3456,11 +3596,17 @@ int PNeXus::ReadFileIdf2()
   // 1st check if 'histogram_resolution' is found
   if (SearchInGroup("histogram_resolution", "name", nxname, nxclass, dataType)) {
     if (!ErrorHandler(NXopendata(fFileHandle, "histogram_resolution"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'histogram_resolution' data in NXdetector!")) return NX_ERROR;
-    if (!ErrorHandler(NXgetdata(fFileHandle, &ival), PNEXUS_GET_DATA_ERROR, "couldn't read 'histogram_resolution' data in NXdetector!")) return NX_ERROR;
-    if (!ErrorHandler(GetStringAttr("units", str), PNEXUS_GET_ATTR_ERROR, "couldn't read magnetic field units in NXsample!")) return NX_ERROR;
+    if (!ErrorHandler(NXgetdata(fFileHandle, &fval), PNEXUS_GET_DATA_ERROR, "couldn't read 'histogram_resolution' data in NXdetector!")) return NX_ERROR;
+    if (!ErrorHandler(GetStringAttr("units", str), PNEXUS_GET_ATTR_ERROR, "couldn't read time resolution units in NXdetector!")) return NX_ERROR;
     if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'histogram_resolution' data in NXdetector!")) return NX_ERROR;
-    fNxEntry2->GetInstrument()->GetDetector()->SetTimeResolution((double)ival, str);
-  } else { // 2nd 'histogram_resolution' is not present, hence extract the time resolution from the 'raw_time' vector
+    fNxEntry2->GetInstrument()->GetDetector()->SetTimeResolution((double)fval, str);
+  } else if (SearchInGroup("resolution", "name", nxname, nxclass, dataType)) { // 2nd check if 'resolution' is found
+    if (!ErrorHandler(NXopendata(fFileHandle, "resolution"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'resolution' data in NXdetector!")) return NX_ERROR;
+    if (!ErrorHandler(NXgetdata(fFileHandle, &fval), PNEXUS_GET_DATA_ERROR, "couldn't read 'resolution' data in NXdetector!")) return NX_ERROR;
+    if (!ErrorHandler(GetStringAttr("units", str), PNEXUS_GET_ATTR_ERROR, "couldn't read time resolution units in NXdetector!")) return NX_ERROR;
+    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'resolution' data in NXdetector!")) return NX_ERROR;
+    fNxEntry2->GetInstrument()->GetDetector()->SetTimeResolution((double)fval, str);
+  } else { // 3nd 'histogram_resolution' is not present, hence extract the time resolution from the 'raw_time' vector
     if (!ErrorHandler(NXopendata(fFileHandle, "raw_time"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'raw_time' data in NXdetector!")) return NX_ERROR;
     vector<double> rawTime;
     if (!ErrorHandler(GetDoubleVectorData(rawTime), PNEXUS_GET_DATA_ERROR, "couldn't get 'raw_time' data in NXdetector!")) return NX_ERROR;
@@ -3569,8 +3715,12 @@ int PNeXus::ReadFileIdf2()
     // check the dimensions of the 'time_zero_bin' vector
     if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'time_zero_bin' info in NXdetector!")) return NX_ERROR;
 
-    if (rank <= 2) {
-      fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(rank);
+    if ((rank == 1) && (dims[0] == 1)) { // single t0 entry
+      fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(1);
+    } else if ((rank == 1) && (dims[0] > 1)) { // t0 of the form t0[ns]
+      fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(2);
+    } else if (rank == 2) { // t0 of the form t0[np][ns]
+      fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(3);
     } else {
       cerr << endl << ">> **ERROR** found 'time_zero_bin' info in NXdetector with rank=" << rank << ". Do not know how to handle." << endl;
       return NX_ERROR;
@@ -3613,8 +3763,12 @@ int PNeXus::ReadFileIdf2()
     // check the dimensions of the 'time_zero' vector
     if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'time_zero' info in NXdetector!")) return NX_ERROR;
 
-    if (rank <= 2) {
-      fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(rank);
+    if ((rank == 1) && (dims[0] == 1)) { // single t0 entry
+      fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(1);
+    } else if ((rank == 1) && (dims[0] > 1)) { // t0 of the form t0[ns]
+      fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(2);
+    } else if (rank == 2) { // t0 of the form t0[np][ns]
+      fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(3);
     } else {
       cerr << endl << ">> **ERROR** found 'time_zero' info in NXdetector with rank=" << rank << ". Do not know how to handle." << endl;
       return NX_ERROR;
@@ -3684,16 +3838,6 @@ int PNeXus::ReadFileIdf2()
     // check the dimensions of the 'first_good_bin' vector
     if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'first_good_bin' info in NXdetector!")) return NX_ERROR;
 
-    if (rank <= 2) {
-      if (rank != fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag()) {
-        cerr << endl << ">> **ERROR** rank of 'first_good_bin' (" << rank << ") is different than t0 rank=" << rank << ". Do not know how to handle." << endl;
-        return NX_ERROR;
-      }
-    } else {
-      cerr << endl << ">> **ERROR** found 'first_good_bin' info in NXdetector with rank=" << rank << ". Do not know how to handle." << endl;
-      return NX_ERROR;
-    }
-
     // calculate the needed size
     size = dims[0];
     for (int i=1; i<rank; i++)
@@ -3730,16 +3874,6 @@ int PNeXus::ReadFileIdf2()
 
     // check the dimensions of the 'first_good_time' vector
     if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'first_good_time' info in NXdetector!")) return NX_ERROR;
-
-    if (rank <= 2) {
-      if (rank != fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag()) {
-        cerr << endl << ">> **ERROR** rank of 'first_good_time' (" << rank << ") is different than t0 rank=" << rank << ". Do not know how to handle." << endl;
-        return NX_ERROR;
-      }
-    } else {
-      cerr << endl << ">> **ERROR** found 'first_good_time' info in NXdetector with rank=" << rank << ". Do not know how to handle." << endl;
-      return NX_ERROR;
-    }
 
     // calculate the needed size
     size = dims[0];
@@ -3800,16 +3934,6 @@ int PNeXus::ReadFileIdf2()
     // check the dimensions of the 'last_good_bin' vector
     if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'last_good_bin' info in NXdetector!")) return NX_ERROR;
 
-    if (rank <= 2) {
-      if (rank != fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag()) {
-        cerr << endl << ">> **ERROR** rank of 'last_good_bin' (" << rank << ") is different than t0 rank=" << rank << ". Do not know how to handle." << endl;
-        return NX_ERROR;
-      }
-    } else {
-      cerr << endl << ">> **ERROR** found 'last_good_bin' info in NXdetector with rank=" << rank << ". Do not know how to handle." << endl;
-      return NX_ERROR;
-    }
-
     // calculate the needed size
     size = dims[0];
     for (int i=1; i<rank; i++)
@@ -3847,16 +3971,6 @@ int PNeXus::ReadFileIdf2()
 
     // check the dimensions of the 'last_good_time' vector
     if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'last_good_time' info in NXdetector!")) return NX_ERROR;
-
-    if (rank <= 2) {
-      if (rank != fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag()) {
-        cerr << endl << ">> **ERROR** rank of 'last_good_time' (" << rank << ") is different than t0 rank=" << rank << ". Do not know how to handle." << endl;
-        return NX_ERROR;
-      }
-    } else {
-      cerr << endl << ">> **ERROR** found 'last_good_time' info in NXdetector with rank=" << rank << ". Do not know how to handle." << endl;
-      return NX_ERROR;
-    }
 
     // calculate the needed size
     size = dims[0];
@@ -4206,13 +4320,15 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
   if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'NXsample/magnetic_field'")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
-  // write sample 'shape'
-  size = fNxEntry1->GetSample()->GetShape().length();
-  if (!ErrorHandler(NXmakedata(fFileHandle, "shape", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXsample/shape'.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "shape"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXsample/shape' for writting.")) return NX_ERROR;
-  strncpy(cstr, fNxEntry1->GetSample()->GetShape().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXsample/shape'.")) return NX_ERROR;
-  NXclosedata(fFileHandle);
+  // write sample 'shape' only if populated with something different than 'n/a'
+  if (fNxEntry1->GetSample()->GetShape() != "n/a") {
+    size = fNxEntry1->GetSample()->GetShape().length();
+    if (!ErrorHandler(NXmakedata(fFileHandle, "shape", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXsample/shape'.")) return NX_ERROR;
+    if (!ErrorHandler(NXopendata(fFileHandle, "shape"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXsample/shape' for writting.")) return NX_ERROR;
+    strncpy(cstr, fNxEntry1->GetSample()->GetShape().c_str(), sizeof(cstr));
+    if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXsample/shape'.")) return NX_ERROR;
+    NXclosedata(fFileHandle);
+  }
 
   // write sample 'magnetic_field_state'
   size = fNxEntry1->GetSample()->GetMagneticFieldState().length();
@@ -4556,7 +4672,8 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
   int   size, idata;
   float fdata;
   double dval;
-  NXlink clink;
+  NXlink nxLink;
+  vector<NXlink> nxLinkVec;
 
   memset(cstr, '\0', sizeof(cstr));
   snprintf(cstr, sizeof(cstr), "couldn't open file '%s' for writing", fileName);
@@ -4593,6 +4710,20 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
   strncpy(cstr, fNxEntry2->GetDefinition().c_str(), sizeof(cstr));
   if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'definition' in NXentry.")) return NX_ERROR;
   NXclosedata(fFileHandle);
+
+  // write 'program_name' if present
+  if (!fNxEntry2->GetProgramName().empty()) {
+    size = fNxEntry2->GetProgramName().length();
+    if (!ErrorHandler(NXmakedata(fFileHandle, "program_name", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'program_name' in NXentry.")) return NX_ERROR;
+    if (!ErrorHandler(NXopendata(fFileHandle, "program_name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'program_name' in NXentry for writting.")) return NX_ERROR;
+    memset(cstr, '\0', sizeof(cstr));
+    strncpy(cstr, fNxEntry2->GetProgramName().c_str(), sizeof(cstr));
+    if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'program_name' in NXentry.")) return NX_ERROR;
+    memset(cstr, '\0', sizeof(cstr));
+    strncpy(cstr, fNxEntry2->GetProgramVersion().c_str(), sizeof(cstr));
+    if (!ErrorHandler(NXputattr(fFileHandle, "version", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'version' for 'program_name' in NXentry.")) return NX_ERROR;
+    NXclosedata(fFileHandle);
+  }
 
   // write run 'run_number'
   size = 1;
@@ -4638,22 +4769,25 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
   if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'experiment_identifier' in NXentry.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
-  // make group 'user_1'
-  if (!ErrorHandler(NXmakegroup(fFileHandle, "user_1", "NXuser"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'user_1' in NXentry.")) return NX_ERROR;
-  // open group 'user'
-  if (!ErrorHandler(NXopengroup(fFileHandle, "user_1", "NXuser"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'user_1' in NXentry for writting.")) return NX_ERROR;
+  // user_1 (NXuser) will only be written if there is at least a user name present
+  if (fNxEntry2->GetUser()->GetName() != "n/a") {
+    // make group 'user_1'
+    if (!ErrorHandler(NXmakegroup(fFileHandle, "user_1", "NXuser"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'user_1' in NXentry.")) return NX_ERROR;
+    // open group 'user'
+    if (!ErrorHandler(NXopengroup(fFileHandle, "user_1", "NXuser"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'user_1' in NXentry for writting.")) return NX_ERROR;
 
-  // write user 'name'
-  size = fNxEntry2->GetUser()->GetName().length();
-  if (!ErrorHandler(NXmakedata(fFileHandle, "name", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'name' in NXuser.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'name' in NXuser for writting.")) return NX_ERROR;
-  memset(cstr, '\0', sizeof(cstr));
-  strncpy(cstr, fNxEntry2->GetUser()->GetName().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'name' in NXuser.")) return NX_ERROR;
-  NXclosedata(fFileHandle);
+    // write user 'name'
+    size = fNxEntry2->GetUser()->GetName().length();
+    if (!ErrorHandler(NXmakedata(fFileHandle, "name", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'name' in NXuser.")) return NX_ERROR;
+    if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'name' in NXuser for writting.")) return NX_ERROR;
+    memset(cstr, '\0', sizeof(cstr));
+    strncpy(cstr, fNxEntry2->GetUser()->GetName().c_str(), sizeof(cstr));
+    if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'name' in NXuser.")) return NX_ERROR;
+    NXclosedata(fFileHandle);
 
-  // close group 'user_1'
-  NXclosegroup(fFileHandle);
+    // close group 'user_1'
+    NXclosegroup(fFileHandle);
+  }
 
   // make group 'sample'
   if (!ErrorHandler(NXmakegroup(fFileHandle, "sample", "NXsample"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'sample' in NXentry.")) return NX_ERROR;
@@ -4683,10 +4817,10 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
 
   // check if temperature is present and if yes, write it into the file
   ok=false;
-  dval = fNxEntry2->GetSample()->GetPhysPropValue("temperature", ok);
+  dval = fNxEntry2->GetSample()->GetPhysPropValue("temperature_1", ok);
   if (ok) {
     fdata = (float)dval;
-    fNxEntry2->GetSample()->GetPhysPropUnit("temperature", str, ok);
+    fNxEntry2->GetSample()->GetPhysPropUnit("temperature_1", str, ok);
   }
   if (ok) {
     size = 1;
@@ -4701,22 +4835,28 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
 
   // check if temperature environment info is present
   if (fNxEntry2->GetSample()->GetEnvironmentTemp().compare("n/a")) {
+    // make group 'temperature_1_env'
+    if (!ErrorHandler(NXmakegroup(fFileHandle, "temperature_1_env", "NXenvironment"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'temperature_1_env' in NXsample.")) return NX_ERROR;
+    // open group 'temperature_1_env'
+    if (!ErrorHandler(NXopengroup(fFileHandle, "temperature_1_env", "NXenvironment"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'NXenvironment' in NXsample for writting.")) return NX_ERROR;
     // write sample 'temperature_1_env'
     size = fNxEntry2->GetSample()->GetEnvironmentTemp().length();
-    if (!ErrorHandler(NXmakedata(fFileHandle, "temperature_1_env", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'temperature_1_env' in NXsample.")) return NX_ERROR;
-    if (!ErrorHandler(NXopendata(fFileHandle, "temperature_1_env"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'temperature_1_env' in NXsample for writting.")) return NX_ERROR;
+    if (!ErrorHandler(NXmakedata(fFileHandle, "name", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'name' in 'temperature_1_env' in NXsample.")) return NX_ERROR;
+    if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'name' in 'temperature_1_env' in NXsample for writting.")) return NX_ERROR;
     memset(cstr, '\0', sizeof(cstr));
     strncpy(cstr, fNxEntry2->GetSample()->GetEnvironmentTemp().c_str(), sizeof(cstr));
     if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'temperature_1_env' in NXsample.")) return NX_ERROR;
     NXclosedata(fFileHandle);
+    // close group 'temperature_1_env'
+    NXclosegroup(fFileHandle);
   }
 
   // check if magnetic field is present and if yes, write it into the file
   ok=false;
-  dval = fNxEntry2->GetSample()->GetPhysPropValue("magnetic_field", ok);
+  dval = fNxEntry2->GetSample()->GetPhysPropValue("magnetic_field_1", ok);
   if (ok) {
     fdata = (float)dval;
-    fNxEntry2->GetSample()->GetPhysPropUnit("magnetic_field", str, ok);
+    fNxEntry2->GetSample()->GetPhysPropUnit("magnetic_field_1", str, ok);
   }
   if (ok) {
     size = 1;
@@ -4731,6 +4871,10 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
 
   // check if magnetic field environment info is present
   if (fNxEntry2->GetSample()->GetEnvironmentField().compare("n/a")) {
+    // make group 'magnetic_field_1_env'
+    if (!ErrorHandler(NXmakegroup(fFileHandle, "magnetic_field_1_env", "NXenvironment"), PNEXUS_CREATE_GROUP_ERROR, "couldn't create group 'magnetic_field_1_env' in NXsample.")) return NX_ERROR;
+    // open group 'magnetic_field_1_env'
+    if (!ErrorHandler(NXopengroup(fFileHandle, "magnetic_field_1_env", "NXenvironment"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'NXenvironment' in NXsample for writting.")) return NX_ERROR;
     // write sample 'magnetic_field_1_env'
     size = fNxEntry2->GetSample()->GetEnvironmentField().length();
     if (!ErrorHandler(NXmakedata(fFileHandle, "magnetic_field_1_env", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'magnetic_field_1_env' in NXsample.")) return NX_ERROR;
@@ -4739,6 +4883,8 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
     strncpy(cstr, fNxEntry2->GetSample()->GetEnvironmentField().c_str(), sizeof(cstr));
     if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'magnetic_field_1_env' in NXsample.")) return NX_ERROR;
     NXclosedata(fFileHandle);
+    // close group 'magnetic_field_1_env'
+    NXclosegroup(fFileHandle);
   }
 
   // check if magnetic field state info is present
@@ -4811,13 +4957,13 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
   // open group 'beamline'
   if (!ErrorHandler(NXopengroup(fFileHandle, "beamline", "NXbeamline"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'beamline' in NXentry for NXinstrument.")) return NX_ERROR;
 
-  // write instrument 'name'
+  // write beamline 'beamline'
   size = fNxEntry2->GetInstrument()->GetBeamline()->GetName().length();
-  if (!ErrorHandler(NXmakedata(fFileHandle, "name", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'name' in NXbeamline.")) return NX_ERROR;
-  if (!ErrorHandler(NXopendata(fFileHandle, "name"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'name' in NXbeamline for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "beamline", NX_CHAR, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'beamline' in NXbeamline.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "beamline"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'beamline' in NXbeamline for writting.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, fNxEntry2->GetInstrument()->GetBeamline()->GetName().c_str(), sizeof(cstr));
-  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'name' in NXbeamline.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, cstr), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'beamline' in NXbeamline.")) return NX_ERROR;
   NXclosedata(fFileHandle);
 
   // close group 'beamline'
@@ -4883,17 +5029,59 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
   }
   if (!ErrorHandler(NXputattr(fFileHandle, "long_name", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'long_name' for 'counts' in NXdetector.")) return NX_ERROR;
   // create link of 'counts' for NXdata
-  if (!ErrorHandler(NXgetdataID(fFileHandle, &clink), PNEXUS_LINKING_ERROR, "couldn't obtain link of 'counts' in NXdetector.")) return NX_ERROR;
+  if (!ErrorHandler(NXgetdataID(fFileHandle, &nxLink), PNEXUS_LINKING_ERROR, "couldn't obtain link of 'counts' in NXdetector.")) return NX_ERROR;
+  nxLinkVec.push_back(nxLink);
   NXclosedata(fFileHandle);
+
+  // write time resolution
+  fdata = (float)fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution("ns");
+  size = 1;
+  if (!ErrorHandler(NXmakedata(fFileHandle, "histogram_resolution", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'histogram_resolution' in NXdetector.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "histogram_resolution"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'histogram_resolution' in NXdetector for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, (void*)&fdata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'histogram_resolution' in NXdetector.")) return NX_ERROR;
+  memset(cstr, '\0', sizeof(cstr));
+  strncpy(cstr, "nano.second", sizeof(cstr));
+  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'histogram_resolution' in NXdetector.")) return NX_ERROR;
+  // create link of 'histogram_resolution' for NXdata
+  if (!ErrorHandler(NXgetdataID(fFileHandle, &nxLink), PNEXUS_LINKING_ERROR, "couldn't obtain link of 'histogram_resolution' in NXdetector.")) return NX_ERROR;
+  nxLinkVec.push_back(nxLink);
+  NXclosedata(fFileHandle);
+
+  // write detector_1 'raw_time'
+  size = (int)fNxEntry2->GetInstrument()->GetDetector()->GetRawTime()->size();
+  float *p_fdata = new float[size];
+  assert(p_fdata);
+  for (int i=0; i<size; i++)
+    p_fdata[i] = (float)fNxEntry2->GetInstrument()->GetDetector()->GetRawTime()->at(i);
+  if (!ErrorHandler(NXmakedata(fFileHandle, "raw_time", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'raw_time' in NXdetector.")) return NX_ERROR;
+  if (!ErrorHandler(NXopendata(fFileHandle, "raw_time"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'raw_time' in NXdetector for writting.")) return NX_ERROR;
+  if (!ErrorHandler(NXputdata(fFileHandle, (void*)p_fdata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'raw_time' in NXdetector.")) return NX_ERROR;
+  strncpy(cstr, fNxEntry2->GetInstrument()->GetDetector()->GetRawTimeUnit().c_str(), sizeof(cstr));
+  if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'raw_time' in NXdetector.")) return NX_ERROR;
+  strncpy(cstr, fNxEntry2->GetInstrument()->GetDetector()->GetRawTimeName().c_str(), sizeof(cstr));
+  if (!ErrorHandler(NXputattr(fFileHandle, "long_name", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'long_name' for 'raw_time' in NXdetector.")) return NX_ERROR;
+  // create link of 'raw_time' for NXdata
+  if (!ErrorHandler(NXgetdataID(fFileHandle, &nxLink), PNEXUS_LINKING_ERROR, "couldn't obtain link of 'raw_time' in NXdetector.")) return NX_ERROR;
+  nxLinkVec.push_back(nxLink);
+  NXclosedata(fFileHandle);
+  // clean up
+  if (p_fdata) {
+    delete [] p_fdata;
+    p_fdata = 0;
+  }
 
   // write detector_1 'spectrum_index'
   size = fNxEntry2->GetInstrument()->GetDetector()->GetSpectrumIndexSize();
   int *p_idata = new int[size];
+  assert(p_idata);
   for (int i=0; i<size; i++)
     *(p_idata+i) = fNxEntry2->GetInstrument()->GetDetector()->GetSpectrumIndex(i);
   if (!ErrorHandler(NXmakedata(fFileHandle, "spectrum_index", NX_INT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'spectrum_index' in NXdetector.")) return NX_ERROR;
   if (!ErrorHandler(NXopendata(fFileHandle, "spectrum_index"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'spectrum_index' in NXdetector for writting.")) return NX_ERROR;
   if (!ErrorHandler(NXputdata(fFileHandle, (void*)p_idata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'spectrum_index' in NXdetector.")) return NX_ERROR;
+  // create link of 'spectrum_index' for NXdata
+  if (!ErrorHandler(NXgetdataID(fFileHandle, &nxLink), PNEXUS_LINKING_ERROR, "couldn't obtain link of 'spectrum_index' in NXdetector.")) return NX_ERROR;
+  nxLinkVec.push_back(nxLink);
   NXclosedata(fFileHandle);
   if (p_idata) {
     delete [] p_idata;
@@ -4910,6 +5098,13 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
       if (!ErrorHandler(NXputdata(fFileHandle, (void*)&idata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'time_zero_bin' in NXdetector.")) return NX_ERROR;
       NXclosedata(fFileHandle);
     } else if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 2) {
+      int dims[1];
+      dims[0] = fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra();
+      if (!ErrorHandler(NXmakedata(fFileHandle, "time_zero_bin", NX_INT32, 1, dims), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'time_zero_bin' in NXdetector.")) return NX_ERROR;
+      if (!ErrorHandler(NXopendata(fFileHandle, "time_zero_bin"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'time_zero_bin' in NXdetector for writting.")) return NX_ERROR;
+      if (!ErrorHandler(NXputdata(fFileHandle, (void*)fNxEntry2->GetInstrument()->GetDetector()->GetT0s()), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'time_zero_bin' in NXdetector.")) return NX_ERROR;
+      NXclosedata(fFileHandle);
+    } else if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 3) {
       int dims[2];
       dims[0] = fNxEntry2->GetInstrument()->GetDetector()->GetNoOfPeriods();
       dims[1] = fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra();
@@ -4932,6 +5127,13 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
       if (!ErrorHandler(NXputdata(fFileHandle, (void*)&idata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'first_good_bin' in NXdetector.")) return NX_ERROR;
       NXclosedata(fFileHandle);
     } else if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 2) {
+      int dims[1];
+      dims[0] = fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra();
+      if (!ErrorHandler(NXmakedata(fFileHandle, "first_good_bin", NX_INT32, 1, dims), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'first_good_bin' in NXdetector.")) return NX_ERROR;
+      if (!ErrorHandler(NXopendata(fFileHandle, "first_good_bin"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'first_good_bin' in NXdetector for writting.")) return NX_ERROR;
+      if (!ErrorHandler(NXputdata(fFileHandle, (void*)fNxEntry2->GetInstrument()->GetDetector()->GetFirstGoodBins()), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'first_good_bin' in NXdetector.")) return NX_ERROR;
+      NXclosedata(fFileHandle);
+    } else if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 3) {
       int dims[2];
       dims[0] = fNxEntry2->GetInstrument()->GetDetector()->GetNoOfPeriods();
       dims[1] = fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra();
@@ -4954,6 +5156,13 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
       if (!ErrorHandler(NXputdata(fFileHandle, (void*)&idata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'last_good_bin' in NXdetector.")) return NX_ERROR;
       NXclosedata(fFileHandle);
     } else if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 2) {
+      int dims[1];
+      dims[0] = fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra();
+      if (!ErrorHandler(NXmakedata(fFileHandle, "last_good_bin", NX_INT32, 1, dims), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'last_good_bin' in NXdetector.")) return NX_ERROR;
+      if (!ErrorHandler(NXopendata(fFileHandle, "last_good_bin"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'last_good_bin' in NXdetector for writting.")) return NX_ERROR;
+      if (!ErrorHandler(NXputdata(fFileHandle, (void*)fNxEntry2->GetInstrument()->GetDetector()->GetLastGoodBins()), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'last_good_bin' in NXdetector.")) return NX_ERROR;
+      NXclosedata(fFileHandle);
+    } else if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 3) {
       int dims[2];
       dims[0] = fNxEntry2->GetInstrument()->GetDetector()->GetNoOfPeriods();
       dims[1] = fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra();
@@ -4977,7 +5186,10 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
   // open group 'detector_1' NXdata
   if (!ErrorHandler(NXopengroup(fFileHandle, "detector_1", "NXdata"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'detector_1' in NXroot.")) return NX_ERROR;
 
-  if (!ErrorHandler(NXmakelink(fFileHandle, &clink), PNEXUS_LINKING_ERROR, "couldn't create link to 'counts' in NXdetector.")) return NX_ERROR;
+  for (unsigned int i=0; i<nxLinkVec.size(); i++) {
+    str = string("couldn't create link to ") + string(nxLinkVec[i].targetPath);
+    if (!ErrorHandler(NXmakelink(fFileHandle, &nxLinkVec[i]), PNEXUS_LINKING_ERROR, str.c_str())) return NX_ERROR;
+  }
 
   // close group 'detector_1' NXdata
   NXclosegroup(fFileHandle);
@@ -4986,6 +5198,9 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
   NXclosegroup(fFileHandle);
 
   NXclose(&fFileHandle);
+
+  // clean up
+  nxLinkVec.clear();
 
   return NX_OK;
 }
@@ -5092,6 +5307,7 @@ bool PNeXus::SearchInGroup(string str, string tag, NXname &nxname, NXname &nxcla
   bool found = false;
   int status;
 
+  NXinitgroupdir(fFileHandle);
   do {
     status = NXgetnextentry(fFileHandle, nxname, nxclass, &dataType);
     if (!tag.compare("name")) {

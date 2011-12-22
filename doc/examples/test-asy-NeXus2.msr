@@ -20,7 +20,7 @@ FUNCTIONS
 fun1 = gamma_mu * par4
 
 ###############################################################
-RUN data/emu00005989_v2 EMU ISIS NEXUS   (name beamline institute data-file-format)
+RUN data/EMU00005989_v2 EMU ISIS NEXUS   (name beamline institute data-file-format)
 fittype         2         (asymmetry fit)
 alpha           1
 map             0    0    0    0    0    0    0    0    0    0

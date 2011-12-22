@@ -224,6 +224,8 @@ PRawRunData::PRawRunData()
   fLaboratory = TString("n/a");
   fBeamline = TString("n/a");
   fInstrument = TString("n/a");
+  fMuonSource = TString("n/a");
+  fMuonSpecies = TString("n/a");
   fRunName = TString("n/a");
   fRunNumber = -1;
   fRunTitle = TString("n/a");

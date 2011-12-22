@@ -95,7 +95,7 @@ class PRunDataHandler
 
     virtual TString GetFileName(const TString extension, Bool_t &ok);
     virtual TString FileNameFromTemplate(TString &fileNameTemplate, Int_t run, TString &year, Bool_t &ok);
-    virtual TString GetMonth(Int_t month);
+    virtual bool DateToISO8601(string inDate, string &iso8601Date);
     virtual void SplitTimeDate(TString timeDate, TString &time, TString &date, Bool_t &ok);
 };
 

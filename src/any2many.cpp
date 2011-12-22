@@ -53,8 +53,8 @@ void any2many_syntax()
   cout << endl << "usage: any2many [--help]   : will show this help.";
   cout << endl << "       any2many --version  : will show the svn version.";
   cout << endl << "       any2many -f <filenameList-input> | -r <runList-input>";
-  cout << endl << "                -c <convert-options> [-p <output-path>]";
-  cout << endl << "                [-y <year>] [-t <in-template> <out-template>] [-s]";
+  cout << endl << "                -c <convert-options> [-p <output-path>] [-y <year>]";
+  cout << endl << "                [-o <outputFileName> | -t <in-template> <out-template>] [-s]";
   cout << endl << "                [-rebin <n>] [-z <compressed>]";
   cout << endl << "          -f <filenameList-input> : where <filenameList-input> is space";
   cout << endl << "                separeted a list of file names (not starting with a '-'),";

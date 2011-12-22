@@ -279,6 +279,8 @@ class PRawRunData {
     virtual const TString* GetBeamline() { return &fBeamline; }
     virtual const TString* GetInstrument() { return &fInstrument; }
     virtual const TString* GetRunName() { return &fRunName; }
+    virtual const TString* GetMuonSource() { return &fMuonSource; }
+    virtual const TString* GetMuonSpecies() { return &fMuonSpecies; }
     virtual const Int_t GetRunNumber() { return fRunNumber; }
     virtual const TString* GetRunTitle() { return &fRunTitle; }
     virtual const TString* GetSetup() { return &fSetup; }
@@ -305,6 +307,7 @@ class PRawRunData {
     virtual const UInt_t GetT0EstimatedSize() { return fT0Estimated.size(); }
     virtual const Int_t GetT0Estimated(const UInt_t idx);
     virtual const PIntPair GetBkgBin(const UInt_t idx);
+    virtual const UInt_t GetGoodDataBinSize() { return fGoodDataBin.size(); }
     virtual const PIntPair GetGoodDataBin(const UInt_t idx);
     virtual const UInt_t GetNoOfHistos() { return fDataBin.size(); }
     virtual const PDoubleVector* GetDataBin(const UInt_t idx);
@@ -313,6 +316,8 @@ class PRawRunData {
     virtual void SetLaboratory(const TString &str) { fLaboratory = str; }
     virtual void SetBeamline(const TString &str) { fBeamline = str; }
     virtual void SetInstrument(const TString &str) { fInstrument = str; }
+    virtual void SetMuonSource(const TString &str) { fMuonSource = str; }
+    virtual void SetMuonSpecies(const TString &str) { fMuonSpecies = str; }
     virtual void SetRunName(const TString &str) { fRunName = str; }
     virtual void SetRunNumber(const Int_t &val) { fRunNumber = val; }
     virtual void SetRunTitle(const TString str) { fRunTitle = str; }
@@ -347,6 +352,8 @@ class PRawRunData {
     TString fLaboratory;             ///< keeps the name of the laboratory, e.g. PSI, ISIS, TRIUMF, JPARC
     TString fBeamline;               ///< keeps the name of the be beamline, e.g. muE4, piM3.1, ...
     TString fInstrument;             ///< keeps the name of the instrument, e.g. LEM, GPS, MUSR, EMU, ...
+    TString fMuonSource;             ///< keeps the type of muon source, e.g. continous surface beam, pulsed beam, low energy muon beam
+    TString fMuonSpecies;            ///< positive muon or negative muon
     TString fRunName;                ///< name of the run
     Int_t  fRunNumber;               ///< run number
     TString fRunTitle;               ///< run title

@@ -26,7 +26,7 @@ fun1 = par2 + map1
 fun2 = gamma_mu * par3
 
 ###############################################################
-RUN data/emu00005989_v2 XXXX ISIS NEXUS   (name beamline institute data-file-format)
+RUN data/EMU00005989_v2 XXXX ISIS NEXUS   (name beamline institute data-file-format)
 fittype         0         (single histogram fit)
 norm            7
 backgr.fit      8
@@ -37,7 +37,7 @@ data            40      1500
 fit             0.2     14     
 packing         1
 
-RUN data/emu00005989_v2 XXXX ISIS NEXUS   (name beamline institute data-file-format)
+RUN data/EMU00005989_v2 XXXX ISIS NEXUS   (name beamline institute data-file-format)
 fittype         0         (single histogram fit)
 norm            9
 backgr.fit      10
