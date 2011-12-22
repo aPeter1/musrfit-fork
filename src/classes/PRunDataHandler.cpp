@@ -3751,7 +3751,7 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
     nxs->GetEntryIdf1()->GetInstrument()->GetDetector()->SetNumber(fData[0].GetNoOfHistos());
     nxs->GetEntryIdf1()->GetInstrument()->GetCollimator()->SetType("n/a");
     // calculate the total number of counts
-    int total_counts = 0;
+    double total_counts = 0;
     for (unsigned int i=0; i<fData[0].GetNoOfHistos(); i++) {
       for (unsigned int j=0; j<fData[0].GetDataBin(i)->size(); j++)
         total_counts += fData[0].GetDataBin(i)->at(j);

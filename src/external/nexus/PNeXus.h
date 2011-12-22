@@ -631,6 +631,7 @@ class PNeXus {
     virtual bool IsValidIdf2(bool strict);
 
     virtual bool SearchInGroup(string str, string tag, NXname &nxname, NXname &nxclass, int &dataType);
+    virtual bool SearchAttrInData(string str, int &length, int &dataType);
 };
 
 #endif // _PNEXUS_H_

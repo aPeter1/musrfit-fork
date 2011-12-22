@@ -2913,9 +2913,11 @@ int PNeXus::ReadFileIdf1()
   NXclosegroup(fFileHandle);
 
   // open group NXsample
-  if (NXopengroup(fFileHandle, "sample", "NXsample") == NX_ERROR) {
+  if (SearchInGroup("NXsample", "class", nxname, nxclass, dataType)) {
+    if (!ErrorHandler(NXopengroup(fFileHandle, "sample", "NXsample"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open NeXus subgroup 'sample'!")) return NX_ERROR;
+  } else {
     cout << endl << ">> **WARNING** unable to open subgroup NXsample, will try NXSample." << endl;
-    if (!ErrorHandler(NXopengroup(fFileHandle, "sample", "NXSample"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open NeXus subgroup sample!")) return NX_ERROR;
+    if (!ErrorHandler(NXopengroup(fFileHandle, "sample", "NXSample"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open NeXus subgroup 'sample'!")) return NX_ERROR;
   }
 
   // read sample name
@@ -2939,7 +2941,8 @@ int PNeXus::ReadFileIdf1()
   fNxEntry1->GetSample()->SetPhysProp("magnetic_field", (double)fval, str);
 
   // read sample shape, e.g. powder, single crystal, etc (THIS IS AN OPTIONAL ENTRY)
-  if (NXopendata(fFileHandle, "shape") == NX_OK) {
+  if (SearchInGroup("shape", "name", nxname, nxclass, dataType)) {
+    if (!ErrorHandler(NXopendata(fFileHandle, "shape"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'shape' data in sample group!")) return NX_ERROR;
     if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'shape' data in sample group!")) return NX_ERROR;
     if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'shape' data in sample group")) return NX_ERROR;
     fNxEntry1->GetSample()->SetShape(str);
@@ -2967,19 +2970,16 @@ int PNeXus::ReadFileIdf1()
     fNxEntry1->GetSample()->SetMagneticFieldVectorCoordinateSystem(str);
 
     // workaround since not all ISIS IDF 1 files have the 'units' entry!!
-    int i, status, attlen, atttype;
-    char cstr[VGNAMELENMAX];
-    NXname data_value;
-
-    attlen = VGNAMELENMAX - 1;
-    atttype = NX_CHAR;
-    status = NXgetattr(fFileHandle, const_cast<char*>("units"), data_value, &attlen, &atttype);
-    if (status == NX_OK) {
-      for (i = 0; i < attlen; i++)
-        cstr[i] = *(data_value + i);
-      cstr[i] = '\0';
-
-      str = cstr;
+    memset(cstr, '\0', sizeof(cstr));
+    strncpy(cstr, "units", sizeof(cstr));
+    if (SearchAttrInData(cstr, attLen, attType)) {
+      status = NXgetattr(fFileHandle, cstr, data_value, &attLen, &attType);
+      if (status == NX_OK) {
+        strncpy(cstr, data_value, sizeof(cstr));
+        str = cstr;
+      } else {
+        str = string("Gauss");
+      }
     } else {
       str = string("Gauss");
     }
@@ -3101,7 +3101,9 @@ int PNeXus::ReadFileIdf1()
   attType = NX_INT32;
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, "T0_bin", sizeof(cstr));
-  if (NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType) == NX_ERROR) {
+  if (SearchAttrInData(cstr, attLen, attType)) {
+    if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'T0_bin' data in NXdata group!")) return NX_ERROR;
+  } else {
     cout << endl << ">> **WARNING** didn't find attribute 'T0_bin' in NXdata/counts, will try 't0_bin'." << endl;
     memset(cstr, '\0', sizeof(cstr));
     strncpy(cstr, "t0_bin", sizeof(cstr));
@@ -5322,6 +5324,40 @@ bool PNeXus::SearchInGroup(string str, string tag, NXname &nxname, NXname &nxcla
       }
     } else {
       cerr << endl << ">> **ERROR** found tag='" << tag << "' which is not handled!" << endl;
+      break;
+    }
+  } while (!found && (status == NX_OK));
+
+  return found;
+}
+
+//------------------------------------------------------------------------------------------
+// SearchAttrInData (private)
+//------------------------------------------------------------------------------------------
+/**
+ * <p>Searches an attribute (labelled by str) in the currently open data set.
+ *
+ * <b>return:</b>
+ * - true if attribute 'str' is found in the currently open data set. nxname, nxclass keeps than the entry information.
+ * - false otherwise
+ *
+ * \param str label of the attribute to be looked for
+ * \param length of the attribute data it entry is found
+ * \param dataType of the entry if entry is found
+ */
+bool PNeXus::SearchAttrInData(string str, int &length, int &dataType)
+{
+  bool found = false;
+  int status;
+  char name[128];
+
+  memset(name, 0, sizeof(name));
+
+  NXinitattrdir(fFileHandle);
+  do {
+    status = NXgetnextattr(fFileHandle, name, &length, &dataType);
+    if (!str.compare(name)) {
+      found = true;
       break;
     }
   } while (!found && (status == NX_OK));
