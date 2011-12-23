@@ -214,3 +214,9 @@ q:after { content:close-quote; color:#000000; }
 .restriction ul {
 	margin-bottom: 0;
 }
+
+p, dd {
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+}

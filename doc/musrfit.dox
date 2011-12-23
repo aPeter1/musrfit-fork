@@ -18,18 +18,18 @@
 
 <p>People merely intrested in the handling of the programs should check this link:
 \htmlonly
-<a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit user manual</a>
+<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>
 \endhtmlonly
 \latexonly
-musrfit user manual: \texttt{https://intranet.psi.ch/MUSR/MusrFit}
+musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html}
 \endlatexonly 
 
 <p>People which would like to know how to install the musrfit framework, please check this link:
 \htmlonly
-<a href="https://intranet.psi.ch/MUSR/MusrFitSetup">How to setup musrfit on different platforms</a>
+<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFitSetup.html">How to setup musrfit on different platforms</a>
 \endhtmlonly
 \latexonly
-How to setup musrfit on different platforms: \texttt{https://intranet.psi.ch/MUSR/MusrFitSetup}
+How to setup musrfit on different platforms: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFitSetup.html}
 \endlatexonly
 
 //****************************************************************************************************
@@ -49,11 +49,14 @@ How to setup musrfit on different platforms: \texttt{https://intranet.psi.ch/MUS
 - \ref musredit An editor to handle msr-files, calling musrfit, etc. from within a simple text editor, based 
                on >= Qt4.6. 
 - \ref MuSRFit A graphical user interface based on PerlQt (written by Z. Salman) for an easy to use interface to the musrfit framework. Compared to the more general approach of writting msr-files, it has some limitations, though it might be easier for a first user of the musrfit framework.
+- \ref any2many Should be a "universal" muSR data-file-format converter.
+- \ref nexus_dump Is a small program to dump NeXus file information (mainly run header info) to the standard output.
 
 \section roadmap Road map and missing features
 
+<p>Support for NeXus files is underway and should be fully available from early 2012 on. 
+
 <p>The following features should eventually be implemented, but are still missing:
-- support for NeXuS files. Reason: As soon as ISIS and PSI will support this file type, musrfit will do as well
 - there are still issues with MUD files on 64bit systems which should eventually be fixed.
 - non-muSR: The plan is to add an option to fit/plot \f$f(x_1,\ldots,x_n)\f$ versus \f$g(x_1,\ldots,x_n)\f$, where \f$x_i\f$ is a given data set element.
 - mu-Minus: The handling for \f$\mu_{-}\f$ fits is still missing and should be implemented.
@@ -73,57 +76,70 @@ This two points are somewhat contradictory, and currently it is not clear which 
 
 \section bugs How to report bugs
 
-<p>Bugs, unexpected features, can be reported directly to me: \verbatim andreas.suter@psi.ch, \endverbatim or entered in the bug-tracking tool at PSI \verbatim https://tracker.intranet.psi.ch/ \endverbatim.
+<p>Bugs, unexpected features, can be reported directly to me: \verbatim andreas.suter@psi.ch, \endverbatim or entered in the bug-tracking tool at PSI \verbatim https://tracker.intranet.psi.ch/ \endverbatim (access to within
+PSI firewall required).
 
 //****************************************************************************************************
 \page musrfitPage
 \section musrfit musrfit
 
-<p>Here will eventually follow a more technical description of musrfit. If you looking for a user-manual like description, please check \htmlonly<a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{https://intranet.psi.ch/MUSR/MusrFit} \endlatexonly
+<p>Here will eventually follow a more technical description of musrfit. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html} \endlatexonly
 
 //****************************************************************************************************
 \page musrviewPage
 \section musrview musrview
 
-<p>Here will eventually follow a more technical description of musrview. If you looking for a user-manual like description, please check \htmlonly<a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{https://intranet.psi.ch/MUSR/MusrFit} \endlatexonly
+<p>Here will eventually follow a more technical description of musrview. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html} \endlatexonly
 
 //****************************************************************************************************
 \page musrt0Page
 \section musrt0 musrt0
 
-<p>Here will eventually follow a more technical description of musrt0. If you looking for a user-manual like description, please check \htmlonly<a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{https://intranet.psi.ch/MUSR/MusrFit} \endlatexonly
+<p>Here will eventually follow a more technical description of musrt0. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html} \endlatexonly
 
 //****************************************************************************************************
 \page musrparamPage
 \section musrparam musrparam
 
-<p>Here will eventually follow a more technical description of musrparam. If you looking for a user-manual like description, please check \htmlonly<a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{https://intranet.psi.ch/MUSR/MusrFit} \endlatexonly
+<p>Here will eventually follow a more technical description of musrparam. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html} \endlatexonly
 
 //****************************************************************************************************
 \page msr2dataPage
 \section msr2data msr2data
 
-<p>Here will eventually follow a more technical description of musr2data. If you looking for a user-manual like description, please check \htmlonly<a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{https://intranet.psi.ch/MUSR/MusrFit} \endlatexonly
+<p>Here will eventually follow a more technical description of musr2data. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html} \endlatexonly
 
 //****************************************************************************************************
 \page msr2msrPage
 \section msr2msr msr2msr
 
-<p>Here will eventually follow a more technical description of msr2msr. If you looking for a user-manual like description, please check \htmlonly<a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{https://intranet.psi.ch/MUSR/MusrFit} \endlatexonly
+<p>Here will eventually follow a more technical description of msr2msr. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html} \endlatexonly
 
 //****************************************************************************************************
 \page musrguiPage
 \section musrgui musrgui
 
-<p>Here will eventually follow a more technical description of musrgui. If you looking for a user-manual like description, please check \htmlonly<a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{https://intranet.psi.ch/MUSR/MusrFit} \endlatexonly
+<p>Here will eventually follow a more technical description of musrgui. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html} \endlatexonly
 
 //****************************************************************************************************
 \page musreditPage
 \section musredit musredit
 
-<p>Here will eventually follow a more technical description of musredit. If you looking for a user-manual like description, please check \htmlonly<a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{https://intranet.psi.ch/MUSR/MusrFit} \endlatexonly
+<p>Here will eventually follow a more technical description of musredit. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html} \endlatexonly
 
 //****************************************************************************************************
 \page MuSRFitPage
 \section MuSRFit MuSRFit
+
+//****************************************************************************************************
+\page any2manyPage
+\section any2many any2many
+
+<p>Here will eventually follow a more technical description of any2many. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html} \endlatexonly
+
+//****************************************************************************************************
+\page nexusDumpPage
+\section nexus_dump nexus_dump
+<p>This is a little help program which reads a NeXus file and dumps most of the relevant information to the standard output.
+
 */
