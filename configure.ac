@@ -771,7 +771,7 @@ if test "x$enable_editor" != "xno"; then
             QMAKEVERSIONSTRING="$(${QT3_PREFIX}/bin/${QMAKE} -v 2>&1)"
             for a in $QMAKEVERSIONSTRING
             do
-              if test "$(expr match "$a" '\(..\)')" = "3."; then
+              if test "$(expr "$a" : '\(..\)')" = "3."; then
                 QMAKEBIN="${QT3_PREFIX}/bin/${QMAKE}"
                 QTEDITOR=musrgui
                 AC_MSG_RESULT([${QMAKEBIN}])
@@ -800,7 +800,7 @@ if test "x$enable_editor" != "xno"; then
             QMAKEVERSIONSTRING="$(${QT4_PREFIX}/bin/${QMAKE} -v 2>&1)"
             for a in $QMAKEVERSIONSTRING
             do
-              if test "$(expr match "$a" '\(..\)')" = "4."; then
+              if test "$(expr "$a" : '\(..\)')" = "4."; then
                 QMAKEBIN="${QT4_PREFIX}/bin/${QMAKE}"
                 QTEDITOR=musredit
                 AC_MSG_RESULT([${QMAKEBIN}])
@@ -865,7 +865,7 @@ if test "x$enable_editor" != "xno"; then
               QMAKEVERSIONSTRING="$(${QTPATH}/bin/qmake -v 2>&1)"
               for a in $QMAKEVERSIONSTRING
               do
-                if test "$(expr match "$a" '\(..\)')" = "4."; then
+                if test "$(expr "$a" : '\(..\)')" = "4."; then
                   QMAKEBIN="${QTPATH}/bin/qmake"
                   AC_MSG_RESULT([${QMAKEBIN}])
                   break
@@ -887,7 +887,7 @@ if test "x$enable_editor" != "xno"; then
               QMAKEVERSIONSTRING="$(${QTPATH}/bin/qmake -v 2>&1)"
               for a in $QMAKEVERSIONSTRING
               do
-                if test "$(expr match "$a" '\(..\)')" = "3."; then
+                if test "$(expr "$a" : '\(..\)')" = "3."; then
                   QMAKEBIN="${QTPATH}/bin/qmake"
                   AC_MSG_RESULT([${QMAKEBIN}])
                   break
@@ -1182,4 +1182,3 @@ echo ""
 echo "   Programs and XML configuration files:  ${INSTALLDIR}/bin"
 echo "   Documentation:                         ${DOCDIR}"
 echo ""
-
