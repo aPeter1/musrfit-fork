@@ -495,11 +495,16 @@ Bool_t PRunAsymmetry::PrepareData()
     }
   }
 
-  // get raw forward/backward histo data
-  fForward.resize(runData->GetDataBin(forwardHistoNo[0])->size());
-  fBackward.resize(runData->GetDataBin(backwardHistoNo[0])->size());
-  fForward = *runData->GetDataBin(forwardHistoNo[0]);
-  fBackward = *runData->GetDataBin(backwardHistoNo[0]);
+  // keep the histo of each group at this point (addruns handled below)
+  vector<PDoubleVector> forward, backward;
+  forward.resize(forwardHistoNo.size());   // resize to number of groups
+  backward.resize(backwardHistoNo.size()); // resize to numer of groups
+  for (UInt_t i=0; i<forwardHistoNo.size(); i++) {
+    forward[i].resize(runData->GetDataBin(forwardHistoNo[i])->size());
+    backward[i].resize(runData->GetDataBin(backwardHistoNo[i])->size());
+    forward[i]  = *runData->GetDataBin(forwardHistoNo[i]);
+    backward[i] = *runData->GetDataBin(backwardHistoNo[i]);
+  }
 
   // check if addrun's are present, and if yes add data
   // check if there are runs to be added to the current one
@@ -579,24 +584,24 @@ Bool_t PRunAsymmetry::PrepareData()
       }
 
       // add forward run
-      UInt_t addRunSize;
-      for (UInt_t k=0; k<forwardHistoNo.size(); k++) {
+      UInt_t addRunSize;      
+      for (UInt_t k=0; k<forwardHistoNo.size(); k++) { // fill each group
         addRunSize = addRunData->GetDataBin(forwardHistoNo[k])->size();
-        for (UInt_t j=0; j<runData->GetDataBin(forwardHistoNo[k])->size(); j++) {
+        for (UInt_t j=0; j<addRunData->GetDataBin(forwardHistoNo[k])->size(); j++) { // loop over the bin indices
           // make sure that the index stays in the proper range
           if ((j+t0Add[2*k]-fT0s[2*k] >= 0) && (j+t0Add[2*k]-fT0s[2*k] < addRunSize)) {
-            fForward[j] += addRunData->GetDataBin(forwardHistoNo[k])->at(j+t0Add[2*k]-fT0s[2*k]);
+            forward[k][j] += addRunData->GetDataBin(forwardHistoNo[k])->at(j+t0Add[2*k]-fT0s[2*k]);
           }
         }
       }
 
       // add backward run
-      for (UInt_t k=0; k<backwardHistoNo.size(); k++) {
+      for (UInt_t k=0; k<backwardHistoNo.size(); k++) { // fill each group
         addRunSize = addRunData->GetDataBin(backwardHistoNo[k])->size();
-        for (UInt_t j=0; j<runData->GetDataBin(backwardHistoNo[k])->size(); j++) {
+        for (UInt_t j=0; j<addRunData->GetDataBin(backwardHistoNo[k])->size(); j++) { // loop over the bin indices
           // make sure that the index stays in the proper range
           if ((j+t0Add[2*k+1]-fT0s[2*k+1] >= 0) && (j+t0Add[2*k+1]-fT0s[2*k+1] < addRunSize)) {
-            fBackward[j] += addRunData->GetDataBin(backwardHistoNo[k])->at(j+t0Add[2*k+1]-fT0s[2*k+1]);
+            backward[k][j] += addRunData->GetDataBin(backwardHistoNo[k])->at(j+t0Add[2*k+1]-fT0s[2*k+1]);
           }
         }
       }
@@ -606,22 +611,30 @@ Bool_t PRunAsymmetry::PrepareData()
     }
   }
 
-  // group histograms, add all the forward histograms to the one with forwardHistoNo[0]
-  for (UInt_t i=1; i<forwardHistoNo.size(); i++) {
-    for (UInt_t j=0; j<runData->GetDataBin(forwardHistoNo[i])->size(); j++) {
+  // set forward/backward histo data of the first group
+  fForward.resize(forward[0].size());
+  fBackward.resize(backward[0].size());
+  for (UInt_t i=0; i<fForward.size(); i++) {
+    fForward[i]  = forward[0][i];
+    fBackward[i] = backward[0][i];
+  }
+
+  // group histograms, add all the remaining forward histograms of the group
+  for (UInt_t i=1; i<forwardHistoNo.size(); i++) { // loop over the groupings
+    for (UInt_t j=0; j<runData->GetDataBin(forwardHistoNo[i])->size(); j++) { // loop over the bin indices
       // make sure that the index stays within proper range
       if ((j+fT0s[2*i]-fT0s[0] >= 0) && (j+fT0s[2*i]-fT0s[0] < runData->GetDataBin(forwardHistoNo[i])->size())) {
-        fForward[j] += runData->GetDataBin(forwardHistoNo[i])->at(j+fT0s[2*i]-fT0s[0]);
+        fForward[j] += forward[i][j+fT0s[2*i]-fT0s[0]];
       }
     }
   }
 
-  // group histograms, add all the backward histograms to the one with backwardHistoNo[0]
-  for (UInt_t i=1; i<backwardHistoNo.size(); i++) {
-    for (UInt_t j=0; j<runData->GetDataBin(backwardHistoNo[i])->size(); j++) {
+  // group histograms, add all the remaining backward histograms of the group
+  for (UInt_t i=1; i<backwardHistoNo.size(); i++) { // loop over the groupings
+    for (UInt_t j=0; j<runData->GetDataBin(backwardHistoNo[i])->size(); j++) { // loop over the bin indices
       // make sure that the index stays within proper range
       if ((j+fT0s[2*i+1]-fT0s[1] >= 0) && (j+fT0s[2*i+1]-fT0s[1] < runData->GetDataBin(backwardHistoNo[i])->size())) {
-        fBackward[j] += runData->GetDataBin(backwardHistoNo[i])->at(j+fT0s[2*i+1]-fT0s[1]);
+        fBackward[j] += backward[i][j+fT0s[2*i+1]-fT0s[1]];
       }
     }
   }
@@ -801,12 +814,14 @@ Bool_t PRunAsymmetry::SubtractEstimatedBkg()
     bkg[0] += fForward[i];
   errBkg[0] = TMath::Sqrt(bkg[0])/(end[0] - start[0] + 1);
   bkg[0] /= static_cast<Double_t>(end[0] - start[0] + 1);
+  cout << endl << ">> estimated forward histo background: " << bkg[0];
 
   // backward
   for (UInt_t i=start[1]; i<end[1]; i++)
     bkg[1] += fBackward[i];
   errBkg[1] = TMath::Sqrt(bkg[1])/(end[0] - start[0] + 1);
   bkg[1] /= static_cast<Double_t>(end[1] - start[1] + 1);
+  cout << endl << ">> estimated backward histo background: " << bkg[1] << endl;
 
   // correct error for forward, backward
   for (UInt_t i=0; i<fForward.size(); i++) {
@@ -833,7 +848,7 @@ Bool_t PRunAsymmetry::SubtractEstimatedBkg()
  * <p>Take the pre-processed data (i.e. grouping and addrun are preformed) and form the asymmetry for fitting.
  * Before forming the asymmetry, the following checks will be performed:
  * -# check if data range is given, if not try to estimate one.
- * -# check that data range is present, that it makes any sense.
+ * -# check that if a data range is present, that it makes any sense.
  * -# check that 'first good bin'-'t0' is the same for forward and backward histogram. If not adjust it.
  * -# pack data (rebin).
  * -# if packed forward size != backward size, truncate the longer one such that an asymmetry can be formed.
@@ -1245,14 +1260,6 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
     fData.AppendErrorValue(error);
   }
 
-//   // count the number of bins to be fitted
-//   Double_t time;
-//   fNoOfFitBins=0;
-//   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
-//     time = fData.GetDataTimeStart() + (Double_t)i * fData.GetDataTimeStep();
-//     if ((time >= fFitStartTime) && (time <= fFitEndTime))
-//       fNoOfFitBins++;
-//   }
   CalcNoOfFitBins();
 
   // clean up

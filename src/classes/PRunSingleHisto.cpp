@@ -812,14 +812,6 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
     }
   }
 
-//   // count the number of bins to be fitted
-//   fNoOfFitBins=0;
-//   Double_t time;
-//   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
-//     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
-//     if ((time >= fFitStartTime) && (time <= fFitEndTime))
-//       fNoOfFitBins++;
-//   }
   CalcNoOfFitBins();
 
   return true;

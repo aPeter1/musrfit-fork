@@ -21,6 +21,8 @@ NEW the chi^2 calculation in single-histogram and asymmetry fits is parallelized
     if musrfit is built using a compiler supporting OpenMP (e.g. GCC >= 4.2)
     Using --disable-omp this feature can be disabled on the configure level.
 NEW any2many: force the user to define the exact NeXus ouput format (HDF4,HDF5,XML)
+FIXED 2012-01-05 fixed a bug in PRunAsymmetry::PrepareData relevant when combining addrun's and grouping (MUSR-209). 
+      Remove some commented out stuff from PRunSingleHisto.
 FIXED 2011-12-23 changed Qt parts of configure.ac in order to be compatible
 with BSD MacOS X
 FIXED 2011-12-22 some more work towards a proper NeXus muon data format support.
