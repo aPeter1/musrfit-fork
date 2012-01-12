@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  read_psi_runHeader.cpp
+  read_musrRoot_runHeader.cpp
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Andreas Suter                              *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -36,32 +36,24 @@ using namespace std;
 #include <TFile.h>
 #include <TFolder.h>
 
-#include "TPsiRunHeader.h"
+#include "TMusrRunHeader.h"
 
-void read_psi_runHeader_syntax()
+void read_musrRoot_runHeader_syntax()
 {
-  cout << endl << "usage: read_psi_runHeader <fileName> <headerDefinition> [<strict>]";
+  cout << endl << "usage: read_musrRoot_runHeader <fileName>";
   cout << endl << "       <fileName> is the file name including the extention root, e.g. test.root";
-  cout << endl << "       <headerDefinition> is the header definition XML-file.";
-  cout << endl << "       <strict> 'strict'=strict validation; otherwise=less strict validation.";
   cout << endl << endl;
 }
 
 int main(int argc, char *argv[])
 {
-  if ((argc != 3) && (argc != 4)) {
-    read_psi_runHeader_syntax();
+  if (argc != 2) {
+    read_musrRoot_runHeader_syntax();
     return 1;
   }
 
-  Bool_t strict = false;
-  if (argc == 4) {
-    if (!strcmp(argv[3], "strict"))
-      strict = true;
-  }
-
   // read the file back and extract the header info
-  TFile *f = new TFile(argv[1], "READ", "read_psi_runHeader");
+  TFile *f = new TFile(argv[1], "READ", "read_musrRoot_runHeader");
   if (f->IsZombie()) {
     delete f;
     return -1;
@@ -76,53 +68,55 @@ int main(int argc, char *argv[])
   }
 
   TObjArray *oarray = 0;
-  TPsiRunHeader *header = new TPsiRunHeader(argv[2]);
+  TMusrRunHeader *header = new TMusrRunHeader(argv[1]);
+
+  // first read map!!
+  TMap *map = (TMap*) runHeader->FindObjectAny("__map");
+  if (map == 0) {
+    cerr << endl << ">> **ERROR** couldn't find required __map :-(" << endl;
+    f->Close();
+    return -1;
+  }
+  header->SetMap(map);
 
   // get RunHeader
   oarray = (TObjArray*) runHeader->FindObjectAny("RunInfo");
   if (oarray == 0) {
     cerr << endl << ">> **ERROR** Couldn't get RunInfo" << endl;
   }
-  header->ExtractHeaderInformation(oarray, "RunInfo");
+  if (!header->ExtractHeaderInformation(oarray, "RunInfo")) return -1;
+
 
   // get SampleEnv
   oarray = (TObjArray*) runHeader->FindObjectAny("SampleEnv");
   if (oarray == 0) {
     cerr << endl << ">> **ERROR** Couldn't get SampleEnv" << endl;
   }
-  header->ExtractHeaderInformation(oarray, "SampleEnv");
+  if (!header->ExtractHeaderInformation(oarray, "SampleEnv")) return -1;
 
   // get MagFieldEnv
   oarray = (TObjArray*) runHeader->FindObjectAny("MagFieldEnv");
   if (oarray == 0) {
     cerr << endl << ">> **ERROR** Couldn't get MagFieldEnv" << endl;
   }
-  header->ExtractHeaderInformation(oarray, "MagFieldEnv");
+  if (!header->ExtractHeaderInformation(oarray, "MagFieldEnv")) return -1;
 
   // get Beamline
   oarray = (TObjArray*) runHeader->FindObjectAny("Beamline");
   if (oarray == 0) {
     cerr << endl << ">> **ERROR** Couldn't get Beamline" << endl;
   }
-  header->ExtractHeaderInformation(oarray, "Beamline");
+  if (!header->ExtractHeaderInformation(oarray, "Beamline")) return -1;
 
   // get Scaler
   oarray = (TObjArray*) runHeader->FindObjectAny("Scaler");
   if (oarray == 0) {
     cerr << endl << ">> **ERROR** Couldn't get Scaler" << endl;
   }
-  header->ExtractHeaderInformation(oarray, "Scaler");
+  if (!header->ExtractHeaderInformation(oarray, "Scaler")) return -1;
 
   f->Close();
   delete f;
-
-  if (!header->IsValid(strict)) {
-    cerr << endl << ">> **ERROR** run header validation failed." << endl;
-    if (strict) { // clean up and quit
-      delete header;
-      return -1;
-    }
-  }
 
   header->DumpHeader();
 

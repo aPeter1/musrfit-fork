@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  TPsiRunHeader2LinkDef.h
+  TMusrRunHeaderLinkDef.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Andreas Suter                              *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -35,8 +35,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class TPsiRunProperty+;
-#pragma link C++ class TPsiStartupHandler+;
-#pragma link C++ class TPsiRunHeader+;
+#pragma link C++ class TMusrRunPhysicalQuantity+;
+#pragma link C++ class TMusrRunHeader+;
 
 #endif

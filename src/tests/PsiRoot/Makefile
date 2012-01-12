@@ -61,36 +61,36 @@ LIBS          = $(ROOTLIBS) -lXMLParser
 GLIBS         = $(ROOTGLIBS) -lXMLParser
 
 # PSI libs
-PSILIBS       = -lTPsiRunHeader
+PSILIBS       = -lTMusrRunHeader
 
 EXEC  = 
-EXEC += psi_runHeader_test
-EXEC += write_psi_runHeader
-EXEC += read_psi_runHeader
+EXEC += musrRoot_runHeader_test
+EXEC += write_musrRoot_runHeader
+EXEC += read_musrRoot_runHeader
 
 # some definitions: headers (used to generate *Dict* stuff), sources, objects,...
 OBJS =
-OBJS += psi_runHeader_test.o
-OBJS += write_psi_runHeader.o
-OBJS += read_psi_runHeader.o
+OBJS += musrRoot_runHeader_test.o
+OBJS += write_musrRoot_runHeader.o
+OBJS += read_musrRoot_runHeader.o
 
 # make the executable:
 #
 all:  $(EXEC)
 
-psi_runHeader_test: psi_runHeader_test.o
-	@echo "---> Building psi_runHeader_test ..."
-	$(LD) psi_runHeader_test.o -o psi_runHeader_test $(GLIBS) $(PSILIBS)  
+musrRoot_runHeader_test: musrRoot_runHeader_test.o
+	@echo "---> Building musrRoot_runHeader_test ..."
+	$(LD) musrRoot_runHeader_test.o -o musrRoot_runHeader_test $(GLIBS) $(PSILIBS)  
 	@echo "done"
 
-write_psi_runHeader: write_psi_runHeader.o
-	@echo "---> Building write_psi_runHeader ..."
-	$(LD) write_psi_runHeader.o -o write_psi_runHeader $(GLIBS) $(PSILIBS)  
+write_musrRoot_runHeader: write_musrRoot_runHeader.o
+	@echo "---> Building write_musrRoot_runHeader ..."
+	$(LD) write_musrRoot_runHeader.o -o write_musrRoot_runHeader $(GLIBS) $(PSILIBS)  
 	@echo "done"
 
-read_psi_runHeader: read_psi_runHeader.o
-	@echo "---> Building read_psi_runHeader ..."
-	$(LD) read_psi_runHeader.o -o read_psi_runHeader $(GLIBS) $(PSILIBS)  
+read_musrRoot_runHeader: read_musrRoot_runHeader.o
+	@echo "---> Building read_musrRoot_runHeader ..."
+	$(LD) read_musrRoot_runHeader.o -o read_musrRoot_runHeader $(GLIBS) $(PSILIBS)  
 	@echo "done"
 
 # clean up: remove all object file (and core files)

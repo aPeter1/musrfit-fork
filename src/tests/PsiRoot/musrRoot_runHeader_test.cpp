@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  psi_runHeader_test.cpp
+  musrRoot_runHeader_test.cpp
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Andreas Suter                              *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -36,39 +36,31 @@ using namespace std;
 #include <TFile.h>
 #include <TFolder.h>
 
-#include "TPsiRunHeader.h"
+#include "TMusrRunHeader.h"
 
-void psi_runHeader_test_syntax()
+void musrRoot_runHeader_test_syntax()
 {
-  cout << endl << "usage: psi_runHeader_test <fileName> <headerDefinition> [<strict>]";
+  cout << endl << "usage: musrRoot_runHeader_test <fileName>";
   cout << endl << "       <fileName> is the file name including the extention root, e.g. test.root";
-  cout << endl << "       <headerDefinition> is the header definition XML-file.";
-  cout << endl << "       <strict> 'strict'=strict validation; otherwise=less strict validation.";
   cout << endl << endl;
 }
 
 int main(int argc, char *argv[])
 {
-  if ((argc != 3) && (argc != 4)) {
-    psi_runHeader_test_syntax();
+  if (argc != 2) {
+    musrRoot_runHeader_test_syntax();
     return 1;
   }
 
-  Bool_t strict = false;
-  if (argc == 4) {
-    if (!strcmp(argv[3], "strict"))
-      strict = true;
-  }
-
-  // PSI Run Header object
-  TPsiRunHeader *header = new TPsiRunHeader(argv[2]);
-  TPsiRunProperty prop;
+  // MusrRoot Run Header object
+  TMusrRunHeader *header = new TMusrRunHeader(argv[1]);
+  TMusrRunPhysicalQuantity prop;
 
   // run info
   header->Set("RunInfo/Version", "$Id$");
   header->Set("RunInfo/Generator", "any2many");
   header->Set("RunInfo/File Name", "thisIsAFileName");
-//  header->Set("RunInfo/Run Title", "here comes the run title");
+  header->Set("RunInfo/Run Title", "here comes the run title");
   header->Set("RunInfo/Run Number", 576);
   header->Set("RunInfo/Run Number", 577);
   header->Set("RunInfo/Run Start Time", "2011-04-19 14:25:22");
@@ -80,7 +72,7 @@ int main(int argc, char *argv[])
   prop.Set("Sample Temperature", 3.2, 3.21, 0.05, "K", "CF1");
   header->Set("RunInfo/Sample Temperature", prop);
 
-  prop.Set("Muon Beam Momentum", PRH_UNDEFINED, 28.1, PRH_UNDEFINED, "MeV/c");
+  prop.Set("Muon Beam Momentum", MRRH_UNDEFINED, 28.1, MRRH_UNDEFINED, "MeV/c");
   header->Set("RunInfo/Muon Beam Momentum", prop);
 
   TStringVector detectorName;
@@ -94,8 +86,8 @@ int main(int argc, char *argv[])
   detectorName.push_back("bottom_up");
   header->Set("RunInfo/Histo Names", detectorName);
 
-  TIntVector t0;
-  for (UInt_t i=0; i<8; i++) t0.push_back(3419);
+  TDoubleVector t0;
+  for (UInt_t i=0; i<8; i++) t0.push_back(3419.0);
   header->Set("RunInfo/Time Zero Bin", t0);
 
   TStringVector dummyTest;
@@ -110,7 +102,7 @@ int main(int argc, char *argv[])
   prop.Set("CF2", 3.2, 3.22, 0.04, "K");
   header->Set("SampleEnv/CF2", prop);
 
-  prop.Set("CF3", PRH_UNDEFINED, 3.27, 0.09, "K", "strange temperature");
+  prop.Set("CF3", MRRH_UNDEFINED, 3.27, 0.09, "K", "strange temperature");
   header->Set("SampleEnv/CF3", prop);
 
   prop.Set("CF4", 3.25, 3.28, "K");
@@ -134,26 +126,17 @@ int main(int argc, char *argv[])
   for (UInt_t i=0; i<3; i++) dummyInt.push_back(i+1000);
   header->Set("Beamline/Dummy Int", dummyInt);
 
-
   // scaler
   header->Set("Scaler/Ip", 12332123);
 
-  if (!header->IsValid(strict)) {
-    cerr << endl << ">> **ERROR** run header validation failed." << endl;
-    if (strict) { // clean up and quit
-      delete header;
-      return -1;
-    }
-  }
-
-  TFile *f = new TFile(argv[1], "RECREATE", "psi_runHeader_test");
+  TFile *f = new TFile(argv[1], "RECREATE", "musrRoot_runHeader_test");
   if (f->IsZombie()) {
     delete f;
     return -1;
   }
 
   // root file header related things
-  TFolder *runHeader = gROOT->GetRootFolder()->AddFolder("RunHeader", "PSI Run Header Info");
+  TFolder *runHeader = gROOT->GetRootFolder()->AddFolder("RunHeader", "MusrRoot Run Header Info");
   gROOT->GetListOfBrowsables()->Add(runHeader, "RunHeader");
 
   TObjArray runInfo;
@@ -176,6 +159,9 @@ int main(int argc, char *argv[])
   header->GetHeaderInfo("Scaler", scaler);
   runHeader->Add(&scaler);
 
+  TMap *map = header->GetMap();
+  runHeader->Add(map);
+
   runHeader->Write();
 
   f->Close();
@@ -193,7 +179,7 @@ int main(int argc, char *argv[])
   cout << endl << "++++++++++++++++++++++++++++" << endl;
 
   // read the file back and extract the header info
-  f = new TFile(argv[1], "READ", "psi_runHeader_test");
+  f = new TFile(argv[1], "READ", "musrRoot_runHeader_test");
   if (f->IsZombie()) {
     delete f;
     return -1;
@@ -208,7 +194,15 @@ int main(int argc, char *argv[])
   }
 
   TObjArray *oarray = 0;
-  header = new TPsiRunHeader(argv[2]);
+  header = new TMusrRunHeader(argv[1]);
+
+  map = (TMap*) runHeader->FindObjectAny("__map");
+  if (map == 0) {
+    cerr << endl << ">> **ERROR** couldn't find required __map :-(" << endl;
+    f->Close();
+    return -1;
+  }
+  header->SetMap(map);
 
   // get RunHeader
   oarray = (TObjArray*) runHeader->FindObjectAny("RunInfo");
@@ -248,14 +242,6 @@ int main(int argc, char *argv[])
   f->Close();
   delete f;
 
-  if (!header->IsValid(strict)) {
-    cerr << endl << ">> **ERROR** run header validation failed." << endl;
-    if (strict) { // clean up and quit
-      delete header;
-      return -1;
-    }
-  }
-
   header->DumpHeader();
 
   // get some information from the read file
@@ -266,8 +252,8 @@ int main(int argc, char *argv[])
   TString str("");
   TStringVector strVec;
   Int_t ival;
-  TIntVector ivec;
-  TPsiRunProperty prop1;
+  TDoubleVector dvec;
+  TMusrRunPhysicalQuantity prop1;
   Bool_t ok;
 
   header->GetValue("RunInfo/Run Title", str, ok);
@@ -293,13 +279,13 @@ int main(int argc, char *argv[])
     cout << endl << "**ERROR** Couldn't obtain the 'Histo Names'.";
   }
 
-  header->GetValue("RunInfo/Time Zero Bin", ivec, ok);
+  header->GetValue("RunInfo/Time Zero Bin", dvec, ok);
   if (ok) {
     cout << endl << "Time Zero Bin: ";
-    for (UInt_t i=0; i<ivec.size()-1; i++) {
-      cout << ivec[i] << ", ";
+    for (UInt_t i=0; i<dvec.size()-1; i++) {
+      cout << dvec[i] << ", ";
     }
-    cout << ivec[ivec.size()-1];
+    cout << dvec[dvec.size()-1];
   } else {
     cout << endl << "**ERROR** Couldn't obtain the 'Time Zero Bin'.";
   }

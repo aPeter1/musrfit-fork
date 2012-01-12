@@ -10,7 +10,7 @@ ARCH         := $(shell root-config --arch)
 
 CXX           =
 ObjSuf        = o
-SrcSuf        = cxx
+SrcSuf        = cpp
 ExeSuf        =
 DllSuf        = so
 OutPutOpt     = -o # keep whitespace after "-o"

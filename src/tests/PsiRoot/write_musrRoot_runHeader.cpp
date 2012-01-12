@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  write_runHeader.cpp
+  write_musrRoot_runHeader.cpp
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Andreas Suter                              *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -40,33 +40,25 @@ using namespace std;
 #include <TFile.h>
 #include <TFolder.h>
 
-#include "TPsiRunHeader.h"
+#include "TMusrRunHeader.h"
 
-void write_psi_runHeader_syntax()
+void write_musrRoot_runHeader_syntax()
 {
-  cout << endl << "usage: write_psi_runHeader <fileName> <headerDefinition> [<strict>]";
+  cout << endl << "usage: write_musrRoot_runHeader <fileName>";
   cout << endl << "       <fileName> is the file name including the extention root, e.g. test.root";
-  cout << endl << "       <headerDefinition> is the header definition XML-file.";
-  cout << endl << "       <strict> 'strict'=strict validation; otherwise=less strict validation.";
   cout << endl << endl;
 }
 
 int main(int argc, char *argv[])
 {
-  if ((argc != 3) && (argc != 4)) {
-    write_psi_runHeader_syntax();
+  if (argc != 2) {
+    write_musrRoot_runHeader_syntax();
     return 1;
   }
 
-  Bool_t strict = false;
-  if (argc == 4) {
-    if (!strcmp(argv[3], "strict"))
-      strict = true;
-  }
-
-  // PSI Run Header object
-  TPsiRunHeader *header = new TPsiRunHeader(argv[2]);
-  TPsiRunProperty prop;
+  // MusrRoot Run Header object
+  TMusrRunHeader *header = new TMusrRunHeader(argv[1]);
+  TMusrRunPhysicalQuantity prop;
 
   // run info
   header->Set("RunInfo/Version", "$Id$");
@@ -161,7 +153,7 @@ int main(int argc, char *argv[])
   prop.Set("CF2", 3.2, 3.22, 0.04, "K");
   header->Set("SampleEnv/CF2", prop);
 
-  prop.Set("CF3", PRH_UNDEFINED, 3.27, 0.09, "K", "strange temperature");
+  prop.Set("CF3", MRRH_UNDEFINED, 3.27, 0.09, "K", "strange temperature");
   header->Set("SampleEnv/CF3", prop);
 
   prop.Set("CF4", 3.25, 3.28, "K");
@@ -189,22 +181,14 @@ int main(int argc, char *argv[])
   // scaler
   header->Set("Scaler/Ip", 12332123);
 
-  if (!header->IsValid(strict)) {
-    cerr << endl << ">> **ERROR** run header validation failed." << endl;
-    if (strict) { // clean up and quit
-      delete header;
-      return -1;
-    }
-  }
-
-  TFile *f = new TFile(argv[1], "RECREATE", "psi_runHeader_test");
+  TFile *f = new TFile(argv[1], "RECREATE", "write_musrRoot_runHeader");
   if (f->IsZombie()) {
     delete f;
     return -1;
   }
 
   // root file header related things
-  TFolder *runHeader = gROOT->GetRootFolder()->AddFolder("RunHeader", "PSI Run Header Info");
+  TFolder *runHeader = gROOT->GetRootFolder()->AddFolder("RunHeader", "MusrRoot Run Header Info");
   gROOT->GetListOfBrowsables()->Add(runHeader, "RunHeader");
 
   TObjArray runInfo;
@@ -226,6 +210,9 @@ int main(int argc, char *argv[])
   TObjArray scaler;
   header->GetHeaderInfo("Scaler", scaler);
   runHeader->Add(&scaler);
+
+  TMap *map = header->GetMap();
+  runHeader->Add(map);
 
   runHeader->Write();
 

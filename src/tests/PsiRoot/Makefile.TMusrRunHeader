@@ -1,18 +1,18 @@
-# Makefile for TPH1F
+# Makefile for TMusrRunHeader
 #
 # Copyright (c) 2000 Rene Brun and Fons Rademakers
 #
 # Author: Fons Rademakers,   29/2/2000
 # 
-# modified: Andreas Suter,   14/04/2004
-# modified: Thomas Prokscha, 30/01/2007
-# 
+# modified: Andreas Suter,   12/01/2012
+#
+# $Id$
 #
 include Makefile.arch
 #------------------------------------------------------------------------------
 
-# TPsiRunHeader
-TNAME        = TPsiRunHeader
+# TMusrRunHeader
+TNAME        = TMusrRunHeader
 TLRHO        = $(TNAME).$(ObjSuf) $(TNAME)Dict.$(ObjSuf)
 TLRHS        = $(TNAME).$(SrcSuf) $(TNAME)Dict.$(SrcSuf)
 TLRHSO       = lib$(TNAME).$(DllSuf)
@@ -84,7 +84,7 @@ distclean:      clean
 		@rm -rf cxx_repository
 		-@cd RootShower && $(MAKE) distclean
 		
-install:
+install: $(TLRHS) $(TLRHSO)
 ifeq ($(ARCH),linux)
 		cp -pv $(MYLIBS)/$(TLRHSO) $(ROOTSYS)/lib
 		cp -pv $(MYINCLUDES)/$(TNAME).h $(ROOTSYS)/include

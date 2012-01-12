@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  TPsiRunHeader.h
+  TMusrRunHeader.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Andreas Suter                              *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -29,28 +29,30 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef TPSIRUNHEADER_H
-#define TPSIRUNHEADER_H
+#ifndef TMUSRRUNHEADER_H
+#define TMUSRRUNHEADER_H
 
 #include <TDatime.h>
 #include <TObject.h>
 #include <TQObject.h>
 #include <TObjString.h>
 #include <TObjArray.h>
+#include <TMap.h>
 #include <TSAXParser.h>
 
-#define PRH_UNDEFINED -9.99e99
+#define MRRH_UNDEFINED -9.99e99
 
 typedef vector<Int_t> TIntVector;
+typedef vector<Double_t> TDoubleVector;
 typedef vector<TString> TStringVector;
 
 //-------------------------------------------------------------------------
-template <class T> class TPsiRunObject : public TObject
+template <class T> class TMusrRunObject : public TObject
 {
 public:
-  TPsiRunObject() { fPathName = "n/a"; fType = "n/a"; }
-  TPsiRunObject(TString pathName, TString type, T value) : fPathName(pathName), fType(type), fValue(value) {}
-  virtual ~TPsiRunObject() {}
+  TMusrRunObject() { fPathName = "n/a"; fType = "n/a"; }
+  TMusrRunObject(TString pathName, TString type, T value) : fPathName(pathName), fType(type), fValue(value) {}
+  virtual ~TMusrRunObject() {}
 
   virtual TString GetPathName() { return fPathName; }
   virtual TString GetType() { return fType; }
@@ -67,14 +69,14 @@ private:
 };
 
 //-------------------------------------------------------------------------
-class TPsiRunProperty : public TObject
+class TMusrRunPhysicalQuantity : public TObject
 {
 public:
-  TPsiRunProperty();
-  TPsiRunProperty(TString label, Double_t demand, Double_t value, Double_t error, TString unit, TString description = TString("n/a"));
-  TPsiRunProperty(TString label, Double_t demand, Double_t value, TString unit, TString description = TString("n/a"));
-  TPsiRunProperty(TString label, Double_t value, TString unit, TString description = TString("n/a"));
-  virtual ~TPsiRunProperty() {}
+  TMusrRunPhysicalQuantity();
+  TMusrRunPhysicalQuantity(TString label, Double_t demand, Double_t value, Double_t error, TString unit, TString description = TString("n/a"));
+  TMusrRunPhysicalQuantity(TString label, Double_t demand, Double_t value, TString unit, TString description = TString("n/a"));
+  TMusrRunPhysicalQuantity(TString label, Double_t value, TString unit, TString description = TString("n/a"));
+  virtual ~TMusrRunPhysicalQuantity() {}
 
   virtual TString  GetLabel() const { return fLabel; }
   virtual Double_t GetDemand() const { return fDemand; }
@@ -98,88 +100,47 @@ public:
 
 private:
   TString  fLabel; ///<  property label, like ’Sample Temperature’ etc.
-  Double_t fDemand; ///< demand value of the property, e.g. temperature setpoint
-  Double_t fValue; ///<  measured value of the property
-  Double_t fError; ///<  estimated error (standard deviation) of the measured property value
-  TString  fUnit;   ///< unit of the property
-  TString  fDescription; ///< a more detailed description of the property
+  Double_t fDemand; ///< demand value of the physical quantity, e.g. temperature setpoint
+  Double_t fValue; ///<  measured value of the physical quantity
+  Double_t fError; ///<  estimated error (standard deviation) of the measured value
+  TString  fUnit;   ///< unit of the physical quantity
+  TString  fDescription; ///< a more detailed description of the physical quantity
 
-  ClassDef(TPsiRunProperty, 1)
+  ClassDef(TMusrRunPhysicalQuantity, 1)
 };
 
 //-------------------------------------------------------------------------
-class TPsiEntry
+class TMusrRunHeader : public TObject
 {
 public:
-  TPsiEntry() { fPathName = "n/a"; fType = "n/a"; }
-  TPsiEntry(TString pathName, TString type) : fPathName(pathName), fType(type) {}
-  virtual ~TPsiEntry() {}
+  TMusrRunHeader();
+  TMusrRunHeader(const char *fileName);
+  virtual ~TMusrRunHeader();
 
-  virtual TString GetPathName() { return fPathName; }
-  virtual TString GetType() { return fType; }
-
-  virtual void SetPathName(TString pathName) { fPathName = pathName; }
-  virtual void SetType(TString type) { fType = type; }
-
-private:
-  TString fPathName;
-  TString fType;
-};
-
-//-------------------------------------------------------------------------
-class TPsiStartupHandler : public TObject, public TQObject
-{
-public:
-  TPsiStartupHandler();
-  virtual ~TPsiStartupHandler();
-
-  virtual void OnStartDocument(); // SLOT
-  virtual void OnEndDocument(); // SLOT
-  virtual void OnStartElement(const Char_t*, const TList*); // SLOT
-  virtual void OnEndElement(const Char_t*); // SLOT
-  virtual void OnCharacters(const Char_t*); // SLOT
-  virtual void OnComment(const Char_t*); // SLOT
-  virtual void OnWarning(const Char_t*); // SLOT
-  virtual void OnError(const Char_t*); // SLOT
-  virtual void OnFatalError(const Char_t*); // SLOT
-  virtual void OnCdataBlock(const Char_t*, Int_t); // SLOT
-
-  virtual TStringVector GetFolders() { return fFolder; }
-  virtual vector<TPsiEntry> GetEntries() { return fEntry; }
-
-private:
-  enum EKeyWords {eEmpty, eFolder, eEntry, eName, eType};
-
-  EKeyWords fKey, fGroupKey; ///< xml filter key
-
-  TStringVector fFolder;
-  vector<TPsiEntry> fEntry;
-
-  ClassDef(TPsiStartupHandler, 1)      
-};
-
-//-------------------------------------------------------------------------
-class TPsiRunHeader : public TObject
-{
-public:
-  TPsiRunHeader(const char *headerDefinition);
-  virtual ~TPsiRunHeader();
-
-  virtual Bool_t IsValid(Bool_t strict = false);
+  virtual TString GetFileName() { return fFileName; }
 
   virtual void GetHeaderInfo(TString path, TObjArray &content);
 
   virtual void GetValue(TString pathName, TString &value, Bool_t &ok);
   virtual void GetValue(TString pathName, Int_t &value, Bool_t &ok);
-  virtual void GetValue(TString pathName, TPsiRunProperty &value, Bool_t &ok);
+  virtual void GetValue(TString pathName, Double_t &value, Bool_t &ok);
+  virtual void GetValue(TString pathName, TMusrRunPhysicalQuantity &value, Bool_t &ok);
   virtual void GetValue(TString pathName, TStringVector &value, Bool_t &ok);
   virtual void GetValue(TString pathName, TIntVector &value, Bool_t &ok);
+  virtual void GetValue(TString pathName, TDoubleVector &value, Bool_t &ok);
 
-  virtual void Set(TString pathName, TString value);
-  virtual void Set(TString pathName, Int_t value);
-  virtual void Set(TString pathName, TPsiRunProperty value);
-  virtual void Set(TString pathName, TStringVector value);
-  virtual void Set(TString pathName, TIntVector value);
+  virtual TMap* GetMap() { return &fMap; }
+
+  virtual void SetFileName(TString fln) { fFileName = fln; }
+  virtual void SetMap(TMap* map);
+
+  virtual void Set(TString pathName, TString value, Bool_t addMap=true);
+  virtual void Set(TString pathName, Int_t value, Bool_t addMap=true);
+  virtual void Set(TString pathName, Double_t value, Bool_t addMap=true);
+  virtual void Set(TString pathName, TMusrRunPhysicalQuantity value, Bool_t addMap=true);
+  virtual void Set(TString pathName, TStringVector value, Bool_t addMap=true);
+  virtual void Set(TString pathName, TIntVector value, Bool_t addMap=true);
+  virtual void Set(TString pathName, TDoubleVector value, Bool_t addMap=true);
 
   virtual Bool_t ExtractHeaderInformation(TObjArray *headerInfo, TString path);
 
@@ -187,22 +148,27 @@ public:
   virtual void DrawHeader();
 
 private:
-  TString fHeaderDefinition;
+  TString fFileName;
 
-  vector< TPsiRunObject<TString> > fStringObj;
-  vector< TPsiRunObject<Int_t> >   fIntObj;
-  vector< TPsiRunObject<TPsiRunProperty> > fPsiRunPropertyObj;
-  vector< TPsiRunObject<TStringVector> > fStringVectorObj;
-  vector< TPsiRunObject<TIntVector> > fIntVectorObj;
+  vector< TMusrRunObject<TString> >  fStringObj;
+  vector< TMusrRunObject<Int_t> >    fIntObj;
+  vector< TMusrRunObject<Double_t> > fDoubleObj;
+  vector< TMusrRunObject<TMusrRunPhysicalQuantity> > fMusrRunPhysQuantityObj;
+  vector< TMusrRunObject<TStringVector> > fStringVectorObj;
+  vector< TMusrRunObject<TIntVector> > fIntVectorObj;
+  vector< TMusrRunObject<TDoubleVector> > fDoubleVectorObj;
 
   TStringVector fFolder;
-  vector<TPsiEntry> fEntry;
 
+  TMap fMap; ///< maps run header label to its root type, e.g. 'Run Number' -> 'Int_t' or 'Time Resolution' -> 'TMusrRunPhysicalQuantity'
+
+  virtual void Init();
   virtual UInt_t GetDecimalPlace(Double_t val);
   virtual UInt_t GetLeastSignificantDigit(Double_t val) const;
   virtual void SplitPathName(TString pathName, TString &path, TString &name);
+  virtual Bool_t FolderPresent(TString &path);
 
-  ClassDef(TPsiRunHeader, 1)
+  ClassDef(TMusrRunHeader, 1)
 };
 
-#endif // TPSIRUNHEADER_H
+#endif // TMUSRRUNHEADER_H
