@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  read_musrRoot_runHeader.cpp
+  musrRoot_runHeader_test.cpp
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -38,9 +38,9 @@ using namespace std;
 
 #include "TMusrRunHeader.h"
 
-void read_musrRoot_runHeader_syntax()
+void musrRoot_runHeader_test_syntax()
 {
-  cout << endl << "usage: read_musrRoot_runHeader <fileName>";
+  cout << endl << "usage: musrRoot_runHeader_test <fileName>";
   cout << endl << "       <fileName> is the file name including the extention root, e.g. test.root";
   cout << endl << endl;
 }
@@ -48,12 +48,12 @@ void read_musrRoot_runHeader_syntax()
 int main(int argc, char *argv[])
 {
   if (argc != 2) {
-    read_musrRoot_runHeader_syntax();
+    musrRoot_runHeader_test_syntax();
     return 1;
   }
 
-  // read the file back and extract the header info
-  TFile *f = new TFile(argv[1], "READ", "read_musrRoot_runHeader");
+  // read the file and extract the header info
+  TFile *f = new TFile(argv[1], "READ", "musrRoot_runHeader_test");
   if (f->IsZombie()) {
     delete f;
     return -1;
@@ -67,60 +67,78 @@ int main(int argc, char *argv[])
     return -1;
   }
 
-  TObjArray *oarray = 0;
+  // MusrRoot Run Header object
   TMusrRunHeader *header = new TMusrRunHeader(argv[1]);
-
-  // first read map!!
-  TMap *map = (TMap*) runHeader->FindObjectAny("__map");
-  if (map == 0) {
-    cerr << endl << ">> **ERROR** couldn't find required __map :-(" << endl;
-    f->Close();
-    return -1;
-  }
-  header->SetMap(map);
-
-  // get RunHeader
-  oarray = (TObjArray*) runHeader->FindObjectAny("RunInfo");
-  if (oarray == 0) {
-    cerr << endl << ">> **ERROR** Couldn't get RunInfo" << endl;
-  }
-  if (!header->ExtractHeaderInformation(oarray, "RunInfo")) return -1;
-
-
-  // get SampleEnv
-  oarray = (TObjArray*) runHeader->FindObjectAny("SampleEnv");
-  if (oarray == 0) {
-    cerr << endl << ">> **ERROR** Couldn't get SampleEnv" << endl;
-  }
-  if (!header->ExtractHeaderInformation(oarray, "SampleEnv")) return -1;
-
-  // get MagFieldEnv
-  oarray = (TObjArray*) runHeader->FindObjectAny("MagFieldEnv");
-  if (oarray == 0) {
-    cerr << endl << ">> **ERROR** Couldn't get MagFieldEnv" << endl;
-  }
-  if (!header->ExtractHeaderInformation(oarray, "MagFieldEnv")) return -1;
-
-  // get Beamline
-  oarray = (TObjArray*) runHeader->FindObjectAny("Beamline");
-  if (oarray == 0) {
-    cerr << endl << ">> **ERROR** Couldn't get Beamline" << endl;
-  }
-  if (!header->ExtractHeaderInformation(oarray, "Beamline")) return -1;
-
-  // get Scaler
-  oarray = (TObjArray*) runHeader->FindObjectAny("Scaler");
-  if (oarray == 0) {
-    cerr << endl << ">> **ERROR** Couldn't get Scaler" << endl;
-  }
-  if (!header->ExtractHeaderInformation(oarray, "Scaler")) return -1;
+  header->ExtractAll(runHeader);
 
   f->Close();
   delete f;
 
   header->DumpHeader();
 
+  // get some information from the read file
+  cout << endl << "++++++++++++++++++++++++++++";
+  cout << endl << ">> get header infos " << argv[1];
+  cout << endl << "++++++++++++++++++++++++++++" << endl;
+
+  TString str("");
+  TStringVector strVec;
+  Int_t ival;
+  TDoubleVector dvec;
+  TMusrRunPhysicalQuantity prop;
+  Bool_t ok;
+
+  header->GetValue("RunInfo/Run Title", str, ok);
+  if (ok)
+    cout << endl << "Run Title: " << str.Data();
+  else
+    cout << endl << "**ERROR** Couldn't obtain the 'Run Title'.";
+
+  header->GetValue("RunInfo/Run Number", ival, ok);
+  if (ok)
+    cout << endl << "Run Number: " << ival;
+  else
+    cout << endl << "**ERROR** Couldn't obtain the 'Run Number'.";
+
+  header->GetValue("RunInfo/Histo Names", strVec, ok);
+  if (ok) {
+    cout << endl << "Histo Names: ";
+    for (UInt_t i=0; i<strVec.size()-1; i++) {
+      cout << strVec[i].Data() << ", ";
+    }
+    cout << strVec[strVec.size()-1].Data();
+  } else {
+    cout << endl << "**ERROR** Couldn't obtain the 'Histo Names'.";
+  }
+
+  header->GetValue("RunInfo/Time Zero Bin", dvec, ok);
+  if (ok) {
+    cout << endl << "Time Zero Bin: ";
+    for (UInt_t i=0; i<dvec.size()-1; i++) {
+      cout << dvec[i] << ", ";
+    }
+    cout << dvec[dvec.size()-1];
+  } else {
+    cout << endl << "**ERROR** Couldn't obtain the 'Time Zero Bin'.";
+  }
+
+  header->GetValue("RunInfo/Sample Temperature", prop, ok);
+  if (ok) {
+    cout << endl << "Sample Temperature: " << prop.GetValue() << " +- " << prop.GetError() << " " << prop.GetUnit().Data() << "; SP: " << prop.GetDemand() << "; " << prop.GetDescription().Data();
+  } else {
+    cout << endl << "**ERROR** Couldn't obtain the 'Sample Temperature'.";
+  }
+
+  header->GetValue("Detectors/Detector000/Name", str, ok);
+  if (ok) {
+    cout << endl << "Detectors/Detector000: Name=" << str;
+  } else {
+    cout << endl << "**ERROR** Couldn't obtain 'Detector/Detector000/Name'.";
+  }
+
   cout << endl << endl;
+
+  delete header;
 
   return 0;
 }

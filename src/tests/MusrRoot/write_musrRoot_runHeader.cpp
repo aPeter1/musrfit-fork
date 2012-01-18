@@ -112,13 +112,14 @@ int main(int argc, char *argv[])
   prop.Set("Time Resolution", 0.1953125, "ns", "TDC 9999");
   header->Set("RunInfo/Time Resolution", prop);
 
-  TIntVector t0;
-  for (UInt_t i=0; i<4; i++) t0.push_back(215+(Int_t)(5.0*(Double_t)rand()/(Double_t)RAND_MAX));
+  TDoubleVector t0;
+  TIntVector ivec;
+  for (UInt_t i=0; i<4; i++) t0.push_back(215.0+5.0*(Double_t)rand()/(Double_t)RAND_MAX);
   header->Set("RunInfo/Time Zero Bin", t0);
-  for (UInt_t i=0; i<4; i++) t0[i] += 12;
-  header->Set("RunInfo/First Good Bin", t0);
-  for (UInt_t i=0; i<4; i++) t0[i] = 8191;
-  header->Set("RunInfo/Last Good Bin", t0);
+  for (UInt_t i=0; i<4; i++) ivec.push_back((Int_t)t0[i] + 12);
+  header->Set("RunInfo/First Good Bin", ivec);
+  for (UInt_t i=0; i<4; i++) ivec[i] = 8191;
+  header->Set("RunInfo/Last Good Bin", ivec);
 
   TIntVector readGreenOffset;
   readGreenOffset.push_back(0);
@@ -146,40 +147,54 @@ int main(int argc, char *argv[])
   header->Set("RunInfo/Dummy Test", dummyTest);
 
   // sample environment
-  header->Set("SampleEnv/Cryo", "Konti-1");
-  header->Set("SampleEnv/Insert", "X123");
-  header->Set("SampleEnv/Orientation", "c-axis perp spin, perp field. spin perp field");
+  header->Set("SampleEnvironmentInfo/Cryo", "Konti-1");
+  header->Set("SampleEnvironmentInfo/Insert", "X123");
+  header->Set("SampleEnvironmentInfo/Orientation", "c-axis perp spin, perp field. spin perp field");
 
   prop.Set("CF2", 3.2, 3.22, 0.04, "K");
-  header->Set("SampleEnv/CF2", prop);
+  header->Set("SampleEnvironmentInfo/CF2", prop);
 
-  prop.Set("CF3", MRRH_UNDEFINED, 3.27, 0.09, "K", "strange temperature");
-  header->Set("SampleEnv/CF3", prop);
+  prop.Set("CF3", MRH_UNDEFINED, 3.27, 0.09, "K", "strange temperature");
+  header->Set("SampleEnvironmentInfo/CF3", prop);
 
   prop.Set("CF4", 3.25, 3.28, "K");
-  header->Set("SampleEnv/CF4", prop);
+  header->Set("SampleEnvironmentInfo/CF4", prop);
 
   prop.Set("CF5", 3.26, 3.29, "K", "another strange temperature");
-  header->Set("SampleEnv/CF5", prop);
+  header->Set("SampleEnvironmentInfo/CF5", prop);
 
   prop.Set("Dummy Prop", -2.0, -2.001, 0.002, "SI-unit");
-  header->Set("SampleEnv/Dummy Prop", prop);
+  header->Set("SampleEnvironmentInfo/Dummy Prop", prop);
 
   // magnetic field environment
-  header->Set("MagFieldEnv/Name", "Bpar");
+  header->Set("MagneticFieldEnvironmentInfo/Name", "Bpar");
   prop.Set("Current", 1.34, "A");
-  header->Set("MagFieldEnv/Current", prop);
+  header->Set("MagneticFieldEnvironmentInfo/Current", prop);
+
+  // detector forward
+  header->Set("Detectors/Detector000/Name", "forward");
+  header->Set("Detectors/Detector000/Histo Number", 0);
+  header->Set("Detectors/Detector000/Histo Length", 8192);
+
+  // detector backward
+  header->Set("Detectors/Detector001/Name", "backward");
+  header->Set("Detectors/Detector001/Histo Number", 0);
+  header->Set("Detectors/Detector001/Histo Length", 8192);
 
   // beamline
-  header->Set("Beamline/WSX61a", "DAC = 3289, ADC = 0.800");
+  header->Set("BeamlineInfo/WSX61a", "DAC = 3289, ADC = 0.800");
 
   TIntVector dummyInt;
   for (UInt_t i=0; i<3; i++) dummyInt.push_back(i+1000);
-  header->Set("Beamline/Dummy Int", dummyInt);
+  header->Set("BeamlineInfo/Dummy Int", dummyInt);
 
 
   // scaler
-  header->Set("Scaler/Ip", 12332123);
+  header->Set("ScalerInfo/Ip", 12332123);
+
+  // funny sub/sub/../sub-structure
+  header->Set("aa/bb/cc/dd/ee/ff/name", "funny");
+  header->Set("aa/bb/cc/dd/ee/ff/gg/xyz", 123);
 
   TFile *f = new TFile(argv[1], "RECREATE", "write_musrRoot_runHeader");
   if (f->IsZombie()) {
@@ -191,35 +206,15 @@ int main(int argc, char *argv[])
   TFolder *runHeader = gROOT->GetRootFolder()->AddFolder("RunHeader", "MusrRoot Run Header Info");
   gROOT->GetListOfBrowsables()->Add(runHeader, "RunHeader");
 
-  TObjArray runInfo;
-  header->GetHeaderInfo("RunInfo", runInfo);
-  runHeader->Add(&runInfo);
-
-  TObjArray sampleEnv;
-  header->GetHeaderInfo("SampleEnv", sampleEnv);
-  runHeader->Add(&sampleEnv);
-
-  TObjArray magFieldEnv;
-  header->GetHeaderInfo("MagFieldEnv", magFieldEnv);
-  runHeader->Add(&magFieldEnv);
-
-  TObjArray beamline;
-  header->GetHeaderInfo("Beamline", beamline);
-  runHeader->Add(&beamline);
-
-  TObjArray scaler;
-  header->GetHeaderInfo("Scaler", scaler);
-  runHeader->Add(&scaler);
-
-  TMap *map = header->GetMap();
-  runHeader->Add(map);
-
-  runHeader->Write();
+  if (header->FillFolder(runHeader)) {
+    runHeader->Write();
+  }
 
   f->Close();
 
+  // clean up
   delete f;
-  f = 0;
+  delete header;
 
   return 0;
 }

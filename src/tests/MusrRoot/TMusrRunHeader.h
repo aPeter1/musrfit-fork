@@ -37,10 +37,19 @@
 #include <TQObject.h>
 #include <TObjString.h>
 #include <TObjArray.h>
-#include <TMap.h>
-#include <TSAXParser.h>
+#include <TFolder.h>
 
-#define MRRH_UNDEFINED -9.99e99
+#define MRH_UNDEFINED -9.99e99
+
+#define MRH_DOUBLE_PREC 6
+
+#define MRH_TSTRING                     0
+#define MRH_INT                         1
+#define MRH_DOUBLE                      2
+#define MRH_TMUSR_RUN_PHYSICAL_QUANTITY 3
+#define MRH_TSTRING_VECTOR              4
+#define MRH_INT_VECTOR                  5
+#define MRH_DOUBLE_VECTOR               6
 
 typedef vector<Int_t> TIntVector;
 typedef vector<Double_t> TDoubleVector;
@@ -119,7 +128,10 @@ public:
 
   virtual TString GetFileName() { return fFileName; }
 
-  virtual void GetHeaderInfo(TString path, TObjArray &content);
+  virtual Bool_t FillFolder(TFolder *folder);
+
+  virtual Bool_t ExtractAll(TFolder *folder);
+  virtual Bool_t ExtractHeaderInformation(TObjArray *headerInfo, TString path);
 
   virtual void GetValue(TString pathName, TString &value, Bool_t &ok);
   virtual void GetValue(TString pathName, Int_t &value, Bool_t &ok);
@@ -129,20 +141,15 @@ public:
   virtual void GetValue(TString pathName, TIntVector &value, Bool_t &ok);
   virtual void GetValue(TString pathName, TDoubleVector &value, Bool_t &ok);
 
-  virtual TMap* GetMap() { return &fMap; }
-
   virtual void SetFileName(TString fln) { fFileName = fln; }
-  virtual void SetMap(TMap* map);
 
-  virtual void Set(TString pathName, TString value, Bool_t addMap=true);
-  virtual void Set(TString pathName, Int_t value, Bool_t addMap=true);
-  virtual void Set(TString pathName, Double_t value, Bool_t addMap=true);
-  virtual void Set(TString pathName, TMusrRunPhysicalQuantity value, Bool_t addMap=true);
-  virtual void Set(TString pathName, TStringVector value, Bool_t addMap=true);
-  virtual void Set(TString pathName, TIntVector value, Bool_t addMap=true);
-  virtual void Set(TString pathName, TDoubleVector value, Bool_t addMap=true);
-
-  virtual Bool_t ExtractHeaderInformation(TObjArray *headerInfo, TString path);
+  virtual void Set(TString pathName, TString value);
+  virtual void Set(TString pathName, Int_t value);
+  virtual void Set(TString pathName, Double_t value);
+  virtual void Set(TString pathName, TMusrRunPhysicalQuantity value);
+  virtual void Set(TString pathName, TStringVector value);
+  virtual void Set(TString pathName, TIntVector value);
+  virtual void Set(TString pathName, TDoubleVector value);
 
   virtual void DumpHeader();
   virtual void DrawHeader();
@@ -158,15 +165,23 @@ private:
   vector< TMusrRunObject<TIntVector> > fIntVectorObj;
   vector< TMusrRunObject<TDoubleVector> > fDoubleVectorObj;
 
-  TStringVector fFolder;
+  vector< TString > fPathNameOrder; ///< keeps the path-name as they or set and hence its ordering
 
-  TMap fMap; ///< maps run header label to its root type, e.g. 'Run Number' -> 'Int_t' or 'Time Resolution' -> 'TMusrRunPhysicalQuantity'
-
-  virtual void Init();
   virtual UInt_t GetDecimalPlace(Double_t val);
   virtual UInt_t GetLeastSignificantDigit(Double_t val) const;
   virtual void SplitPathName(TString pathName, TString &path, TString &name);
-  virtual Bool_t FolderPresent(TString &path);
+
+  virtual TString GetLabel(TString str);
+  virtual TString GetStrValue(TString str);
+  virtual TString GetType(TString str);
+
+  virtual Int_t ObjectPresent(vector<TObjArray*> &content, TString &path);
+  virtual TObjString GetHeaderString(UInt_t idx);
+
+  virtual void RemoveFirst(TString &str, const char splitter);
+  virtual TString GetFirst(TString &str, const char splitter);
+  virtual void AddSubTrees(TObjArray *content, TString pathName);
+  virtual void SetSubTreeObject(TObjArray *content, TObjString ostr, Int_t idx);
 
   ClassDef(TMusrRunHeader, 1)
 };

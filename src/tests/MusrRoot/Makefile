@@ -4,7 +4,7 @@
 # Author: Andreas Suter
 # e-mail: andreas.suter@psi.ch
 #
-# $Id$
+# $Id: Makefile 5052 2012-01-12 09:55:19Z suter_a $
 #
 #---------------------------------------------------
 
