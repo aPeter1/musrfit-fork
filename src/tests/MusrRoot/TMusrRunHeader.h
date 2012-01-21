@@ -156,6 +156,7 @@ public:
 
 private:
   TString fFileName;
+  TString fVersion;
 
   vector< TMusrRunObject<TString> >  fStringObj;
   vector< TMusrRunObject<Int_t> >    fIntObj;
@@ -166,6 +167,9 @@ private:
   vector< TMusrRunObject<TDoubleVector> > fDoubleVectorObj;
 
   vector< TString > fPathNameOrder; ///< keeps the path-name as they or set and hence its ordering
+
+  virtual void Init(TString str="n/a");
+  virtual void CleanUp();
 
   virtual UInt_t GetDecimalPlace(Double_t val);
   virtual UInt_t GetLeastSignificantDigit(Double_t val) const;

@@ -61,14 +61,15 @@ int main(int argc, char *argv[])
   TMusrRunPhysicalQuantity prop;
 
   // run info
-  header->Set("RunInfo/Version", "$Id$");
+  header->Set("RunInfo/Generic Validator URL", "http://lmu.web.psi.ch/facilities/software/MusrRoot/Validation/MusrRoot.xsd");
+  header->Set("RunInfo/Specific Validator URL", "http://lmu.web.psi.ch/facilities/software/MusrRoot/Validation/MusrRootGPS.xsd");
   header->Set("RunInfo/Generator", "any2many");
-  header->Set("RunInfo/File Name", "thisIsAFileName");
+  header->Set("RunInfo/File Name", "deltat_tdc_gps_2871.root");
   header->Set("RunInfo/Run Title", "here comes the run title");
-  header->Set("RunInfo/Run Number", 577);
+  header->Set("RunInfo/Run Number", 2871);
 
   // run info - start/stop time and duration
-  TString startTime("2011-04-19 14:25:22"), stopTime("2011-04-19 19:13:47");
+  TString startTime("2012-04-19 14:25:22"), stopTime("2012-04-19 19:13:47");
   struct tm tm_start, tm_stop;
   header->Set("RunInfo/Run Start Time", startTime);
   header->Set("RunInfo/Run Stop Time", stopTime);
@@ -78,17 +79,18 @@ int main(int argc, char *argv[])
   memset(&tm_stop, 0, sizeof(tm_stop));
   strptime(stopTime.Data(), "%Y-%m-%d %H:%M:%S", &tm_stop);
   Double_t duration = difftime(mktime(&tm_stop), mktime(&tm_start));
-  header->Set("RunInfo/Run Duration", (Int_t)duration);
+  prop.Set("Run Duration", (Int_t)duration, "sec");
+  header->Set("RunInfo/Run Duration", prop);
 
   header->Set("RunInfo/Laboratory", "PSI");
-  header->Set("RunInfo/Area", "piM3.2");
   header->Set("RunInfo/Instrument", "GPS");
 
   prop.Set("Muon Beam Momentum", 28.1, "MeV/c");
   header->Set("RunInfo/Muon Beam Momentum", prop);
 
   header->Set("RunInfo/Muon Species", "positive muon");
-  header->Set("RunInfo/Setup", "a very special setup");
+  header->Set("RunInfo/Muon Source", "target M");
+  header->Set("RunInfo/Setup", "a very special setup with Heliox");
   header->Set("RunInfo/Comment", "nothing more to be said");
   header->Set("RunInfo/Sample Name", "the best ever");
 
@@ -100,40 +102,64 @@ int main(int argc, char *argv[])
 
   header->Set("RunInfo/No of Histos", 4);
 
-  TStringVector detectorName;
-  detectorName.push_back("forward");
-  detectorName.push_back("top");
-  detectorName.push_back("backward");
-  detectorName.push_back("bottom");
-  header->Set("RunInfo/Histo Names", detectorName);
-
-  header->Set("RunInfo/Histo Length", 8192);
-
   prop.Set("Time Resolution", 0.1953125, "ns", "TDC 9999");
   header->Set("RunInfo/Time Resolution", prop);
 
-  TDoubleVector t0;
-  TIntVector ivec;
-  for (UInt_t i=0; i<4; i++) t0.push_back(215.0+5.0*(Double_t)rand()/(Double_t)RAND_MAX);
-  header->Set("RunInfo/Time Zero Bin", t0);
-  for (UInt_t i=0; i<4; i++) ivec.push_back((Int_t)t0[i] + 12);
-  header->Set("RunInfo/First Good Bin", ivec);
-  for (UInt_t i=0; i<4; i++) ivec[i] = 8191;
-  header->Set("RunInfo/Last Good Bin", ivec);
+  header->Set("DetectorInfo/Detector000/Name", "Left - NPP");
+  header->Set("DetectorInfo/Detector000/Histo Number", 0);
+  header->Set("DetectorInfo/Detector000/Histo Length", 66661);
+  header->Set("DetectorInfo/Detector000/Time Zero Bin", 3419.0);
+  header->Set("DetectorInfo/Detector000/First Good Bin", 3419);
+  header->Set("DetectorInfo/Detector000/Last Good Bin", 66661);
 
-  TIntVector readGreenOffset;
-  readGreenOffset.push_back(0);
-  readGreenOffset.push_back(10);
-  readGreenOffset.push_back(20);
-  readGreenOffset.push_back(30);
-  header->Set("RunInfo/Red-Green Offsets", readGreenOffset);
+  header->Set("DetectorInfo/Detector001/Name", "Top - NPP");
+  header->Set("DetectorInfo/Detector001/Histo Number", 1);
+  header->Set("DetectorInfo/Detector001/Histo Length", 66661);
+  header->Set("DetectorInfo/Detector001/Time Zero Bin", 3419.0);
+  header->Set("DetectorInfo/Detector001/First Good Bin", 3419);
+  header->Set("DetectorInfo/Detector001/Last Good Bin", 66661);
 
-  TStringVector redGreenDescription;
-  redGreenDescription.push_back("E-field/light off/off");
-  redGreenDescription.push_back("E-field/light on/off");
-  redGreenDescription.push_back("E-field/light off/on");
-  redGreenDescription.push_back("E-field/light on/on");
-  header->Set("RunInfo/Red-Green Description", redGreenDescription);
+  header->Set("DetectorInfo/Detector002/Name", "Right - NPP");
+  header->Set("DetectorInfo/Detector002/Histo Number", 2);
+  header->Set("DetectorInfo/Detector002/Histo Length", 66661);
+  header->Set("DetectorInfo/Detector002/Time Zero Bin", 3419.0);
+  header->Set("DetectorInfo/Detector002/First Good Bin", 3419);
+  header->Set("DetectorInfo/Detector002/Last Good Bin", 66661);
+
+  header->Set("DetectorInfo/Detector003/Name", "Bottom - NPP");
+  header->Set("DetectorInfo/Detector003/Histo Number", 3);
+  header->Set("DetectorInfo/Detector003/Histo Length", 66661);
+  header->Set("DetectorInfo/Detector003/Time Zero Bin", 3419.0);
+  header->Set("DetectorInfo/Detector003/First Good Bin", 3419);
+  header->Set("DetectorInfo/Detector003/Last Good Bin", 66661);
+
+  header->Set("DetectorInfo/Detector004/Name", "Left - PPC");
+  header->Set("DetectorInfo/Detector004/Histo Number", 20);
+  header->Set("DetectorInfo/Detector004/Histo Length", 66661);
+  header->Set("DetectorInfo/Detector004/Time Zero Bin", 3419.0);
+  header->Set("DetectorInfo/Detector004/First Good Bin", 3419);
+  header->Set("DetectorInfo/Detector004/Last Good Bin", 66661);
+
+  header->Set("DetectorInfo/Detector005/Name", "Top - PPC");
+  header->Set("DetectorInfo/Detector005/Histo Number", 21);
+  header->Set("DetectorInfo/Detector005/Histo Length", 66661);
+  header->Set("DetectorInfo/Detector005/Time Zero Bin", 3419.0);
+  header->Set("DetectorInfo/Detector005/First Good Bin", 3419);
+  header->Set("DetectorInfo/Detector005/Last Good Bin", 66661);
+
+  header->Set("DetectorInfo/Detector006/Name", "Right - PPC");
+  header->Set("DetectorInfo/Detector006/Histo Number", 22);
+  header->Set("DetectorInfo/Detector006/Histo Length", 66661);
+  header->Set("DetectorInfo/Detector006/Time Zero Bin", 3419.0);
+  header->Set("DetectorInfo/Detector006/First Good Bin", 3419);
+  header->Set("DetectorInfo/Detector006/Last Good Bin", 66661);
+
+  header->Set("DetectorInfo/Detector007/Name", "Bottom - PPC");
+  header->Set("DetectorInfo/Detector007/Histo Number", 23);
+  header->Set("DetectorInfo/Detector007/Histo Length", 66661);
+  header->Set("DetectorInfo/Detector007/Time Zero Bin", 3419.0);
+  header->Set("DetectorInfo/Detector007/First Good Bin", 3419);
+  header->Set("DetectorInfo/Detector007/Last Good Bin", 66661);
 
   TStringVector scHistoNames;
   scHistoNames.push_back("Sample Temperature");
@@ -167,21 +193,12 @@ int main(int argc, char *argv[])
   header->Set("SampleEnvironmentInfo/Dummy Prop", prop);
 
   // magnetic field environment
-  header->Set("MagneticFieldEnvironmentInfo/Name", "Bpar");
+  header->Set("MagneticFieldEnvironmentInfo/Magnet Name", "Bpar");
   prop.Set("Current", 1.34, "A");
   header->Set("MagneticFieldEnvironmentInfo/Current", prop);
 
-  // detector forward
-  header->Set("Detectors/Detector000/Name", "forward");
-  header->Set("Detectors/Detector000/Histo Number", 0);
-  header->Set("Detectors/Detector000/Histo Length", 8192);
-
-  // detector backward
-  header->Set("Detectors/Detector001/Name", "backward");
-  header->Set("Detectors/Detector001/Histo Number", 0);
-  header->Set("Detectors/Detector001/Histo Length", 8192);
-
   // beamline
+  header->Set("BeamlineInfo/Name", "piM3.2");
   header->Set("BeamlineInfo/WSX61a", "DAC = 3289, ADC = 0.800");
 
   TIntVector dummyInt;
@@ -203,8 +220,11 @@ int main(int argc, char *argv[])
   }
 
   // root file header related things
+/*
   TFolder *runHeader = gROOT->GetRootFolder()->AddFolder("RunHeader", "MusrRoot Run Header Info");
   gROOT->GetListOfBrowsables()->Add(runHeader, "RunHeader");
+*/
+  TFolder *runHeader = new TFolder("RunHeader", "MusrRoot Run Header Info");
 
   if (header->FillFolder(runHeader)) {
     runHeader->Write();

@@ -216,7 +216,7 @@ ClassImp(TMusrRunHeader)
   */
 TMusrRunHeader::TMusrRunHeader()
 {
-  fFileName = TString("n/a");
+  Init();
 }
 
 //--------------------------------------------------------------------------
@@ -227,7 +227,22 @@ TMusrRunHeader::TMusrRunHeader()
   */
 TMusrRunHeader::TMusrRunHeader(const char *fileName)
 {
-  fFileName = TString(fileName);
+  Init(TString(fileName));
+}
+
+//--------------------------------------------------------------------------
+// Init (private)
+//--------------------------------------------------------------------------
+/**
+  * <p>Initializer
+  *
+  * \param fileName file name of the caller.
+  */
+void TMusrRunHeader::Init(TString fileName)
+{
+  fFileName = fileName;
+  fVersion = TString("$Id$");
+  Set("RunInfo/Version", fVersion);
 }
 
 //--------------------------------------------------------------------------
@@ -237,6 +252,17 @@ TMusrRunHeader::TMusrRunHeader(const char *fileName)
   * <p>Destructor.
   */
 TMusrRunHeader::~TMusrRunHeader()
+{
+  CleanUp();
+}
+
+//--------------------------------------------------------------------------
+// CleanUp (private)
+//--------------------------------------------------------------------------
+/**
+  * <p>Clean up internal stuff.
+  */
+void TMusrRunHeader::CleanUp()
 {
   fStringObj.clear();
   fIntObj.clear();
@@ -333,172 +359,6 @@ Bool_t TMusrRunHeader::FillFolder(TFolder *folder)
 
   return true;
 }
-
-//--------------------------------------------------------------------------
-// GetHeaderInfo (public)
-//--------------------------------------------------------------------------
-/**
- * <p>Get MUSR-ROOT header information of 'path'.
- *
- * \param requestedPath of the MUSR-ROOT header, e.g. RunInfo
- * \param content of the requested MUSR-ROOT header.
- */
-/*
-void TMusrRunHeader::GetHeaderInfo(TString requestedPath, TObjArray &content)
-{
-  // make sure content is initialized
-  content.Delete();
-  content.Expand(0);
-  content.SetOwner(); // takes ownership of the attached objects!!
-
-  TString str(""), path(""), name(""), fmt(""), tstr("");
-  TObjString *tostr;
-  TMusrRunPhysicalQuantity prop;
-
-  for (UInt_t i=0; i<fPathNameOrder.size(); i++) {
-    if (fPathNameOrder[i].Contains(requestedPath)) {
-      // go through all objects and try to find it
-      // 1st check TString
-      for (UInt_t j=0; j<fStringObj.size(); j++) {
-        if (fStringObj[j].GetPathName() == fPathNameOrder[i]) { // found correct object
-          SplitPathName(fStringObj[j].GetPathName(), path, name);
-          str.Form("%03d - %s: %s -@%d", i, name.Data(), fStringObj[j].GetValue().Data(), MRH_TSTRING);
-          tostr = new TObjString(str);
-          content.AddLast(tostr);
-        }
-      }
-      // 2nd check Int_t
-      for (UInt_t j=0; j<fIntObj.size(); j++) {
-        if (fIntObj[j].GetPathName() == fPathNameOrder[i]) { // found correct object
-          SplitPathName(fIntObj[j].GetPathName(), path, name);
-          str.Form("%03d - %s: %d -@%d", i, name.Data(), fIntObj[j].GetValue(), MRH_INT);
-          tostr = new TObjString(str);
-          content.AddLast(tostr);
-        }
-      }
-      // 3rd check Double_t
-      for (UInt_t j=0; j<fDoubleObj.size(); j++) {
-        if (fDoubleObj[j].GetPathName() == fPathNameOrder[i]) { // found correct object
-          SplitPathName(fDoubleObj[j].GetPathName(), path, name);
-          fmt.Form("%%03d - %%s: %%.%dlf -@%%d", MRH_DOUBLE_PREC);
-          str.Form(fmt, i, name.Data(), fDoubleObj[j].GetValue(), MRH_DOUBLE);
-          tostr = new TObjString(str);
-          content.AddLast(tostr);
-        }
-      }
-      // 4th check TMusrRunPhysicalQuantity
-      for (UInt_t j=0; j<fMusrRunPhysQuantityObj.size(); j++) {
-        if (fMusrRunPhysQuantityObj[j].GetPathName() == fPathNameOrder[i]) { // found correct object
-          prop = fMusrRunPhysQuantityObj[j].GetValue();
-          Int_t digit, digit_d;
-          if ((prop.GetDemand() != MRH_UNDEFINED) && (prop.GetValue() != MRH_UNDEFINED) && (prop.GetError() != MRH_UNDEFINED) &&
-              (prop.GetUnit() != "n/a")) { // <value> +- <error> <unit>; SP: <demand> [; <description>]
-            digit = GetDecimalPlace(prop.GetError());
-            digit_d = GetLeastSignificantDigit(prop.GetDemand());
-            if (prop.GetDescription() != "n/a") {
-              fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit, digit_d);
-
-              tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(), prop.GetDemand(), prop.GetDescription().Data());
-            } else {
-              fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; SP: %%.%dlf", digit, digit, digit_d);
-              tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(), prop.GetDemand());
-            }
-          } else if ((prop.GetDemand() == MRH_UNDEFINED) && (prop.GetValue() != MRH_UNDEFINED) && (prop.GetError() != MRH_UNDEFINED) &&
-                     (prop.GetUnit() != "n/a")) { // <value> +- <error> <unit> [; <description>]
-            digit = GetDecimalPlace(prop.GetError());
-            if (prop.GetDescription() != "n/a") {
-              fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s; %%s", digit, digit);
-              tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data(), prop.GetDescription().Data());
-            } else {
-              fmt.Form("%%s: %%.%dlf +- %%.%dlf %%s", digit, digit);
-              tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetError(), prop.GetUnit().Data());
-            }
-          } else if ((prop.GetDemand() == MRH_UNDEFINED) && (prop.GetValue() != MRH_UNDEFINED) && (prop.GetError() == MRH_UNDEFINED) &&
-                     (prop.GetUnit() != "n/a")) { // <value> <unit> [; <description>]
-            digit = GetLeastSignificantDigit(prop.GetValue());
-            if (prop.GetDescription() != "n/a") {
-              fmt.Form("%%s: %%.%dlf %%s; %%s", digit);
-              tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data(), prop.GetDescription().Data());
-            } else {
-              fmt.Form("%%s: %%.%dlf %%s", digit);
-              tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data());
-            }
-          } else if ((prop.GetDemand() != MRH_UNDEFINED) && (prop.GetValue() != MRH_UNDEFINED) && (prop.GetError() == MRH_UNDEFINED) &&
-                     (prop.GetUnit() != "n/a")) { // <value> <unit>; SP: <demand> [; <description>]
-            digit = GetLeastSignificantDigit(prop.GetValue());
-            digit_d = GetLeastSignificantDigit(prop.GetDemand());
-            if (prop.GetDescription() != "n/a") {
-              fmt.Form("%%s: %%.%dlf %%s; SP: %%.%dlf; %%s", digit, digit_d);
-              tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data(), prop.GetDemand(), prop.GetDescription().Data());
-            } else {
-              fmt.Form("%%s: %%.%dlf %%s; SP: %%.%dlf", digit, digit_d);
-              tstr.Form(fmt, prop.GetLabel().Data(), prop.GetValue(), prop.GetUnit().Data(), prop.GetDemand());
-            }
-          }
-          str.Form("%03d - %s -@%d", i, tstr.Data(), MRH_TMUSR_RUN_PHYSICAL_QUANTITY);
-          tostr = new TObjString(str);
-          content.AddLast(tostr);
-        }
-      }
-      // 5th check TStringVector
-      for (UInt_t j=0; j<fStringVectorObj.size(); j++) {
-        if (fStringVectorObj[j].GetPathName() == fPathNameOrder[i]) { // found correct object
-          SplitPathName(fStringVectorObj[j].GetPathName(), path, name);
-          str.Form("%03d - %s: ", i, name.Data());
-          TStringVector vstr = fStringVectorObj[j].GetValue();
-          for (UInt_t k=0; k<vstr.size()-1; k++)
-            str += vstr[k] + "; ";
-          str += vstr[vstr.size()-1];
-          str += " -@";
-          str += MRH_TSTRING_VECTOR;
-          tostr = new TObjString(str);
-          content.AddLast(tostr);
-        }
-      }
-      // 6th check TIntVector
-      for (UInt_t j=0; j<fIntVectorObj.size(); j++) {
-        if (fIntVectorObj[j].GetPathName() == fPathNameOrder[i]) { // found correct object
-          SplitPathName(fIntVectorObj[j].GetPathName(), path, name);
-          str.Form("%03d - %s: ", i, name.Data());
-          TIntVector vint = fIntVectorObj[j].GetValue();
-          for (UInt_t k=0; k<vint.size()-1; k++) {
-            str += vint[k];
-            str += "; ";
-          }
-          str += vint[vint.size()-1];
-          str += " -@";
-          str += MRH_INT_VECTOR;
-          tostr = new TObjString(str);
-          content.AddLast(tostr);
-        }
-      }
-      // 7th check TDoubleVector
-      for (UInt_t j=0; j<fDoubleVectorObj.size(); j++) {
-        if (fDoubleVectorObj[j].GetPathName() == fPathNameOrder[i]) { // found correct object
-          SplitPathName(fDoubleVectorObj[j].GetPathName(), path, name);
-          str.Form("%03d - %s: ", i, name.Data());
-          TDoubleVector dvec = fDoubleVectorObj[j].GetValue();
-          TString subStr("");
-          fmt.Form("%%.%dlf", MRH_DOUBLE_PREC);
-          for (UInt_t k=0; k<dvec.size()-1; k++) {
-            subStr.Form(fmt, dvec[k]);
-            str += subStr;
-            str += "; ";
-          }
-          subStr.Form(fmt, dvec.size()-1);
-          str += subStr;
-          str += " -@";
-          str += MRH_DOUBLE_VECTOR;
-          tostr = new TObjString(str);
-          content.AddLast(tostr);
-        }
-      }
-    }
-  }
-
-  content.SetName(requestedPath);
-}
-*/
 
 //--------------------------------------------------------------------------
 // GetValue (public)
@@ -899,6 +759,9 @@ Bool_t TMusrRunHeader::ExtractAll(TFolder *folder)
 {
   TIter next(folder->GetListOfFolders());
   TObjArray* entry;
+
+  // clean up all internal structures - just in case this is called multiple times
+  CleanUp();
 
   while ((entry = (TObjArray*)next())) {
     ExtractHeaderInformation(entry, entry->GetName());

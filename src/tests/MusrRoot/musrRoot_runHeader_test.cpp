@@ -84,6 +84,7 @@ int main(int argc, char *argv[])
   TString str("");
   TStringVector strVec;
   Int_t ival;
+  Double_t dval;
   TDoubleVector dvec;
   TMusrRunPhysicalQuantity prop;
   Bool_t ok;
@@ -100,28 +101,6 @@ int main(int argc, char *argv[])
   else
     cout << endl << "**ERROR** Couldn't obtain the 'Run Number'.";
 
-  header->GetValue("RunInfo/Histo Names", strVec, ok);
-  if (ok) {
-    cout << endl << "Histo Names: ";
-    for (UInt_t i=0; i<strVec.size()-1; i++) {
-      cout << strVec[i].Data() << ", ";
-    }
-    cout << strVec[strVec.size()-1].Data();
-  } else {
-    cout << endl << "**ERROR** Couldn't obtain the 'Histo Names'.";
-  }
-
-  header->GetValue("RunInfo/Time Zero Bin", dvec, ok);
-  if (ok) {
-    cout << endl << "Time Zero Bin: ";
-    for (UInt_t i=0; i<dvec.size()-1; i++) {
-      cout << dvec[i] << ", ";
-    }
-    cout << dvec[dvec.size()-1];
-  } else {
-    cout << endl << "**ERROR** Couldn't obtain the 'Time Zero Bin'.";
-  }
-
   header->GetValue("RunInfo/Sample Temperature", prop, ok);
   if (ok) {
     cout << endl << "Sample Temperature: " << prop.GetValue() << " +- " << prop.GetError() << " " << prop.GetUnit().Data() << "; SP: " << prop.GetDemand() << "; " << prop.GetDescription().Data();
@@ -129,11 +108,46 @@ int main(int argc, char *argv[])
     cout << endl << "**ERROR** Couldn't obtain the 'Sample Temperature'.";
   }
 
-  header->GetValue("Detectors/Detector000/Name", str, ok);
+  header->GetValue("DetectorInfo/Detector000/Name", str, ok);
   if (ok) {
-    cout << endl << "Detectors/Detector000: Name=" << str;
+    cout << endl << "DetectorInfo/Detector000: Name=" << str;
   } else {
     cout << endl << "**ERROR** Couldn't obtain 'Detector/Detector000/Name'.";
+  }
+
+  header->GetValue("DetectorInfo/Detector000/Histo Number", ival, ok);
+  if (ok) {
+    cout << endl << "DetectorInfo/Detector000: Histo Number=" << ival;
+  } else {
+    cout << endl << "**ERROR** Couldn't obtain 'Detector/Detector000/Histo Number'.";
+  }
+
+  header->GetValue("DetectorInfo/Detector000/Histo Length", ival, ok);
+  if (ok) {
+    cout << endl << "DetectorInfo/Detector000: Histo Length=" << ival;
+  } else {
+    cout << endl << "**ERROR** Couldn't obtain 'Detector/Detector000/Histo Length'.";
+  }
+
+  header->GetValue("DetectorInfo/Detector000/Time Zero Bin", dval, ok);
+  if (ok) {
+    cout << endl << "DetectorInfo/Detector000: Time Zero Bin=" << dval;
+  } else {
+    cout << endl << "**ERROR** Couldn't obtain 'Detector/Detector000/Time Zero Bin'.";
+  }
+
+  header->GetValue("DetectorInfo/Detector000/First Good Bin", ival, ok);
+  if (ok) {
+    cout << endl << "DetectorInfo/Detector000: First Good Bin=" << ival;
+  } else {
+    cout << endl << "**ERROR** Couldn't obtain 'Detector/Detector000/First Good Bin'.";
+  }
+
+  header->GetValue("DetectorInfo/Detector000/Last Good Bin", ival, ok);
+  if (ok) {
+    cout << endl << "DetectorInfo/Detector000: Last Good Bin=" << ival;
+  } else {
+    cout << endl << "**ERROR** Couldn't obtain 'Detector/Detector000/Last Good Bin'.";
   }
 
   cout << endl << endl;
