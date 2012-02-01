@@ -146,11 +146,11 @@ PFunctionHandler::PFunctionHandler(vector<string> lines)
 
   fValid = MapsAreValid();
 
-if (fValid) {
-  cout << endl << "Functions: ";
-  for (unsigned int i=0; i<fLines.size(); i++)
-    cout << endl << fLines[i];
-}
+  if (fValid) {
+    cout << endl << "Functions: ";
+    for (unsigned int i=0; i<fLines.size(); i++)
+      cout << endl << fLines[i];
+  }
 }
 
 //-------------------------------------------------------------
@@ -308,6 +308,8 @@ bool PFunctionHandler::ReadFile()
   while ( !f.eof() && !done) {
     f.getline(c_line, 128); // line of text excluding '\n'
     line = c_line;
+    size_t pos = line.find('\r');
+    line.resize(pos);
     if (line.find("#") == 0) // comment hence ignore
       continue;
     boost::to_upper(line);
@@ -367,11 +369,11 @@ bool PFunctionHandler::ReadFile()
     success = false;
   }
 
-if (success) {
-  cout << endl << "Functions: ";
-  for (unsigned int i=0; i<fLines.size(); i++)
-    cout << endl << fLines[i];
-}
+  if (success) {
+    cout << endl << "Functions: ";
+    for (unsigned int i=0; i<fLines.size(); i++)
+      cout << endl << fLines[i];
+  }
 
   return success;
 }

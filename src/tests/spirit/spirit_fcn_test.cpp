@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include <iostream>
 #include <string>
 using namespace std;
@@ -81,7 +83,6 @@ int main(int argc, char *argv[])
   } else {
     vector<string> lines;
     handle_input(lines);
-cout << endl << "lines.size() = " << lines.size();
     fcnHandler = new PFunctionHandler(lines);
   }
 

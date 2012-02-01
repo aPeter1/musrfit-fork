@@ -35,8 +35,15 @@
 #include <vector>
 #include <string>
 
-#include <boost/spirit/tree/ast.hpp>
-using namespace boost::spirit;
+#include <boost/version.hpp>
+
+#if BOOST_VERSION >= 103800
+#  include <boost/spirit/include/classic_ast.hpp>
+   using namespace BOOST_SPIRIT_CLASSIC_NS;
+#else
+#  include <boost/spirit/tree/ast.hpp>
+   using namespace boost::spirit;
+#endif
 
 #include "PFunctionGrammar.h"
 

@@ -37,6 +37,7 @@ using namespace std;
 
 //#define BOOST_SPIRIT_DEBUG
 
+#include <boost/version.hpp>
 #include <boost/spirit/version.hpp>
 
 #if BOOST_VERSION >= 103800
