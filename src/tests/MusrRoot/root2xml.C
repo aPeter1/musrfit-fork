@@ -47,11 +47,62 @@ void root2xml(const char *filename, const char *xmlFilename)
 
   xml_data.push_back("</MusrRoot>");
 
+  // the sort_histo_folders is needed since XML-Schema is not flexible enough to handle
+  // histos -|
+  //         |- DecayAnaModule
+  //         ... (any other analyzer module sub-folder
+  //         |- SCAnaModule
+  // Hence SCAnaModule has artificially moved up, just to follow DecayAnaModule
+  sort_histo_folders();
+
   ofstream fout(xmlFilename);
 
   for (UInt_t i=0; i<xml_data.size(); i++)
     fout << xml_data[i] << endl;
   fout.close();
+}
+
+void sort_histo_folders()
+{
+  vector<string> temp_xml_data;
+
+  // first make a copy of the original xml_data
+  for (unsigned int i=0; i<xml_data.size(); i++)
+    temp_xml_data.push_back(xml_data[i]);
+
+  // remove SCAnaModule from temp_xml_data
+  unsigned int start = 0, end = 0;
+  for (unsigned int i=0; i<temp_xml_data.size(); i++) {
+    if (temp_xml_data[i].find("<SCAnaModule>") != string::npos)
+      start = i;
+    if (temp_xml_data[i].find("</SCAnaModule>") != string::npos)
+      end = i+1;
+  }
+  if ((start > 0) && (end > 0))
+    temp_xml_data.erase(temp_xml_data.begin()+start, temp_xml_data.begin()+end);
+  else // no SCAnaModule present, hence nothing to be done
+    return;
+
+  // insert SCAnaModule just after DecayAnaModule
+  // 1st find end of DecayAnaModule
+  unsigned int pos = 0;
+  for (unsigned int i=0; i<temp_xml_data.size(); i++) {
+    if (temp_xml_data[i].find("</DecayAnaModule>") != string::npos) {
+      pos = i+1;
+      break;
+    }
+  }
+  if (pos == 0) // something is wrong, hence to not do anything
+    return;
+  temp_xml_data.insert(temp_xml_data.begin()+pos, xml_data.begin()+start, xml_data.begin()+end);
+
+  // copy temp_xml_data back into xml_data
+  xml_data.clear();
+  for (unsigned int i=0; i<temp_xml_data.size(); i++)
+    xml_data.push_back(temp_xml_data[i]);
+
+  // clean up
+  temp_xml_data.clear();
 }
 
 void dumpFolder(TFolder *folder, UInt_t offset)

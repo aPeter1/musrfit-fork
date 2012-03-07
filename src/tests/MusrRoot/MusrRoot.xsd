@@ -16,28 +16,30 @@
   
   <xs:complexType name="musrRoot">
     <xs:sequence>
-      <xs:element name="histos" type="histosFolder"/>
+      <xs:element ref="histos"/>
       <xs:element name="RunHeader" type="runHeaderFolder"/>
       <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/> <!-- here can go any additional stuff you like -->
     </xs:sequence>  
   </xs:complexType>
     
-  <xs:complexType name="histosFolder">
+  <xs:element name="histos">
     <xs:annotation>
        <xs:documentation>
          The histos folder is containing potentially various subfolders. 
-          At least one subfolder, called DecayAnaModule, which holds the 
-          muSR decay histograms, must be present.
+         At least two subfolders, called DecayAnaModule, and SlowControlAnaModule,
+         which holds the muSR decay histograms, must be present.
       </xs:documentation>
     </xs:annotation>
       
-    <xs:sequence>
-      <xs:element name="DecayAnaModule" type="decayHistoData"/>
-      <xs:element name="SlowControlAnaModule" type="slowControlHistoData"/>
-      <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/> <!-- here can go any additional stuff you like --> 
-    </xs:sequence>
-  </xs:complexType>
-    
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="DecayAnaModule" type="decayHistoData"/>
+        <xs:element name="SCAnaModule" type="slowControlHistoData"/>
+        <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/> <!-- here can go any additional stuff you like -->
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+       
   <xs:complexType name="decayHistoData">
      <xs:sequence>
        <xs:element name="DecayHistoEntry" type="decayHistoEntry" minOccurs="1" maxOccurs="unbounded"/>
@@ -53,7 +55,7 @@
     
   <xs:simpleType name="histoName">
       <xs:restriction base="xs:string">
-        <xs:pattern value="hDecay([0-9]){3}"/> <!-- this means hDecayXXX, where XXX are 3 digits -->
+        <xs:pattern value="hDecay([0-9]){4}"/> <!-- this means hDecayXXX, where XXX are 3 digits -->
       </xs:restriction>
   </xs:simpleType>  
     
@@ -71,17 +73,11 @@
 
   <xs:complexType name="slowControlHistoEntry">
       <xs:sequence>
-        <xs:element name="SlowControlName" type="slowControlName"/>
+        <xs:element name="SlowControlName" type="xs:string"/>
         <xs:element name="SlowControlType" type="slowControlType"/>
       </xs:sequence>
   </xs:complexType>
-    
-  <xs:simpleType name="slowControlName">
-    <xs:restriction base="xs:string">
-      <xs:pattern value="h(\S)+"/>  <!-- this means 'h' followed by one or more characters without space, e.g. 'hTemperature1', but NOT 'hTemp 1'-->      
-    </xs:restriction> 
-  </xs:simpleType>
-    
+       
   <xs:simpleType name="slowControlType">
     <xs:restriction base="xs:string">
       <xs:pattern value="TH1F"/>  
