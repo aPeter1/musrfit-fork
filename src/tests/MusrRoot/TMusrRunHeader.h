@@ -32,6 +32,9 @@
 #ifndef TMUSRRUNHEADER_H
 #define TMUSRRUNHEADER_H
 
+#include <vector>
+using namespace std;
+
 #include <TDatime.h>
 #include <TObject.h>
 #include <TQObject.h>
@@ -122,8 +125,8 @@ private:
 class TMusrRunHeader : public TObject
 {
 public:
-  TMusrRunHeader();
-  TMusrRunHeader(const char *fileName);
+  TMusrRunHeader(bool quite=false);
+  TMusrRunHeader(const char *fileName, bool quite=false);
   virtual ~TMusrRunHeader();
 
   virtual TString GetFileName() { return fFileName; }
@@ -155,6 +158,7 @@ public:
   virtual void DrawHeader();
 
 private:
+  bool fQuite;
   TString fFileName;
   TString fVersion;
 
@@ -166,7 +170,7 @@ private:
   vector< TMusrRunObject<TIntVector> > fIntVectorObj;
   vector< TMusrRunObject<TDoubleVector> > fDoubleVectorObj;
 
-  vector< TString > fPathNameOrder; ///< keeps the path-name as they or set and hence its ordering
+  vector< TString > fPathNameOrder; ///< keeps the path-name as they were created in ordered to keep ordering
 
   virtual void Init(TString str="n/a");
   virtual void CleanUp();
@@ -179,13 +183,12 @@ private:
   virtual TString GetStrValue(TString str);
   virtual TString GetType(TString str);
 
-  virtual Int_t ObjectPresent(vector<TObjArray*> &content, TString &path);
+  virtual bool UpdateFolder(TObject *treeObj, TString path);
+  virtual TObject* FindObject(TObject *treeObj, TString path);
   virtual TObjString GetHeaderString(UInt_t idx);
 
-  virtual void RemoveFirst(TString &str, const char splitter);
+  virtual bool RemoveFirst(TString &str, const char splitter);
   virtual TString GetFirst(TString &str, const char splitter);
-  virtual void AddSubTrees(TObjArray *content, TString pathName);
-  virtual void SetSubTreeObject(TObjArray *content, TObjString ostr, Int_t idx);
 
   ClassDef(TMusrRunHeader, 1)
 };

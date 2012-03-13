@@ -135,7 +135,6 @@ void dumpObjArray(TObjArray *obj, UInt_t offset)
   xmlLabel = TString(obj->GetName());
   if (xmlLabel.BeginsWith("Detector")) {
     xmlLabel.Remove(0, 8); // remove 'Detector'
-    cout << endl << "debug>> xmlLablel=" << xmlLabel;
     if (xmlLabel.IsDigit())
       xmlLabel = "Detector";
     else
@@ -309,6 +308,11 @@ void getLabel(TString entry, TString &label)
   label.Remove(0, start+2);
   label.Remove(end-start-2, label.Length());
 
-  // replace spaces through underscores
-  label.ReplaceAll(' ', '_');
+  label.ReplaceAll(' ', '_'); // replace spaces through underscores
+  label.ReplaceAll('(', '_'); // replace '(' through underscores
+  label.ReplaceAll(')', '_'); // replace ')' through underscores
+  label.ReplaceAll('[', '_'); // replace '[' through underscores
+  label.ReplaceAll(']', '_'); // replace ']' through underscores
+  label.ReplaceAll('{', '_'); // replace '[' through underscores
+  label.ReplaceAll('}', '_'); // replace ']' through underscores
 }

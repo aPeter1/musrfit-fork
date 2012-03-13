@@ -220,10 +220,6 @@ int main(int argc, char *argv[])
   }
 
   // root file header related things
-/*
-  TFolder *runHeader = gROOT->GetRootFolder()->AddFolder("RunHeader", "MusrRoot Run Header Info");
-  gROOT->GetListOfBrowsables()->Add(runHeader, "RunHeader");
-*/
   TFolder *runHeader = new TFolder("RunHeader", "MusrRoot Run Header Info");
 
   if (header->FillFolder(runHeader)) {

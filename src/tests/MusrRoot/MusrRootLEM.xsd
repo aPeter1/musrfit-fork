@@ -2,10 +2,9 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"> 
   <xs:annotation>
     <xs:documentation>
-       This XSD document describes the muSR file structure for CERN/ROOT based files.
-       In the following it will be called MusrRoot.
-       It is currently the default standard for writting muSR data files at the 
-       Paul Scherrer Institute.
+       This XSD document describes the muSR file structure of CERN/ROOT based files for LEM.
+       In the following it will be called MusrRootLEM.
+       It is an extension of MusrRoot.xsd and describes the additional LEM specific entries.
           
         Author: Andreas Suter, andreas.suter@psi.ch          
         $Id$
@@ -35,6 +34,8 @@
       <xs:sequence>
         <xs:element name="DecayAnaModule" type="decayHistoData"/>
         <xs:element name="SCAnaModule" type="slowControlHistoData"/>
+        <xs:element name="TOFAnaModule" type="histoData"/>
+        <xs:element name="PileUpAnaModule" type="histoData"/>
         <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/> <!-- here can go any additional stuff you like -->
       </xs:sequence>
     </xs:complexType>
@@ -55,7 +56,7 @@
     
   <xs:simpleType name="histoName">
       <xs:restriction base="xs:string">
-        <xs:pattern value="hDecay([0-9]){3,}"/> <!-- this means hDecayXXX, where XXX are 3 digits -->
+        <xs:pattern value="hDecay([0-9]){3,}"/> <!-- this means hDecayXXX, where XXX are 3 digits or more -->
       </xs:restriction>
   </xs:simpleType>  
     
@@ -120,6 +121,11 @@
     	<xs:element name="No_of_Histos" type="Int_t"/>
     	<xs:element name="Time_Resolution" type="TMusrRunPhysicalQuantity"/>
       <xs:element name="RedGreen_Offsets" type="TIntVector"/>
+      <xs:element name="Moderator" type="TString"/>
+      <xs:element name="Moderator_HV" type="TMusrRunPhysicalQuantity"/>
+      <xs:element name="Sample_HV" type="TMusrRunPhysicalQuantity"/>
+      <xs:element name="Implantation_Energy" type="TMusrRunPhysicalQuantity"/>
+      <xs:element name="Cuts" type="TString"/>
       <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/> <!-- here can go any additional stuff you like -->
     </xs:sequence>
   </xs:complexType>
@@ -189,7 +195,27 @@
   <xs:complexType name="beamlineInfo">
     <xs:sequence>
     	<xs:element name="Name" type="TString"/>
+      <xs:element name="Beamline_Settings" type="TString"/>
       <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/> <!-- here can go any additional stuff you like -->          
     </xs:sequence>
   </xs:complexType>
+  
+  <xs:complexType name="histoData">
+    <xs:sequence>
+      <xs:element name="Entry" type="histoEntry" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence> 
+  </xs:complexType>
+  
+  <xs:complexType name="histoEntry">
+    <xs:sequence>
+      <xs:element name="Name" type="xs:string"/>
+      <xs:element name="Type" type="rootHistoType"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:simpleType name="rootHistoType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="TH([1-2])F"/> <!-- this means TH1F or TH2F -->      
+    </xs:restriction>
+  </xs:simpleType>
 </xs:schema>

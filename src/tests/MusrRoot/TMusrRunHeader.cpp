@@ -213,8 +213,10 @@ ClassImp(TMusrRunHeader)
 //--------------------------------------------------------------------------
 /**
   * <p>Constructor.
+  *
+  * \param quite if set to true, warnings will be omited. Default is false.
   */
-TMusrRunHeader::TMusrRunHeader()
+TMusrRunHeader::TMusrRunHeader(bool quite) : fQuite(quite)
 {
   Init();
 }
@@ -224,9 +226,13 @@ TMusrRunHeader::TMusrRunHeader()
 //--------------------------------------------------------------------------
 /**
   * <p>Constructor.
+  *
+  * \param fileName file name of the MusrRoot file.
+  * \param quite if set to true, warnings will be omited. Default is false.
   */
-TMusrRunHeader::TMusrRunHeader(const char *fileName)
+TMusrRunHeader::TMusrRunHeader(const char *fileName, bool quite)
 {
+  fQuite = quite;
   Init(TString(fileName));
 }
 
@@ -243,6 +249,11 @@ void TMusrRunHeader::Init(TString fileName)
   fFileName = fileName;
   fVersion = TString("$Id$");
   Set("RunInfo/Version", fVersion);
+  Set("RunInfo/Generic Validator URL", "http://lmu.web.psi.ch/facilities/software/MusrRoot/validation/MusrRoot.xsd");
+  Set("DetectorInfo/Detector000/Name", "n/a");
+  Set("SampleEnvironmentInfo/Cryo", "n/a");
+  Set("MagneticFieldEnvironmentInfo/Magnet Name", "n/a");
+  Set("BeamlineInfo/Name", "n/a");
 }
 
 //--------------------------------------------------------------------------
@@ -280,82 +291,67 @@ void TMusrRunHeader::CleanUp()
 //--------------------------------------------------------------------------
 /**
  * <p>Fills the RunHeader folder. This is needed to write it to a ROOT file.
- * It walks through all information and attaches it to folder.
+ * It walks through all information and attaches it to the folder or replaces
+ * it, if it is already present.
  *
  * \param folder to be filled
  */
 Bool_t TMusrRunHeader::FillFolder(TFolder *folder)
 {
-  TObjArray  *oarray, *tokens;
-  vector<TObjArray*> content;
-  TObjString ostr;
-  TString path, name, pathName;
+  TObjArray  *oarray;
+  TObjString ostr, *p_ostr;
+  TString path, name, str;
+  Ssiz_t pos=0;
+  bool found=false;
 
   if (folder == 0) {
     cerr << endl << ">> TMusrRunHeader::FillFolder(): **ERROR** folder == 0!!" << endl;
     return false;
   }
 
-  folder->SetOwner(); // folder takes ownership of all added objects!
+  folder->SetOwner(); // folder takes ownership of all added objects! This means that the folder object does the cleanup
 
+  // update/generate tree structure in folder
   for (UInt_t i=0; i<fPathNameOrder.size(); i++) {
-    tokens = fPathNameOrder[i].Tokenize('/');
-    if (tokens == 0) {
-      cout << endl << ">> TMusrRunHeader::FillFolder(): **ERROR** couldn't tokenize string " << fPathNameOrder[i] << endl;
+    path=fPathNameOrder[i];
+
+    if (!UpdateFolder(folder, path))
+      return false;
+  }
+
+  // update/generate tree content
+  for (UInt_t i=0; i<fPathNameOrder.size(); i++) {
+    path=fPathNameOrder[i];
+    pos = path.Last('/');
+    if (pos == -1) {
+      cerr << endl << ">> TMusrRunHeader::FillFolder(): **ERROR** somethig is wrong with the path=" << path << " !!" << endl;
+      return false;
+    }
+    path.Remove(pos); // remove the value from the path
+
+    oarray = (TObjArray*)FindObject(folder, path);
+    if (!oarray) {
+      cerr << endl << ">> TMusrRunHeader::FillFolder(): **ERROR** couldn't create header structure!!" << endl;
       return false;
     }
 
-    Int_t idx;
-    if (tokens->GetEntries() == 2) { // <path>/<value>
-      path = ((TObjString*)tokens->At(0))->GetString();
-      idx = ObjectPresent(content, path);
-      if (idx == -1) {
-        // add object array
-        oarray = new TObjArray();
-        oarray->SetName(path);
-        content.push_back(oarray);
-        idx = content.size()-1;
+    // check if <value> is already found in oarray
+    ostr = GetHeaderString(i); // encode the string for the MusrRoot file
+    name = ostr.GetString(); // convert to TString
+    str = GetFirst(name, ':'); // get the first part of the encoded string, i.e. <nnn> - <name>
+    found = false;
+    for (Int_t j=0; j<oarray->GetEntriesFast(); j++) {
+      p_ostr = (TObjString*) oarray->At(j);
+      if (p_ostr->GetString().BeginsWith(str)) { // present hence replace
+        oarray->AddAt(ostr.Clone(), j);
+        found = true;
+        break;
       }
-      // add value
-      ostr = GetHeaderString(i);
-      content[idx]->AddLast(ostr.Clone());
-    } else { // <path>/../<path>/<value>
-      path = ((TObjString*)tokens->At(0))->GetString();
-      idx = ObjectPresent(content, path);
-      if (idx == -1) {
-        // add object array
-        oarray = new TObjArray();
-        oarray->SetName(path);
-        content.push_back(oarray);
-        idx = content.size()-1;
-      }
-
-      // add necessary sub object arrays
-      pathName = fPathNameOrder[i];
-      RemoveFirst(pathName, '/');
-      AddSubTrees(content[idx], pathName);
-
-      // get header string
-      ostr = GetHeaderString(i);
-
-      // set object string on the right position within content
-      SetSubTreeObject(content[idx], ostr, i);
     }
-
-    // clean up
-    if (tokens) {
-      delete tokens;
-      tokens = 0;
+    if (!found) {
+      oarray->AddLast(ostr.Clone());
     }
   }
-
-  // fill folder with all run header information
-  for (UInt_t i=0; i<content.size(); i++) {
-    folder->Add(content[i]);
-  }
-
-  // clean up
-  content.clear();
 
   return true;
 }
@@ -525,11 +521,12 @@ void TMusrRunHeader::GetValue(TString pathName, TDoubleVector &value, Bool_t &ok
  */
 void TMusrRunHeader::Set(TString pathName, TString value)
 {
-  // check if pathName is already set, and if not add it as a new entry
+  // check if pathName is already set, if not add it as a new entry, otherwise replace it
   UInt_t i=0;
   for (i=0; i<fStringObj.size(); i++) {
     if (!fStringObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
-      cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
+      if (!fQuite)
+        cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
       fStringObj[i].SetType("TString");
       fStringObj[i].SetValue(value);
       break;
@@ -558,11 +555,12 @@ void TMusrRunHeader::Set(TString pathName, TString value)
  */
 void TMusrRunHeader::Set(TString pathName, Int_t value)
 {
-  // check if pathName is already set, and if not add it as a new entry
+  // check if pathName is already set, if not add it as a new entry, otherwise replace it
   UInt_t i=0;
   for (i=0; i<fIntObj.size(); i++) {
     if (!fIntObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
-      cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
+      if (!fQuite)
+        cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
       fIntObj[i].SetType("Int_t");
       fIntObj[i].SetValue(value);
       break;
@@ -591,11 +589,12 @@ void TMusrRunHeader::Set(TString pathName, Int_t value)
  */
 void TMusrRunHeader::Set(TString pathName, Double_t value)
 {
-  // check if pathName is already set, and if not add it as a new entry
+  // check if pathName is already set, if not add it as a new entry, otherwise replace it
   UInt_t i=0;
   for (i=0; i<fDoubleObj.size(); i++) {
     if (!fDoubleObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
-      cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
+      if (!fQuite)
+        cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
       fDoubleObj[i].SetType("Double_t");
       fDoubleObj[i].SetValue(value);
       break;
@@ -624,11 +623,12 @@ void TMusrRunHeader::Set(TString pathName, Double_t value)
  */
 void TMusrRunHeader::Set(TString pathName, TMusrRunPhysicalQuantity value)
 {
-  // check if pathName is already set, and if not add it as a new entry
+  // check if pathName is already set, if not add it as a new entry, otherwise replace it
   UInt_t i=0;
   for (i=0; i<fMusrRunPhysQuantityObj.size(); i++) {
     if (!fMusrRunPhysQuantityObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
-      cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
+      if (!fQuite)
+        cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
       fMusrRunPhysQuantityObj[i].SetType("TMusrRunHeader");
       fMusrRunPhysQuantityObj[i].SetValue(value);
       break;
@@ -657,11 +657,12 @@ void TMusrRunHeader::Set(TString pathName, TMusrRunPhysicalQuantity value)
  */
 void TMusrRunHeader::Set(TString pathName, TStringVector value)
 {
-  // check if pathName is already set, and if not add it as a new entry
+  // check if pathName is already set, if not add it as a new entry, otherwise replace it
   UInt_t i=0;
   for (i=0; i<fStringVectorObj.size(); i++) {
     if (!fStringVectorObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
-      cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
+      if (!fQuite)
+        cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
       fStringVectorObj[i].SetType("TStringVector");
       fStringVectorObj[i].SetValue(value);
       break;
@@ -690,11 +691,12 @@ void TMusrRunHeader::Set(TString pathName, TStringVector value)
  */
 void TMusrRunHeader::Set(TString pathName, TIntVector value)
 {
-  // check if pathName is already set, and if not add it as a new entry
+  // check if pathName is already set, if not add it as a new entry, otherwise replace it
   UInt_t i=0;
   for (i=0; i<fIntVectorObj.size(); i++) {
     if (!fIntVectorObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
-      cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
+      if (!fQuite)
+        cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
       fIntVectorObj[i].SetType("TIntVector");
       fIntVectorObj[i].SetValue(value);
       break;
@@ -723,11 +725,12 @@ void TMusrRunHeader::Set(TString pathName, TIntVector value)
  */
 void TMusrRunHeader::Set(TString pathName, TDoubleVector value)
 {
-  // check if pathName is already set, and if not add it as a new entry
+  // check if pathName is already set, if not add it as a new entry, otherwise replace it
   UInt_t i=0;
   for (i=0; i<fDoubleVectorObj.size(); i++) {
     if (!fDoubleVectorObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
-      cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
+      if (!fQuite)
+        cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
       fDoubleVectorObj[i].SetType("TDoubleVector");
       fDoubleVectorObj[i].SetValue(value);
       break;
@@ -1365,23 +1368,89 @@ TString TMusrRunHeader::GetType(TString str)
 }
 
 //--------------------------------------------------------------------------
-// ObjectPresent (private)
+// UpdateFolder (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Update folder structure
  *
- * \param content
- * \param path
+ * <p><b>return:</b>
+ * - true if everything is all right
+ * - false otherwise
+ *
+ * \param treeObj to be updated
+ * \param path to be added within 'treeObj'
  */
-Int_t TMusrRunHeader::ObjectPresent(vector<TObjArray*> &content, TString &path)
+bool TMusrRunHeader::UpdateFolder(TObject *treeObj, TString path)
 {
-  for (UInt_t i=0; i<content.size(); i++) {
-    if (content[i]->GetName() == path) {
-      return (Int_t)i;
-    }
+  if (path.First('/') == -1) // only value element left, hence nothing to be done
+    return true;
+
+  TString str = GetFirst(path, '/');
+
+  TObject *obj = treeObj->FindObject(str);
+
+  // remove the first path element
+  if (!RemoveFirst(path, '/')) {
+    cerr << endl << ">> TMusrRunHeader::FillFolder(): **ERROR** couldn't tokenize path!!" << endl;
+    return false;
   }
 
-  return -1;
+  if (!obj) { // required object not present, create it
+    TObjArray *oarray = new TObjArray();
+    if (!oarray) {
+      cerr << endl << ">> TMusrRunHeader::FillFolder(): **ERROR** couldn't create header structure!!" << endl;
+      return false;
+    }
+    // set the name of the new TObjArray
+    oarray->SetName(str);
+
+    if (!strcmp(treeObj->ClassName(), "TFolder"))
+      ((TFolder*)treeObj)->Add(oarray);
+    else // it is a TObjArray
+      ((TObjArray*)treeObj)->AddLast(oarray);
+
+    return UpdateFolder(oarray, path);
+  } else { // object present, hence check rest of the path
+    return UpdateFolder(obj, path);
+  }
+}
+
+//--------------------------------------------------------------------------
+// FindObject (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Check if 'path' is present in 'treeObj'
+ *
+ * <p><b>return:</b>
+ * - pointer to the 'path' object if present
+ * - otherwise return 0
+ *
+ * \param treeObj to be searched
+ * \param path searched for within 'treeObj'
+ */
+TObject* TMusrRunHeader::FindObject(TObject *treeObj, TString path)
+{
+  Ssiz_t pos;
+  TObject *obj=0;
+
+  // make sure that treeObj is either TFolder or TObjArray
+  if (strcmp(treeObj->ClassName(), "TFolder") && strcmp(treeObj->ClassName(), "TObjArray"))
+    return obj;
+
+  pos = path.First('/');
+  if (pos == -1) { // i.e. no sub-paths anymore
+    obj = treeObj->FindObject(path);
+    return obj;
+  } else { // sub-paths present
+    TString objName = GetFirst(path, '/'); // get first token of the path <objName0>/<objName1>/.../<objNameN>
+    obj = treeObj->FindObject(objName);
+    if (obj) { // object found, check for subPath object
+      RemoveFirst(path, '/'); // remove first tokens of the path
+      return FindObject(obj, path);
+    } else { // object not found
+      return obj;
+    }
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -1536,22 +1605,36 @@ TObjString TMusrRunHeader::GetHeaderString(UInt_t idx)
 // RemoveFirst (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Removes the first junk of a string up to 'splitter'. If 'splitter' is
+ * NOT present in the string, the string stays untouched and the routine
+ * returns false.
  *
- * \param str
- * \param splitter
+ * \param str string to be truncated
+ * \param splitter the start of the string up to the splitter character removed
  */
-void TMusrRunHeader::RemoveFirst(TString &str, const char splitter)
+bool TMusrRunHeader::RemoveFirst(TString &str, const char splitter)
 {
   Ssiz_t idx = str.First(splitter);
+  if (idx == -1)
+    return false;
+
   str.Remove(0, idx+1);
+
+  return true;
 }
 
 //--------------------------------------------------------------------------
 // GetFirst (private)
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Assuming a string built like 'this/is/a/string:with:diffrent:splitters'.
+ * Using as splitter '/', this routine would return 'this', it means get from str
+ * everything up to the first occurance of splitter. If splitter would be ':'
+ * in this example, the return string would be 'this/is/a/string'.
+ *
+ * <p>If splitter is <b>not</b> present in str the original str is returned.
+ *
+ * <p><b>return:</b> first part of up to the splitter in struct
  *
  * \param str
  * \param splitter
@@ -1561,71 +1644,10 @@ TString TMusrRunHeader::GetFirst(TString &str, const char splitter)
   TString result = str;
 
   Ssiz_t idx = str.First(splitter);
-  result.Remove(idx, str.Length());
+  if (idx != -1)
+    result.Remove(idx, str.Length());
 
   return result;
-}
-
-//--------------------------------------------------------------------------
-// AddSubTrees (private)
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param content
- * \param pathName
- */
-void TMusrRunHeader::AddSubTrees(TObjArray *content, TString pathName)
-{
-  // check if element is already present
-  TString objName = GetFirst(pathName, '/');
-  if (!content->FindObject(objName.Data())) { // object array not present yet, add it
-    TObjArray *oarray = new TObjArray();
-    oarray->SetName(objName);
-    content->AddLast(oarray);
-  }
-
-  // check if more sub trees are needed
-  TObjArray *tok = pathName.Tokenize('/');
-
-  if (tok->GetEntries() > 2) { // still sub trees present
-    RemoveFirst(pathName, '/');
-    AddSubTrees((TObjArray*)content->FindObject(objName.Data()), pathName);
-  }
-
-  if (tok)
-    delete tok;
-}
-
-//--------------------------------------------------------------------------
-// SetSubTreeObject (private)
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param content
- * \param ostr
- */
-void TMusrRunHeader::SetSubTreeObject(TObjArray *content, TObjString ostr, Int_t idx)
-{
-  TObjArray *tok = fPathNameOrder[idx].Tokenize('/');
-  TObjArray *pos = content;
-
-  for (Int_t i=1; i<tok->GetEntries()-1; i++) {
-    pos = (TObjArray*)pos->FindObject(((TObjString*)tok->At(i))->GetString()); // go down the proper tree
-    if (pos == 0) {
-      cerr << endl << "TMusrRunHeader::SetSubTreeObject(): **ERROR** couldn't reach requested path: " << fPathNameOrder[idx];
-      if (tok)
-        delete tok;
-      return;
-    }
-  }
-  TObjString *value = new TObjString();
-  value = (TObjString*)ostr.Clone();
-  pos->AddLast(value);
-
-  if (tok)
-    delete tok;
 }
 
 // end ---------------------------------------------------------------------
