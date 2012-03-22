@@ -1,0 +1,81 @@
+03000 - test
+###############################################################
+FITPARAMETER
+#       No Name        Value     Step        Pos_Error   Boundaries
+        1 asym1       0.1137    -0.0016     0.0016      0       0.3     
+        2 field1      150.04    -0.10       0.10        0       300     
+        3 rate1       0.1845    -0.0088     0.0089      0       none    
+        4 asym2       0.04571   -0.00099    0.00099     0       0.3     
+        5 field2      399.80    -0.13       0.13        0       none    
+        6 rate2       0.170     -0.018      0.017       0       none    
+        7 phase_L     26.96     -0.90       0.89        -360    360     
+        8 Norm_L      1024.12   -0.98       0.98        
+        9 BG_L        102.25    -0.17       0.17        
+       10 phase_R     208.14    -0.90       0.90        -360    360     
+       11 Norm_R      1022.3    -1.0        1.0         
+       12 BG_R        144.09    -0.20       0.20        
+
+###############################################################
+THEORY
+asymmetry      1
+simplExpo      3          (rate)
+TFieldCos   map1  fun1       (phase frequency)
++
+asymmetry      4
+simpleGss      6          (rate)
+TFieldCos   map1  fun2       (phase frequency)
+
+###############################################################
+FUNCTIONS
+fun1 = par2 * gamma_mu
+fun2 = par5 * gamma_mu
+
+###############################################################
+RUN data/03000 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            8
+backgr.fit      9
+lifetimecorrection
+map             7    0    0    0    0    0    0    0    0    0
+forward         1 2 
+data            3479    66000   
+t0              3419.0  3520.0  
+fit             0.1     10     
+packing         50
+
+RUN data/03000 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            11
+backgr.fit      12
+lifetimecorrection
+map            10    0    0    0    0    0    0    0    0    0
+forward         5 6 
+data            3609    66000   
+t0              3517.0  3418.0  
+fit             0.1     10     
+packing         50
+
+###############################################################
+COMMANDS
+MINIMIZE
+MINOS
+SAVE
+
+###############################################################
+FOURIER
+units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
+fourier_power    11
+apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            par7
+range            0    1000
+
+###############################################################
+PLOT 0   (single histo plot)
+runs     1   
+range    0   10   -0.3   0.3
+view_packing 100
+
+###############################################################
+STATISTIC --- 2012-03-22 09:15:43
+  chisq = 2418.0, NDF = 2016, chisq/NDF = 1.199415
