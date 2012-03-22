@@ -262,7 +262,6 @@ void TMusrRunHeader::Init(TString fileName)
   prop.Set("Run Duration", 0.0, "sec");
   Set("RunInfo/Run Duration", prop);
   Set("RunInfo/Laboratory", "n/a");
-  Set("RunInfo/Area", "n/a");
   Set("RunInfo/Instrument", "n/a");
   prop.Set("Muon Beam Momentum", 0.0, "MeV/c");
   Set("RunInfo/Muon Beam Momentum", prop);
