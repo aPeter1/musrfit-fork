@@ -76,7 +76,7 @@ dict_cpp_sources_userFcn = \
 include_HEADERS = $(h_sources) $(h_sources_userFcn)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources) $(h_linkdef_userFcn) $(dict_h_sources_userFcn)
 
-INCLUDES = -I$(top_srcdir)/src/include $(PSIBIN_CFLAGS) $(MUD_CFLAGS) $(LEM_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(BOOST_CFLAGS) $(ROOT_CFLAGS) $(PNEXUS_CXXFLAGS) $(NEXUS_CFLAGS)
+INCLUDES = -I$(top_srcdir)/src/include $(MUSR_ROOT_CFLAGS) $(PSIBIN_CFLAGS) $(MUD_CFLAGS) $(LEM_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(BOOST_CFLAGS) $(ROOT_CFLAGS) $(PNEXUS_CXXFLAGS) $(NEXUS_CFLAGS)
 AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources) $(dict_cpp_sources_userFcn) $(dict_h_sources_userFcn)
@@ -93,7 +93,7 @@ libPUserFcnBase_la_LIBADD = $(ROOT_LIBS)
 libPUserFcnBase_la_LDFLAGS = -version-info $(MUSR_LIBRARY_VERSION) -release $(MUSR_RELEASE) $(AM_LDFLAGS)
 
 libPMusr_la_SOURCES = $(h_sources) $(cpp_sources) $(dict_h_sources) $(dict_cpp_sources)
-libPMusr_la_LIBADD = libPUserFcnBase.la $(LEM_LIBS) $(PSIBIN_LIBS) $(MUD_LIBS) $(PNEXUS_LIBS) $(FFTW3_LIBS) $(GSL_LIBS) $(ROOT_LIBS)
+libPMusr_la_LIBADD = libPUserFcnBase.la $(MUSR_ROOT_LIBS) $(LEM_LIBS) $(PSIBIN_LIBS) $(MUD_LIBS) $(PNEXUS_LIBS) $(FFTW3_LIBS) $(GSL_LIBS) $(ROOT_LIBS)
 libPMusr_la_LDFLAGS = -version-info $(MUSR_LIBRARY_VERSION) -release $(MUSR_RELEASE) $(AM_LDFLAGS)
 
 pkgconfigdir = $(libdir)/pkgconfig

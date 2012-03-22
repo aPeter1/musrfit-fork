@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2009 by Andreas Suter                                   *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -134,7 +134,7 @@ Int_t PMusrT0Data::GetHistoNo(UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetT0
+// GetT0Bin
 //--------------------------------------------------------------------------
 /**
  * <p>Get t0 (in bin) of a run.
@@ -145,7 +145,7 @@ Int_t PMusrT0Data::GetHistoNo(UInt_t idx)
  *
  * \param idx index of the run (msr-file).
  */
-Int_t PMusrT0Data::GetT0(UInt_t idx)
+Int_t PMusrT0Data::GetT0Bin(UInt_t idx)
 {
   if (idx >= fT0.size())
     return -1;
@@ -154,7 +154,7 @@ Int_t PMusrT0Data::GetT0(UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetAddT0Size
+// GetAddT0BinSize
 //--------------------------------------------------------------------------
 /**
  * <p>Get addt0 size of a run, i.e. the number of addt0's for a given msr-file run.
@@ -165,7 +165,7 @@ Int_t PMusrT0Data::GetT0(UInt_t idx)
  *
  * \param idx index of the run (msr-file).
  */
-UInt_t PMusrT0Data::GetAddT0Size(UInt_t idx)
+UInt_t PMusrT0Data::GetAddT0BinSize(UInt_t idx)
 {
   if (idx >= fAddT0.size())
     return 0;
@@ -174,7 +174,7 @@ UInt_t PMusrT0Data::GetAddT0Size(UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetAddT0
+// GetAddT0Bin
 //--------------------------------------------------------------------------
 /**
  * <p>Get addt0 (in bin) of a run.
@@ -186,7 +186,7 @@ UInt_t PMusrT0Data::GetAddT0Size(UInt_t idx)
  * \param addRunIdx index of the addrun
  * \param idx index of the run (msr-file).
  */
-Int_t PMusrT0Data::GetAddT0(UInt_t addRunIdx, UInt_t idx)
+Int_t PMusrT0Data::GetAddT0Bin(UInt_t addRunIdx, UInt_t idx)
 {
   if (addRunIdx >= fAddT0.size())
     return -1;
@@ -198,7 +198,7 @@ Int_t PMusrT0Data::GetAddT0(UInt_t addRunIdx, UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// SetT0
+// SetT0Bin
 //--------------------------------------------------------------------------
 /**
  * <p>Set t0 value.
@@ -206,7 +206,7 @@ Int_t PMusrT0Data::GetAddT0(UInt_t addRunIdx, UInt_t idx)
  * \param val t0 value to be set
  * \param idx index at which t0 shall be set.
  */
-void PMusrT0Data::SetT0(UInt_t val, UInt_t idx)
+void PMusrT0Data::SetT0Bin(UInt_t val, UInt_t idx)
 {
   if (idx >= fT0.size())
     fT0.resize(idx+1);
@@ -215,7 +215,7 @@ void PMusrT0Data::SetT0(UInt_t val, UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// SetAddT0
+// SetAddT0Bin
 //--------------------------------------------------------------------------
 /**
  * <p>Set addt0 value.
@@ -224,7 +224,7 @@ void PMusrT0Data::SetT0(UInt_t val, UInt_t idx)
  * \param addRunIdx addt0 index (for each addrun, there has to be an addt0)
  * \param idx index at which t0 shall be set.
  */
-void PMusrT0Data::SetAddT0(UInt_t val, UInt_t addRunIdx, UInt_t idx)
+void PMusrT0Data::SetAddT0Bin(UInt_t val, UInt_t addRunIdx, UInt_t idx)
 {
   if (addRunIdx >= fAddT0.size())
     fAddT0.resize(addRunIdx+1);
@@ -334,9 +334,9 @@ PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
       fValid = false;
       return;
     }
-    Int_t histoNo = fMusrT0Data.GetHistoNo(fMusrT0Data.GetHistoNoIdx())-1;
-    if (histoNo >= (Int_t)rawRunData->GetNoOfHistos()) {
-      cerr << endl << ">> PMusrT0::PMusrT0: **ERROR** found histogram number " << histoNo+1 << ", but only " << rawRunData->GetNoOfHistos() << " are present.";
+    Int_t histoNo = fMusrT0Data.GetHistoNo(fMusrT0Data.GetHistoNoIdx());
+    if (!rawRunData->IsPresent(histoNo)) {
+      cerr << endl << ">> PMusrT0::PMusrT0: **ERROR** found histogram number " << histoNo+1 << " which is NOT present in the data file.";
       cerr << endl << ">> Please try to fix this first ..." << endl;
       fValid = false;
       return;
@@ -375,7 +375,7 @@ PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
     }
 
     // get run and first histo of grouping and feed it into fHisto
-    Int_t histoNo = fMusrT0Data.GetHistoNo(0)-1;
+    Int_t histoNo = fMusrT0Data.GetHistoNo(0);
     Int_t noOfBins = rawRunData->GetDataBin(histoNo)->size();
     Double_t start = -0.5;
     Double_t end   = noOfBins - 0.5; // -0.5 is correct since the data start at 0.0
@@ -395,9 +395,9 @@ PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
       factor=2;
 
     if (fMusrT0Data.GetDetectorTag() == PMUSRT0_FORWARD)
-      t00 = fMusrT0Data.GetT0(0);
+      t00 = fMusrT0Data.GetT0Bin(0);
     else
-      t00 = fMusrT0Data.GetT0(1);
+      t00 = fMusrT0Data.GetT0Bin(1);
 
     // check if there are addruns and grouping
     if ((fMusrT0Data.GetRawRunDataSize() > 1) && (fMusrT0Data.GetHistoNoSize() > 1)) { // addruns and grouping present
@@ -408,13 +408,13 @@ PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
 
         for (UInt_t k=0; k<fMusrT0Data.GetHistoNoSize(); k++) { // loop over all histograms (grouping)
 
-          histoNo = fMusrT0Data.GetHistoNo(k)-1;
+          histoNo = fMusrT0Data.GetHistoNo(k);
 
           // get t0
           if (fMusrT0Data.GetDetectorTag() == PMUSRT0_FORWARD)
-            t0 = fMusrT0Data.GetT0(factor*k);
+            t0 = fMusrT0Data.GetT0Bin(factor*k);
           else
-            t0 = fMusrT0Data.GetT0(factor*k+1);
+            t0 = fMusrT0Data.GetT0Bin(factor*k+1);
 
           // get proper rawRunData
           rawRunData = fMusrT0Data.GetRawRunData(0);
@@ -429,9 +429,9 @@ PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
 
             // get t0
             if (fMusrT0Data.GetDetectorTag() == PMUSRT0_FORWARD)
-              t0 = fMusrT0Data.GetAddT0(j-1, factor*k);
+              t0 = fMusrT0Data.GetAddT0Bin(j-1, factor*k);
             else
-              t0 = fMusrT0Data.GetAddT0(j-1, factor*k+1);
+              t0 = fMusrT0Data.GetAddT0Bin(j-1, factor*k+1);
 
             // get bin value from addrun/grouping
             if ((i+t0-t00 > 0) && (i+t0-t00 < static_cast<Int_t>(rawRunData->GetDataBin(histoNo)->size())))
@@ -448,13 +448,13 @@ PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
 
         dval = 0;
 
-        histoNo = fMusrT0Data.GetHistoNo(0)-1;
+        histoNo = fMusrT0Data.GetHistoNo(0);
 
         // get t0
         if (fMusrT0Data.GetDetectorTag() == PMUSRT0_FORWARD)
-          t0 = fMusrT0Data.GetT0(0);
+          t0 = fMusrT0Data.GetT0Bin(0);
         else
-          t0 = fMusrT0Data.GetT0(1);
+          t0 = fMusrT0Data.GetT0Bin(1);
 
         // get proper rawRunData
         rawRunData = fMusrT0Data.GetRawRunData(0);
@@ -470,9 +470,9 @@ PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
 
           // get t0
           if (fMusrT0Data.GetDetectorTag() == PMUSRT0_FORWARD)
-            t0 = fMusrT0Data.GetAddT0(j-1, 0);
+            t0 = fMusrT0Data.GetAddT0Bin(j-1, 0);
           else
-            t0 = fMusrT0Data.GetAddT0(j-1, 1);
+            t0 = fMusrT0Data.GetAddT0Bin(j-1, 1);
 
           // get bin value from addrun/grouping
           if ((i+t0-t00 > 0) && (i+t0-t00 < static_cast<Int_t>(rawRunData->GetDataBin(histoNo)->size())))
@@ -493,13 +493,13 @@ PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
 
         for (UInt_t k=0; k<fMusrT0Data.GetHistoNoSize(); k++) { // loop over all histograms (grouping)
 
-          histoNo = fMusrT0Data.GetHistoNo(k)-1;
+          histoNo = fMusrT0Data.GetHistoNo(k);
 
           // get t0
           if (fMusrT0Data.GetDetectorTag() == PMUSRT0_FORWARD)
-            t0 = fMusrT0Data.GetT0(factor*k);
+            t0 = fMusrT0Data.GetT0Bin(factor*k);
           else
-            t0 = fMusrT0Data.GetT0(factor*k+1);
+            t0 = fMusrT0Data.GetT0Bin(factor*k+1);
 
           // get bin value from run/grouping
           if ((i+t0-t00 > 0) && (i+t0-t00 < static_cast<Int_t>(rawRunData->GetDataBin(histoNo)->size())))
@@ -724,7 +724,7 @@ void PMusrT0::SetMsrHandler(PMsrHandler *msrHandler)
 void PMusrT0::InitT0()
 {
   // t0 line
-  Int_t t0Bin = 0;
+  Double_t t0Bin = 0;
   Int_t histoIdx  = fMusrT0Data.GetHistoNoIdx();
   Int_t addRunIdx = fMusrT0Data.GetAddRunIdx();
   UInt_t factor=1;
@@ -733,15 +733,15 @@ void PMusrT0::InitT0()
   switch (fMusrT0Data.GetDetectorTag() ) {
     case PMUSRT0_FORWARD:
       if (addRunIdx == 0)
-        t0Bin = fMsrHandler->GetMsrRunList()->at(fMusrT0Data.GetRunNo()).GetT0(factor*histoIdx);
+        t0Bin = fMsrHandler->GetMsrRunList()->at(fMusrT0Data.GetRunNo()).GetT0Bin(factor*histoIdx);
       else if (addRunIdx > 0)
-        t0Bin = fMsrHandler->GetMsrRunList()->at(fMusrT0Data.GetRunNo()).GetAddT0(addRunIdx-1, factor*histoIdx);
+        t0Bin = fMsrHandler->GetMsrRunList()->at(fMusrT0Data.GetRunNo()).GetAddT0Bin(addRunIdx-1, factor*histoIdx);
       break;
     case PMUSRT0_BACKWARD:
       if (addRunIdx == 0)
-        t0Bin = fMsrHandler->GetMsrRunList()->at(fMusrT0Data.GetRunNo()).GetT0(factor*histoIdx+1);
+        t0Bin = fMsrHandler->GetMsrRunList()->at(fMusrT0Data.GetRunNo()).GetT0Bin(factor*histoIdx+1);
       else if (addRunIdx > 0)
-        t0Bin = fMsrHandler->GetMsrRunList()->at(fMusrT0Data.GetRunNo()).GetAddT0(addRunIdx-1, factor*histoIdx+1);
+        t0Bin = fMsrHandler->GetMsrRunList()->at(fMusrT0Data.GetRunNo()).GetAddT0Bin(addRunIdx-1, factor*histoIdx+1);
       break;
     default:
       // not clear yet what to be done
@@ -861,7 +861,7 @@ void PMusrT0::InitDataAndBkg()
 void PMusrT0::ShowDataFileT0Channel()
 {
   // t0 line
-  Int_t t0Bin = fMusrT0Data.GetT0Data();
+  Int_t t0Bin = fMusrT0Data.GetT0BinData();
   Double_t max = fHisto->GetMaximum();
 
   if (!fT0DataLine) {

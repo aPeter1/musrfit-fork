@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Andreas Suter                              *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -77,8 +77,8 @@ class PMsrHandler
     virtual Bool_t SetMsrParamPosErrorPresent(UInt_t i, Bool_t value);
     virtual Bool_t SetMsrParamPosError(UInt_t i, Double_t value);
 
-    virtual void SetMsrT0Entry(UInt_t runNo, UInt_t idx, Int_t bin);
-    virtual void SetMsrAddT0Entry(UInt_t runNo, UInt_t addRunIdx, UInt_t histoIdx, Int_t bin);
+    virtual void SetMsrT0Entry(UInt_t runNo, UInt_t idx, Double_t bin);
+    virtual void SetMsrAddT0Entry(UInt_t runNo, UInt_t addRunIdx, UInt_t histoIdx, Double_t bin);
     virtual void SetMsrDataRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin);
     virtual void SetMsrBkgRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin);
 

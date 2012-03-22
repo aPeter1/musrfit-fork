@@ -364,7 +364,7 @@ int main(int argc, char *argv[])
 
   if (argc == 2) {
     if (!strcmp(argv[1], "--version")) {
-      cout << endl << "musrfit version: $Id$";
+      cout << endl << "musrfit version: " << PMUSR_VERSION << " / $Id$";
       cout << endl << endl;
       return PMUSR_SUCCESS; 
     }

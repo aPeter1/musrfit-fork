@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: TMusrRunHeader
+Description: C++ shared library providing the MusrRoot Run Header class
+Version: @MUSR_ROOT_VERSION@
+Libs: -L${libdir} -l@MUSR_ROOT_LIBRARY_NAME@
+Cflags: -I${includedir}

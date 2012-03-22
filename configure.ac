@@ -1,7 +1,7 @@
 AC_REVISION([$Id$])
 
 AC_PREREQ(2.59)
-AC_INIT(musrfit, 0.9.0, andreas.suter@psi.ch)
+AC_INIT(musrfit, 0.10.0, andreas.suter@psi.ch)
 AC_CONFIG_AUX_DIR(admin)
 AC_CANONICAL_HOST
 #AC_MSG_RESULT([${host} ${host_cpu} ${host_vendor} ${host_os}])
@@ -21,6 +21,7 @@ dnl -----------------------------------------------
 MUSR_PROGRAM_NAME=musrfit
 MUSR_LIBRARY_NAME=PMusr
 USERFCN_LIBRARY_NAME=PUserFcnBase
+MUSR_ROOT_LIBRARY_NAME=TMusrRunHeader
 LEM_LIBRARY_NAME=TLemRunHeader
 PSIBIN_LIBRARY_NAME=Class_MuSR_PSI
 MUD_LIBRARY_NAME=mud
@@ -34,8 +35,13 @@ dnl -----------------------------------------------
 
 #release versioning
 MUSR_MAJOR_VERSION=0
-MUSR_MINOR_VERSION=9
+MUSR_MINOR_VERSION=10
 MUSR_MICRO_VERSION=0
+
+#release versioning
+MUSR_ROOT_MAJOR_VERSION=1
+MUSR_ROOT_MINOR_VERSION=0
+MUSR_ROOT_MICRO_VERSION=0
 
 #release versioning
 LEM_MAJOR_VERSION=1
@@ -71,6 +77,9 @@ CUBA_MICRO_VERSION=0
 MUSR_API_VERSION=$MUSR_MAJOR_VERSION.$MUSR_MINOR_VERSION
 AC_SUBST(MUSR_API_VERSION)
 
+MUSR_ROOT_API_VERSION=$MUSR_ROOT_MAJOR_VERSION.$MUSR_ROOT_MINOR_VERSION
+AC_SUBST(MUSR_ROOT_API_VERSION)
+
 LEM_API_VERSION=$LEM_MAJOR_VERSION.$LEM_MINOR_VERSION
 AC_SUBST(LEM_API_VERSION)
 
@@ -92,6 +101,7 @@ AC_SUBST(CUBA_API_VERSION)
 #shared library versioning
 CUBA_LIBRARY_VERSION=$CUBA_MAJOR_VERSION:$CUBA_MINOR_VERSION:$CUBA_MICRO_VERSION
 PLUGIN_LIBRARY_VERSION=$PLUGIN_MAJOR_VERSION:$PLUGIN_MINOR_VERSION:$PLUGIN_MICRO_VERSION
+MUSR_ROOT_LIBRARY_VERSION=$MUSR_ROOT_MAJOR_VERSION:$MUSR_ROOT_MINOR_VERSION:$MUSR_ROOT_MICRO_VERSION
 LEM_LIBRARY_VERSION=$LEM_MAJOR_VERSION:$LEM_MINOR_VERSION:$LEM_MICRO_VERSION
 PSIBIN_LIBRARY_VERSION=$PSIBIN_MAJOR_VERSION:$PSIBIN_MINOR_VERSION:$PSIBIN_MICRO_VERSION
 MUD_LIBRARY_VERSION=$MUD_MAJOR_VERSION:$MUD_MINOR_VERSION:$MUD_MICRO_VERSION
@@ -113,6 +123,7 @@ MUSR_LIBRARY_VERSION=$MUSR_MAJOR_VERSION:$MUSR_MINOR_VERSION:$MUSR_MICRO_VERSION
 #             +- increment if interfaces have been added, removed or changed
 
 AC_SUBST(MUSR_LIBRARY_VERSION)
+AC_SUBST(MUSR_ROOT_LIBRARY_VERSION)
 AC_SUBST(LEM_LIBRARY_VERSION)
 AC_SUBST(PSIBIN_LIBRARY_VERSION)
 AC_SUBST(MUD_LIBRARY_VERSION)
@@ -123,6 +134,7 @@ AC_SUBST(CUBA_LIBRARY_VERSION)
 PACKAGE=$MUSR_PROGRAM_NAME
 AC_SUBST(MUSR_LIBRARY_NAME)
 AC_SUBST(USERFCN_LIBRARY_NAME)
+AC_SUBST(MUSR_ROOT_LIBRARY_NAME)
 AC_SUBST(LEM_LIBRARY_NAME)
 AC_SUBST(PSIBIN_LIBRARY_NAME)
 AC_SUBST(MUD_LIBRARY_NAME)
@@ -148,6 +160,11 @@ LEM_VERSION=$LEM_MAJOR_VERSION.$LEM_MINOR_VERSION.$LEM_MICRO_VERSION
 LEM_RELEASE=$LEM_MAJOR_VERSION.$LEM_MINOR_VERSION
 AC_SUBST(LEM_RELEASE)
 AC_SUBST(LEM_VERSION)
+
+MUSR_ROOT_VERSION=$MUSR_ROOT_MAJOR_VERSION.$MUSR_ROOT_MINOR_VERSION.$MUSR_ROOT_MICRO_VERSION
+MUSR_ROOT_RELEASE=$MUSR_ROOT_MAJOR_VERSION.$MUSR_ROOT_MINOR_VERSION
+AC_SUBST(MUSR_ROOT_RELEASE)
+AC_SUBST(MUSR_ROOT_VERSION)
 
 MUSR_VERSION=$MUSR_MAJOR_VERSION.$MUSR_MINOR_VERSION.$MUSR_MICRO_VERSION
 MUSR_RELEASE=$MUSR_MAJOR_VERSION.$MUSR_MINOR_VERSION
@@ -645,7 +662,7 @@ dnl -----------------------------------------------
 AC_ARG_ENABLE([ASlibs], [AC_HELP_STRING([--enable-ASlibs],[build optional AS plug-ins [default=no]])],[BUILD_AS_LIBS=1], [BUILD_AS_LIBS=0])
 
 dnl -----------------------------------------------
-dnl Set some paths and flags for PMusr, TLemRunHeader, Class_MuSR_PSI, mud, NeXus (if enabled), etc.
+dnl Set some paths and flags for PMusr, MusrRoot, TLemRunHeader, Class_MuSR_PSI, mud, NeXus (if enabled), etc.
 dnl -----------------------------------------------
 
 SRCDIR="$(pwd)/src"
@@ -667,6 +684,12 @@ LEM_LIBS="${LEM_SRCDIR}/lib${LEM_LIBRARY_NAME}.la"
 LEM_CFLAGS="-I${LEM_SRCDIR}"
 AC_SUBST(LEM_LIBS)
 AC_SUBST(LEM_CFLAGS)
+
+MUSR_ROOT_SRCDIR="${SRCDIR}/external/MusrRoot"
+MUSR_ROOT_LIBS="${MUSR_ROOT_SRCDIR}/lib${MUSR_ROOT_LIBRARY_NAME}.la"
+MUSR_ROOT_CFLAGS="-I${MUSR_ROOT_SRCDIR}"
+AC_SUBST(MUSR_ROOT_LIBS)
+AC_SUBST(MUSR_ROOT_CFLAGS)
 
 PMUSR_LIBS="${SRCDIR}/classes/lib${MUSR_LIBRARY_NAME}.la"
 PMUSR_CFLAGS="-I${SRCDIR}/include"
@@ -1023,6 +1046,8 @@ AC_CONFIG_FILES([Makefile \
                  src/classes/PMusr.pc \
                  src/classes/PUserFcnBase.pc \
                  src/external/Makefile \
+		 src/external/MusrRoot/Makefile \
+		 src/external/MusrRoot/TMusrRunHeader.pc \
                  src/external/TLemRunHeader/Makefile \
                  src/external/TLemRunHeader/TLemRunHeader.pc \
                  src/external/MuSR_software/Makefile \
@@ -1140,11 +1165,12 @@ echo "   musrfit (including musrfit, musrview, musrt0, musrparam,"
 echo "            msr2msr, msr2data, any2many): yes"
 echo ""
 echo "   Supported muSR file formats:"
+echo "     MusrRoot:                            yes"
+echo "     ROOT (LEM):                          yes"
 echo "     MUD:                                 yes"
 echo "     PSI-BIN:                             yes"
 echo "     PSI-MDU:                             yes"
 echo "     WKM:                                 yes"
-echo "     ROOT (LEM):                          yes"
 if test "${PNEXUS_ENABLED}" -eq 1; then
   echo "     NeXus:                               yes"
 else

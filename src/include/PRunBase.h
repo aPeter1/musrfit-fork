@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007 by Andreas Suter                                   *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -76,7 +76,7 @@ class PRunBase
 
     PRunData fData;             ///< data to be fitted, viewed, i.e. binned data
     Double_t fTimeResolution;   ///< time resolution in (us)
-    PIntVector fT0s;            ///< all t0's of a run! The derived classes will handle it
+    PDoubleVector fT0s;         ///< all t0 bins of a run! The derived classes will handle it
 
     Double_t fFitStartTime; ///< fit start time
     Double_t fFitEndTime;   ///< fit end time

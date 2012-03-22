@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2009 by Andreas Suter                                   *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -77,12 +77,12 @@ class PMusrT0Data {
     virtual Int_t GetHistoNo(UInt_t idx);
     virtual Int_t GetDetectorTag() { return fDetectorTag; }
     virtual Int_t GetCmdTag() { return fCmdTag; }
-    virtual UInt_t GetT0Size() { return fT0.size(); }
-    virtual Int_t GetT0(UInt_t idx);
+    virtual UInt_t GetT0BinSize() { return fT0.size(); }
+    virtual Int_t GetT0Bin(UInt_t idx);
     virtual UInt_t GetAddT0Entries() { return fAddT0.size(); }
-    virtual UInt_t GetAddT0Size(UInt_t idx);
-    virtual Int_t GetAddT0(UInt_t addRunIdx, UInt_t idx);
-    virtual Int_t GetT0Data() { return fT0Data; }
+    virtual UInt_t GetAddT0BinSize(UInt_t idx);
+    virtual Int_t GetAddT0Bin(UInt_t addRunIdx, UInt_t idx);
+    virtual Int_t GetT0BinData() { return fT0Data; }
 
     virtual void SetSingleHisto(const Bool_t flag) { fSingleHisto = flag; }
     virtual void SetRawRunData(const vector<PRawRunData*> rawRunData) { fRawRunData = rawRunData; }
@@ -92,9 +92,9 @@ class PMusrT0Data {
     virtual void SetHistoNo(const PIntVector histoNo) { fHistoNo = histoNo; }
     virtual void SetDetectorTag(const UInt_t detectorTag) { fDetectorTag = detectorTag; }
     virtual void SetCmdTag(const UInt_t cmdTag) { fCmdTag = cmdTag; }
-    virtual void SetT0(UInt_t val, UInt_t idx);
-    virtual void SetAddT0(UInt_t val, UInt_t addRunIdx, UInt_t idx);
-    virtual void SetT0Data(UInt_t val) { fT0Data = val; }
+    virtual void SetT0Bin(UInt_t val, UInt_t idx);
+    virtual void SetAddT0Bin(UInt_t val, UInt_t addRunIdx, UInt_t idx);
+    virtual void SetT0BinData(UInt_t val) { fT0Data = val; }
 
   private:
     Bool_t fSingleHisto;              ///< true if single histo fit, false for asymmetry fit
@@ -102,7 +102,7 @@ class PMusrT0Data {
     Int_t fRunNo;                     ///< msr-file run number
     Int_t fAddRunIdx;                 ///< msr-file addrun index
     Int_t fHistoNoIdx;                ///< msr-file histo number index
-    PIntVector fHistoNo;              ///< msr-file histo numbers
+    PIntVector fHistoNo;              ///< msr-file histo numbers, i.e. idx + Red/Green offset
     Int_t fDetectorTag;               ///< detector tag. forward=0,backward=1
     Int_t fCmdTag;                    ///< command tag. 0=get t0, 1=get data-/bkg-range, 2=get t0, and data-/bkg-range
     PIntVector fT0;                   ///< holding the t0's of the run

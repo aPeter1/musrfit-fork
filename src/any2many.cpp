@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007 by Andreas Suter                                   *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -74,9 +74,9 @@ void any2many_syntax()
   cout << endl << "                year, i.e. [yyyy] will result in something like 1999.";
   cout << endl << "          -c <convert-options> : <inFormat> <outFormat>";
   cout << endl << "             <inFormat>  : input data file format. Supported formats are:";
-  cout << endl << "                PSI-BIN, ROOT (LEM), MUD, NeXus1, NeXus2, PSI-MDU, WKM";
+  cout << endl << "                MusrRoot, PSI-BIN, ROOT (LEM), MUD, NeXus1, NeXus2, PSI-MDU, WKM";
   cout << endl << "             <outFormat> : ouput data file format. Supported formats are:";
-  cout << endl << "                PSI-BIN, ROOT (LEM), MUD, NeXus1-HDF4, NeXus1-HDF5, NeXus1-XML,";
+  cout << endl << "                PSI-BIN, MusrRoot, MUD, NeXus1-HDF4, NeXus1-HDF5, NeXus1-XML,";
   cout << endl << "                NeXus2-HDF4, NeXus2-HDF5, NeXus2-XML, WKM, ASCII";
   cout << endl << "          -p <output-path> : where <output-path> is the output path for the";
   cout << endl << "               converted files. If nothing is given, the current directory";
@@ -99,8 +99,8 @@ void any2many_syntax()
   cout << endl << "      Will take the LEM ROOT file '2010/lem10_his_0123.root' rebin it with 25";
   cout << endl << "      and convert it to ASCII. The output file name will be";
   cout << endl << "      lem10_his_0123.ascii, and the file will be saved in the current directory." << endl;
-  cout << endl << "  any2many -f 2010/lem10_his_0123.root -c ROOT NEXUS2-HDF5 -o 2010/lem10_his_0123_v2.nxs";
-  cout << endl << "      Will take the LEM ROOT file '2010/lem10_his_0123.root' ";
+  cout << endl << "  any2many -f 2010/lem10_his_0123.root -c MusrRoot NEXUS2-HDF5 -o 2010/lem10_his_0123_v2.nxs";
+  cout << endl << "      Will take the MusrRoot file '2010/lem10_his_0123.root' ";
   cout << endl << "      and convert it to NeXus IDF V2. The output file name will be";
   cout << endl << "      lem10_his_0123_v2.nxs, and the file will be saved in the current directory." << endl;
   cout << endl << "  any2many -r 123 137 -c PSI-BIN MUD -t d[yyyy]/deltat_tdc_gps_[rrrr].bin \\";
@@ -113,12 +113,12 @@ void any2many_syntax()
   cout << endl << "      Will take the runs 100 through 117 and convert the PSI-MDU input files to";
   cout << endl << "      ASCII output and instead of saving them into a file, they will be spit to";
   cout << endl << "      the standard output." << endl;
-  cout << endl << "  any2many -r 100-117 -c NEXUS ROOT -t d[yyyy]/psi_gps_[rrrr].NXS \\";
+  cout << endl << "  any2many -r 100-117 -c NEXUS MusrRoot -t d[yyyy]/psi_gps_[rrrr].NXS \\";
   cout << endl << "      psi_[yyyy]_gps_[rrrr].root -z b psi_gps_run_100to117";
-  cout << endl << "      Will take the runs 100 through 117 and convert the PSI-NEXUS input files";
-  cout << endl << "      to ROOT output. Afterwards these new files will be collected in a";
+  cout << endl << "      Will take the runs 100 through 117 and convert the NEXUS input files";
+  cout << endl << "      to MusrRoot output. Afterwards these new files will be collected in a";
   cout << endl << "      compressed archive psi_gps_run_100to117.tar.bz2." << endl;
-  cout << endl << "  any2many -f 2010/lem10_his_0123.root 2010/lem10_his_0012.root -c ROOT ROOT -rebin 25";
+  cout << endl << "  any2many -f 2010/lem10_his_0123.root 2010/lem10_his_0012.root -c MusrRoot MusrRoot -rebin 25";
   cout << endl << "      Will read the two files '2010/lem10_his_0123.root' and '2010/lem10_his_0012.root',";
   cout << endl << "      rebin them with 25 and export them as LEM ROOT files with adding rebin25 to the";
   cout << endl << "      name, e.g. 2010/lem10_his_0123_rebin25.root";
@@ -146,6 +146,7 @@ int main(int argc, char *argv[])
   TString outputFileName = TString("");
 
   // init inputFormat
+  inputFormat.push_back("musrroot");
   inputFormat.push_back("psi-bin");
   inputFormat.push_back("root");
   inputFormat.push_back("mud");
@@ -155,6 +156,7 @@ int main(int argc, char *argv[])
 
   // init outputFormat
   outputFormat.push_back("psi-bin");
+  outputFormat.push_back("musrroot");
   outputFormat.push_back("root");
   outputFormat.push_back("mud");
   outputFormat.push_back("nexus1-hdf4");
@@ -186,7 +188,7 @@ int main(int argc, char *argv[])
     if (strstr(argv[1], "--h"))
       any2many_syntax();
     else if (strstr(argv[1], "--v"))
-      cout << endl << "any2many version: $Id$" << endl << endl;
+      cout << endl << "any2many version: " << PMUSR_VERSION << " / $Id$" << endl << endl;
     else {
       any2many_syntax();
       return PMUSR_WRONG_STARTUP_SYNTAX;

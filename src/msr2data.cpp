@@ -79,6 +79,7 @@ bool isNumber(const string &s)
  */
 void msr2data_syntax()
 {
+  cout << endl << "usage 0: msr2data [--version] | [--help]";
   cout << endl << "usage 1: msr2data <run> <extension> [-o<outputfile>] [new] [data] [[no]header] [nosummary] [global[+[!]]]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
   cout << endl << "usage 2: msr2data <run1> <run2> <extension> [-o<outputfile>] [new] [data] [[no]header] [nosummary] [global[+[!]]]";
@@ -379,8 +380,22 @@ int msr2data_doInputCreation(vector<string> &arg, bool &inputOnly)
  */
 int main(int argc, char *argv[])
 {
+  // check if version dump is wanted
+  if (argc == 2) {
+    if (!strcmp(argv[1], "--help")) {
+      msr2data_syntax();
+      return 0;
+    } else if (!strcmp(argv[1], "--version")) {
+      cout << endl << "msr2data  version: " << PMUSR_VERSION << " / $Id$" << endl << endl;
+      return 0;
+    } else {
+      msr2data_syntax();
+      return 0;
+    }
+  }
+
   // check the number of arguments
-  if (argc < 3) {
+  if (argc < 2) {
     msr2data_syntax();
     return 0;
   }

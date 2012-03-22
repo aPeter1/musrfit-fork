@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  PUserFcn.h
+  read_musrRoot_runHeader.cpp
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -29,25 +29,75 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PUSERFCN_H_
-#define _PUSERFCN_H_
+#include <iostream>
+using namespace std;
 
-#include <vector>
+#include <TROOT.h>
+#include <TFile.h>
+#include <TFolder.h>
 
-#include "PUserFcnBase.h"
+#include "PMusr.h"
+#include "TMusrRunHeader.h"
 
-/**
- * <p>User function example class. Polynome of 3rd order.
- */
-class PUserFcn : public PUserFcnBase
+void closeFile(TFile *f)
 {
-  public:
-    PUserFcn();
-    ~PUserFcn();
+  if (f == 0)
+    return;
 
-    Double_t operator()(Double_t t, const std::vector<Double_t> &param) const;
+  f->Close();
+  delete f;
+}
 
-  ClassDef(PUserFcn, 1)
-};
+void read_musrRoot_runHeader_syntax()
+{
+  cout << endl << "usage: read_musrRoot_runHeader [<fileName>] | --version";
+  cout << endl << "       <fileName> is the file name including the extention root, e.g. test.root";
+  cout << endl << endl;
+}
 
-#endif // _PUSERFCN_H_
+int main(int argc, char *argv[])
+{
+  if (argc != 2) {
+    read_musrRoot_runHeader_syntax();
+    return 1;
+  }
+
+  if (!strcmp(argv[1], "--version")) {
+    cout << endl << "read_musrRoot_runHeader version: " << PMUSR_VERSION << " / $Id$" << endl << endl;
+    return 0;
+  }
+
+  // read the file back and extract the header info
+  TFile *f = new TFile(argv[1], "READ", "read_musrRoot_runHeader");
+  if (f->IsZombie()) {
+    delete f;
+    return -1;
+  }
+
+  TFolder *runHeader = 0;
+  f->GetObject("RunHeader", runHeader);
+  if (runHeader == 0) {
+    cerr << endl << ">> **ERROR** Couldn't get top folder RunHeader";
+    closeFile(f);
+    return -1;
+  }
+
+  TMusrRunHeader *header = new TMusrRunHeader(argv[1]);
+
+  if (!header->ExtractAll(runHeader)) {
+    cerr << endl << ">> **ERROR** couldn't extract all RunHeader information :-(" << endl << endl;
+    closeFile(f);
+    return -1;
+  }
+
+  f->Close();
+  delete f;
+
+  header->DumpHeader();
+
+  delete header;
+
+  cout << endl << endl;
+
+  return 0;
+}

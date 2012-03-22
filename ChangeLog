@@ -4,6 +4,14 @@
 # $Id$
 #---------------------------------------------------------------------
 
+changes since 0.10.0
+===================================
+NEW 2012-03-22 added a first version of MusrRoot, the next muSR file format at PSI. At the same time a rewrite of 
+    the low run data handling has been done which enables a proper Red/Green handling with histogram sets addressable
+    either via the histogram number or the index in the data vector.
+CHANGED 2012-03-22 removed outdated musrparam.cpp. This program is not needed anymore since msr2data is much
+    more powerful and deals with all (and much more) options which where present in musrparam.     
+
 changes since 0.9.0
 ===================================
 NEW 2011-12-22 added nexus_dump. It is used to dump nexus files in an ascii

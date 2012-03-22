@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007 by Andreas Suter                                   *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -214,7 +214,7 @@ Int_t main(Int_t argc, Char_t *argv[])
       break;
     case 2:
       if (strstr(argv[1], "--version")) {
-        cout << endl << ">> musrt0 version: $Id$";
+        cout << endl << ">> musrt0 version: " << PMUSR_VERSION << " / $Id$";
         cout << endl << endl;
         return PMUSR_SUCCESS;
       } else if (strstr(argv[1], "--help")) {
@@ -369,12 +369,12 @@ Int_t main(Int_t argc, Char_t *argv[])
       case MSR_FITTYPE_SINGLE_HISTO:
         if ((runList->at(i).GetRunNameSize() == 1) && (runList->at(i).GetForwardHistoNoSize() == 1)) { // no addruns / no grouping
           // get histo number
-          histoNo = runList->at(i).GetForwardHistoNo()-1;
+          histoNo = runList->at(i).GetForwardHistoNo();
           runName = runList->at(i).GetRunName();
           // get bin position of maximal data
           t0Bin = musrt0_getMaxBin(dataHandler->GetRunData(*runName)->GetDataBin(histoNo));
           // set t0 to maximum data position
-          runList->at(i).SetT0(t0Bin, 0);
+          runList->at(i).SetT0Bin(t0Bin, 0);
           // set data range as well if firstGoodBinOffset is given
           if (firstGoodBinOffsetPresent) {
             start = t0Bin + firstGoodBinOffset;
@@ -384,12 +384,12 @@ Int_t main(Int_t argc, Char_t *argv[])
           }
         } else if ((runList->at(i).GetRunNameSize() > 1) && (runList->at(i).GetForwardHistoNoSize() == 1)) { // addruns / no grouping
           // get histo number
-          histoNo = runList->at(i).GetForwardHistoNo()-1;
+          histoNo = runList->at(i).GetForwardHistoNo();
           runName = runList->at(i).GetRunName();
           // get bin position of maximal data
           t0Bin = musrt0_getMaxBin(dataHandler->GetRunData(*runName)->GetDataBin(histoNo));
           // set t0 to maximum data position
-          runList->at(i).SetT0(t0Bin, 0);
+          runList->at(i).SetT0Bin(t0Bin, 0);
           // set data range as well if firstGoodBinOffset is given
           if (firstGoodBinOffsetPresent) {
             start = t0Bin + firstGoodBinOffset;
@@ -403,17 +403,17 @@ Int_t main(Int_t argc, Char_t *argv[])
             // get bin position of maximal data
             t0Bin = musrt0_getMaxBin(dataHandler->GetRunData(*runName)->GetDataBin(histoNo));
             // set t0 to maximum data position
-            runList->at(i).SetAddT0(t0Bin, j-1, 0);
+            runList->at(i).SetAddT0Bin(t0Bin, j-1, 0);
           }
         } else if ((runList->at(i).GetRunNameSize() == 1) && (runList->at(i).GetForwardHistoNoSize() > 1)) { // no addruns / grouping
           for (UInt_t j=0; j<runList->at(i).GetForwardHistoNoSize(); j++) {
             // get histo number
-            histoNo = runList->at(i).GetForwardHistoNo(j)-1;
+            histoNo = runList->at(i).GetForwardHistoNo(j);
             runName = runList->at(i).GetRunName();
             // get bin position of maximal data
             t0Bin = musrt0_getMaxBin(dataHandler->GetRunData(*runName)->GetDataBin(histoNo));
             // set t0 to maximum data position
-            runList->at(i).SetT0(t0Bin, j);
+            runList->at(i).SetT0Bin(t0Bin, j);
             if (firstGoodBinOffsetPresent && (j==0)) {
               start = t0Bin + firstGoodBinOffset;
               end   = dataHandler->GetRunData(*runName)->GetDataBin(histoNo)->size();
@@ -424,12 +424,12 @@ Int_t main(Int_t argc, Char_t *argv[])
         } else { // addruns / grouping
           for (UInt_t j=0; j<runList->at(i).GetForwardHistoNoSize(); j++) {
             // get histo number
-            histoNo = runList->at(i).GetForwardHistoNo(j)-1;
+            histoNo = runList->at(i).GetForwardHistoNo(j);
             runName = runList->at(i).GetRunName();
             // get bin position of maximal data
             t0Bin = musrt0_getMaxBin(dataHandler->GetRunData(*runName)->GetDataBin(histoNo));
             // set t0 to maximum data position
-            runList->at(i).SetT0(t0Bin, j);
+            runList->at(i).SetT0Bin(t0Bin, j);
             if (firstGoodBinOffsetPresent && (j==0)) {
               start = t0Bin + firstGoodBinOffset;
               end   = dataHandler->GetRunData(*runName)->GetDataBin(histoNo)->size();
@@ -442,7 +442,7 @@ Int_t main(Int_t argc, Char_t *argv[])
               // get bin position of maximal data
               t0Bin = musrt0_getMaxBin(dataHandler->GetRunData(*runName)->GetDataBin(histoNo));
               // set t0 to maximum data position
-              runList->at(i).SetAddT0(t0Bin, k-1, j);
+              runList->at(i).SetAddT0Bin(t0Bin, k-1, j);
             }
           }
         }
@@ -451,12 +451,12 @@ Int_t main(Int_t argc, Char_t *argv[])
         if ((runList->at(i).GetRunNameSize() == 1) && (runList->at(i).GetForwardHistoNoSize() == 1)) { // no addruns / no grouping
           // handle forward histo
           // get histo number
-          histoNo = runList->at(i).GetForwardHistoNo()-1;
+          histoNo = runList->at(i).GetForwardHistoNo();
           runName = runList->at(i).GetRunName();
           // get bin position of maximal data
           t0Bin = musrt0_getMaxBin(dataHandler->GetRunData(*runName)->GetDataBin(histoNo));
           // set t0 to maximum data position
-          runList->at(i).SetT0(t0Bin, 0);
+          runList->at(i).SetT0Bin(t0Bin, 0);
           // set data range as well if firstGoodBinOffset is given
           if (firstGoodBinOffsetPresent) {
             start = t0Bin + firstGoodBinOffset;
@@ -466,12 +466,12 @@ Int_t main(Int_t argc, Char_t *argv[])
           }
           // handle backward histo
           // get histo number
-          histoNo = runList->at(i).GetBackwardHistoNo()-1;
+          histoNo = runList->at(i).GetBackwardHistoNo();
           runName = runList->at(i).GetRunName();
           // get bin position of maximal data
           t0Bin = musrt0_getMaxBin(dataHandler->GetRunData(*runName)->GetDataBin(histoNo));
           // set t0 to maximum data position
-          runList->at(i).SetT0(t0Bin, 1);
+          runList->at(i).SetT0Bin(t0Bin, 1);
           // set data range as well if firstGoodBinOffset is given
           if (firstGoodBinOffsetPresent) {
             start = t0Bin + firstGoodBinOffset;
@@ -482,12 +482,12 @@ Int_t main(Int_t argc, Char_t *argv[])
         } else if ((runList->at(i).GetRunNameSize() > 1) && (runList->at(i).GetForwardHistoNoSize() == 1)) { // addruns / no grouping
           // handle forward histo
           // get histo number
-          histoNo = runList->at(i).GetForwardHistoNo()-1;
+          histoNo = runList->at(i).GetForwardHistoNo();
           runName = runList->at(i).GetRunName();
           // get bin position of maximal data
           t0Bin = musrt0_getMaxBin(dataHandler->GetRunData(*runName)->GetDataBin(histoNo));
           // set t0 to maximum data position
-          runList->at(i).SetT0(t0Bin, 0);
+          runList->at(i).SetT0Bin(t0Bin, 0);
           // set data range as well if firstGoodBinOffset is given
           if (firstGoodBinOffsetPresent) {
             start = t0Bin + firstGoodBinOffset;
@@ -501,16 +501,16 @@ Int_t main(Int_t argc, Char_t *argv[])
             // get bin position of maximal data
             t0Bin = musrt0_getMaxBin(dataHandler->GetRunData(*runName)->GetDataBin(histoNo));
             // set t0 to maximum data position
-            runList->at(i).SetAddT0(t0Bin, j-1, 0);
+            runList->at(i).SetAddT0Bin(t0Bin, j-1, 0);
           }
           // handle backward histo
           // get histo number
-          histoNo = runList->at(i).GetBackwardHistoNo()-1;
+          histoNo = runList->at(i).GetBackwardHistoNo();
           runName = runList->at(i).GetRunName();
           // get bin position of maximal data
           t0Bin = musrt0_getMaxBin(dataHandler->GetRunData(*runName)->GetDataBin(histoNo));
           // set t0 to maximum data position
-          runList->at(i).SetT0(t0Bin, 1);
+          runList->at(i).SetT0Bin(t0Bin, 1);
           // set data range as well if firstGoodBinOffset is given
           if (firstGoodBinOffsetPresent) {
             start = t0Bin + firstGoodBinOffset;
@@ -524,18 +524,18 @@ Int_t main(Int_t argc, Char_t *argv[])
             // get bin position of maximal data
             t0Bin = musrt0_getMaxBin(dataHandler->GetRunData(*runName)->GetDataBin(histoNo));
             // set t0 to maximum data position
-            runList->at(i).SetAddT0(t0Bin, j-1, 1);
+            runList->at(i).SetAddT0Bin(t0Bin, j-1, 1);
           }
         } else if ((runList->at(i).GetRunNameSize() == 1) && (runList->at(i).GetForwardHistoNoSize() > 1)) { // no addruns / grouping
           // handle forward histo
           for (UInt_t j=0; j<runList->at(i).GetForwardHistoNoSize(); j++) {
             // get histo number
-            histoNo = runList->at(i).GetForwardHistoNo(j)-1;
+            histoNo = runList->at(i).GetForwardHistoNo(j);
             runName = runList->at(i).GetRunName();
             // get bin position of maximal data
             t0Bin = musrt0_getMaxBin(dataHandler->GetRunData(*runName)->GetDataBin(histoNo));
             // set t0 to maximum data position
-            runList->at(i).SetT0(t0Bin, 2*j);
+            runList->at(i).SetT0Bin(t0Bin, 2*j);
             if (firstGoodBinOffsetPresent && (j==0)) {
               start = t0Bin + firstGoodBinOffset;
               end   = dataHandler->GetRunData(*runName)->GetDataBin(histoNo)->size();
@@ -546,12 +546,12 @@ Int_t main(Int_t argc, Char_t *argv[])
           // handle backward histo
           for (UInt_t j=0; j<runList->at(i).GetBackwardHistoNoSize(); j++) {
             // get histo number
-            histoNo = runList->at(i).GetBackwardHistoNo(j)-1;
+            histoNo = runList->at(i).GetBackwardHistoNo(j);
             runName = runList->at(i).GetRunName();
             // get bin position of maximal data
             t0Bin = musrt0_getMaxBin(dataHandler->GetRunData(*runName)->GetDataBin(histoNo));
             // set t0 to maximum data position
-            runList->at(i).SetT0(t0Bin, 2*j+1);
+            runList->at(i).SetT0Bin(t0Bin, 2*j+1);
             if (firstGoodBinOffsetPresent && (j==0)) {
               start = t0Bin + firstGoodBinOffset;
               end   = dataHandler->GetRunData(*runName)->GetDataBin(histoNo)->size();
@@ -563,12 +563,12 @@ Int_t main(Int_t argc, Char_t *argv[])
           // handle forward histo
           for (UInt_t j=0; j<runList->at(i).GetForwardHistoNoSize(); j++) {
             // get histo number
-            histoNo = runList->at(i).GetForwardHistoNo(j)-1;
+            histoNo = runList->at(i).GetForwardHistoNo(j);
             runName = runList->at(i).GetRunName();
             // get bin position of maximal data
             t0Bin = musrt0_getMaxBin(dataHandler->GetRunData(*runName)->GetDataBin(histoNo));
             // set t0 to maximum data position
-            runList->at(i).SetT0(t0Bin, 2*j);
+            runList->at(i).SetT0Bin(t0Bin, 2*j);
             if (firstGoodBinOffsetPresent && (j==0)) {
               start = t0Bin + firstGoodBinOffset;
               end   = dataHandler->GetRunData(*runName)->GetDataBin(histoNo)->size();
@@ -581,18 +581,18 @@ Int_t main(Int_t argc, Char_t *argv[])
               // get bin position of maximal data
               t0Bin = musrt0_getMaxBin(dataHandler->GetRunData(*runName)->GetDataBin(histoNo));
               // set t0 to maximum data position
-              runList->at(i).SetAddT0(t0Bin, k-1, 2*j);
+              runList->at(i).SetAddT0Bin(t0Bin, k-1, 2*j);
             }
           }
           // handle backward histo
           for (UInt_t j=0; j<runList->at(i).GetBackwardHistoNoSize(); j++) {
             // get histo number
-            histoNo = runList->at(i).GetBackwardHistoNo(j)-1;
+            histoNo = runList->at(i).GetBackwardHistoNo(j);
             runName = runList->at(i).GetRunName();
             // get bin position of maximal data
             t0Bin = musrt0_getMaxBin(dataHandler->GetRunData(*runName)->GetDataBin(histoNo));
             // set t0 to maximum data position
-            runList->at(i).SetT0(t0Bin, 2*j+1);
+            runList->at(i).SetT0Bin(t0Bin, 2*j+1);
             if (firstGoodBinOffsetPresent && (j==0)) {
               start = t0Bin + firstGoodBinOffset;
               end   = dataHandler->GetRunData(*runName)->GetDataBin(histoNo)->size();
@@ -605,7 +605,7 @@ Int_t main(Int_t argc, Char_t *argv[])
               // get bin position of maximal data
               t0Bin = musrt0_getMaxBin(dataHandler->GetRunData(*runName)->GetDataBin(histoNo));
               // set t0 to maximum data position
-              runList->at(i).SetAddT0(t0Bin, k-1, 2*j+1);
+              runList->at(i).SetAddT0Bin(t0Bin, k-1, 2*j+1);
             }
           }
         }
@@ -648,8 +648,8 @@ Int_t main(Int_t argc, Char_t *argv[])
             rawRunData.push_back(dataHandler->GetRunData(*(runList->at(i).GetRunName(0))));
             musrT0Data.SetRawRunData(rawRunData);
             // feed data t0 if present
-            if (rawRunData[0]->GetT0Size() > 0) {
-              musrT0Data.SetT0Data(rawRunData[0]->GetT0(runList->at(i).GetForwardHistoNo(0)-1));
+            if (rawRunData[0]->IsPresent(runList->at(i).GetForwardHistoNo(0))) {
+              musrT0Data.SetT0BinData(rawRunData[0]->GetT0Bin(runList->at(i).GetForwardHistoNo(0)));
             }
             musrT0Data.SetRunNo(i);
             musrT0Data.SetAddRunIdx(0); // no addruns
@@ -682,8 +682,8 @@ Int_t main(Int_t argc, Char_t *argv[])
               musrT0Data.SetRawRunData(rawRunData);
               for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++) {
                 // feed data t0 if present
-                if (rawRunData[j]->GetT0Size() > 0) {
-                  musrT0Data.SetT0Data(rawRunData[j]->GetT0(runList->at(i).GetForwardHistoNo(0)-1));
+                if (rawRunData[j]->IsPresent(runList->at(i).GetForwardHistoNo(0))) {
+                  musrT0Data.SetT0BinData(rawRunData[j]->GetT0Bin(runList->at(i).GetForwardHistoNo(0)));
                 }
                 // feed necessary data
                 musrT0Data.SetAddRunIdx(j); // addruns
@@ -709,8 +709,8 @@ Int_t main(Int_t argc, Char_t *argv[])
               musrT0Data.SetAddRunIdx(0);
               for (UInt_t j=0; j<runList->at(i).GetForwardHistoNoSize(); j++) {
                 // feed data t0 if present
-                if (rawRunData[0]->GetT0Size() > 0) {
-                  musrT0Data.SetT0Data(rawRunData[0]->GetT0(runList->at(i).GetForwardHistoNo(j)-1));
+                if (rawRunData[0]->IsPresent(runList->at(i).GetForwardHistoNo(j))) {
+                  musrT0Data.SetT0BinData(rawRunData[0]->GetT0Bin(runList->at(i).GetForwardHistoNo(j)));
                 }
                 // feed necessary data
                 musrT0Data.SetHistoNoIdx(j);
@@ -738,8 +738,8 @@ Int_t main(Int_t argc, Char_t *argv[])
                 musrT0Data.SetAddRunIdx(j); // addruns
                 for (UInt_t k=0; k<runList->at(i).GetForwardHistoNoSize(); k++) { // forward histo grouping
                   // feed data t0 if present
-                  if (rawRunData[j]->GetT0Size() > 0) {
-                    musrT0Data.SetT0Data(rawRunData[j]->GetT0(runList->at(i).GetForwardHistoNo(k)-1));
+                  if (rawRunData[j]->IsPresent(runList->at(i).GetForwardHistoNo(k))) {
+                    musrT0Data.SetT0BinData(rawRunData[j]->GetT0Bin(runList->at(i).GetForwardHistoNo(k)));
                   }
                   // feed necessary data
                   musrT0Data.SetHistoNoIdx(k);
@@ -753,10 +753,10 @@ Int_t main(Int_t argc, Char_t *argv[])
             // get data- and bkg-range
             musrT0Data.SetCmdTag(PMUSRT0_GET_DATA_AND_BKG_RANGE);
             // feed all t0's
-            for (UInt_t j=0; j<runList->at(i).GetT0Size(); j++) {
-              musrT0Data.SetT0(runList->at(i).GetT0(j), j);
-              for (UInt_t k=0; k<runList->at(i).GetAddT0Entries(); k++) {
-                musrT0Data.SetAddT0(runList->at(i).GetAddT0(k, j), k, j);
+            for (UInt_t j=0; j<runList->at(i).GetT0BinSize(); j++) {
+              musrT0Data.SetT0Bin(runList->at(i).GetT0Bin(j), j);
+              for (UInt_t k=0; k<runList->at(i).GetAddT0BinEntries(); k++) {
+                musrT0Data.SetAddT0Bin(runList->at(i).GetAddT0Bin(k, j), k, j);
               }
             }
             if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
@@ -774,8 +774,8 @@ Int_t main(Int_t argc, Char_t *argv[])
             rawRunData.push_back(dataHandler->GetRunData(*(runList->at(i).GetRunName(0))));
             musrT0Data.SetRawRunData(rawRunData);
             // feed data t0 if present
-            if (rawRunData[0]->GetT0Size() > 0) {
-              musrT0Data.SetT0Data(rawRunData[0]->GetT0(runList->at(i).GetForwardHistoNo(0)-1));
+            if (rawRunData[0]->IsPresent(runList->at(i).GetForwardHistoNo(0))) {
+              musrT0Data.SetT0BinData(rawRunData[0]->GetT0Bin(runList->at(i).GetForwardHistoNo(0)));
             }
             musrT0Data.SetRunNo(i);
             musrT0Data.SetAddRunIdx(0); // no addruns
@@ -797,8 +797,8 @@ Int_t main(Int_t argc, Char_t *argv[])
             rawRunData.push_back(dataHandler->GetRunData(*(runList->at(i).GetRunName(0))));
             musrT0Data.SetRawRunData(rawRunData);
             // feed data t0 if present
-            if (rawRunData[0]->GetT0Size() > 0) {
-              musrT0Data.SetT0Data(rawRunData[0]->GetT0(runList->at(i).GetBackwardHistoNo(0)-1));
+            if (rawRunData[0]->IsPresent(runList->at(i).GetForwardHistoNo(0))) {
+              musrT0Data.SetT0BinData(rawRunData[0]->GetT0Bin(runList->at(i).GetForwardHistoNo(0)));
             }
             musrT0Data.SetRunNo(i);
             musrT0Data.SetAddRunIdx(0); // no addruns
@@ -832,8 +832,8 @@ Int_t main(Int_t argc, Char_t *argv[])
               musrT0Data.SetRawRunData(rawRunData);
               for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++) {
                 // feed data t0 if present
-                if (rawRunData[j]->GetT0Size() > 0) {
-                  musrT0Data.SetT0Data(rawRunData[j]->GetT0(runList->at(i).GetForwardHistoNo(0)-1));
+                if (rawRunData[j]->IsPresent(runList->at(i).GetForwardHistoNo(0))) {
+                  musrT0Data.SetT0BinData(rawRunData[j]->GetT0Bin(runList->at(i).GetForwardHistoNo(0)));
                 }
                 // feed necessary data
                 musrT0Data.SetAddRunIdx(j); // addruns
@@ -858,8 +858,8 @@ Int_t main(Int_t argc, Char_t *argv[])
               musrT0Data.SetRawRunData(rawRunData);
               for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++) {
                 // feed data t0 if present
-                if (rawRunData[j]->GetT0Size() > 0) {
-                  musrT0Data.SetT0Data(rawRunData[j]->GetT0(runList->at(i).GetBackwardHistoNo(0)-1));
+                if (rawRunData[j]->IsPresent(runList->at(i).GetForwardHistoNo(0))) {
+                  musrT0Data.SetT0BinData(rawRunData[j]->GetT0Bin(runList->at(i).GetForwardHistoNo(0)));
                 }
                 // feed necessary data
                 musrT0Data.SetAddRunIdx(j); // addruns
@@ -885,8 +885,8 @@ Int_t main(Int_t argc, Char_t *argv[])
               musrT0Data.SetAddRunIdx(0);
               for (UInt_t j=0; j<runList->at(i).GetForwardHistoNoSize(); j++) {
                 // feed data t0 if present
-                if (rawRunData[0]->GetT0Size() > 0) {
-                  musrT0Data.SetT0Data(rawRunData[0]->GetT0(runList->at(i).GetForwardHistoNo(j)-1));
+                if (rawRunData[0]->IsPresent(runList->at(i).GetForwardHistoNo(j))) {
+                  musrT0Data.SetT0BinData(rawRunData[0]->GetT0Bin(runList->at(i).GetForwardHistoNo(j)));
                 }
                 // feed necessary data
                 musrT0Data.SetHistoNoIdx(j);
@@ -911,8 +911,8 @@ Int_t main(Int_t argc, Char_t *argv[])
               musrT0Data.SetAddRunIdx(0);
               for (UInt_t j=0; j<runList->at(i).GetBackwardHistoNoSize(); j++) {
                 // feed data t0 if present
-                if (rawRunData[0]->GetT0Size() > 0) {
-                  musrT0Data.SetT0Data(rawRunData[0]->GetT0(runList->at(i).GetBackwardHistoNo(j)-1));
+                if (rawRunData[0]->IsPresent(runList->at(i).GetForwardHistoNo(j))) {
+                  musrT0Data.SetT0BinData(rawRunData[0]->GetT0Bin(runList->at(i).GetForwardHistoNo(j)));
                 }
                 // feed necessary data
                 musrT0Data.SetHistoNoIdx(j);
@@ -940,8 +940,8 @@ Int_t main(Int_t argc, Char_t *argv[])
                 musrT0Data.SetAddRunIdx(j); // addruns
                 for (UInt_t k=0; k<runList->at(i).GetForwardHistoNoSize(); k++) { // forward histo grouping
                   // feed data t0 if present
-                  if (rawRunData[j]->GetT0Size() > 0) {
-                    musrT0Data.SetT0Data(rawRunData[j]->GetT0(runList->at(i).GetForwardHistoNo(k)-1));
+                  if (rawRunData[j]->IsPresent(runList->at(i).GetForwardHistoNo(k))) {
+                    musrT0Data.SetT0BinData(rawRunData[j]->GetT0Bin(runList->at(i).GetForwardHistoNo(k)));
                   }
                   // feed necessary data
                   musrT0Data.SetHistoNoIdx(k);
@@ -969,8 +969,8 @@ Int_t main(Int_t argc, Char_t *argv[])
                 musrT0Data.SetAddRunIdx(j); // addruns
                 for (UInt_t k=0; k<runList->at(i).GetBackwardHistoNoSize(); k++) { // backward histo grouping
                   // feed data t0 if present
-                  if (rawRunData[j]->GetT0Size() > 0) {
-                    musrT0Data.SetT0Data(rawRunData[j]->GetT0(runList->at(i).GetBackwardHistoNo(k)-1));
+                  if (rawRunData[j]->IsPresent(runList->at(i).GetForwardHistoNo(k))) {
+                    musrT0Data.SetT0BinData(rawRunData[j]->GetT0Bin(runList->at(i).GetForwardHistoNo(k)));
                   }
                   // feed necessary data
                   musrT0Data.SetHistoNoIdx(k);
@@ -984,10 +984,10 @@ Int_t main(Int_t argc, Char_t *argv[])
             // get data- and bkg-range
             musrT0Data.SetCmdTag(PMUSRT0_GET_DATA_AND_BKG_RANGE);
             // feed all t0's
-            for (UInt_t j=0; j<runList->at(i).GetT0Size(); j++) {
-              musrT0Data.SetT0(runList->at(i).GetT0(j), j);
-              for (UInt_t k=0; k<runList->at(i).GetAddT0Entries(); k++) {
-                musrT0Data.SetAddT0(runList->at(i).GetAddT0(k, j), k, j);
+            for (UInt_t j=0; j<runList->at(i).GetT0BinSize(); j++) {
+              musrT0Data.SetT0Bin(runList->at(i).GetT0Bin(j), j);
+              for (UInt_t k=0; k<runList->at(i).GetAddT0BinEntries(); k++) {
+                musrT0Data.SetAddT0Bin(runList->at(i).GetAddT0Bin(k, j), k, j);
               }
             }
             musrT0Data.SetHistoNo(forwardHistos);

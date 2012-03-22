@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2010 by Andreas Suter                              *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -37,6 +37,8 @@
 using namespace std;
 
 #include <TString.h>
+
+#define PMUSR_VERSION  "0.10.0"
 
 #define PMUSR_SUCCESS                   0
 #define PMUSR_WRONG_STARTUP_SYNTAX     -1
@@ -268,6 +270,76 @@ class PNonMusrRawRunData {
 
 //-------------------------------------------------------------
 /**
+ * <p>Handles a single raw muSR histogram set, without any additional header information.
+ */
+class PRawRunDataSet {
+  public:
+    PRawRunDataSet();
+    virtual ~PRawRunDataSet() { fData.clear(); }
+
+    virtual TString GetName() { return fName; }
+    virtual Int_t GetHistoNo() { return fHistoNo; }
+    virtual Double_t GetTimeZeroBin() { return fTimeZeroBin; }
+    virtual Double_t GetTimeZeroBinEstimated() { return fTimeZeroBinEstimated; }
+    virtual Int_t GetFirstGoodBin() { return fFirstGoodBin; }
+    virtual Int_t GetLastGoodBin() { return fLastGoodBin; }
+    virtual Int_t GetFirstBkgBin() { return fFirstBkgBin; }
+    virtual Int_t GetLastBkgBin() { return fLastBkgBin; }
+    virtual PDoubleVector *GetData() { return &fData; }
+
+    virtual void Clear();
+    virtual void SetName(TString str) { fName = str; }
+    virtual void SetHistoNo(Int_t no) { fHistoNo = no; }
+    virtual void SetTimeZeroBin(Double_t tzb) { fTimeZeroBin = tzb; }
+    virtual void SetTimeZeroBinEstimated(Double_t tzb) { fTimeZeroBinEstimated = tzb; }
+    virtual void SetFirstGoodBin(Int_t fgb) { fFirstGoodBin = fgb; }
+    virtual void SetLastGoodBin(Int_t lgb) { fLastGoodBin = lgb; }
+    virtual void SetFirstBkgBin(Int_t fbb) { fFirstBkgBin = fbb; }
+    virtual void SetLastBkgBin(Int_t lbb) { fLastGoodBin = lbb; }
+    virtual void SetData(PDoubleVector data) { fData = data; }
+
+  private:
+    TString fName;         ///< keeps the histogram name.
+    Int_t fHistoNo;        ///< corresponds to the histogram number in the data file
+    Double_t fTimeZeroBin; ///< keeps the time zero bin
+    Double_t fTimeZeroBinEstimated; ///< keeps the estimated time zero bin
+    Int_t fFirstGoodBin;   ///< keeps the first good bin of the data set
+    Int_t fLastGoodBin;    ///< keeps the last good bin of the data set
+    Int_t fFirstBkgBin;    ///< keeps the first background bin of the data set
+    Int_t fLastBkgBin;     ///< keeps the last background bin of the data set
+    PDoubleVector fData;   ///< keeps the histogram data
+};
+
+//-------------------------------------------------------------
+/**
+ * <p>Handles a vector of PRawRunDataSet's. Addressing of the data set can be done
+ * via a map mechanism, since e.g. for MusrRoot, the data sets are not continuously
+ * numbered due to Red/Green options.
+ */
+class PRawRunDataVector {
+  public:
+    PRawRunDataVector() {}
+    virtual ~PRawRunDataVector() { fDataVec.clear(); }
+
+    virtual UInt_t Size() { return fDataVec.size(); }
+    virtual Bool_t IsPresent(UInt_t histoNo);
+    virtual PRawRunDataSet* GetSet(UInt_t idx);
+    virtual PRawRunDataSet* Get(UInt_t histoNo);
+    virtual PRawRunDataSet* operator[](UInt_t histoNo);
+    virtual PDoubleVector* GetData(UInt_t histoNo);
+    virtual Double_t GetT0Bin(UInt_t histoNo);
+    virtual Double_t GetT0BinEstimated(UInt_t histoNo);
+    virtual PIntPair GetBkgBin(UInt_t histoNo);
+    virtual PIntPair GetGoodDataBin(UInt_t histoNo);
+
+    virtual void Set(PRawRunDataSet dataSet, Int_t idx=-1);
+
+  private:
+    vector<PRawRunDataSet> fDataVec;
+};
+
+//-------------------------------------------------------------
+/**
  * <p>Handles raw data, both non-muSR data as well muSR histogram data.
  */
 class PRawRunData {
@@ -275,12 +347,20 @@ class PRawRunData {
     PRawRunData();
     virtual ~PRawRunData();
 
+    virtual const TString* GetVersion() { return &fVersion; }
+    virtual const TString* GetGenericValidatorUrl() { return &fGenericValidatorURL; }
+    virtual const TString* GetSpecificValidatorUrl() { return &fSpecificValidatorURL; }
+    virtual const TString* GetGenerator() { return &fGenerator; }
+    virtual const TString* GetComment() { return &fComment; }
+    virtual const TString* GetFileName() { return &fFileName; }
     virtual const TString* GetLaboratory() { return &fLaboratory; }
     virtual const TString* GetBeamline() { return &fBeamline; }
     virtual const TString* GetInstrument() { return &fInstrument; }
+    virtual const TString* GetArea() { return &fArea; }
     virtual const TString* GetRunName() { return &fRunName; }
     virtual const TString* GetMuonSource() { return &fMuonSource; }
     virtual const TString* GetMuonSpecies() { return &fMuonSpecies; }
+    virtual const Double_t GetMuonBeamMomentum() { return fMuonBeamMomentum; }
     virtual const Int_t GetRunNumber() { return fRunNumber; }
     virtual const TString* GetRunTitle() { return &fRunTitle; }
     virtual const TString* GetSetup() { return &fSetup; }
@@ -290,8 +370,10 @@ class PRawRunData {
     virtual const TString* GetStopTime() { return &fStopTime; }
     virtual const TString* GetStopDate() { return &fStopDate; }
     virtual const time_t GetStopDateTime() { return fStopDateTimeSec; }
+    virtual const TString* GetCryoName() { return &fCryo; }
     virtual const TString* GetSample() { return &fSample; }
     virtual const TString* GetOrientation() { return &fOrientation; }
+    virtual const TString* GetMagnetName() { return &fMagnet; }
     virtual const Double_t GetField() { return fField; }
     virtual const UInt_t GetNoOfTemperatures() { return fTemp.size(); }
     virtual const PDoublePairVector* GetTemperature() const { return &fTemp; }
@@ -301,23 +383,31 @@ class PRawRunData {
     virtual const Double_t GetTransport() { return fTransport; }
     virtual const PDoubleVector GetRingAnode() { return fRingAnode; }
     virtual const Double_t GetRingAnode(const UInt_t idx);
-    virtual const Double_t GetTimeResolution() { return fTimeResolution; }
-    virtual const UInt_t GetT0Size() { return fT0s.size(); }
-    virtual const Int_t GetT0(const UInt_t idx);
-    virtual const UInt_t GetT0EstimatedSize() { return fT0Estimated.size(); }
-    virtual const Int_t GetT0Estimated(const UInt_t idx);
-    virtual const PIntPair GetBkgBin(const UInt_t idx);
-    virtual const UInt_t GetGoodDataBinSize() { return fGoodDataBin.size(); }
-    virtual const PIntPair GetGoodDataBin(const UInt_t idx);
-    virtual const UInt_t GetNoOfHistos() { return fDataBin.size(); }
-    virtual const PDoubleVector* GetDataBin(const UInt_t idx);
+    virtual const Double_t GetTimeResolution() { return fTimeResolution; }    
+    virtual const Bool_t IsPresent(UInt_t histoNo) { return fData.IsPresent(histoNo); }
+    virtual const Double_t GetT0Bin(const UInt_t histoNo) { return fData.GetT0Bin(histoNo); }
+    virtual const Double_t GetT0BinEstimated(const UInt_t histoNo) { return fData.GetT0BinEstimated(histoNo); }
+    virtual const PIntPair GetBkgBin(const UInt_t histoNo) { return fData.GetBkgBin(histoNo); }
+    virtual const PIntPair GetGoodDataBin(const UInt_t histoNo) { return fData.GetGoodDataBin(histoNo); }
+    virtual const PIntVector GetRedGreenOffset() { return fRedGreenOffset; }
+    virtual const UInt_t GetNoOfHistos() { return fData.Size(); }
+    virtual PRawRunDataSet* GetDataSet(const UInt_t idx, Bool_t wantHistoNo = true);
+    virtual const PDoubleVector* GetDataBin(const UInt_t histoNo) { return fData.GetData(histoNo); }
     virtual const PNonMusrRawRunData* GetDataNonMusr() { return &fDataNonMusr; }
 
+    virtual void SetVersion(const TString &str) { fVersion = str; }
+    virtual void SetGenericValidatorUrl(const TString &str) { fGenericValidatorURL = str; }
+    virtual void SetSpecificValidatorUrl(const TString &str) { fSpecificValidatorURL = str; }
+    virtual void SetGenerator(const TString &str) { fGenerator = str; }
+    virtual void SetComment(const TString &str) { fComment = str; }
+    virtual void SetFileName(const TString &str) { fFileName = str; }
     virtual void SetLaboratory(const TString &str) { fLaboratory = str; }
     virtual void SetBeamline(const TString &str) { fBeamline = str; }
     virtual void SetInstrument(const TString &str) { fInstrument = str; }
+    virtual void SetArea(const TString &str) { fArea = str; }
     virtual void SetMuonSource(const TString &str) { fMuonSource = str; }
     virtual void SetMuonSpecies(const TString &str) { fMuonSpecies = str; }
+    virtual void SetMuonBeamMomentum(const Double_t dval) { fMuonBeamMomentum = dval; }
     virtual void SetRunName(const TString &str) { fRunName = str; }
     virtual void SetRunNumber(const Int_t &val) { fRunNumber = val; }
     virtual void SetRunTitle(const TString str) { fRunTitle = str; }
@@ -328,7 +418,9 @@ class PRawRunData {
     virtual void SetStopTime(const TString str) { fStopTime = str; }
     virtual void SetStopDate(const TString str) { fStopDate = str; }
     virtual void SetStopDateTime(const time_t val) { fStopDateTimeSec = val; }
+    virtual void SetMagnetName(const TString str) { fMagnet = str; }
     virtual void SetField(const Double_t dval) { fField = dval; }
+    virtual void SetCryoName(const TString str) { fCryo = str; }
     virtual void SetSample(const TString str) { fSample = str; }
     virtual void SetOrientation(const TString str) { fOrientation = str; }
     virtual void ClearTemperature() { fTemp.clear(); }
@@ -338,24 +430,27 @@ class PRawRunData {
     virtual void SetTransport(const Double_t dval) { fTransport = dval; }
     virtual void SetRingAnode(const UInt_t idx, const Double_t dval);
     virtual void SetTimeResolution(const Double_t dval) { fTimeResolution = dval; }
-    virtual void AppendT0(const Int_t ival) { fT0s.push_back(ival); }
-    virtual void AppendT0Estimated(const Int_t ival) { fT0Estimated.push_back(ival); }
-    virtual void AppendBkgBin(PIntPair pair) { fBkgBin.push_back(pair); }
-    virtual void AppendGoodDataBin(PIntPair pair) { fGoodDataBin.push_back(pair); }
-    virtual void AppendDataBin(PDoubleVector data) { fDataBin.push_back(data); }
-    virtual void SetDataBin(const UInt_t histoNo, const UInt_t bin, const Double_t dval);
-    virtual void AddDataBin(const UInt_t histoNo, const UInt_t bin, const Double_t dval);
+    virtual void SetRedGreenOffset(PIntVector &ivec) { fRedGreenOffset = ivec; }
+    virtual void SetDataSet(PRawRunDataSet &dataSet, UInt_t idx=-1) { fData.Set(dataSet, idx); }
 
     PNonMusrRawRunData fDataNonMusr; ///< keeps all ascii- or db-file info in case of nonMusr fit
 
   private:
+    TString fVersion;                ///< keeps the version information of the data file
+    TString fGenericValidatorURL;    ///< keeps the generic validator MusrRoot URL
+    TString fSpecificValidatorURL;   ///< keeps the instrument specific validator MusrRoot URL
+    TString fGenerator;              ///< keeps the data file generator name
+    TString fComment;                ///< keeps the data file comment
+    TString fFileName;               ///< keeps the name of the original data file
     TString fLaboratory;             ///< keeps the name of the laboratory, e.g. PSI, ISIS, TRIUMF, JPARC
     TString fBeamline;               ///< keeps the name of the be beamline, e.g. muE4, piM3.1, ...
     TString fInstrument;             ///< keeps the name of the instrument, e.g. LEM, GPS, MUSR, EMU, ...
+    TString fArea;                   ///< keeps the beam area
     TString fMuonSource;             ///< keeps the type of muon source, e.g. continous surface beam, pulsed beam, low energy muon beam
     TString fMuonSpecies;            ///< positive muon or negative muon
-    TString fRunName;                ///< name of the run
-    Int_t  fRunNumber;               ///< run number
+    Double_t fMuonBeamMomentum;      ///< given in MeV/c, for LEM this is the momentum of the secondary beamline and NOT the momentum of the low energy beam
+    TString fRunName;                ///< name of the run as found in the msr-file
+    Int_t   fRunNumber;              ///< run number
     TString fRunTitle;               ///< run title
     TString fSetup;                  ///< description of the setup of this run
     TString fStartTime;              ///< start time of the run
@@ -364,19 +459,19 @@ class PRawRunData {
     TString fStopTime;               ///< stop time of the run
     TString fStopDate;               ///< stop date of the run
     time_t fStopDateTimeSec;         ///< stop run given as time_t object
+    TString fCryo;                   ///< name of the cryo
     TString fSample;                 ///< description of the sample
     TString fOrientation;            ///< description of the orientation
-    Double_t fField;                 ///< magnetic field value
+    TString fMagnet;                 ///< name of the sample magnet
+    Double_t fField;                 ///< magnetic field value in (G)
     PDoublePairVector fTemp;         ///< measured temperatures and standard deviations during the run
     Double_t fEnergy;                ///< implantation energy of the muon
     Double_t fTransport;             ///< LEM transport settings (Moderator HV)
     PDoubleVector fRingAnode;        ///< LEM ring anode HVs (L,R[,T,B])
     Double_t fTimeResolution;        ///< time resolution of the run in (ns)
-    PIntVector fT0s;                 ///< vector of t0's of a run
-    PIntVector fT0Estimated;         ///< vector of t0's estimated based on the maximum of the histogram
-    PIntPairVector fBkgBin;          ///< background bins (first/last)
-    PIntPairVector fGoodDataBin;     ///< data bins (first/last)
-    vector<PDoubleVector> fDataBin;  ///< vector of all histos of a run
+    PIntVector fRedGreenOffset;      ///< keeps the Red/Green offsets
+
+    PRawRunDataVector fData;         ///< keeps the histos together with the histo related properties such as T0, first good bin, etc.
 };
 
 //-------------------------------------------------------------
@@ -461,11 +556,11 @@ class PMsrRunBlock {
     virtual Double_t GetBkgFix(UInt_t idx);
     virtual Int_t GetBkgRange(UInt_t idx);
     virtual Int_t GetDataRange(UInt_t idx);
-    virtual UInt_t GetT0Size() { return fT0.size(); }
-    virtual Int_t GetT0(UInt_t idx=0);
-    virtual UInt_t GetAddT0Entries() { return fAddT0.size(); }
-    virtual Int_t GetAddT0Size(UInt_t addRunIdx);
-    virtual Int_t GetAddT0(UInt_t addRunIdx, UInt_t histoIdx);
+    virtual UInt_t GetT0BinSize() { return fT0.size(); }
+    virtual Double_t GetT0Bin(UInt_t idx=0);
+    virtual UInt_t GetAddT0BinEntries() { return fAddT0.size(); }
+    virtual Int_t GetAddT0BinSize(UInt_t addRunIdx);
+    virtual Double_t GetAddT0Bin(UInt_t addRunIdx, UInt_t histoIdx);
     virtual Double_t GetFitRange(UInt_t idx);
     virtual Int_t GetPacking() { return fPacking; }
     virtual Int_t GetXDataIndex() { return fXYDataIndex[0]; }
@@ -493,8 +588,8 @@ class PMsrRunBlock {
     virtual void SetBkgFix(Double_t dval, Int_t idx);
     virtual void SetBkgRange(Int_t ival, Int_t idx);
     virtual void SetDataRange(Int_t ival, Int_t idx);
-    virtual void SetT0(Int_t ival, Int_t idx=-1);
-    virtual void SetAddT0(Int_t ival, UInt_t addRunIdx, UInt_t histoNoIdx);
+    virtual void SetT0Bin(Double_t dval, Int_t idx=-1);
+    virtual void SetAddT0Bin(Double_t dval, UInt_t addRunIdx, UInt_t histoNoIdx);
     virtual void SetFitRange(Double_t dval, UInt_t idx);
     virtual void SetPacking(Int_t ival) { fPacking = ival; }
     virtual void SetXDataIndex(Int_t ival) { fXYDataIndex[0] = ival; }
@@ -523,8 +618,8 @@ class PMsrRunBlock {
     Double_t fBkgFix[2];            ///< fixed background in (1/ns) (fit type 0, 2, 4)
     Int_t fBkgRange[4];             ///< background bin range (fit type 0, 2, 4)
     Int_t fDataRange[4];            ///< data bin range (fit type 0, 2, 4)
-    PIntVector fT0;                 ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
-    vector<PIntVector> fAddT0;      ///< t0 bins for addrun's
+    PDoubleVector fT0;              ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
+    vector<PDoubleVector> fAddT0;   ///< t0 bins for addrun's
     Double_t fFitRange[2];          ///< fit range in (us)
     Int_t fPacking;                 ///< packing/rebinning
     Int_t fXYDataIndex[2];          ///< used to get the data indices when using db-files (fit type 8)

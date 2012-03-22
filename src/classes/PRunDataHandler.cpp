@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007 by Andreas Suter                                   *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -52,6 +52,7 @@ using namespace std;
 #include <TH1F.h>
 #include <TDatime.h>
 
+#include "TMusrRunHeader.h"
 #include "TLemRunHeader.h"
 #include "MuSR_td_PSI_bin.h"
 #include "mud.h"
@@ -62,18 +63,21 @@ using namespace std;
 
 #include "PRunDataHandler.h"
 
-#define ROOT_ALL 0
-#define ROOT_NPP 1
-#define ROOT_PPC 2
+#define PRH_MUSR_ROOT  0
+#define PRH_LEM_ROOT   1
+
+#define PRH_NPP_OFFSET 0
+#define PRH_PPC_OFFSET 20
 
 #define A2M_UNDEFINED  0
 #define A2M_ROOT       1
-#define A2M_PSIBIN     2
-#define A2M_PSIMDU     3
-#define A2M_MUD        4
-#define A2M_NEXUS      5
-#define A2M_WKM        6
-#define A2M_ASCII      7
+#define A2M_MUSR_ROOT  2
+#define A2M_PSIBIN     3
+#define A2M_PSIMDU     4
+#define A2M_MUD        5
+#define A2M_NEXUS      6
+#define A2M_WKM        7
+#define A2M_ASCII      8
 
 //--------------------------------------------------------------------------
 // Constructor
@@ -220,28 +224,49 @@ Bool_t PRunDataHandler::ReadFilesMsr()
       if (!FileExistsCheck(runList->at(i), j))
         return false;
       // everything looks fine, hence try to read the data file
-      if (!runList->at(i).GetFileFormat(j)->CompareTo("root-npp")) // not post pile up corrected histos
-        success = ReadRootFile(ROOT_NPP);
-      else if (!runList->at(i).GetFileFormat(j)->CompareTo("root-ppc")) // post pile up corrected histos
-        success = ReadRootFile(ROOT_PPC);
-      else if (!runList->at(i).GetFileFormat(j)->CompareTo("nexus"))
+      if (!runList->at(i).GetFileFormat(j)->CompareTo("root-npp")) { // not post pile up corrected histos
+        // check if forward/backward histoNo are within proper bounds, i.e. < PRH_PPC_OFFSET
+        for (UInt_t k=0; k<runList->at(i).GetForwardHistoNoSize(); k++) {
+          if (runList->at(i).GetForwardHistoNo(k) > PRH_PPC_OFFSET)
+            runList->at(i).SetForwardHistoNo(runList->at(i).GetForwardHistoNo(k)-PRH_PPC_OFFSET, k);
+        }
+        for (UInt_t k=0; k<runList->at(i).GetBackwardHistoNoSize(); k++) {
+          if (runList->at(i).GetBackwardHistoNo(k) > PRH_PPC_OFFSET)
+            runList->at(i).SetBackwardHistoNo(runList->at(i).GetBackwardHistoNo(k)-PRH_PPC_OFFSET, k);
+        }
+        success = ReadRootFile();
+      } else if (!runList->at(i).GetFileFormat(j)->CompareTo("root-ppc")) { // post pile up corrected histos
+        // check if forward/backward histoNo are within proper bounds, i.e. > PRH_PPC_OFFSET
+        for (UInt_t k=0; k<runList->at(i).GetForwardHistoNoSize(); k++) {
+          if (runList->at(i).GetForwardHistoNo(k) < PRH_PPC_OFFSET)
+            runList->at(i).SetForwardHistoNo(runList->at(i).GetForwardHistoNo(k)+PRH_PPC_OFFSET, k);
+        }
+        for (UInt_t k=0; k<runList->at(i).GetBackwardHistoNoSize(); k++) {
+          if (runList->at(i).GetBackwardHistoNo(k) < PRH_PPC_OFFSET)
+            runList->at(i).SetBackwardHistoNo(runList->at(i).GetBackwardHistoNo(k)+PRH_PPC_OFFSET, k);
+        }
+        success = ReadRootFile();
+      } else if (!runList->at(i).GetFileFormat(j)->CompareTo("musr-root")) { // MusrRoot style file
+        success = ReadRootFile();
+      } else if (!runList->at(i).GetFileFormat(j)->CompareTo("nexus")) {
         success = ReadNexusFile();
-      else if (!runList->at(i).GetFileFormat(j)->CompareTo("psi-bin"))
+      } else if (!runList->at(i).GetFileFormat(j)->CompareTo("psi-bin")) {
         success = ReadPsiBinFile();
-      else if (!runList->at(i).GetFileFormat(j)->CompareTo("psi-mdu"))
+      } else if (!runList->at(i).GetFileFormat(j)->CompareTo("psi-mdu")) {
         success = ReadPsiBinFile();
-      else if (!runList->at(i).GetFileFormat(j)->CompareTo("mud"))
+      } else if (!runList->at(i).GetFileFormat(j)->CompareTo("mud")) {
         success = ReadMudFile();
-      else if (!runList->at(i).GetFileFormat(j)->CompareTo("wkm"))
+      } else if (!runList->at(i).GetFileFormat(j)->CompareTo("wkm")) {
         success = ReadWkmFile();
-      else if (!runList->at(i).GetFileFormat(j)->CompareTo("mdu-ascii"))
+      } else if (!runList->at(i).GetFileFormat(j)->CompareTo("mdu-ascii")) {
         success = ReadMduAsciiFile();        
-      else if (!runList->at(i).GetFileFormat(j)->CompareTo("ascii"))
+      } else if (!runList->at(i).GetFileFormat(j)->CompareTo("ascii")) {
         success = ReadAsciiFile();
-      else if (!runList->at(i).GetFileFormat(j)->CompareTo("db"))
+      } else if (!runList->at(i).GetFileFormat(j)->CompareTo("db")) {
         success = ReadDBFile();
-      else
+      } else {
         success = false;
+      }
     }
   }
 
@@ -295,6 +320,8 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
   Int_t outTag = A2M_UNDEFINED;
   if (!fAny2ManyInfo->outFormat.CompareTo("root", TString::kIgnoreCase))
     outTag = A2M_ROOT;
+  else if (!fAny2ManyInfo->outFormat.CompareTo("musrroot", TString::kIgnoreCase))
+    outTag = A2M_MUSR_ROOT;
   else if (!fAny2ManyInfo->outFormat.CompareTo("psi-bin", TString::kIgnoreCase))
     outTag = A2M_PSIBIN;
   else if (!fAny2ManyInfo->outFormat.CompareTo("mud",TString::kIgnoreCase))
@@ -326,7 +353,7 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
       Bool_t success = false;
       switch (inTag) {
       case A2M_ROOT:
-        success = ReadRootFile(ROOT_ALL);
+        success = ReadRootFile();
         break;
       case A2M_PSIBIN:
         success = ReadPsiBinFile();
@@ -360,6 +387,13 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
           success = WriteRootFile();
         else
           success = WriteRootFile(fAny2ManyInfo->outFileName);
+        break;
+      case A2M_MUSR_ROOT:
+        if (fAny2ManyInfo->outFileName.Length() == 0)
+          success = WriteMusrRootFile();
+        else
+          success = WriteMusrRootFile(fAny2ManyInfo->outFileName);
+        break;
         break;
       case A2M_PSIBIN:
         if (fAny2ManyInfo->outFileName.Length() == 0)
@@ -421,7 +455,7 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
       Bool_t success = false;
       switch (inTag) {
       case A2M_ROOT:
-        success = ReadRootFile(ROOT_ALL);
+        success = ReadRootFile();
         break;
       case A2M_PSIBIN:
         success = ReadPsiBinFile();
@@ -464,6 +498,9 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
       switch (outTag) {
       case A2M_ROOT:
         success = WriteRootFile(fln);
+        break;
+      case A2M_MUSR_ROOT:
+        success = WriteMusrRootFile(fln);
         break;
       case A2M_PSIBIN:
         success = WritePsiBinFile(fln);
@@ -761,6 +798,8 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
     ext = TString("root");
   else if (!runInfo.GetFileFormat(idx)->CompareTo("root-ppc")) // post pile up corrected histos
     ext = TString("root");
+  else if (!runInfo.GetFileFormat(idx)->CompareTo("musr-root")) // post pile up corrected histos
+    ext = TString("root");
   else if (!runInfo.GetFileFormat(idx)->CompareTo("nexus"))
     ext = TString("NXS");
   else if (!runInfo.GetFileFormat(idx)->CompareTo("psi-bin"))
@@ -796,6 +835,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
     cerr << endl << ">>   support file formats are:";
     cerr << endl << ">>   ROOT-NPP   -> root not post pileup corrected for lem";
     cerr << endl << ">>   ROOT-PPC   -> root post pileup corrected for lem";
+    cerr << endl << ">>   MUSR-ROOT  -> MusrRoot file format";
     cerr << endl << ">>   NEXUS      -> nexus file format, HDF4, HDF5, or XML";
     cerr << endl << ">>   PSI-BIN    -> psi bin file format";
     cerr << endl << ">>   PSI-MDU    -> psi mdu file format (see also MDU-ASCII)";
@@ -1019,279 +1059,269 @@ Bool_t PRunDataHandler::FileExistsCheck(const Bool_t fileName, const Int_t idx)
 // ReadRootFile
 //--------------------------------------------------------------------------
 /**
- * <p> Reads the LEM-data ROOT-files.
+ * <p> Reads both, the "old" LEM-data ROOT-files with TLemRunHeader, and the more general
+ * new MusrRoot file.
  *
  * <b>return:</b>
  * - true at successful reading,
  * - otherwise false.
- *
- * \param tag This tag is used as a switch between "Not Post Pileup Corrected",
- *            "Post Pileup Corrected", and "Read All" histogramms.
  */
-Bool_t PRunDataHandler::ReadRootFile(UInt_t tag)
+Bool_t PRunDataHandler::ReadRootFile()
 {
-  PDoubleVector histoData;
-  PRawRunData   runData;
+  PDoubleVector  histoData;
+  PRawRunData    runData;
+  PRawRunDataSet dataSet;
 
   TFile f(fRunPathName.Data());
   if (f.IsZombie()) {
     return false;
   }
 
+  UInt_t fileType = PRH_MUSR_ROOT;
+
   TFolder *folder;
-  f.GetObject("RunInfo", folder);
-  if (!folder) {
-    cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't obtain RunInfo from " << fRunPathName.Data() << endl;
-    f.Close();
-    return false;
-  }
-
-  // read header and check if some missing run info need to be fed
-  TLemRunHeader *runHeader = dynamic_cast<TLemRunHeader*>(folder->FindObjectAny("TLemRunHeader"));
-
-  // check if run header is valid
-  if (!runHeader) {
-    cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't obtain run header info from ROOT file " << fRunPathName.Data() << endl;
-    f.Close();
-    return false;
-  }
-
-  // set laboratory / beamline / instrument
-  runData.SetLaboratory("PSI");
-  runData.SetBeamline("muE4");
-  runData.SetInstrument("LEM");
-  runData.SetMuonSource("low energy muon source");
-  runData.SetMuonSpecies("positive muons");
-
-  // get run title
-  TObjString ostr = runHeader->GetRunTitle();
-  runData.SetRunTitle(ostr.GetString());
-
-  // get run number
-  runData.SetRunNumber((Int_t)runHeader->GetRunNumber());
-
-  // get temperature
-  runData.ClearTemperature();
-  runData.SetTemperature(0, runHeader->GetSampleTemperature(), runHeader->GetSampleTemperatureError());
-
-  // get field
-  runData.SetField(runHeader->GetSampleBField());
-
-  // get implantation energy
-  runData.SetEnergy(runHeader->GetImpEnergy());
-
-  // get moderator HV
-  runData.SetTransport(runHeader->GetModeratorHV());
-
-  // get setup
-  runData.SetSetup(runHeader->GetLemSetup().GetString());
-
-  // get start time/date
-  // start date
-  time_t idt = (time_t)runHeader->GetStartTime();
-  runData.SetStartDateTime(idt);
-  struct tm *dt = localtime(&idt);
-  char str[128];
-  strftime(str, sizeof(str), "%F", dt);
-  TString stime(str);
-  runData.SetStartDate(stime);
-  // start time
-  memset(str, 0, sizeof(str));
-  strftime(str, sizeof(str), "%T", dt);
-  stime = str;
-  runData.SetStartTime(stime);
-
-  // get stop time/date
-  // stop date
-  idt = (time_t)runHeader->GetStopTime();
-  runData.SetStopDateTime(idt);
-  dt = localtime(&idt);
-  memset(str, 0, sizeof(str));
-  strftime(str, sizeof(str), "%F", dt);
-  stime = str;
-  runData.SetStopDate(stime);
-  // stop time
-  memset(str, 0, sizeof(str));
-  strftime(str, sizeof(str), "%T", dt);
-  stime = str;
-  runData.SetStopTime(stime);
-
-  // get time resolution
-  runData.SetTimeResolution(runHeader->GetTimeResolution());
-
-  // get number of histogramms
-  Int_t noOfHistos = runHeader->GetNHist();  
-
-  // get t0's
-  Double_t *t0 = runHeader->GetTimeZero();
-  // check if t0's are there
-  if (t0[0] != -1) { // ugly, but at the moment there is no other way
-    // copy t0's so they are not lost
-    for (Int_t i=0; i<noOfHistos; i++) {
-      runData.AppendT0((Int_t)t0[i]);
+  f.GetObject("RunInfo", folder); // try first LEM-ROOT style file (used until 2011).
+  if (!folder) { // either something is wrong, or it is a MusrRoot file
+    f.GetObject("RunHeader", folder);
+    if (!folder) { // something is wrong!!
+      cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't neither obtain RunInfo (LEM),";
+      cerr << endl << "   nor RunHeader (MusrRoot) from " << fRunPathName.Data() << endl;
+      f.Close();
+      return false;
+    } else {
+      fileType = PRH_MUSR_ROOT;
     }
-    if (tag == ROOT_ALL) { // since NPP and PPC the t0's needs to be doubled
-      for (Int_t i=0; i<noOfHistos; i++) {
-        runData.AppendT0((Int_t)t0[i]);
-      }
-    }
+  } else {
+    fileType = PRH_LEM_ROOT;
   }
 
-  // read run summary to obtain ring anode HV values
-  TObjArray *runSummary = dynamic_cast<TObjArray*>(folder->FindObjectAny("RunSummary"));
+  if (fileType == PRH_LEM_ROOT) {
+    // read header and check if some missing run info need to be fed
+    TLemRunHeader *runHeader = dynamic_cast<TLemRunHeader*>(folder->FindObjectAny("TLemRunHeader"));
 
-  // check if run summary is valid
-  if (!runSummary) {
-    cout << endl << "**INFO** Couldn't obtain run summary info from ROOT file " << fRunPathName.Data() << endl;
-    // this is not fatal... only RA-HV values are not available
-  } else { // it follows a (at least) little bit strange extraction of the RA values from Thomas' TObjArray...
-           //streaming of a ASCII-file would be more easy
-    TString s;
-    TObjArrayIter summIter(runSummary);
-    TObjString *os(dynamic_cast<TObjString*>(summIter.Next()));
-    TObjArray *oa(0);
-    TObjString *objTok(0);
-    while (os != 0) {
-      s = os->GetString();
-      // will put four parallel if's since it may be that more than one RA-values are on one line
-      if (s.Contains("RA-L")) {
-        oa = s.Tokenize(" ");
-        TObjArrayIter lineIter(oa);
-        objTok = dynamic_cast<TObjString*>(lineIter.Next());
-        while (objTok != 0) {
-          if (!objTok->GetString().CompareTo("RA-L")) {
-            objTok = dynamic_cast<TObjString*>(lineIter.Next()); // "="
-            if (objTok != 0 && !objTok->GetString().CompareTo("=")) {
-              objTok = dynamic_cast<TObjString*>(lineIter.Next()); // HV value
-              runData.SetRingAnode(0, objTok->GetString().Atof()); // fill RA-R value into the runData structure
-              break;
+    // check if run header is valid
+    if (!runHeader) {
+      cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't obtain run header info from ROOT file " << fRunPathName.Data() << endl;
+      f.Close();
+      return false;
+    }
+
+    // set laboratory / beamline / instrument
+    runData.SetLaboratory("PSI");
+    runData.SetBeamline("muE4");
+    runData.SetInstrument("LEM");
+    runData.SetMuonSource("low energy muon source");
+    runData.SetMuonSpecies("positive muons");
+
+    // get run title
+    TObjString ostr = runHeader->GetRunTitle();
+    runData.SetRunTitle(ostr.GetString());
+
+    // get run number
+    runData.SetRunNumber((Int_t)runHeader->GetRunNumber());
+
+    // get temperature
+    runData.ClearTemperature();
+    runData.SetTemperature(0, runHeader->GetSampleTemperature(), runHeader->GetSampleTemperatureError());
+
+    // get field
+    runData.SetField(runHeader->GetSampleBField());
+
+    // get implantation energy
+    runData.SetEnergy(runHeader->GetImpEnergy());
+
+    // get moderator HV
+    runData.SetTransport(runHeader->GetModeratorHV());
+
+    // get setup
+    runData.SetSetup(runHeader->GetLemSetup().GetString());
+
+    // get start time/date
+    // start date
+    time_t idt = (time_t)runHeader->GetStartTime();
+    runData.SetStartDateTime(idt);
+    struct tm *dt = localtime(&idt);
+    char str[128];
+    strftime(str, sizeof(str), "%F", dt);
+    TString stime(str);
+    runData.SetStartDate(stime);
+    // start time
+    memset(str, 0, sizeof(str));
+    strftime(str, sizeof(str), "%T", dt);
+    stime = str;
+    runData.SetStartTime(stime);
+
+    // get stop time/date
+    // stop date
+    idt = (time_t)runHeader->GetStopTime();
+    runData.SetStopDateTime(idt);
+    dt = localtime(&idt);
+    memset(str, 0, sizeof(str));
+    strftime(str, sizeof(str), "%F", dt);
+    stime = str;
+    runData.SetStopDate(stime);
+    // stop time
+    memset(str, 0, sizeof(str));
+    strftime(str, sizeof(str), "%T", dt);
+    stime = str;
+    runData.SetStopTime(stime);
+
+    // get time resolution
+    runData.SetTimeResolution(runHeader->GetTimeResolution());
+
+    // get number of histogramms
+    Int_t noOfHistos = runHeader->GetNHist();
+
+    // get t0's there will be handled together with the data
+    Double_t *t0 = runHeader->GetTimeZero();
+
+    // read run summary to obtain ring anode HV values
+    TObjArray *runSummary = dynamic_cast<TObjArray*>(folder->FindObjectAny("RunSummary"));
+
+    // check if run summary is valid
+    if (!runSummary) {
+      cout << endl << "**INFO** Couldn't obtain run summary info from ROOT file " << fRunPathName.Data() << endl;
+      // this is not fatal... only RA-HV values are not available
+    } else { // it follows a (at least) little bit strange extraction of the RA values from Thomas' TObjArray...
+      //streaming of a ASCII-file would be more easy
+      TString s;
+      TObjArrayIter summIter(runSummary);
+      TObjString *os(dynamic_cast<TObjString*>(summIter.Next()));
+      TObjArray *oa(0);
+      TObjString *objTok(0);
+      while (os != 0) {
+        s = os->GetString();
+        // will put four parallel if's since it may be that more than one RA-values are on one line
+        if (s.Contains("RA-L")) {
+          oa = s.Tokenize(" ");
+          TObjArrayIter lineIter(oa);
+          objTok = dynamic_cast<TObjString*>(lineIter.Next());
+          while (objTok != 0) {
+            if (!objTok->GetString().CompareTo("RA-L")) {
+              objTok = dynamic_cast<TObjString*>(lineIter.Next()); // "="
+              if (objTok != 0 && !objTok->GetString().CompareTo("=")) {
+                objTok = dynamic_cast<TObjString*>(lineIter.Next()); // HV value
+                runData.SetRingAnode(0, objTok->GetString().Atof()); // fill RA-R value into the runData structure
+                break;
+              }
             }
+            objTok = dynamic_cast<TObjString*>(lineIter.Next()); // next token...
           }
-        objTok = dynamic_cast<TObjString*>(lineIter.Next()); // next token...
+          // clean up
+          if (oa) {
+            delete oa;
+            oa = 0;
+          }
         }
-      }
 
-      if (s.Contains("RA-R")) {
-        oa = s.Tokenize(" ");
-        TObjArrayIter lineIter(oa);
-        objTok = dynamic_cast<TObjString*>(lineIter.Next());
-        while (objTok != 0){
-          if (!objTok->GetString().CompareTo("RA-R")) {
-            objTok = dynamic_cast<TObjString*>(lineIter.Next()); // "="
-            if (objTok != 0 && !objTok->GetString().CompareTo("=")) {
-              objTok = dynamic_cast<TObjString*>(lineIter.Next()); // HV value
-              runData.SetRingAnode(1, objTok->GetString().Atof()); // fill RA-R value into the runData structure
-              break;
+        if (s.Contains("RA-R")) {
+          oa = s.Tokenize(" ");
+          TObjArrayIter lineIter(oa);
+          objTok = dynamic_cast<TObjString*>(lineIter.Next());
+          while (objTok != 0){
+            if (!objTok->GetString().CompareTo("RA-R")) {
+              objTok = dynamic_cast<TObjString*>(lineIter.Next()); // "="
+              if (objTok != 0 && !objTok->GetString().CompareTo("=")) {
+                objTok = dynamic_cast<TObjString*>(lineIter.Next()); // HV value
+                runData.SetRingAnode(1, objTok->GetString().Atof()); // fill RA-R value into the runData structure
+                break;
+              }
             }
+            objTok = dynamic_cast<TObjString*>(lineIter.Next()); // next token...
           }
-        objTok = dynamic_cast<TObjString*>(lineIter.Next()); // next token...
+          // clean up
+          if (oa) {
+            delete oa;
+            oa = 0;
+          }
         }
-      }
 
-      if (s.Contains("RA-T")) {
-        oa = s.Tokenize(" ");
-        TObjArrayIter lineIter(oa);
-        objTok = dynamic_cast<TObjString*>(lineIter.Next());
-        while (objTok != 0){
-          if (!objTok->GetString().CompareTo("RA-T")) {
-            objTok = dynamic_cast<TObjString*>(lineIter.Next()); // "="
-            if (objTok != 0 && !objTok->GetString().CompareTo("=")) {
-              objTok = dynamic_cast<TObjString*>(lineIter.Next()); // HV value
-              runData.SetRingAnode(2, objTok->GetString().Atof()); // fill RA-T value into the runData structure
-              break;
+        if (s.Contains("RA-T")) {
+          oa = s.Tokenize(" ");
+          TObjArrayIter lineIter(oa);
+          objTok = dynamic_cast<TObjString*>(lineIter.Next());
+          while (objTok != 0){
+            if (!objTok->GetString().CompareTo("RA-T")) {
+              objTok = dynamic_cast<TObjString*>(lineIter.Next()); // "="
+              if (objTok != 0 && !objTok->GetString().CompareTo("=")) {
+                objTok = dynamic_cast<TObjString*>(lineIter.Next()); // HV value
+                runData.SetRingAnode(2, objTok->GetString().Atof()); // fill RA-T value into the runData structure
+                break;
+              }
             }
+            objTok = dynamic_cast<TObjString*>(lineIter.Next()); // next token...
           }
-        objTok = dynamic_cast<TObjString*>(lineIter.Next()); // next token...
+          // clean up
+          if (oa) {
+            delete oa;
+            oa = 0;
+          }
         }
-      }
 
-      if (s.Contains("RA-B")) {
-        oa = s.Tokenize(" ");
-        TObjArrayIter lineIter(oa);
-        objTok = dynamic_cast<TObjString*>(lineIter.Next());
-        while (objTok != 0){
-          if (!objTok->GetString().CompareTo("RA-B")) {
-            objTok = dynamic_cast<TObjString*>(lineIter.Next()); // "="
-            if (objTok != 0 && !objTok->GetString().CompareTo("=")) {
-              objTok = dynamic_cast<TObjString*>(lineIter.Next()); // HV value
-              runData.SetRingAnode(3, objTok->GetString().Atof()); // fill RA-B value into the runData structure
-              break;
+        if (s.Contains("RA-B")) {
+          oa = s.Tokenize(" ");
+          TObjArrayIter lineIter(oa);
+          objTok = dynamic_cast<TObjString*>(lineIter.Next());
+          while (objTok != 0){
+            if (!objTok->GetString().CompareTo("RA-B")) {
+              objTok = dynamic_cast<TObjString*>(lineIter.Next()); // "="
+              if (objTok != 0 && !objTok->GetString().CompareTo("=")) {
+                objTok = dynamic_cast<TObjString*>(lineIter.Next()); // HV value
+                runData.SetRingAnode(3, objTok->GetString().Atof()); // fill RA-B value into the runData structure
+                break;
+              }
             }
+            objTok = dynamic_cast<TObjString*>(lineIter.Next()); // next token...
           }
-        objTok = dynamic_cast<TObjString*>(lineIter.Next()); // next token...
+          // clean up
+          if (oa) {
+            delete oa;
+            oa = 0;
+          }
         }
-      }
 
-      os = dynamic_cast<TObjString*>(summIter.Next()); // next summary line...
+        os = dynamic_cast<TObjString*>(summIter.Next()); // next summary line...
+      }
     }
-  }
 
-  // read data ---------------------------------------------------------
-  // check if histos folder is found
-  f.GetObject("histos", folder);
-  if (!folder) {
-    cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't obtain histos from " << fRunPathName.Data() << endl;
-    f.Close();
-    return false;
-  }
-  // get all the data
-  Char_t histoName[32];
-  if (tag == ROOT_NPP) { // read the data which are NOT post pileup corrected
-    for (Int_t i=0; i<noOfHistos; i++) {
-      sprintf(histoName, "hDecay%02d", i);
-      TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
-      if (!histo) {
-        cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't get histo " << histoName;
-        cerr << endl;
-        return false;
-      }
-      // keep maximum of histogram as a T0 estimate
-      runData.AppendT0Estimated(histo->GetMaximumBin());
-      // fill data
-      for (Int_t j=1; j<=histo->GetNbinsX(); j++) {
-        histoData.push_back(histo->GetBinContent(j));
-      }
-      // store them in runData vector
-      runData.AppendDataBin(histoData);
-      // clear histoData for the next histo
-      histoData.clear();
+    // read data ---------------------------------------------------------
+
+    // check if histos folder is found
+    f.GetObject("histos", folder);
+    if (!folder) {
+      cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't obtain histos from " << fRunPathName.Data() << endl;
+      f.Close();
+      return false;
     }
-  } else if (tag == ROOT_PPC) { // read the data which ARE post pileup corrected
-    for (Int_t i=0; i<noOfHistos; i++) {
-      sprintf(histoName, "hDecay%02d", i+POST_PILEUP_HISTO_OFFSET);
-      TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
-      if (!histo) {
-        cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't get histo " << histoName;
-        cerr << endl;
-        return false;
-      }
-      // keep maximum of histogram as a T0 estimate
-      runData.AppendT0Estimated(histo->GetMaximumBin());
-      // fill data
-      for (Int_t j=1; j<=histo->GetNbinsX(); j++)
-        histoData.push_back(histo->GetBinContent(j));
-      // store them in runData vector
-      runData.AppendDataBin(histoData);
-      // clear histoData for the next histo
-      histoData.clear();
-    }
-  } else { // read PPC and NPP histos
+
+    // get all the data
+    Char_t histoName[32];
     for (Int_t i=0; i<noOfHistos; i++) {
       sprintf(histoName, "hDecay%02d", i);
       TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
       if (!histo) {
         cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't get histo " << histoName;
         cerr << endl;
+        f.Close();
         return false;
       }
-      // keep maximum of histogram as a T0 estimate
-      runData.AppendT0Estimated(histo->GetMaximumBin());
+
       // fill data
       for (Int_t j=1; j<=histo->GetNbinsX(); j++) {
         histoData.push_back(histo->GetBinContent(j));
       }
-      // store them in runData vector
-      runData.AppendDataBin(histoData);
+
+      // fill the data set
+      dataSet.Clear();
+      dataSet.SetName(histo->GetTitle());
+      dataSet.SetHistoNo(i+1);
+      dataSet.SetTimeZeroBin(t0[i]);
+      dataSet.SetTimeZeroBinEstimated(histo->GetMaximumBin());
+      dataSet.SetFirstGoodBin(t0[i]);
+      dataSet.SetLastGoodBin(histo->GetNbinsX()-1);
+      dataSet.SetData(histoData);
+      runData.SetDataSet(dataSet);
+
       // clear histoData for the next histo
       histoData.clear();
     }
@@ -1308,18 +1338,377 @@ Bool_t PRunDataHandler::ReadRootFile(UInt_t tag)
         if (!histo) {
           cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't get histo " << histoName;
           cerr << endl;
+          f.Close();
           return false;
         }
-        // keep maximum of histogram as a T0 estimate
-        runData.AppendT0Estimated(histo->GetMaximumBin());
+
         // fill data
         for (Int_t j=1; j<=histo->GetNbinsX(); j++)
           histoData.push_back(histo->GetBinContent(j));
-        // store them in runData vector
-        runData.AppendDataBin(histoData);
+
+        // fill the data set
+        dataSet.Clear();
+        dataSet.SetName(histo->GetTitle());
+        dataSet.SetHistoNo(i+1+POST_PILEUP_HISTO_OFFSET);
+        dataSet.SetTimeZeroBin(t0[i]);
+        dataSet.SetTimeZeroBinEstimated(histo->GetMaximumBin());
+        dataSet.SetFirstGoodBin(t0[i]);
+        dataSet.SetLastGoodBin(histo->GetNbinsX()-1);
+        dataSet.SetData(histoData);
+        runData.SetDataSet(dataSet);
+
         // clear histoData for the next histo
         histoData.clear();
       }
+    }
+  } else { // MusrRoot file
+    // invoke the MusrRoot header object
+    TMusrRunHeader *header = new TMusrRunHeader(true); // read quite
+    if (header == 0) {
+      cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't invoke MusrRoot RunHeader in file:" << fRunPathName;
+      cerr << endl;
+      f.Close();
+      return false;
+    }
+
+    // try to populate the MusrRoot header object
+    if (!header->ExtractAll(folder)) {
+      cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't invoke MusrRoot RunHeader in file:" << fRunPathName;
+      cerr << endl;
+      f.Close();
+      return false;
+    }
+
+    // get all the header information
+    Bool_t ok;
+    TString str, path, pathName;
+    Int_t ival, noOfHistos=0;
+    Double_t dval;
+    TMusrRunPhysicalQuantity prop;
+    PIntVector ivec, redGreenOffsets;
+
+    header->Get("RunInfo/Version", str, ok);
+    if (ok)
+      runData.SetVersion(str);
+
+    header->Get("RunInfo/Generic Validator URL", str, ok);
+    if (ok)
+      runData.SetGenericValidatorUrl(str);
+
+    header->Get("RunInfo/Specific Validator URL", str, ok);
+    if (ok)
+      runData.SetSpecificValidatorUrl(str);
+
+    header->Get("RunInfo/Generator", str, ok);
+    if (ok)
+      runData.SetGenerator(str);
+
+    header->Get("RunInfo/File Name", str, ok);
+    if (ok)
+      runData.SetFileName(str);
+
+    header->Get("RunInfo/Run Title", str, ok);
+    if (ok)
+      runData.SetRunTitle(str);
+
+    header->Get("RunInfo/Run Number", ival, ok);
+    if (ok)
+      runData.SetRunNumber(ival);
+
+    header->Get("RunInfo/Run Start Time", str, ok);
+    if (ok) {
+      Ssiz_t pos = str.Index(' ');
+      TString substr = str;
+      substr.Remove(pos, str.Length());
+      runData.SetStartDate(substr);
+      substr = str;
+      substr.Remove(0, pos+1);
+      runData.SetStartTime(substr);
+    }
+
+    header->Get("RunInfo/Run Stop Time", str, ok);
+    if (ok) {
+      Ssiz_t pos = str.Index(' ');
+      TString substr = str;
+      substr.Remove(pos, str.Length());
+      runData.SetStopDate(substr);
+      substr = str;
+      substr.Remove(0, pos+1);
+      runData.SetStopTime(substr);
+    }
+
+    header->Get("RunInfo/Laboratory", str, ok);
+    if (ok)
+      runData.SetLaboratory(str);
+
+    header->Get("RunInfo/Area", str, ok);
+    if (ok)
+      runData.SetArea(str);
+
+    header->Get("RunInfo/Instrument", str, ok);
+    if (ok)
+      runData.SetInstrument(str);
+
+    header->Get("RunInfo/Muon Beam Momentum", prop, ok);
+    if (ok) {
+      if (!prop.GetUnit().CompareTo("MeV/c"))
+        runData.SetMuonBeamMomentum(prop.GetValue());
+    }
+
+    header->Get("RunInfo/Muon Species", str, ok);
+    if (ok)
+      runData.SetMuonSpecies(str);
+
+    header->Get("RunInfo/Muon Source", str, ok);
+    if (ok)
+      runData.SetMuonSource(str);
+
+    header->Get("RunInfo/Setup", str, ok);
+    if (ok)
+      runData.SetSetup(str);
+
+    header->Get("RunInfo/Comment", str, ok);
+    if (ok)
+      runData.SetComment(str);
+
+    header->Get("RunInfo/Sample Name", str, ok);
+    if (ok)
+      runData.SetSample(str);
+
+    header->Get("RunInfo/Sample Temperature", prop, ok);
+    if (ok)
+      runData.SetTemperature(0, prop.GetValue(), prop.GetError());
+
+    header->Get("RunInfo/Sample Magnetic Field", prop, ok);
+    if (ok) {
+      dval = MRH_UNDEFINED;
+      if (!prop.GetUnit().CompareTo("G") || !prop.GetUnit().CompareTo("Gauss"))
+        dval = prop.GetValue();
+      else if (!prop.GetUnit().CompareTo("T") || !prop.GetUnit().CompareTo("Tesla"))
+        dval = prop.GetValue() * 1.0e4;
+      runData.SetField(dval);
+    }
+
+    header->Get("RunInfo/No of Histos", ival, ok);
+    if (ok) {
+      noOfHistos = ival;
+    }
+
+    header->Get("RunInfo/Time Resolution", prop, ok);
+    if (ok) {
+      dval = -1.0;
+      if (!prop.GetUnit().CompareTo("ps") || !prop.GetUnit().CompareTo("picosec"))
+        dval = prop.GetValue()/1.0e3;
+      else if (!prop.GetUnit().CompareTo("ns") || !prop.GetUnit().CompareTo("nanosec"))
+        dval = prop.GetValue();
+      else if (!prop.GetUnit().CompareTo("us") || !prop.GetUnit().CompareTo("microsec"))
+        dval = prop.GetValue()*1.0e3;
+      else
+        cerr << endl << "debug> Found unrecognized Time Resolution unit: " << prop.GetUnit();
+      runData.SetTimeResolution(dval);
+    }
+
+    header->Get("RunInfo/RedGreen Offset", ivec, ok);
+    if (ok) {
+      redGreenOffsets = ivec;
+      runData.SetRedGreenOffset(ivec);
+    }
+
+    // check further for LEM specific stuff in RunInfo
+
+    header->Get("RunInfo/Moderator HV", prop, ok);
+    if (ok)
+      runData.SetTransport(prop.GetValue());
+
+    header->Get("RunInfo/Implantation Energy", prop, ok);
+    if (ok)
+      runData.SetEnergy(prop.GetValue());
+
+    // read the SampleEnvironmentInfo
+
+    header->Get("SampleEnvironmentInfo/Cryo", str, ok);
+    if (ok)
+      runData.SetCryoName(str);
+
+    // read the MagneticFieldEnvironmentInfo
+
+    header->Get("MagneticFieldEnvironmentInfo/Magnet Name", str, ok);
+    if (ok)
+      runData.SetMagnetName(str);
+
+    // read the BeamlineInfo
+
+    header->Get("BeamlineInfo/Name", str, ok);
+    if (ok)
+      runData.SetBeamline(str);
+
+    // read run summary to obtain ring anode HV values
+    TObjArray *runSummary = dynamic_cast<TObjArray*>(folder->FindObjectAny("RunSummary"));
+
+    // check if run summary is valid
+    if (!runSummary) {
+      cout << endl << "**INFO** Couldn't obtain run summary info from ROOT file " << fRunPathName.Data() << endl;
+      // this is not fatal... only RA-HV values are not available
+    } else { // it follows a (at least) little bit strange extraction of the RA values from Thomas' TObjArray...
+      //streaming of a ASCII-file would be more easy
+      TString s;
+      TObjArrayIter summIter(runSummary);
+      TObjString *os(dynamic_cast<TObjString*>(summIter.Next()));
+      TObjArray *oa(0);
+      TObjString *objTok(0);
+      while (os != 0) {
+        s = os->GetString();
+        // will put four parallel if's since it may be that more than one RA-values are on one line
+        if (s.Contains("RA-L")) {
+          oa = s.Tokenize(" ");
+          TObjArrayIter lineIter(oa);
+          objTok = dynamic_cast<TObjString*>(lineIter.Next());
+          while (objTok != 0) {
+            if (!objTok->GetString().CompareTo("RA-L")) {
+              objTok = dynamic_cast<TObjString*>(lineIter.Next()); // "="
+              if (objTok != 0 && !objTok->GetString().CompareTo("=")) {
+                objTok = dynamic_cast<TObjString*>(lineIter.Next()); // HV value
+                runData.SetRingAnode(0, objTok->GetString().Atof()); // fill RA-R value into the runData structure
+                break;
+              }
+            }
+            objTok = dynamic_cast<TObjString*>(lineIter.Next()); // next token...
+          }
+          // clean up
+          if (oa) {
+            delete oa;
+            oa = 0;
+          }
+        }
+
+        if (s.Contains("RA-R")) {
+          oa = s.Tokenize(" ");
+          TObjArrayIter lineIter(oa);
+          objTok = dynamic_cast<TObjString*>(lineIter.Next());
+          while (objTok != 0){
+            if (!objTok->GetString().CompareTo("RA-R")) {
+              objTok = dynamic_cast<TObjString*>(lineIter.Next()); // "="
+              if (objTok != 0 && !objTok->GetString().CompareTo("=")) {
+                objTok = dynamic_cast<TObjString*>(lineIter.Next()); // HV value
+                runData.SetRingAnode(1, objTok->GetString().Atof()); // fill RA-R value into the runData structure
+                break;
+              }
+            }
+            objTok = dynamic_cast<TObjString*>(lineIter.Next()); // next token...
+          }
+          // clean up
+          if (oa) {
+            delete oa;
+            oa = 0;
+          }
+        }
+
+        if (s.Contains("RA-T")) {
+          oa = s.Tokenize(" ");
+          TObjArrayIter lineIter(oa);
+          objTok = dynamic_cast<TObjString*>(lineIter.Next());
+          while (objTok != 0){
+            if (!objTok->GetString().CompareTo("RA-T")) {
+              objTok = dynamic_cast<TObjString*>(lineIter.Next()); // "="
+              if (objTok != 0 && !objTok->GetString().CompareTo("=")) {
+                objTok = dynamic_cast<TObjString*>(lineIter.Next()); // HV value
+                runData.SetRingAnode(2, objTok->GetString().Atof()); // fill RA-T value into the runData structure
+                break;
+              }
+            }
+            objTok = dynamic_cast<TObjString*>(lineIter.Next()); // next token...
+          }
+          // clean up
+          if (oa) {
+            delete oa;
+            oa = 0;
+          }
+        }
+
+        if (s.Contains("RA-B")) {
+          oa = s.Tokenize(" ");
+          TObjArrayIter lineIter(oa);
+          objTok = dynamic_cast<TObjString*>(lineIter.Next());
+          while (objTok != 0){
+            if (!objTok->GetString().CompareTo("RA-B")) {
+              objTok = dynamic_cast<TObjString*>(lineIter.Next()); // "="
+              if (objTok != 0 && !objTok->GetString().CompareTo("=")) {
+                objTok = dynamic_cast<TObjString*>(lineIter.Next()); // HV value
+                runData.SetRingAnode(3, objTok->GetString().Atof()); // fill RA-B value into the runData structure
+                break;
+              }
+            }
+            objTok = dynamic_cast<TObjString*>(lineIter.Next()); // next token...
+          }
+          // clean up
+          if (oa) {
+            delete oa;
+            oa = 0;
+          }
+        }
+
+        os = dynamic_cast<TObjString*>(summIter.Next()); // next summary line...
+      }
+    }
+
+    // read data ---------------------------------------------------------
+
+    // check if histos folder is found
+    f.GetObject("histos", folder);
+    if (!folder) {
+      cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't obtain histos from " << fRunPathName.Data() << endl;
+      f.Close();
+      return false;
+    }
+
+    // get all the data
+    for (UInt_t i=0; i<redGreenOffsets.size(); i++) {
+      for (Int_t j=0; j<noOfHistos; j++) {
+        str.Form("hDecay%03d", redGreenOffsets[i]+j+1);
+        TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(str.Data()));
+        if (!histo) {
+          cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't get histo " << str;
+          cerr << endl;
+          f.Close();
+          return false;
+        }
+
+        dataSet.Clear();
+        dataSet.SetName(histo->GetTitle());
+        dataSet.SetHistoNo(redGreenOffsets[i]+j+1);
+
+        // get detector info
+        path.Form("DetectorInfo/Detector%03d/", redGreenOffsets[i]+j+1);
+        pathName = path + "Time Zero Bin";
+        header->Get(pathName, dval, ok);
+        if (ok)
+          dataSet.SetTimeZeroBin(dval);
+        pathName = path + "First Good Bin";
+        header->Get(pathName, ival, ok);
+        if (ok)
+          dataSet.SetFirstGoodBin(ival);
+        pathName = path + "Last Good Bin";
+        header->Get(pathName, ival, ok);
+        if (ok)
+          dataSet.SetLastGoodBin(ival);
+        dataSet.SetTimeZeroBinEstimated(histo->GetMaximumBin());
+
+        // fill data
+        for (Int_t j=1; j<=histo->GetNbinsX(); j++) {
+          histoData.push_back(histo->GetBinContent(j));
+        }
+        dataSet.SetData(histoData);
+        runData.SetDataSet(dataSet);
+
+        // clear histoData for the next histo
+        histoData.clear();
+      }
+    }
+
+    // clean up
+    if (header) {
+      delete header;
+      header=0;
     }
   }
 
@@ -1349,8 +1738,9 @@ Bool_t PRunDataHandler::ReadNexusFile()
 #ifdef PNEXUS_ENABLED
   cout << endl << ">> PRunDataHandler::ReadNexusFile(): Will read nexus file " << fRunPathName.Data() << " ...";
 
-  PDoubleVector histoData;
-  PRawRunData   runData;
+  PDoubleVector  histoData;
+  PRawRunData    runData;
+  PRawRunDataSet dataSet;
   TString str;
   string sstr;
   Double_t dval;
@@ -1453,31 +1843,44 @@ Bool_t PRunDataHandler::ReadNexusFile()
     vector<unsigned int> *t0  = nxs_file->GetEntryIdf1()->GetData()->GetT0s();
     vector<unsigned int> *fgb = nxs_file->GetEntryIdf1()->GetData()->GetFirstGoodBins();
     vector<unsigned int> *lgb = nxs_file->GetEntryIdf1()->GetData()->GetLastGoodBins();
-    PIntPair goodDataBin;
-    for (UInt_t i=0; i<nxs_file->GetEntryIdf1()->GetData()->GetNoOfHistos(); i++) {
-      if (i<t0->size()) {
-        runData.AppendT0(t0->at(i));
-      } else {
-        runData.AppendT0(t0->at(0));
-      }
-      if (i<fgb->size()) {
-        goodDataBin.first = fgb->at(i);
-        goodDataBin.second = lgb->at(i);
-      } else {
-        goodDataBin.first = fgb->at(0);
-        goodDataBin.second = lgb->at(0);
-      }
-      runData.AppendGoodDataBin(goodDataBin);
-    }
 
     // get/set data
     vector<unsigned int> *pdata;
+    unsigned int max=0, binMax=0;
     PDoubleVector data;
     for (UInt_t i=0; i<nxs_file->GetEntryIdf1()->GetData()->GetNoOfHistos(); i++) {
       pdata = nxs_file->GetEntryIdf1()->GetData()->GetHisto(i);
-      for (UInt_t j=0; j<pdata->size(); j++)
+      for (UInt_t j=0; j<pdata->size(); j++) {
         data.push_back(pdata->at(j));
-      runData.AppendDataBin(data);
+        if (pdata->at(j) > max) {
+          max = pdata->at(j);
+          binMax = j;
+        }
+      }
+
+      // fill data set
+      dataSet.Clear();
+      dataSet.SetHistoNo(i+1); // i.e. histo numbers start with 1
+      // set time zero bin
+      if (i<t0->size())
+        dataSet.SetTimeZeroBin(t0->at(i));
+      else
+        dataSet.SetTimeZeroBin(t0->at(0));
+      // set time zero bin estimate
+      dataSet.SetTimeZeroBinEstimated(binMax);
+      // set first good bin
+      if (i<fgb->size())
+        dataSet.SetFirstGoodBin(fgb->at(i));
+      else
+        dataSet.SetFirstGoodBin(fgb->at(0));
+      // set last good bin
+      if (i<lgb->size())
+        dataSet.SetFirstGoodBin(lgb->at(i));
+      else
+        dataSet.SetFirstGoodBin(lgb->at(0));
+      dataSet.SetData(data);
+
+      runData.SetDataSet(dataSet);
       data.clear();
     }
 
@@ -1582,52 +1985,11 @@ Bool_t PRunDataHandler::ReadNexusFile()
       runData.SetStopDate(date);
     }
 
-    // get/set t0, firstGoodBin, lastGoodBin
-    int *t0  = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetT0s();
-    int *fgb = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetFirstGoodBins();
-    int *lgb = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetLastGoodBins();
-    PIntPair goodDataBin;
-
-    if (nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetT0Tag() == 3) { // t0, fgb, lgb: [][]
-      for (int i=0; i<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfPeriods(); i++) {
-        for (int j=0; j<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra(); j++) {
-          if (fgb && lgb) {
-            goodDataBin.first = *(fgb+i*nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra()+j);
-            goodDataBin.second = *(lgb+i*nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra()+j);
-          }
-          runData.AppendT0(*(t0+i*nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra()+j));
-          if (fgb && lgb) {
-            runData.AppendGoodDataBin(goodDataBin);
-          }
-        }
-      }
-    } else if (nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetT0Tag() == 2) { // t0, fgb, lgb: []
-      for (int i=0; i<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra(); i++) {
-        if (fgb && lgb) {
-          goodDataBin.first = *(fgb+i);
-          goodDataBin.second = *(lgb+i);
-        }
-        runData.AppendT0(*(t0+i));
-        if (fgb && lgb) {
-          runData.AppendGoodDataBin(goodDataBin);
-        }
-      }
-    } else { // t0, fgb, lgb: single numbers
-      if (fgb && lgb) {
-        goodDataBin.first = *fgb;
-        goodDataBin.second = *lgb;
-      }
-      for (int i=0; i<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfPeriods(); i++) {
-        for (int j=0; j<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra(); j++) {
-          runData.AppendT0(*t0);
-          if (fgb && lgb)
-            runData.AppendGoodDataBin(goodDataBin);
-        }
-      }
-    }
-
-    // get/set data
+    // get/set data, t0, fgb, lgb
     PDoubleVector data;
+    PRawRunDataSet dataSet;
+    UInt_t histoNo = 0;
+    Int_t ival;
     int *histos = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetHistos();
     if (nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfPeriods() > 0) { // counts[][][]
       for (int i=0; i<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfPeriods(); i++) {
@@ -1635,7 +1997,26 @@ Bool_t PRunDataHandler::ReadNexusFile()
           for (int k=0; k<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfBins(); k++) {
             data.push_back(*(histos+i*nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra()+j*nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfBins()+k));
           }
-          runData.AppendDataBin(data);
+          dataSet.Clear();
+          dataSet.SetHistoNo(++histoNo); // i.e. histo numbers start with 1
+          // get t0
+          ival = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetT0(i,j);
+          if (ival == -1) // i.e. single value only
+            ival = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetT0();
+          dataSet.SetTimeZeroBin(ival);
+          // get first good bin
+          ival = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetFirstGoodBin(i,j);
+          if (ival == -1) // i.e. single value only
+            ival = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetFirstGoodBin();
+          dataSet.SetFirstGoodBin(ival);
+          // get last good bin
+          ival = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetLastGoodBin(i,j);
+          if (ival == -1) // i.e. single value only
+            ival = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetLastGoodBin();
+          dataSet.SetLastGoodBin(ival);
+
+          dataSet.SetData(data);
+          runData.SetDataSet(dataSet);
           data.clear();
         }
       }
@@ -1645,14 +2026,46 @@ Bool_t PRunDataHandler::ReadNexusFile()
           for (int j=0; j<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfBins(); j++) {
             data.push_back(*(histos+i*nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfBins()+j));
           }
-          runData.AppendDataBin(data);
+          dataSet.Clear();
+          dataSet.SetHistoNo(++histoNo); // i.e. histo numbers start with 1
+          // get t0
+          ival = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetT0(-1,i);
+          if (ival == -1) // i.e. single value only
+            ival = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetT0();
+          dataSet.SetTimeZeroBin(ival);
+          // get first good bin
+          ival = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetFirstGoodBin(-1,i);
+          if (ival == -1) // i.e. single value only
+            ival = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetFirstGoodBin();
+          dataSet.SetFirstGoodBin(ival);
+          // get last good bin
+          ival = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetLastGoodBin(-1,i);
+          if (ival == -1) // i.e. single value only
+            ival = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetLastGoodBin();
+          dataSet.SetLastGoodBin(ival);
+
+          dataSet.SetData(data);
+          runData.SetDataSet(dataSet);
           data.clear();
         }
       } else { // counts[]
         for (int i=0; i<nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfBins(); i++) {
           data.push_back(*(histos+i));
         }
-        runData.AppendDataBin(data);
+        dataSet.Clear();
+        dataSet.SetHistoNo(++histoNo); // i.e. histo numbers start with 1
+        // get t0
+        ival = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetT0();
+        dataSet.SetTimeZeroBin(ival);
+        // get first good bin
+        ival = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetFirstGoodBin();
+        dataSet.SetFirstGoodBin(ival);
+        // get last good bin
+        ival = nxs_file->GetEntryIdf2()->GetInstrument()->GetDetector()->GetLastGoodBin();
+        dataSet.SetLastGoodBin(ival);
+
+        dataSet.SetData(data);
+        runData.SetDataSet(dataSet);
         data.clear();
       }
     }
@@ -1843,10 +2256,15 @@ Bool_t PRunDataHandler::ReadWkmFile()
   TObjArray *tokens;
   TObjString *ostr;
   TString str;
+  UInt_t histoNo = 0;
+  PRawRunDataSet dataSet;
   do {
     // check if empty line, i.e. new group
     if (IsWhitespace(instr)) {
-      runData.AppendDataBin(histoData);
+      dataSet.Clear();
+      dataSet.SetHistoNo(++histoNo);
+      dataSet.SetData(histoData);
+
       // get a T0 estimate
       Double_t maxVal = 0.0;
       Int_t maxBin = 0;
@@ -1856,7 +2274,10 @@ Bool_t PRunDataHandler::ReadWkmFile()
           maxBin = i;
         }
       }
-      runData.AppendT0Estimated(maxBin);
+      dataSet.SetTimeZeroBinEstimated(maxBin);
+
+      runData.SetDataSet(dataSet);
+
       histoData.clear();
       group_counter++;
     } else {
@@ -1928,7 +2349,22 @@ Bool_t PRunDataHandler::ReadWkmFile()
 
   // save the last histo if not empty
   if (histoData.size() > 0) {
-    runData.AppendDataBin(histoData);
+    dataSet.Clear();
+    dataSet.SetHistoNo(++histoNo);
+    dataSet.SetData(histoData);
+
+    // get a T0 estimate
+    Double_t maxVal = 0.0;
+    Int_t maxBin = 0;
+    for (UInt_t i=0; i<histoData.size(); i++) {
+      if (histoData[i] > maxVal) {
+        maxVal = histoData[i];
+        maxBin = i;
+      }
+    }
+    dataSet.SetTimeZeroBinEstimated(maxBin);
+
+    runData.SetDataSet(dataSet);
     histoData.clear();
   }
 
@@ -2013,9 +2449,14 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
     return success;
 
   // fill necessary header informations
-  PIntVector ivec;
   PRawRunData runData;
   Double_t dval;
+
+  // set file name
+  Ssiz_t pos = fRunPathName.Last('/');
+  TString fln(fRunPathName);
+  fln.Remove(0, pos+1);
+  runData.SetFileName(fln);
 
   // set laboratory
   runData.SetLaboratory("PSI");
@@ -2071,6 +2512,8 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   runData.SetSample(TString(psiBin.get_sample().c_str()));
   // get orientation
   runData.SetOrientation(TString(psiBin.get_orient().c_str()));
+  // get comment
+  runData.SetComment(TString(psiBin.get_comment().c_str()));
   // set LEM specific information to default value since it is not in the file and not used...
   runData.SetEnergy(PMUSR_UNDEFINED);
   runData.SetTransport(PMUSR_UNDEFINED);
@@ -2102,15 +2545,6 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
 
   // get time resolution (ns)
   runData.SetTimeResolution(psiBin.get_binWidth_ns());
-  // get t0's
-  ivec = psiBin.get_t0_vector();
-  if (ivec.empty()) {
-    cerr << endl << ">> **ERROR** psi-bin file: couldn't obtain any t0's";
-    cerr << endl;
-    return false;
-  }
-  for (UInt_t i=0; i<ivec.size(); i++)
-    runData.AppendT0(ivec[i]);
 
   // get start/stop time
   vector<string> sDateTime = psiBin.get_timeStart_vector();
@@ -2141,7 +2575,33 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   runData.SetStopTime(sDateTime[1]);
   sDateTime.clear();
 
+  // get t0's
+  PIntVector t0 = psiBin.get_t0_vector();
+
+  if (t0.empty()) {
+    cerr << endl << ">> **ERROR** psi-bin file: couldn't obtain any t0's";
+    cerr << endl;
+    return false;
+  }
+
+  // get first good bin
+  PIntVector fgb = psiBin.get_firstGood_vector();
+  if (fgb.empty()) {
+    cerr << endl << ">> **ERROR** psi-bin file: couldn't obtain any fgb's";
+    cerr << endl;
+    return false;
+  }
+
+  // get last good bin
+  PIntVector lgb = psiBin.get_lastGood_vector();
+  if (lgb.empty()) {
+    cerr << endl << ">> **ERROR** psi-bin file: couldn't obtain any lgb's";
+    cerr << endl;
+    return false;
+  }
+
   // fill raw data
+  PRawRunDataSet dataSet;
   PDoubleVector histoData;
   Int_t *histo;
   for (Int_t i=0; i<psiBin.get_numberHisto_int(); i++) {
@@ -2150,7 +2610,7 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
       histoData.push_back(histo[j]);
     }
     delete[] histo;
-    runData.AppendDataBin(histoData);
+
     // estimate T0 from maximum of the data
     Double_t maxVal = 0.0;
     Int_t maxBin = 0;
@@ -2160,7 +2620,21 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
         maxBin = j;
       }
     }
-    runData.AppendT0Estimated(maxBin);
+
+    dataSet.Clear();
+    dataSet.SetName(psiBin.get_nameHisto(i).c_str());
+    dataSet.SetHistoNo(i+1); // i.e. hist numbering starts at 1
+    if (i < (Int_t)t0.size())
+      dataSet.SetTimeZeroBin(t0[i]);
+    dataSet.SetTimeZeroBinEstimated(maxBin);
+    if (i < (Int_t)fgb.size())
+      dataSet.SetFirstGoodBin(fgb[i]);
+    if (i < (Int_t)lgb.size())
+      dataSet.SetLastGoodBin(lgb[i]);
+    dataSet.SetData(histoData);
+
+    runData.SetDataSet(dataSet);
+
     histoData.clear();
   }
 
@@ -2374,13 +2848,16 @@ Bool_t PRunDataHandler::ReadMudFile()
   runData.SetTimeResolution((Double_t)timeResolution * 1.0e9); // s -> ns
 
   // read histograms
-  pair<Int_t, Int_t> valPair;
   UINT32 *pData; // histo memory
   pData = NULL;
   PDoubleVector histoData;
+  PRawRunDataSet dataSet;
   UInt_t noOfBins;
 
   for (Int_t i=1; i<=noOfHistos; i++) {
+    dataSet.Clear();
+
+    dataSet.SetHistoNo(i);
 
     // get t0's
     success = MUD_getHistT0_Bin( fh, i, &val );
@@ -2388,51 +2865,41 @@ Bool_t PRunDataHandler::ReadMudFile()
       cerr << endl << ">> **WARNING** Couldn't get t0 of histo " << i << " of run " << fRunName.Data();
       cerr << endl;
     }
-    runData.AppendT0((Int_t)val);
+    dataSet.SetTimeZeroBin((Double_t)val);
 
     // get bkg bins
     success = MUD_getHistBkgd1( fh, i, &val );
     if ( !success ) {
       cerr << endl << ">> **WARNING** Couldn't get bkg bin 1 of histo " << i << " of run " << fRunName.Data();
       cerr << endl;
-      valPair.first = -1;
-    } else {
-      valPair.first = (Int_t)val;
+      val = 0;
     }
+    dataSet.SetFirstBkgBin((Int_t)val);
 
     success = MUD_getHistBkgd2( fh, i, &val );
     if ( !success ) {
       cerr << endl << ">> **WARNING** Couldn't get bkg bin 2 of histo " << i << " of run " << fRunName.Data();
       cerr << endl;
-      valPair.second = -1;
+      val = 0;
     }
-    valPair.second = (Int_t)val;
-
-    if ((valPair.first != -1) && (valPair.second != -1)) { // bkg bin1 && bkg bin2 found
-      runData.AppendBkgBin(valPair);
-    }
+    dataSet.SetLastBkgBin((Int_t)val);
 
     // get good data bins
     success = MUD_getHistGoodBin1( fh, i, &val );
     if ( !success ) {
       cerr << endl << ">> **WARNING** Couldn't get good bin 1 of histo " << i << " of run " << fRunName.Data();
       cerr << endl;
-      valPair.first = -1;
-    } else {
-      valPair.first = (Int_t)val;
+      val = 0;
     }
+    dataSet.SetFirstGoodBin((Int_t)val);
 
     success = MUD_getHistGoodBin2( fh, i, &val );
     if ( !success ) {
       cerr << endl << ">> **WARNING** Couldn't get good bin 2 of histo " << i << " of run " << fRunName.Data();
       cerr << endl;
-      valPair.second = -1;
+      val = 0;
     }
-    valPair.second = (Int_t)val;
-
-    if ((valPair.first != -1) && (valPair.second != -1)) { // good bin1 && good bin2 found
-      runData.AppendGoodDataBin(valPair);
-    }
+    dataSet.SetLastGoodBin((Int_t)val);
 
     // get number of bins
     success = MUD_getHistNumBins( fh, i, &val );
@@ -2467,7 +2934,7 @@ Bool_t PRunDataHandler::ReadMudFile()
     for (UInt_t j=0; j<noOfBins; j++) {
       histoData.push_back(pData[j]);
     }
-    runData.AppendDataBin(histoData);
+    dataSet.SetData(histoData);
 
     // estimate T0 from maximum of the data
     Double_t maxVal = 0.0;
@@ -2478,7 +2945,10 @@ Bool_t PRunDataHandler::ReadMudFile()
         maxBin = j;
       }
     }
-    runData.AppendT0Estimated(maxBin);
+    dataSet.SetTimeZeroBinEstimated(maxBin);
+
+    runData.SetDataSet(dataSet);
+
     histoData.clear();
 
     free(pData);
@@ -2761,12 +3231,13 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
   f.close();
 
   // keep data
+  PRawRunDataSet dataSet;
   for (UInt_t i=0; i<data.size(); i++) {
-    runData.AppendDataBin(data[i]);
-  }
+    dataSet.Clear();
+    dataSet.SetHistoNo(i);
+    dataSet.SetData(data[i]);
   
-  // estimate T0 from maximum of the data
-  for (UInt_t i=0; i<data.size(); i++) {
+    // estimate T0 from maximum of the data
     Double_t maxVal = 0.0;
     Int_t maxBin = 0;
     for (UInt_t j=0; j<data[i].size(); j++) {
@@ -2775,7 +3246,8 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
         maxBin = j;
       }
     }
-    runData.AppendT0Estimated(maxBin);
+    dataSet.SetTimeZeroBinEstimated(maxBin);
+    runData.SetDataSet(dataSet);
   }
 
   // clean up
@@ -3480,6 +3952,261 @@ Bool_t PRunDataHandler::ReadDBFile()
 }
 
 //--------------------------------------------------------------------------
+// WriteMusrRootFile
+//--------------------------------------------------------------------------
+/**
+ * <p> Write the MusrRoot file format. Only the required entries will be handled.
+ *
+ * <b>return:</b>
+ * - true on successful writting,
+ * - otherwise false.
+ *
+ * \param fln file name. If empty, the routine will try to construct one
+ */
+Bool_t PRunDataHandler::WriteMusrRootFile(TString fln)
+{
+  // generate output file name if needed
+  if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
+    if (fln.Length() == 0) {
+      Bool_t ok = false;
+      fln = GetFileName(".root", ok);
+      if (!ok)
+        return false;
+    } else {
+      fln.Prepend(fAny2ManyInfo->outPath);
+    }
+    // keep the file name if compression is whished
+    fAny2ManyInfo->outPathFileName.push_back(fln);
+  } else {
+    fln = fAny2ManyInfo->outPath + TString("__tmp.root");
+  }
+
+  if (!fAny2ManyInfo->useStandardOutput)
+    cout << endl << ">> PRunDataHandler::WriteMusrRootFile(): writing a root data file (" << fln.Data() << ") ... " << endl;
+
+  // generate data file
+  TFolder *histosFolder;
+  TFolder *decayAnaModule;
+  TFolder *runHeader;
+
+  histosFolder = gROOT->GetRootFolder()->AddFolder("histos", "Histograms");
+  gROOT->GetListOfBrowsables()->Add(histosFolder, "histos");
+  decayAnaModule = histosFolder->AddFolder("DecayAnaModule", "muSR decay histograms");
+
+  runHeader = gROOT->GetRootFolder()->AddFolder("RunHeader", "MusrRoot Run Header Info");
+  gROOT->GetListOfBrowsables()->Add(runHeader, "RunHeader");
+  TMusrRunHeader *header = new TMusrRunHeader(true);
+  gROOT->GetListOfBrowsables()->Add(runHeader, "RunHeader");
+
+  // feed header info
+  TString str, pathName;
+  Int_t ival;
+  Double_t dval[2];
+  TMusrRunPhysicalQuantity prop;
+
+  // feed RunInfo
+  str = fData[0].GetGenericValidatorUrl()->Copy();
+  header->Set("RunInfo/Generic Validator URL", str);
+  str = fData[0].GetSpecificValidatorUrl()->Copy();
+  header->Set("RunInfo/Specific Validator URL", str);
+  str = fData[0].GetGenerator()->Copy();
+  header->Set("RunInfo/Generator", str);
+  str = fData[0].GetFileName()->Copy();
+  header->Set("RunInfo/File Name", str);
+  str = fData[0].GetRunTitle()->Copy();
+  header->Set("RunInfo/Run Title", str);
+  header->Set("RunInfo/Run Number", fData[0].GetRunNumber());
+  str = fData[0].GetStartDate()->Copy() + " " + fData[0].GetStartTime()->Copy();
+  header->Set("RunInfo/Run Start Time", str);
+  str = fData[0].GetStopDate()->Copy() + " " + fData[0].GetStopTime()->Copy();
+  header->Set("RunInfo/Run Stop Time", str);
+  ival = fData[0].GetStopDateTime() - fData[0].GetStartDateTime();
+  prop.Set("Run Duration", ival, "sec");
+  header->Set("RunInfo/Run Duration", prop);
+  str = fData[0].GetLaboratory()->Copy();
+  header->Set("RunInfo/Laboratory", str);
+  str = fData[0].GetArea()->Copy();
+  header->Set("RunInfo/Area", str);
+  str = fData[0].GetInstrument()->Copy();
+  header->Set("RunInfo/Instrument", str);
+  dval[0] = fData[0].GetMuonBeamMomentum();
+  prop.Set("Muon Beam Momentum", dval[0], "MeV/c");
+  header->Set("RunInfo/Muon Beam Momentum", prop);
+  str = fData[0].GetMuonSpecies()->Copy();
+  header->Set("RunInfo/Muon Species", str);
+  str = fData[0].GetMuonSource()->Copy();
+  header->Set("RunInfo/Muon Source", str);
+  str = fData[0].GetSetup()->Copy();
+  header->Set("RunInfo/Setup", str);
+  str = fData[0].GetComment()->Copy();
+  header->Set("RunInfo/Comment", str);
+  str = fData[0].GetSample()->Copy();
+  header->Set("RunInfo/Sample Name", str);
+  dval[0] = fData[0].GetTemperature(0);
+  dval[1] = fData[0].GetTempError(0);
+  prop.Set("Sample Temperature", MRH_UNDEFINED, dval[0], dval[1], "K");
+  header->Set("RunInfo/Sample Temperature", prop);
+  dval[0] = fData[0].GetField();
+  prop.Set("Sample Magnetic Field", dval[0], "G");
+  header->Set("RunInfo/Sample Magnetic Field", prop);
+  header->Set("RunInfo/No of Histos", (Int_t)fData[0].GetNoOfHistos());
+  dval[0] = fData[0].GetTimeResolution();
+  prop.Set("Time Resolution", dval[0], "ns");
+  header->Set("RunInfo/Time Resolution", prop);
+  header->Set("RunInfo/RedGreen Offset", fData[0].GetRedGreenOffset());
+
+  // feed DetectorInfo
+  Int_t histoNo = 0;
+  PRawRunDataSet *dataSet;
+  UInt_t size = fData[0].GetNoOfHistos();
+  for (UInt_t i=0; i<size; i++) {
+    dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+    if (dataSet == 0) { // something is really wrong
+      cerr << endl << ">> PRunDataHandler::WriteMusrRootFile: **ERROR** Couldn't get data set (idx=" << i << ")";
+      cerr << endl << ">>   something is really wrong!" << endl;
+      return false;
+    }
+    histoNo = dataSet->GetHistoNo();
+    pathName.Form("DetectorInfo/Detector%03d/Name", histoNo);
+    str = dataSet->GetName();
+    if (!str.CompareTo("n/a"))
+      str.Form("Detector%3d", histoNo);
+    header->Set(pathName, str);
+    pathName.Form("DetectorInfo/Detector%03d/Histo Number", histoNo);
+    header->Set(pathName, histoNo);
+    pathName.Form("DetectorInfo/Detector%03d/Histo Length", histoNo);
+    header->Set(pathName, (Int_t)(dataSet->GetData()->size()/fAny2ManyInfo->rebin));
+    pathName.Form("DetectorInfo/Detector%03d/Time Zero Bin", histoNo);
+    header->Set(pathName, dataSet->GetTimeZeroBin()/fAny2ManyInfo->rebin);
+    pathName.Form("DetectorInfo/Detector%03d/First Good Bin", histoNo);
+    ival = dataSet->GetFirstGoodBin();
+    header->Set(pathName, (Int_t)(ival/fAny2ManyInfo->rebin));
+    pathName.Form("DetectorInfo/Detector%03d/Last Good Bin", histoNo);
+    ival = dataSet->GetLastGoodBin();
+    header->Set(pathName, (Int_t)(ival/fAny2ManyInfo->rebin));
+  }
+
+  // feed SampleEnvironmentInfo
+  str = fData[0].GetCryoName()->Copy();
+  header->Set("SampleEnvironmentInfo/Cryo", str);
+
+  // feed MagneticFieldEnvironmentInfo
+  str = fData[0].GetMagnetName()->Copy();
+  header->Set("MagneticFieldEnvironmentInfo/Magnet Name", str);
+
+  // feed BeamlineInfo
+  str = fData[0].GetBeamline()->Copy();
+  header->Set("BeamlineInfo/Name", str);
+
+  // feed histos
+  vector<TH1F*> histos;
+  TH1F *histo = 0;
+  UInt_t length = 0;
+  if (fAny2ManyInfo->rebin == 1) {
+    for (UInt_t i=0; i<size; i++) {
+      dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+      if (dataSet == 0) { // something is really wrong
+        cerr << endl << ">> PRunDataHandler::WriteMusrRootFile: **ERROR** Couldn't get data set (idx=" << i << ")";
+        cerr << endl << ">>   something is really wrong!" << endl;
+        return false;
+      }
+      str.Form("hDecay%03d", dataSet->GetHistoNo());
+      length = dataSet->GetData()->size();
+      histo = new TH1F(str.Data(), str.Data(), length+1, -0.5, (Double_t)length+0.5);
+      for (UInt_t j=0; j<length; j++) {
+        histo->SetBinContent(j+1, dataSet->GetData()->at(j));
+      }
+      histos.push_back(histo);
+    }
+  } else { // rebin > 1
+    UInt_t dataRebin = 0;
+    UInt_t dataCount = 0;
+    for (UInt_t i=0; i<size; i++) {
+      dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+      if (dataSet == 0) { // something is really wrong
+        cerr << endl << ">> PRunDataHandler::WriteMusrRootFile: **ERROR** Couldn't get data set (idx=" << i << ")";
+        cerr << endl << ">>   something is really wrong!" << endl;
+        return false;
+      }
+      str.Form("hDecay%03d", dataSet->GetHistoNo());
+      length = dataSet->GetData()->size();
+      histo = new TH1F(str.Data(), str.Data(), (Int_t)(length/fAny2ManyInfo->rebin)+1, -0.5, (Double_t)((Int_t)(length/fAny2ManyInfo->rebin))+0.5);
+      dataCount = 0;
+      for (UInt_t j=0; j<length; j++) {
+        if ((j > 0) && (j % fAny2ManyInfo->rebin == 0)) {
+          dataCount++;
+          histo->SetBinContent(dataCount, dataRebin);
+          dataRebin = 0;
+        }
+        dataRebin += static_cast<UInt_t>(dataSet->GetData()->at(j));
+      }
+      histos.push_back(histo);
+    }
+  }
+
+  // add histos to the DecayAnaModule folder
+  for (UInt_t i=0; i<histos.size(); i++)
+    decayAnaModule->Add(histos[i]);
+
+  // write file
+  TFile *fout = new TFile(fln, "RECREATE", fln);
+  if (fout == 0) {
+    cerr << endl << "PRunDataHandler::WriteMusrRootFile(): **ERROR** Couldn't create ROOT file '" << fln << "'" << endl;
+    return false;
+  }
+
+  fout->cd();
+  if (header->FillFolder(runHeader))
+    runHeader->Write();
+  histosFolder->Write();
+  fout->Close();
+
+  // check if root file shall be streamed to stdout
+  if (fAny2ManyInfo->useStandardOutput && (fAny2ManyInfo->compressionTag == 0)) {
+    // stream file to stdout
+    ifstream is;
+    int length=1024;
+    char *buffer;
+
+    is.open(fln.Data(), ios::binary);
+    if (!is.is_open()) {
+      cerr << endl << "PRunDataHandler::WriteMusrRootFile(): **ERROR** Couldn't open the root-file for streaming." << endl;
+      remove(fln.Data());
+      return false;
+    }
+
+    // get length of file
+    is.seekg(0, ios::end);
+    length = is.tellg();
+    is.seekg(0, ios::beg);
+
+    if (length == -1) {
+      cerr << endl << "PRunDataHandler::WriteMusrRootFile(): **ERROR** Couldn't determine the root-file size." << endl;
+      remove(fln.Data());
+      return false;
+    }
+
+    // allocate memory
+    buffer = new char [length];
+
+    // read data as a block
+    while (!is.eof()) {
+      is.read(buffer, length);
+      cout.write(buffer, length);
+    }
+
+    is.close();
+
+    delete [] buffer;
+
+    // delete temporary root file
+    remove(fln.Data());
+  }
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
 // WriteRootFile
 //--------------------------------------------------------------------------
 /**
@@ -3542,36 +4269,38 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
   header->SetSampleTemperature(fData[0].GetTemperature(0), fData[0].GetTempError(0));
   header->SetSampleBField(fData[0].GetField(), 0.0);
   header->SetTimeResolution(fData[0].GetTimeResolution());
-  header->SetNChannels(static_cast<UInt_t>(fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin));
+  PRawRunDataSet *dataSet = fData[0].GetDataSet(0, false); // i.e. the false means, that i is the index and NOT the histo number
+  header->SetNChannels(static_cast<UInt_t>(dataSet->GetData()->size()/fAny2ManyInfo->rebin));
   header->SetNHist(fData[0].GetNoOfHistos());
   header->SetCuts("none");
   header->SetModerator("none");
   // feed t0's
   Double_t *tt0 = new Double_t[fData[0].GetNoOfHistos()];
-  for (UInt_t i=0;  i<fData[0].GetNoOfHistos(); i++)
-    tt0[i] = 0.0;
-  if (fData[0].GetT0Size() > 0) {
-    for (UInt_t i=0; i<fData[0].GetT0Size(); i++) {
-      tt0[i] = fData[0].GetT0(i)/fAny2ManyInfo->rebin;
-    }
+  for (UInt_t i=0;  i<fData[0].GetNoOfHistos(); i++) {
+    dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+    tt0[i] = dataSet->GetTimeZeroBin()/fAny2ManyInfo->rebin;
   }
   header->SetTimeZero(tt0);
-  runInfo->Add(header); //add header to RunInfo folder
+  runInfo->Add(header); // add header to RunInfo folder
 
   // feed histos
   vector<TH1F*> histos;
   TH1F *histo = 0;
   Char_t str[32];
-
+  UInt_t size = 0;
   if (fAny2ManyInfo->rebin == 1) {
      for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
-       if (i<10)
-         sprintf(str, "hDecay0%d", (Int_t)i);
-       else
-         sprintf(str, "hDecay%d", (Int_t)i);
-       histo = new TH1F(str, str, static_cast<UInt_t>(fData[0].GetDataBin(0)->size())+1, -0.5, static_cast<UInt_t>(fData[0].GetDataBin(0)->size()+0.5));
-       for (UInt_t j=0; j<fData[0].GetDataBin(i)->size(); j++) {
-         histo->SetBinContent(j+1, fData[0].GetDataBin(i)->at(j));
+       dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+       if (dataSet == 0) { // something is really wrong
+         cerr << endl << ">> PRunDataHandler::WriteNexusFile: **ERROR** Couldn't get data set (idx=0" << i << ")";
+         cerr << endl << ">>   something is really wrong!" << endl;
+         return false;
+       }
+       size = dataSet->GetData()->size();
+       sprintf(str, "hDecay%02d", (Int_t)i);
+       histo = new TH1F(str, str, size+1, -0.5, static_cast<Double_t>(size)+0.5);
+       for (UInt_t j=0; j<size; j++) {
+         histo->SetBinContent(j+1, dataSet->GetData()->at(j));
        }
        histos.push_back(histo);
      }
@@ -3579,20 +4308,24 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
     UInt_t dataRebin = 0;
     UInt_t dataCount = 0;
     for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
-      if (i<10)
-        sprintf(str, "hDecay0%d", (Int_t)i);
-      else
-        sprintf(str, "hDecay%d", (Int_t)i);
-      histo = new TH1F(str, str, static_cast<UInt_t>(fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin)+1, -0.5, static_cast<UInt_t>(fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin+0.5));
+      dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+      if (dataSet == 0) { // something is really wrong
+        cerr << endl << ">> PRunDataHandler::WriteNexusFile: **ERROR** Couldn't get data set (idx=0" << i << ")";
+        cerr << endl << ">>   something is really wrong!" << endl;
+        return false;
+      }
+      size = dataSet->GetData()->size();
+      sprintf(str, "hDecay%02d", (Int_t)i);
+      histo = new TH1F(str, str, (UInt_t)(size/fAny2ManyInfo->rebin)+1, -0.5, (Double_t)size/(Double_t)fAny2ManyInfo->rebin+0.5);
       dataCount = 0;
-      for (UInt_t j=0; j<fData[0].GetDataBin(i)->size(); j++) {
+      for (UInt_t j=0; j<size; j++) {
         if ((j > 0) && (j % fAny2ManyInfo->rebin == 0)) {
           dataCount++;
           histo->SetBinContent(dataCount, dataRebin);
           dataRebin = 0;
         }
-        dataRebin += static_cast<UInt_t>(fData[0].GetDataBin(i)->at(j));
-      }      
+        dataRebin += static_cast<UInt_t>(dataSet->GetData()->at(j));
+      }
       histos.push_back(histo);
     }
   }
@@ -3681,7 +4414,6 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
  */
 Bool_t PRunDataHandler::WriteNexusFile(TString fln)
 {
-
 #ifdef PNEXUS_ENABLED
   // generate output file name
   if (fln.Length() == 0) {
@@ -3752,38 +4484,71 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
     nxs->GetEntryIdf1()->GetInstrument()->GetCollimator()->SetType("n/a");
     // calculate the total number of counts
     double total_counts = 0;
+    PRawRunDataSet *dataSet = 0;
     for (unsigned int i=0; i<fData[0].GetNoOfHistos(); i++) {
-      for (unsigned int j=0; j<fData[0].GetDataBin(i)->size(); j++)
-        total_counts += fData[0].GetDataBin(i)->at(j);
+      dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+      if (dataSet == 0) { // something is really wrong
+        cerr << endl << ">> PRunDataHandler::WriteNexusFile: **ERROR** Couldn't get data set (idx=0" << i << ")";
+        cerr << endl << ">>   something is really wrong!" << endl;
+        return false;
+      }
+      for (unsigned int j=0; j<dataSet->GetData()->size(); j++)
+        total_counts += dataSet->GetData()->at(j);
     }
     double total_counts_mev = (double) total_counts / 1.0e6;
     nxs->GetEntryIdf1()->GetInstrument()->GetBeam()->SetTotalCounts(total_counts_mev);
     nxs->GetEntryIdf1()->GetInstrument()->GetBeam()->SetUnits("Mev");
 
-    nxs->GetEntryIdf1()->GetData()->SetTimeResolution(fData[0].GetTimeResolution(), "ns");
+    nxs->GetEntryIdf1()->GetData()->SetTimeResolution(fData[0].GetTimeResolution()*fAny2ManyInfo->rebin, "ns");
 
-    // t0
-    if (fData[0].GetT0(0) == -1) // t0 not povided in the raw data file header
-      nxs->GetEntryIdf1()->GetData()->SetT0(fData[0].GetT0Estimated(0)); // take the estimated t0 value
-    else
-      nxs->GetEntryIdf1()->GetData()->SetT0(fData[0].GetT0(0)); // this needs to be changed in the long term, since for continous sources each detector has its one t0!!
-
-    int time_bin_offset = (int)(10.0 / fData[0].GetTimeResolution()); // 10ns time offset for fgb if not given
-    if (fData[0].GetGoodDataBin(0).first == -1) {
-      nxs->GetEntryIdf1()->GetData()->SetFirstGoodBin(nxs->GetEntryIdf1()->GetData()->GetT0(0)+time_bin_offset);
-      nxs->GetEntryIdf1()->GetData()->SetLastGoodBin(fData[0].GetDataBin(0)->size()-1);
-    } else {
-      nxs->GetEntryIdf1()->GetData()->SetFirstGoodBin(fData[0].GetGoodDataBin(0).first);
-      nxs->GetEntryIdf1()->GetData()->SetLastGoodBin(fData[0].GetGoodDataBin(0).second);
+    for (unsigned int i=0; i<fData[0].GetNoOfHistos(); i++) {
+      dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+      nxs->GetEntryIdf1()->GetData()->SetT0((Int_t)(dataSet->GetTimeZeroBin()/fAny2ManyInfo->rebin), i);
+      nxs->GetEntryIdf1()->GetData()->SetFirstGoodBin((Int_t)(dataSet->GetFirstGoodBin()/fAny2ManyInfo->rebin), i);
+      nxs->GetEntryIdf1()->GetData()->SetLastGoodBin((Int_t)(dataSet->GetLastGoodBin()/fAny2ManyInfo->rebin), i);
     }
-    // feed real histogram data
+
+    // feed histos
     PUIntVector data;
-    for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
-      for (UInt_t j=0; j<fData[0].GetDataBin(i)->size(); j++) {
-        data.push_back((UInt_t)fData[0].GetDataBin(i)->at(j));
+    UInt_t size = 0;
+    if (fAny2ManyInfo->rebin == 1) {
+      for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
+        dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+        if (dataSet == 0) { // something is really wrong
+          cerr << endl << ">> PRunDataHandler::WriteNexusFile: **ERROR** Couldn't get data set (idx=" << i << ")";
+          cerr << endl << ">>   something is really wrong!" << endl;
+          return false;
+        }
+        size = dataSet->GetData()->size();
+        for (UInt_t j=0; j<size; j++) {
+          data.push_back(dataSet->GetData()->at(j));
+        }
+        nxs->GetEntryIdf1()->GetData()->SetHisto(data, i);
+        data.clear();
       }
-      nxs->GetEntryIdf1()->GetData()->SetHisto(data, i);
-      data.clear();
+    } else { // rebin > 1
+      UInt_t dataRebin = 0;
+      UInt_t dataCount = 0;
+      for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
+        dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+        if (dataSet == 0) { // something is really wrong
+          cerr << endl << ">> PRunDataHandler::WriteNexusFile: **ERROR** Couldn't get data set (idx=" << i << ")";
+          cerr << endl << ">>   something is really wrong!" << endl;
+          return false;
+        }
+        size = dataSet->GetData()->size();
+        dataCount = 0;
+        for (UInt_t j=0; j<size; j++) {
+          if ((j > 0) && (j % fAny2ManyInfo->rebin == 0)) {
+            dataCount++;
+            data.push_back(dataRebin);
+            dataRebin = 0;
+          }
+          dataRebin += static_cast<UInt_t>(dataSet->GetData()->at(j));
+        }
+        nxs->GetEntryIdf1()->GetData()->SetHisto(data, i);
+        data.clear();
+      }
     }
   } else if (fAny2ManyInfo->idf == 2) {
     // fill necessary data structures
@@ -3842,19 +4607,61 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
     nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetDescription(fData[0].GetInstrument()->Data()); // assume that this should be the instrument name
     nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetNoOfPeriods(0); // currently red/green is not distinguished
     nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetNoOfSpectra(fData[0].GetNoOfHistos());
-    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetNoOfBins(fData[0].GetDataBin(0)->size());
-    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetTimeResolution(fData[0].GetTimeResolution(), "ns");
-    int *histo = new int[fData[0].GetNoOfHistos()*fData[0].GetDataBin(0)->size()];
-    for (int i=0; i<nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra(); i++) {
-      for (unsigned int j=0; j<fData[0].GetDataBin(0)->size(); j++) {
-        *(histo+i*fData[0].GetDataBin(0)->size()+j) = (int) fData[0].GetDataBin(i)->at(j);
-      }
+    PRawRunDataSet *dataSet = fData[0].GetDataSet(0, false); // i.e. the false means, that i is the index and NOT the histo number
+    if (dataSet == 0) { // something is really wrong
+      cerr << endl << ">> PRunDataHandler::WriteNeXusFile: **ERROR** Couldn't get data set (idx=0)";
+      cerr << endl << ">>   something is really wrong!" << endl;
+      return false;
     }
-    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetHistos(histo);
-    // clean up
-    if (histo) {
-      delete [] histo;
-      histo = 0;
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetNoOfBins((unsigned int)(dataSet->GetData()->size() / fAny2ManyInfo->rebin));
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetTimeResolution(fData[0].GetTimeResolution()*fAny2ManyInfo->rebin, "ns");
+    int *histo = 0;
+    int idx = 0;
+    if (fAny2ManyInfo->rebin == 1) {
+      histo = new int[fData[0].GetNoOfHistos()*dataSet->GetData()->size()];
+      idx = 0;
+      for (int i=0; i<nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra(); i++) {
+        dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+        if (dataSet == 0) { // something is really wrong
+          cerr << endl << ">> PRunDataHandler::WriteNeXusFile: **ERROR** Couldn't get data set (idx=" << i << ")";
+          cerr << endl << ">>   something is really wrong!" << endl;
+          return false;
+        }
+        for (unsigned int j=0; j<dataSet->GetData()->size(); j++) {
+          *(histo+idx++) = (int) dataSet->GetData()->at(j);
+        }
+      }
+      nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetHistos(histo);
+      // clean up
+      if (histo) {
+        delete [] histo;
+        histo = 0;
+      }
+    } else { // rebin > 1
+      histo = new int[fData[0].GetNoOfHistos()*(int)(dataSet->GetData()->size()/fAny2ManyInfo->rebin)];
+      int counts = 0;
+      idx = 0;
+      for (int i=0; i<nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->GetNoOfSpectra(); i++) {
+        dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+        if (dataSet == 0) { // something is really wrong
+          cerr << endl << ">> PRunDataHandler::WriteNeXusFile: **ERROR** Couldn't get data set (idx=" << i << ")";
+          cerr << endl << ">>   something is really wrong!" << endl;
+          return false;
+        }
+        for (unsigned int j=0; j<dataSet->GetData()->size(); j++) {
+          if ((j>0) && (j % fAny2ManyInfo->rebin == 0)) {
+            *(histo+idx++) = counts;
+            counts = 0;
+          }
+          counts += (int) dataSet->GetData()->at(j);
+        }
+      }
+      nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetHistos(histo);
+      // clean up
+      if (histo) {
+        delete [] histo;
+        histo = 0;
+      }
     }
 
     // handle spectrum index
@@ -3862,12 +4669,13 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
       nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetSpectrumIndex(i+1);
 
     // handle histogram resolution
-    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetTimeResolution(fData[0].GetTimeResolution(), "ns");
+    nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetTimeResolution(fData[0].GetTimeResolution()*fAny2ManyInfo->rebin, "ns");
 
     // handle raw time
     vector<double> raw_time;
-    for (unsigned int i=0; i<fData[0].GetDataBin(0)->size(); i++) {
-      raw_time.push_back((double)i * fData[0].GetTimeResolution() * 1.0e-3); // since time resolution is given in ns, the factor 1.0e-3 is needed to convert to us
+    UInt_t size = (unsigned int)(dataSet->GetData()->size() / fAny2ManyInfo->rebin);
+    for (unsigned int i=0; i<size; i++) {
+      raw_time.push_back((double)i * fData[0].GetTimeResolution() * fAny2ManyInfo->rebin * 1.0e-3); // since time resolution is given in ns, the factor 1.0e-3 is needed to convert to us
     }
     nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetRawTime(raw_time);
     nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetRawTimeUnit("micro.second");
@@ -3877,68 +4685,31 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
     // handle t0
     nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetT0Tag(2); // i.e. t0[#histo] format
     int *t0 = new int[fData[0].GetNoOfHistos()];
+    int *fgb = new int[fData[0].GetNoOfHistos()];
+    int *lgb = new int[fData[0].GetNoOfHistos()];
+    if ((t0==0) || (fgb==0) || (lgb==0)) {
+      cerr << endl << ">> PRunDataHandler::WriteNeXusFile: **ERROR** Couldn't allocate memory for t0, fgb, lgb" << endl;
+      return false;
+    }
     for (unsigned int i=0; i<fData[0].GetNoOfHistos(); i++) {
-      if (fData[0].GetT0Size() == 0) { // NO t0's present, hence take the estimated ones
-        if (i == 0) { // place a warning in case NO t0's were present
-          cerr << endl << ">> **WARNING** NO t0's are present in the original file, will use the estimated once, no waranty this is correct!!" << endl;
-        }
-        if (i<fData[0].GetT0Size())
-          t0[i] = fData[0].GetT0Estimated(i);
-        else
-          t0[i] = fData[0].GetT0Estimated(0);
-      } else { // t0's are given
-        if (i<fData[0].GetT0Size())
-          t0[i] = fData[0].GetT0(i);
-        else
-          t0[i] = fData[0].GetT0(0);
+      PRawRunDataSet *dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+      if (dataSet == 0) { // something is really wrong
+        cerr << endl << ">> PRunDataHandler::WriteNeXusFile: **ERROR** Couldn't get data set (idx=0)";
+        cerr << endl << ">>   something is really wrong!" << endl;
+        return false;
       }
+      t0[i] = (int)(dataSet->GetTimeZeroBin() / fAny2ManyInfo->rebin);
+      fgb[i] = (int)(dataSet->GetFirstGoodBin() / fAny2ManyInfo->rebin);
+      lgb[i] = (int)(dataSet->GetLastGoodBin() / fAny2ManyInfo->rebin);
     }
     nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetT0(t0);
-
-    // handle first_good_bin
-    int *fgb = new int[fData[0].GetNoOfHistos()];
-    for (unsigned int i=0; i<fData[0].GetNoOfHistos(); i++) {
-      if (fData[0].GetGoodDataBinSize() == 0) { // first good bin NOT present, hence fgb = t0 + 10ns
-        fgb[i] = t0[i] + (int)(10.0/fData[0].GetTimeResolution()); // t0 + 10ns
-      } else { // first good bin present
-        if (i < fData[0].GetGoodDataBinSize())
-          fgb[i] = fData[0].GetGoodDataBin(i).first;
-        else
-          fgb[i] = fData[0].GetGoodDataBin(0).first;
-      }
-    }
     nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetFirstGoodBin(fgb);
-    // clean up
-    if (fgb) {
-      delete [] fgb;
-      fgb = 0;
-    }
-
-    // handle last_good_bin
-    int *lgb = new int[fData[0].GetNoOfHistos()];
-    for (unsigned int i=0; i<fData[0].GetNoOfHistos(); i++) {
-      if (fData[0].GetGoodDataBinSize() == 0) { // last good bin NOT present, hence lgb = length of histo - 1
-        lgb[i] = fData[0].GetDataBin(i)->size() - 1;
-      } else { // first good bin present
-        if (i < fData[0].GetGoodDataBinSize())
-          lgb[i] = fData[0].GetGoodDataBin(i).second;
-        else
-          lgb[i] = fData[0].GetGoodDataBin(0).second;
-      }
-    }
     nxs->GetEntryIdf2()->GetInstrument()->GetDetector()->SetLastGoodBin(lgb);
-    // clean up
-    if (lgb) {
-      delete [] lgb;
-      lgb = 0;
-    }
 
     // clean up
-    if (t0) {
-      delete [] t0;
-      t0 = 0;
-    }
-
+    if (t0) delete [] t0;
+    if (fgb) delete [] fgb;
+    if (lgb) delete [] lgb;
   } else {
     // clean up
     if (nxs != 0) {
@@ -4068,7 +4839,7 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
   if (lem_wkm_style)
     cout << endl << "TOF(M3S1):           nocut";
   cout << endl << "Groups:              " << fData[0].GetNoOfHistos();
-  cout << endl << "Channels:            " << static_cast<UInt_t>(fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin);
+  cout << endl << "Channels:            " << static_cast<UInt_t>(fData[0].GetDataBin(1)->size()/fAny2ManyInfo->rebin);
   cout.precision(10);
   cout << endl << "Resolution:          " << fData[0].GetTimeResolution()*fAny2ManyInfo->rebin/1.0e3; // ns->us
   cout.setf(ios::fixed,ios::floatfield);   // floatfield set to fixed
@@ -4137,8 +4908,6 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
  */
 Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
 {
-  cout << endl << ">> PRunDataHandler::WritePsiBinFile(): will write a psi-bin data file. Not yet implemented ... " << endl;
-
   // generate output file name if needed
   if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
     if (fln.Length() == 0) {
@@ -4165,7 +4934,7 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
   // run number
   psibin.put_runNumber_int(fData[0].GetRunNumber());
   // length of histograms
-  psibin.put_histoLength_bin((int)(fData[0].GetDataBin(0)->size()));
+  psibin.put_histoLength_bin((int)(fData[0].GetDataBin(1)->size()/fAny2ManyInfo->rebin));
   // number of histograms
   psibin.put_numberHisto_int((int)fData[0].GetNoOfHistos());
   // run title = sample (10 char) / temp (10 char) / field (10 char) / orientation (10 char)
@@ -4206,9 +4975,18 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
   cstr[10] = '\0';
   psibin.put_setup(cstr);
 
+  // handle PSI-BIN start/stop Time/Date. PSI-BIN requires: Time -> HH:MM:SS, and Date -> DD-MMM-YY
+  //                                      internally given: Time -> HH:MM:SS, and Date -> YYYY-MM-DD
   // run start date
   vector<string> svec;
-  strncpy(cstr, fData[0].GetStartDate()->Data(), 9);
+  TString str, date;
+  TDatime dt;
+  dt.Set(fData[0].GetStartDateTime());
+  date.Form("%02d-", dt.GetDay());
+  date.Append(GetMonth(dt.GetMonth()));
+  date.Append("-");
+  date.Append(GetYear(dt.GetYear()));
+  strncpy(cstr, date.Data(), 9);
   cstr[9] = '\0';
   svec.push_back(cstr);
   // run start time
@@ -4219,7 +4997,12 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
   svec.clear();
 
   // run stop date
-  strncpy(cstr, fData[0].GetStopDate()->Data(), 9);
+  dt.Set(fData[0].GetStopDateTime());
+  date.Form("%02d-", dt.GetDay());
+  date.Append(GetMonth(dt.GetMonth()));
+  date.Append("-");
+  date.Append(GetYear(dt.GetYear()));
+  strncpy(cstr, date.Data(), 9);
   cstr[9] = '\0';
   svec.push_back(cstr);
   // run stop time
@@ -4228,16 +5011,6 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
   svec.push_back(cstr);
   psibin.put_timeStop_vector(svec);
   svec.clear();
-
-  // t0's
-  for (UInt_t i=0; i<fData[0].GetT0Size(); i++)
-    psibin.put_t0_int(i, fData[0].GetT0(i));
-
-  // first/last good bin
-  for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
-    psibin.put_firstGood_int(i, fData[0].GetGoodDataBin(i).first);
-    psibin.put_lastGood_int(i, fData[0].GetGoodDataBin(i).second);
-  }
 
   // number of measured temperatures
   psibin.put_numberTemperature_int(fData[0].GetNoOfTemperatures());
@@ -4257,30 +5030,81 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
   // write comment
   psibin.put_comment(fData[0].GetRunTitle()->Data());
 
-  // write histogram labels
-  vector<string> histoLabel;
-  histoLabel.resize(fData[0].GetNoOfHistos());
-  char hl[32];
-  for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
-    sprintf(hl, "h%d", i);
-    histoLabel[i] = hl;
-  }
-  psibin.put_histoNames_vector(histoLabel);
-
   // write time resolution
-  psibin.put_binWidth_ns(fData[0].GetTimeResolution());
+  psibin.put_binWidth_ns(fData[0].GetTimeResolution()*fAny2ManyInfo->rebin);
 
   // write scaler dummies
   psibin.put_numberScaler_int(0);
 
-  // fill histograms
-  vector< vector<int> > histo;
-  histo.resize(fData[0].GetNoOfHistos());
-  for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
-    for (UInt_t j=0; j<fData[0].GetDataBin(i)->size(); j++)
-      histo[i].push_back((Int_t)fData[0].GetDataBin(i)->at(j));
+  // feed detector related info like, histogram names, t0, fgb, lgb
+  Int_t ival = 0;
+  PRawRunDataSet *dataSet;
+  UInt_t size = fData[0].GetNoOfHistos();
+  for (UInt_t i=0; i<size; i++) {
+    dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+    if (dataSet == 0) { // something is really wrong
+      cerr << endl << ">> PRunDataHandler::WritePsiBinFile: **ERROR** Couldn't get data set (idx=" << i << ")";
+      cerr << endl << ">>   something is really wrong!" << endl;
+      return false;
+    }
+
+    // detector name
+    str = dataSet->GetName();
+    if (!str.CompareTo("n/a"))
+      str.Form("Detector%3d", i+1);
+    psibin.put_nameHisto(str.Data(), i);
+    // time zero bin
+    ival = (Int_t)(dataSet->GetTimeZeroBin()/fAny2ManyInfo->rebin);
+    psibin.put_t0_int(i, ival);
+    // first good bin
+    ival = (Int_t)(dataSet->GetFirstGoodBin()/fAny2ManyInfo->rebin);
+    psibin.put_firstGood_int(i, ival);
+    // last good bin
+    ival = (Int_t)(dataSet->GetLastGoodBin()/fAny2ManyInfo->rebin);
+    psibin.put_lastGood_int(i, ival);
   }
-  status = psibin.put_histo_array_int(histo);
+
+  // feed histos
+  vector< vector<int> > histos;
+  histos.resize(fData[0].GetNoOfHistos());
+  UInt_t length = 0;
+  if (fAny2ManyInfo->rebin == 1) {
+    for (UInt_t i=0; i<size; i++) {
+      dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+      if (dataSet == 0) { // something is really wrong
+        cerr << endl << ">> PRunDataHandler::WritePsiBinFile: **ERROR** Couldn't get data set (idx=" << i << ")";
+        cerr << endl << ">>   something is really wrong!" << endl;
+        return false;
+      }
+      length = dataSet->GetData()->size();
+      histos[i].resize(length);
+      for (UInt_t j=0; j<length; j++) {
+        histos[i][j] = dataSet->GetData()->at(j);
+      }
+    }
+  } else { // rebin > 1
+    UInt_t dataRebin = 0;
+    UInt_t dataCount = 0;
+    for (UInt_t i=0; i<size; i++) {
+      dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+      if (dataSet == 0) { // something is really wrong
+        cerr << endl << ">> PRunDataHandler::WritePsiBinFile: **ERROR** Couldn't get data set (idx=" << i << ")";
+        cerr << endl << ">>   something is really wrong!" << endl;
+        return false;
+      }
+      length = dataSet->GetData()->size();
+      dataCount = 0;
+      for (UInt_t j=0; j<length; j++) {
+        if ((j > 0) && (j % fAny2ManyInfo->rebin == 0)) {
+          dataCount++;
+          histos[i].push_back(dataRebin);
+          dataRebin = 0;
+        }
+        dataRebin += static_cast<UInt_t>(dataSet->GetData()->at(j));
+      }
+    }
+  }
+  status = psibin.put_histo_array_int(histos);
   if (status != 0) {
     cerr << endl << ">> PRunDataHandler::WritePsiBinFile(): " << psibin.ConsistencyStatus() << endl;
     return false;
@@ -4348,17 +5172,18 @@ Bool_t PRunDataHandler::WriteMudFile(TString fln)
   MUD_setRunDesc(fd, MUD_SEC_GEN_RUN_DESC_ID);
   MUD_setExptNumber(fd, 0);
   MUD_setRunNumber(fd, fData[0].GetRunNumber());
-  MUD_setElapsedSec(fd, 0);
+  Int_t ival = fData[0].GetStopDateTime()-fData[0].GetStartDateTime();
+  MUD_setElapsedSec(fd, ival);
   MUD_setTimeBegin(fd, fData[0].GetStartDateTime());
   MUD_setTimeEnd(fd, fData[0].GetStopDateTime());
   MUD_setTitle(fd, (char *)fData[0].GetRunTitle()->Data());
-  MUD_setLab(fd, dummy);
-  MUD_setArea(fd, dummy);
+  MUD_setLab(fd, (char *)fData[0].GetLaboratory()->Data());
+  MUD_setArea(fd, (char *)fData[0].GetArea()->Data());
   MUD_setMethod(fd, (char *)fData[0].GetSetup()->Data());
-  MUD_setApparatus(fd, dummy);
+  MUD_setApparatus(fd, (char *)fData[0].GetInstrument()->Data());
   MUD_setInsert(fd, dummy);
-  MUD_setSample(fd, dummy);
-  MUD_setOrient(fd, dummy);
+  MUD_setSample(fd, (char *)fData[0].GetSample()->Data());
+  MUD_setOrient(fd, (char *)fData[0].GetOrientation()->Data());
   MUD_setDas(fd, dummy);
   MUD_setExperimenter(fd, dummy);
   sprintf(info, "%lf+-%lf (K)", fData[0].GetTemperature(0), fData[0].GetTempError(0));
@@ -4369,7 +5194,7 @@ Bool_t PRunDataHandler::WriteMudFile(TString fln)
   // generate the histograms
   MUD_setHists(fd, MUD_GRP_TRI_TD_HIST_ID, fData[0].GetNoOfHistos());
 
-  UInt_t *data, dataSize = fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin + 1;
+  UInt_t *data, dataSize = fData[0].GetDataSet(0, false)->GetData()->size()/fAny2ManyInfo->rebin + 1;
   data = new UInt_t[dataSize];
   if (data == 0) {
     cerr << endl << ">> PRunDataHandler::WriteMudFile(): **ERROR** couldn't allocate memory for the data ..." << endl;
@@ -4377,22 +5202,30 @@ Bool_t PRunDataHandler::WriteMudFile(TString fln)
     return false;
   }
 
-  UInt_t noOfEvents = 0, ival = 0, k = 0;
+  UInt_t noOfEvents = 0, k = 0;
+  ival = 0;
+  PRawRunDataSet *dataSet;
   for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
+    dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+    if (dataSet == 0) { // something is really wrong
+      cerr << endl << ">> PRunDataHandler::WriteMudFile: **ERROR** Couldn't get data set (idx=" << i << ")";
+      cerr << endl << ">>   something is really wrong!" << endl;
+      return false;
+    }
 
     // fill data
     for (UInt_t j=0; j<dataSize; j++)
       data[j] = 0;
     noOfEvents = 0;
     k = 0;
-    for (UInt_t j=0; j<fData[0].GetDataBin(0)->size(); j++) {
+    for (UInt_t j=0; j<dataSet->GetData()->size(); j++) {
       if ((j != 0) && (j % fAny2ManyInfo->rebin == 0)) {
         data[k] = ival;
         noOfEvents += ival;
         k++;
         ival = 0;
       }
-      ival += static_cast<UInt_t>(fData[0].GetDataBin(i)->at(j));
+      ival += static_cast<UInt_t>(dataSet->GetData()->at(j));
     }
 
     // feed data relevant information
@@ -4402,19 +5235,14 @@ Bool_t PRunDataHandler::WriteMudFile(TString fln)
     MUD_setHistNumBins(fd, i+1, dataSize);
     MUD_setHistBytesPerBin(fd, i+1, 0);
     MUD_setHistFsPerBin(fd, i+1, static_cast<UINT32>(1.0e6*fAny2ManyInfo->rebin*fData[0].GetTimeResolution())); // time resolution is given in (ns)
-    if (fData[0].GetT0Size() > i) {
-      MUD_setHistT0_Ps(fd, i+1, static_cast<UINT32>(1.0e3*fData[0].GetTimeResolution()*((fData[0].GetT0(i)+fAny2ManyInfo->rebin/2)/fAny2ManyInfo->rebin)));
-      MUD_setHistT0_Bin(fd, i+1, static_cast<UINT32>(fData[0].GetT0(i)/fAny2ManyInfo->rebin));
-    } else {
-      MUD_setHistT0_Ps(fd, i+1, 0);
-      MUD_setHistT0_Bin(fd, i+1, 0);
-    }
-    MUD_setHistGoodBin1(fd, i+1, 0);
-    MUD_setHistGoodBin2(fd, i+1, 0);
+    MUD_setHistT0_Ps(fd, i+1, static_cast<UINT32>(1.0e3*fData[0].GetTimeResolution()*((dataSet->GetTimeZeroBin()+fAny2ManyInfo->rebin/2)/fAny2ManyInfo->rebin)));
+    MUD_setHistT0_Bin(fd, i+1, static_cast<UINT32>(dataSet->GetTimeZeroBin()/fAny2ManyInfo->rebin));
+    MUD_setHistGoodBin1(fd, i+1, static_cast<UINT32>(dataSet->GetFirstGoodBin()/fAny2ManyInfo->rebin));
+    MUD_setHistGoodBin2(fd, i+1, static_cast<UINT32>(dataSet->GetLastGoodBin()/fAny2ManyInfo->rebin));
     MUD_setHistBkgd1(fd, i+1, 0);
     MUD_setHistBkgd2(fd, i+1, 0);
     MUD_setHistNumEvents(fd, i+1, (UINT32)noOfEvents);
-    MUD_setHistTitle(fd, i+1, dummy);
+    MUD_setHistTitle(fd, i+1, (char *)dataSet->GetName().Data());
     REAL64 timeResolution = (fAny2ManyInfo->rebin*fData[0].GetTimeResolution())/1.0e9; // ns -> s
     MUD_setHistSecondsPerBin(fd, i+1, timeResolution);
 
@@ -4466,7 +5294,6 @@ Bool_t PRunDataHandler::WriteMudFile(TString fln)
     // delete temporary root file
     remove(fln.Data());
   }
-
   return true;
 }
 
@@ -4548,49 +5375,58 @@ Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
     cout.precision(10);
     cout << endl << "% time resolution : " << fData[0].GetTimeResolution()*fAny2ManyInfo->rebin << " (ns)";
     cout.setf(ios::fixed,ios::floatfield);   // floatfield set to fixed
+  }  
+  PRawRunDataSet *dataSet;
+  cout << endl << "% t0          : ";
+  for (UInt_t i=0; i<fData[0].GetNoOfHistos()-1; i++) {
+    dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+    cout << static_cast<UInt_t>(dataSet->GetTimeZeroBin()/fAny2ManyInfo->rebin) << ", ";
   }
-  if (fData[0].GetT0Size() > 0) {
-    cout << endl << "% t0          : ";
-    for (UInt_t i=0; i<fData[0].GetT0Size()-1; i++) {
-      cout << static_cast<UInt_t>(fData[0].GetT0(i)/fAny2ManyInfo->rebin) << ", ";
-    }
-    cout << fData[0].GetT0(fData[0].GetT0Size()-1)/fAny2ManyInfo->rebin;
-  }
+  dataSet = fData[0].GetDataSet(fData[0].GetNoOfHistos()-1, false); // i.e. the false means, that i is the index and NOT the histo number
+  cout << static_cast<UInt_t>(dataSet->GetTimeZeroBin()/fAny2ManyInfo->rebin);
+
   cout << endl << "% # histos    : " << fData[0].GetNoOfHistos();
-  cout << endl << "% # of bins   : " << static_cast<UInt_t>(fData[0].GetDataBin(0)->size()/fAny2ManyInfo->rebin);
+  dataSet = fData[0].GetDataSet(0, false); // i.e. the false means, that i is the index and NOT the histo number
+  cout << endl << "% # of bins   : " << static_cast<UInt_t>(dataSet->GetData()->size()/fAny2ManyInfo->rebin);
   cout << endl << "%*************************************************************************";
 
   // write data
+  UInt_t length = fData[0].GetDataSet(0,false)->GetData()->size();
   if (fAny2ManyInfo->rebin == 1) {
-    UInt_t length = fData[0].GetDataBin(0)->size();
     for (UInt_t i=0; i<length; i++) {
       cout << endl;
       for (UInt_t j=0; j<fData[0].GetNoOfHistos(); j++) {
+        dataSet = fData[0].GetDataSet(j, false); // i.e. the false means, that i is the index and NOT the histo number
         cout.width(8);
-        cout << static_cast<Int_t>(fData[0].GetDataBin(j)->at(i));
+        cout << static_cast<Int_t>(dataSet->GetData()->at(i));
       }
     }
   } else {
     PUIntVector dataRebin(fData[0].GetNoOfHistos());
-    UInt_t length = fData[0].GetDataBin(0)->size();
 
     // initialize the dataRebin vector
-    for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++)
-      dataRebin[i] = static_cast<UInt_t>(fData[0].GetDataBin(i)->at(0));
+    for (UInt_t i=0; i<dataRebin.size(); i++) {
+      dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+      dataRebin[i] = static_cast<UInt_t>(dataSet->GetData()->at(0));
+    }
 
     for (UInt_t i=0; i<length; i++) {
       if ((i % fAny2ManyInfo->rebin) == 0) {
         cout << endl;
-        for (UInt_t j=0; j<fData[0].GetNoOfHistos(); j++) {
+        for (UInt_t j=0; j<dataRebin.size(); j++) {
           cout.width(8);
           cout << dataRebin[j];
         }
         // initialize the dataRebin vector for the next pack
-        for (UInt_t j=0; j<fData[0].GetNoOfHistos(); j++)
-          dataRebin[j] = static_cast<UInt_t>(fData[0].GetDataBin(j)->at(i));
+        for (UInt_t j=0; j<dataRebin.size(); j++) {
+          dataSet = fData[0].GetDataSet(j, false); // i.e. the false means, that i is the index and NOT the histo number
+          dataRebin[j] = static_cast<UInt_t>(dataSet->GetData()->at(i));
+        }
       } else {
-        for (UInt_t j=0; j<fData[0].GetNoOfHistos(); j++)
-          dataRebin[j] += static_cast<UInt_t>(fData[0].GetDataBin(j)->at(i));
+        for (UInt_t j=0; j<fData[0].GetNoOfHistos(); j++) {
+          dataSet = fData[0].GetDataSet(j, false); // i.e. the false means, that i is the index and NOT the histo number
+          dataRebin[j] += static_cast<UInt_t>(dataSet->GetData()->at(i));
+        }
       }
     }
   }
@@ -5046,4 +5882,90 @@ void PRunDataHandler::SplitTimeDate(TString timeData, TString &time, TString &da
 
   time = TString::Format("%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
   date = TString::Format("%04d-%02d-%02d", tm.tm_year+1900, tm.tm_mon, tm.tm_mday);
+}
+
+//--------------------------------------------------------------------------
+// GetMonth (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>given the month as number, convert it to a 3 character month.
+ * If month is out of range (i.e. not between 1 and 12) a '???' will
+ * be returned.
+ *
+ * \param month as number
+ */
+TString PRunDataHandler::GetMonth(Int_t month)
+{
+  TString monthString = "???";
+
+  switch (month) {
+    case 1:
+      monthString = "JAN";
+      break;
+    case 2:
+      monthString = "FEB";
+      break;
+    case 3:
+      monthString = "MAR";
+      break;
+    case 4:
+      monthString = "APR";
+      break;
+    case 5:
+      monthString = "MAY";
+      break;
+    case 6:
+      monthString = "JUN";
+      break;
+    case 7:
+      monthString = "JUL";
+      break;
+    case 8:
+      monthString = "AUG";
+      break;
+    case 9:
+      monthString = "SEP";
+      break;
+    case 10:
+      monthString = "OCT";
+      break;
+    case 11:
+      monthString = "NOV";
+      break;
+    case 12:
+      monthString = "DEC";
+      break;
+    default:
+      break;
+  }
+
+  return monthString;
+}
+
+//--------------------------------------------------------------------------
+// GetYear (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>given the year as number, convert it to a 2 character year.
+ * If year is out of range '??' will be returned. This routine will
+ * break in the year 2100 or later ;-)
+ *
+ * \param year as number
+ */
+TString PRunDataHandler::GetYear(Int_t year)
+{
+  TString yearString = "??";
+  Int_t yy=0;
+
+  if (year < 2000) {
+    yy = year - 1900;
+    if (yy > 0)
+      yearString.Form("%02d", yy);
+  } else {
+    yy = year - 2000;
+    if ((yy >= 0) && (yy <= 99))
+      yearString.Form("%02d", yy);
+  }
+
+  return yearString;
 }

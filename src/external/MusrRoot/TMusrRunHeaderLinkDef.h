@@ -1,6 +1,17 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Andreas Suter                                   *
- *   andreas.suter@psi.c                                                   *
+
+  TMusrRunHeaderLinkDef.h
+
+  Author: Andreas Suter
+  e-mail: andreas.suter@psi.ch
+
+  $Id: TMusrRunHeaderLinkDef.h 5054 2012-01-18 07:43:50Z suter_a $
+
+***************************************************************************/
+
+/***************************************************************************
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
+ *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,3 +28,14 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
+#ifdef __CINT__
+
+#pragma link off all globals;
+#pragma link off all classes;
+#pragma link off all functions;
+
+#pragma link C++ class TMusrRunPhysicalQuantity+;
+#pragma link C++ class TMusrRunHeader+;
+
+#endif

@@ -12,7 +12,8 @@ if BUILD_MUSREDIT
   EDITORDIR = musredit
 endif
 
-SUBDIRS = external/TLemRunHeader \
+SUBDIRS = external/MusrRoot \
+          external/TLemRunHeader \
           external/MuSR_software \
           external/mud \
           $(PNEXUSDIRS) \
@@ -29,35 +30,38 @@ SUBDIRS += $(EDITORDIR)
 EXTRA_DIST = $(EDITORDIR)/Makefile
 endif
 
-bin_PROGRAMS = musrfit musrview musrt0 musrparam msr2msr msr2data any2many
+bin_PROGRAMS = musrfit musrview musrt0 msr2msr msr2data any2many
 if PNEXUS_ENABLED
 bin_PROGRAMS += nexus_dump
 endif
+bin_PROGRAMS += read_musrRoot_runHeader write_musrRoot_runHeader
 
 musrfit_SOURCES = musrfit.cpp
 musrview_SOURCES = musrview.cpp
 musrt0_SOURCES = musrt0.cpp
-musrparam_SOURCES = musrparam.cpp
 msr2msr_SOURCES = msr2msr.cpp
 msr2data_SOURCES = msr2data.cpp
 any2many_SOURCES = any2many.cpp
 if PNEXUS_ENABLED
 nexus_dump_SOURCES = nexus_dump.cpp
 endif
+read_musrRoot_runHeader_SOURCES = read_musrRoot_runHeader.cpp
+write_musrRoot_runHeader_SOURCES = write_musrRoot_runHeader.cpp
 
 xmldir = $(bindir)
 xml_DATA = musrfit_startup.xml
 
-LIBADD = $(PMUSR_LIBS) $(LEM_LIBS) $(PSIBIN_LIBS) $(MUD_LIBS) $(PNEXUS_LIBS)
+LIBADD = $(PMUSR_LIBS) $(MUSR_ROOT_LIBS) $(LEM_LIBS) $(PSIBIN_LIBS) $(MUD_LIBS) $(PNEXUS_LIBS)
 
 AM_CXXFLAGS = $(LOCAL_BIN_CXXFLAGS)
 AM_LDFLAGS = $(LOCAL_BIN_LDFLAGS)
-INCLUDES = $(PMUSR_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(BOOST_CFLAGS) $(ROOT_CFLAGS)
+INCLUDES = $(MUSR_ROOT_CFLAGS) $(PMUSR_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(BOOST_CFLAGS) $(ROOT_CFLAGS)
 if PNEXUS_ENABLED
 INCLUDES += $(HDF5_CFLAGS) $(NEXUS_CFLAGS) $(PNEXUS_CXXFLAGS)
 endif
 
-LIBS = $(PMUSR_LIBS) $(USERFCN_LIBS) $(LEM_LIBS) $(PSIBIN_LIBS) $(MUD_LIBS) $(PNEXUS_LIBS) $(FFTW3_LIBS) $(GSL_LIBS) $(ROOT_LIBS)
+LIBS = $(PMUSR_LIBS) $(USERFCN_LIBS) $(MUSR_ROOT_LIBS) $(LEM_LIBS) $(PSIBIN_LIBS) $(MUD_LIBS) $(PNEXUS_LIBS) \
+       $(FFTW3_LIBS) $(GSL_LIBS) $(ROOT_LIBS)
 
 install-xmlDATA: $(xml_DATA)
 	test -z "$(xmldir)" || $(mkdir_p) "$(DESTDIR)$(xmldir)"

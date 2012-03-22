@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2010 by Andreas Suter                              *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -360,7 +360,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
   PBoolVector bvec;
   for (UInt_t i=0; i<fRuns.size(); i++) {
     bvec.clear();
-    for (UInt_t j=0; j<fRuns[i].GetAddT0Entries(); j++)
+    for (UInt_t j=0; j<fRuns[i].GetAddT0BinEntries(); j++)
       bvec.push_back(true);
     addt0TagMissing.push_back(bvec);
   }
@@ -775,24 +775,28 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           fout << endl;
         } else if (sstr.BeginsWith("t0")) {
           t0TagMissing[runNo] = false;
-          fout.width(16);
+          fout.width(16);          
           fout << left << "t0";
-          for (UInt_t j=0; j<fRuns[runNo].GetT0Size(); j++) {
+          for (UInt_t j=0; j<fRuns[runNo].GetT0BinSize(); j++) {
             fout.width(8);
-            fout << left << fRuns[runNo].GetT0(j);
+            fout.precision(1);
+            fout.setf(ios::fixed,ios::floatfield);
+            fout << left << fRuns[runNo].GetT0Bin(j);
           }
           fout << endl;
-        } else if (sstr.BeginsWith("addt0")) {
+        } else if (sstr.BeginsWith("addt0")) {          
           addt0TagMissing[runNo][addT0Counter] = false;
-          if (fRuns[runNo].GetAddT0Size(addT0Counter) <=0) {
+          if (fRuns[runNo].GetAddT0BinSize(addT0Counter) <=0) {
             cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **WARNING** 'addt0' tag without any data found!";
             cerr << endl << ">> Something is VERY fishy, please check your msr-file carfully." << endl;
           } else {
             fout.width(16);
             fout << left << "addt0";
-            for (Int_t j=0; j<fRuns[runNo].GetAddT0Size(addT0Counter); j++) {
+            for (Int_t j=0; j<fRuns[runNo].GetAddT0BinSize(addT0Counter); j++) {
               fout.width(8);
-              fout << left << fRuns[runNo].GetAddT0(addT0Counter, j);
+              fout.precision(1);
+              fout.setf(ios::fixed,ios::floatfield);
+              fout << left << fRuns[runNo].GetAddT0Bin(addT0Counter, j);
             }
             fout << endl;
             addT0Counter++;
@@ -820,25 +824,30 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           }
         } else if (sstr.BeginsWith("fit")) {
           // check if missing t0/addt0/background/data tag are present eventhough the values are present, if so write these data values
-          if (t0TagMissing[runNo]) {
-            if (fRuns[runNo].GetT0Size() > 0) {
+          // if ISIS data, do not do anything
+          if (t0TagMissing[runNo] && fRuns[runNo].GetInstitute()->CompareTo("isis", TString::kIgnoreCase)) {
+            if (fRuns[runNo].GetT0BinSize() > 0) {
               fout.width(16);
               fout << left << "t0";
-              for (UInt_t j=0; j<fRuns[runNo].GetT0Size(); j++) {
+              for (UInt_t j=0; j<fRuns[runNo].GetT0BinSize(); j++) {
                 fout.width(8);
-                fout << left << fRuns[runNo].GetT0(j);
+                fout.precision(1);
+                fout.setf(ios::fixed,ios::floatfield);
+                fout << left << fRuns[runNo].GetT0Bin(j);
               }
               fout << endl;
             }
           }
-          for (UInt_t i=0; i<fRuns[runNo].GetAddT0Entries(); i++) {
-            if (addt0TagMissing[runNo][i]) {
-              if (fRuns[runNo].GetAddT0Size(i) > 0) {
+          for (UInt_t i=0; i<fRuns[runNo].GetAddT0BinEntries(); i++) {
+            if (addt0TagMissing[runNo][i]  && fRuns[runNo].GetInstitute()->CompareTo("isis", TString::kIgnoreCase)) {
+              if (fRuns[runNo].GetAddT0BinSize(i) > 0) {
                 fout.width(16);
                 fout << left << "addt0";
-                for (Int_t j=0; j<fRuns[runNo].GetAddT0Size(i); j++) {
+                for (Int_t j=0; j<fRuns[runNo].GetAddT0BinSize(i); j++) {
                   fout.width(8);
-                  fout << left << fRuns[runNo].GetAddT0(i, j);
+                  fout.precision(1);
+                  fout.setf(ios::fixed,ios::floatfield);
+                  fout << left << fRuns[runNo].GetAddT0Bin(i, j);
                 }
                 fout << endl;
               }
@@ -1621,24 +1630,28 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
     }
 
     // t0
-    if (fRuns[i].GetT0Size() > 0) {
+    if (fRuns[i].GetT0BinSize() > 0) {
       fout.width(16);
       fout << left << "t0";
-      for (UInt_t j=0; j<fRuns[i].GetT0Size(); ++j) {
+      for (UInt_t j=0; j<fRuns[i].GetT0BinSize(); ++j) {
         fout.width(8);
-        fout << left << fRuns[i].GetT0(j);
+        fout.precision(1);
+        fout.setf(ios::fixed,ios::floatfield);
+        fout << left << fRuns[i].GetT0Bin(j);
       }
       fout << endl;
     }
 
     // addt0
     for (UInt_t j = 0; j < fRuns[i].GetRunNameSize() - 1; ++j) {
-      if (fRuns[i].GetAddT0Size(j) > 0) {
+      if (fRuns[i].GetAddT0BinSize(j) > 0) {
         fout.width(16);
         fout << left << "addt0";
-        for (Int_t k=0; k<fRuns[i].GetAddT0Size(j); ++k) {
+        for (Int_t k=0; k<fRuns[i].GetAddT0BinSize(j); ++k) {
           fout.width(8);
-          fout << left << fRuns[i].GetAddT0(j, k);
+          fout.precision(1);
+          fout.setf(ios::fixed,ios::floatfield);
+          fout << left << fRuns[i].GetAddT0Bin(j, k);
         }
         fout << endl;
       }
@@ -2051,7 +2064,7 @@ Bool_t PMsrHandler::SetMsrParamPosError(UInt_t idx, Double_t value)
  * \param idx msr-file histogram index
  * \param bin t0 bin value
  */
-void PMsrHandler::SetMsrT0Entry(UInt_t runNo, UInt_t idx, Int_t bin)
+void PMsrHandler::SetMsrT0Entry(UInt_t runNo, UInt_t idx, Double_t bin)
 {
   if (runNo >= fRuns.size()) { // error
     cerr << endl << ">> PMsrHandler::SetMsrT0Entry: **ERROR** runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
@@ -2059,13 +2072,13 @@ void PMsrHandler::SetMsrT0Entry(UInt_t runNo, UInt_t idx, Int_t bin)
     return;
   }
 
-  if (idx >= fRuns[runNo].GetT0Size()) { // error
-    cerr << endl << ">> PMsrHandler::SetMsrT0Entry: **WARNING** idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].GetT0Size();
+  if (idx >= fRuns[runNo].GetT0BinSize()) { // error
+    cerr << endl << ">> PMsrHandler::SetMsrT0Entry: **WARNING** idx = " << idx << ", is out of valid range 0.." << fRuns[runNo].GetT0BinSize();
     cerr << endl << ">> Will add it anyway.";
     cerr << endl;
   }
 
-  fRuns[runNo].SetT0(bin, idx);
+  fRuns[runNo].SetT0Bin(bin, idx);
 }
 
 //--------------------------------------------------------------------------
@@ -2079,7 +2092,7 @@ void PMsrHandler::SetMsrT0Entry(UInt_t runNo, UInt_t idx, Int_t bin)
  * \param histoIdx msr-file histogram index for an addrun.
  * \param bin t0 bin value.
  */
-void PMsrHandler::SetMsrAddT0Entry(UInt_t runNo, UInt_t addRunIdx, UInt_t histoIdx, Int_t bin)
+void PMsrHandler::SetMsrAddT0Entry(UInt_t runNo, UInt_t addRunIdx, UInt_t histoIdx, Double_t bin)
 {
   if (runNo >= fRuns.size()) { // error
     cerr << endl << ">> PMsrHandler::SetMsrAddT0Entry: **ERROR** runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
@@ -2087,19 +2100,19 @@ void PMsrHandler::SetMsrAddT0Entry(UInt_t runNo, UInt_t addRunIdx, UInt_t histoI
     return;
   }
 
-  if (addRunIdx >= fRuns[runNo].GetAddT0Entries()) { // error
-    cerr << endl << ">> PMsrHandler::SetMsrAddT0Entry: **WARNING** addRunIdx = " << addRunIdx << ", is out of valid range 0.." << fRuns[runNo].GetAddT0Entries();
+  if (addRunIdx >= fRuns[runNo].GetAddT0BinEntries()) { // error
+    cerr << endl << ">> PMsrHandler::SetMsrAddT0Entry: **WARNING** addRunIdx = " << addRunIdx << ", is out of valid range 0.." << fRuns[runNo].GetAddT0BinEntries();
     cerr << endl << ">> Will add it anyway.";
     cerr << endl;
   }
 
-  if (static_cast<Int_t>(histoIdx) > fRuns[runNo].GetAddT0Size(addRunIdx)) { // error
-    cerr << endl << ">> PMsrHandler::SetMsrAddT0Entry: **WARNING** histoIdx = " << histoIdx << ", is out of valid range 0.." << fRuns[runNo].GetAddT0Size(addRunIdx);
+  if (static_cast<Int_t>(histoIdx) > fRuns[runNo].GetAddT0BinSize(addRunIdx)) { // error
+    cerr << endl << ">> PMsrHandler::SetMsrAddT0Entry: **WARNING** histoIdx = " << histoIdx << ", is out of valid range 0.." << fRuns[runNo].GetAddT0BinSize(addRunIdx);
     cerr << endl << ">> Will add it anyway.";
     cerr << endl;
   }
 
-  fRuns[runNo].SetAddT0(bin, addRunIdx, histoIdx);
+  fRuns[runNo].SetAddT0Bin(bin, addRunIdx, histoIdx);
 }
 
 //--------------------------------------------------------------------------
@@ -2477,6 +2490,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
   UInt_t addT0Counter = 0;
 
   Int_t ival;
+  Double_t dval;
 
   iter = lines.begin();
   while ((iter != lines.end()) && !error) {
@@ -2860,10 +2874,10 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         for (Int_t i=1; i<tokens->GetEntries(); i++) {
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
-          if (str.IsDigit()) {
-            ival = str.Atoi();
-            if (ival > 0)
-              param.SetT0(ival);
+          if (str.IsFloat()) {
+            dval = str.Atof();
+            if (dval >= 0.0)
+              param.SetT0Bin(dval);
             else
               error = true;
           } else {
@@ -2884,10 +2898,10 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         for (Int_t i=1; i<tokens->GetEntries(); i++) {
           ostr = dynamic_cast<TObjString*>(tokens->At(i));
           str = ostr->GetString();
-          if (str.IsDigit()) {
-            ival = str.Atoi();
-            if (ival > 0)
-              param.SetAddT0(ival, addT0Counter, i-1);
+          if (str.IsFloat()) {
+            dval = str.Atof();
+            if (dval >= 0.0)
+              param.SetAddT0Bin(dval, addT0Counter, i-1);
             else
               error = true;
           } else {
@@ -4972,8 +4986,8 @@ Bool_t PMsrHandler::CheckAddRunParameters()
   for (UInt_t i=0; i<fRuns.size(); i++) {
     if (fRuns[i].GetRunNameSize() > 1) {
       // check concerning the addt0 tags
-      if (fRuns[i].GetAddT0Entries() != 0) {
-        if (fRuns[i].GetAddT0Entries() != fRuns[i].GetRunNameSize()-1) {
+      if (fRuns[i].GetAddT0BinEntries() != 0) {
+        if (fRuns[i].GetAddT0BinEntries() != fRuns[i].GetRunNameSize()-1) {
           cerr << endl << ">> PMsrHandler::CheckAddRunParameters: **ERROR** # of addt0 != # of addruns.";
           cerr << endl << ">> Run #" << i+1;
           cerr << endl;

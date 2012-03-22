@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007 by Andreas Suter                                   *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -61,8 +61,8 @@ class PRunDataHandler
     PStringVector fDataPath; ///< vector containing all the search paths where to look for data files
 
     Bool_t fAllDataAvailable; ///< flag indicating if all data sets could be read
-    TString fRunName;       ///< current run name
-    TString fRunPathName;   ///< current path file name 
+    TString fRunName;         ///< current run name
+    TString fRunPathName;     ///< current path file name
     PRawRunDataList fData;  ///< keeping all the raw data
 
     virtual Bool_t ReadFilesMsr();
@@ -71,7 +71,7 @@ class PRunDataHandler
     virtual void TestFileName(TString &runName, const TString &ext);
     virtual Bool_t FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx);
     virtual Bool_t FileExistsCheck(const Bool_t fileName, const Int_t idx);
-    virtual Bool_t ReadRootFile(UInt_t tag);
+    virtual Bool_t ReadRootFile();
     virtual Bool_t ReadNexusFile();
     virtual Bool_t ReadWkmFile();
     virtual Bool_t ReadPsiBinFile();
@@ -80,6 +80,7 @@ class PRunDataHandler
     virtual Bool_t ReadAsciiFile();
     virtual Bool_t ReadDBFile();
 
+    virtual Bool_t WriteMusrRootFile(TString fln="");
     virtual Bool_t WriteRootFile(TString fln="");
     virtual Bool_t WriteNexusFile(TString fln="");
     virtual Bool_t WriteWkmFile(TString fln="");
@@ -97,6 +98,8 @@ class PRunDataHandler
     virtual TString FileNameFromTemplate(TString &fileNameTemplate, Int_t run, TString &year, Bool_t &ok);
     virtual bool DateToISO8601(string inDate, string &iso8601Date);
     virtual void SplitTimeDate(TString timeDate, TString &time, TString &date, Bool_t &ok);
+    virtual TString GetMonth(Int_t month);
+    virtual TString GetYear(Int_t month);
 };
 
 #endif //  _PRUNDATAHANDLER_H_

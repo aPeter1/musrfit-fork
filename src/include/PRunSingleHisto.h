@@ -10,8 +10,8 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007 by Andreas Suter                                   *
- *   andreas.suter@psi.c                                                   *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
+ *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -62,6 +62,8 @@ class PRunSingleHisto : public PRunBase
     Bool_t fScaleN0AndBkg;  ///< true=scale N0 and background to 1/ns, otherwise 1/bin
     UInt_t fNoOfFitBins;    ///< number of bins to be fitted
     Double_t fBackground;   ///< needed if background range is given (units: 1/bin)
+
+    PDoubleVector fForward;     ///< forward histo data
 
     virtual Bool_t EstimateBkg(UInt_t histoNo);
     virtual Bool_t IsScaleN0AndBkg();

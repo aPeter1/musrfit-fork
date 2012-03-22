@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2010 by Andreas Suter                              *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -209,6 +209,292 @@ void PNonMusrRawRunData::AppendSubErrData(const UInt_t idx, const Double_t dval)
   fErrData[idx].push_back(dval);
 }
 
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// implementation PRawRunDataSet
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//--------------------------------------------------------------------------
+// Constructor
+//--------------------------------------------------------------------------
+/**
+ * <p>Constructor
+ */
+PRawRunDataSet::PRawRunDataSet()
+{
+  Clear();
+}
+
+//--------------------------------------------------------------------------
+// Clear (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Constructor
+ */
+void PRawRunDataSet::Clear()
+{
+  fName = TString("n/a");
+  fHistoNo = -1;
+  fTimeZeroBin = 0.0;
+  fTimeZeroBinEstimated = 0.0;
+  fFirstGoodBin = 0;
+  fLastGoodBin = 0;
+  fFirstBkgBin = 0;
+  fLastBkgBin = 0;
+  fData.clear();
+}
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// implementation PRawRunDataVector
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//--------------------------------------------------------------------------
+// IsPresent (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Checks if the histogram set with histgram number histoNo is present.
+ *
+ * <p><b>return:</b>
+ * - true if found
+ * - false otherwise
+ *
+ * \param histoNo histogram number requested
+ */
+Bool_t PRawRunDataVector::IsPresent(UInt_t histoNo)
+{
+  Bool_t found=false;
+
+  for (UInt_t i=0; i<fDataVec.size(); i++) {
+    if (fDataVec[i].GetHistoNo() == (Int_t)histoNo) {
+      found = true;
+      break;
+    }
+  }
+
+  return found;
+}
+
+//--------------------------------------------------------------------------
+// GetSet (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get the raw data set with the index idx. This routine is different to
+ * PRawRunDataVector::Get(UInt_t histoNo) where the internal saved histogram
+ * number is used.
+ *
+ * <p><b>return:</b>
+ * - pointer to the raw data set if found
+ * - 0 otherwise
+ *
+ * \param idx data set index
+ */
+PRawRunDataSet* PRawRunDataVector::GetSet(UInt_t idx)
+{
+  PRawRunDataSet *result=0;
+
+  if (idx >= fDataVec.size())
+    return result;
+
+  return &fDataVec[idx];
+}
+
+//--------------------------------------------------------------------------
+// Get (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get the raw data set with histogram number histoNo.
+ *
+ * <p><b>return:</b>
+ * - pointer to the raw data set if found
+ * - 0 otherwise
+ *
+ * \param histoNo histogram number requested
+ */
+PRawRunDataSet* PRawRunDataVector::Get(UInt_t histoNo)
+{
+  PRawRunDataSet *result=0;
+
+  for (UInt_t i=0; i<fDataVec.size(); i++) {
+    if (fDataVec[i].GetHistoNo() == (Int_t)histoNo) {
+      result = &fDataVec[i];
+      break;
+    }
+  }
+
+  return result;
+}
+
+//--------------------------------------------------------------------------
+// operator[] (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get the raw data set with histogram number histoNo.
+ *
+ * <p><b>return:</b>
+ * - pointer to the raw data set if found
+ * - 0 otherwise
+ *
+ * \param histoNo histogram number requested
+ */
+PRawRunDataSet* PRawRunDataVector::operator[](UInt_t histoNo)
+{
+  return Get(histoNo);
+}
+
+//--------------------------------------------------------------------------
+// GetData (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get the raw data set data with histogram number histoNo.
+ *
+ * <p><b>return:</b>
+ * - pointer to the raw data set if found
+ * - 0 otherwise
+ *
+ * \param histoNo histogram number requested
+ */
+PDoubleVector* PRawRunDataVector::GetData(UInt_t histoNo)
+{
+  PDoubleVector *result=0;
+
+  for (UInt_t i=0; i<fDataVec.size(); i++) {
+    if (fDataVec[i].GetHistoNo() == (Int_t)histoNo) {
+      result = fDataVec[i].GetData();
+      break;
+    }
+  }
+
+  return result;
+}
+
+//--------------------------------------------------------------------------
+// GetT0Bin (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get the T0 bin of raw run data with histogram number histoNo.
+ *
+ * <p><b>return:</b>
+ * - T0 bin if found
+ * - PMUSR_UNDEFINED otherwise
+ *
+ * \param histoNo histogram number requested
+ */
+Double_t PRawRunDataVector::GetT0Bin(UInt_t histoNo)
+{
+  Double_t result=-1.0; // undefined
+
+  for (UInt_t i=0; i<fDataVec.size(); i++) {
+    if (fDataVec[i].GetHistoNo() == (Int_t)histoNo) {
+      result = fDataVec[i].GetTimeZeroBin();
+      break;
+    }
+  }
+
+  return result;
+}
+
+//--------------------------------------------------------------------------
+// GetT0BinEstimated (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get the estimated T0 bin of raw run data with histogram number histoNo.
+ *
+ * <p><b>return:</b>
+ * - estimated T0 bin if found
+ * - PMUSR_UNDEFINED otherwise
+ *
+ * \param histoNo histogram number requested
+ */
+Double_t PRawRunDataVector::GetT0BinEstimated(UInt_t histoNo)
+{
+  Double_t result=PMUSR_UNDEFINED;
+
+  for (UInt_t i=0; i<fDataVec.size(); i++) {
+    if (fDataVec[i].GetHistoNo() == (Int_t)histoNo) {
+      result = fDataVec[i].GetTimeZeroBinEstimated();
+      break;
+    }
+  }
+
+  return result;
+}
+
+//--------------------------------------------------------------------------
+// GetBkgBin (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get the background bins (start, end).
+ *
+ * <p><b>return:</b>
+ * - background bins if found
+ * - (-1, -1) otherwise
+ *
+ * \param histoNo histogram number requested
+ */
+PIntPair PRawRunDataVector::GetBkgBin(UInt_t histoNo)
+{
+  PIntPair bkg(-1,-1);
+
+  for (UInt_t i=0; i<fDataVec.size(); i++) {
+    if (fDataVec[i].GetHistoNo() == (Int_t)histoNo) {
+      bkg.first  = fDataVec[i].GetFirstBkgBin();
+      bkg.second = fDataVec[i].GetLastBkgBin();
+      break;
+    }
+  }
+
+  return bkg;
+}
+
+//--------------------------------------------------------------------------
+// GetGoodDataBin (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get the first/last good data bin (fgb, lgb).
+ *
+ * <p><b>return:</b>
+ * - good data bins if found
+ * - (-1, -1) otherwise
+ *
+ * \param histoNo histogram number requested
+ */
+PIntPair PRawRunDataVector::GetGoodDataBin(UInt_t histoNo)
+{
+  PIntPair gdb(-1,-1);
+
+  for (UInt_t i=0; i<fDataVec.size(); i++) {
+    if (fDataVec[i].GetHistoNo() == (Int_t)histoNo) {
+      gdb.first  = fDataVec[i].GetFirstGoodBin();
+      gdb.second = fDataVec[i].GetLastGoodBin();
+      break;
+    }
+  }
+
+  return gdb;
+}
+
+//--------------------------------------------------------------------------
+// Set (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Set a data set at idx. If idx == -1 append it at the end (default),
+ * otherwise check if idx is within bounds and if yes, place it there,
+ * otherwise resize the data vector and place it where requested.
+ *
+ * \param dataSet data set to be set
+ * \param idx index at which to place the data set.
+ */
+void PRawRunDataVector::Set(PRawRunDataSet dataSet, Int_t idx)
+{
+  if (idx == -1) { // data set to be appended
+    fDataVec.push_back(dataSet);
+  } else {
+    if (idx >= (Int_t)fDataVec.size())
+      fDataVec.resize(idx+1);
+    fDataVec[idx] = dataSet;
+  }
+}
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implementation PRawRunData
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -221,11 +507,19 @@ void PNonMusrRawRunData::AppendSubErrData(const UInt_t idx, const Double_t dval)
  */
 PRawRunData::PRawRunData()
 {
+  fVersion = TString("n/a");
+  fGenericValidatorURL = TString("n/a");
+  fSpecificValidatorURL = TString("n/a");
+  fGenerator = TString("n/a");
+  fComment = TString("n/a");
+  fFileName = TString("n/a");
   fLaboratory = TString("n/a");
   fBeamline = TString("n/a");
   fInstrument = TString("n/a");
+  fArea = TString("n/a");
   fMuonSource = TString("n/a");
   fMuonSpecies = TString("n/a");
+  fMuonBeamMomentum = PMUSR_UNDEFINED;
   fRunName = TString("n/a");
   fRunNumber = -1;
   fRunTitle = TString("n/a");
@@ -236,12 +530,15 @@ PRawRunData::PRawRunData()
   fStopTime = TString("n/a");
   fStopDate = TString("n/a");
   fStopDateTimeSec = 0;
+  fCryo = TString("n/a");
   fSample = TString("n/a");
   fOrientation = TString("n/a");
+  fMagnet = TString("n/a");
   fField = PMUSR_UNDEFINED;
   fEnergy = PMUSR_UNDEFINED;
   fTransport = PMUSR_UNDEFINED;
   fTimeResolution = PMUSR_UNDEFINED;
+  fRedGreenOffset.push_back(0);
 }
 
 //--------------------------------------------------------------------------
@@ -254,13 +551,7 @@ PRawRunData::~PRawRunData()
 {
   fTemp.clear();
   fRingAnode.clear();
-  fT0s.clear();
-  fT0Estimated.clear();
-  fBkgBin.clear();
-  fGoodDataBin.clear();
-  for (UInt_t i=0; i<fDataBin.size(); i++)
-    fDataBin[i].clear();
-  fDataBin.clear();
+  fRedGreenOffset.clear();
 }
 
 //--------------------------------------------------------------------------
@@ -330,128 +621,24 @@ const Double_t PRawRunData::GetRingAnode(const UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetT0
+// GetDataSet
 //--------------------------------------------------------------------------
 /**
- * <p> Returns a T0 value.
- *
- * <b>return:</b>
- * - t0 value, if idx is within proper boundaries
- * - -1, otherwise
- *
- * \param idx index of the T0 value whished
- */
-const Int_t PRawRunData::GetT0(const UInt_t idx)
-{
-  if (idx >= fT0s.size()) {
-    cerr << endl << ">> PRawRunData::GetT0: **WARNING** idx=" << idx << " is out of range [0," << fT0s.size() << "[.";
-    cerr << endl;
-    return -1;
-  }
-  return fT0s[idx];
-}
-
-//--------------------------------------------------------------------------
-// GetT0Estimated
-//--------------------------------------------------------------------------
-/**
- * <p>Returns an estimated T0 value.
- *
- * <b>return:</b>
- * - estimated t0 value, if idx is within proper boundaries
- * - -1, otherwise
- *
- * \param idx index of the T0 value whished
- */
-const Int_t PRawRunData::GetT0Estimated(const UInt_t idx)
-{
-  if (idx >= fT0Estimated.size()) {
-    cerr << endl << ">> PRawRunData::GetT0Estimated: **WARNING** idx=" << idx << " is out of range [0," << fT0Estimated.size() << "[.";
-    cerr << endl;
-    return -1;
-  }
-  return fT0Estimated[idx];
-}
-
-//--------------------------------------------------------------------------
-// GetBkgBin
-//--------------------------------------------------------------------------
-/**
- * <p>Returns the background bin range (start, stop) from the data file.
- * Currently only used in mud-files.
- *
- * <b>return:</b>
- * - (start, stop) values, if idx is within proper boundaries
- * - (-1, -1), otherwise
- *
- * \param idx index of the background range.
- */
-const PIntPair PRawRunData::GetBkgBin(const UInt_t idx)
-{
-  PIntPair pair(-1, -1);
-
-  if (idx >= fBkgBin.size()) {
-    cerr << endl << ">> PRawRunData::GetBkgBin: **WARNING** idx=" << idx << " is out of range [0," << fBkgBin.size() << "[.";
-    cerr << endl;
-    return pair;
-  }
-
-  pair.first  = fBkgBin[idx].first;
-  pair.second = fBkgBin[idx].second;
-
-  return pair;
-}
-
-//--------------------------------------------------------------------------
-// GetGoodDataBin
-//--------------------------------------------------------------------------
-/**
- * <p>Returns the data range (first good bin, last good bin) from the data file.
- * Currently only used in mud-files.
- *
- * <b>return:</b>
- * - (first good bin, last good bin) values, if idx is within proper boundaries
- * - (-1, -1), otherwise
- *
- * \param idx index of the data range
- */
-const PIntPair PRawRunData::GetGoodDataBin(const UInt_t idx)
-{
-  PIntPair pair(-1, -1);
-
-  if (idx >= fGoodDataBin.size()) {
-    cerr << endl << ">> PRawRunData::GetGoodDataBin: **WARNING** idx=" << idx << " is out of range [0," << fGoodDataBin.size() << "[.";
-    cerr << endl;
-    return pair;
-  }
-
-  pair.first  = fGoodDataBin[idx].first;
-  pair.second = fGoodDataBin[idx].second;
-
-  return pair;
-}
-
-//--------------------------------------------------------------------------
-// GetDataBin
-//--------------------------------------------------------------------------
-/**
- * <p>Returns a raw muSR run histogram.
+ * <p>Returns a raw muSR run data set.
  *
  * <b>return:</b>
  * - pointer of the data vector, if idx is within proper boundaries
  * - 0, otherwise
  *
- * \param idx histo number index
+ * \param idx either the histogram number or the index, depending in wantHistoNo-flag
+ * \param wantHistoNo flag indicating if idx is the histoNo or the index. Default is wantHistoNo==true
  */
-const PDoubleVector* PRawRunData::GetDataBin(const UInt_t idx)
+PRawRunDataSet* PRawRunData::GetDataSet(const UInt_t idx, Bool_t wantHistoNo)
 {
-  if (idx >= fDataBin.size()) {
-    cerr << endl << ">> PRawRunData::GetDataBin: **WARNING** idx=" << idx << " is out of range [0," << fDataBin.size() << "[.";
-    cerr << endl;
-    return 0;
-  }
-
-  return &fDataBin[idx];
+  if (wantHistoNo)
+    return fData[idx];
+  else
+    return fData.GetSet(idx);
 }
 
 
@@ -508,61 +695,6 @@ void PRawRunData::SetTempError(const UInt_t idx, const Double_t errTemp)
   fTemp[idx].second = errTemp;
 }
 
-//--------------------------------------------------------------------------
-// SetDataBin
-//--------------------------------------------------------------------------
-/**
- * <p> sets a value in a data set.
- *
- * \param histoNo histogram number index
- * \param bin number index
- * \param dval value to be set
- */
-void PRawRunData::SetDataBin(const UInt_t histoNo, const UInt_t bin, const Double_t dval)
-{
-  if (histoNo > fDataBin.size()) {
-    cerr << endl << ">> PRawRunData::SetDataBin: **WARNING** histoNo=" << histoNo << " is out of range [0," << fDataBin.size() << "].";
-    cerr << endl;
-    return;
-  }
-
-  if (bin > fDataBin[histoNo].size()) {
-    cerr << endl << ">> PRawRunData::SetDataBin: **WARNING** bin=" << bin << " is out of range [0," << fDataBin[histoNo].size() << "].";
-    cerr << endl;
-    return;
-  }
-
-  fDataBin[histoNo][bin] = dval;
-}
-
-//--------------------------------------------------------------------------
-// AddDataBin
-//--------------------------------------------------------------------------
-/**
- * <p> add a value within a data set.
- *
- * \param histoNo histogram number index
- * \param bin number index
- * \param dval value to be set
- */
-void PRawRunData::AddDataBin(const UInt_t histoNo, const UInt_t bin, const Double_t dval)
-{
-  if (histoNo > fDataBin.size()) {
-    cerr << endl << ">> PRawRunData::AddDataBin: **WARNING** histoNo=" << histoNo << " is out of range [0," << fDataBin.size() << "].";
-    cerr << endl;
-    return;
-  }
-
-  if (bin > fDataBin[histoNo].size()) {
-    cerr << endl << ">> PRawRunData::AddDataBin: **WARNING** bin=" << bin << " is out of range [0," << fDataBin[histoNo].size() << "].";
-    cerr << endl;
-    return;
-  }
-
-  fDataBin[histoNo][bin] += dval;
-}
-
-
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implementation PMsrRunBlock
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -575,7 +707,7 @@ void PRawRunData::AddDataBin(const UInt_t histoNo, const UInt_t bin, const Doubl
  */
 PMsrRunBlock::PMsrRunBlock()
 {
-  fFitType = -1; // undefined fit type
+  fFitType = -1; // undefined fit type  
   fAlphaParamNo = -1; // undefined alpha parameter number
   fBetaParamNo = -1; // undefined beta parameter number
   fNormParamNo = -1; // undefined norm parameter number
@@ -1128,18 +1260,18 @@ void PMsrRunBlock::SetDataRange(Int_t ival, Int_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetT0
+// GetT0Bin
 //--------------------------------------------------------------------------
 /**
- * <p> get T0 value at position idx
+ * <p> get T0 bin at position idx
  *
  * <b>return:</b>
- * - t0 value, if idx is within proper boundaries
+ * - T0 bin, if idx is within proper boundaries
  * - -1, otherwise
  *
- * \param idx index of the T0 value to be returned
+ * \param idx index of the T0 bin to be returned
  */
-Int_t PMsrRunBlock::GetT0(UInt_t idx)
+Double_t PMsrRunBlock::GetT0Bin(UInt_t idx)
 {
   if (idx >= fT0.size())
     return -1;
@@ -1148,29 +1280,29 @@ Int_t PMsrRunBlock::GetT0(UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// SetT0
+// SetT0Bin
 //--------------------------------------------------------------------------
 /**
- * <p> set T0 value at position idx
+ * <p> set T0 bin at position idx
  *
- * \param ival t0 value
- * \param idx index of the T0 value to be set. If idx==-1, append value
+ * \param ival T0 bin
+ * \param idx index of the T0 bin to be set. If idx==-1, append value
  */
-void PMsrRunBlock::SetT0(Int_t ival, Int_t idx)
+void PMsrRunBlock::SetT0Bin(Double_t dval, Int_t idx)
 {
   if (idx == -1) {
-    fT0.push_back(ival);
+    fT0.push_back(dval);
     return;
   }
 
   if (idx >= static_cast<Int_t>(fT0.size()))
     fT0.resize(idx+1);
 
-  fT0[idx] = ival;
+  fT0[idx] = dval;
 }
 
 //--------------------------------------------------------------------------
-// GetAddT0Size
+// GetAddT0BinSize
 //--------------------------------------------------------------------------
 /**
  * <p> get add T0 size of the addrun at index addRunIdx
@@ -1181,7 +1313,7 @@ void PMsrRunBlock::SetT0(Int_t ival, Int_t idx)
  *
  * \param addRunIdx index of the addrun
  */
-Int_t PMsrRunBlock::GetAddT0Size(UInt_t addRunIdx)
+Int_t PMsrRunBlock::GetAddT0BinSize(UInt_t addRunIdx)
 {
   if (fAddT0.empty())
     return -1;
@@ -1193,7 +1325,7 @@ Int_t PMsrRunBlock::GetAddT0Size(UInt_t addRunIdx)
 }
 
 //--------------------------------------------------------------------------
-// GetAddT0
+// GetAddT0Bin
 //--------------------------------------------------------------------------
 /**
  * <p> get add T0 of the addrun (index addRunIdx) at index histoIdx
@@ -1205,34 +1337,34 @@ Int_t PMsrRunBlock::GetAddT0Size(UInt_t addRunIdx)
  * \param addRunIdx index of the addrun
  * \param histoIdx index of the add backward histo number value
  */
-Int_t PMsrRunBlock::GetAddT0(UInt_t addRunIdx, UInt_t histoIdx)
+Double_t PMsrRunBlock::GetAddT0Bin(UInt_t addRunIdx, UInt_t histoIdx)
 {
   if (fAddT0.empty())
-    return -1;
+    return -1.0;
 
   if (addRunIdx >= fAddT0.size())
-    return -1;
+    return -1.0;
 
   if (fAddT0[addRunIdx].empty())
-    return -1;
+    return -1.0;
 
   if (histoIdx >= fAddT0[addRunIdx].size())
-    return -1;
+    return -1.0;
 
   return fAddT0[addRunIdx][histoIdx];
 }
 
 //--------------------------------------------------------------------------
-// SetAddT0
+// SetAddT0Bin
 //--------------------------------------------------------------------------
 /**
- * <p> set add t0 value of the addrun at index histoNoIdx
+ * <p> set add T0 bin of the addrun at index histoNoIdx
  *
- * \param ival t0 value
+ * \param ival T0 bin
  * \param addRunIdx addrun index
  * \param histoNoIdx index whithin the fAddT0 vector where to set the value.
  */
-void PMsrRunBlock::SetAddT0(Int_t ival, UInt_t addRunIdx, UInt_t histoNoIdx)
+void PMsrRunBlock::SetAddT0Bin(Double_t dval, UInt_t addRunIdx, UInt_t histoNoIdx)
 {
   if (addRunIdx >= fAddT0.size())
     fAddT0.resize(addRunIdx+1);
@@ -1240,8 +1372,7 @@ void PMsrRunBlock::SetAddT0(Int_t ival, UInt_t addRunIdx, UInt_t histoNoIdx)
   if (histoNoIdx >= fAddT0[addRunIdx].size())
     fAddT0[addRunIdx].resize(histoNoIdx+1);
 
-  fAddT0[addRunIdx][histoNoIdx] = ival;
-
+  fAddT0[addRunIdx][histoNoIdx] = dval;
 }
 
 //--------------------------------------------------------------------------

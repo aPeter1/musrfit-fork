@@ -2,8 +2,8 @@ MgB12H12 No2 ZF T=150
 ###############################################################
 FITPARAMETER
 #      Nr. Name        Value     Step      Pos_Error  Boundaries
-        1 alpha       1.0       0.0         none        0       2       
-        2 asy         0.17503   -0.00081    0.00083     0       0.33    
+        1 alpha       1         0           none        0       2       
+        2 asy         0.17503   -0.00082    0.00083     0       0.33    
         3 rate        0.1649    -0.0016     0.0016      0       none    
         4 beta        0.892     -0.016      0.016       0.5     2       
 
@@ -20,11 +20,11 @@ RUN data/000100 XXXX TRIUMF MUD   (name beamline institute data-file-format)
 fittype         2         (asymmetry fit)
 alpha           1
 map             0    0    0    0    0    0    0    0    0    0    0
-forward         1       
-backward        2       
-background      79      391     80      409     
+forward         1 
+backward        2 
+background      79      391     80      409        # estimated bkg: 21.0224 / 17.1702
 data            438     12785   436     12787   
-t0              432     431     
+t0              432.0   431.0   
 fit             0       8      
 packing         100
 
@@ -51,5 +51,5 @@ runs     1
 range    0   8   0   0.25
 
 ###############################################################
-STATISTIC --- 2011-02-06 15:03:19
-  chisq = 133.92904274288378, NDF = 99, chisq/NDF = 1.3528186135644826
+STATISTIC --- 2012-03-20 10:11:27
+  chisq = 133.9, NDF = 99, chisq/NDF = 1.352819

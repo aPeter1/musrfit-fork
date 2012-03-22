@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007 by Andreas Suter                                   *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -91,6 +91,7 @@ PRunSingleHisto::PRunSingleHisto(PMsrHandler *msrInfo, PRunDataHandler *rawData,
  */
 PRunSingleHisto::~PRunSingleHisto()
 {
+  fForward.clear();
 }
 
 //--------------------------------------------------------------------------
@@ -509,13 +510,13 @@ Bool_t PRunSingleHisto::PrepareData()
   }
 
   // collect histogram numbers
-  PUIntVector histoNo;
+  PUIntVector histoNo; // histoNo = msr-file forward + redGreen_offset - 1
   for (UInt_t i=0; i<fRunInfo->GetForwardHistoNoSize(); i++) {
-    histoNo.push_back(fRunInfo->GetForwardHistoNo(i)-1);
+    histoNo.push_back(fRunInfo->GetForwardHistoNo(i));
 
-    if (runData->GetNoOfHistos() <= histoNo[i]) {
+    if (!runData->IsPresent(histoNo[i])) {
       cerr << endl << ">> PRunSingleHisto::PrepareData(): **PANIC ERROR**:";
-      cerr << endl << ">> histoNo found = " << histoNo[i]+1 << ", but there are only " << runData->GetNoOfHistos() << " runs!?!?";
+      cerr << endl << ">> histoNo found = " << histoNo[i] << ", which is NOT present in the data file!?!?";
       cerr << endl << ">> Will quit :-(";
       cerr << endl;
       histoNo.clear();
@@ -523,62 +524,57 @@ Bool_t PRunSingleHisto::PrepareData()
     }
   }
 
-  // check if the t0's are given in the msr-file
-  if (fRunInfo->GetT0Size() == 0) { // t0's are NOT in the msr-file
-    // check if the t0's are in the data file
-    if (runData->GetT0Size() != 0) { // t0's in the run data
-      // keep the proper t0's. For single histo runs, forward is holding the histo no
-      // fForwardHistoNo starts with 1 not with 0 ;-)
-      for (UInt_t i=0; i<fRunInfo->GetForwardHistoNoSize(); i++)
-        fT0s.push_back(runData->GetT0(fRunInfo->GetForwardHistoNo(i)-1));
-    } else { // t0's are neither in the run data nor in the msr-file -> will try estimated ones!
-      for (UInt_t i=0; i<fRunInfo->GetForwardHistoNoSize(); i++) {
-        fT0s.push_back(runData->GetT0Estimated(fRunInfo->GetForwardHistoNo(i)-1));
-        cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** NO t0's found, neither in the run data nor in the msr-file!";
-        cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
-        cerr << endl << ">> will try the estimated one: t0 = " << runData->GetT0Estimated(fRunInfo->GetForwardHistoNo(i)-1);
-        cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
-        cerr << endl;
+  // feed all T0's
+  // first init T0's, T0's are stored as (forward T0, backward T0, etc.)
+  fT0s.clear();
+  fT0s.resize(histoNo.size());
+  for (UInt_t i=0; i<fT0s.size(); i++) {
+    fT0s[i] = -1.0;
+  }
+
+  // fill in the T0's from the msr-file (if present)
+  for (UInt_t i=0; i<fRunInfo->GetT0BinSize(); i++) {
+    fT0s[i] = fRunInfo->GetT0Bin(i);
+  }
+
+  // fill in the T0's from the data file, if not already present in the msr-file
+  for (UInt_t i=0; i<histoNo.size(); i++) {
+    if (fT0s[i] == -1.0) // i.e. not present in the msr-file, try the data file
+      if (runData->GetT0Bin(histoNo[i]) > 0.0) {
+        fT0s[i] = runData->GetT0Bin(histoNo[i]);
+        fRunInfo->SetT0Bin(fT0s[i], i); // keep value for the msr-file
       }
-    }
-  } else { // t0's in the msr-file
-    for (UInt_t i=0; i<fRunInfo->GetForwardHistoNoSize(); i++) {
-      // check if enough t0's are given in the msr-file, if not try to get the rest from the data file
-      if (fRunInfo->GetT0Size() <= i) { // t0 for i not present in the msr-file, i.e. #t0's != #forward histos
-        if (static_cast<Int_t>(runData->GetT0Size()) > fRunInfo->GetForwardHistoNo(i)-1) { // t0 for i present in the data file
-          fT0s.push_back(runData->GetT0(fRunInfo->GetForwardHistoNo(i)-1));
-        } else { // t0 is neither in the run data nor in the msr-file -> will try estimated one!
-          fT0s.push_back(runData->GetT0Estimated(fRunInfo->GetForwardHistoNo(i)-1));
-          cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** NO t0's found, neither in the run data nor in the msr-file!";
-          cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
-          cerr << endl << ">> will try the estimated one: t0 = " << runData->GetT0Estimated(fRunInfo->GetForwardHistoNo(i)-1);
-          cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
-          cerr << endl;
-        }
-      } else { // # of t0's in the msr-file == # of histos in forward
-        fT0s.push_back(fRunInfo->GetT0(i));
-        // check if t0's are given in the data file
-        if (runData->GetT0Size() != 0) {
-          // compare t0's of the msr-file with the one in the data file
-          if (fabs(fRunInfo->GetT0(i)-runData->GetT0(fRunInfo->GetForwardHistoNo(i)-1))>5.0) { // given in bins!!
-            cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING**:";
-            cerr << endl << ">> t0 from the msr-file is  " << fRunInfo->GetT0(i);
-            cerr << endl << ">> t0 from the data file is " << runData->GetT0(fRunInfo->GetForwardHistoNo(i)-1);
-            cerr << endl << ">> This is quite a deviation! Is this done intentionally??";
-            cerr << endl;
-          }
-        }
-      }
+  }
+
+  // fill in the T0's gaps, i.e. in case the T0's are NOT in the msr-file and NOT in the data file
+  for (UInt_t i=0; i<histoNo.size(); i++) {
+    if (fT0s[i] == -1.0) { // i.e. not present in the msr-file and data file, use the estimated T0
+      fT0s[i] = runData->GetT0BinEstimated(histoNo[i]);
+      fRunInfo->SetT0Bin(fT0s[i], i); // keep value for the msr-file
+
+      cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
+      cerr << endl << ">> run: " << fRunInfo->GetRunName();
+      cerr << endl << ">> will try the estimated one: forward t0 = " << runData->GetT0BinEstimated(histoNo[i]);
+      cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+      cerr << endl;
     }
   }
 
   // check if t0 is within proper bounds
   for (UInt_t i=0; i<fRunInfo->GetForwardHistoNoSize(); i++) {
     if ((fT0s[i] < 0) || (fT0s[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
-      cerr << endl << ">> PRunSingleHisto::PrepareData(): **ERROR** t0 data bin doesn't make any sense!";
+      cerr << endl << ">> PRunSingleHisto::PrepareData(): **ERROR** t0 data bin (" << fT0s[i] << ") doesn't make any sense!";
       cerr << endl;
       return false;
     }
+  }
+
+  // keep the histo of each group at this point (addruns handled below)
+  vector<PDoubleVector> forward;
+  forward.resize(histoNo.size());   // resize to number of groups
+  for (UInt_t i=0; i<histoNo.size(); i++) {
+    forward[i].resize(runData->GetDataBin(histoNo[i])->size());
+    forward[i] = *runData->GetDataBin(histoNo[i]);
   }
 
   // check if there are runs to be added to the current one
@@ -594,62 +590,59 @@ Bool_t PRunSingleHisto::PrepareData()
         return false;
       }
 
-      // get T0's of the to be added run
-      PUIntVector t0Add;
-      // check if the t0's are given in the msr-file
-      if (i > fRunInfo->GetAddT0Entries()) { // t0's are NOT in the msr-file
-        // check if the t0's are in the data file
-        if (addRunData->GetT0Size() != 0) { // t0's in the run data
-          // keep the proper t0's. For single histo runs, forward is holding the histo no
-          // fForwardHistoNo starts with 1 not with 0 ;-)
-          for (UInt_t j=0; j<fRunInfo->GetForwardHistoNoSize(); j++)
-            t0Add.push_back(addRunData->GetT0(fRunInfo->GetForwardHistoNo(j)-1));
-        } else { // t0's are neither in the run data nor in the msr-file -> will try estimated ones!
-          for (UInt_t j=0; j<fRunInfo->GetForwardHistoNoSize(); j++) {
-            t0Add.push_back(addRunData->GetT0Estimated(fRunInfo->GetForwardHistoNo(j)-1));
-            cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** NO t0's found, neither in the addrun data nor in the msr-file!";
-            cerr << endl << ">> addrun: " << fRunInfo->GetRunName(i)->Data();
-            cerr << endl << ">> will try the estimated one: t0 = " << addRunData->GetT0Estimated(fRunInfo->GetForwardHistoNo(j)-1);
-            cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
-            cerr << endl;
+      // feed all T0's
+      // first init T0's, T0's are stored as (forward T0, backward T0, etc.)
+      PDoubleVector t0Add;
+      t0Add.resize(histoNo.size());
+      for (UInt_t j=0; j<t0Add.size(); j++) {
+        t0Add[j] = -1.0;
+      }
+
+      // fill in the T0's from the msr-file (if present)
+      for (UInt_t j=0; j<fRunInfo->GetT0BinSize(); j++) {
+        t0Add[j] = fRunInfo->GetAddT0Bin(i-1,j); // addRunIdx starts at 0
+      }
+
+      // fill in the T0's from the data file, if not already present in the msr-file
+      for (UInt_t j=0; j<histoNo.size(); j++) {
+        if (t0Add[j] == -1.0) // i.e. not present in the msr-file, try the data file
+          if (addRunData->GetT0Bin(histoNo[j]) > 0.0) {
+            t0Add[j] = addRunData->GetT0Bin(histoNo[j]);
+            fRunInfo->SetAddT0Bin(t0Add[j], i-1, j); // keep value for the msr-file
           }
-        }
-      } else { // t0's in the msr-file
-        for (UInt_t j=0; j<fRunInfo->GetForwardHistoNoSize(); j++) {
-          // check if t0's are given in the data file
-          if (addRunData->GetT0Size() != 0) {
-            // compare t0's of the msr-file with the one in the data file
-            if (fabs(fRunInfo->GetAddT0(i-1,j)-addRunData->GetT0(fRunInfo->GetForwardHistoNo(j)-1))>5.0) { // given in bins!!
-              cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING**:";
-              cerr << endl << ">> t0 from the msr-file is  " << fRunInfo->GetAddT0(i-1,j);
-              cerr << endl << ">> t0 from the data file is " << addRunData->GetT0(fRunInfo->GetForwardHistoNo(j)-1);
-              cerr << endl << ">> This is quite a deviation! Is this done intentionally??";
-              cerr << endl << ">> addrun: " << fRunInfo->GetRunName(i)->Data();
-              cerr << endl;
-            }
-          }
-          if (i <= fRunInfo->GetAddT0Entries()) {
-            if (j < static_cast<UInt_t>(fRunInfo->GetAddT0Size(i-1))) {
-              t0Add.push_back(fRunInfo->GetAddT0(i-1,j));
-            } else {
-              cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** NO t0's found, neither in the addrun data (";
-              cerr << fRunInfo->GetRunName(i)->Data();
-              cerr << "), nor in the msr-file! Will try to use the T0 of the run data (";
-              cerr << fRunInfo->GetRunName(i)->Data();
-              cerr << ") without any warranty!";
-              cerr << endl;
-              t0Add.push_back(fRunInfo->GetT0(j));
-            }
-          }
+      }
+
+      // fill in the T0's gaps, i.e. in case the T0's are NOT in the msr-file and NOT in the data file
+      for (UInt_t j=0; j<histoNo.size(); j++) {
+        if (t0Add[j] == -1.0) { // i.e. not present in the msr-file and data file, use the estimated T0
+          t0Add[j] = addRunData->GetT0BinEstimated(histoNo[j]);
+          fRunInfo->SetAddT0Bin(t0Add[j], i-1, j); // keep value for the msr-file
+
+          cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
+          cerr << endl << ">> run: " << fRunInfo->GetRunName();
+          cerr << endl << ">> will try the estimated one: forward t0 = " << addRunData->GetT0BinEstimated(histoNo[j]);
+          cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+          cerr << endl;
         }
       }
 
-      // add runs
-      for (UInt_t k=0; k<fRunInfo->GetForwardHistoNoSize(); k++) {
-        for (UInt_t j=0; j<runData->GetDataBin(histoNo[k])->size(); j++) {
-          // make sure that the index stays within proper range
-          if ((j+t0Add[k]-fT0s[k] >= 0) && (j+t0Add[k]-fT0s[k] < addRunData->GetDataBin(histoNo[k])->size())) {
-            runData->AddDataBin(histoNo[k], j, addRunData->GetDataBin(histoNo[k])->at(j+t0Add[k]-fT0s[k]));
+      // check if t0 is within proper bounds
+      for (UInt_t j=0; j<fRunInfo->GetForwardHistoNoSize(); j++) {
+        if ((t0Add[j] < 0) || (t0Add[j] > (Int_t)addRunData->GetDataBin(histoNo[j])->size())) {
+          cerr << endl << ">> PRunSingleHisto::PrepareData(): **ERROR** addt0 data bin (" << t0Add[j] << ") doesn't make any sense!";
+          cerr << endl;
+          return false;
+        }
+      }
+
+      // add forward run
+      UInt_t addRunSize;
+      for (UInt_t k=0; k<histoNo.size(); k++) { // fill each group
+        addRunSize = addRunData->GetDataBin(histoNo[k])->size();
+        for (UInt_t j=0; j<addRunData->GetDataBin(histoNo[k])->size(); j++) { // loop over the bin indices
+          // make sure that the index stays in the proper range
+          if ((j+(Int_t)t0Add[k]-(Int_t)fT0s[k] >= 0) && (j+(Int_t)t0Add[k]-(Int_t)fT0s[k] < addRunSize)) {
+            forward[k][j] += addRunData->GetDataBin(histoNo[k])->at(j+(Int_t)t0Add[k]-(Int_t)fT0s[k]);
           }
         }
       }
@@ -659,12 +652,18 @@ Bool_t PRunSingleHisto::PrepareData()
     }
   }
 
-  // group histograms, add all the forward histograms to the one with histoNo[0]
-  for (UInt_t i=1; i<fRunInfo->GetForwardHistoNoSize(); i++) {
-    for (UInt_t j=0; j<runData->GetDataBin(histoNo[0])->size(); j++) {
+  // set forward/backward histo data of the first group
+  fForward.resize(forward[0].size());
+  for (UInt_t i=0; i<fForward.size(); i++) {
+    fForward[i]  = forward[0][i];
+  }
+
+  // group histograms, add all the remaining forward histograms of the group
+  for (UInt_t i=1; i<histoNo.size(); i++) { // loop over the groupings
+    for (UInt_t j=0; j<runData->GetDataBin(histoNo[i])->size(); j++) { // loop over the bin indices
       // make sure that the index stays within proper range
       if ((j+fT0s[i]-fT0s[0] >= 0) && (j+fT0s[i]-fT0s[0] < runData->GetDataBin(histoNo[i])->size())) {
-        runData->AddDataBin(histoNo[0], j, runData->GetDataBin(histoNo[i])->at(j+fT0s[i]-fT0s[0]));
+        fForward[j] += forward[i][j+fT0s[i]-fT0s[0]];
       }
     }
   }
@@ -721,12 +720,14 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
   if (start < 0) {
     Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
     start = fT0s[0]+offset;
+    fRunInfo->SetDataRange(start, 0);
     cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   }
   if (end < 0) {
-    end = runData->GetDataBin(histoNo)->size();
+    end = fForward.size();
+    fRunInfo->SetDataRange(end, 1);
     cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range end = " << end << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
@@ -740,13 +741,13 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
     start = keep;
   }
   // 2nd check if start is within proper bounds
-  if ((start < 0) || (start > (Int_t)runData->GetDataBin(histoNo)->size())) {
+  if ((start < 0) || (start > (Int_t)fForward.size())) {
     cerr << endl << ">> PRunSingleHisto::PrepareFitData(): **ERROR** start data bin doesn't make any sense!";
     cerr << endl;
     return false;
   }
   // 3rd check if end is within proper bounds
-  if ((end < 0) || (end > (Int_t)runData->GetDataBin(histoNo)->size())) {
+  if ((end < 0) || (end > (Int_t)fForward.size())) {
     cerr << endl << ">> PRunSingleHisto::PrepareFitData(): **ERROR** end data bin doesn't make any sense!";
     cerr << endl;
     return false;
@@ -770,8 +771,8 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
           return false;
       }
     } else { // fixed background given
-      for (UInt_t i=0; i<runData->GetDataBin(histoNo)->size(); i++) {
-        runData->AddDataBin(histoNo, i, -fRunInfo->GetBkgFix(0));
+      for (UInt_t i=0; i<fForward.size(); i++) {
+        fForward[i] -= fRunInfo->GetBkgFix(0);
       }
     }
   }
@@ -790,7 +791,7 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
   fData.SetDataTimeStep(fTimeResolution*fRunInfo->GetPacking());
   for (Int_t i=start; i<end; i++) {
     if (fRunInfo->GetPacking() == 1) {
-      value = runData->GetDataBin(histoNo)->at(i);
+      value = fForward[i];
       value /= normalizer;
       fData.AppendValue(value);
       if (value == 0.0)
@@ -808,7 +809,7 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
         // reset values
         value = 0.0;
       }
-      value += runData->GetDataBin(histoNo)->at(i);
+      value += fForward[i];
     }
   }
 
@@ -856,12 +857,12 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
   // start = the first bin which is a multiple of packing backward from first good data bin
   Int_t start = fRunInfo->GetDataRange(0) - (fRunInfo->GetDataRange(0)/packing)*packing;
   // end = last bin starting from start which is a multipl of packing and still within the data 
-  Int_t end   = start + ((runData->GetDataBin(histoNo)->size()-start)/packing)*packing;
+  Int_t end   = start + ((fForward.size()-start)/packing)*packing;
   // check if data range has been provided, and if not try to estimate them
   if (start < 0) {
     Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
     start = (fT0s[0]+offset) - ((fT0s[0]+offset)/packing)*packing;
-    end = start + ((runData->GetDataBin(histoNo)->size()-start)/packing)*packing;
+    end = start + ((fForward.size()-start)/packing)*packing;
     cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range start = " << start << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
@@ -874,13 +875,13 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
     start = keep;
   }
   // 2nd check if start is within proper bounds
-  if ((start < 0) || (start > (Int_t)runData->GetDataBin(histoNo)->size())) {
+  if ((start < 0) || (start > (Int_t)fForward.size())) {
     cerr << endl << ">> PRunSingleHisto::PrepareRawViewData(): **ERROR** start data bin doesn't make any sense!";
     cerr << endl;
     return false;
   }
   // 3rd check if end is within proper bounds
-  if ((end < 0) || (end > (Int_t)runData->GetDataBin(histoNo)->size())) {
+  if ((end < 0) || (end > (Int_t)fForward.size())) {
     cerr << endl << ">> PRunSingleHisto::PrepareRawViewData(): **ERROR** end data bin doesn't make any sense!";
     cerr << endl;
     return false;
@@ -905,7 +906,7 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
       // reset values
       value = 0.0;
     }
-    value += runData->GetDataBin(histoNo)->at(i);
+    value += fForward[i];
   }
 
   CalcNoOfFitBins();
@@ -969,11 +970,11 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
   }
 
   // calculate theory
-  UInt_t size = runData->GetDataBin(histoNo)->size();
+  UInt_t size = fForward.size();
   Double_t factor = 1.0;
-  if (fData.GetValue()->size() * 10 > runData->GetDataBin(histoNo)->size()) {
+  if (fData.GetValue()->size() * 10 > fForward.size()) {
     size = fData.GetValue()->size() * 10;
-    factor = (Double_t)runData->GetDataBin(histoNo)->size() / (Double_t)size;
+    factor = (Double_t)fForward.size() / (Double_t)size;
   }
   Double_t time;
   Double_t theoryValue;
@@ -1051,13 +1052,13 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
   // start = the first bin which is a multiple of packing backward from first good data bin
   Int_t start = fRunInfo->GetDataRange(0) - (fRunInfo->GetDataRange(0)/packing)*packing;
   // end = last bin starting from start which is a multiple of packing and still within the data
-  Int_t end   = start + ((runData->GetDataBin(histoNo)->size()-start)/packing)*packing;
+  Int_t end   = start + ((fForward.size()-start)/packing)*packing;
 
   // check if data range has been provided, and if not try to estimate them
   if (start < 0) {
     Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
     start = (fT0s[0]+offset) - ((fT0s[0]+offset)/packing)*packing;
-    end = start + ((runData->GetDataBin(histoNo)->size()-start)/packing)*packing;
+    end = start + ((fForward.size()-start)/packing)*packing;
     cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range start = " << start << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
@@ -1071,13 +1072,13 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
     start = keep;
   }
   // 2nd check if start is within proper bounds
-  if ((start < 0) || (start > (Int_t)runData->GetDataBin(histoNo)->size())) {
+  if ((start < 0) || (start > (Int_t)fForward.size())) {
     cerr << endl << ">> PRunSingleHisto::PrepareViewData(): **ERROR** start data bin doesn't make any sense!";
     cerr << endl;
     return false;
   }
   // 3rd check if end is within proper bounds
-  if ((end < 0) || (end > (Int_t)runData->GetDataBin(histoNo)->size())) {
+  if ((end < 0) || (end > (Int_t)fForward.size())) {
     cerr << endl << ">> PRunSingleHisto::PrepareViewData(): **ERROR** end data bin doesn't make any sense!";
     cerr << endl;
     return false;
@@ -1157,7 +1158,7 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
         fData.AppendErrorValue(expval*TMath::Sqrt(value*dataNorm));
         value = 0.0;
       }
-      value += runData->GetDataBin(histoNo)->at(i);
+      value += fForward[i];
     }
   } else { // RRF representation
     // check which units shall be used
@@ -1194,9 +1195,9 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
       }
       time = ((Double_t)i-t0)*fTimeResolution;
       expval = TMath::Exp(+time/tau)/N0;
-      rrf_val = (-1.0+expval*(runData->GetDataBin(histoNo)->at(i)*dataNorm-bkg))*TMath::Cos(wRRF * time + phaseRRF);
+      rrf_val = (-1.0+expval*(fForward[i]*dataNorm-bkg))*TMath::Cos(wRRF * time + phaseRRF);
       value += rrf_val;
-      error += runData->GetDataBin(histoNo)->at(i)*dataNorm;
+      error += fForward[i]*dataNorm;
     }
   }
 
@@ -1209,15 +1210,15 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
 
   // calculate theory
   Double_t theoryValue;
-  UInt_t size = runData->GetDataBin(histoNo)->size();
+  UInt_t size = fForward.size();
   Double_t factor = 1.0;
   UInt_t rebinRRF = 0;
 
   if (wRRF == 0) { // no RRF
     // check if a finer binning for the theory is needed
-    if (fData.GetValue()->size() * 10 > runData->GetDataBin(histoNo)->size()) {
+    if (fData.GetValue()->size() * 10 > fForward.size()) {
       size = fData.GetValue()->size() * 10;
-      factor = (Double_t)runData->GetDataBin(histoNo)->size() / (Double_t)size;
+      factor = (Double_t)fForward.size() / (Double_t)size;
     }
     fData.SetTheoryTimeStart(fData.GetDataTimeStart());
     fData.SetTheoryTimeStep(fTimeResolution*factor);
@@ -1316,22 +1317,19 @@ Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
       end = fRunInfo->GetBkgRange(1);
   }
 
-  // get the proper run
-  PRawRunData* runData = fRawData->GetRunData(*fRunInfo->GetRunName());
-
   // check if start is within histogram bounds
-  if ((start < 0) || (start >= runData->GetDataBin(histoNo)->size())) {
+  if ((start < 0) || (start >= fForward.size())) {
     cerr << endl << ">> PRunSingleHisto::EstimatBkg(): **ERROR** background bin values out of bound!";
-    cerr << endl << ">> histo lengths    = " << runData->GetDataBin(histoNo)->size();
+    cerr << endl << ">> histo lengths    = " << fForward.size();
     cerr << endl << ">> background start = " << start;
     cerr << endl;
     return false;
   }
 
   // check if end is within histogram bounds
-  if ((end < 0) || (end >= runData->GetDataBin(histoNo)->size())) {
+  if ((end < 0) || (end >= fForward.size())) {
     cerr << endl << ">> PRunSingleHisto::EstimatBkg(): **ERROR** background bin values out of bound!";
-    cerr << endl << ">> histo lengths  = " << runData->GetDataBin(histoNo)->size();
+    cerr << endl << ">> histo lengths  = " << fForward.size();
     cerr << endl << ">> background end = " << end;
     cerr << endl;
     return false;
@@ -1342,7 +1340,7 @@ Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
 
   // forward
   for (UInt_t i=start; i<end; i++)
-    bkg += runData->GetDataBin(histoNo)->at(i);
+    bkg += fForward[i];
   bkg /= static_cast<Double_t>(end - start + 1);
 
   if (fScaleN0AndBkg)

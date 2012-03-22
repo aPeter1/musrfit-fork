@@ -5,7 +5,7 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id: nexus_read_test.cpp 4981 2011-08-23 17:22:29Z nemu $
+  $Id$
 
 ***************************************************************************/
 
@@ -38,6 +38,7 @@
 #include <vector>
 using namespace std;
 
+#include "PMusr.h"
 #include "PNeXus.h"
 
 //---------------------------------------------------------------------------------------
@@ -45,7 +46,7 @@ using namespace std;
 void nexus_read_test_syntax()
 {
   cout << endl << ">>---------------------------------------------------------------------------------------";
-  cout << endl << ">> usage: nexus_dump <nexus-in-filename>";
+  cout << endl << ">> usage: nexus_dump [<nexus-in-filename>] | --version";
   cout << endl << ">>        This will try to read a nexus-files <nexus-in-filename> and send the relevant";
   cout << endl << ">>        information to the standard output.";
   cout << endl << ">>---------------------------------------------------------------------------------------";
@@ -59,6 +60,11 @@ int main(int argc, char *argv[])
   if (argc !=2) {
     nexus_read_test_syntax();
     return -1;
+  }
+
+  if (!strcmp(argv[1], "--version")) {
+    cout << endl << "nexus_dump version: " << PMUSR_VERSION << " / $Id$" << endl << endl;
+    return 0;
   }
 
   PNeXus *nxs_file = new PNeXus(argv[1]);

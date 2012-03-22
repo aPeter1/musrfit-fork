@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2011 by Andreas Suter                              *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -565,7 +565,7 @@ int PNeXusData1::GetT0(unsigned int idx)
   if (idx >= fT0.size())
     return -1;
 
-  return fT0[idx];
+  return (int)fT0[idx];
 }
 
 //------------------------------------------------------------------------------------------
@@ -581,7 +581,7 @@ int PNeXusData1::GetFirstGoodBin(unsigned int idx)
   if (idx >= fFirstGoodBin.size())
     return -1;
 
-  return fFirstGoodBin[idx];
+  return (int)fFirstGoodBin[idx];
 }
 
 //------------------------------------------------------------------------------------------
@@ -597,7 +597,7 @@ int PNeXusData1::GetLastGoodBin(unsigned int idx)
   if (idx >= fLastGoodBin.size())
     return -1;
 
-  return fLastGoodBin[idx];
+  return (int)fLastGoodBin[idx];
 }
 
 

@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
       break;
     case 2:
       if (strstr(argv[1], "--version")) {
-        cout << endl << "musrview version: $Id$";
+        cout << endl << "musrview version: " << PMUSR_VERSION << " / $Id$";
         cout << endl << endl;
         return PMUSR_SUCCESS;
       } else if (strstr(argv[1], "--help")) {
