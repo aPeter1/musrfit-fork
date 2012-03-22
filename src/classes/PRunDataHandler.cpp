@@ -1441,10 +1441,6 @@ Bool_t PRunDataHandler::ReadRootFile()
     if (ok)
       runData.SetLaboratory(str);
 
-    header->Get("RunInfo/Area", str, ok);
-    if (ok)
-      runData.SetArea(str);
-
     header->Get("RunInfo/Instrument", str, ok);
     if (ok)
       runData.SetInstrument(str);
@@ -4025,8 +4021,6 @@ Bool_t PRunDataHandler::WriteMusrRootFile(TString fln)
   header->Set("RunInfo/Run Duration", prop);
   str = fData[0].GetLaboratory()->Copy();
   header->Set("RunInfo/Laboratory", str);
-  str = fData[0].GetArea()->Copy();
-  header->Set("RunInfo/Area", str);
   str = fData[0].GetInstrument()->Copy();
   header->Set("RunInfo/Instrument", str);
   dval[0] = fData[0].GetMuonBeamMomentum();
@@ -5178,7 +5172,7 @@ Bool_t PRunDataHandler::WriteMudFile(TString fln)
   MUD_setTimeEnd(fd, fData[0].GetStopDateTime());
   MUD_setTitle(fd, (char *)fData[0].GetRunTitle()->Data());
   MUD_setLab(fd, (char *)fData[0].GetLaboratory()->Data());
-  MUD_setArea(fd, (char *)fData[0].GetArea()->Data());
+  MUD_setArea(fd, (char *)fData[0].GetBeamline()->Data());
   MUD_setMethod(fd, (char *)fData[0].GetSetup()->Data());
   MUD_setApparatus(fd, (char *)fData[0].GetInstrument()->Data());
   MUD_setInsert(fd, dummy);

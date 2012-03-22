@@ -356,7 +356,6 @@ class PRawRunData {
     virtual const TString* GetLaboratory() { return &fLaboratory; }
     virtual const TString* GetBeamline() { return &fBeamline; }
     virtual const TString* GetInstrument() { return &fInstrument; }
-    virtual const TString* GetArea() { return &fArea; }
     virtual const TString* GetRunName() { return &fRunName; }
     virtual const TString* GetMuonSource() { return &fMuonSource; }
     virtual const TString* GetMuonSpecies() { return &fMuonSpecies; }
@@ -404,7 +403,6 @@ class PRawRunData {
     virtual void SetLaboratory(const TString &str) { fLaboratory = str; }
     virtual void SetBeamline(const TString &str) { fBeamline = str; }
     virtual void SetInstrument(const TString &str) { fInstrument = str; }
-    virtual void SetArea(const TString &str) { fArea = str; }
     virtual void SetMuonSource(const TString &str) { fMuonSource = str; }
     virtual void SetMuonSpecies(const TString &str) { fMuonSpecies = str; }
     virtual void SetMuonBeamMomentum(const Double_t dval) { fMuonBeamMomentum = dval; }
@@ -445,7 +443,6 @@ class PRawRunData {
     TString fLaboratory;             ///< keeps the name of the laboratory, e.g. PSI, ISIS, TRIUMF, JPARC
     TString fBeamline;               ///< keeps the name of the be beamline, e.g. muE4, piM3.1, ...
     TString fInstrument;             ///< keeps the name of the instrument, e.g. LEM, GPS, MUSR, EMU, ...
-    TString fArea;                   ///< keeps the beam area
     TString fMuonSource;             ///< keeps the type of muon source, e.g. continous surface beam, pulsed beam, low energy muon beam
     TString fMuonSpecies;            ///< positive muon or negative muon
     Double_t fMuonBeamMomentum;      ///< given in MeV/c, for LEM this is the momentum of the secondary beamline and NOT the momentum of the low energy beam

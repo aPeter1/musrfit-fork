@@ -516,7 +516,6 @@ PRawRunData::PRawRunData()
   fLaboratory = TString("n/a");
   fBeamline = TString("n/a");
   fInstrument = TString("n/a");
-  fArea = TString("n/a");
   fMuonSource = TString("n/a");
   fMuonSpecies = TString("n/a");
   fMuonBeamMomentum = PMUSR_UNDEFINED;
