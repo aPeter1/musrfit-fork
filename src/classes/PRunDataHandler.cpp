@@ -1317,7 +1317,7 @@ Bool_t PRunDataHandler::ReadRootFile()
       dataSet.SetHistoNo(i+1);
       dataSet.SetTimeZeroBin(t0[i]);
       dataSet.SetTimeZeroBinEstimated(histo->GetMaximumBin());
-      dataSet.SetFirstGoodBin(t0[i]);
+      dataSet.SetFirstGoodBin((Int_t)t0[i]);
       dataSet.SetLastGoodBin(histo->GetNbinsX()-1);
       dataSet.SetData(histoData);
       runData.SetDataSet(dataSet);
@@ -1352,7 +1352,7 @@ Bool_t PRunDataHandler::ReadRootFile()
         dataSet.SetHistoNo(i+1+POST_PILEUP_HISTO_OFFSET);
         dataSet.SetTimeZeroBin(t0[i]);
         dataSet.SetTimeZeroBinEstimated(histo->GetMaximumBin());
-        dataSet.SetFirstGoodBin(t0[i]);
+        dataSet.SetFirstGoodBin((Int_t)t0[i]);
         dataSet.SetLastGoodBin(histo->GetNbinsX()-1);
         dataSet.SetData(histoData);
         runData.SetDataSet(dataSet);
@@ -5073,7 +5073,7 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
       length = dataSet->GetData()->size();
       histos[i].resize(length);
       for (UInt_t j=0; j<length; j++) {
-        histos[i][j] = dataSet->GetData()->at(j);
+        histos[i][j] = (Int_t)dataSet->GetData()->at(j);
       }
     }
   } else { // rebin > 1

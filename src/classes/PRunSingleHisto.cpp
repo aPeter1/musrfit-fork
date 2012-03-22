@@ -663,7 +663,7 @@ Bool_t PRunSingleHisto::PrepareData()
     for (UInt_t j=0; j<runData->GetDataBin(histoNo[i])->size(); j++) { // loop over the bin indices
       // make sure that the index stays within proper range
       if ((j+fT0s[i]-fT0s[0] >= 0) && (j+fT0s[i]-fT0s[0] < runData->GetDataBin(histoNo[i])->size())) {
-        fForward[j] += forward[i][j+fT0s[i]-fT0s[0]];
+        fForward[j] += forward[i][j+(Int_t)fT0s[i]-(Int_t)fT0s[0]];
       }
     }
   }
@@ -719,7 +719,7 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
   // check if data range has been provided, and if not try to estimate them
   if (start < 0) {
     Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
-    start = fT0s[0]+offset;
+    start = (Int_t)fT0s[0]+offset;
     fRunInfo->SetDataRange(start, 0);
     cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
@@ -778,7 +778,7 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
   }
 
   // everything looks fine, hence fill data set
-  Int_t t0 = fT0s[0];
+  Int_t t0 = (Int_t)fT0s[0];
   Double_t value = 0.0;
   Double_t normalizer = 1.0;
   // in order that after rebinning the fit does not need to be redone (important for plots)
@@ -861,7 +861,7 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
   // check if data range has been provided, and if not try to estimate them
   if (start < 0) {
     Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
-    start = (fT0s[0]+offset) - ((fT0s[0]+offset)/packing)*packing;
+    start = ((Int_t)fT0s[0]+offset) - (((Int_t)fT0s[0]+offset)/packing)*packing;
     end = start + ((fForward.size()-start)/packing)*packing;
     cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range start = " << start << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
@@ -888,7 +888,7 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
   }
 
   // everything looks fine, hence fill data set
-  Int_t t0 = fT0s[0];
+  Int_t t0 = (Int_t)fT0s[0];
   Double_t value = 0.0;
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
@@ -1047,7 +1047,7 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
   // transform raw histo data. This is done the following way (for details see the manual):
   // for the single histo fit, just the rebinned raw data are copied
   // first get start data, end data, and t0
-  Int_t t0 = fT0s[0];
+  Int_t t0 = (Int_t)fT0s[0];
 
   // start = the first bin which is a multiple of packing backward from first good data bin
   Int_t start = fRunInfo->GetDataRange(0) - (fRunInfo->GetDataRange(0)/packing)*packing;
@@ -1057,7 +1057,7 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
   // check if data range has been provided, and if not try to estimate them
   if (start < 0) {
     Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
-    start = (fT0s[0]+offset) - ((fT0s[0]+offset)/packing)*packing;
+    start = ((Int_t)fT0s[0]+offset) - (((Int_t)fT0s[0]+offset)/packing)*packing;
     end = start + ((fForward.size()-start)/packing)*packing;
     cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range start = " << start << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";

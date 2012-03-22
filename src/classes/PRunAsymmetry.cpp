@@ -617,7 +617,7 @@ Bool_t PRunAsymmetry::PrepareData()
     for (UInt_t j=0; j<runData->GetDataBin(forwardHistoNo[i])->size(); j++) { // loop over the bin indices
       // make sure that the index stays within proper range
       if ((j+fT0s[2*i]-fT0s[0] >= 0) && (j+fT0s[2*i]-fT0s[0] < runData->GetDataBin(forwardHistoNo[i])->size())) {
-        fForward[j] += forward[i][j+fT0s[2*i]-fT0s[0]];
+        fForward[j] += forward[i][j+(Int_t)fT0s[2*i]-(Int_t)fT0s[0]];
       }
     }
   }
@@ -627,7 +627,7 @@ Bool_t PRunAsymmetry::PrepareData()
     for (UInt_t j=0; j<runData->GetDataBin(backwardHistoNo[i])->size(); j++) { // loop over the bin indices
       // make sure that the index stays within proper range
       if ((j+fT0s[2*i+1]-fT0s[1] >= 0) && (j+fT0s[2*i+1]-fT0s[1] < runData->GetDataBin(backwardHistoNo[i])->size())) {
-        fBackward[j] += backward[i][j+fT0s[2*i+1]-fT0s[1]];
+        fBackward[j] += backward[i][j+(Int_t)fT0s[2*i+1]-(Int_t)fT0s[1]];
       }
     }
   }

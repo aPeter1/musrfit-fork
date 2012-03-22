@@ -649,7 +649,7 @@ Int_t main(Int_t argc, Char_t *argv[])
             musrT0Data.SetRawRunData(rawRunData);
             // feed data t0 if present
             if (rawRunData[0]->IsPresent(runList->at(i).GetForwardHistoNo(0))) {
-              musrT0Data.SetT0BinData(rawRunData[0]->GetT0Bin(runList->at(i).GetForwardHistoNo(0)));
+              musrT0Data.SetT0BinData((UInt_t)rawRunData[0]->GetT0Bin(runList->at(i).GetForwardHistoNo(0)));
             }
             musrT0Data.SetRunNo(i);
             musrT0Data.SetAddRunIdx(0); // no addruns
@@ -683,7 +683,7 @@ Int_t main(Int_t argc, Char_t *argv[])
               for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++) {
                 // feed data t0 if present
                 if (rawRunData[j]->IsPresent(runList->at(i).GetForwardHistoNo(0))) {
-                  musrT0Data.SetT0BinData(rawRunData[j]->GetT0Bin(runList->at(i).GetForwardHistoNo(0)));
+                  musrT0Data.SetT0BinData((UInt_t)rawRunData[j]->GetT0Bin(runList->at(i).GetForwardHistoNo(0)));
                 }
                 // feed necessary data
                 musrT0Data.SetAddRunIdx(j); // addruns
@@ -710,7 +710,7 @@ Int_t main(Int_t argc, Char_t *argv[])
               for (UInt_t j=0; j<runList->at(i).GetForwardHistoNoSize(); j++) {
                 // feed data t0 if present
                 if (rawRunData[0]->IsPresent(runList->at(i).GetForwardHistoNo(j))) {
-                  musrT0Data.SetT0BinData(rawRunData[0]->GetT0Bin(runList->at(i).GetForwardHistoNo(j)));
+                  musrT0Data.SetT0BinData((UInt_t)rawRunData[0]->GetT0Bin(runList->at(i).GetForwardHistoNo(j)));
                 }
                 // feed necessary data
                 musrT0Data.SetHistoNoIdx(j);
@@ -739,7 +739,7 @@ Int_t main(Int_t argc, Char_t *argv[])
                 for (UInt_t k=0; k<runList->at(i).GetForwardHistoNoSize(); k++) { // forward histo grouping
                   // feed data t0 if present
                   if (rawRunData[j]->IsPresent(runList->at(i).GetForwardHistoNo(k))) {
-                    musrT0Data.SetT0BinData(rawRunData[j]->GetT0Bin(runList->at(i).GetForwardHistoNo(k)));
+                    musrT0Data.SetT0BinData((UInt_t)rawRunData[j]->GetT0Bin(runList->at(i).GetForwardHistoNo(k)));
                   }
                   // feed necessary data
                   musrT0Data.SetHistoNoIdx(k);
@@ -754,9 +754,9 @@ Int_t main(Int_t argc, Char_t *argv[])
             musrT0Data.SetCmdTag(PMUSRT0_GET_DATA_AND_BKG_RANGE);
             // feed all t0's
             for (UInt_t j=0; j<runList->at(i).GetT0BinSize(); j++) {
-              musrT0Data.SetT0Bin(runList->at(i).GetT0Bin(j), j);
+              musrT0Data.SetT0Bin((UInt_t)runList->at(i).GetT0Bin(j), j);
               for (UInt_t k=0; k<runList->at(i).GetAddT0BinEntries(); k++) {
-                musrT0Data.SetAddT0Bin(runList->at(i).GetAddT0Bin(k, j), k, j);
+                musrT0Data.SetAddT0Bin((UInt_t)runList->at(i).GetAddT0Bin(k, j), k, j);
               }
             }
             if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
@@ -775,7 +775,7 @@ Int_t main(Int_t argc, Char_t *argv[])
             musrT0Data.SetRawRunData(rawRunData);
             // feed data t0 if present
             if (rawRunData[0]->IsPresent(runList->at(i).GetForwardHistoNo(0))) {
-              musrT0Data.SetT0BinData(rawRunData[0]->GetT0Bin(runList->at(i).GetForwardHistoNo(0)));
+              musrT0Data.SetT0BinData((UInt_t)rawRunData[0]->GetT0Bin(runList->at(i).GetForwardHistoNo(0)));
             }
             musrT0Data.SetRunNo(i);
             musrT0Data.SetAddRunIdx(0); // no addruns
@@ -798,7 +798,7 @@ Int_t main(Int_t argc, Char_t *argv[])
             musrT0Data.SetRawRunData(rawRunData);
             // feed data t0 if present
             if (rawRunData[0]->IsPresent(runList->at(i).GetForwardHistoNo(0))) {
-              musrT0Data.SetT0BinData(rawRunData[0]->GetT0Bin(runList->at(i).GetForwardHistoNo(0)));
+              musrT0Data.SetT0BinData((UInt_t)rawRunData[0]->GetT0Bin(runList->at(i).GetForwardHistoNo(0)));
             }
             musrT0Data.SetRunNo(i);
             musrT0Data.SetAddRunIdx(0); // no addruns
@@ -833,7 +833,7 @@ Int_t main(Int_t argc, Char_t *argv[])
               for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++) {
                 // feed data t0 if present
                 if (rawRunData[j]->IsPresent(runList->at(i).GetForwardHistoNo(0))) {
-                  musrT0Data.SetT0BinData(rawRunData[j]->GetT0Bin(runList->at(i).GetForwardHistoNo(0)));
+                  musrT0Data.SetT0BinData((UInt_t)rawRunData[j]->GetT0Bin(runList->at(i).GetForwardHistoNo(0)));
                 }
                 // feed necessary data
                 musrT0Data.SetAddRunIdx(j); // addruns
@@ -859,7 +859,7 @@ Int_t main(Int_t argc, Char_t *argv[])
               for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++) {
                 // feed data t0 if present
                 if (rawRunData[j]->IsPresent(runList->at(i).GetForwardHistoNo(0))) {
-                  musrT0Data.SetT0BinData(rawRunData[j]->GetT0Bin(runList->at(i).GetForwardHistoNo(0)));
+                  musrT0Data.SetT0BinData((UInt_t)rawRunData[j]->GetT0Bin(runList->at(i).GetForwardHistoNo(0)));
                 }
                 // feed necessary data
                 musrT0Data.SetAddRunIdx(j); // addruns
@@ -886,7 +886,7 @@ Int_t main(Int_t argc, Char_t *argv[])
               for (UInt_t j=0; j<runList->at(i).GetForwardHistoNoSize(); j++) {
                 // feed data t0 if present
                 if (rawRunData[0]->IsPresent(runList->at(i).GetForwardHistoNo(j))) {
-                  musrT0Data.SetT0BinData(rawRunData[0]->GetT0Bin(runList->at(i).GetForwardHistoNo(j)));
+                  musrT0Data.SetT0BinData((UInt_t)rawRunData[0]->GetT0Bin(runList->at(i).GetForwardHistoNo(j)));
                 }
                 // feed necessary data
                 musrT0Data.SetHistoNoIdx(j);
@@ -912,7 +912,7 @@ Int_t main(Int_t argc, Char_t *argv[])
               for (UInt_t j=0; j<runList->at(i).GetBackwardHistoNoSize(); j++) {
                 // feed data t0 if present
                 if (rawRunData[0]->IsPresent(runList->at(i).GetForwardHistoNo(j))) {
-                  musrT0Data.SetT0BinData(rawRunData[0]->GetT0Bin(runList->at(i).GetForwardHistoNo(j)));
+                  musrT0Data.SetT0BinData((UInt_t)rawRunData[0]->GetT0Bin(runList->at(i).GetForwardHistoNo(j)));
                 }
                 // feed necessary data
                 musrT0Data.SetHistoNoIdx(j);
@@ -941,7 +941,7 @@ Int_t main(Int_t argc, Char_t *argv[])
                 for (UInt_t k=0; k<runList->at(i).GetForwardHistoNoSize(); k++) { // forward histo grouping
                   // feed data t0 if present
                   if (rawRunData[j]->IsPresent(runList->at(i).GetForwardHistoNo(k))) {
-                    musrT0Data.SetT0BinData(rawRunData[j]->GetT0Bin(runList->at(i).GetForwardHistoNo(k)));
+                    musrT0Data.SetT0BinData((UInt_t)rawRunData[j]->GetT0Bin(runList->at(i).GetForwardHistoNo(k)));
                   }
                   // feed necessary data
                   musrT0Data.SetHistoNoIdx(k);
@@ -970,7 +970,7 @@ Int_t main(Int_t argc, Char_t *argv[])
                 for (UInt_t k=0; k<runList->at(i).GetBackwardHistoNoSize(); k++) { // backward histo grouping
                   // feed data t0 if present
                   if (rawRunData[j]->IsPresent(runList->at(i).GetForwardHistoNo(k))) {
-                    musrT0Data.SetT0BinData(rawRunData[j]->GetT0Bin(runList->at(i).GetForwardHistoNo(k)));
+                    musrT0Data.SetT0BinData((UInt_t)rawRunData[j]->GetT0Bin(runList->at(i).GetForwardHistoNo(k)));
                   }
                   // feed necessary data
                   musrT0Data.SetHistoNoIdx(k);
@@ -985,9 +985,9 @@ Int_t main(Int_t argc, Char_t *argv[])
             musrT0Data.SetCmdTag(PMUSRT0_GET_DATA_AND_BKG_RANGE);
             // feed all t0's
             for (UInt_t j=0; j<runList->at(i).GetT0BinSize(); j++) {
-              musrT0Data.SetT0Bin(runList->at(i).GetT0Bin(j), j);
+              musrT0Data.SetT0Bin((UInt_t)runList->at(i).GetT0Bin(j), j);
               for (UInt_t k=0; k<runList->at(i).GetAddT0BinEntries(); k++) {
-                musrT0Data.SetAddT0Bin(runList->at(i).GetAddT0Bin(k, j), k, j);
+                musrT0Data.SetAddT0Bin((UInt_t)runList->at(i).GetAddT0Bin(k, j), k, j);
               }
             }
             musrT0Data.SetHistoNo(forwardHistos);
