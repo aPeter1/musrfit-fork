@@ -108,7 +108,6 @@
     	<xs:element name="Run_Stop_Time" type="TString"/>
     	<xs:element name="Run_Duration" type="TMusrRunPhysicalQuantity"/>
     	<xs:element name="Laboratory" type="TString"/>
-      <xs:element name="Area" type="TString"/>
     	<xs:element name="Instrument" type="TString"/>
     	<xs:element name="Muon_Beam_Momentum" type="TMusrRunPhysicalQuantity"/>
     	<xs:element name="Muon_Species" type="TString"/>
