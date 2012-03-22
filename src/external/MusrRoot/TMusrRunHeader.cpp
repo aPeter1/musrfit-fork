@@ -280,7 +280,7 @@ void TMusrRunHeader::Init(TString fileName)
   Set("RunInfo/Time Resolution", prop);
   vector<int> ivec;
   ivec.push_back(0);
-  Set("RunInfo/RedGreen Offset", ivec);
+  Set("RunInfo/RedGreen Offsets", ivec);
 
   Set("DetectorInfo/Detector001/Name", "n/a");
   Set("DetectorInfo/Detector001/Histo Number", 0);

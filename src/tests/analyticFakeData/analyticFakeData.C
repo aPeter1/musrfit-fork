@@ -116,7 +116,7 @@ void analyticFakeData(const TString type)
     vector<Int_t> ivec;
     ivec.push_back(0);
     ivec.push_back(20);
-    header->Set("RunInfo/RedGreen Offset", ivec);
+    header->Set("RunInfo/RedGreen Offsets", ivec);
 
     offset = 1;
     // 2nd write all the required DetectorInfo entries

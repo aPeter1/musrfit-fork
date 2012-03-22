@@ -1508,7 +1508,7 @@ Bool_t PRunDataHandler::ReadRootFile()
       runData.SetTimeResolution(dval);
     }
 
-    header->Get("RunInfo/RedGreen Offset", ivec, ok);
+    header->Get("RunInfo/RedGreen Offsets", ivec, ok);
     if (ok) {
       redGreenOffsets = ivec;
       runData.SetRedGreenOffset(ivec);
@@ -4053,7 +4053,7 @@ Bool_t PRunDataHandler::WriteMusrRootFile(TString fln)
   dval[0] = fData[0].GetTimeResolution();
   prop.Set("Time Resolution", dval[0], "ns");
   header->Set("RunInfo/Time Resolution", prop);
-  header->Set("RunInfo/RedGreen Offset", fData[0].GetRedGreenOffset());
+  header->Set("RunInfo/RedGreen Offsets", fData[0].GetRedGreenOffset());
 
   // feed DetectorInfo
   Int_t histoNo = 0;
