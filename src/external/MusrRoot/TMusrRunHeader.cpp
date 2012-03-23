@@ -284,7 +284,7 @@ void TMusrRunHeader::Init(TString fileName)
   Set("DetectorInfo/Detector001/Name", "n/a");
   Set("DetectorInfo/Detector001/Histo Number", 0);
   Set("DetectorInfo/Detector001/Histo Length", 0);
-  Set("DetectorInfo/Detector001/Time Zero Bin", 0);
+  Set("DetectorInfo/Detector001/Time Zero Bin", (Double_t)0.0);
   Set("DetectorInfo/Detector001/First Good Bin", 0);
   Set("DetectorInfo/Detector001/Last Good Bin", 0);
 
