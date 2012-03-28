@@ -47,12 +47,12 @@ void analyticFakeData(const TString type)
   gROOT->GetListOfBrowsables()->Add(histosFolder, "histos");
   decayAnaModule = histosFolder->AddFolder("DecayAnaModule", "muSR decay histograms");
 
-  UInt_t runNo = 3000;
+  UInt_t runNo = 2001;
   TString fileName, tstr, label, tstr1;
   fileName.Form("0%d.root", (Int_t)runNo);
 
-  Double_t t0[8] = {3419.0, 3520.0, 3520.0, 3421.0, 3517.0, 3418.0, 3522.0, 3623.0}; // runNo: 1000 & 2000
-//  Double_t t0[8] = {3519.0, 3420.0, 3520.0, 3621.0, 3417.0, 3518.0, 3422.0, 3423.0}; // runNo: 1001 & 2001
+//  Double_t t0[8] = {3419.0, 3520.0, 3520.0, 3421.0, 3517.0, 3418.0, 3522.0, 3623.0}; // runNo: 1000 & 2000
+  Double_t t0[8] = {3519.0, 3420.0, 3520.0, 3621.0, 3417.0, 3518.0, 3422.0, 3423.0}; // runNo: 1001 & 2001
 
   if (!type.CompareTo("TLemRunHeader")) {
     // feed run info header
@@ -169,8 +169,10 @@ void analyticFakeData(const TString type)
   const Double_t tau = 2197.019; // ns
   // asymmetry related stuff
   const Double_t timeResolution = 0.1953125; // ns
-  Double_t a0[8] = {0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12};
-  Double_t a1[8] = {0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05};
+//  Double_t a0[8] = {0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12};
+  Double_t a0[8] = {0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22};
+//  Double_t a1[8] = {0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05};
+  Double_t a1[8] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   Double_t phase[8] = {5.0*TMath::Pi()/180.0, 50.0*TMath::Pi()/180.0, 95.0*TMath::Pi()/180.0, 140.0*TMath::Pi()/180.0,
                        185.0*TMath::Pi()/180.0, 230.0*TMath::Pi()/180.0, 275.0*TMath::Pi()/180.0, 320.0*TMath::Pi()/180.0,};
   const Double_t gamma = 0.00001355; // gamma/(2pi)

@@ -367,6 +367,57 @@ AC_SUBST(BOOST_CFLAGS)
 
 
 dnl -----------------------------------------------
+dnl Ask user for path to libxml2
+dnl -----------------------------------------------
+LIBXML2_FOUND=0
+AC_ARG_WITH([libxml2],
+    [AC_HELP_STRING([--with-libxml2],[path to the header files of the libxml2 installation, e.g. /usr/local/include])],
+    [LIBXML2_INCLUDE=$with_libxml2
+    AC_MSG_CHECKING([whether libxml2 can be found at the specified location])
+     if !(test -r ${LIBXML2_INCLUDE}/libxml/xmlreader.h) && !(test -r ${LIBXML2_INCLUDE}/libxml/parser.h) && !(test -r ${LIBXML2_INCLUDE}/libxml/xmlschemas.h); then
+       AC_MSG_RESULT([no])
+       AC_MSG_ERROR([libxml2 cannot be found at the specified path!])
+     fi
+     AC_MSG_RESULT([${LIBXML2_INCLUDE}])],
+    [PKG_CHECK_MODULES(LIBXML2, libxml2 >= 2.6.26, [LIBXML2_FOUND=1],
+     [AC_MSG_CHECKING([whether libxml2 is installed in a standard location])
+      if test -r /usr/local/include/libxml2/libxml/xmlreader.h || test -r /usr/local/include/libxml2/libxml/parser.h || \
+         test -r /usr/local/include/libxml2/libxml/xmlschemas.h; then
+        LIBXML2_INCLUDE="/usr/local/include/libxml2"
+        AC_MSG_RESULT([${LIBXML2_INCLUDE}])
+      elif test -r /usr/include/libxml2/libxml/xmlreader.h || test -r /usr/include/libxml2/libxml/parser.h || \
+        test -r /usr/include/libxml2/libxml/xmlschemas.h; then
+        LIBXML2_INCLUDE="/usr/include/libxml2"
+        AC_MSG_RESULT([${LIBXML2_INCLUDE}])
+      elif test -r /sw/include/libxml2/libxml/xmlreader.h || test -r /sw/include/libxml2/libxml/parser.h || \
+        test -r /sw/include/libxml2/libxml/xmlschemas.h; then
+        LIBXML2_INCLUDE="/sw/include/libxml2"
+        AC_MSG_RESULT([${LIBXML2_INCLUDE}])
+      elif test -r /opt/local/include/libxml2/libxml/xmlreader.h || test -r /opt/local/include/libxml2/libxml/parser.h || \
+        test -r /opt/local/include/libxml2/libxml/xmlschemas.h; then
+        LIBXML2_INCLUDE="/opt/local/include/libxml2"
+        AC_MSG_RESULT([${LIBXML2_INCLUDE}])
+      else
+        AC_MSG_RESULT([no])
+        AC_MSG_ERROR(
+        [libxml2 not found. Please call configure with the --with-libxml2 option.
+        This tells configure where to find the libxml2 headers,
+        e.g. --with-libxml2=/usr/local/include or --with-libxml2=/usr/include/libxml2]
+        )
+      fi
+     ]
+    )
+    ]
+)
+AC_SUBST(LIBXML2_INCLUDE)
+if test "${LIBXML2_FOUND}" != "1"; then
+  LIBXML2_LIBS=""
+  LIBXML2_CFLAGS="-I${LIBXML2_INCLUDE}"
+fi
+AC_SUBST(LIBXML2_LIBS)
+AC_SUBST(LIBXML2_CFLAGS)
+
+dnl -----------------------------------------------
 dnl Check for ROOT
 dnl -----------------------------------------------
 
@@ -1118,6 +1169,11 @@ if test "${BOOST_FOUND}" = "1"; then
   echo "   BOOST header files found in $(pkg-config --variable=prefix boost)"
 else
   echo "   BOOST header files found in ${BOOST_INCLUDE}"
+fi
+if test "${LIBXML2_FOUND}" = "1"; then
+  echo "   LIBXML2 found in $(pkg-config --variable=prefix libxml2)"
+else
+  echo "   LIBXML2 found in ${LIBXML2_INCLUDE}"
 fi
 echo "   ROOT found in ${ROOTLIBDIR%/lib}"
 echo ""

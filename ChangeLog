@@ -6,6 +6,7 @@
 
 changes since 0.10.0
 ===================================
+NEW 2012-03-28 added a validator program (musrRootValidation) for MusrRoot files.
 NEW 2012-03-22 added a first version of MusrRoot, the next muSR file format at PSI. At the same time a rewrite of 
     the low run data handling has been done which enables a proper Red/Green handling with histogram sets addressable
     either via the histogram number or the index in the data vector.
