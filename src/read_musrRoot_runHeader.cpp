@@ -50,21 +50,35 @@ void closeFile(TFile *f)
 
 void read_musrRoot_runHeader_syntax()
 {
-  cout << endl << "usage: read_musrRoot_runHeader [<fileName>] | --version";
+  cout << endl << "usage: read_musrRoot_runHeader [<fileName> [--all-messages]] | --version";
   cout << endl << "       <fileName> is the file name including the extention root, e.g. test.root";
+  cout << endl << "       --all-messages: display all warnings.";
+  cout << endl << "       --version: display the current version.";
   cout << endl << endl;
 }
 
 int main(int argc, char *argv[])
 {
-  if (argc != 2) {
+  if (argc == 1) {
     read_musrRoot_runHeader_syntax();
-    return 1;
+    return -1;
   }
 
-  if (!strcmp(argv[1], "--version")) {
-    cout << endl << "read_musrRoot_runHeader version: " << PMUSR_VERSION << " / $Id$" << endl << endl;
-    return 0;
+  if (argc == 2) {
+    if (!strcmp(argv[1], "--version")) {
+      cout << endl << "read_musrRoot_runHeader version: " << PMUSR_VERSION << " / $Id$" << endl << endl;
+      return 0;
+    }
+  }
+
+  bool quiet = true;
+  if (argc == 3) {
+    if (!strcmp(argv[2], "--all-messages")) {
+      quiet = false;
+    } else {
+      read_musrRoot_runHeader_syntax();
+      return -1;
+    }
   }
 
   // read the file back and extract the header info
@@ -82,7 +96,7 @@ int main(int argc, char *argv[])
     return -1;
   }
 
-  TMusrRunHeader *header = new TMusrRunHeader(argv[1]);
+  TMusrRunHeader *header = new TMusrRunHeader(argv[1], quiet);
 
   if (!header->ExtractAll(runHeader)) {
     cerr << endl << ">> **ERROR** couldn't extract all RunHeader information :-(" << endl << endl;

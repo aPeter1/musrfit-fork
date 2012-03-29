@@ -125,8 +125,8 @@ private:
 class TMusrRunHeader : public TObject
 {
 public:
-  TMusrRunHeader(bool quite=false);
-  TMusrRunHeader(const char *fileName, bool quite=false);
+  TMusrRunHeader(bool quiet=false);
+  TMusrRunHeader(const char *fileName, bool quiet=false);
   virtual ~TMusrRunHeader();
 
   virtual TString GetFileName() { return fFileName; }
@@ -158,7 +158,7 @@ public:
   virtual void DrawHeader();
 
 private:
-  bool fQuite;
+  bool fQuiet;
   TString fFileName;
   TString fVersion;
 

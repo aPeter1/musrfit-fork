@@ -214,9 +214,9 @@ ClassImp(TMusrRunHeader)
 /**
   * <p>Constructor.
   *
-  * \param quite if set to true, warnings will be omited. Default is false.
+  * \param quiet if set to true, warnings will be omited. Default is false.
   */
-TMusrRunHeader::TMusrRunHeader(bool quite) : fQuite(quite)
+TMusrRunHeader::TMusrRunHeader(bool quiet) : fQuiet(quiet)
 {
   Init();
 }
@@ -228,11 +228,11 @@ TMusrRunHeader::TMusrRunHeader(bool quite) : fQuite(quite)
   * <p>Constructor.
   *
   * \param fileName file name of the MusrRoot file.
-  * \param quite if set to true, warnings will be omited. Default is false.
+  * \param quiet if set to true, warnings will be omited. Default is false.
   */
-TMusrRunHeader::TMusrRunHeader(const char *fileName, bool quite)
+TMusrRunHeader::TMusrRunHeader(const char *fileName, bool quiet)
 {
-  fQuite = quite;
+  fQuiet = quiet;
   Init(TString(fileName));
 }
 
@@ -564,7 +564,7 @@ void TMusrRunHeader::Set(TString pathName, TString value)
   UInt_t i=0;
   for (i=0; i<fStringObj.size(); i++) {
     if (!fStringObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
-      if (!fQuite)
+      if (!fQuiet)
         cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
       fStringObj[i].SetType("TString");
       fStringObj[i].SetValue(value);
@@ -598,7 +598,7 @@ void TMusrRunHeader::Set(TString pathName, Int_t value)
   UInt_t i=0;
   for (i=0; i<fIntObj.size(); i++) {
     if (!fIntObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
-      if (!fQuite)
+      if (!fQuiet)
         cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
       fIntObj[i].SetType("Int_t");
       fIntObj[i].SetValue(value);
@@ -632,7 +632,7 @@ void TMusrRunHeader::Set(TString pathName, Double_t value)
   UInt_t i=0;
   for (i=0; i<fDoubleObj.size(); i++) {
     if (!fDoubleObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
-      if (!fQuite)
+      if (!fQuiet)
         cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
       fDoubleObj[i].SetType("Double_t");
       fDoubleObj[i].SetValue(value);
@@ -666,7 +666,7 @@ void TMusrRunHeader::Set(TString pathName, TMusrRunPhysicalQuantity value)
   UInt_t i=0;
   for (i=0; i<fMusrRunPhysQuantityObj.size(); i++) {
     if (!fMusrRunPhysQuantityObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
-      if (!fQuite)
+      if (!fQuiet)
         cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
       fMusrRunPhysQuantityObj[i].SetType("TMusrRunHeader");
       fMusrRunPhysQuantityObj[i].SetValue(value);
@@ -700,7 +700,7 @@ void TMusrRunHeader::Set(TString pathName, TStringVector value)
   UInt_t i=0;
   for (i=0; i<fStringVectorObj.size(); i++) {
     if (!fStringVectorObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
-      if (!fQuite)
+      if (!fQuiet)
         cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
       fStringVectorObj[i].SetType("TStringVector");
       fStringVectorObj[i].SetValue(value);
@@ -734,7 +734,7 @@ void TMusrRunHeader::Set(TString pathName, TIntVector value)
   UInt_t i=0;
   for (i=0; i<fIntVectorObj.size(); i++) {
     if (!fIntVectorObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
-      if (!fQuite)
+      if (!fQuiet)
         cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
       fIntVectorObj[i].SetType("TIntVector");
       fIntVectorObj[i].SetValue(value);
@@ -768,7 +768,7 @@ void TMusrRunHeader::Set(TString pathName, TDoubleVector value)
   UInt_t i=0;
   for (i=0; i<fDoubleVectorObj.size(); i++) {
     if (!fDoubleVectorObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
-      if (!fQuite)
+      if (!fQuiet)
         cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
       fDoubleVectorObj[i].SetType("TDoubleVector");
       fDoubleVectorObj[i].SetValue(value);
@@ -843,8 +843,8 @@ Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString r
 
       // get the run header label
       label = GetLabel(str);
-      if (label == "n/a")
-        return false;
+      if (label == "n/a") // not a TMusrRunHeader object, hence ignore it
+        continue;
 
       // get the run header 'value'
       strValue = GetStrValue(str);
@@ -854,6 +854,8 @@ Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString r
 
       // get type from map
       type = GetType(str);
+      if (type == "n/a") // not a TMusrRunHeader object, hence ignore it
+        continue;
 
       if (type == "TString") {
         Set(pathName, strValue);
@@ -1302,7 +1304,10 @@ TString TMusrRunHeader::GetLabel(TString str)
   Ssiz_t idx1 = str.First('-');
   Ssiz_t idx2 = str.First(':');
   if ((idx1 == -1) || (idx2 == -1)) {
-    cerr << endl << ">> TMusrRunHeader::GetLabel(): **ERROR** str='" << str << "', seems not correctly encoded." << endl;
+    if (!fQuiet) {
+      cerr << endl << ">> TMusrRunHeader::GetLabel(): **WARNING** str='" << str << "', seems not correctly encoded.";
+      cerr << endl << ">>   Will omit it." << endl;
+    }
     return label;
   }
 
@@ -1331,7 +1336,10 @@ TString TMusrRunHeader::GetStrValue(TString str)
   Ssiz_t idx1 = str.First(':');
   Ssiz_t idx2 = str.Last('-');
   if ((idx1 == -1) || (idx2 == -1)) {
-    cerr << endl << ">> TMusrRunHeader::GetStrValue(): **ERROR** str='" << str << "', seems not correctly encoded." << endl;
+    if (!fQuiet) {
+      cerr << endl << ">> TMusrRunHeader::GetStrValue(): **WARNING** str='" << str << "', seems not correctly encoded.";
+      cerr << endl << ">>   Will omit it." << endl;
+    }
     return strValue;
   }
 
@@ -1359,7 +1367,10 @@ TString TMusrRunHeader::GetType(TString str)
   Ssiz_t pos = str.Last('@');
 
   if (pos == -1) { // i.e. NOT found
-    cerr << endl << ">> TMusrRunHeader::GetType(): **ERROR** str=" << str << " seems to be an invalid MusrROOT run header string." << endl;
+    if (!fQuiet) {
+      cerr << endl << ">> TMusrRunHeader::GetType(): **WARNING** str=" << str << " seems to be an invalid MusrROOT run header string.";
+      cerr << endl << ">>   Will omit it." << endl;
+    }
     return result;
   }
 
