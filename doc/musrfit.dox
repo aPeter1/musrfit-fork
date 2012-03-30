@@ -51,6 +51,9 @@ How to setup musrfit on different platforms: \texttt{http://lmu.web.psi.ch/facil
 - \ref MuSRFit A graphical user interface based on PerlQt (written by Z. Salman) for an easy to use interface to the musrfit framework. Compared to the more general approach of writting msr-files, it has some limitations, though it might be easier for a first user of the musrfit framework.
 - \ref any2many Should be a "universal" muSR data-file-format converter.
 - \ref nexus_dump Is a small program to dump NeXus file information (mainly run header info) to the standard output.
+- \ref musrRootValidation This is a program to validate MusrRoot files.
+- \ref read_musrRoot_runHeader Is a small program to dump MusrRoot file information (mainly run header info) to the standard output.
+- \ref write_musrRoot_runHeader Is a little example program showing how to write MusrRoot files.
 
 \section roadmap Road map and missing features
 
@@ -142,4 +145,19 @@ PSI firewall required).
 \section nexus_dump nexus_dump
 <p>This is a little help program which reads a NeXus file and dumps most of the relevant information to the standard output.
 
+//****************************************************************************************************
+\page musrRootValidationPage
+\section musrRootValidation musrRootValidation
+<p>This program allows to validate a given (or supposedly given) MusrRoot file if it is consistent with the minimal required entries via XML Schema schemes.
+Please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrRoot.html">MusrRoot web-page</a>\endhtmlonly \latexonly MusrRoot web-page: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrRoot.html}\endlatexonly
+
+//****************************************************************************************************
+\page read_musrRoot_runHeader_Page
+\section read_musrRoot_runHeader read_musrRoot_runHeader
+<p>This is a little help program which reads a MusrRoot file and dumps the RunHeader information to the standard output.
+
+//****************************************************************************************************
+\page write_musrRoot_runHeader_Page
+\section write_musrRoot_runHeader write_musrRoot_runHeader
+<p>This is a little help program shows how to write a MusrRoot file.
 */

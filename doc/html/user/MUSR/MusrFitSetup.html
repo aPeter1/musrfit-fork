@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en_US">
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Fri, 23 Dec 2011 08:21:27 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 29 Mar 2012 14:12:46 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 <head>
 <link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
@@ -21,7 +21,7 @@
 <meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
 
 	<link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" /> <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
-	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFitSetup?t=1324628468" type="application/x-wiki" title="edit MusrFitSetup" />
+	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFitSetup?t=1333030348" type="application/x-wiki" title="edit MusrFitSetup" />
 	<meta name="description" content="MusrFitSetup" />
   <base  /><!--[if IE]></base><![endif]-->
 	
@@ -63,8 +63,6 @@
 
 <style type="text/css" media="all">
 	@import url("../pub/System/PatternSkin/print.css");
-		  .foswikiAttachments, #patternInfo, #patternBottomBar {display: none;}
-		  .patternContent {overflow: visible}
 </style>
 <!--[if IE]><style type="text/css" media="screen">
 pre {
@@ -113,7 +111,7 @@ pre {
 	
 <script src="https://intranet.psi.ch/pub/System/ChecklistPlugin/itemstatechange.js" language="javascript" type="text/javascript"></script><script src="https://intranet.psi.ch/pub/System/TimeTablePlugin/timetabletooltips.js" language="javascript" type="text/javascript"></script><link rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
 </head>
-<body class="patternViewPage patternPrintPage" id="BodyTop">
+<body class="foswikiNoJs patternViewPage patternPrintPage">
 <a name="PageTop"></a><div class="foswikiPage"><div id="patternScreen">
 <div id="patternPageShadow">
 <div id="patternPage">
@@ -121,6 +119,8 @@ pre {
 <div id="patternFloatWrap">
 <div id="patternMain">
 <div id="patternMainContents">
+<p></p>
+<p></p>
 <div class="patternContent"><div class="foswikiTopic"><h1><a name="Setting_up_61_61musrfit_61_61_on_Different_Platforms"></a>  Setting up <code><b>musrfit</b></code> on Different Platforms </h1>
 <p></p>
 <a name="foswikiTOC"></a><div class="foswikiToc"> <ul>
@@ -235,7 +235,7 @@ Even though there might exist binary packages for the <code>NeXus</code> library
 The <code>ROOT</code> system may or may not be part of the GNU/Linux distribution. If it is, it should be checked that the provided binaries are of a recent version and then these in principle can be installed using a package manager as described above. <br>
 In case the distribution provides no or only outdated binary packages there are the following possibilities: <ul>
 <li> Visit the <code>ROOT</code> <a href="http://root.cern.ch/drupal/content/downloading-root" target="_top">web page</a> and download the packed precompiled binary version matching best the GNU/Linux distribution. Then unpack the bundle to its final destination.
-</li> <li> If there is no precompiled binary version of <code>ROOT</code> available for your system or e.g. <code>ROOT</code> should be compiled with another version of <code>GCC</code> visit the <a href="http://root.cern.ch/drupal/content/downloading-root" target="_top">web page</a> and download the 'complete source tree for all systems'. Then unpack this source tree to its destination (e.g. /opt/root-system)<a name="FootNote1text"></a><span class="FootNoteTextLink" title="In case only a single user is working at the machine it might be considerable to change the ownership of the &#61;ROOT&#61; folder so that the user has easy write access to this directory&#58; &#60;&#33;&#45;&#45;&#0;verbatim939&#0;&#45;&#45;&#62;"><a href="#FootNote1note" class="foswikiCurrentTopicLink">(1)</a></span>, configure<a name="FootNote2text"></a><span class="FootNoteTextLink" title=" When using &#61;GCC&#61; &#38;&#35;8805&#59; 4&#46;2 please make sure that the environment variables &#42;USE_PARALLEL_MINUIT2&#42; and &#42;USE_OPENMP&#42; are <em>not</em> set&#33; Otherwise &#61;MINUIT2&#61; will be compiled with parallelization support and cannot be used together with &#61;musrfit&#61; afterwards since the &#61;musrfit&#61; code is <em>not</em> fully thread&#45;safe&#33; When compiled with &#61;GCC&#61; &#38;&#35;8805&#59; 4&#46;2 &#61;musrfit&#61; itself will parallelize the &#38;chi&#59;&#60;sup&#62;2&#60;&#47;sup&#62; calculation&#46;"><a href="#FootNote2note" class="foswikiCurrentTopicLink">(2)</a></span> it (here using the minimal set of options) and compile it as follows right below: <pre class="bash">
+</li> <li> If there is no precompiled binary version of <code>ROOT</code> available for your system or e.g. <code>ROOT</code> should be compiled with another version of <code>GCC</code> visit the <a href="http://root.cern.ch/drupal/content/downloading-root" target="_top">web page</a> and download the 'complete source tree for all systems'. Then unpack this source tree to its destination (e.g. /opt/root-system)<a name="FootNote1text"></a><span class="FootNoteTextLink" title="In case only a single user is working at the machine it might be considerable to change the ownership of the <code>ROOT</code> folder so that the user has easy write access to this directory: <pre class="bash">chown username:username /opt/root-system/ -R</pre>"><a href="#FootNote1note" class="foswikiCurrentTopicLink">(1)</a></span>, configure<a name="FootNote2text"></a><span class="FootNoteTextLink" title=" When using <code>GCC</code> &#8805; 4.2 please make sure that the environment variables <strong>USE_PARALLEL_MINUIT2</strong> and <strong>USE_OPENMP</strong> are <em>not</em> set! Otherwise <code>MINUIT2</code> will be compiled with parallelization support and cannot be used together with <code>musrfit</code> afterwards since the <code>musrfit</code> code is <em>not</em> fully thread-safe! When compiled with <code>GCC</code> &#8805; 4.2 <code>musrfit</code> itself will parallelize the &chi;<sup>2</sup> calculation."><a href="#FootNote2note" class="foswikiCurrentTopicLink">(2)</a></span> it (here using the minimal set of options) and compile it as follows right below: <pre class="bash">
 cd /opt/root-system
 ./configure linux --gminimal --enable-asimage --enable-mathmore --enable-minuit2 --enable-xml
             (or in case of a 64 bit installation: ./configure linuxx8664gcc --gminimal --enable-asimage --enable-mathmore --enable-minuit2 --enable-xml)
@@ -292,7 +292,7 @@ After the source-code extraction the <strong>autogen.sh</strong> script is calle
 </dd></dl> 
 <p></p>
 Normally it should not be necessary to make use of any of the options except for specifying the installation path with <strong>--prefix</strong>. The other paths should be detected automatically. If this does not work for some reason the <strong>configure</strong> script will terminate and ask for the information.
-When the <strong>configure</strong> script has been called successfully everything is ready for building the <code>musrfit</code> libraries and executables. A standard installation sequence (without <code>NeXus</code> support) might then look like<a name="FootNote3text"></a><span class="FootNoteTextLink" title="In case the normal user has no write permissions to the &#38;&#35;36&#59;ROOTSYS and the installation path the &#34;make install&#34; commands have to be executed as superuser&#46;"><a href="#FootNote3note" class="foswikiCurrentTopicLink">(3)</a></span>:
+When the <strong>configure</strong> script has been called successfully everything is ready for building the <code>musrfit</code> libraries and executables. A standard installation sequence (without <code>NeXus</code> support) might then look like<a name="FootNote3text"></a><span class="FootNoteTextLink" title="In case the normal user has no write permissions to the &#36;ROOTSYS and the installation path the "make install" commands have to be executed as superuser."><a href="#FootNote3note" class="foswikiCurrentTopicLink">(3)</a></span>:
 <pre class="bash">
 cd musrfit
 sh autogen.sh
@@ -339,7 +339,7 @@ musrview test-histo-ROOT-NPP.msr
 <p></p>
 Notes
 <p></p>
-<a name="FootNote1note"></a><span class="FootNoteLabel"><a href="MusrFitSetup.html#FootNote1text" class="foswikiCurrentWebHomeLink"> <strong>1</strong> </a></span>: <span class="FootNote">In case only a single user is working at the machine it might be considerable to change the ownership of the <code>ROOT</code> folder so that the user has easy write access to this directory: <pre class="bash">chown username:username /opt/root-system/ -R</pre></span> 
+<a name="FootNote1note"></a><span class="FootNoteLabel"><a href="MusrFitSetup.html#FootNote1text" class="foswikiCurrentWebHomeLink"> <strong>1</strong> </a></span>: <span class="FootNote">In case only a single user is working at the machine it might be considerable to change the ownership of the <code>ROOT</code> folder so that the user has easy write access to this directory: <!-- verbatim605 --></span> 
 <p></p>
 <a name="FootNote2note"></a><span class="FootNoteLabel"><a href="MusrFitSetup.html#FootNote2text" class="foswikiCurrentWebHomeLink"> <strong>2</strong> </a></span>: <span class="FootNote"> When using <code>GCC</code> &#8805; 4.2 please make sure that the environment variables <strong>USE_PARALLEL_MINUIT2</strong> and <strong>USE_OPENMP</strong> are <em>not</em> set! Otherwise <code>MINUIT2</code> will be compiled with parallelization support and cannot be used together with <code>musrfit</code> afterwards since the <code>musrfit</code> code is <em>not</em> fully thread-safe! When compiled with <code>GCC</code> &#8805; 4.2 <code>musrfit</code> itself will parallelize the &chi;<sup>2</sup> calculation.</span> 
 <p></p>
@@ -410,7 +410,7 @@ In order to install the <code>ROOT</code> system, there are two possibilities: <
 cd /cygdrive/c
 tar xzf root&#95;v5.xx.yy.win32gcc-gcc-4.3.tar.gz
 </pre>
-</li> <li> If due to some reason there was no precompiled <strong>Cygwin GCC 4.3</strong> package available or <code>ROOT</code> should be built from source, one has to visit the <a href="http://root.cern.ch/drupal/content/downloading-root" target="_top">web page</a>, download the 'complete source tree for all systems' and save it for instance in <strong>C:\</strong>.<br>Then go to the Cygwin shell and unpack this source tree, configure<a name="FootNote4text"></a><span class="FootNoteTextLink" title=" When using &#61;GCC&#61; &#38;&#35;8805&#59; 4&#46;2 please make sure that the environment variables &#42;USE_PARALLEL_MINUIT2&#42; and &#42;USE_OPENMP&#42; are <em>not</em> set&#33; Otherwise &#61;MINUIT2&#61; will be compiled with parallelization support and cannot be used together with &#61;musrfit&#61; afterwards since the &#61;musrfit&#61; code is <em>not</em> fully thread&#45;safe&#33; When compiled with &#61;GCC&#61; &#38;&#35;8805&#59; 4&#46;2 &#61;musrfit&#61; itself will parallelize the &#38;chi&#59;&#60;sup&#62;2&#60;&#47;sup&#62; calculation&#46;"><a href="#FootNote4note" class="foswikiCurrentTopicLink">(2)</a></span> it (here using the minimal set of options) and compile it as follows right below:<pre class="bash">
+</li> <li> If due to some reason there was no precompiled <strong>Cygwin GCC 4.3</strong> package available or <code>ROOT</code> should be built from source, one has to visit the <a href="http://root.cern.ch/drupal/content/downloading-root" target="_top">web page</a>, download the 'complete source tree for all systems' and save it for instance in <strong>C:\</strong>.<br>Then go to the Cygwin shell and unpack this source tree, configure<a name="FootNote4text"></a><span class="FootNoteTextLink" title=" When using <code>GCC</code> &#8805; 4.2 please make sure that the environment variables <strong>USE_PARALLEL_MINUIT2</strong> and <strong>USE_OPENMP</strong> are <em>not</em> set! Otherwise <code>MINUIT2</code> will be compiled with parallelization support and cannot be used together with <code>musrfit</code> afterwards since the <code>musrfit</code> code is <em>not</em> fully thread-safe! When compiled with <code>GCC</code> &#8805; 4.2 <code>musrfit</code> itself will parallelize the &chi;<sup>2</sup> calculation."><a href="#FootNote4note" class="foswikiCurrentTopicLink">(2)</a></span> it (here using the minimal set of options) and compile it as follows right below:<pre class="bash">
 cd /cygdrive/c
 tar xzf root&#95;v5.xx.yy.source.tar.gz
 cd root
@@ -774,7 +774,7 @@ qmake musrgui.pro
 make
 make install
 </pre>
-The last command copies <strong>musrgui.app</strong> to the standard program directory <strong>/Applications</strong> <a name="FootNote5text"></a><span class="FootNoteTextLink" title="In the case &#61;&#61;qt3&#45;mac&#61;&#61; has not been installed&#44; there will be no &#42;musrgui&#46;app&#42; but only the executable &#42;musrgui&#42; which will be placed in the directory &#42;&#36;ROOTSYS&#47;bin&#42; and has to be called from the terminal&#46;"><a href="#FootNote5note" class="foswikiCurrentTopicLink">(4)</a></span> and the <strong>musrgui_startup.xml</strong> to <strong>$ROOTSYS/bin/musrgui_startup.xml</strong>. Eventually, in the installed <strong>musrgui_startup.xml</strong> the path-specifications have to be adjusted to match the local <code>musrfit</code> installation. For detailed information on this XML file refer to the <a href="MusrGui.html#MusrguiStartupXml">manual</a>.
+The last command copies <strong>musrgui.app</strong> to the standard program directory <strong>/Applications</strong> <a name="FootNote5text"></a><span class="FootNoteTextLink" title="In the case <code><b>qt3-mac</b></code> has not been installed, there will be no <strong>musrgui.app</strong> but only the executable <strong>musrgui</strong> which will be placed in the directory <strong>$ROOTSYS/bin</strong> and has to be called from the terminal."><a href="#FootNote5note" class="foswikiCurrentTopicLink">(4)</a></span> and the <strong>musrgui_startup.xml</strong> to <strong>$ROOTSYS/bin/musrgui_startup.xml</strong>. Eventually, in the installed <strong>musrgui_startup.xml</strong> the path-specifications have to be adjusted to match the local <code>musrfit</code> installation. For detailed information on this XML file refer to the <a href="MusrGui.html#MusrguiStartupXml">manual</a>.
 <p></p>
 Under some circumstances it might happen, that if <code>musrgui</code> was called from <code>Finder</code> the necessary libraries for executing <code>musrfit</code> could not be found.
 In that case, the only workaround for the moment is to export the environment variable <strong>DYLD_LIBRARY_PATH</strong> in the shell and call <code>musrgui</code> from a terminal!
@@ -812,7 +812,7 @@ musrview test-histo-ROOT-NPP.msr
 </div>
 </div>
 <div class="clear">&nbsp;</div>
-</div><div id="patternBottomBar"><div id="patternBottomBarContents"><div id="patternWebBottomBar">Ideas, requests, problems regarding <a href="https://intranet.psi.ch/Main/WebHome">PSI Wiki</a>? <a href="mailto:psi.intranet@psi.ch?subject=PSI%20Wiki%20Feedback%20on%20MUSR.MusrFitSetup">Send feedback</a></div></div></div>
+</div><div id="patternBottomBar"><div id="patternBottomBarContents"><div id="patternWebBottomBar">Ideas, requests, problems regarding <a href="https://intranet.psi.ch/Main/WebHome">PSI Wiki</a>? <a href="mailto&#58;psi&#46;intranet&#64;psi&#46;ch&#63;subject&#61;PSI&#32;Wiki&#37;20Feedback&#37;20on&#37;20MUSR&#46;MusrFitSetup">Send feedback</a></div></div></div>
 </div>
 </div>
 </div>
@@ -843,17 +843,15 @@ musrview test-histo-ROOT-NPP.msr
 		</tr>
 	</table>
 	</div>
-</div> <!--8290-->
+</div> <!--2490-->
 <p></p>
 <p></p>
 <p></p>
 <p></p>
 </body>
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Fri, 23 Dec 2011 08:21:28 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 29 Mar 2012 14:12:46 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 </html>
-<p></p>
-<p></p>
 <p></p>
 <p></p>

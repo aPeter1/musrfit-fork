@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en_US">
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Fri, 23 Dec 2011 08:21:28 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 29 Mar 2012 14:12:47 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 <head>
 <link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
@@ -21,7 +21,7 @@
 <meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
 
 	<link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" /> <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
-	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1324628470" type="application/x-wiki" title="edit MusrFit" />
+	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1333030349" type="application/x-wiki" title="edit MusrFit" />
 	<meta name="description" content="MusrFit" />
   <base  /><!--[if IE]></base><![endif]-->
 	
@@ -63,8 +63,6 @@
 
 <style type="text/css" media="all">
 	@import url("../pub/System/PatternSkin/print.css");
-		  .foswikiAttachments, #patternInfo, #patternBottomBar {display: none;}
-		  .patternContent {overflow: visible}
 </style>
 <!--[if IE]><style type="text/css" media="screen">
 pre {
@@ -113,7 +111,7 @@ pre {
 	
 <script src="https://intranet.psi.ch/pub/System/ChecklistPlugin/itemstatechange.js" language="javascript" type="text/javascript"></script><script src="https://intranet.psi.ch/pub/System/TimeTablePlugin/timetabletooltips.js" language="javascript" type="text/javascript"></script><link rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
 </head>
-<body class="patternViewPage patternPrintPage" id="BodyTop">
+<body class="foswikiNoJs patternViewPage patternPrintPage">
 <a name="PageTop"></a><div class="foswikiPage"><div id="patternScreen">
 <div id="patternPageShadow">
 <div id="patternPage">
@@ -121,6 +119,8 @@ pre {
 <div id="patternFloatWrap">
 <div id="patternMain">
 <div id="patternMainContents">
+<p></p>
+<p></p>
 <div class="patternContent"><div class="foswikiTopic">
 <a name="UserManual"></a>
 <h1><a name="A_61_61musrfit_61_61_User_Manual"></a>  <code><b>musrfit</b></code> User Manual </h1>
@@ -131,11 +131,11 @@ pre {
 <li> <a href="MusrFit.html#A_2.1_musrfit"> 2.1  musrfit </a>
 </li> <li> <a href="MusrFit.html#A_2.2_musrview"> 2.2  musrview </a>
 </li> <li> <a href="MusrFit.html#A_2.3_musrt0"> 2.3  musrt0 </a>
-</li> <li> <a href="MusrFit.html#A_2.4_musrparam"> 2.4  musrparam </a>
-</li> <li> <a href="MusrFit.html#A_2.5_musrfit_startup.xml"> 2.5  musrfit_startup.xml </a>
-</li> <li> <a href="MusrFit.html#A_2.6_msr2msr"> 2.6  msr2msr </a>
-</li> <li> <a href="MusrFit.html#A_2.7_any2many"> 2.7  any2many </a>
-</li> <li> <a href="MusrFit.html#A_2.8_nexus_dump"> 2.8  nexus_dump </a>
+</li> <li> <a href="MusrFit.html#A_2.4_musrfit_startup.xml"> 2.4  musrfit_startup.xml </a>
+</li> <li> <a href="MusrFit.html#A_2.5_msr2msr"> 2.5  msr2msr </a>
+</li> <li> <a href="MusrFit.html#A_2.6_any2many"> 2.6  any2many </a>
+</li> <li> <a href="MusrFit.html#A_2.7_nexus_dump"> 2.7  nexus_dump </a>
+</li> <li> <a href="MusrFit.html#A_2.8_read_musrRoot_runHeader"> 2.8  read_musrRoot_runHeader </a>
 </li></ul> 
 </li> <li> <a href="MusrFit.html#A_3_Auxiliary_Programs"> 3  Auxiliary Programs </a>
 </li> <li> <a href="MusrFit.html#A_4_Description_of_the_msr_File_Format"> 4  Description of the msr File Format </a> <ul>
@@ -253,36 +253,8 @@ When all channels have been set correctly for the first histogram, pressing of t
 Using the key <strong>Q</strong>, <code>musrt0</code> can be interrupted. No changes to the msr file are applied in this case.<br>
 Closing a window by clicking the <strong>X</strong> button is equivalent to pressing <strong>Q</strong>, i.e. <code>musrt0</code> is simply terminated.
 <p></p>
-<a name="MusrParam"></a>
-<h2><a name="A_2.4_musrparam"></a> 2.4  musrparam </h2>
-<code>musrparam</code> is used in order to extract the fit parameters of multiple msr output files and to summarize them in a multi-column ASCII file which then can be imported by other programs like <a href="http://www.gnuplot.info/" target="_top">gnuplot</a>, <a href="http://soft.proindependent.com/qtiplot.html" target="_top">qtiplot</a> or <a href="http://www.originlab.com/" target="_top">Origin<sup>&reg;</sup></a> to name just a few.
-As mandatory parameters it accepts two file names in the following order: <dl>
-<dt> &lt;input_file_name&gt; </dt><dd> file name of the control file to extract the parameters.
-</dd></dl> 
-The input file itself has the following structure:
-<pre>
-   msr-file-name-1, independent-var1-1, independent-var2-1
-   msr-file-name-2, independent-var1-2, independent-var2-2
-   etc.
-</pre>
-It is allowed to add comment lines starting with <strong>%</strong>.
-<p></p> <dl>
-<dt> &lt;output_file_name&gt; </dt><dd> file name of the generated output file.
-</dd></dl> 
-The output will have the structure:
-<pre>
-   msr-file-name-1, independent-var1-1, ..., par1, err&#95;par1, par2, err&#95;par2, par3, err&#95;par3, ...
-   msr-file-name-2, independent-var1-2, ..., par1, err&#95;par1, par2, err&#95;par2, par3, err&#95;par3, ...
-   etc.
-</pre>
-If positive and negative errors are present, it will be 
-<pre>
-   msr-file-name-1, independent-var1-1, ..., par1, err&#95;par1-, err&#95;par1+, par2, err&#95;par2-, err&#95;par2+, ...
-   etc.
-</pre>
-<p></p>
 <a name="MusrfitStartupXml"></a>
-<h2><a name="A_2.5_musrfit_startup.xml"></a> 2.5  musrfit_startup.xml </h2>
+<h2><a name="A_2.4_musrfit_startup.xml"></a> 2.4  musrfit_startup.xml </h2>
 <code><b>musrfit_startup.xml</b></code> is a configuration file located at the <code>musrfit</code> binary path. In this file the following XML tags are allowed to define settings: <dl>
 <dt> &lt;data_path&gt;PATH_TO_DATA&lt;/data_path&gt; </dt><dd> add the new path <strong>PATH_TO_DATA</strong> where <code>musrfit</code> and <code>musrview</code> will search for data files
 </dd> <dt> &lt;write_per_run_block_chisq&gt;<b>y/n</b>&lt;/write_per_run_block_chisq&gt; </dt><dd> if enabled &chi;<sup>2</sup> for each RUN block will be written to the <a href="#TheStatisticBlock" class="foswikiCurrentTopicLink">STATISTIC block</a> of the resulting <code>msr</code> file. Additionally, in case a &chi;<sup>2</sup> <a href="#SingleHistogramFit" class="foswikiCurrentTopicLink">single-histogram fit</a> is done, also <a href="http://en.wikipedia.org/wiki/Pearson's_chi-square_test" target="_top">Pearson's &chi;<sup>2</sup></a> will be added.
@@ -338,7 +310,7 @@ An example would look like:
 </pre>
 <p></p>
 <a name="Msr2Msr"></a>
-<h2><a name="A_2.6_msr2msr"></a> 2.6  msr2msr </h2>
+<h2><a name="A_2.5_msr2msr"></a> 2.5  msr2msr </h2>
 <code>msr2msr</code> is a small utility for converting existing <code>WKM</code> msr files into <code>musrfit</code> msr files. It accepts the following parameters: <dl>
 <dt> &lt;msr_file_in&gt; </dt><dd> input <code>WKM</code> msr file (mandatory first parameter)
 </dd> <dt> &lt;msr_file_out&gt; </dt><dd> converted output <code>musrfit</code> msr file (mandatory second parameter)
@@ -350,12 +322,12 @@ A typical example then looks like:
 If the input file has already the <code>musrfit</code> msr file structure, the output file will be just a copy of the input file.
 <p></p>
 <a name="Any2Many"></a>
-<h2><a name="A_2.7_any2many"></a> 2.7  any2many </h2>
+<h2><a name="A_2.6_any2many"></a> 2.6  any2many </h2>
 <code>any2many</code> is a muSR data file converter. Currently different facilities (PSI, TRIUMF, ISIS, J-PARC) are saving their muSR data files in different formats, or even worse some instruments are using other muSR data formats than others. The aim of <code>any2many</code> is that these files can be converted into each other. Of course only a subset of header information can be converted. 
 <p></p>
 Currently <code>any2many</code> can convert the following muSR data file formats: <ul>
-<li> <strong>input formats:</strong> <code>PSI-BIN</code> (PSI bulk), <code>ROOT</code> (PSI LEM), <code>MUD</code> (TRIUMF), <code>NeXus IDF1</code> and <code>NeXus IDF2</code> (ISIS), PSI-MDU (PSI bulk <em>internal only</em>), <code>WKM</code> (outdated ascii file format).
-</li> <li> <strong>output formats:</strong> <code>PSI-BIN</code>, <code>ROOT</code>, <code>MUD</code>, <code>NeXus1-HDF4</code>, <code>NeXus1-HDF5</code>, <code>NeXus1-XML</code>, <code>NeXus2-HDF4</code>, <code>NeXus2-HDF5</code>, <code>NeXus2-XML</code>, <code>WKM</code>, <code>ASCII</code>
+<li> <strong>input formats:</strong> <code>MusrRoot</code>, <code>PSI-BIN</code> (PSI bulk), <code>ROOT</code> (PSI LEM), <code>MUD</code> (TRIUMF), <code>NeXus IDF1</code> and <code>NeXus IDF2</code> (ISIS), PSI-MDU (PSI bulk <em>internal only</em>), <code>WKM</code> (outdated ascii file format).
+</li> <li> <strong>output formats:</strong> <code>MusrRoot</code>, <code>PSI-BIN</code>, <code>ROOT</code>, <code>MUD</code>, <code>NeXus1-HDF4</code>, <code>NeXus1-HDF5</code>, <code>NeXus1-XML</code>, <code>NeXus2-HDF4</code>, <code>NeXus2-HDF5</code>, <code>NeXus2-XML</code>, <code>WKM</code>, <code>ASCII</code>
 </li></ul> 
 <p></p>
 Since the goal was to create a very flexible converter tool, it has ample of options which will listed below, followed by many examples showing how to use it. The options: <dl>
@@ -396,8 +368,12 @@ Will take the runs 100 through 117 and convert the <code>NeXus</code> input file
 Will read the two files <code>'2010/lem10_his_0123.root'</code> and <code>'2010/lem10_his_0012.root'</code>, rebin them with 25 and export them as <code>LEM ROOT</code> files with adding <code>rebin25</code> to the name, e.g. <code>2010/lem10_his_0123_rebin25.root</code>.
 <p></p>
 <a name="NexusDump"></a>
-<h2><a name="A_2.8_nexus_dump"></a> 2.8  nexus_dump </h2>
+<h2><a name="A_2.7_nexus_dump"></a> 2.7  nexus_dump </h2>
 <code>nexus_dump</code> is a little program which tries to read a <code>NeXus</code> file and send the relevant information (required header info, start of the histos, etc.) to the standard output.
+<p></p>
+<a name="MusrRootRunHeaderDump"></a>
+<h2><a name="A_2.8_read_musrRoot_runHeader"></a> 2.8  read_musrRoot_runHeader </h2>
+<code>read_musrRoot_runHeader</code> is a little program which tries to read a <code>MusrRoot</code> file and send the relevant header information to the standard output.
 <p></p>
 <a name="AuxiliaryPrograms"></a>
 <h1><a name="A_3_Auxiliary_Programs"></a> 3  Auxiliary Programs </h1>
@@ -422,7 +398,7 @@ are various possible parameter definitions which are listed here:
    2. &#60;no&#62; &#60;name&#62; &#60;value&#62; &#60;step&#62; &#60;lower&#95;boundary&#62; &#60;upper&#95;boundary&#62;
    3. &#60;no&#62; &#60;name&#62; &#60;value&#62; &#60;step&#62; &#60;pos&#95;error&#62; &#60;lower&#95;boundary&#62; &#60;upper&#95;boundary&#62;
 </pre>
-where <strong>&lt;no&gt;</strong> is the parameter number, <strong>&lt;name&gt;</strong> is the parameter name <a name="FootNote1text"></a><span class="FootNoteTextLink" title=" a standard string without whitespace "><a href="#FootNote1note" class="foswikiCurrentTopicLink">(1)</a></span>, <strong>&lt;value&gt;</strong> is the initial guess of the parameter, <strong>&lt;step&gt;</strong> the inital step width, <strong>&lt;lower/upper_boundary&gt;</strong> is the lower/upper boundary for the parameter <a name="FootNote2text"></a><span class="FootNoteTextLink" title=" According to the &#61;MINUIT&#61; manual this should be avoided whenever possible&#33; "><a href="#FootNote2note" class="foswikiCurrentTopicLink">(2)</a></span>.
+where <strong>&lt;no&gt;</strong> is the parameter number, <strong>&lt;name&gt;</strong> is the parameter name <a name="FootNote1text"></a><span class="FootNoteTextLink" title=" a standard string without whitespace "><a href="#FootNote1note" class="foswikiCurrentTopicLink">(1)</a></span>, <strong>&lt;value&gt;</strong> is the initial guess of the parameter, <strong>&lt;step&gt;</strong> the inital step width, <strong>&lt;lower/upper_boundary&gt;</strong> is the lower/upper boundary for the parameter <a name="FootNote2text"></a><span class="FootNoteTextLink" title=" According to the <code>MINUIT</code> manual this should be avoided whenever possible! "><a href="#FootNote2note" class="foswikiCurrentTopicLink">(2)</a></span>.
 <p></p>
 In the output file, <strong>&lt;value&gt;</strong> will be the <code>MINUIT</code> fit value, <strong>&lt;step&gt;</strong> will contain the error estimate (or the negative error estimate if <code>MINOS</code> was successfully used), <strong>&lt;pos_error&gt;</strong> will have the value <strong>none</strong> if <code>MINOS</code> has not been used, otherwise it will show the positive error estimate.
 <p></p>
@@ -519,35 +495,35 @@ The THEORY block is used to define the fit function. There is a set of predefine
 			<td class="foswikiTableCol1"> sgktlf </td>
 			<td class="foswikiTableCol2"> <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="\sigma\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_6b6bbc4add4da0bde8220c54594658f3.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="G&#95;{\mathrm{G,LF}}(t) \equiv 1-\frac{2\sigma^2}{(2\pi\nu)^2}\left&#91;1-\exp\left(-\frac{1}{2}\sigma^2t^2\right)\cos(2\pi\nu t)\right]+\frac{2\sigma^4}{(2\pi\nu)^3}\int^t&#95;0 \exp\left(-\frac{1}{2}\sigma^2\tau^2\right)\sin(2\pi\nu\tau)\mathrm{d}\tau" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_e9a0c0aa5d84cb4ea67265a3b06b9af5.png"  /> </td>
-			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote3text"></a><span class="FootNoteTextLink" title=" R&#46; S&#46; Hayano _et al&#46;_&#44; &#91;&#91;http&#58;&#47;&#47;link&#46;aps&#46;org&#47;doi&#47;10&#46;1103&#47;PhysRevB&#46;20&#46;850&#93;&#91;Phys&#46; Rev&#46; B &#42;20&#42; &#40;1979&#41; 850&#93;&#93; "><a href="#FootNote3note" class="foswikiCurrentTopicLink">(4)</a></span> </td>
+			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote3text"></a><span class="FootNoteTextLink" title=" R. S. Hayano <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.20.850" target="_top">Phys. Rev. B <strong>20</strong> (1979) 850</a> "><a href="#FootNote3note" class="foswikiCurrentTopicLink">(4)</a></span> </td>
 		</tr>
 		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> dynGssKTLF </td>
 			<td class="foswikiTableCol1"> dgktlf </td>
 			<td class="foswikiTableCol2"> <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="\sigma\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_6b6bbc4add4da0bde8220c54594658f3.png"  />, <img alt="\Gamma\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_f87b1352f663a35bf263bc7e9a214ca3.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{1}{2\pi \imath}\int&#95;{\gamma-\imath\infty}^{\gamma+\imath\infty} \frac{f&#95;{\mathrm{G}}(s+\Gamma)}{1-\Gamma f&#95;{\mathrm{G}}(s+\Gamma)} \exp(s t) \mathrm{d}s,\mathrm{where}\,f&#95;{\mathrm{G}}(s)\equiv \int&#95;0^{\infty}G&#95;{\mathrm{G,LF}}(t)\exp(-s t) \mathrm{d}t" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_cb688f85a062f09bfaff5cf9144860a9.png"  /> </td>
-			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote4text"></a><span class="FootNoteTextLink" title=" R&#46; S&#46; Hayano _et al&#46;_&#44; &#91;&#91;http&#58;&#47;&#47;link&#46;aps&#46;org&#47;doi&#47;10&#46;1103&#47;PhysRevB&#46;20&#46;850&#93;&#91;Phys&#46; Rev&#46; B &#42;20&#42; &#40;1979&#41; 850&#93;&#93;&#59; P&#46; Dalmas de R&#38;eacute&#59;otier and A&#46; Yaouanc&#44; &#91;&#91;http&#58;&#47;&#47;dx&#46;doi&#46;org&#47;10&#46;1088&#47;0953&#45;8984&#47;4&#47;18&#47;020&#93;&#91;J&#46; Phys&#46;&#58; Condens&#46; Matter &#42;4&#42; &#40;1992&#41; 4533&#93;&#93;&#59; A&#46; Keren&#44; &#91;&#91;http&#58;&#47;&#47;link&#46;aps&#46;org&#47;doi&#47;10&#46;1103&#47;PhysRevB&#46;50&#46;10039&#93;&#91;Phys&#46; Rev&#46; B &#42;50&#42; &#40;1994&#41; 10039&#93;&#93; "><a href="#FootNote4note" class="foswikiCurrentTopicLink">(5)</a></span> </td>
+			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote4text"></a><span class="FootNoteTextLink" title=" R. S. Hayano <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.20.850" target="_top">Phys. Rev. B <strong>20</strong> (1979) 850</a>; P. Dalmas de R&eacute;otier and A. Yaouanc, <a href="http://dx.doi.org/10.1088/0953-8984/4/18/020" target="_top">J. Phys.: Condens. Matter <strong>4</strong> (1992) 4533</a>; A. Keren, <a href="http://link.aps.org/doi/10.1103/PhysRevB.50.10039" target="_top">Phys. Rev. B <strong>50</strong> (1994) 10039</a> "><a href="#FootNote4note" class="foswikiCurrentTopicLink">(5)</a></span> </td>
 		</tr>
 		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> statExpKT </td>
 			<td class="foswikiTableCol1"> sekt </td>
 			<td class="foswikiTableCol2"> <img alt="\lambda\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_020e973cf5b1293c76cb3ecef5a269f8.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{1}{3} + \frac{2}{3} \left&#91;1-\lambda t\right] \exp\left(-\lambda t\right)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_6466a97e4b7c510909bffce51d31c4b9.png"  /> </td>
-			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote5text"></a><span class="FootNoteTextLink" title=" Y&#46; J&#46; Uemura _et al&#46;_&#44; &#91;&#91;http&#58;&#47;&#47;link&#46;aps&#46;org&#47;doi&#47;10&#46;1103&#47;PhysRevB&#46;31&#46;546&#93;&#91;Phys&#46; Rev&#46; B &#42;31&#42; &#40;1985&#41; 546&#93;&#93; "><a href="#FootNote5note" class="foswikiCurrentTopicLink">(6)</a></span> </td>
+			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote5text"></a><span class="FootNoteTextLink" title=" Y. J. Uemura <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.31.546" target="_top">Phys. Rev. B <strong>31</strong> (1985) 546</a> "><a href="#FootNote5note" class="foswikiCurrentTopicLink">(6)</a></span> </td>
 		</tr>
 		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> statExpKTLF </td>
 			<td class="foswikiTableCol1"> sektlf </td>
 			<td class="foswikiTableCol2"> <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="a\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_26a5ae8799badcc3bcbe1823265a9053.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="1-\frac{a}{2\pi\nu}j&#95;1(2\pi\nu t)\exp\left(-at\right)-\left(\frac{a}{2\pi\nu}\right)^2 \left&#91;j&#95;0(2\pi\nu t)\exp\left(-at\right)-1\right]-a\left&#91;1+\left(\frac{a}{2\pi\nu}\right)^2\right]\int^t&#95;0 \exp\left(-a\tau\right)j&#95;0(2\pi\nu\tau)\mathrm{d}\tau \equiv G&#95;{\mathrm{L,LF}}(t)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_df4770dd7b14577f14410b4f7ab59721.png"  /> </td>
-			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote6text"></a><span class="FootNoteTextLink" title=" Y&#46; J&#46; Uemura _et al&#46;_&#44; &#91;&#91;http&#58;&#47;&#47;link&#46;aps&#46;org&#47;doi&#47;10&#46;1103&#47;PhysRevB&#46;31&#46;546&#93;&#91;Phys&#46; Rev&#46; B &#42;31&#42; &#40;1985&#41; 546&#93;&#93; "><a href="#FootNote6note" class="foswikiCurrentTopicLink">(7)</a></span> </td>
+			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote6text"></a><span class="FootNoteTextLink" title=" Y. J. Uemura <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.31.546" target="_top">Phys. Rev. B <strong>31</strong> (1985) 546</a> "><a href="#FootNote6note" class="foswikiCurrentTopicLink">(7)</a></span> </td>
 		</tr>
 		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> dynExpKTLF </td>
 			<td class="foswikiTableCol1"> dektlf </td>
 			<td class="foswikiTableCol2"> <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="a\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_26a5ae8799badcc3bcbe1823265a9053.png"  />, <img alt="\Gamma\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_f87b1352f663a35bf263bc7e9a214ca3.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{1}{2\pi \imath}\int&#95;{\gamma-\imath\infty}^{\gamma+\imath\infty} \frac{f&#95;{\mathrm{L}}(s+\Gamma)}{1-\Gamma f&#95;{\mathrm{L}}(s+\Gamma)} \exp(s t) \mathrm{d}s,\mathrm{where}\,f&#95;{\mathrm{L}}(s)\equiv \int&#95;0^{\infty}G&#95;{\mathrm{L,LF}}(t)\exp(-s t) \mathrm{d}t" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_c5c6dea10611dae1d470a5615869073a.png"  /> </td>
-			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote7text"></a><span class="FootNoteTextLink" title=" R&#46; S&#46; Hayano _et al&#46;_&#44; &#91;&#91;http&#58;&#47;&#47;link&#46;aps&#46;org&#47;doi&#47;10&#46;1103&#47;PhysRevB&#46;20&#46;850&#93;&#91;Phys&#46; Rev&#46; B &#42;20&#42; &#40;1979&#41; 850&#93;&#93;&#59; P&#46; Dalmas de R&#38;eacute&#59;otier and A&#46; Yaouanc&#44; &#91;&#91;http&#58;&#47;&#47;dx&#46;doi&#46;org&#47;10&#46;1088&#47;0953&#45;8984&#47;4&#47;18&#47;020&#93;&#91;J&#46; Phys&#46;&#58; Condens&#46; Matter &#42;4&#42; &#40;1992&#41; 4533&#93;&#93; "><a href="#FootNote7note" class="foswikiCurrentTopicLink">(8)</a></span> </td>
+			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote7text"></a><span class="FootNoteTextLink" title=" R. S. Hayano <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.20.850" target="_top">Phys. Rev. B <strong>20</strong> (1979) 850</a>; P. Dalmas de R&eacute;otier and A. Yaouanc, <a href="http://dx.doi.org/10.1088/0953-8984/4/18/020" target="_top">J. Phys.: Condens. Matter <strong>4</strong> (1992) 4533</a> "><a href="#FootNote7note" class="foswikiCurrentTopicLink">(8)</a></span> </td>
 		</tr>
 		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> combiLGKT </td>
@@ -568,7 +544,7 @@ The THEORY block is used to define the fit function. There is a set of predefine
 			<td class="foswikiTableCol1"> rahf </td>
 			<td class="foswikiTableCol2"> <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="\lambda\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_020e973cf5b1293c76cb3ecef5a269f8.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{1}{6}\left(1-\frac{\nu t}{2}\right)\exp\left(-\frac{\nu t}{2}\right)+\frac{1}{3}\left(1-\frac{\nu t}{4}\right)\exp\left(-\frac{\nu t + 2.44949\lambda t}{4}\right)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_f91ff8255a7b8a99c5eefcb2c29f9262.png"  /> </td>
-			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote8text"></a><span class="FootNoteTextLink" title="  R&#46; E&#46; Turner and D&#46; R&#46; Harshman&#44; &#91;&#91;http&#58;&#47;&#47;link&#46;aps&#46;org&#47;doi&#47;10&#46;1103&#47;PhysRevB&#46;34&#46;4467&#93;&#91;Phys&#46; Rev&#46; B &#42;34&#42; &#40;1986&#41; 4467&#93;&#93; "><a href="#FootNote8note" class="foswikiCurrentTopicLink">(9)</a></span> </td>
+			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote8text"></a><span class="FootNoteTextLink" title="  R. E. Turner and D. R. Harshman, <a href="http://link.aps.org/doi/10.1103/PhysRevB.34.4467" target="_top">Phys. Rev. B <strong>34</strong> (1986) 4467</a> "><a href="#FootNote8note" class="foswikiCurrentTopicLink">(9)</a></span> </td>
 		</tr>
 		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> TFieldCos </td>
@@ -972,7 +948,7 @@ The last accepted command in the COMMAND block is <strong>SCALE_N0_BKG TRUE | FA
 The Fourier transform is done and the results are plotted within <code>musrview</code> &mdash;as input data the actual data shown in <code>musrview</code> is used. In the FOURIER block of the msr file all necessary parameters for calculating and presenting the Fourier transform of the data specified in the <a href="#ThePlotBlock" class="foswikiCurrentTopicLink">PLOT block</a> is given. If the FOURIER block is not present in the msr file, either the parameters set in the <a href="#MusrfitStartupXml" class="foswikiCurrentTopicLink">XML startup file</a> or the system defaults are taken when the Fourier transform is performed. The block starts with the FOURIER keyword and may contain the following entries on the successive lines: <dl>
 <dt> units </dt><dd> Here is specified in which domain the Fourier-transformed data is presented. One may choose between the field (<strong>Gauss</strong>), the frequency (<strong>MHz</strong>), and the angular-frequency domain (<strong>Mc/s</strong>).
 </dd> <dt> fourier_power </dt><dd> It is possible (but not necessary) to set the number of data points used for the Fourier transform here. As argument the exponent <i>n</i>&lt;21 of a power of 2 is accepted. The number of data points is then 2<sup><i>n</i></sup>. <strong>Attention:</strong> If the number of points given here is bigger than the actual number of available data points, the input data vector is filled with zeros until the number of requested points is reached (zero padding)!
-</dd> <dt> apodization </dt><dd> Here is decided if the data should be apodized before the Fourier transform is done and if yes, which apodization should be used<a name="FootNote9text"></a><span class="FootNoteTextLink" title="For further details about apodization of &#38;mu&#59;SR data refer to &#91;&#91;https&#58;&#47;&#47;dspace&#46;library&#46;ubc&#46;ca&#47;bitstream&#47;handle&#47;2429&#47;2004&#47;ubc&#38;&#35;95&#59;1993&#38;&#35;95&#59;spring&#38;&#35;95&#59;phd&#38;&#35;95&#59;riseman&#38;&#35;95&#59;tanya&#46;pdf&#63;sequence&#61;1&#93;&#91;the &#33;PhD thesis of T&#46;M&#46; Riseman&#93;&#93; &#60;span class&#61;&#34;foswikiIcon&#34;&#62;&#60;img src&#61;&#34;&#47;pub&#47;System&#47;DocumentGraphics&#47;pdf&#46;png&#34; width&#61;&#34;16&#34; height&#61;&#34;16&#34; alt&#61;&#34;pdf&#34; &#47;&#62;&#60;&#47;span&#62;"><a href="#FootNote9note" class="foswikiCurrentTopicLink">(10)</a></span>. The argument to be put after the keyword is therefore one of the following: <strong>NONE</strong>, <strong>WEAK</strong>, <strong>MEDIUM</strong> or <strong>STRONG</strong>. If the data should be apodized, they are manipulated as follows: each data value is multiplied by the function <img alt="\sum&#95;{j&#61;0}^4 c&#95;j \left(\frac{i}{n}\right)^{2j}" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_cf09f406a2bf16c5f0c20c11d502f3b6.png" size="footnotesize" />, where <img alt="i" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_c465118a8d86d5f25bba37cc1dcb38a0.png"  /> is the data-point index and <img alt="n" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_2be9dcd7bf20bd9b6ae1aae11ded7c43.png"  /> is the total number of data points. The coefficients <img alt="c&#95;j" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_efe7e111043faa761548a2e4bfa741ca.png"  /> for the different apodizations are given by: <dl>
+</dd> <dt> apodization </dt><dd> Here is decided if the data should be apodized before the Fourier transform is done and if yes, which apodization should be used<a name="FootNote9text"></a><span class="FootNoteTextLink" title="For further details about apodization of &mu;SR data refer to <a href="https://dspace.library.ubc.ca/bitstream/handle/2429/2004/ubc_1993_spring_phd_riseman_tanya.pdf?sequence=1" target="_top">the PhD thesis of T.M. Riseman</a> &lt;span class="foswikiIcon"><img src="../pub/System/DocumentGraphics/pdf.png" width="16" height="16" alt="pdf" /></span>"&gt;<a href="#FootNote9note" class="foswikiCurrentTopicLink">(10)</a></span>. The argument to be put after the keyword is therefore one of the following: <strong>NONE</strong>, <strong>WEAK</strong>, <strong>MEDIUM</strong> or <strong>STRONG</strong>. If the data should be apodized, they are manipulated as follows: each data value is multiplied by the function <img alt="\sum&#95;{j&#61;0}^4 c&#95;j \left(\frac{i}{n}\right)^{2j}" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_cf09f406a2bf16c5f0c20c11d502f3b6.png" size="footnotesize" />, where <img alt="i" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_c465118a8d86d5f25bba37cc1dcb38a0.png"  /> is the data-point index and <img alt="n" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_2be9dcd7bf20bd9b6ae1aae11ded7c43.png"  /> is the total number of data points. The coefficients <img alt="c&#95;j" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_efe7e111043faa761548a2e4bfa741ca.png"  /> for the different apodizations are given by: <dl>
 <dt> WEAK </dt><dd> <img alt="c&#95;0 &#61; 1,\, c&#95;1 &#61; -1.319391,\, c&#95;2 &#61; 0.703484,\, c&#95;3&#61;c&#95;4&#61;0" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_ab5be67e3c585fe71d839ada9222b051.png"  />
 </dd> <dt> MEDIUM </dt><dd> <img alt="c&#95;0 &#61; 1,\, c&#95;1 &#61; -1.831292,\, c&#95;2 &#61; 0.983734,\, c&#95;3&#61;c&#95;4&#61;0" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_f2ef2223eea8b06da51ecb20c450fa4a.png"  />
 </dd> <dt> STRONG </dt><dd> <img alt="c&#95;0 &#61; 1,\, c&#95;1 &#61; -2.708894,\, c&#95;2 &#61; 2.953575,\, c&#95;3&#61;-1.599128,\, c&#95;4&#61;0.399782" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_b8a915ef0eb8aa8e117519d01dfb10c1.png"  />
@@ -1448,7 +1424,7 @@ For reporting bugs or requesting new features and improvements please use the <a
 </div>
 </div>
 <div class="clear">&nbsp;</div>
-</div><div id="patternBottomBar"><div id="patternBottomBarContents"><div id="patternWebBottomBar">Ideas, requests, problems regarding <a href="https://intranet.psi.ch/Main/WebHome">PSI Wiki</a>? <a href="mailto:psi.intranet@psi.ch?subject=PSI%20Wiki%20Feedback%20on%20MUSR.MusrFit">Send feedback</a></div></div></div>
+</div><div id="patternBottomBar"><div id="patternBottomBarContents"><div id="patternWebBottomBar">Ideas, requests, problems regarding <a href="https://intranet.psi.ch/Main/WebHome">PSI Wiki</a>? <a href="mailto&#58;psi&#46;intranet&#64;psi&#46;ch&#63;subject&#61;PSI&#32;Wiki&#37;20Feedback&#37;20on&#37;20MUSR&#46;MusrFit">Send feedback</a></div></div></div>
 </div>
 </div>
 </div>
@@ -1479,17 +1455,15 @@ For reporting bugs or requesting new features and improvements please use the <a
 		</tr>
 	</table>
 	</div>
-</div> <!--715-->
+</div> <!--1850-->
 <p></p>
 <p></p>
 <p></p>
 <p></p>
 </body>
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Fri, 23 Dec 2011 08:21:44 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 29 Mar 2012 14:13:02 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 </html>
-<p></p>
-<p></p>
 <p></p>
 <p></p>
