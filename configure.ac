@@ -371,32 +371,32 @@ dnl Ask user for path to libxml2
 dnl -----------------------------------------------
 LIBXML2_FOUND=0
 AC_ARG_WITH([libxml2],
-    [AC_HELP_STRING([--with-libxml2],[path to the header files of the libxml2 installation, e.g. /usr/local/include])],
-    [LIBXML2_INCLUDE=$with_libxml2
+    [AC_HELP_STRING([--with-libxml2],[prefix of the libxml2 installation, e.g. /usr/local/include])],
+    [LIBXML2_PREFIX=$with_libxml2
     AC_MSG_CHECKING([whether libxml2 can be found at the specified location])
-     if !(test -r ${LIBXML2_INCLUDE}/libxml/xmlreader.h) && !(test -r ${LIBXML2_INCLUDE}/libxml/parser.h) && !(test -r ${LIBXML2_INCLUDE}/libxml/xmlschemas.h); then
+     if !(test -r ${LIBXML2_PREFIX}/libxml2/libxml/xmlreader.h) && !(test -r ${LIBXML2_PREFIX}/libxml2/libxml/parser.h) && !(test -r ${LIBXML2_PREFIX}/libxml2/libxml/xmlschemas.h); then
        AC_MSG_RESULT([no])
        AC_MSG_ERROR([libxml2 cannot be found at the specified path!])
      fi
-     AC_MSG_RESULT([${LIBXML2_INCLUDE}])],
+     AC_MSG_RESULT([${LIBXML2_PREFIX}])],
     [PKG_CHECK_MODULES(LIBXML2, libxml2 >= 2.6.26, [LIBXML2_FOUND=1],
      [AC_MSG_CHECKING([whether libxml2 is installed in a standard location])
       if test -r /usr/local/include/libxml2/libxml/xmlreader.h || test -r /usr/local/include/libxml2/libxml/parser.h || \
          test -r /usr/local/include/libxml2/libxml/xmlschemas.h; then
-        LIBXML2_INCLUDE="/usr/local/include/libxml2"
-        AC_MSG_RESULT([${LIBXML2_INCLUDE}])
+        LIBXML2_PREFIX="/usr/local/include"
+        AC_MSG_RESULT([${LIBXML2_PREFIX}])
       elif test -r /usr/include/libxml2/libxml/xmlreader.h || test -r /usr/include/libxml2/libxml/parser.h || \
         test -r /usr/include/libxml2/libxml/xmlschemas.h; then
-        LIBXML2_INCLUDE="/usr/include/libxml2"
-        AC_MSG_RESULT([${LIBXML2_INCLUDE}])
+        LIBXML2_PREFIX="/usr/include"
+        AC_MSG_RESULT([${LIBXML2_PREFIX}])
       elif test -r /sw/include/libxml2/libxml/xmlreader.h || test -r /sw/include/libxml2/libxml/parser.h || \
         test -r /sw/include/libxml2/libxml/xmlschemas.h; then
-        LIBXML2_INCLUDE="/sw/include/libxml2"
-        AC_MSG_RESULT([${LIBXML2_INCLUDE}])
+        LIBXML2_PREFIX="/sw/include"
+        AC_MSG_RESULT([${LIBXML2_PREFIX}])
       elif test -r /opt/local/include/libxml2/libxml/xmlreader.h || test -r /opt/local/include/libxml2/libxml/parser.h || \
         test -r /opt/local/include/libxml2/libxml/xmlschemas.h; then
-        LIBXML2_INCLUDE="/opt/local/include/libxml2"
-        AC_MSG_RESULT([${LIBXML2_INCLUDE}])
+        LIBXML2_PREFIX="/opt/local/include"
+        AC_MSG_RESULT([${LIBXML2_PREFIX}])
       else
         AC_MSG_RESULT([no])
         AC_MSG_ERROR(
@@ -411,8 +411,8 @@ AC_ARG_WITH([libxml2],
 )
 AC_SUBST(LIBXML2_INCLUDE)
 if test "${LIBXML2_FOUND}" != "1"; then
-  LIBXML2_LIBS=""
-  LIBXML2_CFLAGS="-I${LIBXML2_INCLUDE}"
+  LIBXML2_LIBS="-L${LIBXML2_PREFIX}/lib -lxml2"
+  LIBXML2_CFLAGS="-I${LIBXML2_PREFIX}/libxml2"
 fi
 AC_SUBST(LIBXML2_LIBS)
 AC_SUBST(LIBXML2_CFLAGS)
