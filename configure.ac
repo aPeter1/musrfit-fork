@@ -409,7 +409,7 @@ AC_ARG_WITH([libxml2],
     )
     ]
 )
-AC_SUBST(LIBXML2_INCLUDE)
+AC_SUBST(LIBXML2_PREFIX)
 if test "${LIBXML2_FOUND}" != "1"; then
   LIBXML2_LIBS="-L${LIBXML2_PREFIX}/lib -lxml2"
   LIBXML2_CFLAGS="-I${LIBXML2_PREFIX}/libxml2"
@@ -1173,7 +1173,7 @@ fi
 if test "${LIBXML2_FOUND}" = "1"; then
   echo "   LIBXML2 found in $(pkg-config --variable=prefix libxml2)"
 else
-  echo "   LIBXML2 found in ${LIBXML2_INCLUDE}"
+  echo "   LIBXML2 found in ${LIBXML2_PREFIX}"
 fi
 echo "   ROOT found in ${ROOTLIBDIR%/lib}"
 echo ""
