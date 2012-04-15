@@ -59,7 +59,7 @@ class PAdminXMLParser : public QXmlDefaultHandler
     virtual ~PAdminXMLParser() {}
 
   private:
-    enum EAdminKeyWords {eEmpty, eFontName, eFontSize, eExecPath, eDefaultSavePath, eTitleFromDataFile, eEnableMusrT0,
+    enum EAdminKeyWords {eEmpty, eTimeout, eFontName, eFontSize, eExecPath, eDefaultSavePath, eTitleFromDataFile, eEnableMusrT0,
                          eBeamline, eInstitute, eFileFormat, eLifetimeCorrection, eMsrDefaultFilePath,
                          eHelpMain, eTheoFuncPixmapPath, eFunc, eFuncName, eFuncComment, eFuncLabel,
                          eFuncPixmap, eFuncParams,
@@ -93,6 +93,8 @@ class PAdmin
     PAdmin();
     virtual ~PAdmin() {}
 
+    int     getTimeout() { return fTimeout; }
+
     QString getFontName() { return fFontName; }
     int     getFontSize() { return fFontSize; }
     QString getExecPath() { return fExecPath; }
@@ -114,6 +116,7 @@ class PAdmin
     void setFontSize(const int ival) { fFontSize = ival; }
 
   protected:
+    void setTimeout(const int ival) { fTimeout = ival; }
     void setExecPath(const QString str) { fExecPath = str; }
     void setDefaultSavePath(const QString str) { fDefaultSavePath = str; }
     void setTitleFromDataFileFlag(const bool flag) { fTitleFromDataFile = flag; }
@@ -129,6 +132,8 @@ class PAdmin
 
   private:
     friend class PAdminXMLParser;
+
+    int fTimeout;       ///< timeout in seconds
 
     QString fFontName;
     int fFontSize;

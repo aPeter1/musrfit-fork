@@ -115,6 +115,8 @@ ClassImpQ(PMusrCanvas)
  */
 PMusrCanvas::PMusrCanvas()
 {
+  fTimeout = 0;
+
   fScaleN0AndBkg = true;
   fValid = false;
   fDifferenceView   = false;
@@ -179,6 +181,8 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          const Bool_t batch) :
                          fBatchMode(batch), fPlotNumber(number)
 {
+  fTimeout = 0;
+
   fMultiGraphData = 0;
   fMultiGraphDiff = 0;
 
@@ -229,6 +233,8 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          fPlotNumber(number), fFourier(fourierDefault),
                          fMarkerList(markerList), fColorList(colorList)
 {
+  fTimeout = 0;
+
   fMultiGraphData = 0;
   fMultiGraphDiff = 0;
 
@@ -260,6 +266,10 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
 PMusrCanvas::~PMusrCanvas()
 {
   // cleanup
+  if (fTimeoutTimer) {
+    delete fTimeoutTimer;
+    fTimeoutTimer = 0;
+  }
   if (fCurrentFourierPhaseText) {
     delete fCurrentFourierPhaseText;
     fCurrentFourierPhaseText = 0;
@@ -410,6 +420,32 @@ void PMusrCanvas::SetMsrHandler(PMsrHandler *msrHandler)
     *fRRFText += TString(", RRF packing = ");
     *fRRFText += fMsrHandler->GetMsrPlotList()->at(0).fRRFPacking;
   }
+}
+
+//--------------------------------------------------------------------------
+// SetTimeout (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param timeout after which the done signal shall be emitted. Given in seconds
+ */
+void PMusrCanvas::SetTimeout(Int_t timeout)
+{
+  fTimeout = timeout;
+
+  if (fTimeout <= 0)
+    return;
+
+  if (fTimeoutTimer) {
+    delete fTimeoutTimer;
+    fTimeoutTimer = 0;
+  }
+  fTimeoutTimer = new TTimer();
+
+  fTimeoutTimer->Connect("Timeout()", "PMusrCanvas", this, "Done()");
+
+  fTimeoutTimer->Start(1000*fTimeout, kTRUE);
 }
 
 //--------------------------------------------------------------------------

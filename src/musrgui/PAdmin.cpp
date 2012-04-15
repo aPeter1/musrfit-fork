@@ -69,7 +69,9 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
                                        const QString& qName,
                                        const QXmlAttributes& )
 {
-  if (qName == "font_name") {
+  if (qName == "timeout") {
+    fKeyWord = eTimeout;
+  } else if (qName == "font_name") {
     fKeyWord = eFontName;
   } else if (qName == "font_size") {
     fKeyWord = eFontSize;
@@ -171,6 +173,11 @@ bool PAdminXMLParser::characters(const QString& str)
   int  ival;
 
   switch (fKeyWord) {
+    case eTimeout:
+      ival = QString(str.ascii()).stripWhiteSpace().toInt(&ok);
+      if (ok)
+        fAdmin->setTimeout(ival);
+      break;
     case eFontName:
       fAdmin->setFontName(QString(str.ascii()).stripWhiteSpace());
       break;

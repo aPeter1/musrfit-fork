@@ -219,6 +219,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void SetRunListCollection(PRunListCollection *runList) { fRunList = runList; }
 #endif // __MAKECINT__
 
+    virtual void SetTimeout(Int_t ival);
     virtual void UpdateParamTheoryPad();
     virtual void UpdateDataTheoryPad();
     virtual void UpdateInfoPad();
@@ -231,6 +232,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat);
 
   private:
+    Int_t  fTimeout;          ///< timeout after which the Done signal should be emited. If timeout <= 0, no timeout is taking place
     Bool_t fScaleN0AndBkg;    ///< true=N0 and background is scaled to (1/ns), otherwise (1/bin) for the single histogram case
     Bool_t fBatchMode;        ///< musrview in ROOT batch mode
     Bool_t fValid;            ///< if true, everything looks OK
@@ -249,6 +251,8 @@ class PMusrCanvas : public TObject, public TQObject
     TLatex  *fRRFLatexText; ///< used to display RRF info
 
     TStyle    *fStyle; ///< A collection of all graphics attributes
+
+    TTimer *fTimeoutTimer; ///< timeout timer in order to terminate if no action is taking place for too long
 
     // canvas menu related variables
     TRootCanvas *fImp;           ///< ROOT native GUI version of main window with menubar and drawing area

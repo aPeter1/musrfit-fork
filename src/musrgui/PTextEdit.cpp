@@ -1390,6 +1390,12 @@ void PTextEdit::musrFit()
       break;
   }
 
+  // add timeout
+  cmd.append("--timeout");
+  QString numStr;
+  numStr.setNum(fAdmin->getTimeout());
+  cmd.append(numStr);
+
   PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() )).dirPath(), cmd);
   fitOutputHandler.setModal(true);
   fitOutputHandler.exec();
@@ -1775,7 +1781,9 @@ void PTextEdit::musrView()
   cmd = str + " \"";
 
   str = *fFilenames.find( currentEditor() );
-  cmd += str + "\" &";
+  QString numStr;
+  numStr.setNum(fAdmin->getTimeout());
+  cmd += str + "\" --timeout " + numStr + "&";
 
   system(cmd.latin1());
 }
@@ -1806,7 +1814,9 @@ void PTextEdit::musrT0()
   cmd = str + " \"";
 
   str = *fFilenames.find( currentEditor() );
-  cmd += str + "\" &";
+  QString numStr;
+  numStr.setNum(fAdmin->getTimeout());
+  cmd += str + "\" --timeout " + numStr + " &";
 
   system(cmd.latin1());
 

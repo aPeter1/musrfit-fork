@@ -41,6 +41,7 @@
 #include <TH1.h>
 #include <TLine.h>
 #include <TLatex.h>
+#include <TTimer.h>
 
 #include "PMusr.h"
 #ifndef __MAKECINT__
@@ -130,6 +131,7 @@ class PMusrT0 : public TObject, public TQObject
     virtual void Done(Int_t status=0); // *SIGNAL*
     virtual void HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected); // SLOT
     virtual void Quit(); // SLOT
+    virtual void SetTimeout(Int_t timeout);
 
 #ifndef __MAKECINT__
     virtual void SetMsrHandler(PMsrHandler *msrHandler);
@@ -143,6 +145,7 @@ class PMusrT0 : public TObject, public TQObject
 #ifndef __MAKECINT__
     PMsrHandler *fMsrHandler; ///< msr-file handler
 #endif // __MAKECINT__
+    Int_t  fTimeout;          ///< timeout after which the Done signal should be emited. If timeout <= 0, no timeout is taking place
 
     Bool_t fValid; ///< true if raw data set are available, otherwise false
 
@@ -154,6 +157,8 @@ class PMusrT0 : public TObject, public TQObject
     Bool_t fT0Enabled; ///< enable/disable t0 handling (necessary in connection with grouping and addrun)
     Int_t  fT0Estimated; ///< estimated t0 value (in bins)
     Bool_t fShowT0DataChannel;
+
+    TTimer *fTimeoutTimer; ///< timeout timer in order to terminate if no action is taking place for too long
 
     // canvas related variables
     TCanvas   *fMainCanvas; ///< main canvas for the graphical user interface

@@ -667,7 +667,7 @@ bool PTextEdit::validRunList(const QString runList)
   int i = 0;
   QString subStr;
   bool done = false;
-  int val;
+  int val = 0;
   bool ok;
   while (!done) {
     subStr = runList.section(' ', i, i, QString::SectionSkipEmpty);
@@ -1655,6 +1655,12 @@ void PTextEdit::musrFit()
       break;
   }
 
+  // add timeout
+  cmd.append("--timeout");
+  QString numStr;
+  numStr.setNum(fAdmin->getTimeout());
+  cmd.append(numStr);
+
   PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath(), cmd);
   fitOutputHandler.setModal(true);
   fFileSystemWatcherActive = false;
@@ -2058,9 +2064,11 @@ void PTextEdit::musrView()
   cmd = str + " \"";
 
   str = *fFilenames.find( currentEditor() );
-  cmd += str + "\" &";
+  QString numStr;
+  numStr.setNum(fAdmin->getTimeout());
+  cmd += str + "\" --timeout " + numStr + " &";
 
-  system(cmd.toLatin1());
+  int status=system(cmd.toLatin1());
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -2089,9 +2097,11 @@ void PTextEdit::musrT0()
   cmd = str + " \"";
 
   str = *fFilenames.find( currentEditor() );
-  cmd += str + "\" &";
+  QString numStr;
+  numStr.setNum(fAdmin->getTimeout());
+  cmd += str + "\" --timeout " + numStr + " &";
 
-  system(cmd.toLatin1());
+  int status=system(cmd.toLatin1());
 
   QString fln = *fFilenames.find( currentEditor() );
 }
@@ -2166,13 +2176,13 @@ void PTextEdit::musrSwapMsrMlog()
   // swap files
   QString cmd;
   cmd = QString("cp \"") + currentFileName + QString("\" \"") + tempFileName + QString("\"");
-  system(cmd.toLatin1());
+  int status=system(cmd.toLatin1());
   cmd = QString("cp \"") + swapFileName + QString("\" \"") + currentFileName + QString("\"");
-  system(cmd.toLatin1());
+  status=system(cmd.toLatin1());
   cmd = QString("cp \"") + tempFileName + QString("\" \"") + swapFileName + QString("\"");
-  system(cmd.toLatin1());
+  status=system(cmd.toLatin1());
   cmd = QString("rm \"") + tempFileName + QString("\"");
-  system(cmd.toLatin1());
+  status=system(cmd.toLatin1());
 
   int currentIdx = fTabWidget->currentIndex();
 

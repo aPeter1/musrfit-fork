@@ -53,13 +53,20 @@ using namespace std;
  */
 void musrt0_syntax()
 {
-  cout << endl << "usage: musrt0 <msr-file> [{--getT0FromPromptPeak | -g} [<firstGoodBinOffset>]] | --version | --help";
+  cout << endl << "usage: musrt0 <msr-file> [{--getT0FromPromptPeak | -g} [<firstGoodBinOffset>]]";
+  cout << endl << "       [--timeout <timeout>] | --version | --help";
   cout << endl << "       <msr-file>: msr input file";
   cout << endl << "       --getT0FromPromptPeak, -g with <firstGoodBinOffset>:";
-  cout << endl << "         will, in non-interactive mode estimate the t0's from the prompt peak and write it into the msr-file.";
+  cout << endl << "         will, in non-interactive mode estimate the t0's from the prompt peak";
+  cout << endl << "         and write it into the msr-file.";
   cout << endl << "         if <firstGoodBinOffset> is given, to first good bin will be t0+<firstGoodBinOffset>.";
   cout << endl << "         if no <firstGoodBinOffset> is given, only t0 will be set.";
+  cout << endl << "       --timeout <timeout>: <timeout> given in seconds after which musrview terminates.";
+  cout << endl << "           If <timeout> <= 0, no timeout will take place. Default <timeout> is 0.";
+  cout << endl;
   cout << endl << "       'musrt0 <msr-file>' will execute musrt0";
+  cout << endl << "       'musrt0 <msr-file> --timeout 180' will execute musrt0, but terminate it after";
+  cout << endl << "                          180 sec if not already done so.";
   cout << endl << "       'musrt0' or 'musrt0 --help' will show this help";
   cout << endl << "       'musrt0 --version' will print the musrt0 version";
   cout << endl << endl;
@@ -79,7 +86,7 @@ void musrt0_syntax()
  * \param data musrT0 data set handler
  * \param idx index to filter out the proper msr-file run
  */
-Bool_t musrt0_item(TApplication &app, PMsrHandler *msrHandler, PMusrT0Data &data, UInt_t idx)
+Bool_t musrt0_item(TApplication &app, PMsrHandler *msrHandler, PMusrT0Data &data, UInt_t idx, Int_t timeout)
 {
   PMusrT0 *musrT0 = new PMusrT0(data);
 
@@ -97,6 +104,9 @@ Bool_t musrt0_item(TApplication &app, PMsrHandler *msrHandler, PMusrT0Data &data
     cerr << endl;
     return false;
   }
+
+  // set timeout
+  musrT0->SetTimeout(timeout);
 
   // set the msr-file handler. The handler cannot be transfered at construction time since rootcint is not able to handle the PMsrHandler class
   musrT0->SetMsrHandler(msrHandler);
@@ -207,66 +217,65 @@ Int_t main(Int_t argc, Char_t *argv[])
   Bool_t getT0FromPromptPeak = false;
   Bool_t firstGoodBinOffsetPresent = false;
   Int_t firstGoodBinOffset = 0;
+  Int_t timeout = 0;
 
-  switch (argc) {
-    case 1:
+  if (argc == 1) {
+    musrt0_syntax();
+    return PMUSR_SUCCESS;
+  }
+
+  memset(filename, '\0', sizeof(filename));
+  for (int i=1; i<argc; i++) {
+    if (!strcmp(argv[i], "--version")) {
+      cout << endl << ">> musrt0 version: " << PMUSR_VERSION << " / $Id$";
+      cout << endl << endl;
+      return PMUSR_SUCCESS;
+    } else if (!strcmp(argv[i], "--help")) {
       show_syntax = true;
       break;
-    case 2:
-      if (strstr(argv[1], "--version")) {
-        cout << endl << ">> musrt0 version: " << PMUSR_VERSION << " / $Id$";
-        cout << endl << endl;
-        return PMUSR_SUCCESS;
-      } else if (strstr(argv[1], "--help")) {
-        show_syntax = true;
+    } else if (strstr(argv[i], ".msr")) { // check for filename
+      if (strlen(filename) == 0) {
+        strcpy(filename, argv[i]);
       } else {
-        // check if filename has extension msr or mlog
-        if (!strstr(argv[1], ".msr")) {
-          cerr << endl << ">> musrt0 **ERROR** " << argv[1] << " is not a msr-file!" << endl;
-          show_syntax = true;
+        cout << endl << "**ERROR** only one file name allowed." << endl;
+        show_syntax = true;
+        break;
+      }
+    } else if (!strcmp(argv[i], "--getT0FromPromptPeak") || !strcmp(argv[i], "-g")) { // T0 from prompt peak option
+      getT0FromPromptPeak = true;
+      if (i+1 < argc) {
+        TString offset(argv[i+1]);
+        if (offset.IsFloat()) {
+          firstGoodBinOffsetPresent = true;
+          firstGoodBinOffset = offset.Atof();
+          i++;
+        }
+      }
+    } else if (!strcmp(argv[i], "--timeout")) {
+      if (i+1 < argc) {
+        TString numStr(argv[i+1]);
+        if (numStr.IsDigit()) {
+          timeout = numStr.Atoi();
         } else {
-          strncpy(filename, argv[1], sizeof(filename));
-        }
-      }
-      break;
-    case 3:
-      // check if filename has extension msr or mlog
-      if (!strstr(argv[1], ".msr")) {
-        cerr << endl << ">> musrt0 **ERROR** " << argv[1] << " is not a msr-file!" << endl;
-        show_syntax = true;
-      } else {
-        strncpy(filename, argv[1], sizeof(filename));
-        if (!strcmp(argv[2], "-g") || !strcmp(argv[2], "--getT0FromPromptPeak")) {
-          getT0FromPromptPeak = true;
-        }
-      }
-      break;
-    case 4:
-      // check if filename has extension msr or mlog
-      if (!strstr(argv[1], ".msr")) {
-        cerr << endl << ">> musrt0 **ERROR** " << argv[1] << " is not a msr-file!" << endl;
-        show_syntax = true;
-      } else {
-        strncpy(filename, argv[1], sizeof(filename));
-        if (!strcmp(argv[2], "-g") || !strcmp(argv[2], "--getT0FromPromptPeak")) {
-          getT0FromPromptPeak = true;
-          Int_t dval = 0;
-          status = sscanf(argv[3], "%d", &dval);
-          if (status == 1) { // it is a number
-            firstGoodBinOffsetPresent = true;
-            firstGoodBinOffset = dval;
-          } else { // it is not a number
-            cerr << endl << ">> musrt0 **ERROR** first good bin offset option found: '" << argv[3] << "', this is not a number." << endl;
-            show_syntax = true;
-          }
-        } else {
-          cerr << endl << ">> musrt0 **ERROR** found 4 input arguments, but missing the 'get prompt T0 from peak' option." << endl;
+          cout << endl << "**ERROR** timeout '" << argv[i+1] << "' is not a number" << endl;
           show_syntax = true;
+          break;
         }
+        i++;
+      } else {
+        cout << endl << "**ERROR** no timeout given." << endl;
+        show_syntax = true;
+        break;
       }
-      break;
-    default:
+    } else {
       show_syntax = true;
+      break;
+    }
+  }
+
+  if (strlen(filename) == 0) {
+    cout  << endl << "**ERROR** msr-file missing!" << endl;
+    show_syntax = true;
   }
 
   if (show_syntax) {
@@ -660,7 +669,7 @@ Int_t main(Int_t argc, Char_t *argv[])
             musrT0Data.SetDetectorTag(PMUSRT0_FORWARD);
             musrT0Data.SetCmdTag(PMUSRT0_GET_T0_DATA_AND_BKG_RANGE);
             // execute cmd
-            if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
+            if (!musrt0_item(app, msrHandler, musrT0Data, 0, timeout)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
             }
@@ -687,7 +696,7 @@ Int_t main(Int_t argc, Char_t *argv[])
                 }
                 // feed necessary data
                 musrT0Data.SetAddRunIdx(j); // addruns
-                if (!musrt0_item(app, msrHandler, musrT0Data, j)) {
+                if (!musrt0_item(app, msrHandler, musrT0Data, j, timeout)) {
                   musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
                   exit(0);
                 }
@@ -714,7 +723,7 @@ Int_t main(Int_t argc, Char_t *argv[])
                 }
                 // feed necessary data
                 musrT0Data.SetHistoNoIdx(j);
-                if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
+                if (!musrt0_item(app, msrHandler, musrT0Data, 0, timeout)) {
                   musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
                   exit(0);
                 }
@@ -743,7 +752,7 @@ Int_t main(Int_t argc, Char_t *argv[])
                   }
                   // feed necessary data
                   musrT0Data.SetHistoNoIdx(k);
-                  if (!musrt0_item(app, msrHandler, musrT0Data, j)) {
+                  if (!musrt0_item(app, msrHandler, musrT0Data, j, timeout)) {
                     musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
                     exit(0);
                   }
@@ -759,7 +768,7 @@ Int_t main(Int_t argc, Char_t *argv[])
                 musrT0Data.SetAddT0Bin((UInt_t)runList->at(i).GetAddT0Bin(k, j), k, j);
               }
             }
-            if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
+            if (!musrt0_item(app, msrHandler, musrT0Data, 0, timeout)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
             }
@@ -786,7 +795,7 @@ Int_t main(Int_t argc, Char_t *argv[])
             musrT0Data.SetDetectorTag(PMUSRT0_FORWARD);
             musrT0Data.SetCmdTag(PMUSRT0_GET_T0_DATA_AND_BKG_RANGE);
             // execute cmd
-            if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
+            if (!musrt0_item(app, msrHandler, musrT0Data, 0, timeout)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
             }
@@ -809,7 +818,7 @@ Int_t main(Int_t argc, Char_t *argv[])
             musrT0Data.SetDetectorTag(PMUSRT0_BACKWARD);
             musrT0Data.SetCmdTag(PMUSRT0_GET_T0_DATA_AND_BKG_RANGE);
             // execute cmd
-            if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
+            if (!musrt0_item(app, msrHandler, musrT0Data, 0, timeout)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
             }
@@ -837,7 +846,7 @@ Int_t main(Int_t argc, Char_t *argv[])
                 }
                 // feed necessary data
                 musrT0Data.SetAddRunIdx(j); // addruns
-                if (!musrt0_item(app, msrHandler, musrT0Data, j)) {
+                if (!musrt0_item(app, msrHandler, musrT0Data, j, timeout)) {
                   musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
                   exit(0);
                 }
@@ -863,7 +872,7 @@ Int_t main(Int_t argc, Char_t *argv[])
                 }
                 // feed necessary data
                 musrT0Data.SetAddRunIdx(j); // addruns
-                if (!musrt0_item(app, msrHandler, musrT0Data, j)) {
+                if (!musrt0_item(app, msrHandler, musrT0Data, j, timeout)) {
                   musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
                   exit(0);
                 }
@@ -890,7 +899,7 @@ Int_t main(Int_t argc, Char_t *argv[])
                 }
                 // feed necessary data
                 musrT0Data.SetHistoNoIdx(j);
-                if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
+                if (!musrt0_item(app, msrHandler, musrT0Data, 0, timeout)) {
                   musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
                   exit(0);
                 }
@@ -916,7 +925,7 @@ Int_t main(Int_t argc, Char_t *argv[])
                 }
                 // feed necessary data
                 musrT0Data.SetHistoNoIdx(j);
-                if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
+                if (!musrt0_item(app, msrHandler, musrT0Data, 0, timeout)) {
                   musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
                   exit(0);
                 }
@@ -945,7 +954,7 @@ Int_t main(Int_t argc, Char_t *argv[])
                   }
                   // feed necessary data
                   musrT0Data.SetHistoNoIdx(k);
-                  if (!musrt0_item(app, msrHandler, musrT0Data, j)) {
+                  if (!musrt0_item(app, msrHandler, musrT0Data, j, timeout)) {
                     musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
                     exit(0);
                   }
@@ -974,7 +983,7 @@ Int_t main(Int_t argc, Char_t *argv[])
                   }
                   // feed necessary data
                   musrT0Data.SetHistoNoIdx(k);
-                  if (!musrt0_item(app, msrHandler, musrT0Data, j)) {
+                  if (!musrt0_item(app, msrHandler, musrT0Data, j, timeout)) {
                     musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
                     exit(0);
                   }
@@ -992,13 +1001,13 @@ Int_t main(Int_t argc, Char_t *argv[])
             }
             musrT0Data.SetHistoNo(forwardHistos);
             musrT0Data.SetDetectorTag(PMUSRT0_FORWARD);
-            if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
+            if (!musrt0_item(app, msrHandler, musrT0Data, 0, timeout)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
             }
             musrT0Data.SetHistoNo(backwardHistos);
             musrT0Data.SetDetectorTag(PMUSRT0_BACKWARD);
-            if (!musrt0_item(app, msrHandler, musrT0Data, 0)) {
+            if (!musrt0_item(app, msrHandler, musrT0Data, 0, timeout)) {
               musrt0_cleanup(saxParser, startupHandler, msrHandler, dataHandler);
               exit(0);
             }

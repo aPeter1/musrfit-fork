@@ -28,6 +28,7 @@
     <font_name>Courier</font_name>
     <font_size>12</font_size>
   </font_settings>
+  <timeout>3600</timeout>
   <msr_file_defaults>
     <beamline>mue4</beamline>
     <institute>psi</institute>

@@ -247,6 +247,8 @@ ClassImpQ(PMusrT0)
  */
 PMusrT0::PMusrT0()
 {
+  fTimeout = 0;
+
   fValid = false;
 
   fStatus = 0; // default is quit locally
@@ -286,6 +288,8 @@ PMusrT0::PMusrT0()
  */
 PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
 {
+  fTimeout = 0;
+
   fValid = true;
 
   fStatus = 0; // default is quit locally
@@ -568,6 +572,10 @@ PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
  */
 PMusrT0::~PMusrT0()
 {
+  if (fTimeoutTimer) {
+    delete fTimeoutTimer;
+    fTimeoutTimer = 0;
+  }
   if (fHisto) {
     delete fHisto;
     fHisto = 0;
@@ -700,6 +708,32 @@ void PMusrT0::Quit()
 {
   fStatus = 2; // will quit globally
   Done(0);
+}
+
+//--------------------------------------------------------------------------
+// SetTimeout (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param timeout after which the done signal shall be emitted. Given in seconds
+ */
+void PMusrT0::SetTimeout(Int_t timeout)
+{
+  fTimeout = timeout;
+
+  if (fTimeout <= 0)
+    return;
+
+  if (fTimeoutTimer) {
+    delete fTimeoutTimer;
+    fTimeoutTimer = 0;
+  }
+  fTimeoutTimer = new TTimer();
+
+  fTimeoutTimer->Connect("Timeout()", "PMusrT0", this, "Quit()");
+
+  fTimeoutTimer->Start(1000*fTimeout, kTRUE);
 }
 
 //--------------------------------------------------------------------------

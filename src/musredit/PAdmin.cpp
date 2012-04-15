@@ -69,7 +69,9 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
                                        const QString& qName,
                                        const QXmlAttributes& )
 {
-  if (qName == "font_name") {
+  if (qName == "timeout") {
+    fKeyWord = eTimeout;
+  } else if (qName == "font_name") {
     fKeyWord = eFontName;
   } else if (qName == "font_size") {
     fKeyWord = eFontSize;
@@ -196,6 +198,11 @@ bool PAdminXMLParser::characters(const QString& str)
   int  ival;
 
   switch (fKeyWord) {
+    case eTimeout:
+      ival = QString(str.toLatin1()).trimmed().toInt(&ok);
+      if (ok)
+        fAdmin->setTimeout(ival);
+      break;
     case eFontName:
       fAdmin->setFontName(QString(str.toLatin1()).trimmed());
       break;
@@ -529,6 +536,8 @@ QString PAdminXMLParser::expandPath(const QString &str)
  */
 PAdmin::PAdmin()
 {
+  fTimeout = 3600;
+
   fFontName = QString("Courier"); // default font
   fFontSize = 11; // default font size
 

@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007 by Andreas Suter                                   *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -54,7 +54,7 @@ using namespace std;
  */
 void musrview_syntax()
 {
-  cout << endl << "usage: musrview <msr-file> [--<graphic-format-extension>] | --version | --help";
+  cout << endl << "usage: musrview <msr-file> [--<graphic-format-extension>] [--timeout <timeout>] | --version | --help";
   cout << endl << "       <msr-file>: msr/mlog input file";
   cout << endl << "       'musrview <msr-file>' will execute musrview";
   cout << endl << "       --<graphic-format-extension>: ";
@@ -64,6 +64,9 @@ void musrview_syntax()
   cout << endl << "           eps, pdf, gif, jpg, png, svg, xpm, root";
   cout << endl << "           example: musrview 3310.msr --png, will produce a files 3310_X.png";
   cout << endl << "                    where 'X' stands for the plot number (starting form 0)";
+  cout << endl << "       --timeout <timeout>: <timeout> given in seconds after which musrview terminates.";
+  cout << endl << "           If <timeout> <= 0, no timeout will take place. Default <timeout> is 0.";
+  cout << endl;
   cout << endl << "       'musrview' or 'musrview --help' will show this help";
   cout << endl << "       'musrview --version' will print the musrview version";
   cout << endl << endl;
@@ -95,61 +98,55 @@ int main(int argc, char *argv[])
   char fileName[128];
   bool graphicsOutput = false;
   char graphicsExtension[128];
+  int  timeout = 0;
 
+  memset(fileName, '\0', sizeof(fileName));
 
   // check input arguments
-  switch (argc) {
-    case 1:
+  if (argc == 1) {
+    musrview_syntax();
+    return PMUSR_SUCCESS;
+  }
+  for (int i=1; i<argc; i++) {
+    if (strstr(argv[i], ".msr") || strstr(argv[i], ".mlog")) {
+      if (strlen(fileName) == 0) {
+        strcpy(fileName, argv[i]);
+      } else {
+        cerr << endl << "**ERROR** only one file name allowed." << endl;
+        show_syntax = true;
+        break;
+      }
+    } else if (!strcmp(argv[i], "--version")) {
+      cout << endl << "musrview version: " << PMUSR_VERSION << " / $Id$";
+      cout << endl << endl;
+      return PMUSR_SUCCESS;
+    } else if (!strcmp(argv[i], "--help")) {
       show_syntax = true;
       break;
-    case 2:
-      if (strstr(argv[1], "--version")) {
-        cout << endl << "musrview version: " << PMUSR_VERSION << " / $Id$";
-        cout << endl << endl;
-        return PMUSR_SUCCESS;
-      } else if (strstr(argv[1], "--help")) {
-        show_syntax = true;
-      } else {
-        // check if filename has extension msr or mlog
-        if (!strstr(argv[1], ".msr") && !strstr(argv[1], ".mlog")) {
-          cerr << endl << ">> musrview **ERROR** " << argv[1] << " is not a msr/mlog-file, nor is it a supported graphics extension." << endl;
-          show_syntax = true;
+    } else if (!strcmp(argv[i], "--eps") || !strcmp(argv[i], "--pdf") || !strcmp(argv[i], "--gif") ||
+               !strcmp(argv[i], "--jpg") || !strcmp(argv[i], "--png") || !strcmp(argv[i], "--svg") ||
+               !strcmp(argv[i], "--xpm") || !strcmp(argv[i], "--root")) {
+
+      graphicsOutput = true;
+      strcpy(graphicsExtension, argv[i]+2);
+    } else if (!strcmp(argv[i], "--timeout")) {
+      if (i+1 < argc) {
+        TString str(argv[i+1]);
+        if (str.IsDigit()) {
+          timeout = str.Atoi();
         } else {
-          strcpy(fileName, argv[1]);
-        }
-      }
-      break;
-    case 3:
-      if (!strcmp(argv[1], "--eps") || !strcmp(argv[1], "--pdf") || !strcmp(argv[1], "--gif") ||
-          !strcmp(argv[1], "--jpg") || !strcmp(argv[1], "--png") || !strcmp(argv[1], "--svg") ||
-          !strcmp(argv[1], "--xpm") || !strcmp(argv[1], "--root")) {
-        graphicsOutput = true;
-        strcpy(graphicsExtension, argv[1]+2);
-        // check if filename has extension msr or mlog
-        if (!strstr(argv[2], ".msr") && !strstr(argv[2], ".mlog")) {
-          cerr << endl << ">> musrview **ERROR** " << argv[2] << " is not a msr/mlog-file, nor is it a supported graphics extension." << endl;
           show_syntax = true;
-        } else {
-          strcpy(fileName, argv[2]);
+          break;
         }
-      } else if (!strcmp(argv[2], "--eps") || !strcmp(argv[2], "--pdf") || !strcmp(argv[2], "--gif") ||
-                 !strcmp(argv[2], "--jpg") || !strcmp(argv[2], "--png") || !strcmp(argv[2], "--svg") ||
-                 !strcmp(argv[2], "--xpm") || !strcmp(argv[2], "--root")) {
-        graphicsOutput = true;
-        strcpy(graphicsExtension, argv[2]+2);
-        // check if filename has extension msr or mlog
-        if (!strstr(argv[1], ".msr") && !strstr(argv[1], ".mlog")) {
-          cerr << endl << ">> musrview **ERROR** " << argv[1] << " is not a msr/mlog-file, nor is it a supported graphics extension." << endl;
-          show_syntax = true;
-        } else {
-          strcpy(fileName, argv[1]);
-        }
+        i++;
       } else {
         show_syntax = true;
+        break;
       }
-      break;
-    default:
+    } else {
       show_syntax = true;
+      break;
+    }
   }
 
   if (show_syntax) {
@@ -307,6 +304,8 @@ int main(int argc, char *argv[])
       }
       // connect signal/slot
       TQObject::Connect("TCanvas", "Closed()", "PMusrCanvas", musrCanvas, "LastCanvasClosed()");
+
+      musrCanvas->SetTimeout(timeout);
 
       // ugly but rootcint cannot handle the spirit-parser framework
       musrCanvas->SetMsrHandler(msrHandler);

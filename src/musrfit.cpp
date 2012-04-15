@@ -29,9 +29,12 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+//#include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <signal.h>
 
 #include <iostream>
 #include <fstream>
@@ -44,6 +47,7 @@ using namespace std;
 #include <TH1.h>
 #include <TSystem.h>
 #include <TSystemFile.h>
+#include <TThread.h>
 
 #include "PMusr.h"
 #include "PStartupHandler.h"
@@ -53,13 +57,35 @@ using namespace std;
 #include "PFitter.h"
 
 //--------------------------------------------------------------------------
+
+static int timeout = 3600; // given in (sec)
+
+//--------------------------------------------------------------------------
+/**
+ * <p>Sometimes musrfit is not terminating properly for reasons still not pinned down, hence
+ * this workaround. It should be removed asap. Especially since it is leading to memory leaks.
+ */
+void* musrfit_timeout(void *args)
+{
+  pid_t *pid = (pid_t*)(args);
+
+  sleep(timeout);
+
+  cerr << endl << ">> **FATAL ERROR** musrfit_timeout for task pid=" << *pid << " called! Will kill it!" << endl << endl;
+
+  kill(*pid, SIGKILL);
+
+  return (void*)0;
+}
+
+//--------------------------------------------------------------------------
 /**
  * <p>Sends the usage description to the standard output.
  */
 void musrfit_syntax()
 {
   cout << endl << "usage: musrfit [<msr-file> [-k, --keep-mn2-ouput] [-c, --chisq-only] [-t, --title-from-data-file]";
-  cout << endl << "                            [--dump <type>] | --version | --help";
+  cout << endl << "                            [--dump <type>] [--timeout <timeout_tag>] | --version | --help";
   cout << endl << "       <msr-file>: msr input file";
   cout << endl << "       'musrfit <msr-file>' will execute musrfit";
   cout << endl << "       'musrfit' or 'musrfit --help' will show this help";
@@ -75,7 +101,11 @@ void musrfit_syntax()
   cout << endl << "              run title of the FIRST run of the <msr-file> run block, if a run title";
   cout << endl << "              is present in the data file.";
   cout << endl << "       --dump <type> is writing a data file with the fit data and the theory";
-  cout << endl << "              <type> can be 'ascii', 'root'" << endl;
+  cout << endl << "              <type> can be 'ascii', 'root'";
+  cout << endl << "       --timeout <timeout_tag>: overwrites to predefined timeout of " << timeout << " (sec).";
+  cout << endl << "              <timeout_tag> = 'none' means timeout facility is not enabled. <timeout_tag> = nn";
+  cout << endl << "              will set the timeout to nn (sec).";
+  cout << endl;
   cout << endl << "       At the end of a fit, musrfit writes the fit results into an <mlog-file> and";
   cout << endl << "       swaps them, i.e. in the <msr-file> you will find the fit results and in the";
   cout << endl << "       <mlog-file> your initial guess values.";
@@ -352,6 +382,7 @@ int main(int argc, char *argv[])
   bool keep_mn2_output = false;
   bool chisq_only = false;
   bool title_from_data_file = false;
+  bool timeout_enabled = true;
 
   TString dump("");
   char filename[1024];
@@ -392,6 +423,24 @@ int main(int argc, char *argv[])
     } else if (!strcmp(argv[i], "--dump")) {
       if (i<argc-1) {
         dump = TString(argv[i+1]);
+        i++;
+      } else {
+        show_syntax = true;
+        break;
+      }
+    } else if (!strcmp(argv[i], "--timeout")) {
+      if (i<argc-1) {
+        if (!strcmp(argv[i+1], "none")) {
+          timeout_enabled = false;
+        } else {
+          TString str(argv[i+1]);
+          if (str.IsDigit()) {
+            timeout = str.Atoi();
+          } else {
+            show_syntax = true;
+            break;
+          }
+        }
         i++;
       } else {
         show_syntax = true;
@@ -515,6 +564,16 @@ int main(int argc, char *argv[])
     }
   }
 
+  // start timeout thread
+  TThread *th = 0;
+  if (timeout_enabled) {
+    pid_t musrfit_pid = getpid();
+    th = new TThread(musrfit_timeout, (void*)&musrfit_pid);
+    if (th) {
+      th->Run();
+    }
+  }
+
   // do fitting
   PFitter *fitter = 0;
   if (success) {
@@ -597,6 +656,9 @@ int main(int argc, char *argv[])
   }
 
   // clean up
+  if (th) {
+    th->Delete();
+  }
   if (saxParser) {
     delete saxParser;
     saxParser = 0;
