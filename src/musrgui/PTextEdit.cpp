@@ -1783,7 +1783,7 @@ void PTextEdit::musrView()
   str = *fFilenames.find( currentEditor() );
   QString numStr;
   numStr.setNum(fAdmin->getTimeout());
-  cmd += str + "\" --timeout " + numStr + "&";
+  cmd += str + "\" --timeout " + numStr + " &";
 
   system(cmd.latin1());
 }
@@ -1832,7 +1832,7 @@ void PTextEdit::musrT0()
  */
 void PTextEdit::musrPrefs()
 {
-  PPrefsDialog *dlg = new PPrefsDialog(fKeepMinuit2Output, fDump, fTitleFromDataFile, fEnableMusrT0);
+  PPrefsDialog *dlg = new PPrefsDialog(fKeepMinuit2Output, fDump, fTitleFromDataFile, fEnableMusrT0, fAdmin->getTimeout());
 
   if (dlg->exec() == QDialog::Accepted) {
     fKeepMinuit2Output = dlg->getKeepMinuit2OutputFlag();
@@ -1840,6 +1840,7 @@ void PTextEdit::musrPrefs()
     fEnableMusrT0 = dlg->getEnableMusrT0Flag();
     fMusrT0Action->setEnabled(fEnableMusrT0);
     fDump = dlg->getDump();
+    fAdmin->setTimeout(dlg->getTimeout());
   }
 }
 

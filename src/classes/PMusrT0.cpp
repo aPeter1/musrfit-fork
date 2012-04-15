@@ -248,6 +248,7 @@ ClassImpQ(PMusrT0)
 PMusrT0::PMusrT0()
 {
   fTimeout = 0;
+  fTimeoutTimer = 0;
 
   fValid = false;
 
@@ -289,6 +290,7 @@ PMusrT0::PMusrT0()
 PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
 {
   fTimeout = 0;
+  fTimeoutTimer = 0;
 
   fValid = true;
 

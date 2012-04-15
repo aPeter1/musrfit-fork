@@ -116,6 +116,7 @@ ClassImpQ(PMusrCanvas)
 PMusrCanvas::PMusrCanvas()
 {
   fTimeout = 0;
+  fTimeoutTimer = 0;
 
   fScaleN0AndBkg = true;
   fValid = false;
@@ -182,6 +183,7 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          fBatchMode(batch), fPlotNumber(number)
 {
   fTimeout = 0;
+  fTimeoutTimer = 0;
 
   fMultiGraphData = 0;
   fMultiGraphDiff = 0;
@@ -234,6 +236,7 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          fMarkerList(markerList), fColorList(colorList)
 {
   fTimeout = 0;
+  fTimeoutTimer = 0;
 
   fMultiGraphData = 0;
   fMultiGraphDiff = 0;

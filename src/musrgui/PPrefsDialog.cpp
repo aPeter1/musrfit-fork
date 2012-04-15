@@ -30,13 +30,14 @@
  ***************************************************************************/
 
 #include "PPrefsDialog.h"
+#include "qvalidator.h"
 
 //----------------------------------------------------------------------------------------------------
 /**
  * <p>
  */
 PPrefsDialog::PPrefsDialog(const bool keep_mn2_output, const int dump_tag, const bool title_from_data_file,
-                           const bool enable_musrt0)
+                           const bool enable_musrt0, const int timeout)
 {
   if (keep_mn2_output)
     fKeepMn2Output_checkBox->setChecked(true);
@@ -56,6 +57,11 @@ PPrefsDialog::PPrefsDialog(const bool keep_mn2_output, const int dump_tag, const
 
   fTitleFromData_checkBox->setChecked(title_from_data_file);
   fEnableMusrT0_checkBox->setChecked(enable_musrt0);
+
+  fTimeout_lineEdit->setValidator( new QIntValidator(fTimeout_lineEdit) );
+  QString numStr;
+  numStr.setNum(timeout);
+  fTimeout_lineEdit->setText(numStr);
 }
 
 //----------------------------------------------------------------------------------------------------

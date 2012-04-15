@@ -124,6 +124,43 @@
         </property>
         <widget class="QWidget">
             <property name="name">
+                <cstring>TabPage</cstring>
+            </property>
+            <attribute name="title">
+                <string>general</string>
+            </attribute>
+            <widget class="QLineEdit">
+                <property name="name">
+                    <cstring>fTimeout_lineEdit</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>3</x>
+                        <y>6</y>
+                        <width>100</width>
+                        <height>20</height>
+                    </rect>
+                </property>
+            </widget>
+            <widget class="QLabel">
+                <property name="name">
+                    <cstring>fTimeout_textLabel</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>112</x>
+                        <y>6</y>
+                        <width>42</width>
+                        <height>20</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>timeout</string>
+                </property>
+            </widget>
+        </widget>
+        <widget class="QWidget">
+            <property name="name">
                 <cstring>tab</cstring>
             </property>
             <attribute name="title">

@@ -112,11 +112,11 @@ class PAdmin
     PTheory* getTheoryItem(const unsigned int idx);
     PMsr2DataParam getMsr2DataParam() { return fMsr2DataParam; }
 
+    void setTimeout(const int ival) { fTimeout = ival; }
     void setFontName(const QString str) { fFontName = str; }
     void setFontSize(const int ival) { fFontSize = ival; }
 
   protected:
-    void setTimeout(const int ival) { fTimeout = ival; }
     void setExecPath(const QString str) { fExecPath = str; }
     void setDefaultSavePath(const QString str) { fDefaultSavePath = str; }
     void setTitleFromDataFileFlag(const bool flag) { fTitleFromDataFile = flag; }
