@@ -2112,7 +2112,7 @@ void PTextEdit::musrT0()
  */
 void PTextEdit::musrPrefs()
 {
-  PPrefsDialog *dlg = new PPrefsDialog(fKeepMinuit2Output, fDump, fTitleFromDataFile, fEnableMusrT0);
+  PPrefsDialog *dlg = new PPrefsDialog(fKeepMinuit2Output, fDump, fTitleFromDataFile, fEnableMusrT0, fAdmin->getTimeout());
   if (dlg == 0) {
     QMessageBox::critical(this, "**ERROR** musrPrefs", "Couldn't invoke Preferences Dialog.");
     return;
@@ -2124,6 +2124,7 @@ void PTextEdit::musrPrefs()
     fEnableMusrT0 = dlg->getEnableMusrT0Flag();
     fMusrT0Action->setEnabled(fEnableMusrT0);
     fDump = dlg->getDump();
+    fAdmin->setTimeout(dlg->getTimeout());
   }
 
   delete dlg;

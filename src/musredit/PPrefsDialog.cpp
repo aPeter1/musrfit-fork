@@ -44,7 +44,7 @@
  * \param enable_musrt0 if true, musrt0 is enabled from within musredit.
  */
 PPrefsDialog::PPrefsDialog(const bool keep_mn2_output, const int dump_tag, const bool title_from_data_file,
-                           const bool enable_musrt0)
+                           const bool enable_musrt0, const int timeout)
 {
   setupUi(this);
 
@@ -68,6 +68,11 @@ PPrefsDialog::PPrefsDialog(const bool keep_mn2_output, const int dump_tag, const
 
   fTitleFromData_checkBox->setChecked(title_from_data_file);
   fEnableMusrT0_checkBox->setChecked(enable_musrt0);
+
+  QString numStr;
+  numStr.setNum(timeout);
+  fTimeout_lineEdit->setText(numStr);
+  fTimeout_lineEdit->setValidator(new QIntValidator(fTimeout_lineEdit));
 }
 
 //----------------------------------------------------------------------------------------------------
