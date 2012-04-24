@@ -45,31 +45,33 @@
 
 // function tags
 #define THEORY_UNDEFINED                    -1
-#define THEORY_ASYMMETRY                     0
-#define THEORY_SIMPLE_EXP                    1
-#define THEORY_GENERAL_EXP                   2
-#define THEORY_SIMPLE_GAUSS                  3
-#define THEORY_STATIC_GAUSS_KT               4
-#define THEORY_STATIC_GAUSS_KT_LF            5
-#define THEORY_DYNAMIC_GAUSS_KT_LF           6
-#define THEORY_STATIC_LORENTZ_KT             7
-#define THEORY_STATIC_LORENTZ_KT_LF          8
-#define THEORY_DYNAMIC_LORENTZ_KT_LF         9
-#define THEORY_COMBI_LGKT                   10
-#define THEORY_SPIN_GLASS                   11
-#define THEORY_RANDOM_ANISOTROPIC_HYPERFINE 12
-#define THEORY_ABRAGAM                      13
-#define THEORY_INTERNAL_FIELD               14
-#define THEORY_TF_COS                       15
-#define THEORY_BESSEL                       16
-#define THEORY_INTERNAL_BESSEL              17
-#define THEORY_SKEWED_GAUSS                 18
-#define THEORY_POLYNOM                      19
-#define THEORY_USER_FCN                     20
+#define THEORY_CONST                         0
+#define THEORY_ASYMMETRY                     1
+#define THEORY_SIMPLE_EXP                    2
+#define THEORY_GENERAL_EXP                   3
+#define THEORY_SIMPLE_GAUSS                  4
+#define THEORY_STATIC_GAUSS_KT               5
+#define THEORY_STATIC_GAUSS_KT_LF            6
+#define THEORY_DYNAMIC_GAUSS_KT_LF           7
+#define THEORY_STATIC_LORENTZ_KT             8
+#define THEORY_STATIC_LORENTZ_KT_LF          9
+#define THEORY_DYNAMIC_LORENTZ_KT_LF        10
+#define THEORY_COMBI_LGKT                   11
+#define THEORY_SPIN_GLASS                   12
+#define THEORY_RANDOM_ANISOTROPIC_HYPERFINE 13
+#define THEORY_ABRAGAM                      14
+#define THEORY_INTERNAL_FIELD               15
+#define THEORY_TF_COS                       16
+#define THEORY_BESSEL                       17
+#define THEORY_INTERNAL_BESSEL              18
+#define THEORY_SKEWED_GAUSS                 19
+#define THEORY_POLYNOM                      20
+#define THEORY_USER_FCN                     21
 
 // function parameter tags, i.e. how many parameters has a specific function
 // if there is a comment with a (tshift), the number of parameters is increased by one
-#define THEORY_PARAM_ASYMMETRY                    1 // asymetry
+#define THEORY_PARAM_CONST                        1 // const
+#define THEORY_PARAM_ASYMMETRY                    1 // asymmetry
 #define THEORY_PARAM_SIMPLE_EXP                   1 // damping (tshift)
 #define THEORY_PARAM_GENERAL_EXP                  2 // damping, exponents  (tshift)
 #define THEORY_PARAM_SIMPLE_GAUSS                 1 // damping (tshift)
@@ -90,7 +92,7 @@
 #define THEORY_PARAM_SKEWED_GAUSS                 4 // phase, frequency, rate minus, rate plus (tshift)
 
 // number of available user functions
-#define THEORY_MAX 21
+#define THEORY_MAX 22
 
 // maximal number of parameters. Needed in the contents of LF
 #define THEORY_MAX_PARAM 10
@@ -122,68 +124,72 @@ typedef struct theo_data_base {
  */
 static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
 
-        {THEORY_ASYMMETRY, THEORY_PARAM_ASYMMETRY, false,
-         "asymmetry", "a", "", ""},
+  {THEORY_CONST, THEORY_PARAM_CONST, false,
+   "const", "c", "", ""},
 
-        {THEORY_SIMPLE_EXP, THEORY_PARAM_SIMPLE_EXP, false,
-         "simplExpo", "se", "(rate)", "(rate tshift)"},
+  {THEORY_ASYMMETRY, THEORY_PARAM_ASYMMETRY, false,
+   "asymmetry", "a", "", ""},
 
-        {THEORY_GENERAL_EXP, THEORY_PARAM_GENERAL_EXP, false,
-         "generExpo", "ge", "(rate exponent)", "(rate exponent tshift)"},
+  {THEORY_SIMPLE_EXP, THEORY_PARAM_SIMPLE_EXP, false,
+   "simplExpo", "se", "(rate)", "(rate tshift)"},
 
-        {THEORY_SIMPLE_GAUSS, THEORY_PARAM_SIMPLE_GAUSS, false,
-         "simpleGss", "sg", "(rate)", "(rate tshift)"},
+  {THEORY_GENERAL_EXP, THEORY_PARAM_GENERAL_EXP, false,
+   "generExpo", "ge", "(rate exponent)", "(rate exponent tshift)"},
 
-        {THEORY_STATIC_GAUSS_KT, THEORY_PARAM_STATIC_GAUSS_KT, false,
-         "statGssKt", "stg", "(rate)", "(rate tshift)"},
+  {THEORY_SIMPLE_GAUSS, THEORY_PARAM_SIMPLE_GAUSS, false,
+   "simpleGss", "sg", "(rate)", "(rate tshift)"},
 
-        {THEORY_STATIC_GAUSS_KT_LF, THEORY_PARAM_STATIC_GAUSS_KT_LF, true,
-         "statGssKTLF", "sgktlf", "(frequency damping)", "(frequency damping tshift)"},
+  {THEORY_STATIC_GAUSS_KT, THEORY_PARAM_STATIC_GAUSS_KT, false,
+   "statGssKt", "stg", "(rate)", "(rate tshift)"},
 
-        {THEORY_DYNAMIC_GAUSS_KT_LF, THEORY_PARAM_DYNAMIC_GAUSS_KT_LF, true,
-         "dynGssKTLF", "dgktlf", "(frequency damping hopping-rate)", "(frequency damping hopping-rate tshift)"},
+  {THEORY_STATIC_GAUSS_KT_LF, THEORY_PARAM_STATIC_GAUSS_KT_LF, true,
+   "statGssKTLF", "sgktlf", "(frequency damping)", "(frequency damping tshift)"},
 
-        {THEORY_STATIC_LORENTZ_KT, THEORY_PARAM_STATIC_LORENTZ_KT, true,
-         "statExpKT", "sekt", "(rate)", "(rate tshift)"},
+  {THEORY_DYNAMIC_GAUSS_KT_LF, THEORY_PARAM_DYNAMIC_GAUSS_KT_LF, true,
+   "dynGssKTLF", "dgktlf", "(frequency damping hopping-rate)", "(frequency damping hopping-rate tshift)"},
 
-        {THEORY_STATIC_LORENTZ_KT_LF, THEORY_PARAM_STATIC_LORENTZ_KT_LF, true,
-         "statExpKTLF", "sektlf", "(frequency damping)", "(frequency damping tshift)"},
+  {THEORY_STATIC_LORENTZ_KT, THEORY_PARAM_STATIC_LORENTZ_KT, true,
+   "statExpKT", "sekt", "(rate)", "(rate tshift)"},
 
-        {THEORY_DYNAMIC_LORENTZ_KT_LF, THEORY_PARAM_DYNAMIC_LORENTZ_KT_LF, true,
-         "dynExpKTLF", "dektlf", "(frequency damping hopping-rate)", "(frequency damping hopping-rate tshift)"},
+  {THEORY_STATIC_LORENTZ_KT_LF, THEORY_PARAM_STATIC_LORENTZ_KT_LF, true,
+   "statExpKTLF", "sektlf", "(frequency damping)", "(frequency damping tshift)"},
 
-        {THEORY_COMBI_LGKT, THEORY_PARAM_COMBI_LGKT, false,
-         "combiLGKT", "lgkt", "(LorentzRate GaussRate)", "(LorentzRate GaussRate tshift)"},
+  {THEORY_DYNAMIC_LORENTZ_KT_LF, THEORY_PARAM_DYNAMIC_LORENTZ_KT_LF, true,
+   "dynExpKTLF", "dektlf", "(frequency damping hopping-rate)", "(frequency damping hopping-rate tshift)"},
 
-        {THEORY_SPIN_GLASS, THEORY_PARAM_SPIN_GLASS, false,
-         "spinGlass",  "spg", "(rate hopprate order)", "(rate hopprate order tshift)"},
+  {THEORY_COMBI_LGKT, THEORY_PARAM_COMBI_LGKT, false,
+   "combiLGKT", "lgkt", "(LorentzRate GaussRate)", "(LorentzRate GaussRate tshift)"},
 
-        {THEORY_RANDOM_ANISOTROPIC_HYPERFINE, THEORY_PARAM_RANDOM_ANISOTROPIC_HYPERFINE, false,
-         "rdAnisoHf", "rahf", "(frequency rate)", "(frequency rate tshift)"},
+  {THEORY_SPIN_GLASS, THEORY_PARAM_SPIN_GLASS, false,
+   "spinGlass",  "spg", "(rate hopprate order)", "(rate hopprate order tshift)"},
 
-        {THEORY_ABRAGAM, THEORY_PARAM_ABRAGAM, false,
-         "abragam", "ab", "(rate hopprate)", "(rate hopprate tshift)"},
+  {THEORY_RANDOM_ANISOTROPIC_HYPERFINE, THEORY_PARAM_RANDOM_ANISOTROPIC_HYPERFINE, false,
+   "rdAnisoHf", "rahf", "(frequency rate)", "(frequency rate tshift)"},
 
-        {THEORY_INTERNAL_FIELD, THEORY_PARAM_INTERNAL_FIELD, false,
-         "internFld", "if", "(fraction phase frequency Trate Lrate)", "(fraction phase frequency Trate Lrate tshift)"},
+  {THEORY_ABRAGAM, THEORY_PARAM_ABRAGAM, false,
+   "abragam", "ab", "(rate hopprate)", "(rate hopprate tshift)"},
 
-        {THEORY_TF_COS, THEORY_PARAM_TF_COS, false,
-         "TFieldCos", "tf", "(phase frequency)", "(phase frequency tshift)"},
+  {THEORY_INTERNAL_FIELD, THEORY_PARAM_INTERNAL_FIELD, false,
+   "internFld", "if", "(fraction phase frequency Trate Lrate)", "(fraction phase frequency Trate Lrate tshift)"},
 
-        {THEORY_BESSEL, THEORY_PARAM_BESSEL, false,
-         "bessel", "b", "(phase frequency)", "(phase frequency tshift)"},
+  {THEORY_TF_COS, THEORY_PARAM_TF_COS, false,
+   "TFieldCos", "tf", "(phase frequency)", "(phase frequency tshift)"},
 
-        {THEORY_INTERNAL_BESSEL, THEORY_PARAM_INTERNAL_BESSEL, false,
-         "internBsl", "ib", "(fraction phase frequency Trate Lrate)", "(fraction phase frequency Trate Lrate tshift)"},
+  {THEORY_BESSEL, THEORY_PARAM_BESSEL, false,
+   "bessel", "b", "(phase frequency)", "(phase frequency tshift)"},
 
-        {THEORY_SKEWED_GAUSS, THEORY_PARAM_SKEWED_GAUSS, false,
-         "skewedGss", "skg", "(phase frequency rate_m rate_p)", "(phase frequency rate_m rate_p tshift)"},
+  {THEORY_INTERNAL_BESSEL, THEORY_PARAM_INTERNAL_BESSEL, false,
+   "internBsl", "ib", "(fraction phase frequency Trate Lrate)", "(fraction phase frequency Trate Lrate tshift)"},
 
-        {THEORY_POLYNOM, 0, false,
-         "polynom", "p", "(tshift p0 p1 ... pn)", "(tshift p0 p1 ... pn)"},
+  {THEORY_SKEWED_GAUSS, THEORY_PARAM_SKEWED_GAUSS, false,
+   "skewedGss", "skg", "(phase frequency rate_m rate_p)", "(phase frequency rate_m rate_p tshift)"},
 
-        {THEORY_USER_FCN, 0, false,
-         "userFcn", "u", "", ""}};
+  {THEORY_POLYNOM, 0, false,
+   "polynom", "p", "(tshift p0 p1 ... pn)", "(tshift p0 p1 ... pn)"},
+
+  {THEORY_USER_FCN, 0, false,
+   "userFcn", "u", "", ""}
+};
 
 //--------------------------------------------------------------------------------------
 /**
@@ -206,6 +212,7 @@ class PTheory
     virtual void MakeCleanAndTidyPolynom(UInt_t i, PMsrLines* fullTheoryBlock);
     virtual void MakeCleanAndTidyUserFcn(UInt_t i, PMsrLines* fullTheoryBlock);
 
+    virtual Double_t Constant(const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t Asymmetry(const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t SimpleExp(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t GeneralExp(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;

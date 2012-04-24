@@ -581,7 +581,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         sstr.Remove(TString::kLeading, ' ');
         if (str.BeginsWith("fun")) {
           if (FilterNumber(sstr, "fun", 0, number)) {
-            sstr = *fFuncHandler->GetFuncString(number-1);
+            sstr = fFuncHandler->GetFuncString(number-1);
             sstr.ToLower();
             fout << sstr.Data() << endl;
           }
@@ -3361,10 +3361,8 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
   PMsrLines::iterator iter1;
   PMsrLines::iterator iter2;
   TObjArray *tokens = 0;
-  TObjArray *tokens2 = 0;
   TObjString *ostr = 0;
   TString str;
-  TString str2;
 
   if (lines.empty()) {
     cerr << endl << "**WARNING**: There is no PLOT block! Do you really want this?";
@@ -3433,6 +3431,7 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           case MSR_PLOT_SINGLE_HISTO: // like: runs 1 5 13
           case MSR_PLOT_ASYM:
           case MSR_PLOT_NON_MUSR:
+          case MSR_PLOT_MU_MINUS:
             tokens = iter1->fLine.Tokenize(" \t");
             if (!tokens) {
               cerr << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
@@ -3450,46 +3449,6 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
                   param.fRuns.push_back(run);
                 } else {
                   error = true;
-                }
-              }
-            }
-            // clean up
-            if (tokens) {
-              delete tokens;
-              tokens = 0;
-            }
-            break;
-          case MSR_PLOT_MU_MINUS: // like: runs 1,1 1,2
-            tokens = iter1->fLine.Tokenize(" \t");
-            if (!tokens) {
-              cerr << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
-              cerr << endl << endl;
-              return false;
-            }
-            if (tokens->GetEntries() < 2) { // runs missing
-              error = true;
-            } else {
-              for (Int_t i=1; i<tokens->GetEntries(); i++) {
-                ostr = dynamic_cast<TObjString*>(tokens->At(i)); // something like 1,2
-                str = ostr->GetString();
-                tokens2 = str.Tokenize(",");
-                if (!tokens2) {
-                  error = true;
-                } else {
-                  ostr = dynamic_cast<TObjString*>(tokens2->At(0)); // real part
-                  str = ostr->GetString();
-                  ostr = dynamic_cast<TObjString*>(tokens2->At(1)); // imag part
-                  str2 = ostr->GetString();
-                  if (str.IsDigit() && str2.IsDigit()) {
-                    run = TComplex(str.Atoi(),str2.Atoi());
-                    param.fRuns.push_back(run);
-                  } else {
-                    error = true;
-                  }
-                }
-                if (tokens2) {
-                  delete tokens2;
-                  tokens2 = 0;
                 }
               }
             }

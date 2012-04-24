@@ -58,13 +58,14 @@ class PFunctionHandler
     virtual Int_t GetFuncNo(UInt_t idx);
     virtual Int_t GetFuncIndex(Int_t funcNo);
     virtual UInt_t GetNoOfFuncs() { return fFuncs.size(); }
-    virtual TString* GetFuncString(UInt_t idx);
+    virtual TString GetFuncString(UInt_t idx);
 
   private:
     Bool_t fValid; ///< true = function handler has valid functions
 
     PMsrLines fLines; ///< stores the msr-file FUNCTIONS block as clear text.
     vector<PFunction> fFuncs; ///< vector of all evaluatable functions
+    vector<TString> fFuncComment; ///< vector of prepended function comments
 };
 
 #endif // _PFUNCTIONHANDLER_H_

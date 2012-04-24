@@ -52,10 +52,15 @@ class PRunMuMinus : public PRunBase
     virtual UInt_t GetNoOfFitBins();
 
   protected:
+    virtual void CalcNoOfFitBins();
     virtual Bool_t PrepareData();
+    virtual Bool_t PrepareFitData(PRawRunData* runData, const UInt_t histoNo);
+    virtual Bool_t PrepareRawViewData(PRawRunData* runData, const UInt_t histoNo);
 
   private:
     UInt_t fNoOfFitBins;    ///< number of bins to be fitted
+
+    PDoubleVector fForward; ///< forward histo data
 };
 
 #endif // _PRUNMUMINUS_H_

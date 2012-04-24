@@ -3059,11 +3059,6 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
 {
   fDataTheoryPad->cd();
 
-  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogX)
-    fDataTheoryPad->SetLogx(1);
-  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogY)
-    fDataTheoryPad->SetLogy(1);
-
   if (!fBatchMode) {
     // uncheck fourier menu entries
     fPopupFourier->UnCheckEntries();
@@ -3109,8 +3104,14 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
               dataYmax = GetMaximum(fData[i].data, dataXmin, dataXmax);
           }
           Double_t dd = 0.05*fabs(dataYmax-dataYmin);
-          dataYmin -= dd;
-          dataYmax += dd;
+          if (!fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogY) {
+            dataYmin -= dd;
+            dataYmax += dd;
+          } else {
+            if (dataYmin < 0)
+              dataYmin = 0.1;
+            dataYmax += dd;
+          }
         }
       } else { // set the x-/y-range to the previous fHistoFrame range
         dataXmin = xmin;
@@ -3128,8 +3129,14 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
               dataYmax = GetMaximum(fData[i].data, dataXmin, dataXmax);
           }
           Double_t dd = 0.05*fabs(dataYmax-dataYmin);
-          dataYmin -= dd;
-          dataYmax += dd;
+          if (!fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogY) {
+            dataYmin -= dd;
+            dataYmax += dd;
+          } else {
+            if (dataYmin < 0)
+              dataYmin = 0.1;
+            dataYmax += dd;
+          }
         }
       }
 
@@ -3153,6 +3160,11 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
         fData[i].theory->GetYaxis()->SetRangeUser(dataYmin, dataYmax);
       }
 
+      if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogX)
+        fDataTheoryPad->SetLogx(1);
+      if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogY)
+        fDataTheoryPad->SetLogy(1);
+
       // set x-axis label
       fHistoFrame->GetXaxis()->SetTitle("time (#mus)");
       // set y-axis label
@@ -3173,7 +3185,7 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
           yAxisTitle = "asymmetry";
           break;
         case MSR_PLOT_MU_MINUS:
-          yAxisTitle = "??";
+          yAxisTitle = "N(t) per bin";
           break;
         default:
           yAxisTitle = "??";
@@ -3244,8 +3256,14 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
               dataYmax = GetMaximum(fNonMusrData[i].data, dataXmin, dataXmax);
           }
           Double_t dd = 0.05*fabs(dataYmax-dataYmin);
-          dataYmin -= dd;
-          dataYmax += dd;
+          if (!fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogY) {
+            dataYmin -= dd;
+            dataYmax += dd;
+          } else {
+            if (dataYmin < 0)
+              dataYmin = 0.1;
+            dataYmax += dd;
+          }
         }
       } else { // set the x-/y-range to the previous fHistoFrame range
         dataXmin = xmin;
@@ -3263,8 +3281,14 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
               dataYmax = GetMaximum(fNonMusrData[i].data, dataXmin, dataXmax);
           }
           Double_t dd = 0.05*fabs(dataYmax-dataYmin);
-          dataYmin -= dd;
-          dataYmax += dd;
+          if (!fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogY) {
+            dataYmin -= dd;
+            dataYmax += dd;
+          } else {
+            if (dataYmin < 0)
+              dataYmin = 0.1;
+            dataYmax += dd;
+          }
         }
       }
 
@@ -3288,6 +3312,11 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
         TGraphErrors *ge = new TGraphErrors(*(fNonMusrData[i].theory));
         fMultiGraphData->Add(ge, "l");
       }
+
+      if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogX)
+        fDataTheoryPad->SetLogx(1);
+      if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogY)
+        fDataTheoryPad->SetLogy(1);
 
       fMultiGraphData->Draw("a");
 
@@ -3344,6 +3373,12 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
 void PMusrCanvas::PlotDifference(Bool_t unzoom)
 {
   fDataTheoryPad->cd();
+
+  // check if log scale plotting and if yes switch back to linear
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogY)
+    fDataTheoryPad->SetLogy(0); // switch to linear
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogX)
+    fDataTheoryPad->SetLogx(0); // switch to linear
 
   if (fPlotType < 0) // plot type not defined
     return;
@@ -3542,6 +3577,12 @@ void PMusrCanvas::PlotDifference(Bool_t unzoom)
 void PMusrCanvas::PlotFourier(Bool_t unzoom)
 {
   fDataTheoryPad->cd();
+
+  // check if log scale plotting and if yes switch back to linear
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogY)
+    fDataTheoryPad->SetLogy(0); // switch to linear
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogX)
+    fDataTheoryPad->SetLogx(0); // switch to linear
 
   if (fPlotType < 0) // plot type not defined
     return;
@@ -3975,6 +4016,12 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
 void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
 {
   fDataTheoryPad->cd();
+
+  // check if log scale plotting and if yes switch back to linear
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogY)
+    fDataTheoryPad->SetLogy(0); // switch to linear
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogX)
+    fDataTheoryPad->SetLogx(0); // switch to linear
 
   if (fPlotType < 0) // plot type not defined
     return;

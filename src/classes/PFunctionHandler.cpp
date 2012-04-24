@@ -57,6 +57,7 @@ PFunctionHandler::~PFunctionHandler()
 {
   fLines.clear();
   fFuncs.clear();
+  fFuncComment.clear();
 }
 
 //-------------------------------------------------------------
@@ -74,8 +75,20 @@ Bool_t PFunctionHandler::DoParse()
   // feed the function block into the parser. Start with i=1, since i=0 is FUNCTIONS
   for (UInt_t i=1; i<fLines.size(); i++) {
 
-    // function line to upper case
+    // function line to upper case after cutting out prepended comment
     line = fLines[i].fLine;
+    Ssiz_t pos = line.First('#'); // find prepended comment
+    TString Comment("");
+    if (pos != kNPOS) { // comment present
+      for (Int_t i=pos; i<line.Length(); i++) {
+        Comment += line[i];
+      }
+    }
+    fFuncComment.push_back(Comment);
+    if (pos != kNPOS) { // comment present, hence remove it from the string to be parsed
+      line.Remove(pos);
+      line.Remove(TString::kTrailing, ' ');
+    }
     line.ToUpper();
 
     // do parsing
@@ -205,10 +218,17 @@ Int_t PFunctionHandler::GetFuncIndex(Int_t funcNo)
  *
  * \param idx index of the function
  */
-TString* PFunctionHandler::GetFuncString(UInt_t idx)
+TString PFunctionHandler::GetFuncString(UInt_t idx)
 {
-  if (idx > fFuncs.size())
-    return 0;
+  TString funStr("");
 
-  return fFuncs[idx].GetFuncString();
+  if ((idx > fFuncs.size()) || (idx > fFuncComment.size()))
+    return funStr;
+
+  if (fFuncComment[idx].Length() > 0)
+    funStr = *fFuncs[idx].GetFuncString() + " " + fFuncComment[idx];
+  else
+    funStr = *fFuncs[idx].GetFuncString();
+
+  return funStr;
 }

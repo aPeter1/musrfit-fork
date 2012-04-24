@@ -146,7 +146,7 @@ void PFitOutputHandler::readFromStdErr()
  */
 void PFitOutputHandler::processDone(int exitCode, QProcess::ExitStatus exitStatus)
 {
-  if (exitStatus == QProcess::CrashExit)
+  if ((exitStatus == QProcess::CrashExit) && (exitCode != 0))
     qDebug() << "**ERROR** PFitOutputHandler::processDone: exitCode = " << exitCode << endl;
   fQuitButton->setText("Done");
 }
@@ -161,8 +161,9 @@ void PFitOutputHandler::quitButtonPressed()
   // if the fitting is still taking place, kill it
   if (fProc->state() == QProcess::Running) {
     fProc->terminate();
-    if (!fProc->waitForFinished())
+    if (!fProc->waitForFinished()) {
       fProc->kill();
+    }
   }
 
   accept();

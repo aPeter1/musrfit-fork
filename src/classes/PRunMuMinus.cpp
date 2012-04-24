@@ -59,11 +59,13 @@ PRunMuMinus::PRunMuMinus() : PRunBase()
  */
 PRunMuMinus::PRunMuMinus(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
 {
-  Bool_t success;
+  fNoOfFitBins  = 0;
 
-  // calculate fFitData
-  if (success) {
-    success = PrepareData();
+  if (!PrepareData()) {
+    cerr << endl << ">> PRunMuMinus::PRunMuMinus: **SEVERE ERROR**: Couldn't prepare data for fitting!";
+    cerr << endl << ">> This is very bad :-(, will quit ...";
+    cerr << endl;
+    fValid = false;
   }
 }
 
@@ -75,6 +77,7 @@ PRunMuMinus::PRunMuMinus(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t 
  */
 PRunMuMinus::~PRunMuMinus()
 {
+  fForward.clear();
 }
 
 //--------------------------------------------------------------------------
@@ -93,6 +96,42 @@ Double_t PRunMuMinus::CalcChiSquare(const std::vector<Double_t>& par)
   Double_t chisq = 0.0;
   Double_t diff = 0.0;
 
+  // calculate functions
+  for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
+    Int_t funcNo = fMsrInfo->GetFuncNo(i);
+    fFuncValues[i] = fMsrInfo->EvalFunc(funcNo, *fRunInfo->GetMap(), par);
+  }
+
+  // calculate chi square
+  Double_t time(1.0);
+  Int_t i, N(static_cast<Int_t>(fData.GetValue()->size()));
+
+  // In order not to have an IF in the next loop, determine the start and end bins for the fit range now
+  Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
+  if (startTimeBin < 0)
+    startTimeBin = 0;
+  Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
+  if (endTimeBin > N)
+    endTimeBin = N;
+
+  // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
+  // This is needed for the LF and user functions where some non-thread-save calculations only need to be calculated once
+  // for a given set of parameters---which should be done outside of the parallelized loop.
+  // For all other functions it means a tiny and acceptable overhead.
+  time = fTheory->Func(time, par, fFuncValues);
+
+  #ifdef HAVE_GOMP
+  Int_t chunk = (endTimeBin - startTimeBin)/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(i,time,diff) schedule(dynamic,chunk) reduction(+:chisq)
+  #endif
+  for (i=startTimeBin; i < endTimeBin; ++i) {
+    time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
+    diff = fData.GetValue()->at(i) - fTheory->Func(time, par, fFuncValues);
+    chisq += diff*diff / (fData.GetError()->at(i)*fData.GetError()->at(i));
+  }
+
   return chisq;
 }
 
@@ -109,6 +148,47 @@ Double_t PRunMuMinus::CalcChiSquare(const std::vector<Double_t>& par)
  */
 Double_t PRunMuMinus::CalcChiSquareExpected(const std::vector<Double_t>& par)
 {
+  Double_t chisq = 0.0;
+  Double_t diff  = 0.0;
+  Double_t theo  = 0.0;
+
+  // calculate functions
+  for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
+    Int_t funcNo = fMsrInfo->GetFuncNo(i);
+    fFuncValues[i] = fMsrInfo->EvalFunc(funcNo, *fRunInfo->GetMap(), par);
+  }
+
+  // calculate chi square
+  Double_t time(1.0);
+  Int_t i, N(static_cast<Int_t>(fData.GetValue()->size()));
+
+  // In order not to have an IF in the next loop, determine the start and end bins for the fit range now
+  Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
+  if (startTimeBin < 0)
+    startTimeBin = 0;
+  Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
+  if (endTimeBin > N)
+    endTimeBin = N;
+
+  // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
+  // This is needed for the LF and user functions where some non-thread-save calculations only need to be calculated once
+  // for a given set of parameters---which should be done outside of the parallelized loop.
+  // For all other functions it means a tiny and acceptable overhead.
+  time = fTheory->Func(time, par, fFuncValues);
+
+  #ifdef HAVE_GOMP
+  Int_t chunk = (endTimeBin - startTimeBin)/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(i,time,diff) schedule(dynamic,chunk) reduction(+:chisq)
+  #endif
+  for (i=startTimeBin; i < endTimeBin; ++i) {
+    time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
+    theo = fTheory->Func(time, par, fFuncValues);
+    diff = fData.GetValue()->at(i) - theo;
+    chisq += diff*diff / theo;
+  }
+
   return 0.0;
 }
 
@@ -125,9 +205,54 @@ Double_t PRunMuMinus::CalcChiSquareExpected(const std::vector<Double_t>& par)
  */
 Double_t PRunMuMinus::CalcMaxLikelihood(const std::vector<Double_t>& par)
 {
-  cout << endl << "PRunSingleHisto::CalcMaxLikelihood(): not implemented yet ..." << endl;
+  Double_t mllh = 0.0; // maximum log likelihood assuming poisson distribution for the single bin
 
-  return 1.0;
+  // calculate functions
+  for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
+    Int_t funcNo = fMsrInfo->GetFuncNo(i);
+    fFuncValues[i] = fMsrInfo->EvalFunc(funcNo, *fRunInfo->GetMap(), par);
+  }
+
+  // calculate maximum log likelihood
+  Double_t theo;
+  Double_t data;
+  Double_t time(1.0);
+  Int_t i, N(static_cast<Int_t>(fData.GetValue()->size()));
+
+  // In order not to have an IF in the next loop, determine the start and end bins for the fit range now
+  Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
+  if (startTimeBin < 0)
+    startTimeBin = 0;
+  Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
+  if (endTimeBin > N)
+    endTimeBin = N;
+
+  // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
+  // This is needed for the LF and user functions where some non-thread-save calculations only need to be calculated once
+  // for a given set of parameters---which should be done outside of the parallelized loop.
+  // For all other functions it means a tiny and acceptable overhead.
+  time = fTheory->Func(time, par, fFuncValues);
+
+  #ifdef HAVE_GOMP
+  Int_t chunk = (endTimeBin - startTimeBin)/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(i,time,theo,data) schedule(dynamic,chunk) reduction(-:mllh)
+  #endif
+  for (i=startTimeBin; i < endTimeBin; ++i) {
+    time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
+    // calculate theory for the given parameter set
+    theo = fTheory->Func(time, par, fFuncValues);
+    // check if data value is not too small
+    if (fData.GetValue()->at(i) > 1.0e-9)
+      data = fData.GetValue()->at(i);
+    else
+      data = 1.0e-9;
+    // add maximum log likelihood contribution of bin i
+    mllh -= data*TMath::Log(theo) - theo - TMath::LnGamma(data+1);
+  }
+
+  return mllh;
 }
 
 //--------------------------------------------------------------------------
@@ -140,7 +265,31 @@ Double_t PRunMuMinus::CalcMaxLikelihood(const std::vector<Double_t>& par)
  */
 UInt_t PRunMuMinus::GetNoOfFitBins()
 {
+  CalcNoOfFitBins();
+
   return fNoOfFitBins;
+}
+
+//--------------------------------------------------------------------------
+// CalcNoOfFitBins (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculate the number of fitted bins for the current fit range.
+ */
+void PRunMuMinus::CalcNoOfFitBins()
+{
+  // In order not having to loop over all bins and to stay consistent with the chisq method, calculate the start and end bins explicitly
+  Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
+  if (startTimeBin < 0)
+    startTimeBin = 0;
+  Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
+  if (endTimeBin > static_cast<Int_t>(fData.GetValue()->size()))
+    endTimeBin = fData.GetValue()->size();
+
+  if (endTimeBin > startTimeBin)
+    fNoOfFitBins = endTimeBin - startTimeBin;
+  else
+    fNoOfFitBins = 0;
 }
 
 //--------------------------------------------------------------------------
@@ -151,13 +300,42 @@ UInt_t PRunMuMinus::GetNoOfFitBins()
  */
 void PRunMuMinus::CalcTheory()
 {
+  // feed the parameter vector
+  std::vector<Double_t> par;
+  PMsrParamList *paramList = fMsrInfo->GetMsrParamList();
+  for (UInt_t i=0; i<paramList->size(); i++)
+    par.push_back((*paramList)[i].fValue);
+
+  // calculate functions
+  for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
+    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), *fRunInfo->GetMap(), par);
+  }
+
+  // calculate theory
+  UInt_t size = fData.GetValue()->size();
+  Double_t start = fData.GetDataTimeStart();
+  Double_t resolution = fData.GetDataTimeStep();
+  Double_t time;
+  for (UInt_t i=0; i<size; i++) {
+    time = start + (Double_t)i*resolution;
+    fData.AppendTheoryValue(fTheory->Func(time, par, fFuncValues));
+  }
+
+  // clean up
+  par.clear();
 }
 
 //--------------------------------------------------------------------------
 // PrepareData
 //--------------------------------------------------------------------------
 /**
- * <p>Prepare data for fitting or viewing. <b>(Not yet implemented)</b>
+ * <p>Prepare data for fitting or viewing. What is already processed at this stage:
+ * -# get proper raw run data
+ * -# get all needed forward histograms
+ * -# get time resolution
+ * -# get t0's and perform necessary cross checks (e.g. if t0 of msr-file (if present) are consistent with t0 of the data files, etc.)
+ * -# add runs (if addruns are present)
+ * -# group histograms (if grouping is present)
  *
  * <b>return:</b>
  * - true if everthing went smooth
@@ -167,8 +345,414 @@ Bool_t PRunMuMinus::PrepareData()
 {
   Bool_t success = true;
 
-  cout << endl << "in PRunMuMinus::PrepareData(): will feed fData" << endl;
+  // get the proper run
+  PRawRunData* runData = fRawData->GetRunData(*fRunInfo->GetRunName());
+  if (!runData) { // couldn't get run
+    cerr << endl << ">> PRunSingleHisto::PrepareData(): **ERROR** Couldn't get run " << fRunInfo->GetRunName()->Data() << "!";
+    cerr << endl;
+    return false;
+  }
+
+  // collect histogram numbers
+  PUIntVector histoNo; // histoNo = msr-file forward + redGreen_offset - 1
+  for (UInt_t i=0; i<fRunInfo->GetForwardHistoNoSize(); i++) {
+    histoNo.push_back(fRunInfo->GetForwardHistoNo(i));
+
+    if (!runData->IsPresent(histoNo[i])) {
+      cerr << endl << ">> PRunSingleHisto::PrepareData(): **PANIC ERROR**:";
+      cerr << endl << ">> histoNo found = " << histoNo[i] << ", which is NOT present in the data file!?!?";
+      cerr << endl << ">> Will quit :-(";
+      cerr << endl;
+      histoNo.clear();
+      return false;
+    }
+  }
+
+  // feed all T0's
+  // first init T0's, T0's are stored as (forward T0, backward T0, etc.)
+  fT0s.clear();
+  fT0s.resize(histoNo.size());
+  for (UInt_t i=0; i<fT0s.size(); i++) {
+    fT0s[i] = -1.0;
+  }
+
+  // fill in the T0's from the msr-file (if present)
+  for (UInt_t i=0; i<fRunInfo->GetT0BinSize(); i++) {
+    fT0s[i] = fRunInfo->GetT0Bin(i);
+  }
+
+  // fill in the T0's from the data file, if not already present in the msr-file
+  for (UInt_t i=0; i<histoNo.size(); i++) {
+    if (fT0s[i] == -1.0) // i.e. not present in the msr-file, try the data file
+      if (runData->GetT0Bin(histoNo[i]) > 0.0) {
+        fT0s[i] = runData->GetT0Bin(histoNo[i]);
+        fRunInfo->SetT0Bin(fT0s[i], i); // keep value for the msr-file
+      }
+  }
+
+  // fill in the T0's gaps, i.e. in case the T0's are NOT in the msr-file and NOT in the data file
+  for (UInt_t i=0; i<histoNo.size(); i++) {
+    if (fT0s[i] == -1.0) { // i.e. not present in the msr-file and data file, use the estimated T0
+      fT0s[i] = runData->GetT0BinEstimated(histoNo[i]);
+      fRunInfo->SetT0Bin(fT0s[i], i); // keep value for the msr-file
+
+      cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
+      cerr << endl << ">> run: " << fRunInfo->GetRunName();
+      cerr << endl << ">> will try the estimated one: forward t0 = " << runData->GetT0BinEstimated(histoNo[i]);
+      cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+      cerr << endl;
+    }
+  }
+
+  // check if t0 is within proper bounds
+  for (UInt_t i=0; i<fRunInfo->GetForwardHistoNoSize(); i++) {
+    if ((fT0s[i] < 0) || (fT0s[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
+      cerr << endl << ">> PRunSingleHisto::PrepareData(): **ERROR** t0 data bin (" << fT0s[i] << ") doesn't make any sense!";
+      cerr << endl;
+      return false;
+    }
+  }
+
+  // keep the histo of each group at this point (addruns handled below)
+  vector<PDoubleVector> forward;
+  forward.resize(histoNo.size());   // resize to number of groups
+  for (UInt_t i=0; i<histoNo.size(); i++) {
+    forward[i].resize(runData->GetDataBin(histoNo[i])->size());
+    forward[i] = *runData->GetDataBin(histoNo[i]);
+  }
+
+  // check if there are runs to be added to the current one
+  if (fRunInfo->GetRunNameSize() > 1) { // runs to be added present
+    PRawRunData *addRunData;
+    for (UInt_t i=1; i<fRunInfo->GetRunNameSize(); i++) {
+
+      // get run to be added to the main one
+      addRunData = fRawData->GetRunData(*fRunInfo->GetRunName(i));
+      if (addRunData == 0) { // couldn't get run
+        cerr << endl << ">> PRunSingleHisto::PrepareData(): **ERROR** Couldn't get addrun " << fRunInfo->GetRunName(i)->Data() << "!";
+        cerr << endl;
+        return false;
+      }
+
+      // feed all T0's
+      // first init T0's, T0's are stored as (forward T0, backward T0, etc.)
+      PDoubleVector t0Add;
+      t0Add.resize(histoNo.size());
+      for (UInt_t j=0; j<t0Add.size(); j++) {
+        t0Add[j] = -1.0;
+      }
+
+      // fill in the T0's from the msr-file (if present)
+      for (UInt_t j=0; j<fRunInfo->GetT0BinSize(); j++) {
+        t0Add[j] = fRunInfo->GetAddT0Bin(i-1,j); // addRunIdx starts at 0
+      }
+
+      // fill in the T0's from the data file, if not already present in the msr-file
+      for (UInt_t j=0; j<histoNo.size(); j++) {
+        if (t0Add[j] == -1.0) // i.e. not present in the msr-file, try the data file
+          if (addRunData->GetT0Bin(histoNo[j]) > 0.0) {
+            t0Add[j] = addRunData->GetT0Bin(histoNo[j]);
+            fRunInfo->SetAddT0Bin(t0Add[j], i-1, j); // keep value for the msr-file
+          }
+      }
+
+      // fill in the T0's gaps, i.e. in case the T0's are NOT in the msr-file and NOT in the data file
+      for (UInt_t j=0; j<histoNo.size(); j++) {
+        if (t0Add[j] == -1.0) { // i.e. not present in the msr-file and data file, use the estimated T0
+          t0Add[j] = addRunData->GetT0BinEstimated(histoNo[j]);
+          fRunInfo->SetAddT0Bin(t0Add[j], i-1, j); // keep value for the msr-file
+
+          cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
+          cerr << endl << ">> run: " << fRunInfo->GetRunName();
+          cerr << endl << ">> will try the estimated one: forward t0 = " << addRunData->GetT0BinEstimated(histoNo[j]);
+          cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+          cerr << endl;
+        }
+      }
+
+      // check if t0 is within proper bounds
+      for (UInt_t j=0; j<fRunInfo->GetForwardHistoNoSize(); j++) {
+        if ((t0Add[j] < 0) || (t0Add[j] > (Int_t)addRunData->GetDataBin(histoNo[j])->size())) {
+          cerr << endl << ">> PRunSingleHisto::PrepareData(): **ERROR** addt0 data bin (" << t0Add[j] << ") doesn't make any sense!";
+          cerr << endl;
+          return false;
+        }
+      }
+
+      // add forward run
+      UInt_t addRunSize;
+      for (UInt_t k=0; k<histoNo.size(); k++) { // fill each group
+        addRunSize = addRunData->GetDataBin(histoNo[k])->size();
+        for (UInt_t j=0; j<addRunData->GetDataBin(histoNo[k])->size(); j++) { // loop over the bin indices
+          // make sure that the index stays in the proper range
+          if ((j+(Int_t)t0Add[k]-(Int_t)fT0s[k] >= 0) && (j+(Int_t)t0Add[k]-(Int_t)fT0s[k] < addRunSize)) {
+            forward[k][j] += addRunData->GetDataBin(histoNo[k])->at(j+(Int_t)t0Add[k]-(Int_t)fT0s[k]);
+          }
+        }
+      }
+
+      // clean up
+      t0Add.clear();
+    }
+  }
+
+  // set forward/backward histo data of the first group
+  fForward.resize(forward[0].size());
+  for (UInt_t i=0; i<fForward.size(); i++) {
+    fForward[i]  = forward[0][i];
+  }
+
+  // group histograms, add all the remaining forward histograms of the group
+  for (UInt_t i=1; i<histoNo.size(); i++) { // loop over the groupings
+    for (UInt_t j=0; j<runData->GetDataBin(histoNo[i])->size(); j++) { // loop over the bin indices
+      // make sure that the index stays within proper range
+      if ((j+fT0s[i]-fT0s[0] >= 0) && (j+fT0s[i]-fT0s[0] < runData->GetDataBin(histoNo[i])->size())) {
+        fForward[j] += forward[i][j+(Int_t)fT0s[i]-(Int_t)fT0s[0]];
+      }
+    }
+  }
+
+  // keep the time resolution in (us)
+  fTimeResolution = runData->GetTimeResolution()/1.0e3;
+  cout.precision(10);
+  cout << endl << ">> PRunSingleHisto::PrepareData(): time resolution=" << fixed << runData->GetTimeResolution() << "(ns)" << endl;
+
+  if (fHandleTag == kFit)
+    success = PrepareFitData(runData, histoNo[0]);
+  else if (fHandleTag == kView)
+    success = PrepareRawViewData(runData, histoNo[0]);
+  else
+    success = false;
+
+  // cleanup
+  histoNo.clear();
 
   return success;
+}
+
+//--------------------------------------------------------------------------
+// PrepareFitData (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Take the pre-processed data (i.e. grouping and addrun are preformed) and form the histogram for fitting.
+ * The following steps are preformed:
+ * -# get fit start/stop time
+ * -# check that 'first good data bin', 'last good data bin', and 't0' make any sense
+ * -# packing (i.e rebinning)
+ *
+ * <b>return:</b>
+ * - true, if everything went smooth
+ * - false, otherwise
+ *
+ * \param runData raw run data handler
+ * \param histoNo forward histogram number
+ */
+Bool_t PRunMuMinus::PrepareFitData(PRawRunData* runData, const UInt_t histoNo)
+{
+  // transform raw histo data. This is done the following way (for details see the manual):
+  // for the single histo fit, just the rebinned raw data are copied
+
+  // first get start data, end data, and t0
+  Int_t start;
+  Int_t end;
+  start = fRunInfo->GetDataRange(0);
+  end   = fRunInfo->GetDataRange(1);
+  // check if data range has been provided, and if not try to estimate them
+  if (start < 0) {
+    Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
+    start = (Int_t)fT0s[0]+offset;
+    fRunInfo->SetDataRange(start, 0);
+    cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start << ".";
+    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl;
+  }
+  if (end < 0) {
+    end = fForward.size();
+    fRunInfo->SetDataRange(end, 1);
+    cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range end = " << end << ".";
+    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl;
+  }
+
+  // check if start and end make any sense
+  // 1st check if start and end are in proper order
+  if (end < start) { // need to swap them
+    Int_t keep = end;
+    end = start;
+    start = keep;
+  }
+  // 2nd check if start is within proper bounds
+  if ((start < 0) || (start > (Int_t)fForward.size())) {
+    cerr << endl << ">> PRunSingleHisto::PrepareFitData(): **ERROR** start data bin doesn't make any sense!";
+    cerr << endl;
+    return false;
+  }
+  // 3rd check if end is within proper bounds
+  if ((end < 0) || (end > (Int_t)fForward.size())) {
+    cerr << endl << ">> PRunSingleHisto::PrepareFitData(): **ERROR** end data bin doesn't make any sense!";
+    cerr << endl;
+    return false;
+  }
+
+  // everything looks fine, hence fill data set
+  Int_t t0 = (Int_t)fT0s[0];
+  Double_t value = 0.0;
+  // data start at data_start-t0
+  // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
+  fData.SetDataTimeStart(fTimeResolution*((Double_t)start-(Double_t)t0+(Double_t)(fRunInfo->GetPacking()-1)/2.0));
+  fData.SetDataTimeStep(fTimeResolution*fRunInfo->GetPacking());
+  for (Int_t i=start; i<end; i++) {
+    if (fRunInfo->GetPacking() == 1) {
+      value = fForward[i];
+      fData.AppendValue(value);
+      if (value == 0.0)
+        fData.AppendErrorValue(1.0);
+      else
+        fData.AppendErrorValue(TMath::Sqrt(value));
+    } else { // packed data, i.e. fRunInfo->GetPacking() > 1
+      if (((i-start) % fRunInfo->GetPacking() == 0) && (i != start)) { // fill data
+        fData.AppendValue(value);
+        if (value == 0.0)
+          fData.AppendErrorValue(1.0);
+        else
+          fData.AppendErrorValue(TMath::Sqrt(value));
+        // reset values
+        value = 0.0;
+      }
+      value += fForward[i];
+    }
+  }
+
+  CalcNoOfFitBins();
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// PrepareRawViewData (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Take the pre-processed data (i.e. grouping and addrun are preformed) and form the histogram for viewing
+ * without any life time correction.
+ * <p>The following steps are preformed:
+ * -# check if view packing is whished.
+ * -# check that 'first good data bin', 'last good data bin', and 't0' makes any sense
+ * -# packing (i.e. rebinnig)
+ * -# calculate theory
+ *
+ * <b>return:</b>
+ * - true, if everything went smooth
+ * - false, otherwise.
+ *
+ * \param runData raw run data handler
+ * \param histoNo forward histogram number
+ */
+Bool_t PRunMuMinus::PrepareRawViewData(PRawRunData* runData, const UInt_t histoNo)
+{
+  // check if view_packing is wished
+  Int_t packing = fRunInfo->GetPacking();
+  if (fMsrInfo->GetMsrPlotList()->at(0).fViewPacking > 0) {
+    packing = fMsrInfo->GetMsrPlotList()->at(0).fViewPacking;
+  }
+
+  // calculate necessary norms
+  Double_t theoryNorm = 1.0;
+  if (fMsrInfo->GetMsrPlotList()->at(0).fViewPacking > 0) {
+    theoryNorm = (Double_t)fMsrInfo->GetMsrPlotList()->at(0).fViewPacking/(Double_t)fRunInfo->GetPacking();
+  }
+
+  // raw data, since PMusrCanvas is doing ranging etc.
+  // start = the first bin which is a multiple of packing backward from first good data bin
+  Int_t start = fRunInfo->GetDataRange(0) - (fRunInfo->GetDataRange(0)/packing)*packing;
+  // end = last bin starting from start which is a multipl of packing and still within the data
+  Int_t end   = start + ((fForward.size()-start)/packing)*packing;
+  // check if data range has been provided, and if not try to estimate them
+  if (start < 0) {
+    Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
+    start = ((Int_t)fT0s[0]+offset) - (((Int_t)fT0s[0]+offset)/packing)*packing;
+    end = start + ((fForward.size()-start)/packing)*packing;
+    cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range start = " << start << ".";
+    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl;
+  }
+  // check if start, end, and t0 make any sense
+  // 1st check if start and end are in proper order
+  if (end < start) { // need to swap them
+    Int_t keep = end;
+    end = start;
+    start = keep;
+  }
+  // 2nd check if start is within proper bounds
+  if ((start < 0) || (start > (Int_t)fForward.size())) {
+    cerr << endl << ">> PRunSingleHisto::PrepareRawViewData(): **ERROR** start data bin doesn't make any sense!";
+    cerr << endl;
+    return false;
+  }
+  // 3rd check if end is within proper bounds
+  if ((end < 0) || (end > (Int_t)fForward.size())) {
+    cerr << endl << ">> PRunSingleHisto::PrepareRawViewData(): **ERROR** end data bin doesn't make any sense!";
+    cerr << endl;
+    return false;
+  }
+
+  // everything looks fine, hence fill data set
+  Int_t t0 = (Int_t)fT0s[0];
+  Double_t value = 0.0;
+  // data start at data_start-t0
+  // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
+  fData.SetDataTimeStart(fTimeResolution*((Double_t)start-(Double_t)t0+(Double_t)(packing-1)/2.0));
+  fData.SetDataTimeStep(fTimeResolution*packing);
+
+  for (Int_t i=start; i<end; i++) {
+    if (((i-start) % packing == 0) && (i != start)) { // fill data
+      fData.AppendValue(value);
+      if (value == 0.0)
+        fData.AppendErrorValue(1.0);
+      else
+        fData.AppendErrorValue(TMath::Sqrt(value));
+      // reset values
+      value = 0.0;
+    }
+    value += fForward[i];
+  }
+
+  CalcNoOfFitBins();
+
+  // fill theory vector for kView
+  // feed the parameter vector
+  std::vector<Double_t> par;
+  PMsrParamList *paramList = fMsrInfo->GetMsrParamList();
+  for (UInt_t i=0; i<paramList->size(); i++)
+    par.push_back((*paramList)[i].fValue);
+
+  // calculate functions
+  for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
+    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), *fRunInfo->GetMap(), par);
+  }
+
+  // calculate theory
+  UInt_t size = fForward.size();
+  Double_t factor = 1.0;
+  if (fData.GetValue()->size() * 10 > fForward.size()) {
+    size = fData.GetValue()->size() * 10;
+    factor = (Double_t)fForward.size() / (Double_t)size;
+  }
+  Double_t time;
+  Double_t theoryValue;
+  fData.SetTheoryTimeStart(fData.GetDataTimeStart());
+  fData.SetTheoryTimeStep(fTimeResolution*factor);
+  for (UInt_t i=0; i<size; i++) {
+    time = fData.GetTheoryTimeStart() + i*fData.GetTheoryTimeStep();
+    theoryValue = fTheory->Func(time, par, fFuncValues);
+    if (fabs(theoryValue) > 1.0e10) {  // dirty hack needs to be fixed!!
+      theoryValue = 0.0;
+    }
+    fData.AppendTheoryValue(theoryNorm*theoryValue);
+  }
+
+  // clean up
+  par.clear();
+
+  return true;
 }
 

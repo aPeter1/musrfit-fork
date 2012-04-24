@@ -196,7 +196,7 @@ void musrfit_dump_ascii(char *fileName, PRunListCollection *runList)
     }
   }
 
-  // rrf
+  // muMinus
   size = runList->GetNoOfMuMinus();
   if (size > 0) {
     for (unsigned int i=0; i<size; i++) {
@@ -329,7 +329,7 @@ void musrfit_dump_root(char *fileName, PRunListCollection *runList)
     }
   }
 
-  // rrf
+  // muMinus
   size = runList->GetNoOfMuMinus();
   if (size > 0) {
     for (unsigned int i=0; i<size; i++) {

@@ -397,6 +397,10 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
   if (fMul) {
     if (fAdd) { // fMul != 0 && fAdd != 0
       switch (fType) {
+        case THEORY_CONST:
+          return Constant(paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
+              fAdd->Func(t, paramValues, funcValues);
+          break;
         case THEORY_ASYMMETRY:
           return Asymmetry(paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
@@ -488,6 +492,9 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
       }
     } else { // fMul !=0 && fAdd == 0
       switch (fType) {
+        case THEORY_CONST:
+          return Constant(paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
+          break;
         case THEORY_ASYMMETRY:
           return Asymmetry(paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
@@ -560,6 +567,9 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
   } else { // fMul == 0 && fAdd != 0
     if (fAdd) {
       switch (fType) {
+        case THEORY_CONST:
+          return Constant(paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
+          break;
         case THEORY_ASYMMETRY:
           return Asymmetry(paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
@@ -630,6 +640,9 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
       }
     } else { // fMul == 0 && fAdd == 0
       switch (fType) {
+        case THEORY_CONST:
+          return Constant(paramValues, funcValues);
+          break;
         case THEORY_ASYMMETRY:
           return Asymmetry(paramValues, funcValues);
           break;
@@ -979,6 +992,34 @@ void PTheory::MakeCleanAndTidyUserFcn(UInt_t i, PMsrLines *fullTheoryBlock)
     delete tokens;
     tokens = 0;
   }
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p> theory function: Const
+ * \f[ = const \f]
+ *
+ * <b>meaning of paramValues:</b> const
+ *
+ * <b>return:</b> function value
+ *
+ * \param paramValues vector with the parameters
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
+ */
+Double_t PTheory::Constant(const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+{
+  // expected parameters: const
+
+  Double_t constant;
+
+  // check if FUNCTIONS are used
+  if (fParamNo[0] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
+    constant = paramValues[fParamNo[0]];
+  } else {
+    constant = funcValues[fParamNo[0]-MSR_PARAM_FUN_OFFSET];
+  }
+
+  return constant;
 }
 
 //--------------------------------------------------------------------------

@@ -611,6 +611,8 @@ PRunData* PRunListCollection::GetMuMinus(UInt_t index, EDataSwitch tag)
         cerr << endl;
         return 0;
       }
+      fRunMuMinusList[index]->CalcTheory();
+      data = fRunMuMinusList[index]->GetData();
       break;
     case kRunNo:
       for (UInt_t i=0; i<fRunMuMinusList.size(); i++) {

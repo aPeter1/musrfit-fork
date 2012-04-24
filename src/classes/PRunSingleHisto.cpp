@@ -74,6 +74,7 @@ PRunSingleHisto::PRunSingleHisto() : PRunBase()
 PRunSingleHisto::PRunSingleHisto(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
 {
   fScaleN0AndBkg = IsScaleN0AndBkg();
+  fNoOfFitBins  = 0;
 
   if (!PrepareData()) {
     cerr << endl << ">> PRunSingleHisto::PRunSingleHisto: **SEVERE ERROR**: Couldn't prepare data for fitting!";
