@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en_US">
 
-<!-- Mirrored from intranet.psi.ch/MUSR/Msr2Data?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 29 Mar 2012 14:13:02 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/Msr2Data?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 08 May 2012 05:20:56 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 <head>
 <link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
@@ -21,7 +21,7 @@
 <meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
 
 	<link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" /> <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
-	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/Msr2Data?t=1333030350" type="application/x-wiki" title="edit Msr2Data" />
+	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/Msr2Data?t=1336454419" type="application/x-wiki" title="edit Msr2Data" />
 	<meta name="description" content="Msr2Data" />
   <base  /><!--[if IE]></base><![endif]-->
 	
@@ -109,7 +109,7 @@ pre {
 </style><![endif]-->
 
 	
-<script src="https://intranet.psi.ch/pub/System/ChecklistPlugin/itemstatechange.js" language="javascript" type="text/javascript"></script><script src="https://intranet.psi.ch/pub/System/TimeTablePlugin/timetabletooltips.js" language="javascript" type="text/javascript"></script><link rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
+<link rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
 </head>
 <body class="foswikiNoJs patternViewPage patternPrintPage">
 <a name="PageTop"></a><div class="foswikiPage"><div id="patternScreen">
@@ -147,7 +147,7 @@ pre {
 <p></p>
 Before the usage of msr2data will be explained in greater detail first be aware of the following:
 <p></p>
-<strong><font color="#ff0000">If using msr2data always bear in mind <a href="#KnownLimitations" class="foswikiCurrentTopicLink">its limitations</a>!</font></strong>
+<strong><span class='foswikiRedFG'>If using msr2data always bear in mind <a href="#KnownLimitations" class="foswikiCurrentTopicLink">its limitations</a>!</span></strong>
 <p></p>
 <p></p>
 <p></p>
@@ -183,7 +183,7 @@ RUN VAR1 VAR2 VAR3 ...
 ·     ·    ·    ·
 ·     ·    ·    ·
 </pre>
-<font color="#ff0000">The first not commented and not empty line determines the parameter names and labels and has to be present!</font><br/>
+<span class='foswikiRedFG'>The first not commented and not empty line determines the parameter names and labels and has to be present!</span><br/>
 It is allowed to add comments (with a preceding <strong>#</strong>) or empty lines to the run-list file. 
 <p></p>
 The following should be mentioned together with the above examples: <ul>
@@ -191,7 +191,7 @@ The following should be mentioned together with the above examples: <ul>
 </li> <li> If the files have been newly created, also the <strong>DB</strong> file header is written. If the files were present before, only the data blocks are appended. The output of the header can either be forced or completely suppressed with the <a href="#OptionalParameters" class="foswikiCurrentTopicLink">header and noheader options</a> as shall be seen later.
 </li></ul> 
 <a name="NoExtension"></a> <ul>
-<li> <font color="#ff0000">If the <code>musrfit</code> output files do not have an &lt;extension&gt; as specified above like <code><b>8472.msr</b></code> one has to call <code>msr2data</code> like in the following example:</font> <pre class="bash">
+<li> <span class='foswikiRedFG'>If the <code>musrfit</code> output files do not have an &lt;extension&gt; as specified above like <code><b>8472.msr</b></code> one has to call <code>msr2data</code> like in the following example:</span> <pre class="bash">
 msr2data 8472 8460 &#34;&#34;
 </pre>
 </li></ul> 
@@ -232,7 +232,7 @@ Take the <strong>given</strong> msr files <code><b>8472.msr</b></code> through <
 <pre class="bash">
 msr2data 8472 8475 &#95;tf&#95;h13 msr-8471!
 </pre>
-Using <code><b>8471_tf_h13.msr</b></code> as template for <em>all</em> runs, <code>msr2data</code> generates the msr input files <code><b>8472_tf_h13.msr</b></code> through <code><b>8475_tf_h13.msr</b></code>. <font color="#ff0000">No fitting will be performed and no DB or ASCII output will be generated!</font>
+Using <code><b>8471_tf_h13.msr</b></code> as template for <em>all</em> runs, <code>msr2data</code> generates the msr input files <code><b>8472_tf_h13.msr</b></code> through <code><b>8475_tf_h13.msr</b></code>. <span class='foswikiRedFG'>No fitting will be performed and no DB or ASCII output will be generated!</span>
 <p></p>
 <a name="TheGlobalMode"></a>
 <h1><a name="A_4_The_Global_Mode"></a> 4  The Global Mode </h1>
@@ -282,7 +282,7 @@ The example's global FITPARAMETER block would be:<pre>
 This shows that the fit parameters are reorganized in a way that the common parameters appear at the beginning of the parameter list and they are followed by copies of the parameters specific to each run (in the specified order!). Additionally, for each specified run new RUN blocks are created&mdash;for each run as many as found for the template run.<br>
 During this reorganization all the affected parameter occurrences are changed accordingly!
 <p></p>
-<font color="#ff0000">Please be aware of the fact that comments in the template msr file are <em>not</em> propagated to the newly generated global msr file!</font>
+<span class='foswikiRedFG'>Please be aware of the fact that comments in the template msr file are <em>not</em> propagated to the newly generated global msr file!</span>
 <p></p>
 <h2><a name="A_4.2_Parameter_Extraction"></a> 4.2  Parameter Extraction </h2>
 After fitting some model to the specified data the fit parameters can be extracted from the global msr file to a <strong>DB</strong> or column-structured ASCII file&mdash;as usual this includes also parameters stored in the run data files or externally specified parameters given in a <a href="#RunListStructure" class="foswikiCurrentTopicLink">run-list file</a>.
@@ -306,13 +306,13 @@ The single run msr files are not deleted at the moment. The information containe
 msr2data 8471 8470 -OneRunFit&#95;example -o OneRunFits.db
 </pre>
 <p></p>
-<font color="#ff0000">Please be aware that the program in this mode always generates new single-run msr files and always calls <code>musrfit</code> for them. In case there are already single-run fits present, these cannot be used in conjunction with this option. The program on purpose behaves in this way in order to ensure the file integrity and correct parameter order within these files.</font>
+<span class='foswikiRedFG'>Please be aware that the program in this mode always generates new single-run msr files and always calls <code>musrfit</code> for them. In case there are already single-run fits present, these cannot be used in conjunction with this option. The program on purpose behaves in this way in order to ensure the file integrity and correct parameter order within these files.</span>
 <p></p>
 <a name="KnownLimitations"></a>
 <h1><a name="A_5_Known_Limitations"></a> 5  Known Limitations </h1> <ul>
 <li> The indexing run number of the msr file has to be at the begin of every filename.
 </li> <li> Within the data file name the <strong>RUN#</strong> has the format <strong>%0Xu</strong>, i.e. <strong>X</strong> digits with leading zeros, and has to be the rightmost number given in this format in the file name. <strong>X</strong> has to be at least 4. The highest treatable run number is 2<sup>32</sup>-1 = 4294967295.
-</li> <li> In order to keep <code>msr2data</code> working properly the msr files should only contain <em><font color="#ff0000">one</font> STATISTIC block at the end of the file</em> and <i><font color="#ff0000">one</font> FITPARAMETER block right after the TITLE</i>&mdash;<code>musrfit</code> itself allows to have more creative msr files...
+</li> <li> In order to keep <code>msr2data</code> working properly the msr files should only contain <em><span class='foswikiRedFG'>one</span> STATISTIC block at the end of the file</em> and <i><span class='foswikiRedFG'>one</span> FITPARAMETER block right after the TITLE</i>&mdash;<code>musrfit</code> itself allows to have more creative msr files...
 </li> <li> The msr-file generation from a template takes only care of runs given on the first line of a RUN block. <a href="MusrFit.html#AddRun">ADDRUN statements</a> are simply copied! Since this is most probably not what one likes to do, it is suggested not to use the <strong>fit-&lt;template&gt;</strong> and <strong>msr-&lt;template&gt;</strong> options if ADDRUN statements were present in the template file.
 </li> <li> <code>msr2data</code> will write only up to <em>two successive</em> empty lines in newly generated msr files. In case more subsequent empty lines are encountered in a template file, these are <em>not</em> copied! Actually, this measure is not a limitation but has been introduced to keep the msr files in a reasonable shape.
 </li></ul> 
@@ -321,21 +321,21 @@ msr2data 8471 8470 -OneRunFit&#95;example -o OneRunFits.db
 <h1><a name="A_6_The_Graphical_User_Interface_Provided_by_61_61musrgui_61_61_47_61_61musredit_61_61"></a> 6  The Graphical User Interface Provided by <code><b>musrgui</b></code> / <code><b>musredit</b></code> </h1>
 <code><a href="MusrGui.html">musrgui/musredit</a></code>, editors designed especially for the manipulation of <code>musrfit</code> msr files and graphical front ends to <code><a href="MusrFit.html">musrfit</a></code>, offer an almost self-explanatory graphical user interface to <code>msr2data</code> depicted below:<br>
 <img src="../pub/MUSR/Msr2Data/msr2data-input-tabs.png" alt="msr2data-input-tabs.png" width='612' height='605' align="right" /> <dl>
-<dt> <font color="#ff0000">1&ndash;3</font> </dt><dd> Choose one of the <a href="#BasicTypesOfUsage" class="foswikiCurrentTopicLink">ways</a> to specify your list of runs.
-</dd> <dt> <font color="#ff0000">4</font> </dt><dd> Give the file extension here, e.g. <strong>_zf</strong> for files like <code><b>8472_zf.msr</b></code>. If the files do not have an extension this field stays empty. <code>musrgui</code> / <code>musredit</code> take care of passing the <strong>""</strong> to <code>msr2data</code> as mentioned <a href="#NoExtension" class="foswikiCurrentTopicLink">above</a>.
-</dd> <dt> <font color="#ff0000">5</font> </dt><dd> Activates the <strong>fit-&lt;template&gt;</strong> option if <strong>&lt;template&gt;</strong> is entered. In case the option "Chain Fit" is <em>not</em> set the given template will be used for the input-file generation for <em>all</em> runs to be fitted&mdash;otherwise the output of the first fit serves as template for the second and so on. The template field stays empty if no fits should be performed!
-</dd> <dt> <font color="#ff0000">6</font> </dt><dd> Activates the <strong>-o&lt;outputFileName&gt;</strong> option if <strong>&lt;outputFileName&gt;</strong> is entered. If nothing is entered the default output file <code><b>out.db</b></code> or <code><b>out.dat</b></code> is used.
-</dd> <dt> <font color="#ff0000">7</font> </dt><dd> If <em>not</em> set, the <strong>noheader</strong> option is passed to <code>msr2data</code>.
-</dd> <dt> <font color="#ff0000">8</font> </dt><dd> If set, the <strong>nosummary</strong> option is passed to <code>msr2data</code>.
-</dd> <dt> <font color="#ff0000">9</font> </dt><dd> If set, the <strong>-k</strong> option is passed to <code>msr2data</code>.
-</dd> <dt> <font color="#ff0000">10</font> </dt><dd> If set, the <strong>data</strong> option is passed to <code>msr2data</code>.
-</dd> <dt> <font color="#ff0000">11</font> </dt><dd> If set, the output file is deleted before <code>msr2data</code> is called. Otherwise the data is appended to the file if it existed before <code>msr2data</code> has been called.
-</dd> <dt> <font color="#ff0000">12</font> </dt><dd> If set, after processing by <code>msr2data</code> all specified msr files are opened in tabs in <code>musrgui</code> / <code>musredit</code>.
-</dd> <dt> <font color="#ff0000">13</font> </dt><dd> If set, the <strong>-t</strong> option is passed to <code>msr2data</code>.
-</dd> <dt> <font color="#ff0000">14</font> </dt><dd> If set, <code>msr2data</code> is called with the option <strong>msr-&lt;template&gt;</strong> (instead of <strong>fit-&lt;template&gt;</strong>) and hence is only producing the msr input files without any fitting.
-</dd> <dt> <font color="#ff0000">15</font> </dt><dd> If set, <code>msr2data</code> is called with the option <strong>fit</strong>, i.e. no template will be used to generate new msr input files; only existing files are fed to <code>musrfit</code>.
-</dd> <dt> <font color="#ff0000">16</font> </dt><dd> If set, <code>msr2data</code> is operating in the <a href="#TheGlobalMode" class="foswikiCurrentTopicLink">global mode</a>.
-</dd> <dt> <font color="#ff0000">17</font> </dt><dd> If set, <code>msr2data</code> is operating in the <a href="#GlobalPlus" class="foswikiCurrentTopicLink">extended global mode</a>.
+<dt> <span class='foswikiRedFG'>1&ndash;3</span> </dt><dd> Choose one of the <a href="#BasicTypesOfUsage" class="foswikiCurrentTopicLink">ways</a> to specify your list of runs.
+</dd> <dt> <span class='foswikiRedFG'>4</span> </dt><dd> Give the file extension here, e.g. <strong>_zf</strong> for files like <code><b>8472_zf.msr</b></code>. If the files do not have an extension this field stays empty. <code>musrgui</code> / <code>musredit</code> take care of passing the <strong>""</strong> to <code>msr2data</code> as mentioned <a href="#NoExtension" class="foswikiCurrentTopicLink">above</a>.
+</dd> <dt> <span class='foswikiRedFG'>5</span> </dt><dd> Activates the <strong>fit-&lt;template&gt;</strong> option if <strong>&lt;template&gt;</strong> is entered. In case the option "Chain Fit" is <em>not</em> set the given template will be used for the input-file generation for <em>all</em> runs to be fitted&mdash;otherwise the output of the first fit serves as template for the second and so on. The template field stays empty if no fits should be performed!
+</dd> <dt> <span class='foswikiRedFG'>6</span> </dt><dd> Activates the <strong>-o&lt;outputFileName&gt;</strong> option if <strong>&lt;outputFileName&gt;</strong> is entered. If nothing is entered the default output file <code><b>out.db</b></code> or <code><b>out.dat</b></code> is used.
+</dd> <dt> <span class='foswikiRedFG'>7</span> </dt><dd> If <em>not</em> set, the <strong>noheader</strong> option is passed to <code>msr2data</code>.
+</dd> <dt> <span class='foswikiRedFG'>8</span> </dt><dd> If set, the <strong>nosummary</strong> option is passed to <code>msr2data</code>.
+</dd> <dt> <span class='foswikiRedFG'>9</span> </dt><dd> If set, the <strong>-k</strong> option is passed to <code>msr2data</code>.
+</dd> <dt> <span class='foswikiRedFG'>10</span> </dt><dd> If set, the <strong>data</strong> option is passed to <code>msr2data</code>.
+</dd> <dt> <span class='foswikiRedFG'>11</span> </dt><dd> If set, the output file is deleted before <code>msr2data</code> is called. Otherwise the data is appended to the file if it existed before <code>msr2data</code> has been called.
+</dd> <dt> <span class='foswikiRedFG'>12</span> </dt><dd> If set, after processing by <code>msr2data</code> all specified msr files are opened in tabs in <code>musrgui</code> / <code>musredit</code>.
+</dd> <dt> <span class='foswikiRedFG'>13</span> </dt><dd> If set, the <strong>-t</strong> option is passed to <code>msr2data</code>.
+</dd> <dt> <span class='foswikiRedFG'>14</span> </dt><dd> If set, <code>msr2data</code> is called with the option <strong>msr-&lt;template&gt;</strong> (instead of <strong>fit-&lt;template&gt;</strong>) and hence is only producing the msr input files without any fitting.
+</dd> <dt> <span class='foswikiRedFG'>15</span> </dt><dd> If set, <code>msr2data</code> is called with the option <strong>fit</strong>, i.e. no template will be used to generate new msr input files; only existing files are fed to <code>musrfit</code>.
+</dd> <dt> <span class='foswikiRedFG'>16</span> </dt><dd> If set, <code>msr2data</code> is operating in the <a href="#TheGlobalMode" class="foswikiCurrentTopicLink">global mode</a>.
+</dd> <dt> <span class='foswikiRedFG'>17</span> </dt><dd> If set, <code>msr2data</code> is operating in the <a href="#GlobalPlus" class="foswikiCurrentTopicLink">extended global mode</a>.
 </dd></dl> 
 <p></p>
 <a name="BugTracking"></a>
@@ -385,39 +385,12 @@ For reporting bugs or requesting new features and improvements please use the <a
 </div>
 </div></div><!-- /endWrap -->
 <p></p>
-<!-- gugus -->
-<div id='peopleIcon' onmouseout='$(this).css("visibility","hidden")'>
-      <img id='peopleIconImg' src='../data/people/information.png'>
-</div>
-<div id='tooltip'>
- <div id='tooltip_inner'>
-	<table id='tooltip_table'>
-		<tr>
-			<td id='tooltip_avatar' rowspan='4'><img id='tooltip_avatar_img' src='../data/people/nobody-100.gif' /></td>
-			<td id='tooltip_username' colspan='2'>Oscar Fridolin</td>
-		</tr>
-		<tr>
-			<td id='tooltip_tel_title'>Telefon:</td>
-			<td id='tooltip_tel'>1234512345</td>
-		</tr>
-		<tr>
-			<td id='tooltip_mail_title'>E-Mail:</td>
-			<td id='tooltip_mail'>oscarfridolin@psi.ch</td>
-		</tr>
-		<tr>
-			<td id='tooltip_office_title'>Büro:</td>
-			<td id='tooltip_office'>WHGA/019</td>
-		</tr>
-	</table>
-	</div>
-</div> <!--9632-->
-<p></p>
 <p></p>
 <p></p>
 <p></p>
 </body>
 
-<!-- Mirrored from intranet.psi.ch/MUSR/Msr2Data?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 29 Mar 2012 14:13:03 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/Msr2Data?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 08 May 2012 05:20:56 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 </html>
 <p></p>

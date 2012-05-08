@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en_US">
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 29 Mar 2012 14:12:46 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 08 May 2012 05:20:37 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 <head>
 <link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
@@ -21,7 +21,7 @@
 <meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
 
 	<link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" /> <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
-	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFitSetup?t=1333030348" type="application/x-wiki" title="edit MusrFitSetup" />
+	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFitSetup?t=1336454415" type="application/x-wiki" title="edit MusrFitSetup" />
 	<meta name="description" content="MusrFitSetup" />
   <base  /><!--[if IE]></base><![endif]-->
 	
@@ -109,7 +109,7 @@ pre {
 </style><![endif]-->
 
 	
-<script src="https://intranet.psi.ch/pub/System/ChecklistPlugin/itemstatechange.js" language="javascript" type="text/javascript"></script><script src="https://intranet.psi.ch/pub/System/TimeTablePlugin/timetabletooltips.js" language="javascript" type="text/javascript"></script><link rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
+<link rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
 </head>
 <body class="foswikiNoJs patternViewPage patternPrintPage">
 <a name="PageTop"></a><div class="foswikiPage"><div id="patternScreen">
@@ -171,7 +171,7 @@ pre {
 <p></p>
 <h1><a name="A_1_Supported_Operating_Systems_and_Software_Requirements"></a> 1  Supported Operating Systems and Software Requirements </h1>
 <p></p>
-This page is intended to demonstrate for the interested user which steps are necessary to set up the <a href="http://www.gnu.org/philosophy/free-sw.html" target="_top">free software</a> &mu;SR data analysis framework <code><a href="MusrFit.html">musrfit</a></code>. While the preferred way is to run the software on <strong>GNU/Linux</strong>, with some restrictions it can also be set up under <strong>MS Windows</strong> and <strong>MacOS X</strong>. <font color="#ff0000">In case <code>musrfit</code> should be installed according to the description found on this page, the user is strongly encouraged to <em>read completely</em> each section dealing with the present installation step <em>before</em> starting the installation process!</font>
+This page is intended to demonstrate for the interested user which steps are necessary to set up the <a href="http://www.gnu.org/philosophy/free-sw.html" target="_top">free software</a> &mu;SR data analysis framework <code><a href="MusrFit.html">musrfit</a></code>. While the preferred way is to run the software on <strong>GNU/Linux</strong>, with some restrictions it can also be set up under <strong>MS Windows</strong> and <strong>MacOS X</strong>. <span class='foswikiRedFG'>In case <code>musrfit</code> should be installed according to the description found on this page, the user is strongly encouraged to <em>read completely</em> each section dealing with the present installation step <em>before</em> starting the installation process!</span>
 <p></p>
 <a name="ReqSw"></a>
 Apart from <a href="http://gcc.gnu.org/" target="_top">GCC, the GNU Compiler Collection</a>, the GNU build tools <a href="http://www.gnu.org/software/autoconf/" target="_top">autoconf</a>, <a href="http://www.gnu.org/software/automake/" target="_top">automake</a> and <a href="http://www.gnu.org/software/libtool/" target="_top">libtool</a> as well as the helper tool <a href="http://pkg-config.freedesktop.org/wiki/" target="_top">pkg-config</a> <code>musrfit</code> requires the installation of a few open-source libraries and programs: <dl>
@@ -183,7 +183,7 @@ Apart from <a href="http://gcc.gnu.org/" target="_top">GCC, the GNU Compiler Col
 </dd></dl> 
 <p></p>
 <a name="ReqSwNeXus"></a>
-Additionally, <font color="#ff0000">only if</font> <code>musrfit</code> should support reading of data files in the <code>NeXus</code> format the following libraries are needed: <dl>
+Additionally, <span class='foswikiRedFG'>only if</span> <code>musrfit</code> should support reading of data files in the <code>NeXus</code> format the following libraries are needed: <dl>
 <dt> <a href="http://www.hdfgroup.org/products/hdf4/" target="_top">HDF4</a> </dt><dd> A library and multi-object file format for storing and managing data.
 </dd> <dt> <a href="http://www.hdfgroup.org/HDF5/" target="_top">HDF5</a> </dt><dd> A data model, library, and file format for storing and managing data.
 </dd> <dt> <a href="http://www.minixml.org/" target="_top">minixml</a> </dt><dd> A small <code>XML</code> library that can be used to read and write <code>XML</code> and <code>XML</code> -like data files. <em>Required version &#8805; 2.2</em>
@@ -227,7 +227,7 @@ In order to obtain some information about the possible options for the installat
 For any further information on the standard installation of software, please refer to the web search engine of choice and ask for "install software on linux"...
 <p></p>
 <h3><a name="A_3.1.2_Installation_of_61_61NeXus_61_61_requirements_40optional_41"></a> 3.1.2  Installation of <code><b>NeXus</b></code> requirements (optional) </h3>
-<font color="#ff0000">Only if</font> <code>musrfit</code> should support reading data files in the <code>NeXus</code> format the further <a href="#ReqSwNeXus" class="foswikiCurrentTopicLink">required</a> software has to be set up. The required libraries and header files could either be available through the user's GNU/Linux distribution or if this is not the case, the packages can be installed from the source code. E.g. on Red Hat-like systems binary packages for <code>MXML</code>, <code>HDF4</code>, and <code>HDF5</code> might be called <code><b>mxml, mxml-devel, hdf, hdf-devel, hdf5, hdf5-devel</b></code>, on Debian-like systems <code><b>libmxml1, libmxml-dev, libhdf4-0, libhdf4-dev, libhdf5-serial-1.8.4, libhdf5-serial-dev</b></code>.
+<span class='foswikiRedFG'>Only if</span> <code>musrfit</code> should support reading data files in the <code>NeXus</code> format the further <a href="#ReqSwNeXus" class="foswikiCurrentTopicLink">required</a> software has to be set up. The required libraries and header files could either be available through the user's GNU/Linux distribution or if this is not the case, the packages can be installed from the source code. E.g. on Red Hat-like systems binary packages for <code>MXML</code>, <code>HDF4</code>, and <code>HDF5</code> might be called <code><b>mxml, mxml-devel, hdf, hdf-devel, hdf5, hdf5-devel</b></code>, on Debian-like systems <code><b>libmxml1, libmxml-dev, libhdf4-0, libhdf4-dev, libhdf5-serial-1.8.4, libhdf5-serial-dev</b></code>.
 <p></p>
 Even though there might exist binary packages for the <code>NeXus</code> library, it is best to build and install it directly from the source code which can be found <a href="http://download.nexusformat.org/kits/" target="_top">here</a>.
 <p></p>
@@ -248,7 +248,7 @@ After one of the two setup variants has been executed the system should be told 
 echo &#34;/opt/root-system/lib&#34; &#62;&#62; /etc/ld.so.conf.d/root-system.conf
 /sbin/ldconfig
 </pre>
-</li> <li> <font color="#ff0000">Additionally</font>, as normal user one should append the following lines to the <strong>~/.bashrc</strong> and/or <strong>~/.bash_profile</strong> (and then either restart the shell or call the same commands once more from the shell) in order to change some path-setting environment variables: <pre class="bash">
+</li> <li> <span class='foswikiRedFG'>Additionally</span>, as normal user one should append the following lines to the <strong>~/.bashrc</strong> and/or <strong>~/.bash_profile</strong> (and then either restart the shell or call the same commands once more from the shell) in order to change some path-setting environment variables: <pre class="bash">
 export ROOTSYS&#61;/opt/root-system/
 export PATH&#61;$ROOTSYS/bin:$PATH
 </pre>
@@ -268,13 +268,13 @@ cd
 svn up musrfit
 </pre>
 <p></p>
-<font color="#ff0000">As an alternative (if subversion is not available)</font>, the source code can also be downloaded and extracted from a tarball.
+<span class='foswikiRedFG'>As an alternative (if subversion is not available)</span>, the source code can also be downloaded and extracted from a tarball.
 <pre class="bash">
 cd
 curl http://savannah.psi.ch/viewcvs/trunk/analysis/musrfit.tar.gz -G --data-binary root&#61;nemu&#37;2Flem &#124; tar xz
 </pre>
 <p></p>
-After the source-code extraction the <strong>autogen.sh</strong> script is called to prepare the build environment. If it has been executed successfully the <strong>configure</strong> script should be ready to collect all the information needed to create the Makefiles. <font color="#ff0000">If <code>musrfit</code> should support <code>NeXus</code> data files this has to be enabled by specifying the <strong>--enable-NeXus</strong> switch when calling <strong>configure</strong>.</font> For an overview of all available options just call <code>./configure --help</code>. Besides the standard options there are a few special options which should be mentioned here:
+After the source-code extraction the <strong>autogen.sh</strong> script is called to prepare the build environment. If it has been executed successfully the <strong>configure</strong> script should be ready to collect all the information needed to create the Makefiles. <span class='foswikiRedFG'>If <code>musrfit</code> should support <code>NeXus</code> data files this has to be enabled by specifying the <strong>--enable-NeXus</strong> switch when calling <strong>configure</strong>.</span> For an overview of all available options just call <code>./configure --help</code>. Besides the standard options there are a few special options which should be mentioned here:
 <p></p> <dl>
 <dt> --prefix </dt><dd> Specify the installation prefix, e.g. /opt/root-system (<em>by default: /usr/local</em>)
 </dd> <dt> --with-rootsys </dt><dd> Specify the top of the <code>ROOT</code> installation directory, e.g. /opt/root-system
@@ -310,7 +310,7 @@ export MUSRFITPATH&#61;/opt/root-system/bin
 <p></p>
 <a name="MusrGuiInstallLinux"></a>
 <h2><a name="A_3.3_61_61musredit_61_61"></a> 3.3  <code><b>musredit</b></code> </h2>
-<font color="#0000ff">In the latest version of <code>musrfit</code> the configure script tries to determine automatically if <code>Qt4.6</code> or higher is set up on the machine. In case this is found, the editor <code>musredit</code> is built already together with <code>musrfit</code>. <em>If not</em>, one can either try to call the configure script with the "--with-qt4" option or install this editor separately:</font>
+<span class='foswikiBlueFG'>In the latest version of <code>musrfit</code> the configure script tries to determine automatically if <code>Qt4.6</code> or higher is set up on the machine. In case this is found, the editor <code>musredit</code> is built already together with <code>musrfit</code>. <em>If not</em>, one can either try to call the configure script with the "--with-qt4" option or install this editor separately:</span>
 <pre class="bash">
 cd src/musredit
 qmake musredit.pro
@@ -339,7 +339,7 @@ musrview test-histo-ROOT-NPP.msr
 <p></p>
 Notes
 <p></p>
-<a name="FootNote1note"></a><span class="FootNoteLabel"><a href="MusrFitSetup.html#FootNote1text" class="foswikiCurrentWebHomeLink"> <strong>1</strong> </a></span>: <span class="FootNote">In case only a single user is working at the machine it might be considerable to change the ownership of the <code>ROOT</code> folder so that the user has easy write access to this directory: <!-- verbatim605 --></span> 
+<a name="FootNote1note"></a><span class="FootNoteLabel"><a href="MusrFitSetup.html#FootNote1text" class="foswikiCurrentWebHomeLink"> <strong>1</strong> </a></span>: <span class="FootNote">In case only a single user is working at the machine it might be considerable to change the ownership of the <code>ROOT</code> folder so that the user has easy write access to this directory: <!-- verbatim5317 --></span> 
 <p></p>
 <a name="FootNote2note"></a><span class="FootNoteLabel"><a href="MusrFitSetup.html#FootNote2text" class="foswikiCurrentWebHomeLink"> <strong>2</strong> </a></span>: <span class="FootNote"> When using <code>GCC</code> &#8805; 4.2 please make sure that the environment variables <strong>USE_PARALLEL_MINUIT2</strong> and <strong>USE_OPENMP</strong> are <em>not</em> set! Otherwise <code>MINUIT2</code> will be compiled with parallelization support and cannot be used together with <code>musrfit</code> afterwards since the <code>musrfit</code> code is <em>not</em> fully thread-safe! When compiled with <code>GCC</code> &#8805; 4.2 <code>musrfit</code> itself will parallelize the &chi;<sup>2</sup> calculation.</span> 
 <p></p>
@@ -351,10 +351,10 @@ Notes
 <p></p>
 <h1><a name="A_4_MS_Windows"></a> 4  MS Windows </h1>
 Under Windows a native installation is not supported but there is the possibility to run <code>musrfit</code> through <a href="http://www.cygwin.com/" target="_top">Cygwin</a> which has the great advantage that one gains additionally various nice <code>UNIX</code> tools also for other purposes <img src="../pub/Main/SmiliesPluginPSI/wink.gif" alt="wink" title="wink" border="0" /> <br>
-<font color="#ff0000">Please also be aware of the fact that the X server which is going to be installed with Cygwin has to be started (e.g. by selecting it from the "Programs" folder) before any graphical application (<code>musrview</code>, <code>musrgui</code>, etc.) is run</font>.
+<span class='foswikiRedFG'>Please also be aware of the fact that the X server which is going to be installed with Cygwin has to be started (e.g. by selecting it from the "Programs" folder) before any graphical application (<code>musrview</code>, <code>musrgui</code>, etc.) is run</span>.
 <p></p>
-<font color="#ff00ff">One more advice: Please never try to install either <code>ROOT</code> or <code>musrfit</code> from or to a directory containing spaces in the absolute path or in case you do, do not wonder if some errors occur!<br>
-msr files, however, might be saved in such directories like ...\My Documents\...</font>
+<span class='foswikiPinkFG'>One more advice: Please never try to install either <code>ROOT</code> or <code>musrfit</code> from or to a directory containing spaces in the absolute path or in case you do, do not wonder if some errors occur!<br>
+msr files, however, might be saved in such directories like ...\My Documents\...</span>
 <p></p>
 <h2><a name="A_4.1_Requirements"></a> 4.1  Requirements </h2>
 <h3><a name="A_4.1.1_Setting_up_Cygwin"></a> 4.1.1  Setting up Cygwin </h3>
@@ -372,9 +372,9 @@ ln -sf /usr/include/boost-x&#95;yy&#95;z/boost /usr/include/boost
 where <strong>x_yy_z</strong> has to be substituted by the correct version number, e.g. <strong>1_33_1</strong>.
 <p></p>
 <h3><a name="A_4.1.2_Installation_of_61_61NeXus_61_61_requirements_40optional_41"></a> 4.1.2  Installation of <code><b>NeXus</b></code> requirements (optional) </h3>
-<font color="#ff0000">Only if</font> <code>musrfit</code> should support reading data files in the <code>NeXus</code> format the further <a href="#ReqSwNeXus" class="foswikiCurrentTopicLink">required</a> software has to be set up. Under Cygwin of all the required libraries only <code>HDF5</code> is available. The packages <code><b>hdf5</b></code> and <code><b>libhdf5-devel</b></code> can be installed through the Cygwin setup. One should also make sure that <code><b>bison</b></code>, <code><b>flex</b></code> and a package containing <nobr><b>/usr/lib/librpc.a</b></nobr> (e.g. <code><b>sunrpc</b></code> = <strong>4.0-3</strong>, <font color="#ff0000">but not</font> <code><b>sunrpc</b></code> = <strong>4.0-4</strong>) are installed.
+<span class='foswikiRedFG'>Only if</span> <code>musrfit</code> should support reading data files in the <code>NeXus</code> format the further <a href="#ReqSwNeXus" class="foswikiCurrentTopicLink">required</a> software has to be set up. Under Cygwin of all the required libraries only <code>HDF5</code> is available. The packages <code><b>hdf5</b></code> and <code><b>libhdf5-devel</b></code> can be installed through the Cygwin setup. One should also make sure that <code><b>bison</b></code>, <code><b>flex</b></code> and a package containing <nobr><b>/usr/lib/librpc.a</b></nobr> (e.g. <code><b>sunrpc</b></code> = <strong>4.0-3</strong>, <span class='foswikiRedFG'>but not</span> <code><b>sunrpc</b></code> = <strong>4.0-4</strong>) are installed.
 <p></p>
-All other libraries have to be built from the sources. The following lines will track the installation of <code>JPEG</code> <strong>6b</strong>, <code>MXML</code> <strong>2.5</strong>, <code>HDF</code> <strong>4.2.5</strong>, and <code>NeXus</code> <strong>4.2.1</strong>. The version numbers and source-code locations might of course change with time but should be easily adjustable.
+All other libraries have to be built from the sources. The following lines will track the installation of <code>JPEG</code> <strong>6b</strong>, <code>MXML</code> <strong>2.5</strong>, <code>HDF</code> <strong>4.2.7-patch1</strong>, and <code>NeXus</code> <strong>4.2.1</strong>. The version numbers and source-code locations might of course change with time but should be easily adjustable.
 <pre class="bash">
 cd
 mkdir nexus
@@ -391,8 +391,8 @@ cd mxml-2.5
 make
 make install
 cd ..
-curl http://www.hdfgroup.org/ftp/HDF/HDF&#95;Current/src/hdf-4.2.5.tar.gz -G &#124; tar xz
-cd hdf-4.2.5
+curl http://www.hdfgroup.org/ftp/HDF/HDF&#95;Current/src/hdf-4.2.7-patch1.tar.gz -G &#124; tar xz
+cd hdf-4.2.7-patch1
 ./configure --prefix&#61;/usr/local --enable-static --disable-fortran --with-jpeg&#61;/usr/local
 make
 make install
@@ -406,7 +406,7 @@ make install
 <p></p>
 <h3><a name="A_4.1.3_61_61ROOT_61_61"></a> 4.1.3  <code><b>ROOT</b></code> </h3>
 In order to install the <code>ROOT</code> system, there are two possibilities: <ul>
-<li> Download the precompiled <strong>Cygwin GCC 4.3</strong> package of the most recent <code>ROOT</code> version from the <a href="http://root.cern.ch/drupal/content/downloading-root" target="_top">web page</a> and unpack it <font color="#ff0000">in a Cygwin shell</font> (in order to get the line endings correctly) at the final location. Suppose the package has been downloaded to <strong>C:\</strong> and the <code>ROOT</code> tree should be in <strong>C:\root</strong>, this is achieved by:<pre class="bash">
+<li> Download the precompiled <strong>Cygwin GCC 4.3</strong> package of the most recent <code>ROOT</code> version from the <a href="http://root.cern.ch/drupal/content/downloading-root" target="_top">web page</a> and unpack it <span class='foswikiRedFG'>in a Cygwin shell</span> (in order to get the line endings correctly) at the final location. Suppose the package has been downloaded to <strong>C:\</strong> and the <code>ROOT</code> tree should be in <strong>C:\root</strong>, this is achieved by:<pre class="bash">
 cd /cygdrive/c
 tar xzf root&#95;v5.xx.yy.win32gcc-gcc-4.3.tar.gz
 </pre>
@@ -443,13 +443,13 @@ cd
 svn up musrfit
 </pre>
 <p></p>
-<font color="#ff0000">As an alternative (if subversion is not available)</font>, the source code can also be downloaded and extracted from a tarball.
+<span class='foswikiRedFG'>As an alternative (if subversion is not available)</span>, the source code can also be downloaded and extracted from a tarball.
 <pre class="bash">
 cd
 curl http://savannah.psi.ch/viewcvs/trunk/analysis/musrfit.tar.gz -G --data-binary root&#61;nemu&#37;2Flem &#124; tar xz
 </pre>
 <p></p>
-After the source-code extraction the <strong>autogen.sh</strong> script is called to prepare the build environment. If it has been executed successfully the <strong>configure</strong> script should be ready to collect all the information needed to create the Makefiles. <font color="#ff0000">If <code>musrfit</code> should support <code>NeXus</code> data files this has to be enabled by specifying the <nobr><b>--enable-static</b></nobr> <nobr><b>--enable-NeXus</b></nobr> switches when calling <strong>configure</strong>.</font> For an overview of all available options just call <code>./configure --help</code>. Besides the standard options there are a few special options which should be mentioned here:
+After the source-code extraction the <strong>autogen.sh</strong> script is called to prepare the build environment. If it has been executed successfully the <strong>configure</strong> script should be ready to collect all the information needed to create the Makefiles. <span class='foswikiRedFG'>If <code>musrfit</code> should support <code>NeXus</code> data files this has to be enabled by specifying the <nobr><b>--enable-static</b></nobr> <nobr><b>--enable-NeXus</b></nobr> switches when calling <strong>configure</strong>.</span> For an overview of all available options just call <code>./configure --help</code>. Besides the standard options there are a few special options which should be mentioned here:
 <p></p> <dl>
 <dt> --prefix </dt><dd> Specify the installation prefix, e.g. /opt/root-system (<em>by default: /usr/local</em>)
 </dd> <dt> --with-rootsys </dt><dd> Specify the top of the <code>ROOT</code> installation directory, e.g. /opt/root-system
@@ -479,7 +479,7 @@ In order to finish the installation of <code>musrfit</code> the paths where <cod
 <p></p>
 <a name="MusrEditInstallCygwin"></a>
 <h2><a name="A_4.3_61_61musredit_61_61"></a> 4.3  <code><b>musredit</b></code> </h2>
-<font color="#0000ff">In the latest version of <code>musrfit</code> the configure script tries to determine automatically if <code>Qt4.5</code> or higher is set up on the machine. In case this is found, the editor <code>musredit</code> is built already together with <code>musrfit</code>. <em>If not</em>, one can either try to call the configure script with the "--with-qt4" option or install this editor separately:</font>
+<span class='foswikiBlueFG'>In the latest version of <code>musrfit</code> the configure script tries to determine automatically if <code>Qt4.5</code> or higher is set up on the machine. In case this is found, the editor <code>musredit</code> is built already together with <code>musrfit</code>. <em>If not</em>, one can either try to call the configure script with the "--with-qt4" option or install this editor separately:</span>
 <pre class="bash">
 cd src/musredit
 qmake-qt4 musredit.pro
@@ -524,7 +524,7 @@ C:\cygwin\bin\ash.exe /bin/rebaseall
 If this does not resolve the problem, try to change the compatibility settings of <strong>C:\cygwin\bin\sh.exe</strong> and <strong>C:\cygwin\bin\bash.exe</strong> so that they are executed with administrator privileges.
 <p></p>
 <h1><a name="A_5_Mac_OS_X"></a> 5  Mac OS X </h1>
-With Mac OS X the situation is up to some extent similar like on MS Windows but still different since Mac OS X is a UNIX system. The similarity is that also on OS X a helping framework&mdash;<i>either</i> <code><a href="http://www.macports.org/" target="_top">MacPorts</a></code> <em>or</em> <code><a href="http://www.finkproject.org/" target="_top">Fink</a></code>&mdash;which provides open-source software is employed to fulfill the basic software requirements of <code>musrfit</code>. <font color="#ff0000">In the following, both possibilities (using <code>MacPorts</code> or <code>Fink</code>) are described but it is emphasized here that it should be followed <em>only one of the possible routes</em>.</font>
+With Mac OS X the situation is up to some extent similar like on MS Windows but still different since Mac OS X is a UNIX system. The similarity is that also on OS X a helping framework&mdash;<i>either</i> <code><a href="http://www.macports.org/" target="_top">MacPorts</a></code> <em>or</em> <code><a href="http://www.finkproject.org/" target="_top">Fink</a></code>&mdash;which provides open-source software is employed to fulfill the basic software requirements of <code>musrfit</code>. <span class='foswikiRedFG'>In the following, both possibilities (using <code>MacPorts</code> or <code>Fink</code>) are described but it is emphasized here that it should be followed <em>only one of the possible routes</em>.</span>
 <p></p>
 <h2><a name="A_5.1_Requirements_40_61_61MacPorts_61_61_41"></a> 5.1  Requirements (<code><b>MacPorts</b></code>) </h2>
 <h3><a name="A_5.1.1_Everything_but_61_61ROOT_61_61_and_61_61NeXus_61_61"></a> 5.1.1  Everything but <code><b>ROOT</b></code> and <code><b>NeXus</b></code> </h3>
@@ -561,7 +561,7 @@ Under OS X 10.6 Snow Leopard it will not be possible to install <code><b>qt3-mac
 <p></p>
 <h3><a name="A_5.1.2_Installation_of_61_61NeXus_61_61_requirements_40optional_41"></a> 5.1.2  Installation of <code><b>NeXus</b></code> requirements (optional) </h3>
 <p></p>
-<font color="#ff0000">Only if</font> <code>musrfit</code> should support reading data files in the <code>NeXus</code> format the further <a href="#ReqSwNeXus" class="foswikiCurrentTopicLink">required</a> packages are set up:
+<span class='foswikiRedFG'>Only if</span> <code>musrfit</code> should support reading data files in the <code>NeXus</code> format the further <a href="#ReqSwNeXus" class="foswikiCurrentTopicLink">required</a> packages are set up:
 <pre class="bash">
 sudo port -v install jpeg6b hdf4 hdf5-18
 </pre>
@@ -591,7 +591,7 @@ make
 </pre>
 </li></ul> 
 <p></p>
-In order to finalize the <code>ROOT</code> installation and to prepare already the installation of <code>musrfit</code> and <code>musrgui</code> / <code>musredit</code> this is a good time for setting necessary environment variables for the use in Mac OS X. Put the following lines (without the comments in parentheses and with the paths adjusted to your local installation) into the file <strong>~/.MacOSX/environment.plist</strong> and <font color="#ff0000">re-login</font>:<br>
+In order to finalize the <code>ROOT</code> installation and to prepare already the installation of <code>musrfit</code> and <code>musrgui</code> / <code>musredit</code> this is a good time for setting necessary environment variables for the use in Mac OS X. Put the following lines (without the comments in parentheses and with the paths adjusted to your local installation) into the file <strong>~/.MacOSX/environment.plist</strong> and <span class='foswikiRedFG'>re-login</span>:<br>
 <pre class="html">
 &#60;?xml version&#61;&#34;1.0&#34; encoding&#61;&#34;UTF-8&#34;?&#62;
 &#60;!DOCTYPE plist PUBLIC &#34;-//Apple//DTD PLIST 1.0//EN&#34; &#34;http://www.apple.com/DTDs/PropertyList-1.0.dtd&#34;&#62;
@@ -635,7 +635,7 @@ The <code>Fink</code> installer package also contains a graphical user interface
 <p></p>
 Under OS X 10.6 Snow Leopard it will not be possible to install <code><b>qt3mac</b></code> since the system is by default a 64-bit system and the old <code><b>qt3-mac</b></code> depends on software which is only available for 32-bit systems. It is suggested to install <code><b>qt4mac</b></code> instead and use <code>musredit</code>.
 <p></p>
-Also, due to some not fulfilled dependencies, it might not be possible to install FFTW3 through Fink. In this case (<font color="#ff0000">and ONLY in THIS case</font>) simply download the FFTW3 source code from <a href="http://www.fftw.org/download.html" target="_top">its download page</a> and install it from a terminal using the following commands (for the FFTW version 3.x.y):
+Also, due to some not fulfilled dependencies, it might not be possible to install FFTW3 through Fink. In this case (<span class='foswikiRedFG'>and ONLY in THIS case</span>) simply download the FFTW3 source code from <a href="http://www.fftw.org/download.html" target="_top">its download page</a> and install it from a terminal using the following commands (for the FFTW version 3.x.y):
 <pre class="bash">
 tar xz fftw-3.x.y
 cd fftw-3.x.y
@@ -652,7 +652,7 @@ where <strong>x_yy_z</strong> has to be substituted by the correct version numbe
 <p></p>
 <h3><a name="A_5.2.2_Installation_of_61_61NeXus_61_61_requirements_40optional_41"></a> 5.2.2  Installation of <code><b>NeXus</b></code> requirements (optional) </h3>
 <p></p>
-<font color="#ff0000">Only if</font> <code>musrfit</code> should support reading data files in the <code>NeXus</code> format the further <a href="#ReqSwNeXus" class="foswikiCurrentTopicLink">required</a> packages can be installed through <code>Fink</code>:
+<span class='foswikiRedFG'>Only if</span> <code>musrfit</code> should support reading data files in the <code>NeXus</code> format the further <a href="#ReqSwNeXus" class="foswikiCurrentTopicLink">required</a> packages can be installed through <code>Fink</code>:
 <p></p>
 <code><b>libjpeg hdf hdf5-18 hdf5-18-shlibs</b></code>
 <p></p>
@@ -683,7 +683,7 @@ make
 </li> <li> <code>ROOT</code> is also available through the <code>FinkCommander</code>! Install <strong>root5</strong> or <strong>root5-devel</strong>. However, this versions also have to be compiled locally since there are no binary packages. The manual installation mentioned right above should be preferred in this case.
 </li></ul> 
 <p></p>
-In order to finalize the <code>ROOT</code> installation and to prepare already the installation of <code>musrfit</code> and <code>musrgui</code> / <code>musredit</code> this is a good time for setting necessary environment variables for the use in Mac OS X. Put the following lines (without the comments in parentheses and with the paths adjusted to your local installation) into the file <strong>~/.MacOSX/environment.plist</strong> and <font color="#ff0000">re-login</font>:<br>
+In order to finalize the <code>ROOT</code> installation and to prepare already the installation of <code>musrfit</code> and <code>musrgui</code> / <code>musredit</code> this is a good time for setting necessary environment variables for the use in Mac OS X. Put the following lines (without the comments in parentheses and with the paths adjusted to your local installation) into the file <strong>~/.MacOSX/environment.plist</strong> and <span class='foswikiRedFG'>re-login</span>:<br>
 <pre class="html">
 &#60;?xml version&#61;&#34;1.0&#34; encoding&#61;&#34;UTF-8&#34;?&#62;
 &#60;!DOCTYPE plist PUBLIC &#34;-//Apple//DTD PLIST 1.0//EN&#34; &#34;http://www.apple.com/DTDs/PropertyList-1.0.dtd&#34;&#62;
@@ -718,13 +718,13 @@ cd
 svn up musrfit
 </pre>
 <p></p>
-<font color="#ff0000">As an alternative (if subversion is not available)</font>, the source code can also be downloaded and extracted from a tarball.
+<span class='foswikiRedFG'>As an alternative (if subversion is not available)</span>, the source code can also be downloaded and extracted from a tarball.
 <pre class="bash">
 cd
 curl http://savannah.psi.ch/viewcvs/trunk/analysis/musrfit.tar.gz -G --data-binary root&#61;nemu&#37;2Flem &#124; tar xz
 </pre>
 <p></p>
-After the source-code extraction the <strong>autogen.sh</strong> script is called to prepare the build environment. If it has been executed successfully the <strong>configure</strong> script should be ready to collect all the information needed to create the Makefiles. <font color="#ff0000">If <code>musrfit</code> should support <code>NeXus</code> data files this has to be enabled by specifying the <strong>--enable-NeXus</strong> switch when calling <strong>configure</strong>.</font> For an overview of all available options just call <code>./configure --help</code>. Besides the standard options there are a few special options which should be mentioned here:
+After the source-code extraction the <strong>autogen.sh</strong> script is called to prepare the build environment. If it has been executed successfully the <strong>configure</strong> script should be ready to collect all the information needed to create the Makefiles. <span class='foswikiRedFG'>If <code>musrfit</code> should support <code>NeXus</code> data files this has to be enabled by specifying the <strong>--enable-NeXus</strong> switch when calling <strong>configure</strong>.</span> For an overview of all available options just call <code>./configure --help</code>. Besides the standard options there are a few special options which should be mentioned here:
 <p></p> <dl>
 <dt> --prefix </dt><dd> Specify the installation prefix, e.g. /opt/root-system (<em>by default: /usr/local</em>)
 </dd> <dt> --with-rootsys </dt><dd> Specify the top of the <code>ROOT</code> installation directory, e.g. /opt/root-system
@@ -754,7 +754,7 @@ In order to finish the installation of <code>musrfit</code> the paths where <cod
 <p></p>
 <a name="MusrGuiInstall"></a>
 <h2><a name="A_5.4_61_61musredit_61_61"></a> 5.4  <code><b>musredit</b></code> </h2>
-<font color="#0000ff">In the latest version of <code>musrfit</code> the configure script tries to determine automatically if <code>Qt4.5</code> or higher is set up on the machine. In case this is found, the editor <code>musredit</code> is built already together with <code>musrfit</code>. <em>If not</em>, one can either try to call the configure script with the "--with-qt4" option or install this editor separately:</font>
+<span class='foswikiBlueFG'>In the latest version of <code>musrfit</code> the configure script tries to determine automatically if <code>Qt4.5</code> or higher is set up on the machine. In case this is found, the editor <code>musredit</code> is built already together with <code>musrfit</code>. <em>If not</em>, one can either try to call the configure script with the "--with-qt4" option or install this editor separately:</span>
 <pre class="bash">
 cd src/musredit
 qmake musredit.pro
@@ -818,39 +818,12 @@ musrview test-histo-ROOT-NPP.msr
 </div>
 </div></div><!-- /endWrap -->
 <p></p>
-<!-- gugus -->
-<div id='peopleIcon' onmouseout='$(this).css("visibility","hidden")'>
-      <img id='peopleIconImg' src='../data/people/information.png'>
-</div>
-<div id='tooltip'>
- <div id='tooltip_inner'>
-	<table id='tooltip_table'>
-		<tr>
-			<td id='tooltip_avatar' rowspan='4'><img id='tooltip_avatar_img' src='../data/people/nobody-100.gif' /></td>
-			<td id='tooltip_username' colspan='2'>Oscar Fridolin</td>
-		</tr>
-		<tr>
-			<td id='tooltip_tel_title'>Telefon:</td>
-			<td id='tooltip_tel'>1234512345</td>
-		</tr>
-		<tr>
-			<td id='tooltip_mail_title'>E-Mail:</td>
-			<td id='tooltip_mail'>oscarfridolin@psi.ch</td>
-		</tr>
-		<tr>
-			<td id='tooltip_office_title'>Büro:</td>
-			<td id='tooltip_office'>WHGA/019</td>
-		</tr>
-	</table>
-	</div>
-</div> <!--2490-->
-<p></p>
 <p></p>
 <p></p>
 <p></p>
 </body>
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 29 Mar 2012 14:12:46 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 08 May 2012 05:20:38 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 </html>
 <p></p>

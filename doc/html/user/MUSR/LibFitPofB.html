@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en_US">
 
-<!-- Mirrored from intranet.psi.ch/MUSR/LibFitPofB?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 29 Mar 2012 14:13:03 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/LibFitPofB?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 08 May 2012 05:20:56 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 <head>
 <link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
@@ -21,7 +21,7 @@
 <meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
 
 	<link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" /> <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
-	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/LibFitPofB?t=1333030351" type="application/x-wiki" title="edit LibFitPofB" />
+	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/LibFitPofB?t=1336454419" type="application/x-wiki" title="edit LibFitPofB" />
 	<meta name="description" content="LibFitPofB" />
   <base  /><!--[if IE]></base><![endif]-->
 	
@@ -109,7 +109,7 @@ pre {
 </style><![endif]-->
 
 	
-<script src="https://intranet.psi.ch/pub/System/ChecklistPlugin/itemstatechange.js" language="javascript" type="text/javascript"></script><script src="https://intranet.psi.ch/pub/System/TimeTablePlugin/timetabletooltips.js" language="javascript" type="text/javascript"></script><link rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
+<link rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
 </head>
 <body class="foswikiNoJs patternViewPage patternPrintPage">
 <a name="PageTop"></a><div class="foswikiPage"><div id="patternScreen">
@@ -147,13 +147,13 @@ where <img alt="\gamma&#95;{\mu} &#61; 2\pi\times 135.54~\mathrm{MHz/T}" class="
 At the moment the only available implementations deal with field distributions measured in local isotropic superconductors, either by means of <a href="http://lmu.web.psi.ch/lem/" target="_top">low-energy &mu;SR</a> in the Meissner state or by conventional &mu;SR in the mixed state. In the following the basic usage of the library in <code>musrfit</code> is explained&mdash;the calculations by themselves are only outlined. For further information please refer to the original literature and/or the source code of the implementation.
 <p></p>
 <hr />
-<strong><font color="#000000">Remark 1:</font></strong> In order to supply certain information needed for the calculations but not suited to be stored in the <code>musrfit</code> msr files an XML configuration file in the working directory is used. For details, see <a href="#XmlFile" class="foswikiCurrentTopicLink">below</a>.
+<strong><span class='foswikiBlackFG'>Remark 1:</span></strong> In order to supply certain information needed for the calculations but not suited to be stored in the <code>musrfit</code> msr files an XML configuration file in the working directory is used. For details, see <a href="#XmlFile" class="foswikiCurrentTopicLink">below</a>.
 <p></p>
-<strong><font color="#000000">Remark 2:</font></strong> The implementations in this library heavily rely on <code><a href="http://www.fftw.org/" target="_top">FFTW3</a></code>. In principle, it always checks what is the best way to do efficient Fourier transforms for a given machine before the transforms are actually done. If repeatedly Fourier transforms of the same (sizable) length should be done, it might be worth storing the once obtained information in an external file and just load it the next time this information is needed (<a href="http://fftw.org/fftw3_doc/Wisdom.html" target="_top">"wisdom handling"</a>). In case this feature shall be used, a valid wisdom file has to be specified in the <a href="#XmlFile" class="foswikiCurrentTopicLink">XML file</a>.
+<strong><span class='foswikiBlackFG'>Remark 2:</span></strong> The implementations in this library heavily rely on <code><a href="http://www.fftw.org/" target="_top">FFTW3</a></code>. In principle, it always checks what is the best way to do efficient Fourier transforms for a given machine before the transforms are actually done. If repeatedly Fourier transforms of the same (sizable) length should be done, it might be worth storing the once obtained information in an external file and just load it the next time this information is needed (<a href="http://fftw.org/fftw3_doc/Wisdom.html" target="_top">"wisdom handling"</a>). In case this feature shall be used, a valid wisdom file has to be specified in the <a href="#XmlFile" class="foswikiCurrentTopicLink">XML file</a>.
 <p></p>
-<strong><font color="#000000">Remark 3:</font></strong> The model functions described in the following do generally not behave nicely in conjunction with <code>MINUIT</code> function minimizations (or maximizations). The analysis process at the moment in most cases involves some tedious <em>trial-and-error</em> procedure, where the displayed <code>MINUIT</code> information as always deserves attention. This is especially true if small effects should be analyzed (e.g. small diamagnetic shifts in superconductors). The parameter uncertainty in many cases has to be estimated independently. Due to these limitations, also the use of the fit option of <code><a href="Msr2Data.html">msr2data</a></code> cannot be advised.
+<strong><span class='foswikiBlackFG'>Remark 3:</span></strong> The model functions described in the following do generally not behave nicely in conjunction with <code>MINUIT</code> function minimizations (or maximizations). The analysis process at the moment in most cases involves some tedious <em>trial-and-error</em> procedure, where the displayed <code>MINUIT</code> information as always deserves attention. This is especially true if small effects should be analyzed (e.g. small diamagnetic shifts in superconductors). The parameter uncertainty in many cases has to be estimated independently. Due to these limitations, also the use of the fit option of <code><a href="Msr2Data.html">msr2data</a></code> cannot be advised.
 <p></p>
-<strong><font color="#000000">Remark 4:</font></strong> If these classes still prove useful and results obtained through them are part of scientific publications,
+<strong><span class='foswikiBlackFG'>Remark 4:</span></strong> If these classes still prove useful and results obtained through them are part of scientific publications,
 an acknowledgement of the use of the library is appreciated.
 <p></p>
 <h1><a name="A_2_LE_45SR"></a> 2  LE-&mu;SR </h1>
@@ -281,7 +281,7 @@ where <img alt="\mathbf{r}&#61;(x,y)" class="mmpImage" src="../pub/MUSR/LibFitPo
 </dd></dl> 
 Apart from the mentioned analytical models the <strong>numerical Ginzburg-Landau model</strong> <a name="FootNote5text"></a><span class="FootNoteTextLink" title="E.H. Brandt, <a href="http://dx.doi.org/10.1103/PhysRevB.68.054506" target="_top">Phys. Rev. B <strong>68</strong>, 054506 (2003)</a>."><a href="#FootNote5note" class="foswikiCurrentTopicLink">(5)</a></span> is available. In this case <img alt="B(\mathbf{r})" class="mmpImage" src="../pub/MUSR/LibFitPofB/_MathModePlugin_373e9bf1fc97e2c6aacf93bcc090402c.png" title="BofR" /> is obtained by an iterative minimization of the free energy of the vortex lattice.
 <p></p>
-<font color="#ff0000">Concerning the applicability (e.g. field regions) of each of the mentioned models please refer to the original publications!</font>
+<span class='foswikiRedFG'>Concerning the applicability (e.g. field regions) of each of the mentioned models please refer to the original publications!</span>
 <p></p>
 At the moment, the calculation of the field distribution has been implemented for triangular flux-line lattices. The number of grid lines in which the inter-vortex distance is divided for the calculations to be specified through the <a href="#XmlFile" class="foswikiCurrentTopicLink">XML file</a>.<br>The muon-spin depolarization functions finally are calculated using the following lines in the THEORY block of a <code>musrfit</code> msr file: <dl>
 <dt> 2D triangular vortex lattice, London model with Gaussian cutoff </dt><dd> <pre>
@@ -328,7 +328,7 @@ The parameters are: <ol>
 </li> <li> Ginzburg-Landau coherence length (nm)
 </li></ol> 
 <p></p>
-<strong><font color="#000000">Remark:</font></strong> In order to improve the convergence of <code>MIGRAD</code> it has proven useful to use the log-likelihood maximization instead of the &chi;<sup>2</sup> minimization routines and to choose sufficiently large initial steps for the parameters. Calling <code>MINOS</code> in conjunction with these functions is futile.<br>Therefore, the <a href="MusrFit.html#TheCommandsBlock">COMMANDS block</a> of the msr file could look like:
+<strong><span class='foswikiBlackFG'>Remark:</span></strong> In order to improve the convergence of <code>MIGRAD</code> it has proven useful to use the log-likelihood maximization instead of the &chi;<sup>2</sup> minimization routines and to choose sufficiently large initial steps for the parameters. Calling <code>MINOS</code> in conjunction with these functions is futile.<br>Therefore, the <a href="MusrFit.html#TheCommandsBlock">COMMANDS block</a> of the msr file could look like:
 <pre>
 COMMANDS
 STRATEGY 0
@@ -368,7 +368,7 @@ Notes
 <dt> &lt;data_path&gt;DATA_PATH_PREFIX&lt;/data_path&gt; </dt><dd> specify the <strong>DATA_PATH_PREFIX</strong> to the <code>TRIM.SP</code> implantation profiles (inside a &lt;LEM&gt; environment)
 </dd> <dt> &lt;N_theory&gt;N_THEORY&lt;/N_theory&gt; </dt><dd> specify the number of points <strong>N_THEORY</strong> for which <i>B</i>(<i>z</i>) is calculated (inside a &lt;LEM&gt; environment)<br>The specification of this number is not needed if the calculation of the inverse of <i>B</i>(<i>z</i>) is implemented!
 </dd> <dt> &lt;energy_list&gt;&lt;/energy_list&gt; </dt><dd> set the energies for which <code>TRIM.SP</code> implantation profiles are available (inside a &lt;LEM&gt; environment) <dl>
-<dt> &lt;energy_label&gt;LABEL&lt;/energy_label&gt; </dt><dd> specify the <strong>LABEL</strong> within the file name of a available <code>TRIM.SP</code> RGE file (inside a &lt;energy_list&gt; environment)<br><font color="#0000ff">The expected name of the RGE file will be: <strong>DATA_PATH_PREFIX</strong> + <strong>LABEL</strong> + .rge</font>
+<dt> &lt;energy_label&gt;LABEL&lt;/energy_label&gt; </dt><dd> specify the <strong>LABEL</strong> within the file name of a available <code>TRIM.SP</code> RGE file (inside a &lt;energy_list&gt; environment)<br><span class='foswikiBlueFG'>The expected name of the RGE file will be: <strong>DATA_PATH_PREFIX</strong> + <strong>LABEL</strong> + .rge</span>
 </dd> <dt> &lt;energy&gt;E&lt;/energy&gt; </dt><dd> specify the muon energy <strong>E</strong> (in <strong>keV</strong>) belonging to the <code>TRIM.SP</code> RGE file given above (inside a &lt;energy_list&gt; environment)
 </dd></dl> 
 </dd></dl> 
@@ -420,39 +420,12 @@ An example XML file looks as follows:
 </div>
 </div></div><!-- /endWrap -->
 <p></p>
-<!-- gugus -->
-<div id='peopleIcon' onmouseout='$(this).css("visibility","hidden")'>
-      <img id='peopleIconImg' src='../data/people/information.png'>
-</div>
-<div id='tooltip'>
- <div id='tooltip_inner'>
-	<table id='tooltip_table'>
-		<tr>
-			<td id='tooltip_avatar' rowspan='4'><img id='tooltip_avatar_img' src='../data/people/nobody-100.gif' /></td>
-			<td id='tooltip_username' colspan='2'>Oscar Fridolin</td>
-		</tr>
-		<tr>
-			<td id='tooltip_tel_title'>Telefon:</td>
-			<td id='tooltip_tel'>1234512345</td>
-		</tr>
-		<tr>
-			<td id='tooltip_mail_title'>E-Mail:</td>
-			<td id='tooltip_mail'>oscarfridolin@psi.ch</td>
-		</tr>
-		<tr>
-			<td id='tooltip_office_title'>Büro:</td>
-			<td id='tooltip_office'>WHGA/019</td>
-		</tr>
-	</table>
-	</div>
-</div> <!--1754-->
-<p></p>
 <p></p>
 <p></p>
 <p></p>
 </body>
 
-<!-- Mirrored from intranet.psi.ch/MUSR/LibFitPofB?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 29 Mar 2012 14:13:09 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/LibFitPofB?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 08 May 2012 05:21:02 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 </html>
 <p></p>

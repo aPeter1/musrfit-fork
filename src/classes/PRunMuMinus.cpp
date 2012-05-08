@@ -84,7 +84,7 @@ PRunMuMinus::~PRunMuMinus()
 // CalcChiSquare
 //--------------------------------------------------------------------------
 /**
- * <p>Calculate chi-square. <b>(Not yet implemented)</b>
+ * <p>Calculate chi-square.
  *
  * <b>return:</b>
  * - chisq value
@@ -139,7 +139,7 @@ Double_t PRunMuMinus::CalcChiSquare(const std::vector<Double_t>& par)
 // CalcChiSquareExpected (public)
 //--------------------------------------------------------------------------
 /**
- * <p>Calculate expected chi-square. Currently not implemented.
+ * <p>Calculate expected chi-square.
  *
  * <b>return:</b>
  * - chisq value == 0.0
@@ -196,7 +196,7 @@ Double_t PRunMuMinus::CalcChiSquareExpected(const std::vector<Double_t>& par)
 // CalcMaxLikelihood
 //--------------------------------------------------------------------------
 /**
- * <p>Calculate log max-likelihood. <b>(Not yet implemented)</b>
+ * <p>Calculate log max-likelihood.
  *
  * <b>return:</b>
  * - log max-likelihood value
@@ -296,7 +296,7 @@ void PRunMuMinus::CalcNoOfFitBins()
 // CalcTheory
 //--------------------------------------------------------------------------
 /**
- * <p>Calculate theory for a given set of fit-parameters. <b>(Not yet implemented)</b>
+ * <p>Calculate theory for a given set of fit-parameters.
  */
 void PRunMuMinus::CalcTheory()
 {

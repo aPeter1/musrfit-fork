@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en_US">
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 29 Mar 2012 14:12:47 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 08 May 2012 05:20:38 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 <head>
 <link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
@@ -21,7 +21,7 @@
 <meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
 
 	<link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" /> <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
-	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1333030349" type="application/x-wiki" title="edit MusrFit" />
+	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1336454417" type="application/x-wiki" title="edit MusrFit" />
 	<meta name="description" content="MusrFit" />
   <base  /><!--[if IE]></base><![endif]-->
 	
@@ -109,7 +109,7 @@ pre {
 </style><![endif]-->
 
 	
-<script src="https://intranet.psi.ch/pub/System/ChecklistPlugin/itemstatechange.js" language="javascript" type="text/javascript"></script><script src="https://intranet.psi.ch/pub/System/TimeTablePlugin/timetabletooltips.js" language="javascript" type="text/javascript"></script><link rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
+<link rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
 </head>
 <body class="foswikiNoJs patternViewPage patternPrintPage">
 <a name="PageTop"></a><div class="foswikiPage"><div id="patternScreen">
@@ -156,7 +156,7 @@ pre {
 </li> <li> <a href="MusrFit.html#A_5_The_Fit_Types"> 5  The Fit Types </a> <ul>
 <li> <a href="MusrFit.html#A_5.1_Single_Histogram_Fit"> 5.1  Single Histogram Fit </a>
 </li> <li> <a href="MusrFit.html#A_5.2_Asymmetry_Fit"> 5.2  Asymmetry Fit </a>
-</li> <li> <a href="MusrFit.html#A_5.3_Rotating_45Reference_45Frame_Asymmetry_Fit"> 5.3  Rotating-Reference-Frame Asymmetry Fit </a>
+</li> <li> <a href="MusrFit.html#A_5.3_Negative_Muon_SR_Fit"> 5.3  Negative Muon &mu;SR Fit </a>
 </li> <li> <a href="MusrFit.html#A_5.4_Non_45SR_Fit"> 5.4  Non-&mu;SR Fit </a>
 </li></ul> 
 </li> <li> <a href="MusrFit.html#A_6_User_Functions"> 6  User Functions </a> <ul>
@@ -183,6 +183,7 @@ If called from within a shell it accepts several parameters: <dl>
 </dd> <dt> -c, --chisq-only </dt><dd> Instead of fitting the model, <code>musrfit</code> calculates &#967;<sup>2</sup> only once and sends the result to the standard output if called with this option. This might be useful for the adjustment of the initial values of the fit parameters.
 </dd> <dt> -t, --title-from-data-file </dt><dd> If this option is given <code>musrfit</code> will replace the title in the <strong>&lt;msr_file&gt;</strong> by the run title in the data file of the first run appearing in a RUN block. In case there is no run title in the data file no substitution is done.
 </dd> <dt> --dump &lt;type&gt; </dt><dd> is writing a data file with the fit data and the theory; <strong>&lt;type&gt;</strong> can be <strong>ascii</strong> (data in columns) or <strong>root</strong> (data in <code>ROOT</code> histograms)
+</dd> <dt> --timeout &lt;timeout_tag&gt; </dt><dd> overwrites the predefined timeout tag 'none'. &lt;timeout_tag&gt;='none' means the timeout facility is not enabled. &lt;timeout_tag&gt; = <code>nn</code> will set the timeout to <code>nn</code> (sec). If during a fit this timeout is reached, <code>musrfit</code> will terminate. This is used to prevent orphan musrfit process to jam the system.
 </dd> <dt> --help </dt><dd> displays a small help notice in the shell explaining the basic usage of the program
 </dd> <dt> --version </dt><dd> prints the version number of <code>musrfit</code>
 </dd></dl> 
@@ -196,6 +197,7 @@ the fit described in the input file will be executed and the results will be wri
 <code>musrview</code> is an interactive graphical user interface for the presentation of the analyzed data and the corresponding fits. If called from within a shell it accepts the following parameters: <dl>
 <dt> &lt;msr_file&gt; </dt><dd> name of the msr input or output file to be displayed&mdash;this parameter is mandatory
 </dd> <dt> --&lt;graphic_format_extension&gt; </dt><dd> will produce a graphics output file without starting a <code>ROOT</code> session. The filename is based on the name of the <strong>&lt;msr_file&gt;</strong>, e.g. <code><b>8472.msr</b></code> &rarr; <code><b>8472_0.png</b></code> <br> Supported values for <strong>&lt;graphic_format_extension&gt;</strong> are <strong>eps</strong>, <strong>pdf</strong>, <strong>gif</strong>, <strong>jpg</strong>, <strong>png</strong>, <strong>svg</strong>, <strong>xpm</strong>, <strong>root</strong>
+</dd> <dt> --timeout &lt;timeout&gt; </dt><dd> &lt;timeout&gt; given in seconds after which <code>musrview</code> terminates. If &lt;timeout&gt; &lt;= 0, no timeout will take place. Default for &lt;timeout&gt; is 0.
 </dd> <dt> --help </dt><dd> displays a small help notice in the shell explaining the basic usage of the program
 </dd> <dt> --version </dt><dd> prints the version number of <code>musrview</code>
 </dd></dl> 
@@ -228,6 +230,7 @@ Additionally, some functions can be accessed using key-shortcuts: <dl>
 <code>musrt0</code> is a user interface for the determination of <strong>t0</strong> and the time windows of <strong>data</strong> and <strong>background</strong> needed to be specified in the <a href="#TheRunBlock" class="foswikiCurrentTopicLink">RUN blocks</a> of the msr file. It can be operated either as an interactive program or in a non-interactive mode. In the non-interactive mode it accepts the following parameters: <dl>
 <dt> &lt;msr_file&gt; </dt><dd> name of an msr file
 </dd> <dt> -g, --getT0FromPromptPeak [&lt;firstGoodBinOffset&gt;] </dt><dd> tries to estimate <strong>t0</strong> from the <em>prompt peak</em> (maximum entry) in each histogram and writes the corresponding values to the <a href="#TimeZero" class="foswikiCurrentTopicLink">t0 lines</a> in the <a href="#TheRunBlock" class="foswikiCurrentTopicLink">RUN blocks</a> of the msr file. If an optional number <strong>&lt;firstGoodBinOffset&gt;</strong> is given, the lower limit of the <a href="#DataRange" class="foswikiCurrentTopicLink"><b>data</b> range</a> will be set to <strong>t0 + &lt;firstGoodBinOffset&gt;</strong>.
+</dd> <dt> --timeout &lt;timeout&gt; </dt><dd> &lt;timeout&gt; given in seconds after which <code>musrview</code> terminates. If &lt;timeout&gt; &lt;= 0, no timeout will take place. Default for &lt;timeout&gt; is 0.
 </dd> <dt> --help </dt><dd> displays a small help notice in the shell explaining the basic usage of the program
 </dd> <dt> --version </dt><dd> prints the version number of <code>musrt0</code>
 </dd></dl> 
@@ -236,7 +239,7 @@ The interactive mode of <code>musrt0</code> is started if the program is called 
 <pre class="bash">musrt0 8472.msr</pre>
 Then a <code>ROOT</code> canvas depicting the histogram of the data set mentioned first in the <a href="#TheRunBlock" class="foswikiCurrentTopicLink">RUN block</a> is drawn in different colors:<br />
 <img src="../pub/MUSR/MusrFit/musrt0.png" alt="musrt0" width='626' height='424' align="center" /><br />
-The colors of the data points represent the choice of the time windows of <strong><font color="#0000ff">data (blue)</font></strong> and <strong><font color="#ff0000">background (red)</font></strong>, as well as <strong><font color="#008000">t0 (green line)</font></strong>. In order to change these ranges the mouse cross-hair is moved to a channel of choice and one of the following keys is pressed: <dl>
+The colors of the data points represent the choice of the time windows of <strong><span class='foswikiBlueFG'>data (blue)</span></strong> and <strong><span class='foswikiRedFG'>background (red)</span></strong>, as well as <strong><span class='foswikiGreenFG'>t0 (green line)</span></strong>. In order to change these ranges the mouse cross-hair is moved to a channel of choice and one of the following keys is pressed: <dl>
 <dt> q </dt><dd> close the currently open histogram and opens the next (see also below)
 </dd> <dt> Q </dt><dd> quit <code>musrt0</code> without writing into the msr file
 </dd> <dt> z </dt><dd> zoom into the region about the <strong>t0</strong>
@@ -271,7 +274,7 @@ Closing a window by clicking the <strong>X</strong> button is equivalent to pres
 <dt> &lt;marker&gt;X&lt;/marker&gt; </dt><dd> use the <code>ROOT</code> marker number <strong>X</strong> (inside a &lt;marker_list&gt; environment)
 </dd></dl> 
 </dd> <dt> &lt;color_list&gt;&lt;/color_list&gt; </dt><dd> specify the order in which <code>musrview</code> should use colors when plotting data (inside a &lt;root_settings&gt; environment) <dl>
-<dt> &lt;color&gt;<font color="#ff0000">R</font>,<font color="#008000">G</font>,<font color="#0000ff">B</font>&lt;/color&gt; </dt><dd> use the RGB coded color (inside a &lt;color_list&gt; environment)
+<dt> &lt;color&gt;<span class='foswikiRedFG'>R</span>,<span class='foswikiGreenFG'>G</span>,<span class='foswikiBlueFG'>B</span>&lt;/color&gt; </dt><dd> use the RGB coded color (inside a &lt;color_list&gt; environment)
 </dd></dl> 
 </dd></dl> 
 </dd></dl> 
@@ -379,7 +382,7 @@ Will read the two files <code>'2010/lem10_his_0123.root'</code> and <code>'2010/
 <h1><a name="A_3_Auxiliary_Programs"></a> 3  Auxiliary Programs </h1>
 Additionally to the programs mentioned above editor front ends called <code><a href="MusrGui.html">musrgui/musredit</a></code> and another tool named <code><a href="Msr2Data.html">msr2data</a></code> are available. The purpose of <code>msr2data</code> is to process multiple msr files with the same parameters and to summarize the fitting results either in a <strong>DB</strong> or a <strong>column ASCII</strong> file. Also, new msr files can be generated from a template. For details refer to its <a href="Msr2Data.html">manual</a>.
 <p></p>
-<strong><font color="#ff0000">Before going to use <code>musrgui</code> / <code>musredit</code> it is strongly recommended to read this manual first!</font></strong>
+<strong><span class='foswikiRedFG'>Before going to use <code>musrgui</code> / <code>musredit</code> it is strongly recommended to read this manual first!</span></strong>
 <p></p>
 <a name="DescriptionOfTheMsrFileFormat"></a>
 <h1><a name="A_4_Description_of_the_msr_File_Format"></a> 4  Description of the msr File Format </h1>
@@ -455,140 +458,146 @@ The THEORY block is used to define the fit function. There is a set of predefine
 			<th class="foswikiTableCol1"> <a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?cover=print;sortcol=1;table=1;up=0#sorted_table" title="Sort by this column">abbreviation</a> </th>
 			<th class="foswikiTableCol2"> <a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?cover=print;sortcol=2;table=1;up=0#sorted_table" title="Sort by this column">parameters</a> </th>
 			<th class="foswikiTableCol3"> <a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?cover=print;sortcol=3;table=1;up=0#sorted_table" title="Sort by this column">mathematical expression</a> </th>
-			<th rowspan="5" class="foswikiTableCol4 foswikiLastCol"> <a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?cover=print;sortcol=4;table=1;up=0#sorted_table" title="Sort by this column">reference</a> </th>
+			<th rowspan="6" class="foswikiTableCol4 foswikiLastCol"> <a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?cover=print;sortcol=4;table=1;up=0#sorted_table" title="Sort by this column">reference</a> </th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
+			<td class="foswikiTableCol0 foswikiFirstCol"> const </td>
+			<td class="foswikiTableCol1"> c </td>
+			<td class="foswikiTableCol2"> <img alt="\mathrm{const}\,(1)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_819a4fe998dacad865a00b643564873e.png"  /> </td>
+			<td class="foswikiTableCol3"> <img alt="\mathrm{const}" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_b2a023c64c8d8b460f929d404730ec8a.png"  /> </td>
+		</tr>
+		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> asymmetry </td>
 			<td class="foswikiTableCol1"> a </td>
 			<td class="foswikiTableCol2"> <img alt="A\,(1)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_facd1d42ae8b62aa1043316d525d3af4.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="A" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_be8817308ad9fe2fa99fe00abdaba828.png"  /> </td>
 		</tr>
-		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
+		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> simplExpo </td>
 			<td class="foswikiTableCol1"> se </td>
 			<td class="foswikiTableCol2"> <img alt="\lambda\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_020e973cf5b1293c76cb3ecef5a269f8.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\exp\left(-\lambda t\right)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_6a34fe0c88c79d8a90defad81f36da6d.png"  /> </td>
 		</tr>
-		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
+		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> generExpo </td>
 			<td class="foswikiTableCol1"> ge </td>
 			<td class="foswikiTableCol2"> <img alt="\lambda\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_020e973cf5b1293c76cb3ecef5a269f8.png"  />, <img alt="\beta\,(1)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_aad467dd15ac57481f24ada5fbe5d85f.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\exp\left&#91;-\left(\lambda t\right)^{\beta}\right]" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_8b46c96933bc8a754fde5aa613d0e806.png"  /> </td>
 		</tr>
-		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
+		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> simpleGss </td>
 			<td class="foswikiTableCol1"> sg </td>
 			<td class="foswikiTableCol2"> <img alt="\sigma\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_6b6bbc4add4da0bde8220c54594658f3.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\exp\left&#91;-\frac{1}{2}\left(\sigma t\right)^2\right]" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_d284ec460bdb1abb64e7f9156d87d659.png"  /> </td>
 		</tr>
-		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
+		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> statGssKT </td>
 			<td class="foswikiTableCol1"> stg </td>
 			<td class="foswikiTableCol2"> <img alt="\sigma\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_6b6bbc4add4da0bde8220c54594658f3.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{1}{3} + \frac{2}{3} \left&#91;1-(\sigma t)^2\right] \exp\left&#91;-\frac{1}{2}\left(\sigma t\right)^2\right]" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_1f1b2becd9ba1bee3b5d7f897bd8db7e.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <img src="../pub/Main/SmiliesPluginPSI/skull.gif" alt="dead!" title="dead!" border="0" /> </td>
 		</tr>
-		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
+		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> statGssKTLF </td>
 			<td class="foswikiTableCol1"> sgktlf </td>
 			<td class="foswikiTableCol2"> <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="\sigma\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_6b6bbc4add4da0bde8220c54594658f3.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="G&#95;{\mathrm{G,LF}}(t) \equiv 1-\frac{2\sigma^2}{(2\pi\nu)^2}\left&#91;1-\exp\left(-\frac{1}{2}\sigma^2t^2\right)\cos(2\pi\nu t)\right]+\frac{2\sigma^4}{(2\pi\nu)^3}\int^t&#95;0 \exp\left(-\frac{1}{2}\sigma^2\tau^2\right)\sin(2\pi\nu\tau)\mathrm{d}\tau" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_e9a0c0aa5d84cb4ea67265a3b06b9af5.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote3text"></a><span class="FootNoteTextLink" title=" R. S. Hayano <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.20.850" target="_top">Phys. Rev. B <strong>20</strong> (1979) 850</a> "><a href="#FootNote3note" class="foswikiCurrentTopicLink">(4)</a></span> </td>
 		</tr>
-		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
+		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> dynGssKTLF </td>
 			<td class="foswikiTableCol1"> dgktlf </td>
 			<td class="foswikiTableCol2"> <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="\sigma\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_6b6bbc4add4da0bde8220c54594658f3.png"  />, <img alt="\Gamma\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_f87b1352f663a35bf263bc7e9a214ca3.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{1}{2\pi \imath}\int&#95;{\gamma-\imath\infty}^{\gamma+\imath\infty} \frac{f&#95;{\mathrm{G}}(s+\Gamma)}{1-\Gamma f&#95;{\mathrm{G}}(s+\Gamma)} \exp(s t) \mathrm{d}s,\mathrm{where}\,f&#95;{\mathrm{G}}(s)\equiv \int&#95;0^{\infty}G&#95;{\mathrm{G,LF}}(t)\exp(-s t) \mathrm{d}t" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_cb688f85a062f09bfaff5cf9144860a9.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote4text"></a><span class="FootNoteTextLink" title=" R. S. Hayano <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.20.850" target="_top">Phys. Rev. B <strong>20</strong> (1979) 850</a>; P. Dalmas de R&eacute;otier and A. Yaouanc, <a href="http://dx.doi.org/10.1088/0953-8984/4/18/020" target="_top">J. Phys.: Condens. Matter <strong>4</strong> (1992) 4533</a>; A. Keren, <a href="http://link.aps.org/doi/10.1103/PhysRevB.50.10039" target="_top">Phys. Rev. B <strong>50</strong> (1994) 10039</a> "><a href="#FootNote4note" class="foswikiCurrentTopicLink">(5)</a></span> </td>
 		</tr>
-		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
+		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> statExpKT </td>
 			<td class="foswikiTableCol1"> sekt </td>
 			<td class="foswikiTableCol2"> <img alt="\lambda\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_020e973cf5b1293c76cb3ecef5a269f8.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{1}{3} + \frac{2}{3} \left&#91;1-\lambda t\right] \exp\left(-\lambda t\right)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_6466a97e4b7c510909bffce51d31c4b9.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote5text"></a><span class="FootNoteTextLink" title=" Y. J. Uemura <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.31.546" target="_top">Phys. Rev. B <strong>31</strong> (1985) 546</a> "><a href="#FootNote5note" class="foswikiCurrentTopicLink">(6)</a></span> </td>
 		</tr>
-		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
+		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> statExpKTLF </td>
 			<td class="foswikiTableCol1"> sektlf </td>
 			<td class="foswikiTableCol2"> <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="a\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_26a5ae8799badcc3bcbe1823265a9053.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="1-\frac{a}{2\pi\nu}j&#95;1(2\pi\nu t)\exp\left(-at\right)-\left(\frac{a}{2\pi\nu}\right)^2 \left&#91;j&#95;0(2\pi\nu t)\exp\left(-at\right)-1\right]-a\left&#91;1+\left(\frac{a}{2\pi\nu}\right)^2\right]\int^t&#95;0 \exp\left(-a\tau\right)j&#95;0(2\pi\nu\tau)\mathrm{d}\tau \equiv G&#95;{\mathrm{L,LF}}(t)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_df4770dd7b14577f14410b4f7ab59721.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote6text"></a><span class="FootNoteTextLink" title=" Y. J. Uemura <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.31.546" target="_top">Phys. Rev. B <strong>31</strong> (1985) 546</a> "><a href="#FootNote6note" class="foswikiCurrentTopicLink">(7)</a></span> </td>
 		</tr>
-		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
+		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> dynExpKTLF </td>
 			<td class="foswikiTableCol1"> dektlf </td>
 			<td class="foswikiTableCol2"> <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="a\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_26a5ae8799badcc3bcbe1823265a9053.png"  />, <img alt="\Gamma\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_f87b1352f663a35bf263bc7e9a214ca3.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{1}{2\pi \imath}\int&#95;{\gamma-\imath\infty}^{\gamma+\imath\infty} \frac{f&#95;{\mathrm{L}}(s+\Gamma)}{1-\Gamma f&#95;{\mathrm{L}}(s+\Gamma)} \exp(s t) \mathrm{d}s,\mathrm{where}\,f&#95;{\mathrm{L}}(s)\equiv \int&#95;0^{\infty}G&#95;{\mathrm{L,LF}}(t)\exp(-s t) \mathrm{d}t" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_c5c6dea10611dae1d470a5615869073a.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote7text"></a><span class="FootNoteTextLink" title=" R. S. Hayano <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.20.850" target="_top">Phys. Rev. B <strong>20</strong> (1979) 850</a>; P. Dalmas de R&eacute;otier and A. Yaouanc, <a href="http://dx.doi.org/10.1088/0953-8984/4/18/020" target="_top">J. Phys.: Condens. Matter <strong>4</strong> (1992) 4533</a> "><a href="#FootNote7note" class="foswikiCurrentTopicLink">(8)</a></span> </td>
 		</tr>
-		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
+		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> combiLGKT </td>
 			<td class="foswikiTableCol1"> lgkt </td>
 			<td class="foswikiTableCol2"> <img alt="\lambda\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_020e973cf5b1293c76cb3ecef5a269f8.png"  />, <img alt="\sigma\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_6b6bbc4add4da0bde8220c54594658f3.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{1}{3}+\frac{2}{3}\left(1-\sigma^2 t^2-\lambda t\right)\exp\left(-\frac{\sigma^2t^2}{2}-\lambda t\right)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_95da508ef32b516260a14999eaf14f46.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <img src="../pub/Main/SmiliesPluginPSI/skull.gif" alt="dead!" title="dead!" border="0" /> </td>
 		</tr>
-		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
+		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> spinGlass </td>
 			<td class="foswikiTableCol1"> spg </td>
 			<td class="foswikiTableCol2"> <img alt="\lambda\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_020e973cf5b1293c76cb3ecef5a269f8.png"  />, <img alt="\gamma\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_8aad0e0c2c1f20995c483933a896ca0d.png"  />, <img alt="q\,(1)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_16b8c518c1e529e6c963929287ef3a56.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{1}{3}\exp\left(-\sqrt{\frac{4\lambda^2(1-q)t}{\gamma}}\right)+\frac{2}{3}\left(1-\frac{q\lambda^2t^2}{\sqrt{\frac{4\lambda^2(1-q)t}{\gamma}+q\lambda^2t^2}}\right)\exp\left(-\sqrt{\frac{4\lambda^2(1-q)t}{\gamma}+q\lambda^2t^2}\right)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_e35c4217aa50607f25e6eadf9f27f874.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <img src="../pub/Main/SmiliesPluginPSI/skull.gif" alt="dead!" title="dead!" border="0" /> </td>
 		</tr>
-		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
+		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> rdAnisoHf </td>
 			<td class="foswikiTableCol1"> rahf </td>
 			<td class="foswikiTableCol2"> <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="\lambda\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_020e973cf5b1293c76cb3ecef5a269f8.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{1}{6}\left(1-\frac{\nu t}{2}\right)\exp\left(-\frac{\nu t}{2}\right)+\frac{1}{3}\left(1-\frac{\nu t}{4}\right)\exp\left(-\frac{\nu t + 2.44949\lambda t}{4}\right)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_f91ff8255a7b8a99c5eefcb2c29f9262.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote8text"></a><span class="FootNoteTextLink" title="  R. E. Turner and D. R. Harshman, <a href="http://link.aps.org/doi/10.1103/PhysRevB.34.4467" target="_top">Phys. Rev. B <strong>34</strong> (1986) 4467</a> "><a href="#FootNote8note" class="foswikiCurrentTopicLink">(9)</a></span> </td>
 		</tr>
-		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
+		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> TFieldCos </td>
 			<td class="foswikiTableCol1"> tf </td>
 			<td class="foswikiTableCol2"> <img alt="\varphi\,(^{\circ})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_61136f20673ad20f955c43e43b8cec9d.png"  />, <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\cos\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_51757d805f7111ffe6e0b430b6d137c7.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <img src="../pub/Main/SmiliesPluginPSI/skull.gif" alt="dead!" title="dead!" border="0" /> </td>
 		</tr>
-		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
+		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> internFld </td>
 			<td class="foswikiTableCol1"> if </td>
 			<td class="foswikiTableCol2"> <img alt="\alpha\,(1)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_f266f29ff7212b8d77bf67567eac1fd3.png"  />, <img alt="\varphi\,(^{\circ})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_61136f20673ad20f955c43e43b8cec9d.png"  />, <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="\lambda&#95;{\mathrm{T}}\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_49046b617890ffeaca8bc16ae66d0dc5.png"  />, <img alt="\lambda&#95;{\mathrm{L}}\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_b0c4a8cbbcf4189b64418b381939a979.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\alpha\,\cos\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)\exp\left(-\lambda&#95;{\mathrm{T}}t\right)+(1-\alpha)\,\exp\left(-\lambda&#95;{\mathrm{L}}t\right)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_1582d158c5651581ca9e800ee698ce9f.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <img src="../pub/Main/SmiliesPluginPSI/skull.gif" alt="dead!" title="dead!" border="0" /> </td>
 		</tr>
-		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
+		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> Bessel </td>
 			<td class="foswikiTableCol1"> b </td>
 			<td class="foswikiTableCol2"> <img alt="\varphi\,(^{\circ})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_61136f20673ad20f955c43e43b8cec9d.png"  />, <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="j&#95;0\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_cff60a46de8608e97a33bbae7c4e566d.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <img src="../pub/Main/SmiliesPluginPSI/skull.gif" alt="dead!" title="dead!" border="0" /> </td>
 		</tr>
-		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
+		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> internBsl </td>
 			<td class="foswikiTableCol1"> ib </td>
 			<td class="foswikiTableCol2"> <img alt="\alpha\,(1)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_f266f29ff7212b8d77bf67567eac1fd3.png"  />, <img alt="\varphi\,(^{\circ})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_61136f20673ad20f955c43e43b8cec9d.png"  />, <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="\lambda&#95;{\mathrm{T}}\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_49046b617890ffeaca8bc16ae66d0dc5.png"  />, <img alt="\lambda&#95;{\mathrm{L}}\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_b0c4a8cbbcf4189b64418b381939a979.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\alpha\,j&#95;0\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)\exp\left(-\lambda&#95;{\mathrm{T}}t\right)+(1-\alpha)\,\exp\left(-\lambda&#95;{\mathrm{L}}t\right)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_23ec8fc398b4e415b86bbd2b65f9a63c.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <img src="../pub/Main/SmiliesPluginPSI/skull.gif" alt="dead!" title="dead!" border="0" /> </td>
 		</tr>
-		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
+		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> abragam </td>
 			<td class="foswikiTableCol1"> ab </td>
 			<td class="foswikiTableCol2"> <img alt="\sigma\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_6b6bbc4add4da0bde8220c54594658f3.png"  />, <img alt="\gamma\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_ebef6cda2881306e993839c1b4bcaa4c.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\exp\left&#91;-\frac{\sigma^2}{\gamma^2}\left(e^{-\gamma t}-1+\gamma t\right)\right]" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_e56be15b7e230ec52a9f6632e552ca4b.png"  /> </td>
-			<td class="foswikiTableCol4 foswikiLastCol"> <img src="../pub/Main/SmiliesPluginPSI/skull.gif" alt="dead!" title="dead!" border="0" /> </td>
+			<td class="foswikiTableCol4"> <img src="../pub/Main/SmiliesPluginPSI/skull.gif" alt="dead!" title="dead!" border="0" /> </td>
 		</tr>
-		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
+		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> skewedGss </td>
 			<td class="foswikiTableCol1"> skg </td>
 			<td class="foswikiTableCol2"> <img alt="\varphi\,(^{\circ})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_61136f20673ad20f955c43e43b8cec9d.png"  />, <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="\sigma&#95;{-}\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_bd5c765027d46aa1433dda03f540c17e.png"  />, <img alt="\sigma&#95;{+}\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_82adbab00b6a057f04037b44746e33eb.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{\sigma&#95;{-}}{\sigma&#95;{+}+\sigma&#95;{-}}\exp\left&#91;-\frac{\sigma&#95;{-}^2t^2}{2}\right]\left\lbrace\cos\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)+\sin\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)\mathrm{Erfi}\left(\frac{\sigma&#95;{-}t}{\sqrt{2}}\right)\right\rbrace+ \frac{\sigma&#95;{+}}{\sigma&#95;{+}+\sigma&#95;{-}}\exp\left&#91;-\frac{\sigma&#95;{+}^2t^2}{2}\right]\left\lbrace\cos\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)-\sin\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)\mathrm{Erfi}\left(\frac{\sigma&#95;{+}t}{\sqrt{2}}\right)\right\rbrace" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7f4cd42199fbf712ad5a86f9d94bd698.png"  /> </td>
-			<td class="foswikiTableCol4"> <a href="http://nemu.web.psi.ch/doc/LEM_Memo/skewedGaussian/skewedGaussian.pdf" target="_top">memo</a> <span class="foswikiIcon"><img src="../pub/System/DocumentGraphics/pdf.png" width="16" height="16" alt="pdf" /></span> </td>
+			<td class="foswikiTableCol4 foswikiLastCol"> <a href="http://nemu.web.psi.ch/doc/LEM_Memo/skewedGaussian/skewedGaussian.pdf" target="_top">memo</a> <span class="foswikiIcon"><img src="../pub/System/DocumentGraphics/pdf.png" width="16" height="16" alt="pdf" /></span> </td>
 		</tr>
-		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
+		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol foswikiLast"> polynom </td>
 			<td class="foswikiTableCol1 foswikiLast"> p </td>
 			<td class="foswikiTableCol2 foswikiLast"> <img alt="t&#95;0\,(&#91;t])" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_20651e8230c7eb66c452bb1f01dc4633.png"  />, <img alt="a&#95;0\,(1),\,a&#95;1\,(1),\,\dots,\,a&#95;{n}\,(1)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_03095d51eca2bcb1dda113e995238fc0.png"  /> </td>
@@ -743,7 +752,7 @@ The RUN block is used to collect the data needed for a particular run to be fitt
 		</tr>
 		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol foswikiLast"> &lt;file_format&gt; </td>
-			<td class="foswikiTableCol1 foswikiLastCol foswikiLast"> file format: NEXUS, ROOT-NPP, ROOT-PPC, PSI-BIN, PSI-MDU, WKM, MUD, MDU-ASCII, ASCII, DB </td>
+			<td class="foswikiTableCol1 foswikiLastCol foswikiLast"> file format: MUSR-ROOT, NEXUS, ROOT-NPP, ROOT-PPC, PSI-BIN, PSI-MDU, WKM, MUD, MDU-ASCII, ASCII, DB </td>
 		</tr>
 	</tbody></table>
 <p></p>
@@ -779,7 +788,7 @@ In order to describe the operations needed for fitting and plotting, quite some 
 <a name="AddRun"></a> <dl>
 <dt> ADDRUN &lt;run_file_name&gt; &lt;beamline&gt; &lt;facility&gt; &lt;file_format&gt; (optional) </dt><dd> If an ADDRUN is just following after a RUN statement, these runs will be added. More than one ADDRUN statements are possible, i.e. adding up as many runs as wished. It is also possible to add runs with different file formats. If the t0's are given in the data files, the ADDRUN statement is all what is needed, otherwise just add the t0's with the <a href="#AddTimeZero" class="foswikiCurrentTopicLink">addt0</a> statement.<br>
 </dd></dl> 
-For a 'Single Histogram Fit' it will be <pre>
+For a 'Single Histogram Fit' or a 'MuMinus Fit' it will be <pre>
 addt0 t0AddRun1
 addt0 t0AddRun2
 etc.
@@ -793,17 +802,14 @@ etc.
 <dt> fittype (required) </dt><dd> This tag is used to indicate which type of fit is wished. The supported fit types are: <dl>
 <dt> 0 </dt><dd> Single Histogram Fit
 </dd> <dt> 2 </dt><dd> Asymmetry Fit
-</dd> <dt> 4 </dt><dd> Asymmetry Fit in a Rotating Reference Frame (Fitting is actually never going to be supported; eventually, it will be possible to plot data in a rotating reference frame)
+</dd> <dt> 4 </dt><dd> MuMinus Fit. This is a single histogram fit especially for negative muon &mu;SR
 </dd> <dt> 8 </dt><dd> Non-&mu;SR Fit
 </dd></dl> 
 </dd></dl> 
 <p></p>
       The description of these fit types can be found in <a href="#TheFitTypes" class="foswikiCurrentTopicLink">the corresponding section</a>.
 <p></p> <dl>
-<dt> alpha, beta (fit types 2, 4) </dt><dd> These parameters are used to correct the asymmetry for different detector efficiencies, solid angles and initial asymmetries. They are defined as &#945;&#8801;<i>N</i><sub>0,b</sub>/<i>N</i><sub>0,f</sub> and &#946;&#8801;&#124;<i>A</i><sub>0,b</sub>/<i>A</i><sub>0,f</sub>&#124;. If the parameters are not specified in the RUN block, for each one the value of 1 is assumed.
-</dd></dl> 
-<p></p> <dl>
-<dt> alpha2, beta2 (fit type 4) </dt><dd> &alpha; and &beta; parameters for the calculation of the asymmetry of the second pair of detectors for a plot in a rotating reference frame.
+<dt> alpha, beta (fit types 2) </dt><dd> These parameters are used to correct the asymmetry for different detector efficiencies, solid angles and initial asymmetries. They are defined as &#945;&#8801;<i>N</i><sub>0,b</sub>/<i>N</i><sub>0,f</sub> and &#946;&#8801;&#124;<i>A</i><sub>0,b</sub>/<i>A</i><sub>0,f</sub>&#124;. If the parameters are not specified in the RUN block, for each one the value of 1 is assumed.
 </dd></dl> 
 <p></p>
 <a name="NormFun"></a> <dl>
@@ -824,14 +830,14 @@ etc.
 </dd></dl> 
 <p></p>
 <a name="ForwardHisto"></a> <dl>
-<dt> forward (fit type 0) </dt><dd> Number of the histogram in the data file to be processed. If histograms shall be grouped, all the numbers which shall be grouped. Examples: <pre>
+<dt> forward (fit type 0, 4) </dt><dd> Number of the histogram in the data file to be processed. If histograms shall be grouped, all the numbers which shall be grouped. Examples: <pre>
   forward 3       # no grouping, take histogram number 3
   forward 1 2     # group histogram number 1 and 2
   forward 1-10 12 # group histograms with numbers from 1 to 10 and additionally histogram 12 
 </pre>
 </dd></dl> 
 <p></p> <dl>
-<dt> forward, backward (fit types 2, 4) </dt><dd> Numbers of the histograms in the data file that should be taken to calculate the asymmetry. If histograms shall be grouped, all the numbers which shall be grouped. Examples: <pre>
+<dt> forward, backward (fit types 2) </dt><dd> Numbers of the histograms in the data file that should be taken to calculate the asymmetry. If histograms shall be grouped, all the numbers which shall be grouped. Examples: <pre>
   # build forward/backward asymmetry with histogram 1 and 3
   forward  1
   backward 3
@@ -844,45 +850,45 @@ etc.
 </pre>
 </dd></dl> 
 <p></p> <dl>
-<dt> backgr.fix (fit types 0, 2, 4) </dt><dd> A fixed constant background in counts per nanosecond or per bin (see <a href="#ScaleNzero" class="foswikiCurrentTopicLink">below</a>) may be given at this point. The background is specified for all histograms in the order <i>B</i><sub>f</sub> <i>B</i><sub>b</sub> [<i>B</i><sub>r</sub> <i>B</i><sub>l</sub>]. If this keyword is present, any information on a <strong>background</strong> line is ignored.
+<dt> backgr.fix (fit types 0, 2) </dt><dd> A fixed constant background in counts per nanosecond or per bin (see <a href="#ScaleNzero" class="foswikiCurrentTopicLink">below</a>) may be given at this point. The background is specified for all histograms in the order <i>B</i><sub>f</sub> <i>B</i><sub>b</sub> [<i>B</i><sub>r</sub> <i>B</i><sub>l</sub>]. If this keyword is present, any information on a <strong>background</strong> line is ignored.
 </dd></dl> 
 <p></p> <dl>
 <dt> background (fit type 0) </dt><dd> The numbers of the first and the last channel of an interval from which the constant background should be calculated are specified here. In case histograms are being grouped, the specified channels are interpreted with respect to the first histogram.
 </dd></dl> 
 <p></p> <dl>
-<dt> background (fit types 2, 4) </dt><dd> The numbers of the first and the last channel of an interval from which the constant background should be calculated are specified here. For all the histograms this is done together in the following order: <i>k</i><sub>f,first</sub> <i>k</i><sub>f,last</sub> <i>k</i><sub>b,first</sub> <i>k</i><sub>b,last</sub> [<i>k</i><sub>r,first</sub> <i>k</i><sub>r,last</sub> <i>k</i><sub>l,first</sub> <i>k</i><sub>l,last</sub>]. In case histograms are being grouped, the specified channels are interpreted with respect to the first histograms.
+<dt> background (fit types 2) </dt><dd> The numbers of the first and the last channel of an interval from which the constant background should be calculated are specified here. For all the histograms this is done together in the following order: <i>k</i><sub>f,first</sub> <i>k</i><sub>f,last</sub> <i>k</i><sub>b,first</sub> <i>k</i><sub>b,last</sub> [<i>k</i><sub>r,first</sub> <i>k</i><sub>r,last</sub> <i>k</i><sub>l,first</sub> <i>k</i><sub>l,last</sub>]. In case histograms are being grouped, the specified channels are interpreted with respect to the first histograms.
 </dd></dl> 
 <p></p>
 <a name="DataRange"></a> <dl>
-<dt> data (fit type 0) </dt><dd> The numbers of the first and the last channel of an interval from which the data is taken are specified here. In case histograms are being grouped, the specified channels are interpreted with respect to the first histogram.
+<dt> data (fit type 0, 4) </dt><dd> The numbers of the first and the last channel of an interval from which the data is taken are specified here. In case histograms are being grouped, the specified channels are interpreted with respect to the first histogram.
 </dd></dl> 
 <p></p> <dl>
-<dt> data (fit types 2, 4) </dt><dd> The numbers of the first and the last channel of an interval from which the data is taken are specified here. For all the histograms this is done together in the following order: <i>k</i><sub>f,first</sub> <i>k</i><sub>f,last</sub> <i>k</i><sub>b,first</sub> <i>k</i><sub>b,last</sub> [<i>k</i><sub>r,first</sub> <i>k</i><sub>r,last</sub> <i>k</i><sub>l,first</sub> <i>k</i><sub>l,last</sub>]. In case histograms are being grouped, the specified channels are interpreted with respect to the first histograms.
+<dt> data (fit types 2) </dt><dd> The numbers of the first and the last channel of an interval from which the data is taken are specified here. For all the histograms this is done together in the following order: <i>k</i><sub>f,first</sub> <i>k</i><sub>f,last</sub> <i>k</i><sub>b,first</sub> <i>k</i><sub>b,last</sub> [<i>k</i><sub>r,first</sub> <i>k</i><sub>r,last</sub> <i>k</i><sub>l,first</sub> <i>k</i><sub>l,last</sub>]. In case histograms are being grouped, the specified channels are interpreted with respect to the first histograms.
 </dd></dl> 
 <a name="TimeZero"></a> <dl>
-<dt> t0 (fit type 0) </dt><dd> The number of the time-zero channel of the histogram. Example: <pre>
+<dt> t0 (fit type 0, 4) </dt><dd> The number of the time-zero channel of the histogram. Example: <pre>
   t0 3419        # t0 channel &#61; 3419
   t0 3419 3434   # t0 channels for groupings: forward f1 f2. 3419 t0 for f1, 3434 t0 for f2. 
 </pre>
 </dd></dl> 
 <p></p> <dl>
-<dt> t0 (fit types 2, 4) </dt><dd> The numbers of time-zero channels of the histograms in the order <i>t</i><sub>0,f</sub> <i>t</i><sub>0,b</sub>. Example: <pre>
+<dt> t0 (fit types 2) </dt><dd> The numbers of time-zero channels of the histograms in the order <i>t</i><sub>0,f</sub> <i>t</i><sub>0,b</sub>. Example: <pre>
   t0 3419 3418           # t0 channels: forward (3419), backward (3418)
   t0 3419 3418 3417 3416 # t0 channels (assuming forward f1 f2, backward b1 b2): forward (3419, f1), backward (3418, b1); forward (3417, f2), backward (3416, b2)
 </pre>
 </dd></dl> 
 <p></p>
 <a name="AddTimeZero"></a> <dl>
-<dt> addt0 (fit type 0) </dt><dd> The number of the time-zero channel of the histogram. If grouping of histograms is present (see <a href="#ForwardHisto" class="foswikiCurrentTopicLink">forward</a>) the same syntax as for <a href="#TimeZero" class="foswikiCurrentTopicLink">t0</a> applies. If one addt0 is given, the total number of addt0's needs to be equal to the total number of ADDRUN's!
+<dt> addt0 (fit type 0, 4) </dt><dd> The number of the time-zero channel of the histogram. If grouping of histograms is present (see <a href="#ForwardHisto" class="foswikiCurrentTopicLink">forward</a>) the same syntax as for <a href="#TimeZero" class="foswikiCurrentTopicLink">t0</a> applies. If one addt0 is given, the total number of addt0's needs to be equal to the total number of ADDRUN's!
 </dd></dl> 
 <p></p> <dl>
-<dt> addt0 (fit types 2, 4) </dt><dd> The numbers of time-zero channels of the histograms in the order <i>t</i><sub>0,f</sub> <i>t</i><sub>0,b</sub> [<i>t</i><sub>0,r</sub> <i>t</i><sub>0,l</sub>]. If grouping of histograms is present (see <a href="#ForwardHisto" class="foswikiCurrentTopicLink">forward</a>) the same syntax as for <a href="#TimeZero" class="foswikiCurrentTopicLink">t0</a> applies. If one addt0 is given, the total number of addt0's needs to be equal to the total number of ADDRUN's!
+<dt> addt0 (fit types 2) </dt><dd> The numbers of time-zero channels of the histograms in the order <i>t</i><sub>0,f</sub> <i>t</i><sub>0,b</sub> [<i>t</i><sub>0,r</sub> <i>t</i><sub>0,l</sub>]. If grouping of histograms is present (see <a href="#ForwardHisto" class="foswikiCurrentTopicLink">forward</a>) the same syntax as for <a href="#TimeZero" class="foswikiCurrentTopicLink">t0</a> applies. If one addt0 is given, the total number of addt0's needs to be equal to the total number of ADDRUN's!
 </dd></dl> 
 <p></p> <dl>
 <dt> xy-data (fit type 8) </dt><dd> Specification of the data from an ASCII or DB file which should be used as <i>x</i> and <i>y</i> data (in this order). For a simple ASCII file the column numbers are used, in the case of a DB file one can either specify the variable numbers or the name of the variables as given in the DB header.  
 </dd></dl> 
 <p></p> <dl>
-<dt> fit </dt><dd> The range of data that should be considered when the fitting is done. For the &mu;SR fit types <strong>0</strong>, <strong>2</strong>, and <strong>4</strong> here the starting and end times are given in microseconds. For the non-&mu;SR fit type <strong>8</strong> the starting and end points of the fitting range are given in the units of the <i>x</i> data.<br><font color="#ff0000">In case the fit range specified here is larger than the <a href="#DataRange" class="foswikiCurrentTopicLink">data range</a> (in any direction), eventually the <a href="#DataRange" class="foswikiCurrentTopicLink">data range</a> will be used as fit range.</font>
+<dt> fit </dt><dd> The range of data that should be considered when the fitting is done. For the &mu;SR fit types <strong>0</strong>, <strong>2</strong>, and <strong>4</strong> here the starting and end times are given in microseconds. For the non-&mu;SR fit type <strong>8</strong> the starting and end points of the fitting range are given in the units of the <i>x</i> data.<br><span class='foswikiRedFG'>In case the fit range specified here is larger than the <a href="#DataRange" class="foswikiCurrentTopicLink">data range</a> (in any direction), eventually the <a href="#DataRange" class="foswikiCurrentTopicLink">data range</a> will be used as fit range.</span>
 </dd></dl> 
 <p></p> <dl>
 <dt> packing </dt><dd> Number of data channels to be binned together. For the non-&mu;SR fit type <strong>8</strong> the binning is supposed to be 1.
@@ -991,14 +997,14 @@ Notes
 <h2><a name="A_4.8_The_PLOT_Block"></a> 4.8  The PLOT Block </h2>
 The PLOT block is intended to collect all the information needed for the graphical presentation of the data and fits using <code>musrview</code>. The PLOT keyword at the beginning of the block is followed by a number which indicates the plot type. The plot types match the <a href="#FitTypes" class="foswikiCurrentTopicLink">fit types</a>. Additionally, it is possible to provide information using the following keywords: <dl>
 <dt> runs </dt><dd> The numbers of the runs to be plotted have to be put here. The runs are numbered according to their appearance in the RUN block.
-</dd> <dt> range </dt><dd> Here it is possible to define the plotting range explicitly. Depending on the plot type the following settings are allowed where the times are given in microseconds and the <i>N</i> in counts: <dl>
-<dt> 0 without <a href="#LifeTimeCorrection" class="foswikiCurrentTopicLink">lifetimecorrection</a> </dt><dd> <i>t</i><sub>min</sub> <i>t</i><sub>max</sub> [ <i>N</i><sub>min</sub> <i>N</i><sub>max</sub> ]
-</dd> <dt> 0 with <a href="#LifeTimeCorrection" class="foswikiCurrentTopicLink">lifetimecorrection</a>, 2, 4 </dt><dd> <i>t</i><sub>min</sub> <i>t</i><sub>max</sub> [ <i>A</i><sub>min</sub> <i>A</i><sub>max</sub> ]
+</dd> <dt> range </dt><dd> Here it is possible to define the plotting range explicitly. Depending on the plot type the following settings are allowed where the times are given in microseconds and the <i>N</i> in counts (type 0, 4) or in counts/nsec (type 0): <dl>
+<dt> 0 without <a href="#LifeTimeCorrection" class="foswikiCurrentTopicLink">lifetimecorrection</a>, 4 </dt><dd> <i>t</i><sub>min</sub> <i>t</i><sub>max</sub> [ <i>N</i><sub>min</sub> <i>N</i><sub>max</sub> ]
+</dd> <dt> 0 with <a href="#LifeTimeCorrection" class="foswikiCurrentTopicLink">lifetimecorrection</a>, 2 </dt><dd> <i>t</i><sub>min</sub> <i>t</i><sub>max</sub> [ <i>A</i><sub>min</sub> <i>A</i><sub>max</sub> ]
 </dd> <dt> 8 </dt><dd> <i>x</i><sub>min</sub> <i>x</i><sub>max</sub> [ <i>y</i><sub>min</sub> <i>y</i><sub>max</sub> ]
 </dd></dl> 
 </dd> <dt> sub_ranges </dt><dd> Here it is possible to define the plotting range for each run individually. For the different plot types the command has the structure <dl>
-<dt> 0 without <a href="#LifeTimeCorrection" class="foswikiCurrentTopicLink">lifetimecorrection</a> </dt><dd> <i>t</i><sub>min</sub><sup>1</sup> <i>t</i><sub>max</sub><sup>1</sup> <i>t</i><sub>min</sub><sup>2</sup> <i>t</i><sub>max</sub><sup>2</sup> ... <i>t</i><sub>min</sub><sup><i>n</i></sup> <i>t</i><sub>max</sub><sup><i>n</i></sup> [ <i>N</i><sub>min</sub> <i>N</i><sub>max</sub> ] (<i>n</i> = the number of runs to be plotted)
-</dd> <dt> 0 with <a href="#LifeTimeCorrection" class="foswikiCurrentTopicLink">lifetimecorrection</a>, 2, 4 </dt><dd> <i>t</i><sub>min</sub><sup>1</sup> <i>t</i><sub>max</sub><sup>1</sup> <i>t</i><sub>min</sub><sup>2</sup> <i>t</i><sub>max</sub><sup>2</sup> ... <i>t</i><sub>min</sub><sup><i>n</i></sup> <i>t</i><sub>max</sub><sup><i>n</i></sup> [ <i>A</i><sub>min</sub> <i>A</i><sub>max</sub> ] (<i>n</i> = the number of runs to be plotted)
+<dt> 0 without <a href="#LifeTimeCorrection" class="foswikiCurrentTopicLink">lifetimecorrection</a>, 4 </dt><dd> <i>t</i><sub>min</sub><sup>1</sup> <i>t</i><sub>max</sub><sup>1</sup> <i>t</i><sub>min</sub><sup>2</sup> <i>t</i><sub>max</sub><sup>2</sup> ... <i>t</i><sub>min</sub><sup><i>n</i></sup> <i>t</i><sub>max</sub><sup><i>n</i></sup> [ <i>N</i><sub>min</sub> <i>N</i><sub>max</sub> ] (<i>n</i> = the number of runs to be plotted)
+</dd> <dt> 0 with <a href="#LifeTimeCorrection" class="foswikiCurrentTopicLink">lifetimecorrection</a>, 2 </dt><dd> <i>t</i><sub>min</sub><sup>1</sup> <i>t</i><sub>max</sub><sup>1</sup> <i>t</i><sub>min</sub><sup>2</sup> <i>t</i><sub>max</sub><sup>2</sup> ... <i>t</i><sub>min</sub><sup><i>n</i></sup> <i>t</i><sub>max</sub><sup><i>n</i></sup> [ <i>A</i><sub>min</sub> <i>A</i><sub>max</sub> ] (<i>n</i> = the number of runs to be plotted)
 </dd> <dt> 8 </dt><dd>  not yet implemented.
 </dd></dl> 
 </dd> <dt> use_fit_ranges [ <i>y</i><sub>min</sub> <i>y</i><sub>max</sub>] </dt><dd> The fit ranges of the individual runs are used to present the data. Optionally, an ordinate range can be provided.
@@ -1076,9 +1082,20 @@ For the graphical representation in plot type <strong>2</strong> the equation ab
 </div>
 and plotted together with the function given in the THEORY block.
 <p></p>
-<a name="RotatingReferenceFrameAsymmetryFit"></a>
-<h2><a name="A_5.3_Rotating_45Reference_45Frame_Asymmetry_Fit"></a> 5.3  Rotating-Reference-Frame Asymmetry Fit </h2>
-(Is going to be implemented as pure plotting option...)
+<a name="MuMinusFit"></a>
+<h2><a name="A_5.3_Negative_Muon_SR_Fit"></a> 5.3  Negative Muon &mu;SR Fit </h2>
+The negative muon &mu;SR fit (fit type <strong>4</strong>) is used for single histogram fits of MuMinus, i.e.
+<div style="text-align:center">
+<img alt="N(t) &#61; \sum&#95;i N&#95;i\,\mathrm{e}^{-t/\tau&#95;i} \left&#91; 1 + A&#95;i(t)\right] + B(t)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_91086477d80ae4fd407c852073b3a5b8.png"  />
+</div>
+where <img alt="i" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_c465118a8d86d5f25bba37cc1dcb38a0.png"  /> runs over the different lifetime channels of <img alt="\mu^{-}" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_e5709fc3ddb272adeaa7258d3d25ab22.png"  />, and <dl>
+<dt> <img alt="N&#95;i" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_e52a515ef5edcb18f7f96aedab4af26e.png"  /> </dt><dd> counts of lifetime channel <img alt="i" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_c465118a8d86d5f25bba37cc1dcb38a0.png"  />
+</dd> <dt> <img alt="\tau&#95;i" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_65bea57ac8fb766c4f93ca77947937f5.png"  /> </dt><dd> lifetime of lifetime channel <img alt="i" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_c465118a8d86d5f25bba37cc1dcb38a0.png"  />
+</dd> <dt> <img alt="A&#95;i(t)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_a57c0747dc272c95ffb683f35359ecf9.png"  /> </dt><dd> depolarization function of lifetime channel <img alt="i" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_c465118a8d86d5f25bba37cc1dcb38a0.png"  />
+</dd> <dt> <img alt="B(t)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_ad7013bb754d671a35485233edf30254.png"  /> </dt><dd> <img alt="B(t)&#61; B&#95;0 + \sum&#95;j B&#95;j \cos(j \omega&#95;{\rm cyclotron} t)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_b59000274e877651d11323c23f21c665.png"  /> the background
+</dd></dl> 
+<p></p>
+Since MuMinus is quite generic, the full functional depends has to be written in the <a href="#TheTheoryBlock" class="foswikiCurrentTopicLink">THEORY Block</a>.
 <p></p>
 <a name="NonMusrFit"></a>
 <h2><a name="A_5.4_Non_45SR_Fit"></a> 5.4  Non-&mu;SR Fit </h2>
@@ -1354,7 +1371,7 @@ This way the efficiency of the user function can be increased by almost a factor
 <p></p>
 <hr />
 <a name="UserFunctionRemark"></a>
-<font color="#ff0000"><b>Important remark:</b></font> If <code>musrfit</code> <a href="MusrFitSetup.html#MusrFitInstallation">has been built</a> with parallelization support (default for <code>GCC</code> &ge; 4.2) it should be taken care of the thread safety of the user-function <strong>operator()</strong>. During the function optimization of <code>musrfit</code> the <strong>operator()</strong> is called once for any given set of parameters in order to allow the safe execution of any calculation. Within the <a href="#SingleHistogramFit" class="foswikiCurrentTopicLink">single-histogram</a> and <a href="#AsymmetryFit" class="foswikiCurrentTopicLink">asymmetry</a> fits the calculation of &chi;<sup>2</sup> or the log-likelihood is parallelized and the <strong>operator()</strong> is expected to evaluate to reasonable values for a fixed set of parameters (but changing <i>t</i>) beginning with the second function call.
+<span class='foswikiRedFG'><b>Important remark:</b></span> If <code>musrfit</code> <a href="MusrFitSetup.html#MusrFitInstallation">has been built</a> with parallelization support (default for <code>GCC</code> &ge; 4.2) it should be taken care of the thread safety of the user-function <strong>operator()</strong>. During the function optimization of <code>musrfit</code> the <strong>operator()</strong> is called once for any given set of parameters in order to allow the safe execution of any calculation. Within the <a href="#SingleHistogramFit" class="foswikiCurrentTopicLink">single-histogram</a> and <a href="#AsymmetryFit" class="foswikiCurrentTopicLink">asymmetry</a> fits the calculation of &chi;<sup>2</sup> or the log-likelihood is parallelized and the <strong>operator()</strong> is expected to evaluate to reasonable values for a fixed set of parameters (but changing <i>t</i>) beginning with the second function call.
 In case this cannot be ensured, the parallelization can be disabled by <strong>--disable-omp</strong> on the <a href="MusrFitSetup.html#MusrFitInstallation">configure level</a> of the program installation.
 <hr />
 <p></p>
@@ -1430,39 +1447,12 @@ For reporting bugs or requesting new features and improvements please use the <a
 </div>
 </div></div><!-- /endWrap -->
 <p></p>
-<!-- gugus -->
-<div id='peopleIcon' onmouseout='$(this).css("visibility","hidden")'>
-      <img id='peopleIconImg' src='../data/people/information.png'>
-</div>
-<div id='tooltip'>
- <div id='tooltip_inner'>
-	<table id='tooltip_table'>
-		<tr>
-			<td id='tooltip_avatar' rowspan='4'><img id='tooltip_avatar_img' src='../data/people/nobody-100.gif' /></td>
-			<td id='tooltip_username' colspan='2'>Oscar Fridolin</td>
-		</tr>
-		<tr>
-			<td id='tooltip_tel_title'>Telefon:</td>
-			<td id='tooltip_tel'>1234512345</td>
-		</tr>
-		<tr>
-			<td id='tooltip_mail_title'>E-Mail:</td>
-			<td id='tooltip_mail'>oscarfridolin@psi.ch</td>
-		</tr>
-		<tr>
-			<td id='tooltip_office_title'>Büro:</td>
-			<td id='tooltip_office'>WHGA/019</td>
-		</tr>
-	</table>
-	</div>
-</div> <!--1850-->
-<p></p>
 <p></p>
 <p></p>
 <p></p>
 </body>
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 29 Mar 2012 14:13:02 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 08 May 2012 05:20:56 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 </html>
 <p></p>

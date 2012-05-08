@@ -9,6 +9,7 @@ changes since 0.11.0
 NEW 2012-04-24 added a first version for negative muon fitting. At the same 
                time substaintial bug fixing has been carried out (mainly the
 	       logx/logy handling).
+CHANGED 2012-05-08 updating docu
 
 changes since 0.10.0
 ===================================

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en_US">
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrGui?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 29 Mar 2012 14:12:44 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrGui?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 08 May 2012 05:20:36 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 <head>
 <link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
@@ -21,7 +21,7 @@
 <meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
 
 	<link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" /> <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
-	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrGui?t=1333030347" type="application/x-wiki" title="edit MusrGui" />
+	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrGui?t=1336454414" type="application/x-wiki" title="edit MusrGui" />
 	<meta name="description" content="MusrGui" />
   <base  /><!--[if IE]></base><![endif]-->
 	
@@ -109,7 +109,7 @@ pre {
 </style><![endif]-->
 
 	
-<script src="https://intranet.psi.ch/pub/System/ChecklistPlugin/itemstatechange.js" language="javascript" type="text/javascript"></script><script src="https://intranet.psi.ch/pub/System/TimeTablePlugin/timetabletooltips.js" language="javascript" type="text/javascript"></script><link rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
+<link rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
 </head>
 <body class="foswikiNoJs patternViewPage patternPrintPage">
 <a name="PageTop"></a><div class="foswikiPage"><div id="patternScreen">
@@ -140,7 +140,7 @@ pre {
 <h1><a name="A_1_Introduction"></a> 1  Introduction </h1>
 <code>musrgui</code> and <code>musredit</code> are editors which also provide a graphical user interface to the programs contained in the <code><a href="MusrFit.html">musrfit</a></code> suite and are intended to help the user handle <code>musrfit</code> msr files. They are implemented in <code>C++</code> and use the <a href="http://qt.nokia.com/" target="_top">Qt</a> framework. Principally, <code>musrgui</code> and <code>musredit</code> are doing the same, but are based on different Qt versions. <code>musrgui</code> is based on Qt 3.x and will only be maintained on bug-fixing level since the Qt 3.x licensing is less straight forward than the Qt 4.x one. <code>musredit</code> is based on Qt 4.6 (or above) and this is the program which will be developed further.<br>
 On this documentation page only the features related to <code>musrfit</code> are described&mdash;the basic editor functions which should be self-explanatory are not.
-<strong><font color="#ff0000">Before going on using <code>musrgui</code> / <code>musredit</code> it is strongly recommended to read the <a href="MusrFit.html">manual</a> of <code>musrfit</code> first!</font></strong>
+<strong><span class='foswikiRedFG'>Before going on using <code>musrgui</code> / <code>musredit</code> it is strongly recommended to read the <a href="MusrFit.html">manual</a> of <code>musrfit</code> first!</span></strong>
 <p></p>
 <h1><a name="A_2_Available_Executables_44_Configuration_Files_and_their_Basic_Usage"></a> 2  Available Executables, Configuration Files and their Basic Usage </h1>
 <a name="MusrEdit"></a>
@@ -306,7 +306,7 @@ The features of <code>musrfit</code> which can be accessed by the graphical fron
 <h1><a name="A_4_Editor_Features"></a> 4  Editor Features </h1>
 Besides the functions described above and which are mostly interfacing <code>musrfit/msr2data</code> the editors of <code>musrgui</code> / <code>musredit</code> offer various functions for manipulating especially <code>musrfit</code> msr files:
 <img src="../pub/MUSR/MusrGui/musrgui-editor-v0.png" alt="musrgui editor features" width='415' height='566' align="right" /> <ul>
-<li> Upon right-clicking an open msr file a menu as shown to the right is displayed which offers the addition of any valid msr file block or theory function. In case a simple theory function is chosen, the function will be inserted into the THEORY block using the <a href="MusrFit.html#TheoryTable">correct syntax</a>. If one chooses to add a whole block to the file a dialog opens in which the necessary information for each block as described in the <a href="MusrFit.html#DescriptionOfTheMsrFileFormat">manual</a> of <code>musrfit</code> can be supplied. <font color="#0000ff">This feature is available only in <code>musrgui</code>. In <code>musredit</code> the respective functions can be accessed through the <em>Edit</em> menu.</font>
+<li> Upon right-clicking an open msr file a menu as shown to the right is displayed which offers the addition of any valid msr file block or theory function. In case a simple theory function is chosen, the function will be inserted into the THEORY block using the <a href="MusrFit.html#TheoryTable">correct syntax</a>. If one chooses to add a whole block to the file a dialog opens in which the necessary information for each block as described in the <a href="MusrFit.html#DescriptionOfTheMsrFileFormat">manual</a> of <code>musrfit</code> can be supplied. <span class='foswikiBlueFG'>This feature is available only in <code>musrgui</code>. In <code>musredit</code> the respective functions can be accessed through the <em>Edit</em> menu.</span>
 </li> <li> In order to comment or uncomment lines in a msr file select the according lines and apply <strong>Edit &rarr; (Un)Comment</strong> or use the keyboard shortcut <strong>Ctrl+(Shift)+m</strong>.
 </li></ul> 
 <p></p>
@@ -457,39 +457,12 @@ For reporting bugs or requesting new features and improvements please use the <a
 </div>
 </div></div><!-- /endWrap -->
 <p></p>
-<!-- gugus -->
-<div id='peopleIcon' onmouseout='$(this).css("visibility","hidden")'>
-      <img id='peopleIconImg' src='../data/people/information.png'>
-</div>
-<div id='tooltip'>
- <div id='tooltip_inner'>
-	<table id='tooltip_table'>
-		<tr>
-			<td id='tooltip_avatar' rowspan='4'><img id='tooltip_avatar_img' src='../data/people/nobody-100.gif' /></td>
-			<td id='tooltip_username' colspan='2'>Oscar Fridolin</td>
-		</tr>
-		<tr>
-			<td id='tooltip_tel_title'>Telefon:</td>
-			<td id='tooltip_tel'>1234512345</td>
-		</tr>
-		<tr>
-			<td id='tooltip_mail_title'>E-Mail:</td>
-			<td id='tooltip_mail'>oscarfridolin@psi.ch</td>
-		</tr>
-		<tr>
-			<td id='tooltip_office_title'>Büro:</td>
-			<td id='tooltip_office'>WHGA/019</td>
-		</tr>
-	</table>
-	</div>
-</div> <!--4372-->
-<p></p>
 <p></p>
 <p></p>
 <p></p>
 </body>
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrGui?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 29 Mar 2012 14:12:46 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrGui?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 08 May 2012 05:20:37 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 </html>
 <p></p>
