@@ -33,6 +33,9 @@
 #include "config.h"
 #endif
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <cstdio>
 #include <ctime>
 #include <iostream>
@@ -298,6 +301,8 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
   Int_t inTag = A2M_UNDEFINED;
   if (!fAny2ManyInfo->inFormat.CompareTo("root", TString::kIgnoreCase))
     inTag = A2M_ROOT;
+  else if (!fAny2ManyInfo->inFormat.CompareTo("musrroot", TString::kIgnoreCase))
+    inTag = A2M_MUSR_ROOT;
   else if (!fAny2ManyInfo->inFormat.CompareTo("psi-bin", TString::kIgnoreCase))
     inTag = A2M_PSIBIN;
   else if (!fAny2ManyInfo->inFormat.CompareTo("psi-mdu", TString::kIgnoreCase))
@@ -353,6 +358,7 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
       Bool_t success = false;
       switch (inTag) {
       case A2M_ROOT:
+      case A2M_MUSR_ROOT:
         success = ReadRootFile();
         break;
       case A2M_PSIBIN:
@@ -455,6 +461,7 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
       Bool_t success = false;
       switch (inTag) {
       case A2M_ROOT:
+      case A2M_MUSR_ROOT:
         success = ReadRootFile();
         break;
       case A2M_PSIBIN:
@@ -537,7 +544,7 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
 
   // check if compression is wished
   if (fAny2ManyInfo->compressionTag > 0) {
-    TString fln = fAny2ManyInfo->compressFileName;
+    TString fln = fAny2ManyInfo->outPath + fAny2ManyInfo->compressFileName;
 
     // currently system call is used, which means this is only running under Linux and Mac OS X but not under Windows
     char cmd[256];
@@ -3961,21 +3968,10 @@ Bool_t PRunDataHandler::ReadDBFile()
  */
 Bool_t PRunDataHandler::WriteMusrRootFile(TString fln)
 {
-  // generate output file name if needed
-  if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
-    if (fln.Length() == 0) {
-      Bool_t ok = false;
-      fln = GetFileName(".root", ok);
-      if (!ok)
-        return false;
-    } else {
-      fln.Prepend(fAny2ManyInfo->outPath);
-    }
-    // keep the file name if compression is whished
-    fAny2ManyInfo->outPathFileName.push_back(fln);
-  } else {
-    fln = fAny2ManyInfo->outPath + TString("__tmp.root");
-  }
+  Bool_t ok = false;
+  fln = GenerateOutputFileName(fln, ".root", ok);
+  if (!ok)
+    return false;
 
   if (!fAny2ManyInfo->useStandardOutput)
     cout << endl << ">> PRunDataHandler::WriteMusrRootFile(): writing a root data file (" << fln.Data() << ") ... " << endl;
@@ -4214,21 +4210,11 @@ Bool_t PRunDataHandler::WriteMusrRootFile(TString fln)
  */
 Bool_t PRunDataHandler::WriteRootFile(TString fln)
 {
-  // generate output file name if needed
-  if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
-    if (fln.Length() == 0) {
-      Bool_t ok = false;
-      fln = GetFileName(".root", ok);
-      if (!ok)
-        return false;
-    } else {
-      fln.Prepend(fAny2ManyInfo->outPath);
-    }
-    // keep the file name if compression is whished
-    fAny2ManyInfo->outPathFileName.push_back(fln);
-  } else {
-    fln = fAny2ManyInfo->outPath + TString("__tmp.root");
-  }
+  Bool_t ok = false;
+  fln = GenerateOutputFileName(fln, ".root", ok);
+  if (!ok)
+    return false;
+
 
   if (!fAny2ManyInfo->useStandardOutput)
     cout << endl << ">> PRunDataHandler::WriteRootFile(): writing a root data file (" << fln.Data() << ") ... " << endl;
@@ -4409,17 +4395,10 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
 Bool_t PRunDataHandler::WriteNexusFile(TString fln)
 {
 #ifdef PNEXUS_ENABLED
-  // generate output file name
-  if (fln.Length() == 0) {
-    Bool_t ok = false;
-    fln = GetFileName(".nxs", ok);
-    if (!ok)
-      return false;
-  } else {
-    fln.Prepend(fAny2ManyInfo->outPath);
-  }
-  // keep the file name if compression is whished
-  fAny2ManyInfo->outPathFileName.push_back(fln);
+  Bool_t ok = false;
+  fln = GenerateOutputFileName(fln, ".nxs", ok);
+  if (!ok)
+    return false;
 
   if (!fAny2ManyInfo->useStandardOutput)
     cout << endl << ">> PRunDataHandler::WriteNexusFile(): writing a NeXus data file (" << fln.Data() << ") ... " << endl;
@@ -4765,22 +4744,16 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
   if (!fAny2ManyInfo->inFormat.CompareTo("ROOT"))
     lem_wkm_style = true;
 
-  // generate output file name
-  TString fileName("");
-  if (fln.Length() == 0) {
-    Bool_t ok = false;
-    if (lem_wkm_style)
-      fln = GetFileName(".nemu", ok);
-    else
-      fln = GetFileName(".wkm", ok);
-    if (!ok)
-      return false;
-    fileName = fln;
-  } else {
-    fln.Prepend(fAny2ManyInfo->outPath);
-  }
-  // keep the file name if compression is whished
-  fAny2ManyInfo->outPathFileName.push_back(fln);
+  Bool_t ok = false;
+  if (lem_wkm_style)
+    fln = GenerateOutputFileName(fln, ".nemu", ok);
+  else
+    fln = GenerateOutputFileName(fln, ".wkm", ok);
+
+  if (!ok)
+    return false;
+
+  TString fileName = fln;
 
   if (!fAny2ManyInfo->useStandardOutput)
     cout << endl << ">> PRunDataHandler::WriteWkmFile(): writing a wkm data file (" << fln.Data() << ") ... " << endl;
@@ -4842,16 +4815,20 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
   UInt_t no_of_bins_per_line = 16;
   if (lem_wkm_style)
     no_of_bins_per_line = 10;
+
+  PRawRunDataSet *dataSet;
+
   if (fAny2ManyInfo->rebin == 1) {
     for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
       cout << endl << endl;
-      for (UInt_t j=0; j<fData[0].GetDataBin(i)->size(); j++) {
+      dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+      for (UInt_t j=0; j<dataSet->GetData()->size(); j++) {
         if ((j > 0) && (j % no_of_bins_per_line == 0))
           cout << endl;
         if (lem_wkm_style)
-          cout << setw(8) << static_cast<Int_t>(fData[0].GetDataBin(i)->at(j));
+          cout << setw(8) << static_cast<Int_t>(dataSet->GetData()->at(j));
         else
-          cout << static_cast<Int_t>(fData[0].GetDataBin(i)->at(j)) << " ";
+          cout << static_cast<Int_t>(dataSet->GetData()->at(j)) << " ";
       }
     }
   } else { // rebin > 1
@@ -4861,7 +4838,8 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
       cout << endl << endl;
       count = 0;
       dataRebin = 0; // reset rebin
-      for (UInt_t j=0; j<fData[0].GetDataBin(i)->size(); j++) {
+      dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
+      for (UInt_t j=0; j<dataSet->GetData()->size(); j++) {
         if ((j > 0) && (j % fAny2ManyInfo->rebin == 0)) {
           if (lem_wkm_style)
             cout << setw(8) << dataRebin;
@@ -4872,7 +4850,7 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
           if ((count > 0) && (count % no_of_bins_per_line == 0))
             cout << endl;
         } else {
-          dataRebin += static_cast<Int_t>(fData[0].GetDataBin(i)->at(j));
+          dataRebin += static_cast<Int_t>(dataSet->GetData()->at(j));
         }
       }
     }
@@ -4902,21 +4880,10 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
  */
 Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
 {
-  // generate output file name if needed
-  if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
-    if (fln.Length() == 0) {
-      Bool_t ok = false;
-      fln = GetFileName(".bin", ok);
-      if (!ok)
-        return false;
-    } else {
-      fln.Prepend(fAny2ManyInfo->outPath);
-    }
-    // keep the file name if compression is whished
-    fAny2ManyInfo->outPathFileName.push_back(fln);
-  } else {
-    fln = fAny2ManyInfo->outPath + TString("__tmp.bin");
-  }
+  Bool_t ok = false;
+  fln = GenerateOutputFileName(fln, ".bin", ok);
+  if (!ok)
+    return false;
 
   if (!fAny2ManyInfo->useStandardOutput)
     cout << endl << ">> PRunDataHandler::WritePsiBinFile(): writing a psi-bin data file (" << fln.Data() << ") ... " << endl;
@@ -5134,21 +5101,10 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
  */
 Bool_t PRunDataHandler::WriteMudFile(TString fln)
 {
-  // generate output file name if needed
-  if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
-    if (fln.Length() == 0) {
-      Bool_t ok = false;
-      fln = GetFileName(".msr", ok);
-      if (!ok)
-        return false;
-    } else {
-      fln.Prepend(fAny2ManyInfo->outPath);
-    }
-    // keep the file name if compression is whished
-    fAny2ManyInfo->outPathFileName.push_back(fln);
-  } else {
-    fln = TString("__tmp.msr");
-  }
+  Bool_t ok = false;
+  fln = GenerateOutputFileName(fln, ".msr", ok);
+  if (!ok)
+    return false;
 
   if (!fAny2ManyInfo->useStandardOutput)
     cout << endl << ">> PRunDataHandler::WriteMudFile(): writing a mud data file (" << fln.Data() << ") ... " << endl;
@@ -5305,19 +5261,12 @@ Bool_t PRunDataHandler::WriteMudFile(TString fln)
  */
 Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
 {
-  // generate output file name
-  TString fileName("");
-  if (fln.Length() == 0) {
-    Bool_t ok = false;
-    fln = GetFileName(".ascii", ok);
-    if (!ok)
-      return false;
-    fileName = fln;
-  } else {
-    fln.Prepend(fAny2ManyInfo->outPath);
-  }
-  // keep the file name if compression is whished
-  fAny2ManyInfo->outPathFileName.push_back(fln);
+  Bool_t ok = false;
+  fln = GenerateOutputFileName(fln, ".ascii", ok);
+  if (!ok)
+    return false;
+
+  TString fileName = fln;
 
   if (!fAny2ManyInfo->useStandardOutput)
     cout << endl << ">> PRunDataHandler::WriteAsciiFile(): writing an ascii data file (" << fln.Data() << ") ... " << endl;
@@ -5667,6 +5616,62 @@ Int_t PRunDataHandler::GetDataTagIndex(TString &str, const PStringVector* dataTa
   return result;
 }
 
+
+//--------------------------------------------------------------------------
+// GenerateOutputFileName (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Generates the output file name (any2many). It also makes sure that the
+ * generated output file name does not coincidentally is identical to an already
+ * existing file.
+ *
+ * <b>return:</b>
+ * - constructed file name
+ * - empty string
+ *
+ * \param fileName
+ * \param extension if the file name to be constructed
+ * \param ok flag which is 'true' if the file name could be constructed, 'false' otherwise
+ */
+TString PRunDataHandler::GenerateOutputFileName(const TString fileName, const TString extension, Bool_t &ok)
+{
+  TString fln = fileName;
+  ok = true;
+
+  // generate output file name if needed
+  if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {
+    if (fln.Length() == 0) {
+      ok = false;
+      fln = GetFileName(extension, ok);
+      if (!ok) {
+        fln = "";
+        return fln;
+      }
+    } else {
+      fln.Prepend(fAny2ManyInfo->outPath);
+    }
+
+    // make sure that the file name doesn't already exist as a real file
+    if (!gSystem->AccessPathName(fln)) { // file name already exists!!
+      Int_t count = 1;
+      TString newFln;
+      do {
+        newFln = fln;
+        newFln.Insert(newFln.Last('.'), TString::Format(".%d", count++));
+      } while (!gSystem->AccessPathName(newFln));
+      cerr << endl << ">> PRunDataHandler::GenerateOutputFileName **WARNING** needed to modify output filename to " << newFln << ",";
+      cerr << endl << ">>    due to potential conflict with already existing files." << endl << endl;
+      fln = newFln;
+    }
+
+    // keep the file name if compression is whished
+    fAny2ManyInfo->outPathFileName.push_back(fln);
+  } else {
+    fln = fAny2ManyInfo->outPath + TString("__tmp.") + extension;
+  }
+
+  return fln;
+}
 
 //--------------------------------------------------------------------------
 // GetFileName (private)

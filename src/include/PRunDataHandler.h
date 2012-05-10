@@ -94,6 +94,7 @@ class PRunDataHandler
     virtual Int_t ToInt(TString &str, Bool_t &ok);
     virtual Int_t GetDataTagIndex(TString &str, const PStringVector* fLabels);
 
+    virtual TString GenerateOutputFileName(const TString fileName, const TString extension, Bool_t &ok);
     virtual TString GetFileName(const TString extension, Bool_t &ok);
     virtual TString FileNameFromTemplate(TString &fileNameTemplate, Int_t run, TString &year, Bool_t &ok);
     virtual bool DateToISO8601(string inDate, string &iso8601Date);

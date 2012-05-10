@@ -202,8 +202,7 @@ int main(int argc, char *argv[])
   Int_t ival;
   for (int i=1; i<argc; i++) {
 
-    // handle year option
-    if (!strcmp(argv[i], "-y")) {
+    if (!strcmp(argv[i], "-y")) { // handle year option
       if (i+1 < argc) {
         ival=0;
         status = sscanf(argv[i+1], "%d", &ival);
@@ -219,14 +218,9 @@ int main(int argc, char *argv[])
         show_syntax = true;
         break;
       }
-    }
-
-    // handle standard output option '-s'
-    if (!strcmp(argv[i], "-s"))
+    } else if (!strcmp(argv[i], "-s")) { // handle standard output option '-s'
       info.useStandardOutput = true;
-
-    // set input option tag
-    if (!strcmp(argv[i], "-f")) {
+    } else if (!strcmp(argv[i], "-f")) { // set input option tag
       if (i+1 < argc) {
         bool done = false;
         int j = i+1;
@@ -238,18 +232,15 @@ int main(int argc, char *argv[])
             j++; // shift input to the proper place
           }
         } while (!done && (j<argc));
-        i = j;
-        if (i >= argc) // make sure that counter is still in range
+        i = j-1;
+        if (j >= argc) // make sure that counter is still in range
           break;
       } else {
         cerr << endl << ">> any2many **ERROR** found input option '-f' without any arguments" << endl;
         show_syntax = true;
         break;
       }
-    }
-
-    // handle output file name option '-o'
-    if (!strcmp(argv[i], "-o")) {
+    } else if (!strcmp(argv[i], "-o")) { // handle output file name option '-o'
       if (i+1 < argc) {
         outputFileName = argv[i+1];
         i++;
@@ -258,9 +249,7 @@ int main(int argc, char *argv[])
         show_syntax = true;
         break;
       }
-    }
-
-    if (!strcmp(argv[i], "-r")) {
+    } else if (!strcmp(argv[i], "-r")) {
       if (i+1 < argc) {
         // first check for run list sequence of the form <runStartNo>-<runEndNo>
         int startNo, endNo;
@@ -273,7 +262,7 @@ int main(int argc, char *argv[])
           }
           for (int j=startNo; j<=endNo; j++)
             info.runList.push_back(j);
-          i += 2;
+          i++;
         } else { // check for run list of the form <run1>  <run2>  ...  <runN>
           bool done = false;
           int j = i+1;
@@ -286,8 +275,8 @@ int main(int argc, char *argv[])
               done = true;
             }
           } while (!done && (j<argc));
-          i = j;
-          if (i >= argc) // make sure that counter is still in range
+          i = j-1;
+          if (j >= argc) // make sure that counter is still in range
             break;
         }
       } else {
@@ -302,10 +291,7 @@ int main(int argc, char *argv[])
         show_syntax = true;
         break;
       }
-    }
-
-    // set convert option tag
-    if (!strcmp(argv[i], "-c")) {
+    } else if (!strcmp(argv[i], "-c")) { // set convert option tag
       bool found = false;
       string sval;
       if (i+2 < argc) {
@@ -343,10 +329,7 @@ int main(int argc, char *argv[])
         show_syntax = true;
         break;
       }
-    }
-
-    // filter output path name flag
-    if (!strcmp(argv[i], "-p")) {
+    } else if (!strcmp(argv[i], "-p")) { // filter output path name flag
       if (i+1 < argc) {
         info.outPath = argv[i+1];
         if (!info.outPath.EndsWith("/"))
@@ -357,14 +340,12 @@ int main(int argc, char *argv[])
         show_syntax = true;
         break;
       }
-    }
-
-    // filter out rebinning option
-    if (!strcmp(argv[i], "-rebin")) {
+    } else if (!strcmp(argv[i], "-rebin")) { // filter out rebinning option
       if (i+1 < argc) {
         status = sscanf(argv[i+1], "%d", &ival);
         if (status == 1) {
           info.rebin = ival;
+          i++;
         } else {
           cerr << endl << ">> any2many **ERROR** found in option '-rebin " << argv[i+1] << "' which doesn't make any sense." << endl;
           show_syntax = true;
@@ -375,10 +356,7 @@ int main(int argc, char *argv[])
         show_syntax = true;
         break;
       }
-    }
-
-    // filter out the input/output file template
-    if (!strcmp(argv[i], "-t")) {
+    } else if (!strcmp(argv[i], "-t")) { // filter out the input/output file template
       if (i+2 < argc) {
         if ((argv[i+1][0] == '-') || (argv[i+2][0] == '-')) {
           cerr << endl << ">> any2many **ERROR** found invalid template in option '-t'" << endl;
@@ -393,10 +371,7 @@ int main(int argc, char *argv[])
         show_syntax = true;
         break;
       }
-    }
-
-    // filter out if compression is whished
-    if (!strcmp(argv[i], "-z")) {
+    } else if (!strcmp(argv[i], "-z")) { // filter out if compression is whished
       if (i+2 < argc) {
         if ((argv[i+1][0] == '-') || (argv[i+2][0] == '-')) {
           cerr << endl << ">> any2many **ERROR** found invalid template in option '-t'" << endl;
@@ -419,6 +394,10 @@ int main(int argc, char *argv[])
         show_syntax = true;
         break;
       }
+    } else { // unrecognized command
+      cerr << endl << ">> any2many **ERROR** found unrecognized option " << argv[i] << endl;
+      show_syntax = true;
+      break;
     }
   }
 
