@@ -29,6 +29,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -571,7 +575,11 @@ int main(int argc, char *argv[])
     return -1;
   } else if (argc==2) {
     if (!strcmp(argv[1], "--version")) {
-      cout << endl << "musrRootValidation version: " << PMUSR_VERSION << " / $Id$" << endl << endl;
+#ifdef HAVE_CONFIG_H
+      cout << endl << "musrRootValidation version: " << PACKAGE_VERSION << ", $Id$" << endl << endl;
+#else
+      cout << endl << "musrRootValidation version: $Id$" << endl << endl;
+#endif
       return 0;
     } else {
       mrv_syntax();

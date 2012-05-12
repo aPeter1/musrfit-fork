@@ -31,10 +31,8 @@ EXTRA_DIST = $(EDITORDIR)/Makefile
 endif
 
 bin_PROGRAMS = musrfit musrview musrt0 msr2msr msr2data any2many
-if PNEXUS_ENABLED
-bin_PROGRAMS += nexus_dump
-endif
-bin_PROGRAMS += read_musrRoot_runHeader write_musrRoot_runHeader musrRootValidation
+bin_PROGRAMS += write_musrRoot_runHeader musrRootValidation
+bin_PROGRAMS += dump_header
 
 musrfit_SOURCES = musrfit.cpp
 musrview_SOURCES = musrview.cpp
@@ -42,12 +40,9 @@ musrt0_SOURCES = musrt0.cpp
 msr2msr_SOURCES = msr2msr.cpp
 msr2data_SOURCES = msr2data.cpp
 any2many_SOURCES = any2many.cpp
-if PNEXUS_ENABLED
-nexus_dump_SOURCES = nexus_dump.cpp
-endif
-read_musrRoot_runHeader_SOURCES = read_musrRoot_runHeader.cpp
 write_musrRoot_runHeader_SOURCES = write_musrRoot_runHeader.cpp
 musrRootValidation_SOURCES = musrRootValidation.cpp
+dump_header_SOURCES = dump_header.cpp
 
 xmldir = $(bindir)
 xml_DATA = musrfit_startup.xml
@@ -56,7 +51,7 @@ LIBADD = $(PMUSR_LIBS) $(MUSR_ROOT_LIBS) $(LEM_LIBS) $(PSIBIN_LIBS) $(MUD_LIBS) 
 
 AM_CXXFLAGS = $(LOCAL_BIN_CXXFLAGS)
 AM_LDFLAGS = $(LOCAL_BIN_LDFLAGS)
-INCLUDES = $(MUSR_ROOT_CFLAGS) $(PMUSR_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(BOOST_CFLAGS) $(ROOT_CFLAGS) \
+INCLUDES = $(MUSR_ROOT_CFLAGS) $(LEM_CFLAGS) $(MUD_CFLAGS) $(PSIBIN_CFLAGS) $(PMUSR_CFLAGS) $(FFTW3_CFLAGS) $(GSL_CFLAGS) $(BOOST_CFLAGS) $(ROOT_CFLAGS) \
            $(LIBXML2_CFLAGS)
 if PNEXUS_ENABLED
 INCLUDES += $(HDF5_CFLAGS) $(NEXUS_CFLAGS) $(PNEXUS_CXXFLAGS)

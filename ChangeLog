@@ -6,6 +6,11 @@
 
 changes since 0.11.0
 ===================================
+NEW 2012-05-12 added dump_header. This is a little program which dumps the
+               header information of a given muSR data file onto the standard
+	       output. Since dump_header also includes the option of
+	       nexus_dump and read_musrRoot_runHeader these latter programs
+	       were removed.
 NEW 2012-04-24 added a first version for negative muon fitting. At the same 
                time substaintial bug fixing has been carried out (mainly the
 	       logx/logy handling).

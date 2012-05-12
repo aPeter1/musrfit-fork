@@ -29,6 +29,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -187,9 +191,13 @@ int main(int argc, char *argv[])
   if (argc == 2) {
     if (strstr(argv[1], "--h"))
       any2many_syntax();
-    else if (strstr(argv[1], "--v"))
-      cout << endl << "any2many version: " << PMUSR_VERSION << " / $Id$" << endl << endl;
-    else {
+    else if (strstr(argv[1], "--v")) {
+#ifdef HAVE_CONFIG_H
+      cout << endl << "any2many version: " << PACKAGE_VERSION << ", $Id$" << endl << endl;
+#else
+      cout << endl << "any2many version: $Id$" << endl << endl;
+#endif
+    } else {
       any2many_syntax();
       return PMUSR_WRONG_STARTUP_SYNTAX;
     }

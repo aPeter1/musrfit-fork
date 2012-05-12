@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2009-2010 by Bastian M. Wojek / Andreas Suter           *
+ *   Copyright (C) 2009-2012 by Bastian M. Wojek / Andreas Suter           *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -33,6 +33,10 @@
 //       using std::string, boost and related standard C++ features
 //       This implies, however, occasionally strange constructs when interoperating with PMusr-classes
 //       which mostly rely on ROOT's TString.
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "PMsr2Data.h"
 
@@ -386,7 +390,11 @@ int main(int argc, char *argv[])
       msr2data_syntax();
       return 0;
     } else if (!strcmp(argv[1], "--version")) {
-      cout << endl << "msr2data  version: " << PMUSR_VERSION << " / $Id$" << endl << endl;
+#ifdef HAVE_CONFIG_H
+      cout << endl << "msr2data  version: " << PACKAGE_VERSION << ", $Id$" << endl << endl;
+#else
+      cout << endl << "msr2data  version: $Id$" << endl << endl;
+#endif
       return 0;
     } else {
       msr2data_syntax();

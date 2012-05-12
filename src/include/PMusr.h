@@ -38,8 +38,6 @@ using namespace std;
 
 #include <TString.h>
 
-#define PMUSR_VERSION  "0.11.0"
-
 #define PMUSR_SUCCESS                   0
 #define PMUSR_WRONG_STARTUP_SYNTAX     -1
 #define PMUSR_MSR_FILE_NOT_FOUND       -2

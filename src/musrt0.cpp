@@ -29,6 +29,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -227,8 +231,11 @@ Int_t main(Int_t argc, Char_t *argv[])
   memset(filename, '\0', sizeof(filename));
   for (int i=1; i<argc; i++) {
     if (!strcmp(argv[i], "--version")) {
-      cout << endl << ">> musrt0 version: " << PMUSR_VERSION << " / $Id$";
-      cout << endl << endl;
+#ifdef HAVE_CONFIG_H
+      cout << endl << ">> musrt0 version: " << PACKAGE_VERSION << ", $Id$" << endl << endl;
+#else
+      cout << endl << ">> musrt0 version: $Id$" << endl << endl;
+#endif
       return PMUSR_SUCCESS;
     } else if (!strcmp(argv[i], "--help")) {
       show_syntax = true;

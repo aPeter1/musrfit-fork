@@ -29,6 +29,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -117,8 +121,11 @@ int main(int argc, char *argv[])
         break;
       }
     } else if (!strcmp(argv[i], "--version")) {
-      cout << endl << "musrview version: " << PMUSR_VERSION << " / $Id$";
-      cout << endl << endl;
+#ifdef HAVE_CONFIG_H
+      cout << endl << "musrview version: " << PACKAGE_VERSION << ", $Id$" << endl << endl;
+#else
+      cout << endl << "musrview version: $Id$" << endl << endl;
+#endif
       return PMUSR_SUCCESS;
     } else if (!strcmp(argv[i], "--help")) {
       show_syntax = true;

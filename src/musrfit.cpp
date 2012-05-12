@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007 by Andreas Suter                                   *
+ *   Copyright (C) 2007-2012 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -28,6 +28,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include <cstdio>
 #include <cstdlib>
@@ -395,9 +399,12 @@ int main(int argc, char *argv[])
 
   if (argc == 2) {
     if (!strcmp(argv[1], "--version")) {
-      cout << endl << "musrfit version: " << PMUSR_VERSION << " / $Id$";
-      cout << endl << endl;
-      return PMUSR_SUCCESS; 
+#ifdef HAVE_CONFIG_H
+      cout << endl << "musrfit version: " << PACKAGE_VERSION << ", $Id$" << endl << endl;
+#else
+      cout << endl << "musrfit version: $Id$" << endl << endl;
+#endif
+      return PMUSR_SUCCESS;
     }
 
     if (!strcmp(argv[1], "--help")) {
