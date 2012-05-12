@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en_US">
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 08 May 2012 05:20:38 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Sat, 12 May 2012 14:47:32 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 <head>
 <link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
@@ -21,7 +21,7 @@
 <meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
 
 	<link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" /> <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
-	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1336454417" type="application/x-wiki" title="edit MusrFit" />
+	<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1336834032" type="application/x-wiki" title="edit MusrFit" />
 	<meta name="description" content="MusrFit" />
   <base  /><!--[if IE]></base><![endif]-->
 	
@@ -134,8 +134,7 @@ pre {
 </li> <li> <a href="MusrFit.html#A_2.4_musrfit_startup.xml"> 2.4  musrfit_startup.xml </a>
 </li> <li> <a href="MusrFit.html#A_2.5_msr2msr"> 2.5  msr2msr </a>
 </li> <li> <a href="MusrFit.html#A_2.6_any2many"> 2.6  any2many </a>
-</li> <li> <a href="MusrFit.html#A_2.7_nexus_dump"> 2.7  nexus_dump </a>
-</li> <li> <a href="MusrFit.html#A_2.8_read_musrRoot_runHeader"> 2.8  read_musrRoot_runHeader </a>
+</li> <li> <a href="MusrFit.html#A_2.7_dump_header"> 2.7  dump_header </a>
 </li></ul> 
 </li> <li> <a href="MusrFit.html#A_3_Auxiliary_Programs"> 3  Auxiliary Programs </a>
 </li> <li> <a href="MusrFit.html#A_4_Description_of_the_msr_File_Format"> 4  Description of the msr File Format </a> <ul>
@@ -370,13 +369,9 @@ Will take the runs 100 through 117 and convert the <code>NeXus</code> input file
 <pre class="bash">any2many -f 2010/lem10&#95;his&#95;0123.root 2010/lem10&#95;his&#95;0012.root -c ROOT ROOT -rebin 25</pre>
 Will read the two files <code>'2010/lem10_his_0123.root'</code> and <code>'2010/lem10_his_0012.root'</code>, rebin them with 25 and export them as <code>LEM ROOT</code> files with adding <code>rebin25</code> to the name, e.g. <code>2010/lem10_his_0123_rebin25.root</code>.
 <p></p>
-<a name="NexusDump"></a>
-<h2><a name="A_2.7_nexus_dump"></a> 2.7  nexus_dump </h2>
-<code>nexus_dump</code> is a little program which tries to read a <code>NeXus</code> file and send the relevant information (required header info, start of the histos, etc.) to the standard output.
-<p></p>
-<a name="MusrRootRunHeaderDump"></a>
-<h2><a name="A_2.8_read_musrRoot_runHeader"></a> 2.8  read_musrRoot_runHeader </h2>
-<code>read_musrRoot_runHeader</code> is a little program which tries to read a <code>MusrRoot</code> file and send the relevant header information to the standard output.
+<a name="DumpHeader"></a>
+<h2><a name="A_2.7_dump_header"></a> 2.7  dump_header </h2>
+<code>dump_header</code> is a little program which tries to read a &#956;SR data file and sends the relevant information (required header info, start of the histos, etc.) to the standard output. Currently the following &#956;SR data file formats are supported: <code>MusrROOT</code>, <code>ROOT</code> (old LEM format), <code>PSI-BIN</code>, <code>PSI-MDU</code>, <code>NeXus</code> (IDF1 and IDF2), <code>MUD</code>, and <code>WKM</code>.
 <p></p>
 <a name="AuxiliaryPrograms"></a>
 <h1><a name="A_3_Auxiliary_Programs"></a> 3  Auxiliary Programs </h1>
@@ -1452,7 +1447,7 @@ For reporting bugs or requesting new features and improvements please use the <a
 <p></p>
 </body>
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 08 May 2012 05:20:56 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Sat, 12 May 2012 14:47:50 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 </html>
 <p></p>
