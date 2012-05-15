@@ -420,12 +420,18 @@ void PPippard::SaveField()
   fprintf(fp, "%% Data --------------------------------------\n");
   fprintf(fp, "%% z (nm), B/B_0 \n");
   if (fParams.specular) {
+    for (Int_t i=0; i<(Int_t)(fParams.deadLayer/f_dz); i++) {
+      fprintf(fp, "%lf, %lf\n", f_dz*(Double_t)i, 1.0);
+    }
     for (Int_t i=0; i<PippardFourierPoints/2; i++) {
-      fprintf(fp, "%lf, %lf\n", f_dz*(Double_t)i, fFieldB[i+fShift][1]);
+      fprintf(fp, "%lf, %lf\n", fParams.deadLayer + f_dz*(Double_t)i, fFieldB[i+fShift][1]);
     }
   } else {
+    for (Int_t i=0; i<(Int_t)(fParams.deadLayer/(f_dz * XiP_T(fParams.t))); i++) {
+      fprintf(fp, "%lf, %lf\n", f_dz * XiP_T(fParams.t) * (Double_t)i, 1.0);
+    }
     for (Int_t i=0; i<PippardDiffusePoints; i++) {
-      fprintf(fp, "%lf, %lf\n", f_dz * XiP_T(fParams.t) * (Double_t)i, (*fFieldDiffuse)(i));
+      fprintf(fp, "%lf, %lf\n", fParams.deadLayer + f_dz * XiP_T(fParams.t) * (Double_t)i, (*fFieldDiffuse)(i));
     }
   }
 
