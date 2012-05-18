@@ -220,13 +220,11 @@ Bool_t PRunDataHandler::ReadFilesMsr()
   for (UInt_t i=0; i<runList->size(); i++) {
     for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++) {
       fRunName = *(runList->at(i).GetRunName(j));
-      // check is file is already read
-      if (FileAlreadyRead(*(runList->at(i).GetRunName(j))))
-        continue;
       // check if file actually exists
       if (!FileExistsCheck(runList->at(i), j))
         return false;
-      // everything looks fine, hence try to read the data file
+
+      // check special case for ROOT-NPP/ROOT-PPC (LEM)
       if (!runList->at(i).GetFileFormat(j)->CompareTo("root-npp")) { // not post pile up corrected histos
         // check if forward/backward histoNo are within proper bounds, i.e. < PRH_PPC_OFFSET
         for (UInt_t k=0; k<runList->at(i).GetForwardHistoNoSize(); k++) {
@@ -237,7 +235,6 @@ Bool_t PRunDataHandler::ReadFilesMsr()
           if (runList->at(i).GetBackwardHistoNo(k) > PRH_PPC_OFFSET)
             runList->at(i).SetBackwardHistoNo(runList->at(i).GetBackwardHistoNo(k)-PRH_PPC_OFFSET, k);
         }
-        success = ReadRootFile();
       } else if (!runList->at(i).GetFileFormat(j)->CompareTo("root-ppc")) { // post pile up corrected histos
         // check if forward/backward histoNo are within proper bounds, i.e. > PRH_PPC_OFFSET
         for (UInt_t k=0; k<runList->at(i).GetForwardHistoNoSize(); k++) {
@@ -248,6 +245,15 @@ Bool_t PRunDataHandler::ReadFilesMsr()
           if (runList->at(i).GetBackwardHistoNo(k) < PRH_PPC_OFFSET)
             runList->at(i).SetBackwardHistoNo(runList->at(i).GetBackwardHistoNo(k)+PRH_PPC_OFFSET, k);
         }
+      }
+
+      // check is file is already read
+      if (FileAlreadyRead(*(runList->at(i).GetRunName(j))))
+        continue;
+      // everything looks fine, hence try to read the data file
+      if (!runList->at(i).GetFileFormat(j)->CompareTo("root-npp")) { // not post pile up corrected histos
+        success = ReadRootFile();
+      } else if (!runList->at(i).GetFileFormat(j)->CompareTo("root-ppc")) { // post pile up corrected histos
         success = ReadRootFile();
       } else if (!runList->at(i).GetFileFormat(j)->CompareTo("musr-root")) { // MusrRoot style file
         success = ReadRootFile();

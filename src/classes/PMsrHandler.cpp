@@ -3853,7 +3853,7 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
       cerr << endl;
       cerr << endl << "where <plot_type> is: 0=single histo asym,";
       cerr << endl << "                      2=forward-backward asym,";
-      cerr << endl << "                      4=mu minus singhle histo (not implemented yet),";
+      cerr << endl << "                      4=mu minus single histo,";
       cerr << endl << "                      8=non muSR.";
       cerr << endl << "<run_list> is the list of runs, e.g. runs 1 3";
       cerr << endl << "range is optional";
