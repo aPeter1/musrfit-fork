@@ -125,6 +125,7 @@
       <xs:element name="Moderator_HV" type="TMusrRunPhysicalQuantity"/>
       <xs:element name="Sample_HV" type="TMusrRunPhysicalQuantity"/>
       <xs:element name="Implantation_Energy" type="TMusrRunPhysicalQuantity"/>
+      <xs:element name="Muon_Spin_Angle" type="TMusrRunPhysicalQuantity"/>
       <xs:element name="Cuts" type="TString"/>
       <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/> <!-- here can go any additional stuff you like -->
     </xs:sequence>

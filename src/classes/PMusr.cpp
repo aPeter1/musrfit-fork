@@ -519,6 +519,7 @@ PRawRunData::PRawRunData()
   fMuonSource = TString("n/a");
   fMuonSpecies = TString("n/a");
   fMuonBeamMomentum = PMUSR_UNDEFINED;
+  fMuonSpinAngle = PMUSR_UNDEFINED;
   fRunName = TString("n/a");
   fRunNumber = -1;
   fRunTitle = TString("n/a");

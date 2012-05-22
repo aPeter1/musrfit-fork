@@ -358,6 +358,7 @@ class PRawRunData {
     virtual const TString* GetMuonSource() { return &fMuonSource; }
     virtual const TString* GetMuonSpecies() { return &fMuonSpecies; }
     virtual const Double_t GetMuonBeamMomentum() { return fMuonBeamMomentum; }
+    virtual const Double_t GetMuonSpinAngle() { return fMuonSpinAngle; }
     virtual const Int_t GetRunNumber() { return fRunNumber; }
     virtual const TString* GetRunTitle() { return &fRunTitle; }
     virtual const TString* GetSetup() { return &fSetup; }
@@ -404,6 +405,7 @@ class PRawRunData {
     virtual void SetMuonSource(const TString &str) { fMuonSource = str; }
     virtual void SetMuonSpecies(const TString &str) { fMuonSpecies = str; }
     virtual void SetMuonBeamMomentum(const Double_t dval) { fMuonBeamMomentum = dval; }
+    virtual void SetMuonSpinAngle(const Double_t dval) { fMuonSpinAngle = dval; }
     virtual void SetRunName(const TString &str) { fRunName = str; }
     virtual void SetRunNumber(const Int_t &val) { fRunNumber = val; }
     virtual void SetRunTitle(const TString str) { fRunTitle = str; }
@@ -444,6 +446,7 @@ class PRawRunData {
     TString fMuonSource;             ///< keeps the type of muon source, e.g. continous surface beam, pulsed beam, low energy muon beam
     TString fMuonSpecies;            ///< positive muon or negative muon
     Double_t fMuonBeamMomentum;      ///< given in MeV/c, for LEM this is the momentum of the secondary beamline and NOT the momentum of the low energy beam
+    Double_t fMuonSpinAngle;         ///< gives the muon spin angle in degrees (reference frame depends on the instrument)
     TString fRunName;                ///< name of the run as found in the msr-file
     Int_t   fRunNumber;              ///< run number
     TString fRunTitle;               ///< run title

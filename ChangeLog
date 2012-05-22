@@ -6,6 +6,7 @@
 
 changes since 0.11.0
 ===================================
+NEW 2012-05-22 added spin rotation angle to the LEM MusrRoot file.
 NEW 2012-05-12 added dump_header. This is a little program which dumps the
                header information of a given muSR data file onto the standard
 	       output. Since dump_header also includes the option of

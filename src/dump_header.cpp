@@ -190,6 +190,7 @@ int dump_header_root(const string fileName, const string fileFormat)
  */
 int dump_header_nexus(const string fileName) {
 
+#ifdef PNEXUS_ENABLED
   PNeXus *nxs_file = new PNeXus(fileName.c_str());
 
   if (nxs_file->IsValid(false)) {
@@ -198,6 +199,9 @@ int dump_header_nexus(const string fileName) {
 
   if (nxs_file)
     delete nxs_file;
+#else
+  cout << endl << "NeXus not enabled, hence the header information cannot be dumped." << endl << endl;
+#endif
 
   return 0;
 }

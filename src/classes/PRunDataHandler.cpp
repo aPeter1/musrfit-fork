@@ -1472,6 +1472,11 @@ Bool_t PRunDataHandler::ReadRootFile()
     if (ok)
       runData.SetMuonSource(str);
 
+    header->Get("RunInfo/Muon Spin Angle", prop, ok);
+    if (ok) {
+      runData.SetMuonSpinAngle(prop.GetValue());
+    }
+
     header->Get("RunInfo/Setup", str, ok);
     if (ok)
       runData.SetSetup(str);
