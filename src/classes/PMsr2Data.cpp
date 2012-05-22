@@ -1894,6 +1894,13 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHead
       }
     }
     rawRunData = 0;
+
+    value = rawRunData->GetMuonSpinAngle();
+    if (value != PMUSR_UNDEFINED) {
+      dataParamNames.push_back("dataSpinRot");
+      dataParamLabels.push_back("Spin Rotation Angle (degree)");
+      dataParam.push_back(value);
+    }
   }
 
 // get the independent variable values from the runlist file if needed
