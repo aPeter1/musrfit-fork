@@ -68,6 +68,7 @@ using namespace std;
 #include "PReplaceDialog.h"
 #include "PReplaceConfirmationDialog.h"
 #include "PFitOutputHandler.h"
+#include "PDumpOutputHandler.h"
 #include "PPrefsDialog.h"
 #include "PGetDefaultDialog.h"
 #include "PMusrEditAbout.h"
@@ -549,6 +550,15 @@ void PTextEdit::setupMusrActions()
   a = new QAction( QIcon( QPixmap( ":/images/musrprefs.xpm" ) ), tr( "&Preferences" ), this );
   a->setStatusTip( tr("Show Preferences") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrPrefs() ) );
+  tb->addAction(a);
+  menu->addAction(a);
+
+  menu->addSeparator();
+  tb->addSeparator();
+
+  a = new QAction( QIcon( QPixmap(":/images/musrdump.xpm")), tr( "&Dump Header"), this);
+  a->setStatusTip( tr("Dumps muSR File Header Information") );
+  connect( a, SIGNAL(triggered()), this, SLOT(musrDump()));
   tb->addAction(a);
   menu->addAction(a);
 }
@@ -2205,6 +2215,25 @@ void PTextEdit::musrSwapMsrMlog()
     load(swapFileName);
     fTabWidget->setCurrentIndex(currentIdx);
   }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>Dumps the run header information of a selected muSR data file.
+ */
+void PTextEdit::musrDump()
+{
+  // select a muSR data filename
+  QString fileName = QFileDialog::getOpenFileName(this, tr("Select muSR Data File"), "./", tr("muSR Data Files (*.root *.bin *.msr *.nxs)"));
+
+  QVector<QString> cmd;
+  QString str = fAdmin->getExecPath() + "/dump_header";
+  cmd.append(str);
+  cmd.append(fileName);
+
+  PDumpOutputHandler dumpOutputHandler(cmd);
+  dumpOutputHandler.setModal(false);
+  dumpOutputHandler.exec();
 }
 
 //----------------------------------------------------------------------------------------------------

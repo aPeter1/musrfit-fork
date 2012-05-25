@@ -124,6 +124,7 @@ private slots:
   void musrT0();
   void musrPrefs();
   void musrSwapMsrMlog();
+  void musrDump();
 
   void helpContents();
   void helpAboutQt();

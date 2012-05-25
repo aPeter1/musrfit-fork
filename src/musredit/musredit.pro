@@ -81,6 +81,7 @@ HEADERS = musredit.h \
     PReplaceDialog.h \
     PReplaceConfirmationDialog.h \
     PFitOutputHandler.h \
+    PDumpOutputHandler.h \
     PPrefsDialog.h \
     PGetDefaultDialog.h \
     PGetTitleBlockDialog.h \ 
@@ -103,6 +104,7 @@ SOURCES = PHelp.cpp \
     PReplaceDialog.cpp \
     PReplaceConfirmationDialog.cpp \
     PFitOutputHandler.cpp \
+    PDumpOutputHandler.cpp \
     PPrefsDialog.cpp \
     PGetDefaultDialog.cpp \
     PGetTitleBlockDialog.cpp \ 
