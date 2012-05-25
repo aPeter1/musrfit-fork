@@ -2,6 +2,6 @@
 # Copyright 2009 by Zaher Salman and the LEM Group.
 
 export MUSRBIN=$ROOTSYS/bin/
-export PERLLIB=$HOME/analysis/musrfit/src/external/MuSRFitGUI
+export PERLLIB=$HOME/LEM/musrfit/src/external/MuSRFitGUI
 perl $PERLLIB/MuSRFit.pl
 

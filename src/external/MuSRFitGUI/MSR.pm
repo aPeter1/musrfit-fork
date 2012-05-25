@@ -47,7 +47,12 @@ my $erradd = "d";
 my $minadd = "_min";
 my $maxadd = "_max";
 
+# Subroutine to create a clean run block
+# Needs: Run number, year and beamline (or manual)
+sub CreateRUNBlk {
 
+
+}
 
 ##########################################################################
 # CreateMSR
@@ -94,6 +99,7 @@ sub CreateMSR {
 
     my @Hists = split( /,/, $All{"LRBF"} );
     # TODO
+    # : to separate twoo sets of asymmetries with same parameters
     # Check the number of histograms
     # should be 2 or 4 histograms
     # should be checked in GUI
@@ -277,7 +283,7 @@ FUNCTIONS
         $RUN = $RUNS[ $iRun - 1 ];
 
 	if ($All{"RUNSType"}) {
-	    $RUN_Line = MSR::RUNFileNameMan($RUN);
+	    $RUN_Line = MSR::RUNFileNameAuto($RUN,"0000",$EMPTY);
 	} else {
 	    $RUN_Line = MSR::RUNFileNameAuto($RUN,$YEAR,$BeamLine);
 	}
@@ -315,20 +321,20 @@ FUNCTIONS
 # Put T0_Line Bg_Line and Data_Line together if not empty
 	my $T0DataBg=$EMPTY;
 	if ($T0_Line ne "t0") {
-	    $T0DataBg = $T0DataBg."\n".$T0_Line;
+	    $T0DataBg = $T0DataBg.$T0_Line."\n";
 	}
 	if ($Bg_Line ne "background") {
-	    $T0DataBg = $T0DataBg."\n".$Bg_Line;
+	    $T0DataBg = $T0DataBg.$Bg_Line."\n";
 	}
 	if ($Data_Line ne "data") {
-	    $T0DataBg = $T0DataBg."\n".$Data_Line;
+	    $T0DataBg = $T0DataBg.$Data_Line."\n";
 	}
 
         $FRANGE_Line = "fit             TINI    TFIN";
         $PAC_Line    = "packing         BINNING";
 
 	$Single_RUN =
-"$RUN_Line\n$Type_Line\n$Alpha_Line$Hist_Lines\n$T0DataBg\n$MAP_Line\n$FRANGE_Line\n$PAC_Line\n\n";
+"$RUN_Line\n$Type_Line\n$Alpha_Line$Hist_Lines\n$T0DataBg$MAP_Line\n$FRANGE_Line\n$PAC_Line\n\n";
         
         # Now add the appropriate values of fit range and packing
         my $Range_Min = 8;
@@ -682,7 +688,7 @@ FUNCTIONS
 	    $RUN = $RUNS[ $iRun - 1 ];
 
 	    if ($All{"RUNSType"}) {
-		$RUN_Line = MSR::RUNFileNameMan($RUN);
+		$RUN_Line = MSR::RUNFileNameAuto($RUN,"0000",$EMPTY);
 	    } else {
 		$RUN_Line = MSR::RUNFileNameAuto($RUN,$YEAR,$BeamLine);
 	    }
@@ -1663,63 +1669,55 @@ sub RUNFileNameAuto {
 # Take this information as input arguments
     (my $RUN, my $YEAR, my $BeamLine) = @_;
 
-    my $DATADIR = $DATADIRS{$BeamLine};
-    my $RUNtmp=sprintf("%04d",$RUN);
-	    
-    # Get current year
-    my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
-	localtime( time() );
-    my $current_year = $year + 1900;
-    
-    if ( $BeamLine eq "LEM" || $BeamLine eq "LEM (PPC)") {
-	$RUN_File_Name = "lem" . substr( $YEAR, 2 ) . "_his_" . $RUNtmp;
-	$RUNFILE       = "$DATADIR/$YEAR/$RUN_File_Name";
-    }
-    elsif ( $BeamLine eq "GPS" ) {
-	$RUN_File_Name = "deltat_tdc_gps_" . $RUNtmp;
-	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
-    }
-    elsif ( $BeamLine eq "LTF" ) {
-	$RUN_File_Name = "deltat_tdc_ltf_" . $RUNtmp;
-	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
-    }
-    elsif ( $BeamLine eq "Dolly" ) {
-	$RUN_File_Name = "deltat_tdc_dolly_" . $RUNtmp;
-	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
-    }
-    elsif ( $BeamLine eq "GPD" ) {
-	$RUN_File_Name = "deltat_tdc_gpd_" . $RUNtmp;
-	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
-    }
-    my $RUN_Line = join( $SPACE,
-			 "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
-			 $Def_Format{$BeamLine} );
-    return $RUN_Line;
-}
-
-########################
-# RUNFileNameMan
-# Function return the RUN_Line for a given RUN
-# input should be 
-# $RUN is the run number
-# $YEAR is the year
-# $BeamLine in the name of beamline
-########################
-sub RUNFileNameMan { 
-    my %EXTs = ("root","ROOT-NPP",
-		"bin","PSI-BIN",
-		"msr","MUD");
+    my $RUN_Line=$EMPTY;
+# if BeamLine is empty assume manual name
+    if ($BeamLine eq $EMPTY) {
+	my %EXTs = ("root","ROOT-NPP",
+		    "bin","PSI-BIN",
+		    "msr","MUD");
 
 # Take this information as input arguments
-    (my $RUN) = @_;
-    my @tmp = split(/\./,$RUN);
-    my $EXT = @tmp[$#tmp];
+	(my $RUN) = @_;
+	my @tmp = split(/\./,$RUN);
+	my $EXT = @tmp[$#tmp];
+	
+	$RUN =~  s/\.[^.]+$//;
 
-    $RUN =~  s/\.[^.]+$//;
-
-    my $RUN_Line = join( $SPACE,
-			 "RUN", $RUN, "MUE4", "PSI",$EXTs{$EXT});
-
+	$RUN_Line = join( $SPACE,
+			     "RUN", $RUN, "MUE4", "PSI",$EXTs{$EXT});
+    } else {
+	my $DATADIR = $DATADIRS{$BeamLine};
+	my $RUNtmp=sprintf("%04d",$RUN);
+	    
+	# Get current year
+	my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
+	    localtime( time() );
+	my $current_year = $year + 1900;
+	
+	if ( $BeamLine eq "LEM" || $BeamLine eq "LEM (PPC)") {
+	    $RUN_File_Name = "lem" . substr( $YEAR, 2 ) . "_his_" . $RUNtmp;
+	    $RUNFILE       = "$DATADIR/$YEAR/$RUN_File_Name";
+	}
+	elsif ( $BeamLine eq "GPS" ) {
+	    $RUN_File_Name = "deltat_tdc_gps_" . $RUNtmp;
+	    $RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
+	}
+	elsif ( $BeamLine eq "LTF" ) {
+	    $RUN_File_Name = "deltat_tdc_ltf_" . $RUNtmp;
+	    $RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
+	}
+	elsif ( $BeamLine eq "Dolly" ) {
+	    $RUN_File_Name = "deltat_tdc_dolly_" . $RUNtmp;
+	    $RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
+	}
+	elsif ( $BeamLine eq "GPD" ) {
+	    $RUN_File_Name = "deltat_tdc_gpd_" . $RUNtmp;
+	    $RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
+	}
+	$RUN_Line = join( $SPACE,
+			     "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
+			     $Def_Format{$BeamLine} );
+    }
     return $RUN_Line;
 }
 
