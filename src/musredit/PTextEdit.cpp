@@ -2225,6 +2225,8 @@ void PTextEdit::musrDump()
 {
   // select a muSR data filename
   QString fileName = QFileDialog::getOpenFileName(this, tr("Select muSR Data File"), "./", tr("muSR Data Files (*.root *.bin *.msr *.nxs)"));
+  if (fileName.isEmpty())
+    return;
 
   QVector<QString> cmd;
   QString str = fAdmin->getExecPath() + "/dump_header";

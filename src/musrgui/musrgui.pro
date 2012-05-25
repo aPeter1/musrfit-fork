@@ -69,6 +69,7 @@ HEADERS = musrgui.h \
     PFindDialog.h \
     PReplaceDialog.h \
     PFitOutputHandler.h \
+    PDumpOutputHandler.h \
     PPrefsDialog.h \
     PGetDefaultDialog.h \
     PGetParameterDialog.h \
@@ -88,6 +89,7 @@ SOURCES = PFileWatcher.cpp \
     PFindDialog.cpp \
     PReplaceDialog.cpp \
     PFitOutputHandler.cpp \
+    PDumpOutputHandler.cpp \
     PPrefsDialog.cpp \
     PGetDefaultDialog.cpp \
     PGetParameterDialog.cpp \
@@ -139,4 +141,5 @@ IMAGES = images/editcopy.xpm \
     images/musrview.xpm \
     images/musrt0.xpm \
     images/musrprefs.xpm \
-    images/musrswap.xpm
+    images/musrswap.xpm \
+    images/musrdump.xpm

@@ -65,6 +65,7 @@ using namespace std;
 #include "PReplaceDialog.h"
 #include "forms/PReplaceConfirmationDialog.h"
 #include "PFitOutputHandler.h"
+#include "PDumpOutputHandler.h"
 #include "PPrefsDialog.h"
 #include "PGetDefaultDialog.h"
 #include "forms/PMusrGuiAbout.h"
@@ -397,6 +398,15 @@ void PTextEdit::setupMusrActions()
   connect( a, SIGNAL( activated() ), this, SLOT( musrPrefs() ) );
   a->addTo( tb );
   a->addTo( menu );
+
+  menu->insertSeparator();
+  tb->addSeparator();
+
+  a = new QAction( QPixmap::fromMimeSource( "musrdump.xpm" ), tr( "&Dump Header" ), 0, this, "musrDump" );
+  connect( a, SIGNAL( activated() ), this, SLOT( musrDump() ) );
+  a->addTo( tb );
+  a->addTo( menu );
+
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1918,6 +1928,33 @@ void PTextEdit::musrSwapMsrMlog()
     load(swapFileName);
     fTabWidget->setCurrentPage(currentIdx);
   }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>
+ */
+void PTextEdit::musrDump()
+{
+  QString fileName = QFileDialog::getOpenFileName(
+                      "./",
+                      "muSR Data Files (*.root *.bin *.msr *.nxs)",
+                      this,
+                      "Select muSR Data File",
+                      "Select muSR Data File" );
+
+  if (fileName.isNull())
+    return;
+
+  QValueVector<QString> cmd;
+  QString str;
+  str = fAdmin->getExecPath() + "/dump_header";
+  cmd.append(str);
+  cmd.append(fileName);
+
+  PDumpOutputHandler dumpOutputHandler(cmd);
+  dumpOutputHandler.setModal(false);
+  dumpOutputHandler.exec();
 }
 
 //----------------------------------------------------------------------------------------------------
