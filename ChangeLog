@@ -16,6 +16,7 @@ NEW 2012-05-12 added dump_header. This is a little program which dumps the
 NEW 2012-04-24 added a first version for negative muon fitting. At the same 
                time substaintial bug fixing has been carried out (mainly the
 	       logx/logy handling).
+FIXED 2012-05-30 fixed RRF  bug in single histo plotting.
 FIXED 2012-05-18 fixed wrong forward/backward tag for ROOT-PPC (MUSR-215) 
 CHANGED 2012-05-10 prevent any2many from overwriting an input file. At the
    some additional bug fixing of any2many has be carried out.

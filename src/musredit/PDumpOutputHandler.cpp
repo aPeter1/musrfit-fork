@@ -62,8 +62,6 @@ PDumpOutputHandler::PDumpOutputHandler(QVector<QString> &cmd)
   // QProcess related code
   fProc = new QProcess( this );
 
-//  fProc->setWorkingDirectory(workingDirectory);
-
   // Set up the command and arguments.
   QString program = cmd[0];
   QStringList arguments;
@@ -72,7 +70,6 @@ PDumpOutputHandler::PDumpOutputHandler(QVector<QString> &cmd)
 
   connect( fProc, SIGNAL( readyReadStandardOutput() ), this, SLOT( readFromStdOut() ) );
   connect( fProc, SIGNAL( readyReadStandardError() ), this, SLOT( readFromStdErr() ) );
-//  connect( fProc, SIGNAL( finished(int, QProcess::ExitStatus) ),   this, SLOT( processDone(int, QProcess::ExitStatus) ) );
 
   fProc->start(program, arguments);
   if ( !fProc->waitForStarted() ) {

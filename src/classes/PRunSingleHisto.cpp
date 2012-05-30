@@ -1148,6 +1148,7 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
   fData.SetDataTimeStart(fTimeResolution*((Double_t)start-(Double_t)t0+(Double_t)(packing-1)/2.0));
   fData.SetDataTimeStep(fTimeResolution*packing);
 
+  // data is always normalized to (per nsec!!)
   Double_t gammaRRF = 0.0, wRRF = 0.0, phaseRRF = 0.0;
   if (fMsrInfo->GetMsrPlotList()->at(0).fRRFFreq == 0.0) { // normal Data representation
     for (Int_t i=start; i<end; i++) {
@@ -1196,7 +1197,7 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
       }
       time = ((Double_t)i-t0)*fTimeResolution;
       expval = TMath::Exp(+time/tau)/N0;
-      rrf_val = (-1.0+expval*(fForward[i]*dataNorm-bkg))*TMath::Cos(wRRF * time + phaseRRF);
+      rrf_val = (-1.0+expval*(fForward[i]/(fTimeResolution*1.0e3)-bkg))*TMath::Cos(wRRF * time + phaseRRF);
       value += rrf_val;
       error += fForward[i]*dataNorm;
     }
