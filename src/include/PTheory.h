@@ -65,8 +65,12 @@
 #define THEORY_BESSEL                       17
 #define THEORY_INTERNAL_BESSEL              18
 #define THEORY_SKEWED_GAUSS                 19
-#define THEORY_POLYNOM                      20
-#define THEORY_USER_FCN                     21
+#define THEORY_STATIC_ZF_NK                 20
+#define THEORY_STATIC_TF_NK                 21
+#define THEORY_DYNAMIC_ZF_NK                22
+#define THEORY_DYNAMIC_TF_NK                23
+#define THEORY_POLYNOM                      24
+#define THEORY_USER_FCN                     25
 
 // function parameter tags, i.e. how many parameters has a specific function
 // if there is a comment with a (tshift), the number of parameters is increased by one
@@ -90,9 +94,13 @@
 #define THEORY_PARAM_BESSEL                       2 // phase, frequency (tshift)
 #define THEORY_PARAM_INTERNAL_BESSEL              5 // fraction, phase, frequency, TF damping, LF damping (tshift)
 #define THEORY_PARAM_SKEWED_GAUSS                 4 // phase, frequency, rate minus, rate plus (tshift)
+#define THEORY_PARAM_STATIC_ZF_NK                 2 // damping D0, R_b=DGbG/D0 (tshift)
+#define THEORY_PARAM_STATIC_TF_NK                 4 // phase, frequency, damping D0, R_b=DGbG/D0 (tshift)
+#define THEORY_PARAM_DYNAMIC_ZF_NK                3 // damping D0, R_b=DGbG/D0, nu_c (tshift)
+#define THEORY_PARAM_DYNAMIC_TF_NK                5 // phase, frequency, damping D0, R_b=DGbG/D0, nu_c (tshift)
 
 // number of available user functions
-#define THEORY_MAX 22
+#define THEORY_MAX 26
 
 // maximal number of parameters. Needed in the contents of LF
 #define THEORY_MAX_PARAM 10
@@ -184,6 +192,18 @@ static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
   {THEORY_SKEWED_GAUSS, THEORY_PARAM_SKEWED_GAUSS, false,
    "skewedGss", "skg", "(phase frequency rate_m rate_p)", "(phase frequency rate_m rate_p tshift)"},
 
+  {THEORY_STATIC_ZF_NK, THEORY_PARAM_STATIC_ZF_NK, false,
+   "staticNKZF", "snkzf", "(damping_D0 R_b)", "(damping_D0 R_b tshift)"},
+
+  {THEORY_STATIC_TF_NK, THEORY_PARAM_STATIC_TF_NK, false,
+   "staticNKTF", "snktf", "(phase frequency damping_D0 R_b)", "(phase frequency damping_D0 R_b tshift)"},
+
+  {THEORY_DYNAMIC_ZF_NK, THEORY_PARAM_DYNAMIC_ZF_NK, false,
+   "dynamicNKZF", "dnkzf", "(damping_D0 R_b nu_c)", "(damping_D0 R_b nu_c tshift)"},
+
+  {THEORY_DYNAMIC_TF_NK, THEORY_PARAM_DYNAMIC_TF_NK, false,
+   "dynamicNKTF", "dnktf", "(phase frequency damping_D0 R_b nu_c)", "(phase frequency damping_D0 R_b nu_c tshift)"},
+
   {THEORY_POLYNOM, 0, false,
    "polynom", "p", "(tshift p0 p1 ... pn)", "(tshift p0 p1 ... pn)"},
 
@@ -232,6 +252,10 @@ class PTheory
     virtual Double_t Bessel(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t InternalBessel(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t SkewedGauss(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t StaticNKZF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t StaticNKTF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t DynamicNKZF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t DynamicNKTF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t Polynom(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t UserFcn(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
 
