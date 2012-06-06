@@ -47,12 +47,6 @@ my $erradd = "d";
 my $minadd = "_min";
 my $maxadd = "_max";
 
-# Subroutine to create a clean run block
-# Needs: Run number, year and beamline (or manual)
-sub CreateRUNBlk {
-
-
-}
 
 ##########################################################################
 # CreateMSR
@@ -473,6 +467,8 @@ STATISTIC --- 0000-00-00 00:00:00
     close(OUTF);
     return($Full_T_Block,\@Paramcomp);
 }
+
+
 
 ##########################################################################
 # CreateMSRSingleHist
@@ -1825,7 +1821,643 @@ sub ExtractInfoBulk {
     return $RTRN_Val;
 }
 
+# Subroutine to create a clean run block (Not finished yet)
+sub CreateRUNBlk {
+# Take this information as input arguments
+    (my $RUN, my $YEAR, my $BeamLine, my $Fit_Type, my $LRBF, my $Ti, my $Tf, my $BIN) = @_;
+
+    my $RUN_Block = 
+"RUN_LINE
+fittype  FIT_TYPE
+ALPHA_LINE
+forward  FHIST
+backward BHIST
+MAP_LINE
+fit      TIVAL TFVAL
+packing  BINNING
+";
+
+    my $RUN_Line = MSR::RUNFileNameAuto($RUN,$YEAR,$BeamLine);
+    my @Hists = split( /,/, $LRBF );
+
+    $RUN_Block =~ s/RUN_LINE/$RUN_Line/;
+    $RUN_Block =~ s/FIT_TYPE/$Fit_Type/;
+    $RUN_Block =~ s/FHIST/$Hists[0]/;
+    $RUN_Block =~ s/BHIST/$Hists[1]/;
+    $RUN_Block =~ s/TIVAL TFVAL/$Ti   $Tf/;
+    $RUN_Block =~ s/BINNING/$BIN/;
+
+    return $RUN_Block;
+
+}
 
 
+##########################################################################
+# CreateMSRSh - to generate template file for msr2data global fit
+#
+# Input in %All
+# Required:
+#  $All{"FitType1/2/3"} - Function types, 3 components
+#  $All{"LRBF"}         - Histograms, comma separated
+#  $All{"Tis"}           
+#  $All{"Tfs"}
+#  $All{"BINS"}
+#  $All{"FILENAME"}
+#  $All{"go"}
+#  $All{"TITLE"}
+#  $All{"RunNumbers"}
+#  $All{"FitAsyType"}
+#  $All{"BeamLine"}
+#  $All{"YEAR"}
+# 
+# Optional:
+#  $All{"Sh_$Param"}
+#  $All{"ltc"}
+#  $All{"$Param"} value, error, min, and max
+#  $All{"logx/y"}
+#  $All{"Xi/f"}
+#
+# Output
+#  $Full_T_Block - Full theory block
+#  @Paramcomp    - Space separated list of parameters for each component
+#  FILENAME.msr  - MSR file saved
+#
+##########################################################################
+sub CreateMSRSh {
+    my %All = %{$_[0]};
+
+    # Start with empty array
+    my @FitTypes = ();
+
+    foreach ($All{"FitType1"},$All{"FitType2"},$All{"FitType3"}) {
+	if ($_ ne "None") {
+	    @FitTypes=(@FitTypes,$_);
+	}
+    }
+
+    my @Hists = split( /,/, $All{"LRBF"} );
+    # TODO
+    # : to separate twoo sets of asymmetries with same parameters
+    # Check the number of histograms
+    # should be 2 or 4 histograms
+    # should be checked in GUI
+    # for 2 simple asymmetry fit
+    # for 4 two run blocks with different geometric parameters:
+    # Alpha, No, NBg, Phi, Asy
+
+    my @TiVals = split( /,/, $All{"Tis"} );
+    my @TfVals = split( /,/, $All{"Tfs"} );
+    my @BINVals = split( /,/, $All{"BINS"} );
+    my $FILENAME = $All{"FILENAME"};
+    my $BeamLine = $All{"BeamLine"};
+    my $YEAR = $All{"YEAR"};
+
+    my $Step = $All{"go"};
+    if ( $Step eq "PLOT" ) {
+	$FITMINTYPE = $EMPTY;
+    }
+    elsif ( $Step eq "MIGRAD" ) {
+	$FITMINTYPE = "MINIMIZE\nMIGRAD\nHESSE";
+    }
+    elsif ( $Step eq "MINOS" ) {
+	$FITMINTYPE = "MIGRAD\nMINOS";
+    }
+    elsif ( $Step eq "SIMPLEX" ) {
+	$FITMINTYPE = "SCAN\nSIMPLEX";
+    }
+
+    # Proper way
+    if ( $All{"Minimization"} ne $EMPTY &&  $All{"ErrorCalc"} ne $EMPTY && $Step ne "PLOT" ) {
+	$FITMINTYPE = $All{"Minimization"}."\n".$All{"ErrorCalc"};
+    }
+
+
+    # First create the THEORY Block
+    my ($Full_T_Block,$Paramcomp_ref)=MSR::CreateTheory(@FitTypes);
+    my @Paramcomp = @$Paramcomp_ref;
+
+
+    # If we have a FUNCTIONS Block the Full_T_Block should be 
+    # replaced by Func_T_Block
+    $FUNCTIONS_Block = $EMPTY;
+    if ($All{"FunctionsBlock"} ne $EMPTY) {
+	$FUNCTIONS_Block = "
+###############################################################
+FUNCTIONS
+###############################################################
+".$All{"FunctionsBlock"}."\n";
+	$Full_T_Block=$All{"Func_T_Block"};
+	# remove all _N to end (may fail with large number of parameters)
+	$Full_T_Block =~ s/_\d\b//g;
+    }
+
+    # Counter of Params
+    my $PCount = 1;
+
+    # Need to select here RUNSAuto or RUNSManual
+    # $RUNSType = 0 (Auto) or 1 (Manual)
+    my $RUNSType = 0;
+    my @RUNS=();
+    if ($All{"RunNumbers"} ne $EMPTY) {
+	@RUNS=split( /,/, $All{"RunNumbers"});
+	$RUNSType = 0;
+    }
+    elsif ($All{"RunFiles"} ne $EMPTY) {
+	@RUNS=split( /,/, $All{"RunFiles"});
+	$RUNSType = 1;
+    }
+
+    # $shcount is a counter for shared parameters
+    # msr2data \[1363 1365 1366\] _Dolly_2010 msr-1363 global
+    if ( $#RUNS == 0 ) {
+        my $shcount = 1;
+    } else {
+        if ( $All{"Sh_Alpha"} == 1 ) {
+            my $shcount = 1;
+        } else {
+            my $shcount = 0;
+        }
+    }
+
+    $shcount   = 1;
+    my $RUN_Block = $EMPTY;
+    my $RUNS_Line = $EMPTY;
+
+    # range order
+    my $Range_Order = 1;
+
+    # Create template from the first run
+    # Prepare the Parameters and initial values block
+    my $component  = 0;
+    my $Single_RUN = $EMPTY;
+
+    # Prepare map line for each run
+    my $MAP_Line = "map            ";
+
+    # How many non-shared parameter for this RUN?
+    my $nonsh = 0;
+
+    # Prepeare Alpha line for the RUN block. Empty initially.
+    my $Alpha_Line = $EMPTY;
+
+    # Loop over all components in the fit
+    foreach my $FitType (@FitTypes) {
+	++$component;
+	my $Parameters = $Paramcomp[ $component - 1 ];
+	my @Params = split( /\s+/, $Parameters );
+
+	# For the first component we need Alpha for Asymmetry fits
+	if ($component == 1) {
+	    unshift( @Params, "Alpha" );
+	}
+
+	foreach $Param (@Params) {
+	    $Param_ORG = $Param;
+	    if ( ($#FitTypes != 0) && ($Param ne "Alpha") ) {
+		$Param = join( $EMPTY, $Param, "_", "$component" );
+	    }
+
+	    # If we have only one RUN then everything is shared
+	    if ( $#RUNS == 0 ) {
+		$Shared = 1;
+	    }
+	    # Otherwise check input if it was marked as shared
+	    else {
+		$Shared = $All{"Sh_$Param"};
+	    }
+
+	    # Alpha Line
+	    #
+	    # If you encounter alpha in the parameters list make sure
+	    # to fill this line for the RUN block.
+	    if ( $Param_ORG eq "Alpha" ) {
+		if ($Shared) {
+		    # If alpha is shared use always the same line
+		    $Alpha_Line = "alpha           1\n";
+		}
+		else {
+		    # Otherwise modify alpha line accordingly
+		    $Alpha_Line = "alpha           $PCount\n";
+		}
+	    }
+
+	    # End of Alpha Line
+####################################################################################################
+
+	    # Start preparing the parameters block
+	    if ($Shared) {
+		
+		# Parameter is shared enough to keep order from first run
+		$Full_T_Block =~ s/$Param_ORG/$PCount/;
+		++$shcount;
+		++$PCount;
+	    } else {
+		# Parameter is not shared, use map unless it is a single RUN fit
+		# Skip adding to map line in these cases
+		if ( $Param ne "Alpha" && $#RUNS != 0 )
+		{
+		    ++$nonsh;
+		    $Full_T_Block =~ s/$Param_ORG/map$nonsh/;
+		    $MAP_Line = join( ' ', $MAP_Line, $PCount );
+		}
+		++$PCount;
+	    }
+	    $NtotPar = $PCount;
+	}
+    }
+
+    # Finished preparing the FITPARAMETERS block
+#######################################################################
+
+    # For each defined range we need a block in the RUN-Block
+    # Also for each histogram in Single Histograms fits
+    # Also for Imaginaryand and Real for RRF fits
+    
+    $RUN = $RUNS[0];
+    
+    if ($All{"RUNSType"}) {
+	$RUN_Line = MSR::RUNFileNameAuto($RUN,"0000",$EMPTY);
+    } else {
+	$RUN_Line = MSR::RUNFileNameAuto($RUN,$YEAR,$BeamLine);
+    }
+
+    $Type_Line = "fittype         2";
+    $PLT       = 2;
+    $Hist_Lines =
+	"forward         $Hists[0]\nbackward        $Hists[1]";
+    
+    $Bg_Line = "background";
+    $Data_Line = "data";
+    $T0_Line = "t0";
+    $NHist=1;
+    foreach $Hist (@Hists) {
+	foreach ("t0","Bg1","Bg2","Data1","Data2") {
+	    $Name = "$_$NHist";
+# If empty fill with defaults
+#		if ($All{$Name} eq $EMPTY) {
+#		    $All{$Name}=MSR::T0BgData($_,$Hist,$BeamLine);
+#		}
+	    }
+# If empty skip lines
+	if ($All{"Bg1$NHist"} ne $EMPTY && $All{"Bg2$NHist"} ne $EMPTY) {
+	    $Bg_Line = $Bg_Line."    ".$All{"Bg1$NHist"}."    ".$All{"Bg2$NHist"};
+	}
+	if ($All{"Data1$NHist"} ne $EMPTY && $All{"Data2$NHist"} ne $EMPTY) {
+	    $Data_Line =$Data_Line."    ".$All{"Data1$NHist"}."    ".$All{"Data2$NHist"};
+	}
+	if ($All{"t0$NHist"} ne $EMPTY) {
+	    $T0_Line=$T0_Line."      ".$All{"t0$NHist"};  
+	}
+	$NHist++;
+    }
+
+# Put T0_Line Bg_Line and Data_Line together if not empty
+    my $T0DataBg=$EMPTY;
+    if ($T0_Line ne "t0") {
+	$T0DataBg = $T0DataBg.$T0_Line."\n";
+    }
+    if ($Bg_Line ne "background") {
+	$T0DataBg = $T0DataBg.$Bg_Line."\n";
+    }
+    if ($Data_Line ne "data") {
+	$T0DataBg = $T0DataBg.$Data_Line."\n";
+    }
+
+    $FRANGE_Line = "fit             TINI    TFIN";
+    $PAC_Line    = "packing         BINNING";
+
+    $Single_RUN =
+	"$RUN_Line\n$Type_Line\n$Alpha_Line$Hist_Lines\n$T0DataBg$MAP_Line\n$FRANGE_Line\n$PAC_Line\n\n";
+        
+    # Now add the appropriate values of fit range and packing
+    my $Range_Min = 8;
+    my $Range_Max = 0;
+    my $k         = 0;
+    foreach my $Ti (@TiVals) {
+	my $Tf        = $TfVals[$k];
+	my $BIN       = $BINVals[$k];
+	$RUN_Block = $RUN_Block . $Single_RUN;
+	$RUN_Block =~ s/TINI/$Ti/g;
+	$RUN_Block =~ s/TFIN/$Tf/g;
+	$RUN_Block =~ s/BINNING/$BIN/g;
+
+	# For multiple ranges use this
+	if ( $Ti < $Range_Min ) { $Range_Min = $Ti; }
+	if ( $Tf > $Range_Max ) { $Range_Max = $Tf; }
+	
+	$RUNS_Line = "$RUNS_Line " . $Range_Order;
+	++$k;
+	++$Range_Order;
+    }
+
+# For the plotting command of multiple runs
+    foreach $RUN (@RUNS) {
+	foreach $Ti (@TiVals) {
+	    $RUNS_Line = "$RUNS_Line " . $Range_Order;
+	    ++$Range_Order;
+	}
+    }
+
+# Start constructing all blocks
+    my $TitleLine = $All{"TITLE"}."\n# Run Numbers: ".$All{"RunNumbers"};
+#    $TitleLine =~ s/,/:/g;
+
+    # Get parameter block from MSR::PrepParamTable(\%All);
+    my $FitParaBlk = 
+"###############################################################
+FITPARAMETER
+###############################################################
+#     No     Name       Value    Err     Min  Max                  ";
+    my %PTable=MSR::PrepParamTableSh(\%All);
+    my $NParam=scalar keys( %PTable );
+# Fill the table with labels and values of parametr 
+    for (my $iP=0;$iP<$NParam;$iP++) {
+	my ($Param,$value,$error,$minvalue,$maxvalue,$RUNtmp) = split(/,/,$PTable{$iP});
+	if ( $minvalue == $maxvalue ) {
+	    $minvalue = $EMPTY;
+	    $maxvalue = $EMPTY;
+	}
+	$PCount=$iP+1;
+	$FitParaBlk = $FitParaBlk."
+      $PCount      $Param    $value     $error    $error    $minvalue    $maxvalue";
+    }
+
+    $Full_T_Block = "
+###############################################################
+THEORY
+###############################################################
+$Full_T_Block
+";
+
+
+    $RUN_Block =
+      "###############################################################
+$RUN_Block";
+
+    $COMMANDS_Block =
+      "###############################################################
+COMMANDS
+FITMINTYPE
+SAVE
+";
+    $COMMANDS_Block =~ s/FITMINTYPE/$FITMINTYPE/g;
+
+    # Check if log x and log y are selected
+    my $logxy = $EMPTY;
+    if ( $All{"logx"} eq "y" ) { $logxy = $logxy . "logx\n"; }
+    if ( $All{"logy"} eq "y" ) { $logxy = $logxy . "logy\n"; }
+
+    # Check if a plot range is defined (i.e. different from fit)
+    $PRANGE_Line = "use_fit_ranges";
+    if ( $All{"Xi"} != $All{"Xf"} ) {
+
+        #	if ($Yi != $Yf) {
+        $PRANGE_Line = "range  ".$All{"Xi"}."  ".$All{"Xf"}."  ".$All{"Yi"}."  ".$All{"Yf"};
+
+        #	} else {
+        #	    $PRANGE_Line = "range  $Xi  $Xf";
+        #	}
+    }
+
+    $VIEWBIN_Line ="";
+    if ( $All{"ViewBin"}!=0 ) { $VIEWBIN_Line = "view_packing ".$All{"ViewBin"};}
+
+    my $RRFBlock=MSR::CreateRRFBlock(\%All);
+    $PLOT_Block =
+      "###############################################################
+PLOT $PLT
+runs     $RUNS_Line
+$PRANGE_Line
+$VIEWBIN_Line
+$RRFBlock
+$logxy";
+
+    if ($All{"FUNITS"} eq $EMPTY) {$All{"FUNITS"}="MHz";}
+    if ($All{"FAPODIZATION"} eq $EMPTY) {$All{"FAPODIZATION"}="STRONG";}
+    if ($All{"FPLOT"} eq $EMPTY) {$All{"FPLOT"}="POWER";}
+    if ($All{"FPHASE"} eq $EMPTY) {$All{"FPHASE"}="8.5";}
+
+
+    $FOURIER_Block=
+      "###############################################################
+FOURIER
+units            FUNITS    # units either 'Gauss', 'MHz', or 'Mc/s'
+fourier_power    12
+apodization      FAPODIZATION  # NONE, WEAK, MEDIUM, STRONG
+plot             FPLOT   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            FPHASE
+#range            FRQMIN  FRQMAX";
+
+    $FOURIER_Block=~ s/FUNITS/$All{"FUNITS"}/g;
+    $FOURIER_Block=~ s/FAPODIZATION/$All{"FAPODIZATION"}/g;
+    $FOURIER_Block=~ s/FPLOT/$All{"FPLOT"}/g;
+    $FOURIER_Block=~ s/FPHASE/$All{"FPHASE"}/g;
+
+    # Don't know why but it is needed initially
+    $STAT_Block =
+      "###############################################################
+STATISTIC --- 0000-00-00 00:00:00
+*** FIT DID NOT CONVERGE ***";
+
+
+    # Empty line at the end of each block
+    my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$FUNCTIONS_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$FOURIER_Block\n$STAT_Block\n";
+
+# Open output file FILENAME.msr
+    open( OUTF,q{>},"$FILENAME.msr" );
+    print OUTF ("$FullMSRFile");
+    close(OUTF);
+    return($Full_T_Block,\@Paramcomp);
+}
+
+########################
+# PrepParamTableSh - Prepare fir parameters block for global fit using msr2data
+# Function return a Hash with a table of parameters for the fit
+# input should be 
+# %All
+########################
+sub PrepParamTableSh { 
+# Take this information as input arguments
+# "Smart" default value of the fit parameters.
+    my %Defaults = (
+    "Asy",           "0.15",  "dAsy",          "0.01",
+    "Asy_min",       "0",     "Asy_max",       "0",
+    "Alpha",         "1.0",   "dAlpha",        "0.01",
+    "Alpha_min",     "0",     "Alpha_max",     "0",
+    "No",            "300.0", "dNo",           "0.01",
+    "No_min",        "0",     "No_max",        "0",
+    "NBg",           "30.0",  "dNBg",          "0.01",
+    "NBg_min",       "0",     "NBg_max",       "0",
+    "Lam",           "1.0",   "dLam",          "0.01",
+    "Lam_min",       "0",     "Lam_max",       "0",
+    "Gam",           "1.0",   "dGam",          "0.01",
+    "Gam_min",       "0",     "Gam_max",       "0",
+    "Bet",           "0.5",   "dBet",          "0.01",
+    "Bet_min",       "0",     "Bet_max",       "0",
+    "Two",           "2.0",   "dTwo",          "0.0",
+    "Two_min",       "0",     "Two_max",       "0",
+    "Del",           "0.1",   "dDel",          "0.01",
+    "Del_min",       "0",     "Del_max",       "0",
+    "Sgm",           "0.1",   "dSgm",          "0.01",
+    "Sgm_min",       "0",     "Sgm_max",       "0",
+    "Aa",            "60.",   "dAa",           "0.01",
+    "Aa_min",        "0",     "Aa_max",        "0",
+    "q",             "0.1",   "dq",            "0.01",
+    "q_min",         "0",     "q_max",         "0",
+    "Bg",            "0.036", "dBg",           "0.01",
+    "Bg_min",        "0",     "Bg_max",        "0",
+    "bgrlx",         "0.",    "dbgrlx",        "0.0",
+    "bgrlx_min",     "0",     "bgrlx_max",     "0",
+    "Frq",           "1.0",   "dFrq",          "1.",
+    "Frq_min",       "0",     "Frq_max",       "0",
+    "Field",         "100.0", "dField",        "1.",
+    "Field_min",     "0",     "Field_max",     "0",
+    "Energy",        "14.1",  "dEnergy",       "0.",
+    "Energy_min",    "0",     "Energy_max",    "0",
+    "DeadLayer",     "10.",   "dDeadLayer",    "0.1",
+    "DeadLayer_min", "0",     "DeadLayer_max", "0",
+    "Lambda",        "128.1", "dLambda",       "0.1",
+    "Lambda_min",    "0",     "Lambda_max",    "0",
+    "Phi",           "1.",    "dPhi",          "0.01",
+    "Phi_min",       "0",     "Phi_max",       "0"
+    );
+
+    my $erradd = "d";
+    my $minadd = "_min";
+    my $maxadd = "_max";
+   
+# First assume nothing is shared
+    my $Shared = 0;
+
+# Reset output Hash
+    %ParTable = ();
+ 
+    my %All = %{$_[0]};
+    my @RUNS = ();
+    if ($All{"RUNSType"}) {
+	@RUNS = split( /,/, $All{"RunFiles"} );
+    } else {
+	@RUNS = split( /,/, $All{"RunNumbers"} );
+    }
+    my @Hists = split( /,/, $All{"LRBF"} );
+
+    my @FitTypes =();
+    foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
+	if ( $FitType ne "None" ) { push( @FitTypes, $FitType ); }
+    }
+# Get theory block to determine the size of the table 
+    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
+# For now the line below does not work. Why?    
+#    my $Paramcomp_ref=$All{"Paramcomp_ref"};
+    my @Paramcomp = @$Paramcomp_ref;
+    my $Full_T_Block= $All{"Full_T_Block"};
+    my $PCount =0;
+    my $value =0;
+    my $error    = 0;
+    my $minvalue = 0;
+    my $maxvalue = 0;
+    my $Component=1;
+    
+    $Component=1;
+    if ($All{"FitAsyType"} eq "Asymmetry") {
+	foreach my $FitType (@FitTypes) {
+	    my $Parameters=$Paramcomp[$Component-1];
+	    my @Params = split( /\s+/, $Parameters );		
+	    if ( $Component == 1 ) {
+		unshift( @Params, "Alpha" );
+	    }
+		
+# This is the counter for parameters of this component
+	    my $NP=1;
+	    $Shared = 0;
+# Change state/label of parameters
+	    foreach my $Param (@Params) {
+		my $Param_ORG = $Param;
+		if ( $#FitTypes != 0 && ( $Param ne "Alpha" ) ){
+		    $Param = join( $EMPTY, $Param, "_", "$Component" );
+		}
+		    
+		$Shared = $All{"Sh_$Param"};
+# It there are multiple runs index the parameters accordingly
+		my $RUNtmp=sprintf("%04d",$RUN);
+		if ($Shared!=1) {
+		    $Param=$Param."_".$RUNtmp;
+		}
+# Check if this parameter has been initialized befor. If not take from defaults
+		$value = $All{"$Param"};
+		if ( $value ne $EMPTY ) {
+		    $error    = $All{"$erradd$Param"};
+		    $minvalue = $All{"$Param$minadd"};
+		    $maxvalue = $All{"$Param$maxadd"};
+		} else {
+# We have two options here, either take default values or take values of previous 
+# run if available
+		    $value = $Defaults{$Param_ORG};
+		    $error = $Defaults{ join( $EMPTY, $erradd, $Param_ORG ) };
+		    $minvalue = $Defaults{ join($EMPTY, $Param_ORG, $minadd ) };
+		    $maxvalue = $Defaults{ join($EMPTY, $Param_ORG, $maxadd ) };
+		}
+		$values=join(",",$Param,$value,$error,$minvalue,$maxvalue,$RUN);
+		$ParTable{$PCount}=$values;
+		$PCount++;
+	    }
+	    $NP++;
+	}
+	$Component++;
+    }
+    elsif ($All{"FitAsyType"} eq "SingleHist") {
+# For a single histogram fit we basically need to repeat this for each hist
+	foreach my $Hist (@Hists) {
+	    $Component=1;
+	    foreach my $FitType (@FitTypes) {
+		my $Parameters=$Paramcomp[$Component-1];
+		my @Params = split( /\s+/, $Parameters );		
+		if ( $Component == 1 ) {
+		    unshift( @Params, ( "No", "NBg" ) );
+		}
+		
+# This is the counter for parameters of this component
+		my $NP=1;
+		$Shared = 0;
+# Change state/label of parameters
+		foreach my $Param (@Params) {
+		    my $Param_ORG = $Param;
+		    # If multiple histograms (sum or difference) take the first histogram only
+		    ($Hist,$tmp) = split(/ /,$Hist);
+		    $Param=$Param.$Hist;
+		    if ( $#FitTypes != 0 && ( $Param_ORG ne "No" && $Param_ORG ne "NBg" ) ){
+			$Param = join( $EMPTY, $Param, "_", "$Component" );
+		    }
+			
+		    $Shared = $All{"Sh_$Param"};
+# It there are multiple runs index the parameters accordingly
+		    my $RUNtmp=sprintf("%04d",$RUN);
+		    if ($Shared!=1) {$Param=$Param."_".$RUNtmp;}
+# Check if this parameter has been initialized befor. If not take from defaults
+		    $value = $All{"$Param"};
+		    if ( $value ne $EMPTY ) {
+			$error    = $All{"$erradd$Param"};
+			$minvalue = $All{"$Param$minadd"};
+			$maxvalue = $All{"$Param$maxadd"};
+		    } else {
+# I need this although it is already in the MSR.pm module, just for this table
+# We can remove it from the MSR module later...
+# Or keep in the MSR as function ??
+			$value = $Defaults{$Param_ORG};
+			$error = $Defaults{ join( $EMPTY, $erradd, $Param_ORG ) };
+			$minvalue = $Defaults{ join($EMPTY, $Param_ORG, $minadd ) };
+			$maxvalue = $Defaults{ join($EMPTY, $Param_ORG, $maxadd ) };
+		    }
+		    $values=join(",",$Param,$value,$error,$minvalue,$maxvalue,$RUN);
+		    $ParTable{$PCount}=$values;
+		    $PCount++;
+		}
+		$NP++;
+	    }
+	    $Component++;
+	}
+    }
+    return %ParTable;
+}
 
 1;

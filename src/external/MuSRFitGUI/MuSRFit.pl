@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Wed Sep 28 15:51:27 2011
+# Created: Wed Jun 6 14:00:51 2012
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -3926,7 +3926,7 @@ sub CallMSRCreate
 # Check if the option for checking for existing files is selected    
     my $FileExistCheck= FileExistCheck->isOn();
     my $FILENAME=$All{"FILENAME"}.".msr";
-    my $Answer=0;
+    my $Answer=0;    
     if ($All{"RunNumbers"} ne ""  || $All{"RunFiles"} ne "") {
 	if ( $FileExistCheck==1 ) {
 	    if (-e $FILENAME) {
@@ -3944,7 +3944,34 @@ sub CallMSRCreate
 	
 	if ($Answer) {
 	    if ( $All{"FitAsyType"} eq "Asymmetry" ) {
-		my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
+		if ($All{"RUNSType"}) {
+		    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
+		} else {
+		    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSRSh(\%All);
+# if it is multiple runs then the produced file is a template
+		    my $FILENAME=$All{"FILENAME"}.".msr";
+		    my $Extension = "_".$All{"BeamLine"}."_".$All{"YEAR"};
+		    if ($All{"BeamLine"} eq "LEM (PPC)") {
+			$Extension = "_LEM_".$All{"YEAR"};
+		    }
+		    
+		    if (-e $FILENAME) {
+			my $RUN0 = $FILENAME;
+			$RUN0 =~ s/$Extension//g;
+			$RUN0 =~ s/.msr//g;
+			my $cmd = $All{"RunNumbers"};
+			$cmd =~ s/,/ /g;
+			$cmd = "msr2data \[".$cmd."\] ".$Extension." msr-".$RUN0." global";
+			$cmd = $cmd."; mv $RUN0+global$Extension.msr ".$FILENAME;
+			print $cmd."\n";
+			my $pid = open(FTO,"$cmd 2>&1 |");
+			while (<FTO>) {
+			    FitTextOutput->append("$_");
+			}
+			close(FTO);
+		    }
+		}
+		
 	    }
 	    elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
 		my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSRSingleHist(\%All);
