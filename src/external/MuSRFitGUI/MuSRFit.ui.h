@@ -478,7 +478,8 @@ void MuSRFitform::CallMSRCreate()
 		if ($All{"RUNSType"}) {
 		    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
 		} else {
-		    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSRSh(\%All);
+#		    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSRSh(\%All);
+		    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
 # if it is multiple runs then the produced file is a template
 		    my $FILENAME=$All{"FILENAME"}.".msr";
 		    my $Extension = "_".$All{"BeamLine"}."_".$All{"YEAR"};

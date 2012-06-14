@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Wed Jun 6 14:00:51 2012
+# Created: Thu Jun 14 14:52:06 2012
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -3947,7 +3947,8 @@ sub CallMSRCreate
 		if ($All{"RUNSType"}) {
 		    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
 		} else {
-		    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSRSh(\%All);
+#		    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSRSh(\%All);
+		    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
 # if it is multiple runs then the produced file is a template
 		    my $FILENAME=$All{"FILENAME"}.".msr";
 		    my $Extension = "_".$All{"BeamLine"}."_".$All{"YEAR"};
