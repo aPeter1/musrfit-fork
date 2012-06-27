@@ -164,7 +164,7 @@ void analyticFakeData(const TString type)
   }
 
   // create histos
-  UInt_t n0[8] = {100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0};
+  UInt_t n0[8] = {1900.0, 1900.0, 1000.0, 1000.0, 1000.0, 1000.0, 1800.0, 1800.0};
   UInt_t bkg[8] = {10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0};
   const Double_t tau = 2197.019; // ns
   // asymmetry related stuff
@@ -203,7 +203,7 @@ void analyticFakeData(const TString type)
         histo[i]->SetBinContent(j+1, bkg[i]);
       } else {
         time = (Double_t)(j-t0[i])*timeResolution;
-        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a0[i]*TMath::Exp(-0.5*TMath::Power(time*sigma0,1.2))*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i])
+        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a0[i]*TMath::Exp(-0.5*TMath::Power(time*sigma0,2.0))*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i])
                                                          +a1[i]*TMath::Exp(-0.5*TMath::Power(time*sigma1,2.0))*TMath::Cos(TMath::TwoPi()*gamma*bb1*time+phase[i]))+(Double_t)bkg[i];
         histo[i]->SetBinContent(j+1, (UInt_t)dval);
       }
