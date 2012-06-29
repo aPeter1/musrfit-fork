@@ -107,7 +107,7 @@ void musrfit_syntax()
   cout << endl << "       --dump <type> is writing a data file with the fit data and the theory";
   cout << endl << "              <type> can be 'ascii', 'root'";
   cout << endl << "       --timeout <timeout_tag>: overwrites to predefined timeout of " << timeout << " (sec).";
-  cout << endl << "              <timeout_tag> = 'none' means timeout facility is not enabled. <timeout_tag> = nn";
+  cout << endl << "              <timeout_tag> <= 0 means timeout facility is not enabled. <timeout_tag> = nn";
   cout << endl << "              will set the timeout to nn (sec).";
   cout << endl;
   cout << endl << "       At the end of a fit, musrfit writes the fit results into an <mlog-file> and";
@@ -437,16 +437,16 @@ int main(int argc, char *argv[])
       }
     } else if (!strcmp(argv[i], "--timeout")) {
       if (i<argc-1) {
-        if (!strcmp(argv[i+1], "none")) {
-          timeout_enabled = false;
-        } else {
-          TString str(argv[i+1]);
-          if (str.IsDigit()) {
-            timeout = str.Atoi();
-          } else {
-            show_syntax = true;
-            break;
+        TString str(argv[i+1]);
+        if (str.IsFloat()) {
+          timeout = str.Atoi();
+          if (timeout <= 0) {
+            timeout_enabled = false;
+            cout << endl << ">> musrfit: timeout disabled." << endl;
           }
+        } else {
+          show_syntax = true;
+          break;
         }
         i++;
       } else {
