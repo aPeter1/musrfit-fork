@@ -51,7 +51,7 @@ class PNL_PippardFitterGlobal
     Bool_t IsValid() { return fValid; }
     virtual void CalculateField(const std::vector<Double_t> &param) const;
     virtual Int_t GetEnergyIndex(const Double_t energy) { return fRgeHandler->GetRgeEnergyIndex(energy); }
-    virtual Double_t GetMuoneStoppingDensity(const Int_t energyIndex, const Double_t z) const { return fRgeHandler->GetRgeValue(energyIndex, z); }
+    virtual Double_t GetMuonStoppingDensity(const Int_t energyIndex, const Double_t z) const { return fRgeHandler->GetRgeValue(energyIndex, z); }
     virtual Double_t GetMagneticField(const Double_t z) const;
 
   private:

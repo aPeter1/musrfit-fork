@@ -91,26 +91,23 @@ Double_t PNL_RgeHandler::GetRgeValue(const Int_t index, const Double_t dist)
 {
   Double_t rgeVal = 0.0;
 
-  UInt_t distIdx = (UInt_t)(dist/(fRgeDataList[index].stoppingDistance[1]-fRgeDataList[index].stoppingDistance[0]));
+  // find the proper position index
+  Int_t distIdx = -2;
+  for (UInt_t i=0; i<fRgeDataList[index].stoppingDistance.size(); i++) {
+    if (fRgeDataList[index].stoppingDistance[i] > dist) {
+      distIdx = i-1;
+      break;
+    }
+  }
 
-  if ((distIdx >= fRgeDataList[index].stoppingDistance.size()) || (distIdx < 0)) {
+  // get the proper n(z) value
+  if (distIdx < 0) {
     rgeVal = 0.0;
   } else {
     rgeVal = fRgeDataList[index].stoppingAmplitude[distIdx] +
              (fRgeDataList[index].stoppingAmplitude[distIdx+1] - fRgeDataList[index].stoppingAmplitude[distIdx]) *
              (dist-fRgeDataList[index].stoppingDistance[distIdx])/(fRgeDataList[index].stoppingDistance[distIdx+1]-fRgeDataList[index].stoppingDistance[distIdx]);
   }
-
-/*
-cout << endl << "distIdx = " << distIdx << ", fRgeDataList[index].stoppingDistance.size() = " << fRgeDataList[index].stoppingDistance.size();
-cout << endl << "fRgeDataList[index].stoppingAmplitude[distIdx]   = " << fRgeDataList[index].stoppingAmplitude[distIdx];
-cout << endl << "fRgeDataList[index].stoppingAmplitude[distIdx+1] = " << fRgeDataList[index].stoppingAmplitude[distIdx+1];
-cout << endl << "dist = " << dist;
-cout << endl << "fRgeDataList[index].stoppingDistance[distIdx] = " << fRgeDataList[index].stoppingDistance[distIdx];
-cout << endl << "fRgeDataList[index].stoppingDistance[distIdx+1] = " << fRgeDataList[index].stoppingDistance[distIdx+1];
-cout << endl << "rgeVal = " << rgeVal;
-cout << endl << "----" << endl;
-*/
 
   return rgeVal;
 }
@@ -150,8 +147,7 @@ Bool_t PNL_RgeHandler::LoadRgeData(const PStringVector &rgeDataPathList, const P
 {
   ifstream fin;
   PNL_RgeData data;
-  Int_t idx=0;
-  TString dataName, tstr;
+  TString tstr;
   char line[512];
   int result;
   double dist, val;
@@ -170,28 +166,20 @@ Bool_t PNL_RgeHandler::LoadRgeData(const PStringVector &rgeDataPathList, const P
     data.energy = rgeDataEnergyList[i]/1000.0;
 
     // read msr-file
-    idx = 0;
     while (!fin.eof()) {
       // read a line
       fin.getline(line, sizeof(line));
-      idx++;
-
-      // ignore first line
-      if (idx == 1)
-        continue;
 
       // ignore empty lines
       tstr = line;
       if (tstr.IsWhitespace())
         continue;
 
-
       // get values
       result = sscanf(line, "%lf %lf", &dist, &val);
-      // check if data are valid
+      // check if data are valid, otherwise ignore it
       if (result != 2) {
-        fin.close();
-        return false;
+        continue;
       }
 
       // feed fRgeDataList

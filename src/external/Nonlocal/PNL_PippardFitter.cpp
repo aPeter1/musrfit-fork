@@ -200,7 +200,6 @@ void PNL_PippardFitterGlobal::CalculateField(const std::vector<Double_t> &param)
   Double_t xiP = XiP_T(param[4], param[3], param[1]);
   Double_t preFactor = pow(xiP/(LambdaL_T(param[5], param[1])),2.0)*xiP/param[4];
 
-
   // calculate the fFieldq vector, which is x/(x^2 + alpha k(x)), with alpha = xiP(T)^3/(lambdaL(T)^2 xiP(0)), and
   // k(x) = 3/2 [(1+x^2) arctan(x) - x]/x^3, see lab-book p.137
   Double_t x;
@@ -443,6 +442,10 @@ Double_t PNL_PippardFitter::operator()(Double_t t, const std::vector<Double_t> &
   // calculate field if parameter have changed
   fPippardFitterGlobal->CalculateField(param);
   Int_t energyIndex = fPippardFitterGlobal->GetEnergyIndex(param[0]);
+  if (energyIndex == -1) { // energy not found
+    cerr << endl << ">> PNL_PippardFitter::operator() energy " << param[0] << " not found. Will terminate." << endl;
+    assert(0);
+  }
 
   // calcualte polarization
   Bool_t done = false;
@@ -450,11 +453,12 @@ Double_t PNL_PippardFitter::operator()(Double_t t, const std::vector<Double_t> &
   Double_t z=0.0;
   Int_t terminate = 0;
   Double_t dz = 1.0;
+
   do {
     if (z < param[8]) { // z < dead-layer
-      dPol = fPippardFitterGlobal->GetMuoneStoppingDensity(energyIndex, z) * cos(GAMMA_MU * param[6] * t + param[7] * DEGREE2RAD);
+      dPol = fPippardFitterGlobal->GetMuonStoppingDensity(energyIndex, z) * cos(GAMMA_MU * param[6] * t + param[7] * DEGREE2RAD);
     } else {
-      dPol = fPippardFitterGlobal->GetMuoneStoppingDensity(energyIndex, z) * cos(GAMMA_MU * param[6] * fPippardFitterGlobal->GetMagneticField(z-param[8]) * t + param[7] * DEGREE2RAD);
+      dPol = fPippardFitterGlobal->GetMuonStoppingDensity(energyIndex, z) * cos(GAMMA_MU * param[6] * fPippardFitterGlobal->GetMagneticField(z-param[8]) * t + param[7] * DEGREE2RAD);
     }
     z += dz;
     pol += dPol;
