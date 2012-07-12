@@ -1,0 +1,3 @@
+// the configured options and settings for nonlocal
+#define nonlocal_VERSION_MAJOR @nonlocal_VERSION_MAJOR@
+#define nonlocal_VERSION_MINOR @nonlocal_VERSION_MINOR@

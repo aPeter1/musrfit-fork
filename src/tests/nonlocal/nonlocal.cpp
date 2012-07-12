@@ -8,6 +8,7 @@
 #include <iostream>
 using namespace std;
 
+#include "build/nonlocalConfig.h"
 #include "PPippard.h"
 
 typedef struct {
@@ -327,6 +328,13 @@ int main(int argc, char *argv[])
   params.outputFileNameBmean = "";
   params.meanX.clear();
   params.meanB.clear();
+
+  if (argc == 2) {
+    if (!strcmp(argv[1], "--version")) {
+      cout << endl << argv[0] << " version " << nonlocal_VERSION_MAJOR << "." << nonlocal_VERSION_MINOR << endl << endl;
+      return 1;
+    }
+  }
 
   if (!readInputFile(argv[1], params)) {
     cout << endl << "**ERROR** Couldn't open the input file " << argv[1] << ". Will quit.";
