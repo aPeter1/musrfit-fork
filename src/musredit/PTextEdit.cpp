@@ -2244,12 +2244,8 @@ void PTextEdit::musrDump()
  */
 void PTextEdit::helpContents()
 {
-  #ifdef _WIN32GCC
-  QMessageBox::information(this, "**INFO**", "If a newer Qt version was available, a help window would be shown!");
-  #else
   PHelp *help = new PHelp(fAdmin->getHelpUrl("main"));
   help->show();
-  #endif // _WIN32GCC
 }
 
 //----------------------------------------------------------------------------------------------------
