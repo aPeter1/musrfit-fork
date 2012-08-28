@@ -2595,10 +2595,10 @@ void PTheory::CalculateDynKTLF(const Double_t *val, Int_t tag) const
     Double_t tmin = 20.0;
     switch (tag) {
       case 0: // Gauss
-        tmin = sqrt(3.0)/val[1];
+        tmin = fabs(sqrt(3.0)/val[1]);
         break;
       case 1: // Lorentz
-        tmin = 2.0/val[1];
+        tmin = fabs(2.0/val[1]);
         break;
       default:
         break;
@@ -2611,6 +2611,9 @@ void PTheory::CalculateDynKTLF(const Double_t *val, Int_t tag) const
 
   if (N < 300) // if too few points, i.e. nu0 very small, take 300 points
     N = 300;
+
+  if (N>1e6) // make sure that N is not too large to prevent memory overflow
+    N = 1e6;
 
   // allocate memory for dyn KT LF function vector
   fDynLFFuncValue.clear(); // get rid of a possible previous vector
