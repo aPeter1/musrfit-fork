@@ -1,63 +1,96 @@
-03000 - test
+LSCO x=0.02 (224-227), T=12.00 (K), E=5.57 keV, WEW B=~49(G)/8.62(A), Tr=15.02 (kV), Sample=8.70 (kV), SpinRot -10
 ###############################################################
 FITPARAMETER
 #       No Name        Value     Step        Pos_Error   Boundaries
-        1 asym1       0.1137    -0.0016     0.0016      0       0.3     
-        2 field1      150.04    -0.10       0.10        0       300     
-        3 rate1       0.1845    -0.0088     0.0089      0       none    
-        4 asym2       0.04571   -0.00099    0.00099     0       0.3     
-        5 field2      399.80    -0.13       0.13        0       none    
-        6 rate2       0.170     -0.018      0.017       0       none    
-        7 phase_L     26.96     -0.90       0.89        -360    360     
-        8 Norm_L      1024.12   -0.98       0.98        
-        9 BG_L        102.25    -0.17       0.17        
-       10 phase_R     208.14    -0.90       0.90        -360    360     
-       11 Norm_R      1022.3    -1.0        1.0         
-       12 BG_R        144.09    -0.20       0.20        
+        1 AsymT       0.0506    -0.0010     0.0010      0       0.33    
+        2 Field       48.29     -0.13       0.13        
+        3 RateT       0.128     -0.015      0.014       0       none    
+        4 AsymL       0         0           none        0       0.33    
+        5 RateL       0         0           none        
+        6 AlphaLR     0.9785    -0.0019     0.0019      
+        7 PhaseL      6.5       -2.2        2.3         -40     40      
+        8 BkgL        6.824     -0.068      0.067       
+        9 RelPhaseR   178.7     -2.7        2.7         150     210     
+       10 NormR       419.43    -0.57       0.56        
+       11 BkgR        8.303     -0.071      0.071       
+       12 AlphaTB     1.1026    -0.0021     0.0021      
+       13 RelPhaseT   269.1     -2.7        2.7         240     300     
+       14 BkgT        7.363     -0.070      0.070       
+       15 NormB       393.04    -0.55       0.55        
+       16 RelPhaseB   90.8      -2.8        2.8         60      120     
+       17 BkgB        6.995     -0.067      0.067       
+       18 One         1         0           none        
+       19 Zero        0         0           none        
 
 ###############################################################
 THEORY
 asymmetry      1
-simplExpo      3          (rate)
-TFieldCos   map1  fun1       (phase frequency)
+simpleGss      3          (rate)
+TFieldCos   fun1  fun2       (phase frequency)
 +
-asymmetry      4
-simpleGss      6          (rate)
-TFieldCos   map1  fun2       (phase frequency)
+asymmetry   fun4
+simplExpo      5          (rate)
 
 ###############################################################
 FUNCTIONS
-fun1 = par2 * gamma_mu
-fun2 = par5 * gamma_mu
+fun1 = par7 + map1
+fun2 = par2 * gamma_mu
+fun3 = map2 * map3
+fun4 = par4 * cos(pi / 180.0 * (par7 + map1))
 
 ###############################################################
-RUN data/03000 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
+RUN data/lem12_his_2466 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
 fittype         0         (single histogram fit)
-norm            8
-backgr.fit      9
+norm            fun3
+backgr.fit      8
 lifetimecorrection
-map             7    0    0    0    0    0    0    0    0    0
-forward         1 2 
-data            3479    66000   
-t0              3419.0  3520.0  
-fit             0.1     10     
+map            19    6   10    0    0    0    0    0    0    0
+forward         1 5 
+data            2741    63000   
+t0              2741.0  2741.0  
+fit             0.2     10     
 packing         50
 
-RUN data/03000 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
+RUN data/lem12_his_2466 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
 fittype         0         (single histogram fit)
-norm            11
-backgr.fit      12
+norm            fun3
+backgr.fit      11
 lifetimecorrection
-map            10    0    0    0    0    0    0    0    0    0
-forward         5 6 
-data            3609    66000   
-t0              3517.0  3418.0  
-fit             0.1     10     
+map             9   18   10    0    0    0    0    0    0    0
+forward         3 7 
+data            2741    63000   
+t0              2741.0  2741.0  
+fit             0.2     10     
+packing         50
+
+RUN data/lem12_his_2466 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            fun3
+backgr.fit      14
+lifetimecorrection
+map            13   12   15    0    0    0    0    0    0    0
+forward         2 6 
+data            2741    63000   
+t0              2741.0  2741.0  
+fit             0.2     10     
+packing         50
+
+RUN data/lem12_his_2466 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            fun3
+backgr.fit      17
+lifetimecorrection
+map            16   18   15    0    0    0    0    0    0    0
+forward         4 8 
+data            2741    63000   
+t0              2741.0  2741.0  
+fit             0.2     10     
 packing         50
 
 ###############################################################
 COMMANDS
 MINIMIZE
+#HESSE
 MINOS
 SAVE
 
@@ -65,17 +98,16 @@ SAVE
 FOURIER
 units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
 fourier_power    11
-apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+apodization      MEDIUM  # NONE, WEAK, MEDIUM, STRONG
 plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
-phase            par7
-range            0    1000
+range            0    100
 
 ###############################################################
 PLOT 0   (single histo plot)
-runs     1   
-range    0   10   -0.3   0.3
-view_packing 100
+runs     1   3   
+range    0   9   -0.15   0.15
+view_packing 500
 
 ###############################################################
-STATISTIC --- 2012-03-22 09:15:43
-  chisq = 2418.0, NDF = 2016, chisq/NDF = 1.199415
+STATISTIC --- 2012-06-03 14:14:15
+  chisq = 3981.9, NDF = 4001, chisq/NDF = 0.995215

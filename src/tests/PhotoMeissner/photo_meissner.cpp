@@ -118,6 +118,8 @@ int main(int argc, char *argv[])
         start_x = 0.0;
         end_x = 5.0*lam0;
         x = start_x;
+        cout << "# lam0=" << lam0 << ", lam1=" << lam1 << ", x0=" << x0 << endl;
+        cout << "# n=" << n << ", np=" << np << endl;
         cout << "# x exp(-x/lam0) B(x) semi-infinite" << endl;
         do {
           dval = In(n, np*sqrt(exp(-x/x0)))/In(n, np);
