@@ -1397,6 +1397,12 @@ Double_t PTheory::DynamicGaussKTLF(register Double_t t, const PDoubleVector& par
   if ((val[0] == 0.0) && (val[1] == 0.0) && (val[2] == 0.0))
     return 1.0;
 
+  // make sure that damping and hopping are positive definite
+  if (val[1] < 0.0)
+    val[1] = -val[1];
+  if (val[2] < 0.0)
+    val[2] = -val[2];
+
   // check that Delta != 0, if not (i.e. stupid parameter) return 1, which is the correct limit
   if (fabs(val[1]) < 1.0e-6) {
     return 1.0;
@@ -1627,6 +1633,13 @@ Double_t PTheory::DynamicLorentzKTLF(register Double_t t, const PDoubleVector& p
   // check if all parameters == 0
   if ((val[0] == 0.0) && (val[1] == 0.0) && (val[2] == 0.0))
     return 1.0;
+
+  // make sure that damping and hopping are positive definite
+  if (val[1] < 0.0)
+    val[1] = -val[1];
+  if (val[2] < 0.0)
+    val[2] = -val[2];
+
 
   Double_t tt;
   if (fParamNo.size() == 3) // no tshift
