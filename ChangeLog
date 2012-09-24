@@ -6,6 +6,7 @@
 
 changes since 0.11.0
 ===================================
+NEW 2012-09-24 add header information for printing.
 NEW 2012-05-31 added Noakes-Kalvius function (see A. Yaouanc and P. Dalmas de Reotiers, 
                "Muon Spin Rotation, Relaxation, and Resonance" Oxford, Section 6.4.1.3).
 NEW 2012-05-25 musredit/musrgui: added a dump muSR data header file information. 

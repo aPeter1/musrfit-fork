@@ -970,12 +970,35 @@ void PTextEdit::filePrint()
     int margin = (int) ( (2/2.54)*dpiy ); // 2 cm margins
 
     // print msr-file
+    QString fln = *fFilenames.find(currentEditor());
+    QString header1(fln);
+    QFileInfo flnInfo(fln);
+    QString header2 = QString("last modified: ") + flnInfo.lastModified().toString("dd.MM.yyyy - hh:mm:ss");
+    QString line("-------------------------------------");
     QStringList strList = currentEditor()->toPlainText().split("\n");
     for (QStringList::Iterator it = strList.begin(); it != strList.end(); ++it) {
       // new page needed?
       if ( margin + yPos > printer.height() - margin ) {
         printer.newPage();             // no more room on this page
         yPos = 0;                      // back to top of page
+      }
+
+      if (yPos == 0) { // print header
+        font.setPointSize( 8 );
+        p.setFont( font );
+
+        p.drawText(margin, margin+yPos, printer.width(), fm.lineSpacing(),
+                   Qt::TextExpandTabs | Qt::TextDontClip, header1);
+        yPos += fm.lineSpacing();
+        p.drawText(margin, margin+yPos, printer.width(), fm.lineSpacing(),
+                   Qt::TextExpandTabs | Qt::TextDontClip, header2);
+        yPos += fm.lineSpacing();
+        p.drawText(margin, margin+yPos, printer.width(), fm.lineSpacing(),
+                   Qt::TextExpandTabs | Qt::TextDontClip, line);
+        yPos += 1.5*fm.lineSpacing();
+
+        font.setPointSize( 10 );
+        p.setFont( font );
       }
 
       // print data
