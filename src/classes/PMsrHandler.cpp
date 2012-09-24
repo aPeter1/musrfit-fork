@@ -3928,13 +3928,23 @@ Bool_t PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
     }
     // extract chisq
     if (lines[i].fLine.Contains("chisq =")) {
-      fStatistic.fValid = true;
-      strncpy(str, lines[i].fLine.Data(), sizeof(str));
-      status = sscanf(str+lines[i].fLine.Index("chisq = ")+8, "%lf", &dval);
-      if (status == 1) {
-        fStatistic.fMin = dval;
-      } else {
-        fStatistic.fMin = -1.0;
+      if (lines[i].fLine.Contains("expected")) { // expected chisq
+        strncpy(str, lines[i].fLine.Data(), sizeof(str));
+        status = sscanf(str+lines[i].fLine.Index("chisq = ")+8, "%lf", &dval);
+        if (status == 1) {
+          fStatistic.fMinExpected = dval;
+        } else {
+          fStatistic.fMinExpected = -1.0;
+        }
+      } else { // chisq
+        fStatistic.fValid = true;
+        strncpy(str, lines[i].fLine.Data(), sizeof(str));
+        status = sscanf(str+lines[i].fLine.Index("chisq = ")+8, "%lf", &dval);
+        if (status == 1) {
+          fStatistic.fMin = dval;
+        } else {
+          fStatistic.fMin = -1.0;
+        }
       }
     }
     // extract maxLH
