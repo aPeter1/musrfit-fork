@@ -43,14 +43,15 @@ void runMuSimulation()
   decayAnaModule = histosFolder->AddFolder("DecayAnaModule", "muSR decay histograms");
 
   // feed run info header
-  UInt_t runNo = 9102;
+  UInt_t runNo = 9702;
   TString tstr;
   runInfo = gROOT->GetRootFolder()->AddFolder("RunInfo", "LEM RunInfo");  
   gROOT->GetListOfBrowsables()->Add(runInfo, "RunInfo");
   header = new TLemRunHeader();
   tstr  = TString("0");
   tstr += runNo;
-  tstr += TString(" - test");
+  tstr += TString("Ge, Mu-frac 1.0, Mu12 737MHz (0.44), Mu34 -1622MHz(0.44), T=220K/EA=170meV, Cap.(200K) 0.0MHz, 100mT");
+
   header->SetRunTitle(tstr.Data());
   header->SetLemSetup("trivial");
   header->SetRunNumber(runNo);
@@ -60,7 +61,7 @@ void runMuSimulation()
   header->SetSampleHV(0.0, 0.01);
   header->SetImpEnergy(31.8);
   header->SetSampleTemperature(0.2, 0.001);
-  header->SetSampleBField(-1.0, 0.1);
+  header->SetSampleBField(100.0, 0.1);
   header->SetTimeResolution(1.);
   header->SetNChannels(12001);
   header->SetNHist(2);
@@ -86,15 +87,25 @@ void runMuSimulation()
     return;
   }
 
-  //prepare to run simulation
-  simulateMuTransition->SetMuPrecFreq1(41.);   // MHz
-  simulateMuTransition->SetMuPrecFreq2(-35.);  // MHz
-  simulateMuTransition->SetMuFraction(0.5);    // initial Mu fraction
-  simulateMuTransition->SetMuFractionState1(0.42);  // 100% of Mu in state 1
-  simulateMuTransition->SetMuFractionState2(0.32);  // 0% of Mu in state 2
-  simulateMuTransition->SetBfield(0.01);           // Tesla
-  simulateMuTransition->SetCaptureRate(1.5);       // MHz
-  simulateMuTransition->SetIonizationRate(250.);    // MHz
+  //prepare to run simulation; here: isotropic Mu in Germanium
+  Double_t ionRate;  //assume Arrhenius behaviour ionRate = preFac*exp(-EA/kT)
+  Double_t capRate;  //assume that capture rate varies as sqrt(T), capRate = sigma*v*p , v ~ sqrt(T) 
+  Double_t EA, T;     //activation energy (meV) and temperature (K) 
+  EA = 170.;
+  T  = 220.;
+  ionRate = 2.9e7 * exp(-EA/(0.08625*T)); // Ge: 2.9*10^7MHz "attempt" frequency; 1K = 0.08625 meV 
+  capRate = 0.00001*sqrt(T/200.); 
+
+  simulateMuTransition->SetMuPrecFreq12(737.3);   // MHz
+  simulateMuTransition->SetMuPrecFreq34(-1622.2);  // MHz
+  simulateMuTransition->SetMuPrecFreq23(2051.6);   // MHz
+  simulateMuTransition->SetMuPrecFreq14(4111.2);  // MHz
+  simulateMuTransition->SetMuFraction(1.0);    // initial Mu fraction
+  simulateMuTransition->SetMuFractionState1(0.88);  // Mu in states 12, 34
+  simulateMuTransition->SetMuFractionState2(0.12);  // Mu in states 23, 14
+  simulateMuTransition->SetBfield(0.1);           // Tesla
+  simulateMuTransition->SetCaptureRate(capRate);       // MHz
+  simulateMuTransition->SetIonizationRate(ionRate);    // MHz
   simulateMuTransition->SetNmuons(1e7);
   simulateMuTransition->SetDecayAsymmetry(0.27);
   simulateMuTransition->SetDebugFlag(kFALSE); // to print time and phase during charge-changing cycle

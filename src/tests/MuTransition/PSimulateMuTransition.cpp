@@ -18,8 +18,8 @@
   (analogous to MuBC in Si, B||(100)), a non-precessing signal, and two precessing 
   states ("nu_12" and "nu_34").
   Parameters:
-  1) Precession frequencies of "nu_12" and "nu_34"
-  2) fractions of nu_12, nu_34
+  1) Precession frequencies of "nu_12", "nu_34", "nu_23", "nu_14"
+  2) fractions of nu_12, nu_34; and nu_23 and nu_14
   3) total Mu0 fraction
   4) electron-capture rate
   5) Mu ionization rate
@@ -91,8 +91,10 @@ PSimulateMuTransition::PSimulateMuTransition(UInt_t seed)
   }
 
   fNmuons           = 100;   // number of muons to simulate
-  fMuPrecFreq1      = 4463.; // vacuum Mu hyperfine coupling constant
-  fMuPrecFreq2      = 0.;    // Mu precession frequency of a 2nd Mu transition
+  fMuPrecFreq34     = 4463.; // vacuum Mu hyperfine coupling constant
+  fMuPrecFreq12     = 0.;    // Mu precession frequency of a 12 transition
+  fMuPrecFreq23     = 0.;    // Mu precession frequency of a 23 transition
+  fMuPrecFreq14     = 0.;    // Mu precession frequency of a 14 transition
   fBfield           = 0.01;  // magnetic field (T)
   fCaptureRate      = 0.01;  // Mu+ capture rate (MHz)
   fIonizationRate   = 10.;   // Mu0 ionization rate (MHz)
@@ -128,8 +130,10 @@ PSimulateMuTransition::~PSimulateMuTransition()
  */
 void PSimulateMuTransition::PrintSettings() const
 {
-  cout << endl << "Mu precession frequency state1 (MHz)  = " << fMuPrecFreq1;
-  cout << endl << "Mu precession frequency state2 (MHz)  = " << fMuPrecFreq2;
+  cout << endl << "Mu precession frequency 12 (MHz)  = " << fMuPrecFreq12;
+  cout << endl << "Mu precession frequency 34 (MHz)  = " << fMuPrecFreq34;
+  cout << endl << "Mu precession frequency 23 (MHz)  = " << fMuPrecFreq23;
+  cout << endl << "Mu precession frequency 14 (MHz)  = " << fMuPrecFreq14;
   cout << endl << "B field (T)                           = " << fBfield;
   cout << endl << "Mu+ electron capture rate (MHz)       = " << fCaptureRate;
   cout << endl << "Mu ionizatioan rate (MHz)             = " << fIonizationRate;
@@ -239,6 +243,10 @@ Double_t PSimulateMuTransition::PrecessionPhase(const Double_t &time, const Doub
  *        at the capture event. Calculate muon spin precession.
  *     4) get the next electron capture time, continue until t_d is reached.
  *
+ * <p> For isotropic muonium, TF:
+ *     nu_12 and nu_34 with equal probabilities, probability for both states fMuFractionState1
+ *     ni_23 and nu_14 with equal probabilities, probability for both states fMuFractionState2
+ *
  * \param muonString if eq. "Mu+" begin with Mu+ precession
  */
 void PSimulateMuTransition::Event(const TString muonString)
@@ -278,10 +286,18 @@ void PSimulateMuTransition::Event(const TString muonString)
      frac2 = 1. - fMuFractionState2;
      if ( rndm < frac1 )
        muoniumPrecessionFreq = 0.;
-     else if (rndm >= frac1 && rndm <= frac2)
-       muoniumPrecessionFreq = fMuPrecFreq1;
-     else
-       muoniumPrecessionFreq = fMuPrecFreq2;
+     else if (rndm >= frac1 && rndm <= frac2){
+       if (fRandom->Rndm() <= 0.5) 
+	muoniumPrecessionFreq = fMuPrecFreq12;
+       else
+        muoniumPrecessionFreq = fMuPrecFreq34;
+     }
+     else{
+       if (fRandom->Rndm() <= 0.5)
+        muoniumPrecessionFreq = fMuPrecFreq23;
+       else
+        muoniumPrecessionFreq = fMuPrecFreq14;
+     }
 
      if (fDebugFlag) cout << "Ioniza. time = " << ionizationTime << " Freq = " << muoniumPrecessionFreq 
                           << " Phase = " << fMuonPhase << endl;
@@ -303,10 +319,18 @@ void PSimulateMuTransition::Event(const TString muonString)
      frac2 = 1. - fMuFractionState2;
      if ( rndm < frac1 )
        muoniumPrecessionFreq = 0.;
-     else if (rndm >= frac1 && rndm <= frac2)
-       muoniumPrecessionFreq = fMuPrecFreq1;
-     else
-       muoniumPrecessionFreq = fMuPrecFreq2;
+     else if (rndm >= frac1 && rndm <= frac2){
+       if (fRandom->Rndm() <= 0.5) 
+	muoniumPrecessionFreq = fMuPrecFreq12;
+       else
+        muoniumPrecessionFreq = fMuPrecFreq34;
+     }
+     else{
+       if (fRandom->Rndm() <= 0.5)
+        muoniumPrecessionFreq = fMuPrecFreq23;
+       else
+        muoniumPrecessionFreq = fMuPrecFreq14;
+     }
 
      if (fDebugFlag) 
       cout << "Mu Ioniza. time = " << ionizationTime << " Freq = " << muoniumPrecessionFreq 
