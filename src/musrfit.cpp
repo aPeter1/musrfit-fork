@@ -543,6 +543,8 @@ int main(int argc, char *argv[])
   else
     dataHandler = new PRunDataHandler(msrHandler);
 
+  dataHandler->ReadData();
+
   bool success = dataHandler->IsAllDataAvailable();
   if (!success) {
     cout << endl << ">> musrfit **ERROR** Couldn't read all data files, will quit ..." << endl;

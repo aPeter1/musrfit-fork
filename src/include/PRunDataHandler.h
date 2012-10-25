@@ -46,14 +46,23 @@ using namespace std;
 class PRunDataHandler
 {
   public:
+    PRunDataHandler();
+    PRunDataHandler(TString fileName, const TString fileFormat);
+    PRunDataHandler(TString fileName, const TString fileFormat, const PStringVector dataPath);
+    PRunDataHandler(TString fileName, const TString fileFormat, const TString dataPath, PRawRunData &runData);
     PRunDataHandler(PAny2ManyInfo *any2ManyInfo);
     PRunDataHandler(PAny2ManyInfo *any2ManyInfo, const PStringVector dataPath);
     PRunDataHandler(PMsrHandler *msrInfo);
     PRunDataHandler(PMsrHandler *msrInfo, const PStringVector dataPath);
     virtual ~PRunDataHandler();
 
+    virtual void ReadData();
+    virtual void ConvertData();
+    virtual void WriteData();
+
     virtual Bool_t IsAllDataAvailable() const { return fAllDataAvailable; }
     virtual PRawRunData* GetRunData(const TString &runName);
+    virtual TString GetRunPathName() {return fRunPathName; }
 
   private:
     PMsrHandler   *fMsrInfo; ///< pointer to the msr-file handler
@@ -61,16 +70,19 @@ class PRunDataHandler
     PStringVector fDataPath; ///< vector containing all the search paths where to look for data files
 
     Bool_t fAllDataAvailable; ///< flag indicating if all data sets could be read
+    TString fFileFormat;      ///< keeps the file format if explicitly given
     TString fRunName;         ///< current run name
     TString fRunPathName;     ///< current path file name
-    PRawRunDataList fData;  ///< keeping all the raw data
+    PRawRunDataList fData;    ///< keeping all the raw data
 
+    virtual void Init(const Int_t tag=0);
     virtual Bool_t ReadFilesMsr();
     virtual Bool_t ReadWriteFilesList();
     virtual Bool_t FileAlreadyRead(TString runName);
     virtual void TestFileName(TString &runName, const TString &ext);
     virtual Bool_t FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx);
     virtual Bool_t FileExistsCheck(const Bool_t fileName, const Int_t idx);
+    virtual Bool_t FileExistsCheck(const TString fileName);
     virtual Bool_t ReadRootFile();
     virtual Bool_t ReadNexusFile();
     virtual Bool_t ReadWkmFile();

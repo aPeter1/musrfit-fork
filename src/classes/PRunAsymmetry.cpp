@@ -42,6 +42,10 @@
 #include <iostream>
 using namespace std;
 
+#include <TString.h>
+#include <TObjArray.h>
+#include <TObjString.h>
+
 #include "PMusr.h"
 #include "PRunAsymmetry.h"
 
@@ -54,6 +58,11 @@ using namespace std;
 PRunAsymmetry::PRunAsymmetry() : PRunBase()
 {
   fNoOfFitBins  = 0;
+
+  // the 2 following variables are need in case fit range is given in bins, and since
+  // the fit range can be changed in the command block, these variables need to be accessible
+  fGoodBins[0] = -1;
+  fGoodBins[1] = -1;
 }
 
 //--------------------------------------------------------------------------
@@ -69,6 +78,11 @@ PRunAsymmetry::PRunAsymmetry() : PRunBase()
  */
 PRunAsymmetry::PRunAsymmetry(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
 {
+  // the 2 following variables are need in case fit range is given in bins, and since
+  // the fit range can be changed in the command block, these variables need to be accessible
+  fGoodBins[0] = -1;
+  fGoodBins[1] = -1;
+
   // check if alpha and/or beta is fixed --------------------
 
   PMsrParamList *param = msrInfo->GetMsrParamList();
@@ -140,7 +154,7 @@ PRunAsymmetry::~PRunAsymmetry()
 }
 
 //--------------------------------------------------------------------------
-// CalcChiSquare
+// CalcChiSquare (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Calculate chi-square.
@@ -236,7 +250,7 @@ Double_t PRunAsymmetry::CalcChiSquareExpected(const std::vector<Double_t>& par)
 }
 
 //--------------------------------------------------------------------------
-// CalcMaxLikelihood
+// CalcMaxLikelihood (public)
 //--------------------------------------------------------------------------
 /**
  * <p>NOT IMPLEMENTED!!
@@ -266,7 +280,97 @@ UInt_t PRunAsymmetry::GetNoOfFitBins()
 }
 
 //--------------------------------------------------------------------------
-// CalcNoOfFitBins (private)
+// SetFitRangeBin (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Allows to change the fit range on the fly. Used in the COMMAND block.
+ * The syntax of the string is: FIT_RANGE fgb[+n00] lgb[-n01] [fgb[+n10] lgb[-n11] ... fgb[+nN0] lgb[-nN1]].
+ * If only one pair of fgb/lgb is given, it is used for all runs in the RUN block section.
+ * If multiple fgb/lgb's are given, the number N has to be the number of RUN blocks in
+ * the msr-file.
+ *
+ * <p>nXY are offsets which can be used to shift, limit the fit range.
+ *
+ * \param fitRange string containing the necessary information.
+ */
+void PRunAsymmetry::SetFitRangeBin(const TString fitRange)
+{
+  TObjArray *tok = 0;
+  TObjString *ostr = 0;
+  TString str;
+  Ssiz_t idx = -1;
+  Int_t offset = 0;
+
+  tok = fitRange.Tokenize(" \t");
+
+  if (tok->GetEntries() == 3) { // structure FIT_RANGE fgb+n0 lgb-n1
+    // handle fgb+n0 entry
+    ostr = (TObjString*) tok->At(1);
+    str = ostr->GetString();
+    // check if there is an offset present
+    idx = str.First("+");
+    if (idx != -1) { // offset present
+      str.Remove(0, idx+1);
+      if (str.IsFloat()) // if str is a valid number, convert is to an integer
+        offset = str.Atoi();
+    }
+    fFitStartTime = (fGoodBins[0] + offset - fT0s[0]) * fTimeResolution;
+
+    // handle lgb-n1 entry
+    ostr = (TObjString*) tok->At(2);
+    str = ostr->GetString();
+    // check if there is an offset present
+    idx = str.First("-");
+    if (idx != -1) { // offset present
+      str.Remove(0, idx+1);
+      if (str.IsFloat()) // if str is a valid number, convert is to an integer
+        offset = str.Atoi();
+    }
+    fFitEndTime = (fGoodBins[1] - offset - fT0s[0]) * fTimeResolution;
+  } else if ((tok->GetEntries() > 3) && (tok->GetEntries() % 2 == 1)) { // structure FIT_RANGE fgb[+n00] lgb[-n01] [fgb[+n10] lgb[-n11] ... fgb[+nN0] lgb[-nN1]]
+    Int_t pos = 2*(fRunNo+1)-1;
+
+    if (pos + 1 >= tok->GetEntries()) {
+      cerr << endl << ">> PRunSingleHisto::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
+      cerr << endl << ">> will ignore it. Sorry ..." << endl;
+    } else {
+      // handle fgb+n0 entry
+      ostr = (TObjString*) tok->At(pos);
+      str = ostr->GetString();
+      // check if there is an offset present
+      idx = str.First("+");
+      if (idx != -1) { // offset present
+        str.Remove(0, idx+1);
+        if (str.IsFloat()) // if str is a valid number, convert is to an integer
+          offset = str.Atoi();
+      }
+      fFitStartTime = (fGoodBins[0] + offset - fT0s[0]) * fTimeResolution;
+
+      // handle lgb-n1 entry
+      ostr = (TObjString*) tok->At(pos+1);
+      str = ostr->GetString();
+      // check if there is an offset present
+      idx = str.First("-");
+      if (idx != -1) { // offset present
+        str.Remove(0, idx+1);
+        if (str.IsFloat()) // if str is a valid number, convert is to an integer
+          offset = str.Atoi();
+      }
+      fFitEndTime = (fGoodBins[1] - offset - fT0s[0]) * fTimeResolution;
+    }
+  } else { // error
+    cerr << endl << ">> PRunSingleHisto::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
+    cerr << endl << ">> will ignore it. Sorry ..." << endl;
+  }
+
+  // clean up
+  if (tok) {
+    delete tok;
+  }
+}
+
+//--------------------------------------------------------------------------
+// CalcNoOfFitBins (protected)
 //--------------------------------------------------------------------------
 /**
  * <p>Calculate the number of fitted bins for the current fit range.
@@ -288,7 +392,7 @@ void PRunAsymmetry::CalcNoOfFitBins()
 }
 
 //--------------------------------------------------------------------------
-// CalcTheory
+// CalcTheory (protected)
 //--------------------------------------------------------------------------
 /**
  * <p>Calculate theory for a given set of fit-parameters.
@@ -344,7 +448,7 @@ void PRunAsymmetry::CalcTheory()
 }
 
 //--------------------------------------------------------------------------
-// PrepareData
+// PrepareData (protected)
 //--------------------------------------------------------------------------
 /**
  * <p>Prepare data for fitting or viewing. What is already processed at this stage:
@@ -682,7 +786,7 @@ Bool_t PRunAsymmetry::PrepareData()
 }
 
 //--------------------------------------------------------------------------
-// SubtractFixBkg
+// SubtractFixBkg (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Subtracts a fixed background from the raw data. The background is given
@@ -722,7 +826,7 @@ Bool_t PRunAsymmetry::SubtractFixBkg()
 }
 
 //--------------------------------------------------------------------------
-// SubtractEstimatedBkg
+// SubtractEstimatedBkg (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Subtracts the background which is estimated from a given interval (typically before t0).
@@ -835,7 +939,7 @@ Bool_t PRunAsymmetry::SubtractEstimatedBkg()
 }
 
 //--------------------------------------------------------------------------
-// PrepareFitData
+// PrepareFitData (protected)
 //--------------------------------------------------------------------------
 /**
  * <p>Take the pre-processed data (i.e. grouping and addrun are preformed) and form the asymmetry for fitting.
@@ -936,6 +1040,19 @@ Bool_t PRunAsymmetry::PrepareFitData(PRawRunData* runData, UInt_t histoNo[2])
     cerr << endl;
   }
 
+  // if fit range is given in bins (and not time), the fit start/end time can be calculated at this point now
+  if (fRunInfo->IsFitRangeInBin()) {
+    fFitStartTime = (fRunInfo->GetDataRange(0) + fRunInfo->GetFitRangeOffset(0) - fT0s[0]) * fTimeResolution; // (fgb+n0-t0)*dt
+    fFitEndTime = (fRunInfo->GetDataRange(1) - fRunInfo->GetFitRangeOffset(1) - fT0s[0]) * fTimeResolution;   // (lgb-n1-t0)*dt
+    // write these times back into the data structure. This way it is available when writting the log-file
+    fRunInfo->SetFitRange(fFitStartTime, 0);
+    fRunInfo->SetFitRange(fFitEndTime, 1);
+  }
+
+  // keep good bins for potential latter use
+  fGoodBins[0] = start[0];
+  fGoodBins[1] = end[0];
+
   // everything looks fine, hence fill packed forward and backward histo
   PRunData forwardPacked;
   PRunData backwardPacked;
@@ -1032,7 +1149,7 @@ Bool_t PRunAsymmetry::PrepareFitData(PRawRunData* runData, UInt_t histoNo[2])
 }
 
 //--------------------------------------------------------------------------
-// PrepareViewData
+// PrepareViewData (protected)
 //--------------------------------------------------------------------------
 /**
  * <p>Take the pre-processed data (i.e. grouping and addrun are preformed) and form the asymmetry for view representation.
@@ -1139,6 +1256,12 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
       cerr << endl;
       return false;
     }
+  }
+
+  // if fit range is given in bins (and not time), the fit start/end time can be calculated at this point now
+  if (fRunInfo->IsFitRangeInBin()) {
+    fFitStartTime = (fRunInfo->GetDataRange(0) + fRunInfo->GetFitRangeOffset(0) - fT0s[0]) * fTimeResolution; // (fgb+n0-t0)*dt
+    fFitEndTime = (fRunInfo->GetDataRange(1) - fRunInfo->GetFitRangeOffset(1) - fT0s[0]) * fTimeResolution;   // (lgb-n1-t0)*dt
   }
 
   // everything looks fine, hence fill packed forward and backward histo
@@ -1289,7 +1412,7 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
 }
 
 //--------------------------------------------------------------------------
-// PrepareRRFViewData
+// PrepareRRFViewData (protected)
 //--------------------------------------------------------------------------
 /**
  * <p> Prepares the RRF data set for visual representation. This is done the following way:

@@ -502,6 +502,10 @@ int main(int argc, char *argv[])
   else
     dataHandler = new PRunDataHandler(&info);
 
+  // read and convert all data
+  dataHandler->ConvertData();
+
+  // check if it has been successfull
   bool success = dataHandler->IsAllDataAvailable();
   if (!success) {
     cout << endl << ">> any2many **ERROR** Couldn't read all data files, will quit ..." << endl;

@@ -52,6 +52,8 @@ class PRunAsymmetry : public PRunBase
 
     virtual UInt_t GetNoOfFitBins();
 
+    virtual void SetFitRangeBin(const TString fitRange);
+
   protected:
     virtual void CalcNoOfFitBins();
     virtual Bool_t PrepareData();
@@ -68,6 +70,8 @@ class PRunAsymmetry : public PRunBase
     PDoubleVector fForwardErr;  ///< forward histo errors
     PDoubleVector fBackward;    ///< backward histo data
     PDoubleVector fBackwardErr; ///< backward histo errors
+
+    Int_t fGoodBins[2];        ///< keep first/last good bins. 0=fgb, 1=lgb
 
     Bool_t SubtractFixBkg();
     Bool_t SubtractEstimatedBkg();

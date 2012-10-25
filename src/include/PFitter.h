@@ -81,6 +81,7 @@ class PFitter
     Bool_t fConverged;   ///< flag. true: the fit has converged.
     Bool_t fChisqOnly;   ///< flag. true: calculate chi^2 only (no fitting).
     Bool_t fUseChi2;     ///< flag. true: chi^2 fit. false: log-max-likelihood
+    UInt_t fPrintLevel;  ///< tag, showing the level of messages whished. 0=minimum, 1=standard, 2=maximum
 
     UInt_t fStrategy; ///< fitting strategy (see minuit2 manual).
 
@@ -119,6 +120,7 @@ class PFitter
     Bool_t ExecuteMinimize();
     Bool_t ExecuteMinos();
     Bool_t ExecutePlot();
+    Bool_t ExecutePrintLevel(UInt_t lineNo);
     Bool_t ExecuteRelease(UInt_t lineNo);
     Bool_t ExecuteRestore();
     Bool_t ExecuteScan();

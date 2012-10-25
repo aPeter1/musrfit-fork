@@ -51,6 +51,7 @@ using namespace std;
 #include "Minuit2/MnMigrad.h"
 #include "Minuit2/MnMinos.h"
 #include "Minuit2/MnPlot.h"
+#include "Minuit2/MnPrint.h"
 #include "Minuit2/MnScan.h"
 #include "Minuit2/MnSimplex.h"
 #include "Minuit2/MnUserParameterState.h"
@@ -99,6 +100,7 @@ PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, Bo
   fScanNoPoints = 41; // minuit2 default
   fScanLow  = 0.0; // minuit2 default, i.e. 2 std deviations
   fScanHigh = 0.0; // minuit2 default, i.e. 2 std deviations
+  fPrintLevel = 1.0;
 
   // keep all the fit ranges in case RANGE command is present
   PMsrRunList *runs = fRunInfo->GetMsrRunList();
@@ -289,8 +291,7 @@ Bool_t PFitter::DoFit()
         cerr << endl;
         break;
       case PMN_PRINT:
-        cerr << endl << "**WARNING** from PFitter::DoFit() : the command PRINT is not yet implemented.";
-        cerr << endl;
+        status = ExecutePrintLevel(fCmdList[i].second);
         break;
       default:
         cerr << endl << "**PANIC ERROR**: PFitter::DoFit(): You should never have reached this point";
@@ -447,14 +448,19 @@ Bool_t PFitter::CheckCommands()
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
     } else if (it->fLine.Contains("FIT_RANGE", TString::kIgnoreCase)) {
-      // check the 3 options: FIT_RANGE RESET, FIT_RANGE start end, FIT_RANGE start1 end1 start2 end2 ... startN endN
+      // check the 5 options:
+      // (i)   FIT_RANGE RESET,
+      // (ii)  FIT_RANGE start end,
+      // (iii) FIT_RANGE start1 end1 start2 end2 ... startN endN
+      // (iv)  FIT_RANGE fgb+n0 lgb-n1
+      // (v)   FIT_RANGE fgb+n00 lgb-n01 fgb+n10 lgb-n11 ... fgb+nN0 lgb-nN1
       TObjArray *tokens = 0;
       TObjString *ostr;
       TString str;
 
       tokens = it->fLine.Tokenize(", \t");
 
-      if (tokens->GetEntries() == 2) {
+      if (tokens->GetEntries() == 2) { // should only be RESET
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (str.Contains("RESET"), TString::kIgnoreCase) {
@@ -478,7 +484,8 @@ Bool_t PFitter::CheckCommands()
         if ((tokens->GetEntries() > 3) && ((static_cast<UInt_t>(tokens->GetEntries())-1)) != 2*fRunInfo->GetMsrRunList()->size()) {
           cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
           cerr << endl << ">> " << it->fLine.Data();
-          cerr << endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE start end | FIT_RANGE s1 e1 s2 e2 .. sN eN,";
+          cerr << endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE <start> <end> | FIT_RANGE <s1> <e1> <s2> <e2> .. <sN> <eN> |";
+          cerr << endl << ">>         FIT_RANGE fgb+<n0> lgb-<n1> | FIT_RANGE fgb+<n00> lgb-<n01> fgb+<n10> lgb-<n11> ... fgb+<nN0> lgb-<nN1>,";
           cerr << endl << ">>         with N the number of runs in the msr-file.";
           cerr << endl << ">>         Found N=" << (tokens->GetEntries()-1)/2 << ", # runs in msr-file=" << fRunInfo->GetMsrRunList()->size() << endl;
           fIsValid = false;
@@ -488,21 +495,30 @@ Bool_t PFitter::CheckCommands()
           }
           break;
         } else {
-          // check that all range entries are numbers
-          Int_t n=1;
-          do {
+          // check that all range entries are numbers or fgb+n0 / lgb-n1
+          Bool_t ok = true;
+          for (Int_t n=1; n<tokens->GetEntries(); n++) {
             ostr = dynamic_cast<TObjString*>(tokens->At(n));
             str = ostr->GetString();
-          } while ((++n < tokens->GetEntries()) && str.IsFloat());
+            if (!str.IsFloat()) {
+              if ((n%2 == 1) && (!str.Contains("fgb", TString::kIgnoreCase)))
+                ok = false;
+              if ((n%2 == 0) && (!str.Contains("lgb", TString::kIgnoreCase)))
+                ok = false;
+            }
+            if (!ok)
+              break;
+          }
 
-          if (str.IsFloat()) { // everything is fine, last string was a floating point number
+          if (ok) { // everything is fine
             cmd.first = PMN_FIT_RANGE;
             cmd.second = cmdLineNo;
             fCmdList.push_back(cmd);
           } else {
             cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
             cerr << endl << ">> " << it->fLine.Data();
-            cerr << endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE <start> <end> | FIT_RANGE <s1> <e1> <s2> <e2> .. <sN> <eN>,";
+            cerr << endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE <start> <end> | FIT_RANGE <s1> <e1> <s2> <e2> .. <sN> <eN> |";
+            cerr << endl << ">>         FIT_RANGE fgb+<n0> lgb-<n1> | FIT_RANGE fgb+<n00> lgb-<n01> fgb+<n10> lgb-<n11> ... fgb+<nN0> lgb-<nN1>,";
             cerr << endl << ">>         with N the number of runs in the msr-file.";
             cerr << endl << ">>         Found token '" << str.Data() << "', which is not a floating point number." << endl;
             fIsValid = false;
@@ -516,8 +532,9 @@ Bool_t PFitter::CheckCommands()
       } else {
         cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
         cerr << endl << ">> " << it->fLine.Data();
-        cerr << endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE start end | FIT_RANGE s1 e1 s2 e2 .. sN eN,";
-        cerr << endl << ">>         with N the number of runs in the msr-file." << endl;
+        cerr << endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE <start> <end> | FIT_RANGE <s1> <e1> <s2> <e2> .. <sN> <eN> |";
+        cerr << endl << ">>         FIT_RANGE fgb+<n0> lgb-<n1> | FIT_RANGE fgb+<n00> lgb-<n01> fgb+<n10> lgb-<n11> ... fgb+<nN0> lgb-<nN1>,";
+        cerr << endl << ">>         with N the number of runs in the msr-file.";
         fIsValid = false;
         if (tokens) {
           delete tokens;
@@ -617,6 +634,10 @@ Bool_t PFitter::CheckCommands()
       fCmdList.push_back(cmd);
     } else if (it->fLine.Contains("MNPLOT", TString::kIgnoreCase)) {
       cmd.first  = PMN_PLOT;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
+    } else if (it->fLine.Contains("PRINT_LEVEL", TString::kIgnoreCase)) {
+      cmd.first = PMN_PRINT;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
     } else if (it->fLine.Contains("RELEASE", TString::kIgnoreCase)) {
@@ -849,10 +870,6 @@ Bool_t PFitter::CheckCommands()
       cmd.first  = PMN_USER_PARAM_STATE;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
-    } else if (it->fLine.Contains("PRINT", TString::kIgnoreCase)) {
-      cmd.first  = PMN_PRINT;
-      cmd.second = cmdLineNo;
-      fCmdList.push_back(cmd);
     } else { // unkown command
       cerr << endl << ">> PFitter::CheckCommands(): **FATAL ERROR** in line " << it->fLineNo << " an unkown command is found:";
       cerr << endl << ">> " << it->fLine.Data();
@@ -872,7 +889,7 @@ Bool_t PFitter::CheckCommands()
     if (it->fLine.Contains("FIX", TString::kIgnoreCase))
       fixFlag = true;
     else if (it->fLine.Contains("RELEASE", TString::kIgnoreCase) ||
-        it->fLine.Contains("RESTORE", TString::kIgnoreCase))
+             it->fLine.Contains("RESTORE", TString::kIgnoreCase))
       releaseFlag = true;
     else if (it->fLine.Contains("MINIMIZE", TString::kIgnoreCase) ||
              it->fLine.Contains("MIGRAD", TString::kIgnoreCase) ||
@@ -991,6 +1008,11 @@ Bool_t PFitter::ExecuteFitRange(UInt_t lineNo)
 {
   cout << ">> PFitter::ExecuteFitRange(): " << fCmdLines[lineNo].fLine.Data() << endl;
 
+  if (fCmdLines[lineNo].fLine.Contains("fgb", TString::kIgnoreCase)) { // fit range given in bins
+    fRunListCollection->SetFitRange(fCmdLines[lineNo].fLine);
+    return true;
+  }
+
   TObjArray *tokens = 0;
   TObjString *ostr;
   TString str;
@@ -1002,7 +1024,7 @@ Bool_t PFitter::ExecuteFitRange(UInt_t lineNo)
   // execute command, no error  checking needed since this has been already carried out in CheckCommands()
   if (tokens->GetEntries() == 2) { // reset command
     fRunListCollection->SetFitRange(fOriginalFitRange);
-  } else if (tokens->GetEntries() == 3) { // single fit range for all runs
+  } else if (tokens->GetEntries() == 3) { // single fit range for all runs    
     Double_t start = 0.0, end = 0.0;
     PDoublePair fitRange;
     PDoublePairVector fitRangeVector;
@@ -1116,6 +1138,9 @@ Bool_t PFitter::ExecuteHesse()
     fRunInfo->SetMsrParamPosErrorPresent(i, false);
   }
 
+  if (fPrintLevel >= 2)
+    cout << mnState << endl;
+
   return true;
 }
 
@@ -1180,6 +1205,9 @@ Bool_t PFitter::ExecuteMigrad()
   fRunInfo->SetMsrStatisticNdf(ndf);
 
   fConverged = true;
+
+  if (fPrintLevel >= 2)
+    cout << *fFcnMin << endl;
 
   return true;
 }
@@ -1246,6 +1274,9 @@ Bool_t PFitter::ExecuteMinimize()
   fRunInfo->SetMsrStatisticNdf(ndf);
 
   fConverged = true;
+
+  if (fPrintLevel >= 2)
+    cout << *fFcnMin << endl;
 
   return true;
 }
@@ -1324,6 +1355,60 @@ Bool_t PFitter::ExecutePlot()
 
   ROOT::Minuit2::MnPlot plot;
   plot(fScanData);
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// ExecutePrintLevel
+//--------------------------------------------------------------------------
+/**
+ * <p>Set the print level.
+ *
+ * \param lineNo the line number of the command block
+ *
+ * <b>return:</b> true if done, otherwise returns false.
+ */
+Bool_t PFitter::ExecutePrintLevel(UInt_t lineNo)
+{
+  cout << ">> PFitter::ExecutePrintLevel(): " << fCmdLines[lineNo].fLine.Data() << endl;
+
+  TObjArray *tokens = 0;
+  TObjString *ostr;
+  TString str;
+
+  tokens = fCmdLines[lineNo].fLine.Tokenize(", \t");
+
+  if (tokens->GetEntries() < 2) {
+    cerr << endl << "**ERROR** from PFitter::ExecutePrintLevel(): SYNTAX: PRINT_LEVEL <N>, where <N>=0-3" << endl << endl;
+    return false;
+  }
+
+  ostr = (TObjString*)tokens->At(1);
+  str = ostr->GetString();
+
+  Int_t ival;
+  if (str.IsDigit()) {
+    ival = str.Atoi();
+    if ((ival >=0) && (ival <= 3)) {
+      fPrintLevel = (UInt_t) ival;
+    } else {
+      cerr << endl << "**ERROR** from PFitter::ExecutePrintLevel(): SYNTAX: PRINT_LEVEL <N>, where <N>=0-3";
+      cerr << endl << "   found <N>=" << ival << endl << endl;
+      return false;
+    }
+  } else {
+    cerr << endl << "**ERROR** from PFitter::ExecutePrintLevel(): SYNTAX: PRINT_LEVEL <N>, where <N>=0-3" << endl << endl;
+    return false;
+  }
+
+  ROOT::Minuit2::MnPrint::SetLevel(fPrintLevel);
+
+  // clean up
+  if (tokens) {
+    delete tokens;
+    tokens = 0;
+  }
 
   return true;
 }
@@ -1809,6 +1894,9 @@ Bool_t PFitter::ExecuteSimplex()
   fRunInfo->SetMsrStatisticNdf(ndf);
 
   fConverged = true;
+
+  if (fPrintLevel >= 2)
+    cout << *fFcnMin << endl;
 
   return true;
 }

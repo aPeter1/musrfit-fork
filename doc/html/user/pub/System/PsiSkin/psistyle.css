@@ -128,6 +128,10 @@ blockquote.psi {
         padding-right: 0px;
 }
 
+.patternContent a[href^="http://i.psi.ch"] {
+        background: transparent;
+        padding-right: 0px;
+}
 
 /* ...but not to absolute links in this domain...
 

@@ -6,6 +6,9 @@
 
 changes since 0.11.0
 ===================================
+NEW 2012-10-25 (i) add PRINT_LEVEL to the command block (0='nothing' to
+3='everything'). This allows to tune the Minuit2 output. (ii) added the
+possibilty to give the fit range in bins. For details see the docu.  
 NEW 2012-09-24 add header information for printing.
 NEW 2012-05-31 added Noakes-Kalvius function (see A. Yaouanc and P. Dalmas de Reotiers, 
                "Muon Spin Rotation, Relaxation, and Resonance" Oxford, Section 6.4.1.3).

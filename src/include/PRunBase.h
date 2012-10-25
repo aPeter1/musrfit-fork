@@ -78,8 +78,8 @@ class PRunBase
     Double_t fTimeResolution;   ///< time resolution in (us)
     PDoubleVector fT0s;         ///< all t0 bins of a run! The derived classes will handle it
 
-    Double_t fFitStartTime; ///< fit start time
-    Double_t fFitEndTime;   ///< fit end time
+    Double_t fFitStartTime;     ///< fit start time
+    Double_t fFitEndTime;       ///< fit end time
 
     PDoubleVector fFuncValues;  ///< is keeping the values of the functions from the FUNCTIONS block
     PTheory *fTheory;           ///< theory needed to calculate chi-square

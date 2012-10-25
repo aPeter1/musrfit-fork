@@ -559,7 +559,9 @@ class PMsrRunBlock {
     virtual UInt_t GetAddT0BinEntries() { return fAddT0.size(); }
     virtual Int_t GetAddT0BinSize(UInt_t addRunIdx);
     virtual Double_t GetAddT0Bin(UInt_t addRunIdx, UInt_t histoIdx);
+    virtual Bool_t IsFitRangeInBin() { return fFitRangeInBins; }
     virtual Double_t GetFitRange(UInt_t idx);
+    virtual Int_t GetFitRangeOffset(UInt_t idx);
     virtual Int_t GetPacking() { return fPacking; }
     virtual Int_t GetXDataIndex() { return fXYDataIndex[0]; }
     virtual Int_t GetYDataIndex() { return fXYDataIndex[1]; }
@@ -588,7 +590,9 @@ class PMsrRunBlock {
     virtual void SetDataRange(Int_t ival, Int_t idx);
     virtual void SetT0Bin(Double_t dval, Int_t idx=-1);
     virtual void SetAddT0Bin(Double_t dval, UInt_t addRunIdx, UInt_t histoNoIdx);
+    virtual void SetFitRangeInBins(Bool_t bval) { fFitRangeInBins = bval; }
     virtual void SetFitRange(Double_t dval, UInt_t idx);
+    virtual void SetFitRangeOffset(Int_t ival, UInt_t idx);
     virtual void SetPacking(Int_t ival) { fPacking = ival; }
     virtual void SetXDataIndex(Int_t ival) { fXYDataIndex[0] = ival; }
     virtual void SetYDataIndex(Int_t ival) { fXYDataIndex[1] = ival; }
@@ -618,7 +622,9 @@ class PMsrRunBlock {
     Int_t fDataRange[4];            ///< data bin range (fit type 0, 2, 4)
     PDoubleVector fT0;              ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
     vector<PDoubleVector> fAddT0;   ///< t0 bins for addrun's
+    Bool_t fFitRangeInBins;         ///< flag telling if fit range is given in time or in bins
     Double_t fFitRange[2];          ///< fit range in (us)
+    Int_t fFitRangeOffset[2];       ///< if fit range is given in bins it can have the form fit fgb+n0 lgb-n1. This variable holds the n0 and n1.
     Int_t fPacking;                 ///< packing/rebinning
     Int_t fXYDataIndex[2];          ///< used to get the data indices when using db-files (fit type 8)
     TString fXYDataLabel[2];        ///< used to get the indices via labels when using db-files  (fit type 8)

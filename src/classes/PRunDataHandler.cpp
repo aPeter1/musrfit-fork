@@ -82,22 +82,68 @@ using namespace std;
 #define A2M_WKM        7
 #define A2M_ASCII      8
 
+#define PHR_INIT_ALL      0
+#define PHR_INIT_MSR      1
+#define PHR_INIT_ANY2MANY 2
+
 //--------------------------------------------------------------------------
 // Constructor
 //--------------------------------------------------------------------------
 /**
- * <p>Constructor, reading the data histogramm files.
- *
- * \param msrInfo pointer to the msr-file handler
+ * <p>Empty Constructor
  */
-PRunDataHandler::PRunDataHandler(PAny2ManyInfo *any2ManyInfo) : fAny2ManyInfo(any2ManyInfo)
+PRunDataHandler::PRunDataHandler()
 {
-  fDataPath.clear();
-  // read files
-  if (!ReadWriteFilesList()) // couldn't read file
-    fAllDataAvailable = false;
-  else
-    fAllDataAvailable = true;
+  Init();
+}
+
+//--------------------------------------------------------------------------
+// Constructor
+//--------------------------------------------------------------------------
+/**
+ * <p>Constructor which just reads a single muSR data file.
+ *
+ * \param fileName
+ * \param fileFormat
+ */
+PRunDataHandler::PRunDataHandler(TString fileName, const TString fileFormat) : fFileFormat(fileFormat)
+{
+  Init();
+
+  FileExistsCheck(fileName);
+}
+
+//--------------------------------------------------------------------------
+// Constructor
+//--------------------------------------------------------------------------
+/**
+ * <p>Constructor which just reads a single muSR data file.
+ *
+ * \param fileName
+ * \param fileFormat
+ * \param dataPath
+ */
+PRunDataHandler::PRunDataHandler(TString fileName, const TString fileFormat, const PStringVector dataPath) : fDataPath(dataPath), fFileFormat(fileFormat)
+{
+  Init();
+
+  FileExistsCheck(fileName);
+}
+
+//--------------------------------------------------------------------------
+// Constructor
+//--------------------------------------------------------------------------
+/**
+ * <p>Constructor which just writes a single muSR data file.
+ *
+ * \param fileName
+ * \param fileFormat
+ * \param dataPath
+ * \param runData
+ */
+PRunDataHandler::PRunDataHandler(TString fileName, const TString fileFormat, const TString dataPath, PRawRunData &runData)
+{
+  Init();
 }
 
 //--------------------------------------------------------------------------
@@ -108,14 +154,24 @@ PRunDataHandler::PRunDataHandler(PAny2ManyInfo *any2ManyInfo) : fAny2ManyInfo(an
  *
  * \param msrInfo pointer to the msr-file handler
  */
+PRunDataHandler::PRunDataHandler(PAny2ManyInfo *any2ManyInfo) : fAny2ManyInfo(any2ManyInfo)
+{
+  Init(PHR_INIT_ANY2MANY);
+}
+
+//--------------------------------------------------------------------------
+// Constructor
+//--------------------------------------------------------------------------
+/**
+ * <p>Constructor, reading the data histogramm files.
+ *
+ * \param any2ManyInfo pointer to the PAny2ManyInfo structure needed to convert data
+ * \param dataPath contains all data search paths.
+ */
 PRunDataHandler::PRunDataHandler(PAny2ManyInfo *any2ManyInfo, const PStringVector dataPath) :
     fAny2ManyInfo(any2ManyInfo), fDataPath(dataPath)
 {
-  // read files
-  if (!ReadWriteFilesList()) // couldn't read file
-    fAllDataAvailable = false;
-  else
-    fAllDataAvailable = true;
+  Init(PHR_INIT_ANY2MANY);
 }
 
 //--------------------------------------------------------------------------
@@ -128,11 +184,7 @@ PRunDataHandler::PRunDataHandler(PAny2ManyInfo *any2ManyInfo, const PStringVecto
  */
 PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo) : fMsrInfo(msrInfo)
 {
-  // read files
-  if (!ReadFilesMsr()) // couldn't read file
-    fAllDataAvailable = false;
-  else
-    fAllDataAvailable = true;
+  Init(PHR_INIT_MSR);
 }
 
 //--------------------------------------------------------------------------
@@ -148,11 +200,7 @@ PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo) : fMsrInfo(msrInfo)
 PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo, const PStringVector dataPath) : 
       fMsrInfo(msrInfo), fDataPath(dataPath)
 {
-  // read files
-  if (!ReadFilesMsr()) // couldn't read file
-    fAllDataAvailable = false;
-  else
-    fAllDataAvailable = true;
+  Init(PHR_INIT_MSR);
 }
 
 //--------------------------------------------------------------------------
@@ -163,6 +211,7 @@ PRunDataHandler::PRunDataHandler(PMsrHandler *msrInfo, const PStringVector dataP
  */
 PRunDataHandler::~PRunDataHandler()
 {
+  fDataPath.clear();
   fData.clear();
 }
 
@@ -170,7 +219,7 @@ PRunDataHandler::~PRunDataHandler()
 // GetRunData
 //--------------------------------------------------------------------------
 /**
- * <p>Checks if runName is found.
+ * <p>Checks if runName is found, and if so return these data.
  *
  * <b>return:</b>
  * - if data are found: pointer to the data.
@@ -194,7 +243,87 @@ PRawRunData* PRunDataHandler::GetRunData(const TString &runName)
 }
 
 //--------------------------------------------------------------------------
-// ReadFilesMsr
+// ReadData
+//--------------------------------------------------------------------------
+/**
+ * <p>Read data. Used to read data, either msr-file triggered, or a single
+ * explicit data file should be read.
+ */
+void PRunDataHandler::ReadData()
+{
+  if (fMsrInfo) { // i.e. msr-file triggered
+    if (!ReadFilesMsr()) // couldn't read file
+      fAllDataAvailable = false;
+    else
+      fAllDataAvailable = true;
+  } else if (!fRunPathName.IsWhitespace()) { // i.e. file name triggered
+    cerr << endl << "debug>> fFileFormat=\"" << fFileFormat << "\"" << endl;
+    if ((fFileFormat == "MusrRoot") || (fFileFormat == "musrroot")) {
+      fAllDataAvailable = ReadRootFile();
+    } else if ((fFileFormat == "NeXus") || (fFileFormat == "nexus")) {
+      fAllDataAvailable = ReadNexusFile();
+    } else if ((fFileFormat == "PsiBin") || (fFileFormat == "psibin")) {
+      fAllDataAvailable = ReadPsiBinFile();
+    } else if ((fFileFormat == "Mud") || (fFileFormat == "mud")) {
+      fAllDataAvailable = ReadMudFile();
+    } else if ((fFileFormat == "Wkm") || (fFileFormat == "wkm")) {
+      fAllDataAvailable = ReadWkmFile();
+    } else {
+      cerr << endl << ">> PRunDataHandler::ReadData(): **ERROR** unkown file format \"" << fFileFormat << "\" found." << endl;
+      fAllDataAvailable = false;
+    }
+  } else {
+    cerr << endl << ">> PRunDataHandler::ReadData(): **ERROR** Couldn't read files." << endl;
+    fAllDataAvailable = false;
+  }
+}
+
+//--------------------------------------------------------------------------
+// ConvertData
+//--------------------------------------------------------------------------
+/**
+ * <p>Read data and convert it. This routine is used by any2many.
+ */
+void PRunDataHandler::ConvertData()
+{
+  if (!ReadWriteFilesList()) // couldn't read file
+    fAllDataAvailable = false;
+  else
+    fAllDataAvailable = true;
+}
+
+//--------------------------------------------------------------------------
+// WriteData
+//--------------------------------------------------------------------------
+/**
+ * <p>Write data. This routine is used to write a single file.
+ */
+void PRunDataHandler::WriteData()
+{
+
+}
+
+//--------------------------------------------------------------------------
+// Init (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Common initializer.
+ */
+void PRunDataHandler::Init(const Int_t tag)
+{
+  if ((tag==PHR_INIT_ALL) || (tag==PHR_INIT_ANY2MANY))
+    fMsrInfo = 0;
+  if ((tag==PHR_INIT_ALL) || (tag==PHR_INIT_MSR))
+    fAny2ManyInfo = 0;
+  fAllDataAvailable = false;
+  if (tag!=PHR_INIT_ALL)
+    fFileFormat = TString("");
+  fRunName = TString("");
+  fRunPathName = TString("");
+}
+
+//--------------------------------------------------------------------------
+// ReadFilesMsr (private)
 //--------------------------------------------------------------------------
 /**
  * <p> The main read file routine which is filtering what read sub-routine
@@ -283,7 +412,7 @@ Bool_t PRunDataHandler::ReadFilesMsr()
 }
 
 //--------------------------------------------------------------------------
-// ReadWriteFilesList
+// ReadWriteFilesList (private)
 //--------------------------------------------------------------------------
 /**
  * <p> The main read file routine which is filtering what read sub-routine
@@ -762,7 +891,7 @@ void PRunDataHandler::TestFileName(TString &runName, const TString &ext)
 }
 
 //--------------------------------------------------------------------------
-// FileExistsCheck
+// FileExistsCheck (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Checks if a given data file exists.
@@ -972,7 +1101,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// FileExistsCheck
+// FileExistsCheck (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Checks if a given data file exists. Used for the any2many program.
@@ -1069,7 +1198,76 @@ Bool_t PRunDataHandler::FileExistsCheck(const Bool_t fileName, const Int_t idx)
 }
 
 //--------------------------------------------------------------------------
-// ReadRootFile
+// FileExistsCheck (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Checks if a given data file exists. Used for the any2many program.
+ *
+ * <b>return:</b>
+ * - true if data file exists,
+ * - otherwise false.
+ *
+ * \param fileName file name
+ */
+Bool_t PRunDataHandler::FileExistsCheck(const TString fileName)
+{
+  TString pathName("???");
+  TString str("");
+
+  // check if the file is in the local directory
+  if (gSystem->AccessPathName(fileName) != true) { // found in the local dir
+    pathName = fileName;
+  }
+  // check if the file is found in the directory given in the startup file
+  if (pathName.CompareTo("???") == 0) { // not found in local directory search
+    for (UInt_t i=0; i<fDataPath.size(); i++) {
+      str = fDataPath[i] + TString("/") + fileName;
+      if (gSystem->AccessPathName(str.Data())!=true) { // found
+        pathName = str;
+        break;
+      }
+    }
+  }
+  // check if the file is found in the directories given by MUSRFULLDATAPATH
+  const Char_t *musrpath = gSystem->Getenv("MUSRFULLDATAPATH");
+  if (pathName.CompareTo("???") == 0) { // not found in local directory and xml path
+    str = TString(musrpath);
+    // MUSRFULLDATAPATH has the structure: path_1:path_2:...:path_n
+    TObjArray *tokens = str.Tokenize(":");
+    TObjString *ostr;
+    for (Int_t i=0; i<tokens->GetEntries(); i++) {
+      ostr = dynamic_cast<TObjString*>(tokens->At(i));
+      str = ostr->GetString() + TString("/") + fileName;
+      if (gSystem->AccessPathName(str.Data())!=true) { // found
+        pathName = str;
+        break;
+      }
+    }
+    // cleanup
+    if (tokens) {
+      delete tokens;
+      tokens = 0;
+    }
+  }
+  // no proper path name found
+  if (pathName.CompareTo("???") == 0) {
+    cerr << endl << ">> PRunDataHandler::FileExistsCheck(): **ERROR** Couldn't find '" << fileName.Data() << "' in any standard path.";
+    cerr << endl << ">>  standard search pathes are:";
+    cerr << endl << ">>  1. the local directory";
+    cerr << endl << ">>  2. the data directory given in the startup XML file";
+    cerr << endl << ">>  3. the directories listed in MUSRFULLDATAPATH";
+    return false;
+  }
+
+  fRunPathName = pathName;
+
+  cerr << endl << "debug-> fRunPathName=" << fRunPathName << endl;
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// ReadRootFile (private)
 //--------------------------------------------------------------------------
 /**
  * <p> Reads both, the "old" LEM-data ROOT-files with TLemRunHeader, and the more general
@@ -1738,7 +1936,7 @@ Bool_t PRunDataHandler::ReadRootFile()
 }
 
 //--------------------------------------------------------------------------
-// ReadNexusFile
+// ReadNexusFile (private)
 //--------------------------------------------------------------------------
 /**
  * <p> Will read the NeXuS File Format as soon as PSI will have an implementation.
@@ -2105,7 +2303,7 @@ Bool_t PRunDataHandler::ReadNexusFile()
 }
 
 //--------------------------------------------------------------------------
-// ReadWkmFile
+// ReadWkmFile (private)
 //--------------------------------------------------------------------------
 /**
  * <p> Reads, for backwards compatibility, the ascii-wkm-file data format.
@@ -2411,7 +2609,7 @@ Bool_t PRunDataHandler::ReadWkmFile()
 }
 
 //--------------------------------------------------------------------------
-// ReadPsiBinFile
+// ReadPsiBinFile (private)
 //--------------------------------------------------------------------------
 /**
  * <p> Reads the old-fashioned PSI-BIN data-files. The MuSR_td_PSI_bin class
@@ -2659,7 +2857,7 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
 }
 
 //--------------------------------------------------------------------------
-// ReadMudFile
+// ReadMudFile (private)
 //--------------------------------------------------------------------------
 /**
  * <p> Reads the triumf mud-file format.
@@ -2977,7 +3175,7 @@ Bool_t PRunDataHandler::ReadMudFile()
 }
 
 //--------------------------------------------------------------------------
-// ReadMduAsciiFile
+// ReadMduAsciiFile (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Reads the mdu ascii files (PSI). Needed to work around PSI-BIN limitations.
@@ -3280,7 +3478,7 @@ Bool_t PRunDataHandler::ReadMduAsciiFile()
 }
  
 //--------------------------------------------------------------------------
-// ReadAsciiFile
+// ReadAsciiFile (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Reads ascii files. Intended for the nonMuSR data.
@@ -3517,7 +3715,7 @@ Bool_t PRunDataHandler::ReadAsciiFile()
 }
 
 //--------------------------------------------------------------------------
-// ReadDBFile
+// ReadDBFile (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Reads triumf db-files. Intended for the nonMuSR data.
@@ -3966,7 +4164,7 @@ Bool_t PRunDataHandler::ReadDBFile()
 }
 
 //--------------------------------------------------------------------------
-// WriteMusrRootFile
+// WriteMusrRootFile (private)
 //--------------------------------------------------------------------------
 /**
  * <p> Write the MusrRoot file format. Only the required entries will be handled.
@@ -4208,7 +4406,7 @@ Bool_t PRunDataHandler::WriteMusrRootFile(TString fln)
 }
 
 //--------------------------------------------------------------------------
-// WriteRootFile
+// WriteRootFile (private)
 //--------------------------------------------------------------------------
 /**
  * <p> Write the PSI LEM root-file format.
@@ -4392,7 +4590,7 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
 }
 
 //--------------------------------------------------------------------------
-// WriteNexusFile
+// WriteNexusFile (private)
 //--------------------------------------------------------------------------
 /**
  * <p> Write the nexus-file format.
@@ -4737,7 +4935,7 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
 }
 
 //--------------------------------------------------------------------------
-// WriteWkmFile
+// WriteWkmFile (private)
 //--------------------------------------------------------------------------
 /**
  * <p> Write the wkm-file format.
@@ -4878,7 +5076,7 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
 }
 
 //--------------------------------------------------------------------------
-// WritePsiBinFile
+// WritePsiBinFile (private)
 //--------------------------------------------------------------------------
 /**
  * <p> Write the psi-bin-file format.
@@ -5099,7 +5297,7 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
 }
 
 //--------------------------------------------------------------------------
-// WriteMudFile
+// WriteMudFile (private)
 //--------------------------------------------------------------------------
 /**
  * <p> Write the mud-file format.
@@ -5259,7 +5457,7 @@ Bool_t PRunDataHandler::WriteMudFile(TString fln)
 }
 
 //--------------------------------------------------------------------------
-// WriteAsciiFile
+// WriteAsciiFile (private)
 //--------------------------------------------------------------------------
 /**
  * <p> Write the ascii-file format.

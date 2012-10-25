@@ -51,6 +51,8 @@ class PRunSingleHisto : public PRunBase
 
     virtual UInt_t GetNoOfFitBins();
 
+    virtual void SetFitRangeBin(const TString fitRange);
+
   protected:
     virtual void CalcNoOfFitBins();
     virtual Bool_t PrepareData();
@@ -63,7 +65,9 @@ class PRunSingleHisto : public PRunBase
     UInt_t fNoOfFitBins;    ///< number of bins to be fitted
     Double_t fBackground;   ///< needed if background range is given (units: 1/bin)
 
-    PDoubleVector fForward;     ///< forward histo data
+    Int_t fGoodBins[2];        ///< keep first/last good bins. 0=fgb, 1=lgb
+
+    PDoubleVector fForward;    ///< forward histo data
 
     virtual Bool_t EstimateBkg(UInt_t histoNo);
     virtual Bool_t IsScaleN0AndBkg();

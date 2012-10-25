@@ -75,7 +75,7 @@ PRunData::~PRunData()
 }
 
 //--------------------------------------------------------------------------
-// SetTheoryValue
+// SetTheoryValue (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Sets a value of the theory vector
@@ -92,7 +92,7 @@ void PRunData::SetTheoryValue(UInt_t idx, Double_t dval)
 }
 
 //--------------------------------------------------------------------------
-// ReplaceTheory
+// ReplaceTheory (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Replaces the theory vector.
@@ -150,7 +150,7 @@ PNonMusrRawRunData::~PNonMusrRawRunData()
 }
 
 //--------------------------------------------------------------------------
-// SetLabel
+// SetLabel (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Modifies a label at position idx. In case idx is larges than the number
@@ -170,7 +170,7 @@ void PNonMusrRawRunData::SetLabel(const UInt_t idx, const TString str)
 }
 
 //--------------------------------------------------------------------------
-// AppendSubData
+// AppendSubData (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Modifies the data set at position idx. In case idx is larger than the number
@@ -190,7 +190,7 @@ void PNonMusrRawRunData::AppendSubData(const UInt_t idx, const Double_t dval)
 }
 
 //--------------------------------------------------------------------------
-// AppendSubErrData
+// AppendSubErrData (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Modifies the error-data set at position idx. In case idx is larger than the number
@@ -555,7 +555,7 @@ PRawRunData::~PRawRunData()
 }
 
 //--------------------------------------------------------------------------
-// GetTemperature
+// GetTemperature (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Returns the temperature of a muSR run.
@@ -577,7 +577,7 @@ const Double_t PRawRunData::GetTemperature(const UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetTempError
+// GetTempError (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Returns the error estimate of the temperature of a muSR run.
@@ -599,7 +599,7 @@ const Double_t PRawRunData::GetTempError(const UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetRingAnode
+// GetRingAnode (public)
 //--------------------------------------------------------------------------
 /**
  * <p> Returns the value of a ring anode high voltage. (idx = 0: RAL, 1: RAR, 2: RAT, 3: RAB)
@@ -621,7 +621,7 @@ const Double_t PRawRunData::GetRingAnode(const UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetDataSet
+// GetDataSet (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Returns a raw muSR run data set.
@@ -643,7 +643,7 @@ PRawRunDataSet* PRawRunData::GetDataSet(const UInt_t idx, Bool_t wantHistoNo)
 
 
 //--------------------------------------------------------------------------
-// SetRingAnode
+// SetRingAnode (public)
 //--------------------------------------------------------------------------
 /**
  * <p> Store the ring anode value at index position idx.
@@ -659,7 +659,7 @@ void PRawRunData::SetRingAnode(const UInt_t idx, const Double_t dval)
 }
 
 //--------------------------------------------------------------------------
-// SetTemperature
+// SetTemperature (public)
 //--------------------------------------------------------------------------
 /**
  * <p> Store the temperature with its error at index position idx.
@@ -678,7 +678,7 @@ void PRawRunData::SetTemperature(const UInt_t idx, const Double_t temp, const Do
 }
 
 //--------------------------------------------------------------------------
-// SetTempError
+// SetTempError (public)
 //--------------------------------------------------------------------------
 /**
  * <p> Store the temperature error at index position idx.
@@ -722,8 +722,11 @@ PMsrRunBlock::PMsrRunBlock()
     fBkgRange[i] = -1; // undefined start background range
     fDataRange[i] = -1; // undefined start data range
   }
+  fFitRangeInBins = false; // default is that fit range is given in time NOT bins
   fFitRange[0] = PMUSR_UNDEFINED; // undefined start fit range
   fFitRange[1] = PMUSR_UNDEFINED; // undefined end fit range
+  fFitRangeOffset[0] = 0; // undefined start fit range offset
+  fFitRangeOffset[1] = 0; // undefined end fit range offset
   fPacking = -1; // undefined packing
   fXYDataIndex[0] = -1; // undefined x data index (NonMusr)
   fXYDataIndex[1] = -1; // undefined y data index (NonMusr)
@@ -752,7 +755,7 @@ PMsrRunBlock::~PMsrRunBlock()
 }
 
 //--------------------------------------------------------------------------
-// CleanUp
+// CleanUp (public)
 //--------------------------------------------------------------------------
 /**
  * <p> Clean up data structure.
@@ -772,8 +775,11 @@ void PMsrRunBlock::CleanUp()
     fBkgRange[i] = -1; // undefined background range
     fDataRange[i] = -1; // undefined data range
   }
+  fFitRangeInBins = false; // default is that fit range is given in time NOT bins
   fFitRange[0] = PMUSR_UNDEFINED; // undefined start fit range
   fFitRange[1] = PMUSR_UNDEFINED; // undefined end fit range
+  fFitRangeOffset[0] = 0; // undefined start fit range offset
+  fFitRangeOffset[1] = 0; // undefined end fit range offset
   fPacking = -1; // undefined packing
   fXYDataIndex[0] = -1; // undefined x data index (NonMusr)
   fXYDataIndex[1] = -1; // undefined y data index (NonMusr)
@@ -797,7 +803,7 @@ void PMsrRunBlock::CleanUp()
 }
 
 //--------------------------------------------------------------------------
-// GetRunName
+// GetRunName (public)
 //--------------------------------------------------------------------------
 /**
  * <p> get run name at position idx
@@ -817,7 +823,7 @@ TString* PMsrRunBlock::GetRunName(UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// SetRunName
+// SetRunName (public)
 //--------------------------------------------------------------------------
 /**
  * <p> set run name at position idx
@@ -839,7 +845,7 @@ void PMsrRunBlock::SetRunName(TString &str, Int_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetBeamline
+// GetBeamline (public)
 //--------------------------------------------------------------------------
 /**
  * <p> get beamline name at position idx
@@ -859,7 +865,7 @@ TString* PMsrRunBlock::GetBeamline(UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// SetBeamline
+// SetBeamline (public)
 //--------------------------------------------------------------------------
 /**
  * <p> set beamline name at position idx
@@ -881,7 +887,7 @@ void PMsrRunBlock::SetBeamline(TString &str, Int_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetInstitute
+// GetInstitute (public)
 //--------------------------------------------------------------------------
 /**
  * <p> get institute name at position idx
@@ -901,7 +907,7 @@ TString* PMsrRunBlock::GetInstitute(UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// SetInstitute
+// SetInstitute (public)
 //--------------------------------------------------------------------------
 /**
  * <p> set institute name at position idx
@@ -923,7 +929,7 @@ void PMsrRunBlock::SetInstitute(TString &str, Int_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetFileFormat
+// GetFileFormat (public)
 //--------------------------------------------------------------------------
 /**
  * <p> get file format name at position idx
@@ -943,7 +949,7 @@ TString* PMsrRunBlock::GetFileFormat(UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// SetFileFormat
+// SetFileFormat (public)
 //--------------------------------------------------------------------------
 /**
  * <p> set file format name at position idx
@@ -965,7 +971,7 @@ void PMsrRunBlock::SetFileFormat(TString &str, Int_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetForwardHistoNo
+// GetForwardHistoNo (public)
 //--------------------------------------------------------------------------
 /**
  * <p> get forward histogram value at position idx
@@ -988,7 +994,7 @@ Int_t PMsrRunBlock::GetForwardHistoNo(UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// SetForwardHistoNo
+// SetForwardHistoNo (public)
 //--------------------------------------------------------------------------
 /**
  * <p> set forward histogram value at index idx
@@ -1009,7 +1015,7 @@ void PMsrRunBlock::SetForwardHistoNo(Int_t histoNo, Int_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetBackwardHistoNo
+// GetBackwardHistoNo (public)
 //--------------------------------------------------------------------------
 /**
  * <p> get backward histogram value at position idx
@@ -1032,7 +1038,7 @@ Int_t PMsrRunBlock::GetBackwardHistoNo(UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// SetBackwardHistoNo
+// SetBackwardHistoNo (public)
 //--------------------------------------------------------------------------
 /**
  * <p> set backward histogram value at position pos
@@ -1053,7 +1059,7 @@ void PMsrRunBlock::SetBackwardHistoNo(Int_t histoNo, Int_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetMap
+// GetMap (public)
 //--------------------------------------------------------------------------
 /**
  * <p> get map value at position idx
@@ -1073,7 +1079,7 @@ Int_t PMsrRunBlock::GetMap(UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// SetMap
+// SetMap (public)
 //--------------------------------------------------------------------------
 /**
  * <p> set map value at position idx
@@ -1095,7 +1101,7 @@ void PMsrRunBlock::SetMap(Int_t mapVal, Int_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetBkgEstimated
+// GetBkgEstimated (public)
 //--------------------------------------------------------------------------
 /**
  * <p> get estimated background value at position idx. If not present,
@@ -1117,7 +1123,7 @@ Double_t PMsrRunBlock::GetBkgEstimated(UInt_t idx)
 
 
 //--------------------------------------------------------------------------
-// SetBkgEstimated
+// SetBkgEstimated (public)
 //--------------------------------------------------------------------------
 /**
  * <p> set estimated background value at position idx
@@ -1137,7 +1143,7 @@ void PMsrRunBlock::SetBkgEstimated(Double_t dval, Int_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetBkgFix
+// GetBkgFix (public)
 //--------------------------------------------------------------------------
 /**
  * <p> get background fixed value at position idx
@@ -1157,7 +1163,7 @@ Double_t PMsrRunBlock::GetBkgFix(UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// SetBkgFix
+// SetBkgFix (public)
 //--------------------------------------------------------------------------
 /**
  * <p> set background fixed value at position idx
@@ -1177,7 +1183,7 @@ void PMsrRunBlock::SetBkgFix(Double_t dval, Int_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetBkgRange
+// GetBkgRange (public)
 //--------------------------------------------------------------------------
 /**
  * <p> get background range at position idx
@@ -1198,7 +1204,7 @@ Int_t PMsrRunBlock::GetBkgRange(UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// SetBkgRange
+// SetBkgRange (public)
 //--------------------------------------------------------------------------
 /**
  * <p> set background range element at position idx
@@ -1219,7 +1225,7 @@ void PMsrRunBlock::SetBkgRange(Int_t ival, Int_t idx)
 
 
 //--------------------------------------------------------------------------
-// GetDataRange
+// GetDataRange (public)
 //--------------------------------------------------------------------------
 /**
  * <p> get data range at position idx
@@ -1240,7 +1246,7 @@ Int_t PMsrRunBlock::GetDataRange(UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// SetDataRange
+// SetDataRange (public)
 //--------------------------------------------------------------------------
 /**
  * <p> set data range element at position idx
@@ -1260,7 +1266,7 @@ void PMsrRunBlock::SetDataRange(Int_t ival, Int_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetT0Bin
+// GetT0Bin (public)
 //--------------------------------------------------------------------------
 /**
  * <p> get T0 bin at position idx
@@ -1280,7 +1286,7 @@ Double_t PMsrRunBlock::GetT0Bin(UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// SetT0Bin
+// SetT0Bin (public)
 //--------------------------------------------------------------------------
 /**
  * <p> set T0 bin at position idx
@@ -1302,7 +1308,7 @@ void PMsrRunBlock::SetT0Bin(Double_t dval, Int_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetAddT0BinSize
+// GetAddT0BinSize (public)
 //--------------------------------------------------------------------------
 /**
  * <p> get add T0 size of the addrun at index addRunIdx
@@ -1325,7 +1331,7 @@ Int_t PMsrRunBlock::GetAddT0BinSize(UInt_t addRunIdx)
 }
 
 //--------------------------------------------------------------------------
-// GetAddT0Bin
+// GetAddT0Bin (public)
 //--------------------------------------------------------------------------
 /**
  * <p> get add T0 of the addrun (index addRunIdx) at index histoIdx
@@ -1355,7 +1361,7 @@ Double_t PMsrRunBlock::GetAddT0Bin(UInt_t addRunIdx, UInt_t histoIdx)
 }
 
 //--------------------------------------------------------------------------
-// SetAddT0Bin
+// SetAddT0Bin (public)
 //--------------------------------------------------------------------------
 /**
  * <p> set add T0 bin of the addrun at index histoNoIdx
@@ -1376,7 +1382,7 @@ void PMsrRunBlock::SetAddT0Bin(Double_t dval, UInt_t addRunIdx, UInt_t histoNoId
 }
 
 //--------------------------------------------------------------------------
-// GetFitRange
+// GetFitRange (public)
 //--------------------------------------------------------------------------
 /**
  * <p> get fit range value at position idx. idx: 0=fit range start, 1=fit range end.
@@ -1396,7 +1402,7 @@ Double_t PMsrRunBlock::GetFitRange(UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// SetFitRange
+// SetFitRange (public)
 //--------------------------------------------------------------------------
 /**
  * <p> set fit range value at position idx
@@ -1413,7 +1419,44 @@ void PMsrRunBlock::SetFitRange(Double_t dval, UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// SetParGlobal
+// GetFitRangeOffset (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> get fit range offset value at position idx. idx: 0=fit range offset start, 1=fit range offset end.
+ *
+ * <b>return:</b>
+ * - fit range offset value, if idx is within proper boundaries
+ * - -1, otherwise
+ *
+ * \param idx index of the fit range value to be returned
+ */
+Int_t PMsrRunBlock::GetFitRangeOffset(UInt_t idx)
+{
+  if (idx >= 2)
+    return -1;
+
+  return fFitRangeOffset[idx];
+}
+
+//--------------------------------------------------------------------------
+// SetFitRangeOffset (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> set fit range offset value at position idx. Illegale values will be ignored.
+ *
+ * \param ival value to be set
+ * \param idx index of the fit range value to be set
+ */
+void PMsrRunBlock::SetFitRangeOffset(Int_t ival, UInt_t idx)
+{
+  if (idx >= 2)
+    return;
+
+  fFitRangeOffset[idx] = ival;
+}
+
+//--------------------------------------------------------------------------
+// SetParGlobal (public)
 //--------------------------------------------------------------------------
 /**
  * <p> store the information that a certain parameter used in the block is global
@@ -1428,7 +1471,7 @@ void PMsrRunBlock::SetParGlobal(const TString &str, Int_t ival)
 }
 
 //--------------------------------------------------------------------------
-// SetMapGlobal
+// SetMapGlobal (public)
 //--------------------------------------------------------------------------
 /**
  * <p> store the information that a certain mapped parameter in the block is global

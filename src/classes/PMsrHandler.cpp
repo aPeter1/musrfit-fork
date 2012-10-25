@@ -882,16 +882,30 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           // write fit range line
           fout.width(16);
           fout << left << "fit";
-          for (UInt_t j=0; j<2; j++) {
-            if (fRuns[runNo].GetFitRange(j) == -1)
-              break;
-            neededWidth = 7;
-            neededPrec = LastSignificant(fRuns[runNo].GetFitRange(j));
-            fout.width(neededWidth);
+          if (fRuns[runNo].IsFitRangeInBin()) { // fit range given in bins
+            fout << "fgb";
+            if (fRuns[runNo].GetFitRangeOffset(0) > 0)
+              fout << "+" << fRuns[runNo].GetFitRangeOffset(0);
+            fout << "   lgb";
+            if (fRuns[runNo].GetFitRangeOffset(1) > 0)
+              fout << "-" << fRuns[runNo].GetFitRangeOffset(1);
+            neededPrec = LastSignificant(fRuns[runNo].GetFitRange(0));
+            if (LastSignificant(fRuns[runNo].GetFitRange(1)) > neededPrec)
+              neededPrec = LastSignificant(fRuns[runNo].GetFitRange(1));
             fout.precision(neededPrec);
-            fout << left << fixed << fRuns[runNo].GetFitRange(j);
-            if (j==0)
-              fout << " ";
+            fout << "  # in time: " << fRuns[runNo].GetFitRange(0) << ".." << fRuns[runNo].GetFitRange(1) << " in (usec)";
+          } else { // fit range given in time
+            for (UInt_t j=0; j<2; j++) {
+              if (fRuns[runNo].GetFitRange(j) == -1)
+                break;
+              neededWidth = 7;
+              neededPrec = LastSignificant(fRuns[runNo].GetFitRange(j));
+              fout.width(neededWidth);
+              fout.precision(neededPrec);
+              fout << left << fixed << fRuns[runNo].GetFitRange(j);
+              if (j==0)
+                fout << " ";
+            }
           }
           fout << endl;
         } else if (sstr.BeginsWith("packing")) {
@@ -1682,14 +1696,25 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
     // fit
     fout.width(16);
     fout << left << "fit";
-    for (UInt_t j=0; j<2; j++) {
-      if (fRuns[i].GetFitRange(j) == -1)
-        break;
-      fout.width(8);
-      UInt_t neededPrec = 2;
-      neededPrec = LastSignificant(fRuns[i].GetFitRange(j));
-      fout.precision(neededPrec);
-      fout << left << fixed << fRuns[i].GetFitRange(j);
+    if (fRuns[i].IsFitRangeInBin()) { // fit range given in bins
+      fout << "fgb";
+      if (fRuns[i].GetFitRangeOffset(0) > 0)
+        fout << "+" << fRuns[i].GetFitRangeOffset(0);
+      fout << "   lgb";
+      if (fRuns[i].GetFitRangeOffset(1) > 0)
+        fout << "-" << fRuns[i].GetFitRangeOffset(1);
+    } else { // fit range given in time
+      for (UInt_t j=0; j<2; j++) {
+        if (fRuns[i].GetFitRange(j) == -1)
+          break;
+        UInt_t neededWidth = 7;
+        UInt_t neededPrec = LastSignificant(fRuns[i].GetFitRange(j));
+        fout.width(neededWidth);
+        fout.precision(neededPrec);
+        fout << left << fixed << fRuns[i].GetFitRange(j);
+        if (j==0)
+          fout << " ";
+      }
     }
     fout << endl;
 
@@ -2921,13 +2946,49 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       if (tokens->GetEntries() < 3) {
         error = true;
       } else {
-        for (Int_t i=1; i<3; i++) {
-          ostr = dynamic_cast<TObjString*>(tokens->At(i));
+        if (iter->fLine.Contains("fgb", TString::kIgnoreCase)) { // fit given in bins, i.e. fit fgb+n0 lgb-n1
+          // check 1st entry, i.e. fgb[+n0]
+          ostr = dynamic_cast<TObjString*>(tokens->At(1));
           str = ostr->GetString();
-          if (str.IsFloat())
-            param.SetFitRange(str.Atof(), i-1);
-          else
-            error = true;
+          Ssiz_t idx = str.First("+");
+          TString numStr = str;
+          if (idx > -1) { // '+' present hence extract n0
+            numStr.Remove(0,idx+1);
+            if (numStr.IsFloat()) {
+              param.SetFitRangeOffset(numStr.Atoi(), 0);
+            } else {
+              error = true;
+            }
+          } else { // n0 == 0
+            param.SetFitRangeOffset(0, 0);
+          }
+          // check 2nd entry, i.e. lgb[-n1]
+          ostr = dynamic_cast<TObjString*>(tokens->At(2));
+          str = ostr->GetString();
+          idx = str.First("-");
+          numStr = str;
+          if (idx > -1) { // '-' present hence extract n1
+            numStr.Remove(0,idx+1);
+            if (numStr.IsFloat()) {
+              param.SetFitRangeOffset(numStr.Atoi(), 1);
+            } else {
+              error = true;
+            }
+          } else { // n0 == 0
+            param.SetFitRangeOffset(0, 0);
+          }
+
+          if (!error)
+            param.SetFitRangeInBins(true);
+        } else { // fit given in time, i.e. fit <start> <end>, where <start>, <end> are given as doubles
+          for (Int_t i=1; i<3; i++) {
+            ostr = dynamic_cast<TObjString*>(tokens->At(i));
+            str = ostr->GetString();
+            if (str.IsFloat())
+              param.SetFitRange(str.Atof(), i-1);
+            else
+              error = true;
+          }
         }
       }
     }
@@ -4570,10 +4631,12 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           }
         }
         // check fit range
-        if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) {
-          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          cerr << endl << "  Fit range is not defined. Necessary for single histogram fits." << endl;
-          return false;
+        if (!fRuns[i].IsFitRangeInBin()) { // fit range given as times in usec
+          if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) {
+            cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+            cerr << endl << "  Fit range is not defined. Necessary for single histogram fits." << endl;
+            return false;
+          }
         }
         // check packing
         if (fRuns[i].GetPacking() == -1) {
@@ -4603,10 +4666,12 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           return false;
         }
         // check fit range
-        if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) {
-          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          cerr << endl << "  Fit range is not defined. Necessary for single histogram fits." << endl;
-          return false;
+        if (!fRuns[i].IsFitRangeInBin()) { // fit range given as times in usec
+          if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) {
+            cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+            cerr << endl << "  Fit range is not defined. Necessary for single histogram fits." << endl;
+            return false;
+          }
         }
         // check packing
         if (fRuns[i].GetPacking() == -1) {

@@ -52,6 +52,8 @@ class PRunNonMusr : public PRunBase
 
     virtual UInt_t GetNoOfFitBins();
 
+    virtual void SetFitRangeBin(const TString fitRange) {}
+
     virtual UInt_t GetXIndex();
     virtual UInt_t GetYIndex();
 

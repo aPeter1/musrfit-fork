@@ -131,8 +131,34 @@ Bool_t PRunListCollection::Add(Int_t runNo, EPMusrHandleTag tag)
 // SetFitRange (public)
 //--------------------------------------------------------------------------
 /**
- * <p>Set the current fit range. If fitRange.size()==1 the given fit range will be used for all the runs,
- * otherwise fitRange.size()==the number of runs in the msr-file, and for each run there will be an induvidual
+ * <p>Set the current fit range in bins. The string has the structure:
+ * 'fit_range fgb0+n00 lgb0-n01 [fgb1+n10 lgb-n11 fgb2+n20 lgb2-n21 .. fgbN+nN0 lgbN-nN1]'
+ * where fgb is the first good bin, lgb is the last good bin. nXY are offsets in bins.
+ * N is the number of runs in the msr-file.
+ *
+ * <p>This means there are 2 options: (i) a globle fit range in bins for <em>all</em> runs in the
+ * msr-file, or (ii) each run block in the msr-file needs its individual range.
+ *
+ * \param fitRange string holding the fit range(s).
+ */
+void PRunListCollection::SetFitRange(const TString fitRange)
+{
+  for (UInt_t i=0; i<fRunSingleHistoList.size(); i++)
+    fRunSingleHistoList[i]->SetFitRangeBin(fitRange);
+  for (UInt_t i=0; i<fRunAsymmetryList.size(); i++)
+    fRunAsymmetryList[i]->SetFitRangeBin(fitRange);
+  for (UInt_t i=0; i<fRunMuMinusList.size(); i++)
+    fRunMuMinusList[i]->SetFitRangeBin(fitRange);
+  for (UInt_t i=0; i<fRunNonMusrList.size(); i++)
+    fRunNonMusrList[i]->SetFitRangeBin(fitRange);
+}
+
+//--------------------------------------------------------------------------
+// SetFitRange (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Set the current fit range in time. If fitRange.size()==1 the given fit range will be used for all the runs,
+ * otherwise fitRange.size()==the number of runs in the msr-file, and for each run there will be an individual
  * fit range.
  *
  * \param fitRange vector holding the fit range(s).

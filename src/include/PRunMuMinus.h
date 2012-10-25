@@ -51,6 +51,8 @@ class PRunMuMinus : public PRunBase
 
     virtual UInt_t GetNoOfFitBins();
 
+    virtual void SetFitRangeBin(const TString fitRange);
+
   protected:
     virtual void CalcNoOfFitBins();
     virtual Bool_t PrepareData();
@@ -59,6 +61,8 @@ class PRunMuMinus : public PRunBase
 
   private:
     UInt_t fNoOfFitBins;    ///< number of bins to be fitted
+
+    Int_t fGoodBins[2];        ///< keep first/last good bins. 0=fgb, 1=lgb
 
     PDoubleVector fForward; ///< forward histo data
 };

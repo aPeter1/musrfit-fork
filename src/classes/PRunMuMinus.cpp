@@ -30,6 +30,11 @@
  ***************************************************************************/
 
 #include <iostream>
+using namespace std;
+
+#include <TString.h>
+#include <TObjArray.h>
+#include <TObjString.h>
 
 #include "PRunMuMinus.h"
 
@@ -42,6 +47,11 @@
 PRunMuMinus::PRunMuMinus() : PRunBase()
 {
   fNoOfFitBins  = 0;
+
+  // the 2 following variables are need in case fit range is given in bins, and since
+  // the fit range can be changed in the command block, these variables need to be accessible
+  fGoodBins[0] = -1;
+  fGoodBins[1] = -1;
 
   fHandleTag = kEmpty;
 }
@@ -60,6 +70,11 @@ PRunMuMinus::PRunMuMinus() : PRunBase()
 PRunMuMinus::PRunMuMinus(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
 {
   fNoOfFitBins  = 0;
+
+  // the 2 following variables are need in case fit range is given in bins, and since
+  // the fit range can be changed in the command block, these variables need to be accessible
+  fGoodBins[0] = -1;
+  fGoodBins[1] = -1;
 
   if (!PrepareData()) {
     cerr << endl << ">> PRunMuMinus::PRunMuMinus: **SEVERE ERROR**: Couldn't prepare data for fitting!";
@@ -268,6 +283,96 @@ UInt_t PRunMuMinus::GetNoOfFitBins()
   CalcNoOfFitBins();
 
   return fNoOfFitBins;
+}
+
+//--------------------------------------------------------------------------
+// SetFitRangeBin (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Allows to change the fit range on the fly. Used in the COMMAND block.
+ * The syntax of the string is: FIT_RANGE fgb[+n00] lgb[-n01] [fgb[+n10] lgb[-n11] ... fgb[+nN0] lgb[-nN1]].
+ * If only one pair of fgb/lgb is given, it is used for all runs in the RUN block section.
+ * If multiple fgb/lgb's are given, the number N has to be the number of RUN blocks in
+ * the msr-file.
+ *
+ * <p>nXY are offsets which can be used to shift, limit the fit range.
+ *
+ * \param fitRange string containing the necessary information.
+ */
+void PRunMuMinus::SetFitRangeBin(const TString fitRange)
+{
+  TObjArray *tok = 0;
+  TObjString *ostr = 0;
+  TString str;
+  Ssiz_t idx = -1;
+  Int_t offset = 0;
+
+  tok = fitRange.Tokenize(" \t");
+
+  if (tok->GetEntries() == 3) { // structure FIT_RANGE fgb+n0 lgb-n1
+    // handle fgb+n0 entry
+    ostr = (TObjString*) tok->At(1);
+    str = ostr->GetString();
+    // check if there is an offset present
+    idx = str.First("+");
+    if (idx != -1) { // offset present
+      str.Remove(0, idx+1);
+      if (str.IsFloat()) // if str is a valid number, convert is to an integer
+        offset = str.Atoi();
+    }
+    fFitStartTime = (fGoodBins[0] + offset - fT0s[0]) * fTimeResolution;
+
+    // handle lgb-n1 entry
+    ostr = (TObjString*) tok->At(2);
+    str = ostr->GetString();
+    // check if there is an offset present
+    idx = str.First("-");
+    if (idx != -1) { // offset present
+      str.Remove(0, idx+1);
+      if (str.IsFloat()) // if str is a valid number, convert is to an integer
+        offset = str.Atoi();
+    }
+    fFitEndTime = (fGoodBins[1] - offset - fT0s[0]) * fTimeResolution;
+  } else if ((tok->GetEntries() > 3) && (tok->GetEntries() % 2 == 1)) { // structure FIT_RANGE fgb[+n00] lgb[-n01] [fgb[+n10] lgb[-n11] ... fgb[+nN0] lgb[-nN1]]
+    Int_t pos = 2*(fRunNo+1)-1;
+
+    if (pos + 1 >= tok->GetEntries()) {
+      cerr << endl << ">> PRunSingleHisto::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
+      cerr << endl << ">> will ignore it. Sorry ..." << endl;
+    } else {
+      // handle fgb+n0 entry
+      ostr = (TObjString*) tok->At(pos);
+      str = ostr->GetString();
+      // check if there is an offset present
+      idx = str.First("+");
+      if (idx != -1) { // offset present
+        str.Remove(0, idx+1);
+        if (str.IsFloat()) // if str is a valid number, convert is to an integer
+          offset = str.Atoi();
+      }
+      fFitStartTime = (fGoodBins[0] + offset - fT0s[0]) * fTimeResolution;
+
+      // handle lgb-n1 entry
+      ostr = (TObjString*) tok->At(pos+1);
+      str = ostr->GetString();
+      // check if there is an offset present
+      idx = str.First("-");
+      if (idx != -1) { // offset present
+        str.Remove(0, idx+1);
+        if (str.IsFloat()) // if str is a valid number, convert is to an integer
+          offset = str.Atoi();
+      }
+      fFitEndTime = (fGoodBins[1] - offset - fT0s[0]) * fTimeResolution;
+    }
+  } else { // error
+    cerr << endl << ">> PRunSingleHisto::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
+    cerr << endl << ">> will ignore it. Sorry ..." << endl;
+  }
+
+  // clean up
+  if (tok) {
+    delete tok;
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -594,6 +699,19 @@ Bool_t PRunMuMinus::PrepareFitData(PRawRunData* runData, const UInt_t histoNo)
     return false;
   }
 
+  // if fit range is given in bins (and not time), the fit start/end time can be calculated at this point now
+  if (fRunInfo->IsFitRangeInBin()) {
+    fFitStartTime = (fRunInfo->GetDataRange(0) + fRunInfo->GetFitRangeOffset(0) - fT0s[0]) * fTimeResolution; // (fgb+n0-t0)*dt
+    fFitEndTime = (fRunInfo->GetDataRange(1) - fRunInfo->GetFitRangeOffset(1) - fT0s[0]) * fTimeResolution;   // (lgb-n1-t0)*dt
+    // write these times back into the data structure. This way it is available when writting the log-file
+    fRunInfo->SetFitRange(fFitStartTime, 0);
+    fRunInfo->SetFitRange(fFitEndTime, 1);
+  }
+
+  // keep good bins for potential latter use
+  fGoodBins[0] = start;
+  fGoodBins[1] = end;
+
   // everything looks fine, hence fill data set
   Int_t t0 = (Int_t)fT0s[0];
   Double_t value = 0.0;
@@ -693,6 +811,12 @@ Bool_t PRunMuMinus::PrepareRawViewData(PRawRunData* runData, const UInt_t histoN
     cerr << endl << ">> PRunSingleHisto::PrepareRawViewData(): **ERROR** end data bin doesn't make any sense!";
     cerr << endl;
     return false;
+  }
+
+  // if fit range is given in bins (and not time), the fit start/end time can be calculated at this point now
+  if (fRunInfo->IsFitRangeInBin()) {
+    fFitStartTime = (fRunInfo->GetDataRange(0) + fRunInfo->GetFitRangeOffset(0) - fT0s[0]) * fTimeResolution; // (fgb+n0-t0)*dt
+    fFitEndTime = (fRunInfo->GetDataRange(1) - fRunInfo->GetFitRangeOffset(1) - fT0s[0]) * fTimeResolution;   // (lgb-n1-t0)*dt
   }
 
   // everything looks fine, hence fill data set
