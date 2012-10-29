@@ -526,6 +526,8 @@ int PMsr2Data::ReadRunDataFile()
   else
     fDataHandler = new PRunDataHandler(fMsrHandler);
 
+  fDataHandler->ReadData();
+
   bool success = fDataHandler->IsAllDataAvailable();
   if (!success) {
     cerr << endl << ">> msr2data: **WARNING** Could not read all data files, will continue without the data file information..." << endl;
