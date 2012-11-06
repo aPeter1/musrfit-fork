@@ -79,6 +79,10 @@ class PMsr2Data
     bool PrepareNewSortedInputFile(unsigned int) const; // template
     PMsrHandler* GetSingleRunMsrFile() const;
 
+    void WriteValue(fstream &outFile, const double &value, const unsigned int &width) const;
+    void WriteValue(fstream &outFile, const double &value, const double &errValue, const unsigned int &width, const bool &db) const;
+    int GetFirstSignificantDigit(const double &value) const;
+
     string fFileExtension;
     vector<unsigned int> fRunVector;
     mutable vector<unsigned int>::const_iterator fRunVectorIter;

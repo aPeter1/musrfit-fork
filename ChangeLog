@@ -22,6 +22,9 @@ NEW 2012-05-12 added dump_header. This is a little program which dumps the
 NEW 2012-04-24 added a first version for negative muon fitting. At the same 
                time substaintial bug fixing has been carried out (mainly the
 	       logx/logy handling).
+FIXED 2012-11-06 changed to out formating of the fitting parameters such that
+                 enough relevant digits are written, which was not always the
+		 case previously.
 FIXED 2012-10-29 fixed missing read call in PMsr2Data.
 FIXED 2012-09-23 fixed wrong chisq output in musrview if expected chisq is
                  present.

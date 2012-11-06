@@ -51,25 +51,6 @@ using namespace boost::algorithm;
 
 #include "PMsr2Data.h"
 
-
-//-------------------------------------------------------------
-/**
- * <p> Write formatted output to column-formatted ASCII output file
- *
- * \param outFile output file stream to the ASCII file
- * \param value number to be written to the ASCII file
- * \param width column width of the ASCII file
- */
-void writeValues(fstream &outFile, const double &value, const unsigned int &width)
-{
-  if (fabs(value) >= 1.0e6 || (fabs(value) < 1.0e-4 && fabs(value) > 0.0))
-    outFile << scientific << setprecision(width - 8);
-  else
-    outFile.setf(ios::floatfield);
-  outFile << setw(width) << left << value;
-  return;
-}
-
 //-------------------------------------------------------------
 /**
  * <p> Constructor
@@ -2155,7 +2136,14 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHead
       string tempName;
       unsigned int idx;
       for (unsigned int i(0); i < fNumGlobalParam; ++i) {
-        outFile << (*msrParamList)[i].fName.Data() << " = " << (*msrParamList)[i].fValue << ", ";
+        outFile << (*msrParamList)[i].fName.Data() << " = ";
+        if ((*msrParamList)[i].fPosErrorPresent) {
+          WriteValue(outFile, (*msrParamList)[i].fValue, (*msrParamList)[i].fPosError, outFile.width(), db);
+          outFile << ", ";
+        } else {
+          outFile << (*msrParamList)[i].fValue << ", ";
+        }
+
         if ((*msrParamList)[i].fPosErrorPresent)
           outFile << (*msrParamList)[i].fPosError << ", ";
         else
@@ -2167,22 +2155,42 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHead
         tempName = (*msrParamList)[idx].fName.Data();
         string::size_type loc = tempName.rfind(curRunNumber.str());
         if (loc == tempName.length() - fRunNumberDigits) {
-          outFile << tempName.substr(0, loc) << " = " << (*msrParamList)[idx].fValue << ", ";
-          if ((*msrParamList)[idx].fPosErrorPresent)
-            outFile << (*msrParamList)[idx].fPosError << ", ";
-          else
-            outFile << fabs((*msrParamList)[idx].fStep) << ", ";
-          outFile << fabs((*msrParamList)[idx].fStep) << ",\\" << endl;
+          outFile << tempName.substr(0, loc) << " = ";
+          if ((*msrParamList)[idx].fPosErrorPresent) {
+            WriteValue(outFile, (*msrParamList)[idx].fPosError, (*msrParamList)[idx].fPosError, outFile.width(), db);
+            outFile << ", ";
+          } else {
+            outFile << (*msrParamList)[idx].fValue << ", ";
+          }
+          if ((*msrParamList)[idx].fPosErrorPresent) {
+            WriteValue(outFile, (*msrParamList)[idx].fPosError, (*msrParamList)[idx].fPosError, outFile.width(), db);
+            outFile << ", ";
+          } else {
+            WriteValue(outFile, (*msrParamList)[idx].fStep, (*msrParamList)[idx].fStep, outFile.width(), db);
+            outFile << ", ";
+          }
+          WriteValue(outFile, (*msrParamList)[idx].fStep, (*msrParamList)[idx].fStep, outFile.width(), db);
+          outFile << ",\\" << endl;
         }
       }
     } else {
       for (unsigned int i(0); i < msrNoOfParams; ++i) {
-        outFile << (*msrParamList)[i].fName.Data() << " = " << (*msrParamList)[i].fValue << ", ";
-        if ((*msrParamList)[i].fPosErrorPresent)
-          outFile << (*msrParamList)[i].fPosError << ", ";
-        else
-          outFile << fabs((*msrParamList)[i].fStep) << ", ";
-        outFile << fabs((*msrParamList)[i].fStep) << ",\\" << endl;
+        outFile << (*msrParamList)[i].fName.Data() << " = ";
+        if ((*msrParamList)[i].fPosErrorPresent) {
+          WriteValue(outFile, (*msrParamList)[i].fValue, (*msrParamList)[i].fPosError, outFile.width(), db);
+          outFile << ", ";
+        } else {
+          outFile << (*msrParamList)[i].fValue << ", ";
+        }
+        if ((*msrParamList)[i].fPosErrorPresent) {
+          WriteValue(outFile, (*msrParamList)[i].fPosError, (*msrParamList)[i].fPosError, outFile.width(), db);
+          outFile << ", ";
+        } else {
+          WriteValue(outFile, (*msrParamList)[i].fStep, (*msrParamList)[i].fStep, outFile.width(), db);
+          outFile << ", ";
+        }
+        WriteValue(outFile, (*msrParamList)[i].fStep, (*msrParamList)[i].fStep, outFile.width(), db);
+        outFile << ",\\" << endl;
       }
     }
 
@@ -2319,64 +2327,73 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHead
     if (fDataHandler) {
       for (unsigned int i(0); i < dataParam.size(); ++i) {
         if (i < dataParamErr.size()) {
-          writeValues(outFile, dataParam[i], maxlength);
-          writeValues(outFile, dataParamErr[i], maxlength + 3);
+          WriteValue(outFile, dataParam[i], maxlength);
+          WriteValue(outFile, dataParamErr[i], maxlength + 3);
         } else {
-          writeValues(outFile, dataParam[i], maxlength);
+          WriteValue(outFile, dataParam[i], maxlength);
         }
       }
     }
 
     if (fRunListFile) {
       for (unsigned int i(0); i < indVarValues.size(); ++i) {
-        writeValues(outFile, indVarValues[i], maxlength);
+        WriteValue(outFile, indVarValues[i], maxlength);
       }
     }
 
     // in the GLOBAL mode write only global parameters and those which belong to the actual run - in the NORMAL mode write all parameters
     if (global) {
       for (unsigned int i(0); i < fNumGlobalParam; ++i) {
-        writeValues(outFile, (*msrParamList)[i].fValue, maxlength);
+        if ((*msrParamList)[i].fPosErrorPresent)
+          WriteValue(outFile, (*msrParamList)[i].fValue, (*msrParamList)[i].fPosError, maxlength, db);
+        else
+          WriteValue(outFile, (*msrParamList)[i].fValue, maxlength);
 
         if ((*msrParamList)[i].fPosErrorPresent)
-          writeValues(outFile, (*msrParamList)[i].fPosError, maxlength + 6);
+          WriteValue(outFile, (*msrParamList)[i].fPosError, (*msrParamList)[i].fPosError, maxlength, db);
         else
-          writeValues(outFile, fabs((*msrParamList)[i].fStep), maxlength + 6);
+          WriteValue(outFile, fabs((*msrParamList)[i].fStep), (*msrParamList)[i].fStep, maxlength, db);
 
-        writeValues(outFile, fabs((*msrParamList)[i].fStep), maxlength + 6);
+        WriteValue(outFile, fabs((*msrParamList)[i].fStep), (*msrParamList)[i].fStep, maxlength, db);
       }
       unsigned int idx;
       for (unsigned int i(0); i < fNumSpecParam; ++i) {
         idx = fNumGlobalParam + fNumSpecParam*counter + i;
-        writeValues(outFile, (*msrParamList)[idx].fValue, maxlength);
+        if ((*msrParamList)[idx].fPosErrorPresent)
+          WriteValue(outFile, (*msrParamList)[idx].fValue, (*msrParamList)[idx].fPosError, maxlength, db);
+        else
+          WriteValue(outFile, (*msrParamList)[idx].fValue, maxlength);
 
         if ((*msrParamList)[idx].fPosErrorPresent)
-          writeValues(outFile, (*msrParamList)[idx].fPosError, maxlength + 6);
+          WriteValue(outFile, (*msrParamList)[idx].fPosError, (*msrParamList)[idx].fPosError, maxlength, db);
         else
-          writeValues(outFile, fabs((*msrParamList)[idx].fStep), maxlength + 6);
+          WriteValue(outFile, (*msrParamList)[idx].fStep, (*msrParamList)[idx].fStep, maxlength, db);
 
-        writeValues(outFile, fabs((*msrParamList)[idx].fStep), maxlength + 6);
+        WriteValue(outFile, (*msrParamList)[idx].fStep, (*msrParamList)[idx].fStep, maxlength, db);
       }
     } else {
       for (unsigned int i(0); i < msrNoOfParams; ++i) {
-        writeValues(outFile, (*msrParamList)[i].fValue, maxlength);
+        if ((*msrParamList)[i].fPosErrorPresent)
+          WriteValue(outFile, (*msrParamList)[i].fValue, (*msrParamList)[i].fPosError, maxlength, db);
+        else
+          WriteValue(outFile, (*msrParamList)[i].fValue, maxlength);
 
         if ((*msrParamList)[i].fPosErrorPresent)
-          writeValues(outFile, (*msrParamList)[i].fPosError, maxlength + 6);
+          WriteValue(outFile, (*msrParamList)[i].fPosError, (*msrParamList)[i].fPosError, maxlength, db);
         else
-          writeValues(outFile, fabs((*msrParamList)[i].fStep), maxlength + 6);
+          WriteValue(outFile, fabs((*msrParamList)[i].fStep), fabs((*msrParamList)[i].fStep), maxlength, db);
 
-        writeValues(outFile, fabs((*msrParamList)[i].fStep), maxlength + 6);
+        WriteValue(outFile, fabs((*msrParamList)[i].fStep), fabs((*msrParamList)[i].fStep), maxlength, db);
       }
     }
 
-    writeValues(outFile, msrStatistic->fMin, maxlength);
+    WriteValue(outFile, msrStatistic->fMin, maxlength);
 
-    writeValues(outFile, msrStatistic->fNdf, maxlength);
+    WriteValue(outFile, msrStatistic->fNdf, maxlength);
 
-    writeValues(outFile, msrStatistic->fMin/msrStatistic->fNdf, maxlength);
+    WriteValue(outFile, msrStatistic->fMin/msrStatistic->fNdf, maxlength);
 
-    writeValues(outFile, *fRunVectorIter, maxlength);
+    WriteValue(outFile, *fRunVectorIter, maxlength);
     outFile << endl;
 
   }
@@ -2416,4 +2433,82 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHead
 
 }
 
+//-------------------------------------------------------------
+/**
+ * <p>Write formatted output to column-formatted ASCII output file
+ *
+ * \param outFile output file stream to the ASCII file
+ * \param value number to be written to the ASCII file
+ * \param width column width of the ASCII file
+ */
+void PMsr2Data::WriteValue(fstream &outFile, const double &value, const unsigned int &width) const
+{
+  if ((fabs(value) >= 1.0e6) || ((fabs(value) < 1.0e-4) && (fabs(value) > 0.0)))
+    outFile << scientific << setprecision(width - 8);
+  else
+    outFile.setf(ios::floatfield);
+  outFile << setw(width) << left << value;
+}
 
+//-------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param outFile
+ * \param value
+ * \param errValue
+ * \param width
+ */
+void PMsr2Data::WriteValue(fstream &outFile, const double &value, const double &errValue, const unsigned int &width, const bool &db) const
+{
+  Int_t previous_prec = outFile.precision();
+  Int_t prec = GetFirstSignificantDigit(errValue);
+
+  // for iostream also the number of digit before the decimal points are needed
+  if (fabs(value) > 0.0)
+    prec += (int)log10(fabs(value));
+
+  if ((fabs(value) >= 1.0e6) || ((fabs(value) < 1.0e-4) && (fabs(value) > 0)))
+    outFile << scientific;
+  else
+    outFile.setf(ios::floatfield);
+
+  outFile.precision(prec);
+  outFile << setw(width) << left << value;
+  outFile.precision(previous_prec);
+
+  // make sure there is at least one space before the next number starts
+  if (!db) {
+    outFile << " ";
+  }
+}
+
+//-------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param value
+ */
+int PMsr2Data::GetFirstSignificantDigit(const double &value) const
+{
+  int prec=6;
+
+  int i=0;
+  bool done = false;
+  double dval = value;
+  do {
+    if (fabs(dval) >= 1.0)
+      done = true;
+    i++;
+    dval *= 10.0;
+  } while ((i<20) && !done);
+
+  if (i<20)
+    prec = i;
+
+  return prec+1;
+}
+
+//-------------------------------------------------------------------------------------------------------
+// end
+//-------------------------------------------------------------------------------------------------------
