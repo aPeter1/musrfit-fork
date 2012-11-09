@@ -30,6 +30,8 @@ FIXED 2012-09-23 fixed wrong chisq output in musrview if expected chisq is
                  present.
 FIXED 2012-05-30 fixed RRF  bug in single histo plotting.
 FIXED 2012-05-18 fixed wrong forward/backward tag for ROOT-PPC (MUSR-215) 
+CHANGED 2012-11-09 when converting to WKM, take the beamline tag to decide
+                   which exact WKM flavour should be written.
 CHANGED 2012-08-28 prevent LF from allocating too much memory
 CHANGED 2012-06-29 changed handling of the timeout for musrfit.
 CHANGED 2012-05-10 prevent any2many from overwriting an input file. At the

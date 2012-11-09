@@ -4950,7 +4950,7 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
 {
   // check if a LEM nemu file needs to be written
   bool lem_wkm_style = false;
-  if (!fAny2ManyInfo->inFormat.CompareTo("ROOT"))
+  if (!fData[0].GetBeamline()->CompareTo("mue4", TString::kIgnoreCase))
     lem_wkm_style = true;
 
   Bool_t ok = false;
