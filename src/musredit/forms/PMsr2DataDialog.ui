@@ -319,7 +319,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Data Ouput File Name</string>
+    <string>Data Output File Name</string>
    </property>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">

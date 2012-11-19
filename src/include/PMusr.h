@@ -55,6 +55,12 @@ using namespace std;
 // muon life time in (us), see PRL99, 032001 (2007)
 #define PMUON_LIFETIME 2.197019
 
+// muon gyromagnetic ratio, see gamma_mu = 2.0 mu_mu / hbar
+// mu_mu = -4.49044807(15) 1e-26 J/T (see http://physics.nist.gov/cgi-bin/cuu/Results?search_for=muon)
+// hbar  = 1.054571726(47) 1e-34 Js  (see http://physics.nist.gov/cgi-bin/cuu/Value?hbar|search_for=universal_in!)
+// gamma_muon / (2 pi) = 1.355342e-2 (MHz/G)
+#define GAMMA_BAR_MUON  1.35538817e-2
+
 // accelerator cycles in (us), needed to determine proper background
 #define ACCEL_PERIOD_PSI     0.01975
 #define ACCEL_PERIOD_TRIUMF  0.04337
@@ -654,6 +660,7 @@ typedef vector<PMsrRunBlock> PMsrRunList;
 typedef struct {
   Bool_t fFourierBlockPresent; ///< flag indicating if a Fourier block is present in the msr-file
   Int_t  fUnits;               ///< flag used to indicate the units. 0=field units (G); 1=frequency units (MHz); 2=Mc/s
+  Bool_t fDCCorrected;         ///< if set true, the dc offset of the signal/theory will be removed before the FFT is made.
   Int_t  fFourierPower;        ///< i.e. zero padding up to 2^fFourierPower, default = 0 which means NO zero padding
   Int_t  fApodization;         ///< tag indicating the kind of apodization wished, 0=no appodization (default), 1=weak, 2=medium, 3=strong (for details see the docu)
   Int_t  fPlotTag;             ///< tag used for initial plot. 0=real, 1=imaginary, 2=real & imaginary (default), 3=power, 4=phase

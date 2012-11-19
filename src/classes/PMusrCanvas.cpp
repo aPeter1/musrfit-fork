@@ -369,6 +369,7 @@ void PMusrCanvas::SetMsrHandler(PMsrHandler *msrHandler)
     if (fMsrHandler->GetMsrFourierList()->fFourierPower != -1) {
       fFourier.fFourierPower = fMsrHandler->GetMsrFourierList()->fFourierPower;
     }
+    fFourier.fDCCorrected = fMsrHandler->GetMsrFourierList()->fDCCorrected;
     if (fMsrHandler->GetMsrFourierList()->fApodization != FOURIER_APOD_NOT_GIVEN) {
       fFourier.fApodization = fMsrHandler->GetMsrFourierList()->fApodization;
     }
@@ -2326,7 +2327,7 @@ void PMusrCanvas::HandleFourier()
     double endTime   = fHistoFrame->GetBinCenter(bin);
     for (UInt_t i=0; i<fData.size(); i++) {
       // calculate fourier transform of the data
-      PFourier fourierData(fData[i].data, fFourier.fUnits, startTime, endTime, fFourier.fFourierPower);
+      PFourier fourierData(fData[i].data, fFourier.fUnits, startTime, endTime, fFourier.fDCCorrected, fFourier.fFourierPower);
       if (!fourierData.IsValid()) {
         cerr << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier data ..." << endl;
         return;
@@ -2366,7 +2367,7 @@ void PMusrCanvas::HandleFourier()
 
       // calculate fourier transform of the theory
       Int_t powerPad = (Int_t)round(log((endTime-startTime)/fData[i].theory->GetBinWidth(1))/log(2))+3;
-      PFourier fourierTheory(fData[i].theory, fFourier.fUnits, startTime, endTime, powerPad);
+      PFourier fourierTheory(fData[i].theory, fFourier.fUnits, startTime, endTime, fFourier.fDCCorrected, powerPad);
       if (!fourierTheory.IsValid()) {
         cerr << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier theory ..." << endl;
         return;
@@ -2486,7 +2487,7 @@ void PMusrCanvas::HandleDifferenceFourier()
 
     for (UInt_t i=0; i<fData.size(); i++) {
       // calculate fourier transform of the data
-      PFourier fourierData(fData[i].diff, fFourier.fUnits, startTime, endTime, fFourier.fFourierPower);
+      PFourier fourierData(fData[i].diff, fFourier.fUnits, startTime, endTime, fFourier.fDCCorrected, fFourier.fFourierPower);
       if (!fourierData.IsValid()) {
         cerr << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier diff ..." << endl;
         return;

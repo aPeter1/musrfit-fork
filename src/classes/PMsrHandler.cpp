@@ -935,6 +935,12 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           fout << endl;
         } else if (sstr.BeginsWith("fourier_power")) {
           fout << "fourier_power    " << fFourier.fFourierPower << endl;
+        } else if (sstr.BeginsWith("dc-corrected")) {
+          fout << "dc-corrected     ";
+          if (fFourier.fDCCorrected == true)
+            fout << "true" << endl;
+          else
+            fout << "false" << endl;
         } else if (sstr.BeginsWith("apodization")) {
           fout << "apodization      ";
           if (fFourier.fApodization == FOURIER_APOD_NONE) {
@@ -3156,6 +3162,7 @@ void PMsrHandler::InitFourierParameterStructure(PMsrFourierStructure &fourier)
   fourier.fFourierBlockPresent = false;           // fourier block present
   fourier.fUnits = FOURIER_UNIT_NOT_GIVEN;        // fourier untis, default: NOT GIVEN
   fourier.fFourierPower = -1;                     // zero padding, default: -1 = NOT GIVEN
+  fourier.fDCCorrected = false;                   // dc-corrected FFT, default: false
   fourier.fApodization = FOURIER_APOD_NOT_GIVEN;  // apodization, default: NOT GIVEN
   fourier.fPlotTag = FOURIER_PLOT_NOT_GIVEN;      // initial plot tag, default: NOT GIVEN
   fourier.fPhaseParamNo = 0;                      // initial parameter no = 0 means not a parameter
@@ -3186,8 +3193,6 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
 
   if (lines.empty()) // no fourier block present
     return true;
-
-//cout << endl << ">> in PMsrHandler::HandleFourierEntry, Fourier block present ...";
 
   PMsrFourierStructure fourier;
 
@@ -3247,6 +3252,22 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
             continue;
           }
         } else { // fourier power not a number
+          error = true;
+          continue;
+        }
+      }
+    } else if (iter->fLine.BeginsWith("dc-corrected", TString::kIgnoreCase)) { // dc-corrected
+      if (tokens->GetEntries() < 2) { // dc-corrected tag is missing
+        error = true;
+        continue;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (!str.CompareTo("true", TString::kIgnoreCase) || !str.CompareTo("1")) {
+          fourier.fDCCorrected = true;
+        } else if (!str.CompareTo("false", TString::kIgnoreCase) || !str.CompareTo("0")) {
+          fourier.fDCCorrected = false;
+        } else { // unrecognized dc-corrected tag
           error = true;
           continue;
         }
@@ -3388,6 +3409,7 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
     cerr << endl << "[fourier_power n # n is a number such that zero padding up to 2^n will be used]";
     cerr << endl << "   n=0 means no zero padding";
     cerr << endl << "   0 <= n <= 20 are allowed values";
+    cerr << endl << "[dc-corrected true | false]";
     cerr << endl << "[apodization none | weak | medium | strong]";
     cerr << endl << "[plot real | imag | real_and_imag | power | phase]";
     cerr << endl << "[phase value]";

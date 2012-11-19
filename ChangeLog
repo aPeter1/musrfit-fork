@@ -6,6 +6,9 @@
 
 changes since 0.11.0
 ===================================
+NEW 2012-11-19 added a flag in the Fourier block (dc-corrected) which can
+               be used to subtract a potential DC-offset before the Fourier
+	       transform is carried out.
 NEW 2012-10-25 (i) add PRINT_LEVEL to the command block (0='nothing' to
 3='everything'). This allows to tune the Minuit2 output. (ii) added the
 possibilty to give the fit range in bins. For details see the docu.  
@@ -22,6 +25,7 @@ NEW 2012-05-12 added dump_header. This is a little program which dumps the
 NEW 2012-04-24 added a first version for negative muon fitting. At the same 
                time substaintial bug fixing has been carried out (mainly the
 	       logx/logy handling).
+FIXED 2012-11-19 the Fourier transform had 1 Bin too much, this is fixed now
 FIXED 2012-11-06 changed to out formating of the fitting parameters such that
                  enough relevant digits are written, which was not always the
 		 case previously.
@@ -30,6 +34,8 @@ FIXED 2012-09-23 fixed wrong chisq output in musrview if expected chisq is
                  present.
 FIXED 2012-05-30 fixed RRF  bug in single histo plotting.
 FIXED 2012-05-18 fixed wrong forward/backward tag for ROOT-PPC (MUSR-215) 
+CHANGED 2012-11-19 replaced hard coded gyromagnetic ratio of the muon in the
+                   whole code.
 CHANGED 2012-11-09 when converting to WKM, take the beamline tag to decide
                    which exact WKM flavour should be written.
 CHANGED 2012-08-28 prevent LF from allocating too much memory

@@ -47,7 +47,7 @@ void analyticFakeData(const TString type)
   gROOT->GetListOfBrowsables()->Add(histosFolder, "histos");
   decayAnaModule = histosFolder->AddFolder("DecayAnaModule", "muSR decay histograms");
 
-  UInt_t runNo = 2001;
+  UInt_t runNo = 7001;
   TString fileName, tstr, label, tstr1;
   fileName.Form("0%d.root", (Int_t)runNo);
 
@@ -160,7 +160,7 @@ void analyticFakeData(const TString type)
     header->Set("MagneticFieldEnvironmentInfo/Magnet Name", "virtual");
 
     // 5th write required BeamlineInfo entries
-    header->Set("BeamlineInfo/Name", "virtual");
+    header->Set("BeamlineInfo/Name", "muE4");
   }
 
   // create histos
@@ -170,15 +170,15 @@ void analyticFakeData(const TString type)
   // asymmetry related stuff
   const Double_t timeResolution = 0.1953125; // ns
 //  Double_t a0[8] = {0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12};
-  Double_t a0[8] = {0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22};
+  Double_t a0[8] = {0.2201, 0.22, 0.2202, 0.2198, 0.22, 0.2199, 0.22, 0.2203};
 //  Double_t a1[8] = {0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05};
   Double_t a1[8] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   Double_t phase[8] = {5.0*TMath::Pi()/180.0, 50.0*TMath::Pi()/180.0, 95.0*TMath::Pi()/180.0, 140.0*TMath::Pi()/180.0,
                        185.0*TMath::Pi()/180.0, 230.0*TMath::Pi()/180.0, 275.0*TMath::Pi()/180.0, 320.0*TMath::Pi()/180.0,};
-  const Double_t gamma = 0.00001355; // gamma/(2pi)
-  Double_t bb0 = 150.0; // field in Gauss
+  const Double_t gamma = 0.0000135538817; // gamma/(2pi)
+  Double_t bb0 = 1000.0; // field in Gauss
   Double_t bb1 = 400.0; // field in Gauss
-  Double_t sigma0 = 0.35/1000.0; // Gaussian sigma in 1/ns
+  Double_t sigma0 = 0.05/1000.0; // Gaussian sigma in 1/ns
   Double_t sigma1 = 0.15/1000.0; // Gaussian sigma in 1/ns
 
   TH1F *histo[16];
@@ -203,8 +203,9 @@ void analyticFakeData(const TString type)
         histo[i]->SetBinContent(j+1, bkg[i]);
       } else {
         time = (Double_t)(j-t0[i])*timeResolution;
-        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a0[i]*TMath::Exp(-0.5*TMath::Power(time*sigma0,2.0))*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i])
-                                                         +a1[i]*TMath::Exp(-0.5*TMath::Power(time*sigma1,2.0))*TMath::Cos(TMath::TwoPi()*gamma*bb1*time+phase[i]))+(Double_t)bkg[i];
+//        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a0[i]*TMath::Exp(-0.5*TMath::Power(time*sigma0,2.0))*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i])
+//                                                         +a1[i]*TMath::Exp(-0.5*TMath::Power(time*sigma1,2.0))*TMath::Cos(TMath::TwoPi()*gamma*bb1*time+phase[i]))+(Double_t)bkg[i];
+        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a0[i]*TMath::BesselJ0(TMath::TwoPi()*gamma*bb0*time+phase[i])*TMath::Exp(-time*sigma0))+(Double_t)bkg[i];
         histo[i]->SetBinContent(j+1, (UInt_t)dval);
       }
     }

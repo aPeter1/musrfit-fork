@@ -1604,10 +1604,10 @@ Bool_t PRunAsymmetry::PrepareRRFViewData(PRawRunData* runData, UInt_t histoNo[2]
       gammaRRF = 1.0;
       break;
     case RRF_UNIT_G:
-      gammaRRF = 0.0135538817*TMath::TwoPi();
+      gammaRRF = GAMMA_BAR_MUON*TMath::TwoPi();
       break;
     case RRF_UNIT_T:
-      gammaRRF = 0.0135538817*TMath::TwoPi()*1.0e4;
+      gammaRRF = GAMMA_BAR_MUON*TMath::TwoPi()*1.0e4;
       break;
     default:
       gammaRRF = TMath::TwoPi();

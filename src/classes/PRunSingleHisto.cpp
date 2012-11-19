@@ -866,7 +866,6 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
     // write these times back into the data structure. This way it is available when writting the log-file
     fRunInfo->SetFitRange(fFitStartTime, 0);
     fRunInfo->SetFitRange(fFitEndTime, 1);
-    cout << "debug> fit: " << fRunInfo->GetFitRange(0) << ", " << fRunInfo->GetFitRange(1) << end;
   }
 
   // check how the background shall be handled
@@ -1302,10 +1301,10 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
         gammaRRF = 1.0;
         break;
       case RRF_UNIT_G:
-        gammaRRF = 0.0135538817*TMath::TwoPi();
+        gammaRRF = GAMMA_BAR_MUON*TMath::TwoPi();
         break;
       case RRF_UNIT_T:
-        gammaRRF = 0.0135538817*TMath::TwoPi()*1.0e4;
+        gammaRRF = GAMMA_BAR_MUON*TMath::TwoPi()*1.0e4;
         break;
       default:
         gammaRRF = TMath::TwoPi();

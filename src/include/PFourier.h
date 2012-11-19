@@ -34,13 +34,12 @@
 
 #include "fftw3.h"
 
+#include "PMusr.h"
+
 #define F_APODIZATION_NONE   1
 #define F_APODIZATION_WEAK   2
 #define F_APODIZATION_MEDIUM 3
 #define F_APODIZATION_STRONG 4
-
-// gamma_muon / (2 pi) = 1.355342e-2 (MHz/G)
-#define F_GAMMA_BAR_MUON  1.355342e-2
 
 /**
  * muSR Fourier class.
@@ -50,7 +49,7 @@ class PFourier
   public:
     PFourier(TH1F *data, Int_t unitTag,
              Double_t startTime = 0.0, Double_t endTime = 0.0,
-             UInt_t zeroPaddingPower = 0);
+             Bool_t dcCorrected = false, UInt_t zeroPaddingPower = 0);
     virtual ~PFourier();
 
     virtual void Transform(UInt_t apodizationTag = 0);
@@ -74,6 +73,7 @@ class PFourier
     Double_t fTimeResolution; ///< time resolution of the data histogram
     Double_t fStartTime; ///< start time of the data histogram
     Double_t fEndTime; ///< end time of the data histogram
+    Bool_t fDCCorrected; ///< if true, removed DC offset from signal before Fourier transformation, otherwise not
     UInt_t fZeroPaddingPower; ///< power for zero padding, if set < 0 no zero padding will be done
     Double_t fResolution; ///< Fourier resolution (field, frequency, or angular frequency)
 
