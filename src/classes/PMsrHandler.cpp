@@ -274,7 +274,7 @@ Int_t PMsrHandler::ReadMsrFile()
     UInt_t parX, parY;
     if (!CheckUniquenessOfParamNames(parX, parY)) {
       cerr << endl << ">> PMsrHandler::ReadMsrFile: **SEVERE ERROR** parameter name " << fParam[parX].fName.Data() << " is identical for parameter no " << fParam[parX].fNo << " and " << fParam[parY].fNo << "!";
-      cerr << endl << "Needs to be fixed first!";
+      cerr << endl << ">>   Needs to be fixed first!";
       cerr << endl;
       result = PMUSR_MSR_SYNTAX_ERROR;
     }
@@ -1165,7 +1165,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
   // there was no statistic block present in the msr-input-file
   if (!statisticBlockFound) {
     partialStatisticBlockFound = false;
-    cerr << endl << "PMsrHandler::WriteMsrLogFile: **WARNING** no STATISTIC block present, will write a default one" << endl;
+    cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **WARNING** no STATISTIC block present, will write a default one" << endl;
     fout << "###############################################################" << endl;
     TDatime dt;
     fout << "STATISTIC --- " << dt.AsSQLString() << endl;
@@ -1222,8 +1222,8 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
 
   // there was only a partial statistic block present in the msr-input-file
   if (partialStatisticBlockFound) {
-    cerr << endl << "PMsrHandler::WriteMsrLogFile: **WARNING** garbage STATISTIC block present in the msr-input file.";
-    cerr << endl << "** WILL ADD SOME SENSIBLE STUFF, BUT YOU HAVE TO CHECK IT SINCE I AM **NOT** REMOVING THE GARBAGE! **" << endl;
+    cerr << endl << ">> PMsrHandler::WriteMsrLogFile: **WARNING** garbage STATISTIC block present in the msr-input file.";
+    cerr << endl << ">> ** WILL ADD SOME SENSIBLE STUFF, BUT YOU HAVE TO CHECK IT SINCE I AM **NOT** REMOVING THE GARBAGE! **" << endl;
     TDatime dt;
     fout << "STATISTIC --- " << dt.AsSQLString() << endl;
     if (fStatistic.fValid) { // valid fit result
@@ -1995,7 +1995,7 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
 Bool_t PMsrHandler::SetMsrParamValue(UInt_t idx, Double_t value)
 {
   if (idx >= fParam.size()) {
-    cerr << endl << "PMsrHandler::SetMsrParamValue(): **ERROR** idx = " << idx << " is >= than the number of fit parameters " << fParam.size();
+    cerr << endl << ">> PMsrHandler::SetMsrParamValue(): **ERROR** idx = " << idx << " is >= than the number of fit parameters " << fParam.size();
     cerr << endl;
     return false;
   }
@@ -2022,7 +2022,7 @@ Bool_t PMsrHandler::SetMsrParamValue(UInt_t idx, Double_t value)
 Bool_t PMsrHandler::SetMsrParamStep(UInt_t idx, Double_t value)
 {
   if (idx >= fParam.size()) {
-    cerr << endl << "PMsrHandler::SetMsrParamValue(): **ERROR** idx = " << idx << " is larger than the number of parameters " << fParam.size();
+    cerr << endl << ">> PMsrHandler::SetMsrParamValue(): **ERROR** idx = " << idx << " is larger than the number of parameters " << fParam.size();
     cerr << endl;
     return false;
   }
@@ -2048,7 +2048,7 @@ Bool_t PMsrHandler::SetMsrParamStep(UInt_t idx, Double_t value)
 Bool_t PMsrHandler::SetMsrParamPosErrorPresent(UInt_t idx, Bool_t value)
 {
   if (idx >= fParam.size()) {
-    cerr << endl << "PMsrHandler::SetMsrParamPosErrorPresent(): **ERROR** idx = " << idx << " is larger than the number of parameters " << fParam.size();
+    cerr << endl << ">> PMsrHandler::SetMsrParamPosErrorPresent(): **ERROR** idx = " << idx << " is larger than the number of parameters " << fParam.size();
     cerr << endl;
     return false;
   }
@@ -2074,7 +2074,7 @@ Bool_t PMsrHandler::SetMsrParamPosErrorPresent(UInt_t idx, Bool_t value)
 Bool_t PMsrHandler::SetMsrParamPosError(UInt_t idx, Double_t value)
 {
   if (idx >= fParam.size()) {
-    cerr << endl << "PMsrHandler::SetMsrParamPosError(): **ERROR** idx = " << idx << " is larger than the number of parameters " << fParam.size();
+    cerr << endl << ">> PMsrHandler::SetMsrParamPosError(): **ERROR** idx = " << idx << " is larger than the number of parameters " << fParam.size();
     cerr << endl;
     return false;
   }
@@ -2159,7 +2159,7 @@ void PMsrHandler::SetMsrAddT0Entry(UInt_t runNo, UInt_t addRunIdx, UInt_t histoI
 void PMsrHandler::SetMsrDataRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
 {
   if (runNo >= fRuns.size()) { // error
-    cerr << endl << "PMsrHandler::SetMsrDataRangeEntry: **ERROR** runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
+    cerr << endl << ">> PMsrHandler::SetMsrDataRangeEntry: **ERROR** runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
     cerr << endl;
     return;
   }
@@ -2180,7 +2180,7 @@ void PMsrHandler::SetMsrDataRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
 void PMsrHandler::SetMsrBkgRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
 {
   if (runNo >= fRuns.size()) { // error
-    cerr << endl << "PMsrHandler::SetMsrBkgRangeEntry: **ERROR** runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
+    cerr << endl << ">> PMsrHandler::SetMsrBkgRangeEntry: **ERROR** runNo = " << runNo << ", is out of valid range 0.." << fRuns.size();
     cerr << endl;
     return;
   }
@@ -2386,25 +2386,25 @@ Bool_t PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
     if (error) {
       cerr << endl;
       cerr << endl << ">> PMsrHandler::HandleFitParameterEntry: **ERROR** in line " << iter->fLineNo << ":";
-      cerr << endl << iter->fLine.Data();
-      cerr << endl << "A Fit Parameter line needs to have the following form: ";
+      cerr << endl << ">> " << iter->fLine.Data();
+      cerr << endl << ">> A Fit Parameter line needs to have the following form: ";
       cerr << endl;
-      cerr << endl << "No Name Value Step/Error [Lower_Boundary Upper_Boundary]";
+      cerr << endl << ">> No Name Value Step/Error [Lower_Boundary Upper_Boundary]";
       cerr << endl;
-      cerr << endl << "or";
+      cerr << endl << ">> or";
       cerr << endl;
-      cerr << endl << "No Name Value Step/Neg_Error Pos_Error [Lower_Boundary Upper_Boundary]";
+      cerr << endl << ">> No Name Value Step/Neg_Error Pos_Error [Lower_Boundary Upper_Boundary]";
       cerr << endl;
-      cerr << endl << "No:             the parameter number (an Int_t)";
-      cerr << endl << "Name:           the name of the parameter (less than 256 character)";
-      cerr << endl << "Value:          the starting value of the parameter (a Double_t)";
-      cerr << endl << "Step/Error,";
-      cerr << endl << "Step/Neg_Error: the starting step value in a fit  (a Double_t), or";
-      cerr << endl << "                the symmetric error (MIGRAD, SIMPLEX), or";
-      cerr << endl << "                the negative error (MINOS)";
-      cerr << endl << "Pos_Error:      the positive error (MINOS),  (a Double_t or \"none\")";
-      cerr << endl << "Lower_Boundary: the lower boundary allowed for the fit parameter  (a Double_t or \"none\")";
-      cerr << endl << "Upper_Boundary: the upper boundary allowed for the fit parameter  (a Double_t or \"none\")";
+      cerr << endl << ">> No:             the parameter number (an Int_t)";
+      cerr << endl << ">> Name:           the name of the parameter (less than 256 character)";
+      cerr << endl << ">> Value:          the starting value of the parameter (a Double_t)";
+      cerr << endl << ">> Step/Error,";
+      cerr << endl << ">> Step/Neg_Error: the starting step value in a fit  (a Double_t), or";
+      cerr << endl << ">>                 the symmetric error (MIGRAD, SIMPLEX), or";
+      cerr << endl << ">>                 the negative error (MINOS)";
+      cerr << endl << ">> Pos_Error:      the positive error (MINOS),  (a Double_t or \"none\")";
+      cerr << endl << ">> Lower_Boundary: the lower boundary allowed for the fit parameter  (a Double_t or \"none\")";
+      cerr << endl << ">> Upper_Boundary: the upper boundary allowed for the fit parameter  (a Double_t or \"none\")";
       cerr << endl;
     } else { // everything is OK, therefore add the parameter to the parameter list
       fParam.push_back(param);
@@ -3065,8 +3065,8 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
   if (error) {
     --iter;
     cerr << endl << ">> PMsrHandler::HandleRunEntry: **ERROR** in line " << iter->fLineNo << ":";
-    cerr << endl << iter->fLine.Data();
-    cerr << endl << "RUN block syntax is too complex to print it here. Please check the manual.";
+    cerr << endl << ">> " << iter->fLine.Data();
+    cerr << endl << ">> RUN block syntax is too complex to print it here. Please check the manual.";
   } else { // save last run found
     fRuns.push_back(param);
     param.CleanUp();
@@ -3137,7 +3137,7 @@ Bool_t PMsrHandler::HandleCommandsEntry(PMsrLines &lines)
   PMsrLines::iterator iter;
 
   if (lines.empty()) {
-    cerr << endl << "**WARNING**: There is no COMMANDS block! Do you really want this?";
+    cerr << endl << ">> PMsrHandler::HandleCommandsEntry(): **WARNING**: There is no COMMAND block! Do you really want this?";
     cerr << endl;
   }
 
@@ -3400,21 +3400,21 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
   if (error) {
     cerr << endl << ">> PMsrHandler::HandleFourierEntry: **ERROR** in line " << iter->fLineNo << ":";
     cerr << endl;
-    cerr << endl << iter->fLine.Data();
+    cerr << endl << ">> " << iter->fLine.Data();
     cerr << endl;
-    cerr << endl << "FOURIER block syntax, parameters in [] are optinal:";
+    cerr << endl << ">> FOURIER block syntax, parameters in [] are optinal:";
     cerr << endl;
-    cerr << endl << "FOURIER";
-    cerr << endl << "[units Gauss | MHz | Mc/s]";
-    cerr << endl << "[fourier_power n # n is a number such that zero padding up to 2^n will be used]";
-    cerr << endl << "   n=0 means no zero padding";
-    cerr << endl << "   0 <= n <= 20 are allowed values";
-    cerr << endl << "[dc-corrected true | false]";
-    cerr << endl << "[apodization none | weak | medium | strong]";
-    cerr << endl << "[plot real | imag | real_and_imag | power | phase]";
-    cerr << endl << "[phase value]";
-    cerr << endl << "[range_for_phase_correction min max]";
-    cerr << endl << "[range min max]";
+    cerr << endl << ">> FOURIER";
+    cerr << endl << ">> [units Gauss | MHz | Mc/s]";
+    cerr << endl << ">> [fourier_power n # n is a number such that zero padding up to 2^n will be used]";
+    cerr << endl << ">>    n=0 means no zero padding";
+    cerr << endl << ">>    0 <= n <= 20 are allowed values";
+    cerr << endl << ">> [dc-corrected true | false]";
+    cerr << endl << ">> [apodization none | weak | medium | strong]";
+    cerr << endl << ">> [plot real | imag | real_and_imag | power | phase]";
+    cerr << endl << ">> [phase value]";
+    cerr << endl << ">> [range_for_phase_correction min max]";
+    cerr << endl << ">> [range min max]";
     cerr << endl;
   } else { // save last run found
     fFourier = fourier;
@@ -3448,7 +3448,7 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
   TString str;
 
   if (lines.empty()) {
-    cerr << endl << "**WARNING**: There is no PLOT block! Do you really want this?";
+    cerr << endl << ">> PMsrHandler::HandlePlotEntry(): **WARNING**: There is no PLOT block! Do you really want this?";
     cerr << endl;
   }
 
@@ -3924,26 +3924,26 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
     if (error) { // print error message
       --iter1;
       cerr << endl << ">> PMsrHandler::HandlePlotEntry: **ERROR** in line " << iter1->fLineNo << ": " << iter1->fLine.Data();
-      cerr << endl << "A PLOT block needs to have the following structure:";
+      cerr << endl << ">> A PLOT block needs to have the following structure:";
       cerr << endl;
-      cerr << endl << "PLOT <plot_type>";
-      cerr << endl << "runs <run_list>";
-      cerr << endl << "[range tmin tmax [ymin ymax]]";
-      cerr << endl << "[sub_ranges tmin1 tmax1 tmin2 tmax2 ... tminN tmaxN [ymin ymax]";
-      cerr << endl << "[logx | logy]";
-      cerr << endl << "[use_fit_ranges [ymin ymax]]";
-      cerr << endl << "[view_packing n]";
+      cerr << endl << ">> PLOT <plot_type>";
+      cerr << endl << ">> runs <run_list>";
+      cerr << endl << ">> [range tmin tmax [ymin ymax]]";
+      cerr << endl << ">> [sub_ranges tmin1 tmax1 tmin2 tmax2 ... tminN tmaxN [ymin ymax]";
+      cerr << endl << ">> [logx | logy]";
+      cerr << endl << ">> [use_fit_ranges [ymin ymax]]";
+      cerr << endl << ">> [view_packing n]";
       cerr << endl;
-      cerr << endl << "where <plot_type> is: 0=single histo asym,";
-      cerr << endl << "                      2=forward-backward asym,";
-      cerr << endl << "                      4=mu minus single histo,";
-      cerr << endl << "                      8=non muSR.";
-      cerr << endl << "<run_list> is the list of runs, e.g. runs 1 3";
-      cerr << endl << "range is optional";
-      cerr << endl << "sub_ranges (if present) will plot the N given runs each on its own sub-range";
-      cerr << endl << "logx, logy (if present) will present the x-, y-axis in log-scale";
-      cerr << endl << "use_fit_ranges (if present) will plot each run on its fit-range";
-      cerr << endl << "view_packing n (if present) will bin all data by n (> 0) rather than the binning of the fit";
+      cerr << endl << ">> where <plot_type> is: 0=single histo asym,";
+      cerr << endl << ">>                       2=forward-backward asym,";
+      cerr << endl << ">>                       4=mu minus single histo,";
+      cerr << endl << ">>                       8=non muSR.";
+      cerr << endl << ">> <run_list> is the list of runs, e.g. runs 1 3";
+      cerr << endl << ">> range is optional";
+      cerr << endl << ">> sub_ranges (if present) will plot the N given runs each on its own sub-range";
+      cerr << endl << ">> logx, logy (if present) will present the x-, y-axis in log-scale";
+      cerr << endl << ">> use_fit_ranges (if present) will plot each run on its fit-range";
+      cerr << endl << ">> view_packing n (if present) will bin all data by n (> 0) rather than the binning of the fit";
       cerr << endl;
     }
 
@@ -4576,7 +4576,7 @@ void PMsrHandler::FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLi
   for (UInt_t i=0; i<fParam.size(); i++) {
     if (!ParameterInUse(i)) {
       if (fParam[i].fStep != 0.0) {
-        cerr << endl << "**WARNING** : Parameter No " << i+1 << " is not used at all, will fix it" << endl;
+        cerr << endl << ">> **WARNING** : Parameter No " << i+1 << " is not used at all, will fix it" << endl;
         fParam[i].fStep = 0.0;
       }
     }
@@ -4607,7 +4607,7 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
     // check if fittype is defined
     fitType = fRuns[i].GetFitType();
     if (fitType == -1) {
-      cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** fittype is not defined in RUN block number " << i+1 << endl;
+      cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** fittype is not defined in RUN block number " << i+1 << endl;
       return false;
     }
 
@@ -4616,39 +4616,39 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
       case PRUN_SINGLE_HISTO:
         // check of norm is present
         if (fRuns[i].GetNormParamNo() == -1) {
-          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          cerr << endl << "  Norm parameter number not defined. Necessary for single histogram fits." << endl;
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   Norm parameter number not defined. Necessary for single histogram fits." << endl;
           return false;
         }
         // check if norm parameter is given that it is either a valid function of a fit parameter present
         if (fRuns[i].GetNormParamNo() < MSR_PARAM_FUN_OFFSET) { // parameter number
           // check that norm parameter number is not larger than the number of parameters
           if (fRuns[i].GetNormParamNo() > static_cast<Int_t>(fParam.size())) {
-            cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-            cerr << endl << "  Norm parameter number " << fRuns[i].GetNormParamNo() << " is larger than the number of fit parameters (" << fParam.size() << ").";
-            cerr << endl << "  Consider to check the manual ;-)" << endl;
+            cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+            cerr << endl << ">>   Norm parameter number " << fRuns[i].GetNormParamNo() << " is larger than the number of fit parameters (" << fParam.size() << ").";
+            cerr << endl << ">>   Consider to check the manual ;-)" << endl;
             return false;
           }
         } else { // function norm
           if (fRuns[i].GetNormParamNo()-MSR_PARAM_FUN_OFFSET > GetNoOfFuncs()) {
-            cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-            cerr << endl << "  Norm parameter function number " << fRuns[i].GetNormParamNo()-MSR_PARAM_FUN_OFFSET << " is larger than the number of functions (" << GetNoOfFuncs() << ").";
-            cerr << endl << "  Consider to check the manual ;-)" << endl;
+            cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+            cerr << endl << ">>   Norm parameter function number " << fRuns[i].GetNormParamNo()-MSR_PARAM_FUN_OFFSET << " is larger than the number of functions (" << GetNoOfFuncs() << ").";
+            cerr << endl << ">>   Consider to check the manual ;-)" << endl;
             return false;
           }
         }
         // check that there is a forward parameter number
         if (fRuns[i].GetForwardHistoNo() == -1) {
-          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          cerr << endl << "  forward parameter number not defined. Necessary for single histogram fits." << endl;
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   forward parameter number not defined. Necessary for single histogram fits." << endl;
           return false;
         }
         if (fRuns[i].GetNormParamNo() > static_cast<Int_t>(fParam.size())) {
           // check if forward histogram number is a function
           if (fRuns[i].GetNormParamNo() - MSR_PARAM_FUN_OFFSET > static_cast<Int_t>(fParam.size())) {
-            cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-            cerr << endl << "  forward histogram number " << fRuns[i].GetNormParamNo() << " is larger than the number of fit parameters (" << fParam.size() << ").";
-            cerr << endl << "  Consider to check the manual ;-)" << endl;
+            cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+            cerr << endl << ">>   forward histogram number " << fRuns[i].GetNormParamNo() << " is larger than the number of fit parameters (" << fParam.size() << ").";
+            cerr << endl << ">>   Consider to check the manual ;-)" << endl;
             return false;
           }
         }
@@ -4660,45 +4660,57 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
             return false;
           }
         }
+        // check number of T0's provided
+        if (fRuns[i].GetT0BinSize() > 1) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only 1. Needs to be fixed." << endl;
+          return false;
+        }
         // check packing
         if (fRuns[i].GetPacking() == -1) {
-          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **WARNING** in RUN block number " << i+1;
-          cerr << endl << "  Packing is not defined, will set it to 1." << endl;
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **WARNING** in RUN block number " << i+1;
+          cerr << endl << ">>   Packing is not defined, will set it to 1." << endl;
           fRuns[i].SetPacking(1);
         }
         break;
       case PRUN_ASYMMETRY:
         // check alpha
         if (fRuns[i].GetAlphaParamNo() == -1) {
-          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          cerr << endl << "  alpha parameter number missing which is needed for an asymmetry fit.";
-          cerr << endl << "  Consider to check the manual ;-)" << endl;
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   alpha parameter number missing which is needed for an asymmetry fit.";
+          cerr << endl << ">>   Consider to check the manual ;-)" << endl;
           return false;
         }
         // check that there is a forward parameter number
         if (fRuns[i].GetForwardHistoNo() == -1) {
-          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          cerr << endl << "  forward histogram number not defined. Necessary for single histogram fits." << endl;
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   forward histogram number not defined. Necessary for single histogram fits." << endl;
           return false;
         }
         // check that there is a backward parameter number
         if (fRuns[i].GetBackwardHistoNo() == -1) {
-          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          cerr << endl << "  backward histogram number not defined. Necessary for single histogram fits." << endl;
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   backward histogram number not defined. Necessary for single histogram fits." << endl;
           return false;
         }
         // check fit range
         if (!fRuns[i].IsFitRangeInBin()) { // fit range given as times in usec
           if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) {
-            cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-            cerr << endl << "  Fit range is not defined. Necessary for single histogram fits." << endl;
+            cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+            cerr << endl << ">>   Fit range is not defined. Necessary for single histogram fits." << endl;
             return false;
           }
         }
+        // check number of T0's provided
+        if (fRuns[i].GetT0BinSize() > 2) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only 2. Needs to be fixed." << endl;
+          return false;
+        }
         // check packing
         if (fRuns[i].GetPacking() == -1) {
-          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **WARNING** in RUN block number " << i+1;
-          cerr << endl << "  Packing is not defined, will set it to 1." << endl;
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **WARNING** in RUN block number " << i+1;
+          cerr << endl << ">>   Packing is not defined, will set it to 1." << endl;
           fRuns[i].SetPacking(1);
         }
         break;
@@ -4708,25 +4720,25 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
       case PRUN_NON_MUSR:
         // check xy-data
         if ((fRuns[i].GetXDataIndex() == -1) && (fRuns[i].GetXDataLabel()->Length() == 0)) {
-          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          cerr << endl << "  xy-data is missing. Necessary for non muSR fits." << endl;
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   xy-data is missing. Necessary for non muSR fits." << endl;
           return false;
         }
         // check fit range
         if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) {
-          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          cerr << endl << "  Fit range is not defined. Necessary for single histogram fits." << endl;
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   Fit range is not defined. Necessary for single histogram fits." << endl;
           return false;
         }
         // check packing
         if (fRuns[i].GetPacking() == -1) {
-          cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **WARNING** in RUN block number " << i+1;
-          cerr << endl << "  Packing is not defined, will set it to 1." << endl;
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **WARNING** in RUN block number " << i+1;
+          cerr << endl << ">>   Packing is not defined, will set it to 1." << endl;
           fRuns[i].SetPacking(1);
         }
         break;
       default:
-        cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** fittype " << fitType << " undefined." << endl;
+        cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** fittype " << fitType << " undefined." << endl;
         return false;
         break;
     }
