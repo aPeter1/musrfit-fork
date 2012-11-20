@@ -4661,9 +4661,9 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           }
         }
         // check number of T0's provided
-        if (fRuns[i].GetT0BinSize() > 1) {
+        if (fRuns[i].GetT0BinSize() > fRuns[i].GetForwardHistoNoSize()) {
           cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          cerr << endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only 1. Needs to be fixed." << endl;
+          cerr << endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << fRuns[i].GetForwardHistoNoSize() << ". Needs to be fixed." << endl;
           return false;
         }
         // check packing
@@ -4702,9 +4702,14 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           }
         }
         // check number of T0's provided
-        if (fRuns[i].GetT0BinSize() > 2) {
+        if (fRuns[i].GetT0BinSize() > 2*fRuns[i].GetForwardHistoNoSize()) {
           cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          cerr << endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only 2. Needs to be fixed." << endl;
+          cerr << endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetForwardHistoNoSize() << " in forward. Needs to be fixed." << endl;
+          return false;
+        }
+        if (fRuns[i].GetT0BinSize() > 2*fRuns[i].GetBackwardHistoNoSize()) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetBackwardHistoNoSize() << " in backward. Needs to be fixed." << endl;
           return false;
         }
         // check packing
