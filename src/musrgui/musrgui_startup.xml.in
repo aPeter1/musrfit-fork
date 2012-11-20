@@ -177,6 +177,34 @@
       <params>4</params>
     </func>
     <func>
+      <name>staticNKZF</name>
+      <comment>(damping_D0 R_b)</comment>
+      <label>static Noakes-Kalvius ZF</label>
+      <pixmap></pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>staticNKTF</name>
+      <comment>(phase frequency damping_D0 R_b)</comment>
+      <label>static Noakes-Kalvius TF</label>
+      <pixmap></pixmap>
+      <params>4</params>
+    </func>
+    <func>
+      <name>dynamicNKZF</name>
+      <comment>(damping_D0 R_b nu_c)</comment>
+      <label>dynamic Noakes-Kalvius ZF</label>
+      <pixmap></pixmap>
+      <params>3</params>
+    </func>
+    <func>
+      <name>dynamicNKTF</name>
+      <comment>(phase frequency damping_D0 R_b nu_c)</comment>
+      <label>dynamic Noakes-Kalvius TF</label>
+      <pixmap></pixmap>
+      <params>5</params>
+    </func>
+    <func>
       <name>polynom</name>
       <comment>(tshift p0 p1 ... pn)</comment>
       <label>polynom</label>
