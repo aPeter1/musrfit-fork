@@ -160,6 +160,8 @@ PMusrCanvas::PMusrCanvas()
   fXmax = 0.0;
   fYmin = 0.0;
   fYmax = 0.0;
+
+  gStyle->SetHistMinimumZero(kTRUE); // needed to enforce proper bar option handling
 }
 
 //--------------------------------------------------------------------------
@@ -206,6 +208,8 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
   fXmax = 0.0;
   fYmin = 0.0;
   fYmax = 0.0;
+
+  gStyle->SetHistMinimumZero(kTRUE); // needed to enforce proper bar option handling
 }
 
 //--------------------------------------------------------------------------
@@ -258,6 +262,8 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
   fXmax = 0.0;
   fYmin = 0.0;
   fYmax = 0.0;
+
+  gStyle->SetHistMinimumZero(kTRUE); // needed to enforce proper bar option handling
 }
 
 //--------------------------------------------------------------------------
