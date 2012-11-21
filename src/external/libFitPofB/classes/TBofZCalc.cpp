@@ -232,7 +232,7 @@ void TLondon1D_1L::SetBmin()
 {
   double b_a(fCoeff[1]/fCoeff[0]);
 // assert(b_a>0.);
-  if(b_a<10E-7){
+  if (b_a<10E-7) {
     b_a = 10E-7;
   }
 
@@ -360,7 +360,10 @@ double TLondon1D_2L::GetBmin() const
 void TLondon1D_2L::SetBmin()
 {
   double b_a(fCoeff[1]/fCoeff[0]);
-  assert (b_a>0.);
+//  assert (b_a>0.);
+  if (b_a<10E-7) {
+    b_a = 10E-7;
+  }
 
   double minZ;
   // check if the minimum is in the first layer
@@ -637,7 +640,10 @@ double TLondon1D_3L::GetBmin() const
 void TLondon1D_3L::SetBmin()
 {
   double b_a(fCoeff[1]/fCoeff[0]);
-  assert (b_a>0.);
+//  assert (b_a>0.);
+  if (b_a<10E-7) {
+    b_a = 10E-7;
+  }
 
   double minZ;
   // check if the minimum is in the first layer
@@ -868,7 +874,10 @@ double TLondon1D_3LS::GetBmin() const
 void TLondon1D_3LS::SetBmin()
 {
   double b_a(fCoeff[1]/fCoeff[0]);
-  assert (b_a>0.);
+//  assert (b_a>0.);
+  if (b_a<10E-7) {
+    b_a = 10E-7;
+  }
 
   double minZ;
   // check if the minimum is in the first layer
