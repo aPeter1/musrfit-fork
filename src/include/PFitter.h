@@ -124,7 +124,7 @@ class PFitter
     Bool_t ExecuteRelease(UInt_t lineNo);
     Bool_t ExecuteRestore();
     Bool_t ExecuteScan();
-    Bool_t ExecuteSave();
+    Bool_t ExecuteSave(Bool_t first);
     Bool_t ExecuteSimplex();
 };
 

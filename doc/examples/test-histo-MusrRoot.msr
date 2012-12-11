@@ -97,10 +97,11 @@ SAVE
 ###############################################################
 FOURIER
 units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
-fourier_power    11
-apodization      MEDIUM  # NONE, WEAK, MEDIUM, STRONG
-plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
-range            0    100
+fourier_power    10
+apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+plot             REAL    # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+dc-corrected     true
+phase            par7 
 
 ###############################################################
 PLOT 0   (single histo plot)

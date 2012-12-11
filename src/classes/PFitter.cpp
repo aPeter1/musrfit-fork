@@ -229,6 +229,7 @@ Bool_t PFitter::DoFit()
   }
 
   // walk through the command list and execute them
+  Bool_t firstSave = true;
   for (UInt_t i=0; i<fCmdList.size(); i++) {
     switch (fCmdList[i].first) {
       case PMN_INTERACTIVE:
@@ -274,7 +275,9 @@ Bool_t PFitter::DoFit()
         status = ExecuteRestore();
         break;
       case PMN_SAVE:
-        status = ExecuteSave();
+        status = ExecuteSave(firstSave);
+        if (firstSave)
+          firstSave = false;
         break;
       case PMN_SCAN:
         status = ExecuteScan();
@@ -1510,9 +1513,11 @@ Bool_t PFitter::ExecuteScan()
 /**
  * <p>Execute the save command.
  *
+ * \param firstSave flag indication if this is the first save call and hence write a fresh MINUIT2.OUTPUT
+ *
  * <b>return:</b> true if the valid minuit2 state is found, otherwise returns false.
  */
-Bool_t PFitter::ExecuteSave()
+Bool_t PFitter::ExecuteSave(Bool_t firstSave)
 {
   // if any minimization was done, otherwise get out immediately
   if (!fFcnMin) {
@@ -1593,7 +1598,11 @@ Bool_t PFitter::ExecuteSave()
   ofstream fout;
 
   // open minuit2 output file
-  fout.open("MINUIT2.OUTPUT", iostream::out);
+  if (firstSave)
+    fout.open("MINUIT2.OUTPUT", iostream::out);
+  else
+    fout.open("MINUIT2.OUTPUT", iostream::out | iostream::app);
+
   if (!fout.is_open()) {
     cerr << endl << "**ERROR** PFitter::ExecuteSave() couldn't open MINUIT2.OUTPUT file";
     cerr << endl;
@@ -1826,6 +1835,11 @@ Bool_t PFitter::ExecuteSave()
   } else {
     fout << endl << " no correlation coefficients available";
   }
+  fout << endl;
+  fout << endl << "*************************************************************************";
+  fout << endl << " DONE ";
+  fout << endl << "*************************************************************************";
+  fout << endl << endl;
 
   // close MINUIT2.OUTPUT file
   fout.close();

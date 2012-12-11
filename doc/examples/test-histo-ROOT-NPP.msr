@@ -25,15 +25,17 @@ norm            5
 backgr.fit      6
 lifetimecorrection
 map             0    0    0    0    0    0    0    0    0    0
-forward         1       
+forward         1 
 data            3419    66000   
-t0              3419    
+t0              3419.0  
 fit             0.1     10     
 packing         250
 
 ###############################################################
 COMMANDS
+PRINT_LEVEL 3
 MINIMIZE
+SAVE
 MINOS
 SAVE
 
@@ -43,5 +45,5 @@ runs     1
 range    0   8   -0.3   0.3
 
 ###############################################################
-STATISTIC --- 2011-02-06 14:52:54
-  chisq = 248.83532814099809, NDF = 197, chisq/NDF = 1.2631234931015132
+STATISTIC --- 2012-12-11 07:58:13
+  chisq = 248.8, NDF = 197, chisq/NDF = 1.263124
