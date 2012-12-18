@@ -4463,9 +4463,17 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
   header->SetNHist(fData[0].GetNoOfHistos());
   header->SetCuts("none");
   header->SetModerator("none");
-  // feed t0's
-  Double_t *tt0 = new Double_t[fData[0].GetNoOfHistos()];
-  for (UInt_t i=0;  i<fData[0].GetNoOfHistos(); i++) {
+
+  // feed t0's if possible
+  UInt_t NoT0s = fData[0].GetNoOfHistos();
+  if (fData[0].GetNoOfHistos() > NHIST) {
+    cerr << endl << ">> PRunDataHandler::WriteRootFile: **WARNING** found more T0's (" << NoT0s << ") than can be handled (" << NHIST << ").";
+    cerr << endl << ">> Will only write the first " << NHIST << " T0s!!" << endl;
+    NoT0s = NHIST;
+  }
+  Double_t *tt0 = new Double_t[NoT0s];
+
+  for (UInt_t i=0;  i<NoT0s; i++) {
     dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
     tt0[i] = dataSet->GetTimeZeroBin()/fAny2ManyInfo->rebin;
   }
@@ -4481,7 +4489,7 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
      for (UInt_t i=0; i<fData[0].GetNoOfHistos(); i++) {
        dataSet = fData[0].GetDataSet(i, false); // i.e. the false means, that i is the index and NOT the histo number
        if (dataSet == 0) { // something is really wrong
-         cerr << endl << ">> PRunDataHandler::WriteNexusFile: **ERROR** Couldn't get data set (idx=0" << i << ")";
+         cerr << endl << ">> PRunDataHandler::WriteRootFile: **ERROR** Couldn't get data set (idx=0" << i << ")";
          cerr << endl << ">>   something is really wrong!" << endl;
          return false;
        }
@@ -4703,7 +4711,7 @@ Bool_t PRunDataHandler::WriteNexusFile(TString fln)
         }
         size = dataSet->GetData()->size();
         for (UInt_t j=0; j<size; j++) {
-          data.push_back(dataSet->GetData()->at(j));
+          data.push_back((UInt_t)dataSet->GetData()->at(j));
         }
         nxs->GetEntryIdf1()->GetData()->SetHisto(data, i);
         data.clear();

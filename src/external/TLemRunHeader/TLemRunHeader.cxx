@@ -5,6 +5,9 @@
 //
 // $Id: TLemRunHeader.cxx 3897 2009-05-01 22:06:11Z l_wojek $
 //
+#include <iostream>
+using namespace std;
+
 #include "TLemRunHeader.h"
 
 ClassImp(TLemRunHeader)
@@ -190,10 +193,13 @@ void TLemRunHeader::SetModerator(const Char_t *moderator){
 }
 //----------------------------------------------------------
 void TLemRunHeader::SetTimeZero(const Double_t *value){
+ Int_t noT0s = fNHist;
+ if (noT0s > NHIST)
+   noT0s = NHIST;
  TString str;
  str = "16 t0: ";
- for (Int_t i = 0; i < fNHist; i++){
-  //fTimeZero.push_back(value[i]);
+ for (Int_t i = 0; i < noT0s; i++){
+   //fTimeZero.push_back(value[i]);
   fTimeZero[i] = value[i];
   str   += value[i];
   str   += "   ";
