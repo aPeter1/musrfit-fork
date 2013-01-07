@@ -38,11 +38,14 @@
 #endif
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <limits>
+
+#include <cmath>
 using namespace std;
 
-#include <math.h>
+#include <sys/time.h>
 
 #include "Minuit2/FunctionMinimum.h"
 #include "Minuit2/MnContours.h"
@@ -135,6 +138,8 @@ PFitter::~PFitter()
   fCmdList.clear();
 
   fScanData.clear();
+
+  fElapsedTime.clear();
 
   if (fFcnMin) {
     delete fFcnMin;
@@ -1127,10 +1132,15 @@ Bool_t PFitter::ExecuteHesse()
   UInt_t maxfcn = numeric_limits<UInt_t>::max();
 
   // call hesse
+  Double_t start=0.0, end=0.0;
+  start=MilliTime();
   ROOT::Minuit2::MnUserParameterState mnState = hesse((*fFitterFcn), fMnUserParams, maxfcn);
-
+  end=MilliTime();
+  cout << ">> PFitter::ExecuteMinimize(): execution time for Hesse = " << setprecision(3) << (end-start)/1.0e3 << " sec." << endl;
+  TString str = TString::Format("Hesse:    %.3f sec", (end-start)/1.0e3);
+  fElapsedTime.push_back(str);
   if (!mnState.IsValid()) {
-    cerr << endl << "**WARNING** PFitter::ExecuteHesse(): Hesse encountered some problems!";
+    cerr << endl << ">> PFitter::ExecuteHesse(): **WARNING** Hesse encountered some problems!";
     cerr << endl;
     return false;
   }
@@ -1168,9 +1178,16 @@ Bool_t PFitter::ExecuteMigrad()
   UInt_t maxfcn = numeric_limits<UInt_t>::max();
   // tolerance = MINUIT2 Default tolerance
   Double_t tolerance = 0.1;
+  // keep track of elapsed time
+  Double_t start=0.0, end=0.0;
+  start=MilliTime();
   ROOT::Minuit2::FunctionMinimum min = migrad(maxfcn, tolerance);
+  end=MilliTime();
+  cout << ">> PFitter::ExecuteMinimize(): execution time for Migrad = " << setprecision(3) << (end-start)/1.0e3 << " sec." << endl;
+  TString str = TString::Format("Migrad:   %.3f sec", (end-start)/1.0e3);
+  fElapsedTime.push_back(str);
   if (!min.IsValid()) {
-    cerr << endl << "**WARNING**: PFitter::ExecuteMigrad(): Fit did not converge, sorry ...";
+    cerr << endl << ">> PFitter::ExecuteMigrad(): **WARNING**: Fit did not converge, sorry ...";
     cerr << endl;
     fIsValid = false;
     return false;
@@ -1237,9 +1254,16 @@ Bool_t PFitter::ExecuteMinimize()
 
   // tolerance = MINUIT2 Default tolerance
   Double_t tolerance = 0.1;
+  // keep track of elapsed time
+  Double_t start=0.0, end=0.0;
+  start = MilliTime();
   ROOT::Minuit2::FunctionMinimum min = minimize(maxfcn, tolerance);
+  end = MilliTime();
+  cout << ">> PFitter::ExecuteMinimize(): execution time for Minimize = " << setprecision(3) << (end-start)/1.0e3 << " sec." << endl;
+  TString str = TString::Format("Minimize: %.3f sec", (end-start)/1.0e3);
+  fElapsedTime.push_back(str);
   if (!min.IsValid()) {
-    cerr << endl << "**WARNING**: PFitter::ExecuteMinimize(): Fit did not converge, sorry ...";
+    cerr << endl << ">> PFitter::ExecuteMinimize(): **WARNING**: Fit did not converge, sorry ...";
     cerr << endl;
     fIsValid = false;
     return false;
@@ -1311,7 +1335,13 @@ Bool_t PFitter::ExecuteMinos()
   }
 
   // make minos analysis
+  Double_t start=0.0, end=0.0;
+  start=MilliTime();
   ROOT::Minuit2::MnMinos minos((*fFitterFcn), (*fFcnMin));
+  end=MilliTime();
+  cout << ">> PFitter::ExecuteMinimize(): execution time for Minos = " << setprecision(3) << (end-start)/1.0e3 << " sec." << endl;
+  TString str = TString::Format("Minos:    %.3f sec", (end-start)/1.0e3);
+  fElapsedTime.push_back(str);
 
   for (UInt_t i=0; i<fParams.size(); i++) {
     // only try to call minos if the parameter is not fixed!!
@@ -1529,7 +1559,7 @@ Bool_t PFitter::ExecuteSave(Bool_t firstSave)
 
   // check if the user parameter state is valid
   if (!mnState.IsValid()) {
-    cerr << endl << "**WARNING** Minuit2 User Parameter State is not valid, i.e. nothing to be saved";
+    cerr << endl << ">> PFitter::ExecuteSave: **WARNING** Minuit2 User Parameter State is not valid, i.e. nothing to be saved";
     cerr << endl;
     return false;
   }
@@ -1616,10 +1646,21 @@ Bool_t PFitter::ExecuteSave(Bool_t firstSave)
   fout << endl << "*************************************************************************";
   fout << endl;
 
+  // write elapsed times
+  fout << endl << " elapsed times:";
+  for (UInt_t i=0; i<fElapsedTime.size(); i++) {
+    fout << endl << "   " << fElapsedTime[i];
+  }
+  fout << endl;
+  fout << endl << "*************************************************************************";
+  fout << endl;
+  fElapsedTime.clear();
+
   // write global informations
   fout << endl << " Fval() = " << mnState.Fval() << ", Edm() = " << mnState.Edm() << ", NFcn() = " << mnState.NFcn();
   fout << endl;
   fout << endl << "*************************************************************************";
+  fout << endl;
 
   // identifiy the longest variable name for proper formating reasons
   Int_t maxLength = 10;
@@ -1868,9 +1909,16 @@ Bool_t PFitter::ExecuteSimplex()
   UInt_t maxfcn = numeric_limits<UInt_t>::max();
   // tolerance = MINUIT2 Default tolerance
   Double_t tolerance = 0.1;
+  // keep track of elapsed time
+  Double_t start=0.0, end=0.0;
+  start=MilliTime();
   ROOT::Minuit2::FunctionMinimum min = simplex(maxfcn, tolerance);
+  end=MilliTime();
+  cout << ">> PFitter::ExecuteMinimize(): execution time for Simplex = " << setprecision(3) << (end-start)/1.0e3 << " sec." << endl;
+  TString str = TString::Format("Simplex:  %.3f sec", (end-start)/1.0e3);
+  fElapsedTime.push_back(str);
   if (!min.IsValid()) {
-    cerr << endl << "**WARNING**: PFitter::ExecuteSimplex(): Fit did not converge, sorry ...";
+    cerr << endl << ">> PFitter::ExecuteSimplex(): **WARNING**: Fit did not converge, sorry ...";
     cerr << endl;
     fIsValid = false;
     return false;
@@ -1913,6 +1961,22 @@ Bool_t PFitter::ExecuteSimplex()
     cout << *fFcnMin << endl;
 
   return true;
+}
+
+//--------------------------------------------------------------------------
+// MilliTime
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * <b>return:</b>
+ */
+Double_t PFitter::MilliTime()
+{
+  struct timeval now;
+  gettimeofday(&now, 0);
+
+  return ((Double_t)now.tv_sec * 1.0e6 + (Double_t)now.tv_usec)/1.0e3;
 }
 
 //-------------------------------------------------------------------------------------------------

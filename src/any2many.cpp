@@ -78,10 +78,12 @@ void any2many_syntax()
   cout << endl << "                year, i.e. [yyyy] will result in something like 1999.";
   cout << endl << "          -c <convert-options> : <inFormat> <outFormat>";
   cout << endl << "             <inFormat>  : input data file format. Supported formats are:";
-  cout << endl << "                MusrRoot, PSI-BIN, ROOT (LEM), MUD, NeXus1, NeXus2, PSI-MDU, WKM";
+  cout << endl << "                MusrRoot, PSI-BIN, ROOT (LEM), MUD, NeXus, PSI-MDU, WKM";
   cout << endl << "             <outFormat> : ouput data file format. Supported formats are:";
-  cout << endl << "                PSI-BIN, MusrRoot, MUD, NeXus1-HDF4, NeXus1-HDF5, NeXus1-XML,";
+  cout << endl << "                PSI-BIN, MusrRoot, ROOT, MUD, NeXus1-HDF4, NeXus1-HDF5, NeXus1-XML,";
   cout << endl << "                NeXus2-HDF4, NeXus2-HDF5, NeXus2-XML, WKM, ASCII";
+  cout << endl << "                Comment: ROOT is superseeded by MusrRoot. If there is not a very good";
+  cout << endl << "                reason, avoid it!";
   cout << endl << "          -p <output-path> : where <output-path> is the output path for the";
   cout << endl << "               converted files. If nothing is given, the current directory";
   cout << endl << "               will be used, unless the option '-s' is used.";

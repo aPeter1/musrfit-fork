@@ -6,6 +6,8 @@
 
 changes since 0.11.0
 ===================================
+NEW 2013-01-07 print out the estimated time needed for the Minimize,Minos, etc.
+               both, to the stdout and to the MINUIT2.OUTPUT file.
 NEW 2012-11-19 added a flag in the Fourier block (dc-corrected) which can
                be used to subtract a potential DC-offset before the Fourier
 	       transform is carried out.

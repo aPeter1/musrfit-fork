@@ -108,6 +108,8 @@ class PFitter
 
     PDoublePairVector fOriginalFitRange; ///< keeps the original fit range in case there is a range command in the COMMAND block
 
+    PStringVector fElapsedTime;
+
     // commands
     Bool_t CheckCommands();
     Bool_t SetParameters();
@@ -126,6 +128,8 @@ class PFitter
     Bool_t ExecuteScan();
     Bool_t ExecuteSave(Bool_t first);
     Bool_t ExecuteSimplex();
+
+    Double_t MilliTime();
 };
 
 #endif // _PFITTER_H_

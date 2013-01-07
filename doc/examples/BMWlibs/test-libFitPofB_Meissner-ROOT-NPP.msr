@@ -4,19 +4,19 @@ FITPARAMETER
 #       No Name        Value     Step        Pos_Error   Boundaries
         1 field       94.717    0           none        
         2 deadlayer   10.5      0           none        
-        3 lambda      115.947   -0.91963    none        
+        3 lambda      115.96    -0.92       0.88        
 
 # E = 22keV
 
         4 phase22     25.4956   0           none        
-        5 asym22      0.104724  -0.00293244 none        0       0.3     
-        6 rate22      0.558459  -0.0323891  none        
-        7 NormL22     753.067   -0.86835    none        
-        8 BGL22       51.0796   -0.132894   none        
-        9 NormR22     545.968   -0.762193   none        
-       10 BGR22       38.5992   -0.115679   none        
-       11 relasyR22   1.0697    -0.0377904  none        0.2     2       
-       12 relphaR22   162.711   -1.53722    none        110     210     
+        5 asym22      0.1047    -0.0029     0.0030      0       0.3     
+        6 rate22      0.558     -0.032      0.033       
+        7 NormL22     753.00    -0.87       0.87        
+        8 BGL22       51.08     -0.13       0.13        
+        9 NormR22     545.93    -0.77       0.76        
+       10 BGR22       38.60     -0.12       0.12        
+       11 relasyR22   1.068     -0.038      0.039       0.2     2       
+       12 relphaR22   162.8     -1.5        1.5         110     210     
        13 energy22    22        0           none        
 
        14 one         1         0           none        
@@ -41,11 +41,11 @@ norm            7
 backgr.fit      8
 lifetimecorrection
 map             4    5    6   14   15   13    0    0    0    0
-forward         1       
+forward         1 
 background      65000   66500   
 data            3419    63000   
-t0              3419    
-fit             0.15    10.00   
+t0              3419.0  
+fit             0.15    10     
 packing         150
 
 RUN data/lem09_his_0916 MUE4 PSI ROOT-NPP   (name beamline institute data-file-format)
@@ -54,21 +54,17 @@ norm            9
 backgr.fit      10
 lifetimecorrection
 map             4    5    6   11   12   13    0    0    0    0
-forward         3       
+forward         3 
 background      65000   66500   
 data            3419    63000   
-t0              3419    
-fit             0.15    10.00   
+t0              3419.0  
+fit             0.15    10     
 packing         150
 
 ###############################################################
 COMMANDS
 MINIMIZE
-#HESSE
-#MINOS
-#SCAN 3
-CONTOURS 2 3
-MNPLOT
+MINOS
 SAVE
 
 ###############################################################
@@ -78,13 +74,13 @@ fourier_power    10
 apodization      WEAK    # NONE, WEAK, MEDIUM, STRONG
 plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
 phase            par4
-range            0.00    200.00
+range            0    200
 
 ###############################################################
 PLOT 0   (single histo plot)
 runs     1   2   
-range    0.00   4.00   -0.25   0.25
+range    0   4   -0.25   0.25
 
 ###############################################################
-STATISTIC --- 2010-03-12 11:22:43
-*** FIT DID NOT CONVERGE ***
+STATISTIC --- 2013-01-07 11:11:17
+  chisq = 696.9, NDF = 663, chisq/NDF = 1.051076
