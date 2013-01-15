@@ -1338,10 +1338,6 @@ Bool_t PFitter::ExecuteMinos()
   Double_t start=0.0, end=0.0;
   start=MilliTime();
   ROOT::Minuit2::MnMinos minos((*fFitterFcn), (*fFcnMin));
-  end=MilliTime();
-  cout << ">> PFitter::ExecuteMinimize(): execution time for Minos = " << setprecision(3) << (end-start)/1.0e3 << " sec." << endl;
-  TString str = TString::Format("Minos:    %.3f sec", (end-start)/1.0e3);
-  fElapsedTime.push_back(str);
 
   for (UInt_t i=0; i<fParams.size(); i++) {
     // only try to call minos if the parameter is not fixed!!
@@ -1370,6 +1366,11 @@ Bool_t PFitter::ExecuteMinos()
       fRunInfo->SetMsrParamPosErrorPresent(i, false);
     }
   }
+
+  end=MilliTime();
+  cout << ">> PFitter::ExecuteMinimize(): execution time for Minos = " << setprecision(3) << (end-start)/1.0e3 << " sec." << endl;
+  TString str = TString::Format("Minos:    %.3f sec", (end-start)/1.0e3);
+  fElapsedTime.push_back(str);
 
   return true;
 }

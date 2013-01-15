@@ -1,0 +1,74 @@
+09001 - test
+###############################################################
+FITPARAMETER
+#      Nr. Name       Value     Step      Pos_Error Boundaries   
+        1 Asy         0.2033    -0.0012     0.0012      0       none    
+        2 Rate        0.4981    -0.0061     0.0062      
+        3 Field       200.075   -0.070      0.070       
+        4 N0_L        2048.8    -1.2        1.2         
+        5 Bkg_L       4.98      -0.19       0.19        
+        6 Phase_L     27.21     -0.40       0.40        
+        7 alpha_LR    0.99834   -0.00084    0.00085     
+        8 Bkg_R       5.05      -0.19       0.19        
+        9 Phase_R     206.62    -0.40       0.40        
+
+###############################################################
+THEORY
+asymmetry      1
+simplExpo      2          (rate)
+TFieldCos   map1  fun2       (phase frequency)
+
+###############################################################
+FUNCTIONS
+fun1 = par7 * par4
+fun2 = gamma_mu * par3
+
+###############################################################
+RUN 09001 MUE4 PSI ROOT-NPP   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            4
+backgr.fit      5
+lifetimecorrection
+map             6    0    0    0    0    0    0    0    0    0
+forward         1 2 
+data            3519    66601   
+t0              3519.0  3420.0  
+fit             0       8.2    
+packing         50
+
+RUN 09001 MUE4 PSI ROOT-NPP   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            fun1
+backgr.fit      8
+lifetimecorrection
+map             9    0    0    0    0    0    0    0    0    0
+forward         5 6 
+data            3417    66601   
+t0              3417.0  3518.0  
+fit             0       8.2    
+packing         50
+
+###############################################################
+COMMANDS
+MINIMIZE
+MINOS
+SAVE
+
+###############################################################
+PLOT 0   (single histo plot)
+runs     1   2   
+range    0   8.2   -0.25   0.25
+view_packing 100
+
+###############################################################
+FOURIER
+units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
+fourier_power    9
+apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+plot             REAL    # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            par8
+dc-corrected     true
+
+###############################################################
+STATISTIC --- 2013-01-15 07:05:17
+  chisq = 2199.5, NDF = 1671, chisq/NDF = 1.316259

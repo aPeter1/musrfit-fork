@@ -2,7 +2,8 @@
 
 if BUILD_ASLIBS
   ASDIRS = Nonlocal \
-           MagProximity
+           MagProximity \
+	   libSpinValve
 endif
 
 if BUILD_CUBALIB

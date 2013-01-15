@@ -47,7 +47,7 @@ void analyticFakeData(const TString type)
   gROOT->GetListOfBrowsables()->Add(histosFolder, "histos");
   decayAnaModule = histosFolder->AddFolder("DecayAnaModule", "muSR decay histograms");
 
-  UInt_t runNo = 7001;
+  UInt_t runNo = 9001;
   TString fileName, tstr, label, tstr1;
   fileName.Form("0%d.root", (Int_t)runNo);
 
@@ -164,8 +164,8 @@ void analyticFakeData(const TString type)
   }
 
   // create histos
-  UInt_t n0[8] = {1900.0, 1900.0, 1000.0, 1000.0, 1000.0, 1000.0, 1800.0, 1800.0};
-  UInt_t bkg[8] = {10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0};
+  UInt_t n0[8] = {200.0, 200.0, 200.0, 200.0, 200.0, 200.0, 200.0, 200.0};
+  UInt_t bkg[8] = {1.3, 1.5, 1.0, 1.3, 1.2, 1.1, 1.0, 1.4};
   const Double_t tau = 2197.019; // ns
   // asymmetry related stuff
   const Double_t timeResolution = 0.1953125; // ns
@@ -176,10 +176,10 @@ void analyticFakeData(const TString type)
   Double_t phase[8] = {5.0*TMath::Pi()/180.0, 50.0*TMath::Pi()/180.0, 95.0*TMath::Pi()/180.0, 140.0*TMath::Pi()/180.0,
                        185.0*TMath::Pi()/180.0, 230.0*TMath::Pi()/180.0, 275.0*TMath::Pi()/180.0, 320.0*TMath::Pi()/180.0,};
   const Double_t gamma = 0.0000135538817; // gamma/(2pi)
-  Double_t bb0 = 1000.0; // field in Gauss
+  Double_t bb0 = 200.0; // field in Gauss
   Double_t bb1 = 400.0; // field in Gauss
-  Double_t sigma0 = 0.05/1000.0; // Gaussian sigma in 1/ns
-  Double_t sigma1 = 0.15/1000.0; // Gaussian sigma in 1/ns
+  Double_t rate0 = 0.5/1000.0; // in 1/ns
+  Double_t rate1 = 0.15/1000.0; // in 1/ns
 
   TH1F *histo[16];
   char str[128];
@@ -203,16 +203,14 @@ void analyticFakeData(const TString type)
         histo[i]->SetBinContent(j+1, bkg[i]);
       } else {
         time = (Double_t)(j-t0[i])*timeResolution;
-//        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a0[i]*TMath::Exp(-0.5*TMath::Power(time*sigma0,2.0))*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i])
-//                                                         +a1[i]*TMath::Exp(-0.5*TMath::Power(time*sigma1,2.0))*TMath::Cos(TMath::TwoPi()*gamma*bb1*time+phase[i]))+(Double_t)bkg[i];
-        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a0[i]*TMath::BesselJ0(TMath::TwoPi()*gamma*bb0*time+phase[i])*TMath::Exp(-time*sigma0))+(Double_t)bkg[i];
+        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a0[i]*TMath::Exp(-time*rate0)*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i]))+(Double_t)bkg[i];
         histo[i]->SetBinContent(j+1, (UInt_t)dval);
       }
     }
   }
 
   // add a promp peak
-  Double_t ampl = 1000.0;
+  Double_t ampl = 0.0;
   Double_t promptLambda = 500.0/1000.0; // Lorentzain in 1/ns
   for (UInt_t i=0; i<8; i++) {
     for (UInt_t j=1; j<66601; j++) {
