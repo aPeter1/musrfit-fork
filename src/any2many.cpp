@@ -87,7 +87,7 @@ void any2many_syntax()
   cout << endl << "          -p <output-path> : where <output-path> is the output path for the";
   cout << endl << "               converted files. If nothing is given, the current directory";
   cout << endl << "               will be used, unless the option '-s' is used.";
-  cout << endl << "          -y <year> : if the option -y is used, here a year in the form 'yy' can";
+  cout << endl << "          -y <year> : if the option -y is used, here a year in the form 'yy' or 'yyyy' can";
   cout << endl << "                be given, if this is the case, any automatic file name";
   cout << endl << "                generation needs a year, this number will be used.";
   cout << endl << "          -s : with this option the output data file will be sent to the stdout.";
@@ -214,6 +214,12 @@ int main(int argc, char *argv[])
 
     if (!strcmp(argv[i], "-y")) { // handle year option
       if (i+1 < argc) {
+        // check that date if it is either of the form 'yy' or 'yyyy'
+        if ((strlen(argv[i+1]) != 2) && (strlen(argv[i+1]) != 4)) {
+          cerr << endl << ">> any2many **ERROR** found in option '-y' the argument '" << argv[i+1] << "' which is neither of the form 'yy' nor 'yyyy'." << endl;
+          show_syntax = true;
+          break;
+        }
         ival=0;
         status = sscanf(argv[i+1], "%d", &ival);
         if (status == 1) {

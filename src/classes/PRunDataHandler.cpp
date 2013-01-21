@@ -257,7 +257,6 @@ void PRunDataHandler::ReadData()
     else
       fAllDataAvailable = true;
   } else if (!fRunPathName.IsWhitespace()) { // i.e. file name triggered
-    cerr << endl << "debug>> fFileFormat=\"" << fFileFormat << "\"" << endl;
     if ((fFileFormat == "MusrRoot") || (fFileFormat == "musrroot")) {
       fAllDataAvailable = ReadRootFile();
     } else if ((fFileFormat == "NeXus") || (fFileFormat == "nexus")) {
@@ -497,8 +496,6 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
         success = ReadRootFile();
         break;
       case A2M_PSIBIN:
-        success = ReadPsiBinFile();
-        break;
       case A2M_PSIMDU:
         success = ReadPsiBinFile();
         break;
@@ -580,6 +577,9 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
         cerr << endl << ">> PRunDataHandler::ReadWriteFilesList(): **ERROR** Couldn't write converted output file." << endl;
         return false;
       }
+
+      // throw away the current data set
+      fData.clear();
     }
   }
 
@@ -600,8 +600,6 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
         success = ReadRootFile();
         break;
       case A2M_PSIBIN:
-        success = ReadPsiBinFile();
-        break;
       case A2M_PSIMDU:
         success = ReadPsiBinFile();
         break;
@@ -1261,8 +1259,6 @@ Bool_t PRunDataHandler::FileExistsCheck(const TString fileName)
 
   fRunPathName = pathName;
 
-  cerr << endl << "debug-> fRunPathName=" << fRunPathName << endl;
-
   return true;
 }
 
@@ -1716,7 +1712,7 @@ Bool_t PRunDataHandler::ReadRootFile()
       else if (!prop.GetUnit().CompareTo("us") || !prop.GetUnit().CompareTo("microsec"))
         dval = prop.GetValue()*1.0e3;
       else
-        cerr << endl << "debug> Found unrecognized Time Resolution unit: " << prop.GetUnit();
+        cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Found unrecognized Time Resolution unit: " << prop.GetUnit() << endl;
       runData.SetTimeResolution(dval);
     }
 
@@ -5957,87 +5953,77 @@ TString PRunDataHandler::GetFileName(const TString extension, Bool_t &ok)
 TString PRunDataHandler::FileNameFromTemplate(TString &fileNameTemplate, Int_t run, TString &year, Bool_t &ok)
 {
   TString result("");
-  TString str = fileNameTemplate;
 
-  Int_t tag = 0;
-  Int_t yearStart = -1;
-  Int_t yearLength = 0;
-  Int_t runStart = -1;
-  Int_t runLength = 0;
+  TObjArray *tok=0;
+  TObjString *ostr;
+  TString str;
 
-  // find position and length of the year tag
-  Bool_t foundLeft = false, foundRight = false;
-  for (Int_t i=0; i<str.Length(); i++) {
+  // check year string
+  if ((year.Length() != 2) && (year.Length() != 4)) {
+    cerr << endl << ">> PRunDataHandler::FileNameFromTemplate: **ERROR** year needs to be of the format";
+    cerr << endl << ">>    'yy' or 'yyyy', found " << year << endl;
+    return result;
+  }
 
-    if (str[i] == '[') {
-      foundLeft = true;
-      tag = 1;
-      continue;
-    } else if (str[i] == ']') {
-      foundRight = true;
-      tag = 0;
-      continue;
-    }
+  // make a short year version 'yy' and a long year version 'yyyy'
+  TString yearShort="", yearLong="";
+  if (year.Length() == 2) {
+    yearShort = year;
+    yearLong = "20" ;
+    yearLong += year;
+  } else {
+    yearShort = year[2];
+    yearShort += year[3];
+    yearLong = year;
+  }
 
-    if (tag == 1) {
-      if (str[i] == 'y') {
-        if (yearStart == -1)
-          yearStart = i-1;
-        yearLength++;
+  // tokenize template string
+  tok = fileNameTemplate.Tokenize("[]");
+  if (tok == 0) {
+    cerr << endl << ">> PRunDataHandler::FileNameFromTemplate: **ERROR** couldn't tokenize template!" << endl;
+    return result;
+  }
+  if (tok->GetEntries()==1) {
+    cerr << endl << ">> PRunDataHandler::FileNameFromTemplate: **WARNING** template without tags." << endl;
+  }
+
+  // go through the tokens and generate the result string
+  for (Int_t i=0; i<tok->GetEntries(); i++) {
+    ostr = (TObjString*)tok->At(i);
+    str = ostr->GetString();
+
+    // check tokens
+    if (!str.CompareTo("yy", TString::kExact)) { // check for 'yy'
+      result += yearShort;
+    } else if (!str.CompareTo("yyyy", TString::kExact)) { // check for 'yyyy'
+      result += yearLong;
+    } else if (str.Contains("rr")) { // check for run
+      // make sure ONLY 'r' are present
+      Int_t idx;
+      for (idx=0; idx<str.Length(); idx++) {
+        if (str[idx] != 'r')
+          break;
       }
+      if (idx == str.Length()) { // 'r' only
+        TString runStr("");
+        char fmt[128];
+        sprintf(fmt , "%%0%dd", str.Length());
+        runStr.Form(fmt, run);
+        result += runStr;
+      } else { // not only 'r'
+        result += str;
+      }
+    } else { // all parts which are NOT tags
+      result += str;
     }
   }
 
-  if ((yearStart != -1) && (yearLength != 0)) {
-    yearLength += 2; // including the []
-    str.Replace(yearStart, yearLength, year);
-    ok = true;
-  }
+  // clean up
+  if (tok)
+    delete tok;
 
-  if (foundLeft && !foundRight)
-    ok = false;
-  else
-    ok = true;
-
-  if (ok) {
-    // find position and length of the run tag
-    foundLeft = false, foundRight = false;
-    for (Int_t i=0; i<str.Length(); i++) {
-      if (str[i] == '[') {
-        foundLeft = true;
-        tag = 1;
-        continue;
-      } else if (str[i] == ']') {
-        foundRight = true;
-        tag = 0;
-        continue;
-      }
-
-      if (tag == 1) {
-        if (str[i] == 'r') {
-          if (runStart == -1)
-            runStart = i-1;
-          runLength++;
-        }
-      }
-    }
-
-    if ((runStart == -1) || (runLength == 0)) {
-      cerr << endl << ">> PRunDataHandler::FileNameFromTemplate(): **ERROR** run template not ok." << endl;
-      ok = false;
-    } else {
-      TString runStr("");
-      char fmt[128];
-      sprintf(fmt , "%%0%dd", runLength);
-      runStr.Form(fmt, run);
-      runLength += 2; // including the []
-      str.Replace(runStart, runLength, runStr);
-      ok = true;
-    }
-  }
-
-  if (ok)
-    result = str;
+  // everything fine here
+  ok = true;
 
   return result;
 }

@@ -29,6 +29,8 @@ NEW 2012-05-12 added dump_header. This is a little program which dumps the
 NEW 2012-04-24 added a first version for negative muon fitting. At the same 
                time substaintial bug fixing has been carried out (mainly the
 	       logx/logy handling).
+FIXED 2013-01-21 fixed any2many bug concerning input file lists as described
+                 in MUSR-247. Rewrote the template browser.
 FIXED 2012-12-18 fixed a shortcoming of the outdated TLemRunHeader class
                  (see MUSR-246).
 FIXED 2012-11-19 fixes issue with too many t0's in the msr-file (see
