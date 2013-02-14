@@ -37,6 +37,7 @@
 #include <omp.h>
 #endif
 
+#include <cmath>
 #include <iostream>
 #include <fstream>
 using namespace std;
@@ -810,6 +811,10 @@ Bool_t PRunSingleHisto::PrepareData()
  */
 Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoNo)
 {
+  if (fMsrInfo->EstimateN0()) {
+    EstimateN0();
+  }
+
   // transform raw histo data. This is done the following way (for details see the manual):
   // for the single histo fit, just the rebinned raw data are copied
 
@@ -1396,6 +1401,68 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
   par.clear();
 
   return true;
+}
+
+//--------------------------------------------------------------------------
+// EstimateN0 (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Estimate the N0 for the given run.
+ */
+void PRunSingleHisto::EstimateN0()
+{
+  // check that 'norm' in the msr-file run block is indeed a parameter number.
+  // in case it is a function, nothing will be done.
+  UInt_t paramNo = fRunInfo->GetNormParamNo();
+  if (paramNo > 10000) // i.e. fun or map
+    return;
+
+  // still missing: set this value in the parameters
+  PMsrParamList *param = fMsrInfo->GetMsrParamList();
+  assert(param);
+
+  if (paramNo > param->size()) {
+    cerr << endl << ">> PRunSingleHisto::EstimateN0: **ERROR** found parameter number " << paramNo << ", which is larger than the number of parameters = " << param->size() << endl;
+    return;
+  }
+
+  // estimate N0
+  Double_t dt = fTimeResolution;
+  Double_t tau = PMUON_LIFETIME;
+
+  UInt_t t0 = (UInt_t)round(fT0s[0]);
+  Double_t alpha = fMsrInfo->GetAlphaEstimateN0();
+  Double_t dval = 0.0;
+  Double_t nom = 0.0;
+  Double_t denom = 0.0;
+  Double_t xx = 0.0;
+
+  // calc nominator
+  for (UInt_t i=t0; i<fForward.size(); i++) {
+    xx = exp(-dt*(Double_t)(i-t0)/tau);
+    xx += alpha;
+    nom += xx;
+  }
+
+  // calc: denominator
+  for (UInt_t i=t0; i<fForward.size(); i++) {
+    xx = exp(-dt*(Double_t)(i-t0)/tau);
+    xx += alpha;
+    dval = fForward[i];
+    if (dval > 0)
+      denom += xx*xx/dval;
+  }
+  Double_t N0 = nom/denom;
+
+  if (fScaleN0AndBkg) {
+    N0 /= fTimeResolution*1.0e3;
+  } else {
+    N0 *= fRunInfo->GetPacking();
+  }
+
+  cout << ">> PRunSingleHisto::EstimateN0: found N0=" << param->at(paramNo-1).fValue << ", will set it to N0=" << N0 << endl;
+  fMsrInfo->SetMsrParamValue(paramNo-1, N0);
+  fMsrInfo->SetMsrParamStep(paramNo-1, sqrt(fabs(N0)));
 }
 
 //--------------------------------------------------------------------------

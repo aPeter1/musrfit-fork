@@ -6,6 +6,11 @@
 
 changes since 0.11.0
 ===================================
+NEW 2013-02-14 (i) adding t0 estimate for single histogram fits. The estimate
+               procedure is documented under doc/memos/estimateN0.
+	       (ii) adding a more flexible preference handling in musredit.
+	       Likely it will not ported anymore to musrgui.
+	       (iii) adding 'recent files' to musredit.
 NEW 2013-01-15 adding an external spin valve related library, currently
                only containing a skewed Lorentzian.
 NEW 2013-01-07 print out the estimated time needed for the Minimize,Minos, etc.

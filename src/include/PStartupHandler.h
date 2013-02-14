@@ -75,14 +75,16 @@ class PStartupHandler : public TObject, public TQObject
 
     virtual void CheckLists();
 
-    virtual const Bool_t         GetWritePerRunBlockChisq() { return fWritePerRunBlockChisq; } ///< returns the write_per_run_block_chisq flag
-    virtual PMsrFourierStructure GetFourierDefaults() { return fFourierDefaults; } ///< returns the Fourier defaults
-    virtual const PStringVector  GetDataPathList() const { return fDataPathList; } ///< returns the search data path list
-    virtual const PIntVector     GetMarkerList() const { return fMarkerList; }     ///< returns the marker list
-    virtual const PIntVector     GetColorList() const { return fColorList; }       ///< returns the color list
+    virtual PStartupOptions* GetStartupOptions() { return &fStartupOptions; } ///< returns the startup options
+    virtual PMsrFourierStructure  GetFourierDefaults() { return fFourierDefaults; } ///< returns the Fourier defaults
+    virtual const PStringVector   GetDataPathList() const { return fDataPathList; } ///< returns the search data path list
+    virtual const PIntVector      GetMarkerList() const { return fMarkerList; }     ///< returns the marker list
+    virtual const PIntVector      GetColorList() const { return fColorList; }       ///< returns the color list
+
+    virtual void SetStartupOptions(const PStartupOptions opt) { fStartupOptions = opt; }
 
   private:
-    enum EKeyWords {eEmpty, eComment, eDataPath, eWritePerRunBlockChisq,
+    enum EKeyWords {eEmpty, eComment, eDataPath, eOptions, eWritePerRunBlockChisq, eEstimateN0, eAlphaEstimateN0,
                     eFourierSettings, eUnits, eFourierPower, eApodization, ePlot, ePhase, ePhaseIncrement,
                     eRootSettings, eMarkerList, eMarker, 
                     eColorList, eColor};
@@ -90,11 +92,11 @@ class PStartupHandler : public TObject, public TQObject
 
     Bool_t               fStartupFileFound; ///< startup file found flag
     TString              fStartupFilePath;  ///< full musrfit_startup.xml startup file paths
-    Bool_t               fWritePerRunBlockChisq; ///< flag showing if per run block chisq and the expected chisq shall be written to the msr-file
     PMsrFourierStructure fFourierDefaults;  ///< Fourier defaults
     PStringVector        fDataPathList;     ///< search data path list
     PIntVector           fMarkerList;       ///< marker list
     PIntVector           fColorList;        ///< color list
+    PStartupOptions      fStartupOptions;   ///< collects all startup options which will be requested by PMsrFileHandler
 
     Bool_t StartupFileExists(Char_t *fln);
 

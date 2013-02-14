@@ -39,7 +39,7 @@ using namespace std;
 
 /**
  * <p>musredit is a simple editor based interface to the musrfit programs. It is based on Qt 4.6
- * of Nokia (<code>http://qt.nokia.com</code>).
+ * of Digia (<code>http://qt.digia.com</code> and <code>http://qt-project.org/</code>).
  *
  * <p>musredit is free software liensenced under GPL 2 or later (for detail license informations see
  * <code>http://www.gnu.org/licenses</code>).
@@ -64,11 +64,12 @@ int main( int argc, char ** argv )
 
   QApplication a( argc, argv );
 
-  PTextEdit * mw = new PTextEdit();
+  PTextEdit *mw = new PTextEdit();
   mw->setWindowTitle( "MusrFit Editor" );
   mw->resize( 800, 800 );
   mw->show();
 
   a.connect( &a, SIGNAL( lastWindowClosed() ), &a, SLOT( quit() ) );
+  a.connect( &a, SIGNAL( aboutToQuit() ), mw, SLOT( aboutToQuit() ) );
   return a.exec();
 }

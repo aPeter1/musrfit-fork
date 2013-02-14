@@ -10,7 +10,7 @@
 *****************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2010 by Andreas Suter                                   *
+ *   Copyright (C) 2010-2013 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -102,11 +102,6 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
   fMsr2DataParam = 0;
   fFindReplaceData = 0,
 
-  fKeepMinuit2Output = false;
-  fTitleFromDataFile = fAdmin->getTitleFromDataFileFlag();
-  fEnableMusrT0      = fAdmin->getEnableMusrT0Flag();
-  fDump = 0; // 0 = no dump, 1 = ascii dump, 2 = root dump
-
   // setup menus
   setupFileActions();
   setupEditActions();
@@ -140,9 +135,10 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>Destructor
+ * <p>This slot is called if the main application is on the way to quit. This ensures that allocated
+ * memory indeed can be free'd.
  */
-PTextEdit::~PTextEdit()
+void PTextEdit::aboutToQuit()
 {
   if (fAdmin) {
     delete fAdmin;
@@ -160,12 +156,6 @@ PTextEdit::~PTextEdit()
     delete fFindReplaceData;
     fFindReplaceData = 0;
   }
-/*
-  if (fFileWatcher) {
-    delete fFileWatcher;
-    fFileWatcher = 0;
-  }
-*/
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -197,11 +187,24 @@ void PTextEdit::setupFileActions()
   tb->addAction(a);
   menu->addAction(a);
 
+  fRecentFilesMenu = menu->addMenu( tr("Recent Files") );
+  for (int i=0; i<MAX_RECENT_FILES; i++) {
+    fRecentFilesAction[i] = new QAction(fRecentFilesMenu);
+    fRecentFilesAction[i]->setVisible(false);
+    connect( fRecentFilesAction[i], SIGNAL(triggered()), this, SLOT(fileOpenRecent()));
+    fRecentFilesMenu->addAction(fRecentFilesAction[i]);
+  }
+  fillRecentFiles();
+
   a = new QAction( QIcon( QPixmap(":/images/filereload.xpm") ), tr( "Reload..." ), this );
   a->setShortcut( tr("F5") );
   a->setStatusTip( tr("Reload msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( fileReload() ) );
   tb->addAction(a);
+  menu->addAction(a);
+
+  a = new QAction( tr( "Open Prefs..." ), this);
+  connect( a, SIGNAL( triggered() ), this, SLOT( fileOpenPrefs() ) );
   menu->addAction(a);
 
   menu->addSeparator();
@@ -216,6 +219,10 @@ void PTextEdit::setupFileActions()
   a = new QAction( tr( "Save &As..." ), this );
   a->setStatusTip( tr("Save msr-file As") );
   connect( a, SIGNAL( triggered() ), this, SLOT( fileSaveAs() ) );
+  menu->addAction(a);
+
+  a = new QAction( tr( "Save Prefs..." ), this );
+  connect( a, SIGNAL( triggered() ), this, SLOT( fileSavePrefs() ) );
   menu->addAction(a);
 
   menu->addSeparator();
@@ -446,7 +453,6 @@ void PTextEdit::setupTextActions()
            this, SLOT( textFamily( const QString & ) ) );
   QLineEdit *edit = fComboFont->lineEdit();
   if (edit == 0) {
-//    qDebug() << endl << "**ERROR** PTextEdit::setupTextActions(): cannot edit fComboFont" << endl;
     return;
   }
   edit->setText( fAdmin->getFontName() );
@@ -462,7 +468,6 @@ void PTextEdit::setupTextActions()
            this, SLOT( textSize( const QString & ) ) );
   edit = fComboSize->lineEdit();
   if (edit == 0) {
-//    qDebug() << endl << "**ERROR** PTextEdit::setupTextActions(): cannot edit fComboSize" << endl;
     return;
   }
   edit->setText( QString("%1").arg(fAdmin->getFontSize()) );
@@ -545,7 +550,7 @@ void PTextEdit::setupMusrActions()
   connect( fMusrT0Action, SIGNAL( triggered() ), this, SLOT( musrT0() ) );
   tb->addAction(fMusrT0Action);
   menu->addAction(fMusrT0Action);
-  fMusrT0Action->setEnabled(fEnableMusrT0);
+  fMusrT0Action->setEnabled(fAdmin->getEnableMusrT0Flag());
 
   a = new QAction( QIcon( QPixmap( ":/images/musrprefs.xpm" ) ), tr( "&Preferences" ), this );
   a->setStatusTip( tr("Show Preferences") );
@@ -614,6 +619,10 @@ void PTextEdit::load( const QString &f, const int index )
   QFile file( f );
   if ( !file.open( QIODevice::ReadOnly ) )
     return;
+
+  // add file name to recent file names
+  fAdmin->addRecentFile(f); // keep it in admin
+  fillRecentFiles();        // update menu
 
   // add the msr-file to the file system watchersssss
   fFileSystemWatcher->addPath(f);
@@ -853,7 +862,6 @@ void PTextEdit::fileOpen()
     finfo1.setFile(*it);
     for (int i=0; i<fTabWidget->count(); i++) {
       tabFln = *fFilenames.find( dynamic_cast<PSubTextEdit*>(fTabWidget->widget(i)));
- //     qDebug() << endl << "tabFln=" << tabFln;
       finfo2.setFile(tabFln);
       if (finfo1.absoluteFilePath() == finfo2.absoluteFilePath()) {
         alreadyOpen = true;
@@ -873,6 +881,37 @@ void PTextEdit::fileOpen()
 
 //----------------------------------------------------------------------------------------------------
 /**
+ * <p>This slot will open the file from the recent file list. If already open, it will reload it.
+ */
+void PTextEdit::fileOpenRecent()
+{
+  QAction *action = qobject_cast<QAction *>(sender());
+  if (action) {
+    // check if this file is already open and if so, switch the tab
+    QFileInfo finfo1, finfo2;
+    QString tabFln;
+    bool alreadyOpen = false;
+    finfo1.setFile(action->text());
+
+    for (int i=0; i<fTabWidget->count(); i++) {
+      tabFln = *fFilenames.find( dynamic_cast<PSubTextEdit*>(fTabWidget->widget(i)));
+      finfo2.setFile(tabFln);
+      if (finfo1.absoluteFilePath() == finfo2.absoluteFilePath()) {
+        alreadyOpen = true;
+        fTabWidget->setCurrentIndex(i);
+        break;
+      }
+    }
+
+    if (!alreadyOpen)
+      load(action->text());
+    else
+      fileReload();
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
  * <p>Will reload the currently selected msr-file.
  */
 void PTextEdit::fileReload()
@@ -885,6 +924,20 @@ void PTextEdit::fileReload()
     fileClose(false);
     load(fln, index);
   }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>Will save the currently selected file.
+ */
+void PTextEdit::fileOpenPrefs()
+{
+  QString fln = QFileDialog::getOpenFileName( this, tr("Open Prefs"),
+                        fLastDirInUse,
+                        tr( "xml-Files (*.xml);; All Files (*)" ));
+
+  if (fAdmin->loadPrefs(fln))
+    QMessageBox::information(0, "Prefs", "<b>Prefs Loaded.</b>");
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -938,6 +991,21 @@ void PTextEdit::fileSaveAs()
   }
 
   fileSystemWatcherActivation(); // delayed activation of fFileSystemWatcherActive
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>Will save the current preferences.
+ */
+void PTextEdit::fileSavePrefs()
+{
+  QString fn = QFileDialog::getSaveFileName( this,
+                    tr( "Save Prefs As" ), "musredit_startup.xml",
+                    tr( "xml-Files (*.xml);;All Files (*)" ) );
+
+  if ( !fn.isEmpty() ) {
+    fAdmin->savePrefs(fn);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1349,18 +1417,22 @@ void PTextEdit::editFindAndReplace()
   delete dlg;
   dlg = 0;
 
-  editFindNext();
+  if (fFindReplaceData->promptOnReplace)  {
+    editFindNext();
 
-  PReplaceConfirmationDialog confirmDlg(this);
+    PReplaceConfirmationDialog confirmDlg(this);
 
-  // connect all the necessary signals/slots
-  QObject::connect(confirmDlg.fReplace_pushButton, SIGNAL(clicked()), this, SLOT(replace()));
-  QObject::connect(confirmDlg.fReplaceAndClose_pushButton, SIGNAL(clicked()), this, SLOT(replaceAndClose()));
-  QObject::connect(confirmDlg.fReplaceAll_pushButton, SIGNAL(clicked()), this, SLOT(replaceAll()));
-  QObject::connect(confirmDlg.fFindNext_pushButton, SIGNAL(clicked()), this, SLOT(editFindNext()));
-  QObject::connect(this, SIGNAL(close()), &confirmDlg, SLOT(accept()));
+    // connect all the necessary signals/slots
+    QObject::connect(confirmDlg.fReplace_pushButton, SIGNAL(clicked()), this, SLOT(replace()));
+    QObject::connect(confirmDlg.fReplaceAndClose_pushButton, SIGNAL(clicked()), this, SLOT(replaceAndClose()));
+    QObject::connect(confirmDlg.fReplaceAll_pushButton, SIGNAL(clicked()), this, SLOT(replaceAll()));
+    QObject::connect(confirmDlg.fFindNext_pushButton, SIGNAL(clicked()), this, SLOT(editFindNext()));
+    QObject::connect(this, SIGNAL(close()), &confirmDlg, SLOT(accept()));
 
-  confirmDlg.exec();
+    confirmDlg.exec();
+  } else {
+    replaceAll();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1667,25 +1739,39 @@ void PTextEdit::musrFit()
   cmd.append(QFileInfo(*fFilenames.find( currentEditor())).fileName() );
 
   // check if keep minuit2 output is wished
-  if (fKeepMinuit2Output)
+  if (fAdmin->getKeepMinuit2OutputFlag())
     cmd.append("--keep-mn2-output");
 
   // check if title of the data file should be used to replace the msr-file title
-  if (fTitleFromDataFile)
+  if (fAdmin->getTitleFromDataFileFlag())
     cmd.append("--title-from-data-file");
 
   // check if dump files are wished
-  switch (fDump) {
-    case 1: // ascii dump
-      cmd.append("--dump");
-      cmd.append("ascii");
-      break;
-    case 2: // root dump
-      cmd.append("--dump");
-      cmd.append("root");
-      break;
-    default:
-      break;
+  if (fAdmin->getDumpAsciiFlag()) {
+    cmd.append("--dump");
+    cmd.append("ascii");
+  }
+  if (fAdmin->getDumpRootFlag()) {
+    cmd.append("--dump");
+    cmd.append("root");
+  }
+
+  // check estimate N0 flag
+  if (fAdmin->getEstimateN0Flag()) {
+    cmd.append("--estimateN0");
+    cmd.append("yes");
+  } else {
+    cmd.append("--estimateN0");
+    cmd.append("no");
+  }
+
+  // check per-run-block-chisq flag
+  if (fAdmin->getChisqPerRunBlockFlag()) {
+    cmd.append("--per-run-block-chisq");
+    cmd.append("yes");
+  } else {
+    cmd.append("--per-run-block-chisq");
+    cmd.append("no");
   }
 
   // add timeout
@@ -1756,8 +1842,8 @@ void PTextEdit::musrMsr2Data()
   }
 
   // init fMsr2DataParam
-  fMsr2DataParam->keepMinuit2Output = fKeepMinuit2Output;
-  fMsr2DataParam->titleFromDataFile = fTitleFromDataFile;
+  fMsr2DataParam->keepMinuit2Output = fAdmin->getKeepMinuit2OutputFlag();
+  fMsr2DataParam->titleFromDataFile = fAdmin->getTitleFromDataFileFlag();
 
   PMsr2DataDialog *dlg = new PMsr2DataDialog(fMsr2DataParam, fAdmin->getHelpUrl("msr2data"));
 
@@ -1775,8 +1861,8 @@ void PTextEdit::musrMsr2Data()
     int i, end;
 
     fMsr2DataParam = dlg->getMsr2DataParam();
-    fKeepMinuit2Output = fMsr2DataParam->keepMinuit2Output;
-    fTitleFromDataFile = fMsr2DataParam->titleFromDataFile;
+    fAdmin->setKeepMinuit2OutputFlag(fMsr2DataParam->keepMinuit2Output);
+    fAdmin->setTitleFromDataFileFlag(fMsr2DataParam->titleFromDataFile);
 
     // analyze parameters
     switch (dlg->getRunTag()) {
@@ -1942,8 +2028,6 @@ void PTextEdit::musrMsr2Data()
     if (fMsr2DataParam->recreateDbFile) {
       cmd.append("new");
     }
-
-//   qDebug() << endl << ">> " << cmd << endl;
 
     PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath(), cmd);
     fitOutputHandler.setModal(true);
@@ -2145,19 +2229,31 @@ void PTextEdit::musrT0()
  */
 void PTextEdit::musrPrefs()
 {
-  PPrefsDialog *dlg = new PPrefsDialog(fKeepMinuit2Output, fDump, fTitleFromDataFile, fEnableMusrT0, fAdmin->getTimeout());
+  PPrefsDialog *dlg = new PPrefsDialog(fAdmin);
+
   if (dlg == 0) {
     QMessageBox::critical(this, "**ERROR** musrPrefs", "Couldn't invoke Preferences Dialog.");
     return;
   }
 
   if (dlg->exec() == QDialog::Accepted) {
-    fKeepMinuit2Output = dlg->getKeepMinuit2OutputFlag();
-    fTitleFromDataFile = dlg->getTitleFromDataFileFlag();
-    fEnableMusrT0 = dlg->getEnableMusrT0Flag();
-    fMusrT0Action->setEnabled(fEnableMusrT0);
-    fDump = dlg->getDump();
+    fAdmin->setKeepMinuit2OutputFlag(dlg->getKeepMinuit2OutputFlag());
+    fAdmin->setTitleFromDataFileFlag(dlg->getTitleFromDataFileFlag());
+    fAdmin->setEnableMusrT0Flag(dlg->getEnableMusrT0Flag());
+    fMusrT0Action->setEnabled(fAdmin->getEnableMusrT0Flag());
+    if (dlg->getDump() == 1) {
+      fAdmin->setDumpAsciiFlag(true);
+      fAdmin->setDumpRootFlag(false);
+    } else if (dlg->getDump() == 2) {
+      fAdmin->setDumpAsciiFlag(false);
+      fAdmin->setDumpRootFlag(true);
+    } else {
+      fAdmin->setDumpAsciiFlag(false);
+      fAdmin->setDumpRootFlag(false);
+    }
     fAdmin->setTimeout(dlg->getTimeout());
+    fAdmin->setChisqPerRunBlockFlag(dlg->getKeepRunPerBlockChisqFlag());
+    fAdmin->setEstimateN0Flag(dlg->getEstimateN0Flag());
   }
 
   delete dlg;
@@ -2463,7 +2559,7 @@ void PTextEdit::fileChanged(const QString &fileName)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>.Delayed reactivation of file system watcher, needed when saving files. At the moment the delay
+ * <p>Delayed reactivation of file system watcher, needed when saving files. At the moment the delay
  * is set to 2000 ms.
  */
 void PTextEdit::fileSystemWatcherActivation()
@@ -2476,12 +2572,24 @@ void PTextEdit::fileSystemWatcherActivation()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>.slot needed to reactivate the file system watcher. It is called by PTextEdit::fileSystemWatcherActivation()
+ * <p>slot needed to reactivate the file system watcher. It is called by PTextEdit::fileSystemWatcherActivation()
  * after some given timeout.
  */
 void PTextEdit::setFileSystemWatcherActive()
 {
   fFileSystemWatcherActive = true;
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>fill the recent file list in the menu.
+ */
+void PTextEdit::fillRecentFiles()
+{
+  for (int i=0; i<fAdmin->getNumRecentFiles(); i++) {
+    fRecentFilesAction[i]->setText(fAdmin->getRecentFile(i));
+    fRecentFilesAction[i]->setVisible(true);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

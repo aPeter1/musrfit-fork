@@ -166,7 +166,9 @@ void PStartupHandler::OnStartDocument()
   fFourierDefaults.fPlotRange[1] = -1.0;
   fFourierDefaults.fPhaseIncrement = 1.0;
 
-  fWritePerRunBlockChisq = false;
+  fStartupOptions.writeExpectedChisq = false;
+  fStartupOptions.estimateN0 = true;
+  fStartupOptions.alphaEstimateN0 = 0.0;
 }
 
 //--------------------------------------------------------------------------
@@ -197,6 +199,10 @@ void PStartupHandler::OnStartElement(const Char_t *str, const TList *attributes)
     fKey = eDataPath;
   } else if (!strcmp(str, "write_per_run_block_chisq")) {
     fKey = eWritePerRunBlockChisq;
+  } else if (!strcmp(str, "estimate_n0")) {
+    fKey = eEstimateN0;
+  } else if (!strcmp(str, "alpha_estimate_n0")) {
+    fKey = eAlphaEstimateN0;
   } else if (!strcmp(str, "marker")) {
     fKey = eMarker;
   } else if (!strcmp(str, "color")) {
@@ -254,7 +260,17 @@ void PStartupHandler::OnCharacters(const Char_t *str)
     case eWritePerRunBlockChisq:
       tstr = TString(str);
       if (tstr.BeginsWith("y") || tstr.BeginsWith("Y"))
-        fWritePerRunBlockChisq = true;
+        fStartupOptions.writeExpectedChisq = true;
+      break;
+    case eEstimateN0:
+      tstr = TString(str);
+      if (tstr.BeginsWith("n") || tstr.BeginsWith("N"))
+        fStartupOptions.estimateN0 = false;
+      break;
+    case eAlphaEstimateN0:
+      tstr = TString(str);
+      if (tstr.IsFloat())
+        fStartupOptions.alphaEstimateN0 = tstr.Atof();
       break;
     case eMarker:
       // check that str is a number

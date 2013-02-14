@@ -1,0 +1,177 @@
+% $Id$
+\documentclass[twoside]{article}
+
+\usepackage[english]{babel}
+\usepackage{a4}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{xspace}
+\usepackage{rotating}
+\usepackage{dcolumn}
+
+\setlength{\topmargin}{10mm}
+\setlength{\topmargin}{-13mm}
+% \setlength{\oddsidemargin}{0.5cm}
+% \setlength{\evensidemargin}{0cm}
+\setlength{\oddsidemargin}{1cm}
+\setlength{\evensidemargin}{1cm}
+\setlength{\textwidth}{14.5cm}
+\setlength{\textheight}{23.8cm}
+
+\def\mathbi#1{\textbf{\em #1}}
+
+\pagestyle{fancyplain}
+\addtolength{\headwidth}{0.6cm}
+\fancyhead{}%
+\fancyhead[RE,LO]{\bf Estimate $\mathbi{N}_0$}%
+\fancyhead[LE,RO]{\thepage}
+\cfoot{--- Andreas Suter -- \today ---}
+\rfoot{\includegraphics[width=6.4cm]{PSI_Logo_wide_blau.pdf}}
+
+\DeclareMathAlphabet{\bi}{OML}{cmm}{b}{it}
+
+\newcommand{\mean}[1]{\langle #1 \rangle}
+\newcommand{\lem}{LE-$\mu$SR\xspace}
+\newcommand{\musr}{$\mu$SR\xspace}
+\newcommand{\etal}{\emph{et al.\xspace}}
+\newcommand{\ie}{\emph{i.e.\xspace}}
+\newcommand{\eg}{\emph{e.g.\xspace}}
+
+\newcolumntype{d}[1]{D{.}{.}{#1}}
+
+\begin{document}
+
+% Header info --------------------------------------------------
+\thispagestyle{empty}
+\noindent
+\begin{tabular}{@{\hspace{-0.7cm}}l@{\hspace{6cm}}r}
+\noindent\includegraphics[width=3.4cm]{PSI_Logo_narrow_blau.jpg} &
+  {\Huge\sf Memorandum}
+\end{tabular}
+%
+\vskip 1cm
+%
+\begin{tabular}{@{\hspace{-0.5cm}}ll@{\hspace{4cm}}ll}
+Datum:   & \today        &     & \\[3ex]
+Von:     & Andreas Suter & An: & \\
+Telefon: & +41\, (0)56\, 310\, 4238        &     & \\
+Raum:    & WLGA / 119    & cc: & \\
+e-mail:  & \verb?andreas.suter@psi.ch? & & \\
+\end{tabular}
+%
+\vskip 0.3cm
+\noindent\hrulefill
+\vskip 1cm
+%
+
+\noindent The \musr decay histogram can be described by
+
+\begin{equation}\label{eq:decay}
+ N(t) = N_0\, e^{-t/\tau_\mu} \left[ 1 + A P(t) \right] + \mathrm{Bkg}
+\end{equation}
+
+\noindent For single histogram fits a good initial estimate for $N_0$ is needed
+in order that \textsc{Minuit2} has a chance to converge.
+Here I summaries how $N_0$ can be reasonably well estimates. For all estimates,
+it is assumed that rather to take Eq.(\ref{eq:decay}), 
+the following ansatz will be used
+
+\begin{equation}\label{eq:N0ansatz}
+ T(t) = N_0\, e^{-t/\tau_\mu} + \mathrm{Bkg},
+\end{equation}
+
+\noindent \ie the asymmetry is ignored all together.
+
+
+\section*{Estimate $\mathbi{N}_0$ with free Background}
+
+We would like to minimize $\chi^2$, which is
+
+\begin{equation}\label{eq:chisq}
+ \chi^2 = \sum_i \frac{(D_i - T_i)^2}{\sigma_i^2} = \sum_i \frac{(D_i -
+T_i)^2}{D_i},
+\end{equation}
+
+\noindent where $D_i$ is a histogram entry of the measured data, $T_i$ the
+evaluation of Eq.(\ref{eq:N0ansatz}) at $t_i = \Delta t \cdot i$, with $\Delta
+t$ the histogram time resolution. In the last step Poisson statistics is used,
+\ie $\sigma_i^2 = D_i$.
+In order to minimize Eq.(\ref{eq:N0ansatz}), it is sufficient that $\nabla
+\chi^2 = 0 \Longrightarrow$
+
+\begin{eqnarray*}
+ \frac{\partial \chi^2}{\partial N_0} &=& \sum_i \left[ \frac{2 (D_i -
+T_i)}{D_i}\, e^{-t_i/\tau_\mu} \right] = 0 \\
+ \frac{\partial \chi^2}{\partial \mathrm{Bkg}} &=& \sum_i \left[ \frac{2 (D_i -
+T_i)}{D_i} \right] = 0 
+\end{eqnarray*}
+
+\noindent With the following abbreviations
+
+\begin{eqnarray}\label{eq:abbrv}
+  x_i &=& e^{-t_i/\tau_\mu} \\
+  \Delta &=& \sum_i 1/D_i \nonumber \\
+  S &=& \sum_i 1 \nonumber
+\end{eqnarray}
+
+\noindent ($S$ is the number of bins in the histogram) the background can be
+written as
+
+\begin{equation}\label{eq:bkgEstimate}
+ \mathrm{Bkg} = \frac{1}{\Delta}\, \sum_i \left[ 1 - \frac{N_0}{D_i}\, x_i
+\right]
+\end{equation}
+ 
+\noindent and using this result, $N_0$ is
+
+\begin{equation}\label{eq:N0estimate}
+ N_0 = \frac{\displaystyle\sum_i \left[x_i \left(1-\frac{S}{D_i
+\Delta}\right)\right]}{\displaystyle\sum_j \left[\frac{x_j}{D_j}\left(x_j -
+\frac{1}{\Delta} \sum_k \frac{x_k}{D_k}\right)\right]}.
+\end{equation}
+
+\noindent Eqs.(\ref{eq:bkgEstimate}) \& (\ref{eq:N0estimate}) allow to estimate
+$N_0$ and Bkg. However, the results are mostly unsatisfactory since typically
+$N_0$ is underestimate whereas Bkg is grossly overestimated. The reason is the
+missing asymmetry term.
+
+\section*{Estimate $\mathbi{N}_0$ with linked Background}
+
+A much more robust ansatz is to link the background to $N_0$, \ie
+
+\begin{equation}\label{eq:N0ansatz_with_linked_bkg}
+ T(t) = N_0\, e^{-t/\tau_\mu} + \mathrm{Bkg} = N_0\, e^{-t/\tau_\mu} + \alpha
+N_0,
+\end{equation}
+
+\noindent where $\alpha$ is typically $0.01$ are smaller. The practical tests
+show that it is mostly save to set $\alpha=0$. From 
+
+$$ \frac{\partial \chi^2}{\partial N_0} = 0 $$
+
+\noindent it follows
+
+\begin{equation}\label{eq:N0estimate_with_linked_bkg}
+ N_0 = \frac{\displaystyle\sum_i (\alpha +
+x_i)}{\displaystyle\sum_i\frac{(\alpha + x_i)^2}{D_i}}.
+\end{equation}
+
+\noindent Eq.(\ref{eq:N0estimate_with_linked_bkg}) with $\alpha < 0.01$ leads typically to
+very good results.
+
+A closer look at Eq.(\ref{eq:N0estimate_with_linked_bkg}) reveals that there is
+a principle problem. How should one deal with $D_i = 0$? There are two
+possibilities:
+
+\begin{enumerate}
+ \item if $D_i = 0$, set it to $D_i = 1$. This implicitly assumes that an empty bin has an uncertainty of 1.
+ \item if $D_i = 0$, ignore it!
+\end{enumerate}
+
+\noindent Currently \texttt{musrfit} ignores empty bins.
+
+\end{document}

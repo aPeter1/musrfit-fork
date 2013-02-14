@@ -35,6 +35,11 @@
 #include <QMainWindow>
 #include <QMap>
 #include <QTimer>
+#include <QString>
+#include <QVector>
+
+#include <QtDebug>
+
 
 #include "musredit.h"
 
@@ -57,7 +62,10 @@ class PTextEdit : public QMainWindow
 
 public:
   PTextEdit( QWidget *parent = 0, Qt::WindowFlags f = 0 );
-  virtual ~PTextEdit();
+  virtual ~PTextEdit() {}
+
+public slots:
+  void aboutToQuit();
 
 signals:
   void close();
@@ -90,9 +98,12 @@ private slots:
 
   void fileNew();
   void fileOpen();
+  void fileOpenRecent();
   void fileReload();
+  void fileOpenPrefs();
   void fileSave();
   void fileSaveAs();
+  void fileSavePrefs();
   void filePrint();
   void fileClose( const bool check = true );
   void fileCloseAll();
@@ -151,11 +162,6 @@ private:
 
   QAction *fMusrT0Action;
 
-  bool fKeepMinuit2Output; ///< 'global' flag, if set to true, musrfit calls will keep the minuit2 output files.
-  bool fTitleFromDataFile; ///< 'global' flag, if set to true, musrfit will take the title from the data file instead of the msr-file.
-  bool fEnableMusrT0;      ///< 'global' flag, if set to true, musrt0 will be enabled
-  int  fDump;              ///< 'global' tag for musrfit calls: 0 == no dump, 1 == ascii dump, 2 == root dump
-
   PMsr2DataParam *fMsr2DataParam; ///< structure holding the necessary input information for msr2data
   PFindReplaceData *fFindReplaceData; ///< structure holding the ncessary input for find/replace
 
@@ -165,6 +171,11 @@ private:
 
   QTabWidget *fTabWidget; ///< tab widget in which the text editor(s) are placed
   QMap<PSubTextEdit*, QString> fFilenames; ///< mapper between tab widget object and filename
+
+  QMenu *fRecentFilesMenu;   ///< recent file menu
+  QAction *fRecentFilesAction[MAX_RECENT_FILES]; ///< array of the recent file actions
+
+  void fillRecentFiles();
 };
 
 

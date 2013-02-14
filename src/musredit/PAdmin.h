@@ -70,12 +70,14 @@ class PAdminXMLParser : public QXmlDefaultHandler
     virtual ~PAdminXMLParser() {}
 
   private:
-    enum EAdminKeyWords {eEmpty, eTimeout, eFontName, eFontSize, eExecPath, eDefaultSavePath, eTitleFromDataFile, eEnableMusrT0,
-                         eBeamline, eInstitute, eFileFormat, eLifetimeCorrection, eMsrDefaultFilePath,
+    enum EAdminKeyWords {eEmpty, eTimeout, eKeepMinuit2Output, eDumpAscii, eDumpRoot,
+                         eTitleFromDataFile, eChisqPreRunBlock, eEstimateN0, eEnableMusrT0,
+                         eFontName, eFontSize, eExecPath, eDefaultSavePath,
+                         eRecentFile, eBeamline, eInstitute, eFileFormat, eLifetimeCorrection, eMsrDefaultFilePath,
                          eTheoFuncPixmapPath, eFunc, eFuncName, eFuncComment, eFuncLabel,
                          eFuncPixmap, eFuncParams, eHelpMain, eHelpTitle, eHelpParameters, eHelpTheory, eHelpFunctions,
                          eHelpRun, eHelpCommand, eHelpFourier, eHelpPlot, eHelpStatistic, eHelpMsr2Data,
-                         eChainFit, eWriteDataHeader, eIgnoreDataHeaderInfo, eKeepMinuit2Output, eWriteColumnData,
+                         eChainFit, eWriteDataHeader, eIgnoreDataHeaderInfo, eWriteColumnData,
                          eRecreateDataFile, eOpenFileAfterFitting, eCreateMsrFileOnly, eFitOnly, eGlobal, eGlobalPlus};
 
     bool startDocument();
@@ -106,11 +108,11 @@ class PAdminXMLParser : public QXmlDefaultHandler
  * default font sizes, etc. The XML parsing is done with the help of the PAdminXMLParser
  * class.
  */
-class PAdmin
+class PAdmin : public QObject
 {
   public:
     PAdmin();
-    virtual ~PAdmin() {}
+    virtual ~PAdmin();
 
     int     getTimeout() { return fTimeout; }
     QString getFontName() { return fFontName; }
@@ -119,6 +121,11 @@ class PAdmin
     QString getDefaultSavePath() { return fDefaultSavePath; }
     bool    getTitleFromDataFileFlag() { return fTitleFromDataFile; }
     bool    getEnableMusrT0Flag() { return fEnableMusrT0; }
+    bool    getKeepMinuit2OutputFlag() { return fKeepMinuit2Output; }
+    bool    getDumpAsciiFlag() { return fDumpAscii; }
+    bool    getDumpRootFlag() { return fDumpRoot; }
+    bool    getEstimateN0Flag() { return fEstimateN0; }
+    bool    getChisqPerRunBlockFlag() { return fChisqPreRunBlock; }
     QString getBeamline() { return fBeamline; }
     QString getInstitute() { return fInstitute; }
     QString getFileFormat() { return fFileFormat; }
@@ -129,16 +136,28 @@ class PAdmin
     unsigned int getTheoryCounts() { return fTheory.size(); }
     PTheory* getTheoryItem(const unsigned int idx);
     PMsr2DataParam getMsr2DataParam() { return fMsr2DataParam; }
+    int     getNumRecentFiles() { return fRecentFile.size(); }
+    QString getRecentFile(int idx);
 
     void setTimeout(const int ival) { fTimeout = ival; }
+    void setTitleFromDataFileFlag(const bool flag) { fTitleFromDataFile = flag; }
+    void setEnableMusrT0Flag(const bool flag) { fEnableMusrT0 = flag; }
+    void setKeepMinuit2OutputFlag(const bool flag) { fKeepMinuit2Output = flag; }
+    void setDumpAsciiFlag(const bool flag) { fDumpAscii = flag; }
+    void setDumpRootFlag(const bool flag) { fDumpRoot = flag; }
+    void setEstimateN0Flag(const bool flag) { fEstimateN0 = flag; }
+    void setChisqPerRunBlockFlag(const bool flag) { fChisqPreRunBlock = flag; }
+
     void setFontName(const QString str) { fFontName = str; }
     void setFontSize(const int ival) { fFontSize = ival; }
+    void addRecentFile(const QString str);
+
+    int loadPrefs(QString fln);
+    int  savePrefs(QString pref_fln);
 
   protected:
     void setExecPath(const QString str) { fExecPath = str; }
     void setDefaultSavePath(const QString str) { fDefaultSavePath = str; }
-    void setTitleFromDataFileFlag(const bool flag) { fTitleFromDataFile = flag; }
-    void setEnableMusrT0Flag(const bool flag) { fEnableMusrT0 = flag; }
     void setBeamline(const QString str) { fBeamline = str; }
     void setInstitute(const QString str) { fInstitute = str; }
     void setFileFormat(const QString str) { fFileFormat = str; }
@@ -161,8 +180,15 @@ class PAdmin
     QString fMsrDefaultFilePath; ///< path where to find musredit source
     QString fTheoFuncPixmapPath; ///< path where the default pixmaps can be found
 
-    bool fTitleFromDataFile; ///< flag indicating if the title should be extracted from the data file (default settings).
-    bool fEnableMusrT0;      ///< flag indicating if musrT0 shall be enabled at startup from within musredit (default settings)
+    QVector<QString> fRecentFile; ///< keep vector of recent path-file names
+
+    bool fKeepMinuit2Output; ///< flag indicating if the Minuit2 output shall be kept (default: no)
+    bool fDumpAscii;         ///< flag indicating if musrfit shall make an ascii-dump file (for debugging purposes, default: no).
+    bool fDumpRoot;          ///< flag indicating if musrfit shall make an root-dump file (for debugging purposes, default: no).
+    bool fTitleFromDataFile; ///< flag indicating if the title should be extracted from the data file (default: yes).
+    bool fChisqPreRunBlock;  ///< flag indicating if musrfit shall write 'per run block' chisq to the msr-file (default: no).
+    bool fEstimateN0;        ///< flag indicating if musrfit shall estimate N0 for single histogram fits (default: yes).
+    bool fEnableMusrT0;      ///< flag indicating if musrT0 shall be enabled at startup from within musredit (default: yes).
 
     QString fBeamline;   ///< name of the beamline. Used to generate default run header lines.
     QString fInstitute;  ///< name of the institute. Used to generate default run header lines.
@@ -174,6 +200,8 @@ class PAdmin
     QMap<QString, QString> fHelpUrl; ///< maps tag to help url
 
     QVector<PTheory> fTheory; ///< stores all known theories. Needed when generating theory blocks from within musredit.
+
+    void saveRecentFiles(); ///< save recent file list
 };
 
 #endif // _PADMIN_H_

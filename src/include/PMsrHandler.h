@@ -47,7 +47,7 @@
 class PMsrHandler
 {
   public:
-    PMsrHandler(const Char_t *fileName, const Bool_t writeExpectedChisq=false);
+    PMsrHandler(const Char_t *fileName, PStartupOptions *startupOptions=0);
     virtual ~PMsrHandler();
 
     virtual Int_t ReadMsrFile();
@@ -106,9 +106,11 @@ class PMsrHandler
     virtual void CheckMaxLikelihood();
 
     virtual void GetGroupingString(Int_t runNo, TString detector, TString &groupingStr);
+    virtual Bool_t EstimateN0();
+    virtual Double_t GetAlphaEstimateN0();
 
   private:
-    Bool_t                 fWriteExpectedChisq; ///< flag shows if expected chisq shall be written to the msr-file
+    PStartupOptions       *fStartupOptions; ///< contains information about startup options from the musrfit_startup.xml
 
     TString                fFileName;  ///< file name of the msr-file
     TString                fMsrFileDirectoryPath; ///< msr-file directory path

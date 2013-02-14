@@ -34,6 +34,8 @@
 
 #include <QCheckBox>
 
+#include <PAdmin.h>
+
 #include "ui_PPrefsDialog.h"
 
 /**
@@ -44,18 +46,22 @@ class PPrefsDialog : public QDialog, private Ui::PPrefsDialog
   Q_OBJECT
 
   public:
-    PPrefsDialog(const bool keep_mn2_output, const int dump_tag, const bool title_from_data_file,
-                 const bool enable_musrt0, const int timeout);
+    PPrefsDialog(PAdmin *admin);
 
     bool getKeepMinuit2OutputFlag() { return fKeepMn2Output_checkBox->isChecked(); }
     bool getTitleFromDataFileFlag() { return fTitleFromData_checkBox->isChecked(); }
     bool getEnableMusrT0Flag()      { return fEnableMusrT0_checkBox->isChecked(); }
-    int  getDump();
+    bool getKeepRunPerBlockChisqFlag() { return fPerRunBlockChisq_checkBox->isChecked(); }
+    bool getEstimateN0Flag()        { return fEstimateN0_checkBox->isChecked(); }
+    int  getDump();    
     int  getTimeout() { return fTimeout_lineEdit->text().toInt(); }
 
   public slots:
     void dumpAscii();
     void dumpRoot();
+
+  private:
+    PAdmin *fAdmin;
 };
 
 #endif // _PPREFSDIALOG_H_

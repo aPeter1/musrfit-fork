@@ -33,13 +33,13 @@
     <item>
      <widget class="QTabWidget" name="fTabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
         <string>general</string>
        </attribute>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -129,6 +129,32 @@
         </property>
         <property name="text">
          <string>take title from data file</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="fPerRunBlockChisq_checkBox">
+        <property name="geometry">
+         <rect>
+          <x>170</x>
+          <y>35</y>
+          <width>191</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>keep per run block chisq</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="fEstimateN0_checkBox">
+        <property name="geometry">
+         <rect>
+          <x>170</x>
+          <y>60</y>
+          <width>161</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>estimate N0</string>
         </property>
        </widget>
       </widget>

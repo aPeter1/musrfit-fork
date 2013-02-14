@@ -30,8 +30,14 @@
  ***************************************************************************/
 
 #include <cstdlib>
+#include <iostream>
+using namespace std;
 
 #include <QMessageBox>
+#include <QString>
+#include <QFile>
+#include <QTextStream>
+#include <QVector>
 
 #include "PAdmin.h"
 
@@ -83,6 +89,18 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eTitleFromDataFile;
   } else if (qName == "enable_musrt0") {
     fKeyWord = eEnableMusrT0;
+  } else if (qName == "keep_minuit2_output") {
+    fKeyWord = eKeepMinuit2Output;
+  } else if (qName == "dump_ascii") {
+    fKeyWord = eDumpAscii;
+  } else if (qName == "dump_root") {
+    fKeyWord = eDumpRoot;
+  } else if (qName == "estimate_n0") {
+    fKeyWord = eEstimateN0;
+  } else if (qName == "chisq_per_run_block") {
+    fKeyWord = eChisqPreRunBlock;
+  } else if (qName == "path_file_name") {
+    fKeyWord = eRecentFile;
   } else if (qName == "beamline") {
     fKeyWord = eBeamline;
   } else if (qName == "institute") {
@@ -231,6 +249,45 @@ bool PAdminXMLParser::characters(const QString& str)
         flag = false;
       fAdmin->setEnableMusrT0Flag(flag);
       break;
+    case eKeepMinuit2Output:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->fMsr2DataParam.keepMinuit2Output = flag;
+      fAdmin->setKeepMinuit2OutputFlag(flag);
+      break;
+    case eDumpAscii:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->setDumpAsciiFlag(flag);
+      break;
+    case eDumpRoot:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->setDumpRootFlag(flag);
+      break;
+    case eEstimateN0:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->setEstimateN0Flag(flag);
+      break;
+    case eChisqPreRunBlock:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->setChisqPerRunBlockFlag(flag);
+      break;
+    case eRecentFile:
+      fAdmin->addRecentFile(QString(str.toLatin1()).trimmed());
+      break;
     case eBeamline:
       fAdmin->setBeamline(QString(str.toLatin1()).trimmed());
       break;
@@ -303,13 +360,6 @@ bool PAdminXMLParser::characters(const QString& str)
       else
         flag = false;
       fAdmin->fMsr2DataParam.ignoreDataHeaderInfo = flag;
-      break;
-    case eKeepMinuit2Output:
-      if (str == "y")
-        flag = true;
-      else
-        flag = false;
-      fAdmin->fMsr2DataParam.keepMinuit2Output = flag;
       break;
     case eWriteColumnData:
       if (str == "y")
@@ -534,7 +584,7 @@ QString PAdminXMLParser::expandPath(const QString &str)
  * <p>Initializes that PAdmin object, and calls the XML parser which feeds
  * the object variables.
  */
-PAdmin::PAdmin()
+PAdmin::PAdmin() : QObject()
 {
   fTimeout = 3600;
 
@@ -553,6 +603,8 @@ PAdmin::PAdmin()
   fTitleFromDataFile  = false;
   fEnableMusrT0       = false;
   fLifetimeCorrection = true;
+  fEstimateN0         = true;
+  fChisqPreRunBlock   = false;
 
   fMsr2DataParam.firstRun = -1;
   fMsr2DataParam.lastRun  = -1;
@@ -592,28 +644,18 @@ PAdmin::PAdmin()
     fln = path + "/musredit_startup.xml";
   }
 #endif
-  if (QFile::exists(fln)) { // administration file present
-    PAdminXMLParser handler(this);
-    QFile xmlFile(fln);
-    QXmlInputSource source( &xmlFile );
-    QXmlSimpleReader reader;
-    reader.setContentHandler( &handler );
-    reader.setErrorHandler( &handler );
-    if (!reader.parse( source )) {
-      QMessageBox::critical(0, "ERROR",
-                            "Error parsing musredit_startup.xml settings file.\nProbably a few things will not work porperly.\nPlease fix this first.",
-                            QMessageBox::Ok, QMessageBox::NoButton);
-    }
-  } else {
-    QMessageBox::critical(0, "ERROR",
-                          "Couldn't find the musredit_startup.xml settings file.\nProbably a few things will not work porperly.\nPlease fix this first.",
-                          QMessageBox::Ok, QMessageBox::NoButton);
-  }
+
+  loadPrefs(fln);
 }
 
 //--------------------------------------------------------------------------
-// implementation of PAdmin class
-//--------------------------------------------------------------------------
+/**
+ * <p>Destructor
+ */
+PAdmin::~PAdmin()
+{
+  saveRecentFiles();
+}
 
 //--------------------------------------------------------------------------
 /**
@@ -643,6 +685,21 @@ PTheory* PAdmin::getTheoryItem(const unsigned int idx)
 
 //--------------------------------------------------------------------------
 /**
+ * <p>returns the recent path-file name at position idx. If idx is out of scope,
+ * an empty string is returned.
+ *
+ * \param idx index of the recent path-file name to be retrieved.
+ */
+QString PAdmin::getRecentFile(int idx)
+{
+  if (idx >= fRecentFile.size())
+    return QString("");
+
+  return fRecentFile[idx];
+}
+
+//--------------------------------------------------------------------------
+/**
  * <p>set the help url, addressed via a tag. At the moment the following tags should be present:
  * main, title, parameters, theory, functions, run, command, fourier, plot, statistic, msr2data
  *
@@ -652,6 +709,241 @@ PTheory* PAdmin::getTheoryItem(const unsigned int idx)
 void PAdmin::setHelpUrl(const QString tag, const QString url)
 {
   fHelpUrl[tag] = url;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>Loads the preference file fln.
+ *
+ * <b>return:</b> 1 on success, 0 otherwise
+ *
+ * \param fln path-file name of the preference file to be loaded.
+ */
+int PAdmin::loadPrefs(QString fln)
+{
+  if (QFile::exists(fln)) { // administration file present
+    PAdminXMLParser handler(this);
+    QFile xmlFile(fln);
+    QXmlInputSource source( &xmlFile );
+    QXmlSimpleReader reader;
+    reader.setContentHandler( &handler );
+    reader.setErrorHandler( &handler );
+    if (!reader.parse( source )) {
+      QMessageBox::critical(0, "ERROR",
+                            "Error parsing musredit_startup.xml settings file.\nProbably a few things will not work porperly.\nPlease fix this first.",
+                            QMessageBox::Ok, QMessageBox::NoButton);
+      return 0;
+    }
+  } else {
+    QMessageBox::critical(0, "ERROR",
+                          "Couldn't find the musredit_startup.xml settings file.\nProbably a few things will not work porperly.\nPlease fix this first.",
+                          QMessageBox::Ok, QMessageBox::NoButton);
+    return 0;
+  }
+  return 1;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>Save the preference file pref_fln.
+ *
+ * <b>return:</b> 1 on success, 0 otherwise
+ *
+ * \param pref_fln preference path-file name
+ */
+int PAdmin::savePrefs(QString pref_fln)
+{
+  // check if musredit_startup.xml is present in the current directory, and if yes, use this file to
+  // save the recent file names otherwise use the "master" musredit_startup.xml
+
+  QString str;
+  QString fln = "musredit_startup.xml";
+  // check if it is a MacOSX
+#ifdef Q_WS_MAC
+  fln = "./musredit_startup.xml";
+  if (!QFile::exists(fln)) {
+    fln = "/Applications/musredit.app/Contents/Resources/musredit_startup.xml";
+  }
+#else
+  fln = "./musredit_startup.xml";
+  if (!QFile::exists(fln)) {
+    QString path = std::getenv("MUSRFITPATH");
+    QString rootsys = std::getenv("ROOTSYS");
+    if (path.isEmpty())
+      path = rootsys + "/bin";
+    fln = path + "/musredit_startup.xml";
+  }
+#endif
+  if (QFile::exists(fln)) { // administration file present
+    QVector<QString> data;
+    QFile file(fln);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      cerr << endl << ">> PAdmin::savePrefs: **ERROR** Cannot open " << fln.toLatin1().data() << " for reading." << endl;
+      return 1;
+    }
+    QTextStream fin(&file);
+    while (!fin.atEnd()) {
+      data.push_back(fin.readLine());
+    }
+    file.close();
+
+    // replace all the prefs
+    for (int i=0; i<data.size(); i++) {
+      if (data[i].contains("<timeout>") && data[i].contains("</timeout>")) {
+        data[i] = "    <timeout>" + QString("%1").arg(fTimeout) + "</timeout>";
+      }
+      if (data[i].contains("<keep_minuit2_output>") && data[i].contains("</keep_minuit2_output>")) {
+        if (fKeepMinuit2Output)
+          data[i] = "    <keep_minuit2_output>y</keep_minuit2_output>";
+        else
+          data[i] = "    <keep_minuit2_output>n</keep_minuit2_output>";
+      }
+      if (data[i].contains("<dump_ascii>") && data[i].contains("</dump_ascii>")) {
+        if (fDumpAscii)
+          data[i] = "    <dump_ascii>y</dump_ascii>";
+        else
+          data[i] = "    <dump_ascii>n</dump_ascii>";
+      }
+      if (data[i].contains("<dump_root>") && data[i].contains("</dump_root>")) {
+        if (fDumpRoot)
+          data[i] = "    <dump_root>y</dump_root>";
+        else
+          data[i] = "    <dump_root>n</dump_root>";
+      }
+      if (data[i].contains("<title_from_data_file>") && data[i].contains("</title_from_data_file>")) {
+        if (fTitleFromDataFile)
+          data[i] = "    <title_from_data_file>y</title_from_data_file>";
+        else
+          data[i] = "    <title_from_data_file>n</title_from_data_file>";
+      }
+      if (data[i].contains("<chisq_per_run_block>") && data[i].contains("</chisq_per_run_block>")) {
+        if (fChisqPreRunBlock)
+          data[i] = "    <chisq_per_run_block>y</chisq_per_run_block>";
+        else
+          data[i] = "    <chisq_per_run_block>n</chisq_per_run_block>";
+      }
+      if (data[i].contains("<estimate_n0>") && data[i].contains("</estimate_n0>")) {
+        if (fEstimateN0)
+          data[i] = "    <estimate_n0>y</estimate_n0>";
+        else
+          data[i] = "    <estimate_n0>n</estimate_n0>";
+      }
+      if (data[i].contains("<enable_musrt0>") && data[i].contains("</enable_musrt0>")) {
+        if (fEnableMusrT0)
+          data[i] = "    <enable_musrt0>y</enable_musrt0>";
+        else
+          data[i] = "    <enable_musrt0>n</enable_musrt0>";
+      }
+    }
+
+    // write prefs
+    file.setFileName(pref_fln);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+      cerr << endl << ">> PAdmin::savePrefs: **ERROR** Cannot open " << fln.toLatin1().data() << " for writing." << endl;
+      return 0;
+    }
+    fin.setDevice(&file);
+    for (int i=0; i<data.size(); i++)
+      fin << data[i] << endl;
+    file.close();
+  }
+
+  return 1;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>Add recent path-file name to the internal ring-buffer.
+ *
+ * \param str recent path-file name to be added
+ */
+void PAdmin::addRecentFile(const QString str)
+{
+  // check if file name is not already present
+  for (int i=0; i<fRecentFile.size(); i++) {
+    if (str == fRecentFile[i])
+      return;
+  }
+
+  fRecentFile.push_front(str);
+  if (fRecentFile.size() > MAX_RECENT_FILES)
+    fRecentFile.resize(MAX_RECENT_FILES);
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>Merges the recent file ring buffer into musredit_startup.xml and saves it.
+ * If a local copy is present it will be saved there, otherwise the master file
+ * will be used.
+ */
+void PAdmin::saveRecentFiles()
+{
+  // check if musredit_startup.xml is present in the current directory, and if yes, use this file to
+  // save the recent file names otherwise use the "master" musredit_startup.xml
+
+  QString str;
+  QString fln = "musredit_startup.xml";
+  // check if it is a MacOSX
+#ifdef Q_WS_MAC
+  fln = "./musredit_startup.xml";
+  if (!QFile::exists(fln)) {
+    fln = "/Applications/musredit.app/Contents/Resources/musredit_startup.xml";
+  }
+#else
+  fln = "./musredit_startup.xml";
+  if (!QFile::exists(fln)) {
+    QString path = std::getenv("MUSRFITPATH");
+    QString rootsys = std::getenv("ROOTSYS");
+    if (path.isEmpty())
+      path = rootsys + "/bin";
+    fln = path + "/musredit_startup.xml";
+  }
+#endif
+  if (QFile::exists(fln)) { // administration file present
+    QVector<QString> data;
+    QFile file(fln);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      cerr << endl << ">> PAdmin::saveRecentFile: **ERROR** Cannot open " << fln.toLatin1().data() << " for reading." << endl;
+      return;
+    }
+    QTextStream fin(&file);
+    while (!fin.atEnd()) {
+      data.push_back(fin.readLine());
+    }
+    file.close();
+
+    // remove <path_file_name> from data
+    for (QVector<QString>::iterator it = data.begin(); it != data.end(); ++it) {
+      if (it->contains("<path_file_name>"))
+        it = data.erase(it);
+    }
+
+    // add recent files
+    int i;
+    for (i=0; i<data.size(); i++) {
+      if (data[i].contains("<recent_files>"))
+        break;
+    }
+
+    if (i == data.size()) {
+      cerr << endl << ">> PAdmin::saveRecentFile: **ERROR** " << fln.toLatin1().data() << " seems to be corrupt." << endl;
+      return;
+    }
+    i++;
+    for (int j=0; j<fRecentFile.size(); j++) {
+      str = "    <path_file_name>" + fRecentFile[j] + "</path_file_name>";
+      data.insert(i++, str);
+    }
+
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+      cerr << endl << ">> PAdmin::saveRecentFile: **ERROR** Cannot open " << fln.toLatin1().data() << " for reading." << endl;
+      return;
+    }
+    fin.setDevice(&file);
+    for (int i=0; i<data.size(); i++)
+      fin << data[i] << endl;
+    file.close();
+  }
 }
 
 //--------------------------------------------------------------------------

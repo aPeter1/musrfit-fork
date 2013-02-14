@@ -34,6 +34,8 @@
 
 #include <QString>
 
+#define MAX_RECENT_FILES 5
+
 //-------------------------------------------------------------------------------------------------
 /**
  * <p> This structure is used in conjunction to <code>msr2data</code>. It stores the necessary

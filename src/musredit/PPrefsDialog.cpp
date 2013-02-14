@@ -35,30 +35,23 @@
 /**
  * <p>Constructor.
  *
- * \param keep_mn2_output if true, keep the minuit2 output for each fitted msr-file, i.e.
- *        MINUIT2.OUTPUT -> <msr-file-name>-mn2.output, and MINUIT2.root -> <msr-file-name>-mn2.root.
- *        See the '-k' option of musrfit.
- * \param dump_tag tag telling if dumps ('ascii' == 1, 'root' == 2) are wanted. See '--dump' option of musrfit.
- * \param title_from_data_file flag telling if musrfit shall, by default, take the title from the data file.
- *        See the '-t' option of musrfit.
- * \param enable_musrt0 if true, musrt0 is enabled from within musredit.
+ * \param fAdmin keeps all the needed flags
  */
-PPrefsDialog::PPrefsDialog(const bool keep_mn2_output, const int dump_tag, const bool title_from_data_file,
-                           const bool enable_musrt0, const int timeout)
+PPrefsDialog::PPrefsDialog(PAdmin *admin) : fAdmin(admin)
 {
+  if (!fAdmin)
+    return;
+
   setupUi(this);
 
   setModal(true);
 
-  if (keep_mn2_output)
-    fKeepMn2Output_checkBox->setChecked(true);
-  else
-    fKeepMn2Output_checkBox->setChecked(false);
+  fKeepMn2Output_checkBox->setChecked(fAdmin->getKeepMinuit2OutputFlag());
 
-  if (dump_tag == 1) {
+  if (fAdmin->getDumpAsciiFlag() && !fAdmin->getDumpRootFlag()) {
     fDumpAscii_checkBox->setChecked(true);
     fDumpRoot_checkBox->setChecked(false);
-  } else if (dump_tag == 2) {
+  } else if (!fAdmin->getDumpAsciiFlag() && fAdmin->getDumpRootFlag()) {
     fDumpAscii_checkBox->setChecked(false);
     fDumpRoot_checkBox->setChecked(true);
   } else {
@@ -66,12 +59,12 @@ PPrefsDialog::PPrefsDialog(const bool keep_mn2_output, const int dump_tag, const
     fDumpRoot_checkBox->setChecked(false);
   }
 
-  fTitleFromData_checkBox->setChecked(title_from_data_file);
-  fEnableMusrT0_checkBox->setChecked(enable_musrt0);
+  fTitleFromData_checkBox->setChecked(fAdmin->getTitleFromDataFileFlag());
+  fEnableMusrT0_checkBox->setChecked(fAdmin->getEnableMusrT0Flag());
+  fPerRunBlockChisq_checkBox->setChecked(fAdmin->getChisqPerRunBlockFlag());
+  fEstimateN0_checkBox->setChecked(fAdmin->getEstimateN0Flag());
 
-  QString numStr;
-  numStr.setNum(timeout);
-  fTimeout_lineEdit->setText(numStr);
+  fTimeout_lineEdit->setText(QString("%1").arg(fAdmin->getTimeout()));
   fTimeout_lineEdit->setValidator(new QIntValidator(fTimeout_lineEdit));
 }
 
