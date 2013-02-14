@@ -8,9 +8,18 @@
     <exec_path>@prefix@/bin</exec_path>
     <default_save_path>./</default_save_path>
     <msr_default_file_path>@DOCDIR@/templates</msr_default_file_path>
+    <timeout>3600</timeout>
+    <keep_minuit2_output>n</keep_minuit2_output>
+    <dump_ascii>n</dump_ascii>
+    <dump_root>n</dump_root>
     <title_from_data_file>y</title_from_data_file>
+    <chisq_per_run_block>n</chisq_per_run_block>
+    <estimate_n0>y</estimate_n0>
     <enable_musrt0>y</enable_musrt0>
   </general>
+  <recent_files>
+    <path_file_name>/home/nemu/analysis/musrfit/doc/examples/test-histo-PSI-BIN.msr</path_file_name>
+  </recent_files>
   <help_section>
     <musr_web_main>file://@DOCDIR@/html/user/MUSR/MusrFit.html</musr_web_main>
     <musr_web_title>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheTitle</musr_web_title>
@@ -25,10 +34,9 @@
     <musr_web_msr2data>file://@DOCDIR@/html/user/MUSR/Msr2Data.html</musr_web_msr2data>
   </help_section>
   <font_settings>
-    <font_name>Courier</font_name>
+    <font_name>Courier New</font_name>
     <font_size>12</font_size>
   </font_settings>
-  <timeout>3600</timeout>
   <msr_file_defaults>
     <beamline>mue4</beamline>
     <institute>psi</institute>

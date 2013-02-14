@@ -914,9 +914,12 @@ void PAdmin::saveRecentFiles()
 
     // remove <path_file_name> from data
     for (QVector<QString>::iterator it = data.begin(); it != data.end(); ++it) {
-      if (it->contains("<path_file_name>"))
+      if (it->contains("<path_file_name>")) {
         it = data.erase(it);
+        --it;
+      }
     }
+for (int i=0; i<data.size(); i++) qDebug() << data[i];
 
     // add recent files
     int i;
@@ -930,6 +933,7 @@ void PAdmin::saveRecentFiles()
       return;
     }
     i++;
+qDebug() << endl << "debug> fRecentFile.size()=" << fRecentFile.size() << endl;
     for (int j=0; j<fRecentFile.size(); j++) {
       str = "    <path_file_name>" + fRecentFile[j] + "</path_file_name>";
       data.insert(i++, str);
