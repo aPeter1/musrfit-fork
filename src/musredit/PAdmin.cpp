@@ -919,7 +919,6 @@ void PAdmin::saveRecentFiles()
         --it;
       }
     }
-for (int i=0; i<data.size(); i++) qDebug() << data[i];
 
     // add recent files
     int i;
@@ -933,7 +932,6 @@ for (int i=0; i<data.size(); i++) qDebug() << data[i];
       return;
     }
     i++;
-qDebug() << endl << "debug> fRecentFile.size()=" << fRecentFile.size() << endl;
     for (int j=0; j<fRecentFile.size(); j++) {
       str = "    <path_file_name>" + fRecentFile[j] + "</path_file_name>";
       data.insert(i++, str);
