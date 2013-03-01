@@ -2588,9 +2588,9 @@ Bool_t PRunDataHandler::ReadWkmFile()
 
   // check if all groups have enough channels
   for (UInt_t i=0; i<runData.GetNoOfHistos(); i++) {
-    if ((Int_t) runData.GetDataBin(i)->size() != channels) {
+    if ((Int_t) runData.GetDataBin(i+1)->size() != channels) {
       cerr << endl << ">> PRunDataHandler::ReadWkmFile(): **ERROR**";
-      cerr << endl << ">> expected " << channels << " bins in histo " << i << ", but found " << runData.GetDataBin(i)->size();
+      cerr << endl << ">> expected " << channels << " bins in histo " << i+1 << ", but found " << runData.GetDataBin(i)->size();
       return false;
     }
   }
