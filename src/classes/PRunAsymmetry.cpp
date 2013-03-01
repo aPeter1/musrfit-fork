@@ -563,7 +563,7 @@ Bool_t PRunAsymmetry::PrepareData()
       fRunInfo->SetT0Bin(fT0s[2*i], 2*i);
 
       cerr << endl << ">> PRunAsymmetry::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
-      cerr << endl << ">> run: " << fRunInfo->GetRunName();
+      cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
       cerr << endl << ">> will try the estimated one: forward t0 = " << runData->GetT0BinEstimated(forwardHistoNo[i]);
       cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
       cerr << endl;
@@ -575,7 +575,7 @@ Bool_t PRunAsymmetry::PrepareData()
       fRunInfo->SetT0Bin(fT0s[2*i+1], 2*i+1);
 
       cerr << endl << ">> PRunAsymmetry::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
-      cerr << endl << ">> run: " << fRunInfo->GetRunName();
+      cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
       cerr << endl << ">> will try the estimated one: backward t0 = " << runData->GetT0BinEstimated(backwardHistoNo[i]);
       cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
       cerr << endl;
@@ -661,7 +661,7 @@ Bool_t PRunAsymmetry::PrepareData()
           fRunInfo->SetAddT0Bin(t0Add[2*j], i-1, 2*j);
 
           cerr << endl << ">> PRunAsymmetry::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
-          cerr << endl << ">> run: " << fRunInfo->GetRunName(i);
+          cerr << endl << ">> run: " << fRunInfo->GetRunName(i)->Data();
           cerr << endl << ">> will try the estimated one: forward t0 = " << addRunData->GetT0BinEstimated(forwardHistoNo[j]);
           cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
           cerr << endl;
@@ -673,7 +673,7 @@ Bool_t PRunAsymmetry::PrepareData()
           fRunInfo->SetAddT0Bin(t0Add[2*j+1], i-1, 2*j+1);
 
           cerr << endl << ">> PRunAsymmetry::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
-          cerr << endl << ">> run: " << fRunInfo->GetRunName(i);
+          cerr << endl << ">> run: " << fRunInfo->GetRunName(i)->Data();
           cerr << endl << ">> will try the estimated one: backward t0 = " << runData->GetT0BinEstimated(backwardHistoNo[j]);
           cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
           cerr << endl;

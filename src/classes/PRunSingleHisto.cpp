@@ -656,7 +656,7 @@ Bool_t PRunSingleHisto::PrepareData()
       fRunInfo->SetT0Bin(fT0s[i], i); // keep value for the msr-file
 
       cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
-      cerr << endl << ">> run: " << fRunInfo->GetRunName();
+      cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
       cerr << endl << ">> will try the estimated one: forward t0 = " << runData->GetT0BinEstimated(histoNo[i]);
       cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
       cerr << endl;
@@ -722,7 +722,7 @@ Bool_t PRunSingleHisto::PrepareData()
           fRunInfo->SetAddT0Bin(t0Add[j], i-1, j); // keep value for the msr-file
 
           cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
-          cerr << endl << ">> run: " << fRunInfo->GetRunName();
+          cerr << endl << ">> run: " << fRunInfo->GetRunName(i)->Data();
           cerr << endl << ">> will try the estimated one: forward t0 = " << addRunData->GetT0BinEstimated(histoNo[j]);
           cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
           cerr << endl;
