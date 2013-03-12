@@ -14,6 +14,7 @@
     <data_path>/afs/psi.ch/project/bulkmusr/data/ltf</data_path>
     <data_path>/afs/psi.ch/project/bulkmusr/data/alc</data_path>
     <data_path>/afs/psi.ch/project/bulkmusr/data/hifi</data_path>
+    <data_path>/afs/psi.ch/project/bulkmusr/data/lem</data_path>
     <options>
       <write_per_run_block_chisq>n</write_per_run_block_chisq>
       <estimate_n0>yes</estimate_n0>
