@@ -42,15 +42,23 @@ void runMuSimulation()
   gROOT->GetListOfBrowsables()->Add(histosFolder, "histos");
   decayAnaModule = histosFolder->AddFolder("DecayAnaModule", "muSR decay histograms");
 
+  //prepare to run simulation; here: isotropic Mu in Germanium
+  UInt_t   runNo   = 9859;
+  Double_t T       = 290.; //temperature
+  Double_t capRate = 300.0;//*sqrt(T/200.); //assume that capture rate varies as sqrt(T), capRate = sigma*v*p , v ~ sqrt(T)  
+  Double_t ionRate;  //assume Arrhenius behaviour ionRate = preFac*exp(-EA/kT)
+  Double_t EA;       //activation energy (meV) 
+  EA = 170.;
+  ionRate = 2.9e7 * exp(-EA/(0.08625*T)); // Ge: 2.9*10^7MHz "attempt" frequency; 1K = 0.08625 meV 
+
   // feed run info header
-  UInt_t runNo = 9702;
   TString tstr;
   runInfo = gROOT->GetRootFolder()->AddFolder("RunInfo", "LEM RunInfo");  
   gROOT->GetListOfBrowsables()->Add(runInfo, "RunInfo");
   header = new TLemRunHeader();
   tstr  = TString("0");
   tstr += runNo;
-  tstr += TString("Ge, Mu-frac 1.0, Mu12 737MHz (0.44), Mu34 -1622MHz(0.44), T=220K/EA=170meV, Cap.(200K) 0.0MHz, 100mT");
+  tstr += TString(" - Ge, Mu-frac 1.0, Mu12 737MHz (0.44), Mu34 -1622MHz(0.44), T=290K/EA=170meV, Cap. 300.0MHz, 100mT");
 
   header->SetRunTitle(tstr.Data());
   header->SetLemSetup("trivial");
@@ -60,8 +68,8 @@ void runMuSimulation()
   header->SetModeratorHV(32.0, 0.01);
   header->SetSampleHV(0.0, 0.01);
   header->SetImpEnergy(31.8);
-  header->SetSampleTemperature(0.2, 0.001);
-  header->SetSampleBField(100.0, 0.1);
+  header->SetSampleTemperature(T, 0.001);
+  header->SetSampleBField(1000.0, 0.1);
   header->SetTimeResolution(1.);
   header->SetNChannels(12001);
   header->SetNHist(2);
@@ -86,15 +94,6 @@ void runMuSimulation()
     cerr << endl << "**ERROR** while invoking PSimulateTransition" << endl;
     return;
   }
-
-  //prepare to run simulation; here: isotropic Mu in Germanium
-  Double_t ionRate;  //assume Arrhenius behaviour ionRate = preFac*exp(-EA/kT)
-  Double_t capRate;  //assume that capture rate varies as sqrt(T), capRate = sigma*v*p , v ~ sqrt(T) 
-  Double_t EA, T;     //activation energy (meV) and temperature (K) 
-  EA = 170.;
-  T  = 220.;
-  ionRate = 2.9e7 * exp(-EA/(0.08625*T)); // Ge: 2.9*10^7MHz "attempt" frequency; 1K = 0.08625 meV 
-  capRate = 0.00001*sqrt(T/200.); 
 
   simulateMuTransition->SetMuPrecFreq12(737.3);   // MHz
   simulateMuTransition->SetMuPrecFreq34(-1622.2);  // MHz
