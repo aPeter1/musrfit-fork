@@ -31,6 +31,7 @@
 
 #include <QtGui>
 #include <QtWebKit>
+#include <QNetworkProxyFactory>
 
 #include <QtDebug>
 
