@@ -5060,7 +5060,7 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
             cout << dataRebin << " ";
           count++;
           dataRebin = 0;
-          if ((count > 0) && (count % no_of_bins_per_line == 0))
+          if ((count > 0) && (count % no_of_bins_per_line == 0) && (j != dataSet->GetData()->size()-1))
             cout << endl;
         } else {
           dataRebin += static_cast<Int_t>(dataSet->GetData()->at(j));
