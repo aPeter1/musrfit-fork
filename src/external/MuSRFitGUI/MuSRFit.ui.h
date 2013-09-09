@@ -328,7 +328,10 @@ void MuSRFitform::CreateAllInput()
 	     12,"GLFSExp",
 	     13,"MolMag",
 	     14,"Meissner",
-	     15,"None"
+	     15,"LGKT",
+	     16,"LGKTExp",
+	     17,"LGKTSExp",
+	     18,"None"
 	     );
     
     my $FT1=FitType1->currentItem;
@@ -476,10 +479,19 @@ void MuSRFitform::CallMSRCreate()
 	if ($Answer) {
 	    if ( $All{"FitAsyType"} eq "Asymmetry" ) {
 		if ($All{"RUNSType"}) {
-		    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
+		    my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSR(\%All);
+# Open output file FILENAME.msr
+		    open( OUTF,q{>},"$FILENAME" );
+		    print OUTF ("$FullMSRFile");
+		    close(OUTF);
 		} else {
-#		    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSRSh(\%All);
-		    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
+#		    my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSRSh(\%All);
+		    my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSR(\%All);
+# Open output file FILENAME.msr
+		    open( OUTF,q{>},"$FILENAME" );
+		    print OUTF ("$FullMSRFile");
+		    close(OUTF);
+		    
 # if it is multiple runs then the produced file is a template
 		    my $FILENAME=$All{"FILENAME"}.".msr";
 		    my $Extension = "_".$All{"BeamLine"}."_".$All{"YEAR"};
@@ -503,10 +515,13 @@ void MuSRFitform::CallMSRCreate()
 			close(FTO);
 		    }
 		}
-		
 	    }
 	    elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
-		my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSRSingleHist(\%All);
+		my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSRSingleHist(\%All);
+# Open output file FILENAME.msr
+		open( OUTF,q{>},"$FILENAME" );
+		print OUTF ("$FullMSRFile");
+		close(OUTF);
 	    }
 	    UpdateMSRFileInitTable();
 	}

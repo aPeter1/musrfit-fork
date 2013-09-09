@@ -1,6 +1,6 @@
 # Form implementation generated from reading ui file 'MuSRFit.ui'
 #
-# Created: Thu Jun 14 14:52:06 2012
+# Created: Thu Sep 5 14:20:55 2013
 #      by: The PerlQt User Interface Compiler (puic)
 #
 # WARNING! All changes made in this file will be lost!
@@ -1708,7 +1708,7 @@ sub NEW
         setName("MuSRFitform" );
     }
     setSizePolicy(Qt::SizePolicy(7, 7, 1, 1, this->sizePolicy()->hasHeightForWidth()) );
-    setMinimumSize(Qt::Size(582, 502) );
+    setMinimumSize(Qt::Size(582, 505) );
     setIcon($image0 );
 
     setCentralWidget(Qt::Widget(this, "qt_central_widget"));
@@ -3068,7 +3068,7 @@ sub NEW
     MenuBar->insertSeparator( 8 );
 
     languageChange();
-    my $resize = Qt::Size(582, 502);
+    my $resize = Qt::Size(611, 559);
     $resize = $resize->expandedTo(minimumSizeHint());
     resize( $resize );
     clearWState( &Qt::WState_Polished );
@@ -3226,8 +3226,11 @@ sub languageChange
     FitType2->insertItem( trUtf8("Gaussian Kubo-Toyabe LF x Str Exp") );
     FitType2->insertItem( trUtf8("MolMag") );
     FitType2->insertItem( trUtf8("Meissner State Model") );
+    FitType2->insertItem( trUtf8("Lor-Gss combi KT") );
+    FitType2->insertItem( trUtf8("Lor-Gss combi KT x Exp") );
+    FitType2->insertItem( trUtf8("Lor-Gss combi KT x SExp") );
     FitType2->insertItem( trUtf8("None") );
-    FitType2->setCurrentItem( int(15) );
+    FitType2->setCurrentItem( int(18) );
     TfsLabel->setText( trUtf8("Final Time") );
     FitType1->clear();
     FitType1->insertItem( trUtf8("Exponential") );
@@ -3245,6 +3248,9 @@ sub languageChange
     FitType1->insertItem( trUtf8("Gaussian Kubo-Toyabe LF x Str Exp") );
     FitType1->insertItem( trUtf8("MolMag") );
     FitType1->insertItem( trUtf8("Meissner State Model") );
+    FitType1->insertItem( trUtf8("Lor-Gss combi KT") );
+    FitType1->insertItem( trUtf8("Lor-Gss combi KT x Exp") );
+    FitType1->insertItem( trUtf8("Lor-Gss combi KT x SExp") );
     BINS->setText( trUtf8("100") );
     Comp3Label->setText( trUtf8("Third Component") );
     Tis->setText( trUtf8("0") );
@@ -3268,8 +3274,11 @@ sub languageChange
     FitType3->insertItem( trUtf8("Gaussian Kubo-Toyabe LF x Str Exp") );
     FitType3->insertItem( trUtf8("MolMag") );
     FitType3->insertItem( trUtf8("Meissner State Model") );
+    FitType3->insertItem( trUtf8("Lor-Gss combi KT") );
+    FitType3->insertItem( trUtf8("Lor-Gss combi KT x Exp") );
+    FitType3->insertItem( trUtf8("Lor-Gss combi KT x SExp") );
     FitType3->insertItem( trUtf8("None") );
-    FitType3->setCurrentItem( int(15) );
+    FitType3->setCurrentItem( int(18) );
     Comp2Label->setText( trUtf8("Second Component") );
     FitAsyTypeLabel->setText( trUtf8("Fit type") );
     FitAsyType->clear();
@@ -3795,7 +3804,10 @@ sub CreateAllInput
 	     12,"GLFSExp",
 	     13,"MolMag",
 	     14,"Meissner",
-	     15,"None"
+	     15,"LGKT",
+	     16,"LGKTExp",
+	     17,"LGKTSExp",
+	     18,"None"
 	     );
     
     my $FT1=FitType1->currentItem;
@@ -3945,10 +3957,19 @@ sub CallMSRCreate
 	if ($Answer) {
 	    if ( $All{"FitAsyType"} eq "Asymmetry" ) {
 		if ($All{"RUNSType"}) {
-		    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
+		    my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSR(\%All);
+# Open output file FILENAME.msr
+		    open( OUTF,q{>},"$FILENAME" );
+		    print OUTF ("$FullMSRFile");
+		    close(OUTF);
 		} else {
-#		    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSRSh(\%All);
-		    my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSR(\%All);
+#		    my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSRSh(\%All);
+		    my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSR(\%All);
+# Open output file FILENAME.msr
+		    open( OUTF,q{>},"$FILENAME" );
+		    print OUTF ("$FullMSRFile");
+		    close(OUTF);
+		    
 # if it is multiple runs then the produced file is a template
 		    my $FILENAME=$All{"FILENAME"}.".msr";
 		    my $Extension = "_".$All{"BeamLine"}."_".$All{"YEAR"};
@@ -3972,10 +3993,13 @@ sub CallMSRCreate
 			close(FTO);
 		    }
 		}
-		
 	    }
 	    elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
-		my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateMSRSingleHist(\%All);
+		my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSRSingleHist(\%All);
+# Open output file FILENAME.msr
+		open( OUTF,q{>},"$FILENAME" );
+		print OUTF ("$FullMSRFile");
+		close(OUTF);
 	    }
 	    UpdateMSRFileInitTable();
 	}

@@ -7,7 +7,7 @@ my $EMPTY="";
 my $SPACE=" ";
 
 my %DATADIRS = (
-		"LEM",   "/mnt/data/nemu/his",
+		"LEM",   "/afs/psi.ch/project/bulkmusr/data/lem",
 		"GPS",   "/afs/psi.ch/project/bulkmusr/data/gps",
 		"LTF",   "/afs/psi.ch/project/bulkmusr/data/ltf",
 		"Dolly", "/afs/psi.ch/project/bulkmusr/data/dolly",
@@ -46,6 +46,7 @@ $SUMM_DIR="/afs/psi.ch/project/nemu/data/summ/";
 my $erradd = "d";
 my $minadd = "_min";
 my $maxadd = "_max";
+
 
 
 ##########################################################################
@@ -93,7 +94,7 @@ sub CreateMSR {
 
     my @Hists = split( /,/, $All{"LRBF"} );
     # TODO
-    # : to separate twoo sets of asymmetries with same parameters
+    # : to separate two sets of asymmetries with same parameters
     # Check the number of histograms
     # should be 2 or 4 histograms
     # should be checked in GUI
@@ -108,6 +109,7 @@ sub CreateMSR {
     my $BeamLine = $All{"BeamLine"};
     my $YEAR = $All{"YEAR"};
 
+    # Works for CGI script
     my $Step = $All{"go"};
     if ( $Step eq "PLOT" ) {
 	$FITMINTYPE = $EMPTY;
@@ -178,7 +180,8 @@ FUNCTIONS
         }
     }
 
-    $shcount   = 1;
+    # Initialise $shcount, a counter for shared parameters
+    my $shcount   = 1;
     my $RUN_Block = $EMPTY;
     my $RUNS_Line = $EMPTY;
 
@@ -358,7 +361,10 @@ FUNCTIONS
 
 # Start constructing all blocks
     my $TitleLine = $All{"TITLE"}."\n# Run Numbers: ".$All{"RunNumbers"};
-#    $TitleLine =~ s/,/:/g;
+#    if ($All{"RUNSType"}) {
+#	$TitleLine = $EMPTY;
+#    }
+#    $TitleLine =~ s/\n//g;
 
     # Get parameter block from MSR::PrepParamTable(\%All);
     my $FitParaBlk = "
@@ -368,6 +374,7 @@ FITPARAMETER
 #     No     Name       Value    Err     Min  Max                  ";
     my %PTable=MSR::PrepParamTable(\%All);
     my $NParam=scalar keys( %PTable );
+
 # Fill the table with labels and values of parametr 
     for (my $iP=0;$iP<$NParam;$iP++) {
 	my ($Param,$value,$error,$minvalue,$maxvalue,$RUNtmp) = split(/,/,$PTable{$iP});
@@ -461,11 +468,8 @@ STATISTIC --- 0000-00-00 00:00:00
     # Empty line at the end of each block
     my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$FUNCTIONS_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$FOURIER_Block\n$STAT_Block\n";
 
-# Open output file FILENAME.msr
-    open( OUTF,q{>},"$FILENAME.msr" );
-    print OUTF ("$FullMSRFile");
-    close(OUTF);
-    return($Full_T_Block,\@Paramcomp);
+# Return information and file
+    return($Full_T_Block,\@Paramcomp,$FullMSRFile);
 }
 
 
@@ -493,6 +497,7 @@ sub CreateMSRSingleHist {
     my $BeamLine = $All{"BeamLine"};
     my $YEAR = $All{"YEAR"};
 
+    # Works for CGI script
     my $Step = $All{"go"};
     if ( $Step eq "PLOT" ) {
 	$FITMINTYPE = $EMPTY;
@@ -513,6 +518,8 @@ sub CreateMSRSingleHist {
     # First create the THEORY Block
     my ($Full_T_Block,$Paramcomp_ref)=MSR::CreateTheory(@FitTypes);
     my @Paramcomp = @$Paramcomp_ref;
+
+    print "Paramcomp= $Paramcomp[0]";
 
     # If we have a FUNCTIONS Block the Full_T_Block should be 
     # replaced by Func_T_Block
@@ -569,6 +576,8 @@ FUNCTIONS
     my $Range_Order = 1;
     my $iHist = 0;
     foreach my $RUN (@RUNS) {
+	# Until here identical to sub CreateMSR
+
 #######################################################################
 # For a single histogram fit we basically need to repeat this for each hist
 # However, "physical" parameters such as Asymmetry, relaxation etc. should
@@ -599,6 +608,13 @@ FUNCTIONS
 		my @Params = split( /\s+/, $Parameters );
 		# Only the first histiograms has new physical parameters
 		# the others keep only Phi if they have it
+		if ($iHist != 0) {
+		    # look for Phi
+#		    if ( grep( /^Phi$/, @Params ) ) {
+			# if it is there keep only that
+#			@Params=("Phi");
+#		    }
+		}
 		
 		# For the first component we need No and NBg for SingleHist fits
 		if ( $component == 1 ) {
@@ -648,9 +664,14 @@ FUNCTIONS
 			    $NoBg_Line = $NoBg_Line . "backgr.fit      $PCount\n";
 			}
 		    }
-
 		    # End of No and NBg Lines
+		    # Now deal with physical parameters and phases
+		    elsif ( $Param_ORG ne "Phi" && $Param_ORG ne "No"  && $Param_ORG ne "NBg") {
+			
+		    }
 ####################################################################################################
+		    print $Full_T_Block."\n";
+
 		    
 		    # Start preparing the parameters block
 		    if ($Shared) {
@@ -747,7 +768,7 @@ FUNCTIONS
 
 # Start constructing all block
     my $TitleLine = $All{"TITLE"}."\n# Run Numbers: ".$All{"RunNumbers"};
-    $TitleLine =~ s/,/:/g;
+#    $TitleLine =~ s/\n//g;
 
     # Get parameter block from MSR::PrepParamTable(\%All);
     my $FitParaBlk = "
@@ -845,11 +866,8 @@ STATISTIC --- 0000-00-00 00:00:00
     # Empty line at the end of each block
     my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$FUNCTIONS_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$FOURIER_Block\n$STAT_Block\n";
 
-# Open output file FILENAME.msr
-    open( OUTF,q{>},"$FILENAME.msr" );
-    print OUTF ("$FullMSRFile");
-    close(OUTF);
-    return($Full_T_Block,\@Paramcomp);
+# Return information and file
+    return($Full_T_Block,\@Paramcomp,$FullMSRFile);
 }
 
 ##########################################################################
@@ -914,7 +932,7 @@ sub CreateTheory {
 		  "statExpKT",   "Lam",
 		  "statExpKTLF", "Frq Aa",
 		  "dynExpKTLF",  "Frq Aa Lam",
-		  "combiLGKT",   "Lam Sgm",
+		  "combiLGKT",   "Del Sgm",
 		  "spinGlass",   "Lam gam q",
 		  "rdAnisoHf",   "Frq Lam",
 		  "TFieldCos",   "Phi Frq",
@@ -1039,6 +1057,11 @@ sub CreateTheory {
 	    $Parameters = join( $SPACE, $Parameters, $THEORY{'dynGssKTLF'} );
 	}
 	
+	elsif ( $FitType eq "LGKT" ) {
+	    $T_Block = $T_Block . "\n" . "combiLGKT " . $THEORY{'combiLGKT'};
+	    $Parameters = join( $SPACE, $Parameters, $THEORY{'combiLGKT'} );
+	} 
+
 	# Now some more combined functions (multiplication).
 	
 	# Lorentzian KT LF multiplied by exponential
@@ -1077,6 +1100,24 @@ sub CreateTheory {
 	    $Parameters = join( $SPACE, $Parameters, $THEORY{'statGssKTLF'} );
 	}
 	
+	# Lorentzian or Gaussian KT ZF multiplied by exponential
+	elsif ( $FitType eq "LGKTExp" ) {
+	    $T_Block = $T_Block . "\n" . "simplExpo " . $THEORY{'simplExpo'};
+	    $Parameters = join( $SPACE, $Parameters, $THEORY{'simplExpo'} );
+	    $T_Block =
+		$T_Block . "\n" . "combiLGKT " . $THEORY{'combiLGKT'};
+	    $Parameters = join( $SPACE, $Parameters, $THEORY{'combiLGKT'} );
+	}
+
+	# Lorentzian or Gaussian KT ZF multiplied by stretched exponential
+	elsif ( $FitType eq "LGKTSExp" ) {
+	    $T_Block = $T_Block . "\n" . "generExpo " . $THEORY{'generExpo'};
+	    $Parameters = join( $SPACE, $Parameters, $THEORY{'generExpo'} );
+	    $T_Block =
+		$T_Block . "\n" . "combiLGKT " . $THEORY{'combiLGKT'};
+	    $Parameters = join( $SPACE, $Parameters, $THEORY{'combiLGKT'} );
+	}
+
 	# Lorentzian or Gaussian KT LF multiplied by stretched exponential
 	elsif ( $FitType eq "MolMag" ) {
 	    $T_Block = $T_Block . "\n" . "generExpo " . $THEORY{'generExpo'};
@@ -1241,6 +1282,10 @@ sub PrepParamTable {
     "bgrlx_min",     "0",     "bgrlx_max",     "0",
     "Frq",           "1.0",   "dFrq",          "1.",
     "Frq_min",       "0",     "Frq_max",       "0",
+    "Frql",          "1.0",   "dFrql",          "1.",
+    "Frql_min",      "0",     "Frql_max",       "0",
+    "Frqg",          "1.0",   "dFrqg",          "1.",
+    "Frqg_min",      "0",     "Frqg_max",       "0",
     "Field",         "100.0", "dField",        "1.",
     "Field_min",     "0",     "Field_max",     "0",
     "Energy",        "14.1",  "dEnergy",       "0.",
@@ -1314,7 +1359,10 @@ sub PrepParamTable {
 		    $Shared = $All{"Sh_$Param"};
 		    if ( $Shared!=1 || $iRun == 1 ) {
 # It there are multiple runs index the parameters accordingly
-			my $RUNtmp=sprintf("%04d",$RUN);
+			my $RUNtmp = sprintf("%04d",$RUN);
+			if ($All{"RUNSType"}) {
+			    $RUNtmp = $iRun;
+			}
 			if ($Shared!=1) {$Param=$Param."_".$RUNtmp;}
 # Check if this parameter has been initialized befor. If not take from defaults
 			$value = $All{"$Param"};
@@ -1423,6 +1471,7 @@ sub ExportParams {
     my $HEADER="RUN";
 
     my %All = %{$_[0]};
+    
     my @RUNS = ();
     if ($All{"RUNSType"}) {
 	@RUNS = split( /,/, $All{"RunFiles"} );
@@ -1674,51 +1723,57 @@ sub RUNFileNameAuto {
 
 # Take this information as input arguments
 	(my $RUN) = @_;
-	my @tmp = split(/\./,$RUN);
-	my $EXT = @tmp[$#tmp];
+	my $EXT = $EMPTY;
+	my $key = $EMPTY;
+# Find out the type of file (possibilities are root, bin and msr).
+	foreach $key (keys %EXTs) {
+	    if (index($RUN,$key) != -1) {
+		$EXT = $key;
+	    }
+	}
 	
 	$RUN =~  s/\.[^.]+$//;
 
 	$RUN_Line = join( $SPACE,
 			     "RUN", $RUN, "MUE4", "PSI",$EXTs{$EXT});
     } else {
-	my $DATADIR = $DATADIRS{$BeamLine};
-	my $RUNtmp=sprintf("%04d",$RUN);
+    my $DATADIR = $DATADIRS{$BeamLine};
+    my $RUNtmp=sprintf("%04d",$RUN);
 	    
-	# Get current year
-	my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
-	    localtime( time() );
-	my $current_year = $year + 1900;
-	
-	if ( $BeamLine eq "LEM" || $BeamLine eq "LEM (PPC)") {
-	    $RUN_File_Name = "lem" . substr( $YEAR, 2 ) . "_his_" . $RUNtmp;
-	    $RUNFILE       = "$DATADIR/$YEAR/$RUN_File_Name";
-	}
-	elsif ( $BeamLine eq "GPS" ) {
-	    $RUN_File_Name = "deltat_tdc_gps_" . $RUNtmp;
-	    $RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
-	}
-	elsif ( $BeamLine eq "LTF" ) {
-	    $RUN_File_Name = "deltat_tdc_ltf_" . $RUNtmp;
-	    $RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
-	}
-	elsif ( $BeamLine eq "Dolly" ) {
-	    $RUN_File_Name = "deltat_tdc_dolly_" . $RUNtmp;
-	    $RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
-	}
-	elsif ( $BeamLine eq "GPD" ) {
-	    $RUN_File_Name = "deltat_tdc_gpd_" . $RUNtmp;
-	    $RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
-	}
-	$RUN_Line = join( $SPACE,
-			     "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
-			     $Def_Format{$BeamLine} );
+    # Get current year
+    my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
+	localtime( time() );
+    my $current_year = $year + 1900;
+    
+    if ( $BeamLine eq "LEM" || $BeamLine eq "LEM (PPC)") {
+	$RUN_File_Name = "lem" . substr( $YEAR, 2 ) . "_his_" . $RUNtmp;
+	$RUNFILE       = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
     }
+    elsif ( $BeamLine eq "GPS" ) {
+	$RUN_File_Name = "deltat_tdc_gps_" . $RUNtmp;
+	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
+    }
+    elsif ( $BeamLine eq "LTF" ) {
+	$RUN_File_Name = "deltat_tdc_ltf_" . $RUNtmp;
+	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
+    }
+    elsif ( $BeamLine eq "Dolly" ) {
+	$RUN_File_Name = "deltat_tdc_dolly_" . $RUNtmp;
+	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
+    }
+    elsif ( $BeamLine eq "GPD" ) {
+	$RUN_File_Name = "deltat_tdc_gpd_" . $RUNtmp;
+	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
+    }
+	$RUN_Line = join( $SPACE,
+			 "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
+			 $Def_Format{$BeamLine} );
+}
     return $RUN_Line;
 }
 
 ########################
-# ExtractInfoLEM
+# CreateRRFBlock
 ########################
 # This creates the RRF related lines, these are the same always
 sub CreateRRFBlock {
@@ -1745,6 +1800,7 @@ sub CreateRRFBlock {
 # Uset to extract information from summary files
 sub ExtractInfoLEM {
     my ($RUN,$YEAR,$Arg) = @_;
+# Use file header
     my $Summ_File_Name = "lem" . substr( $YEAR, 2 ) . "_" . $RUN . ".summ";
     my $SummFile = "$SUMM_DIR/$YEAR/$Summ_File_Name";
 
@@ -1897,7 +1953,7 @@ sub CreateMSRSh {
 
     my @Hists = split( /,/, $All{"LRBF"} );
     # TODO
-    # : to separate twoo sets of asymmetries with same parameters
+    # : to separate two sets of asymmetries with same parameters
     # Check the number of histograms
     # should be 2 or 4 histograms
     # should be checked in GUI
@@ -2160,7 +2216,7 @@ FUNCTIONS
 
 # Start constructing all blocks
     my $TitleLine = $All{"TITLE"}."\n# Run Numbers: ".$All{"RunNumbers"};
-#    $TitleLine =~ s/,/:/g;
+#    $TitleLine =~ s/\n//g;
 
     # Get parameter block from MSR::PrepParamTable(\%All);
     my $FitParaBlk = 
@@ -2263,11 +2319,8 @@ STATISTIC --- 0000-00-00 00:00:00
     # Empty line at the end of each block
     my $FullMSRFile = "$TitleLine$FitParaBlk\n$Full_T_Block\n$FUNCTIONS_Block\n$RUN_Block\n$COMMANDS_Block\n$PLOT_Block\n$FOURIER_Block\n$STAT_Block\n";
 
-# Open output file FILENAME.msr
-    open( OUTF,q{>},"$FILENAME.msr" );
-    print OUTF ("$FullMSRFile");
-    close(OUTF);
-    return($Full_T_Block,\@Paramcomp);
+# Return information and file
+    return($Full_T_Block,\@Paramcomp,$FullMSRFile);
 }
 
 ########################
