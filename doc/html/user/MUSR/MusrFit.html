@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en_US" lang="en_US">
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 15 Jan 2013 11:56:04 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 10 Sep 2013 08:47:20 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 <head>
 <link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
@@ -8,11 +8,12 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
 <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
-<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1358250914" type="application/x-wiki" title="edit MusrFit" />
+<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1378802790" type="application/x-wiki" title="edit MusrFit" />
 <meta name="TEXT_NUM_TOPICS" content="Number of topics:" />
 <meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
 <meta name="robots" content="noindex" /><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="WebRsshtml.html" />
 <base  /><!--[if IE]></base><![endif]-->
+<link rel='stylesheet' href='../pub/System/ImagePlugin/style.css' media='all' />
 <style type="text/css" media="all">
 @import url('../pub/System/SkinTemplates/base.css');
 </style>
@@ -389,7 +390,7 @@ are various possible parameter definitions which are listed here:
    2. &#60;no&#62; &#60;name&#62; &#60;value&#62; &#60;step&#62; &#60;lower&#95;boundary&#62; &#60;upper&#95;boundary&#62;
    3. &#60;no&#62; &#60;name&#62; &#60;value&#62; &#60;step&#62; &#60;pos&#95;error&#62; &#60;lower&#95;boundary&#62; &#60;upper&#95;boundary&#62;
 </pre>
-where <strong>&lt;no&gt;</strong> is the parameter number, <strong>&lt;name&gt;</strong> is the parameter name <a name="FootNote1text"></a><span class="FootNoteTextLink" title=" a standard string without whitespace "><a href="#FootNote1note" class="foswikiCurrentTopicLink">(1)</a></span>, <strong>&lt;value&gt;</strong> is the initial guess of the parameter, <strong>&lt;step&gt;</strong> the inital step width, <strong>&lt;lower/upper_boundary&gt;</strong> is the lower/upper boundary for the parameter <a name="FootNote2text"></a><span class="FootNoteTextLink" title=" According to the <code>MINUIT</code> manual this should be avoided whenever possible! "><a href="#FootNote2note" class="foswikiCurrentTopicLink">(2)</a></span>.
+where <strong>&lt;no&gt;</strong> is the parameter number, <strong>&lt;name&gt;</strong> is the parameter name <a name="FootNote1text"></a><span class='FootNoteTextLink' title=' a standard string without whitespace '><a href="#FootNote1note" class="foswikiCurrentTopicLink">(1)</a></span>, <strong>&lt;value&gt;</strong> is the initial guess of the parameter, <strong>&lt;step&gt;</strong> the inital step width, <strong>&lt;lower/upper_boundary&gt;</strong> is the lower/upper boundary for the parameter <a name="FootNote2text"></a><span class='FootNoteTextLink' title=' According to the <code>MINUIT</code> manual this should be avoided whenever possible! '><a href="#FootNote2note" class="foswikiCurrentTopicLink">(2)</a></span>.
 <p></p>
 In the output file, <strong>&lt;value&gt;</strong> will be the <code>MINUIT</code> fit value, <strong>&lt;step&gt;</strong> will contain the error estimate (or the negative error estimate if <code>MINOS</code> was successfully used), <strong>&lt;pos_error&gt;</strong> will have the value <strong>none</strong> if <code>MINOS</code> has not been used, otherwise it will show the positive error estimate.
 <p></p>
@@ -492,35 +493,35 @@ The THEORY block is used to define the fit function. There is a set of predefine
 			<td class="foswikiTableCol1"> sgktlf </td>
 			<td class="foswikiTableCol2"> <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="\sigma\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_6b6bbc4add4da0bde8220c54594658f3.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="G&#95;{\mathrm{G,LF}}(t) \equiv 1-\frac{2\sigma^2}{(2\pi\nu)^2}\left&#91;1-\exp\left(-\frac{1}{2}\sigma^2t^2\right)\cos(2\pi\nu t)\right]+\frac{2\sigma^4}{(2\pi\nu)^3}\int^t&#95;0 \exp\left(-\frac{1}{2}\sigma^2\tau^2\right)\sin(2\pi\nu\tau)\mathrm{d}\tau" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_e9a0c0aa5d84cb4ea67265a3b06b9af5.png"  /> </td>
-			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote3text"></a><span class="FootNoteTextLink" title=" R. S. Hayano <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.20.850" target="_top">Phys. Rev. B <strong>20</strong> (1979) 850</a> "><a href="#FootNote3note" class="foswikiCurrentTopicLink">(4)</a></span> </td>
+			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote3text"></a><span class='FootNoteTextLink' title=' R. S. Hayano <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.20.850" target="_top">Phys. Rev. B <strong>20</strong> (1979) 850</a> '><a href="#FootNote3note" class="foswikiCurrentTopicLink">(4)</a></span> </td>
 		</tr>
 		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> dynGssKTLF </td>
 			<td class="foswikiTableCol1"> dgktlf </td>
 			<td class="foswikiTableCol2"> <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="\sigma\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_6b6bbc4add4da0bde8220c54594658f3.png"  />, <img alt="\Gamma\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_f87b1352f663a35bf263bc7e9a214ca3.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{1}{2\pi \imath}\int&#95;{\gamma-\imath\infty}^{\gamma+\imath\infty} \frac{f&#95;{\mathrm{G}}(s+\Gamma)}{1-\Gamma f&#95;{\mathrm{G}}(s+\Gamma)} \exp(s t) \mathrm{d}s,\mathrm{where}\,f&#95;{\mathrm{G}}(s)\equiv \int&#95;0^{\infty}G&#95;{\mathrm{G,LF}}(t)\exp(-s t) \mathrm{d}t" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_cb688f85a062f09bfaff5cf9144860a9.png"  /> </td>
-			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote4text"></a><span class="FootNoteTextLink" title=" R. S. Hayano <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.20.850" target="_top">Phys. Rev. B <strong>20</strong> (1979) 850</a>; P. Dalmas de R&eacute;otier and A. Yaouanc, <a href="http://dx.doi.org/10.1088/0953-8984/4/18/020" target="_top">J. Phys.: Condens. Matter <strong>4</strong> (1992) 4533</a>; A. Keren, <a href="http://link.aps.org/doi/10.1103/PhysRevB.50.10039" target="_top">Phys. Rev. B <strong>50</strong> (1994) 10039</a> "><a href="#FootNote4note" class="foswikiCurrentTopicLink">(5)</a></span> </td>
+			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote4text"></a><span class='FootNoteTextLink' title=' R. S. Hayano <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.20.850" target="_top">Phys. Rev. B <strong>20</strong> (1979) 850</a>; P. Dalmas de R&eacute;otier and A. Yaouanc, <a href="http://dx.doi.org/10.1088/0953-8984/4/18/020" target="_top">J. Phys.: Condens. Matter <strong>4</strong> (1992) 4533</a>; A. Keren, <a href="http://link.aps.org/doi/10.1103/PhysRevB.50.10039" target="_top">Phys. Rev. B <strong>50</strong> (1994) 10039</a> '><a href="#FootNote4note" class="foswikiCurrentTopicLink">(5)</a></span> </td>
 		</tr>
 		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> statExpKT </td>
 			<td class="foswikiTableCol1"> sekt </td>
 			<td class="foswikiTableCol2"> <img alt="\lambda\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_020e973cf5b1293c76cb3ecef5a269f8.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{1}{3} + \frac{2}{3} \left&#91;1-\lambda t\right] \exp\left(-\lambda t\right)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_6466a97e4b7c510909bffce51d31c4b9.png"  /> </td>
-			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote5text"></a><span class="FootNoteTextLink" title=" Y. J. Uemura <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.31.546" target="_top">Phys. Rev. B <strong>31</strong> (1985) 546</a> "><a href="#FootNote5note" class="foswikiCurrentTopicLink">(6)</a></span> </td>
+			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote5text"></a><span class='FootNoteTextLink' title=' Y. J. Uemura <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.31.546" target="_top">Phys. Rev. B <strong>31</strong> (1985) 546</a> '><a href="#FootNote5note" class="foswikiCurrentTopicLink">(6)</a></span> </td>
 		</tr>
 		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> statExpKTLF </td>
 			<td class="foswikiTableCol1"> sektlf </td>
 			<td class="foswikiTableCol2"> <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="a\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_26a5ae8799badcc3bcbe1823265a9053.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="1-\frac{a}{2\pi\nu}j&#95;1(2\pi\nu t)\exp\left(-at\right)-\left(\frac{a}{2\pi\nu}\right)^2 \left&#91;j&#95;0(2\pi\nu t)\exp\left(-at\right)-1\right]-a\left&#91;1+\left(\frac{a}{2\pi\nu}\right)^2\right]\int^t&#95;0 \exp\left(-a\tau\right)j&#95;0(2\pi\nu\tau)\mathrm{d}\tau \equiv G&#95;{\mathrm{L,LF}}(t)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_df4770dd7b14577f14410b4f7ab59721.png"  /> </td>
-			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote6text"></a><span class="FootNoteTextLink" title=" Y. J. Uemura <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.31.546" target="_top">Phys. Rev. B <strong>31</strong> (1985) 546</a> "><a href="#FootNote6note" class="foswikiCurrentTopicLink">(7)</a></span> </td>
+			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote6text"></a><span class='FootNoteTextLink' title=' Y. J. Uemura <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.31.546" target="_top">Phys. Rev. B <strong>31</strong> (1985) 546</a> '><a href="#FootNote6note" class="foswikiCurrentTopicLink">(7)</a></span> </td>
 		</tr>
 		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> dynExpKTLF </td>
 			<td class="foswikiTableCol1"> dektlf </td>
 			<td class="foswikiTableCol2"> <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="a\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_26a5ae8799badcc3bcbe1823265a9053.png"  />, <img alt="\Gamma\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_f87b1352f663a35bf263bc7e9a214ca3.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{1}{2\pi \imath}\int&#95;{\gamma-\imath\infty}^{\gamma+\imath\infty} \frac{f&#95;{\mathrm{L}}(s+\Gamma)}{1-\Gamma f&#95;{\mathrm{L}}(s+\Gamma)} \exp(s t) \mathrm{d}s,\mathrm{where}\,f&#95;{\mathrm{L}}(s)\equiv \int&#95;0^{\infty}G&#95;{\mathrm{L,LF}}(t)\exp(-s t) \mathrm{d}t" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_c5c6dea10611dae1d470a5615869073a.png"  /> </td>
-			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote7text"></a><span class="FootNoteTextLink" title=" R. S. Hayano <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.20.850" target="_top">Phys. Rev. B <strong>20</strong> (1979) 850</a>; P. Dalmas de R&eacute;otier and A. Yaouanc, <a href="http://dx.doi.org/10.1088/0953-8984/4/18/020" target="_top">J. Phys.: Condens. Matter <strong>4</strong> (1992) 4533</a> "><a href="#FootNote7note" class="foswikiCurrentTopicLink">(8)</a></span> </td>
+			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote7text"></a><span class='FootNoteTextLink' title=' R. S. Hayano <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.20.850" target="_top">Phys. Rev. B <strong>20</strong> (1979) 850</a>; P. Dalmas de R&eacute;otier and A. Yaouanc, <a href="http://dx.doi.org/10.1088/0953-8984/4/18/020" target="_top">J. Phys.: Condens. Matter <strong>4</strong> (1992) 4533</a> '><a href="#FootNote7note" class="foswikiCurrentTopicLink">(8)</a></span> </td>
 		</tr>
 		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> combiLGKT </td>
@@ -530,90 +531,97 @@ The THEORY block is used to define the fit function. There is a set of predefine
 			<td class="foswikiTableCol4 foswikiLastCol"> <img src="../pub/Main/SmiliesPluginPSI/skull.gif" alt="dead!" title="dead!" border="0" /> </td>
 		</tr>
 		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
+			<td class="foswikiTableCol0 foswikiFirstCol"> strKT </td>
+			<td class="foswikiTableCol1"> skt </td>
+			<td class="foswikiTableCol2"> <img alt="\sigma\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_6b6bbc4add4da0bde8220c54594658f3.png"  />, <img alt="\beta\,(1)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_aad467dd15ac57481f24ada5fbe5d85f.png"  /> </td>
+			<td class="foswikiTableCol3"> <img alt="\frac{1}{3}+\frac{2}{3}\left&#91;1-(\sigma t)^\beta\right] \exp\left&#91;-(\sigma t)^\beta / \beta \right]" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_63b1658426cdac24a0730149c3b5ea80.png"  /> </td>
+			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote8text"></a><span class='FootNoteTextLink' title='  M.R. Crook and R. Cywinski, <a href="http://dx.doi.org/10.1088/0953-8984/9/5/018" target="_top">J. Phys.: Condens. Matter <strong>9</strong> (1997) 1149</a> '><a href="#FootNote8note" class="foswikiCurrentTopicLink">(9)</a></span> </td>
+		</tr>
+		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> spinGlass </td>
 			<td class="foswikiTableCol1"> spg </td>
 			<td class="foswikiTableCol2"> <img alt="\lambda\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_020e973cf5b1293c76cb3ecef5a269f8.png"  />, <img alt="\gamma\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_8aad0e0c2c1f20995c483933a896ca0d.png"  />, <img alt="q\,(1)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_16b8c518c1e529e6c963929287ef3a56.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{1}{3}\exp\left(-\sqrt{\frac{4\lambda^2(1-q)t}{\gamma}}\right)+\frac{2}{3}\left(1-\frac{q\lambda^2t^2}{\sqrt{\frac{4\lambda^2(1-q)t}{\gamma}+q\lambda^2t^2}}\right)\exp\left(-\sqrt{\frac{4\lambda^2(1-q)t}{\gamma}+q\lambda^2t^2}\right)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_e35c4217aa50607f25e6eadf9f27f874.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <img src="../pub/Main/SmiliesPluginPSI/skull.gif" alt="dead!" title="dead!" border="0" /> </td>
 		</tr>
-		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
+		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> rdAnisoHf </td>
 			<td class="foswikiTableCol1"> rahf </td>
 			<td class="foswikiTableCol2"> <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="\lambda\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_020e973cf5b1293c76cb3ecef5a269f8.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{1}{6}\left(1-\frac{\nu t}{2}\right)\exp\left(-\frac{\nu t}{2}\right)+\frac{1}{3}\left(1-\frac{\nu t}{4}\right)\exp\left(-\frac{\nu t + 2.44949\lambda t}{4}\right)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_f91ff8255a7b8a99c5eefcb2c29f9262.png"  /> </td>
-			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote8text"></a><span class="FootNoteTextLink" title="  R. E. Turner and D. R. Harshman, <a href="http://link.aps.org/doi/10.1103/PhysRevB.34.4467" target="_top">Phys. Rev. B <strong>34</strong> (1986) 4467</a> "><a href="#FootNote8note" class="foswikiCurrentTopicLink">(9)</a></span> </td>
+			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote9text"></a><span class='FootNoteTextLink' title='  R. E. Turner and D. R. Harshman, <a href="http://link.aps.org/doi/10.1103/PhysRevB.34.4467" target="_top">Phys. Rev. B <strong>34</strong> (1986) 4467</a> '><a href="#FootNote9note" class="foswikiCurrentTopicLink">(9)</a></span> </td>
 		</tr>
-		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
+		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> TFieldCos </td>
 			<td class="foswikiTableCol1"> tf </td>
 			<td class="foswikiTableCol2"> <img alt="\varphi\,(^{\circ})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_61136f20673ad20f955c43e43b8cec9d.png"  />, <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\cos\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_51757d805f7111ffe6e0b430b6d137c7.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <img src="../pub/Main/SmiliesPluginPSI/skull.gif" alt="dead!" title="dead!" border="0" /> </td>
 		</tr>
-		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
+		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> internFld </td>
 			<td class="foswikiTableCol1"> if </td>
 			<td class="foswikiTableCol2"> <img alt="\alpha\,(1)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_f266f29ff7212b8d77bf67567eac1fd3.png"  />, <img alt="\varphi\,(^{\circ})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_61136f20673ad20f955c43e43b8cec9d.png"  />, <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="\lambda&#95;{\mathrm{T}}\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_49046b617890ffeaca8bc16ae66d0dc5.png"  />, <img alt="\lambda&#95;{\mathrm{L}}\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_b0c4a8cbbcf4189b64418b381939a979.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\alpha\,\cos\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)\exp\left(-\lambda&#95;{\mathrm{T}}t\right)+(1-\alpha)\,\exp\left(-\lambda&#95;{\mathrm{L}}t\right)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_1582d158c5651581ca9e800ee698ce9f.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <img src="../pub/Main/SmiliesPluginPSI/skull.gif" alt="dead!" title="dead!" border="0" /> </td>
 		</tr>
-		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
+		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> Bessel </td>
 			<td class="foswikiTableCol1"> b </td>
 			<td class="foswikiTableCol2"> <img alt="\varphi\,(^{\circ})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_61136f20673ad20f955c43e43b8cec9d.png"  />, <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="j&#95;0\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_cff60a46de8608e97a33bbae7c4e566d.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <img src="../pub/Main/SmiliesPluginPSI/skull.gif" alt="dead!" title="dead!" border="0" /> </td>
 		</tr>
-		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
+		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> internBsl </td>
 			<td class="foswikiTableCol1"> ib </td>
 			<td class="foswikiTableCol2"> <img alt="\alpha\,(1)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_f266f29ff7212b8d77bf67567eac1fd3.png"  />, <img alt="\varphi\,(^{\circ})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_61136f20673ad20f955c43e43b8cec9d.png"  />, <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="\lambda&#95;{\mathrm{T}}\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_49046b617890ffeaca8bc16ae66d0dc5.png"  />, <img alt="\lambda&#95;{\mathrm{L}}\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_b0c4a8cbbcf4189b64418b381939a979.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\alpha\,j&#95;0\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)\exp\left(-\lambda&#95;{\mathrm{T}}t\right)+(1-\alpha)\,\exp\left(-\lambda&#95;{\mathrm{L}}t\right)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_23ec8fc398b4e415b86bbd2b65f9a63c.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <img src="../pub/Main/SmiliesPluginPSI/skull.gif" alt="dead!" title="dead!" border="0" /> </td>
 		</tr>
-		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
+		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> abragam </td>
 			<td class="foswikiTableCol1"> ab </td>
 			<td class="foswikiTableCol2"> <img alt="\sigma\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_6b6bbc4add4da0bde8220c54594658f3.png"  />, <img alt="\gamma\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_ebef6cda2881306e993839c1b4bcaa4c.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\exp\left&#91;-\frac{\sigma^2}{\gamma^2}\left(e^{-\gamma t}-1+\gamma t\right)\right]" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_e56be15b7e230ec52a9f6632e552ca4b.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <img src="../pub/Main/SmiliesPluginPSI/skull.gif" alt="dead!" title="dead!" border="0" /> </td>
 		</tr>
-		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
+		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> skewedGss </td>
 			<td class="foswikiTableCol1"> skg </td>
 			<td class="foswikiTableCol2"> <img alt="\varphi\,(^{\circ})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_61136f20673ad20f955c43e43b8cec9d.png"  />, <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="\sigma&#95;{-}\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_bd5c765027d46aa1433dda03f540c17e.png"  />, <img alt="\sigma&#95;{+}\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_82adbab00b6a057f04037b44746e33eb.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{\sigma&#95;{-}}{\sigma&#95;{+}+\sigma&#95;{-}}\exp\left&#91;-\frac{\sigma&#95;{-}^2t^2}{2}\right]\left\lbrace\cos\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)+\sin\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)\mathrm{Erfi}\left(\frac{\sigma&#95;{-}t}{\sqrt{2}}\right)\right\rbrace+ \frac{\sigma&#95;{+}}{\sigma&#95;{+}+\sigma&#95;{-}}\exp\left&#91;-\frac{\sigma&#95;{+}^2t^2}{2}\right]\left\lbrace\cos\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)-\sin\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)\mathrm{Erfi}\left(\frac{\sigma&#95;{+}t}{\sqrt{2}}\right)\right\rbrace" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7f4cd42199fbf712ad5a86f9d94bd698.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> <a href="http://nemu.web.psi.ch/doc/LEM_Memo/skewedGaussian/skewedGaussian.pdf" target="_top">memo</a> <span class="foswikiIcon"><img src="../pub/System/DocumentGraphics/pdf.png" width="16" height="16" alt="pdf" /></span> </td>
 		</tr>
-		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
+		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> staticNKZF </td>
 			<td class="foswikiTableCol1"> snkzf </td>
 			<td class="foswikiTableCol2"> <img alt="\Delta&#95;0\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_30b87ca180341a9f8f9a15c1082f7f29.png"  />, <img alt="R&#95;b\,(\text{1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_9016746d6ee324a55cc3902971095eda.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\frac{1}{3}+\frac{2}{3}\left(\frac{1+R&#95;b^2}{1+R&#95;b^2+R&#95;b^2\Delta&#95;0^2(1+R&#95;b^2)t^2}\right)^{3/2} \left(1-\frac{\Delta&#95;0^2 t^2}{1+R&#95;b^2+R&#95;b^2\Delta&#95;0^2(1+R&#95;b^2)t^2}\right)\,\exp\left&#91;-\frac{\Delta&#95;0^2 t^2}{2(1+R&#95;b^2+R&#95;b^2\Delta&#95;0^2(1+R&#95;b^2)t^2)}\right]" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_d945c87728b1d56d770a30b5e026053b.png"  /> </td>
-			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote9text"></a><span class="FootNoteTextLink" title=" D.R. Noakes and G.M. Kalvius, <a href="http://link.aps.org/doi/10.1103/PhysRevB.56.2352" target="_top">Phys. Rev. B <strong>56</strong> (1997) 2352</a>; A. Yaouanc and P. Dalmas de R&eacute;otier "Muon Spin Rotation, Relaxation, and Resonance" Oxford Scientific Publication "><a href="#FootNote9note" class="foswikiCurrentTopicLink">(10)</a></span> </td>
+			<td class="foswikiTableCol4 foswikiLastCol"> <a name="FootNote10text"></a><span class='FootNoteTextLink' title=' D.R. Noakes and G.M. Kalvius, <a href="http://link.aps.org/doi/10.1103/PhysRevB.56.2352" target="_top">Phys. Rev. B <strong>56</strong> (1997) 2352</a>; A. Yaouanc and P. Dalmas de R&eacute;otier "Muon Spin Rotation, Relaxation, and Resonance" Oxford Scientific Publication '><a href="#FootNote10note" class="foswikiCurrentTopicLink">(10)</a></span> </td>
 		</tr>
-		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
+		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> staticNKTF </td>
 			<td class="foswikiTableCol1"> snktf </td>
 			<td class="foswikiTableCol2"> <img alt="\varphi\,(^{\circ})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_61136f20673ad20f955c43e43b8cec9d.png"  />, <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="\Delta&#95;0\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_30b87ca180341a9f8f9a15c1082f7f29.png"  />, <img alt="R&#95;b\,(\text{1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_9016746d6ee324a55cc3902971095eda.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\sqrt{\frac{1+R&#95;b^2}{1+R&#95;b^2+R&#95;b^2\Delta&#95;0^2(1+R&#95;b^2)t^2}}\,\exp\left&#91;-\frac{\Delta&#95;0^2 t^2}{2(1+R&#95;b^2+R&#95;b^2\Delta&#95;0^2(1+R&#95;b^2)t^2)}\right]\,\cos(\nu t+\varphi)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_732f1af523dc20db4cc7a3928128b3ff.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> see note 10 </td>
 		</tr>
-		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
+		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol"> dynamicNKZF </td>
 			<td class="foswikiTableCol1"> dnkzf </td>
 			<td class="foswikiTableCol2"> <img alt="\Delta&#95;0\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_30b87ca180341a9f8f9a15c1082f7f29.png"  />, <img alt="R&#95;b\,(\text{1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_9016746d6ee324a55cc3902971095eda.png"  />, <img alt="\nu&#95;c\,(\text{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_c4bdea6bbc03bcca6d713519e7bab071.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\sqrt{\frac{1+R&#95;b^2}{1+R&#95;b^2+4 R&#95;b^2\Delta&#95;0^2(1+R&#95;b^2) \Theta(t)}}\,\exp\left&#91;-\frac{2 \Delta&#95;0^2 (1+R&#95;b^2) \Theta(t)}{1+R&#95;b^2+4 R&#95;b^2\Delta&#95;0^2(1+R&#95;b^2)\Theta(t)}\right]\quad,\, \Theta(t) &#61; \frac{\exp(-\nu&#95;c t) - 1 - \nu&#95;c t}{\nu&#95;c^2}" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_cf5fc22c270ed7fdf4757c86fa922663.png"  /> </td>
 			<td class="foswikiTableCol4"> see note 10 </td>
 		</tr>
-		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
+		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
 			<td class="foswikiTableCol0 foswikiFirstCol"> dynamicNKTF </td>
 			<td class="foswikiTableCol1"> dnktf </td>
 			<td class="foswikiTableCol2"> <img alt="\varphi\,(^{\circ})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_61136f20673ad20f955c43e43b8cec9d.png"  />, <img alt="\nu\,(\mathrm{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_7188605a647615e4fb92cc89274b22a0.png"  />, <img alt="\Delta&#95;0\,(\mu\text{s}^{-1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_30b87ca180341a9f8f9a15c1082f7f29.png"  />, <img alt="R&#95;b\,(\text{1})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_9016746d6ee324a55cc3902971095eda.png"  />, <img alt="\nu&#95;c\,(\text{MHz})" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_c4bdea6bbc03bcca6d713519e7bab071.png"  /> </td>
 			<td class="foswikiTableCol3"> <img alt="\sqrt{\frac{1+R&#95;b^2}{1+R&#95;b^2+2 R&#95;b^2\Delta&#95;0^2(1+R&#95;b^2) \Theta(t)}}\,\exp\left&#91;-\frac{\Delta&#95;0^2 (1+R&#95;b^2) \Theta(t)}{1+R&#95;b^2+2 R&#95;b^2\Delta&#95;0^2(1+R&#95;b^2)\Theta(t)}\right]\, \cos(\nu t + \varphi) \quad,\, \Theta(t) &#61; \frac{\exp(-\nu&#95;c t) - 1 - \nu&#95;c t}{\nu&#95;c^2}" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_5567d64021662c39ddb8af17e153389d.png"  /> </td>
 			<td class="foswikiTableCol4 foswikiLastCol"> see note 10 </td>
 		</tr>
-		<tr class="foswikiTableEven foswikiTableRowdataBgSorted0 foswikiTableRowdataBg0">
+		<tr class="foswikiTableOdd foswikiTableRowdataBgSorted1 foswikiTableRowdataBg1">
 			<td class="foswikiTableCol0 foswikiFirstCol foswikiLast"> polynom </td>
 			<td class="foswikiTableCol1 foswikiLast"> p </td>
 			<td class="foswikiTableCol2 foswikiLast"> <img alt="t&#95;0\,(&#91;t])" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_20651e8230c7eb66c452bb1f01dc4633.png"  />, <img alt="a&#95;0\,(1),\,a&#95;1\,(1),\,\dots,\,a&#95;{n}\,(1)" class="mmpImage" src="../pub/MUSR/MusrFit/_MathModePlugin_03095d51eca2bcb1dda113e995238fc0.png"  /> </td>
@@ -651,9 +659,11 @@ Notes
 <p></p>
 <a name="FootNote7note"></a><span class="FootNoteLabel"><a href="#FootNote7text" class="foswikiCurrentTopicLink"> <strong>8</strong> </a></span>: <span class="FootNote"> R. S. Hayano <em>et al.</em>, <a href="http://link.aps.org/doi/10.1103/PhysRevB.20.850" target="_top">Phys. Rev. B <strong>20</strong> (1979) 850</a>; P. Dalmas de R&eacute;otier and A. Yaouanc, <a href="http://dx.doi.org/10.1088/0953-8984/4/18/020" target="_top">J. Phys.: Condens. Matter <strong>4</strong> (1992) 4533</a> </span> 
 <p></p>
-<a name="FootNote8note"></a><span class="FootNoteLabel"><a href="#FootNote8text" class="foswikiCurrentTopicLink"> <strong>9</strong> </a></span>: <span class="FootNote">  R. E. Turner and D. R. Harshman, <a href="http://link.aps.org/doi/10.1103/PhysRevB.34.4467" target="_top">Phys. Rev. B <strong>34</strong> (1986) 4467</a> </span> 
+<a name="FootNote8note"></a><span class="FootNoteLabel"><a href="#FootNote8text" class="foswikiCurrentTopicLink"> <strong>9</strong> </a></span>: <span class="FootNote">  M.R. Crook and R. Cywinski, <a href="http://dx.doi.org/10.1088/0953-8984/9/5/018" target="_top">J. Phys.: Condens. Matter <strong>9</strong> (1997) 1149</a> </span> 
 <p></p>
-<a name="FootNote9note"></a><span class="FootNoteLabel"><a href="#FootNote9text" class="foswikiCurrentTopicLink"> <strong>10</strong> </a></span>: <span class="FootNote"> D.R. Noakes and G.M. Kalvius, <a href="http://link.aps.org/doi/10.1103/PhysRevB.56.2352" target="_top">Phys. Rev. B <strong>56</strong> (1997) 2352</a>; A. Yaouanc and P. Dalmas de R&eacute;otier "Muon Spin Rotation, Relaxation, and Resonance" Oxford Scientific Publication </span> 
+<a name="FootNote9note"></a><span class="FootNoteLabel"><a href="#FootNote9text" class="foswikiCurrentTopicLink"> <strong>9</strong> </a></span>: <span class="FootNote">  R. E. Turner and D. R. Harshman, <a href="http://link.aps.org/doi/10.1103/PhysRevB.34.4467" target="_top">Phys. Rev. B <strong>34</strong> (1986) 4467</a> </span> 
+<p></p>
+<a name="FootNote10note"></a><span class="FootNoteLabel"><a href="#FootNote10text" class="foswikiCurrentTopicLink"> <strong>10</strong> </a></span>: <span class="FootNote"> D.R. Noakes and G.M. Kalvius, <a href="http://link.aps.org/doi/10.1103/PhysRevB.56.2352" target="_top">Phys. Rev. B <strong>56</strong> (1997) 2352</a>; A. Yaouanc and P. Dalmas de R&eacute;otier "Muon Spin Rotation, Relaxation, and Resonance" Oxford Scientific Publication </span> 
 <p></p>
 <p></p>
 <p></p>
@@ -1436,18 +1446,17 @@ For reporting bugs or requesting new features and improvements please use the <a
 <!-- -->
 <!-- -->
 <!-- -->
-<!-- -->
 <span class='foswikiClear'></span>
-<div class="foswikiMetaData foswikiMetaDataNotAllowed">
-<div class="jqTabPane jqTabPaneSimple {select:'1', autoMaxExpand:false, animate:true, minHeight:230}">
+<div class="foswikiMetaData foswikiHideOnPrint foswikiMetaDataNotAllowed">
+<div class="jqTabPane jqTabPanePlain {select:'1', autoMaxExpand:false, animate:true, minHeight:230}">
 <!-- -->
 <!-- -->
 <!-- --><!-- -->
 <!-- -->
-<!-- TAB --><div id='jqTab3181' class="attachments jqAjaxTab jqTab {url: 'https://intranet.psi.ch/wiki/bin/rest/RenderPlugin/template?name=metadata;expand=attachments;topic=MUSR.MusrFit;render=on;1358250914'}">
+<!-- TAB --><div id='jqTab5227' class="attachments jqAjaxTab jqTab {url: 'https://intranet.psi.ch/wiki/bin/rest/RenderPlugin/template?name=metadata;expand=attachments;topic=MUSR.MusrFit;render=on;1378802790'}">
 <h2 class='jqTabLabel'>Attachments <span class='foswikiAttachmentsCount'>(2)</span></h2>
 <div class='jqTabContents' >
-  <div class='foswikiFormSteps foswikiAttachmentsProcess'><span class="foswikiIcon"><img src="../pub/System/DocumentGraphics/processing.gif" width="16" height="16" alt="processing" /></span></div>
+  <div class='foswikiFormSteps foswikiAttachmentsProcess'><span class='jqAjaxLoader'>&nbsp;</span></div>
   </div></div><!-- //ENDTAB --><!-- -->
 <!-- -->
 <!-- -->
@@ -1466,9 +1475,9 @@ For reporting bugs or requesting new features and improvements please use the <a
 <div class="foswikiFormSteps">
 <a name="topic-actions"></a>
   <div class="patternTopicActions foswikiFormStep">
-	 <span class="patternActionButtons"><span><a href='https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1358250914' rel='nofollow' title='Edit this topic text' accesskey='e'><span class='foswikiAccessKey'>E</span>dit</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/attach/MUSR/MusrFit' rel='nofollow' title='Attach an image or document to this topic' accesskey='a'><span class='foswikiAccessKey'>A</span>ttach</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='MusrFitc99a.html?cover=print;cover=print' rel='nofollow' title='Printable version of this topic' accesskey='p'><span class='foswikiAccessKey'>P</span>rint version</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/print/pdf.php?url=MUSR/MusrFit?cover=print' title='PDF version of this topic'>PDF</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/oops/MUSR/MusrFit?template=oopshistory' rel='nofollow' title='View total topic history' accesskey='h'><span class='foswikiAccessKey'>H</span>istory</a></span>: r111&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=110;rev2=111">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=110">r110</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=109;rev2=110">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=109">r109</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=108;rev2=109">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=108">r108</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=backlinksweb' rel='nofollow' title='Search the MUSR Web for topics that link to here' accesskey='b'><span class='foswikiAccessKey'>B</span>acklinks</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?raw=on' rel='nofollow' title='View without formatting' accesskey='v'><span class='foswikiAccessKey'>V</span>iew wiki text</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?refresh=on' title='Refresh images and LaTeX charts'>Refresh</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=more&amp;maxrev=111&amp;currrev=111' rel='nofollow' title='Delete or rename this topic; set parent topic; view and compare revisions' accesskey='m'><span class='foswikiAccessKey'>M</span>ore topic actions</a></span></span>
+	 <span class="patternActionButtons"><span><a href='https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1378802790' rel='nofollow' title='Edit this topic text' accesskey='e'><span class='foswikiAccessKey'>E</span>dit</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/attach/MUSR/MusrFit' rel='nofollow' title='Attach an image or document to this topic' accesskey='a'><span class='foswikiAccessKey'>A</span>ttach</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='MusrFitc99a.html?cover=print;cover=print' rel='nofollow' title='Printable version of this topic' accesskey='p'><span class='foswikiAccessKey'>P</span>rint version</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/print/pdf.php?url=MUSR/MusrFit?cover=print' title='PDF version of this topic'>PDF</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/oops/MUSR/MusrFit?template=oopshistory' rel='nofollow' title='View total topic history' accesskey='h'><span class='foswikiAccessKey'>H</span>istory</a></span>: r112&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=111;rev2=112">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=111">r111</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=110;rev2=111">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=110">r110</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=109;rev2=110">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=109">r109</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=backlinksweb' rel='nofollow' title='Search the MUSR Web for topics that link to here' accesskey='b'><span class='foswikiAccessKey'>B</span>acklinks</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?raw=on' rel='nofollow' title='View without formatting' accesskey='v'><span class='foswikiAccessKey'>V</span>iew wiki text</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?refresh=on' title='Refresh images and LaTeX charts'>Refresh</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=more&amp;maxrev=112&amp;currrev=112' rel='nofollow' title='Delete or rename this topic; set parent topic; view and compare revisions' accesskey='m'><span class='foswikiAccessKey'>M</span>ore topic actions</a></span></span>
   </div>
-</div></div><div class="patternInfo"><span class="patternRevInfo">Topic revision: 11 Dec 2012, <a href="https://intranet.psi.ch/Main/AndreasSuter">AndreasSuter</a></span></div>
+</div></div><div class="patternInfo"><span class="patternRevInfo">Topic revision: r112 - 10 Sep 2013, <a href="https://intranet.psi.ch/Main/AndreasSuter">AndreasSuter</a></span></div>
 </div>
 </div><div id="patternSideBar"><div id="patternClearHeaderLeft"></div>
 <div id="patternSideBarContents">
@@ -1478,7 +1487,7 @@ For reporting bugs or requesting new features and improvements please use the <a
 <p></p>
 <p></p>
 <b>PSI Webs</b> <ul>
-<li> <span class="foswikiIcon"><img src="../pub/System/DocumentGraphics/psi.png" width="16" height="16" alt="psi" /></span> <a href="https://intranet.psi.ch/Main/WebHome">WebHome</a>
+<li> <span class="foswikiIcon"><img src="../pub/System/DocumentGraphics/psi.png" width="16" height="16" alt="psi" /></span> <a href="https://intranet.psi.ch/Main/WebHome">Main</a>
 </li> <li> <span class="foswikiIcon"><img src="../pub/System/DocumentGraphics/psi.png" width="16" height="16" alt="psi" /></span> <a href="https://intranet.psi.ch/Main/WebList">weitere Webs</a>
 </li></ul> 
 <hr />
@@ -1502,10 +1511,13 @@ For reporting bugs or requesting new features and improvements please use the <a
 <div id="patternTopBarContents"><table border="0" cellpadding="0" cellspacing="0" style="width:100%" summary="">
 <tr><td valign="middle"><span id="foswikiLogo" class="foswikiImage"><a href="WebHome.html"><img src="../pub/Main/WebPreferences/psi_logo_150.gif" border="0" alt="Paul Scherrer Institut" style="border:none; margin: -8px 0 0 15px;" /></a></span></td>
 <td align="right" valign="top" class="patternMetaMenu" id="psimetanav">
- <ul>
-<li> <form name="quickSearchForm" action="https://intranet.psi.ch/PSI/Search"><input type="hidden" name="filter" value="web:MUSR" /><input type="text" class="foswikiInputField" id="quickSearchBox" name="search" value="" size="18" /><input type="hidden" name="scope" value="all" /><!-- <input type="hidden" name="web" value="MUSR" /> --> <noscript>&nbsp;<input type="submit" size="5" class="foswikiButton" name="submit" value="Search" />&nbsp;</noscript><input type="image" class="searchsubmit" alt="Search" value="Suche..." name="sa" src="../webbase/img/search.png">	</form>
+<p></p> <ul>
+<li> <form name="quickSearchForm" id="solrSearchForm" action="https://intranet.psi.ch/PSI/Search"><input type="hidden" name="filter" value="web:MUSR" /><input type="text" class="foswikiInputField" id="quickSearchBox" name="search" value="" size="18" /><input type="hidden" name="scope" value="all" /><!-- <input type="hidden" name="web" value="MUSR" /> --> <noscript>&nbsp;<input type="submit" size="5" class="foswikiButton" name="submit" value="Search" />&nbsp;</noscript><input type="image" class="searchsubmit" alt="Search" value="Suche..." name="sa" src="../webbase/img/search.png">	</form>
 </li> <li> <form name="changeLanguage"    action="https://intranet.psi.ch/wiki/bin/oops/MUSR/MusrFit" method="get">    <input type="hidden" name="redirectto" value="/MUSR/MusrFit?cover=print" />    <select name="language" class="foswikiSelect"        onchange="document.changeLanguage.submit()">    <option  value="de">Deutsch</option> <option selected="selected" value="en">English</option></select>    <input type="hidden" name="template" value="oopslanguagechanged" />    <noscript>        <input class="foswikiButton" type="submit"            value="Change language" />    </noscript> </form>
 </li></ul> 
+<p></p>
+<p></p>
+<p></p>
 </td></tr></table>
 </div><!--/patternTopBarContents-->
 </div><!--/patternTopBarContentsWrapper-->
@@ -1514,7 +1526,7 @@ For reporting bugs or requesting new features and improvements please use the <a
 </div>
 </div>
 </div></body>
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 15 Jan 2013 11:56:25 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 10 Sep 2013 08:47:41 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 </html>
 <p></p>

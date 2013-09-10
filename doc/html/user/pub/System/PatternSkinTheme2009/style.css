@@ -23,6 +23,8 @@
 html body {
 	font-family:arial, verdana, sans-serif;
 	font-size:104%;
+	voice-family:"\"}\""; 
+	voice-family:inherit;
 	font-size:small;
 }
 html>body { /* Mozilla */

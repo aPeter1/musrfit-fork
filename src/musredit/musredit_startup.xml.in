@@ -130,9 +130,16 @@
     </func>
     <func>
       <name>combiLGKT</name>
-      <comment>(LorentzRate GaussRate)</comment>
+      <comment>(lorentzRate gaussRate)</comment>
       <label>combined Lorentz-Gauss KT</label>
       <pixmap>combiLGKT.png</pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>strKT</name>
+      <comment>(rate beta)</comment>
+      <label>stretched Kubo-Toyabe</label>
+      <pixmap></pixmap>
       <params>2</params>
     </func>
     <func>

@@ -444,6 +444,10 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
           return CombiLGKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
           break;
+        case THEORY_STR_KT:
+          return StrKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
+                 fAdd->Func(t, paramValues, funcValues);
+          break;
         case THEORY_SPIN_GLASS:
           return SpinGlass(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
@@ -543,6 +547,9 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
         case THEORY_COMBI_LGKT:
           return CombiLGKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
+        case THEORY_STR_KT:
+          return StrKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
+          break;
         case THEORY_SPIN_GLASS:
           return SpinGlass(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
@@ -630,6 +637,9 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
         case THEORY_COMBI_LGKT:
           return CombiLGKT(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
+        case THEORY_STR_KT:
+          return StrKT(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
+          break;
         case THEORY_SPIN_GLASS:
           return SpinGlass(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
@@ -714,6 +724,9 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
           break;
         case THEORY_COMBI_LGKT:
           return CombiLGKT(t, paramValues, funcValues);
+          break;
+        case THEORY_STR_KT:
+          return StrKT(t, paramValues, funcValues);
           break;
         case THEORY_SPIN_GLASS:
           return SpinGlass(t, paramValues, funcValues);
@@ -1750,6 +1763,56 @@ Double_t PTheory::CombiLGKT(register Double_t t, const PDoubleVector& paramValue
 
   return 0.333333333333333 * 
          (1.0 + 2.0*(1.0-lambdaL_t-lambdaG_t_2)*TMath::Exp(-(lambdaL_t+0.5*lambdaG_t_2)));
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p> theory function: stretched Kubo-Toyabe in zero field.
+ * Ref: Crook M. R. and Cywinski R., J. Phys. Condens. Matter, 9 (1997) 1149.
+ *
+ * \f[ =  1/3 + 2/3 \left(1-(\sigma t)^\beta \right) \exp\left(-(\sigma t)^\beta / \beta\right)\f]
+ * or the time shifted version of it.
+ *
+ * <b>meaning of paramValues:</b> \f$\sigma\f$, \f$\beta\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
+ */
+Double_t PTheory::StrKT(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+{
+  // expected parameters: sigma beta [tshift]
+
+  Double_t val[3];
+
+  assert(fParamNo.size() <= 3);
+
+  // check if FUNCTIONS are used
+  for (UInt_t i=0; i<fParamNo.size(); i++) {
+    if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
+      val[i] = paramValues[fParamNo[i]];
+    } else { // function
+      val[i] = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
+    }
+  }
+
+  // check for beta too small (beta < 0.1) in which case numerical problems could arise and the function is anyhow
+  // almost identical to a constant of 1/3.
+  if (val[1] < 0.1)
+    return 0.333333333333333;
+
+  Double_t tt;
+  if (fParamNo.size() == 2) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[2];
+
+  Double_t sigma_t   = TMath::Power(tt*val[0],val[1]);
+
+  return 0.333333333333333 * 
+    (1.0 + 2.0*(1.0-sigma_t)*TMath::Exp(-sigma_t/val[1]));
 }
 
 //--------------------------------------------------------------------------

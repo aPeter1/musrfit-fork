@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en_US" lang="en_US">
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 15 Jan 2013 11:56:00 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 10 Sep 2013 08:47:16 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 <head>
 <link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
@@ -8,11 +8,12 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
 <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
-<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFitSetup?t=1358250911" type="application/x-wiki" title="edit MusrFitSetup" />
+<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFitSetup?t=1378802787" type="application/x-wiki" title="edit MusrFitSetup" />
 <meta name="TEXT_NUM_TOPICS" content="Number of topics:" />
 <meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
 <meta name="robots" content="noindex" /><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="WebRsshtml.html" />
 <base  /><!--[if IE]></base><![endif]-->
+<link rel='stylesheet' href='../pub/System/ImagePlugin/style.css' media='all' />
 <style type="text/css" media="all">
 @import url('../pub/System/SkinTemplates/base.css');
 </style>
@@ -228,7 +229,7 @@ Even though there might exist binary packages for the <code>NeXus</code> library
 The <code>ROOT</code> system may or may not be part of the GNU/Linux distribution. If it is, it should be checked that the provided binaries are of a recent version and then these in principle can be installed using a package manager as described above. <br>
 In case the distribution provides no or only outdated binary packages there are the following possibilities: <ul>
 <li> Visit the <code>ROOT</code> <a href="http://root.cern.ch/drupal/content/downloading-root" target="_top">web page</a> and download the packed precompiled binary version matching best the GNU/Linux distribution. Then unpack the bundle to its final destination.
-</li> <li> If there is no precompiled binary version of <code>ROOT</code> available for your system or e.g. <code>ROOT</code> should be compiled with another version of <code>GCC</code> visit the <a href="http://root.cern.ch/drupal/content/downloading-root" target="_top">web page</a> and download the 'complete source tree for all systems'. Then unpack this source tree to its destination (e.g. /opt/root-system)<a name="FootNote1text"></a><span class="FootNoteTextLink" title="In case only a single user is working at the machine it might be considerable to change the ownership of the <code>ROOT</code> folder so that the user has easy write access to this directory: <pre class="bash">chown username:username /opt/root-system/ -R</pre>"><a href="#FootNote1note" class="foswikiCurrentTopicLink">(1)</a></span>, configure<a name="FootNote2text"></a><span class="FootNoteTextLink" title=" When using <code>GCC</code> &#8805; 4.2 please make sure that the environment variables <strong>USE_PARALLEL_MINUIT2</strong> and <strong>USE_OPENMP</strong> are <em>not</em> set! Otherwise <code>MINUIT2</code> will be compiled with parallelization support and cannot be used together with <code>musrfit</code> afterwards since the <code>musrfit</code> code is <em>not</em> fully thread-safe! When compiled with <code>GCC</code> &#8805; 4.2 <code>musrfit</code> itself will parallelize the &chi;<sup>2</sup> calculation."><a href="#FootNote2note" class="foswikiCurrentTopicLink">(2)</a></span> it (here using the minimal set of options) and compile it as follows right below: <pre class="bash">
+</li> <li> If there is no precompiled binary version of <code>ROOT</code> available for your system or e.g. <code>ROOT</code> should be compiled with another version of <code>GCC</code> visit the <a href="http://root.cern.ch/drupal/content/downloading-root" target="_top">web page</a> and download the 'complete source tree for all systems'. Then unpack this source tree to its destination (e.g. /opt/root-system)<a name="FootNote1text"></a><span class='FootNoteTextLink' title='In case only a single user is working at the machine it might be considerable to change the ownership of the <code>ROOT</code> folder so that the user has easy write access to this directory: <pre class="bash">chown username:username /opt/root-system/ -R</pre>'><a href="#FootNote1note" class="foswikiCurrentTopicLink">(1)</a></span>, configure<a name="FootNote2text"></a><span class='FootNoteTextLink' title=' When using <code>GCC</code> &#8805; 4.2 please make sure that the environment variables <strong>USE_PARALLEL_MINUIT2</strong> and <strong>USE_OPENMP</strong> are <em>not</em> set! Otherwise <code>MINUIT2</code> will be compiled with parallelization support and cannot be used together with <code>musrfit</code> afterwards since the <code>musrfit</code> code is <em>not</em> fully thread-safe! When compiled with <code>GCC</code> &#8805; 4.2 <code>musrfit</code> itself will parallelize the &chi;<sup>2</sup> calculation.'><a href="#FootNote2note" class="foswikiCurrentTopicLink">(2)</a></span> it (here using the minimal set of options) and compile it as follows right below: <pre class="bash">
 cd /opt/root-system
 ./configure linux --gminimal --enable-asimage --enable-mathmore --enable-minuit2 --enable-xml
             (or in case of a 64 bit installation: ./configure linuxx8664gcc --gminimal --enable-asimage --enable-mathmore --enable-minuit2 --enable-xml)
@@ -285,7 +286,7 @@ After the source-code extraction the <strong>autogen.sh</strong> script is calle
 </dd></dl> 
 <p></p>
 Normally it should not be necessary to make use of any of the options except for specifying the installation path with <strong>--prefix</strong>. The other paths should be detected automatically. If this does not work for some reason the <strong>configure</strong> script will terminate and ask for the information.
-When the <strong>configure</strong> script has been called successfully everything is ready for building the <code>musrfit</code> libraries and executables. A standard installation sequence (without <code>NeXus</code> support) might then look like<a name="FootNote3text"></a><span class="FootNoteTextLink" title="In case the normal user has no write permissions to the &#36;ROOTSYS and the installation path the "make install" commands have to be executed as superuser."><a href="#FootNote3note" class="foswikiCurrentTopicLink">(3)</a></span>:
+When the <strong>configure</strong> script has been called successfully everything is ready for building the <code>musrfit</code> libraries and executables. A standard installation sequence (without <code>NeXus</code> support) might then look like<a name="FootNote3text"></a><span class='FootNoteTextLink' title='In case the normal user has no write permissions to the &#36;ROOTSYS and the installation path the "make install" commands have to be executed as superuser.'><a href="#FootNote3note" class="foswikiCurrentTopicLink">(3)</a></span>:
 <pre class="bash">
 cd musrfit
 sh autogen.sh
@@ -403,7 +404,7 @@ In order to install the <code>ROOT</code> system, there are two possibilities: <
 cd /cygdrive/c
 tar xzf root&#95;v5.xx.yy.win32gcc-gcc-4.3.tar.gz
 </pre>
-</li> <li> If due to some reason there was no precompiled <strong>Cygwin GCC 4.3</strong> package available or <code>ROOT</code> should be built from source, one has to visit the <a href="http://root.cern.ch/drupal/content/downloading-root" target="_top">web page</a>, download the 'complete source tree for all systems' and save it for instance in <strong>C:\</strong>.<br>Then go to the Cygwin shell and unpack this source tree, configure<a name="FootNote4text"></a><span class="FootNoteTextLink" title=" When using <code>GCC</code> &#8805; 4.2 please make sure that the environment variables <strong>USE_PARALLEL_MINUIT2</strong> and <strong>USE_OPENMP</strong> are <em>not</em> set! Otherwise <code>MINUIT2</code> will be compiled with parallelization support and cannot be used together with <code>musrfit</code> afterwards since the <code>musrfit</code> code is <em>not</em> fully thread-safe! When compiled with <code>GCC</code> &#8805; 4.2 <code>musrfit</code> itself will parallelize the &chi;<sup>2</sup> calculation."><a href="#FootNote4note" class="foswikiCurrentTopicLink">(2)</a></span> it (here using the minimal set of options) and compile it as follows right below:<pre class="bash">
+</li> <li> If due to some reason there was no precompiled <strong>Cygwin GCC 4.3</strong> package available or <code>ROOT</code> should be built from source, one has to visit the <a href="http://root.cern.ch/drupal/content/downloading-root" target="_top">web page</a>, download the 'complete source tree for all systems' and save it for instance in <strong>C:\</strong>.<br>Then go to the Cygwin shell and unpack this source tree, configure<a name="FootNote4text"></a><span class='FootNoteTextLink' title=' When using <code>GCC</code> &#8805; 4.2 please make sure that the environment variables <strong>USE_PARALLEL_MINUIT2</strong> and <strong>USE_OPENMP</strong> are <em>not</em> set! Otherwise <code>MINUIT2</code> will be compiled with parallelization support and cannot be used together with <code>musrfit</code> afterwards since the <code>musrfit</code> code is <em>not</em> fully thread-safe! When compiled with <code>GCC</code> &#8805; 4.2 <code>musrfit</code> itself will parallelize the &chi;<sup>2</sup> calculation.'><a href="#FootNote4note" class="foswikiCurrentTopicLink">(2)</a></span> it (here using the minimal set of options) and compile it as follows right below:<pre class="bash">
 cd /cygdrive/c
 tar xzf root&#95;v5.xx.yy.source.tar.gz
 cd root
@@ -770,7 +771,7 @@ qmake musrgui.pro
 make
 make install
 </pre>
-The last command copies <strong>musrgui.app</strong> to the standard program directory <strong>/Applications</strong> <a name="FootNote5text"></a><span class="FootNoteTextLink" title="In the case <code><b>qt3-mac</b></code> has not been installed, there will be no <strong>musrgui.app</strong> but only the executable <strong>musrgui</strong> which will be placed in the directory <strong>$ROOTSYS/bin</strong> and has to be called from the terminal."><a href="#FootNote5note" class="foswikiCurrentTopicLink">(4)</a></span> and the <strong>musrgui_startup.xml</strong> to <strong>$ROOTSYS/bin/musrgui_startup.xml</strong>. Eventually, in the installed <strong>musrgui_startup.xml</strong> the path-specifications have to be adjusted to match the local <code>musrfit</code> installation. For detailed information on this XML file refer to the <a href="MusrGui.html#MusrguiStartupXml">manual</a>.
+The last command copies <strong>musrgui.app</strong> to the standard program directory <strong>/Applications</strong> <a name="FootNote5text"></a><span class='FootNoteTextLink' title='In the case <code><b>qt3-mac</b></code> has not been installed, there will be no <strong>musrgui.app</strong> but only the executable <strong>musrgui</strong> which will be placed in the directory <strong>$ROOTSYS/bin</strong> and has to be called from the terminal.'><a href="#FootNote5note" class="foswikiCurrentTopicLink">(4)</a></span> and the <strong>musrgui_startup.xml</strong> to <strong>$ROOTSYS/bin/musrgui_startup.xml</strong>. Eventually, in the installed <strong>musrgui_startup.xml</strong> the path-specifications have to be adjusted to match the local <code>musrfit</code> installation. For detailed information on this XML file refer to the <a href="MusrGui.html#MusrguiStartupXml">manual</a>.
 <p></p>
 Under some circumstances it might happen, that if <code>musrgui</code> was called from <code>Finder</code> the necessary libraries for executing <code>musrfit</code> could not be found.
 In that case, the only workaround for the moment is to export the environment variable <strong>DYLD_LIBRARY_PATH</strong> in the shell and call <code>musrgui</code> from a terminal!
@@ -803,10 +804,9 @@ musrview test-histo-ROOT-NPP.msr
 <!-- -->
 <!-- -->
 <!-- -->
-<!-- -->
 <span class='foswikiClear'></span>
-<div class="foswikiMetaData foswikiMetaDataNotAllowed">
-<div class="jqTabPane jqTabPaneSimple {select:'1', autoMaxExpand:false, animate:true, minHeight:230}">
+<div class="foswikiMetaData foswikiHideOnPrint foswikiMetaDataNotAllowed">
+<div class="jqTabPane jqTabPanePlain {select:'1', autoMaxExpand:false, animate:true, minHeight:230}">
 <!-- -->
 <!-- -->
 <!-- --><!-- -->
@@ -821,9 +821,9 @@ musrview test-histo-ROOT-NPP.msr
 <div class="foswikiFormSteps">
 <a name="topic-actions"></a>
   <div class="patternTopicActions foswikiFormStep">
-	 <span class="patternActionButtons"><span><a href='https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFitSetup?t=1358250911' rel='nofollow' title='Edit this topic text' accesskey='e'><span class='foswikiAccessKey'>E</span>dit</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/attach/MUSR/MusrFitSetup' rel='nofollow' title='Attach an image or document to this topic' accesskey='a'><span class='foswikiAccessKey'>A</span>ttach</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='MusrFitSetupc99a.html?cover=print;cover=print' rel='nofollow' title='Printable version of this topic' accesskey='p'><span class='foswikiAccessKey'>P</span>rint version</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/print/pdf.php?url=MUSR/MusrFitSetup?cover=print' title='PDF version of this topic'>PDF</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/oops/MUSR/MusrFitSetup?template=oopshistory' rel='nofollow' title='View total topic history' accesskey='h'><span class='foswikiAccessKey'>H</span>istory</a></span>: r53&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFitSetup?rev1=52;rev2=53">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFitSetup?rev=52">r52</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFitSetup?rev1=51;rev2=52">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFitSetup?rev=51">r51</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFitSetup?rev1=50;rev2=51">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFitSetup?rev=50">r50</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFitSetup?template=backlinksweb' rel='nofollow' title='Search the MUSR Web for topics that link to here' accesskey='b'><span class='foswikiAccessKey'>B</span>acklinks</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFitSetup?raw=on' rel='nofollow' title='View without formatting' accesskey='v'><span class='foswikiAccessKey'>V</span>iew wiki text</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFitSetup?refresh=on' title='Refresh images and LaTeX charts'>Refresh</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFitSetup?template=more&amp;maxrev=53&amp;currrev=53' rel='nofollow' title='Delete or rename this topic; set parent topic; view and compare revisions' accesskey='m'><span class='foswikiAccessKey'>M</span>ore topic actions</a></span></span>
+	 <span class="patternActionButtons"><span><a href='https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFitSetup?t=1378802787' rel='nofollow' title='Edit this topic text' accesskey='e'><span class='foswikiAccessKey'>E</span>dit</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/attach/MUSR/MusrFitSetup' rel='nofollow' title='Attach an image or document to this topic' accesskey='a'><span class='foswikiAccessKey'>A</span>ttach</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='MusrFitSetupc99a.html?cover=print;cover=print' rel='nofollow' title='Printable version of this topic' accesskey='p'><span class='foswikiAccessKey'>P</span>rint version</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/print/pdf.php?url=MUSR/MusrFitSetup?cover=print' title='PDF version of this topic'>PDF</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/oops/MUSR/MusrFitSetup?template=oopshistory' rel='nofollow' title='View total topic history' accesskey='h'><span class='foswikiAccessKey'>H</span>istory</a></span>: r53&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFitSetup?rev1=52;rev2=53">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFitSetup?rev=52">r52</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFitSetup?rev1=51;rev2=52">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFitSetup?rev=51">r51</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFitSetup?rev1=50;rev2=51">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFitSetup?rev=50">r50</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFitSetup?template=backlinksweb' rel='nofollow' title='Search the MUSR Web for topics that link to here' accesskey='b'><span class='foswikiAccessKey'>B</span>acklinks</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFitSetup?raw=on' rel='nofollow' title='View without formatting' accesskey='v'><span class='foswikiAccessKey'>V</span>iew wiki text</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFitSetup?refresh=on' title='Refresh images and LaTeX charts'>Refresh</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFitSetup?template=more&amp;maxrev=53&amp;currrev=53' rel='nofollow' title='Delete or rename this topic; set parent topic; view and compare revisions' accesskey='m'><span class='foswikiAccessKey'>M</span>ore topic actions</a></span></span>
   </div>
-</div></div><div class="patternInfo"><span class="patternRevInfo">Topic revision: 15 Jan 2013, <a href="https://intranet.psi.ch/Main/AndreasSuter">AndreasSuter</a></span></div>
+</div></div><div class="patternInfo"><span class="patternRevInfo">Topic revision: r53 - 15 Jan 2013, <a href="https://intranet.psi.ch/Main/AndreasSuter">AndreasSuter</a></span></div>
 </div>
 </div><div id="patternSideBar"><div id="patternClearHeaderLeft"></div>
 <div id="patternSideBarContents">
@@ -833,7 +833,7 @@ musrview test-histo-ROOT-NPP.msr
 <p></p>
 <p></p>
 <b>PSI Webs</b> <ul>
-<li> <span class="foswikiIcon"><img src="../pub/System/DocumentGraphics/psi.png" width="16" height="16" alt="psi" /></span> <a href="https://intranet.psi.ch/Main/WebHome">WebHome</a>
+<li> <span class="foswikiIcon"><img src="../pub/System/DocumentGraphics/psi.png" width="16" height="16" alt="psi" /></span> <a href="https://intranet.psi.ch/Main/WebHome">Main</a>
 </li> <li> <span class="foswikiIcon"><img src="../pub/System/DocumentGraphics/psi.png" width="16" height="16" alt="psi" /></span> <a href="https://intranet.psi.ch/Main/WebList">weitere Webs</a>
 </li></ul> 
 <hr />
@@ -857,10 +857,13 @@ musrview test-histo-ROOT-NPP.msr
 <div id="patternTopBarContents"><table border="0" cellpadding="0" cellspacing="0" style="width:100%" summary="">
 <tr><td valign="middle"><span id="foswikiLogo" class="foswikiImage"><a href="WebHome.html"><img src="../pub/Main/WebPreferences/psi_logo_150.gif" border="0" alt="Paul Scherrer Institut" style="border:none; margin: -8px 0 0 15px;" /></a></span></td>
 <td align="right" valign="top" class="patternMetaMenu" id="psimetanav">
- <ul>
-<li> <form name="quickSearchForm" action="https://intranet.psi.ch/PSI/Search"><input type="hidden" name="filter" value="web:MUSR" /><input type="text" class="foswikiInputField" id="quickSearchBox" name="search" value="" size="18" /><input type="hidden" name="scope" value="all" /><!-- <input type="hidden" name="web" value="MUSR" /> --> <noscript>&nbsp;<input type="submit" size="5" class="foswikiButton" name="submit" value="Search" />&nbsp;</noscript><input type="image" class="searchsubmit" alt="Search" value="Suche..." name="sa" src="../webbase/img/search.png">	</form>
+<p></p> <ul>
+<li> <form name="quickSearchForm" id="solrSearchForm" action="https://intranet.psi.ch/PSI/Search"><input type="hidden" name="filter" value="web:MUSR" /><input type="text" class="foswikiInputField" id="quickSearchBox" name="search" value="" size="18" /><input type="hidden" name="scope" value="all" /><!-- <input type="hidden" name="web" value="MUSR" /> --> <noscript>&nbsp;<input type="submit" size="5" class="foswikiButton" name="submit" value="Search" />&nbsp;</noscript><input type="image" class="searchsubmit" alt="Search" value="Suche..." name="sa" src="../webbase/img/search.png">	</form>
 </li> <li> <form name="changeLanguage"    action="https://intranet.psi.ch/wiki/bin/oops/MUSR/MusrFitSetup" method="get">    <input type="hidden" name="redirectto" value="/MUSR/MusrFitSetup?cover=print" />    <select name="language" class="foswikiSelect"        onchange="document.changeLanguage.submit()">    <option  value="de">Deutsch</option> <option selected="selected" value="en">English</option></select>    <input type="hidden" name="template" value="oopslanguagechanged" />    <noscript>        <input class="foswikiButton" type="submit"            value="Change language" />    </noscript> </form>
 </li></ul> 
+<p></p>
+<p></p>
+<p></p>
 </td></tr></table>
 </div><!--/patternTopBarContents-->
 </div><!--/patternTopBarContentsWrapper-->
@@ -869,7 +872,7 @@ musrview test-histo-ROOT-NPP.msr
 </div>
 </div>
 </div></body>
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 15 Jan 2013 11:56:02 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Tue, 10 Sep 2013 08:47:18 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 </html>
 <p></p>

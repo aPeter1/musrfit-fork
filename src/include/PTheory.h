@@ -57,20 +57,21 @@
 #define THEORY_STATIC_LORENTZ_KT_LF          9
 #define THEORY_DYNAMIC_LORENTZ_KT_LF        10
 #define THEORY_COMBI_LGKT                   11
-#define THEORY_SPIN_GLASS                   12
-#define THEORY_RANDOM_ANISOTROPIC_HYPERFINE 13
-#define THEORY_ABRAGAM                      14
-#define THEORY_INTERNAL_FIELD               15
-#define THEORY_TF_COS                       16
-#define THEORY_BESSEL                       17
-#define THEORY_INTERNAL_BESSEL              18
-#define THEORY_SKEWED_GAUSS                 19
-#define THEORY_STATIC_ZF_NK                 20
-#define THEORY_STATIC_TF_NK                 21
-#define THEORY_DYNAMIC_ZF_NK                22
-#define THEORY_DYNAMIC_TF_NK                23
-#define THEORY_POLYNOM                      24
-#define THEORY_USER_FCN                     25
+#define THEORY_STR_KT                       12
+#define THEORY_SPIN_GLASS                   13
+#define THEORY_RANDOM_ANISOTROPIC_HYPERFINE 14
+#define THEORY_ABRAGAM                      15
+#define THEORY_INTERNAL_FIELD               16
+#define THEORY_TF_COS                       17
+#define THEORY_BESSEL                       18
+#define THEORY_INTERNAL_BESSEL              19
+#define THEORY_SKEWED_GAUSS                 20
+#define THEORY_STATIC_ZF_NK                 21
+#define THEORY_STATIC_TF_NK                 22
+#define THEORY_DYNAMIC_ZF_NK                23
+#define THEORY_DYNAMIC_TF_NK                24
+#define THEORY_POLYNOM                      25
+#define THEORY_USER_FCN                     26
 
 // function parameter tags, i.e. how many parameters has a specific function
 // if there is a comment with a (tshift), the number of parameters is increased by one
@@ -86,6 +87,7 @@
 #define THEORY_PARAM_STATIC_LORENTZ_KT_LF         2 // frequency, damping (tshift)
 #define THEORY_PARAM_DYNAMIC_LORENTZ_KT_LF        3 // frequency, damping, hop-rate (tshift)
 #define THEORY_PARAM_COMBI_LGKT                   2 // Lorentz rate, Gauss rate (tshift)
+#define THEORY_PARAM_STR_KT                       2 // rate, exponent (tshift)
 #define THEORY_PARAM_SPIN_GLASS                   3 // rate, hop-rate, order parameter (tshift)
 #define THEORY_PARAM_RANDOM_ANISOTROPIC_HYPERFINE 2 // frequency, rate (tshift)
 #define THEORY_PARAM_ABRAGAM                      2 // rate, hop-rate (tshift)
@@ -100,7 +102,7 @@
 #define THEORY_PARAM_DYNAMIC_TF_NK                5 // phase, frequency, damping D0, R_b=DGbG/D0, nu_c (tshift)
 
 // number of available user functions
-#define THEORY_MAX 26
+#define THEORY_MAX 27
 
 // maximal number of parameters. Needed in the contents of LF
 #define THEORY_MAX_PARAM 10
@@ -166,7 +168,10 @@ static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
    "dynExpKTLF", "dektlf", "(frequency damping hopping-rate)", "(frequency damping hopping-rate tshift)"},
 
   {THEORY_COMBI_LGKT, THEORY_PARAM_COMBI_LGKT, false,
-   "combiLGKT", "lgkt", "(LorentzRate GaussRate)", "(LorentzRate GaussRate tshift)"},
+   "combiLGKT", "lgkt", "(lorentzRate gaussRate)", "(lorentzRate gaussRate tshift)"},
+
+  {THEORY_STR_KT, THEORY_PARAM_STR_KT, false,
+   "strKT", "skt", "(rate beta)", "(rate beta tshift)"},
 
   {THEORY_SPIN_GLASS, THEORY_PARAM_SPIN_GLASS, false,
    "spinGlass",  "spg", "(rate hopprate order)", "(rate hopprate order tshift)"},
@@ -244,6 +249,7 @@ class PTheory
     virtual Double_t StaticLorentzKTLF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t DynamicLorentzKTLF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t CombiLGKT(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t StrKT(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t SpinGlass(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t RandomAnisotropicHyperfine(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t Abragam(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
