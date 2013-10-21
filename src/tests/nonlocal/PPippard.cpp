@@ -486,7 +486,10 @@ Double_t PPippard::Calc_v(const Double_t s) const
   if (ss < 0.001) {
     v = (-0.0772157-log(ss))*ss+s2; // series expansion in s up to 2nd order
   } else {
-    v = 1/6.0*(exp(-ss)*(s2-ss-4.0) + 4.0 - ss*(s2-6.0) * gsl_sf_gamma_inc(0.0, ss));
+    if (ss > 50.0)
+      v = 1/6.0*(exp(-ss)*(s2-ss-4.0) + 4.0);
+    else
+      v = 1/6.0*(exp(-ss)*(s2-ss-4.0) + 4.0 - ss*(s2-6.0) * gsl_sf_gamma_inc(0.0, ss));
   }
 
   if (s < 0)
@@ -511,7 +514,10 @@ Double_t PPippard::Calc_w(const Double_t s) const
   if (ss < 0.001) {
     w = (0.211392 - 0.5*log(ss))*s2; // series expansion in s up to 2nd order
   } else {
-    w = 1/24.0*(exp(-ss)*(6.0-10.0*ss-s2+ss*s2)+16.0*ss-6.0-s2*(s2-12.0)*gsl_sf_gamma_inc(0.0, ss));
+    if (ss > 50.0)
+      w = 1/24.0*(exp(-ss)*(6.0-10.0*ss-s2+ss*s2)+16.0*ss-6.0);
+    else
+      w = 1/24.0*(exp(-ss)*(6.0-10.0*ss-s2+ss*s2)+16.0*ss-6.0-s2*(s2-12.0)*gsl_sf_gamma_inc(0.0, ss));
   }
 
   return w;
