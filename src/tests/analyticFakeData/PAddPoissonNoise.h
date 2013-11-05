@@ -34,7 +34,7 @@
 
 #include <TObject.h>
 #include <TH1F.h>
-#include <TRandom2.h>
+#include <TRandom3.h>
 
 class PAddPoissonNoise : public TObject
 {
@@ -49,7 +49,7 @@ class PAddPoissonNoise : public TObject
 
   private:
     Bool_t fValid;
-    TRandom2 *fRandom;
+    TRandom3 *fRandom;
 
     Double_t fSquareRoot;
     Double_t fAlxm;

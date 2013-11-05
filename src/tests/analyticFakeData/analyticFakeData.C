@@ -47,7 +47,7 @@ void analyticFakeData(const TString type)
   gROOT->GetListOfBrowsables()->Add(histosFolder, "histos");
   decayAnaModule = histosFolder->AddFolder("DecayAnaModule", "muSR decay histograms");
 
-  UInt_t runNo = 9001;
+  UInt_t runNo = 9042;
   TString fileName, tstr, label, tstr1;
   fileName.Form("0%d.root", (Int_t)runNo);
 
@@ -164,13 +164,14 @@ void analyticFakeData(const TString type)
   }
 
   // create histos
-  UInt_t n0[8] = {200.0, 200.0, 200.0, 200.0, 200.0, 200.0, 200.0, 200.0};
-  UInt_t bkg[8] = {1.3, 1.5, 1.0, 1.3, 1.2, 1.1, 1.0, 1.4};
+  Double_t n0[8] = {200.0, 200.0, 200.0, 200.0, 200.0, 200.0, 200.0, 200.0};
+  Double_t bkg[8] = {1.3, 1.5, 1.0, 1.3, 1.2, 1.1, 1.0, 1.4};
   const Double_t tau = 2197.019; // ns
+
   // asymmetry related stuff
   const Double_t timeResolution = 0.1953125; // ns
 //  Double_t a0[8] = {0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12};
-  Double_t a0[8] = {0.2201, 0.22, 0.2202, 0.2198, 0.22, 0.2199, 0.22, 0.2203};
+  Double_t a0[8] = {0.21, 0.22, 0.22, 0.24, 0.22, 0.21, 0.22, 0.23};
 //  Double_t a1[8] = {0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05};
   Double_t a1[8] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   Double_t phase[8] = {5.0*TMath::Pi()/180.0, 50.0*TMath::Pi()/180.0, 95.0*TMath::Pi()/180.0, 140.0*TMath::Pi()/180.0,
@@ -178,8 +179,33 @@ void analyticFakeData(const TString type)
   const Double_t gamma = 0.0000135538817; // gamma/(2pi)
   Double_t bb0 = 200.0; // field in Gauss
   Double_t bb1 = 400.0; // field in Gauss
-  Double_t rate0 = 0.5/1000.0; // in 1/ns
+  Double_t rate0 = 0.10/1000.0; // in 1/ns
   Double_t rate1 = 0.15/1000.0; // in 1/ns
+
+  // fake function parameters header info: only for test purposes
+  if (type.CompareTo("TLemRunHeader")) {
+    TDoubleVector dvec;
+    header->Set("FakeFct/Def", "N0 exp(-t/tau_mu) [1 + A exp(-t lambda) cos(gamma_mu B t + phi)] + bkg");
+    for (UInt_t i=0; i<8; i++)
+      dvec.push_back(n0[i]);
+    header->Set("FakeFct/N0", dvec);
+    dvec.clear();
+    for (UInt_t i=0; i<8; i++)
+      dvec.push_back(bkg[i]);
+    header->Set("FakeFct/bkg", dvec);
+    dvec.clear();
+    for (UInt_t i=0; i<8; i++)
+      dvec.push_back(a0[i]);
+    header->Set("FakeFct/A", dvec);
+    dvec.clear();
+    for (UInt_t i=0; i<8; i++)
+      dvec.push_back(phase[i]);
+    header->Set("FakeFct/phase", dvec);
+    prop.Set("B", bb0, "G");
+    header->Set("FakeFct/B", prop);
+    prop.Set("lambda", rate0, "1/usec");
+    header->Set("FakeFct/lambda", prop);
+  }
 
   TH1F *histo[16];
   char str[128];

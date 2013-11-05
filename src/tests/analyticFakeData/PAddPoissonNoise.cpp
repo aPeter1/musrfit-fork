@@ -50,7 +50,7 @@ PAddPoissonNoise::PAddPoissonNoise(UInt_t seed)
 {
   fValid = true;
 
-  fRandom = new TRandom2(seed);
+  fRandom = new TRandom3(seed);
   if (fRandom == 0) {
     fValid = false;
   }
@@ -144,7 +144,7 @@ Double_t PAddPoissonNoise::PoiDev(const Double_t &mean)
   if (mean < 12.0) {
     if (mean != fOldMean) {
       fOldMean = mean;
-      fG = TMath::Exp(-mean);
+      fG = exp(-mean);
     }
     em = -1.0;
     t  =  1.0;
@@ -155,17 +155,17 @@ Double_t PAddPoissonNoise::PoiDev(const Double_t &mean)
   } else {
     if (mean != fOldMean) {
       fOldMean = mean;
-      fSquareRoot = TMath::Sqrt(2.0*mean);
-      fAlxm = TMath::Log(mean);
+      fSquareRoot = sqrt(2.0*mean);
+      fAlxm = log(mean);
       fG = mean*fAlxm-TMath::LnGamma(mean+1.0);
     }
     do {
       do {
-        y = TMath::Tan(TMath::Pi()*fRandom->Rndm());
+        y = tan(TMath::Pi()*fRandom->Rndm());
         em = fSquareRoot*y+mean;
       } while (em < 0.0);
       em = TMath::Floor(em);
-      t = 0.9*(1.0+y*y)*TMath::Exp(em*fAlxm-TMath::LnGamma(em+1.0)-fG);
+      t = 0.9*(1.0+y*y)*exp(em*fAlxm-TMath::LnGamma(em+1.0)-fG);
     } while (fRandom->Rndm() > t);
   }
 
