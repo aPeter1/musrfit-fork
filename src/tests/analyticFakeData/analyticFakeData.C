@@ -164,8 +164,8 @@ void analyticFakeData(const TString type)
   }
 
   // create histos
-  Double_t n0[8] = {200.0, 200.0, 200.0, 200.0, 200.0, 200.0, 200.0, 200.0};
-  Double_t bkg[8] = {1.3, 1.5, 1.0, 1.3, 1.2, 1.1, 1.0, 1.4};
+  Double_t n0[8] = {50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0};
+  Double_t bkg[8] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
   const Double_t tau = 2197.019; // ns
 
   // asymmetry related stuff
@@ -230,7 +230,7 @@ void analyticFakeData(const TString type)
       } else {
         time = (Double_t)(j-t0[i])*timeResolution;
         dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a0[i]*TMath::Exp(-time*rate0)*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i]))+(Double_t)bkg[i];
-        histo[i]->SetBinContent(j+1, (UInt_t)dval);
+        histo[i]->SetBinContent(j+1, dval);
       }
     }
   }
@@ -238,15 +238,17 @@ void analyticFakeData(const TString type)
   // add a promp peak
   Double_t ampl = 0.0;
   Double_t promptLambda = 500.0/1000.0; // Lorentzain in 1/ns
-  for (UInt_t i=0; i<8; i++) {
-    for (UInt_t j=1; j<66601; j++) {
-      dval = histo[i]->GetBinContent(j);
-      dval1 = dval*0.9; // simulate a PPC
-      time = (Double_t)(j-t0[i])*timeResolution;
-      dval += ampl*TMath::Exp(-fabs(time)*promptLambda);
-      dval1 += ampl*TMath::Exp(-fabs(time)*promptLambda);
-      histo[i]->SetBinContent(j, (UInt_t)dval);
-      histo[i+8]->SetBinContent(j, (UInt_t)dval1);
+  if (ampl != 0.0) {
+    for (UInt_t i=0; i<8; i++) {
+      for (UInt_t j=1; j<66601; j++) {
+        dval = histo[i]->GetBinContent(j);
+        dval1 = dval*0.9; // simulate a PPC
+        time = (Double_t)(j-t0[i])*timeResolution;
+        dval += ampl*TMath::Exp(-fabs(time)*promptLambda);
+        dval1 += ampl*TMath::Exp(-fabs(time)*promptLambda);
+        histo[i]->SetBinContent(j, dval);
+        histo[i+8]->SetBinContent(j, dval1);
+      }
     }
   }
 
