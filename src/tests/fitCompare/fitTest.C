@@ -1,5 +1,5 @@
 /*******************************************************************
-  minuit2test.C
+  fitTest.C
 
   author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -61,19 +61,17 @@ Double_t Spectrum(Double_t *x, Double_t *par)
 
 //------------------------------------------------------------------
 /**
- * <p>minuit2test
+ * <p>fitTest
  *
- * \param x 
- * \param par 
  */
-void minuit2test()
+void fitTest(const char *fln, const char *fitter)
 {
   TH1::AddDirectory(kFALSE);
   TCanvas *c1 = new TCanvas("c1","Fitting Test",10,10,500,500);
 
   // create a TF1 with the range from 0.0 to 12.0 and 6 parameters
   gFitFcn = new TF1("gFitFcn", Spectrum, 0.0, 12.0, 6);
-  gFitFcn->SetNpx(1200);
+  gFitFcn->SetNpx(63082);
 
   // set parameters
   gFitFcn->SetParNames("N0", "asym", "lambda", "B", "phase", "Bkg");
@@ -93,21 +91,50 @@ void minuit2test()
   cout << endl << "gFitFcn->Integral(0.0, 12.0) = " << gFitFcn->Integral(0.0, 12.0);
   cout << endl;
 
-  // fill histo
-  TH1F *histo = new TH1F("histo","Minuit2 Test",1200,0.0,12.0);
-  histo->FillRandom("gFitFcn", 100*(int)gFitFcn->Integral(0.0, 12.0));
-  histo->Rebin(5);
+  // read data
+  ifstream ifs(fln, ifstream::in);
+  char line[256];
+  TObjArray  *tok;
+  TObjString *ostr;
+  TString     str;
+  Int_t lineNo = 0;
+  Double_t dval;
+  Double_t data[63082];
+  while (ifs.good()) {
+    ifs.getline(line, 256);
+    if (line[0]=='%') continue;
+    str = line;
+    if (str.Length() == 0) break;
+    tok = str.Tokenize("\t");
+    ostr = (TObjString*)tok->At(1);
+    str = ostr->GetString();
+    dval = str.Atof();
+    data[lineNo++] = dval;
+    if (tok) delete tok;
+  }
+  ifs.close();
 
+  // fill histo
+  TH1F *histo = new TH1F("histo","Minuit Test",63083,-0.00009765625,12.32080078125);
+  for (Int_t i=1; i<63083; i++)
+    histo->SetBinContent(i,data[i]);
+
+  histo->Rebin(50);
   histo->Draw();
 
-  gFitFcn->SetParameter(0, 1000.0); // N0
-  gFitFcn->SetParameter(1, 0.1);    // asym
-  gFitFcn->SetParameter(2, 1.0);    // lambda
-  gFitFcn->SetParameter(3, 100.0);   // B
-  gFitFcn->SetParameter(4, 0.0);    // phase
+  gFitFcn->SetParameter(0, 10000.0); // N0
+  gFitFcn->SetParameter(1, 0.2);    // asym
+  gFitFcn->SetParameter(2, 0.11);    // lambda
+  gFitFcn->SetParameter(3, 200.0);   // B
+  gFitFcn->SetParameter(4, 6.0);    // phase
   gFitFcn->SetParameter(5, 300.0);  // Bkg
   
-  TVirtualFitter::SetDefaultFitter("Minuit2");
+  ROOT::Math::MinimizerOptions::SetDefaultStrategy(2);
+//  ROOT::Math::MinimizerOptions::SetDefaultPrintLevel(1);
+  if (!strcmp(fitter, "Minuit2"))
+    TVirtualFitter::SetDefaultFitter("Minuit2");
+  else
+    TVirtualFitter::SetDefaultFitter("Minuit");
   histo->Fit("gFitFcn", ""); // L->likleyhood, E->minos
   histo->Fit("gFitFcn", "ME"); // L->likleyhood, E->minos
 }

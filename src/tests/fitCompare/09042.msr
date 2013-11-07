@@ -1,0 +1,59 @@
+09042 - test
+###############################################################
+FITPARAMETER
+#       No Name        Value     Step        Pos_Error   Boundaries
+        1 AsymT       0.2089    -0.0033     0.0033      0       0.33    
+        2 Field       200.027   -0.092      0.091       
+        3 RateT       0.0913    -0.0076     0.0077      0       none    
+        4 N0          255.90    -0.40       0.40        
+        5 PhaseL      3.73      -0.90       0.91        
+        6 BkgL        5.028     -0.042      0.042       
+
+###############################################################
+THEORY
+asymmetry      1
+simplExpo      3          (rate)
+TFieldCos      5  fun1       (phase frequency)
+
+###############################################################
+FUNCTIONS
+fun1 = par2 * gamma_mu
+
+###############################################################
+RUN 09042 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            4
+backgr.fit      6
+lifetimecorrection
+map             0    0    0    0    0    0    0    0    0    0
+forward         1 
+data            3519    63000   
+t0              3519.0  
+fit             0       12     
+packing         50
+
+###############################################################
+COMMANDS
+STRATEGY 2
+MINIMIZE
+MINOS
+SAVE
+
+###############################################################
+FOURIER
+units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
+#fourier_power    10
+apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+plot             REAL    # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+dc-corrected     true
+phase            par6
+
+###############################################################
+PLOT 0   (single histo plot)
+runs     1   
+range    0   10   -0.25   0.25
+#view_packing 50
+
+###############################################################
+STATISTIC --- 2013-11-06 09:49:19
+  chisq = 1114.7, NDF = 1183, chisq/NDF = 0.942283
