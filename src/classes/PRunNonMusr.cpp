@@ -144,7 +144,7 @@ Double_t PRunNonMusr::CalcChiSquareExpected(const std::vector<Double_t>& par)
  */
 Double_t PRunNonMusr::CalcMaxLikelihood(const std::vector<Double_t>& par)
 {
-  cout << endl << "PRunSingleHisto::CalcMaxLikelihood(): not implemented yet ..." << endl;
+  cout << endl << "PRunNonMusr::CalcMaxLikelihood(): not implemented yet ..." << endl;
 
   return 1.0;
 }

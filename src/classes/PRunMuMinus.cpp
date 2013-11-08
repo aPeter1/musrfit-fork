@@ -211,7 +211,7 @@ Double_t PRunMuMinus::CalcChiSquareExpected(const std::vector<Double_t>& par)
 // CalcMaxLikelihood
 //--------------------------------------------------------------------------
 /**
- * <p>Calculate log max-likelihood.
+ * <p>Calculate log max-likelihood. See http://pdg.lbl.gov/index.html
  *
  * <b>return:</b>
  * - log max-likelihood value
@@ -258,13 +258,14 @@ Double_t PRunMuMinus::CalcMaxLikelihood(const std::vector<Double_t>& par)
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
     // calculate theory for the given parameter set
     theo = fTheory->Func(time, par, fFuncValues);
-    // check if data value is not too small
-    if (fData.GetValue()->at(i) > 1.0e-9)
-      data = fData.GetValue()->at(i);
-    else
-      data = 1.0e-9;
-    // add maximum log likelihood contribution of bin i
-    mllh -= data*TMath::Log(theo) - theo - TMath::LnGamma(data+1);
+
+    data = fData.GetValue()->at(i);
+
+    if (data > 1.0e-9) {
+      mllh += (theo-data) + data*log(data/theo);
+    } else {
+      mllh += (theo-data);
+    }
   }
 
   return mllh;

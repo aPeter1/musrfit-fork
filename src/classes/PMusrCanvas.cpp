@@ -5328,9 +5328,9 @@ void PMusrCanvas::SaveDataAscii()
             fout << dumpVector[j].dataErr[i] << ", ";
         } else {
           if (dumpVector[j].dataErr.size() > 0)
-            fout << ", , , ";
+            fout << " , , , ";
           else
-            fout << ", , ";
+            fout << " , , ";
         }
       }
       // write theory
@@ -5339,7 +5339,7 @@ void PMusrCanvas::SaveDataAscii()
           fout << dumpVector[j].theoryX[i] << ", ";
           fout << dumpVector[j].theory[i] << ", ";
         } else {
-          fout << ", , ";
+          fout << " , , ";
         }
       }
       // write last theory entry
@@ -5347,7 +5347,7 @@ void PMusrCanvas::SaveDataAscii()
         fout << dumpVector[dumpVector.size()-1].theoryX[i] << ", ";
         fout << dumpVector[dumpVector.size()-1].theory[i];
       } else {
-        fout << ", ";
+        fout << " , ";
       }
       fout << endl;
     }

@@ -296,7 +296,7 @@ Double_t PRunSingleHisto::CalcChiSquareExpected(const std::vector<Double_t>& par
 // CalcMaxLikelihood (public)
 //--------------------------------------------------------------------------
 /**
- * <p>Calculate log maximum-likelihood.
+ * <p>Calculate log maximum-likelihood. See http://pdg.lbl.gov/index.html
  *
  * <b>return:</b>
  * - log maximum-likelihood value
@@ -381,13 +381,14 @@ Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
     // calculate theory for the given parameter set
     theo = N0*TMath::Exp(-time/tau)*(1+fTheory->Func(time, par, fFuncValues))+bkg;
     theo *= normalizer;
-    // check if data value is not too small
-    if (fData.GetValue()->at(i) > 1.0e-9)
-      data = normalizer*fData.GetValue()->at(i);
-    else
-      data = 1.0e-9;
-    // add maximum log likelihood contribution of bin i
-    mllh -= data*TMath::Log(theo) - theo - TMath::LnGamma(data+1);
+
+    data = normalizer*fData.GetValue()->at(i);
+
+    if (data > 1.0e-9) {
+      mllh += (theo-data) + data*log(data/theo);
+    } else {
+      mllh += (theo-data);
+    }
   }
 
   return mllh;
