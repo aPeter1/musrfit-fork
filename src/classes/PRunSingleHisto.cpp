@@ -376,13 +376,18 @@ Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
     chunk = 10;
   #pragma omp parallel for default(shared) private(i,time,theo,data) schedule(dynamic,chunk) reduction(-:mllh)
   #endif
-  for (i=startTimeBin; i < endTimeBin; ++i) {
+  for (i=startTimeBin; i<endTimeBin; ++i) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
     // calculate theory for the given parameter set
-    theo = N0*TMath::Exp(-time/tau)*(1+fTheory->Func(time, par, fFuncValues))+bkg;
+    theo = N0*TMath::Exp(-time/tau)*(1.0+fTheory->Func(time, par, fFuncValues))+bkg;
     theo *= normalizer;
 
     data = normalizer*fData.GetValue()->at(i);
+
+    if (theo <= 0.0) {
+      cerr << ">> PRunSingleHisto::CalcMaxLikelihood: **WARNING** NEGATIVE theory!!" << endl;
+      continue;
+    }
 
     if (data > 1.0e-9) {
       mllh += (theo-data) + data*log(data/theo);
@@ -391,7 +396,7 @@ Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
     }
   }
 
-  return mllh;
+  return 2.0*mllh;
 }
 
 //--------------------------------------------------------------------------

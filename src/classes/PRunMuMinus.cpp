@@ -261,6 +261,11 @@ Double_t PRunMuMinus::CalcMaxLikelihood(const std::vector<Double_t>& par)
 
     data = fData.GetValue()->at(i);
 
+    if (theo <= 0.0) {
+      cerr << ">> PRunMuMinus::CalcMaxLikelihood: **WARNING** NEGATIVE theory!!" << endl;
+      continue;
+    }
+
     if (data > 1.0e-9) {
       mllh += (theo-data) + data*log(data/theo);
     } else {
@@ -268,7 +273,7 @@ Double_t PRunMuMinus::CalcMaxLikelihood(const std::vector<Double_t>& par)
     }
   }
 
-  return mllh;
+  return 2.0*mllh;
 }
 
 //--------------------------------------------------------------------------
