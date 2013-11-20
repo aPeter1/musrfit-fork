@@ -1707,6 +1707,8 @@ void PTextEdit::musrCalcChisq()
   cmd.append(str);
   cmd.append(QFileInfo(*fFilenames.find( currentEditor())).fileName() );
   cmd.append("--chisq-only");
+  cmd.append("--estimateN0");
+  cmd.append("no");
   PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath(), cmd);
   fitOutputHandler.setModal(true);
   fitOutputHandler.exec();
