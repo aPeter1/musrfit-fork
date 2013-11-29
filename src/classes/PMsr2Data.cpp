@@ -2157,7 +2157,7 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHead
         if (loc == tempName.length() - fRunNumberDigits) {
           outFile << tempName.substr(0, loc) << " = ";
           if ((*msrParamList)[idx].fPosErrorPresent) {
-            WriteValue(outFile, (*msrParamList)[idx].fPosError, (*msrParamList)[idx].fPosError, outFile.width(), db);
+            WriteValue(outFile, (*msrParamList)[idx].fValue, (*msrParamList)[idx].fPosError, outFile.width(), db);
             outFile << ", ";
           } else {
             outFile << (*msrParamList)[idx].fValue << ", ";
