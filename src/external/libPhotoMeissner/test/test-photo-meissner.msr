@@ -1,0 +1,104 @@
+YBCO (PZA-PZD) irradiated, ZFC T=10.00 K,E=20.26 keV,B=~98(G)/3.02(A),Tr/Sa=15.02/-6.00 kV, RAL-RAR=-0.4kV, SR=-10
+###############################################################
+FITPARAMETER
+#      Nr. Name       Value     Step      Pos_Error Boundaries   
+        1 one         1         0           none        
+        2 zero        0         0           none        
+        3 Asy         0.17      0.025        none        0       0.33    
+        4 energy      20.3      0           none        
+        5 thickness   400       0           none        
+        6 deadLayer   20        0           none        0       none    
+        7 lambdaL     262.4     10.4         none        
+        8 lambdaP     0         0           none        0       none    
+        9 z0          25.0      1.4         none        0.1     none    
+       10 Bext        94.64     0           none        
+       11 RateSmear   0.3       0.1         none        
+       12 N0_L        1066.2    32.7        none        
+       13 Bkg_L       17.14     0.10        none        
+       14 Phase_L     10.4      1.4         none        
+       15 Alpha_LR    1.02506   0.00073     none        
+       16 Bkg_R       18.57     0.11        none        
+       17 RelPhase_R  160.2     1.4         none        
+
+###############################################################
+THEORY
+asymmetry      3
+userFcn  libPPhotoMeissner PPhotoMeissner 4 6 10 7 fun3 9 fun2 5
+simpleGss     11          (rate)
+
+###############################################################
+FUNCTIONS
+fun1 = par12 * map1
+fun2 = par14 + map2
+fun3 = 1.0 / sqrt(4.444e-5 - 1.0/par7/par7)
+
+###############################################################
+RUN lem12_his_2868 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            12
+backgr.fit      13
+lifetimecorrection
+map             1    2    0    0    0    0    0    0    0    0
+forward         1 
+data            2741    65000   
+t0              2741.0  
+fit             0.1     9.2    
+packing         250
+
+RUN lem12_his_2868 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            fun1
+backgr.fit      16
+lifetimecorrection
+map            15   17    0    0    0    0    0    0    0    0
+forward         3 
+data            2741    65000   
+t0              2741.0  
+fit             0.1     9.2    
+packing         250
+
+###############################################################
+COMMANDS
+MINIMIZE
+HESSE
+SAVE
+
+###############################################################
+PLOT 0   (single histo plot)
+runs     1   2   
+range    0   9   -0.3   0.3
+view_packing 250
+
+###############################################################
+FOURIER
+units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
+fourier_power    10
+apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            8.5
+#range_for_phase_correction 50.0 70.0
+range            0.0    200.0
+
+###############################################################
+STATISTIC --- 2013-04-24 14:02:36
+*** FIT DID NOT CONVERGE ***
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

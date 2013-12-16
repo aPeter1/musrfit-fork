@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<photo_meissner xmlns="http://nemu.web.psi.ch/musrfit/libPhotoMeissner">
+  <comment>
+    $Id$
+  </comment>
+  <trim_sp_part>
+    <data_path>/afs/psi.ch/project/nemu/analysis/2012/YBCO/PZA-D/trimsp/YBCO_E</data_path>
+    <energy_list>
+      <energy>1000</energy>
+      <energy>3000</energy>
+      <energy>5000</energy>
+      <energy>7500</energy>
+      <energy>11000</energy>
+      <energy>14300</energy>
+      <energy>17300</energy>
+      <energy>20300</energy>
+      <energy>24300</energy>
+    </energy_list>
+  </trim_sp_part>
+</photo_meissner>
