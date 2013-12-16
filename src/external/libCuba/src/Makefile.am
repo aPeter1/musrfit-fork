@@ -10,7 +10,7 @@ c_sources = cuhre/Cuhre.c \
 
 include_HEADERS = cuba.h
 
-INCLUDES = -I. -Icommon
+AM_CPPFLAGS = -I. -Icommon
 AM_CFLAGS = $(LOCAL_CUBA_LIB_CFLAGS)
 
 AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS)

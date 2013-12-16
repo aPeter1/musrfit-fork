@@ -6,7 +6,7 @@ cpp_sources = MuSR_td_PSI_bin.cpp
 
 include_HEADERS = MuSR_td_PSI_bin.h
 
-INCLUDES = -I.
+AM_CPPFLAGS = -I.
 AM_CXXFLAGS = $(LOCAL_PSIBIN_LIB_CXXFLAGS)
 
 AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS)

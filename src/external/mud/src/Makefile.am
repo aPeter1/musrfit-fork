@@ -12,7 +12,7 @@ cpp_sources = mud_all.c \
 
 include_HEADERS = mud.h
 
-INCLUDES = -I.
+AM_CPPFLAGS = -I.
 AM_CFLAGS = $(LOCAL_MUD_LIB_CFLAGS)
 
 AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS)
