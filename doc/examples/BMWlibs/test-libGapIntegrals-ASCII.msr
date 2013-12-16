@@ -3,8 +3,8 @@ Test libGapIntegrals (arbitrary data), ASCII data file
 FITPARAMETER
 #      Nr. Name        Value     Step      Pos_Error  Boundaries
         1 lambdaInvSq0 12.7664   0.40786     none        
-        2 Tc          0.555355  0.0203235   none        0       2       
-        3 Delta0      0.110329  0.00576485  none        
+        2 Tc          15  0.0203235   none        0       2       
+        3 Delta0      26  0.00576485  none        
 
 ###############################################################
 THEORY
@@ -32,7 +32,7 @@ SAVE
 ###############################################################
 PLOT 8   (non muSR plot)
 runs     1   
-range    0.00   1.40
+range    0.00   20
 
 ###############################################################
 STATISTIC --- 2010-01-08 13:54:19

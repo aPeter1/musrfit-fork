@@ -1123,6 +1123,8 @@ AC_CONFIG_FILES([Makefile \
                  src/external/MagProximity/Makefile \
 		 src/external/libSpinValve/Makefile \
 		 src/external/libSpinValve/classes/Makefile \
+                 src/external/libPhotoMeissner/Makefile \
+                 src/external/libPhotoMeissner/classes/Makefile \
                  src/musredit/musredit_startup.xml \
                  src/musrgui/musrgui_startup.xml])
 

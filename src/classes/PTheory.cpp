@@ -2194,10 +2194,13 @@ Double_t PTheory::SkewedGauss(register Double_t t, const PDoubleVector& paramVal
 /**
  * <p> theory function: staticNKZF (see D.R. Noakes and G.M. Kalvius Phys. Rev. B 56, 2352 (1997) and
  * A. Yaouanc and P. Dalmas de Reotiers, "Muon Spin Rotation, Relaxation, and Resonance" Oxford, Section 6.4.1.3)
+ * However, I have rewritten it using the identity \f$\Delta_{\rm eff}^2 = (1+R_b^2) \Delta_0^2\f$, which allows
+ * to massively simplify the formula which now only involves \f$R_b\f$ and \f$\Delta_0\f$. Here \f$\Delta_0\f$
+ * Will be given in units of \f$1/\mu\mathrm{sec}\f$.
  *
- * \f[ = \frac{1}{3} + \frac{2}{3}\,\frac{1}{\left(1+(\gamma\Delta_{\rm GbG}t)^2\right)^{3/2}}\,
- *    \left(1 - \frac{(\gamma\Delta_0 t)^2}{\left(1+(\gamma\Delta_{\rm GbG}t)^2\right)}\right)\,
- *    \exp\left[\frac{(\gamma\Delta_0 t)^2}{2\left(1+(\gamma\Delta_{\rm GbG}t)^2\right)}\right] \f]
+ * \f[ = \frac{1}{3} + \frac{2}{3}\,\frac{1}{\left(1+(R_b \Delta_0 t)^2\right)^{3/2}}\,
+ *    \left(1 - \frac{(\Delta_0 t)^2}{\left(1+(R_b \Delta_0 t)^2\right)}\right)\,
+ *    \exp\left[\frac{(\Delta_0 t)^2}{2\left(1+(R_b \Delta_0 t)^2\right)}\right] \f]
  *
  * <b>meaning of paramValues:</b> \f$\Delta_0\f$, \f$R_{\rm b} = \Delta_{\rm GbG}/\Delta_0\f$ [,\f$t_{\rm shift}\f$]
  *
@@ -2209,7 +2212,7 @@ Double_t PTheory::SkewedGauss(register Double_t t, const PDoubleVector& paramVal
  */
 Double_t PTheory::StaticNKZF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  // expected paramters: damping_D0 R_b tshift
+  // expected paramters: damping_D0 [0], R_b tshift [1]
 
   Double_t val[3];
   Double_t result = 1.0;
@@ -2234,13 +2237,10 @@ Double_t PTheory::StaticNKZF(register Double_t t, const PDoubleVector& paramValu
   else // tshift present
     tt = t-val[2];
 
-  Double_t t2 = tt*tt;
-  Double_t Rb2 = val[1]*val[1];
-  Double_t Rb2p = 1.0+Rb2;
-  Double_t Deff2_t2 = val[0]*val[0]*(1.0+Rb2)*t2;
-  Double_t denom = (Rb2p+Rb2*Deff2_t2);
+  Double_t D2_t2 = val[0]*val[0]*tt*tt;
+  Double_t denom = 1.0+val[1]*val[1]*D2_t2;
 
-  result = 0.333333333333333 + 0.666666666666666667 * TMath::Power(Rb2p/denom, 1.5) * (1.0 - (Deff2_t2/denom)) * exp(-0.5*Deff2_t2/denom);
+  result = 0.333333333333333 + 0.666666666666666667 * TMath::Power(1.0/denom, 1.5) * (1.0 - (D2_t2/denom)) * exp(-0.5*D2_t2/denom);
 
   return result;
 }
@@ -2249,9 +2249,12 @@ Double_t PTheory::StaticNKZF(register Double_t t, const PDoubleVector& paramValu
 /**
  * <p> theory function: staticNKTF (see D.R. Noakes and G.M. Kalvius Phys. Rev. B 56, 2352 (1997) and
  * A. Yaouanc and P. Dalmas de Reotiers, "Muon Spin Rotation, Relaxation, and Resonance" Oxford, Section 6.4.1.3)
+ * However, I have rewritten it using the identity \f$\Delta_{\rm eff}^2 = (1+R_b^2) \Delta_0^2\f$, which allows
+ * to massively simplify the formula which now only involves \f$R_b\f$ and \f$\Delta_0\f$. Here \f$\Delta_0\f$
+ * Will be given in units of \f$1/\mu\mathrm{sec}\f$.
  *
- * \f[ = \frac{1}{\sqrt{1+(\gamma\Delta_{\rm GbG} t)^2}}\,
- *     \exp\left[-\frac{(\gamma\Delta_0 t)^2}{2(1+(\gamma\Delta_{\rm GbG}t)^2)}\right]\,
+ * \f[ = \frac{1}{\sqrt{1+(R_b \gamma\Delta_0 t)^2}}\,
+ *     \exp\left[-\frac{(\gamma\Delta_0 t)^2}{2(1+(R_b \gamma\Delta_0 t)^2)}\right]\,
  *     \cos(\gamma B_{\rm ext} t + \varphi) \f]
  *
  * <b>meaning of paramValues:</b> \f$\varphi\f$, \f$\nu = \gamma B_{\rm ext}\f$, \f$\Delta_0\f$, \f$R_{\rm b} = \Delta_{\rm GbG}/\Delta_0\f$ [,\f$t_{\rm shift}\f$]
@@ -2264,7 +2267,7 @@ Double_t PTheory::StaticNKZF(register Double_t t, const PDoubleVector& paramValu
  */
 Double_t PTheory::StaticNKTF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  // expected paramters: phase frequency damping_D0 R_b tshift
+  // expected paramters: phase [0], frequency [1], damping_D0 [2], R_b [3],  [tshift [4]]
 
   Double_t val[5];
   Double_t result = 1.0;
@@ -2289,10 +2292,10 @@ Double_t PTheory::StaticNKTF(register Double_t t, const PDoubleVector& paramValu
   else // tshift present
     tt = t-val[4];
 
-  Double_t D0t_2 = val[2]*val[2]*tt*tt;
-  Double_t DGt_2p = 1.0 + val[2]*val[2]*val[3]*val[3]*tt*tt;
+  Double_t D2_t2 = val[2]*val[2]*tt*tt;
+  Double_t denom = 1.0+val[3]*val[3]*D2_t2;
 
-  result = 1.0/sqrt(DGt_2p)*exp(-0.5*D0t_2/DGt_2p)*TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*tt);
+  result = sqrt(1.0/denom)*exp(-0.5*D2_t2/denom)*TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*tt);
 
   return result;
 }
@@ -2301,13 +2304,13 @@ Double_t PTheory::StaticNKTF(register Double_t t, const PDoubleVector& paramValu
 /**
  * <p> theory function: dynamicNKZF (see D.R. Noakes and G.M. Kalvius Phys. Rev. B 56, 2352 (1997) and
  * A. Yaouanc and P. Dalmas de Reotiers, "Muon Spin Rotation, Relaxation, and Resonance" Oxford, Section 6.4.1.3)
+ * However, I have rewritten it using the identity \f$\Delta_{\rm eff}^2 = (1+R_b^2) \Delta_0^2\f$, which allows
+ * to massively simplify the formula which now only involves \f$R_b\f$ and \f$\Delta_0\f$. Here \f$\Delta_0\f$
+ * Will be given in units of \f$1/\mu\mathrm{sec}\f$.
  *
  * \f{eqnarray*}
  * \Theta(t) &=& \frac{\exp(-\nu_c t) - 1 - \nu_c t}{\nu_c^2} \\
- * \Delta_{\rm eff} &=& \sqrt{\Delta_0^2 + \Delta_{\rm GbG}^2} \\
- * P_{Z}^{\rm dyn}(t) &=& \sqrt{\frac{1+R_{\rm b}^2}{1+R_{\rm b}^2+4 (R_{\rm b}\gamma\Delta_{\rm eff})^2 \Theta(t)}}\,
- *     \exp\left[-\frac{2 (\gamma\Delta_{\rm eff})^2\Theta(t)}{1+R_{\rm b}^2+4 (R_{\rm b}\gamma\Delta_{\rm eff})^2 \Theta(t)}\right] \\
- * &=& \sqrt{\frac{1}{1+4 \Delta_{\rm GbG}^2 \Theta(t)}}\,\exp\left[-\frac{2 \Delta_0^2 \Theta(t)}{1+4 \Delta_{\rm GbG}^2 \Theta(t)}\right]
+ * P_{Z}^{\rm dyn}(t) &=& \sqrt{\frac{1}{1+4 R_b^2 \Delta_0^2 \Theta(t)}}\,\exp\left[-\frac{2 \Delta_0^2 \Theta(t)}{1+4 R_b^2 \Delta_0^2 \Theta(t)}\right]
  * \f}
  *
  * <b>meaning of paramValues:</b> \f$\Delta_0\f$, \f$R_{\rm b} = \Delta_{\rm GbG}/\Delta_0\f$, \f$\nu_c\f$ [,\f$t_{\rm shift}\f$]
@@ -2320,7 +2323,7 @@ Double_t PTheory::StaticNKTF(register Double_t t, const PDoubleVector& paramValu
  */
 Double_t PTheory::DynamicNKZF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  // expected paramters: damping_D0 R_b nu_c tshift
+  // expected paramters: damping_D0 [0], R_b [1], nu_c [2], [tshift [3]]
 
   Double_t val[4];
   Double_t result = 1.0;
@@ -2351,9 +2354,9 @@ Double_t PTheory::DynamicNKZF(register Double_t t, const PDoubleVector& paramVal
   } else {
     theta = (exp(-val[2]*tt) - 1.0 + val[2]*tt)/(val[2]*val[2]);
   }
-  Double_t denom = 1.0/(1.0 + 4.0*val[0]*val[0]*val[1]*val[1]*theta);
+  Double_t denom = 1.0 + 4.0*val[0]*val[0]*val[1]*val[1]*theta;
 
-  result = sqrt(denom)*exp(-2.0*val[0]*val[0]*theta*denom);
+  result = sqrt(1.0/denom)*exp(-2.0*val[0]*val[0]*theta/denom);
 
   return result;
 }
@@ -2362,13 +2365,13 @@ Double_t PTheory::DynamicNKZF(register Double_t t, const PDoubleVector& paramVal
 /**
  * <p> theory function: dynamicNKTF (see D.R. Noakes and G.M. Kalvius Phys. Rev. B 56, 2352 (1997) and
  * A. Yaouanc and P. Dalmas de Reotiers, "Muon Spin Rotation, Relaxation, and Resonance" Oxford, Section 6.4.1.3)
+ * However, I have rewritten it using the identity \f$\Delta_{\rm eff}^2 = (1+R_b^2) \Delta_0^2\f$, which allows
+ * to massively simplify the formula which now only involves \f$R_b\f$ and \f$\Delta_0\f$. Here \f$\Delta_0\f$
+ * Will be given in units of \f$1/\mu\mathrm{sec}\f$.
  *
  * \f{eqnarray*}
  * \Theta(t) &=& \frac{\exp(-\nu_c t) - 1 - \nu_c t}{\nu_c^2} \\
- * \Delta_{\rm eff} &=& \sqrt{\Delta_0^2 + \Delta_{\rm GbG}^2} \\
- * P_{X}^{\rm dyn}(t) &=& \sqrt{\frac{1+R_{\rm b}^2}{1+R_{\rm b}^2+2 (R_{\rm b}\gamma\Delta_{\rm eff})^2 \Theta(t)}}\,
- *     \exp\left[-\frac{(\gamma\Delta_{\rm eff})^2\Theta(t)}{1+R_{\rm b}^2+2 (R_{\rm b}\gamma\Delta_{\rm eff})^2 \Theta(t)}\right]\,\cos(\gamma B_{\rm ext} t + \varphi) \\
- * &=& \sqrt{\frac{1}{1+2 \Delta_{\rm GbG}^2 \Theta(t)}}\,\exp\left[-\frac{\Delta_0^2 \Theta(t)}{1+2 \Delta_{\rm GbG}^2 \Theta(t)}\right]\,\cos(\gamma B_{\rm ext} t + \varphi)
+ * P_{X}^{\rm dyn}(t) &=& \sqrt{\frac{1}{1+2 R_b^2 \Delta_0^2 \Theta(t)}}\,\exp\left[-\frac{\Delta_0^2 \Theta(t)}{1+2 R_b^2 \Delta_0^2 \Theta(t)}\right]\,\cos(\gamma B_{\rm ext} t + \varphi)
  * \f}
  *
  * <b>meaning of paramValues:</b> \f$\varphi\f$, \f$\nu = \gamma B_{\rm ext}\f$, \f$\Delta_0\f$, \f$R_{\rm b} = \Delta_{\rm GbG}/\Delta_0\f$, \f$\nu_c\f$ [,\f$t_{\rm shift}\f$]
@@ -2381,7 +2384,7 @@ Double_t PTheory::DynamicNKZF(register Double_t t, const PDoubleVector& paramVal
  */
 Double_t PTheory::DynamicNKTF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  // expected paramters: phase frequency damping_D0 R_b nu_c tshift
+  // expected paramters: phase [0], frequency [1], damping_D0 [2], R_b [3], nu_c [4], [tshift [5]]
 
   Double_t val[6];
   Double_t result = 1.0;
@@ -2412,9 +2415,9 @@ Double_t PTheory::DynamicNKTF(register Double_t t, const PDoubleVector& paramVal
   } else {
     theta = (exp(-val[4]*tt) - 1.0 + val[4]*tt)/(val[4]*val[4]);
   }
-  Double_t denom = 1.0/(1.0 + 2.0*val[2]*val[2]*val[3]*val[3]*theta);
+  Double_t denom = 1.0 + 2.0*val[2]*val[2]*val[3]*val[3]*theta;
 
-  result = sqrt(denom)*exp(-val[2]*val[2]*theta*denom)*TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*tt);
+  result = sqrt(1.0/denom)*exp(-val[2]*val[2]*theta/denom)*TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*tt);
 
   return result;
 }

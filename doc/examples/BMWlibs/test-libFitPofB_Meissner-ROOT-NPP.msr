@@ -1,4 +1,4 @@
-Test libTFitPofB SC Meissner state, single histogram plot, ROOT data file
+UBC YBCO XLs 90 degrees, E=22.02(keV),T=11.00(K),B ~97(G)/3.03(A),Tr/Sa=15.02/-7.90(kV),RA-LR -0.41(kV), RA-TB 0.08(kV)
 ###############################################################
 FITPARAMETER
 #       No Name        Value     Step        Pos_Error   Boundaries
@@ -10,11 +10,11 @@ FITPARAMETER
 
         4 phase22     25.4956   0           none        
         5 asym22      0.1047    -0.0029     0.0030      0       0.3     
-        6 rate22      0.558     -0.032      0.033       
-        7 NormL22     753.00    -0.87       0.87        
+        6 rate22      0.559     -0.032      0.033       
+        7 NormL22     753.00    -0.86       0.87        
         8 BGL22       51.08     -0.13       0.13        
         9 NormR22     545.93    -0.77       0.76        
-       10 BGR22       38.60     -0.12       0.12        
+       10 BGR22       38.60     -0.11       0.12        
        11 relasyR22   1.068     -0.038      0.039       0.2     2       
        12 relphaR22   162.8     -1.5        1.5         110     210     
        13 energy22    22        0           none        
@@ -63,6 +63,7 @@ packing         150
 
 ###############################################################
 COMMANDS
+#MAX_LIKELIHOOD
 MINIMIZE
 MINOS
 SAVE
@@ -82,5 +83,5 @@ runs     1   2
 range    0   4   -0.25   0.25
 
 ###############################################################
-STATISTIC --- 2013-01-07 11:11:17
+STATISTIC --- 2013-11-12 10:25:11
   chisq = 696.9, NDF = 663, chisq/NDF = 1.051076

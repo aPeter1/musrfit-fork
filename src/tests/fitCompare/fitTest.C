@@ -119,15 +119,15 @@ void fitTest(const char *fln, const char *fitter)
   for (Int_t i=1; i<63083; i++)
     histo->SetBinContent(i,data[i]);
 
-  histo->Rebin(50);
+//  histo->Rebin(50);
   histo->Draw();
 
-  gFitFcn->SetParameter(0, 10000.0); // N0
+  gFitFcn->SetParameter(0, 200.0); // N0
   gFitFcn->SetParameter(1, 0.2);    // asym
   gFitFcn->SetParameter(2, 0.11);    // lambda
   gFitFcn->SetParameter(3, 200.0);   // B
   gFitFcn->SetParameter(4, 6.0);    // phase
-  gFitFcn->SetParameter(5, 300.0);  // Bkg
+  gFitFcn->SetParameter(5, 1.0);  // Bkg
   
   ROOT::Math::MinimizerOptions::SetDefaultStrategy(2);
 //  ROOT::Math::MinimizerOptions::SetDefaultPrintLevel(1);

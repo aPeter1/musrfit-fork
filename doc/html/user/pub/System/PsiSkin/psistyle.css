@@ -131,6 +131,12 @@ blockquote.psi {
 .patternContent a[href^="http://i.psi.ch"] {
         background: transparent;
         padding-right: 0px;
+        background-repeat: no-repeat;
+        background-image: none;
+}
+.patternContent a[href^="http://i.psi.ch"]:hover,
+.patternContent a[href^="http://i.psi.ch"]:visited:hover {
+    background-image: none;
 }
 
 /* ...but not to absolute links in this domain...

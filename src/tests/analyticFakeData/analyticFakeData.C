@@ -29,7 +29,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-void analyticFakeData(const TString type)
+void analyticFakeData(const TString type, UInt_t runNo)
 {
   // load library
   gSystem->Load("$ROOTSYS/lib/libTLemRunHeader");
@@ -47,8 +47,8 @@ void analyticFakeData(const TString type)
   gROOT->GetListOfBrowsables()->Add(histosFolder, "histos");
   decayAnaModule = histosFolder->AddFolder("DecayAnaModule", "muSR decay histograms");
 
-  UInt_t runNo = 9042;
   TString fileName, tstr, label, tstr1;
+
   fileName.Form("0%d.root", (Int_t)runNo);
 
 //  Double_t t0[8] = {3419.0, 3520.0, 3520.0, 3421.0, 3517.0, 3418.0, 3522.0, 3623.0}; // runNo: 1000 & 2000
@@ -164,8 +164,8 @@ void analyticFakeData(const TString type)
   }
 
   // create histos
-  Double_t n0[8] = {50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0};
-  Double_t bkg[8] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+  Double_t n0[8] = {13200.0, 13200.0, 13200.0, 13200.0, 13200.0, 13200.0, 13200.0, 13200.0};
+  Double_t bkg[8] = {264.0, 264.0, 264.0, 264.0, 264.0, 264.0, 264.0, 264.0};
   const Double_t tau = 2197.019; // ns
 
   // asymmetry related stuff
@@ -261,6 +261,8 @@ void analyticFakeData(const TString type)
   for (UInt_t i=0; i<16; i++) {
     addNoise->AddNoise(histo[i]);
   }
+  delete addNoise;
+  addNoise = 0;
 /*
   for (UInt_t i=0; i<8; i++) {
     for (UInt_t j=1; j<histo[i]->GetEntries(); j++) {

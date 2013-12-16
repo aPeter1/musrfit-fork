@@ -2,23 +2,23 @@ LSCO x=0.02 (224-227), T=12.00 (K), E=5.57 keV, WEW B=~49(G)/8.62(A), Tr=15.02 (
 ###############################################################
 FITPARAMETER
 #       No Name        Value     Step        Pos_Error   Boundaries
-        1 AsymT       0.0506    -0.0010     0.0010      0       0.33    
-        2 Field       48.29     -0.13       0.13        
-        3 RateT       0.128     -0.015      0.014       0       none    
+        1 AsymT       0.05053   -0.00072    0.00072     0       0.33    
+        2 Field       48.299    -0.095      0.094       
+        3 RateT       0.129     -0.010      0.010       0       none    
         4 AsymL       0         0           none        0       0.33    
         5 RateL       0         0           none        
-        6 AlphaLR     0.9785    -0.0019     0.0019      
-        7 PhaseL      6.5       -2.2        2.3         -40     40      
-        8 BkgL        6.824     -0.068      0.067       
-        9 RelPhaseR   178.7     -2.7        2.7         150     210     
-       10 NormR       419.43    -0.57       0.56        
-       11 BkgR        8.303     -0.071      0.071       
-       12 AlphaTB     1.1026    -0.0021     0.0021      
-       13 RelPhaseT   269.1     -2.7        2.7         240     300     
-       14 BkgT        7.363     -0.070      0.070       
-       15 NormB       393.04    -0.55       0.55        
-       16 RelPhaseB   90.8      -2.8        2.8         60      120     
-       17 BkgB        6.995     -0.067      0.067       
+        6 AlphaLR     0.9784    -0.0013     0.0013      
+        7 PhaseL      6.6       -1.6        1.6         -40     40      
+        8 BkgL        6.920     -0.048      0.048       
+        9 RelPhaseR   178.8     -1.9        1.9         150     210     
+       10 NormR       419.47    -0.40       0.40        
+       11 BkgR        8.393     -0.050      0.050       
+       12 AlphaTB     1.1024    -0.0015     0.0015      
+       13 RelPhaseT   269.0     -1.9        2.0         240     300     
+       14 BkgT        7.466     -0.050      0.049       
+       15 NormB       393.08    -0.39       0.39        
+       16 RelPhaseB   90.7      -2.0        2.0         60      120     
+       17 BkgB        7.091     -0.047      0.048       
        18 One         1         0           none        
        19 Zero        0         0           none        
 
@@ -89,6 +89,7 @@ packing         50
 
 ###############################################################
 COMMANDS
+MAX_LIKELIHOOD
 MINIMIZE
 #HESSE
 MINOS
@@ -101,7 +102,7 @@ fourier_power    10
 apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
 plot             REAL    # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
 dc-corrected     true
-phase            par7 
+phase            par7
 
 ###############################################################
 PLOT 0   (single histo plot)
@@ -110,5 +111,5 @@ range    0   9   -0.15   0.15
 view_packing 500
 
 ###############################################################
-STATISTIC --- 2012-06-03 14:14:15
-  chisq = 3981.9, NDF = 4001, chisq/NDF = 0.995215
+STATISTIC --- 2013-11-12 10:21:48
+  maxLH = 3971.7, NDF = 4001, maxLH/NDF = 0.992668

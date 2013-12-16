@@ -2,12 +2,12 @@
 ###############################################################
 FITPARAMETER
 #       No Name        Value     Step        Pos_Error   Boundaries
-        1 AsymT       0.2089    -0.0033     0.0033      0       0.33    
-        2 Field       200.027   -0.092      0.091       
-        3 RateT       0.0913    -0.0076     0.0077      0       none    
-        4 N0          255.90    -0.40       0.40        
-        5 PhaseL      3.73      -0.90       0.91        
-        6 BkgL        5.028     -0.042      0.042       
+        1 AsymT       0.2118    -0.0032     0.0032      0       0.33    
+        2 Field       200.077   -0.086      0.086       
+        3 RateT       0.0855    -0.0069     0.0070      0       none    
+        4 N0          48.229    -0.075      0.074       
+        5 PhaseL      2.71      -0.90       0.90        
+        6 BkgL        0.4206    -0.0072     0.0072      
 
 ###############################################################
 THEORY
@@ -27,13 +27,15 @@ backgr.fit      6
 lifetimecorrection
 map             0    0    0    0    0    0    0    0    0    0
 forward         1 
-data            3519    63000   
+data            3519    66000   
 t0              3519.0  
-fit             0       12     
-packing         50
+fit             0       12.5   
+packing         1
 
 ###############################################################
 COMMANDS
+#MAX_LIKELIHOOD
+SCALE_N0_BKG FALSE
 STRATEGY 2
 MINIMIZE
 MINOS
@@ -51,9 +53,9 @@ phase            par6
 ###############################################################
 PLOT 0   (single histo plot)
 runs     1   
-range    0   10   -0.25   0.25
-#view_packing 50
+range    0   10
+view_packing 50
 
 ###############################################################
-STATISTIC --- 2013-11-06 09:49:19
-  chisq = 1114.7, NDF = 1183, chisq/NDF = 0.942283
+STATISTIC --- 2013-11-08 16:20:32
+  chisq = 61171.4, NDF = 62475, chisq/NDF = 0.979135

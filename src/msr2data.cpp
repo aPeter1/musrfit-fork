@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2009-2012 by Bastian M. Wojek / Andreas Suter           *
+ *   Copyright (C) 2009-2013 by Bastian M. Wojek / Andreas Suter           *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
