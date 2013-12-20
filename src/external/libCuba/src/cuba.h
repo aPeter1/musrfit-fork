@@ -2,28 +2,8 @@
 	cuba.h
 		Prototypes for the Cuba library
 		this file is part of Cuba
-		last modified 16 Jun 10 th
+		last modified 30 Apr 13 th
 */
-
-/***************************************************************************
- *   Copyright (C) 2004-2010 by Thomas Hahn                                *
- *   hahn@feynarts.de                                                      *
- *                                                                         *
- *   This library is free software; you can redistribute it and/or         *
- *   modify it under the terms of the GNU Lesser General Public            *
- *   License as published by the Free Software Foundation; either          *
- *   version 2.1 of the License, or (at your option) any later version.    *
- *                                                                         *
- *   This library is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
- *   Lesser General Public License for more details.                       *
- *                                                                         *
- *   You should have received a copy of the GNU Lesser General Public      *
- *   License along with this library; if not, write to the                 *
- *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA          *
- ***************************************************************************/
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,6 +48,7 @@ void Suave(const int ndim, const int ncomp,
   const int flags, const int seed,
   const int mineval, const int maxeval,
   const int nnew, const double flatness,
+  const char *statefile,
   int *nregions, int *neval, int *fail,
   double integral[], double error[], double prob[]);
 
@@ -77,6 +58,7 @@ void llSuave(const int ndim, const int ncomp,
   const int flags, const int seed,
   const long long int mineval, const long long int maxeval,
   const long long int nnew, const double flatness,
+  const char *statefile,
   int *nregions, long long int *neval, int *fail,
   double integral[], double error[], double prob[]);
 
@@ -89,6 +71,7 @@ void Divonne(const int ndim, const int ncomp,
   const double border, const double maxchisq, const double mindeviation,
   const int ngiven, const int ldxgiven, double xgiven[],
   const int nextra, peakfinder_t peakfinder,
+  const char *statefile,
   int *nregions, int *neval, int *fail,
   double integral[], double error[], double prob[]);
 
@@ -102,6 +85,7 @@ void llDivonne(const int ndim, const int ncomp,
   const long long int ngiven, const int ldxgiven, double xgiven[],
   const long long int nextra,
   void (*peakfinder)(const int *, const double [], int *, double []),
+  const char *statefile,
   int *nregions, long long int *neval, int *fail,
   double integral[], double error[], double prob[]);
 
@@ -110,6 +94,7 @@ void Cuhre(const int ndim, const int ncomp,
   const double epsrel, const double epsabs,
   const int flags, const int mineval, const int maxeval,
   const int key,
+  const char *statefile,
   int *nregions, int *neval, int *fail,
   double integral[], double error[], double prob[]);
 
@@ -119,8 +104,14 @@ void llCuhre(const int ndim, const int ncomp,
   const int flags,
   const long long int mineval, const long long int maxeval,
   const int key,
+  const char *statefile,
   int *nregions, long long int *neval, int *fail,
   double integral[], double error[], double prob[]);
+
+void cubasetinit(void (*)(), void *);
+void cubasetexit(void (*)(), void *);
+void cubaruninit(void);
+void cubaruninit(void);
 
 #ifdef __cplusplus
 }

@@ -2,28 +2,8 @@
 	Sample.c
 		the sampling step of Suave
 		this file is part of Suave
-		last modified 13 Sep 10 th
+		last modified 30 Jul 13 th
 */
-
-/***************************************************************************
- *   Copyright (C) 2004-2010 by Thomas Hahn                                *
- *   hahn@feynarts.de                                                      *
- *                                                                         *
- *   This library is free software; you can redistribute it and/or         *
- *   modify it under the terms of the GNU Lesser General Public            *
- *   License as published by the Free Software Foundation; either          *
- *   version 2.1 of the License, or (at your option) any later version.    *
- *                                                                         *
- *   This library is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
- *   Lesser General Public License for more details.                       *
- *                                                                         *
- *   You should have received a copy of the GNU Lesser General Public      *
- *   License along with this library; if not, write to the                 *
- *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA          *
- ***************************************************************************/
 
 
 typedef struct {
@@ -34,16 +14,16 @@ typedef struct {
 
 /*********************************************************************/
 
-static void Sample(This *t, cnumber nnew, void *voidregion,
+static void Sample(This *t, cnumber nnew, Region *region,
   real *lastw, real *lastx, real *lastf)
 {
-  TYPEDEFREGION;
-
-  Region *const region = (Region *)voidregion;
-  count comp, dim, df;
+  count comp, df;
   number n;
-  Cumulants cumul[NCOMP];
-  char **ss, *s;
+  Vector(Cumulants, cumul, NCOMP);
+  Cumulants *C = cumul + t->ncomp, *c;
+  Bounds *bounds = RegionBounds(region), *B = bounds + t->ndim, *b;
+  Result *res;
+  char **ss = NULL, *s = NULL;
   ccount chars = 128*(region->div + 1);
 
   creal jacobian = 1/ldexp((real)nnew, region->div);
@@ -55,8 +35,7 @@ static void Sample(This *t, cnumber nnew, void *voidregion,
 
     t->rng.getrandom(t, f);
 
-    for( dim = 0; dim < t->ndim; ++dim ) {
-      cBounds *b = &region->bounds[dim];
+    for( b = bounds; b < B; ++b ) {
       creal pos = *f*NBINS;
       ccount ipos = (count)pos;
       creal prev = (ipos == 0) ? 0 : b->grid[ipos - 1];
@@ -69,11 +48,11 @@ static void Sample(This *t, cnumber nnew, void *voidregion,
     *w++ = weight;
   }
 
-  DoSample(t, nnew, lastw, lastx, lastf, region->div + 1);
+  DoSample(t, nnew, lastx, lastf, lastw, region->div + 1);
 
   w[-1] = -w[-1];
   lastw = w;
-  w = region->w;
+  w = RegionW(region);
   region->n = lastw - w;
 
   if( VERBOSE > 2 ) {
@@ -87,7 +66,7 @@ static void Sample(This *t, cnumber nnew, void *voidregion,
     }
   }
 
-  Zap(cumul);
+  FClear(cumul);
   df = n = 0;
 
   while( w < lastw ) {
@@ -95,9 +74,7 @@ static void Sample(This *t, cnumber nnew, void *voidregion,
     creal weight = fabs(*w++);
     ++n;
 
-    for( comp = 0; comp < t->ncomp; ++comp ) {
-      Cumulants *c = &cumul[comp];
-
+    for( c = cumul, comp = 0; c < C; ++c ) {
       creal wfun = weight*(*f++);
       c->sum += wfun;
       c->sqsum += Sq(wfun);
@@ -135,23 +112,21 @@ static void Sample(This *t, cnumber nnew, void *voidregion,
 
   region->df = --df;
 
-  for( comp = 0; comp < t->ncomp; ++comp ) {
-    Result *r = &region->result[comp];
-    Cumulants *c = &cumul[comp];
+  for( c = cumul, res = region->result; c < C; ++c, ++res ) {
     creal sigsq = 1/c->weightsum;
     creal avg = sigsq*c->avgsum;
 
     if( LAST ) {
-      r->sigsq = 1/c->weight;
-      r->avg = r->sigsq*c->avg;
+      res->sigsq = 1/c->weight;
+      res->avg = res->sigsq*c->avg;
     }
     else {
-      r->sigsq = sigsq;
-      r->avg = avg;
+      res->sigsq = sigsq;
+      res->avg = avg;
     }
-    r->err = sqrt(r->sigsq);
+    res->err = sqrt(res->sigsq);
 
-    r->chisq = (sigsq < .9*NOTZERO) ? 0 : c->chisqsum - avg*c->chisum;
+    res->chisq = (sigsq < .9*NOTZERO) ? 0 : c->chisqsum - avg*c->chisum;
       /* This catches the special case where the integrand is constant
          over the entire region.  Unless that constant is zero, only the
          first set of samples will have zero variance, and hence weight
@@ -168,19 +143,17 @@ static void Sample(This *t, cnumber nnew, void *voidregion,
   if( VERBOSE > 2 ) {
     char *p = s;
     char *p0 = p + t->ndim*64;
+    char *msg = "\nRegion (" REALF ") - (" REALF ")";
 
-    for( dim = 0; dim < t->ndim; ++dim ) {
-      cBounds *b = &region->bounds[dim];
-      p += sprintf(p, 
-        (dim == 0) ? "\nRegion (" REALF ") - (" REALF ")" :
-                     "\n       (" REALF ") - (" REALF ")",
-        b->lower, b->upper);
+    for( b = bounds; b < B; ++b ) {
+      p += sprintf(p, msg, b->lower, b->upper);
+      msg = "\n       (" REALF ") - (" REALF ")";
     }
 
-    for( comp = 0; comp < t->ncomp; ++comp ) {
-      cResult *r = &region->result[comp];
+    for( comp = 0, res = region->result;
+         comp < t->ncomp; ++comp, ++res ) {
       p += sprintf(p, "%s  \tchisq " REAL " (" COUNT " df)",
-        p0, r->chisq, df);
+        p0, res->chisq, df);
       p0 += chars;
     }
 

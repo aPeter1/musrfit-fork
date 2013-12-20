@@ -2,28 +2,8 @@
 	decl.h
 		Type declarations
 		this file is part of Suave
-		last modified 13 Sep 10 th
+		last modified 29 Jul 13 th
 */
-
-/***************************************************************************
- *   Copyright (C) 2004-2010 by Thomas Hahn                                *
- *   hahn@feynarts.de                                                      *
- *                                                                         *
- *   This library is free software; you can redistribute it and/or         *
- *   modify it under the terms of the GNU Lesser General Public            *
- *   License as published by the Free Software Foundation; either          *
- *   version 2.1 of the License, or (at your option) any later version.    *
- *                                                                         *
- *   This library is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
- *   Lesser General Public License for more details.                       *
- *                                                                         *
- *   You should have received a copy of the GNU Lesser General Public      *
- *   License along with this library; if not, write to the                 *
- *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA          *
- ***************************************************************************/
 
 
 #include "stddecl.h"
@@ -48,7 +28,7 @@ typedef struct {
 typedef const Result cResult;
 
 typedef struct {
-  real lower, upper, mid;
+  real lower, upper;
   Grid grid;
 } Bounds;
 
@@ -62,28 +42,36 @@ typedef struct _this {
 #ifndef MLVERSION
   Integrand integrand;
   void *userdata;
+#ifdef HAVE_FORK
+  int ncores, *child;
+  real *frame;
+  SHM_ONLY(int shmid;)
+#endif
 #endif
   real epsrel, epsabs;
   int flags, seed;
   number mineval, maxeval;
   number nnew;
   real flatness;
+  cchar *statefile;
   count nregions;
   number neval;
   RNGState rng;  
   jmp_buf abort;
 } This;
 
+#define nframe nnew
+
 typedef const This cThis;
 
-#define TYPEDEFREGION \
-  typedef struct region { \
-    struct region *next; \
-    count div, df; \
-    number n; \
-    Result result[NCOMP]; \
-    Bounds bounds[NDIM]; \
-    real fluct[NCOMP][NDIM][2]; \
-    real w[]; \
-  } Region
+typedef struct region {
+  struct region *next;
+  size_t size;
+  count div, df;
+  number n;
+  Result result[];
+} Region;
+
+#define RegionBounds(r) ((Bounds *)(r->result + t->ncomp))
+#define RegionW(r) ((real *)(RegionBounds(r) + t->ndim))
 

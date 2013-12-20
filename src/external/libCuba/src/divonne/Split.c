@@ -2,33 +2,13 @@
 	Split.c
 		determine optimal cuts for splitting a region
 		this file is part of Divonne
-		last modified 20 Jul 10 th
+		last modified 31 Aug 13 th
 */
-
-/***************************************************************************
- *   Copyright (C) 2004-2010 by Thomas Hahn                                *
- *   hahn@feynarts.de                                                      *
- *                                                                         *
- *   This library is free software; you can redistribute it and/or         *
- *   modify it under the terms of the GNU Lesser General Public            *
- *   License as published by the Free Software Foundation; either          *
- *   version 2.1 of the License, or (at your option) any later version.    *
- *                                                                         *
- *   This library is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
- *   Lesser General Public License for more details.                       *
- *                                                                         *
- *   You should have received a copy of the GNU Lesser General Public      *
- *   License along with this library; if not, write to the                 *
- *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA          *
- ***************************************************************************/
 
 
 #define BNDTOL .05
 #define FRACT .5
-#define BIG 1e10
+#define SMALL 1e-10
 #define SINGTOL 1e-4
 
 #define LHSTOL .1
@@ -47,26 +27,21 @@ typedef struct {
   real lhs, row, sol;
 } Cut;
 
-typedef struct {
-  real diff, err, spread;
-} Errors;
-
-typedef const Errors cErrors;
-
 /*********************************************************************/
 
 static inline real Div(creal a, creal b)
 {
-  return (b != 0 && fabs(b) < BIG*fabs(a)) ? a/b : a;
+  return (b != 0 /*&& fabs(a) > SMALL*fabs(b)*/) ? a/b : a;
 }
 
 /*********************************************************************/
 
 static void SomeCut(This *t, Cut *cut, Bounds *b)
 {
+  Vector(real, xmid, NDIM);
+  real ymid, maxdev;
   count dim, maxdim;
   static count nextdim = 0;
-  real xmid[NDIM], ymid, maxdev;
 
   for( dim = 0; dim < t->ndim; ++dim )
     xmid[dim] = .5*(b[dim].upper + b[dim].lower);
@@ -111,10 +86,10 @@ static inline real Volume(cThis *t, creal *delta)
 
 /*********************************************************************/
 
-static inline real SetupEqs(Cut *cut, ccount ncut, real f)
+static inline real SetupEqs(Cut *cut, ccount ncuts, real f)
 {
   real sqsum = 0;
-  Cut *c = &cut[ncut];
+  Cut *c = &cut[ncuts];
   while( --c >= cut ) {
     sqsum += Sq(c->lhs = f - c->f);
     f = c->f;
@@ -124,7 +99,7 @@ static inline real SetupEqs(Cut *cut, ccount ncut, real f)
 
 /*********************************************************************/
 
-static inline void SolveEqs(Cut *cut, count ncut,
+static inline void SolveEqs(Cut *cut, count ncuts,
   creal *delta, creal diff)
 {
   real last = 0;
@@ -135,7 +110,7 @@ static inline void SolveEqs(Cut *cut, count ncut,
     ccount dim = Dim(c->i);
     c->row = r -=
       Div(diff, (delta[Lower(dim)] + delta[Upper(dim)])*c->df);
-    if( --ncut == 0 ) break;
+    if( --ncuts == 0 ) break;
     last += r*c->lhs;
   }
 
@@ -157,8 +132,8 @@ static count FindCuts(This *t, Cut *cut, Bounds *bounds, creal vol,
 {
   cint sign = (fdiff < 0) ? -1 : 1;
 
-  count ncut = 0, icut;
-  real delta[2*NDIM];
+  count ncuts = 0, icut;
+  Vector(real, delta, 2*NDIM);
   real gamma, fgamma, lhssq;
   count dim, div;
 
@@ -167,7 +142,7 @@ static count FindCuts(This *t, Cut *cut, Bounds *bounds, creal vol,
     creal xsave = xmajor[dim];
     real dist = b->upper - xsave;
     if( dist >= BNDTOL*(b->upper - b->lower) ) {
-      Cut *c = &cut[ncut++];
+      Cut *c = &cut[ncuts++];
       c->i = Upper(dim);
       c->save = dist;
       xmajor[dim] += dist *= FRACT;
@@ -182,7 +157,7 @@ static count FindCuts(This *t, Cut *cut, Bounds *bounds, creal vol,
     creal xsave = xmajor[dim];
     real dist = xsave - b->lower;
     if( dist >= BNDTOL*(b->upper - b->lower) ) {
-      Cut *c = &cut[ncut++];
+      Cut *c = &cut[ncuts++];
       c->i = Lower(dim);
       c->save = dist;
       xmajor[dim] -= dist *= FRACT;
@@ -192,7 +167,7 @@ static count FindCuts(This *t, Cut *cut, Bounds *bounds, creal vol,
     delta[Lower(dim)] = dist;
   }
 
-  if( ncut == 0 ) {
+  if( ncuts == 0 ) {
     SomeCut(t, cut, bounds);
     return 1;
   }
@@ -201,7 +176,7 @@ static count FindCuts(This *t, Cut *cut, Bounds *bounds, creal vol,
     real mindiff = INFTY;
     Cut *mincut = cut;
 
-    for( icut = 0; icut < ncut; ++icut ) {
+    for( icut = 0; icut < ncuts; ++icut ) {
       Cut *c = &cut[icut];
       creal diff = fabs(fmajor - c->f);
       if( diff <= mindiff ) {
@@ -215,30 +190,30 @@ static count FindCuts(This *t, Cut *cut, Bounds *bounds, creal vol,
 
     if( sign*(mincut->f - fgamma) < 0 ) break;
 
-    if( --ncut == 0 ) {
+    if( --ncuts == 0 ) {
       SomeCut(t, cut, bounds);
       return 1;
     }
 
     delta[mincut->i] = mincut->save;
-    memcpy(mincut, mincut + 1, (char *)&cut[ncut] - (char *)mincut);
+    memmove(mincut, mincut + 1, (char *)&cut[ncuts] - (char *)mincut);
   }
 
-  for( icut = 0; icut < ncut; ++icut ) {
+  for( icut = 0; icut < ncuts; ++icut ) {
     Cut *c = &cut[icut];
     c->fold = c->f;
     c->df = (c->f - fmajor)/delta[c->i];
   }
 
-  lhssq = SetupEqs(cut, ncut, fgamma);
+  lhssq = SetupEqs(cut, ncuts, fgamma);
 
 repeat:
-  SolveEqs(cut, ncut, delta, gamma*fdiff);
+  SolveEqs(cut, ncuts, delta, gamma*fdiff);
 
   for( div = 1; div <= 16; div *= 4 ) {
     real gammanew, lhssqnew;
 
-    for( icut = 0; icut < ncut; ++icut ) {
+    for( icut = 0; icut < ncuts; ++icut ) {
       Cut *c = &cut[icut];
       real *x = &xmajor[Dim(c->i)];
       creal xsave = *x;
@@ -250,7 +225,7 @@ repeat:
 
     gammanew = Volume(t, delta)/vol;
     fgamma = fmajor + (gammanew - 1)*fdiff;
-    lhssqnew = SetupEqs(cut, ncut, fgamma);
+    lhssqnew = SetupEqs(cut, ncuts, fgamma);
 
     if( lhssqnew <= lhssq ) {
       real fmax;
@@ -259,12 +234,12 @@ repeat:
       gamma = gammanew;
 
       fmax = fabs(fgamma);
-      for( icut = 0; icut < ncut; ++icut ) {
+      for( icut = 0; icut < ncuts; ++icut ) {
         Cut *c = &cut[icut];
         creal dfmin = SINGTOL*c->df;
         creal sol = c->sol/div;
         real df = c->f - c->fold;
-        df = (fabs(sol) < BIG*fabs(df)) ? df/sol : 1;
+        df = (fabs(df) > SMALL*fabs(sol)) ? df/sol : 1;
         c->df = (fabs(df) < fabs(dfmin)) ? dfmin : df;
         fmax = Max(fmax, fabs(c->f));
         c->fold = c->f;
@@ -276,90 +251,62 @@ repeat:
     }
   }
 
-  for( icut = 0; icut < ncut; ++icut ) {
+  for( icut = 0; icut < ncuts; ++icut ) {
     Cut *c = &cut[icut];
     real *b = (real *)bounds + c->i;
     c->save = *b;
     *b = xmajor[Dim(c->i)] + SignedDelta(c->i);
   }
 
-  return ncut;
+  return ncuts;
 }
 
 /*********************************************************************/
 
-static void Split(This *t, count iregion, int depth)
+static void Split(This *t, ccount iregion)
 {
-  TYPEDEFREGION;
+  csize_t regionsize = RegionSize;
+  Region *region = RegionPtr(iregion);
+  Vector(Cut, cut, 2*NDIM);
+  Cut *c;
+  count ncuts, succ;
+  int depth;
+  real *b;
 
-  Cut cut[2*NDIM];
-  Errors errors[NCOMP];
-  count comp, ncut, nsplit, xregion, ireg, xreg;
-  real tmp;
-
-{
-  Region *const region = RegionPtr(iregion);
   t->selectedcomp = region->cutcomp;
   t->neval_cut -= t->neval;
-  ncut = FindCuts(t, cut, region->bounds, region->vol,
-    (real *)region->result + region->xmajor, region->fmajor,
+  ncuts = FindCuts(t, cut, region->bounds, region->vol,
+    (real *)RegionResult(region) + region->xmajor, region->fmajor,
     region->fmajor - region->fminor);
   t->neval_cut += t->neval;
 
-  for( comp = 0; comp < t->ncomp; ++comp ) {
-    Errors *e = &errors[comp];
-    e->diff = region->result[comp].avg;
-    e->spread = e->err = 0;
+  depth = region->depth - ncuts;
+
+  EnlargeRegions(t, ++ncuts);
+  region = RegionPtr(iregion);
+  region->depth = -ncuts;
+  succ = iregion + region->next;
+  region->next = t->nregions - iregion;
+  b = (real *)region->bounds;
+
+  region = RegionPtr(t->nregions);
+  XCopy(region->bounds, b);
+  region->depth = IDim(depth) + 1;
+  region->next = 1;
+  region->isamples = 0;
+  for( c = cut; --ncuts; ++c ) {
+    ccount ci = c->i;
+    creal tmp = b[ci ^ 1];
+    b[ci ^ 1] = b[ci];
+    b[ci] = c->save;
+    region = RegionPtr(++t->nregions);
+    XCopy(region->bounds, b);
+    region->depth = IDim(depth) + 1;
+    region->next = 1;
+    region->isamples = 0;
+    ++depth;
+    b[ci ^ 1] = tmp;
   }
-}
-
-  xregion = t->nregions;
-
-  depth -= ncut;
-  if( Explore(t, iregion, &t->samples[0], depth, 1) ) {
-    Cut *c;
-    for( c = cut; ncut--; ++c ) {
-      real *b = (real *)RegionPtr(iregion)->bounds;
-      ccount c0 = c->i, c1 = c0 ^ 1;
-      creal tmp = b[c1];
-      b[c1] = b[c0];
-      b[c0] = c->save;
-      if( !Explore(t, iregion, &t->samples[0], depth++, ncut != 0) ) break;
-      if( ncut ) ((real *)RegionPtr(iregion)->bounds)[c1] = tmp;
-    }
-  }
-
-  nsplit = t->nregions - xregion + 1;
-
-  for( ireg = iregion, xreg = xregion; ireg < t->nregions; ireg = xreg++ ) {
-    cResult *result = RegionPtr(ireg)->result;
-    for( comp = 0; comp < t->ncomp; ++comp ) {
-      cResult *r = &result[comp];
-      Errors *e = &errors[comp];
-      e->diff -= r->avg;
-      e->err += r->err;
-      e->spread += Sq(r->spread);
-    }
-  }
-
-  tmp = 1./nsplit;
-  for( comp = 0; comp < t->ncomp; ++comp ) {
-    Errors *e = &errors[comp];
-    e->diff = tmp*fabs(e->diff);
-    e->err = (e->err == 0) ? 1 : 1 + e->diff/e->err;
-    e->spread = (e->spread == 0) ? 1 : 1 + e->diff/sqrt(e->spread);
-  }
-
-  tmp = 1 - tmp;
-  for( ireg = iregion, xreg = xregion; ireg < t->nregions; ireg = xreg++ ) {
-    Result *result = RegionPtr(ireg)->result;
-    for( comp = 0; comp < t->ncomp; ++comp ) {
-      Result *r = &result[comp];
-      cErrors *e = &errors[comp];
-      creal c = tmp*e->diff;
-      if( r->err > 0 ) r->err = r->err*e->err + c;
-      r->spread = r->spread*e->spread + c*t->samples[0].neff;
-    }
-  }
+  region->next = succ - t->nregions++;
 }
 

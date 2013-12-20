@@ -2,37 +2,17 @@
 	FindMinimum.c
 		find minimum (maximum) of hyperrectangular region
 		this file is part of Divonne
-		last modified 8 Jun 10 th
+		last modified 7 Aug 13 th
 */
 
-/***************************************************************************
- *   Copyright (C) 2004-2010 by Thomas Hahn                                *
- *   hahn@feynarts.de                                                      *
- *                                                                         *
- *   This library is free software; you can redistribute it and/or         *
- *   modify it under the terms of the GNU Lesser General Public            *
- *   License as published by the Free Software Foundation; either          *
- *   version 2.1 of the License, or (at your option) any later version.    *
- *                                                                         *
- *   This library is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
- *   Lesser General Public License for more details.                       *
- *                                                                         *
- *   You should have received a copy of the GNU Lesser General Public      *
- *   License along with this library; if not, write to the                 *
- *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA          *
- ***************************************************************************/
 
+#define EPS POW2(52)
+#define RTEPS POW2(26)
+#define QEPS POW2(13)
 
-#define EPS 0x1p-52
-#define RTEPS 0x1p-26
-#define QEPS 0x1p-13
-
-#define DELTA 0x1p-16
-#define RTDELTA 0x1p-8
-#define QDELTA 0x1p-4
+#define DELTA POW2(16)
+#define RTDELTA POW2(8)
+#define QDELTA POW2(4)
 
 /*
 #define DELTA 1e-5
@@ -162,7 +142,8 @@ static void UpdateCholesky(cThis *t, ccount n, real *hessian,
 static inline void BFGS(cThis *t, ccount n, real *hessian,
   creal *gnew, creal *g, real *p, creal dx)
 {
-  real y[NDIM], c;
+  Vector(real, y, NDIM);
+  real c;
   count i, j;
 
   for( i = 0; i < n; ++i )
@@ -210,7 +191,7 @@ static Point LineSearch(This *t, ccount nfree, ccount *ifree,
   real tol = ftol, tol2 = tol + tol;
   Point cur = {0, fini};
 
-  VecCopy(x, xini);
+  XCopy(x, xini);
 
   /* don't even try if
      a) we'd walk backwards,
@@ -360,9 +341,10 @@ static Point LineSearch(This *t, ccount nfree, ccount *ifree,
 static real LocalSearch(This *t, ccount nfree, ccount *ifree,
   cBounds *b, creal *x, creal fx, real *z)
 {
+  Vector(real, y, NDIM);
+  Vector(real, p, NDIM);
   real delta, smax, sopp, spmax, snmax;
-  real y[NDIM], fy, fz, ftest;
-  real p[NDIM];
+  real fy, fz, ftest;
   int sign;
   count i;
 
@@ -389,7 +371,7 @@ static real LocalSearch(This *t, ccount nfree, ccount *ifree,
   /* Move along p until the integrand changes appreciably
      or we come close to a border. */
 
-  VecCopy(y, x);
+  XCopy(y, x);
   ftest = SUFTOL*(1 + fabs(fx));
   delta = RTDELTA/5;
   do {
@@ -442,7 +424,7 @@ static real LocalSearch(This *t, ccount nfree, ccount *ifree,
   /* Move along p' until the integrand changes appreciably
      or we come close to a border. */
 
-  VecCopy(z, y);
+  XCopy(z, y);
   ftest = SUFTOL*(1 + fabs(fy));
   delta = RTDELTA/5;
   do {
@@ -468,7 +450,7 @@ static real LocalSearch(This *t, ccount nfree, ccount *ifree,
       grad = (fy - fz)/delta;
       range = sopp/.9 + delta;
       step = Min(delta + delta, sopp);
-      VecCopy(y, z);
+      XCopy(y, z);
       fy = fz;
       for( i = 0; i < nfree; ++i )
         p[i] = -p[i];
@@ -535,15 +517,18 @@ static real LocalSearch(This *t, ccount nfree, ccount *ifree,
 
 static real FindMinimum(This *t, cBounds *b, real *xmin, real fmin)
 {
-  real hessian[NDIM*NDIM];
-  real gfree[NDIM], p[NDIM];
-  real tmp[NDIM], ftmp, fini = fmin;
+  Vector(real, hessian, NDIM*NDIM);
+  Vector(real, gfree, NDIM);
+  Vector(real, p, NDIM);
+  Vector(real, tmp, NDIM);
+  Vector(count, ifree, NDIM);
+  Vector(count, ifix, NDIM);
+  real ftmp, fini = fmin;
   ccount maxeval = t->neval + 50*t->ndim;
   count nfree, nfix;
-  count ifree[NDIM], ifix[NDIM];
   count dim, local;
 
-  Zap(hessian);
+  Clear(hessian, t->ndim*t->ndim);
   for( dim = 0; dim < t->ndim; ++dim )
     Hessian(dim, dim) = 1;
 
@@ -580,7 +565,7 @@ static real FindMinimum(This *t, cBounds *b, real *xmin, real fmin)
     if( ftmp > fmin - (1 + fabs(fmin))*RTEPS )
       goto releasebounds;
     fmin = ftmp;
-    VecCopy(xmin, tmp);
+    XCopy(xmin, tmp);
   }
 
   while( t->neval <= maxeval ) {
@@ -632,13 +617,13 @@ fixbound:
             tmp[i] = Hessian(i + 1, mini);
 
           for( i = mini; i < nfree; ++i ) {
-            Copy(&Hessian(i, 0), &Hessian(i + 1, 0), i);
+            Move(&Hessian(i, 0), &Hessian(i + 1, 0), i);
             Hessian(i, i) = Hessian(i + 1, i + 1);
           }
           RenormalizeCholesky(t, nfree, hessian, tmp, diag);
 
-          Copy(&ifree[mini], &ifree[mini + 1], nfree - mini);
-          Copy(&gfree[mini], &gfree[mini + 1], nfree - mini);
+          Move(&ifree[mini], &ifree[mini + 1], nfree - mini);
+          Move(&gfree[mini], &gfree[mini + 1], nfree - mini);
         }
         continue;
       }
@@ -651,11 +636,11 @@ fixbound:
         real fdiff;
 
         fmin = low.f;
-        VecCopy(xmin, tmp);
+        XCopy(xmin, tmp);
 
         Gradient(t, nfree, ifree, b, xmin, fmin, tmp);
         BFGS(t, nfree, hessian, tmp, gfree, p, low.dx);
-        VecCopy(gfree, tmp);
+        XCopy(gfree, tmp);
 
         if( fabs(low.dx - minstep) < QEPS*minstep ) goto fixbound;
 
@@ -696,7 +681,7 @@ releasebounds:
         ++nfree;
 
         --nfix;
-        Copy(&ifix[mini], &ifix[mini + 1], nfix - mini);
+        Move(&ifix[mini], &ifix[mini + 1], nfix - mini);
         continue;
       }
     }

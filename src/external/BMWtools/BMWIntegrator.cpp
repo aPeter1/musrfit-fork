@@ -34,6 +34,7 @@
 
 #define USERDATA NULL
 #define SEED 0
+#define STATEFILE NULL
 
 std::vector<double> TDWaveGapIntegralCuhre::fPar;
 
@@ -60,7 +61,7 @@ double TDWaveGapIntegralCuhre::IntegrateFunc()
 
   Cuhre(fNDim, NCOMP, Integrand, USERDATA,
     EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
-    KEY,
+    KEY, STATEFILE,
     &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];
@@ -111,7 +112,7 @@ double TCosSqDWaveGapIntegralCuhre::IntegrateFunc()
 
   Cuhre(fNDim, NCOMP, Integrand, USERDATA,
     EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
-    KEY,
+    KEY, STATEFILE,
     &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];
@@ -162,7 +163,7 @@ double TSinSqDWaveGapIntegralCuhre::IntegrateFunc()
 
   Cuhre(fNDim, NCOMP, Integrand, USERDATA,
     EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
-    KEY,
+    KEY, STATEFILE,
     &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];
@@ -213,7 +214,7 @@ double TAnSWaveGapIntegralCuhre::IntegrateFunc()
 
   Cuhre(fNDim, NCOMP, Integrand, USERDATA,
     EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
-    KEY,
+    KEY, STATEFILE,
     &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];
@@ -272,7 +273,7 @@ double TAnSWaveGapIntegralDivonne::IntegrateFunc()
   Divonne(fNDim, NCOMP, Integrand, USERDATA,
     EPSREL, EPSABS, VERBOSE, SEED, MINEVAL, MAXEVAL,
     KEY1, KEY2, KEY3, MAXPASS, BORDER, MAXCHISQ, MINDEVIATION,
-    NGIVEN, LDXGIVEN, NULL, NEXTRA, NULL,
+    NGIVEN, LDXGIVEN, NULL, NEXTRA, NULL, STATEFILE,
     &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];
@@ -324,7 +325,7 @@ double TAnSWaveGapIntegralSuave::IntegrateFunc()
 
   Suave(fNDim, NCOMP, Integrand, USERDATA,
     EPSREL, EPSABS, VERBOSE | LAST, SEED, MINEVAL, MAXEVAL,
-    NNEW, FLATNESS,
+    NNEW, FLATNESS, STATEFILE,
     &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];
@@ -375,7 +376,7 @@ double TNonMonDWave1GapIntegralCuhre::IntegrateFunc()
 
   Cuhre(fNDim, NCOMP, Integrand, USERDATA,
     EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
-    KEY,
+    KEY, STATEFILE,
     &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];
@@ -426,7 +427,7 @@ double TNonMonDWave2GapIntegralCuhre::IntegrateFunc()
 
   Cuhre(fNDim, NCOMP, Integrand, USERDATA,
     EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
-    KEY,
+    KEY, STATEFILE,
     &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];

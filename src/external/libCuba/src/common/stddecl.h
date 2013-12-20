@@ -1,36 +1,19 @@
 /*
 	stddecl.h
-		Type declarations common to all Cuba routines
-		last modified 16 Jun 10 th
+		declarations common to all Cuba routines
+		last modified 17 Sep 13 th
 */
 
-/***************************************************************************
- *   Copyright (C) 2004-2010 by Thomas Hahn                                *
- *   hahn@feynarts.de                                                      *
- *                                                                         *
- *   This library is free software; you can redistribute it and/or         *
- *   modify it under the terms of the GNU Lesser General Public            *
- *   License as published by the Free Software Foundation; either          *
- *   version 2.1 of the License, or (at your option) any later version.    *
- *                                                                         *
- *   This library is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
- *   Lesser General Public License for more details.                       *
- *                                                                         *
- *   You should have received a copy of the GNU Lesser General Public      *
- *   License along with this library; if not, write to the                 *
- *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA          *
- ***************************************************************************/
 
-
-#ifndef __stddecl_h__
-#define __stddecl_h__
+#ifndef _stddecl_h_
+#define _stddecl_h_
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
+#define _BSD_SOURCE
+#define _XOPEN_SOURCE
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,28 +22,83 @@
 #include <float.h>
 #include <limits.h>
 #include <unistd.h>
+#include <assert.h>
 #include <fcntl.h>
 #include <setjmp.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#ifdef HAVE_FORK
+#include <sys/wait.h>
+#include <sys/socket.h>
+#ifdef HAVE_SHMGET
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#endif
+#endif
 
+#ifdef HAVE_ALLOCA_H
+#include <alloca.h>
+#elif defined __GNUC__
+#define alloca __builtin_alloca
+#elif defined _AIX
+#define alloca __alloca
+#elif defined _MSC_VER
+#include <malloc.h>
+#define alloca _alloca
+#else
+#include <stddef.h>
+#ifdef  __cplusplus
+extern "C"
+#endif
+void *alloca (size_t);
+#endif
 
 #ifndef NDIM
 #define NDIM t->ndim
-#endif
-#ifndef NCOMP
-#define NCOMP t->ncomp
+#define MAXDIM 1024
+#else
+#define MAXDIM NDIM
 #endif
 
+#ifndef NCOMP
+#define NCOMP t->ncomp
+#define MAXCOMP 1024
+#else
+#define MAXCOMP NCOMP
+#endif
+
+#if defined(VEGAS) || defined(SUAVE)
+#define VES_ONLY(...) __VA_ARGS__
+#define NW 1
+#else
+#define VES_ONLY(...)
+#define NW 0
+#endif
+
+#ifdef DIVONNE
+#define DIV_ONLY(...) __VA_ARGS__
+#else
+#define DIV_ONLY(...)
+#endif
+
+#define SAMPLESIZE (NW + t->ndim + t->ncomp)*sizeof(real)
 
 #define VERBOSE (t->flags & 3)
 #define LAST (t->flags & 4)
 #define SHARPEDGES (t->flags & 8)
+#define KEEPFILE (t->flags & 16)
 #define REGIONS (t->flags & 128)
 #define RNG (t->flags >> 8)
 
 #define INFTY DBL_MAX
 
-#define NOTZERO 0x1p-104
+#if __STDC_VERSION__ >= 199901L
+#define POW2(n) 0x1p-##n
+#else
+#define POW2(n) ldexp(1., -n)
+#endif
+
+#define NOTZERO POW2(104)
 
 #define ABORT -999
 
@@ -68,15 +106,17 @@
 
 #define Copy(d, s, n) memcpy(d, s, (n)*sizeof(*(d)))
 
-#define VecCopy(d, s) Copy(d, s, t->ndim)
+#define Move(d, s, n) memmove(d, s, (n)*sizeof(*(d)))
 
-#define ResCopy(d, s) Copy(d, s, t->ncomp)
+#define XCopy(d, s) Copy(d, s, t->ndim)
+
+#define FCopy(d, s) Copy(d, s, t->ncomp)
 
 #define Clear(d, n) memset(d, 0, (n)*sizeof(*(d)))
 
-#define VecClear(d) Clear(d, t->ndim)
+#define XClear(d) Clear(d, t->ndim)
 
-#define ResClear(d) Clear(d, t->ncomp)
+#define FClear(d) Clear(d, t->ncomp)
 
 #define Zap(d) memset(d, 0, sizeof(d))
 
@@ -90,14 +130,155 @@
 #define reallocset(p, n) (p = realloc(p, n))
 #endif
 
-#define ChkAlloc(r) if( r == NULL ) { \
-  fprintf(stderr, "Out of memory in " __FILE__ " line %d.\n", __LINE__); \
-  exit(1); \
+#define Abort(s) abort1(s, __LINE__)
+#define abort1(s, line) abort2(s, line)
+#define abort2(s, line) { perror(s " " __FILE__ "(" #line ")"); exit(1); }
+
+#define Die(p) if( (p) == NULL ) Abort("malloc")
+
+#define MemAlloc(p, n) Die(mallocset(p, n))
+#define ReAlloc(p, n) Die(reallocset(p, n))
+#define Alloc(p, n) MemAlloc(p, (n)*sizeof(*p))
+
+#if __STDC_VERSION__ >= 199901L
+#define Sized(type, var, size) char var##_[size]; type *var = (type *)var##_
+#define Vector(type, var, n1) type var[n1]
+#define Array(type, var, n1, n2) type var[n1][n2]
+#else
+#define Sized(type, var, size) type *var = alloca(size)
+#define Vector(type, var, n1) type *var = alloca((n1)*sizeof(type))
+#define Array(type, var, n1, n2) type (*var)[n2] = alloca((n1)*(n2)*sizeof(type))
+#endif
+
+#define FORK_ONLY(...)
+#define SHM_ONLY(...)
+#define ShmAlloc(...)
+#define ShmFree(...)
+
+#ifdef MLVERSION
+#define ML_ONLY(...) __VA_ARGS__
+#else
+#define ML_ONLY(...)
+
+#ifdef HAVE_FORK
+#undef FORK_ONLY
+#define FORK_ONLY(...) __VA_ARGS__
+
+#ifdef HAVE_SHMGET
+#undef SHM_ONLY
+#define SHM_ONLY(...) __VA_ARGS__
+
+#define ShmMap(t, ...) if( t->shmid != -1 ) { \
+  t->frame = shmat(t->shmid, NULL, 0); \
+  if( t->frame == (void *)-1 ) Abort("shmat"); \
+  __VA_ARGS__ \
 }
 
-#define Alloc(p, n) MemAlloc(p, (n)*sizeof(*p))
-#define MemAlloc(p, n) ChkAlloc(mallocset(p, n))
-#define ReAlloc(p, n) ChkAlloc(reallocset(p, n))
+#define ShmRm(t) shmctl(t->shmid, IPC_RMID, NULL);
+
+#undef ShmAlloc
+#define ShmAlloc(t, ...) \
+  t->shmid = shmget(IPC_PRIVATE, t->nframe*SAMPLESIZE, IPC_CREAT | 0600); \
+  ShmMap(t, __VA_ARGS__)
+
+#undef ShmFree
+#define ShmFree(t, ...) if( t->shmid != -1 ) { \
+  shmdt(t->frame); \
+  __VA_ARGS__ \
+}
+
+#endif
+#endif
+#endif
+  
+#define FrameAlloc(t, ...) \
+  SHM_ONLY(ShmAlloc(t, __VA_ARGS__) else) \
+  MemAlloc(t->frame, t->nframe*SAMPLESIZE);
+
+#define FrameFree(t, ...) DIV_ONLY(if( t->nframe )) { \
+  SHM_ONLY(ShmFree(t, __VA_ARGS__) else) \
+  free(t->frame); \
+}
+
+
+#define StateDecl \
+char *statefile_tmp = NULL, *statefile_XXXXXX = NULL; \
+int statemsg = VERBOSE; \
+ssize_t ini = 1; \
+struct stat st
+
+#define StateSetup(t) if( (t)->statefile ) { \
+  if( *(t)->statefile == 0 ) (t)->statefile = NULL; \
+  else { \
+    ccount len = strlen((t)->statefile); \
+    statefile_tmp = alloca(len + 8); \
+    strcpy(statefile_tmp, (t)->statefile); \
+    statefile_XXXXXX = statefile_tmp + len; \
+  } \
+}
+
+typedef long long int signature_t;
+
+#define StateSignature(t, i) (0x41425543 + \
+  ((signature_t)(i) << 60) + \
+  ((signature_t)(t)->ncomp << 48) + \
+  ((signature_t)(t)->ndim << 32))
+
+#define StateReadTest(t) (t)->statefile && \
+  stat((t)->statefile, &st) == 0 && (st.st_mode & 0400)
+
+#define StateReadOpen(t, fd) do { \
+  int fd; \
+  if( (fd = open((t)->statefile, O_RDONLY)) != -1 ) { \
+    do
+
+#define StateRead(fd, buf, size) \
+  ini += size - read(fd, buf, size)
+
+#define StateReadClose(t, fd) \
+    while( (--ini, 0) ); \
+    close(fd); \
+  } \
+  if( ini | statemsg ) { \
+    char s[512]; \
+    sprintf(s, ini ? \
+      "\nError restoring state from %s, starting from scratch." : \
+      "\nRestored state from %s.", (t)->statefile); \
+    Print(s); \
+  } \
+} while( 0 )
+
+
+#define StateWriteTest(t) ((t)->statefile)
+
+#define StateWriteOpen(t, fd) do { \
+  ssize_t fail = 1; \
+  int fd; \
+  strcpy(statefile_XXXXXX, "-XXXXXX"); \
+  if( (fd = mkstemp(statefile_tmp)) != -1 ) { \
+    do
+
+#define StateWrite(fd, buf, size) \
+  fail += size - write(fd, buf, size)
+
+#define StateWriteClose(t, fd) \
+    while( (--fail, 0) ); \
+    close(fd); \
+    if( fail == 0 ) fail |= rename(statefile_tmp, (t)->statefile); \
+  } \
+  if( fail | statemsg ) { \
+    char s[512]; \
+    sprintf(s, fail ? \
+      "\nError saving state to %s." : \
+      "\nSaved state to %s.", (t)->statefile); \
+    Print(s); \
+    statemsg &= fail & -2; \
+  } \
+} while( 0 )
+
+
+#define StateRemove(t) \
+if( fail == 0 && (t)->statefile && KEEPFILE == 0 ) unlink((t)->statefile)
 
 
 #ifdef __cplusplus
@@ -114,6 +295,8 @@ typedef const bool cbool;
 typedef const int cint;
 
 typedef const long clong;
+
+typedef const size_t csize_t;
 
 #define COUNT "%d"
 typedef /*unsigned*/ int count;
@@ -143,6 +326,15 @@ typedef /*long*/ double real;
 	   quite another matter, too. */
 
 typedef const real creal;
+
+typedef void (*subroutine)();
+
+typedef struct {
+  subroutine initfun;
+  void *initarg;
+  subroutine exitfun;
+  void *exitarg;
+} workerini;
 
 
 struct _this;
@@ -179,33 +371,42 @@ typedef struct {
 } RNGState;
 
 
-#ifdef UNDERSCORE
-#define SUFFIX(s) s##_
-#else
+#if NOUNDERSCORE
 #define SUFFIX(s) s
+#else
+#define SUFFIX(s) s##_
 #endif
 
 #define EXPORT(s) EXPORT_(PREFIX(s))
 #define EXPORT_(s) SUFFIX(s)
 
 
-static inline real Sq(creal x)
-{
+#define CString(cs, fs, len) { \
+  char *_s = NULL; \
+  if( fs ) { \
+    int _l = len; \
+    while( _l > 0 && fs[_l - 1] == ' ' ) --_l; \
+    if( _l > 0 && (_s = alloca(_l + 1)) ) { \
+      memcpy(_s, fs, _l); \
+      _s[_l] = 0; \
+    } \
+  } \
+  cs = _s; \
+}
+
+static inline real Sq(creal x) {
   return x*x;
 }
 
-static inline real Min(creal a, creal b)
-{
+static inline real Min(creal a, creal b) {
   return (a < b) ? a : b;
 }
 
-static inline real Max(creal a, creal b)
-{
+static inline real Max(creal a, creal b) {
   return (a > b) ? a : b;
 }
 
-static inline real Weight(creal sum, creal sqsum, cnumber n)
-{
+static inline real Weight(creal sum, creal sqsum, cnumber n) {
   creal w = sqrt(sqsum*n);
   return (n - 1)/Max((w + sum)*(w - sum), NOTZERO);
 }
@@ -234,6 +435,26 @@ static inline real Weight(creal sum, creal sqsum, cnumber n)
 
 /* abs(a) + (a == 0) */
 #define Abs1(a) (((a) ^ NegQ(a)) - NegQ((a) - 1))
+
+
+#ifdef MLVERSION
+
+static inline void Print(MLCONST char *s)
+{
+  MLPutFunction(stdlink, "EvaluatePacket", 1);
+  MLPutFunction(stdlink, "Print", 1);
+  MLPutString(stdlink, s);
+  MLEndPacket(stdlink);
+
+  MLNextPacket(stdlink);
+  MLNewPacket(stdlink);
+}
+
+#else
+
+#define Print(s) puts(s); fflush(stdout)
+
+#endif
 
 #endif
 

@@ -2,28 +2,8 @@
 	Grid.c
 		utility functions for the Vegas grid
 		this file is part of Vegas
-		last modified 28 May 10 th
+		last modified 13 Dec 11 th
 */
-
-/***************************************************************************
- *   Copyright (C) 2004-2010 by Thomas Hahn                                *
- *   hahn@feynarts.de                                                      *
- *                                                                         *
- *   This library is free software; you can redistribute it and/or         *
- *   modify it under the terms of the GNU Lesser General Public            *
- *   License as published by the Free Software Foundation; either          *
- *   version 2.1 of the License, or (at your option) any later version.    *
- *                                                                         *
- *   This library is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
- *   Lesser General Public License for more details.                       *
- *                                                                         *
- *   You should have received a copy of the GNU Lesser General Public      *
- *   License along with this library; if not, write to the                 *
- *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA          *
- ***************************************************************************/
 
 
 static inline void GetGrid(cThis *t, Grid *grid)
@@ -35,7 +15,7 @@ static inline void GetGrid(cThis *t, Grid *grid)
 
   if( slot < MAXGRIDS && gridptr_[slot] ) {
     if( griddim_[slot] == t->ndim ) {
-      VecCopy(grid, gridptr_[slot]);
+      XCopy(grid, gridptr_[slot]);
       return;
     }
     free(gridptr_[slot]);
@@ -57,7 +37,7 @@ static inline void PutGrid(cThis *t, Grid *grid)
   if( slot < MAXGRIDS ) {
     if( gridptr_[slot] == NULL ) Alloc(gridptr_[slot], t->ndim);
     griddim_[slot] = t->ndim;
-    VecCopy(gridptr_[slot], grid);
+    XCopy(gridptr_[slot], grid);
   }
 }
 

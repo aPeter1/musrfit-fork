@@ -2,27 +2,9 @@
 	decl.h
 		Type declarations
 		this file is part of Cuhre
-		last modified 7 Jun 10 th */
+		last modified 26 Jul 13 th
+*/
 
-/***************************************************************************
- *   Copyright (C) 2004-2010 by Thomas Hahn                                *
- *   hahn@feynarts.de                                                      *
- *                                                                         *
- *   This library is free software; you can redistribute it and/or         *
- *   modify it under the terms of the GNU Lesser General Public            *
- *   License as published by the Free Software Foundation; either          *
- *   version 2.1 of the License, or (at your option) any later version.    *
- *                                                                         *
- *   This library is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
- *   Lesser General Public License for more details.                       *
- *                                                                         *
- *   You should have received a copy of the GNU Lesser General Public      *
- *   License along with this library; if not, write to the                 *
- *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA          *
- ***************************************************************************/
 
 #include "stddecl.h"
 
@@ -47,9 +29,18 @@ typedef struct {
 
 typedef const Bounds cBounds;
 
+enum { nrules = 5 };
+
 typedef struct {
-  real *x, *f;
-  void *first, *last;
+  count n;
+  real weight[nrules], scale[nrules], norm[nrules];
+  real gen[];
+} Set;
+
+#define SetSize (sizeof(Set) + t->ndim*sizeof(real))
+
+typedef struct {
+  Set *first, *last;
   real errcoeff[3];
   count n;
 } Rule;
@@ -63,22 +54,34 @@ typedef struct _this {
 #ifndef MLVERSION
   Integrand integrand;
   void *userdata;
+#ifdef HAVE_FORK
+  int ncores, *child;
+  SHM_ONLY(int shmid;)
 #endif
+#endif
+  real *frame;
   real epsrel, epsabs;
   int flags;
   number mineval, maxeval;
   count key, nregions;
+  cchar *statefile;
   number neval;
   Rule rule;
   jmp_buf abort;
 } This;
 
+#define nframe rule.n
+
 typedef const This cThis;
 
-#define TYPEDEFREGION \
-  typedef struct region { \
-    count div; \
-    Result result[NCOMP]; \
-    Bounds bounds[NDIM]; \
-  } Region
+typedef struct region {
+  count div;
+  Bounds bounds[];
+} Region;
+
+#define RegionSize (sizeof(Region) + t->ndim*sizeof(Bounds) + t->ncomp*sizeof(Result))
+
+#define RegionResult(r) ((Result *)(r->bounds + t->ndim))
+
+#define RegionPtr(p, n) ((Region *)((char *)p->region + (n)*regionsize))
 

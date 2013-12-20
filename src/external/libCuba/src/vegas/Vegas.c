@@ -2,52 +2,17 @@
 	Vegas.c
 		Vegas Monte-Carlo integration
 		by Thomas Hahn
-		last modified 13 Sep 10 th
+		last modified 17 Sep 13 th
 */
 
-/***************************************************************************
- *   Copyright (C) 2004-2010 by Thomas Hahn                                *
- *   hahn@feynarts.de                                                      *
- *                                                                         *
- *   This library is free software; you can redistribute it and/or         *
- *   modify it under the terms of the GNU Lesser General Public            *
- *   License as published by the Free Software Foundation; either          *
- *   version 2.1 of the License, or (at your option) any later version.    *
- *                                                                         *
- *   This library is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
- *   Lesser General Public License for more details.                       *
- *                                                                         *
- *   You should have received a copy of the GNU Lesser General Public      *
- *   License along with this library; if not, write to the                 *
- *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA          *
- ***************************************************************************/
 
+#define VEGAS
+#define ROUTINE "Vegas"
 
 #include "decl.h"
-
-#define Print(s) puts(s); fflush(stdout)
-
-/*********************************************************************/
-
-static inline void DoSample(This *t, number n,
-  creal *w, creal *x, real *f, cint iter)
-{
-  t->neval += n;
-  while( n-- ) {
-    if( t->integrand(&t->ndim, x, &t->ncomp, f, t->userdata,
-          w++, &iter) == ABORT )
-      longjmp(t->abort, 1);
-    x += t->ndim;
-    f += t->ncomp;
-  }
-}
+#include "CSample.c"
 
 /*********************************************************************/
-
-#include "common.c"
 
 Extern void EXPORT(Vegas)(ccount ndim, ccount ncomp,
   Integrand integrand, void *userdata,
@@ -74,7 +39,6 @@ Extern void EXPORT(Vegas)(ccount ndim, ccount ncomp,
   t.nbatch = nbatch;
   t.gridno = gridno;
   t.statefile = statefile;
-  t.neval = 0;
 
   *pfail = Integrate(&t, integral, error, prob);
   *pneval = t.neval;
@@ -89,9 +53,8 @@ Extern void EXPORT(vegas)(ccount *pndim, ccount *pncomp,
   cnumber *pnstart, cnumber *pnincrease, 
   cnumber *pnbatch, cint *pgridno, cchar *statefile,
   number *pneval, int *pfail,
-  real *integral, real *error, real *prob, int statefilelen)
+  real *integral, real *error, real *prob, cint statefilelen)
 {
-  char *s = NULL;
   This t;
   t.ndim = *pndim;
   t.ncomp = *pncomp;
@@ -107,22 +70,9 @@ Extern void EXPORT(vegas)(ccount *pndim, ccount *pncomp,
   t.nincrease = *pnincrease;
   t.nbatch = *pnbatch;
   t.gridno = *pgridno;
-  t.neval = 0;
-
-  if( statefile ) {
-	/* strip trailing spaces */
-    while( statefilelen > 0 && statefile[statefilelen - 1] == ' ' )
-      --statefilelen;
-    if( statefilelen > 0 && (s = malloc(statefilelen + 1)) ) {
-      memcpy(s, statefile, statefilelen);
-      s[statefilelen] = 0;
-    }
-  }
-  t.statefile = s;
+  CString(t.statefile, statefile, statefilelen);
 
   *pfail = Integrate(&t, integral, error, prob);
   *pneval = t.neval;
-
-  free(s);
 }
 

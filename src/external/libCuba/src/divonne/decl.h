@@ -2,31 +2,15 @@
 	decl.h
 		Type declarations
 		this file is part of Divonne
-		last modified 8 Jun 10 th
+		last modified 26 Jul 13 th
 */
-
-/***************************************************************************
- *   Copyright (C) 2004-2010 by Thomas Hahn                                *
- *   hahn@feynarts.de                                                      *
- *                                                                         *
- *   This library is free software; you can redistribute it and/or         *
- *   modify it under the terms of the GNU Lesser General Public            *
- *   License as published by the Free Software Foundation; either          *
- *   version 2.1 of the License, or (at your option) any later version.    *
- *                                                                         *
- *   This library is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
- *   Lesser General Public License for more details.                       *
- *                                                                         *
- *   You should have received a copy of the GNU Lesser General Public      *
- *   License along with this library; if not, write to the                 *
- *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA          *
- ***************************************************************************/
 
 
 #include "stddecl.h"
+
+#define INIDEPTH 3
+#define DEPTH 5
+#define POSTDEPTH 15
 
 #define Tag(x) ((x) | INT_MIN)
 #define Untag(x) ((x) & INT_MAX)
@@ -38,14 +22,30 @@ typedef struct {
 typedef const Bounds cBounds;
 
 typedef struct {
+  real avg, err;
+} PhaseResult;
+
+typedef struct {
   real avg, spreadsq;
   real spread, secondspread;
   real nneed, maxerrsq, mindevsq;
+  real integral, sigsq, chisq;
+  PhaseResult phase[2];
   int iregion;
 } Totals;
 
+enum { nrules = 5 };
+      
 typedef struct {
-  void *first, *last;
+  count n;
+  real weight[nrules], scale[nrules], norm[nrules];
+  real gen[];
+} Set;
+
+#define SetSize (sizeof(Set) + t->ndim*sizeof(real))
+
+typedef struct {
+  Set *first, *last;
   real errcoeff[3];
   count n;
 } Rule;
@@ -53,15 +53,44 @@ typedef struct {
 typedef const Rule cRule;
 
 typedef struct samples {
-  real weight;
-  real *x, *f, *avg, *err;
-  void (*sampler)(struct _this *t, const struct samples *, cBounds *, creal);
+  real *x, *f;
+  void (*sampler)(struct _this *t, ccount);
   cRule *rule;
-  count coeff;
   number n, neff;
+  count coeff;
 } Samples;
 
 typedef const Samples cSamples;
+
+typedef struct {
+  real diff, err, spread;
+} Errors;
+
+typedef const Errors cErrors;
+
+typedef struct {
+  real avg, err, spread, chisq;
+  real fmin, fmax;
+  real xminmax[];
+} Result;
+
+typedef const Result cResult;
+
+#define ResultSize (sizeof(Result) + t->ndim*2*sizeof(real))
+
+typedef struct region {
+  int depth, next;
+  count isamples, cutcomp, xmajor;
+  real fmajor, fminor, vol;
+  Bounds bounds[];
+} Region;
+
+#define RegionSize (sizeof(Region) + t->ndim*sizeof(Bounds) + t->ncomp*ResultSize)
+
+#define RegionResult(r) ((Result *)(r->bounds + t->ndim))
+
+#define RegionPtr(n) ((Region *)((char *)t->region + (n)*regionsize))
+
 
 typedef int (*Integrand)(ccount *, creal *, ccount *, real *, void *, cint *);
 
@@ -73,6 +102,12 @@ typedef struct _this {
   Integrand integrand;
   void *userdata;
   PeakFinder peakfinder;
+#ifdef HAVE_FORK
+  int ncores, running, *child;
+  real *frame;
+  number nframe;
+  SHM_ONLY(int shmid;)
+#endif
 #endif
   real epsrel, epsabs;
   int flags, seed;
@@ -82,37 +117,39 @@ typedef struct _this {
   Bounds border;
   real maxchisq, mindeviation;
   number ngiven, nextra;
-  real *xgiven, *xextra, *fgiven, *fextra;
+  real *xgiven, *fgiven;
+  real *xextra, *fextra;
   count ldxgiven;
   count nregions;
-  number neval, neval_opt, neval_cut;
-  int phase;
+  cchar *statefile;
+  number neval, neval_opt, neval_cut, nrand;
+  count phase;
   count selectedcomp, size;
   Samples samples[3];
   Totals *totals;
   Rule rule7, rule9, rule11, rule13;
   RNGState rng;
-  void *voidregion;
+  Region *region;
   jmp_buf abort;
 } This;
 
 typedef const This cThis;
 
+
 #define CHUNKSIZE 4096
 
-#define TYPEDEFREGION \
-  typedef struct { \
-    real avg, err, spread, chisq; \
-    real fmin, fmax; \
-    real xmin[NDIM], xmax[NDIM]; \
-  } Result; \
-  typedef const Result cResult; \
-  typedef struct region { \
-    count cutcomp, depth, xmajor; \
-    real fmajor, fminor, vol; \
-    Bounds bounds[NDIM]; \
-    Result result[NCOMP]; \
-  } Region
+#define AllocRegions(t) \
+  MemAlloc((t)->region, (t)->size*regionsize)
 
-#define RegionPtr(n) (&((Region *)t->voidregion)[n])
+#define EnlargeRegions(t, n) if( (t)->nregions + n > (t)->size ) \
+  ReAlloc((t)->region, ((t)->size += CHUNKSIZE)*regionsize)
+
+#define SAMPLERDEFS \
+  csize_t regionsize = RegionSize; \
+  Region *region = RegionPtr(iregion); \
+  cBounds *b = region->bounds; \
+  Result *res = RegionResult(region); \
+  cSamples *samples = &t->samples[region->isamples]; \
+  real *x = samples->x, *f = samples->f; \
+  cnumber n = samples->n
 

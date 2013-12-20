@@ -2,28 +2,8 @@
 	decl.h
 		Type declarations
 		this file is part of Vegas
-		last modified 13 Sep 10 th
+		last modified 21 Dec 11 th
 */
-
-/***************************************************************************
- *   Copyright (C) 2004-2010 by Thomas Hahn                                *
- *   hahn@feynarts.de                                                      *
- *                                                                         *
- *   This library is free software; you can redistribute it and/or         *
- *   modify it under the terms of the GNU Lesser General Public            *
- *   License as published by the Free Software Foundation; either          *
- *   version 2.1 of the License, or (at your option) any later version.    *
- *                                                                         *
- *   This library is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
- *   Lesser General Public License for more details.                       *
- *                                                                         *
- *   You should have received a copy of the GNU Lesser General Public      *
- *   License along with this library; if not, write to the                 *
- *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA          *
- ***************************************************************************/
 
 
 #include "stddecl.h"
@@ -56,7 +36,12 @@ typedef struct _this {
 #ifndef MLVERSION
   Integrand integrand;
   void *userdata;
+#ifdef HAVE_FORK
+  int ncores, *child;
+  SHM_ONLY(int shmid;)
 #endif
+#endif
+  real *frame;
   real epsrel, epsabs;
   int flags, seed;
   number mineval, maxeval;
@@ -67,6 +52,8 @@ typedef struct _this {
   RNGState rng;
   jmp_buf abort;
 } This;
+
+#define nframe nbatch
 
 typedef const This cThis;
 

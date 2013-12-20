@@ -69,8 +69,8 @@ PLUGIN_MINOR_VERSION=0
 PLUGIN_MICRO_VERSION=0
 
 #release versioning
-CUBA_MAJOR_VERSION=2
-CUBA_MINOR_VERSION=1
+CUBA_MAJOR_VERSION=3
+CUBA_MINOR_VERSION=2
 CUBA_MICRO_VERSION=0
 
 #API version
@@ -200,9 +200,9 @@ dnl -----------------------------------------------
 dnl Automake initialization and program checks
 dnl -----------------------------------------------
 
-AM_INIT_AUTOMAKE(@PACKAGE_NAME@, @PACKAGE_VERSION@)
-m4_ifdef([AM_SILENT_RULES],
-         [AM_SILENT_RULES([yes])])
+AM_INIT_AUTOMAKE
+# m4_ifdef([AM_SILENT_RULES],
+#          [AM_SILENT_RULES([yes])])
 AC_CONFIG_HEADER([config.h])
 AC_LANG([C++])
 AC_PROG_LN_S
@@ -657,6 +657,17 @@ AC_ARG_ENABLE([BMWlibs], [AC_HELP_STRING([--enable-BMWlibs],[build optional BMW 
 
       AC_CHECK_FUNCS([powl])
       AC_CHECK_FUNCS([erf])
+#      AC_FUNC_FORK
+      AC_FUNC_ALLOCA
+
+      AC_DEFUN([chk_shmget], [dnl
+        AC_REQUIRE([AC_CANONICAL_HOST])
+        AS_CASE([$host_os],
+        [*cygwin*], [],
+        [AC_CHECK_FUNCS([shmget])])
+      ])
+      chk_shmget
+      AC_CHECK_FUNCS([getloadavg])
 
       MAXDIM=${MAXDIM:-16}
       AC_ARG_WITH(maxdim,
@@ -1112,6 +1123,11 @@ AC_CONFIG_FILES([Makefile \
                  src/external/libCuba/Makefile \
                  src/external/libCuba/src/Makefile \
                  src/external/libCuba/src/cuba.pc \
+                 src/external/libCuba/src/cuhre/Makefile \
+                 src/external/libCuba/src/divonne/Makefile \
+                 src/external/libCuba/src/suave/Makefile \
+                 src/external/libCuba/src/vegas/Makefile \
+                 src/external/libCuba/src/common/Makefile \
                  src/external/BMWtools/Makefile \
                  src/external/libFitPofB/Makefile \
                  src/external/libFitPofB/classes/Makefile \

@@ -2,48 +2,32 @@
 	Fluct.c
 		compute the fluctuation in the left and right half
 		this file is part of Suave
-		last modified 9 Feb 05 th
+		last modified 29 Jul 13 th
 */
-
-/***************************************************************************
- *   Copyright (C) 2004-2010 by Thomas Hahn                                *
- *   hahn@feynarts.de                                                      *
- *                                                                         *
- *   This library is free software; you can redistribute it and/or         *
- *   modify it under the terms of the GNU Lesser General Public            *
- *   License as published by the Free Software Foundation; either          *
- *   version 2.1 of the License, or (at your option) any later version.    *
- *                                                                         *
- *   This library is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
- *   Lesser General Public License for more details.                       *
- *                                                                         *
- *   You should have received a copy of the GNU Lesser General Public      *
- *   License along with this library; if not, write to the                 *
- *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA          *
- ***************************************************************************/
 
 
 #if defined(HAVE_LONG_DOUBLE) && defined(HAVE_POWL)
 
-typedef long double xdouble;
+typedef long double realx;
 #define XDBL_MAX_EXP LDBL_MAX_EXP
 #define XDBL_MAX LDBL_MAX
 #define powx powl
+#define ldexpx ldexpl
 
 #else
 
-typedef double xdouble;
+typedef double realx;
 #define XDBL_MAX_EXP DBL_MAX_EXP
 #define XDBL_MAX DBL_MAX
 #define powx pow
+#define ldexpx ldexp
 
 #endif
 
+typedef const realx crealx;
+
 typedef struct {
-  xdouble fluct;
+  realx fluct;
   number n;
 } Var;
 
@@ -54,23 +38,23 @@ static void Fluct(cThis *t, Var *var,
 {
   creal *x = w + n;
   creal *f = x + n*t->ndim + comp;
-  creal flat = 2/3./t->flatness;
-  creal max = ldexp(1., (int)((XDBL_MAX_EXP - 2)/t->flatness));
-  creal norm = 1/(err*Max(fabs(avg), err));
   count nvar = 2*t->ndim;
+  creal norm = 1/(err*Max(fabs(avg), err));
+  creal flat = 2/3./t->flatness;
+  crealx max = ldexpx(1., (int)((XDBL_MAX_EXP - 2)/t->flatness));
 
   Clear(var, nvar);
 
   while( n-- ) {
     count dim;
-    const xdouble ft =
-      powx(Min(1 + fabs(*w++)*Sq(*f - avg)*norm, max), t->flatness);
+    crealx arg = 1 + fabs(*w++)*Sq(*f - avg)*norm;
+    crealx ft = powx(arg < max ? arg : max, t->flatness);
 
     f += t->ncomp;
 
     for( dim = 0; dim < t->ndim; ++dim ) {
-      Var *v = &var[2*dim + (*x++ >= b[dim].mid)];
-      const xdouble f = v->fluct + ft;
+      Var *v = &var[2*dim + (*x++ >= .5*(b[dim].lower + b[dim].upper))];
+      crealx f = v->fluct + ft;
       v->fluct = (f > XDBL_MAX/2) ? XDBL_MAX/2 : f;
       ++v->n;
     }

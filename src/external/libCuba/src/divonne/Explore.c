@@ -2,28 +2,8 @@
 	Explore.c
 		sample region, determine min and max, split if necessary
 		this file is part of Divonne
-		last modified 8 Jun 10 th
+		last modified 2 Aug 13 th
 */
-
-/***************************************************************************
- *   Copyright (C) 2004-2010 by Thomas Hahn                                *
- *   hahn@feynarts.de                                                      *
- *                                                                         *
- *   This library is free software; you can redistribute it and/or         *
- *   modify it under the terms of the GNU Lesser General Public            *
- *   License as published by the Free Software Foundation; either          *
- *   version 2.1 of the License, or (at your option) any later version.    *
- *                                                                         *
- *   This library is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
- *   Lesser General Public License for more details.                       *
- *                                                                         *
- *   You should have received a copy of the GNU Lesser General Public      *
- *   License along with this library; if not, write to the                 *
- *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA          *
- ***************************************************************************/
 
 
 typedef struct {
@@ -33,38 +13,21 @@ typedef struct {
 
 /*********************************************************************/
 
-static bool Explore(This *t, count iregion, cSamples *samples,
-  cint depth, cint flags)
+static int ExploreSerial(This *t, ccount iregion)
 {
-#define SPLICE (flags & 1)
-#define HAVESAMPLES (flags & 2)
+  csize_t regionsize = RegionSize;
+  Region *region = RegionPtr(iregion);
+  cBounds *bounds = region->bounds;
+  Result *result = RegionResult(region);
 
-  TYPEDEFREGION;
-
-  count n, dim, comp, maxcomp;
-  Extrema extrema[NCOMP];
-  Result *r;
+  Vector(Extrema, extrema, NCOMP);
+  Vector(real, xtmp, NDIM);
+  Result *r, *r0;
   creal *x;
   real *f;
   real halfvol, maxerr;
-  Region *region;
-  Bounds *bounds;
-  Result *result;
-
-  /* needed as of gcc 3.3 to make gcc correctly address region #@$&! */
-  sizeof(*region);
-
-  if( SPLICE ) {
-    if( t->nregions == t->size ) {
-      t->size += CHUNKSIZE;
-      ReAlloc(t->voidregion, t->size*sizeof(Region));
-    }
-    VecCopy(RegionPtr(t->nregions)->bounds, RegionPtr(iregion)->bounds);
-    iregion = t->nregions++;
-  }
-  region = RegionPtr(iregion);
-  bounds = region->bounds;
-  result = region->result;
+  count n, dim, comp, maxcomp;
+  cSamples *samples = &t->samples[region->isamples];
 
   for( comp = 0; comp < t->ncomp; ++comp ) {
     Extrema *e = &extrema[comp];
@@ -73,7 +36,7 @@ static bool Explore(This *t, count iregion, cSamples *samples,
     e->xmin = e->xmax = NULL;
   }
 
-  if( !HAVESAMPLES ) {
+  if( region->isamples == 0 ) {		/* others already sampled */
     real vol = 1;
     for( dim = 0; dim < t->ndim; ++dim ) {
       cBounds *b = &bounds[dim];
@@ -108,7 +71,7 @@ skip:
       f += t->ncomp;
     }
 
-    samples->sampler(t, samples, bounds, vol);
+    samples->sampler(t, iregion);
   }
 
   x = samples->x;
@@ -131,30 +94,27 @@ skip:
   for( comp = 0; comp < t->ncomp; ++comp ) {
     Extrema *e = &extrema[comp];
     Result *r = &result[comp];
-    real xtmp[NDIM], ftmp, err;
+    real ftmp, err;
 
     if( e->xmin ) {	/* not all NaNs */
       t->selectedcomp = comp;
-      VecCopy(xtmp, e->xmin);
+      XCopy(xtmp, e->xmin);
       ftmp = FindMinimum(t, bounds, xtmp, e->fmin);
       if( ftmp < r->fmin ) {
         r->fmin = ftmp;
-        VecCopy(r->xmin, xtmp);
+        XCopy(&r->xminmax[0], xtmp);
       }
 
       t->selectedcomp = Tag(comp);
-      VecCopy(xtmp, e->xmax);
+      XCopy(xtmp, e->xmax);
       ftmp = -FindMinimum(t, bounds, xtmp, -e->fmax);
       if( ftmp > r->fmax ) {
         r->fmax = ftmp;
-        VecCopy(r->xmax, xtmp);
+        XCopy(&r->xminmax[t->ndim], xtmp);
       }
     }
 
-    r->avg = samples->avg[comp];
-    r->err = samples->err[comp];
     r->spread = halfvol*(r->fmax - r->fmin);
-
     err = r->spread/Max(fabs(r->avg), NOTZERO);
     if( err > maxerr ) {
       maxerr = err;
@@ -166,26 +126,25 @@ skip:
 
   if( maxcomp == -1 ) { /* all NaNs */
     region->depth = 0;
-    return false;
+    return -1;
   }
 
   region->cutcomp = maxcomp;
-  r = &region->result[maxcomp];
+  r0 = RegionResult(region);
+  r = r0 + maxcomp;
   if( halfvol*(r->fmin + r->fmax) > r->avg ) {
     region->fminor = r->fmin;
     region->fmajor = r->fmax;
-    region->xmajor = r->xmax - (real *)region->result;
+    region->xmajor = &r->xminmax[t->ndim] - (real *)r0;
   }
   else {
     region->fminor = r->fmax;
     region->fmajor = r->fmin;
-    region->xmajor = r->xmin - (real *)region->result;
+    region->xmajor = &r->xminmax[0] - (real *)r0;
   }
 
-  region->depth = IDim(depth);
-
-  if( !HAVESAMPLES ) {
-    if( samples->weight*r->spread < r->err ||
+  if( region->isamples == 0 ) {
+    if( (region->depth < INIDEPTH && r->spread < samples->neff*r->err) ||
         r->spread < t->totals[maxcomp].secondspread ) region->depth = 0;
     if( region->depth == 0 )
       for( comp = 0; comp < t->ncomp; ++comp )
@@ -193,7 +152,8 @@ skip:
           Max(t->totals[comp].secondspread, result[comp].spread);
   }
 
-  if( region->depth ) Split(t, iregion, region->depth);
-  return true;
+  if( region->depth ) Split(t, iregion);
+
+  return iregion;
 }
 

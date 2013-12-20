@@ -2,28 +2,8 @@
 	Sample.c
 		most of what is related to sampling
 		this file is part of Divonne
-		last modified 16 Jun 10 th
+		last modified 30 Aug 13 th
 */
-
-/***************************************************************************
- *   Copyright (C) 2004-2010 by Thomas Hahn                                *
- *   hahn@feynarts.de                                                      *
- *                                                                         *
- *   This library is free software; you can redistribute it and/or         *
- *   modify it under the terms of the GNU Lesser General Public            *
- *   License as published by the Free Software Foundation; either          *
- *   version 2.1 of the License, or (at your option) any later version.    *
- *                                                                         *
- *   This library is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
- *   Lesser General Public License for more details.                       *
- *                                                                         *
- *   You should have received a copy of the GNU Lesser General Public      *
- *   License along with this library; if not, write to the                 *
- *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA          *
- ***************************************************************************/
 
 
 #define MARKMASK 0xfffffff
@@ -38,6 +18,7 @@
 static inline void SamplesIni(Samples *samples)
 {
   samples->x = NULL;
+  samples->n = 0;
 }
 
 /*********************************************************************/
@@ -56,11 +37,11 @@ static inline void SamplesFree(cSamples *samples)
 
 /*********************************************************************/
 
-static void SampleSobol(This *t, cSamples *samples, cBounds *b, creal vol)
+static void SampleSobol(This *t, ccount iregion)
 {
-  creal norm = vol*samples->weight;
-  real *x = samples->x, *f = samples->f, *avg = samples->avg;
-  cnumber n = samples->n;
+  SAMPLERDEFS;
+  Vector(real, avg, NCOMP);
+  real norm;
   number i;
   count dim, comp;
 
@@ -70,35 +51,40 @@ static void SampleSobol(This *t, cSamples *samples, cBounds *b, creal vol)
       *x = b[dim].lower + *x*(b[dim].upper - b[dim].lower);
   }
 
-  DoSample(t, n, t->ndim, samples->x, f);
+  t->nrand += n;
 
-  ResCopy(avg, f);
+  DoSample(t, n, samples->x, f);
+
+  FCopy(avg, f);
   f += t->ncomp;
-  for( i = 1; i < n; ++i )
+  for( i = 2; i < n; ++i )
     for( comp = 0; comp < t->ncomp; ++comp )
       avg[comp] += *f++;
 
-  for( comp = 0; comp < t->ncomp; ++comp )
-    avg[comp] *= norm;
+  norm = region->vol/samples->neff;
+  for( comp = 0; comp < t->ncomp; ++comp ) {
+    res[comp].avg = norm*avg[comp];
+    res[comp].err = 0;
+  }
 }
 
 /*********************************************************************/
 
-static void SampleKorobov(This *t, cSamples *samples, cBounds *b, creal vol)
+static void SampleKorobov(This *t, ccount iregion)
 {
-  creal norm = vol*samples->weight;
-  real *x = samples->x, *xlast = x + t->ndim;
-  real *f = samples->f, *flast = f + t->ncomp;
-  real *avg = samples->avg;
-  cnumber n = samples->n, neff = samples->neff;
-  number nextra = n, i;
+  SAMPLERDEFS;
+  real *xlast = x + t->ndim, *flast = f + t->ncomp;
+  Vector(real, avg, NCOMP);
+  real norm;
+  cnumber neff = samples->neff;
+  number nextra = 0, i;
   real dist = 0;
   count dim, comp;
 
   for( i = 1; i < n; ++i ) {
     number c = i;
     for( dim = 0; dim < t->ndim; ++dim ) {
-      creal dx = abs(2*c - neff)*samples->weight;
+      creal dx = abs(2*c - neff)/(real)neff;
       *xlast++ = b[dim].lower + dx*(b[dim].upper - b[dim].lower);
       c = c*samples->coeff % neff;
     }
@@ -119,26 +105,29 @@ static void SampleKorobov(This *t, cSamples *samples, cBounds *b, creal vol)
       }
       xlast[dim] = x2;
     }
-    ++nextra;
+    nextra = 1;
   }
 
-  DoSample(t, nextra, t->ndim, x, f);
+  DoSample(t, n + nextra, x, f);
 
-  ResCopy(avg, flast);
+  FCopy(avg, flast);
   flast += t->ncomp;
   for( i = 2; i < n; ++i )
     for( comp = 0; comp < t->ncomp; ++comp )
       avg[comp] += *flast++;
 
-  if( nextra > n ) {
+  if( nextra ) {
     for( comp = 0; comp < t->ncomp; ++comp )
       f[comp] += dist*(f[comp] - flast[comp]);
     for( dim = 0; dim < t->ndim; ++dim )
       x[dim] = b[dim].upper;
   }
 
-  for( comp = 0; comp < t->ncomp; ++comp )
-    avg[comp] = (avg[comp] + avg[comp] + f[comp])*norm;
+  norm = region->vol/samples->neff;
+  for( comp = 0; comp < t->ncomp; ++comp ) {
+    res[comp].avg = norm*(avg[comp] + avg[comp] + f[comp]);
+    res[comp].err = 0;
+  }
 }
 
 /*********************************************************************/
@@ -165,25 +154,21 @@ static count SamplesLookup(This *t, Samples *samples, cint key,
   number n;
 
   if( key == 13 && t->ndim == 2 ) {
-    if( RuleIniQ(&t->rule13) ) Rule13Alloc(t);
     samples->rule = &t->rule13;
     samples->n = n = nmin = t->rule13.n;
     samples->sampler = SampleRule;
   }
   else if( key == 11 && t->ndim == 3 ) {
-    if( RuleIniQ(&t->rule11) ) Rule11Alloc(t);
     samples->rule = &t->rule11;
     samples->n = n = nmin = t->rule11.n;
     samples->sampler = SampleRule;
   }
   else if( key == 9 ) {
-    if( RuleIniQ(&t->rule9) ) Rule9Alloc(t);
     samples->rule = &t->rule9;
     samples->n = n = nmin = t->rule9.n;
     samples->sampler = SampleRule;
   }
   else if( key == 7 ) {
-    if( RuleIniQ(&t->rule7) ) Rule7Alloc(t);
     samples->rule = &t->rule7;
     samples->n = n = nmin = t->rule7.n;
     samples->sampler = SampleRule;
@@ -234,21 +219,18 @@ static void SamplesAlloc(cThis *t, Samples *samples)
 
   Alloc(samples->x, nx + nf + t->ncomp + t->ncomp);
   samples->f = samples->x + nx;
-  samples->avg = samples->f + nf;
-  samples->err = samples->avg + t->ncomp;
-  ResClear(samples->err);
-
-  samples->weight = 1./samples->neff;
 }
 
 /*********************************************************************/
 
 static real Sample(This *t, creal *x0)
 {
-  real xtmp[2*NDIM], ftmp[2*NCOMP], *xlast = xtmp, f;
+  Vector(real, xtmp, 2*NDIM);
+  Vector(real, ftmp, 2*NCOMP);
+  real *xlast = xtmp, f;
   real dist = 0;
   count dim, comp;
-  number nextra = 1;
+  number n = 1;
 
   for( dim = 0; dim < t->ndim; ++dim ) {
     creal x1 = *xlast++ = Min(Max(*x0++, 0.), 1.);
@@ -268,14 +250,16 @@ static real Sample(This *t, creal *x0)
       }
       *xlast++ = x2;
     }
-    nextra = 2;
+    n = 2;
   }
 
-  DoSample(t, nextra, t->ndim, xtmp, ftmp);
+  DoSample(t, n, xtmp, ftmp);
+
+#define fin(x) Min(Max(x, -.5*INFTY), .5*INFTY) 
 
   comp = Untag(t->selectedcomp);
-  f = ftmp[comp];
-  if( nextra > 1 ) f += dist*(f - ftmp[comp + t->ncomp]);
+  f = fin(ftmp[comp]);
+  if( n > 1 ) f += dist*(f - fin(ftmp[comp + t->ncomp]));
 
   return Sign(t->selectedcomp)*f;
 }
