@@ -23,7 +23,7 @@ dict_cpp_sources = \
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 
-AM_CPPFLAGS = -I$(top_srcdir)/src/include $(LEM_CFLAGS) $(PMUSR_CFLAGS) $(CUBA_CFLAGS) $(ROOT_CFLAGS)
+AM_CPPFLAGS = -I$(top_srcdir)/src/include $(LEM_CFLAGS) $(PMUSR_CFLAGS) $(CUBA_CFLAGS) -I$(ROOTINCDIR)
 AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources)

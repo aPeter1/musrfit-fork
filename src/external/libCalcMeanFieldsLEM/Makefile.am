@@ -19,7 +19,7 @@ dict_cpp_sources = \
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 
-AM_CPPFLAGS = -I$(top_srcdir)/src/include $(BMWTOOLS_CFLAGS) $(FITPOFB_CFLAGS) $(PMUSR_CFLAGS) $(ROOT_CFLAGS) $(FFTW3_CFLAGS)
+AM_CPPFLAGS = -I$(top_srcdir)/src/include $(BMWTOOLS_CFLAGS) $(FITPOFB_CFLAGS) $(PMUSR_CFLAGS) -I$(ROOTINCDIR) $(FFTW3_CFLAGS)
 AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources)
