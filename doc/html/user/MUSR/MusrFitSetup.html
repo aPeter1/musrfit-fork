@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en_US" lang="en_US">
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Mon, 16 Dec 2013 07:43:52 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 09 Jan 2014 06:59:10 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 <head>
 <link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
@@ -8,7 +8,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
 <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
-<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFitSetup?t=1387179779" type="application/x-wiki" title="edit MusrFitSetup" />
+<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFitSetup?t=1389250699" type="application/x-wiki" title="edit MusrFitSetup" />
 <meta name="TEXT_NUM_TOPICS" content="Number of topics:" />
 <meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
 <meta name="robots" content="noindex" /><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="WebRsshtml.html" />
@@ -368,7 +368,7 @@ where <strong>x_yy_z</strong> has to be substituted by the correct version numbe
 <h3><a name="A_4.1.2_Installation_of_61_61NeXus_61_61_requirements_40optional_41"></a> 4.1.2  Installation of <code><b>NeXus</b></code> requirements (optional) </h3>
 <span class='foswikiRedFG'>Only if</span> <code>musrfit</code> should support reading data files in the <code>NeXus</code> format the further <a href="#ReqSwNeXus" class="foswikiCurrentTopicLink">required</a> software has to be set up. Under Cygwin of all the required libraries only <code>HDF5</code> is available. The packages <code><b>hdf5</b></code> and <code><b>libhdf5-devel</b></code> can be installed through the Cygwin setup. One should also make sure that <code><b>bison</b></code>, <code><b>flex</b></code> and a package containing <nobr><b>/usr/lib/librpc.a</b></nobr> (e.g. <code><b>sunrpc</b></code> = <strong>4.0-3</strong>, <span class='foswikiRedFG'>but not</span> <code><b>sunrpc</b></code> = <strong>4.0-4</strong>) are installed.
 <p></p>
-All other libraries have to be built from the sources. The following lines will track the installation of <code>JPEG</code> <strong>6b</strong>, <code>MXML</code> <strong>2.5</strong>, <code>HDF</code> <strong>4.2.7-patch1</strong>, and <code>NeXus</code> <strong>4.2.1</strong>. The version numbers and source-code locations might of course change with time but should be easily adjustable.
+All other libraries have to be built from the sources. The following lines will track the installation of <code>JPEG</code> <strong>6b</strong>, <code>MXML</code> <strong>2.8</strong>, <code>HDF</code> <strong>4.2.7-patch1</strong>, and <code>NeXus</code> <strong>4.2.1</strong>. The version numbers and source-code locations might of course change with time but should be easily adjustable.
 <pre class="bash">
 cd
 mkdir nexus
@@ -379,8 +379,8 @@ cd jpeg-6b
 make
 make install
 cd ..
-curl http://ftp.easysw.com/pub/mxml/2.5/mxml-2.5.tar.gz -G &#124; tar xz
-cd mxml-2.5
+curl www.msweet.org/files/project3/mxml-2.8.tar.gz -G &#124; tar xz
+cd mxml-2.8
 ./configure --prefix&#61;/usr/local --enable-static
 make
 make install
@@ -518,7 +518,6 @@ C:\cygwin\bin\ash.exe /bin/rebaseall
 If this does not resolve the problem, try to change the compatibility settings of <strong>C:\cygwin\bin\sh.exe</strong> and <strong>C:\cygwin\bin\bash.exe</strong> so that they are executed with administrator privileges.
 <p></p>
 <h1><a name="A_5_Mac_OS_X"></a> 5  Mac OS X </h1>
-<img src="../pub/System/DocumentGraphics/warning.png" alt="ALERT!" title="ALERT!" width="16" height="16" /> <strong>Currently there is a problem with Mac OS X 10.9 (Mavericks) in conjunction with CERN/ROOT and musrfit!! Investigations to fix it are underway.</strong> <img src="../pub/System/DocumentGraphics/warning.png" alt="ALERT!" title="ALERT!" width="16" height="16" />
 <p></p>
 With Mac OS X the situation is up to some extent similar like on MS Windows but still different since Mac OS X is a UNIX system. The similarity is that also on OS X a helping framework&mdash;<i>either</i> <code><a href="http://www.macports.org/" target="_top">MacPorts</a></code> <em>or</em> <code><a href="http://www.finkproject.org/" target="_top">Fink</a></code>&mdash;which provides open-source software is employed to fulfill the basic software requirements of <code>musrfit</code>. <span class='foswikiRedFG'>In the following, both possibilities (using <code>MacPorts</code> or <code>Fink</code>) are described but it is emphasized here that it should be followed <em>only one of the possible routes</em>.</span>
 <p></p>
@@ -526,7 +525,7 @@ With Mac OS X the situation is up to some extent similar like on MS Windows but 
 <h3><a name="A_5.1.1_Everything_but_61_61ROOT_61_61_and_61_61NeXus_61_61"></a> 5.1.1  Everything but <code><b>ROOT</b></code> and <code><b>NeXus</b></code> </h3>
 Before proceeding with the usage of the <code><a href="http://www.macports.org/" target="_top">MacPorts</a></code> system first a few useful tools provided by Apple together with OS X (on the installation DVD/CDs) should be installed: <dl>
 <dt> <a href="http://developer.apple.com/technology/tools.html" target="_top">Xcode tools</a> </dt><dd> Useful developer tools including for instance the GNU compiler collection. Starting from XCode &gt;= 4.3 the command line tools need to be installed manually.
-</dd> <dt> X11 </dt><dd> The X-window system (automatically installed on 10.5 Leopard and 10.6 Snow Leopard)
+</dd> <dt> X11 </dt><dd> The X-window system (automatically installed on 10.5 Leopard and 10.6 Snow Leopard). For 10.7 and higher you also will need to install <code><a href="http://xquartz.macosforge.org/trac" target="_top">XQuartz</a></code> 
 </dd></dl> 
 <p></p>
 After installing the Xcode tools go to the <a href="http://www.macports.org/install.php" target="_top">MacPorts install page</a>, download the installer for your system and follow the installation instructions on the page. By default the <code>MacPorts</code> system will be installed in <strong>/opt/local</strong>.<br>
@@ -551,9 +550,9 @@ sudo port -v -d sync
 Then the <code>MacPorts</code> system should be set up and can be used to install additional software.<br>
 The installation of the software mentioned <a href="#ReqSw" class="foswikiCurrentTopicLink">above</a> is then done in the terminal:
 <pre class="bash">
-sudo port -v install pkgconfig autoconf automake libtool fftw-3 fftw-3-single gsl boost libxml2 qt3-mac
+sudo port -v install pkgconfig autoconf automake libtool fftw-3 fftw-3-single gsl boost libxml2 qt4-mac
 </pre>
-Under OS X 10.6 Snow Leopard it will not be possible to install <code><b>qt3-mac</b></code> since the system is by default a 64-bit system and the old <code><b>qt3-mac</b></code> depends on software which is only available for 32-bit systems. It is suggested to install <code><b>qt4-mac</b></code> instead and use <code>musredit</code>. (It would also be possible to install the <code><b>qt3</b></code> port instead; the disadvantage is that the <code><b>qt3</b></code> version does not support Apple's aqua style and a great deal of additional software has to be installed to meet its dependencies. At the moment this seems to be the only possibility to get <code>musrgui</code> running on OS X 10.6.)
+With <code><b>qt4-mac</b></code>, <code>musredit</code> will be installed. If it happens that you used <code>musrgui</code> in the past, please change over to <code>musredit</code> since there will be <strong>no</strong> further development for <code>musrgui</code> anymore!
 <p></p>
 <h3><a name="A_5.1.2_Installation_of_61_61NeXus_61_61_requirements_40optional_41"></a> 5.1.2  Installation of <code><b>NeXus</b></code> requirements (optional) </h3>
 <p></p>
@@ -561,11 +560,11 @@ Under OS X 10.6 Snow Leopard it will not be possible to install <code><b>qt3-mac
 <pre class="bash">
 sudo port -v install jpeg6b hdf4 hdf5-18
 </pre>
-Unfortunately, the <code>minixml</code> and <code>NeXus</code> libraries have to be compiled and installed directly from the source code. Given the respective version numbers of <strong>2.5</strong> and <strong>4.2.1</strong> (which are subject to change with time) this can be achieved for example by:
+Unfortunately, the <code>minixml</code> and <code>NeXus</code> libraries have to be compiled and installed directly from the source code. Given the respective version numbers of <strong>2.8</strong> and <strong>4.2.1</strong> (which are subject to change with time) this can be achieved for example by:
 <pre class="bash">
 cd
-curl http://ftp.easysw.com/pub/mxml/2.5/mxml-2.5.tar.gz -G &#124; tar xz
-cd mxml-2.5
+curl www.msweet.org/files/project3/mxml-2.8.tar.gz -G &#124; tar xz
+cd mxml-2.8
 ./configure --prefix&#61;/usr/local
 make
 sudo make install
@@ -584,10 +583,14 @@ For installing the <code>ROOT</code> system there are two <strong>independent</s
 cd /opt/root-system
 ./configure --gminimal --enable-fink --enable-asimage --enable-mathmore --enable-minuit2 --enable-xml
 make
+</pre> and for Mac OS X 10.9 (Mavericks) for now (beginning 2014, subject to be changed <strong>hopefully</strong> soon): <pre class="bash">
+cd /opt/root-system
+./configure --gminimal --enable-builtin-freetype --enable-fink --enable-asimage --enable-mathmore --enable-minuit2 --enable-xml
+make
 </pre>
-</li> <li> In case you are just migrating to the latest Mac OS X version (<em>e.g.</em> from 10.7 to 10.8.1) often for a period of a few weeks it is necessary to work with the SVN trunk version of <code>ROOT</code>, <em>i.e.</em> that you have to checkout <code>ROOT</code> via <code>svn</code>: <pre class="bash">
-svn co https://root.cern.ch/svn/root/trunk root
-</pre> For details see <a href="http://root.cern.ch/drupal/content/subversion-howto#How_do_I_check_out_the_ROOT_Subv" target="_top">ROOT: How to's</a>.
+</li> <li> In case you are just migrating to the latest Mac OS X version (<em>e.g.</em> from 10.7 to 10.8.1) often for a period of a few weeks it is necessary to work with the GIT trunk version of <code>ROOT</code>, <em>i.e.</em> that you have to checkout <code>ROOT</code> via <code>git</code>: <pre class="bash">
+git clone http://root.cern.ch/git/root.git
+</pre> For details see <a href="http://root.cern.ch/drupal/content/installing-root-source" target="_top">Installing ROOT from Source</a>.
 </li></ul> 
 <p></p>
 In order to finalize the <code>ROOT</code> installation and to prepare already the installation of <code>musrfit</code> and <code>musrgui</code> / <code>musredit</code> this is a good time for setting necessary environment variables for the use in Mac OS X. Put the following lines (without the comments in parentheses and with the paths adjusted to your local installation) into the file <strong>~/.MacOSX/environment.plist</strong> and <span class='foswikiRedFG'>re-login</span>:<br>
@@ -655,11 +658,11 @@ where <strong>x_yy_z</strong> has to be substituted by the correct version numbe
 <p></p>
 <code><b>libjpeg hdf hdf5-18 hdf5-18-shlibs</b></code>
 <p></p>
-Unfortunately, the <code>minixml</code> and <code>NeXus</code> libraries have to be compiled and installed directly from the source code. Given the respective version numbers of <strong>2.5</strong> and <strong>4.2.1</strong> (which are subject to change with time) this can be achieved for example by:
+Unfortunately, the <code>minixml</code> and <code>NeXus</code> libraries have to be compiled and installed directly from the source code. Given the respective version numbers of <strong>2.8</strong> and <strong>4.2.1</strong> (which are subject to change with time) this can be achieved for example by:
 <pre class="bash">
 cd
-curl http://ftp.easysw.com/pub/mxml/2.5/mxml-2.5.tar.gz -G &#124; tar xz
-cd mxml-2.5
+curl www.msweet.org/files/project3/mxml-2.8.tar.gz -G &#124; tar xz
+cd mxml-2.8
 ./configure --prefix&#61;/usr/local
 make
 sudo make install
@@ -677,6 +680,10 @@ For installing the <code>ROOT</code> system there are some <strong>independent</
 </li> <li> If there is no precompiled binary version of <code>ROOT</code> available for your system or e.g. <code>ROOT</code> should be compiled with another version of <code>GCC</code> visit the <a href="http://root.cern.ch/drupal/content/downloading-root" target="_top">web page</a> and download the 'complete source tree for all systems'. Then unpack this source tree to its destination (e.g. /opt/root-system). In case only a single user is working at the machine it might be considerable to change the ownership of the <code>ROOT</code> folder so that the user ("username" in the example) has easy write access to this directory: <pre class="bash">sudo chown -R username:staff /opt/root-system/ </pre> Finally, <code>ROOT</code> can be configured (here using the minimal set of options) and compiled as stated right below: <pre class="bash">
 cd /opt/root-system
 ./configure --gminimal --enable-asimage --enable-mathmore --enable-minuit2 --enable-xml
+make
+</pre> and for Mac OS X 10.9 (Mavericks) for now (beginning 2014, subject to be changed <strong>hopefully</strong> soon): <pre class="bash">
+cd /opt/root-system
+./configure --gminimal --enable-builtin-freetype --enable-fink --enable-asimage --enable-mathmore --enable-minuit2 --enable-xml
 make
 </pre>
 </li> <li> <code>ROOT</code> is also available through the <code>FinkCommander</code>! Install <strong>root5</strong> or <strong>root5-devel</strong>. However, this versions also have to be compiled locally since there are no binary packages. The manual installation mentioned right above should be preferred in this case.
@@ -823,9 +830,9 @@ musrview test-histo-ROOT-NPP.msr
 <div class="foswikiFormSteps">
 <a name="topic-actions"></a>
   <div class="patternTopicActions foswikiFormStep">
-	 <span class="patternActionButtons"><span><a href='https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFitSetup?t=1387179779' rel='nofollow' title='Edit this topic text' accesskey='e'><span class='foswikiAccessKey'>E</span>dit</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/attach/MUSR/MusrFitSetup' rel='nofollow' title='Attach an image or document to this topic' accesskey='a'><span class='foswikiAccessKey'>A</span>ttach</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='MusrFitSetupc99a.html?cover=print;cover=print' rel='nofollow' title='Printable version of this topic' accesskey='p'><span class='foswikiAccessKey'>P</span>rint version</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/print/pdf.php?url=MUSR/MusrFitSetup?cover=print' title='PDF version of this topic'>PDF</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/oops/MUSR/MusrFitSetup?template=oopshistory' rel='nofollow' title='View total topic history' accesskey='h'><span class='foswikiAccessKey'>H</span>istory</a></span>: r54&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFitSetup?rev1=53;rev2=54">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFitSetup?rev=53">r53</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFitSetup?rev1=52;rev2=53">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFitSetup?rev=52">r52</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFitSetup?rev1=51;rev2=52">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFitSetup?rev=51">r51</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFitSetup?template=backlinksweb' rel='nofollow' title='Search the MUSR Web for topics that link to here' accesskey='b'><span class='foswikiAccessKey'>B</span>acklinks</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFitSetup?raw=on' rel='nofollow' title='View without formatting' accesskey='v'><span class='foswikiAccessKey'>V</span>iew wiki text</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFitSetup?refresh=on' title='Refresh images and LaTeX charts'>Refresh</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFitSetup?template=more&amp;maxrev=54&amp;currrev=54' rel='nofollow' title='Delete or rename this topic; set parent topic; view and compare revisions' accesskey='m'><span class='foswikiAccessKey'>M</span>ore topic actions</a></span></span>
+	 <span class="patternActionButtons"><span><a href='https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFitSetup?t=1389250699' rel='nofollow' title='Edit this topic text' accesskey='e'><span class='foswikiAccessKey'>E</span>dit</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/attach/MUSR/MusrFitSetup' rel='nofollow' title='Attach an image or document to this topic' accesskey='a'><span class='foswikiAccessKey'>A</span>ttach</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='MusrFitSetupc99a.html?cover=print;cover=print' rel='nofollow' title='Printable version of this topic' accesskey='p'><span class='foswikiAccessKey'>P</span>rint version</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/print/pdf.php?url=MUSR/MusrFitSetup?cover=print' title='PDF version of this topic'>PDF</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/oops/MUSR/MusrFitSetup?template=oopshistory' rel='nofollow' title='View total topic history' accesskey='h'><span class='foswikiAccessKey'>H</span>istory</a></span>: r55&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFitSetup?rev1=54;rev2=55">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFitSetup?rev=54">r54</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFitSetup?rev1=53;rev2=54">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFitSetup?rev=53">r53</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFitSetup?rev1=52;rev2=53">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFitSetup?rev=52">r52</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFitSetup?template=backlinksweb' rel='nofollow' title='Search the MUSR Web for topics that link to here' accesskey='b'><span class='foswikiAccessKey'>B</span>acklinks</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFitSetup?raw=on' rel='nofollow' title='View without formatting' accesskey='v'><span class='foswikiAccessKey'>V</span>iew wiki text</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFitSetup?refresh=on' title='Refresh images and LaTeX charts'>Refresh</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFitSetup?template=more&amp;maxrev=55&amp;currrev=55' rel='nofollow' title='Delete or rename this topic; set parent topic; view and compare revisions' accesskey='m'><span class='foswikiAccessKey'>M</span>ore topic actions</a></span></span>
   </div>
-</div></div><div class="patternInfo"><span class="patternRevInfo">Topic revision: r54 - 12 Nov 2013, <a href="https://intranet.psi.ch/Main/AndreasSuter">AndreasSuter</a></span></div>
+</div></div><div class="patternInfo"><span class="patternRevInfo">Topic revision: r55 - 08 Jan 2014, <a href="https://intranet.psi.ch/Main/AndreasSuter">AndreasSuter</a></span></div>
 </div>
 </div><div id="patternSideBar"><div id="patternClearHeaderLeft"></div>
 <div id="patternSideBarContents">
@@ -874,7 +881,7 @@ musrview test-histo-ROOT-NPP.msr
 </div>
 </div>
 </div></body>
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Mon, 16 Dec 2013 07:43:54 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 09 Jan 2014 06:59:11 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 </html>
 <p></p>
