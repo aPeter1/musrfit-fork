@@ -4,7 +4,7 @@
     $Id$
   </comment>
   <trim_sp_part>
-    <data_path>/afs/psi.ch/project/nemu/analysis/2012/YBCO/PZA-D/trimsp/YBCO_E</data_path>
+    <data_path>./trimsp/YBCO_E</data_path>
     <energy_list>
       <energy>1000</energy>
       <energy>3000</energy>
