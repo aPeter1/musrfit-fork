@@ -409,7 +409,7 @@ void calcFields(const double zStart, const double zEnd, const PhotoParam param, 
       bb.push_back(b);
       bbL.push_back(bL);
       z += dz;
-    } while (z <= zEnd);
+    } while (z <= zEnd+dz);
   } else { // film
     double beta = exp(-(param.filmThickness/2.0-param.deadLayer)/param.z0);
     double NN = InuMinus(nuPlus, nuPhoto*beta)*gsl_sf_bessel_Inu(nuPlus, nuPhoto) -
@@ -428,7 +428,7 @@ void calcFields(const double zStart, const double zEnd, const PhotoParam param, 
       bb.push_back(b);
       bbL.push_back(bL);
       z += dz;
-    } while (z <= zEnd);
+    } while (z <= zEnd+dz);
   }
 }
 
@@ -842,8 +842,8 @@ int main(int argc, char *argv[])
       nn.clear();
       matched_nz(rgeZ[0], rgeN[0], zz, nn);
       zMean.push_back(averaged(zz, nn));
-      BMean.push_back(averaged(zz, bb));
-      BLMean.push_back(averaged(zz, bbL));
+      BMean.push_back(averaged(bb, nn));
+      BLMean.push_back(averaged(bbL, nn));
       rgeFlnList.push_back(rgeFln);
       if (!strcmp(fln, ""))
         cout << "<z>=" << zMean[0] << " (nm), <B>/Bext=" << BMean[0] << ", <BL>/Bext=" << BLMean[0] << " for rge-file: '" << rgeFln << "'." << endl;
