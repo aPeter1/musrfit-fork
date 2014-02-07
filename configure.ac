@@ -1,7 +1,7 @@
 AC_REVISION([$Id$])
 
-AC_PREREQ(2.59)
-AC_INIT(musrfit, 0.11.0, andreas.suter@psi.ch)
+AC_PREREQ(2.63)
+AC_INIT([musrfit],[0.11.0],[andreas.suter@psi.ch])
 AC_CONFIG_AUX_DIR(admin)
 AC_CANONICAL_HOST
 #AC_MSG_RESULT([${host} ${host_cpu} ${host_vendor} ${host_os}])
@@ -218,8 +218,8 @@ m4_ifdef([LT_INIT],
           LT_LANG([C++])
           LT_LANG([C])],
          [m4_defun([_LT_AC_LANG_F77_CONFIG], [:])
-          AM_DISABLE_STATIC
-          AM_PROG_LIBTOOL
+          AC_DISABLE_STATIC([])
+          LT_INIT
           AC_PROG_CXX
           AC_PROG_CC])
 
@@ -229,7 +229,7 @@ dnl -----------------------------------------------
 
 FFTW3_FOUND=0
 AC_ARG_WITH([fftw3],
-    [AC_HELP_STRING([--with-fftw3],[prefix of FFTW3 installation, e.g. /usr/local or /usr])],
+    [AS_HELP_STRING([--with-fftw3],[prefix of FFTW3 installation, e.g. /usr/local or /usr])],
     [FFTW3_PREFIX=$with_fftw3
      AC_MSG_CHECKING([whether FFTW3 can be found at the specified location])
      if !(test -r ${FFTW3_PREFIX}/include/fftw3.h); then
@@ -275,7 +275,7 @@ dnl -----------------------------------------------
 
 GSL_FOUND=0
 AC_ARG_WITH([gsl],
-    [AC_HELP_STRING([--with-gsl],[prefix of GSL installation. e.g. /usr/local or /usr])],
+    [AS_HELP_STRING([--with-gsl],[prefix of GSL installation. e.g. /usr/local or /usr])],
     [GSL_PREFIX=$with_gsl
      AC_MSG_CHECKING([whether GSL can be found at the specified location])
      if !(test -r ${GSL_PREFIX}/include/gsl/gsl_sf_hyperg.h); then
@@ -323,7 +323,7 @@ dnl -----------------------------------------------
 
 BOOST_FOUND=0
 AC_ARG_WITH([boostinc],
-    [AC_HELP_STRING([--with-boostinc],[path to the header files of the BOOST installation, e.g. /usr/local/include or /usr/include])],
+    [AS_HELP_STRING([--with-boostinc],[path to the header files of the BOOST installation, e.g. /usr/local/include or /usr/include])],
     [BOOST_INCLUDE=$with_boostinc
      AC_MSG_CHECKING([whether BOOST can be found at the specified location])
      if !(test -r ${BOOST_INCLUDE}/boost/spirit.hpp) && !(test -r ${BOOST_INCLUDE}/boost/spirit/include/classic_spirit.hpp); then
@@ -371,7 +371,7 @@ dnl Ask user for path to libxml2
 dnl -----------------------------------------------
 LIBXML2_FOUND=0
 AC_ARG_WITH([libxml2],
-    [AC_HELP_STRING([--with-libxml2],[prefix of the libxml2 installation, e.g. /usr/local/include])],
+    [AS_HELP_STRING([--with-libxml2],[prefix of the libxml2 installation, e.g. /usr/local/include])],
     [LIBXML2_PREFIX=$with_libxml2
     AC_MSG_CHECKING([whether libxml2 can be found at the specified location])
      if !(test -r ${LIBXML2_PREFIX}/libxml2/libxml/xmlreader.h) && !(test -r ${LIBXML2_PREFIX}/libxml2/libxml/parser.h) && !(test -r ${LIBXML2_PREFIX}/libxml2/libxml/xmlschemas.h); then
@@ -466,11 +466,11 @@ AC_SUBST(ROOT_CFLAGS)
 dnl -----------------------------------------------
 dnl Check for NeXus, HDF5, etc.
 dnl -----------------------------------------------
-AC_ARG_ENABLE([NeXus], [AC_HELP_STRING([--enable-NeXus], [build optional NeXus support [default=no]])],
+AC_ARG_ENABLE([NeXus], [AS_HELP_STRING([--enable-NeXus],[build optional NeXus support [default=no]])],
     [
     # checking for hdf4
     AC_ARG_WITH([hdf4],
-        [AC_HELP_STRING([--with-hdf4], [prefix of the HDF4 installation (needed for NeXus), e.g. /usr/local/hdf4 or /opt/hdf4])],
+        [AS_HELP_STRING([--with-hdf4],[prefix of the HDF4 installation (needed for NeXus), e.g. /usr/local/hdf4 or /opt/hdf4])],
         [HDF4_PREFIX=$with_hdf4
          AC_MSG_CHECKING([whether HDF4 can be found at the specified location])
          if !(test -r ${HDF4_PREFIX}/include/hdf.h); then
@@ -510,7 +510,7 @@ AC_ARG_ENABLE([NeXus], [AC_HELP_STRING([--enable-NeXus], [build optional NeXus s
 
     # checking for hdf5
     AC_ARG_WITH([hdf5],
-        [AC_HELP_STRING([--with-hdf5], [prefix of the HDF5 installation (needed for NeXus), e.g. /usr/local/hdf5 or /opt/hdf5])],
+        [AS_HELP_STRING([--with-hdf5],[prefix of the HDF5 installation (needed for NeXus), e.g. /usr/local/hdf5 or /opt/hdf5])],
         [HDF5_PREFIX=$with_hdf5
          AC_MSG_CHECKING([whether HDF5 can be found at the specified location])
          if !(test -r ${HDF5_PREFIX}/include/hdf5.h); then
@@ -548,7 +548,7 @@ AC_ARG_ENABLE([NeXus], [AC_HELP_STRING([--enable-NeXus], [build optional NeXus s
     # checking for NeXus
     NEXUS_FOUND=0
     AC_ARG_WITH([nexus],
-        [AC_HELP_STRING([--with-nexus], [prefix of the NeXus installation, e.g. /usr/local])],
+        [AS_HELP_STRING([--with-nexus],[prefix of the NeXus installation, e.g. /usr/local])],
         [NEXUS_PREFIX=$with_nexus
          AC_MSG_CHECKING([whether NeXus can be found at the specified location])
          if !(test -r ${NEXUS_PREFIX}/include/napi.h); then
@@ -601,11 +601,11 @@ dnl -----------------------------------------------
 dnl Ask user if BMWlibs should be built and where to find the CUBA installation
 dnl -----------------------------------------------
 
-AC_ARG_ENABLE([BMWlibs], [AC_HELP_STRING([--enable-BMWlibs],[build optional BMW plug-ins [default=no]])],
+AC_ARG_ENABLE([BMWlibs], [AS_HELP_STRING([--enable-BMWlibs],[build optional BMW plug-ins [default=no]])],
     [CUBA_FOUND=0
     BUILD_CUBA=0
     AC_ARG_WITH([cuba],
-        [AC_HELP_STRING([--with-cuba],[prefix of CUBA installation, e.g. /usr/local or /usr])],
+        [AS_HELP_STRING([--with-cuba],[prefix of CUBA installation, e.g. /usr/local or /usr])],
         [CUBA_PREFIX=$with_cuba
         AC_MSG_CHECKING([whether CUBA can be found at the specified location])
         if !(test -r ${CUBA_PREFIX}/include/cuba.h); then
@@ -653,7 +653,17 @@ AC_ARG_ENABLE([BMWlibs], [AC_HELP_STRING([--enable-BMWlibs],[build optional BMW 
 
       AC_C_CONST
       AC_C_INLINE
-      AC_C_LONG_DOUBLE
+      AC_DIAGNOSE([obsolete],[The macro `AC_C_LONG_DOUBLE' is obsolete.
+You should use `AC_TYPE_LONG_DOUBLE' or `AC_TYPE_LONG_DOUBLE_WIDER' instead.
+])dnl
+
+    AC_TYPE_LONG_DOUBLE_WIDER
+    ac_cv_c_long_double=$ac_cv_type_long_double_wider
+    if test $ac_cv_c_long_double = yes; then
+      AC_DEFINE([HAVE_LONG_DOUBLE],[1],[Define to 1 if the type `long double' works and has more range or
+	 precision than `double'.])
+    fi
+  
 
       AC_CHECK_FUNCS([powl])
       AC_CHECK_FUNCS([erf])
@@ -721,7 +731,7 @@ dnl -----------------------------------------------
 dnl Ask user if ASlibs should be built
 dnl -----------------------------------------------
 
-AC_ARG_ENABLE([ASlibs], [AC_HELP_STRING([--enable-ASlibs],[build optional AS plug-ins [default=no]])],[BUILD_AS_LIBS=1], [BUILD_AS_LIBS=0])
+AC_ARG_ENABLE([ASlibs], [AS_HELP_STRING([--enable-ASlibs],[build optional AS plug-ins [default=no]])],[BUILD_AS_LIBS=1], [BUILD_AS_LIBS=0])
 
 dnl -----------------------------------------------
 dnl Set some paths and flags for PMusr, MusrRoot, TLemRunHeader, Class_MuSR_PSI, mud, NeXus (if enabled), etc.
@@ -810,7 +820,7 @@ dnl -----------------------------------------------
 dnl Ask user if OpenMP support should be disabled (used for parallel chisq calculation and in libFitPofB)
 dnl -----------------------------------------------
 
-AC_ARG_ENABLE([omp], [AC_HELP_STRING([--enable-omp],[build musrfit with OpenMP support [default=yes]])])
+AC_ARG_ENABLE([omp], [AS_HELP_STRING([--enable-omp],[build musrfit with OpenMP support [default=yes]])])
 
 if test "x$enable_omp" != "xno"; then
   SAVED_CXXFLAGS="$CXXFLAGS"
@@ -825,7 +835,7 @@ dnl -----------------------------------------------
 dnl Ask user if the building of musredit/musrgui should be disabled
 dnl -----------------------------------------------
 
-AC_ARG_ENABLE([editor], [AC_HELP_STRING([--enable-editor],[check for Qt and build musredit or musrgui [default=yes]])])
+AC_ARG_ENABLE([editor], [AS_HELP_STRING([--enable-editor],[check for Qt and build musredit or musrgui [default=yes]])])
 
 if test "x$enable_editor" != "xno"; then
 
@@ -847,7 +857,7 @@ if test "x$enable_editor" != "xno"; then
   QTEDITOR=none
 
   AC_ARG_WITH([qt3],
-        [AC_HELP_STRING([--with-qt3],[prefix of the Qt3 installation, e.g. /usr/lib/qt-3.3])],
+        [AS_HELP_STRING([--with-qt3],[prefix of the Qt3 installation, e.g. /usr/lib/qt-3.3])],
         [QT3_PREFIX=$with_qt3
         AC_MSG_CHECKING([whether qmake for Qt3 can be found at the specified location])
         for QMAKE in qmake qmake-qt3
@@ -876,7 +886,7 @@ if test "x$enable_editor" != "xno"; then
   )
 
   AC_ARG_WITH([qt4],
-        [AC_HELP_STRING([--with-qt4],[prefix of the Qt4 installation, e.g. /opt/qt-4.7])],
+        [AS_HELP_STRING([--with-qt4],[prefix of the Qt4 installation, e.g. /opt/qt-4.7])],
         [QT4_PREFIX=$with_qt4
         AC_MSG_CHECKING([whether qmake for Qt4 can be found at the specified location])
         for QMAKE in qmake qmake-qt4

@@ -1,11 +1,11 @@
 #---------------------------------------------------------------------
 # ChangeLog
-#
-# $Id$
 #---------------------------------------------------------------------
 
 changes since 0.11.0
 ===================================
+NEW 2014-02-07 added new internal field functions internFldGK and internFldLL to
+               PTheory. Online documentation still missing.
 NEW 2013-09-10 add a stretched Kubo-Toyabe function to the PTheory class, including 
                an update of the docu.
 NEW 2013-02-14 (i) adding t0 estimate for single histogram fits. The estimate

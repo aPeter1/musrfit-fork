@@ -5,12 +5,10 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id$
-
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2013 by Andreas Suter                              *
+ *   Copyright (C) 2007-2014 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -460,13 +458,21 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
           return Abragam(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) + 
                  fAdd->Func(t, paramValues, funcValues);
           break;
+        case THEORY_TF_COS:
+          return TFCos(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
+                 fAdd->Func(t, paramValues, funcValues);
+          break;
         case THEORY_INTERNAL_FIELD:
           return InternalField(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
           break;
-        case THEORY_TF_COS:
-          return TFCos(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) + 
-                 fAdd->Func(t, paramValues, funcValues);
+        case THEORY_INTERNAL_FIELD_KORNILOV:
+          return InternalFieldGK(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
+              fAdd->Func(t, paramValues, funcValues);
+          break;
+        case THEORY_INTERNAL_FIELD_LARKIN:
+          return InternalFieldLL(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
+              fAdd->Func(t, paramValues, funcValues);
           break;
         case THEORY_BESSEL:
           return Bessel(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) + 
@@ -559,11 +565,17 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
         case THEORY_ABRAGAM:
           return Abragam(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
+        case THEORY_TF_COS:
+          return TFCos(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
+          break;
         case THEORY_INTERNAL_FIELD:
           return InternalField(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
-        case THEORY_TF_COS:
-          return TFCos(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
+        case THEORY_INTERNAL_FIELD_KORNILOV:
+          return InternalFieldGK(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
+          break;
+        case THEORY_INTERNAL_FIELD_LARKIN:
+          return InternalFieldLL(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
         case THEORY_BESSEL:
           return Bessel(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
@@ -649,11 +661,17 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
         case THEORY_ABRAGAM:
           return Abragam(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
+        case THEORY_TF_COS:
+          return TFCos(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
+          break;
         case THEORY_INTERNAL_FIELD:
           return InternalField(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
-        case THEORY_TF_COS:
-          return TFCos(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
+        case THEORY_INTERNAL_FIELD_KORNILOV:
+          return InternalFieldGK(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
+          break;
+        case THEORY_INTERNAL_FIELD_LARKIN:
+          return InternalFieldLL(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
         case THEORY_BESSEL:
           return Bessel(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
@@ -737,11 +755,17 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
         case THEORY_ABRAGAM:
           return Abragam(t, paramValues, funcValues);
           break;
+        case THEORY_TF_COS:
+          return TFCos(t, paramValues, funcValues);
+          break;
         case THEORY_INTERNAL_FIELD:
           return InternalField(t, paramValues, funcValues);
           break;
-        case THEORY_TF_COS:
-          return TFCos(t, paramValues, funcValues);
+        case THEORY_INTERNAL_FIELD_KORNILOV:
+          return InternalFieldGK(t, paramValues, funcValues);
+          break;
+        case THEORY_INTERNAL_FIELD_LARKIN:
+          return InternalFieldLL(t, paramValues, funcValues);
           break;
         case THEORY_BESSEL:
           return Bessel(t, paramValues, funcValues);
@@ -1957,6 +1981,47 @@ Double_t PTheory::Abragam(register Double_t t, const PDoubleVector& paramValues,
 
 //--------------------------------------------------------------------------
 /**
+ * <p> theory function: cosine including phase
+ *
+ * \f[ = \cos(2\pi\nu t + \varphi) \f]
+ * or the time shifted version of it.
+ *
+ * <b>meaning of paramValues:</b> \f$\nu\f$, \f$\varphi\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
+ */
+Double_t PTheory::TFCos(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+{
+  // expected parameters: phase frequency [tshift]
+
+  Double_t val[3];
+
+  assert(fParamNo.size() <= 3);
+
+  // check if FUNCTIONS are used
+  for (UInt_t i=0; i<fParamNo.size(); i++) {
+    if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
+      val[i] = paramValues[fParamNo[i]];
+    } else { // function
+      val[i] = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
+    }
+  }
+
+  Double_t tt;
+  if (fParamNo.size() == 2) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[2];
+
+  return TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*tt);
+}
+
+//--------------------------------------------------------------------------
+/**
  * <p> theory function: internal field function
  *
  * \f[ = \alpha\,\cos\left(2\pi\nu t+\frac{\pi\varphi}{180}\right)\exp\left(-\lambda_{\mathrm{T}}t\right)+(1-\alpha)\,\exp\left(-\lambda_{\mathrm{L}}t\right)\f]
@@ -1999,12 +2064,12 @@ Double_t PTheory::InternalField(register Double_t t, const PDoubleVector& paramV
 
 //--------------------------------------------------------------------------
 /**
- * <p> theory function: cosine including phase
+ * <p> theory function: internal field function Gauss-Kornilov (see Physics Letters A <b>153</b>, 364 (1991)).
  *
- * \f[ = \cos(2\pi\nu t + \varphi) \f]
- * or the time shifted version of it.
+ * \f[ = \alpha\,\left[\cos(2\pi\nu t)-\frac{\sigma^2 t}{2\pi\nu}\sin(2\pi\nu t)\right]\exp(-[\sigma t]^2/2)+(1-\alpha)\,\exp(-(\lambda t)^\beta)\f]
+ * or the time shifted version of it. For the powder averaged case, \f$\alpha=2/3\f$.
  *
- * <b>meaning of paramValues:</b> \f$\nu\f$, \f$\varphi\f$ [, \f$t_{\rm shift}\f$]
+ * <b>meaning of paramValues:</b> \f$\alpha\f$, \f$\nu\f$, \f$\sigma\f$, \f$\lambda\f$, \f$\beta\f$ [, \f$t_{\rm shift}\f$]
  *
  * <b>return:</b> function value
  *
@@ -2012,13 +2077,13 @@ Double_t PTheory::InternalField(register Double_t t, const PDoubleVector& paramV
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::TFCos(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::InternalFieldGK(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
-  // expected parameters: phase frequency [tshift]
+  // expected parameters: [0]:fraction [1]:frequency [2]:sigma [3]:lambda [4]:beta [[5]:tshift]
 
-  Double_t val[3];
+  Double_t val[6];
 
-  assert(fParamNo.size() <= 3);
+  assert(fParamNo.size() <= 6);
 
   // check if FUNCTIONS are used
   for (UInt_t i=0; i<fParamNo.size(); i++) {
@@ -2030,12 +2095,75 @@ Double_t PTheory::TFCos(register Double_t t, const PDoubleVector& paramValues, c
   }
 
   Double_t tt;
-  if (fParamNo.size() == 2) // no tshift
+  if (fParamNo.size() == 5) // no tshift
     tt = t;
   else // tshift present
-    tt = t-val[2];
+    tt = t-val[5];
 
-  return TMath::Cos(DEG_TO_RAD*val[0]+TWO_PI*val[1]*tt);
+  Double_t result = 0.0;
+  Double_t nu_t = val[1]*tt;
+  Double_t rateLF = TMath::Power(val[3]*tt, val[4]);
+  Double_t rate2 = val[2]*val[2]*tt*tt; // (sigma t)^2
+
+  if (val[1] < 0.01) { // internal field frequency is approaching zero
+    result = (1.0-val[0])*TMath::Exp(-rateLF) + val[0]*(1.0-rate2)*TMath::Exp(-0.5*rate2);
+  } else {
+    result = (1.0-val[0])*TMath::Exp(-rateLF) + val[0]*(TMath::Cos(nu_t)-val[2]*val[2]*tt/val[1]*TMath::Sin(nu_t))*TMath::Exp(-0.5*rate2);
+  }
+
+  return result;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p> theory function: internal field function Lorentz-Larkin (see Physica B: Condensed Matter <b>289-290</b>, 153 (2000)).
+ *
+ * \f[ = \alpha\,\left[\cos(2\pi\nu t)-\frac{a}{2\pi\nu}\sin(2\pi\nu t)\right]\exp(-a t)+(1-\alpha)\,\exp(-(\lambda t)^\beta)\f]
+ * or the time shifted version of it. For the powder averaged case, \f$\alpha=2/3\f$.
+ *
+ * <b>meaning of paramValues:</b> \f$\alpha\f$, \f$\nu\f$, \f$a\f$, \f$\lambda\f$, \f$\beta\f$ [, \f$t_{\rm shift}\f$]
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
+ */
+Double_t PTheory::InternalFieldLL(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+{
+  // expected parameters: [0]:fraction [1]:frequency [2]:a [3]:lambda [4]:beta [[5]:tshift]
+
+  Double_t val[6];
+
+  assert(fParamNo.size() <= 6);
+
+  // check if FUNCTIONS are used
+  for (UInt_t i=0; i<fParamNo.size(); i++) {
+    if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
+      val[i] = paramValues[fParamNo[i]];
+    } else { // function
+      val[i] = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
+    }
+  }
+
+  Double_t tt;
+  if (fParamNo.size() == 5) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[5];
+
+  Double_t result = 0.0;
+  Double_t nu_t = val[1]*tt;
+  Double_t rateLF = TMath::Power(val[3]*tt, val[4]);
+  Double_t a_t = val[2]*tt; // a t
+
+  if (val[1] < 0.01) { // internal field frequency is approaching zero
+    result = (1.0-val[0])*TMath::Exp(-rateLF) + val[0]*(1.0-a_t)*TMath::Exp(-a_t);
+  } else {
+    result = (1.0-val[0])*TMath::Exp(-rateLF) + val[0]*(TMath::Cos(nu_t)-val[3]/val[1]*TMath::Sin(nu_t))*TMath::Exp(-a_t);
+  }
+
+  return result;
 }
 
 //--------------------------------------------------------------------------

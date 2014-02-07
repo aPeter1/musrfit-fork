@@ -5,12 +5,10 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id$
-
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2013 by Andreas Suter                              *
+ *   Copyright (C) 2007-2014 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -61,17 +59,19 @@
 #define THEORY_SPIN_GLASS                   13
 #define THEORY_RANDOM_ANISOTROPIC_HYPERFINE 14
 #define THEORY_ABRAGAM                      15
-#define THEORY_INTERNAL_FIELD               16
-#define THEORY_TF_COS                       17
-#define THEORY_BESSEL                       18
-#define THEORY_INTERNAL_BESSEL              19
-#define THEORY_SKEWED_GAUSS                 20
-#define THEORY_STATIC_ZF_NK                 21
-#define THEORY_STATIC_TF_NK                 22
-#define THEORY_DYNAMIC_ZF_NK                23
-#define THEORY_DYNAMIC_TF_NK                24
-#define THEORY_POLYNOM                      25
-#define THEORY_USER_FCN                     26
+#define THEORY_TF_COS                       16
+#define THEORY_INTERNAL_FIELD               17
+#define THEORY_INTERNAL_FIELD_KORNILOV      18
+#define THEORY_INTERNAL_FIELD_LARKIN        19
+#define THEORY_BESSEL                       20
+#define THEORY_INTERNAL_BESSEL              21
+#define THEORY_SKEWED_GAUSS                 22
+#define THEORY_STATIC_ZF_NK                 23
+#define THEORY_STATIC_TF_NK                 24
+#define THEORY_DYNAMIC_ZF_NK                25
+#define THEORY_DYNAMIC_TF_NK                26
+#define THEORY_POLYNOM                      27
+#define THEORY_USER_FCN                     28
 
 // function parameter tags, i.e. how many parameters has a specific function
 // if there is a comment with a (tshift), the number of parameters is increased by one
@@ -91,8 +91,10 @@
 #define THEORY_PARAM_SPIN_GLASS                   3 // rate, hop-rate, order parameter (tshift)
 #define THEORY_PARAM_RANDOM_ANISOTROPIC_HYPERFINE 2 // frequency, rate (tshift)
 #define THEORY_PARAM_ABRAGAM                      2 // rate, hop-rate (tshift)
-#define THEORY_PARAM_INTERNAL_FIELD               5 // fraction, phase, frequency, TF damping, damping (tshift)
 #define THEORY_PARAM_TF_COS                       2 // phase, frequency (tshift)
+#define THEORY_PARAM_INTERNAL_FIELD               5 // fraction, phase, frequency, TF damping, damping (tshift)
+#define THEORY_PARAM_INTERNAL_FIELD_KORNILOV      5 // fraction, frequency, TF damping, damping, beta (tshift)
+#define THEORY_PARAM_INTERNAL_FIELD_LARKIN        4 // fraction, frequency, TF damping, damping (tshift)
 #define THEORY_PARAM_BESSEL                       2 // phase, frequency (tshift)
 #define THEORY_PARAM_INTERNAL_BESSEL              5 // fraction, phase, frequency, TF damping, LF damping (tshift)
 #define THEORY_PARAM_SKEWED_GAUSS                 4 // phase, frequency, rate minus, rate plus (tshift)
@@ -102,7 +104,7 @@
 #define THEORY_PARAM_DYNAMIC_TF_NK                5 // phase, frequency, damping D0, R_b=DGbG/D0, nu_c (tshift)
 
 // number of available user functions
-#define THEORY_MAX 27
+#define THEORY_MAX 29
 
 // maximal number of parameters. Needed in the contents of LF
 #define THEORY_MAX_PARAM 10
@@ -182,11 +184,17 @@ static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
   {THEORY_ABRAGAM, THEORY_PARAM_ABRAGAM, false,
    "abragam", "ab", "(rate hopprate)", "(rate hopprate tshift)"},
 
+  {THEORY_TF_COS, THEORY_PARAM_TF_COS, false,
+   "TFieldCos", "tf", "(phase frequency)", "(phase frequency tshift)"},
+
   {THEORY_INTERNAL_FIELD, THEORY_PARAM_INTERNAL_FIELD, false,
    "internFld", "if", "(fraction phase frequency Trate Lrate)", "(fraction phase frequency Trate Lrate tshift)"},
 
-  {THEORY_TF_COS, THEORY_PARAM_TF_COS, false,
-   "TFieldCos", "tf", "(phase frequency)", "(phase frequency tshift)"},
+  {THEORY_INTERNAL_FIELD_KORNILOV, THEORY_PARAM_INTERNAL_FIELD_KORNILOV, false,
+   "internFldGK", "ifgk", "(fraction phase frequency Trate Lrate)", "(fraction phase frequency Trate Lrate tshift)"},
+
+  {THEORY_INTERNAL_FIELD_LARKIN, THEORY_PARAM_INTERNAL_FIELD_LARKIN, false,
+   "internFldLL", "ifll", "(fraction phase frequency Trate Lrate)", "(fraction phase frequency Trate Lrate tshift)"},
 
   {THEORY_BESSEL, THEORY_PARAM_BESSEL, false,
    "bessel", "b", "(phase frequency)", "(phase frequency tshift)"},
@@ -253,8 +261,10 @@ class PTheory
     virtual Double_t SpinGlass(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t RandomAnisotropicHyperfine(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t Abragam(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
-    virtual Double_t InternalField(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t TFCos(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t InternalField(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t InternalFieldGK(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t InternalFieldLL(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t Bessel(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t InternalBessel(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t SkewedGauss(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
