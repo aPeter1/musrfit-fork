@@ -5,12 +5,10 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id$
-
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2012 by Andreas Suter                              *
+ *   Copyright (C) 2007-2014 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -44,6 +42,7 @@ using namespace std;
 #include <TSAXParser.h>
 #include <TROOT.h>
 
+#include "git-revision.h"
 #include "PMusr.h"
 #include "PStartupHandler.h"
 #include "PMsrHandler.h"
@@ -122,9 +121,9 @@ int main(int argc, char *argv[])
       }
     } else if (!strcmp(argv[i], "--version")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "musrview version: " << PACKAGE_VERSION << ", $Id$" << endl << endl;
+      cout << endl << "musrview version: " << PACKAGE_VERSION << ", git-rev: " << GIT_REVISION << endl << endl;
 #else
-      cout << endl << "musrview version: $Id$" << endl << endl;
+      cout << endl << "musrview git-rev: " << GIT_REVISION << endl << endl;
 #endif
       return PMUSR_SUCCESS;
     } else if (!strcmp(argv[i], "--help")) {

@@ -5,12 +5,10 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id$
-
 *****************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2010 by Andreas Suter                                   *
+ *   Copyright (C) 2010-2014 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -34,6 +32,7 @@ using namespace std;
 
 #include <QApplication>
 
+#include "../include/git-revision.h"
 #include "PTextEdit.h"
 #include "PFitOutputHandler.h"
 
@@ -43,8 +42,6 @@ using namespace std;
  *
  * <p>musredit is free software liensenced under GPL 2 or later (for detail license informations see
  * <code>http://www.gnu.org/licenses</code>).
- *
- * <p>The source code can be downloaded from <code>http://savannah.psi.ch/viewcvs/trunk/analysis/musrfit/src/musredit/?root=nemu%2Flem</code>.
  */
 int main( int argc, char ** argv ) 
 {
@@ -56,7 +53,7 @@ int main( int argc, char ** argv )
       cout << endl << endl;
       return 0;
     } else if (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-v")) {
-      cout << endl << "musredit version: $Id$";
+      cout << endl << "musredit git-rev: " << GIT_REVISION;
       cout << endl << endl;
       return 0;
     }

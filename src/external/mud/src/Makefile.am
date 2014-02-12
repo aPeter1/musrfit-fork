@@ -1,5 +1,4 @@
 ## Process this file with automake to create Makefile.in
-## $Id$
 
 h_sources = mud.h
 cpp_sources = mud_all.c \

@@ -1,7 +1,6 @@
 #---------------------------------------------------------------------
 # README
 # Andreas Suter, 2010/06/20
-# $Id$
 #---------------------------------------------------------------------
 
 musredit requires Qt 4.6.x or newer. If you have Qt 3.x.y only, use musrgui instead.

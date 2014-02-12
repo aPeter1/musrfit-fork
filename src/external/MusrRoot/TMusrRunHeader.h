@@ -5,12 +5,10 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id: TMusrRunHeader.h 5092 2012-03-13 07:47:00Z nemu $
-
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2012 by Andreas Suter                              *
+ *   Copyright (C) 2007-2014 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *

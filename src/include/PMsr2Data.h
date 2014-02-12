@@ -5,12 +5,10 @@
   Author: Bastian M. Wojek / Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id$
-
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2009-2013 by Bastian M. Wojek / Andreas Suter           *
+ *   Copyright (C) 2009-2014 by Bastian M. Wojek / Andreas Suter           *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *

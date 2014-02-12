@@ -5,12 +5,10 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id$
-
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2012 by Andreas Suter                              *
+ *   Copyright (C) 2007-2014 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -53,6 +51,7 @@ using namespace std;
 #include <TSystemFile.h>
 #include <TThread.h>
 
+#include "git-revision.h"
 #include "PMusr.h"
 #include "PStartupHandler.h"
 #include "PMsrHandler.h"
@@ -408,9 +407,9 @@ int main(int argc, char *argv[])
   if (argc == 2) {
     if (!strcmp(argv[1], "--version")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "musrfit version: " << PACKAGE_VERSION << ", $Id$" << endl << endl;
+      cout << endl << "musrfit version: " << PACKAGE_VERSION << ", git-rev: " << GIT_REVISION << endl << endl;
 #else
-      cout << endl << "musrfit version: $Id$" << endl << endl;
+      cout << endl << "musrfit git-rev: " << GIT_REVISION << endl << endl;
 #endif
       return PMUSR_SUCCESS;
     }

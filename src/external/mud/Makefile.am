@@ -1,3 +1,2 @@
-## $Id$
 
 SUBDIRS = src

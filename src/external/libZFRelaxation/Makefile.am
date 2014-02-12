@@ -1,5 +1,4 @@
 ## Process this file with automake to create Makefile.in
-## $Id$
 
 h_sources = \
   ZFRelaxation.h

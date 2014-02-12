@@ -7,7 +7,6 @@
        It is an extension of MusrRoot.xsd and describes the additional LEM specific entries.
           
         Author: Andreas Suter, andreas.suter@psi.ch          
-        $Id: MusrRootLEM.xsd 5092 2012-03-13 07:47:00Z nemu $
     </xs:documentation>
   </xs:annotation>
     

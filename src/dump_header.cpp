@@ -5,8 +5,6 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id$
-
 ***************************************************************************/
 
 /***************************************************************************
@@ -47,6 +45,7 @@ using namespace std;
 
 #include <TFile.h>
 
+#include "git-revision.h"
 #include "TMusrRunHeader.h"
 #include "TLemRunHeader.h"
 #include "MuSR_td_PSI_bin.h"
@@ -581,9 +580,9 @@ int main(int argc, char *argv[])
       return 0;
     } else if (!strcmp(argv[i], "--version") || !strcmp(argv[i], "-v")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "dump_header: version " << PACKAGE_VERSION << ", $Id$" << endl << endl;
+      cout << endl << "dump_header: version " << PACKAGE_VERSION << ", git-rev: " << GIT_REVISION << endl << endl;
 #else
-      cout << endl << "dump_header: version $Id$" << endl << endl;
+      cout << endl << "dump_header: git-rev: " << GIT_REVISION << endl << endl;
 #endif
       return 0;
     } else if (!strcmp(argv[i], "--file_format")) {

@@ -8,7 +8,6 @@
        Paul Scherrer Institute.
           
         Author: Andreas Suter, andreas.suter@psi.ch          
-        $Id: MusrRoot.xsd 5092 2012-03-13 07:47:00Z nemu $
     </xs:documentation>
   </xs:annotation>
     

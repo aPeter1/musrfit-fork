@@ -2,8 +2,6 @@
 
   Author: Bastian M. Wojek
 
-  $Id$
-
 ***************************************************************************/
 
 Implementation of a userFcn-interface to Gaussian and Lorentzian static and dynamic LF relaxation functions.

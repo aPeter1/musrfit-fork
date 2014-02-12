@@ -1,5 +1,4 @@
 ## Process this file with automake to create Makefile.in
-## $Id: Makefile.am 4808 2011-03-21 14:33:34Z l_wojek $
 
 c_sources = Vegas.c
 

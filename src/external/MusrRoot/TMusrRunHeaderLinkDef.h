@@ -5,12 +5,10 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id: TMusrRunHeaderLinkDef.h 5054 2012-01-18 07:43:50Z suter_a $
-
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2012 by Andreas Suter                              *
+ *   Copyright (C) 2007-2014 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *

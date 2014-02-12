@@ -1,5 +1,9 @@
 ## Process this file with automake to create Makefile.in
 
+BUILT_SOURCES = git-revision.h
+git-revision.h : Makefile
+	echo \#define GIT_REVISION \"`git log -n 1 --pretty=format:"%ad - %h"`\" > include/git-revision.h
+
 if PNEXUS_ENABLED
   PNEXUSDIRS = external/nexus
 endif

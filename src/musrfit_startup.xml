@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <musrfit xmlns="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">
     <comment>
-        $Id$
         Defines default settings for the musrfit package
     </comment>
     <data_path>/mnt/data/nemu/his</data_path>

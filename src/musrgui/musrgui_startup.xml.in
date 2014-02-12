@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <musrgui_startup xmlns="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrGui.html">
   <comment>
-    $Id: musrgui_startup.xml 4949 2011-07-15 05:43:41Z nemu $
     This is handling default setting parameters for the musrgui.
   </comment>
   <general>

@@ -5,12 +5,10 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id$
-
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2012 by Andreas Suter                              *
+ *   Copyright (C) 2007-2014 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -44,6 +42,7 @@ using namespace std;
 #include <TString.h>
 #include <TSAXParser.h>
 
+#include "git-revision.h"
 #include "PMusr.h"
 #include "PStartupHandler.h"
 #include "PRunDataHandler.h"
@@ -195,9 +194,9 @@ int main(int argc, char *argv[])
       any2many_syntax();
     else if (strstr(argv[1], "--v")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "any2many version: " << PACKAGE_VERSION << ", $Id$" << endl << endl;
+      cout << endl << "any2many version: " << PACKAGE_VERSION << ", git-rev: " << GIT_REVISION << endl << endl;
 #else
-      cout << endl << "any2many version: $Id$" << endl << endl;
+      cout << endl << "any2many git-rev: " << GIT_REVISION << endl << endl;
 #endif
     } else {
       any2many_syntax();

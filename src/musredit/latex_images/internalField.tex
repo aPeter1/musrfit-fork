@@ -2,8 +2,19 @@
 \pagestyle{empty}
 \begin{document}
 
+% internal field, delta-B
 \begin{displaymath}
 \alpha \cos\left(2\pi\nu t + \phi\pi/180\right) e^{-\lambda_{\rm T} t} + (1-\alpha) e^{-\lambda_{\rm L} t}
+\end{displaymath}
+
+% internal field, Gaussian broadened
+\begin{displaymath}
+\alpha \left[\cos(2\pi\nu t) -\frac{\sigma^2 t}{2\pi\nu}\sin(2\pi\nu t)\right] e^{-(\sigma t)^2/2} + (1-\alpha) e^{-(\lambda t)^\beta}
+\end{displaymath}
+
+% internal field, Lorentzian broadened
+\begin{displaymath}
+\alpha \left[\cos(2\pi\nu t) -\frac{a}{2\pi\nu}\sin(2\pi\nu t)\right] e^{-a t} + (1-\alpha) e^{-\lambda t}
 \end{displaymath}
 
 \end{document}

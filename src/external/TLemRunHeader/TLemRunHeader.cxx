@@ -3,7 +3,6 @@
 // T. Prokscha
 // 18/06/2006
 //
-// $Id: TLemRunHeader.cxx 3897 2009-05-01 22:06:11Z l_wojek $
 //
 #include <iostream>
 using namespace std;

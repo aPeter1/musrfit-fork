@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <photo_meissner xmlns="http://nemu.web.psi.ch/musrfit/libPhotoMeissner">
   <comment>
-    $Id$
+    contains the needed trim.sp meta-file information 
   </comment>
   <trim_sp_part>
     <data_path>./trimsp/YBCO_E</data_path>

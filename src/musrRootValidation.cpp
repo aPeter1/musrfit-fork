@@ -5,12 +5,10 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id$
-
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2012 by Andreas Suter                              *
+ *   Copyright (C) 2007-2014 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -51,6 +49,7 @@ using namespace std;
 #include <libxml/parser.h>
 #include <libxml/xmlschemas.h>
 
+#include "git-revision.h"
 #include "PMusr.h"
 
 //-----------------------------------------------------------------------
@@ -576,9 +575,9 @@ int main(int argc, char *argv[])
   } else if (argc==2) {
     if (!strcmp(argv[1], "--version")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "musrRootValidation version: " << PACKAGE_VERSION << ", $Id$" << endl << endl;
+      cout << endl << "musrRootValidation version: " << PACKAGE_VERSION << ", git-rev: " << GIT_REVISION << endl << endl;
 #else
-      cout << endl << "musrRootValidation version: $Id$" << endl << endl;
+      cout << endl << "musrRootValidation git-rev: " << GIT_REVISION << endl << endl;
 #endif
       return 0;
     } else {

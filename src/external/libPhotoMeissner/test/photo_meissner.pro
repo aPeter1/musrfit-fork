@@ -1,7 +1,6 @@
 #  photo_meissner.pro
 #  Author: Andreas Suter
 #  e-mail: andreas.suter@psi.ch
-# $Id$
 
 SOURCES = photo_meissner.cpp
 

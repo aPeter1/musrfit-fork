@@ -5,12 +5,10 @@
   Author: Bastian M. Wojek / Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id$
-
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2009-2013 by Bastian M. Wojek / Andreas Suter           *
+ *   Copyright (C) 2009-2014 by Bastian M. Wojek / Andreas Suter           *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -38,6 +36,7 @@
 #include "config.h"
 #endif
 
+#include "git-revision.h"
 #include "PMsr2Data.h"
 
 #include <algorithm>
@@ -391,9 +390,9 @@ int main(int argc, char *argv[])
       return 0;
     } else if (!strcmp(argv[1], "--version")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "msr2data  version: " << PACKAGE_VERSION << ", $Id$" << endl << endl;
+      cout << endl << "msr2data version: " << PACKAGE_VERSION << ", git-rev: " << GIT_REVISION << endl << endl;
 #else
-      cout << endl << "msr2data  version: $Id$" << endl << endl;
+      cout << endl << "msr2data git-rev: " << GIT_REVISION << endl << endl;
 #endif
       return 0;
     } else {

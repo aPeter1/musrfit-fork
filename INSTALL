@@ -1,13 +1,12 @@
 #---------------------------------------------------------------------
 # INSTALL
-# BMW, 2011/01/27
-# $Id: INSTALL 4013 2009-06-21
+# AS/BMW, 2014/02/11; 2011/01/27
 #---------------------------------------------------------------------
 
 To get it all build:
 
    sh autogen.sh
-   ./configure --prefix=/apps/cern/root      (or whereever musrfit should be installed)
+   ./configure --prefix=/opt/cern/root       (or where ever musrfit should be installed)
    make
    make install                              (as superuser -- maybe)
    

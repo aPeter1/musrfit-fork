@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nonlocal xmlns="http://nemu.web.psi.ch/musrfit/nonlocal">
     <comment>
-        $Id$
+        trim.sp meta information
     </comment>
     <nonlocal_par>
         <fourier_points>262144</fourier_points>

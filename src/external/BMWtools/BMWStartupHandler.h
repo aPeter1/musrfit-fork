@@ -4,8 +4,6 @@
 
   Author: Bastian M. Wojek
 
-  $Id$
-
   based upon:
   PStartupHandler.h
   by Andreas Suter
@@ -13,7 +11,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2008 by Andreas Suter, Bastian M. Wojek            *
+ *   Copyright (C) 2007-2014 by Andreas Suter, Bastian M. Wojek            *
  *                                                                         *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *

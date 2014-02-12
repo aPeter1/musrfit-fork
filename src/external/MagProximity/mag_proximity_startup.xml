@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mag_proximity xmlns="http://nemu.web.psi.ch/musrfit/mag_proximity">
     <comment>
-        $Id$
+      contains meta file infromation of the needed trim.sp files.
     </comment>
     <trim_sp_part>
         <data_path>/mnt/home/nemu/analysis/2010/EuS-Co/trimsp2/EuS-Co_E</data_path>
