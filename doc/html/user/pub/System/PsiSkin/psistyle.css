@@ -137,6 +137,7 @@ blockquote.psi {
 .patternContent a[href^="http://i.psi.ch"]:hover,
 .patternContent a[href^="http://i.psi.ch"]:visited:hover {
     background-image: none;
+    background-color: #0055B5;
 }
 
 /* ...but not to absolute links in this domain...
