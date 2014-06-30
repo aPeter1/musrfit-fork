@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
     } else if (!strcmp(argv[i], "--timeout")) {
       if (i+1 < argc) {
         TString str(argv[i+1]);
-        if (str.IsDigit()) {
+        if (str.IsFloat()) {
           timeout = str.Atoi();
         } else {
           show_syntax = true;
