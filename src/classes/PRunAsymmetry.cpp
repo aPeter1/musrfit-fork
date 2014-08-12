@@ -736,7 +736,7 @@ Bool_t PRunAsymmetry::PrepareData()
 
   // subtract background from histogramms ------------------------------------------
   if (fRunInfo->GetBkgFix(0) == PMUSR_UNDEFINED) { // no fixed background given
-    if (fRunInfo->GetBkgRange(0) >= 0) {
+    if (fRunInfo->GetBkgRange(0) >= 0) { // background range given
       if (!SubtractEstimatedBkg())
         return false;
     } else { // no background given to do the job, try to estimate it
@@ -788,8 +788,8 @@ Bool_t PRunAsymmetry::PrepareData()
 //--------------------------------------------------------------------------
 /**
  * <p>Subtracts a fixed background from the raw data. The background is given
- * in units of (1/ns). The error propagation
- * is done the following way: it is assumed that the error of the background
+ * in units of (1/bin); for the Asymmetry representation (1/ns) doesn't make too much sense.
+ * The error propagation is done the following way: it is assumed that the error of the background
  * is Poisson like, i.e. \f$\Delta\mathrm{bkg} = \sqrt{\mathrm{bkg}}\f$.
  *
  * Error propagation: 
@@ -806,18 +806,21 @@ Bool_t PRunAsymmetry::SubtractFixBkg()
 {
   Double_t dval;
   for (UInt_t i=0; i<fForward.size(); i++) {
+    // keep the error, and make sure that the bin is NOT empty
     if (fForward[i] != 0.0)
       dval = TMath::Sqrt(fForward[i]);
     else
       dval = 1.0;
     fForwardErr.push_back(dval);
-    fForward[i] -= fRunInfo->GetBkgFix(0) * fTimeResolution * 1.0e3; // bkg per ns -> bkg per bin; 1.0e3: us -> ns
+    fForward[i] -= fRunInfo->GetBkgFix(0);
+
+    // keep the error, and make sure that the bin is NOT empty
     if (fBackward[i] != 0.0)
       dval = TMath::Sqrt(fBackward[i]);
     else
       dval = 1.0;
     fBackwardErr.push_back(dval);
-    fBackward[i] -= fRunInfo->GetBkgFix(1) * fTimeResolution * 1.0e3; // bkg per ns -> bkg per bin; 1.0e3: us -> ns
+    fBackward[i] -= fRunInfo->GetBkgFix(1);
   }
 
   return true;
@@ -905,23 +908,32 @@ Bool_t PRunAsymmetry::SubtractEstimatedBkg()
   Double_t errBkg[2] = {0.0, 0.0};
 
   // forward
-  for (UInt_t i=start[0]; i<end[0]; i++)
+  for (UInt_t i=start[0]; i<=end[0]; i++)
     bkg[0] += fForward[i];
   errBkg[0] = TMath::Sqrt(bkg[0])/(end[0] - start[0] + 1);
   bkg[0] /= static_cast<Double_t>(end[0] - start[0] + 1);
   cout << endl << ">> estimated forward histo background: " << bkg[0];
 
   // backward
-  for (UInt_t i=start[1]; i<end[1]; i++)
+  for (UInt_t i=start[1]; i<=end[1]; i++)
     bkg[1] += fBackward[i];
-  errBkg[1] = TMath::Sqrt(bkg[1])/(end[0] - start[0] + 1);
+  errBkg[1] = TMath::Sqrt(bkg[1])/(end[1] - start[1] + 1);
   bkg[1] /= static_cast<Double_t>(end[1] - start[1] + 1);
   cout << endl << ">> estimated backward histo background: " << bkg[1] << endl;
 
   // correct error for forward, backward
+  Double_t errVal = 0.0;
   for (UInt_t i=0; i<fForward.size(); i++) {
-    fForwardErr.push_back(TMath::Sqrt(fForward[i]+errBkg[0]*errBkg[0]));
-    fBackwardErr.push_back(TMath::Sqrt(fBackward[i]+errBkg[1]*errBkg[1]));
+    if (fForward[i] > 0.0)
+      errVal = TMath::Sqrt(fForward[i]+errBkg[0]*errBkg[0]);
+    else
+      errVal = 1.0;
+    fForwardErr.push_back(errVal);
+    if (fBackward[i] > 0.0)
+      errVal = TMath::Sqrt(fBackward[i]+errBkg[1]*errBkg[1]);
+    else
+      errVal = 1.0;
+    fBackwardErr.push_back(errVal);
   }
 
   // subtract background from data
