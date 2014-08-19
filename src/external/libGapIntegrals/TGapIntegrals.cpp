@@ -2,13 +2,13 @@
 
   TGapIntegrals.cpp
 
-  Author: Bastian M. Wojek
+  Author: Bastian M. Wojek / Andreas Suter
 
 ***************************************************************************/
 
 /***************************************************************************
  *   Copyright (C) 2009 by Bastian M. Wojek                                *
- *   bastian.wojek@psi.ch                                                  *
+ *   bastian.wojek@psi.ch / andreas.suter@psi.ch                           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -64,8 +64,10 @@ ClassImp(TLambdaInvPowerLaw)
 
 ClassImp(TFilmMagnetizationDWave)
 
-// s wave  gap integral
-
+//--------------------------------------------------------------------
+/**
+ * <p> s wave  gap integral
+ */
 TGapSWave::TGapSWave() {
   TGapIntegral *gapint = new TGapIntegral();
   fGapIntegral = gapint;
@@ -78,6 +80,10 @@ TGapSWave::TGapSWave() {
   fPar.clear();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TGapDWave::TGapDWave() {
   TDWaveGapIntegralCuhre *gapint = new TDWaveGapIntegralCuhre();
   fGapIntegral = gapint;
@@ -90,6 +96,10 @@ TGapDWave::TGapDWave() {
   fPar.clear();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TGapCosSqDWave::TGapCosSqDWave() {
   TCosSqDWaveGapIntegralCuhre *gapint = new TCosSqDWaveGapIntegralCuhre();
   fGapIntegral = gapint;
@@ -102,6 +112,10 @@ TGapCosSqDWave::TGapCosSqDWave() {
   fPar.clear();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TGapSinSqDWave::TGapSinSqDWave() {
   TSinSqDWaveGapIntegralCuhre *gapint = new TSinSqDWaveGapIntegralCuhre();
   fGapIntegral = gapint;
@@ -114,6 +128,10 @@ TGapSinSqDWave::TGapSinSqDWave() {
   fPar.clear();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TGapAnSWave::TGapAnSWave() {
   TAnSWaveGapIntegralCuhre *gapint = new TAnSWaveGapIntegralCuhre();
   fGapIntegral = gapint;
@@ -126,6 +144,10 @@ TGapAnSWave::TGapAnSWave() {
   fPar.clear();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TGapNonMonDWave1::TGapNonMonDWave1() {
   TNonMonDWave1GapIntegralCuhre *gapint = new TNonMonDWave1GapIntegralCuhre();
   fGapIntegral = gapint;
@@ -138,6 +160,10 @@ TGapNonMonDWave1::TGapNonMonDWave1() {
   fPar.clear();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TGapNonMonDWave2::TGapNonMonDWave2() {
   TNonMonDWave2GapIntegralCuhre *gapint = new TNonMonDWave2GapIntegralCuhre();
   fGapIntegral = gapint;
@@ -150,46 +176,90 @@ TGapNonMonDWave2::TGapNonMonDWave2() {
   fPar.clear();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaSWave::TLambdaSWave() {
   fLambdaInvSq = new TGapSWave();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaDWave::TLambdaDWave() {
   fLambdaInvSq = new TGapDWave();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaAnSWave::TLambdaAnSWave() {
   fLambdaInvSq = new TGapAnSWave();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaNonMonDWave1::TLambdaNonMonDWave1() {
   fLambdaInvSq = new TGapNonMonDWave1();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaNonMonDWave2::TLambdaNonMonDWave2() {
   fLambdaInvSq = new TGapNonMonDWave2();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaInvSWave::TLambdaInvSWave() {
   fLambdaInvSq = new TGapSWave();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaInvDWave::TLambdaInvDWave() {
   fLambdaInvSq = new TGapDWave();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaInvAnSWave::TLambdaInvAnSWave() {
   fLambdaInvSq = new TGapAnSWave();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaInvNonMonDWave1::TLambdaInvNonMonDWave1() {
   fLambdaInvSq = new TGapNonMonDWave1();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaInvNonMonDWave2::TLambdaInvNonMonDWave2() {
   fLambdaInvSq = new TGapNonMonDWave2();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TGapSWave::~TGapSWave() {
   delete fGapIntegral;
   fGapIntegral = 0;
@@ -201,6 +271,10 @@ TGapSWave::~TGapSWave() {
   fPar.clear();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TGapDWave::~TGapDWave() {
   delete fGapIntegral;
   fGapIntegral = 0;
@@ -212,6 +286,10 @@ TGapDWave::~TGapDWave() {
   fPar.clear();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TGapCosSqDWave::~TGapCosSqDWave() {
   delete fGapIntegral;
   fGapIntegral = 0;
@@ -223,6 +301,10 @@ TGapCosSqDWave::~TGapCosSqDWave() {
   fPar.clear();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TGapSinSqDWave::~TGapSinSqDWave() {
   delete fGapIntegral;
   fGapIntegral = 0;
@@ -234,6 +316,10 @@ TGapSinSqDWave::~TGapSinSqDWave() {
   fPar.clear();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TGapAnSWave::~TGapAnSWave() {
   delete fGapIntegral;
   fGapIntegral = 0;
@@ -245,6 +331,10 @@ TGapAnSWave::~TGapAnSWave() {
   fPar.clear();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TGapNonMonDWave1::~TGapNonMonDWave1() {
   delete fGapIntegral;
   fGapIntegral = 0;
@@ -256,6 +346,10 @@ TGapNonMonDWave1::~TGapNonMonDWave1() {
   fPar.clear();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TGapNonMonDWave2::~TGapNonMonDWave2() {
   delete fGapIntegral;
   fGapIntegral = 0;
@@ -267,60 +361,110 @@ TGapNonMonDWave2::~TGapNonMonDWave2() {
   fPar.clear();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaSWave::~TLambdaSWave() {
   delete fLambdaInvSq;
   fLambdaInvSq = 0;
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaDWave::~TLambdaDWave() {
   delete fLambdaInvSq;
   fLambdaInvSq = 0;
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaAnSWave::~TLambdaAnSWave() {
   delete fLambdaInvSq;
   fLambdaInvSq = 0;
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaNonMonDWave1::~TLambdaNonMonDWave1() {
   delete fLambdaInvSq;
   fLambdaInvSq = 0;
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaNonMonDWave2::~TLambdaNonMonDWave2() {
   delete fLambdaInvSq;
   fLambdaInvSq = 0;
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaInvSWave::~TLambdaInvSWave() {
   delete fLambdaInvSq;
   fLambdaInvSq = 0;
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaInvDWave::~TLambdaInvDWave() {
   delete fLambdaInvSq;
   fLambdaInvSq = 0;
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaInvAnSWave::~TLambdaInvAnSWave() {
   delete fLambdaInvSq;
   fLambdaInvSq = 0;
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaInvNonMonDWave1::~TLambdaInvNonMonDWave1() {
   delete fLambdaInvSq;
   fLambdaInvSq = 0;
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaInvNonMonDWave2::~TLambdaInvNonMonDWave2() {
   delete fLambdaInvSq;
   fLambdaInvSq = 0;
 }
 
 
+//--------------------------------------------------------------------
+/**
+ * <p>prepare the needed parameters for the integration carried out in TGapIntegral.
+ * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (9).
+ */
 double TGapSWave::operator()(double t, const vector<double> &par) const {
 
-  assert(par.size() == 2); // two parameters: Tc, Delta(0)
+  assert((par.size() == 2) || (par.size() == 3)); // two or three parameters: Tc (K), Delta(0) (meV), [a (1)]
+                                                  // see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
+                                                  // and Erratum Supercond. Sci. Technol. 21 (2008) 082003
+  double aa = 1.0;
+  if (par.size() == 3)
+    aa = par[2];
 
   if (t<=0.0)
     return 1.0;
@@ -364,8 +508,8 @@ double TGapSWave::operator()(double t, const vector<double> &par) const {
     double ds;
 
     vector<double> intPar; // parameters for the integral, T & Delta(T)
-    intPar.push_back(2.0*0.08617384436*t); // 2 kB T, kB in meV/K
-    intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
+    intPar.push_back(0.172346648*t); // 2 kB T, kB in meV/K = 0.086173324 meV/K
+    intPar.push_back(par[1]*tanh(0.2707214816*par[0]/par[1]*sqrt(aa*(par[0]/t-1.0)))); // tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
 
     fGapIntegral->SetParameters(intPar);
     ds = 1.0-1.0/intPar[0]*fGapIntegral->IntegrateFunc(0.0, 2.0*(t+intPar[1]));
@@ -384,9 +528,19 @@ double TGapSWave::operator()(double t, const vector<double> &par) const {
 
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>prepare the needed parameters for the integration carried out in TDWaveGapIntegralCuhre.
+ * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (10).
+ */
 double TGapDWave::operator()(double t, const vector<double> &par) const {
 
-  assert(par.size() == 2); // two parameters: Tc, Delta(0)
+  assert((par.size() == 2) || (par.size() == 3)); // two or three parameters: Tc (K), Delta(0) (meV), [a (1)]
+                                                  // see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
+                                                  // and Erratum Supercond. Sci. Technol. 21 (2008) 082003
+  double aa = 4.0/3.0;
+  if (par.size() == 3)
+    aa = par[2];
 
   if (t<=0.0)
     return 1.0;
@@ -429,9 +583,8 @@ double TGapDWave::operator()(double t, const vector<double> &par) const {
 
     double ds;
     vector<double> intPar; // parameters for the integral, T & Delta(T)
-    intPar.push_back(2.0*0.08617384436*t); // 2 kB T, kB in meV/K
-    //intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
-    intPar.push_back(par[1]*tanh(TMath::Pi()*0.08617384436*par[0]/par[1]*sqrt(4.0/3.0*(par[0]/t-1.0))));
+    intPar.push_back(0.172346648*t); // 2 kB T, kB in meV/K = 0.086173324 meV/K
+    intPar.push_back(par[1]*tanh(0.2707214816*par[0]/par[1]*sqrt(aa*(par[0]/t-1.0)))); // tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
     intPar.push_back(4.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
     intPar.push_back(TMath::PiOver2()); // upper limit of phi-integration
 
@@ -456,9 +609,21 @@ double TGapDWave::operator()(double t, const vector<double> &par) const {
 
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>prepare the needed parameters for the integration carried out in TCosSqDWaveGapIntegralCuhre.
+ * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (??).
+ */
 double TGapCosSqDWave::operator()(double t, const vector<double> &par) const {
 
-  assert(par.size() == 3); // three parameters: Tc, DeltaD(0), DeltaS(0)
+  assert((par.size() == 3) || (par.size() == 5)); // three or five parameters: Tc (K), DeltaD(0) (meV), DeltaS(0) (meV), [aD (1), aS (1)]
+
+  double aD = 4.0/3.0;
+  double aS = 1.0;
+  if (par.size() == 5) {
+    aD = par[3];
+    aS = par[4];
+  }
 
   if (t<=0.0)
     return 1.0;
@@ -501,12 +666,11 @@ double TGapCosSqDWave::operator()(double t, const vector<double> &par) const {
 
     double ds;
     vector<double> intPar; // parameters for the integral, T & Delta(T)
-    intPar.push_back(2.0*0.08617384436*t); // 2 kB T, kB in meV/K
-//    intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
-    intPar.push_back(par[1]*tanh(TMath::Pi()*0.08617384436*par[0]/par[1]*sqrt(4.0/3.0*(par[0]/t-1.0)))); // DeltaD(T)
+    intPar.push_back(0.172346648*t); // 2 kB T, kB in meV/K = 0.086173324 meV/K
+    intPar.push_back(par[1]*tanh(0.2707214816*par[0]/par[1]*sqrt(aD*(par[0]/t-1.0)))); // DeltaD(T) : tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
     intPar.push_back(1.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
     intPar.push_back(TMath::Pi()); // upper limit of phi-integration
-    intPar.push_back(par[2]*tanh(TMath::Pi()*0.08617384436*par[0]/par[2]*sqrt((par[0]/t-1.0)))); // DeltaS(T)
+    intPar.push_back(par[2]*tanh(0.2707214816*par[0]/par[2]*sqrt(aS*(par[0]/t-1.0)))); // DeltaS(T) : tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
 
 //    double xl[] = {0.0, 0.0}; // lower bound E, phi
 //    double xu[] = {4.0*(t+intPar[1]), 0.5*PI}; // upper bound E, phi
@@ -529,9 +693,21 @@ double TGapCosSqDWave::operator()(double t, const vector<double> &par) const {
 
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>prepare the needed parameters for the integration carried out in TSinSqDWaveGapIntegralCuhre.
+ * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (??).
+ */
 double TGapSinSqDWave::operator()(double t, const vector<double> &par) const {
 
-  assert(par.size() == 3); // two parameters: Tc, Delta(0), s-weight
+  assert((par.size() == 3) || (par.size() == 5));  // three or five parameters: Tc (K), DeltaD(0) (meV), DeltaS(0) (meV), [aD (1), aS (1)]
+
+  double aD = 4.0/3.0;
+  double aS = 1.0;
+  if (par.size() == 5) {
+    aD = par[3];
+    aS = par[4];
+  }
 
   if (t<=0.0)
     return 1.0;
@@ -574,12 +750,11 @@ double TGapSinSqDWave::operator()(double t, const vector<double> &par) const {
 
     double ds;
     vector<double> intPar; // parameters for the integral, T & Delta(T)
-    intPar.push_back(2.0*0.08617384436*t); // 2 kB T, kB in meV/K
-//    intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
-    intPar.push_back(par[1]*tanh(TMath::Pi()*0.08617384436*par[0]/par[1]*sqrt(4.0/3.0*(par[0]/t-1.0))));
+    intPar.push_back(0.172346648*t); // 2 kB T, kB in meV/K = 0.086173324 meV/K
+    intPar.push_back(par[1]*tanh(0.2707214816*par[0]/par[1]*sqrt(aD*(par[0]/t-1.0)))); // DeltaD(T) : tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
     intPar.push_back(1.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
     intPar.push_back(TMath::Pi()); // upper limit of phi-integration
-    intPar.push_back(par[2]*tanh(TMath::Pi()*0.08617384436*par[0]/par[2]*sqrt((par[0]/t-1.0)))); // DeltaS(T)
+    intPar.push_back(par[2]*tanh(0.2707214816*par[0]/par[2]*sqrt(aS*(par[0]/t-1.0)))); // DeltaS(T) : tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
 
 //    double xl[] = {0.0, 0.0}; // lower bound E, phi
 //    double xu[] = {4.0*(t+intPar[1]), 0.5*PI}; // upper bound E, phi
@@ -602,9 +777,19 @@ double TGapSinSqDWave::operator()(double t, const vector<double> &par) const {
 
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>prepare the needed parameters for the integration carried out in TAnSWaveGapIntegralCuhre (anisotropic s-wave).
+ * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (13).
+ */
 double TGapAnSWave::operator()(double t, const vector<double> &par) const {
 
-  assert(par.size() == 3); // three parameters: Tc, Delta(0), a
+  assert((par.size() == 3) || (par.size() == 4)); // three or four parameters: Tc (K), Delta(0) (meV), a (1), [aS_Gap (1)]
+
+  double aS = 1.0;
+  if (par.size() == 4) {
+    aS = par[3];
+  }
 
   if (t<=0.0)
     return 1.0;
@@ -647,8 +832,8 @@ double TGapAnSWave::operator()(double t, const vector<double> &par) const {
 
     double ds;
     vector<double> intPar; // parameters for the integral, T & Delta(T)
-    intPar.push_back(2.0*0.08617384436*t); // 2 kB T, kB in meV/K
-    intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
+    intPar.push_back(0.172346648*t); // 2 kB T, kB in meV/K = 0.086173324 meV/K
+    intPar.push_back(par[1]*tanh(0.2707214816*par[0]/par[1]*sqrt(aS*(par[0]/t-1.0)))); // DeltaS(T) : tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
     intPar.push_back(par[2]);
     intPar.push_back(4.0*(t+(1.0+par[2])*intPar[1])); // upper limit of energy-integration: cutoff energy
     intPar.push_back(TMath::PiOver2()); // upper limit of phi-integration
@@ -674,9 +859,19 @@ double TGapAnSWave::operator()(double t, const vector<double> &par) const {
 
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>prepare the needed parameters for the integration carried out in TNonMonDWave1GapIntegralCuhre.
+ * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (11).
+ */
 double TGapNonMonDWave1::operator()(double t, const vector<double> &par) const {
 
-  assert(par.size() == 3); // two parameters: Tc, Delta(0), a
+  assert((par.size() == 3) || (par.size() == 4)); // three or four parameters: Tc (K), Delta(0) (meV), a (1), [aD_Gap (1)]
+
+  double aD = 4.0/3.0;
+  if (par.size() == 4) {
+    aD = par[3];
+  }
 
   if (t<=0.0)
     return 1.0;
@@ -719,8 +914,8 @@ double TGapNonMonDWave1::operator()(double t, const vector<double> &par) const {
 
     double ds;
     vector<double> intPar; // parameters for the integral: 2 k_B T, Delta(T), a, E_c, phi_c
-    intPar.push_back(2.0*0.08617384436*t); // 2 kB T, kB in meV/K
-    intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
+    intPar.push_back(0.172346648*t); // 2 kB T, kB in meV/K = 0.086173324 meV/K
+    intPar.push_back(par[1]*tanh(0.2707214816*par[0]/par[1]*sqrt(aD*(par[0]/t-1.0)))); // DeltaD(T) : tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
     intPar.push_back(par[2]);
     intPar.push_back(4.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
     intPar.push_back(TMath::PiOver2()); // upper limit of phi-integration
@@ -743,9 +938,19 @@ double TGapNonMonDWave1::operator()(double t, const vector<double> &par) const {
 
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>prepare the needed parameters for the integration carried out in TNonMonDWave2GapIntegralCuhre.
+ * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (11).
+ */
 double TGapNonMonDWave2::operator()(double t, const vector<double> &par) const {
 
-  assert(par.size() == 3); // two parameters: Tc, Delta(0), a
+  assert((par.size() == 3) || (par.size() == 4)); // three parameters: Tc (K), Delta(0) (meV), a (1), [aD_Gap (1)]
+
+  double aD = 4.0/3.0;
+  if (par.size() == 4) {
+    aD = par[3];
+  }
 
   if (t<=0.0)
     return 1.0;
@@ -788,8 +993,8 @@ double TGapNonMonDWave2::operator()(double t, const vector<double> &par) const {
 
     double ds;
     vector<double> intPar; // parameters for the integral: 2 k_B T, Delta(T), a, E_c, phi_c
-    intPar.push_back(2.0*0.08617384436*t); // 2 kB T, kB in meV/K
-    intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
+    intPar.push_back(0.172346648*t); // 2 kB T, kB in meV/K = 0.086173324 meV/K
+    intPar.push_back(par[1]*tanh(0.2707214816*par[0]/par[1]*sqrt(aD*(par[0]/t-1.0)))); // DeltaD(T) : tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
     intPar.push_back(par[2]);
     intPar.push_back(4.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
     intPar.push_back(TMath::PiOver2()); // upper limit of phi-integration
@@ -812,9 +1017,14 @@ double TGapNonMonDWave2::operator()(double t, const vector<double> &par) const {
 
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>Superfluid density in the ``two-fluid'' approximation.
+ * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (14).
+ */
 double TGapPowerLaw::operator()(double t, const vector<double> &par) const {
 
-  assert(par.size() == 2); // two parameters: Tc, N
+  assert(par.size() == 2); // two parameters: Tc, n
 
   if(t<=0.0)
     return 1.0;
@@ -826,22 +1036,35 @@ double TGapPowerLaw::operator()(double t, const vector<double> &par) const {
 }
 
 
+//--------------------------------------------------------------------
+/**
+ * <p>Superfluid density for a dirty s-wave superconductor.
+ * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (15).
+ */
 double TGapDirtySWave::operator()(double t, const vector<double> &par) const {
 
-  assert(par.size() == 2); // two parameters: Tc, Delta(0)
+  assert((par.size() == 2) || (par.size() == 3)); // two or three parameters: Tc (K), Delta(0) (meV), [a (1)]
+
+  double a = 1.0;
+  if (par.size() == 3) {
+    a = par[2];
+  }
 
   if (t<=0.0)
     return 1.0;
   else if (t >= par[0])
     return 0.0;
 
-  double deltaT(tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
+  double deltaT(tanh(0.2707214816*par[0]/par[1]*sqrt(a*(par[0]/t-1.0)))); // DeltaS(T) : tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
 
-  return deltaT*tanh(par[1]*deltaT/(2.0*0.08617384436*t)); // Delta(T)/Delta(0)*tanh(Delta(T)/2 kB T), kB in meV/K
-
+  return deltaT*tanh(par[1]*deltaT/(0.172346648*t)); // Delta(T)/Delta(0)*tanh(Delta(T)/2 kB T), kB in meV/K
 }
 
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 double TLambdaSWave::operator()(double t, const vector<double> &par) const
 {
   assert(par.size() == 2); // two parameters: Tc, Delta0
@@ -856,6 +1079,10 @@ double TLambdaSWave::operator()(double t, const vector<double> &par) const
 
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 double TLambdaDWave::operator()(double t, const vector<double> &par) const
 {
   assert(par.size() == 2); // two parameters: Tc, Delta0
@@ -870,6 +1097,10 @@ double TLambdaDWave::operator()(double t, const vector<double> &par) const
 
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 double TLambdaAnSWave::operator()(double t, const vector<double> &par) const
 {
   assert(par.size() == 3); // three parameters: Tc, Delta0, a
@@ -884,6 +1115,10 @@ double TLambdaAnSWave::operator()(double t, const vector<double> &par) const
 
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 double TLambdaNonMonDWave1::operator()(double t, const vector<double> &par) const
 {
   assert(par.size() == 3); // three parameters: Tc, Delta0, a
@@ -898,6 +1133,10 @@ double TLambdaNonMonDWave1::operator()(double t, const vector<double> &par) cons
 
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 double TLambdaNonMonDWave2::operator()(double t, const vector<double> &par) const
 {
   assert(par.size() == 3); // three parameters: Tc, Delta0, a
@@ -912,6 +1151,10 @@ double TLambdaNonMonDWave2::operator()(double t, const vector<double> &par) cons
 
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 double TLambdaPowerLaw::operator()(double t, const vector<double> &par) const {
 
   assert(par.size() == 2); // two parameters: Tc, N
@@ -926,6 +1169,10 @@ double TLambdaPowerLaw::operator()(double t, const vector<double> &par) const {
 }
 
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 double TLambdaInvSWave::operator()(double t, const vector<double> &par) const
 {
   assert(par.size() == 2); // two parameters: Tc, Delta0
@@ -940,6 +1187,10 @@ double TLambdaInvSWave::operator()(double t, const vector<double> &par) const
 
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 double TLambdaInvDWave::operator()(double t, const vector<double> &par) const
 {
   assert(par.size() == 2); // two parameters: Tc, Delta0
@@ -954,6 +1205,10 @@ double TLambdaInvDWave::operator()(double t, const vector<double> &par) const
 
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 double TLambdaInvAnSWave::operator()(double t, const vector<double> &par) const
 {
   assert(par.size() == 3); // three parameters: Tc, Delta0, a
@@ -968,6 +1223,10 @@ double TLambdaInvAnSWave::operator()(double t, const vector<double> &par) const
 
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 double TLambdaInvNonMonDWave1::operator()(double t, const vector<double> &par) const
 {
   assert(par.size() == 3); // three parameters: Tc, Delta0, a
@@ -982,6 +1241,10 @@ double TLambdaInvNonMonDWave1::operator()(double t, const vector<double> &par) c
 
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 double TLambdaInvNonMonDWave2::operator()(double t, const vector<double> &par) const
 {
   assert(par.size() == 3); // three parameters: Tc, Delta0, a
@@ -996,6 +1259,10 @@ double TLambdaInvNonMonDWave2::operator()(double t, const vector<double> &par) c
 
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 double TLambdaInvPowerLaw::operator()(double t, const vector<double> &par) const {
 
   assert(par.size() == 2); // two parameters: Tc, N
@@ -1009,12 +1276,20 @@ double TLambdaInvPowerLaw::operator()(double t, const vector<double> &par) const
 
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TFilmMagnetizationDWave::TFilmMagnetizationDWave()
 {
   fLambdaInvSq = new TGapDWave();
   fPar.clear();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TFilmMagnetizationDWave::~TFilmMagnetizationDWave()
 {
   delete fLambdaInvSq;
@@ -1022,6 +1297,10 @@ TFilmMagnetizationDWave::~TFilmMagnetizationDWave()
   fPar.clear();
 }
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 double TFilmMagnetizationDWave::operator()(double t, const vector<double> &par) const
 {
   assert(par.size() == 4); // four parameters: Tc, Delta0, lambda0, film-thickness
