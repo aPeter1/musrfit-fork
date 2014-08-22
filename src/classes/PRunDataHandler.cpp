@@ -1057,15 +1057,11 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
     }
     pstr->ToUpper();
     runInfo.SetBeamline(*pstr, idx);
-    TDatime datetime;
-    TString dt;
-    dt += datetime.GetYear();
     for (Int_t i=0; i<tokens->GetEntries(); i++) {
       ostr = dynamic_cast<TObjString*>(tokens->At(i));
       str = ostr->GetString() + TString("/DATA/") +
             *runInfo.GetInstitute(idx) + TString("/") +
             *runInfo.GetBeamline(idx) + TString("/") +
-            dt + TString("/") +
             *runInfo.GetRunName(idx);
       TestFileName(str, ext);
       if (!str.IsNull()) { // found
