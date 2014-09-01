@@ -2931,17 +2931,24 @@ Bool_t PRunDataHandler::ReadMudFile()
   if (success) {
     runData.SetStartDateTime((const time_t)tval);
     dt = localtime((const time_t*)&tval);
-    assert(dt);
 
-    // start date
-    strftime(str, sizeof(str), "%F", dt);
-    stime = str;
-    runData.SetStartDate(stime);
-    // start time
-    memset(str, 0, sizeof(str));
-    strftime(str, sizeof(str), "%T", dt);
-    stime = str;
-    runData.SetStartTime(stime);
+    if (dt) {
+      // start date
+      strftime(str, sizeof(str), "%F", dt);
+      stime = str;
+      runData.SetStartDate(stime);
+      // start time
+      memset(str, 0, sizeof(str));
+      strftime(str, sizeof(str), "%T", dt);
+      stime = str;
+      runData.SetStartTime(stime);
+    } else {
+      cerr << "PRunDataHandler::ReadMudFile: **WARNING** run start time readback wrong, will set it to 1900-01-01, 00:00:00" << endl;
+      stime = "1900-01-01";
+      runData.SetStartDate(stime);
+      stime = "00:00:00";
+      runData.SetStartTime(stime);
+    }
   }
 
   stime = TString("");
@@ -2949,17 +2956,24 @@ Bool_t PRunDataHandler::ReadMudFile()
   if (success) {
     runData.SetStopDateTime((const time_t)tval);
     dt = localtime((const time_t*)&tval);
-    assert(dt);
 
-    // stop date
-    strftime(str, sizeof(str), "%F", dt);
-    stime = str;
-    runData.SetStopDate(stime);
-    // stop time
-    memset(str, 0, sizeof(str));
-    strftime(str, sizeof(str), "%T", dt);
-    stime = str;
-    runData.SetStopTime(stime);
+    if (dt) {
+      // stop date
+      strftime(str, sizeof(str), "%F", dt);
+      stime = str;
+      runData.SetStopDate(stime);
+      // stop time
+      memset(str, 0, sizeof(str));
+      strftime(str, sizeof(str), "%T", dt);
+      stime = str;
+      runData.SetStopTime(stime);
+    } else {
+      cerr << "PRunDataHandler::ReadMudFile: **WARNING** run stop time readback wrong, will set it to 1900-01-01, 00:00:00" << endl;
+      stime = "1900-01-01";
+      runData.SetStopDate(stime);
+      stime = "00:00:00";
+      runData.SetStopTime(stime);
+    }
   }
 
   // get setup
