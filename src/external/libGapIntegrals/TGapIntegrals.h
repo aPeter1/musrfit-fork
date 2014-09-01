@@ -37,6 +37,10 @@ using namespace std;
 #include "PUserFcnBase.h"
 #include "BMWIntegrator.h"
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TGapSWave : public PUserFcnBase {
 
 public:
@@ -61,6 +65,10 @@ private:
   ClassDef(TGapSWave,1)
 };
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TGapDWave : public PUserFcnBase {
 
 public:
@@ -85,6 +93,10 @@ private:
   ClassDef(TGapDWave,1)
 };
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TGapCosSqDWave : public PUserFcnBase {
 
 public:
@@ -109,6 +121,10 @@ private:
   ClassDef(TGapCosSqDWave,1)
 };
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TGapSinSqDWave : public PUserFcnBase {
 
 public:
@@ -133,7 +149,10 @@ private:
   ClassDef(TGapSinSqDWave,1)
 };
 
-
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TGapAnSWave : public PUserFcnBase {
 
 public:
@@ -158,6 +177,10 @@ private:
   ClassDef(TGapAnSWave,1)
 };
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TGapNonMonDWave1 : public PUserFcnBase {
 
 public:
@@ -182,6 +205,10 @@ private:
   ClassDef(TGapNonMonDWave1,1)
 };
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TGapNonMonDWave2 : public PUserFcnBase {
 
 public:
@@ -207,6 +234,10 @@ private:
 };
 
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TGapPowerLaw : public PUserFcnBase {
 
 public:
@@ -224,6 +255,10 @@ private:
   ClassDef(TGapPowerLaw,1)
 };
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TGapDirtySWave : public PUserFcnBase {
 
 public:
@@ -242,6 +277,10 @@ private:
 };
 
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TLambdaSWave : public PUserFcnBase {
 
 public:
@@ -260,6 +299,10 @@ private:
   ClassDef(TLambdaSWave,1)
 };
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TLambdaDWave : public PUserFcnBase {
 
 public:
@@ -278,6 +321,10 @@ private:
   ClassDef(TLambdaDWave,1)
 };
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TLambdaAnSWave : public PUserFcnBase {
 
 public:
@@ -296,6 +343,10 @@ private:
   ClassDef(TLambdaAnSWave,1)
 };
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TLambdaNonMonDWave1 : public PUserFcnBase {
 
 public:
@@ -314,6 +365,10 @@ private:
   ClassDef(TLambdaNonMonDWave1,1)
 };
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TLambdaNonMonDWave2 : public PUserFcnBase {
 
 public:
@@ -332,7 +387,10 @@ private:
   ClassDef(TLambdaNonMonDWave2,1)
 };
 
-
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TLambdaPowerLaw : public PUserFcnBase {
 
 public:
@@ -350,6 +408,10 @@ private:
   ClassDef(TLambdaPowerLaw,1)
 };
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TLambdaInvSWave : public PUserFcnBase {
 
 public:
@@ -368,6 +430,10 @@ private:
   ClassDef(TLambdaInvSWave,1)
 };
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TLambdaInvDWave : public PUserFcnBase {
 
 public:
@@ -386,6 +452,10 @@ private:
   ClassDef(TLambdaInvDWave,1)
 };
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TLambdaInvAnSWave : public PUserFcnBase {
 
 public:
@@ -404,6 +474,10 @@ private:
   ClassDef(TLambdaInvAnSWave,1)
 };
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TLambdaInvNonMonDWave1 : public PUserFcnBase {
 
 public:
@@ -422,6 +496,10 @@ private:
   ClassDef(TLambdaInvNonMonDWave1,1)
 };
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TLambdaInvNonMonDWave2 : public PUserFcnBase {
 
 public:
@@ -440,7 +518,10 @@ private:
   ClassDef(TLambdaInvNonMonDWave2,1)
 };
 
-
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TLambdaInvPowerLaw : public PUserFcnBase {
 
 public:
@@ -458,6 +539,10 @@ private:
   ClassDef(TLambdaInvPowerLaw,1)
 };
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TFilmMagnetizationDWave : public PUserFcnBase {
 
 public:

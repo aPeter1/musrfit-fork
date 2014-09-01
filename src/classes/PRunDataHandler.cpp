@@ -1057,15 +1057,11 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
     }
     pstr->ToUpper();
     runInfo.SetBeamline(*pstr, idx);
-    TDatime datetime;
-    TString dt;
-    dt += datetime.GetYear();
     for (Int_t i=0; i<tokens->GetEntries(); i++) {
       ostr = dynamic_cast<TObjString*>(tokens->At(i));
       str = ostr->GetString() + TString("/DATA/") +
             *runInfo.GetInstitute(idx) + TString("/") +
             *runInfo.GetBeamline(idx) + TString("/") +
-            dt + TString("/") +
             *runInfo.GetRunName(idx);
       TestFileName(str, ext);
       if (!str.IsNull()) { // found
@@ -5167,7 +5163,15 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
   vector<string> svec;
   TString str, date;
   TDatime dt;
-  dt.Set(fData[0].GetStartDateTime());
+  int     year, month, day;
+  
+  // 28-Aug-2014, TP: the following line does not work, it generates the wrong date
+  //dt.Set(fData[0].GetStartDateTime());
+  // the following generates the correct date entry
+  date.Append(*fData[0].GetStartDate());
+  sscanf((const char*)date.Data(),"%04d-%02d-%02d", &year, &month, &day);
+  dt.Set(year, month, day, 0, 0, 0);
+  
   date.Form("%02d-", dt.GetDay());
   date.Append(GetMonth(dt.GetMonth()));
   date.Append("-");
@@ -5183,7 +5187,14 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
   svec.clear();
 
   // run stop date
-  dt.Set(fData[0].GetStopDateTime());
+  // 28-Aug-2014, TP: the following line does not work, it generates the wrong date
+  //dt.Set(fData[0].GetStopDateTime());
+  // the following generates the correct date entry
+  date.Clear();
+  date.Append(*fData[0].GetStopDate());
+  sscanf((const char*)date.Data(),"%04d-%02d-%02d", &year, &month, &day);
+  dt.Set(year, month, day, 0, 0, 0);
+  
   date.Form("%02d-", dt.GetDay());
   date.Append(GetMonth(dt.GetMonth()));
   date.Append("-");

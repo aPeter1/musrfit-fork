@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en_US" lang="en_US">
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Fri, 09 May 2014 12:05:02 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Fri, 22 Aug 2014 15:08:31 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 <head>
 <link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
@@ -8,7 +8,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
 <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
-<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1399637055" type="application/x-wiki" title="edit MusrFit" />
+<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1408720073" type="application/x-wiki" title="edit MusrFit" />
 <meta name="TEXT_NUM_TOPICS" content="Number of topics:" />
 <meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
 <meta name="robots" content="noindex" /><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="WebRsshtml.html" />
@@ -105,7 +105,7 @@ pre {
 <div id="patternWrapper"><div id="patternOuter">
 <div id="patternFloatWrap">
 <div id="patternMain"><div id="patternClearHeaderCenter"></div>
-<div id="patternMainContents"><div class="patternTop"><span class="patternHomePath foswikiLeft"><a href="WebHome.html" class="foswikiCurrentWebHomeLink">MUSR</a><span class='natSep'>&nbsp;&#187; </span><a href="MusrFit.html" class="foswikiCurrentTopicLink">MusrFit</a></span><span class="patternToolBar foswikiRight"><span><a href='MusrFitc99a.html?cover=print;cover=print' rel='nofollow' title='Printable version of this topic' accesskey='p'><span class='foswikiAccessKey'>P</span>rint version</a></span><a href="https://intranet.psi.ch/MUSR/MusrFit?restrictions=on" id="restriction_link"><img src='../pub/System/PsiSkin/lock_open.png' class='lock' height='16' width='23' title='open in PSI - click for more information'/></a></span><div class="foswikiClear"></div></div><div class="foswikiContentHeader">
+<div id="patternMainContents"><div class="patternTop"><span class="patternHomePath foswikiLeft"></span><span class="patternToolBar foswikiRight"><span><a href='MusrFitc99a.html?cover=print;cover=print' rel='nofollow' title='Printable version of this topic' accesskey='p'><span class='foswikiAccessKey'>P</span>rint version</a></span><a href="https://intranet.psi.ch/MUSR/MusrFit?restrictions=on" id="restriction_link"><img src='../pub/System/PsiSkin/lock_open.png' class='lock' height='16' width='23' title='open in PSI - click for more information'/></a></span><div class="foswikiClear"></div></div><div class="foswikiContentHeader">
 <p></p>
 <p></p>
       	
@@ -787,20 +787,20 @@ The RUN block is used to collect the data needed for a particular run to be fitt
 The tokens following the RUN statement are used to identify the run, the potential location where the run might be found, and the file format in which the run data has been saved. In order to understand the meaning of all the above tokens, a short digression is needed.
 <p></p>
 <a name="PathToDataFiles"></a>
-Where is <code>musrfit</code> looking for data files? There is a specific order how this is done: <ul>
+Where is <code>musrfit</code> looking for data files? There is a specific order how this is done: <ol>
 <li> Check if the file is found in the current directory
 </li> <li> Check if the path (or multiple paths) was (were) given in the <a href="#MusrfitStartupXml" class="foswikiCurrentTopicLink">XML startup file</a>.
 </li> <li> Check if there is a system variable MUSRFULLDATAPATH. This system variable can contain multiple search paths separated by colons, e.g. <pre>
 export MUSRFULLDATAPATH&#61;/mnt/data/nemu/wkm/:/mnt/data/nemu/his/:/afs/psi.ch/user/s/smith/
 </pre>
 </li> <li> Construct the search path from the RUN-block information in the following way: Based on the RUN line in the RUN block, default paths will be generated, e.g. for <pre>
-RUN lem07&#95;his&#95;2018 MUE4 PSI ROOT-NPP
+RUN 2007/lem07&#95;his&#95;2018 MUE4 PSI ROOT-NPP
 </pre> the generated search path will look like <pre>
-musrFullDataPathToken/DATA/Facility/Beamline/Year/runName.ext
+musrFullDataPathToken/DATA/Facility/Beamline/runName.ext
 </pre> where <strong>musrFullDataPathToken</strong> is extracted from the MUSRFULLDATAPATH token by token, for the above example this might lead to the path <pre>
 /afs/psi.ch/user/s/smith/DATA/PSI/MUE4/2007/lem07&#95;his&#95;2018.root
 </pre>
-</li></ul> 
+</li></ol> 
 <p></p>
 Here are some valid examples for the first line of a RUN block:<pre>
 RUN 2007/lem07&#95;his&#95;2018 MUE4 PSI ROOT-NPP
@@ -1453,7 +1453,7 @@ For reporting bugs or requesting new features and improvements please use the <a
 <!-- -->
 <!-- --><!-- -->
 <!-- -->
-<!-- TAB --><div id='jqTab9158' class="attachments jqAjaxTab jqTab {url: 'https://intranet.psi.ch/wiki/bin/rest/RenderPlugin/template?name=metadata;expand=attachments;topic=MUSR.MusrFit;render=on;1399637055'}">
+<!-- TAB --><div id='jqTab2564' class="attachments jqAjaxTab jqTab {url: 'https://intranet.psi.ch/wiki/bin/rest/RenderPlugin/template?name=metadata;expand=attachments;topic=MUSR.MusrFit;render=on;1408720073'}">
 <h2 class='jqTabLabel'>Attachments <span class='foswikiAttachmentsCount'>(2)</span></h2>
 <div class='jqTabContents' >
   <div class='foswikiFormSteps foswikiAttachmentsProcess'><span class='jqAjaxLoader'>&nbsp;</span></div>
@@ -1475,9 +1475,9 @@ For reporting bugs or requesting new features and improvements please use the <a
 <div class="foswikiFormSteps">
 <a name="topic-actions"></a>
   <div class="patternTopicActions foswikiFormStep">
-	 <span class="patternActionButtons"><span><a href='https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1399637055' rel='nofollow' title='Edit this topic text' accesskey='e'><span class='foswikiAccessKey'>E</span>dit</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/attach/MUSR/MusrFit' rel='nofollow' title='Attach an image or document to this topic' accesskey='a'><span class='foswikiAccessKey'>A</span>ttach</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='MusrFitc99a.html?cover=print;cover=print' rel='nofollow' title='Printable version of this topic' accesskey='p'><span class='foswikiAccessKey'>P</span>rint version</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/print/pdf.php?url=MUSR/MusrFit?cover=print' title='PDF version of this topic'>PDF</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/oops/MUSR/MusrFit?template=oopshistory' rel='nofollow' title='View total topic history' accesskey='h'><span class='foswikiAccessKey'>H</span>istory</a></span>: r113&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=112;rev2=113">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=112">r112</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=111;rev2=112">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=111">r111</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=110;rev2=111">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=110">r110</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=backlinksweb' rel='nofollow' title='Search the MUSR Web for topics that link to here' accesskey='b'><span class='foswikiAccessKey'>B</span>acklinks</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?raw=on' rel='nofollow' title='View without formatting' accesskey='v'><span class='foswikiAccessKey'>V</span>iew wiki text</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?refresh=on' title='Refresh images and LaTeX charts'>Refresh</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=more&amp;maxrev=113&amp;currrev=113' rel='nofollow' title='Delete or rename this topic; set parent topic; view and compare revisions' accesskey='m'><span class='foswikiAccessKey'>M</span>ore topic actions</a></span></span>
+	 <span class="patternActionButtons"><span><a href='https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1408720073' rel='nofollow' title='Edit this topic text' accesskey='e'><span class='foswikiAccessKey'>E</span>dit</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/attach/MUSR/MusrFit' rel='nofollow' title='Attach an image or document to this topic' accesskey='a'><span class='foswikiAccessKey'>A</span>ttach</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='MusrFitc99a.html?cover=print;cover=print' rel='nofollow' title='Printable version of this topic' accesskey='p'><span class='foswikiAccessKey'>P</span>rint version</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/print/php/pdf.php?url=MUSR/MusrFit?cover=print' title='PDF version of this topic'>PDF</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/oops/MUSR/MusrFit?template=oopshistory' rel='nofollow' title='View total topic history' accesskey='h'><span class='foswikiAccessKey'>H</span>istory</a></span>: r114&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=113;rev2=114">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=113">r113</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=112;rev2=113">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=112">r112</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=111;rev2=112">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=111">r111</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=backlinksweb' rel='nofollow' title='Search the MUSR Web for topics that link to here' accesskey='b'><span class='foswikiAccessKey'>B</span>acklinks</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?raw=on' rel='nofollow' title='View without formatting' accesskey='v'><span class='foswikiAccessKey'>V</span>iew wiki text</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?refresh=on' title='Refresh images and LaTeX charts'>Refresh</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=more&amp;maxrev=114&amp;currrev=114' rel='nofollow' title='Delete or rename this topic; set parent topic; view and compare revisions' accesskey='m'><span class='foswikiAccessKey'>M</span>ore topic actions</a></span></span>
   </div>
-</div></div><div class="patternInfo"><span class="patternRevInfo">Topic revision: r113 - 16 Dec 2013, <a href="https://intranet.psi.ch/Main/AndreasSuter">AndreasSuter</a></span></div>
+</div></div><div class="patternInfo"><span class="patternRevInfo">Topic revision: r114 - 22 Aug 2014, <a href="https://intranet.psi.ch/Main/AndreasSuter">AndreasSuter</a></span></div>
 </div>
 </div><div id="patternSideBar"><div id="patternClearHeaderLeft"></div>
 <div id="patternSideBarContents">
@@ -1526,7 +1526,7 @@ For reporting bugs or requesting new features and improvements please use the <a
 </div>
 </div>
 </div></body>
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Fri, 09 May 2014 12:05:23 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Fri, 22 Aug 2014 15:08:52 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 </html>
 <p></p>

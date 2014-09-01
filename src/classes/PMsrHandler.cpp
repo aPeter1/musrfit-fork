@@ -579,7 +579,8 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         sstr.Remove(TString::kLeading, ' ');
         if (str.BeginsWith("fun")) {
           if (FilterNumber(sstr, "fun", 0, number)) {
-            sstr = fFuncHandler->GetFuncString(number-1);
+            idx = GetFuncIndex(number); // get index of the function number
+            sstr = fFuncHandler->GetFuncString(idx);
             sstr.ToLower();
             fout << sstr.Data() << endl;
           }
@@ -1228,6 +1229,8 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         fout << str.Data() << endl;
         if (messages)
           cout << endl << str.Data() << endl;
+
+        // check if per run block maxLH needs to be written
       }
     }  else {
       fout << "*** FIT DID NOT CONVERGE ***" << endl;
