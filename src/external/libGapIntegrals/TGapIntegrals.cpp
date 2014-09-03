@@ -1039,23 +1039,20 @@ double TGapPowerLaw::operator()(double t, const vector<double> &par) const {
 //--------------------------------------------------------------------
 /**
  * <p>Superfluid density for a dirty s-wave superconductor.
- * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (15).
+ * For details see also the Memo GapIntegrals.pdf, especially Eq.(8) and (15).
+ * Here we use INTENTIONALLY the temperature dependence of the gap according
+ * to A. Carrington and F. Manzano, Physica C 385 (2003) 205
  */
 double TGapDirtySWave::operator()(double t, const vector<double> &par) const {
 
-  assert((par.size() == 2) || (par.size() == 3)); // two or three parameters: Tc (K), Delta(0) (meV), [a (1)]
-
-  double a = 1.0;
-  if (par.size() == 3) {
-    a = par[2];
-  }
+  assert(par.size() == 2); // two parameters: Tc (K), Delta(0) (meV)
 
   if (t<=0.0)
     return 1.0;
   else if (t >= par[0])
     return 0.0;
 
-  double deltaT(tanh(0.2707214816*par[0]/par[1]*sqrt(a*(par[0]/t-1.0)))); // DeltaS(T) : tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
+  double deltaT(tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
 
   return deltaT*tanh(par[1]*deltaT/(0.172346648*t)); // Delta(T)/Delta(0)*tanh(Delta(T)/2 kB T), kB in meV/K
 }
