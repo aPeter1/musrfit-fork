@@ -215,7 +215,7 @@ vector<string> dump_header_instrument_info(string fileName)
   string fln(fileName);
   boost::to_lower(fln);
 
-  if (fln.find(".bin") != string::npos) { // PSI-BIN or PSI-MDU format
+  if ((fln.find(".bin") != string::npos) || (fln.find(".mdu") != string::npos)) { // PSI-BIN or PSI-MDU format
     if (fln.find("_gps_") != string::npos) {
       result.push_back("GPS");
       result.push_back("piM3.2");
@@ -241,7 +241,7 @@ vector<string> dump_header_instrument_info(string fileName)
       result.push_back("likely to be positive muons");
       result.push_back("Target E");
     } else if (fln.find("_hifi_") != string::npos) {
-      result.push_back("HIFI");
+      result.push_back("HAL9500");
       result.push_back("piE3");
       result.push_back("28 MeV/c");
       result.push_back("likely to be positive muons");
