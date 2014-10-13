@@ -1,19 +1,25 @@
-#---------------------------------------------------------------------
-# README
-# BMW, 2011/01/27
-# AS,  2014/02/12
-#---------------------------------------------------------------------
-
 musrfit - muSR data analysis package
 
-Installation instructions can be found in INSTALL and at
-https://intranet.psi.ch/MUSR/MusrFitSetup
-http://lmu.web.psi.ch/facilities/software/musrfit/user/intranet.psi.ch/MUSR/MusrFitSetup.html
+This is a data analysis package to analyze time differential muSR data. 
+Currently it allows the following things:
 
-For further documentation, please visit
-https://intranet.psi.ch/MUSR/MusrFit
-http://lmu.web.psi.ch/facilities/software/musrfit/user/intranet.psi.ch/MUSR/MusrFit.html
+* setting up most commonly used fitting functions for muSR
+* fitting data, including global fits
+* showing the fit results and the residuals
+* showing the Fourier transform of the data
+* extracting easily the fitting parameters to be used in other programs (gnuplot, qtiplot/origin, ...)
+* allows to generate fitting input files for follow-up runs
+* allows to generate global fitting input files based on a single run template
+* allows to implement more sophisticated user functions 
+  (e.g. GL vortex lattice, Meissner screening including low-energy muon stopping profiles)
 
-#---------------------------------------------------------------------
-# this is the end ...
-#---------------------------------------------------------------------
+Currently supported platforms:
+
+* Linux
+* Mac OS X
+* Windows - not really, only for the very brave ones
+
+For a more exhaustive user documentation see:
+
+  http://lmu.web.psi.ch/musrfit/user/MUSR/WebHome.html
+
