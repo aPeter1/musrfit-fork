@@ -182,7 +182,7 @@ double TSinSqDWaveGapIntegralCuhre::IntegrateFunc()
 int TSinSqDWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
                       const int *ncomp, double f[], void *userdata) // x = {E, phi}, fPar = {twokBT, DeltaD(T), Ec, phic, DeltaS(T)}
 {
-  double deltasq(TMath::Power(fPar[1]*TMath::Cos(2.0*x[1]*fPar[3]) + fPar[4],2.0));
+  double deltasq(TMath::Power(fPar[1]*TMath::Cos(2.0*x[1]*fPar[3]) + fPar[4], 2.0));
   f[0] = TMath::Power(TMath::Sin(x[1]*fPar[3]),2.0)/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[2]*fPar[2]+deltasq)/fPar[0]),2.0);
   return 0;
 }

@@ -5,8 +5,6 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id$
-
 ***************************************************************************/
 
 /***************************************************************************
@@ -51,8 +49,7 @@ void analyticFakeData(const TString type, UInt_t runNo)
 
   fileName.Form("0%d.root", (Int_t)runNo);
 
-//  Double_t t0[8] = {3419.0, 3520.0, 3520.0, 3421.0, 3517.0, 3418.0, 3522.0, 3623.0}; // runNo: 1000 & 2000
-  Double_t t0[8] = {3519.0, 3420.0, 3520.0, 3621.0, 3417.0, 3518.0, 3422.0, 3423.0}; // runNo: 1001 & 2001
+  Double_t t0[16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
   if (!type.CompareTo("TLemRunHeader")) {
     // feed run info header
@@ -70,7 +67,7 @@ void analyticFakeData(const TString type, UInt_t runNo)
     header->SetImpEnergy(31.8);
     header->SetSampleTemperature(0.2, 0.001);
     header->SetSampleBField(-1.0, 0.1);
-    header->SetTimeResolution(0.1953125);
+    header->SetTimeResolution(0.025);
     header->SetNChannels(66601);
     header->SetNHist(8);
     header->SetCuts("none");
@@ -86,15 +83,15 @@ void analyticFakeData(const TString type, UInt_t runNo)
     // 1st write all the required RunInfo entries
 
     header->Set("RunInfo/Generic Validator URL", "http://lmu.web.psi.ch/facilities/software/MusrRoot/validation/MusrRoot.xsd");
-    header->Set("RunInfo/Specific Validator URL", "http://lmu.web.psi.ch/facilities/software/MusrRoot/validation/MusrRootLEM.xsd");
+    header->Set("RunInfo/Specific Validator URL", "http://lmu.web.psi.ch/facilities/software/MusrRoot/validation/MusrRootHAL9500.xsd");
     header->Set("RunInfo/Generator", "analyticFakeData");
     header->Set("RunInfo/File Name", fileName);
     tstr.Form("0%d - test", runNo);
     header->Set("RunInfo/Run Title", tstr);
     header->Set("RunInfo/Run Number", (Int_t)runNo);
     header->Set("RunInfo/Start Time", "1970-01-01 00:00:00");
-    header->Set("RunInfo/Stop Time", "1970-01-01 00:00:00");
-    prop.Set("Run Duration", 0, "sec");
+    header->Set("RunInfo/Stop Time", "1970-01-01 00:00:02");
+    prop.Set("Run Duration", 2, "sec");
     header->Set("RunInfo/Run Duration", prop);
     header->Set("RunInfo/Laboratory", "PSI");
     header->Set("RunInfo/Instrument", "virtual");
@@ -107,20 +104,20 @@ void analyticFakeData(const TString type, UInt_t runNo)
     header->Set("RunInfo/Sample Name", "virtual");
     prop.Set("Sample Temperature", 1.0, "mK");
     header->Set("RunInfo/Sample Temperature", prop);
-    prop.Set("Sample Magnetic Field", 0.0, "G");
+    prop.Set("Sample Magnetic Field", 40.0, "T");
     header->Set("RunInfo/Sample Magnetic Field", prop);
     prop.Set("Sample Temperature", 1.0, "mK");
     header->Set("RunInfo/No of Histos", 8);
-    prop.Set("Time Resolution", 0.1953125, "ns");
+    prop.Set("Time Resolution", 0.025, "ns");
     header->Set("RunInfo/Time Resolution", prop);
     vector<Int_t> ivec;
     ivec.push_back(0);
-    ivec.push_back(20);
+//    ivec.push_back(20);
     header->Set("RunInfo/RedGreen Offsets", ivec);
 
     offset = 1;
     // 2nd write all the required DetectorInfo entries
-    for (UInt_t i=0; i<8; i++) {
+    for (UInt_t i=0; i<16; i++) {
       tstr.Form("DetectorInfo/Detector%03d/", i+offset);
       label = tstr + TString("Name");
       tstr1.Form("Detector%03d", (Int_t)(i+offset));
@@ -128,14 +125,15 @@ void analyticFakeData(const TString type, UInt_t runNo)
       label = tstr + TString("Histo No");
       header->Set(label, (Int_t)(i+offset));
       label = tstr + TString("Histo Length");
-      header->Set(label, 66601);
+      header->Set(label, 426600);
       label = tstr + TString("Time Zero Bin");
       header->Set(label, t0[i]);
       label = tstr + TString("First Good Bin");
       header->Set(label, (Int_t)t0[i]);
       label = tstr + TString("Last Good Bin");
-      header->Set(label, 66600);
+      header->Set(label, 426600);
     }
+/*
     for (UInt_t i=0; i<8; i++) {
       tstr.Form("DetectorInfo/Detector%03d/", 20+i+offset);
       label = tstr + TString("Name");
@@ -152,7 +150,7 @@ void analyticFakeData(const TString type, UInt_t runNo)
       label = tstr + TString("Last Good Bin");
       header->Set(label, 66600);
     }
-
+*/
     // 3rd write required SampleEnvironmentInfo entries
     header->Set("SampleEnvironmentInfo/Cryo", "virtual");
 
@@ -160,45 +158,45 @@ void analyticFakeData(const TString type, UInt_t runNo)
     header->Set("MagneticFieldEnvironmentInfo/Magnet Name", "virtual");
 
     // 5th write required BeamlineInfo entries
-    header->Set("BeamlineInfo/Name", "muE4");
+    header->Set("BeamlineInfo/Name", "piE3");
   }
 
   // create histos
-  Double_t n0[8] = {13200.0, 13200.0, 13200.0, 13200.0, 13200.0, 13200.0, 13200.0, 13200.0};
-  Double_t bkg[8] = {264.0, 264.0, 264.0, 264.0, 264.0, 264.0, 264.0, 264.0};
+  Double_t n0[16] = {25.0, 24.8, 25.1, 25.0, 24.8, 24.9, 25.3, 25.0, 25.0, 24.8, 25.1, 25.0, 24.8, 24.9, 25.3, 25.0};
+  Double_t bkg[16] = {0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05};
   const Double_t tau = 2197.019; // ns
 
   // asymmetry related stuff
-  const Double_t timeResolution = 0.1953125; // ns
-//  Double_t a0[8] = {0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12};
-  Double_t a0[8] = {0.21, 0.22, 0.22, 0.24, 0.22, 0.21, 0.22, 0.23};
-//  Double_t a1[8] = {0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05};
-  Double_t a1[8] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-  Double_t phase[8] = {5.0*TMath::Pi()/180.0, 50.0*TMath::Pi()/180.0, 95.0*TMath::Pi()/180.0, 140.0*TMath::Pi()/180.0,
-                       185.0*TMath::Pi()/180.0, 230.0*TMath::Pi()/180.0, 275.0*TMath::Pi()/180.0, 320.0*TMath::Pi()/180.0,};
+  const Double_t timeResolution = 0.025; // ns
+  Double_t a0[16] = {0.25, 0.26, 0.25, 0.26, 0.25, 0.26, 0.25, 0.26, 0.25, 0.26, 0.25, 0.26, 0.25, 0.26, 0.25, 0.26};
+//  Double_t a1[8] = {0.06, 0.07, 0.06, 0.07, 0.06, 0.07, 0.06, 0.07};
+  Double_t phase[16] = {5.0*TMath::Pi()/180.0, 27.5*TMath::Pi()/180.0, 50.0*TMath::Pi()/180.0, 72.5*TMath::Pi()/180.0,
+                       95.0*TMath::Pi()/180.0, 117.5*TMath::Pi()/180.0, 140.0*TMath::Pi()/180.0, 162.5*TMath::Pi()/180.0,
+                       185.0*TMath::Pi()/180, 207.5*TMath::Pi()/180.0, 230.0*TMath::Pi()/180.0, 252.5*TMath::Pi()/180.0,
+                       275*TMath::Pi()/180.0, 297.5*TMath::Pi()/180.0, 320.0*TMath::Pi()/180.0, 342.5*TMath::Pi()/180.0};
   const Double_t gamma = 0.0000135538817; // gamma/(2pi)
-  Double_t bb0 = 200.0; // field in Gauss
-  Double_t bb1 = 400.0; // field in Gauss
-  Double_t rate0 = 0.10/1000.0; // in 1/ns
-  Double_t rate1 = 0.15/1000.0; // in 1/ns
+  Double_t bb0 = 40000.0; // field in Gauss
+//  Double_t bb1 = 40015.0; // field in Gauss
+  Double_t rate0 = 0.25/1000.0; // in 1/ns
+//  Double_t rate1 = 0.15/1000.0; // in 1/ns
 
   // fake function parameters header info: only for test purposes
   if (type.CompareTo("TLemRunHeader")) {
     TDoubleVector dvec;
-    header->Set("FakeFct/Def", "N0 exp(-t/tau_mu) [1 + A exp(-t lambda) cos(gamma_mu B t + phi)] + bkg");
-    for (UInt_t i=0; i<8; i++)
+    header->Set("FakeFct/Def", "N0 exp(-t/tau_mu) [1 + A exp(-1/2 (t sigma)^2) cos(gamma_mu B t + phi)] + bkg");
+    for (UInt_t i=0; i<16; i++)
       dvec.push_back(n0[i]);
     header->Set("FakeFct/N0", dvec);
     dvec.clear();
-    for (UInt_t i=0; i<8; i++)
+    for (UInt_t i=0; i<16; i++)
       dvec.push_back(bkg[i]);
     header->Set("FakeFct/bkg", dvec);
     dvec.clear();
-    for (UInt_t i=0; i<8; i++)
+    for (UInt_t i=0; i<16; i++)
       dvec.push_back(a0[i]);
     header->Set("FakeFct/A", dvec);
     dvec.clear();
-    for (UInt_t i=0; i<8; i++)
+    for (UInt_t i=0; i<16; i++)
       dvec.push_back(phase[i]);
     header->Set("FakeFct/phase", dvec);
     prop.Set("B", bb0, "G");
@@ -209,38 +207,45 @@ void analyticFakeData(const TString type, UInt_t runNo)
 
   TH1F *histo[16];
   char str[128];
-  for (UInt_t i=0; i<8; i++) {
+  for (UInt_t i=0; i<16; i++) {
     if (!type.CompareTo("TLemRunHeader"))
       sprintf(str, "hDecay%02d", (Int_t)(i+offset));
     else
       sprintf(str, "hDecay%03d", (Int_t)(i+offset));
-    histo[i] = new TH1F(str, str, 66601, -0.5, 66600.5);
+    histo[i] = new TH1F(str, str, 426601, -0.5, 426600.5);
+/*
     if (!type.CompareTo("TLemRunHeader"))
       sprintf(str, "hDecay%02d", (Int_t)(20+i+offset));
     else
       sprintf(str, "hDecay%03d", (Int_t)(20+i+offset));
-    histo[i+8] = new TH1F(str, str, 66601, -0.5, 66600.5);
+    histo[i+8] = new TH1F(str, str, 426601, -0.5, 426600.5);
+*/
   }
   Double_t time;
   Double_t dval, dval1;
-  for (UInt_t i=0; i<8; i++) {
-    for (UInt_t j=0; j<66600; j++) {
+  for (UInt_t i=0; i<16; i++) {
+    for (UInt_t j=0; j<426600; j++) {
       if (j<t0[i]) {
         histo[i]->SetBinContent(j+1, bkg[i]);
       } else {
         time = (Double_t)(j-t0[i])*timeResolution;
-        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a0[i]*TMath::Exp(-time*rate0)*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i]))+(Double_t)bkg[i];
+/*
+        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a0[i]*TMath::Exp(-time*rate0)*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i])+
+                                                          a1[i]*TMath::Exp(-time*rate1)*TMath::Cos(TMath::TwoPi()*gamma*bb1*time+phase[i]))+(Double_t)bkg[i];
+*/
+        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a0[i]*TMath::Exp(-0.5*TMath::Power(time*rate0,2))*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i]))+(Double_t)bkg[i];
         histo[i]->SetBinContent(j+1, dval);
       }
     }
   }
 
+/*
   // add a promp peak
   Double_t ampl = 0.0;
   Double_t promptLambda = 500.0/1000.0; // Lorentzain in 1/ns
   if (ampl != 0.0) {
     for (UInt_t i=0; i<8; i++) {
-      for (UInt_t j=1; j<66601; j++) {
+      for (UInt_t j=1; j<426601; j++) {
         dval = histo[i]->GetBinContent(j);
         dval1 = dval*0.9; // simulate a PPC
         time = (Double_t)(j-t0[i])*timeResolution;
@@ -251,6 +256,7 @@ void analyticFakeData(const TString type, UInt_t runNo)
       }
     }
   }
+*/
 
   // add Poisson noise
   PAddPoissonNoise *addNoise = new PAddPoissonNoise();

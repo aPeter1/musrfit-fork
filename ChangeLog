@@ -60,6 +60,7 @@ FIXED 2012-09-23 fixed wrong chisq output in musrview if expected chisq is
                  present.
 FIXED 2012-05-30 fixed RRF  bug in single histo plotting.
 FIXED 2012-05-18 fixed wrong forward/backward tag for ROOT-PPC (MUSR-215) 
+CHANGED 2014-10-25 updated docu, since git is now available for ALL users
 CHANGED 2014-02-12 since we moved to git, I cleaned up the svn prop's from
                    the sources.
 CHANGED 2013-12-20 upgrade of cuba to version 3.2. Merge in from BMW 

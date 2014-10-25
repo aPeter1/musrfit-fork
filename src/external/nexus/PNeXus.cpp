@@ -3304,7 +3304,7 @@ int PNeXus::ReadFileIdf2()
 {
   cout << endl << ">> reading NeXus IDF Version 2 file ..." << endl;
 
-  // create first the necessary NXentry object for IDF Version 1
+  // create first the necessary NXentry object for IDF Version 2
   fNxEntry2 = new PNeXusEntry2();
   if (fNxEntry2 == 0) {
     fErrorCode = PNEXUS_OBJECT_INVOK_ERROR;
