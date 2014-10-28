@@ -61,9 +61,9 @@
 \vskip 1cm
 %
 \begin{tabular}{@{\hspace{-0.5cm}}ll@{\hspace{4cm}}ll}
-Date:    & September 19, 2009 / August 19, 2014       &     & \\[3ex]
+Date:    & \today       &     & \\[3ex]
 From:    & B.M.~Wojek / Modified by A. Suter & \\
-E-Mail:  & \verb?bastian.wojek@psi.ch? / \verb?andreas.suter@psi.ch? &&
+E-Mail:  & \verb?andreas.suter@psi.ch? &&
 \end{tabular}
 %
 \vskip 0.3cm
@@ -102,8 +102,9 @@ For the numerical integration we use algorithms of the \textsc{Cuba} library \ci
 \end{equation}
 
 \subsection*{Implemented gap functions and function calls from MUSRFIT}
-At the moment the calculation of $\tilde{I}(T)$ is implemented for various gap functions all using the approximate \textsc{BCS} temperature dependence~\cite{Prozorov}
-\begin{equation}\label{eq:gapT}
+Currently the calculation of $\tilde{I}(T)$ is implemented for various gap functions.
+The temperature dependence of the gap functions is either given by Eq.(\ref{eq:gapT_Prozorov}) \cite{Prozorov}, or by Eq.(\ref{eq:gapT_Manzano}) \cite{Manzano}.
+\begin{equation}\label{eq:gapT_Prozorov}
  \Delta(\varphi,T) \simeq \Delta(\varphi,0)\,\tanh\left[\frac{\pi k_{\rm B} T_{\rm c}}{\Delta_0}\sqrt{a_{\rm G} \left(\frac{T_{\rm c}}{T}-1\right)}\right]
 \end{equation}
 \noindent with $\Delta_0$ as given below, and $a_{\rm G}$ depends on the pairing state:
@@ -113,8 +114,7 @@ At the moment the calculation of $\tilde{I}(T)$ is implemented for various gap f
  \item [\textit{d}-wave:] $a_{\rm G}=4/3$ \quad with $\Delta_0 = 2.14\, k_{\rm B} T_c$
 \end{description}
 
-\noindent Eq.(\ref{eq:gapT}) replaces the \emph{previously} used approximation~\cite{Manzano}:
-\begin{equation}
+\begin{equation}\label{eq:gapT_Manzano}
 \Delta(\varphi,T) \simeq \Delta(\varphi)\tanh\left(1.82\left(1.018\left(\frac{T_{\mathrm c}}{T}-1\right)\right)^{0.51}\right)\,.
 \end{equation}
 The \gapint plug-in calculates $\tilde{I}(T)$ for the following $\Delta(\varphi)$:
@@ -125,31 +125,36 @@ The \gapint plug-in calculates $\tilde{I}(T)$ for the following $\Delta(\varphi)
      \Delta(\varphi) = \Delta_0
    \end{equation}
    \musrfit theory line: \verb?userFcn libGapIntegrals TGapSWave 1 2 [3]?\\
-   (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $[a_{\rm G}~(1)]$, if $a_{\rm G}$ is not given, $a_{\rm G} = 1$)
+   (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $[a_{\rm G}~(1)]$. If $a_{\rm G}$ is given, the temperature dependence 
+    according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.)
  \item[\textit{d}-wave gap \cite{Deutscher}:] 
    \begin{equation}
      \Delta(\varphi) = \Delta_0\cos\left(2\varphi\right)
    \end{equation}
    \musrfit theory line: \verb?userFcn libGapIntegrals TGapDWave 1 2 [3]?\\
-   (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $[a_{\rm G}~(1)]$, if $a_{\rm G}$ is not given, $a_{\rm G} = 4/3$)
+   (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $[a_{\rm G}~(1)]$. If $a_{\rm G}$ is given, the temperature dependence 
+    according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.)
  \item[non-monotonic \textit{d}-wave gap \cite{Matsui}:] 
    \begin{equation}
      \Delta(\varphi) = \Delta_0\left[a \cos\left(2\varphi\right) + (1-a)\cos\left(6\varphi\right)\right]
    \end{equation}
     \musrfit theory line: \verb?userFcn libGapIntegrals TGapNonMonDWave1 1 2 3 [4]?\\
-    (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $a~(1)$, $[a_{\rm G}~(1)]$, if $a_{\rm G}$ is not given, $a_{\rm G} = 4/3$)
+    (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $a~(1)$, $[a_{\rm G}~(1)]$. If $a_{\rm G}$ is given, the temperature dependence 
+    according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.)
  \item[non-monotonic \textit{d}-wave gap \cite{Eremin}:]
     \begin{equation}
       \Delta(\varphi) = \Delta_0\left[\frac{2}{3} \sqrt{\frac{a}{3}}\cos\left(2\varphi\right) / \left( 1 + a\cos^2\left(2\varphi\right)\right)^{\frac{3}{2}}\right],\,a>1/2
     \end{equation}
     \musrfit theory line: \verb?userFcn libGapIntegrals TGapNonMonDWave2 1 2 3 [4]?\\
-    (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $a~(1)$, $a~(1)$, $[a_{\rm G}~(1)]$, if $a_{\rm G}$ is not given, $a_{\rm G} = 4/3$)
+    (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $a~(1)$, $a~(1)$, $[a_{\rm G}~(1)]$. If $a_{\rm G}$ is given, the temperature dependence 
+    according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.)
  \item[anisotropic \textit{s}-wave gap \cite{AnisotropicSWave}:] 
     \begin{equation}
       \Delta(\varphi) = \Delta_0\left[1+a\cos\left(4\varphi\right)\right]\,,\,0\leqslant a\leqslant1
     \end{equation}
     \musrfit theory line: \verb?userFcn libGapIntegrals TGapAnSWave 1 2 3 [4]?\\
-    (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $a~(1)$, $[a_{\rm G}~(1)]$, if $a_{\rm G}$ is not given, $a_{\rm G} = 1$)
+    (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $a~(1)$, $[a_{\rm G}~(1)]$. If $a_{\rm G}$ is given, the temperature dependence 
+    according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.)
 \end{description}
 
 \noindent It is also possible to calculate a power law temperature dependence (in the two fluid approximation $n=4$) and the dirty \textit{s}-wave expression. 
@@ -167,7 +172,8 @@ Obviously for this no integration is needed.
     \end{equation}
     with $\Delta(T)$ given by Eq.(\ref{eq:gapT}).\\ 
     \musrfit theory line: \verb?userFcn libGapIntegrals TGapDirtySWave 1 2 [3]?\\
-    (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $[a_{\rm G}~(1)]$, if $a_{\rm G}$ is not given, $a_{\rm G} = 1$)
+    (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $[a_{\rm G}~(1)]$. If $a_{\rm G}$ is given, the temperature dependence 
+    according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.)
 \end{description}
 
 \noindent Currently there are two gap functions to be found in the code which are \emph{not} documented here: 
