@@ -1216,20 +1216,33 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   } else {
-    // calculate the max(data range start[i]-t0[i])
-    Int_t diff = fRunInfo->GetDataRange(0)-static_cast<Int_t>(t0[0]);
-    if (abs(diff) < abs(fRunInfo->GetDataRange(2)-static_cast<Int_t>(t0[1])))
-      diff = fRunInfo->GetDataRange(0)-static_cast<Int_t>(t0[0]);
+    // check if the data ranges and t0's between forward/backward are compatible
+    Int_t fgb[2];
+    if (fRunInfo->GetDataRange(0)-t0[0] != fRunInfo->GetDataRange(2)-t0[1]) { // wrong fgb aligning
+      if (fabs(fRunInfo->GetDataRange(0)-t0[0]) > fabs(fRunInfo->GetDataRange(2)-t0[1])) {
+        fgb[0] = fRunInfo->GetDataRange(0);
+        fgb[1] = static_cast<Int_t>(t0[1]) + fRunInfo->GetDataRange(0)-t0[0];
+        cerr << endl << ">> PRunAsymmetry::PrepareViewData(): **WARNING** needed to shift backward fgb from ";
+        cerr << fRunInfo->GetDataRange(2) << " to " << fgb[1] << endl;
+      } else {
+        fgb[0] = static_cast<Int_t>(t0[0]) + fRunInfo->GetDataRange(2)-t0[1];
+        fgb[1] = fRunInfo->GetDataRange(2);
+        cerr << endl << ">> PRunAsymmetry::PrepareViewData(): **WARNING** needed to shift forward fgb from ";
+        cerr << fRunInfo->GetDataRange(0) << " to " << fgb[0] << endl;
+      }
+    } else { // fgb aligning is correct
+      fgb[0] = fRunInfo->GetDataRange(0);
+      fgb[1] = fRunInfo->GetDataRange(2);
+    }
 
-    // calculate start position for plotting
-    Int_t val = static_cast<Int_t>(t0[1])+diff-packing*((static_cast<Int_t>(t0[1])+diff)/packing);
+    Int_t val = fgb[0]-packing*(fgb[0]/packing);
     do {
-      if (static_cast<Double_t>(val)+t0[1]-t0[0] < 0.0)
+      if (fgb[1] - fgb[0] < 0)
         val += packing;
-    } while (static_cast<Double_t>(val) + t0[1] - t0[0] < 0.0);
+    } while (val + fgb[1] - fgb[0] < 0);
 
     start[0] = val;
-    start[1] = val + static_cast<Int_t>(t0[1] - t0[0]);
+    start[1] = val + fgb[1] - fgb[0];
   }
 
   // make sure that there are equal number of rebinned bins in forward and backward
@@ -1468,15 +1481,34 @@ Bool_t PRunAsymmetry::PrepareRRFViewData(PRawRunData* runData, UInt_t histoNo[2]
     cerr << endl << ">> PRunAsymmetry::PrepareRRFViewData(): **WARNING** data range (backward) was not provided, will try data range start = " << start[1] << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
-  } else {
-    Int_t val = fRunInfo->GetDataRange(0)-packing*(fRunInfo->GetDataRange(0)/packing);
+  } else { // data range has been provided
+    // check if the data ranges and t0's between forward/backward are compatible
+    Int_t fgb[2];
+    if (fRunInfo->GetDataRange(0)-t0[0] != fRunInfo->GetDataRange(2)-t0[1]) { // wrong fgb aligning
+      if (fabs(fRunInfo->GetDataRange(0)-t0[0]) > fabs(fRunInfo->GetDataRange(2)-t0[1])) {
+        fgb[0] = fRunInfo->GetDataRange(0);
+        fgb[1] = static_cast<Int_t>(t0[1]) + fRunInfo->GetDataRange(0)-t0[0];
+        cerr << endl << ">> PRunAsymmetry::PrepareRRFViewData(): **WARNING** needed to shift backward fgb from ";
+        cerr << fRunInfo->GetDataRange(2) << " to " << fgb[1] << endl;
+      } else {
+        fgb[0] = static_cast<Int_t>(t0[0]) + fRunInfo->GetDataRange(2)-t0[1];
+        fgb[1] = fRunInfo->GetDataRange(2);
+        cerr << endl << ">> PRunAsymmetry::PrepareRRFViewData(): **WARNING** needed to shift forward fgb from ";
+        cerr << fRunInfo->GetDataRange(0) << " to " << fgb[0] << endl;
+      }
+    } else { // fgb aligning is correct
+      fgb[0] = fRunInfo->GetDataRange(0);
+      fgb[1] = fRunInfo->GetDataRange(2);
+    }
+
+    Int_t val = fgb[0]-packing*(fgb[0]/packing);
     do {
-      if (fRunInfo->GetDataRange(2) - fRunInfo->GetDataRange(0) < 0)
+      if (fgb[1] - fgb[0] < 0)
         val += packing;
-    } while (val + fRunInfo->GetDataRange(2) - fRunInfo->GetDataRange(0) < 0);
+    } while (val + fgb[1] - fgb[0] < 0);
 
     start[0] = val;
-    start[1] = val + fRunInfo->GetDataRange(2) - fRunInfo->GetDataRange(0);
+    start[1] = val + fgb[1] - fgb[0];
   }
 
   // make sure that there are equal number of rebinned bins in forward and backward

@@ -60,6 +60,11 @@ FIXED 2012-09-23 fixed wrong chisq output in musrview if expected chisq is
                  present.
 FIXED 2012-05-30 fixed RRF  bug in single histo plotting.
 FIXED 2012-05-18 fixed wrong forward/backward tag for ROOT-PPC (MUSR-215) 
+CHANGED 2014-11-10 (i) added cross-check for Asymmetry view which makes sure that
+                   fbg-t0 is equal for forward and backward histo.
+                   (ii) extended the command block for the test-nonlocal.msr in 
+                   order to have an example which shows the more 'advanced' features
+                   of minuit.
 CHANGED 2014-10-28 BMWlibs, calculation of superconducting gap functions:
                    allow to choose between to different parameterization of the
                    temperature dependence of the gap. For details see the memo

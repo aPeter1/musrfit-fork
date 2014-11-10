@@ -4,22 +4,22 @@ FITPARAMETER
 #      Nr. Name       Value     Step      Pos_Error Boundaries   
         1 one         1         0           none        
         2 zero        0         0           none        
-        3 Asy         0.2133    -0.0053     0.0056      0       0.33    
+        3 Asy         0.2235    -0.0066     0.0072      0       0.33    
         4 energy      22        0           none        
         5 redTemp     0.8683    0           none        
         6 thickness   5000      0           none        
         7 ell         12000     0           none        
         8 xi          94        0           none        
-        9 lambdaL     48.21     0.98        none        
+        9 lambdaL     52.5      -1.4        1.2         
        10 Bext        47.11     0           none        
-       11 deadLayer   15.555    0.063       none        0       none    
-       12 RateSmear   0.363     -0.016      0.016       
-       13 N0_L        299.40    -0.99       1.02        
-       14 Bkg_L       24.535    -0.089      0.089       
-       15 Phase_L     35.5      -2.0        2.1         
-       16 Alpha_LR    1.0734    -0.0059     0.0057      
-       17 Bkg_R       27.611    -0.088      0.088       
-       18 RelPhase_R  153.4     -1.1        1.1         
+       11 deadLayer   0.00052   -0.00052    6.89563     0       none    
+       12 RateSmear   0.418     -0.015      0.015       
+       13 N0_L        301.61    0.62        none        
+       14 Bkg_L       24.442    0.076       none        
+       15 Phase_L     42.0      -2.2        2.2         
+       16 Alpha_LR    1.0614    -0.0066     0.0064      
+       17 Bkg_R       27.646    -0.090      0.090       
+       18 RelPhase_R  154.4     -1.1        1.1         
 
 ###############################################################
 THEORY
@@ -60,6 +60,8 @@ packing         250
 ###############################################################
 COMMANDS
 MAX_LIKELIHOOD
+PRINT_LEVEL 3
+STRATEGY=2
 MINIMIZE
 #HESSE
 MINOS
@@ -82,8 +84,8 @@ phase            8.5
 range            0.0    200.0
 
 ###############################################################
-STATISTIC --- 2013-11-12 10:23:31
-  maxLH = 415.7, NDF = 358, maxLH/NDF = 1.161264
+STATISTIC --- 2014-11-05 12:34:54
+  maxLH = 415.6, NDF = 358, maxLH/NDF = 1.160933
 
 
 
