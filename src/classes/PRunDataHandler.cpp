@@ -2974,6 +2974,7 @@ Bool_t PRunDataHandler::ReadMudFile()
 
   // get setup
   TString setup;
+  REAL64 timeResMultiplier = 1.0e9; // Multiplier time resolution
   success = MUD_getLab( fh, str, sizeof(str) );
   if (success) {
     setup = TString(str) + TString("/");
@@ -2981,6 +2982,11 @@ Bool_t PRunDataHandler::ReadMudFile()
   success = MUD_getArea( fh, str, sizeof(str) );
   if (success) {
     setup += TString(str) + TString("/");
+    if (TString(str) == "BNQR" || TString(str) == "BNMR") {
+      cerr << "PRunDataHandler::ReadMudFile: **INFORMATION** this run was performed on " << str << endl;     
+      // identified BNMR/BNQR, correct time resolution.
+      timeResMultiplier = 1.0e15;
+    }
   }
   success = MUD_getApparatus( fh, str, sizeof(str) );
   if (success) {
@@ -3061,7 +3067,11 @@ Bool_t PRunDataHandler::ReadMudFile()
     }
   }
 
-  runData.SetTimeResolution((Double_t)timeResolution * 1.0e9); // s -> ns
+  runData.SetTimeResolution((Double_t)timeResolution * timeResMultiplier); // s -> ns
+  // An additional factor of 1e6 needed for bNMR
+  // Check if it is a bNMR run and fix it or check if "timeres" line
+  // was introduced in the msr file
+
 
   // read histograms
   UINT32 *pData; // histo memory
