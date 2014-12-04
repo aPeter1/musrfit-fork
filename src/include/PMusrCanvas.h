@@ -66,7 +66,8 @@
 #define P_MENU_ID_DATA          10001
 #define P_MENU_ID_FOURIER       10002
 #define P_MENU_ID_DIFFERENCE    10003
-#define P_MENU_ID_SAVE_DATA     10004
+#define P_MENU_ID_AVERAGE       10004
+#define P_MENU_ID_SAVE_DATA     10005
 
 #define P_MENU_PLOT_OFFSET      1000
 
@@ -234,6 +235,7 @@ class PMusrCanvas : public TObject, public TQObject
     Bool_t fScaleN0AndBkg;    ///< true=N0 and background is scaled to (1/ns), otherwise (1/bin) for the single histogram case
     Bool_t fBatchMode;        ///< musrview in ROOT batch mode
     Bool_t fValid;            ///< if true, everything looks OK
+    Bool_t fAveragedView;     ///< tag showing that the averaged view or normal view should be presented.
     Bool_t fDifferenceView;   ///< tag showing that the shown data, fourier, are the difference between data and theory
     Int_t  fCurrentPlotView;  ///< tag showing what the current plot view is: data, fourier, ...
     Int_t  fPreviousPlotView; ///< tag showing the previous plot view
@@ -276,6 +278,7 @@ class PMusrCanvas : public TObject, public TQObject
 #endif // __MAKECINT__
 
     PMusrCanvasDataList fData; ///< list of all histogram data to be plotted (asymmetry/single histogram)
+    PMusrCanvasDataSet fDataAvg; ///< set of all averaged data to be plotted (asymmetry/single histogram)
     PMusrCanvasNonMusrDataList fNonMusrData; ///< list of all error graphs to be plotted (non-muSR)
     TMultiGraph *fMultiGraphData; ///< fMultiGraphData is a 'global' graph needed in order to plot error graphs (data) with (potentially) different x-frames
     TMultiGraph *fMultiGraphDiff; ///< fMultiGraphDiff is a 'global' graph needed in order to plot error graphs (data-theory) with (potentially) different x-frames
@@ -286,6 +289,7 @@ class PMusrCanvas : public TObject, public TQObject
 
     virtual void CreateStyle();
     virtual void InitFourier();
+    virtual void InitAverage();
     virtual void InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh);
     virtual void InitDataSet(PMusrCanvasDataSet &dataSet);
     virtual void InitDataSet(PMusrCanvasNonMusrDataSet &dataSet);
@@ -297,10 +301,12 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void HandleFourier();
     virtual void HandleDifferenceFourier();
     virtual void HandleFourierDifference();
+    virtual void HandleAverage();
     virtual Double_t FindOptimalFourierPhase();
     virtual void CleanupDifference();
     virtual void CleanupFourier();
     virtual void CleanupFourierDifference();
+    virtual void CleanupAverage();
 
     virtual Double_t CalculateDiff(const Double_t x, const Double_t y, TH1F *theo);
     virtual Double_t CalculateDiff(const Double_t x, const Double_t y, TGraphErrors *theo);
@@ -316,6 +322,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void PlotFourier(Bool_t unzoom=false);
     virtual void PlotFourierDifference(Bool_t unzoom=false);
     virtual void PlotFourierPhaseValue(Bool_t unzoom=false);
+    virtual void PlotAverage(Bool_t unzoom=false);
     virtual void IncrementFourierPhase();
     virtual void DecrementFourierPhase();
 

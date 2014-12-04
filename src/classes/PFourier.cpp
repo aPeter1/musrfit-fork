@@ -53,7 +53,7 @@ using namespace std;
  *
  * \param data data histogram
  * \param unitTag tag telling in which units the Fourier transform shall be represented. Possible tags are:
- *                FOURIER_UNIT_FIELD, FOURIER_UNIT_FREQ, FOURIER_UNIT_CYCLES
+ *                FOURIER_UNIT_GAUSS, FOURIER_UNIT_TESLA, FOURIER_UNIT_FREQ, FOURIER_UNIT_CYCLES
  * \param startTime start time of the data time window
  * \param endTime end time of the data time window
  * \param dcCorrected if true, removed DC offset from signal before Fourier transformation, otherwise not
@@ -109,8 +109,11 @@ PFourier::PFourier(TH1F *data, Int_t unitTag, Double_t startTime, Double_t endTi
   // calculate fourier resolution, depending on the units
   Double_t resolution = 1.0/(fTimeResolution*fNoOfBins); // in MHz
   switch (fUnitTag) {
-    case FOURIER_UNIT_FIELD:
+    case FOURIER_UNIT_GAUSS:
       fResolution = resolution/GAMMA_BAR_MUON;
+      break;
+    case FOURIER_UNIT_TESLA:
+      fResolution = 1e-4*resolution/GAMMA_BAR_MUON;
       break;
     case FOURIER_UNIT_FREQ:
       fResolution = resolution;

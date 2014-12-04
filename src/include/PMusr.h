@@ -104,9 +104,10 @@ using namespace std;
 //-------------------------------------------------------------
 // fourier related tags
 #define FOURIER_UNIT_NOT_GIVEN 0
-#define FOURIER_UNIT_FIELD     1
-#define FOURIER_UNIT_FREQ      2
-#define FOURIER_UNIT_CYCLES    3
+#define FOURIER_UNIT_GAUSS     1
+#define FOURIER_UNIT_TESLA     2
+#define FOURIER_UNIT_FREQ      3
+#define FOURIER_UNIT_CYCLES    4
 
 #define FOURIER_APOD_NOT_GIVEN 0
 #define FOURIER_APOD_NONE      1

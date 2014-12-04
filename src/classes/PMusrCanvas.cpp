@@ -118,6 +118,7 @@ PMusrCanvas::PMusrCanvas()
 
   fScaleN0AndBkg = true;
   fValid = false;
+  fAveragedView     = false;
   fDifferenceView   = false;
   fCurrentPlotView  = PV_DATA;
   fPreviousPlotView = PV_DATA;
@@ -145,6 +146,7 @@ PMusrCanvas::PMusrCanvas()
   fMultiGraphDiff = 0;
 
   InitFourier();
+  InitAverage();
 
   fCurrentFourierPhase = fFourier.fPhaseIncrement;
   fCurrentFourierPhaseText = 0;
@@ -184,6 +186,7 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
 {
   fTimeout = 0;
   fTimeoutTimer = 0;
+  fAveragedView = false;
 
   fMultiGraphData = 0;
   fMultiGraphDiff = 0;
@@ -191,6 +194,7 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
   fHistoFrame     = 0;
 
   InitFourier();
+  InitAverage();
   CreateStyle();
   InitMusrCanvas(title, wtopx, wtopy, ww, wh);
 
@@ -245,6 +249,7 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
 
   fHistoFrame     = 0;
 
+  InitAverage();
   CreateStyle();
   InitMusrCanvas(title, wtopx, wtopy, ww, wh);
 
@@ -866,12 +871,12 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   static eKeySwitch lastKeySwitch = kNotRelevant;
 
   if ((lastKeySwitch == kFourierDiff) && (x == 'f')) {
-    cout << "debug> f-d-f doesn't make any sense, will ignore 'f' ..." << endl;
+    cout << "**INFO** f-d-f doesn't make any sense, will ignore 'f' ..." << endl;
     return;
   }
 
   if ((lastKeySwitch == kDiffFourier) && (x == 'd')) {
-    cout << "debug> d-f-d doesn't make any sense, will ignore 'd' ..." << endl;
+    cout << "**INFO** d-f-d doesn't make any sense, will ignore 'd' ..." << endl;
     return;
   }
 
@@ -974,6 +979,32 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   } else if (x == '-') {
     if (fCurrentPlotView != PV_DATA)
       DecrementFourierPhase();
+  } else if (x == 'a') {
+    if (fData.size() > 1) {
+      // toggle average view flag
+      fAveragedView = !fAveragedView;
+      // update menu
+      if (fAveragedView) {
+        fPopupMain->CheckEntry(P_MENU_ID_AVERAGE+P_MENU_PLOT_OFFSET*fPlotNumber);
+        HandleAverage();
+        PlotAverage(true);
+      } else {
+        fPopupMain->UnCheckEntry(P_MENU_ID_AVERAGE+P_MENU_PLOT_OFFSET*fPlotNumber);
+        CleanupAverage();
+      }
+      // check which relevantKeySwitch is needed
+      if ((fCurrentPlotView == PV_DATA) && fDifferenceView && !fAveragedView)
+        relevantKeySwitch = kDiffData;
+      else if ((fCurrentPlotView == PV_DATA) && !fDifferenceView && !fAveragedView)
+        relevantKeySwitch = kData;
+      else if ((fCurrentPlotView != PV_DATA) && fDifferenceView && !fAveragedView)
+        relevantKeySwitch = kFourierDiff;
+      else if ((fCurrentPlotView != PV_DATA) && !fDifferenceView && !fAveragedView)
+        relevantKeySwitch = kFourier;
+    } else { // with only 1 data set, it doesn't make any sense to average!
+      cout << "**INFO** averaging of a single data set doesn't make any sense, will ignore 'a' ..." << endl;
+      return;
+    }
   } else {
     fMainCanvas->Update();
   }
@@ -1224,6 +1255,22 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
           break;
       }
     }
+  } else if (id == P_MENU_ID_AVERAGE+P_MENU_PLOT_OFFSET*fPlotNumber) {
+    if (fData.size() > 1) {
+      fAveragedView = !fAveragedView;
+      // set the popup menu entry properly
+      if (fAveragedView) {
+        fPopupMain->CheckEntry(id);
+        HandleAverage();
+        PlotAverage();
+      } else {
+        fPopupMain->UnCheckEntry(id);
+        CleanupAverage();
+      }
+    } else {
+      cout << "**INFO** averaging of a single data set doesn't make any sense, will ignore 'a' ..." << endl;
+      return;
+    }
   } else if (id == P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_ASCII) {
     SaveDataAscii();
   }
@@ -1328,7 +1375,7 @@ void PMusrCanvas::CreateStyle()
 void PMusrCanvas::InitFourier()
 {
   fFourier.fFourierBlockPresent = false;           // fourier block present
-  fFourier.fUnits = FOURIER_UNIT_FIELD;            // fourier untis
+  fFourier.fUnits = FOURIER_UNIT_GAUSS;            // fourier untis
   fFourier.fFourierPower = 0;                      // no zero padding
   fFourier.fApodization = FOURIER_APOD_NONE;       // no apodization
   fFourier.fPlotTag = FOURIER_PLOT_REAL_AND_IMAG;  // initial plot tag, plot real and imaginary part
@@ -1338,6 +1385,33 @@ void PMusrCanvas::InitFourier()
     fFourier.fPlotRange[i] = -1.0;                 // fourier plot range, default: {-1, -1} = NOT GIVEN
   }
   fFourier.fPhaseIncrement = 1.0;                  // fourier phase increment
+}
+
+//--------------------------------------------------------------------------
+// InitAverage (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Initializes the Average structure.
+ */
+void PMusrCanvas::InitAverage()
+{
+  fDataAvg.data = 0;
+  fDataAvg.dataFourierRe = 0;
+  fDataAvg.dataFourierIm = 0;
+  fDataAvg.dataFourierPwr = 0;
+  fDataAvg.dataFourierPhase = 0;
+  fDataAvg.theory = 0;
+  fDataAvg.theoryFourierRe = 0;
+  fDataAvg.theoryFourierIm = 0;
+  fDataAvg.theoryFourierPwr = 0;
+  fDataAvg.theoryFourierPhase = 0;
+  fDataAvg.diff = 0;
+  fDataAvg.diffFourierRe = 0;
+  fDataAvg.diffFourierIm = 0;
+  fDataAvg.diffFourierPwr = 0;
+  fDataAvg.diffFourierPhase = 0;
+  fDataAvg.dataRange = 0;
+  fDataAvg.diffFourierTag = 0;
 }
 
 //--------------------------------------------------------------------------
@@ -1356,6 +1430,7 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
 {
   fScaleN0AndBkg = true;
   fValid = false;
+  fAveragedView     = false;
   fDifferenceView   = false;
   fCurrentPlotView  = PV_DATA;
   fPreviousPlotView = PV_DATA;
@@ -1408,6 +1483,9 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
     fPopupFourier->DisableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
 
     fPopupMain->AddEntry("D&ifference", P_MENU_ID_DIFFERENCE+P_MENU_PLOT_OFFSET*fPlotNumber);
+    fPopupMain->AddSeparator();
+
+    fPopupMain->AddEntry("Average", P_MENU_ID_AVERAGE+P_MENU_PLOT_OFFSET*fPlotNumber);
     fPopupMain->AddSeparator();
 
     fPopupSave = new TGPopupMenu();
@@ -2650,6 +2728,304 @@ void PMusrCanvas::HandleFourierDifference()
 }
 
 //--------------------------------------------------------------------------
+// HandleAverage (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Handles the calculation of the average of the ploted data.
+ * It allocates the necessary objects if they are not already present. At the
+ * end it calls the plotting routine.
+ */
+void PMusrCanvas::HandleAverage()
+{
+  // check if plot type is appropriate for average
+  if (fPlotType == MSR_PLOT_NON_MUSR)
+    return;
+
+  // in case there is still some average left over, cleanup first
+  if (fDataAvg.data != 0) {
+    CleanupAverage();
+  }
+
+  // create all the needed average data sets
+  TString name("");
+  if (fData[0].data != 0) {
+    name = TString(fData[0].data->GetTitle()) + "_avg";
+    fDataAvg.data = new TH1F(name, name, fData[0].data->GetNbinsX(),
+                             fData[0].data->GetXaxis()->GetXmin(),
+                             fData[0].data->GetXaxis()->GetXmax());
+  }
+  if (fData[0].dataFourierRe != 0) {
+    name = TString(fData[0].dataFourierRe->GetTitle()) + "_avg";
+    fDataAvg.dataFourierRe = new TH1F(name, name, fData[0].dataFourierRe->GetNbinsX(),
+                                      fData[0].dataFourierRe->GetXaxis()->GetXmin(),
+                                      fData[0].dataFourierRe->GetXaxis()->GetXmax());
+  }
+  if (fData[0].dataFourierIm != 0) {
+    name = TString(fData[0].dataFourierIm->GetTitle()) + "_avg";
+    fDataAvg.dataFourierIm = new TH1F(name, name, fData[0].dataFourierIm->GetNbinsX(),
+                                      fData[0].dataFourierIm->GetXaxis()->GetXmin(),
+                                      fData[0].dataFourierIm->GetXaxis()->GetXmax());
+  }
+  if (fData[0].dataFourierPwr != 0) {
+    name = TString(fData[0].dataFourierPwr->GetTitle()) + "_avg";
+    fDataAvg.dataFourierPwr = new TH1F(name, name, fData[0].dataFourierPwr->GetNbinsX(),
+                                       fData[0].dataFourierPwr->GetXaxis()->GetXmin(),
+                                       fData[0].dataFourierPwr->GetXaxis()->GetXmax());
+  }
+  if (fData[0].dataFourierPhase != 0) {
+    name = TString(fData[0].dataFourierPhase->GetTitle()) + "_avg";
+    fDataAvg.dataFourierPhase = new TH1F(name, name, fData[0].dataFourierPhase->GetNbinsX(),
+                                         fData[0].dataFourierPhase->GetXaxis()->GetXmin(),
+                                         fData[0].dataFourierPhase->GetXaxis()->GetXmax());
+  }
+  if (fData[0].theory != 0) {
+    name = TString(fData[0].theory->GetTitle()) + "_avg";
+    fDataAvg.theory = new TH1F(name, name, fData[0].theory->GetNbinsX(),
+                             fData[0].theory->GetXaxis()->GetXmin(),
+                             fData[0].theory->GetXaxis()->GetXmax());
+  }
+  if (fData[0].theoryFourierRe != 0) {
+    name = TString(fData[0].theoryFourierRe->GetTitle()) + "_avg";
+    fDataAvg.theoryFourierRe = new TH1F(name, name, fData[0].theoryFourierRe->GetNbinsX(),
+                                        fData[0].theoryFourierRe->GetXaxis()->GetXmin(),
+                                        fData[0].theoryFourierRe->GetXaxis()->GetXmax());
+  }
+  if (fData[0].theoryFourierIm != 0) {
+    name = TString(fData[0].theoryFourierIm->GetTitle()) + "_avg";
+    fDataAvg.theoryFourierIm = new TH1F(name, name, fData[0].theoryFourierIm->GetNbinsX(),
+                                        fData[0].theoryFourierIm->GetXaxis()->GetXmin(),
+                                        fData[0].theoryFourierIm->GetXaxis()->GetXmax());
+  }
+  if (fData[0].theoryFourierPwr != 0) {
+    name = TString(fData[0].theoryFourierPwr->GetTitle()) + "_avg";
+    fDataAvg.theoryFourierPwr = new TH1F(name, name, fData[0].theoryFourierPwr->GetNbinsX(),
+                                         fData[0].theoryFourierPwr->GetXaxis()->GetXmin(),
+                                         fData[0].theoryFourierPwr->GetXaxis()->GetXmax());
+  }
+  if (fData[0].theoryFourierPhase != 0) {
+    name = TString(fData[0].theoryFourierPhase->GetTitle()) + "_avg";
+    fDataAvg.theoryFourierPhase = new TH1F(name, name, fData[0].theoryFourierPhase->GetNbinsX(),
+                                           fData[0].theoryFourierPhase->GetXaxis()->GetXmin(),
+                                           fData[0].theoryFourierPhase->GetXaxis()->GetXmax());
+  }
+  if (fData[0].diff != 0) {
+    name = TString(fData[0].diff->GetTitle()) + "_avg";
+    fDataAvg.diff = new TH1F(name, name, fData[0].diff->GetNbinsX(),
+                             fData[0].diff->GetXaxis()->GetXmin(),
+                             fData[0].diff->GetXaxis()->GetXmax());
+  }
+  if (fData[0].diffFourierRe != 0) {
+    name = TString(fData[0].diffFourierRe->GetTitle()) + "_avg";
+    fDataAvg.diff = new TH1F(name, name, fData[0].diffFourierRe->GetNbinsX(),
+                             fData[0].diffFourierRe->GetXaxis()->GetXmin(),
+                             fData[0].diffFourierRe->GetXaxis()->GetXmax());
+  }
+  if (fData[0].diffFourierIm != 0) {
+    name = TString(fData[0].diffFourierIm->GetTitle()) + "_avg";
+    fDataAvg.diffFourierIm = new TH1F(name, name, fData[0].diffFourierIm->GetNbinsX(),
+                                     fData[0].diffFourierIm->GetXaxis()->GetXmin(),
+                                     fData[0].diffFourierIm->GetXaxis()->GetXmax());
+  }
+  if (fData[0].diffFourierPwr != 0) {
+    name = TString(fData[0].diffFourierPwr->GetTitle()) + "_avg";
+    fDataAvg.diffFourierPwr = new TH1F(name, name, fData[0].diffFourierPwr->GetNbinsX(),
+                                       fData[0].diffFourierPwr->GetXaxis()->GetXmin(),
+                                       fData[0].diffFourierPwr->GetXaxis()->GetXmax());
+  }
+  if (fData[0].diffFourierPhase != 0) {
+    name = TString(fData[0].diffFourierPhase->GetTitle()) + "_avg";
+    fDataAvg.diffFourierPhase = new TH1F(name, name, fData[0].diffFourierPhase->GetNbinsX(),
+                                         fData[0].diffFourierPhase->GetXaxis()->GetXmin(),
+                                         fData[0].diffFourierPhase->GetXaxis()->GetXmax());
+  }
+
+  // calculate all the average data sets
+  double dval;
+  if (fDataAvg.data != 0) {
+    for (Int_t i=0; i<fData[0].data->GetNbinsX(); i++) {
+      dval = 0.0;
+      for (UInt_t j=0; j<fData.size(); j++) {
+        dval += fData[j].data->GetBinContent(i);
+      }
+      fDataAvg.data->SetBinContent(i, dval/fData.size());
+    }
+    // set marker color, line color, maker size, marker type
+    fDataAvg.data->SetMarkerColor(fData[0].data->GetMarkerColor());
+    fDataAvg.data->SetLineColor(fData[0].data->GetLineColor());
+    fDataAvg.data->SetMarkerSize(fData[0].data->GetMarkerSize());
+    fDataAvg.data->SetMarkerStyle(fData[0].data->GetMarkerStyle());
+  }
+  if (fDataAvg.dataFourierRe != 0) {
+    for (Int_t i=0; i<fData[0].dataFourierRe->GetNbinsX(); i++) {
+      dval = 0.0;
+      for (UInt_t j=0; j<fData.size(); j++) {
+        dval += fData[j].dataFourierRe->GetBinContent(i);
+      }
+      fDataAvg.dataFourierRe->SetBinContent(i, dval/fData.size());
+    }
+    // set marker color, line color, maker size, marker type
+    fDataAvg.dataFourierRe->SetMarkerColor(fData[0].dataFourierRe->GetMarkerColor());
+    fDataAvg.dataFourierRe->SetLineColor(fData[0].dataFourierRe->GetLineColor());
+    fDataAvg.dataFourierRe->SetMarkerSize(fData[0].dataFourierRe->GetMarkerSize());
+    fDataAvg.dataFourierRe->SetMarkerStyle(fData[0].dataFourierRe->GetMarkerStyle());
+  }
+  if (fDataAvg.dataFourierIm != 0) {
+    for (Int_t i=0; i<fData[0].dataFourierIm->GetNbinsX(); i++) {
+      dval = 0.0;
+      for (UInt_t j=0; j<fData.size(); j++) {
+        dval += fData[j].dataFourierIm->GetBinContent(i);
+      }
+      fDataAvg.dataFourierIm->SetBinContent(i, dval/fData.size());
+    }
+    // set marker color, line color, maker size, marker type
+    fDataAvg.dataFourierIm->SetMarkerColor(fData[0].dataFourierIm->GetMarkerColor());
+    fDataAvg.dataFourierIm->SetLineColor(fData[0].dataFourierIm->GetLineColor());
+    fDataAvg.dataFourierIm->SetMarkerSize(fData[0].dataFourierIm->GetMarkerSize());
+    fDataAvg.dataFourierIm->SetMarkerStyle(fData[0].dataFourierIm->GetMarkerStyle());
+  }
+  if (fDataAvg.dataFourierPwr != 0) {
+    for (Int_t i=0; i<fData[0].dataFourierPwr->GetNbinsX(); i++) {
+      dval = 0.0;
+      for (UInt_t j=0; j<fData.size(); j++) {
+        dval += fData[j].dataFourierPwr->GetBinContent(i);
+      }
+      fDataAvg.dataFourierPwr->SetBinContent(i, dval/fData.size());
+    }
+    // set marker color, line color, maker size, marker type
+    fDataAvg.dataFourierPwr->SetMarkerColor(fData[0].dataFourierPwr->GetMarkerColor());
+    fDataAvg.dataFourierPwr->SetLineColor(fData[0].dataFourierPwr->GetLineColor());
+    fDataAvg.dataFourierPwr->SetMarkerSize(fData[0].dataFourierPwr->GetMarkerSize());
+    fDataAvg.dataFourierPwr->SetMarkerStyle(fData[0].dataFourierPwr->GetMarkerStyle());
+  }
+  if (fDataAvg.dataFourierPhase != 0) {
+    for (Int_t i=0; i<fData[0].dataFourierPhase->GetNbinsX(); i++) {
+      dval = 0.0;
+      for (UInt_t j=0; j<fData.size(); j++) {
+        dval += fData[j].dataFourierPhase->GetBinContent(i);
+      }
+      fDataAvg.dataFourierPhase->SetBinContent(i, dval/fData.size());
+    }
+    // set marker color, line color, maker size, marker type
+    fDataAvg.dataFourierPhase->SetMarkerColor(fData[0].dataFourierPhase->GetMarkerColor());
+    fDataAvg.dataFourierPhase->SetLineColor(fData[0].dataFourierPhase->GetLineColor());
+    fDataAvg.dataFourierPhase->SetMarkerSize(fData[0].dataFourierPhase->GetMarkerSize());
+    fDataAvg.dataFourierPhase->SetMarkerStyle(fData[0].dataFourierPhase->GetMarkerStyle());
+  }
+  if (fDataAvg.theoryFourierRe != 0) {
+    for (Int_t i=0; i<fData[0].theoryFourierRe->GetNbinsX(); i++) {
+      dval = 0.0;
+      for (UInt_t j=0; j<fData.size(); j++) {
+        dval += fData[j].theoryFourierRe->GetBinContent(i);
+      }
+      fDataAvg.theoryFourierRe->SetBinContent(i, dval/fData.size());
+    }
+    // set marker color, line color, maker size, marker type
+    fDataAvg.theoryFourierRe->SetMarkerColor(fData[0].theoryFourierRe->GetMarkerColor());
+    fDataAvg.theoryFourierRe->SetLineColor(fData[0].theoryFourierRe->GetLineColor());
+    fDataAvg.theoryFourierRe->SetMarkerSize(fData[0].theoryFourierRe->GetMarkerSize());
+    fDataAvg.theoryFourierRe->SetMarkerStyle(fData[0].theoryFourierRe->GetMarkerStyle());
+  }
+  if (fDataAvg.theoryFourierIm != 0) {
+    for (Int_t i=0; i<fData[0].theoryFourierIm->GetNbinsX(); i++) {
+      dval = 0.0;
+      for (UInt_t j=0; j<fData.size(); j++) {
+        dval += fData[j].theoryFourierIm->GetBinContent(i);
+      }
+      fDataAvg.theoryFourierIm->SetBinContent(i, dval/fData.size());
+    }
+    // set marker color, line color, maker size, marker type
+    fDataAvg.theoryFourierIm->SetMarkerColor(fData[0].theoryFourierIm->GetMarkerColor());
+    fDataAvg.theoryFourierIm->SetLineColor(fData[0].theoryFourierIm->GetLineColor());
+    fDataAvg.theoryFourierIm->SetMarkerSize(fData[0].theoryFourierIm->GetMarkerSize());
+    fDataAvg.theoryFourierIm->SetMarkerStyle(fData[0].theoryFourierIm->GetMarkerStyle());
+  }
+  if (fDataAvg.theoryFourierPwr != 0) {
+    for (Int_t i=0; i<fData[0].theoryFourierPwr->GetNbinsX(); i++) {
+      dval = 0.0;
+      for (UInt_t j=0; j<fData.size(); j++) {
+        dval += fData[j].theoryFourierPwr->GetBinContent(i);
+      }
+      fDataAvg.theoryFourierPwr->SetBinContent(i, dval/fData.size());
+    }
+    // set marker color, line color, maker size, marker type
+    fDataAvg.theoryFourierPwr->SetMarkerColor(fData[0].theoryFourierPwr->GetMarkerColor());
+    fDataAvg.theoryFourierPwr->SetLineColor(fData[0].theoryFourierPwr->GetLineColor());
+    fDataAvg.theoryFourierPwr->SetMarkerSize(fData[0].theoryFourierPwr->GetMarkerSize());
+    fDataAvg.theoryFourierPwr->SetMarkerStyle(fData[0].theoryFourierPwr->GetMarkerStyle());
+  }
+  if (fDataAvg.theoryFourierPhase != 0) {
+    for (Int_t i=0; i<fData[0].theoryFourierPhase->GetNbinsX(); i++) {
+      dval = 0.0;
+      for (UInt_t j=0; j<fData.size(); j++) {
+        dval += fData[j].theoryFourierPhase->GetBinContent(i);
+      }
+      fDataAvg.theoryFourierPhase->SetBinContent(i, dval/fData.size());
+    }
+    // set marker color, line color, maker size, marker type
+    fDataAvg.theoryFourierPhase->SetMarkerColor(fData[0].theoryFourierPhase->GetMarkerColor());
+    fDataAvg.theoryFourierPhase->SetLineColor(fData[0].theoryFourierPhase->GetLineColor());
+    fDataAvg.theoryFourierPhase->SetMarkerSize(fData[0].theoryFourierPhase->GetMarkerSize());
+    fDataAvg.theoryFourierPhase->SetMarkerStyle(fData[0].theoryFourierPhase->GetMarkerStyle());
+  }
+  if (fDataAvg.diffFourierRe != 0) {
+    for (Int_t i=0; i<fData[0].diffFourierRe->GetNbinsX(); i++) {
+      dval = 0.0;
+      for (UInt_t j=0; j<fData.size(); j++) {
+        dval += fData[j].diffFourierRe->GetBinContent(i);
+      }
+      fDataAvg.diffFourierRe->SetBinContent(i, dval/fData.size());
+    }
+    // set marker color, line color, maker size, marker type
+    fDataAvg.diffFourierRe->SetMarkerColor(fData[0].diffFourierRe->GetMarkerColor());
+    fDataAvg.diffFourierRe->SetLineColor(fData[0].diffFourierRe->GetLineColor());
+    fDataAvg.diffFourierRe->SetMarkerSize(fData[0].diffFourierRe->GetMarkerSize());
+    fDataAvg.diffFourierRe->SetMarkerStyle(fData[0].diffFourierRe->GetMarkerStyle());
+  }
+  if (fDataAvg.diffFourierIm != 0) {
+    for (Int_t i=0; i<fData[0].diffFourierIm->GetNbinsX(); i++) {
+      dval = 0.0;
+      for (UInt_t j=0; j<fData.size(); j++) {
+        dval += fData[j].diffFourierIm->GetBinContent(i);
+      }
+      fDataAvg.diffFourierIm->SetBinContent(i, dval/fData.size());
+    }
+    // set marker color, line color, maker size, marker type
+    fDataAvg.diffFourierIm->SetMarkerColor(fData[0].diffFourierIm->GetMarkerColor());
+    fDataAvg.diffFourierIm->SetLineColor(fData[0].diffFourierIm->GetLineColor());
+    fDataAvg.diffFourierIm->SetMarkerSize(fData[0].diffFourierIm->GetMarkerSize());
+    fDataAvg.diffFourierIm->SetMarkerStyle(fData[0].diffFourierIm->GetMarkerStyle());
+  }
+  if (fDataAvg.diffFourierPwr != 0) {
+    for (Int_t i=0; i<fData[0].diffFourierPwr->GetNbinsX(); i++) {
+      dval = 0.0;
+      for (UInt_t j=0; j<fData.size(); j++) {
+        dval += fData[j].diffFourierPwr->GetBinContent(i);
+      }
+      fDataAvg.diffFourierPwr->SetBinContent(i, dval/fData.size());
+    }
+    // set marker color, line color, maker size, marker type
+    fDataAvg.diffFourierPwr->SetMarkerColor(fData[0].diffFourierPwr->GetMarkerColor());
+    fDataAvg.diffFourierPwr->SetLineColor(fData[0].diffFourierPwr->GetLineColor());
+    fDataAvg.diffFourierPwr->SetMarkerSize(fData[0].diffFourierPwr->GetMarkerSize());
+    fDataAvg.diffFourierPwr->SetMarkerStyle(fData[0].diffFourierPwr->GetMarkerStyle());
+  }
+  if (fDataAvg.diffFourierPhase != 0) {
+    for (Int_t i=0; i<fData[0].diffFourierPhase->GetNbinsX(); i++) {
+      dval = 0.0;
+      for (UInt_t j=0; j<fData.size(); j++) {
+        dval += fData[j].diffFourierPhase->GetBinContent(i);
+      }
+      fDataAvg.diffFourierPhase->SetBinContent(i, dval/fData.size());
+    }
+    // set marker color, line color, maker size, marker type
+    fDataAvg.diffFourierPhase->SetMarkerColor(fData[0].dataFourierRe->GetMarkerColor());
+    fDataAvg.diffFourierPhase->SetLineColor(fData[0].dataFourierRe->GetLineColor());
+    fDataAvg.diffFourierPhase->SetMarkerSize(fData[0].dataFourierRe->GetMarkerSize());
+    fDataAvg.diffFourierPhase->SetMarkerStyle(fData[0].dataFourierRe->GetMarkerStyle());
+  }
+}
+
+//--------------------------------------------------------------------------
 // FindOptimalFourierPhase (private)
 //--------------------------------------------------------------------------
 /**
@@ -2806,6 +3182,76 @@ void PMusrCanvas::CleanupFourierDifference()
       delete fData[i].diffFourierPhase;
       fData[i].diffFourierPhase = 0;
     }
+  }
+}
+
+//--------------------------------------------------------------------------
+// CleanupAverage (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Cleans up (deallocate) averaged data set.
+ */
+void PMusrCanvas::CleanupAverage()
+{
+  if (fDataAvg.data != 0) {
+    delete fDataAvg.data;
+    fDataAvg.data = 0;
+  }
+  if (fDataAvg.dataFourierRe != 0) {
+    delete fDataAvg.dataFourierRe;
+    fDataAvg.dataFourierRe = 0;
+  }
+  if (fDataAvg.dataFourierIm != 0) {
+    delete fDataAvg.dataFourierIm;
+    fDataAvg.dataFourierIm = 0;
+  }
+  if (fDataAvg.dataFourierPwr != 0) {
+    delete fDataAvg.dataFourierPwr;
+    fDataAvg.dataFourierPwr = 0;
+  }
+  if (fDataAvg.dataFourierPhase != 0) {
+    delete fDataAvg.dataFourierPhase;
+    fDataAvg.dataFourierPhase = 0;
+  }
+  if (fDataAvg.theory != 0) {
+    delete fDataAvg.theory;
+    fDataAvg.theory = 0;
+  }
+  if (fDataAvg.theoryFourierRe != 0) {
+    delete fDataAvg.theoryFourierRe;
+    fDataAvg.theoryFourierRe = 0;
+  }
+  if (fDataAvg.theoryFourierIm != 0) {
+    delete fDataAvg.theoryFourierIm;
+    fDataAvg.theoryFourierIm = 0;
+  }
+  if (fDataAvg.theoryFourierPwr != 0) {
+    delete fDataAvg.theoryFourierPwr;
+    fDataAvg.theoryFourierPwr = 0;
+  }
+  if (fDataAvg.theoryFourierPhase != 0) {
+    delete fDataAvg.theoryFourierPhase;
+    fDataAvg.theoryFourierPhase = 0;
+  }
+  if (fDataAvg.diff != 0) {
+    delete fDataAvg.diff;
+    fDataAvg.diff = 0;
+  }
+  if (fDataAvg.diffFourierRe != 0) {
+    delete fDataAvg.diffFourierRe;
+    fDataAvg.diffFourierRe = 0;
+  }
+  if (fDataAvg.diffFourierIm != 0) {
+    delete fDataAvg.diffFourierIm;
+    fDataAvg.diffFourierIm = 0;
+  }
+  if (fDataAvg.diffFourierPwr != 0) {
+    delete fDataAvg.diffFourierPwr;
+    fDataAvg.diffFourierPwr = 0;
+  }
+  if (fDataAvg.diffFourierPhase != 0) {
+    delete fDataAvg.diffFourierPhase;
+    fDataAvg.diffFourierPhase = 0;
   }
 }
 
@@ -3597,8 +4043,10 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
 
   // define x-axis title
   TString xAxisTitle("");
-  if (fFourier.fUnits == FOURIER_UNIT_FIELD) {
+  if (fFourier.fUnits == FOURIER_UNIT_GAUSS) {
     xAxisTitle = TString("Field (G)");
+  } else if (fFourier.fUnits == FOURIER_UNIT_TESLA) {
+    xAxisTitle = TString("Field (T)");
   } else if (fFourier.fUnits == FOURIER_UNIT_FREQ) {
     xAxisTitle = TString("Frequency (MHz)");
   } else if (fFourier.fUnits == FOURIER_UNIT_CYCLES) {
@@ -3610,6 +4058,7 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
   // plot fourier data
   Double_t xmin, xmax, ymin, ymax, binContent;
   UInt_t noOfPoints = 1000;
+
   switch (fCurrentPlotView) {
     case PV_FOURIER_REAL:
       // set x-range
@@ -3644,6 +4093,12 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
         binContent = GetMaximum(fData[i].theoryFourierRe);
         if (binContent > ymax)
           ymax = binContent;
+      }
+
+      // delete old fHistoFrame if present
+      if (fHistoFrame) {
+        delete fHistoFrame;
+        fHistoFrame = 0;
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
@@ -3718,6 +4173,12 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
         binContent = GetMaximum(fData[i].theoryFourierIm);
         if (binContent > ymax)
           ymax = binContent;
+      }
+
+      // delete old fHistoFrame if present
+      if (fHistoFrame) {
+        delete fHistoFrame;
+        fHistoFrame = 0;
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
@@ -3807,6 +4268,12 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
           ymax = binContent;
       }
 
+      // delete old fHistoFrame if present
+      if (fHistoFrame) {
+        delete fHistoFrame;
+        fHistoFrame = 0;
+      }
+
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
 
       // find the maximal number of points present in the histograms and increase the default number of points of fHistoFrame (1000) to the needed one
@@ -3887,7 +4354,13 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
           ymax = binContent;
       }
 
-      fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
+      // delete old fHistoFrame if present
+      if (fHistoFrame) {
+        delete fHistoFrame;
+        fHistoFrame = 0;
+      }
+
+      fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 0.95*ymin, xmax, 1.05*ymax);
 
       // find the maximal number of points present in the histograms and increase the default number of points of fHistoFrame (1000) to the needed one
       noOfPoints = 1000;
@@ -3901,9 +4374,9 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
       // set ranges for Fourier and Fourier theory
       for (UInt_t i=0; i<fData.size(); i++) {
         fData[i].dataFourierPwr->GetXaxis()->SetRangeUser(xmin, xmax);
-        fData[i].dataFourierPwr->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+        fData[i].dataFourierPwr->GetYaxis()->SetRangeUser(0.95*ymin, 1.05*ymax);
         fData[i].theoryFourierPwr->GetXaxis()->SetRangeUser(xmin, xmax);
-        fData[i].theoryFourierPwr->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+        fData[i].theoryFourierPwr->GetYaxis()->SetRangeUser(0.95*ymin, 1.05*ymax);
       }
 
       // set x-axis title
@@ -3957,6 +4430,12 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
         binContent = GetMaximum(fData[i].theoryFourierPhase);
         if (binContent > ymax)
           ymax = binContent;
+      }
+
+      // delete old fHistoFrame if present
+      if (fHistoFrame) {
+        delete fHistoFrame;
+        fHistoFrame = 0;
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
@@ -4036,8 +4515,10 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
 
   // define x-axis title
   TString xAxisTitle("");
-  if (fFourier.fUnits == FOURIER_UNIT_FIELD) {
+  if (fFourier.fUnits == FOURIER_UNIT_GAUSS) {
     xAxisTitle = TString("Field (G)");
+  } else if (fFourier.fUnits == FOURIER_UNIT_TESLA) {
+    xAxisTitle = TString("Field (T)");
   } else if (fFourier.fUnits == FOURIER_UNIT_FREQ) {
     xAxisTitle = TString("Frequency (MHz)");
   } else if (fFourier.fUnits == FOURIER_UNIT_CYCLES) {
@@ -4070,6 +4551,12 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
         binContent = GetMaximum(fData[i].diffFourierRe);
         if (binContent > ymax)
           ymax = binContent;
+      }
+
+      // delete old fHistoFrame if present
+      if (fHistoFrame) {
+        delete fHistoFrame;
+        fHistoFrame = 0;
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
@@ -4120,6 +4607,13 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
         if (binContent > ymax)
           ymax = binContent;
       }
+
+      // delete old fHistoFrame if present
+      if (fHistoFrame) {
+        delete fHistoFrame;
+        fHistoFrame = 0;
+      }
+
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
 
       // set ranges for Fourier difference
@@ -4176,6 +4670,13 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
         if (binContent > ymax)
           ymax = binContent;
       }
+
+      // delete old fHistoFrame if present
+      if (fHistoFrame) {
+        delete fHistoFrame;
+        fHistoFrame = 0;
+      }
+
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
 
       // set ranges for Fourier difference
@@ -4227,7 +4728,14 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
         if (binContent > ymax)
           ymax = binContent;
       }
-      fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
+
+      // delete old fHistoFrame if present
+      if (fHistoFrame) {
+        delete fHistoFrame;
+        fHistoFrame = 0;
+      }
+
+      fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 0.95*ymin, xmax, 1.05*ymax);
 
       // set x-axis title
       fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
@@ -4235,7 +4743,7 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
       // set ranges for Fourier difference
       for (UInt_t i=0; i<fData.size(); i++) {
         fData[i].diffFourierPwr->GetXaxis()->SetRangeUser(xmin, xmax);
-        fData[i].diffFourierPwr->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+        fData[i].diffFourierPwr->GetYaxis()->SetRangeUser(0.95*ymin, 1.05*ymax);
       }
 
       // set y-axis title
@@ -4273,6 +4781,13 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
         if (binContent > ymax)
           ymax = binContent;
       }
+
+      // delete old fHistoFrame if present
+      if (fHistoFrame) {
+        delete fHistoFrame;
+        fHistoFrame = 0;
+      }
+
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
 
       // set ranges for Fourier difference
@@ -4349,6 +4864,211 @@ void PMusrCanvas::PlotFourierPhaseValue(Bool_t unzoom)
   fCurrentFourierPhaseText->Draw();
 
   fDataTheoryPad->Update();
+}
+
+//--------------------------------------------------------------------------
+// PlotAverage (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Plot the average of the given data sets.
+ *
+ * \param unzoom if true, rescale to the original average range.
+ */
+void PMusrCanvas::PlotAverage(Bool_t unzoom)
+{
+  fDataTheoryPad->cd();
+
+  // define x-axis title
+  TString xAxisTitle("");
+  if (fCurrentPlotView == PV_DATA) {
+    xAxisTitle = TString("time (#mus)");
+  } else { // all the Fourier
+    if (fFourier.fUnits == FOURIER_UNIT_GAUSS) {
+      xAxisTitle = TString("Field (G)");
+    } else if (fFourier.fUnits == FOURIER_UNIT_TESLA) {
+      xAxisTitle = TString("Field (T)");
+    } else if (fFourier.fUnits == FOURIER_UNIT_FREQ) {
+      xAxisTitle = TString("Frequency (MHz)");
+    } else if (fFourier.fUnits == FOURIER_UNIT_CYCLES) {
+      xAxisTitle = TString("Frequency (Mc/s)");
+    } else {
+      xAxisTitle = TString("??");
+    }
+  }
+  // define y-axis title
+  TString yAxisTitle("");
+  if (fCurrentPlotView == PV_DATA) {
+    if (!fDifferenceView) {
+      PMsrRunList *runList = fMsrHandler->GetMsrRunList();
+      switch (fPlotType) {
+        case MSR_PLOT_SINGLE_HISTO:
+          if (runList->at(0).IsLifetimeCorrected()) { // lifetime correction
+            yAxisTitle = "<asymmetry>";
+          } else { // no liftime correction
+            if (fScaleN0AndBkg)
+              yAxisTitle = "<N(t)> per nsec";
+            else
+              yAxisTitle = "<N(t)> per bin";
+          }
+          break;
+        case MSR_PLOT_ASYM:
+          yAxisTitle = "<asymmetry>";
+          break;
+        case MSR_PLOT_MU_MINUS:
+          yAxisTitle = "<N(t)> per bin";
+          break;
+        default:
+          yAxisTitle = "??";
+          break;
+      }
+    } else { // DifferenceView
+      yAxisTitle = "<data-theory>";
+    }
+  } else { // all the Fourier
+    if (!fDifferenceView) {
+      switch (fCurrentPlotView) {
+        case PV_FOURIER_REAL:
+          yAxisTitle = "<Real Fourier>";
+          break;
+        case PV_FOURIER_IMAG:
+          yAxisTitle = "<Imaginary Fourier>";
+          break;
+        case PV_FOURIER_REAL_AND_IMAG:
+          yAxisTitle = "<Real/Imag Fourier>";
+          break;
+        case PV_FOURIER_PWR:
+          yAxisTitle = "<Ampl. Fourier>";
+          break;
+        case PV_FOURIER_PHASE:
+          yAxisTitle = "<Phase Fourier>";
+          break;
+        default:
+        yAxisTitle = "??";
+          break;
+      }
+    } else { // DifferenceView
+      switch (fCurrentPlotView) {
+        case PV_FOURIER_REAL:
+          if (fData[0].diffFourierTag == 1)
+            yAxisTitle = "<Real Fourier (d-f: data-theory)>";
+          else
+            yAxisTitle = "<Real Fourier (f-d: [(F data)-(F theory)]>";
+          break;
+        case PV_FOURIER_IMAG:
+        if (fData[0].diffFourierTag == 1)
+          yAxisTitle = "<Imag Fourier (d-f: data-theory)>";
+        else
+          yAxisTitle = "<Imag Fourier (f-d: [(F data)-(F theory)]>";
+        break;
+          break;
+        case PV_FOURIER_REAL_AND_IMAG:
+        if (fData[0].diffFourierTag == 1)
+          yAxisTitle = "<Real/Imag Fourier (d-f: data-theory)>";
+        else
+          yAxisTitle = "<Real/Imag Fourier (f-d: [(F data)-(F theory)]>";
+        break;
+          break;
+        case PV_FOURIER_PWR:
+        if (fData[0].diffFourierTag == 1)
+          yAxisTitle = "<Ampl. Fourier (d-f: data-theory)>";
+        else
+          yAxisTitle = "<Ampl. Fourier (f-d: [(F data)-(F theory)]>";
+        break;
+          break;
+        case PV_FOURIER_PHASE:
+        if (fData[0].diffFourierTag == 1)
+          yAxisTitle = "<Phase Fourier (d-f: data-theory)>";
+        else
+          yAxisTitle = "<Phase Fourier (f-d: [(F data)-(F theory)]>";
+        break;
+          break;
+        default:
+        yAxisTitle = "??";
+          break;
+      }
+    }
+  }
+
+  // find proper ranges
+  Double_t xmin, xmax, ymin, ymax;
+  xmin = fHistoFrame->GetXaxis()->GetBinLowEdge(fHistoFrame->GetXaxis()->GetFirst());
+  xmax = fHistoFrame->GetXaxis()->GetBinLowEdge(fHistoFrame->GetXaxis()->GetLast()) + fHistoFrame->GetXaxis()->GetBinWidth(fHistoFrame->GetXaxis()->GetLast());
+  ymin = fHistoFrame->GetMinimum();
+  ymax = fHistoFrame->GetMaximum();
+
+  // delete old fHistoFrame if present
+  if (fHistoFrame) {
+    delete fHistoFrame;
+    fHistoFrame = 0;
+  }
+
+  fHistoFrame = fDataTheoryPad->DrawFrame(xmin, ymin, xmax, ymax);
+
+  fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
+  fHistoFrame->GetYaxis()->SetTitle(yAxisTitle.Data());
+  fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
+
+  // find out what to be plotted
+  switch (fCurrentPlotView) {
+    case PV_DATA:
+      if (!fDifferenceView) { // averaged data view
+        fDataAvg.data->Draw("psame");
+        fDataAvg.theory->Draw("same");
+      } else { // averaged diff data view
+        fDataAvg.diff->Draw("psame");
+      }
+      break;
+    case PV_FOURIER_REAL:
+      if (!fDifferenceView) { // averaged Fourier Real view
+        fDataAvg.dataFourierRe->Draw("psame");
+        fDataAvg.theoryFourierRe->Draw("same");
+      } else { // averaged diff Fourier Real view
+        fDataAvg.diffFourierRe->Draw("psame");
+      }
+      break;
+    case PV_FOURIER_IMAG:
+      if (!fDifferenceView) { // averaged Fourier Imag view
+        fDataAvg.dataFourierIm->Draw("psame");
+        fDataAvg.theoryFourierIm->Draw("same");
+      } else { // averaged diff Fourier Imag view
+        fDataAvg.diffFourierIm->Draw("psame");
+      }
+      break;
+    case PV_FOURIER_REAL_AND_IMAG:
+      if (!fDifferenceView) { // averaged Fourier Real&Imag view
+        fDataAvg.dataFourierRe->Draw("psame");
+        fDataAvg.theoryFourierRe->Draw("same");
+        fDataAvg.dataFourierIm->Draw("psame");
+        fDataAvg.theoryFourierIm->Draw("same");
+      } else { // averaged diff Fourier Real&Imag view
+        fDataAvg.diffFourierRe->Draw("psame");
+        fDataAvg.diffFourierIm->Draw("psame");
+      }
+      break;
+    case PV_FOURIER_PWR:
+      if (!fDifferenceView) { // averaged Fourier Power view
+        fDataAvg.dataFourierPwr->Draw("psame");
+        fDataAvg.theoryFourierPwr->Draw("same");
+      } else { // averaged diff Fourier Power view
+        fDataAvg.diffFourierPwr->Draw("psame");
+      }
+      break;
+    case PV_FOURIER_PHASE:
+      if (!fDifferenceView) { // averaged Fourier Phase view
+        fDataAvg.dataFourierPhase->Draw("psame");
+        fDataAvg.theoryFourierPhase->Draw("same");
+      } else { // averaged diff Fourier Phase view
+        fDataAvg.diffFourierPhase->Draw("psame");
+      }
+      break;
+    default:
+      break;
+  }
+
+  fDataTheoryPad->Update();
+
+  fMainCanvas->cd();
+  fMainCanvas->Update();
 }
 
 //--------------------------------------------------------------------------

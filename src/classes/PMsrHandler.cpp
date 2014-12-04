@@ -923,14 +923,16 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         sstr.Remove(TString::kLeading, ' ');
         if (sstr.BeginsWith("units")) {
           fout << "units            ";
-          if (fFourier.fUnits == FOURIER_UNIT_FIELD) {
+          if (fFourier.fUnits == FOURIER_UNIT_GAUSS) {
             fout << "Gauss";
+          } else if (fFourier.fUnits == FOURIER_UNIT_TESLA) {
+            fout << "Tesla";
           } else if (fFourier.fUnits == FOURIER_UNIT_FREQ) {
             fout << "MHz ";
           } else if (fFourier.fUnits == FOURIER_UNIT_CYCLES) {
             fout << "Mc/s";
           }
-          fout << "   # units either 'Gauss', 'MHz', or 'Mc/s'";
+          fout << "   # units either 'Gauss', 'Tesla', 'MHz', or 'Mc/s'";
           fout << endl;
         } else if (sstr.BeginsWith("fourier_power")) {
           fout << "fourier_power    " << fFourier.fFourierPower << endl;
@@ -1783,14 +1785,16 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
     // units
     if (fFourier.fUnits) {
       fout << "units            ";
-      if (fFourier.fUnits == FOURIER_UNIT_FIELD) {
+      if (fFourier.fUnits == FOURIER_UNIT_GAUSS) {
         fout << "Gauss";
+      } else if (fFourier.fUnits == FOURIER_UNIT_TESLA) {
+        fout << "Tesla";
       } else if (fFourier.fUnits == FOURIER_UNIT_FREQ) {
         fout << "MHz ";
       } else if (fFourier.fUnits == FOURIER_UNIT_CYCLES) {
         fout << "Mc/s";
       }
-      fout << "   # units either 'Gauss', 'MHz', or 'Mc/s'";
+      fout << "   # units either 'Gauss', 'Tesla', 'MHz', or 'Mc/s'";
       fout << endl;
     }
 
@@ -3251,7 +3255,9 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (!str.CompareTo("gauss", TString::kIgnoreCase)) {
-          fourier.fUnits = FOURIER_UNIT_FIELD;
+          fourier.fUnits = FOURIER_UNIT_GAUSS;
+        } else if (!str.CompareTo("tesla", TString::kIgnoreCase)) {
+          fourier.fUnits = FOURIER_UNIT_TESLA;
         } else if (!str.CompareTo("mhz", TString::kIgnoreCase)) {
           fourier.fUnits = FOURIER_UNIT_FREQ;
         } else if (!str.CompareTo("mc/s", TString::kIgnoreCase)) {

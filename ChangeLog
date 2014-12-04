@@ -2,6 +2,13 @@
 # ChangeLog
 #---------------------------------------------------------------------
 
+changes since 0.12.0
+===================================
+NEW 2014-12-04 Fourier: added the unit 'Tesla' needed e.g. for HAL-9500
+NEW 2014-12-04 Added the possibility to show the average of currently viewed data.
+               This is useful e.g. when looking at the Fourier of lots
+               of histogram channels (detectors).
+
 changes since 0.11.0
 ===================================
 NEW 2014-02-07 added new internal field functions internFldGK and internFldLL to
@@ -38,7 +45,7 @@ NEW 2012-05-12 added dump_header. This is a little program which dumps the
 NEW 2012-04-24 added a first version for negative muon fitting. At the same 
                time substaintial bug fixing has been carried out (mainly the
 	       logx/logy handling).
-FIXED 2013-12-16 fixed a couple of bugs on level of config. This is needed expecially
+FIXED 2013-12-16 fixed a couple of bugs on level of config. This is needed especially
                  for Mac OS X 10.9 (Mavericks).
 FIXED 2013-11-29 in the global mode of msr2data for run lists, instread of the
                  value of the global parameter, the positive error was written into

@@ -1,4 +1,6 @@
-musrfit - muSR data analysis package
+# musrfit - muSR data analysis package #
+
+### Contents ###
 
 This is a data analysis package to analyze time differential muSR data. 
 Currently it allows the following things:
@@ -13,13 +15,19 @@ Currently it allows the following things:
 * allows to implement more sophisticated user functions 
   (e.g. GL vortex lattice, Meissner screening including low-energy muon stopping profiles)
 
-Currently supported platforms:
+### Currently supported platforms: ###
 
 * Linux
 * Mac OS X
 * Windows - not really, only for the very brave ones
 
+### Documentation ####
+
 For a more exhaustive user documentation see:
 
   http://lmu.web.psi.ch/musrfit/user/MUSR/WebHome.html
+
+### Contact ###
+
+<andreas.suter@psi.ch>
 

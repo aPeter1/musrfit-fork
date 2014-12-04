@@ -64,7 +64,7 @@ class PFourier
     TH1F *fData; ///< data histogram to be Fourier transformed.
 
     Bool_t fValid; ///< true = all boundary conditions fullfilled and hence a Fourier transform can be performed.
-    Int_t  fUnitTag; ///< 1=Field Units (G), 2=Frequency Units (MHz), 3=Angular Frequency Units (Mc/s)
+    Int_t  fUnitTag; ///< 1=Field Units (G), 2=Field Units (T), 3=Frequency Units (MHz), 4=Angular Frequency Units (Mc/s)
 
     Int_t fApodization; ///< 0=none, 1=weak, 2=medium, 3=strong
 

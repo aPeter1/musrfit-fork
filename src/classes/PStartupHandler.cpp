@@ -153,7 +153,7 @@ void PStartupHandler::OnStartDocument()
 
   // init fourier default variables
   fFourierDefaults.fFourierBlockPresent = false;
-  fFourierDefaults.fUnits = FOURIER_UNIT_FIELD;
+  fFourierDefaults.fUnits = FOURIER_UNIT_GAUSS;
   fFourierDefaults.fFourierPower = 0;
   fFourierDefaults.fApodization = FOURIER_APOD_NONE;
   fFourierDefaults.fPlotTag = FOURIER_PLOT_REAL_AND_IMAG;
@@ -340,7 +340,9 @@ void PStartupHandler::OnCharacters(const Char_t *str)
     case eUnits:
       tstr = TString(str);
       if (!tstr.CompareTo("gauss", TString::kIgnoreCase)) {
-        fFourierDefaults.fUnits = FOURIER_UNIT_FIELD;
+        fFourierDefaults.fUnits = FOURIER_UNIT_GAUSS;
+      } else if (!tstr.CompareTo("tesla", TString::kIgnoreCase)) {
+        fFourierDefaults.fUnits = FOURIER_UNIT_TESLA;
       } else if (!tstr.CompareTo("mhz", TString::kIgnoreCase)) {
         fFourierDefaults.fUnits = FOURIER_UNIT_FREQ;
       } else if (!tstr.CompareTo("mc/s", TString::kIgnoreCase)) {
