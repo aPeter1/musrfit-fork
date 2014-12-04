@@ -1,0 +1,338 @@
+153
+###############################################################
+FITPARAMETER
+#      Nr. Name       Value     Step      Pos_Error Boundaries   
+        1 Rate_1      1.6687    0.0083      none        
+        2 Field_1     73089.883 0.089       none        
+        3 Rate_2      1.968     0.031       none        
+        4 Field_2     72289.02  0.24        none        
+        
+        5 Asym_1      0.2949    0.0027      none        
+        6 Frc_1       0.7316    0.0052      none        
+        7 Phase_1     55.61     0.52        none        
+        8 N0_1        940.35    0.44        none        
+        9 Bkg_1       1.523     0.052       none        
+
+       10 Asym_2      0.2960    0.0026      none        
+       11 Frc_2       0.7475    0.0051      none        
+       12 Phase_2     30.77     0.50        none        
+       13 N0_2        961.49    0.45        none        
+       14 Bkg_2       1.928     0.053       none        
+
+       15 Asym_3      0.3002    0.0026      none        
+       16 Frc_3       0.7462    0.0050      none        
+       17 Phase_3     18.03     0.48        none        
+       18 N0_3        1024.28   0.46        none        
+       19 Bkg_3       1.919     0.055       none        
+
+       20 Asym_4      0.3088    0.0026      none        
+       21 Frc_4       0.7333    0.0048      none        
+       22 Phase_4     336.94    0.47        none        
+       23 N0_4        1029.36   0.46        none        
+       24 Bkg_4       1.863     0.055       none        
+
+       25 Asym_5      0.3094    0.0026      none        
+       26 Frc_5       0.7416    0.0049      none        
+       27 Phase_5     280.32    0.48        none        
+       28 N0_5        1002.69   0.46        none        
+       29 Bkg_5       1.979     0.054       none        
+
+       30 Asym_6      0.3153    0.0028      none        
+       31 Frc_6       0.7403    0.0051      none        
+       32 Phase_6     211.07    0.50        none        
+       33 N0_6        853.43    0.42        none        
+       34 Bkg_6       1.656     0.050       none        
+
+       35 Asym_7      0.3118    0.0028      none        
+       36 Frc_7       0.7378    0.0052      none        
+       37 Phase_7     161.74    0.51        none        
+       38 N0_7        858.76    0.42        none        
+       39 Bkg_7       1.594     0.050       none        
+
+       40 Asym_8      0.2985    0.0028      none        
+       41 Frc_8       0.7373    0.0053      none        
+       42 Phase_8     133.70    0.53        none        
+       43 N0_8        871.20    0.42        none        
+       44 Bkg_8       1.746     0.051       none        
+
+       45 Asym_9      0.2874    0.0024      none        
+       46 Frc_9       0.7341    0.0048      none        
+       47 Phase_9     158.63    0.47        none        
+       48 N0_9        1184.29   0.50        none        
+       49 Bkg_9       2.542     0.060       none        
+
+       50 Asym_10     0.2846    0.0026      none        
+       51 Frc_10      0.7453    0.0053      none        
+       52 Phase_10    128.05    0.49        none        
+       53 N0_10       1193.66   0.50        none        
+       54 Bkg_10      2.394     0.060       none        
+
+       55 Asym_11     0.2876   0.0024      none        
+       56 Frc_11      0.7463    0.0049      none        
+       57 Phase_11    102.57   0.46        none        
+       58 N0_11       1280.00   0.52        none        
+       59 Bkg_11      2.730     0.061       none        
+
+       60 Asym_12     0.2919    0.0022      none        
+       61 Frc_12      0.7405    0.0045      none        
+       62 Phase_12    42.97     0.44        none        
+       63 N0_12       1383.96   0.54        none        
+       64 Bkg_12      2.807     0.064       none        
+
+       65 Asym_13     0.2903    0.0021      none        
+       66 Frc_13      0.7494    0.0044      none        
+       67 Phase_13    350.74    0.43        none        
+       68 N0_13       1393.01   0.55        none        
+       69 Bkg_13      2.738     0.064       none        
+
+       70 Asym_14     0.2968    0.0022      none        
+       71 Frc_14      0.7327    0.0045      none        
+       72 Phase_14    288.56    0.43        none        
+       73 N0_14       1374.46   0.54        none        
+       74 Bkg_14      2.768     0.064       none        
+
+       75 Asym_15     0.2799    0.0021      none        
+       76 Frc_15      0.7427    0.0044      none        
+       77 Phase_15    282.56    0.47        none        
+       78 N0_15       1365.97   0.54        none        
+       79 Bkg_15      2.809     0.063       none        
+
+       80 Asym_16     0.2771    0.0023      none        
+       81 Frc_16      0.7344    0.0048      none        
+       82 Phase_16    212.46    0.47        none        
+       83 N0_16       1256.93   0.52        none        
+       84 Bkg_16      2.458     0.062       none        
+
+###############################################################
+THEORY
+asymmetry   fun1
+simplExpo      1          (rate)
+TFieldCos   map3  fun3       (phase frequency)
++
+asymmetry   fun2
+simplExpo      3          (rate)
+TFieldCos   map3  fun4       (phase frequency)
+
+###############################################################
+FUNCTIONS
+fun1 = map1 * map2
+fun2 = map1 * (1 - map2)
+fun3 = par2 * gamma_mu
+fun4 = par4 * gamma_mu
+
+###############################################################
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+lifetimecorrection
+map             5    6    7    0    0    0    0    0    0    0    0
+norm            8
+backgr.fit      9
+forward         2 
+data            20120   409500  
+t0              20108.0 
+fit             0.0005  10     
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+lifetimecorrection
+map            10   11   12    0    0    0    0    0    0    0    0
+norm            13
+backgr.fit      14
+forward         3 
+data            20111   409500  
+t0              20088.0 
+fit             0.0005  10     
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+lifetimecorrection
+map            15   16   17    0    0    0    0    0    0    0    0
+norm            18
+backgr.fit      19
+forward         4 
+data            20090   409500  
+t0              20061.0 
+fit             0.0005  10     
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+lifetimecorrection
+map            20   21   22    0    0    0    0    0    0    0    0
+norm            23
+backgr.fit      24
+forward         5 
+data            20106   409500  
+t0              20071.0 
+fit             0.0005  10     
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+lifetimecorrection
+map            25   26   27    0    0    0    0    0    0    0    0
+norm            28
+backgr.fit      29
+forward         6 
+data            20120   409500  
+t0              20080.0 
+fit             0.0005  10     
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+lifetimecorrection
+map            30   31   32    0    0    0    0    0    0    0    0
+norm            33
+backgr.fit      34
+forward         7 
+data            20120   409500  
+t0              20071.0 
+fit             0.0005  10     
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+lifetimecorrection
+map            35   36   37    0    0    0    0    0    0    0    0
+norm            38
+backgr.fit      39
+forward         8 
+data            20120   409500  
+t0              20066.0 
+fit             0.0005  10     
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+lifetimecorrection
+map            40   41   42    0    0    0    0    0    0    0    0
+norm            43
+backgr.fit      44
+forward         9 
+data            20058   409500  
+t0              20032.0 
+fit             0.0005  10     
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+lifetimecorrection
+map            45   46   47    0    0    0    0    0    0    0    0
+norm            48
+backgr.fit      49
+forward         10 
+data            20043   409500  
+t0              20022.0 
+fit             0.0005  10     
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+lifetimecorrection
+map            50   51   52    0    0    0    0    0    0    0    0
+norm            53
+backgr.fit      54
+forward         11 
+data            20043   409500  
+t0              20026.0 
+fit             0.0005  10     
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+lifetimecorrection
+map            55   56   57    0    0    0    0    0    0    0    0
+norm            58
+backgr.fit      59
+forward         12 
+data            20031   409500  
+t0              20010.0 
+fit             0.0005  10     
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+lifetimecorrection
+map            60   61   62    0    0    0    0    0    0    0    0
+norm            63
+backgr.fit      64
+forward         13 
+data            20043   409500  
+t0              20013.0 
+fit             0.0005  10     
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+lifetimecorrection
+map            65   66   67    0    0    0    0    0    0    0    0
+norm            68
+backgr.fit      69
+forward         14 
+data            20043   409500  
+t0              20017.0 
+fit             0.0005  10     
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+lifetimecorrection
+map            70   71   72    0    0    0    0    0    0    0    0
+norm            73
+backgr.fit      74
+forward         15 
+data            20043   409500  
+t0              20019.0 
+fit             0.0005  10     
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+lifetimecorrection
+map            75   76   77    0    0    0    0    0    0    0    0
+norm            78
+backgr.fit      79
+forward         16 
+data            20043   409500  
+t0              20019.0 
+fit             0.0005  10     
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+lifetimecorrection
+map            80   81   82    0    0    0    0    0    0    0    0
+norm            83
+backgr.fit      84
+forward         17 
+data            20058   409500  
+t0              20039.0 
+fit             0.0005  10     
+packing         5
+
+###############################################################
+COMMANDS
+MAX_LIKELIHOOD
+PRINT_LEVEL 2
+MINIMIZE
+SAVE
+
+###############################################################
+PLOT 0   (single histo plot)
+runs    1 11   
+range    0   9.07   -0.5   0.5
+
+###############################################################
+FOURIER
+units            Tesla   # units either 'Gauss', 'MHz', or 'Mc/s'
+fourier_power    12
+apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+range            7.1    7.5
+
+###############################################################
+STATISTIC --- 2014-12-03 15:42:56
+  maxLH = 1286508.7, NDF = 1246064, maxLH/NDF = 1.032458
