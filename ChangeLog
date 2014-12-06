@@ -8,6 +8,8 @@ NEW 2014-12-04 Fourier: added the unit 'Tesla' needed e.g. for HAL-9500
 NEW 2014-12-04 Added the possibility to show the average of currently viewed data.
                This is useful e.g. when looking at the Fourier of lots
                of histogram channels (detectors).
+FIXED 2014-12-04 added proper alignment for averaging. Still missing: error propagation
+                 for averaging in time based data.
 
 changes since 0.11.0
 ===================================
