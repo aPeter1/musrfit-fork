@@ -76,11 +76,12 @@ using namespace std;
 #define MSR_TAG_FITPARAMETER 1
 #define MSR_TAG_THEORY       2
 #define MSR_TAG_FUNCTIONS    3
-#define MSR_TAG_RUN          4
-#define MSR_TAG_COMMANDS     5
-#define MSR_TAG_FOURIER      6
-#define MSR_TAG_PLOT         7
-#define MSR_TAG_STATISTIC    8
+#define MSR_TAG_GLOBAL       4
+#define MSR_TAG_RUN          5
+#define MSR_TAG_COMMANDS     6
+#define MSR_TAG_FOURIER      7
+#define MSR_TAG_PLOT         8
+#define MSR_TAG_STATISTIC    9
 
 //-------------------------------------------------------------
 // msr fit type tags
@@ -522,6 +523,36 @@ typedef struct {
  * <p>typedef to make to code more readable: vector of fit parameters.
  */
 typedef vector<PMsrParamStructure> PMsrParamList;
+
+//-------------------------------------------------------------
+/**
+ * <p>Handles the information of the GLOBAL section
+ */
+class PMsrGlobalBlock {
+  public:
+    PMsrGlobalBlock();
+    virtual ~PMsrGlobalBlock() {}
+
+    virtual Int_t GetFitType() { return fFitType; }
+    virtual Int_t GetDataRange(UInt_t idx);
+    virtual UInt_t GetT0BinSize() { return fT0.size(); }
+    virtual Double_t GetT0Bin(UInt_t idx=0);
+    virtual Double_t GetFitRange(UInt_t idx);
+    virtual Int_t GetPacking() { return fPacking; }
+
+    virtual void SetFitType(Int_t ival) { fFitType = ival; }
+    virtual void SetDataRange(Int_t ival, Int_t idx);
+    virtual void SetT0Bin(Double_t dval, Int_t idx=-1);
+    virtual void SetFitRange(Double_t dval, UInt_t idx);
+    virtual void SetPacking(Int_t ival) { fPacking = ival; }
+
+  private:
+    Int_t fFitType;        ///< fit type: 0=single histo fit, 2=asymmetry fit, 4=mu^- single histo fit, 8=non muSR fit
+    Int_t fDataRange[4];   ///< data bin range (fit type 0, 2, 4)
+    PDoubleVector fT0;     ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type
+    Double_t fFitRange[2]; ///< fit range in (us)
+    Int_t fPacking;        ///< packing/rebinning
+};
 
 //-------------------------------------------------------------
 /**

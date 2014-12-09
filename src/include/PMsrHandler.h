@@ -45,7 +45,7 @@
 class PMsrHandler
 {
   public:
-    PMsrHandler(const Char_t *fileName, PStartupOptions *startupOptions=0);
+    PMsrHandler(const Char_t *fileName, const Bool_t fourierOnly=false, PStartupOptions *startupOptions=0);
     virtual ~PMsrHandler();
 
     virtual Int_t ReadMsrFile();
@@ -57,6 +57,7 @@ class PMsrHandler
     virtual PMsrParamList*          GetMsrParamList() { return &fParam; }
     virtual PMsrLines*              GetMsrTheory() { return &fTheory; }
     virtual PMsrLines*              GetMsrFunctions() { return &fFunctions; }
+    virtual PMsrGlobalBlock*        GetMsrGlobal() { return &fGlobal; }
     virtual PMsrRunList*            GetMsrRunList() { return &fRuns; }
     virtual PMsrLines*              GetMsrCommands() { return &fCommands; }
     virtual PMsrFourierStructure*   GetMsrFourierList() { return &fFourier; }
@@ -108,6 +109,7 @@ class PMsrHandler
     virtual Double_t GetAlphaEstimateN0();
 
   private:
+    Bool_t                 fFourierOnly; ///< flag indicating if Fourier transform only is wished. If yes, some part of the msr-file blocks are not needed.
     PStartupOptions       *fStartupOptions; ///< contains information about startup options from the musrfit_startup.xml
 
     TString                fFileName;  ///< file name of the msr-file
@@ -116,6 +118,7 @@ class PMsrHandler
     PMsrParamList          fParam;     ///< holds a list of the fit parameters
     PMsrLines              fTheory;    ///< holds the theory definition
     PMsrLines              fFunctions; ///< holds the user defined functions
+    PMsrGlobalBlock        fGlobal;    ///< holds the information of the global section
     PMsrRunList            fRuns;      ///< holds a list of run information
     PMsrLines              fCommands;  ///< holds a list of the minuit commands
     PMsrFourierStructure   fFourier;   ///< holds the parameters used for the Fourier transform
@@ -133,6 +136,7 @@ class PMsrHandler
     virtual Bool_t HandleFitParameterEntry(PMsrLines &line);
     virtual Bool_t HandleTheoryEntry(PMsrLines &line);
     virtual Bool_t HandleFunctionsEntry(PMsrLines &line);
+    virtual Bool_t HandleGlobalEntry(PMsrLines &line);
     virtual Bool_t HandleRunEntry(PMsrLines &line);
     virtual Bool_t HandleCommandsEntry(PMsrLines &line);
     virtual Bool_t HandleFourierEntry(PMsrLines &line);

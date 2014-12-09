@@ -694,6 +694,146 @@ void PRawRunData::SetTempError(const UInt_t idx, const Double_t errTemp)
 }
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// implementation PMsrGlobalBlock
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//--------------------------------------------------------------------------
+// PMsrGlobalBlock
+//--------------------------------------------------------------------------
+/**
+ * <p> Constructor
+ */
+PMsrGlobalBlock::PMsrGlobalBlock()
+{
+  fFitType = -1; // undefined fit type
+  for (UInt_t i=0; i<4; i++) {
+    fDataRange[i] = -1; // undefined data bin range
+  }
+  fFitRange[0] = PMUSR_UNDEFINED; // undefined start fit range
+  fFitRange[1] = PMUSR_UNDEFINED; // undefined end fit range
+  fPacking = -1; // undefined packing/rebinning
+}
+
+//--------------------------------------------------------------------------
+// GetDataRange (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> get data range at position idx
+ *
+ * <b>return:</b>
+ * - data range value, if idx is within proper boundaries
+ * - -1, otherwise
+ *
+ * \param idx index of the data range to be returned
+ */
+Int_t PMsrGlobalBlock::GetDataRange(UInt_t idx)
+{
+  if (idx >= 4)
+    return -1;
+
+  return fDataRange[idx];
+}
+
+//--------------------------------------------------------------------------
+// SetDataRange (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> set data range element at position idx
+ *
+ * \param ival data range element
+ * \param idx index of the data range element to be set.
+ */
+void PMsrGlobalBlock::SetDataRange(Int_t ival, Int_t idx)
+{
+  if (idx >= 4) {
+    cerr << endl << ">> PMsrGlobalBlock::SetDataRange: **WARNING** idx=" << idx << ", only idx=0..3 are sensible.";
+    cerr << endl;
+    return;
+  }
+
+  fDataRange[idx] = ival;
+}
+
+//--------------------------------------------------------------------------
+// GetT0Bin (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> get T0 bin at position idx
+ *
+ * <b>return:</b>
+ * - T0 bin, if idx is within proper boundaries
+ * - -1, otherwise
+ *
+ * \param idx index of the T0 bin to be returned
+ */
+Double_t PMsrGlobalBlock::GetT0Bin(UInt_t idx)
+{
+  if (idx >= fT0.size())
+    return -1;
+
+  return fT0[idx];
+}
+
+//--------------------------------------------------------------------------
+// SetT0Bin (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> set T0 bin at position idx
+ *
+ * \param ival T0 bin
+ * \param idx index of the T0 bin to be set. If idx==-1, append value
+ */
+void PMsrGlobalBlock::SetT0Bin(Double_t dval, Int_t idx)
+{
+  if (idx == -1) {
+    fT0.push_back(dval);
+    return;
+  }
+
+  if (idx >= static_cast<Int_t>(fT0.size()))
+    fT0.resize(idx+1);
+
+  fT0[idx] = dval;
+}
+
+//--------------------------------------------------------------------------
+// GetFitRange (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> get fit range value at position idx. idx: 0=fit range start, 1=fit range end.
+ *
+ * <b>return:</b>
+ * - fit range value, if idx is within proper boundaries
+ * - PMUSR_UNDEFINED, otherwise
+ *
+ * \param idx index of the fit range value to be returned
+ */
+Double_t PMsrGlobalBlock::GetFitRange(UInt_t idx)
+{
+  if (idx >= 2)
+    return PMUSR_UNDEFINED;
+
+  return fFitRange[idx];
+}
+
+//--------------------------------------------------------------------------
+// SetFitRange (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> set fit range value at position idx
+ *
+ * \param dval value to be set
+ * \param idx index of the fit range value to be set
+ */
+void PMsrGlobalBlock::SetFitRange(Double_t dval, UInt_t idx)
+{
+  if (idx >= 2)
+    return;
+
+  fFitRange[idx] = dval;
+}
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implementation PMsrRunBlock
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

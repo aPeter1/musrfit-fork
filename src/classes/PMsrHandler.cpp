@@ -50,8 +50,8 @@ using namespace std;
  *
  * \param fileName name of a msr-file.
  */
-PMsrHandler::PMsrHandler(const Char_t *fileName, PStartupOptions *startupOptions) :
-    fStartupOptions(startupOptions), fFileName(fileName)
+PMsrHandler::PMsrHandler(const Char_t *fileName, const Bool_t fourierOnly, PStartupOptions *startupOptions) :
+    fFourierOnly(fourierOnly), fStartupOptions(startupOptions), fFileName(fileName)
 { 
   // init variables
   fMsrBlockCounter = 0;
@@ -130,6 +130,7 @@ Int_t PMsrHandler::ReadMsrFile()
   PMsrLines fit_parameter;
   PMsrLines theory;
   PMsrLines functions;
+  PMsrLines global;
   PMsrLines run;
   PMsrLines commands;
   PMsrLines fourier;
@@ -174,6 +175,9 @@ Int_t PMsrHandler::ReadMsrFile()
       } else if (line.BeginsWith("FUNCTIONS")) {    // FUNCTIONS block tag
         fMsrBlockCounter = MSR_TAG_FUNCTIONS;
         functions.push_back(current);
+      } else if (line.BeginsWith("GLOBAL")) {       // GLOBAL block tag
+        fMsrBlockCounter = MSR_TAG_GLOBAL;
+        global.push_back(current);
       } else if (line.BeginsWith("RUN")) {          // RUN block tag
         fMsrBlockCounter = MSR_TAG_RUN;
         run.push_back(current);
@@ -200,6 +204,9 @@ Int_t PMsrHandler::ReadMsrFile()
             break;
           case MSR_TAG_FUNCTIONS:    // FUNCTIONS block
             functions.push_back(current);
+            break;
+          case MSR_TAG_GLOBAL:       // GLOBAL block
+            global.push_back(current);
             break;
           case MSR_TAG_RUN:          // RUN block
             run.push_back(current);
@@ -234,6 +241,9 @@ Int_t PMsrHandler::ReadMsrFile()
       result = PMUSR_MSR_SYNTAX_ERROR;
   if (result == PMUSR_SUCCESS)
     if (!HandleFunctionsEntry(functions))
+      result = PMUSR_MSR_SYNTAX_ERROR;
+  if (result == PMUSR_SUCCESS)
+    if (!HandleGlobalEntry(global))
       result = PMUSR_MSR_SYNTAX_ERROR;
   if (result == PMUSR_SUCCESS)
     if (!HandleRunEntry(run))
@@ -310,6 +320,7 @@ Int_t PMsrHandler::ReadMsrFile()
   fit_parameter.clear();
   theory.clear();
   functions.clear();
+  global.clear();
   run.clear();
   commands.clear();
   fourier.clear();
@@ -453,6 +464,10 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
       tag = MSR_TAG_FUNCTIONS;
       fout << str.Data() << endl;
       continue;
+    } else if (str.BeginsWith("GLOBAL")) {       // GLOBAL block tag
+      tag = MSR_TAG_GLOBAL;
+      fout << str.Data() << endl;
+      continue;
     } else if (str.BeginsWith("RUN")) {          // RUN block tag
       tag = MSR_TAG_RUN;
       runNo++;
@@ -587,6 +602,9 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         } else {
           fout << str.Data() << endl;
         }
+        break;
+      case MSR_TAG_GLOBAL:
+        // STILL MISSING
         break;
       case MSR_TAG_RUN:
         sstr = str;
@@ -1472,6 +1490,9 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
   }
   fout << endl;
   fout << hline.Data() << endl;
+
+  // write GLOBAL block
+  // STILL MISSING
 
   // write RUN blocks
   for (i = 0; i < fRuns.size(); ++i) {
@@ -2524,6 +2545,169 @@ Bool_t PMsrHandler::HandleFunctionsEntry(PMsrLines &lines)
 }
 
 //--------------------------------------------------------------------------
+// HandleGlobalEntry (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Parses the GLOBAL block of the msr-file.
+ *
+ * <b>return:</b>
+ * - true if successful
+ * - false otherwise
+ *
+ * \param lines is a list of lines containing the run blocks
+ */
+Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
+{
+  PMsrLines::iterator iter;
+  PMsrGlobalBlock global;
+
+  Bool_t error = false;
+
+  TString str;
+  TObjArray *tokens = 0;
+  TObjString *ostr = 0;
+  Int_t ival;
+  Double_t dval;
+
+  iter = lines.begin();
+  while ((iter != lines.end()) && !error) {
+    // remove potential comment at the end of lines
+    str = iter->fLine;
+    Ssiz_t idx = str.Index("#");
+    if (idx != -1)
+      str.Remove(idx);
+
+    // tokenize line
+    tokens = str.Tokenize(" \t");
+    if (!tokens) {
+      cerr << endl << ">> PMsrHandler::HandleGlobalEntry: **SEVERE ERROR** Couldn't tokenize line " << iter->fLineNo;
+      cerr << endl << endl;
+      return false;
+    }
+
+    if (iter->fLine.BeginsWith("fittype", TString::kIgnoreCase)) { // fittype
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit()) {
+          Int_t fittype = str.Atoi();
+          if ((fittype == MSR_FITTYPE_SINGLE_HISTO) ||
+              (fittype == MSR_FITTYPE_ASYM) ||
+              (fittype == MSR_FITTYPE_MU_MINUS) ||
+              (fittype == MSR_FITTYPE_NON_MUSR)) {
+            global.SetFitType(fittype);
+          } else {
+            error = true;
+          }
+        } else {
+          error = true;
+        }
+      }
+    } else if (iter->fLine.BeginsWith("data", TString::kIgnoreCase)) { // data
+      if (tokens->GetEntries() < 3) {
+        error = true;
+      } else {
+        for (Int_t i=1; i<tokens->GetEntries(); i++) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(i));
+          str = ostr->GetString();
+          if (str.IsDigit()) {
+            ival = str.Atoi();
+            if (ival >= 0) {
+              global.SetDataRange(ival, i-1);
+            } else {
+              error = true;
+            }
+          } else {
+            error = true;
+          }
+        }
+      }
+    } else if (iter->fLine.BeginsWith("t0", TString::kIgnoreCase)) { // t0
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        for (Int_t i=1; i<tokens->GetEntries(); i++) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(i));
+          str = ostr->GetString();
+          if (str.IsFloat()) {
+            dval = str.Atof();
+            if (dval >= 0.0)
+              global.SetT0Bin(dval);
+            else
+              error = true;
+          } else {
+            error = true;
+          }
+        }
+      }
+    } else if (iter->fLine.BeginsWith("fit", TString::kIgnoreCase)) { // fit range
+      if (tokens->GetEntries() < 3) {
+        error = true;
+      } else { // fit given in time, i.e. fit <start> <end>, where <start>, <end> are given as doubles
+        for (Int_t i=1; i<3; i++) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(i));
+          str = ostr->GetString();
+          if (str.IsFloat())
+            global.SetFitRange(str.Atof(), i-1);
+          else
+            error = true;
+        }
+      }
+    } else if (iter->fLine.BeginsWith("packing", TString::kIgnoreCase)) { // packing
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit()) {
+          ival = str.Atoi();
+          if (ival >= 0) {
+            global.SetPacking(ival);
+          } else {
+            error = true;
+          }
+        } else {
+          error = true;
+        }
+      }
+    }
+
+    // clean up
+    if (tokens) {
+      delete tokens;
+      tokens = 0;
+    }
+
+    ++iter;
+  }
+
+  if (error) {
+    --iter;
+    cerr << endl << ">> PMsrHandler::HandleGlobalEntry: **ERROR** in line " << iter->fLineNo << ":";
+    cerr << endl << ">> '" << iter->fLine.Data() << "'";
+    cerr << endl << ">> GLOBAL block syntax is too complex to print it here. Please check the manual.";
+  } else { // save global
+    fGlobal = global;
+  }
+
+  cout << endl << "debug> Global: fittype   : " << fGlobal.GetFitType();
+  cout << endl << "debug> Global: data bin range: ";
+  for (UInt_t i=0; i<4; i++) {
+    cout << fGlobal.GetDataRange(i) << ", ";
+  }
+  cout << endl << "debug> Global: t0's      : ";
+  for (UInt_t i=0; i<fGlobal.GetT0BinSize(); i++)
+    cout << fGlobal.GetT0Bin(i) << ", ";
+  cout << endl << "debug> Global: fit       : " << fGlobal.GetFitRange(0) << ", " << fGlobal.GetFitRange(1);
+  cout << endl << "debug> Global: packing   : " << fGlobal.GetPacking();
+  cout << endl;
+
+  return !error;
+}
+
+//--------------------------------------------------------------------------
 // HandleRunEntry (private)
 //--------------------------------------------------------------------------
 /**
@@ -3165,7 +3349,7 @@ Bool_t PMsrHandler::HandleCommandsEntry(PMsrLines &lines)
 {
   PMsrLines::iterator iter;
 
-  if (lines.empty()) {
+  if (lines.empty() && !fFourierOnly) {
     cerr << endl << ">> PMsrHandler::HandleCommandsEntry(): **WARNING**: There is no COMMAND block! Do you really want this?";
     cerr << endl;
   }
@@ -3216,8 +3400,6 @@ void PMsrHandler::InitFourierParameterStructure(PMsrFourierStructure &fourier)
  */
 Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
 {
-//cout << endl << ">> in PMsrHandler::HandleFourierEntry ...";
-
   Bool_t error = false;
 
   if (lines.empty()) // no fourier block present
@@ -3999,7 +4181,7 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
  */
 Bool_t PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
 {
-  if (lines.empty()) {
+  if (lines.empty() && !fFourierOnly) {
     cerr << endl << ">> PMsrHandler::HandleStatisticEntry: **WARNING** There is no STATISTIC block! Do you really want this?";
     cerr << endl;
     fStatistic.fValid = false;
@@ -4637,35 +4819,40 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
   for (UInt_t i=0; i<fRuns.size(); i++) {
     // check if fittype is defined
     fitType = fRuns[i].GetFitType();
-    if (fitType == -1) {
-      cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** fittype is not defined in RUN block number " << i+1 << endl;
-      return false;
+    if (fitType == -1) { // fittype not given in the run block
+      fitType = fGlobal.GetFitType();
+      if (fitType == -1) {
+        cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** fittype is neither defined in RUN block number " << i+1 << ", nor in the GLOBAL block." << endl;
+        return false;
+      }
     }
 
     // check for the different fittypes differently
     switch (fitType) {
       case PRUN_SINGLE_HISTO:
         // check of norm is present
-        if (fRuns[i].GetNormParamNo() == -1) {
+        if ((fRuns[i].GetNormParamNo() == -1) && !fFourierOnly) {
           cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
           cerr << endl << ">>   Norm parameter number not defined. Necessary for single histogram fits." << endl;
           return false;
         }
-        // check if norm parameter is given that it is either a valid function of a fit parameter present
-        if (fRuns[i].GetNormParamNo() < MSR_PARAM_FUN_OFFSET) { // parameter number
-          // check that norm parameter number is not larger than the number of parameters
-          if (fRuns[i].GetNormParamNo() > static_cast<Int_t>(fParam.size())) {
-            cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-            cerr << endl << ">>   Norm parameter number " << fRuns[i].GetNormParamNo() << " is larger than the number of fit parameters (" << fParam.size() << ").";
-            cerr << endl << ">>   Consider to check the manual ;-)" << endl;
-            return false;
-          }
-        } else { // function norm
-          if (fRuns[i].GetNormParamNo()-MSR_PARAM_FUN_OFFSET > GetNoOfFuncs()) {
-            cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-            cerr << endl << ">>   Norm parameter function number " << fRuns[i].GetNormParamNo()-MSR_PARAM_FUN_OFFSET << " is larger than the number of functions (" << GetNoOfFuncs() << ").";
-            cerr << endl << ">>   Consider to check the manual ;-)" << endl;
-            return false;
+        if (!fFourierOnly) { // next check NOT needed for Fourier only
+          // check if norm parameter is given that it is either a valid function of a fit parameter present
+          if (fRuns[i].GetNormParamNo() < MSR_PARAM_FUN_OFFSET) { // parameter number
+            // check that norm parameter number is not larger than the number of parameters
+            if (fRuns[i].GetNormParamNo() > static_cast<Int_t>(fParam.size())) {
+              cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+              cerr << endl << ">>   Norm parameter number " << fRuns[i].GetNormParamNo() << " is larger than the number of fit parameters (" << fParam.size() << ").";
+              cerr << endl << ">>   Consider to check the manual ;-)" << endl;
+              return false;
+            }
+          } else { // function norm
+            if (fRuns[i].GetNormParamNo()-MSR_PARAM_FUN_OFFSET > GetNoOfFuncs()) {
+              cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+              cerr << endl << ">>   Norm parameter function number " << fRuns[i].GetNormParamNo()-MSR_PARAM_FUN_OFFSET << " is larger than the number of functions (" << GetNoOfFuncs() << ").";
+              cerr << endl << ">>   Consider to check the manual ;-)" << endl;
+              return false;
+            }
           }
         }
         // check that there is a forward parameter number
@@ -4685,28 +4872,32 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
         }
         // check fit range
         if (!fRuns[i].IsFitRangeInBin()) { // fit range given as times in usec
-          if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) {
-            cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-            cerr << endl << "  Fit range is not defined. Necessary for single histogram fits." << endl;
-            return false;
+          if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) { // check fit range in RUN block
+            if ((fGlobal.GetFitRange(0) == PMUSR_UNDEFINED) || (fGlobal.GetFitRange(1) == PMUSR_UNDEFINED)) { // check fit range in GLOBAL block
+              cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+              cerr << endl << "  Fit range is not defined. Necessary for single histogram fits." << endl;
+              return false;
+            }
           }
         }
         // check number of T0's provided
-        if (fRuns[i].GetT0BinSize() > fRuns[i].GetForwardHistoNoSize()) {
+        if ((fRuns[i].GetT0BinSize() > fRuns[i].GetForwardHistoNoSize()) &&
+            (fGlobal.GetT0BinSize() > fRuns[i].GetForwardHistoNoSize())) {
           cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
           cerr << endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << fRuns[i].GetForwardHistoNoSize() << ". Needs to be fixed." << endl;
+          cerr << endl << ">>   In GLOBAL block: " << fGlobal.GetT0BinSize() << " T0 entries. Expecting only " << fRuns[i].GetForwardHistoNoSize() << ". Needs to be fixed." << endl;
           return false;
         }
         // check packing
-        if (fRuns[i].GetPacking() == -1) {
+        if ((fRuns[i].GetPacking() == -1) && (fGlobal.GetPacking() == -1)) {
           cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **WARNING** in RUN block number " << i+1;
-          cerr << endl << ">>   Packing is not defined, will set it to 1." << endl;
+          cerr << endl << ">>   Packing is neither defined here, nor in the GLOBAL block, will set it to 1." << endl;
           fRuns[i].SetPacking(1);
         }
         break;
       case PRUN_ASYMMETRY:
         // check alpha
-        if (fRuns[i].GetAlphaParamNo() == -1) {
+        if ((fRuns[i].GetAlphaParamNo() == -1) && !fFourierOnly) {
           cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
           cerr << endl << ">>   alpha parameter number missing which is needed for an asymmetry fit.";
           cerr << endl << ">>   Consider to check the manual ;-)" << endl;
@@ -4715,38 +4906,44 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
         // check that there is a forward parameter number
         if (fRuns[i].GetForwardHistoNo() == -1) {
           cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          cerr << endl << ">>   forward histogram number not defined. Necessary for single histogram fits." << endl;
+          cerr << endl << ">>   forward histogram number not defined. Necessary for asymmetry fits." << endl;
           return false;
         }
         // check that there is a backward parameter number
         if (fRuns[i].GetBackwardHistoNo() == -1) {
           cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          cerr << endl << ">>   backward histogram number not defined. Necessary for single histogram fits." << endl;
+          cerr << endl << ">>   backward histogram number not defined. Necessary for asymmetry fits." << endl;
           return false;
         }
         // check fit range
         if (!fRuns[i].IsFitRangeInBin()) { // fit range given as times in usec
           if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) {
-            cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-            cerr << endl << ">>   Fit range is not defined. Necessary for single histogram fits." << endl;
-            return false;
+            if ((fGlobal.GetFitRange(0) == PMUSR_UNDEFINED) || (fGlobal.GetFitRange(1) == PMUSR_UNDEFINED)) {
+              cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+              cerr << endl << ">>   Fit range is not defined, also NOT present in the GLOBAL block. Necessary for asymmetry fits." << endl;
+              return false;
+            }
           }
         }
         // check number of T0's provided
-        if (fRuns[i].GetT0BinSize() > 2*fRuns[i].GetForwardHistoNoSize()) {
+        if ((fRuns[i].GetT0BinSize() > 2*fRuns[i].GetForwardHistoNoSize()) &&
+            (fGlobal.GetT0BinSize() > 2*fRuns[i].GetForwardHistoNoSize())) {
           cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
           cerr << endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetForwardHistoNoSize() << " in forward. Needs to be fixed." << endl;
+          cerr << endl << ">>   In GLOBAL block: " << fGlobal.GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetForwardHistoNoSize() << ". Needs to be fixed." << endl;
           return false;
         }
-        if (fRuns[i].GetT0BinSize() > 2*fRuns[i].GetBackwardHistoNoSize()) {
+        if ((fRuns[i].GetT0BinSize() > 2*fRuns[i].GetBackwardHistoNoSize()) &&
+            (fGlobal.GetT0BinSize() > 2*fRuns[i].GetBackwardHistoNoSize())) {
           cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
           cerr << endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetBackwardHistoNoSize() << " in backward. Needs to be fixed." << endl;
+          cerr << endl << ">>   In GLOBAL block: " << fGlobal.GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetBackwardHistoNoSize() << ". Needs to be fixed." << endl;
           return false;
         }
         // check packing
-        if (fRuns[i].GetPacking() == -1) {
+        if ((fRuns[i].GetPacking() == -1) && (fGlobal.GetPacking() == -1)) {
           cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **WARNING** in RUN block number " << i+1;
-          cerr << endl << ">>   Packing is not defined, will set it to 1." << endl;
+          cerr << endl << ">>   Packing is neither defined here, nor in the GLOBAL block, will set it to 1." << endl;
           fRuns[i].SetPacking(1);
         }
         break;
