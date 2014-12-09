@@ -58,6 +58,7 @@ PRunSingleHisto::PRunSingleHisto() : PRunBase()
   fScaleN0AndBkg = true;
   fNoOfFitBins  = 0;
   fBackground = 0;
+  fPacking = -1;
 
   // the 2 following variables are need in case fit range is given in bins, and since
   // the fit range can be changed in the command block, these variables need to be accessible
@@ -80,6 +81,18 @@ PRunSingleHisto::PRunSingleHisto(PMsrHandler *msrInfo, PRunDataHandler *rawData,
 {
   fScaleN0AndBkg = IsScaleN0AndBkg();
   fNoOfFitBins  = 0;
+
+  fPacking = fRunInfo->GetPacking();
+  if (fPacking == -1) { // i.e. packing is NOT given in the RUN-block, it must be given in the GLOBAL-block
+    fPacking = fMsrInfo->GetMsrGlobal()->GetPacking();
+  }
+  if (fPacking == -1) { // this should NOT happen, somethin is severely wrong
+    cerr << endl << ">> PRunSingleHisto::PRunSingleHisto: **SEVERE ERROR**: Couldn't find any packing information!";
+    cerr << endl << ">> This is very bad :-(, will quit ...";
+    cerr << endl;
+    fValid = false;
+    return;
+  }
 
   // the 2 following variables are need in case fit range is given in bins, and since
   // the fit range can be changed in the command block, these variables need to be accessible
@@ -192,7 +205,7 @@ Double_t PRunSingleHisto::CalcChiSquare(const std::vector<Double_t>& par)
   // the correction factor is need since the data scales like pack*t_res,
   // whereas the error scales like sqrt(pack*t_res)
   if (fScaleN0AndBkg)
-    chisq *= fRunInfo->GetPacking() * (fTimeResolution * 1.0e3);
+    chisq *= fPacking * (fTimeResolution * 1.0e3);
 
   return chisq;
 }
@@ -285,7 +298,7 @@ Double_t PRunSingleHisto::CalcChiSquareExpected(const std::vector<Double_t>& par
   // the correction factor is need since the data scales like pack*t_res,
   // whereas the error scales like sqrt(pack*t_res)
   if (fScaleN0AndBkg)
-    chisq *= fRunInfo->GetPacking() * (fTimeResolution * 1.0e3);
+    chisq *= fPacking * (fTimeResolution * 1.0e3);
 
   return chisq;
 }
@@ -352,7 +365,7 @@ Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
   Double_t normalizer = 1.0;
 
   if (fScaleN0AndBkg)
-    normalizer = fRunInfo->GetPacking() * (fTimeResolution * 1.0e3);
+    normalizer = fPacking * (fTimeResolution * 1.0e3);
 
   // In order not to have an IF in the next loop, determine the start and end bins for the fit range now
   Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
@@ -608,6 +621,9 @@ Bool_t PRunSingleHisto::PrepareData()
 {
   Bool_t success = true;
 
+  // keep the Global block info
+  PMsrGlobalBlock *globalBlock = fMsrInfo->GetMsrGlobal();
+
   // get the proper run
   PRawRunData* runData = fRawData->GetRunData(*fRunInfo->GetRunName());
   if (!runData) { // couldn't get run
@@ -644,13 +660,21 @@ Bool_t PRunSingleHisto::PrepareData()
     fT0s[i] = fRunInfo->GetT0Bin(i);
   }
 
+  // fill in the T0's from the GLOBAL block section (if present)
+  for (UInt_t i=0; i<globalBlock->GetT0BinSize(); i++) {
+    if (fT0s[i] == -1) { // i.e. not given in the RUN block section
+      fT0s[i] = globalBlock->GetT0Bin(i);
+    }
+  }
+
   // fill in the T0's from the data file, if not already present in the msr-file
   for (UInt_t i=0; i<histoNo.size(); i++) {
-    if (fT0s[i] == -1.0) // i.e. not present in the msr-file, try the data file
+    if (fT0s[i] == -1.0) { // i.e. not present in the msr-file, try the data file
       if (runData->GetT0Bin(histoNo[i]) > 0.0) {
         fT0s[i] = runData->GetT0Bin(histoNo[i]);
         fRunInfo->SetT0Bin(fT0s[i], i); // keep value for the msr-file
       }
+    }
   }
 
   // fill in the T0's gaps, i.e. in case the T0's are NOT in the msr-file and NOT in the data file
@@ -827,6 +851,15 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
   Int_t end;
   start = fRunInfo->GetDataRange(0);
   end   = fRunInfo->GetDataRange(1);
+
+  // check if data range has been provided, and if not try to get it from the GLOBAL block section
+  if (start < 0) {
+    start = fMsrInfo->GetMsrGlobal()->GetDataRange(0);
+  }
+  if (end < 0) {
+    end = fMsrInfo->GetMsrGlobal()->GetDataRange(1);
+  }
+
   // check if data range has been provided, and if not try to estimate them
   if (start < 0) {
     Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
@@ -864,7 +897,7 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
     return false;
   }
 
-  // keep good bins for potential latter use
+  // keep good bins for potential later use
   fGoodBins[0] = start;
   fGoodBins[1] = end;
 
@@ -875,6 +908,11 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
     // write these times back into the data structure. This way it is available when writting the log-file
     fRunInfo->SetFitRange(fFitStartTime, 0);
     fRunInfo->SetFitRange(fFitEndTime, 1);
+  }
+
+  // check if fit range is given in the run block. If not, i.e. it has to be found in the global section!
+  if (fRunInfo->GetFitRange(0) == PMUSR_UNDEFINED) {
+// ANYTHING NEEDED AT THIS POINT??? as35
   }
 
   // check how the background shall be handled
@@ -908,13 +946,13 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
   // in order that after rebinning the fit does not need to be redone (important for plots)
   // the value is normalize to per 1 nsec if scaling is whished
   if (fScaleN0AndBkg)
-    normalizer = fRunInfo->GetPacking() * (fTimeResolution * 1.0e3); // fTimeResolution us->ns
+    normalizer = fPacking * (fTimeResolution * 1.0e3); // fTimeResolution us->ns
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.SetDataTimeStart(fTimeResolution*((Double_t)start-(Double_t)t0+(Double_t)(fRunInfo->GetPacking()-1)/2.0));
-  fData.SetDataTimeStep(fTimeResolution*fRunInfo->GetPacking());
+  fData.SetDataTimeStart(fTimeResolution*((Double_t)start-(Double_t)t0+(Double_t)(fPacking-1)/2.0));
+  fData.SetDataTimeStep(fTimeResolution*fPacking);
   for (Int_t i=start; i<end; i++) {
-    if (fRunInfo->GetPacking() == 1) {
+    if (fPacking == 1) {
       value = fForward[i];
       value /= normalizer;
       fData.AppendValue(value);
@@ -922,8 +960,8 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
         fData.AppendErrorValue(1.0/normalizer);
       else
         fData.AppendErrorValue(TMath::Sqrt(value));
-    } else { // packed data, i.e. fRunInfo->GetPacking() > 1
-      if (((i-start) % fRunInfo->GetPacking() == 0) && (i != start)) { // fill data
+    } else { // packed data, i.e. fPacking > 1
+      if (((i-start) % fPacking == 0) && (i != start)) { // fill data
         value /= normalizer;
         fData.AppendValue(value);
         if (value == 0.0)
@@ -964,7 +1002,7 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
 Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t histoNo)
 {
   // check if view_packing is wished
-  Int_t packing = fRunInfo->GetPacking();
+  Int_t packing = fPacking;
   if (fMsrInfo->GetMsrPlotList()->at(0).fViewPacking > 0) {
     packing = fMsrInfo->GetMsrPlotList()->at(0).fViewPacking;
   }
@@ -974,7 +1012,7 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
   if (fScaleN0AndBkg) {
     dataNorm = 1.0/ (packing * (fTimeResolution * 1.0e3)); // fTimeResolution us->ns
   } else if (!fScaleN0AndBkg && (fMsrInfo->GetMsrPlotList()->at(0).fViewPacking > 0)) {
-    theoryNorm = (Double_t)fMsrInfo->GetMsrPlotList()->at(0).fViewPacking/(Double_t)fRunInfo->GetPacking();
+    theoryNorm = (Double_t)fMsrInfo->GetMsrPlotList()->at(0).fViewPacking/(Double_t)packing;
   }
 
   // raw data, since PMusrCanvas is doing ranging etc.
@@ -1157,7 +1195,7 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
 Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histoNo)
 {
   // check if view_packing is wished. This is a global option for all PLOT blocks!
-  Int_t packing = fRunInfo->GetPacking();
+  Int_t packing = fPacking;
   if (fMsrInfo->GetMsrPlotList()->at(0).fViewPacking > 0) {
     packing = fMsrInfo->GetMsrPlotList()->at(0).fViewPacking;
   }
@@ -1171,7 +1209,7 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
   if (fScaleN0AndBkg) {
     dataNorm = 1.0/ (packing * (fTimeResolution * 1.0e3)); // fTimeResolution us->ns
   } else if (!fScaleN0AndBkg && (fMsrInfo->GetMsrPlotList()->at(0).fViewPacking > 0)) {
-    theoryNorm = (Double_t)fMsrInfo->GetMsrPlotList()->at(0).fViewPacking/(Double_t)fRunInfo->GetPacking();
+    theoryNorm = (Double_t)fMsrInfo->GetMsrPlotList()->at(0).fViewPacking/(Double_t)packing;
   }
 
   // transform raw histo data. This is done the following way (for details see the manual):
@@ -1461,7 +1499,7 @@ void PRunSingleHisto::EstimateN0()
   if (fScaleN0AndBkg) {
     N0 /= fTimeResolution*1.0e3;
   } else {
-    N0 *= fRunInfo->GetPacking();
+    N0 *= fPacking;
   }
 
   cout << ">> PRunSingleHisto::EstimateN0: found N0=" << param->at(paramNo-1).fValue << ", will set it to N0=" << N0 << endl;
@@ -1507,10 +1545,10 @@ Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
 
   // calculate proper background range
   if (beamPeriod != 0.0) {
-    Double_t timeBkg = (Double_t)(end-start)*(fTimeResolution*fRunInfo->GetPacking()); // length of the background intervall in time
+    Double_t timeBkg = (Double_t)(end-start)*(fTimeResolution*fPacking); // length of the background intervall in time
     UInt_t fullCycles = (UInt_t)(timeBkg/beamPeriod); // how many proton beam cylces can be placed within the proposed background intervall
     // correct the end of the background intervall such that the background is as close as possible to a multiple of the proton cylce
-    end = start + (UInt_t) ((fullCycles*beamPeriod)/(fTimeResolution*fRunInfo->GetPacking()));
+    end = start + (UInt_t) ((fullCycles*beamPeriod)/(fTimeResolution*fPacking));
     cout << endl << "PRunSingleHisto::EstimatBkg(): Background " << start << ", " << end;
     if (end == start)
       end = fRunInfo->GetBkgRange(1);
@@ -1545,7 +1583,7 @@ Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
   if (fScaleN0AndBkg)
     fBackground = bkg / (fTimeResolution * 1e3); // keep background (per 1 nsec) for chisq, max.log.likelihood, fTimeResolution us->ns
   else
-    fBackground = bkg * fRunInfo->GetPacking();  // keep background (per bin)
+    fBackground = bkg * fPacking;  // keep background (per bin)
 
   fRunInfo->SetBkgEstimated(fBackground, 0);
 

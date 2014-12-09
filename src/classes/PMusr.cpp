@@ -709,8 +709,11 @@ PMsrGlobalBlock::PMsrGlobalBlock()
   for (UInt_t i=0; i<4; i++) {
     fDataRange[i] = -1; // undefined data bin range
   }
+  fFitRangeInBins = false; // default is that fit range is given in time NOT bins
   fFitRange[0] = PMUSR_UNDEFINED; // undefined start fit range
   fFitRange[1] = PMUSR_UNDEFINED; // undefined end fit range
+  fFitRangeOffset[0] = -1; // undefined start fit range offset
+  fFitRangeOffset[1] = -1; // undefined end fit range offset
   fPacking = -1; // undefined packing/rebinning
 }
 
@@ -833,6 +836,43 @@ void PMsrGlobalBlock::SetFitRange(Double_t dval, UInt_t idx)
   fFitRange[idx] = dval;
 }
 
+//--------------------------------------------------------------------------
+// GetFitRangeOffset (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> get fit range offset value at position idx. idx: 0=fit range offset start, 1=fit range offset end.
+ *
+ * <b>return:</b>
+ * - fit range offset value, if idx is within proper boundaries
+ * - -1, otherwise
+ *
+ * \param idx index of the fit range value to be returned
+ */
+Int_t PMsrGlobalBlock::GetFitRangeOffset(UInt_t idx)
+{
+  if (idx >= 2)
+    return -1;
+
+  return fFitRangeOffset[idx];
+}
+
+//--------------------------------------------------------------------------
+// SetFitRangeOffset (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> set fit range offset value at position idx. Illegale values will be ignored.
+ *
+ * \param ival value to be set
+ * \param idx index of the fit range value to be set
+ */
+void PMsrGlobalBlock::SetFitRangeOffset(Int_t ival, UInt_t idx)
+{
+  if (idx >= 2)
+    return;
+
+  fFitRangeOffset[idx] = ival;
+}
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implementation PMsrRunBlock
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -863,8 +903,8 @@ PMsrRunBlock::PMsrRunBlock()
   fFitRangeInBins = false; // default is that fit range is given in time NOT bins
   fFitRange[0] = PMUSR_UNDEFINED; // undefined start fit range
   fFitRange[1] = PMUSR_UNDEFINED; // undefined end fit range
-  fFitRangeOffset[0] = 0; // undefined start fit range offset
-  fFitRangeOffset[1] = 0; // undefined end fit range offset
+  fFitRangeOffset[0] = -1; // undefined start fit range offset
+  fFitRangeOffset[1] = -1; // undefined end fit range offset
   fPacking = -1; // undefined packing
   fXYDataIndex[0] = -1; // undefined x data index (NonMusr)
   fXYDataIndex[1] = -1; // undefined y data index (NonMusr)
@@ -916,8 +956,8 @@ void PMsrRunBlock::CleanUp()
   fFitRangeInBins = false; // default is that fit range is given in time NOT bins
   fFitRange[0] = PMUSR_UNDEFINED; // undefined start fit range
   fFitRange[1] = PMUSR_UNDEFINED; // undefined end fit range
-  fFitRangeOffset[0] = 0; // undefined start fit range offset
-  fFitRangeOffset[1] = 0; // undefined end fit range offset
+  fFitRangeOffset[0] = -1; // undefined start fit range offset
+  fFitRangeOffset[1] = -1; // undefined end fit range offset
   fPacking = -1; // undefined packing
   fXYDataIndex[0] = -1; // undefined x data index (NonMusr)
   fXYDataIndex[1] = -1; // undefined y data index (NonMusr)

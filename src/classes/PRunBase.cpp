@@ -54,8 +54,8 @@ PRunBase::PRunBase()
   fRawData = 0;
   fTimeResolution = -1.0;
 
-  fFitStartTime = 0.0;
-  fFitEndTime   = 0.0;
+  fFitStartTime = PMUSR_UNDEFINED;
+  fFitEndTime   = PMUSR_UNDEFINED;
 
   fValid = true;
   fHandleTag = kEmpty;

@@ -604,7 +604,37 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         }
         break;
       case MSR_TAG_GLOBAL:
-        // STILL MISSING
+        // STILL QUITE A FEW ITEMS MISSING !!!!!!
+        sstr = str;
+        if (sstr.BeginsWith("fittype")) {
+          fout.width(16);
+          switch (fGlobal.GetFitType()) {
+            case MSR_FITTYPE_SINGLE_HISTO:
+              fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)" << endl;
+              break;
+            case MSR_FITTYPE_ASYM:
+              fout << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)" << endl ;
+              break;
+            case MSR_FITTYPE_MU_MINUS:
+              fout << left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << endl ;
+              break;
+            case MSR_FITTYPE_NON_MUSR:
+              fout << left << "fittype" << MSR_FITTYPE_NON_MUSR << "         (non muSR fit)" << endl ;
+              break;
+            default:
+              break;
+          }
+        } else if (sstr.BeginsWith("data")) {
+          // STILL MISSING
+        } else if (sstr.BeginsWith("t0")) {
+          // STILL MISSING
+        } else if (sstr.BeginsWith("fit")) {
+          // STILL MISSING
+        } else if (sstr.BeginsWith("packing")) {
+          // STILL MISSING
+        } else {
+          fout << str.Data() << endl;
+        }
         break;
       case MSR_TAG_RUN:
         sstr = str;
@@ -2646,13 +2676,49 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
       if (tokens->GetEntries() < 3) {
         error = true;
       } else { // fit given in time, i.e. fit <start> <end>, where <start>, <end> are given as doubles
-        for (Int_t i=1; i<3; i++) {
-          ostr = dynamic_cast<TObjString*>(tokens->At(i));
+        if (iter->fLine.Contains("fgb", TString::kIgnoreCase)) { // fit given in bins, i.e. fit fgb+n0 lgb-n1
+          // check 1st entry, i.e. fgb[+n0]
+          ostr = dynamic_cast<TObjString*>(tokens->At(1));
           str = ostr->GetString();
-          if (str.IsFloat())
-            global.SetFitRange(str.Atof(), i-1);
-          else
-            error = true;
+          Ssiz_t idx = str.First("+");
+          TString numStr = str;
+          if (idx > -1) { // '+' present hence extract n0
+            numStr.Remove(0,idx+1);
+            if (numStr.IsFloat()) {
+              global.SetFitRangeOffset(numStr.Atoi(), 0);
+            } else {
+              error = true;
+            }
+          } else { // n0 == 0
+            global.SetFitRangeOffset(0, 0);
+          }
+          // check 2nd entry, i.e. lgb[-n1]
+          ostr = dynamic_cast<TObjString*>(tokens->At(2));
+          str = ostr->GetString();
+          idx = str.First("-");
+          numStr = str;
+          if (idx > -1) { // '-' present hence extract n1
+            numStr.Remove(0,idx+1);
+            if (numStr.IsFloat()) {
+              global.SetFitRangeOffset(numStr.Atoi(), 1);
+            } else {
+              error = true;
+            }
+          } else { // n0 == 0
+            global.SetFitRangeOffset(0, 0);
+          }
+
+          if (!error)
+            global.SetFitRangeInBins(true);
+        } else { // fit given in time, i.e. fit <start> <end>, where <start>, <end> are given as doubles
+          for (Int_t i=1; i<3; i++) {
+            ostr = dynamic_cast<TObjString*>(tokens->At(i));
+            str = ostr->GetString();
+            if (str.IsFloat())
+              global.SetFitRange(str.Atof(), i-1);
+            else
+              error = true;
+          }
         }
       }
     } else if (iter->fLine.BeginsWith("packing", TString::kIgnoreCase)) { // packing

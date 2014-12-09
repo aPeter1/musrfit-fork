@@ -537,21 +537,27 @@ class PMsrGlobalBlock {
     virtual Int_t GetDataRange(UInt_t idx);
     virtual UInt_t GetT0BinSize() { return fT0.size(); }
     virtual Double_t GetT0Bin(UInt_t idx=0);
+    virtual Bool_t IsFitRangeInBin() { return fFitRangeInBins; }
     virtual Double_t GetFitRange(UInt_t idx);
+    virtual Int_t GetFitRangeOffset(UInt_t idx);
     virtual Int_t GetPacking() { return fPacking; }
 
     virtual void SetFitType(Int_t ival) { fFitType = ival; }
     virtual void SetDataRange(Int_t ival, Int_t idx);
     virtual void SetT0Bin(Double_t dval, Int_t idx=-1);
+    virtual void SetFitRangeInBins(Bool_t bval) { fFitRangeInBins = bval; }
     virtual void SetFitRange(Double_t dval, UInt_t idx);
+    virtual void SetFitRangeOffset(Int_t ival, UInt_t idx);
     virtual void SetPacking(Int_t ival) { fPacking = ival; }
 
   private:
-    Int_t fFitType;        ///< fit type: 0=single histo fit, 2=asymmetry fit, 4=mu^- single histo fit, 8=non muSR fit
-    Int_t fDataRange[4];   ///< data bin range (fit type 0, 2, 4)
-    PDoubleVector fT0;     ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type
-    Double_t fFitRange[2]; ///< fit range in (us)
-    Int_t fPacking;        ///< packing/rebinning
+    Int_t fFitType;           ///< fit type: 0=single histo fit, 2=asymmetry fit, 4=mu^- single histo fit, 8=non muSR fit
+    Int_t fDataRange[4];      ///< data bin range (fit type 0, 2, 4)
+    PDoubleVector fT0;        ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type
+    Bool_t fFitRangeInBins;   ///< flag telling if fit range is given in time or in bins
+    Double_t fFitRange[2];    ///< fit range in (us)
+    Int_t fFitRangeOffset[2]; ///< if fit range is given in bins it can have the form fit fgb+n0 lgb-n1. This variable holds the n0 and n1.
+    Int_t fPacking;           ///< packing/rebinning
 };
 
 //-------------------------------------------------------------
