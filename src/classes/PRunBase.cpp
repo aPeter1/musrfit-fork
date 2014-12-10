@@ -109,8 +109,8 @@ PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo,
   }
 
   // set fit time ranges
-  fFitStartTime = fRunInfo->GetFitRange(0);
-  fFitEndTime   = fRunInfo->GetFitRange(1);
+  fFitStartTime = PMUSR_UNDEFINED;
+  fFitEndTime   = PMUSR_UNDEFINED;
 }
 
 //--------------------------------------------------------------------------

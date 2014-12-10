@@ -50,7 +50,7 @@ using namespace std;
  *
  * \param fileName name of a msr-file.
  */
-PMsrHandler::PMsrHandler(const Char_t *fileName, const Bool_t fourierOnly, PStartupOptions *startupOptions) :
+PMsrHandler::PMsrHandler(const Char_t *fileName, PStartupOptions *startupOptions, const Bool_t fourierOnly) :
     fFourierOnly(fourierOnly), fStartupOptions(startupOptions), fFileName(fileName)
 { 
   // init variables
@@ -311,10 +311,10 @@ Int_t PMsrHandler::ReadMsrFile()
     if (!CheckAddRunParameters())
       result = PMUSR_MSR_SYNTAX_ERROR;
 
-  // check if the user wants to use max likelihood with asymmetry/non-muSR fit (which is not implemented)
-  if (result == PMUSR_SUCCESS)
-    CheckMaxLikelihood();
-
+  if (result == PMUSR_SUCCESS) {
+    CheckMaxLikelihood(); // check if the user wants to use max likelihood with asymmetry/non-muSR fit (which is not implemented)
+    CheckLegacyLifetimecorrection(); // check if lifetimecorrection is found in RUN blocks, if yes transfer it to PLOT blocks
+  }
 
   // clean up
   fit_parameter.clear();
@@ -604,7 +604,6 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         }
         break;
       case MSR_TAG_GLOBAL:
-        // STILL QUITE A FEW ITEMS MISSING !!!!!!
         sstr = str;
         if (sstr.BeginsWith("fittype")) {
           fout.width(16);
@@ -625,13 +624,58 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
               break;
           }
         } else if (sstr.BeginsWith("data")) {
-          // STILL MISSING
+          fout.width(16);
+          fout << left << "data";
+          for (UInt_t j=0; j<4; j++) {
+            if (fGlobal.GetDataRange(j) > 0) {
+              fout.width(8);
+              fout << left << fGlobal.GetDataRange(j);
+            }
+          }
+          fout << endl;
         } else if (sstr.BeginsWith("t0")) {
-          // STILL MISSING
+          fout.width(16);
+          fout << left << "t0";
+          for (UInt_t j=0; j<fGlobal.GetT0BinSize(); j++) {
+            fout.width(8);
+            fout.precision(1);
+            fout.setf(ios::fixed,ios::floatfield);
+            fout << left << fGlobal.GetT0Bin(j);
+          }
+          fout << endl;
         } else if (sstr.BeginsWith("fit")) {
-          // STILL MISSING
+          fout.width(16);
+          fout << left << "fit";
+          if (fGlobal.IsFitRangeInBin()) { // fit range given in bins
+            fout << "fgb";
+            if (fGlobal.GetFitRangeOffset(0) > 0)
+              fout << "+" << fGlobal.GetFitRangeOffset(0);
+            fout << "   lgb";
+            if (fGlobal.GetFitRangeOffset(1) > 0)
+              fout << "-" << fGlobal.GetFitRangeOffset(1);
+            neededPrec = LastSignificant(fGlobal.GetFitRange(0));
+            if (LastSignificant(fGlobal.GetFitRange(1)) > neededPrec)
+              neededPrec = LastSignificant(fGlobal.GetFitRange(1));
+            fout.precision(neededPrec);
+            fout << "  # in time: " << fGlobal.GetFitRange(0) << ".." << fGlobal.GetFitRange(1) << " (usec)";
+          } else { // fit range given in time
+            for (UInt_t j=0; j<2; j++) {
+              if (fGlobal.GetFitRange(j) == -1)
+                break;
+              neededWidth = 7;
+              neededPrec = LastSignificant(fGlobal.GetFitRange(j));
+              fout.width(neededWidth);
+              fout.precision(neededPrec);
+              fout << left << fixed << fGlobal.GetFitRange(j);
+              if (j==0)
+                fout << " ";
+            }
+          }
+          fout << endl;
         } else if (sstr.BeginsWith("packing")) {
-          // STILL MISSING
+          fout.width(16);
+          fout << left << "packing";
+          fout << fGlobal.GetPacking() << endl;
         } else {
           fout << str.Data() << endl;
         }
@@ -731,9 +775,13 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           fout << left << "lifetime";
           fout << fRuns[runNo].GetLifetimeParamNo() << endl;
         } else if (sstr.BeginsWith("lifetimecorrection")) {
-          if ((fRuns[runNo].IsLifetimeCorrected()) && (fRuns[runNo].GetFitType() == MSR_FITTYPE_SINGLE_HISTO)) {
+/* obsolate, hence do nothing here
+          if ((fRuns[runNo].IsLifetimeCorrected()) &&
+              ((fRuns[runNo].GetFitType() == MSR_FITTYPE_SINGLE_HISTO) ||
+               (fGlobal.GetFitType() == MSR_FITTYPE_SINGLE_HISTO))) {
             fout << "lifetimecorrection" << endl;
           }
+*/
         } else if (sstr.BeginsWith("map")) {
           fout << "map         ";
           for (UInt_t j=0; j<fRuns[runNo].GetMap()->size(); j++) {
@@ -940,7 +988,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             if (LastSignificant(fRuns[runNo].GetFitRange(1)) > neededPrec)
               neededPrec = LastSignificant(fRuns[runNo].GetFitRange(1));
             fout.precision(neededPrec);
-            fout << "  # in time: " << fRuns[runNo].GetFitRange(0) << ".." << fRuns[runNo].GetFitRange(1) << " in (usec)";
+            fout << "  # in time: " << fRuns[runNo].GetFitRange(0) << ".." << fRuns[runNo].GetFitRange(1) << " (usec)";
           } else { // fit range given in time
             for (UInt_t j=0; j<2; j++) {
               if (fRuns[runNo].GetFitRange(j) == -1)
@@ -1054,6 +1102,13 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           default:
             break;
           }
+          if (fPlots[plotNo].fLifeTimeCorrection) {
+            fout << "lifetimecorrection" << endl;
+          }
+        } else if (sstr.BeginsWith("lifetimecorrection")) {
+          // do nothing, since it is already handled in the lines above.
+          // The reason why this handled that oddly is due to legacy issues
+          // of this flag, i.e. transfer from RUN -> PLOT
         } else if (sstr.BeginsWith("runs")) {
           fout << "runs     ";
           fout.precision(0);
@@ -2707,7 +2762,6 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
           } else { // n0 == 0
             global.SetFitRangeOffset(0, 0);
           }
-
           if (!error)
             global.SetFitRangeInBins(true);
         } else { // fit given in time, i.e. fit <start> <end>, where <start>, <end> are given as doubles
@@ -2766,6 +2820,8 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
   cout << endl << "debug> Global: t0's      : ";
   for (UInt_t i=0; i<fGlobal.GetT0BinSize(); i++)
     cout << fGlobal.GetT0Bin(i) << ", ";
+  cout << endl << "debug> Global: fit in bin: " << fGlobal.IsFitRangeInBin();
+  cout << endl << "debug> Global: fit offset: " << fGlobal.GetFitRangeOffset(0) << ", " << fGlobal.GetFitRangeOffset(1);
   cout << endl << "debug> Global: fit       : " << fGlobal.GetFitRange(0) << ", " << fGlobal.GetFitRange(1);
   cout << endl << "debug> Global: packing   : " << fGlobal.GetPacking();
   cout << endl;
@@ -3736,6 +3792,7 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
 
     // initialize param structure
     param.fPlotType = -1;
+    param.fLifeTimeCorrection = false;
     param.fUseFitRanges = false; // i.e. if not overwritten use the range info of the plot block
     param.fLogX = false; // i.e. if not overwritten use linear x-axis
     param.fLogY = false; // i.e. if not overwritten use linear y-axis
@@ -3784,6 +3841,8 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           delete tokens;
           tokens = 0;
         }
+      } else if (iter1->fLine.Contains("lifetimecorrection", TString::kIgnoreCase)) {
+        param.fLifeTimeCorrection = true;
       } else if (iter1->fLine.Contains("runs", TString::kIgnoreCase)) { // handle plot runs
         TComplex run;
         switch (param.fPlotType) {
@@ -4937,12 +4996,14 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           }
         }
         // check fit range
-        if (!fRuns[i].IsFitRangeInBin()) { // fit range given as times in usec
+        if (!fRuns[i].IsFitRangeInBin()) { // fit range given as times in usec (RUN block)
           if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) { // check fit range in RUN block
-            if ((fGlobal.GetFitRange(0) == PMUSR_UNDEFINED) || (fGlobal.GetFitRange(1) == PMUSR_UNDEFINED)) { // check fit range in GLOBAL block
-              cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-              cerr << endl << "  Fit range is not defined. Necessary for single histogram fits." << endl;
-              return false;
+            if (!fGlobal.IsFitRangeInBin()) { // fit range given as times in usec (GLOBAL block)
+              if ((fGlobal.GetFitRange(0) == PMUSR_UNDEFINED) || (fGlobal.GetFitRange(1) == PMUSR_UNDEFINED)) { // check fit range in GLOBAL block
+                cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+                cerr << endl << "  Fit range is not defined. Necessary for single histogram fits." << endl;
+                return false;
+              }
             }
           }
         }
@@ -5380,7 +5441,7 @@ void PMsrHandler::CheckMaxLikelihood()
 {
   if (!fStatistic.fChisq) {
     for (UInt_t i=0; i<fRuns.size(); i++) {
-      if (fRuns[i].GetFitType() != MSR_FITTYPE_SINGLE_HISTO) {
+      if ((fRuns[i].GetFitType() != MSR_FITTYPE_SINGLE_HISTO) && (fGlobal.GetFitType() != MSR_FITTYPE_SINGLE_HISTO)) {
         cerr << endl << ">> PMsrHandler::CheckMaxLikelihood: **WARNING**: Maximum Log Likelihood Fit is only implemented";
         cerr << endl << ">>    for Single Histogram Fit. Will fall back to Chi Square Fit.";
         cerr << endl << endl;
@@ -5645,6 +5706,28 @@ void PMsrHandler::MakeDetectorGroupingString(TString str, PIntVector &group, TSt
     }
     result += " ";
   } while (i<group.size());
+}
+
+//--------------------------------------------------------------------------
+// CheckLegacyLifetimecorrection (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Checks for lifetimecorrection flags in the RUN-blocks and if present,
+ * transfer it to the PLOT-blocks. This is needed since originally the lifetimecorrection
+ * was (miss)placed in the RUN-blocks rather than in the PLOT-blocks where it
+ * most naturally would have been expected.
+ */
+void PMsrHandler::CheckLegacyLifetimecorrection()
+{
+  UInt_t idx=0;
+  for (UInt_t i=0; i<fPlots.size(); i++) {
+    for (UInt_t j=0; j<fPlots[i].fRuns.size(); j++) {
+      idx = fPlots[i].fRuns[j];
+      if (fRuns[idx].IsLifetimeCorrected()) {
+        fPlots[i].fLifeTimeCorrection = true;
+      }
+    }
+  }
 }
 
 // end ---------------------------------------------------------------------

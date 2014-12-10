@@ -804,55 +804,13 @@ Bool_t PRunSingleHisto::PrepareData()
   cout.precision(10);
   cout << endl << ">> PRunSingleHisto::PrepareData(): time resolution=" << fixed << runData->GetTimeResolution() << "(ns)" << endl;
 
-  if (fHandleTag == kFit)
-    success = PrepareFitData(runData, histoNo[0]);
-  else if ((fHandleTag == kView) && !fRunInfo->IsLifetimeCorrected())
-    success = PrepareRawViewData(runData, histoNo[0]);
-  else if ((fHandleTag == kView) && fRunInfo->IsLifetimeCorrected())
-    success = PrepareViewData(runData, histoNo[0]);
-  else
-    success = false;
-
-  // cleanup
-  histoNo.clear();
-
-  return success;
-}
-
-//--------------------------------------------------------------------------
-// PrepareFitData (protected)
-//--------------------------------------------------------------------------
-/**
- * <p>Take the pre-processed data (i.e. grouping and addrun are preformed) and form the histogram for fitting.
- * The following steps are preformed:
- * -# get fit start/stop time
- * -# check that 'first good data bin', 'last good data bin', and 't0' make any sense
- * -# check how the background shall be handled, i.e. fitted, subtracted from background estimate data range, or subtacted from a given fixed background.
- * -# packing (i.e rebinning)
- *
- * <b>return:</b>
- * - true, if everything went smooth
- * - false, otherwise
- *
- * \param runData raw run data handler
- * \param histoNo forward histogram number
- */
-Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoNo)
-{
-  if (fMsrInfo->EstimateN0()) {
-    EstimateN0();
-  }
-
-  // transform raw histo data. This is done the following way (for details see the manual):
-  // for the single histo fit, just the rebinned raw data are copied
-
   // first get start data, end data, and t0
   Int_t start;
   Int_t end;
   start = fRunInfo->GetDataRange(0);
   end   = fRunInfo->GetDataRange(1);
 
-  // check if data range has been provided, and if not try to get it from the GLOBAL block section
+  // check if data range has been given in the RUN block, if not try to get it from the GLOBAL block
   if (start < 0) {
     start = fMsrInfo->GetMsrGlobal()->GetDataRange(0);
   }
@@ -900,20 +858,83 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
   // keep good bins for potential later use
   fGoodBins[0] = start;
   fGoodBins[1] = end;
+cout << endl << "debug> PRunSingleHisto::PrepareData(): start=" << start << ", end=" << end << endl;
 
+
+  // set fit start/end time; first check RUN Block
+  fFitStartTime = fRunInfo->GetFitRange(0);
+  fFitEndTime   = fRunInfo->GetFitRange(1);
   // if fit range is given in bins (and not time), the fit start/end time can be calculated at this point now
   if (fRunInfo->IsFitRangeInBin()) {
-    fFitStartTime = (fRunInfo->GetDataRange(0) + fRunInfo->GetFitRangeOffset(0) - fT0s[0]) * fTimeResolution; // (fgb+n0-t0)*dt
-    fFitEndTime = (fRunInfo->GetDataRange(1) - fRunInfo->GetFitRangeOffset(1) - fT0s[0]) * fTimeResolution;   // (lgb-n1-t0)*dt
+    fFitStartTime = (start + fRunInfo->GetFitRangeOffset(0) - fT0s[0]) * fTimeResolution; // (fgb+n0-t0)*dt
+    fFitEndTime = (end - fRunInfo->GetFitRangeOffset(1) - fT0s[0]) * fTimeResolution;   // (lgb-n1-t0)*dt
     // write these times back into the data structure. This way it is available when writting the log-file
     fRunInfo->SetFitRange(fFitStartTime, 0);
     fRunInfo->SetFitRange(fFitEndTime, 1);
   }
-
-  // check if fit range is given in the run block. If not, i.e. it has to be found in the global section!
-  if (fRunInfo->GetFitRange(0) == PMUSR_UNDEFINED) {
-// ANYTHING NEEDED AT THIS POINT??? as35
+  if (fFitStartTime == PMUSR_UNDEFINED) { // fit start/end NOT found in the RUN block, check GLOBAL block
+    fFitStartTime = globalBlock->GetFitRange(0);
+    fFitEndTime   = globalBlock->GetFitRange(1);
+    // if fit range is given in bins (and not time), the fit start/end time can be calculated at this point now
+    if (globalBlock->IsFitRangeInBin()) {
+      fFitStartTime = (start + globalBlock->GetFitRangeOffset(0) - fT0s[0]) * fTimeResolution; // (fgb+n0-t0)*dt
+      fFitEndTime = (end - globalBlock->GetFitRangeOffset(1) - fT0s[0]) * fTimeResolution;   // (lgb-n1-t0)*dt
+      // write these times back into the data structure. This way it is available when writting the log-file
+      globalBlock->SetFitRange(fFitStartTime, 0);
+      globalBlock->SetFitRange(fFitEndTime, 1);
+    }
   }
+  if ((fFitStartTime == PMUSR_UNDEFINED) || (fFitEndTime == PMUSR_UNDEFINED)) {
+    cerr << "PRunSingleHisto::PrepareData(): **ERROR** Couldn't get fit start/end time!" << endl;
+    return false;
+  }
+cout << endl << "debug> PRunSingleHisto::PrepareData(): fFitStartTime=" << fFitStartTime << ", fFitEndTime=" << fFitEndTime << endl;
+
+  Bool_t lifetimecorrection = false;
+  PMsrPlotList *plot = fMsrInfo->GetMsrPlotList();
+  lifetimecorrection = plot->at(0).fLifeTimeCorrection;
+
+  if (fHandleTag == kFit)
+    success = PrepareFitData(runData, histoNo[0]);
+  else if ((fHandleTag == kView) && !lifetimecorrection)
+    success = PrepareRawViewData(runData, histoNo[0]);
+  else if ((fHandleTag == kView) && lifetimecorrection)
+    success = PrepareViewData(runData, histoNo[0]);
+  else
+    success = false;
+
+  // cleanup
+  histoNo.clear();
+
+  return success;
+}
+
+//--------------------------------------------------------------------------
+// PrepareFitData (protected)
+//--------------------------------------------------------------------------
+/**
+ * <p>Take the pre-processed data (i.e. grouping and addrun are preformed) and form the histogram for fitting.
+ * The following steps are preformed:
+ * -# get fit start/stop time
+ * -# check that 'first good data bin', 'last good data bin', and 't0' make any sense
+ * -# check how the background shall be handled, i.e. fitted, subtracted from background estimate data range, or subtacted from a given fixed background.
+ * -# packing (i.e rebinning)
+ *
+ * <b>return:</b>
+ * - true, if everything went smooth
+ * - false, otherwise
+ *
+ * \param runData raw run data handler
+ * \param histoNo forward histogram number
+ */
+Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoNo)
+{
+  if (fMsrInfo->EstimateN0()) {
+    EstimateN0();
+  }
+
+  // transform raw histo data. This is done the following way (for details see the manual):
+  // for the single histo fit, just the rebinned raw data are copied
 
   // check how the background shall be handled
   if (fRunInfo->GetBkgFitParamNo() == -1) { // bkg shall **NOT** be fitted
@@ -949,9 +970,9 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
     normalizer = fPacking * (fTimeResolution * 1.0e3); // fTimeResolution us->ns
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.SetDataTimeStart(fTimeResolution*((Double_t)start-(Double_t)t0+(Double_t)(fPacking-1)/2.0));
+  fData.SetDataTimeStart(fTimeResolution*((Double_t)fGoodBins[0]-(Double_t)t0+(Double_t)(fPacking-1)/2.0));
   fData.SetDataTimeStep(fTimeResolution*fPacking);
-  for (Int_t i=start; i<end; i++) {
+  for (Int_t i=fGoodBins[0]; i<fGoodBins[1]; i++) {
     if (fPacking == 1) {
       value = fForward[i];
       value /= normalizer;
@@ -961,7 +982,7 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
       else
         fData.AppendErrorValue(TMath::Sqrt(value));
     } else { // packed data, i.e. fPacking > 1
-      if (((i-start) % fPacking == 0) && (i != start)) { // fill data
+      if (((i-fGoodBins[0]) % fPacking == 0) && (i != fGoodBins[0])) { // fill data
         value /= normalizer;
         fData.AppendValue(value);
         if (value == 0.0)
@@ -1017,7 +1038,7 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
 
   // raw data, since PMusrCanvas is doing ranging etc.
   // start = the first bin which is a multiple of packing backward from first good data bin
-  Int_t start = fRunInfo->GetDataRange(0) - (fRunInfo->GetDataRange(0)/packing)*packing;
+  Int_t start = fGoodBins[0] - (fGoodBins[0]/packing)*packing;
   // end = last bin starting from start which is a multipl of packing and still within the data 
   Int_t end   = start + ((fForward.size()-start)/packing)*packing;
   // check if data range has been provided, and if not try to estimate them
@@ -1025,7 +1046,7 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
     Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
     start = ((Int_t)fT0s[0]+offset) - (((Int_t)fT0s[0]+offset)/packing)*packing;
     end = start + ((fForward.size()-start)/packing)*packing;
-    cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range start = " << start << ".";
+    cerr << endl << ">> PRunSingleHisto::PrepareRawViewData(): **WARNING** data range was not provided, will try data range start = " << start << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   }
@@ -1047,12 +1068,6 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
     cerr << endl << ">> PRunSingleHisto::PrepareRawViewData(): **ERROR** end data bin doesn't make any sense!";
     cerr << endl;
     return false;
-  }
-
-  // if fit range is given in bins (and not time), the fit start/end time can be calculated at this point now
-  if (fRunInfo->IsFitRangeInBin()) {
-    fFitStartTime = (fRunInfo->GetDataRange(0) + fRunInfo->GetFitRangeOffset(0) - fT0s[0]) * fTimeResolution; // (fgb+n0-t0)*dt
-    fFitEndTime = (fRunInfo->GetDataRange(1) - fRunInfo->GetFitRangeOffset(1) - fT0s[0]) * fTimeResolution;   // (lgb-n1-t0)*dt
   }
 
   // everything looks fine, hence fill data set
@@ -1116,7 +1131,7 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
       } else { // no background given to do the job, try estimate
         fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[0]*0.1), 0);
         fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[0]*0.6), 1);
-        cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** Neither fix background nor background bins are given!";
+        cerr << endl << ">> PRunSingleHisto::PrepareRawViewData(): **WARNING** Neither fix background nor background bins are given!";
         cerr << endl << ">> Will try the following: bkg start = " << fRunInfo->GetBkgRange(0) << ", bkg end = " << fRunInfo->GetBkgRange(1);
         cerr << endl << ">> NO WARRANTY THAT THIS MAKES ANY SENSE! Better check ...";
         cerr << endl;
@@ -1218,7 +1233,7 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
   Int_t t0 = (Int_t)fT0s[0];
 
   // start = the first bin which is a multiple of packing backward from first good data bin
-  Int_t start = fRunInfo->GetDataRange(0) - (fRunInfo->GetDataRange(0)/packing)*packing;
+  Int_t start = fGoodBins[0] - (fGoodBins[0]/packing)*packing;
   // end = last bin starting from start which is a multiple of packing and still within the data
   Int_t end   = start + ((fForward.size()-start)/packing)*packing;
 
@@ -1227,7 +1242,7 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
     Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
     start = ((Int_t)fT0s[0]+offset) - (((Int_t)fT0s[0]+offset)/packing)*packing;
     end = start + ((fForward.size()-start)/packing)*packing;
-    cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range start = " << start << ".";
+    cerr << endl << ">> PRunSingleHisto::PrepareViewData(): **WARNING** data range was not provided, will try data range start = " << start << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   }
@@ -1250,12 +1265,6 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
     cerr << endl << ">> PRunSingleHisto::PrepareViewData(): **ERROR** end data bin doesn't make any sense!";
     cerr << endl;
     return false;
-  }
-
-  // if fit range is given in bins (and not time), the fit start/end time can be calculated at this point now
-  if (fRunInfo->IsFitRangeInBin()) {
-    fFitStartTime = (fRunInfo->GetDataRange(0) + fRunInfo->GetFitRangeOffset(0) - fT0s[0]) * fTimeResolution; // (fgb+n0-t0)*dt
-    fFitEndTime = (fRunInfo->GetDataRange(1) - fRunInfo->GetFitRangeOffset(1) - fT0s[0]) * fTimeResolution;   // (lgb-n1-t0)*dt
   }
 
   // everything looks fine, hence fill data set
@@ -1296,7 +1305,7 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
       } else { // no background given to do the job, try estimate
         fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[0]*0.1), 0);
         fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[0]*0.6), 1);
-        cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** Neither fix background nor background bins are given!";
+        cerr << endl << ">> PRunSingleHisto::PrepareViewData(): **WARNING** Neither fix background nor background bins are given!";
         cerr << endl << ">> Will try the following: bkg start = " << fRunInfo->GetBkgRange(0) << ", bkg end = " << fRunInfo->GetBkgRange(1);
         cerr << endl << ">> NO WARRANTY THAT THIS MAKES ANY SENSE! Better check ...";
         cerr << endl;

@@ -713,6 +713,7 @@ typedef struct {
  */
 typedef struct {
   Int_t    fPlotType;      ///< plot type
+  Bool_t   fLifeTimeCorrection; ///< needed for single histo. If yes, only the asymmetry is shown, otherweise the positron spectrum
   Bool_t   fUseFitRanges;  ///< yes -> use the fit ranges to plot the data, no (default) -> use range information if present
   Bool_t   fLogX;          ///< yes -> x-axis in log-scale, no (default) -> x-axis in lin-scale
   Bool_t   fLogY;          ///< yes -> y-axis in log-scale, no (default) -> y-axis in lin-scale

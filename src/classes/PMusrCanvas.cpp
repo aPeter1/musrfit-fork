@@ -596,6 +596,9 @@ void PMusrCanvas::UpdateDataTheoryPad()
   UInt_t runNo;
   PMsrPlotStructure plotInfo = fMsrHandler->GetMsrPlotList()->at(fPlotNumber);
   PMsrRunList runs = *fMsrHandler->GetMsrRunList();
+  PMsrGlobalBlock *globalBlock = fMsrHandler->GetMsrGlobal();
+
+  Int_t fitType = globalBlock->GetFitType();
 
   fPlotType = plotInfo.fPlotType;
   for (UInt_t i=0; i<plotInfo.fRuns.size(); i++) {
@@ -608,9 +611,14 @@ void PMusrCanvas::UpdateDataTheoryPad()
     }
     // check that the plottype and the fittype do correspond
     runNo = (UInt_t)plotInfo.fRuns[i]-1;
-    if (fPlotType != runs[runNo].GetFitType()) {
+    if (runs[runNo].GetFitType() != -1) { // fit type found in RUN block, hence overwrite the GLOBAL block
+      fitType = runs[runNo].GetFitType();
+    }
+    if (fitType) {
       fValid = false;
-      cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** plottype = " << fPlotType << ", fittype = " << runs[runNo].GetFitType() << ", however they have to correspond!";
+      cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** plottype = " << fPlotType;
+      cerr << ", fittype = " << runs[runNo].GetFitType() << "(RUN block)/";
+      cerr << "fittype = " << globalBlock->GetFitType() << "(GLOBAL block). However, they have to correspond!";
       cerr << endl;
       return;
     }
@@ -622,7 +630,10 @@ void PMusrCanvas::UpdateDataTheoryPad()
     data = 0;
     runNo = (UInt_t)plotInfo.fRuns[i]-1;
     // get data depending on the fittype
-    switch (runs[runNo].GetFitType()) {
+    if (runs[runNo].GetFitType() != -1) { // fit type found in RUN block, hence overwrite the GLOBAL block
+      fitType = runs[runNo].GetFitType();
+    }
+    switch (fitType) {
       case MSR_FITTYPE_SINGLE_HISTO:
         data = fRunList->GetSingleHisto(runNo, PRunListCollection::kRunNo);
         if (!data) { // something wrong

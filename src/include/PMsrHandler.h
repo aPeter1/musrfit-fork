@@ -45,7 +45,7 @@
 class PMsrHandler
 {
   public:
-    PMsrHandler(const Char_t *fileName, const Bool_t fourierOnly=false, PStartupOptions *startupOptions=0);
+    PMsrHandler(const Char_t *fileName, PStartupOptions *startupOptions=0, const Bool_t fourierOnly=false);
     virtual ~PMsrHandler();
 
     virtual Int_t ReadMsrFile();
@@ -154,6 +154,8 @@ class PMsrHandler
 
     virtual Bool_t ParseDetectorGrouping(TString str, PIntVector &group);
     virtual void MakeDetectorGroupingString(TString str, PIntVector &group, TString &result, Bool_t includeDetector = true);
+
+    virtual void CheckLegacyLifetimecorrection();
 };
 
 #endif // _PMSRHANDLER_H_
